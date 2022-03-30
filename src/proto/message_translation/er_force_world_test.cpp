@@ -47,8 +47,8 @@ TEST(ErForceWorldTest, test_create_robot)
     const Point expected_pos(sim_robot->p_x(), sim_robot->p_y());
     const Vector expected_vel(sim_robot->v_x(), sim_robot->v_y());
     RobotState expected_state(expected_pos, expected_vel, Angle::zero(),
-                              Angle::fromDegrees(45));
+                              Angle::fromRadians(5.0));
     EXPECT_EQ(0, test_robot.id());
     EXPECT_TRUE(TestUtil::equalWithinTolerance(test_robot.currentState(), expected_state,
-                                               1e-6, Angle::fromDegrees(1)));
+                                               1e-6, Angle::fromDegrees(0)));
 }

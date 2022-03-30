@@ -50,6 +50,9 @@ class Robot
 
     /**
      * Creates a new robot based on the TbotsProto::Robot protobuf representation
+     * NOTE: TbotsProto::Robot does not store the robot constants and the original robot
+     * constants is lost in the conversion, as a result, the 2021 robot constants are used
+     * as default.
      *
      * @param robot_proto The TbotsProto::Robot protobuf which this robot should be based
      * on

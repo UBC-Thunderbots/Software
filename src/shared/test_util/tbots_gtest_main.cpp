@@ -21,7 +21,7 @@ int main(int argc, char **argv)
     auto args           = std::make_shared<TbotsGtestMainCommandLineArgs>();
     bool help_requested = args->loadFromCommandLineArguments(argc, argv);
 
-    TbotsGtestMain::logging_dir = args->getLoggingDir()->value();
+    TbotsGtestMain::logging_dir = args->getRuntimeDir()->value();
 
     if (!help_requested)
     {

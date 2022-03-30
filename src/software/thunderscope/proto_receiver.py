@@ -1,19 +1,17 @@
-import software.thunderscope.constants as constants
 import queue
 from threading import Thread
-from software.networking.threaded_unix_listener import ThreadedUnixListener
+
 import software.thunderscope.constants as constants
+from software.networking.threaded_unix_listener import ThreadedUnixListener
 
 
 class ProtoReceiver:
     def __init__(self):
         self.proto_map = dict()
         self.proto_receiver = ThreadedUnixListener(
-            constants.UNIX_SOCKET_BASE_PATH + "protobuf",
-            convert_from_any=True,
-            max_buffer_size=3,
+            constants.UNIX_SOCKET_BASE_PATH + "protobuf", max_buffer_size=3,
         )
-        self.thread = Thread(target=self.start)
+        self.thread = Thread(target=self.start, daemon=True)
         self.thread.start()
 
     def start(self):

@@ -9,23 +9,24 @@
 
 #include <Arduino.h>
 
-/**
- * main code to be run on Arduino
- */
-
-int input_pin = 7;
+int ESTOP_BUTTON_PIN = 7;
 
 void setup()
 {
     Serial.begin(ARDUINO_BAUD_RATE);  // opens serial port, sets data rate
-    pinMode(input_pin, INPUT_PULLUP);
+    pinMode(ESTOP_BUTTON_PIN, INPUT_PULLUP);
 }
 
 void loop()
 {
-    // PLAY when connected to gnd, STOP when yanked out
+    // When the estop is disabled (button released)
+    //    - circuit is closed
+    //    - the input is pulled down, we send ESTOP_PLAY_MSG
+    // When the estop is enabled (button pushed down)
+    //    - circuit is broken
+    //    - the input is pulled up, we send ESTOP_STOP_MSG
     unsigned char estop_val =
-        digitalRead(input_pin) == 0 ? ESTOP_PLAY_MSG : ESTOP_STOP_MSG;
+        digitalRead(ESTOP_BUTTON_PIN) == 1 ? ESTOP_PLAY_MSG : ESTOP_STOP_MSG;
 
     Serial.write(estop_val);
 }
