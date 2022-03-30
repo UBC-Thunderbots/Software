@@ -159,10 +159,10 @@ class HRVOAgent : public Agent
     // TODO (#2519): Remove magic numbers
     // Increasing deceleration distance to reduce the chance of overshooting the
     // destination
-    static constexpr float decel_dist_multiplier = 1.f;
+    static constexpr float decel_dist_multiplier = 1.2f;
     // Decreasing preferred speed during deceleration to reduce the chance of
     // overshooting the destination
-    static constexpr float decel_pref_speed_multiplier = 1.0f;
+    static constexpr float decel_pref_speed_multiplier = 0.6f;
 
 //    TODO: addedd for debugging
     float in_decel_zone = 0.f;
