@@ -109,17 +109,16 @@ std::unique_ptr<TbotsProto::Primitive> createChipPrimitive(
     TbotsProto::MotionControl motion_control;
     TbotsProto::Path path_proto;
 
-    *(path_proto.add_point()) = *createPointProto(chip_origin);
+    *(path_proto.add_point())        = *createPointProto(chip_origin);
     *(motion_control.mutable_path()) = path_proto;
 
-    motion_control.set_path_length( 0);
+    motion_control.set_path_length(0);
 
     return createCostedMovePrimitive(
         motion_control, chip_direction, 0.0, TbotsProto::DribblerMode::OFF,
         TbotsProto::BallCollisionType::ALLOW,
         AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, chip_distance_meters},
-        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0, robot_constants,
-        cost);
+        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0, robot_constants, cost);
 }
 
 std::unique_ptr<TbotsProto::Primitive> createKickPrimitive(
@@ -129,17 +128,16 @@ std::unique_ptr<TbotsProto::Primitive> createKickPrimitive(
     TbotsProto::MotionControl motion_control;
     TbotsProto::Path path_proto;
 
-    *(path_proto.add_point()) = *createPointProto(kick_origin);
+    *(path_proto.add_point())        = *createPointProto(kick_origin);
     *(motion_control.mutable_path()) = path_proto;
 
-    motion_control.set_path_length( 0);
+    motion_control.set_path_length(0);
 
-        return createCostedMovePrimitive(
-            motion_control, kick_direction, 0.0, TbotsProto::DribblerMode::OFF,
-            TbotsProto::BallCollisionType::ALLOW,
-            AutoChipOrKick{AutoChipOrKickMode::AUTOKICK, kick_speed_meters_per_second},
-            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0, robot_constants,
-            cost);
+    return createCostedMovePrimitive(
+        motion_control, kick_direction, 0.0, TbotsProto::DribblerMode::OFF,
+        TbotsProto::BallCollisionType::ALLOW,
+        AutoChipOrKick{AutoChipOrKickMode::AUTOKICK, kick_speed_meters_per_second},
+        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0, robot_constants, cost);
 }
 
 std::unique_ptr<TbotsProto::Primitive> createStopPrimitive(bool coast)

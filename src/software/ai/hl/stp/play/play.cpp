@@ -113,39 +113,43 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
                 buildMotionConstraintSet(world.gameState(), *goalie_tactic);
             auto path_planner = path_planner_factory.getPathPlanner(motion_constraints);
 
-            CreateMotionControl create_motion_control =
-                [path_planner, motion_constraints](const Point &robot_position,
-                                                   const Point &destination) {
-                    TbotsProto::MotionControl motion_control;
-                    TbotsProto::Path path_proto;
+            CreateMotionControl create_motion_control = [path_planner,
+                                                         motion_constraints](
+                                                            const Point &robot_position,
+                                                            const Point &destination) {
+                TbotsProto::MotionControl motion_control;
+                TbotsProto::Path path_proto;
 
-                    std::vector<Point> path_points = {robot_position};
-                    auto path = path_planner->findPath(robot_position, destination);
+                std::vector<Point> path_points = {robot_position};
+                auto path = path_planner->findPath(robot_position, destination);
 
-                    if (path.has_value())
-                    {
-                        path_points = path.value().getKnots();
-                    }
+                if (path.has_value())
+                {
+                    path_points = path.value().getKnots();
+                }
 
-                    *(path_proto.add_point()) = *createPointProto(path_points.back());
-                    *(motion_control.mutable_path()) = path_proto;
-                    for (const auto &motion_constraint : motion_constraints)
-                    {
-                        TbotsProto::MotionConstraint motion_constraint_proto;
-                        TbotsProto::MotionConstraint_Parse(toString(motion_constraint),
-                                                           &motion_constraint_proto);
-                        motion_control.add_motion_constraints(motion_constraint_proto);
-                    }
+                *(path_proto.add_point())        = *createPointProto(path_points.back());
+                *(motion_control.mutable_path()) = path_proto;
+                for (const auto &motion_constraint : motion_constraints)
+                {
+                    TbotsProto::MotionConstraint motion_constraint_proto;
+                    TbotsProto::MotionConstraint_Parse(toString(motion_constraint),
+                                                       &motion_constraint_proto);
+                    motion_control.add_motion_constraints(motion_constraint_proto);
+                }
 
-                    motion_control.set_path_length(
-                        EnlsvgPathPlanner::pathLength(path_points, robot_position));
-                    return motion_control;
-                };
+                motion_control.set_path_length(
+                    EnlsvgPathPlanner::pathLength({destination}, robot_position) * 10 +
+                    10);
+                return motion_control;
+            };
 
 
-            auto primitive = goalie_tactic->get(world, create_motion_control)
-                                 ->robot_primitives()
-                                 .at(goalie_robot_id);
+            auto primitives =
+                goalie_tactic->get(world, create_motion_control)->robot_primitives();
+            CHECK(primitives.contains(goalie_robot_id))
+                << "Couldn't find a primitive for robot id " << goalie_robot_id;
+            auto primitive = primitives.at(goalie_robot_id);
 
             primitives_to_run->mutable_robot_primitives()->insert(
                 google::protobuf::MapPair(goalie_robot_id, primitive));
@@ -200,34 +204,36 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
                 buildMotionConstraintSet(world.gameState(), *goalie_tactic);
             auto path_planner = path_planner_factory.getPathPlanner(motion_constraints);
             // TODO: clean up duplication
-            CreateMotionControl create_motion_control =
-                [path_planner, motion_constraints](const Point &robot_position,
-                                                   const Point &destination) {
-                    TbotsProto::MotionControl motion_control;
-                    TbotsProto::Path path_proto;
+            CreateMotionControl create_motion_control = [path_planner,
+                                                         motion_constraints](
+                                                            const Point &robot_position,
+                                                            const Point &destination) {
+                TbotsProto::MotionControl motion_control;
+                TbotsProto::Path path_proto;
 
-                    std::vector<Point> path_points = {robot_position};
-                    auto path = path_planner->findPath(robot_position, destination);
+                std::vector<Point> path_points = {robot_position};
+                auto path = path_planner->findPath(robot_position, destination);
 
-                    if (path.has_value())
-                    {
-                        path_points = path.value().getKnots();
-                    }
+                if (path.has_value())
+                {
+                    path_points = path.value().getKnots();
+                }
 
-                    *(path_proto.add_point()) = *createPointProto(path_points.back());
-                    *(motion_control.mutable_path()) = path_proto;
-                    for (const auto &motion_constraint : motion_constraints)
-                    {
-                        TbotsProto::MotionConstraint motion_constraint_proto;
-                        TbotsProto::MotionConstraint_Parse(toString(motion_constraint),
-                                                           &motion_constraint_proto);
-                        motion_control.add_motion_constraints(motion_constraint_proto);
-                    }
+                *(path_proto.add_point())        = *createPointProto(path_points.back());
+                *(motion_control.mutable_path()) = path_proto;
+                for (const auto &motion_constraint : motion_constraints)
+                {
+                    TbotsProto::MotionConstraint motion_constraint_proto;
+                    TbotsProto::MotionConstraint_Parse(toString(motion_constraint),
+                                                       &motion_constraint_proto);
+                    motion_control.add_motion_constraints(motion_constraint_proto);
+                }
 
-                    motion_control.set_path_length(
-                        EnlsvgPathPlanner::pathLength(path_points, robot_position));
-                    return motion_control;
-                };
+                motion_control.set_path_length(
+                    EnlsvgPathPlanner::pathLength({destination}, robot_position) * 10 +
+                    10);
+                return motion_control;
+            };
 
 
             primitive_sets.emplace_back(tactic->get(world, create_motion_control));
@@ -256,8 +262,10 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
             {
                 Robot robot                    = robots.at(row);
                 std::shared_ptr<Tactic> tactic = tactic_vector.at(col);
-                double robot_cost_for_tactic =
-                    primitive_sets.at(col)->robot_primitives().at(robot.id()).cost();
+                auto primitives = primitive_sets.at(col)->robot_primitives();
+                CHECK(primitives.contains(robot.id()))
+                    << "Couldn't find a primitive for robot id " << robot.id();
+                double robot_cost_for_tactic = primitives.at(robot.id()).cost();
 
                 std::set<RobotCapability> required_capabilities =
                     tactic->robotCapabilityRequirements();
@@ -306,10 +314,12 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
                     RobotId robot_id = robots.at(row).id();
                     robot_tactic_assignment.emplace(tactic_vector.at(col), robot_id);
                     tactic_vector.at(col)->setLastExecutionRobot(robot_id);
+
+                    auto primitives = primitive_sets.at(col)->robot_primitives();
+                    CHECK(primitives.contains(robot_id))
+                        << "Couldn't find a primitive for robot id " << robot_id;
                     primitives_to_run->mutable_robot_primitives()->insert(
-                        google::protobuf::MapPair(
-                            robot_id,
-                            primitive_sets.at(col)->robot_primitives().at(robot_id)));
+                        google::protobuf::MapPair(robot_id, primitives.at(robot_id)));
                     remaining_robots.erase(
                         std::remove_if(remaining_robots.begin(), remaining_robots.end(),
                                        [robots, row](const Robot &robot) {

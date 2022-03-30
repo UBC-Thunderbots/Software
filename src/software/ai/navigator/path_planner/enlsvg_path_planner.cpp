@@ -75,7 +75,8 @@ std::optional<Path> EnlsvgPathPlanner::findPath(const Point &start,
     {
         LOG(WARNING)
             << "Unable to find a path; Unable to find a nearby start and/or end point that isn't blocked "
-            << "within the navigable area; no path found between " << start << " and "<<end<<std::endl;
+            << "within the navigable area; no path found between " << start << " and "
+            << end << std::endl;
         return std::nullopt;
     }
 
@@ -85,7 +86,8 @@ std::optional<Path> EnlsvgPathPlanner::findPath(const Point &start,
     std::optional<Path> path = convertEnlsvgPathToPath(enlsvgPath);
     if (path == std::nullopt)
     {
-        LOG(WARNING) << "The path planner was unable to find a path" << start << " and "<<end<<std::endl;
+        LOG(WARNING) << "The path planner was unable to find a path between " << start
+                     << " and " << end << std::endl;
         return std::nullopt;
     }
 

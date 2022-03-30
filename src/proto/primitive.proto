@@ -33,7 +33,7 @@ enum MotionConstraint
     // Region around the playable zone
     AVOID_FIELD_BOUNDARY_ZONE = 6;
     // A half meter radius around the ball
-    HALF_METER_AROUND_BALL = 7[(dynamic) = true];
+    HALF_METER_AROUND_BALL = 7 [(dynamic) = true];
     // Path between ball and placement point in ball placement
     AVOID_BALL_PLACEMENT_INTERFERENCE = 8 [(dynamic) = true];
 }
