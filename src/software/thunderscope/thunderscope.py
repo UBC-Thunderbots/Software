@@ -32,7 +32,8 @@ from software.thunderscope.field import (
 from software.thunderscope.field.field import Field
 from software.thunderscope.log.g3log_widget import g3logWidget
 from software.thunderscope.proto_receiver import ProtoReceiver
-from proto.play_info_msg_pb2 import PlayInfo
+from software.thunderscope.play.playinfo_widget import playInfoWidget
+
 
 class Thunderscope(object):
 
@@ -195,11 +196,16 @@ class Thunderscope(object):
         return named_value_plotter_dock
 
     def setup_play_info(self):
+        """Setup the play info widget
+
+        :returns: The play info widget setup in a dock
+
+        """
 
         play_info = playInfoWidget()
         play_info_dock = Dock("playInfo", size=(500, 100))
         play_info_dock.addWidget(play_info)
-        proto_receiver.register_observer(play_info, play_info.log_buffer)
+        self.proto_receiver.register_observer(playInfo, play_info.log_buffer)
         return play_info_dock
 
     def show(self):
