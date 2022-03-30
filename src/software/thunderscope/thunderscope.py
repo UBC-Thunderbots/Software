@@ -206,6 +206,7 @@ class Thunderscope(object):
         play_info_dock = Dock("playInfo", size=(500, 100))
         play_info_dock.addWidget(play_info)
         self.proto_receiver.register_observer(PlayInfo, play_info.log_buffer)
+        self.register_refresh_function(play_info.refresh)
         return play_info_dock
 
     def show(self):
