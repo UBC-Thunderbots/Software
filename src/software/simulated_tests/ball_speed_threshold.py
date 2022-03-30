@@ -35,7 +35,7 @@ class BallSpeedThreshold(Validation):
 
     def get_validation_geometry(self, world) -> ValidationGeometry:
         """override"""
-        # TODO: visualize
+        # TODO (#2556): visualize
         return create_validation_geometry([])
 
     def __repr__(self):
