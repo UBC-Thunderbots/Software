@@ -6,6 +6,7 @@ import software.thunderscope.constants as constants
 from google.protobuf.json_format import MessageToDict
 from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtWidgets import *
+import qdarktheme
 import queue
 
 from proto.robot_log_msg_pb2 import RobotLog
@@ -19,13 +20,10 @@ class playInfoWidget(QTableWidget):
     def __init__(self, buffer_size=10):
 
         QTableWidget.__init__(self, playInfoWidget.NUM_ROWS, playInfoWidget.NUM_COLS)
+        self.setStyleSheet(qdarktheme.load_stylesheet())
 
         self.log_buffer = queue.Queue(buffer_size)
         self.verticalHeader().setVisible(False)
-
-        self.setStyleSheet(
-            "QHeaderView::section {background-color: rgba(0, 0, 0, 255); color: rgba(255, 255, 255, 255);}"
-        )
 
     def set_data(self, data):
         """Data to set in the table
@@ -41,15 +39,8 @@ class playInfoWidget(QTableWidget):
             for m, item in enumerate(data[key]):
                 newitem = QTableWidgetItem(item)
                 self.setItem(m, n, newitem)
-                self.item(m, n).setBackground(QtGui.QColor(0, 0, 0))
-                self.item(m, n).setForeground(QtGui.QBrush(QtGui.QColor(255, 255, 255)))
 
         self.setHorizontalHeaderLabels(horizontal_headers)
-
-        for x in range(1, playInfoWidget.NUM_ROWS):
-            newitem = QTableWidgetItem(item)
-            self.setItem(x, 0, newitem)
-            self.item(x, 0).setBackground(QtGui.QColor(0, 0, 0))
 
     def refresh(self):
         """Update the play info widget with new play information

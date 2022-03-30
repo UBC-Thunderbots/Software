@@ -28,7 +28,6 @@ CONFIG_H = (
     '#include "shared/parameter/enumerated_parameter.h"\n'
     '#include "shared/parameter/numeric_parameter.h"\n'
     '#include "software/util/generic_factory/generic_factory.h"\n'
-    '#include "shared/parameter/dynamic_parameters.pb.h"\n'
     "\n"
     "{include_headers}\n"
     "\n"

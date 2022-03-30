@@ -17,13 +17,13 @@ else:
     import PyQt6
 
 import pyqtgraph
+import qdarktheme
 from pyqtgraph.dockarea import *
 from pyqtgraph.parametertree import Parameter, ParameterTree
 from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtWidgets import *
 
 from proto.import_all_protos import *
-from proto.message_translation.message_to_dict import message_to_dict
 
 from software.networking import threaded_unix_sender
 from software.thunderscope.arbitrary_plot.named_value_plotter import NamedValuePlotter
