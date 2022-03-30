@@ -2,18 +2,17 @@ from pyqtgraph.Qt.QtCore import Qt
 from pyqtgraph.Qt.QtWidgets import *
 
 
-def create_button(text: list, num_buttons=1):
+def create_button(text: list):
     """
     Creates QPushButton objects inside a QGroupBox object.
-    See line 35: src/software/thunderscope/chicker/chicker.py for an example.
     The default color of button will be white with black background.
 
-    :param text: type:list - list of text for all buttons - must have same items as num_buttons
-    :param num_buttons: numbers of buttons in this one QGroupBox
+    :param text: type:list - list of text for all buttons
     :return: group_box: QGroupBox object - add this to the widget
     :return: buttons: list of QPushButton objects - use this to perform tasks on the buttons
     """
     group_box = QGroupBox()
+    num_buttons = len(text)
     buttons = []
     for i in range(num_buttons):
         button = QPushButton(text[i])
@@ -28,19 +27,18 @@ def create_button(text: list, num_buttons=1):
     return group_box, buttons
 
 
-def create_radio(text: list, radio_group, num_buttons=1):
+def create_radio(text: list, radio_group):
     """
     Creates QRadioButton objects inside a QGroupBox object.
-    See line 44: src/software/thunderscope/chicker/chicker.py for an example.
     The default color of button background will be white.
 
-    :param text: type:list - list of text for all buttons - must have same items as num_buttons
+    :param text: type:list - list of text for all buttons
     :param radio_group: QButtonGroup to add these buttons to
-    :param num_buttons: numbers of buttons in this one QGroupBox
     :return: group_box: QGroupBox object - add this to the widget
     :return: buttons: list of QRadioButton object - use this to perform tasks on the buttons
     """
     group_box = QGroupBox()
+    num_buttons = len(text)
     radios = []
     for i in range(num_buttons):
         radio = QRadioButton(text[i])
@@ -60,7 +58,6 @@ def create_radio(text: list, radio_group, num_buttons=1):
 def create_slider(text, min_val, max_val, tick_spacing):
     """
     Creates a QSlider object inside a QGroupBox object, along with a value label on the right
-    See line 54: src/software/thunderscope/chicker/chicker.py for an example.
     The slider orientation will be horizontal.
 
     :param text: text to display above the slider
