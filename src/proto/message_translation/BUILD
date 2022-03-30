@@ -227,14 +227,3 @@ cc_test(
         "//software/test_util",
     ],
 )
-
-py_library(
-    name = "message_to_dict",
-    srcs = [
-        "message_to_dict.py",
-    ],
-    deps = [
-        "//proto:software_py_proto",
-        "//proto:tbots_py_proto",
-    ],
-)
