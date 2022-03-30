@@ -39,6 +39,7 @@ from software.thunderscope.field import (
 from software.thunderscope.field.field import Field
 from software.thunderscope.log.g3log_widget import g3logWidget
 from software.thunderscope.proto_receiver import ProtoReceiver
+from proto.play_info_msg_pb2 import PlayInfo
 import qdarktheme
 
 class Thunderscope(object):
@@ -148,11 +149,13 @@ class Thunderscope(object):
         log_dock = self.setup_log_widget()
         parameter_dock = self.setup_parameter_widget()
         performance_dock = self.setup_performance_plot()
+        play_info_dock = self.setup_play_info()
 
         self.dock_area.addDock(field_dock, "left")
         self.dock_area.addDock(log_dock, "bottom", field_dock)
         self.dock_area.addDock(performance_dock, "right", log_dock)
         self.dock_area.addDock(parameter_dock, "top", log_dock)
+        self.dock_area.addDock(play_info_dock, "right", performance_dock)
 
     def setup_field_widget(self):
         """Setup the field widget with the constituent layers
@@ -254,6 +257,14 @@ class Thunderscope(object):
         named_value_plotter_dock = Dock("Performance", size=(500, 100))
         named_value_plotter_dock.addWidget(self.named_value_plotter.plot)
         return named_value_plotter_dock
+
+    def setup_play_info(self):
+
+        play_info = playInfoWidget()
+        play_info_dock = Dock("playInfo", size=(500, 100))
+        play_info_dock.addWidget(play_info)
+        proto_receiver.register_observer(play_info, play_info.log_buffer)
+        return play_info_dock
 
     def show(self):
         self.window.show()
