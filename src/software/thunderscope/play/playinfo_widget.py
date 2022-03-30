@@ -46,11 +46,6 @@ class playInfoWidget(QTableWidget):
 
         self.setHorizontalHeaderLabels(horizontal_headers)
 
-        for x in range(1, playInfoWidget.NUM_ROWS):
-            newitem = QTableWidgetItem(item)
-            self.setItem(x, 0, newitem)
-            self.item(x, 0).setBackground(QtGui.QColor(0, 0, 0))
-
     def refresh(self):
         """Update the play info widget with new play information
         """
