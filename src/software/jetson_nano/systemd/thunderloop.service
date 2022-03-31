@@ -8,9 +8,7 @@ PartOf=thunderbots.service
 After=thunderbots.service network.target
 
 [Service]
-# Pretend that the component is running
-# todo: execute thunderloop binary (#2443)
-ExecStart=/bin/sleep infinity
+ExecStart=/home/robot/thunderbots_binaries/thunderloop_main
 
 #always restart on crash
 Restart=always

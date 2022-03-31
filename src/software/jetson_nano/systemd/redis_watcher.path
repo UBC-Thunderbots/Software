@@ -4,8 +4,8 @@ After=thunderbots.service
 
 [Path]
 #todo add binary path (#2443)
-PathChanged=${%i_path}
-Unit=watcher@%redis.service
+PathChanged=/home/robot/example.txt
+Unit=watcher@redis.service
 
 [Install]
 # This unit should be run at startup
