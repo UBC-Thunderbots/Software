@@ -9,7 +9,6 @@ py_library(
         "//software/jetson_nano/display:constants",
         "//software/jetson_nano/display:utils",
         requirement("Pillow"),
-        requirement("subprocess"),
     ],
 )
 
