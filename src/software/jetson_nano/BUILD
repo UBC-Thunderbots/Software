@@ -5,6 +5,7 @@ cc_library(
     srcs = ["primitive_executor.cpp"],
     hdrs = ["primitive_executor.h"],
     deps = [
+        "//extlibs/hrvo",
         "//proto:tbots_cc_proto",
         "//proto/primitive:primitive_msg_factory",
         "//shared:constants",
@@ -20,6 +21,7 @@ cc_library(
     deps = [
         ":primitive_executor",
         "//proto:tbots_cc_proto",
+        "//software/jetson_nano/redis",
         "//software/jetson_nano/services:motor",
         "//software/jetson_nano/services:network",
         "//software/util/scoped_timespec_timer",

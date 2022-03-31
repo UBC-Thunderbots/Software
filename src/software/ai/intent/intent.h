@@ -3,13 +3,12 @@
 #include <set>
 #include <string>
 
+#include "proto/primitive.pb.h"
 #include "proto/primitive/primitive_types.h"
 #include "software/ai/intent/intent_visitor.h"
 #include "software/ai/motion_constraint/motion_constraint.h"
 #include "software/geom/angle.h"
 #include "software/geom/point.h"
-
-MAKE_ENUM(BallCollisionType, AVOID, ALLOW);
 
 /**
  * An intent is a simple "thing" a robot or player may want to do. It specifies WHAT a

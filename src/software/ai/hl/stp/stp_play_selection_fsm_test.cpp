@@ -14,16 +14,10 @@ TEST(PlaySelectionFSMTest, test_transitions)
     std::unique_ptr<Play> current_play(std::make_unique<HaltPlay>(ai_config));
     std::unique_ptr<FSM<PlaySelectionFSM>> fsm(
         std::make_unique<FSM<PlaySelectionFSM>>(PlaySelectionFSM{ai_config}));
-    auto shoot_or_pass_override_constructor =
-        [](std::shared_ptr<const AiConfig> ai_config) {
-            return GenericFactory<std::string, Play, AiConfig>::create("ShootOrPassPlay",
-                                                                       ai_config);
-        };
     GameState game_state;
 
     // Start in halt
     fsm->process_event(PlaySelectionFSM::Update(
-        std::nullopt,
         [&current_play](std::unique_ptr<Play> play) { current_play = std::move(play); },
         game_state));
 
@@ -33,7 +27,6 @@ TEST(PlaySelectionFSMTest, test_transitions)
     // Stop
     game_state.updateRefereeCommand(RefereeCommand::STOP);
     fsm->process_event(PlaySelectionFSM::Update(
-        std::nullopt,
         [&current_play](std::unique_ptr<Play> play) { current_play = std::move(play); },
         game_state));
 
@@ -43,25 +36,15 @@ TEST(PlaySelectionFSMTest, test_transitions)
     // Penalty kick preparation
     game_state.updateRefereeCommand(RefereeCommand::PREPARE_PENALTY_US);
     fsm->process_event(PlaySelectionFSM::Update(
-        std::nullopt,
         [&current_play](std::unique_ptr<Play> play) { current_play = std::move(play); },
         game_state));
     EXPECT_TRUE(fsm->is(boost::sml::state<PlaySelectionFSM::SetPlay>));
     EXPECT_EQ("PenaltyKickPlay", objectTypeName(*current_play));
 
-    // Pass in shoot_or_pass_override_constructor
-    fsm->process_event(PlaySelectionFSM::Update(
-        shoot_or_pass_override_constructor,
-        [&current_play](std::unique_ptr<Play> play) { current_play = std::move(play); },
-        game_state));
-    EXPECT_TRUE(fsm->is(boost::sml::state<PlaySelectionFSM::OverridePlay>));
-    EXPECT_EQ("ShootOrPassPlay", objectTypeName(*current_play));
-
     // Normal start
     game_state.updateRefereeCommand(RefereeCommand::NORMAL_START);
     EXPECT_TRUE(game_state.isReadyState());
     fsm->process_event(PlaySelectionFSM::Update(
-        std::nullopt,
         [&current_play](std::unique_ptr<Play> play) { current_play = std::move(play); },
         game_state));
     EXPECT_TRUE(fsm->is(boost::sml::state<PlaySelectionFSM::SetPlay>));
@@ -72,7 +55,6 @@ TEST(PlaySelectionFSMTest, test_transitions)
     game_state.updateRefereeCommand(RefereeCommand::FORCE_START);
     EXPECT_TRUE(game_state.isPlaying());
     fsm->process_event(PlaySelectionFSM::Update(
-        std::nullopt,
         [&current_play](std::unique_ptr<Play> play) { current_play = std::move(play); },
         game_state));
     EXPECT_TRUE(fsm->is(boost::sml::state<PlaySelectionFSM::Playing>));

@@ -73,6 +73,29 @@ cc_library(
 )
 
 cc_library(
+    name = "proto_unix_sender",
+    hdrs = [
+        "proto_unix_sender.hpp",
+    ],
+    visibility = ["//visibility:private"],
+    deps = [
+        ":unix_sender",
+        "@boost//:asio",
+    ],
+)
+
+cc_library(
+    name = "proto_unix_listener",
+    hdrs = [
+        "proto_unix_listener.hpp",
+    ],
+    visibility = ["//visibility:private"],
+    deps = [
+        "@boost//:asio",
+    ],
+)
+
+cc_library(
     name = "threaded_unix_sender",
     srcs = [
         "threaded_unix_sender.cpp",
@@ -86,10 +109,42 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "threaded_proto_unix_sender",
+    hdrs = [
+        "threaded_proto_unix_sender.hpp",
+    ],
+    deps = [
+        ":proto_unix_sender",
+        "@boost//:asio",
+    ],
+)
+
+cc_library(
+    name = "threaded_proto_unix_listener",
+    hdrs = [
+        "threaded_proto_unix_listener.hpp",
+    ],
+    deps = [
+        ":proto_unix_listener",
+        "@boost//:asio",
+    ],
+)
+
 py_library(
     name = "threaded_unix_listener_py",
     srcs = ["threaded_unix_listener.py"],
     deps = [
         "//proto:software_py_proto",
+        "//software/logger:py_logger",
+    ],
+)
+
+py_library(
+    name = "threaded_unix_sender_py",
+    srcs = ["threaded_unix_sender.py"],
+    deps = [
+        "//proto:software_py_proto",
+        "//software/logger:py_logger",
     ],
 )
