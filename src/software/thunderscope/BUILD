@@ -10,10 +10,12 @@ py_binary(
         "//software/networking:threaded_unix_listener_py",
         "//software/networking:threaded_unix_sender_py",
         "//software/thunderscope:colors",
+        "//software/thunderscope:common_widgets",
         "//software/thunderscope:constants",
         "//software/thunderscope:proto_receiver",
         "//software/thunderscope/arbitrary_plot:named_value_plotter",
         "//software/thunderscope/common:proto_configuration_widget",
+        "//software/thunderscope/chicker",
         "//software/thunderscope/field",
         "//software/thunderscope/field:field_layer",
         "//software/thunderscope/field:obstacle_layer",
@@ -41,4 +43,9 @@ py_library(
 py_library(
     name = "colors",
     srcs = ["colors.py"],
+)
+
+py_library(
+    name = "common_widgets",
+    srcs = ["common_widgets.py"],
 )
