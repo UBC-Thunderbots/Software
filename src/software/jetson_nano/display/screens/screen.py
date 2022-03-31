@@ -1,12 +1,8 @@
 from PIL import ImageFont
 import subprocess
 
-# TODO: move constants.py into bazel build so don't need to import sys
-import sys
-
-sys.path.append("../")
-import constants
-from utils import get_ip_address, get_signal_strength
+import software.jetson_nano.display.constants as constants
+from software.jetson_nano.display.utils import get_ip_address, get_signal_strength
 
 SCREEN_TYPE = str
 

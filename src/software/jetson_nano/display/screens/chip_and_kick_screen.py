@@ -1,4 +1,4 @@
-from screen import Screen
+from software.display.screens.screen import Screen
 
 
 class ChipAndKickScreen(Screen):

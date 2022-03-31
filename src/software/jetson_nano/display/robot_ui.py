@@ -5,24 +5,13 @@ from PIL import Image, ImageDraw, ImageOps
 import adafruit_rgb_display.st7735 as st7735
 
 # TODO: test if bazel build works
-# import sys
-# sys.path.append("./rotary_encoder/")
-# sys.path.append("./lcd_user_interface/")
-# sys.path.append("./screens/")
-# from rotary_encoder import RotaryEncoder
-# from lcd_user_interface import LcdDisplay
-# from home_screen import HomeScreen
-# from menu_screen import MenuScreen
-# from wheels_screen import WheelsScreen
-# from chip_and_kick_screen import ChipAndKickScreen
-
 from software.display.lcd_user_interface import LcdDisplay
 from software.display.rotary_encoder import RotaryEncoder
-from software.display.screens.home_scren import HomeScreen
-from software.display.screens.menu_scren import MenuScreen
-from software.display.screens.wheels_scren import WheelsScreen
-from software.display.screens.chip_and_kick_scren import ChipAndKickScreen
-import constants
+from software.display.screens.home_screen import HomeScreen
+from software.display.screens.menu_screen import MenuScreen
+from software.display.screens.wheels_screen import WheelsScreen
+from software.display.screens.chip_and_kick_screen import ChipAndKickScreen
+import software.display.screens.constants as constants
 
 # Pins for Rotary Encoder
 BUTTON_PIN = constants.BUTTON_PIN

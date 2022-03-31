@@ -1,13 +1,9 @@
-from screen import Screen
+from software.display.screens.screen import Screen
+import software.jetson_nano.display.constants as constants
 
 ROBOT_ID_INDEX = 0
 CHANNEL_ID_INDEX = 1
 
-# TODO: move constants.py into bazel build so don't need to import sys
-import sys
-
-sys.path.append("../")
-import constants
 
 BATTERY_VOLTAGE_BASE = 60
 
