@@ -59,5 +59,5 @@ class BallMovesForward(Validation):
     BallEventuallyMovesForward,
     BallEventuallyStopsMovingForward,
     BallAlwaysMovesForward,
-    BallNeverMovesBackward,
+    BallNeverMovesForward,
 ) = create_validation_types(BallMovesForward)

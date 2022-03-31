@@ -125,7 +125,7 @@ def test_goalie_blocks_shot(
             BallNeverEntersRegion(
                 regions=[tbots.Field.createSSLDivisionBField().friendlyGoal()]
             ),
-            NeverExcessivelyDribbling(),
+            NeverExcessivelyDribbles(),
         ]
     ]
 

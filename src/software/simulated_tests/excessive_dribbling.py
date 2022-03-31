@@ -50,7 +50,7 @@ class ExcessivelyDribbling(Validation):
 
 (
     EventuallyStopExcessivelyDribbling,
-    EventuallyExcessivelyDribbling,
-    NeverExcessivelyDribbling,
-    AlwaysExcessivelyDribbling,
+    EventuallyStartsExcessivelyDribbling,
+    NeverExcessivelyDribbles,
+    AlwaysExcessivelyDribbles,
 ) = create_validation_types(ExcessivelyDribbling)

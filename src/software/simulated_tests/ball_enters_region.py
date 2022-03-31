@@ -48,6 +48,6 @@ class BallEntersRegion(Validation):
 (
     BallEventuallyEntersRegion,
     BallEventuallyExitsRegion,
-    BallStaysInRegion,
+    BallAlwaysStaysInRegion,
     BallNeverEntersRegion,
 ) = create_validation_types(BallEntersRegion)
