@@ -64,7 +64,7 @@ class ChipAndKickScreen(Screen):
             for i in range(self.len):
                 if self.actions[i]["redis key"] == None:
                     continue
-                
+
                 if self.actions[i]["type"] == bool:
                     self.actions[i]["value"] = (
                         1 if redis_dict[self.actions[i]["redis key"]] else 0

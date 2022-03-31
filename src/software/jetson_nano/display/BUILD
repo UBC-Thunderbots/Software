@@ -26,11 +26,11 @@ py_binary(
     name = "robot_ui",
     srcs = ["robot_ui.py"],
     deps = [
-        "//software/display/rotary_encoder:rotary_encoder.py",
         "//software/display/lcd_user_interface:lcd_user_interface.py",
+        "//software/display/rotary_encoder:rotary_encoder.py",
+        "//software/display/screens:chip_and_kick_screen.py",
         "//software/display/screens:home_screen.py",
         "//software/display/screens:menu_screen.py",
         "//software/display/screens:wheels_screen.py",
-        "//software/display/screens:chip_and_kick_screen.py",
     ],
 )

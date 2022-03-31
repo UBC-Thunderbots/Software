@@ -3,6 +3,7 @@ import subprocess
 
 # TODO: move constants.py into bazel build so don't need to import sys
 import sys
+
 sys.path.append("../")
 import constants
 from utils import get_ip_address, get_signal_strength
@@ -36,13 +37,9 @@ class Screen:
 
         self.lcd_display = lcd_display
         self.font_size = 12
-        self.font = ImageFont.truetype(
-            "DejaVuSans.ttf", self.font_size
-        )
+        self.font = ImageFont.truetype("DejaVuSans.ttf", self.font_size)
         self.big_font_size = 22
-        self.big_font = ImageFont.truetype(
-            "DejaVuSans.ttf", self.big_font_size
-        )
+        self.big_font = ImageFont.truetype("DejaVuSans.ttf", self.big_font_size)
 
     def draw_header(self):
         """ Draw the display header """
@@ -129,9 +126,9 @@ class Screen:
     def draw_actions(self):
         """ Draws our list of actions """
         self.lcd_display.prepare()
-        
+
         cursor = constants.CURSOR
-        cursor_size = self.font.getsize(cursor)[0]     
+        cursor_size = self.font.getsize(cursor)[0]
         cursor_pos_x = constants.BASE_X
 
         if self.curr_action != len(self.actions) - 1:
@@ -144,15 +141,16 @@ class Screen:
         )
 
         x = cursor_size
-        y = constants.BASE_Y        
+        y = constants.BASE_Y
 
-        for action in self.actions: 
-            if action == self.actions[-1]: # last action should take you to previous screen
+        for action in self.actions:
+            if (
+                action == self.actions[-1]
+            ):  # last action should take you to previous screen
                 y = self.lcd_display.height - self.font_size - constants.PADDING
-            
+
             self.lcd_display.draw.text(
-                (x, y), action["display string"],
-                font=self.font, fill=constants.WHITE
+                (x, y), action["display string"], font=self.font, fill=constants.WHITE
             )
 
             if action["type"] != SCREEN_TYPE:
@@ -168,8 +166,10 @@ class Screen:
                     )
                 else:
                     self.lcd_display.draw.text(
-                        (x, y), str(round(action["value"], 1)),
-                        font=self.font, fill=constants.YELLOW,
+                        (x, y),
+                        str(round(action["value"], 1)),
+                        font=self.font,
+                        fill=constants.YELLOW,
                     )
                 x = cursor_size
 

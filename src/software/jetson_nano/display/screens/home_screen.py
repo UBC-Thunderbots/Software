@@ -5,8 +5,10 @@ CHANNEL_ID_INDEX = 1
 
 # TODO: move constants.py into bazel build so don't need to import sys
 import sys
+
 sys.path.append("../")
 import constants
+
 BATTERY_VOLTAGE_BASE = 60
 
 
@@ -50,19 +52,28 @@ class HomeScreen(Screen):
 
         def draw_screen():
             """ Home Screen Layout """
+
             def setup_robot_id(x, y):
                 """ Draw the robot id setting on the screen """
                 robot_id_str = "Robot ID"
                 self.lcd_display.draw.text(
                     (x, y), robot_id_str, font=self.font, fill=constants.WHITE
                 )
-                
-                channel_id_x = x + self.font.getsize(robot_id_str)[0] + cursor_size + constants.PADDING
-                
+
+                channel_id_x = (
+                    x
+                    + self.font.getsize(robot_id_str)[0]
+                    + cursor_size
+                    + constants.PADDING
+                )
+
                 x = self.font.getsize(robot_id_str)[0] / 2
                 y += self.font_size
                 self.lcd_display.draw.text(
-                    (x, y), str(int(self.actions[ROBOT_ID_INDEX]["value"])), font=self.big_font, fill=constants.YELLOW
+                    (x, y),
+                    str(int(self.actions[ROBOT_ID_INDEX]["value"])),
+                    font=self.big_font,
+                    fill=constants.YELLOW,
                 )
 
                 return channel_id_x
@@ -105,10 +116,15 @@ class HomeScreen(Screen):
                 """ Draw the capacitor voltage diagnostic on the screen """
                 cap_str = "Capacitor Voltage: "
                 x = cursor_size
-                self.lcd_display.draw.text((x, y), cap_str, font=self.font, fill=constants.WHITE)
+                self.lcd_display.draw.text(
+                    (x, y), cap_str, font=self.font, fill=constants.WHITE
+                )
                 x += (self.font.getsize(cap_str))[0]
                 self.lcd_display.draw.text(
-                    (x, y), str(round(self.cap_voltage, 1)), font=self.font, fill=constants.YELLOW
+                    (x, y),
+                    str(round(self.cap_voltage, 1)),
+                    font=self.font,
+                    fill=constants.YELLOW,
                 )
 
                 return y + self.font_size
@@ -122,7 +138,10 @@ class HomeScreen(Screen):
                 )
                 x += (self.font.getsize(packet_loss_str))[0]
                 self.lcd_display.draw.text(
-                    (x, y), str(round(self.packet_loss, 1)), font=self.font, fill=constants.YELLOW
+                    (x, y),
+                    str(round(self.packet_loss, 1)),
+                    font=self.font,
+                    fill=constants.YELLOW,
                 )
 
             self.lcd_display.prepare()
@@ -141,21 +160,26 @@ class HomeScreen(Screen):
 
             # draw the back screen
             self.lcd_display.draw.text(
-                (cursor_size, self.lcd_display.height - constants.PADDING - self.font_size),
+                (
+                    cursor_size,
+                    self.lcd_display.height - constants.PADDING - self.font_size,
+                ),
                 "Go to Menu screen",
                 font=self.font,
                 fill=constants.WHITE,
             )
 
             # draw the cursor
-            x = constants.BASE_X 
+            x = constants.BASE_X
             y = constants.BASE_Y
             if self.curr_action == 1:
                 x = self.font.getsize("Robot ID")[0] + cursor_size + constants.PADDING
             elif self.curr_action == 2:
                 y = self.lcd_display.height - constants.PADDING - self.font_size
 
-            self.lcd_display.draw.text((x, y), constants.CURSOR, font=self.font, fill=constants.WHITE)
+            self.lcd_display.draw.text(
+                (x, y), constants.CURSOR, font=self.font, fill=constants.WHITE
+            )
 
         # Pass Home Screen parameters to super class
         super().__init__(lcd_display, screen_actions, actions, draw_screen)

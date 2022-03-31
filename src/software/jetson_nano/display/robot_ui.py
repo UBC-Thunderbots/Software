@@ -5,16 +5,16 @@ from PIL import Image, ImageDraw, ImageOps
 import adafruit_rgb_display.st7735 as st7735
 
 # TODO: test if bazel build works
-#import sys
-#sys.path.append("./rotary_encoder/")
-#sys.path.append("./lcd_user_interface/")
-#sys.path.append("./screens/")
-#from rotary_encoder import RotaryEncoder
-#from lcd_user_interface import LcdDisplay
-#from home_screen import HomeScreen
-#from menu_screen import MenuScreen
-#from wheels_screen import WheelsScreen
-#from chip_and_kick_screen import ChipAndKickScreen
+# import sys
+# sys.path.append("./rotary_encoder/")
+# sys.path.append("./lcd_user_interface/")
+# sys.path.append("./screens/")
+# from rotary_encoder import RotaryEncoder
+# from lcd_user_interface import LcdDisplay
+# from home_screen import HomeScreen
+# from menu_screen import MenuScreen
+# from wheels_screen import WheelsScreen
+# from chip_and_kick_screen import ChipAndKickScreen
 
 from software.display.lcd_user_interface import LcdDisplay
 from software.display.rotary_encoder import RotaryEncoder
@@ -67,7 +67,9 @@ class RobotUi:
     def __init__(self):
 
         # Initialize redis server and our redis dictionary
-        self.redis_client = redis.Redis(host="localhost", port=constants.REDIS_PORT_NUMBER, db=0)
+        self.redis_client = redis.Redis(
+            host="localhost", port=constants.REDIS_PORT_NUMBER, db=0
+        )
         self.redis_dict = {}
         for key in redis_keys:
             self.redis_dict[key] = float(self.redis_client.get(key).decode("UTF-8"))
@@ -148,7 +150,9 @@ if __name__ == "__main__":
     from threading import Thread
 
     def init_redis():
-        redis_client = redis.Redis(host="localhost", port=constants.REDIS_PORT_NUMBER, db=0)
+        redis_client = redis.Redis(
+            host="localhost", port=constants.REDIS_PORT_NUMBER, db=0
+        )
         redis_dict = {}
         for key in redis_keys:
             redis_client.set(key, 0)
