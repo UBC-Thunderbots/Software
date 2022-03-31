@@ -14,12 +14,14 @@ Agent::Agent(HRVOSimulator *simulator, const Vector &position, float radius,
       max_speed_(maxSpeed),
       max_accel_(maxAccel),
       path(path),
-      reached_goal_(false)
+      reached_goal_(false),
+      curr_max_allowed_speed(0.f)
 {
 }
 
 void Agent::update()
 {
+    prev_vel = velocity_;
     if (new_velocity_.length() >= max_speed_)
     {
         // New velocity can not be greater than max speed

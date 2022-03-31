@@ -184,5 +184,11 @@ public: // TODO: protected:
     float max_accel_;
     bool reached_goal_;
 
+    // TODO: Added for testing
+    float curr_max_allowed_speed;
+    float dist_remaining_to_goal;
+    float decel_dist;
+    Vector prev_vel;
+
     HRVOSimulator *const simulator_;
 };

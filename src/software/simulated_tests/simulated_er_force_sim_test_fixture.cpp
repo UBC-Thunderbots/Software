@@ -265,7 +265,7 @@ void SimulatedErForceSimTestFixture::runTest(
         Duration::fromSeconds(1.0 / SIMULATED_CAMERA_FPS);
 
     std::shared_ptr<ErForceSimulator> simulator(std::make_shared<ErForceSimulator>(
-        field_type, create2015RobotConstants(), create2015WheelConstants(),
+        field_type, create2021RobotConstants(), create2021WheelConstants(),
         friendly_thunderbots_config->getSimulatorConfig()));
 
     // TODO (#2419): remove this to re-enable sigfpe checks
@@ -620,6 +620,13 @@ bool SimulatedErForceSimTestFixture::tickTest(
         LOG(VISUALIZE) << *createWorld(*friendly_world);
 
         LOG(VISUALIZE) << *createWorld(friendly_sensor_fusion.getWorld().value());
+
+        if (friendly_world->friendlyTeam().getAllRobots().size() > 1)
+        {
+            LOG(VISUALIZE) << *createNamedValue(
+                        "actual velocity",
+                        static_cast<float>(friendly_world->friendlyTeam().getRobotById(1)->velocity().length()));
+        }
 
         validation_functions_done = validateAndCheckCompletion(
             terminating_function_validators, non_terminating_function_validators);

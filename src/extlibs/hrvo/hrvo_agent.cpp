@@ -475,20 +475,24 @@ void HRVOAgent::computePreferredVelocity()
 
     // d = (Vf^2 - Vi^2) / 2a
     double startLinearDecelerationDistance =
-        std::abs((std::pow(speedAtGoal, 2) - std::pow(prefSpeed_, 2)) /
+        std::abs((std::pow(speedAtGoal, 2) - std::pow(prefSpeed_, 2)) / // TODO: Change to velocity_.length()
                  (2 * max_accel_)) *
-        decel_dist_multiplier;
+        decel_dist_multiplier;// + 10*max_accel_ * simulator_->getTimeStep();
+
+    dist_remaining_to_goal = distToGoal;
+    decel_dist = startLinearDecelerationDistance;
 
     // TODO: Debugging
     in_decel_zone = distToGoal < startLinearDecelerationDistance ? 1.0f : 0.f;
     if (distToGoal < startLinearDecelerationDistance)
     {
         // velocity given linear deceleration, distance away from goal, and desired final
-        // speed
-        // v_pref = sqrt(v_goal^2 + 2 * a * d_remainingToDestination)
+        // speed.           + here since a is negative
+        // Vi^2 = sqrt(Vf^2 + 2 * a * d_remainingToDestination)
         float currPrefSpeed = static_cast<float>(std::sqrt(std::pow(speedAtGoal, 2) +
                                                            2 * max_accel_ * distToGoal)) *
                               decel_pref_speed_multiplier;
+        curr_max_allowed_speed = currPrefSpeed;
         Vector ideal_pref_velocity = distVectorToGoal.normalize(currPrefSpeed);
 
         // Limit the preferred velocity to the kinematic limits
@@ -503,6 +507,11 @@ void HRVOAgent::computePreferredVelocity()
             // acceleration constraint
             pref_velocity_ =
                 velocity_ + dv.normalize(max_accel_ * simulator_->getTimeStep());
+        }
+
+        if (pref_velocity_.length() > currPrefSpeed)
+        {
+            std::cout << pref_velocity_.length() - currPrefSpeed << std::endl;
         }
     }
     else
