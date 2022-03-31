@@ -3,7 +3,7 @@ import subprocess
 
 # TODO: move constants.py into bazel build so don't need to import sys
 import sys
-sys.path.append("../resources/")
+sys.path.append("../")
 import constants
 from utils import get_ip_address, get_signal_strength
 

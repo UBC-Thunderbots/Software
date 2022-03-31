@@ -1,11 +1,5 @@
 from screen import Screen
 
-ENABLE_INDEX = 0
-FL_INDEX = 1
-FR_INDEX = 2
-BL_INDEX = 3
-BR_INDEX = 4
-
 
 class WheelsScreen(Screen):
     """
@@ -33,7 +27,7 @@ class WheelsScreen(Screen):
                 "type": float,
                 "delta": 0.5,
                 "screen action": screen_actions.EDIT_SCREEN,
-                "display string": "Front Left: ",
+                "display string": "Front Left [m/s]: ",
             },
             {
                 "redis key": "fr wheel speed",
@@ -41,7 +35,7 @@ class WheelsScreen(Screen):
                 "type": float,
                 "delta": 0.5,
                 "screen action": screen_actions.EDIT_SCREEN,
-                "display string": "Front Right: ",
+                "display string": "Front Right [m/s]: ",
             },
             {
                 "redis key": "bl wheel speed",
@@ -49,7 +43,7 @@ class WheelsScreen(Screen):
                 "type": float,
                 "delta": 0.5,
                 "screen action": screen_actions.EDIT_SCREEN,
-                "display string": "Back Left: ",
+                "display string": "Back Left [m/s]: ",
             },
             {
                 "redis key": "br wheel speed",
@@ -57,7 +51,7 @@ class WheelsScreen(Screen):
                 "type": float,
                 "delta": 0.5,
                 "screen action": screen_actions.EDIT_SCREEN,
-                "display string": "Back Right: ",
+                "display string": "Back Right [m/s]: ",
             },
             {
                 "redis key": None,
@@ -75,10 +69,13 @@ class WheelsScreen(Screen):
     def update_values(self, redis_dict):
         """ Sync values with those from redis """
         if not self.edit_mode:
-            self.actions[ENABLE_INDEX]["value"] = (
-                1 if redis_dict["wheels enable"] else 0
-            )
-            self.actions[FL_INDEX]["value"] = redis_dict["fl wheel speed"]
-            self.actions[FR_INDEX]["value"] = redis_dict["fr wheel speed"]
-            self.actions[BL_INDEX]["value"] = redis_dict["bl wheel speed"]
-            self.actions[BR_INDEX]["value"] = redis_dict["br wheel speed"]
+            for i in range(self.len):
+                if self.actions[i]["redis key"] == None:
+                    continue
+
+                if self.actions[i]["type"] == bool: 
+                    self.actions[i]["value"] = (
+                        1 if redis_dict[self.actions[i]["redis key"]] else 0
+                    )
+                else:
+                    self.actions[i]["value"] = redis_dict[self.actions[i]["redis key"]]

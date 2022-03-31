@@ -5,10 +5,8 @@ def get_ip_address():
     try:
         cmd = "hostname -I | cut -d' ' -f1"
         IP = subprocess.check_output(cmd, shell=True).decode("utf-8")
-        #IP = "  IP: " + subprocess.check_output(cmd, shell=True).decode("utf-8")
     except:
         IP = "N/A"
-        #IP = "  IP: N/A"
     return IP
 
 

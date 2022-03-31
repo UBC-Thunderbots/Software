@@ -5,7 +5,7 @@ CHANNEL_ID_INDEX = 1
 
 # TODO: move constants.py into bazel build so don't need to import sys
 import sys
-sys.path.append("../constants/")
+sys.path.append("../")
 import constants
 BATTERY_VOLTAGE_BASE = 60
 
@@ -47,8 +47,6 @@ class HomeScreen(Screen):
         self.battery_voltage = redis_dict["battery voltage"]
         self.cap_voltage = redis_dict["cap voltage"]
         self.packet_loss = redis_dict["packet loss"]
-
-
 
         def draw_screen():
             """ Home Screen Layout """
@@ -165,8 +163,12 @@ class HomeScreen(Screen):
     def update_values(self, redis_dict):
         """ Sync values with those from redis """
         if not self.edit_mode:
-            self.actions[ROBOT_ID_INDEX]["value"] = redis_dict["robot id"]
-            self.actions[CHANNEL_ID_INDEX]["value"] = redis_dict["channel id"]
+            for i in range(self.len):
+                if self.actions[i]["redis key"] == None:
+                    continue
+
+                self.actions[i]["value"] = redis_dict[self.actions[i]["redis key"]]
+
         self.battery_voltage = redis_dict["battery voltage"]
         self.cap_voltage = redis_dict["cap voltage"]
         self.packet_loss = redis_dict["packet loss"]

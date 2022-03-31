@@ -1,7 +1,7 @@
-import digitalio
-import board
-from PIL import Image, ImageDraw, ImageOps
 import adafruit_rgb_display.st7735 as st7735
+import board
+import digitalio
+from PIL import Image, ImageDraw, ImageOps
 
 """
 Information for the display that we are using can be found here: https://www.adafruit.com/product/358#description

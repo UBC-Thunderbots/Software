@@ -1,12 +1,5 @@
 from screen import Screen
 
-ENABLE_INDEX = 0
-CHIP_INDEX = 1
-KICK_INDEX = 2
-
-PADDING = 6
-BASE_Y = 20
-
 
 class ChipAndKickScreen(Screen):
     """
@@ -21,12 +14,20 @@ class ChipAndKickScreen(Screen):
         """
         actions = [
             {
-                "redis key": "chip and kick enable",
-                "value": redis_dict["chip and kick enable"],
+                "redis key": "chip enable",
+                "value": redis_dict["chip enable"],
                 "type": bool,
                 "delta": None,
                 "screen action": screen_actions.UPDATE_REDIS,
-                "display string": "Set Chip & Kick: ",
+                "display string": "Set Chip: ",
+            },
+            {
+                "redis key": "kick enable",
+                "value": redis_dict["kick enable"],
+                "type": bool,
+                "delta": None,
+                "screen action": screen_actions.UPDATE_REDIS,
+                "display string": "Set Kick: ",
             },
             {
                 "redis key": "chip speed",
@@ -34,7 +35,7 @@ class ChipAndKickScreen(Screen):
                 "type": float,
                 "delta": 0.5,
                 "screen action": screen_actions.EDIT_SCREEN,
-                "display string": "Chip Speed: ",
+                "display string": "Chip Speed [m/s]: ",
             },
             {
                 "redis key": "kick speed",
@@ -42,7 +43,7 @@ class ChipAndKickScreen(Screen):
                 "type": float,
                 "delta": 0.5,
                 "screen action": screen_actions.EDIT_SCREEN,
-                "display string": "Kick Speed: ",
+                "display string": "Kick Speed [m/s]: ",
             },
             {
                 "redis key": None,
@@ -58,9 +59,15 @@ class ChipAndKickScreen(Screen):
         super().__init__(lcd_display, screen_actions, actions)
 
     def update_values(self, redis_dict):
+        """ Sync values with those from redis """
         if not self.edit_mode:
-            self.actions[ENABLE_INDEX]["value"] = (
-                1 if redis_dict["chip and kick enable"] else 0
-            )
-            self.actions[CHIP_INDEX]["value"] = redis_dict["chip speed"]
-            self.actions[KICK_INDEX]["value"] = redis_dict["kick speed"]
+            for i in range(self.len):
+                if self.actions[i]["redis key"] == None:
+                    continue
+                
+                if self.actions[i]["type"] == bool:
+                    self.actions[i]["value"] = (
+                        1 if redis_dict[self.actions[i]["redis key"]] else 0
+                    )
+                else:
+                    self.actions[i]["value"] = redis_dict[self.actions[i]["redis key"]]
