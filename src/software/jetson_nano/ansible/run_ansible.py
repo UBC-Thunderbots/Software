@@ -71,8 +71,10 @@ def ansible_runner(playbook: str, options: dict = {}):
         skip_tags=skip_tags,
     )
 
+    #for ansible, an inventory represents our fleet of robots. Each host in the inventory belongs to a group.
     inventory = InventoryManager(loader=loader, sources=())
 
+    #a variable manager maintains variables for each individual host. Group or global variables can also be added
     variable_manager = VariableManager(
         loader=loader, inventory=inventory, version_info=CLI.version_info(gitinfo=False)
     )
@@ -84,6 +86,7 @@ def ansible_runner(playbook: str, options: dict = {}):
         inventory.add_host(host, group)
         variable_manager.set_host_variable(host, "inventory_hostname", alias)
 
+    #playbook executor controls running the playbook
     pbex = PlaybookExecutor(
         playbooks=[os.path.dirname(__file__) + "/playbooks/" + playbook],
         inventory=inventory,
@@ -138,10 +141,9 @@ def main():
     ap.add_argument(
         "--port",
         "-p",
-        nargs="*",
         required=False,
         help="port to listen to Announcement scripts on",
-        default=[],
+        default=0,
     )
 
     args = vars(ap.parse_args())

@@ -14,7 +14,6 @@
         - ../../../../../../../../jetson_nano/display
         - ../../../../../../../../jetson_nano/broadcasts
         - ../../../../../../../../jetson_nano/thunderloop_main
-        - ../../../../../../../../jetson_nano/display
       loop_control:
         loop_var: binary_path
       ansible.posix.synchronize:
@@ -23,7 +22,7 @@
         recursive: yes
         copy_links: yes
       tags:
-        - copyBinaries
+        - syncAllBinaries
 
     - name: sync all relevant systemd files
       become_method: sudo
