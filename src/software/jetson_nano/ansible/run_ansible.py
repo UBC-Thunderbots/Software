@@ -40,7 +40,7 @@ def ansible_runner(playbook: str, options: dict = {}):
             exit()
 
         announcements = receive_announcements(
-            port=options["port"], duration=ANNOUNCEMENT_LISTEN_DURATION_S
+            port=int(options["port"]), duration=ANNOUNCEMENT_LISTEN_DURATION_S
         )
         hosts = {a.ip_addr for a in announcements}
         host_aliases = {a.robot_id for a in announcements}
