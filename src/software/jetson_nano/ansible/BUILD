@@ -16,7 +16,7 @@ py_binary(
         "//software/jetson_nano/broadcasts:robot_broadcast_receiver",
         "//software/jetson_nano/broadcasts:robot_broadcast_sender",
         "//software/jetson_nano/display:lcd_user_interface",
-        "//software/jetson_nano/systemd:systemdFiles",
+        "//software/jetson_nano/systemd:systemd_files",
         "//software/jetson_nano/tftp:receiver",
     ],
     deps = [
