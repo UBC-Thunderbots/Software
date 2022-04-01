@@ -18,16 +18,6 @@ class g3logWidget(pg_console.ConsoleWidget):
         self.ui.exceptionBtn.hide()
         self.ui.historyBtn.hide()
 
-        # flip the text and background color to make it dark theme
-        self.ui.output.setStyleSheet(
-            """QPlainTextEdit{
-                color: #ffffff;
-                background-color: #000000;
-                selection-background-color: #606060;
-                selection-color: #ffffff;
-            }"""
-        )
-
         # Creates checkbox widget
         self.checkbox_widget = g3logCheckboxes()
 

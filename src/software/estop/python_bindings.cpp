@@ -7,8 +7,8 @@
 #include <sstream>
 
 #include "pybind11_protobuf/native_proto_caster.h"
-#include "software/uart/boost_uart_communication.h"
 #include "software/estop/threaded_estop_reader.h"
+#include "software/uart/boost_uart_communication.h"
 
 namespace py = pybind11;
 

@@ -1,5 +1,4 @@
 from subprocess import Popen
-import os
 import pygame
 import time
 

@@ -1,6 +1,7 @@
 import os
-import time
 import signal
+import time
+import shelve
 import argparse
 
 import platform
@@ -16,9 +17,10 @@ else:
     import PyQt6
 
 import pyqtgraph
+import qdarktheme
 from pyqtgraph.dockarea import *
 from pyqtgraph.Qt import QtCore, QtGui
-from pyqtgraph.Qt.QtWidgets import QVBoxLayout, QWidget
+from pyqtgraph.Qt.QtWidgets import *
 
 from proto.import_all_protos import *
 
@@ -61,9 +63,8 @@ class Thunderscope(object):
 
         # Setup MainApp and initialize DockArea
         self.app = pyqtgraph.mkQApp("Thunderscope")
-        self.app.setStyleSheet(
-            "QMainWindow{background-color: black;border: 1px solid black;}"
-        )
+        self.app.setStyleSheet(qdarktheme.load_stylesheet())
+
         signal.signal(signal.SIGINT, signal.SIG_DFL)
         self.dock_area = DockArea()
 
@@ -89,6 +90,52 @@ class Thunderscope(object):
         self.refresh_timer.setTimerType(QtCore.Qt.TimerType.PreciseTimer)
         self.refresh_timer.timeout.connect(__refresh)
         self.refresh_timer.start(refresh_interval_ms)  # Refresh at 200hz
+
+        def __save_layout():
+
+            filename, _ = QtGui.QFileDialog.getSaveFileName(
+                self.window,
+                "Save layout",
+                "~/dock_layout_{}.tscopelayout".format(int(time.time())),
+                options=QFileDialog.Option.DontUseNativeDialog,
+            )
+
+            result = self.dock_area.saveState()
+
+            with shelve.open(filename, "c") as shelf:
+                shelf["dock_state"] = result
+
+        def __load_layout():
+
+            filename, _ = QtGui.QFileDialog.getOpenFileName(
+                self.window,
+                "Open layout",
+                "~/",
+                options=QFileDialog.Option.DontUseNativeDialog,
+            )
+
+            with shelve.open(filename, "r") as shelf:
+                self.dock_area.restoreState(shelf["dock_state"])
+
+        self.save_layout = QtGui.QShortcut(QtGui.QKeySequence("Ctrl+S"), self.window)
+        self.save_layout.activated.connect(__save_layout)
+
+        self.save_layout = QtGui.QShortcut(QtGui.QKeySequence("Ctrl+O"), self.window)
+        self.save_layout.activated.connect(__load_layout)
+
+        self.show_help = QtGui.QShortcut(QtGui.QKeySequence("h"), self.window)
+        self.show_help.activated.connect(
+            lambda: QMessageBox.information(
+                self.window,
+                "Help",
+                """
+                Cntrl+S: Save Layout
+                Double Click Purple Bar to pop window out
+                Drag Purple Bar to rearrange docks
+                Click items in legends to select/deselect
+                """,
+            )
+        )
 
     def register_refresh_function(self, refresh_func):
         """Register the refresh functions to run at the refresh_interval_ms
@@ -225,22 +272,22 @@ class Thunderscope(object):
 
 if __name__ == "__main__":
 
-    full_system = FullSystem()
-    mobile_gamepad.MobileGamepad()
+    # full_system = FullSystem()
+    # mobile_gamepad.MobileGamepad()
 
-    def relay_sensor_proto(bob):
-        # TODO is this thread safe?
-        print(time.time())
+    # def relay_sensor_proto(bob):
+    # # TODO is this thread safe?
+    # print(time.time())
 
-    wrapper_packet_listener = networking.SSLWrapperPacketProtoListener(
-        "224.5.23.2", 10020, full_system.send_ssl_wrapper, True
-    )
-    referee_listener = networking.SSLRefereeProtoListener(
-        "224.5.23.2", 10003, full_system.send_ssl_referee, True
-    )
-    robot_status_listener = networking.RobotStatusProtoListener(
-        "ff02::c3d0:42d2:bb01%wlp4s0", 42500, full_system.send_robot_status, True
-    )
+    # wrapper_packet_listener = networking.SSLWrapperPacketProtoListener(
+    # "224.5.23.2", 10020, full_system.send_ssl_wrapper, True
+    # )
+    # referee_listener = networking.SSLRefereeProtoListener(
+    # "224.5.23.2", 10003, full_system.send_ssl_referee, True
+    # )
+    # robot_status_listener = networking.RobotStatusProtoListener(
+    # "ff02::c3d0:42d2:bb01%wlp4s0", 42500, full_system.send_robot_status, True
+    # )
 
     parser = argparse.ArgumentParser(description="Thunderscope")
     parser.add_argument(
@@ -256,16 +303,21 @@ if __name__ == "__main__":
 
     if args.robot_diagnostics:
 
-        estop_reader = ThreadedEstopReader("/dev/ttyACM0", 115200)
+        # estop_reader = ThreadedEstopReader("/dev/ttyACM0", 115200)
 
         thunderscope = Thunderscope()
         log_dock = thunderscope.setup_log_widget()
         thunderscope.dock_area.addDock(log_dock)
 
+        chicker_dock = thunderscope.setup_chicker_widget()
+        thunderscope.dock_area.addDock(chicker_dock)
+
         thunderscope.show()
 
     elif args.run_simulator:
-        print("TODO #2050, this isn't implemented, just run the current standalone simulator")
+        print(
+            "TODO #2050, this isn't implemented, just run the current standalone simulator"
+        )
 
     else:
         thunderscope = Thunderscope()
