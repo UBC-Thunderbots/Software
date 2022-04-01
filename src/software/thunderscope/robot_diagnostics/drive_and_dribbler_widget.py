@@ -61,10 +61,10 @@ class DriveAndDribblerWidget(QWidget):
         label.setStyleSheet("font:white;")
         slider.value()
 
-        if step == 1:
-            slider.valueChanged.connect(label.setNum)
-        else:
+        if step == 10:
             slider.valueChanged.connect(lambda: label.setText(self.valuechange(slider)))
+        else:
+            slider.valueChanged.connect(label.setNum)
 
         # add widgets
         vbox = QGridLayout()
@@ -74,23 +74,38 @@ class DriveAndDribblerWidget(QWidget):
 
         return groupBox, slider
 
-    # slider's value change by 0.1 per step
-    def valuechange(self, slider):
+    def value_change(self, slider):
 
+        """Change the slider's value by 0.1 per step
+
+        :param title: the name of the slider
+
+        """
         value = slider.value()
         value = float(value)
         value = value / 100.0
         valueStr = "%.1f" % value
         return valueStr
 
-    def pushButton(self, title):
+    def push_button(self, title):
+
+        """Create a push button
+
+        :param title: the name of the button
+
+        """
         push_button = QPushButton(title)
         push_button.setFixedWidth(150)
 
         return push_button
 
-    def setUpDirectPerWheel(self, title):
+    def setup_direct_per_wheel(self, title):
 
+        """Create a widget to change the RPM per wheel
+
+        :param title: the name of the slider
+
+        """
         groupBox = QGroupBox(title)
         dbox = QVBoxLayout()
 
@@ -129,6 +144,7 @@ class DriveAndDribblerWidget(QWidget):
         """Create a widget to control the direct velocity of the robot's motors
 
         :param title: the name of the slider
+
         """
 
         groupBox = QGroupBox(title)
@@ -153,6 +169,12 @@ class DriveAndDribblerWidget(QWidget):
 
     def setup_dribbler(self, title):
 
+        """Create a widget to control the dribbler RPM
+
+        :param title: the name of the slider
+
+        """
+
         groupBox = QGroupBox(title)
         dbox = QVBoxLayout()
 
@@ -169,6 +191,11 @@ class DriveAndDribblerWidget(QWidget):
         return groupBox
 
     def reset_all_sliders(self):
+
+        """reset all sliders
+
+        """
+
         self.front_left_slider.setValue(0)
         self.front_right_slider.setValue(0)
         self.back_left_slider.setValue(0)
