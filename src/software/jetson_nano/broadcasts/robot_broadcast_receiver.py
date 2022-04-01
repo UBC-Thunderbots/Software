@@ -48,7 +48,6 @@ def main():
         help="how long to listen for announcements. Recommended > 2",
     )
     args = vars(ap.parse_args())
-    print("workingssssss!!!s")
     port = args["port"]
     duration = args["duration"]
 
