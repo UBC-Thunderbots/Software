@@ -129,7 +129,6 @@ class DriveAndDribblerWidget(QWidget):
         """Create a widget to control the direct velocity of the robot's motors
 
         :param title: the name of the slider
-
         """
 
         groupBox = QGroupBox(title)
