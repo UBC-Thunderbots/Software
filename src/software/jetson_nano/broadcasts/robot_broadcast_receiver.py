@@ -1,7 +1,8 @@
-from proto.announcement_pb2 import Announcement
-import socket
 import argparse
+import socket
 from time import time
+
+from proto.announcement_pb2 import Announcement
 
 RECEIVE_TIMEOUT_SECONDS = 0.2
 

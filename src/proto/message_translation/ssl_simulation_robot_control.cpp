@@ -1,6 +1,7 @@
 #include "proto/message_translation/ssl_simulation_robot_control.h"
 
 #include "shared/constants.h"
+#include "software/geom/angle.h"
 
 extern "C"
 {
@@ -94,8 +95,81 @@ std::unique_ptr<SSLSimulationProto::RobotMoveCommand> createRobotMoveCommand(
     return std::make_unique<SSLSimulationProto::RobotMoveCommand>();
 }
 
+std::unique_ptr<SSLSimulationProto::RobotCommand> getRobotCommandFromDirectControl(
+    unsigned int robot_id,
+    std::unique_ptr<TbotsProto::DirectControlPrimitive> direct_control,
+    RobotConstants_t& robot_constants, WheelConstants_t wheel_constants)
+{
+    auto move_command = createRobotMoveCommand(
+        *direct_control, robot_constants.front_wheel_angle_deg,
+        robot_constants.back_wheel_angle_deg, wheel_constants.wheel_radius_meters);
+    // Values for robot command
+    std::optional<float> kick_speed;       // [m/s]
+    std::optional<float> kick_angle;       // [degree]
+    std::optional<double> dribbler_speed;  // [rpm]
+
+    switch (direct_control->chick_command_case())
+    {
+        case TbotsProto::DirectControlPrimitive::kKickSpeedMPerS:
+        {
+            kick_speed = direct_control->kick_speed_m_per_s();
+            kick_angle = std::nullopt;
+            break;
+        }
+        case TbotsProto::DirectControlPrimitive::kChipDistanceMeters:
+        {
+            Angle chip_angle = Angle::fromDegrees(ROBOT_CHIP_ANGLE_DEGREES);
+            // Use the formula for the Range of a parabolic projectile
+            // Rearrange to solve for the initial velocity.
+            // https://courses.lumenlearning.com/boundless-physics/chapter/projectile-motion/
+            float range = direct_control->chip_distance_meters();
+            float numerator =
+                range *
+                static_cast<float>(ACCELERATION_DUE_TO_GRAVITY_METERS_PER_SECOND_SQUARED);
+            float denominator = static_cast<float>(2.0f * (chip_angle * 2.0f).sin());
+            float chip_speed  = static_cast<float>(std::sqrt(numerator / denominator));
+
+            kick_speed = chip_speed;
+            kick_angle = chip_angle.toDegrees();
+            break;
+        }
+        case TbotsProto::DirectControlPrimitive::kAutokickSpeedMPerS:
+        {
+            kick_speed = direct_control->autokick_speed_m_per_s();
+            kick_angle = std::nullopt;
+            break;
+        }
+        case TbotsProto::DirectControlPrimitive::kAutochipDistanceMeters:
+        {
+            Angle chip_angle = Angle::fromDegrees(ROBOT_CHIP_ANGLE_DEGREES);
+            // Use the formula for the Range of a parabolic projectile
+            // Rearrange to solve for the initial velocity.
+            // https://courses.lumenlearning.com/boundless-physics/chapter/projectile-motion/
+            float range = direct_control->autochip_distance_meters();
+            float numerator =
+                range *
+                static_cast<float>(ACCELERATION_DUE_TO_GRAVITY_METERS_PER_SECOND_SQUARED);
+            float denominator = static_cast<float>(2.0f * (chip_angle * 2.0f).sin());
+            float chip_speed  = static_cast<float>(std::sqrt(numerator / denominator));
+
+            kick_speed = chip_speed;
+            kick_angle = chip_angle.toDegrees();
+            break;
+        }
+        case TbotsProto::DirectControlPrimitive::CHICK_COMMAND_NOT_SET:
+        {
+            direct_control->clear_chick_command();
+            break;
+        }
+    }
+
+    return createRobotCommand(robot_id, std::move(move_command), kick_speed, kick_angle,
+                              direct_control->dribbler_speed_rpm());
+}
+
 std::unique_ptr<SSLSimulationProto::RobotCommand> createRobotCommand(
-    unsigned robot_id, std::unique_ptr<SSLSimulationProto::RobotMoveCommand> move_command,
+    unsigned int robot_id,
+    std::unique_ptr<SSLSimulationProto::RobotMoveCommand> move_command,
     std::optional<double> kick_speed, std::optional<double> kick_angle,
     std::optional<double> dribbler_speed)
 {
