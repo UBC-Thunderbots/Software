@@ -16,9 +16,11 @@ py_binary(
         "//software/simulated_tests:er_force_simulator",
         "//software/simulated_tests:full_system",
         "//software/thunderscope:colors",
+        "//software/thunderscope:common_widgets",
         "//software/thunderscope:constants",
         "//software/thunderscope:proto_receiver",
         "//software/thunderscope/arbitrary_plot:named_value_plotter",
+        "//software/thunderscope/chicker",
         "//software/thunderscope/field",
         "//software/thunderscope/field:field_layer",
         "//software/thunderscope/field:obstacle_layer",
@@ -46,4 +48,9 @@ py_library(
 py_library(
     name = "colors",
     srcs = ["colors.py"],
+)
+
+py_library(
+    name = "common_widgets",
+    srcs = ["common_widgets.py"],
 )

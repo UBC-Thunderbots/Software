@@ -38,6 +38,7 @@ from software.thunderscope.proto_receiver import ProtoReceiver
 from software.thunderscope.robot_communication import mobile_gamepad
 from software.simulated_tests.full_system import FullSystem
 from software.simulated_tests.er_force_simulator import ErForceSimulator
+from software.thunderscope.chicker.chicker import ChickerWidget
 
 
 class Thunderscope(object):
@@ -190,13 +191,29 @@ class Thunderscope(object):
             NamedValue, self.named_value_plotter.named_value_buffer
         )
 
-        # Register refresh funcntion
+        # Register refresh function
         self.register_refresh_function(self.named_value_plotter.refresh)
 
         # Create and return dock
         named_value_plotter_dock = Dock("Performance", size=(500, 100))
         named_value_plotter_dock.addWidget(self.named_value_plotter.plot)
         return named_value_plotter_dock
+
+    def setup_chicker_widget(self):
+        """Setup the chicker widget for robot diagnostics
+
+        :returns: The dock containing the chicker widget
+        """
+        # Create widget
+        self.chicker_widget = ChickerWidget()
+
+        # Register refresh function
+        self.register_refresh_function(self.chicker_widget.refresh)
+
+        # Create and return dock
+        chicker_dock = Dock("Chicker", size=(100, 100))
+        chicker_dock.addWidget(self.chicker_widget)
+        return chicker_dock
 
     def show(self):
         self.window.show()
