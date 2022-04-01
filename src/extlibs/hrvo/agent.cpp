@@ -1,10 +1,11 @@
 #include "agent.h"
 
+#include "extlibs/hrvo/path.h"
 #include "extlibs/hrvo/simulator.h"
 
-Agent::Agent(Simulator *simulator, const Vector2 &position, float radius,
-             const Vector2 &velocity, const Vector2 &prefVelocity, float maxSpeed,
-             float maxAccel, std::size_t goalIndex, float goalRadius)
+Agent::Agent(HRVOSimulator *simulator, const Vector &position, float radius,
+             const Vector &velocity, const Vector &prefVelocity, float maxSpeed,
+             float maxAccel, AgentPath &path)
     : simulator_(simulator),
       position_(position),
       radius_(radius),
@@ -12,22 +13,21 @@ Agent::Agent(Simulator *simulator, const Vector2 &position, float radius,
       pref_velocity_(prefVelocity),
       max_speed_(maxSpeed),
       max_accel_(maxAccel),
-      goal_index_(goalIndex),
-      goal_radius_(goalRadius),
+      path(path),
       reached_goal_(false)
 {
 }
 
 void Agent::update()
 {
-    if (abs(new_velocity_) >= max_speed_)
+    if (new_velocity_.length() >= max_speed_)
     {
         // New velocity can not be greater than max speed
-        new_velocity_ = normalize(new_velocity_) * max_speed_;
+        new_velocity_ = new_velocity_.normalize(max_speed_);
     }
 
-    const Vector2 dv = new_velocity_ - velocity_;
-    if (abs(dv) < max_accel_ * simulator_->getTimeStep() || abs(dv) == 0.f)
+    const Vector dv = new_velocity_ - velocity_;
+    if (dv.length() < max_accel_ * simulator_->getTimeStep() || dv.length() == 0.f)
     {
         velocity_ = new_velocity_;
     }
@@ -35,31 +35,65 @@ void Agent::update()
     {
         // Calculate the maximum velocity towards the preferred velocity, given the
         // acceleration constraint
-        velocity_ = velocity_ + (max_accel_ * simulator_->getTimeStep()) * (dv / abs(dv));
+        velocity_ =
+            velocity_ + (max_accel_ * simulator_->getTimeStep()) * (dv / dv.length());
     }
 
-    position_ += velocity_ * simulator_->timeStep_;
+    position_ += velocity_ * simulator_->time_step;
 
-    if (absSq(simulator_->goals_[goal_index_]->getCurrentGoalPosition() - position_) <
-        goal_radius_ * goal_radius_)
+    Vector current_dest;
+
+    const std::optional<PathPoint> &path_point = path.getCurrentPathPoint();
+    if (path_point == std::nullopt)
+    {
+        // If there are no destinations, the robot should stay at its current position
+        current_dest = position_;
+    }
+    else
+    {
+        current_dest = path_point.value().getPosition();
+    }
+
+    if ((current_dest - position_).lengthSquared() <
+        path.getPathRadius() * path.getPathRadius())
     {
         // Is at current goal position
-        if (simulator_->goals_[goal_index_]->isGoingToFinalGoal())
+        if (path.isGoingToFinalPathPoint())
         {
             reached_goal_ = true;
         }
         else
         {
-            simulator_->goals_[goal_index_]->getNextGoalPostion();
+            path.incrementPathIndex();
             reached_goal_             = false;
-            simulator_->reachedGoals_ = false;
+            simulator_->reached_goals = false;
         }
     }
     else
     {
         reached_goal_             = false;
-        simulator_->reachedGoals_ = false;
+        simulator_->reached_goals = false;
     }
+}
+
+void Agent::setPath(const AgentPath &new_path)
+{
+    path = new_path;
+}
+
+void Agent::setPosition(const Vector &position)
+{
+    position_ = position;
+}
+
+void Agent::setVelocity(const Vector &velocity)
+{
+    velocity_ = velocity;
+}
+
+float Agent::getMaxSpeed() const
+{
+    return max_speed_;
 }
 
 float Agent::getMaxAccel() const
@@ -67,7 +101,7 @@ float Agent::getMaxAccel() const
     return max_accel_;
 }
 
-const Vector2 &Agent::getVelocity() const
+const Vector &Agent::getVelocity() const
 {
     return velocity_;
 }
@@ -77,19 +111,14 @@ float Agent::getRadius() const
     return radius_;
 }
 
-const Vector2 &Agent::getPosition() const
+const Vector &Agent::getPosition() const
 {
     return position_;
 }
 
-const Vector2 &Agent::getPrefVelocity() const
+const Vector &Agent::getPrefVelocity() const
 {
     return pref_velocity_;
-}
-
-size_t Agent::getGoalIndex() const
-{
-    return goal_index_;
 }
 
 bool Agent::hasReachedGoal() const
@@ -97,7 +126,22 @@ bool Agent::hasReachedGoal() const
     return reached_goal_;
 }
 
-float Agent::getGoalRadius() const
+float Agent::getPathRadius() const
 {
-    return goal_radius_;
+    return path.getPathRadius();
+}
+
+const AgentPath &Agent::getPath() const
+{
+    return path;
+}
+
+void Agent::setMaxSpeed(float max_speed)
+{
+    max_speed_ = max_speed;
+}
+
+void Agent::setRadius(float radius)
+{
+    radius_ = radius;
 }

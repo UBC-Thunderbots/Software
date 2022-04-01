@@ -110,13 +110,20 @@ class SimulatedErForceSimTestFixture : public ::testing::Test
      * @param ai_time_step minimum time for one tick of AI
      * @param world the shared_ptr to the world that is updated by this function
      * @param simulator The simulator to tick test on
-     *
+     * @param ball_displacement the ball displacement of the ball in this tick
+     * @param ball_velocity_diff the ball velocity difference in this tick
+     * @param robots_displacement the array that saves the displacement of each robot in
+     * id order
+     * @param robots_velocity_diff the array that saves the velocity difference of each
+     * robot in id order
      * @return if validation functions are done
      */
     bool tickTest(Duration simulation_time_step, Duration ai_time_step,
                   std::shared_ptr<World> friendly_world,
                   std::shared_ptr<World> enemy_world,
-                  std::shared_ptr<ErForceSimulator> simulator);
+                  std::shared_ptr<ErForceSimulator> simulator, double &ball_displacement,
+                  double &ball_velocity_diff, std::vector<double> &robots_displacement,
+                  std::vector<double> &robots_velocity_diff);
 
     /**
      * Sets configs that are common to the friendly and enemy teams

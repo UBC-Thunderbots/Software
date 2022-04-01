@@ -1,12 +1,14 @@
-import pyqtgraph as pg
-from pyqtgraph.Qt import QtCore, QtGui
-from software.thunderscope.field.field_layer import FieldLayer
-import software.thunderscope.constants as constants
-import software.thunderscope.colors as colors
 import queue
-from proto.geometry_pb2 import Polygon, Circle
+
+import pyqtgraph as pg
+from proto.geometry_pb2 import Circle, Polygon
 from proto.visualization_pb2 import Obstacles
+from pyqtgraph.Qt import QtCore, QtGui
+
+from software.thunderscope.colors import Colors
+import software.thunderscope.constants as constants
 from software.networking.threaded_unix_listener import ThreadedUnixListener
+from software.thunderscope.field.field_layer import FieldLayer
 
 
 class ObstacleLayer(FieldLayer):
@@ -32,7 +34,7 @@ class ObstacleLayer(FieldLayer):
 
         self.cached_obstacles = obstacles
 
-        painter.setPen(pg.mkPen(colors.NAVIGATOR_OBSTACLE_COLOR))
+        painter.setPen(pg.mkPen(Colors.NAVIGATOR_OBSTACLE_COLOR, width=2))
 
         for polyobstacle in obstacles.polygon:
             polygon_points = [

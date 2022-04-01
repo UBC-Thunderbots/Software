@@ -1,20 +1,5 @@
-import sys
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import (
-    QApplication,
-    QCheckBox,
-    QGridLayout,
-    QGroupBox,
-    QMenu,
-    QPushButton,
-    QRadioButton,
-    QHBoxLayout,
-    QVBoxLayout,
-    QWidget,
-    QSlider,
-    QLabel,
-    QTabWidget,
-)
+from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import *
 
 
 class DriveAndDribblerWidget(QWidget):
@@ -24,47 +9,62 @@ class DriveAndDribblerWidget(QWidget):
 
         # Initialize tab screen
         tabs = QTabWidget()
-        tab1 = QWidget()
-        tab2 = QWidget()
+        per_wheel_tab = QWidget()
+        direct_velocity_tab = QWidget()
         tabs.setStyleSheet("background-color: black; color:white")
-
         # Add tabs
-        tabs.addTab(tab1, "Direct Per-Wheel Control")
-        tabs.addTab(tab2, "Direct Velocity Control")
+        tabs.addTab(per_wheel_tab, "Direct Per-Wheel Control")
+        tabs.addTab(direct_velocity_tab, "Direct Velocity Control")
 
         # Create first tab
-        tab1.grid = QVBoxLayout()
-        tab1.grid.addWidget(self.setUpDirectPerWheel("Drive"))
-        tab1.grid.addStretch(1)
-        tab1.setLayout(tab1.grid)
+        per_wheel_tab.grid = QVBoxLayout()
+        per_wheel_tab.grid.addWidget(self.setUpDirectPerWheel("Drive"))
+        per_wheel_tab.grid.addStretch(1)
+        per_wheel_tab.setLayout(per_wheel_tab.grid)
 
         # Create second tab
-        tab2.grid2 = QVBoxLayout()
-        tab2.grid2.addWidget(self.setUpDirectVelocity("Drive"))
-        tab2.grid2.addStretch(1)
-        tab2.setLayout(tab2.grid2)
+        direct_velocity_tab.grid2 = QVBoxLayout()
+        direct_velocity_tab.grid2.addWidget(self.setUpDirectVelocity("Drive"))
+        direct_velocity_tab.grid2.addStretch(1)
+        direct_velocity_tab.setLayout(direct_velocity_tab.grid2)
 
         # Add tabs to widget
         layout.addWidget(tabs)
         layout.addWidget(self.setUpDribbler("  Dribbler"))
+        tabs.currentChanged.connect(self.reset_all_sliders)
         self.setLayout(layout)
 
-    def setSlider(self, title):
+    def create_slider(self, title, min, max, step):
+
+        """Creates a slider for the widget
+
+        :param title: the name of the slider
+        :param min: the minimum value of the slider
+        :param max: the maximum value of the slider
+        :param step: singleStep of the slider
+
+        """
+
         groupBox = QGroupBox(title)
 
         # set up the slide
-        slider = QSlider(Qt.Horizontal)
+        slider = QSlider(Qt.Orientation.Horizontal)
         slider.setStyleSheet("font:white")
-        slider.setFocusPolicy(Qt.StrongFocus)
-        slider.setSingleStep(1)
-        slider.setMinimum(-100)
-        slider.setMaximum(100)
+        slider.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
+        slider.setSingleStep(step)
+        slider.setMinimum(min)
+        slider.setMaximum(max)
 
         # create a label to display slide's value
         label = QLabel()
-        label.setAlignment(Qt.AlignCenter)
+        label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         label.setStyleSheet("font:white;")
-        slider.valueChanged.connect(label.setNum)
+        slider.value()
+
+        if step == 1:
+            slider.valueChanged.connect(label.setNum)
+        else:
+            slider.valueChanged.connect(lambda: label.setText(self.valuechange(slider)))
 
         # add widgets
         vbox = QGridLayout()
@@ -74,11 +74,20 @@ class DriveAndDribblerWidget(QWidget):
 
         return groupBox, slider
 
-    def resetBtn(self):
-        wheelBtn = QPushButton("Stop and Reset")
-        wheelBtn.setFixedWidth(150)
+    # slider's value change by 0.1 per step
+    def valuechange(self, slider):
 
-        return wheelBtn
+        value = slider.value()
+        value = float(value)
+        value = value / 100.0
+        valueStr = "%.1f" % value
+        return valueStr
+
+    def pushButton(self, title):
+        push_button = QPushButton(title)
+        push_button.setFixedWidth(150)
+
+        return push_button
 
     def setUpDirectPerWheel(self, title):
 
@@ -86,66 +95,86 @@ class DriveAndDribblerWidget(QWidget):
         dbox = QVBoxLayout()
 
         # set up the sliders
-        frontLeft, slidefl = self.setSlider("Front Left")
-        frontRight, slidefr = self.setSlider("Front Right")
-        backLeft, slidebl = self.setSlider("Back Left")
-        backRight, slidebr = self.setSlider("Back Right")
+        front_left_groupbox, self.front_left_slider = self.create_slider(
+            "Front Left", -100, 100, 1
+        )
+        front_right_groupbox, self.front_right_slider = self.create_slider(
+            "Front Right", -100, 100, 1
+        )
+        back_left_groupbox, self.back_left_slider = self.create_slider(
+            "Back Left", -100, 100, 1
+        )
+        back_right_groupbox, self.back_right_slider = self.create_slider(
+            "Back Right", -100, 100, 1
+        )
 
         # set up the stop and reset button
-        stopAndreset = self.resetBtn()
-        stopAndreset.clicked.connect(lambda: slidefl.setValue(0))
-        stopAndreset.clicked.connect(lambda: slidefr.setValue(0))
-        stopAndreset.clicked.connect(lambda: slidebl.setValue(0))
-        stopAndreset.clicked.connect(lambda: slidebr.setValue(0))
+        stop_and_reset = self.pushButton("Stop and Reset")
+
+        stop_and_reset.clicked.connect(self.reset_all_sliders)
 
         # add widget
-        dbox.addWidget(frontLeft)
-        dbox.addWidget(frontRight)
-        dbox.addWidget(backLeft)
-        dbox.addWidget(backRight)
-        dbox.addWidget(stopAndreset, alignment=Qt.AlignCenter)
+        dbox.addWidget(front_left_groupbox)
+        dbox.addWidget(front_right_groupbox)
+        dbox.addWidget(back_left_groupbox)
+        dbox.addWidget(back_right_groupbox)
+        dbox.addWidget(stop_and_reset, alignment=Qt.AlignmentFlag.AlignCenter)
 
         groupBox.setLayout(dbox)
 
         return groupBox
 
-    def setUpDirectVelocity(self, title):
+    def setup_direct_velocity(self, title):
+
+        """Create a widget to control the direct velocity of the robot's motors
+
+        :param title: the name of the slider
+
+        """
 
         groupBox = QGroupBox(title)
         dbox = QVBoxLayout()
 
-        xms, slidexms = self.setSlider("X (m/s)")
-        yms, slideyms = self.setSlider("Y (m/s)")
-        degree, slidedegree = self.setSlider("θ (°/s)")
+        xms, self.slidexms = self.create_slider("X (m/s)", -1000, 1000, 10)
+        yms, self.slideyms = self.create_slider("Y (m/s)", -1000, 1000, 10)
+        degree, self.slidedegree = self.create_slider("θ (°/s)", -100, 100, 1)
 
-        stopAndreset = self.resetBtn()
+        stop_and_reset = self.pushButton("Stop and Reset")
 
-        stopAndreset.clicked.connect(lambda: slidexms.setValue(0))
-        stopAndreset.clicked.connect(lambda: slideyms.setValue(0))
-        stopAndreset.clicked.connect(lambda: slidedegree.setValue(0))
+        stop_and_reset.clicked.connect(self.reset_all_sliders)
 
         dbox.addWidget(xms)
         dbox.addWidget(yms)
         dbox.addWidget(degree)
-        dbox.addWidget(stopAndreset, alignment=Qt.AlignCenter)
+        dbox.addWidget(stop_and_reset, alignment=Qt.AlignmentFlag.AlignCenter)
 
         groupBox.setLayout(dbox)
 
         return groupBox
 
-    def setUpDribbler(self, title):
+    def setup_dribbler(self, title):
 
         groupBox = QGroupBox(title)
         dbox = QVBoxLayout()
 
-        dribbler, sliderDribbler = self.setSlider("RPM")
+        dribbler, self.sliderDribbler = self.create_slider("RPM", -100, 100, 1)
 
-        stopAndreset = self.resetBtn()
-        stopAndreset.clicked.connect(lambda: sliderDribbler.setValue(0))
+        stop_and_reset = self.pushButton("Stop and Reset")
+        stop_and_reset.clicked.connect(lambda: self.sliderDribbler.setValue(0))
 
         dbox.addWidget(dribbler)
-        dbox.addWidget(stopAndreset, alignment=Qt.AlignCenter)
+        dbox.addWidget(stop_and_reset, alignment=Qt.AlignmentFlag.AlignCenter)
         groupBox.setStyleSheet("background-color: black; color:white")
         groupBox.setLayout(dbox)
 
         return groupBox
+
+    def reset_all_sliders(self):
+        self.front_left_slider.setValue(0)
+        self.front_right_slider.setValue(0)
+        self.back_left_slider.setValue(0)
+        self.back_right_slider.setValue(0)
+
+        self.slidexms.setValue(0)
+        self.slideyms.setValue(0)
+        self.slidedegree.setValue(0)

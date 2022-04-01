@@ -3,10 +3,10 @@
 #include "extlibs/er_force_sim/src/amun/simulator/simulator.h"
 #include "proto/defending_side_msg.pb.h"
 #include "proto/messages_robocup_ssl_wrapper.pb.h"
+#include "proto/robot_status_msg.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
 #include "shared/parameter/cpp_dynamic_parameters.h"
-#include "software/simulation/er_force_simulator_ball.h"
-#include "software/simulation/er_force_simulator_robot.h"
+#include "software/jetson_nano/primitive_executor.h"
 #include "software/simulation/firmware_object_deleter.h"
 #include "software/world/field.h"
 #include "software/world/team_types.h"
@@ -26,7 +26,7 @@ extern "C"
  * as well as the firmware simulation for the robots. This provides a simple interface
  * to setup, run, and query the current state of the simulation.
  */
-class ErForceSimulator : public QObject
+class ErForceSimulator
 {
    public:
     /**
@@ -70,18 +70,27 @@ class ErForceSimulator : public QObject
     void setBlueRobots(const std::vector<RobotStateWithId>& robots);
     void setRobots(const std::vector<RobotStateWithId>& robots,
                    gameController::Team team);
+    void setRobots(const google::protobuf::Map<uint32_t, TbotsProto::RobotState>& robots,
+                   gameController::Team side);
+
+    /**
+     * Set the world state from a WorldState proto in the simulation.
+     *
+     * @param world_state The new WorldState
+     */
+    void setWorldState(const TbotsProto::WorldState& world_state);
 
     /**
      * Sets the primitive being simulated by the robot on the corresponding team
      * in simulation
      *
      * @param primitive_set_msg The set of primitives to run on the robot
-     * @param vision_msg The vision message
+     * @param world_msg The world message
      */
     void setYellowRobotPrimitiveSet(const TbotsProto::PrimitiveSet& primitive_set_msg,
-                                    std::unique_ptr<TbotsProto::Vision> vision_msg);
+                                    std::unique_ptr<TbotsProto::World> world_msg);
     void setBlueRobotPrimitiveSet(const TbotsProto::PrimitiveSet& primitive_set_msg,
-                                  std::unique_ptr<TbotsProto::Vision> vision_msg);
+                                  std::unique_ptr<TbotsProto::World> world_msg);
 
     /**
      * Advances the simulation by the given time step.
@@ -89,6 +98,14 @@ class ErForceSimulator : public QObject
      * @param time_step how much to advance the simulation by
      */
     void stepSimulation(const Duration& time_step);
+
+    /**
+     * Gets the blue and yellow robot statuses
+     *
+     * @return a vector of robot statuses from either blue or yellow robots
+     */
+    std::vector<TbotsProto::RobotStatus> getBlueRobotStatuses() const;
+    std::vector<TbotsProto::RobotStatus> getYellowRobotStatuses() const;
 
     /**
      * Returns the most recent SSL Wrapper Packets
@@ -127,32 +144,40 @@ class ErForceSimulator : public QObject
      * Sets the primitive being simulated by the robot in simulation
      *
      * @param id The id of the robot to set the primitive for
-     * @param primitive_msg The primitive to run on the robot
-     * @param simulator_robots The robots to set the primitives on
-     * @param vision_msg The vision message
+     * @param primitive_set_msg The primitive to run on the robot
+     * @param robot_primitive_executor_map The robot primitive executors to send the
+     * primitive set to
+     * @param world_msg The world message
      */
     static void setRobotPrimitive(
-        RobotId id, const TbotsProto::Primitive& primitive_msg,
-        std::vector<std::shared_ptr<ErForceSimulatorRobot>>& simulator_robots,
-        const TbotsProto::Vision& vision_msg);
+        RobotId id, const TbotsProto::PrimitiveSet& primitive_set_msg,
+        std::unordered_map<unsigned int, std::shared_ptr<PrimitiveExecutor>>&
+            robot_primitive_executor_map,
+        const TbotsProto::World& world_msg);
 
     /**
      * Update Simulator Robot and get the latest robot control
      *
-     * @param simulator_robots Vector of simulator robots
-     * @param vision_msg The vision msg for this team of robots
+     * @param robot_primitive_executor_map Map of robot IDs to the robot's primitive
+     * executor
+     * @param world_msg The world msg for this team of robots
      *
      * @return robot control
      */
-    static SSLSimulationProto::RobotControl updateSimulatorRobots(
-        std::vector<std::shared_ptr<ErForceSimulatorRobot>> simulator_robots,
-        TbotsProto::Vision vision_msg);
+    SSLSimulationProto::RobotControl updateSimulatorRobots(
+        std::unordered_map<unsigned int, std::shared_ptr<PrimitiveExecutor>>&
+            robot_primitive_executor_map,
+        const TbotsProto::World& world_msg);
 
-    std::vector<std::shared_ptr<ErForceSimulatorRobot>> yellow_simulator_robots;
-    std::vector<std::shared_ptr<ErForceSimulatorRobot>> blue_simulator_robots;
-    std::unique_ptr<TbotsProto::Vision> yellow_team_vision_msg;
-    std::unique_ptr<TbotsProto::Vision> blue_team_vision_msg;
+    // Map of Robot id to Primitive Executor
+    std::unordered_map<unsigned int, std::shared_ptr<PrimitiveExecutor>>
+        yellow_primitive_executor_map;
+    std::unordered_map<unsigned int, std::shared_ptr<PrimitiveExecutor>>
+        blue_primitive_executor_map;
+    std::unique_ptr<TbotsProto::World> yellow_team_world_msg;
+    std::unique_ptr<TbotsProto::World> blue_team_world_msg;
 
+    static constexpr double primitive_executor_time_step = 1.0 / 60.0;
     unsigned int frame_number;
 
     // The current time.
@@ -164,6 +189,9 @@ class ErForceSimulator : public QObject
     RobotConstants_t robot_constants;
     WheelConstants wheel_constants;
     Field field;
+
+    std::optional<RobotId> blue_robot_with_ball;
+    std::optional<RobotId> yellow_robot_with_ball;
 
     const QString CONFIG_FILE      = "simulator/2020";
     const QString CONFIG_DIRECTORY = "extlibs/er_force_sim/config/";

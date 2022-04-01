@@ -28,9 +28,7 @@ echo "================================================================"
 
 sudo apt-get update
 sudo apt-get install -y software-properties-common # required for add-apt-repository
-
 sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
-
 sudo apt-get update
 
 # (sorted alphabetically)
@@ -90,7 +88,9 @@ if [[ $(lsb_release -rs) == "18.04" ]]; then
     # the bazel install hasn't installed it properly
     host_software_packages+=(python-minimal)
     host_software_packages+=(libclang-dev)
+    host_software_packages+=(python2.7-dev)
     host_software_packages+=(python3.8)
+    host_software_packages+=(python3.8-dev)
     host_software_packages+=(python3.8-venv)
     host_software_packages+=(python3-setuptools)
 fi
@@ -108,7 +108,7 @@ echo "Setting Up Virtual Python Environment"
 echo "================================================================"
 
 # delete tbotspython first
-sudo rm -r /opt/tbotspython
+sudo rm -rf /opt/tbotspython
 
 if ! sudo /usr/bin/python3.8 -m venv /opt/tbotspython ; then
     echo "##############################################################"
@@ -124,13 +124,14 @@ if ! sudo /opt/tbotspython/bin/python3 -m pip install --upgrade pip ; then
     exit 1
 fi
 
-
-if ! sudo /opt/tbotspython/bin/pip3 install pyqt5  ; then
-    echo "##############################################################"
-    echo "Error: Installing pyqt5 failed"
-    echo "##############################################################"
-    exit 1
+if [[ $(lsb_release -rs) == "18.04" ]]; then
+    sudo /opt/tbotspython/bin/pip3 install -r ubuntu18_requirements.txt
 fi
+
+if [[ $(lsb_release -rs) == "20.04" ]]; then
+    sudo /opt/tbotspython/bin/pip3 install -r ubuntu20_requirements.txt
+fi
+
 
 if ! sudo /opt/tbotspython/bin/pip3 install --upgrade protobuf  ; then
     echo "##############################################################"
