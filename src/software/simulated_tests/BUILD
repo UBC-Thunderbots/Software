@@ -137,43 +137,6 @@ py_library(
 )
 
 py_library(
-    name = "er_force_simulator",
-    srcs = [
-        "er_force_simulator.py",
-    ],
-    data = [
-        "//software:er_force_simulator_main",
-        "//software:py_constants.so",
-    ],
-    deps = [
-        "//proto:software_py_proto",
-        "//proto:tbots_py_proto",
-        "//software/logger:py_logger",
-        "//software/networking:threaded_unix_listener_py",
-        "//software/networking:threaded_unix_sender_py",
-    ],
-)
-
-py_library(
-    name = "full_system",
-    srcs = [
-        "full_system.py",
-    ],
-    data = [
-        "//software:py_constants.so",
-        "//software:unix_full_system",
-        "//software/geom:geometry.so",
-    ],
-    deps = [
-        "//proto:software_py_proto",
-        "//proto:tbots_py_proto",
-        "//software/logger:py_logger",
-        "//software/networking:threaded_unix_listener_py",
-        "//software/networking:threaded_unix_sender_py",
-    ],
-)
-
-py_library(
     name = "validation",
     srcs = [
         "ball_enters_region.py",

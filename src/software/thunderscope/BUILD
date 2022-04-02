@@ -8,17 +8,19 @@ py_binary(
     data = [
         "//software/estop:estop_reader.so",
         "//software/networking:networking.so",
+        "//software:py_constants.so",
+        "//software:unix_full_system",
+        "//software/geom:geometry.so",
+        "//software:er_force_simulator_main",
     ],
     deps = [
         "//proto:software_py_proto",
         "//software/networking:threaded_unix_listener_py",
         "//software/networking:threaded_unix_sender_py",
-        "//software/simulated_tests:er_force_simulator",
-        "//software/simulated_tests:full_system",
         "//software/thunderscope:colors",
         "//software/thunderscope:common_widgets",
         "//software/thunderscope:constants",
-        "//software/thunderscope:proto_receiver",
+        "//software/thunderscope:proto_unix_io",
         "//software/thunderscope/arbitrary_plot:named_value_plotter",
         "//software/thunderscope/chicker",
         "//software/thunderscope/field",
@@ -36,8 +38,8 @@ py_binary(
 )
 
 py_library(
-    name = "proto_receiver",
-    srcs = ["proto_receiver.py"],
+    name = "proto_unix_io",
+    srcs = ["proto_unix_io.py"],
 )
 
 py_library(

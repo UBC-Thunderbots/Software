@@ -144,15 +144,20 @@ echo "================================================================"
 echo "Done Setting Up Virtual Python Environment"
 echo "================================================================"
 
+echo "================================================================"
+echo "Fetching mobile gamepad and game controller"
+echo "================================================================"
+
 FILE=/opt/mobile_gamepad.zip
 if [ ! -f "$FILE" ]; then
     echo "Mobile Gamepad Binary not found, fetching"
     # Download handheld controller
-    sudo curl -L https://github.com/UBC-Thunderbots/mobile-gamepad/releases/download/vtbots.0.1/gamepad.zip -o /opt/mobile_gamepad.zip
+    sudo curl -L https://github.com/UBC-Thunderbots/mobile-gamepad/releases/download/vtbots.0.1/gamepad.zip -o /opt/tbotspython/mobile_gamepad.zip
     sudo unzip /opt/mobile_gamepad.zip -d /opt
     sudo chown -R $USER:$USER /opt/mobile_gamepad
 fi
 
+sudo wget -nc https://github.com/RoboCup-SSL/ssl-game-controller/releases/download/v2.4.0/ssl-game-controller_v2.4.0_linux_amd64 -O /opt/tbotspython/gamecontroller
 
 # Install Bazel
 echo "================================================================"

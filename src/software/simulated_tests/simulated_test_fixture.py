@@ -16,6 +16,7 @@ from software.simulated_tests import validation
 from software.simulated_tests.full_system import FullSystem
 from software.simulated_tests.er_force_simulator import ErForceSimulator
 from software.thunderscope.thunderscope import Thunderscope
+from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.py_constants import MILLISECONDS_PER_SECOND
 
 from software.logger.logger import createLogger
@@ -41,6 +42,9 @@ class TacticTestRunner(object):
         :param runtime_dir: Directory to open sockets, store logs and any output files
 
         """
+        blue_full_system_proto_unix_io = ProtoUnixIO()
+        simulation_proto_unix_io = ProtoUnixIO()
+
 
         # Setup runtime directory
         try:
@@ -48,21 +52,13 @@ class TacticTestRunner(object):
         except:
             pass
 
-        self.enable_thunderscope = enable_thunderscope
+        self.thunderscope = Thunderscope()
+        self.thunderscope.configure_default_layout()
 
-        if self.enable_thunderscope:
-            self.thunderscope = Thunderscope()
-            self.thunderscope.configure_default_layout()
-            self.eventually_validation_sender = ThreadedUnixSender(
-                runtime_dir + "/eventually_validation"
-            )
-            self.always_validation_sender = ThreadedUnixSender(
-                runtime_dir + "/always_validation"
-            )
-
-        self.simulator = ErForceSimulator()
-        self.yellow_full_system = FullSystem()
-        time.sleep(launch_delay_s)
+        # Run full system and er_force_simulator
+        self.thunderscope.run_full_system(blue_full_system_proto_unix_io)
+        self.thunderscope.run_er_force_simulator(
+                simulation_proto_unix_io, blue_full_system_proto_unix_io)
 
         self.last_exception = None
 
@@ -93,15 +89,7 @@ class TacticTestRunner(object):
 
             """
             time.sleep(delay)
-
-            # Close everything
-            self.simulator.simulator_process.kill()
-            self.yellow_full_system.full_system_process.kill()
-            self.simulator.simulator_process.wait()
-            self.yellow_full_system.full_system_process.wait()
-
-            if self.enable_thunderscope:
-                self.thunderscope.close()
+            self.thunderscope.close()
 
         def __runner():
             """Step simulation, full_system and run validation
