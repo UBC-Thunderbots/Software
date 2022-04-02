@@ -33,6 +33,7 @@ from software.thunderscope.field.field import Field
 from software.thunderscope.log.g3log_widget import g3logWidget
 from software.thunderscope.proto_receiver import ProtoReceiver
 from software.thunderscope.play.playinfo_widget import playInfoWidget
+from software.thunderscope.chicker.chicker import ChickerWidget
 
 
 class Thunderscope(object):
@@ -187,7 +188,7 @@ class Thunderscope(object):
             NamedValue, self.named_value_plotter.named_value_buffer
         )
 
-        # Register refresh funcntion
+        # Register refresh function
         self.register_refresh_function(self.named_value_plotter.refresh)
 
         # Create and return dock
@@ -208,6 +209,22 @@ class Thunderscope(object):
         self.proto_receiver.register_observer(PlayInfo, play_info.log_buffer)
         self.register_refresh_function(play_info.refresh)
         return play_info_dock
+
+    def setup_chicker_widget(self):
+        """Setup the chicker widget for robot diagnostics
+
+        :returns: The dock containing the chicker widget
+        """
+        # Create widget
+        self.chicker_widget = ChickerWidget()
+
+        # Register refresh function
+        self.register_refresh_function(self.chicker_widget.refresh)
+
+        # Create and return dock
+        chicker_dock = Dock("Chicker", size=(100, 100))
+        chicker_dock.addWidget(self.chicker_widget)
+        return chicker_dock
 
     def show(self):
         self.window.show()
