@@ -32,7 +32,6 @@ const std::string SSL_WRAPPER_PATH         = "/ssl_wrapper";
 const std::string SSL_REFEREE_PATH         = "/ssl_referee";
 const std::string SENSOR_PROTO_PATH        = "/sensor_proto";
 const std::string WORLD_STATE_PATH         = "/world_state";
-const std::string SSL_WRAPPER_PACKET_PATH  = "/ssl_wrapper_packet";
 const std::string BLUE_ROBOT_STATUS_PATH   = "/blue_robot_status";
 const std::string YELLOW_ROBOT_STATUS_PATH = "/yellow_robot_status";
 const std::string SIMULATION_TICK_PATH     = "/simulation_tick";

@@ -41,16 +41,16 @@ class WorldLayer(FieldLayer):
         :param event: The event
 
         """
-        if event.key() == Qt.Key_R:
+        if event.key() == Qt.Key.Key_R:
             # TODO (#2410) enter function to rotate the robot
             print("pressed R")
             self.pressed_R = True
 
-        elif event.key() == Qt.Key_Control:
+        elif event.key() == Qt.Key.Key_Control:
             # TODO (#2410) enter function to move the ball
             print("pressed CTRL")
 
-        elif event.key() == Qt.Key_M:
+        elif event.key() == Qt.Key.Key_M:
             # TODO (#2410) enter function to move the robot
             print("pressed M")
             self.pressed_M = True
@@ -62,17 +62,17 @@ class WorldLayer(FieldLayer):
         :param event: The event
 
         """
-        if event.key() == Qt.Key_R:
+        if event.key() == Qt.Key.Key_R:
             # TODO (#2410) exit function to rotate the robot
             print("released R")
             self.pressed_R = False
 
-        elif event.key() == Qt.Key_Control:
+        elif event.key() == Qt.Key.Key_Control:
             # TODO (#2410) exit function to move the ball
             self.pressed_CTRL = False
             print("released CTRL")
 
-        elif event.key() == Qt.Key_M:
+        elif event.key() == Qt.Key.Key_M:
             # TODO (#2410) exit function to move the robot
             print("released M")
             self.pressed_M = False
@@ -92,9 +92,6 @@ class WorldLayer(FieldLayer):
         :param event: The event
 
         """
-        # TODO (#2410) implement robot and ball interactivity through simulator, based on mouse and keyboard events
-
-        # print the position of the mouse click
         print("x: " + str(event.pos().x() / MM_PER_M))
         print("y: " + str(event.pos().y() / MM_PER_M))
 

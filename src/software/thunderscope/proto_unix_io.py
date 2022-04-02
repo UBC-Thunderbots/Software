@@ -43,6 +43,7 @@ class ProtoUnixIO:
     function and a register_observer interface to reiceve data over unix sockets.
 
     """
+
     def __init__(self):
         # Mapping from ProtoType.DESCRIPTOR.full_name -> buffer
         self.proto_observers = {}
@@ -73,12 +74,25 @@ class ProtoUnixIO:
         :param buffer: buffer from the widget to register
 
         """
-        if proto_class in self.proto_observers:
+        if proto_class.DESCRIPTOR.full_name in self.proto_observers:
             self.proto_observers[proto_class.DESCRIPTOR.full_name].append(buffer)
         else:
             self.proto_observers[proto_class.DESCRIPTOR.full_name] = [buffer]
 
-    def attach_unix_sender(self, unix_path,  proto_class):
+    def send_proto(self, proto_class, data):
+        """Send the data to all register_observers
+
+        :param proto_class: The class to send
+        :param data: The data to send
+
+        """
+        for buffer in self.proto_observers[proto_class.DESCRIPTOR.full_name]:
+            try:
+                buffer.put_nowait(data)
+            except queue.Full:
+                pass
+
+    def attach_unix_sender(self, unix_path, proto_class):
         """Creates a unix sender and registers an observer
         of the proto_class to send the data over the unix_path socket.
         
@@ -94,6 +108,8 @@ class ProtoUnixIO:
         """Creates a unix listener of that protobuf type and provides
         incoming data to registered observers.
         
+        NOTE: We have to special case log visualize calls
+
         :param unix_path: The unix path to send data over
         :param proto_class: The prototype to send
 
@@ -101,6 +117,7 @@ class ProtoUnixIO:
         listener = ThreadedUnixListener(unix_path, proto_class=proto_class)
         key = proto_class.DESCRIPTOR.full_name if proto_class else "protobuf"
         self.unix_listeners[key] = listener
-        self.send_proto_to_observer_threads[key] =\
-                Thread(target=self.__send_proto_to_observers, args=(listener.proto_buffer, ))
+        self.send_proto_to_observer_threads[key] = Thread(
+            target=self.__send_proto_to_observers, args=(listener.proto_buffer,)
+        )
         self.send_proto_to_observer_threads[key].start()

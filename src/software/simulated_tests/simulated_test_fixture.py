@@ -45,7 +45,6 @@ class TacticTestRunner(object):
         blue_full_system_proto_unix_io = ProtoUnixIO()
         simulation_proto_unix_io = ProtoUnixIO()
 
-
         # Setup runtime directory
         try:
             os.mkdir(runtime_dir)
@@ -58,7 +57,8 @@ class TacticTestRunner(object):
         # Run full system and er_force_simulator
         self.thunderscope.run_full_system(blue_full_system_proto_unix_io)
         self.thunderscope.run_er_force_simulator(
-                simulation_proto_unix_io, blue_full_system_proto_unix_io)
+            simulation_proto_unix_io, blue_full_system_proto_unix_io
+        )
 
         self.last_exception = None
 

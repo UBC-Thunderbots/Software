@@ -1,5 +1,7 @@
 import os
 import signal
+from threading import Thread
+import queue
 import time
 import shelve
 import argparse
@@ -21,6 +23,7 @@ import qdarktheme
 from subprocess import Popen
 from pyqtgraph.dockarea import *
 from pyqtgraph.Qt import QtCore, QtGui
+import software.geom.geometry as geom
 from pyqtgraph.Qt.QtWidgets import *
 from PyQt6.QtWebEngineWidgets import QWebEngineView
 
@@ -152,26 +155,38 @@ class Thunderscope(object):
 
         """
         # inputs to full_system
-        self.proto_unix_io.attach_unix_sender(self.runtime_dir + ROBOT_STATUS_PATH, RobotStatus)
-        self.proto_unix_io.attach_unix_sender(self.runtime_dir + SSL_WRAPPER_PATH, SSL_WrapperPacket)
-        self.proto_unix_io.attach_unix_sender(self.runtime_dir + SSL_REFEREE_PATH, Referee)
-        self.proto_unix_io.attach_unix_sender(self.runtime_dir + SENSOR_PROTO_PATH, SensorProto)
+        self.proto_unix_io.attach_unix_sender(
+            self.runtime_dir + ROBOT_STATUS_PATH, RobotStatus
+        )
+        self.proto_unix_io.attach_unix_sender(
+            self.runtime_dir + SSL_WRAPPER_PATH, SSL_WrapperPacket
+        )
+        self.proto_unix_io.attach_unix_sender(
+            self.runtime_dir + SSL_REFEREE_PATH, Referee
+        )
+        self.proto_unix_io.attach_unix_sender(
+            self.runtime_dir + SENSOR_PROTO_PATH, SensorProto
+        )
         self.proto_unix_io.attach_unix_receiver(
-                        self.runtime_dir + TACTIC_OVERRIDE_PATH, AssignedTacticPlayControlParams)
+            self.runtime_dir + TACTIC_OVERRIDE_PATH, AssignedTacticPlayControlParams
+        )
 
         # outputs from full_system
         self.proto_unix_io.attach_unix_receiver(self.runtime_dir + "/protobuf")
         self.proto_unix_io.attach_unix_receiver(self.runtime_dir + WORLD_PATH, World)
-        self.proto_unix_io.attach_unix_receiver(self.runtime_dir + PRIMITIVE_PATH, PrimitiveSet)
+        self.proto_unix_io.attach_unix_receiver(
+            self.runtime_dir + PRIMITIVE_PATH, PrimitiveSet
+        )
 
         # TODO (#2510) rename to full_system
         self.full_system_process = Popen(["software/unix_full_system"])
 
-
-    def run_er_force_simulator(self, 
-            thunderscope_proto_unix_io,
-            blue_full_system_proto_unix_io,
-            yellow_full_system_proto_unix_io=None):
+    def run_er_force_simulator(
+        self,
+        thunderscope_proto_unix_io,
+        blue_full_system_proto_unix_io,
+        yellow_full_system_proto_unix_io=None,
+    ):
         """Run er force simulator and set up the proto unix IO
 
         :param thunderscope_proto_unix_io: These protobufs will be managed
@@ -180,51 +195,60 @@ class Thunderscope(object):
         :param blue_full_system_proto_unix_io: The unix io for the blue full system 
         :param yellow_proto_unix_io: The unix io for the yellow full system
 
-        NOTE: We have two seperate IOs for each full system because the
+        NOTE: We have two separate IOs for each full system because the
         er force simulator expects two inputs of the same type but from the blue
         or yellow team.
 
         """
         # inputs to er_force_simulator_main
-        thunderscope_proto_unix_io.attach_unix_sender(self.runtime_dir + SIMULATION_TICK_PATH, SimulatorTick)
-        thunderscope_proto_unix_io.attach_unix_sender(self.runtime_dir + WORLD_STATE_PATH, WorldState)
+        thunderscope_proto_unix_io.attach_unix_sender(
+            self.runtime_dir + SIMULATION_TICK_PATH, SimulatorTick
+        )
+        thunderscope_proto_unix_io.attach_unix_sender(
+            self.runtime_dir + WORLD_STATE_PATH, WorldState
+        )
 
         # setup blue full system unix io
         if blue_full_system_proto_unix_io:
             blue_full_system_proto_unix_io.attach_unix_sender(
-                    self.runtime_dir + BLUE_WORLD_PATH, World)
-            blue_full_system_proto_unix_io = ThreadedUnixSender(
-                runtime_dir + BLUE_PRIMITIVE_SET, PrimitiveSet
+                self.runtime_dir + BLUE_WORLD_PATH, World
             )
-            blue_full_system_proto_unix_io = ThreadedUnixListener(
-                runtime_dir + SSL_WRAPPER_PACKET_PATH, SSL_WrapperPacket
+            blue_full_system_proto_unix_io.attach_unix_sender(
+                self.runtime_dir + BLUE_PRIMITIVE_SET, PrimitiveSet
             )
-            blue_full_system_proto_unix_io = ThreadedUnixListener(
-                runtime_dir + BLUE_ROBOT_STATUS_PATH, RobotStatus
+            blue_full_system_proto_unix_io.attach_unix_receiver(
+                self.runtime_dir + SSL_WRAPPER_PATH, SSL_WrapperPacket
+            )
+            blue_full_system_proto_unix_io.attach_unix_receiver(
+                self.runtime_dir + BLUE_ROBOT_STATUS_PATH, RobotStatus
             )
 
         # setup yellow full system unix io
         if yellow_full_system_proto_unix_io:
+            # yellow_full_system_proto_unix_io.attach_unix_sender(
+            # self.runtime_dir + YELLOW_WORLD_PATH, World)
             yellow_full_system_proto_unix_io.attach_unix_sender(
-                    self.runtime_dir + YELLOW_WORLD_PATH, World)
-            yellow_full_system_proto_unix_io = ThreadedUnixSender(
-                runtime_dir + YELLOW_PRIMITIVE_SET, PrimitiveSet
+                self.runtime_dir + YELLOW_PRIMITIVE_SET, PrimitiveSet
             )
-            yellow_full_system_proto_unix_io = ThreadedUnixListener(
-                runtime_dir + SSL_WRAPPER_PACKET_PATH, SSL_WrapperPacket
+            yellow_full_system_proto_unix_io.attach_unix_receiver(
+                self.runtime_dir + SSL_WRAPPER_PATH, SSL_WrapperPacket
             )
-            yellow_full_system_proto_unix_io = ThreadedUnixListener(
-                runtime_dir + YELLOW_ROBOT_STATUS_PATH, RobotStatus
+            yellow_full_system_proto_unix_io.attach_unix_receiver(
+                self.runtime_dir + YELLOW_ROBOT_STATUS_PATH, RobotStatus
             )
 
         self.simulator_process = Popen(["software/er_force_simulator_main"])
-
 
     def run_gamecontroller(self):
         """Run the gamecontroller
         """
         self.gamecontroller = Popen(["/opt/tbotspython/gamecontroller"])
-
+        self.receive_referee_command = networking.SSLRefereeProtoListener(
+            "224.5.23.1",
+            10003,
+            lambda data: self.proto_unix_io.send_proto(Referee, data),
+            True,
+        )
 
     def register_refresh_function(self, refresh_func):
         """Register the refresh functions to run at the refresh_interval_ms
@@ -244,8 +268,8 @@ class Thunderscope(object):
         performance_dock = self.setup_performance_plot()
         gamecontroller_dock = self.setup_gamecontroller_widget()
 
-        dock_area.addDock(field_dock, "left")
-        dock_area.addDock(gamecontroller_dock, "below", field_dock)
+        dock_area.addDock(gamecontroller_dock, "left")
+        dock_area.addDock(field_dock, "below", gamecontroller_dock)
         dock_area.addDock(log_dock, "bottom", field_dock)
         dock_area.addDock(performance_dock, "right", log_dock)
 
@@ -270,7 +294,9 @@ class Thunderscope(object):
         self.field.add_layer("Validation", validation)
 
         # Register observers
+        buf = queue.Queue()
         self.proto_unix_io.register_observer(World, world.world_buffer)
+        self.proto_unix_io.register_observer(PrimitiveSet, buf)
         self.proto_unix_io.register_observer(Obstacles, obstacles.obstacle_buffer)
         self.proto_unix_io.register_observer(
             PathVisualization, paths.path_visualization_buffer
@@ -293,7 +319,7 @@ class Thunderscope(object):
         web_view.load(QtCore.QUrl("http://localhost:8081"))
 
         # create and return dock
-        gamecontroller_dock = Dock("gamecontroller", size=(500, 2000))
+        gamecontroller_dock = Dock("GameController", size=(500, 2000))
         gamecontroller_dock.addWidget(web_view)
 
         return gamecontroller_dock
@@ -371,6 +397,8 @@ class Thunderscope(object):
         pyqtgraph.exec()
 
     def close(self):
+        self.full_system_process.kill()
+        self.full_system_process.wait()
         QtCore.QTimer.singleShot(0, self.window.close)
 
 
@@ -405,6 +433,35 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
+    def __setup_robots(robot_locations, team_colour):
+        """Initializes the world from a list of robot locations
+
+        :param robot_locations: A list of robot locations (index is robot id)
+        :param team_colour: The color (either "blue" or "yellow")
+
+        """
+        world_state = WorldState()
+
+        for x, robot_map in enumerate(
+            [world_state.blue_robots, world_state.yellow_robots]
+        ):
+
+            for robot_id, robot_location in enumerate(robot_locations):
+                robot_map[robot_id].CopyFrom(
+                    RobotState(
+                        global_position=Point(
+                            x_meters=-3 if x == 0 else 3, y_meters=robot_location.y()
+                        ),
+                        global_orientation=Angle(radians=0),
+                        global_velocity=Vector(
+                            x_component_meters=0, y_component_meters=0
+                        ),
+                        global_angular_velocity=AngularVelocity(radians_per_second=0),
+                    )
+                )
+
+        return world_state
+
     if args.robot_diagnostics:
 
         # estop_reader = ThreadedEstopReader("/dev/ttyACM0", 115200)
@@ -426,6 +483,23 @@ if __name__ == "__main__":
     else:
         thunderscope = Thunderscope()
         thunderscope.run_full_system()
+        thunderscope.run_er_force_simulator(
+            thunderscope.proto_unix_io, thunderscope.proto_unix_io
+        )
         thunderscope.run_gamecontroller()
         thunderscope.configure_default_layout(thunderscope.blue_full_system_dock_area)
+
+        def ticker():
+            world_state = __setup_robots(
+                [geom.Point(-3, x) for x in range(-2, 3)], "blue"
+            )
+            thunderscope.proto_unix_io.send_proto(WorldState, world_state)
+            while True:
+                tick = SimulatorTick()
+                tick.milliseconds = 10
+                thunderscope.proto_unix_io.send_proto(SimulatorTick, tick)
+                time.sleep(0.01)
+
+        thread = Thread(target=ticker)
+        thread.start()
         thunderscope.show()

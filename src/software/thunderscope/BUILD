@@ -6,12 +6,12 @@ py_binary(
     name = "thunderscope",
     srcs = ["thunderscope.py"],
     data = [
-        "//software/estop:estop_reader.so",
-        "//software/networking:networking.so",
+        "//software:er_force_simulator_main",
         "//software:py_constants.so",
         "//software:unix_full_system",
+        "//software/estop:estop_reader.so",
         "//software/geom:geometry.so",
-        "//software:er_force_simulator_main",
+        "//software/networking:networking.so",
     ],
     deps = [
         "//proto:software_py_proto",
