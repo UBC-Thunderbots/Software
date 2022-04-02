@@ -312,8 +312,9 @@ class Thunderscope(object):
         """
         self.field = Field()
 
+        self.simulator_io = ProtoUnixIO()
         # Create layers
-        world = world_layer.WorldLayer()
+        world = world_layer.WorldLayer(self.simulator_io)
         obstacles = obstacle_layer.ObstacleLayer()
         paths = path_layer.PathLayer()
         validation = validation_layer.ValidationLayer()
@@ -494,11 +495,11 @@ if __name__ == "__main__":
 
     else:
 
-        simulator_io = ProtoUnixIO()
         yellow_io = ProtoUnixIO()
         blue_io = ProtoUnixIO()
 
-        thunderscope = Thunderscope(blue_io)
+        thunderscope = Thunderscope(yellow_io)
+        thunderscope.configure_default_layout(thunderscope.blue_full_system_dock_area)
 
         thunderscope.run_full_system("/tmp/tbots/blue", blue_io, False)
         thunderscope.run_full_system("/tmp/tbots/yellow", yellow_io, True)
@@ -506,22 +507,22 @@ if __name__ == "__main__":
             "/tmp/tbots",
             "/tmp/tbots/blue",
             "/tmp/tbots/yellow",
-            simulator_io,
+            thunderscope.simulator_io,
             blue_io,
             yellow_io,
         )
         thunderscope.run_gamecontroller(blue_io, yellow_io)
-        thunderscope.configure_default_layout(thunderscope.blue_full_system_dock_area)
 
         def ticker():
+            import time; time.sleep(1)
             world_state = __setup_robots(
                 [geom.Point(-3, x) for x in range(-2, 3)], "blue"
             )
-            simulator_io.send_proto(WorldState, world_state)
+            thunderscope.simulator_io.send_proto(WorldState, world_state)
             while True:
                 tick = SimulatorTick()
                 tick.milliseconds = 16
-                simulator_io.send_proto(SimulatorTick, tick)
+                thunderscope.simulator_io.send_proto(SimulatorTick, tick)
                 time.sleep(0.016)
 
         thread = Thread(target=ticker)

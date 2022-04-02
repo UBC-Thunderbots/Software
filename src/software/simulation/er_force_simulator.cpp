@@ -137,6 +137,11 @@ void ErForceSimulator::setRobots(
     const google::protobuf::Map<uint32_t, TbotsProto::RobotState>& robots,
     gameController::Team side)
 {
+    // HACK
+    if (robots.empty())
+    {
+        return;
+    }
     auto simulator_setup_command = std::make_unique<amun::Command>();
 
     robot::Specs ERForce;

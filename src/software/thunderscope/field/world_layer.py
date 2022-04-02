@@ -1,11 +1,9 @@
 import math
 import queue
 
+import software.geom.geometry as geom
 import pyqtgraph as pg
-from proto.ball_pb2 import Ball
-from proto.team_pb2 import Robot, Team
-from proto.vision_pb2 import BallState, RobotState
-from proto.world_pb2 import Field, World
+from proto.import_all_protos import *
 from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtCore import Qt
 
@@ -20,7 +18,7 @@ from software.thunderscope.field.field_layer import FieldLayer
 
 
 class WorldLayer(FieldLayer):
-    def __init__(self, buffer_size=10):
+    def __init__(self, simulator_io, buffer_size=1):
         FieldLayer.__init__(self)
         self.cached_world = World()
         self.world_buffer = queue.Queue(buffer_size)
@@ -32,6 +30,7 @@ class WorldLayer(FieldLayer):
         self.mouse_clicked = False
         self.mouse_click_pos = [0, 0]
         self.mouse_hover_pos = [0, 0]  # might not need later, see hoverMoveEvent
+        self.simulator_io = simulator_io
 
     def keyPressEvent(self, event):
         """Detect when a key has been pressed (override)
@@ -48,11 +47,41 @@ class WorldLayer(FieldLayer):
         elif event.key() == Qt.Key.Key_Control:
             # TODO (#2410) enter function to move the ball
             print("pressed CTRL")
+            self.pressed_CTRL = True
 
         elif event.key() == Qt.Key.Key_M:
             # TODO (#2410) enter function to move the robot
             print("pressed M")
             self.pressed_M = True
+
+    def __setup_robots(self, robot_locations, team_colour):
+        """Initializes the world from a list of robot locations
+
+        :param robot_locations: A list of robot locations (index is robot id)
+        :param team_colour: The color (either "blue" or "yellow")
+
+        """
+        world_state = WorldState()
+
+        for x, robot_map in enumerate(
+            [world_state.blue_robots, world_state.yellow_robots]
+        ):
+
+            for robot_id, robot_location in enumerate(robot_locations):
+                robot_map[robot_id].CopyFrom(
+                    RobotState(
+                        global_position=Point(
+                            x_meters=-3 if x == 0 else 3, y_meters=robot_location.y()
+                        ),
+                        global_orientation=Angle(radians=0),
+                        global_velocity=Vector(
+                            x_component_meters=0, y_component_meters=0
+                        ),
+                        global_angular_velocity=AngularVelocity(radians_per_second=0),
+                    )
+                )
+
+        return world_state
 
     # Note: the function name formatting is different but this can't be changed since it's overriding the built-in Qt function
     def keyReleaseEvent(self, event):
@@ -91,14 +120,29 @@ class WorldLayer(FieldLayer):
         :param event: The event
 
         """
-        print("x: " + str(event.pos().x() / MM_PER_M))
-        print("y: " + str(event.pos().y() / MM_PER_M))
+        x = event.pos().x() / MM_PER_M
+        y = event.pos().y() / MM_PER_M
 
         self.mouse_clicked = True
         self.mouse_click_pos = [event.pos().x(), event.pos().y()]
 
         # determine whether a robot was clicked
         self.identify_robots(event.pos().x(), event.pos().y())
+
+        if self.pressed_CTRL:
+            # world_state = self.__setup_robots(
+                # [geom.Point(-3, x) for x in range(-2, 3)], "blue"
+            # )
+            world_state = WorldState()
+            world_state.ball_state.CopyFrom(
+            BallState(
+                global_position=Point(
+                    x_meters=x, y_meters=y,
+                ),
+            )
+            )
+            print("HYELO")
+            self.simulator_io.send_proto(WorldState, world_state)
 
     def identify_robots(self, mouse_x, mouse_y):
         """Identify which robot was clicked on the field
@@ -259,9 +303,6 @@ class WorldLayer(FieldLayer):
         self.cached_world = world
         self.draw_field(painter, world.field)
         self.draw_ball(painter, world.ball)
-
-        # temporary function call for testing purposes
-        self.draw_mouse_click_loc(painter)
 
         # TODO (#2399) Figure out which team color _we_ are and update the color
         # passed into the team.
