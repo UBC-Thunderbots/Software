@@ -4,7 +4,6 @@ import board
 from PIL import Image, ImageDraw, ImageOps
 import adafruit_rgb_display.st7735 as st7735
 
-# TODO: test if bazel build works
 from software.display.lcd_user_interface import LcdDisplay
 from software.display.rotary_encoder import RotaryEncoder
 from software.display.screens.home_screen import HomeScreen
@@ -49,8 +48,17 @@ redis_keys = [
 
 class RobotUi:
     """
-    This is the top level class for the robot user interface. It ties together the 
-    rotary encoder, lcd display, redis server, and all the screens.
+    RobotUI is our user interface for our robots that allows us to quickly get robot 
+    diagnostics and change settings of the robot.
+
+    RobotUI uses LcdDisplay to show information, RotaryEncoder to toggle and change different settings,
+    and Screen classes to organize the layout of the user interface. 
+
+    RobotUI can synchronize the user interface with a redis server by calling the `poll_redis` 
+    function which will continuously update the values with what is in redis every 3 seconds.
+
+    Ensure that the 'spidev' kernel module is loaded while using RobotUI. This can be loaded by 
+    the following command: 'sudo modprobe spidev'
     """
 
     def __init__(self):

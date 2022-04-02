@@ -10,7 +10,8 @@ SCREEN_TYPE = str
 class Screen:
     """
     All new screens will inherit from this class. This class will handles editing variables and maintaining
-    the current action the cursor is hovering.
+    the current action the cursor is hovering. It also accepts the list of actions so that it can display
+    them on the screen.
     """
 
     def __init__(self, lcd_display, screen_actions, actions, draw_screen=None):
