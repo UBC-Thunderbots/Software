@@ -20,7 +20,7 @@ class HRVOTest : public ::testing::Test
 
    public:
     // HRVO Properties
-    Simulator simulator;
+    HRVOSimulator simulator;
     Timestamp current_time;
     Ball ball;
     Field field;
@@ -30,7 +30,7 @@ class HRVOTest : public ::testing::Test
     TbotsProto::PrimitiveSet primitive_set;
 
     HRVOTest()
-        : simulator(1.f / SIMULATOR_FRAME_RATE),
+        : simulator(1.f / SIMULATOR_FRAME_RATE, create2021RobotConstants()),
           current_time(Timestamp::fromSeconds(123)),
           ball(Point(), Vector(), current_time),
           field(Field::createSSLDivisionBField()),
@@ -199,10 +199,14 @@ class HRVOTest : public ::testing::Test
                     prev_x_pos_arr[robot_id] = curr_x_pos;
                     prev_y_pos_arr[robot_id] = curr_y_pos;
                 }
-                Vector goal_position =
-                    simulator.goals_[simulator.agents_[robot_id]->getGoalIndex()]
-                        ->getCurrentGoalPosition();
-                float goal_radius = simulator.agents_[robot_id]->getGoalRadius();
+
+                Vector goal_position = simulator.getAgents()[robot_id]
+                                           ->getPath()
+                                           .getCurrentPathPoint()
+                                           .value()
+                                           .getPosition();
+
+                float goal_radius = simulator.getAgents()[robot_id]->getPathRadius();
 
                 output_file << frame << "," << time << ","
                             << std::to_string(computation_time.count()) << "," << robot_id

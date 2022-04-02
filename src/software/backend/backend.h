@@ -32,4 +32,5 @@ class Backend : public Subject<SensorProto>,
     void receiveRobotStatus(TbotsProto::RobotStatus msg);
     void receiveSSLWrapperPacket(SSLProto::SSL_WrapperPacket msg);
     void receiveSSLReferee(SSLProto::Referee msg);
+    void receiveSensorProto(SensorProto sensor_msg);
 };
