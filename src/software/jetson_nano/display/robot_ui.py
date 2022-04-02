@@ -150,7 +150,6 @@ if __name__ == "__main__":
         redis_client = redis.Redis(
             host="localhost", port=constants.REDIS_PORT_NUMBER, db=0
         )
-        redis_dict = {}
         for key in redis_keys:
             redis_client.set(key, 0)
 

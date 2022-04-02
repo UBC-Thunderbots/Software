@@ -1,5 +1,4 @@
 from PIL import ImageFont
-import subprocess
 
 import software.jetson_nano.display.constants as constants
 from software.jetson_nano.display.utils import get_ip_address, get_signal_strength
