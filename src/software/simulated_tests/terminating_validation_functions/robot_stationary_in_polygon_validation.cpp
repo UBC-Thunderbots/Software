@@ -7,17 +7,18 @@ void robotStationaryInPolygon(RobotId robot_id, Polygon polygon, unsigned int nu
                               std::shared_ptr<World> world_ptr,
                               ValidationCoroutine::push_type& yield)
 {
-    auto robot_stationary_in_polygon = [robot_id,
-                                        polygon](std::shared_ptr<World> world_ptr) {
+    auto robot_position_speed_pair = [robot_id](std::shared_ptr<World> world_ptr) {
         std::optional<Robot> robot_optional =
-            world_ptr->friendlyTeam().getRobotById(robot_id);
+                world_ptr->friendlyTeam().getRobotById(robot_id);
         CHECK(robot_optional.has_value())
             << "There is no robot with ID: " + std::to_string(robot_id);
 
-        Point position  = robot_optional.value().position();
-        double velocity = robot_optional->velocity().length();
+        return std::pair(robot_optional.value().position(), robot_optional->velocity().length());
+    };
 
-        return contains(polygon, position) && velocity < 1e-4;
+    auto robot_stationary_in_polygon = [polygon, robot_position_speed_pair](std::shared_ptr<World> world_ptr) {
+        auto [position, speed]  = robot_position_speed_pair(world_ptr);
+        return contains(polygon, position) && speed < 1e-4;
     };
 
     for (unsigned int stationary_tick_count = 0; stationary_tick_count < num_ticks;
@@ -29,10 +30,13 @@ void robotStationaryInPolygon(RobotId robot_id, Polygon polygon, unsigned int nu
             // ticks the robot has been stationary in the polygon
             stationary_tick_count = 0;
 
-            std::stringstream ss;
-            ss << polygon;
+            auto [position, speed]  = robot_position_speed_pair(world_ptr);
+            std::stringstream ss_polygon;
+            ss_polygon << polygon;
+            std::stringstream ss_position;
+            ss_position << position;
             yield("Robot with ID " + std::to_string(robot_id) +
-                  " is not stationary or has not entered the " + ss.str());
+                  " is not stationary or has not entered the " + ss_polygon.str() + ". Robot is at " + ss_position.str() + " with a speed of " + std::to_string(speed) + ".");
         }
     }
 }
