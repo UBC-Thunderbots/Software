@@ -146,7 +146,7 @@ class HRVOAgent : public Agent
     };
 
    public:
-    float prefSpeed_;
+    float pref_speed_;
 
     std::size_t maxNeighbors_;
     float neighborDist_;

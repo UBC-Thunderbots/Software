@@ -51,7 +51,7 @@ HRVOAgent::HRVOAgent(HRVOSimulator *simulator, const Vector &position, float nei
     : Agent(simulator, position, radius, velocity, velocity, maxSpeed, maxAccel, path),
       maxNeighbors_(maxNeighbors),
       neighborDist_(neighborDist),
-      prefSpeed_(prefSpeed),
+      pref_speed_(prefSpeed),
       uncertaintyOffset_(uncertaintyOffset)
 {
 }
@@ -460,41 +460,41 @@ void HRVOAgent::computePreferredVelocity()
 {
     auto path_point_opt = path.getCurrentPathPoint();
 
-    if (prefSpeed_ <= 0.01f || max_accel_ <= 0.01f || path_point_opt == std::nullopt)
+    if (pref_speed_ <= 0.01f || max_accel_ <= 0.01f || path_point_opt == std::nullopt)
     {
         // Used to avoid edge cases with division by zero
         pref_velocity_ = Vector(0.f, 0.f);
         return;
     }
 
-    Vector goalPosition = path_point_opt.value().getPosition();
-    float speedAtGoal   = path_point_opt.value().getSpeed();
+    Vector goal_position = path_point_opt.value().getPosition();
+    float speed_at_dest   = path_point_opt.value().getSpeed();
     float max_dist_per_tick = max_accel_ * simulator_->getTimeStep();
 
-    Vector distVectorToGoal = goalPosition - position_;
+    Vector vector_to_dest = goal_position - position_;
     // TODO: May be a problem if the goal is closer than max_accel away
     // Given the lag of HRVO simulator compared to real life, we assume that the robot has
     // travelled the maximum distance for one tick.
-    auto distToGoal         = std::max(0.0, distVectorToGoal.length() - max_dist_per_tick);
+    auto dist_to_dest         = std::max(0.0, vector_to_dest.length() - max_dist_per_tick);
 
     // d = (Vf^2 - Vi^2) / 2a
-    double startLinearDecelerationDistance =
-        std::abs((std::pow(speedAtGoal, 2) - std::pow(prefSpeed_, 2)) / // TODO: Change to velocity_.length()
+    double start_linear_deceleration_distance =
+        std::abs((std::pow(speed_at_dest, 2) - std::pow(pref_speed_, 2)) / // TODO: Change to velocity_.length()
                  (2 * max_accel_));
 
-    dist_remaining_to_goal = distToGoal;
-    decel_dist = startLinearDecelerationDistance;
+    dist_remaining_to_goal = dist_to_dest;
+    decel_dist = start_linear_deceleration_distance;
 
     // TODO: Debugging
-    in_decel_zone = distToGoal < startLinearDecelerationDistance ? 1.0f : 0.f;
-    if (distToGoal < startLinearDecelerationDistance)
+    in_decel_zone = dist_to_dest < start_linear_deceleration_distance ? 1.0f : 0.f;
+    if (dist_to_dest < start_linear_deceleration_distance)
     {
         // velocity given linear deceleration, distance away from goal, and desired final
         // speed.           + here since a is negative
         // Vi^2 = sqrt(Vf^2 + 2 * a * d_remainingToDestination)
-        double currPrefSpeed = std::sqrt(std::pow(speedAtGoal, 2) + 2 * max_accel_ * distToGoal);
+        double currPrefSpeed = std::sqrt(std::pow(speed_at_dest, 2) + 2 * max_accel_ * dist_to_dest);
         curr_max_allowed_speed = currPrefSpeed;
-        Vector ideal_pref_velocity = distVectorToGoal.normalize(currPrefSpeed);
+        Vector ideal_pref_velocity = vector_to_dest.normalize(currPrefSpeed);
 
         // Limit the preferred velocity to the kinematic limits
         const Vector dv = ideal_pref_velocity - velocity_;
@@ -519,8 +519,8 @@ void HRVOAgent::computePreferredVelocity()
     {
         // Accelerate to preferred speed
         // Vf = Vi + a * t
-        double currPrefSpeed = std::min(static_cast<double>(prefSpeed_), velocity_.length() + max_dist_per_tick);
-        pref_velocity_ = distVectorToGoal.normalize(currPrefSpeed);
+        double curr_pref_speed = std::min(static_cast<double>(pref_speed_), velocity_.length() + max_dist_per_tick);
+        pref_velocity_ = vector_to_dest.normalize(curr_pref_speed);
     }
 }
 
@@ -620,5 +620,5 @@ std::vector<Circle> HRVOAgent::getCandidateVelocitiesAsCircles(
 
 void HRVOAgent::setPreferredSpeed(float new_pref_speed)
 {
-    prefSpeed_ = new_pref_speed;
+    pref_speed_ = new_pref_speed;
 }
