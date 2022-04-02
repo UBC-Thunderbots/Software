@@ -383,24 +383,24 @@ void HRVOSimulator::visualize(unsigned int robot_id) const
         {
             *(obstacle_proto.add_circle()) = *createCircleProto(candidate_circle);
         }
-//        LOG(VISUALIZE) << *createNamedValue(
-//                    "hrvo_accel",
-//                    static_cast<float>((friendly_agent->velocity_ - friendly_agent->prev_vel).length() / time_step));
-//        LOG(VISUALIZE) << *createNamedValue(
-//                    "max_allowed_speed",
-//                    static_cast<float>(friendly_agent->curr_max_allowed_speed));
-//        LOG(VISUALIZE) << *createNamedValue(
-//                    "pref_velocity_",
-//                    static_cast<float>(friendly_agent->pref_velocity_.length()));
+        LOG(VISUALIZE) << *createNamedValue(
+                    "hrvo_accel",
+                    static_cast<float>((friendly_agent->velocity_ - friendly_agent->prev_vel).length() / time_step));
+        LOG(VISUALIZE) << *createNamedValue(
+                    "max_allowed_speed",
+                    static_cast<float>(friendly_agent->curr_max_allowed_speed));
+        LOG(VISUALIZE) << *createNamedValue(
+                    "pref_velocity_",
+                    static_cast<float>(friendly_agent->pref_velocity_.length()));
         LOG(VISUALIZE) << *createNamedValue(
                     "hrvo velocity",
                     static_cast<float>(friendly_agent->velocity_.length()));
-//        LOG(VISUALIZE) << *createNamedValue(
-//                    "dist_remaining_to_goal",
-//                    static_cast<float>(friendly_agent->dist_remaining_to_goal));
-//        LOG(VISUALIZE) << *createNamedValue(
-//                    "decel_dist",
-//                    static_cast<float>(friendly_agent->decel_dist));
+        LOG(VISUALIZE) << *createNamedValue(
+                    "dist_remaining_to_goal",
+                    static_cast<float>(friendly_agent->dist_remaining_to_goal));
+        LOG(VISUALIZE) << *createNamedValue(
+                    "decel_dist",
+                    static_cast<float>(friendly_agent->decel_dist));
     }
 
     // Add circles representing agents
@@ -410,7 +410,7 @@ void HRVOSimulator::visualize(unsigned int robot_id) const
         *(obstacle_proto.add_circle()) =
             *createCircleProto(Circle(position, agent->getRadius()));
     }
-    // LOG(VISUALIZE) << obstacle_proto;
+     LOG(VISUALIZE) << obstacle_proto;
 }
 
 std::optional<std::shared_ptr<HRVOAgent>> HRVOSimulator::getFriendlyAgentFromRobotId(

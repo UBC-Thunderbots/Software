@@ -469,15 +469,18 @@ void HRVOAgent::computePreferredVelocity()
 
     Vector goalPosition = path_point_opt.value().getPosition();
     float speedAtGoal   = path_point_opt.value().getSpeed();
+    float max_dist_per_tick = max_accel_ * simulator_->getTimeStep();
 
     Vector distVectorToGoal = goalPosition - position_;
-    auto distToGoal         = static_cast<float>(distVectorToGoal.length());
+    // TODO: May be a problem if the goal is closer than max_accel away
+    // Given the lag of HRVO simulator compared to real life, we assume that the robot has
+    // travelled the maximum distance for one tick.
+    auto distToGoal         = std::max(0.0, distVectorToGoal.length() - max_dist_per_tick);
 
     // d = (Vf^2 - Vi^2) / 2a
     double startLinearDecelerationDistance =
         std::abs((std::pow(speedAtGoal, 2) - std::pow(prefSpeed_, 2)) / // TODO: Change to velocity_.length()
-                 (2 * max_accel_)) *
-        decel_dist_multiplier;// + 10*max_accel_ * simulator_->getTimeStep();
+                 (2 * max_accel_));
 
     dist_remaining_to_goal = distToGoal;
     decel_dist = startLinearDecelerationDistance;
@@ -489,15 +492,13 @@ void HRVOAgent::computePreferredVelocity()
         // velocity given linear deceleration, distance away from goal, and desired final
         // speed.           + here since a is negative
         // Vi^2 = sqrt(Vf^2 + 2 * a * d_remainingToDestination)
-        float currPrefSpeed = static_cast<float>(std::sqrt(std::pow(speedAtGoal, 2) +
-                                                           2 * max_accel_ * distToGoal)) *
-                              decel_pref_speed_multiplier;
+        double currPrefSpeed = std::sqrt(std::pow(speedAtGoal, 2) + 2 * max_accel_ * distToGoal);
         curr_max_allowed_speed = currPrefSpeed;
         Vector ideal_pref_velocity = distVectorToGoal.normalize(currPrefSpeed);
 
         // Limit the preferred velocity to the kinematic limits
         const Vector dv = ideal_pref_velocity - velocity_;
-        if (dv.length() <= max_accel_ * simulator_->getTimeStep())
+        if (dv.length() <= max_dist_per_tick)
         {
             pref_velocity_ = ideal_pref_velocity;
         }
@@ -506,7 +507,7 @@ void HRVOAgent::computePreferredVelocity()
             // Calculate the maximum velocity towards the preferred velocity, given the
             // acceleration constraint
             pref_velocity_ =
-                velocity_ + dv.normalize(max_accel_ * simulator_->getTimeStep());
+                velocity_ + dv.normalize(max_dist_per_tick);
         }
 
         if (pref_velocity_.length() > currPrefSpeed)
@@ -517,10 +518,8 @@ void HRVOAgent::computePreferredVelocity()
     else
     {
         // Accelerate to preferred speed
-        // v_pref = v_now + a * t
-        float currPrefSpeed =
-            std::min(static_cast<double>(prefSpeed_),
-                     velocity_.length() + max_accel_ * simulator_->getTimeStep());
+        // Vf = Vi + a * t
+        double currPrefSpeed = std::min(static_cast<double>(prefSpeed_), velocity_.length() + max_dist_per_tick);
         pref_velocity_ = distVectorToGoal.normalize(currPrefSpeed);
     }
 }
