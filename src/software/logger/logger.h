@@ -54,13 +54,13 @@ class LoggerSingleton
      * Initializes a g3log logger for the calling program. This should only be
      * called once at the start of a program.
      */
-    static void initializeLogger(const std::string& log_directory)
+    static void initializeLogger(const std::string& runtime_dir)
     {
-        static std::shared_ptr<LoggerSingleton> s(new LoggerSingleton(log_directory));
+        static std::shared_ptr<LoggerSingleton> s(new LoggerSingleton(runtime_dir));
     }
 
    private:
-    LoggerSingleton(const std::string& log_directory)
+    LoggerSingleton(const std::string& runtime_dir)
     {
         logWorker = g3::LogWorker::createLogWorker();
         // Default locations
@@ -78,23 +78,23 @@ class LoggerSingleton
         // hermetic build principles
 
         auto csv_sink_handle = logWorker->addSink(
-            std::make_unique<CSVSink>(log_directory), &CSVSink::appendToFile);
+            std::make_unique<CSVSink>(runtime_dir), &CSVSink::appendToFile);
         // Sink for outputting logs to the terminal
         auto colour_cout_sink_handle =
             logWorker->addSink(std::make_unique<ColouredCoutSink>(true),
                                &ColouredCoutSink::displayColouredLog);
         // Sink for storing a file of all logs
         auto log_rotate_sink_handle = logWorker->addSink(
-            std::make_unique<LogRotate>(log_name, log_directory), &LogRotate::save);
+            std::make_unique<LogRotate>(log_name, runtime_dir), &LogRotate::save);
         // Sink for storing a file of filtered logs
         auto filtered_log_rotate_sink_handle = logWorker->addSink(
             std::make_unique<LogRotateWithFilter>(
-                std::make_unique<LogRotate>(log_name + filter_suffix, log_directory),
+                std::make_unique<LogRotate>(log_name + filter_suffix, runtime_dir),
                 level_filter),
             &LogRotateWithFilter::save);
 
         // Sink for visualization
-        auto visualization_handle = logWorker->addSink(std::make_unique<ProtobufSink>(),
+        auto visualization_handle = logWorker->addSink(std::make_unique<ProtobufSink>(runtime_dir),
                                                        &ProtobufSink::sendProtobuf);
 
 

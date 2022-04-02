@@ -8,12 +8,16 @@
 #include "software/networking/threaded_unix_sender.h"
 
 static const std::string TYPE_DELIMITER = "!!!";
-static const std::string UNIX_BASE_PATH = "/tmp/tbots/";
 
 class ProtobufSink
 {
    public:
-    ProtobufSink();
+    /** 
+     * Creates a protobuf sink with the given runtime dir
+     * 
+     * @param runtime_dir The runtime directory
+     */
+    ProtobufSink(std::string runtime_dir);
 
     /*
      * Send the protobuf to /tmp/tbots/(protobuf typename)

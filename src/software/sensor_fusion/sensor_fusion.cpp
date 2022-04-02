@@ -206,7 +206,8 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
     const bool should_invert_field =
         override_game_controller_defending_side && defending_positive_side;
 
-    bool friendly_team_is_yellow = false;
+    bool friendly_team_is_yellow =
+        sensor_fusion_config->getFriendlyColorYellow()->value();
 
     std::optional<Ball> new_ball;
     auto ball_detections = createBallDetections({ssl_detection_frame}, min_valid_x,

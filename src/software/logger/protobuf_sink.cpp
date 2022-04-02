@@ -7,10 +7,10 @@
 #include "proto/robot_log_msg.pb.h"
 #include "shared/constants.h"
 
-ProtobufSink::ProtobufSink()
+ProtobufSink::ProtobufSink(std::string runtime_dir)
 {
     // Setup the logs
-    protobuf_sender = std::make_unique<ThreadedUnixSender>(UNIX_BASE_PATH + "protobuf");
+    protobuf_sender = std::make_unique<ThreadedUnixSender>(runtime_dir + "/protobuf");
 }
 
 void ProtobufSink::sendProtobuf(g3::LogMessageMover log_entry)

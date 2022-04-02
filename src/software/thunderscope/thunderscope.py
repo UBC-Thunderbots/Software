@@ -63,7 +63,7 @@ class Thunderscope(object):
 
     """
 
-    def __init__(self, runtime_dir="/tmp/tbots", refresh_interval_ms=5):
+    def __init__(self, proto_unix_io, other_proto_unix_io, refresh_interval_ms=5):
 
         # Setup MainApp and initialize DockArea
         self.app = pyqtgraph.mkQApp("Thunderscope")
@@ -88,8 +88,8 @@ class Thunderscope(object):
         except:
             pass
 
-        self.runtime_dir = runtime_dir
-        self.proto_unix_io = ProtoUnixIO()
+        self.proto_unix_io = proto_unix_io
+        self.other_proto_unix_io = other_proto_unix_io
         self.refresh_functions = []
 
         def __refresh():
@@ -148,44 +148,58 @@ class Thunderscope(object):
             )
         )
 
-    def run_full_system(self):
+
+    def run_full_system(self, runtime_dir, proto_unix_io, friendly_colour_yellow="true"):
         """Run full system and attach the appropriate unix senders/listeners
 
-        :param proto_unix_io: The unix io object to attach listeners/senders to
+        :param runtime_dir: The runtime directory to run fullsystem
+        :param proto_unix_io: The unix io to setup
+        :returns: Running full system process
 
         """
+        # Setup unix socket directory
+        try:
+            os.mkdir(runtime_dir)
+        except:
+            pass
+
         # inputs to full_system
-        self.proto_unix_io.attach_unix_sender(
-            self.runtime_dir + ROBOT_STATUS_PATH, RobotStatus
+        proto_unix_io.attach_unix_sender(
+            runtime_dir + ROBOT_STATUS_PATH, RobotStatus
         )
-        self.proto_unix_io.attach_unix_sender(
-            self.runtime_dir + SSL_WRAPPER_PATH, SSL_WrapperPacket
+        proto_unix_io.attach_unix_sender(
+            runtime_dir + SSL_WRAPPER_PATH, SSL_WrapperPacket
         )
-        self.proto_unix_io.attach_unix_sender(
-            self.runtime_dir + SSL_REFEREE_PATH, Referee
+        proto_unix_io.attach_unix_sender(
+            runtime_dir + SSL_REFEREE_PATH, Referee
         )
-        self.proto_unix_io.attach_unix_sender(
-            self.runtime_dir + SENSOR_PROTO_PATH, SensorProto
+        proto_unix_io.attach_unix_sender(
+            runtime_dir + SENSOR_PROTO_PATH, SensorProto
         )
-        self.proto_unix_io.attach_unix_receiver(
-            self.runtime_dir + TACTIC_OVERRIDE_PATH, AssignedTacticPlayControlParams
+        proto_unix_io.attach_unix_receiver(
+            runtime_dir + TACTIC_OVERRIDE_PATH, AssignedTacticPlayControlParams
         )
 
         # outputs from full_system
-        self.proto_unix_io.attach_unix_receiver(self.runtime_dir + "/protobuf")
-        self.proto_unix_io.attach_unix_receiver(self.runtime_dir + WORLD_PATH, World)
-        self.proto_unix_io.attach_unix_receiver(
-            self.runtime_dir + PRIMITIVE_PATH, PrimitiveSet
+        proto_unix_io.attach_unix_receiver(runtime_dir + "/protobuf")
+        proto_unix_io.attach_unix_receiver(runtime_dir + WORLD_PATH, World)
+        proto_unix_io.attach_unix_receiver(
+            runtime_dir + PRIMITIVE_PATH, PrimitiveSet
         )
 
         # TODO (#2510) rename to full_system
-        self.full_system_process = Popen(["software/unix_full_system"])
+        return Popen(
+                'software/unix_full_system --runtime_dir={} --friendly_colour_yellow={}'.format(runtime_dir, friendly_colour_yellow).split(" "))
+
 
     def run_er_force_simulator(
         self,
-        thunderscope_proto_unix_io,
+        simulator_runtime_dir,
+        blue_runtime_dir, 
+        yellow_runtime_dir,
+        simulator_io,
         blue_full_system_proto_unix_io,
-        yellow_full_system_proto_unix_io=None,
+        yellow_full_system_proto_unix_io,
     ):
         """Run er force simulator and set up the proto unix IO
 
@@ -200,53 +214,64 @@ class Thunderscope(object):
         or yellow team.
 
         """
+        try:
+            os.mkdir(simulator_runtime_dir)
+        except:
+            pass
+
+        print(simulator_runtime_dir, blue_runtime_dir, yellow_runtime_dir)
+
         # inputs to er_force_simulator_main
-        thunderscope_proto_unix_io.attach_unix_sender(
-            self.runtime_dir + SIMULATION_TICK_PATH, SimulatorTick
+        simulator_io.attach_unix_sender(
+            simulator_runtime_dir + SIMULATION_TICK_PATH, SimulatorTick
         )
-        thunderscope_proto_unix_io.attach_unix_sender(
-            self.runtime_dir + WORLD_STATE_PATH, WorldState
+        simulator_io.attach_unix_sender(
+            simulator_runtime_dir + WORLD_STATE_PATH, WorldState
         )
 
         # setup blue full system unix io
-        if blue_full_system_proto_unix_io:
-            blue_full_system_proto_unix_io.attach_unix_sender(
-                self.runtime_dir + BLUE_WORLD_PATH, World
-            )
-            blue_full_system_proto_unix_io.attach_unix_sender(
-                self.runtime_dir + BLUE_PRIMITIVE_SET, PrimitiveSet
-            )
-            blue_full_system_proto_unix_io.attach_unix_receiver(
-                self.runtime_dir + SSL_WRAPPER_PATH, SSL_WrapperPacket
-            )
-            blue_full_system_proto_unix_io.attach_unix_receiver(
-                self.runtime_dir + BLUE_ROBOT_STATUS_PATH, RobotStatus
-            )
+        blue_full_system_proto_unix_io.attach_unix_sender(
+            simulator_runtime_dir + BLUE_WORLD_PATH, World
+        )
+        blue_full_system_proto_unix_io.attach_unix_sender(
+            simulator_runtime_dir + BLUE_PRIMITIVE_SET, PrimitiveSet
+        )
+        blue_full_system_proto_unix_io.attach_unix_receiver(
+            simulator_runtime_dir + BLUE_SSL_WRAPPER_PATH, SSL_WrapperPacket
+        )
+        blue_full_system_proto_unix_io.attach_unix_receiver(
+            simulator_runtime_dir + BLUE_ROBOT_STATUS_PATH, RobotStatus
+        )
 
         # setup yellow full system unix io
-        if yellow_full_system_proto_unix_io:
-            # yellow_full_system_proto_unix_io.attach_unix_sender(
-            # self.runtime_dir + YELLOW_WORLD_PATH, World)
-            yellow_full_system_proto_unix_io.attach_unix_sender(
-                self.runtime_dir + YELLOW_PRIMITIVE_SET, PrimitiveSet
-            )
-            yellow_full_system_proto_unix_io.attach_unix_receiver(
-                self.runtime_dir + SSL_WRAPPER_PATH, SSL_WrapperPacket
-            )
-            yellow_full_system_proto_unix_io.attach_unix_receiver(
-                self.runtime_dir + YELLOW_ROBOT_STATUS_PATH, RobotStatus
-            )
+        yellow_full_system_proto_unix_io.attach_unix_sender(
+            simulator_runtime_dir + YELLOW_WORLD_PATH, World
+        )
+        yellow_full_system_proto_unix_io.attach_unix_sender(
+            simulator_runtime_dir + YELLOW_PRIMITIVE_SET, PrimitiveSet
+        )
+        yellow_full_system_proto_unix_io.attach_unix_receiver(
+            simulator_runtime_dir + YELLOW_SSL_WRAPPER_PATH, SSL_WrapperPacket
+        )
+        yellow_full_system_proto_unix_io.attach_unix_receiver(
+            simulator_runtime_dir + YELLOW_ROBOT_STATUS_PATH, RobotStatus
+        )
 
         self.simulator_process = Popen(["software/er_force_simulator_main"])
 
-    def run_gamecontroller(self):
+    def run_gamecontroller(self, blue_io, yellow_io):
         """Run the gamecontroller
         """
         self.gamecontroller = Popen(["/opt/tbotspython/gamecontroller"])
+
+        def send_referee_command(data):
+            blue_io.send_proto(Referee, data)
+            yellow_io.send_proto(Referee, data)
+
         self.receive_referee_command = networking.SSLRefereeProtoListener(
             "224.5.23.1",
             10003,
-            lambda data: self.proto_unix_io.send_proto(Referee, data),
+            send_referee_command,
             True,
         )
 
@@ -397,29 +422,10 @@ class Thunderscope(object):
         pyqtgraph.exec()
 
     def close(self):
-        self.full_system_process.kill()
-        self.full_system_process.wait()
         QtCore.QTimer.singleShot(0, self.window.close)
 
 
 if __name__ == "__main__":
-
-    # full_system = FullSystem()
-    # mobile_gamepad.MobileGamepad()
-
-    # def relay_sensor_proto(bob):
-    # # TODO is this thread safe?
-    # print(time.time())
-
-    # wrapper_packet_listener = networking.SSLWrapperPacketProtoListener(
-    # "224.5.23.2", 10020, full_system.send_ssl_wrapper, True
-    # )
-    # referee_listener = networking.SSLRefereeProtoListener(
-    # "224.5.23.2", 10003, full_system.send_ssl_referee, True
-    # )
-    # robot_status_listener = networking.RobotStatusProtoListener(
-    # "ff02::c3d0:42d2:bb01%wlp4s0", 42500, full_system.send_robot_status, True
-    # )
 
     parser = argparse.ArgumentParser(description="Thunderscope")
     parser.add_argument(
@@ -481,23 +487,29 @@ if __name__ == "__main__":
         )
 
     else:
-        thunderscope = Thunderscope()
-        thunderscope.run_full_system()
+
+        simulator_io = ProtoUnixIO()
+        yellow_io = ProtoUnixIO()
+        blue_io = ProtoUnixIO()
+
+        thunderscope = Thunderscope(blue_io, yellow_io)
+        thunderscope.run_full_system("/tmp/tbots/blue", blue_io, "false")
+        thunderscope.run_full_system("/tmp/tbots/yellow", yellow_io, "true")
         thunderscope.run_er_force_simulator(
-            thunderscope.proto_unix_io, thunderscope.proto_unix_io
+            "/tmp/tbots", "/tmp/tbots/blue", "/tmp/tbots/yellow", simulator_io, blue_io, yellow_io
         )
-        thunderscope.run_gamecontroller()
+        thunderscope.run_gamecontroller(blue_io, yellow_io)
         thunderscope.configure_default_layout(thunderscope.blue_full_system_dock_area)
 
         def ticker():
             world_state = __setup_robots(
                 [geom.Point(-3, x) for x in range(-2, 3)], "blue"
             )
-            thunderscope.proto_unix_io.send_proto(WorldState, world_state)
+            simulator_io.send_proto(WorldState, world_state)
             while True:
                 tick = SimulatorTick()
                 tick.milliseconds = 10
-                thunderscope.proto_unix_io.send_proto(SimulatorTick, tick)
+                simulator_io.send_proto(SimulatorTick, tick)
                 time.sleep(0.01)
 
         thread = Thread(target=ticker)
