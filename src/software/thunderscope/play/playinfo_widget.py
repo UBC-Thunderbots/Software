@@ -13,6 +13,8 @@ from proto.robot_log_msg_pb2 import RobotLog
 
 class playInfoWidget(QTableWidget):
 
+    #TODO: set these values dynamically
+    
     NUM_ROWS = 6
     NUM_COLS = 4
 
