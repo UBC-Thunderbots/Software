@@ -16,6 +16,7 @@ SensorFusion::SensorFusion(std::shared_ptr<const SensorFusionConfig> sensor_fusi
       team_with_possession(TeamSide::ENEMY),
       friendly_goalie_id(0),
       enemy_goalie_id(0),
+      ball_in_dribbler_timeout(0),
       reset_time_vision_packets_detected(0),
       last_t_capture(0)
 {
@@ -164,7 +165,7 @@ void SensorFusion::updateWorld(
 {
     for (auto &robot_status_msg : robot_status_msgs)
     {
-        int robot_id = robot_status_msg.robot_id();
+        RobotId robot_id = robot_status_msg.robot_id();
         std::set<RobotCapability> unavailableCapabilities;
 
         for (const auto &error_code_msg : robot_status_msg.error_code())
@@ -188,6 +189,21 @@ void SensorFusion::updateWorld(
             }
         }
         friendly_team.setUnavailableRobotCapabilities(robot_id, unavailableCapabilities);
+
+        if (robot_status_msg.has_break_beam_status() &&
+            robot_status_msg.break_beam_status().ball_in_beam())
+        {
+            friendly_robot_id_with_ball_in_dribbler = robot_id;
+            ball_in_dribbler_timeout =
+                sensor_fusion_config->getNumDroppedDetectionsBeforeBallNotInDribbler()
+                    ->value();
+        }
+        else if (friendly_robot_id_with_ball_in_dribbler.has_value() &&
+                 friendly_robot_id_with_ball_in_dribbler.value() == robot_id)
+        {
+            friendly_robot_id_with_ball_in_dribbler = std::nullopt;
+            ball_in_dribbler_timeout                = 0;
+        }
     }
 }
 
@@ -246,10 +262,64 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
         enemy_team    = createEnemyTeam(yellow_team);
     }
 
-    new_ball = createBall(ball_detections);
-    if (new_ball)
+    ball_in_dribbler_timeout--;
+    if (ball_in_dribbler_timeout <= 0)
     {
-        updateBall(*new_ball);
+        friendly_robot_id_with_ball_in_dribbler = std::nullopt;
+        ball_in_dribbler_timeout                = 0;
+    }
+
+    if (friendly_robot_id_with_ball_in_dribbler.has_value())
+    {
+        std::optional<Robot> robot_with_ball_in_dribbler =
+            friendly_team.getRobotById(friendly_robot_id_with_ball_in_dribbler.value());
+
+        if (robot_with_ball_in_dribbler.has_value())
+        {
+            std::vector<BallDetection> dribbler_in_ball_detection = {BallDetection{
+                .position =
+                    robot_with_ball_in_dribbler->position() +
+                    Vector::createFromAngle(robot_with_ball_in_dribbler->orientation())
+                        // MAX_FRACTION_OF_BALL_COVERED_BY_ROBOT of the ball should be
+                        // inside the robot
+                        .normalize(DIST_TO_FRONT_OF_ROBOT_METERS +
+                                   BALL_MAX_RADIUS_METERS -
+                                   2 * BALL_MAX_RADIUS_METERS *
+                                       MAX_FRACTION_OF_BALL_COVERED_BY_ROBOT),
+                .distance_from_ground = 0,
+                .timestamp  = Timestamp::fromSeconds(ssl_detection_frame.t_capture()),
+                .confidence = 1}};
+
+            std::optional<Ball> new_ball = createBall(dribbler_in_ball_detection);
+
+            if (new_ball)
+            {
+                updateBall(*new_ball);
+            }
+        }
+    }
+    else
+    {
+        std::optional<Ball> new_ball = createBall(ball_detections);
+        if (new_ball)
+        {
+            // If vision detected a new ball, then use that one
+            updateBall(*new_ball);
+        }
+        else if (ball)
+        {
+            // If we already have a ball from a previous frame, but is occluded this frame
+            std::optional<Robot> closest_enemy =
+                enemy_team.getNearestRobot(ball->position());
+
+            if (closest_enemy.has_value())
+            {
+                ball = Ball(closest_enemy->position() +
+                                Vector::createFromAngle(closest_enemy->orientation())
+                                    .normalize(DIST_TO_FRONT_OF_ROBOT_METERS),
+                            Vector(0, 0), closest_enemy->timestamp());
+            }
+        }
     }
 
     if (ball)

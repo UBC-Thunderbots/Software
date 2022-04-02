@@ -37,8 +37,7 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const World
             ai_config->getRobotNavigationObstacleConfig()),
     };
 
-    auto attacker =
-        std::make_shared<AttackerTactic>(ai_config->getAttackerTacticConfig());
+    auto attacker = std::make_shared<AttackerTactic>(ai_config);
 
     PassWithRating best_pass_and_score_so_far =
         shootOrFindPassStage(yield, attacker, crease_defender_tactics, world);
@@ -118,8 +117,7 @@ void FreeKickPlay::performPassStage(
     LOG(DEBUG) << "Score of pass we committed to: " << best_pass_and_score_so_far.rating;
 
     // Perform the pass and wait until the receiver is finished
-    auto attacker =
-        std::make_shared<AttackerTactic>(ai_config->getAttackerTacticConfig());
+    auto attacker = std::make_shared<AttackerTactic>(ai_config);
     auto receiver = std::make_shared<ReceiverTactic>();
     do
     {
