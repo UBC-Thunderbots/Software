@@ -57,7 +57,7 @@ void ProtobufSink::sendProtobuf(g3::LogMessageMover log_entry)
 
             std::string log_msg;
             log_msg_proto.SerializeToString(&log_msg);
-            unix_senders_["log"]->sendString(base64_encode(log_msg));
+            unix_senders_["log"]->sendString(log_msg);
         }
     }
 }

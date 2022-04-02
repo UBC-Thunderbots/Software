@@ -63,7 +63,7 @@ class Thunderscope(object):
 
     """
 
-    def __init__(self, proto_unix_io, refresh_interval_ms=1):
+    def __init__(self, proto_unix_io, refresh_interval_ms=5):
 
         # Setup MainApp and initialize DockArea
         self.app = pyqtgraph.mkQApp("Thunderscope")
@@ -160,6 +160,23 @@ class Thunderscope(object):
             os.mkdir(runtime_dir)
         except:
             pass
+
+        proto_unix_io.attach_unix_receiver(
+            runtime_dir + "/" + Obstacles.DESCRIPTOR.full_name,
+            Obstacles,
+            from_log_visualize=True,
+        )
+        proto_unix_io.attach_unix_receiver(
+            runtime_dir + "/" + PathVisualization.DESCRIPTOR.full_name,
+            PathVisualization,
+            from_log_visualize=True,
+        )
+        proto_unix_io.attach_unix_receiver(
+            runtime_dir + "/" + NamedValue.DESCRIPTOR.full_name,
+            NamedValue,
+            from_log_visualize=True,
+        )
+        proto_unix_io.attach_unix_receiver(runtime_dir + "/log", RobotLog)
 
         # inputs to full_system
         proto_unix_io.attach_unix_sender(runtime_dir + ROBOT_STATUS_PATH, RobotStatus)
@@ -483,18 +500,6 @@ if __name__ == "__main__":
 
         thunderscope = Thunderscope(blue_io)
 
-        blue_io.attach_unix_receiver(
-            "/tmp/tbots/blue/" + Obstacles.DESCRIPTOR.full_name,
-            Obstacles,
-            from_log_visualize=True,
-        )
-        blue_io.attach_unix_receiver(
-            "/tmp/tbots/blue/" + PathVisualization.DESCRIPTOR.full_name,
-            PathVisualization,
-            from_log_visualize=True,
-        )
-        blue_io.attach_unix_receiver("/tmp/tbots/blue/log", RobotLog)
-
         thunderscope.run_full_system("/tmp/tbots/blue", blue_io, False)
         thunderscope.run_full_system("/tmp/tbots/yellow", yellow_io, True)
         thunderscope.run_er_force_simulator(
@@ -515,9 +520,9 @@ if __name__ == "__main__":
             simulator_io.send_proto(WorldState, world_state)
             while True:
                 tick = SimulatorTick()
-                tick.milliseconds = 20
+                tick.milliseconds = 16
                 simulator_io.send_proto(SimulatorTick, tick)
-                time.sleep(0.02)
+                time.sleep(0.016)
 
         thread = Thread(target=ticker)
         thread.start()

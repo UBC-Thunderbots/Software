@@ -142,7 +142,9 @@ class Session(socketserver.BaseRequestHandler):
         payload = self.request[0]
         result = base64.b64decode(payload)
         msg = self.proto_class()
-        msg.ParseFromString(result)
+
+        any_msg = Any.FromString(result)
+        any_msg.Unpack(msg)
         self.handle_callback(msg)
 
 
