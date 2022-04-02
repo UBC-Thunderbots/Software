@@ -19,8 +19,6 @@ UnixSimulatorBackend::UnixSimulatorBackend(std::shared_ptr<const BackendConfig> 
         config->getFullSystemMainCommandLineArgs()->getRuntimeDir()->value() +
             ROBOT_STATUS_PATH,
         boost::bind(&Backend::receiveRobotStatus, this, _1)));
-    LOG(DEBUG) << config->getFullSystemMainCommandLineArgs()->getRuntimeDir()->value() +
-                      SSL_WRAPPER_PATH;
 
     ssl_wrapper_input.reset(new ThreadedProtoUnixListener<SSLProto::SSL_WrapperPacket>(
         config->getFullSystemMainCommandLineArgs()->getRuntimeDir()->value() +
@@ -45,27 +43,12 @@ UnixSimulatorBackend::UnixSimulatorBackend(std::shared_ptr<const BackendConfig> 
     primitive_output.reset(new ThreadedProtoUnixSender<TbotsProto::PrimitiveSet>(
         config->getFullSystemMainCommandLineArgs()->getRuntimeDir()->value() +
         PRIMITIVE_PATH));
-
-    defending_side_output.reset(new ThreadedProtoUnixSender<DefendingSideProto>(
-        config->getFullSystemMainCommandLineArgs()->getRuntimeDir()->value() +
-        DEFENDING_SIDE));
 }
 
 void UnixSimulatorBackend::onValueReceived(TbotsProto::PrimitiveSet primitives)
 {
     primitive_output->sendProto(primitives);
 
-    if (sensor_fusion_config->getOverrideGameControllerDefendingSide()->value())
-    {
-        defending_side_output->sendProto(
-            *createDefendingSide(sensor_fusion_config->getDefendingPositiveSide()->value()
-                                     ? FieldSide::POS_X
-                                     : FieldSide::NEG_X));
-    }
-    else
-    {
-        defending_side_output->sendProto(*createDefendingSide(FieldSide::NEG_X));
-    }
     // TODO (#2510) Find a new home once SimulatorBackend and ThreadedFullSystemGUI are
     // gone
     LOG(VISUALIZE) << *createNamedValue(
@@ -77,7 +60,7 @@ void UnixSimulatorBackend::onValueReceived(TbotsProto::PrimitiveSet primitives)
 void UnixSimulatorBackend::onValueReceived(World world)
 {
     world_output->sendProto(*createWorld(world));
-    LOG(VISUALIZE) << *createWorld(world);
+    // LOG(VISUALIZE) << *createWorld(world);
     // TODO (#2510) Find a new home once SimulatorBackend and ThreadedFullSystemGUI are
     // gone
     LOG(VISUALIZE) << *createNamedValue(

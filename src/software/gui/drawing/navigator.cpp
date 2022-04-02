@@ -38,7 +38,7 @@ AIDrawFunction drawNavigator(std::shared_ptr<Navigator> navigator)
         obstacle_pen.setWidth(2);
         obstacle_pen.setCosmetic(true);
 
-        ObstacleArtist obstacle_artist(scene, obstacle_pen);
+        ObstacleArtist obstacle_artist(scene, std::make_optional<QPen>(obstacle_pen));
         for (const auto& obstacle : obstacles)
         {
             obstacle->accept(obstacle_artist);

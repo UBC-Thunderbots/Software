@@ -104,7 +104,9 @@ class ProtoUnixIO:
         self.unix_senders[proto_class.DESCRIPTOR.full_name] = sender
         self.register_observer(proto_class, sender.proto_buffer)
 
-    def attach_unix_receiver(self, unix_path, proto_class=None):
+    def attach_unix_receiver(
+        self, unix_path, proto_class=None, from_log_visualize=False
+    ):
         """Creates a unix listener of that protobuf type and provides
         incoming data to registered observers.
         
@@ -114,8 +116,10 @@ class ProtoUnixIO:
         :param proto_class: The prototype to send
 
         """
-        listener = ThreadedUnixListener(unix_path, proto_class=proto_class)
-        key = proto_class.DESCRIPTOR.full_name if proto_class else "protobuf"
+        listener = ThreadedUnixListener(
+            unix_path, proto_class=proto_class, base64_encoded=from_log_visualize
+        )
+        key = proto_class.DESCRIPTOR.full_name
         self.unix_listeners[key] = listener
         self.send_proto_to_observer_threads[key] = Thread(
             target=self.__send_proto_to_observers, args=(listener.proto_buffer,)

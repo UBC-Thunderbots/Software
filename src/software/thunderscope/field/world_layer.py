@@ -15,7 +15,6 @@ from software.thunderscope.constants import (
     BALL_RADIUS,
     MM_PER_M,
     ROBOT_MAX_RADIUS,
-    UNIX_SOCKET_BASE_PATH,
 )
 from software.thunderscope.field.field_layer import FieldLayer
 

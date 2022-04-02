@@ -63,7 +63,7 @@ class Thunderscope(object):
 
     """
 
-    def __init__(self, proto_unix_io, other_proto_unix_io, refresh_interval_ms=5):
+    def __init__(self, proto_unix_io, refresh_interval_ms=1):
 
         # Setup MainApp and initialize DockArea
         self.app = pyqtgraph.mkQApp("Thunderscope")
@@ -89,7 +89,6 @@ class Thunderscope(object):
             pass
 
         self.proto_unix_io = proto_unix_io
-        self.other_proto_unix_io = other_proto_unix_io
         self.refresh_functions = []
 
         def __refresh():
@@ -148,9 +147,7 @@ class Thunderscope(object):
             )
         )
 
-    def run_full_system(
-        self, runtime_dir, proto_unix_io, friendly_colour_yellow="true"
-    ):
+    def run_full_system(self, runtime_dir, proto_unix_io, friendly_colour_yellow=False):
         """Run full system and attach the appropriate unix senders/listeners
 
         :param runtime_dir: The runtime directory to run fullsystem
@@ -176,17 +173,15 @@ class Thunderscope(object):
         )
 
         # outputs from full_system
-        proto_unix_io.attach_unix_receiver(runtime_dir + "/protobuf")
         proto_unix_io.attach_unix_receiver(runtime_dir + WORLD_PATH, World)
         proto_unix_io.attach_unix_receiver(runtime_dir + PRIMITIVE_PATH, PrimitiveSet)
 
         # TODO (#2510) rename to full_system
         return Popen(
-            "software/unix_full_system --runtime_dir={} --friendly_colour_yellow={}".format(
-                runtime_dir, friendly_colour_yellow
-            ).split(
-                " "
-            )
+            "software/unix_full_system --runtime_dir={} {}".format(
+                runtime_dir,
+                "--friendly_colour_yellow" if friendly_colour_yellow else "",
+            ).split(" ")
         )
 
     def run_er_force_simulator(
@@ -486,9 +481,22 @@ if __name__ == "__main__":
         yellow_io = ProtoUnixIO()
         blue_io = ProtoUnixIO()
 
-        thunderscope = Thunderscope(blue_io, yellow_io)
-        thunderscope.run_full_system("/tmp/tbots/blue", blue_io, "false")
-        thunderscope.run_full_system("/tmp/tbots/yellow", yellow_io, "true")
+        thunderscope = Thunderscope(blue_io)
+
+        blue_io.attach_unix_receiver(
+            "/tmp/tbots/blue/" + Obstacles.DESCRIPTOR.full_name,
+            Obstacles,
+            from_log_visualize=True,
+        )
+        blue_io.attach_unix_receiver(
+            "/tmp/tbots/blue/" + PathVisualization.DESCRIPTOR.full_name,
+            PathVisualization,
+            from_log_visualize=True,
+        )
+        blue_io.attach_unix_receiver("/tmp/tbots/blue/log", RobotLog)
+
+        thunderscope.run_full_system("/tmp/tbots/blue", blue_io, False)
+        thunderscope.run_full_system("/tmp/tbots/yellow", yellow_io, True)
         thunderscope.run_er_force_simulator(
             "/tmp/tbots",
             "/tmp/tbots/blue",
@@ -507,9 +515,9 @@ if __name__ == "__main__":
             simulator_io.send_proto(WorldState, world_state)
             while True:
                 tick = SimulatorTick()
-                tick.milliseconds = 10
+                tick.milliseconds = 20
                 simulator_io.send_proto(SimulatorTick, tick)
-                time.sleep(0.01)
+                time.sleep(0.02)
 
         thread = Thread(target=ticker)
         thread.start()

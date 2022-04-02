@@ -9,6 +9,11 @@
 
 static const std::string TYPE_DELIMITER = "!!!";
 
+
+using UnixSenderMap =
+    std::unordered_map<std::string, std::unique_ptr<ThreadedUnixSender>>;
+
+
 class ProtobufSink
 {
    public:
@@ -27,7 +32,8 @@ class ProtobufSink
     void sendProtobuf(g3::LogMessageMover log_entry);
 
    private:
-    std::unique_ptr<ThreadedUnixSender> protobuf_sender;
+    UnixSenderMap unix_senders_;
+    std::string runtime_dir_;
 };
 
 /*
