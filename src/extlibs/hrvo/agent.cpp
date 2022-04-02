@@ -9,6 +9,7 @@ Agent::Agent(HRVOSimulator *simulator, const Vector &position, float radius,
     : simulator_(simulator),
       position_(position),
       radius_(radius),
+      min_radius_(radius),
       velocity_(velocity),
       pref_velocity_(prefVelocity),
       max_speed_(maxSpeed),
@@ -43,20 +44,8 @@ void Agent::update()
 
     position_ += velocity_ * simulator_->time_step;
 
-    Vector current_dest;
-
     const std::optional<PathPoint> &path_point = path.getCurrentPathPoint();
-    if (path_point == std::nullopt)
-    {
-        // If there are no destinations, the robot should stay at its current position
-        current_dest = position_;
-    }
-    else
-    {
-        current_dest = path_point.value().getPosition();
-    }
-
-    if ((current_dest - position_).lengthSquared() <
+    if (path_point == std::nullopt || (path_point.value().getPosition() - position_).lengthSquared() <
         path.getPathRadius() * path.getPathRadius())
     {
         // Is at current goal position

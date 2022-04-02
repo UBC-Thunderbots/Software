@@ -13,7 +13,6 @@ void LinearVelocityAgent::computeNewVelocity()
     // Preferring a velocity which points directly towards goal
 
     auto path_point_opt = path.getCurrentPathPoint();
-
     if (path_point_opt == std::nullopt)
     {
         pref_velocity_ = Vector(0.f, 0.f);
@@ -21,8 +20,8 @@ void LinearVelocityAgent::computeNewVelocity()
         return;
     }
 
-    Vector goal_pos = path_point_opt.value().getPosition();
-    pref_velocity_  = goal_pos - position_;
+    Vector destination = path_point_opt.value().getPosition();
+    pref_velocity_  = destination - position_;
 
     if (pref_velocity_.length() > max_speed_)
     {

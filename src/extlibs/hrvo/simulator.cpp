@@ -116,7 +116,7 @@ void HRVOSimulator::updateWorld(const World &world)
                 // was updated. This is to allow SensorFusion to update the actual robot
                 // velocity in World.
                 // TODO (#2531): Remove 4 multiplier and fix goal keeper moving slowly
-                if (global_time - last_time_velocity_updated >= 4 * time_step)
+                if (global_time - last_time_velocity_updated >= time_step)
                 {
                     Vector velocity = friendly_robot.velocity();
                     hrvo_agent.value()->setVelocity(friendly_robot.velocity());
@@ -284,7 +284,7 @@ std::size_t HRVOSimulator::addLinearVelocityRobotAgent(const Robot &robot,
     float path_radius = (max_speed * time_step) / 2 * GOAL_RADIUS_SCALE;
 
     // Enemy agents should appear larger to friendly agents to avoid collision
-    float agent_radius = ROBOT_MAX_RADIUS_METERS * ENEMY_ROBOT_RADIUS_SCALE;
+    float agent_radius = ROBOT_MAX_RADIUS_METERS; // TODO: * ENEMY_ROBOT_RADIUS_SCALE;
 
     AgentPath path = AgentPath({PathPoint(destination, 0.0f)}, path_radius);
     return addLinearVelocityAgent(position, agent_radius, velocity, max_speed, max_accel,
@@ -345,6 +345,12 @@ void HRVOSimulator::doStep()
     for (auto &agent : agents)
     {
         agent->update();
+    }
+
+    // Dynamically update all agent radii based on their velocity
+    for (auto &agent : agents)
+    {
+        agent->radius_ = agent->min_radius_ * (1 + agent->getVelocity().length() / (agent->max_speed_ * 2)) ;
     }
 
     global_time += time_step;
