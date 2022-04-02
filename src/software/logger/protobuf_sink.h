@@ -12,9 +12,9 @@ static const std::string TYPE_DELIMITER = "!!!";
 class ProtobufSink
 {
    public:
-    /** 
+    /**
      * Creates a protobuf sink with the given runtime dir
-     * 
+     *
      * @param runtime_dir The runtime directory
      */
     ProtobufSink(std::string runtime_dir);

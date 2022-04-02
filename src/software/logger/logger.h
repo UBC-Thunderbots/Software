@@ -77,8 +77,8 @@ class LoggerSingleton
         // arg. Note: log locations are defaulted to the bazel-out folder due to Bazel's
         // hermetic build principles
 
-        auto csv_sink_handle = logWorker->addSink(
-            std::make_unique<CSVSink>(runtime_dir), &CSVSink::appendToFile);
+        auto csv_sink_handle = logWorker->addSink(std::make_unique<CSVSink>(runtime_dir),
+                                                  &CSVSink::appendToFile);
         // Sink for outputting logs to the terminal
         auto colour_cout_sink_handle =
             logWorker->addSink(std::make_unique<ColouredCoutSink>(true),
@@ -94,8 +94,8 @@ class LoggerSingleton
             &LogRotateWithFilter::save);
 
         // Sink for visualization
-        auto visualization_handle = logWorker->addSink(std::make_unique<ProtobufSink>(runtime_dir),
-                                                       &ProtobufSink::sendProtobuf);
+        auto visualization_handle = logWorker->addSink(
+            std::make_unique<ProtobufSink>(runtime_dir), &ProtobufSink::sendProtobuf);
 
 
         g3::initializeLogging(logWorker.get());

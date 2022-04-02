@@ -19,9 +19,8 @@ UnixSimulatorBackend::UnixSimulatorBackend(std::shared_ptr<const BackendConfig> 
         config->getFullSystemMainCommandLineArgs()->getRuntimeDir()->value() +
             ROBOT_STATUS_PATH,
         boost::bind(&Backend::receiveRobotStatus, this, _1)));
-    LOG(DEBUG) << 
-        config->getFullSystemMainCommandLineArgs()->getRuntimeDir()->value() +
-            SSL_WRAPPER_PATH;
+    LOG(DEBUG) << config->getFullSystemMainCommandLineArgs()->getRuntimeDir()->value() +
+                      SSL_WRAPPER_PATH;
 
     ssl_wrapper_input.reset(new ThreadedProtoUnixListener<SSLProto::SSL_WrapperPacket>(
         config->getFullSystemMainCommandLineArgs()->getRuntimeDir()->value() +

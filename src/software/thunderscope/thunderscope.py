@@ -148,8 +148,9 @@ class Thunderscope(object):
             )
         )
 
-
-    def run_full_system(self, runtime_dir, proto_unix_io, friendly_colour_yellow="true"):
+    def run_full_system(
+        self, runtime_dir, proto_unix_io, friendly_colour_yellow="true"
+    ):
         """Run full system and attach the appropriate unix senders/listeners
 
         :param runtime_dir: The runtime directory to run fullsystem
@@ -164,18 +165,12 @@ class Thunderscope(object):
             pass
 
         # inputs to full_system
-        proto_unix_io.attach_unix_sender(
-            runtime_dir + ROBOT_STATUS_PATH, RobotStatus
-        )
+        proto_unix_io.attach_unix_sender(runtime_dir + ROBOT_STATUS_PATH, RobotStatus)
         proto_unix_io.attach_unix_sender(
             runtime_dir + SSL_WRAPPER_PATH, SSL_WrapperPacket
         )
-        proto_unix_io.attach_unix_sender(
-            runtime_dir + SSL_REFEREE_PATH, Referee
-        )
-        proto_unix_io.attach_unix_sender(
-            runtime_dir + SENSOR_PROTO_PATH, SensorProto
-        )
+        proto_unix_io.attach_unix_sender(runtime_dir + SSL_REFEREE_PATH, Referee)
+        proto_unix_io.attach_unix_sender(runtime_dir + SENSOR_PROTO_PATH, SensorProto)
         proto_unix_io.attach_unix_receiver(
             runtime_dir + TACTIC_OVERRIDE_PATH, AssignedTacticPlayControlParams
         )
@@ -183,19 +178,21 @@ class Thunderscope(object):
         # outputs from full_system
         proto_unix_io.attach_unix_receiver(runtime_dir + "/protobuf")
         proto_unix_io.attach_unix_receiver(runtime_dir + WORLD_PATH, World)
-        proto_unix_io.attach_unix_receiver(
-            runtime_dir + PRIMITIVE_PATH, PrimitiveSet
-        )
+        proto_unix_io.attach_unix_receiver(runtime_dir + PRIMITIVE_PATH, PrimitiveSet)
 
         # TODO (#2510) rename to full_system
         return Popen(
-                'software/unix_full_system --runtime_dir={} --friendly_colour_yellow={}'.format(runtime_dir, friendly_colour_yellow).split(" "))
-
+            "software/unix_full_system --runtime_dir={} --friendly_colour_yellow={}".format(
+                runtime_dir, friendly_colour_yellow
+            ).split(
+                " "
+            )
+        )
 
     def run_er_force_simulator(
         self,
         simulator_runtime_dir,
-        blue_runtime_dir, 
+        blue_runtime_dir,
         yellow_runtime_dir,
         simulator_io,
         blue_full_system_proto_unix_io,
@@ -269,10 +266,7 @@ class Thunderscope(object):
             yellow_io.send_proto(Referee, data)
 
         self.receive_referee_command = networking.SSLRefereeProtoListener(
-            "224.5.23.1",
-            10003,
-            send_referee_command,
-            True,
+            "224.5.23.1", 10003, send_referee_command, True,
         )
 
     def register_refresh_function(self, refresh_func):
@@ -496,7 +490,12 @@ if __name__ == "__main__":
         thunderscope.run_full_system("/tmp/tbots/blue", blue_io, "false")
         thunderscope.run_full_system("/tmp/tbots/yellow", yellow_io, "true")
         thunderscope.run_er_force_simulator(
-            "/tmp/tbots", "/tmp/tbots/blue", "/tmp/tbots/yellow", simulator_io, blue_io, yellow_io
+            "/tmp/tbots",
+            "/tmp/tbots/blue",
+            "/tmp/tbots/yellow",
+            simulator_io,
+            blue_io,
+            yellow_io,
         )
         thunderscope.run_gamecontroller(blue_io, yellow_io)
         thunderscope.configure_default_layout(thunderscope.blue_full_system_dock_area)

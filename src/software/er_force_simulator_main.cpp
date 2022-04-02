@@ -67,8 +67,9 @@ int main(int argc, char **argv)
         auto blue_ssl_wrapper_output =
             ThreadedProtoUnixSender<SSLProto::SSL_WrapperPacket>(runtime_dir +
                                                                  BLUE_SSL_WRAPPER_PATH);
-        auto yellow_ssl_wrapper_output = ThreadedProtoUnixSender<SSLProto::SSL_WrapperPacket>(
-            runtime_dir + YELLOW_SSL_WRAPPER_PATH);
+        auto yellow_ssl_wrapper_output =
+            ThreadedProtoUnixSender<SSLProto::SSL_WrapperPacket>(runtime_dir +
+                                                                 YELLOW_SSL_WRAPPER_PATH);
 
         // Robot Status Outputs
         auto blue_robot_status_output = ThreadedProtoUnixSender<TbotsProto::RobotStatus>(
