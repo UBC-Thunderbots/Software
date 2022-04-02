@@ -200,7 +200,7 @@ class WorldLayer(FieldLayer):
             self.createCircle(0, 0, field.center_circle_radius * MM_PER_M)
         )
 
-    def draw_team(self, painter, color, team: Team):
+    def draw_team(self, painter, color, team: Team, field: Field):
 
         """Draw the team
 
@@ -213,30 +213,19 @@ class WorldLayer(FieldLayer):
 
         for robot in team.team_robots:
 
-            painter.setPen(pg.mkPen(colors.ROBOT_ID_COLOR))
-
-            painter.setPen(pg.mkPen(colors.ROBOT_ID_COLOR))
-            robot_id_bounding_rect = QtCore.QRectF(robot.current_state.global_position.x_meters * MM_PER_M - (1 * ROBOT_MAX_RADIUS),
-                                                   robot.current_state.global_position.y_meters * MM_PER_M + (2 * ROBOT_MAX_RADIUS),
-                                                   ROBOT_MAX_RADIUS * MM_PER_M,
-                                                   ROBOT_MAX_RADIUS * MM_PER_M)
-
             robot_id_font = painter.font()
-            robot_id_font.setPointSize((robot_id_bounding_rect.width()) / (ROBOT_MAX_RADIUS * 4))
-            painter.setFont(robot_id_font)
+            robot_id_font.setPointSize(ROBOT_MAX_RADIUS/9)
+            robot_id_text = pg.TextItem(str(robot.id), color=Colors.ROBOT_ID_COLOR, anchor=(0,0))
+            robot_id_text.setFont(robot_id_font)
 
-            painter.drawText(robot_id_bounding_rect, str(robot.id))
-
-            # scaling_factor = 1.0 / (robot_id_bounding_rect.width() / (ROBOT_MAX_RADIUS * 2))
-            # unsuccessful scaling attempts:
-            # QtGui.QTransform(scaling_factor, 0, 0, -scaling_factor, 0, 0)
-            # QtGui.QTransform.scale(scaling_factor, scaling_factor)
-
-            #painter.scale(1.0, -1.0)
+            robot_id_text.setPos((robot.current_state.global_position.x_meters * MM_PER_M) - ROBOT_MAX_RADIUS,
+                                 robot.current_state.global_position.y_meters * MM_PER_M)
+            robot_id_text.setParentItem(self)
 
             """
+            Problem: text is unscaled
             Working code:
-            painter.setPen(pg.mkPen(colors.ROBOT_ID_COLOR))
+            painter.setPen(pg.mkPen(Colors.ROBOT_ID_COLOR))
 
             robot_id_font = painter.font()
             robot_id_font.setPointSize(robot_id_bounding_rect.width() / (ROBOT_MAX_RADIUS * 4))
@@ -246,8 +235,17 @@ class WorldLayer(FieldLayer):
                                                    robot.current_state.global_position.y_meters * MM_PER_M + (2 * ROBOT_MAX_RADIUS),
                                                    ROBOT_MAX_RADIUS * MM_PER_M,
                                                    ROBOT_MAX_RADIUS * MM_PER_M)
-                                                   
+            
             painter.drawText(robot_id_bounding_rect, str(robot.id))
+            ------------------------------------------------------------------------------------------------
+            robot_id_font = painter.font()
+            robot_id_font.setPointSize(ROBOT_MAX_RADIUS/9)
+            robot_id_text = pg.TextItem(str(robot.id), color=Colors.ROBOT_ID_COLOR, anchor=(0,0))
+            robot_id_text.setFont(robot_id_font)
+
+            robot_id_text.setPos((robot.current_state.global_position.x_meters * MM_PER_M) - ROBOT_MAX_RADIUS,
+                                 robot.current_state.global_position.y_meters * MM_PER_M)
+            robot_id_text.setParentItem(self)
             """
 
             painter.setPen(pg.mkPen(color))
@@ -306,5 +304,5 @@ class WorldLayer(FieldLayer):
 
         # TODO (#2399) Figure out which team color _we_ are and update the color
         # passed into the team.
-        self.draw_team(painter, Colors.YELLOW_ROBOT_COLOR, world.friendly_team)
-        self.draw_team(painter, Colors.BLUE_ROBOT_COLOR, world.enemy_team)
+        self.draw_team(painter, Colors.YELLOW_ROBOT_COLOR, world.friendly_team, world.field)
+        self.draw_team(painter, Colors.BLUE_ROBOT_COLOR, world.enemy_team, world.field)
