@@ -21,6 +21,19 @@ cc_library(
 )
 
 cc_library(
+    name = "power",
+    srcs = ["power.cpp"],
+    hdrs = ["power.h"],
+    deps = [
+        ":service",
+        "//shared/uart_framing",
+        "//software/logger",
+        "//software/uart:boost_uart_communication",
+        "@boost//:asio",
+    ],
+)
+
+cc_library(
     name = "network",
     srcs = ["network.cpp"],
     hdrs = ["network.h"],

@@ -1,6 +1,10 @@
-import tftpy, hashlib, os, argparse, pathlib
-from python_tools.robot_broadcast_receiver import receive_announcements
+import argparse
+import hashlib
+import os
+import pathlib
 
+import tftpy
+from python_tools.robot_broadcast_receiver import receive_announcements
 
 MAX_UPLOAD_RETRIES = 3
 

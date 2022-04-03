@@ -39,7 +39,6 @@
 #include <vector>
 
 #include "agent.h"
-#include "goal.h"
 #include "simulator.h"
 #include "software/geom/vector.h"
 
@@ -66,10 +65,10 @@ class HRVOAgent : public Agent
      * @param maxAccel           The maximum acceleration of this agent.
      * @param velocity           The initial velocity of this agent.
      */
-    HRVOAgent(Simulator *simulator, const Vector &position, std::size_t goalIndex,
-              float neighborDist, std::size_t maxNeighbors, float radius,
-              const Vector &velocity, float maxAccel, float goalRadius, float prefSpeed,
-              float maxSpeed, float uncertaintyOffset);
+    HRVOAgent(HRVOSimulator *simulator, const Vector &position, float neighborDist,
+              std::size_t maxNeighbors, float radius, const Vector &velocity,
+              float maxAccel, AgentPath &path, float prefSpeed, float maxSpeed,
+              float uncertaintyOffset);
 
     /**
      * Computes the new velocity of this agent.
@@ -105,6 +104,28 @@ class HRVOAgent : public Agent
      */
     void insertNeighbor(std::size_t agentNo, float &rangeSq);
 
+    /**
+     * Get a list of circles which represent the new velocity candidates
+     * @param circle_rad The radius of the circles which represent candidates
+     * @return list of circles which represent the new velocity candidates
+     */
+    std::vector<Circle> getCandidateVelocitiesAsCircles(
+        const float circle_rad = 0.03f) const;
+
+    /**
+     * Get a list of triangles (polygons) which represent the velocity obstacles
+     * which this HRVO Agent currently sees.
+     * @return A list of polygons which represent velocity obstacles
+     */
+    std::vector<Polygon> getVelocityObstaclesAsPolygons() const;
+
+    /**
+     * Update preferred speed of Agent. The preferred speed represents the speed which we
+     * would like this Agent to travel at.
+     * @param new_pref_speed New preferred speed
+     */
+    void setPreferredSpeed(float new_pref_speed);
+
    private:
     /**
      * A candidate point.
@@ -126,6 +147,7 @@ class HRVOAgent : public Agent
 
    public:
     float prefSpeed_;
+
     std::size_t maxNeighbors_;
     float neighborDist_;
     float uncertaintyOffset_;
@@ -133,6 +155,14 @@ class HRVOAgent : public Agent
     // distance -> Agent Index
     std::set<std::pair<float, std::size_t>> neighbors_;
     std::vector<VelocityObstacle> velocityObstacles_;
+
+    // TODO (#2519): Remove magic numbers
+    // Increasing deceleration distance to reduce the chance of overshooting the
+    // destination
+    static constexpr float decel_dist_multiplier = 1.2f;
+    // Decreasing preferred speed during deceleration to reduce the chance of
+    // overshooting the destination
+    static constexpr float decel_pref_speed_multiplier = 0.6f;
 
     friend class KdTree;
     friend class Simulator;

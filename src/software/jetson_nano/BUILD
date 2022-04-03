@@ -5,6 +5,7 @@ cc_library(
     srcs = ["primitive_executor.cpp"],
     hdrs = ["primitive_executor.h"],
     deps = [
+        "//extlibs/hrvo",
         "//proto:tbots_cc_proto",
         "//proto/primitive:primitive_msg_factory",
         "//shared:constants",

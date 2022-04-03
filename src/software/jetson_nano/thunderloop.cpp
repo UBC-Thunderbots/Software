@@ -21,6 +21,7 @@ extern int clock_nanosleep(clockid_t __clock_id, int __flags,
 
 Thunderloop::Thunderloop(const RobotConstants_t& robot_constants,
                          const WheelConstants_t& wheel_consants, const int loop_hz)
+    : primitive_executor_(loop_hz, robot_constants)
 {
     robot_id_        = 0;
     channel_id_      = 0;
@@ -99,8 +100,7 @@ void Thunderloop::runLoop()
                 // Save new primitive set
                 primitive_set_ = new_primitive_set;
 
-                // If we have a primitive for "this" robot, lets start it
-                if (new_primitive_set.robot_primitives().count(robot_id_) != 0)
+                // Update primitive executor's primitive set
                 {
                     primitive_ =
                         new_primitive_set.mutable_robot_primitives()->at(robot_id_);
@@ -118,6 +118,8 @@ void Thunderloop::runLoop()
                 }
             }
 
+            // TODO (#2495): Replace Vision proto with World proto in Network Service and
+            //               call PrimitiveExecutor::updateWorld
             // If the vision msg is new, update the internal buffer
             if (new_vision.time_sent().epoch_timestamp_seconds() >
                 vision_.time_sent().epoch_timestamp_seconds())

@@ -3,8 +3,8 @@
 #include <gmock/gmock.h>
 
 #include "gtest/gtest.h"
-#include "mock_uart_communication.h"
-#include "uart_communication.h"
+#include "software/uart/mock_uart_communication.h"
+#include "software/uart/uart_communication.h"
 
 static constexpr unsigned char STOP = 0;
 static constexpr unsigned char PLAY = 1;

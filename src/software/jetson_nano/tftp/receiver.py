@@ -1,4 +1,6 @@
-import tftpy, argparse
+import argparse
+
+import tftpy
 
 
 def main():
