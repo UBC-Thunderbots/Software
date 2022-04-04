@@ -1,11 +1,9 @@
 import math
 import queue
 
+import software.python_bindings as geom
 import pyqtgraph as pg
-from proto.ball_pb2 import Ball
-from proto.team_pb2 import Robot, Team
-from proto.vision_pb2 import BallState, RobotState
-from proto.world_pb2 import Field, World
+from proto.import_all_protos import *
 from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtCore import Qt
 
@@ -15,13 +13,12 @@ from software.thunderscope.constants import (
     BALL_RADIUS,
     MM_PER_M,
     ROBOT_MAX_RADIUS,
-    UNIX_SOCKET_BASE_PATH,
 )
 from software.thunderscope.field.field_layer import FieldLayer
 
 
 class WorldLayer(FieldLayer):
-    def __init__(self, buffer_size=10):
+    def __init__(self, simulator_io, buffer_size=1):
         FieldLayer.__init__(self)
         self.cached_world = World()
         self.world_buffer = queue.Queue(buffer_size)
@@ -33,6 +30,7 @@ class WorldLayer(FieldLayer):
         self.mouse_clicked = False
         self.mouse_click_pos = [0, 0]
         self.mouse_hover_pos = [0, 0]  # might not need later, see hoverMoveEvent
+        self.simulator_io = simulator_io
 
     def keyPressEvent(self, event):
         """Detect when a key has been pressed (override)
@@ -41,19 +39,49 @@ class WorldLayer(FieldLayer):
         :param event: The event
 
         """
-        if event.key() == Qt.Key_R:
+        if event.key() == Qt.Key.Key_R:
             # TODO (#2410) enter function to rotate the robot
             print("pressed R")
             self.pressed_R = True
 
-        elif event.key() == Qt.Key_Control:
+        elif event.key() == Qt.Key.Key_Control:
             # TODO (#2410) enter function to move the ball
             print("pressed CTRL")
+            self.pressed_CTRL = True
 
-        elif event.key() == Qt.Key_M:
+        elif event.key() == Qt.Key.Key_M:
             # TODO (#2410) enter function to move the robot
             print("pressed M")
             self.pressed_M = True
+
+    def __setup_robots(self, robot_locations, team_colour):
+        """Initializes the world from a list of robot locations
+
+        :param robot_locations: A list of robot locations (index is robot id)
+        :param team_colour: The color (either "blue" or "yellow")
+
+        """
+        world_state = WorldState()
+
+        for x, robot_map in enumerate(
+            [world_state.blue_robots, world_state.yellow_robots]
+        ):
+
+            for robot_id, robot_location in enumerate(robot_locations):
+                robot_map[robot_id].CopyFrom(
+                    RobotState(
+                        global_position=Point(
+                            x_meters=-3 if x == 0 else 3, y_meters=robot_location.y()
+                        ),
+                        global_orientation=Angle(radians=0),
+                        global_velocity=Vector(
+                            x_component_meters=0, y_component_meters=0
+                        ),
+                        global_angular_velocity=AngularVelocity(radians_per_second=0),
+                    )
+                )
+
+        return world_state
 
     # Note: the function name formatting is different but this can't be changed since it's overriding the built-in Qt function
     def keyReleaseEvent(self, event):
@@ -62,17 +90,17 @@ class WorldLayer(FieldLayer):
         :param event: The event
 
         """
-        if event.key() == Qt.Key_R:
+        if event.key() == Qt.Key.Key_R:
             # TODO (#2410) exit function to rotate the robot
             print("released R")
             self.pressed_R = False
 
-        elif event.key() == Qt.Key_Control:
+        elif event.key() == Qt.Key.Key_Control:
             # TODO (#2410) exit function to move the ball
             self.pressed_CTRL = False
             print("released CTRL")
 
-        elif event.key() == Qt.Key_M:
+        elif event.key() == Qt.Key.Key_M:
             # TODO (#2410) exit function to move the robot
             print("released M")
             self.pressed_M = False
@@ -92,17 +120,25 @@ class WorldLayer(FieldLayer):
         :param event: The event
 
         """
-        # TODO (#2410) implement robot and ball interactivity through simulator, based on mouse and keyboard events
-
-        # print the position of the mouse click
-        print("x: " + str(event.pos().x() / MM_PER_M))
-        print("y: " + str(event.pos().y() / MM_PER_M))
+        x = event.pos().x() / MM_PER_M
+        y = event.pos().y() / MM_PER_M
 
         self.mouse_clicked = True
         self.mouse_click_pos = [event.pos().x(), event.pos().y()]
 
         # determine whether a robot was clicked
         self.identify_robots(event.pos().x(), event.pos().y())
+
+        if self.pressed_CTRL:
+            # world_state = self.__setup_robots(
+            # [geom.Point(-3, x) for x in range(-2, 3)], "blue"
+            # )
+            world_state = WorldState()
+            world_state.ball_state.CopyFrom(
+                BallState(global_position=Point(x_meters=x, y_meters=y,),)
+            )
+            print("HYELO")
+            self.simulator_io.send_proto(WorldState, world_state)
 
     def identify_robots(self, mouse_x, mouse_y):
         """Identify which robot was clicked on the field
@@ -147,7 +183,7 @@ class WorldLayer(FieldLayer):
         :param painter: The painter
 
         """
-        painter.setPen(pg.mkPen("g", width=2))
+        painter.setPen(pg.mkPen("g", width=1))
         painter.drawEllipse(
             self.createCircle(
                 self.mouse_click_pos[0], self.mouse_click_pos[1], BALL_RADIUS * 3,
@@ -163,7 +199,7 @@ class WorldLayer(FieldLayer):
         :param field: The field proto to draw
 
         """
-        painter.setPen(pg.mkPen("w", width=2))
+        painter.setPen(pg.mkPen("w", width=1))
 
         # Draw Field Bounds
         painter.drawRect(
@@ -263,9 +299,6 @@ class WorldLayer(FieldLayer):
         self.cached_world = world
         self.draw_field(painter, world.field)
         self.draw_ball(painter, world.ball)
-
-        # temporary function call for testing purposes
-        self.draw_mouse_click_loc(painter)
 
         # TODO (#2399) Figure out which team color _we_ are and update the color
         # passed into the team.

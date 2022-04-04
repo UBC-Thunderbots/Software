@@ -144,13 +144,29 @@ echo "================================================================"
 echo "Done Setting Up Virtual Python Environment"
 echo "================================================================"
 
+echo "================================================================"
+echo "Fetching mobile gamepad and game controller"
+echo "================================================================"
+
+FILE=/opt/mobile_gamepad.zip
+if [ ! -f "$FILE" ]; then
+    echo "Mobile Gamepad Binary not found, fetching"
+    # Download handheld controller
+    sudo curl -L https://github.com/UBC-Thunderbots/mobile-gamepad/releases/download/vtbots.0.1/gamepad.zip -o /opt/tbotspython/mobile_gamepad.zip
+    sudo unzip /opt/mobile_gamepad.zip -d /opt
+    sudo chown -R $USER:$USER /opt/mobile_gamepad
+fi
+
+sudo wget -nc https://github.com/RoboCup-SSL/ssl-game-controller/releases/download/v2.4.0/ssl-game-controller_v2.4.0_linux_amd64 -O /opt/tbotspython/gamecontroller
+sudo chmod +x /opt/tbotspython/gamecontroller
+
 # Install Bazel
 echo "================================================================"
 echo "Installing Bazel"
 echo "================================================================"
 
 # Adapted from https://docs.bazel.build/versions/master/install-ubuntu.html#install-on-ubuntu
-sudo apt install apt-transport-https curl gnupg
+sudo apt install apt-transport-https curl gnupg -y
 curl -fsSL https://bazel.build/bazel-release.pub.gpg | gpg --dearmor > bazel.gpg
 sudo mv bazel.gpg /etc/apt/trusted.gpg.d/
 echo "deb [arch=amd64] https://storage.googleapis.com/bazel-apt stable jdk1.8" | sudo tee /etc/apt/sources.list.d/bazel.list

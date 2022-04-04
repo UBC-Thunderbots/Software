@@ -36,10 +36,6 @@ class ThreadedUnixSender:
         self.stop = True
         self.server.server_close()
 
-    @property
-    def buffer(self):
-        return self.proto_buffer
-
     def __send_protobuf(self):
         """Send the buffered protobuf
         """

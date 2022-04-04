@@ -155,25 +155,6 @@ py_library(
 )
 
 py_library(
-    name = "full_system",
-    srcs = [
-        "full_system.py",
-    ],
-    data = [
-        "//software:py_constants.so",
-        "//software:python_bindings.so",
-        "//software:unix_full_system",
-    ],
-    deps = [
-        "//proto:software_py_proto",
-        "//proto:tbots_py_proto",
-        "//software/logger:py_logger",
-        "//software/networking:threaded_unix_listener_py",
-        "//software/networking:threaded_unix_sender_py",
-    ],
-)
-
-py_library(
     name = "validation",
     srcs = [
         "ball_enters_region.py",

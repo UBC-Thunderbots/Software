@@ -129,14 +129,16 @@ void SensorFusion::updateWorld(const SSLProto::Referee &packet)
     if (sensor_fusion_config->getFriendlyColorYellow()->value())
     {
         game_state.updateRefereeCommand(createRefereeCommand(packet, TeamColour::YELLOW));
-        friendly_goalie_id = packet.yellow().goalkeeper();
-        enemy_goalie_id    = packet.blue().goalkeeper();
+        friendly_goalie_id      = packet.yellow().goalkeeper();
+        enemy_goalie_id         = packet.blue().goalkeeper();
+        defending_positive_side = !packet.blue_team_on_positive_half();
     }
     else
     {
         game_state.updateRefereeCommand(createRefereeCommand(packet, TeamColour::BLUE));
-        friendly_goalie_id = packet.blue().goalkeeper();
-        enemy_goalie_id    = packet.yellow().goalkeeper();
+        friendly_goalie_id      = packet.blue().goalkeeper();
+        enemy_goalie_id         = packet.yellow().goalkeeper();
+        defending_positive_side = packet.blue_team_on_positive_half();
     }
 
     if (game_state.isOurBallPlacement())
@@ -201,8 +203,6 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
     // the side we are defending if we are overriding the value
     const bool override_game_controller_defending_side =
         sensor_fusion_config->getOverrideGameControllerDefendingSide()->value();
-    const bool defending_positive_side =
-        sensor_fusion_config->getDefendingPositiveSide()->value();
     const bool should_invert_field =
         override_game_controller_defending_side && defending_positive_side;
 

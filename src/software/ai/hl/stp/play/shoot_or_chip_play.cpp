@@ -12,6 +12,7 @@
 #include "software/logger/logger.h"
 #include "software/util/generic_factory/generic_factory.h"
 #include "software/world/game_state.h"
+#include "proto/message_translation/tbots_protobuf.h"
 
 ShootOrChipPlay::ShootOrChipPlay(std::shared_ptr<const AiConfig> config)
     : Play(config, true)

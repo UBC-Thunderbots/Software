@@ -141,6 +141,7 @@ class SensorFusion
 
     unsigned int friendly_goalie_id;
     unsigned int enemy_goalie_id;
+    bool defending_positive_side;
 
     // The number of "reset packets" we have received. These indicate that the
     // vision time should be reset. Please see `checkForVisionReset` to see how

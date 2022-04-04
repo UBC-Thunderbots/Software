@@ -10,14 +10,14 @@ from pyqtgraph.Qt import QtGui
 import software.thunderscope.constants as constants
 from software.networking.threaded_unix_listener import ThreadedUnixListener
 
-DEQUE_SIZE = 500
+DEQUE_SIZE = 1000
 MIN_Y_RANGE = 0
 MAX_Y_RANGE = 100
 TIME_WINDOW_TO_DISPLAY_S = 10
 
 
 class NamedValuePlotter(object):
-    def __init__(self, buffer_size=10):
+    def __init__(self, buffer_size=1000):
 
         self.win = pg.plot()
         self.plots = {}
@@ -62,7 +62,6 @@ class NamedValuePlotter(object):
                 self.data_x[named_value.name], self.data_y[named_value.name]
             )
             self.win.setRange(
-                yRange=[MIN_Y_RANGE, MAX_Y_RANGE],
                 xRange=[
                     time.time() - self.time - TIME_WINDOW_TO_DISPLAY_S,
                     time.time() - self.time,

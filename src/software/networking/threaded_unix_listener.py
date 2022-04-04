@@ -1,7 +1,4 @@
 import base64
-import glob
-import importlib
-import inspect
 import os
 import queue
 import socketserver
@@ -15,13 +12,16 @@ from google.protobuf.any_pb2 import Any
 
 
 class ThreadedUnixListener:
-    def __init__(self, unix_path, proto_class=None, max_buffer_size=3):
+    def __init__(
+        self, unix_path, proto_class=None, base64_encoded=False, max_buffer_size=100
+    ):
 
         """Receive protobuf over unix sockets and buffers them
 
         :param unix_path: The unix path to receive the new protobuf to plot
         :param proto_class: The protobuf to unpack from (None if its encoded in the payload)
         :param max_buffer_size: The size of the buffer
+        :param base64_encoded: False
 
         """
 
@@ -32,7 +32,8 @@ class ThreadedUnixListener:
             pass
 
         self.server = socketserver.UnixDatagramServer(
-            unix_path, handler_factory(self.__buffer_protobuf, proto_class)
+            unix_path,
+            handler_factory(self.__buffer_protobuf, proto_class, base64_encoded),
         )
         self.stop = False
 
@@ -96,22 +97,15 @@ class ThreadedUnixListener:
 
 
 class Session(socketserver.BaseRequestHandler):
-    def __init__(self, handle_callback, proto_class=None, *args, **keys):
+    def __init__(self, handle_callback, proto_class, base64_encoded, *args, **keys):
         self.handle_callback = handle_callback
         self.proto_class = proto_class
+        self.base64_encoded = base64_encoded
         super().__init__(*args, **keys)
 
     def handle(self):
-        """Handle the two cases:
-
-        1. Given the proto_class, decode the incoming data and trigger a callback.
-           This is mostly used for direct protobuf communication.
-        2. LOG(VISUALIZE) calls from g3log in the C++ code sending over stuff to
-           visualize follows a specific format (see handle_log_visualize) we
-           need to decode.
-
-        """
-        if self.proto_class:
+        """TODO"""
+        if not self.base64_encoded:
             self.handle_proto()
         else:
             self.handle_log_visualize()
@@ -146,50 +140,26 @@ class Session(socketserver.BaseRequestHandler):
 
         """
         payload = self.request[0]
-        type_name = str(payload.split(b"!!!")[0], "utf-8")
-        proto_type = self.find_proto_class(type_name.split(".")[1])
-        msg = proto_type()
+        result = base64.b64decode(payload)
+        msg = self.proto_class()
 
-        payload = base64.b64decode(payload.split(b"!!!")[1])
-
-        any_msg = Any.FromString(payload)
+        any_msg = Any.FromString(result)
         any_msg.Unpack(msg)
-
         self.handle_callback(msg)
 
-    def find_proto_class(self, proto_class_name):
-        """Search through all protobufs and return class of proto_type
 
-        :param proto_class_name: String of the proto class name to search for
-
-        """
-        proto_path = os.path.dirname(proto.__file__)
-
-        for file in glob.glob(proto_path + "**/*.py"):
-            name = os.path.splitext(os.path.basename(file))[0]
-
-            # Ignore __ files
-            if name.startswith("__"):
-                continue
-            module = importlib.import_module("proto." + name)
-
-            for member in dir(module):
-                handler_class = getattr(module, member)
-                if handler_class and inspect.isclass(handler_class):
-                    if str(member) == proto_class_name:
-                        return handler_class
-
-
-def handler_factory(handle_callback, proto_class):
+def handler_factory(handle_callback, proto_class, base64_encoded):
     """To pass in an arbitrary handle callback into the SocketServer,
     we need to create a constructor that can create a Session object with
     appropriate handle function.
 
     :param handle_callback: The callback to run
     :param proto_class: The protobuf to unpack from (None if its encoded in the payload)
+    :param base64_encoded: TODO
+
     """
 
     def create_handler(*args, **keys):
-        return Session(handle_callback, proto_class, *args, **keys)
+        return Session(handle_callback, proto_class, base64_encoded, *args, **keys)
 
     return create_handler

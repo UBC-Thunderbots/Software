@@ -5,6 +5,14 @@ load("@thunderscope_deps//:requirements.bzl", "requirement")
 py_binary(
     name = "thunderscope",
     srcs = ["thunderscope.py"],
+    data = [
+        "//software:er_force_simulator_main",
+        "//software:py_constants.so",
+        "//software:unix_full_system",
+        "//software/estop:estop_reader.so",
+        "//software:python_bindings.so",
+        "//software/networking:networking.so",
+    ],
     deps = [
         "//proto:software_py_proto",
         "//software/networking:threaded_unix_listener_py",
@@ -12,7 +20,7 @@ py_binary(
         "//software/thunderscope:colors",
         "//software/thunderscope:common_widgets",
         "//software/thunderscope:constants",
-        "//software/thunderscope:proto_receiver",
+        "//software/thunderscope:proto_unix_io",
         "//software/thunderscope/arbitrary_plot:named_value_plotter",
         "//software/thunderscope/chicker",
         "//software/thunderscope/field",
@@ -23,14 +31,15 @@ py_binary(
         "//software/thunderscope/field:world_layer",
         "//software/thunderscope/log:g3log_checkboxes",
         "//software/thunderscope/log:g3log_widget",
+        "//software/thunderscope/robot_communication:mobile_gamepad",
         requirement("pyqtgraph"),
         requirement("numpy"),
     ],
 )
 
 py_library(
-    name = "proto_receiver",
-    srcs = ["proto_receiver.py"],
+    name = "proto_unix_io",
+    srcs = ["proto_unix_io.py"],
 )
 
 py_library(

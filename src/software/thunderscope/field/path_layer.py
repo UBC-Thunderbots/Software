@@ -10,7 +10,7 @@ from software.thunderscope.field.field_layer import FieldLayer
 
 
 class PathLayer(FieldLayer):
-    def __init__(self, buffer_size=10):
+    def __init__(self, buffer_size=1):
         FieldLayer.__init__(self)
         self.cached_paths = PathVisualization()
         self.path_visualization_buffer = queue.Queue(buffer_size)
@@ -29,7 +29,7 @@ class PathLayer(FieldLayer):
             paths = self.cached_paths
 
         self.cached_paths = paths
-        painter.setPen(pg.mkPen("b", width=2))
+        painter.setPen(pg.mkPen("b", width=1))
 
         for path in paths.path:
             polygon_points = [

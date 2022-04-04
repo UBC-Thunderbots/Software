@@ -27,6 +27,7 @@ cc_library(
     hdrs = ["corner_kick_play.h"],
     deps = [
         ":play",
+        "//proto/message_translation:tbots_protobuf",
         "//shared:constants",
         "//software/ai/evaluation:possession",
         "//software/ai/hl/stp/tactic/attacker:attacker_tactic",
@@ -238,6 +239,7 @@ cc_library(
     deps = [
         ":play",
         "//shared:constants",
+        "//proto/message_translation:tbots_protobuf",
         "//shared/parameter:cpp_configs",
         "//software/ai/evaluation:enemy_threat",
         "//software/ai/evaluation:find_open_areas",
