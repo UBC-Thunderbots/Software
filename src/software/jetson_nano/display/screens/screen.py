@@ -149,7 +149,8 @@ class Screen:
                 (x, y), action["display string"], font=self.font, fill=constants.WHITE
             )
 
-            if action["type"] != SCREEN_TYPE:
+            # Display the value for an action; no value when changing screens
+            if action["screen action"] != self.screen_actions.CHANGE_SCREEN:
                 x += self.font.getsize(action["display string"])[0]
 
                 if action["type"] == bool:
@@ -170,3 +171,17 @@ class Screen:
                 x = cursor_size
 
             y += self.font_size
+
+    def update_values(self, redis_dict):
+        """ Sync values with those from redis """
+        if not self.edit_mode:
+            for i in range(self.len):
+                if self.actions[i]["redis key"] == None:
+                    continue
+
+                if self.actions[i]["type"] == bool:
+                    self.actions[i]["value"] = (
+                        1 if redis_dict[self.actions[i]["redis key"]] else 0
+                    )
+                else:
+                    self.actions[i]["value"] = redis_dict[self.actions[i]["redis key"]]

@@ -10,7 +10,7 @@ from software.display.screens.home_screen import HomeScreen
 from software.display.screens.menu_screen import MenuScreen
 from software.display.screens.wheels_screen import WheelsScreen
 from software.display.screens.chip_and_kick_screen import ChipAndKickScreen
-import software.display.screens.constants as constants
+import software.display.constants as constants
 
 # Pins for Rotary Encoder
 BUTTON_PIN = constants.BUTTON_PIN
