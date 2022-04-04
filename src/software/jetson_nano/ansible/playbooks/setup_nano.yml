@@ -1,0 +1,17 @@
+---
+
+- name: Setting up the jetson Nano
+  hosts: THUNDERBOTS_HOSTS
+
+  tasks:
+    - name: Copy and Execute the setup_nano script
+      script: ../../setup_nano.sh
+      become: true
+      become_method: sudo
+      register: res
+
+    - debug:
+        msg:
+          - "[Robot ID = {{ inventory_hostname }}]"
+          - "stdout = {{ res.stdout_lines }} "
+          - "stderr = {{ res.stderr }}"

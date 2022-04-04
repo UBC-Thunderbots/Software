@@ -2,17 +2,25 @@ package(default_visibility = ["//visibility:public"])
 
 load("@rules_python//python:defs.bzl", "py_binary")
 load("@ansible_deps//:requirements.bzl", "requirement")
+load("@bazel_tools//tools/build_defs/pkg:pkg.bzl", "pkg_tar")
 
 py_binary(
     name = "run_ansible",
-    srcs = ["run_ansible.py"],
+    srcs = [
+        "run_ansible.py",
+    ],
     data = [
         ":playbooks",
-        "//software/jetson_nano/systemd:systemdFiles",
+        "//software/jetson_nano:setup_nano",
+        "//software/jetson_nano:thunderloop_main",
+        "//software/jetson_nano/broadcasts:robot_broadcast_receiver",
+        "//software/jetson_nano/broadcasts:robot_broadcast_sender",
+        "//software/jetson_nano/display:lcd_user_interface",
+        "//software/jetson_nano/systemd:systemd_files",
+        "//software/jetson_nano/tftp:receiver",
     ],
     deps = [
         requirement("ansible"),
-        "//software/jetson_nano/broadcasts:robot_broadcast_receiver",
     ],
 )
 

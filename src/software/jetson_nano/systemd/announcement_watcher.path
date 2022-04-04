@@ -3,9 +3,8 @@ Description=Monitor for changes in the announcement script
 After=thunderbots.service
 
 [Path]
-#todo add binary path (#2443)
-PathChanged=${%i_path}
-Unit=watcher@%announcement.service
+PathChanged=/home/robot/thunderbots_binaries/broadcasts/robot_broadcast_receiver.runfiles/__main__/software/jetson_nano/broadcasts/robot_broadcast_sender.py
+Unit=watcher@announcement.service
 
 [Install]
 # This unit should be run at startup

@@ -37,8 +37,6 @@ http_archive(
 
 http_archive(
     name = "cpp_redis",
-    patch_args = ["-p1"],
-    patches = ["@//extlibs:cpp_redis.patch"],
     sha256 = "12a6fc86ba4ca3d4537a3eee82c094f385b8e03e283c664c976f16d421f17f7d",
     strip_prefix = "cpp_redis-fc2c43fa07e45e1ef0f77cbda6a240e7890ae5aa",
     urls = [
@@ -84,26 +82,43 @@ http_archive(
     url = "https://github.com/ReneNyffenegger/cpp-base64/archive/refs/tags/V2.rc.08.zip",
 )
 
-http_archive(
-    name = "rules_proto",
-    sha256 = "ba66b430aaed1b6d2530154fd5ff968fb810ee0936edfe5f48e1f1c36ff2ea65",
-    strip_prefix = "rules_proto-e507ccded37c389186afaeb2b836ec576dc875dc",
-    urls = [
-        "https://github.com/bazelbuild/rules_proto/archive/e507ccded37c389186afaeb2b836ec576dc875dc.zip",
-    ],
+load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
+
+git_repository(
+    name = "com_google_protobuf",
+    # We need this patch to properly add generated dependencies to the protoc
+    # compiler. It also fixes an issue with the python imports.
+    patch_args = ["-p1"],
+    patches = ["@//extlibs:protobuf.patch"],
+    remote = "https://github.com/protocolbuffers/protobuf",
+    tag = "v3.19.4",
 )
 
-load("@rules_proto//proto:repositories.bzl", "rules_proto_dependencies", "rules_proto_toolchains")
+load("@com_google_protobuf//:protobuf_deps.bzl", "protobuf_deps")
 
-rules_proto_dependencies()
-
-rules_proto_toolchains()
+protobuf_deps()
 
 git_repository(
     name = "com_github_nelhage_rules_boost",
     commit = "9f9fb8b2f0213989247c9d5c0e814a8451d18d7f",
     remote = "https://github.com/nelhage/rules_boost",
     shallow_since = "1570056263 -0700",
+)
+
+git_repository(
+    name = "pybind11_protobuf",
+    commit = "f20537c3285636716ed86a7ef96baa19a788c944",
+    remote = "https://github.com/pybind/pybind11_protobuf",
+)
+
+# Used by pybind11 proto autocasters
+http_archive(
+    name = "com_google_absl",
+    sha256 = "dcf71b9cba8dc0ca9940c4b316a0c796be8fab42b070bb6b7cab62b48f0e66c4",  # SHARED_ABSL_SHA
+    strip_prefix = "abseil-cpp-20211102.0",
+    urls = [
+        "https://github.com/abseil/abseil-cpp/archive/refs/tags/20211102.0.tar.gz",
+    ],
 )
 
 load("@com_github_nelhage_rules_boost//:boost/boost.bzl", "boost_deps")
@@ -190,10 +205,10 @@ new_local_repository(
 http_archive(
     name = "jetson_nano_gcc",
     build_file = "@//extlibs:jetson_nano_gcc.BUILD",
-    sha256 = "8dfe681531f0bd04fb9c53cf3c0a3368c616aa85d48938eebe2b516376e06a66",
-    strip_prefix = "gcc-arm-9.2-2019.12-x86_64-aarch64-none-linux-gnu",
+    sha256 = "73eed74e593e2267504efbcf3678918bb22409ab7afa3dc7c135d2c6790c2345",
+    strip_prefix = "gcc-linaro-7.3.1-2018.05-x86_64_aarch64-linux-gnu",
     urls = [
-        "https://developer.arm.com/-/media/Files/downloads/gnu-a/9.2-2019.12/binrel/gcc-arm-9.2-2019.12-x86_64-aarch64-none-linux-gnu.tar.xz",
+        "http://releases.linaro.org/components/toolchain/binaries/7.3-2018.05/aarch64-linux-gnu/gcc-linaro-7.3.1-2018.05-x86_64_aarch64-linux-gnu.tar.xz",
     ],
 )
 
@@ -335,6 +350,12 @@ pip_install(
     requirements = "//software/jetson_nano/ansible:requirements.txt",
 )
 
+pip_install(
+    name = "simulated_tests_deps",
+    python_interpreter = "/opt/tbotspython/bin/python",
+    requirements = "//software/simulated_tests:requirements.txt",
+)
+
 # required to use `py_proto_library` from protobuf
 http_archive(
     name = "six_archive",
@@ -366,7 +387,16 @@ http_archive(
 
 load("@pybind11_bazel//:python_configure.bzl", "python_configure")
 
-python_configure(name = "local_config_python")
+python_configure(
+    name = "local_config_python",
+    python_version = "3",
+)
+
+# These headers are used by pybind11
+bind(
+    name = "python_headers",
+    actual = "@local_config_python//:python_headers",
+)
 
 maybe(
     git_repository,

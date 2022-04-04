@@ -3,9 +3,8 @@ Description=Monitor for changes in the tftp script
 After=thunderbots.service
 
 [Path]
-#todo add binary path (#2443)
-PathChanged=${%i_path}
-Unit=watcher@%tftp.service
+PathChanged=/home/robot/thunderbots_binaries/tftp/receiver/receiver.runfiles/__main__/software/jetson_nano/tftp/receiver.py
+Unit=watcher@tftp.service
 
 [Install]
 # This unit should be run at startup

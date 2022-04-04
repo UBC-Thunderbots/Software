@@ -11,7 +11,7 @@
         If enable_visualizer is true, then stops the AI when the test starts
 
 - string:
-    name: logging_dir
+    name: runtime_dir
     value: ""
     description: >-
         The directory to output logs to. Absolute paths are recommended as the working directory

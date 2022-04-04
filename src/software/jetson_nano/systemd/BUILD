@@ -1,7 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
 filegroup(
-    name = "systemdFiles",
+    name = "systemd_files",
     data = glob([
         "*path",
         "*service",

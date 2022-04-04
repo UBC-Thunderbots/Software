@@ -5,6 +5,7 @@ cc_library(
     srcs = ["primitive_executor.cpp"],
     hdrs = ["primitive_executor.h"],
     deps = [
+        "//extlibs/hrvo",
         "//proto:tbots_cc_proto",
         "//proto/primitive:primitive_msg_factory",
         "//shared:constants",
@@ -48,4 +49,9 @@ cc_binary(
         ":thunderloop",
         "//shared:constants",
     ],
+)
+
+sh_binary(
+    name = "setup_nano",
+    srcs = ["setup_nano.sh"],
 )
