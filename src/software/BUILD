@@ -131,6 +131,28 @@ pybind_extension(
     ],
 )
 
+pybind_library(
+    name = "python_bindings_lib",
+    srcs = ["python_bindings.cpp"],
+    deps = [
+        "//proto/message_translation:tbots_geometry",
+        "//software/geom:angle",
+        "//software/geom:point",
+        "//software/geom:vector",
+        "//software/geom/algorithms",
+        "//software/world",
+        "//software/world:field",
+        "@pybind11_protobuf//pybind11_protobuf:native_proto_caster",
+    ],
+)
+
+pybind_extension(
+    name = "python_bindings",
+    deps = [
+        ":python_bindings_lib",
+    ],
+)
+
 sh_binary(
     name = "restart_on_crash",
     srcs = ["restart_on_crash.sh"],
