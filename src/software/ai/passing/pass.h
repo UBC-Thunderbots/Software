@@ -101,6 +101,16 @@ class Pass
      */
     friend std::ostream& operator<<(std::ostream& output_stream, const Pass& pass);
 
+    /**
+     * Compares Passes for equality. Passes are considered
+     * equal if all their member variables are equal.
+     *
+     * @param other the Pass to compare with for equality
+     *
+     * @return true if the Passes are equal and false otherwise
+     */
+    bool operator==(const Pass& other) const;
+
    private:
     // The location of the passer
     Point passer_point;
