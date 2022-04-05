@@ -300,11 +300,12 @@ class Thunderscope(object):
         log_dock = self.setup_log_widget()
         performance_dock = self.setup_performance_plot()
         gamecontroller_dock = self.setup_gamecontroller_widget()
+        play_info_dock = self.setup_play_info()
 
-        self.dock_area.addDock(field_dock, "left")
-        self.dock_area.addDock(log_dock, "bottom", field_dock)
-        self.dock_area.addDock(performance_dock, "right", log_dock)
-        self.dock_area.addDock(play_info_dock, "right", performance_dock)
+        dock_area.addDock(field_dock, "left")
+        dock_area.addDock(log_dock, "bottom", field_dock)
+        dock_area.addDock(performance_dock, "right", log_dock)
+        dock_area.addDock(play_info_dock, "right", performance_dock)
 
     def setup_field_widget(self):
         """setup the field widget with the constituent layers
