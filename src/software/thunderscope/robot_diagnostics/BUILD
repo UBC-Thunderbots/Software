@@ -1,0 +1,13 @@
+package(default_visibility = ["//visibility:public"])
+
+load("@thunderscope_deps//:requirements.bzl", "requirement")
+
+py_library(
+    name = "drive_and_dribbler_widget",
+    srcs = ["drive_and_dribbler_widget.py"],
+    deps = [
+        "//proto:software_py_proto",
+        "//software/thunderscope:constants",
+        requirement("pyqtgraph"),
+    ],
+)
