@@ -33,10 +33,10 @@ class g3logWidget(QWidget):
 
         # LogLevel to string conversion map
         self.log_level_str_map = {
-            LogLevel.DEBUG   : "DEBUG",
-            LogLevel.INFO    : "INFO",
-            LogLevel.WARNING : "WARNING",
-            LogLevel.FATAL   : "FATAL",
+            LogLevel.DEBUG: "DEBUG",
+            LogLevel.INFO: "INFO",
+            LogLevel.WARNING: "WARNING",
+            LogLevel.FATAL: "FATAL",
         }
 
     def refresh(self):

@@ -1,7 +1,6 @@
 import os
 import signal
 from threading import Thread
-import queue
 import time
 import shelve
 import argparse
@@ -46,9 +45,13 @@ from software.thunderscope.field.field import Field
 from software.thunderscope.log.g3log_widget import g3logWidget
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.thunderscope.robot_communication import mobile_gamepad
-from software.thunderscope.robot_diagnostics.drive_and_dribbler_widget import DriveAndDribblerWidget
+from software.thunderscope.robot_diagnostics.drive_and_dribbler_widget import (
+    DriveAndDribblerWidget,
+)
 from software.thunderscope.play.playinfo_widget import playInfoWidget
 from software.thunderscope.chicker.chicker import ChickerWidget
+
+DEFAULT_LAYOUT_PATH = "/opt/tbotspython/default_tscope_layout"
 
 
 class Thunderscope(object):
@@ -81,6 +84,7 @@ class Thunderscope(object):
         self.tabs = QTabWidget()
         self.tabs.addTab(self.blue_full_system_dock_area, "Blue Full System")
         self.tabs.addTab(self.yellow_full_system_dock_area, "Yellow Full System")
+        self.current_index = 0
 
         self.window = QtGui.QMainWindow()
         self.window.setCentralWidget(self.tabs)
@@ -113,6 +117,7 @@ class Thunderscope(object):
             QtGui.QKeySequence("Ctrl+S"), self.window
         )
         self.save_layout_shortcut.activated.connect(self.save_layout)
+
         self.open_layout_shortcut = QtGui.QShortcut(
             QtGui.QKeySequence("Ctrl+O"), self.window
         )
@@ -136,6 +141,12 @@ class Thunderscope(object):
             )
         )
 
+        with shelve.open(DEFAULT_LAYOUT_PATH, "r") as shelf:
+            self.blue_full_system_dock_area.restoreState(shelf["blue_dock_area_state"], missing='create')
+            self.yellow_full_system_dock_area.restoreState(
+                shelf["yellow_dock_area_state"], missing='create')
+
+
     def save_layout(self):
         """Open a file dialog to save the layout and any other
         registered state to a file
@@ -149,10 +160,18 @@ class Thunderscope(object):
             options=QFileDialog.Option.DontUseNativeDialog,
         )
 
+        if not filename:
+            print("No filename selected")
+            return
+
         blue_dock_area_state = self.blue_full_system_dock_area.saveState()
         yellow_dock_area_state = self.yellow_full_system_dock_area.saveState()
 
         with shelve.open(filename, "c") as shelf:
+            shelf["blue_dock_area_state"] = blue_dock_area_state
+            shelf["yellow_dock_area_state"] = yellow_dock_area_state
+
+        with shelve.open(DEFAULT_LAYOUT_PATH, "c") as shelf:
             shelf["blue_dock_area_state"] = blue_dock_area_state
             shelf["yellow_dock_area_state"] = yellow_dock_area_state
 
@@ -168,6 +187,10 @@ class Thunderscope(object):
             "~/",
             options=QFileDialog.Option.DontUseNativeDialog,
         )
+
+        if not filename:
+            print("No filename selected")
+            return
 
         with shelve.open(filename, "r") as shelf:
             self.blue_full_system_dock_area.restoreState(shelf["blue_dock_area_state"])
@@ -210,9 +233,9 @@ class Thunderscope(object):
 
         # Inputs to full_system
         proto_unix_io.attach_unix_sender(runtime_dir + ROBOT_STATUS_PATH, RobotStatus)
-        # proto_unix_io.attach_unix_sender(
-            # runtime_dir + SSL_WRAPPER_PATH, SSL_WrapperPacket
-        # )
+        proto_unix_io.attach_unix_sender(
+            runtime_dir + SSL_WRAPPER_PATH, SSL_WrapperPacket
+        )
         proto_unix_io.attach_unix_sender(runtime_dir + SSL_REFEREE_PATH, Referee)
         proto_unix_io.attach_unix_sender(runtime_dir + SENSOR_PROTO_PATH, SensorProto)
         proto_unix_io.attach_unix_receiver(
@@ -255,6 +278,11 @@ class Thunderscope(object):
         :param yellow_runtime_dir: The runtime directory of the yellow full system.
 
         """
+        # Setup unix socket directory
+        try:
+            os.mkdir(simulator_runtime_dir)
+        except:
+            pass
 
         # inputs to er_force_simulator_main
         self.simulator_proto_unix_io.attach_unix_sender(
@@ -268,7 +296,7 @@ class Thunderscope(object):
         self.blue_full_system_proto_unix_io.attach_unix_sender(
             simulator_runtime_dir + BLUE_WORLD_PATH, World
         )
-        self.blue_full_system_proto_unix_io.attach_uni_sender(
+        self.blue_full_system_proto_unix_io.attach_unix_sender(
             simulator_runtime_dir + BLUE_PRIMITIVE_SET, PrimitiveSet
         )
         self.blue_full_system_proto_unix_io.attach_unix_receiver(
@@ -317,15 +345,21 @@ class Thunderscope(object):
         """
         self.refresh_functions.append(refresh_func)
 
-    def configure_default_layout(self, dock_area):
+    def configure_default_layout(
+        self, dock_area, proto_unix_io, friendly_colour_yellow
+    ):
         """Configure the default layout for thunderscope
+
+        :param dock_area: The dock area to configure the layout
+        :param proto_unix_io: The proto unix io object
+
         """
         # Configure Docks
-        field_dock = self.setup_field_widget(self.blue_full_system_proto_unix_io)
-        log_dock = self.setup_log_widget()
-        performance_dock = self.setup_performance_plot()
+        field_dock = self.setup_field_widget(proto_unix_io, friendly_colour_yellow)
+        log_dock = self.setup_log_widget(proto_unix_io)
+        performance_dock = self.setup_performance_plot(proto_unix_io)
         gamecontroller_dock = self.setup_gamecontroller_widget()
-        play_info_dock = self.setup_play_info()
+        play_info_dock = self.setup_play_info(proto_unix_io)
 
         dock_area.addDock(gamecontroller_dock, "left")
         dock_area.addDock(field_dock, "below", gamecontroller_dock)
@@ -333,7 +367,7 @@ class Thunderscope(object):
         dock_area.addDock(performance_dock, "right", log_dock)
         dock_area.addDock(play_info_dock, "right", performance_dock)
 
-    def setup_field_widget(self, proto_unix_io):
+    def setup_field_widget(self, proto_unix_io, friendly_colour_yellow):
         """setup the field widget with the constituent layers
 
         :param proto_unix_io: The proto unix io
@@ -343,7 +377,7 @@ class Thunderscope(object):
         self.field = Field()
 
         # Create layers
-        world = world_layer.WorldLayer(proto_unix_io)
+        world = world_layer.WorldLayer(proto_unix_io, friendly_colour_yellow)
         obstacles = obstacle_layer.ObstacleLayer()
         paths = path_layer.PathLayer()
         validation = validation_layer.ValidationLayer()
@@ -359,13 +393,15 @@ class Thunderscope(object):
         # Register observers
         proto_unix_io.register_observer(World, world.world_buffer)
         proto_unix_io.register_observer(Obstacles, obstacles.obstacle_buffer)
-        proto_unix_io.register_observer(PathVisualization, paths.path_visualization_buffer)
+        proto_unix_io.register_observer(
+            PathVisualization, paths.path_visualization_buffer
+        )
 
         # Register refresh functions
         self.register_refresh_function(self.field.refresh)
 
         # Create and return dock
-        field_dock = Dock("Field", size=(500, 2000))
+        field_dock = Dock("Field")
         field_dock.addWidget(self.field)
 
         return field_dock
@@ -373,19 +409,23 @@ class Thunderscope(object):
     def setup_gamecontroller_widget(self):
         """Setup the gamecontroller widget
 
+        :param proto_unix_io: The proto unix io object
+        :return the gamecontroller in a dock
+
         """
         web_view = QWebEngineView()
         web_view.load(QtCore.QUrl("http://localhost:8081"))
 
         # create and return dock
-        gamecontroller_dock = Dock("GameController", size=(500, 2000))
+        gamecontroller_dock = Dock("GameController")
         gamecontroller_dock.addWidget(web_view)
 
         return gamecontroller_dock
 
-    def setup_log_widget(self):
+    def setup_log_widget(self, proto_unix_io):
         """Setup the wiget that receives logs from full system
 
+        :param proto_unix_io: The proto unix io object
         :returns: The dock containing the log widget
 
         """
@@ -393,22 +433,21 @@ class Thunderscope(object):
         self.logs = g3logWidget()
 
         # Register observer
-        self.blue_full_system_proto_unix_io.register_observer(
-            RobotLog, self.logs.log_buffer
-        )
+        proto_unix_io.register_observer(RobotLog, self.logs.log_buffer)
 
         # Register refresh function
         self.register_refresh_function(self.logs.refresh)
 
         # Create and return dock
-        log_dock = Dock("Logs", size=(500, 100))
+        log_dock = Dock("Logs")
         log_dock.addWidget(self.logs)
 
         return log_dock
 
-    def setup_performance_plot(self):
+    def setup_performance_plot(self, proto_unix_io):
         """Setup the performance plot
 
+        :param proto_unix_io: The proto unix io object
         :returns: The performance plot setup in a dock
 
         """
@@ -416,7 +455,7 @@ class Thunderscope(object):
         self.named_value_plotter = NamedValuePlotter()
 
         # Register observer
-        self.blue_full_system_proto_unix_io.register_observer(
+        proto_unix_io.register_observer(
             NamedValue, self.named_value_plotter.named_value_buffer
         )
 
@@ -424,30 +463,31 @@ class Thunderscope(object):
         self.register_refresh_function(self.named_value_plotter.refresh)
 
         # Create and return dock
-        named_value_plotter_dock = Dock("Performance", size=(500, 100))
+        named_value_plotter_dock = Dock("Performance")
         named_value_plotter_dock.addWidget(self.named_value_plotter.plot)
         return named_value_plotter_dock
 
-    def setup_play_info(self):
+    def setup_play_info(self, proto_unix_io):
         """Setup the play info widget
 
+        :param proto_unix_io: The proto unix io object
         :returns: The play info widget setup in a dock
 
         """
 
         play_info = playInfoWidget()
-        play_info_dock = Dock("playInfo", size=(500, 100))
+        play_info_dock = Dock("playInfo")
         play_info_dock.addWidget(play_info)
-        self.blue_full_system_proto_unix_io.register_observer(
-            PlayInfo, play_info.log_buffer
-        )
+        proto_unix_io.register_observer(PlayInfo, play_info.log_buffer)
         self.register_refresh_function(play_info.refresh)
         return play_info_dock
 
-    def setup_chicker_widget(self):
+    def setup_chicker_widget(self, proto_unix_io):
         """Setup the chicker widget for robot diagnostics
 
+        :param proto_unix_io: The proto unix io object
         :returns: The dock containing the chicker widget
+
         """
         # Create widget
         self.chicker_widget = ChickerWidget()
@@ -456,7 +496,7 @@ class Thunderscope(object):
         self.register_refresh_function(self.chicker_widget.refresh)
 
         # Create and return dock
-        chicker_dock = Dock("Chicker", size=(100, 100))
+        chicker_dock = Dock("Chicker")
         chicker_dock.addWidget(self.chicker_widget)
 
         return chicker_dock
@@ -464,7 +504,7 @@ class Thunderscope(object):
     def setup_drive_and_dribbler_widget(self):
         drive_and_dribbler = DriveAndDribblerWidget()
 
-        drive_and_dribbler_dock = Dock("robot diagnostics", size=(50, 100))
+        drive_and_dribbler_dock = Dock("Drive and Dribbler")
         drive_and_dribbler_dock.addWidget(drive_and_dribbler)
 
         return drive_and_dribbler_dock
@@ -543,15 +583,22 @@ if __name__ == "__main__":
     else:
 
         thunderscope = Thunderscope()
-        thunderscope.configure_default_layout(thunderscope.blue_full_system_dock_area)
         thunderscope.run_blue_full_system("/tmp/tbots/blue")
         thunderscope.run_yellow_full_system("/tmp/tbots/yellow")
         thunderscope.run_er_force_simulator(
-            "/tmp/tbots",
-            "/tmp/tbots/blue",
-            "/tmp/tbots/yellow",
+            "/tmp/tbots", "/tmp/tbots/blue", "/tmp/tbots/yellow",
         )
         thunderscope.run_gamecontroller()
+        thunderscope.configure_default_layout(
+            thunderscope.blue_full_system_dock_area,
+            thunderscope.blue_full_system_proto_unix_io,
+            False,
+        )
+        thunderscope.configure_default_layout(
+            thunderscope.yellow_full_system_dock_area,
+            thunderscope.yellow_full_system_proto_unix_io,
+            True,
+        )
 
         def ticker():
             import time

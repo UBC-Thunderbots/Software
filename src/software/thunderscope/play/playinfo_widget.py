@@ -13,21 +13,14 @@ from proto.robot_log_msg_pb2 import RobotLog
 
 class playInfoWidget(QTableWidget):
 
-    # TODO: set these values dynamically (PR: #2560)
-
+    # TODO (#2560): set these values dynamically
     NUM_ROWS = 6
     NUM_COLS = 4
 
     def __init__(self, buffer_size=10):
-
         QTableWidget.__init__(self, playInfoWidget.NUM_ROWS, playInfoWidget.NUM_COLS)
-
         self.log_buffer = queue.Queue(buffer_size)
         self.verticalHeader().setVisible(False)
-
-        self.setStyleSheet(
-            "QHeaderView::section {background-color: rgba(0, 0, 0, 255); color: rgba(255, 255, 255, 255);}"
-        )
 
     def set_data(self, data):
         """Data to set in the table
@@ -43,8 +36,6 @@ class playInfoWidget(QTableWidget):
             for m, item in enumerate(data[key]):
                 newitem = QTableWidgetItem(item)
                 self.setItem(m, n, newitem)
-                self.item(m, n).setBackground(QtGui.QColor(0, 0, 0))
-                self.item(m, n).setForeground(QtGui.QBrush(QtGui.QColor(255, 255, 255)))
 
         self.setHorizontalHeaderLabels(horizontal_headers)
 
@@ -64,6 +55,9 @@ class playInfoWidget(QTableWidget):
         play_name = []
 
         play_name.append(play_info_dict["play"]["playName"])
+
+        if "robotTacticAssignment" not in play_info_dict:
+            return
 
         for robot_id in sorted(play_info_dict["robotTacticAssignment"]):
             robot_ids.append(robot_id)

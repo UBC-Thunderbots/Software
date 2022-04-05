@@ -19,7 +19,7 @@ from software.thunderscope.field.field_layer import FieldLayer
 
 
 class WorldLayer(FieldLayer):
-    def __init__(self, simulator_io, buffer_size=1):
+    def __init__(self, simulator_io, friendly_colour_yellow, buffer_size=1):
         FieldLayer.__init__(self)
         self.cached_world = World()
         self.world_buffer = queue.Queue(buffer_size)
@@ -32,6 +32,7 @@ class WorldLayer(FieldLayer):
         self.mouse_click_pos = [0, 0]
         self.mouse_hover_pos = [0, 0]  # might not need later, see hoverMoveEvent
         self.simulator_io = simulator_io
+        self.friendly_colour_yellow = friendly_colour_yellow
 
     def keyPressEvent(self, event):
         """Detect when a key has been pressed (override)
@@ -84,7 +85,8 @@ class WorldLayer(FieldLayer):
 
         return world_state
 
-    # Note: the function name formatting is different but this can't be changed since it's overriding the built-in Qt function
+    # Note: the function name formatting is different but this can't be changed
+    # since it's overriding the built-in Qt function
     def keyReleaseEvent(self, event):
         """Detect when a key has been released (override)
 
@@ -301,15 +303,23 @@ class WorldLayer(FieldLayer):
         self.draw_field(painter, world.field)
         self.draw_ball_state(painter, world.ball.current_state, Colors.BALL_COLOR)
 
-        # TODO (#2399) Figure out which team color _we_ are and update the color
-        # passed into the team.
+        friendly_colour = (
+            Colors.YELLOW_ROBOT_COLOR
+            if self.friendly_colour_yellow
+            else Colors.BLUE_ROBOT_COLOR
+        )
+        enemy_colour = (
+            Colors.BLUE_ROBOT_COLOR
+            if self.friendly_colour_yellow
+            else Colors.YELLOW_ROBOT_COLOR
+        )
         self.draw_robot_states(
             painter,
-            Colors.YELLOW_ROBOT_COLOR,
+            friendly_colour,
             [robot.current_state for robot in world.friendly_team.team_robots],
         )
         self.draw_robot_states(
             painter,
-            Colors.BLUE_ROBOT_COLOR,
+            enemy_colour,
             [robot.current_state for robot in world.enemy_team.team_robots],
         )
