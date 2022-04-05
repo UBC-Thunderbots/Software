@@ -184,7 +184,7 @@ class WorldLayer(FieldLayer):
         :param painter: The painter
 
         """
-        painter.setPen(pg.mkPen("g", width=1))
+        painter.setPen(pg.mkPen("g", width=2))
         painter.drawEllipse(
             self.createCircle(
                 self.mouse_click_pos[0], self.mouse_click_pos[1], BALL_RADIUS * 3,
@@ -200,7 +200,7 @@ class WorldLayer(FieldLayer):
         :param field: The field proto to draw
 
         """
-        painter.setPen(pg.mkPen("w", width=1))
+        painter.setPen(pg.mkPen("w", width=2))
 
         # Draw Field Bounds
         painter.drawRect(

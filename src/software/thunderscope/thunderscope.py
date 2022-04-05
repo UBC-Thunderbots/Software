@@ -97,6 +97,7 @@ class Thunderscope(object):
             for refresh_func in self.refresh_functions:
                 refresh_func()
 
+
         # Setup refresh Timer
         self.refresh_timer = QtCore.QTimer()
         self.refresh_timer.setTimerType(QtCore.Qt.TimerType.PreciseTimer)
