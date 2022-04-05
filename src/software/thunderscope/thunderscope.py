@@ -44,7 +44,6 @@ from software.thunderscope.field.field import Field
 from software.thunderscope.log.g3log_widget import g3logWidget
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 #from software.thunderscope.robot_communication import mobile_gamepad
-from software.thunderscope.proto_receiver import ProtoReceiver
 from software.thunderscope.play.playinfo_widget import playInfoWidget
 from software.thunderscope.chicker.chicker import ChickerWidget
 
@@ -424,7 +423,7 @@ class Thunderscope(object):
         play_info = playInfoWidget()
         play_info_dock = Dock("playInfo", size=(500, 100))
         play_info_dock.addWidget(play_info)
-        self.proto_receiver.register_observer(PlayInfo, play_info.log_buffer)
+        self.proto_unix_io.register_observer(PlayInfo, play_info.log_buffer)
         self.register_refresh_function(play_info.refresh)
         return play_info_dock
 
