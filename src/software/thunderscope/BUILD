@@ -15,6 +15,7 @@ py_binary(
     ],
     deps = [
         "//proto:software_py_proto",
+        "//proto/message_translation:py_tbots_protobuf",
         "//software/networking:threaded_unix_listener_py",
         "//software/networking:threaded_unix_sender_py",
         "//software/thunderscope:colors",

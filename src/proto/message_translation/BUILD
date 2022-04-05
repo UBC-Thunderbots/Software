@@ -227,3 +227,15 @@ cc_test(
         "//software/test_util",
     ],
 )
+
+py_library(
+    name = "py_tbots_protobuf",
+    srcs = [
+        "tbots_protobuf.py",
+    ],
+    deps = [
+        "//proto:import_all_protos",
+        "//proto:software_py_proto",
+        "//proto:tbots_py_proto",
+    ],
+)

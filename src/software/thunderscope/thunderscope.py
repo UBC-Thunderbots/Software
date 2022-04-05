@@ -5,6 +5,7 @@ import time
 import shelve
 import argparse
 import platform
+import numpy
 
 # PyQt5 doesn't play nicely with i3 and Ubuntu 18, PyQt6 is much more stable
 # Unfortunately, PyQt6 doesn't install on Ubuntu 18. Thankfully both
@@ -28,6 +29,7 @@ from pyqtgraph.Qt.QtWidgets import *
 
 
 from proto.import_all_protos import *
+from proto.message_translation import tbots_protobuf
 from software.py_constants import *
 
 from software.networking import threaded_unix_sender
@@ -531,35 +533,6 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
-    def __setup_robots(robot_locations, team_colour):
-        """Initializes the world from a list of robot locations
-
-        :param robot_locations: A list of robot locations (index is robot id)
-        :param team_colour: The color (either "blue" or "yellow")
-
-        """
-        world_state = WorldState()
-
-        for x, robot_map in enumerate(
-            [world_state.blue_robots, world_state.yellow_robots]
-        ):
-
-            for robot_id, robot_location in enumerate(robot_locations):
-                robot_map[robot_id].CopyFrom(
-                    RobotState(
-                        global_position=Point(
-                            x_meters=-3 if x == 0 else 3, y_meters=robot_location.y()
-                        ),
-                        global_orientation=Angle(radians=0),
-                        global_velocity=Vector(
-                            x_component_meters=0, y_component_meters=0
-                        ),
-                        global_angular_velocity=AngularVelocity(radians_per_second=0),
-                    )
-                )
-
-        return world_state
-
     if args.robot_diagnostics:
 
         # estop_reader = ThreadedEstopReader("/dev/ttyACM0", 115200)
@@ -617,18 +590,24 @@ if __name__ == "__main__":
                       "layout at {} doesn't exist".format(path)))
 
 
+        def async_sim_ticker():
+            """Setup the world and tick simulation forever
+            """
 
-        def ticker():
-            world_state = __setup_robots(
-                [geom.Point(-3, x) for x in range(-2, 3)], "blue"
+            # Setup World
+            world_state = tbots_protobuf.create_world_state(
+                [geom.Point(3, y) for y in numpy.linspace(-2, 2, 6)],
+                [geom.Point(-3, y) for y in numpy.linspace(-2, 2, 6)],
             )
             thunderscope.simulator_proto_unix_io.send_proto(WorldState, world_state)
+
+            # Tick Simulation
             while True:
                 tick = SimulatorTick()
                 tick.milliseconds = 16
                 thunderscope.simulator_proto_unix_io.send_proto(SimulatorTick, tick)
-                time.sleep(0.016)
+                time.sleep(0.015)
 
-        thread = Thread(target=ticker)
+        thread = Thread(target=async_sim_ticker)
         thread.start()
         thunderscope.show()
