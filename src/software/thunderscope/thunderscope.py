@@ -31,6 +31,9 @@ from software.thunderscope.field import (
 )
 from software.thunderscope.field.field import Field
 from software.thunderscope.log.g3log_widget import g3logWidget
+from software.thunderscope.robot_diagnostics.drive_and_dribbler_widget import (
+    DriveAndDribblerWidget,
+)
 from software.thunderscope.proto_receiver import ProtoReceiver
 from software.thunderscope.play.playinfo_widget import playInfoWidget
 from software.thunderscope.chicker.chicker import ChickerWidget
@@ -224,7 +227,16 @@ class Thunderscope(object):
         # Create and return dock
         chicker_dock = Dock("Chicker", size=(100, 100))
         chicker_dock.addWidget(self.chicker_widget)
+
         return chicker_dock
+
+    def setup_drive_and_dribbler_widget(self):
+        drive_and_dribbler = DriveAndDribblerWidget()
+
+        drive_and_dribbler_dock = Dock("robot diagnostics", size=(50, 100))
+        drive_and_dribbler_dock.addWidget(drive_and_dribbler)
+
+        return drive_and_dribbler_dock
 
     def show(self):
         self.window.show()
@@ -253,6 +265,8 @@ if __name__ == "__main__":
         log_dock = thunderscope.setup_log_widget()
         thunderscope.dock_area.addDock(log_dock)
 
+        drive_and_dribbler_dock = thunderscope.setup_drive_and_dribbler_widget()
+        thunderscope.dock_area.addDock(drive_and_dribbler_dock)
         thunderscope.show()
 
     elif args.run_simulator:
