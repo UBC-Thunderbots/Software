@@ -1,7 +1,5 @@
 package(default_visibility = ["//visibility:public"])
 
-load("@pybind11_bazel//:build_defs.bzl", "pybind_extension", "pybind_library")
-
 cc_library(
     name = "angle",
     hdrs = ["angle.h"],
@@ -415,26 +413,5 @@ cc_test(
         ":cubic_bezier_spline2d",
         "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
-    ],
-)
-
-pybind_library(
-    name = "geom_lib",
-    srcs = ["python_bindings.cpp"],
-    deps = [
-        ":angle",
-        ":point",
-        ":vector",
-        "//proto/message_translation:tbots_geometry",
-        "//software/geom/algorithms",
-        "//software/world:field",
-        "@pybind11_protobuf//pybind11_protobuf:native_proto_caster",
-    ],
-)
-
-pybind_extension(
-    name = "geometry",
-    deps = [
-        ":geom_lib",
     ],
 )

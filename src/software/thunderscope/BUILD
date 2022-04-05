@@ -24,6 +24,7 @@ py_binary(
         "//software/thunderscope/log:g3log_checkboxes",
         "//software/thunderscope/log:g3log_widget",
         "//software/thunderscope/robot_diagnostics:drive_and_dribbler_widget",
+        "//software/thunderscope/play:playinfo_widget",
         requirement("pyqtgraph"),
         requirement("numpy"),
     ],
