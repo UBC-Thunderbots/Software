@@ -558,19 +558,12 @@ if __name__ == "__main__":
         thunderscope = Thunderscope()
         thunderscope.configure_default_layout(thunderscope.blue_full_system_dock_area)
 
-        thunderscope.run_full_system(
-            "/tmp/tbots/blue", thunderscope.blue_full_system_proto_unix_io, False
-        )
-        thunderscope.run_full_system(
-            "/tmp/tbots/yellow", thunderscope.yellow_full_system_proto_unix_io, True
-        )
+        thunderscope.run_blue_full_system("/tmp/tbots/blue")
+        thunderscope.run_yellow_full_system("/tmp/tbots/yellow")
         thunderscope.run_er_force_simulator(
             "/tmp/tbots",
             "/tmp/tbots/blue",
             "/tmp/tbots/yellow",
-            thunderscope.simulator_proto_unix_io,
-            thunderscope.blue_full_system_proto_unix_io,
-            thunderscope.yellow_full_system_proto_unix_io,
         )
         thunderscope.run_gamecontroller(
             thunderscope.blue_full_system_proto_unix_io,
