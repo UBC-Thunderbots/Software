@@ -78,6 +78,10 @@ int main(int argc, char **argv)
             ThreadedProtoUnixSender<TbotsProto::RobotStatus>(runtime_dir +
                                                              YELLOW_ROBOT_STATUS_PATH);
 
+        // Simulator State as World State Output
+        auto simulator_state_as_world_state_output =
+            ThreadedProtoUnixSender<TbotsProto::WorldState>(runtime_dir +
+                                                            SIMULATOR_STATE_PATH);
         // Inputs
         // World State Input: Configures the ERForceSimulator
         auto world_state_input = ThreadedProtoUnixListener<TbotsProto::WorldState>(
@@ -141,6 +145,9 @@ int main(int argc, char **argv)
                 {
                     yellow_robot_status_output.sendProto(packet);
                 }
+
+                auto bob = er_force_sim->getWorldState();
+                simulator_state_as_world_state_output.sendProto(bob);
             });
 
         // This blocks forever without using the CPU

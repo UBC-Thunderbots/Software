@@ -1,7 +1,8 @@
 #include "software/ai/hl/stp/play/shoot_or_pass/shoot_or_pass_play_fsm.h"
-#include "proto/message_translation/tbots_protobuf.h"
 
 #include <algorithm>
+
+#include "proto/message_translation/tbots_protobuf.h"
 
 ShootOrPassPlayFSM::ShootOrPassPlayFSM(std::shared_ptr<const AiConfig> ai_config)
     : ai_config(ai_config),
@@ -30,7 +31,8 @@ void ShootOrPassPlayFSM::updateOffensivePositioningTactics(
     if (num_tactics != offensive_positioning_tactics.size())
     {
         offensive_positioning_tactics =
-            std::vector<std::shared_ptr<MoveTactic>>(num_tactics); std::generate(offensive_positioning_tactics.begin(),
+            std::vector<std::shared_ptr<MoveTactic>>(num_tactics);
+        std::generate(offensive_positioning_tactics.begin(),
                       offensive_positioning_tactics.end(),
                       []() { return std::make_shared<MoveTactic>(); });
     }
@@ -106,7 +108,8 @@ void ShootOrPassPlayFSM::startLookingForPass(const Update& event)
 void ShootOrPassPlayFSM::takePass(const Update& event)
 {
     // Commit to a pass
-    LOG(VISUALIZE) << *createNamedValue("Best Pass", static_cast<float>(best_pass_and_score_so_far.rating));
+    LOG(VISUALIZE) << *createNamedValue(
+        "Best Pass", static_cast<float>(best_pass_and_score_so_far.rating));
 
     auto pass_eval = pass_generator.generatePassEvaluation(event.common.world);
 

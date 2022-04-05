@@ -8,6 +8,7 @@
 #include <iostream>
 
 #include "extlibs/er_force_sim/src/protobuf/robot.h"
+#include "proto/message_translation/er_force_world.h"
 #include "proto/message_translation/primitive_google_to_nanopb_converter.h"
 #include "proto/message_translation/ssl_detection.h"
 #include "proto/message_translation/ssl_geometry.h"
@@ -414,6 +415,32 @@ std::vector<SSLProto::SSL_WrapperPacket> ErForceSimulator::getSSLWrapperPackets(
 world::SimulatorState ErForceSimulator::getSimulatorState() const
 {
     return er_force_sim->getSimulatorState();
+}
+
+TbotsProto::WorldState ErForceSimulator::getWorldState() const
+{
+    // extract simulator ball and robot
+    auto simulator_state = er_force_sim->getSimulatorState();
+
+    TbotsProto::WorldState world_state;
+
+    *(world_state.mutable_ball_state()) =
+        *createBallState(createBall(simulator_state.ball(), Timestamp::fromSeconds(0)));
+
+    for (int robot_id = 0; robot_id < simulator_state.yellow_robots().size(); robot_id++)
+    {
+        (*world_state.mutable_yellow_robots())[robot_id] =
+            *createRobotStateProto(createRobot(simulator_state.yellow_robots()[robot_id],
+                                               Timestamp::fromSeconds(0)));
+    }
+    for (int robot_id = 0; robot_id < simulator_state.blue_robots().size(); robot_id++)
+    {
+        (*world_state.mutable_blue_robots())[robot_id] =
+            *createRobotStateProto(createRobot(simulator_state.blue_robots()[robot_id],
+                                               Timestamp::fromSeconds(0)));
+    }
+
+    return world_state;
 }
 
 Field ErForceSimulator::getField() const

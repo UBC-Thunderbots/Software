@@ -8,9 +8,9 @@ py_binary(
     data = [
         "//software:er_force_simulator_main",
         "//software:py_constants.so",
+        "//software:python_bindings.so",
         "//software:unix_full_system",
         "//software/estop:estop_reader.so",
-        "//software:python_bindings.so",
         "//software/networking:networking.so",
     ],
     deps = [
@@ -27,6 +27,7 @@ py_binary(
         "//software/thunderscope/field:field_layer",
         "//software/thunderscope/field:obstacle_layer",
         "//software/thunderscope/field:path_layer",
+        "//software/thunderscope/field:simulator_layer",
         "//software/thunderscope/field:validation_layer",
         "//software/thunderscope/field:world_layer",
         "//software/thunderscope/log:g3log_checkboxes",

@@ -7,6 +7,7 @@ class Colors(object):
 
     BLUE_ROBOT = QtGui.QColor(255, 100, 0, 255)
     BALL_COLOR = QtGui.QColor(255, 100, 0, 255)
+    SIM_BALL_COLOR = QtGui.QColor(255, 100, 0, 100)
     YELLOW_ROBOT_COLOR = QtGui.QColor(255, 255, 0, 255)
     BLUE_ROBOT_COLOR = QtGui.QColor(0, 75, 255, 255)
 

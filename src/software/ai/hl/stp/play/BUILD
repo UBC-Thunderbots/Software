@@ -238,8 +238,8 @@ cc_library(
     hdrs = ["shoot_or_chip_play.h"],
     deps = [
         ":play",
-        "//shared:constants",
         "//proto/message_translation:tbots_protobuf",
+        "//shared:constants",
         "//shared/parameter:cpp_configs",
         "//software/ai/evaluation:enemy_threat",
         "//software/ai/evaluation:find_open_areas",

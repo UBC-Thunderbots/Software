@@ -313,17 +313,20 @@ class Thunderscope(object):
         self.field = Field()
 
         self.simulator_io = ProtoUnixIO()
+
         # Create layers
         world = world_layer.WorldLayer(self.simulator_io)
         obstacles = obstacle_layer.ObstacleLayer()
         paths = path_layer.PathLayer()
         validation = validation_layer.ValidationLayer()
+        # sim_state_layer = simulator_layer.SimulatorLayer(self.simulator_io)
 
         # Add field layers to field
         self.field.add_layer("Vision", world)
         self.field.add_layer("Obstacles", obstacles)
         self.field.add_layer("Paths", paths)
         self.field.add_layer("Validation", validation)
+        # self.field.add_layer("Simulator Layer", sim_state_layer)
 
         # Register observers
         buf = queue.Queue()

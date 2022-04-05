@@ -47,6 +47,15 @@ py_library(
 )
 
 py_library(
+    name = "simulator_layer",
+    srcs = ["simulator_layer.py"],
+    deps = [
+        ":field_layer",
+        requirement("pyqtgraph"),
+    ],
+)
+
+py_library(
     name = "validation_layer",
     srcs = ["validation_layer.py"],
     deps = [

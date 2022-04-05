@@ -1,5 +1,6 @@
 import math
 import queue
+from typing import List
 
 import software.python_bindings as geom
 import pyqtgraph as pg
@@ -236,9 +237,9 @@ class WorldLayer(FieldLayer):
             self.createCircle(0, 0, field.center_circle_radius * MM_PER_M)
         )
 
-    def draw_team(self, painter, color, team: Team):
+    def draw_robot_states(self, painter, color, robot_states: List[RobotState]):
 
-        """Draw the team
+        """Draw the robot states
 
         :param painter: The painter
         :param color: The color of the robots
@@ -247,7 +248,7 @@ class WorldLayer(FieldLayer):
         """
         convert_degree = -16
 
-        for robot in team.team_robots:
+        for robot_state in robot_states:
 
             painter.setPen(pg.mkPen(color))
             painter.setBrush(pg.mkBrush(color))
@@ -255,29 +256,29 @@ class WorldLayer(FieldLayer):
             # TODO (#2396) Draw the robot IDs of the robots
             painter.drawChord(
                 self.createCircle(
-                    robot.current_state.global_position.x_meters * MM_PER_M,
-                    robot.current_state.global_position.y_meters * MM_PER_M,
+                    robot_state.global_position.x_meters * MM_PER_M,
+                    robot_state.global_position.y_meters * MM_PER_M,
                     ROBOT_MAX_RADIUS,
                 ),
-                int((math.degrees(robot.current_state.global_orientation.radians) + 45))
+                int((math.degrees(robot_state.global_orientation.radians) + 45))
                 * convert_degree,
                 270 * convert_degree,
             )
 
-    def draw_ball(self, painter, ball: Ball):
+    def draw_ball_state(self, painter, ball_state: BallState, ball_color):
         """Draw the ball
 
         :param painter: The painter
-        :param ball: The ball proto to draw
+        :param ball_state: The ball state proto to draw
 
         """
 
-        painter.setPen(pg.mkPen(Colors.BALL_COLOR))
-        painter.setBrush(pg.mkBrush(Colors.BALL_COLOR))
+        painter.setPen(pg.mkPen(ball_color))
+        painter.setBrush(pg.mkBrush(ball_color))
         painter.drawEllipse(
             self.createCircle(
-                ball.current_state.global_position.x_meters * MM_PER_M,
-                ball.current_state.global_position.y_meters * MM_PER_M,
+                ball_state.global_position.x_meters * MM_PER_M,
+                ball_state.global_position.y_meters * MM_PER_M,
                 BALL_RADIUS,
             )
         )
@@ -298,9 +299,17 @@ class WorldLayer(FieldLayer):
 
         self.cached_world = world
         self.draw_field(painter, world.field)
-        self.draw_ball(painter, world.ball)
+        self.draw_ball_state(painter, world.ball.current_state, Colors.BALL_COLOR)
 
         # TODO (#2399) Figure out which team color _we_ are and update the color
         # passed into the team.
-        self.draw_team(painter, Colors.YELLOW_ROBOT_COLOR, world.friendly_team)
-        self.draw_team(painter, Colors.BLUE_ROBOT_COLOR, world.enemy_team)
+        self.draw_robot_states(
+            painter,
+            Colors.YELLOW_ROBOT_COLOR,
+            [robot.current_state for robot in world.friendly_team.team_robots],
+        )
+        self.draw_robot_states(
+            painter,
+            Colors.BLUE_ROBOT_COLOR,
+            [robot.current_state for robot in world.enemy_team.team_robots],
+        )

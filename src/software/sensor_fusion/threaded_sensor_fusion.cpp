@@ -17,8 +17,8 @@ void ThreadedSensorFusion::onValueReceived(SensorProto sensor_msg)
     sensor_fusion.processSensorProto(sensor_msg);
 
     // Limit sensor fusion to only send out worlds on ssl wrapper packets
-    // to prevent spamming worlds everytime a referee msg or robot status
-    // msg comes through. 
+    // to prevent spamming worlds every time a referee msg or robot status
+    // msg comes through.
     if (sensor_msg.has_ssl_vision_msg())
     {
         std::optional<World> world = sensor_fusion.getWorld();

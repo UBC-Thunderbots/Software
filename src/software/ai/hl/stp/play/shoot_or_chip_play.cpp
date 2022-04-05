@@ -1,5 +1,6 @@
 #include "software/ai/hl/stp/play/shoot_or_chip_play.h"
 
+#include "proto/message_translation/tbots_protobuf.h"
 #include "shared/constants.h"
 #include "software/ai/evaluation/enemy_threat.h"
 #include "software/ai/evaluation/find_open_areas.h"
@@ -12,7 +13,6 @@
 #include "software/logger/logger.h"
 #include "software/util/generic_factory/generic_factory.h"
 #include "software/world/game_state.h"
-#include "proto/message_translation/tbots_protobuf.h"
 
 ShootOrChipPlay::ShootOrChipPlay(std::shared_ptr<const AiConfig> config)
     : Play(config, true)

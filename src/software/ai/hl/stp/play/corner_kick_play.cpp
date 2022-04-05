@@ -1,5 +1,6 @@
 #include "software/ai/hl/stp/play/corner_kick_play.h"
 
+#include "proto/message_translation/tbots_protobuf.h"
 #include "shared/constants.h"
 #include "software/ai/evaluation/possession.h"
 #include "software/ai/hl/stp/tactic/attacker/attacker_tactic.h"
@@ -12,7 +13,6 @@
 #include "software/logger/logger.h"
 #include "software/util/generic_factory/generic_factory.h"
 #include "software/world/ball.h"
-#include "proto/message_translation/tbots_protobuf.h"
 
 CornerKickPlay::CornerKickPlay(std::shared_ptr<const AiConfig> config)
     : Play(config, true)
@@ -155,7 +155,8 @@ Pass CornerKickPlay::setupPass(TacticCoroutine::push_type &yield, const World &w
     Pass pass = best_pass_and_score_so_far.pass;
 
     LOG(DEBUG) << "Committing to pass: " << best_pass_and_score_so_far.pass;
-    LOG(VISUALIZE) << *createNamedValue("Best Pass", static_cast<float>(best_pass_and_score_so_far.rating));
+    LOG(VISUALIZE) << *createNamedValue(
+        "Best Pass", static_cast<float>(best_pass_and_score_so_far.rating));
     return pass;
 }
 
