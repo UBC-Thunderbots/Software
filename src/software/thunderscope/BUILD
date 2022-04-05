@@ -33,6 +33,7 @@ py_binary(
         "//software/thunderscope/log:g3log_checkboxes",
         "//software/thunderscope/log:g3log_widget",
         "//software/thunderscope/robot_communication:mobile_gamepad",
+        "//software/thunderscope/play:playinfo_widget",
         requirement("pyqtgraph"),
         requirement("numpy"),
     ],
