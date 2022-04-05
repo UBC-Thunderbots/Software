@@ -178,6 +178,11 @@ class Thunderscope(object):
             NamedValue,
             from_log_visualize=True,
         )
+        proto_unix_io.attach_unix_receiver(
+            runtime_dir + "/" + PlayInfo.DESCRIPTOR.full_name,
+            PlayInfo,
+            from_log_visualize=True,
+        )
         proto_unix_io.attach_unix_receiver(runtime_dir + "/log", RobotLog)
 
         # inputs to full_system
@@ -302,7 +307,8 @@ class Thunderscope(object):
         gamecontroller_dock = self.setup_gamecontroller_widget()
         play_info_dock = self.setup_play_info()
 
-        dock_area.addDock(field_dock, "left")
+        dock_area.addDock(gamecontroller_dock, "left")
+        dock_area.addDock(field_dock, "below", gamecontroller_dock)
         dock_area.addDock(log_dock, "bottom", field_dock)
         dock_area.addDock(performance_dock, "right", log_dock)
         dock_area.addDock(play_info_dock, "right", performance_dock)
