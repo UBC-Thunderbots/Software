@@ -45,10 +45,6 @@ class ThreadedUnixListener:
         self.thread = Thread(target=self.start, daemon=True)
         self.thread.start()
 
-    @property
-    def buffer(self):
-        return self.proto_buffer
-
     def get_most_recent_message(self, block=False):
         """Pop from the buffer if a new packet exists. If not just return None
 

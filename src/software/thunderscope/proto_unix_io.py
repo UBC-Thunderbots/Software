@@ -122,7 +122,7 @@ class ProtoUnixIO:
         listener = ThreadedUnixListener(
             unix_path + "/{}".format(proto_class.DESCRIPTOR.full_name)
             if from_log_visualize
-            else "",
+            else unix_path,
             proto_class=proto_class,
             base64_encoded=from_log_visualize,
         )
