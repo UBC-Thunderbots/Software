@@ -4,7 +4,6 @@ from threading import Thread
 import time
 import shelve
 import argparse
-
 import platform
 
 # PyQt5 doesn't play nicely with i3 and Ubuntu 18, PyQt6 is much more stable
@@ -81,6 +80,8 @@ class Thunderscope(object):
         self.blue_full_system_dock_area = DockArea()
         self.yellow_full_system_dock_area = DockArea()
 
+        self.settings = QtCore.QSettings()
+
         self.tabs = QTabWidget()
         self.tabs.addTab(self.blue_full_system_dock_area, "Blue Full System")
         self.tabs.addTab(self.yellow_full_system_dock_area, "Yellow Full System")
@@ -141,12 +142,6 @@ class Thunderscope(object):
             )
         )
 
-        with shelve.open(DEFAULT_LAYOUT_PATH, "r") as shelf:
-            self.blue_full_system_dock_area.restoreState(shelf["blue_dock_area_state"], missing='create')
-            self.yellow_full_system_dock_area.restoreState(
-                shelf["yellow_dock_area_state"], missing='create')
-
-
     def save_layout(self):
         """Open a file dialog to save the layout and any other
         registered state to a file
@@ -197,6 +192,7 @@ class Thunderscope(object):
             self.yellow_full_system_dock_area.restoreState(
                 shelf["yellow_dock_area_state"]
             )
+
 
     def __run_full_system(
         self, runtime_dir, proto_unix_io, friendly_colour_yellow=False
@@ -519,6 +515,7 @@ class Thunderscope(object):
 
 if __name__ == "__main__":
 
+    # Setup parser
     parser = argparse.ArgumentParser(description="Thunderscope")
     parser.add_argument(
         "--robot_diagnostics",
@@ -528,7 +525,10 @@ if __name__ == "__main__":
     parser.add_argument(
         "--run_simulator", action="store_true", help="Run the standalone simulator"
     )
-
+    parser.add_argument(
+        "--layout", action="store",
+        help="Which layout to run, if not specified the last layout will run"
+    )
     args = parser.parse_args()
 
     def __setup_robots(robot_locations, team_colour):
@@ -600,10 +600,25 @@ if __name__ == "__main__":
             True,
         )
 
-        def ticker():
-            import time
+        # Load the specificed layout or the default file. If the default layout
+        # file doesn't exist, and no layout is provided, then just configure
+        # the default layout.
+        path = args.layout if args.layout else DEFAULT_LAYOUT_PATH
 
-            time.sleep(1)
+        try:
+            with shelve.open(path, "r") as shelf:
+                thunderscope.blue_full_system_dock_area.restoreState(shelf["blue_dock_area_state"])
+                thunderscope.yellow_full_system_dock_area.restoreState(
+                    shelf["yellow_dock_area_state"]
+                )
+
+        except Exception as e:
+            print(Warning("No layout file specified and default " + 
+                      "layout at {} doesn't exist".format(path)))
+
+
+
+        def ticker():
             world_state = __setup_robots(
                 [geom.Point(-3, x) for x in range(-2, 3)], "blue"
             )
