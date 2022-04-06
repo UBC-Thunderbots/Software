@@ -33,7 +33,6 @@ from proto.message_translation import tbots_protobuf
 from software.py_constants import *
 
 from software.networking import threaded_unix_sender
-from software.thunderscope.robot_communication.mobile_gamepad import MobileGamepad
 from software.networking import networking
 from software.thunderscope.arbitrary_plot.named_value_plotter import NamedValuePlotter
 from software.estop.estop_reader import ThreadedEstopReader
@@ -46,7 +45,6 @@ from software.thunderscope.field import (
 from software.thunderscope.field.field import Field
 from software.thunderscope.log.g3log_widget import g3logWidget
 from software.thunderscope.proto_unix_io import ProtoUnixIO
-from software.thunderscope.robot_communication import mobile_gamepad
 from software.thunderscope.robot_diagnostics.drive_and_dribbler_widget import (
     DriveAndDribblerWidget,
 )
@@ -533,8 +531,6 @@ if __name__ == "__main__":
     if args.robot_diagnostics:
 
         # estop_reader = ThreadedEstopReader("/dev/ttyACM0", 115200)
-        mobile_gamepad = MobileGamepad()
-        mobile_gamepad.process_event()
 
         thunderscope = Thunderscope()
         log_dock = thunderscope.setup_log_widget()
