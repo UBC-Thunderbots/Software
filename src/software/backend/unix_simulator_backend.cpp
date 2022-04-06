@@ -60,7 +60,6 @@ void UnixSimulatorBackend::onValueReceived(TbotsProto::PrimitiveSet primitives)
 void UnixSimulatorBackend::onValueReceived(World world)
 {
     world_output->sendProto(*createWorld(world));
-    // LOG(VISUALIZE) << *createWorld(world);
     // TODO (#2510) Find a new home once SimulatorBackend and ThreadedFullSystemGUI are
     // gone
     LOG(VISUALIZE) << *createNamedValue(

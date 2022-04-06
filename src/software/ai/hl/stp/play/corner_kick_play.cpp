@@ -1,6 +1,5 @@
 #include "software/ai/hl/stp/play/corner_kick_play.h"
 
-#include "proto/message_translation/tbots_protobuf.h"
 #include "shared/constants.h"
 #include "software/ai/evaluation/possession.h"
 #include "software/ai/hl/stp/tactic/attacker/attacker_tactic.h"
@@ -142,6 +141,9 @@ Pass CornerKickPlay::setupPass(TacticCoroutine::push_type &yield, const World &w
         best_pass_and_score_so_far =
             pass_generator.generatePassEvaluation(world).getBestPassOnField();
 
+        LOG(DEBUG) << "Best pass found so far is: " << best_pass_and_score_so_far.pass;
+        LOG(DEBUG) << "    with score: " << best_pass_and_score_so_far.rating;
+
         Duration time_since_commit_stage_start =
             world.getMostRecentTimestamp() - commit_stage_start_time;
         min_score = 1 - std::min(time_since_commit_stage_start.toSeconds() /
@@ -155,8 +157,7 @@ Pass CornerKickPlay::setupPass(TacticCoroutine::push_type &yield, const World &w
     Pass pass = best_pass_and_score_so_far.pass;
 
     LOG(DEBUG) << "Committing to pass: " << best_pass_and_score_so_far.pass;
-    LOG(VISUALIZE) << *createNamedValue(
-        "Best Pass", static_cast<float>(best_pass_and_score_so_far.rating));
+    LOG(DEBUG) << "Score of pass we committed to: " << best_pass_and_score_so_far.rating;
     return pass;
 }
 

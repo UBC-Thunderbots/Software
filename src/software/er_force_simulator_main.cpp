@@ -146,8 +146,8 @@ int main(int argc, char **argv)
                     yellow_robot_status_output.sendProto(packet);
                 }
 
-                auto bob = er_force_sim->getWorldState();
-                simulator_state_as_world_state_output.sendProto(bob);
+                simulator_state_as_world_state_output.sendProto(
+                    er_force_sim->getWorldState());
             });
 
         // This blocks forever without using the CPU

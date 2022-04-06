@@ -33,6 +33,7 @@ from proto.message_translation import tbots_protobuf
 from software.py_constants import *
 
 from software.networking import threaded_unix_sender
+from software.thunderscope.robot_communication.mobile_gamepad import MobileGamepad
 from software.networking import networking
 from software.thunderscope.arbitrary_plot.named_value_plotter import NamedValuePlotter
 from software.estop.estop_reader import ThreadedEstopReader
@@ -87,7 +88,6 @@ class Thunderscope(object):
         self.tabs = QTabWidget()
         self.tabs.addTab(self.blue_full_system_dock_area, "Blue Full System")
         self.tabs.addTab(self.yellow_full_system_dock_area, "Yellow Full System")
-        self.current_index = 0
 
         self.window = QtGui.QMainWindow()
         self.window.setCentralWidget(self.tabs)
@@ -525,9 +525,6 @@ if __name__ == "__main__":
         help="Run thunderscope in the robot diagnostics configuration",
     )
     parser.add_argument(
-        "--run_simulator", action="store_true", help="Run the standalone simulator"
-    )
-    parser.add_argument(
         "--layout", action="store",
         help="Which layout to run, if not specified the last layout will run"
     )
@@ -536,6 +533,8 @@ if __name__ == "__main__":
     if args.robot_diagnostics:
 
         # estop_reader = ThreadedEstopReader("/dev/ttyACM0", 115200)
+        mobile_gamepad = MobileGamepad()
+        mobile_gamepad.process_event()
 
         thunderscope = Thunderscope()
         log_dock = thunderscope.setup_log_widget()
@@ -548,20 +547,16 @@ if __name__ == "__main__":
         thunderscope.dock_area.addDock(drive_and_dribbler_dock)
         thunderscope.show()
 
-    elif args.run_simulator:
-        print(
-            "TODO #2050, this isn't implemented, just run the current standalone simulator"
-        )
-
     else:
 
         thunderscope = Thunderscope()
-        thunderscope.run_blue_full_system("/tmp/tbots/blue")
-        thunderscope.run_yellow_full_system("/tmp/tbots/yellow")
         thunderscope.run_er_force_simulator(
             "/tmp/tbots", "/tmp/tbots/blue", "/tmp/tbots/yellow",
         )
+        thunderscope.run_blue_full_system("/tmp/tbots/blue")
+        thunderscope.run_yellow_full_system("/tmp/tbots/yellow")
         thunderscope.run_gamecontroller()
+
         thunderscope.configure_default_layout(
             thunderscope.blue_full_system_dock_area,
             thunderscope.blue_full_system_proto_unix_io,

@@ -160,7 +160,8 @@ std::unordered_set<PathObjective> Navigator::createPathObjectives(
         }
     }
 
-    // TODO find a home for this and
+    // TODO (#2510) This is a nasty hack we need to visualize the obstacles
+    // using the obstacle artist.
     ObstacleArtist obstacle_artist(NULL, std::nullopt);
     for (const auto &obstacle : getObstacles())
     {

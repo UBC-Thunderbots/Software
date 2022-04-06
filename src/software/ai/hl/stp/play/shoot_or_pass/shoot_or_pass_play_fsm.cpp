@@ -2,8 +2,6 @@
 
 #include <algorithm>
 
-#include "proto/message_translation/tbots_protobuf.h"
-
 ShootOrPassPlayFSM::ShootOrPassPlayFSM(std::shared_ptr<const AiConfig> ai_config)
     : ai_config(ai_config),
       attacker_tactic(
@@ -108,8 +106,8 @@ void ShootOrPassPlayFSM::startLookingForPass(const Update& event)
 void ShootOrPassPlayFSM::takePass(const Update& event)
 {
     // Commit to a pass
-    LOG(VISUALIZE) << *createNamedValue(
-        "Best Pass", static_cast<float>(best_pass_and_score_so_far.rating));
+    LOG(DEBUG) << "Committing to pass: " << best_pass_and_score_so_far.pass;
+    LOG(DEBUG) << "Score of pass we committed to: " << best_pass_and_score_so_far.rating;
 
     auto pass_eval = pass_generator.generatePassEvaluation(event.common.world);
 
