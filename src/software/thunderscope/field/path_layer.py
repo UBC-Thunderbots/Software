@@ -16,6 +16,7 @@ class PathLayer(FieldLayer):
         self.path_visualization_buffer = queue.Queue(buffer_size)
 
     def paint(self, painter, option, widget):
+
         """Paint this layer
 
         :param painter: The painter object to draw with

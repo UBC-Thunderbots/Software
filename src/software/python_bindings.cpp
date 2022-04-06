@@ -6,6 +6,7 @@
 
 #include "proto/geometry.pb.h"
 #include "proto/message_translation/tbots_geometry.h"
+#include "proto/team.pb.h"
 #include "pybind11_protobuf/native_proto_caster.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/circle.h"
@@ -15,10 +16,12 @@
 #include "software/geom/rectangle.h"
 #include "software/geom/vector.h"
 #include "software/world/field.h"
+#include "software/world/robot.h"
+#include "software/world/world.h"
 
 namespace py = pybind11;
 
-PYBIND11_MODULE(geometry, m)
+PYBIND11_MODULE(python_bindings, m)
 {
     pybind11_protobuf::ImportNativeProtoCasters();
 
@@ -50,6 +53,8 @@ PYBIND11_MODULE(geometry, m)
         .def("y", &Vector::y)
         .def("setX", &Vector::setX)
         .def("setY", &Vector::setY)
+        .def("length", &Vector::length)
+        .def("lengthSquared", &Vector::lengthSquared)
         .def("normalize", py::overload_cast<>(&Vector::normalize, py::const_))
         .def("normalize", py::overload_cast<double>(&Vector::normalize, py::const_))
         // Overloaded
@@ -84,11 +89,25 @@ PYBIND11_MODULE(geometry, m)
     py::class_<ConvexPolygon, Polygon>(m, "ConvexPolygon");
     py::class_<Rectangle, ConvexPolygon>(m, "Rectangle")
         .def(py::init<Point, Point>())
-        .def("__repr__", [](const Rectangle& v) {
-            std::stringstream stream;
-            stream << v;
-            return stream.str();
-        });
+        .def("__repr__",
+             [](const Rectangle& v) {
+                 std::stringstream stream;
+                 stream << v;
+                 return stream.str();
+             })
+        .def("xLength", &Rectangle::xLength)
+        .def("yLength", &Rectangle::yLength)
+        .def("centre", &Rectangle::centre)
+        .def("posXPosYCorner", &Rectangle::posXPosYCorner)
+        .def("negXPosYCorner", &Rectangle::negXPosYCorner)
+        .def("negXNegYCorner", &Rectangle::negXNegYCorner)
+        .def("posXNegYCorner", &Rectangle::posXNegYCorner)
+        .def("xMax", &Rectangle::xMax)
+        .def("xMin", &Rectangle::xMin)
+        .def("yMax", &Rectangle::yMax)
+        .def("yMin", &Rectangle::yMin)
+        .def("diagonal", &Rectangle::diagonal)
+        .def("expand", &Rectangle::expand);
 
     py::class_<Segment>(m, "Segment")
         .def(py::init<Point, Point>())
@@ -125,10 +144,29 @@ PYBIND11_MODULE(geometry, m)
           py::overload_cast<const Segment&, const Point&, double, int>(&contains));
     m.def("contains", py::overload_cast<const Rectangle&, const Point&>(&contains));
 
+    py::class_<Robot>(m, "Robot")
+        .def(py::init<unsigned, Point&, Vector&, Angle&, Angle&, Timestamp&>())
+        .def(py::init<TbotsProto::Robot>())
+        .def("timestamp", &Robot::timestamp)
+        .def("position", &Robot::position)
+        .def("velocity", &Robot::velocity)
+        .def("orientation", &Robot::orientation)
+        .def("angularVelocity", &Robot::angularVelocity)
+        .def("isNearDribbler", &Robot::isNearDribbler)
+        .def("dribblerArea", &Robot::dribblerArea);
+
+    py::class_<Team>(m, "Team")
+        .def(py::init<const std::vector<Robot>&>())
+        .def("assignGoalie", &Team::assignGoalie)
+        .def("getAllRobots", &Team::getAllRobots);
+
+    py::class_<Ball>(m, "Ball").def("position", &Ball::position);
+
     // https://pybind11.readthedocs.io/en/stable/classes.html
     py::class_<Field>(m, "Field")
-        .def(py::init(&Field::createSSLDivisionBField))  // Default to Div B Field
-        .def("createSSLDivisionAField", &Field::createSSLDivisionAField)
+        .def(py::init<TbotsProto::Field>())
+        .def_static("createSSLDivisionAField", &Field::createSSLDivisionAField)
+        .def_static("createSSLDivisionBField", &Field::createSSLDivisionBField)
         .def("xLength", &Field::xLength)
         .def("totalXLength", &Field::totalXLength)
         .def("yLength", &Field::yLength)
@@ -164,4 +202,10 @@ PYBIND11_MODULE(geometry, m)
         .def("friendlyGoalpostPos", &Field::friendlyGoalpostPos)
         .def("friendlyGoalpostNeg", &Field::friendlyGoalpostNeg)
         .def("enemyGoalpostPos", &Field::enemyGoalpostPos);
+
+    py::class_<World>(m, "World")
+        .def("friendlyTeam", &World::friendlyTeam)
+        .def("enemyTeam", &World::enemyTeam)
+        .def("ball", &World::ball)
+        .def("field", &World::field);
 }

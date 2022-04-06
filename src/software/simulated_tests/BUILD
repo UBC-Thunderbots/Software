@@ -153,8 +153,8 @@ py_library(
     ],
     data = [
         "//software:py_constants.so",
+        "//software:python_bindings.so",
         "//software:unix_full_system",
-        "//software/geom:geometry.so",
     ],
     deps = [
         "//proto:software_py_proto",
@@ -169,12 +169,17 @@ py_library(
     name = "validation",
     srcs = [
         "ball_enters_region.py",
+        "ball_moves_forward.py",
+        "ball_speed_threshold.py",
+        "excessive_dribbling.py",
+        "friendly_has_ball_possession.py",
         "robot_enters_region.py",
+        "robot_speed_threshold.py",
         "validation.py",
     ],
     data = [
         "//software:py_constants.so",
-        "//software/geom:geometry.so",
+        "//software:python_bindings.so",
     ],
     deps = [
         "//proto:software_py_proto",

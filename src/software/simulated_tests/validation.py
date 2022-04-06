@@ -1,7 +1,7 @@
 import pytest
 
 
-import software.geom.geometry as tbots_geom
+import software.python_bindings as tbots
 from proto.validation_pb2 import *
 
 
@@ -242,17 +242,17 @@ def create_validation_geometry(geometry=[]) -> ValidationGeometry:
     validation_geometry = ValidationGeometry()
 
     CREATE_PROTO_DISPATCH = {
-        tbots_geom.Vector.__name__: tbots_geom.createVectorProto,
-        tbots_geom.Polygon.__name__: tbots_geom.createPolygonProto,
-        tbots_geom.Rectangle.__name__: tbots_geom.createPolygonProto,
-        tbots_geom.Circle.__name__: tbots_geom.createCircleProto,
+        tbots.Vector.__name__: tbots.createVectorProto,
+        tbots.Polygon.__name__: tbots.createPolygonProto,
+        tbots.Rectangle.__name__: tbots.createPolygonProto,
+        tbots.Circle.__name__: tbots.createCircleProto,
     }
 
     ADD_TO_VALIDATION_GEOMETRY_DISPATCH = {
-        tbots_geom.Vector.__name__: validation_geometry.vectors.append,
-        tbots_geom.Polygon.__name__: validation_geometry.polygons.append,
-        tbots_geom.Rectangle.__name__: validation_geometry.polygons.append,
-        tbots_geom.Circle.__name__: validation_geometry.circles.append,
+        tbots.Vector.__name__: validation_geometry.vectors.append,
+        tbots.Polygon.__name__: validation_geometry.polygons.append,
+        tbots.Rectangle.__name__: validation_geometry.polygons.append,
+        tbots.Circle.__name__: validation_geometry.circles.append,
     }
 
     for geom in geometry:
