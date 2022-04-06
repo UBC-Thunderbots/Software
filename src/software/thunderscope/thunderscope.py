@@ -193,6 +193,13 @@ class Thunderscope(object):
                 shelf["yellow_dock_area_state"]
             )
 
+            # Update default layout
+            with shelve.open(DEFAULT_LAYOUT_PATH, "c") as default_shelf:
+                default_shelf["blue_dock_area_state"] = shelf["blue_dock_area_state"]
+                default_shelf["yellow_dock_area_state"] = shelf[
+                    "yellow_dock_area_state"
+                ]
+                default_shelf.sync()
 
     def __run_full_system(
         self, runtime_dir, proto_unix_io, friendly_colour_yellow=False
@@ -523,8 +530,9 @@ if __name__ == "__main__":
         help="Run thunderscope in the robot diagnostics configuration",
     )
     parser.add_argument(
-        "--layout", action="store",
-        help="Which layout to run, if not specified the last layout will run"
+        "--layout",
+        action="store",
+        help="Which layout to run, if not specified the last layout will run",
     )
     args = parser.parse_args()
 
@@ -564,22 +572,27 @@ if __name__ == "__main__":
             True,
         )
 
-        # Load the specificed layout or the default file. If the default layout
+        # Load the specified layout or the default file. If the default layout
         # file doesn't exist, and no layout is provided, then just configure
         # the default layout.
         path = args.layout if args.layout else DEFAULT_LAYOUT_PATH
 
         try:
             with shelve.open(path, "r") as shelf:
-                thunderscope.blue_full_system_dock_area.restoreState(shelf["blue_dock_area_state"])
+                thunderscope.blue_full_system_dock_area.restoreState(
+                    shelf["blue_dock_area_state"]
+                )
                 thunderscope.yellow_full_system_dock_area.restoreState(
                     shelf["yellow_dock_area_state"]
                 )
 
-        except Exception as e:
-            print(Warning("No layout file specified and default " + 
-                      "layout at {} doesn't exist".format(path)))
-
+        except Exception:
+            print(
+                Warning(
+                    "No layout file specified and default "
+                    + "layout at {} doesn't exist".format(path)
+                )
+            )
 
         def async_sim_ticker():
             """Setup the world and tick simulation forever
