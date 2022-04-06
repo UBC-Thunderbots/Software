@@ -10,7 +10,7 @@ from software.thunderscope.field.field_layer import FieldLayer
 
 
 class PathLayer(FieldLayer):
-    def __init__(self, buffer_size=1):
+    def __init__(self, buffer_size=10):
         FieldLayer.__init__(self)
         self.cached_paths = PathVisualization()
         self.path_visualization_buffer = queue.Queue(buffer_size)

@@ -20,8 +20,8 @@ class ThreadedUnixListener:
 
         :param unix_path: The unix path to receive the new protobuf to plot
         :param proto_class: The protobuf to unpack from (None if its encoded in the payload)
-        :param max_buffer_size: The size of the buffer
         :param base64_encoded: False
+        :param max_buffer_size: The size of the buffer
 
         """
 
@@ -55,7 +55,6 @@ class ThreadedUnixListener:
         """
         if block:
             return self.proto_buffer.get()
-
         try:
             return self.proto_buffer.get_nowait()
         except queue.Empty as empty:
@@ -100,7 +99,9 @@ class Session(socketserver.BaseRequestHandler):
         super().__init__(*args, **keys)
 
     def handle(self):
-        """TODO"""
+        """Handle proto
+
+        """
         if not self.base64_encoded:
             self.handle_proto()
         else:
@@ -120,19 +121,8 @@ class Session(socketserver.BaseRequestHandler):
 
     def handle_log_visualize(self):
         """We send protobufs from our C++ code to python for visualization.
-        If we used the handle_proto handler and passed in a proto_class, we
-        would need to setup a sender/receiver pair for every protobuf we want
-        to visualize. 
-        
-        So instead, we special case the communication coming from the ProtobufSink
-        (C++ side). The ProtobufSink sends the typename prefixed at the beginning
-        of the payload delimited by the TYPE_DELIMITER (!!!).
-
-                              |         -- data --            |
-        PackageName.TypeName!!!eW91Zm91bmR0aGVzZWNyZXRtZXNzYWdl
-
-        This allows us to call LOG(VISUALIZE) _anywhere_ in C++ and 
-        receive/decode here with minimum boilerplate code.
+        The C++ logger encodes a serialized anyproto with base64 and sends it over.
+        We need to apply the reverse sequence of operations to unpack the data.
 
         """
         payload = self.request[0]
@@ -151,7 +141,7 @@ def handler_factory(handle_callback, proto_class, base64_encoded):
 
     :param handle_callback: The callback to run
     :param proto_class: The protobuf to unpack from (None if its encoded in the payload)
-    :param base64_encoded: TODO
+    :param base64_encoded: If sent over fom LOG(VISUALIZE) the data will be base64_encoded
 
     """
 

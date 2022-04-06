@@ -12,7 +12,7 @@ from software.thunderscope.field.field_layer import FieldLayer
 
 
 class ObstacleLayer(FieldLayer):
-    def __init__(self, buffer_size=1):
+    def __init__(self, buffer_size=10):
         FieldLayer.__init__(self)
         self.cached_obstacles = Obstacles()
 

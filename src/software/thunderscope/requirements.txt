@@ -1,2 +1,1 @@
 pyqtgraph==0.12.3
-pygame==2.0.1
