@@ -214,12 +214,19 @@ class WorldLayer(FieldLayer):
         for robot in team.team_robots:
 
             robot_id_font = painter.font()
-            robot_id_font.setPointSize(ROBOT_MAX_RADIUS/9)
-            robot_id_text = pg.TextItem(str(robot.id), color=Colors.ROBOT_ID_COLOR, anchor=(0,0))
+            robot_id_font.setPointSize(ROBOT_MAX_RADIUS / 8)
+            robot_id_text = pg.TextItem(
+                html='<span style="color: #FFF; background-color: #000">'
+                + str(robot.id)
+                + "</span>"
+            )
             robot_id_text.setFont(robot_id_font)
 
-            robot_id_text.setPos((robot.current_state.global_position.x_meters * MM_PER_M) - ROBOT_MAX_RADIUS,
-                                 robot.current_state.global_position.y_meters * MM_PER_M)
+            robot_id_text.setPos(
+                (robot.current_state.global_position.x_meters * MM_PER_M)
+                - ROBOT_MAX_RADIUS,
+                robot.current_state.global_position.y_meters * MM_PER_M,
+            )
             robot_id_text.setParentItem(self)
 
             """
@@ -304,5 +311,7 @@ class WorldLayer(FieldLayer):
 
         # TODO (#2399) Figure out which team color _we_ are and update the color
         # passed into the team.
-        self.draw_team(painter, Colors.YELLOW_ROBOT_COLOR, world.friendly_team, world.field)
+        self.draw_team(
+            painter, Colors.YELLOW_ROBOT_COLOR, world.friendly_team, world.field
+        )
         self.draw_team(painter, Colors.BLUE_ROBOT_COLOR, world.enemy_team, world.field)
