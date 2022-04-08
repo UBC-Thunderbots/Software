@@ -87,6 +87,11 @@ double Vector::cross(const Vector &other) const
     return x_ * other.y() - y_ * other.x();
 }
 
+double Vector::determinant(const Vector &other) const
+{
+    return x_ * other.y() - y_ * other.x();
+}
+
 Vector &Vector::operator=(const Vector &q)
 {
     x_ = q.x();

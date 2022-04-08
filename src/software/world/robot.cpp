@@ -28,7 +28,8 @@ Robot::Robot(RobotId id, const RobotState &initial_state, const Timestamp &times
 Robot::Robot(const TbotsProto::Robot &robot_proto)
     : id_(robot_proto.id()),
       current_state_(RobotState(robot_proto.current_state())),
-      timestamp_(Timestamp::fromTimestampProto(robot_proto.timestamp()))
+      timestamp_(Timestamp::fromTimestampProto(robot_proto.timestamp())),
+      robot_constants_(create2021RobotConstants())
 {
     for (const auto &unavailable_capability : robot_proto.unavailable_capabilities())
     {
@@ -149,4 +150,23 @@ std::set<RobotCapability> &Robot::getMutableRobotCapabilities()
 const RobotConstants_t &Robot::robotConstants() const
 {
     return robot_constants_;
+}
+
+Polygon Robot::dribblerArea() const
+{
+    auto vector_to_front = Vector::createFromAngle(orientation());
+    double depth         = BALL_MAX_RADIUS_METERS;
+    double width         = robot_constants_.front_of_robot_width_meters;
+    Point bottom_left_position =
+        position() +
+        vector_to_front.normalize(DIST_TO_FRONT_OF_ROBOT_METERS -
+                                  MAX_FRACTION_OF_BALL_COVERED_BY_ROBOT * 2 *
+                                      BALL_MAX_RADIUS_METERS) -
+        vector_to_front.perpendicular().normalize(
+            robot_constants_.front_of_robot_width_meters / 2.0);
+    return Polygon(
+        {bottom_left_position, bottom_left_position + vector_to_front.normalize(depth),
+         bottom_left_position + vector_to_front.normalize(depth) +
+             vector_to_front.perpendicular().normalize(width),
+         bottom_left_position + vector_to_front.perpendicular().normalize(width)});
 }

@@ -43,9 +43,9 @@ TEST_P(CobsEncodingTest, encode_decode_test)
     auto encoded = cobsEncoding(std::get<0>(GetParam()));
     EXPECT_EQ(encoded, std::get<1>(GetParam()));
     // Check that cobs decodes to the expected value
-    auto decoded = cobsDecoding(encoded);
-    EXPECT_TRUE(decoded.has_value());
-    EXPECT_EQ(*decoded, std::get<0>(GetParam()));
+    auto decoded = std::vector<uint8_t>();
+    EXPECT_TRUE(cobsDecoding(encoded, decoded));
+    EXPECT_EQ(decoded, std::get<0>(GetParam()));
 }
 
 INSTANTIATE_TEST_CASE_P(
@@ -73,8 +73,8 @@ class CobsDecodingErrorTest : public ::testing::TestWithParam<std::vector<uint8_
 
 TEST_P(CobsDecodingErrorTest, decode_error_tests)
 {
-    auto decoded = cobsDecoding(GetParam());
-    EXPECT_FALSE(decoded.has_value());
+    auto decoded = std::vector<uint8_t>();
+    EXPECT_FALSE(cobsDecoding(GetParam(), decoded));
 }
 
 INSTANTIATE_TEST_CASE_P(
@@ -168,14 +168,14 @@ TEST_F(UartFramingTest, marshalling_test)
     EXPECT_EQ(bytes.size(),
               sizeof(test_message) + 2 * sizeof(uint16_t) + 3 * sizeof(uint8_t));
 
-    auto test_frame_unmarshalled = unmarshalUartPacket<TestMessage>(bytes);
-    EXPECT_TRUE(test_frame_unmarshalled.has_value());
+    auto test_frame_unmarshalled = UartMessageFrame<TestMessage>();
+    EXPECT_TRUE(unmarshalUartPacket<TestMessage>(bytes, test_frame_unmarshalled));
     // Check size of frame is the size of the original struct + length and crc fields
-    EXPECT_EQ(sizeof(test_frame_unmarshalled.value()),
+    EXPECT_EQ(sizeof(test_frame_unmarshalled),
               sizeof(TestMessage) + 2 * sizeof(uint16_t));
     // Check fields of frame
-    EXPECT_EQ(test_frame_unmarshalled->length, sizeof(TestMessage));
-    EXPECT_EQ(test_frame_unmarshalled->crc, TEST_MESSAGE_CRC);
-    EXPECT_EQ(test_frame_unmarshalled->message, test_message);
-    EXPECT_TRUE(test_frame_unmarshalled->verifyLengthAndCrc());
+    EXPECT_EQ(test_frame_unmarshalled.length, sizeof(TestMessage));
+    EXPECT_EQ(test_frame_unmarshalled.crc, TEST_MESSAGE_CRC);
+    EXPECT_EQ(test_frame_unmarshalled.message, test_message);
+    EXPECT_TRUE(test_frame_unmarshalled.verifyLengthAndCrc());
 }

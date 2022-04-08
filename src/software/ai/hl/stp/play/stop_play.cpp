@@ -37,7 +37,8 @@ void StopPlay::getNextTactics(TacticCoroutine::push_type &yield, const World &wo
     // 		+--------------------+--------------------+
 
 
-    MaxAllowedSpeedMode stop_mode = MaxAllowedSpeedMode::STOP_COMMAND;
+    TbotsProto::MaxAllowedSpeedMode stop_mode =
+        TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND;
 
     std::vector<std::shared_ptr<MoveTactic>> move_tactics = {
         std::make_shared<MoveTactic>(), std::make_shared<MoveTactic>(),
@@ -92,11 +93,11 @@ void StopPlay::getNextTactics(TacticCoroutine::push_type &yield, const World &wo
             stop_mode);
 
         std::get<0>(crease_defender_tactics)
-            ->updateControlParams(world.ball().position(), CreaseDefenderAlignment::LEFT,
-                                  stop_mode);
+            ->updateControlParams(world.ball().position(),
+                                  TbotsProto::CreaseDefenderAlignment::LEFT, stop_mode);
         std::get<1>(crease_defender_tactics)
-            ->updateControlParams(world.ball().position(), CreaseDefenderAlignment::RIGHT,
-                                  stop_mode);
+            ->updateControlParams(world.ball().position(),
+                                  TbotsProto::CreaseDefenderAlignment::RIGHT, stop_mode);
 
         // insert all the tactics to the result
         result[0].emplace_back(std::get<0>(crease_defender_tactics));

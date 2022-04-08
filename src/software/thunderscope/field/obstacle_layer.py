@@ -1,22 +1,22 @@
+import queue
+
 import pyqtgraph as pg
-from pyqtgraph.Qt import QtCore, QtGui
-from software.thunderscope.field.field_layer import FieldLayer
-import software.thunderscope.constants as constants
-import software.thunderscope.colors as colors
-from proto.geometry_pb2 import Polygon, Circle
+from proto.geometry_pb2 import Circle, Polygon
 from proto.visualization_pb2 import Obstacles
+from pyqtgraph.Qt import QtCore, QtGui
+
+from software.thunderscope.colors import Colors
+import software.thunderscope.constants as constants
 from software.networking.threaded_unix_listener import ThreadedUnixListener
+from software.thunderscope.field.field_layer import FieldLayer
 
 
 class ObstacleLayer(FieldLayer):
-    def __init__(self):
+    def __init__(self, buffer_size=10):
         FieldLayer.__init__(self)
-        self.obstacle_receiver = ThreadedUnixListener(
-            constants.UNIX_SOCKET_BASE_PATH + Obstacles.DESCRIPTOR.full_name,
-            Obstacles,
-            max_buffer_size=1,
-        )
         self.cached_obstacles = Obstacles()
+
+        self.obstacle_buffer = queue.Queue(buffer_size)
 
     def paint(self, painter, option, widget):
         """Paint this layer
@@ -27,14 +27,14 @@ class ObstacleLayer(FieldLayer):
 
         """
 
-        obstacles = self.obstacle_receiver.maybe_pop()
-
-        if not obstacles:
+        try:
+            obstacles = self.obstacle_buffer.get_nowait()
+        except queue.Empty as empty:
             obstacles = self.cached_obstacles
 
         self.cached_obstacles = obstacles
 
-        painter.setPen(pg.mkPen(colors.NAVIGATOR_OBSTACLE_COLOR))
+        painter.setPen(pg.mkPen(Colors.NAVIGATOR_OBSTACLE_COLOR, width=2))
 
         for polyobstacle in obstacles.polygon:
             polygon_points = [

@@ -1,5 +1,6 @@
 #include "software/simulated_tests/simulated_er_force_sim_play_test_fixture.h"
 
+#include "proto/message_translation/primitive_google_to_nanopb_converter.h"
 #include "proto/message_translation/tbots_protobuf.h"
 #include "software/gui/drawing/navigator.h"
 #include "software/test_util/test_util.h"
@@ -42,10 +43,9 @@ void SimulatedErForceSimPlayTestFixture::setAIPlay(const std::string& ai_play)
     ai_config->getMutableAiControlConfig()->getMutableCurrentAiPlay()->setValue(ai_play);
 }
 
-void SimulatedErForceSimPlayTestFixture::setAIPlayConstructor(
-    std::optional<PlayConstructor> constructor)
+void SimulatedErForceSimPlayTestFixture::setAIPlay(std::unique_ptr<Play> play)
 {
-    ai.overridePlayConstructor(constructor);
+    ai.overridePlay(std::move(play));
 }
 
 void SimulatedErForceSimPlayTestFixture::setRefereeCommand(
@@ -73,9 +73,9 @@ void SimulatedErForceSimPlayTestFixture::updatePrimitives(
     auto primitive_set_msg = ai.getPrimitives(world_with_updated_game_state);
     double duration_ms     = ::TestUtil::millisecondsSince(start_tick_time);
     registerFriendlyTickTime(duration_ms);
-    auto vision_msg = createVision(friendly_world);
+    auto world_msg = createWorld(world_with_updated_game_state);
     simulator_to_update->setYellowRobotPrimitiveSet(*primitive_set_msg,
-                                                    std::move(vision_msg));
+                                                    std::move(world_msg));
 }
 
 const std::shared_ptr<AiConfig> SimulatedErForceSimPlayTestFixture::getAiConfig() const

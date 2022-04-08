@@ -28,14 +28,13 @@ STP::STP(std::shared_ptr<const AiConfig> ai_config)
       stop_tactics(),
       current_play(std::make_unique<HaltPlay>(ai_config)),
       fsm(std::make_unique<FSM<PlaySelectionFSM>>(PlaySelectionFSM{ai_config})),
-      override_play_changed(false),
-      override_constructor(std::nullopt)
+      override_play(nullptr)
 {
     ai_config->getAiControlConfig()->getCurrentAiPlay()->registerCallbackFunction(
         [this, ai_config](std::string new_override_play_name) {
             if (ai_config->getAiControlConfig()->getOverrideAiPlay()->value())
             {
-                overridePlayConstructorFromName(new_override_play_name);
+                overridePlayFromName(new_override_play_name);
             }
         });
 
@@ -43,7 +42,7 @@ STP::STP(std::shared_ptr<const AiConfig> ai_config)
         [this, ai_config](bool new_override_ai_play) {
             if (new_override_ai_play)
             {
-                overridePlayConstructorFromName(
+                overridePlayFromName(
                     ai_config->getAiControlConfig()->getCurrentAiPlay()->value());
             }
         });
@@ -56,30 +55,27 @@ STP::STP(std::shared_ptr<const AiConfig> ai_config)
 
 std::vector<std::unique_ptr<Intent>> STP::getIntentsFromCurrentPlay(const World& world)
 {
-    if (override_play_changed)
-    {
-        // Reset override play
-        fsm->process_event(PlaySelectionFSM::Update(
-            std::nullopt,
-            [this](std::unique_ptr<Play> play) { current_play = std::move(play); },
-            world.gameState()));
-        override_play_changed = false;
-    }
-
     fsm->process_event(PlaySelectionFSM::Update(
-        override_constructor,
         [this](std::unique_ptr<Play> play) { current_play = std::move(play); },
         world.gameState()));
 
-    return current_play->get(
-        [this](const ConstPriorityTacticVector& tactics, const World& world,
-               bool automatically_assign_goalie) {
-            return assignRobotsToTactics(tactics, world, automatically_assign_goalie);
-        },
-        [world](const Tactic& tactic) {
-            return buildMotionConstraintSet(world.gameState(), tactic);
-        },
-        world);
+    auto assignment_function = [this](const ConstPriorityTacticVector& tactics,
+                                      const World& world,
+                                      bool automatically_assign_goalie) {
+        return assignRobotsToTactics(tactics, world, automatically_assign_goalie);
+    };
+    auto motion_constraint_function = [world](const Tactic& tactic) {
+        return buildMotionConstraintSet(world.gameState(), tactic);
+    };
+
+    if (static_cast<bool>(override_play))
+    {
+        return override_play->get(assignment_function, motion_constraint_function, world);
+    }
+    else
+    {
+        return current_play->get(assignment_function, motion_constraint_function, world);
+    }
 }
 
 std::vector<std::unique_ptr<Intent>> STP::getIntents(const World& world)
@@ -131,10 +127,23 @@ std::map<std::shared_ptr<const Tactic>, Robot> STP::assignRobotsToTactics(
 
     if (goalie_robot && automatically_assign_goalie)
     {
-        robot_tactic_assignment.emplace(goalie_tactic, goalie_robot.value());
+        if (goalie_robot.has_value())
+        {
+            robot_tactic_assignment.emplace(goalie_tactic, goalie_robot.value());
 
-        robots.erase(std::remove(robots.begin(), robots.end(), goalie_robot.value()),
-                     robots.end());
+            robots.erase(std::remove(robots.begin(), robots.end(), goalie_robot.value()),
+                         robots.end());
+        }
+        else if (world.friendlyTeam().getGoalieId().has_value())
+        {
+            LOG(WARNING) << "Robot not found for goalie ID: "
+                         << std::to_string(world.friendlyTeam().getGoalieId().value())
+                         << std::endl;
+        }
+        else
+        {
+            LOG(WARNING) << "No goalie ID set!" << std::endl;
+        }
     }
 
     // This functions optimizes the assignment of robots to tactics by minimizing
@@ -144,8 +153,9 @@ std::map<std::shared_ptr<const Tactic>, Robot> STP::assignRobotsToTactics(
     //
     // https://github.com/saebyn/munkres-cpp is the implementation of the Hungarian
     // algorithm that we use here
-    for (auto tactic_vector : tactics)
+    for (unsigned int i = 0; i < tactics.size(); i++)
     {
+        auto tactic_vector = tactics[i];
         size_t num_tactics = tactic_vector.size();
 
         if (robots.size() < tactic_vector.size())
@@ -156,10 +166,11 @@ std::map<std::shared_ptr<const Tactic>, Robot> STP::assignRobotsToTactics(
             tactic_vector.resize(robots.size());
             num_tactics = tactic_vector.size();
         }
-        else
+        else if (i == (tactics.size() - 1))
         {
-            // Assign rest of robots with StopTactic
-            for (unsigned int i = 0; i < (robots.size() - tactic_vector.size()); i++)
+            // If assigning the last tactic vector, then assign rest of robots with
+            // StopTactics
+            for (unsigned int i = 0; i < (robots.size() - num_tactics); i++)
             {
                 tactic_vector.push_back(stop_tactics[i]);
             }
@@ -229,7 +240,7 @@ std::map<std::shared_ptr<const Tactic>, Robot> STP::assignRobotsToTactics(
 
         for (size_t row = 0; row < num_rows; row++)
         {
-            for (size_t col = 0; col < num_tactics; col++)
+            for (size_t col = 0; col < num_cols; col++)
             {
                 auto val = matrix(row, col);
                 if (val == 0)
@@ -253,15 +264,12 @@ std::map<std::shared_ptr<const Tactic>, Robot> STP::assignRobotsToTactics(
     return robot_tactic_assignment;
 }
 
-void STP::overridePlayConstructor(std::optional<PlayConstructor> constructor)
+void STP::overridePlay(std::unique_ptr<Play> play)
 {
-    override_play_changed = true;
-    override_constructor  = constructor;
+    override_play = std::move(play);
 }
 
-void STP::overridePlayConstructorFromName(std::string name)
+void STP::overridePlayFromName(std::string name)
 {
-    overridePlayConstructor([name](std::shared_ptr<const AiConfig> ai_config) {
-        return GenericFactory<std::string, Play, AiConfig>::create(name, ai_config);
-    });
+    overridePlay(GenericFactory<std::string, Play, AiConfig>::create(name, ai_config));
 }

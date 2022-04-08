@@ -126,17 +126,17 @@ double SimulatedErForceSimTacticTestFixture::updatePrimitives(
 
     auto primitive_set_msg = navigator->getAssignedPrimitives(world, intents);
     double duration_ms     = ::TestUtil::millisecondsSince(start_tick_time);
-    auto vision_msg        = createVision(world);
+    auto world_msg         = createWorld(world);
 
     if (config->getSensorFusionConfig()->getFriendlyColorYellow()->value())
     {
         simulator_to_update->setYellowRobotPrimitiveSet(*primitive_set_msg,
-                                                        std::move(vision_msg));
+                                                        std::move(world_msg));
     }
     else
     {
         simulator_to_update->setBlueRobotPrimitiveSet(*primitive_set_msg,
-                                                      std::move(vision_msg));
+                                                      std::move(world_msg));
     }
     return duration_ms;
 }

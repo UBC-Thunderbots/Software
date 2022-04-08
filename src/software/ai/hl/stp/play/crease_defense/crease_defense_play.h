@@ -21,9 +21,9 @@ class CreaseDefensePlay : public Play
      * @param enemy_threat_origin The origin of the enemy threat
      * @param max_allowed_speed_mode The mode of maximum speed allowed
      */
-    void updateControlParams(
-        const Point &enemy_threat_origin,
-        MaxAllowedSpeedMode max_allowed_speed_mode = MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+    void updateControlParams(const Point &enemy_threat_origin,
+                             TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode =
+                                 TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
 
    private:
     FSM<CreaseDefensePlayFSM> fsm;
