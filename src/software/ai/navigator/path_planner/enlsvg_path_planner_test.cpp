@@ -106,12 +106,12 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_empty_grid)
 
     EXPECT_TRUE(path != std::nullopt);
 
-    std::vector<Point> path_points = path->getKnots();
+    std::vector<Point> path_points = path->knots();
 
     EXPECT_EQ(2, path_points.size());
 
-    EXPECT_EQ(start, path->getStartPoint());
-    EXPECT_EQ(dest, path->getEndPoint());
+    EXPECT_EQ(start, path->knots.front());
+    EXPECT_EQ(dest, path->knots.back());
 }
 
 TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_no_navigable_area)
@@ -150,11 +150,11 @@ TEST_F(TestEnlsvgPathPlanner,
 
     EXPECT_TRUE(path != std::nullopt);
 
-    std::vector<Point> path_points = path->getKnots();
+    std::vector<Point> path_points = path->knots();
 
     // The path should start at exactly the start point and end at exactly the dest
-    EXPECT_EQ(start, path->getStartPoint());
-    EXPECT_EQ(dest, path->getEndPoint());
+    EXPECT_EQ(start, path->knots.front());
+    EXPECT_EQ(dest, path->knots.back());
 
     // Make sure the path does not exceed a bounding box
     Rectangle bounding_box({-3.1, 1.3}, {3.1, -1.3});
@@ -182,11 +182,11 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_blocked_src)
 
     EXPECT_TRUE(path != std::nullopt);
 
-    std::vector<Point> path_points = path->getKnots();
+    std::vector<Point> path_points = path->knots();
 
     // Make sure the start and end of the path are correct
-    EXPECT_EQ(start, path->getStartPoint());
-    EXPECT_EQ(dest, path->getEndPoint());
+    EXPECT_EQ(start, path->knots.front());
+    EXPECT_EQ(dest, path->knots.back());
 
     // Make sure the path planner creates a path that exits out at the nearest edge
     // Here, the nearest edge is straight up in the x direction.
@@ -224,14 +224,14 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_blocked_dest)
 
     EXPECT_TRUE(path != std::nullopt);
 
-    std::vector<Point> path_points = path->getKnots();
+    std::vector<Point> path_points = path->knots();
 
     // Make sure the start and end of the path are correct
-    EXPECT_EQ(start, path->getStartPoint());
+    EXPECT_EQ(start, path->knots.front());
 
     // The endpoint should be the closest point to the obstacle, which is around (3.5, 0)
-    EXPECT_NEAR(3.5, path->getEndPoint().x(), 0.3);
-    EXPECT_NEAR(0, path->getEndPoint().y(), 0.1);
+    EXPECT_NEAR(3.5, path->knots.back().x(), 0.3);
+    EXPECT_NEAR(0, path->knots.back().y(), 0.1);
 
     // Make the sure the path does not exceed a bounding box
     Rectangle bounding_box({-0.3, -1.1}, {3.8, 2.1});
@@ -265,10 +265,10 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_blocked_dest_blocked_src)
 
     EXPECT_TRUE(path != std::nullopt);
 
-    std::vector<Point> path_points = path->getKnots();
+    std::vector<Point> path_points = path->knots();
 
     // Make sure the start and end of the path are correct
-    EXPECT_EQ(start, path->getStartPoint());
+    EXPECT_EQ(start, path->knots.front());
 
     // The point following the start should be the closest point out of the obstacle,
     // which is around (0, 1)
@@ -276,8 +276,8 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_blocked_dest_blocked_src)
     EXPECT_NEAR(1, path_points[1].y(), 0.3);
 
     // The endpoint should be the closest point to the obstacle, which is around (3.5, 0)
-    EXPECT_NEAR(3.5, path->getEndPoint().x(), 0.3);
-    EXPECT_NEAR(0, path->getEndPoint().y(), 0.1);
+    EXPECT_NEAR(3.5, path->knots.back().x(), 0.3);
+    EXPECT_NEAR(0, path->knots.back().y(), 0.1);
 
     // Make the sure the path does not exceed a bounding box
     Rectangle bounding_box({-0.3, -1.1}, {3.8, 2.1});
@@ -311,11 +311,11 @@ TEST_F(TestEnlsvgPathPlanner,
 
     EXPECT_TRUE(path != std::nullopt);
 
-    std::vector<Point> path_points = path->getKnots();
+    std::vector<Point> path_points = path->knots();
 
     // Make sure the start and end of the path are correct
-    EXPECT_EQ(start, path->getStartPoint());
-    EXPECT_EQ(dest, path->getEndPoint());
+    EXPECT_EQ(start, path->knots.front());
+    EXPECT_EQ(dest, path->knots.back());
 
     // The point following the start should be the closest point out of the obstacle,
     // which is around (0 , 2)
@@ -350,11 +350,11 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_same_cell_dest)
 
     EXPECT_TRUE(path != std::nullopt);
 
-    std::vector<Point> path_points = path->getKnots();
+    std::vector<Point> path_points = path->knots();
 
     // Make sure the start and end of the path are correct
-    EXPECT_EQ(start, path->getStartPoint());
-    EXPECT_EQ(dest, path->getEndPoint());
+    EXPECT_EQ(start, path->knots.front());
+    EXPECT_EQ(dest, path->knots.back());
 }
 
 TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_single_obstacle_outside_of_path)
@@ -376,13 +376,13 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_single_obstacle_outside_o
 
     EXPECT_TRUE(path != std::nullopt);
 
-    std::vector<Point> path_points = path->getKnots();
+    std::vector<Point> path_points = path->knots();
 
     // Straight line path expected
     EXPECT_EQ(2, path_points.size());
 
     // Make sure the start and end of the path are correct
-    EXPECT_EQ(start, path->getStartPoint());
+    EXPECT_EQ(start, path->knots.front());
 
     // Make the sure the path does not exceed a bounding box
     Rectangle bounding_box({-3.1, 0.1}, {3.1, -1.0});
@@ -414,11 +414,11 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_single_obstacle_along_x_a
 
     EXPECT_TRUE(path != std::nullopt);
 
-    std::vector<Point> path_points = path->getKnots();
+    std::vector<Point> path_points = path->knots();
 
     // Make sure the start and end of the path are correct
-    EXPECT_EQ(start, path->getStartPoint());
-    EXPECT_EQ(dest, path->getEndPoint());
+    EXPECT_EQ(start, path->knots.front());
+    EXPECT_EQ(dest, path->knots.back());
 
     // Make the sure the path does not exceed a bounding box
     Rectangle bounding_box({-0.1, -1.3}, {3.1, 1.3});
@@ -446,11 +446,11 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_single_obstacle_along_y_a
 
     EXPECT_TRUE(path != std::nullopt);
 
-    std::vector<Point> path_points = path->getKnots();
+    std::vector<Point> path_points = path->knots();
 
     // Make sure the start and end of the path are correct
-    EXPECT_EQ(start, path->getStartPoint());
-    EXPECT_EQ(dest, path->getEndPoint());
+    EXPECT_EQ(start, path->knots.front());
+    EXPECT_EQ(dest, path->knots.back());
 
     // Make the sure the path does not exceed a bounding box
     Rectangle bounding_box({-0.1, -0.1}, {2.1, 3.1});
@@ -476,11 +476,11 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_not_centered_at_origin)
 
     EXPECT_TRUE(path != std::nullopt);
 
-    std::vector<Point> path_points = path->getKnots();
+    std::vector<Point> path_points = path->knots();
 
     // Make sure the start and end of the path are correct
-    EXPECT_EQ(start, path->getStartPoint());
-    EXPECT_EQ(dest, path->getEndPoint());
+    EXPECT_EQ(start, path->knots.front());
+    EXPECT_EQ(dest, path->knots.back());
 
     // Make the sure the path does not exceed a bounding box
     Rectangle bounding_box({0.4, 0.4}, {2.6, 2.6});
@@ -505,12 +505,12 @@ TEST_F(TestEnlsvgPathPlanner,
 
     EXPECT_TRUE(path != std::nullopt);
 
-    std::vector<Point> path_points = path->getKnots();
+    std::vector<Point> path_points = path->knots();
 
     // Straight line path
     EXPECT_EQ(2, path_points.size());
-    EXPECT_EQ(start, path->getStartPoint());
-    EXPECT_EQ(dest, path->getEndPoint());
+    EXPECT_EQ(start, path->knots.front());
+    EXPECT_EQ(dest, path->knots.back());
 }
 
 TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_circular_obstacle)
@@ -530,11 +530,11 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_circular_obstacle)
 
     EXPECT_TRUE(path != std::nullopt);
 
-    std::vector<Point> path_points = path->getKnots();
+    std::vector<Point> path_points = path->knots();
 
     // since endpoint ends in obstacle, make sure the endpoint is close enough
-    EXPECT_EQ(start, path->getStartPoint());
-    EXPECT_LE(0.27150, distance(path->getEndPoint(), dest));
+    EXPECT_EQ(start, path->knots.front());
+    EXPECT_LE(0.27150, distance(path->knots.back(), dest));
 
     // Make sure path does not exceed a bounding box
     Rectangle bounding_box({-1.46, -2.6}, {-1, -1.31});
@@ -559,10 +559,10 @@ TEST_F(TestEnlsvgPathPlanner, test_enslvg_path_planner_check_obstacle_edge)
 
     EXPECT_TRUE(path != std::nullopt);
 
-    std::vector<Point> path_points = path->getKnots();
+    std::vector<Point> path_points = path->knots();
 
-    EXPECT_EQ(start, path->getStartPoint());
-    EXPECT_EQ(dest, path->getEndPoint());
+    EXPECT_EQ(start, path->knots.front());
+    EXPECT_EQ(dest, path->knots.back());
 
     // Make sure path does not exceed a bounding box
     Rectangle bounding_box({-0.1, 2.9}, {3.1, 3.3});
@@ -588,10 +588,10 @@ TEST_F(TestEnlsvgPathPlanner,
 
     ASSERT_TRUE(path != std::nullopt);
 
-    std::vector<Point> path_points = path->getKnots();
+    std::vector<Point> path_points = path->knots();
 
-    EXPECT_EQ(start, path->getStartPoint());
-    EXPECT_EQ(dest, path->getEndPoint());
+    EXPECT_EQ(start, path->knots.front());
+    EXPECT_EQ(dest, path->knots.back());
 
     // Make sure path does not exceed a bounding box
     Rectangle bounding_box({1.3, 2}, {-0.1, 3.1});
@@ -617,10 +617,10 @@ TEST_F(TestEnlsvgPathPlanner, test_enslvg_path_planner_start_in_enemy_half)
 
     ASSERT_TRUE(path != std::nullopt);
 
-    std::vector<Point> path_points = path->getKnots();
+    std::vector<Point> path_points = path->knots();
 
     // Make sure the start and end points match
-    EXPECT_EQ(start, path->getStartPoint());
+    EXPECT_EQ(start, path->knots.front());
 
     // Ensure path planner exits out the closest point outside the enemy half
     EXPECT_LE(path_points[1].x(), 0);
@@ -651,11 +651,11 @@ TEST_F(TestEnlsvgPathPlanner, test_start_in_boundary_margin)
 
     ASSERT_TRUE(path != std::nullopt);
 
-    std::vector<Point> path_points = path->getKnots();
+    std::vector<Point> path_points = path->knots();
 
     // Make sure the start and end points match
-    EXPECT_EQ(start, path->getStartPoint());
-    EXPECT_EQ(dest, path->getEndPoint());
+    EXPECT_EQ(start, path->knots.front());
+    EXPECT_EQ(dest, path->knots.back());
 
     // Make sure second point is not in the margins, but in the playing field and is close
     // to the start point
@@ -665,7 +665,7 @@ TEST_F(TestEnlsvgPathPlanner, test_start_in_boundary_margin)
     // Make sure path does not exceed a bounding box
     Rectangle bounding_box({-1.1, -2.1}, {6.3, 4.8});
     checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
-    checkPathDoesNotIntersectObstacle(path->getKnots(), obstacles);
+    checkPathDoesNotIntersectObstacle(path->knots(), obstacles);
 }
 
 TEST_F(TestEnlsvgPathPlanner, test_one_path_planner_object_called_twice_for_same_path)
@@ -686,21 +686,21 @@ TEST_F(TestEnlsvgPathPlanner, test_one_path_planner_object_called_twice_for_same
 
     ASSERT_TRUE(path != std::nullopt);
 
-    std::vector<Point> path_points = path->getKnots();
+    std::vector<Point> path_points = path->knots();
 
     // Make sure the start and end points match
-    EXPECT_EQ(start, path->getStartPoint());
-    EXPECT_EQ(dest, path->getEndPoint());
+    EXPECT_EQ(start, path->knots.front());
+    EXPECT_EQ(dest, path->knots.back());
 
     // Make sure path does not exceed a bounding box
     Rectangle bounding_box({-3.1, -4.1}, {2.1, 3.1});
     checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
-    checkPathDoesNotIntersectObstacle(path->getKnots(), obstacles);
+    checkPathDoesNotIntersectObstacle(path->knots(), obstacles);
 
     // Test same path using the same path planner object to make sure it still works when
     // being reused
     auto same_path = planner.findPath(start, dest, navigable_area, obstacles);
-    std::vector<Point> same_path_points = path->getKnots();
+    std::vector<Point> same_path_points = path->knots();
 
     for (unsigned i = 0; i < path_points.size(); ++i)
     {
@@ -727,16 +727,16 @@ TEST_F(TestEnlsvgPathPlanner,
 
     ASSERT_TRUE(path != std::nullopt);
 
-    std::vector<Point> path_points = path->getKnots();
+    std::vector<Point> path_points = path->knots();
 
     // Make sure the start and end points match
-    EXPECT_EQ(start, path->getStartPoint());
-    EXPECT_EQ(dest, path->getEndPoint());
+    EXPECT_EQ(start, path->knots.front());
+    EXPECT_EQ(dest, path->knots.back());
 
     // Make sure path does not exceed a bounding box
     Rectangle bounding_box({-2.1, -1.1}, {4.1, 4.1});
     checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
-    checkPathDoesNotIntersectObstacle(path->getKnots(), obstacles);
+    checkPathDoesNotIntersectObstacle(path->knots(), obstacles);
 
     // Make sure that reusing the path planner still works by computing another path
     start = Point(5, 0);

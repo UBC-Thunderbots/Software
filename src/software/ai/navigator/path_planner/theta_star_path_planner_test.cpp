@@ -106,11 +106,11 @@ TEST_F(TestThetaStarPathPlanner, test_theta_star_path_planner_blocked_src)
 
     EXPECT_TRUE(path != std::nullopt);
 
-    std::vector<Point> path_points = path->getKnots();
+    std::vector<Point> path_points = path->knots();
 
     // Make sure the start and end of the path are correct
-    EXPECT_EQ(start, path->getStartPoint());
-    EXPECT_EQ(dest, path->getEndPoint());
+    EXPECT_EQ(start, path->knots.front());
+    EXPECT_EQ(dest, path->knots.back());
 
     // Make sure the path does not exceed a bounding box
     // bounding box is expanded around the src because the path planner needs to find a
@@ -142,10 +142,10 @@ TEST_F(TestThetaStarPathPlanner, test_theta_star_path_planner_blocked_dest)
 
     EXPECT_TRUE(path != std::nullopt);
 
-    std::vector<Point> path_points = path->getKnots();
+    std::vector<Point> path_points = path->knots();
 
     // The path should start at exactly the start point
-    EXPECT_EQ(start, path->getStartPoint());
+    EXPECT_EQ(start, path->knots.front());
 
     // Make sure the path does not exceed a bounding box
     Rectangle bounding_box({-0.1, 0.1}, {3.1, -0.1});
@@ -173,11 +173,11 @@ TEST_F(TestThetaStarPathPlanner,
 
     EXPECT_TRUE(path != std::nullopt);
 
-    std::vector<Point> path_points = path->getKnots();
+    std::vector<Point> path_points = path->knots();
 
     // The path should start at exactly the start point and end at exactly the dest
-    EXPECT_EQ(start, path->getStartPoint());
-    EXPECT_EQ(dest, path->getEndPoint());
+    EXPECT_EQ(start, path->knots.front());
+    EXPECT_EQ(dest, path->knots.back());
 
     // Make sure the path does not exceed a bounding box
     Rectangle bounding_box({-3.1, 1.4}, {3.1, -1.4});
@@ -204,11 +204,11 @@ TEST_F(TestThetaStarPathPlanner,
 
     EXPECT_TRUE(path != std::nullopt);
 
-    std::vector<Point> path_points = path->getKnots();
+    std::vector<Point> path_points = path->knots();
 
     // The path should start at exactly the start point and end at exactly the dest
-    EXPECT_EQ(start, path->getStartPoint());
-    EXPECT_EQ(dest, path->getEndPoint());
+    EXPECT_EQ(start, path->knots.front());
+    EXPECT_EQ(dest, path->knots.back());
 
     // Make sure the path does not exceed a bounding box
     Rectangle bounding_box({-3.1, 0.15}, {3.1, -1.0});
@@ -242,11 +242,11 @@ TEST_F(TestThetaStarPathPlanner,
 
     EXPECT_TRUE(path != std::nullopt);
 
-    std::vector<Point> path_points = path->getKnots();
+    std::vector<Point> path_points = path->knots();
 
     // The path should start at exactly the start point and end at exactly the dest
-    EXPECT_EQ(start, path->getStartPoint());
-    EXPECT_EQ(dest, path->getEndPoint());
+    EXPECT_EQ(start, path->knots.front());
+    EXPECT_EQ(dest, path->knots.back());
 
     // Make sure the path does not exceed a bounding box
     Rectangle bounding_box({-0.1, 1.35}, {3.1, -1.35});
@@ -280,11 +280,11 @@ TEST_F(TestThetaStarPathPlanner,
 
     EXPECT_TRUE(path != std::nullopt);
 
-    std::vector<Point> path_points = path->getKnots();
+    std::vector<Point> path_points = path->knots();
 
     // The path should start at exactly the start point and end at exactly the dest
-    EXPECT_EQ(start, path->getStartPoint());
-    EXPECT_EQ(dest, path->getEndPoint());
+    EXPECT_EQ(start, path->knots.front());
+    EXPECT_EQ(dest, path->knots.back());
 
     // Make sure the path does not exceed a bounding box
     Rectangle bounding_box({1.32, -0.1}, {-1.3, 3.1});
@@ -307,9 +307,9 @@ TEST_F(TestThetaStarPathPlanner, test_theta_star_path_planner_empty_grid)
 
     // Since there are no obstacles, there should be two path points, one at the start
     // and one at the destination
-    EXPECT_EQ(2, path->getNumKnots());
-    EXPECT_EQ(start, path->getStartPoint());
-    EXPECT_EQ(dest, path->getEndPoint());
+    EXPECT_EQ(2, path->knots.size());
+    EXPECT_EQ(start, path->knots.front());
+    EXPECT_EQ(dest, path->knots.back());
 }
 
 TEST_F(TestThetaStarPathPlanner, test_theta_star_path_planner_same_cell_dest)
@@ -325,11 +325,11 @@ TEST_F(TestThetaStarPathPlanner, test_theta_star_path_planner_same_cell_dest)
 
     EXPECT_TRUE(path != std::nullopt);
 
-    std::vector<Point> path_points = path->getKnots();
+    std::vector<Point> path_points = path->knots();
 
-    EXPECT_EQ(2, path->getNumKnots());
-    EXPECT_EQ(start, path->getStartPoint());
-    EXPECT_EQ(dest, path->getEndPoint());
+    EXPECT_EQ(2, path->knots.size());
+    EXPECT_EQ(start, path->knots.front());
+    EXPECT_EQ(dest, path->knots.back());
 }
 
 TEST_F(TestThetaStarPathPlanner, no_navigable_area)
@@ -357,11 +357,11 @@ TEST_F(TestThetaStarPathPlanner,
 
     EXPECT_TRUE(path != std::nullopt);
 
-    std::vector<Point> path_points = path->getKnots();
+    std::vector<Point> path_points = path->knots();
 
     // The path should start at exactly the start point and end at exactly the dest
-    EXPECT_EQ(start, path->getStartPoint());
-    EXPECT_EQ(dest, path->getEndPoint());
+    EXPECT_EQ(start, path->knots.front());
+    EXPECT_EQ(dest, path->knots.back());
 
     // Make sure the path does not exceed the navigable area
     checkPathDoesNotExceedBoundingBox(path_points, navigable_area);
@@ -383,8 +383,8 @@ TEST_F(TestThetaStarPathPlanner,
 
     ASSERT_TRUE(path != std::nullopt);
 
-    EXPECT_EQ(start, path->getStartPoint());
-    EXPECT_EQ(dest, path->getEndPoint());
+    EXPECT_EQ(start, path->knots.front());
+    EXPECT_EQ(dest, path->knots.back());
 }
 
 TEST_F(TestThetaStarPathPlanner,
@@ -405,8 +405,8 @@ TEST_F(TestThetaStarPathPlanner,
     ASSERT_TRUE(path != std::nullopt);
 
     // Expect that the last two points are combined into one
-    EXPECT_EQ(2, path->getKnots().size());
-    EXPECT_EQ(start, path->getStartPoint());
+    EXPECT_EQ(2, path->knots().size());
+    EXPECT_EQ(start, path->knots.front());
 }
 
 TEST_F(TestThetaStarPathPlanner, test_theta_star_check_obstacle_edge)
@@ -424,7 +424,7 @@ TEST_F(TestThetaStarPathPlanner, test_theta_star_check_obstacle_edge)
 
     ASSERT_TRUE(path != std::nullopt);
 
-    checkPathDoesNotIntersectObstacle(path->getKnots(), obstacles);
+    checkPathDoesNotIntersectObstacle(path->knots(), obstacles);
 }
 
 TEST_F(TestThetaStarPathPlanner,
@@ -450,7 +450,7 @@ TEST_F(TestThetaStarPathPlanner,
     auto path = planner->findPath(start, end, navigable_area, expanded_obstacles);
 
     ASSERT_TRUE(path != std::nullopt);
-    checkPathDoesNotIntersectObstacle(path->getKnots(), actual_obstacles);
+    checkPathDoesNotIntersectObstacle(path->knots(), actual_obstacles);
 }
 
 TEST_F(TestThetaStarPathPlanner, test_theta_star_path_planner_start_in_enemy_half)
@@ -471,5 +471,5 @@ TEST_F(TestThetaStarPathPlanner, test_theta_star_path_planner_start_in_enemy_hal
     // Make sure the path does not exceed a bounding box
 
     Rectangle bounding_box({4.5, 3.3}, {-1.3, -3.2});
-    checkPathDoesNotExceedBoundingBox(path->getKnots(), bounding_box);
+    checkPathDoesNotExceedBoundingBox(path->knots(), bounding_box);
 }

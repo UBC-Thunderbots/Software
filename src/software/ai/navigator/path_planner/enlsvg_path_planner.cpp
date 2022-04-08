@@ -100,7 +100,7 @@ std::optional<Path> EnlsvgPathPlanner::findPath(const Point &start, const Point 
         return std::nullopt;
     }
 
-    std::vector<Point> path_points = path.value().getKnots();
+    std::vector<Point> path_points = path.value().knots();
 
     // If start was initially blocked, add the start point
     if (new_start.value() != enlsvg_start)

@@ -15,7 +15,7 @@
  * from start to the destination
  */
 
-using Path = LinearSpline2d;
+using Path = std::vector<Point>;
 
 class PathPlanner
 {
