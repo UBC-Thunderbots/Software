@@ -70,6 +70,7 @@ cc_library(
     visibility = ["//visibility:private"],
     deps = [
         "@boost//:asio",
+        "//software:constants"
     ],
 )
 
@@ -93,6 +94,7 @@ cc_library(
     visibility = ["//visibility:private"],
     deps = [
         "@boost//:asio",
+        "//software:constants"
     ],
 )
 
@@ -135,6 +137,9 @@ cc_library(
 py_library(
     name = "threaded_unix_listener_py",
     srcs = ["threaded_unix_listener.py"],
+    data = [
+        "//software:py_constants.so",
+    ],
     deps = [
         "//proto:software_py_proto",
         "//software/logger:py_logger",

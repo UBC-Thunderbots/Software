@@ -22,6 +22,7 @@ class ThreadedUnixSender:
         self.proto_buffer = queue.Queue(max_buffer_size)
 
         self.socket = socket.socket(socket.AF_UNIX, type=socket.SOCK_DGRAM)
+        self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF, 20000)
 
         self.stop = False
 

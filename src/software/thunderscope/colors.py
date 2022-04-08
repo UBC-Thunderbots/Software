@@ -13,7 +13,7 @@ class Colors(object):
 
     ROBOT_SPEED_SLOW_COLOR = "black"
     NAVIGATOR_PATH_COLOR = "b"
-    NAVIGATOR_OBSTACLE_COLOR = "r"
+    NAVIGATOR_OBSTACLE_COLOR = "orange"
 
     VALIDATION_PASSED_COLOR = "g"
     VALIDATION_FAILED_COLOR = "r"

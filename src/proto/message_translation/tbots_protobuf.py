@@ -1,7 +1,7 @@
 from proto.import_all_protos import *
 
 
-def create_world_state(yellow_robot_locations, blue_robot_locations):
+def create_world_state(yellow_robot_locations, blue_robot_locations, ball_location, ball_velocity):
     """Initializes the world from a list of robot locations
 
     NOTE: (index is robot id)
@@ -29,5 +29,9 @@ def create_world_state(yellow_robot_locations, blue_robot_locations):
                 ),
             )
         )
+
+    world_state.ball_state.CopyFrom(BallState(
+            global_position=Point(x_meters=ball_location.x(), y_meters=ball_location.y()),
+            global_velocity=Vector(x_component_meters=ball_velocity.x(), y_component_meters=ball_velocity.y())))
 
     return world_state

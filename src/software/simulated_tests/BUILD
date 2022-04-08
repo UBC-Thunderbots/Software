@@ -38,7 +38,6 @@ cc_library(
         "//software/sensor_fusion",
         "//software/simulated_tests/validation:non_terminating_function_validator",
         "//software/simulated_tests/validation:terminating_function_validator",
-        "//software/simulation:er_force_simulator",
         "//software/test_util",
         "//software/time:duration",
         "//proto/logging:proto_logger",
@@ -125,8 +124,6 @@ py_library(
         "//software:py_constants.so",
     ],
     deps = [
-        ":er_force_simulator",
-        ":full_system",
         "//proto:import_all_protos",
         "//software/logger:py_logger",
         "//software/networking:threaded_unix_listener_py",
@@ -136,23 +133,6 @@ py_library(
     ],
 )
 
-py_library(
-    name = "er_force_simulator",
-    srcs = [
-        "er_force_simulator.py",
-    ],
-    data = [
-        "//software:er_force_simulator_main",
-        "//software:py_constants.so",
-    ],
-    deps = [
-        "//proto:software_py_proto",
-        "//proto:tbots_py_proto",
-        "//software/logger:py_logger",
-        "//software/networking:threaded_unix_listener_py",
-        "//software/networking:threaded_unix_sender_py",
-    ],
-)
 
 py_library(
     name = "validation",

@@ -42,3 +42,5 @@ const std::string BLUE_WORLD_PATH          = "/blue_world";
 const std::string BLUE_PRIMITIVE_SET       = "/blue_primitive_set";
 const std::string YELLOW_PRIMITIVE_SET     = "/yellow_primitive_set";
 const std::string SIMULATOR_STATE_PATH     = "/simulator_state_path";
+
+const unsigned UNIX_BUFFER_SIZE = 20000;

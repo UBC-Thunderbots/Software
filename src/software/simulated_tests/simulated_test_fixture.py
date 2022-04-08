@@ -1,6 +1,8 @@
 import threading
 import argparse
 import time
+import logging
+import queue
 import os
 
 import pytest
@@ -13,8 +15,6 @@ from software.networking.threaded_unix_sender import ThreadedUnixSender
 from software.simulated_tests.robot_enters_region import RobotEntersRegion
 
 from software.simulated_tests import validation
-from software.simulated_tests.full_system import FullSystem
-from software.simulated_tests.er_force_simulator import ErForceSimulator
 from software.thunderscope.thunderscope import Thunderscope
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.py_constants import MILLISECONDS_PER_SECOND
@@ -27,38 +27,35 @@ PROCESS_BUFFER_DELAY_S = 0.01
 PAUSE_AFTER_FAIL_DELAY_S = 3
 
 
-class TacticTestRunner(object):
+class SimulatorTestRunner(object):
 
-    """Run a tactic"""
+    """Run a simulated test"""
 
     def __init__(
-        self, launch_delay_s=0.1, enable_thunderscope=True, runtime_dir="/tmp/tbots"
+        self, launch_delay_s=0.1, show_thunderscope=True, runtime_dir="/tmp/tbots"
     ):
-        """Initialize the TacticTestRunner
+        """Initialize the SimulatorTestRunner
 
         :param launch_delay_s: How long to wait after launching the processes
-        :param enable_thunderscope: If true, thunderscope opens and the test runs
+        :param show_thunderscope: If true, thunderscope opens and the test runs
                                   in realtime
         :param runtime_dir: Directory to open sockets, store logs and any output files
 
         """
-        blue_full_system_proto_unix_io = ProtoUnixIO()
-        simulation_proto_unix_io = ProtoUnixIO()
-
-        # Setup runtime directory
-        try:
-            os.mkdir(runtime_dir)
-        except:
-            pass
 
         self.thunderscope = Thunderscope()
-        self.thunderscope.configure_default_layout()
+        self.show_thunderscope = show_thunderscope
 
         # Run full system and er_force_simulator
-        self.thunderscope.run_full_system(blue_full_system_proto_unix_io)
-        self.thunderscope.run_er_force_simulator(
-            simulation_proto_unix_io, blue_full_system_proto_unix_io
-        )
+        self.thunderscope.run_blue_full_system("/tmp/tbots/blue")
+        self.thunderscope.run_yellow_full_system("/tmp/tbots/yellow")
+        self.thunderscope.run_er_force_simulator("/tmp/tbots", "/tmp/tbots/blue", "/tmp/tbots/yellow")
+        time.sleep(launch_delay_s)
+
+        self.world_buffer = queue.Queue()
+
+        # Only validate on the blue worlds
+        self.thunderscope.blue_full_system_proto_unix_io.register_observer(World, self.world_buffer)
 
         self.last_exception = None
 
@@ -99,18 +96,14 @@ class TacticTestRunner(object):
 
             while time_elapsed_s < test_timeout_s:
 
-                self.simulator.tick(tick_duration_s * MILLISECONDS_PER_SECOND)
+                tick = SimulatorTick(milliseconds=tick_duration_s * MILLISECONDS_PER_SECOND)
+                self.thunderscope.simulator_proto_unix_io.send_proto(SimulatorTick, tick)
                 time_elapsed_s += tick_duration_s
 
-                if self.enable_thunderscope:
+                if self.show_thunderscope:
                     time.sleep(tick_duration_s)
 
-                # Send the sensor_proto and get world
-                ssl_wrapper = self.simulator.get_ssl_wrapper_packet(block=True)
-                self.yellow_full_system.send_sensor_proto(
-                    self.simulator.get_yellow_sensor_proto(ssl_wrapper)
-                )
-                world = self.yellow_full_system.get_world(block=True)
+                world = self.world_buffer.get()
 
                 # Validate
                 (
@@ -122,20 +115,22 @@ class TacticTestRunner(object):
                     always_validation_sequence_set,
                 )
 
-                if self.enable_thunderscope:
+                if self.show_thunderscope:
                     # Send out the validation proto to thunderscope
-                    self.eventually_validation_sender.send(
-                        eventually_validation_proto_set
+                    self.thunderscope.blue_full_system_proto_unix_io.send_proto(
+                        ValidationProtoSet,  eventually_validation_proto_set
                     )
-                    self.always_validation_sender.send(always_validation_proto_set)
+                    self.thunderscope.yellow_full_system_proto_unix_io.send_proto(
+                        ValidationProtoSet, eventually_validation_proto_set)
+                    self.thunderscope.blue_full_system_proto_unix_io.send_proto(
+                        ValidationProtoSet,  always_validation_proto_set
+                    )
+                    self.thunderscope.yellow_full_system_proto_unix_io.send_proto(
+                        ValidationProtoSet,  always_validation_proto_set
+                    )
 
                 # Check that all always validations are always valid
                 validation.check_validation(always_validation_proto_set)
-
-                # Step the primtives
-                self.simulator.send_yellow_primitive_set_and_world(
-                    world, self.yellow_full_system.get_primitive_set(),
-                )
 
             # Check that all eventually validations are eventually valid
             validation.check_validation(eventually_validation_proto_set)
@@ -143,7 +138,7 @@ class TacticTestRunner(object):
             __stopper()
 
         def excepthook(args):
-            """This function is _critical_ for enable_thunderscope to work.
+            """This function is _critical_ for show_thunderscope to work.
             If the test Thread will raises an exception we won't be able to close
             the window from the main thread.
 
@@ -160,7 +155,7 @@ class TacticTestRunner(object):
         # If thunderscope is enabled, run the test in a thread and show
         # thunderscope on this thread. The excepthook is setup to catch
         # any test failures and propagate them to the main thread
-        if self.enable_thunderscope:
+        if self.show_thunderscope:
 
             run_sim_thread = threading.Thread(target=__runner, daemon=True)
             run_sim_thread.start()
@@ -184,14 +179,15 @@ def load_command_line_arguments():
 
     """
     parser = argparse.ArgumentParser(description="Run simulated pytests")
+    # TODO (#2510) change to tscope
     parser.add_argument(
-        "--enable_thunderscope", action="store_true", help="enable the visualizer"
+        "--enable_visualizer", action="store_true", help="enable the visualizer"
     )
     return parser.parse_args()
 
 
 @pytest.fixture
-def tactic_runner():
+def simulated_test_runner():
     args = load_command_line_arguments()
-    runner = TacticTestRunner(enable_thunderscope=args.enable_thunderscope)
+    runner = SimulatorTestRunner(show_thunderscope=args.enable_visualizer)
     yield runner

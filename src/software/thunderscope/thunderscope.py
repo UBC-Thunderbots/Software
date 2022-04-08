@@ -241,7 +241,7 @@ class Thunderscope(object):
         )
         proto_unix_io.attach_unix_sender(runtime_dir + SSL_REFEREE_PATH, Referee)
         proto_unix_io.attach_unix_sender(runtime_dir + SENSOR_PROTO_PATH, SensorProto)
-        proto_unix_io.attach_unix_receiver(
+        proto_unix_io.attach_unix_sender(
             runtime_dir + TACTIC_OVERRIDE_PATH, AssignedTacticPlayControlParams
         )
 
@@ -263,12 +263,22 @@ class Thunderscope(object):
             self.blue_full_system_proto_unix_io,
             friendly_colour_yellow=False,
         )
+        self.configure_default_layout(
+            self.blue_full_system_dock_area,
+            self.blue_full_system_proto_unix_io,
+            False,
+        )
 
     def run_yellow_full_system(self, runtime_dir):
         self.yellow_full_system = self.__run_full_system(
             runtime_dir,
             self.yellow_full_system_proto_unix_io,
             friendly_colour_yellow=True,
+        )
+        self.configure_default_layout(
+            self.yellow_full_system_dock_area,
+            self.yellow_full_system_proto_unix_io,
+            True,
         )
 
     def run_er_force_simulator(
@@ -328,16 +338,17 @@ class Thunderscope(object):
     def run_gamecontroller(self):
         """Run the gamecontroller
         """
+        pass
 
-        def send_referee_command(data):
-            self.blue_full_system_proto_unix_io.send_proto(Referee, data)
-            self.yellow_full_system_proto_unix_io.send_proto(Referee, data)
+        # def send_referee_command(data):
+            # self.blue_full_system_proto_unix_io.send_proto(Referee, data)
+            # self.yellow_full_system_proto_unix_io.send_proto(Referee, data)
 
-        self.receive_referee_command = networking.SSLRefereeProtoListener(
-            "224.5.23.1", 10003, send_referee_command, True,
-        )
+        # self.receive_referee_command = networking.SSLRefereeProtoListener(
+            # "224.5.23.1", 10003, send_referee_command, True,
+        # )
 
-        self.gamecontroller = Popen(["/opt/tbotspython/gamecontroller"])
+        # self.gamecontroller = Popen(["/opt/tbotspython/gamecontroller"])
 
     def register_refresh_function(self, refresh_func):
         """Register the refresh functions to run at the refresh_interval_ms
@@ -398,6 +409,9 @@ class Thunderscope(object):
         proto_unix_io.register_observer(Obstacles, obstacles.obstacle_buffer)
         proto_unix_io.register_observer(
             PathVisualization, paths.path_visualization_buffer
+        )
+        proto_unix_io.register_observer(
+            ValidationProtoSet, validation.validation_set_buffer
         )
 
         # Register refresh functions
@@ -561,16 +575,6 @@ if __name__ == "__main__":
         thunderscope.run_yellow_full_system("/tmp/tbots/yellow")
         thunderscope.run_gamecontroller()
 
-        thunderscope.configure_default_layout(
-            thunderscope.blue_full_system_dock_area,
-            thunderscope.blue_full_system_proto_unix_io,
-            False,
-        )
-        thunderscope.configure_default_layout(
-            thunderscope.yellow_full_system_dock_area,
-            thunderscope.yellow_full_system_proto_unix_io,
-            True,
-        )
 
         # Load the specified layout or the default file. If the default layout
         # file doesn't exist, and no layout is provided, then just configure
@@ -602,13 +606,13 @@ if __name__ == "__main__":
             world_state = tbots_protobuf.create_world_state(
                 [geom.Point(3, y) for y in numpy.linspace(-2, 2, 6)],
                 [geom.Point(-3, y) for y in numpy.linspace(-2, 2, 6)],
+                geom.Point(0,0), geom.Vector(-5,5)
             )
             thunderscope.simulator_proto_unix_io.send_proto(WorldState, world_state)
 
             # Tick Simulation
             while True:
-                tick = SimulatorTick()
-                tick.milliseconds = 16
+                tick = SimulatorTick(milliseconds=16)
                 thunderscope.simulator_proto_unix_io.send_proto(SimulatorTick, tick)
                 time.sleep(0.015)
 
