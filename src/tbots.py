@@ -30,6 +30,7 @@ if __name__ == "__main__":
     # These are shortcut args for commonly used arguments on our tests
     # and full_system. All other arguments are passed through as-is
     # to the underlying binary/test that is being run (unknown_args)
+    parser.add_argument("-t", "--enable_thunderscope", action="store_true")
     parser.add_argument("-v", "--enable_visualizer", action="store_true")
     parser.add_argument("-s", "--stop_ai_on_start", action="store_true")
     args, unknown_args = parser.parse_known_args()
@@ -72,21 +73,19 @@ if __name__ == "__main__":
     if args.action in "run":
         command += ["--"]
 
-    # Handle stop_ai_on_start
+    bazel_arguments = unknown_args
+
     if args.stop_ai_on_start:
-        if args.action in "run":
-            command += ["--stop_ai_on_start"]
-        if args.action in "test":
-            command += ['--test_arg="--stop_ai_on_start"']
-
-    # Handle visualizer argument
+        bazel_arguments += ["--stop_ai_on_start"]
     if args.enable_visualizer:
-        if args.action in "run":
-            command += ["--enable_visualizer"]
-        if args.action in "test":
-            command += ['--test_arg="--enable_visualizer"']
+        bazel_arguments += ["--enable_visualizer"]
+    if args.enable_thunderscope:
+        bazel_arguments += ["--enable_thunderscope"]
 
-    command += unknown_args
+    if args.action in "test":
+        command += ['--test_arg="' + arg + '"' for arg in bazel_arguments]
+    else:
+        command += bazel_arguments
 
     # If the user requested a command dump, just print the command to run
     if args.print_command:
