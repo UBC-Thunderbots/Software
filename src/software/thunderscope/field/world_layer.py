@@ -33,6 +33,8 @@ class WorldLayer(FieldLayer):
         self.mouse_clicked = False
         self.mouse_click_pos = [0, 0]
         self.mouse_hover_pos = [0, 0]  # might not need later, see hoverMoveEvent
+        self.yellow_robot_id_text_items = {}
+        self.blue_robot_id_text_items = {}
 
     def keyPressEvent(self, event):
         """Detect when a key has been pressed (override)
@@ -200,34 +202,37 @@ class WorldLayer(FieldLayer):
             self.createCircle(0, 0, field.center_circle_radius * MM_PER_M)
         )
 
-    def draw_team(self, painter, color, team: Team):
+    def draw_team(self, painter, color, team: Team, robot_id_map):
 
         """Draw the team with robot IDs
 
         :param painter: The painter
         :param color: The color of the robots
         :param team: The team proto to draw
+        :param robot_id_map: map of robot_id -> text_item for the team being drawn
 
         """
         convert_degree = -16
 
         for robot in team.team_robots:
 
-            robot_id_font = painter.font()
-            robot_id_font.setPointSize(ROBOT_MAX_RADIUS / 7)
-            # setting a black background to keep ID visible over yellow robot
-            robot_id_text = pg.TextItem(
-                html='<span style="color: #FFF; background-color: #000">'
-                + str(robot.id)
-                + "</span>"
-            )
-            robot_id_text.setFont(robot_id_font)
-            robot_id_text.setPos(
-                (robot.current_state.global_position.x_meters * MM_PER_M)
-                - ROBOT_MAX_RADIUS,
-                robot.current_state.global_position.y_meters * MM_PER_M,
-            )
-            robot_id_text.setParentItem(self)
+            if robot.id not in robot_id_map:
+                robot_id_font = painter.font()
+                robot_id_font.setPointSize(ROBOT_MAX_RADIUS / 7)
+                # setting a black background to keep ID visible over yellow robot
+                robot_id_text = pg.TextItem(
+                    html='<span style="color: #FFF; background-color: #000">'
+                    + str(robot.id)
+                    + "</span>"
+                )
+                robot_id_text.setFont(robot_id_font)
+                robot_id_text.setPos(
+                    (robot.current_state.global_position.x_meters * MM_PER_M)
+                    - ROBOT_MAX_RADIUS,
+                    robot.current_state.global_position.y_meters * MM_PER_M,
+                )
+                robot_id_map[robot.id] = robot_id_text
+                robot_id_text.setParentItem(self)
 
             painter.setPen(pg.mkPen(color))
             painter.setBrush(pg.mkBrush(color))
@@ -284,5 +289,15 @@ class WorldLayer(FieldLayer):
 
         # TODO (#2399) Figure out which team color _we_ are and update the color
         # passed into the team.
-        self.draw_team(painter, Colors.YELLOW_ROBOT_COLOR, world.friendly_team)
-        self.draw_team(painter, Colors.BLUE_ROBOT_COLOR, world.enemy_team)
+        self.draw_team(
+            painter,
+            Colors.YELLOW_ROBOT_COLOR,
+            world.friendly_team,
+            self.yellow_robot_id_text_items,
+        )
+        self.draw_team(
+            painter,
+            Colors.BLUE_ROBOT_COLOR,
+            world.enemy_team,
+            self.blue_robot_id_text_items,
+        )
