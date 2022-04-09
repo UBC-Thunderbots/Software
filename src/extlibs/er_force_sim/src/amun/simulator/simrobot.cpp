@@ -639,7 +639,7 @@ void SimRobot::update(SSLProto::SSL_DetectionRobot *robot, float stddev_p,
     btTransform transform;
     m_motionState->getWorldTransform(transform);
     const btVector3 p    = transform.getOrigin() / SIMULATOR_SCALE + positionOffset;
-    const Vector p_noise = m_rng->normalVector(stddev_p);
+    const ErForceVector p_noise = m_rng->normalVector(stddev_p);
     robot->set_x((p.y() + p_noise.x) * 1000.0f);
     robot->set_y(-(p.x() + p_noise.y) * 1000.0f);
 

@@ -143,7 +143,7 @@ void SimBall::begin()
     {
         if (m_move.by_force())
         {
-            Vector pos;
+            ErForceVector pos;
             coordinates::fromVision(m_move, pos);
             // move ball by hand
             btVector3 force(pos.x, pos.y, m_move.z() + BALL_RADIUS);
@@ -157,7 +157,7 @@ void SimBall::begin()
             if (m_move.has_x())
             {
                 // set position
-                Vector cPos;
+                ErForceVector cPos;
                 coordinates::fromVision(m_move, cPos);
                 float height = BALL_RADIUS;
                 if (m_move.has_z())
@@ -171,7 +171,7 @@ void SimBall::begin()
             }
             if (m_move.has_vx())
             {
-                Vector vel;
+                ErForceVector vel;
                 coordinates::fromVisionVelocity(m_move, vel);
                 float vz = 0;
                 if (m_move.has_vz())
@@ -346,8 +346,8 @@ bool SimBall::addDetection(SSLProto::SSL_DetectionBall *ball, btVector3 pos, flo
     // add noise to coordinates
     // to convert from bullet coordinate system to ssl-vision rotate by 90 degree
     // ccw
-    const Vector noise = m_rng->normalVector(stddev);
-    coordinates::toVision(Vector(modX, modY) + noise, *ball);
+    const ErForceVector noise = m_rng->normalVector(stddev);
+    coordinates::toVision(ErForceVector(modX, modY) + noise, *ball);
     return true;
 }
 
