@@ -37,7 +37,7 @@ if __name__ == "__main__":
 
     bazel_queries = {
         "test": ["bazel", "query", "tests(//...)"],
-        "run": ["bazel", "query", "kind(.*_binary,//...)"],
+        "run": ["bazel", "query", "kind(.*,//...)"],
         "build": ["bazel", "query", "kind(.*_library,//...)"],
     }
 
