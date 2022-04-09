@@ -31,7 +31,12 @@ from software.thunderscope.field import (
 )
 from software.thunderscope.field.field import Field
 from software.thunderscope.log.g3log_widget import g3logWidget
+from software.thunderscope.robot_diagnostics.drive_and_dribbler_widget import (
+    DriveAndDribblerWidget,
+)
 from software.thunderscope.proto_receiver import ProtoReceiver
+from software.thunderscope.play.playinfo_widget import playInfoWidget
+from software.thunderscope.chicker.chicker import ChickerWidget
 
 
 class Thunderscope(object):
@@ -99,10 +104,12 @@ class Thunderscope(object):
         field_dock = self.setup_field_widget()
         log_dock = self.setup_log_widget()
         performance_dock = self.setup_performance_plot()
+        play_info_dock = self.setup_play_info()
 
         self.dock_area.addDock(field_dock, "left")
         self.dock_area.addDock(log_dock, "bottom", field_dock)
         self.dock_area.addDock(performance_dock, "right", log_dock)
+        self.dock_area.addDock(play_info_dock, "right", performance_dock)
 
     def setup_field_widget(self):
         """Setup the field widget with the constituent layers
@@ -184,13 +191,52 @@ class Thunderscope(object):
             NamedValue, self.named_value_plotter.named_value_buffer
         )
 
-        # Register refresh funcntion
+        # Register refresh function
         self.register_refresh_function(self.named_value_plotter.refresh)
 
         # Create and return dock
         named_value_plotter_dock = Dock("Performance", size=(500, 100))
         named_value_plotter_dock.addWidget(self.named_value_plotter.plot)
         return named_value_plotter_dock
+
+    def setup_play_info(self):
+        """Setup the play info widget
+
+        :returns: The play info widget setup in a dock
+
+        """
+
+        play_info = playInfoWidget()
+        play_info_dock = Dock("playInfo", size=(500, 100))
+        play_info_dock.addWidget(play_info)
+        self.proto_receiver.register_observer(PlayInfo, play_info.log_buffer)
+        self.register_refresh_function(play_info.refresh)
+        return play_info_dock
+
+    def setup_chicker_widget(self):
+        """Setup the chicker widget for robot diagnostics
+
+        :returns: The dock containing the chicker widget
+        """
+        # Create widget
+        self.chicker_widget = ChickerWidget()
+
+        # Register refresh function
+        self.register_refresh_function(self.chicker_widget.refresh)
+
+        # Create and return dock
+        chicker_dock = Dock("Chicker", size=(100, 100))
+        chicker_dock.addWidget(self.chicker_widget)
+
+        return chicker_dock
+
+    def setup_drive_and_dribbler_widget(self):
+        drive_and_dribbler = DriveAndDribblerWidget()
+
+        drive_and_dribbler_dock = Dock("robot diagnostics", size=(50, 100))
+        drive_and_dribbler_dock.addWidget(drive_and_dribbler)
+
+        return drive_and_dribbler_dock
 
     def show(self):
         self.window.show()
@@ -219,6 +265,8 @@ if __name__ == "__main__":
         log_dock = thunderscope.setup_log_widget()
         thunderscope.dock_area.addDock(log_dock)
 
+        drive_and_dribbler_dock = thunderscope.setup_drive_and_dribbler_widget()
+        thunderscope.dock_area.addDock(drive_and_dribbler_dock)
         thunderscope.show()
 
     elif args.run_simulator:
