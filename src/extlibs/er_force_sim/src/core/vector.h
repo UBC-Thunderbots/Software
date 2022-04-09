@@ -77,7 +77,8 @@ class ErForceVector
         return x * other.x + y * other.y;
     }
 
-    static float det(const ErForceVector &a, const ErForceVector &b, const ErForceVector &c)
+    static float det(const ErForceVector &a, const ErForceVector &b,
+                     const ErForceVector &c)
     {
         return a.x * b.y + b.x * c.y + c.x * a.y - a.x * c.y - b.x * a.y - c.x * b.y;
     }
@@ -177,8 +178,8 @@ inline ErForceVector ErForceVector::perpendicular() const
  */
 inline ErForceVector ErForceVector::normalized() const
 {
-    ErForceVector v      = *this;
-    const float l = length();
+    ErForceVector v = *this;
+    const float l   = length();
     if (l > 0)
     {
         v.x /= l;
