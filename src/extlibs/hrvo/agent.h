@@ -167,7 +167,8 @@ public: // TODO: protected:
 
     // Agent Properties
     Vector position_;
-    float radius_;
+    float radius_; // Simulated Radius
+    float min_radius_;
 
     // The actual current velocity of this Agent
     Vector velocity_;

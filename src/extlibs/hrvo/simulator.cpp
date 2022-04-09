@@ -47,15 +47,35 @@
 
 HRVOSimulator::HRVOSimulator(float time_step, const RobotConstants_t &robot_constants)
     : global_time(0.0f),
+      last_update_timestamp(Timestamp::fromSeconds(0.0)),
       time_step(time_step),
       robot_constants(robot_constants),
       reached_goals(false),
       kd_tree(std::make_unique<KdTree>(this))
 {
+    CHECK(time_step > 0.f);
 }
 
 void HRVOSimulator::updateWorld(const World &world)
 {
+//    if (global_time >= 2 * time_step)
+//    {
+//        return;
+//    }
+//    if (world.getMostRecentTimestamp() <= last_update_timestamp)
+//    {
+//        return;
+//    }
+//    std::cout << "updateWorld after = " << (world.getMostRecentTimestamp() - last_update_timestamp).toSeconds() << " sim time diff = " << global_time - last_time_velocity_updated << std::endl;
+//    std::cout << "updateWorld after = " << (world.getMostRecentTimestamp() - last_update_timestamp).toSeconds() << " sim time diff = " << ((global_time - last_time_velocity_updated) >= time_step) << std::endl;
+//    last_update_timestamp = world.getMostRecentTimestamp();
+//
+//    // Reset all friendly Agents to match the updated World
+//    friendly_robot_id_map.clear();
+//    enemy_robot_id_map.clear();
+
+
+    // TODO: Now that velocity updating bug is fixed, we can revert/update this function to add/remove agents properly
     const auto &friendly_team = world.friendlyTeam().getAllRobots();
     const auto &enemy_team    = world.enemyTeam().getAllRobots();
     // TODO (#2498): Update implementation to correctly support adding and removing agents
@@ -317,16 +337,17 @@ size_t HRVOSimulator::addLinearVelocityAgent(const Vector &position, float agent
 
 void HRVOSimulator::doStep()
 {
-    if (kd_tree == nullptr)
-    {
-        throw std::runtime_error(
-            "Simulation not initialized when attempting to do step.");
-    }
+//    std::cout << "doStep" << std::endl;
+//    if (kd_tree == nullptr)
+//    {
+//        throw std::runtime_error(
+//                "Simulation not initialized when attempting to do step.");
+//    }
 
-    if (time_step == 0.0f)
-    {
-        throw std::runtime_error("Time step not set when attempting to do step.");
-    }
+//    if (time_step == 0.0f)
+//    {
+//        throw std::runtime_error("Time step not set when attempting to do step.");
+//    }
 
     reached_goals = true;
 
@@ -385,28 +406,39 @@ void HRVOSimulator::visualize(unsigned int robot_id) const
             *(obstacle_proto.add_polygon()) = *createPolygonProto(obstacle);
         }
 
-        for (auto &candidate_circle : friendly_agent->getCandidateVelocitiesAsCircles())
+//        for (auto &candidate_circle : friendly_agent->getCandidateVelocitiesAsCircles())
+//        {
+//            *(obstacle_proto.add_circle()) = *createCircleProto(candidate_circle);
+//        }
+
+        *(obstacle_proto.add_circle()) = *createCircleProto(Circle(Point(friendly_agent->prev_vel + friendly_agent->getPosition()), friendly_agent->max_accel_ * time_step));
+        *(obstacle_proto.add_circle()) = *createCircleProto(Circle(Point(friendly_agent->pref_velocity_ + friendly_agent->getPosition()), 0.03));
+        *(obstacle_proto.add_circle()) = *createCircleProto(Circle(Point(friendly_agent->new_velocity_ + friendly_agent->getPosition()), 0.05));
+        *(obstacle_proto.add_circle()) = *createCircleProto(Circle(Point(friendly_agent->velocity_ + friendly_agent->getPosition()), 0.07));
+        auto path_point_opt = friendly_agent->getPath().getCurrentPathPoint();
+        if (path_point_opt.has_value())
         {
-            *(obstacle_proto.add_circle()) = *createCircleProto(candidate_circle);
+//            *(obstacle_proto.add_circle()) = *createCircleProto(Circle(Point(path_point_opt->getPosition()), 0.06));
         }
-        LOG(VISUALIZE) << *createNamedValue(
-                    "hrvo_accel",
-                    static_cast<float>((friendly_agent->velocity_ - friendly_agent->prev_vel).length() / time_step));
-        LOG(VISUALIZE) << *createNamedValue(
-                    "max_allowed_speed",
-                    static_cast<float>(friendly_agent->curr_max_allowed_speed));
-        LOG(VISUALIZE) << *createNamedValue(
-                    "pref_velocity_",
-                    static_cast<float>(friendly_agent->pref_velocity_.length()));
-        LOG(VISUALIZE) << *createNamedValue(
-                    "hrvo velocity",
-                    static_cast<float>(friendly_agent->velocity_.length()));
-        LOG(VISUALIZE) << *createNamedValue(
-                    "dist_remaining_to_goal",
-                    static_cast<float>(friendly_agent->dist_remaining_to_goal));
-        LOG(VISUALIZE) << *createNamedValue(
-                    "decel_dist",
-                    static_cast<float>(friendly_agent->decel_dist));
+
+//        LOG(VISUALIZE) << *createNamedValue(
+//                    "hrvo_accel",
+//                    static_cast<float>((friendly_agent->velocity_ - friendly_agent->prev_vel).length() / time_step));
+//        LOG(VISUALIZE) << *createNamedValue(
+//                    "max_allowed_speed",
+//                    static_cast<float>(friendly_agent->curr_max_allowed_speed));
+//        LOG(VISUALIZE) << *createNamedValue(
+//                    "pref_velocity_",
+//                    static_cast<float>(friendly_agent->pref_velocity_.length()));
+//        LOG(VISUALIZE) << *createNamedValue(
+//                    "hrvo velocity",
+//                    static_cast<float>(friendly_agent->velocity_.length()));
+//        LOG(VISUALIZE) << *createNamedValue(
+//                    "dist_remaining_to_goal",
+//                    static_cast<float>(friendly_agent->dist_remaining_to_goal));
+//        LOG(VISUALIZE) << *createNamedValue(
+//                    "decel_dist",
+//                    static_cast<float>(friendly_agent->decel_dist));
     }
 
     // Add circles representing agents

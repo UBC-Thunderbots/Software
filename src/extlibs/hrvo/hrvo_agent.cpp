@@ -192,6 +192,7 @@ void HRVOAgent::computeNewVelocity()
     candidates_.insert(std::make_pair(
         (pref_velocity_ - candidate.position_).lengthSquared(), candidate));
 
+    // The ones close to the robot when stationary
     for (int i = 0; i < static_cast<int>(velocityObstacles_.size()); ++i)
     {
         candidate.velocityObstacle1_ = i;
@@ -231,193 +232,195 @@ void HRVOAgent::computeNewVelocity()
         }
     }
 
-    for (int j = 0; j < static_cast<int>(velocityObstacles_.size()); ++j)
-    {
-        candidate.velocityObstacle1_ = std::numeric_limits<int>::max();
-        candidate.velocityObstacle2_ = j;
+    // // The ones far away from the robot when stationary
+//    for (int j = 0; j < static_cast<int>(velocityObstacles_.size()); ++j)
+//    {
+//        candidate.velocityObstacle1_ = std::numeric_limits<int>::max();
+//        candidate.velocityObstacle2_ = j;
+//
+//        float discriminant =
+//            max_speed_ * max_speed_ -
+//            std::pow(
+//                (velocityObstacles_[j].apex_).determinant(velocityObstacles_[j].side1_),
+//                2.f);
+//
+//        if (discriminant > 0.0f)
+//        {
+//            const float t1 =
+//                -(velocityObstacles_[j].apex_.dot(velocityObstacles_[j].side1_)) +
+//                std::sqrt(discriminant);
+//            const float t2 =
+//                -(velocityObstacles_[j].apex_.dot(velocityObstacles_[j].side1_)) -
+//                std::sqrt(discriminant);
+//
+//            if (t1 >= 0.0f)
+//            {
+//                candidate.position_ =
+//                    velocityObstacles_[j].apex_ + t1 * velocityObstacles_[j].side1_;
+//                candidates_.insert(std::make_pair(
+//                    (pref_velocity_ - candidate.position_).lengthSquared(), candidate));
+//            }
+//
+//            if (t2 >= 0.0f)
+//            {
+//                candidate.position_ =
+//                    velocityObstacles_[j].apex_ + t2 * velocityObstacles_[j].side1_;
+//                candidates_.insert(std::make_pair(
+//                    (pref_velocity_ - candidate.position_).lengthSquared(), candidate));
+//            }
+//        }
+//
+//        discriminant =
+//            max_speed_ * max_speed_ -
+//            std::pow(
+//                (velocityObstacles_[j].apex_).determinant(velocityObstacles_[j].side2_),
+//                2.f);
+//
+//        if (discriminant > 0.0f)
+//        {
+//            const float t1 =
+//                -(velocityObstacles_[j].apex_.dot(velocityObstacles_[j].side2_)) +
+//                std::sqrt(discriminant);
+//            const float t2 =
+//                -(velocityObstacles_[j].apex_.dot(velocityObstacles_[j].side2_)) -
+//                std::sqrt(discriminant);
+//
+//            if (t1 >= 0.0f)
+//            {
+//                candidate.position_ =
+//                    velocityObstacles_[j].apex_ + t1 * velocityObstacles_[j].side2_;
+//                candidates_.insert(std::make_pair(
+//                    (pref_velocity_ - candidate.position_).lengthSquared(), candidate));
+//            }
+//
+//            if (t2 >= 0.0f)
+//            {
+//                candidate.position_ =
+//                    velocityObstacles_[j].apex_ + t2 * velocityObstacles_[j].side2_;
+//                candidates_.insert(std::make_pair(
+//                    (pref_velocity_ - candidate.position_).lengthSquared(), candidate));
+//            }
+//        }
+//    }
 
-        float discriminant =
-            max_speed_ * max_speed_ -
-            std::pow(
-                (velocityObstacles_[j].apex_).determinant(velocityObstacles_[j].side1_),
-                2.f);
-
-        if (discriminant > 0.0f)
-        {
-            const float t1 =
-                -(velocityObstacles_[j].apex_.dot(velocityObstacles_[j].side1_)) +
-                std::sqrt(discriminant);
-            const float t2 =
-                -(velocityObstacles_[j].apex_.dot(velocityObstacles_[j].side1_)) -
-                std::sqrt(discriminant);
-
-            if (t1 >= 0.0f)
-            {
-                candidate.position_ =
-                    velocityObstacles_[j].apex_ + t1 * velocityObstacles_[j].side1_;
-                candidates_.insert(std::make_pair(
-                    (pref_velocity_ - candidate.position_).lengthSquared(), candidate));
-            }
-
-            if (t2 >= 0.0f)
-            {
-                candidate.position_ =
-                    velocityObstacles_[j].apex_ + t2 * velocityObstacles_[j].side1_;
-                candidates_.insert(std::make_pair(
-                    (pref_velocity_ - candidate.position_).lengthSquared(), candidate));
-            }
-        }
-
-        discriminant =
-            max_speed_ * max_speed_ -
-            std::pow(
-                (velocityObstacles_[j].apex_).determinant(velocityObstacles_[j].side2_),
-                2.f);
-
-        if (discriminant > 0.0f)
-        {
-            const float t1 =
-                -(velocityObstacles_[j].apex_.dot(velocityObstacles_[j].side2_)) +
-                std::sqrt(discriminant);
-            const float t2 =
-                -(velocityObstacles_[j].apex_.dot(velocityObstacles_[j].side2_)) -
-                std::sqrt(discriminant);
-
-            if (t1 >= 0.0f)
-            {
-                candidate.position_ =
-                    velocityObstacles_[j].apex_ + t1 * velocityObstacles_[j].side2_;
-                candidates_.insert(std::make_pair(
-                    (pref_velocity_ - candidate.position_).lengthSquared(), candidate));
-            }
-
-            if (t2 >= 0.0f)
-            {
-                candidate.position_ =
-                    velocityObstacles_[j].apex_ + t2 * velocityObstacles_[j].side2_;
-                candidates_.insert(std::make_pair(
-                    (pref_velocity_ - candidate.position_).lengthSquared(), candidate));
-            }
-        }
-    }
-
-    for (int i = 0; i < static_cast<int>(velocityObstacles_.size()) - 1; ++i)
-    {
-        for (int j = i + 1; j < static_cast<int>(velocityObstacles_.size()); ++j)
-        {
-            candidate.velocityObstacle1_ = i;
-            candidate.velocityObstacle2_ = j;
-
-            float d =
-                (velocityObstacles_[i].side1_).determinant(velocityObstacles_[j].side1_);
-
-            if (d != 0.0f)
-            {
-                const float s =
-                    (velocityObstacles_[j].apex_ - velocityObstacles_[i].apex_)
-                        .determinant(velocityObstacles_[j].side1_) /
-                    d;
-                const float t =
-                    (velocityObstacles_[j].apex_ - velocityObstacles_[i].apex_)
-                        .determinant(velocityObstacles_[i].side1_) /
-                    d;
-
-                if (s >= 0.0f && t >= 0.0f)
-                {
-                    candidate.position_ =
-                        velocityObstacles_[i].apex_ + s * velocityObstacles_[i].side1_;
-
-                    if (candidate.position_.lengthSquared() < max_speed_ * max_speed_)
-                    {
-                        candidates_.insert(std::make_pair(
-                            (pref_velocity_ - candidate.position_).lengthSquared(),
-                            candidate));
-                    }
-                }
-            }
-
-            d = (velocityObstacles_[i].side2_).determinant(velocityObstacles_[j].side1_);
-
-            if (d != 0.0f)
-            {
-                const float s =
-                    (velocityObstacles_[j].apex_ - velocityObstacles_[i].apex_)
-                        .determinant(velocityObstacles_[j].side1_) /
-                    d;
-                const float t =
-                    (velocityObstacles_[j].apex_ - velocityObstacles_[i].apex_)
-                        .determinant(velocityObstacles_[i].side2_) /
-                    d;
-
-                if (s >= 0.0f && t >= 0.0f)
-                {
-                    candidate.position_ =
-                        velocityObstacles_[i].apex_ + s * velocityObstacles_[i].side2_;
-
-                    if (candidate.position_.lengthSquared() < max_speed_ * max_speed_)
-                    {
-                        candidates_.insert(std::make_pair(
-                            (pref_velocity_ - candidate.position_).lengthSquared(),
-                            candidate));
-                    }
-                }
-            }
-
-            d = (velocityObstacles_[i].side1_).determinant(velocityObstacles_[j].side2_);
-
-            if (d != 0.0f)
-            {
-                const float s =
-                    (velocityObstacles_[j].apex_ - velocityObstacles_[i].apex_)
-                        .determinant(velocityObstacles_[j].side2_) /
-                    d;
-                const float t =
-                    (velocityObstacles_[j].apex_ - velocityObstacles_[i].apex_)
-                        .determinant(velocityObstacles_[i].side1_) /
-                    d;
-
-                if (s >= 0.0f && t >= 0.0f)
-                {
-                    candidate.position_ =
-                        velocityObstacles_[i].apex_ + s * velocityObstacles_[i].side1_;
-
-                    if (candidate.position_.lengthSquared() < max_speed_ * max_speed_)
-                    {
-                        candidates_.insert(std::make_pair(
-                            (pref_velocity_ - candidate.position_).lengthSquared(),
-                            candidate));
-                    }
-                }
-            }
-
-            d = (velocityObstacles_[i].side2_).determinant(velocityObstacles_[j].side2_);
-
-            if (d != 0.0f)
-            {
-                const float s =
-                    (velocityObstacles_[j].apex_ - velocityObstacles_[i].apex_)
-                        .determinant(velocityObstacles_[j].side2_) /
-                    d;
-                const float t =
-                    (velocityObstacles_[j].apex_ - velocityObstacles_[i].apex_)
-                        .determinant(velocityObstacles_[i].side2_) /
-                    d;
-
-                if (s >= 0.0f && t >= 0.0f)
-                {
-                    candidate.position_ =
-                        velocityObstacles_[i].apex_ + s * velocityObstacles_[i].side2_;
-
-                    if (candidate.position_.lengthSquared() < max_speed_ * max_speed_)
-                    {
-                        candidates_.insert(std::make_pair(
-                            (pref_velocity_ - candidate.position_).lengthSquared(),
-                            candidate));
-                    }
-                }
-            }
-        }
-    }
+    // // The one right on top of the robot
+//    for (int i = 0; i < static_cast<int>(velocityObstacles_.size()) - 1; ++i)
+//    {
+//        for (int j = i + 1; j < static_cast<int>(velocityObstacles_.size()); ++j)
+//        {
+//            candidate.velocityObstacle1_ = i;
+//            candidate.velocityObstacle2_ = j;
+//
+//            float d =
+//                (velocityObstacles_[i].side1_).determinant(velocityObstacles_[j].side1_);
+//
+//            if (d != 0.0f)
+//            {
+//                const float s =
+//                    (velocityObstacles_[j].apex_ - velocityObstacles_[i].apex_)
+//                        .determinant(velocityObstacles_[j].side1_) /
+//                    d;
+//                const float t =
+//                    (velocityObstacles_[j].apex_ - velocityObstacles_[i].apex_)
+//                        .determinant(velocityObstacles_[i].side1_) /
+//                    d;
+//
+//                if (s >= 0.0f && t >= 0.0f)
+//                {
+//                    candidate.position_ =
+//                        velocityObstacles_[i].apex_ + s * velocityObstacles_[i].side1_;
+//
+//                    if (candidate.position_.lengthSquared() < max_speed_ * max_speed_)
+//                    {
+//                        candidates_.insert(std::make_pair(
+//                            (pref_velocity_ - candidate.position_).lengthSquared(),
+//                            candidate));
+//                    }
+//                }
+//            }
+//
+//            d = (velocityObstacles_[i].side2_).determinant(velocityObstacles_[j].side1_);
+//
+//            if (d != 0.0f)
+//            {
+//                const float s =
+//                    (velocityObstacles_[j].apex_ - velocityObstacles_[i].apex_)
+//                        .determinant(velocityObstacles_[j].side1_) /
+//                    d;
+//                const float t =
+//                    (velocityObstacles_[j].apex_ - velocityObstacles_[i].apex_)
+//                        .determinant(velocityObstacles_[i].side2_) /
+//                    d;
+//
+//                if (s >= 0.0f && t >= 0.0f)
+//                {
+//                    candidate.position_ =
+//                        velocityObstacles_[i].apex_ + s * velocityObstacles_[i].side2_;
+//
+//                    if (candidate.position_.lengthSquared() < max_speed_ * max_speed_)
+//                    {
+//                        candidates_.insert(std::make_pair(
+//                            (pref_velocity_ - candidate.position_).lengthSquared(),
+//                            candidate));
+//                    }
+//                }
+//            }
+//
+//            d = (velocityObstacles_[i].side1_).determinant(velocityObstacles_[j].side2_);
+//
+//            if (d != 0.0f)
+//            {
+//                const float s =
+//                    (velocityObstacles_[j].apex_ - velocityObstacles_[i].apex_)
+//                        .determinant(velocityObstacles_[j].side2_) /
+//                    d;
+//                const float t =
+//                    (velocityObstacles_[j].apex_ - velocityObstacles_[i].apex_)
+//                        .determinant(velocityObstacles_[i].side1_) /
+//                    d;
+//
+//                if (s >= 0.0f && t >= 0.0f)
+//                {
+//                    candidate.position_ =
+//                        velocityObstacles_[i].apex_ + s * velocityObstacles_[i].side1_;
+//
+//                    if (candidate.position_.lengthSquared() < max_speed_ * max_speed_)
+//                    {
+//                        candidates_.insert(std::make_pair(
+//                            (pref_velocity_ - candidate.position_).lengthSquared(),
+//                            candidate));
+//                    }
+//                }
+//            }
+//
+//            d = (velocityObstacles_[i].side2_).determinant(velocityObstacles_[j].side2_);
+//
+//            if (d != 0.0f)
+//            {
+//                const float s =
+//                    (velocityObstacles_[j].apex_ - velocityObstacles_[i].apex_)
+//                        .determinant(velocityObstacles_[j].side2_) /
+//                    d;
+//                const float t =
+//                    (velocityObstacles_[j].apex_ - velocityObstacles_[i].apex_)
+//                        .determinant(velocityObstacles_[i].side2_) /
+//                    d;
+//
+//                if (s >= 0.0f && t >= 0.0f)
+//                {
+//                    candidate.position_ =
+//                        velocityObstacles_[i].apex_ + s * velocityObstacles_[i].side2_;
+//
+//                    if (candidate.position_.lengthSquared() < max_speed_ * max_speed_)
+//                    {
+//                        candidates_.insert(std::make_pair(
+//                            (pref_velocity_ - candidate.position_).lengthSquared(),
+//                            candidate));
+//                    }
+//                }
+//            }
+//        }
+//    }
 
     int optimal = -1;
 
@@ -459,7 +462,6 @@ void HRVOAgent::computeNewVelocity()
 void HRVOAgent::computePreferredVelocity()
 {
     auto path_point_opt = path.getCurrentPathPoint();
-
     if (pref_speed_ <= 0.01f || max_accel_ <= 0.01f || path_point_opt == std::nullopt)
     {
         // Used to avoid edge cases with division by zero
@@ -469,7 +471,6 @@ void HRVOAgent::computePreferredVelocity()
 
     Vector goal_position = path_point_opt.value().getPosition();
     float speed_at_dest   = path_point_opt.value().getSpeed();
-    std::cout << "speed_at_dest=" << speed_at_dest << std::endl;
 
     Vector vector_to_dest = goal_position - position_;
     // TODO: May be a problem if the goal is closer than max_accel away

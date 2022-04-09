@@ -282,6 +282,7 @@ class HRVOSimulator
 
     // The last time which the velocity of the robot was updated
     float last_time_velocity_updated;
+    Timestamp last_update_timestamp;
 
     // True if all agents have reached their destination
     bool reached_goals;
