@@ -225,14 +225,14 @@ class WorldLayer(FieldLayer):
                     + str(robot.id)
                     + "</span>"
                 )
-                robot_id_text.setFont(robot_id_font)
-                robot_id_text.setPos(
-                    (robot.current_state.global_position.x_meters * MM_PER_M)
-                    - ROBOT_MAX_RADIUS,
-                    robot.current_state.global_position.y_meters * MM_PER_M,
-                )
                 robot_id_map[robot.id] = robot_id_text
                 robot_id_text.setParentItem(self)
+
+            robot_id_map[robot.id].setPos(
+                (robot.current_state.global_position.x_meters * MM_PER_M)
+                - ROBOT_MAX_RADIUS,
+                robot.current_state.global_position.y_meters * MM_PER_M,
+            )
 
             painter.setPen(pg.mkPen(color))
             painter.setBrush(pg.mkBrush(color))
