@@ -1,7 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "simulated_test_fixture",
+    name = "simulated_test_fixture_cpp",
     testonly = True,
     srcs = ["simulated_test_fixture.cpp"],
     hdrs = ["simulated_test_fixture.h"],
@@ -43,8 +43,10 @@ cc_library(
         "//software/time:duration",
         "//proto/logging:proto_logger",
         "//shared/test_util:tbots_gtest_main",
+        "//shared/test_util",
         # TODO (#1889) Remove this dep after optional params are implemented
         "//software/ai/hl/stp/play:halt_play",
+        "//proto/message_translation:er_force_world",
     ],
 )
 
@@ -54,7 +56,7 @@ cc_library(
     srcs = ["simulated_play_test_fixture.cpp"],
     hdrs = ["simulated_play_test_fixture.h"],
     deps = [
-        ":simulated_test_fixture",
+        ":simulated_test_fixture_cpp",
         "//software/ai",
         "@gtest",
     ],
@@ -78,7 +80,7 @@ cc_library(
     srcs = ["simulated_tactic_test_fixture.cpp"],
     hdrs = ["simulated_tactic_test_fixture.h"],
     deps = [
-        ":simulated_test_fixture",
+        ":simulated_test_fixture_cpp",
         "//software/ai/hl/stp/tactic",
         "//software/ai/navigator",
         "//software/ai/navigator/path_manager:velocity_obstacle_path_manager",
@@ -111,5 +113,85 @@ cc_test(
         "//software/time:duration",
         "//software/time:timestamp",
         "//software/world",
+    ],
+)
+
+py_library(
+    name = "simulated_test_fixture",
+    srcs = [
+        "simulated_test_fixture.py",
+    ],
+    data = [
+        "//software:py_constants.so",
+    ],
+    deps = [
+        ":er_force_simulator",
+        ":full_system",
+        "//proto:import_all_protos",
+        "//software/logger:py_logger",
+        "//software/networking:threaded_unix_listener_py",
+        "//software/networking:threaded_unix_sender_py",
+        "//software/simulated_tests:validation",
+        "//software/thunderscope",
+    ],
+)
+
+py_library(
+    name = "er_force_simulator",
+    srcs = [
+        "er_force_simulator.py",
+    ],
+    data = [
+        "//software:er_force_simulator_main",
+        "//software:py_constants.so",
+    ],
+    deps = [
+        "//proto:software_py_proto",
+        "//proto:tbots_py_proto",
+        "//software/logger:py_logger",
+        "//software/networking:threaded_unix_listener_py",
+        "//software/networking:threaded_unix_sender_py",
+    ],
+)
+
+py_library(
+    name = "full_system",
+    srcs = [
+        "full_system.py",
+    ],
+    data = [
+        "//software:py_constants.so",
+        "//software:python_bindings.so",
+        "//software:unix_full_system",
+    ],
+    deps = [
+        "//proto:software_py_proto",
+        "//proto:tbots_py_proto",
+        "//software/logger:py_logger",
+        "//software/networking:threaded_unix_listener_py",
+        "//software/networking:threaded_unix_sender_py",
+    ],
+)
+
+py_library(
+    name = "validation",
+    srcs = [
+        "ball_enters_region.py",
+        "ball_moves_forward.py",
+        "ball_speed_threshold.py",
+        "excessive_dribbling.py",
+        "friendly_has_ball_possession.py",
+        "robot_enters_region.py",
+        "robot_speed_threshold.py",
+        "validation.py",
+    ],
+    data = [
+        "//software:py_constants.so",
+        "//software:python_bindings.so",
+    ],
+    deps = [
+        "//proto:software_py_proto",
+        "//proto:tbots_py_proto",
+        "//software/logger:py_logger",
     ],
 )

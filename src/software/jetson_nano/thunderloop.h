@@ -7,6 +7,7 @@
 #include "shared/2021_robot_constants.h"
 #include "shared/constants.h"
 #include "software/jetson_nano/primitive_executor.h"
+#include "software/jetson_nano/redis/redis_client.h"
 #include "software/jetson_nano/services/motor.h"
 #include "software/jetson_nano/services/network.h"
 #include "software/logger/logger.h"
@@ -56,6 +57,9 @@ class Thunderloop
     // Services
     std::unique_ptr<MotorService> motor_service_;
     std::unique_ptr<NetworkService> network_service_;
+
+    // Clients
+    std::unique_ptr<RedisClient> redis_client_;
 
    private:
     /*
