@@ -156,9 +156,6 @@ class HRVOAgent : public Agent
     std::set<std::pair<float, std::size_t>> neighbors_;
     std::vector<VelocityObstacle> velocityObstacles_;
 
-//    TODO: addedd for debugging
-    float in_decel_zone = 0.f;
-
     friend class KdTree;
     friend class Simulator;
 };

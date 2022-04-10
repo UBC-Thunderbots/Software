@@ -484,11 +484,6 @@ void HRVOAgent::computePreferredVelocity()
         std::abs((std::pow(speed_at_dest, 2) - std::pow(pref_speed_, 2)) / // TODO: Change to velocity_.length()
                  (2 * max_accel_));
 
-    dist_remaining_to_goal = distance_to_dest;
-    decel_dist = start_linear_deceleration_distance;
-
-    // TODO: Debugging
-    in_decel_zone = distance_to_dest < start_linear_deceleration_distance ? 1.0f : 0.f;
     if (distance_to_dest < start_linear_deceleration_distance)
     {
         // velocity given linear deceleration, distance away from goal, and desired final
@@ -510,11 +505,6 @@ void HRVOAgent::computePreferredVelocity()
             // acceleration constraint
             pref_velocity_ =
                 velocity_ + dv.normalize(max_dist_per_tick);
-        }
-
-        if (pref_velocity_.length() > curr_pref_speed)
-        {
-            std::cout << pref_velocity_.length() - curr_pref_speed << std::endl;
         }
     }
     else
