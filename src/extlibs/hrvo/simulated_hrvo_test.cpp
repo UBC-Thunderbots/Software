@@ -228,7 +228,7 @@ TEST_F(SimulatedHRVOTest, test_zig_zag_movement)
     double robot_y_delta = 0.2;
 
     Point destination      = Point(front_wall_x + gate_3 + 0.5, 0);
-    Point initial_position = Point(2.4, 0);
+    Point initial_position = Point(front_wall_x - 0.5, 0);
     BallState ball_state(Point(0, -2), Vector(0, 0));
     auto friendly_robots =
         TestUtil::createStationaryRobotStatesWithId({Point(-3, 0), initial_position});
@@ -307,7 +307,7 @@ TEST_F(SimulatedHRVOTest, test_start_in_local_minima_with_open_end)
     auto friendly_robots =
         TestUtil::createStationaryRobotStatesWithId({Point(-3, 0), initial_position});
     auto enemy_robots = TestUtil::createStationaryRobotStatesWithId(
-        {Point(1.3, 0), Point(1, 0.3), Point(1, 0.6), Point(0.7, 0.6), Point(1, -0.3),
+        {Point(1.55, 0), Point(1, 0.3), Point(1, 0.6), Point(0.7, 0.6), Point(1, -0.3),
          Point(1, -0.6), Point(0.7, -0.6)});
 
     auto tactic = std::make_shared<MoveTactic>();
@@ -315,7 +315,18 @@ TEST_F(SimulatedHRVOTest, test_start_in_local_minima_with_open_end)
     setTactic(tactic);
     setFriendlyRobotId(1);
 
-    std::vector<ValidationFunction> terminating_validation_functions     = {};
+    std::vector<ValidationFunction> terminating_validation_functions     = {
+            [destination, tactic](std::shared_ptr<World> world_ptr,
+                                  ValidationCoroutine::push_type& yield) {
+                // Small rectangle around the destination point that the robot should be
+                // stationary within for 15 ticks
+                float threshold = 0.05f;
+                Rectangle expected_final_position(
+                        Point(destination.x() - threshold, destination.y() - threshold),
+                        Point(destination.x() + threshold, destination.y() + threshold));
+                robotStationaryInPolygon(1, expected_final_position, 15, world_ptr, yield);
+            }
+    };
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
     runTest(field_type, ball_state, friendly_robots, enemy_robots,
