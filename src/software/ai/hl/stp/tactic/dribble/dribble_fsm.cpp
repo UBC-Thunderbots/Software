@@ -142,10 +142,7 @@ void DribbleFSM::startDribble(const Update &event)
 
 bool DribbleFSM::havePossession(const Update &event)
 {
-    return event.common.robot.isNearDribbler(
-        event.common.world.ball().position(),
-        BALL_MAX_RADIUS_METERS -
-            2 * BALL_MAX_RADIUS_METERS * MAX_FRACTION_OF_BALL_COVERED_BY_ROBOT);
+    return event.common.robot.isNearDribbler(event.common.world.ball().position());
 }
 
 bool DribbleFSM::lostPossession(const Update &event)
