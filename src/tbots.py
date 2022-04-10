@@ -3,6 +3,7 @@
 import os
 import sys
 import iterfzf
+import itertools
 from subprocess import PIPE, run, check_call
 import argparse
 from thefuzz import fuzz
@@ -35,15 +36,27 @@ if __name__ == "__main__":
     parser.add_argument("-s", "--stop_ai_on_start", action="store_true")
     args, unknown_args = parser.parse_known_args()
 
+    test_query = ["bazel", "query", "tests(//...)"]
+    binary_query = ["bazel", "query", "kind(.*_binary,//...)"]
+    library_query = ["bazel", "query", "kind(.*_library,//...)"]
+
     bazel_queries = {
-        "test": ["bazel", "query", "tests(//...)"],
-        "run": ["bazel", "query", "kind(.*,//...)"],
-        "build": ["bazel", "query", "kind(.*_library,//...)"],
+        "test": [test_query],
+        "run": [test_query, binary_query],
+        "build": [library_query, test_query, binary_query],
     }
 
     # Run the appropriate bazel query and ask thefuzz to find the best matching
     # target, gauranteed to return 1 result because we set limit=1
-    targets = run(bazel_queries[args.action], stdout=PIPE).stdout.split(b"\n")
+    # Combine results of multiple queries with itertools.chain
+    targets = list(
+        itertools.chain.from_iterable(
+            [
+                run(query, stdout=PIPE).stdout.split(b"\n")
+                for query in bazel_queries[args.action]
+            ]
+        )
+    )
     target, confidence = process.extract(args.search_query, targets, limit=1)[0]
     target = str(target, encoding="utf-8")
 
