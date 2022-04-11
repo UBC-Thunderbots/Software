@@ -15,7 +15,14 @@
 class DribbleTactic : public Tactic
 {
    public:
-    explicit DribbleTactic();
+    /**
+     * Creates a new DribbleTactic
+     *
+     * @param ai_config The AI configuration
+     */
+    explicit DribbleTactic(std::shared_ptr<const AiConfig> ai_config);
+
+    DribbleTactic() = delete;
 
     /**
      * Updates control params for optionally moving the ball to a dribble destination and
