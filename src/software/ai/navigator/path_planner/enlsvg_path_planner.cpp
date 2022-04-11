@@ -64,10 +64,10 @@ bool EnlsvgPathPlanner::isCoordNavigable(const EnlsvgPoint &ep) const
 std::optional<Path> EnlsvgPathPlanner::findPath(const Point &start,
                                                 const Point &end) const
 {
-    // Find closest unblocked points in case the start and end positions are inside
-    // obstacles
     EnlsvgPoint enlsvg_start = convertPointToEnlsvgPoint(start);
     EnlsvgPoint enlsvg_end   = convertPointToEnlsvgPoint(end);
+    
+    // closest unblocked points to requested start and end
     auto new_start           = findClosestUnblockedEnlsvgPoint(enlsvg_start);
     auto new_end             = findClosestUnblockedEnlsvgPoint(enlsvg_end);
 
@@ -80,7 +80,7 @@ std::optional<Path> EnlsvgPathPlanner::findPath(const Point &start,
     }
     
     // If the start and end points are very close together and are unblocked, just return a straight line path
-    if ((start != end) && (enlsvg_start == enlsvg_end) && (new_start == new_end))
+    if ((start != end) && (enlsvg_start == enlsvg_end) && (new_start == enlsvg_start) && (new_end == enlsvg_end))
     {
         return Path({start, end});
     }
