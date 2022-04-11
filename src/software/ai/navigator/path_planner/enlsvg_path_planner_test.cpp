@@ -739,3 +739,19 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_speed_test)
     std::cout << "Took " << duration_ms << "ms to run, average time of " << avg_ms << "ms"
               << std::endl;
 }
+
+TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_close_start_end)
+{
+    Field field = Field::createSSLDivisionBField();
+    Point start{4.39, -2.88},dest {4.37, -2.86};
+    std::vector<ObstaclePtr> obstacles = {};
+    Rectangle navigable_area           = field.fieldBoundary();
+    EnlsvgPathPlanner planner =
+        EnlsvgPathPlanner(navigable_area, obstacles, field.boundaryMargin());
+    auto path = planner.findPath(start, dest);
+    EXPECT_TRUE(path != std::nullopt);
+    std::vector<Point> path_points = path->getKnots();
+    EXPECT_EQ(2, path_points.size());
+    EXPECT_EQ(start, path->getStartPoint());
+    EXPECT_EQ(dest, path->getEndPoint());
+}

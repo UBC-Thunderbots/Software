@@ -78,6 +78,12 @@ std::optional<Path> EnlsvgPathPlanner::findPath(const Point &start,
             << "within the navigable area; no path found" << std::endl;
         return std::nullopt;
     }
+    
+    // If the start and end points are very close together and are unblocked, just return a straight line path
+    if ((start != end) && (enlsvg_start == enlsvg_end) && (new_start == new_end))
+    {
+        return Path({start, end});
+    }
 
     EnlsvgPath enlsvgPath =
         enlsvg_algo->computePath(*enlsvg_mem, new_start.value().x, new_start.value().y,
