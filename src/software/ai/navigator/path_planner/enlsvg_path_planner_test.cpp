@@ -743,7 +743,7 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_speed_test)
 TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_close_start_end)
 {
     Field field = Field::createSSLDivisionBField();
-    Point start{4.39, -2.88},dest {4.37, -2.86};
+    Point start{4.39, -2.88}, dest{4.37, -2.86};
     std::vector<ObstaclePtr> obstacles = {};
     Rectangle navigable_area           = field.fieldBoundary();
     EnlsvgPathPlanner planner =
@@ -759,12 +759,12 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_close_start_end)
 TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_close_start_end_but_blocked)
 {
     Field field = Field::createSSLDivisionBField();
-    Point start{4.39, -2.88},dest {4.37, -2.86};
+    Point start{4.39, -2.88}, dest{4.37, -2.86};
     std::vector<ObstaclePtr> obstacles = {
         robot_navigation_obstacle_factory.createFromShape(
             Rectangle(Point(4.36, -2.85), Point(4.4, -2.89))),
     };
-    Rectangle navigable_area           = field.fieldBoundary();
+    Rectangle navigable_area = field.fieldBoundary();
     EnlsvgPathPlanner planner =
         EnlsvgPathPlanner(navigable_area, obstacles, field.boundaryMargin());
     auto path = planner.findPath(start, dest);
@@ -773,7 +773,7 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_close_start_end_but_block
 
     EXPECT_EQ(start, path->getStartPoint());
     EXPECT_LE(0.1, distance(path->getEndPoint(), dest));
-    
+
     // Make sure path does not exceed a bounding box;
     Rectangle bounding_box = Rectangle(Point(4.3, -2.57), Point(4.5, -2.9));
     TestUtil::checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
