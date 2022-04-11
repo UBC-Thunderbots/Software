@@ -15,14 +15,12 @@ void PenaltyKickEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
                                           const World &world)
 {
     auto move_to_goal_line_tactic = std::make_shared<MoveGoalieToGoalLineTactic>();
-    std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config =
-        std::make_shared<const GoalieTacticConfig>();
-    auto goalie_tactic = std::make_shared<GoalieTactic>(goalie_tactic_config);
-    auto move_tactic_2 = std::make_shared<MoveTactic>();
-    auto move_tactic_3 = std::make_shared<MoveTactic>();
-    auto move_tactic_4 = std::make_shared<MoveTactic>();
-    auto move_tactic_5 = std::make_shared<MoveTactic>();
-    auto move_tactic_6 = std::make_shared<MoveTactic>();
+    auto goalie_tactic            = std::make_shared<GoalieTactic>(ai_config);
+    auto move_tactic_2            = std::make_shared<MoveTactic>();
+    auto move_tactic_3            = std::make_shared<MoveTactic>();
+    auto move_tactic_4            = std::make_shared<MoveTactic>();
+    auto move_tactic_5            = std::make_shared<MoveTactic>();
+    auto move_tactic_6            = std::make_shared<MoveTactic>();
 
     PriorityTacticVector tactics_to_run = {{move_to_goal_line_tactic, move_tactic_2,
                                             move_tactic_3, move_tactic_4, move_tactic_5,
