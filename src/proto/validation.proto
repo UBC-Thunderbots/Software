@@ -30,13 +30,13 @@ message ValidationGeometry
 
 message ValidationProto
 {
-    required string failure_msg             = 1;
-    required ValidationGeometry geometry    = 2;
-    required ValidationStatus status        = 3;
+    required string failure_msg          = 1;
+    required ValidationGeometry geometry = 2;
+    required ValidationStatus status     = 3;
 }
 
 message ValidationProtoSet
 {
     required ValidationType validation_type = 1;
-    repeated ValidationProto validations = 2;
+    repeated ValidationProto validations    = 2;
 }

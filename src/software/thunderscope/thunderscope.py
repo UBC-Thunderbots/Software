@@ -49,7 +49,7 @@ from software.thunderscope.robot_diagnostics.drive_and_dribbler_widget import (
     DriveAndDribblerWidget,
 )
 from software.thunderscope.play.playinfo_widget import playInfoWidget
-from software.thunderscope.chicker.chicker import ChickerWidget
+from software.thunderscope.robot_diagnostics.chicker import ChickerWidget
 
 DEFAULT_LAYOUT_PATH = "/opt/tbotspython/default_tscope_layout"
 
@@ -264,9 +264,7 @@ class Thunderscope(object):
             friendly_colour_yellow=False,
         )
         self.configure_default_layout(
-            self.blue_full_system_dock_area,
-            self.blue_full_system_proto_unix_io,
-            False,
+            self.blue_full_system_dock_area, self.blue_full_system_proto_unix_io, False,
         )
 
     def run_yellow_full_system(self, runtime_dir):
@@ -338,17 +336,16 @@ class Thunderscope(object):
     def run_gamecontroller(self):
         """Run the gamecontroller
         """
-        pass
 
-        # def send_referee_command(data):
-            # self.blue_full_system_proto_unix_io.send_proto(Referee, data)
-            # self.yellow_full_system_proto_unix_io.send_proto(Referee, data)
+        def send_referee_command(data):
+            self.blue_full_system_proto_unix_io.send_proto(Referee, data)
+            self.yellow_full_system_proto_unix_io.send_proto(Referee, data)
 
-        # self.receive_referee_command = networking.SSLRefereeProtoListener(
-            # "224.5.23.1", 10003, send_referee_command, True,
-        # )
+        self.receive_referee_command = networking.SSLRefereeProtoListener(
+            "224.5.23.1", 10003, send_referee_command, True,
+        )
 
-        # self.gamecontroller = Popen(["/opt/tbotspython/gamecontroller"])
+        self.gamecontroller = Popen(["/opt/tbotspython/gamecontroller"])
 
     def register_refresh_function(self, refresh_func):
         """Register the refresh functions to run at the refresh_interval_ms
@@ -481,7 +478,7 @@ class Thunderscope(object):
 
         # Create and return dock
         named_value_plotter_dock = Dock("Performance")
-        named_value_plotter_dock.addWidget(self.named_value_plotter.plot)
+        named_value_plotter_dock.addWidget(self.named_value_plotter.win)
         return named_value_plotter_dock
 
     def setup_play_info(self, proto_unix_io):
@@ -575,7 +572,6 @@ if __name__ == "__main__":
         thunderscope.run_yellow_full_system("/tmp/tbots/yellow")
         thunderscope.run_gamecontroller()
 
-
         # Load the specified layout or the default file. If the default layout
         # file doesn't exist, and no layout is provided, then just configure
         # the default layout.
@@ -606,7 +602,8 @@ if __name__ == "__main__":
             world_state = tbots_protobuf.create_world_state(
                 [geom.Point(3, y) for y in numpy.linspace(-2, 2, 6)],
                 [geom.Point(-3, y) for y in numpy.linspace(-2, 2, 6)],
-                geom.Point(0,0), geom.Vector(-5,5)
+                geom.Point(0, 0),
+                geom.Vector(-5, 5),
             )
             thunderscope.simulator_proto_unix_io.send_proto(WorldState, world_state)
 

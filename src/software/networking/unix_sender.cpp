@@ -1,7 +1,8 @@
 #include "software/networking/unix_sender.h"
-#include "software/constants.h"
 
 #include <iostream>
+
+#include "software/constants.h"
 
 UnixSender::UnixSender(boost::asio::io_service& io_service,
                        const std::string& unix_socket_path)
@@ -12,7 +13,8 @@ UnixSender::UnixSender(boost::asio::io_service& io_service,
     unix_socket_path_ = unix_socket_path;
     socket_.open();
 
-    boost::asio::local::datagram_protocol::socket::send_buffer_size option(UNIX_BUFFER_SIZE);
+    boost::asio::local::datagram_protocol::socket::send_buffer_size option(
+        UNIX_BUFFER_SIZE);
     socket_.set_option(option);
 }
 

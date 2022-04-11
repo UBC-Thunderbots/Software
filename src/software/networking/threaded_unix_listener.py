@@ -1,5 +1,4 @@
 import base64
-import socket
 import os
 import queue
 import socketserver

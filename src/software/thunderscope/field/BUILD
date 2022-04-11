@@ -24,6 +24,7 @@ py_library(
     srcs = ["obstacle_layer.py"],
     deps = [
         ":field_layer",
+        "//software/thunderscope:thread_safe_buffer",
         requirement("pyqtgraph"),
     ],
 )
@@ -33,6 +34,7 @@ py_library(
     srcs = ["path_layer.py"],
     deps = [
         ":field_layer",
+        "//software/thunderscope:thread_safe_buffer",
         requirement("pyqtgraph"),
     ],
 )
@@ -42,6 +44,7 @@ py_library(
     srcs = ["world_layer.py"],
     deps = [
         ":field_layer",
+        "//software/thunderscope:thread_safe_buffer",
         requirement("pyqtgraph"),
     ],
 )
@@ -51,6 +54,7 @@ py_library(
     srcs = ["simulator_layer.py"],
     deps = [
         ":field_layer",
+        "//software/thunderscope:thread_safe_buffer",
         requirement("pyqtgraph"),
     ],
 )
@@ -61,6 +65,7 @@ py_library(
     deps = [
         ":field_layer",
         "//proto:import_all_protos",
+        "//software/thunderscope:thread_safe_buffer",
         requirement("pyqtgraph"),
     ],
 )

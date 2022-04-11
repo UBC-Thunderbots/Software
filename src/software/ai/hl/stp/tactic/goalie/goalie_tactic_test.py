@@ -100,18 +100,21 @@ from proto.message_translation.tbots_protobuf import create_world_state
     ],
 )
 def test_goalie_blocks_shot(
-    ball_initial_position, ball_initial_velocity, robot_initial_position, simulated_test_runner
+    ball_initial_position,
+    ball_initial_velocity,
+    robot_initial_position,
+    simulated_test_runner,
 ):
     # Setup Robot
     simulated_test_runner.thunderscope.simulator_proto_unix_io.send_proto(
-            WorldState, 
-            create_world_state(
-                [],
-                blue_robot_locations=[robot_initial_position],
-                ball_location=ball_initial_position,
-                ball_velocity=ball_initial_velocity
-            )
-        )
+        WorldState,
+        create_world_state(
+            [],
+            blue_robot_locations=[robot_initial_position],
+            ball_location=ball_initial_position,
+            ball_velocity=ball_initial_velocity,
+        ),
+    )
 
     # Setup Tactic
     params = AssignedTacticPlayControlParams()
@@ -119,7 +122,8 @@ def test_goalie_blocks_shot(
         GoalieTactic(max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT)
     )
     simulated_test_runner.thunderscope.blue_full_system_proto_unix_io.send_proto(
-            AssignedTacticPlayControlParams, params)
+        AssignedTacticPlayControlParams, params
+    )
 
     # Always Validation
     always_validation_sequence_set = [

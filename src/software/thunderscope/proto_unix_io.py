@@ -4,10 +4,10 @@ from threading import Thread
 import software.thunderscope.constants as constants
 from software.networking.threaded_unix_listener import ThreadedUnixListener
 from software.networking.threaded_unix_sender import ThreadedUnixSender
+from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 
 class ProtoUnixIO:
-
     """The ProtoUnixIO is responsible for communicating protobufs over unix sockets.
 
 
@@ -20,27 +20,36 @@ class ProtoUnixIO:
         ProtoUnixReceiver ┌───────────────────┐           ┌──┬──┬──┬──┬──┐
                 ──────────>                   ├──────────>│  │  │  │  │  │
                           │                   │           └──┴──┴──┴──┴──┘
-                          │    ProtoUnixIO    │                Queue 
+                          │    ProtoUnixIO    │           ThreadSafeBuffer 
         ProtoUnixSender   │                   │
                 <─────────┤                   <──────────── send_proto
                           └───────────────────┘
 
-    Classes can register as an observer by providing a protobuf type to observe
-    and a queue to place incoming data. We pass in a queue rather than a callback
-    so not bog down the ProtoUnixIO class and allowing the observers to process
-    the data at their own pace.
+    Observing Protobuf:
 
-    Clases can send proto and ProtoUnixIO will send that data to the registered
-    observers.
+    - Classes can register as an observer by providing a protobuf type to
+      observe and a ThreadSafeBuffer to place incoming data. We pass in a
+      ThreadSafeBuffer rather than a callback to not bog down this class.
+      We don't want slow callbacks from a single observer to hold up other
+      observers from receiving new data.
 
-    attach_unix_receiver can be called with a protobuf type and unix socket path
-    to receive data over the unix socket to get sent to all the registered observers
+    Sending Protobuf:
 
-    attach_unix_sender can be called with a protobuf type and unix socket path
-    to send data over the socket, if send_proto was called.
+    - Clases can also call send_proto to send data to any registered observers
+      attach_unix_sender can be called with a protobuf type and unix socket path
+      to send data over the socket, if send_proto was called.
 
-    TL;DR This class manages all IO over unix sockets and provides a send proto
-    function and a register_observer interface to reiceve data over unix sockets.
+    Unix IO:
+
+    - attach_unix_receiver() configures a unix receiver to receive protobufs
+      over a unix socket and send data to all observers of that proto type.
+
+    - attach_unix_sender() configurs a unix sender (it is an observer as well)
+      and relays data from send_proto over the socket.
+
+    TL;DR This class manages inter-thread communication through register_observer
+    and send_proto calls. If unix senders/receivers are attached to a proto type,
+    then the data is also sent/received over the sockets.
 
     """
 
@@ -51,8 +60,8 @@ class ProtoUnixIO:
         self.unix_listeners = {}
         self.send_proto_to_observer_threads = {}
 
-    def __send_proto_to_observers(self, receive_buffer):
-        """Given a queue (receive_buffer) consume it and
+    def __send_proto_to_observers(self, receive_buffer: ThreadSafeBuffer):
+        """Given a ThreadSafeBuffer (receive_buffer) consume it and
         send place it in the other buffers.
 
         :param receive_buffer: The queue to consume from
@@ -60,12 +69,10 @@ class ProtoUnixIO:
         """
         while True:
             proto = receive_buffer.get()
+
             if proto.DESCRIPTOR.full_name in self.proto_observers:
                 for buffer in self.proto_observers[proto.DESCRIPTOR.full_name]:
-                    try:
-                        buffer.put_nowait(proto)
-                    except queue.Full:
-                        pass
+                    buffer.put(proto, block=False)
 
     def register_observer(self, proto_class, buffer):
         """Register a widget to consume from a given protobuf class

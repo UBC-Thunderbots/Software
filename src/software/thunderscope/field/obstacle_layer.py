@@ -1,5 +1,3 @@
-import queue
-
 import pyqtgraph as pg
 from proto.geometry_pb2 import Circle, Polygon
 from proto.visualization_pb2 import Obstacles
@@ -9,14 +7,21 @@ from software.thunderscope.colors import Colors
 import software.thunderscope.constants as constants
 from software.networking.threaded_unix_listener import ThreadedUnixListener
 from software.thunderscope.field.field_layer import FieldLayer
+from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 
 class ObstacleLayer(FieldLayer):
-    def __init__(self, buffer_size=10):
+    def __init__(self, buffer_size=1):
+        """Visualize the obstacles
+
+        :param buffer_size: The buffer size, set higher for smoother plots.
+                            Set lower for more realtime plots. Default is arbitrary
+
+        """
         FieldLayer.__init__(self)
         self.cached_obstacles = Obstacles()
 
-        self.obstacle_buffer = queue.Queue(buffer_size)
+        self.obstacle_buffer = ThreadSafeBuffer(buffer_size, Obstacles)
 
     def paint(self, painter, option, widget):
         """Paint this layer
@@ -27,14 +32,12 @@ class ObstacleLayer(FieldLayer):
 
         """
 
-        try:
-            obstacles = self.obstacle_buffer.get_nowait()
-        except queue.Empty as empty:
-            obstacles = self.cached_obstacles
+        # Draw the obstacles
+        obstacles = self.obstacle_buffer.get()
 
-        self.cached_obstacles = obstacles
-
-        painter.setPen(pg.mkPen(Colors.NAVIGATOR_OBSTACLE_COLOR, width=2))
+        painter.setPen(
+            pg.mkPen(Colors.NAVIGATOR_OBSTACLE_COLOR, width=constants.LINE_WIDTH)
+        )
 
         for polyobstacle in obstacles.polygon:
             polygon_points = [

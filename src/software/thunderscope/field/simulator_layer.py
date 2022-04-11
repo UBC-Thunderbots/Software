@@ -1,5 +1,3 @@
-import queue
-
 import software.python_bindings as geom
 import pyqtgraph as pg
 from proto.import_all_protos import *
@@ -15,14 +13,22 @@ from software.thunderscope.constants import (
 )
 from software.thunderscope.field.field_layer import FieldLayer
 from software.thunderscope.field.world_layer import WorldLayer
+from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 
 class SimulatorLayer(FieldLayer):
     def __init__(self, simulator_io, buffer_size=1):
+        """Visualize the simulator
+
+        :param simulator_io: The simulator io communicate with the simulator
+        :param friendly_colour_yellow: Is the friendly_colour_yellow?
+        :param buffer_size: The buffer size, set higher for smoother plots.
+                            Set lower for more realtime plots. Default is arbitrary
+
+        """
         FieldLayer.__init__(self)
-        self.sim_world_state_buffer = queue.Queue(buffer_size)
+        self.sim_world_state_buffer = ThreadSafeBuffer(buffer_size, WorldState)
         self.world_layer = WorldLayer(simulator_io)
-        self.cached_sim_world_state = WorldState()
 
     def paint(self, painter, option, widget):
         """Paint this layer
@@ -33,13 +39,8 @@ class SimulatorLayer(FieldLayer):
 
         """
 
-        print("REDRAW")
-        try:
-            sim_world_state = self.sim_world_state_buffer.get_nowait()
-        except queue.Empty as empty:
-            sim_world_state = self.cached_sim_world_state
+        sim_world_state = self.sim_world_state_buffer.get()
 
-        self.cached_sim_world_state = sim_world_state
         self.world_layer.draw_ball_state(
             painter, sim_world_state.ball_state, Colors.SIM_BALL_COLOR
         )

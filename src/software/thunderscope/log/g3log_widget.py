@@ -1,7 +1,6 @@
-import queue
-
 import pyqtgraph as pg
 from pyqtgraph.Qt.QtWidgets import *
+import queue
 import pyqtgraph.console as pg_console
 from proto.robot_log_msg_pb2 import RobotLog, LogLevel
 from proto.import_all_protos import *
@@ -9,10 +8,19 @@ from proto.import_all_protos import *
 import software.thunderscope.constants as constants
 from software.networking.threaded_unix_listener import ThreadedUnixListener
 from software.thunderscope.log.g3log_checkboxes import g3logCheckboxes
+from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 
 class g3logWidget(QWidget):
     def __init__(self, buffer_size=10):
+        """The g3log widget is a console widget that displays g3log messages
+
+        :param simulator_io: The simulator io communicate with the simulator
+        :param friendly_colour_yellow: Is the friendly_colour_yellow?
+        :param buffer_size: The buffer size, set higher for smoother plots.
+                            Set lower for more realtime plots. Default is arbitrary
+
+        """
         QWidget.__init__(self)
 
         self.console_widget = pg_console.ConsoleWidget()
@@ -25,7 +33,7 @@ class g3logWidget(QWidget):
 
         # Creates checkbox widget
         self.checkbox_widget = g3logCheckboxes()
-        self.log_buffer = queue.Queue(buffer_size)
+        self.log_buffer = ThreadSafeBuffer(buffer_size, RobotLog)
 
         self.layout.addWidget(self.console_widget)
         self.layout.addWidget(self.checkbox_widget)
@@ -43,7 +51,7 @@ class g3logWidget(QWidget):
         """Update the log widget with another log message
         """
         try:
-            log = self.log_buffer.get_nowait()
+            log = self.log_buffer.buffer.get_nowait()
         except queue.Empty as empty:
             return
 

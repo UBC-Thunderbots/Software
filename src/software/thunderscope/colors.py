@@ -2,6 +2,7 @@ from pyqtgraph.Qt import QtCore, QtGui
 
 
 class Colors(object):
+
     FIELD_COLOR = "w"
     FIELD_LINE_COLOR = "w"
 
@@ -12,7 +13,7 @@ class Colors(object):
     BLUE_ROBOT_COLOR = QtGui.QColor(0, 75, 255, 255)
 
     ROBOT_SPEED_SLOW_COLOR = "black"
-    NAVIGATOR_PATH_COLOR = "b"
+    NAVIGATOR_PATH_COLOR = "g"
     NAVIGATOR_OBSTACLE_COLOR = "orange"
 
     VALIDATION_PASSED_COLOR = "g"

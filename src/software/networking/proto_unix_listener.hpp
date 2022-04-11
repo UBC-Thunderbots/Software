@@ -4,8 +4,8 @@
 #include <boost/bind.hpp>
 #include <string>
 
-#include "software/logger/logger.h"
 #include "software/constants.h"
+#include "software/logger/logger.h"
 #include "software/util/typename/typename.h"
 
 template <class ReceiveProtoT>

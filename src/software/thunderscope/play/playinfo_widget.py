@@ -6,9 +6,9 @@ import software.thunderscope.constants as constants
 from google.protobuf.json_format import MessageToDict
 from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtWidgets import *
-import queue
+from proto.import_all_protos import *
 
-from proto.robot_log_msg_pb2 import RobotLog
+from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 
 class playInfoWidget(QTableWidget):
@@ -18,8 +18,15 @@ class playInfoWidget(QTableWidget):
     NUM_COLS = 4
 
     def __init__(self, buffer_size=10):
+        """Shows the current play information including tactic and FSM state
+
+        :param buffer_size: The buffer size, set higher for smoother plots.
+                            Set lower for more realtime plots. Default is arbitrary
+
+        """
         QTableWidget.__init__(self, playInfoWidget.NUM_ROWS, playInfoWidget.NUM_COLS)
-        self.log_buffer = queue.Queue(buffer_size)
+
+        self.log_buffer = ThreadSafeBuffer(buffer_size, PlayInfo)
         self.verticalHeader().setVisible(False)
 
     def set_data(self, data):
@@ -42,11 +49,8 @@ class playInfoWidget(QTableWidget):
     def refresh(self):
         """Update the play info widget with new play information
         """
-        try:
-            playinfo = self.log_buffer.get_nowait()
-        except queue.Empty as empty:
-            return
 
+        playinfo = self.log_buffer.get(block=False)
         play_info_dict = MessageToDict(playinfo)
 
         robot_ids = []

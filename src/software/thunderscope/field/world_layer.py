@@ -1,5 +1,4 @@
 import math
-import queue
 from typing import List
 
 import software.python_bindings as geom
@@ -16,27 +15,40 @@ from software.thunderscope.constants import (
     ROBOT_MAX_RADIUS,
 )
 from software.thunderscope.field.field_layer import FieldLayer
+from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 
 class WorldLayer(FieldLayer):
     def __init__(self, simulator_io, friendly_colour_yellow, buffer_size=1):
+        """The WorldLayer
+
+        :param simulator_io: The simulator io communicate with the simulator
+        :param friendly_colour_yellow: Is the friendly_colour_yellow?
+        :param buffer_size: The buffer size, set higher for smoother plots.
+                            Set lower for more realtime plots. Default is arbitrary
+
+        """
         FieldLayer.__init__(self)
-        self.cached_world = World()
-        self.world_buffer = queue.Queue(buffer_size)
+
+        self.simulator_io = simulator_io
+        self.friendly_colour_yellow = friendly_colour_yellow
+        self.world_buffer = ThreadSafeBuffer(buffer_size, World)
+
         self.setAcceptHoverEvents(True)
         self.setAcceptTouchEvents(True)
+
         self.pressed_CTRL = False
         self.pressed_M = False
         self.pressed_R = False
+
         self.mouse_clicked = False
         self.mouse_click_pos = [0, 0]
         self.mouse_hover_pos = [0, 0]  # might not need later, see hoverMoveEvent
-        self.simulator_io = simulator_io
-        self.friendly_colour_yellow = friendly_colour_yellow
 
     def keyPressEvent(self, event):
         """Detect when a key has been pressed (override)
-        Note: function name format is different due to overriding the Qt function
+
+        NOTE: function name format is different due to overriding the Qt function
 
         :param event: The event
 
@@ -294,12 +306,8 @@ class WorldLayer(FieldLayer):
 
         """
 
-        try:
-            world = self.world_buffer.get_nowait()
-        except queue.Empty as empty:
-            world = self.cached_world
+        world = self.world_buffer.get(block=False)
 
-        self.cached_world = world
         self.draw_field(painter, world.field)
         self.draw_ball_state(painter, world.ball.current_state, Colors.BALL_COLOR)
 

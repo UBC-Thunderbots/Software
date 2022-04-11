@@ -1,9 +1,7 @@
 import threading
 import argparse
 import time
-import logging
 import queue
-import os
 
 import pytest
 import software.python_bindings as tbots
@@ -49,13 +47,17 @@ class SimulatorTestRunner(object):
         # Run full system and er_force_simulator
         self.thunderscope.run_blue_full_system("/tmp/tbots/blue")
         self.thunderscope.run_yellow_full_system("/tmp/tbots/yellow")
-        self.thunderscope.run_er_force_simulator("/tmp/tbots", "/tmp/tbots/blue", "/tmp/tbots/yellow")
+        self.thunderscope.run_er_force_simulator(
+            "/tmp/tbots", "/tmp/tbots/blue", "/tmp/tbots/yellow"
+        )
         time.sleep(launch_delay_s)
 
         self.world_buffer = queue.Queue()
 
         # Only validate on the blue worlds
-        self.thunderscope.blue_full_system_proto_unix_io.register_observer(World, self.world_buffer)
+        self.thunderscope.blue_full_system_proto_unix_io.register_observer(
+            World, self.world_buffer
+        )
 
         self.last_exception = None
 
@@ -96,8 +98,12 @@ class SimulatorTestRunner(object):
 
             while time_elapsed_s < test_timeout_s:
 
-                tick = SimulatorTick(milliseconds=tick_duration_s * MILLISECONDS_PER_SECOND)
-                self.thunderscope.simulator_proto_unix_io.send_proto(SimulatorTick, tick)
+                tick = SimulatorTick(
+                    milliseconds=tick_duration_s * MILLISECONDS_PER_SECOND
+                )
+                self.thunderscope.simulator_proto_unix_io.send_proto(
+                    SimulatorTick, tick
+                )
                 time_elapsed_s += tick_duration_s
 
                 if self.show_thunderscope:
@@ -118,15 +124,16 @@ class SimulatorTestRunner(object):
                 if self.show_thunderscope:
                     # Send out the validation proto to thunderscope
                     self.thunderscope.blue_full_system_proto_unix_io.send_proto(
-                        ValidationProtoSet,  eventually_validation_proto_set
+                        ValidationProtoSet, eventually_validation_proto_set
                     )
                     self.thunderscope.yellow_full_system_proto_unix_io.send_proto(
-                        ValidationProtoSet, eventually_validation_proto_set)
+                        ValidationProtoSet, eventually_validation_proto_set
+                    )
                     self.thunderscope.blue_full_system_proto_unix_io.send_proto(
-                        ValidationProtoSet,  always_validation_proto_set
+                        ValidationProtoSet, always_validation_proto_set
                     )
                     self.thunderscope.yellow_full_system_proto_unix_io.send_proto(
-                        ValidationProtoSet,  always_validation_proto_set
+                        ValidationProtoSet, always_validation_proto_set
                     )
 
                 # Check that all always validations are always valid

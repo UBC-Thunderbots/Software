@@ -69,8 +69,8 @@ cc_library(
     ],
     visibility = ["//visibility:private"],
     deps = [
+        "//software:constants",
         "@boost//:asio",
-        "//software:constants"
     ],
 )
 
@@ -93,8 +93,8 @@ cc_library(
     ],
     visibility = ["//visibility:private"],
     deps = [
+        "//software:constants",
         "@boost//:asio",
-        "//software:constants"
     ],
 )
 

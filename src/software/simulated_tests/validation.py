@@ -164,7 +164,9 @@ def run_validation_sequence_sets(
     always_validation_proto_set = ValidationProtoSet()
     eventually_validation_proto_set = ValidationProtoSet()
 
-    def create_validation_proto_helper(validation_type, validation_proto_set, validation):
+    def create_validation_proto_helper(
+        validation_type, validation_proto_set, validation
+    ):
         """Helper function that computes the status and creates a
         validation_proto, and updates it in the validation_proto_set.
 
@@ -211,7 +213,9 @@ def run_validation_sequence_sets(
     # Validate the always validations. We need to look at all of them
     for validation_sequence in always_validation_sequence_set:
         for validation in validation_sequence:
-            create_validation_proto_helper(ValidationType.ALWAYS,  always_validation_proto_set, validation)
+            create_validation_proto_helper(
+                ValidationType.ALWAYS, always_validation_proto_set, validation
+            )
 
     return eventually_validation_proto_set, always_validation_proto_set
 

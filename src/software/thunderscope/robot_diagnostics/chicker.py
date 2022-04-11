@@ -4,6 +4,8 @@ from pyqtgraph.Qt.QtWidgets import *
 import software.thunderscope.constants as constants
 import software.thunderscope.common_widgets as common_widgets
 
+from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
+
 
 class ChickerWidget(QWidget):
     def __init__(self):

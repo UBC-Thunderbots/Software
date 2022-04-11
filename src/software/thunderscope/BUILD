@@ -23,7 +23,6 @@ py_binary(
         "//software/thunderscope:constants",
         "//software/thunderscope:proto_unix_io",
         "//software/thunderscope/arbitrary_plot:named_value_plotter",
-        "//software/thunderscope/chicker",
         "//software/thunderscope/field",
         "//software/thunderscope/field:field_layer",
         "//software/thunderscope/field:obstacle_layer",
@@ -34,6 +33,7 @@ py_binary(
         "//software/thunderscope/log:g3log_checkboxes",
         "//software/thunderscope/log:g3log_widget",
         "//software/thunderscope/play:playinfo_widget",
+        "//software/thunderscope/robot_diagnostics:chicker",
         "//software/thunderscope/robot_diagnostics:drive_and_dribbler_widget",
         requirement("pyqtgraph"),
         requirement("numpy"),
@@ -58,4 +58,9 @@ py_library(
 py_library(
     name = "common_widgets",
     srcs = ["common_widgets.py"],
+)
+
+py_library(
+    name = "thread_safe_buffer",
+    srcs = ["thread_safe_buffer.py"],
 )
