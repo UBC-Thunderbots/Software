@@ -31,7 +31,9 @@ class PathLayer(FieldLayer):
 
         """
         paths = self.path_visualization_buffer.get(block=False)
-        painter.setPen(pg.mkPen(Colors.NAVIGATOR_PATH_COLOR, width=constants.LINE_WIDTH))
+        painter.setPen(
+            pg.mkPen(Colors.NAVIGATOR_PATH_COLOR, width=constants.LINE_WIDTH)
+        )
 
         for path in paths.path:
             polygon_points = [

@@ -139,6 +139,8 @@ class ProtoUnixIO:
         key = proto_class.DESCRIPTOR.full_name
         self.unix_listeners[key] = listener
         self.send_proto_to_observer_threads[key] = Thread(
-            target=self.__send_proto_to_observers, args=(listener.proto_buffer,)
+            target=self.__send_proto_to_observers,
+            args=(listener.proto_buffer,),
+            daemon=True,
         )
         self.send_proto_to_observer_threads[key].start()

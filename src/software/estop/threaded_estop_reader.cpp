@@ -7,10 +7,9 @@
 
 #include "software/logger/logger.h"
 
-
 ThreadedEstopReader::ThreadedEstopReader(std::unique_ptr<UartCommunication> uart_reader)
     : estop_state(EstopState::STOP),
-      timer(io_service),
+      timer(io_service, boost::posix_time::milliseconds(INTERVAL_BETWEEN_READS_MS)),
       uart_reader(std::move(uart_reader))
 {
     estop_thread = std::thread(boost::bind(&ThreadedEstopReader::continousRead, this));
@@ -97,6 +96,7 @@ void ThreadedEstopReader::tick(const boost::system::error_code& error)
 ThreadedEstopReader::~ThreadedEstopReader()
 {
     in_destructor = true;
+    io_service.stop();
 
     // We must wait for the thread to stop, as if we destroy it while it's still
     // running we will segfault

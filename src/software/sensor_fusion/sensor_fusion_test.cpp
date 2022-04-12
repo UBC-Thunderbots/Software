@@ -2,10 +2,10 @@
 
 #include <gtest/gtest.h>
 
-#include "proto/message_translation/tbots_protobuf.h"
 #include "proto/message_translation/ssl_detection.h"
 #include "proto/message_translation/ssl_geometry.h"
 #include "proto/message_translation/ssl_wrapper.h"
+#include "proto/message_translation/tbots_protobuf.h"
 #include "shared/parameter/cpp_dynamic_parameters.h"
 
 class SensorFusionTest : public ::testing::Test
@@ -512,7 +512,7 @@ TEST_F(SensorFusionTest, test_inverted_detection_frame_wrapper_packet)
     SSLProto::Referee ssl_referee_packet;
     ssl_referee_packet.set_blue_team_on_positive_half(false);
 
-    *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
+    *(sensor_msg.mutable_ssl_vision_msg())  = *ssl_wrapper_packet;
     *(sensor_msg.mutable_ssl_referee_msg()) = ssl_referee_packet;
 
     EXPECT_EQ(std::nullopt, sensor_fusion.getWorld());
@@ -525,12 +525,11 @@ TEST_F(SensorFusionTest, test_inverted_detection_frame_wrapper_packet)
 
     result = sensor_fusion.getWorld();
     ASSERT_TRUE(result);
-    std::cerr<<"INVERTED WORLD"<<std::endl;
+    std::cerr << "INVERTED WORLD" << std::endl;
     std::cerr << createWorld(initInvertedWorld())->DebugString() << std::endl;
-    std::cerr<<"RESULT WORLD"<<std::endl;
+    std::cerr << "RESULT WORLD" << std::endl;
     std::cerr << createWorld(*result)->DebugString() << std::endl;
     EXPECT_EQ(initWorld(), *result);
-
 }
 
 TEST_F(SensorFusionTest, test_complete_wrapper_packet)

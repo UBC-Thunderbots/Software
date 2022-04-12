@@ -6,9 +6,6 @@
 #include "software/uart/mock_uart_communication.h"
 #include "software/uart/uart_communication.h"
 
-static constexpr unsigned char STOP = 0;
-static constexpr unsigned char PLAY = 1;
-
 using ::testing::_;
 using ::testing::AtLeast;
 using ::testing::InvokeWithoutArgs;
@@ -19,7 +16,7 @@ TEST(ThreadedEstopReaderTest, estop_play_is_false_by_default_before_startup)
 {
     std::unique_ptr<MockUart> mock_uart = std::make_unique<MockUart>();
 
-    std::vector<unsigned char> ret_val(1, PLAY);
+    std::vector<unsigned char> ret_val(1, ESTOP_PLAY_MSG);
 
     auto mock_uart_ptr = mock_uart.get();
     EXPECT_CALL(*mock_uart_ptr, serialRead(_)).WillRepeatedly(Return(ret_val));
@@ -38,9 +35,9 @@ TEST(ThreadedEstopReaderTest, estop_tick_is_called_multiple_times)
 
     int test_timeout_ms                 = 100;
     unsigned char arbitrary_garbage_val = 0b10111011;
-    std::vector<unsigned char> play_ret_val(1, PLAY);
+    std::vector<unsigned char> play_ret_val(1, ESTOP_PLAY_MSG);
     std::vector<unsigned char> garbage_ret_val(1, arbitrary_garbage_val);
-    std::vector<unsigned char> stop_ret_val(1, STOP);
+    std::vector<unsigned char> stop_ret_val(1, ESTOP_STOP_MSG);
 
     auto mock_uart_ptr = mock_uart.get();
 
@@ -74,8 +71,8 @@ TEST(ThreadedEstopReaderTest, estop_state_changes_based_on_read_val)
 {
     std::unique_ptr<MockUart> mock_uart = std::make_unique<MockUart>();
 
-    std::vector<unsigned char> play_ret_val(1, PLAY);
-    std::vector<unsigned char> stop_ret_val(1, STOP);
+    std::vector<unsigned char> play_ret_val(1, ESTOP_PLAY_MSG);
+    std::vector<unsigned char> stop_ret_val(1, ESTOP_STOP_MSG);
 
     int test_timeout_ms     = 1000;
     int startup_interval_ms = 5;
@@ -148,7 +145,7 @@ TEST(ThreadedEstopReaderTest, estop_play_is_false_after_reading_unexpected_messa
     int test_timeout_ms = 1000;
 
     unsigned char arbitrary_garbage_val = 0b10111011;
-    std::vector<unsigned char> play_ret_val(1, PLAY);
+    std::vector<unsigned char> play_ret_val(1, ESTOP_PLAY_MSG);
     std::vector<unsigned char> garbage_ret_val(1, arbitrary_garbage_val);
 
     std::mutex m;
@@ -189,9 +186,9 @@ TEST(ThreadedEstopReaderTest,
     std::unique_ptr<MockUart> mock_uart = std::make_unique<MockUart>();
 
     unsigned char arbitrary_garbage_val = 0b10111011;
-    std::vector<unsigned char> play_ret_val(1, PLAY);
+    std::vector<unsigned char> play_ret_val(1, ESTOP_PLAY_MSG);
     std::vector<unsigned char> garbage_ret_val(1, arbitrary_garbage_val);
-    std::vector<unsigned char> stop_ret_val(1, STOP);
+    std::vector<unsigned char> stop_ret_val(1, ESTOP_STOP_MSG);
     int test_timeout_ms = 1000;
 
 

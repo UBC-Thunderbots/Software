@@ -128,11 +128,13 @@ class Thunderscope(object):
 
         # Save and Load Prompts
         self.save_layout_shortcut = QtGui.QShortcut(
-            QtGui.QKeySequence("Ctrl+S"), self.window)
+            QtGui.QKeySequence("Ctrl+S"), self.window
+        )
         self.save_layout_shortcut.activated.connect(self.save_layout)
 
         self.open_layout_shortcut = QtGui.QShortcut(
-            QtGui.QKeySequence("Ctrl+O"), self.window)
+            QtGui.QKeySequence("Ctrl+O"), self.window
+        )
         self.open_layout_shortcut.activated.connect(self.load_layout)
 
         self.show_help = QtGui.QShortcut(QtGui.QKeySequence("h"), self.window)
@@ -199,10 +201,8 @@ class Thunderscope(object):
 
         with shelve.open(filename, "r") as shelf:
             self.main_dock.restoreState(shelf["dock_state"])
-            self.blue_full_system_dock_area.restoreState(
-                    shelf["blue_dock_state"])
-            self.yellow_full_system_dock_area.restoreState(
-                    shelf["yellow_dock_state"])
+            self.blue_full_system_dock_area.restoreState(shelf["blue_dock_state"])
+            self.yellow_full_system_dock_area.restoreState(shelf["yellow_dock_state"])
 
             # Update default layout
             with shelve.open(DEFAULT_LAYOUT_PATH, "c") as default_shelf:
@@ -219,21 +219,38 @@ class Thunderscope(object):
         :param layout_path: Path to the layout file to load.
 
         """
+        self.configure_default_layout(
+            self.yellow_full_system_dock_area,
+            self.simulator_proto_unix_io,
+            self.yellow_full_system_proto_unix_io,
+            True,
+        )
+
+        self.configure_default_layout(
+            self.blue_full_system_dock_area,
+            self.simulator_proto_unix_io,
+            self.blue_full_system_proto_unix_io,
+            False,
+        )
+
         path = layout_path if layout_path else DEFAULT_LAYOUT_PATH
 
         try:
             with shelve.open(path, "r") as shelf:
                 self.main_dock.restoreState(shelf["dock_state"])
                 self.blue_full_system_dock_area.restoreState(shelf["blue_dock_state"])
-                self.yellow_full_system_dock_area.restoreState(shelf["yellow_dock_state"])
+                self.yellow_full_system_dock_area.restoreState(
+                    shelf["yellow_dock_state"]
+                )
                 shelf.sync()
 
                 # Update default layout
-                with shelve.open(DEFAULT_LAYOUT_PATH, "c") as default_shelf:
-                    default_shelf["dock_state"] = shelf["dock_state"]
-                    default_shelf["blue_dock_state"] = shelf["blue_dock_state"]
-                    default_shelf["yellow_dock_state"] = shelf["yellow_dock_state"]
-                    default_shelf.sync()
+                if path != DEFAULT_LAYOUT_PATH:
+                    with shelve.open(DEFAULT_LAYOUT_PATH, "c") as default_shelf:
+                        default_shelf["dock_state"] = shelf["dock_state"]
+                        default_shelf["blue_dock_state"] = shelf["blue_dock_state"]
+                        default_shelf["yellow_dock_state"] = shelf["yellow_dock_state"]
+                        default_shelf.sync()
 
         except Exception as e:
             print(
@@ -241,7 +258,7 @@ class Thunderscope(object):
                 Warning(
                     "No layout file specified and default "
                     + "layout at {} doesn't exist".format(path)
-                )
+                ),
             )
 
     def __run_full_system(
@@ -306,24 +323,12 @@ class Thunderscope(object):
             self.blue_full_system_proto_unix_io,
             friendly_colour_yellow=False,
         )
-        self.configure_default_layout(
-            self.blue_full_system_dock_area,
-            self.simulator_proto_unix_io,
-            self.blue_full_system_proto_unix_io,
-            False,
-        )
 
     def run_yellow_full_system(self, runtime_dir):
         self.yellow_full_system = self.__run_full_system(
             runtime_dir,
             self.yellow_full_system_proto_unix_io,
             friendly_colour_yellow=True,
-        )
-        self.configure_default_layout(
-            self.yellow_full_system_dock_area,
-            self.simulator_proto_unix_io,
-            self.yellow_full_system_proto_unix_io,
-            True,
         )
 
     def run_er_force_simulator(
@@ -494,12 +499,12 @@ class Thunderscope(object):
         :return the gamecontroller in a dock
 
         """
-        web_view = QWebEngineView()
-        web_view.load(QtCore.QUrl("http://localhost:8081"))
+        # web_view = QWebEngineView()
+        # web_view.load(QtCore.QUrl("http://localhost:8081"))
 
         # create and return dock
         gamecontroller_dock = Dock("GameController")
-        gamecontroller_dock.addWidget(web_view)
+        # gamecontroller_dock.addWidget(web_view)
 
         return gamecontroller_dock
 

@@ -30,8 +30,11 @@ class SimulatorTestRunner(object):
     """Run a simulated test"""
 
     def __init__(
-        self, launch_delay_s=0.1, show_thunderscope=True,
-        thunderscope_layout_path=None, runtime_dir="/tmp/tbots"
+        self,
+        launch_delay_s=0.1,
+        show_thunderscope=True,
+        thunderscope_layout_path=None,
+        runtime_dir="/tmp/tbots",
     ):
         """Initialize the SimulatorTestRunner
 
@@ -46,11 +49,14 @@ class SimulatorTestRunner(object):
         self.show_thunderscope = show_thunderscope
 
         # Run full system and er_force_simulator
-        self.thunderscope.run_er_force_simulator("/tmp/tbots",
-                            "/tmp/tbots/blue", "/tmp/tbots/yellow")
+        self.thunderscope.run_er_force_simulator(
+            "/tmp/tbots", "/tmp/tbots/blue", "/tmp/tbots/yellow"
+        )
         self.thunderscope.run_blue_full_system("/tmp/tbots/blue")
         self.thunderscope.run_yellow_full_system("/tmp/tbots/yellow")
-        self.thunderscope.load_saved_layout(thunderscope_layout_path)
+
+        if self.show_thunderscope:
+            self.thunderscope.load_saved_layout(thunderscope_layout_path)
 
         time.sleep(launch_delay_s)
 
@@ -58,7 +64,8 @@ class SimulatorTestRunner(object):
 
         # Only validate on the blue worlds
         self.thunderscope.blue_full_system_proto_unix_io.register_observer(
-                    World, self.world_buffer)
+            World, self.world_buffer
+        )
 
         self.last_exception = None
 
@@ -199,6 +206,6 @@ def load_command_line_arguments():
 def simulated_test_runner():
     args = load_command_line_arguments()
     runner = SimulatorTestRunner(
-                show_thunderscope=args.enable_thunderscope,
-                thunderscope_layout_path=args.layout)
+        show_thunderscope=args.enable_thunderscope, thunderscope_layout_path=args.layout
+    )
     yield runner
