@@ -162,9 +162,7 @@ class Robot
      */
     bool isNearDribbler(
         const Point &test_point,
-        double TOLERANCE = BALL_MAX_RADIUS_METERS -
-                           2 * BALL_MAX_RADIUS_METERS *
-                               MAX_FRACTION_OF_BALL_COVERED_BY_ROBOT) const;
+        double TOLERANCE = BALL_TO_FRONT_OF_ROBOT_DISTANCE_WHEN_DRIBBLING) const;
 
     /**
      * Defines the equality operator for a Robot. Robots are equal if their IDs and
