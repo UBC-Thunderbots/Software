@@ -54,21 +54,19 @@ class HRVOAgent : public Agent
      *
      * @param simulator          The simulation.
      * @param position           The starting position of this agent.
-     * @param goalIndex          The goal number of this agent.
-     * @param neighborDist       The maximum neighbor distance of this agent.
-     * @param maxNeighbors       The maximum neighbor count of this agent.
-     * @param radius             The radius of this agent.
-     * @param goalRadius         The goal radius of this agent.
-     * @param prefSpeed          The preferred speed of this agent.
-     * @param maxSpeed           The maximum speed of this agent.
-     * @param uncertaintyOffset  The uncertainty offset of this agent.
-     * @param maxAccel           The maximum acceleration of this agent.
      * @param velocity           The initial velocity of this agent.
+     * @param pref_speed          The preferred speed of this agent.
+     * @param max_speed           The maximum speed of this agent.
+     * @param max_accel           The maximum acceleration of this agent.
+     * @param path           The path which this agent should follow.
+     * @param radius             The radius of this agent.
+     * @param max_num_neighbors       The maximum neighbor count of this agent.
+     * @param max_neighbor_dist       The maximum neighbor distance of this agent.
+     * @param uncertainty_offset  The uncertainty offset of this agent.
      */
-    HRVOAgent(HRVOSimulator *simulator, const Vector &position, float neighborDist,
-              std::size_t maxNeighbors, float radius, const Vector &velocity,
-              float maxAccel, AgentPath &path, float prefSpeed, float maxSpeed,
-              float uncertaintyOffset);
+    HRVOAgent(HRVOSimulator *simulator, const Vector &position, const Vector &velocity, float pref_speed,
+              float max_speed, float max_accel, AgentPath &path, float radius, std::size_t max_num_neighbors,
+              float max_neighbor_dist, float uncertainty_offset);
 
     /**
      * Computes the new velocity of this agent.
@@ -99,10 +97,10 @@ class HRVOAgent : public Agent
     /**
      * Inserts a neighbor into the set of neighbors of this agent.
      *
-     * @param  agentNo  The number of the agent to be inserted.
-     * @param  rangeSq  The squared range around this agent.
+     * @param  agent_id  The id of the agent to be inserted.
+     * @param  range_squared  The squared range around this agent.
      */
-    void insertNeighbor(std::size_t agentNo, float &rangeSq);
+    void insertNeighbor(std::size_t agent_id, float range_squared);
 
     /**
      * Get a list of circles which represent the new velocity candidates
@@ -133,28 +131,28 @@ class HRVOAgent : public Agent
     class Candidate
     {
        public:
-        Candidate() : velocityObstacle1_(0), velocityObstacle2_(0) {}
+        Candidate() : velocity_obstacle1_(0), velocity_obstacle2_(0) {}
 
         // The position of the candidate point.
         Vector position_;
 
         // The number of the first velocity obstacle.
-        int velocityObstacle1_;
+        int velocity_obstacle1_;
 
         // The number of the second velocity obstacle.
-        int velocityObstacle2_;
+        int velocity_obstacle2_;
     };
 
    public:
     float pref_speed_;
 
-    std::size_t maxNeighbors_;
-    float neighborDist_;
-    float uncertaintyOffset_;
+    std::size_t max_neighbors_;
+    float neighbor_dist_;
+    float uncertainty_offset_;
     std::multimap<float, Candidate> candidates_;
     // distance -> Agent Index
     std::set<std::pair<float, std::size_t>> neighbors_;
-    std::vector<VelocityObstacle> velocityObstacles_;
+    std::vector<VelocityObstacle> velocity_obstacles_;
 
     friend class KdTree;
     friend class Simulator;

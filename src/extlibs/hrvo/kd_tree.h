@@ -57,10 +57,10 @@ class KdTree
               end_(0),
               left_(0),
               right_(0),
-              maxX_(0.0f),
-              maxY_(0.0f),
-              minX_(0.0f),
-              minY_(0.0f)
+              max_x(0.0f),
+              max_y(0.0f),
+              min_x(0.0f),
+              min_y(0.0f)
         {
         }
 
@@ -77,16 +77,16 @@ class KdTree
         std::size_t right_;
 
         // The maximum x-coordinate.
-        float maxX_;
+        float max_x;
 
         // The maximum y-coordinate.
-        float maxY_;
+        float max_y;
 
         // The minimum x-coordinate.
-        float minX_;
+        float min_x;
 
         // The minimum y-coordinate.
-        float minY_;
+        float min_y;
     };
 
     // The maximum leaf size of a k-D tree.
@@ -130,10 +130,10 @@ class KdTree
      * Recursive function to compute the neighbors of the specified agent.
      *
      * @param agent    A pointer to the agent for which neighbors are to be computed.
-     * @param rangeSq  The squared range around the agent.
+     * @param range_squared  The squared range around the agent.
      * @param node     The current k-D tree node.
      */
-    void queryRecursive(HRVOAgent *agent, float &rangeSq, std::size_t node) const;
+    void queryRecursive(HRVOAgent *agent, float &range_squared, std::size_t node) const;
 
    private:
     HRVOSimulator *const simulator_;

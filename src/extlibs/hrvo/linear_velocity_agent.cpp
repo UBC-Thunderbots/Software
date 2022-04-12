@@ -1,9 +1,9 @@
 #include "linear_velocity_agent.h"
 
-LinearVelocityAgent::LinearVelocityAgent(HRVOSimulator *simulator, const Vector &position,
-                                         float radius, const Vector &velocity,
-                                         float maxSpeed, float maxAccel, AgentPath &path)
-    : Agent(simulator, position, radius, velocity, velocity, maxSpeed, maxAccel, path)
+LinearVelocityAgent::LinearVelocityAgent(HRVOSimulator *simulator, const Vector &position, const Vector &velocity,
+                                         float max_speed,
+                                         float max_accel, AgentPath &path, float radius)
+    : Agent(simulator, position, velocity, velocity, max_speed, max_accel, path, radius)
 {
 }
 
@@ -44,12 +44,12 @@ void LinearVelocityAgent::computeNewVelocity()
 Agent::VelocityObstacle LinearVelocityAgent::createVelocityObstacle(
     const Agent &other_agent)
 {
-    VelocityObstacle velocityObstacle;
+    VelocityObstacle velocity_obstacle;
     if ((position_ - other_agent.getPosition()).lengthSquared() >
         std::pow(radius_ + other_agent.getRadius(), 2))
     {
         // This Agent is not colliding with other agent
-        velocityObstacle.apex_ = velocity_;
+        velocity_obstacle.apex_ = velocity_;
 
         const float angle =
             (position_ - other_agent.getPosition()).orientation().toRadians();
@@ -60,9 +60,9 @@ Agent::VelocityObstacle LinearVelocityAgent::createVelocityObstacle(
                       (position_ - other_agent.getPosition()).length());
 
         // Direction of the two edges of the velocity obstacle
-        velocityObstacle.side1_ =
+        velocity_obstacle.side1_ =
             Vector(std::cos(angle - openingAngle), std::sin(angle - openingAngle));
-        velocityObstacle.side2_ =
+        velocity_obstacle.side2_ =
             Vector(std::cos(angle + openingAngle), std::sin(angle + openingAngle));
     }
     else
@@ -70,10 +70,10 @@ Agent::VelocityObstacle LinearVelocityAgent::createVelocityObstacle(
         // This Agent is colliding with other agent
         // Creates Velocity Obstacle with the sides being 180 degrees
         // apart from each other
-        velocityObstacle.apex_ = velocity_;
-        velocityObstacle.side1_ =
+        velocity_obstacle.apex_ = velocity_;
+        velocity_obstacle.side1_ =
             (other_agent.getPosition() - position_).perpendicular().normalize();
-        velocityObstacle.side2_ = -velocityObstacle.side1_;
+        velocity_obstacle.side2_ = -velocity_obstacle.side1_;
     }
-    return velocityObstacle;
+    return velocity_obstacle;
 }

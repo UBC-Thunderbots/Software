@@ -168,19 +168,19 @@ class HRVOSimulator
     /**
      *      Returns the maximum acceleration of a specified agent.
      *
-     * @param agentNo  The number of the agent whose maximum acceleration is to be
+     * @param agent_id  The number of the agent whose maximum acceleration is to be
      * retrieved.
      * @return    The present maximum acceleration of the agent.
      */
-    float getAgentMaxAccel(std::size_t agentNo) const;
+    float getAgentMaxAccel(std::size_t agent_id) const;
 
     /**
      *      Returns the position of a specified agent.
      *
-     * @param agentNo  The number of the agent whose position is to be retrieved.
+     * @param agent_id  The number of the agent whose position is to be retrieved.
      * @return    The present position of the (center of) the agent.
      */
-    Vector getAgentPosition(std::size_t agentNo) const;
+    Vector getAgentPosition(std::size_t agent_id) const;
 
     /**
      *      Returns the preferred velocity of a specified agent.
@@ -188,36 +188,36 @@ class HRVOSimulator
      * The preferred speed of an agent is the speed it would choose
      * to take if it were not influenced by other agents.
      *
-     * @param agentNo  The number of the agent whose preferred velocity is to be
+     * @param agent_id  The number of the agent whose preferred velocity is to be
      * retrieved.
      * @return    The present preferred velocity of the agent.
      */
-    Vector getAgentPrefVelocity(std::size_t agentNo) const;
+    Vector getAgentPrefVelocity(std::size_t agent_id) const;
 
     /**
      *      Returns the radius of a specified agent.
      *
-     * @param agentNo  The number of the agent whose radius is to be retrieved.
+     * @param agent_id  The number of the agent whose radius is to be retrieved.
      * @return    The present radius of the agent.
      */
-    float getAgentRadius(std::size_t agentNo) const;
+    float getAgentRadius(std::size_t agent_id) const;
 
     /**
      *      Returns the progress towards its goal of a specified agent.
      *
-     * @param agentNo  The number of the agent whose progress towards its goal is to
+     * @param agent_id  The number of the agent whose progress towards its goal is to
      * be retrieved.
      * @return    True if the agent has reached its goal; false otherwise.
      */
-    bool hasAgentReachedGoal(std::size_t agentNo) const;
+    bool hasAgentReachedGoal(std::size_t agent_id) const;
 
     /**
      *      Returns the velocity of a specified agent.
      *
-     * @param agentNo  The number of the agent whose velocity is to be retrieved.
+     * @param agent_id  The number of the agent whose velocity is to be retrieved.
      * @return    The present velocity of the agent.
      */
-    Vector getAgentVelocity(std::size_t agentNo) const;
+    Vector getAgentVelocity(std::size_t agent_id) const;
 
     /**
      *   Returns the global time of the simulation.

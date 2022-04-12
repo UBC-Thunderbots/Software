@@ -3,27 +3,24 @@
 #include "extlibs/hrvo/path.h"
 #include "extlibs/hrvo/simulator.h"
 
-Agent::Agent(HRVOSimulator *simulator, const Vector &position, float radius,
-             const Vector &velocity, const Vector &prefVelocity, float maxSpeed,
-             float maxAccel, AgentPath &path)
+Agent::Agent(HRVOSimulator *simulator, const Vector &position, const Vector &velocity, const Vector &pref_velocity,
+             float max_speed, float max_accel, AgentPath &path, float min_radius)
     : simulator_(simulator),
       position_(position),
-      radius_(radius),
-      min_radius_(radius),
+      min_radius_(min_radius),
       velocity_(velocity),
-      pref_velocity_(prefVelocity),
-      max_speed_(maxSpeed),
-      max_accel_(maxAccel),
+      pref_velocity_(pref_velocity),
+      max_speed_(max_speed),
+      max_accel_(max_accel),
       path(path),
-      reached_goal_(false),
-      curr_max_allowed_speed(0.f)
+      reached_goal_(false)
 {
+    updateAgentRadius();
 }
 
 void Agent::update()
 {
-    // Update agent radius expansion based on velocity
-    radius_ = min_radius_ * (1 + velocity_.length() / (max_speed_ * 2));
+    updateAgentRadius();
 
     // Update agent velocity
     prev_vel = velocity_;
@@ -69,6 +66,11 @@ void Agent::update()
         reached_goal_             = false;
         simulator_->reached_goals = false;
     }
+}
+
+void Agent::updateAgentRadius()
+{
+    radius_ = min_radius_ * (1 + velocity_.length() / (max_speed_ * 2));
 }
 
 void Agent::setPath(const AgentPath &new_path)

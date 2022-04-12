@@ -14,16 +14,16 @@ class LinearVelocityAgent : public Agent
     /**
      * Constructor
      *
+     * @param simulator     The simulator which this agent is a part of.
      * @param position    The starting position of this agent.
-     * @param radius      The radius of this agent.
      * @param velocity    The initial velocity of this agent.
-     * @param maxSpeed    The maximum speed of this agent.
-     * @param maxAccel    The maximum acceleration of this agent.
+     * @param max_speed    The maximum speed of this agent.
+     * @param max_accel    The maximum acceleration of this agent.
      * @param path        The path of this agent
+     * @param radius      The radius of this agent.
      */
-    LinearVelocityAgent(HRVOSimulator *simulator, const Vector &position, float radius,
-                        const Vector &velocity, float maxSpeed, float maxAccel,
-                        AgentPath &path);
+    LinearVelocityAgent(HRVOSimulator *simulator, const Vector &position, const Vector &velocity, float max_speed,
+                        float max_accel, AgentPath &path, float radius);
 
     /**
      * Computes the new velocity of this agent.

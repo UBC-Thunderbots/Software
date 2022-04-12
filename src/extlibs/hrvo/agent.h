@@ -14,18 +14,17 @@ class Agent
     /**
      * Constructor
      *
-     * @param simulator          The simulator which this agent is a part of
-     * @param position           The starting position of this agent.
-     * @param radius             The radius of this agent.
-     * @param velocity           The initial velocity of this agent.
-     * @param prefVelocity       The preferred velocity of this agent.
-     * @param maxSpeed           The maximum speed of this agent.
-     * @param maxAccel           The maximum acceleration of this agent.
-     * @param path               The path for this agent
+     * @param simulator     The simulator which this agent is a part of.
+     * @param position      The starting position of this agent.
+     * @param velocity      The initial velocity of this agent.
+     * @param pref_velocity The preferred velocity of this agent.
+     * @param max_speed     The maximum speed of this agent.
+     * @param max_accel     The maximum acceleration of this agent.
+     * @param path          The path for this agent
+     * @param min_radius    The minimum min_radius which this agent can have.
      */
-    Agent(HRVOSimulator *simulator, const Vector &position, float radius,
-          const Vector &velocity, const Vector &prefVelocity, float maxSpeed,
-          float maxAccel, AgentPath &path);
+    Agent(HRVOSimulator *simulator, const Vector &position, const Vector &velocity, const Vector &pref_velocity,
+          float max_speed, float max_accel, AgentPath &path, float min_radius);
 
     virtual ~Agent() = default;
 
@@ -64,6 +63,11 @@ class Agent
      * Updates the position and velocity of this agent.
      */
     virtual void update();
+
+    /**
+     * Update agent radius based on its current velocity
+     */
+    void updateAgentRadius();
 
     /**
      * Returns the current position of the agent
@@ -167,7 +171,9 @@ public: // TODO: protected:
 
     // Agent Properties
     Vector position_;
-    float radius_; // Simulated Radius
+    // Current radius of agent which is expanded based on velocity (>= min_radius_)
+    float radius_;
+    // The minimum radius which this agent can have
     float min_radius_;
 
     // The actual current velocity of this Agent
@@ -186,9 +192,6 @@ public: // TODO: protected:
     bool reached_goal_;
 
     // TODO: Added for testing
-    float curr_max_allowed_speed;
-    float dist_remaining_to_goal;
-    float decel_dist;
     Vector prev_vel;
 
     HRVOSimulator *const simulator_;
