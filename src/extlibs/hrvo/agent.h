@@ -193,6 +193,9 @@ class Agent
 
     // TODO: Added for testing
     Vector prev_vel;
+    float dist_remaining_to_goal = 0;
+    float decel_dist = 0;
+    float ideal_speed = 0;
 
     HRVOSimulator *const simulator_;
 };

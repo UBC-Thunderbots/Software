@@ -17,7 +17,7 @@ TIME_WINDOW_TO_DISPLAY_S = 10
 
 
 class NamedValuePlotter(object):
-    def __init__(self, buffer_size=100):
+    def __init__(self, buffer_size=500):
 
         self.win = pg.plot()
         self.plots = {}

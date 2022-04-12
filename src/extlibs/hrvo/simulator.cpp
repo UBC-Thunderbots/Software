@@ -129,6 +129,8 @@ void HRVOSimulator::updateWorld(const World &world)
                 auto hrvo_agent = getFriendlyAgentFromRobotId(friendly_robot.id());
                 if (hrvo_agent.has_value())
                 {
+                    // TODO: Update velocity every 2 sec? but position every 0.2sec ...
+                    //       Worried that if robots have collision, hrvo sim wouldnt take that into account...
                     hrvo_agent.value()->setPosition(friendly_robot.position().toVector());
 
                     hrvo_agent.value()->setVelocity(friendly_robot.velocity());

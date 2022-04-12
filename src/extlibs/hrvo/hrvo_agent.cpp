@@ -507,14 +507,21 @@ void HRVOAgent::computePreferredVelocity()
                   std::pow(pref_speed_, 2)) /  // TODO: Change to velocity_.length()
                  (2 * max_accel_));
 
+    // TODO: DEBUGGING
+    decel_dist = start_linear_deceleration_distance;
+    dist_remaining_to_goal = distance_to_dest;
+
     if (distance_to_dest < start_linear_deceleration_distance)
     {
         // velocity given linear deceleration, distance away from goal, and desired final
         // speed.           + here since a is negative
-        // Vi^2 = sqrt(Vf^2 + 2 * a * d)
+        // Vi = sqrt(Vf^2 + 2 * a * d)
         double curr_pref_speed =
             std::sqrt(std::pow(speed_at_dest, 2) + 2 * max_accel_ * distance_to_dest);
         Vector ideal_pref_velocity = vector_to_dest.normalize(curr_pref_speed);
+
+        // TODO: DEBUGGING
+        ideal_speed = curr_pref_speed;
 
         // Limit the preferred velocity to the kinematic limits
         const Vector dv = ideal_pref_velocity - velocity_;
