@@ -20,10 +20,6 @@ static const double BALL_MAX_RADIUS_METERS = 0.0215;
 // cover more than 20% of the ball
 static const double MAX_FRACTION_OF_BALL_COVERED_BY_ROBOT = 0.2;
 
-static const double BALL_TO_FRONT_OF_ROBOT_DISTANCE_WHEN_DRIBBLING =
-    BALL_MAX_RADIUS_METERS -
-    2 * BALL_MAX_RADIUS_METERS * MAX_FRACTION_OF_BALL_COVERED_BY_ROBOT;
-
 // The mass of a standard golf ball, as defined by https://en.wikipedia.org/wiki/Golf_ball
 static const double BALL_MASS_KG = 0.004593;
 // The max allowed speed of the robot when the stop command is issued, in meters per

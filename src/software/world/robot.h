@@ -3,6 +3,7 @@
 #include <optional>
 
 #include "proto/team.pb.h"
+#include "software/constants.h"
 #include "software/geom/polygon.h"
 #include "software/time/timestamp.h"
 #include "software/world/robot_capabilities.h"
