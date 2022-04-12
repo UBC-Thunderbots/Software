@@ -222,7 +222,6 @@ std::size_t HRVOSimulator::addHRVORobotAgent(const Robot &robot)
 {
     Vector position = robot.position().toVector();
     Vector velocity;
-    float agent_radius = ROBOT_MAX_RADIUS_METERS * FRIENDLY_ROBOT_RADIUS_SCALE;
     float max_accel    = 1e-4;
     float pref_speed   = 1e-4;
     float max_speed    = 1e-4;
@@ -271,7 +270,7 @@ std::size_t HRVOSimulator::addHRVORobotAgent(const Robot &robot)
     AgentPath path =
         AgentPath({PathPoint(destination_point, speed_at_goal)}, path_radius);
 
-    return addHRVOAgent(position, agent_radius, velocity, max_speed, pref_speed,
+    return addHRVOAgent(position, ROBOT_MAX_RADIUS_METERS, velocity, max_speed, pref_speed,
                         max_accel, path, MAX_NEIGHBOR_SEARCH_DIST, MAX_NEIGHBORS,
                         uncertainty_offset);
 }
@@ -279,7 +278,6 @@ std::size_t HRVOSimulator::addHRVORobotAgent(const Robot &robot)
 std::size_t HRVOSimulator::addLinearVelocityRobotAgent(const Robot &robot,
                                                        const Vector &destination)
 {
-    // TODO (#2371): Replace Vector with Vector
     Vector position = robot.position().toVector();
     Vector velocity = robot.velocity();
     float max_accel = 0.f;
@@ -288,11 +286,8 @@ std::size_t HRVOSimulator::addLinearVelocityRobotAgent(const Robot &robot,
     // Max distance which the robot can travel in one time step + scaling
     float path_radius = (max_speed * time_step) / 2 * GOAL_RADIUS_SCALE;
 
-    // Enemy agents should appear larger to friendly agents to avoid collision
-    float agent_radius = ROBOT_MAX_RADIUS_METERS; // TODO: * ENEMY_ROBOT_RADIUS_SCALE;
-
     AgentPath path = AgentPath({PathPoint(destination, 0.0f)}, path_radius);
-    return addLinearVelocityAgent(position, agent_radius, velocity, max_speed, max_accel,
+    return addLinearVelocityAgent(position, ROBOT_MAX_RADIUS_METERS, velocity, max_speed, max_accel,
                                   path);
 }
 
