@@ -89,12 +89,19 @@ class Thunderscope(object):
 
         self.settings = QtCore.QSettings()
 
-        self.tabs = QTabWidget()
-        self.tabs.addTab(self.blue_full_system_dock_area, "Blue Full System")
-        self.tabs.addTab(self.yellow_full_system_dock_area, "Yellow Full System")
+        self.main_dock = DockArea()
+
+        blue_dock = Dock("Blue Fullsystem")
+        yellow_dock = Dock("Yellow Fullsystem")
+
+        blue_dock.addWidget(self.blue_full_system_dock_area)
+        yellow_dock.addWidget(self.yellow_full_system_dock_area)
+
+        self.main_dock.addDock(blue_dock)
+        self.main_dock.addDock(yellow_dock, "left", blue_dock)
 
         self.window = QtGui.QMainWindow()
-        self.window.setCentralWidget(self.tabs)
+        self.window.setCentralWidget(self.main_dock)
         self.window.setWindowTitle("Thunderscope")
 
         # ProtoUnixIOs
@@ -121,13 +128,11 @@ class Thunderscope(object):
 
         # Save and Load Prompts
         self.save_layout_shortcut = QtGui.QShortcut(
-            QtGui.QKeySequence("Ctrl+S"), self.window
-        )
+            QtGui.QKeySequence("Ctrl+S"), self.window)
         self.save_layout_shortcut.activated.connect(self.save_layout)
 
         self.open_layout_shortcut = QtGui.QShortcut(
-            QtGui.QKeySequence("Ctrl+O"), self.window
-        )
+            QtGui.QKeySequence("Ctrl+O"), self.window)
         self.open_layout_shortcut.activated.connect(self.load_layout)
 
         self.show_help = QtGui.QShortcut(QtGui.QKeySequence("h"), self.window)
@@ -165,16 +170,15 @@ class Thunderscope(object):
             print("No filename selected")
             return
 
-        blue_dock_area_state = self.blue_full_system_dock_area.saveState()
-        yellow_dock_area_state = self.yellow_full_system_dock_area.saveState()
-
         with shelve.open(filename, "c") as shelf:
-            shelf["blue_dock_area_state"] = blue_dock_area_state
-            shelf["yellow_dock_area_state"] = yellow_dock_area_state
+            shelf["dock_state"] = self.main_dock.saveState()
+            shelf["blue_dock_state"] = self.blue_full_system_dock_area.saveState()
+            shelf["yellow_dock_state"] = self.yellow_full_system_dock_area.saveState()
 
         with shelve.open(DEFAULT_LAYOUT_PATH, "c") as shelf:
-            shelf["blue_dock_area_state"] = blue_dock_area_state
-            shelf["yellow_dock_area_state"] = yellow_dock_area_state
+            shelf["dock_state"] = self.main_dock.saveState()
+            shelf["blue_dock_state"] = self.blue_full_system_dock_area.saveState()
+            shelf["yellow_dock_state"] = self.yellow_full_system_dock_area.saveState()
 
     def load_layout(self):
         """Open a file dialog to load the layout and state to all
@@ -194,18 +198,51 @@ class Thunderscope(object):
             return
 
         with shelve.open(filename, "r") as shelf:
-            self.blue_full_system_dock_area.restoreState(shelf["blue_dock_area_state"])
+            self.main_dock.restoreState(shelf["dock_state"])
+            self.blue_full_system_dock_area.restoreState(
+                    shelf["blue_dock_state"])
             self.yellow_full_system_dock_area.restoreState(
-                shelf["yellow_dock_area_state"]
-            )
+                    shelf["yellow_dock_state"])
 
             # Update default layout
             with shelve.open(DEFAULT_LAYOUT_PATH, "c") as default_shelf:
-                default_shelf["blue_dock_area_state"] = shelf["blue_dock_area_state"]
-                default_shelf["yellow_dock_area_state"] = shelf[
-                    "yellow_dock_area_state"
-                ]
+                default_shelf["dock_state"] = shelf["dock_state"]
+                default_shelf["blue_dock_state"] = shelf["blue_dock_state"]
+                default_shelf["yellow_dock_state"] = shelf["yellow_dock_state"]
                 default_shelf.sync()
+
+    def load_saved_layout(self, layout_path):
+        """Load the specified layout or the default file. If the default layout
+        file doesn't exist, and no layout is provided, then just configure
+        the default layout.
+
+        :param layout_path: Path to the layout file to load.
+
+        """
+        path = layout_path if layout_path else DEFAULT_LAYOUT_PATH
+
+        try:
+            with shelve.open(path, "r") as shelf:
+                self.main_dock.restoreState(shelf["dock_state"])
+                self.blue_full_system_dock_area.restoreState(shelf["blue_dock_state"])
+                self.yellow_full_system_dock_area.restoreState(shelf["yellow_dock_state"])
+                shelf.sync()
+
+                # Update default layout
+                with shelve.open(DEFAULT_LAYOUT_PATH, "c") as default_shelf:
+                    default_shelf["dock_state"] = shelf["dock_state"]
+                    default_shelf["blue_dock_state"] = shelf["blue_dock_state"]
+                    default_shelf["yellow_dock_state"] = shelf["yellow_dock_state"]
+                    default_shelf.sync()
+
+        except Exception as e:
+            print(
+                e,
+                Warning(
+                    "No layout file specified and default "
+                    + "layout at {} doesn't exist".format(path)
+                )
+            )
 
     def __run_full_system(
         self, runtime_dir, proto_unix_io, friendly_colour_yellow=False
@@ -601,28 +638,7 @@ if __name__ == "__main__":
         thunderscope.run_blue_full_system("/tmp/tbots/blue")
         thunderscope.run_yellow_full_system("/tmp/tbots/yellow")
         thunderscope.run_gamecontroller()
-
-        # Load the specified layout or the default file. If the default layout
-        # file doesn't exist, and no layout is provided, then just configure
-        # the default layout.
-        path = args.layout if args.layout else DEFAULT_LAYOUT_PATH
-
-        try:
-            with shelve.open(path, "r") as shelf:
-                thunderscope.blue_full_system_dock_area.restoreState(
-                    shelf["blue_dock_area_state"]
-                )
-                thunderscope.yellow_full_system_dock_area.restoreState(
-                    shelf["yellow_dock_area_state"]
-                )
-
-        except Exception:
-            print(
-                Warning(
-                    "No layout file specified and default "
-                    + "layout at {} doesn't exist".format(path)
-                )
-            )
+        thunderscope.load_saved_layout(args.layout)
 
         def async_sim_ticker():
             """Setup the world and tick simulation forever

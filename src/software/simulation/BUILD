@@ -208,7 +208,6 @@ cc_library(
         "//firmware/app/primitives:primitive_manager",
         "//firmware/app/world:firmware_world",
         "//proto:defending_side_msg_cc_proto",
-        "//proto/message_translation:er_force_world",
         "//proto/message_translation:primitive_google_to_nanopb_converter",
         "//proto/message_translation:ssl_detection",
         "//proto/message_translation:ssl_geometry",

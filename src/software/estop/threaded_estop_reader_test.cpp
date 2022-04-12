@@ -26,9 +26,8 @@ TEST(ThreadedEstopReaderTest, estop_play_is_false_by_default_before_startup)
     EXPECT_CALL(*mock_uart_ptr, flushSerialPort(_)).WillRepeatedly(Return(true));
 
 
-    int startup_interval_ms = 500;
 
-    ThreadedEstopReader estopReader(std::move(mock_uart), startup_interval_ms);
+    ThreadedEstopReader estopReader(std::move(mock_uart));
 
     EXPECT_FALSE(estopReader.isEstopPlay());
 }
@@ -45,7 +44,6 @@ TEST(ThreadedEstopReaderTest, estop_tick_is_called_multiple_times)
 
     auto mock_uart_ptr = mock_uart.get();
 
-    int startup_interval_ms = 5;
     std::mutex m;
     std::unique_lock lock(m);
     std::condition_variable cv;
@@ -66,7 +64,7 @@ TEST(ThreadedEstopReaderTest, estop_tick_is_called_multiple_times)
                         Return(play_ret_val)))
         .WillRepeatedly(Return(play_ret_val));
 
-    ThreadedEstopReader estopReader(std::move(mock_uart), startup_interval_ms);
+    ThreadedEstopReader estopReader(std::move(mock_uart));
     auto now = std::chrono::system_clock::now();
     EXPECT_TRUE(cv.wait_until(lock, now + std::chrono::milliseconds(test_timeout_ms),
                               [&ready] { return ready; }));
@@ -100,7 +98,7 @@ TEST(ThreadedEstopReaderTest, estop_state_changes_based_on_read_val)
                         Return(play_ret_val)))
         .WillRepeatedly(Return(play_ret_val));
 
-    ThreadedEstopReader estopReader(std::move(mock_uart), startup_interval_ms);
+    ThreadedEstopReader estopReader(std::move(mock_uart));
 
     EXPECT_TRUE(cv.wait_until(
         lock,
@@ -175,7 +173,7 @@ TEST(ThreadedEstopReaderTest, estop_play_is_false_after_reading_unexpected_messa
 
     int startup_interval_ms = 1;
 
-    ThreadedEstopReader estopReader(std::move(mock_uart), startup_interval_ms);
+    ThreadedEstopReader estopReader(std::move(mock_uart));
 
     EXPECT_TRUE(cv.wait_until(
         lock,
@@ -219,7 +217,7 @@ TEST(ThreadedEstopReaderTest,
 
     int startup_interval_ms = 5;
 
-    ThreadedEstopReader estopReader(std::move(mock_uart), startup_interval_ms);
+    ThreadedEstopReader estopReader(std::move(mock_uart));
 
     EXPECT_TRUE(cv.wait_until(
         lock,

@@ -7,8 +7,7 @@
 PowerService::PowerService()
     : status(), READ_BUFFER_SIZE(getMarshalledSize(PowerStatus()))
 {
-    this->uart = std::make_unique<BoostUartCommunication>(io_service, BAUD_RATE,
-                                                          DEVICE_SERIAL_PORT);
+    this->uart = std::make_unique<BoostUartCommunication>(BAUD_RATE, DEVICE_SERIAL_PORT);
 }
 
 void PowerService::start() {}

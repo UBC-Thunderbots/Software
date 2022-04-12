@@ -60,7 +60,6 @@ class PowerService : public Service
     std::unique_ptr<PowerStatus> poll(const PowerCommand& command);
 
    private:
-    boost::asio::io_service io_service;
     std::unique_ptr<BoostUartCommunication> uart;
     PowerStatus status;
 

@@ -214,14 +214,6 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
     bool ignore_invalid_camera_data =
         sensor_fusion_config->getIgnoreInvalidCameraData()->value();
 
-    // We invert the field side if we explicitly choose to override the values
-    // provided by the game controller. The 'defending_positive_side' parameter dictates
-    // the side we are defending if we are overriding the value
-    const bool override_game_controller_defending_side =
-        sensor_fusion_config->getOverrideGameControllerDefendingSide()->value();
-    const bool should_invert_field =
-        override_game_controller_defending_side && defending_positive_side;
-
     bool friendly_team_is_yellow =
         sensor_fusion_config->getFriendlyColorYellow()->value();
 
@@ -235,7 +227,7 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
         createTeamDetection({ssl_detection_frame}, TeamColour::BLUE, min_valid_x,
                             max_valid_x, ignore_invalid_camera_data);
 
-    if (should_invert_field)
+    if (defending_positive_side)
     {
         for (auto &detection : ball_detections)
         {

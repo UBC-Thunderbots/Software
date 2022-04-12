@@ -13,7 +13,7 @@ class Colors(object):
     BLUE_ROBOT_COLOR = QtGui.QColor(0, 75, 255, 255)
 
     ROBOT_SPEED_SLOW_COLOR = "black"
-    NAVIGATOR_PATH_COLOR = "blue"
+    NAVIGATOR_PATH_COLOR = "green"
     NAVIGATOR_OBSTACLE_COLOR = "orange"
 
     VALIDATION_PASSED_COLOR = "g"

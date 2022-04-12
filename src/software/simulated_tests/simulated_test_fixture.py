@@ -30,13 +30,14 @@ class SimulatorTestRunner(object):
     """Run a simulated test"""
 
     def __init__(
-        self, launch_delay_s=0.1, show_thunderscope=True, runtime_dir="/tmp/tbots"
+        self, launch_delay_s=0.1, show_thunderscope=True,
+        thunderscope_layout_path=None, runtime_dir="/tmp/tbots"
     ):
         """Initialize the SimulatorTestRunner
 
         :param launch_delay_s: How long to wait after launching the processes
-        :param show_thunderscope: If true, thunderscope opens and the test runs
-                                  in realtime
+        :param show_thunderscope: If true, thunderscope opens and the test runs in realtime
+        :param thunderscope_layout_path: The path to the thunderscope layout
         :param runtime_dir: Directory to open sockets, store logs and any output files
 
         """
@@ -45,19 +46,19 @@ class SimulatorTestRunner(object):
         self.show_thunderscope = show_thunderscope
 
         # Run full system and er_force_simulator
+        self.thunderscope.run_er_force_simulator("/tmp/tbots",
+                            "/tmp/tbots/blue", "/tmp/tbots/yellow")
         self.thunderscope.run_blue_full_system("/tmp/tbots/blue")
         self.thunderscope.run_yellow_full_system("/tmp/tbots/yellow")
-        self.thunderscope.run_er_force_simulator(
-            "/tmp/tbots", "/tmp/tbots/blue", "/tmp/tbots/yellow"
-        )
+        self.thunderscope.load_saved_layout(thunderscope_layout_path)
+
         time.sleep(launch_delay_s)
 
         self.world_buffer = queue.Queue()
 
         # Only validate on the blue worlds
         self.thunderscope.blue_full_system_proto_unix_io.register_observer(
-            World, self.world_buffer
-        )
+                    World, self.world_buffer)
 
         self.last_exception = None
 
@@ -132,9 +133,6 @@ class SimulatorTestRunner(object):
                     self.thunderscope.blue_full_system_proto_unix_io.send_proto(
                         ValidationProtoSet, always_validation_proto_set
                     )
-                    self.thunderscope.yellow_full_system_proto_unix_io.send_proto(
-                        ValidationProtoSet, always_validation_proto_set
-                    )
 
                 # Check that all always validations are always valid
                 validation.check_validation(always_validation_proto_set)
@@ -189,11 +187,18 @@ def load_command_line_arguments():
     parser.add_argument(
         "--enable_thunderscope", action="store_true", help="enable thunderscope"
     )
+    parser.add_argument(
+        "--layout",
+        action="store",
+        help="Which layout to run, if not specified the last layout will run",
+    )
     return parser.parse_args()
 
 
 @pytest.fixture
 def simulated_test_runner():
     args = load_command_line_arguments()
-    runner = SimulatorTestRunner(show_thunderscope=args.enable_thunderscope)
+    runner = SimulatorTestRunner(
+                show_thunderscope=args.enable_thunderscope,
+                thunderscope_layout_path=args.layout)
     yield runner

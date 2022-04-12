@@ -8,7 +8,6 @@
 #include <iostream>
 
 #include "extlibs/er_force_sim/src/protobuf/robot.h"
-#include "proto/message_translation/er_force_world.h"
 #include "proto/message_translation/primitive_google_to_nanopb_converter.h"
 #include "proto/message_translation/ssl_detection.h"
 #include "proto/message_translation/ssl_geometry.h"
@@ -86,11 +85,11 @@ void ErForceSimulator::setWorldState(const TbotsProto::WorldState& world_state)
     {
         setBallState(createBallState(world_state.ball_state()));
     }
-    if (!world_state.blue_robots().empty())
+    if (world_state.blue_robots().size() > 0)
     {
         setRobots(world_state.blue_robots(), gameController::Team::BLUE);
     }
-    if (!world_state.yellow_robots().empty())
+    if (world_state.yellow_robots().size() > 0)
     {
         setRobots(world_state.yellow_robots(), gameController::Team::YELLOW);
     }

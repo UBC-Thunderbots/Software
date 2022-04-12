@@ -7,6 +7,7 @@ cc_library(
     deps = [
         "//proto:sensor_msg_cc_proto",
         "//proto/message_translation:ssl_detection",
+        "//proto/message_translation:tbots_protobuf",
         "//proto/message_translation:ssl_geometry",
         "//proto/message_translation:ssl_referee",
         "//shared/parameter:cpp_configs",
