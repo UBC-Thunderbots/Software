@@ -37,14 +37,16 @@
 #include <limits>
 
 #include "path.h"
-#include "software/geom/vector.h"
 #include "proto/message_translation/tbots_protobuf.h"
+#include "software/geom/vector.h"
 #include "software/logger/logger.h"
 
 
-HRVOAgent::HRVOAgent(HRVOSimulator *simulator, const Vector &position, const Vector &velocity, float pref_speed,
-                     float max_speed, float max_accel, AgentPath &path, float radius, std::size_t max_num_neighbors,
-                     float max_neighbor_dist, float uncertainty_offset)
+HRVOAgent::HRVOAgent(HRVOSimulator *simulator, const Vector &position,
+                     const Vector &velocity, float pref_speed, float max_speed,
+                     float max_accel, AgentPath &path, float radius,
+                     std::size_t max_num_neighbors, float max_neighbor_dist,
+                     float uncertainty_offset)
     : Agent(simulator, position, velocity, velocity, max_speed, max_accel, path, radius),
       max_neighbors_(max_num_neighbors),
       neighbor_dist_(max_neighbor_dist),
@@ -109,8 +111,8 @@ Agent::VelocityObstacle HRVOAgent::createVelocityObstacle(const Agent &other_age
                             d;
 
             velocity_obstacle.apex_ =
-                    velocity_ + s * velocity_obstacle.side1_ -
-                    (position_ - other_agent.getPosition())
+                velocity_ + s * velocity_obstacle.side1_ -
+                (position_ - other_agent.getPosition())
                     .normalize((uncertainty_offset_ *
                                 (position_ - other_agent.getPosition()).length() /
                                 (radius_ + other_agent.getRadius())));
@@ -126,8 +128,8 @@ Agent::VelocityObstacle HRVOAgent::createVelocityObstacle(const Agent &other_age
                             d;
 
             velocity_obstacle.apex_ =
-                    velocity_ + s * velocity_obstacle.side2_ -
-                    (position_ - other_agent.getPosition())
+                velocity_ + s * velocity_obstacle.side2_ -
+                (position_ - other_agent.getPosition())
                     .normalize(uncertainty_offset_ *
                                (position_ - other_agent.getPosition()).length() /
                                (other_agent.getRadius() + radius_));
@@ -196,16 +198,16 @@ void HRVOAgent::computeNewVelocity()
         candidate.velocity_obstacle2_ = i;
 
         const float dot_product_1 = (pref_velocity_ - velocity_obstacles_[i].apex_)
-                                      .dot(velocity_obstacles_[i].side1_);
+                                        .dot(velocity_obstacles_[i].side1_);
         const float dot_product_2 = (pref_velocity_ - velocity_obstacles_[i].apex_)
-                                      .dot(velocity_obstacles_[i].side2_);
+                                        .dot(velocity_obstacles_[i].side2_);
 
         if (dot_product_1 > 0.0f &&
             (velocity_obstacles_[i].side1_)
                     .determinant(pref_velocity_ - velocity_obstacles_[i].apex_) > 0.0f)
         {
-            candidate.position_ =
-                    velocity_obstacles_[i].apex_ + dot_product_1 * velocity_obstacles_[i].side1_;
+            candidate.position_ = velocity_obstacles_[i].apex_ +
+                                  dot_product_1 * velocity_obstacles_[i].side1_;
 
             if (candidate.position_.lengthSquared() < max_speed_ * max_speed_)
             {
@@ -218,8 +220,8 @@ void HRVOAgent::computeNewVelocity()
             (velocity_obstacles_[i].side2_)
                     .determinant(pref_velocity_ - velocity_obstacles_[i].apex_) < 0.0f)
         {
-            candidate.position_ =
-                    velocity_obstacles_[i].apex_ + dot_product_2 * velocity_obstacles_[i].side2_;
+            candidate.position_ = velocity_obstacles_[i].apex_ +
+                                  dot_product_2 * velocity_obstacles_[i].side2_;
 
             if (candidate.position_.lengthSquared() < max_speed_ * max_speed_)
             {
@@ -230,194 +232,213 @@ void HRVOAgent::computeNewVelocity()
     }
 
     // // The ones far away from the robot when stationary TODO: Convert naming? or remove
-//    for (int j = 0; j < static_cast<int>(velocity_obstacles_.size()); ++j)
-//    {
-//        candidate.velocity_obstacle1_ = std::numeric_limits<int>::max();
-//        candidate.velocity_obstacle2_ = j;
-//
-//        float discriminant =
-//            max_speed_ * max_speed_ -
-//            std::pow(
-//                (velocity_obstacles_[j].apex_).determinant(velocity_obstacles_[j].side1_),
-//                2.f);
-//
-//        if (discriminant > 0.0f)
-//        {
-//            const float t1 =
-//                -(velocity_obstacles_[j].apex_.dot(velocity_obstacles_[j].side1_)) +
-//                std::sqrt(discriminant);
-//            const float t2 =
-//                -(velocity_obstacles_[j].apex_.dot(velocity_obstacles_[j].side1_)) -
-//                std::sqrt(discriminant);
-//
-//            if (t1 >= 0.0f)
-//            {
-//                candidate.position_ =
-//                    velocity_obstacles_[j].apex_ + t1 * velocity_obstacles_[j].side1_;
-//                candidates_.insert(std::make_pair(
-//                    (pref_velocity_ - candidate.position_).lengthSquared(), candidate));
-//            }
-//
-//            if (t2 >= 0.0f)
-//            {
-//                candidate.position_ =
-//                    velocity_obstacles_[j].apex_ + t2 * velocity_obstacles_[j].side1_;
-//                candidates_.insert(std::make_pair(
-//                    (pref_velocity_ - candidate.position_).lengthSquared(), candidate));
-//            }
-//        }
-//
-//        discriminant =
-//            max_speed_ * max_speed_ -
-//            std::pow(
-//                (velocity_obstacles_[j].apex_).determinant(velocity_obstacles_[j].side2_),
-//                2.f);
-//
-//        if (discriminant > 0.0f)
-//        {
-//            const float t1 =
-//                -(velocity_obstacles_[j].apex_.dot(velocity_obstacles_[j].side2_)) +
-//                std::sqrt(discriminant);
-//            const float t2 =
-//                -(velocity_obstacles_[j].apex_.dot(velocity_obstacles_[j].side2_)) -
-//                std::sqrt(discriminant);
-//
-//            if (t1 >= 0.0f)
-//            {
-//                candidate.position_ =
-//                    velocity_obstacles_[j].apex_ + t1 * velocity_obstacles_[j].side2_;
-//                candidates_.insert(std::make_pair(
-//                    (pref_velocity_ - candidate.position_).lengthSquared(), candidate));
-//            }
-//
-//            if (t2 >= 0.0f)
-//            {
-//                candidate.position_ =
-//                    velocity_obstacles_[j].apex_ + t2 * velocity_obstacles_[j].side2_;
-//                candidates_.insert(std::make_pair(
-//                    (pref_velocity_ - candidate.position_).lengthSquared(), candidate));
-//            }
-//        }
-//    }
+    //    for (int j = 0; j < static_cast<int>(velocity_obstacles_.size()); ++j)
+    //    {
+    //        candidate.velocity_obstacle1_ = std::numeric_limits<int>::max();
+    //        candidate.velocity_obstacle2_ = j;
+    //
+    //        float discriminant =
+    //            max_speed_ * max_speed_ -
+    //            std::pow(
+    //                (velocity_obstacles_[j].apex_).determinant(velocity_obstacles_[j].side1_),
+    //                2.f);
+    //
+    //        if (discriminant > 0.0f)
+    //        {
+    //            const float t1 =
+    //                -(velocity_obstacles_[j].apex_.dot(velocity_obstacles_[j].side1_)) +
+    //                std::sqrt(discriminant);
+    //            const float t2 =
+    //                -(velocity_obstacles_[j].apex_.dot(velocity_obstacles_[j].side1_)) -
+    //                std::sqrt(discriminant);
+    //
+    //            if (t1 >= 0.0f)
+    //            {
+    //                candidate.position_ =
+    //                    velocity_obstacles_[j].apex_ + t1 *
+    //                    velocity_obstacles_[j].side1_;
+    //                candidates_.insert(std::make_pair(
+    //                    (pref_velocity_ - candidate.position_).lengthSquared(),
+    //                    candidate));
+    //            }
+    //
+    //            if (t2 >= 0.0f)
+    //            {
+    //                candidate.position_ =
+    //                    velocity_obstacles_[j].apex_ + t2 *
+    //                    velocity_obstacles_[j].side1_;
+    //                candidates_.insert(std::make_pair(
+    //                    (pref_velocity_ - candidate.position_).lengthSquared(),
+    //                    candidate));
+    //            }
+    //        }
+    //
+    //        discriminant =
+    //            max_speed_ * max_speed_ -
+    //            std::pow(
+    //                (velocity_obstacles_[j].apex_).determinant(velocity_obstacles_[j].side2_),
+    //                2.f);
+    //
+    //        if (discriminant > 0.0f)
+    //        {
+    //            const float t1 =
+    //                -(velocity_obstacles_[j].apex_.dot(velocity_obstacles_[j].side2_)) +
+    //                std::sqrt(discriminant);
+    //            const float t2 =
+    //                -(velocity_obstacles_[j].apex_.dot(velocity_obstacles_[j].side2_)) -
+    //                std::sqrt(discriminant);
+    //
+    //            if (t1 >= 0.0f)
+    //            {
+    //                candidate.position_ =
+    //                    velocity_obstacles_[j].apex_ + t1 *
+    //                    velocity_obstacles_[j].side2_;
+    //                candidates_.insert(std::make_pair(
+    //                    (pref_velocity_ - candidate.position_).lengthSquared(),
+    //                    candidate));
+    //            }
+    //
+    //            if (t2 >= 0.0f)
+    //            {
+    //                candidate.position_ =
+    //                    velocity_obstacles_[j].apex_ + t2 *
+    //                    velocity_obstacles_[j].side2_;
+    //                candidates_.insert(std::make_pair(
+    //                    (pref_velocity_ - candidate.position_).lengthSquared(),
+    //                    candidate));
+    //            }
+    //        }
+    //    }
 
     // // The one right on top of the robot
-//    for (int i = 0; i < static_cast<int>(velocity_obstacles_.size()) - 1; ++i)
-//    {
-//        for (int j = i + 1; j < static_cast<int>(velocity_obstacles_.size()); ++j)
-//        {
-//            candidate.velocity_obstacle1_ = i;
-//            candidate.velocity_obstacle2_ = j;
-//
-//            float d =
-//                (velocity_obstacles_[i].side1_).determinant(velocity_obstacles_[j].side1_);
-//
-//            if (d != 0.0f)
-//            {
-//                const float s =
-//                    (velocity_obstacles_[j].apex_ - velocity_obstacles_[i].apex_)
-//                        .determinant(velocity_obstacles_[j].side1_) /
-//                    d;
-//                const float t =
-//                    (velocity_obstacles_[j].apex_ - velocity_obstacles_[i].apex_)
-//                        .determinant(velocity_obstacles_[i].side1_) /
-//                    d;
-//
-//                if (s >= 0.0f && t >= 0.0f)
-//                {
-//                    candidate.position_ =
-//                        velocity_obstacles_[i].apex_ + s * velocity_obstacles_[i].side1_;
-//
-//                    if (candidate.position_.lengthSquared() < max_speed_ * max_speed_)
-//                    {
-//                        candidates_.insert(std::make_pair(
-//                            (pref_velocity_ - candidate.position_).lengthSquared(),
-//                            candidate));
-//                    }
-//                }
-//            }
-//
-//            d = (velocity_obstacles_[i].side2_).determinant(velocity_obstacles_[j].side1_);
-//
-//            if (d != 0.0f)
-//            {
-//                const float s =
-//                    (velocity_obstacles_[j].apex_ - velocity_obstacles_[i].apex_)
-//                        .determinant(velocity_obstacles_[j].side1_) /
-//                    d;
-//                const float t =
-//                    (velocity_obstacles_[j].apex_ - velocity_obstacles_[i].apex_)
-//                        .determinant(velocity_obstacles_[i].side2_) /
-//                    d;
-//
-//                if (s >= 0.0f && t >= 0.0f)
-//                {
-//                    candidate.position_ =
-//                        velocity_obstacles_[i].apex_ + s * velocity_obstacles_[i].side2_;
-//
-//                    if (candidate.position_.lengthSquared() < max_speed_ * max_speed_)
-//                    {
-//                        candidates_.insert(std::make_pair(
-//                            (pref_velocity_ - candidate.position_).lengthSquared(),
-//                            candidate));
-//                    }
-//                }
-//            }
-//
-//            d = (velocity_obstacles_[i].side1_).determinant(velocity_obstacles_[j].side2_);
-//
-//            if (d != 0.0f)
-//            {
-//                const float s =
-//                    (velocity_obstacles_[j].apex_ - velocity_obstacles_[i].apex_)
-//                        .determinant(velocity_obstacles_[j].side2_) /
-//                    d;
-//                const float t =
-//                    (velocity_obstacles_[j].apex_ - velocity_obstacles_[i].apex_)
-//                        .determinant(velocity_obstacles_[i].side1_) /
-//                    d;
-//
-//                if (s >= 0.0f && t >= 0.0f)
-//                {
-//                    candidate.position_ =
-//                        velocity_obstacles_[i].apex_ + s * velocity_obstacles_[i].side1_;
-//
-//                    if (candidate.position_.lengthSquared() < max_speed_ * max_speed_)
-//                    {
-//                        candidates_.insert(std::make_pair(
-//                            (pref_velocity_ - candidate.position_).lengthSquared(),
-//                            candidate));
-//                    }
-//                }
-//            }
-//
-//            d = (velocity_obstacles_[i].side2_).determinant(velocity_obstacles_[j].side2_);
-//
-//            if (d != 0.0f)
-//            {
-//                const float s =
-//                    (velocity_obstacles_[j].apex_ - velocity_obstacles_[i].apex_)
-//                        .determinant(velocity_obstacles_[j].side2_) /
-//                    d;
-//                const float t =
-//                    (velocity_obstacles_[j].apex_ - velocity_obstacles_[i].apex_)
-//                        .determinant(velocity_obstacles_[i].side2_) /
-//                    d;
-//
-//                if (s >= 0.0f && t >= 0.0f)
-//                {
-//                    candidate.position_ =
-//                        velocity_obstacles_[i].apex_ + s * velocity_obstacles_[i].side2_;
-//
-//                    if (candidate.position_.lengthSquared() < max_speed_ * max_speed_)
-//                    {
-//                        candidates_.insert(std::make_pair(
-//                            (pref_velocity_ - candidate.position_).lengthSquared(),
-//                            candidate));
-//                    }
-//                }
-//            }
-//        }
-//    }
+    //    for (int i = 0; i < static_cast<int>(velocity_obstacles_.size()) - 1; ++i)
+    //    {
+    //        for (int j = i + 1; j < static_cast<int>(velocity_obstacles_.size()); ++j)
+    //        {
+    //            candidate.velocity_obstacle1_ = i;
+    //            candidate.velocity_obstacle2_ = j;
+    //
+    //            float d =
+    //                (velocity_obstacles_[i].side1_).determinant(velocity_obstacles_[j].side1_);
+    //
+    //            if (d != 0.0f)
+    //            {
+    //                const float s =
+    //                    (velocity_obstacles_[j].apex_ - velocity_obstacles_[i].apex_)
+    //                        .determinant(velocity_obstacles_[j].side1_) /
+    //                    d;
+    //                const float t =
+    //                    (velocity_obstacles_[j].apex_ - velocity_obstacles_[i].apex_)
+    //                        .determinant(velocity_obstacles_[i].side1_) /
+    //                    d;
+    //
+    //                if (s >= 0.0f && t >= 0.0f)
+    //                {
+    //                    candidate.position_ =
+    //                        velocity_obstacles_[i].apex_ + s *
+    //                        velocity_obstacles_[i].side1_;
+    //
+    //                    if (candidate.position_.lengthSquared() < max_speed_ *
+    //                    max_speed_)
+    //                    {
+    //                        candidates_.insert(std::make_pair(
+    //                            (pref_velocity_ - candidate.position_).lengthSquared(),
+    //                            candidate));
+    //                    }
+    //                }
+    //            }
+    //
+    //            d =
+    //            (velocity_obstacles_[i].side2_).determinant(velocity_obstacles_[j].side1_);
+    //
+    //            if (d != 0.0f)
+    //            {
+    //                const float s =
+    //                    (velocity_obstacles_[j].apex_ - velocity_obstacles_[i].apex_)
+    //                        .determinant(velocity_obstacles_[j].side1_) /
+    //                    d;
+    //                const float t =
+    //                    (velocity_obstacles_[j].apex_ - velocity_obstacles_[i].apex_)
+    //                        .determinant(velocity_obstacles_[i].side2_) /
+    //                    d;
+    //
+    //                if (s >= 0.0f && t >= 0.0f)
+    //                {
+    //                    candidate.position_ =
+    //                        velocity_obstacles_[i].apex_ + s *
+    //                        velocity_obstacles_[i].side2_;
+    //
+    //                    if (candidate.position_.lengthSquared() < max_speed_ *
+    //                    max_speed_)
+    //                    {
+    //                        candidates_.insert(std::make_pair(
+    //                            (pref_velocity_ - candidate.position_).lengthSquared(),
+    //                            candidate));
+    //                    }
+    //                }
+    //            }
+    //
+    //            d =
+    //            (velocity_obstacles_[i].side1_).determinant(velocity_obstacles_[j].side2_);
+    //
+    //            if (d != 0.0f)
+    //            {
+    //                const float s =
+    //                    (velocity_obstacles_[j].apex_ - velocity_obstacles_[i].apex_)
+    //                        .determinant(velocity_obstacles_[j].side2_) /
+    //                    d;
+    //                const float t =
+    //                    (velocity_obstacles_[j].apex_ - velocity_obstacles_[i].apex_)
+    //                        .determinant(velocity_obstacles_[i].side1_) /
+    //                    d;
+    //
+    //                if (s >= 0.0f && t >= 0.0f)
+    //                {
+    //                    candidate.position_ =
+    //                        velocity_obstacles_[i].apex_ + s *
+    //                        velocity_obstacles_[i].side1_;
+    //
+    //                    if (candidate.position_.lengthSquared() < max_speed_ *
+    //                    max_speed_)
+    //                    {
+    //                        candidates_.insert(std::make_pair(
+    //                            (pref_velocity_ - candidate.position_).lengthSquared(),
+    //                            candidate));
+    //                    }
+    //                }
+    //            }
+    //
+    //            d =
+    //            (velocity_obstacles_[i].side2_).determinant(velocity_obstacles_[j].side2_);
+    //
+    //            if (d != 0.0f)
+    //            {
+    //                const float s =
+    //                    (velocity_obstacles_[j].apex_ - velocity_obstacles_[i].apex_)
+    //                        .determinant(velocity_obstacles_[j].side2_) /
+    //                    d;
+    //                const float t =
+    //                    (velocity_obstacles_[j].apex_ - velocity_obstacles_[i].apex_)
+    //                        .determinant(velocity_obstacles_[i].side2_) /
+    //                    d;
+    //
+    //                if (s >= 0.0f && t >= 0.0f)
+    //                {
+    //                    candidate.position_ =
+    //                        velocity_obstacles_[i].apex_ + s *
+    //                        velocity_obstacles_[i].side2_;
+    //
+    //                    if (candidate.position_.lengthSquared() < max_speed_ *
+    //                    max_speed_)
+    //                    {
+    //                        candidates_.insert(std::make_pair(
+    //                            (pref_velocity_ - candidate.position_).lengthSquared(),
+    //                            candidate));
+    //                    }
+    //                }
+    //            }
+    //        }
+    //    }
 
     int optimal = -1;
 
@@ -428,13 +449,14 @@ void HRVOAgent::computeNewVelocity()
 
         for (int j = 0; j < static_cast<int>(velocity_obstacles_.size()); ++j)
         {
-            if (j != candidate.velocity_obstacle1_ && j != candidate.velocity_obstacle2_ &&
+            if (j != candidate.velocity_obstacle1_ &&
+                j != candidate.velocity_obstacle2_ &&
                 (velocity_obstacles_[j].side2_)
                         .determinant(candidate.position_ - velocity_obstacles_[j].apex_) <
-                0.0f &&
+                    0.0f &&
                 (velocity_obstacles_[j].side1_)
                         .determinant(candidate.position_ - velocity_obstacles_[j].apex_) >
-                0.0f)
+                    0.0f)
             {
                 valid = false;
 
@@ -467,21 +489,22 @@ void HRVOAgent::computePreferredVelocity()
     }
 
     Vector goal_position = path_point_opt.value().getPosition();
-    float speed_at_dest   = path_point_opt.value().getSpeed();
+    float speed_at_dest  = path_point_opt.value().getSpeed();
 
     float max_dist_per_tick = max_accel_ * simulator_->getTimeStep();
-    Vector vector_to_dest = goal_position - position_;
-    double distance_to_dest         = vector_to_dest.length();
+    Vector vector_to_dest   = goal_position - position_;
+    double distance_to_dest = vector_to_dest.length();
     if (distance_to_dest > max_dist_per_tick)
     {
-        // Given the lag of HRVO simulator compared to real life, we assume that the robot has
-        // travelled the maximum distance for one tick.
+        // Given the lag of HRVO simulator compared to real life, we assume that the robot
+        // has travelled the maximum distance for one tick.
         distance_to_dest -= max_dist_per_tick;
     }
 
     // d = (Vf^2 - Vi^2) / 2a
     double start_linear_deceleration_distance =
-        std::abs((std::pow(speed_at_dest, 2) - std::pow(pref_speed_, 2)) / // TODO: Change to velocity_.length()
+        std::abs((std::pow(speed_at_dest, 2) -
+                  std::pow(pref_speed_, 2)) /  // TODO: Change to velocity_.length()
                  (2 * max_accel_));
 
     if (distance_to_dest < start_linear_deceleration_distance)
@@ -489,7 +512,8 @@ void HRVOAgent::computePreferredVelocity()
         // velocity given linear deceleration, distance away from goal, and desired final
         // speed.           + here since a is negative
         // Vi^2 = sqrt(Vf^2 + 2 * a * d)
-        double curr_pref_speed = std::sqrt(std::pow(speed_at_dest, 2) + 2 * max_accel_ * distance_to_dest);
+        double curr_pref_speed =
+            std::sqrt(std::pow(speed_at_dest, 2) + 2 * max_accel_ * distance_to_dest);
         Vector ideal_pref_velocity = vector_to_dest.normalize(curr_pref_speed);
 
         // Limit the preferred velocity to the kinematic limits
@@ -502,16 +526,16 @@ void HRVOAgent::computePreferredVelocity()
         {
             // Calculate the maximum velocity towards the preferred velocity, given the
             // acceleration constraint
-            pref_velocity_ =
-                velocity_ + dv.normalize(max_dist_per_tick);
+            pref_velocity_ = velocity_ + dv.normalize(max_dist_per_tick);
         }
     }
     else
     {
         // Accelerate to preferred speed
         // Vf = Vi + a * curr_pref_speed
-        double curr_pref_speed = std::min(static_cast<double>(pref_speed_), velocity_.length() + max_dist_per_tick);
-        pref_velocity_ = vector_to_dest.normalize(curr_pref_speed);
+        double curr_pref_speed = std::min(static_cast<double>(pref_speed_),
+                                          velocity_.length() + max_dist_per_tick);
+        pref_velocity_         = vector_to_dest.normalize(curr_pref_speed);
     }
 }
 
@@ -526,7 +550,7 @@ void HRVOAgent::insertNeighbor(std::size_t agent_id, float range_squared)
     }
 
     Vector other_agent_relative_pos = other_agent->getPosition() - position_;
-    const float dist_squared              = other_agent_relative_pos.lengthSquared();
+    const float dist_squared        = other_agent_relative_pos.lengthSquared();
 
     Vector goal_pos          = path_point_opt.value().getPosition();
     Vector relative_goal_pos = goal_pos - position_;

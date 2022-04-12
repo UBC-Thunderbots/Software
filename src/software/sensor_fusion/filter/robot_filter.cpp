@@ -77,15 +77,18 @@ std::optional<Robot> RobotFilter::getFilteredData(
             filtered_data.timestamp.toMilliseconds() / data_num);
 
         // velocity = position difference / time difference
-//        if (getRobotId() == 1)
-//        {
-//            double time_delta = filtered_data.timestamp.toSeconds() -
-//                                current_robot_state.timestamp().toSeconds();
-//            double position_delta = (filtered_data.position - current_robot_state.position()).length();
-//            LOG(VISUALIZE) << *createNamedValue("time_delta " + std::to_string(getRobotId()), static_cast<float>(time_delta));
-//            LOG(VISUALIZE) << *createNamedValue("position_delta " + std::to_string(getRobotId()), static_cast<float>(position_delta));
-//
-//        }
+        //        if (getRobotId() == 1)
+        //        {
+        //            double time_delta = filtered_data.timestamp.toSeconds() -
+        //                                current_robot_state.timestamp().toSeconds();
+        //            double position_delta = (filtered_data.position -
+        //            current_robot_state.position()).length(); LOG(VISUALIZE) <<
+        //            *createNamedValue("time_delta " + std::to_string(getRobotId()),
+        //            static_cast<float>(time_delta)); LOG(VISUALIZE) <<
+        //            *createNamedValue("position_delta " + std::to_string(getRobotId()),
+        //            static_cast<float>(position_delta));
+        //
+        //        }
         filtered_data.velocity =
             (filtered_data.position - current_robot_state.position()) /
             (filtered_data.timestamp.toSeconds() -

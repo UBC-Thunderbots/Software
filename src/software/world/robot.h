@@ -33,7 +33,7 @@ class Robot
                    const Timestamp &timestamp,
                    const std::set<RobotCapability> &unavailable_capabilities =
                        std::set<RobotCapability>(),
-                               // TODO: Maybe not have default??
+                   // TODO: Maybe not have default??
                    const RobotConstants_t &robot_constants = create2015RobotConstants());
 
     /**

@@ -143,7 +143,8 @@ void KdTree::buildRecursive(std::size_t begin, std::size_t end, std::size_t node
     }
 }
 
-void KdTree::queryRecursive(HRVOAgent *agent, float &range_squared, std::size_t node) const
+void KdTree::queryRecursive(HRVOAgent *agent, float &range_squared,
+                            std::size_t node) const
 {
     if (nodes_[node].end_ - nodes_[node].begin_ <= HRVO_MAX_LEAF_SIZE)
     {

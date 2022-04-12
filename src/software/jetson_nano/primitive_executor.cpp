@@ -1,13 +1,13 @@
 #include "software/jetson_nano/primitive_executor.h"
 
 #include "proto/message_translation/tbots_geometry.h"
+#include "proto/message_translation/tbots_protobuf.h"
 #include "proto/primitive.pb.h"
 #include "proto/primitive/primitive_msg_factory.h"
 #include "proto/tbots_software_msgs.pb.h"
 #include "proto/visualization.pb.h"
 #include "software/logger/logger.h"
 #include "software/math/math_functions.h"
-#include "proto/message_translation/tbots_protobuf.h"
 
 PrimitiveExecutor::PrimitiveExecutor(const double time_step,
                                      const RobotConstants_t& robot_constants)
@@ -44,8 +44,10 @@ Vector PrimitiveExecutor::getTargetLinearVelocity(const unsigned int robot_id,
     double local_y_velocity = -orientation.sin() * target_global_velocity.x() +
                               orientation.cos() * target_global_velocity.y();
 
-//    std::cout << "HRVO Vel robot " << robot_id << " = " << target_global_velocity.length() << std::endl;
-//    LOG(VISUALIZE) << *createNamedValue("HRVO output " + std::to_string(robot_id), static_cast<float>(target_global_velocity.length()));
+    //    std::cout << "HRVO Vel robot " << robot_id << " = " <<
+    //    target_global_velocity.length() << std::endl; LOG(VISUALIZE) <<
+    //    *createNamedValue("HRVO output " + std::to_string(robot_id),
+    //    static_cast<float>(target_global_velocity.length()));
 
     return Vector(local_x_velocity, local_y_velocity)
         .normalize(target_global_velocity.length());

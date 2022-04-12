@@ -64,9 +64,10 @@ class HRVOAgent : public Agent
      * @param max_neighbor_dist       The maximum neighbor distance of this agent.
      * @param uncertainty_offset  The uncertainty offset of this agent.
      */
-    HRVOAgent(HRVOSimulator *simulator, const Vector &position, const Vector &velocity, float pref_speed,
-              float max_speed, float max_accel, AgentPath &path, float radius, std::size_t max_num_neighbors,
-              float max_neighbor_dist, float uncertainty_offset);
+    HRVOAgent(HRVOSimulator *simulator, const Vector &position, const Vector &velocity,
+              float pref_speed, float max_speed, float max_accel, AgentPath &path,
+              float radius, std::size_t max_num_neighbors, float max_neighbor_dist,
+              float uncertainty_offset);
 
     /**
      * Computes the new velocity of this agent.

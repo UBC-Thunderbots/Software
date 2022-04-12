@@ -50,8 +50,8 @@ cc_library(
     deps = [
         "//proto:visualization_cc_proto",
         "//proto/primitive:primitive_msg_factory",
-        "//software/logger:logger",
         "//software/geom:vector",
+        "//software/logger",
         "//software/world",
     ],
 )

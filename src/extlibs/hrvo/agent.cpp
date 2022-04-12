@@ -3,8 +3,9 @@
 #include "extlibs/hrvo/path.h"
 #include "extlibs/hrvo/simulator.h"
 
-Agent::Agent(HRVOSimulator *simulator, const Vector &position, const Vector &velocity, const Vector &pref_velocity,
-             float max_speed, float max_accel, AgentPath &path, float min_radius)
+Agent::Agent(HRVOSimulator *simulator, const Vector &position, const Vector &velocity,
+             const Vector &pref_velocity, float max_speed, float max_accel,
+             AgentPath &path, float min_radius)
     : simulator_(simulator),
       position_(position),
       min_radius_(min_radius),
@@ -39,15 +40,15 @@ void Agent::update()
     {
         // Calculate the maximum velocity towards the preferred velocity, given the
         // acceleration constraint
-        velocity_ =
-            velocity_ + dv.normalize(max_accel_ * simulator_->getTimeStep());
+        velocity_ = velocity_ + dv.normalize(max_accel_ * simulator_->getTimeStep());
     }
 
     position_ += velocity_ * simulator_->time_step;
 
     const std::optional<PathPoint> &path_point = path.getCurrentPathPoint();
-    if (path_point == std::nullopt || (path_point.value().getPosition() - position_).lengthSquared() <
-        path.getPathRadius() * path.getPathRadius())
+    if (path_point == std::nullopt ||
+        (path_point.value().getPosition() - position_).lengthSquared() <
+            path.getPathRadius() * path.getPathRadius())
     {
         // Is at current goal position
         if (path.isGoingToFinalPathPoint())

@@ -1,7 +1,7 @@
 #include "linear_velocity_agent.h"
 
-LinearVelocityAgent::LinearVelocityAgent(HRVOSimulator *simulator, const Vector &position, const Vector &velocity,
-                                         float max_speed,
+LinearVelocityAgent::LinearVelocityAgent(HRVOSimulator *simulator, const Vector &position,
+                                         const Vector &velocity, float max_speed,
                                          float max_accel, AgentPath &path, float radius)
     : Agent(simulator, position, velocity, velocity, max_speed, max_accel, path, radius)
 {
@@ -21,7 +21,7 @@ void LinearVelocityAgent::computeNewVelocity()
     }
 
     Vector destination = path_point_opt.value().getPosition();
-    pref_velocity_  = destination - position_;
+    pref_velocity_     = destination - position_;
 
     if (pref_velocity_.length() > max_speed_)
     {

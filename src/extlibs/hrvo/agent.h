@@ -23,8 +23,9 @@ class Agent
      * @param path          The path for this agent
      * @param min_radius    The minimum min_radius which this agent can have.
      */
-    Agent(HRVOSimulator *simulator, const Vector &position, const Vector &velocity, const Vector &pref_velocity,
-          float max_speed, float max_accel, AgentPath &path, float min_radius);
+    Agent(HRVOSimulator *simulator, const Vector &position, const Vector &velocity,
+          const Vector &pref_velocity, float max_speed, float max_accel, AgentPath &path,
+          float min_radius);
 
     virtual ~Agent() = default;
 
@@ -167,8 +168,7 @@ class Agent
      */
     void setPath(const AgentPath &new_path);
 
-public: // TODO: protected:
-
+   public:  // TODO: protected:
     // Agent Properties
     Vector position_;
     // Current radius of agent which is expanded based on velocity (>= min_radius_)

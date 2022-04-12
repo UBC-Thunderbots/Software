@@ -43,9 +43,9 @@ cc_library(
     srcs = ["robot_filter.cpp"],
     hdrs = ["robot_filter.h"],
     deps = [
+        ":vision_detection",
         "//proto:visualization_cc_proto",
         "//proto/primitive:primitive_msg_factory",
-        ":vision_detection",
         "//software/world:robot",
     ],
 )
