@@ -40,7 +40,7 @@ void Agent::update()
         // Calculate the maximum velocity towards the preferred velocity, given the
         // acceleration constraint
         velocity_ =
-            velocity_ + (max_accel_ * simulator_->getTimeStep()) * (dv / dv.length());
+            velocity_ + dv.normalize(max_accel_ * simulator_->getTimeStep());
     }
 
     position_ += velocity_ * simulator_->time_step;
@@ -70,7 +70,9 @@ void Agent::update()
 
 void Agent::updateAgentRadius()
 {
-    radius_ = min_radius_ * (1 + velocity_.length() / (max_speed_ * 2));
+    const float LOCAL_EPSILON = 1e-6f;  // Avoid dividing by zero
+    // Radius can be [min_radius_, 1.5 * min_radius]
+    radius_ = min_radius_ * (1 + velocity_.length() / (max_speed_ * 2 + LOCAL_EPSILON));
 }
 
 void Agent::setPath(const AgentPath &new_path)
