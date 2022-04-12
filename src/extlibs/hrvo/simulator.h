@@ -280,9 +280,8 @@ class HRVOSimulator
     // The amount of time which the simulator should advance by
     const float time_step;
 
-    // The last time which the velocity of the robot was updated
-    float last_time_velocity_updated;
-    Timestamp last_update_timestamp;
+    // The last time which the friendly robot states were updated
+    Timestamp last_update_friendlies_timestamp;
 
     // True if all agents have reached their destination
     bool reached_goals;
@@ -334,6 +333,5 @@ class HRVOSimulator
     static constexpr float MAX_COLLISION_SPEED = 0.5f;
 
     friend class Agent;
-    friend class Goal;
     friend class KdTree;
 };

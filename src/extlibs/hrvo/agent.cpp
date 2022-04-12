@@ -22,6 +22,10 @@ Agent::Agent(HRVOSimulator *simulator, const Vector &position, float radius,
 
 void Agent::update()
 {
+    // Update agent radius expansion based on velocity
+    radius_ = min_radius_ * (1 + velocity_.length() / (max_speed_ * 2));
+
+    // Update agent velocity
     prev_vel = velocity_;
     if (new_velocity_.length() >= max_speed_)
     {

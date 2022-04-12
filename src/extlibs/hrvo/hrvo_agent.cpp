@@ -474,10 +474,14 @@ void HRVOAgent::computePreferredVelocity()
 
     Vector vector_to_dest = goal_position - position_;
     // TODO: May be a problem if the goal is closer than max_accel away
-    // Given the lag of HRVO simulator compared to real life, we assume that the robot has
-    // travelled the maximum distance for one tick.
     float max_dist_per_tick = max_accel_ * simulator_->getTimeStep();
-    double distance_to_dest         = std::max(0.0, vector_to_dest.length() - max_dist_per_tick);
+    double distance_to_dest         = vector_to_dest.length();
+    if (distance_to_dest > max_dist_per_tick)
+    {
+        // Given the lag of HRVO simulator compared to real life, we assume that the robot has
+        // travelled the maximum distance for one tick.
+        distance_to_dest -= max_dist_per_tick;
+    }
 
     // d = (Vf^2 - Vi^2) / 2a
     double start_linear_deceleration_distance =
