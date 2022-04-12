@@ -32,7 +32,9 @@ class WorldLayer(FieldLayer):
 
         self.simulator_io = simulator_io
         self.friendly_colour_yellow = friendly_colour_yellow
+
         self.world_buffer = ThreadSafeBuffer(buffer_size, World)
+        self.robot_status_buffer = ThreadSafeBuffer(buffer_size, RobotStatus)
 
         self.setAcceptHoverEvents(True)
         self.setAcceptTouchEvents(True)
@@ -41,9 +43,8 @@ class WorldLayer(FieldLayer):
         self.pressed_M = False
         self.pressed_R = False
 
-        self.mouse_clicked = False
         self.mouse_click_pos = [0, 0]
-        self.mouse_hover_pos = [0, 0]  # might not need later, see hoverMoveEvent
+        self.mouse_hover_pos = [0, 0]
 
     def keyPressEvent(self, event):
         """Detect when a key has been pressed (override)
@@ -53,71 +54,30 @@ class WorldLayer(FieldLayer):
         :param event: The event
 
         """
+        print(event)
         if event.key() == Qt.Key.Key_R:
-            # TODO (#2410) enter function to rotate the robot
-            print("pressed R")
             self.pressed_R = True
 
         elif event.key() == Qt.Key.Key_Control:
-            # TODO (#2410) enter function to move the ball
-            print("pressed CTRL")
             self.pressed_CTRL = True
 
         elif event.key() == Qt.Key.Key_M:
-            # TODO (#2410) enter function to move the robot
-            print("pressed M")
             self.pressed_M = True
 
-    def __setup_robots(self, robot_locations, team_colour):
-        """Initializes the world from a list of robot locations
-
-        :param robot_locations: A list of robot locations (index is robot id)
-        :param team_colour: The color (either "blue" or "yellow")
-
-        """
-        world_state = WorldState()
-
-        for x, robot_map in enumerate(
-            [world_state.blue_robots, world_state.yellow_robots]
-        ):
-
-            for robot_id, robot_location in enumerate(robot_locations):
-                robot_map[robot_id].CopyFrom(
-                    RobotState(
-                        global_position=Point(
-                            x_meters=-3 if x == 0 else 3, y_meters=robot_location.y()
-                        ),
-                        global_orientation=Angle(radians=0),
-                        global_velocity=Vector(
-                            x_component_meters=0, y_component_meters=0
-                        ),
-                        global_angular_velocity=AngularVelocity(radians_per_second=0),
-                    )
-                )
-
-        return world_state
-
-    # Note: the function name formatting is different but this can't be changed
-    # since it's overriding the built-in Qt function
     def keyReleaseEvent(self, event):
         """Detect when a key has been released (override)
 
         :param event: The event
 
         """
+        print(event)
         if event.key() == Qt.Key.Key_R:
-            # TODO (#2410) exit function to rotate the robot
-            print("released R")
             self.pressed_R = False
 
         elif event.key() == Qt.Key.Key_Control:
-            # TODO (#2410) exit function to move the ball
             self.pressed_CTRL = False
-            print("released CTRL")
 
         elif event.key() == Qt.Key.Key_M:
-            # TODO (#2410) exit function to move the robot
-            print("released M")
             self.pressed_M = False
 
     def hoverMoveEvent(self, event):
@@ -142,17 +102,16 @@ class WorldLayer(FieldLayer):
         self.mouse_click_pos = [event.pos().x(), event.pos().y()]
 
         # determine whether a robot was clicked
-        self.identify_robots(event.pos().x(), event.pos().y())
+        friendly_robot, enemy_robot = self.identify_robots(
+            event.pos().x(), event.pos().y()
+        )
+        print(friendly_robot, enemy_robot)
 
         if self.pressed_CTRL:
-            # world_state = self.__setup_robots(
-            # [geom.Point(-3, x) for x in range(-2, 3)], "blue"
-            # )
             world_state = WorldState()
             world_state.ball_state.CopyFrom(
                 BallState(global_position=Point(x_meters=x, y_meters=y,),)
             )
-            print("HYELO")
             self.simulator_io.send_proto(WorldState, world_state)
 
     def identify_robots(self, mouse_x, mouse_y):
@@ -162,20 +121,21 @@ class WorldLayer(FieldLayer):
         :param mouse_y: The y position of the mouse click
         
         """
-        self.identify_robot(
-            mouse_x, mouse_y, self.cached_world.friendly_team.team_robots, "Friendly: "
+        friendly_robot = self.identify_robot(
+            mouse_x, mouse_y, self.cached_world.friendly_team.team_robots
         )
-        self.identify_robot(
-            mouse_x, mouse_y, self.cached_world.enemy_team.team_robots, "Enemy: "
+        enemy_robot = self.identify_robot(
+            mouse_x, mouse_y, self.cached_world.enemy_team.team_robots
         )
 
-    def identify_robot(self, mouse_x, mouse_y, team, side):
+        return friendly_robot, enemy_robot
+
+    def identify_robot(self, mouse_x, mouse_y, team):
         """Identify which robot was clicked on the team
 
         :param mouse_x: The x position of the mouse click
         :param mouse_y: The y position of the mouse click
         :param team: The team of robots to iterate over
-        :param side: The label of the team, "Friendly" or "Enemy"
 
         """
         for robot_ in team:
@@ -188,23 +148,8 @@ class WorldLayer(FieldLayer):
                 )
                 <= ROBOT_MAX_RADIUS / MM_PER_M
             ):
-                print(side)
-                print(robot_.id)
-
-    # Temporary draw function for testing purposes
-    def draw_mouse_click_loc(self, painter):
-        """Draw a circle indicating where the mouse was clicked on the field
-
-        :param painter: The painter
-
-        """
-        painter.setPen(pg.mkPen("g", width=2))
-        painter.drawEllipse(
-            self.createCircle(
-                self.mouse_click_pos[0], self.mouse_click_pos[1], BALL_RADIUS * 3,
-            )
-        )
-        self.mouse_clicked = False
+                return robot_
+        return None
 
     def draw_field(self, painter, field: Field):
 
@@ -279,7 +224,7 @@ class WorldLayer(FieldLayer):
                 270 * convert_degree,
             )
 
-    def draw_ball_state(self, painter, ball_state: BallState, ball_color):
+    def draw_ball_state(self, painter, ball_state: BallState):
         """Draw the ball
 
         :param painter: The painter
@@ -287,8 +232,8 @@ class WorldLayer(FieldLayer):
 
         """
 
-        painter.setPen(pg.mkPen(ball_color))
-        painter.setBrush(pg.mkBrush(ball_color))
+        painter.setPen(pg.mkPen(Colors.BALL_COLOR))
+        painter.setBrush(pg.mkBrush(Colors.BALL_COLOR))
         painter.drawEllipse(
             self.createCircle(
                 ball_state.global_position.x_meters * MM_PER_M,
@@ -306,10 +251,10 @@ class WorldLayer(FieldLayer):
 
         """
 
-        world = self.world_buffer.get(block=False)
+        self.cached_world = self.world_buffer.get(block=False)
 
-        self.draw_field(painter, world.field)
-        self.draw_ball_state(painter, world.ball.current_state, Colors.BALL_COLOR)
+        self.draw_field(painter, self.cached_world.field)
+        self.draw_ball_state(painter, self.cached_world.ball.current_state)
 
         friendly_colour = (
             Colors.YELLOW_ROBOT_COLOR
@@ -324,10 +269,13 @@ class WorldLayer(FieldLayer):
         self.draw_robot_states(
             painter,
             friendly_colour,
-            [robot.current_state for robot in world.friendly_team.team_robots],
+            [
+                robot.current_state
+                for robot in self.cached_world.friendly_team.team_robots
+            ],
         )
         self.draw_robot_states(
             painter,
             enemy_colour,
-            [robot.current_state for robot in world.enemy_team.team_robots],
+            [robot.current_state for robot in self.cached_world.enemy_team.team_robots],
         )

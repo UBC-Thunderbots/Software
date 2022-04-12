@@ -14,21 +14,25 @@ from software.thunderscope.constants import (
 from software.thunderscope.field.field_layer import FieldLayer
 from software.thunderscope.field.world_layer import WorldLayer
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
+from extlibs.er_force_sim.src.protobuf.world_pb2 import (
+    SimulatorState,
+    SimBall,
+    SimRobot,
+)
 
 
 class SimulatorLayer(FieldLayer):
-    def __init__(self, simulator_io, buffer_size=1):
+    def __init__(self, friendly_colour_yellow, buffer_size=1):
         """Visualize the simulator
 
-        :param simulator_io: The simulator io communicate with the simulator
         :param friendly_colour_yellow: Is the friendly_colour_yellow?
         :param buffer_size: The buffer size, set higher for smoother plots.
                             Set lower for more realtime plots. Default is arbitrary
 
         """
         FieldLayer.__init__(self)
-        self.sim_world_state_buffer = ThreadSafeBuffer(buffer_size, WorldState)
-        self.world_layer = WorldLayer(simulator_io)
+        self.friendly_colour_yellow = friendly_colour_yellow
+        self.simulator_state_buffer = ThreadSafeBuffer(buffer_size, SimulatorState)
 
     def paint(self, painter, option, widget):
         """Paint this layer
@@ -39,17 +43,16 @@ class SimulatorLayer(FieldLayer):
 
         """
 
-        sim_world_state = self.sim_world_state_buffer.get()
+        sim_world_state = self.simulator_state_buffer.get(block=False)
 
-        self.world_layer.draw_ball_state(
-            painter, sim_world_state.ball_state, Colors.SIM_BALL_COLOR
-        )
+        painter.setPen(pg.mkPen(Colors.SIM_BALL_COLOR))
+        painter.setBrush(pg.mkBrush(Colors.SIM_BALL_COLOR))
 
-        # TODO (#2399) Figure out which team color _we_ are and update the color
-        # passed into the team.
-        self.world_layer.draw_robot_states(
-            painter, Colors.YELLOW_ROBOT_COLOR, sim_world_state.yellow_robots.values()
-        )
-        self.world_layer.draw_robot_states(
-            painter, Colors.BLUE_ROBOT_COLOR, sim_world_state.blue_robots.values()
+        # Draw the ball from the simulator state
+        painter.drawEllipse(
+            self.createCircle(
+                sim_world_state.ball.p_y * MM_PER_M,
+                -sim_world_state.ball.p_x * MM_PER_M,
+                BALL_RADIUS,
+            )
         )

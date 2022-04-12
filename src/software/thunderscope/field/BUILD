@@ -54,6 +54,7 @@ py_library(
     srcs = ["simulator_layer.py"],
     deps = [
         ":field_layer",
+        "//extlibs/er_force_sim/src/protobuf:erforce_py_proto",
         "//software/thunderscope:thread_safe_buffer",
         requirement("pyqtgraph"),
     ],

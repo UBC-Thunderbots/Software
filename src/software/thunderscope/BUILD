@@ -14,6 +14,7 @@ py_binary(
         "//software/networking:networking.so",
     ],
     deps = [
+        "//extlibs/er_force_sim/src/protobuf:erforce_py_proto",
         "//proto:software_py_proto",
         "//proto/message_translation:py_tbots_protobuf",
         "//software/networking:threaded_unix_listener_py",

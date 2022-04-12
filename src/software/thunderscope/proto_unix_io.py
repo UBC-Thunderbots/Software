@@ -1,4 +1,3 @@
-import queue
 from threading import Thread
 
 import software.thunderscope.constants as constants
@@ -93,11 +92,15 @@ class ProtoUnixIO:
         :param data: The data to send
 
         """
+        if proto_class.DESCRIPTOR.full_name not in self.proto_observers:
+            raise KeyError(
+                "No observers registered for {}!".format(
+                    proto_class.DESCRIPTOR.full_name
+                )
+            )
+
         for buffer in self.proto_observers[proto_class.DESCRIPTOR.full_name]:
-            try:
-                buffer.put_nowait(data)
-            except queue.Full:
-                pass
+            buffer.put(data)
 
     def attach_unix_sender(self, unix_path, proto_class):
         """Creates a unix sender and registers an observer
@@ -112,7 +115,7 @@ class ProtoUnixIO:
         self.register_observer(proto_class, sender.proto_buffer)
 
     def attach_unix_receiver(
-        self, unix_path, proto_class=None, from_log_visualize=False
+        self, unix_path, proto_class=None, from_log_visualize=False,
     ):
         """Creates a unix listener of that protobuf type and provides
         incoming data to registered observers.

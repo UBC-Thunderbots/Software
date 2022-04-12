@@ -121,11 +121,6 @@ class ErForceSimulator
     world::SimulatorState getSimulatorState() const;
 
     /**
-     * Returns the current Simulator States converted to a WorldState
-     */
-    TbotsProto::WorldState getWorldState() const;
-
-    /**
      * Returns the field in the simulation
      *
      * @return the field in the simulation

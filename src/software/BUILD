@@ -7,6 +7,7 @@ cc_binary(
     name = "unix_full_system",
     srcs = ["unix_full_system_main.cpp"],
     deps = [
+        "//extlibs/er_force_sim/src/protobuf:protobuf_cc_lib",
         "//proto/logging:proto_logger",
         "//proto/message_translation:ssl_wrapper",
         "//shared/parameter:cpp_configs",

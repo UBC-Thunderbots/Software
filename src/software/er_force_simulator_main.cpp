@@ -1,3 +1,4 @@
+#include "extlibs/er_force_sim/src/protobuf/world.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
 #include "proto/vision.pb.h"
 #include "proto/world.pb.h"
@@ -79,9 +80,9 @@ int main(int argc, char **argv)
                                                              YELLOW_ROBOT_STATUS_PATH);
 
         // Simulator State as World State Output
-        auto simulator_state_as_world_state_output =
-            ThreadedProtoUnixSender<TbotsProto::WorldState>(runtime_dir +
-                                                            SIMULATOR_STATE_PATH);
+        auto simulator_state_output = ThreadedProtoUnixSender<world::SimulatorState>(
+            runtime_dir + SIMULATOR_STATE_PATH);
+
         // Inputs
         // World State Input: Configures the ERForceSimulator
         auto world_state_input = ThreadedProtoUnixListener<TbotsProto::WorldState>(
@@ -97,6 +98,7 @@ int main(int argc, char **argv)
                 std::scoped_lock lock(simulator_mutex);
                 blue_vision = input;
             });
+
         auto yellow_world_input = ThreadedProtoUnixListener<TbotsProto::World>(
             runtime_dir + YELLOW_WORLD_PATH, [&](TbotsProto::World input) {
                 std::scoped_lock lock(simulator_mutex);
@@ -146,8 +148,7 @@ int main(int argc, char **argv)
                     yellow_robot_status_output.sendProto(packet);
                 }
 
-                simulator_state_as_world_state_output.sendProto(
-                    er_force_sim->getWorldState());
+                simulator_state_output.sendProto(er_force_sim->getSimulatorState());
             });
 
         // This blocks forever without using the CPU

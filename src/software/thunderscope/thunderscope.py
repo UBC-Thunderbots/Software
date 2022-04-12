@@ -30,6 +30,11 @@ from pyqtgraph.Qt.QtWidgets import *
 
 from proto.import_all_protos import *
 from proto.message_translation import tbots_protobuf
+from extlibs.er_force_sim.src.protobuf.world_pb2 import (
+    SimulatorState,
+    SimBall,
+    SimRobot,
+)
 from software.py_constants import *
 
 from software.networking import threaded_unix_sender
@@ -40,6 +45,7 @@ from software.thunderscope.field import (
     obstacle_layer,
     path_layer,
     validation_layer,
+    simulator_layer,
     world_layer,
 )
 from software.thunderscope.field.field import Field
@@ -264,7 +270,10 @@ class Thunderscope(object):
             friendly_colour_yellow=False,
         )
         self.configure_default_layout(
-            self.blue_full_system_dock_area, self.blue_full_system_proto_unix_io, False,
+            self.blue_full_system_dock_area,
+            self.simulator_proto_unix_io,
+            self.blue_full_system_proto_unix_io,
+            False,
         )
 
     def run_yellow_full_system(self, runtime_dir):
@@ -275,6 +284,7 @@ class Thunderscope(object):
         )
         self.configure_default_layout(
             self.yellow_full_system_dock_area,
+            self.simulator_proto_unix_io,
             self.yellow_full_system_proto_unix_io,
             True,
         )
@@ -301,6 +311,9 @@ class Thunderscope(object):
         )
         self.simulator_proto_unix_io.attach_unix_sender(
             simulator_runtime_dir + WORLD_STATE_PATH, WorldState
+        )
+        self.simulator_proto_unix_io.attach_unix_receiver(
+            simulator_runtime_dir + SIMULATOR_STATE_PATH, SimulatorState,
         )
 
         # setup blue full system unix io
@@ -357,20 +370,28 @@ class Thunderscope(object):
         self.refresh_functions.append(refresh_func)
 
     def configure_default_layout(
-        self, dock_area, proto_unix_io, friendly_colour_yellow
+        self,
+        dock_area,
+        sim_proto_unix_io,
+        full_system_proto_unix_io,
+        friendly_colour_yellow,
     ):
         """Configure the default layout for thunderscope
 
         :param dock_area: The dock area to configure the layout
-        :param proto_unix_io: The proto unix io object
+        :param sim_proto_unix_io: The proto unix io object for the simulator
+        :param full_system_proto_unix_io: The proto unix io object for the full system
+        :param friendly_colour_yellow: Whether the friendly colour is yellow
 
         """
         # Configure Docks
-        field_dock = self.setup_field_widget(proto_unix_io, friendly_colour_yellow)
-        log_dock = self.setup_log_widget(proto_unix_io)
-        performance_dock = self.setup_performance_plot(proto_unix_io)
+        field_dock = self.setup_field_widget(
+            sim_proto_unix_io, full_system_proto_unix_io, friendly_colour_yellow
+        )
+        log_dock = self.setup_log_widget(full_system_proto_unix_io)
+        performance_dock = self.setup_performance_plot(full_system_proto_unix_io)
+        play_info_dock = self.setup_play_info(full_system_proto_unix_io)
         gamecontroller_dock = self.setup_gamecontroller_widget()
-        play_info_dock = self.setup_play_info(proto_unix_io)
 
         dock_area.addDock(gamecontroller_dock, "left")
         dock_area.addDock(field_dock, "below", gamecontroller_dock)
@@ -378,36 +399,45 @@ class Thunderscope(object):
         dock_area.addDock(performance_dock, "right", log_dock)
         dock_area.addDock(play_info_dock, "right", performance_dock)
 
-    def setup_field_widget(self, proto_unix_io, friendly_colour_yellow):
+    def setup_field_widget(
+        self, sim_proto_unix_io, full_system_proto_unix_io, friendly_colour_yellow
+    ):
         """setup the field widget with the constituent layers
 
-        :param proto_unix_io: The proto unix io
+        :param sim_proto_unix_io: The proto unix io object for the simulator
+        :param full_system_proto_unix_io: The proto unix io object for the full system
+        :param friendly_colour_yellow: Whether the friendly colour is yellow
         :returns: the dock containing the field widget
 
         """
         self.field = Field()
 
         # Create layers
-        world = world_layer.WorldLayer(proto_unix_io, friendly_colour_yellow)
-        obstacles = obstacle_layer.ObstacleLayer()
         paths = path_layer.PathLayer()
+        obstacles = obstacle_layer.ObstacleLayer()
         validation = validation_layer.ValidationLayer()
-        # sim_state_layer = simulator_layer.SimulatorLayer(self.simulator_proto_unix_io)
+        world = world_layer.WorldLayer(sim_proto_unix_io, friendly_colour_yellow)
+        sim_state = simulator_layer.SimulatorLayer(friendly_colour_yellow)
 
         # Add field layers to field
         self.field.add_layer("Vision", world)
         self.field.add_layer("Obstacles", obstacles)
         self.field.add_layer("Paths", paths)
         self.field.add_layer("Validation", validation)
-        # self.field.add_layer("Simulator Layer", sim_state_layer)
+        self.field.add_layer("Simulator Layer", sim_state)
 
         # Register observers
-        proto_unix_io.register_observer(World, world.world_buffer)
-        proto_unix_io.register_observer(Obstacles, obstacles.obstacle_buffer)
-        proto_unix_io.register_observer(
+        sim_proto_unix_io.register_observer(
+            SimulatorState, sim_state.simulator_state_buffer
+        )
+        full_system_proto_unix_io.register_observer(World, world.world_buffer)
+        full_system_proto_unix_io.register_observer(
+            Obstacles, obstacles.obstacle_buffer
+        )
+        full_system_proto_unix_io.register_observer(
             PathVisualization, paths.path_visualization_buffer
         )
-        proto_unix_io.register_observer(
+        full_system_proto_unix_io.register_observer(
             ValidationProtoSet, validation.validation_set_buffer
         )
 

@@ -86,8 +86,14 @@ void ErForceSimulator::setWorldState(const TbotsProto::WorldState& world_state)
     {
         setBallState(createBallState(world_state.ball_state()));
     }
-    setRobots(world_state.blue_robots(), gameController::Team::BLUE);
-    setRobots(world_state.yellow_robots(), gameController::Team::YELLOW);
+    if (!world_state.blue_robots().empty())
+    {
+        setRobots(world_state.blue_robots(), gameController::Team::BLUE);
+    }
+    if (!world_state.yellow_robots().empty())
+    {
+        setRobots(world_state.yellow_robots(), gameController::Team::YELLOW);
+    }
 }
 
 void ErForceSimulator::setBallState(const BallState& ball_state)
@@ -138,11 +144,6 @@ void ErForceSimulator::setRobots(
     const google::protobuf::Map<uint32_t, TbotsProto::RobotState>& robots,
     gameController::Team side)
 {
-    // HACK
-    if (robots.empty())
-    {
-        return;
-    }
     auto simulator_setup_command = std::make_unique<amun::Command>();
 
     robot::Specs ERForce;
@@ -415,32 +416,6 @@ std::vector<SSLProto::SSL_WrapperPacket> ErForceSimulator::getSSLWrapperPackets(
 world::SimulatorState ErForceSimulator::getSimulatorState() const
 {
     return er_force_sim->getSimulatorState();
-}
-
-TbotsProto::WorldState ErForceSimulator::getWorldState() const
-{
-    // extract simulator ball and robot
-    auto simulator_state = er_force_sim->getSimulatorState();
-
-    TbotsProto::WorldState world_state;
-
-    *(world_state.mutable_ball_state()) =
-        *createBallState(createBall(simulator_state.ball(), Timestamp::fromSeconds(0)));
-
-    for (int robot_id = 0; robot_id < simulator_state.yellow_robots().size(); robot_id++)
-    {
-        (*world_state.mutable_yellow_robots())[robot_id] =
-            *createRobotStateProto(createRobot(simulator_state.yellow_robots()[robot_id],
-                                               Timestamp::fromSeconds(0)));
-    }
-    for (int robot_id = 0; robot_id < simulator_state.blue_robots().size(); robot_id++)
-    {
-        (*world_state.mutable_blue_robots())[robot_id] =
-            *createRobotStateProto(createRobot(simulator_state.blue_robots()[robot_id],
-                                               Timestamp::fromSeconds(0)));
-    }
-
-    return world_state;
 }
 
 Field ErForceSimulator::getField() const

@@ -186,9 +186,8 @@ def load_command_line_arguments():
 
     """
     parser = argparse.ArgumentParser(description="Run simulated pytests")
-    # TODO (#2510) change to tscope
     parser.add_argument(
-        "--enable_visualizer", action="store_true", help="enable the visualizer"
+        "--enable_thunderscope", action="store_true", help="enable thunderscope"
     )
     return parser.parse_args()
 
@@ -196,5 +195,5 @@ def load_command_line_arguments():
 @pytest.fixture
 def simulated_test_runner():
     args = load_command_line_arguments()
-    runner = SimulatorTestRunner(show_thunderscope=args.enable_visualizer)
+    runner = SimulatorTestRunner(show_thunderscope=args.enable_thunderscope)
     yield runner
