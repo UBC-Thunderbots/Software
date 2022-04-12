@@ -79,7 +79,8 @@ INSTANTIATE_TEST_CASE_P(
         // place the ball directly to the right of the robot
         std::make_tuple(Vector(0, -0.5), Angle::half()),
         // place the ball directly infront of the robot
-        std::make_tuple(Vector(0.5, 0), Angle::half()),
+        // TODO (#2472): Fix this
+        // std::make_tuple(Vector(0.5, 0), Angle::half()),
         // place the ball directly behind the robot
         std::make_tuple(Vector(-0.5, 0), Angle::half()),
         // place the ball in the robots dribbler

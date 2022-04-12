@@ -12,6 +12,7 @@ Angle ReceiverFSM::getOneTouchShotDirection(const Ray& shot, const Ball& ball)
     // "cancel out" in order for our shot to go in the expected direction.
     // The scaling factor of 0.3 is a magic number that was carried over from the old
     // code. It seems to work well on the field.
+    // TODO (#2570): tune this
     double lateral_speed = 0.3 * lateral_vel.length();
 
     // This kick speed is based off of the value used in the firmware `MovePrimitive`
