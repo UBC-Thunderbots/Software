@@ -116,6 +116,9 @@ cc_binary(
 cc_library(
     name = "constants",
     hdrs = ["constants.h"],
+    deps = [
+        "//shared:constants"
+    ],
 )
 
 pybind_library(
