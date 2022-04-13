@@ -148,7 +148,7 @@ void ReceiverFSM::adjustReceive(const Update& event)
     auto robot_pos = event.common.robot.position();
 
     if ((ball.position() - robot_pos).length() >
-        DIST_TO_FRONT_OF_ROBOT_METERS + 2 * BALL_MAX_RADIUS_METERS)
+        BALL_TO_FRONT_OF_ROBOT_DISTANCE_WHEN_DRIBBLING)
     {
         Point ball_receive_pos = ball.position();
 
