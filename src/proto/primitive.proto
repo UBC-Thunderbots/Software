@@ -36,6 +36,35 @@ message AutoChipOrKick
     };
 }
 
+message PowerControl
+{
+    message ChickerControl
+    {
+        oneof chicker_command {
+            float kick_speed_m_per_s = 1;
+            float chip_distance_meters = 2;
+            AutoChipOrKick auto_chip_or_kick = 3;
+        };
+    }
+
+    message GenevaControl
+    {
+        float angle_deg          = 1;
+        float rotation_speed_rpm = 2;
+    }
+
+    enum ChargeMode
+    {
+        DISCHARGE = 0;
+        CHARGE    = 1;
+        FLOAT     = 2;
+    }
+
+    ChickerControl chicker = 1;
+    GenevaControl  geneva  = 2;
+    ChargeMode charge_mode = 3;
+}
+
 message Primitive
 {
     oneof primitive
@@ -51,15 +80,6 @@ message EstopPrimitive {}
 
 message MovePrimitive
 {
-    message AutoChipOrKick
-    {
-        oneof auto_chip_or_kick
-        {
-            float autokick_speed_m_per_s   = 1;
-            float autochip_distance_meters = 2;
-        };
-    }
-
     Path path                        = 1;
     float final_speed_m_per_s        = 2;
     Angle final_angle                = 3;
@@ -81,13 +101,6 @@ message StopPrimitive
 
 message DirectControlPrimitive
 {
-    enum ChargeMode
-    {
-        DISCHARGE = 0;
-        CHARGE    = 1;
-        FLOAT     = 2;
-    }
-
     message DirectPerWheelControl
     {
         float front_left_wheel_rpm  = 1;
@@ -107,13 +120,7 @@ message DirectControlPrimitive
         DirectPerWheelControl direct_per_wheel_control = 1;
         DirectVelocityControl direct_velocity_control  = 2;
     }
-    ChargeMode charge_mode = 3;
-    oneof chick_command
-    {
-        float kick_speed_m_per_s       = 4;
-        float chip_distance_meters     = 5;
-        float autokick_speed_m_per_s   = 6;
-        float autochip_distance_meters = 7;
-    }
-    float dribbler_speed_rpm = 8;
+
+    PowerControl power = 3;
+    float dribbler_speed_rpm = 4;
 }

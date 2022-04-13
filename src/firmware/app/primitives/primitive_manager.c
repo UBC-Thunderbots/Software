@@ -5,7 +5,6 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#include "firmware/app/primitives/direct_control_primitive.h"
 #include "firmware/app/primitives/move_primitive.h"
 #include "firmware/app/primitives/primitive.h"
 #include "firmware/app/primitives/stop_primitive.h"
@@ -107,28 +106,12 @@ void app_primitive_manager_startNewPrimitive(PrimitiveManager_t *manager,
                                      manager->current_primitive_state, world);
             break;
         }
-        case TbotsProto_Primitive_direct_control_tag:
-        {
-            manager->current_primitive       = &DIRECT_CONTROL_PRIMITIVE;
-            manager->current_primitive_state = manager->current_primitive->create_state();
-            app_direct_control_primitive_start(primitive_msg.primitive.direct_control,
-                                               manager->current_primitive_state, world);
-            break;
-        }
         default:
         {
             // the estop case is handled here
             app_primitive_makeRobotSafe(world);
             return;
         }
-    }
-
-    if (!manager->current_primitive->direct)
-    {
-        // Charge capacitor during gameplay
-        const FirmwareRobot_t *robot = app_firmware_world_getRobot(world);
-        Charger_t *charger           = app_firmware_robot_getCharger(robot);
-        app_charger_charge_capacitor(charger);
     }
 
     app_primitive_manager_unlockPrimitiveMutex(manager);

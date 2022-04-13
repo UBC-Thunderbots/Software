@@ -24,6 +24,7 @@ cc_library(
         "//software/jetson_nano/redis",
         "//software/jetson_nano/services:motor",
         "//software/jetson_nano/services:network",
+        "//software/jetson_nano/services:power",
         "//software/util/scoped_timespec_timer",
     ],
 )
@@ -48,5 +49,14 @@ cc_binary(
     deps = [
         ":thunderloop",
         "//shared:constants",
+    ],
+)
+
+cc_binary(
+    name = "power_main",
+    srcs = ["power_test_main.cpp"],
+    deps = [
+        "//software/jetson_nano/services:power",
+        "//software/logger",
     ],
 )

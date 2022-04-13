@@ -149,10 +149,15 @@ message NetworkStatus
 message PowerStatus
 {
     // The voltage on the robot’s battery, in volts.
-    float battery_voltage = 1;
+    float battery_voltage                = 1;
 
     // voltage on the robot’s capacitor, in volts.
-    float capacitor_voltage = 2;
+    float capacitor_voltage              = 2;
+    float current_draw                   = 3;
+    float high_voltage_measurement_volts = 4;
+    float geneva_angle_deg               = 5;
+    bool breakbream_tripped              = 6;
+    bool flyback_fault                   = 7;
 }
 
 /* Temperature of robot components */
