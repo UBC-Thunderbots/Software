@@ -103,6 +103,7 @@ class Angle final
      */
     constexpr double toDegrees() const;
 
+
     /**
      * Computes the modulus of a division between this angle and another
      * angle.

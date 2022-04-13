@@ -17,6 +17,8 @@ from software.thunderscope.constants import (
 from software.thunderscope.field.field_layer import FieldLayer
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
+MAX_ALLOWED_KICK_SPEED = 6.5
+
 
 class WorldLayer(FieldLayer):
     def __init__(self, simulator_io, friendly_colour_yellow, buffer_size=1):
@@ -35,9 +37,10 @@ class WorldLayer(FieldLayer):
 
         self.world_buffer = ThreadSafeBuffer(buffer_size, World)
         self.robot_status_buffer = ThreadSafeBuffer(buffer_size, RobotStatus)
+        self.cached_world = World()
 
-        self.setAcceptHoverEvents(True)
-        self.setAcceptTouchEvents(True)
+        self.ball_velocity_vector = None
+        self.mouse_clicked = False
 
         self.pressed_CTRL = False
         self.pressed_M = False
@@ -54,7 +57,6 @@ class WorldLayer(FieldLayer):
         :param event: The event
 
         """
-        print(event)
         if event.key() == Qt.Key.Key_R:
             self.pressed_R = True
 
@@ -70,7 +72,6 @@ class WorldLayer(FieldLayer):
         :param event: The event
 
         """
-        print(event)
         if event.key() == Qt.Key.Key_R:
             self.pressed_R = False
 
@@ -80,39 +81,102 @@ class WorldLayer(FieldLayer):
         elif event.key() == Qt.Key.Key_M:
             self.pressed_M = False
 
-    def hoverMoveEvent(self, event):
-        """Detect where the mouse is hovering on the field (override)
-        NOTE: Currently not used but may be useful in next part of (#2410)
+    def mouseMoveEvent(self, event):
+        """We want to be able to use the mouse to pan/zoom the field.
+        But we also want to be able to click on a things to interact with them.
+
+        We need to make sure that when we are not handling the mouse events,
+        the super class receives them.
 
         :param event: The event
 
         """
-        self.mouse_hover_pos = [event.pos().x(), event.pos().y()]
+        ball_position = geom.Vector(
+            self.cached_world.ball.current_state.global_position.x_meters * MM_PER_M,
+            self.cached_world.ball.current_state.global_position.y_meters * MM_PER_M,
+        )
 
-    def mouseClickEvent(self, event):
-        """Detect whether the mouse was clicked anywhere on the field (override)
+        if self.pressed_CTRL and self.mouse_clicked:
+            self.ball_velocity_vector = ball_position - geom.Vector(
+                event.pos().x(), event.pos().y()
+            )
+
+            if self.ball_velocity_vector.length() > MAX_ALLOWED_KICK_SPEED * MM_PER_M:
+                self.ball_velocity_vector = self.ball_velocity_vector.normalize(
+                    MAX_ALLOWED_KICK_SPEED * MM_PER_M
+                )
+
+        else:
+            super().mouseMoveEvent(event)
+
+    def mousePressEvent(self, event):
+        """We want to be able to use the mouse to pan/zoom the field.
+        But we also want to be able to click on a things to interact with them.
+
+        We need to make sure that when we are not handling the mouse events,
+        the super class receives them.
 
         :param event: The event
 
         """
-        x = event.pos().x() / MM_PER_M
-        y = event.pos().y() / MM_PER_M
-
         self.mouse_clicked = True
+
+        event.pos().x() / MM_PER_M
+        event.pos().y() / MM_PER_M
         self.mouse_click_pos = [event.pos().x(), event.pos().y()]
 
         # determine whether a robot was clicked
         friendly_robot, enemy_robot = self.identify_robots(
             event.pos().x(), event.pos().y()
         )
-        print(friendly_robot, enemy_robot)
 
         if self.pressed_CTRL:
             world_state = WorldState()
             world_state.ball_state.CopyFrom(
-                BallState(global_position=Point(x_meters=x, y_meters=y,),)
+                BallState(
+                    global_position=Point(
+                        x_meters=event.pos().x() / MM_PER_M,
+                        y_meters=event.pos().y() / MM_PER_M,
+                    )
+                )
             )
             self.simulator_io.send_proto(WorldState, world_state)
+
+        else:
+            super().mousePressEvent(event)
+
+    def mouseReleaseEvent(self, event):
+        """We want to be able to use the mouse to pan/zoom the field.
+        But we also want to be able to click on a things to interact with them.
+
+        We need to make sure that when we are not handling the mouse events,
+        the super class receives them.
+
+        :param event: The event
+
+        """
+        self.mouse_clicked = False
+
+        if self.pressed_CTRL and self.ball_velocity_vector:
+            world_state = WorldState()
+            world_state.ball_state.CopyFrom(
+                BallState(
+                    global_position=Point(
+                        x_meters=self.cached_world.ball.current_state.global_position.x_meters,
+                        y_meters=self.cached_world.ball.current_state.global_position.y_meters,
+                    ),
+                    global_velocity=Vector(
+                        x_component_meters=self.ball_velocity_vector.x() / MM_PER_M,
+                        y_component_meters=self.ball_velocity_vector.y() / MM_PER_M,
+                    ),
+                )
+            )
+
+            self.simulator_io.send_proto(WorldState, world_state)
+            self.ball_velocity_vector = None
+
+        else:
+            super().mouseReleaseEvent(event)
 
     def identify_robots(self, mouse_x, mouse_y):
         """Identify which robot was clicked on the field
@@ -241,6 +305,25 @@ class WorldLayer(FieldLayer):
                 BALL_RADIUS,
             )
         )
+
+        if self.ball_velocity_vector:
+            vector = self.ball_velocity_vector * 0.5
+            polyline = QtGui.QPolygon(
+                [
+                    QtCore.QPoint(
+                        int(MM_PER_M * ball_state.global_position.x_meters),
+                        int(MM_PER_M * ball_state.global_position.y_meters),
+                    ),
+                    QtCore.QPoint(
+                        int(MM_PER_M * ball_state.global_position.x_meters)
+                        + vector.x(),
+                        int(MM_PER_M * ball_state.global_position.y_meters)
+                        + vector.y(),
+                    ),
+                ]
+            )
+
+            painter.drawPolyline(polyline)
 
     def paint(self, painter, option, widget):
         """Paint this layer

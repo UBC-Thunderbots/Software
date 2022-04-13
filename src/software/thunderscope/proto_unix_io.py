@@ -1,4 +1,5 @@
 from threading import Thread
+import queue
 
 import software.thunderscope.constants as constants
 from software.networking.threaded_unix_listener import ThreadedUnixListener
@@ -71,7 +72,10 @@ class ProtoUnixIO:
 
             if proto.DESCRIPTOR.full_name in self.proto_observers:
                 for buffer in self.proto_observers[proto.DESCRIPTOR.full_name]:
-                    buffer.put(proto, block=False)
+                    try:
+                        buffer.put(proto, block=False)
+                    except queue.Full:
+                        pass
 
     def register_observer(self, proto_class, buffer):
         """Register a widget to consume from a given protobuf class

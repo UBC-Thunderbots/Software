@@ -57,6 +57,7 @@ PYBIND11_MODULE(python_bindings, m)
         .def("lengthSquared", &Vector::lengthSquared)
         .def("normalize", py::overload_cast<>(&Vector::normalize, py::const_))
         .def("normalize", py::overload_cast<double>(&Vector::normalize, py::const_))
+        .def("rotate", &Vector::rotate)
         // Overloaded
         .def(py::self + py::self)
         .def(py::self += py::self)
@@ -83,6 +84,17 @@ PYBIND11_MODULE(python_bindings, m)
         .def("__repr__", [](const Polygon& v) {
             std::stringstream stream;
             stream << v;
+            return stream.str();
+        });
+
+    py::class_<Angle>(m, "Angle")
+        .def(py::init<>())
+        .def_static("fromRadians", &Angle::fromRadians)
+        .def_static("fromDegrees", &Angle::fromDegrees)
+        // Overloaded
+        .def("__repr__", [](const Angle& a) {
+            std::stringstream stream;
+            stream << a;
             return stream.str();
         });
 

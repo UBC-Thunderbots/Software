@@ -12,7 +12,8 @@ class Field(pg.PlotWidget):
 
         # Setup Field Plot
         self.setAspectLocked()
-        self.showGrid(x=True, y=True, alpha=0.4)
+        self.showGrid(x=True, y=True, alpha=0.5)
+        self.setMouseTracking(True)
 
         # Setup Field Plot Legend
         self.legend = pg.LegendItem((80, 60), offset=(70, 20))
@@ -27,6 +28,7 @@ class Field(pg.PlotWidget):
         :param event: The event
         
         """
+        self.setMouseEnabled(x=False, y=False)
         for layer in self.layers:
             layer.keyPressEvent(event)
 
@@ -36,6 +38,7 @@ class Field(pg.PlotWidget):
         :param event: The event
         
         """
+        self.setMouseEnabled(x=True, y=True)
         for layer in self.layers:
             layer.keyReleaseEvent(event)
 

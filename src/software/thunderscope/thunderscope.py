@@ -27,7 +27,6 @@ from pyqtgraph.Qt import QtCore, QtGui
 import software.python_bindings as geom
 from pyqtgraph.Qt.QtWidgets import *
 
-
 from proto.import_all_protos import *
 from proto.message_translation import tbots_protobuf
 from extlibs.er_force_sim.src.protobuf.world_pb2 import (
@@ -97,8 +96,8 @@ class Thunderscope(object):
         blue_dock.addWidget(self.blue_full_system_dock_area)
         yellow_dock.addWidget(self.yellow_full_system_dock_area)
 
-        self.main_dock.addDock(blue_dock)
-        self.main_dock.addDock(yellow_dock, "left", blue_dock)
+        self.main_dock.addDock(yellow_dock)
+        self.main_dock.addDock(blue_dock, "left", yellow_dock)
 
         self.window = QtGui.QMainWindow()
         self.window.setCentralWidget(self.main_dock)
@@ -499,12 +498,12 @@ class Thunderscope(object):
         :return the gamecontroller in a dock
 
         """
-        # web_view = QWebEngineView()
-        # web_view.load(QtCore.QUrl("http://localhost:8081"))
+        web_view = QWebEngineView()
+        web_view.load(QtCore.QUrl("http://localhost:8081"))
 
         # create and return dock
         gamecontroller_dock = Dock("GameController")
-        # gamecontroller_dock.addWidget(web_view)
+        gamecontroller_dock.addWidget(web_view)
 
         return gamecontroller_dock
 
