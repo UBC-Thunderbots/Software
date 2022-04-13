@@ -40,7 +40,8 @@ message PowerControl
 {
     message ChickerControl
     {
-        oneof chicker_command {
+        oneof chicker_command
+        {
             float kick_speed_m_per_s         = 1;
             float chip_distance_meters       = 2;
             AutoChipOrKick auto_chip_or_kick = 3;
@@ -61,7 +62,7 @@ message PowerControl
     }
 
     ChickerControl chicker = 1;
-    GenevaControl  geneva  = 2;
+    GenevaControl geneva   = 2;
     ChargeMode charge_mode = 3;
 }
 
@@ -121,6 +122,6 @@ message DirectControlPrimitive
         DirectVelocityControl direct_velocity_control  = 2;
     }
 
-    PowerControl power = 3;
+    PowerControl power       = 3;
     float dribbler_speed_rpm = 4;
 }

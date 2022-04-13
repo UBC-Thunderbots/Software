@@ -2,10 +2,10 @@
 
 #include <boost/asio.hpp>
 
+#include "proto/power_frame_msg.pb.h"
 #include "software/jetson_nano/services/service.h"
 #include "software/logger/logger.h"
 #include "software/uart/boost_uart_communication.h"
-#include "proto/power_frame_msg.pb.h"
 extern "C"
 {
 #include "proto/power_frame_msg.nanopb.h"
@@ -29,7 +29,8 @@ class PowerService : public Service
      * @param control The power control msg to send
      * @return the latest power status
      */
-    std::unique_ptr<TbotsProto::PowerStatus> poll(const TbotsProto::PowerControl& control);
+    std::unique_ptr<TbotsProto::PowerStatus> poll(
+        const TbotsProto::PowerControl& control);
 
    private:
     boost::asio::io_service io_service;

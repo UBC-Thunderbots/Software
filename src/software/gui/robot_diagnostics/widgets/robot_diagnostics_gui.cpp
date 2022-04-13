@@ -177,28 +177,42 @@ void RobotDiagnosticsGUI::setChickCommandPrimitiveFromUI(
         // Checks if chip/kick radio buttons were pressed
         if (chip_pressed)
         {
-            primitive_msg.mutable_direct_control()->mutable_power()->mutable_chicker()->set_chip_distance_meters(
-                main_widget->lineEdit_chicker_power->text().toFloat());
+            primitive_msg.mutable_direct_control()
+                ->mutable_power()
+                ->mutable_chicker()
+                ->set_chip_distance_meters(
+                    main_widget->lineEdit_chicker_power->text().toFloat());
             chip_pressed = false;
         }
         else if (kick_pressed)
         {
-            primitive_msg.mutable_direct_control()->mutable_power()->mutable_chicker()->set_kick_speed_m_per_s(
-                main_widget->lineEdit_chicker_power->text().toFloat());
+            primitive_msg.mutable_direct_control()
+                ->mutable_power()
+                ->mutable_chicker()
+                ->set_kick_speed_m_per_s(
+                    main_widget->lineEdit_chicker_power->text().toFloat());
             kick_pressed = false;
         }
     }
     else if (main_widget->buttonGroup_auto_chip_or_kick->checkedButton() ==
              main_widget->radioButton_autochip)
     {
-        primitive_msg.mutable_direct_control()->mutable_power()->mutable_chicker()->mutable_auto_chip_or_kick()->set_autochip_distance_meters(
-            main_widget->lineEdit_chicker_power->text().toFloat());
+        primitive_msg.mutable_direct_control()
+            ->mutable_power()
+            ->mutable_chicker()
+            ->mutable_auto_chip_or_kick()
+            ->set_autochip_distance_meters(
+                main_widget->lineEdit_chicker_power->text().toFloat());
     }
     else if (main_widget->buttonGroup_auto_chip_or_kick->checkedButton() ==
              main_widget->radioButton_autokick)
     {
-        primitive_msg.mutable_direct_control()->mutable_power()->mutable_chicker()->mutable_auto_chip_or_kick()->set_autokick_speed_m_per_s(
-            main_widget->lineEdit_chicker_power->text().toFloat());
+        primitive_msg.mutable_direct_control()
+            ->mutable_power()
+            ->mutable_chicker()
+            ->mutable_auto_chip_or_kick()
+            ->set_autokick_speed_m_per_s(
+                main_widget->lineEdit_chicker_power->text().toFloat());
     }
 }
 

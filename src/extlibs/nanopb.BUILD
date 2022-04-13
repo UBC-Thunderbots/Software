@@ -8,7 +8,8 @@ load("@nanopb_deps//:requirements.bzl", "requirement")
 load("@com_google_protobuf//:protobuf.bzl", "py_proto_library")
 load(
     "@platformio_rules//platformio:platformio.bzl",
-    "platformio_library")
+    "platformio_library",
+)
 
 common_defines = [
     # By default, NanoPb only supports 8-bit tags. This define changes the tag type to
@@ -43,18 +44,18 @@ cc_library(
 platformio_library(
     name = "nanopb_platformio",
     src = "pb_common.c",
-    add_srcs = [
-        "pb_common.c",
-        "pb_decode.c",
-        "pb_encode.c",
-    ],
-    hdr = "pb_common.h",
     add_hdrs = [
         "pb.h",
         "pb_common.h",
         "pb_decode.h",
         "pb_encode.h",
     ],
+    add_srcs = [
+        "pb_common.c",
+        "pb_decode.c",
+        "pb_encode.c",
+    ],
+    hdr = "pb_common.h",
     visibility = ["//visibility:public"],
 )
 

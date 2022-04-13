@@ -1,8 +1,9 @@
 #pragma once
 
+#include <pb_decode.h>
+
 #include <cstdint>
 #include <vector>
-#include <pb_decode.h>
 
 #ifdef PLATFORMIO_BUILD
 #include <power_frame_msg_platformio.h>
@@ -56,11 +57,11 @@ namespace
         {
             case TbotsProto_PowerFrame_power_control_tag:
                 expected_length = TbotsProto_PowerControl_size;
-                bytes = serializeToVector(frame.power_msg.power_control);
+                bytes           = serializeToVector(frame.power_msg.power_control);
                 break;
             case TbotsProto_PowerFrame_power_status_tag:
                 expected_length = TbotsProto_PowerStatus_size;
-                bytes = serializeToVector(frame.power_msg.power_status);
+                bytes           = serializeToVector(frame.power_msg.power_status);
                 break;
             default:
                 return false;
@@ -169,13 +170,13 @@ namespace
  * @param power_msg the power_msg to put in a UartMessageFrame
  * @return a TbotsProto_PowerFrame with the given data and computed fields
  */
-template<typename T>
+template <typename T>
 TbotsProto_PowerFrame createUartFrame(const T& power_msg)
 {
     TbotsProto_PowerFrame frame = TbotsProto_PowerFrame_init_default;
-    auto buffer = serializeToVector(power_msg);
-    frame.length = static_cast<uint32_t>(buffer.size());
-    frame.crc = crc16(buffer, static_cast<uint16_t>(frame.length));
+    auto buffer                 = serializeToVector(power_msg);
+    frame.length                = static_cast<uint32_t>(buffer.size());
+    frame.crc                   = crc16(buffer, static_cast<uint16_t>(frame.length));
     setPowerMsg(frame, power_msg);
     return frame;
 }
@@ -213,7 +214,8 @@ bool unmarshalUartPacket(const std::vector<uint8_t>& data, TbotsProto_PowerFrame
         return false;
     }
     frame = TbotsProto_PowerFrame_init_default;
-    pb_istream_t stream = pb_istream_from_buffer(static_cast<uint8_t*>(decoded.data()), decoded.size());
+    pb_istream_t stream =
+        pb_istream_from_buffer(static_cast<uint8_t*>(decoded.data()), decoded.size());
     if (!pb_decode(&stream, TbotsProto_PowerFrame_fields, &frame))
     {
         return false;
@@ -221,16 +223,17 @@ bool unmarshalUartPacket(const std::vector<uint8_t>& data, TbotsProto_PowerFrame
     return verifyLengthAndCrc(frame);
 }
 /**
- * Finds the expected size of a TbotsProto_PowerStatus/TbotsProto_PowerControl msg once its encoded with cobs
+ * Finds the expected size of a TbotsProto_PowerStatus/TbotsProto_PowerControl msg once
+ * its encoded with cobs
  *
  * @tparam T type of power_msg should be TbotsProto_PowerStatus or TbotsProto_PowerControl
  * @param power_msg nanopb msg to get the marshalled size of
  * @return the expected marshalled size of the given message
  */
-template<typename T>
+template <typename T>
 size_t getMarshalledSize(const T& power_msg)
 {
-    auto frame = createUartFrame(power_msg);
+    auto frame  = createUartFrame(power_msg);
     auto buffer = serializeToVector(frame);
     return cobsEncoding(buffer).size();
 }
