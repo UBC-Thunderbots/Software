@@ -1,7 +1,7 @@
 #include "software/jetson_nano/services/power.h"
 
 #include <cstdint>
-#include <proto/power_frame_msg.nanopb.h>
+#include "proto/power_frame_msg.nanopb.h"
 
 #include "shared/uart_framing/uart_framing.hpp"
 

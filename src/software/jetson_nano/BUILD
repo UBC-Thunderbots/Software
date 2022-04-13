@@ -51,12 +51,3 @@ cc_binary(
         "//shared:constants",
     ],
 )
-
-cc_binary(
-    name = "power_main",
-    srcs = ["power_test_main.cpp"],
-    deps = [
-        "//software/jetson_nano/services:power",
-        "//software/logger",
-    ],
-)

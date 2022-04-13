@@ -15,7 +15,7 @@ std::vector<uint8_t> serializeToVector(const TbotsProto_PowerFrame& data)
     std::vector<uint8_t> buffer(TbotsProto_PowerFrame_size);
     pb_ostream_t stream = pb_ostream_from_buffer(static_cast<uint8_t*>(buffer.data()), buffer.size());
     if (!pb_encode(&stream, TbotsProto_PowerFrame_fields, &data)) {
-        throw std::runtime_error("failed to convert nanopb to vector");
+        throw std::runtime_error("Failed to encode PowerFrame msg to vector when converting nanopb to vector");
     }
     return buffer;
 }
@@ -25,7 +25,7 @@ std::vector<uint8_t> serializeToVector(const TbotsProto_PowerControl& data)
     std::vector<uint8_t> buffer(TbotsProto_PowerControl_size);
     pb_ostream_t stream = pb_ostream_from_buffer(static_cast<uint8_t*>(buffer.data()), buffer.size());
     if (!pb_encode(&stream, TbotsProto_PowerControl_fields, &data)) {
-        throw std::runtime_error("failed to convert nanopb to vector");
+        throw std::runtime_error("Failed to encode PowerControl msg to vector when converting nanopb to vector");
     }
     return buffer;
 }
@@ -35,7 +35,7 @@ std::vector<uint8_t> serializeToVector(const TbotsProto_PowerStatus& data)
     std::vector<uint8_t> buffer(TbotsProto_PowerStatus_size);
     pb_ostream_t stream = pb_ostream_from_buffer(static_cast<uint8_t*>(buffer.data()), buffer.size());
     if (!pb_encode(&stream, TbotsProto_PowerStatus_fields, &data)) {
-        throw std::runtime_error("failed to convert nanopb to vector");
+        throw std::runtime_error("Failed to encode PowerStatus msg to vector when converting nanopb to vector");
     }
     return buffer;
 }
@@ -80,7 +80,7 @@ TbotsProto_PowerControl createNanoPbPowerControl(const TbotsProto::PowerControl&
             static_cast<uint8_t*>(serialized_proto.data()), serialized_proto.size());
     if (!pb_decode(&pb_in_stream, TbotsProto_PowerControl_fields, &nanopb_control))
     {
-        throw std::runtime_error("Failed to decode serialized power control msg to nanopb when converting google primitive proto to nanopb");
+        throw std::runtime_error("Failed to decode serialized PowerControl msg to nanopb when converting google protobuf to nanopb");
     }
     return nanopb_control;
 }
@@ -101,20 +101,21 @@ TbotsProto_PowerControl createNanoPbPowerControl(ChickerCommandMode chicker_comm
             chicker.chicker_command.kick_speed_m_per_s = kick_speed_m_per_s;
         case ChickerCommandMode::AUTOCHIPORKICK:
             control.chicker.which_chicker_command = TbotsProto_PowerControl_ChickerControl_auto_chip_or_kick_tag;
+            switch (auto_chip_or_kick)
+            {
+                case AutoChipOrKickMode::AUTOCHIP:
+                    chicker.chicker_command.auto_chip_or_kick.which_auto_chip_or_kick = TbotsProto_AutoChipOrKick_autochip_distance_meters_tag;
+                    chicker.chicker_command.auto_chip_or_kick.auto_chip_or_kick.autochip_distance_meters = autochip_distance_meters;
+                    break;
+                case AutoChipOrKickMode::AUTOKICK:
+                    chicker.chicker_command.auto_chip_or_kick.which_auto_chip_or_kick = TbotsProto_AutoChipOrKick_autokick_speed_m_per_s_tag;
+                    chicker.chicker_command.auto_chip_or_kick.auto_chip_or_kick.autokick_speed_m_per_s = autokick_speed_m_per_s;
+                    break;
+                default:
+                    break;
+            }
     }
-    switch (auto_chip_or_kick)
-    {
-        case AutoChipOrKickMode::AUTOCHIP:
-            chicker.chicker_command.auto_chip_or_kick.which_auto_chip_or_kick = TbotsProto_AutoChipOrKick_autochip_distance_meters_tag;
-            chicker.chicker_command.auto_chip_or_kick.auto_chip_or_kick.autochip_distance_meters = autochip_distance_meters;
-            break;
-        case AutoChipOrKickMode::AUTOKICK:
-            chicker.chicker_command.auto_chip_or_kick.which_auto_chip_or_kick = TbotsProto_AutoChipOrKick_autokick_speed_m_per_s_tag;
-            chicker.chicker_command.auto_chip_or_kick.auto_chip_or_kick.autokick_speed_m_per_s = autokick_speed_m_per_s;
-            break;
-        default:
-            break;
-    }
+
     TbotsProto_PowerControl_GenevaControl geneva = TbotsProto_PowerControl_GenevaControl_init_default;
     geneva.angle_deg = angle_deg;
     geneva.rotation_speed_rpm = rotation_speed_rpm;

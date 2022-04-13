@@ -25,7 +25,7 @@ namespace
      * @param length the length of the data
      * @return CRC-16 for given data and length
      */
-    uint16_t crc16(const std::vector<uint8_t>& data, uint32_t length)
+    uint16_t crc16(const std::vector<uint8_t>& data, uint16_t length)
     {
         uint8_t x;
         uint16_t crc = 0xFFFF;
@@ -65,7 +65,7 @@ namespace
             default:
                 return false;
         }
-        uint16_t expected_crc = crc16(bytes, frame.length);
+        uint16_t expected_crc = crc16(bytes, static_cast<uint16_t>(frame.length));
         return frame.crc == expected_crc && frame.length == expected_length;
     }
 
@@ -175,7 +175,7 @@ TbotsProto_PowerFrame createUartFrame(const T& power_msg)
     TbotsProto_PowerFrame frame = TbotsProto_PowerFrame_init_default;
     auto buffer = serializeToVector(power_msg);
     frame.length = static_cast<uint32_t>(buffer.size());
-    frame.crc = crc16(buffer, frame.length);
+    frame.crc = crc16(buffer, static_cast<uint16_t>(frame.length));
     setPowerMsg(frame, power_msg);
     return frame;
 }

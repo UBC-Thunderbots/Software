@@ -41,8 +41,8 @@ message PowerControl
     message ChickerControl
     {
         oneof chicker_command {
-            float kick_speed_m_per_s = 1;
-            float chip_distance_meters = 2;
+            float kick_speed_m_per_s         = 1;
+            float chip_distance_meters       = 2;
             AutoChipOrKick auto_chip_or_kick = 3;
         };
     }

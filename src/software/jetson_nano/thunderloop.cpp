@@ -27,13 +27,11 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants,
     robot_constants_ = robot_constants;
     wheel_consants_  = wheel_consants;
 
-    // motor_service_   = std::make_unique<MotorService>(robot_constants, wheel_consants);
-    // network_service_ = std::make_unique<NetworkService>(
-    //    std::string(ROBOT_MULTICAST_CHANNELS[channel_id_]) + "%" + "eth0", VISION_PORT,
-    //    PRIMITIVE_PORT, ROBOT_STATUS_PORT, true);
-    power_service_ = std::make_unique<PowerService>();
-    // redis_client_ = std::make_unique<RedisClient>(REDIS_DEFAULT_HOST,
-    // REDIS_DEFAULT_PORT);
+    motor_service_   = std::make_unique<MotorService>(robot_constants, wheel_consants);
+    network_service_ = std::make_unique<NetworkService>(
+            std::string(ROBOT_MULTICAST_CHANNELS[channel_id_]) + "%" + "eth0", VISION_PORT,
+            PRIMITIVE_PORT, ROBOT_STATUS_PORT, true);
+    redis_client_ = std::make_unique<RedisClient>(REDIS_DEFAULT_HOST, REDIS_DEFAULT_PORT);
 }
 
 Thunderloop::~Thunderloop()
@@ -61,7 +59,7 @@ void Thunderloop::runLoop()
         static_cast<int>(1.0f / static_cast<float>(loop_hz_) * NANOSECONDS_PER_SECOND);
 
     // Start the services
-    // motor_service_->start();
+    motor_service_->start();
 
     // Get current time
     // Note: CLOCK_MONOTONIC is used over CLOCK_REALTIME since CLOCK_REALTIME can jump
@@ -71,22 +69,6 @@ void Thunderloop::runLoop()
     for (;;)
     {
         {
-            TbotsProto::PowerControl control;
-            control.mutable_chicker()->set_kick_speed_m_per_s(1.0);
-            control.mutable_chicker()->set_chip_distance_meters(2.0);
-            control.mutable_chicker()->mutable_auto_chip_or_kick()->set_autochip_distance_meters(3.0);
-            control.mutable_geneva()->set_angle_deg(4.0);
-            control.mutable_geneva()->set_angle_deg(5.0);
-            control.set_charge_mode(TbotsProto::PowerControl_ChargeMode_CHARGE);
-            auto status = power_service_->poll(control);
-            LOG(INFO) << status->flyback_fault() << " "
-                      << status->breakbream_tripped() << " "
-                      << status->geneva_angle_deg() << " "
-                      << status->high_voltage_measurement_volts() << " "
-                      << status->current_draw() << " "
-                      << status->capacitor_voltage() << " "
-                      << status->battery_voltage() << " ";
-            continue;
             // Wait until next shot
             // Note: CLOCK_MONOTONIC is used over CLOCK_REALTIME since CLOCK_REALTIME can
             // jump backwards

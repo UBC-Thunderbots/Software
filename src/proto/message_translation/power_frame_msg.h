@@ -25,7 +25,7 @@ extern "C"
  * Serialize nanopb into its byte representation
  *
  * @param data nanopb msg to be serialized
- * @return byte representation of provided nanopb
+ * @return vector of bytes representation of provided nanopb
  */
 std::vector<uint8_t> serializeToVector(const TbotsProto_PowerFrame& data);
 std::vector<uint8_t> serializeToVector(const TbotsProto_PowerControl& data);
