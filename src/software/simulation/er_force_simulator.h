@@ -2,7 +2,7 @@
 
 #include "extlibs/er_force_sim/src/amun/simulator/simulator.h"
 #include "proto/defending_side_msg.pb.h"
-#include "proto/messages_robocup_ssl_wrapper.pb.h"
+#include "proto/ssl_vision_wrapper.pb.h"
 #include "proto/robot_status_msg.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
 #include "shared/parameter/cpp_dynamic_parameters.h"

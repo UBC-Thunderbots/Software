@@ -6,7 +6,7 @@
 
 #include <sstream>
 
-#include "proto/messages_robocup_ssl_wrapper.pb.h"
+#include "proto/ssl_vision_wrapper.pb.h"
 #include "proto/robot_status_msg.pb.h"
 #include "proto/ssl_gc_referee_message.pb.h"
 #include "proto/tbots_software_msgs.pb.h"

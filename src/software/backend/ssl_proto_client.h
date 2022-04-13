@@ -1,6 +1,6 @@
 #pragma once
 
-#include "proto/messages_robocup_ssl_wrapper.pb.h"
+#include "proto/ssl_vision_wrapper.pb.h"
 #include "proto/ssl_gc_referee_message.pb.h"
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/constants.h"

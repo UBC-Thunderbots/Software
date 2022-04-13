@@ -91,9 +91,11 @@ class WorldLayer(FieldLayer):
         :param event: The event
 
         """
+        ball_state = self.cached_world.ball.current_state
+
         ball_position = geom.Vector(
-            self.cached_world.ball.current_state.global_position.x_meters * MM_PER_M,
-            self.cached_world.ball.current_state.global_position.y_meters * MM_PER_M,
+            ball_state.global_position.x_meters * MM_PER_M,
+            ball_state.global_position.y_meters * MM_PER_M,
         )
 
         if self.pressed_CTRL and self.mouse_clicked:
@@ -157,7 +159,7 @@ class WorldLayer(FieldLayer):
         """
         self.mouse_clicked = False
 
-        if self.pressed_CTRL and self.ball_velocity_vector:
+        if self.ball_velocity_vector:
             world_state = WorldState()
             world_state.ball_state.CopyFrom(
                 BallState(
