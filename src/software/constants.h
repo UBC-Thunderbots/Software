@@ -2,6 +2,8 @@
 
 #include <string>
 
+#include "shared/constants.h"
+
 // How many milliseconds a robot must not be seen in vision before it is
 // considered as "gone" and no longer reported.
 static constexpr unsigned int ROBOT_DEBOUNCE_DURATION_MILLISECONDS = 200;
@@ -44,3 +46,7 @@ const std::string YELLOW_PRIMITIVE_SET     = "/yellow_primitive_set";
 const std::string SIMULATOR_STATE_PATH     = "/simulator_state_path";
 
 const unsigned UNIX_BUFFER_SIZE = 20000;
+
+static const double BALL_TO_FRONT_OF_ROBOT_DISTANCE_WHEN_DRIBBLING =
+    BALL_MAX_RADIUS_METERS -
+    2 * BALL_MAX_RADIUS_METERS * MAX_FRACTION_OF_BALL_COVERED_BY_ROBOT;

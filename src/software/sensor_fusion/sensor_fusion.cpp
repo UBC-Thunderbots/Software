@@ -275,9 +275,7 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
                         // MAX_FRACTION_OF_BALL_COVERED_BY_ROBOT of the ball should be
                         // inside the robot
                         .normalize(DIST_TO_FRONT_OF_ROBOT_METERS +
-                                   BALL_MAX_RADIUS_METERS -
-                                   2 * BALL_MAX_RADIUS_METERS *
-                                       MAX_FRACTION_OF_BALL_COVERED_BY_ROBOT),
+                                   BALL_TO_FRONT_OF_ROBOT_DISTANCE_WHEN_DRIBBLING),
                 .distance_from_ground = 0,
                 .timestamp  = Timestamp::fromSeconds(ssl_detection_frame.t_capture()),
                 .confidence = 1}};
