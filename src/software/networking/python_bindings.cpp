@@ -6,9 +6,9 @@
 
 #include <sstream>
 
-#include "proto/ssl_vision_wrapper.pb.h"
 #include "proto/robot_status_msg.pb.h"
 #include "proto/ssl_gc_referee_message.pb.h"
+#include "proto/ssl_vision_wrapper.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
 #include "proto/world.pb.h"
 #include "pybind11_protobuf/native_proto_caster.h"

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "proto/ssl_vision_wrapper.pb.h"
 #include "proto/ssl_gc_referee_message.pb.h"
+#include "proto/ssl_vision_wrapper.pb.h"
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/constants.h"
 #include "software/networking/threaded_proto_udp_listener.hpp"

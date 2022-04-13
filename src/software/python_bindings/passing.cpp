@@ -1,7 +1,7 @@
 #include <pybind11/pybind11.h>
 
-#include "proto/ssl_vision_wrapper.pb.h"
 #include "proto/sensor_msg.pb.h"
+#include "proto/ssl_vision_wrapper.pb.h"
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/passing/cost_function.h"
 #include "software/python_bindings/pass_utilities.h"
