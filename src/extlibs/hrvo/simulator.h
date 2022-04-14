@@ -281,7 +281,10 @@ class HRVOSimulator
     const float time_step;
 
     // The last time which the friendly robot states were updated
-    Timestamp last_update_friendlies_timestamp;
+    Timestamp last_update_velocities_timestamp;
+    Timestamp last_update_positions_timestamp;
+    const Duration update_velocities_frequency;
+    const Duration update_positions_frequency;
 
     // True if all agents have reached their destination
     bool reached_goals;
