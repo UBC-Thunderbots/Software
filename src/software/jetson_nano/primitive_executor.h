@@ -1,6 +1,7 @@
 #pragma once
 #include "extlibs/hrvo/simulator.h"
 #include "proto/primitive.pb.h"
+#include "proto/robot_status_msg.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
 #include "software/geom/vector.h"
 #include "software/world/world.h"
@@ -32,6 +33,12 @@ class PrimitiveExecutor
      * of)
      */
     void updateWorld(const TbotsProto::World& world_msg);
+
+    /**
+     * Update primitive executor with robot statuses
+     * @param robot_statuses The robot statuses
+     */
+    void updateRobotStatuses(std::vector<TbotsProto::RobotStatus> robot_statuses);
 
     /**
      * Steps the current primitive and returns a direct control primitive with the

@@ -246,7 +246,7 @@ void ErForceSimulator::setYellowRobotPrimitiveSet(
     for (auto& [robot_id, primitive] : primitive_set_msg.robot_primitives())
     {
         setRobotPrimitive(robot_id, primitive_set_msg, yellow_primitive_executor_map,
-                          *yellow_team_world_msg);
+                          *yellow_team_world_msg, getYellowRobotStatuses());
     }
     yellow_team_world_msg = std::move(world_msg);
 }
@@ -258,7 +258,7 @@ void ErForceSimulator::setBlueRobotPrimitiveSet(
     for (auto& [robot_id, primitive] : primitive_set_msg.robot_primitives())
     {
         setRobotPrimitive(robot_id, primitive_set_msg, blue_primitive_executor_map,
-                          *blue_team_world_msg);
+                          *blue_team_world_msg, getBlueRobotStatuses());
     }
     blue_team_world_msg = std::move(world_msg);
 }
@@ -267,7 +267,8 @@ void ErForceSimulator::setRobotPrimitive(
     RobotId id, const TbotsProto::PrimitiveSet& primitive_set_msg,
     std::unordered_map<unsigned int, std::shared_ptr<PrimitiveExecutor>>&
         robot_primitive_executor_map,
-    const TbotsProto::World& world_msg)
+    const TbotsProto::World& world_msg,
+    std::vector<TbotsProto::RobotStatus> robot_statuses)
 {
     // Set to NEG_X because the world msg in this simulator is normalized
     // correctly
@@ -286,6 +287,7 @@ void ErForceSimulator::setRobotPrimitive(
         {
             robot_primitive_executor->updatePrimitiveSet(robot_id, primitive_set_msg);
             robot_primitive_executor->updateWorld(world_msg);
+            robot_primitive_executor->updateRobotStatuses(robot_statuses);
         }
         else
         {
