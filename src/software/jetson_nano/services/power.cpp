@@ -28,18 +28,15 @@ std::unique_ptr<TbotsProto::PowerStatus> PowerService::poll(
     try
     {
         // Write power command
-        if (uart->serialWrite(power_command_buffer))
-        {
-            uart->flushSerialPort(uart->flush_send);
-        }
-        else
+        uart->flushSerialPort(uart->flush_send);
+        if (!uart->serialWrite(power_command_buffer))
         {
             LOG(WARNING) << "Writing power command failed.";
         }
 
         // Read power status
-        uart->flushSerialPort(uart->flush_receive);
         power_status = uart->serialRead(READ_BUFFER_SIZE);
+        uart->flushSerialPort(uart->flush_receive);
     }
     catch (std::exception& e)
     {
