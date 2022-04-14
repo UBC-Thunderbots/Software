@@ -1,7 +1,7 @@
 #pragma once
 
 #include "software/ai/hl/stp/tactic/tactic.h"
-#include "software/ai/passing/pass.h"
+#include "software/ai/passing/pass_with_rating.h"
 #include "software/util/sml_fsm/sml_fsm.h"
 #include "software/world/world.h"
 
@@ -13,7 +13,7 @@ using ConstPriorityTacticVector = std::vector<ConstTacticVector>;
 // Struct used to communicate between plays
 struct InterPlayCommunication
 {
-    std::optional<Pass> last_committed_pass;
+    std::optional<PassWithRating> last_committed_pass;
 };
 
 // This callback is used to return tactics from the fsm
