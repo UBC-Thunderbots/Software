@@ -108,21 +108,21 @@ std::unique_ptr<SSLSimulationProto::RobotCommand> getRobotCommandFromDirectContr
     std::optional<float> kick_angle;       // [degree]
     std::optional<double> dribbler_speed;  // [rpm]
 
-    switch (direct_control->chick_command_case())
+    switch (direct_control->power().chicker().chicker_command_case())
     {
-        case TbotsProto::DirectControlPrimitive::kKickSpeedMPerS:
+        case TbotsProto::PowerControl::ChickerControl::kKickSpeedMPerS:
         {
-            kick_speed = direct_control->kick_speed_m_per_s();
+            kick_speed = direct_control->power().chicker().kick_speed_m_per_s();
             kick_angle = std::nullopt;
             break;
         }
-        case TbotsProto::DirectControlPrimitive::kChipDistanceMeters:
+        case TbotsProto::PowerControl::ChickerControl::kChipDistanceMeters:
         {
             Angle chip_angle = Angle::fromDegrees(ROBOT_CHIP_ANGLE_DEGREES);
             // Use the formula for the Range of a parabolic projectile
             // Rearrange to solve for the initial velocity.
             // https://courses.lumenlearning.com/boundless-physics/chapter/projectile-motion/
-            float range = direct_control->chip_distance_meters();
+            float range = direct_control->power().chicker().chip_distance_meters();
             float numerator =
                 range *
                 static_cast<float>(ACCELERATION_DUE_TO_GRAVITY_METERS_PER_SECOND_SQUARED);
@@ -133,32 +133,43 @@ std::unique_ptr<SSLSimulationProto::RobotCommand> getRobotCommandFromDirectContr
             kick_angle = chip_angle.toDegrees();
             break;
         }
-        case TbotsProto::DirectControlPrimitive::kAutokickSpeedMPerS:
+        case TbotsProto::PowerControl::ChickerControl::kAutoChipOrKick:
         {
-            kick_speed = direct_control->autokick_speed_m_per_s();
-            kick_angle = std::nullopt;
-            break;
-        }
-        case TbotsProto::DirectControlPrimitive::kAutochipDistanceMeters:
-        {
-            Angle chip_angle = Angle::fromDegrees(ROBOT_CHIP_ANGLE_DEGREES);
-            // Use the formula for the Range of a parabolic projectile
-            // Rearrange to solve for the initial velocity.
-            // https://courses.lumenlearning.com/boundless-physics/chapter/projectile-motion/
-            float range = direct_control->autochip_distance_meters();
-            float numerator =
-                range *
-                static_cast<float>(ACCELERATION_DUE_TO_GRAVITY_METERS_PER_SECOND_SQUARED);
-            float denominator = static_cast<float>(2.0f * (chip_angle * 2.0f).sin());
-            float chip_speed  = static_cast<float>(std::sqrt(numerator / denominator));
+            switch (direct_control->power().chicker().auto_chip_or_kick().auto_chip_or_kick_case()) {
+                case TbotsProto::AutoChipOrKick::kAutokickSpeedMPerS:
+                {
+                    kick_speed = direct_control->power().chicker().auto_chip_or_kick().autokick_speed_m_per_s();
+                    kick_angle = std::nullopt;
+                    break;
+                }
+                case TbotsProto::AutoChipOrKick::kAutochipDistanceMeters:
+                {
+                    Angle chip_angle = Angle::fromDegrees(ROBOT_CHIP_ANGLE_DEGREES);
+                    // Use the formula for the Range of a parabolic projectile
+                    // Rearrange to solve for the initial velocity.
+                    // https://courses.lumenlearning.com/boundless-physics/chapter/projectile-motion/
+                    float range = direct_control->power().chicker().auto_chip_or_kick().autochip_distance_meters();
+                    float numerator =
+                            range *
+                            static_cast<float>(ACCELERATION_DUE_TO_GRAVITY_METERS_PER_SECOND_SQUARED);
+                    float denominator = static_cast<float>(2.0f * (chip_angle * 2.0f).sin());
+                    float chip_speed  = static_cast<float>(std::sqrt(numerator / denominator));
 
-            kick_speed = chip_speed;
-            kick_angle = chip_angle.toDegrees();
+                    kick_speed = chip_speed;
+                    kick_angle = chip_angle.toDegrees();
+                    break;
+                }
+                case TbotsProto::AutoChipOrKick::AUTO_CHIP_OR_KICK_NOT_SET:
+                {
+                    direct_control->mutable_power()->mutable_chicker()->clear_chicker_command();
+                    break;
+                }
+            }
             break;
         }
-        case TbotsProto::DirectControlPrimitive::CHICK_COMMAND_NOT_SET:
+        case TbotsProto::PowerControl::ChickerControl::CHICKER_COMMAND_NOT_SET:
         {
-            direct_control->clear_chick_command();
+            direct_control->mutable_power()->mutable_chicker()->clear_chicker_command();
             break;
         }
     }
