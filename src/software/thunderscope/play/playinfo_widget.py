@@ -58,10 +58,10 @@ class playInfoWidget(QTableWidget):
         tactic_names = []
         play_name = []
 
-        play_name.append(play_info_dict["play"]["playName"])
-
         if "robotTacticAssignment" not in play_info_dict:
             return
+
+        play_name.append(play_info_dict["play"]["playName"])
 
         for robot_id in sorted(play_info_dict["robotTacticAssignment"]):
             robot_ids.append(robot_id)

@@ -117,7 +117,7 @@ cc_library(
     name = "constants",
     hdrs = ["constants.h"],
     deps = [
-        "//shared:constants"
+        "//shared:constants",
     ],
 )
 
