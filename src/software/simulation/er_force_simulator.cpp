@@ -372,6 +372,18 @@ void ErForceSimulator::stepSimulation(const Duration& time_step)
 std::vector<TbotsProto::RobotStatus> ErForceSimulator::getBlueRobotStatuses() const
 {
     std::vector<TbotsProto::RobotStatus> robot_statuses;
+
+    auto sim_state  = getSimulatorState();
+    auto sim_robots = sim_state.blue_robots();
+    for (const auto& sim_robot : sim_robots)
+    {
+        auto robot_status = TbotsProto::RobotStatus();
+        robot_status.set_robot_id(sim_robot.id());
+        *(robot_status.mutable_global_velocity()) =
+            *createVectorProto(Vector(sim_robot.v_x(), sim_robot.v_y()));
+        robot_statuses.push_back(robot_status);
+    }
+
     if (blue_robot_with_ball.has_value())
     {
         auto robot_status = TbotsProto::RobotStatus();
@@ -388,6 +400,18 @@ std::vector<TbotsProto::RobotStatus> ErForceSimulator::getBlueRobotStatuses() co
 std::vector<TbotsProto::RobotStatus> ErForceSimulator::getYellowRobotStatuses() const
 {
     std::vector<TbotsProto::RobotStatus> robot_statuses;
+
+    auto sim_state  = getSimulatorState();
+    auto sim_robots = sim_state.yellow_robots();
+    for (const auto& sim_robot : sim_robots)
+    {
+        auto robot_status = TbotsProto::RobotStatus();
+        robot_status.set_robot_id(sim_robot.id());
+        *(robot_status.mutable_global_velocity()) =
+            *createVectorProto(Vector(sim_robot.v_x(), sim_robot.v_y()));
+        robot_statuses.push_back(robot_status);
+    }
+
     if (yellow_robot_with_ball.has_value())
     {
         auto robot_status = TbotsProto::RobotStatus();
