@@ -23,8 +23,11 @@ class AssignedTacticsPlay : public Play
 
     std::vector<std::unique_ptr<Intent>> get(
         RobotToTacticAssignmentFunction,
-        MotionConstraintBuildFunction motion_constraint_builder,
-        const World &new_world) override;
+        MotionConstraintBuildFunction motion_constraint_builder, const World &new_world,
+        const InterPlayCommunication &, const SetInterPlayCommunicationCallback &
+
+
+        ) override;
 
    private:
     std::map<RobotId, std::shared_ptr<Tactic>> assigned_tactics;

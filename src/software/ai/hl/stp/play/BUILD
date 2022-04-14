@@ -282,6 +282,7 @@ cc_library(
     deps = [
         "//shared/parameter:cpp_configs",
         "//software/ai/hl/stp/tactic",
+        "//software/ai/passing:pass",
         "//software/util/sml_fsm",
         "@boost//:coroutine2",
     ],
