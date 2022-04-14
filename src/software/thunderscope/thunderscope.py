@@ -1,7 +1,8 @@
 import os
 import atexit
 import signal
-from threading import Thread
+import threading
+import logging
 import time
 import shelve
 import argparse
@@ -22,10 +23,11 @@ else:
 
 import pyqtgraph
 import qdarktheme
+import software.python_bindings as geom
+
 from subprocess import Popen
 from pyqtgraph.dockarea import *
 from pyqtgraph.Qt import QtCore, QtGui
-import software.python_bindings as geom
 from pyqtgraph.Qt.QtWidgets import *
 
 from proto.import_all_protos import *
@@ -35,10 +37,9 @@ from extlibs.er_force_sim.src.protobuf.world_pb2 import (
     SimBall,
     SimRobot,
 )
-from software.py_constants import *
 
-from software.networking import threaded_unix_sender
-from software.networking import networking
+from software.py_constants import *
+from software.networking import threaded_unix_sender, networking
 from software.thunderscope.arbitrary_plot.named_value_plotter import NamedValuePlotter
 from software.estop.estop_reader import ThreadedEstopReader
 from software.thunderscope.field import (
@@ -51,13 +52,14 @@ from software.thunderscope.field import (
 from software.thunderscope.field.field import Field
 from software.thunderscope.log.g3log_widget import g3logWidget
 from software.thunderscope.proto_unix_io import ProtoUnixIO
+from software.thunderscope.play.playinfo_widget import playInfoWidget
+from software.thunderscope.robot_diagnostics.chicker import ChickerWidget
 from software.thunderscope.robot_diagnostics.drive_and_dribbler_widget import (
     DriveAndDribblerWidget,
 )
-from software.thunderscope.play.playinfo_widget import playInfoWidget
-from software.thunderscope.robot_diagnostics.chicker import ChickerWidget
 
 DEFAULT_LAYOUT_PATH = "/opt/tbotspython/default_tscope_layout"
+PROCESS_LAUNCH_DELAY_S = 0.1
 
 
 class Thunderscope(object):
@@ -80,7 +82,25 @@ class Thunderscope(object):
 
     """
 
-    def __init__(self, refresh_interval_ms=2):
+    def __init__(
+        self,
+        simulator_runtime_dir,
+        blue_fullsystem_runtime_dir,
+        yellow_fullsystem_runtime_dir,
+        refresh_interval_ms=2,
+    ):
+        """Initialize Thunderscope
+
+        :param simulator_runtime_dir: The directory to run the simulator in
+        :param blue_fullsystem_runtime_dir: The directory to run the blue fullsystem in
+        :param yellow_fullsystem_runtime_dir: The directory to run the yellow fullsystem in
+        :param refresh_interval_ms: The interval in milliseconds to refresh the simulator
+
+        """
+
+        self.simulator_runtime_dir = simulator_runtime_dir
+        self.blue_fullsystem_runtime_dir = blue_fullsystem_runtime_dir
+        self.yellow_fullsystem_runtime_dir = yellow_fullsystem_runtime_dir
 
         # Setup MainApp and initialize DockArea
         self.app = pyqtgraph.mkQApp("Thunderscope")
@@ -88,12 +108,9 @@ class Thunderscope(object):
 
         signal.signal(signal.SIGINT, signal.SIG_DFL)
 
+        self.main_dock = DockArea()
         self.blue_full_system_dock_area = DockArea()
         self.yellow_full_system_dock_area = DockArea()
-
-        self.settings = QtCore.QSettings()
-
-        self.main_dock = DockArea()
 
         blue_dock = Dock("Blue Fullsystem")
         blue_dock.addWidget(self.blue_full_system_dock_area)
@@ -158,6 +175,75 @@ class Thunderscope(object):
                 """,
             )
         )
+
+    def __enter__(self):
+        """Enter the Thunderscope context manager. 
+
+        Launches the simulator and the blue and yellow fullsystems. Also starts the
+        gamecontroller. We use the context manager to launch these binaries, so that
+        we can cleanly kill them when we exit on any error, signal, etc..
+
+        :return: Thunderscope instance
+
+        """
+        logging.info("Starting Thunderscope")
+        self.running = True
+
+        self.yellow_full_system_proc = Popen(
+            "software/unix_full_system --runtime_dir={} {}".format(
+                self.yellow_fullsystem_runtime_dir, "--friendly_colour_yellow"
+            ).split(" ")
+        )
+
+        self.blue_full_system_proc = Popen(
+            "software/unix_full_system --runtime_dir={}".format(
+                self.blue_fullsystem_runtime_dir
+            ).split(" ")
+        )
+
+        self.er_force_simulator_proc = Popen(
+            "software/er_force_simulator_main --runtime_dir={}".format(
+                self.simulator_runtime_dir
+            ).split(" ")
+        )
+
+        self.gamecontroller_proc = Popen(["/opt/tbotspython/gamecontroller"])
+
+        # Setup proto unix IO
+        self.__setup_fullsystem_proto_unix_io(
+            self.blue_fullsystem_runtime_dir, self.blue_full_system_proto_unix_io
+        )
+        self.__setup_fullsystem_proto_unix_io(
+            self.yellow_fullsystem_runtime_dir, self.yellow_full_system_proto_unix_io
+        )
+        self.__setup_simulator_proto_unix_io(self.simulator_runtime_dir)
+        self.__setup_gamecontroller_proto_unix_io()
+
+        time.sleep(PROCESS_LAUNCH_DELAY_S)
+
+        return self
+
+    def __exit__(self, type, value, traceback):
+        """Exit the Thunderscope context manager.
+
+        Kill the fullsystems, simulator, and gamecontroller.
+
+        :param type: The type of exception that was raised
+        :param value: The exception that was raised
+        :param traceback: The traceback of the exception
+
+        """
+        self.running = False
+
+        for proc in [
+            self.gamecontroller_proc,
+            self.er_force_simulator_proc,
+            self.yellow_full_system_proc,
+            self.blue_full_system_proc,
+        ]:
+            if proc:
+                proc.kill()
+                proc.wait()
 
     def save_layout(self):
         """Open a file dialog to save the layout and any other
@@ -255,15 +341,11 @@ class Thunderscope(object):
                 ),
             )
 
-    def __run_full_system(
-        self, runtime_dir, proto_unix_io, friendly_colour_yellow=False
-    ):
+    def __setup_fullsystem_proto_unix_io(self, runtime_dir, proto_unix_io):
         """Helper to run full system and attach the appropriate unix senders/listeners
 
         :param runtime_dir: The runtime directory to run fullsystem
         :param proto_unix_io: The unix io to setup for this fullsystem instance
-        :param friendly_colour_yellow: Whether this fullsystems friendly color is yellow
-        :returns: Running full system process
 
         """
 
@@ -299,36 +381,10 @@ class Thunderscope(object):
         proto_unix_io.attach_unix_receiver(runtime_dir + WORLD_PATH, World)
         proto_unix_io.attach_unix_receiver(runtime_dir + PRIMITIVE_PATH, PrimitiveSet)
 
-        # Run FullSystem TODO (#2510) rename to full_system
-        return Popen(
-            "software/unix_full_system --runtime_dir={} {}".format(
-                runtime_dir,
-                "--friendly_colour_yellow" if friendly_colour_yellow else "",
-            ).split(" ")
-        )
-
-    def run_blue_full_system(self, runtime_dir):
-        self.blue_full_system = self.__run_full_system(
-            runtime_dir,
-            self.blue_full_system_proto_unix_io,
-            friendly_colour_yellow=False,
-        )
-
-    def run_yellow_full_system(self, runtime_dir):
-        self.yellow_full_system = self.__run_full_system(
-            runtime_dir,
-            self.yellow_full_system_proto_unix_io,
-            friendly_colour_yellow=True,
-        )
-
-    def run_er_force_simulator(
-        self, simulator_runtime_dir, blue_runtime_dir, yellow_runtime_dir,
-    ):
-        """Run er force simulator and set up the proto unix IO
+    def __setup_simulator_proto_unix_io(self, simulator_runtime_dir):
+        """Setup the proto unix io for the simulator
 
         :param simulator_runtime_dir: The runtime directory of the simulator.
-        :param blue_runtime_dir: The runtime directory of the blue full system.
-        :param yellow_runtime_dir: The runtime directory of the yellow full system.
 
         """
         # Setup unix socket directory
@@ -371,10 +427,8 @@ class Thunderscope(object):
         ]:
             self.yellow_full_system_proto_unix_io.attach_unix_receiver(*arg)
 
-        self.er_force_simulator = Popen(["software/er_force_simulator_main"])
-
-    def run_gamecontroller(self):
-        """Run the gamecontroller
+    def __setup_gamecontroller_proto_unix_io(self):
+        """Setup gamecontroller io
         """
 
         def __send_referee_command(data):
@@ -385,8 +439,6 @@ class Thunderscope(object):
         self.receive_referee_command = networking.SSLRefereeProtoListener(
             "224.5.23.1", 10003, __send_referee_command, True,
         )
-
-        self.gamecontroller = Popen(["/opt/tbotspython/gamecontroller"])
 
     def register_refresh_function(self, refresh_func):
         """Register the refresh functions to run at the refresh_interval_ms
@@ -589,20 +641,10 @@ class Thunderscope(object):
         pyqtgraph.exec()
 
     def close(self):
-        """Close the main window
-
-        NOTE: Its important that we use the timer to call the close
-        function so that its handled by the pyqt event loop.
-
-        """
-
         QtCore.QTimer.singleShot(0, self.window.close)
 
 
 if __name__ == "__main__":
-    # TODO kill stuff
-    # atexit.register(goodbye, 'Donny', 'nice')
-
     # Setup parser
     parser = argparse.ArgumentParser(description="Thunderscope")
     parser.add_argument(
@@ -631,6 +673,7 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
+    # Robot Diagnostics
     if args.robot_diagnostics:
 
         estop_reader = ThreadedEstopReader("/dev/ttyACM0", 115200)
@@ -646,16 +689,11 @@ if __name__ == "__main__":
         thunderscope.dock_area.addDock(drive_and_dribbler_dock)
         thunderscope.show()
 
+    # Default (AI vs AI + Simulator)
+    #
+    # Asynchronously tick the simulator to run both full systems at the
+    # provided rate.
     else:
-
-        thunderscope = Thunderscope()
-        thunderscope.run_er_force_simulator(
-            "/tmp/tbots", "/tmp/tbots/blue", "/tmp/tbots/yellow",
-        )
-        thunderscope.run_blue_full_system("/tmp/tbots/blue")
-        thunderscope.run_yellow_full_system("/tmp/tbots/yellow")
-        thunderscope.run_gamecontroller()
-        thunderscope.load_saved_layout(args.layout)
 
         def __async_sim_ticker(tick_rate_ms, division):
             """Setup the world and tick simulation forever
@@ -673,16 +711,26 @@ if __name__ == "__main__":
                 ball_location=geom.Point(0, 0),
                 ball_velocity=geom.Vector(0, 0),
             )
-            thunderscope.simulator_proto_unix_io.send_proto(WorldState, world_state)
+            tscope.simulator_proto_unix_io.send_proto(WorldState, world_state)
 
             # Tick Simulation
-            while True:
+            while tscope.running:
                 tick = SimulatorTick(milliseconds=tick_rate_ms)
-                thunderscope.simulator_proto_unix_io.send_proto(SimulatorTick, tick)
+                tscope.simulator_proto_unix_io.send_proto(SimulatorTick, tick)
                 time.sleep(tick_rate_ms / 1000)
 
-        thread = Thread(
-            target=__async_sim_ticker, args=(args.sim_tick_rate_ms, args.division)
-        )
-        thread.start()
-        thunderscope.show()
+        with Thunderscope(
+            "/tmp/tbots", "/tmp/tbots/blue", "/tmp/tbots/yellow"
+        ) as tscope:
+
+            tscope.load_saved_layout(args.layout)
+
+            thread = threading.Thread(
+                target=__async_sim_ticker,
+                args=(args.sim_tick_rate_ms, args.division),
+                daemon=True,
+            )
+
+            thread.start()
+            tscope.show()
+            thread.join()

@@ -29,45 +29,23 @@ class SimulatorTestRunner(object):
 
     """Run a simulated test"""
 
-    def __init__(
-        self,
-        launch_delay_s=0.1,
-        show_thunderscope=True,
-        thunderscope_layout_path=None,
-        runtime_dir="/tmp/tbots",
-    ):
+    def __init__(self, thunderscope, show_thunderscope=True):
         """Initialize the SimulatorTestRunner
 
-        :param launch_delay_s: How long to wait after launching the processes
+        :param thunderscope: The thunderscope to use
         :param show_thunderscope: If true, thunderscope opens and the test runs in realtime
-        :param thunderscope_layout_path: The path to the thunderscope layout
-        :param runtime_dir: Directory to open sockets, store logs and any output files
 
         """
 
-        self.thunderscope = Thunderscope()
+        self.thunderscope = thunderscope
         self.show_thunderscope = show_thunderscope
-
-        # Run full system and er_force_simulator
-        self.thunderscope.run_er_force_simulator(
-            "/tmp/tbots", "/tmp/tbots/blue", "/tmp/tbots/yellow"
-        )
-        self.thunderscope.run_blue_full_system("/tmp/tbots/blue")
-        self.thunderscope.run_yellow_full_system("/tmp/tbots/yellow")
-
-        if self.show_thunderscope:
-            self.thunderscope.load_saved_layout(thunderscope_layout_path)
-
-        time.sleep(launch_delay_s)
-
         self.world_buffer = queue.Queue()
+        self.last_exception = None
 
         # Only validate on the blue worlds
         self.thunderscope.blue_full_system_proto_unix_io.register_observer(
             World, self.world_buffer
         )
-
-        self.last_exception = None
 
     def run_test(
         self,
@@ -134,9 +112,6 @@ class SimulatorTestRunner(object):
                     self.thunderscope.blue_full_system_proto_unix_io.send_proto(
                         ValidationProtoSet, eventually_validation_proto_set
                     )
-                    self.thunderscope.yellow_full_system_proto_unix_io.send_proto(
-                        ValidationProtoSet, eventually_validation_proto_set
-                    )
                     self.thunderscope.blue_full_system_proto_unix_io.send_proto(
                         ValidationProtoSet, always_validation_proto_set
                     )
@@ -171,7 +146,6 @@ class SimulatorTestRunner(object):
 
             run_sim_thread = threading.Thread(target=__runner, daemon=True)
             run_sim_thread.start()
-
             self.thunderscope.show()
             run_sim_thread.join()
 
@@ -205,7 +179,13 @@ def load_command_line_arguments():
 @pytest.fixture
 def simulated_test_runner():
     args = load_command_line_arguments()
+
+    thunderscope = Thunderscope("/tmp/tbots", "/tmp/tbots/blue", "/tmp/tbots/yellow")
+    thunderscope.load_saved_layout(args.layout)
+
     runner = SimulatorTestRunner(
-        show_thunderscope=args.enable_thunderscope, thunderscope_layout_path=args.layout
+        thunderscope=thunderscope, show_thunderscope=args.enable_thunderscope,
     )
-    yield runner
+
+    with thunderscope:
+        yield runner
