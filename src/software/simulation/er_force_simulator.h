@@ -148,12 +148,14 @@ class ErForceSimulator
      * @param robot_primitive_executor_map The robot primitive executors to send the
      * primitive set to
      * @param world_msg The world message
+     * @param robot_statuses The robot statuses
      */
     static void setRobotPrimitive(
         RobotId id, const TbotsProto::PrimitiveSet& primitive_set_msg,
         std::unordered_map<unsigned int, std::shared_ptr<PrimitiveExecutor>>&
             robot_primitive_executor_map,
-        const TbotsProto::World& world_msg);
+        const TbotsProto::World& world_msg,
+        std::vector<TbotsProto::RobotStatus> robot_statuses);
 
     /**
      * Update Simulator Robot and get the latest robot control

@@ -33,6 +33,11 @@ void PrimitiveExecutor::updateWorld(const TbotsProto::World& world_msg)
     hrvo_simulator_.updateWorld(World(world_msg));
 }
 
+void PrimitiveExecutor::updateRobotStatuses(
+    std::vector<TbotsProto::RobotStatus> robot_statuses)
+{
+}
+
 Vector PrimitiveExecutor::getTargetLinearVelocity(const unsigned int robot_id,
                                                   const Angle& orientation)
 {

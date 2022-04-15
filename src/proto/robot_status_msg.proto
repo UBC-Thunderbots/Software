@@ -3,6 +3,7 @@ syntax = "proto3";
 package TbotsProto;
 
 import "proto/tbots_timestamp_msg.proto";
+import "proto/geometry.proto";
 
 message RobotStatus
 {
@@ -18,6 +19,7 @@ message RobotStatus
     TemperatureStatus temperature_status      = 10;
     Timestamp time_sent                       = 11;
     ThunderloopStatus thunderloop_status      = 12;
+    Vector global_velocity                    = 13;
 }
 
 message ThunderloopStatus
