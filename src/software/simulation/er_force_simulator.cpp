@@ -287,7 +287,7 @@ void ErForceSimulator::setRobotPrimitive(
         {
             robot_primitive_executor->updatePrimitiveSet(robot_id, primitive_set_msg);
             robot_primitive_executor->updateWorld(world_msg);
-            robot_primitive_executor->updateRobotStatuses(robot_statuses);
+            robot_primitive_executor->updateRobotStatuses(robot_id, robot_statuses);
         }
         else
         {

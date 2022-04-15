@@ -8,6 +8,7 @@
 #include "proto/visualization.pb.h"
 #include "software/logger/logger.h"
 #include "software/math/math_functions.h"
+#include "extlibs/hrvo/hrvo_agent.h"
 
 PrimitiveExecutor::PrimitiveExecutor(const double time_step,
                                      const RobotConstants_t& robot_constants)
@@ -34,8 +35,25 @@ void PrimitiveExecutor::updateWorld(const TbotsProto::World& world_msg)
 }
 
 void PrimitiveExecutor::updateRobotStatuses(
-    std::vector<TbotsProto::RobotStatus> robot_statuses)
+        const unsigned int robot_id,
+        const std::vector<TbotsProto::RobotStatus>& robot_statuses)
 {
+    // TODO: Maybe made robot_id a field
+    // TODO: instead of a vector, a single robot_status should be sent. Then we could remove robot_id param as its
+    //       included in the robot_status
+    std::optional<std::shared_ptr<HRVOAgent>> friendly_agent_opt = hrvo_simulator_.getFriendlyAgentFromRobotId(robot_id);
+    if (friendly_agent_opt.has_value())
+    {
+        auto robot_status = std::find_if(robot_statuses.begin(), robot_statuses.end(), [robot_id](const TbotsProto::RobotStatus& status)
+        {
+            return status.robot_id() == robot_id;
+        });
+        if (robot_status != robot_statuses.end())
+        {
+            auto curr_velocity = createVector(robot_status->global_velocity());
+            friendly_agent_opt.value()->setVelocity(curr_velocity);
+        }
+    }
 }
 
 Vector PrimitiveExecutor::getTargetLinearVelocity(const unsigned int robot_id,

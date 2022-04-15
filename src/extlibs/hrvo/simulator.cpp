@@ -203,7 +203,7 @@ void HRVOSimulator::updateWorld(const World &world)
     // TODO: DEBUGGING!!!!!!!!!!!!!!!!!
     doStep();
     doStep();
-    doStep();
+//    doStep();
 }
 
 void HRVOSimulator::updatePrimitiveSet(const TbotsProto::PrimitiveSet &new_primitive_set)

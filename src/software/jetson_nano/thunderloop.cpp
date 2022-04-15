@@ -104,6 +104,10 @@ void Thunderloop::runLoop()
                     static_cast<unsigned long>(poll_time.tv_nsec));
             }
 
+            // TODO (#2583): Based on encoder values, update the velocity of the HRVO Agent
+            //               which represents the robot which this Thunderloop is running on.
+            //               Call PrimitiveExecutor::updateRobotStatuses
+
             // TODO (#2495): Replace Vision proto with World proto in Network Service and
             //               call PrimitiveExecutor::updateWorld
             // If the vision msg is new, update the internal buffer
