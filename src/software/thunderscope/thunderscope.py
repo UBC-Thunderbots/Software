@@ -87,7 +87,9 @@ class Thunderscope(object):
         simulator_runtime_dir,
         blue_fullsystem_runtime_dir,
         yellow_fullsystem_runtime_dir,
-        refresh_interval_ms=2,
+        debug_fullsystem=False,
+        debug_simulator=False,
+        refresh_interval_ms=10,
     ):
         """Initialize Thunderscope
 
@@ -95,12 +97,16 @@ class Thunderscope(object):
         :param blue_fullsystem_runtime_dir: The directory to run the blue fullsystem in
         :param yellow_fullsystem_runtime_dir: The directory to run the yellow fullsystem in
         :param refresh_interval_ms: The interval in milliseconds to refresh the simulator
+        :param debug_fullsystem: Whether to run the fullsystem in debug mode
+        :param debug_simulator: Whether to run the simulator in debug mode
 
         """
 
         self.simulator_runtime_dir = simulator_runtime_dir
         self.blue_fullsystem_runtime_dir = blue_fullsystem_runtime_dir
         self.yellow_fullsystem_runtime_dir = yellow_fullsystem_runtime_dir
+        self.debug_fullsystem = debug_fullsystem
+        self.debug_simulator = debug_simulator
 
         # Setup MainApp and initialize DockArea
         self.app = pyqtgraph.mkQApp("Thunderscope")
@@ -119,7 +125,7 @@ class Thunderscope(object):
         yellow_dock.addWidget(self.yellow_full_system_dock_area)
 
         self.main_dock.addDock(yellow_dock)
-        self.main_dock.addDock(blue_dock, "left", yellow_dock)
+        self.main_dock.addDock(blue_dock, "above", yellow_dock)
 
         self.window = QtGui.QMainWindow()
         self.window.setCentralWidget(self.main_dock)
@@ -183,29 +189,54 @@ class Thunderscope(object):
         gamecontroller. We use the context manager to launch these binaries, so that
         we can cleanly kill them when we exit on any error, signal, etc..
 
+        If the debug mode is enabled (debug_fullsystem or debug_simulator), then
+        the binary is _not_ run and the command to debug under gdb is printed.
+
         :return: Thunderscope instance
 
         """
         logging.info("Starting Thunderscope")
         self.running = True
 
-        self.yellow_full_system_proc = Popen(
-            "software/unix_full_system --runtime_dir={} {}".format(
-                self.yellow_fullsystem_runtime_dir, "--friendly_colour_yellow"
-            ).split(" ")
+        yellow_fullsystem_command = "software/unix_full_system --runtime_dir={} {}".format(
+            self.yellow_fullsystem_runtime_dir, "--friendly_colour_yellow"
+        )
+        blue_fullsystem_command = "software/unix_full_system --runtime_dir={}".format(
+            self.blue_fullsystem_runtime_dir
+        )
+        simulator_command = "software/er_force_simulator_main --runtime_dir={}".format(
+            self.simulator_runtime_dir
         )
 
-        self.blue_full_system_proc = Popen(
-            "software/unix_full_system --runtime_dir={}".format(
-                self.blue_fullsystem_runtime_dir
-            ).split(" ")
-        )
+        if self.debug_fullsystem:
+            print("============ Debugging Full System ==============")
 
-        self.er_force_simulator_proc = Popen(
-            "software/er_force_simulator_main --runtime_dir={}".format(
-                self.simulator_runtime_dir
-            ).split(" ")
-        )
+            print("\n1. Build full system in debug mode")
+            print("./tbots.py -d build unix_full_system")
+
+            print("\n2. Run the following binaries from src to debug full system")
+            print("gdb --args bazel-bin/{}".format(yellow_fullsystem_command))
+            print("gdb --args bazel-bin/{}\n".format(blue_fullsystem_command))
+
+        else:
+            self.yellow_full_system_proc = Popen(yellow_fullsystem_command.split(" "))
+            self.blue_full_system_proc = Popen(blue_fullsystem_command.split(" "))
+
+        if self.debug_simulator:
+            print("============== Debugging Simulator ==============")
+
+            print("\n1. Build the simulator in debug mode:")
+            print("./tbots.py -d build er_force_simulator_main")
+
+            print("\n2. Run the following binary from src to debug the simulator:")
+            print("gdb --args bazel-bin/{}\n".format(simulator_command))
+
+        else:
+            self.er_force_simulator_proc = Popen(simulator_command.split(" "))
+
+        # Wait for user to start the gdb/debugging instances
+        if self.debug_fullsystem or self.debug_simulator:
+            input("After launching the gdb instances, press enter to continue...")
 
         self.gamecontroller_proc = Popen(["/opt/tbotspython/gamecontroller"])
 
@@ -645,6 +676,7 @@ class Thunderscope(object):
 
 
 if __name__ == "__main__":
+
     # Setup parser
     parser = argparse.ArgumentParser(description="Thunderscope")
     parser.add_argument(
@@ -670,6 +702,36 @@ if __name__ == "__main__":
         type=str,
         default="B",
         help="Which division to run A: 11v11 or B: 6v6",
+    )
+    parser.add_argument(
+        "--simulator_runtime_dir",
+        type=str,
+        help="simulator runtime directory",
+        default="/tmp/tbots",
+    )
+    parser.add_argument(
+        "--blue_fullsystem_runtime_dir",
+        type=str,
+        help="blue fullsystem runtime directory",
+        default="/tmp/tbots/blue",
+    )
+    parser.add_argument(
+        "--yellow_fullsystem_runtime_dir",
+        type=str,
+        help="yellow fullsystem runtime directory",
+        default="/tmp/tbots/yellow",
+    )
+    parser.add_argument(
+        "--debug_fullsystem",
+        action="store_true",
+        default=False,
+        help="Debug fullsystem",
+    )
+    parser.add_argument(
+        "--debug_simulator",
+        action="store_true",
+        default=False,
+        help="Debug the simulator",
     )
     args = parser.parse_args()
 
@@ -720,7 +782,11 @@ if __name__ == "__main__":
                 time.sleep(tick_rate_ms / 1000)
 
         with Thunderscope(
-            "/tmp/tbots", "/tmp/tbots/blue", "/tmp/tbots/yellow"
+            args.simulator_runtime_dir,
+            args.blue_fullsystem_runtime_dir,
+            args.yellow_fullsystem_runtime_dir,
+            args.debug_fullsystem,
+            args.debug_simulator,
         ) as tscope:
 
             tscope.load_saved_layout(args.layout)

@@ -169,9 +169,39 @@ def load_command_line_arguments():
         "--enable_thunderscope", action="store_true", help="enable thunderscope"
     )
     parser.add_argument(
+        "--simulator_runtime_dir",
+        type=str,
+        help="simulator runtime directory",
+        default="/tmp/tbots",
+    )
+    parser.add_argument(
+        "--blue_fullsystem_runtime_dir",
+        type=str,
+        help="blue fullsystem runtime directory",
+        default="/tmp/tbots/blue",
+    )
+    parser.add_argument(
+        "--yellow_fullsystem_runtime_dir",
+        type=str,
+        help="yellow fullsystem runtime directory",
+        default="/tmp/tbots/yellow",
+    )
+    parser.add_argument(
         "--layout",
         action="store",
         help="Which layout to run, if not specified the last layout will run",
+    )
+    parser.add_argument(
+        "--debug_fullsystem",
+        action="store_true",
+        default=False,
+        help="Debug fullsystem",
+    )
+    parser.add_argument(
+        "--debug_simulator",
+        action="store_true",
+        default=False,
+        help="Debug the simulator",
     )
     return parser.parse_args()
 
@@ -180,7 +210,13 @@ def load_command_line_arguments():
 def simulated_test_runner():
     args = load_command_line_arguments()
 
-    thunderscope = Thunderscope("/tmp/tbots", "/tmp/tbots/blue", "/tmp/tbots/yellow")
+    thunderscope = Thunderscope(
+        args.simulator_runtime_dir,
+        args.blue_fullsystem_runtiem_dir,
+        args.yellow_fullsystem_runtime_dir,
+        debug_fullsystem=args.debug_fullsystem,
+        debug_simulator=args.debug_simulator,
+    )
     thunderscope.load_saved_layout(args.layout)
 
     runner = SimulatorTestRunner(

@@ -42,8 +42,8 @@ class ObstacleLayer(FieldLayer):
         for polyobstacle in obstacles.polygon:
             polygon_points = [
                 QtCore.QPoint(
-                    constants.MM_PER_M * point.x_meters,
-                    constants.MM_PER_M * point.y_meters,
+                    int(constants.MM_PER_M * point.x_meters),
+                    int(constants.MM_PER_M * point.y_meters),
                 )
                 for point in polyobstacle.points
             ]

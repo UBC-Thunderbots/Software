@@ -308,7 +308,7 @@ class WorldLayer(FieldLayer):
             )
         )
 
-        if self.ball_velocity_vector:
+        if self.ball_velocity_vector and self.mouse_clicked:
             vector = self.ball_velocity_vector * 0.5
             polyline = QtGui.QPolygon(
                 [
