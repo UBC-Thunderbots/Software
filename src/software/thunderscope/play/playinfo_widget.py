@@ -17,7 +17,7 @@ class playInfoWidget(QTableWidget):
     NUM_ROWS = 6
     NUM_COLS = 4
 
-    def __init__(self, buffer_size=10):
+    def __init__(self, buffer_size=5):
         """Shows the current play information including tactic and FSM state
 
         :param buffer_size: The buffer size, set higher for smoother plots.
@@ -26,7 +26,7 @@ class playInfoWidget(QTableWidget):
         """
         QTableWidget.__init__(self, playInfoWidget.NUM_ROWS, playInfoWidget.NUM_COLS)
 
-        self.log_buffer = ThreadSafeBuffer(buffer_size, PlayInfo)
+        self.playinfo_buffer = ThreadSafeBuffer(buffer_size, PlayInfo)
         self.verticalHeader().setVisible(False)
 
     def set_data(self, data):
@@ -49,8 +49,15 @@ class playInfoWidget(QTableWidget):
     def refresh(self):
         """Update the play info widget with new play information
         """
+        # TODO for some reason, even though the refresh function takes < 0.01s
+        # to run, # we are not able to consume the play info buffer fast enough
+        # to get the latest data.
+        #
+        # This is a hack to get around this issue. We need to figure out what is
+        # holding up the event loop. But for now, this prevents spamming logs.
+        for _ in range(5):
+            playinfo = self.playinfo_buffer.get(block=False)
 
-        playinfo = self.log_buffer.get(block=False)
         play_info_dict = MessageToDict(playinfo)
 
         robot_ids = []
@@ -80,5 +87,6 @@ class playInfoWidget(QTableWidget):
                 "Play Name": play_name,
             }
         )
+
         self.resizeColumnsToContents()
         self.resizeRowsToContents()

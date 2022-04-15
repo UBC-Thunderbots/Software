@@ -10,7 +10,7 @@ import software.thunderscope.constants as constants
 from software.networking.threaded_unix_listener import ThreadedUnixListener
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
-DEQUE_SIZE = 1000
+DEQUE_SIZE = 10000
 MIN_Y_RANGE = 0
 MAX_Y_RANGE = 100
 TIME_WINDOW_TO_DISPLAY_S = 10
@@ -32,29 +32,37 @@ class NamedValuePlotter(object):
         plots.
 
         """
-        named_value = self.named_value_buffer.get(block=False)
 
-        # If named_value is new, create a plot and for the new value and
-        # add it to necessary maps
-        if named_value.name not in self.plots:
-            self.plots[named_value.name] = self.win.plot(
-                pen=QtGui.QColor(
-                    random.randint(100, 255),
-                    random.randint(100, 255),
-                    random.randint(100, 255),
-                ),
-                name=named_value.name,
-                brush=None,
-            )
+        # Dump the entire buffer into a deque. This operation is incredibly
+        # fast because its just consuming data from the buffer and
+        # appending it to a deque. We then call setData once to update the
+        # plot.
+        for _ in range(self.named_value_buffer.queue.qsize()):
+            named_value = self.named_value_buffer.get(block=False)
 
-            self.plots[named_value.name].setDownsampling(method="peak")
-            self.data_x[named_value.name] = deque([], DEQUE_SIZE)
-            self.data_y[named_value.name] = deque([], DEQUE_SIZE)
-            self.legend.addItem(self.plots[named_value.name], named_value.name)
+            # If named_value is new, create a plot and for the new value and
+            # add it to necessary maps
+            if named_value.name not in self.plots:
+                self.plots[named_value.name] = self.win.plot(
+                    pen=QtGui.QColor(
+                        random.randint(100, 255),
+                        random.randint(100, 255),
+                        random.randint(100, 255),
+                    ),
+                    name=named_value.name,
+                    brush=None,
+                )
 
-        # Add incoming data to existing deques of data
-        self.data_x[named_value.name].append(time.time() - self.time)
-        self.data_y[named_value.name].append(named_value.value)
+                self.plots[named_value.name].setDownsampling(method="peak")
+                self.data_x[named_value.name] = deque([], DEQUE_SIZE)
+                self.data_y[named_value.name] = deque([], DEQUE_SIZE)
+                self.legend.addItem(self.plots[named_value.name], named_value.name)
+
+            # Add incoming data to existing deques of data
+            self.data_x[named_value.name].append(time.time() - self.time)
+            self.data_y[named_value.name].append(named_value.value)
+
+        # Update the data
         self.plots[named_value.name].setData(
             self.data_x[named_value.name], self.data_y[named_value.name]
         )

@@ -11,7 +11,7 @@ from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 
 class ObstacleLayer(FieldLayer):
-    def __init__(self, buffer_size=1):
+    def __init__(self, buffer_size=5):
         """Visualize the obstacles
 
         :param buffer_size: The buffer size, set higher for smoother plots.
@@ -33,7 +33,7 @@ class ObstacleLayer(FieldLayer):
         """
 
         # Draw the obstacles
-        obstacles = self.obstacle_buffer.get()
+        obstacles = self.obstacle_buffer.get(block=False)
 
         painter.setPen(
             pg.mkPen(Colors.NAVIGATOR_OBSTACLE_COLOR, width=constants.LINE_WIDTH)

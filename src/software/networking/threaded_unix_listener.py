@@ -14,7 +14,7 @@ from google.protobuf.any_pb2 import Any
 
 class ThreadedUnixListener:
     def __init__(
-        self, unix_path, proto_class=None, base64_encoded=False, max_buffer_size=100
+        self, unix_path, proto_class=None, base64_encoded=False, max_buffer_size=10
     ):
 
         """Receive protobuf over unix sockets and buffers them
@@ -46,21 +46,6 @@ class ThreadedUnixListener:
         # even if there are still unix listener threads running
         self.thread = Thread(target=self.start, daemon=True)
         self.thread.start()
-
-    def get_most_recent_message(self, block=False):
-        """Pop from the buffer if a new packet exists. If not just return None
-
-        :param block: If true, blocks until a new message is received
-        :return: proto if exists, else None
-        :rtype: proto or None
-
-        """
-        if block:
-            return self.proto_buffer.get()
-        try:
-            return self.proto_buffer.get_nowait()
-        except queue.Empty as empty:
-            return None
 
     def __buffer_protobuf(self, proto):
         """Buffer the protobuf, and raise a warning if we overrun the buffer

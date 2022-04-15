@@ -10,7 +10,7 @@ from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 
 class PathLayer(FieldLayer):
-    def __init__(self, buffer_size=1):
+    def __init__(self, buffer_size=5):
         """Visualizes paths from the navigator
 
         :param buffer_size: The buffer size, set higher for smoother plots.

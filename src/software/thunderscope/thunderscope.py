@@ -2,7 +2,6 @@ import os
 import atexit
 import signal
 import threading
-import logging
 import time
 import shelve
 import argparse
@@ -59,7 +58,10 @@ from software.thunderscope.robot_diagnostics.drive_and_dribbler_widget import (
 )
 
 DEFAULT_LAYOUT_PATH = "/opt/tbotspython/default_tscope_layout"
-PROCESS_LAUNCH_DELAY_S = 0.1
+PROCESS_LAUNCH_DELAY_S = 1
+NUM_ROBOTS = 6
+
+pyqtgraph.setConfigOption("antialias", True)
 
 
 class Thunderscope(object):
@@ -89,7 +91,7 @@ class Thunderscope(object):
         yellow_fullsystem_runtime_dir,
         debug_fullsystem=False,
         debug_simulator=False,
-        refresh_interval_ms=10,
+        refresh_interval_ms=5,
     ):
         """Initialize Thunderscope
 
@@ -107,6 +109,7 @@ class Thunderscope(object):
         self.yellow_fullsystem_runtime_dir = yellow_fullsystem_runtime_dir
         self.debug_fullsystem = debug_fullsystem
         self.debug_simulator = debug_simulator
+        self.refresh_interval_ms = refresh_interval_ms
 
         # Setup MainApp and initialize DockArea
         self.app = pyqtgraph.mkQApp("Thunderscope")
@@ -118,18 +121,22 @@ class Thunderscope(object):
         self.blue_full_system_dock_area = DockArea()
         self.yellow_full_system_dock_area = DockArea()
 
+        gamecontroller_dock = self.setup_gamecontroller_widget()
+        self.main_dock.addDock(gamecontroller_dock, "below")
+
         blue_dock = Dock("Blue Fullsystem")
         blue_dock.addWidget(self.blue_full_system_dock_area)
 
         yellow_dock = Dock("Yellow Fullsystem")
         yellow_dock.addWidget(self.yellow_full_system_dock_area)
 
-        self.main_dock.addDock(yellow_dock)
+        self.main_dock.addDock(yellow_dock, "above", gamecontroller_dock)
         self.main_dock.addDock(blue_dock, "above", yellow_dock)
 
         self.window = QtGui.QMainWindow()
         self.window.setCentralWidget(self.main_dock)
         self.window.setWindowTitle("Thunderscope")
+        self.last_refresh_time = time.time()
 
         # ProtoUnixIOs
         #
@@ -141,17 +148,7 @@ class Thunderscope(object):
         self.yellow_full_system_proto_unix_io = ProtoUnixIO()
         self.blue_full_system_proto_unix_io = ProtoUnixIO()
 
-        # Setup refresh Timer
-        self.refresh_functions = []
-
-        def __refresh():
-            for refresh_func in self.refresh_functions:
-                refresh_func()
-
-        self.refresh_timer = QtCore.QTimer()
-        self.refresh_timer.setTimerType(QtCore.Qt.TimerType.PreciseTimer)
-        self.refresh_timer.timeout.connect(__refresh)
-        self.refresh_timer.start(refresh_interval_ms)
+        self.refresh_timers = []
 
         # Save and Load Prompts
         self.save_layout_shortcut = QtGui.QShortcut(
@@ -163,6 +160,23 @@ class Thunderscope(object):
             QtGui.QKeySequence("Ctrl+O"), self.window
         )
         self.open_layout_shortcut.activated.connect(self.load_layout)
+
+        self.reset_layout_shortcut = QtGui.QShortcut(
+            QtGui.QKeySequence("Ctrl+R"), self.window
+        )
+
+        def __reset_layout():
+            if os.path.exists(DEFAULT_LAYOUT_PATH):
+                os.remove(DEFAULT_LAYOUT_PATH)
+                QMessageBox.information(
+                    self.window,
+                    "Restart Required",
+                    """
+                    Restart thunderscope to reset the layout.
+                    """,
+                )
+
+        self.reset_layout_shortcut.activated.connect(__reset_layout)
 
         self.show_help = QtGui.QShortcut(QtGui.QKeySequence("h"), self.window)
         self.show_help.activated.connect(
@@ -195,7 +209,6 @@ class Thunderscope(object):
         :return: Thunderscope instance
 
         """
-        logging.info("Starting Thunderscope")
         self.running = True
 
         yellow_fullsystem_command = "software/unix_full_system --runtime_dir={} {}".format(
@@ -325,16 +338,21 @@ class Thunderscope(object):
                 return
 
         with shelve.open(filename, "r") as shelf:
-            self.main_dock.restoreState(shelf["dock_state"])
-            self.blue_full_system_dock_area.restoreState(shelf["blue_dock_state"])
-            self.yellow_full_system_dock_area.restoreState(shelf["yellow_dock_state"])
+            self.main_dock.restoreState(shelf["dock_state"], missing="ignore")
+            self.blue_full_system_dock_area.restoreState(
+                shelf["blue_dock_state"], missing="ignore"
+            )
+            self.yellow_full_system_dock_area.restoreState(
+                shelf["yellow_dock_state"], missing="ignore"
+            )
 
             # Update default layout
-            with shelve.open(DEFAULT_LAYOUT_PATH, "c") as default_shelf:
-                default_shelf["dock_state"] = shelf["dock_state"]
-                default_shelf["blue_dock_state"] = shelf["blue_dock_state"]
-                default_shelf["yellow_dock_state"] = shelf["yellow_dock_state"]
-                default_shelf.sync()
+            if filename != DEFAULT_LAYOUT_PATH:
+                with shelve.open(DEFAULT_LAYOUT_PATH, "c") as default_shelf:
+                    default_shelf["dock_state"] = shelf["dock_state"]
+                    default_shelf["blue_dock_state"] = shelf["blue_dock_state"]
+                    default_shelf["yellow_dock_state"] = shelf["yellow_dock_state"]
+                    default_shelf.sync()
 
     def load_saved_layout(self, layout_path):
         """Load the specified layout or the default file. If the default layout
@@ -478,7 +496,13 @@ class Thunderscope(object):
         :param refresh_func: The function to call at refresh_interval_ms
 
         """
-        self.refresh_functions.append(refresh_func)
+
+        refresh_timer = QtCore.QTimer()
+        refresh_timer.setTimerType(QtCore.Qt.TimerType.PreciseTimer)
+        refresh_timer.timeout.connect(refresh_func)
+        refresh_timer.start(self.refresh_interval_ms)
+
+        self.refresh_timers.append(refresh_timer)
 
     def configure_default_layout(
         self,
@@ -495,6 +519,7 @@ class Thunderscope(object):
         :param friendly_colour_yellow: Whether the friendly colour is yellow
 
         """
+        print("Configuring default layout", friendly_colour_yellow)
         # Configure Docks
         field_dock = self.setup_field_widget(
             sim_proto_unix_io, full_system_proto_unix_io, friendly_colour_yellow
@@ -502,10 +527,8 @@ class Thunderscope(object):
         log_dock = self.setup_log_widget(full_system_proto_unix_io)
         performance_dock = self.setup_performance_plot(full_system_proto_unix_io)
         play_info_dock = self.setup_play_info(full_system_proto_unix_io)
-        gamecontroller_dock = self.setup_gamecontroller_widget()
 
-        dock_area.addDock(gamecontroller_dock, "left")
-        dock_area.addDock(field_dock, "below", gamecontroller_dock)
+        dock_area.addDock(field_dock)
         dock_area.addDock(log_dock, "bottom", field_dock)
         dock_area.addDock(performance_dock, "right", log_dock)
         dock_area.addDock(play_info_dock, "right", performance_dock)
@@ -629,7 +652,7 @@ class Thunderscope(object):
         """
 
         play_info = playInfoWidget()
-        proto_unix_io.register_observer(PlayInfo, play_info.log_buffer)
+        proto_unix_io.register_observer(PlayInfo, play_info.playinfo_buffer)
         self.register_refresh_function(play_info.refresh)
 
         play_info_dock = Dock("playInfo")
@@ -697,13 +720,6 @@ if __name__ == "__main__":
         help="The tick rate of the simulator in ms",
     )
     parser.add_argument(
-        "--division",
-        action="store",
-        type=str,
-        default="B",
-        help="Which division to run A: 11v11 or B: 6v6",
-    )
-    parser.add_argument(
         "--simulator_runtime_dir",
         type=str,
         help="simulator runtime directory",
@@ -757,19 +773,15 @@ if __name__ == "__main__":
     # provided rate.
     else:
 
-        def __async_sim_ticker(tick_rate_ms, division):
+        def __async_sim_ticker(tick_rate_ms):
             """Setup the world and tick simulation forever
 
             :param tick_rate_ms: The tick rate of the simulation
-            :param division: The division to setup the field for
 
             """
-            # Setup World
-            num_robots = 11 if division == "A" else 6
-
             world_state = tbots_protobuf.create_world_state(
-                [geom.Point(3, y) for y in numpy.linspace(-2, 2, num_robots)],
-                [geom.Point(-3, y) for y in numpy.linspace(-2, 2, num_robots)],
+                [geom.Point(3, y) for y in numpy.linspace(-2, 2, NUM_ROBOTS)],
+                [geom.Point(-3, y) for y in numpy.linspace(-2, 2, NUM_ROBOTS)],
                 ball_location=geom.Point(0, 0),
                 ball_velocity=geom.Vector(0, 0),
             )
@@ -792,9 +804,7 @@ if __name__ == "__main__":
             tscope.load_saved_layout(args.layout)
 
             thread = threading.Thread(
-                target=__async_sim_ticker,
-                args=(args.sim_tick_rate_ms, args.division),
-                daemon=True,
+                target=__async_sim_ticker, args=(args.sim_tick_rate_ms,), daemon=True,
             )
 
             thread.start()

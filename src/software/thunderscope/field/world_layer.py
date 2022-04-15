@@ -1,5 +1,4 @@
 import math
-from typing import List
 
 import software.python_bindings as geom
 import pyqtgraph as pg
@@ -35,7 +34,7 @@ class WorldLayer(FieldLayer):
         self.simulator_io = simulator_io
         self.friendly_colour_yellow = friendly_colour_yellow
 
-        self.world_buffer = ThreadSafeBuffer(buffer_size, World)
+        self.world_buffer = ThreadSafeBuffer(buffer_size, World, True)
         self.robot_status_buffer = ThreadSafeBuffer(buffer_size, RobotStatus)
         self.cached_world = World()
 
@@ -125,9 +124,6 @@ class WorldLayer(FieldLayer):
 
         """
         self.mouse_clicked = True
-
-        event.pos().x() / MM_PER_M
-        event.pos().y() / MM_PER_M
         self.mouse_click_pos = [event.pos().x(), event.pos().y()]
 
         # determine whether a robot was clicked
@@ -177,8 +173,8 @@ class WorldLayer(FieldLayer):
                 )
             )
 
-            self.simulator_io.send_proto(WorldState, world_state)
             self.ball_velocity_vector = None
+            self.simulator_io.send_proto(WorldState, world_state)
 
         else:
             super().mouseReleaseEvent(event)
@@ -282,6 +278,7 @@ class WorldLayer(FieldLayer):
             if robot.id not in robot_id_map:
                 robot_id_font = painter.font()
                 robot_id_font.setPointSize(ROBOT_MAX_RADIUS / 7)
+
                 # setting a black background to keep ID visible over yellow robot
                 robot_id_text = pg.TextItem(
                     html='<span style="color: #FFF; background-color: #000">'
@@ -356,7 +353,6 @@ class WorldLayer(FieldLayer):
         :param widget: The widget that we are painting on
 
         """
-
         self.cached_world = self.world_buffer.get(block=False)
 
         self.draw_field(painter, self.cached_world.field)

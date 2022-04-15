@@ -27,11 +27,12 @@ class ThreadSafeBuffer(object):
 
         """
         self.logger = createLogger(protobuf_type.DESCRIPTOR.name + " Buffer")
-        self.buffer = queue.Queue(buffer_size)
+        self.queue = queue.Queue(buffer_size)
         self.protobuf_type = protobuf_type
         self.log_overrun = log_overrun
         self.cached_msg = protobuf_type()
-        self.packets_lost = 0
+        self.protos_dropped = 0
+        self.last_logged_protos_dropped = 0
 
     def get(self, block=False):
         """Get data from the buffer. If the buffer is empty, and
@@ -46,11 +47,19 @@ class ThreadSafeBuffer(object):
 
         """
 
+        if self.log_overrun and self.protos_dropped > self.last_logged_protos_dropped:
+            self.logger.warn(
+                "packets dropped; thunderscope did not show {} protos".format(
+                    self.protos_dropped
+                )
+            )
+            self.last_logged_protos_dropped = self.protos_dropped
+
         if block:
-            return self.buffer.get()
+            return self.queue.get()
 
         try:
-            self.cached_msg = self.buffer.get_nowait()
+            self.cached_msg = self.queue.get_nowait()
 
         except queue.Empty as empty:
             pass
@@ -66,17 +75,10 @@ class ThreadSafeBuffer(object):
 
         """
         if block:
-            self.buffer.put(proto)
+            self.queue.put(proto)
+            return
 
         try:
-            self.buffer.put_nowait(proto)
-
+            self.queue.put_nowait(proto)
         except queue.Full as full:
-            if self.log_overrun:
-                self.packets_lost += 1
-                self.logger.warn(
-                    proto.DESCRIPTOR.name
-                    + " buffer overrun, {} packets dropped so far".format(
-                        self.packets_lost
-                    )
-                )
+            self.protos_dropped += 1

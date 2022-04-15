@@ -74,7 +74,9 @@ class SimulatorTestRunner(object):
 
             """
             time.sleep(delay)
-            self.thunderscope.close()
+
+            if self.show_thunderscope:
+                self.thunderscope.close()
 
         def __runner():
             """Step simulation, full_system and run validation
@@ -212,12 +214,14 @@ def simulated_test_runner():
 
     thunderscope = Thunderscope(
         args.simulator_runtime_dir,
-        args.blue_fullsystem_runtiem_dir,
+        args.blue_fullsystem_runtime_dir,
         args.yellow_fullsystem_runtime_dir,
         debug_fullsystem=args.debug_fullsystem,
         debug_simulator=args.debug_simulator,
     )
-    thunderscope.load_saved_layout(args.layout)
+
+    if args.enable_thunderscope:
+        thunderscope.load_saved_layout(args.layout)
 
     runner = SimulatorTestRunner(
         thunderscope=thunderscope, show_thunderscope=args.enable_thunderscope,
