@@ -10,7 +10,7 @@ import software.thunderscope.constants as constants
 from software.networking.threaded_unix_listener import ThreadedUnixListener
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
-DEQUE_SIZE = 10000
+DEQUE_SIZE = 1000
 MIN_Y_RANGE = 0
 MAX_Y_RANGE = 100
 TIME_WINDOW_TO_DISPLAY_S = 10
@@ -62,10 +62,10 @@ class NamedValuePlotter(object):
             self.data_x[named_value.name].append(time.time() - self.time)
             self.data_y[named_value.name].append(named_value.value)
 
-        # Update the data
-        self.plots[named_value.name].setData(
-            self.data_x[named_value.name], self.data_y[named_value.name]
-        )
+            # Update the data
+            self.plots[named_value.name].setData(
+                self.data_x[named_value.name], self.data_y[named_value.name]
+            )
 
         self.win.setRange(
             xRange=[
