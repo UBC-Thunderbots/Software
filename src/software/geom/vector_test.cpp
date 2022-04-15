@@ -244,3 +244,51 @@ TEST(VectorOperatorTests, vector_equality_inequality_test)
     EXPECT_FALSE(u == v);
     EXPECT_TRUE(u != v);
 }
+
+TEST(VectorLogicTests, vector_right_of_acute_angle_test)
+{
+	Vector u = Vector::createFromAngle(Angle::fromDegrees(30));
+	Vector v = Vector::createFromAngle(Angle::fromDegrees(60));
+
+	EXPECT_TRUE(u.isToTheRightOf(v));
+}
+
+TEST(VectorLogicTests, vector_left_of_acute_angle_test)
+{
+	Vector u = Vector::createFromAngle(Angle::zero());
+	Vector v = Vector::createFromAngle(Angle::fromDegrees(45));
+
+	EXPECT_TRUE(v.isToTheLeftOf(u));
+}
+
+TEST(VectorLogicTests, vector_left_of_obtuse_angle_expect_failure_test)
+{
+	Vector u = Vector::createFromAngle(Angle::fromDegrees(10));
+	Vector v = Vector::createFromAngle(Angle::fromDegrees(110));
+
+	EXPECT_FALSE(v.isToTheLeftOf(u));
+}
+
+TEST(VectorLogicTests, vector_right_of_obtuse_angle_expect_failure_test)
+{
+	Vector u = Vector::createFromAngle(Angle::zero());
+	Vector v = Vector::createFromAngle(Angle::fromDegrees(-91));
+
+	EXPECT_FALSE(v.isToTheRightOf(u));
+}
+
+TEST(VectorLogicTests, vector_right_of_right_angle_expect_failure_test)
+{
+	Vector u = Vector::createFromAngle(Angle::zero());
+	Vector v = Vector::createFromAngle(Angle::fromDegrees(90));
+
+	EXPECT_FALSE(v.isToTheRightOf(u));
+}
+
+TEST(VectorLogicTests, vector_left_of_right_angle_expect_failure_test)
+{
+	Vector u = Vector::createFromAngle(Angle::fromDegrees(-90));
+	Vector v = Vector::createFromAngle(Angle::fromDegrees(-180));
+
+	EXPECT_FALSE(v.isToTheLeftOf(u));
+}

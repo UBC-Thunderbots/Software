@@ -191,6 +191,10 @@ class Vector final
      */
     Vector &operator=(const Vector &other);
 
+    bool isToTheRightOf(const Vector &other);
+
+    bool isToTheLeftOf(const Vector &other);
+
    private:
     /**
      * The magnitude in the X coordinate of the Vector. The variable name starts with an
