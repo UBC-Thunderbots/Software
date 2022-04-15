@@ -21,7 +21,7 @@ MAX_ALLOWED_KICK_SPEED = 6.5
 
 
 class WorldLayer(FieldLayer):
-    def __init__(self, simulator_io, friendly_colour_yellow, buffer_size=1):
+    def __init__(self, simulator_io, friendly_colour_yellow, buffer_size=5):
         """The WorldLayer
 
         :param simulator_io: The simulator io communicate with the simulator
@@ -48,6 +48,9 @@ class WorldLayer(FieldLayer):
 
         self.mouse_click_pos = [0, 0]
         self.mouse_hover_pos = [0, 0]
+
+        self.friendly_robot_id_text_items = {}
+        self.enemy_robot_id_text_items = {}
 
     def keyPressEvent(self, event):
         """Detect when a key has been pressed (override)
@@ -262,30 +265,48 @@ class WorldLayer(FieldLayer):
             self.createCircle(0, 0, field.center_circle_radius * MM_PER_M)
         )
 
-    def draw_robot_states(self, painter, color, robot_states: List[RobotState]):
+    def draw_team(self, painter, color, team, robot_id_map):
 
-        """Draw the robot states
+        """Draw the team with robot IDs
 
         :param painter: The painter
         :param color: The color of the robots
         :param team: The team proto to draw
+        :param robot_id_map: map of robot_id -> text_item for the team being drawn
 
         """
         convert_degree = -16
 
-        for robot_state in robot_states:
+        for robot in team.team_robots:
+
+            if robot.id not in robot_id_map:
+                robot_id_font = painter.font()
+                robot_id_font.setPointSize(ROBOT_MAX_RADIUS / 7)
+                # setting a black background to keep ID visible over yellow robot
+                robot_id_text = pg.TextItem(
+                    html='<span style="color: #FFF; background-color: #000">'
+                    + str(robot.id)
+                    + "</span>"
+                )
+                robot_id_map[robot.id] = robot_id_text
+                robot_id_text.setParentItem(self)
+
+            robot_id_map[robot.id].setPos(
+                (robot.current_state.global_position.x_meters * MM_PER_M)
+                - ROBOT_MAX_RADIUS,
+                robot.current_state.global_position.y_meters * MM_PER_M,
+            )
 
             painter.setPen(pg.mkPen(color))
             painter.setBrush(pg.mkBrush(color))
 
-            # TODO (#2396) Draw the robot IDs of the robots
             painter.drawChord(
                 self.createCircle(
-                    robot_state.global_position.x_meters * MM_PER_M,
-                    robot_state.global_position.y_meters * MM_PER_M,
+                    robot.current_state.global_position.x_meters * MM_PER_M,
+                    robot.current_state.global_position.y_meters * MM_PER_M,
                     ROBOT_MAX_RADIUS,
                 ),
-                int((math.degrees(robot_state.global_orientation.radians) + 45))
+                int((math.degrees(robot.current_state.global_orientation.radians) + 45))
                 * convert_degree,
                 270 * convert_degree,
             )
@@ -351,16 +372,16 @@ class WorldLayer(FieldLayer):
             if self.friendly_colour_yellow
             else Colors.YELLOW_ROBOT_COLOR
         )
-        self.draw_robot_states(
+
+        self.draw_team(
             painter,
             friendly_colour,
-            [
-                robot.current_state
-                for robot in self.cached_world.friendly_team.team_robots
-            ],
+            self.cached_world.friendly_team,
+            self.friendly_robot_id_text_items,
         )
-        self.draw_robot_states(
+        self.draw_team(
             painter,
             enemy_colour,
-            [robot.current_state for robot in self.cached_world.enemy_team.team_robots],
+            self.cached_world.enemy_team,
+            self.enemy_robot_id_text_items,
         )

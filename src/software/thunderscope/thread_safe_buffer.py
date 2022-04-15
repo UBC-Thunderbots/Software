@@ -17,7 +17,7 @@ class ThreadSafeBuffer(object):
 
     """
 
-    def __init__(self, buffer_size, protobuf_type, log_overrun=False):
+    def __init__(self, buffer_size, protobuf_type, log_overrun=True):
 
         """A buffer to hold data to be consumed.
 
