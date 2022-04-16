@@ -12,6 +12,7 @@ from software.thunderscope.constants import (
     BALL_RADIUS,
     MM_PER_M,
     ROBOT_MAX_RADIUS,
+    LINE_WIDTH,
 )
 from software.thunderscope.field.field_layer import FieldLayer
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
@@ -224,7 +225,7 @@ class WorldLayer(FieldLayer):
         :param field: The field proto to draw
 
         """
-        painter.setPen(pg.mkPen("w", width=2))
+        painter.setPen(pg.mkPen("w", width=LINE_WIDTH))
 
         # Draw Field Bounds
         painter.drawRect(

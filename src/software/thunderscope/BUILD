@@ -22,7 +22,9 @@ py_binary(
         "//software/thunderscope:colors",
         "//software/thunderscope:common_widgets",
         "//software/thunderscope:constants",
+        "//software/thunderscope:cpp_binary_context_managers",
         "//software/thunderscope:proto_unix_io",
+        "//software/thunderscope:robot_communication",
         "//software/thunderscope/arbitrary_plot:named_value_plotter",
         "//software/thunderscope/field",
         "//software/thunderscope/field:field_layer",
@@ -64,4 +66,20 @@ py_library(
 py_library(
     name = "thread_safe_buffer",
     srcs = ["thread_safe_buffer.py"],
+)
+
+py_library(
+    name = "cpp_binary_context_managers",
+    srcs = ["cpp_binary_context_managers.py"],
+)
+
+py_library(
+    name = "robot_communication",
+    srcs = ["robot_communication.py"],
+    data = [
+        "//software:py_constants.so",
+    ],
+    deps = [
+        "//software/thunderscope:constants",
+    ],
 )

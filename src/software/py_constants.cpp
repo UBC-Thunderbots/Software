@@ -28,4 +28,16 @@ PYBIND11_MODULE(py_constants, m)
     m.attr("SIMULATOR_STATE_PATH")     = SIMULATOR_STATE_PATH;
     m.attr("MILLISECONDS_PER_SECOND")  = MILLISECONDS_PER_SECOND;
     m.attr("UNIX_BUFFER_SIZE")         = UNIX_BUFFER_SIZE;
+
+    // TODO: Change the channels to a map when we remove all legacy c code
+    // Then we can have a pybind here in a 1-liner from unordered_map to py::dict
+    m.attr("ROBOT_MULTICAST_CHANNEL_0") = ROBOT_MULTICAST_CHANNELS[0];
+    m.attr("ROBOT_MULTICAST_CHANNEL_1") = ROBOT_MULTICAST_CHANNELS[1];
+    m.attr("ROBOT_MULTICAST_CHANNEL_2") = ROBOT_MULTICAST_CHANNELS[2];
+    m.attr("ROBOT_MULTICAST_CHANNEL_3") = ROBOT_MULTICAST_CHANNELS[3];
+
+    m.attr("VISION_PORT")       = VISION_PORT;
+    m.attr("PRIMITIVE_PORT")    = PRIMITIVE_PORT;
+    m.attr("ROBOT_STATUS_PORT") = ROBOT_STATUS_PORT;
+    m.attr("ROBOT_LOGS_PORT")   = ROBOT_LOGS_PORT;
 }
