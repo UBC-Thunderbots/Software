@@ -19,7 +19,6 @@ message RobotStatus
     TemperatureStatus temperature_status      = 10;
     Timestamp time_sent                       = 11;
     ThunderloopStatus thunderloop_status      = 12;
-    Vector local_velocity                     = 13;
 }
 
 message ThunderloopStatus

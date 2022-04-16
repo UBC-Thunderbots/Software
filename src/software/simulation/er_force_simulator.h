@@ -148,14 +148,23 @@ class ErForceSimulator
      * @param robot_primitive_executor_map The robot primitive executors to send the
      * primitive set to
      * @param world_msg The world message
-     * @param robot_statuses The robot statuses
+     * @param local_velocity The local velocity
      */
     static void setRobotPrimitive(
         RobotId id, const TbotsProto::PrimitiveSet& primitive_set_msg,
         std::unordered_map<unsigned int, std::shared_ptr<PrimitiveExecutor>>&
             robot_primitive_executor_map,
-        const TbotsProto::World& world_msg,
-        std::vector<TbotsProto::RobotStatus> robot_statuses);
+        const TbotsProto::World& world_msg, Vector local_velocity);
+
+    /**
+     * Gets a map from robot id to local velocity from repeated sim robots
+     *
+     * @param repeated sim robots
+     *
+     * @return a map from robot id to local velocity
+     */
+    static std::map<RobotId, Vector> getRobotIdToLocalVelocityMap(
+        const google::protobuf::RepeatedPtrField<world::SimRobot>& sim_robots);
 
     /**
      * Update Simulator Robot and get the latest robot control

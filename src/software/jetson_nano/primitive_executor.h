@@ -36,9 +36,9 @@ class PrimitiveExecutor
 
     /**
      * Update primitive executor with robot statuses
-     * @param robot_statuses The robot statuses
+     * @param local_velocity The local velocity
      */
-    void updateRobotStatuses(std::vector<TbotsProto::RobotStatus> robot_statuses);
+    void updateLocalVelocity(Vector local_velocity);
 
     /**
      * Steps the current primitive and returns a direct control primitive with the
