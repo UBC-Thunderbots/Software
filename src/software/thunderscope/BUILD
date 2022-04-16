@@ -29,6 +29,7 @@ py_binary(
         "//software/thunderscope/field",
         "//software/thunderscope/field:field_layer",
         "//software/thunderscope/field:obstacle_layer",
+        "//software/thunderscope/field:passing_layer",
         "//software/thunderscope/field:path_layer",
         "//software/thunderscope/field:simulator_layer",
         "//software/thunderscope/field:validation_layer",

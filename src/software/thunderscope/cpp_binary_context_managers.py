@@ -90,6 +90,7 @@ class FullSystem(object):
         for arg in [
             (self.fullsystem_runtime_dir, Obstacles, True),
             (self.fullsystem_runtime_dir, PathVisualization, True),
+            (self.fullsystem_runtime_dir, PassVisualization, True),
             (self.fullsystem_runtime_dir, NamedValue, True),
             (self.fullsystem_runtime_dir, PlayInfo, True),
         ]:

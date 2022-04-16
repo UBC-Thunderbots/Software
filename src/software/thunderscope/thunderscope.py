@@ -54,7 +54,7 @@ from software.thunderscope.field import (
     validation_layer,
     simulator_layer,
     world_layer,
-    pass_layer,
+    passing_layer,
 )
 
 from software.thunderscope.field.field import Field
@@ -349,7 +349,7 @@ class Thunderscope(object):
         self.field.add_layer("Obstacles", obstacles)
         self.field.add_layer("Paths", paths)
         self.field.add_layer("Validation", validation)
-        self.field.add_layer("Passing", pass_layer.PassingLayer())
+        self.field.add_layer("Passing", passing)
         self.field.add_layer("Simulator", sim_state)
 
         # Register observers
@@ -363,6 +363,7 @@ class Thunderscope(object):
             (Referee, world.referee_buffer),
             (Obstacles, obstacles.obstacle_buffer),
             (PathVisualization, paths.path_visualization_buffer),
+            (PassVisualization, passing.pass_visualization_buffer),
             (ValidationProtoSet, validation.validation_set_buffer),
         ]:
             full_system_proto_unix_io.register_observer(*arg)
