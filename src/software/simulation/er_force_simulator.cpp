@@ -387,6 +387,13 @@ std::vector<TbotsProto::RobotStatus> ErForceSimulator::getBlueRobotStatuses() co
         *(robot_status.mutable_break_beam_status()) = break_beam_status;
         robot_statuses.push_back(robot_status);
     }
+    else
+    {
+        // TODO we need to send the robot status for all robots, even
+        // those that don't have a ball.
+        auto robot_status = TbotsProto::RobotStatus();
+        robot_statuses.push_back(robot_status);
+    }
 
     return robot_statuses;
 }
@@ -401,6 +408,13 @@ std::vector<TbotsProto::RobotStatus> ErForceSimulator::getYellowRobotStatuses() 
         auto break_beam_status = TbotsProto::BreakBeamStatus();
         break_beam_status.set_ball_in_beam(true);
         *(robot_status.mutable_break_beam_status()) = break_beam_status;
+        robot_statuses.push_back(robot_status);
+    }
+    else
+    {
+        // TODO we need to send the robot status for all robots, even
+        // those that don't have a ball.
+        auto robot_status = TbotsProto::RobotStatus();
         robot_statuses.push_back(robot_status);
     }
 

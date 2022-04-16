@@ -11,7 +11,7 @@ from software.networking.threaded_unix_listener import ThreadedUnixListener
 from software.thunderscope.constants import (
     BALL_RADIUS,
     MM_PER_M,
-    ROBOT_MAX_RADIUS,
+    ROBOT_MAX_RADIUS_MM,
     LINE_WIDTH,
 )
 from software.thunderscope.field.field_layer import FieldLayer
@@ -35,9 +35,11 @@ class WorldLayer(FieldLayer):
         self.simulator_io = simulator_io
         self.friendly_colour_yellow = friendly_colour_yellow
 
-        self.world_buffer = ThreadSafeBuffer(buffer_size, World, True)
+        self.world_buffer = ThreadSafeBuffer(buffer_size, World)
         self.robot_status_buffer = ThreadSafeBuffer(buffer_size, RobotStatus)
+        self.referee_buffer = ThreadSafeBuffer(buffer_size, Referee)
         self.cached_world = World()
+        self.cached_status = {}
 
         self.ball_velocity_vector = None
         self.mouse_clicked = False
@@ -46,7 +48,6 @@ class WorldLayer(FieldLayer):
         self.pressed_M = False
         self.pressed_R = False
 
-        self.mouse_click_pos = [0, 0]
         self.mouse_hover_pos = [0, 0]
 
         self.friendly_robot_id_text_items = {}
@@ -84,6 +85,37 @@ class WorldLayer(FieldLayer):
         elif event.key() == Qt.Key.Key_M:
             self.pressed_M = False
 
+    def __should_invert_coordinate_frame(self):
+        """Our coordinate system is defined such that we are on the negative half
+        of the field.
+
+        If we are defending the positive half, we invert the coordinate frame
+        and render the inverted proto. 
+
+        :return: True if we should invert the coordinate frame, False otherwise
+
+        """
+        referee = self.referee_buffer.get(block=False)
+
+        if (self.friendly_colour_yellow and not referee.blue_team_on_positive_half) or (
+            not self.friendly_colour_yellow and referee.blue_team_on_positive_half
+        ):
+            return True
+        return False
+
+    def __invert_mouse_position_if_defending_negative_half(self, mouse_click):
+        """If we are defending the negative half of the field, we invert the coordinate frame
+        for the mouse click.
+
+        :param mouse_click: The mouse click location [x, y]
+        :return: The inverted mouse click location [x, y] (if needed to be inverted)
+
+        """
+        if self.__should_invert_coordinate_frame():
+            return [-mouse_click[0], -mouse_click[1]]
+
+        return mouse_click
+
     def mouseMoveEvent(self, event):
         """We want to be able to use the mouse to pan/zoom the field.
         But we also want to be able to click on a things to interact with them.
@@ -94,6 +126,8 @@ class WorldLayer(FieldLayer):
         :param event: The event
 
         """
+        self.mouse_move_pos = [event.pos().x(), event.pos().y()]
+
         ball_state = self.cached_world.ball.current_state
 
         ball_position = geom.Vector(
@@ -103,7 +137,7 @@ class WorldLayer(FieldLayer):
 
         if self.pressed_CTRL and self.mouse_clicked:
             self.ball_velocity_vector = ball_position - geom.Vector(
-                event.pos().x(), event.pos().y()
+                self.mouse_move_pos[0], self.mouse_move_pos[1]
             )
 
             if self.ball_velocity_vector.length() > MAX_ALLOWED_KICK_SPEED * MM_PER_M:
@@ -126,19 +160,20 @@ class WorldLayer(FieldLayer):
         """
         self.mouse_clicked = True
         self.mouse_click_pos = [event.pos().x(), event.pos().y()]
+        self.mouse_click_pos = self.__invert_mouse_position_if_defending_negative_half(
+            self.mouse_click_pos
+        )
 
         # determine whether a robot was clicked
-        friendly_robot, enemy_robot = self.identify_robots(
-            event.pos().x(), event.pos().y()
-        )
+        friendly_robot, enemy_robot = self.identify_robots(*self.mouse_click_pos)
 
         if self.pressed_CTRL:
             world_state = WorldState()
             world_state.ball_state.CopyFrom(
                 BallState(
                     global_position=Point(
-                        x_meters=event.pos().x() / MM_PER_M,
-                        y_meters=event.pos().y() / MM_PER_M,
+                        x_meters=self.mouse_click_pos[0] / MM_PER_M,
+                        y_meters=self.mouse_click_pos[1] / MM_PER_M,
                     )
                 )
             )
@@ -160,12 +195,16 @@ class WorldLayer(FieldLayer):
         self.mouse_clicked = False
 
         if self.ball_velocity_vector:
+
+            if self.__should_invert_coordinate_frame():
+                self.ball_velocity_vector = -self.ball_velocity_vector
+
             world_state = WorldState()
             world_state.ball_state.CopyFrom(
                 BallState(
                     global_position=Point(
-                        x_meters=self.cached_world.ball.current_state.global_position.x_meters,
-                        y_meters=self.cached_world.ball.current_state.global_position.y_meters,
+                        x_meters=self.mouse_click_pos[0] / MM_PER_M,
+                        y_meters=self.mouse_click_pos[1] / MM_PER_M,
                     ),
                     global_velocity=Vector(
                         x_component_meters=self.ball_velocity_vector.x() / MM_PER_M,
@@ -212,7 +251,7 @@ class WorldLayer(FieldLayer):
                     (pos_x - mouse_x / MM_PER_M) ** 2
                     + (pos_y - mouse_y / MM_PER_M) ** 2
                 )
-                <= ROBOT_MAX_RADIUS / MM_PER_M
+                <= ROBOT_MAX_RADIUS_MM / MM_PER_M
             ):
                 return robot_
         return None
@@ -278,7 +317,7 @@ class WorldLayer(FieldLayer):
 
             if robot.id not in robot_id_map:
                 robot_id_font = painter.font()
-                robot_id_font.setPointSize(ROBOT_MAX_RADIUS / 7)
+                robot_id_font.setPointSize(ROBOT_MAX_RADIUS_MM / 7)
 
                 # setting a black background to keep ID visible over yellow robot
                 robot_id_text = pg.TextItem(
@@ -291,7 +330,7 @@ class WorldLayer(FieldLayer):
 
             robot_id_map[robot.id].setPos(
                 (robot.current_state.global_position.x_meters * MM_PER_M)
-                - ROBOT_MAX_RADIUS,
+                - ROBOT_MAX_RADIUS_MM,
                 robot.current_state.global_position.y_meters * MM_PER_M,
             )
 
@@ -302,7 +341,7 @@ class WorldLayer(FieldLayer):
                 self.createCircle(
                     robot.current_state.global_position.x_meters * MM_PER_M,
                     robot.current_state.global_position.y_meters * MM_PER_M,
-                    ROBOT_MAX_RADIUS,
+                    ROBOT_MAX_RADIUS_MM,
                 ),
                 int((math.degrees(robot.current_state.global_orientation.radians) + 45))
                 * convert_degree,
@@ -329,6 +368,7 @@ class WorldLayer(FieldLayer):
 
         if self.ball_velocity_vector and self.mouse_clicked:
             vector = self.ball_velocity_vector * 0.5
+
             polyline = QtGui.QPolygon(
                 [
                     QtCore.QPoint(
@@ -345,6 +385,33 @@ class WorldLayer(FieldLayer):
             )
 
             painter.drawPolyline(polyline)
+
+    def draw_robot_status(self, painter):
+        """Draw the robot status
+
+        :param painter: The painter
+
+        """
+        self.cached_status = self.robot_status_buffer.get(block=False)
+
+        painter.setBrush(pg.mkBrush(None))
+        painter.setPen(pg.mkPen("r", width=LINE_WIDTH * 2))
+
+        # TODO draw unavailable robot capabilities
+        for robot in self.cached_world.friendly_team.team_robots:
+            if (
+                self.cached_status.break_beam_status.ball_in_beam is True
+                and robot.id == self.cached_status.robot_id
+            ):
+                painter.drawEllipse(
+                    self.createCircle(
+                        robot.current_state.global_position.x_meters * MM_PER_M,
+                        robot.current_state.global_position.y_meters * MM_PER_M,
+                        ROBOT_MAX_RADIUS_MM / 2,
+                    )
+                )
+                print("ball in beam", self.cached_status.robot_id)
+                print(self.cached_status.break_beam_status.ball_in_beam)
 
     def paint(self, painter, option, widget):
         """Paint this layer
@@ -382,3 +449,4 @@ class WorldLayer(FieldLayer):
             self.cached_world.enemy_team,
             self.enemy_robot_id_text_items,
         )
+        self.draw_robot_status(painter)

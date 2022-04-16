@@ -9,7 +9,6 @@ from software.networking.threaded_unix_listener import ThreadedUnixListener
 from software.thunderscope.constants import (
     BALL_RADIUS,
     MM_PER_M,
-    ROBOT_MAX_RADIUS,
 )
 from software.thunderscope.field.field_layer import FieldLayer
 from software.thunderscope.field.world_layer import WorldLayer

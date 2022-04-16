@@ -4,6 +4,7 @@ import signal
 import threading
 import time
 import shelve
+import signal
 import argparse
 import platform
 import numpy
@@ -65,8 +66,8 @@ from software.thunderscope.robot_diagnostics.drive_and_dribbler_widget import (
 )
 
 DEFAULT_LAYOUT_PATH = "/opt/tbotspython/default_tscope_layout"
-PROCESS_LAUNCH_DELAY_S = 1
 NUM_ROBOTS = 6
+SIM_TICK_RATE_MS = 16
 
 
 class Thunderscope(object):
@@ -105,16 +106,13 @@ class Thunderscope(object):
         self.blue_full_system_dock_area = DockArea()
         self.yellow_full_system_dock_area = DockArea()
 
-        gamecontroller_dock = self.setup_gamecontroller_widget()
-        self.main_dock.addDock(gamecontroller_dock, "below")
-
         blue_dock = Dock("Blue Fullsystem")
         blue_dock.addWidget(self.blue_full_system_dock_area)
 
         yellow_dock = Dock("Yellow Fullsystem")
         yellow_dock.addWidget(self.yellow_full_system_dock_area)
 
-        self.main_dock.addDock(yellow_dock, "above", gamecontroller_dock)
+        self.main_dock.addDock(yellow_dock)
         self.main_dock.addDock(blue_dock, "above", yellow_dock)
 
         self.window = QtGui.QMainWindow()
@@ -179,24 +177,6 @@ class Thunderscope(object):
                 """,
             )
         )
-
-        # # Setup proto unix IO, only the runtime directories are provided.
-        # if self.blue_fw`llsystem_runtime_dir:
-        # self.__setup_fullsystem_proto_unix_io(
-        # self.blue_fullsystem_runtime_dir, self.blue_full_system_proto_unix_io
-        # )
-
-        # if self.yellow_fullsystem_runtime_dir:
-        # self.__setup_fullsystem_proto_unix_io(
-        # self.yellow_fullsystem_runtime_dir,
-        # self.yellow_full_system_proto_unix_io,
-        # )
-
-        # if self.simulator_runtime_dir:
-        # self.__setup_simulator_proto_unix_io(self.simulator_runtime_dir)
-        # self.__setup_gamecontroller_proto_unix_io()
-
-        # return self
 
     def save_layout(self):
         """Open a file dialog to save the layout and any other
@@ -375,6 +355,8 @@ class Thunderscope(object):
 
         for arg in [
             (World, world.world_buffer),
+            (RobotStatus, world.robot_status_buffer),
+            (Referee, world.referee_buffer),
             (Obstacles, obstacles.obstacle_buffer),
             (PathVisualization, paths.path_visualization_buffer),
             (ValidationProtoSet, validation.validation_set_buffer),
@@ -389,22 +371,6 @@ class Thunderscope(object):
         field_dock.addWidget(self.field)
 
         return field_dock
-
-    def setup_gamecontroller_widget(self):
-        """Setup the gamecontroller widget
-
-        :param proto_unix_io: The proto unix io object
-        :return the gamecontroller in a dock
-
-        """
-        web_view = QWebEngineView()
-        web_view.load(QtCore.QUrl("http://localhost:8081"))
-
-        # create and return dock
-        gamecontroller_dock = Dock("GameController")
-        gamecontroller_dock.addWidget(web_view)
-
-        return gamecontroller_dock
 
     def setup_log_widget(self, proto_unix_io):
         """Setup the wiget that receives logs from full system
@@ -509,20 +475,17 @@ class Thunderscope(object):
 if __name__ == "__main__":
 
     # Setup parser
-    parser = argparse.ArgumentParser(description="Thunderscope")
+    parser = argparse.ArgumentParser(
+        description="Thunderscope: Run with no arguments to run AI vs AI"
+    )
+
     parser.add_argument(
         "--layout",
         action="store",
         help="Which layout to run, if not specified the last layout will run",
     )
-    parser.add_argument("--simulated", action="store_true", help="Run the simulator",),
-    parser.add_argument(
-        "--sim_tick_rate_ms",
-        action="store",
-        type=int,
-        default=16,
-        help="The tick rate of the simulator in ms",
-    )
+
+    # Runtime directories
     parser.add_argument(
         "--simulator_runtime_dir",
         type=str,
@@ -541,12 +504,8 @@ if __name__ == "__main__":
         help="yellow fullsystem runtime directory",
         default="/tmp/tbots/yellow",
     )
-    parser.add_argument(
-        "--run_blue", action="store_true", default=False, help="Debug fullsystem",
-    )
-    parser.add_argument(
-        "--run_yellow", action="store_true", default=False, help="Debug fullsystem",
-    )
+
+    # Debugging
     parser.add_argument(
         "--debug_fullsystem",
         action="store_true",
@@ -559,24 +518,71 @@ if __name__ == "__main__":
         default=False,
         help="Debug the simulator",
     )
+
+    # Run blue or yellow full system over WiFi
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument(
+        "--run_blue",
+        action="store_true",
+        help="Run full system as the blue team, over WiFi; estop required",
+    )
+    group.add_argument(
+        "--run_yellow",
+        action="store_true",
+        help="Run full system as the yellow team, over WiFi; estop required",
+    )
+    parser.add_argument(
+        "--interface",
+        action="store",
+        type=str,
+        default=None,
+        help="Which interface to communicate over",
+    )
+
+    # Sanity check that an interface was provided
     args = parser.parse_args()
 
-    # Run Blue Full System and Robot Diagnostics
+    if args.run_blue or args.run_yellow:
+        if args.interface is None:
+            parser.error("Must specify interface")
 
-    if args.run_blue:
-        robot_communication = RobotCommunication(ROBOT_MULTICAST_CHANNEL_0, "enp7s0")
-        while True:
-            import time
+    tscope = Thunderscope()
 
-            time.sleep(10)
-
-    # Default (AI vs AI + Simulator)
+    ###########################################################################
+    #              AI + Robot Communication + Robot Diagnostics               #
+    ###########################################################################
     #
-    # Asynchronously tick the simulator to run both full systems at the
-    # provided rate.
-    else:
+    # When we are running with real robots. We want to run 1 instance of AI
+    # and 1 instance of RobotCommunication which will send/recv packets over
+    # the provided multicast channel.
+    proto_unix_io = tscope.blue_full_system_proto_unix_io
+    runtime_dir = args.blue_fullsystem_runtime_dir
+    friendly_colour_yellow = False
 
-        tscope = Thunderscope()
+    if args.run_yellow:
+        proto_unix_io = tscope.yellow_full_system_proto_unix_io
+        runtime_dir = args.yellow_fullsystem_runtime_dir
+        friendly_colour_yellow = True
+
+    if args.run_blue or args.run_yellow:
+        # TODO: Change the channel
+        with RobotCommunication(
+            proto_unix_io, ROBOT_MULTICAST_CHANNEL_0, args.interface
+        ), FullSystem(
+            runtime_dir, args.debug_fullsystem, friendly_colour_yellow
+        ) as full_system:
+            while True:
+                time.sleep(1)
+
+    ###########################################################################
+    #           Blue AI vs Yellow AI + Simulator + Gamecontroller             #
+    ###########################################################################
+    #
+    # Run two AIs against each other with the er-force simulator. We also run
+    # the gamecontroller which can be accessed from http://localhost:8081
+    #
+    # The async sim ticket ticks the simulator at a fixed rate.
+    else:
 
         def __async_sim_ticker(tick_rate_ms):
             """Setup the world and tick simulation forever
@@ -598,6 +604,7 @@ if __name__ == "__main__":
                 tscope.simulator_proto_unix_io.send_proto(SimulatorTick, tick)
                 time.sleep(tick_rate_ms / 1000)
 
+        # Launch all binaries
         with FullSystem(
             args.blue_fullsystem_runtime_dir, args.debug_fullsystem, False
         ) as blue_fs, FullSystem(
@@ -622,7 +629,7 @@ if __name__ == "__main__":
 
             # Start the simulator
             thread = threading.Thread(
-                target=__async_sim_ticker, args=(args.sim_tick_rate_ms,), daemon=True,
+                target=__async_sim_ticker, args=(SIM_TICK_RATE_MS,), daemon=True,
             )
 
             thread.start()
