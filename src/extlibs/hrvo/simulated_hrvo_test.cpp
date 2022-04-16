@@ -264,7 +264,7 @@ TEST_F(SimulatedHRVOTest, test_start_in_local_minima)
 
     runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(6));
+            Duration::fromSeconds(7));
 }
 
 TEST_F(SimulatedHRVOTest, test_start_in_local_minima_with_open_end)
