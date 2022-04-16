@@ -1,0 +1,30 @@
+- double:
+    name: lose_ball_possession_threshold
+    min: 0.0
+    max: 1.0
+    value: 0.04
+    description: If ball and front of robot are separated by this amount, then we've lost possession (in m)
+- double:
+    name: ball_close_to_dest_threshold
+    min: 0.0
+    max: 1.0
+    value: 0.1
+    description: Threshold to determine if the ball is at the destination determined experimentally (in m)
+- double:
+    name: final_destination_close_threshold
+    min: 0.0
+    max: 10.0
+    value: 1.0
+    description: Threshold to determine if the robot has the expected orientation when completing the dribble (in degrees)
+- double:
+    name: max_continuous_dribbling_distance
+    min: 0.0
+    max: 2.0
+    value: 0.78
+    description: Maximum distance to continuously dribble the ball, slightly conservative to not break the 1 meter rule (in m)
+- double:
+    name: robot_dribbling_done_speed
+    min: 0.0
+    max: 1.0
+    value: 1.0
+    description: Robot speed at which the robot is done dribbling (in m/s)

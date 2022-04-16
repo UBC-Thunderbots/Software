@@ -16,9 +16,12 @@ class PenaltyKickTactic : public Tactic
    public:
     /**
      * Creates a new PenaltyKickTactic
+     *
+     * @param ai_config The AI configuration
      */
+    explicit PenaltyKickTactic(std::shared_ptr<const AiConfig> ai_config);
 
-    explicit PenaltyKickTactic();
+    PenaltyKickTactic() = delete;
 
     void updateControlParams();
 

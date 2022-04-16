@@ -24,6 +24,16 @@ void PivotKickFSM::kickBall(const Update& event)
 
 bool PivotKickFSM::ballKicked(const Update& event)
 {
-    return event.common.world.ball().hasBallBeenKicked(
-        event.control_params.kick_direction);
+    if (event.control_params.auto_chip_or_kick.auto_chip_kick_mode ==
+        AutoChipOrKickMode::AUTOKICK)
+    {
+        return event.common.world.ball().hasBallBeenKicked(
+            event.control_params.kick_direction);
+    }
+    else
+    {
+        // check for separation for chipping since kick angle is not reliable
+        return !event.common.robot.isNearDribbler(event.common.world.ball().position(),
+                                                  ROBOT_MAX_RADIUS_METERS);
+    }
 }

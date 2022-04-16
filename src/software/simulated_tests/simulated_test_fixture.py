@@ -4,7 +4,7 @@ import time
 import os
 
 import pytest
-import software.geom.geometry as tbots_geom
+import software.python_bindings as tbots
 from proto.import_all_protos import *
 
 from pyqtgraph.Qt import QtCore, QtGui

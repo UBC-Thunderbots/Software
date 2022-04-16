@@ -36,9 +36,9 @@ class RNG
     double uniform();
     double uniformPositive();
     float uniformFloat(float min, float max);
-    Vector uniformVector();
+    ErForceVector uniformVector();
     double normal(double sigma, double mean = 0.0);
-    Vector normalVector(double sigma, double mean = 0.0);
+    ErForceVector normalVector(double sigma, double mean = 0.0);
 
    private:
     uint32_t m_s1;
@@ -66,9 +66,9 @@ inline float RNG::uniformFloat(float min, float max)
  * \sa uniform
  * \return A random vector drawn from a uniform distribution
  */
-inline Vector RNG::uniformVector()
+inline ErForceVector RNG::uniformVector()
 {
-    return Vector(uniform(), uniform());
+    return ErForceVector(uniform(), uniform());
 }
 
 /*!
