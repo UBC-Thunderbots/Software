@@ -40,6 +40,15 @@ py_library(
 )
 
 py_library(
+    name = "pass_layer",
+    srcs = ["pass_layer.py"],
+    deps = [
+        ":field_layer",
+        requirement("pyqtgraph"),
+    ],
+)
+
+py_library(
     name = "world_layer",
     srcs = ["world_layer.py"],
     deps = [

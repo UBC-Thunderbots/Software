@@ -21,3 +21,20 @@ message NamedValue
     string name = 1;
     float value = 2;
 }
+
+message PassWithRating
+{
+    double rating = 1;
+    Pass pass_    = 2;  // needs the _ because pass is a keyword in python
+}
+
+message Pass
+{
+    Point passer   = 1;
+    Point receiver = 2;
+}
+
+message PassVisualization
+{
+    repeated PassWithRating best_passes = 1;
+}

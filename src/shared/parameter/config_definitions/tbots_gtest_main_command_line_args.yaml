@@ -5,6 +5,12 @@
         Displays simulated test on visualizer
 
 - bool:
+    name: run_sim_in_realtime
+    value: false
+    description: >-
+        Runs simulation in realtime, useful to look at tests in thunderscope
+
+- bool:
     name: stop_ai_on_start
     value: false
     description: >-

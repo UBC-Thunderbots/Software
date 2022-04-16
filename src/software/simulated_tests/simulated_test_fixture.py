@@ -220,13 +220,10 @@ def simulated_test_runner():
     tscope = Thunderscope()
 
     # Launch all binaries
-    with FullSystem(
-        args.blue_fullsystem_runtime_dir, args.debug_fullsystem, False
-    ) as blue_fs, FullSystem(
-        args.yellow_fullsystem_runtime_dir, args.debug_fullsystem, True
-    ) as yellow_fs, Simulator(
-        args.simulator_runtime_dir, args.debug_simulator
-    ) as simulator, Gamecontroller() as gamecontroller:
+    with Simulator(args.simulator_runtime_dir, args.debug_simulator) as simulator,\
+        FullSystem(args.blue_fullsystem_runtime_dir, args.debug_fullsystem, False) as blue_fs,\
+        FullSystem(args.yellow_fullsystem_runtime_dir, args.debug_fullsystem, True) as yellow_fs,\
+        Gamecontroller() as gamecontroller:
 
         blue_fs.setup_proto_unix_io(tscope.blue_full_system_proto_unix_io)
         yellow_fs.setup_proto_unix_io(tscope.yellow_full_system_proto_unix_io)

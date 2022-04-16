@@ -4,12 +4,14 @@ from proto.import_all_protos import *
 def create_world_state(
     yellow_robot_locations, blue_robot_locations, ball_location, ball_velocity
 ):
-    """Initializes the world from a list of robot locations
+    """Initializes the world from a list of robot locations and ball location/velocity.
 
     NOTE: (index is robot id)
 
     :param yellow_robot_locations: A list of yellowrobot locations
     :param blue_robot_locations: A list of blue robot locations
+    :param ball_location: Location of the ball
+    :param ball_velocity: Velocity of the ball
 
     """
     world_state = WorldState()

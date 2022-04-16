@@ -1,3 +1,4 @@
+import os
 from proto.import_all_protos import *
 from subprocess import Popen
 from software.networking import threaded_unix_sender, networking
@@ -41,6 +42,12 @@ class FullSystem(object):
         :return: FullSystem instance
 
         """
+        # Setup unix socket directory
+        try:
+            os.mkdir(self.fullsystem_runtime_dir)
+        except:
+            pass
+
         full_system = "software/unix_full_system --runtime_dir={} {}".format(
             self.fullsystem_runtime_dir,
             "--friendly_colour_yellow" if self.friendly_colour_yellow else "",
@@ -77,12 +84,6 @@ class FullSystem(object):
         :param proto_unix_io: The unix io to setup for this fullsystem instance
 
         """
-
-        # Setup unix socket directory
-        try:
-            os.mkdir(self.fullsystem_runtime_dir)
-        except:
-            pass
 
         # Setup LOG(VISUALIZE) handling from full system. We set from_log_visualize
         # to true.

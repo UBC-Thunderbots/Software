@@ -54,6 +54,7 @@ from software.thunderscope.field import (
     validation_layer,
     simulator_layer,
     world_layer,
+    pass_layer,
 )
 
 from software.thunderscope.field.field import Field
@@ -341,13 +342,15 @@ class Thunderscope(object):
         validation = validation_layer.ValidationLayer()
         world = world_layer.WorldLayer(sim_proto_unix_io, friendly_colour_yellow)
         sim_state = simulator_layer.SimulatorLayer(friendly_colour_yellow)
+        passing = passing_layer.PassingLayer()
 
         # Add field layers to field
         self.field.add_layer("Vision", world)
         self.field.add_layer("Obstacles", obstacles)
         self.field.add_layer("Paths", paths)
         self.field.add_layer("Validation", validation)
-        self.field.add_layer("Simulator Layer", sim_state)
+        self.field.add_layer("Passing", pass_layer.PassingLayer())
+        self.field.add_layer("Simulator", sim_state)
 
         # Register observers
         sim_proto_unix_io.register_observer(
