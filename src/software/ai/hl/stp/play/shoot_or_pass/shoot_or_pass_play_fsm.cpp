@@ -149,7 +149,7 @@ void ShootOrPassPlayFSM::takePass(const Update& event)
 
 bool ShootOrPassPlayFSM::passFound(const Update& event)
 {
-//    std::cout << "SCORE IS: " << best_pass_and_score_so_far.rating << std::endl;
+    //    std::cout << "SCORE IS: " << best_pass_and_score_so_far.rating << std::endl;
     return best_pass_and_score_so_far.rating > min_pass_score_threshold;
 }
 
@@ -162,8 +162,11 @@ bool ShootOrPassPlayFSM::shouldAbortPass(const Update& event)
     }
 
     // distance between robot and ball is too far,
-    // i.e. team might still have possession, but kicker/passer doesn't have control over ball
-    if ((event.common.world.ball().position() -  best_pass_and_score_so_far.pass.passerPoint()).length() >
+    // i.e. team might still have possession, but kicker/passer doesn't have control over
+    // ball
+    if ((event.common.world.ball().position() -
+         best_pass_and_score_so_far.pass.passerPoint())
+            .length() >
         this->ai_config->getShootOrPassPlayConfig()->getMinDistanceToPass()->value())
     {
         std::cout << "BRUH2" << std::endl;
@@ -171,7 +174,8 @@ bool ShootOrPassPlayFSM::shouldAbortPass(const Update& event)
     }
 
     // ball has already been kicked
-    if  (tookShot(event)) {
+    if (tookShot(event))
+    {
         return true;
     }
 
