@@ -191,8 +191,18 @@ class Vector final
      */
     Vector &operator=(const Vector &other);
 
+	/**
+	 * Returns true if this vector is to the right of the given vector.
+	 *
+	 * @param other the Vector to compare this Vector to
+	 */
     bool isToTheRightOf(const Vector &other);
 
+	/**
+	 * Returns true if this vector is to the left of the given vector.
+	 *
+	 * @param other the Vector to compare this Vector to
+	 */
     bool isToTheLeftOf(const Vector &other);
 
    private:
