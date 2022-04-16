@@ -4,14 +4,31 @@
   hosts: THUNDERBOTS_HOSTS
 
   tasks:
+    - name: enable passwordless sudo for rsync
+      become: true
+      become_method: sudo
+      lineinfile:
+        path: /etc/sudoers
+        state: present
+        insertafter: EOF
+        line: '{{ ansible_user }} ALL=NOPASSWD:/usr/bin/rsync'
+
     - name: Copy and Execute the setup_nano script
       script: ../../setup_nano.sh
       become: true
       become_method: sudo
-      register: res
+      async: 3600
+      poll: 10
+      register: result_async
+
+    - name: Check command
+      async_status: jid="{{ result_async.ansible_job_id }}"
+      register: result
+      failed_when: result.finished != 1 or "Finished 'command'" not in result.stdout
 
     - debug:
         msg:
           - "[Robot ID = {{ inventory_hostname }}]"
           - "stdout = {{ res.stdout_lines }} "
           - "stderr = {{ res.stderr }}"
+

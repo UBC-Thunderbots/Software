@@ -15,7 +15,7 @@ import argparse
 # documentation can be found here: https://docs.ansible.com/ansible/latest/dev_guide/developing_api.html
 
 HOST_GROUP = "THUNDERBOTS_HOSTS"
-NANO_USER = "robot"
+NANO_USER = "dev"
 ANNOUNCEMENT_LISTEN_DURATION_S = 2
 
 
@@ -59,7 +59,7 @@ def ansible_runner(playbook: str, options: dict = {}):
         forks=num_forks,
         remote_user=NANO_USER,
         private_key_file=None,
-        ssh_common_args=None,
+        ssh_common_args="StrictHostKeyChecking=no",
         ssh_extra_args=None,
         sftp_extra_args=None,
         scp_extra_args=None,
