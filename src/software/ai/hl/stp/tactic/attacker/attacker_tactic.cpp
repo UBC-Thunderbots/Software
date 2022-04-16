@@ -11,7 +11,7 @@ AttackerTactic::AttackerTactic(std::shared_ptr<const AiConfig> ai_config)
       best_pass_so_far(std::nullopt),
       pass_committed(false),
       chip_target(std::nullopt),
-      attacker_tactic_config(ai_config->getAttackerTacticConfig())
+      ai_config(ai_config)
 {
     for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)
     {
@@ -60,17 +60,19 @@ void AttackerTactic::updatePrimitive(const TacticUpdate& tactic_update, bool res
 {
     if (reset_fsm)
     {
-        fsm_map[tactic_update.robot.id()] =
-            std::make_unique<FSM<AttackerFSM>>(DribbleFSM());
+        fsm_map[tactic_update.robot.id()] = std::make_unique<FSM<AttackerFSM>>(
+            DribbleFSM(ai_config->getDribbleTacticConfig()),
+            AttackerFSM(ai_config->getAttackerTacticConfig()));
     }
 
     std::optional<Shot> shot = calcBestShotOnGoal(
         tactic_update.world.field(), tactic_update.world.friendlyTeam(),
         tactic_update.world.enemyTeam(), tactic_update.world.ball().position(),
         TeamType::ENEMY, {tactic_update.robot});
-    if (shot && shot->getOpenAngle() <
-                    Angle::fromDegrees(
-                        attacker_tactic_config->getMinOpenAngleForShotDeg()->value()))
+    if (shot &&
+        shot->getOpenAngle() < Angle::fromDegrees(ai_config->getAttackerTacticConfig()
+                                                      ->getMinOpenAngleForShotDeg()
+                                                      ->value()))
     {
         // reject shots that have an open angle below the minimum
         shot = std::nullopt;
@@ -81,5 +83,6 @@ void AttackerTactic::updatePrimitive(const TacticUpdate& tactic_update, bool res
                                               .shot             = shot,
                                               .chip_target      = chip_target};
 
-    fsm.process_event(AttackerFSM::Update(control_params, tactic_update));
+    fsm_map[tactic_update.robot.id()]->process_event(
+        AttackerFSM::Update(control_params, tactic_update));
 }

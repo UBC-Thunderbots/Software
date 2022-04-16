@@ -7,7 +7,8 @@ DribbleTactic::DribbleTactic(std::shared_ptr<const AiConfig> ai_config)
       fsm_map(),
       control_params{DribbleFSM::ControlParams{.dribble_destination       = std::nullopt,
                                                .final_dribble_orientation = std::nullopt,
-                                               .allow_excessive_dribbling = false}}
+                                               .allow_excessive_dribbling = false}},
+      ai_config(ai_config)
 {
     for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)
     {
@@ -51,8 +52,9 @@ void DribbleTactic::updatePrimitive(const TacticUpdate &tactic_update, bool rese
 {
     if (reset_fsm)
     {
-        fsm_map[tactic_update.robot.id()] =
-            std::make_unique<FSM<DribbleFSM>>(DribbleFSM());
+        fsm_map[tactic_update.robot.id()] = std::make_unique<FSM<DribbleFSM>>(
+            DribbleFSM(ai_config->getDribbleTacticConfig()));
     }
-    fsm.process_event(DribbleFSM::Update(control_params, tactic_update));
+    fsm_map[tactic_update.robot.id()]->process_event(
+        DribbleFSM::Update(control_params, tactic_update));
 }

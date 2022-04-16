@@ -49,4 +49,5 @@ class PivotKickTactic : public Tactic
     std::map<RobotId, std::unique_ptr<FSM<PivotKickFSM>>> fsm_map;
 
     PivotKickFSM::ControlParams control_params;
+    std::shared_ptr<const AiConfig> ai_config;
 };

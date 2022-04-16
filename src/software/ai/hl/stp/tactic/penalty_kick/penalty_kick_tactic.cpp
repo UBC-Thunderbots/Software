@@ -2,7 +2,8 @@
 
 PenaltyKickTactic::PenaltyKickTactic(std::shared_ptr<const AiConfig> ai_config)
     : Tactic({RobotCapability::Move, RobotCapability::Dribble, RobotCapability::Kick}),
-      fsm_map()
+      fsm_map(),
+      ai_config(ai_config)
 {
     for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)
     {
@@ -33,7 +34,9 @@ void PenaltyKickTactic::updatePrimitive(const TacticUpdate& tactic_update, bool 
     if (reset_fsm)
     {
         fsm_map[tactic_update.robot.id()] = std::make_unique<FSM<PenaltyKickFSM>>(
-            DribbleFSM(), PenaltyKickFSM(), GetBehindBallFSM());
+            DribbleFSM(ai_config->getDribbleTacticConfig()), PenaltyKickFSM(),
+            GetBehindBallFSM());
     }
-    fsm.process_event(PenaltyKickFSM::Update({}, tactic_update));
+    fsm_map.at(tactic_update.robot.id())
+        ->process_event(PenaltyKickFSM::Update({}, tactic_update));
 }

@@ -66,6 +66,5 @@ class AttackerTactic : public Tactic
     // The point the robot will chip towards if it is unable to shoot and is in danger
     // of losing the ball to an enemy
     std::optional<Point> chip_target;
-    // shoot goal config
-    std::shared_ptr<const AttackerTacticConfig> attacker_tactic_config;
+    std::shared_ptr<const AiConfig> ai_config;
 };

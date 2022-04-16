@@ -8,7 +8,7 @@
 
 Play::Play(std::shared_ptr<const AiConfig> ai_config, bool requires_goalie)
     : ai_config(ai_config),
-      goalie_tactic(std::make_shared<GoalieTactic>(ai_config->getGoalieTacticConfig())),
+      goalie_tactic(std::make_shared<GoalieTactic>(ai_config)),
       stop_tactics(),
       requires_goalie(requires_goalie),
       tactic_sequence(boost::bind(&Play::getNextTacticsWrapper, this, _1)),

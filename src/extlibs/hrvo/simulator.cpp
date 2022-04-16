@@ -195,7 +195,7 @@ void HRVOSimulator::updatePrimitiveSet(const TbotsProto::PrimitiveSet &new_primi
 
                 // TODO (#2418): Update implementation of Primitive to support
                 // multiple path points
-                auto destination = primitive.move().path().point().at(0);
+                auto destination = primitive.move().motion_control().path().point().at(0);
 
                 // Max distance which the robot can travel in one time step + scaling
                 float path_radius =
@@ -249,7 +249,8 @@ std::size_t HRVOSimulator::addHRVORobotAgent(const Robot &robot)
         if (primitive.has_move())
         {
             const auto &move_primitive = primitive.move();
-            destination_point_proto    = move_primitive.path().point().at(0);
+            destination_point_proto =
+                move_primitive.motion_control().path().point().at(0);
             destination_point =
                 Vector(static_cast<float>(destination_point_proto.x_meters()),
                        static_cast<float>(destination_point_proto.y_meters()));

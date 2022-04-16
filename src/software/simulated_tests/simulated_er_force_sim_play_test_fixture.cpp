@@ -2,7 +2,6 @@
 
 #include "proto/message_translation/primitive_google_to_nanopb_converter.h"
 #include "proto/message_translation/tbots_protobuf.h"
-#include "software/gui/drawing/navigator.h"
 #include "software/test_util/test_util.h"
 
 SimulatedErForceSimPlayTestFixture::SimulatedErForceSimPlayTestFixture()
@@ -90,5 +89,5 @@ std::optional<TbotsProto::PlayInfo> SimulatedErForceSimPlayTestFixture::getPlayI
 
 AIDrawFunction SimulatedErForceSimPlayTestFixture::getDrawFunctions()
 {
-    return drawNavigator(ai.getNavigator());
+    return AIDrawFunction([](QGraphicsScene* scene) {});
 }

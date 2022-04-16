@@ -56,7 +56,13 @@ struct TacticUpdate
 #define DEFINE_TACTIC_DONE_AND_GET_FSM_STATE                                             \
     bool done() const override                                                           \
     {                                                                                    \
-        return fsm.is(boost::sml::X);                                                    \
+        bool is_done          = false;                                                   \
+        std::string state_str = "";                                                      \
+        if (last_execution_robot.has_value())                                            \
+        {                                                                                \
+            is_done = fsm_map.at(last_execution_robot.value())->is(boost::sml::X);       \
+        }                                                                                \
+        return is_done;                                                                  \
     }                                                                                    \
                                                                                          \
     std::string getFSMState() const override                                             \

@@ -31,6 +31,7 @@ void OffensePlay::updateTactics(const PlayUpdate &play_update)
     unsigned int num_defenders     = 2;
     if (play_update.num_tactics <= 3)
     {
+        // TODO: handle num_tactics = 0 case
         num_shoot_or_pass = 1;
         num_defenders     = play_update.num_tactics - 1;
     }
