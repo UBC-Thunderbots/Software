@@ -12,9 +12,11 @@ class PivotKickTactic : public Tactic
     /**
      * Creates a new PivotKickTactic
      *
-     * @param robot_navigation_obstacle_config The config
+     * @param ai_config The AI configuration
      */
-    explicit PivotKickTactic();
+    explicit PivotKickTactic(std::shared_ptr<const AiConfig> ai_config);
+
+    PivotKickTactic() = delete;
 
     DEFINE_TACTIC_DONE_AND_GET_FSM_STATE
 
@@ -44,7 +46,6 @@ class PivotKickTactic : public Tactic
    private:
     void updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm) override;
 
-    FSM<PivotKickFSM> fsm;
     std::map<RobotId, std::unique_ptr<FSM<PivotKickFSM>>> fsm_map;
 
     PivotKickFSM::ControlParams control_params;

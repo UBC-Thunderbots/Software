@@ -14,7 +14,14 @@
 class DribbleTactic : public Tactic
 {
    public:
-    explicit DribbleTactic();
+    /**
+     * Creates a new DribbleTactic
+     *
+     * @param ai_config The AI configuration
+     */
+    explicit DribbleTactic(std::shared_ptr<const AiConfig> ai_config);
+
+    DribbleTactic() = delete;
 
     /**
      * Updates control params for optionally moving the ball to a dribble destination and
@@ -48,7 +55,6 @@ class DribbleTactic : public Tactic
    private:
     void updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm) override;
 
-    FSM<DribbleFSM> fsm;
     std::map<RobotId, std::unique_ptr<FSM<DribbleFSM>>> fsm_map;
     DribbleFSM::ControlParams control_params;
 };

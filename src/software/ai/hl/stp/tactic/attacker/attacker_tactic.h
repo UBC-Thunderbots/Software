@@ -17,10 +17,9 @@ class AttackerTactic : public Tactic
     /**
      * Creates a new AttackerTactic
      *
-     * @param attacker_tactic_config The config to fetch parameters from
+     * @param ai_config The AI configuration
      */
-    explicit AttackerTactic(
-        std::shared_ptr<const AttackerTacticConfig> attacker_tactic_config);
+    explicit AttackerTactic(std::shared_ptr<const AiConfig> ai_config);
 
     AttackerTactic() = delete;
 
@@ -58,7 +57,6 @@ class AttackerTactic : public Tactic
    private:
     void updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm) override;
 
-    FSM<AttackerFSM> fsm;
     std::map<RobotId, std::unique_ptr<FSM<AttackerFSM>>> fsm_map;
 
     // The pass to execute

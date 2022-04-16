@@ -43,7 +43,7 @@ class Play
     /**
      * Creates a new Play
      *
-     * @param ai_config The Play configuration
+     * @param ai_config The AI configuration
      * @param requires_goalie Whether this plays requires a goalie
      */
     explicit Play(std::shared_ptr<const AiConfig> ai_config, bool requires_goalie);

@@ -1,14 +1,14 @@
 #include "software/ai/hl/stp/tactic/penalty_kick/penalty_kick_tactic.h"
 
-PenaltyKickTactic::PenaltyKickTactic()
+PenaltyKickTactic::PenaltyKickTactic(std::shared_ptr<const AiConfig> ai_config)
     : Tactic({RobotCapability::Move, RobotCapability::Dribble, RobotCapability::Kick}),
-      fsm{DribbleFSM(), PenaltyKickFSM(), GetBehindBallFSM()},
       fsm_map()
 {
     for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)
     {
         fsm_map[id] = std::make_unique<FSM<PenaltyKickFSM>>(
-            DribbleFSM(), PenaltyKickFSM(), GetBehindBallFSM());
+            DribbleFSM(ai_config->getDribbleTacticConfig()), PenaltyKickFSM(),
+            GetBehindBallFSM());
     }
 }
 

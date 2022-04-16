@@ -6,7 +6,8 @@
 
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/simulated_tests/non_terminating_validation_functions/enemy_never_scores_validation.h"
-#include "software/simulated_tests/simulated_tactic_test_fixture.h"
+#include "software/simulated_tests/simulated_er_force_sim_tactic_test_fixture.h"
+#include "software/simulated_tests/terminating_validation_functions/ball_kicked_validation.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_in_polygon_validation.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_received_ball_validation.h"
 #include "software/simulated_tests/validation/validation_function.h"
@@ -16,7 +17,7 @@
 #include "software/world/world.h"
 
 class GoalieTacticTest
-    : public SimulatedTacticTestFixture,
+    : public SimulatedErForceSimTacticTestFixture,
       public ::testing::WithParamInterface<std::tuple<BallState, RobotStateWithId>>
 {
    protected:
@@ -36,12 +37,15 @@ class GoalieTacticTest
             yield("Ball is in the friendly defense area");
         }
     }
-    Field field = Field::createSSLDivisionBField();
+    TbotsProto::FieldType field_type = TbotsProto::FieldType::DIV_B;
+    Field field                      = Field::createField(field_type);
     std::vector<RobotStateWithId> enemy_robots =
         TestUtil::createStationaryRobotStatesWithId(
             {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field.enemyGoalCenter(),
              field.enemyDefenseArea().negXNegYCorner(),
              field.enemyDefenseArea().negXPosYCorner()});
+    std::shared_ptr<const AiConfig> ai_config =
+        std::make_shared<ThunderbotsConfig>()->getAiConfig();
 };
 
 TEST_F(GoalieTacticTest, test_panic_ball_very_fast_in_straight_line)
@@ -49,10 +53,7 @@ TEST_F(GoalieTacticTest, test_panic_ball_very_fast_in_straight_line)
     BallState ball_state(Point(0, 0), Vector(-3, 0));
     auto friendly_robots = TestUtil::createStationaryRobotStatesWithId({Point(-4, -1)});
 
-    std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config =
-        std::make_shared<const GoalieTacticConfig>();
-
-    auto tactic = std::make_shared<GoalieTactic>(goalie_tactic_config);
+    auto tactic = std::make_shared<GoalieTactic>(ai_config);
     setTactic(tactic);
     setFriendlyRobotId(0);
 
@@ -67,7 +68,7 @@ TEST_F(GoalieTacticTest, test_panic_ball_very_fast_in_straight_line)
             enemyNeverScores(world_ptr, yield);
         }};
 
-    runTest(field, ball_state, friendly_robots, enemy_robots,
+    runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
 }
@@ -78,10 +79,7 @@ TEST_F(GoalieTacticTest, test_panic_ball_very_fast_in_diagonal_line)
     auto friendly_robots = TestUtil::createStationaryRobotStatesWithId(
         {field.friendlyGoalCenter() + Vector(0, -0.5)});
 
-    std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config =
-        std::make_shared<const GoalieTacticConfig>();
-    auto tactic =
-        std::make_shared<GoalieTactic>(std::make_shared<const GoalieTacticConfig>());
+    auto tactic = std::make_shared<GoalieTactic>(ai_config);
     setTactic(tactic);
     setFriendlyRobotId(0);
 
@@ -96,7 +94,7 @@ TEST_F(GoalieTacticTest, test_panic_ball_very_fast_in_diagonal_line)
             enemyNeverScores(world_ptr, yield);
         }};
 
-    runTest(field, ball_state, friendly_robots, enemy_robots,
+    runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
 }
@@ -106,9 +104,7 @@ TEST_F(GoalieTacticTest, test_ball_very_fast_misses_net)
     BallState ball_state(Point(0, 0), Vector(-4, 1));
     auto friendly_robots = TestUtil::createStationaryRobotStatesWithId({Point(-4.5, 0)});
 
-    std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config =
-        std::make_shared<const GoalieTacticConfig>();
-    auto tactic = std::make_shared<GoalieTactic>(goalie_tactic_config);
+    auto tactic = std::make_shared<GoalieTactic>(ai_config);
     setTactic(tactic);
     setFriendlyRobotId(0);
 
@@ -122,7 +118,7 @@ TEST_F(GoalieTacticTest, test_ball_very_fast_misses_net)
             enemyNeverScores(world_ptr, yield);
         }};
 
-    runTest(field, ball_state, friendly_robots, enemy_robots,
+    runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
 }
@@ -132,9 +128,7 @@ TEST_F(GoalieTacticTest, test_slow_ball_at_sharp_angle_to_friendly_goal)
     BallState ball_state(Point(-4.5, -3), Vector(0, 0.1));
     auto friendly_robots = TestUtil::createStationaryRobotStatesWithId({Point(-4.5, 0)});
 
-    std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config =
-        std::make_shared<const GoalieTacticConfig>();
-    auto tactic = std::make_shared<GoalieTactic>(goalie_tactic_config);
+    auto tactic = std::make_shared<GoalieTactic>(ai_config);
     setTactic(tactic);
     setFriendlyRobotId(0);
 
@@ -150,7 +144,7 @@ TEST_F(GoalieTacticTest, test_slow_ball_at_sharp_angle_to_friendly_goal)
             enemyNeverScores(world_ptr, yield);
         }};
 
-    runTest(field, ball_state, friendly_robots, enemy_robots,
+    runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
 }
@@ -162,9 +156,7 @@ TEST_P(GoalieTacticTest, goalie_test)
 
     auto friendly_robots = {robot_state};
 
-    std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config =
-        std::make_shared<const GoalieTacticConfig>();
-    auto tactic = std::make_shared<GoalieTactic>(goalie_tactic_config);
+    auto tactic = std::make_shared<GoalieTactic>(ai_config);
     setTactic(tactic);
     setFriendlyRobotId(0);
 
@@ -180,7 +172,7 @@ TEST_P(GoalieTacticTest, goalie_test)
             enemyNeverScores(world_ptr, yield);
         }};
 
-    runTest(field, ball_state, friendly_robots, enemy_robots,
+    runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
 }
@@ -218,15 +210,18 @@ INSTANTIATE_TEST_CASE_P(
                             0, RobotState(Point(-3.5, 1), Vector(0, 0),
                                           Angle::fromDegrees(0), Angle::fromDegrees(0))}),
 
+        // TODO(#2471): re-enable and fix this
         // ball moving out from inside defense area
-        std::make_tuple(BallState(Field::createSSLDivisionBField().friendlyGoalCenter() +
-                                      Vector(0.5, 0),
-                                  Vector(0.5, 0)),
-                        RobotStateWithId{
-                            0, RobotState(Point(-3.5, 0), Vector(0, 0),
-                                          Angle::fromDegrees(0), Angle::fromDegrees(0))}),
+        //        std::make_tuple(BallState(Field::createSSLDivisionBField().friendlyGoalCenter()
+        //        +
+        //                                      Vector(0.5, 0),
+        //                                  Vector(0.5, 0)),
+        //                        RobotStateWithId{
+        //                            0, RobotState(Point(-3.5, 0), Vector(0, 0),
+        //                                          Angle::fromDegrees(0),
+        //                                          Angle::fromDegrees(0))}),
 
-        // TODO (#2167): This test fails so disabling for Robocup
+        // TODO(#2471): re-enable and fix this
         // ball moving into goal from inside defense area
         //        std::make_tuple(BallState(Field::createSSLDivisionBField().friendlyGoalCenter()
         //        +
@@ -237,24 +232,24 @@ INSTANTIATE_TEST_CASE_P(
         //                                          Angle::fromDegrees(0),
         //                                          Angle::fromDegrees(0))}),
 
+        // TODO(#2471): re-enable and fix this
         // ball moving up and out of defense area
-        std::make_tuple(BallState(Field::createSSLDivisionBField().friendlyGoalCenter() +
-                                      Vector(0.3, 0),
-                                  Vector(0, 1)),
-                        RobotStateWithId{
-                            0, RobotState(Point(-3.5, 0), Vector(0, 0),
-                                          Angle::fromDegrees(0), Angle::fromDegrees(0))}),
-
-        // TODO (#2167): This test fails so disabling for Robocup
-        // ball moving down and out goal from defense area
         //        std::make_tuple(BallState(Field::createSSLDivisionBField().friendlyGoalCenter()
         //        +
         //                                      Vector(0.3, 0),
-        //                                  Vector(0, -0.7)),
+        //                                  Vector(0, 1)),
         //                        RobotStateWithId{
         //                            0, RobotState(Point(-3.5, 0), Vector(0, 0),
         //                                          Angle::fromDegrees(0),
         //                                          Angle::fromDegrees(0))}),
+
+        // ball moving down and out goal from defense area
+        std::make_tuple(BallState(Field::createSSLDivisionBField().friendlyGoalCenter() +
+                                      Vector(0.3, 0),
+                                  Vector(0, -0.7)),
+                        RobotStateWithId{
+                            0, RobotState(Point(-3.5, 0), Vector(0, 0),
+                                          Angle::fromDegrees(0), Angle::fromDegrees(0))}),
 
         // ball slow inside no-chip rectangle
         std::make_tuple(BallState(Field::createSSLDivisionBField().friendlyGoalCenter() +

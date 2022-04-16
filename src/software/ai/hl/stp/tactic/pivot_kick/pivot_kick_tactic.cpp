@@ -9,16 +9,16 @@
 #include "software/geom/segment.h"
 #include "software/logger/logger.h"
 
-PivotKickTactic::PivotKickTactic()
+PivotKickTactic::PivotKickTactic(std::shared_ptr<const AiConfig> ai_config)
     : Tactic({RobotCapability::Move, RobotCapability::Kick, RobotCapability::Chip,
               RobotCapability::Dribble}),
-      fsm(DribbleFSM()),
       fsm_map(),
       control_params(PivotKickFSM::ControlParams())
 {
     for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)
     {
-        fsm_map[id] = std::make_unique<FSM<PivotKickFSM>>(DribbleFSM());
+        fsm_map[id] = std::make_unique<FSM<PivotKickFSM>>(
+            DribbleFSM(ai_config->getDribbleTacticConfig()));
     }
 }
 

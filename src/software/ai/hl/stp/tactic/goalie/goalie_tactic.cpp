@@ -4,10 +4,9 @@
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/point.h"
 
-GoalieTactic::GoalieTactic(std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config,
+GoalieTactic::GoalieTactic(std::shared_ptr<const AiConfig> ai_config,
                            TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode)
     : Tactic({RobotCapability::Move, RobotCapability::Dribble, RobotCapability::Chip}),
-      fsm(DribbleFSM(), GoalieFSM(goalie_tactic_config, max_allowed_speed_mode)),
       fsm_map(),
       goalie_tactic_config(goalie_tactic_config),
       max_allowed_speed_mode(max_allowed_speed_mode),

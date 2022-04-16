@@ -2,9 +2,8 @@
 
 #include <algorithm>
 
-DribbleTactic::DribbleTactic()
+DribbleTactic::DribbleTactic(std::shared_ptr<const AiConfig> ai_config)
     : Tactic({RobotCapability::Move, RobotCapability::Dribble, RobotCapability::Kick}),
-      fsm(DribbleFSM()),
       fsm_map(),
       control_params{DribbleFSM::ControlParams{.dribble_destination       = std::nullopt,
                                                .final_dribble_orientation = std::nullopt,
@@ -12,7 +11,8 @@ DribbleTactic::DribbleTactic()
 {
     for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)
     {
-        fsm_map[id] = std::make_unique<FSM<DribbleFSM>>(DribbleFSM());
+        fsm_map[id] = std::make_unique<FSM<DribbleFSM>>(
+            DribbleFSM(ai_config->getDribbleTacticConfig()));
     }
 }
 

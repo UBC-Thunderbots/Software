@@ -16,9 +16,12 @@ class PenaltyKickTactic : public Tactic
    public:
     /**
      * Creates a new PenaltyKickTactic
+     *
+     * @param ai_config The AI configuration
      */
+    explicit PenaltyKickTactic(std::shared_ptr<const AiConfig> ai_config);
 
-    explicit PenaltyKickTactic();
+    PenaltyKickTactic() = delete;
 
     void updateControlParams();
 
@@ -40,6 +43,5 @@ class PenaltyKickTactic : public Tactic
    private:
     void updatePrimitive(const TacticUpdate &tactic_update, bool reset_fsm) override;
 
-    FSM<PenaltyKickFSM> fsm;
     std::map<RobotId, std::unique_ptr<FSM<PenaltyKickFSM>>> fsm_map;
 };
