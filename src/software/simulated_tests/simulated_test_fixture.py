@@ -16,11 +16,17 @@ from software.simulated_tests import validation
 from software.thunderscope.thunderscope import Thunderscope
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.py_constants import MILLISECONDS_PER_SECOND
+from software.thunderscope.cpp_binary_context_managers import (
+    FullSystem,
+    Simulator,
+    Gamecontroller,
+)
 
 from software.logger.logger import createLogger
 
 logger = createLogger(__name__)
 
+LAUNCH_DELAY_S = 0.2
 PROCESS_BUFFER_DELAY_S = 0.01
 PAUSE_AFTER_FAIL_DELAY_S = 3
 
@@ -211,21 +217,36 @@ def load_command_line_arguments():
 @pytest.fixture
 def simulated_test_runner():
     args = load_command_line_arguments()
+    tscope = Thunderscope()
 
-    thunderscope = Thunderscope(
-        args.simulator_runtime_dir,
-        args.blue_fullsystem_runtime_dir,
-        args.yellow_fullsystem_runtime_dir,
-        debug_fullsystem=args.debug_fullsystem,
-        debug_simulator=args.debug_simulator,
-    )
+    # Launch all binaries
+    with FullSystem(
+        args.blue_fullsystem_runtime_dir, args.debug_fullsystem, False
+    ) as blue_fs, FullSystem(
+        args.yellow_fullsystem_runtime_dir, args.debug_fullsystem, True
+    ) as yellow_fs, Simulator(
+        args.simulator_runtime_dir, args.debug_simulator
+    ) as simulator, Gamecontroller() as gamecontroller:
 
-    if args.enable_thunderscope:
-        thunderscope.load_saved_layout(args.layout)
+        blue_fs.setup_proto_unix_io(tscope.blue_full_system_proto_unix_io)
+        yellow_fs.setup_proto_unix_io(tscope.yellow_full_system_proto_unix_io)
+        simulator.setup_proto_unix_io(
+            tscope.simulator_proto_unix_io,
+            tscope.blue_full_system_proto_unix_io,
+            tscope.yellow_full_system_proto_unix_io,
+        )
+        gamecontroller.setup_proto_unix_io(
+            tscope.blue_full_system_proto_unix_io,
+            tscope.yellow_full_system_proto_unix_io,
+        )
 
-    runner = SimulatorTestRunner(
-        thunderscope=thunderscope, show_thunderscope=args.enable_thunderscope,
-    )
+        if args.enable_thunderscope:
+            tscope.load_saved_layout(args.layout)
 
-    with thunderscope:
+        time.sleep(LAUNCH_DELAY_S)
+
+        runner = SimulatorTestRunner(
+            thunderscope=tscope, show_thunderscope=args.enable_thunderscope,
+        )
+
         yield runner

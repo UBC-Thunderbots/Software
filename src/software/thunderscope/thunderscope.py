@@ -68,6 +68,7 @@ from software.thunderscope.robot_diagnostics.drive_and_dribbler_widget import (
 DEFAULT_LAYOUT_PATH = "/opt/tbotspython/default_tscope_layout"
 NUM_ROBOTS = 6
 SIM_TICK_RATE_MS = 16
+REFRESH_INTERVAL_MS = 5
 
 
 class Thunderscope(object):

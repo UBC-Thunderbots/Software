@@ -74,12 +74,14 @@ class ValidationLayer(FieldLayer):
 
         """
 
-        self.validation_set = self.validation_set_buffer.get()
+        # Consume the validation set buffer
+        for _ in range(self.validation_set_buffer.queue.qsize()):
+            self.validation_set = self.validation_set_buffer.get()
 
-        if self.validation_set.validation_type == ValidationType.ALWAYS:
-            self.cached_always_validation_set = self.validation_set
-        else:
-            self.cached_eventually_validation_set = self.validation_set
+            if self.validation_set.validation_type == ValidationType.ALWAYS:
+                self.cached_always_validation_set = self.validation_set
+            else:
+                self.cached_eventually_validation_set = self.validation_set
 
         # Draw Always Validation
         for validation in self.cached_always_validation_set.validations:

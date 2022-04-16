@@ -17,7 +17,15 @@ TIME_WINDOW_TO_DISPLAY_S = 10
 
 
 class NamedValuePlotter(object):
+
+    """ Plot named values in real time with a scrolling plot """
+
     def __init__(self, buffer_size=1000):
+        """Initializes NamedValuePlotter.
+
+        :param buffer_size: The size of the buffer to use for plotting.
+
+        """
         self.win = pg.plot()
         self.plots = {}
         self.data_x = {}

@@ -4,6 +4,8 @@ from software.logger.logger import createLogger
 
 class ThreadSafeBuffer(object):
 
+    MIN_DROPPED_BEFORE_LOG = 20
+
     """Multiple producer, multiple consumer buffer.
 
                │              buffer_size                 │
@@ -17,7 +19,7 @@ class ThreadSafeBuffer(object):
 
     """
 
-    def __init__(self, buffer_size, protobuf_type, log_overrun=True):
+    def __init__(self, buffer_size, protobuf_type, log_overrun=False):
 
         """A buffer to hold data to be consumed.
 
@@ -47,7 +49,11 @@ class ThreadSafeBuffer(object):
 
         """
 
-        if self.log_overrun and self.protos_dropped > self.last_logged_protos_dropped:
+        if (
+            self.log_overrun
+            and self.protos_dropped > self.last_logged_protos_dropped
+            and self.protos_dropped > self.MIN_DROPPED_BEFORE_LOG
+        ):
             self.logger.warn(
                 "packets dropped; thunderscope did not show {} protos".format(
                     self.protos_dropped

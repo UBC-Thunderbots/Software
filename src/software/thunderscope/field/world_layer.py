@@ -410,8 +410,6 @@ class WorldLayer(FieldLayer):
                         ROBOT_MAX_RADIUS_MM / 2,
                     )
                 )
-                print("ball in beam", self.cached_status.robot_id)
-                print(self.cached_status.break_beam_status.ball_in_beam)
 
     def paint(self, painter, option, widget):
         """Paint this layer
