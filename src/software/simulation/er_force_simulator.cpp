@@ -381,8 +381,9 @@ std::vector<TbotsProto::RobotStatus> ErForceSimulator::getBlueRobotStatuses() co
     {
         auto robot_status = TbotsProto::RobotStatus();
         robot_status.set_robot_id(sim_robot.id());
-        *(robot_status.mutable_global_velocity()) =
-            *createVectorProto(Vector(sim_robot.v_x(), sim_robot.v_y()));
+        *(robot_status.mutable_local_velocity()) =
+            *createVectorProto(Vector(sim_robot.v_x(), sim_robot.v_y())
+                                   .rotate(Angle::fromRadians(sim_robot.angle())));
         robot_statuses.push_back(robot_status);
     }
 
@@ -409,8 +410,9 @@ std::vector<TbotsProto::RobotStatus> ErForceSimulator::getYellowRobotStatuses() 
     {
         auto robot_status = TbotsProto::RobotStatus();
         robot_status.set_robot_id(sim_robot.id());
-        *(robot_status.mutable_global_velocity()) =
-            *createVectorProto(Vector(sim_robot.v_x(), sim_robot.v_y()));
+        *(robot_status.mutable_local_velocity()) =
+            *createVectorProto(Vector(sim_robot.v_x(), sim_robot.v_y())
+                                   .rotate(Angle::fromRadians(sim_robot.angle())));
         robot_statuses.push_back(robot_status);
     }
 

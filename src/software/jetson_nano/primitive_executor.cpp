@@ -41,15 +41,7 @@ Vector PrimitiveExecutor::getTargetLinearVelocity(const unsigned int robot_id,
                                                   const Angle& orientation)
 {
     Vector target_global_velocity = hrvo_simulator_.getRobotVelocity(robot_id);
-
-    double local_x_velocity = orientation.cos() * target_global_velocity.x() +
-                              orientation.sin() * target_global_velocity.y();
-
-    double local_y_velocity = -orientation.sin() * target_global_velocity.x() +
-                              orientation.cos() * target_global_velocity.y();
-
-    return Vector(local_x_velocity, local_y_velocity)
-        .normalize(target_global_velocity.length());
+    return target_global_velocity.rotate(-orientation);
 }
 
 AngularVelocity PrimitiveExecutor::getTargetAngularVelocity(
