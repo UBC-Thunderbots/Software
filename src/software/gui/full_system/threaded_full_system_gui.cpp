@@ -104,12 +104,6 @@ void ThreadedFullSystemGUI::onValueReceived(World world)
         view_area_buffer->push(world.field().fieldBoundary());
     }
 
-    LOG(VISUALIZE) << *createNamedValue(
-        "World Hz",
-        static_cast<float>(
-            FirstInFirstOutThreadedObserver<World>::getDataReceivedPerSecond()));
-
-
     worlds_received_per_second_buffer->push(
         FirstInFirstOutThreadedObserver<World>::getDataReceivedPerSecond());
 }
@@ -131,11 +125,6 @@ void ThreadedFullSystemGUI::onValueReceived(SensorProto sensor_msg)
 
 void ThreadedFullSystemGUI::onValueReceived(TbotsProto::PrimitiveSet primitive_msg)
 {
-    LOG(VISUALIZE) << *createNamedValue(
-        "Primitive Hz",
-        static_cast<float>(FirstInFirstOutThreadedObserver<
-                           TbotsProto::PrimitiveSet>::getDataReceivedPerSecond()));
-
     primitives_sent_per_second_buffer->push(
         FirstInFirstOutThreadedObserver<
             TbotsProto::PrimitiveSet>::getDataReceivedPerSecond());

@@ -24,7 +24,7 @@
 STP::STP(std::shared_ptr<const AiConfig> ai_config)
     : robot_tactic_assignment(),
       ai_config(ai_config),
-      goalie_tactic(std::make_shared<GoalieTactic>(ai_config->getGoalieTacticConfig())),
+      goalie_tactic(std::make_shared<GoalieTactic>(ai_config)),
       stop_tactics(),
       current_play(std::make_unique<HaltPlay>(ai_config)),
       fsm(std::make_unique<FSM<PlaySelectionFSM>>(PlaySelectionFSM{ai_config})),
@@ -153,8 +153,9 @@ std::map<std::shared_ptr<const Tactic>, Robot> STP::assignRobotsToTactics(
     //
     // https://github.com/saebyn/munkres-cpp is the implementation of the Hungarian
     // algorithm that we use here
-    for (auto tactic_vector : tactics)
+    for (unsigned int i = 0; i < tactics.size(); i++)
     {
+        auto tactic_vector = tactics[i];
         size_t num_tactics = tactic_vector.size();
 
         if (robots.size() < tactic_vector.size())
@@ -165,10 +166,11 @@ std::map<std::shared_ptr<const Tactic>, Robot> STP::assignRobotsToTactics(
             tactic_vector.resize(robots.size());
             num_tactics = tactic_vector.size();
         }
-        else
+        else if (i == (tactics.size() - 1))
         {
-            // Assign rest of robots with StopTactic
-            for (unsigned int i = 0; i < (robots.size() - tactic_vector.size()); i++)
+            // If assigning the last tactic vector, then assign rest of robots with
+            // StopTactics
+            for (unsigned int i = 0; i < (robots.size() - num_tactics); i++)
             {
                 tactic_vector.push_back(stop_tactics[i]);
             }
@@ -238,7 +240,7 @@ std::map<std::shared_ptr<const Tactic>, Robot> STP::assignRobotsToTactics(
 
         for (size_t row = 0; row < num_rows; row++)
         {
-            for (size_t col = 0; col < num_tactics; col++)
+            for (size_t col = 0; col < num_cols; col++)
             {
                 auto val = matrix(row, col);
                 if (val == 0)

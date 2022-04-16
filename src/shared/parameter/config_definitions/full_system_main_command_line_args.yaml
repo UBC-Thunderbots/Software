@@ -35,11 +35,10 @@ include:
         be the `SensorMsg` folder outputted by `proto_log_output_dir`.
 
 - string:
-    name: logging_dir
-    value: ""
+    name: runtime_dir
+    value: "/tmp/tbots"
     description: >-
-        The directory to output logs to. Absolute paths are recommended as the working directory
-        is inside the bazel-out directory.
+        The directory to output logs and setup unix sockets.
 
 - int:
       name: channel

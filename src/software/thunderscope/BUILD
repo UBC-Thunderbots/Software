@@ -8,21 +8,30 @@ py_binary(
     deps = [
         "//proto:software_py_proto",
         "//software/networking:threaded_unix_listener_py",
-        "//software/thunderscope:ProtoReceiver",
+        "//software/networking:threaded_unix_sender_py",
         "//software/thunderscope:colors",
+        "//software/thunderscope:common_widgets",
         "//software/thunderscope:constants",
+        "//software/thunderscope:proto_receiver",
         "//software/thunderscope/arbitrary_plot:named_value_plotter",
+        "//software/thunderscope/chicker",
         "//software/thunderscope/field",
         "//software/thunderscope/field:field_layer",
+        "//software/thunderscope/field:obstacle_layer",
+        "//software/thunderscope/field:path_layer",
+        "//software/thunderscope/field:validation_layer",
+        "//software/thunderscope/field:world_layer",
         "//software/thunderscope/log:g3log_checkboxes",
         "//software/thunderscope/log:g3log_widget",
+        "//software/thunderscope/play:playinfo_widget",
+        "//software/thunderscope/robot_diagnostics:drive_and_dribbler_widget",
         requirement("pyqtgraph"),
         requirement("numpy"),
     ],
 )
 
 py_library(
-    name = "ProtoReceiver",
+    name = "proto_receiver",
     srcs = ["proto_receiver.py"],
 )
 
@@ -34,4 +43,9 @@ py_library(
 py_library(
     name = "colors",
     srcs = ["colors.py"],
+)
+
+py_library(
+    name = "common_widgets",
+    srcs = ["common_widgets.py"],
 )

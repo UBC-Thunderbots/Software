@@ -38,18 +38,16 @@
 #include <iostream>
 #include <limits>
 
-#include "goal.h"
 #include "kd_tree.h"
+#include "path.h"
 #include "software/geom/vector.h"
 
 
-HRVOAgent::HRVOAgent(HRVOSimulator *simulator, const Vector &position,
-                     std::size_t goalIndex, float neighborDist, std::size_t maxNeighbors,
-                     float radius, const Vector &velocity, float maxAccel,
-                     float goalRadius, float prefSpeed, float maxSpeed,
+HRVOAgent::HRVOAgent(HRVOSimulator *simulator, const Vector &position, float neighborDist,
+                     std::size_t maxNeighbors, float radius, const Vector &velocity,
+                     float maxAccel, AgentPath &path, float prefSpeed, float maxSpeed,
                      float uncertaintyOffset)
-    : Agent(simulator, position, radius, velocity, velocity, maxSpeed, maxAccel,
-            goalIndex, goalRadius),
+    : Agent(simulator, position, radius, velocity, velocity, maxSpeed, maxAccel, path),
       maxNeighbors_(maxNeighbors),
       neighborDist_(neighborDist),
       prefSpeed_(prefSpeed),
@@ -61,15 +59,21 @@ void HRVOAgent::computeNeighbors()
 {
     neighbors_.clear();
 
-    std::unique_ptr<Goal> &current_goal = simulator_->goals[goal_index_];
-    float new_neighbor_dist             = std::min(
-        static_cast<double>(neighborDist_),
-        (position_ - current_goal->getCurrentGoalPosition()).length() + goal_radius_);
+    if (path.getCurrentPathPoint() == std::nullopt)
+    {
+        return;
+    }
+
+    Vector current_dest = path.getCurrentPathPoint().value().getPosition();
+
+    float new_neighbor_dist =
+        std::min(static_cast<double>(neighborDist_),
+                 (position_ - current_dest).length() + path.getPathRadius());
 
     simulator_->getKdTree()->query(this, new_neighbor_dist);
 }
 
-Agent::VelocityObstacle HRVOAgent::createVelocityObstacle(const Agent &other_agent)
+VelocityObstacle HRVOAgent::createVelocityObstacle(const Agent &other_agent)
 {
     VelocityObstacle velocityObstacle;
     if ((position_ - other_agent.getPosition()).lengthSquared() >
@@ -89,6 +93,8 @@ Agent::VelocityObstacle HRVOAgent::createVelocityObstacle(const Agent &other_age
             Vector::createFromAngle(Angle::fromRadians(angle - openingAngle));
         velocityObstacle.side2_ =
             Vector::createFromAngle(Angle::fromRadians(angle + openingAngle));
+
+	assert(velocityObstacle.side1_.isToTheRightOf(velocityObstacle.side2_));
 
         const float d = std::sin(2.f * openingAngle);
 
@@ -427,16 +433,14 @@ void HRVOAgent::computeNewVelocity()
     };
 
     // Choosing a candidate point has these goals:
-    // - Pick a velcoty as close as possible to the preferred velocity as long as it
+    // - Pick a velocity as close as possible to the preferred velocity as long as it
     // doesn't lie in any velocity obstacle.
     // - Failing the first condition, then choose the best preferred velocity that
     // minimizes collisions with the closest velocity obstacle
     // - Candidate multimap is organized by distance from preferred velocity so all we
-    // have to do is pick the first 		velocity that is valid
-    for (std::pair<float, Candidate> candidate_pair : candidates_)
+    // have to do is pick the first velocity that is valid
+    for (auto [dist_sq, candidate] : candidates_)
     {
-        candidate = candidate_pair.second;
-
         int first_intersecting_velocity_obstacle =
             firstIntersectingVelocityObstacle(candidate);
 
@@ -470,18 +474,21 @@ void HRVOAgent::computeNewVelocity()
 
 void HRVOAgent::computePreferredVelocity()
 {
-    if (prefSpeed_ <= 0.01f || max_accel_ <= 0.01f)
+    auto path_point_opt = path.getCurrentPathPoint();
+
+    if (prefSpeed_ <= 0.01f || max_accel_ <= 0.01f || path_point_opt == std::nullopt)
     {
         // Used to avoid edge cases with division by zero
         pref_velocity_ = Vector(0.f, 0.f);
         return;
     }
 
-    std::unique_ptr<Goal> &nextGoal = simulator_->goals[goal_index_];
-    Vector goalPosition             = nextGoal->getCurrentGoalPosition();
-    float speedAtGoal               = nextGoal->getDesiredSpeedAtCurrentGoal();
-    Vector distVectorToGoal         = goalPosition - position_;
-    auto distToGoal                 = static_cast<float>(distVectorToGoal.length());
+    Vector goalPosition = path_point_opt.value().getPosition();
+    float speedAtGoal   = path_point_opt.value().getSpeed();
+
+    Vector distVectorToGoal = goalPosition - position_;
+    auto distToGoal         = static_cast<float>(distVectorToGoal.length());
+
     // d = (Vf^2 - Vi^2) / 2a
     double startLinearDecelerationDistance =
         std::abs((std::pow(speedAtGoal, 2) - std::pow(prefSpeed_, 2)) /
@@ -526,62 +533,65 @@ void HRVOAgent::computePreferredVelocity()
 void HRVOAgent::insertNeighbor(std::size_t agentNo, float &rangeSq)
 {
     std::shared_ptr<Agent> other_agent = simulator_->getAgents()[agentNo];
+    auto path_point_opt                = path.getCurrentPathPoint();
 
-    if (this != other_agent.get())
+    if (path_point_opt == std::nullopt || this == other_agent.get())
     {
-        Vector other_agent_relative_pos = other_agent->getPosition() - position_;
-        const float distSq              = other_agent_relative_pos.lengthSquared();
+        return;
+    }
 
-        Vector goal_pos = simulator_->goals[goal_index_]->getCurrentGoalPosition();
-        Vector relative_goal_pos = goal_pos - position_;
+    Vector other_agent_relative_pos = other_agent->getPosition() - position_;
+    const float distSq              = other_agent_relative_pos.lengthSquared();
 
-        // Whether the other robot is with in 45 degrees of the goal, relative to us
-        const float forty_five_deg_ratio = 1.f / std::sqrt(2.f);
-        bool is_other_agent_in_front =
-            relative_goal_pos.normalize().dot(other_agent_relative_pos.normalize()) >
-            forty_five_deg_ratio;
+    Vector goal_pos          = path_point_opt.value().getPosition();
+    Vector relative_goal_pos = goal_pos - position_;
 
-        bool is_other_agent_moving_towards_us =
-            velocity_.normalize().dot((other_agent->getVelocity()).normalize()) <
-            -forty_five_deg_ratio;
+    // Whether the other robot is with in 45 degrees of the goal, relative to us
+    const float forty_five_deg_ratio = 1.f / std::sqrt(2.f);
+    bool is_other_agent_in_front =
+        relative_goal_pos.normalize().dot(other_agent_relative_pos.normalize()) >
+        forty_five_deg_ratio;
 
-        // Whether the other agent is within a 1.5-meter radius of our goal
-        bool is_other_agent_near_goal =
-            (other_agent->getPosition() - goal_pos).lengthSquared() < 1.5f;
+    bool is_other_agent_moving_towards_us =
+        velocity_.normalize().dot((other_agent->getVelocity()).normalize()) <
+        -forty_five_deg_ratio;
 
-        // Helper lambda function for adding other_agent to list of neighbors
-        auto add_other_agent = [&]() {
-            if (neighbors_.size() == maxNeighbors_)
-            {
-                neighbors_.erase(--neighbors_.end());
-            }
+    // Whether the other agent is within a 1.5-meter radius of our goal
+    bool is_other_agent_near_goal =
+        (other_agent->getPosition() - goal_pos).lengthSquared() < 1.5f;
 
-            neighbors_.insert(std::make_pair(distSq, agentNo));
-
-            if (neighbors_.size() == maxNeighbors_)
-            {
-                rangeSq = (--neighbors_.end())->first;
-            }
-        };
-
-        if (distSq < std::pow(radius_ + other_agent->getRadius(), 2))
+    // Helper lambda function for adding other_agent to list of neighbors
+    auto add_other_agent = [&]() {
+        if (neighbors_.size() == maxNeighbors_)
         {
-            // In collision with other agent, so the other neighbors are not important
-            neighbors_.clear();
-            add_other_agent();
+            neighbors_.erase(--neighbors_.end());
         }
-        else if (distSq < rangeSq)
+
+        neighbors_.insert(std::make_pair(distSq, agentNo));
+
+        if (neighbors_.size() == maxNeighbors_)
         {
-            add_other_agent();
+            rangeSq = (--neighbors_.end())->first;
         }
-        else if (is_other_agent_in_front && is_other_agent_moving_towards_us &&
-                 is_other_agent_near_goal)
-        {
-            // This is an edge case for when the other agent is outside our search range,
-            // but is moving towards us from behind our destination, so it is posing a
-            // possible threat of collision if we ignore it.
-            add_other_agent();
-        }
+    };
+
+    if (distSq < std::pow(radius_ + other_agent->getRadius(), 2))
+    {
+        // In collision with other agent, so the other neighbors are not important
+        neighbors_.clear();
+        add_other_agent();
+    }
+    else if (distSq < rangeSq)
+    {
+        add_other_agent();
+    }
+    else if (is_other_agent_in_front && is_other_agent_moving_towards_us &&
+             is_other_agent_near_goal)
+    {
+        // This is an edge case for when the other agent is outside our search range,
+        // but is moving towards us from behind our destination, so it is posing a
+        // possible threat of collision if we ignore it.
+        add_other_agent();
     }
 }
 

@@ -264,7 +264,7 @@ TEST_F(SimulatedHRVOTest, test_start_in_local_minima)
 
     runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(7));
+            Duration::fromSeconds(6));
 }
 
 TEST_F(SimulatedHRVOTest, test_start_in_local_minima_with_open_end)
@@ -275,7 +275,7 @@ TEST_F(SimulatedHRVOTest, test_start_in_local_minima_with_open_end)
     auto friendly_robots =
         TestUtil::createStationaryRobotStatesWithId({Point(-3, 0), initial_position});
     auto enemy_robots = TestUtil::createStationaryRobotStatesWithId(
-        {Point(2, 0), Point(1, 0.3), Point(1, 0.6), Point(0.7, 0.6), Point(1, -0.3),
+        {Point(1.5, 0), Point(1, 0.3), Point(1, 0.6), Point(0.7, 0.6), Point(1, -0.3),
          Point(1, -0.6), Point(0.7, -0.6)});
 
     auto tactic = std::make_shared<MoveTactic>();

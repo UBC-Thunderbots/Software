@@ -110,7 +110,7 @@ double RNG::uniformPositive()
  * normal distribution \param sigma Standard deviation \param mean Expected
  * value \return A random vector drawn from a normal distribution
  */
-Vector RNG::normalVector(double sigma, double mean)
+ErForceVector RNG::normalVector(double sigma, double mean)
 {
     double u;
     double v;
@@ -127,5 +127,5 @@ Vector RNG::normalVector(double sigma, double mean)
     // Box-Muller transform (polar)
     const double tmp = sigma * std::sqrt(-2.0 * std::log(s) / s);
 
-    return Vector(tmp * u + mean, tmp * v + mean);
+    return ErForceVector(tmp * u + mean, tmp * v + mean);
 }

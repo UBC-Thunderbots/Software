@@ -1,6 +1,8 @@
 #pragma once
 
+#include "extlibs/hrvo/path.h"
 #include "software/geom/vector.h"
+#include "extlibs/hrvo/velocity_obstacle.h"
 
 class HRVOSimulator;
 
@@ -20,32 +22,13 @@ class Agent
      * @param prefVelocity       The preferred velocity of this agent.
      * @param maxSpeed           The maximum speed of this agent.
      * @param maxAccel           The maximum acceleration of this agent.
-     * @param goalIndex          The index of the Goal which this agent should go to.
-     * @param goalRadius         The goal radius of this agent.
+     * @param path               The path for this agent
      */
     Agent(HRVOSimulator *simulator, const Vector &position, float radius,
           const Vector &velocity, const Vector &prefVelocity, float maxSpeed,
-          float maxAccel, std::size_t goalIndex, float goalRadius);
+          float maxAccel, AgentPath &path);
 
     virtual ~Agent() = default;
-
-    /**
-     * A hybrid reciprocal velocity obstacle.
-     */
-    class VelocityObstacle
-    {
-       public:
-        VelocityObstacle() = default;
-
-        // The position of the apex of the hybrid reciprocal velocity obstacle.
-        Vector apex_;
-
-        // The direction of the first side of the hybrid reciprocal velocity obstacle.
-        Vector side1_;
-
-        // The direction of the second side of the hybrid reciprocal velocity obstacle.
-        Vector side2_;
-    };
 
     /**
      * Computes the new velocity of this agent.
@@ -98,7 +81,7 @@ class Agent
      *
      * @return The goal radius of the agent
      */
-    float getGoalRadius() const;
+    float getPathRadius() const;
 
     /**
      * Return the preferred velocity of the agent
@@ -120,6 +103,18 @@ class Agent
      * @return True if this agent has reached its final goal, false otherwise.
      */
     bool hasReachedGoal() const;
+
+    /**
+     * Gets the the path for this agent
+     * @return Path for this agent
+     */
+    const AgentPath &getPath() const;
+
+    /**
+     * Gets the max speed for this agent
+     * @return max speed for this agent
+     */
+    float getMaxSpeed() const;
 
     /**
      * Update position of Agent
@@ -145,6 +140,12 @@ class Agent
      */
     void setMaxSpeed(float max_speed);
 
+    /**
+     * Sets a new path for this agent
+     * @param new_path new path for this agent
+     */
+    void setPath(const AgentPath &new_path);
+
    protected:
     // Agent Properties
     Vector position_;
@@ -158,15 +159,12 @@ class Agent
     // NOTE: HRVO algorithm will try to pick this speed, however, it may pick a different
     // speed to avoid collisions.
     Vector pref_velocity_;
+    // The path of this Agent
+    AgentPath path;
 
     float max_speed_;
     float max_accel_;
-
-    std::size_t goal_index_;
-    float goal_radius_;
     bool reached_goal_;
 
-    // TODO (#2373): Remove once new Path class is added and add timeStep as a argument to
-    // update(time_step)
     HRVOSimulator *const simulator_;
 };
