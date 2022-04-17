@@ -149,6 +149,9 @@ py_library(
 py_library(
     name = "threaded_unix_sender_py",
     srcs = ["threaded_unix_sender.py"],
+    data = [
+        "//software:py_constants.so",
+    ],
     deps = [
         "//proto:software_py_proto",
         "//software/logger:py_logger",

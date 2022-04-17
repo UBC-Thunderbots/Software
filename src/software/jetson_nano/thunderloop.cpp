@@ -27,20 +27,17 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants,
     robot_constants_ = robot_constants;
     wheel_consants_  = wheel_consants;
 
-    robot_status_.set_robot_id(1);
-
-    // motor_service_   = std::make_unique<MotorService>(robot_constants, wheel_consants);
+    motor_service_   = std::make_unique<MotorService>(robot_constants, wheel_consants);
     network_service_ = std::make_unique<NetworkService>(
         std::string(ROBOT_MULTICAST_CHANNELS[channel_id_]) + "%" + "eth0", VISION_PORT,
         PRIMITIVE_PORT, ROBOT_STATUS_PORT, true);
-    // redis_client_ = std::make_unique<RedisClient>(REDIS_DEFAULT_HOST,
-    // REDIS_DEFAULT_PORT);
+    redis_client_ = std::make_unique<RedisClient>(REDIS_DEFAULT_HOST, REDIS_DEFAULT_PORT);
 }
 
 Thunderloop::~Thunderloop()
 {
     // De-initialize Services
-    // motor_service_->stop();
+    motor_service_->stop();
 }
 
 /*
@@ -62,7 +59,7 @@ void Thunderloop::runLoop()
         static_cast<int>(1.0f / static_cast<float>(loop_hz_) * NANOSECONDS_PER_SECOND);
 
     // Start the services
-    // motor_service_->start();
+    motor_service_->start();
 
     // Get current time
     // Note: CLOCK_MONOTONIC is used over CLOCK_REALTIME since CLOCK_REALTIME can jump
@@ -136,7 +133,7 @@ void Thunderloop::runLoop()
             // Run the motor service with the direct_control_ msg
             {
                 ScopedTimespecTimer timer(&poll_time);
-                // drive_units_status_ = *motor_service_->poll(direct_control_);
+                drive_units_status_ = *motor_service_->poll(direct_control_);
             }
             thunderloop_status_.set_motor_service_poll_time_ns(
                 static_cast<unsigned long>(poll_time.tv_nsec));

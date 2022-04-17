@@ -202,7 +202,6 @@ class Simulator(object):
         for arg in [
             (self.simulator_runtime_dir + SIMULATION_TICK_PATH, SimulatorTick),
             (self.simulator_runtime_dir + WORLD_STATE_PATH, WorldState),
-            (self.simulator_runtime_dir + SIMULATOR_STATE_PATH, SimulatorState),
         ]:
             simulator_proto_unix_io.attach_unix_sender(*arg)
 
@@ -216,6 +215,7 @@ class Simulator(object):
         for arg in [
             (self.simulator_runtime_dir + BLUE_SSL_WRAPPER_PATH, SSL_WrapperPacket),
             (self.simulator_runtime_dir + BLUE_ROBOT_STATUS_PATH, RobotStatus),
+            (self.simulator_runtime_dir + SIMULATOR_STATE_PATH, SimulatorState),
         ]:
             blue_full_system_proto_unix_io.attach_unix_receiver(*arg)
 

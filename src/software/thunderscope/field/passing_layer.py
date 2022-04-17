@@ -79,7 +79,7 @@ class PassingLayer(FieldLayer):
             if pass_num == 0:
                 painter.setPen(pg.mkPen("green", width=constants.LINE_WIDTH * 2))
             else:
-                painter.setPen(pg.mkPen("blue", width=constants.LINE_WIDTH))
+                painter.setPen(pg.mkPen("white", width=constants.LINE_WIDTH))
 
             painter.drawEllipse(
                 self.createCircle(
