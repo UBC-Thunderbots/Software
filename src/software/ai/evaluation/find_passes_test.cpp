@@ -27,23 +27,14 @@ TEST(FindPasses, find_all_passes_with_no_enemies)
                                    AngularVelocity::zero(), Timestamp::fromSeconds(0));
     friendly_team.updateRobots({initial_robot, friendly_robot_1, friendly_robot_2,
                                 friendly_robot_3, friendly_robot_4});
-    std::vector<Pass> direct_passes =
-        findDirectPasses(initial_robot, friendly_team, enemy_team);
-    std::vector<Pass> indirect_passes =
-        findIndirectPasses(initial_robot, friendly_team, enemy_team);
 
-    std::vector<Pass> expected_direct_passes = {
-        Pass(initial_robot.position(), friendly_robot_1.position(),
-             BALL_MAX_SPEED_METERS_PER_SECOND),
-        Pass(initial_robot.position(), friendly_robot_2.position(),
-             BALL_MAX_SPEED_METERS_PER_SECOND),
-        Pass(initial_robot.position(), friendly_robot_3.position(),
-             BALL_MAX_SPEED_METERS_PER_SECOND),
-        Pass(initial_robot.position(), friendly_robot_4.position(),
-             BALL_MAX_SPEED_METERS_PER_SECOND)};
-    std::vector<Pass> expected_indirect_passes = {};
-    EXPECT_EQ(expected_direct_passes, direct_passes);
-    EXPECT_EQ(expected_indirect_passes, indirect_passes);
+    AllPasses all_passes = findAllPasses(initial_robot, friendly_team, enemy_team);
+    std::vector<Point> expected_direct_passes = {
+        friendly_robot_1.position(), friendly_robot_2.position(),
+        friendly_robot_3.position(), friendly_robot_4.position()};
+    std::vector<Point> expected_indirect_passes = {};
+    EXPECT_EQ(expected_direct_passes, all_passes.direct_passes);
+    EXPECT_EQ(expected_indirect_passes, all_passes.indirect_passes);
 }
 
 TEST(FindPasses, find_all_passes_with_one_enemy)
@@ -73,23 +64,16 @@ TEST(FindPasses, find_all_passes_with_one_enemy)
     friendly_team.updateRobots({initial_robot, friendly_robot_1, friendly_robot_2,
                                 friendly_robot_3, friendly_robot_4});
     enemy_team.updateRobots({enemy_robot_0});
-    std::vector<Pass> direct_passes =
-        findDirectPasses(initial_robot, friendly_team, enemy_team);
-    std::vector<Pass> indirect_passes =
-        findIndirectPasses(initial_robot, friendly_team, enemy_team);
+    AllPasses all_passes = findAllPasses(initial_robot, friendly_team, enemy_team);
 
-    std::vector<Pass> expected_direct_passes = {
-        Pass(initial_robot.position(), friendly_robot_2.position(),
-             BALL_MAX_SPEED_METERS_PER_SECOND),
-        Pass(initial_robot.position(), friendly_robot_3.position(),
-             BALL_MAX_SPEED_METERS_PER_SECOND),
-        Pass(initial_robot.position(), friendly_robot_4.position(),
-             BALL_MAX_SPEED_METERS_PER_SECOND)};
-    std::vector<Pass> expected_indirect_passes = {Pass(initial_robot.position(),
-                                                       friendly_robot_1.position(),
-                                                       BALL_MAX_SPEED_METERS_PER_SECOND)};
-    EXPECT_EQ(expected_direct_passes, direct_passes);
-    EXPECT_EQ(expected_indirect_passes, indirect_passes);
+    std::vector<Point> expected_direct_passes = {
+        friendly_robot_2.position(),
+        friendly_robot_3.position(),
+        friendly_robot_4.position(),
+    };
+    std::vector<Point> expected_indirect_passes = {friendly_robot_1.position()};
+    EXPECT_EQ(expected_direct_passes, all_passes.direct_passes);
+    EXPECT_EQ(expected_indirect_passes, all_passes.indirect_passes);
 }
 
 TEST(FindPasses, find_all_passes_with_one_enemy_not_directly_in_path)
@@ -119,23 +103,19 @@ TEST(FindPasses, find_all_passes_with_one_enemy_not_directly_in_path)
     friendly_team.updateRobots({initial_robot, friendly_robot_1, friendly_robot_2,
                                 friendly_robot_3, friendly_robot_4});
     enemy_team.updateRobots({enemy_robot_0});
-    std::vector<Pass> direct_passes =
-        findDirectPasses(initial_robot, friendly_team, enemy_team);
-    std::vector<Pass> indirect_passes =
-        findIndirectPasses(initial_robot, friendly_team, enemy_team);
+    AllPasses all_passes = findAllPasses(initial_robot, friendly_team, enemy_team);
 
-    std::vector<Pass> expected_direct_passes = {
-        Pass(initial_robot.position(), friendly_robot_2.position(),
-             BALL_MAX_SPEED_METERS_PER_SECOND),
-        Pass(initial_robot.position(), friendly_robot_3.position(),
-             BALL_MAX_SPEED_METERS_PER_SECOND),
-        Pass(initial_robot.position(), friendly_robot_4.position(),
-             BALL_MAX_SPEED_METERS_PER_SECOND)};
-    std::vector<Pass> expected_indirect_passes = {Pass(initial_robot.position(),
-                                                       friendly_robot_1.position(),
-                                                       BALL_MAX_SPEED_METERS_PER_SECOND)};
-    EXPECT_EQ(expected_direct_passes, direct_passes);
-    EXPECT_EQ(expected_indirect_passes, indirect_passes);
+
+    std::vector<Point> expected_direct_passes = {
+        friendly_robot_2.position(),
+        friendly_robot_3.position(),
+        friendly_robot_4.position(),
+    };
+    std::vector<Point> expected_indirect_passes = {
+        friendly_robot_1.position(),
+    };
+    EXPECT_EQ(expected_direct_passes, all_passes.direct_passes);
+    EXPECT_EQ(expected_indirect_passes, all_passes.indirect_passes);
 }
 
 
@@ -174,26 +154,15 @@ TEST(FindPasses, find_no_direct_passes)
     friendly_team.updateRobots({initial_robot, friendly_robot_1, friendly_robot_2,
                                 friendly_robot_3, friendly_robot_4});
     enemy_team.updateRobots({enemy_robot_0, enemy_robot_1, enemy_robot_2, enemy_robot_3});
-    std::vector<Pass> passes = findDirectPasses(initial_robot, friendly_team, enemy_team);
+    AllPasses all_passes = findAllPasses(initial_robot, friendly_team, enemy_team);
 
+    std::vector<Point> expected_direct_passes   = {};
+    std::vector<Point> expected_indirect_passes = {
+        friendly_robot_1.position(), friendly_robot_2.position(),
+        friendly_robot_3.position(), friendly_robot_4.position()};
 
-    std::vector<Pass> direct_passes =
-        findDirectPasses(initial_robot, friendly_team, enemy_team);
-    std::vector<Pass> indirect_passes =
-        findIndirectPasses(initial_robot, friendly_team, enemy_team);
-    std::vector<Pass> expected_direct_passes   = {};
-    std::vector<Pass> expected_indirect_passes = {
-        Pass(initial_robot.position(), friendly_robot_1.position(),
-             BALL_MAX_SPEED_METERS_PER_SECOND),
-        Pass(initial_robot.position(), friendly_robot_2.position(),
-             BALL_MAX_SPEED_METERS_PER_SECOND),
-        Pass(initial_robot.position(), friendly_robot_3.position(),
-             BALL_MAX_SPEED_METERS_PER_SECOND),
-        Pass(initial_robot.position(), friendly_robot_4.position(),
-             BALL_MAX_SPEED_METERS_PER_SECOND)};
-
-    EXPECT_EQ(expected_direct_passes, direct_passes);
-    EXPECT_EQ(expected_indirect_passes, indirect_passes);
+    EXPECT_EQ(expected_direct_passes, all_passes.direct_passes);
+    EXPECT_EQ(expected_indirect_passes, all_passes.indirect_passes);
 }
 
 
@@ -232,15 +201,13 @@ TEST(FindPasses, find_passes_with_no_open_robots)
     friendly_team.updateRobots({initial_robot, friendly_robot_1, friendly_robot_2,
                                 friendly_robot_3, friendly_robot_4});
     enemy_team.updateRobots({enemy_robot_0, enemy_robot_1, enemy_robot_2, enemy_robot_3});
-    std::vector<Pass> direct_passes =
-        findDirectPasses(initial_robot, friendly_team, enemy_team);
-    std::vector<Pass> indirect_passes =
-        findIndirectPasses(initial_robot, friendly_team, enemy_team);
-    std::vector<Pass> expected_direct_passes   = {};
-    std::vector<Pass> expected_indirect_passes = {};
+    AllPasses all_passes = findAllPasses(initial_robot, friendly_team, enemy_team);
 
-    EXPECT_EQ(expected_direct_passes, direct_passes);
-    EXPECT_EQ(expected_indirect_passes, indirect_passes);
+    std::vector<Point> expected_direct_passes   = {};
+    std::vector<Point> expected_indirect_passes = {};
+
+    EXPECT_EQ(expected_direct_passes, all_passes.direct_passes);
+    EXPECT_EQ(expected_indirect_passes, all_passes.indirect_passes);
 }
 
 
@@ -265,19 +232,12 @@ TEST(FindPasses, find_passes_with_friendly_robots_blocking_passes)
 
     friendly_team.updateRobots(
         {initial_robot, friendly_robot_1, friendly_robot_2, friendly_robot_3});
-    std::vector<Pass> direct_passes =
-        findDirectPasses(initial_robot, friendly_team, enemy_team);
-    std::vector<Pass> indirect_passes =
-        findIndirectPasses(initial_robot, friendly_team, enemy_team);
-    std::vector<Pass> expected_direct_passes = {
-        Pass(initial_robot.position(), friendly_robot_1.position(),
-             BALL_MAX_SPEED_METERS_PER_SECOND),
-        Pass(initial_robot.position(), friendly_robot_3.position(),
-             BALL_MAX_SPEED_METERS_PER_SECOND)};
-    std::vector<Pass> expected_indirect_passes = {Pass(initial_robot.position(),
-                                                       friendly_robot_2.position(),
-                                                       BALL_MAX_SPEED_METERS_PER_SECOND)};
+    AllPasses all_passes = findAllPasses(initial_robot, friendly_team, enemy_team);
 
-    EXPECT_EQ(expected_direct_passes, direct_passes);
-    EXPECT_EQ(expected_indirect_passes, indirect_passes);
+    std::vector<Point> expected_direct_passes   = {friendly_robot_1.position(),
+                                                 friendly_robot_3.position()};
+    std::vector<Point> expected_indirect_passes = {friendly_robot_2.position()};
+
+    EXPECT_EQ(expected_direct_passes, all_passes.direct_passes);
+    EXPECT_EQ(expected_indirect_passes, all_passes.indirect_passes);
 }

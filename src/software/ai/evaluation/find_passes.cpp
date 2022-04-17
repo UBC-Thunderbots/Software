@@ -8,7 +8,7 @@ Circle getObstacle(const Robot& robot, double radius)
 std::vector<Circle> getObstacles(const std::vector<Robot>& robots, double radius)
 {
     std::vector<Circle> obstacles;
-    for (Robot robot : robots)
+    for (const Robot& robot : robots)
     {
         obstacles.push_back(getObstacle(robot, radius));
     }
@@ -21,10 +21,10 @@ std::vector<Robot> findOpenFriendlyRobots(const Team& friendly_team,
     std::vector<Circle> obstacles = getObstacles(enemy_team.getAllRobots(), radius);
 
     std::vector<Robot> open_robots;
-    for (Robot friendly : friendly_team.getAllRobots())
+    for (const Robot& friendly : friendly_team.getAllRobots())
     {
         if (std::all_of(obstacles.begin(), obstacles.end(),
-                        [friendly](Circle enemy_circle) {
+                        [friendly](const Circle enemy_circle) {
                             return !contains(enemy_circle, friendly.position());
                         }))
         {
@@ -34,11 +34,12 @@ std::vector<Robot> findOpenFriendlyRobots(const Team& friendly_team,
     return open_robots;
 }
 
-std::vector<Pass> findDirectPasses(const Robot& robot, const Team& friendly_team,
-                                   const Team& enemy_team)
+
+AllPasses findAllPasses(const Robot& robot, const Team& friendly_team,
+                        const Team& enemy_team, double radius)
 {
     std::vector<Robot> open_robots =
-        findOpenFriendlyRobots(friendly_team, enemy_team, ROBOT_MAX_RADIUS_METERS * 1.5);
+        findOpenFriendlyRobots(friendly_team, enemy_team, radius);
 
     open_robots.erase(remove(open_robots.begin(), open_robots.end(), robot));
     std::vector<Robot> robot_obstacles = friendly_team.getAllRobots();
@@ -46,56 +47,27 @@ std::vector<Pass> findDirectPasses(const Robot& robot, const Team& friendly_team
                            enemy_team.getAllRobots().end());
     robot_obstacles.erase(remove(robot_obstacles.begin(), robot_obstacles.end(), robot));
 
-    std::vector<Circle> obstacles =
-        getObstacles(robot_obstacles, ROBOT_MAX_RADIUS_METERS * 1.5);
-    std::vector<Pass> direct_passes;
-    for (Robot open_robot : open_robots)
+    std::vector<Circle> obstacles = getObstacles(robot_obstacles, radius);
+    std::vector<Point> direct_passes;
+    std::vector<Point> indirect_passes;
+    for (const Robot& open_robot : open_robots)
     {
-        Circle obstacle = getObstacle(open_robot, ROBOT_MAX_RADIUS_METERS * 1.5);
-        obstacles.erase(remove(obstacles.begin(), obstacles.end(), obstacle));
-        Segment possible_pass = Segment(robot.position(), open_robot.position());
-        if (std::all_of(obstacles.begin(), obstacles.end(),
-                        [possible_pass](Circle obstacle) {
-                            return !intersects(possible_pass, obstacle);
-                        }))
-        {
-            direct_passes.push_back(Pass(robot.position(), open_robot.position(),
-                                         BALL_MAX_SPEED_METERS_PER_SECOND));
-        }
-        obstacles.push_back(obstacle);
-    }
-    return direct_passes;
-}
-
-std::vector<Pass> findIndirectPasses(const Robot& robot, const Team& friendly_team,
-                                     const Team& enemy_team)
-{
-    std::vector<Robot> open_robots =
-        findOpenFriendlyRobots(friendly_team, enemy_team, ROBOT_MAX_RADIUS_METERS * 1.5);
-    open_robots.erase(remove(open_robots.begin(), open_robots.end(), robot));
-
-    std::vector<Robot> robot_obstacles = friendly_team.getAllRobots();
-    robot_obstacles.insert(robot_obstacles.begin(), enemy_team.getAllRobots().begin(),
-                           enemy_team.getAllRobots().end());
-    robot_obstacles.erase(remove(robot_obstacles.begin(), robot_obstacles.end(), robot));
-
-    std::vector<Circle> obstacles =
-        getObstacles(robot_obstacles, ROBOT_MAX_RADIUS_METERS * 1.5);
-    std::vector<Pass> indirect_passes;
-    for (Robot open_robot : open_robots)
-    {
-        Circle obstacle = getObstacle(open_robot, ROBOT_MAX_RADIUS_METERS * 1.5);
+        Circle obstacle = getObstacle(open_robot, radius);
         obstacles.erase(remove(obstacles.begin(), obstacles.end(), obstacle));
         Segment possible_pass = Segment(robot.position(), open_robot.position());
         if (std::any_of(obstacles.begin(), obstacles.end(),
-                        [possible_pass](Circle obstacle) {
+                        [possible_pass](const Circle obstacle) {
                             return intersects(possible_pass, obstacle);
                         }))
         {
-            indirect_passes.push_back(Pass(robot.position(), open_robot.position(),
-                                           BALL_MAX_SPEED_METERS_PER_SECOND));
+            indirect_passes.push_back(open_robot.position());
+        }
+        else
+        {
+            direct_passes.push_back(open_robot.position());
         }
         obstacles.push_back(obstacle);
     }
-    return indirect_passes;
+    AllPasses all_passes{direct_passes, indirect_passes};
+    return all_passes;
 }
