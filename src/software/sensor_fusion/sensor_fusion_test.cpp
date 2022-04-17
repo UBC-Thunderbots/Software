@@ -504,32 +504,26 @@ TEST_F(SensorFusionTest, test_detection_frame_wrapper_packet)
 
 TEST_F(SensorFusionTest, test_inverted_detection_frame_wrapper_packet)
 {
+    EXPECT_EQ(std::nullopt, sensor_fusion.getWorld());
+
     SensorProto sensor_msg;
+    SSLProto::Referee ssl_referee_packet;
+    ssl_referee_packet.set_blue_team_on_positive_half(false);
+    *(sensor_msg.mutable_ssl_referee_msg()) = ssl_referee_packet;
+
+    sensor_fusion.processSensorProto(sensor_msg);
 
     auto ssl_wrapper_packet =
         createSSLWrapperPacket(std::move(geom_data), initDetectionFrame());
 
-    SSLProto::Referee ssl_referee_packet;
-    ssl_referee_packet.set_blue_team_on_positive_half(false);
+    SensorProto sensor_msg_2;
+    *(sensor_msg_2.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
 
-    *(sensor_msg.mutable_ssl_vision_msg())  = *ssl_wrapper_packet;
-    *(sensor_msg.mutable_ssl_referee_msg()) = ssl_referee_packet;
-
-    EXPECT_EQ(std::nullopt, sensor_fusion.getWorld());
-    sensor_fusion.processSensorProto(sensor_msg);
+    sensor_fusion.processSensorProto(sensor_msg_2);
     auto result = sensor_fusion.getWorld();
-    sensor_fusion.processSensorProto(sensor_msg);
 
-    result = sensor_fusion.getWorld();
-    sensor_fusion.processSensorProto(sensor_msg);
-
-    result = sensor_fusion.getWorld();
     ASSERT_TRUE(result);
-    std::cerr << "INVERTED WORLD" << std::endl;
-    std::cerr << createWorld(initInvertedWorld())->DebugString() << std::endl;
-    std::cerr << "RESULT WORLD" << std::endl;
-    std::cerr << createWorld(*result)->DebugString() << std::endl;
-    EXPECT_EQ(initWorld(), *result);
+    EXPECT_EQ(initInvertedWorld(), *result);
 }
 
 TEST_F(SensorFusionTest, test_complete_wrapper_packet)

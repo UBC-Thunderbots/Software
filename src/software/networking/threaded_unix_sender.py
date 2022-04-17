@@ -9,6 +9,9 @@ from software.py_constants import UNIX_BUFFER_SIZE
 
 
 class ThreadedUnixSender:
+
+    MAX_SEND_FAILURES_BEFORE_LOG = 100
+
     def __init__(self, unix_path, max_buffer_size=3):
 
         """Send protobufs over unix sockets
@@ -31,6 +34,7 @@ class ThreadedUnixSender:
         # even if there are still unix listener threads running
         self.thread = Thread(target=self.__send_protobuf, daemon=True)
         self.thread.start()
+        self.send_failures = 0
 
     def force_stop(self):
         """Stop handling requests
@@ -50,7 +54,17 @@ class ThreadedUnixSender:
                 try:
                     self.socket.sendto(send, self.unix_path)
                 except Exception:
-                    logging.exception("Failed to send on {}".format(self.unix_path))
+                    self.send_failures += 1
+                    if (
+                        self.send_failures
+                        > ThreadedUnixSender.MAX_SEND_FAILURES_BEFORE_LOG
+                    ):
+                        logging.warning(
+                            "Failed to send on {}, make sure the receiver is running".format(
+                                self.unix_path
+                            )
+                        )
+                        self.send_failures = 0
 
     def send(self, proto):
         """Buffer a protobuf to be sent by the send thread

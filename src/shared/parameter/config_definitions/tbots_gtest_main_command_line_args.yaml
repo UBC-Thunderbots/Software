@@ -8,7 +8,8 @@
     name: run_sim_in_realtime
     value: false
     description: >-
-        Runs simulation in realtime, useful to look at tests in thunderscope
+        Runs simulation in realtime, useful to look at simulated C++ tests in thunderscope
+        without running ThreadedFullsystemGUI
 
 - bool:
     name: stop_ai_on_start

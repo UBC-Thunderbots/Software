@@ -217,7 +217,7 @@ def load_command_line_arguments():
 
 
 @pytest.fixture
-def simulated_test_runner():
+def simulated_test_runner(capsys):
     args = load_command_line_arguments()
     tscope = Thunderscope()
 
@@ -228,31 +228,30 @@ def simulated_test_runner():
         args.blue_fullsystem_runtime_dir, args.debug_fullsystem, False
     ) as blue_fs, FullSystem(
         args.yellow_fullsystem_runtime_dir, args.debug_fullsystem, True
-    ) as yellow_fs, Gamecontroller(
-        ci_mode=True
-    ) as gamecontroller:
+    ) as yellow_fs:
+        with Gamecontroller(ci_mode=True) as gamecontroller:
 
-        blue_fs.setup_proto_unix_io(tscope.blue_full_system_proto_unix_io)
-        yellow_fs.setup_proto_unix_io(tscope.yellow_full_system_proto_unix_io)
-        simulator.setup_proto_unix_io(
-            tscope.simulator_proto_unix_io,
-            tscope.blue_full_system_proto_unix_io,
-            tscope.yellow_full_system_proto_unix_io,
-        )
-        gamecontroller.setup_proto_unix_io(
-            tscope.blue_full_system_proto_unix_io,
-            tscope.yellow_full_system_proto_unix_io,
-        )
+            blue_fs.setup_proto_unix_io(tscope.blue_full_system_proto_unix_io)
+            yellow_fs.setup_proto_unix_io(tscope.yellow_full_system_proto_unix_io)
+            simulator.setup_proto_unix_io(
+                tscope.simulator_proto_unix_io,
+                tscope.blue_full_system_proto_unix_io,
+                tscope.yellow_full_system_proto_unix_io,
+            )
+            gamecontroller.setup_proto_unix_io(
+                tscope.blue_full_system_proto_unix_io,
+                tscope.yellow_full_system_proto_unix_io,
+            )
 
-        if args.enable_thunderscope:
-            tscope.load_saved_layout(args.layout)
+            if args.enable_thunderscope:
+                tscope.load_saved_layout(args.layout)
 
-        time.sleep(LAUNCH_DELAY_S)
+            time.sleep(LAUNCH_DELAY_S)
 
-        runner = SimulatorTestRunner(
-            thunderscope=tscope,
-            gamecontroller=gamecontroller,
-            show_thunderscope=args.enable_thunderscope,
-        )
+            runner = SimulatorTestRunner(
+                thunderscope=tscope,
+                gamecontroller=gamecontroller,
+                show_thunderscope=args.enable_thunderscope,
+            )
 
-        yield runner
+            yield runner

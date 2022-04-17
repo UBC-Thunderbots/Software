@@ -11,6 +11,12 @@ ObstacleArtist::ObstacleArtist(QGraphicsScene* scene, std::optional<QPen> pen)
 
 void ObstacleArtist::visit(const GeomObstacle<Circle>& geom_obstacle)
 {
+    // TODO (#2584) This is a nasty hack we need to visualize the obstacles
+    // using the obstacle artist.
+    //
+    // We will be visualizing static obstacles
+    // through primitives and dynamic obstacles through the HRVO layer so
+    // we can remove this hack.
     if (pen_.has_value())
     {
         drawCircle(scene_, geom_obstacle.getGeom(), pen_.value());
@@ -23,6 +29,7 @@ void ObstacleArtist::visit(const GeomObstacle<Circle>& geom_obstacle)
 
 void ObstacleArtist::visit(const GeomObstacle<Polygon>& geom_obstacle)
 {
+    // TODO (#2584) This is a nasty hack we need to visualize the obstacles
     if (pen_.has_value())
     {
         drawPolygon(scene_, geom_obstacle.getGeom(), pen_.value());
@@ -35,6 +42,7 @@ void ObstacleArtist::visit(const GeomObstacle<Polygon>& geom_obstacle)
 
 void ObstacleArtist::visit(const GeomObstacle<Rectangle>& geom_obstacle)
 {
+    // TODO (#2584) This is a nasty hack we need to visualize the obstacles
     if (pen_.has_value())
     {
         drawPolygon(scene_, geom_obstacle.getGeom(), pen_.value());

@@ -1,4 +1,6 @@
 package(default_visibility = ["//visibility:public"])
+# TODO (#2584):  This has to be public until we either remove
+# the obstacle artist or remove this folder, whichever is first.
 
 cc_library(
     name = "colors",

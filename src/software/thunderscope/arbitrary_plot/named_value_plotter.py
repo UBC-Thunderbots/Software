@@ -13,7 +13,7 @@ from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 DEQUE_SIZE = 1000
 MIN_Y_RANGE = 0
 MAX_Y_RANGE = 100
-TIME_WINDOW_TO_DISPLAY_S = 10
+TIME_WINDOW_TO_DISPLAY_S = 20
 
 
 class NamedValuePlotter(object):
@@ -41,10 +41,8 @@ class NamedValuePlotter(object):
 
         """
 
-        # Dump the entire buffer into a deque. This operation is incredibly
-        # fast because its just consuming data from the buffer and
-        # appending it to a deque. We then call setData once to update the
-        # plot.
+        # Dump the entire buffer into a deque. This operation is fast because
+        # its just consuming data from the buffer and appending it to a deque.
         for _ in range(self.named_value_buffer.queue.qsize()):
             named_value = self.named_value_buffer.get(block=False)
 

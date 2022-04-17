@@ -143,7 +143,7 @@ class SensorFusion
 
     unsigned int friendly_goalie_id;
     unsigned int enemy_goalie_id;
-    bool defending_positive_side = false;
+    bool defending_positive_side;
     int ball_in_dribbler_timeout;
 
     // The number of "reset packets" we have received. These indicate that the

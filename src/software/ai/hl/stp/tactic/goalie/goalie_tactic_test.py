@@ -166,4 +166,4 @@ def test_goalie_blocks_shot(
 
 
 if __name__ == "__main__":
-    sys.exit(pytest.main([__file__, "-svv"]))
+    sys.exit(pytest.main([__file__, "-svvv"]))

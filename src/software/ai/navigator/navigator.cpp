@@ -160,8 +160,12 @@ std::unordered_set<PathObjective> Navigator::createPathObjectives(
         }
     }
 
-    // TODO (#2510) This is a nasty hack we need to visualize the obstacles
+    // TODO (#2584) This is a nasty hack we need to visualize the obstacles
     // using the obstacle artist.
+    //
+    // We will be visualizing static obstacles
+    // through primitives and dynamic obstacles through the HRVO layer so
+    // we can remove this hack.
     ObstacleArtist obstacle_artist(NULL, std::nullopt);
     for (const auto &obstacle : getObstacles())
     {

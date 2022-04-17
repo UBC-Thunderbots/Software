@@ -16,6 +16,7 @@ SensorFusion::SensorFusion(std::shared_ptr<const SensorFusionConfig> sensor_fusi
       team_with_possession(TeamSide::ENEMY),
       friendly_goalie_id(0),
       enemy_goalie_id(0),
+      defending_positive_side(false),
       ball_in_dribbler_timeout(0),
       reset_time_vision_packets_detected(0),
       last_t_capture(0)
@@ -130,16 +131,22 @@ void SensorFusion::updateWorld(const SSLProto::Referee &packet)
     if (sensor_fusion_config->getFriendlyColorYellow()->value())
     {
         game_state.updateRefereeCommand(createRefereeCommand(packet, TeamColour::YELLOW));
-        friendly_goalie_id      = packet.yellow().goalkeeper();
-        enemy_goalie_id         = packet.blue().goalkeeper();
-        defending_positive_side = !packet.blue_team_on_positive_half();
+        friendly_goalie_id = packet.yellow().goalkeeper();
+        enemy_goalie_id    = packet.blue().goalkeeper();
+        if (packet.has_blue_team_on_positive_half())
+        {
+            defending_positive_side = !packet.blue_team_on_positive_half();
+        }
     }
     else
     {
         game_state.updateRefereeCommand(createRefereeCommand(packet, TeamColour::BLUE));
-        friendly_goalie_id      = packet.blue().goalkeeper();
-        enemy_goalie_id         = packet.yellow().goalkeeper();
-        defending_positive_side = packet.blue_team_on_positive_half();
+        friendly_goalie_id = packet.blue().goalkeeper();
+        enemy_goalie_id    = packet.yellow().goalkeeper();
+        if (packet.has_blue_team_on_positive_half())
+        {
+            defending_positive_side = packet.blue_team_on_positive_half();
+        }
     }
 
     if (game_state.isOurBallPlacement())

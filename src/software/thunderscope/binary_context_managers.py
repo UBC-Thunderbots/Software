@@ -1,5 +1,7 @@
 import os
 import socket
+import logging
+import psutil
 import time
 import google.protobuf.internal.encoder as encoder
 import google.protobuf.internal.decoder as decoder
@@ -15,9 +17,31 @@ from extlibs.er_force_sim.src.protobuf.world_pb2 import (
 )
 
 
+def is_cmd_running(command):
+    """Check if there is any running process that was launched
+    with the given command.
+
+    :param command: Command that was used to launch the process. List of strings.
+
+    """
+    for proc in psutil.process_iter():
+        try:
+            for string in command:
+                if string not in "".join(proc.cmdline()):
+                    break
+            else:
+                return True
+        except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
+            pass
+
+    return False
+
+
 class FullSystem(object):
 
     """ Full System Binary Context Manager """
+
+    DEBUG_MODE_POLL_INTERVAL_S = 0.1
 
     def __init__(
         self,
@@ -37,6 +61,7 @@ class FullSystem(object):
         self.fullsystem_runtime_dir = fullsystem_runtime_dir
         self.debug_fullsystem = debug_fullsystem
         self.friendly_colour_yellow = friendly_colour_yellow
+        self.fullsystem_proc = None
 
     def __enter__(self):
         """Enter the fullsystem context manager. 
@@ -59,13 +84,25 @@ class FullSystem(object):
         )
 
         if self.debug_fullsystem:
-            print("============ Debugging Full System ==============")
+            logging.info(
+                (
+                    "\n\nDebugging Fullsystem ==============\n\n"
+                    "1. Build the full system in debug mode:\n"
+                    "./tbots.py -d build unix_full_system\n\n"
+                    "2. Run the following binaries from src to debug full system:\n"
+                    "gdb --args bazel-bin/{}\n".format(full_system)
+                )
+            )
 
-            print("\n1. Build full system in debug mode")
-            print("./tbots.py -d build unix_full_system")
-
-            print("\n2. Run the following binaries from src to debug full system")
-            print("gdb --args bazel-bin/{}".format(full_system))
+            # We don't want to check the exact command because this binary could
+            # be debugged from clion or somewhere other than gdb
+            while not is_cmd_running(
+                [
+                    "unix_full_system",
+                    "--runtime_dir={}".format(self.fullsystem_runtime_dir),
+                ]
+            ):
+                time.sleep(Simulator.DEBUG_MODE_POLL_INTERVAL_S)
 
         else:
             self.fullsystem_proc = Popen(full_system.split(" "))
@@ -80,8 +117,9 @@ class FullSystem(object):
         :param traceback: The traceback of the exception
 
         """
-        self.fullsystem_proc.kill()
-        self.fullsystem_proc.wait()
+        if self.fullsystem_proc:
+            self.fullsystem_proc.kill()
+            self.fullsystem_proc.wait()
 
     def setup_proto_unix_io(self, proto_unix_io):
         """Helper to run full system and attach the appropriate unix senders/listeners
@@ -131,6 +169,8 @@ class Simulator(object):
 
     """ Simulator Context Manager """
 
+    DEBUG_MODE_POLL_INTERVAL_S = 0.1
+
     def __init__(self, simulator_runtime_dir=None, debug_simulator=False):
         """Run Simulator
 
@@ -143,6 +183,7 @@ class Simulator(object):
         """
         self.simulator_runtime_dir = simulator_runtime_dir
         self.debug_simulator = debug_simulator
+        self.er_force_simulator_proc = None
 
     def __enter__(self):
         """Enter the simulator context manager. 
@@ -164,13 +205,25 @@ class Simulator(object):
         )
 
         if self.debug_simulator:
-            print("============== Debugging Simulator ==============")
+            logging.info(
+                (
+                    "\n\nDebugging Simulator ==============\n\n"
+                    "1. Build the simulator in debug mode:\n"
+                    "./tbots.py -d build er_force_simulator_main\n\n"
+                    "2. Run the following binary from src to debug the simulator:\n"
+                    "gdb --args bazel-bin/{}\n".format(simulator_command)
+                )
+            )
 
-            print("\n1. Build the simulator in debug mode:")
-            print("./tbots.py -d build er_force_simulator_main")
-
-            print("\n2. Run the following binary from src to debug the simulator:")
-            print("gdb --args bazel-bin/{}\n".format(simulator_command))
+            # We don't want to check the exact command because this binary could
+            # be debugged from clion or somewhere other than gdb
+            while not is_cmd_running(
+                [
+                    "er_force_simulator_main",
+                    "--runtime_dir={}".format(self.simulator_runtime_dir),
+                ]
+            ):
+                time.sleep(Simulator.DEBUG_MODE_POLL_INTERVAL_S)
 
         else:
             self.er_force_simulator_proc = Popen(simulator_command.split(" "))
@@ -185,8 +238,9 @@ class Simulator(object):
         :param traceback: The traceback of the exception
 
         """
-        self.er_force_simulator_proc.kill()
-        self.er_force_simulator_proc.wait()
+        if self.er_force_simulator_proc:
+            self.er_force_simulator_proc.kill()
+            self.er_force_simulator_proc.wait()
 
     def setup_proto_unix_io(
         self,
@@ -242,6 +296,9 @@ class Gamecontroller(object):
 
     """ Gamecontroller Context Manager """
 
+    # It takes a bit of time for the gamecontroller to start up and accept connections
+    CI_MODE_LAUNCH_DELAY_S = 0.5
+
     def __init__(self, ci_mode=False):
         """Run Gamecontroller
 
@@ -260,7 +317,7 @@ class Gamecontroller(object):
             self.gamecontroller_proc = Popen(
                 ["/opt/tbotspython/gamecontroller", "--timeAcquisitionMode", "ci"]
             )
-            time.sleep(0.5)
+            time.sleep(Gamecontroller.CI_MODE_LAUNCH_DELAY_S)
             self.ci_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.ci_socket.connect(("", 10009))
 
