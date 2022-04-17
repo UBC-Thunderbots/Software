@@ -36,7 +36,7 @@ from software.py_constants import *
 from software.networking import threaded_unix_sender, networking
 from software.thunderscope.robot_communication import RobotCommunication
 from software.thunderscope.arbitrary_plot.named_value_plotter import NamedValuePlotter
-from software.thunderscope.cpp_binary_context_managers import (
+from software.thunderscope.binary_context_managers import (
     FullSystem,
     Simulator,
     Gamecontroller,

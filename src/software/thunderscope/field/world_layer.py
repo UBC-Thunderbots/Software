@@ -317,7 +317,7 @@ class WorldLayer(FieldLayer):
 
             if robot.id not in robot_id_map:
                 robot_id_font = painter.font()
-                robot_id_font.setPointSize(ROBOT_MAX_RADIUS_MM / 7)
+                robot_id_font.setPointSize(int(ROBOT_MAX_RADIUS_MM / 7))
 
                 # setting a black background to keep ID visible over yellow robot
                 robot_id_text = pg.TextItem(

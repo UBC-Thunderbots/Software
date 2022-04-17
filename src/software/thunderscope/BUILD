@@ -19,10 +19,10 @@ py_binary(
         "//proto/message_translation:py_tbots_protobuf",
         "//software/networking:threaded_unix_listener_py",
         "//software/networking:threaded_unix_sender_py",
+        "//software/thunderscope:binary_context_managers",
         "//software/thunderscope:colors",
         "//software/thunderscope:common_widgets",
         "//software/thunderscope:constants",
-        "//software/thunderscope:cpp_binary_context_managers",
         "//software/thunderscope:proto_unix_io",
         "//software/thunderscope:robot_communication",
         "//software/thunderscope/arbitrary_plot:named_value_plotter",
@@ -70,8 +70,8 @@ py_library(
 )
 
 py_library(
-    name = "cpp_binary_context_managers",
-    srcs = ["cpp_binary_context_managers.py"],
+    name = "binary_context_managers",
+    srcs = ["binary_context_managers.py"],
 )
 
 py_library(

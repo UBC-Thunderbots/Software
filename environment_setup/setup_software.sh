@@ -149,7 +149,7 @@ echo "Fetching game controller"
 echo "================================================================"
 
 sudo chown -R $USER:$USER /opt/tbotspython
-sudo wget -nc https://github.com/RoboCup-SSL/ssl-game-controller/releases/download/v2.4.0/ssl-game-controller_v2.4.0_linux_amd64 -O /opt/tbotspython/gamecontroller
+sudo wget -nc https://github.com/RoboCup-SSL/ssl-game-controller/releases/download/v2.15.2/ssl-game-controller_v2.15.2_linux_amd64 -O /opt/tbotspython/gamecontroller
 sudo chmod +x /opt/tbotspython/gamecontroller
 
 # Install Bazel

@@ -1,4 +1,9 @@
 import os
+import socket
+import time
+import google.protobuf.internal.encoder as encoder
+import google.protobuf.internal.decoder as decoder
+
 from proto.import_all_protos import *
 from subprocess import Popen
 from software.networking import threaded_unix_sender, networking
@@ -237,13 +242,30 @@ class Gamecontroller(object):
 
     """ Gamecontroller Context Manager """
 
+    def __init__(self, ci_mode=False):
+        """Run Gamecontroller
+
+        :param ci_mode: Whether to run the gamecontroller in CI mode
+
+        """
+        self.ci_mode = ci_mode
+
     def __enter__(self):
         """Enter the gamecontroller context manager. 
 
         :return: gamecontroller instance
 
         """
-        self.gamecontroller_proc = Popen(["/opt/tbotspython/gamecontroller"])
+        if self.ci_mode:
+            self.gamecontroller_proc = Popen(
+                ["/opt/tbotspython/gamecontroller", "--timeAcquisitionMode", "ci"]
+            )
+            time.sleep(0.5)
+            self.ci_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.ci_socket.connect(("", 10009))
+
+        else:
+            self.gamecontroller_proc = Popen(["/opt/tbotspython/gamecontroller"])
 
         return self
 
@@ -257,6 +279,9 @@ class Gamecontroller(object):
         """
         self.gamecontroller_proc.kill()
         self.gamecontroller_proc.wait()
+
+        if self.ci_socket:
+            self.ci_socket.close()
 
     def setup_proto_unix_io(
         self, blue_full_system_proto_unix_io, yellow_full_system_proto_unix_io
@@ -276,3 +301,46 @@ class Gamecontroller(object):
         self.receive_referee_command = networking.SSLRefereeProtoListener(
             "224.5.23.1", 10003, __send_referee_command, True,
         )
+
+    def send_ci_input(
+        self,
+        gc_command: proto.ssl_gc_state_pb2.Command,
+        team: proto.ssl_gc_common_pb2.Team,
+    ):
+        """Send a ci input to the gamecontroller.
+
+        CiInput -> Input -> Change ->  NewCommand -> Command -> (Type, Team)
+
+        https://github.com/RoboCup-SSL/ssl-game-controller
+        https://github.com/RoboCup-SSL/ssl-game-controller/blob/master/cmd/ssl-ci-test-client/README.md
+
+        :param gc_command: The gc command to send
+        :param team: The team to send the command to
+        :return: The response CiOutput containing 1 or more refree msgs
+
+        """
+        ci_ci_input = CiInput(timestamp=int(time.time_ns()))
+        ci_input = Input()
+        ci_change = Change()
+        ci_new_command = NewCommand()
+        ci_command = Command(type=gc_command, for_team=team)
+
+        ci_new_command.command.CopyFrom(ci_command)
+        ci_change.new_command.CopyFrom(ci_new_command)
+        ci_input.change.CopyFrom(ci_change)
+        ci_ci_input.api_inputs.append(ci_input)
+
+        # https://cwiki.apache.org/confluence/display/GEODE/Delimiting+Protobuf+Messages
+        size = ci_ci_input.ByteSize()
+
+        # Send a request to the host
+        self.ci_socket.send(
+            encoder._VarintBytes(size) + ci_ci_input.SerializeToString()
+        )
+
+        response_data = self.ci_socket.recv(9000)
+
+        msg_len, new_pos = decoder._DecodeVarint32(response_data, 0)
+        ci_output = CiOutput()
+        ci_output.ParseFromString(response_data[new_pos : new_pos + msg_len])
+        return ci_output

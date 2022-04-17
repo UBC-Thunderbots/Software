@@ -131,7 +131,7 @@ py_library(
         "//software/networking:threaded_unix_sender_py",
         "//software/simulated_tests:validation",
         "//software/thunderscope",
-        "//software/thunderscope:cpp_binary_context_managers",
+        "//software/thunderscope:binary_context_managers",
     ],
 )
 

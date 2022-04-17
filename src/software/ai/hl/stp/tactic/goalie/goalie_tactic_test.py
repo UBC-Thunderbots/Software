@@ -3,8 +3,6 @@ import sys
 import pytest
 
 import software.python_bindings as tbots
-from proto.primitive_pb2 import MaxAllowedSpeedMode
-from proto.tactic_pb2 import AssignedTacticPlayControlParams, GoalieTactic, Tactic
 from software.simulated_tests.robot_enters_region import *
 from software.simulated_tests.ball_enters_region import *
 from software.simulated_tests.ball_moves_forward import *
@@ -14,6 +12,7 @@ from software.simulated_tests.robot_speed_threshold import *
 from software.simulated_tests.excessive_dribbling import *
 from software.simulated_tests.simulated_test_fixture import simulated_test_runner
 from proto.message_translation.tbots_protobuf import create_world_state
+from proto.ssl_gc_common_pb2 import Team
 
 
 @pytest.mark.parametrize(
@@ -114,6 +113,18 @@ def test_goalie_blocks_shot(
             ball_location=ball_initial_position,
             ball_velocity=ball_initial_velocity,
         ),
+    )
+
+    # These aren't necessary for this test, but this is just an example
+    # of how to send commands to the simulator.
+    #
+    # NOTE: The gamecontroller responses are automatically handled by
+    # the gamecontroller context manager class
+    simulated_test_runner.gamecontroller.send_ci_input(
+        gc_command=Command.Type.STOP, team=Team.UNKNOWN
+    )
+    simulated_test_runner.gamecontroller.send_ci_input(
+        gc_command=Command.Type.FORCE_START, team=Team.BLUE
     )
 
     # Setup Tactic

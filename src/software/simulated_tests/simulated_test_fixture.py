@@ -16,7 +16,7 @@ from software.simulated_tests import validation
 from software.thunderscope.thunderscope import Thunderscope
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.py_constants import MILLISECONDS_PER_SECOND
-from software.thunderscope.cpp_binary_context_managers import (
+from software.thunderscope.binary_context_managers import (
     FullSystem,
     Simulator,
     Gamecontroller,
@@ -35,15 +35,17 @@ class SimulatorTestRunner(object):
 
     """Run a simulated test"""
 
-    def __init__(self, thunderscope, show_thunderscope=True):
+    def __init__(self, thunderscope, gamecontroller, show_thunderscope=True):
         """Initialize the SimulatorTestRunner
 
         :param thunderscope: The thunderscope to use
+        :param gamecontroller: The gamecontroller context managed instance 
         :param show_thunderscope: If true, thunderscope opens and the test runs in realtime
 
         """
 
         self.thunderscope = thunderscope
+        self.gamecontroller = gamecontroller
         self.show_thunderscope = show_thunderscope
         self.world_buffer = queue.Queue()
         self.last_exception = None
@@ -226,7 +228,9 @@ def simulated_test_runner():
         args.blue_fullsystem_runtime_dir, args.debug_fullsystem, False
     ) as blue_fs, FullSystem(
         args.yellow_fullsystem_runtime_dir, args.debug_fullsystem, True
-    ) as yellow_fs, Gamecontroller() as gamecontroller:
+    ) as yellow_fs, Gamecontroller(
+        ci_mode=True
+    ) as gamecontroller:
 
         blue_fs.setup_proto_unix_io(tscope.blue_full_system_proto_unix_io)
         yellow_fs.setup_proto_unix_io(tscope.yellow_full_system_proto_unix_io)
@@ -246,7 +250,9 @@ def simulated_test_runner():
         time.sleep(LAUNCH_DELAY_S)
 
         runner = SimulatorTestRunner(
-            thunderscope=tscope, show_thunderscope=args.enable_thunderscope,
+            thunderscope=tscope,
+            gamecontroller=gamecontroller,
+            show_thunderscope=args.enable_thunderscope,
         )
 
         yield runner
