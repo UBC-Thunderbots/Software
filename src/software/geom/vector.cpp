@@ -174,12 +174,12 @@ bool operator!=(const Vector &u, const Vector &v)
     return !(u == v);
 }
 
-bool Vector::isToTheRightOf(const Vector &other)
+bool Vector::isToTheRightOf(const Vector &other) const
 {
     return determinant(other) > 0.0f;
 }
 
-bool Vector::isToTheLeftOf(const Vector &other)
+bool Vector::isToTheLeftOf(const Vector &other) const
 {
     return determinant(other) < 0.0f;
 }

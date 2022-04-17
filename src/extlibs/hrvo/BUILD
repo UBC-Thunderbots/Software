@@ -37,7 +37,6 @@ cc_library(
         "path.cpp",
         "path_point.cpp",
         "simulator.cpp",
-		"velocity_obstacle.cpp",
     ],
     hdrs = [
         "agent.h",
@@ -47,12 +46,12 @@ cc_library(
         "path.h",
         "path_point.h",
         "simulator.h",
-		"velocity_obstacle.h"
     ],
     deps = [
         "//proto:visualization_cc_proto",
         "//proto/primitive:primitive_msg_factory",
         "//software/geom:vector",
         "//software/world",
+		"//software/ai/navigator/path_planner/hrvo:velocity_obstacle",
     ],
 )

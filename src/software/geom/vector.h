@@ -196,14 +196,14 @@ class Vector final
      *
      * @param other the Vector to compare this Vector to
      */
-    bool isToTheRightOf(const Vector &other);
+    bool isToTheRightOf(const Vector &other) const;
 
     /**
      * Returns true if this vector is to the left of the given vector.
      *
      * @param other the Vector to compare this Vector to
      */
-    bool isToTheLeftOf(const Vector &other);
+    bool isToTheLeftOf(const Vector &other) const;
 
    private:
     /**

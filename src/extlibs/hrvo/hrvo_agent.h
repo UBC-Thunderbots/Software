@@ -84,7 +84,7 @@ class HRVOAgent : public Agent
      * @return The hybrid reciprocal velocity obstacle which other_agent should see for
      * this Agent
      */
-    Agent::VelocityObstacle createVelocityObstacle(const Agent &other_agent) override;
+    VelocityObstacle createVelocityObstacle(const Agent &other_agent) override;
 
     /**
      * Computes the maxNeighbors nearest neighbors of this agent.
@@ -143,7 +143,12 @@ class HRVOAgent : public Agent
 
         // The number of the second velocity obstacle.
         int velocityObstacle2_;
+
+	bool intersectsVelocityObstacle(const VelocityObstacle &vo) const;
     };
+
+    // this multiplier is used with the preferred velocity to try to select a new velocity that lets us reach the destination faster
+    float min_pref_speed_multiplier = 0.4f;
 
    public:
     float prefSpeed_;

@@ -42,7 +42,7 @@ void LinearVelocityAgent::computeNewVelocity()
     }
 }
 
-Agent::VelocityObstacle LinearVelocityAgent::createVelocityObstacle(
+VelocityObstacle LinearVelocityAgent::createVelocityObstacle(
     const Agent &other_agent)
 {
     VelocityObstacle velocityObstacle;
