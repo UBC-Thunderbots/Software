@@ -38,7 +38,7 @@ class WorldLayer(FieldLayer):
 
         self.world_buffer = ThreadSafeBuffer(buffer_size, World)
         self.robot_status_buffer = ThreadSafeBuffer(buffer_size, RobotStatus)
-        self.referee_buffer = ThreadSafeBuffer(buffer_size, Referee)
+        self.referee_buffer = ThreadSafeBuffer(buffer_size, Referee, False)
         self.cached_world = World()
         self.cached_status = {}
 
@@ -73,11 +73,14 @@ class WorldLayer(FieldLayer):
         self.key_pressed[event.key()] = False
 
     def __should_invert_coordinate_frame(self):
-        """Our coordinate system is defined such that we are on the negative half
-        of the field.
+        """Our coordinate system always assumes that the friendly team is defending
+        the negative half of the field.
 
         If we are defending the positive half, we invert the coordinate frame
         and render the inverted proto. 
+
+        We can use the referee msg to determine if we are defending the positive
+        or negative half of the field.
 
         :return: True if we should invert the coordinate frame, False otherwise
 
@@ -92,7 +95,7 @@ class WorldLayer(FieldLayer):
 
     def __invert_mouse_position_if_defending_negative_half(self, mouse_click):
         """If we are defending the negative half of the field, we invert the coordinate frame
-        for the mouse click.
+        for the mouse click to match up with the visualization.
 
         :param mouse_click: The mouse click location [x, y]
         :return: The inverted mouse click location [x, y] (if needed to be inverted)
@@ -104,7 +107,9 @@ class WorldLayer(FieldLayer):
         return mouse_click
 
     def mouseMoveEvent(self, event):
-        """We want to be able to use the mouse to pan/zoom the field.
+        """Handle mouse movement
+
+        NOTE: We want to be able to use the mouse to pan/zoom the field.
         But we also want to be able to click on a things to interact with them.
 
         We need to make sure that when we are not handling the mouse events,
@@ -113,7 +118,7 @@ class WorldLayer(FieldLayer):
         :param event: The event
 
         """
-        self.mouse_move_pos = [event.pos().x(), event.pos().y()]
+        mouse_move_pos = [event.pos().x(), event.pos().y()]
 
         ball_state = self.cached_world.ball.current_state
 
@@ -124,7 +129,7 @@ class WorldLayer(FieldLayer):
 
         if self.key_pressed[Qt.Key.Key_Control] and self.mouse_clicked:
             self.ball_velocity_vector = ball_position - geom.Vector(
-                self.mouse_move_pos[0], self.mouse_move_pos[1]
+                mouse_move_pos[0], mouse_move_pos[1]
             )
 
             if self.ball_velocity_vector.length() > MAX_ALLOWED_KICK_SPEED * MM_PER_M:
@@ -132,11 +137,14 @@ class WorldLayer(FieldLayer):
                     MAX_ALLOWED_KICK_SPEED * MM_PER_M
                 )
 
+        # This is key to not break the panning/zooming features
         else:
             super().mouseMoveEvent(event)
 
     def mousePressEvent(self, event):
-        """We want to be able to use the mouse to pan/zoom the field.
+        """Handle mouse clicks
+
+        NOTE: We want to be able to use the mouse to pan/zoom the field.
         But we also want to be able to click on a things to interact with them.
 
         We need to make sure that when we are not handling the mouse events,
@@ -166,11 +174,14 @@ class WorldLayer(FieldLayer):
             )
             self.simulator_io.send_proto(WorldState, world_state)
 
+        # This is key to not break the panning/zooming features
         else:
             super().mousePressEvent(event)
 
     def mouseReleaseEvent(self, event):
-        """We want to be able to use the mouse to pan/zoom the field.
+        """Handle mouse clicks
+
+        NOTE: We want to be able to use the mouse to pan/zoom the field.
         But we also want to be able to click on a things to interact with them.
 
         We need to make sure that when we are not handling the mouse events,
@@ -353,8 +364,10 @@ class WorldLayer(FieldLayer):
             )
         )
 
-        if self.ball_velocity_vector and self.mouse_clicked:
-            vector = self.ball_velocity_vector * 0.5
+        # If the mouse is being dragged on the screen, visualize
+        # the ball velocity vector. The 0.5 scaling is abitrary
+        if self.ball_velocity_vector:
+            vector = self.ball_velocity_vector
 
             polyline = QtGui.QPolygon(
                 [
@@ -384,7 +397,6 @@ class WorldLayer(FieldLayer):
         painter.setBrush(pg.mkBrush(None))
         painter.setPen(pg.mkPen("r", width=LINE_WIDTH))
 
-        # TODO draw unavailable robot capabilities
         for robot in self.cached_world.friendly_team.team_robots:
             if (
                 self.cached_status.break_beam_status.ball_in_beam is True

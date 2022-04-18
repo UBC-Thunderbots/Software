@@ -36,8 +36,6 @@ class ProtoUnixIO:
     Sending Protobuf:
 
     - Clases can also call send_proto to send data to any registered observers
-      attach_unix_sender can be called with a protobuf type and unix socket path
-      to send data over the socket, if send_proto was called.
 
     Unix IO:
 

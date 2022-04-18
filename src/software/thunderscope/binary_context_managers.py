@@ -51,9 +51,6 @@ class FullSystem(object):
     ):
         """Run FullSystem
 
-        NOTE: If any of the runtime directories are None, the corresponding binary
-              will not be launched.
-
         :param fullsystem_runtime_dir: The directory to run the blue fullsystem in
         :param debug_fullsystem: Whether to run the fullsystem in debug mode
 
@@ -67,9 +64,10 @@ class FullSystem(object):
         """Enter the fullsystem context manager. 
 
         If the debug mode is enabled then the binary is _not_ run and the
-        command to debug under gdb is printed.
+        command to debug under gdb is printed. The  context manager will then
+        wait for the binary to be launched before continuing.
 
-        :return: FullSystem instance
+        :return: fullsystem context managed instance
 
         """
         # Setup unix socket directory
@@ -90,7 +88,8 @@ class FullSystem(object):
                     "1. Build the full system in debug mode:\n"
                     "./tbots.py -d build unix_full_system\n\n"
                     "2. Run the following binaries from src to debug full system:\n"
-                    "gdb --args bazel-bin/{}\n".format(full_system)
+                    f"gdb --args bazel-bin/{full_system}\n"
+                    "3. Rerun this binary once the gdb instance is setup\n"
                 )
             )
 
@@ -129,7 +128,7 @@ class FullSystem(object):
         """
 
         # Setup LOG(VISUALIZE) handling from full system. We set from_log_visualize
-        # to true.
+        # to true to decode from base64.
         for arg in [
             (self.fullsystem_runtime_dir, Obstacles, True),
             (self.fullsystem_runtime_dir, PathVisualization, True),
@@ -191,7 +190,7 @@ class Simulator(object):
         If the debug mode is enabled then the binary is _not_ run and the
         command to debug under gdb is printed.
 
-        :return: simulator instance
+        :return: simulator context managed instance
 
         """
         # Setup unix socket directory
@@ -211,7 +210,8 @@ class Simulator(object):
                     "1. Build the simulator in debug mode:\n"
                     "./tbots.py -d build er_force_simulator_main\n\n"
                     "2. Run the following binary from src to debug the simulator:\n"
-                    "gdb --args bazel-bin/{}\n".format(simulator_command)
+                    f"gdb --args bazel-bin/{simulator_command}\n"
+                    "3. Rerun this binary once the gdb instance is setup\n"
                 )
             )
 
@@ -296,8 +296,11 @@ class Gamecontroller(object):
 
     """ Gamecontroller Context Manager """
 
-    # It takes a bit of time for the gamecontroller to start up and accept connections
-    CI_MODE_LAUNCH_DELAY_S = 0.5
+    CI_MODE_LAUNCH_DELAY_S = 0.3
+    CI_MODE_PORT = 10009
+    REFEREE_IP = "224.5.23.1"
+    REFEREE_PORT = 10003
+    CI_MODE_OUTPUT_RECEIVE_BUFFER_SIZE = 9000
 
     def __init__(self, ci_mode=False):
         """Run Gamecontroller
@@ -310,16 +313,19 @@ class Gamecontroller(object):
     def __enter__(self):
         """Enter the gamecontroller context manager. 
 
-        :return: gamecontroller instance
+        :return: gamecontroller context managed instance
 
         """
         if self.ci_mode:
             self.gamecontroller_proc = Popen(
                 ["/opt/tbotspython/gamecontroller", "--timeAcquisitionMode", "ci"]
             )
+            # We can't connect to the ci port right away, it takes
+            # CI_MODE_LAUNCH_DELAY_S to start up the gamecontroller
             time.sleep(Gamecontroller.CI_MODE_LAUNCH_DELAY_S)
+
             self.ci_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.ci_socket.connect(("", 10009))
+            self.ci_socket.connect(("", Gamecontroller.CI_MODE_PORT))
 
         else:
             self.gamecontroller_proc = Popen(["/opt/tbotspython/gamecontroller"])
@@ -351,12 +357,20 @@ class Gamecontroller(object):
         """
 
         def __send_referee_command(data):
+            """Send a referee command from the gamecontroller to both full
+            systems.
+
+            :param data: The referee command to send
+
+            """
             blue_full_system_proto_unix_io.send_proto(Referee, data)
             yellow_full_system_proto_unix_io.send_proto(Referee, data)
 
-        # TODO pull the constants out into a file
         self.receive_referee_command = networking.SSLRefereeProtoListener(
-            "224.5.23.1", 10003, __send_referee_command, True,
+            Gamecontroller.REFEREE_IP,
+            Gamecontroller.REFEREE_PORT,
+            __send_referee_command,
+            True,
         )
 
     def send_ci_input(
@@ -368,7 +382,7 @@ class Gamecontroller(object):
 
         CiInput -> Input -> Change ->  NewCommand -> Command -> (Type, Team)
 
-        https://github.com/RoboCup-SSL/ssl-game-controller
+        More info here:
         https://github.com/RoboCup-SSL/ssl-game-controller/blob/master/cmd/ssl-ci-test-client/README.md
 
         :param gc_command: The gc command to send
@@ -390,12 +404,14 @@ class Gamecontroller(object):
         # https://cwiki.apache.org/confluence/display/GEODE/Delimiting+Protobuf+Messages
         size = ci_ci_input.ByteSize()
 
-        # Send a request to the host
+        # Send a request to the host with the size of the message
         self.ci_socket.send(
             encoder._VarintBytes(size) + ci_ci_input.SerializeToString()
         )
 
-        response_data = self.ci_socket.recv(9000)
+        response_data = self.ci_socket.recv(
+            Gamecontroller.CI_MODE_OUTPUT_RECEIVE_BUFFER_SIZE
+        )
 
         msg_len, new_pos = decoder._DecodeVarint32(response_data, 0)
         ci_output = CiOutput()

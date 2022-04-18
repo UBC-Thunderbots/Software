@@ -26,7 +26,7 @@ class playInfoWidget(QTableWidget):
         """
         QTableWidget.__init__(self, playInfoWidget.NUM_ROWS, playInfoWidget.NUM_COLS)
 
-        self.playinfo_buffer = ThreadSafeBuffer(buffer_size, PlayInfo)
+        self.playinfo_buffer = ThreadSafeBuffer(buffer_size, PlayInfo, False)
         self.verticalHeader().setVisible(False)
 
     def set_data(self, data):
@@ -49,14 +49,7 @@ class playInfoWidget(QTableWidget):
     def refresh(self):
         """Update the play info widget with new play information
         """
-        # TODO for some reason, even though the refresh function takes < 0.01s
-        # to run, we are not able to consume the play info buffer fast enough
-        # to get the latest data.
-        #
-        # This is a hack to get around this issue. We need to figure out what is
-        # holding up the event loop. But for now, this prevents spamming logs.
-        for _ in range(5):
-            playinfo = self.playinfo_buffer.get(block=False)
+        playinfo = self.playinfo_buffer.get(block=False)
 
         play_info_dict = MessageToDict(playinfo)
 

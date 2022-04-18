@@ -56,6 +56,7 @@ class NamedValuePlotter(object):
                         random.randint(100, 255),
                     ),
                     name=named_value.name,
+                    disableAutoRange=True,
                     brush=None,
                 )
 
@@ -78,5 +79,4 @@ class NamedValuePlotter(object):
                 time.time() - self.time - TIME_WINDOW_TO_DISPLAY_S,
                 time.time() - self.time,
             ],
-            disableAutoRange=True,
         )

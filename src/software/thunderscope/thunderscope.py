@@ -94,7 +94,7 @@ class Thunderscope(object):
         simulator_proto_unix_io=None,
         blue_full_system_proto_unix_io=None,
         yellow_full_system_proto_unix_io=None,
-        refresh_interval_ms=5,
+        refresh_interval_ms=10,
     ):
         """Initialize Thunderscope
 
@@ -104,8 +104,6 @@ class Thunderscope(object):
         :param refresh_interval_ms: The interval in milliseconds to refresh the simulator
 
         """
-        # Pyqtgraph settings
-        pyqtgraph.setConfigOption("antialias", True)
 
         # Setup MainApp and initialize DockArea
         self.app = pyqtgraph.mkQApp("Thunderscope")
@@ -130,7 +128,6 @@ class Thunderscope(object):
         self.window = QtGui.QMainWindow()
         self.window.setCentralWidget(self.tabs)
         self.window.setWindowTitle("Thunderscope")
-        self.last_refresh_time = time.time()
 
         # ProtoUnixIOs
         #
@@ -264,27 +261,31 @@ class Thunderscope(object):
                     default_shelf["yellow_dock_state"] = shelf["yellow_dock_state"]
                     default_shelf.sync()
 
-    def load_saved_layout(self, layout_path):
+    def load_saved_layout(self, layout_path, load_blue=True, load_yellow=True):
         """Load the specified layout or the default file. If the default layout
         file doesn't exist, and no layout is provided, then just configure
         the default layout.
 
         :param layout_path: Path to the layout file to load.
+        :param load_blue: Whether to load the blue layout.
+        :param load_yellow: Whether to load the yellow layout.
 
         """
-        self.configure_default_layout(
-            self.yellow_full_system_dock_area,
-            self.simulator_proto_unix_io,
-            self.yellow_full_system_proto_unix_io,
-            True,
-        )
+        if load_yellow:
+            self.configure_default_layout(
+                self.yellow_full_system_dock_area,
+                self.simulator_proto_unix_io,
+                self.yellow_full_system_proto_unix_io,
+                True,
+            )
 
-        self.configure_default_layout(
-            self.blue_full_system_dock_area,
-            self.simulator_proto_unix_io,
-            self.blue_full_system_proto_unix_io,
-            False,
-        )
+        if load_blue:
+            self.configure_default_layout(
+                self.blue_full_system_dock_area,
+                self.simulator_proto_unix_io,
+                self.blue_full_system_proto_unix_io,
+                False,
+            )
 
         path = layout_path if layout_path else DEFAULT_LAYOUT_PATH
 
@@ -595,6 +596,9 @@ if __name__ == "__main__":
         ), FullSystem(
             runtime_dir, args.debug_fullsystem, friendly_colour_yellow
         ) as full_system:
+            tscope.load_saved_layout(
+                args.layout, load_blue=args.run_blue, load_yellow=args.run_yellow
+            )
             tscope.show()
 
     ###########################################################################

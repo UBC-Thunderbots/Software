@@ -21,7 +21,7 @@ from extlibs.er_force_sim.src.protobuf.world_pb2 import (
 
 
 class SimulatorLayer(FieldLayer):
-    def __init__(self, friendly_colour_yellow, buffer_size=1):
+    def __init__(self, friendly_colour_yellow, buffer_size=5):
         """Visualize the simulator
 
         :param friendly_colour_yellow: Is the friendly_colour_yellow?
