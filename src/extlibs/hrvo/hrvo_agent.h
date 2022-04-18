@@ -144,10 +144,19 @@ class HRVOAgent : public Agent
         // The number of the second velocity obstacle.
         int velocityObstacle2_;
 
-	bool intersectsVelocityObstacle(const VelocityObstacle &vo) const;
+        /**
+         * Returns true if this candidate point intersects the given velocity obstacle,
+         * false otherwise.
+         *
+         * @param vo the velocity obstacle to check against
+         *
+         * @return true if intersecting, false otherwise
+         */
+        bool intersectsVelocityObstacle(const VelocityObstacle &vo) const;
     };
 
-    // this multiplier is used with the preferred velocity to try to select a new velocity that lets us reach the destination faster
+    // this multiplier is used with the preferred velocity to try to select a new velocity
+    // that lets us reach the destination faster
     float min_pref_speed_multiplier = 0.4f;
 
    public:
