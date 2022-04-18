@@ -18,7 +18,7 @@ class Field(pg.PlotWidget):
         self.showGrid(x=True, y=True, alpha=0.5)
 
         # NOTE: This line has caused a lot of grief. DO NOT remove this, or you
-        # will have a _severe_ performance penalty.
+        # will encounter a severe performance hit.
         #
         # If auto range is enabled, pyqtgraph will recalculate the range of the
         # field plot every time something changes. Since we have a lot of things
