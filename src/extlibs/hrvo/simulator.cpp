@@ -122,10 +122,6 @@ void HRVOSimulator::updateWorld(const World &world)
                     last_time_velocity_updated = global_time;
                 }
             }
-            if (friendly_robot.id() == 1)
-            {
-                visualize(1);
-            }
         }
 
         for (const Robot &enemy_robot : enemy_team)

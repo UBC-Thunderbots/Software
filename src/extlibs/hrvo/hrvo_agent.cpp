@@ -1,4 +1,3 @@
-
 /*
  * agent.cpp
  * HRVO Library
