@@ -287,6 +287,8 @@ void ErForceSimulator::setRobotPrimitive(
         {
             robot_primitive_executor->updatePrimitiveSet(robot_id, primitive_set_msg);
             robot_primitive_executor->updateWorld(world_msg);
+            // TODO: Seems like its not completely accurate. In ShadowEnemyTacticTest, it causes
+            //       the robot to no go in straight line when rotating
             robot_primitive_executor->updateRobotStatuses(robot_id, robot_statuses);
         }
         else

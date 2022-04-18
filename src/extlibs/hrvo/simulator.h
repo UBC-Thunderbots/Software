@@ -300,9 +300,13 @@ class HRVOSimulator
     std::map<unsigned int, unsigned int> enemy_robot_id_map;
 
    public:
-    // How much larger should the goal radius be. This is added as a safety tolerance so
+
+    // How much larger should the destination radius be. This is added as a safety tolerance so
     // robots do not pass over the goal between two simulation frames.
-    static constexpr float GOAL_RADIUS_SCALE = 1.05f;
+    static constexpr float DESTINATION_THRESHOLD_SCALE = 1.05f;
+
+    // The smallest which the Agent radius can be relative to the actual robot radius
+    static constexpr float ROBOT_AGENT_RADIUS_SCALE = 1.2f;
 
     // How much larger should the goal radius be (in meters). This is added as a safety
     // tolerance so robots do not accidentally enter the minimum distance threshold.

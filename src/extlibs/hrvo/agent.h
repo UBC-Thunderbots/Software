@@ -191,6 +191,9 @@ class Agent
     float max_accel_;
     bool reached_goal_;
 
+    // How much larger can the Agent radius grow by as its speed increases
+    static constexpr float MAX_RADIUS_EXPANSION = 0.5f;
+
     // TODO: Added for testing
     Vector prev_vel;
     float dist_remaining_to_goal = 0;

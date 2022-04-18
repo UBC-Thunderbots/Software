@@ -72,8 +72,9 @@ void Agent::update()
 void Agent::updateAgentRadius()
 {
     const float LOCAL_EPSILON = 1e-6f;  // Avoid dividing by zero
-    // Radius can be [min_radius_, 1.5 * min_radius]
-    radius_ = min_radius_ * (1 + velocity_.length() / (max_speed_ * 2 + LOCAL_EPSILON));
+    // Radius can be [min_radius, (MAX_RADIUS_EXPANSION + 1) * min_radius]
+    float expansion_scale = velocity_.length() / (max_speed_ + LOCAL_EPSILON) * MAX_RADIUS_EXPANSION;
+    radius_ = min_radius_ * (1 + expansion_scale);
 }
 
 void Agent::setPath(const AgentPath &new_path)
