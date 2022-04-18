@@ -42,7 +42,7 @@ class PrimitiveExecutor
      * @returns DirectPerWheelControl The per-wheel direct control primitive msg
      */
     std::unique_ptr<TbotsProto::DirectControlPrimitive> stepPrimitive(
-            const unsigned int robot_id, const RobotState &robot_state);
+        const unsigned int robot_id, const RobotState& robot_state);
 
    private:
     /*
@@ -66,7 +66,7 @@ class PrimitiveExecutor
      * @returns AngularVelocity The target angular velocity
      */
     AngularVelocity getTargetAngularVelocity(
-            const TbotsProto::MovePrimitive& move_primitive, const RobotState &robot_state);
+        const TbotsProto::MovePrimitive& move_primitive, const RobotState& robot_state);
 
     /*
      * The AutoKickOrChip settings from the move primitive need to get copied over

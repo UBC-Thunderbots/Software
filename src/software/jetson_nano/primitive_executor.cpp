@@ -48,34 +48,31 @@ Vector PrimitiveExecutor::getTargetLinearVelocity(const unsigned int robot_id,
 }
 
 AngularVelocity PrimitiveExecutor::getTargetAngularVelocity(
-        const TbotsProto::MovePrimitive& move_primitive, const RobotState &robot_state)
+    const TbotsProto::MovePrimitive& move_primitive, const RobotState& robot_state)
 {
-    const float LOCAL_EPSILON = 1e-6f;  // Avoid dividing by zero
-
     const Angle dest_orientation = createAngle(move_primitive.final_angle());
-    const double delta_orientation = dest_orientation.minDiff(robot_state.orientation()).toRadians();
-    const double curr_angular_velocity = robot_state.angularVelocity().toRadians();
+    const double delta_orientation =
+        dest_orientation.minDiff(robot_state.orientation()).toRadians();
 
-    // Compute at what angular distance we should start decelerating angularly
-    // d = (0 - Vi^2) / (2a + LOCAL_EPSILON)
-    const double start_angular_deceleration_distance = std::pow(curr_angular_velocity, 2) /
-        (2 * robot_constants_.robot_max_ang_acceleration_rad_per_s_2 + LOCAL_EPSILON);
+    // velocity given linear deceleration, distance away from goal, and desired final
+    // speed
+    // Vi = sqrt(0^2 + 2 * a * d)
+    double deceleration_angular_speed = std::sqrt(
+        2 * robot_constants_.robot_max_ang_acceleration_rad_per_s_2 * delta_orientation);
 
-    double next_angular_speed = robot_constants_.robot_max_ang_speed_rad_per_s;
-    if (delta_orientation < start_angular_deceleration_distance)
-    {
-        // velocity given linear deceleration, distance away from goal, and desired final
-        // speed
-        // Vi = sqrt(0^2 + 2 * a * d)
-        next_angular_speed = std::sqrt(2 * robot_constants_.robot_max_ang_acceleration_rad_per_s_2 * delta_orientation);
-    }
-    const double signed_delta_orientation = (dest_orientation - robot_state.orientation()).clamp().toRadians();
-    return AngularVelocity::fromRadians(std::copysign(next_angular_speed, signed_delta_orientation));
+    double max_angular_speed =
+        static_cast<double>(robot_constants_.robot_max_ang_speed_rad_per_s);
+    double next_angular_speed = std::min(max_angular_speed, deceleration_angular_speed);
+
+    const double signed_delta_orientation =
+        (dest_orientation - robot_state.orientation()).clamp().toRadians();
+    return AngularVelocity::fromRadians(
+        std::copysign(next_angular_speed, signed_delta_orientation));
 }
 
 
 std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimitive(
-        const unsigned int robot_id, const RobotState &robot_state)
+    const unsigned int robot_id, const RobotState& robot_state)
 {
     hrvo_simulator_.doStep();
     // TODO (#2499): Remove if and visualize the HRVO Simulator of all robots
@@ -117,7 +114,8 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
         case TbotsProto::Primitive::kMove:
         {
             // Compute the target velocities
-            Vector target_velocity = getTargetLinearVelocity(robot_id, robot_state.orientation());
+            Vector target_velocity =
+                getTargetLinearVelocity(robot_id, robot_state.orientation());
             AngularVelocity target_angular_velocity =
                 getTargetAngularVelocity(current_primitive_.move(), robot_state);
 
