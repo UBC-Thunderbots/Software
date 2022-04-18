@@ -80,11 +80,9 @@ INSTANTIATE_TEST_CASE_P(
         std::make_tuple(BallState(Point(3.8, -1.9), Vector()), Point(1, 1),
                         TestUtil::createStationaryRobotStatesWithId(
                             {Point(1, 0), Point(3, 1.2), Point(3, 0.8), Point(3.1, 0.6),
-                             Point(3.1, 1), Point(4.2, 0.5)}))
-        // TODO(#2468): Fix and re-enable
+                             Point(3.1, 1), Point(4.2, 0.5)})),
         // enemy trying to steal
-        // std::make_tuple(BallState(Point(2.5, -1), Vector()), Point(1, 1),
-        //                 TestUtil::createStationaryRobotStatesWithId(
-        //                     {Point(2.5, -1.4), Point(3, 0.4), Point(3, 0.8),
-        //                      Point(3.1, 0.6), Point(3.1, 1), Point(4.2, 1.2)})),
-        ));
+        std::make_tuple(BallState(Point(2.5, -1), Vector()), Point(1, 1),
+                        TestUtil::createStationaryRobotStatesWithId(
+                            {Point(2.5, -1.4), Point(3, 0.4), Point(3, 0.8),
+                             Point(3.1, 0.6), Point(3.1, 1), Point(4.2, 1.2)}))));
