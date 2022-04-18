@@ -54,7 +54,8 @@ AngularVelocity PrimitiveExecutor::getTargetAngularVelocity(
     const double delta_orientation =
         dest_orientation.minDiff(curr_orientation).toRadians();
 
-    // angular velocity given linear deceleration and distance remaining to target orientation
+    // angular velocity given linear deceleration and distance remaining to target
+    // orientation.
     // Vi = sqrt(0^2 + 2 * a * d)
     double deceleration_angular_speed = std::sqrt(
         2 * robot_constants_.robot_max_ang_acceleration_rad_per_s_2 * delta_orientation);
