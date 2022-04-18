@@ -26,23 +26,6 @@ void DribbleTactic::updateControlParams(std::optional<Point> dribble_destination
     control_params.allow_excessive_dribbling = allow_excessive_dribbling;
 }
 
-double DribbleTactic::calculateRobotCost(const Robot &robot, const World &world) const
-{
-    // Default 0 cost assuming ball is in dribbler
-    double cost = 0.0;
-    if (!robot.isNearDribbler(world.ball().position()))
-    {
-        // Prefer robots closer to the interception point
-        // We normalize with the total field length so that robots that are within the
-        // field have a cost less than 1
-        cost = (robot.position() -
-                DribbleFSM::findInterceptionPoint(robot, world.ball(), world.field()))
-                   .length() /
-               world.field().totalXLength();
-    }
-    return std::clamp<double>(cost, 0, 1);
-}
-
 void DribbleTactic::accept(TacticVisitor &visitor) const
 {
     visitor.visit(*this);

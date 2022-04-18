@@ -21,17 +21,6 @@ void GetBehindBallTactic::updateControlParams(const Point &ball_location,
     control_params.chick_direction = chick_direction;
 }
 
-double GetBehindBallTactic::calculateRobotCost(const Robot &robot,
-                                               const World &world) const
-{
-    // Prefer robots closer to the destination
-    // We normalize with the total field length so that robots that are within the
-    // field have a cost less than 1
-    double cost = (robot.position() - control_params.ball_location).length() /
-                  world.field().totalXLength();
-    return std::clamp<double>(cost, 0, 1);
-}
-
 void GetBehindBallTactic::accept(TacticVisitor &visitor) const
 {
     visitor.visit(*this);

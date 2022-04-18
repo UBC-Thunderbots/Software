@@ -19,17 +19,6 @@ class StopTactic : public Tactic
 
     StopTactic() = delete;
 
-    /**
-     * Calculates the cost of assigning the given robot to this Tactic. Prefers all robots
-     * equally
-     *
-     * @param robot The robot to evaluate the cost for
-     * @param world The state of the world with which to perform the evaluation
-     * @return A cost in the range [0,1] indicating the cost of assigning the given robot
-     * to this tactic. Lower cost values indicate a more preferred robot.
-     */
-    double calculateRobotCost(const Robot& robot, const World& world) const override;
-
     void accept(TacticVisitor& visitor) const override;
 
     DEFINE_TACTIC_DONE_AND_GET_FSM_STATE

@@ -23,17 +23,6 @@ PivotKickTactic::PivotKickTactic(std::shared_ptr<const AiConfig> ai_config)
     }
 }
 
-double PivotKickTactic::calculateRobotCost(const Robot &robot, const World &world) const
-{
-    {
-        // the closer the robot is to a ball, the cheaper it is to perform the kick
-        double cost = (robot.position() - world.ball().position()).length() /
-                      world.field().totalXLength();
-
-        return std::clamp<double>(cost, 0, 1);
-    }
-}
-
 void PivotKickTactic::accept(TacticVisitor &visitor) const
 {
     visitor.visit(*this);

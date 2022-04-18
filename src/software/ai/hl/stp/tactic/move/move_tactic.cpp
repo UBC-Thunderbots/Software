@@ -54,16 +54,6 @@ void MoveTactic::updateControlParams(
     control_params.target_spin_rev_per_s  = 0.0;
 }
 
-double MoveTactic::calculateRobotCost(const Robot &robot, const World &world) const
-{
-    // Prefer robots closer to the destination
-    // We normalize with the total field length so that robots that are within the field
-    // have a cost less than 1
-    double cost = (robot.position() - control_params.destination).length() /
-                  world.field().totalXLength();
-    return std::clamp<double>(cost, 0, 1);
-}
-
 void MoveTactic::updatePrimitive(const TacticUpdate &tactic_update, bool reset_fsm)
 {
     if (reset_fsm)

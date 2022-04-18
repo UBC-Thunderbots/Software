@@ -25,25 +25,6 @@ CreaseDefenderTactic::CreaseDefenderTactic(
     }
 }
 
-double CreaseDefenderTactic::calculateRobotCost(const Robot &robot,
-                                                const World &world) const
-{
-    auto block_point = CreaseDefenderFSM::findBlockThreatPoint(
-        world.field(), control_params.enemy_threat_origin,
-        control_params.crease_defender_alignment,
-        robot_navigation_obstacle_config->getRobotObstacleInflationFactor()->value());
-    // Prefer robots closer to the crease defender desired position
-    // We normalize with the total field length so that robots that are within the field
-    // have a cost less than 1
-    double cost = 1.0;
-    if (block_point)
-    {
-        cost = (robot.position() - block_point.value()).length() /
-               world.field().totalXLength();
-    }
-    return std::clamp<double>(cost, 0, 1);
-}
-
 void CreaseDefenderTactic::accept(TacticVisitor &visitor) const
 {
     visitor.visit(*this);

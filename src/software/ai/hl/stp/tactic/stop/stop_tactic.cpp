@@ -11,12 +11,6 @@ StopTactic::StopTactic(bool coast)
     }
 }
 
-double StopTactic::calculateRobotCost(const Robot &robot, const World &world) const
-{
-    // Prefer all robots equally
-    return 0.5;
-}
-
 void StopTactic::accept(TacticVisitor &visitor) const
 {
     visitor.visit(*this);

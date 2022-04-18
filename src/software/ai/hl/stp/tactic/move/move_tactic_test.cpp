@@ -242,16 +242,3 @@ TEST_F(MoveTacticTest, test_spinning_move_counter_clockwise)
             terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
 }
-
-TEST(MoveTacticRobotCostTest, test_calculate_robot_cost)
-{
-    World world = ::TestUtil::createBlankTestingWorld();
-
-    Robot robot = Robot(0, Point(), Vector(), Angle::zero(), AngularVelocity::zero(),
-                        Timestamp::fromSeconds(0));
-
-    MoveTactic tactic = MoveTactic();
-    tactic.updateControlParams(Point(3, -4), Angle::zero(), 0.0);
-
-    EXPECT_EQ(5 / world.field().totalXLength(), tactic.calculateRobotCost(robot, world));
-}

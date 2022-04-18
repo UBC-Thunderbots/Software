@@ -74,23 +74,6 @@ class Tactic
      */
     std::set<RobotCapability> &mutableRobotCapabilityRequirements();
 
-
-    /**
-     * Calculates the cost of assigning the given robot to this Tactic. The returned cost
-     * value must be in the range [0, 1], with smaller values indicating a higher
-     * preference for the robot.
-     *
-     * For example, a tactic that wanted a robot to shoot the ball would return lower
-     * costs for robots closer to the ball than for robots far from the ball.
-     *
-     * @param robot The Robot to calculate the cost for
-     * @param world The state of the world used to perform the cost calculation
-     *
-     * @return A cost value in the range [0, 1] indicating the cost of assigning the given
-     * robot to this Tactic. Lower cost values indicate more preferred robots.
-     */
-    virtual double calculateRobotCost(const Robot &robot, const World &world) const = 0;
-
     /**
      * Updates the last execution robot
      *

@@ -37,17 +37,6 @@ class DribbleTactic : public Tactic
                              std::optional<Angle> final_dribble_orientation,
                              bool allow_excessive_dribbling = false);
 
-    /**
-     * Calculates the cost of assigning the given robot to this Tactic. Prefers robots
-     * closer to intercepting the ball
-     *
-     * @param robot The robot to evaluate the cost for
-     * @param world The state of the world with which to perform the evaluation
-     * @return A cost in the range [0,1] indicating the cost of assigning the given robot
-     * to this tactic. Lower cost values indicate a more preferred robot.
-     */
-    double calculateRobotCost(const Robot& robot, const World& world) const override;
-
     void accept(TacticVisitor& visitor) const override;
 
     DEFINE_TACTIC_DONE_AND_GET_FSM_STATE

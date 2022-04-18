@@ -25,19 +25,6 @@ void GoalieTactic::updateControlParams(bool should_move_to_goal_line)
     control_params.should_move_to_goal_line = should_move_to_goal_line;
 }
 
-
-double GoalieTactic::calculateRobotCost(const Robot &robot, const World &world) const
-{
-    if (world.friendlyTeam().getGoalieId() == robot.id())
-    {
-        return 0.0;
-    }
-    else
-    {
-        return 1.0;
-    }
-}
-
 void GoalieTactic::accept(TacticVisitor &visitor) const
 {
     visitor.visit(*this);

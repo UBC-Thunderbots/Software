@@ -16,21 +16,6 @@ class StopTacticTest : public SimulatedErForceSimTacticTestFixture
     Field field                      = Field::createField(field_type);
 };
 
-
-TEST(StopTacticCostTest, test_calculate_robot_cost)
-{
-    World world = ::TestUtil::createBlankTestingWorld();
-
-    Robot robot = Robot(0, Point(), Vector(), Angle::zero(), AngularVelocity::zero(),
-                        Timestamp::fromSeconds(0));
-
-    StopTactic tactic = StopTactic(false);
-
-    // We always expect the cost to be 0.5, because the StopTactic prefers all robots
-    // equally
-    EXPECT_EQ(0.5, tactic.calculateRobotCost(robot, world));
-}
-
 TEST_F(StopTacticTest, robot_already_stopped)
 {
     BallState ball_state(Point(0, 0.5), Vector(0, 0));

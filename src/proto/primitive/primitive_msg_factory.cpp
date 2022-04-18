@@ -157,7 +157,7 @@ std::unique_ptr<TbotsProto::Primitive> createStopPrimitive(bool coast)
             TbotsProto::StopPrimitive::BRAKE);
     }
 
-    stop_primitive_msg->set_cost(10000000000);
+    stop_primitive_msg->set_cost(1.0);
 
     return stop_primitive_msg;
 }
