@@ -105,7 +105,7 @@ def test_goalie_blocks_shot(
     simulated_test_runner,
 ):
     # Setup Robot
-    simulated_test_runner.thunderscope.simulator_proto_unix_io.send_proto(
+    simulated_test_runner.simulator_proto_unix_io.send_proto(
         WorldState,
         create_world_state(
             [],
@@ -132,7 +132,7 @@ def test_goalie_blocks_shot(
     params.assigned_tactics[0].goalie.CopyFrom(
         GoalieTactic(max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT)
     )
-    simulated_test_runner.thunderscope.blue_full_system_proto_unix_io.send_proto(
+    simulated_test_runner.blue_full_system_proto_unix_io.send_proto(
         AssignedTacticPlayControlParams, params
     )
 

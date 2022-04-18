@@ -35,25 +35,31 @@ class SimulatorTestRunner(object):
 
     """Run a simulated test"""
 
-    def __init__(self, thunderscope, gamecontroller, show_thunderscope=True):
+    def __init__(
+        self,
+        thunderscope,
+        simulator_proto_unix_io,
+        blue_full_system_proto_unix_io,
+        yellow_full_system_proto_unix_io,
+        gamecontroller,
+    ):
         """Initialize the SimulatorTestRunner
-
-        :param thunderscope: The thunderscope to use
+        
+        :param thunderscope: The thunderscope to use, None if not used
+        :param simulator_proto_unix_io: The simulator proto unix io to use
+        :param blue_full_system_proto_unix_io: The blue full system proto unix io to use
+        :param yellow_full_system_proto_unix_io: The yellow full system proto unix io to use
         :param gamecontroller: The gamecontroller context managed instance 
-        :param show_thunderscope: If true, thunderscope opens and the test runs in realtime
 
         """
 
         self.thunderscope = thunderscope
+        self.simulator_proto_unix_io = simulator_proto_unix_io
+        self.blue_full_system_proto_unix_io = blue_full_system_proto_unix_io
+        self.yellow_full_system_proto_unix_io = yellow_full_system_proto_unix_io
         self.gamecontroller = gamecontroller
-        self.show_thunderscope = show_thunderscope
         self.world_buffer = queue.Queue()
         self.last_exception = None
-
-        # Only validate on the blue worlds
-        self.thunderscope.blue_full_system_proto_unix_io.register_observer(
-            World, self.world_buffer
-        )
 
     def run_test(
         self,
@@ -83,7 +89,7 @@ class SimulatorTestRunner(object):
             """
             time.sleep(delay)
 
-            if self.show_thunderscope:
+            if self.thunderscope:
                 self.thunderscope.close()
 
         def __runner():
@@ -97,12 +103,10 @@ class SimulatorTestRunner(object):
                 tick = SimulatorTick(
                     milliseconds=tick_duration_s * MILLISECONDS_PER_SECOND
                 )
-                self.thunderscope.simulator_proto_unix_io.send_proto(
-                    SimulatorTick, tick
-                )
+                self.simulator_proto_unix_io.send_proto(SimulatorTick, tick)
                 time_elapsed_s += tick_duration_s
 
-                if self.show_thunderscope:
+                if self.thunderscope:
                     time.sleep(tick_duration_s)
 
                 world = self.world_buffer.get()
@@ -117,7 +121,7 @@ class SimulatorTestRunner(object):
                     always_validation_sequence_set,
                 )
 
-                if self.show_thunderscope:
+                if self.thunderscope:
                     # Send out the validation proto to thunderscope
                     self.thunderscope.blue_full_system_proto_unix_io.send_proto(
                         ValidationProtoSet, eventually_validation_proto_set
@@ -152,7 +156,7 @@ class SimulatorTestRunner(object):
         # If thunderscope is enabled, run the test in a thread and show
         # thunderscope on this thread. The excepthook is setup to catch
         # any test failures and propagate them to the main thread
-        if self.show_thunderscope:
+        if self.thunderscope:
 
             run_sim_thread = threading.Thread(target=__runner, daemon=True)
             run_sim_thread.start()
@@ -219,7 +223,11 @@ def load_command_line_arguments():
 @pytest.fixture
 def simulated_test_runner(capsys):
     args = load_command_line_arguments()
-    tscope = Thunderscope()
+    tscope = None
+
+    simulator_proto_unix_io = ProtoUnixIO()
+    yellow_full_system_proto_unix_io = ProtoUnixIO()
+    blue_full_system_proto_unix_io = ProtoUnixIO()
 
     # Launch all binaries
     with Simulator(
@@ -231,27 +239,38 @@ def simulated_test_runner(capsys):
     ) as yellow_fs:
         with Gamecontroller(ci_mode=True) as gamecontroller:
 
-            blue_fs.setup_proto_unix_io(tscope.blue_full_system_proto_unix_io)
-            yellow_fs.setup_proto_unix_io(tscope.yellow_full_system_proto_unix_io)
+            blue_fs.setup_proto_unix_io(blue_full_system_proto_unix_io)
+            yellow_fs.setup_proto_unix_io(yellow_full_system_proto_unix_io)
             simulator.setup_proto_unix_io(
-                tscope.simulator_proto_unix_io,
-                tscope.blue_full_system_proto_unix_io,
-                tscope.yellow_full_system_proto_unix_io,
+                simulator_proto_unix_io,
+                blue_full_system_proto_unix_io,
+                yellow_full_system_proto_unix_io,
             )
             gamecontroller.setup_proto_unix_io(
-                tscope.blue_full_system_proto_unix_io,
-                tscope.yellow_full_system_proto_unix_io,
+                blue_full_system_proto_unix_io, yellow_full_system_proto_unix_io,
             )
 
+            # If we want to run thunderscope, inject the proto unix ios
+            # and start the test
             if args.enable_thunderscope:
+                tscope = Thunderscope(
+                    simulator_proto_unix_io,
+                    blue_full_system_proto_unix_io,
+                    yellow_full_system_proto_unix_io,
+                )
                 tscope.load_saved_layout(args.layout)
 
             time.sleep(LAUNCH_DELAY_S)
 
             runner = SimulatorTestRunner(
-                thunderscope=tscope,
-                gamecontroller=gamecontroller,
-                show_thunderscope=args.enable_thunderscope,
+                tscope,
+                simulator_proto_unix_io,
+                blue_full_system_proto_unix_io,
+                yellow_full_system_proto_unix_io,
+                gamecontroller,
             )
+
+            # Only validate on the blue worlds
+            blue_full_system_proto_unix_io.register_observer(World, runner.world_buffer)
 
             yield runner

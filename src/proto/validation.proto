@@ -2,11 +2,7 @@ syntax = "proto2";
 
 package TbotsProto;
 
-import "proto/game_state.proto";
-import "proto/team.proto";
-import "proto/vision.proto";
 import "proto/geometry.proto";
-import "proto/ball.proto";
 
 enum ValidationStatus
 {

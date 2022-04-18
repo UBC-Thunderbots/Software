@@ -5,6 +5,7 @@ import pyqtgraph as pg
 from proto.import_all_protos import *
 from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtCore import Qt
+from pyqtgraph.Qt.QtWidgets import *
 
 from software.thunderscope.colors import Colors
 from software.networking.threaded_unix_listener import ThreadedUnixListener
@@ -44,11 +45,11 @@ class WorldLayer(FieldLayer):
         self.ball_velocity_vector = None
         self.mouse_clicked = False
 
-        self.pressed_CTRL = False
-        self.pressed_M = False
-        self.pressed_R = False
+        self.key_pressed = {}
 
-        self.mouse_hover_pos = [0, 0]
+        self.accepted_keys = [Qt.Key.Key_Control, Qt.Key.Key_I]
+        for key in self.accepted_keys:
+            self.key_pressed[key] = False
 
         self.friendly_robot_id_text_items = {}
         self.enemy_robot_id_text_items = {}
@@ -61,14 +62,7 @@ class WorldLayer(FieldLayer):
         :param event: The event
 
         """
-        if event.key() == Qt.Key.Key_R:
-            self.pressed_R = True
-
-        elif event.key() == Qt.Key.Key_Control:
-            self.pressed_CTRL = True
-
-        elif event.key() == Qt.Key.Key_M:
-            self.pressed_M = True
+        self.key_pressed[event.key()] = True
 
     def keyReleaseEvent(self, event):
         """Detect when a key has been released (override)
@@ -76,14 +70,7 @@ class WorldLayer(FieldLayer):
         :param event: The event
 
         """
-        if event.key() == Qt.Key.Key_R:
-            self.pressed_R = False
-
-        elif event.key() == Qt.Key.Key_Control:
-            self.pressed_CTRL = False
-
-        elif event.key() == Qt.Key.Key_M:
-            self.pressed_M = False
+        self.key_pressed[event.key()] = False
 
     def __should_invert_coordinate_frame(self):
         """Our coordinate system is defined such that we are on the negative half
@@ -135,7 +122,7 @@ class WorldLayer(FieldLayer):
             ball_state.global_position.y_meters * MM_PER_M,
         )
 
-        if self.pressed_CTRL and self.mouse_clicked:
+        if self.key_pressed[Qt.Key.Key_Control] and self.mouse_clicked:
             self.ball_velocity_vector = ball_position - geom.Vector(
                 self.mouse_move_pos[0], self.mouse_move_pos[1]
             )
@@ -167,7 +154,7 @@ class WorldLayer(FieldLayer):
         # determine whether a robot was clicked
         friendly_robot, enemy_robot = self.identify_robots(*self.mouse_click_pos)
 
-        if self.pressed_CTRL:
+        if self.key_pressed[Qt.Key.Key_Control]:
             world_state = WorldState()
             world_state.ball_state.CopyFrom(
                 BallState(
@@ -317,22 +304,21 @@ class WorldLayer(FieldLayer):
 
             if robot.id not in robot_id_map:
                 robot_id_font = painter.font()
-                robot_id_font.setPointSize(int(ROBOT_MAX_RADIUS_MM / 7))
+                robot_id_font.setPointSize(int(ROBOT_MAX_RADIUS_MM / 4))
 
                 # setting a black background to keep ID visible over yellow robot
-                robot_id_text = pg.TextItem(
-                    html='<span style="color: #FFF; background-color: #000">'
-                    + str(robot.id)
-                    + "</span>"
-                )
+                robot_id_text = pg.TextItem(str(robot.id), fill=(0, 0, 0, 0))
+                robot_id_text.setFont(robot_id_font)
                 robot_id_map[robot.id] = robot_id_text
                 robot_id_text.setParentItem(self)
 
             robot_id_map[robot.id].setPos(
                 (robot.current_state.global_position.x_meters * MM_PER_M)
                 - ROBOT_MAX_RADIUS_MM,
-                robot.current_state.global_position.y_meters * MM_PER_M,
+                (robot.current_state.global_position.y_meters * MM_PER_M)
+                - ROBOT_MAX_RADIUS_MM,
             )
+            robot_id_map[robot.id].setVisible(self.key_pressed[Qt.Key.Key_I])
 
             painter.setPen(pg.mkPen(color))
             painter.setBrush(pg.mkBrush(color))
@@ -356,8 +342,9 @@ class WorldLayer(FieldLayer):
 
         """
 
-        painter.setPen(pg.mkPen(Colors.BALL_COLOR))
+        painter.setPen(pg.mkPen(Colors.BALL_COLOR, width=LINE_WIDTH))
         painter.setBrush(pg.mkBrush(Colors.BALL_COLOR))
+
         painter.drawEllipse(
             self.createCircle(
                 ball_state.global_position.x_meters * MM_PER_M,
@@ -395,7 +382,7 @@ class WorldLayer(FieldLayer):
         self.cached_status = self.robot_status_buffer.get(block=False)
 
         painter.setBrush(pg.mkBrush(None))
-        painter.setPen(pg.mkPen("r", width=LINE_WIDTH * 2))
+        painter.setPen(pg.mkPen("r", width=LINE_WIDTH))
 
         # TODO draw unavailable robot capabilities
         for robot in self.cached_world.friendly_team.team_robots:

@@ -208,7 +208,7 @@ void ErForceSimulator::setRobots(
         teleport_robot->set_v_x(static_cast<float>(
             robot_state.global_velocity().x_component_meters() * MILLIMETERS_PER_METER));
         teleport_robot->set_v_y(static_cast<float>(
-            robot_state.global_velocity().x_component_meters() * MILLIMETERS_PER_METER));
+            robot_state.global_velocity().y_component_meters() * MILLIMETERS_PER_METER));
         teleport_robot->set_v_angular(static_cast<float>(
             robot_state.global_angular_velocity().radians_per_second()));
 

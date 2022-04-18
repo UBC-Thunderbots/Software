@@ -50,7 +50,7 @@ class playInfoWidget(QTableWidget):
         """Update the play info widget with new play information
         """
         # TODO for some reason, even though the refresh function takes < 0.01s
-        # to run, # we are not able to consume the play info buffer fast enough
+        # to run, we are not able to consume the play info buffer fast enough
         # to get the latest data.
         #
         # This is a hack to get around this issue. We need to figure out what is

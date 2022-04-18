@@ -15,8 +15,6 @@ class g3logWidget(QWidget):
     def __init__(self, buffer_size=10):
         """The g3log widget is a console widget that displays g3log messages
 
-        :param simulator_io: The simulator io communicate with the simulator
-        :param friendly_colour_yellow: Is the friendly_colour_yellow?
         :param buffer_size: The buffer size, set higher for smoother plots.
                             Set lower for more realtime plots. Default is arbitrary
 

@@ -10,7 +10,7 @@ from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 class PassingLayer(FieldLayer):
 
-    # The pass generator is created and destroyed as plays need to generate passes.
+    # The pass generator is created and destroyed as we move in and out of offensive  plays.
     # If we no longer receive new passes, we need to stop drawing the old one.
     PASS_VISUALIZATION_TIMEOUT_S = 0.5
 
@@ -32,6 +32,7 @@ class PassingLayer(FieldLayer):
         self.cached_pass_vis = PassVisualization()
         self.timeout = time.time() + PassingLayer.PASS_VISUALIZATION_TIMEOUT_S
 
+        # Test item to show scores
         self.pass_rating_text_items = [
             pg.TextItem() for _ in range(PassingLayer.NUM_TOP_PASSES_TO_RENDER)
         ]
@@ -75,9 +76,9 @@ class PassingLayer(FieldLayer):
             sorted_pass_with_rating[0 : PassingLayer.NUM_TOP_PASSES_TO_RENDER]
         ):
 
-            # Lets color the best pass green and rest dark pink
+            # Lets color the best pass green and rest white
             if pass_num == 0:
-                painter.setPen(pg.mkPen("green", width=constants.LINE_WIDTH * 2))
+                painter.setPen(pg.mkPen("green", width=constants.LINE_WIDTH))
             else:
                 painter.setPen(pg.mkPen("white", width=constants.LINE_WIDTH))
 
@@ -92,11 +93,11 @@ class PassingLayer(FieldLayer):
             # Draw the pass rating
             text_item = self.pass_rating_text_items[pass_num]
             text_item.setText(
-                str("P: {} R: {:.2f}".format(pass_num, pass_with_rating.rating))
+                str("Pass {} {:.2f}".format(pass_num, pass_with_rating.rating))
             )
             text_item.setPos(
                 pass_with_rating.pass_.receiver_point.x_meters * constants.MM_PER_M
-                - constants.ROBOT_MAX_RADIUS_MM,
+                - 4 * constants.ROBOT_MAX_RADIUS_MM,
                 pass_with_rating.pass_.receiver_point.y_meters * constants.MM_PER_M
-                - constants.ROBOT_MAX_RADIUS_MM,
+                - 4 * constants.ROBOT_MAX_RADIUS_MM,
             )

@@ -38,7 +38,6 @@ class RobotCommunication(object):
         self.proto_unix_io.register_observer(World, self.world_buffer)
         self.proto_unix_io.register_observer(PrimitiveSet, self.primitive_buffer)
 
-        # TODO make this automagical
         try:
             self.estop_reader = ThreadedEstopReader(
                 self.estop_path, self.estop_buadrate
