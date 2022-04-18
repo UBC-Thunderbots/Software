@@ -125,7 +125,7 @@ void Thunderloop::runLoop()
             {
                 ScopedTimespecTimer timer(&poll_time);
                 direct_control_ = *primitive_executor_.stepPrimitive(
-                    robot_id_, createRobotState(robot_state_).orientation());
+                    robot_id_, createRobotState(robot_state_));
             }
             thunderloop_status_.set_primitive_executor_step_time_ns(
                 static_cast<unsigned long>(poll_time.tv_nsec));
