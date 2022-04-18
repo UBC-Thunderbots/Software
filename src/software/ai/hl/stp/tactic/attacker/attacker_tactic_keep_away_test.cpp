@@ -23,8 +23,7 @@ class AttackerTacticKeepAwayTest
     Field field                      = Field::createField(field_type);
 };
 
-// TODO(#2468): Fix and re-enable
-TEST_P(AttackerTacticKeepAwayTest, DISABLED_attacker_test_keep_away)
+TEST_P(AttackerTacticKeepAwayTest, attacker_test_keep_away)
 {
     Pass pass                    = std::get<0>(GetParam());
     RobotStateWithId robot_state = std::get<1>(GetParam());
