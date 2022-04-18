@@ -108,4 +108,6 @@ if __name__ == "__main__":
     # care about the output and subprocess doesn't seem to run qt for somereason
     else:
         print(" ".join(command))
-        os.system(" ".join(command))
+        code = os.system(" ".join(command))
+        # propagate exit code
+        sys.exit(1 if code!=0 else 0)
