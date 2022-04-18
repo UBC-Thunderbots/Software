@@ -44,9 +44,11 @@ class ProtoConfigurationWidget(QWidget):
 
         # Create ParameterGroup from Protobuf
         self.param_group = parametertree.Parameter.create(
-            name="params", type="group",
+            name="params",
+            type="group",
             children=self.config_proto_to_param_dict(
-                self.proto_to_configure(), None, self.convert_all_fields_to_bools)
+                self.proto_to_configure(), None, self.convert_all_fields_to_bools
+            ),
         )
 
         # Create ParameterTree
@@ -72,9 +74,11 @@ class ProtoConfigurationWidget(QWidget):
         """
 
         self.param_group = parametertree.Parameter.create(
-            name="params", type="group",
+            name="params",
+            type="group",
             children=self.config_proto_to_param_dict(
-                self.proto_to_configure(), search_term, self.convert_all_fields_to_bools)
+                self.proto_to_configure(), search_term, self.convert_all_fields_to_bools
+            ),
         )
         self.param_tree.setParameters(self.param_group, showTop=False)
 
@@ -96,7 +100,7 @@ class ProtoConfigurationWidget(QWidget):
     @staticmethod
     def __create_int_parameter(key, value, descriptor):
         """Converts an int field of a proto to a SliderParameter with
-        the min/max range set according to the provided ParameterRangeOptions
+        the min/max bounds set according to the provided ParameterRangeOptions
         min/vax options.
 
         :param key: The name of the parameter
@@ -112,23 +116,23 @@ class ProtoConfigurationWidget(QWidget):
         )
 
         try:
-            min_max = options["[TbotsProto.range]"]
+            min_max = options["[TbotsProto.bounds]"]
         except KeyError:
             raise KeyError("{} missing ParameterRangeOptions".format(key))
 
         return {
-                "name": key,
-                "type": "slider",
-                "value": value,
-                "default": value,
-                "limits": (int(min_max["min_int_value"]), int(min_max["max_int_value"])),
-                "step": 1,
-            }
+            "name": key,
+            "type": "slider",
+            "value": value,
+            "default": value,
+            "limits": (int(min_max["min_int_value"]), int(min_max["max_int_value"])),
+            "step": 1,
+        }
 
     @staticmethod
     def __create_double_parameter(key, value, descriptor):
         """Converts a double field of a proto to a SliderParameter with
-        the min/max range set according to the provided ParameterRangeOptions
+        the min/max bounds set according to the provided ParameterRangeOptions
         min/vax options.
 
         :param key: The name of the parameter
@@ -144,21 +148,18 @@ class ProtoConfigurationWidget(QWidget):
         )
 
         try:
-            min_max = options["[TbotsProto.range]"]
+            min_max = options["[TbotsProto.bounds]"]
         except KeyError:
             raise KeyError("{} missing ParameterRangeOptions".format(key))
 
         return {
-                "name": key,
-                "type": "slider",
-                "value": value,
-                "default": value,
-                "limits": (
-                    min_max["min_double_value"],
-                    min_max["max_double_value"],
-                ),
-                "step": 0.01,
-            }
+            "name": key,
+            "type": "slider",
+            "value": value,
+            "default": value,
+            "limits": (min_max["min_double_value"], min_max["max_double_value"],),
+            "step": 0.01,
+        }
 
     @staticmethod
     def __create_enum_parameter(key, value, descriptor):
@@ -177,8 +178,8 @@ class ProtoConfigurationWidget(QWidget):
             options.append(enum_desc.name)
 
         return parametertree.parameterTypes.ListParameter(
-                name=key, default=None, value=None, limits=options + [None]
-            )
+            name=key, default=None, value=None, limits=options + [None]
+        )
 
     @staticmethod
     def __create_bool_parameter(key, value, descriptor):
@@ -201,7 +202,6 @@ class ProtoConfigurationWidget(QWidget):
 
         """
         return {"name": key, "type": "bool", "value": value}
-
 
     def config_proto_to_param_dict(
         self, message, search_term=None, convert_all_fields_to_bools=False
@@ -249,10 +249,14 @@ class ProtoConfigurationWidget(QWidget):
                 field_list.append(self.__create_enum_parameter(key, value, descriptor))
 
             elif descriptor.type == descriptor.TYPE_STRING:
-                field_list.append(self.__create_string_parameter(key, value, descriptor))
+                field_list.append(
+                    self.__create_string_parameter(key, value, descriptor)
+                )
 
             elif descriptor.type == descriptor.TYPE_DOUBLE:
-                field_list.append(self.__create_double_parameter(key, value, descriptor))
+                field_list.append(
+                    self.__create_double_parameter(key, value, descriptor)
+                )
 
             elif descriptor.type in [descriptor.TYPE_INT32, descriptor.TYPE_INT64]:
                 field_list.append(self.__create_int_parameter(key, value, descriptor))

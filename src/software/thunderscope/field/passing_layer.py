@@ -1,10 +1,10 @@
-import pyqtgraph as pg
 import time
 import queue
 from software.thunderscope.field.field_layer import FieldLayer
 import software.thunderscope.constants as constants
 from pyqtgraph.Qt import QtCore, QtGui
 from proto.import_all_protos import *
+import pyqtgraph as pg
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 
@@ -32,6 +32,7 @@ class PassingLayer(FieldLayer):
         self.cached_pass_vis = PassVisualization()
         self.timeout = time.time() + PassingLayer.PASS_VISUALIZATION_TIMEOUT_S
 
+        print(range)
         # Test item to show scores
         self.pass_rating_text_items = [
             pg.TextItem() for _ in range(PassingLayer.NUM_TOP_PASSES_TO_RENDER)

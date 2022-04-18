@@ -307,47 +307,51 @@ class Thunderscope(object):
                 ),
             )
 
-
         def __save_layout():
 
             filename, _ = QtGui.QFileDialog.getSaveFileName(
-                    self.window,
-                    "Save layout",
-                    "~/dock_layout_{}.tscopelayout".format(int(time.time())),
-                    options=QFileDialog.Option.DontUseNativeDialog,
+                self.window,
+                "Save layout",
+                "~/dock_layout_{}.tscopelayout".format(int(time.time())),
+                options=QFileDialog.Option.DontUseNativeDialog,
             )
 
             result = self.dock_area.saveState()
 
-            with shelve.open(filename, 'c') as shelf:
-                shelf['dock_state'] = result
+            with shelve.open(filename, "c") as shelf:
+                shelf["dock_state"] = result
 
         def __load_layout():
 
             filename, _ = QtGui.QFileDialog.getOpenFileName(
-                    self.window,
-                    "Open layout", "~/",
-                    options=QFileDialog.Option.DontUseNativeDialog,
+                self.window,
+                "Open layout",
+                "~/",
+                options=QFileDialog.Option.DontUseNativeDialog,
             )
 
-            with shelve.open(filename, 'r') as shelf:
-                self.dock_area.restoreState(shelf['dock_state'])
+            with shelve.open(filename, "r") as shelf:
+                self.dock_area.restoreState(shelf["dock_state"])
 
-
-        self.save_layout = QtGui.QShortcut(QtGui.QKeySequence('Ctrl+S'), self.window)
+        self.save_layout = QtGui.QShortcut(QtGui.QKeySequence("Ctrl+S"), self.window)
         self.save_layout.activated.connect(__save_layout)
 
-        self.save_layout = QtGui.QShortcut(QtGui.QKeySequence('Ctrl+O'), self.window)
+        self.save_layout = QtGui.QShortcut(QtGui.QKeySequence("Ctrl+O"), self.window)
         self.save_layout.activated.connect(__load_layout)
 
-        self.show_help = QtGui.QShortcut(QtGui.QKeySequence('h'), self.window)
-        self.show_help.activated.connect(lambda : QMessageBox.information(self.window,
-            'Help', """
+        self.show_help = QtGui.QShortcut(QtGui.QKeySequence("h"), self.window)
+        self.show_help.activated.connect(
+            lambda: QMessageBox.information(
+                self.window,
+                "Help",
+                """
                 Cntrl+S: Save Layout
                 Double Click Purple Bar to pop window out
                 Drag Purple Bar to rearrange docks
                 Click items in legends to select/deselect
-                """))
+                """,
+            )
+        )
 
     def register_refresh_function(self, refresh_func):
         """Register the refresh functions to run at the refresh_interval_ms
@@ -399,11 +403,18 @@ class Thunderscope(object):
         performance_dock = Dock("Performance")
         performance_dock.addWidget(widgets["performance_widget"].win)
 
+        widgets["parameter_widget"] = self.setup_parameter_widget(
+            full_system_proto_unix_io
+        )
+        parameter_dock = Dock("Parameters")
+        parameter_dock.addWidget(widgets["parameter_widget"])
+
         widgets["playinfo_widget"] = self.setup_play_info(full_system_proto_unix_io)
         playinfo_dock = Dock("Play Info")
         playinfo_dock.addWidget(widgets["playinfo_widget"])
 
         dock_area.addDock(field_dock)
+        dock_area.addDock(parameter_dock, "left", field_dock)
         dock_area.addDock(log_dock, "bottom", field_dock)
         dock_area.addDock(performance_dock, "right", log_dock)
         dock_area.addDock(playinfo_dock, "right", performance_dock)

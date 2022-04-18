@@ -6,9 +6,9 @@
 
 #include "proto/logging/proto_logger.h"
 #include "proto/message_translation/ssl_wrapper.h"
+#include "proto/parameters.pb.h"
 #include "proto/play_info_msg.pb.h"
 #include "shared/parameter/cpp_dynamic_parameters.h"
-#include "shared/parameter/dynamic_parameters.pb.h"
 #include "software/ai/threaded_ai.h"
 #include "software/backend/backend.h"
 #include "software/backend/unix_simulator_backend.h"
