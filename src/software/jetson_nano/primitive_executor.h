@@ -35,7 +35,8 @@ class PrimitiveExecutor
     void updateWorld(const TbotsProto::World& world_msg);
 
     /**
-     * Update primitive executor with robot statuses
+     * Update primitive executor with the local velocity
+     *
      * @param local_velocity The local velocity
      */
     void updateLocalVelocity(Vector local_velocity);

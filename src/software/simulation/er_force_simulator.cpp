@@ -445,6 +445,7 @@ std::map<RobotId, Vector> ErForceSimulator::getRobotIdToLocalVelocityMap(
     std::map<RobotId, Vector> robot_to_local_velocity;
     for (const auto& sim_robot : sim_robots)
     {
+        // rotate converts global velocity to local velocity
         robot_to_local_velocity[sim_robot.id()] =
             Vector(sim_robot.v_x(), sim_robot.v_y())
                 .rotate(Angle::fromRadians(sim_robot.angle()));
