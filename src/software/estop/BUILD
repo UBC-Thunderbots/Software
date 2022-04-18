@@ -1,5 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
+load("@pybind11_bazel//:build_defs.bzl", "pybind_extension", "pybind_library")
+
 # https://github.com/mum4k/platformio_rules/blob/master/docs/platformio_doc.md
 load(
     "@platformio_rules//platformio:platformio.bzl",
@@ -51,5 +53,25 @@ cc_test(
         ":threaded_estop_reader",
         "//shared/test_util:tbots_gtest_main",
         "//software/uart:mock_uart_communication",
+    ],
+)
+
+pybind_library(
+    name = "estop_reader_lib",
+    srcs = ["python_bindings.cpp"],
+    deps = [
+        ":threaded_estop_reader",
+        "//proto/message_translation:tbots_geometry",
+        "//software/geom/algorithms",
+        "//software/uart:boost_uart_communication",
+        "//software/world:field",
+        "@pybind11_protobuf//pybind11_protobuf:native_proto_caster",
+    ],
+)
+
+pybind_extension(
+    name = "estop_reader",
+    deps = [
+        ":estop_reader_lib",
     ],
 )

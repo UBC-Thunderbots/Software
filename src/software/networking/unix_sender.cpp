@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+#include "software/constants.h"
+
 UnixSender::UnixSender(boost::asio::io_service& io_service,
                        const std::string& unix_socket_path)
     : socket_(io_service)
@@ -10,6 +12,10 @@ UnixSender::UnixSender(boost::asio::io_service& io_service,
         boost::asio::local::datagram_protocol::endpoint(unix_socket_path);
     unix_socket_path_ = unix_socket_path;
     socket_.open();
+
+    boost::asio::local::datagram_protocol::socket::send_buffer_size option(
+        UNIX_BUFFER_SIZE);
+    socket_.set_option(option);
 }
 
 void UnixSender::sendString(const std::string& message)

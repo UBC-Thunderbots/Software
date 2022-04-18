@@ -19,6 +19,7 @@ static const double BALL_MAX_RADIUS_METERS = 0.0215;
 // According to the rules, 80% of the ball must be seen at all times. Robots may not
 // cover more than 20% of the ball
 static const double MAX_FRACTION_OF_BALL_COVERED_BY_ROBOT = 0.2;
+
 // The mass of a standard golf ball, as defined by https://en.wikipedia.org/wiki/Golf_ball
 static const double BALL_MASS_KG = 0.004593;
 // The max allowed speed of the robot when the stop command is issued, in meters per
@@ -121,8 +122,8 @@ static const long ARDUINO_BAUD_RATE = 115200;
  */
 static const int ESTOP_MESSAGE_SIZE_BYTES = 1;
 
-static const unsigned char ESTOP_PLAY_MSG = 1;
-static const unsigned char ESTOP_STOP_MSG = 0;
+static const unsigned char ESTOP_PLAY_MSG = 0;
+static const unsigned char ESTOP_STOP_MSG = 1;
 
 // product and vendor id for Arduino Uno Rev3 (retrieved from
 // http://www.linux-usb.org/usb.ids )

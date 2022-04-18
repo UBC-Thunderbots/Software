@@ -4,13 +4,12 @@ from pyqtgraph.Qt.QtWidgets import *
 import software.thunderscope.constants as constants
 import software.thunderscope.common_widgets as common_widgets
 
+from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
+
 
 class ChickerWidget(QWidget):
-    def __init__(self, parent=None):
-        super(ChickerWidget, self).__init__(parent)
-
-        """
-        The Chicker Widget grid is laid out in the following way:
+    def __init__(self):
+        """The Chicker Widget grid is laid out in the following way:
                     ┌────────┐     ┌──────┐      ┌──────┐
                     │ Charge │     │ Kick │      │ Chip │
                     └────────┘     └──────┘      └──────┘
@@ -27,6 +26,9 @@ class ChickerWidget(QWidget):
                     │           Power Slider            │
                     └───────────────────────────────────┘
         """
+
+        super(ChickerWidget, self).__init__()
+
         # grid --> groupBox --> button/slider
         grid = QGridLayout()
         self.radio_buttons_group = QButtonGroup()
@@ -47,6 +49,7 @@ class ChickerWidget(QWidget):
         self.no_auto_button = self.radio_buttons[0]
         self.auto_kick_button = self.radio_buttons[1]
         self.auto_chip_button = self.radio_buttons[2]
+
         grid.addWidget(self.radio_button_box, 1, 0)
         self.no_auto_button.setChecked(True)
 
@@ -59,6 +62,7 @@ class ChickerWidget(QWidget):
             "Geneva Slider", 1, constants.GENEVA_NUM_POSITIONS, 1
         )
         grid.addWidget(self.geneva_slider_box, 2, 0)
+
         (
             self.power_slider_box,
             self.power_slider,
@@ -67,21 +71,22 @@ class ChickerWidget(QWidget):
         grid.addWidget(self.power_slider_box, 3, 0)
 
         self.setLayout(grid)
-        self.grid = grid
+
         # to manage the state of radio buttons - to make sure message is only sent once
         self.radio_checkable = {"no_auto": True, "auto_kick": True, "auto_chip": True}
         self.charged = False
+
         # initial values
-        self.geneva_value = 1
+        self.geneva_value = 3
         self.power_value = 1
 
     def change_button_state(self, button, enable):
-        """
-        Change button color and clickable state.
+        """Change button color and clickable state.
 
         :param button: button to change the state of
         :param enable: bool: if True: enable this button, if False: disable
-        :return:
+        :returns: None
+
         """
         if enable:
             button.setStyleSheet("background-color: White")

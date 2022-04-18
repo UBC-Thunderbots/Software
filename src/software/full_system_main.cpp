@@ -60,7 +60,7 @@ int main(int argc, char** argv)
 
         mutable_thunderbots_config->getMutableSensorFusionConfig()
             ->getMutableFriendlyColorYellow()
-            ->setValue(args->getTeamColor()->value() == "yellow");
+            ->setValue(args->getFriendlyColourYellow()->value());
         mutable_thunderbots_config->getMutableSensorFusionConfig()
             ->getMutableOverrideGameControllerDefendingSide()
             ->setValue(args->getDefendingSide()->value() != "gamecontroller");

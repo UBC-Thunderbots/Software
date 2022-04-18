@@ -6,23 +6,27 @@ import software.thunderscope.constants as constants
 from google.protobuf.json_format import MessageToDict
 from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtWidgets import *
-import qdarktheme
-import queue
+from proto.import_all_protos import *
 
-from proto.robot_log_msg_pb2 import RobotLog
+from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 
 class playInfoWidget(QTableWidget):
 
+    # TODO (#2560): set these values dynamically
     NUM_ROWS = 6
     NUM_COLS = 4
 
-    def __init__(self, buffer_size=10):
+    def __init__(self, buffer_size=5):
+        """Shows the current play information including tactic and FSM state
 
+        :param buffer_size: The buffer size, set higher for smoother plots.
+                            Set lower for more realtime plots. Default is arbitrary
+
+        """
         QTableWidget.__init__(self, playInfoWidget.NUM_ROWS, playInfoWidget.NUM_COLS)
-        self.setStyleSheet(qdarktheme.load_stylesheet())
 
-        self.log_buffer = queue.Queue(buffer_size)
+        self.playinfo_buffer = ThreadSafeBuffer(buffer_size, PlayInfo, False)
         self.verticalHeader().setVisible(False)
 
     def set_data(self, data):
@@ -45,10 +49,7 @@ class playInfoWidget(QTableWidget):
     def refresh(self):
         """Update the play info widget with new play information
         """
-        try:
-            playinfo = self.log_buffer.get_nowait()
-        except queue.Empty as empty:
-            return
+        playinfo = self.playinfo_buffer.get(block=False)
 
         play_info_dict = MessageToDict(playinfo)
 
@@ -56,6 +57,9 @@ class playInfoWidget(QTableWidget):
         tactic_fsm_states = []
         tactic_names = []
         play_name = []
+
+        if "robotTacticAssignment" not in play_info_dict:
+            return
 
         play_name.append(play_info_dict["play"]["playName"])
 
@@ -76,5 +80,6 @@ class playInfoWidget(QTableWidget):
                 "Play Name": play_name,
             }
         )
+
         self.resizeColumnsToContents()
         self.resizeRowsToContents()

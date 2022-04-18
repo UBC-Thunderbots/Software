@@ -7,11 +7,9 @@
 
 #include "software/logger/logger.h"
 
-
-ThreadedEstopReader::ThreadedEstopReader(std::unique_ptr<UartCommunication> uart_reader,
-                                         unsigned int startup_time_ms)
+ThreadedEstopReader::ThreadedEstopReader(std::unique_ptr<UartCommunication> uart_reader)
     : estop_state(EstopState::STOP),
-      timer(io_service, boost::posix_time::milliseconds(startup_time_ms)),
+      timer(io_service, boost::posix_time::milliseconds(INTERVAL_BETWEEN_READS_MS)),
       uart_reader(std::move(uart_reader))
 {
     estop_thread = std::thread(boost::bind(&ThreadedEstopReader::continousRead, this));
@@ -52,21 +50,27 @@ void ThreadedEstopReader::tick(const boost::system::error_code& error)
 
         EstopState new_state;
 
-        switch (estop_msg.at(0))
+        switch (static_cast<int>(estop_msg.at(0)))
         {
             case ESTOP_PLAY_MSG:
+            {
                 new_state                    = EstopState::PLAY;
                 num_consecutive_status_error = 0;
                 break;
+            }
             case ESTOP_STOP_MSG:
+            {
                 new_state                    = EstopState::STOP;
                 num_consecutive_status_error = 0;
                 break;
+            }
             default:
+            {
                 new_state = EstopState::STATUS_ERROR;
                 LOG(WARNING) << "read unexpected estop message";
                 num_consecutive_status_error++;
                 break;
+            }
         }
 
         if (new_state != estop_state)
@@ -92,6 +96,7 @@ void ThreadedEstopReader::tick(const boost::system::error_code& error)
 ThreadedEstopReader::~ThreadedEstopReader()
 {
     in_destructor = true;
+    io_service.stop();
 
     // We must wait for the thread to stop, as if we destroy it while it's still
     // running we will segfault

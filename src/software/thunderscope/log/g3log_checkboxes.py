@@ -1,8 +1,11 @@
 from pyqtgraph.Qt.QtWidgets import QVBoxLayout, QWidget, QGridLayout, QCheckBox
+from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 
 class g3logCheckboxes(QWidget):
     def __init__(self):
+        """Check boxes to filter g3log levels
+        """
         QWidget.__init__(self)
         layout = QGridLayout()
         self.setLayout(layout)

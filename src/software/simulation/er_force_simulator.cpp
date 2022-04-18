@@ -85,8 +85,14 @@ void ErForceSimulator::setWorldState(const TbotsProto::WorldState& world_state)
     {
         setBallState(createBallState(world_state.ball_state()));
     }
-    setRobots(world_state.blue_robots(), gameController::Team::BLUE);
-    setRobots(world_state.yellow_robots(), gameController::Team::YELLOW);
+    if (world_state.blue_robots().size() > 0)
+    {
+        setRobots(world_state.blue_robots(), gameController::Team::BLUE);
+    }
+    if (world_state.yellow_robots().size() > 0)
+    {
+        setRobots(world_state.yellow_robots(), gameController::Team::YELLOW);
+    }
 }
 
 void ErForceSimulator::setBallState(const BallState& ball_state)
@@ -202,7 +208,7 @@ void ErForceSimulator::setRobots(
         teleport_robot->set_v_x(static_cast<float>(
             robot_state.global_velocity().x_component_meters() * MILLIMETERS_PER_METER));
         teleport_robot->set_v_y(static_cast<float>(
-            robot_state.global_velocity().x_component_meters() * MILLIMETERS_PER_METER));
+            robot_state.global_velocity().y_component_meters() * MILLIMETERS_PER_METER));
         teleport_robot->set_v_angular(static_cast<float>(
             robot_state.global_angular_velocity().radians_per_second()));
 
@@ -372,15 +378,22 @@ void ErForceSimulator::stepSimulation(const Duration& time_step)
 std::vector<TbotsProto::RobotStatus> ErForceSimulator::getBlueRobotStatuses() const
 {
     std::vector<TbotsProto::RobotStatus> robot_statuses;
+    auto robot_status      = TbotsProto::RobotStatus();
+    auto break_beam_status = TbotsProto::BreakBeamStatus();
+
     if (blue_robot_with_ball.has_value())
     {
-        auto robot_status = TbotsProto::RobotStatus();
         robot_status.set_robot_id(blue_robot_with_ball.value());
-        auto break_beam_status = TbotsProto::BreakBeamStatus();
         break_beam_status.set_ball_in_beam(true);
-        *(robot_status.mutable_break_beam_status()) = break_beam_status;
-        robot_statuses.push_back(robot_status);
     }
+    else
+    {
+        robot_status.clear_robot_id();
+        break_beam_status.set_ball_in_beam(false);
+    }
+
+    *(robot_status.mutable_break_beam_status()) = break_beam_status;
+    robot_statuses.push_back(robot_status);
 
     return robot_statuses;
 }
@@ -388,15 +401,22 @@ std::vector<TbotsProto::RobotStatus> ErForceSimulator::getBlueRobotStatuses() co
 std::vector<TbotsProto::RobotStatus> ErForceSimulator::getYellowRobotStatuses() const
 {
     std::vector<TbotsProto::RobotStatus> robot_statuses;
+    auto robot_status      = TbotsProto::RobotStatus();
+    auto break_beam_status = TbotsProto::BreakBeamStatus();
+
     if (yellow_robot_with_ball.has_value())
     {
-        auto robot_status = TbotsProto::RobotStatus();
         robot_status.set_robot_id(yellow_robot_with_ball.value());
-        auto break_beam_status = TbotsProto::BreakBeamStatus();
         break_beam_status.set_ball_in_beam(true);
-        *(robot_status.mutable_break_beam_status()) = break_beam_status;
-        robot_statuses.push_back(robot_status);
     }
+    else
+    {
+        robot_status.clear_robot_id();
+        break_beam_status.set_ball_in_beam(false);
+    }
+
+    *(robot_status.mutable_break_beam_status()) = break_beam_status;
+    robot_statuses.push_back(robot_status);
 
     return robot_statuses;
 }

@@ -13,7 +13,7 @@ PenaltyKickPlay::PenaltyKickPlay(std::shared_ptr<const AiConfig> config)
 void PenaltyKickPlay::getNextTactics(TacticCoroutine::push_type &yield,
                                      const World &world)
 {
-    auto penalty_shot_tactic = std::make_shared<PenaltyKickTactic>();
+    auto penalty_shot_tactic = std::make_shared<PenaltyKickTactic>(ai_config);
 
     auto shooter_setup_move = std::make_shared<PenaltySetupTactic>();
 

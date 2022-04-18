@@ -9,10 +9,10 @@
 #include "software/geom/segment.h"
 #include "software/logger/logger.h"
 
-PivotKickTactic::PivotKickTactic()
+PivotKickTactic::PivotKickTactic(std::shared_ptr<const AiConfig> ai_config)
     : Tactic({RobotCapability::Move, RobotCapability::Kick, RobotCapability::Chip,
               RobotCapability::Dribble}),
-      fsm(DribbleFSM()),
+      fsm(DribbleFSM(ai_config->getDribbleTacticConfig())),
       control_params(PivotKickFSM::ControlParams())
 {
 }
