@@ -212,9 +212,9 @@ INSTANTIATE_TEST_CASE_P(
         // Enemy threat left side of crease, CENTRE
         std::make_tuple(Point(-4, 2.5), TbotsProto::CreaseDefenderAlignment::CENTRE, 0)
 
-        // TODO (#2519): Re-enable tests where robot overshoots path and gets stuck behind goal
-        // Enemy threat right side of crease, RIGHT
-        // std::make_tuple(Point(-4, -2), TbotsProto::CreaseDefenderAlignment::RIGHT, 5),
-        // Enemy threat right side of crease, LEFT
-        // std::make_tuple(Point(-4.25, -2), TbotsProto::CreaseDefenderAlignment::LEFT, 5)
+        // TODO (#2519): Re-enable tests where robot overshoots path and gets stuck behind
+        // goal Enemy threat right side of crease, RIGHT std::make_tuple(Point(-4, -2),
+        // TbotsProto::CreaseDefenderAlignment::RIGHT, 5), Enemy threat right side of
+        // crease, LEFT std::make_tuple(Point(-4.25, -2),
+        // TbotsProto::CreaseDefenderAlignment::LEFT, 5)
         ));
