@@ -61,9 +61,9 @@ VelocityObstacle LinearVelocityAgent::createVelocityObstacle(
                       (position_ - other_agent.getPosition()).length());
 
         // Direction of the two edges of the velocity obstacle
-        velocityObstacle.side1_ =
+        velocityObstacle.right_side =
             Vector(std::cos(angle - openingAngle), std::sin(angle - openingAngle));
-        velocityObstacle.side2_ =
+        velocityObstacle.left_side =
             Vector(std::cos(angle + openingAngle), std::sin(angle + openingAngle));
     }
     else
@@ -72,9 +72,9 @@ VelocityObstacle LinearVelocityAgent::createVelocityObstacle(
         // Creates Velocity Obstacle with the sides being 180 degrees
         // apart from each other
         velocityObstacle.apex_ = velocity_;
-        velocityObstacle.side1_ =
+        velocityObstacle.right_side =
             (other_agent.getPosition() - position_).perpendicular().normalize();
-        velocityObstacle.side2_ = -velocityObstacle.side1_;
+        velocityObstacle.left_side = -velocityObstacle.right_side;
     }
     return velocityObstacle;
 }

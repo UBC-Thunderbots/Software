@@ -233,7 +233,7 @@ TEST_F(SimulatedHRVOTest, test_zig_zag_movement)
             Duration::fromSeconds(10));
 }
 
-TEST_F(SimulatedHRVOTest, test_start_in_local_minima)
+TEST_F(SimulatedHRVOTest, DISABLED_test_start_in_local_minima)
 {
     Point destination      = Point(4, 0);
     Point initial_position = Point(0.7, 0);
@@ -264,7 +264,7 @@ TEST_F(SimulatedHRVOTest, test_start_in_local_minima)
 
     runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(6));
+            Duration::fromSeconds(7));
 }
 
 TEST_F(SimulatedHRVOTest, test_start_in_local_minima_with_open_end)
@@ -288,5 +288,5 @@ TEST_F(SimulatedHRVOTest, test_start_in_local_minima_with_open_end)
 
     runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(6));
+            Duration::fromSeconds(7));
 }
