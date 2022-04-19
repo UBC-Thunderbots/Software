@@ -1,6 +1,0 @@
-PyYAML==5.4
-jsonschema==2.6.0
-colorama==0.3.7
-networkx==2.4
-decorator==4.4.2
-
