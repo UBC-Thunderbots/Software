@@ -6,7 +6,7 @@
 
 #include "proto/logging/proto_logger.h"
 #include "proto/message_translation/ssl_wrapper.h"
-#include "proto/parameters.pb.h"
+// #include "proto/parameters.pb.h"
 #include "proto/play_info_msg.pb.h"
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/threaded_ai.h"
@@ -30,9 +30,9 @@ int main(int argc, char** argv)
         mutable_thunderbots_config->getMutableFullSystemMainCommandLineArgs()
             ->loadFromCommandLineArguments(argc, argv);
 
-    std::string runtime_path =
+    std::string runtime_dir =
         thunderbots_config->getFullSystemMainCommandLineArgs()->getRuntimeDir()->value();
-    LoggerSingleton::initializeLogger(runtime_path);
+    LoggerSingleton::initializeLogger(runtime_dir);
 
     // TODO (#2510) remove
     bool friendly_colour_yellow =
@@ -44,8 +44,7 @@ int main(int argc, char** argv)
 
     if (!help_requested)
     {
-        auto backend = std::make_shared<UnixSimulatorBackend>(
-            thunderbots_config->getBackendConfig());
+        auto backend       = std::make_shared<UnixSimulatorBackend>(runtime_dir);
         auto sensor_fusion = std::make_shared<ThreadedSensorFusion>(
             thunderbots_config->getSensorFusionConfig());
         auto ai = std::make_shared<ThreadedAI>(thunderbots_config->getAiConfig());
@@ -53,7 +52,7 @@ int main(int argc, char** argv)
         // Overrides
         auto tactic_override_listener =
             ThreadedProtoUnixListener<TbotsProto::AssignedTacticPlayControlParams>(
-                runtime_path + TACTIC_OVERRIDE_PATH,
+                runtime_dir + TACTIC_OVERRIDE_PATH,
                 [&ai](TbotsProto::AssignedTacticPlayControlParams input) {
                     ai->overrideTactics(input);
                 });

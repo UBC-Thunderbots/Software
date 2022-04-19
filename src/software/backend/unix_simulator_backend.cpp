@@ -11,38 +11,33 @@
 #include "software/logger/logger.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-UnixSimulatorBackend::UnixSimulatorBackend(std::shared_ptr<const BackendConfig> config)
-    : sensor_fusion_config(config->getSimulatorBackendConfig()->getSensorFusionConfig())
+UnixSimulatorBackend::UnixSimulatorBackend(std::string runtime_dir)
 {
+    const std::shared_ptr<const SensorFusionConfig> sensor_fusion_config;
+
     // Protobuf Inputs
     robot_status_input.reset(new ThreadedProtoUnixListener<TbotsProto::RobotStatus>(
-        config->getFullSystemMainCommandLineArgs()->getRuntimeDir()->value() +
-            ROBOT_STATUS_PATH,
+        runtime_dir + ROBOT_STATUS_PATH,
         boost::bind(&Backend::receiveRobotStatus, this, _1)));
 
     ssl_wrapper_input.reset(new ThreadedProtoUnixListener<SSLProto::SSL_WrapperPacket>(
-        config->getFullSystemMainCommandLineArgs()->getRuntimeDir()->value() +
-            SSL_WRAPPER_PATH,
+        runtime_dir + SSL_WRAPPER_PATH,
         boost::bind(&Backend::receiveSSLWrapperPacket, this, _1)));
 
     ssl_referee_input.reset(new ThreadedProtoUnixListener<SSLProto::Referee>(
-        config->getFullSystemMainCommandLineArgs()->getRuntimeDir()->value() +
-            SSL_REFEREE_PATH,
+        runtime_dir + SSL_REFEREE_PATH,
         boost::bind(&Backend::receiveSSLReferee, this, _1)));
 
     sensor_proto_input.reset(new ThreadedProtoUnixListener<SensorProto>(
-        config->getFullSystemMainCommandLineArgs()->getRuntimeDir()->value() +
-            SENSOR_PROTO_PATH,
+        runtime_dir + SENSOR_PROTO_PATH,
         boost::bind(&Backend::receiveSensorProto, this, _1)));
 
     // Protobuf Outputs
-    world_output.reset(new ThreadedProtoUnixSender<TbotsProto::World>(
-        config->getFullSystemMainCommandLineArgs()->getRuntimeDir()->value() +
-        WORLD_PATH));
+    world_output.reset(
+        new ThreadedProtoUnixSender<TbotsProto::World>(runtime_dir + WORLD_PATH));
 
     primitive_output.reset(new ThreadedProtoUnixSender<TbotsProto::PrimitiveSet>(
-        config->getFullSystemMainCommandLineArgs()->getRuntimeDir()->value() +
-        PRIMITIVE_PATH));
+        runtime_dir + PRIMITIVE_PATH));
 }
 
 void UnixSimulatorBackend::onValueReceived(TbotsProto::PrimitiveSet primitives)
@@ -67,6 +62,3 @@ void UnixSimulatorBackend::onValueReceived(World world)
         static_cast<float>(
             FirstInFirstOutThreadedObserver<World>::getDataReceivedPerSecond()));
 }
-
-// Register this backend in the genericFactory
-static TGenericFactory<std::string, Backend, UnixSimulatorBackend, BackendConfig> factory;

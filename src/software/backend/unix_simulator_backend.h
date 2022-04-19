@@ -13,13 +13,16 @@
 class UnixSimulatorBackend : public Backend
 {
    public:
-    UnixSimulatorBackend(std::shared_ptr<const BackendConfig> config);
+    /**
+     * Constructs a new UnixSimulatorBackend
+     *
+     * @param runtime_dir The directory to setup the unix sockets
+     */
+    UnixSimulatorBackend(std::string runtime_dir);
 
    private:
     void onValueReceived(TbotsProto::PrimitiveSet primitives) override;
     void onValueReceived(World world) override;
-
-    const std::shared_ptr<const SensorFusionConfig> sensor_fusion_config;
 
     // ThreadedProtoUnix** to communicate with Thunderscope
     // Inputs

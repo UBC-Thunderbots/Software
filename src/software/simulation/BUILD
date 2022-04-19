@@ -272,24 +272,6 @@ cc_test(
 )
 
 cc_library(
-    name = "standalone_simulator",
-    srcs = ["standalone_simulator.cpp"],
-    hdrs = ["standalone_simulator.h"],
-    deps = [
-        ":threaded_simulator",
-        "//proto:defending_side_msg_cc_proto",
-        "//proto:tbots_cc_proto",
-        "//proto/message_translation:primitive_google_to_nanopb_converter",
-        "//shared/parameter:cpp_configs",
-        "//software:constants",
-        "//software/logger",
-        "//software/networking:threaded_proto_udp_listener",
-        "//software/networking:threaded_proto_udp_sender",
-        "//software/world:field",
-    ],
-)
-
-cc_library(
     name = "firmware_object_deleter",
     hdrs = ["firmware_object_deleter.h"],
     deps = [

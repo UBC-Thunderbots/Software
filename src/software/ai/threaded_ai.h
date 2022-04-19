@@ -2,7 +2,6 @@
 
 #include <mutex>
 
-#include "proto/parameters.pb.h"
 #include "proto/play.pb.h"
 #include "proto/play_info_msg.pb.h"
 #include "proto/tactic.pb.h"

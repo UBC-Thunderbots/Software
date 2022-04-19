@@ -475,10 +475,10 @@ class Thunderscope(object):
         def cak(p, t):
             print(p, t)
 
-        print(ThunderbotsConfig)
-        p = ProtoConfigurationWidget(ThunderbotsConfig, cak)
+        # TODO run this up
+        # p = ProtoConfigurationWidget(World, cak)
 
-        return p
+        return QtGui.QWidget()
 
     def setup_log_widget(self, proto_unix_io):
         """Setup the wiget that receives logs from full system
