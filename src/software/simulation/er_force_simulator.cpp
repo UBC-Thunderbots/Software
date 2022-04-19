@@ -249,10 +249,15 @@ void ErForceSimulator::setYellowRobotPrimitiveSet(
     const TbotsProto::PrimitiveSet& primitive_set_msg,
     std::unique_ptr<TbotsProto::World> world_msg)
 {
+    auto sim_state  = getSimulatorState();
+    auto sim_robots = sim_state.yellow_robots();
+    std::map<RobotId, Vector> robot_to_local_velocity =
+        getRobotIdToLocalVelocityMap(sim_robots);
+
     for (auto& [robot_id, primitive] : primitive_set_msg.robot_primitives())
     {
         setRobotPrimitive(robot_id, primitive_set_msg, yellow_primitive_executor_map,
-                          *yellow_team_world_msg);
+                          *yellow_team_world_msg, robot_to_local_velocity.at(robot_id));
     }
     yellow_team_world_msg = std::move(world_msg);
 }
@@ -261,10 +266,15 @@ void ErForceSimulator::setBlueRobotPrimitiveSet(
     const TbotsProto::PrimitiveSet& primitive_set_msg,
     std::unique_ptr<TbotsProto::World> world_msg)
 {
+    auto sim_state  = getSimulatorState();
+    auto sim_robots = sim_state.blue_robots();
+    std::map<RobotId, Vector> robot_to_local_velocity =
+        getRobotIdToLocalVelocityMap(sim_robots);
+
     for (auto& [robot_id, primitive] : primitive_set_msg.robot_primitives())
     {
         setRobotPrimitive(robot_id, primitive_set_msg, blue_primitive_executor_map,
-                          *blue_team_world_msg);
+                          *blue_team_world_msg, robot_to_local_velocity.at(robot_id));
     }
     blue_team_world_msg = std::move(world_msg);
 }
@@ -273,7 +283,7 @@ void ErForceSimulator::setRobotPrimitive(
     RobotId id, const TbotsProto::PrimitiveSet& primitive_set_msg,
     std::unordered_map<unsigned int, std::shared_ptr<PrimitiveExecutor>>&
         robot_primitive_executor_map,
-    const TbotsProto::World& world_msg)
+    const TbotsProto::World& world_msg, Vector local_velocity)
 {
     // Set to NEG_X because the world msg in this simulator is normalized
     // correctly
@@ -292,6 +302,7 @@ void ErForceSimulator::setRobotPrimitive(
         {
             robot_primitive_executor->updatePrimitiveSet(robot_id, primitive_set_msg);
             robot_primitive_executor->updateWorld(world_msg);
+            robot_primitive_executor->updateLocalVelocity(local_velocity);
         }
         else
         {
@@ -444,4 +455,18 @@ Timestamp ErForceSimulator::getTimestamp() const
 void ErForceSimulator::resetCurrentTime()
 {
     current_time = Timestamp::fromSeconds(0);
+}
+
+std::map<RobotId, Vector> ErForceSimulator::getRobotIdToLocalVelocityMap(
+    const google::protobuf::RepeatedPtrField<world::SimRobot>& sim_robots)
+{
+    std::map<RobotId, Vector> robot_to_local_velocity;
+    for (const auto& sim_robot : sim_robots)
+    {
+        // rotate converts global velocity to local velocity
+        robot_to_local_velocity[sim_robot.id()] =
+            Vector(sim_robot.v_x(), sim_robot.v_y())
+                .rotate(Angle::fromRadians(sim_robot.angle()));
+    }
+    return robot_to_local_velocity;
 }

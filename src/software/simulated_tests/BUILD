@@ -51,18 +51,6 @@ cc_library(
 )
 
 cc_library(
-    name = "simulated_play_test_fixture",
-    testonly = True,
-    srcs = ["simulated_play_test_fixture.cpp"],
-    hdrs = ["simulated_play_test_fixture.h"],
-    deps = [
-        ":simulated_test_fixture_cpp",
-        "//software/ai",
-        "@gtest",
-    ],
-)
-
-cc_library(
     name = "simulated_er_force_sim_play_test_fixture",
     testonly = True,
     srcs = ["simulated_er_force_sim_play_test_fixture.cpp"],
@@ -101,18 +89,6 @@ cc_library(
         "//software/ai/navigator/path_manager:velocity_obstacle_path_manager",
         "//software/ai/navigator/path_planner:theta_star_path_planner",
         "@gtest",
-    ],
-)
-
-cc_test(
-    name = "simulated_play_test_fixture_test",
-    srcs = ["simulated_play_test_fixture_test.cpp"],
-    deps = [
-        ":simulated_play_test_fixture",
-        "//software/simulated_tests/validation:validation_function",
-        "//software/time:duration",
-        "//software/time:timestamp",
-        "//software/world",
     ],
 )
 
