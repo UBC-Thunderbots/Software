@@ -8,7 +8,7 @@
 #ifdef PLATFORMIO_BUILD
 #include <power_frame_msg_platformio.h>
 #else
-#include "proto/message_translation/power_frame_msg.h"
+#include "proto/message_translation/power_frame_msg.hpp"
 extern "C"
 {
 #include "proto/power_frame_msg.nanopb.h"

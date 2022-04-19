@@ -121,6 +121,8 @@ def _nanopb_proto_library_impl(ctx):
             linking_contexts = nanopb_linking_contexts,
         )
 
+    # platformio_* bazel rules require a provider named transitive_zip_files and an output zip file
+    # these contain all files needed for compilation with platformio.
     name = ctx.label.name
     commands = []
     inputs = all_proto_hdr_files + all_proto_src_files
