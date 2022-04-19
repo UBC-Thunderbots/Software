@@ -228,6 +228,7 @@ void HRVOSimulator::updatePrimitiveSet(const TbotsProto::PrimitiveSet &new_primi
                 float speed_at_dest = primitive.move().final_speed_m_per_s();
                 float new_max_speed = primitive.move().max_speed_m_per_s();
                 hrvo_agent->setMaxSpeed(new_max_speed);
+                hrvo_agent->setMaxSpeed(new_max_speed);
                 hrvo_agent->setPreferredSpeed(new_max_speed * PREF_SPEED_SCALE);
 
                 // TODO (#2418): Update implementation of Primitive to support
