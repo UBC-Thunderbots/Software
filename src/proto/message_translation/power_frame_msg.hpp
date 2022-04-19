@@ -1,11 +1,12 @@
 #pragma once
 
-#include <cstdint>
-#include <memory>
-#include <vector>
-#include <unordered_map>
 #include <pb_decode.h>
 #include <pb_encode.h>
+
+#include <cstdint>
+#include <memory>
+#include <unordered_map>
+#include <vector>
 
 #ifdef PLATFORMIO_BUILD
 #include <proto/power_frame_msg.nanopb.h>
@@ -38,26 +39,33 @@ std::vector<uint8_t> serializeToVector(const T& data)
 {
     const pb_field_t* fields;
     int size;
-    if (std::is_same<T, TbotsProto_PowerFrame>::value) {
+    if (std::is_same<T, TbotsProto_PowerFrame>::value)
+    {
         fields = TbotsProto_PowerFrame_fields;
-        size  = TbotsProto_PowerFrame_size;
-    } else if (std::is_same<T, TbotsProto_PowerControl>::value) {
+        size   = TbotsProto_PowerFrame_size;
+    }
+    else if (std::is_same<T, TbotsProto_PowerControl>::value)
+    {
         fields = TbotsProto_PowerControl_fields;
-        size  = TbotsProto_PowerControl_size;
-    } else if (std::is_same<T, TbotsProto_PowerStatus>::value) {
+        size   = TbotsProto_PowerControl_size;
+    }
+    else if (std::is_same<T, TbotsProto_PowerStatus>::value)
+    {
         fields = TbotsProto_PowerStatus_fields;
-        size  = TbotsProto_PowerStatus_size;
-    } else {
+        size   = TbotsProto_PowerStatus_size;
+    }
+    else
+    {
         throw std::runtime_error("Unexpected type as argument");
     }
 
     std::vector<uint8_t> buffer(size);
     pb_ostream_t stream =
-            pb_ostream_from_buffer(static_cast<uint8_t*>(buffer.data()), buffer.size());
+        pb_ostream_from_buffer(static_cast<uint8_t*>(buffer.data()), buffer.size());
     if (!pb_encode(&stream, fields, &data))
     {
         throw std::runtime_error(
-                "Failed to encode PowerFrame msg to vector when converting nanopb to vector");
+            "Failed to encode PowerFrame msg to vector when converting nanopb to vector");
     }
     return buffer;
 }
@@ -113,7 +121,7 @@ TbotsProto_PowerStatus createNanoPbPowerStatus(float battery_voltage,
  * @return a nanopb power control msg matching provided protobuf
  */
 TbotsProto_PowerControl createNanoPbPowerControl(
-        const TbotsProto::PowerControl& google_control)
+    const TbotsProto::PowerControl& google_control)
 {
     std::vector<uint8_t> serialized_proto(google_control.ByteSizeLong());
     google_control.SerializeToArray(serialized_proto.data(),
@@ -122,11 +130,11 @@ TbotsProto_PowerControl createNanoPbPowerControl(
     TbotsProto_PowerControl nanopb_control = TbotsProto_PowerControl_init_default;
 
     pb_istream_t pb_in_stream = pb_istream_from_buffer(
-            static_cast<uint8_t*>(serialized_proto.data()), serialized_proto.size());
+        static_cast<uint8_t*>(serialized_proto.data()), serialized_proto.size());
     if (!pb_decode(&pb_in_stream, TbotsProto_PowerControl_fields, &nanopb_control))
     {
         throw std::runtime_error(
-                "Failed to decode serialized PowerControl msg to nanopb when converting google protobuf to nanopb");
+            "Failed to decode serialized PowerControl msg to nanopb when converting google protobuf to nanopb");
     }
     return nanopb_control;
 }
@@ -137,42 +145,42 @@ TbotsProto_PowerControl createNanoPbPowerControl(
  * @return a nanobp power control msg with provided fields
  */
 TbotsProto_PowerControl createNanoPbPowerControl(
-        ChickerCommandMode chicker_command, float kick_speed_m_per_s,
-        float chip_distance_meters, AutoChipOrKickMode auto_chip_or_kick,
-        float autochip_distance_meters, float autokick_speed_m_per_s, float angle_deg,
-        float rotation_speed_rpm, TbotsProto_PowerControl_ChargeMode charge_mode)
+    ChickerCommandMode chicker_command, float kick_speed_m_per_s,
+    float chip_distance_meters, AutoChipOrKickMode auto_chip_or_kick,
+    float autochip_distance_meters, float autokick_speed_m_per_s, float angle_deg,
+    float rotation_speed_rpm, TbotsProto_PowerControl_ChargeMode charge_mode)
 {
     TbotsProto_PowerControl control = TbotsProto_PowerControl_init_default;
     TbotsProto_PowerControl_ChickerControl chicker =
-            TbotsProto_PowerControl_ChickerControl_init_default;
+        TbotsProto_PowerControl_ChickerControl_init_default;
     switch (chicker_command)
     {
         case ChickerCommandMode::CHIP:
             control.chicker.which_chicker_command =
-                    TbotsProto_PowerControl_ChickerControl_chip_distance_meters_tag;
+                TbotsProto_PowerControl_ChickerControl_chip_distance_meters_tag;
             chicker.chicker_command.chip_distance_meters = chip_distance_meters;
             break;
         case ChickerCommandMode::KICK:
             control.chicker.which_chicker_command =
-                    TbotsProto_PowerControl_ChickerControl_kick_speed_m_per_s_tag;
+                TbotsProto_PowerControl_ChickerControl_kick_speed_m_per_s_tag;
             chicker.chicker_command.kick_speed_m_per_s = kick_speed_m_per_s;
             break;
         case ChickerCommandMode::AUTOCHIPORKICK:
             control.chicker.which_chicker_command =
-                    TbotsProto_PowerControl_ChickerControl_auto_chip_or_kick_tag;
+                TbotsProto_PowerControl_ChickerControl_auto_chip_or_kick_tag;
             switch (auto_chip_or_kick)
             {
                 case AutoChipOrKickMode::AUTOCHIP:
                     chicker.chicker_command.auto_chip_or_kick.which_auto_chip_or_kick =
-                            TbotsProto_AutoChipOrKick_autochip_distance_meters_tag;
+                        TbotsProto_AutoChipOrKick_autochip_distance_meters_tag;
                     chicker.chicker_command.auto_chip_or_kick.auto_chip_or_kick
-                            .autochip_distance_meters = autochip_distance_meters;
+                        .autochip_distance_meters = autochip_distance_meters;
                     break;
                 case AutoChipOrKickMode::AUTOKICK:
                     chicker.chicker_command.auto_chip_or_kick.which_auto_chip_or_kick =
-                            TbotsProto_AutoChipOrKick_autokick_speed_m_per_s_tag;
+                        TbotsProto_AutoChipOrKick_autokick_speed_m_per_s_tag;
                     chicker.chicker_command.auto_chip_or_kick.auto_chip_or_kick
-                            .autokick_speed_m_per_s = autokick_speed_m_per_s;
+                        .autokick_speed_m_per_s = autokick_speed_m_per_s;
                     break;
                 default:
                     break;
@@ -183,7 +191,7 @@ TbotsProto_PowerControl createNanoPbPowerControl(
     }
 
     TbotsProto_PowerControl_GenevaControl geneva =
-            TbotsProto_PowerControl_GenevaControl_init_default;
+        TbotsProto_PowerControl_GenevaControl_init_default;
     geneva.angle_deg          = angle_deg;
     geneva.rotation_speed_rpm = rotation_speed_rpm;
 
@@ -200,7 +208,7 @@ TbotsProto_PowerControl createNanoPbPowerControl(
  * @return a google protobuf power status matching provided nanopb
  */
 std::unique_ptr<TbotsProto::PowerStatus> createTbotsPowerStatus(
-        const TbotsProto_PowerStatus& status)
+    const TbotsProto_PowerStatus& status)
 {
     auto buffer       = serializeToVector(status);
     auto proto_status = std::make_unique<TbotsProto::PowerStatus>();
