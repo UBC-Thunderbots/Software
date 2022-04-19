@@ -3,7 +3,6 @@
 #include "proto/message_translation/tbots_protobuf.h"
 #include "software/ai/navigator/path_manager/velocity_obstacle_path_manager.h"
 #include "software/ai/navigator/path_planner/theta_star_path_planner.h"
-#include "software/gui/drawing/navigator.h"
 #include "software/simulation/er_force_simulator.h"
 #include "software/test_util/test_util.h"
 
@@ -151,9 +150,4 @@ std::optional<TbotsProto::PlayInfo> SimulatedErForceSimTacticTestFixture::getPla
     CHECK(friendly_robot_id_opt.has_value()) << "No friendly robot id set" << std::endl;
     (*info.mutable_robot_tactic_assignment())[friendly_robot_id_opt.value()] = tactic_msg;
     return info;
-}
-
-AIDrawFunction SimulatedErForceSimTacticTestFixture::getDrawFunctions()
-{
-    return drawNavigator(friendly_navigator);
 }

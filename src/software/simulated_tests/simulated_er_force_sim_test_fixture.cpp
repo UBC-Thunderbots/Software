@@ -70,10 +70,6 @@ void SimulatedErForceSimTestFixture::SetUp()
         SensorFusion(friendly_thunderbots_config->getSensorFusionConfig());
     enemy_sensor_fusion = SensorFusion(enemy_thunderbots_config->getSensorFusionConfig());
 
-    if (TbotsGtestMain::enable_visualizer)
-    {
-        enableVisualizer();
-    }
     setupReplayLogging();
 
     // Reset tick duration trackers
@@ -111,13 +107,6 @@ void SimulatedErForceSimTestFixture::setCommonConfigs(
     mutable_thunderbots_config->getMutableSimulatorConfig()
         ->getMutableRollingFrictionAcceleration()
         ->setValue(0.5);
-}
-
-void SimulatedErForceSimTestFixture::enableVisualizer()
-{
-    full_system_gui =
-        std::make_shared<ThreadedFullSystemGUI>(friendly_mutable_thunderbots_config);
-    run_simulation_in_realtime = true;
 }
 
 void SimulatedErForceSimTestFixture::setupReplayLogging()
@@ -634,16 +623,6 @@ bool SimulatedErForceSimTestFixture::tickTest(
         if (run_simulation_in_realtime)
         {
             sleep(wall_start_time, ai_time_step);
-        }
-
-        if (full_system_gui)
-        {
-            full_system_gui->onValueReceived(*friendly_world);
-            if (auto play_info_msg = getPlayInfo())
-            {
-                full_system_gui->onValueReceived(*play_info_msg);
-            }
-            full_system_gui->onValueReceived(getDrawFunctions());
         }
     }
     else

@@ -106,7 +106,6 @@ class SimulatedErForceSimTacticTestFixture : public SimulatedErForceSimTestFixtu
                                    std::shared_ptr<const ThunderbotsConfig> config);
 
     std::optional<TbotsProto::PlayInfo> getPlayInfo() override;
-    AIDrawFunction getDrawFunctions() override;
 
     std::shared_ptr<Tactic> friendly_tactic;
     std::shared_ptr<Tactic> enemy_tactic;

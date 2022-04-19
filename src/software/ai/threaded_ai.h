@@ -8,7 +8,6 @@
 #include "proto/tactic.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
 #include "software/ai/ai.h"
-#include "software/gui/drawing/draw_functions.h"
 #include "software/multithreading/first_in_first_out_threaded_observer.h"
 #include "software/multithreading/subject.hpp"
 #include "software/world/world.h"
@@ -21,7 +20,6 @@
 class ThreadedAI : public FirstInFirstOutThreadedObserver<World>,
                    public FirstInFirstOutThreadedObserver<TbotsProto::ThunderbotsConfig>,
                    public Subject<TbotsProto::PrimitiveSet>,
-                   public Subject<AIDrawFunction>,
                    public Subject<TbotsProto::PlayInfo>
 {
    public:
@@ -59,11 +57,6 @@ class ThreadedAI : public FirstInFirstOutThreadedObserver<World>,
      * @param world the new world
      */
     void runAIAndSendPrimitives(const World &world);
-
-    /**
-     * Publishes draw functions
-     */
-    void drawAI();
 
     AI ai;
     std::shared_ptr<const AiConfig> ai_config;

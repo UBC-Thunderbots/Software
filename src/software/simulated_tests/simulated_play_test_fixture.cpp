@@ -1,7 +1,6 @@
 #include "software/simulated_tests/simulated_play_test_fixture.h"
 
 #include "proto/message_translation/primitive_google_to_nanopb_converter.h"
-#include "software/gui/drawing/navigator.h"
 #include "software/test_util/test_util.h"
 
 SimulatedPlayTestFixture::SimulatedPlayTestFixture()
@@ -86,7 +85,3 @@ std::optional<TbotsProto::PlayInfo> SimulatedPlayTestFixture::getPlayInfo()
     return ai.getPlayInfo();
 }
 
-AIDrawFunction SimulatedPlayTestFixture::getDrawFunctions()
-{
-    return drawNavigator(ai.getNavigator());
-}

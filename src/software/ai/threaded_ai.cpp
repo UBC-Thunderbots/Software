@@ -8,7 +8,6 @@
 #include "software/ai/hl/stp/play/assigned_tactics_play.h"
 #include "software/ai/hl/stp/play/play_factory.h"
 #include "software/ai/hl/stp/tactic/tactic_factory.h"
-#include "software/gui/drawing/navigator.h"
 #include "software/multithreading/thread_safe_buffer.hpp"
 
 ThreadedAI::ThreadedAI(std::shared_ptr<const AiConfig> ai_config)
@@ -50,7 +49,6 @@ void ThreadedAI::overrideTactics(
 void ThreadedAI::onValueReceived(World world)
 {
     runAIAndSendPrimitives(world);
-    drawAI();
 }
 
 void ThreadedAI::onValueReceived(TbotsProto::ThunderbotsConfig config)
@@ -72,14 +70,5 @@ void ThreadedAI::runAIAndSendPrimitives(const World& world)
         Subject<TbotsProto::PlayInfo>::sendValueToObservers(play_info_msg);
 
         Subject<TbotsProto::PrimitiveSet>::sendValueToObservers(*new_primitives);
-    }
-}
-
-void ThreadedAI::drawAI()
-{
-    if (ai.getNavigator())
-    {
-        auto draw_function = drawNavigator(ai.getNavigator());
-        Subject<AIDrawFunction>::sendValueToObservers(draw_function);
     }
 }

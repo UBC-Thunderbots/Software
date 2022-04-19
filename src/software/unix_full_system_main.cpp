@@ -14,7 +14,6 @@
 #include "software/backend/unix_simulator_backend.h"
 #include "software/constants.h"
 #include "software/estop/arduino_util.h"
-#include "software/gui/full_system/threaded_full_system_gui.h"
 #include "software/logger/logger.h"
 #include "software/multithreading/observer_subject_adapter.hpp"
 #include "software/networking/threaded_proto_unix_listener.hpp"

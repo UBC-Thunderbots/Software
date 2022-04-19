@@ -31,8 +31,6 @@ cc_library(
         "//proto:tbots_cc_proto",
         "//shared/parameter:cpp_configs",
         "//software/ai",
-        "//software/gui/drawing:draw_functions",
-        "//software/gui/drawing:navigator",
         "//software/multithreading:subject",
         "//software/multithreading:threaded_observer",
         "//software/world",

@@ -3,7 +3,6 @@
 #include "proto/logging/proto_logger.h"
 #include "shared/test_util/tbots_gtest_main.h"
 #include "software/ai/hl/stp/play/halt_play.h"
-#include "software/gui/full_system/threaded_full_system_gui.h"
 #include "software/sensor_fusion/sensor_fusion.h"
 #include "software/simulated_tests/validation/non_terminating_function_validator.h"
 #include "software/simulated_tests/validation/terminating_function_validator.h"
@@ -22,13 +21,6 @@ class SimulatedTestFixture : public ::testing::Test
 
    protected:
     void SetUp() override;
-
-    /**
-     * This function enables the FullSystemGUI while a test is running, so that the test
-     * can be debugged Visually. Simply call this function at the start of the test(s) you
-     * want to show in the FullSystemGUI.
-     */
-    void enableVisualizer();
 
     /**
      * Creates a directory to output logs to in the directory at the
@@ -142,13 +134,6 @@ class SimulatedTestFixture : public ::testing::Test
     virtual std::optional<TbotsProto::PlayInfo> getPlayInfo() = 0;
 
     /**
-     * Gets draw functions for visualizing on the FullSystemGUI
-     *
-     * @return draw functions to draw
-     */
-    virtual AIDrawFunction getDrawFunctions() = 0;
-
-    /**
      * Runs the given function validators and returns whether or not the
      * FunctionValidators have completed (Note: completed does not necessarily
      * mean passed).
@@ -197,7 +182,6 @@ class SimulatedTestFixture : public ::testing::Test
     std::vector<NonTerminatingFunctionValidator> non_terminating_function_validators;
     std::vector<TerminatingFunctionValidator> terminating_function_validators;
 
-    std::shared_ptr<ThreadedFullSystemGUI> full_system_gui;
     // If false, runs the simulation as fast as possible.
     // If true, introduces artificial delay so that simulation
     // time passes at the same speed a real life time

@@ -110,6 +110,7 @@ class Thunderscope(object):
         :param refresh_interval_ms: The interval in milliseconds to refresh the simulator
 
         """
+        pyqtgraph.setConfigOption("antialias", True)
 
         # Setup MainApp and initialize DockArea
         self.app = pyqtgraph.mkQApp("Thunderscope")
