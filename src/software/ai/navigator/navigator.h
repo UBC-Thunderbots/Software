@@ -24,11 +24,9 @@ class Navigator : public IntentVisitor
      *                     the robots
      * @param robot_navigation_obstacle_factory Will be used to generate obstacles from
      * various constructs
-     * @param config The navigator config
      */
     explicit Navigator(std::unique_ptr<PathManager> path_manager,
-                       RobotNavigationObstacleFactory robot_navigation_obstacle_factory,
-                       std::shared_ptr<const NavigatorConfig> config);
+                       RobotNavigationObstacleFactory robot_navigation_obstacle_factory);
 
     /**
      * Get Primitives for given assigned intents
@@ -73,7 +71,6 @@ class Navigator : public IntentVisitor
      */
     std::unordered_set<PathObjective> createPathObjectives(const World &world) const;
 
-    std::shared_ptr<const NavigatorConfig> config;
     RobotNavigationObstacleFactory robot_navigation_obstacle_factory;
     std::unique_ptr<PathManager> path_manager;
 

@@ -1,15 +1,8 @@
 #include "software/ai/navigator/obstacle/robot_navigation_obstacle_factory.h"
 
-RobotNavigationObstacleFactory::RobotNavigationObstacleFactory(
-    std::shared_ptr<const RobotNavigationObstacleConfig> config)
-    : config(config),
-      robot_radius_expansion_amount(config->getRobotObstacleInflationFactor()->value() *
-                                    ROBOT_MAX_RADIUS_METERS)
+RobotNavigationObstacleFactory::RobotNavigationObstacleFactory()
+    : robot_radius_expansion_amount(2.0167 * ROBOT_MAX_RADIUS_METERS)
 {
-    config->getRobotObstacleInflationFactor()->registerCallbackFunction(
-        [&](double new_value) {
-            robot_radius_expansion_amount = new_value * ROBOT_MAX_RADIUS_METERS;
-        });
 }
 
 std::vector<ObstaclePtr> RobotNavigationObstacleFactory::createFromMotionConstraint(
@@ -108,15 +101,18 @@ std::vector<ObstaclePtr> RobotNavigationObstacleFactory::createFromMotionConstra
 
 ObstaclePtr RobotNavigationObstacleFactory::createFromRobot(const Robot &robot) const
 {
-    // radius of a hexagonal approximation of a robot
+    // Radius of a hexagonal approximation of a robot
     double robot_hexagon_radius =
         (ROBOT_MAX_RADIUS_METERS + robot_radius_expansion_amount) * 2.0 / std::sqrt(3);
+
+    // The factor to multiply object speed by to determine the length of the velocity
+    // obstacle in the objects direction of travel.
+    double speed_scaling_factor = 0.2;
 
     // vector in the direction of the velocity and proportional to the magnitude of the
     // velocity
     Vector expanded_velocity_vector = robot.velocity().normalize(
-        robot.velocity().length() * config->getSpeedScalingFactor()->value() +
-        robot_radius_expansion_amount);
+        robot.velocity().length() * speed_scaling_factor + robot_radius_expansion_amount);
 
     /* If the robot is travelling slower than a threshold, then a stationary robot
      * obstacle will be returned. If the robot is travelling faster than a threshold, then
@@ -179,7 +175,10 @@ std::vector<ObstaclePtr> RobotNavigationObstacleFactory::createFromTeam(
 std::vector<ObstaclePtr> RobotNavigationObstacleFactory::createEnemyCollisionAvoidance(
     const Team &enemy_team, double friendly_robot_speed) const
 {
-    if (friendly_robot_speed < config->getAllowedRobotCollisionSpeed()->value())
+    // The allowed robot speed for collisions with enemy robots
+    const double allowed_robot_collision_speed = 0.2;
+
+    if (friendly_robot_speed < allowed_robot_collision_speed)
     {
         std::vector<ObstaclePtr> obstacles;
         for (const auto &robot : enemy_team.getAllRobots())

@@ -21,6 +21,12 @@ extend google.protobuf.FieldOptions
 
 message ThunderbotsConfig
 {
+    required AiConfig ai_config                 = 1;
+}
+
+
+message AiConfig
+{
     required AiControlConfig ai_control_config                 = 1;
     required AttackerTacticConfig attacker_tactic_config       = 2;
     required CornerKickPlayConfig corner_kick_play_config      = 3;

@@ -21,7 +21,7 @@
 #include "software/util/generic_factory/generic_factory.h"
 #include "software/util/typename/typename.h"
 
-STP::STP(std::shared_ptr<const AiConfig> ai_config)
+STP::STP(TbotsProto::AiConfig ai_config)
     : robot_tactic_assignment(),
       ai_config(ai_config),
       goalie_tactic(std::make_shared<GoalieTactic>(ai_config)),
@@ -30,23 +30,6 @@ STP::STP(std::shared_ptr<const AiConfig> ai_config)
       fsm(std::make_unique<FSM<PlaySelectionFSM>>(PlaySelectionFSM{ai_config})),
       override_play(nullptr)
 {
-    ai_config->getAiControlConfig()->getCurrentAiPlay()->registerCallbackFunction(
-        [this, ai_config](std::string new_override_play_name) {
-            if (ai_config->getAiControlConfig()->getOverrideAiPlay()->value())
-            {
-                overridePlayFromName(new_override_play_name);
-            }
-        });
-
-    ai_config->getAiControlConfig()->getOverrideAiPlay()->registerCallbackFunction(
-        [this, ai_config](bool new_override_ai_play) {
-            if (new_override_ai_play)
-            {
-                overridePlayFromName(
-                    ai_config->getAiControlConfig()->getCurrentAiPlay()->value());
-            }
-        });
-
     for (unsigned int i = 0; i < MAX_ROBOT_IDS; i++)
     {
         stop_tactics.push_back(std::make_shared<StopTactic>(false));
@@ -271,5 +254,6 @@ void STP::overridePlay(std::unique_ptr<Play> play)
 
 void STP::overridePlayFromName(std::string name)
 {
-    overridePlay(GenericFactory<std::string, Play, AiConfig>::create(name, ai_config));
+    overridePlay(
+        GenericFactory<std::string, Play, TbotsProto::AiConfig>::create(name, ai_config));
 }

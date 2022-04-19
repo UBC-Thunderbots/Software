@@ -20,9 +20,8 @@ class NavigatingPrimitiveCreator : public NavigatingIntentVisitor
     /**
      * Create a NavigatingPrimitiveCreator
      *
-     * @param config The navigator config
      */
-    explicit NavigatingPrimitiveCreator(std::shared_ptr<const NavigatorConfig> config);
+    explicit NavigatingPrimitiveCreator();
 
     /**
      * Creates a primitive for a given path and navigating intent

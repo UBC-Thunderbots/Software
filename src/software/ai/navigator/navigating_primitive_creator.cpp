@@ -4,9 +4,7 @@
 #include "software/geom/algorithms/distance.h"
 #include "software/logger/logger.h"
 
-NavigatingPrimitiveCreator::NavigatingPrimitiveCreator(
-    std::shared_ptr<const NavigatorConfig> config)
-    : config(config)
+NavigatingPrimitiveCreator::NavigatingPrimitiveCreator()
 {
 }
 
@@ -48,9 +46,12 @@ std::pair<Point, double> NavigatingPrimitiveCreator::calculateDestinationAndFina
     }
     else
     {
+        // Factor of max speed to use for transition speed calculations
+        const double TRANSITION_SPEED_FACTOR = 0.6;
+
         // we are going to some intermediate point so we transition smoothly
-        double transition_final_speed = robot_constants.robot_max_speed_m_per_s *
-                                        config->getTransitionSpeedFactor()->value();
+        double transition_final_speed =
+            robot_constants.robot_max_speed_m_per_s * TRANSITION_SPEED_FACTOR;
 
         desired_final_speed = calculateTransitionSpeedBetweenSegments(
             path_points[0], path_points[1], path_points[2], transition_final_speed);
@@ -68,7 +69,8 @@ std::pair<Point, double> NavigatingPrimitiveCreator::calculateDestinationAndFina
 double NavigatingPrimitiveCreator::getEnemyObstacleProximityFactor(
     const Point &p, const std::vector<ObstaclePtr> &enemy_robot_obstacles) const
 {
-    double robot_proximity_limit = config->getEnemyRobotProximityLimit()->value();
+    // Distance to nearest robot when we stop slowing down to avoid collisions
+    double robot_proximity_limit = 2.0;
 
     // find min dist between p and any robot
     double closest_dist = std::numeric_limits<double>::max();

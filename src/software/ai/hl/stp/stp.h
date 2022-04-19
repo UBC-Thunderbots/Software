@@ -62,7 +62,7 @@ class STP
      *
      * @param ai_config The Ai configuration
      */
-    explicit STP(std::shared_ptr<const AiConfig> ai_config);
+    explicit STP(TbotsProto::AiConfig ai_config);
 
     /**
      * Given the state of the world, returns the Intent that each available Robot should
@@ -151,7 +151,8 @@ class STP
 
     // The Play that is currently running
     std::map<std::shared_ptr<const Tactic>, Robot> robot_tactic_assignment;
-    std::shared_ptr<const AiConfig> ai_config;
+    TbotsProto::AiConfig ai_config;
+
     // Goalie tactic common to all plays
     std::shared_ptr<GoalieTactic> goalie_tactic;
     // Stop tactic common to all plays for robots that don't have tactics assigned

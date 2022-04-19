@@ -2,6 +2,7 @@
 
 #include <mutex>
 
+#include "proto/parameters.pb.h"
 #include "proto/play.pb.h"
 #include "proto/play_info_msg.pb.h"
 #include "proto/tactic.pb.h"
@@ -25,11 +26,11 @@ class ThreadedAI : public FirstInFirstOutThreadedObserver<World>,
     ThreadedAI() = delete;
 
     /**
-     * Create an AI with the given config
+     * Constructs a new ThreadedAI object.
      *
-     * @param ai_config The AI configuration
+     * @param tbots_proto The AI configuration
      */
-    explicit ThreadedAI(std::shared_ptr<const AiConfig> ai_config);
+    explicit ThreadedAI(TbotsProto::AiConfig ai_config);
 
     /**
      * Override the AI play
@@ -58,7 +59,7 @@ class ThreadedAI : public FirstInFirstOutThreadedObserver<World>,
     void runAIAndSendPrimitives(const World &world);
 
     AI ai;
-    std::shared_ptr<const AiConfig> ai_config;
-    std::shared_ptr<const AiControlConfig> control_config;
+    TbotsProto::AiConfig ai_config;
+    TbotsProto::AiControlConfig ai_control_config;
     std::mutex ai_mutex;
 };

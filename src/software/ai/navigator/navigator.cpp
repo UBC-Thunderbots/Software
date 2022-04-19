@@ -9,10 +9,8 @@
 #include "software/logger/logger.h"
 
 Navigator::Navigator(std::unique_ptr<PathManager> path_manager,
-                     RobotNavigationObstacleFactory robot_navigation_obstacle_factory,
-                     std::shared_ptr<const NavigatorConfig> config)
-    : config(config),
-      robot_navigation_obstacle_factory(std::move(robot_navigation_obstacle_factory)),
+                     RobotNavigationObstacleFactory robot_navigation_obstacle_factory)
+    : robot_navigation_obstacle_factory(std::move(robot_navigation_obstacle_factory)),
       path_manager(std::move(path_manager))
 {
 }
@@ -73,7 +71,7 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Navigator::getAssignedPrimitives(
             }
 
             robot_primitives_map[robot_id] =
-                NavigatingPrimitiveCreator(config).createNavigatingPrimitive(
+                NavigatingPrimitiveCreator().createNavigatingPrimitive(
                     *intent, *(robot_id_to_path_iter->second),
                     robot_navigation_obstacle_factory.createFromTeam(world.enemyTeam()));
 

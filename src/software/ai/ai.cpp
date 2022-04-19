@@ -7,14 +7,11 @@
 #include "software/ai/navigator/path_manager/velocity_obstacle_path_manager.h"
 #include "software/ai/navigator/path_planner/theta_star_path_planner.h"
 
-AI::AI(std::shared_ptr<const AiConfig> ai_config)
+AI::AI(TbotsProto::AiConfig ai_config)
     : navigator(std::make_shared<Navigator>(
           std::make_unique<VelocityObstaclePathManager>(
-              std::make_unique<ThetaStarPathPlanner>(),
-              RobotNavigationObstacleFactory(
-                  ai_config->getRobotNavigationObstacleConfig())),
-          RobotNavigationObstacleFactory(ai_config->getRobotNavigationObstacleConfig()),
-          ai_config->getNavigatorConfig())),
+              std::make_unique<ThetaStarPathPlanner>(), RobotNavigationObstacleFactory()),
+          RobotNavigationObstacleFactory())),
       // We use the current time in nanoseconds to initialize STP with a "random" seed
       stp(std::make_unique<STP>(ai_config))
 {

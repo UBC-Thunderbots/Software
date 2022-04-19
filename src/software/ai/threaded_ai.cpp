@@ -9,14 +9,14 @@
 #include "software/ai/hl/stp/tactic/tactic_factory.h"
 #include "software/multithreading/thread_safe_buffer.hpp"
 
-ThreadedAI::ThreadedAI(std::shared_ptr<const AiConfig> ai_config)
-    // Disabling warnings on log buffer full, since buffer size is 1 and we always want AI
-    // to use the latest World
+ThreadedAI::ThreadedAI(TbotsProto::AiConfig ai_config)
+    // Disabling warnings on log buffer full, since buffer size is 1 and we
+    // always want AI to use the latest World
     : FirstInFirstOutThreadedObserver<World>(),
       FirstInFirstOutThreadedObserver<TbotsProto::ThunderbotsConfig>(),
       ai(ai_config),
       ai_config(ai_config),
-      control_config(ai_config->getAiControlConfig())
+      ai_control_config(ai_config.ai_control_config()),
 {
 }
 
@@ -58,7 +58,7 @@ void ThreadedAI::onValueReceived(TbotsProto::ThunderbotsConfig config)
 void ThreadedAI::runAIAndSendPrimitives(const World& world)
 {
     std::scoped_lock lock(ai_mutex);
-    if (control_config->getRunAi()->value())
+    if (ai_control_config.run_ai())
     {
         auto new_primitives = ai.getPrimitives(world);
 
