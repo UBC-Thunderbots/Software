@@ -7,7 +7,6 @@
 #include "proto/tbots_software_msgs.pb.h"
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/backend/backend.h"
-#include "software/backend/ssl_proto_client.h"
 #include "software/networking/threaded_proto_unix_listener.hpp"
 #include "software/networking/threaded_proto_unix_sender.hpp"
 

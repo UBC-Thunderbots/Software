@@ -1,6 +1,7 @@
 #pragma once
 
 #include "proto/logging/proto_logger.h"
+#include "proto/play_info_msg.pb.h"
 #include "shared/test_util/tbots_gtest_main.h"
 #include "software/ai/hl/stp/play/halt_play.h"
 #include "software/sensor_fusion/sensor_fusion.h"

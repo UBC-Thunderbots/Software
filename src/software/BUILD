@@ -27,39 +27,6 @@ cc_binary(
 )
 
 cc_binary(
-    # TODO (#2510) Remove
-    name = "full_system",
-    srcs = ["full_system_main.cpp"],
-    deps = [
-        "//proto/logging:proto_logger",
-        "//proto/message_translation:ssl_wrapper",
-        "//shared/parameter:cpp_configs",
-        "//software:constants",
-        "//software/ai:threaded_ai",
-        "//software/backend",
-        "//software/backend:all_backends",
-        "//software/estop:arduino_util",
-        "//software/logger",
-        "//software/multithreading:observer_subject_adapter",
-        "//software/networking:threaded_proto_unix_listener",
-        "//software/sensor_fusion:threaded_sensor_fusion",
-        "//software/util/generic_factory",
-        "@boost//:program_options",
-    ],
-)
-
-cc_binary(
-    name = "standalone_simulator_main",
-    srcs = ["standalone_simulator_main.cpp"],
-    deps = [
-        "//shared/parameter:cpp_configs",
-        "//software/logger",
-        "//software/simulation:standalone_simulator",
-        "@boost//:program_options",
-    ],
-)
-
-cc_binary(
     name = "er_force_simulator_main",
     srcs = ["er_force_simulator_main.cpp"],
     deps = [
@@ -67,30 +34,6 @@ cc_binary(
         "//software/networking:threaded_proto_unix_listener",
         "//software/networking:threaded_proto_unix_sender",
         "//software/simulation:er_force_simulator",
-    ],
-)
-
-cc_binary(
-    name = "handheld_control",
-    srcs = ["handheld_control_main.cpp"],
-    deps = [
-        "//shared/parameter:cpp_configs",
-        "//software/backend:wifi_backend",
-        "//software/handheld_controller:controller_primitive_generator",
-        "//software/handheld_controller:xbox_360_controller",
-    ],
-)
-
-cc_binary(
-    name = "robot_diagnostics_main",
-    srcs = ["robot_diagnostics_main.cpp"],
-    deps = [
-        "//shared/parameter:cpp_configs",
-        "//software/backend",
-        "//software/backend:all_backends",
-        "//software/logger",
-        "//software/util/generic_factory",
-        "@boost//:program_options",
     ],
 )
 
@@ -151,13 +94,5 @@ pybind_extension(
     name = "python_bindings",
     deps = [
         ":python_bindings_lib",
-    ],
-)
-
-sh_binary(
-    name = "restart_on_crash",
-    srcs = ["restart_on_crash.sh"],
-    deps = [
-        "@bazel_tools//tools/bash/runfiles",
     ],
 )

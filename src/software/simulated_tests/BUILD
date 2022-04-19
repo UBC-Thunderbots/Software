@@ -9,6 +9,7 @@ cc_library(
         "//software/logger",
         "//proto/message_translation:primitive_google_to_nanopb_converter",
         "//proto/message_translation:tbots_protobuf",
+        "//proto:play_info_msg_cc_proto",
         "//software/sensor_fusion",
         "//software/simulated_tests/validation:non_terminating_function_validator",
         "//software/simulated_tests/validation:terminating_function_validator",

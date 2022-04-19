@@ -67,7 +67,6 @@ class SimulatedErForceSimPlayTestFixture : public SimulatedErForceSimTestFixture
     const std::shared_ptr<AiConfig> getAiConfig() const;
 
     std::optional<TbotsProto::PlayInfo> getPlayInfo() override;
-    AIDrawFunction getDrawFunctions() override;
 
    private:
     void updatePrimitives(const World& friendly_world, const World& enemy_world,
