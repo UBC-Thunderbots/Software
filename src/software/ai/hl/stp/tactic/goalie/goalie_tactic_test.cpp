@@ -126,6 +126,7 @@ TEST_F(GoalieTacticTest, test_ball_very_fast_misses_net)
             Duration::fromSeconds(10));
 }
 
+// TODO (#2590): Goalie gets stuck in goal if path is close to the goal
 TEST_F(GoalieTacticTest, test_slow_ball_at_sharp_angle_to_friendly_goal)
 {
     BallState ball_state(Point(-4.5, -3), Vector(0, 0.1));
@@ -221,38 +222,29 @@ INSTANTIATE_TEST_CASE_P(
                             0, RobotState(Point(-3.5, 1), Vector(0, 0),
                                           Angle::fromDegrees(0), Angle::fromDegrees(0))}),
 
-        // TODO(#2471): re-enable and fix this
         // ball moving out from inside defense area
-        //        std::make_tuple(BallState(Field::createSSLDivisionBField().friendlyGoalCenter()
-        //        +
-        //                                      Vector(0.5, 0),
-        //                                  Vector(0.5, 0)),
-        //                        RobotStateWithId{
-        //                            0, RobotState(Point(-3.5, 0), Vector(0, 0),
-        //                                          Angle::fromDegrees(0),
-        //                                          Angle::fromDegrees(0))}),
+        std::make_tuple(BallState(Field::createSSLDivisionBField().friendlyGoalCenter() +
+                                      Vector(0.5, 0),
+                                  Vector(0.5, 0)),
+                        RobotStateWithId{
+                            0, RobotState(Point(-3.5, 0), Vector(0, 0),
+                                          Angle::fromDegrees(0), Angle::fromDegrees(0))}),
 
-        // TODO(#2471): re-enable and fix this
         // ball moving into goal from inside defense area
-        //        std::make_tuple(BallState(Field::createSSLDivisionBField().friendlyGoalCenter()
-        //        +
-        //                                      Vector(0.5, 0),
-        //                                  Vector(-0.5, 0)),
-        //                        RobotStateWithId{
-        //                            0, RobotState(Point(-3.5, 0), Vector(0, 0),
-        //                                          Angle::fromDegrees(0),
-        //                                          Angle::fromDegrees(0))}),
+        std::make_tuple(BallState(Field::createSSLDivisionBField().friendlyGoalCenter() +
+                                      Vector(0.5, 0),
+                                  Vector(-0.5, 0)),
+                        RobotStateWithId{
+                            0, RobotState(Point(-3.5, 0), Vector(0, 0),
+                                          Angle::fromDegrees(0), Angle::fromDegrees(0))}),
 
-        // TODO(#2471): re-enable and fix this
         // ball moving up and out of defense area
-        //        std::make_tuple(BallState(Field::createSSLDivisionBField().friendlyGoalCenter()
-        //        +
-        //                                      Vector(0.3, 0),
-        //                                  Vector(0, 1)),
-        //                        RobotStateWithId{
-        //                            0, RobotState(Point(-3.5, 0), Vector(0, 0),
-        //                                          Angle::fromDegrees(0),
-        //                                          Angle::fromDegrees(0))}),
+        std::make_tuple(BallState(Field::createSSLDivisionBField().friendlyGoalCenter() +
+                                      Vector(0.3, 0),
+                                  Vector(0, 1)),
+                        RobotStateWithId{
+                            0, RobotState(Point(-3.5, 0), Vector(0, 0),
+                                          Angle::fromDegrees(0), Angle::fromDegrees(0))}),
 
         // ball moving down and out goal from defense area
         std::make_tuple(BallState(Field::createSSLDivisionBField().friendlyGoalCenter() +

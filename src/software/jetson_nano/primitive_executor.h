@@ -46,11 +46,12 @@ class PrimitiveExecutor
      * target wheel velocities
      *
      * @param robot_id The id of the robot which is running this Primitive Executor
-     * @param orientation The current robot_state to step the primitive on
+     * @param curr_orientation The current orientation of the robot which is running this
+     * Primitive Executor
      * @returns DirectPerWheelControl The per-wheel direct control primitive msg
      */
     std::unique_ptr<TbotsProto::DirectControlPrimitive> stepPrimitive(
-        const unsigned int robot_id, const Angle& orientation);
+        const unsigned int robot_id, const Angle& curr_orientation);
 
    private:
     /*
@@ -58,23 +59,24 @@ class PrimitiveExecutor
      * assuming max acceleration.
      *
      * @param robot_id The id of the robot which is running this Primitive Executor
-     * @param orientation The orientation of the robot we are planning the current
-     * primitive for
+     * @param curr_orientation The current orientation of the robot which is running this
+     * Primitive Executor
      * @returns Vector The target linear velocity
      */
-    Vector getTargetLinearVelocity(const unsigned int robot_id, const Angle& orientation);
+    Vector getTargetLinearVelocity(const unsigned int robot_id,
+                                   const Angle& curr_orientation);
 
     /*
      * Compute the next target angular velocity the robot should be at
      * assuming max acceleration.
      *
      * @param move_primitive The MovePrimitive to compute the angular velocity for
-     * @param orientation The orientation of the robot we are planning the current
-     * primitive for
+     * @param curr_orientation The current orientation of the robot which is running this
+     * Primitive Executor
      * @returns AngularVelocity The target angular velocity
      */
     AngularVelocity getTargetAngularVelocity(
-        const TbotsProto::MovePrimitive& move_primitive, const Angle& orientation);
+        const TbotsProto::MovePrimitive& move_primitive, const Angle& curr_orientation);
 
     /*
      * The AutoKickOrChip settings from the move primitive need to get copied over

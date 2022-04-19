@@ -25,7 +25,6 @@ class PenaltyKickEnemyPlayTest
     Field field                      = Field::createField(field_type);
 };
 
-// TODO (#2519): Re-enable tests failing due to HRVO integration
 TEST_P(PenaltyKickEnemyPlayTest, test_penalty_kick_enemy_play_setup)
 {
     RefereeCommand current_command  = std::get<0>(GetParam());
