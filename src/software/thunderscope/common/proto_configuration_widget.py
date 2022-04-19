@@ -245,14 +245,26 @@ class ProtoConfigurationWidget(QWidget):
                 value = False if convert_all_fields_to_bools else value
                 field_list.append(self.__create_bool_parameter(key, value, descriptor))
 
+            elif descriptor.type == descriptor.TYPE_ENUM:
+                field_list.append(self.__create_enum_parameter(key, value, descriptor))
+
+            elif descriptor.type == descriptor.TYPE_STRING:
+                field_list.append(
+                    self.__create_string_parameter(key, value, descriptor)
+                )
+
+            elif descriptor.type == descriptor.TYPE_DOUBLE:
+                field_list.append(
+                    self.__create_double_parameter(key, value, descriptor)
+                )
+
+            elif descriptor.type in [descriptor.TYPE_INT32, descriptor.TYPE_INT64]:
+                field_list.append(self.__create_int_parameter(key, value, descriptor))
+
             else:
-                field_list.append({
-                    descriptor.TYPE_ENUM: self.__create_enum_parameter,
-                    descriptor.TYPE_INT32: self.__create_int_parameter,
-                    descriptor.TYPE_INT64: self.__create_int_parameter,
-                    descriptor.TYPE_DOUBLE: self.__create_double_parameter,
-                    descriptor.TYPE_STRING: self.__create_string_parameter,
-                }[descriptor.type](key, value, descriptor))
+                raise NotImplementedError(
+                    "Unsupported type {} in parameter config".format(descriptor.type)
+                )
 
         if field_list:
             return field_list
