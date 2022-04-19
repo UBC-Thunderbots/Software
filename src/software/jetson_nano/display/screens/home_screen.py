@@ -1,4 +1,4 @@
-from software.display.screens.screen import Screen
+from software.jetson_nano.display.screens.screen import Screen
 import software.jetson_nano.display.constants as constants
 
 ROBOT_ID_INDEX = 0

@@ -4,13 +4,13 @@ import board
 from PIL import Image, ImageDraw, ImageOps
 import adafruit_rgb_display.st7735 as st7735
 
-from software.display.lcd_user_interface import LcdDisplay
-from software.display.rotary_encoder import RotaryEncoder
-from software.display.screens.home_screen import HomeScreen
-from software.display.screens.menu_screen import MenuScreen
-from software.display.screens.wheels_screen import WheelsScreen
-from software.display.screens.chip_and_kick_screen import ChipAndKickScreen
-import software.display.constants as constants
+from software.jetson_nano.display.lcd_user_interface.lcd_user_interface import LcdDisplay
+from software.jetson_nano.display.rotary_encoder.rotary_encoder import RotaryEncoder
+from software.jetson_nano.display.screens.home_screen import HomeScreen
+from software.jetson_nano.display.screens.menu_screen import MenuScreen
+from software.jetson_nano.display.screens.wheels_screen import WheelsScreen
+from software.jetson_nano.display.screens.chip_and_kick_screen import ChipAndKickScreen
+import software.jetson_nano.display.constants as constants
 
 # Pins for Rotary Encoder
 BUTTON_PIN = constants.BUTTON_PIN
@@ -104,6 +104,7 @@ class RobotUi:
                         self.redis_client.get(action["redis key"]).decode("UTF-8"),
                     )
                 )
+        on_click()
 
         def on_clockwise_rotate():
             """ Execute the clockwise rotate callback of curr screen """

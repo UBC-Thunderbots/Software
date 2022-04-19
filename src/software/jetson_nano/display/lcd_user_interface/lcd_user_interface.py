@@ -1,10 +1,12 @@
 import adafruit_rgb_display.st7735 as st7735
 import board
+import busio
 import digitalio
 from PIL import Image, ImageDraw, ImageOps
 
 """
-Information for the display that we are using can be found here: https://www.adafruit.com/product/358#description
+Information for the display that we are using can be found here:
+https://www.adafruit.com/product/358#description
 
 Pin Connections:
     Jetson Nano              LCD Display
@@ -26,12 +28,12 @@ DC_PIN = digitalio.DigitalInOut(board.D25)  # Pin 22
 RESET_PIN = digitalio.DigitalInOut(board.D24)  # Pin 18
 
 # Config for display baudrate to 4MHz:
-BAUDRATE = 4000000
+BAUDRATE = 400000
 # Config the proper screen rotation
 ROTATION = 90
 
 # Setup SPI bus using hardware SPI:
-SPI = board.SPI()
+SPI = busio.SPI(board.SCK_1, MOSI=board.MOSI_1, MISO=board.MISO_1)
 
 # We will use RGB colour model
 COLOUR_MODEL = "RGB"
@@ -105,7 +107,7 @@ class LcdDisplay:
 
 
 if __name__ == "__main__":
-    path_to_logo = "./imgs/tbots.jpg"
+    # path_to_logo = "./imgs/tbots.jpg"
 
     display = LcdDisplay()
     display.draw_image(path_to_logo)
