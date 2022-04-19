@@ -1,0 +1,15 @@
+- double:
+    name: enemy_about_to_steal_ball_radius
+    min: 0.0
+    max: 4.0
+    value: 0.1
+    description: >-
+        The radius of the circle around a friendly robot around which
+        we think an enemy is about to steal the ball
+
+- double:
+    name: min_open_angle_for_shot_deg
+    min: 0.0
+    max: 90.0
+    value: 6
+    description: The minimum open angle to the goal that we require before taking a shot

@@ -1,0 +1,69 @@
+ - double:
+     name: static_field_position_quality_x_offset
+     min: 0
+     max: 1
+     value: 0.3
+     description: >-
+                The offset from the sides of the field to place the rectangular
+                sigmoid we use to determine what areas to pass to
+ - double:
+     name: static_field_position_quality_y_offset
+     min: 0
+     max: 1
+     value: 0.3
+     description: >-
+                The offset from the sides of the field to place the rectangular
+                sigmoid we use to determine what areas to pass to
+ - double:
+     name: static_field_position_quality_friendly_goal_distance_weight
+     min: 0
+     max: 1
+     value: 0.3
+     description: >-
+         The weight that being close to the goal will have on the static
+         position quality. Lower, more negative weights result in the distance
+         to the goal having less of an effect.
+ - double:
+     name: enemy_proximity_importance
+     min: 0
+     max: 10
+     value: 0.5
+     description: >-
+                This controls how heavily we weigh an enemy robot being near the pass
+                receiver when calculating enemy risk to a pass
+ - double:
+     name: ideal_max_rotation_to_shoot_degrees
+     min: 0
+     max: 180
+     value: 60
+     description: >-
+                The maximum angle that we have to rotate after receiving a pass to
+                shoot that we think would likely result in a goal. Note that we may
+                try to take shots that require us to rotate more then this, it's more
+                of a soft limit.
+ - double:
+     name: min_pass_speed_m_per_s
+     min: 0
+     max: 5
+     value: 4.3
+     description: "The minimum pass speed (in m/s)"
+ - double:
+     name: max_pass_speed_m_per_s
+     min: 0
+     max: 10
+     value: 6
+     description: "The maximum pass speed (in m/s)"
+ - double:
+     name: enemy_reaction_time
+     min: 0
+     max: 3.0
+     value: 0.4
+     description: >-
+       How long we think the enemy will take to recognize we're passing and start
+       moving to intercept
+ - int:
+     name: number_of_gradient_descent_steps_per_iter
+     min: 0
+     max: 1000
+     value: 2 # TODO (#1987) find optimal iterations after tuning, for now 2 does the trick
+     description: "The number of steps of gradient descent to perform in each iteration"

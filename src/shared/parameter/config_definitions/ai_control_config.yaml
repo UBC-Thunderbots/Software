@@ -1,0 +1,19 @@
+- bool:
+    name: run_ai
+    value: true
+    description: >-
+        Selecting will allow HL and Navigator to run, unselecting will
+        stop new decisions from being made, but the robots will finish
+        the last commands they were given. DO NOT USE in place of the e-stop.
+- bool:
+    name: override_ai_play
+    value: false
+    description: >-
+        Overrides the current play with the play
+        specified by currentPlay parameter
+
+- string:
+    name: current_ai_play
+    value: "HaltPlay"
+    description: >-
+        Specifies the ai play that should be in use
