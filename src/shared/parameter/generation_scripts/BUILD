@@ -28,25 +28,3 @@ py_binary(
         requirement("decorator"),
     ],
 )
-
-py_binary(
-    name = "generate_proto_dynamic_parameters",
-    srcs = [
-        ":generate_proto_dynamic_parameters.py",
-        ":proto_writer.py",
-        ":type_map.py",
-    ],
-    data = [
-        "//shared/parameter/config_definitions:parameter_configs",
-    ],
-    main = ":generate_proto_dynamic_parameters.py",
-    python_version = "PY3",
-    visibility = ["//shared/parameter:__subpackages__"],
-    deps = [
-        requirement("PyYAML"),
-        requirement("jsonschema"),
-        requirement("colorama"),
-        requirement("networkx"),
-        requirement("decorator"),
-    ],
-)
