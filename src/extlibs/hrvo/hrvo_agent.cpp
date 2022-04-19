@@ -488,11 +488,11 @@ void HRVOAgent::computePreferredVelocity()
         return;
     }
 
-    Vector goal_position = path_point_opt.value().getPosition();
+    Vector destination = path_point_opt.value().getPosition();
     float speed_at_dest  = path_point_opt.value().getSpeed();
 
     float max_dist_per_tick = max_accel_ * simulator_->getTimeStep();
-    Vector vector_to_dest   = goal_position - position_;
+    Vector vector_to_dest   = destination - position_;
     double distance_to_dest = vector_to_dest.length();
     if (distance_to_dest > max_dist_per_tick)
     {
@@ -500,6 +500,30 @@ void HRVOAgent::computePreferredVelocity()
         // has travelled the maximum distance for one tick.
         distance_to_dest -= max_dist_per_tick;
     }
+
+
+    // angular velocity given linear deceleration and distance remaining to target
+    // orientation.
+    // Vi = sqrt(Vf^2 + 2 * a * d)
+    double deceleration_speed = std::sqrt(std::pow(speed_at_dest, 2.f) +
+                                          2 * max_accel_ * distance_to_dest);
+
+    double desired_next_speed = std::min(static_cast<double>(max_speed_), deceleration_speed);
+    Vector desired_next_velocity = vector_to_dest.normalize(desired_next_speed);
+    Vector dv = desired_next_velocity - velocity_;
+    if (dv.length() <= max_accel_ * simulator_->getTimeStep())
+    {
+        pref_velocity_ = desired_next_velocity;
+    }
+    else
+    {
+        // Calculate the maximum velocity towards the preferred velocity, given the
+        // acceleration constraint
+        pref_velocity_ =
+                velocity_ + dv.normalize(max_accel_ * simulator_->getTimeStep());
+    }
+    return;
+
 
     // d = (Vf^2 - Vi^2) / 2a
     double start_linear_deceleration_distance =
