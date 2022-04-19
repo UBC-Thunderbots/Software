@@ -1,10 +1,5 @@
 #include "software/ai/navigator/obstacle/robot_navigation_obstacle_factory.h"
 
-RobotNavigationObstacleFactory::RobotNavigationObstacleFactory()
-    : robot_radius_expansion_amount(2.0167 * ROBOT_MAX_RADIUS_METERS)
-{
-}
-
 std::vector<ObstaclePtr> RobotNavigationObstacleFactory::createFromMotionConstraint(
     const MotionConstraint &motion_constraint, const World &world) const
 {
@@ -101,12 +96,14 @@ std::vector<ObstaclePtr> RobotNavigationObstacleFactory::createFromMotionConstra
 
 ObstaclePtr RobotNavigationObstacleFactory::createFromRobot(const Robot &robot) const
 {
+
     // Radius of a hexagonal approximation of a robot
     double robot_hexagon_radius =
         (ROBOT_MAX_RADIUS_METERS + robot_radius_expansion_amount) * 2.0 / std::sqrt(3);
 
     // The factor to multiply object speed by to determine the length of the velocity
     // obstacle in the objects direction of travel.
+    // TODO-DYNAMIC_PARAMETER
     double speed_scaling_factor = 0.2;
 
     // vector in the direction of the velocity and proportional to the magnitude of the

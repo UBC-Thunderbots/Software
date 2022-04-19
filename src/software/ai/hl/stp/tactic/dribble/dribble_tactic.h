@@ -20,7 +20,7 @@ class DribbleTactic : public Tactic
      *
      * @param ai_config The AI configuration
      */
-    explicit DribbleTactic(std::shared_ptr<const AiConfig> ai_config);
+    explicit DribbleTactic(TbotsProto::AiConfig ai_config);
 
     DribbleTactic() = delete;
 

@@ -9,7 +9,7 @@
 class PenaltyKickEnemyPlay : public Play
 {
    public:
-    PenaltyKickEnemyPlay(std::shared_ptr<const AiConfig> config);
+    PenaltyKickEnemyPlay(TbotsProto::AiConfig config);
 
     void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
 };

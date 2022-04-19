@@ -7,7 +7,7 @@
 #include "software/logger/logger.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-OffensePlay::OffensePlay(std::shared_ptr<const AiConfig> config)
+OffensePlay::OffensePlay(TbotsProto::AiConfig config)
     : Play(config, true),
       shoot_or_pass_play(std::make_shared<ShootOrPassPlay>(ai_config)),
       crease_defense_play(std::make_shared<CreaseDefensePlay>(ai_config))
@@ -61,4 +61,4 @@ void OffensePlay::updateTactics(const PlayUpdate &play_update)
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, OffensePlay, AiConfig> factory;
+static TGenericFactory<std::string, Play, OffensePlay, TbotsProto::AiConfig> factory;

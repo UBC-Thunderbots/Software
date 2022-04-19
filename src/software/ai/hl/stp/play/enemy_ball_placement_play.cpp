@@ -8,7 +8,7 @@
 #include "software/util/generic_factory/generic_factory.h"
 #include "software/world/game_state.h"
 
-EnemyBallPlacementPlay::EnemyBallPlacementPlay(std::shared_ptr<const AiConfig> config)
+EnemyBallPlacementPlay::EnemyBallPlacementPlay(TbotsProto::AiConfig config)
     : Play(config, true)
 {
 }
@@ -125,4 +125,4 @@ void EnemyBallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
     }
 }
 
-static TGenericFactory<std::string, Play, EnemyBallPlacementPlay, AiConfig> factory;
+static TGenericFactory<std::string, Play, EnemyBallPlacementPlay, TbotsProto::AiConfig> factory;

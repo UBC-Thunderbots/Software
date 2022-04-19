@@ -6,7 +6,7 @@
 #include "software/ai/hl/stp/tactic/stop/stop_tactic.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-BallPlacementPlay::BallPlacementPlay(std::shared_ptr<const AiConfig> config)
+BallPlacementPlay::BallPlacementPlay(TbotsProto::AiConfig config)
     : Play(config, true)
 {
 }
@@ -47,4 +47,4 @@ void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, BallPlacementPlay, AiConfig> factory;
+static TGenericFactory<std::string, Play, BallPlacementPlay, TbotsProto::TbotsProto::AiConfig> factory;

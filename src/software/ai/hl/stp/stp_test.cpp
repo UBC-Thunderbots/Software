@@ -14,7 +14,7 @@ class STPTest : public ::testing::Test
     STPTest()
         : world(::TestUtil::createBlankTestingWorld()),
           mutable_ai_config(std::make_shared<ThunderbotsConfig>()->getMutableAiConfig()),
-          ai_config(std::shared_ptr<const AiConfig>(mutable_ai_config)),
+          ai_config(TbotsProto::AiConfig(mutable_ai_config)),
           // Give an explicit seed to STP so that our tests are deterministic
           stp(ai_config)
     {
@@ -31,7 +31,7 @@ class STPTest : public ::testing::Test
 
     World world;
     std::shared_ptr<AiConfig> mutable_ai_config;
-    std::shared_ptr<const AiConfig> ai_config;
+    TbotsProto::AiConfig ai_config;
     STP stp;
 };
 

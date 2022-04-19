@@ -44,7 +44,7 @@ class Play
      * @param ai_config The AI configuration
      * @param requires_goalie Whether this plays requires a goalie
      */
-    explicit Play(std::shared_ptr<const AiConfig> ai_config, bool requires_goalie);
+    explicit Play(TbotsProto::AiConfig ai_config, bool requires_goalie);
 
     /**
      * Gets Intents from the Play given the assignment algorithm and world
@@ -74,7 +74,7 @@ class Play
    protected:
     // TODO (#2359): remove this
     // The Play configuration
-    std::shared_ptr<const AiConfig> ai_config;
+    TbotsProto::AiConfig ai_config;
 
    private:
     /**
@@ -149,4 +149,4 @@ class Play
 
 // Function that creates a play
 using PlayConstructor =
-    std::function<std::unique_ptr<Play>(std::shared_ptr<const AiConfig>)>;
+    std::function<std::unique_ptr<Play>(TbotsProto::AiConfig)>;

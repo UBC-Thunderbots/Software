@@ -7,7 +7,7 @@
 class PlayFactoryTest : public testing::Test
 {
    protected:
-    std::shared_ptr<const AiConfig> ai_config =
+    TbotsProto::AiConfig ai_config =
         std::make_shared<const ThunderbotsConfig>()->getAiConfig();
 };
 

@@ -11,7 +11,7 @@
 class CornerKickPlay : public Play
 {
    public:
-    CornerKickPlay(std::shared_ptr<const AiConfig> config);
+    CornerKickPlay(TbotsProto::AiConfig config);
 
     void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
 

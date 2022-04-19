@@ -28,7 +28,7 @@ struct PlaySelectionFSM
      *
      * @param ai_config the play config for this play fsm
      */
-    explicit PlaySelectionFSM(std::shared_ptr<const AiConfig> ai_config);
+    explicit PlaySelectionFSM(TbotsProto::AiConfig ai_config);
 
     /**
      * Guards for whether the game state is stopped, halted, playing, or in set up
@@ -115,6 +115,6 @@ struct PlaySelectionFSM
     }
 
    private:
-    std::shared_ptr<const AiConfig> ai_config;
+    TbotsProto::AiConfig ai_config;
     std::shared_ptr<Play> current_play;
 };

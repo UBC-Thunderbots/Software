@@ -1,6 +1,6 @@
 #include "software/ai/hl/stp/play/crease_defense/crease_defense_play_fsm.h"
 
-CreaseDefensePlayFSM ::CreaseDefensePlayFSM(std::shared_ptr<const AiConfig> ai_config)
+CreaseDefensePlayFSM ::CreaseDefensePlayFSM(TbotsProto::AiConfig ai_config)
     : ai_config(ai_config), crease_defenders({})
 {
 }

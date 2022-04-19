@@ -23,7 +23,7 @@ class PenaltyKickTacticTest : public SimulatedErForceSimTacticTestFixture,
     Point initial_position   = field.friendlyPenaltyMark() + Vector(-0.1, 0);
     RobotStateWithId shooter = {
         0, RobotState(initial_position, Vector(0, 0), Angle::zero(), Angle::zero())};
-    std::shared_ptr<const AiConfig> ai_config =
+    TbotsProto::AiConfig ai_config =
         std::make_shared<ThunderbotsConfig>()->getAiConfig();
 };
 

@@ -5,7 +5,7 @@
 #include "software/logger/logger.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-ShootOrPassPlay::ShootOrPassPlay(std::shared_ptr<const AiConfig> config)
+ShootOrPassPlay::ShootOrPassPlay(TbotsProto::AiConfig config)
     : Play(config, true), fsm{ShootOrPassPlayFSM{config}}, control_params{}
 {
 }
@@ -26,4 +26,4 @@ void ShootOrPassPlay::updateTactics(const PlayUpdate &play_update)
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, ShootOrPassPlay, AiConfig> factory;
+static TGenericFactory<std::string, Play, ShootOrPassPlay, TbotsProto::AiConfig> factory;

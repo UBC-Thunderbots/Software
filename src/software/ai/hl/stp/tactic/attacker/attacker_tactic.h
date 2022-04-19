@@ -19,7 +19,7 @@ class AttackerTactic : public Tactic
      *
      * @param ai_config The AI configuration
      */
-    explicit AttackerTactic(std::shared_ptr<const AiConfig> ai_config);
+    explicit AttackerTactic(TbotsProto::AiConfig ai_config);
 
     AttackerTactic() = delete;
 

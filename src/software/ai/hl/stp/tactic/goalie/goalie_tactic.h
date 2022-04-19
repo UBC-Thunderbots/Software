@@ -23,7 +23,7 @@ class GoalieTactic : public Tactic
      * @param ai_config The AI configuration
      * @param max_allowed_speed_mode The maximum allowed speed mode
      */
-    explicit GoalieTactic(std::shared_ptr<const AiConfig> ai_config,
+    explicit GoalieTactic(TbotsProto::AiConfig ai_config,
                           TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode =
                               TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
 

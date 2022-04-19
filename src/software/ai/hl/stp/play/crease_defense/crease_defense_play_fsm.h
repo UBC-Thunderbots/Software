@@ -25,7 +25,7 @@ struct CreaseDefensePlayFSM
      *
      * @param ai_config the play config for this play FSM
      */
-    explicit CreaseDefensePlayFSM(std::shared_ptr<const AiConfig> ai_config);
+    explicit CreaseDefensePlayFSM(TbotsProto::AiConfig ai_config);
 
     /**
      * Action to defend the defense area
@@ -58,6 +58,6 @@ struct CreaseDefensePlayFSM
     }
 
    private:
-    std::shared_ptr<const AiConfig> ai_config;
+    TbotsProto::AiConfig ai_config;
     std::vector<std::shared_ptr<CreaseDefenderTactic>> crease_defenders;
 };

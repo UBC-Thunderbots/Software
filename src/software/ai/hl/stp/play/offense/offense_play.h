@@ -12,7 +12,7 @@
 class OffensePlay : public Play
 {
    public:
-    OffensePlay(std::shared_ptr<const AiConfig> config);
+    OffensePlay(TbotsProto::AiConfig config);
 
     void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
     void updateTactics(const PlayUpdate &play_update) override;

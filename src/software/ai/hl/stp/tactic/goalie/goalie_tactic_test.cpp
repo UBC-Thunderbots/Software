@@ -39,7 +39,7 @@ class GoalieTacticTest
             {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field.enemyGoalCenter(),
              field.enemyDefenseArea().negXNegYCorner(),
              field.enemyDefenseArea().negXPosYCorner()});
-    std::shared_ptr<const AiConfig> ai_config =
+    TbotsProto::AiConfig ai_config =
         std::make_shared<ThunderbotsConfig>()->getAiConfig();
 };
 

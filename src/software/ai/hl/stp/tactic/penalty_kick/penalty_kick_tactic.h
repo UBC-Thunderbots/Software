@@ -19,7 +19,7 @@ class PenaltyKickTactic : public Tactic
      *
      * @param ai_config The AI configuration
      */
-    explicit PenaltyKickTactic(std::shared_ptr<const AiConfig> ai_config);
+    explicit PenaltyKickTactic(TbotsProto::AiConfig ai_config);
 
     PenaltyKickTactic() = delete;
 

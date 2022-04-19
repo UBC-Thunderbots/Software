@@ -15,14 +15,6 @@
 class NavigatingPrimitiveCreator : public NavigatingIntentVisitor
 {
    public:
-    NavigatingPrimitiveCreator() = delete;
-
-    /**
-     * Create a NavigatingPrimitiveCreator
-     *
-     */
-    explicit NavigatingPrimitiveCreator();
-
     /**
      * Creates a primitive for a given path and navigating intent
      *

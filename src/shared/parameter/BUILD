@@ -28,6 +28,7 @@ cc_library(
         "//software/util/generic_factory",
         "//software/world:game_state",
         "//software/world:team_colour",
+        "//proto:tbots_cc_proto",
     ],
 )
 

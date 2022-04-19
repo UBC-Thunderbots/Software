@@ -13,7 +13,7 @@
 #include "software/world/game_state.h"
 #include "software/world/team.h"
 
-DefensePlay::DefensePlay(std::shared_ptr<const AiConfig> config) : Play(config, true) {}
+DefensePlay::DefensePlay(TbotsProto::AiConfig config) : Play(config, true) {}
 
 void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World &world)
 {
@@ -131,4 +131,4 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, DefensePlay, AiConfig> factory;
+static TGenericFactory<std::string, Play, DefensePlay, TbotsProto::AiConfig> factory;

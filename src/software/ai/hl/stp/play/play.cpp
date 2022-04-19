@@ -1,6 +1,6 @@
 #include "software/ai/hl/stp/play/play.h"
 
-Play::Play(std::shared_ptr<const AiConfig> ai_config, bool requires_goalie)
+Play::Play(TbotsProto::AiConfig ai_config, bool requires_goalie)
     : ai_config(ai_config),
       requires_goalie(requires_goalie),
       tactic_sequence(boost::bind(&Play::getNextTacticsWrapper, this, _1)),

@@ -14,10 +14,10 @@
 class HaltTestPlay : public Play
 {
    public:
-    HaltTestPlay(std::shared_ptr<const AiConfig> config);
+    HaltTestPlay(TbotsProto::AiConfig config);
 
     void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
 
    private:
-    std::shared_ptr<const AiConfig> ai_config;
+    TbotsProto::AiConfig ai_config;
 };

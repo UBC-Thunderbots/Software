@@ -14,7 +14,7 @@
 #include "software/util/generic_factory/generic_factory.h"
 #include "software/world/game_state.h"
 
-ShootOrChipPlay::ShootOrChipPlay(std::shared_ptr<const AiConfig> config)
+ShootOrChipPlay::ShootOrChipPlay(TbotsProto::AiConfig config)
     : Play(config, true)
 {
 }
@@ -106,4 +106,4 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield,
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, ShootOrChipPlay, AiConfig> factory;
+static TGenericFactory<std::string, Play, ShootOrChipPlay, TbotsProto::AiConfig> factory;

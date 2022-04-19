@@ -14,7 +14,7 @@ class PivotKickTactic : public Tactic
      *
      * @param ai_config The AI configuration
      */
-    explicit PivotKickTactic(std::shared_ptr<const AiConfig> ai_config);
+    explicit PivotKickTactic(TbotsProto::AiConfig ai_config);
 
     PivotKickTactic() = delete;
 

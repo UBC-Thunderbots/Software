@@ -6,7 +6,5 @@ include:
   - defense_play_config.yaml
   - enemy_capability_config.yaml
   - goalie_tactic_config.yaml
-  - navigator_config.yaml
   - passing_config.yaml
-  - robot_navigation_obstacle_config.yaml
   - shoot_or_pass_play_config.yaml

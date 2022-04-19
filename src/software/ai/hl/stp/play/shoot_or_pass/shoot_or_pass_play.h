@@ -10,7 +10,7 @@
 class ShootOrPassPlay : public Play
 {
    public:
-    ShootOrPassPlay(std::shared_ptr<const AiConfig> config);
+    ShootOrPassPlay(TbotsProto::AiConfig config);
 
     void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
     void updateTactics(const PlayUpdate &play_update) override;

@@ -2,9 +2,9 @@
 
 #include <algorithm>
 
-DribbleTactic::DribbleTactic(std::shared_ptr<const AiConfig> ai_config)
+DribbleTactic::DribbleTactic(TbotsProto::AiConfig ai_config)
     : Tactic({RobotCapability::Move, RobotCapability::Dribble, RobotCapability::Kick}),
-      fsm(DribbleFSM(ai_config->getDribbleTacticConfig())),
+      fsm(DribbleFSM(ai_config.dribble_tactic_config())),
       control_params{DribbleFSM::ControlParams{.dribble_destination       = std::nullopt,
                                                .final_dribble_orientation = std::nullopt,
                                                .allow_excessive_dribbling = false}}

@@ -119,7 +119,8 @@ class RobotNavigationObstacleFactory
                                         const Point &ball_point) const;
 
    private:
-    double robot_radius_expansion_amount;
+    // TODO-DYNAMIC_PARAMETER
+    double robot_radius_expansion_amount = 2.0617 * ROBOT_MAX_RADIUS_METERS;
 
     /**
      * Returns an obstacle for the field_rectangle expanded on all sides to account for

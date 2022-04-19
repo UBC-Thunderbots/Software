@@ -10,7 +10,7 @@
 class ShootOrChipPlay : public Play
 {
    public:
-    ShootOrChipPlay(std::shared_ptr<const AiConfig> config);
+    ShootOrChipPlay(TbotsProto::AiConfig config);
 
     void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
 };

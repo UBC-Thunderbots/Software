@@ -1,8 +1,8 @@
 #include "software/ai/hl/stp/tactic/penalty_kick/penalty_kick_tactic.h"
 
-PenaltyKickTactic::PenaltyKickTactic(std::shared_ptr<const AiConfig> ai_config)
+PenaltyKickTactic::PenaltyKickTactic(TbotsProto::AiConfig ai_config)
     : Tactic({RobotCapability::Move, RobotCapability::Dribble, RobotCapability::Kick}),
-      fsm{DribbleFSM(ai_config->getDribbleTacticConfig()), PenaltyKickFSM(),
+      fsm{DribbleFSM(ai_config.dribble_tactic_config()), PenaltyKickFSM(),
           GetBehindBallFSM()}
 {
 }
