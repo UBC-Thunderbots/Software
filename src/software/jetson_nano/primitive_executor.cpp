@@ -32,19 +32,13 @@ void PrimitiveExecutor::updateWorld(const TbotsProto::World& world_msg)
     hrvo_simulator_.updateWorld(World(world_msg));
 }
 
+void PrimitiveExecutor::updateLocalVelocity(Vector local_velocity) {}
+
 Vector PrimitiveExecutor::getTargetLinearVelocity(const unsigned int robot_id,
                                                   const Angle& curr_orientation)
 {
     Vector target_global_velocity = hrvo_simulator_.getRobotVelocity(robot_id);
-
-    double local_x_velocity = curr_orientation.cos() * target_global_velocity.x() +
-                              curr_orientation.sin() * target_global_velocity.y();
-
-    double local_y_velocity = -curr_orientation.sin() * target_global_velocity.x() +
-                              curr_orientation.cos() * target_global_velocity.y();
-
-    return Vector(local_x_velocity, local_y_velocity)
-        .normalize(target_global_velocity.length());
+    return target_global_velocity.rotate(-curr_orientation);
 }
 
 AngularVelocity PrimitiveExecutor::getTargetAngularVelocity(
