@@ -308,52 +308,6 @@ class Thunderscope(object):
                 ),
             )
 
-        def __save_layout():
-
-            filename, _ = QtGui.QFileDialog.getSaveFileName(
-                self.window,
-                "Save layout",
-                "~/dock_layout_{}.tscopelayout".format(int(time.time())),
-                options=QFileDialog.Option.DontUseNativeDialog,
-            )
-
-            result = self.dock_area.saveState()
-
-            with shelve.open(filename, "c") as shelf:
-                shelf["dock_state"] = result
-
-        def __load_layout():
-
-            filename, _ = QtGui.QFileDialog.getOpenFileName(
-                self.window,
-                "Open layout",
-                "~/",
-                options=QFileDialog.Option.DontUseNativeDialog,
-            )
-
-            with shelve.open(filename, "r") as shelf:
-                self.dock_area.restoreState(shelf["dock_state"])
-
-        self.save_layout = QtGui.QShortcut(QtGui.QKeySequence("Ctrl+S"), self.window)
-        self.save_layout.activated.connect(__save_layout)
-
-        self.save_layout = QtGui.QShortcut(QtGui.QKeySequence("Ctrl+O"), self.window)
-        self.save_layout.activated.connect(__load_layout)
-
-        self.show_help = QtGui.QShortcut(QtGui.QKeySequence("h"), self.window)
-        self.show_help.activated.connect(
-            lambda: QMessageBox.information(
-                self.window,
-                "Help",
-                """
-                Cntrl+S: Save Layout
-                Double Click Purple Bar to pop window out
-                Drag Purple Bar to rearrange docks
-                Click items in legends to select/deselect
-                """,
-            )
-        )
-
     def register_refresh_function(self, refresh_func):
         """Register the refresh functions to run at the refresh_interval_ms
         passed into thunderscope.

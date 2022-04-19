@@ -86,6 +86,7 @@ class ConfigYamlLoader(object):
         """
         # load yaml into config_metadata
         config_metadata = ConfigYamlLoader.__load_yaml_into_dict(yaml_paths)
+        print(config_metadata)
 
         # validate correct format with schema
         ConfigYamlLoader.__validate_config_metadata(config_metadata)

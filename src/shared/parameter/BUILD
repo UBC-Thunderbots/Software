@@ -53,24 +53,6 @@ cc_library(
     ],
 )
 
-cc_test(
-    name = "cpp_config_test",
-    srcs = [
-        "cpp_config_test.cpp",
-    ],
-    data = [
-        "//shared/parameter/config_definitions:parameter_configs",
-    ],
-    deps = [
-        "//shared/parameter:cpp_configs",
-        "//shared/test_util:tbots_gtest_main",
-        "//software/ai/hl/stp/play:halt_play",
-        "//software/util/variant_visitor",
-        "@boost//:filesystem",
-        "@yaml-cpp",
-    ],
-)
-
 cc_library(
     name = "parameter",
     hdrs = ["parameter.h"],
@@ -96,17 +78,5 @@ cc_library(
         ":enumerated_parameter",
         ":numeric_parameter",
         "@boost//:program_options",
-    ],
-)
-
-cc_test(
-    name = "parameter_test",
-    srcs = ["parameter_test.cpp"],
-    deps = [
-        ":enumerated_parameter",
-        ":numeric_parameter",
-        ":parameter",
-        "//shared/test_util:tbots_gtest_main",
-        "//software/util/make_enum",
     ],
 )
