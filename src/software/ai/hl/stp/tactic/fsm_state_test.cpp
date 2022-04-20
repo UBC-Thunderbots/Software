@@ -5,7 +5,8 @@
 
 TEST(FsmStateTest, test_get_fsm_state)
 {
-    AttackerTactic tactic(std::make_shared<ThunderbotsConfig>()->getAiConfig());
+    TbotsProto::AiConfig ai_config;
+    AttackerTactic tactic(ai_config);
 
     World world = ::TestUtil::createBlankTestingWorld();
     Robot robot = ::TestUtil::createRobotAtPos(Point(-2, -3));

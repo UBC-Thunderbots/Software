@@ -20,7 +20,7 @@ class PivotKickTacticTest
    protected:
     TbotsProto::FieldType field_type = TbotsProto::FieldType::DIV_B;
     Field field                      = Field::createField(field_type);
-    TbotsProto::AiConfig ai_config = std::make_shared<ThunderbotsConfig>()->getAiConfig();
+    TbotsProto::AiConfig ai_config;
 };
 
 TEST_P(PivotKickTacticTest, pivot_kick_test)

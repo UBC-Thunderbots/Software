@@ -33,7 +33,7 @@ TEST_F(CornerKickPlayTest, DISABLED_test_corner_kick_play_bottom_left)
          field.enemyDefenseArea().negXNegYCorner(),
          field.enemyDefenseArea().negXPosYCorner()});
     setEnemyGoalie(0);
-    setAIPlay(TYPENAME(CornerKickPlay));
+    setAIPlay(TbotsProto::CornerKickPlay);
     setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::INDIRECT_FREE_US);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
@@ -61,7 +61,7 @@ TEST_F(CornerKickPlayTest, test_corner_kick_play_top_right)
          field.enemyDefenseArea().negXNegYCorner(),
          field.enemyDefenseArea().negXPosYCorner()});
     setEnemyGoalie(0);
-    setAIPlay(TYPENAME(CornerKickPlay));
+    setAIPlay(TbotsProto::CornerKickPlay);
     setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::INDIRECT_FREE_US);
 
     std::vector<ValidationFunction> terminating_validation_functions = {

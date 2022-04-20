@@ -40,7 +40,7 @@ TEST_P(EnemyFreekickPlayTest, test_enemy_free_kick_play)
     }
 
     setEnemyGoalie(5);
-    setAIPlay(TYPENAME(EnemyFreekickPlay));
+    setAIPlay(TbotsProto::EnemyFreeKickPlay);
     setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::DIRECT_FREE_THEM);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
@@ -116,7 +116,7 @@ TEST_F(EnemyFreekickPlayTest, test_enemy_free_kick_close_to_net)
         Point(-3.8, -2),
     });
     setEnemyGoalie(0);
-    setAIPlay(TYPENAME(EnemyFreekickPlay));
+    setAIPlay(TbotsProto::EnemyFreeKickPlay);
     setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::DIRECT_FREE_THEM);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
@@ -177,7 +177,7 @@ TEST_F(EnemyFreekickPlayTest, test_enemy_free_kick_chipper_robots_close_to_net)
         Point(-4, 1.4),
     });
     setEnemyGoalie(0);
-    setAIPlay(TYPENAME(EnemyFreekickPlay));
+    setAIPlay(TbotsProto::EnemyFreeKickPlay);
     setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::DIRECT_FREE_THEM);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
