@@ -10,9 +10,7 @@ class TestGlobalPathPlanner : public testing::Test
 {
    public:
     TestGlobalPathPlanner()
-        : world(TestUtil::createBlankTestingWorldDivA()),
-          gpp(std::make_shared<RobotNavigationObstacleConfig>(), world),
-          obstacle_factory(std::make_shared<const RobotNavigationObstacleConfig>())
+        : world(TestUtil::createBlankTestingWorldDivA()), gpp(world), obstacle_factory()
     {
     }
 

@@ -31,10 +31,9 @@ class CreaseDefenderTactic : public Tactic
     /**
      * Creates a new CreaseDefenderTactic
      *
-     * @param robot_navigation_obstacle_config The config
+     * @param robot_obstacle_inflation_factor The amount to inflate the robot obstacles
      */
-    explicit CreaseDefenderTactic(std::shared_ptr<const RobotNavigationObstacleConfig>
-                                      robot_navigation_obstacle_config);
+    explicit CreaseDefenderTactic(double robot_obstacle_inflation_factor);
 
     CreaseDefenderTactic() = delete;
 
@@ -69,5 +68,5 @@ class CreaseDefenderTactic : public Tactic
     // Tactic parameters
     FSM<CreaseDefenderFSM> fsm;
     CreaseDefenderFSM::ControlParams control_params;
-    std::shared_ptr<const RobotNavigationObstacleConfig> robot_navigation_obstacle_config;
+    double robot_obstacle_inflation_factor_;
 };

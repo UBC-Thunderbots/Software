@@ -99,13 +99,10 @@ void EnemyBallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
     std::optional<Point> placement_point = world.gameState().getBallPlacementPoint();
 
     std::array<std::shared_ptr<CreaseDefenderTactic>, 3> crease_defenders = {
-        std::make_shared<CreaseDefenderTactic>(
-            ai_config->getRobotNavigationObstacleConfig()),
-        std::make_shared<CreaseDefenderTactic>(
-            ai_config->getRobotNavigationObstacleConfig()),
-        std::make_shared<CreaseDefenderTactic>(
-            ai_config->getRobotNavigationObstacleConfig()),
-    };
+        // TODO-AKHIL: Remove this hard-coded value
+        std::make_shared<CreaseDefenderTactic>(2.067 * ROBOT_MAX_RADIUS_METERS),
+        std::make_shared<CreaseDefenderTactic>(2.067 * ROBOT_MAX_RADIUS_METERS),
+        std::make_shared<CreaseDefenderTactic>(2.067 * ROBOT_MAX_RADIUS_METERS)};
 
     std::array<std::shared_ptr<MoveTactic>, 2> move_tactics = {
         std::make_shared<MoveTactic>(),
@@ -125,4 +122,5 @@ void EnemyBallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
     }
 }
 
-static TGenericFactory<std::string, Play, EnemyBallPlacementPlay, TbotsProto::AiConfig> factory;
+static TGenericFactory<std::string, Play, EnemyBallPlacementPlay, TbotsProto::AiConfig>
+    factory;

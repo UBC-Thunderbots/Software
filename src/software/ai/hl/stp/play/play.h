@@ -148,5 +148,4 @@ class Play
 };
 
 // Function that creates a play
-using PlayConstructor =
-    std::function<std::unique_ptr<Play>(TbotsProto::AiConfig)>;
+using PlayConstructor = std::function<std::unique_ptr<Play>(TbotsProto::AiConfig)>;

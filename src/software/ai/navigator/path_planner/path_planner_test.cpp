@@ -32,8 +32,7 @@ struct PlannerTestCase
     bool should_return_path;
 };
 
-RobotNavigationObstacleFactory robot_navigation_obstacle_factory(
-    std::make_shared<const RobotNavigationObstacleConfig>());
+RobotNavigationObstacleFactory robot_navigation_obstacle_factory;
 
 std::vector<PlannerTestCase> test_cases =
     std::vector<PlannerTestCase>(

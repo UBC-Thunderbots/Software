@@ -39,8 +39,7 @@ class GoalieTacticTest
             {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field.enemyGoalCenter(),
              field.enemyDefenseArea().negXNegYCorner(),
              field.enemyDefenseArea().negXPosYCorner()});
-    TbotsProto::AiConfig ai_config =
-        std::make_shared<ThunderbotsConfig>()->getAiConfig();
+    TbotsProto::AiConfig ai_config = std::make_shared<ThunderbotsConfig>()->getAiConfig();
 };
 
 TEST_F(GoalieTacticTest, test_panic_ball_very_fast_in_straight_line)

@@ -32,12 +32,10 @@ GenericFactory<IndexType, TypeToCreate, ConfigType>::getRegisteredNames()
 }
 
 template <class IndexType, class TypeToCreate, class ConfigType>
-std::vector<
-    std::function<std::unique_ptr<TypeToCreate>(std::shared_ptr<const ConfigType>)>>
+std::vector<std::function<std::unique_ptr<TypeToCreate>(const ConfigType)>>
 GenericFactory<IndexType, TypeToCreate, ConfigType>::getRegisteredConstructors()
 {
-    std::vector<
-        std::function<std::unique_ptr<TypeToCreate>(std::shared_ptr<const ConfigType>)>>
+    std::vector<std::function<std::unique_ptr<TypeToCreate>(const ConfigType)>>
         constructors;
     auto registry = GenericFactory::getRegistry();
 
@@ -51,8 +49,7 @@ GenericFactory<IndexType, TypeToCreate, ConfigType>::getRegisteredConstructors()
 template <class IndexType, class TypeToCreate, class ConfigType>
 void GenericFactory<IndexType, TypeToCreate, ConfigType>::registerCreator(
     std::string generic_name,
-    std::function<std::unique_ptr<TypeToCreate>(std::shared_ptr<const ConfigType>)>
-        generic_creator)
+    std::function<std::unique_ptr<TypeToCreate>(const ConfigType)> generic_creator)
 {
     GenericFactory::getMutableRegistry().insert(
         std::make_pair(generic_name, generic_creator));
@@ -60,7 +57,7 @@ void GenericFactory<IndexType, TypeToCreate, ConfigType>::registerCreator(
 
 template <class IndexType, class TypeToCreate, class ConfigType>
 std::unique_ptr<TypeToCreate> GenericFactory<IndexType, TypeToCreate, ConfigType>::create(
-    const std::string& generic_name, std::shared_ptr<const ConfigType> config)
+    const std::string& generic_name, const ConfigType config)
 {
     auto registry = GenericFactory<IndexType, TypeToCreate, ConfigType>::getRegistry();
     auto iter     = registry.find(generic_name);

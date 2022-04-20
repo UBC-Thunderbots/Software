@@ -4,10 +4,6 @@
 #include "software/geom/algorithms/distance.h"
 #include "software/logger/logger.h"
 
-NavigatingPrimitiveCreator::NavigatingPrimitiveCreator()
-{
-}
-
 TbotsProto::Primitive NavigatingPrimitiveCreator::createNavigatingPrimitive(
     const NavigatingIntent &intent, const Path &path,
     const std::vector<ObstaclePtr> &enemy_robot_obstacles)

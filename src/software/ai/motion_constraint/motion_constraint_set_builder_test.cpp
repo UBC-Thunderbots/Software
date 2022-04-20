@@ -13,7 +13,7 @@ namespace
 {
     World world = ::TestUtil::createBlankTestingWorld();
     Pass pass({1, 1}, {0.5, 0}, 2.29);
-
+    TbotsProto::AiConfig ai_config;
 
     // vector of pairs of Tactic and allowed MotionConstraints
     std::vector<std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>>
@@ -21,11 +21,10 @@ namespace
             std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
                 new MoveTactic(), std::set<MotionConstraint>({})),
             std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
-                new CreaseDefenderTactic(
-                    std::make_shared<const RobotNavigationObstacleConfig>()),
+                new CreaseDefenderTactic(2.067 * ROBOT_MAX_RADIUS_METERS),
                 std::set<MotionConstraint>({MotionConstraint::HALF_METER_AROUND_BALL})),
             std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
-                new GoalieTactic(std::make_shared<ThunderbotsConfig>()->getAiConfig()),
+                new GoalieTactic(ai_config),
                 std::set<MotionConstraint>({MotionConstraint::FRIENDLY_DEFENSE_AREA,
                                             MotionConstraint::FRIENDLY_DEFENSE_AREA,
                                             MotionConstraint::HALF_METER_AROUND_BALL,
@@ -37,8 +36,7 @@ namespace
                 std::set<MotionConstraint>({MotionConstraint::CENTER_CIRCLE,
                                             MotionConstraint::HALF_METER_AROUND_BALL})),
             std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
-                new PenaltyKickTactic(
-                    std::make_shared<ThunderbotsConfig>()->getAiConfig()),
+                new PenaltyKickTactic(ai_config),
                 std::set<MotionConstraint>({MotionConstraint::HALF_METER_AROUND_BALL,
                                             MotionConstraint::ENEMY_DEFENSE_AREA,
                                             MotionConstraint::ENEMY_HALF})),
@@ -53,8 +51,7 @@ namespace
             std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
                 new ShadowEnemyTactic(), std::set<MotionConstraint>({})),
             std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
-                new AttackerTactic(std::make_shared<ThunderbotsConfig>()->getAiConfig()),
-                std::set<MotionConstraint>({})),
+                new AttackerTactic(ai_config), std::set<MotionConstraint>({})),
             std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
                 new StopTactic(false), std::set<MotionConstraint>({}))};
 

@@ -20,13 +20,11 @@ class NoPathNavigatorTest : public NavigatorTest
 {
    public:
     NoPathNavigatorTest()
-        : robot_navigation_obstacle_factory(RobotNavigationObstacleFactory(
-              std::make_shared<const RobotNavigationObstacleConfig>())),
+        : robot_navigation_obstacle_factory(RobotNavigationObstacleFactory()),
           navigator(std::make_unique<VelocityObstaclePathManager>(
                         std::make_unique<NoPathTestPathPlanner>(),
                         robot_navigation_obstacle_factory),
-                    robot_navigation_obstacle_factory,
-                    std::make_shared<const NavigatorConfig>()),
+                    robot_navigation_obstacle_factory),
           current_time(Timestamp::fromSeconds(123)),
           field(Field::createSSLDivisionBField()),
           ball(Ball(Point(1, 2), Vector(-0.3, 0), current_time)),
@@ -51,13 +49,11 @@ class ThetaStarNavigatorTest : public NavigatorTest
 {
    public:
     ThetaStarNavigatorTest()
-        : robot_navigation_obstacle_factory(RobotNavigationObstacleFactory(
-              std::make_shared<const RobotNavigationObstacleConfig>())),
+        : robot_navigation_obstacle_factory(RobotNavigationObstacleFactory()),
           navigator(std::make_unique<VelocityObstaclePathManager>(
                         std::make_unique<NoPathTestPathPlanner>(),
                         robot_navigation_obstacle_factory),
-                    robot_navigation_obstacle_factory,
-                    std::make_shared<const NavigatorConfig>())
+                    robot_navigation_obstacle_factory)
     {
     }
 
@@ -188,11 +184,8 @@ TEST_F(NavigatorTest, move_intent_with_one_point_path_test_path_planner)
 
     Navigator navigator(std::make_unique<VelocityObstaclePathManager>(
                             std::make_unique<OnePointPathTestPathPlanner>(),
-                            RobotNavigationObstacleFactory(
-                                std::make_shared<const RobotNavigationObstacleConfig>())),
-                        RobotNavigationObstacleFactory(
-                            std::make_shared<const RobotNavigationObstacleConfig>()),
-                        std::make_shared<NavigatorConfig>());
+                            RobotNavigationObstacleFactory()),
+                        RobotNavigationObstacleFactory());
 
     std::vector<std::unique_ptr<Intent>> intents;
     intents.emplace_back(std::make_unique<MoveIntent>(

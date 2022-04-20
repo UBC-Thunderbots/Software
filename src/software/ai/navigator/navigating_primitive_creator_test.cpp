@@ -5,10 +5,7 @@
 class NavigatingPrimitiveCreatorTest : public testing::Test
 {
    public:
-    NavigatingPrimitiveCreatorTest()
-        : navigating_primitive_creator(std::make_shared<const NavigatorConfig>())
-    {
-    }
+    NavigatingPrimitiveCreatorTest() : navigating_primitive_creator() {}
 
     // The NavigatingPrimitiveCreator under test
     NavigatingPrimitiveCreator navigating_primitive_creator;

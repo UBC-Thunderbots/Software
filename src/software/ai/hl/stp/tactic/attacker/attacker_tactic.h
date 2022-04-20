@@ -67,5 +67,5 @@ class AttackerTactic : public Tactic
     // of losing the ball to an enemy
     std::optional<Point> chip_target;
     // shoot goal config
-    std::shared_ptr<const AttackerTacticConfig> attacker_tactic_config;
+    TbotsProto::AttackerTacticConfig attacker_tactic_config;
 };

@@ -92,7 +92,7 @@ bool AttackerFSM::shouldKick(const Update& event)
     // check for enemy threat
     Circle about_to_steal_danger_zone(
         event.common.robot.position(),
-        attacker_tactic_config->getEnemyAboutToStealBallRadius()->value());
+        attacker_tactic_config.enemy_about_to_steal_ball_radius());
     for (const auto& enemy : event.common.world.enemyTeam().getAllRobots())
     {
         if (contains(about_to_steal_danger_zone, enemy.position()))

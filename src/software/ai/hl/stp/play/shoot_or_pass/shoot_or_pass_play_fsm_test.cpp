@@ -10,8 +10,8 @@ TEST(ShootOrPassPlayFSMTest, test_transitions)
 {
     World world = ::TestUtil::createBlankTestingWorld();
 
-    FSM<ShootOrPassPlayFSM> fsm(
-        ShootOrPassPlayFSM{std::make_shared<const ThunderbotsConfig>()->getAiConfig()});
+    TbotsProto::AiConfig ai_config;
+    FSM<ShootOrPassPlayFSM> fsm(ShootOrPassPlayFSM{ai_config});
     EXPECT_TRUE(fsm.is(boost::sml::state<ShootOrPassPlayFSM::StartState>));
 
     fsm.process_event(ShootOrPassPlayFSM::Update(

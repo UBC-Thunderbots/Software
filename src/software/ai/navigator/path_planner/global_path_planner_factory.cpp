@@ -1,12 +1,9 @@
 #include "software/ai/navigator/path_planner/global_path_planner_factory.h"
 
-GlobalPathPlannerFactory::GlobalPathPlannerFactory(
-    const std::shared_ptr<const RobotNavigationObstacleConfig> navigation_obstacle_config,
-    const World &world)
+GlobalPathPlannerFactory::GlobalPathPlannerFactory(const World &world)
 {
-    RobotNavigationObstacleFactory obstacle_factory =
-        RobotNavigationObstacleFactory(navigation_obstacle_config);
-    std::vector<MotionConstraint> all_constraints = allValuesMotionConstraint();
+    RobotNavigationObstacleFactory obstacle_factory = RobotNavigationObstacleFactory();
+    std::vector<MotionConstraint> all_constraints   = allValuesMotionConstraint();
 
     // The idea of this is similar to Gray codes
     // (https://en.wikipedia.org/wiki/Gray_code#History_and_practical_application). The

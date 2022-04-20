@@ -31,11 +31,11 @@ std::optional<Point> CreaseDefenderFSM::findBlockThreatPoint(
 void CreaseDefenderFSM::blockThreat(
     const Update& event, boost::sml::back::process<MoveFSM::Update> processEvent)
 {
-    Point destination       = event.common.robot.position();
+    Point destination = event.common.robot.position();
+    // TODO-DYNAMIC-PARAM:
     auto block_threat_point = findBlockThreatPoint(
         event.common.world.field(), event.control_params.enemy_threat_origin,
-        event.control_params.crease_defender_alignment,
-        robot_navigation_obstacle_config->getRobotObstacleInflationFactor()->value());
+        event.control_params.crease_defender_alignment, robot_obstacle_inflation_factor_);
     if (block_threat_point)
     {
         destination = block_threat_point.value();

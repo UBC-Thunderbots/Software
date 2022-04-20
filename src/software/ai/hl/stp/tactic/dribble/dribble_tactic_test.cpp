@@ -48,8 +48,8 @@ class DribbleTacticTest : public SimulatedErForceSimTacticTestFixture
             {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field.enemyGoalCenter(),
              field.enemyDefenseArea().negXNegYCorner(),
              field.enemyDefenseArea().negXPosYCorner()});
-    TbotsProto::AiConfig ai_config =
-        std::make_shared<ThunderbotsConfig>()->getAiConfig();
+
+    TbotsProto::AiConfig ai_config;
 };
 
 TEST_F(DribbleTacticTest, test_intercept_ball_behind_enemy_robot)

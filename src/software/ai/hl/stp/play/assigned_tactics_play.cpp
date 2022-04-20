@@ -48,4 +48,5 @@ std::vector<std::unique_ptr<Intent>> AssignedTacticsPlay::get(
 void AssignedTacticsPlay::updateTactics(const PlayUpdate &play_update) {}
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, AssignedTacticsPlay, TbotsProto::AiConfig> factory;
+static TGenericFactory<std::string, Play, AssignedTacticsPlay, TbotsProto::AiConfig>
+    factory;

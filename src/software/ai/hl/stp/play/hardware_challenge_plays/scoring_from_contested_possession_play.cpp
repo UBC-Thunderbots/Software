@@ -38,5 +38,6 @@ void ScoringFromContestedPossessionPlay::getNextTactics(TacticCoroutine::push_ty
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, ScoringFromContestedPossessionPlay, AiConfig>
+static TGenericFactory<std::string, Play, ScoringFromContestedPossessionPlay,
+                       TbotsProto::AiConfig>
     factory;

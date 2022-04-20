@@ -5,11 +5,11 @@
 #include "software/test_util/test_util.h"
 
 SimulatedErForceSimPlayTestFixture::SimulatedErForceSimPlayTestFixture()
-    : ai_config(friendly_mutable_thunderbots_config->getMutableAiConfig()),
+    : ai_config(TbotsProto::AiConfig()),
       sensor_fusion_config(
           friendly_mutable_thunderbots_config->getMutableSensorFusionConfig()),
       game_state(),
-      ai(friendly_thunderbots_config->getAiConfig())
+      ai(ai_config)
 {
 }
 
@@ -17,11 +17,10 @@ void SimulatedErForceSimPlayTestFixture::SetUp()
 {
     SimulatedErForceSimTestFixture::SetUp();
 
-    ai_config = friendly_mutable_thunderbots_config->getMutableAiConfig();
     sensor_fusion_config =
         friendly_mutable_thunderbots_config->getMutableSensorFusionConfig();
 
-    ai = AI(friendly_thunderbots_config->getAiConfig());
+    ai = AI(ai_config);
 }
 
 void SimulatedErForceSimPlayTestFixture::setFriendlyGoalie(RobotId goalie_id)
@@ -36,10 +35,10 @@ void SimulatedErForceSimPlayTestFixture::setEnemyGoalie(RobotId goalie_id)
         static_cast<int>(goalie_id));
 }
 
-void SimulatedErForceSimPlayTestFixture::setAIPlay(const std::string& ai_play)
+void SimulatedErForceSimPlayTestFixture::setAIPlay(const TbotsProto::Play& ai_play)
 {
-    ai_config->getMutableAiControlConfig()->getMutableOverrideAiPlay()->setValue(true);
-    ai_config->getMutableAiControlConfig()->getMutableCurrentAiPlay()->setValue(ai_play);
+    // TODO-AKHIL: lookup ai_play and set the enum
+    ai_config.mutable_ai_control_config()->set_override_ai_play(ai_play);
 }
 
 void SimulatedErForceSimPlayTestFixture::setAIPlay(std::unique_ptr<Play> play)
@@ -77,7 +76,7 @@ void SimulatedErForceSimPlayTestFixture::updatePrimitives(
                                                     std::move(world_msg));
 }
 
-const std::shared_ptr<AiConfig> SimulatedErForceSimPlayTestFixture::getAiConfig() const
+const TbotsProto::AiConfig SimulatedErForceSimPlayTestFixture::getAiConfig() const
 {
     return ai_config;
 }

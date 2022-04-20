@@ -21,7 +21,7 @@ extend google.protobuf.FieldOptions
 
 message ThunderbotsConfig
 {
-    required AiConfig ai_config                 = 1;
+    required AiConfig ai_config = 1;
 }
 
 

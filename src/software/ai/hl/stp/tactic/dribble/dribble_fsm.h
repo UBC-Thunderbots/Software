@@ -23,7 +23,7 @@ struct DribbleFSM
      *
      * @param dribble_tactic_config The config to fetch parameters from
      */
-    explicit DribbleFSM(std::shared_ptr<const DribbleTacticConfig> dribble_tactic_config)
+    explicit DribbleFSM(TbotsProto::DribbleTacticConfig dribble_tactic_config)
         : dribble_tactic_config(dribble_tactic_config),
           continuous_dribbling_start_point(Point())
     {
@@ -213,6 +213,6 @@ struct DribbleFSM
 
    private:
     // the dribble tactic config
-    std::shared_ptr<const DribbleTacticConfig> dribble_tactic_config;
+    TbotsProto::DribbleTacticConfig dribble_tactic_config;
     Point continuous_dribbling_start_point;
 };

@@ -43,7 +43,7 @@ class PassGenerator
      */
     explicit PassGenerator(
         std::shared_ptr<const FieldPitchDivision<ZoneEnum>> pitch_division,
-        std::shared_ptr<const PassingConfig> passing_config);
+        TbotsProto::PassingConfig passing_config);
 
     /**
      * Creates a PassEvaluation given a world and a field pitch division.
@@ -118,7 +118,7 @@ class PassGenerator
     std::shared_ptr<const FieldPitchDivision<ZoneEnum>> pitch_division_;
 
     // Passing configuration
-    std::shared_ptr<const PassingConfig> passing_config_;
+    TbotsProto::PassingConfig passing_config_;
 
     // A random number generator for use across the class
     std::mt19937 random_num_gen_;
@@ -126,7 +126,7 @@ class PassGenerator
 template <class ZoneEnum>
 PassGenerator<ZoneEnum>::PassGenerator(
     std::shared_ptr<const FieldPitchDivision<ZoneEnum>> pitch_division,
-    std::shared_ptr<const PassingConfig> passing_config)
+    TbotsProto::PassingConfig passing_config)
     : optimizer_(optimizer_param_weights),
       pitch_division_(pitch_division),
       passing_config_(passing_config),
@@ -166,8 +166,8 @@ template <class ZoneEnum>
 ZonePassMap<ZoneEnum> PassGenerator<ZoneEnum>::samplePasses(const World& world)
 {
     std::uniform_real_distribution speed_distribution(
-        passing_config_->getMinPassSpeedMPerS()->value(),
-        passing_config_->getMaxPassSpeedMPerS()->value());
+        passing_config_.min_pass_speed_m_per_s(),
+        passing_config_.max_pass_speed_m_per_s());
 
     ZonePassMap<ZoneEnum> passes;
 
@@ -215,7 +215,7 @@ ZonePassMap<ZoneEnum> PassGenerator<ZoneEnum>::optimizePasses(
 
         auto pass_array = optimizer_.maximize(
             objective_function, generated_passes.at(zone_id).pass.toPassArray(),
-            passing_config_->getNumberOfGradientDescentStepsPerIter()->value());
+            passing_config_.number_of_gradient_descent_steps_per_iter());
 
         auto new_pass = Pass::fromPassArray(world.ball().position(), pass_array);
         auto score =

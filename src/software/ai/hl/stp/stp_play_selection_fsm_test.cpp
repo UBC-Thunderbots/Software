@@ -10,7 +10,7 @@
 
 TEST(PlaySelectionFSMTest, test_transitions)
 {
-    auto ai_config = std::make_shared<ThunderbotsConfig>()->getAiConfig();
+    TbotsProto::AiConfig ai_config;
     std::unique_ptr<Play> current_play(std::make_unique<HaltPlay>(ai_config));
     std::unique_ptr<FSM<PlaySelectionFSM>> fsm(
         std::make_unique<FSM<PlaySelectionFSM>>(PlaySelectionFSM{ai_config}));

@@ -14,10 +14,7 @@
 #include "software/util/generic_factory/generic_factory.h"
 #include "software/world/game_state.h"
 
-ShootOrChipPlay::ShootOrChipPlay(TbotsProto::AiConfig config)
-    : Play(config, true)
-{
-}
+ShootOrChipPlay::ShootOrChipPlay(TbotsProto::AiConfig config) : Play(config, true) {}
 
 void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield,
                                      const World &world)
@@ -33,10 +30,8 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield,
      */
 
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics = {
-        std::make_shared<CreaseDefenderTactic>(
-            ai_config->getRobotNavigationObstacleConfig()),
-        std::make_shared<CreaseDefenderTactic>(
-            ai_config->getRobotNavigationObstacleConfig()),
+        std::make_shared<CreaseDefenderTactic>(2.067 * ROBOT_MAX_RADIUS_METERS),
+        std::make_shared<CreaseDefenderTactic>(2.067 * ROBOT_MAX_RADIUS_METERS),
     };
 
     std::array<std::shared_ptr<MoveTactic>, 2> move_to_open_area_tactics = {

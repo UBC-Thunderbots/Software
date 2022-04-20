@@ -4,9 +4,7 @@
 #include "software/geom/algorithms/contains.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-HaltTestPlay::HaltTestPlay(TbotsProto::AiConfig config) : Play(config, false)
-{
-}
+HaltTestPlay::HaltTestPlay(TbotsProto::AiConfig config) : Play(config, false) {}
 
 void HaltTestPlay::getNextTactics(TacticCoroutine::push_type &yield, const World &world)
 {

@@ -42,7 +42,7 @@ void CreaseDefensePlayFSM::setUpDefenders(unsigned int num_defenders)
 {
     crease_defenders = std::vector<std::shared_ptr<CreaseDefenderTactic>>(num_defenders);
     std::generate(crease_defenders.begin(), crease_defenders.end(), [this]() {
-        return std::make_shared<CreaseDefenderTactic>(
-            ai_config->getRobotNavigationObstacleConfig());
+        // TODO-AKHIL: Make the crease defense align robots on either side of the threat
+        return std::make_shared<CreaseDefenderTactic>(2.067 * ROBOT_MAX_RADIUS_METERS);
     });
 }

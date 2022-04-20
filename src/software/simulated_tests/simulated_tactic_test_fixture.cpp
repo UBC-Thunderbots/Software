@@ -12,20 +12,12 @@ SimulatedTacticTestFixture::SimulatedTacticTestFixture()
       enemy_motion_constraints(),
       friendly_navigator(std::make_shared<Navigator>(
           std::make_unique<VelocityObstaclePathManager>(
-              std::make_unique<ThetaStarPathPlanner>(),
-              RobotNavigationObstacleFactory(
-                  friendly_thunderbots_config->getRobotNavigationObstacleConfig())),
-          RobotNavigationObstacleFactory(
-              friendly_thunderbots_config->getRobotNavigationObstacleConfig()),
-          friendly_thunderbots_config->getNavigatorConfig())),
+              std::make_unique<ThetaStarPathPlanner>(), RobotNavigationObstacleFactory()),
+          RobotNavigationObstacleFactory())),
       enemy_navigator(std::make_shared<Navigator>(
           std::make_unique<VelocityObstaclePathManager>(
-              std::make_unique<ThetaStarPathPlanner>(),
-              RobotNavigationObstacleFactory(
-                  enemy_thunderbots_config->getRobotNavigationObstacleConfig())),
-          RobotNavigationObstacleFactory(
-              enemy_thunderbots_config->getRobotNavigationObstacleConfig()),
-          enemy_thunderbots_config->getNavigatorConfig()))
+              std::make_unique<ThetaStarPathPlanner>(), RobotNavigationObstacleFactory()),
+          RobotNavigationObstacleFactory()))
 {
 }
 
@@ -34,20 +26,12 @@ void SimulatedTacticTestFixture::SetUp()
     SimulatedTestFixture::SetUp();
     friendly_navigator = std::make_shared<Navigator>(
         std::make_unique<VelocityObstaclePathManager>(
-            std::make_unique<ThetaStarPathPlanner>(),
-            RobotNavigationObstacleFactory(
-                friendly_thunderbots_config->getRobotNavigationObstacleConfig())),
-        RobotNavigationObstacleFactory(
-            friendly_thunderbots_config->getRobotNavigationObstacleConfig()),
-        friendly_thunderbots_config->getNavigatorConfig());
+            std::make_unique<ThetaStarPathPlanner>(), RobotNavigationObstacleFactory()),
+        RobotNavigationObstacleFactory());
     enemy_navigator = std::make_shared<Navigator>(
         std::make_unique<VelocityObstaclePathManager>(
-            std::make_unique<ThetaStarPathPlanner>(),
-            RobotNavigationObstacleFactory(
-                enemy_thunderbots_config->getRobotNavigationObstacleConfig())),
-        RobotNavigationObstacleFactory(
-            enemy_thunderbots_config->getRobotNavigationObstacleConfig()),
-        enemy_thunderbots_config->getNavigatorConfig());
+            std::make_unique<ThetaStarPathPlanner>(), RobotNavigationObstacleFactory()),
+        RobotNavigationObstacleFactory());
 }
 
 void SimulatedTacticTestFixture::setTactic(std::shared_ptr<Tactic> friendly_tactic,

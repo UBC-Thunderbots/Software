@@ -12,11 +12,7 @@
 class TestEnlsvgPathPlanner : public testing::Test
 {
    public:
-    TestEnlsvgPathPlanner()
-        : robot_navigation_obstacle_factory(
-              std::make_shared<const RobotNavigationObstacleConfig>())
-    {
-    }
+    TestEnlsvgPathPlanner() : robot_navigation_obstacle_factory() {}
 
     RobotNavigationObstacleFactory robot_navigation_obstacle_factory;
 };

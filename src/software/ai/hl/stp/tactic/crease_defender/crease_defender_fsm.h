@@ -48,11 +48,10 @@ struct CreaseDefenderFSM
     /**
      * Constructor for CreaseDefenderFSM struct
      *
-     * @param robot_navigation_obstacle_config The config
+     * @param robot_obstacle_inflation_factor The robot obstacle inflation factor
      */
-    explicit CreaseDefenderFSM(std::shared_ptr<const RobotNavigationObstacleConfig>
-                                   robot_navigation_obstacle_config)
-        : robot_navigation_obstacle_config(robot_navigation_obstacle_config)
+    explicit CreaseDefenderFSM(double robot_obstacle_inflation_factor)
+        : robot_obstacle_inflation_factor_(robot_obstacle_inflation_factor)
     {
     }
 
@@ -79,6 +78,8 @@ struct CreaseDefenderFSM
     }
 
    private:
+    double robot_obstacle_inflation_factor_;
+
     /**
      * Finds the intersection with the front or sides of the defense area with the given
      * ray
@@ -95,5 +96,4 @@ struct CreaseDefenderFSM
         const Field& field, const Ray& ray, double robot_obstacle_inflation_factor);
 
    private:
-    std::shared_ptr<const RobotNavigationObstacleConfig> robot_navigation_obstacle_config;
 };

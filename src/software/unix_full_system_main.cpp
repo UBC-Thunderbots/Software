@@ -47,7 +47,8 @@ int main(int argc, char** argv)
         auto backend       = std::make_shared<UnixSimulatorBackend>(runtime_dir);
         auto sensor_fusion = std::make_shared<ThreadedSensorFusion>(
             thunderbots_config->getSensorFusionConfig());
-        auto ai = std::make_shared<ThreadedAI>(thunderbots_config->getAiConfig());
+        TbotsProto::AiConfig ai_config;
+        auto ai = std::make_shared<ThreadedAI>(ai_config);
 
         // Overrides
         auto tactic_override_listener =

@@ -16,7 +16,7 @@ ThreadedAI::ThreadedAI(TbotsProto::AiConfig ai_config)
       FirstInFirstOutThreadedObserver<TbotsProto::ThunderbotsConfig>(),
       ai(ai_config),
       ai_config(ai_config),
-      ai_control_config(ai_config.ai_control_config()),
+      ai_control_config(ai_config.ai_control_config())
 {
 }
 

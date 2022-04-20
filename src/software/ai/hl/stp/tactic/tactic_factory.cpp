@@ -69,8 +69,8 @@ std::shared_ptr<Tactic> createTactic(const TbotsProto::ChipTactic &tactic_proto,
 std::shared_ptr<Tactic> createTactic(const TbotsProto::CreaseDefenderTactic &tactic_proto,
                                      TbotsProto::AiConfig ai_config)
 {
-    auto tactic = std::make_shared<CreaseDefenderTactic>(
-        ai_config->getRobotNavigationObstacleConfig());
+    // TODO-AKHIL: Implement this
+    auto tactic = std::make_shared<CreaseDefenderTactic>(2.067 * ROBOT_MAX_RADIUS_METERS);
 
     tactic->updateControlParams(createPoint(tactic_proto.enemy_threat_origin()),
                                 tactic_proto.crease_defender_alignment(),

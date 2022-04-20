@@ -35,9 +35,9 @@ void AttackerTactic::updateIntent(const TacticUpdate& tactic_update)
         tactic_update.world.field(), tactic_update.world.friendlyTeam(),
         tactic_update.world.enemyTeam(), tactic_update.world.ball().position(),
         TeamType::ENEMY, {tactic_update.robot});
-    if (shot && shot->getOpenAngle() <
-                    Angle::fromDegrees(
-                        attacker_tactic_config->getMinOpenAngleForShotDeg()->value()))
+    if (shot &&
+        shot->getOpenAngle() <
+            Angle::fromDegrees(attacker_tactic_config.min_open_angle_for_shot_deg()))
     {
         // reject shots that have an open angle below the minimum
         shot = std::nullopt;

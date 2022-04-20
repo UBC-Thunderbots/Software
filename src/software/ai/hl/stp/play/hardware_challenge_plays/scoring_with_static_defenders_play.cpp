@@ -56,5 +56,6 @@ void ScoringWithStaticDefendersPlay::getNextTactics(TacticCoroutine::push_type &
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, ScoringWithStaticDefendersPlay, AiConfig>
+static TGenericFactory<std::string, Play, ScoringWithStaticDefendersPlay,
+                       TbotsProto::AiConfig>
     factory;

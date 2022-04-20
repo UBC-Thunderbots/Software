@@ -20,11 +20,9 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
     auto shoot_goal_tactic = std::make_shared<AttackerTactic>(ai_config);
 
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics = {
-        std::make_shared<CreaseDefenderTactic>(
-            ai_config->getRobotNavigationObstacleConfig()),
-        std::make_shared<CreaseDefenderTactic>(
-            ai_config->getRobotNavigationObstacleConfig()),
-    };
+        // TODO-AKHIL remove hardcoded values
+        std::make_shared<CreaseDefenderTactic>(2.067 * ROBOT_MAX_RADIUS_METERS),
+        std::make_shared<CreaseDefenderTactic>(2.067 * ROBOT_MAX_RADIUS_METERS)};
 
     std::array<std::shared_ptr<ShadowEnemyTactic>, 2> shadow_enemy_tactics = {
         std::make_shared<ShadowEnemyTactic>(),
@@ -63,9 +61,7 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
             enemy_threats.begin(), enemy_threats.end(), [this, world](auto enemy_threat) {
                 return distance(world.field().friendlyGoal(),
                                 enemy_threat.robot.position()) <
-                       ai_config->getDefensePlayConfig()
-                           ->getImmediateThreatDistance()
-                           ->value();
+                       ai_config.defense_play_config().immediate_threat_distance();
             }));
 
 

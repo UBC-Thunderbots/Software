@@ -25,10 +25,10 @@ cc_library(
         ":enumerated_parameter",
         ":numeric_parameter",
         ":parameter",
+        "//proto:tbots_cc_proto",
         "//software/util/generic_factory",
         "//software/world:game_state",
         "//software/world:team_colour",
-        "//proto:tbots_cc_proto",
     ],
 )
 

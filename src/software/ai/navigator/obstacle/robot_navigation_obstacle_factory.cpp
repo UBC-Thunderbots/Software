@@ -96,7 +96,6 @@ std::vector<ObstaclePtr> RobotNavigationObstacleFactory::createFromMotionConstra
 
 ObstaclePtr RobotNavigationObstacleFactory::createFromRobot(const Robot &robot) const
 {
-
     // Radius of a hexagonal approximation of a robot
     double robot_hexagon_radius =
         (ROBOT_MAX_RADIUS_METERS + robot_radius_expansion_amount) * 2.0 / std::sqrt(3);

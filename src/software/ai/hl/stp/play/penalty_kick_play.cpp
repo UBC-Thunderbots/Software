@@ -5,10 +5,7 @@
 #include "software/ai/hl/stp/tactic/penalty_kick/penalty_kick_tactic.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-PenaltyKickPlay::PenaltyKickPlay(TbotsProto::AiConfig config)
-    : Play(config, true)
-{
-}
+PenaltyKickPlay::PenaltyKickPlay(TbotsProto::AiConfig config) : Play(config, true) {}
 
 void PenaltyKickPlay::getNextTactics(TacticCoroutine::push_type &yield,
                                      const World &world)

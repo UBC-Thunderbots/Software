@@ -85,7 +85,6 @@ class NavigatingPrimitiveCreator : public NavigatingIntentVisitor
         const std::vector<ObstaclePtr> &enemy_robot_obstacles,
         const RobotConstants_t &robot_constants) const;
 
-    std::shared_ptr<const NavigatorConfig> config;
     std::optional<TbotsProto::Primitive> current_primitive;
     Point new_destination;
     double new_final_speed;
