@@ -26,6 +26,7 @@ cc_library(
         "robots_violating_motion_constraint.h",
     ],
     deps = [
+        "//software/ai/navigator",
         "//software/geom/algorithms",
         "//software/simulated_tests/validation:validation_function",
         "//software/world",
