@@ -26,7 +26,6 @@ cc_library(
         "//proto/message_translation:ssl_wrapper",
         "//proto/message_translation:tbots_protobuf",
         "//shared:constants",
-        "//shared/parameter:cpp_configs",
         "//software:constants",
         "//software/logger",
         "//software/networking:threaded_proto_unix_listener",

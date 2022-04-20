@@ -1,6 +1,6 @@
 #pragma once
 
-#include "shared/parameter/cpp_dynamic_parameters.h"
+#include "proto/parameters.pb.h"
 #include "software/ai/hl/stp/play/crease_defense/crease_defense_play_fsm.h"
 #include "software/ai/hl/stp/play/play.h"
 

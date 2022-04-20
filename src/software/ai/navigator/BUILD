@@ -9,7 +9,6 @@ cc_library(
         ":navigating_primitive_creator",
         "//proto:visualization_cc_proto",
         "//proto/message_translation:tbots_protobuf",
-        "//shared/parameter:cpp_configs",
         "//software/ai/intent",
         "//software/ai/intent:all_intents",
         "//software/ai/intent:intent_visitor",
@@ -43,7 +42,6 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//proto/message_translation:tbots_protobuf",
-        "//shared/parameter:cpp_configs",
         "//software/ai/intent:all_intents",
         "//software/ai/intent:navigating_intent",
         "//software/ai/intent:navigating_intent_visitor",

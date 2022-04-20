@@ -2,7 +2,7 @@
 
 #include <chrono>
 
-#include "shared/parameter/cpp_dynamic_parameters.h"
+#include "proto/parameters.pb.h"
 #include "software/test_util/path_planning_test_util.h"
 #include "software/test_util/test_util.h"
 

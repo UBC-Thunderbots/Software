@@ -25,8 +25,8 @@ cc_library(
     srcs = ["tbots_gtest_main.cpp"],
     hdrs = ["tbots_gtest_main.h"],
     deps = [
-        "//shared/parameter:cpp_configs",
         "//software/logger",
         "@gtest",
+        "@boost//:program_options",
     ],
 )

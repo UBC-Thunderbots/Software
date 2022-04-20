@@ -11,7 +11,6 @@ cc_binary(
         "//proto:tbots_cc_proto",
         "//proto/logging:proto_logger",
         "//proto/message_translation:ssl_wrapper",
-        "//shared/parameter:cpp_configs",
         "//software:constants",
         "//software/ai:threaded_ai",
         "//software/backend",
@@ -30,6 +29,7 @@ cc_binary(
     name = "er_force_simulator_main",
     srcs = ["er_force_simulator_main.cpp"],
     deps = [
+        "@boost//:program_options",
         "//software:constants",
         "//software/networking:threaded_proto_unix_listener",
         "//software/networking:threaded_proto_unix_sender",
@@ -43,7 +43,7 @@ cc_binary(
 #deps = [
 #"//proto:tbots_cc_proto",
 #"//shared:constants",
-#"//shared/parameter:cpp_configs",
+#
 #"//software/logger:network_logger",
 #"//software/networking:threaded_proto_udp_listener",
 #"//software/networking:threaded_proto_udp_sender",

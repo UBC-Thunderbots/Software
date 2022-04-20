@@ -7,8 +7,8 @@
 #include "proto/logging/proto_logger.h"
 #include "proto/message_translation/ssl_wrapper.h"
 // #include "proto/parameters.pb.h"
+#include "proto/parameters.pb.h"
 #include "proto/play_info_msg.pb.h"
-#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/threaded_ai.h"
 #include "software/backend/backend.h"
 #include "software/backend/unix_simulator_backend.h"
@@ -23,31 +23,44 @@
 int main(int argc, char** argv)
 {
     // Setup dynamic parameters
-    auto mutable_thunderbots_config = std::make_shared<ThunderbotsConfig>();
-    auto thunderbots_config =
-        std::const_pointer_cast<const ThunderbotsConfig>(mutable_thunderbots_config);
-    bool help_requested =
-        mutable_thunderbots_config->getMutableFullSystemMainCommandLineArgs()
-            ->loadFromCommandLineArguments(argc, argv);
-
-    std::string runtime_dir =
-        thunderbots_config->getFullSystemMainCommandLineArgs()->getRuntimeDir()->value();
-    LoggerSingleton::initializeLogger(runtime_dir);
-
-    // TODO (#2510) remove
-    bool friendly_colour_yellow =
-        mutable_thunderbots_config->getMutableSensorFusionConfig()
-            ->getMutableFriendlyColorYellow()
-            ->setValue(thunderbots_config->getFullSystemMainCommandLineArgs()
-                           ->getFriendlyColourYellow()
-                           ->value());
-
-
-    TbotsProto::ThunderbotsConfig tbots_proto;
-
-    if (!help_requested)
+    struct CommandLineArgs
     {
-        auto backend = std::make_shared<UnixSimulatorBackend>(runtime_dir);
+        bool help                   = false;
+        std::string runtime_dir     = "/tmp/tbots";
+        bool friendly_colour_yellow = false;
+    };
+
+    CommandLineArgs args;
+    boost::program_options::options_description desc{"Options"};
+
+    desc.add_options()("help,h", boost::program_options::bool_switch(&args.help),
+                       "Help screen");
+    desc.add_options()("runtime_dir",
+                       boost::program_options::value<std::string>(&args.runtime_dir),
+                       "The directory to output logs and setup unix sockets.");
+    desc.add_options()("friendly_colour_yellow",
+                       boost::program_options::bool_switch(&args.friendly_colour_yellow),
+                       "If false, friendly colour is blue");
+
+    boost::program_options::variables_map vm;
+    boost::program_options::store(parse_command_line(argc, argv, desc), vm);
+    boost::program_options::notify(vm);
+
+    if (args.help)
+    {
+        std::cout << desc << std::endl;
+    }
+
+    if (!args.help)
+    {
+        LoggerSingleton::initializeLogger(args.runtime_dir);
+        TbotsProto::ThunderbotsConfig tbots_proto;
+
+        // Override friendly color
+        tbots_proto.mutable_sensor_fusion_config()->set_friendly_color_yellow(
+            args.friendly_colour_yellow);
+
+        auto backend = std::make_shared<UnixSimulatorBackend>(args.runtime_dir);
         auto sensor_fusion =
             std::make_shared<ThreadedSensorFusion>(tbots_proto.sensor_fusion_config());
         auto ai = std::make_shared<ThreadedAI>(tbots_proto.ai_config());
@@ -55,7 +68,7 @@ int main(int argc, char** argv)
         // Overrides
         auto tactic_override_listener =
             ThreadedProtoUnixListener<TbotsProto::AssignedTacticPlayControlParams>(
-                runtime_dir + TACTIC_OVERRIDE_PATH,
+                args.runtime_dir + TACTIC_OVERRIDE_PATH,
                 [&ai](TbotsProto::AssignedTacticPlayControlParams input) {
                     ai->overrideTactics(input);
                 });

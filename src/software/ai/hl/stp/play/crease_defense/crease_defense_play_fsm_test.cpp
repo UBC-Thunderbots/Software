@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-#include "shared/parameter/cpp_dynamic_parameters.h"
+#include "proto/parameters.pb.h"
 #include "software/test_util/equal_within_tolerance.h"
 #include "software/test_util/test_util.h"
 

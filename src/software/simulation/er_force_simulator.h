@@ -2,10 +2,10 @@
 
 #include "extlibs/er_force_sim/src/amun/simulator/simulator.h"
 #include "proto/defending_side_msg.pb.h"
+#include "proto/parameters.pb.h"
 #include "proto/robot_status_msg.pb.h"
 #include "proto/ssl_vision_wrapper.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
-#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/jetson_nano/primitive_executor.h"
 #include "software/simulation/firmware_object_deleter.h"
 #include "software/world/field.h"

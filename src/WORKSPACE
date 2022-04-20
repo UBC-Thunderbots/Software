@@ -309,12 +309,6 @@ pip_install(
 )
 
 pip_install(
-    name = "dynamic_parameter_deps",
-    python_interpreter = "/opt/tbotspython/bin/python",
-    requirements = "//shared/parameter/generation_scripts:requirements.txt",
-)
-
-pip_install(
     name = "nanopb_deps",
     python_interpreter = "/opt/tbotspython/bin/python",
     requirements = "//extlibs:nanopb_requirements.txt",

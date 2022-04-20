@@ -22,7 +22,6 @@ cc_library(
     hdrs = ["robot_navigation_obstacle_factory.h"],
     deps = [
         ":obstacle",
-        "//shared/parameter:cpp_configs",
         "//software/ai/motion_constraint",
         "//software/geom:point",
         "//software/logger",

@@ -1,7 +1,7 @@
 #include <map>
 #include <set>
 
-#include "shared/parameter/cpp_dynamic_parameters.h"
+#include "proto/parameters.pb.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/motion_constraint/motion_constraint.h"
 #include "software/ai/motion_constraint/motion_constraint_set_builder.h"

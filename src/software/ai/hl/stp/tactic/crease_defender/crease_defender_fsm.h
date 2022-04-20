@@ -1,7 +1,7 @@
 #pragma once
 
+#include "proto/parameters.pb.h"
 #include "proto/tactic.pb.h"
-#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/hl/stp/tactic/move/move_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/hl/stp/tactic/transition_conditions.h"

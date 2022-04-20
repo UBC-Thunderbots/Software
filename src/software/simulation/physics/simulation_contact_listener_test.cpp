@@ -3,8 +3,8 @@
 #include <Box2D/Box2D.h>
 #include <gtest/gtest.h>
 
+#include "proto/parameters.pb.h"
 #include "shared/2015_robot_constants.h"
-#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/simulation/physics/physics_ball.h"
 #include "software/simulation/physics/physics_object_user_data.h"
 #include "software/simulation/physics/physics_robot.h"

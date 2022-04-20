@@ -1,7 +1,7 @@
 #include "software/ai/hl/stp/play/kickoff_enemy_play.h"
 
+#include "proto/parameters.pb.h"
 #include "shared/constants.h"
-#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/evaluation/enemy_threat.h"
 #include "software/ai/evaluation/possession.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"

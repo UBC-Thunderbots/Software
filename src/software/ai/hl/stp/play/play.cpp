@@ -1,5 +1,7 @@
 #include "software/ai/hl/stp/play/play.h"
 
+#include "software/logger/logger.h"
+
 Play::Play(TbotsProto::AiConfig ai_config, bool requires_goalie)
     : ai_config(ai_config),
       requires_goalie(requires_goalie),

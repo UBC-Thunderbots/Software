@@ -4,7 +4,7 @@
 #include <boost/coroutine2/all.hpp>
 #include <vector>
 
-#include "shared/parameter/cpp_dynamic_parameters.h"
+#include "proto/parameters.pb.h"
 #include "software/ai/hl/stp/play/play_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 

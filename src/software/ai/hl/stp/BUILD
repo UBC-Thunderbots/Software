@@ -12,7 +12,6 @@ cc_library(
     ],
     deps = [
         "//proto:play_info_msg_cc_proto",
-        "//shared/parameter:cpp_configs",
         "//software/ai/hl/stp/play:all_plays",
         "//software/ai/hl/stp/tactic",
         "//software/ai/hl/stp/tactic:all_tactics",
@@ -56,7 +55,6 @@ cc_test(
     srcs = ["stp_tactic_assignment_test.cpp"],
     deps = [
         ":stp",
-        "//shared/parameter:cpp_configs",
         "//shared/test_util:tbots_gtest_main",
         "//software/ai/hl/stp/play:halt_play",
         "//software/test_util",

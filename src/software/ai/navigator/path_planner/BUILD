@@ -62,7 +62,6 @@ cc_library(
     hdrs = ["enlsvg_path_planner.h"],
     deps = [
         "//extlibs/enlsvg",
-        "//shared/parameter:cpp_configs",
         "//software/ai/motion_constraint:motion_constraint_set_builder",
         "//software/ai/navigator/obstacle",
         "//software/ai/navigator/obstacle:robot_navigation_obstacle_factory",

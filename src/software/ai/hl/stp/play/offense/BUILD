@@ -14,7 +14,6 @@ cc_library(
     ],
     deps = [
         "//shared:constants",
-        "//shared/parameter:cpp_configs",
         "//software/ai/hl/stp/play",
         "//software/ai/hl/stp/play/crease_defense:crease_defense_play",
         "//software/ai/hl/stp/play/shoot_or_pass:shoot_or_pass_play",

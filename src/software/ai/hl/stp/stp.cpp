@@ -9,8 +9,8 @@
 #include <exception>
 #include <random>
 
+#include "proto/parameters.pb.h"
 #include "proto/play_info_msg.pb.h"
-#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/hl/stp/play/halt_play.h"
 #include "software/ai/hl/stp/play/play.h"
 #include "software/ai/hl/stp/tactic/all_tactics.h"

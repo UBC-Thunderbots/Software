@@ -1,11 +1,11 @@
 #pragma once
 
 #include "proto/defending_side_msg.pb.h"
+#include "proto/parameters.pb.h"
 #include "proto/robot_log_msg.pb.h"
 #include "proto/robot_status_msg.pb.h"
 #include "proto/sensor_msg.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
-#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/backend/backend.h"
 #include "software/networking/threaded_proto_unix_listener.hpp"
 #include "software/networking/threaded_proto_unix_sender.hpp"

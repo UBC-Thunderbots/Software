@@ -2,7 +2,7 @@
 
 #include <functional>
 
-#include "shared/parameter/cpp_dynamic_parameters.h"
+#include "proto/parameters.pb.h"
 #include "software/ai/passing/pass.h"
 #include "software/math/math_functions.h"
 #include "software/util/make_enum/make_enum.h"

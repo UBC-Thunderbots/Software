@@ -1,7 +1,7 @@
 #include "software/ai/hl/stp/play/assigned_tactics_play.h"
 
+#include "proto/parameters.pb.h"
 #include "shared/constants.h"
-#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/logger/logger.h"
 #include "software/util/generic_factory/generic_factory.h"
 

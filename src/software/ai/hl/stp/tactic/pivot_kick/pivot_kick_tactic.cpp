@@ -1,7 +1,7 @@
 #include "software/ai/hl/stp/tactic/pivot_kick/pivot_kick_tactic.h"
 
+#include "proto/parameters.pb.h"
 #include "shared/constants.h"
-#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/evaluation/calc_best_shot.h"
 #include "software/geom/algorithms/intersection.h"
 #include "software/geom/point.h"

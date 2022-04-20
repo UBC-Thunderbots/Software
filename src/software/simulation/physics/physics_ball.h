@@ -4,7 +4,7 @@
 
 #include <optional>
 
-#include "shared/parameter/cpp_dynamic_parameters.h"
+#include "proto/parameters.pb.h"
 #include "software/geom/point.h"
 #include "software/geom/vector.h"
 #include "software/time/duration.h"

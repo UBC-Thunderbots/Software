@@ -1,7 +1,7 @@
 #pragma once
 
+#include "proto/parameters.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
-#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/intent/all_intents.h"
 #include "software/ai/intent/intent.h"
 #include "software/ai/intent/intent_visitor.h"

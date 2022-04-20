@@ -4,8 +4,8 @@
 #include <random>
 #include <vector>
 
+#include "proto/parameters.pb.h"
 #include "proto/play_info_msg.pb.h"
-#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/hl/stp/play/play.h"
 #include "software/ai/hl/stp/play_selection_fsm.h"
 #include "software/ai/intent/intent.h"

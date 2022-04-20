@@ -8,7 +8,7 @@
 #include <unordered_set>
 #include <vector>
 
-#include "shared/parameter/cpp_dynamic_parameters.h"
+#include "proto/parameters.pb.h"
 #include "software/ai/passing/field_pitch_division.h"
 #include "software/ai/passing/pass.h"
 #include "software/ai/passing/pass_with_rating.h"
