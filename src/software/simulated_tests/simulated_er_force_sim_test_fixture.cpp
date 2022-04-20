@@ -82,8 +82,9 @@ void SimulatedErForceSimTestFixture::SetUp()
 void SimulatedErForceSimTestFixture::setCommonConfigs(
     TbotsProto::ThunderbotsConfig &mutable_thunderbots_config)
 {
-    mutable_thunderbots_config.mutable_ai_control_config()->set_run_ai(
-        !TbotsGtestMain::stop_ai_on_start);
+    mutable_thunderbots_config.mutable_ai_config()
+        ->mutable_ai_control_config()
+        ->set_run_ai(!TbotsGtestMain::stop_ai_on_start);
 
     mutable_thunderbots_config.mutable_sensor_fusion_config()
         ->set_override_game_controller_defending_side(true);
@@ -309,15 +310,18 @@ void SimulatedErForceSimTestFixture::runTest(
     {
         robots_displacement.clear();
         robots_velocity_diff.clear();
-        if (!friendly_thunderbots_config.ai_control_config().run_ai())
+
+        if (!friendly_thunderbots_config.ai_config().ai_control_config().run_ai())
+        {
             validation_functions_done =
                 tickTest(simulation_time_step, ai_time_step, friendly_world, enemy_world,
                          simulator, ball_displacement, ball_velocity_diff,
                          robots_displacement, robots_velocity_diff);
+        }
 
         while (simulator->getTimestamp() < timeout_time && !validation_functions_done)
         {
-            if (!friendly_thunderbots_config.ai_control_config().run_ai())
+            if (!friendly_thunderbots_config.ai_config().ai_control_config().run_ai())
             {
                 auto ms_to_sleep = std::chrono::milliseconds(
                     static_cast<int>(ai_time_step.toMilliseconds()));

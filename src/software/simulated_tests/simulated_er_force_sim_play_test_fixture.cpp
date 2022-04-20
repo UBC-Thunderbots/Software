@@ -5,10 +5,11 @@
 #include "software/test_util/test_util.h"
 
 SimulatedErForceSimPlayTestFixture::SimulatedErForceSimPlayTestFixture()
-    : ai_config(TbotsProto::AiConfig()),
-      sensor_fusion_config(TbotsProto::SensorFusionConfig()),
+    : mutable_ai_config(friendly_thunderbots_config.mutable_ai_config()),
+      mutable_sensor_fusion_config(
+          friendly_thunderbots_config.mutable_sensor_fusion_config()),
       game_state(),
-      ai(ai_config)
+      ai(*mutable_ai_config)
 {
 }
 
@@ -16,23 +17,22 @@ void SimulatedErForceSimPlayTestFixture::SetUp()
 {
     SimulatedErForceSimTestFixture::SetUp();
 
-    sensor_fusion_config = TbotsProto::SensorFusionConfig();
-    ai                   = AI(ai_config);
+    ai = AI(*mutable_ai_config);
 }
 
 void SimulatedErForceSimPlayTestFixture::setFriendlyGoalie(RobotId goalie_id)
 {
-    sensor_fusion_config.set_friendly_goalie_id(static_cast<int>(goalie_id));
+    mutable_sensor_fusion_config->set_friendly_goalie_id(static_cast<int>(goalie_id));
 }
 
 void SimulatedErForceSimPlayTestFixture::setEnemyGoalie(RobotId goalie_id)
 {
-    sensor_fusion_config.set_enemy_goalie_id(static_cast<int>(goalie_id));
+    mutable_sensor_fusion_config->set_enemy_goalie_id(static_cast<int>(goalie_id));
 }
 
 void SimulatedErForceSimPlayTestFixture::setAIPlay(const TbotsProto::Play& ai_play)
 {
-    ai_config.mutable_ai_control_config()->set_override_ai_play(ai_play);
+    mutable_ai_config->mutable_ai_control_config()->set_override_ai_play(ai_play);
 }
 
 void SimulatedErForceSimPlayTestFixture::setAIPlay(std::unique_ptr<Play> play)
@@ -72,7 +72,7 @@ void SimulatedErForceSimPlayTestFixture::updatePrimitives(
 
 const TbotsProto::AiConfig SimulatedErForceSimPlayTestFixture::getAiConfig() const
 {
-    return ai_config;
+    return *mutable_ai_config;
 }
 
 std::optional<TbotsProto::PlayInfo> SimulatedErForceSimPlayTestFixture::getPlayInfo()

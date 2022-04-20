@@ -11,7 +11,7 @@ bool TbotsGtestMain::help                = false;
 bool TbotsGtestMain::enable_visualizer   = false;
 bool TbotsGtestMain::run_sim_in_realtime = false;
 bool TbotsGtestMain::stop_ai_on_start    = false;
-std::string TbotsGtestMain::runtime_dir  = "";
+std::string TbotsGtestMain::runtime_dir  = "/tmp/tbots";
 double TbotsGtestMain::test_speed        = 1.0;
 
 
@@ -56,6 +56,8 @@ int main(int argc, char **argv)
 
     if (!TbotsGtestMain::help)
     {
+        LoggerSingleton::initializeLogger(TbotsGtestMain::runtime_dir);
+
         if (TbotsGtestMain::enable_visualizer || TbotsGtestMain::run_sim_in_realtime)
         {
             // disable floating point errors when using visualizer due to potential

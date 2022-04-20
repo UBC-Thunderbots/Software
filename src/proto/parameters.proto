@@ -22,25 +22,24 @@ extend google.protobuf.FieldOptions
 message ThunderbotsConfig
 {
     required AiConfig ai_config                      = 1;
-    required AiControlConfig ai_control_config       = 2;
-    required SensorFusionConfig sensor_fusion_config = 3;
-    required SimulatorConfig simulator_config        = 4;
+    required SensorFusionConfig sensor_fusion_config = 2;
+    required SimulatorConfig simulator_config        = 3;
 }
 
 
 message AiConfig
 {
     required AiControlConfig ai_control_config                 = 1;
-    required DribbleTacticConfig dribble_tactic_config         = 12;
-    required AttackerTacticConfig attacker_tactic_config       = 2;
-    required CornerKickPlayConfig corner_kick_play_config      = 3;
-    required PassingConfig passing_config                      = 4;
-    required GoalieTacticConfig goalie_tactic_config           = 5;
-    required EnemyCapabilityConfig enemy_capability_config     = 6;
-    required ShootOrPassPlayConfig shoot_or_pass_play_config   = 7;
-    required RobotCapabilitiesConfig robot_capabilities_config = 8;
-    required SensorFusionConfig sensor_fusion_config           = 9;
-    required DefensePlayConfig defense_play_config             = 10;
+    required DribbleTacticConfig dribble_tactic_config         = 2;
+    required AttackerTacticConfig attacker_tactic_config       = 3;
+    required CornerKickPlayConfig corner_kick_play_config      = 4;
+    required PassingConfig passing_config                      = 5;
+    required GoalieTacticConfig goalie_tactic_config           = 6;
+    required EnemyCapabilityConfig enemy_capability_config     = 7;
+    required ShootOrPassPlayConfig shoot_or_pass_play_config   = 8;
+    required RobotCapabilitiesConfig robot_capabilities_config = 9;
+    required SensorFusionConfig sensor_fusion_config           = 10;
+    required DefensePlayConfig defense_play_config             = 11;
 }
 
 message AiControlConfig

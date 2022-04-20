@@ -474,10 +474,7 @@ class Thunderscope(object):
         def cak(p, t):
             print(p, t)
 
-        # TODO run this up
-        # p = ProtoConfigurationWidget(World, cak)
-
-        return QtGui.QWidget()
+        return ProtoConfigurationWidget(AiConfig, cak)
 
     def setup_log_widget(self, proto_unix_io):
         """Setup the wiget that receives logs from full system
@@ -650,10 +647,9 @@ if __name__ == "__main__":
     # TODO (#2581) remove this
     if args.visualize_cpp_test:
 
-        runtime_dir = "/tmp/tbots/yellow_test"
+        runtime_dir = "/tmp/tbots"
 
         try:
-            os.mkdir("/tmp/tbots")
             os.mkdir(runtime_dir)
         except OSError:
             pass

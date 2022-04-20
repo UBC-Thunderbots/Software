@@ -72,8 +72,8 @@ class SimulatedErForceSimPlayTestFixture : public SimulatedErForceSimTestFixture
     void updatePrimitives(const World& friendly_world, const World& enemy_world,
                           std::shared_ptr<ErForceSimulator> simulator_to_update) override;
     // The configs being used in simulation
-    TbotsProto::AiConfig ai_config;
-    TbotsProto::SensorFusionConfig sensor_fusion_config;
+    std::unique_ptr<TbotsProto::AiConfig> mutable_ai_config;
+    std::unique_ptr<TbotsProto::SensorFusionConfig> mutable_sensor_fusion_config;
 
     GameState game_state;
 
