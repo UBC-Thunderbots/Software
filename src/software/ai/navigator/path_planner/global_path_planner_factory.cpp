@@ -27,28 +27,36 @@ GlobalPathPlannerFactory::GlobalPathPlannerFactory(
         // obstacles out
         unsigned constraint_bits     = counter;
         bool has_dynamic_constraints = false;
-        (void)has_dynamic_constraints;
         for (int j = 0; j < motion_constraint_enum_descriptor->value_count();
              ++j, constraint_bits >>= 1)
         {
             if (constraint_bits & 1)
             {
                 TbotsProto::MotionConstraint constraint;
-                bool parsed = TbotsProto::MotionConstraint_Parse(
-                    motion_constraint_enum_descriptor->value(j)->name(), &constraint);
-                CHECK(parsed) << "Couldn't parse "
-                              << motion_constraint_enum_descriptor->value(j)->name()
-                              << std::endl;
+                auto enum_value = motion_constraint_enum_descriptor->value(j);
+                bool parsed =
+                    TbotsProto::MotionConstraint_Parse(enum_value->name(), &constraint);
+
+                if (enum_value->options().HasExtension(TbotsProto::dynamic) &&
+                    enum_value->options().GetExtension(TbotsProto::dynamic))
+                {
+                    has_dynamic_constraints = true;
+                    break;
+                }
+                CHECK(parsed) << "Couldn't parse " << enum_value->name() << std::endl;
                 motion_constraint_obstacles.emplace(constraint);
             }
         }
 
-        auto obstacles = obstacle_factory.createFromMotionConstraints(
-            motion_constraint_obstacles, field);
-        planners.emplace(std::make_pair(
-            motion_constraint_obstacles,
-            std::make_shared<EnlsvgPathPlanner>(field.fieldBoundary(), obstacles,
-                                                ROBOT_MAX_RADIUS_METERS)));
+        if (!has_dynamic_constraints)
+        {
+            auto obstacles = obstacle_factory.createFromMotionConstraints(
+                motion_constraint_obstacles, field);
+            planners.emplace(std::make_pair(
+                motion_constraint_obstacles,
+                std::make_shared<EnlsvgPathPlanner>(field.fieldBoundary(), obstacles,
+                                                    ROBOT_MAX_RADIUS_METERS)));
+        }
     }
 }
 
