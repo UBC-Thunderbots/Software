@@ -72,7 +72,7 @@ from software.thunderscope.robot_diagnostics.drive_and_dribbler_widget import (
     DriveAndDribblerWidget,
 )
 
-DEFAULT_LAYOUT_PATH = "/opt/tbotspython/default_tscope_layout"
+SAVED_LAYOUT_PATH = "/opt/tbotspython/saved_tscope_layout"
 NUM_ROBOTS = 6
 SIM_TICK_RATE_MS = 16
 REFRESH_INTERVAL_MS = 5
@@ -128,8 +128,8 @@ class Thunderscope(object):
         self.web_view = QWebEngineView()
         self.web_view.load(QtCore.QUrl(GAME_CONTROLLER_URL))
 
-        self.tabs.addTab(self.yellow_full_system_dock_area, "Yellow Fullsystem")
         self.tabs.addTab(self.blue_full_system_dock_area, "Blue Fullsystem")
+        self.tabs.addTab(self.yellow_full_system_dock_area, "Yellow Fullsystem")
         self.tabs.addTab(self.web_view, "Gamecontroller")
 
         self.window = QtGui.QMainWindow()
@@ -176,8 +176,8 @@ class Thunderscope(object):
         )
 
         def __reset_layout():
-            if os.path.exists(DEFAULT_LAYOUT_PATH):
-                os.remove(DEFAULT_LAYOUT_PATH)
+            if os.path.exists(SAVED_LAYOUT_PATH):
+                os.remove(SAVED_LAYOUT_PATH)
                 QMessageBox.information(
                     self.window,
                     "Restart Required",
@@ -193,18 +193,17 @@ class Thunderscope(object):
             lambda: QMessageBox.information(
                 self.window,
                 "Help",
-                """
-                Cntrl+S: Save Layout
-                Cntrl+O: Open Layout
-                Cntrl+R: Reset Layout back to default
-
-                Double Click Purple Bar to pop window out
-                Drag Purple Bar to rearrange docks
-                Click items in legends to select/deselect
-
-                Cntrl-Click and Drag: Move ball and kick
-                I to identify robots, show their IDs
-                """,
+                "\nKeyboard Shortcuts:\n\n"
+                "Cntrl+S: Save Layout\n"
+                "Cntrl+O: Open Layout\n"
+                "Cntrl+R: will remove the file and reset the layout\n"
+                f"\nLayout file (on save) is located at \n{SAVED_LAYOUT_PATH}\n"
+                "I to identify robots, show their IDs\n"
+                "\nMouse Shortcuts:\n\n"
+                "Double Click Purple Bar to pop window out\n"
+                "Drag Purple Bar to rearrange docks\n"
+                "Click items in legends to select/deselect\n"
+                "Cntrl-Click and Drag: Move ball and kick\n",
             )
         )
 
@@ -229,7 +228,7 @@ class Thunderscope(object):
             shelf["blue_dock_state"] = self.blue_full_system_dock_area.saveState()
             shelf["yellow_dock_state"] = self.yellow_full_system_dock_area.saveState()
 
-        with shelve.open(DEFAULT_LAYOUT_PATH, "c") as shelf:
+        with shelve.open(SAVED_LAYOUT_PATH, "c") as shelf:
             shelf["blue_dock_state"] = self.blue_full_system_dock_area.saveState()
             shelf["yellow_dock_state"] = self.yellow_full_system_dock_area.saveState()
 
@@ -262,8 +261,8 @@ class Thunderscope(object):
             )
 
             # Update default layout
-            if filename != DEFAULT_LAYOUT_PATH:
-                with shelve.open(DEFAULT_LAYOUT_PATH, "c") as default_shelf:
+            if filename != SAVED_LAYOUT_PATH:
+                with shelve.open(SAVED_LAYOUT_PATH, "c") as default_shelf:
                     default_shelf["blue_dock_state"] = shelf["blue_dock_state"]
                     default_shelf["yellow_dock_state"] = shelf["yellow_dock_state"]
                     default_shelf.sync()
@@ -294,7 +293,7 @@ class Thunderscope(object):
                 False,
             )
 
-        path = layout_path if layout_path else DEFAULT_LAYOUT_PATH
+        path = layout_path if layout_path else SAVED_LAYOUT_PATH
 
         try:
             self.load_layout(path)

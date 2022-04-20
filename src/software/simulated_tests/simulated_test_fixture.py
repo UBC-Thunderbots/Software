@@ -270,9 +270,7 @@ def simulated_test_runner():
                 gamecontroller,
             )
 
-            # Only validate on the yellow worlds
-            yellow_full_system_proto_unix_io.register_observer(
-                World, runner.world_buffer
-            )
+            # Only validate on the blue worlds
+            blue_full_system_proto_unix_io.register_observer(World, runner.world_buffer)
 
             yield runner
