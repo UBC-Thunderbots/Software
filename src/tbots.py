@@ -3,6 +3,7 @@
 import os
 import sys
 import iterfzf
+import itertools
 from subprocess import PIPE, run, check_call
 import argparse
 from thefuzz import fuzz
@@ -30,19 +31,32 @@ if __name__ == "__main__":
     # These are shortcut args for commonly used arguments on our tests
     # and full_system. All other arguments are passed through as-is
     # to the underlying binary/test that is being run (unknown_args)
+    parser.add_argument("-t", "--enable_thunderscope", action="store_true")
     parser.add_argument("-v", "--enable_visualizer", action="store_true")
     parser.add_argument("-s", "--stop_ai_on_start", action="store_true")
     args, unknown_args = parser.parse_known_args()
 
+    test_query = ["bazel", "query", "tests(//...)"]
+    binary_query = ["bazel", "query", "kind(.*_binary,//...)"]
+    library_query = ["bazel", "query", "kind(.*_library,//...)"]
+
     bazel_queries = {
-        "test": ["bazel", "query", "tests(//...)"],
-        "run": ["bazel", "query", "kind(.*_binary,//...)"],
-        "build": ["bazel", "query", "kind(.*_library,//...)"],
+        "test": [test_query],
+        "run": [test_query, binary_query],
+        "build": [library_query, test_query, binary_query],
     }
 
     # Run the appropriate bazel query and ask thefuzz to find the best matching
     # target, gauranteed to return 1 result because we set limit=1
-    targets = run(bazel_queries[args.action], stdout=PIPE).stdout.split(b"\n")
+    # Combine results of multiple queries with itertools.chain
+    targets = list(
+        itertools.chain.from_iterable(
+            [
+                run(query, stdout=PIPE).stdout.split(b"\n")
+                for query in bazel_queries[args.action]
+            ]
+        )
+    )
     target, confidence = process.extract(args.search_query, targets, limit=1)[0]
     target = str(target, encoding="utf-8")
 
@@ -72,21 +86,19 @@ if __name__ == "__main__":
     if args.action in "run":
         command += ["--"]
 
-    # Handle stop_ai_on_start
+    bazel_arguments = unknown_args
+
     if args.stop_ai_on_start:
-        if args.action in "run":
-            command += ["--stop_ai_on_start"]
-        if args.action in "test":
-            command += ['--test_arg="--stop_ai_on_start"']
-
-    # Handle visualizer argument
+        bazel_arguments += ["--stop_ai_on_start"]
     if args.enable_visualizer:
-        if args.action in "run":
-            command += ["--enable_visualizer"]
-        if args.action in "test":
-            command += ['--test_arg="--enable_visualizer"']
+        bazel_arguments += ["--enable_visualizer"]
+    if args.enable_thunderscope:
+        bazel_arguments += ["--enable_thunderscope"]
 
-    command += unknown_args
+    if args.action in "test":
+        command += ['--test_arg="' + arg + '"' for arg in bazel_arguments]
+    else:
+        command += bazel_arguments
 
     # If the user requested a command dump, just print the command to run
     if args.print_command:
@@ -96,4 +108,6 @@ if __name__ == "__main__":
     # care about the output and subprocess doesn't seem to run qt for somereason
     else:
         print(" ".join(command))
-        os.system(" ".join(command))
+        code = os.system(" ".join(command))
+        # propagate exit code
+        sys.exit(1 if code != 0 else 0)

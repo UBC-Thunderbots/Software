@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 
 #include "software/simulated_tests/non_terminating_validation_functions/robots_avoid_ball_validation.h"
-#include "software/simulated_tests/simulated_play_test_fixture.h"
+#include "software/simulated_tests/simulated_er_force_sim_play_test_fixture.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_halt_validation.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_in_polygon_validation.h"
 #include "software/simulated_tests/validation/validation_function.h"
@@ -12,11 +12,12 @@
 #include "software/world/game_state.h"
 #include "software/world/world.h"
 
-class EnemyFreekickPlayTest : public SimulatedPlayTestFixture,
+class EnemyFreekickPlayTest : public SimulatedErForceSimPlayTestFixture,
                               public ::testing::WithParamInterface<unsigned int>
 {
    protected:
-    Field field = Field::createSSLDivisionBField();
+    TbotsProto::FieldType field_type = TbotsProto::FieldType::DIV_B;
+    Field field                      = Field::createField(field_type);
 };
 
 TEST_P(EnemyFreekickPlayTest, test_enemy_free_kick_play)
@@ -90,7 +91,7 @@ TEST_P(EnemyFreekickPlayTest, test_enemy_free_kick_play)
             }
         }};
 
-    runTest(field, ball_state, friendly_robots, enemy_robots,
+    runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
 }
@@ -155,7 +156,7 @@ TEST_F(EnemyFreekickPlayTest, test_enemy_free_kick_close_to_net)
             }
         }};
 
-    runTest(field, ball_state, friendly_robots, enemy_robots,
+    runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
 }
@@ -214,7 +215,7 @@ TEST_F(EnemyFreekickPlayTest, test_enemy_free_kick_chipper_robots_close_to_net)
             }
         }};
 
-    runTest(field, ball_state, friendly_robots, enemy_robots,
+    runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
 }

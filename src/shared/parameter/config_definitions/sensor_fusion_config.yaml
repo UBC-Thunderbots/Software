@@ -89,3 +89,10 @@
       then `isOurRestart()` will be `true`, while 
       `PREPARE_KICKOFF_THEM` followed by `NORMAL_START` will set 
       `isOurRestart()` to `false`
+- int:
+    name: num_dropped_detections_before_ball_not_in_dribbler
+    min: 0
+    max: 1000
+    value: 3
+    description: >-
+      Number of dropped detections before we consider the ball not to be in the dribbler
