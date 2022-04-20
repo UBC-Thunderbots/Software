@@ -21,7 +21,11 @@ class ThreadedUnixListener:
 
         :param unix_path: The unix path to receive the new protobuf to plot
         :param proto_class: The protobuf to unpack from (None if its encoded in the payload)
-        :param base64_encoded: False
+        :param base64_encoded: If the data is base64_encoded, we need to decode it first
+                               before grabbing the protobuf. This is required for
+                               LOG(VISUALIZE) calls where the data needs to be base64_encoded
+                               to avoid \n characters.
+
         :param max_buffer_size: The size of the buffer
 
         """

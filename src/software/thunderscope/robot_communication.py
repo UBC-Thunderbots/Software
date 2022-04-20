@@ -23,7 +23,7 @@ class RobotCommunication(object):
         :param multicast_channel: The multicast channel to use
         :param interface: The interface to use
         :param estop_path: The path to the estop
-        :param estop_buadrate: The buadrate of the estop
+        :param estop_baudrate: The baudrate of the estop
 
         """
         self.proto_unix_io = proto_unix_io

@@ -7,15 +7,21 @@ class Field(pg.PlotWidget):
 
     """Wrapper to handle Field Layers"""
 
-    MAX_X_RANGE = 10000
-    MAX_Y_RANGE = 6000
+    def __init__(self, max_x_range=10000, max_y_range=6000):
+        """Initialize the field
 
-    def __init__(self):
+        :param max_x_range: Maximum x range of the field
+        :param max_y_range: Maximum y range of the field
+
+        """
         pg.PlotWidget.__init__(self)
 
         # Setup Field Plot
         self.setAspectLocked()
         self.showGrid(x=True, y=True, alpha=0.5)
+
+        self.max_x_range = max_x_range
+        self.max_y_range = max_y_range
 
         # NOTE: This line has caused a lot of grief. DO NOT remove this, or you
         # will encounter a severe performance hit.
@@ -82,7 +88,7 @@ class Field(pg.PlotWidget):
         # Set the field range once
         if not self.range_set:
             self.setRange(
-                xRange=(-int(Field.MAX_X_RANGE / 2), int(Field.MAX_X_RANGE / 2)),
-                yRange=(-int(Field.MAX_Y_RANGE / 2), int(Field.MAX_Y_RANGE / 2)),
+                xRange=(-int(self.max_x_range / 2), int(self.max_x_range / 2)),
+                yRange=(-int(self.max_y_range / 2), int(self.max_y_range / 2)),
             )
             self.range_set = True

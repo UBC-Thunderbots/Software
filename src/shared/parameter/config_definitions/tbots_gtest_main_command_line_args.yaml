@@ -19,7 +19,7 @@
 
 - string:
     name: runtime_dir
-    value: ""
+    value: "/tmp/tbots/yellow_test"
     description: >-
         The directory to output logs to. Absolute paths are recommended as the working directory
         is inside the bazel-out directory.

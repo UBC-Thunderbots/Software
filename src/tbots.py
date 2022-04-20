@@ -76,8 +76,10 @@ if __name__ == "__main__":
     if args.debug_build:
         command += ["-c", "dbg"]
 
-    # If its a binary, then run under gdb
-    if args.action in "run" and args.debug_build:
+    # If its a binary, then run under gdb. We need to special case thunderscope
+    # because it relies on --debug_simulator and --debug_simulator and prompts
+    # the user to run the command under gdb instead.
+    if args.action in "run" and args.debug_build and "thunderscope" not in target:
         command += ["--run_under=gdb"]
 
     # Don't cache test results

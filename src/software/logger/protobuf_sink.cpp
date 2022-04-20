@@ -26,7 +26,7 @@ void ProtobufSink::sendProtobuf(g3::LogMessageMover log_entry)
         std::string proto_type_name  = msg.substr(0, pos);
         std::string serialized_proto = msg.substr(pos + TYPE_DELIMITER.length());
 
-        // If we don't already have a unix sender for this type, lets create it
+        // If we don't already have a unix sender for this type, let's create it
         if (unix_senders_.count(proto_type_name) == 0)
         {
             unix_senders_[proto_type_name] = std::make_unique<ThreadedUnixSender>(

@@ -77,10 +77,11 @@ class PassingLayer(FieldLayer):
         ):
 
             # Lets color the best pass green and rest white
-            if pass_num == 0:
-                painter.setPen(pg.mkPen("green", width=constants.LINE_WIDTH))
-            else:
-                painter.setPen(pg.mkPen("white", width=constants.LINE_WIDTH))
+            painter.setPen(
+                pg.mkPen(
+                    "green" if pass_num == 0 else "white", width=constants.LINE_WIDTH
+                )
+            )
 
             painter.drawEllipse(
                 self.createCircle(
