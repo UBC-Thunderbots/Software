@@ -128,8 +128,8 @@ class Thunderscope(object):
         self.web_view = QWebEngineView()
         self.web_view.load(QtCore.QUrl(GAME_CONTROLLER_URL))
 
-        self.tabs.addTab(self.blue_full_system_dock_area, "Blue Fullsystem")
         self.tabs.addTab(self.yellow_full_system_dock_area, "Yellow Fullsystem")
+        self.tabs.addTab(self.blue_full_system_dock_area, "Blue Fullsystem")
         self.tabs.addTab(self.web_view, "Gamecontroller")
 
         self.window = QtGui.QMainWindow()
@@ -196,13 +196,13 @@ class Thunderscope(object):
                 """
                 Cntrl+S: Save Layout
                 Cntrl+O: Open Layout
-                Cntrl+R: Reset Layout
+                Cntrl+R: Reset Layout back to default
+
                 Double Click Purple Bar to pop window out
                 Drag Purple Bar to rearrange docks
                 Click items in legends to select/deselect
 
                 Cntrl-Click and Drag: Move ball and kick
-                Click and Drag Robots to move them around
                 I to identify robots, show their IDs
                 """,
             )
@@ -612,6 +612,12 @@ if __name__ == "__main__":
         default=False,
         help="Debug the simulator",
     )
+    parser.add_argument(
+        "--visualize_cpp_test",
+        action="store_true",
+        default=False,
+        help="Visualize C++ Tests",
+    )
 
     # Run blue or yellow full system over WiFi
     group = parser.add_mutually_exclusive_group()
@@ -641,6 +647,36 @@ if __name__ == "__main__":
             parser.error("Must specify interface")
 
     tscope = Thunderscope()
+
+    # TODO (#2581) remove this
+    if args.visualize_cpp_test:
+
+        runtime_dir = "/tmp/tbots/yellow_test"
+
+        try:
+            os.mkdir("/tmp/tbots")
+            os.mkdir(runtime_dir)
+        except OSError:
+            pass
+
+        proto_unix_io = tscope.blue_full_system_proto_unix_io
+
+        # Setup LOG(VISUALIZE) handling from full system. We set from_log_visualize
+        # to true to decode from base64.
+        for arg in [
+            (runtime_dir, Obstacles, True),
+            (runtime_dir, PathVisualization, True),
+            (runtime_dir, PassVisualization, True),
+            (runtime_dir, NamedValue, True),
+            (runtime_dir, World, True),
+            (runtime_dir, PlayInfo, True),
+        ]:
+            proto_unix_io.attach_unix_receiver(*arg)
+
+        proto_unix_io.attach_unix_receiver(runtime_dir + "/log", RobotLog)
+
+        tscope.load_saved_layout(args.layout, load_yellow=True)
+        tscope.show()
 
     ###########################################################################
     #              AI + Robot Communication + Robot Diagnostics               #

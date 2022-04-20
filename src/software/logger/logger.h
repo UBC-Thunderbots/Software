@@ -53,6 +53,8 @@ class LoggerSingleton
     /**
      * Initializes a g3log logger for the calling program. This should only be
      * called once at the start of a program.
+     *
+     * @param runtime_dir The directory where the log files will be stored.
      */
     static void initializeLogger(const std::string& runtime_dir)
     {

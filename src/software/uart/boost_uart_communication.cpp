@@ -6,6 +6,7 @@
 
 BoostUartCommunication::BoostUartCommunication(int baud_rate,
                                                std::string device_serial_port)
+    : io_service_()
 {
     openPort(io_service_, baud_rate, device_serial_port);
 }

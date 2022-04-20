@@ -35,9 +35,7 @@ class ObstacleLayer(FieldLayer):
         # Draw the obstacles
         obstacles = self.obstacle_buffer.get(block=False)
 
-        painter.setPen(
-            pg.mkPen(Colors.NAVIGATOR_OBSTACLE_COLOR, width=constants.LINE_WIDTH)
-        )
+        painter.setPen(pg.mkPen(Colors.NAVIGATOR_OBSTACLE_COLOR))
 
         for polyobstacle in obstacles.polygon:
             polygon_points = [

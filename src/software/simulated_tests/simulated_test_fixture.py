@@ -221,7 +221,7 @@ def load_command_line_arguments():
 
 
 @pytest.fixture
-def simulated_test_runner(capsys):
+def simulated_test_runner():
     args = load_command_line_arguments()
     tscope = None
 
@@ -270,7 +270,9 @@ def simulated_test_runner(capsys):
                 gamecontroller,
             )
 
-            # Only validate on the blue worlds
-            blue_full_system_proto_unix_io.register_observer(World, runner.world_buffer)
+            # Only validate on the yellow worlds
+            yellow_full_system_proto_unix_io.register_observer(
+                World, runner.world_buffer
+            )
 
             yield runner

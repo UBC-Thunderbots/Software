@@ -56,6 +56,20 @@ void SimulatedErForceSimTestFixture::SetUp()
 
     setupReplayLogging();
 
+    // reinitializing to prevent the previous test's configs from being reused
+    friendly_sensor_fusion =
+        SensorFusion(friendly_thunderbots_config->getSensorFusionConfig());
+    enemy_sensor_fusion = SensorFusion(enemy_thunderbots_config->getSensorFusionConfig());
+
+    if (TbotsGtestMain::enable_visualizer)
+    {
+        enableVisualizer();
+    }
+    if (TbotsGtestMain::run_sim_in_realtime)
+    {
+        run_simulation_in_realtime = true;
+    }
+
     // Reset tick duration trackers
     total_friendly_tick_duration = 0.0;
     total_enemy_tick_duration    = 0.0;
