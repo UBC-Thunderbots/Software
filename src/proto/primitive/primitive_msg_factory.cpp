@@ -56,7 +56,7 @@ std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
     return createCostedMovePrimitive(
         motion_control, final_angle, final_speed, dribbler_mode, ball_collision_type,
         auto_chip_or_kick, max_allowed_speed_mode, target_spin_rev_per_s, robot_constants,
-        motion_control.path_length() + 1.0);
+        motion_control.normalized_path_length());
 }
 
 std::unique_ptr<TbotsProto::Primitive> createCostedMovePrimitive(
@@ -114,8 +114,6 @@ std::unique_ptr<TbotsProto::Primitive> createChipPrimitive(
     *(path_proto.add_point())        = *createPointProto(chip_origin);
     *(motion_control.mutable_path()) = path_proto;
 
-    motion_control.set_path_length(0);
-
     return createCostedMovePrimitive(
         motion_control, chip_direction, 0.0, TbotsProto::DribblerMode::OFF,
         TbotsProto::BallCollisionType::ALLOW,
@@ -132,8 +130,6 @@ std::unique_ptr<TbotsProto::Primitive> createKickPrimitive(
 
     *(path_proto.add_point())        = *createPointProto(kick_origin);
     *(motion_control.mutable_path()) = path_proto;
-
-    motion_control.set_path_length(0);
 
     return createCostedMovePrimitive(
         motion_control, kick_direction, 0.0, TbotsProto::DribblerMode::OFF,

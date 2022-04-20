@@ -50,14 +50,11 @@ std::unique_ptr<TbotsProto::Primitive> createCostedMovePrimitive(
 
 std::unique_ptr<TbotsProto::Primitive> createChipPrimitive(
     const Point& chip_origin, const Angle& chip_direction, double chip_distance_meters,
-    // TODO: delete default argument
-    RobotConstants_t robot_constants, double cost = 1.0);
+    RobotConstants_t robot_constants, double cost);
 
 std::unique_ptr<TbotsProto::Primitive> createKickPrimitive(
     const Point& kick_origin, const Angle& kick_direction,
-    double kick_speed_meters_per_second,
-    // TODO: delete default argument
-    RobotConstants_t robot_constants, double cost = 1.0);
+    double kick_speed_meters_per_second, RobotConstants_t robot_constants, double cost);
 
 /**
  * Create a Stop Move Primitive Message

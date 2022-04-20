@@ -78,6 +78,9 @@ class EnlsvgPathPlanner
     static double pathLength(const std::vector<Point> &path_points,
                              const Point &robot_position);
 
+    // 100 m upper limit for path length
+    static constexpr double MAX_PATH_LENGTH = 100.0;
+
    private:
     using EnlsvgPath      = Pathfinding::Path;
     using EnlsvgGrid      = Pathfinding::Grid;

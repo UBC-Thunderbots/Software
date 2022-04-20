@@ -41,7 +41,7 @@ enum MotionConstraint
 message MotionControl
 {
     Path path                                    = 1;
-    double path_length                           = 2;
+    double normalized_path_length                = 2;
     repeated MotionConstraint motion_constraints = 3;
 }
 
