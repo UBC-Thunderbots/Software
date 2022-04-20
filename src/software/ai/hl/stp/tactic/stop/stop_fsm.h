@@ -21,7 +21,7 @@ struct StopFSM
     explicit StopFSM(bool coast) : coast(coast) {}
 
     /**
-     * Action to set the StopIntent
+     * Action to set the StopPrimitive
      *
      * @param event StopFSM::Update
      */

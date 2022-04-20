@@ -9,7 +9,7 @@
  * that way throughout all the plays that require a goalie.
  *
  * If the ball is moving faster than a threshold towards the net, moves to intercept
- * the ball. If not, returns intents that position the robot in a cone between the ball
+ * the ball. If not, returns primitives that position the robot in a cone between the ball
  * and the two goal posts, in such a way that the robot would have to move a minimal
  * distance either way to intercept a potential straight shot into the net.
  *

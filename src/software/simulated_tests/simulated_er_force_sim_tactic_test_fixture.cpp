@@ -1,9 +1,6 @@
 #include "software/simulated_tests/simulated_er_force_sim_tactic_test_fixture.h"
 
 #include "proto/message_translation/tbots_protobuf.h"
-#include "software/ai/navigator/path_manager/velocity_obstacle_path_manager.h"
-#include "software/ai/navigator/path_planner/theta_star_path_planner.h"
-#include "software/gui/drawing/navigator.h"
 #include "software/simulation/er_force_simulator.h"
 #include "software/test_util/test_util.h"
 

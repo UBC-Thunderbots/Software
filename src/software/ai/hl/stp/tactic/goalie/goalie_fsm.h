@@ -112,7 +112,7 @@ struct GoalieFSM
     bool panicDone(const Update &event);
 
     /**
-     * Action that updates the MoveIntent to time_to_panic and stop the ball
+     * Action that updates the MovePrimitive to time_to_panic and stop the ball
      *
      * @param event GoalieFSM::Update event
      */
@@ -130,7 +130,7 @@ struct GoalieFSM
                          boost::sml::back::process<PivotKickFSM::Update> processEvent);
 
     /**
-     * Action that updates the MoveIntent to position the goalie in the best spot to
+     * Action that updates the MovePrimitive to position the goalie in the best spot to
      * block shots.
      *
      * @param event GoalieFSM::Update event

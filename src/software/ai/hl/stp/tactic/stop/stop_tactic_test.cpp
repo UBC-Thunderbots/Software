@@ -2,7 +2,6 @@
 
 #include <gtest/gtest.h>
 
-#include "software/ai/intent/stop_intent.h"
 #include "software/simulated_tests/simulated_er_force_sim_tactic_test_fixture.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_halt_validation.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_state_validation.h"

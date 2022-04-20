@@ -21,7 +21,7 @@ struct KickFSM
     DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
     /**
-     * Action that updates the KickIntent
+     * Action that updates the KickPrimitive
      *
      * @param event KickFSM::Update event
      */

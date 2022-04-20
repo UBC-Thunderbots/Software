@@ -28,7 +28,7 @@ TEST_F(PrimitiveGoogleToNanoPbConverterTest, convert_move_primitive)
         TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0, robot_constants);
 
     TbotsProto_Primitive nanopb_primitive = createNanoPbPrimitive(google_primitive);
-    auto destination                      = nanopb_primitive.primitive.move.path.point[0];
+    auto destination = nanopb_primitive.primitive.move.motion_control.path.point[0];
 
     ASSERT_EQ(nanopb_primitive.which_primitive, TbotsProto_Primitive_move_tag);
     EXPECT_EQ(destination.x_meters, 1.0f);
@@ -70,7 +70,7 @@ TEST_F(PrimitiveGoogleToNanoPbConverterTest, convert_primitive_set)
     for (pb_size_t i = 0; i < nanopb_primitive_set.robot_primitives_count; i++)
     {
         auto nanopb_primitive = nanopb_primitive_set.robot_primitives[i].value;
-        auto destination      = nanopb_primitive.primitive.move.path.point[0];
+        auto destination = nanopb_primitive.primitive.move.motion_control.path.point[0];
         if (nanopb_primitive_set.robot_primitives[i].key == 0)
         {
             EXPECT_EQ(nanopb_primitive_set.robot_primitives[i].key, 0);

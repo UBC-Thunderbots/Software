@@ -65,6 +65,4 @@ void ThreadedAI::runAIAndSendPrimitives(const World& world)
     }
 }
 
-void ThreadedAI::drawAI()
-{
-}
+void ThreadedAI::drawAI() {}
