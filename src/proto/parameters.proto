@@ -43,7 +43,7 @@ message AiConfig
 message AiControlConfig
 {
     // Whether we should run or stop ai
-    required bool run_ai = 1;
+    required bool run_ai = 1 [default = true];
 
     // If the enum exists, override the existing play
     // with the Play enum provided
