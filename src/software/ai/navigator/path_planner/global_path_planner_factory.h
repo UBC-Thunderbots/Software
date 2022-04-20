@@ -50,9 +50,10 @@ class GlobalPathPlannerFactory
      * @return path planner for static obstacles created by constraints
      */
     std::shared_ptr<const EnlsvgPathPlanner> getPathPlanner(
-        const std::set<MotionConstraint> &constraints) const;
+        const std::set<TbotsProto::MotionConstraint> &constraints) const;
 
    private:
-    std::map<std::set<MotionConstraint>, std::shared_ptr<const EnlsvgPathPlanner>>
+    std::map<std::set<TbotsProto::MotionConstraint>,
+             std::shared_ptr<const EnlsvgPathPlanner>>
         planners;
 };

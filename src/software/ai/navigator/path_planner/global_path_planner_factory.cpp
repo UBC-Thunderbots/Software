@@ -6,7 +6,8 @@ GlobalPathPlannerFactory::GlobalPathPlannerFactory(
 {
     RobotNavigationObstacleFactory obstacle_factory =
         RobotNavigationObstacleFactory(navigation_obstacle_config);
-    std::vector<MotionConstraint> all_constraints = allValuesMotionConstraint();
+
+    auto motion_constraint_enum_descriptor = TbotsProto::MotionConstraint_descriptor();
 
     // The idea of this is similar to Gray codes
     // (https://en.wikipedia.org/wiki/Gray_code#History_and_practical_application). The
@@ -14,22 +15,31 @@ GlobalPathPlannerFactory::GlobalPathPlannerFactory(
     // is on and off. By cycling through every combination of bits, we'll consequently
     // also have every combination of MotionConstraints
     // (https://www.geeksforgeeks.org/generate-n-bit-gray-codes/)
-    for (unsigned counter = 0; counter < std::pow(2, all_constraints.size()); ++counter)
+    for (unsigned counter = 0;
+         counter < std::pow(2, motion_constraint_enum_descriptor->value_count());
+         ++counter)
     {
         // TODO: somehow ignore dynamic motion constraints
         // maybe use protobuf options
-        std::set<MotionConstraint> motion_constraint_obstacles;
+        std::set<TbotsProto::MotionConstraint> motion_constraint_obstacles;
 
         // Use the value of the counter and bit arithmetic to get the motion constraint
         // obstacles out
         unsigned constraint_bits     = counter;
         bool has_dynamic_constraints = false;
         (void)has_dynamic_constraints;
-        for (unsigned j = 0; j < all_constraints.size(); ++j, constraint_bits >>= 1)
+        for (int j = 0; j < motion_constraint_enum_descriptor->value_count();
+             ++j, constraint_bits >>= 1)
         {
             if (constraint_bits & 1)
             {
-                motion_constraint_obstacles.emplace(all_constraints[j]);
+                TbotsProto::MotionConstraint constraint;
+                bool parsed = TbotsProto::MotionConstraint_Parse(
+                    motion_constraint_enum_descriptor->value(j)->name(), &constraint);
+                CHECK(parsed) << "Couldn't parse "
+                              << motion_constraint_enum_descriptor->value(j)->name()
+                              << std::endl;
+                motion_constraint_obstacles.emplace(constraint);
             }
         }
 
@@ -43,7 +53,7 @@ GlobalPathPlannerFactory::GlobalPathPlannerFactory(
 }
 
 std::shared_ptr<const EnlsvgPathPlanner> GlobalPathPlannerFactory::getPathPlanner(
-    const std::set<MotionConstraint> &motion_constraints) const
+    const std::set<TbotsProto::MotionConstraint> &motion_constraints) const
 {
     try
     {

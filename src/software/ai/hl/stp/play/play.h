@@ -15,7 +15,7 @@ using RobotToTacticAssignmentFunction =
         const ConstPriorityTacticVector&, const World&, bool)>;
 
 using MotionConstraintBuildFunction =
-    std::function<std::set<MotionConstraint>(const Tactic& tactic)>;
+    std::function<std::set<TbotsProto::MotionConstraint>(const Tactic& tactic)>;
 
 // This coroutine returns a list of list of shared_ptrs to Tactic objects
 using TacticCoroutine = boost::coroutines2::coroutine<PriorityTacticVector>;

@@ -83,8 +83,8 @@ void SimulatedErForceSimTacticTestFixture::setBothRobotId(RobotId friendly_robot
 }
 
 void SimulatedErForceSimTacticTestFixture::setMotionConstraints(
-    const std::set<MotionConstraint>& friendly_motion_constraints,
-    const std::set<MotionConstraint>& enemy_motion_constraints)
+    const std::set<TbotsProto::MotionConstraint>& friendly_motion_constraints,
+    const std::set<TbotsProto::MotionConstraint>& enemy_motion_constraints)
 {
     this->friendly_motion_constraints = friendly_motion_constraints;
     this->enemy_motion_constraints    = enemy_motion_constraints;
@@ -110,7 +110,8 @@ void SimulatedErForceSimTacticTestFixture::updatePrimitives(
 double SimulatedErForceSimTacticTestFixture::updatePrimitives(
     const World& world, std::shared_ptr<ErForceSimulator> simulator_to_update,
     std::shared_ptr<Navigator> navigator, RobotId robot_id,
-    std::shared_ptr<Tactic> tactic, const std::set<MotionConstraint>& motion_constraints,
+    std::shared_ptr<Tactic> tactic,
+    const std::set<TbotsProto::MotionConstraint>& motion_constraints,
     std::shared_ptr<const ThunderbotsConfig> config)
 {
     std::vector<std::unique_ptr<Intent>> intents;

@@ -77,15 +77,18 @@ std::vector<ObstaclePtr> RobotNavigationObstacleFactory::createFromMotionConstra
             // AVOID_BALL_PLACEMENT_INTERFERENCE is not handled by this obstacle factory
             // since it's a dynamic obstacle
             break;
-        case TbotsProto::MotionConstraint::MotionConstraint_INT_MIN_SENTINEL_DO_NOT_USE_:; break;
-        case TbotsProto::MotionConstraint::MotionConstraint_INT_MAX_SENTINEL_DO_NOT_USE_:; break;
+        case TbotsProto::MotionConstraint::MotionConstraint_INT_MIN_SENTINEL_DO_NOT_USE_:;
+            break;
+        case TbotsProto::MotionConstraint::MotionConstraint_INT_MAX_SENTINEL_DO_NOT_USE_:;
+            break;
     }
 
     return obstacles;
 }
 
 std::vector<ObstaclePtr> RobotNavigationObstacleFactory::createFromMotionConstraints(
-    const std::set<TbotsProto::MotionConstraint> &motion_constraints, const Field &field) const
+    const std::set<TbotsProto::MotionConstraint> &motion_constraints,
+    const Field &field) const
 {
     std::vector<ObstaclePtr> obstacles;
     for (auto motion_constraint : motion_constraints)

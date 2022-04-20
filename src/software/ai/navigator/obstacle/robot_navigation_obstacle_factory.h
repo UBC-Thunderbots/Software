@@ -36,7 +36,8 @@ class RobotNavigationObstacleFactory
      * @return Obstacles representing the given motion constraints
      */
     std::vector<ObstaclePtr> createFromMotionConstraints(
-        const std::set<TbotsProto::MotionConstraint> &motion_constraints, const Field &field) const;
+        const std::set<TbotsProto::MotionConstraint> &motion_constraints,
+        const Field &field) const;
 
     /**
      * Create obstacles for the given motion constraint

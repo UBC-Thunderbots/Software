@@ -83,8 +83,8 @@ void SimulatedTacticTestFixture::setBothRobotId(RobotId friendly_robot_id,
 }
 
 void SimulatedTacticTestFixture::setMotionConstraints(
-    const std::set<MotionConstraint>& friendly_motion_constraints,
-    const std::set<MotionConstraint>& enemy_motion_constraints)
+    const std::set<TbotsProto::MotionConstraint>& friendly_motion_constraints,
+    const std::set<TbotsProto::MotionConstraint>& enemy_motion_constraints)
 {
     this->friendly_motion_constraints = friendly_motion_constraints;
     this->enemy_motion_constraints    = enemy_motion_constraints;

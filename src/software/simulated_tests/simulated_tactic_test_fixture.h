@@ -78,8 +78,8 @@ class SimulatedTacticTestFixture : public SimulatedTestFixture
      * @param enemy_motion_constraints The enemy motion constraint
      */
     void setMotionConstraints(
-        const std::set<MotionConstraint>& friendly_motion_constraints,
-        const std::set<MotionConstraint>& enemy_motion_constraints = {});
+        const std::set<TbotsProto::MotionConstraint>& friendly_motion_constraints,
+        const std::set<TbotsProto::MotionConstraint>& enemy_motion_constraints = {});
 
    private:
     void updatePrimitives(const World& friendly_world, const World& enemy_world,
@@ -98,8 +98,8 @@ class SimulatedTacticTestFixture : public SimulatedTestFixture
     std::optional<RobotId> enemy_robot_id_opt;
 
     // Motion constraints to set for intent
-    std::set<MotionConstraint> friendly_motion_constraints;
-    std::set<MotionConstraint> enemy_motion_constraints;
+    std::set<TbotsProto::MotionConstraint> friendly_motion_constraints;
+    std::set<TbotsProto::MotionConstraint> enemy_motion_constraints;
     // The Navigator
     std::shared_ptr<Navigator> friendly_navigator;
     std::shared_ptr<Navigator> enemy_navigator;
