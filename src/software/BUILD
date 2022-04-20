@@ -29,11 +29,11 @@ cc_binary(
     name = "er_force_simulator_main",
     srcs = ["er_force_simulator_main.cpp"],
     deps = [
-        "@boost//:program_options",
         "//software:constants",
         "//software/networking:threaded_proto_unix_listener",
         "//software/networking:threaded_proto_unix_sender",
         "//software/simulation:er_force_simulator",
+        "@boost//:program_options",
     ],
 )
 

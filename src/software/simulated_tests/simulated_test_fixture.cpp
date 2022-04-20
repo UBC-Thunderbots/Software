@@ -22,7 +22,7 @@ SimulatedTestFixture::SimulatedTestFixture()
 
 void SimulatedTestFixture::SetUp()
 {
-    LoggerSingleton::initializeLogger(TbotsGtestMain::logging_dir);
+    LoggerSingleton::initializeLogger(TbotsGtestMain::runtime_dir);
 
     friendly_thunderbots_config = TbotsProto::ThunderbotsConfig();
     enemy_thunderbots_config    = TbotsProto::ThunderbotsConfig();

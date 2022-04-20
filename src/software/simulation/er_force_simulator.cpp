@@ -15,8 +15,8 @@
 #include "proto/message_translation/ssl_wrapper.h"
 #include "proto/message_translation/tbots_protobuf.h"
 #include "proto/robot_status_msg.pb.h"
-#include "software/world/robot_state.h"
 #include "software/logger/logger.h"
+#include "software/world/robot_state.h"
 
 ErForceSimulator::ErForceSimulator(const TbotsProto::FieldType& field_type,
                                    const RobotConstants_t& robot_constants,
