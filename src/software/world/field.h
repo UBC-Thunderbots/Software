@@ -460,3 +460,22 @@ class Field
     Rectangle enemy_goal;
     Rectangle friendly_goal;
 };
+
+namespace std
+{
+    template <>
+    struct less<Field>
+    {
+        bool operator()(const Field &lhs, const Field &rhs) const
+        {
+            return lhs.friendlyDefenseArea().halfPerimeter() +
+                       lhs.enemyDefenseArea().halfPerimeter() +
+                       lhs.fieldLines().halfPerimeter() +
+                       lhs.fieldBoundary().halfPerimeter() <
+                   rhs.friendlyDefenseArea().halfPerimeter() +
+                       rhs.enemyDefenseArea().halfPerimeter() +
+                       rhs.fieldLines().halfPerimeter() +
+                       rhs.fieldBoundary().halfPerimeter();
+        }
+    };
+}  // namespace std

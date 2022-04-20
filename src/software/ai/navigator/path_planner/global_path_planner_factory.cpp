@@ -19,8 +19,6 @@ GlobalPathPlannerFactory::GlobalPathPlannerFactory(
          counter < std::pow(2, motion_constraint_enum_descriptor->value_count());
          ++counter)
     {
-        // TODO: somehow ignore dynamic motion constraints
-        // maybe use protobuf options
         std::set<TbotsProto::MotionConstraint> motion_constraint_obstacles;
 
         // Use the value of the counter and bit arithmetic to get the motion constraint
