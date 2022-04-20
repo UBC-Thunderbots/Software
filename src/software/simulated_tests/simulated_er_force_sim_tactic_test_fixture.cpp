@@ -97,7 +97,7 @@ double SimulatedErForceSimTacticTestFixture::updatePrimitives(
     const World& world, std::shared_ptr<ErForceSimulator> simulator_to_update,
     std::shared_ptr<Navigator> navigator, RobotId robot_id,
     std::shared_ptr<Tactic> tactic, const std::set<MotionConstraint>& motion_constraints,
-    std::shared_ptr<const ThunderbotsConfig> config)
+    TbotsProto::ThunderbotsConfig config)
 {
     std::vector<std::unique_ptr<Intent>> intents;
     auto start_tick_time = std::chrono::system_clock::now();
@@ -114,7 +114,7 @@ double SimulatedErForceSimTacticTestFixture::updatePrimitives(
     double duration_ms     = ::TestUtil::millisecondsSince(start_tick_time);
     auto world_msg         = createWorld(world);
 
-    if (config->getSensorFusionConfig()->getFriendlyColorYellow()->value())
+    if (config.sensor_fusion_config().friendly_color_yellow())
     {
         simulator_to_update->setYellowRobotPrimitiveSet(*primitive_set_msg,
                                                         std::move(world_msg));

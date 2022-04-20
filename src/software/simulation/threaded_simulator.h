@@ -31,7 +31,7 @@ class ThreadedSimulator
     explicit ThreadedSimulator(const Field& field,
                                const RobotConstants_t& robot_constants,
                                const WheelConstants& wheel_constants,
-                               std::shared_ptr<const SimulatorConfig> simulator_config);
+                               TbotsProto::SimulatorConfig simulator_config);
     ~ThreadedSimulator();
 
     /**

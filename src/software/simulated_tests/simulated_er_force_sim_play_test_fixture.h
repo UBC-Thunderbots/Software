@@ -73,7 +73,7 @@ class SimulatedErForceSimPlayTestFixture : public SimulatedErForceSimTestFixture
                           std::shared_ptr<ErForceSimulator> simulator_to_update) override;
     // The configs being used in simulation
     TbotsProto::AiConfig ai_config;
-    std::shared_ptr<SensorFusionConfig> sensor_fusion_config;
+    TbotsProto::SensorFusionConfig sensor_fusion_config;
 
     GameState game_state;
 

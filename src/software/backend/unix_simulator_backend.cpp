@@ -13,7 +13,7 @@
 
 UnixSimulatorBackend::UnixSimulatorBackend(std::string runtime_dir)
 {
-    const std::shared_ptr<const SensorFusionConfig> sensor_fusion_config;
+    const TbotsProto::SensorFusionConfig sensor_fusion_config;
 
     // Protobuf Inputs
     robot_status_input.reset(new ThreadedProtoUnixListener<TbotsProto::RobotStatus>(

@@ -22,7 +22,7 @@ class PhysicsBallTest : public testing::Test
     {
         b2Vec2 gravity(0, 0);
         world            = std::make_shared<b2World>(gravity);
-        simulator_config = std::make_shared<const SimulatorConfig>();
+        simulator_config = TbotsProto::SimulatorConfig();
     }
 
     void simulateForDuration(const Duration& duration)
@@ -41,7 +41,7 @@ class PhysicsBallTest : public testing::Test
     }
 
     std::shared_ptr<b2World> world;
-    std::shared_ptr<const SimulatorConfig> simulator_config;
+    TbotsProto::SimulatorConfig simulator_config;
 };
 
 TEST_F(PhysicsBallTest, test_get_position)
@@ -437,12 +437,11 @@ class PhysicsBallFrictionTest : public PhysicsBallTest
     virtual void SetUp()
     {
         PhysicsBallTest::SetUp();
-        simulator_config = std::make_shared<SimulatorConfig>();
-        simulator_config->getMutableSlidingFrictionAcceleration()->setValue(5.0);
-        simulator_config->getMutableRollingFrictionAcceleration()->setValue(0.5);
+        simulator_config.set_sliding_friction_acceleration(5.0);
+        simulator_config.set_rolling_friction_acceleration(0.5);
     }
 
-    std::shared_ptr<SimulatorConfig> simulator_config;
+    TbotsProto::SimulatorConfig simulator_config;
 };
 
 TEST_F(PhysicsBallFrictionTest, test_no_friction_kick)
@@ -450,8 +449,8 @@ TEST_F(PhysicsBallFrictionTest, test_no_friction_kick)
     Point position(3, 5);
     Vector velocity(1, -1);
     BallState initial_ball_state(position, velocity);
-    simulator_config->getMutableSlidingFrictionAcceleration()->setValue(0);
-    simulator_config->getMutableRollingFrictionAcceleration()->setValue(0);
+    simulator_config.set_sliding_friction_acceleration(0);
+    simulator_config.set_rolling_friction_acceleration(0);
     auto physics_ball = PhysicsBall(world, initial_ball_state, 1.0, simulator_config);
     physics_ball.setInitialKickSpeed(velocity.length());
     physics_ball.applyBallFrictionModel(Duration::fromSeconds(1.0));

@@ -41,7 +41,7 @@ class ErForceSimulator
     explicit ErForceSimulator(const TbotsProto::FieldType& field_type,
                               const RobotConstants_t& robot_constants,
                               const WheelConstants& wheel_constants,
-                              std::shared_ptr<const SimulatorConfig> simulator_config);
+                              const TbotsProto::SimulatorConfig simulator_config);
     ErForceSimulator()  = delete;
     ~ErForceSimulator() = default;
 

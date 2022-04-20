@@ -103,7 +103,7 @@ class SimulatedErForceSimTacticTestFixture : public SimulatedErForceSimTestFixtu
                                    std::shared_ptr<Navigator> navigator, RobotId robot_id,
                                    std::shared_ptr<Tactic> tactic,
                                    const std::set<MotionConstraint>& motion_constraints,
-                                   std::shared_ptr<const ThunderbotsConfig> config);
+                                   TbotsProto::ThunderbotsConfig config);
 
     std::optional<TbotsProto::PlayInfo> getPlayInfo() override;
 

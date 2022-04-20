@@ -51,11 +51,10 @@ TEST_P(AttackerTacticKeepAwayTest, attacker_test_keep_away)
     // we use default parameters for testing ratePassEnemyRisk because that's (partially)
     // what the play uses to determine pass/no pass. Keep away state should try to
     // push the best pass in the play above the threshold to commit to passing.
-    auto passing_config = std::make_shared<PassingConfig>();
+    auto passing_config = TbotsProto::PassingConfig();
     auto enemy_reaction_time =
-        Duration::fromSeconds(passing_config->getEnemyReactionTime()->value());
-    auto enemy_proximity_importance =
-        passing_config->getEnemyProximityImportance()->value();
+        Duration::fromSeconds(passing_config.enemy_reaction_time());
+    auto enemy_proximity_importance = passing_config.enemy_proximity_importance();
 
     // we have to create a Team for the enemy here to evaluate the initial enemy risk
     // score

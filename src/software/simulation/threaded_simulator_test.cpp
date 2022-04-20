@@ -12,7 +12,7 @@ class ThreadedSimulatorTest : public ::testing::Test
    protected:
     ThreadedSimulatorTest()
         : threaded_simulator(Field::createSSLDivisionBField(), robot_constants,
-                             wheel_constants, std::make_shared<const SimulatorConfig>())
+                             wheel_constants, TbotsProto::SimulatorConfig())
     {
     }
 

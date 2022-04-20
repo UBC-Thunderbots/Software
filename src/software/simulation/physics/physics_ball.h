@@ -29,7 +29,7 @@ class PhysicsBall
      */
     explicit PhysicsBall(std::shared_ptr<b2World> world, const BallState& ball_state,
                          const double mass_kg,
-                         std::shared_ptr<const SimulatorConfig> simulator_config);
+                         TbotsProto::SimulatorConfig simulator_config);
     PhysicsBall() = delete;
 
     // Delete the copy and assignment operators because copying this class causes
@@ -186,5 +186,5 @@ class PhysicsBall
     // initial speed a ball is kicked to model friction behaviour
     std::optional<double> initial_kick_speed;  // m/s
 
-    std::shared_ptr<const SimulatorConfig> simulator_config;
+    TbotsProto::SimulatorConfig simulator_config;
 };

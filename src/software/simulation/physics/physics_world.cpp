@@ -8,7 +8,7 @@
 
 PhysicsWorld::PhysicsWorld(const Field& field, const RobotConstants_t& robot_constants,
                            const WheelConstants& wheel_constants,
-                           std::shared_ptr<const SimulatorConfig> simulator_config)
+                           TbotsProto::SimulatorConfig simulator_config)
     : b2_world(std::make_shared<b2World>(b2Vec2{0, 0})),
       current_timestamp(Timestamp::fromSeconds(0)),
       contact_listener(std::make_unique<SimulationContactListener>()),

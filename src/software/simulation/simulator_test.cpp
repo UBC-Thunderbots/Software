@@ -12,7 +12,7 @@ class SimulatorTest : public ::testing::Test
    protected:
     void SetUp() override
     {
-        simulator_config = std::make_shared<const SimulatorConfig>();
+        simulator_config = TbotsProto::SimulatorConfig();
         simulator =
             std::make_shared<Simulator>(Field::createSSLDivisionBField(), robot_constants,
                                         wheel_constants, simulator_config);
@@ -20,7 +20,7 @@ class SimulatorTest : public ::testing::Test
     }
 
     std::shared_ptr<Simulator> simulator;
-    std::shared_ptr<const SimulatorConfig> simulator_config;
+    TbotsProto::SimulatorConfig simulator_config;
     RobotConstants_t robot_constants = create2015RobotConstants();
     WheelConstants wheel_constants   = create2015WheelConstants();
 };

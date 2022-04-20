@@ -32,7 +32,7 @@ class PhysicsWorld
      */
     explicit PhysicsWorld(const Field& field, const RobotConstants_t& robot_constants,
                           const WheelConstants& wheel_constants,
-                          std::shared_ptr<const SimulatorConfig> simulator_config);
+                          TbotsProto::SimulatorConfig simulator_config);
     PhysicsWorld() = delete;
 
     // Delete the copy and assignment operators because copying this class causes
@@ -231,5 +231,5 @@ class PhysicsWorld
     std::vector<std::shared_ptr<PhysicsRobot>> blue_physics_robots;
     RobotConstants_t robot_constants;
     WheelConstants_t wheel_constants;
-    std::shared_ptr<const SimulatorConfig> simulator_config;
+    TbotsProto::SimulatorConfig simulator_config;
 };

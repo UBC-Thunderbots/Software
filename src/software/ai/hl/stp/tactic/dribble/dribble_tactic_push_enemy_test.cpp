@@ -41,9 +41,11 @@ class DribbleTacticPushEnemyTest : public SimulatedErForceSimTacticTestFixture,
         SimulatedErForceSimTacticTestFixture::SetUp();
         setMotionConstraints({MotionConstraint::ENEMY_DEFENSE_AREA});
 
-        ai_config.mutable_dribble_tactic_config()->set_lose_ball_possession_threshold(1.0);
+        ai_config.mutable_dribble_tactic_config()->set_lose_ball_possession_threshold(
+            1.0);
         ai_config.mutable_dribble_tactic_config()->set_ball_close_to_dest_threshold(0.1);
-        ai_config.mutable_dribble_tactic_config()->set_final_destination_close_threshold(1.0);
+        ai_config.mutable_dribble_tactic_config()->set_final_destination_close_threshold(
+            1.0);
         ai_config.mutable_dribble_tactic_config()->set_max_continuous_dribbling_distance(
             0.78);
         ai_config.mutable_dribble_tactic_config()->set_robot_dribbling_done_speed(1.0);

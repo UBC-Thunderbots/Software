@@ -22,7 +22,7 @@ class PhysicsFieldTest : public testing::Test
     {
         b2Vec2 gravity(0, 0);
         world            = std::make_shared<b2World>(gravity);
-        simulator_config = std::make_shared<const SimulatorConfig>();
+        simulator_config = TbotsProto::SimulatorConfig();
     }
 
     void simulateForDuration(const Duration& duration)
@@ -41,7 +41,7 @@ class PhysicsFieldTest : public testing::Test
     }
 
     std::shared_ptr<b2World> world;
-    std::shared_ptr<const SimulatorConfig> simulator_config;
+    TbotsProto::SimulatorConfig simulator_config;
 };
 
 TEST_F(PhysicsFieldTest, test_get_field)

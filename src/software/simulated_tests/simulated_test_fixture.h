@@ -90,10 +90,8 @@ class SimulatedTestFixture : public ::testing::Test
     void registerEnemyTickTime(double tick_time_ms);
 
     // The dynamic params being used in the tests
-    std::shared_ptr<ThunderbotsConfig> friendly_mutable_thunderbots_config;
-    std::shared_ptr<ThunderbotsConfig> enemy_mutable_thunderbots_config;
-    std::shared_ptr<const ThunderbotsConfig> friendly_thunderbots_config;
-    std::shared_ptr<const ThunderbotsConfig> enemy_thunderbots_config;
+    TbotsProto::ThunderbotsConfig friendly_thunderbots_config;
+    TbotsProto::ThunderbotsConfig enemy_thunderbots_config;
 
    private:
     /**

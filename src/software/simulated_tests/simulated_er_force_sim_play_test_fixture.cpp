@@ -6,8 +6,7 @@
 
 SimulatedErForceSimPlayTestFixture::SimulatedErForceSimPlayTestFixture()
     : ai_config(TbotsProto::AiConfig()),
-      sensor_fusion_config(
-          friendly_mutable_thunderbots_config->getMutableSensorFusionConfig()),
+      sensor_fusion_config(TbotsProto::SensorFusionConfig()),
       game_state(),
       ai(ai_config)
 {
@@ -17,27 +16,22 @@ void SimulatedErForceSimPlayTestFixture::SetUp()
 {
     SimulatedErForceSimTestFixture::SetUp();
 
-    sensor_fusion_config =
-        friendly_mutable_thunderbots_config->getMutableSensorFusionConfig();
-
-    ai = AI(ai_config);
+    sensor_fusion_config = TbotsProto::SensorFusionConfig();
+    ai                   = AI(ai_config);
 }
 
 void SimulatedErForceSimPlayTestFixture::setFriendlyGoalie(RobotId goalie_id)
 {
-    sensor_fusion_config->getMutableFriendlyGoalieId()->setValue(
-        static_cast<int>(goalie_id));
+    sensor_fusion_config.set_friendly_goalie_id(static_cast<int>(goalie_id));
 }
 
 void SimulatedErForceSimPlayTestFixture::setEnemyGoalie(RobotId goalie_id)
 {
-    sensor_fusion_config->getMutableEnemyGoalieId()->setValue(
-        static_cast<int>(goalie_id));
+    sensor_fusion_config.set_enemy_goalie_id(static_cast<int>(goalie_id));
 }
 
 void SimulatedErForceSimPlayTestFixture::setAIPlay(const TbotsProto::Play& ai_play)
 {
-    // TODO-AKHIL: lookup ai_play and set the enum
     ai_config.mutable_ai_control_config()->set_override_ai_play(ai_play);
 }
 

@@ -52,13 +52,12 @@ void ThreadedAI::onValueReceived(World world)
 
 void ThreadedAI::onValueReceived(TbotsProto::ThunderbotsConfig config)
 {
-    // Config
+    std::scoped_lock lock(ai_mutex);
 }
 
 void ThreadedAI::runAIAndSendPrimitives(const World& world)
 {
     std::scoped_lock lock(ai_mutex);
-    LOG(DEBUG) << ai_control_config.run_ai();
     if (ai_control_config.run_ai())
     {
         auto new_primitives = ai.getPrimitives(world);

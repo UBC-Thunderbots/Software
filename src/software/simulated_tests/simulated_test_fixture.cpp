@@ -9,15 +9,12 @@
 #include "software/logger/logger.h"
 #include "software/test_util/test_util.h"
 
+
 SimulatedTestFixture::SimulatedTestFixture()
-    : friendly_mutable_thunderbots_config(std::make_shared<ThunderbotsConfig>()),
-      enemy_mutable_thunderbots_config(std::make_shared<ThunderbotsConfig>()),
-      friendly_thunderbots_config(std::const_pointer_cast<const ThunderbotsConfig>(
-          friendly_mutable_thunderbots_config)),
-      enemy_thunderbots_config(std::const_pointer_cast<const ThunderbotsConfig>(
-          enemy_mutable_thunderbots_config)),
-      friendly_sensor_fusion(friendly_thunderbots_config->getSensorFusionConfig()),
-      enemy_sensor_fusion(enemy_thunderbots_config->getSensorFusionConfig()),
+    : friendly_thunderbots_config(TbotsProto::ThunderbotsConfig()),
+      enemy_thunderbots_config(TbotsProto::ThunderbotsConfig()),
+      friendly_sensor_fusion(friendly_thunderbots_config.sensor_fusion_config()),
+      enemy_sensor_fusion(enemy_thunderbots_config.sensor_fusion_config()),
       should_log_replay(false),
       run_simulation_in_realtime(false)
 {
@@ -27,85 +24,66 @@ void SimulatedTestFixture::SetUp()
 {
     LoggerSingleton::initializeLogger(TbotsGtestMain::logging_dir);
 
-    friendly_mutable_thunderbots_config = std::make_shared<ThunderbotsConfig>();
-    enemy_mutable_thunderbots_config    = std::make_shared<ThunderbotsConfig>();
-    friendly_thunderbots_config = std::const_pointer_cast<const ThunderbotsConfig>(
-        friendly_mutable_thunderbots_config);
-    enemy_thunderbots_config = std::const_pointer_cast<const ThunderbotsConfig>(
-        enemy_mutable_thunderbots_config);
-
-    friendly_mutable_thunderbots_config->getMutableAiControlConfig()
-        ->getMutableRunAi()
-        ->setValue(!TbotsGtestMain::stop_ai_on_start);
+    friendly_thunderbots_config = TbotsProto::ThunderbotsConfig();
+    enemy_thunderbots_config    = TbotsProto::ThunderbotsConfig();
 
     // The simulated test abstracts and maintains the invariant that the friendly team
     // is always the yellow team
-    friendly_mutable_thunderbots_config->getMutableSensorFusionConfig()
-        ->getMutableOverrideGameControllerDefendingSide()
-        ->setValue(true);
-    friendly_mutable_thunderbots_config->getMutableSensorFusionConfig()
-        ->getMutableDefendingPositiveSide()
-        ->setValue(false);
+    friendly_thunderbots_config.mutable_ai_control_config()->set_run_ai(
+        !TbotsGtestMain::stop_ai_on_start);
+    friendly_thunderbots_config.mutable_sensor_fusion_config()
+        ->set_override_game_controller_defending_side(true);
+    friendly_thunderbots_config.mutable_sensor_fusion_config()
+        ->set_defending_positive_side(false);
 
     // Experimentally determined restitution value
-    friendly_mutable_thunderbots_config->getMutableSimulatorConfig()
-        ->getMutableBallRestitution()
-        ->setValue(0.8);
+    friendly_thunderbots_config.mutable_simulator_config()->set_ball_restitution(0.8);
+
     // Measured these values from fig. 9 on page 8 of
     // https://ssl.robocup.org/wp-content/uploads/2020/03/2020_ETDP_ZJUNlict.pdf
-    friendly_mutable_thunderbots_config->getMutableSimulatorConfig()
-        ->getMutableSlidingFrictionAcceleration()
-        ->setValue(6.9);
-    friendly_mutable_thunderbots_config->getMutableSimulatorConfig()
-        ->getMutableRollingFrictionAcceleration()
-        ->setValue(0.5);
+    friendly_thunderbots_config.mutable_simulator_config()
+        ->set_sliding_friction_acceleration(6.9);
+    friendly_thunderbots_config.mutable_simulator_config()
+        ->set_rolling_friction_acceleration(0.5);
 
     // The simulated test abstracts and maintains the invariant that the friendly team
     // is always defending the "negative" side of the field. This is so that the
     // coordinates given when setting up tests is from the perspective of the friendly
     // team
-    enemy_mutable_thunderbots_config->getMutableSensorFusionConfig()
-        ->getMutableFriendlyColorYellow()
-        ->setValue(true);
-    enemy_mutable_thunderbots_config->getMutableAiControlConfig()
-        ->getMutableRunAi()
-        ->setValue(!TbotsGtestMain::stop_ai_on_start);
+    enemy_thunderbots_config.mutable_sensor_fusion_config()->set_friendly_color_yellow(
+        true);
+    enemy_thunderbots_config.mutable_ai_control_config()->set_run_ai(
+        !TbotsGtestMain::stop_ai_on_start);
 
     // enemy
 
     // The simulated test abstracts and maintains the invariant that the friendly team
     // is always the yellow team
-    enemy_mutable_thunderbots_config->getMutableSensorFusionConfig()
-        ->getMutableOverrideGameControllerDefendingSide()
-        ->setValue(true);
-    enemy_mutable_thunderbots_config->getMutableSensorFusionConfig()
-        ->getMutableDefendingPositiveSide()
-        ->setValue(false);
+    enemy_thunderbots_config.mutable_sensor_fusion_config()
+        ->set_override_game_controller_defending_side(true);
+    enemy_thunderbots_config.mutable_sensor_fusion_config()->set_defending_positive_side(
+        false);
 
     // Experimentally determined restitution value
-    enemy_mutable_thunderbots_config->getMutableSimulatorConfig()
-        ->getMutableBallRestitution()
-        ->setValue(0.8);
+    enemy_thunderbots_config.mutable_simulator_config()->set_ball_restitution(0.8);
+
     // Measured these values from fig. 9 on page 8 of
     // https://ssl.robocup.org/wp-content/uploads/2020/03/2020_ETDP_ZJUNlict.pdf
-    enemy_mutable_thunderbots_config->getMutableSimulatorConfig()
-        ->getMutableSlidingFrictionAcceleration()
-        ->setValue(6.9);
-    enemy_mutable_thunderbots_config->getMutableSimulatorConfig()
-        ->getMutableRollingFrictionAcceleration()
-        ->setValue(0.5);
+    enemy_thunderbots_config.mutable_simulator_config()
+        ->set_sliding_friction_acceleration(6.9);
+    enemy_thunderbots_config.mutable_simulator_config()
+        ->set_rolling_friction_acceleration(0.5);
 
     // The simulated test abstracts and maintains the invariant that the friendly team
     // is always defending the "negative" side of the field. This is so that the
     // coordinates given when setting up tests is from the perspective of the friendly
     // team
-    enemy_mutable_thunderbots_config->getMutableSensorFusionConfig()
-        ->getMutableFriendlyColorYellow()
-        ->setValue(false);
+    enemy_thunderbots_config.mutable_sensor_fusion_config()->set_friendly_color_yellow(
+        false);
 
     friendly_sensor_fusion =
-        SensorFusion(friendly_thunderbots_config->getSensorFusionConfig());
-    enemy_sensor_fusion = SensorFusion(enemy_thunderbots_config->getSensorFusionConfig());
+        SensorFusion(friendly_thunderbots_config.sensor_fusion_config());
+    enemy_sensor_fusion = SensorFusion(enemy_thunderbots_config.sensor_fusion_config());
 
     if (TbotsGtestMain::run_sim_in_realtime)
     {
@@ -231,7 +209,7 @@ void SimulatedTestFixture::runTest(
 {
     std::shared_ptr<Simulator> simulator(std::make_shared<Simulator>(
         field, create2015RobotConstants(), create2015WheelConstants(),
-        friendly_thunderbots_config->getSimulatorConfig()));
+        friendly_thunderbots_config.simulator_config()));
     simulator->setBallState(ball);
     simulator->addYellowRobots(friendly_robots);
     simulator->addBlueRobots(enemy_robots);
@@ -278,7 +256,7 @@ void SimulatedTestFixture::runTest(
 
     while (simulator->getTimestamp() < timeout_time && !validation_functions_done)
     {
-        if (!friendly_thunderbots_config->getAiControlConfig()->getRunAi()->value())
+        if (!friendly_thunderbots_config.ai_control_config().run_ai())
         {
             auto ms_to_sleep = std::chrono::milliseconds(
                 static_cast<int>(ai_time_step.toMilliseconds()));

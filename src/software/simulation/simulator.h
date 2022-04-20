@@ -39,7 +39,7 @@ class Simulator
      */
     explicit Simulator(const Field& field, const RobotConstants_t& robot_constants,
                        const WheelConstants& wheel_constants,
-                       std::shared_ptr<const SimulatorConfig> simulator_config,
+                       TbotsProto::SimulatorConfig simulator_config,
                        const Duration& physics_time_step =
                            Duration::fromSeconds(DEFAULT_PHYSICS_TIME_STEP_SECONDS));
     Simulator() = delete;

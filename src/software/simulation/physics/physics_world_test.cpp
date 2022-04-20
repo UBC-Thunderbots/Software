@@ -12,13 +12,13 @@ class PhysicsWorldTest : public ::testing::Test
    protected:
     void SetUp() override
     {
-        simulator_config = std::make_shared<const SimulatorConfig>();
+        simulator_config = TbotsProto::SimulatorConfig();
         physics_world = std::make_shared<PhysicsWorld>(Field::createSSLDivisionBField(),
                                                        robot_constants, wheel_constants,
                                                        simulator_config);
     }
 
-    std::shared_ptr<const SimulatorConfig> simulator_config;
+    TbotsProto::SimulatorConfig simulator_config;
     std::shared_ptr<PhysicsWorld> physics_world;
     RobotConstants_t robot_constants = create2015RobotConstants();
     WheelConstants_t wheel_constants = create2015WheelConstants();

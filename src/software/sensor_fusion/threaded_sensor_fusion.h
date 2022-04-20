@@ -11,8 +11,7 @@ class ThreadedSensorFusion : public Subject<World>,
                              public FirstInFirstOutThreadedObserver<SensorProto>
 {
    public:
-    explicit ThreadedSensorFusion(
-        std::shared_ptr<const SensorFusionConfig> sensor_fusion_config);
+    explicit ThreadedSensorFusion(TbotsProto::SensorFusionConfig config);
     virtual ~ThreadedSensorFusion() = default;
 
    private:

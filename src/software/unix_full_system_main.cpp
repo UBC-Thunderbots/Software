@@ -42,13 +42,15 @@ int main(int argc, char** argv)
                            ->getFriendlyColourYellow()
                            ->value());
 
+
+    TbotsProto::ThunderbotsConfig tbots_proto;
+
     if (!help_requested)
     {
-        auto backend       = std::make_shared<UnixSimulatorBackend>(runtime_dir);
-        auto sensor_fusion = std::make_shared<ThreadedSensorFusion>(
-            thunderbots_config->getSensorFusionConfig());
-        TbotsProto::AiConfig ai_config;
-        auto ai = std::make_shared<ThreadedAI>(ai_config);
+        auto backend = std::make_shared<UnixSimulatorBackend>(runtime_dir);
+        auto sensor_fusion =
+            std::make_shared<ThreadedSensorFusion>(tbots_proto.sensor_fusion_config());
+        auto ai = std::make_shared<ThreadedAI>(tbots_proto.ai_config());
 
         // Overrides
         auto tactic_override_listener =

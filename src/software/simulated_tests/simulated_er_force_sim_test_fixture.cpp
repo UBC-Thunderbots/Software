@@ -20,14 +20,10 @@
 using namespace TestUtil;
 
 SimulatedErForceSimTestFixture::SimulatedErForceSimTestFixture()
-    : friendly_mutable_thunderbots_config(std::make_shared<ThunderbotsConfig>()),
-      enemy_mutable_thunderbots_config(std::make_shared<ThunderbotsConfig>()),
-      friendly_thunderbots_config(std::const_pointer_cast<const ThunderbotsConfig>(
-          friendly_mutable_thunderbots_config)),
-      enemy_thunderbots_config(std::const_pointer_cast<const ThunderbotsConfig>(
-          enemy_mutable_thunderbots_config)),
-      friendly_sensor_fusion(friendly_thunderbots_config->getSensorFusionConfig()),
-      enemy_sensor_fusion(enemy_thunderbots_config->getSensorFusionConfig()),
+    : friendly_thunderbots_config(TbotsProto::ThunderbotsConfig()),
+      enemy_thunderbots_config(TbotsProto::ThunderbotsConfig()),
+      friendly_sensor_fusion(friendly_thunderbots_config.sensor_fusion_config()),
+      enemy_sensor_fusion(enemy_thunderbots_config.sensor_fusion_config()),
       should_log_replay(false),
       run_simulation_in_realtime(false)
 {
@@ -38,37 +34,25 @@ void SimulatedErForceSimTestFixture::SetUp()
     LoggerSingleton::initializeLogger(TbotsGtestMain::logging_dir);
 
     // new configs so that callbacks to the previous test's AI are cleared
-    friendly_mutable_thunderbots_config = std::make_shared<ThunderbotsConfig>();
-    enemy_mutable_thunderbots_config    = std::make_shared<ThunderbotsConfig>();
-    friendly_thunderbots_config = std::const_pointer_cast<const ThunderbotsConfig>(
-        friendly_mutable_thunderbots_config);
-    enemy_thunderbots_config = std::const_pointer_cast<const ThunderbotsConfig>(
-        enemy_mutable_thunderbots_config);
+    friendly_thunderbots_config = TbotsProto::ThunderbotsConfig();
+    enemy_thunderbots_config    = TbotsProto::ThunderbotsConfig();
 
-    setCommonConfigs(friendly_mutable_thunderbots_config);
-    setCommonConfigs(enemy_mutable_thunderbots_config);
+    setCommonConfigs(friendly_thunderbots_config);
+    setCommonConfigs(enemy_thunderbots_config);
+
     // The friendly team defends the negative side of the field
     // and controls the yellow robots
-    friendly_mutable_thunderbots_config->getMutableSensorFusionConfig()
-        ->getMutableFriendlyColorYellow()
-        ->setValue(true);
-    friendly_mutable_thunderbots_config->getMutableSensorFusionConfig()
-        ->getMutableDefendingPositiveSide()
-        ->setValue(false);
+    friendly_thunderbots_config.mutable_sensor_fusion_config()->set_friendly_color_yellow(
+        true);
+    friendly_thunderbots_config.mutable_sensor_fusion_config()
+        ->set_defending_positive_side(false);
 
     // The enemy team defends the positive side of the field
     // and controls the blue robots
-    enemy_mutable_thunderbots_config->getMutableSensorFusionConfig()
-        ->getMutableFriendlyColorYellow()
-        ->setValue(false);
-    enemy_mutable_thunderbots_config->getMutableSensorFusionConfig()
-        ->getMutableDefendingPositiveSide()
-        ->setValue(true);
-
-    // reinitializing to prevent the previous test's configs from being reused
-    friendly_sensor_fusion =
-        SensorFusion(friendly_thunderbots_config->getSensorFusionConfig());
-    enemy_sensor_fusion = SensorFusion(enemy_thunderbots_config->getSensorFusionConfig());
+    enemy_thunderbots_config.mutable_sensor_fusion_config()->set_friendly_color_yellow(
+        false);
+    enemy_thunderbots_config.mutable_sensor_fusion_config()->set_defending_positive_side(
+        true);
 
     setupReplayLogging();
 
@@ -86,27 +70,13 @@ void SimulatedErForceSimTestFixture::SetUp()
 }
 
 void SimulatedErForceSimTestFixture::setCommonConfigs(
-    std::shared_ptr<ThunderbotsConfig> mutable_thunderbots_config)
+    TbotsProto::ThunderbotsConfig &mutable_thunderbots_config)
 {
-    mutable_thunderbots_config->getMutableAiControlConfig()->getMutableRunAi()->setValue(
+    mutable_thunderbots_config.mutable_ai_control_config()->set_run_ai(
         !TbotsGtestMain::stop_ai_on_start);
 
-    mutable_thunderbots_config->getMutableSensorFusionConfig()
-        ->getMutableOverrideGameControllerDefendingSide()
-        ->setValue(true);
-
-    // Experimentally determined restitution value
-    mutable_thunderbots_config->getMutableSimulatorConfig()
-        ->getMutableBallRestitution()
-        ->setValue(0.8);
-    // Measured these values from fig. 9 on page 8 of
-    // https://ssl.robocup.org/wp-content/uploads/2020/03/2020_ETDP_ZJUNlict.pdf
-    mutable_thunderbots_config->getMutableSimulatorConfig()
-        ->getMutableSlidingFrictionAcceleration()
-        ->setValue(6.9);
-    mutable_thunderbots_config->getMutableSimulatorConfig()
-        ->getMutableRollingFrictionAcceleration()
-        ->setValue(0.5);
+    mutable_thunderbots_config.mutable_sensor_fusion_config()
+        ->set_override_game_controller_defending_side(true);
 }
 
 void SimulatedErForceSimTestFixture::setupReplayLogging()
@@ -188,9 +158,7 @@ void SimulatedErForceSimTestFixture::updateSensorFusion(
             *(yellow_sensor_msg.add_robot_status_msgs()) = msg;
         }
 
-        if (friendly_thunderbots_config->getSensorFusionConfig()
-                ->getFriendlyColorYellow()
-                ->value())
+        if (friendly_thunderbots_config.sensor_fusion_config().friendly_color_yellow())
         {
             friendly_sensor_fusion.processSensorProto(yellow_sensor_msg);
         }
@@ -199,9 +167,7 @@ void SimulatedErForceSimTestFixture::updateSensorFusion(
             friendly_sensor_fusion.processSensorProto(blue_sensor_msg);
         }
 
-        if (enemy_thunderbots_config->getSensorFusionConfig()
-                ->getFriendlyColorYellow()
-                ->value())
+        if (enemy_thunderbots_config.sensor_fusion_config().friendly_color_yellow())
         {
             enemy_sensor_fusion.processSensorProto(yellow_sensor_msg);
         }
@@ -255,7 +221,7 @@ void SimulatedErForceSimTestFixture::runTest(
 
     std::shared_ptr<ErForceSimulator> simulator(std::make_shared<ErForceSimulator>(
         field_type, create2015RobotConstants(), create2015WheelConstants(),
-        friendly_thunderbots_config->getSimulatorConfig()));
+        friendly_thunderbots_config.simulator_config()));
 
     // TODO (#2419): remove this to re-enable sigfpe checks
     fedisableexcept(FE_INVALID | FE_OVERFLOW);
@@ -333,7 +299,7 @@ void SimulatedErForceSimTestFixture::runTest(
     {
         robots_displacement.clear();
         robots_velocity_diff.clear();
-        if (!friendly_thunderbots_config->getAiControlConfig()->getRunAi()->value())
+        if (!friendly_thunderbots_config.ai_control_config().run_ai())
             validation_functions_done =
                 tickTest(simulation_time_step, ai_time_step, friendly_world, enemy_world,
                          simulator, ball_displacement, ball_velocity_diff,
@@ -341,7 +307,7 @@ void SimulatedErForceSimTestFixture::runTest(
 
         while (simulator->getTimestamp() < timeout_time && !validation_functions_done)
         {
-            if (!friendly_thunderbots_config->getAiControlConfig()->getRunAi()->value())
+            if (!friendly_thunderbots_config.ai_control_config().run_ai())
             {
                 auto ms_to_sleep = std::chrono::milliseconds(
                     static_cast<int>(ai_time_step.toMilliseconds()));

@@ -20,7 +20,7 @@ TEST(SimulatorBallSingletonTest, test_create_firmware_ball_with_single_simulator
 {
     auto physics_world = std::make_unique<PhysicsWorld>(
         Field::createSSLDivisionBField(), create2015RobotConstants(),
-        create2015WheelConstants(), std::make_shared<const SimulatorConfig>());
+        create2015WheelConstants(), TbotsProto::SimulatorConfig());
     physics_world->setBallState(BallState(Point(0.4, 0), Vector(-1.3, 2.01)));
     auto simulator_ball =
         std::make_shared<PhysicsSimulatorBall>(physics_world->getPhysicsBall());
@@ -37,14 +37,14 @@ TEST(SimulatorBallSingletonTest, test_change_simulator_ball)
 {
     auto physics_world_1 = std::make_unique<PhysicsWorld>(
         Field::createSSLDivisionBField(), create2015RobotConstants(),
-        create2015WheelConstants(), std::make_shared<const SimulatorConfig>());
+        create2015WheelConstants(), TbotsProto::SimulatorConfig());
     physics_world_1->setBallState(BallState(Point(0.4, 0), Vector(-1.3, 2.01)));
     auto simulator_ball_1 =
         std::make_shared<PhysicsSimulatorBall>(physics_world_1->getPhysicsBall());
 
     auto physics_world_2 = std::make_unique<PhysicsWorld>(
         Field::createSSLDivisionBField(), create2015RobotConstants(),
-        create2015WheelConstants(), std::make_shared<const SimulatorConfig>());
+        create2015WheelConstants(), TbotsProto::SimulatorConfig());
     physics_world_2->setBallState(BallState(Point(0, -3), Vector(0, 1)));
 
     auto simulator_ball_2 =

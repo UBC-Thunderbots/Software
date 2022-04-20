@@ -24,9 +24,9 @@ class SensorFusion
     /**
      * Creates a SensorFusion with a sensor_fusion_config
      *
-     * @param sensor_fusion_config the config to fetch parameters from
+     * @param sensor_fusion_config The config to fetch parameters from
      */
-    explicit SensorFusion(std::shared_ptr<const SensorFusionConfig> sensor_fusion_config);
+    explicit SensorFusion(TbotsProto::SensorFusionConfig sensor_fusion_config);
 
     virtual ~SensorFusion() = default;
 
@@ -125,7 +125,7 @@ class SensorFusion
      */
     static bool teamHasBall(const Team &team, const Ball &ball);
 
-    std::shared_ptr<const SensorFusionConfig> sensor_fusion_config;
+    TbotsProto::SensorFusionConfig sensor_fusion_config;
     std::optional<Field> field;
     std::optional<Ball> ball;
     Team friendly_team;

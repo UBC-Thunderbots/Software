@@ -49,13 +49,13 @@ int main(int argc, char **argv)
         {
             er_force_sim = std::make_shared<ErForceSimulator>(
                 TbotsProto::FieldType::DIV_A, create2021RobotConstants(),
-                create2021WheelConstants(), std::make_shared<const SimulatorConfig>());
+                create2021WheelConstants(), TbotsProto::SimulatorConfig());
         }
         else
         {
             er_force_sim = std::make_shared<ErForceSimulator>(
                 TbotsProto::FieldType::DIV_B, create2021RobotConstants(),
-                create2021WheelConstants(), std::make_shared<const SimulatorConfig>());
+                create2021WheelConstants(), TbotsProto::SimulatorConfig());
         }
         std::mutex simulator_mutex;
 

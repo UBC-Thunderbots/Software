@@ -20,7 +20,7 @@ class PhysicsSimulatorRobotTest : public testing::Test
     {
         auto physics_world = std::make_shared<PhysicsWorld>(
             Field::createSSLDivisionBField(), create2015RobotConstants(),
-            create2015WheelConstants(), std::make_shared<const SimulatorConfig>());
+            create2015WheelConstants(), TbotsProto::SimulatorConfig());
         physics_world->setBallState(ball.currentState());
         physics_world->addYellowRobots(
             {RobotStateWithId{.id = robot.id(), .robot_state = robot.currentState()}});
