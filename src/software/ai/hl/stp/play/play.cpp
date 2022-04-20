@@ -121,6 +121,8 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
 
                     std::vector<Point> path_points = {robot_position};
                     auto path = path_planner->findPath(robot_position, destination);
+                    *(motion_control.mutable_requested_destination()) =
+                        *createPointProto(destination);
 
                     if (path.has_value())
                     {
@@ -215,6 +217,8 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
 
                     std::vector<Point> path_points = {robot_position};
                     auto path = path_planner->findPath(robot_position, destination);
+                    *(motion_control.mutable_requested_destination()) =
+                        *createPointProto(destination);
 
                     if (path.has_value())
                     {

@@ -43,6 +43,7 @@ message MotionControl
     Path path                                    = 1;
     double normalized_path_length                = 2;
     repeated MotionConstraint motion_constraints = 3;
+    Point requested_destination                  = 4;
 }
 
 enum DribblerMode
