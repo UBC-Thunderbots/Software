@@ -1,17 +1,11 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "motion_constraint",
-    hdrs = ["motion_constraint.h"],
-    deps = ["//software/util/make_enum"],
-)
-
-cc_library(
     name = "motion_constraint_visitor",
     srcs = ["motion_constraint_visitor.cpp"],
     hdrs = ["motion_constraint_visitor.h"],
     deps = [
-        ":motion_constraint",
+        "//proto:tbots_cc_proto",
         "//software/ai/hl/stp/tactic:all_tactics",
         "//software/world:game_state",
     ],

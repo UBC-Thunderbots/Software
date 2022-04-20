@@ -3,9 +3,9 @@
 #include <map>
 #include <set>
 
+#include "proto/primitive.pb.h"
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
-#include "software/ai/motion_constraint/motion_constraint.h"
 #include "software/ai/motion_constraint/motion_constraint_set_builder.h"
 #include "software/ai/navigator/obstacle/robot_navigation_obstacle_factory.h"
 #include "software/ai/navigator/path_planner/enlsvg_path_planner.h"

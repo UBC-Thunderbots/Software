@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-#include "software/ai/motion_constraint/motion_constraint.h"
+#include "proto/primitive.pb.h"
 #include "software/ai/navigator/obstacle/robot_navigation_obstacle_factory.h"
 #include "software/simulated_tests/non_terminating_validation_functions/robots_violating_motion_constraint.h"
 #include "software/simulated_tests/simulated_er_force_sim_play_test_fixture.h"

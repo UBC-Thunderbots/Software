@@ -1,5 +1,5 @@
 #pragma once
-#include "software/ai/motion_constraint/motion_constraint.h"
+#include "proto/primitive.pb.h"
 #include "software/ai/navigator/obstacle/obstacle.hpp"
 #include "software/ai/navigator/obstacle/robot_navigation_obstacle_factory.h"
 #include "software/simulated_tests/validation/validation_function.h"

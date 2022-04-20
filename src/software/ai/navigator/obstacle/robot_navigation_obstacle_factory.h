@@ -1,7 +1,7 @@
 #pragma once
 
+#include "proto/primitive.pb.h"
 #include "shared/parameter/cpp_dynamic_parameters.h"
-#include "software/ai/motion_constraint/motion_constraint.h"
 #include "software/ai/navigator/obstacle/obstacle.hpp"
 #include "software/geom/line.h"
 #include "software/geom/point.h"
@@ -36,7 +36,7 @@ class RobotNavigationObstacleFactory
      * @return Obstacles representing the given motion constraints
      */
     std::vector<ObstaclePtr> createFromMotionConstraints(
-        const std::set<MotionConstraint> &motion_constraints, const Field &field) const;
+        const std::set<TbotsProto::MotionConstraint> &motion_constraints, const Field &field) const;
 
     /**
      * Create obstacles for the given motion constraint
@@ -47,7 +47,7 @@ class RobotNavigationObstacleFactory
      * @return Obstacles representing the given motion constraint
      */
     std::vector<ObstaclePtr> createFromMotionConstraint(
-        const MotionConstraint &motion_constraint, const Field &field) const;
+        const TbotsProto::MotionConstraint &motion_constraint, const Field &field) const;
 
     /**
      * Create circle obstacle around robot with additional radius scaling

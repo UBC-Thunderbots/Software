@@ -22,7 +22,9 @@ GlobalPathPlannerFactory::GlobalPathPlannerFactory(
 
         // Use the value of the counter and bit arithmetic to get the motion constraint
         // obstacles out
-        unsigned constraint_bits = counter;
+        unsigned constraint_bits     = counter;
+        bool has_dynamic_constraints = false;
+        (void)has_dynamic_constraints;
         for (unsigned j = 0; j < all_constraints.size(); ++j, constraint_bits >>= 1)
         {
             if (constraint_bits & 1)

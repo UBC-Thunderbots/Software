@@ -24,7 +24,6 @@ cc_library(
     deps = [
         ":enlsvg_path_planner",
         "//software/ai/hl/stp/tactic",
-        "//software/ai/motion_constraint",
         "//software/ai/motion_constraint:motion_constraint_set_builder",
         "//software/geom:linear_spline2d",
         "//software/geom:point",

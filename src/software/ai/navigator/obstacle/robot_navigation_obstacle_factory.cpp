@@ -13,40 +13,40 @@ RobotNavigationObstacleFactory::RobotNavigationObstacleFactory(
 }
 
 std::vector<ObstaclePtr> RobotNavigationObstacleFactory::createFromMotionConstraint(
-    const MotionConstraint &motion_constraint, const Field &field) const
+    const TbotsProto::MotionConstraint &motion_constraint, const Field &field) const
 {
     std::vector<ObstaclePtr> obstacles;
 
     switch (motion_constraint)
     {
-        case MotionConstraint::CENTER_CIRCLE:
+        case TbotsProto::MotionConstraint::CENTER_CIRCLE:
             obstacles.push_back(
                 createFromShape(Circle(field.centerPoint(), field.centerCircleRadius())));
             break;
-        case MotionConstraint::INFLATED_ENEMY_DEFENSE_AREA:
+        case TbotsProto::MotionConstraint::INFLATED_ENEMY_DEFENSE_AREA:
         {
             obstacles.push_back(createFromFieldRectangle(field.enemyDefenseArea(),
                                                          field.fieldLines(),
                                                          field.fieldBoundary(), 0.3));
         }
         break;
-        case MotionConstraint::FRIENDLY_DEFENSE_AREA:
+        case TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA:
             obstacles.push_back(createFromFieldRectangle(
                 field.friendlyDefenseArea(), field.fieldLines(), field.fieldBoundary()));
             break;
-        case MotionConstraint::ENEMY_DEFENSE_AREA:
+        case TbotsProto::MotionConstraint::ENEMY_DEFENSE_AREA:
             obstacles.push_back(createFromFieldRectangle(
                 field.enemyDefenseArea(), field.fieldLines(), field.fieldBoundary()));
             break;
-        case MotionConstraint::FRIENDLY_HALF:
+        case TbotsProto::MotionConstraint::FRIENDLY_HALF:
             obstacles.push_back(createFromFieldRectangle(
                 field.friendlyHalf(), field.fieldLines(), field.fieldBoundary()));
             break;
-        case MotionConstraint::ENEMY_HALF:
+        case TbotsProto::MotionConstraint::ENEMY_HALF:
             obstacles.push_back(createFromFieldRectangle(
                 field.enemyHalf(), field.fieldLines(), field.fieldBoundary()));
             break;
-        case MotionConstraint::AVOID_FIELD_BOUNDARY_ZONE:
+        case TbotsProto::MotionConstraint::AVOID_FIELD_BOUNDARY_ZONE:
         {
             Rectangle field_walls    = field.fieldBoundary();
             Rectangle playable_field = field.fieldLines();
@@ -69,21 +69,23 @@ std::vector<ObstaclePtr> RobotNavigationObstacleFactory::createFromMotionConstra
             obstacles.push_back(createFromShape(lower_boundary));
             break;
         }
-        case MotionConstraint::HALF_METER_AROUND_BALL:;
+        case TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL:;
             // HALF_METER_AROUND_BALL is not handled by this obstacle factory since it's a
             // dynamic obstacle
             break;
-        case MotionConstraint::AVOID_BALL_PLACEMENT_INTERFERENCE:;
+        case TbotsProto::MotionConstraint::AVOID_BALL_PLACEMENT_INTERFERENCE:;
             // AVOID_BALL_PLACEMENT_INTERFERENCE is not handled by this obstacle factory
             // since it's a dynamic obstacle
             break;
+        case TbotsProto::MotionConstraint::MotionConstraint_INT_MIN_SENTINEL_DO_NOT_USE_:; break;
+        case TbotsProto::MotionConstraint::MotionConstraint_INT_MAX_SENTINEL_DO_NOT_USE_:; break;
     }
 
     return obstacles;
 }
 
 std::vector<ObstaclePtr> RobotNavigationObstacleFactory::createFromMotionConstraints(
-    const std::set<MotionConstraint> &motion_constraints, const Field &field) const
+    const std::set<TbotsProto::MotionConstraint> &motion_constraints, const Field &field) const
 {
     std::vector<ObstaclePtr> obstacles;
     for (auto motion_constraint : motion_constraints)
