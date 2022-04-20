@@ -58,13 +58,9 @@ void SimulatedErForceSimTestFixture::SetUp()
 
     // reinitializing to prevent the previous test's configs from being reused
     friendly_sensor_fusion =
-        SensorFusion(friendly_thunderbots_config->getSensorFusionConfig());
-    enemy_sensor_fusion = SensorFusion(enemy_thunderbots_config->getSensorFusionConfig());
+        SensorFusion(friendly_thunderbots_config.sensor_fusion_config());
+    enemy_sensor_fusion = SensorFusion(enemy_thunderbots_config.sensor_fusion_config());
 
-    if (TbotsGtestMain::enable_visualizer)
-    {
-        enableVisualizer();
-    }
     if (TbotsGtestMain::run_sim_in_realtime)
     {
         run_simulation_in_realtime = true;
