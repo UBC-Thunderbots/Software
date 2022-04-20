@@ -4,7 +4,6 @@
 
 #include "software/ai/hl/stp/tactic/stop/stop_tactic.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
-#include "software/ai/navigator/navigator.h"
 #include "software/simulated_tests/simulated_test_fixture.h"
 
 /**
