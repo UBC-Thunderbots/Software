@@ -372,7 +372,7 @@ class WorldLayer(FieldLayer):
             self.createCircle(
                 ball_state.global_position.x_meters * MILLIMETERS_PER_METER,
                 ball_state.global_position.y_meters * MILLIMETERS_PER_METER,
-                BALL_MAX_RADIUS_METERS,
+                BALL_MAX_RADIUS_MILLIMETERS,
             )
         )
 

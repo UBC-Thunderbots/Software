@@ -372,8 +372,12 @@ class Thunderscope(object):
         paths = path_layer.PathLayer(self.visualization_buffer_size)
         obstacles = obstacle_layer.ObstacleLayer(self.visualization_buffer_size)
         validation = validation_layer.ValidationLayer(self.visualization_buffer_size)
-        world = world_layer.WorldLayer(sim_proto_unix_io, friendly_colour_yellow, self.visualization_buffer_size)
-        sim_state = simulator_layer.SimulatorLayer(friendly_colour_yellow, self.visualization_buffer_size)
+        world = world_layer.WorldLayer(
+            sim_proto_unix_io, friendly_colour_yellow, self.visualization_buffer_size
+        )
+        sim_state = simulator_layer.SimulatorLayer(
+            friendly_colour_yellow, self.visualization_buffer_size
+        )
         passing = passing_layer.PassingLayer(self.visualization_buffer_size)
 
         # Add field layers to field

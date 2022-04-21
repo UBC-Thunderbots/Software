@@ -81,8 +81,10 @@ if __name__ == "__main__":
     # the user to run the command under gdb instead. So we only run_under gdb
     # if its _not_ a thunderscope debug command
     if args.action in "run" and args.debug_build:
-        if "--debug_fullsystem" not in unknown_args and\
-                "--debug_simulator" not in unknown_args:
+        if (
+            "--debug_fullsystem" not in unknown_args
+            and "--debug_simulator" not in unknown_args
+        ):
             command += ["--run_under=gdb"]
 
     # Don't cache test results
@@ -102,6 +104,14 @@ if __name__ == "__main__":
 
     if args.action in "test":
         command += ['--test_arg="' + arg + '"' for arg in bazel_arguments]
+
+        if (
+            "--debug_fullsystem" in unknown_args
+            or "--debug_simulator" in unknown_args
+        ):
+            print("Do not run simulated pytests as a test when debugging, use ./tbots.py -d run instead")
+            sys.exit(1)
+
     else:
         command += bazel_arguments
 
