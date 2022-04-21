@@ -330,12 +330,13 @@ class Gamecontroller(object):
         else:
             self.gamecontroller_proc = Popen(command)
 
-        # We can't connect to the ci port right away, it takes
-        # CI_MODE_LAUNCH_DELAY_S to start up the gamecontroller
-        time.sleep(Gamecontroller.CI_MODE_LAUNCH_DELAY_S)
+        if self.ci_mode:
+            # We can't connect to the ci port right away, it takes
+            # CI_MODE_LAUNCH_DELAY_S to start up the gamecontroller
+            time.sleep(Gamecontroller.CI_MODE_LAUNCH_DELAY_S)
 
-        self.ci_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.ci_socket.connect(("", Gamecontroller.CI_MODE_PORT))
+            self.ci_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.ci_socket.connect(("", Gamecontroller.CI_MODE_PORT))
 
         return self
 
