@@ -35,7 +35,8 @@ TEST(ShootOrPassPlayFSMTest, DISABLED_test_should_abort_pass_guard)
 
     fsm.process_event(ShootOrPassPlayFSM::Update(
         ShootOrPassPlayFSM::ControlParams{},
-        PlayUpdate(world, 2, [](PriorityTacticVector new_tactics) {})));
+        PlayUpdate(world, 2, [](PriorityTacticVector new_tactics) {}, InterPlayCommunication{},
+                   [](InterPlayCommunication comm) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<ShootOrPassPlayFSM::AttemptShotState>));
 
 
@@ -48,7 +49,8 @@ TEST(ShootOrPassPlayFSMTest, DISABLED_test_should_abort_pass_guard)
     world.updateFriendlyTeamState(Team(friendlies));
     fsm.process_event(ShootOrPassPlayFSM::Update(
         ShootOrPassPlayFSM::ControlParams{},
-        PlayUpdate(world, 2, [](PriorityTacticVector new_tactics) {})));
+        PlayUpdate(world, 2, [](PriorityTacticVector new_tactics) {}, InterPlayCommunication{},
+                   [](InterPlayCommunication comm) {})));
 
 
 
@@ -59,7 +61,8 @@ TEST(ShootOrPassPlayFSMTest, DISABLED_test_should_abort_pass_guard)
 
     fsm.process_event(ShootOrPassPlayFSM::Update(
         ShootOrPassPlayFSM::ControlParams{},
-        PlayUpdate(world, 2, [](PriorityTacticVector new_tactics) {})));
+        PlayUpdate(world, 2, [](PriorityTacticVector new_tactics) {}, InterPlayCommunication{},
+                   [](InterPlayCommunication comm) {})));
 
     EXPECT_TRUE(fsm.is(boost::sml::state<ShootOrPassPlayFSM::TakePassState>));
 
@@ -72,7 +75,8 @@ TEST(ShootOrPassPlayFSMTest, DISABLED_test_should_abort_pass_guard)
 
     fsm.process_event(ShootOrPassPlayFSM::Update(
         ShootOrPassPlayFSM::ControlParams{},
-        PlayUpdate(world, 2, [](PriorityTacticVector new_tactics) {})));
+        PlayUpdate(world, 2, [](PriorityTacticVector new_tactics) {}, InterPlayCommunication{},
+                   [](InterPlayCommunication comm) {})));
 
 
     // fsm is in the take pass state, and the friendly robot is about to pass
@@ -90,7 +94,8 @@ TEST(ShootOrPassPlayFSMTest, test_took_shot_guard)
 
     fsm.process_event(ShootOrPassPlayFSM::Update(
         ShootOrPassPlayFSM::ControlParams{},
-        PlayUpdate(world, 3, [](PriorityTacticVector new_tactics) {})));
+        PlayUpdate(world, 3, [](PriorityTacticVector new_tactics) {}, InterPlayCommunication{},
+                   [](InterPlayCommunication comm) {})));
 
     EXPECT_TRUE(fsm.is(boost::sml::state<ShootOrPassPlayFSM::AttemptShotState>));
 
@@ -104,7 +109,8 @@ TEST(ShootOrPassPlayFSMTest, test_took_shot_guard)
 
     fsm.process_event(ShootOrPassPlayFSM::Update(
         ShootOrPassPlayFSM::ControlParams{},
-        PlayUpdate(world, 3, [](PriorityTacticVector new_tactics) {})));
+        PlayUpdate(world, 3, [](PriorityTacticVector new_tactics) {}, InterPlayCommunication{},
+                   [](InterPlayCommunication comm) {})));
 
     // friendly robot is in front of goal, no other robots to pass to,
     // he takes the shot and triggers the tookShot guard, fsm goes into termination state
