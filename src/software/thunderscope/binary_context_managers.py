@@ -302,12 +302,14 @@ class Gamecontroller(object):
     REFEREE_PORT = 10003
     CI_MODE_OUTPUT_RECEIVE_BUFFER_SIZE = 9000
 
-    def __init__(self, ci_mode=False):
+    def __init__(self, supress_logs=False, ci_mode=False):
         """Run Gamecontroller
 
+        :param supress_logs: Whether to suppress the logs
         :param ci_mode: Whether to run the gamecontroller in CI mode
 
         """
+        self.supress_logs = supress_logs
         self.ci_mode = ci_mode
 
     def __enter__(self):
@@ -316,19 +318,24 @@ class Gamecontroller(object):
         :return: gamecontroller context managed instance
 
         """
-        if self.ci_mode:
-            self.gamecontroller_proc = Popen(
-                ["/opt/tbotspython/gamecontroller", "--timeAcquisitionMode", "ci"]
-            )
-            # We can't connect to the ci port right away, it takes
-            # CI_MODE_LAUNCH_DELAY_S to start up the gamecontroller
-            time.sleep(Gamecontroller.CI_MODE_LAUNCH_DELAY_S)
+        command = ["/opt/tbotspython/gamecontroller"]
 
-            self.ci_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.ci_socket.connect(("", Gamecontroller.CI_MODE_PORT))
+        if self.ci_mode:
+            command = ["/opt/tbotspython/gamecontroller", "--timeAcquisitionMode", "ci"]
+
+        if self.supress_logs:
+            with open(os.devnull, "w") as fp:
+                self.gamecontroller_proc = Popen(command, stdout=fp, stderr=fp)
 
         else:
-            self.gamecontroller_proc = Popen(["/opt/tbotspython/gamecontroller"])
+            self.gamecontroller_proc = Popen(command)
+
+        # We can't connect to the ci port right away, it takes
+        # CI_MODE_LAUNCH_DELAY_S to start up the gamecontroller
+        time.sleep(Gamecontroller.CI_MODE_LAUNCH_DELAY_S)
+
+        self.ci_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.ci_socket.connect(("", Gamecontroller.CI_MODE_PORT))
 
         return self
 

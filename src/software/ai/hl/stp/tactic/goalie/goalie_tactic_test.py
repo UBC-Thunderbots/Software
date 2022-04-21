@@ -136,6 +136,12 @@ def test_goalie_blocks_shot(
         AssignedTacticPlayControlParams, params
     )
 
+    # Setup no tactics on the enemy side
+    params = AssignedTacticPlayControlParams()
+    simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(
+        AssignedTacticPlayControlParams, params
+    )
+
     # Always Validation
     always_validation_sequence_set = [
         [

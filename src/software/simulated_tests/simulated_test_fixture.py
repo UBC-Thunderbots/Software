@@ -224,6 +224,12 @@ def load_command_line_arguments():
         default=5,
         help="How many packets to buffer while rendering",
     )
+    parser.add_argument(
+        "--show_gamecontroller_logs",
+        action="store_true",
+        default=False,
+        help="How many packets to buffer while rendering",
+    )
     return parser.parse_args()
 
 
@@ -244,7 +250,9 @@ def simulated_test_runner():
     ) as blue_fs, FullSystem(
         args.yellow_fullsystem_runtime_dir, args.debug_fullsystem, True
     ) as yellow_fs:
-        with Gamecontroller(ci_mode=True) as gamecontroller:
+        with Gamecontroller(
+            supress_logs=(not args.show_gamecontroller_logs), ci_mode=True
+        ) as gamecontroller:
 
             blue_fs.setup_proto_unix_io(blue_full_system_proto_unix_io)
             yellow_fs.setup_proto_unix_io(yellow_full_system_proto_unix_io)
