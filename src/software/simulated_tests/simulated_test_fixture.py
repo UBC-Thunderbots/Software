@@ -217,6 +217,13 @@ def load_command_line_arguments():
         default=False,
         help="Debug the simulator",
     )
+    parser.add_argument(
+        "--visualization_buffer_size",
+        action="store",
+        type=int,
+        default=5,
+        help="How many packets to buffer while rendering",
+    )
     return parser.parse_args()
 
 
@@ -257,6 +264,7 @@ def simulated_test_runner():
                     simulator_proto_unix_io,
                     blue_full_system_proto_unix_io,
                     yellow_full_system_proto_unix_io,
+                    visualization_buffer_size=args.visualization_buffer_size,
                 )
                 tscope.load_saved_layout(args.layout)
 

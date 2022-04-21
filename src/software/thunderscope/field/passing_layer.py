@@ -3,6 +3,7 @@ import time
 import queue
 from software.thunderscope.field.field_layer import FieldLayer
 import software.thunderscope.constants as constants
+from software.py_constants import *
 from pyqtgraph.Qt import QtCore, QtGui
 from proto.import_all_protos import *
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
@@ -85,9 +86,11 @@ class PassingLayer(FieldLayer):
 
             painter.drawEllipse(
                 self.createCircle(
-                    pass_with_rating.pass_.receiver_point.x_meters * constants.MM_PER_M,
-                    pass_with_rating.pass_.receiver_point.y_meters * constants.MM_PER_M,
-                    constants.ROBOT_MAX_RADIUS_MM * 4,
+                    pass_with_rating.pass_.receiver_point.x_meters
+                    * MILLIMETERS_PER_METER,
+                    pass_with_rating.pass_.receiver_point.y_meters
+                    * MILLIMETERS_PER_METER,
+                    ROBOT_MAX_RADIUS_MILLIMETERS * 4,
                 )
             )
 
@@ -97,8 +100,8 @@ class PassingLayer(FieldLayer):
                 str("Pass {} {:.2f}".format(pass_num, pass_with_rating.rating))
             )
             text_item.setPos(
-                pass_with_rating.pass_.receiver_point.x_meters * constants.MM_PER_M
-                - 4 * constants.ROBOT_MAX_RADIUS_MM,
-                pass_with_rating.pass_.receiver_point.y_meters * constants.MM_PER_M
-                - 4 * constants.ROBOT_MAX_RADIUS_MM,
+                pass_with_rating.pass_.receiver_point.x_meters * MILLIMETERS_PER_METER
+                - 4 * ROBOT_MAX_RADIUS_MILLIMETERS,
+                pass_with_rating.pass_.receiver_point.y_meters * MILLIMETERS_PER_METER
+                - 4 * ROBOT_MAX_RADIUS_MILLIMETERS,
             )

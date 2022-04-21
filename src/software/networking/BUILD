@@ -157,23 +157,3 @@ py_library(
         "//software/logger:py_logger",
     ],
 )
-
-pybind_library(
-    name = "networking_lib",
-    srcs = ["python_bindings.cpp"],
-    deps = [
-        ":threaded_proto_udp_listener",
-        ":threaded_proto_udp_sender",
-        "//proto:ssl_cc_proto",
-        "//proto:tbots_cc_proto",
-        "//proto/message_translation:tbots_geometry",
-        "@pybind11_protobuf//pybind11_protobuf:native_proto_caster",
-    ],
-)
-
-pybind_extension(
-    name = "networking",
-    deps = [
-        ":networking_lib",
-    ],
-)

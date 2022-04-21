@@ -6,9 +6,9 @@ import time
 import google.protobuf.internal.encoder as encoder
 import google.protobuf.internal.decoder as decoder
 
-from proto.import_all_protos import *
 from subprocess import Popen
-from software.networking import threaded_unix_sender, networking
+from software.python_bindings import *
+from proto.import_all_protos import *
 from software.py_constants import *
 from extlibs.er_force_sim.src.protobuf.world_pb2 import (
     SimulatorState,
@@ -72,7 +72,7 @@ class FullSystem(object):
         """
         # Setup unix socket directory
         try:
-            os.mkdir(self.fullsystem_runtime_dir)
+            os.makedirs(self.fullsystem_runtime_dir)
         except:
             pass
 
@@ -195,7 +195,7 @@ class Simulator(object):
         """
         # Setup unix socket directory
         try:
-            os.mkdir(self.simulator_runtime_dir)
+            os.makedirs(self.simulator_runtime_dir)
         except:
             pass
 
@@ -366,7 +366,7 @@ class Gamecontroller(object):
             blue_full_system_proto_unix_io.send_proto(Referee, data)
             yellow_full_system_proto_unix_io.send_proto(Referee, data)
 
-        self.receive_referee_command = networking.SSLRefereeProtoListener(
+        self.receive_referee_command = SSLRefereeProtoListener(
             Gamecontroller.REFEREE_IP,
             Gamecontroller.REFEREE_PORT,
             __send_referee_command,

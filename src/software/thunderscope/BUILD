@@ -10,8 +10,6 @@ py_binary(
         "//software:py_constants.so",
         "//software:python_bindings.so",
         "//software:unix_full_system",
-        "//software/estop:estop_reader.so",
-        "//software/networking:networking.so",
     ],
     deps = [
         "//extlibs/er_force_sim/src/protobuf:erforce_py_proto",

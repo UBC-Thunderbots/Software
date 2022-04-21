@@ -14,16 +14,16 @@ from google.protobuf.any_pb2 import Any
 
 class ThreadedUnixListener:
     def __init__(
-        self, unix_path, proto_class=None, base64_encoded=False, max_buffer_size=10
+        self, unix_path, proto_class=None, is_base64_encoded=False, max_buffer_size=10
     ):
 
         """Receive protobuf over unix sockets and buffers them
 
         :param unix_path: The unix path to receive the new protobuf to plot
         :param proto_class: The protobuf to unpack from (None if its encoded in the payload)
-        :param base64_encoded: If the data is base64_encoded, we need to decode it first
+        :param is_base64_encoded: If the data is is_base64_encoded, we need to decode it first
                                before grabbing the protobuf. This is required for
-                               LOG(VISUALIZE) calls where the data needs to be base64_encoded
+                               LOG(VISUALIZE) calls where the data needs to be is_base64_encoded
                                to avoid \n characters.
 
         :param max_buffer_size: The size of the buffer
@@ -38,7 +38,7 @@ class ThreadedUnixListener:
 
         self.server = socketserver.UnixDatagramServer(
             unix_path,
-            handler_factory(self.__buffer_protobuf, proto_class, base64_encoded),
+            handler_factory(self.__buffer_protobuf, proto_class, is_base64_encoded),
         )
         self.server.max_packet_size = py_constants.UNIX_BUFFER_SIZE
         self.stop = False
@@ -83,17 +83,17 @@ class ThreadedUnixListener:
 
 
 class Session(socketserver.BaseRequestHandler):
-    def __init__(self, handle_callback, proto_class, base64_encoded, *args, **keys):
+    def __init__(self, handle_callback, proto_class, is_base64_encoded, *args, **keys):
         self.handle_callback = handle_callback
         self.proto_class = proto_class
-        self.base64_encoded = base64_encoded
+        self.is_base64_encoded = is_base64_encoded
         super().__init__(*args, **keys)
 
     def handle(self):
         """Handle proto
 
         """
-        if not self.base64_encoded:
+        if not self.is_base64_encoded:
             self.handle_proto()
         else:
             self.handle_log_visualize()
@@ -125,18 +125,18 @@ class Session(socketserver.BaseRequestHandler):
         self.handle_callback(msg)
 
 
-def handler_factory(handle_callback, proto_class, base64_encoded):
+def handler_factory(handle_callback, proto_class, is_base64_encoded):
     """To pass in an arbitrary handle callback into the SocketServer,
     we need to create a constructor that can create a Session object with
     appropriate handle function.
 
     :param handle_callback: The callback to run
     :param proto_class: The protobuf to unpack from (None if its encoded in the payload)
-    :param base64_encoded: If sent over fom LOG(VISUALIZE) the data will be base64_encoded
+    :param is_base64_encoded: If sent over fom LOG(VISUALIZE) the data will be is_base64_encoded
 
     """
 
     def create_handler(*args, **keys):
-        return Session(handle_callback, proto_class, base64_encoded, *args, **keys)
+        return Session(handle_callback, proto_class, is_base64_encoded, *args, **keys)
 
     return create_handler

@@ -1,7 +1,7 @@
 import pyqtgraph as pg
 from pyqtgraph.Qt.QtCore import Qt
 from pyqtgraph.Qt.QtWidgets import *
-import software.thunderscope.constants as constants
+from software.py_constants import *
 import software.thunderscope.common_widgets as common_widgets
 
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
@@ -58,9 +58,7 @@ class ChickerWidget(QWidget):
             self.geneva_slider_box,
             self.geneva_slider,
             self.geneva_label,
-        ) = common_widgets.create_slider(
-            "Geneva Slider", 1, constants.GENEVA_NUM_POSITIONS, 1
-        )
+        ) = common_widgets.create_slider("Geneva Slider", 1, GENEVA_NUM_POSITIONS, 1)
         grid.addWidget(self.geneva_slider_box, 2, 0)
 
         (

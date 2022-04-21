@@ -5,6 +5,7 @@ from pyqtgraph.Qt import QtCore, QtGui
 
 from software.thunderscope.colors import Colors
 import software.thunderscope.constants as constants
+from software.py_constants import *
 from software.networking.threaded_unix_listener import ThreadedUnixListener
 from software.thunderscope.field.field_layer import FieldLayer
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
@@ -40,8 +41,8 @@ class ObstacleLayer(FieldLayer):
         for polyobstacle in obstacles.polygon:
             polygon_points = [
                 QtCore.QPoint(
-                    int(constants.MM_PER_M * point.x_meters),
-                    int(constants.MM_PER_M * point.y_meters),
+                    int(MILLIMETERS_PER_METER * point.x_meters),
+                    int(MILLIMETERS_PER_METER * point.y_meters),
                 )
                 for point in polyobstacle.points
             ]
@@ -52,8 +53,8 @@ class ObstacleLayer(FieldLayer):
         for circleobstacle in obstacles.circle:
             painter.drawEllipse(
                 self.createCircle(
-                    constants.MM_PER_M * circleobstacle.origin.x_meters,
-                    constants.MM_PER_M * circleobstacle.origin.y_meters,
-                    constants.MM_PER_M * circleobstacle.radius,
+                    int(MILLIMETERS_PER_METER * circleobstacle.origin.x_meters),
+                    int(MILLIMETERS_PER_METER * circleobstacle.origin.y_meters),
+                    int(MILLIMETERS_PER_METER * circleobstacle.radius),
                 )
             )

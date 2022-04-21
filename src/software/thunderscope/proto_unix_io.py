@@ -1,7 +1,6 @@
 from threading import Thread
 import queue
 
-import software.thunderscope.constants as constants
 from software.networking.threaded_unix_listener import ThreadedUnixListener
 from software.networking.threaded_unix_sender import ThreadedUnixSender
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
@@ -42,7 +41,7 @@ class ProtoUnixIO:
     - attach_unix_receiver() configures a unix receiver to receive protobufs
       over a unix socket and send data to all observers of that proto type.
 
-    - attach_unix_sender() configurs a unix sender (it is an observer as well)
+    - attach_unix_sender() configures a unix sender (it is an observer as well)
       and relays data from send_proto over the socket.
 
     TL;DR This class manages inter-thread communication through register_observer
@@ -136,7 +135,7 @@ class ProtoUnixIO:
             if from_log_visualize
             else unix_path,
             proto_class=proto_class,
-            base64_encoded=from_log_visualize,
+            is_base64_encoded=from_log_visualize,
         )
         key = proto_class.DESCRIPTOR.full_name
         self.unix_listeners[key] = listener

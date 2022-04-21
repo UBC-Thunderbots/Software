@@ -6,10 +6,7 @@ from pyqtgraph.Qt.QtCore import Qt
 
 from software.thunderscope.colors import Colors
 from software.networking.threaded_unix_listener import ThreadedUnixListener
-from software.thunderscope.constants import (
-    BALL_RADIUS,
-    MM_PER_M,
-)
+from software.py_constants import *
 from software.thunderscope.field.field_layer import FieldLayer
 from software.thunderscope.field.world_layer import WorldLayer
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
@@ -50,8 +47,8 @@ class SimulatorLayer(FieldLayer):
         # Draw the ball from the simulator state
         painter.drawEllipse(
             self.createCircle(
-                sim_world_state.ball.p_y * MM_PER_M,
-                -sim_world_state.ball.p_x * MM_PER_M,
-                BALL_RADIUS,
+                sim_world_state.ball.p_y * MILLIMETERS_PER_METER,
+                -sim_world_state.ball.p_x * MILLIMETERS_PER_METER,
+                BALL_MAX_RADIUS_METERS,
             )
         )

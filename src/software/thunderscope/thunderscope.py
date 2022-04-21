@@ -28,24 +28,17 @@ from pyqtgraph.dockarea import *
 from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtWidgets import *
 
+import software.python_bindings as cpp_bindings
+
 from proto.import_all_protos import *
 from proto.message_translation import tbots_protobuf
 
-import software.python_bindings as geom
 from software.py_constants import *
-from software.networking import threaded_unix_sender, networking
+from software.networking import threaded_unix_sender
 from software.thunderscope.robot_communication import RobotCommunication
 from software.thunderscope.arbitrary_plot.named_value_plotter import NamedValuePlotter
-from software.thunderscope.binary_context_managers import (
-    FullSystem,
-    Simulator,
-    Gamecontroller,
-)
-from extlibs.er_force_sim.src.protobuf.world_pb2 import (
-    SimulatorState,
-    SimBall,
-    SimRobot,
-)
+from software.thunderscope.binary_context_managers import *
+from extlibs.er_force_sim.src.protobuf.world_pb2 import *
 
 # Import Widgets
 from software.thunderscope.field import (
@@ -95,13 +88,15 @@ class Thunderscope(object):
         blue_full_system_proto_unix_io=None,
         yellow_full_system_proto_unix_io=None,
         refresh_interval_ms=10,
+        visualization_buffer_size=5,
     ):
         """Initialize Thunderscope
 
         :param simulator_proto_unix_io: The simulator's proto unix io
         :param blue_full_system_proto_unix_io: The blue full system's proto unix io
-        :param yellow_full_system_proto_unix_io: The blue full system's proto unix io
+        :param yellow_full_system_proto_unix_io: The yellow full system's proto unix io
         :param refresh_interval_ms: The interval in milliseconds to refresh the simulator
+        :param visualization_buffer_size: The size of the visualization buffer
 
         """
 
@@ -109,6 +104,7 @@ class Thunderscope(object):
         self.app = pyqtgraph.mkQApp("Thunderscope")
         self.app.setStyleSheet(qdarktheme.load_stylesheet())
         self.refresh_interval_ms = refresh_interval_ms
+        self.visualization_buffer_size = visualization_buffer_size
         self.widgets = {}
 
         signal.signal(signal.SIGINT, signal.SIG_DFL)
@@ -373,12 +369,12 @@ class Thunderscope(object):
         field = Field()
 
         # Create layers
-        paths = path_layer.PathLayer()
-        obstacles = obstacle_layer.ObstacleLayer()
-        validation = validation_layer.ValidationLayer()
-        world = world_layer.WorldLayer(sim_proto_unix_io, friendly_colour_yellow)
-        sim_state = simulator_layer.SimulatorLayer(friendly_colour_yellow)
-        passing = passing_layer.PassingLayer()
+        paths = path_layer.PathLayer(self.visualization_buffer_size)
+        obstacles = obstacle_layer.ObstacleLayer(self.visualization_buffer_size)
+        validation = validation_layer.ValidationLayer(self.visualization_buffer_size)
+        world = world_layer.WorldLayer(sim_proto_unix_io, friendly_colour_yellow, self.visualization_buffer_size)
+        sim_state = simulator_layer.SimulatorLayer(friendly_colour_yellow, self.visualization_buffer_size)
+        passing = passing_layer.PassingLayer(self.visualization_buffer_size)
 
         # Add field layers to field
         field.add_layer("Vision", world)
@@ -514,7 +510,7 @@ if __name__ == "__main__":
         "--simulator_runtime_dir",
         type=str,
         help="simulator runtime directory",
-        default="/tmp/tbots",
+        default="/tmp/tbots/sim",
     )
     parser.add_argument(
         "--blue_fullsystem_runtime_dir",
@@ -568,6 +564,13 @@ if __name__ == "__main__":
         default=None,
         help="Which interface to communicate over",
     )
+    parser.add_argument(
+        "--visualization_buffer_size",
+        action="store",
+        type=int,
+        default=5,
+        help="How many packets to buffer while rendering",
+    )
 
     # Sanity check that an interface was provided
     args = parser.parse_args()
@@ -576,7 +579,7 @@ if __name__ == "__main__":
         if args.interface is None:
             parser.error("Must specify interface")
 
-    tscope = Thunderscope()
+    tscope = Thunderscope(visualization_buffer_size=args.visualization_buffer_size)
 
     # TODO (#2581) remove this
     if args.visualize_cpp_test:
@@ -584,8 +587,7 @@ if __name__ == "__main__":
         runtime_dir = "/tmp/tbots/yellow_test"
 
         try:
-            os.mkdir("/tmp/tbots")
-            os.mkdir(runtime_dir)
+            os.mkdirs(runtime_dir)
         except OSError:
             pass
 
@@ -653,10 +655,10 @@ if __name__ == "__main__":
 
             """
             world_state = tbots_protobuf.create_world_state(
-                [geom.Point(3, y) for y in numpy.linspace(-2, 2, NUM_ROBOTS)],
-                [geom.Point(-3, y) for y in numpy.linspace(-2, 2, NUM_ROBOTS)],
-                ball_location=geom.Point(0, 0),
-                ball_velocity=geom.Vector(0, 0),
+                [cpp_bindings.Point(3, y) for y in numpy.linspace(-2, 2, NUM_ROBOTS)],
+                [cpp_bindings.Point(-3, y) for y in numpy.linspace(-2, 2, NUM_ROBOTS)],
+                ball_location=cpp_bindings.Point(0, 0),
+                ball_velocity=cpp_bindings.Vector(0, 0),
             )
             tscope.simulator_proto_unix_io.send_proto(WorldState, world_state)
 
@@ -697,4 +699,3 @@ if __name__ == "__main__":
             thread.start()
             tscope.show()
             thread.join()
-            tscope.close()
