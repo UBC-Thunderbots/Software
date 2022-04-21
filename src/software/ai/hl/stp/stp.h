@@ -160,4 +160,6 @@ class STP
     std::unique_ptr<FSM<PlaySelectionFSM>> fsm;
     bool override_play_changed;
     std::unique_ptr<Play> override_play;
+    // inter play communication
+    InterPlayCommunication inter_play_communication;
 };
