@@ -149,7 +149,6 @@ void ShootOrPassPlayFSM::takePass(const Update& event)
 
 bool ShootOrPassPlayFSM::passFound(const Update& event)
 {
-    //    std::cout << "SCORE IS: " << best_pass_and_score_so_far.rating << std::endl;
     return best_pass_and_score_so_far.rating > min_pass_score_threshold;
 }
 
@@ -169,7 +168,6 @@ bool ShootOrPassPlayFSM::shouldAbortPass(const Update& event)
             .length() >
         this->ai_config->getShootOrPassPlayConfig()->getMinDistanceToPass()->value())
     {
-        std::cout << "BRUH2" << std::endl;
         return true;
     }
 

@@ -24,8 +24,6 @@ TEST(ShootOrPassPlayFSMTest, test_transitions)
 TEST(ShootOrPassPlayFSMTest, DISABLED_test_should_abort_pass_guard)
 {
     World world = ::TestUtil::createBlankTestingWorld();
-    //    world.updateGameState(::TestUtil::createGameState(RefereeCommand::FORCE_START,
-    //    RefereeCommand::HALT));
 
     FSM<ShootOrPassPlayFSM> fsm(
         ShootOrPassPlayFSM{std::make_shared<const ThunderbotsConfig>()->getAiConfig()});
@@ -49,7 +47,6 @@ TEST(ShootOrPassPlayFSMTest, DISABLED_test_should_abort_pass_guard)
     fsm.process_event(ShootOrPassPlayFSM::Update(
         ShootOrPassPlayFSM::ControlParams{},
         PlayUpdate(world, 2, [](PriorityTacticVector new_tactics) {})));
-    //    std::cout << getCurrentFullStateName(fsm) << std::endl;
 
 
 
@@ -62,11 +59,6 @@ TEST(ShootOrPassPlayFSMTest, DISABLED_test_should_abort_pass_guard)
         ShootOrPassPlayFSM::ControlParams{},
         PlayUpdate(world, 2, [](PriorityTacticVector new_tactics) {})));
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(300));
-
-
-
-    //    std::cout << getCurrentFullStateName(fsm) << std::endl;
     EXPECT_TRUE(fsm.is(boost::sml::state<ShootOrPassPlayFSM::TakePassState>));
 
 
@@ -74,7 +66,7 @@ TEST(ShootOrPassPlayFSMTest, DISABLED_test_should_abort_pass_guard)
                             AngularVelocity::zero(), Timestamp());
 
     std::vector<Robot> enemy_team = {enemy_interceptor};
-    //    world.updateEnemyTeamState(Team(enemy_team));
+    world.updateEnemyTeamState(Team(enemy_team));
 
     fsm.process_event(ShootOrPassPlayFSM::Update(
         ShootOrPassPlayFSM::ControlParams{},
@@ -83,7 +75,6 @@ TEST(ShootOrPassPlayFSMTest, DISABLED_test_should_abort_pass_guard)
 
     // fsm is in the take pass state, and the friendly robot is about to pass
     // interceptor gets in the way of the pass, so friendly should abort the pass
-    std::cout << getCurrentFullStateName(fsm) << std::endl;
     EXPECT_TRUE(fsm.is(boost::sml::state<ShootOrPassPlayFSM::TakePassState>));
 }
 
@@ -112,7 +103,6 @@ TEST(ShootOrPassPlayFSMTest, test_took_shot_guard)
     fsm.process_event(ShootOrPassPlayFSM::Update(
         ShootOrPassPlayFSM::ControlParams{},
         PlayUpdate(world, 3, [](PriorityTacticVector new_tactics) {})));
-    //    std::cout << getCurrentFullStateName(fsm) << std::endl;
 
     // friendly robot is in front of goal, no other robots to pass to,
     // he takes the shot and triggers the tookShot guard, fsm goes into termination state
