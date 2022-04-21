@@ -53,12 +53,17 @@ class Play
      * tactics
      * @param motion_constraint_builder Builds motion constraints from tactics
      * @param world The updated world
+     * @param inter_play_communication The inter-play communication struct
+     * @param set_inter_play_communication_fun The callback to set the inter-play
+     * communication struct
      *
      * @return the vector of intents to execute
      */
     virtual std::vector<std::unique_ptr<Intent>> get(
         RobotToTacticAssignmentFunction robot_to_tactic_assignment_algorithm,
-        MotionConstraintBuildFunction motion_constraint_builder, const World& new_world);
+        MotionConstraintBuildFunction motion_constraint_builder, const World& new_world,
+        const InterPlayCommunication& inter_play_communication,
+        const SetInterPlayCommunicationCallback& set_inter_play_communication_fun);
 
     virtual ~Play() = default;
 

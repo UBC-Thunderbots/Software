@@ -28,7 +28,8 @@ void AssignedTacticsPlay::updateControlParams(
 
 std::vector<std::unique_ptr<Intent>> AssignedTacticsPlay::get(
     RobotToTacticAssignmentFunction,
-    MotionConstraintBuildFunction motion_constraint_builder, const World &new_world)
+    MotionConstraintBuildFunction motion_constraint_builder, const World &new_world,
+    const InterPlayCommunication &, const SetInterPlayCommunicationCallback &)
 {
     std::vector<std::unique_ptr<Intent>> intents;
 

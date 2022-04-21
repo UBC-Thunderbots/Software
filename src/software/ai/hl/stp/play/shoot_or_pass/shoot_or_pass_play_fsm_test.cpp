@@ -16,7 +16,9 @@ TEST(ShootOrPassPlayFSMTest, test_transitions)
 
     fsm.process_event(ShootOrPassPlayFSM::Update(
         ShootOrPassPlayFSM::ControlParams{},
-        PlayUpdate(world, 3, [](PriorityTacticVector new_tactics) {})));
+        PlayUpdate(
+            world, 3, [](PriorityTacticVector new_tactics) {}, InterPlayCommunication{},
+            [](InterPlayCommunication comm) {})));
 
     EXPECT_TRUE(fsm.is(boost::sml::state<ShootOrPassPlayFSM::AttemptShotState>));
 }
