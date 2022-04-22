@@ -63,7 +63,7 @@ class AI final
     std::unique_ptr<FSM<PlaySelectionFSM>> fsm;
     std::unique_ptr<Play> override_play;
     std::unique_ptr<Play> current_play;
-    GlobalPathPlannerFactory path_planner_factory;
+    std::map<Field, GlobalPathPlannerFactory> field_to_path_planner_factory;
     bool prev_override;
     std::string prev_override_name;
     // inter play communication

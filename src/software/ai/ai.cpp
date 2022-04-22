@@ -9,9 +9,7 @@ AI::AI(std::shared_ptr<const AiConfig> ai_config)
       fsm(std::make_unique<FSM<PlaySelectionFSM>>(PlaySelectionFSM{ai_config})),
       override_play(nullptr),
       current_play(std::make_unique<HaltPlay>(ai_config)),
-      path_planner_factory(ai_config->getRobotNavigationObstacleConfig(),
-                           // TODO: somehow do a look up??
-                           Field::createSSLDivisionBField()),
+      field_to_path_planner_factory(),
       prev_override(false),
       prev_override_name("")
 {
@@ -48,42 +46,53 @@ std::unique_ptr<TbotsProto::PrimitiveSet> AI::getPrimitives(const World& world)
         [this](std::unique_ptr<Play> play) { current_play = std::move(play); },
         world.gameState()));
 
+    if (!field_to_path_planner_factory.contains(world.field()))
+    {
+        field_to_path_planner_factory.emplace(
+            world.field(),
+            GlobalPathPlannerFactory(ai_config->getRobotNavigationObstacleConfig(),
+                                     world.field()));
+    }
+
     if (static_cast<bool>(override_play))
     {
-        return override_play->get(path_planner_factory, world, inter_play_communication,
+        return override_play->get(field_to_path_planner_factory.at(world.field()), world,
+                                  inter_play_communication,
                                   [this](InterPlayCommunication comm) {
                                       inter_play_communication = std::move(comm);
                                   });
     }
     else
     {
-        return current_play->get(path_planner_factory, world, inter_play_communication,
+        return current_play->get(field_to_path_planner_factory.at(world.field()), world,
+                                 inter_play_communication,
                                  [this](InterPlayCommunication comm) {
                                      inter_play_communication = std::move(comm);
                                  });
     }
+}
 
-    TbotsProto::PlayInfo AI::getPlayInfo() const
+TbotsProto::PlayInfo AI::getPlayInfo() const
+{
+    std::string info_play_name   = objectTypeName(*current_play);
+    auto robot_tactic_assignment = current_play->getRobotTacticAssignment();
+
+    if (static_cast<bool>(override_play))
     {
-        std::string info_play_name   = objectTypeName(*current_play);
-        auto robot_tactic_assignment = current_play->getRobotTacticAssignment();
-
-        if (static_cast<bool>(override_play))
-        {
-            info_play_name          = objectTypeName(*override_play);
-            robot_tactic_assignment = override_play->getRobotTacticAssignment();
-        }
-
-        TbotsProto::PlayInfo info;
-        info.mutable_play()->set_play_name(info_play_name);
-
-        for (const auto& [tactic, robot_id] : robot_tactic_assignment)
-        {
-            TbotsProto::PlayInfo_Tactic tactic_msg;
-            tactic_msg.set_tactic_name(objectTypeName(*tactic));
-            tactic_msg.set_tactic_fsm_state(tactic->getFSMState());
-            (*info.mutable_robot_tactic_assignment())[robot_id] = tactic_msg;
-        }
-
-        return info;
+        info_play_name          = objectTypeName(*override_play);
+        robot_tactic_assignment = override_play->getRobotTacticAssignment();
     }
+
+    TbotsProto::PlayInfo info;
+    info.mutable_play()->set_play_name(info_play_name);
+
+    for (const auto& [tactic, robot_id] : robot_tactic_assignment)
+    {
+        TbotsProto::PlayInfo_Tactic tactic_msg;
+        tactic_msg.set_tactic_name(objectTypeName(*tactic));
+        tactic_msg.set_tactic_fsm_state(tactic->getFSMState());
+        (*info.mutable_robot_tactic_assignment())[robot_id] = tactic_msg;
+    }
+
+    return info;
+}
