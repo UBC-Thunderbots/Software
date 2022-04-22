@@ -18,7 +18,9 @@ TEST(CreaseDefensePlayFSMTest, test_transitions)
         CreaseDefensePlayFSM::ControlParams{
             .enemy_threat_origin    = Point(),
             .max_allowed_speed_mode = TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT},
-        PlayUpdate(world, 3, [](PriorityTacticVector new_tactics) {})));
+        PlayUpdate(
+            world, 3, [](PriorityTacticVector new_tactics) {}, InterPlayCommunication{},
+            [](InterPlayCommunication comm) {})));
 
     // CreaseDefensePlayFSM always stays in the DefenseState
     EXPECT_TRUE(fsm.is(boost::sml::state<CreaseDefensePlayFSM::DefenseState>));

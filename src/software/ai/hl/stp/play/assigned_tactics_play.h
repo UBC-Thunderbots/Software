@@ -22,8 +22,9 @@ class AssignedTacticsPlay : public Play
     void updateControlParams(std::map<RobotId, std::shared_ptr<Tactic>> assigned_tactics);
 
     std::unique_ptr<TbotsProto::PrimitiveSet> get(
-        const GlobalPathPlannerFactory &path_planner_factory,
-        const World &world) override;
+        const GlobalPathPlannerFactory &path_planner_factory, const World &world,
+        const InterPlayCommunication &,
+        const SetInterPlayCommunicationCallback &) override;
 
    private:
     std::map<RobotId, std::shared_ptr<Tactic>> assigned_tactics;

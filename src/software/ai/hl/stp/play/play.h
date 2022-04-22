@@ -53,11 +53,16 @@ class Play
      *
      * @param path_planner_factory The path planner factory
      * @param world The updated world
+     * @param inter_play_communication The inter-play communication struct
+     * @param set_inter_play_communication_fun The callback to set the inter-play
+     * communication struct
      *
      * @return the PrimitiveSet to execute
      */
     virtual std::unique_ptr<TbotsProto::PrimitiveSet> get(
-        const GlobalPathPlannerFactory& path_planner_factory, const World& world);
+        const GlobalPathPlannerFactory& path_planner_factory, const World& world,
+        const InterPlayCommunication& inter_play_communication,
+        const SetInterPlayCommunicationCallback& set_inter_play_communication_fun);
 
     const std::map<std::shared_ptr<const Tactic>, RobotId>& getRobotTacticAssignment()
         const;

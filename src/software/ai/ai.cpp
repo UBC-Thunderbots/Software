@@ -50,35 +50,40 @@ std::unique_ptr<TbotsProto::PrimitiveSet> AI::getPrimitives(const World& world)
 
     if (static_cast<bool>(override_play))
     {
-        return override_play->get(path_planner_factory, world);
+        return override_play->get(path_planner_factory, world, inter_play_communication,
+                                  [this](InterPlayCommunication comm) {
+                                      inter_play_communication = std::move(comm);
+                                  });
     }
     else
     {
-        return current_play->get(path_planner_factory, world);
+        return current_play->get(path_planner_factory, world, inter_play_communication,
+                                 [this](InterPlayCommunication comm) {
+                                     inter_play_communication = std::move(comm);
+                                 });
     }
-}
 
-TbotsProto::PlayInfo AI::getPlayInfo() const
-{
-    std::string info_play_name   = objectTypeName(*current_play);
-    auto robot_tactic_assignment = current_play->getRobotTacticAssignment();
-
-    if (static_cast<bool>(override_play))
+    TbotsProto::PlayInfo AI::getPlayInfo() const
     {
-        info_play_name          = objectTypeName(*override_play);
-        robot_tactic_assignment = override_play->getRobotTacticAssignment();
+        std::string info_play_name   = objectTypeName(*current_play);
+        auto robot_tactic_assignment = current_play->getRobotTacticAssignment();
+
+        if (static_cast<bool>(override_play))
+        {
+            info_play_name          = objectTypeName(*override_play);
+            robot_tactic_assignment = override_play->getRobotTacticAssignment();
+        }
+
+        TbotsProto::PlayInfo info;
+        info.mutable_play()->set_play_name(info_play_name);
+
+        for (const auto& [tactic, robot_id] : robot_tactic_assignment)
+        {
+            TbotsProto::PlayInfo_Tactic tactic_msg;
+            tactic_msg.set_tactic_name(objectTypeName(*tactic));
+            tactic_msg.set_tactic_fsm_state(tactic->getFSMState());
+            (*info.mutable_robot_tactic_assignment())[robot_id] = tactic_msg;
+        }
+
+        return info;
     }
-
-    TbotsProto::PlayInfo info;
-    info.mutable_play()->set_play_name(info_play_name);
-
-    for (const auto& [tactic, robot_id] : robot_tactic_assignment)
-    {
-        TbotsProto::PlayInfo_Tactic tactic_msg;
-        tactic_msg.set_tactic_name(objectTypeName(*tactic));
-        tactic_msg.set_tactic_fsm_state(tactic->getFSMState());
-        (*info.mutable_robot_tactic_assignment())[robot_id] = tactic_msg;
-    }
-
-    return info;
-}

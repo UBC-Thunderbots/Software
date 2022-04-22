@@ -66,4 +66,6 @@ class AI final
     GlobalPathPlannerFactory path_planner_factory;
     bool prev_override;
     std::string prev_override_name;
+    // inter play communication
+    InterPlayCommunication inter_play_communication;
 };

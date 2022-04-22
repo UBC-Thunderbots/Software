@@ -78,7 +78,9 @@ PriorityTacticVector Play::getTactics(const World &world)
 }
 
 std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
-    const GlobalPathPlannerFactory &path_planner_factory, const World &world)
+    const GlobalPathPlannerFactory &path_planner_factory, const World &world,
+    const InterPlayCommunication &inter_play_communication,
+    const SetInterPlayCommunicationCallback &set_inter_play_communication_fun)
 {
     PriorityTacticVector priority_tactics;
     unsigned int num_tactics =
@@ -87,10 +89,12 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
     {
         num_tactics--;
     }
-    updateTactics(PlayUpdate(world, num_tactics,
-                             [&priority_tactics](PriorityTacticVector new_tactics) {
-                                 priority_tactics = std::move(new_tactics);
-                             }));
+    updateTactics(PlayUpdate(
+        world, num_tactics,
+        [&priority_tactics](PriorityTacticVector new_tactics) {
+            priority_tactics = std::move(new_tactics);
+        },
+        inter_play_communication, set_inter_play_communication_fun));
 
     auto primitives_to_run = std::make_unique<TbotsProto::PrimitiveSet>();
 
