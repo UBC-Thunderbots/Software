@@ -199,6 +199,7 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
         {
             // If assigning the last tactic vector, then assign rest of robots with
             // StopTactics
+            // TODO: make sure these tactics get assigned
             for (unsigned int i = 0; i < (robots.size() - num_tactics); i++)
             {
                 tactic_vector.push_back(stop_tactics[i]);
@@ -253,7 +254,10 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
             primitive_sets.emplace_back(tactic->get(world, create_motion_control));
             CHECK(primitive_sets.back()->robot_primitives().size() ==
                   world.friendlyTeam().numRobots())
-                << "Something bad happened with " << objectTypeName(*tactic);
+                << primitive_sets.back()->robot_primitives().size() << " primitives from "
+                << objectTypeName(*tactic)
+                << " is not equal to the number of robots, which is "
+                << world.friendlyTeam().numRobots();
         }
 
         size_t num_rows = robots.size();
