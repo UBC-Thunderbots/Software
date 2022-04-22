@@ -4,7 +4,6 @@
 
 GetBehindBallTactic::GetBehindBallTactic()
     : Tactic({RobotCapability::Move}),
-      fsm{GetBehindBallFSM()},
       fsm_map(),
       control_params({.ball_location = Point(0, 0), .chick_direction = Angle::zero()})
 {
@@ -34,5 +33,6 @@ void GetBehindBallTactic::updatePrimitive(const TacticUpdate &tactic_update,
         fsm_map[tactic_update.robot.id()] =
             std::make_unique<FSM<GetBehindBallFSM>>(GetBehindBallFSM());
     }
-    fsm.process_event(GetBehindBallFSM::Update(control_params, tactic_update));
+    fsm_map.at(tactic_update.robot.id())
+        ->process_event(GetBehindBallFSM::Update(control_params, tactic_update));
 }

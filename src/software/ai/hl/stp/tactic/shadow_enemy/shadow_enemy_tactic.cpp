@@ -2,7 +2,6 @@
 
 ShadowEnemyTactic::ShadowEnemyTactic()
     : Tactic({RobotCapability::Move, RobotCapability::Kick}),
-      fsm(),
       fsm_map(),
       control_params{ShadowEnemyFSM::ControlParams{.enemy_threat    = std::nullopt,
                                                    .shadow_distance = 0}}
@@ -31,5 +30,6 @@ void ShadowEnemyTactic::updatePrimitive(const TacticUpdate &tactic_update, bool 
     {
         fsm_map[tactic_update.robot.id()] = std::make_unique<FSM<ShadowEnemyFSM>>();
     }
-    fsm.process_event(ShadowEnemyFSM::Update(control_params, tactic_update));
+    fsm_map.at(tactic_update.robot.id())
+        ->process_event(ShadowEnemyFSM::Update(control_params, tactic_update));
 }

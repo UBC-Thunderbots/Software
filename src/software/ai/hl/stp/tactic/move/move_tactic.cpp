@@ -4,7 +4,6 @@
 
 MoveTactic::MoveTactic()
     : Tactic({RobotCapability::Move}),
-      fsm(),
       fsm_map(),
       control_params{
           .destination            = Point(),
@@ -60,7 +59,8 @@ void MoveTactic::updatePrimitive(const TacticUpdate &tactic_update, bool reset_f
     {
         fsm_map[tactic_update.robot.id()] = std::make_unique<FSM<MoveFSM>>();
     }
-    fsm.process_event(MoveFSM::Update(control_params, tactic_update));
+    fsm_map.at(tactic_update.robot.id())
+        ->process_event(MoveFSM::Update(control_params, tactic_update));
 }
 
 void MoveTactic::accept(TacticVisitor &visitor) const

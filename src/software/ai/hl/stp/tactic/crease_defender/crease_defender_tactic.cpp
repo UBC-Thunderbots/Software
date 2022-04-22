@@ -12,7 +12,6 @@
 CreaseDefenderTactic::CreaseDefenderTactic(
     std::shared_ptr<const RobotNavigationObstacleConfig> robot_navigation_obstacle_config)
     : Tactic({RobotCapability::Move}),
-      fsm(CreaseDefenderFSM(robot_navigation_obstacle_config)),
       fsm_map(),
       control_params({Point(0, 0), TbotsProto::CreaseDefenderAlignment::CENTRE,
                       TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT}),
@@ -48,5 +47,6 @@ void CreaseDefenderTactic::updatePrimitive(const TacticUpdate &tactic_update,
         fsm_map[tactic_update.robot.id()] = std::make_unique<FSM<CreaseDefenderFSM>>(
             CreaseDefenderFSM(robot_navigation_obstacle_config));
     }
-    fsm.process_event(CreaseDefenderFSM::Update(control_params, tactic_update));
+    fsm_map.at(tactic_update.robot.id())
+        ->process_event(CreaseDefenderFSM::Update(control_params, tactic_update));
 }

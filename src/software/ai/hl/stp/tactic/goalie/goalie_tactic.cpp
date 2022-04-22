@@ -38,6 +38,6 @@ void GoalieTactic::updatePrimitive(const TacticUpdate &tactic_update, bool reset
             DribbleFSM(ai_config->getDribbleTacticConfig()),
             GoalieFSM(ai_config->getGoalieTacticConfig(), max_allowed_speed_mode));
     }
-    fsm_map[tactic_update.robot.id()]->process_event(
-        GoalieFSM::Update(control_params, tactic_update));
+    fsm_map.at(tactic_update.robot.id())
+        ->process_event(GoalieFSM::Update(control_params, tactic_update));
 }

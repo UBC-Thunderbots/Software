@@ -38,6 +38,6 @@ void DribbleTactic::updatePrimitive(const TacticUpdate &tactic_update, bool rese
         fsm_map[tactic_update.robot.id()] = std::make_unique<FSM<DribbleFSM>>(
             DribbleFSM(ai_config->getDribbleTacticConfig()));
     }
-    fsm_map[tactic_update.robot.id()]->process_event(
-        DribbleFSM::Update(control_params, tactic_update));
+    fsm_map.at(tactic_update.robot.id())
+        ->process_event(DribbleFSM::Update(control_params, tactic_update));
 }

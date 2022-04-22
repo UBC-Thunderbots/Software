@@ -91,7 +91,7 @@ TbotsProto::PlayInfo AI::getPlayInfo() const
         TbotsProto::PlayInfo_Tactic tactic_msg;
         tactic_msg.set_tactic_name(objectTypeName(*tactic));
         tactic_msg.set_tactic_fsm_state(tactic->getFSMState());
-        (*info.mutable_tactic_robot_id_assignment())[robot_id] = tactic_msg;
+        (*info.mutable_robot_tactic_assignment())[robot_id] = tactic_msg;
     }
 
     return info;

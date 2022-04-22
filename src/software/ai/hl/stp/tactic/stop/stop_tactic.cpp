@@ -3,7 +3,7 @@
 #include <algorithm>
 
 StopTactic::StopTactic(bool coast)
-    : Tactic(std::set<RobotCapability>()), fsm(StopFSM(coast)), fsm_map(), coast(coast)
+    : Tactic(std::set<RobotCapability>()), fsm_map(), coast(coast)
 {
     for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)
     {
@@ -23,5 +23,6 @@ void StopTactic::updatePrimitive(const TacticUpdate &tactic_update, bool reset_f
         fsm_map[tactic_update.robot.id()] =
             std::make_unique<FSM<StopFSM>>(StopFSM(coast));
     }
-    fsm.process_event(StopFSM::Update({}, tactic_update));
+    fsm_map.at(tactic_update.robot.id())
+        ->process_event(StopFSM::Update({}, tactic_update));
 }

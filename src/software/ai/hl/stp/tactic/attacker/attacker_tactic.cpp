@@ -66,6 +66,6 @@ void AttackerTactic::updatePrimitive(const TacticUpdate& tactic_update, bool res
                                               .shot             = shot,
                                               .chip_target      = chip_target};
 
-    fsm_map[tactic_update.robot.id()]->process_event(
-        AttackerFSM::Update(control_params, tactic_update));
+    fsm_map.at(tactic_update.robot.id())
+        ->process_event(AttackerFSM::Update(control_params, tactic_update));
 }
