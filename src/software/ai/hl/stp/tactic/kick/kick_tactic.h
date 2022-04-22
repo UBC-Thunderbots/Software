@@ -47,7 +47,6 @@ class KickTactic : public Tactic
    private:
     void updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm) override;
 
-    FSM<KickFSM> fsm;
     std::map<RobotId, std::unique_ptr<FSM<KickFSM>>> fsm_map;
 
     // Tactic parameters

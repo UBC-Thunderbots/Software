@@ -44,7 +44,6 @@ class ChipTactic : public Tactic
    private:
     void updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm) override;
 
-    FSM<ChipFSM> fsm;
     std::map<RobotId, std::unique_ptr<FSM<ChipFSM>>> fsm_map;
 
     // Tactic parameters

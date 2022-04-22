@@ -68,7 +68,6 @@ class ReceiverTactic : public Tactic
 
     void updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm) override;
 
-    FSM<ReceiverFSM> fsm;
     std::map<RobotId, std::unique_ptr<FSM<ReceiverFSM>>> fsm_map;
 
     /**

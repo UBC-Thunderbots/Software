@@ -57,7 +57,6 @@ class CreaseDefenderTactic : public Tactic
    private:
     void updatePrimitive(const TacticUpdate &tactic_update, bool reset_fsm) override;
 
-    FSM<CreaseDefenderFSM> fsm;
     std::map<RobotId, std::unique_ptr<FSM<CreaseDefenderFSM>>> fsm_map;
 
     CreaseDefenderFSM::ControlParams control_params;
