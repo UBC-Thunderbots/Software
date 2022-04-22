@@ -49,7 +49,8 @@ class Play
     explicit Play(std::shared_ptr<const AiConfig> ai_config, bool requires_goalie);
 
     /**
-     * Gets Primitives from the Play given the assignment algorithm and world
+     * Gets Primitives from the Play given the path planner factory, the world, and
+     * inter-play communication
      *
      * @param path_planner_factory The path planner factory
      * @param world The updated world
@@ -146,6 +147,20 @@ class Play
      */
     virtual void getNextTactics(TacticCoroutine::push_type& yield,
                                 const World& world) = 0;
+
+    /**
+     * Gets Primitives from a Tactic given the path planner factory, the world, and the
+     * tactic
+     *
+     * @param path_planner_factory The path planner factory
+     * @param world The updated world
+     * @param tactic the Tactic
+     *
+     * @return the PrimitiveSet to execute
+     */
+    std::unique_ptr<TbotsProto::PrimitiveSet> getPrimitivesFromTactic(
+        const GlobalPathPlannerFactory& path_planner_factory, const World& world,
+        std::shared_ptr<Tactic> tactic) const;
 
     // Stop tactic common to all plays for robots that don't have tactics assigned
     TacticVector stop_tactics;
