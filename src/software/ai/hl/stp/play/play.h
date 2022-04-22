@@ -64,7 +64,12 @@ class Play
         const InterPlayCommunication& inter_play_communication,
         const SetInterPlayCommunicationCallback& set_inter_play_communication_fun);
 
-    const std::map<std::shared_ptr<const Tactic>, RobotId>& getRobotTacticAssignment()
+    /**
+     * Get tactic to robot id assignment
+     *
+     * @return a map from tactic to robot id
+     */
+    const std::map<std::shared_ptr<const Tactic>, RobotId>& getTacticRobotIdAssignment()
         const;
 
     virtual ~Play() = default;
@@ -159,6 +164,5 @@ class Play
     // TODO (#2359): remove this
     PriorityTacticVector priority_tactics;
 
-    // TODO: change this to robot id to tactic
-    std::map<std::shared_ptr<const Tactic>, RobotId> robot_tactic_assignment;
+    std::map<std::shared_ptr<const Tactic>, RobotId> tactic_robot_id_assignment;
 };

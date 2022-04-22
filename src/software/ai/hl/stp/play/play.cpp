@@ -98,7 +98,7 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
 
     auto primitives_to_run = std::make_unique<TbotsProto::PrimitiveSet>();
 
-    robot_tactic_assignment.clear();
+    tactic_robot_id_assignment.clear();
 
     std::optional<Robot> goalie_robot = world.friendlyTeam().goalie();
     std::vector<Robot> robots         = world.friendlyTeam().getAllRobots();
@@ -108,7 +108,7 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
         if (goalie_robot.has_value())
         {
             RobotId goalie_robot_id = goalie_robot.value().id();
-            robot_tactic_assignment.emplace(goalie_tactic, goalie_robot_id);
+            tactic_robot_id_assignment.emplace(goalie_tactic, goalie_robot_id);
 
             robots.erase(std::remove(robots.begin(), robots.end(), goalie_robot.value()),
                          robots.end());
@@ -329,7 +329,7 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
                 if (val == 0)
                 {
                     RobotId robot_id = robots.at(row).id();
-                    robot_tactic_assignment.emplace(tactic_vector.at(col), robot_id);
+                    tactic_robot_id_assignment.emplace(tactic_vector.at(col), robot_id);
                     tactic_vector.at(col)->setLastExecutionRobot(robot_id);
 
                     auto primitives = primitive_sets.at(col)->robot_primitives();
@@ -354,10 +354,10 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
     return primitives_to_run;
 }
 
-const std::map<std::shared_ptr<const Tactic>, RobotId> &Play::getRobotTacticAssignment()
+const std::map<std::shared_ptr<const Tactic>, RobotId> &Play::getTacticRobotIdAssignment()
     const
 {
-    return robot_tactic_assignment;
+    return tactic_robot_id_assignment;
 }
 
 void Play::getNextTacticsWrapper(TacticCoroutine::push_type &yield)

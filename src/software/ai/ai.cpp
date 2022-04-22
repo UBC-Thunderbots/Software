@@ -74,24 +74,24 @@ std::unique_ptr<TbotsProto::PrimitiveSet> AI::getPrimitives(const World& world)
 
 TbotsProto::PlayInfo AI::getPlayInfo() const
 {
-    std::string info_play_name   = objectTypeName(*current_play);
-    auto robot_tactic_assignment = current_play->getRobotTacticAssignment();
+    std::string info_play_name      = objectTypeName(*current_play);
+    auto tactic_robot_id_assignment = current_play->getTacticRobotIdAssignment();
 
     if (static_cast<bool>(override_play))
     {
-        info_play_name          = objectTypeName(*override_play);
-        robot_tactic_assignment = override_play->getRobotTacticAssignment();
+        info_play_name             = objectTypeName(*override_play);
+        tactic_robot_id_assignment = override_play->getTacticRobotIdAssignment();
     }
 
     TbotsProto::PlayInfo info;
     info.mutable_play()->set_play_name(info_play_name);
 
-    for (const auto& [tactic, robot_id] : robot_tactic_assignment)
+    for (const auto& [tactic, robot_id] : tactic_robot_id_assignment)
     {
         TbotsProto::PlayInfo_Tactic tactic_msg;
         tactic_msg.set_tactic_name(objectTypeName(*tactic));
         tactic_msg.set_tactic_fsm_state(tactic->getFSMState());
-        (*info.mutable_robot_tactic_assignment())[robot_id] = tactic_msg;
+        (*info.mutable_tactic_robot_id_assignment())[robot_id] = tactic_msg;
     }
 
     return info;
