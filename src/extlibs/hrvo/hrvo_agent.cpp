@@ -400,7 +400,7 @@ void HRVOAgent::computeNewVelocity()
         }
     }
 
-    double min_pref_speed = pref_velocity_.length() * min_pref_speed_multiplier;
+    double min_pref_speed = pref_velocity_.length() * MIN_PREF_SPEED_MULTIPLER;
 
     // corresponds to the velocity obstacle that is furthest away when picking a velocity
     // we might collide with
@@ -413,7 +413,7 @@ void HRVOAgent::computeNewVelocity()
         for (int j = 0; j < static_cast<int>(velocityObstacles_.size()); ++j)
         {
             if (j != c.velocityObstacle1_ && j != c.velocityObstacle2_ &&
-                c.intersectsVelocityObstacle(velocityObstacles_[j]))
+                velocityObstacles_[j].containsVelocity(c.velocity))
             {
                 return j;
             }
@@ -626,11 +626,4 @@ std::vector<Circle> HRVOAgent::getCandidateVelocitiesAsCircles(
 void HRVOAgent::setPreferredSpeed(float new_pref_speed)
 {
     prefSpeed_ = new_pref_speed;
-}
-
-bool HRVOAgent::Candidate::intersectsVelocityObstacle(const VelocityObstacle &vo) const
-{
-    Vector candidate_vector = velocity - vo.apex_;
-    return vo.left_side.isToTheLeftOf(candidate_vector) &&
-           vo.right_side.isToTheRightOf(candidate_vector);
 }

@@ -16,4 +16,15 @@ class VelocityObstacle
 
     // The direction of the left side of the hybrid reciprocal velocity obstacle.
     Vector left_side;
+
+    /**
+     * Returns true if the given velocity is inside this VelocityObstacle, false
+     * otherwise.
+     *
+     * @param velocity the velocity to compare
+     *
+     * @return bool true if this VelocityObstacle contains the given velocity, false
+     * otherwise
+     */
+    bool containsVelocity(const Vector &velocity) const;
 };

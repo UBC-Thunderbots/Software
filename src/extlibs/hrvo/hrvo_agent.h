@@ -128,8 +128,9 @@ class HRVOAgent : public Agent
 
    private:
     /**
-     * A candidate point is a internal structure used when computing new velocities. It is composed of a potential new
-     * velocity and the index of two VelocityObstacles in velocityObstacles_ that were used to compute it.
+     * A candidate point is a internal structure used when computing new velocities. It is
+     * composed of a potential new velocity and the index of two VelocityObstacles in
+     * velocityObstacles_ that were used to compute it.
      */
     class Candidate
     {
@@ -139,26 +140,18 @@ class HRVOAgent : public Agent
         // The velocity of the candidate.
         Vector velocity;
 
-	// The index of the first VelocityObstacle in velocityObstacles_ used to compute this candidate.
+        // The index of the first VelocityObstacle in velocityObstacles_ used to compute
+        // this candidate.
         int velocityObstacle1_;
 
-	// The index of the second VelocityObstacle in velocityObstacles_ used to compute this candidate.
+        // The index of the second VelocityObstacle in velocityObstacles_ used to compute
+        // this candidate.
         int velocityObstacle2_;
-
-        /**
-         * Returns true if this candidate point intersects the given velocity obstacle,
-         * false otherwise.
-         *
-         * @param vo the velocity obstacle to check against
-         *
-         * @return true if intersecting, false otherwise
-         */
-        bool intersectsVelocityObstacle(const VelocityObstacle &vo) const;
     };
 
-    // this multiplier is used with the preferred velocity to try to select a new velocity
-    // that lets us reach the destination faster
-    float min_pref_speed_multiplier = 0.4f;
+    // Percentage of preferred speed that we accept as the lower bound of a potential new
+    // velocity
+    static constexpr float MIN_PREF_SPEED_MULTIPLER = 0.4f;
 
    public:
     float prefSpeed_;
