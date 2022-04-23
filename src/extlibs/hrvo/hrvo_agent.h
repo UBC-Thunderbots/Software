@@ -135,8 +135,8 @@ class HRVOAgent : public Agent
        public:
         Candidate() : velocityObstacle1_(0), velocityObstacle2_(0) {}
 
-        // The position of the candidate point.
-        Vector position_;
+        // The velocity of the candidate.
+        Vector velocity;
 
         // The number of the first velocity obstacle.
         int velocityObstacle1_;
