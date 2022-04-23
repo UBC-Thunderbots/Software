@@ -177,7 +177,8 @@ void HRVOAgent::computeNewVelocity()
     candidate.velocityObstacle1_ = std::numeric_limits<int>::max();
     candidate.velocityObstacle2_ = std::numeric_limits<int>::max();
 
-    // verifies that the candidate speed is realistic and adds it to the possible candidates
+    // verifies that the candidate speed is realistic and adds it to the possible
+    // candidates
     auto addToCandidateListIfValid = [&](const Candidate &c) {
         if (c.velocity.lengthSquared() < max_speed_ * max_speed_)
         {
@@ -186,7 +187,8 @@ void HRVOAgent::computeNewVelocity()
         }
     };
 
-    // if small enough, add preferred velocity as candidate velocity or a normalized version of it otherwise    
+    // if small enough, add preferred velocity as candidate velocity or a normalized
+    // version of it otherwise
     if (pref_velocity_.lengthSquared() < max_speed_ * max_speed_)
     {
         candidate.velocity = pref_velocity_;
@@ -196,10 +198,11 @@ void HRVOAgent::computeNewVelocity()
         candidate.velocity = pref_velocity_.normalize(max_speed_);
     }
 
-    candidates_.insert(std::make_pair(
-        (pref_velocity_ - candidate.velocity).lengthSquared(), candidate));
+    candidates_.insert(
+        std::make_pair((pref_velocity_ - candidate.velocity).lengthSquared(), candidate));
 
-    // this adds candidate points that are projections of the preferred velocity onto the line segment of each obstacle
+    // this adds candidate points that are projections of the preferred velocity onto the
+    // line segment of each obstacle
     for (int i = 0; i < static_cast<int>(velocityObstacles_.size()); ++i)
     {
         const Vector apex_to_pref_velocity = pref_velocity_ - velocityObstacles_[i].apex_;
@@ -216,7 +219,7 @@ void HRVOAgent::computeNewVelocity()
             velocityObstacles_[i].right_side.isToTheRightOf(apex_to_pref_velocity))
         {
             candidate.velocity = velocityObstacles_[i].apex_ +
-                                  dotProduct1 * velocityObstacles_[i].right_side;
+                                 dotProduct1 * velocityObstacles_[i].right_side;
 
             addToCandidateListIfValid(candidate);
         }
@@ -225,7 +228,7 @@ void HRVOAgent::computeNewVelocity()
             velocityObstacles_[i].left_side.isToTheLeftOf(apex_to_pref_velocity))
         {
             candidate.velocity = velocityObstacles_[i].apex_ +
-                                  dotProduct2 * velocityObstacles_[i].left_side;
+                                 dotProduct2 * velocityObstacles_[i].left_side;
 
             addToCandidateListIfValid(candidate);
         }
@@ -324,7 +327,7 @@ void HRVOAgent::computeNewVelocity()
                 if (s >= 0.0f && t >= 0.0f)
                 {
                     candidate.velocity = velocityObstacles_[i].apex_ +
-                                          s * velocityObstacles_[i].right_side;
+                                         s * velocityObstacles_[i].right_side;
                     addToCandidateListIfValid(candidate);
                 }
             }
@@ -368,7 +371,7 @@ void HRVOAgent::computeNewVelocity()
                 if (s >= 0.0f && t >= 0.0f)
                 {
                     candidate.velocity = velocityObstacles_[i].apex_ +
-                                          s * velocityObstacles_[i].right_side;
+                                         s * velocityObstacles_[i].right_side;
                     addToCandidateListIfValid(candidate);
                 }
             }
@@ -399,17 +402,18 @@ void HRVOAgent::computeNewVelocity()
 
     double min_pref_speed = pref_velocity_.length() * min_pref_speed_multiplier;
 
-    // corresponds to the velocity obstacle that is furthest away when picking a velocity we might collide with 
+    // corresponds to the velocity obstacle that is furthest away when picking a velocity
+    // we might collide with
     int optimal_furthest_away_obstacle = -1;
 
     new_velocity_ = Vector();
-    // returns the first velocity obstacle in velocityObstacles_ that the given candidate velocity intersects. returns
-    // -1 if it doesn't intersect any velocity obstacle
+    // returns the first velocity obstacle in velocityObstacles_ that the given candidate
+    // velocity intersects. returns -1 if it doesn't intersect any velocity obstacle
     auto firstIntersectingVelocityObstacle = [&](const Candidate &c) -> int {
         for (int j = 0; j < static_cast<int>(velocityObstacles_.size()); ++j)
         {
             if (j != c.velocityObstacle1_ && j != c.velocityObstacle2_ &&
-                 c.intersectsVelocityObstacle(velocityObstacles_[j]))
+                c.intersectsVelocityObstacle(velocityObstacles_[j]))
             {
                 return j;
             }
@@ -419,41 +423,47 @@ void HRVOAgent::computeNewVelocity()
     };
 
     // Choosing a candidate velocity has these goals:
-    // - Pick a velocity as close as possible to the preferred velocity as long as it doesn't lie in any velocity
-    // 	 	obstacle
-    // - Failing the first condition, then choose the best candidate velocity as new velocity that minimizes collisions
-    // 		with the closest velocity obstacles
-    // - Candidate multimap is organized by distance from preferred velocity so we pick the first valid velocity
+    // - Pick a velocity as close as possible to the preferred velocity as long as it
+    // doesn't lie in any velocity 	 	obstacle
+    // - Failing the first condition, then choose the best candidate velocity as new
+    // velocity that minimizes collisions 		with the closest velocity obstacles
+    // - Candidate multimap is organized by distance from preferred velocity so we pick
+    // the first valid velocity
     for (const auto [dist_to_pref_velocity_sq, candidate] : candidates_)
     {
         int first_intersecting_velocity_obstacle =
             firstIntersectingVelocityObstacle(candidate);
-	bool is_free_of_velocity_obstacle_intersections_and_fast = 
-		first_intersecting_velocity_obstacle == -1 && candidate.velocity.length() >= min_pref_speed;
-	bool is_free_of_velocity_obstacle_intersections_and_slow_but_faster_than_current_selected_speed =
-		first_intersecting_velocity_obstacle == -1 
-		&& candidate.velocity.length() < min_pref_speed 
-		&& candidate.velocity.length() > new_velocity_.length();
-	bool is_intersecting_a_velocity_obstacle_further_away_than_the_current_optimal_and_fast =
-		first_intersecting_velocity_obstacle > optimal_furthest_away_obstacle
-		&& candidate.velocity.length() >=  min_pref_speed;
-	bool is_intersecting_a_vo_further_away_than_optimal_and_slow_but_faster_than_current_best =
-		first_intersecting_velocity_obstacle == -1
-		&& candidate.velocity.length() < min_pref_speed
-		&& candidate.velocity.length() >= new_velocity_.length();
-	
-	// return as soon as we find a candidate velocity that doesn't intersect anything and is fast
-	if (is_free_of_velocity_obstacle_intersections_and_fast)
+        bool is_free_of_velocity_obstacle_intersections_and_fast =
+            first_intersecting_velocity_obstacle == -1 &&
+            candidate.velocity.length() >= min_pref_speed;
+        bool
+            is_free_of_velocity_obstacle_intersections_and_slow_but_faster_than_current_selected_speed =
+                first_intersecting_velocity_obstacle == -1 &&
+                candidate.velocity.length() < min_pref_speed &&
+                candidate.velocity.length() > new_velocity_.length();
+        bool
+            is_intersecting_a_velocity_obstacle_further_away_than_the_current_optimal_and_fast =
+                first_intersecting_velocity_obstacle > optimal_furthest_away_obstacle &&
+                candidate.velocity.length() >= min_pref_speed;
+        bool
+            is_intersecting_a_vo_further_away_than_optimal_and_slow_but_faster_than_current_best =
+                first_intersecting_velocity_obstacle == -1 &&
+                candidate.velocity.length() < min_pref_speed &&
+                candidate.velocity.length() >= new_velocity_.length();
+
+        // return as soon as we find a candidate velocity that doesn't intersect anything
+        // and is fast
+        if (is_free_of_velocity_obstacle_intersections_and_fast)
         {
             new_velocity_ = candidate.velocity;
             return;
         }
 
-	// if this candidate velocity is flawed, but is better than the one we have so far, store it until we find
-	// something better
-	if (is_free_of_velocity_obstacle_intersections_and_slow_but_faster_than_current_selected_speed
-			|| is_intersecting_a_velocity_obstacle_further_away_than_the_current_optimal_and_fast
-			|| is_intersecting_a_vo_further_away_than_optimal_and_slow_but_faster_than_current_best)
+        // if this candidate velocity is flawed, but is better than the one we have so
+        // far, store it until we find something better
+        if (is_free_of_velocity_obstacle_intersections_and_slow_but_faster_than_current_selected_speed ||
+            is_intersecting_a_velocity_obstacle_further_away_than_the_current_optimal_and_fast ||
+            is_intersecting_a_vo_further_away_than_optimal_and_slow_but_faster_than_current_best)
         {
             optimal_furthest_away_obstacle = first_intersecting_velocity_obstacle;
             new_velocity_                  = candidate.velocity;
