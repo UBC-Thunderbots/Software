@@ -128,7 +128,8 @@ class HRVOAgent : public Agent
 
    private:
     /**
-     * A candidate point.
+     * A candidate point is a internal structure used when computing new velocities. It is composed of a potential new
+     * velocity and the index of two VelocityObstacles in velocityObstacles_ that were used to compute it.
      */
     class Candidate
     {
@@ -138,10 +139,10 @@ class HRVOAgent : public Agent
         // The velocity of the candidate.
         Vector velocity;
 
-        // The number of the first velocity obstacle.
+	// The index of the first VelocityObstacle in velocityObstacles_ used to compute this candidate.
         int velocityObstacle1_;
 
-        // The number of the second velocity obstacle.
+	// The index of the second VelocityObstacle in velocityObstacles_ used to compute this candidate.
         int velocityObstacle2_;
 
         /**
