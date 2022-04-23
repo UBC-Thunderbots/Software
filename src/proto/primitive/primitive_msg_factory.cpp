@@ -4,48 +4,6 @@
 #include "software/logger/logger.h"
 
 std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
-    const Point& dest, double final_speed_m_per_s, const Angle& final_angle,
-    TbotsProto::DribblerMode dribbler_mode, AutoChipOrKick auto_chip_or_kick,
-    TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode, double target_spin_rev_per_s,
-    RobotConstants_t robot_constants)
-{
-    auto move_primitive_msg = std::make_unique<TbotsProto::Primitive>();
-
-    TbotsProto::Path path_proto;
-    *(path_proto.add_point()) = *createPointProto(Point(dest.x(), dest.y()));
-    *(move_primitive_msg->mutable_move()->mutable_motion_control()->mutable_path()) =
-        path_proto;
-
-    auto final_angle_msg = createAngleProto(final_angle);
-    *(move_primitive_msg->mutable_move()->mutable_final_angle()) = *final_angle_msg;
-    move_primitive_msg->mutable_move()->set_final_speed_m_per_s(
-        static_cast<float>(final_speed_m_per_s));
-    move_primitive_msg->mutable_move()->set_max_speed_m_per_s(
-        static_cast<float>(convertMaxAllowedSpeedModeToMaxAllowedSpeed(
-            max_allowed_speed_mode, robot_constants)));
-
-    move_primitive_msg->mutable_move()->set_dribbler_speed_rpm(static_cast<float>(
-        convertDribblerModeToDribblerSpeed(dribbler_mode, robot_constants)));
-    if (auto_chip_or_kick.auto_chip_kick_mode == AutoChipOrKickMode::AUTOCHIP)
-    {
-        move_primitive_msg->mutable_move()
-            ->mutable_auto_chip_or_kick()
-            ->set_autochip_distance_meters(
-                static_cast<float>(auto_chip_or_kick.autochip_distance_m));
-    }
-    else if (auto_chip_or_kick.auto_chip_kick_mode == AutoChipOrKickMode::AUTOKICK)
-    {
-        move_primitive_msg->mutable_move()
-            ->mutable_auto_chip_or_kick()
-            ->set_autokick_speed_m_per_s(
-                static_cast<float>(auto_chip_or_kick.autokick_speed_m_per_s));
-    }
-    move_primitive_msg->mutable_move()->set_target_spin_rev_per_s(
-        static_cast<float>(target_spin_rev_per_s));
-    return move_primitive_msg;
-}
-
-std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
     const TbotsProto::MotionControl& motion_control, const Angle& final_angle,
     double final_speed, const TbotsProto::DribblerMode& dribbler_mode,
     const TbotsProto::BallCollisionType& ball_collision_type,

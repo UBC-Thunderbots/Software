@@ -31,11 +31,6 @@ class GoalieTacticTest
             yield("Waiting " + std::to_string(seconds_to_wait) +
                   " seconds to check that the enemy team did not score");
         }
-        while (contains(world_ptr->field().friendlyDefenseArea(),
-                        world_ptr->ball().position()))
-        {
-            yield("Ball is in the friendly defense area");
-        }
     }
     TbotsProto::FieldType field_type = TbotsProto::FieldType::DIV_B;
     Field field                      = Field::createField(field_type);
@@ -60,6 +55,10 @@ TEST_F(GoalieTacticTest, test_panic_ball_very_fast_in_straight_line)
     std::vector<ValidationFunction> terminating_validation_functions = {
         [this, tactic](std::shared_ptr<World> world_ptr,
                        ValidationCoroutine::push_type& yield) {
+            while (!tactic->done())
+            {
+                yield("Tactic not done");
+            }
             checkGoalieSuccess(1, world_ptr, yield);
         }};
 
@@ -86,6 +85,10 @@ TEST_F(GoalieTacticTest, test_panic_ball_very_fast_in_diagonal_line)
     std::vector<ValidationFunction> terminating_validation_functions = {
         [this, tactic](std::shared_ptr<World> world_ptr,
                        ValidationCoroutine::push_type& yield) {
+            while (!tactic->done())
+            {
+                yield("Tactic not done");
+            }
             checkGoalieSuccess(2, world_ptr, yield);
         }};
 
@@ -165,6 +168,14 @@ TEST_P(GoalieTacticTest, goalie_test)
         [this, tactic](std::shared_ptr<World> world_ptr,
                        ValidationCoroutine::push_type& yield) {
             robotReceivedBall(world_ptr, yield);
+            while (!tactic->done())
+            {
+                yield("Tactic not done");
+            }
+            Angle clear_angle =
+                (world_ptr->ball().position() - world_ptr->field().friendlyGoalCenter())
+                    .orientation();
+            ballKicked(clear_angle, world_ptr, yield);
             checkGoalieSuccess(1, world_ptr, yield);
         }};
 

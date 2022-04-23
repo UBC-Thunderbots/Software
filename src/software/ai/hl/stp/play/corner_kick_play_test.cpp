@@ -23,10 +23,10 @@ class CornerKickPlayTest : public SimulatedErForceSimPlayTestFixture
 // TODO (#2577): re-enable once fixed
 TEST_F(CornerKickPlayTest, DISABLED_test_corner_kick_play_bottom_left)
 {
-    BallState ball_state(Point(4.3, -2.8), Vector(0, 0));
+    BallState ball_state(Point(4.5, -3), Vector(0, 0));
     auto friendly_robots = TestUtil::createStationaryRobotStatesWithId(
         {Point(-3, 2.5), Point(-3, 1.5), Point(-3, 0.5), Point(-3, -0.5), Point(-3, -1.5),
-         Point(4.5, -3.0)});
+         Point(4.6, -3.1)});
     setFriendlyGoalie(0);
     auto enemy_robots = TestUtil::createStationaryRobotStatesWithId(
         {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field.enemyGoalCenter(),
@@ -51,10 +51,10 @@ TEST_F(CornerKickPlayTest, DISABLED_test_corner_kick_play_bottom_left)
 
 TEST_F(CornerKickPlayTest, test_corner_kick_play_top_right)
 {
-    BallState ball_state(Point(4.3, 2.8), Vector(0, 0));
+    BallState ball_state(Point(4.5, 3), Vector(0, 0));
     auto friendly_robots = TestUtil::createStationaryRobotStatesWithId(
         {Point(-3, 2.5), Point(0, 1.5), Point(0, 0.5), Point(0, -0.5), Point(0, -1.5),
-         Point(4.5, 3.0)});
+         Point(4.6, 3.1)});
     setFriendlyGoalie(0);
     auto enemy_robots = TestUtil::createStationaryRobotStatesWithId(
         {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field.enemyGoalCenter(),

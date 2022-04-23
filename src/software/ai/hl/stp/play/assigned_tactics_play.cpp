@@ -30,6 +30,7 @@ std::unique_ptr<TbotsProto::PrimitiveSet> AssignedTacticsPlay::get(
     const GlobalPathPlannerFactory &path_planner_factory, const World &world,
     const InterPlayCommunication &, const SetInterPlayCommunicationCallback &)
 {
+    // TODO: fix this
     auto primitives_to_run = std::make_unique<TbotsProto::PrimitiveSet>();
     return primitives_to_run;
 }

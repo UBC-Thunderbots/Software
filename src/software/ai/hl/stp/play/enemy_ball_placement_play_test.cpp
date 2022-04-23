@@ -61,6 +61,7 @@ TEST_P(EnemyBallPlacementPlayTest, test_ball_placement)
                 yield("");
             }
 
+            // TODO: fix this
             //            robotsViolatingMotionConstraint(
             //                world_ptr, yield, obstacle_factory,
             //                MotionConstraint::AVOID_BALL_PLACEMENT_INTERFERENCE);
@@ -109,6 +110,7 @@ TEST_F(EnemyBallPlacementPlayTest, test_no_placement)
             {
                 yield("");
             }
+            // TODO: fix this
             //            robotsViolatingMotionConstraint(
             //                world_ptr, yield, obstacle_factory,
             //                MotionConstraint::AVOID_BALL_PLACEMENT_INTERFERENCE);
