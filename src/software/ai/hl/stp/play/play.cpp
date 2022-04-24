@@ -313,41 +313,46 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::getPrimitivesFromTactic(
 {
     auto motion_constraints = buildMotionConstraintSet(world.gameState(), *tactic);
     auto path_planner       = path_planner_factory.getPathPlanner(motion_constraints);
-    CreateMotionControl create_motion_control = [path_planner, motion_constraints](
-                                                    const Point &robot_position,
-                                                    const Point &destination) {
-        TbotsProto::MotionControl motion_control;
-        TbotsProto::Path path_proto;
+    CreateMotionControl create_motion_control =
+        [path_planner, motion_constraints](const Robot &robot, const Point &destination) {
+            Point robot_position = robot.position();
+            TbotsProto::MotionControl motion_control;
+            TbotsProto::Path path_proto;
 
-        std::vector<Point> path_points = {robot_position};
-        auto path = path_planner->findPath(robot_position, destination);
-        *(motion_control.mutable_requested_destination()) =
-            *createPointProto(destination);
+            // first point is always the robot_position
+            std::vector<Point> path_points = {robot_position, robot_position};
+            auto path = path_planner->findPath(robot_position, destination);
+            *(motion_control.mutable_requested_destination()) =
+                *createPointProto(destination);
 
-        if (path.has_value())
-        {
-            path_points = path.value().getKnots();
-            motion_control.set_normalized_path_length(
-                EnlsvgPathPlanner::pathLength(path_points, robot_position) /
-                EnlsvgPathPlanner::MAX_PATH_LENGTH);
-        }
-        else
-        {
-            motion_control.set_normalized_path_length(1.0);
-        }
+            if (path.has_value())
+            {
+                path_points = path.value().getKnots();
+                motion_control.set_normalized_path_length(
+                    EnlsvgPathPlanner::pathLength(path_points, robot_position) /
+                    EnlsvgPathPlanner::MAX_PATH_LENGTH);
+            }
+            else
+            {
+                motion_control.set_normalized_path_length(1.0);
+            }
 
-        *(path_proto.add_point())        = *createPointProto(path_points.back());
-        *(motion_control.mutable_path()) = path_proto;
-        for (const auto &motion_constraint : motion_constraints)
-        {
-            TbotsProto::MotionConstraint motion_constraint_proto;
-            TbotsProto::MotionConstraint_Parse(toString(motion_constraint),
-                                               &motion_constraint_proto);
-            motion_control.add_motion_constraints(motion_constraint_proto);
-        }
+            path_points.erase(path_points.begin());
+            for (const auto &point : path_points)
+            {
+                *(path_proto.add_point()) = *createPointProto(point);
+            }
+            *(motion_control.mutable_path()) = path_proto;
+            for (const auto &motion_constraint : motion_constraints)
+            {
+                TbotsProto::MotionConstraint motion_constraint_proto;
+                TbotsProto::MotionConstraint_Parse(toString(motion_constraint),
+                                                   &motion_constraint_proto);
+                motion_control.add_motion_constraints(motion_constraint_proto);
+            }
 
-        return motion_control;
-    };
+            return motion_control;
+        };
 
 
     return tactic->get(world, create_motion_control);

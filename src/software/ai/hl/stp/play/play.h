@@ -10,13 +10,6 @@
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/navigator/path_planner/global_path_planner_factory.h"
 
-using RobotToTacticAssignmentFunction =
-    std::function<std::map<std::shared_ptr<const Tactic>, Robot>(
-        const ConstPriorityTacticVector&, const World&, bool)>;
-
-using MotionConstraintBuildFunction =
-    std::function<std::set<TbotsProto::MotionConstraint>(const Tactic& tactic)>;
-
 // This coroutine returns a list of list of shared_ptrs to Tactic objects
 using TacticCoroutine = boost::coroutines2::coroutine<PriorityTacticVector>;
 

@@ -10,7 +10,7 @@
 
 using SetPrimitiveCallback = std::function<void(std::unique_ptr<TbotsProto::Primitive>)>;
 using CreateMotionControl =
-    std::function<TbotsProto::MotionControl(const Point &, const Point &)>;
+    std::function<TbotsProto::MotionControl(const Robot &, const Point &)>;
 
 // The tactic update struct is used to update tactics and set the new primitive
 struct TacticUpdate
@@ -75,4 +75,4 @@ struct TacticUpdate
     }
 
 #define CREATE_MOTION_CONTROL(DESTINATION)                                               \
-    event.common.create_motion_control(event.common.robot.position(), DESTINATION)
+    event.common.create_motion_control(event.common.robot, DESTINATION)
