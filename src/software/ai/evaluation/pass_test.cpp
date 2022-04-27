@@ -116,8 +116,9 @@ TEST_F(PassingEvaluationTest,
 
     double travel_time_expected = 2 * acceleration_time + time_at_max_vel;
 
-    EXPECT_TRUE(TestUtil::equalWithinTolerance(Duration::fromSeconds(travel_time_expected),
-                                               getTimeToPositionForRobot(robot_location, target_location, 2.0, 3.0, 0.5)));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(
+        Duration::fromSeconds(travel_time_expected),
+        getTimeToPositionForRobot(robot_location, target_location, 2.0, 3.0, 0.5)));
 }
 
 TEST_F(PassingEvaluationTest,
@@ -132,28 +133,28 @@ TEST_F(PassingEvaluationTest,
 
     // Equal initial and final velocities, both in the direction of the destination
     double initial_velocity = 2.0;
-    double max_accel = 3.0;
-    double max_vel = 4.0;
+    double max_accel        = 3.0;
+    double max_vel          = 4.0;
 
     Vector distance_to_dest_vector = target_location - robot_location;
-    double distance_to_dest = distance_to_dest_vector.length();
+    double distance_to_dest        = distance_to_dest_vector.length();
 
     double acceleration_time = (max_vel - initial_velocity) / max_accel;
 
     // x = v*t + 1/2*a*t^2, v = initial velocity
-    double acceleration_distance = initial_velocity * acceleration_time + 0.5 *
-                                   max_accel * std::pow(acceleration_time, 2);
-    double time_at_max_vel = (distance_to_dest - 2 * acceleration_distance) /
-                             max_vel;
+    double acceleration_distance = initial_velocity * acceleration_time +
+                                   0.5 * max_accel * std::pow(acceleration_time, 2);
+    double time_at_max_vel = (distance_to_dest - 2 * acceleration_distance) / max_vel;
 
     // Acceleration and deceleration time are equal since initial velocity is equal
     // to final velocity
     double travel_time_expected = 2 * acceleration_time + time_at_max_vel;
 
-    EXPECT_TRUE(TestUtil::equalWithinTolerance(Duration::fromSeconds(travel_time_expected),
-                                               getTimeToPositionForRobot(robot_location, target_location, max_vel, max_accel, 0,
-                                                                         distance_to_dest_vector.normalize(initial_velocity),
-                                                                         distance_to_dest_vector.normalize(initial_velocity))));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(
+        Duration::fromSeconds(travel_time_expected),
+        getTimeToPositionForRobot(robot_location, target_location, max_vel, max_accel, 0,
+                                  distance_to_dest_vector.normalize(initial_velocity),
+                                  distance_to_dest_vector.normalize(initial_velocity))));
 }
 
 TEST_F(PassingEvaluationTest,
@@ -169,17 +170,18 @@ TEST_F(PassingEvaluationTest,
 
     // Equal initial and final velocities, both in the direction of the destination
     double initial_velocity = 1.0;
-    double final_velocity = 3.0;
-    double max_accel = 1.0;
-    double max_vel = 4.0;
+    double final_velocity   = 3.0;
+    double max_accel        = 1.0;
+    double max_vel          = 4.0;
 
     // Calculated graphically through Desmos, work can be found here:
     // https://www.desmos.com/calculator/4glnzfc45x
     double travel_time_expected = 3.74596669241;
-    EXPECT_TRUE(TestUtil::equalWithinTolerance(Duration::fromSeconds(travel_time_expected),
-                                               getTimeToPositionForRobot(robot_location, target_location, max_vel, max_accel, 0,
-                                                                         distance_to_dest_vector.normalize(initial_velocity),
-                                                                         distance_to_dest_vector.normalize(final_velocity))));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(
+        Duration::fromSeconds(travel_time_expected),
+        getTimeToPositionForRobot(robot_location, target_location, max_vel, max_accel, 0,
+                                  distance_to_dest_vector.normalize(initial_velocity),
+                                  distance_to_dest_vector.normalize(final_velocity))));
 }
 
 TEST_F(PassingEvaluationTest,
@@ -194,12 +196,12 @@ TEST_F(PassingEvaluationTest,
 
     // Equal initial and final velocities, both in the direction of the destination
     double initial_vel = -1.0;
-    double final_vel = 3.0;
-    double max_accel = 2.0;
-    double max_vel = 4.0;
+    double final_vel   = 3.0;
+    double max_accel   = 2.0;
+    double max_vel     = 4.0;
 
     Vector distance_to_dest_vector = target_location - robot_location;
-    double distance_to_dest = distance_to_dest_vector.length();
+    double distance_to_dest        = distance_to_dest_vector.length();
 
     double acceleration_time = (max_vel - initial_vel) / max_accel;
     // d = (Vi + Vf) / 2 * t
@@ -209,19 +211,21 @@ TEST_F(PassingEvaluationTest,
     // d = (Vi + Vf) / 2 * t
     double deceleration_distance = (max_vel + final_vel) / 2 * deceleration_time;
 
-    double time_at_max_vel = (distance_to_dest - acceleration_distance - deceleration_distance) /
-                             max_vel;
+    double time_at_max_vel =
+        (distance_to_dest - acceleration_distance - deceleration_distance) / max_vel;
 
     double travel_time_expected = acceleration_time + time_at_max_vel + deceleration_time;
 
-    EXPECT_TRUE(TestUtil::equalWithinTolerance(Duration::fromSeconds(travel_time_expected),
-                                               getTimeToPositionForRobot(robot_location, target_location, max_vel, max_accel, 0,
-                                                                         distance_to_dest_vector.normalize(initial_vel),
-                                                                         distance_to_dest_vector.normalize(final_vel))));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(
+        Duration::fromSeconds(travel_time_expected),
+        getTimeToPositionForRobot(robot_location, target_location, max_vel, max_accel, 0,
+                                  distance_to_dest_vector.normalize(initial_vel),
+                                  distance_to_dest_vector.normalize(final_vel))));
 }
 
-TEST_F(PassingEvaluationTest,
-       getTimeToPositionForRobot_with_final_velocity_not_achievable_in_distance_and_greater_than_initial_velocity)
+TEST_F(
+    PassingEvaluationTest,
+    getTimeToPositionForRobot_with_final_velocity_not_achievable_in_distance_and_greater_than_initial_velocity)
 {
     // Check that the robot reaches the dest with in an expected time frame when
     // it does not have enough space to accelerate to the final velocity
@@ -231,35 +235,34 @@ TEST_F(PassingEvaluationTest,
 
     // Equal initial and final velocities, both in the direction of the destination
     double initial_vel = 0.0;
-    double final_vel = 4.0;
-    double max_accel = 1.0;
-    double max_vel = 4.0;
+    double final_vel   = 4.0;
+    double max_accel   = 1.0;
+    double max_vel     = 4.0;
 
     Vector distance_to_dest_vector = target_location - robot_location;
-    double distance_to_dest = distance_to_dest_vector.length();
+    double distance_to_dest        = distance_to_dest_vector.length();
 
-    // The robot is accelerating throughout the path (since the final velocity is too great for it
-    // to reach within the distance)
-    // t = (-Vi + sqrt(Vi^2 + 2 * a * d)) / a
-    double acceleration_time = (-initial_vel + std::sqrt(std::pow(initial_vel, 2) + 2 * max_accel * distance_to_dest)) / max_accel;
+    // The robot is accelerating throughout the path (since the final velocity is too
+    // great for it to reach within the distance) t = (-Vi + sqrt(Vi^2 + 2 * a * d)) / a
+    double acceleration_time =
+        (-initial_vel +
+         std::sqrt(std::pow(initial_vel, 2) + 2 * max_accel * distance_to_dest)) /
+        max_accel;
 
     // For the upper bound, just choose a time that's much greater then we would expect
     double max_time_to_dest = 5.0;
 
     Duration t =
-            getTimeToPositionForRobot(robot_location, target_location, max_vel, max_accel, 0,
-                                      distance_to_dest_vector.normalize(initial_vel),
-                                      distance_to_dest_vector.normalize(final_vel));
-    EXPECT_LE(
-            Duration::fromSeconds(acceleration_time),
-            t);
-    EXPECT_GE(
-            Duration::fromSeconds(max_time_to_dest),
-            t);
+        getTimeToPositionForRobot(robot_location, target_location, max_vel, max_accel, 0,
+                                  distance_to_dest_vector.normalize(initial_vel),
+                                  distance_to_dest_vector.normalize(final_vel));
+    EXPECT_LE(Duration::fromSeconds(acceleration_time), t);
+    EXPECT_GE(Duration::fromSeconds(max_time_to_dest), t);
 }
 
-TEST_F(PassingEvaluationTest,
-       getTimeToPositionForRobot_with_final_velocity_not_achievable_in_distance_and_smaller_than_initial_velocity)
+TEST_F(
+    PassingEvaluationTest,
+    getTimeToPositionForRobot_with_final_velocity_not_achievable_in_distance_and_smaller_than_initial_velocity)
 {
     // Check that the robot reaches the dest with in an expected time frame when
     // it does not have enough space to accelerate to the final velocity
@@ -269,29 +272,28 @@ TEST_F(PassingEvaluationTest,
 
     // Equal initial and final velocities, both in the direction of the destination
     double initial_vel = 4.0;
-    double final_vel = 0.0;
-    double max_accel = 1.0;
-    double max_vel = 4.0;
+    double final_vel   = 0.0;
+    double max_accel   = 1.0;
+    double max_vel     = 4.0;
 
     Vector distance_to_dest_vector = target_location - robot_location;
-    double distance_to_dest = distance_to_dest_vector.length();
+    double distance_to_dest        = distance_to_dest_vector.length();
 
-    // The robot is decelerating throughout the path (since the final velocity is too small for it
-    // to reach within the distance)
-    // t = (-Vi + sqrt(Vi^2 + 2 * a * d)) / a, with a being negative due to deceleration
-    double acceleration_time = (-initial_vel + std::sqrt(std::pow(initial_vel, 2) - 2 * max_accel * distance_to_dest)) / -max_accel;
+    // The robot is decelerating throughout the path (since the final velocity is too
+    // small for it to reach within the distance) t = (-Vi + sqrt(Vi^2 + 2 * a * d)) / a,
+    // with a being negative due to deceleration
+    double acceleration_time =
+        (-initial_vel +
+         std::sqrt(std::pow(initial_vel, 2) - 2 * max_accel * distance_to_dest)) /
+        -max_accel;
 
     // For the upper bound, just choose a time that's much greater then we would expect
     double max_time_to_dest = 5.0;
 
     Duration t =
-            getTimeToPositionForRobot(robot_location, target_location, max_vel, max_accel, 0,
-                                      distance_to_dest_vector.normalize(initial_vel),
-                                      distance_to_dest_vector.normalize(final_vel));
-    EXPECT_LE(
-            Duration::fromSeconds(acceleration_time),
-            t);
-    EXPECT_GE(
-            Duration::fromSeconds(max_time_to_dest),
-            t);
+        getTimeToPositionForRobot(robot_location, target_location, max_vel, max_accel, 0,
+                                  distance_to_dest_vector.normalize(initial_vel),
+                                  distance_to_dest_vector.normalize(final_vel));
+    EXPECT_LE(Duration::fromSeconds(acceleration_time), t);
+    EXPECT_GE(Duration::fromSeconds(max_time_to_dest), t);
 }
