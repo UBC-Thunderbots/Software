@@ -30,7 +30,7 @@ struct AllPasses
  * @param friendly_team The same team of the robot with the possession of the ball
  * @param enemy_team The opposing team of the robot with the possession of the ball
  * @param radius The radius around a robot to be treated as an obstacle
- * 
+ *
  * @return A vector containing end positions of all direct passes to open robots on the
  * friendly_team, a direct pass is a pass where there is no obstacle between the robot and
  * end position
