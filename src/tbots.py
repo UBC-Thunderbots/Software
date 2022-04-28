@@ -26,6 +26,7 @@ if __name__ == "__main__":
     parser.add_argument("search_query")
     parser.add_argument("-p", "--print_command", action="store_true")
     parser.add_argument("-d", "--debug_build", action="store_true")
+    parser.add_argument("-ds", "--select_debug_binaries", action="store")
     parser.add_argument("-i", "--interactive", action="store_true")
 
     # These are shortcut args for commonly used arguments on our tests
@@ -73,8 +74,17 @@ if __name__ == "__main__":
     command = ["bazel", args.action, target]
 
     # Trigger a debug build
-    if args.debug_build:
+    if args.debug_build or args.select_debug_binaries:
         command += ["-c", "dbg"]
+
+    # Select debug binaries to run
+    if args.select_debug_binaries:
+        if "sim" in args.select_debug_binaries:
+            unknown_args += ["--debug_simulator"]
+        if "blue" in args.select_debug_binaries:
+            unknown_args += ["--debug_blue_full_system"]
+        if "yellow" in args.select_debug_binaries:
+            unknown_args += ["--debug_yellow_full_system"]
 
     # If its a binary, then run under gdb. We need to special case thunderscope
     # because it relies on --debug_simulator, --debug_blue_full_system and
