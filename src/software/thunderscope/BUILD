@@ -7,6 +7,7 @@ py_binary(
     srcs = ["thunderscope_main.py"],
     deps = [
         ":thunderscope",
+        ":replay",
         "//software/thunderscope:binary_context_managers",
     ],
 )
@@ -78,6 +79,11 @@ py_library(
 py_library(
     name = "binary_context_managers",
     srcs = ["binary_context_managers.py"],
+)
+
+py_library(
+    name = "replay",
+    srcs = ["replay.py"],
 )
 
 py_library(

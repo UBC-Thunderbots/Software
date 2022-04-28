@@ -2,6 +2,7 @@ from software.thunderscope.thunderscope import Thunderscope
 from software.thunderscope.binary_context_managers import *
 from proto.message_translation import tbots_protobuf
 import software.python_bindings as cpp_bindings
+from software.thunderscope.replay import ProtoLogger
 
 import time
 import threading
@@ -179,6 +180,7 @@ if __name__ == "__main__":
     #
     # The async sim ticket ticks the simulator at a fixed rate.
     else:
+        print("GETTING HERE")
 
         def __async_sim_ticker(tick_rate_ms):
             """Setup the world and tick simulation forever

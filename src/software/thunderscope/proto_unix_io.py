@@ -53,6 +53,7 @@ class ProtoUnixIO:
     def __init__(self):
         # Mapping from ProtoType.DESCRIPTOR.full_name -> buffer
         self.proto_observers = {}
+        self.all_proto_observers = []
         self.unix_senders = {}
         self.unix_listeners = {}
         self.send_proto_to_observer_threads = {}
@@ -74,6 +75,12 @@ class ProtoUnixIO:
                     except queue.Full:
                         pass
 
+            for buffer in self.all_proto_observers:
+                try:
+                    buffer.put(proto, block=False)
+                except queue.Full:
+                    print("Replay packet dropped")
+
     def register_observer(self, proto_class, buffer):
         """Register a widget to consume from a given protobuf class
 
@@ -85,6 +92,14 @@ class ProtoUnixIO:
             self.proto_observers[proto_class.DESCRIPTOR.full_name].append(buffer)
         else:
             self.proto_observers[proto_class.DESCRIPTOR.full_name] = [buffer]
+
+    def register_to_observe_everything(self, buffer):
+        """Register a buffer to listen to all protobufs
+
+        :param buffer: buffer to store data
+        
+        """
+        self.all_proto_observers.append(buffer)
 
     def send_proto(self, proto_class, data):
         """Send the data to all register_observers
