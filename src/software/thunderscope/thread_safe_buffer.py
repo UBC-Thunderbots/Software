@@ -36,13 +36,14 @@ class ThreadSafeBuffer(object):
         self.protos_dropped = 0
         self.last_logged_protos_dropped = 0
 
-    def get(self, block=False):
+    def get(self, block=False, timeout=None):
         """Get data from the buffer. If the buffer is empty, and
         block is True, wait until a new msg is received. If block
         is False, then return a cached value immediately.
 
         :param block: If block is True, then block until a new message
                       comes through. Otherwise returned the cached msg.
+        :param timeout: If block is True, then wait for this many seconds
 
         :return: protobuf (cached if block is False and there is no data
                  in the buffer)
@@ -62,7 +63,7 @@ class ThreadSafeBuffer(object):
             self.last_logged_protos_dropped = self.protos_dropped
 
         if block:
-            return self.queue.get()
+            return self.queue.get(timeout=timeout)
 
         try:
             self.cached_msg = self.queue.get_nowait()

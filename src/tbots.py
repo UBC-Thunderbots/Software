@@ -77,13 +77,13 @@ if __name__ == "__main__":
         command += ["-c", "dbg"]
 
     # If its a binary, then run under gdb. We need to special case thunderscope
-    # because it relies on --debug_simulator, --debug_blue_fullsystem and
-    # --debug_yellow_fullsystem prompts the user to run the command under gdb
+    # because it relies on --debug_simulator, --debug_blue_full_system and
+    # --debug_yellow_full_system prompts the user to run the command under gdb
     # instead. So we only run_under gdb if its _not_ a thunderscope debug command
     if args.action in "run" and args.debug_build:
         if (
-            "--debug_yellow_fullsystem" not in unknown_args
-            and "--debug_blue_fullsystem" not in unknown_args
+            "--debug_yellow_full_system" not in unknown_args
+            and "--debug_blue_full_system" not in unknown_args
             and "--debug_simulator" not in unknown_args
         ):
             command += ["--run_under=gdb"]
@@ -107,8 +107,8 @@ if __name__ == "__main__":
         command += ['--test_arg="' + arg + '"' for arg in bazel_arguments]
 
         if (
-            "--debug_blue_fullsystem" in unknown_args
-            or "--debug_yellow_fullsystem" in unknown_args
+            "--debug_blue_full_system" in unknown_args
+            or "--debug_yellow_full_system" in unknown_args
             or "--debug_simulator" in unknown_args
         ):
             print(

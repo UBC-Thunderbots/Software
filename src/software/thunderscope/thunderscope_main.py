@@ -36,30 +36,30 @@ if __name__ == "__main__":
         default="/tmp/tbots/sim",
     )
     parser.add_argument(
-        "--blue_fullsystem_runtime_dir",
+        "--blue_full_system_runtime_dir",
         type=str,
-        help="blue fullsystem runtime directory",
+        help="blue full_system runtime directory",
         default="/tmp/tbots/blue",
     )
     parser.add_argument(
-        "--yellow_fullsystem_runtime_dir",
+        "--yellow_full_system_runtime_dir",
         type=str,
-        help="yellow fullsystem runtime directory",
+        help="yellow full_system runtime directory",
         default="/tmp/tbots/yellow",
     )
 
     # Debugging
     parser.add_argument(
-        "--debug_blue_fullsystem",
+        "--debug_blue_full_system",
         action="store_true",
         default=False,
-        help="Debug blue fullsystem",
+        help="Debug blue full_system",
     )
     parser.add_argument(
-        "--debug_yellow_fullsystem",
+        "--debug_yellow_full_system",
         action="store_true",
         default=False,
-        help="Debug yellow fullsystem",
+        help="Debug yellow full_system",
     )
     parser.add_argument(
         "--debug_simulator",
@@ -150,15 +150,15 @@ if __name__ == "__main__":
     # and 1 instance of RobotCommunication which will send/recv packets over
     # the provided multicast channel.
     proto_unix_io = tscope.blue_full_system_proto_unix_io
-    runtime_dir = args.blue_fullsystem_runtime_dir
+    runtime_dir = args.blue_full_system_runtime_dir
     friendly_colour_yellow = False
-    debug = args.debug_blue_fullsystem
+    debug = args.debug_blue_full_system
 
     if args.run_yellow:
         proto_unix_io = tscope.yellow_full_system_proto_unix_io
-        runtime_dir = args.yellow_fullsystem_runtime_dir
+        runtime_dir = args.yellow_full_system_runtime_dir
         friendly_colour_yellow = True
-        debug = args.debug_yellow_fullsystem
+        debug = args.debug_yellow_full_system
 
     if args.run_blue or args.run_yellow:
         # TODO (#2585): Support multiple channels
@@ -214,9 +214,9 @@ if __name__ == "__main__":
         with Simulator(
             args.simulator_runtime_dir, args.debug_simulator
         ) as simulator, FullSystem(
-            args.blue_fullsystem_runtime_dir, args.debug_blue_fullsystem, False
+            args.blue_full_system_runtime_dir, args.debug_blue_full_system, False
         ) as blue_fs, FullSystem(
-            args.yellow_fullsystem_runtime_dir, args.debug_yellow_fullsystem, True
+            args.yellow_full_system_runtime_dir, args.debug_yellow_full_system, True
         ) as yellow_fs, Gamecontroller() as gamecontroller:
 
             blue_fs.setup_proto_unix_io(tscope.blue_full_system_proto_unix_io)
