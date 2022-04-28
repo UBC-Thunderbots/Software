@@ -190,14 +190,8 @@ if __name__ == "__main__":
                 blue_robot_locations=[
                     cpp_bindings.Point(-3, y) for y in numpy.linspace(-2, 2, NUM_ROBOTS)
                 ],
-                blue_robot_velocities=[
-                    cpp_bindings.Vector(0, 0.1) for y in range(NUM_ROBOTS)
-                ],
                 yellow_robot_locations=[
                     cpp_bindings.Point(3, y) for y in numpy.linspace(-2, 2, NUM_ROBOTS)
-                ],
-                yellow_robot_velocities=[
-                    cpp_bindings.Vector(0, -0.1) for y in range(NUM_ROBOTS)
                 ],
                 ball_location=cpp_bindings.Point(0, 0),
                 ball_velocity=cpp_bindings.Vector(0, 0),
