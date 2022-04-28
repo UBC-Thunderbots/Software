@@ -3,6 +3,15 @@ package(default_visibility = ["//visibility:public"])
 load("@thunderscope_deps//:requirements.bzl", "requirement")
 
 py_binary(
+    name = "thunderscope_main",
+    srcs = ["thunderscope_main.py"],
+    deps = [
+        ":thunderscope",
+        "//software/thunderscope:binary_context_managers",
+    ],
+)
+
+py_library(
     name = "thunderscope",
     srcs = ["thunderscope.py"],
     data = [
@@ -17,7 +26,6 @@ py_binary(
         "//proto/message_translation:py_tbots_protobuf",
         "//software/networking:threaded_unix_listener_py",
         "//software/networking:threaded_unix_sender_py",
-        "//software/thunderscope:binary_context_managers",
         "//software/thunderscope:colors",
         "//software/thunderscope:common_widgets",
         "//software/thunderscope:constants",

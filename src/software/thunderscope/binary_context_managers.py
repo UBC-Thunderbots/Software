@@ -82,26 +82,29 @@ class FullSystem(object):
         )
 
         if self.debug_fullsystem:
-            logging.info(
-                (
-                    "\n\nDebugging Fullsystem ==============\n\n"
-                    "1. Build the full system in debug mode:\n"
-                    "./tbots.py -d build unix_full_system\n\n"
-                    "2. Run the following binaries from src to debug full system:\n"
-                    f"gdb --args bazel-bin/{full_system}\n"
-                    "3. Rerun this binary once the gdb instance is setup\n"
-                )
-            )
 
             # We don't want to check the exact command because this binary could
             # be debugged from clion or somewhere other than gdb
-            while not is_cmd_running(
+            if not is_cmd_running(
                 [
                     "unix_full_system",
                     "--runtime_dir={}".format(self.fullsystem_runtime_dir),
                 ]
             ):
-                time.sleep(Simulator.DEBUG_MODE_POLL_INTERVAL_S)
+                logging.info(
+                    (
+                        "\n\nDebugging Fullsystem ==============\n\n"
+                        "1. Build the full system in debug mode:\n"
+                        "./tbots.py -d build unix_full_system\n\n"
+                        "2. Run the following binaries from src to debug full system:\n\n"
+                        f"gdb --args bazel-bin/{full_system}\n"
+                        "3. Rerun this binary once the gdb instance is setup\n"
+                    )
+                )
+
+                # Wait for the user to exit and restart the binary
+                while True:
+                    time.sleep(1)
 
         else:
             self.fullsystem_proc = Popen(full_system.split(" "))
@@ -204,27 +207,29 @@ class Simulator(object):
         )
 
         if self.debug_simulator:
-            logging.info(
-                (
-                    "\n\nDebugging Simulator ==============\n\n"
-                    "1. Build the simulator in debug mode:\n"
-                    "./tbots.py -d build er_force_simulator_main\n\n"
-                    "2. Run the following binary from src to debug the simulator:\n"
-                    f"gdb --args bazel-bin/{simulator_command}\n"
-                    "3. Rerun this binary once the gdb instance is setup\n"
-                )
-            )
 
             # We don't want to check the exact command because this binary could
             # be debugged from clion or somewhere other than gdb
-            while not is_cmd_running(
+            if not is_cmd_running(
                 [
                     "er_force_simulator_main",
                     "--runtime_dir={}".format(self.simulator_runtime_dir),
                 ]
             ):
-                time.sleep(Simulator.DEBUG_MODE_POLL_INTERVAL_S)
+                logging.info(
+                    (
+                        "\n\nDebugging Simulator ==============\n\n"
+                        "1. Build the simulator in debug mode:\n"
+                        "./tbots.py -d build er_force_simulator_main\n\n"
+                        "2. Run the following binary from src to debug the simulator:\n\n"
+                        f"gdb --args bazel-bin/{simulator_command}\n"
+                        "3. Rerun this binary once the gdb instance is setup\n"
+                    )
+                )
 
+                # Wait for the user to exit and restart the binary
+                while True:
+                    time.sleep(1)
         else:
             self.er_force_simulator_proc = Popen(simulator_command.split(" "))
 

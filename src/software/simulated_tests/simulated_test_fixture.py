@@ -1,7 +1,6 @@
 import threading
 import argparse
 import time
-import queue
 
 import pytest
 import software.python_bindings as tbots
@@ -14,6 +13,7 @@ from software.simulated_tests.robot_enters_region import RobotEntersRegion
 
 from software.simulated_tests import validation
 from software.thunderscope.thunderscope import Thunderscope
+from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.py_constants import MILLISECONDS_PER_SECOND
 from software.thunderscope.binary_context_managers import (
@@ -58,7 +58,7 @@ class SimulatorTestRunner(object):
         self.blue_full_system_proto_unix_io = blue_full_system_proto_unix_io
         self.yellow_full_system_proto_unix_io = yellow_full_system_proto_unix_io
         self.gamecontroller = gamecontroller
-        self.world_buffer = queue.Queue()
+        self.world_buffer = ThreadSafeBuffer(buffer_size=1, protobuf_type=World)
         self.last_exception = None
 
     def run_test(
@@ -109,7 +109,7 @@ class SimulatorTestRunner(object):
                 if self.thunderscope:
                     time.sleep(tick_duration_s)
 
-                world = self.world_buffer.get()
+                world = self.world_buffer.get(block=True)
 
                 # Validate
                 (
@@ -206,10 +206,16 @@ def load_command_line_arguments():
         help="Which layout to run, if not specified the last layout will run",
     )
     parser.add_argument(
-        "--debug_fullsystem",
+        "--debug_blue_fullsystem",
         action="store_true",
         default=False,
-        help="Debug fullsystem",
+        help="Debug blue fullsystem",
+    )
+    parser.add_argument(
+        "--debug_yellow_fullsystem",
+        action="store_true",
+        default=False,
+        help="Debug yellow fullsystem",
     )
     parser.add_argument(
         "--debug_simulator",
@@ -246,9 +252,9 @@ def simulated_test_runner():
     with Simulator(
         args.simulator_runtime_dir, args.debug_simulator
     ) as simulator, FullSystem(
-        args.blue_fullsystem_runtime_dir, args.debug_fullsystem, False
+        args.blue_fullsystem_runtime_dir, args.debug_blue_fullsystem, False
     ) as blue_fs, FullSystem(
-        args.yellow_fullsystem_runtime_dir, args.debug_fullsystem, True
+        args.yellow_fullsystem_runtime_dir, args.debug_yellow_fullsystem, True
     ) as yellow_fs:
         with Gamecontroller(
             supress_logs=(not args.show_gamecontroller_logs), ci_mode=True

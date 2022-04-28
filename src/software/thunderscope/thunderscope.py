@@ -1,11 +1,7 @@
 import os
-import atexit
-import signal
-import threading
 import time
 import shelve
 import signal
-import argparse
 import platform
 import numpy
 
@@ -186,7 +182,7 @@ class Thunderscope(object):
                 "Cntrl+S: Save Layout\n"
                 "Cntrl+O: Open Layout\n"
                 "Cntrl+R: will remove the file and reset the layout\n"
-                f"\nLayout file (on save) is located at \n{SAVED_LAYOUT_PATH}\n"
+                f"\nLayout file (on save) is located at \n{SAVED_LAYOUT_PATH}\n\n"
                 "I to identify robots, show their IDs\n"
                 "\nMouse Shortcuts:\n\n"
                 "Double Click Purple Bar to pop window out\n"
@@ -286,15 +282,8 @@ class Thunderscope(object):
 
         try:
             self.load_layout(path)
-
-        except Exception as exc:
-            print(
-                exc,
-                Warning(
-                    "No layout file specified and default "
-                    + "layout at {} doesn't exist".format(path)
-                ),
-            )
+        except Exception:
+            pass
 
     def register_refresh_function(self, refresh_func):
         """Register the refresh functions to run at the refresh_interval_ms
@@ -494,212 +483,3 @@ class Thunderscope(object):
 
     def close(self):
         QtCore.QTimer.singleShot(0, self.window.close)
-
-
-if __name__ == "__main__":
-
-    # Setup parser
-    parser = argparse.ArgumentParser(
-        description="Thunderscope: Run with no arguments to run AI vs AI"
-    )
-
-    parser.add_argument(
-        "--layout",
-        action="store",
-        help="Which layout to run, if not specified the last layout will run",
-    )
-
-    # Runtime directories
-    parser.add_argument(
-        "--simulator_runtime_dir",
-        type=str,
-        help="simulator runtime directory",
-        default="/tmp/tbots/sim",
-    )
-    parser.add_argument(
-        "--blue_fullsystem_runtime_dir",
-        type=str,
-        help="blue fullsystem runtime directory",
-        default="/tmp/tbots/blue",
-    )
-    parser.add_argument(
-        "--yellow_fullsystem_runtime_dir",
-        type=str,
-        help="yellow fullsystem runtime directory",
-        default="/tmp/tbots/yellow",
-    )
-
-    # Debugging
-    parser.add_argument(
-        "--debug_fullsystem",
-        action="store_true",
-        default=False,
-        help="Debug fullsystem",
-    )
-    parser.add_argument(
-        "--debug_simulator",
-        action="store_true",
-        default=False,
-        help="Debug the simulator",
-    )
-    parser.add_argument(
-        "--visualize_cpp_test",
-        action="store_true",
-        default=False,
-        help="Visualize C++ Tests",
-    )
-
-    # Run blue or yellow full system over WiFi
-    group = parser.add_mutually_exclusive_group()
-    group.add_argument(
-        "--run_blue",
-        action="store_true",
-        help="Run full system as the blue team, over WiFi; estop required",
-    )
-    group.add_argument(
-        "--run_yellow",
-        action="store_true",
-        help="Run full system as the yellow team, over WiFi; estop required",
-    )
-    parser.add_argument(
-        "--interface",
-        action="store",
-        type=str,
-        default=None,
-        help="Which interface to communicate over",
-    )
-    parser.add_argument(
-        "--visualization_buffer_size",
-        action="store",
-        type=int,
-        default=5,
-        help="How many packets to buffer while rendering",
-    )
-
-    # Sanity check that an interface was provided
-    args = parser.parse_args()
-
-    if args.run_blue or args.run_yellow:
-        if args.interface is None:
-            parser.error("Must specify interface")
-
-    tscope = Thunderscope(visualization_buffer_size=args.visualization_buffer_size)
-
-    # TODO (#2581) remove this
-    if args.visualize_cpp_test:
-
-        runtime_dir = "/tmp/tbots/yellow_test"
-
-        try:
-            os.mkdirs(runtime_dir)
-        except OSError:
-            pass
-
-        proto_unix_io = tscope.blue_full_system_proto_unix_io
-
-        # Setup LOG(VISUALIZE) handling from full system. We set from_log_visualize
-        # to true to decode from base64.
-        for arg in [
-            (runtime_dir, Obstacles, True),
-            (runtime_dir, PathVisualization, True),
-            (runtime_dir, PassVisualization, True),
-            (runtime_dir, NamedValue, True),
-            (runtime_dir, World, True),
-            (runtime_dir, PlayInfo, True),
-        ]:
-            proto_unix_io.attach_unix_receiver(*arg)
-
-        proto_unix_io.attach_unix_receiver(runtime_dir + "/log", RobotLog)
-
-        tscope.load_saved_layout(args.layout, load_yellow=True)
-        tscope.show()
-
-    ###########################################################################
-    #              AI + Robot Communication + Robot Diagnostics               #
-    ###########################################################################
-    #
-    # When we are running with real robots. We want to run 1 instance of AI
-    # and 1 instance of RobotCommunication which will send/recv packets over
-    # the provided multicast channel.
-    proto_unix_io = tscope.blue_full_system_proto_unix_io
-    runtime_dir = args.blue_fullsystem_runtime_dir
-    friendly_colour_yellow = False
-
-    if args.run_yellow:
-        proto_unix_io = tscope.yellow_full_system_proto_unix_io
-        runtime_dir = args.yellow_fullsystem_runtime_dir
-        friendly_colour_yellow = True
-
-    if args.run_blue or args.run_yellow:
-        # TODO (#2585): Support multiple channels
-        with RobotCommunication(
-            proto_unix_io, ROBOT_MULTICAST_CHANNEL_0, args.interface
-        ), FullSystem(
-            runtime_dir, args.debug_fullsystem, friendly_colour_yellow
-        ) as full_system:
-            tscope.load_saved_layout(
-                args.layout, load_blue=args.run_blue, load_yellow=args.run_yellow
-            )
-            tscope.show()
-
-    ###########################################################################
-    #           Blue AI vs Yellow AI + Simulator + Gamecontroller             #
-    ###########################################################################
-    #
-    # Run two AIs against each other with the er-force simulator. We also run
-    # the gamecontroller which can be accessed from http://localhost:8081
-    #
-    # The async sim ticket ticks the simulator at a fixed rate.
-    else:
-
-        def __async_sim_ticker(tick_rate_ms):
-            """Setup the world and tick simulation forever
-
-            :param tick_rate_ms: The tick rate of the simulation
-
-            """
-            world_state = tbots_protobuf.create_world_state(
-                [cpp_bindings.Point(3, y) for y in numpy.linspace(-2, 2, NUM_ROBOTS)],
-                [cpp_bindings.Point(-3, y) for y in numpy.linspace(-2, 2, NUM_ROBOTS)],
-                ball_location=cpp_bindings.Point(0, 0),
-                ball_velocity=cpp_bindings.Vector(0, 0),
-            )
-            tscope.simulator_proto_unix_io.send_proto(WorldState, world_state)
-
-            # Tick Simulation
-            while True:
-                tick = SimulatorTick(milliseconds=tick_rate_ms)
-                tscope.simulator_proto_unix_io.send_proto(SimulatorTick, tick)
-                time.sleep(tick_rate_ms / 1000)
-
-        # Launch all binaries
-        with Simulator(
-            args.simulator_runtime_dir, args.debug_simulator
-        ) as simulator, FullSystem(
-            args.blue_fullsystem_runtime_dir, args.debug_fullsystem, False
-        ) as blue_fs, FullSystem(
-            args.yellow_fullsystem_runtime_dir, args.debug_fullsystem, True
-        ) as yellow_fs, Gamecontroller() as gamecontroller:
-
-            blue_fs.setup_proto_unix_io(tscope.blue_full_system_proto_unix_io)
-            yellow_fs.setup_proto_unix_io(tscope.yellow_full_system_proto_unix_io)
-            simulator.setup_proto_unix_io(
-                tscope.simulator_proto_unix_io,
-                tscope.blue_full_system_proto_unix_io,
-                tscope.yellow_full_system_proto_unix_io,
-            )
-            gamecontroller.setup_proto_unix_io(
-                tscope.blue_full_system_proto_unix_io,
-                tscope.yellow_full_system_proto_unix_io,
-            )
-
-            tscope.load_saved_layout(args.layout)
-
-            # Start the simulator
-            thread = threading.Thread(
-                target=__async_sim_ticker, args=(SIM_TICK_RATE_MS,), daemon=True,
-            )
-
-            thread.start()
-            tscope.show()
-            thread.join()
