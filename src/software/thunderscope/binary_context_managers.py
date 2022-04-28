@@ -45,50 +45,50 @@ class FullSystem(object):
 
     def __init__(
         self,
-        fullsystem_runtime_dir=None,
-        debug_fullsystem=False,
+        full_system_runtime_dir=None,
+        debug_full_system=False,
         friendly_colour_yellow=False,
     ):
         """Run FullSystem
 
-        :param fullsystem_runtime_dir: The directory to run the blue fullsystem in
-        :param debug_fullsystem: Whether to run the fullsystem in debug mode
+        :param full_system_runtime_dir: The directory to run the blue full_system in
+        :param debug_full_system: Whether to run the full_system in debug mode
 
         """
-        self.fullsystem_runtime_dir = fullsystem_runtime_dir
-        self.debug_fullsystem = debug_fullsystem
+        self.full_system_runtime_dir = full_system_runtime_dir
+        self.debug_full_system = debug_full_system
         self.friendly_colour_yellow = friendly_colour_yellow
-        self.fullsystem_proc = None
+        self.full_system_proc = None
 
     def __enter__(self):
-        """Enter the fullsystem context manager. 
+        """Enter the full_system context manager. 
 
         If the debug mode is enabled then the binary is _not_ run and the
         command to debug under gdb is printed. The  context manager will then
         wait for the binary to be launched before continuing.
 
-        :return: fullsystem context managed instance
+        :return: full_system context managed instance
 
         """
         # Setup unix socket directory
         try:
-            os.makedirs(self.fullsystem_runtime_dir)
+            os.makedirs(self.full_system_runtime_dir)
         except:
             pass
 
         full_system = "software/unix_full_system --runtime_dir={} {}".format(
-            self.fullsystem_runtime_dir,
+            self.full_system_runtime_dir,
             "--friendly_colour_yellow" if self.friendly_colour_yellow else "",
         )
 
-        if self.debug_fullsystem:
+        if self.debug_full_system:
 
             # We don't want to check the exact command because this binary could
             # be debugged from clion or somewhere other than gdb
             if not is_cmd_running(
                 [
                     "unix_full_system",
-                    "--runtime_dir={}".format(self.fullsystem_runtime_dir),
+                    "--runtime_dir={}".format(self.full_system_runtime_dir),
                 ]
             ):
                 logging.info(
@@ -107,52 +107,52 @@ class FullSystem(object):
                     time.sleep(1)
 
         else:
-            self.fullsystem_proc = Popen(full_system.split(" "))
+            self.full_system_proc = Popen(full_system.split(" "))
 
         return self
 
     def __exit__(self, type, value, traceback):
-        """Exit the fullsystem context manager.
+        """Exit the full_system context manager.
 
         :param type: The type of exception that was raised
         :param value: The exception that was raised
         :param traceback: The traceback of the exception
 
         """
-        if self.fullsystem_proc:
-            self.fullsystem_proc.kill()
-            self.fullsystem_proc.wait()
+        if self.full_system_proc:
+            self.full_system_proc.kill()
+            self.full_system_proc.wait()
 
     def setup_proto_unix_io(self, proto_unix_io):
         """Helper to run full system and attach the appropriate unix senders/listeners
 
-        :param proto_unix_io: The unix io to setup for this fullsystem instance
+        :param proto_unix_io: The unix io to setup for this full_system instance
 
         """
 
         # Setup LOG(VISUALIZE) handling from full system. We set from_log_visualize
         # to true to decode from base64.
         for arg in [
-            (self.fullsystem_runtime_dir, Obstacles, True),
-            (self.fullsystem_runtime_dir, PathVisualization, True),
-            (self.fullsystem_runtime_dir, PassVisualization, True),
-            (self.fullsystem_runtime_dir, NamedValue, True),
-            (self.fullsystem_runtime_dir, PlayInfo, True),
+            (self.full_system_runtime_dir, Obstacles, True),
+            (self.full_system_runtime_dir, PathVisualization, True),
+            (self.full_system_runtime_dir, PassVisualization, True),
+            (self.full_system_runtime_dir, NamedValue, True),
+            (self.full_system_runtime_dir, PlayInfo, True),
         ]:
             proto_unix_io.attach_unix_receiver(*arg)
 
         proto_unix_io.attach_unix_receiver(
-            self.fullsystem_runtime_dir + "/log", RobotLog
+            self.full_system_runtime_dir + "/log", RobotLog
         )
 
         # Inputs to full_system
         for arg in [
-            (self.fullsystem_runtime_dir + ROBOT_STATUS_PATH, RobotStatus),
-            (self.fullsystem_runtime_dir + SSL_WRAPPER_PATH, SSL_WrapperPacket),
-            (self.fullsystem_runtime_dir + SSL_REFEREE_PATH, Referee),
-            (self.fullsystem_runtime_dir + SENSOR_PROTO_PATH, SensorProto),
+            (self.full_system_runtime_dir + ROBOT_STATUS_PATH, RobotStatus),
+            (self.full_system_runtime_dir + SSL_WRAPPER_PATH, SSL_WrapperPacket),
+            (self.full_system_runtime_dir + SSL_REFEREE_PATH, Referee),
+            (self.full_system_runtime_dir + SENSOR_PROTO_PATH, SensorProto),
             (
-                self.fullsystem_runtime_dir + TACTIC_OVERRIDE_PATH,
+                self.full_system_runtime_dir + TACTIC_OVERRIDE_PATH,
                 AssignedTacticPlayControlParams,
             ),
         ]:
@@ -160,10 +160,10 @@ class FullSystem(object):
 
         # Outputs from full_system
         proto_unix_io.attach_unix_receiver(
-            self.fullsystem_runtime_dir + WORLD_PATH, World
+            self.full_system_runtime_dir + WORLD_PATH, World
         )
         proto_unix_io.attach_unix_receiver(
-            self.fullsystem_runtime_dir + PRIMITIVE_PATH, PrimitiveSet
+            self.full_system_runtime_dir + PRIMITIVE_PATH, PrimitiveSet
         )
 
 
@@ -236,7 +236,7 @@ class Simulator(object):
         return self
 
     def __exit__(self, type, value, traceback):
-        """Exit the fullsystem context manager.
+        """Exit the full_system context manager.
 
         :param type: The type of exception that was raised
         :param value: The exception that was raised
