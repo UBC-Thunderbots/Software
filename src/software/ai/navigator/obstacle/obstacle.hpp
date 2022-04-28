@@ -8,8 +8,10 @@
 #include "software/ai/navigator/obstacle/obstacle_visitor.h"
 #include "software/geom/algorithms/distance.h"
 #include "software/geom/algorithms/intersects.h"
+#include "software/geom/algorithms/generate_velocity_obstacle.h"
 #include "software/geom/point.h"
 #include "software/geom/segment.h"
+#include "extlibs/hrvo/agent.h"
 
 /**
  * An obstacle is an area to avoid for navigation
@@ -49,6 +51,11 @@ class Obstacle
     virtual std::vector<Point> rasterize(const double) const = 0;
 
     /**
+     * Draw a velocity obstacle for the given agent to this obstacle
+     */
+    virtual Agent::VelocityObstacle generateVelocityObstacle(const Agent&) const = 0;
+
+    /**
      * Output string to describe the obstacle
      *
      * @return string that describes the obstacle
@@ -82,6 +89,7 @@ class GeomObstacle : public Obstacle
     std::string toString(void) const override;
     void accept(ObstacleVisitor& visitor) const override;
     std::vector<Point> rasterize(const double resolution_size) const override;
+    Agent::VelocityObstacle generateVelocityObstacle(const Agent&) const override;
 
     /**
      * Gets the underlying GEOM_TYPE
@@ -144,6 +152,12 @@ template <typename GEOM_TYPE>
 std::vector<Point> GeomObstacle<GEOM_TYPE>::rasterize(const double resolution_size) const
 {
     return ::rasterize(geom_, resolution_size);
+}
+
+template <typename GEOM_TYPE>
+Agent::VelocityObstacle GeomObstacle<GEOM_TYPE>::generateVelocityObstacle(const Agent& agent) const
+{
+    return ::generateVelocityObstacle(geom_, agent);
 }
 
 template <typename GEOM_TYPE>

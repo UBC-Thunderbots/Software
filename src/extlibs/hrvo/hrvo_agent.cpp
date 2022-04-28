@@ -72,6 +72,7 @@ void HRVOAgent::computeNeighbors()
     simulator_->getKdTree()->query(this, new_neighbor_dist);
 }
 
+// TODO: Move implementation to new file created and have this function call that!?
 Agent::VelocityObstacle HRVOAgent::createVelocityObstacle(const Agent &other_agent)
 {
     VelocityObstacle velocityObstacle;

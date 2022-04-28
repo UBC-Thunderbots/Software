@@ -392,7 +392,7 @@ void HRVOSimulator::visualize(unsigned int robot_id) const
         *(obstacle_proto.add_circle()) =
             *createCircleProto(Circle(position, agent->getRadius()));
     }
-    // LOG(VISUALIZE) << obstacle_proto;
+     LOG(VISUALIZE) << obstacle_proto;
 }
 
 std::optional<std::shared_ptr<HRVOAgent>> HRVOSimulator::getFriendlyAgentFromRobotId(
