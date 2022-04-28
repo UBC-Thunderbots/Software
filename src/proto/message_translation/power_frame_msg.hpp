@@ -10,7 +10,7 @@
 
 #ifdef PLATFORMIO_BUILD
 #include <proto/power_frame_msg.nanopb.h>
-#else
+#else  // PLATFORMIO_BUILD
 #include "proto/power_frame_msg.pb.h"
 #include "proto/primitive/primitive_types.h"
 
@@ -18,7 +18,7 @@ extern "C"
 {
 #include "proto/power_frame_msg.nanopb.h"
 }
-#endif
+#endif  // PLATFORMIO_BUILD
 
 // The nanopb generated size isn't c++ compatible so we redefine it here
 // TODO(#2592): Remove with upgrade to nanopb
@@ -100,14 +100,14 @@ TbotsProto_PowerStatus createNanoPbPowerStatus(float battery_voltage,
                                                float geneva_angle_deg,
                                                bool breakbeam_tripped, bool flyback_fault)
 {
-    TbotsProto_PowerStatus status         = TbotsProto_PowerStatus_init_default;
-    status.battery_voltage                = battery_voltage;
-    status.capacitor_voltage              = capacitor_voltage;
-    status.current_draw                   = current_draw;
-    status.high_voltage_measurement_volts = high_voltage_measurement_volts;
-    status.geneva_angle_deg               = geneva_angle_deg;
-    status.breakbream_tripped             = breakbeam_tripped;
-    status.flyback_fault                  = flyback_fault;
+    TbotsProto_PowerStatus status = {
+        .battery_voltage                = battery_voltage,
+        .capacitor_voltage              = capacitor_voltage,
+        .current_draw                   = current_draw,
+        .high_voltage_measurement_volts = high_voltage_measurement_volts,
+        .geneva_angle_deg               = geneva_angle_deg,
+        .breakbream_tripped             = breakbeam_tripped,
+        .flyback_fault                  = flyback_fault};
     return status;
 }
 

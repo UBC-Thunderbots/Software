@@ -7,13 +7,13 @@
 
 #ifdef PLATFORMIO_BUILD
 #include <power_frame_msg_platformio.h>
-#else
+#else  // PLATFORMIO_BUILD
 #include "proto/message_translation/power_frame_msg.hpp"
 extern "C"
 {
 #include "proto/power_frame_msg.nanopb.h"
 }
-#endif
+#endif  // PLATFORMIO_BUILD
 
 const uint8_t START_END_FLAG_BYTE = 0x00;
 

@@ -41,7 +41,7 @@ void loop()
     if (buffer.size() == read_buffer_size) {
         TbotsProto_PowerFrame frame = TbotsProto_PowerFrame_init_default;
         if (unmarshalUartPacket(buffer, frame)) {
-            //Perform command here
+            //TODO(#2597): Perform command here
 
             auto status = createNanoPbPowerStatus(1.2f, 2.3f, 3.4f, 4.5f, 5.6f, true, false);
             auto status_frame = createUartFrame(status);
