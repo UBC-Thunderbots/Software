@@ -183,30 +183,7 @@ void HRVOSimulator::updatePrimitiveSet(const TbotsProto::PrimitiveSet &new_primi
         auto hrvo_agent_opt = getFriendlyAgentFromRobotId(robot_id);
         if (hrvo_agent_opt.has_value())
         {
-            auto hrvo_agent = hrvo_agent_opt.value();
-            AgentPath path;
-
-            if (primitive.has_move())
-            {
-                float speed_at_dest = primitive.move().final_speed_m_per_s();
-                float new_max_speed = primitive.move().max_speed_m_per_s();
-                hrvo_agent->setMaxSpeed(new_max_speed);
-                hrvo_agent->setPreferredSpeed(new_max_speed * PREF_SPEED_SCALE);
-
-                // TODO (#2418): Update implementation of Primitive to support
-                // multiple path points
-                auto destination = primitive.move().motion_control().path().point().at(0);
-
-                // Max distance which the robot can travel in one time step + scaling
-                float path_radius =
-                    (hrvo_agent->getMaxSpeed() * time_step) / 2 * GOAL_RADIUS_SCALE;
-                path = AgentPath(
-                    {PathPoint(Vector(destination.x_meters(), destination.y_meters()),
-                               speed_at_dest)},
-                    path_radius);
-            }
-
-            hrvo_agent->setPath(path);
+            hrvo_agent_opt.value()->updatePrimitiveSet(primitive);
         }
     }
 }

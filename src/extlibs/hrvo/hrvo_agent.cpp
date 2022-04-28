@@ -40,6 +40,7 @@
 #include "kd_tree.h"
 #include "path.h"
 #include "software/geom/vector.h"
+#include "shared/parameter/cpp_dynamic_parameters.h"
 
 
 HRVOAgent::HRVOAgent(HRVOSimulator *simulator, const Vector &position, float neighborDist,
@@ -50,7 +51,9 @@ HRVOAgent::HRVOAgent(HRVOSimulator *simulator, const Vector &position, float nei
       maxNeighbors_(maxNeighbors),
       neighborDist_(neighborDist),
       prefSpeed_(prefSpeed),
-      uncertaintyOffset_(uncertaintyOffset)
+      uncertaintyOffset_(uncertaintyOffset),
+      // TODO: Would need to be updated, add ticket number
+      obstacle_factory(std::make_shared<const RobotNavigationObstacleConfig>())
 {
 }
 
@@ -173,6 +176,11 @@ void HRVOAgent::computeNewVelocity()
         VelocityObstacle velocity_obstacle = other_agent->createVelocityObstacle(*this);
         velocityObstacles_.push_back(velocity_obstacle);
     }
+
+    // TODO: Maybe simulator should own this...?
+
+    // TODO: Maybe updatePrimitiveSet should call updatePrimitive within each HRVOAgent!?!
+    obstacle_factory.createFromMotionConstraints()
 
     candidates_.clear();
     Candidate candidate;
@@ -576,6 +584,36 @@ void HRVOAgent::insertNeighbor(std::size_t agentNo, float &rangeSq)
         // possible threat of collision if we ignore it.
         add_other_agent();
     }
+}
+
+void HRVOAgent::updatePrimitiveSet(const TbotsProto::Primitive &new_primitive)
+{
+    AgentPath path;
+    if (new_primitive.has_move())
+    {
+        float speed_at_dest = new_primitive.move().final_speed_m_per_s();
+        float new_max_speed = new_primitive.move().max_speed_m_per_s();
+        setMaxSpeed(new_max_speed);
+        setPreferredSpeed(new_max_speed * PREF_SPEED_SCALE);
+
+        // TODO (#2418): Update implementation of Primitive to support
+        // multiple path points
+        auto destination = new_primitive.move().motion_control().path().point().at(0);
+
+        // Max distance which the robot can travel in one time step + scaling
+        float path_radius =
+                (getMaxSpeed() * simulator_->getTimeStep()) / 2 * GOAL_RADIUS_SCALE;
+        path = AgentPath(
+                {PathPoint(Vector(destination.x_meters(), destination.y_meters()),
+                           speed_at_dest)},
+                path_radius);
+
+        // Update static obstacles
+        // TODO: Would probably need to be converted to set of motion constraints type.
+        //       would also need to make the obstacle factory a member
+        new_primitive.move().motion_control().motion_constraints()
+    }
+    setPath(path);
 }
 
 std::vector<Polygon> HRVOAgent::getVelocityObstaclesAsPolygons() const

@@ -41,6 +41,7 @@
 #include "agent.h"
 #include "simulator.h"
 #include "software/geom/vector.h"
+#include "software/ai/navigator/obstacle/robot_navigation_obstacle_factory.h"
 
 /**
  * An agent/robot in the simulation which uses the HRVO algorithm to motion plan towards
@@ -104,6 +105,8 @@ class HRVOAgent : public Agent
      */
     void insertNeighbor(std::size_t agentNo, float &rangeSq);
 
+    void updatePrimitiveSet(const TbotsProto::Primitive &new_primitive);
+
     /**
      * Get a list of circles which represent the new velocity candidates
      * @param circle_rad The radius of the circles which represent candidates
@@ -155,6 +158,7 @@ class HRVOAgent : public Agent
     // distance -> Agent Index
     std::set<std::pair<float, std::size_t>> neighbors_;
     std::vector<VelocityObstacle> velocityObstacles_;
+    RobotNavigationObstacleFactory obstacle_factory;
 
     // TODO (#2519): Remove magic numbers
     // Increasing deceleration distance to reduce the chance of overshooting the
