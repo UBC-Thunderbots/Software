@@ -166,6 +166,25 @@ class Robot
         double TOLERANCE = BALL_TO_FRONT_OF_ROBOT_DISTANCE_WHEN_DRIBBLING) const;
 
     /**
+     * Estimate the minimum time it would take to turn to the desired orientation
+     *
+     * @param desired_orientation The orientation which we want the robot to be at
+     *
+     * @return The time required for this robot to rotate to the given orientation
+     */
+    Duration getTimeToOrientation(const Angle &desired_orientation) const;
+
+    /**
+     * Estimate the minimum time it would take to reach the desired point
+     *
+     * @param destination The destination that the robot is going to
+     * @param final_velocity The desired final velocity which the robot should be moving at
+     *
+     * @return The minimum theoretical time it would take this robot to reach the destination
+     */
+    Duration getTimeToPosition(const Point &destination, const Vector &final_velocity = Vector()) const;
+
+    /**
      * Defines the equality operator for a Robot. Robots are equal if their IDs and
      * all other parameters (position, orientation, etc) are equal. The last update
      * timestamp is not part of the equality.

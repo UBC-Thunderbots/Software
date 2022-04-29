@@ -2,6 +2,7 @@
 
 #include "shared/constants.h"
 #include "software/logger/logger.h"
+#include "software/ai/evaluation/time_to_travel.h"
 
 Robot::Robot(RobotId id, const Point &position, const Vector &velocity,
              const Angle &orientation, const AngularVelocity &angular_velocity,
@@ -169,4 +170,28 @@ Polygon Robot::dribblerArea() const
          bottom_left_position + vector_to_front.normalize(depth) +
              vector_to_front.perpendicular().normalize(width),
          bottom_left_position + vector_to_front.perpendicular().normalize(width)});
+}
+
+
+Duration Robot::getTimeToOrientation(const Angle &desired_orientation) const
+{
+    double dist = orientation().minDiff(desired_orientation).toRadians();
+    double initial_ang_vel_rad_per_sec = angularVelocity().toRadians();
+    return getTimeToTravelDistance(dist, robot_constants_.robot_max_ang_speed_rad_per_s, robot_constants_.robot_max_ang_acceleration_rad_per_s_2,
+                                   initial_ang_vel_rad_per_sec, 0);
+}
+
+Duration Robot::getTimeToPosition(const Point &destination, const Vector &final_velocity) const
+{
+    Vector dist_vector = destination - position();
+    double dist        = std::max(0.0, dist_vector.length());
+
+    // To simplify the calculations we will solve this problem with 1D kinematics
+    // by taking the component of the velocities projected onto the vector pointing
+    // towards the destination
+    double initial_velocity_1d = velocity().dot(dist_vector.normalize());
+    double final_velocity_1d   = final_velocity.dot(dist_vector.normalize());
+
+    return getTimeToTravelDistance(dist, robot_constants_.robot_max_speed_m_per_s, robot_constants_.robot_max_acceleration_m_per_s_2,
+                                   initial_velocity_1d, final_velocity_1d);
 }

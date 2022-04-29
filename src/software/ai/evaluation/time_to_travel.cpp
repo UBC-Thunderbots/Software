@@ -1,37 +1,6 @@
-#include "software/ai/evaluation/pass.h"
+#include <cmath>
 
-
-Duration getTimeToOrientationForRobot(const Angle& current_orientation,
-                                      const Angle& desired_orientation,
-                                      const double& max_velocity,
-                                      const double& max_acceleration,
-                                      const AngularVelocity& initial_angular_velocity)
-{
-    double dist = current_orientation.minDiff(desired_orientation).toRadians();
-    double initial_ang_vel_rad_per_sec = initial_angular_velocity.toRadians();
-    return getTimeToTravelDistance(dist, max_velocity, max_acceleration,
-                                   initial_ang_vel_rad_per_sec, 0);
-}
-
-Duration getTimeToPositionForRobot(const Point& start, const Point& dest,
-                                   const double max_velocity,
-                                   const double max_acceleration,
-                                   const double tolerance_meters,
-                                   const Vector& initial_velocity,
-                                   const Vector& final_velocity)
-{
-    Vector dist_vector = dest - start;
-    double dist        = std::max(0.0, dist_vector.length() - tolerance_meters);
-
-    // To simplify the calculations we will solve this problem with 1D kinematics
-    // by taking the component of the velocities projected onto the vector pointing
-    // towards the destination
-    double initial_velocity_1d = initial_velocity.dot(dist_vector.normalize());
-    double final_velocity_1d   = final_velocity.dot(dist_vector.normalize());
-
-    return getTimeToTravelDistance(dist, max_velocity, max_acceleration,
-                                   initial_velocity_1d, final_velocity_1d);
-}
+#include "software/ai/evaluation/time_to_travel.h"
 
 Duration getTimeToTravelDistance(const double distance, const double max_velocity,
                                  const double max_acceleration,
@@ -41,7 +10,7 @@ Duration getTimeToTravelDistance(const double distance, const double max_velocit
     // Bound all values to be realistic
     double d_total = std::max(0.0, distance);
     double v_max   = std::max(0.0, max_velocity);
-    double v_i     = std::min(initial_velocity, max_velocity);
+    double v_i     = std::clamp(initial_velocity, -max_velocity, max_velocity);
     double v_f     = std::clamp(final_velocity, 0.0, max_velocity);
     double a_max   = std::max(1e-6, max_acceleration);
 
