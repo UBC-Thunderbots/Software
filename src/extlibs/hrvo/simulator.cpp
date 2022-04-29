@@ -187,7 +187,7 @@ void HRVOSimulator::updatePrimitiveSet(const TbotsProto::PrimitiveSet &new_primi
         auto hrvo_agent_opt = getFriendlyAgentFromRobotId(robot_id);
         if (hrvo_agent_opt.has_value())
         {
-            hrvo_agent_opt.value()->updatePrimitiveSet(primitive, field);
+            hrvo_agent_opt.value()->updatePrimitive(primitive, field);
         }
     }
 }

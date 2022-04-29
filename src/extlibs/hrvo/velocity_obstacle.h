@@ -1,3 +1,5 @@
+#pragma once
+
 /**
  * A velocity obstacle.
  */

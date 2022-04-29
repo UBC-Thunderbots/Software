@@ -44,7 +44,7 @@ VelocityObstacle generateVelocityObstacle(const Polygon &obstacle, const Circle 
         // The robot is colliding with obstacle.
         // Creates Velocity Obstacle with the sides being 180 degrees
         // apart from each other with center being the center of obstacle
-        velocity_obstacle.side1_ = (obstacle.centroid() - robot.origin()).rotate(Angle::quarter())
+        velocity_obstacle.side1_ = (obstacle.centroid() - robot.origin()).rotate(Angle::quarter());
         velocity_obstacle.side2_ = -velocity_obstacle.side1_;
     }
 
@@ -53,11 +53,11 @@ VelocityObstacle generateVelocityObstacle(const Polygon &obstacle, const Circle 
     Angle min_opening = Angle::zero();
     Vector left_side;
     Vector right_side;
-    for (int i = 0; i < obstacle.getPoints().size(); i++)
+    for (unsigned int i = 0; i < obstacle.getPoints().size(); i++)
     {
         Vector obstacle_to_point_vec_i  = obstacle.getPoints()[i] - robot.origin();
         Angle angle_i = obstacle_to_point_vec_i.orientation();
-        for (int j = i + 1; j < obstacle.getPoints().size(); j++)
+        for (unsigned int j = i + 1; j < obstacle.getPoints().size(); j++)
         {
             Vector obstacle_to_point_vec_j = obstacle.getPoints()[j] - robot.origin();
             Angle angle_j = obstacle_to_point_vec_j.orientation();

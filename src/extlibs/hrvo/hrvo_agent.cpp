@@ -178,9 +178,13 @@ void HRVOAgent::computeNewVelocity()
     }
 
     // Create velocity Obstacles for neighboring static obstacles
+    // Represent this agent with a circle of the same size and position
+    Point agent_position_point(position_);
+    Circle circle_rep_of_agent(agent_position_point, radius_);
+    std::cout << static_obstacles.size() << " static obstacles" << std::endl;
     for (const auto &obstacle_ptr : static_obstacles)
     {
-        if (obstacle_ptr->distance(Point(position_)) <= neighborDist_)
+        if (obstacle_ptr->distance(agent_position_point) <= neighborDist_)
         {
             VelocityObstacle velocity_obstacle = obstacle_ptr->generateVelocityObstacle(*this);
             velocityObstacles_.push_back(velocity_obstacle);
@@ -591,7 +595,7 @@ void HRVOAgent::insertNeighbor(std::size_t agentNo, float &rangeSq)
     }
 }
 
-void HRVOAgent::updatePrimitiveSet(const TbotsProto::Primitive &new_primitive, const Field& field)
+void HRVOAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive, const Field& field)
 {
     AgentPath path;
     if (new_primitive.has_move())
@@ -606,7 +610,7 @@ void HRVOAgent::updatePrimitiveSet(const TbotsProto::Primitive &new_primitive, c
         for (int i = 0; i < motion_control.path().point_size(); i++)
         {
             // TODO (#2418): Update implementation of Primitive to support
-            //               multiple path points with speeds
+            //               a speed per path point
             auto destination = motion_control.path().point().at(i);
             path_points.emplace_back(createPoint(destination).toVector(), speed_at_dest);
         }
@@ -617,11 +621,13 @@ void HRVOAgent::updatePrimitiveSet(const TbotsProto::Primitive &new_primitive, c
         path = AgentPath(path_points, path_radius);
 
         // Update static obstacles
+        auto motion_constraint_enum_descriptor = TbotsProto::MotionConstraint_descriptor();
         std::set<TbotsProto::MotionConstraint> motion_constraints;
-        for (int i = 0; i < motion_control.motion_constraints_size(); i++)
+        for (int constraint_int : motion_control.motion_constraints())
         {
-            motion_constraints.insert(motion_control.motion_constraints(i));
+            motion_constraints.insert(static_cast<TbotsProto::MotionConstraint>(constraint_int));
         }
+
         // TODO: Does TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL create a ball obstacle? What happens if its moving...?
         //       It has a dynamic extension (i.e. HasExtension(TbotsProto::dynamic))
         static_obstacles = obstacle_factory.createFromMotionConstraints(motion_constraints, field);
@@ -632,7 +638,7 @@ void HRVOAgent::updatePrimitiveSet(const TbotsProto::Primitive &new_primitive, c
 std::vector<Polygon> HRVOAgent::getVelocityObstaclesAsPolygons() const
 {
     std::vector<Polygon> velocity_obstacles;
-    for (const Agent::VelocityObstacle &vo : velocityObstacles_)
+    for (const VelocityObstacle &vo : velocityObstacles_)
     {
         std::vector<Point> points;
         Vector shifted_apex  = position_ + vo.apex_;

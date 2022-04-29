@@ -104,7 +104,7 @@ class HRVOAgent : public Agent
     void insertNeighbor(std::size_t agentNo, float &rangeSq);
 
     // TODO: Javadoc
-    void updatePrimitiveSet(const TbotsProto::Primitive &new_primitive, const Field& field);
+    void updatePrimitive(const TbotsProto::Primitive &new_primitive, const Field& field);
 
     /**
      * Get a list of circles which represent the new velocity candidates
