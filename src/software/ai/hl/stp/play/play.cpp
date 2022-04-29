@@ -345,9 +345,6 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::getPrimitivesFromTactic(
             *(motion_control.mutable_path()) = path_proto;
             for (const auto &motion_constraint : motion_constraints)
             {
-                TbotsProto::MotionConstraint motion_constraint_proto;
-                TbotsProto::MotionConstraint_Parse(toString(motion_constraint),
-                                                   &motion_constraint_proto);
                 motion_control.add_motion_constraints(motion_constraint_proto);
             }
 
