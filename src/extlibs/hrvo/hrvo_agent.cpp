@@ -183,9 +183,8 @@ void HRVOAgent::computeNewVelocity()
     Circle circle_rep_of_agent(agent_position_point, radius_);
     for (const auto &obstacle_ptr : static_obstacles)
     {
-        if (obstacle_ptr->distance(agent_position_point) <= 0.15)
+        if (obstacle_ptr->distance(agent_position_point) <= 0.15 && !obstacle_ptr->contains(agent_position_point))
         {
-            std::cout << obstacle_ptr->toString() << " with in " << neighborDist_ << " (" << obstacle_ptr->distance(agent_position_point) << "m away)" << std::endl;
             VelocityObstacle velocity_obstacle = obstacle_ptr->generateVelocityObstacle(circle_rep_of_agent);
             velocityObstacles_.push_back(velocity_obstacle);
         }

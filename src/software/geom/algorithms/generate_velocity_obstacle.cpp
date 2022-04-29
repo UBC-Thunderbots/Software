@@ -39,14 +39,7 @@ VelocityObstacle generateVelocityObstacle(const Polygon &obstacle, const Circle 
     // Since the obstacle is static, the velocity obstacle is not shifted
     velocity_obstacle.apex_ = Vector();
 
-    if (contains(obstacle, robot.origin()))
-    {
-        // The robot is colliding with obstacle.
-        // Creates Velocity Obstacle with the sides being 180 degrees
-        // apart from each other with center being the center of obstacle
-        velocity_obstacle.side1_ = (obstacle.centroid() - robot.origin()).rotate(Angle::quarter());
-        velocity_obstacle.side2_ = -velocity_obstacle.side1_;
-    }
+    // TODO: Assumed not inside obstacle ?!
 
     // The velocity obstacle of a polygon relative to a robot is calculated by finding the
     // two polygon vertices which create the widest opening relative to the robot position
