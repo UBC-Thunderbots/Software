@@ -96,7 +96,6 @@ void setPowerMsg(TbotsProto_PowerFrame& frame, const TbotsProto_PowerStatus& sta
 TbotsProto_PowerStatus createNanoPbPowerStatus(float battery_voltage,
                                                float capacitor_voltage,
                                                float current_draw,
-                                               float high_voltage_measurement_volts,
                                                float geneva_angle_deg,
                                                bool breakbeam_tripped, bool flyback_fault)
 {
@@ -104,7 +103,6 @@ TbotsProto_PowerStatus createNanoPbPowerStatus(float battery_voltage,
         .battery_voltage                = battery_voltage,
         .capacitor_voltage              = capacitor_voltage,
         .current_draw                   = current_draw,
-        .high_voltage_measurement_volts = high_voltage_measurement_volts,
         .geneva_angle_deg               = geneva_angle_deg,
         .breakbream_tripped             = breakbeam_tripped,
         .flyback_fault                  = flyback_fault};

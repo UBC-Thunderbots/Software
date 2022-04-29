@@ -142,10 +142,6 @@ TEST_F(UartFramingTest, marshalling_test)
 
     TbotsProto_PowerFrame test_frame_unmarshalled = TbotsProto_PowerFrame_init_default;
     EXPECT_TRUE(unmarshalUartPacket(bytes, test_frame_unmarshalled));
-    // Check size of frame is the size of the original msg + length and crc fields -
-    // protobuf overhead bytes
-    EXPECT_EQ(sizeof(test_frame_unmarshalled),
-              TbotsProto_PowerFrame_size - 3 * sizeof(uint8_t));
     // Check fields of frame
     EXPECT_EQ(test_frame_unmarshalled.length, TbotsProto_PowerControl_size);
     EXPECT_EQ(test_frame_unmarshalled.crc, TEST_MESSAGE_CRC);
