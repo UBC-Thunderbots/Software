@@ -1,8 +1,8 @@
 import threading
-import os
 import queue
 import argparse
 import time
+import os
 
 import pytest
 import software.python_bindings as tbots
@@ -17,13 +17,13 @@ from software.simulated_tests import validation
 from software.thunderscope.thunderscope import Thunderscope
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.proto_unix_io import ProtoUnixIO
-from software.thunderscope.replay.replay import ProtoLogger, ProtoPlayer
 from software.py_constants import MILLISECONDS_PER_SECOND
 from software.thunderscope.binary_context_managers import (
     FullSystem,
     Simulator,
     Gamecontroller,
 )
+from software.thunderscope.replay.replay import ProtoLogger
 
 from software.logger.logger import createLogger
 
@@ -79,6 +79,15 @@ class SimulatorTestRunner(object):
             RobotStatus, self.robot_status_buffer
         )
 
+        self.timestamp = 0
+        self.timestamp_mutex = threading.Lock()
+
+    def time_provider(self):
+        """Provide the current time in seconds since the epoch"""
+
+        with self.timestamp_mutex:
+            return self.timestamp
+
     def run_test(
         self,
         always_validation_sequence_set=[[]],
@@ -114,104 +123,69 @@ class SimulatorTestRunner(object):
             """Step simulation, full_system and run validation
             """
 
-            timestamp = 0
-            timestamp_mutex = threading.Lock()
-            args = load_command_line_arguments()
+            time_elapsed_s = 0
 
-            def __time_provider():
-                with timestamp_mutex:
-                    return timestamp
+            while time_elapsed_s < test_timeout_s:
 
-            # Grab the current test name to store the proto log file for the test case
-            current_test = (
-                os.environ.get("PYTEST_CURRENT_TEST").split(":")[-1].split(" ")[0]
-            )
-            current_test = current_test.replace("]", "-")
-            current_test = current_test.replace("[", "-")
+                # Update the timestamp used by replay
+                with self.timestamp_mutex:
+                    ssl_wrapper = self.ssl_wrapper_buffer.get(block=False)
+                    self.timestamp = ssl_wrapper.detection.t_capture
 
-            # Setup proto loggers for both full systems
-            with ProtoLogger(
-                args.blue_full_system_runtime_dir,
-                "blue_{}".format(current_test),
-                time_provider=__time_provider,
-            ) as blue_logger, ProtoLogger(
-                args.yellow_full_system_runtime_dir,
-                "yellow_{}".format(current_test),
-                time_provider=__time_provider,
-            ) as yellow_logger:
-
-                self.blue_full_system_proto_unix_io.register_to_observe_everything(
-                    blue_logger.buffer
+                tick = SimulatorTick(
+                    milliseconds=tick_duration_s * MILLISECONDS_PER_SECOND
                 )
-                self.yellow_full_system_proto_unix_io.register_to_observe_everything(
-                    yellow_logger.buffer
-                )
+                self.simulator_proto_unix_io.send_proto(SimulatorTick, tick)
+                time_elapsed_s += tick_duration_s
 
-                time_elapsed_s = 0
+                if self.thunderscope:
+                    time.sleep(tick_duration_s)
 
-                while time_elapsed_s < test_timeout_s:
+                while True:
+                    try:
+                        world = self.world_buffer.get(
+                            block=True, timeout=WORLD_BUFFER_TIMEOUT
+                        )
+                        break
+                    except queue.Empty as empty:
+                        # If we timeout, that means full_system missed the last
+                        # wrapper and robot status, lets resend it.
+                        logger.warning("Fullsystem missed last wrapper, resending ...")
 
-                    # Update the SSL Wrapper packet
-                    with timestamp_mutex:
                         ssl_wrapper = self.ssl_wrapper_buffer.get(block=False)
-                        timestamp = ssl_wrapper.detection.t_capture
+                        robot_status = self.robot_status_buffer.get(block=False)
 
-                    tick = SimulatorTick(
-                        milliseconds=tick_duration_s * MILLISECONDS_PER_SECOND
-                    )
-                    self.simulator_proto_unix_io.send_proto(SimulatorTick, tick)
-                    time_elapsed_s += tick_duration_s
-
-                    if self.thunderscope:
-                        time.sleep(tick_duration_s)
-
-                    while True:
-                        try:
-                            world = self.world_buffer.get(
-                                block=True, timeout=WORLD_BUFFER_TIMEOUT
-                            )
-                            break
-                        except queue.Empty as empty:
-                            # If we timeout, that means full_system missed the last
-                            # wrapper and robot status, lets resend it.
-                            logger.warning(
-                                "Fullsystem missed last wrapper, resending ..."
-                            )
-
-                            ssl_wrapper = self.ssl_wrapper_buffer.get(block=False)
-                            robot_status = self.robot_status_buffer.get(block=False)
-
-                            self.blue_full_system_proto_unix_io.send_proto(
-                                SSL_WrapperPacket, ssl_wrapper
-                            )
-                            self.blue_full_system_proto_unix_io.send_proto(
-                                RobotStatus, robot_status
-                            )
-
-                    # Validate
-                    (
-                        eventually_validation_proto_set,
-                        always_validation_proto_set,
-                    ) = validation.run_validation_sequence_sets(
-                        world,
-                        eventually_validation_sequence_set,
-                        always_validation_sequence_set,
-                    )
-
-                    if self.thunderscope:
-                        # Send out the validation proto to thunderscope
-                        self.thunderscope.blue_full_system_proto_unix_io.send_proto(
-                            ValidationProtoSet, eventually_validation_proto_set
+                        self.blue_full_system_proto_unix_io.send_proto(
+                            SSL_WrapperPacket, ssl_wrapper
                         )
-                        self.thunderscope.blue_full_system_proto_unix_io.send_proto(
-                            ValidationProtoSet, always_validation_proto_set
+                        self.blue_full_system_proto_unix_io.send_proto(
+                            RobotStatus, robot_status
                         )
 
-                    # Check that all always validations are always valid
-                    validation.check_validation(always_validation_proto_set)
+                # Validate
+                (
+                    eventually_validation_proto_set,
+                    always_validation_proto_set,
+                ) = validation.run_validation_sequence_sets(
+                    world,
+                    eventually_validation_sequence_set,
+                    always_validation_sequence_set,
+                )
 
-                # Check that all eventually validations are eventually valid
-                validation.check_validation(eventually_validation_proto_set)
+                if self.thunderscope:
+                    # Send out the validation proto to thunderscope
+                    self.thunderscope.blue_full_system_proto_unix_io.send_proto(
+                        ValidationProtoSet, eventually_validation_proto_set
+                    )
+                    self.thunderscope.blue_full_system_proto_unix_io.send_proto(
+                        ValidationProtoSet, always_validation_proto_set
+                    )
+
+                # Check that all always validations are always valid
+                validation.check_validation(always_validation_proto_set)
+
+            # Check that all eventually validations are eventually valid
+            validation.check_validation(eventually_validation_proto_set)
 
             __stopper()
 
@@ -325,6 +299,11 @@ def simulated_test_runner():
     yellow_full_system_proto_unix_io = ProtoUnixIO()
     blue_full_system_proto_unix_io = ProtoUnixIO()
 
+    # Grab the current test name to store the proto log file for the test case
+    current_test = os.environ.get("PYTEST_CURRENT_TEST").split(":")[-1].split(" ")[0]
+    current_test = current_test.replace("]", "-")
+    current_test = current_test.replace("[", "-")
+
     # Launch all binaries
     with Simulator(
         args.simulator_runtime_dir, args.debug_simulator
@@ -372,4 +351,27 @@ def simulated_test_runner():
             # Only validate on the blue worlds
             blue_full_system_proto_unix_io.register_observer(World, runner.world_buffer)
 
-            yield runner
+            # Setup proto loggers.
+            #
+            # NOTE: Its important we use the test runners time provider because
+            # test will run as fast as possible with varying speed. The
+            # SimulatorTestRunners time provider is tied to the simulators
+            # t_capture coming out of the wrapper packet rather than time.time
+            with ProtoLogger(
+                args.blue_full_system_runtime_dir,
+                "blue_{}".format(current_test),
+                time_provider=runner.time_provider,
+            ) as blue_logger, ProtoLogger(
+                args.yellow_full_system_runtime_dir,
+                "yellow_{}".format(current_test),
+                time_provider=runner.time_provider,
+            ) as yellow_logger:
+
+                blue_full_system_proto_unix_io.register_to_observe_everything(
+                    blue_logger.buffer
+                )
+                yellow_full_system_proto_unix_io.register_to_observe_everything(
+                    yellow_logger.buffer
+                )
+
+                yield runner
