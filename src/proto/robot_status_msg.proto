@@ -152,11 +152,11 @@ message PowerStatus
     float battery_voltage = 1;
 
     // voltage on the robot’s capacitor, in volts.
-    float capacitor_voltage              = 2;
-    float current_draw                   = 3;
-    float geneva_angle_deg               = 4;
-    bool breakbream_tripped              = 5;
-    bool flyback_fault                   = 6;
+    float capacitor_voltage = 2;
+    float current_draw      = 3;
+    float geneva_angle_deg  = 4;
+    bool breakbream_tripped = 5;
+    bool flyback_fault      = 6;
 }
 
 /* Temperature of robot components */
