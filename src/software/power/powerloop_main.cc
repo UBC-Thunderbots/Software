@@ -43,7 +43,7 @@ void loop()
         if (unmarshalUartPacket(buffer, frame)) {
             //TODO(#2597): Perform command here
 
-            auto status = createNanoPbPowerStatus(1.2f, 2.3f, 3.4f, 4.5f, 5.6f, true, false);
+            auto status = createNanoPbPowerStatus(1.2f, 2.3f, 3.4f, 4.5f, true, false);
             auto status_frame = createUartFrame(status);
             packet = marshallUartPacket(status_frame);
         }
