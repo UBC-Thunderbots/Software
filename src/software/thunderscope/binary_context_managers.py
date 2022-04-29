@@ -60,12 +60,6 @@ class FullSystem(object):
         self.friendly_colour_yellow = friendly_colour_yellow
         self.full_system_proc = None
 
-        # Setup unix socket directory
-        try:
-            os.makedirs(self.full_system_runtime_dir)
-        except:
-            pass
-
     def __enter__(self):
         """Enter the full_system context manager. 
 
@@ -76,6 +70,12 @@ class FullSystem(object):
         :return: full_system context managed instance
 
         """
+        # Setup unix socket directory
+        try:
+            os.makedirs(self.full_system_runtime_dir)
+        except:
+            pass
+
         full_system = "software/unix_full_system --runtime_dir={} {}".format(
             self.full_system_runtime_dir,
             "--friendly_colour_yellow" if self.friendly_colour_yellow else "",
@@ -93,12 +93,19 @@ class FullSystem(object):
             ):
                 logging.info(
                     (
-                        "\n\nDebugging Fullsystem ==============\n\n"
-                        "1. Build the full system in debug mode:\n"
-                        "./tbots.py -d build unix_full_system\n\n"
-                        "2. Run the following binaries from src to debug full system:\n\n"
-                        f"gdb --args bazel-bin/{full_system}\n"
-                        "3. Rerun this binary once the gdb instance is setup\n"
+                        f"""
+
+Debugging Fullsystem ==============
+1. Build the full system in debug mode:
+
+./tbots.py -d build unix_full_system
+
+2. Run the following binaries from src to debug full system:
+
+gdb --args bazel-bin/{full_system}
+
+3. Rerun this binary once the gdb instance is setup
+"""
                     )
                 )
 
@@ -218,12 +225,18 @@ class Simulator(object):
             ):
                 logging.info(
                     (
-                        "\n\nDebugging Simulator ==============\n\n"
-                        "1. Build the simulator in debug mode:\n"
-                        "./tbots.py -d build er_force_simulator_main\n\n"
-                        "2. Run the following binary from src to debug the simulator:\n\n"
-                        f"gdb --args bazel-bin/{simulator_command}\n"
-                        "3. Rerun this binary once the gdb instance is setup\n"
+                        f"""
+Debugging Simulator ==============
+1. Build the simulator in debug mode:
+
+./tbots.py -d build er_force_simulator_main
+
+2. Run the following binary from src to debug the simulator:
+
+gdb --args bazel-bin/{simulator_command}
+
+3. Rerun this binary once the gdb instance is setup
+"""
                     )
                 )
 
