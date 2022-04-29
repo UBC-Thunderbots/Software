@@ -93,12 +93,19 @@ class FullSystem(object):
             ):
                 logging.info(
                     (
-                        "\n\nDebugging Fullsystem ==============\n\n"
-                        "1. Build the full system in debug mode:\n"
-                        "./tbots.py -d build unix_full_system\n\n"
-                        "2. Run the following binaries from src to debug full system:\n\n"
-                        f"gdb --args bazel-bin/{full_system}\n"
-                        "3. Rerun this binary once the gdb instance is setup\n"
+f"""
+
+Debugging Fullsystem ==============
+1. Build the full system in debug mode:
+
+./tbots.py -d build unix_full_system
+
+2. Run the following binaries from src to debug full system:
+
+gdb --args bazel-bin/{full_system}
+
+3. Rerun this binary once the gdb instance is setup
+"""
                     )
                 )
 
@@ -218,12 +225,18 @@ class Simulator(object):
             ):
                 logging.info(
                     (
-                        "\n\nDebugging Simulator ==============\n\n"
-                        "1. Build the simulator in debug mode:\n"
-                        "./tbots.py -d build er_force_simulator_main\n\n"
-                        "2. Run the following binary from src to debug the simulator:\n\n"
-                        f"gdb --args bazel-bin/{simulator_command}\n"
-                        "3. Rerun this binary once the gdb instance is setup\n"
+f"""
+Debugging Simulator ==============
+1. Build the simulator in debug mode:
+
+./tbots.py -d build er_force_simulator_main
+
+2. Run the following binary from src to debug the simulator:
+
+gdb --args bazel-bin/{simulator_command}
+
+3. Rerun this binary once the gdb instance is setup
+"""
                     )
                 )
 
