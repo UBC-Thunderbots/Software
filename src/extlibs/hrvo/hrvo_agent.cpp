@@ -76,7 +76,7 @@ void HRVOAgent::computeNeighbors()
 }
 
 // TODO: Move implementation to new file created and have this function call that!?
-Agent::VelocityObstacle HRVOAgent::createVelocityObstacle(const Agent &other_agent)
+VelocityObstacle HRVOAgent::createVelocityObstacle(const Agent &other_agent)
 {
     VelocityObstacle velocityObstacle;
     if ((position_ - other_agent.getPosition()).lengthSquared() >

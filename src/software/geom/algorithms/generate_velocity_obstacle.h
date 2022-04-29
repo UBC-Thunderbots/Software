@@ -4,12 +4,12 @@
 
 #include "software/geom/circle.h"
 #include "software/geom/polygon.h"
-#include "software/geom/rectangle.h"
-#include "extlibs/hrvo/agent.h"
+// TODO: Added for VO import (update this and BUILD when #2589 is merged)
+#include "extlibs/hrvo/velocity_obstacle.h"
 
 /**
  * Set of functions that generate velocity obstacles for a static obstacle
  */
 
-Agent::VelocityObstacle generateVelocityObstacle(const Circle &robot, const Circle& obstacle);
-Agent::VelocityObstacle generateVelocityObstacle(const Circle &robot, const Polygon &obstacle);
+VelocityObstacle generateVelocityObstacle(const Circle& obstacle, const Circle &robot);
+VelocityObstacle generateVelocityObstacle(const Polygon &obstacle, const Circle &robot);

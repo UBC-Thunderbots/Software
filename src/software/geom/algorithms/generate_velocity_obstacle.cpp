@@ -1,29 +1,28 @@
 #include "software/geom/algorithms/generate_velocity_obstacle.h"
 
-#include "software/geom/geom_constants.h"
+#include "software/geom/algorithms/contains.h"
 
 // TODO: Could add velocity aswell...
-Agent::VelocityObstacle generateVelocityObstacle(const Circle &robot, const Circle& obstacle)
+VelocityObstacle generateVelocityObstacle(const Circle& obstacle, const Circle &robot)
 {
-    Agent::VelocityObstacle velocity_obstacle;
+    VelocityObstacle velocity_obstacle;
     // Since the obstacle is static, the velocity obstacle is not shifted
-    velocityObstacle.apex_ = Vector();
+    velocity_obstacle.apex_ = Vector();
 
     const Vector robot_to_obstacle_vector = obstacle.origin() - robot.origin();
     const Angle robot_relative_to_obstacle_angle = robot_to_obstacle_vector.orientation();
 
     // opening angle of each side relative = arcsin((rad_A + rad_B) / distance)
-    const Angle opening_angle = Angle::asin((robot.radius() + obstacle.radius()) /
-                                            robot_to_obstacle_vector.length());
+    Angle opening_angle = Angle::asin((robot.radius() + obstacle.radius()) /
+                                          robot_to_obstacle_vector.length());
 
     if (robot_to_obstacle_vector.lengthSquared() <
         std::pow(obstacle.radius() + robot.radius(), 2))
     {
-        // The robot is colliding with obstacle
+        // The robot is colliding with obstacle.
         // Creates Velocity Obstacle with the sides being 180 degrees
-        // apart from each other (90 degrees relative to the robot to obstacle vector)
-        // TODO: Added - infront because the initial implementation had the vector backwards
-        //       I thought it might mess up the left and right assumptions of side1/2
+        // apart from each other (90 degrees relative to the robot to
+        // obstacle vector) with center being the center of obstacle
         opening_angle = Angle::quarter();
     }
 
@@ -34,18 +33,26 @@ Agent::VelocityObstacle generateVelocityObstacle(const Circle &robot, const Circ
     return velocity_obstacle;
 }
 
-Agent::VelocityObstacle generateVelocityObstacle(const Circle &robot, const Polygon &obstacle)
+VelocityObstacle generateVelocityObstacle(const Polygon &obstacle, const Circle &robot)
 {
-    // TODO: What happen when colliding? Random behaviour depending on which edges robot
-    //       is closest to... Should be try to get away from centeroid of polygon?
-    Agent::VelocityObstacle velocity_obstacle;
+    VelocityObstacle velocity_obstacle;
+    // Since the obstacle is static, the velocity obstacle is not shifted
+    velocity_obstacle.apex_ = Vector();
+
+    if (contains(obstacle, robot.origin()))
+    {
+        // The robot is colliding with obstacle.
+        // Creates Velocity Obstacle with the sides being 180 degrees
+        // apart from each other with center being the center of obstacle
+        velocity_obstacle.side1_ = (obstacle.centroid() - robot.origin()).rotate(Angle::quarter())
+        velocity_obstacle.side2_ = -velocity_obstacle.side1_;
+    }
 
     // The velocity obstacle of a polygon relative to a robot is calculated by finding the
     // two polygon vertices which create the widest opening relative to the robot position
     Angle min_opening = Angle::zero();
     Vector left_side;
     Vector right_side;
-    
     for (int i = 0; i < obstacle.getPoints().size(); i++)
     {
         Vector obstacle_to_point_vec_i  = obstacle.getPoints()[i] - robot.origin();
@@ -58,6 +65,7 @@ Agent::VelocityObstacle generateVelocityObstacle(const Circle &robot, const Poly
             Angle curr_opening = angle_i.minDiff(angle_j);
             if (curr_opening > min_opening)
             {
+                min_opening = curr_opening;
                 // TODO: Update to isToTheRightOf
                 if (obstacle_to_point_vec_i.determinant(obstacle_to_point_vec_j) < 0.0)
                 {

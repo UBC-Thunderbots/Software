@@ -83,7 +83,7 @@ class HRVOAgent : public Agent
      * @return The hybrid reciprocal velocity obstacle which other_agent should see for
      * this Agent
      */
-    Agent::VelocityObstacle createVelocityObstacle(const Agent &other_agent) override;
+    VelocityObstacle createVelocityObstacle(const Agent &other_agent) override;
 
     /**
      * Computes the maxNeighbors nearest neighbors of this agent.
