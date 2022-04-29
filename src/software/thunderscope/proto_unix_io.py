@@ -99,6 +99,7 @@ class ProtoUnixIO:
         :param buffer: buffer to store data
         
         """
+        print("apending, buffer: ", buffer)
         self.all_proto_observers.append(buffer)
 
     def send_proto(self, proto_class, data):

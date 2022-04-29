@@ -2,7 +2,7 @@ from software.thunderscope.thunderscope import Thunderscope
 from software.thunderscope.binary_context_managers import *
 from proto.message_translation import tbots_protobuf
 import software.python_bindings as cpp_bindings
-from software.thunderscope.replay import ProtoLogger
+from software.thunderscope.replay import ProtoLogger, ProtoPlayer
 
 import time
 import threading
@@ -73,6 +73,18 @@ if __name__ == "__main__":
         action="store_true",
         default=False,
         help="Visualize C++ Tests",
+    )
+    parser.add_argument(
+        "--replay_log_blue_full_system",
+        action="store",
+        help="Replay file for the blue full_system",
+        default=None
+    )
+    parser.add_argument(
+        "--replay_log_yellow_full_system",
+        action="store",
+        help="Replay file for the yellow full_system",
+        default=None
     )
 
     # Run blue or yellow full system over WiFi
@@ -180,7 +192,6 @@ if __name__ == "__main__":
     #
     # The async sim ticket ticks the simulator at a fixed rate.
     else:
-        print("GETTING HERE")
 
         def __async_sim_ticker(tick_rate_ms):
             """Setup the world and tick simulation forever
@@ -207,25 +218,21 @@ if __name__ == "__main__":
                 time.sleep(tick_rate_ms / 1000)
 
         # Launch all binaries
-        with Simulator(
-            args.simulator_runtime_dir, args.debug_simulator
-        ) as simulator, FullSystem(
-            args.blue_full_system_runtime_dir, args.debug_blue_full_system, False
-        ) as blue_fs, FullSystem(
-            args.yellow_full_system_runtime_dir, args.debug_yellow_full_system, True
-        ) as yellow_fs, Gamecontroller() as gamecontroller:
+        print(args.blue_full_system_runtime_dir)
+        blue_fs = FullSystem(args.blue_full_system_runtime_dir, args.debug_blue_full_system, friendly_colour_yellow=False)
+        yellow_fs = FullSystem(args.yellow_full_system_runtime_dir, args.debug_yellow_full_system, friendly_colour_yellow=True)
 
-            blue_fs.setup_proto_unix_io(tscope.blue_full_system_proto_unix_io)
-            yellow_fs.setup_proto_unix_io(tscope.yellow_full_system_proto_unix_io)
-            simulator.setup_proto_unix_io(
-                tscope.simulator_proto_unix_io,
-                tscope.blue_full_system_proto_unix_io,
-                tscope.yellow_full_system_proto_unix_io,
-            )
-            gamecontroller.setup_proto_unix_io(
-                tscope.blue_full_system_proto_unix_io,
-                tscope.yellow_full_system_proto_unix_io,
-            )
+        blue_fs.setup_proto_unix_io(tscope.blue_full_system_proto_unix_io)
+        yellow_fs.setup_proto_unix_io(tscope.yellow_full_system_proto_unix_io)
+
+        with ProtoPlayer(args.replay_log_blue_full_system, tscope.blue_full_system_proto_unix_io) as blue_player, \
+             ProtoPlayer(args.replay_log_yellow_full_system, tscope.yellow_full_system_proto_unix_io) as yellow_player:
+            # ProtoLogger("/tmp/tbots/", "blue") as blue_logger, \
+            # ProtoLogger("/tmp/tbots/", "yellow") as yellow_logger: \
+
+            # Setup the logger by observering everything coming in
+            # tscope.blue_full_system_proto_unix_io.register_to_observe_everything(blue_logger.buffer)
+            # tscope.yellow_full_system_proto_unix_io.register_to_observe_everything(yellow_logger.buffer)
 
             tscope.load_saved_layout(args.layout)
 

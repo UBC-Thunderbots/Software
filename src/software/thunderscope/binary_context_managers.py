@@ -55,6 +55,14 @@ class FullSystem(object):
         :param debug_full_system: Whether to run the full_system in debug mode
 
         """
+        # Setup unix socket directory
+        try:
+            logging.info("GETTING HERE")
+            logging.info(self.full_system_runtime_dir)
+            os.makedirs(self.full_system_runtime_dir)
+        except:
+            pass
+
         self.full_system_runtime_dir = full_system_runtime_dir
         self.debug_full_system = debug_full_system
         self.friendly_colour_yellow = friendly_colour_yellow
@@ -70,12 +78,6 @@ class FullSystem(object):
         :return: full_system context managed instance
 
         """
-        # Setup unix socket directory
-        try:
-            os.makedirs(self.full_system_runtime_dir)
-        except:
-            pass
-
         full_system = "software/unix_full_system --runtime_dir={} {}".format(
             self.full_system_runtime_dir,
             "--friendly_colour_yellow" if self.friendly_colour_yellow else "",
