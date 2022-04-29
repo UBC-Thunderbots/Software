@@ -7,7 +7,7 @@ py_binary(
     srcs = ["thunderscope_main.py"],
     deps = [
         ":thunderscope",
-        ":replay",
+        "//software/thunderscope/replay:replay",
         "//software/thunderscope:binary_context_managers",
     ],
 )
@@ -33,6 +33,8 @@ py_library(
         "//software/thunderscope:proto_unix_io",
         "//software/thunderscope:robot_communication",
         "//software/thunderscope/arbitrary_plot:named_value_plotter",
+        "//software/thunderscope/replay:replay",
+        "//software/thunderscope/replay:replay_controls",
         "//software/thunderscope/field",
         "//software/thunderscope/field:field_layer",
         "//software/thunderscope/field:obstacle_layer",
@@ -79,11 +81,6 @@ py_library(
 py_library(
     name = "binary_context_managers",
     srcs = ["binary_context_managers.py"],
-)
-
-py_library(
-    name = "replay",
-    srcs = ["replay.py"],
 )
 
 py_library(

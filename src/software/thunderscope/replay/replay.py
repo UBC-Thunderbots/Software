@@ -142,42 +142,24 @@ class ProtoPlayer(object):
 
         """
         self.stop_playing = True
+        self.exit_requested = True
         self.thread.join()
         self.log_file.close()
-
-    def find_proto_class(self, proto_class_full_name):
-        """Search through all protobufs and return class of proto_type
-
-        param: proto_class_full_name: String of the full descriptors name
-
-        """
-
-        proto_path = os.path.dirname(proto.__file__)
-
-        for file in glob.glob(proto_path + "**/*.py"):
-            name = os.path.splitext(os.path.basename(file))[0]
-
-            # Ignore __ files
-            if name.startswith("__"):
-                continue
-            module = importlib.import_module("proto." + name)
-
-            for member in dir(module):
-                handler_class = getattr(module, member)
-                if handler_class and inspect.isclass(handler_class):
-                    if str(member) == proto_class_full_name.split(".")[1]:
-                        return handler_class
 
     def __play_protobufs(self):
         """Plays all protos in the file in chronologoical order. 
 
         """
         try:
-            while self.stop_playing is False:
-                bytes_retrieved = self.log_file.readline()
-                timestamp, protobuf_type, data = bytes_retrieved.split(REPLAY_METADATA_DELIMETER)
-                proto_class = self.find_proto_class(str(protobuf_type, encoding="utf-8"))
-                proto = proto_class.FromString(base64.b64decode(data[1:-len('\n')]))
-                self.proto_unix_io.send_proto(proto_class, proto)
+            start_playback_time = time.time()
+
+            while self.exit_requested is False:
+                while self.stop_playing is False:
+                    bytes_retrieved = self.log_file.readline()
+                    timestamp, protobuf_type, data = bytes_retrieved.split(REPLAY_METADATA_DELIMETER)
+                    proto_class = self.find_proto_class(str(protobuf_type, encoding="utf-8"))
+                    proto = proto_class.FromString(base64.b64decode(data[len('b'):-len('\n')]))
+                    self.proto_unix_io.send_proto(proto_class, proto)
+
         except Exception as e:
             logging.exception("Exception detected in ProtoPlayer")

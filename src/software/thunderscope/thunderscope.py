@@ -54,6 +54,7 @@ from software.thunderscope.robot_diagnostics.chicker import ChickerWidget
 from software.thunderscope.robot_diagnostics.drive_and_dribbler_widget import (
     DriveAndDribblerWidget,
 )
+from software.thunderscope.replay.replay_controls import ReplayControls
 
 SAVED_LAYOUT_PATH = "/opt/tbotspython/saved_tscope_layout"
 NUM_ROBOTS = 6
@@ -339,7 +340,12 @@ class Thunderscope(object):
         playinfo_dock = Dock("Play Info")
         playinfo_dock.addWidget(widgets["playinfo_widget"])
 
+        widgets["replay_widget"] = self.setup_replay_controls_widget()
+        replay_dock = Dock("Replay")
+        replay_dock.addWidget(widgets["replay_widget"])
+
         dock_area.addDock(field_dock)
+        dock_area.addDock(replay_dock, "bottom", field_dock)
         dock_area.addDock(log_dock, "bottom", field_dock)
         dock_area.addDock(performance_dock, "right", log_dock)
         dock_area.addDock(playinfo_dock, "right", performance_dock)
@@ -416,6 +422,16 @@ class Thunderscope(object):
         self.register_refresh_function(logs.refresh)
 
         return logs
+
+    def setup_replay_controls_widget(self):
+        """Setup the widget that receives logs from full system
+
+        :returns: The replay widget
+        """
+        # Create widget
+        replay_controls = ReplayControls()
+        return replay_controls
+
 
     def setup_performance_plot(self, proto_unix_io):
         """Setup the performance plot

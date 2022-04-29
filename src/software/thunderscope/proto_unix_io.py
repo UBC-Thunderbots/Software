@@ -110,11 +110,7 @@ class ProtoUnixIO:
 
         """
         if proto_class.DESCRIPTOR.full_name not in self.proto_observers:
-            raise KeyError(
-                "No observers registered for {}!".format(
-                    proto_class.DESCRIPTOR.full_name
-                )
-            )
+            return
 
         for buffer in self.proto_observers[proto_class.DESCRIPTOR.full_name]:
             buffer.put(data)
