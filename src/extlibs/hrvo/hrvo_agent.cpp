@@ -181,12 +181,12 @@ void HRVOAgent::computeNewVelocity()
     // Represent this agent with a circle of the same size and position
     Point agent_position_point(position_);
     Circle circle_rep_of_agent(agent_position_point, radius_);
-    std::cout << static_obstacles.size() << " static obstacles" << std::endl;
     for (const auto &obstacle_ptr : static_obstacles)
     {
-        if (obstacle_ptr->distance(agent_position_point) <= neighborDist_)
+        if (obstacle_ptr->distance(agent_position_point) <= 0.15)
         {
-            VelocityObstacle velocity_obstacle = obstacle_ptr->generateVelocityObstacle(*this);
+            std::cout << obstacle_ptr->toString() << " with in " << neighborDist_ << " (" << obstacle_ptr->distance(agent_position_point) << "m away)" << std::endl;
+            VelocityObstacle velocity_obstacle = obstacle_ptr->generateVelocityObstacle(circle_rep_of_agent);
             velocityObstacles_.push_back(velocity_obstacle);
         }
     }
@@ -621,11 +621,13 @@ void HRVOAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive, cons
         path = AgentPath(path_points, path_radius);
 
         // Update static obstacles
-        auto motion_constraint_enum_descriptor = TbotsProto::MotionConstraint_descriptor();
         std::set<TbotsProto::MotionConstraint> motion_constraints;
         for (int constraint_int : motion_control.motion_constraints())
         {
-            motion_constraints.insert(static_cast<TbotsProto::MotionConstraint>(constraint_int));
+            if (TbotsProto::MotionConstraint_IsValid(constraint_int))
+            {
+                motion_constraints.insert(static_cast<TbotsProto::MotionConstraint>(constraint_int));
+            }
         }
 
         // TODO: Does TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL create a ball obstacle? What happens if its moving...?

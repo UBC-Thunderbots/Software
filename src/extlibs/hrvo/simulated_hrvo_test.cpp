@@ -17,6 +17,7 @@ class SimulatedHRVOTest : public SimulatedErForceSimTacticTestFixture
     Field field                      = Field::createField(field_type);
 };
 
+// TODO: Could try using robotsViolatingMotionConstraint
 TEST_F(SimulatedHRVOTest, test_drive_in_straight_line_with_moving_enemy_robot_from_behind)
 {
     Point destination      = Point(3, 0);
