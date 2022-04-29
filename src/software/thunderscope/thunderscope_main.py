@@ -78,13 +78,13 @@ if __name__ == "__main__":
         "--replay_log_blue_full_system",
         action="store",
         help="Replay file for the blue full_system",
-        default=None
+        default=None,
     )
     parser.add_argument(
         "--replay_log_yellow_full_system",
         action="store",
         help="Replay file for the yellow full_system",
-        default=None
+        default=None,
     )
 
     # Run blue or yellow full system over WiFi
@@ -193,23 +193,13 @@ if __name__ == "__main__":
     # We want to setup the proto unix io the same way, but instead use the proto
     # player to replay the logs (rather than the full system binaries)
     elif args.replay_log_blue_full_system or args.replay_log_yellow_full_system:
-        blue_fs = FullSystem(
-                        args.blue_full_system_runtime_dir,
-                        args.debug_blue_full_system,
-                        friendly_colour_yellow=False)
-    
-        yellow_fs = FullSystem(
-                        args.yellow_full_system_runtime_dir,
-                        args.debug_yellow_full_system,
-                        friendly_colour_yellow=True)
-    
-        blue_fs.setup_proto_unix_io(tscope.blue_full_system_proto_unix_io)
-        yellow_fs.setup_proto_unix_io(tscope.yellow_full_system_proto_unix_io)
-    
-        with ProtoPlayer(args.replay_log_blue_full_system, tscope.blue_full_system_proto_unix_io) as blue_player, \
-             ProtoPlayer(args.replay_log_yellow_full_system, tscope.yellow_full_system_proto_unix_io) as yellow_player:
-                tscope.load_saved_layout(args.layout)
-                tscope.show()
+        with ProtoPlayer(
+            args.replay_log_blue_full_system, tscope.blue_full_system_proto_unix_io
+        ) as blue_player, ProtoPlayer(
+            args.replay_log_yellow_full_system, tscope.yellow_full_system_proto_unix_io
+        ) as yellow_player:
+            tscope.load_saved_layout(args.layout)
+            tscope.show()
 
     ###########################################################################
     #           Blue AI vs Yellow AI + Simulator + Gamecontroller             #
@@ -220,6 +210,7 @@ if __name__ == "__main__":
     #
     # The async sim ticket ticks the simulator at a fixed rate.
     else:
+
         def __async_sim_ticker(tick_rate_ms):
             """Setup the world and tick simulation forever
 
@@ -257,8 +248,12 @@ if __name__ == "__main__":
             args.yellow_full_system_runtime_dir, "yellow"
         ) as yellow_logger, Gamecontroller() as gamecontroller:
 
-            tscope.blue_full_system_proto_unix_io.register_to_observe_everything(blue_logger.buffer)
-            tscope.yellow_full_system_proto_unix_io.register_to_observe_everything(yellow_logger.buffer)
+            tscope.blue_full_system_proto_unix_io.register_to_observe_everything(
+                blue_logger.buffer
+            )
+            tscope.yellow_full_system_proto_unix_io.register_to_observe_everything(
+                yellow_logger.buffer
+            )
 
             blue_fs.setup_proto_unix_io(tscope.blue_full_system_proto_unix_io)
             yellow_fs.setup_proto_unix_io(tscope.yellow_full_system_proto_unix_io)

@@ -432,7 +432,6 @@ class Thunderscope(object):
         replay_controls = ReplayControls()
         return replay_controls
 
-
     def setup_performance_plot(self, proto_unix_io):
         """Setup the performance plot
 

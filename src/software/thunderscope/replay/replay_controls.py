@@ -1,7 +1,6 @@
 import pyqtgraph as pg
 from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph.Qt import QtCore, QtGui
-import queue
 import pyqtgraph.console as pg_console
 from proto.robot_log_msg_pb2 import RobotLog, LogLevel
 from proto.import_all_protos import *
@@ -25,8 +24,11 @@ class ReplayControls(QWidget):
 
         self.layout = QHBoxLayout()
 
-        self.replay_box, self.replay_slider, self.replay_label =\
-                    common_widgets.create_slider("Replay", 0, 100, 0.01)
+        (
+            self.replay_box,
+            self.replay_slider,
+            self.replay_label,
+        ) = common_widgets.create_slider("Replay", 0, 100, 0.01)
 
         self.layout.addWidget(self.replay_box)
         self.setLayout(self.layout)

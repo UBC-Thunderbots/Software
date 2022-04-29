@@ -1,27 +1,28 @@
 import time
 import threading
-import  queue
+import queue
 import base64
 import os
 import logging
 import bz2
 import proto
-import importlib
-import inspect
-import glob
+from proto.import_all_protos import *
 from proto.repeated_any_msg_pb2 import RepeatedAnyMsg
+from extlibs.er_force_sim.src.protobuf.world_pb2 import *
 from google.protobuf.any_pb2 import Any
 
-REPLAY_METADATA_DELIMETER = b"!#!"
+REPLAY_METADATA_DELIMETER = "!#!"
 REPLAY_FILE_EXTENSION = ".replay"
 REPLAY_FILE_TIME_FORMAT = "%Y-%m-%d-%H-%M-%S"
-PROTOBUF_BUFFER_SIZE = 1024 * 1024 # 1MB
+PROTOBUF_BUFFER_SIZE = 1024 * 1024  # 1MB
+PLAY_PAUSE_POLL_INTERVAL_SECONDS = 0.1
+
 
 class ProtoLogger(object):
 
     """Logs incoming protobufs to a file. """
 
-    def __init__(self, log_path, log_prefix="log"):
+    def __init__(self, log_path, log_prefix="log", time_provider=None):
         """Creates a proto logger that logs all protos
         registered on the queue.
 
@@ -30,6 +31,8 @@ class ProtoLogger(object):
 
         :param log_path: The path to the log file.
         :param log_prefix: The prefix to use for the log file.
+        :param time_provider: A function that returns the current time
+            in seconds since epoch. Defaults to time.time
 
         """
         try:
@@ -37,14 +40,19 @@ class ProtoLogger(object):
         except OSError:
             pass
 
-        self.log_path = log_path + "/" + log_prefix + "-"\
-                + time.strftime(REPLAY_FILE_TIME_FORMAT)\
-                + REPLAY_FILE_EXTENSION
+        self.log_path = (
+            log_path
+            + "/"
+            + log_prefix
+            + "-"
+            + time.strftime(REPLAY_FILE_TIME_FORMAT)
+            + REPLAY_FILE_EXTENSION
+        )
 
         self.buffer = queue.Queue(PROTOBUF_BUFFER_SIZE)
-        self.start_time = time.time()
+        self.time_provider = time_provider if time_provider else time.time
+        self.start_time = self.time_provider()
         self.stop_logging = False
-
 
     def __enter__(self):
         """Starts the logger.
@@ -54,7 +62,6 @@ class ProtoLogger(object):
 
         """
 
-        self.log_file = bz2.open(self.log_path, 'wb')
         self.thread = threading.Thread(target=self.__log_protobufs, daemon=True)
         self.thread.start()
 
@@ -70,9 +77,7 @@ class ProtoLogger(object):
         """
         self.stop_logging = True
         self.thread.join()
-        self.log_file.close()
 
-    
     def __log_protobufs(self):
         """Logs all protos in the queue. 
 
@@ -82,24 +87,25 @@ class ProtoLogger(object):
 
         """
         try:
-            while self.stop_logging is False:
+            with bz2.open(self.log_path, "wb") as self.log_file:
+                while self.stop_logging is False:
+                    try:
+                        proto = self.buffer.get(block=True, timeout=0.01)
+                    except queue.Empty:
+                        continue
 
-                try:
-                    proto = self.buffer.get(block=True)
-                except queue.Empty:
-                    continue
+                    serialized_proto = base64.b64encode(proto.SerializeToString())
+                    current_time = self.time_provider() - self.start_time
 
-                serialized_proto = base64.b64encode(proto.SerializeToString())
-                current_time = time.time() - self.start_time
+                    log_entry = (
+                        f"{current_time}{REPLAY_METADATA_DELIMETER}"
+                        + f"{proto.DESCRIPTOR.full_name}{REPLAY_METADATA_DELIMETER}"
+                        + f"{serialized_proto}\n"
+                    )
 
-                log_entry =\
-                        f"{current_time}{REPLAY_METADATA_DELIMETER}" +\
-                        f"{proto.DESCRIPTOR.full_name}{REPLAY_METADATA_DELIMETER}" +\
-                        f"{serialized_proto}\n"
+                    self.log_file.write(bytes(log_entry, encoding="utf-8"))
 
-                self.log_file.write(bytes(log_entry, encoding="utf-8"))
-
-        except Exception as e:
+        except Exception:
             logging.exception("Exception detected in ProtoLogger")
 
 
@@ -117,6 +123,8 @@ class ProtoPlayer(object):
         self.log_path = log_file_path
         self.proto_unix_io = proto_unix_io
         self.stop_playing = False
+        self.exit_requested = False
+        self.playback_speed = 1.0
 
     def __enter__(self):
         """Starts the player.
@@ -127,7 +135,7 @@ class ProtoPlayer(object):
 
         """
 
-        self.log_file = bz2.open(self.log_path, 'rb')
+        self.log_file = bz2.open(self.log_path, "rb")
         self.thread = threading.Thread(target=self.__play_protobufs, daemon=True)
         self.thread.start()
 
@@ -151,15 +159,60 @@ class ProtoPlayer(object):
 
         """
         try:
+            replay_ended = False
             start_playback_time = time.time()
 
             while self.exit_requested is False:
+
+                time.sleep(PLAY_PAUSE_POLL_INTERVAL_SECONDS)
+
                 while self.stop_playing is False:
-                    bytes_retrieved = self.log_file.readline()
-                    timestamp, protobuf_type, data = bytes_retrieved.split(REPLAY_METADATA_DELIMETER)
-                    proto_class = self.find_proto_class(str(protobuf_type, encoding="utf-8"))
-                    proto = proto_class.FromString(base64.b64decode(data[len('b'):-len('\n')]))
+
+                    # Read replay log entry
+                    try:
+                        bytes_retrieved = self.log_file.readline()
+
+                        if len(bytes_retrieved) == 0:
+                            replay_ended = True
+
+                    except EOFError:
+                        replay_ended = True
+
+                    if replay_ended:
+                        logging.info("Replay file ended.")
+                        return
+
+                    # Unpack metadata
+                    timestamp, protobuf_type, data = bytes_retrieved.split(
+                        bytes(REPLAY_METADATA_DELIMETER, encoding="utf-8")
+                    )
+
+                    # Convert string to type. eval is an order of mangnitude
+                    # faster than iterating over the protobuf library.
+                    proto_class = eval(
+                        str(protobuf_type.split(b".")[1], encoding="utf-8")
+                    )
+
+                    # Deserialize protobuf
+                    proto = proto_class.FromString(
+                        base64.b64decode(data[len("b") : -len("\n")])
+                    )
+
+                    # Manage playback speed, if this packet needs to be sent
+                    # out later, sleep until its time to send it.
+                    time_elapsed = time.time() - start_playback_time
+                    replay_current_packet_time = float(timestamp[:-2])
+
+                    if replay_current_packet_time > (
+                        time_elapsed / self.playback_speed
+                    ):
+                        time.sleep(
+                            replay_current_packet_time
+                            - (time_elapsed / self.playback_speed)
+                        )
+                        time_elapsed = time.time() - start_playback_time
+
                     self.proto_unix_io.send_proto(proto_class, proto)
 
-        except Exception as e:
+        except Exception:
             logging.exception("Exception detected in ProtoPlayer")

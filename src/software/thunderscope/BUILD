@@ -7,8 +7,8 @@ py_binary(
     srcs = ["thunderscope_main.py"],
     deps = [
         ":thunderscope",
-        "//software/thunderscope/replay:replay",
         "//software/thunderscope:binary_context_managers",
+        "//software/thunderscope/replay",
     ],
 )
 
@@ -33,8 +33,6 @@ py_library(
         "//software/thunderscope:proto_unix_io",
         "//software/thunderscope:robot_communication",
         "//software/thunderscope/arbitrary_plot:named_value_plotter",
-        "//software/thunderscope/replay:replay",
-        "//software/thunderscope/replay:replay_controls",
         "//software/thunderscope/field",
         "//software/thunderscope/field:field_layer",
         "//software/thunderscope/field:obstacle_layer",
@@ -46,6 +44,8 @@ py_library(
         "//software/thunderscope/log:g3log_checkboxes",
         "//software/thunderscope/log:g3log_widget",
         "//software/thunderscope/play:playinfo_widget",
+        "//software/thunderscope/replay",
+        "//software/thunderscope/replay:replay_controls",
         "//software/thunderscope/robot_diagnostics:chicker",
         "//software/thunderscope/robot_diagnostics:drive_and_dribbler_widget",
         requirement("pyqtgraph"),
