@@ -60,15 +60,13 @@ class HRVOAgent : public Agent
      * @param maxNeighbors       The maximum neighbor count of this agent.
      * @param radius             The radius of this agent.
      * @param goalRadius         The goal radius of this agent.
-     * @param prefSpeed          The preferred speed of this agent.
      * @param maxSpeed           The maximum speed of this agent.
      * @param uncertaintyOffset  The uncertainty offset of this agent.
      * @param maxAccel           The maximum acceleration of this agent.
      * @param velocity           The initial velocity of this agent.
      */
-    HRVOAgent(HRVOSimulator *simulator, const Vector &position, float neighborDist,
-              std::size_t maxNeighbors, float radius, const Vector &velocity,
-              float maxAccel, AgentPath &path, float prefSpeed, float maxSpeed,
+    HRVOAgent(HRVOSimulator *simulator, const Vector &position, float neighborDist, std::size_t maxNeighbors,
+              float radius, const Vector &velocity, float maxAccel, AgentPath &path, float maxSpeed,
               float uncertaintyOffset);
 
     /**
@@ -105,7 +103,8 @@ class HRVOAgent : public Agent
      */
     void insertNeighbor(std::size_t agentNo, float &rangeSq);
 
-    void updatePrimitiveSet(const TbotsProto::Primitive &new_primitive);
+    // TODO: Javadoc
+    void updatePrimitiveSet(const TbotsProto::Primitive &new_primitive, const Field& field);
 
     /**
      * Get a list of circles which represent the new velocity candidates
@@ -158,6 +157,7 @@ class HRVOAgent : public Agent
     // distance -> Agent Index
     std::set<std::pair<float, std::size_t>> neighbors_;
     std::vector<VelocityObstacle> velocityObstacles_;
+    std::vector<ObstaclePtr> static_obstacles;
     RobotNavigationObstacleFactory obstacle_factory;
 
     // TODO (#2519): Remove magic numbers
@@ -167,6 +167,11 @@ class HRVOAgent : public Agent
     // Decreasing preferred speed during deceleration to reduce the chance of
     // overshooting the destination
     static constexpr float decel_pref_speed_multiplier = 0.6f;
+
+    // The scale multiple of max robot speed which the preferred speed will be set at.
+    // pref_speed = max_speed * PREF_SPEED_SCALE
+    // NOTE: This scale multiple must be <= 1
+    static constexpr float PREF_SPEED_SCALE = 0.85f;
 
     friend class KdTree;
     friend class Simulator;

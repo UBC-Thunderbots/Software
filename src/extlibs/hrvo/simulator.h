@@ -97,17 +97,15 @@ class HRVOSimulator
      * @param maxNeighbors       The maximum neighbor count of this agent.
      * @param agent_radius       The agent_radius of this agent.
      * @param goalRadius         The goal agent_radius of this agent.
-     * @param prefSpeed          The preferred speed of this agent.
      * @param maxSpeed           The maximum speed of this agent.
      * @param uncertaintyOffset  The uncertainty offset of this agent.
      * @param maxAccel           The maximum acceleration of this agent.
      * @param curr_velocity      The initial velocity of this agent.
      * @return The index of the agent.
      */
-    std::size_t addHRVOAgent(const Vector &position, float agent_radius,
-                             const Vector &curr_velocity, float maxSpeed, float prefSpeed,
-                             float maxAccel, AgentPath &path, float neighborDist,
-                             std::size_t maxNeighbors, float uncertaintyOffset);
+    std::size_t addHRVOAgent(const Vector &position, float agent_radius, const Vector &curr_velocity, float maxSpeed,
+                             float maxAccel, AgentPath &path, float neighborDist, std::size_t maxNeighbors,
+                             float uncertaintyOffset);
 
     /**
      * Add a new LinearlyVelocityAgent
@@ -265,6 +263,9 @@ class HRVOSimulator
     // PrimitiveSet which includes the path which each friendly robot should take
     TbotsProto::PrimitiveSet primitive_set;
 
+    // Field the agent is playing on
+    Field field;
+
     // True if the ball should be treated as an agent (obstacle)
     // NOTE: This will take effect the next time we receive a world, and we know
     //       the current ball position and velocity
@@ -305,19 +306,10 @@ class HRVOSimulator
     // This scale is used to avoid close encounters, and reduce chance of collision
     static constexpr float ENEMY_ROBOT_RADIUS_SCALE = 1.5f;
 
-    // How much larger should the goal radius be. This is added as a safety tolerance so
-    // robots do not "teleport" over the goal between simulation frames.
-    static constexpr float GOAL_RADIUS_SCALE = 1.05f;
-
     // How much larger should the goal radius be (in meters). This is added as a safety
     // tolerance so robots do not accidentally enter the minimum distance threshold.
     // NOTE: This value must be >= 0
     static constexpr float BALL_AGENT_RADIUS_OFFSET = 0.1f;
-
-    // The scale multiple of max robot speed which the preferred speed will be set at.
-    // pref_speed = max_speed * PREF_SPEED_SCALE
-    // NOTE: This scale multiple must be <= 1
-    static constexpr float PREF_SPEED_SCALE = 0.85f;
 
     // The maximum distance which HRVO Agents will look for neighbors, in meters.
     // A large radius picked to allow for far visibility of neighbors so Agents have
@@ -333,6 +325,5 @@ class HRVOSimulator
     static constexpr float MAX_COLLISION_SPEED = 0.5f;
 
     friend class Agent;
-    friend class Goal;
     friend class KdTree;
 };

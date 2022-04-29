@@ -8,9 +8,8 @@
 #include "extlibs/hrvo/agent.h"
 
 /**
- * Set of functions that generate velocity obstacles relative to a shape
+ * Set of functions that generate velocity obstacles for a static obstacle
  */
 
-Agent::VelocityObstacle generateVelocityObstacle(const Circle &circle, const Agent& agent);
-Agent::VelocityObstacle generateVelocityObstacle(const Rectangle &rectangle, const Agent& agent);
-Agent::VelocityObstacle generateVelocityObstacle(const Polygon &polygon, const Agent& agent);
+Agent::VelocityObstacle generateVelocityObstacle(const Circle &robot, const Circle& obstacle);
+Agent::VelocityObstacle generateVelocityObstacle(const Circle &robot, const Polygon &obstacle);
