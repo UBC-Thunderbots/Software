@@ -178,7 +178,7 @@ class Thunderscope(object):
             lambda: QMessageBox.information(
                 self.window,
                 "Help",
-f"""
+                f"""
 Keyboard Shortcuts:
 
 I to identify robots, show their IDs

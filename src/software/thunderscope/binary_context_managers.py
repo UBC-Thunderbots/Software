@@ -93,7 +93,7 @@ class FullSystem(object):
             ):
                 logging.info(
                     (
-f"""
+                        f"""
 
 Debugging Fullsystem ==============
 1. Build the full system in debug mode:
@@ -225,7 +225,7 @@ class Simulator(object):
             ):
                 logging.info(
                     (
-f"""
+                        f"""
 Debugging Simulator ==============
 1. Build the simulator in debug mode:
 
