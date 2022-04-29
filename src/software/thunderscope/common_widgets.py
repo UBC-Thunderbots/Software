@@ -64,7 +64,6 @@ def create_slider(text, min_val, max_val, tick_spacing):
     :return: group_box: QGroupBox object - add this to the widget - see example
     :return: slider: QSlider object - use this to perform tasks on the button
     :return: value_label: displays value of slider, update this when value is changed
-
     """
     group_box = QGroupBox(text)
     slider = QSlider(Qt.Orientation.Horizontal)
