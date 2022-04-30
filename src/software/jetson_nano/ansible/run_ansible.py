@@ -59,7 +59,7 @@ def ansible_runner(playbook: str, options: dict = {}):
         forks=num_forks,
         remote_user=NANO_USER,
         private_key_file=None,
-        ssh_common_args="StrictHostKeyChecking=no",
+        ssh_common_args="-o StrictHostKeyChecking=no",
         ssh_extra_args=None,
         sftp_extra_args=None,
         scp_extra_args=None,

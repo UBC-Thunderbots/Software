@@ -8,7 +8,29 @@
     - debug:
         msg: "[Robot ID = {{ inventory_hostname }}]"
 
-    - name: sync binaries to the nano
+      #NOTE: "Enabling systems" means they will start on boot
+    - name: Stop Running Binaries
+      become: true
+      become_method: sudo
+      with_items:
+        - thunderbots
+        - redis
+        - thunderloop
+        - ui
+        - announcement
+      loop_control:
+        loop_var: service_name
+      ansible.builtin.systemd:
+        name: "{{ service_name }}"
+        masked: no
+        daemon_reload: yes
+        state: stopped
+      tags:
+        - flash
+        - stopBinaries
+
+    # todo: execute lcd ui (#2443)
+    - name: sync new binaries to the nano
       with_items:
         - ../../../../../../../../jetson_nano/display
         - ../../../../../../../../jetson_nano/broadcasts
@@ -22,21 +44,9 @@
         copy_links: yes
       tags:
         - syncAllBinaries
+        - flash
 
-    - name: sync all relevant systemd files
-      become_method: sudo
-      become: true
-      tags:
-        - systemd
-        - syncSystemdFiles
-      register: res
-      ansible.posix.synchronize:
-        src: ../../systemd/
-        dest: /etc/systemd/system
-        copy_links: yes
-
-      #NOTE: "Enabling systems" means they will start on boot
-    - name: Enable system services
+    - name: start binaries
       become: true
       become_method: sudo
       with_items:
@@ -49,24 +59,11 @@
         loop_var: service_name
       ansible.builtin.systemd:
         name: "{{ service_name }}"
-        enabled: yes
         masked: no
         daemon_reload: yes
+        state: started
       tags:
-        - systemd
+        - flash
+        - startBinaries
 
-    - name: Reboot
-      become: true
-      become_user: root
-      become_method: sudo
-      register: res
-      tags:
-        - reboot
-        - systemd
-      reboot:
-        msg: "Reboot initiated by Ansible"
-        connect_timeout: 20
-        reboot_timeout: 1200
-        pre_reboot_delay: 0
-        post_reboot_delay: 10
-        test_command: whoami
+
