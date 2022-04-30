@@ -11,8 +11,6 @@
 #include "software/gui/drawing/geom.h"
 #include "software/gui/geometry_conversion.h"
 
-// DO NOT INCLUDE IN PR
-
 /**
  * The ObstacleArtist draws Obstacles with artistic flair
  */

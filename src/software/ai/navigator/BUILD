@@ -20,7 +20,6 @@ cc_library(
         "//software/gui/drawing:obstacle_artist",
         "//software/logger",
         "//software/world",
-        "//software/gui/drawing:obstacle_artist",
     ],
 )
 
