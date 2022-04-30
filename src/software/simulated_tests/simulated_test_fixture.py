@@ -29,7 +29,7 @@ from software.logger.logger import createLogger
 
 logger = createLogger(__name__)
 
-LAUNCH_DELAY_S = 0.2
+LAUNCH_DELAY_S = 0.1
 WORLD_BUFFER_TIMEOUT = 0.5
 PROCESS_BUFFER_DELAY_S = 0.01
 PAUSE_AFTER_FAIL_DELAY_S = 3
@@ -334,9 +334,9 @@ def simulated_test_runner():
                     simulator_proto_unix_io,
                     blue_full_system_proto_unix_io,
                     yellow_full_system_proto_unix_io,
+                    layout_path=args.layout,
                     visualization_buffer_size=args.visualization_buffer_size,
                 )
-                tscope.load_saved_layout(args.layout)
 
             time.sleep(LAUNCH_DELAY_S)
 

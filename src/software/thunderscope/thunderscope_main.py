@@ -121,8 +121,6 @@ if __name__ == "__main__":
         if args.interface is None:
             parser.error("Must specify interface")
 
-    tscope = Thunderscope(visualization_buffer_size=args.visualization_buffer_size)
-
     ###########################################################################
     #                      Visualize CPP Tests                                #
     ###########################################################################
@@ -152,7 +150,10 @@ if __name__ == "__main__":
 
         proto_unix_io.attach_unix_receiver(runtime_dir + "/log", RobotLog)
 
-        tscope.load_saved_layout(args.layout, load_yellow=True)
+        tscope = Thunderscope(
+                    layout_path=args.layout,
+                    load_yellow=load_yellow,
+                    visualization_buffer_size=args.visualization_buffer_size)
         tscope.show()
 
     ###########################################################################
@@ -162,6 +163,10 @@ if __name__ == "__main__":
     # When we are running with real robots. We want to run 1 instance of AI
     # and 1 instance of RobotCommunication which will send/recv packets over
     # the provided multicast channel.
+    tscope = Thunderscope(
+                layout_path=args.layout,
+                visualization_buffer_size=args.visualization_buffer_size)
+
     proto_unix_io = tscope.blue_full_system_proto_unix_io
     runtime_dir = args.blue_full_system_runtime_dir
     friendly_colour_yellow = False
@@ -198,7 +203,6 @@ if __name__ == "__main__":
         ) as blue_player, ProtoPlayer(
             args.replay_log_yellow_full_system, tscope.yellow_full_system_proto_unix_io
         ) as yellow_player:
-            tscope.load_saved_layout(args.layout)
             tscope.show()
 
     ###########################################################################
@@ -266,8 +270,6 @@ if __name__ == "__main__":
                 tscope.blue_full_system_proto_unix_io,
                 tscope.yellow_full_system_proto_unix_io,
             )
-
-            tscope.load_saved_layout(args.layout)
 
             # Start the simulator
             thread = threading.Thread(

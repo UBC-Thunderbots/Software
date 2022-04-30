@@ -84,6 +84,9 @@ class Thunderscope(object):
         simulator_proto_unix_io=None,
         blue_full_system_proto_unix_io=None,
         yellow_full_system_proto_unix_io=None,
+        layout_path=None,
+        load_blue=True,
+        load_yellow=True,
         refresh_interval_ms=10,
         visualization_buffer_size=5,
     ):
@@ -92,6 +95,9 @@ class Thunderscope(object):
         :param simulator_proto_unix_io: The simulator's proto unix io
         :param blue_full_system_proto_unix_io: The blue full system's proto unix io
         :param yellow_full_system_proto_unix_io: The yellow full system's proto unix io
+        :param layout_path: The path to the layout to load
+        :param load_blue: Whether to load the blue dock area
+        :param load_yellow: Whether to load the yellow dock area
         :param refresh_interval_ms: The interval in milliseconds to refresh the simulator
         :param visualization_buffer_size: The size of the visualization buffer
 
@@ -145,6 +151,9 @@ class Thunderscope(object):
         )
 
         self.refresh_timers = []
+
+        # Setup the main window and  load 
+        self.__setup(layout_path, load_blue, load_yellow)
 
         # Save and Load Prompts
         self.save_layout_shortcut = QtGui.QShortcut(
@@ -260,7 +269,7 @@ Cntrl-Click and Drag: Move ball and kick
                     default_shelf["yellow_dock_state"] = shelf["yellow_dock_state"]
                     default_shelf.sync()
 
-    def load_saved_layout(self, layout_path, load_blue=True, load_yellow=True):
+    def __setup(self, layout_path, load_blue=True, load_yellow=True):
         """Load the specified layout or the default file. If the default layout
         file doesn't exist, and no layout is provided, then just configure
         the default layout.
@@ -348,14 +357,14 @@ Cntrl-Click and Drag: Move ball and kick
         playinfo_dock.addWidget(widgets["playinfo_widget"])
 
         widgets["replay_widget"] = self.setup_replay_controls_widget()
-        replay_dock = Dock("Replay")
+        replay_dock = Dock("Replay", size=(100, 10))
         replay_dock.addWidget(widgets["replay_widget"])
 
         dock_area.addDock(field_dock)
-        dock_area.addDock(replay_dock, "bottom", field_dock)
         dock_area.addDock(log_dock, "bottom", field_dock)
         dock_area.addDock(performance_dock, "right", log_dock)
         dock_area.addDock(playinfo_dock, "right", performance_dock)
+        dock_area.addDock(replay_dock, "bottom", log_dock)
 
     def setup_field_widget(
         self, sim_proto_unix_io, full_system_proto_unix_io, friendly_colour_yellow
