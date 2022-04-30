@@ -15,9 +15,6 @@
 
 using Path = LinearSpline2d;
 
-// TODO #2504: The GlobalPathPlanner doesn't handle
-// MotionConstraint::AVOID_BALL_PLACEMENT_INTERFERENCE and
-// MotionConstraint::HALF_METER_AROUND_BALL correctly in most situations
 /**
  * GlobalPathPlannerFactory is a module that constructs every possible path planner for
  * every possible combination of static obstacles. It pre-computes static obstacle
@@ -50,10 +47,13 @@ class GlobalPathPlannerFactory
      * @return path planner for static obstacles created by constraints
      */
     std::shared_ptr<const EnlsvgPathPlanner> getPathPlanner(
-        const std::set<TbotsProto::MotionConstraint> &constraints) const;
+        std::set<TbotsProto::MotionConstraint> constraints) const;
 
    private:
     std::map<std::set<TbotsProto::MotionConstraint>,
              std::shared_ptr<const EnlsvgPathPlanner>>
         planners;
+
+    // Cache which motion constraints are dynamic for convenience
+    std::set<TbotsProto::MotionConstraint> dynamic_motion_constraints;
 };
