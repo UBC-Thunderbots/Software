@@ -65,7 +65,7 @@ host_software_packages=(
     openssl # possibly also necessary for ssl in Python 3
 )
 
-if [[ $(lsb_release -rs) == "20.3" ]]; then
+if [[ $(lsb_release -rs) == "20.04" ]]; then
     # This is required for bazel, we've seen some issues where
     # the bazel install hasn't installed it properly
     host_software_packages+=(python-is-python3)
@@ -128,7 +128,7 @@ if [[ $(lsb_release -rs) == "18.04" ]]; then
     sudo /opt/tbotspython/bin/pip3 install -r ubuntu18_requirements.txt
 fi
 
-if [[ $(lsb_release -rs) == "20.3" ]]; then
+if [[ $(lsb_release -rs) == "20.04" ]]; then
     sudo /opt/tbotspython/bin/pip3 install -r ubuntu20_requirements.txt
 fi
 

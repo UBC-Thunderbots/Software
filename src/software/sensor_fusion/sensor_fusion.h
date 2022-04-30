@@ -54,7 +54,6 @@ class SensorFusion
     // started, determined experimentally with the simulator
     static constexpr double VISION_PACKET_RESET_TIME_THRESHOLD = 0.5;
 
-
    private:
     /**
      * Updates relevant components of world based on a new data
