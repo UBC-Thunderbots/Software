@@ -33,7 +33,6 @@ class PowerService : public Service
         const TbotsProto::PowerControl& control);
 
    private:
-    boost::asio::io_service io_service;
     std::unique_ptr<BoostUartCommunication> uart;
     TbotsProto_PowerStatus status;
 

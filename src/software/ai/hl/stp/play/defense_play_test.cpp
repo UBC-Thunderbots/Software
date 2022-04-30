@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 
 #include "software/simulated_tests/non_terminating_validation_functions/ball_in_play_or_scored_validation.h"
-#include "software/simulated_tests/simulated_play_test_fixture.h"
+#include "software/simulated_tests/simulated_er_force_sim_play_test_fixture.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_halt_validation.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_in_polygon_validation.h"
 #include "software/simulated_tests/validation/validation_function.h"
@@ -11,10 +11,11 @@
 #include "software/time/duration.h"
 #include "software/world/world.h"
 
-class DefensePlayTest : public SimulatedPlayTestFixture
+class DefensePlayTest : public SimulatedErForceSimPlayTestFixture
 {
    protected:
-    Field field = Field::createSSLDivisionBField();
+    TbotsProto::FieldType field_type = TbotsProto::FieldType::DIV_B;
+    Field field                      = Field::createField(field_type);
 };
 
 TEST_F(DefensePlayTest, test_defense_play)
@@ -68,7 +69,7 @@ TEST_F(DefensePlayTest, test_defense_play)
     std::vector<ValidationFunction> non_terminating_validation_functions = {
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {}};
 
-    runTest(field, ball_state, friendly_robots, enemy_robots,
+    runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
 }
@@ -123,7 +124,7 @@ TEST_F(DefensePlayTest, test_defense_play_one_immediate_threat)
             ballInPlay(world_ptr, yield);
         }};
 
-    runTest(field, ball_state, friendly_robots, enemy_robots,
+    runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
 }
@@ -179,7 +180,7 @@ TEST_F(DefensePlayTest, test_defense_play_close_to_net)
             ballInPlay(world_ptr, yield);
         }};
 
-    runTest(field, ball_state, friendly_robots, enemy_robots,
+    runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
 }

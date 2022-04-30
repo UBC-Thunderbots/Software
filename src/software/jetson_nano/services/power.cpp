@@ -9,8 +9,7 @@ PowerService::PowerService()
     : READ_BUFFER_SIZE(
           getMarshalledSize(TbotsProto_PowerStatus TbotsProto_PowerStatus_init_default))
 {
-    this->uart = std::make_unique<BoostUartCommunication>(io_service, BAUD_RATE,
-                                                          DEVICE_SERIAL_PORT);
+    this->uart = std::make_unique<BoostUartCommunication>(BAUD_RATE, DEVICE_SERIAL_PORT);
 }
 
 void PowerService::start() {}

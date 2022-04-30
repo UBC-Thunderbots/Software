@@ -14,6 +14,7 @@ cc_library(
         ":tbots_geometry",
         "//proto:tbots_cc_proto",
         "//proto:visualization_cc_proto",
+        "//software/ai/passing:pass_with_rating",
         "//software/geom:angle",
         "//software/geom:point",
         "//software/geom:vector",
@@ -233,6 +234,7 @@ cc_test(
     ],
 )
 
+
 platformio_library(
     name = "power_frame_msg_platformio",
     hdr = "power_frame_msg.hpp",
@@ -246,5 +248,17 @@ cc_library(
         "//proto:tbots_nanopb_proto",
         "//proto/primitive:primitive_msg_factory",
         "@nanopb",
+    ],
+)
+
+py_library(
+    name = "py_tbots_protobuf",
+    srcs = [
+        "tbots_protobuf.py",
+    ],
+    deps = [
+        "//proto:import_all_protos",
+        "//proto:software_py_proto",
+        "//proto:tbots_py_proto",
     ],
 )

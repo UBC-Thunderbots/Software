@@ -103,10 +103,6 @@ void ShootOrPassPlayFSM::startLookingForPass(const Update& event)
 
 void ShootOrPassPlayFSM::takePass(const Update& event)
 {
-    // Commit to a pass
-    LOG(DEBUG) << "Committing to pass: " << best_pass_and_score_so_far.pass;
-    LOG(DEBUG) << "Score of pass we committed to: " << best_pass_and_score_so_far.rating;
-
     auto pass_eval = pass_generator.generatePassEvaluation(event.common.world);
 
     auto ranked_zones = pass_eval.rankZonesForReceiving(
@@ -115,6 +111,8 @@ void ShootOrPassPlayFSM::takePass(const Update& event)
     // if we make it here then we have committed to the pass
     attacker_tactic->updateControlParams(best_pass_and_score_so_far.pass, true);
     receiver_tactic->updateControlParams(best_pass_and_score_so_far.pass);
+    event.common.set_inter_play_communication_fun(
+        InterPlayCommunication{.last_committed_pass = best_pass_and_score_so_far});
 
     if (!attacker_tactic->done())
     {

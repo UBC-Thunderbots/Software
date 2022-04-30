@@ -23,7 +23,7 @@ class ObstacleArtist : public ObstacleVisitor
      * @param scene The scene to draw on
      * @param pen The QPen to draw the obstacle
      */
-    explicit ObstacleArtist(QGraphicsScene* scene, const QPen& pen);
+    explicit ObstacleArtist(QGraphicsScene* scene, std::optional<QPen> pen);
 
     /**
      * Draws the ObstaclePtr on the given scene.
@@ -48,6 +48,6 @@ class ObstacleArtist : public ObstacleVisitor
 
    private:
     QGraphicsScene* scene_;
-    QPen pen_;
+    std::optional<QPen> pen_;
     TbotsProto::Obstacles obstacle_proto_;
 };
