@@ -20,13 +20,11 @@ class BoostUartCommunication : public UartCommunication
      * constructs and opens a serial connection with the given device port
      * settings used: 8 bit data, No flow control, No parity, 1 stop bit
      *
-     * @param io_service boost asio construct for managing io operations
      * @param baud_rate the desired baud rate of the connection
      * @param device_serial_port the serial port that we want to communicate with
      * @throws boost::exception if port could not be opened
      */
-    BoostUartCommunication(IoService &io_service, int baud_rate,
-                           std::string device_serial_port);
+    BoostUartCommunication(int baud_rate, std::string device_serial_port);
 
     BoostUartCommunication(const BoostUartCommunication &) = delete;
 
@@ -87,4 +85,5 @@ class BoostUartCommunication : public UartCommunication
     void closePort();
 
     SerialPortPtr serial_port;
+    IoService io_service_;
 };

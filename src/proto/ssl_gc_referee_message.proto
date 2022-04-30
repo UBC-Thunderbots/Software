@@ -7,6 +7,15 @@ import "proto/ssl_gc_game_event.proto";
 // Each UDP packet contains one of these messages.
 message Referee
 {
+    // A random UUID of the source that is kept constant at the source while running
+    // If multiple sources are broadcasting to the same network, this id can be used to
+    // identify individual sources
+    optional string source_identifier = 18;
+
+    // The match type is a meta information about the current match that helps to process
+    // the logs after a competition
+    optional MatchType match_type = 19 [default = UNKNOWN_MATCH];
+
     // The UNIX timestamp when the packet was sent, in microseconds.
     // Divide by 1,000,000 to get a time_t.
     required uint64 packet_timestamp = 1;
@@ -206,4 +215,17 @@ message GameEventProposalGroup
     repeated GameEvent game_event = 1;
     // Whether the proposal group was accepted
     optional bool accepted = 2;
+}
+
+// MatchType is a meta information about the current match for easier log processing
+enum MatchType
+{
+    // not set
+    UNKNOWN_MATCH = 0;
+    // match is part of the group phase
+    GROUP_PHASE = 1;
+    // match is part of the elimination phase
+    ELIMINATION_PHASE = 2;
+    // a friendly match, not part of a tournament
+    FRIENDLY = 3;
 }

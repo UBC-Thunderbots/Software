@@ -3,7 +3,7 @@
 #include <memory>
 #include <optional>
 
-#include "proto/messages_robocup_ssl_geometry.pb.h"
+#include "proto/ssl_vision_geometry.pb.h"
 #include "software/geom/circle.h"
 #include "software/geom/segment.h"
 #include "software/util/make_enum/make_enum.h"

@@ -3,7 +3,7 @@
 #include <limits>
 #include <memory>
 
-#include "proto/messages_robocup_ssl_detection.pb.h"
+#include "proto/ssl_vision_detection.pb.h"
 #include "software/sensor_fusion/filter/vision_detection.h"
 #include "software/time/timestamp.h"
 #include "software/world/ball_state.h"

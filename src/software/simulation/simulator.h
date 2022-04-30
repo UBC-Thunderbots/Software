@@ -1,7 +1,7 @@
 #pragma once
 
 #include "proto/defending_side_msg.pb.h"
-#include "proto/messages_robocup_ssl_wrapper.pb.h"
+#include "proto/ssl_vision_wrapper.pb.h"
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/simulation/firmware_object_deleter.h"
 #include "software/simulation/physics/physics_world.h"

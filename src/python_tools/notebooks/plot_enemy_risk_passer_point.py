@@ -14,7 +14,7 @@
 # ---
 
 # +
-from proto.messages_robocup_ssl_wrapper_pb2 import SSL_WrapperPacket
+from proto.ssl_vision_wrapper_pb2 import SSL_WrapperPacket
 from python_tools.proto_log import ProtoLog
 import ipywidgets
 from IPython.display import display
