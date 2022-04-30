@@ -93,51 +93,13 @@ py_library(
         "//software:py_constants.so",
     ],
     deps = [
-        ":er_force_simulator",
-        ":full_system",
         "//proto:import_all_protos",
         "//software/logger:py_logger",
         "//software/networking:threaded_unix_listener_py",
         "//software/networking:threaded_unix_sender_py",
         "//software/simulated_tests:validation",
         "//software/thunderscope",
-    ],
-)
-
-py_library(
-    name = "er_force_simulator",
-    srcs = [
-        "er_force_simulator.py",
-    ],
-    data = [
-        "//software:er_force_simulator_main",
-        "//software:py_constants.so",
-    ],
-    deps = [
-        "//proto:software_py_proto",
-        "//proto:tbots_py_proto",
-        "//software/logger:py_logger",
-        "//software/networking:threaded_unix_listener_py",
-        "//software/networking:threaded_unix_sender_py",
-    ],
-)
-
-py_library(
-    name = "full_system",
-    srcs = [
-        "full_system.py",
-    ],
-    data = [
-        "//software:py_constants.so",
-        "//software:python_bindings.so",
-        "//software:unix_full_system",
-    ],
-    deps = [
-        "//proto:software_py_proto",
-        "//proto:tbots_py_proto",
-        "//software/logger:py_logger",
-        "//software/networking:threaded_unix_listener_py",
-        "//software/networking:threaded_unix_sender_py",
+        "//software/thunderscope:binary_context_managers",
     ],
 )
 

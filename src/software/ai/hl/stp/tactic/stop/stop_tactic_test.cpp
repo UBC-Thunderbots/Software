@@ -2,13 +2,13 @@
 
 #include <gtest/gtest.h>
 
-#include "software/simulated_tests/simulated_er_force_sim_tactic_test_fixture.h"
+#include "software/simulated_tests/simulated_er_force_sim_play_test_fixture.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_halt_validation.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_state_validation.h"
 #include "software/simulated_tests/validation/validation_function.h"
 #include "software/test_util/test_util.h"
 
-class StopTacticTest : public SimulatedErForceSimTacticTestFixture
+class StopTacticTest : public SimulatedErForceSimPlayTestFixture
 {
    protected:
     TbotsProto::FieldType field_type = TbotsProto::FieldType::DIV_B;
@@ -24,8 +24,7 @@ TEST_F(StopTacticTest, robot_already_stopped)
     auto enemy_robots = TestUtil::createStationaryRobotStatesWithId({Point(4, 0)});
 
     auto tactic = std::make_shared<StopTactic>(false);
-    setTactic(tactic);
-    setFriendlyRobotId(1);
+    setTactic(1, tactic);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
@@ -51,8 +50,7 @@ TEST_F(StopTacticTest, robot_start_moving)
     auto enemy_robots = TestUtil::createStationaryRobotStatesWithId({Point(4, 0)});
 
     auto tactic = std::make_shared<StopTactic>(false);
-    setTactic(tactic);
-    setFriendlyRobotId(1);
+    setTactic(1, tactic);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {

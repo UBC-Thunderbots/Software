@@ -6,7 +6,7 @@
 
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/simulated_tests/non_terminating_validation_functions/enemy_never_scores_validation.h"
-#include "software/simulated_tests/simulated_er_force_sim_tactic_test_fixture.h"
+#include "software/simulated_tests/simulated_er_force_sim_play_test_fixture.h"
 #include "software/simulated_tests/terminating_validation_functions/ball_kicked_validation.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_in_polygon_validation.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_received_ball_validation.h"
@@ -17,7 +17,7 @@
 #include "software/world/world.h"
 
 class GoalieTacticTest
-    : public SimulatedErForceSimTacticTestFixture,
+    : public SimulatedErForceSimPlayTestFixture,
       public ::testing::WithParamInterface<std::tuple<BallState, RobotStateWithId>>
 {
    protected:
@@ -49,8 +49,7 @@ TEST_F(GoalieTacticTest, test_panic_ball_very_fast_in_straight_line)
     auto friendly_robots = TestUtil::createStationaryRobotStatesWithId({Point(-4, -1)});
 
     auto tactic = std::make_shared<GoalieTactic>(ai_config);
-    setTactic(tactic);
-    setFriendlyRobotId(0);
+    setTactic(0, tactic);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [this, tactic](std::shared_ptr<World> world_ptr,
@@ -79,8 +78,7 @@ TEST_F(GoalieTacticTest, test_panic_ball_very_fast_in_diagonal_line)
         {field.friendlyGoalCenter() + Vector(0, -0.5)});
 
     auto tactic = std::make_shared<GoalieTactic>(ai_config);
-    setTactic(tactic);
-    setFriendlyRobotId(0);
+    setTactic(0, tactic);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [this, tactic](std::shared_ptr<World> world_ptr,
@@ -108,8 +106,7 @@ TEST_F(GoalieTacticTest, test_ball_very_fast_misses_net)
     auto friendly_robots = TestUtil::createStationaryRobotStatesWithId({Point(-4.5, 0)});
 
     auto tactic = std::make_shared<GoalieTactic>(ai_config);
-    setTactic(tactic);
-    setFriendlyRobotId(0);
+    setTactic(0, tactic);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [this](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
@@ -133,8 +130,7 @@ TEST_F(GoalieTacticTest, test_slow_ball_at_sharp_angle_to_friendly_goal)
     auto friendly_robots = TestUtil::createStationaryRobotStatesWithId({Point(-4.5, 0)});
 
     auto tactic = std::make_shared<GoalieTactic>(ai_config);
-    setTactic(tactic);
-    setFriendlyRobotId(0);
+    setTactic(0, tactic);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [this](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
@@ -161,8 +157,7 @@ TEST_P(GoalieTacticTest, goalie_test)
     auto friendly_robots = {robot_state};
 
     auto tactic = std::make_shared<GoalieTactic>(ai_config);
-    setTactic(tactic);
-    setFriendlyRobotId(0);
+    setTactic(0, tactic);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [this, tactic](std::shared_ptr<World> world_ptr,

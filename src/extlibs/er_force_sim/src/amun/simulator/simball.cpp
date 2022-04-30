@@ -26,7 +26,7 @@
 #include "extlibs/er_force_sim/src/core/coordinates.h"
 #include "extlibs/er_force_sim/src/core/rng.h"
 #include "extlibs/er_force_sim/src/core/vector.h"
-#include "proto/messages_robocup_ssl_detection.pb.h"
+#include "proto/ssl_vision_detection.pb.h"
 #include "simulator.h"
 
 using namespace camun::simulator;

@@ -1,3 +1,4 @@
+#include "extlibs/er_force_sim/src/protobuf/world.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
 #include "proto/vision.pb.h"
 #include "proto/world.pb.h"
@@ -64,8 +65,12 @@ int main(int argc, char **argv)
 
         // Outputs
         // SSL Wrapper Output
-        auto ssl_wrapper_output = ThreadedProtoUnixSender<SSLProto::SSL_WrapperPacket>(
-            runtime_dir + SSL_WRAPPER_PACKET_PATH);
+        auto blue_ssl_wrapper_output =
+            ThreadedProtoUnixSender<SSLProto::SSL_WrapperPacket>(runtime_dir +
+                                                                 BLUE_SSL_WRAPPER_PATH);
+        auto yellow_ssl_wrapper_output =
+            ThreadedProtoUnixSender<SSLProto::SSL_WrapperPacket>(runtime_dir +
+                                                                 YELLOW_SSL_WRAPPER_PATH);
 
         // Robot Status Outputs
         auto blue_robot_status_output = ThreadedProtoUnixSender<TbotsProto::RobotStatus>(
@@ -73,6 +78,10 @@ int main(int argc, char **argv)
         auto yellow_robot_status_output =
             ThreadedProtoUnixSender<TbotsProto::RobotStatus>(runtime_dir +
                                                              YELLOW_ROBOT_STATUS_PATH);
+
+        // Simulator State as World State Output
+        auto simulator_state_output = ThreadedProtoUnixSender<world::SimulatorState>(
+            runtime_dir + SIMULATOR_STATE_PATH);
 
         // Inputs
         // World State Input: Configures the ERForceSimulator
@@ -89,6 +98,7 @@ int main(int argc, char **argv)
                 std::scoped_lock lock(simulator_mutex);
                 blue_vision = input;
             });
+
         auto yellow_world_input = ThreadedProtoUnixListener<TbotsProto::World>(
             runtime_dir + YELLOW_WORLD_PATH, [&](TbotsProto::World input) {
                 std::scoped_lock lock(simulator_mutex);
@@ -124,7 +134,8 @@ int main(int argc, char **argv)
 
                 for (const auto packet : er_force_sim->getSSLWrapperPackets())
                 {
-                    ssl_wrapper_output.sendProto(packet);
+                    blue_ssl_wrapper_output.sendProto(packet);
+                    yellow_ssl_wrapper_output.sendProto(packet);
                 }
 
                 for (const auto packet : er_force_sim->getBlueRobotStatuses())
@@ -136,6 +147,8 @@ int main(int argc, char **argv)
                 {
                     yellow_robot_status_output.sendProto(packet);
                 }
+
+                simulator_state_output.sendProto(er_force_sim->getSimulatorState());
             });
 
         // This blocks forever without using the CPU
