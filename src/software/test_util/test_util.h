@@ -17,6 +17,13 @@
 #include "software/world/team.h"
 #include "software/world/world.h"
 
+#define TEST_UTIL_CREATE_MOTION_CONTROL \
+[](const Robot &, const Point &){ \
+            TbotsProto::MotionControl motion_control; \
+            *(motion_control.mutable_requested_destination()) = *createPointProto(Point()); \
+return  motion_control; \
+}
+
 #define UNUSED(x) (void)(x)
 
 /**
