@@ -59,6 +59,21 @@ int main(int argc, char** argv)
                     ai->overrideTactics(input);
                 });
 
+        auto play_override_listener = 
+            ThreadedProtoUnixListener<TbotsProto::Play>(
+                runtime_path + PLAY_OVERRIDE_PATH,
+                [&ai](TbotsProto::Play input_play) {
+                    ai->overridePlay(input_play);
+                });
+
+        auto game_state_override_listener =
+            ThreadedProtoUnixListener<TbotsProto::GameState>(
+                runtime_path + GAME_STATE_OVERRIDE_PATH,
+                [&sensor_fusion](TbotsProto::GameState game_state) {
+                    // find function for override game_state?
+                    sensor_fusion->updateGameState(GameState(game_state));
+                });
+
         // Connect observers
         ai->Subject<TbotsProto::PrimitiveSet>::registerObserver(backend);
         sensor_fusion->Subject<World>::registerObserver(ai);

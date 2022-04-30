@@ -155,3 +155,6 @@ src/.clangd
 
 # external is a special directory for bazel so it should be ignored
 src/external
+
+#tbots env
+src/tbots_env

@@ -26,6 +26,9 @@ static const std::string SIMULATOR_MULTICAST_CHANNELS[MAX_SIMULATOR_MULTICAST_CH
 
 // Unix Socket Paths
 const std::string TACTIC_OVERRIDE_PATH     = "/tactic_override";
+const std::string PLAY_OVERRIDE_PATH       = "/play_override";
+//TODO remove as part of issue 2551
+const std::string GAME_STATE_OVERRIDE_PATH = "/game_state_override";
 const std::string WORLD_PATH               = "/world";
 const std::string PRIMITIVE_PATH           = "/primitive";
 const std::string ROBOT_STATUS_PATH        = "/robot_status";
