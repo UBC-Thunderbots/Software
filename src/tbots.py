@@ -1,4 +1,4 @@
-#!/opt/tbotspython/bin/python3.10
+#!/opt/tbotspython/bin/python3
 
 import os
 import sys
