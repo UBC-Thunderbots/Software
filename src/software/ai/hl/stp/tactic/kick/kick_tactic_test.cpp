@@ -5,7 +5,7 @@
 #include <utility>
 
 #include "software/geom/algorithms/contains.h"
-#include "software/simulated_tests/simulated_er_force_sim_tactic_test_fixture.h"
+#include "software/simulated_tests/simulated_er_force_sim_play_test_fixture.h"
 #include "software/simulated_tests/terminating_validation_functions/ball_kicked_validation.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_state_validation.h"
 #include "software/simulated_tests/validation/validation_function.h"
@@ -13,7 +13,7 @@
 #include "software/time/duration.h"
 #include "software/world/world.h"
 
-class KickTacticTest : public SimulatedErForceSimTacticTestFixture,
+class KickTacticTest : public SimulatedErForceSimPlayTestFixture,
                        public ::testing::WithParamInterface<std::tuple<Vector, Angle>>
 {
    protected:
@@ -36,8 +36,7 @@ TEST_P(KickTacticTest, kick_test)
     auto tactic = std::make_shared<KickTactic>();
     tactic->updateControlParams(robot_position + ball_offset_from_robot, angle_to_kick_at,
                                 5);
-    setTactic(tactic);
-    setFriendlyRobotId(1);
+    setTactic(1, tactic);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [angle_to_kick_at, tactic](std::shared_ptr<World> world_ptr,
