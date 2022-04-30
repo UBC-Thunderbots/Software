@@ -152,7 +152,7 @@ class Thunderscope(object):
 
         self.refresh_timers = []
 
-        # Setup the main window and  load 
+        # Setup the main window and  load
         self.__setup(layout_path, load_blue, load_yellow)
 
         # Save and Load Prompts

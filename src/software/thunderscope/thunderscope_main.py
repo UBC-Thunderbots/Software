@@ -151,9 +151,10 @@ if __name__ == "__main__":
         proto_unix_io.attach_unix_receiver(runtime_dir + "/log", RobotLog)
 
         tscope = Thunderscope(
-                    layout_path=args.layout,
-                    load_yellow=load_yellow,
-                    visualization_buffer_size=args.visualization_buffer_size)
+            layout_path=args.layout,
+            load_yellow=load_yellow,
+            visualization_buffer_size=args.visualization_buffer_size,
+        )
         tscope.show()
 
     ###########################################################################
@@ -164,8 +165,9 @@ if __name__ == "__main__":
     # and 1 instance of RobotCommunication which will send/recv packets over
     # the provided multicast channel.
     tscope = Thunderscope(
-                layout_path=args.layout,
-                visualization_buffer_size=args.visualization_buffer_size)
+        layout_path=args.layout,
+        visualization_buffer_size=args.visualization_buffer_size,
+    )
 
     proto_unix_io = tscope.blue_full_system_proto_unix_io
     runtime_dir = args.blue_full_system_runtime_dir
@@ -247,9 +249,9 @@ if __name__ == "__main__":
         ) as blue_fs, FullSystem(
             args.yellow_full_system_runtime_dir, args.debug_yellow_full_system, True
         ) as yellow_fs, ProtoLogger(
-            args.blue_full_system_runtime_dir, "blue"
+            args.blue_full_system_runtime_dir,
         ) as blue_logger, ProtoLogger(
-            args.yellow_full_system_runtime_dir, "yellow"
+            args.yellow_full_system_runtime_dir,
         ) as yellow_logger, Gamecontroller() as gamecontroller:
 
             tscope.blue_full_system_proto_unix_io.register_to_observe_everything(
