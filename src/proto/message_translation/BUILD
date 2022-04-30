@@ -234,7 +234,6 @@ cc_test(
     ],
 )
 
-
 platformio_library(
     name = "power_frame_msg_platformio",
     hdr = "power_frame_msg.hpp",
