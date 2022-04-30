@@ -122,6 +122,7 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
 
             primitives_to_run->mutable_robot_primitives()->insert(
                 google::protobuf::MapPair(goalie_robot_id, primitive));
+            goalie_tactic->setLastExecutionRobot(goalie_robot_id);
         }
         else if (world.friendlyTeam().getGoalieId().has_value())
         {

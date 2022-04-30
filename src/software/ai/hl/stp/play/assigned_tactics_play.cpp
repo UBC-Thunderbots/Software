@@ -30,8 +30,23 @@ std::unique_ptr<TbotsProto::PrimitiveSet> AssignedTacticsPlay::get(
     const GlobalPathPlannerFactory &path_planner_factory, const World &world,
     const InterPlayCommunication &, const SetInterPlayCommunicationCallback &)
 {
-    // TODO: fix this
     auto primitives_to_run = std::make_unique<TbotsProto::PrimitiveSet>();
+    for (const auto &robot : world.friendlyTeam().getAllRobots())
+    {
+        if (assigned_tactics.contains(robot.id()))
+        {
+            auto tactic = assigned_tactics.at(robot.id());
+            tactic_robot_id_assignment.emplace(tactic, robot.id());
+            auto primitives = getPrimitivesFromTactic(path_planner_factory, world, tactic)
+                                  ->robot_primitives();
+            CHECK(primitives.contains(robot.id()))
+                << "Couldn't find a primitive for robot id " << robot.id();
+            auto primitive = primitives.at(robot.id());
+            primitives_to_run->mutable_robot_primitives()->insert(
+                google::protobuf::MapPair(robot.id(), primitive));
+            tactic->setLastExecutionRobot(robot.id());
+        }
+    }
     return primitives_to_run;
 }
 

@@ -30,7 +30,8 @@ void AI::checkAiConfig()
     bool current_override = ai_config->getAiControlConfig()->getOverrideAiPlay()->value();
     std::string current_override_name =
         ai_config->getAiControlConfig()->getCurrentAiPlay()->value();
-    if (current_override != prev_override || current_override_name != prev_override_name)
+    if (current_override && (current_override != prev_override ||
+                             current_override_name != prev_override_name))
     {
         overridePlayFromName(
             ai_config->getAiControlConfig()->getCurrentAiPlay()->value());

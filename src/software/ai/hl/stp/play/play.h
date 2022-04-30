@@ -69,12 +69,13 @@ class Play
     virtual ~Play() = default;
 
    protected:
-    // TODO (#2359): remove this
     // The Play configuration
     std::shared_ptr<const AiConfig> ai_config;
 
     // Goalie tactic common to all plays
     std::shared_ptr<GoalieTactic> goalie_tactic;
+
+    std::map<std::shared_ptr<const Tactic>, RobotId> tactic_robot_id_assignment;
 
     // TODO (#2359): make pure virtual once all plays are not coroutines
     /**
@@ -84,6 +85,20 @@ class Play
      * updating the tactics
      */
     virtual void updateTactics(const PlayUpdate& play_update);
+
+    /**
+     * Gets Primitives from a Tactic given the path planner factory, the world, and the
+     * tactic
+     *
+     * @param path_planner_factory The path planner factory
+     * @param world The updated world
+     * @param tactic the Tactic
+     *
+     * @return the PrimitiveSet to execute
+     */
+    std::unique_ptr<TbotsProto::PrimitiveSet> getPrimitivesFromTactic(
+        const GlobalPathPlannerFactory& path_planner_factory, const World& world,
+        std::shared_ptr<Tactic> tactic) const;
 
    private:
     /**
@@ -141,20 +156,6 @@ class Play
     virtual void getNextTactics(TacticCoroutine::push_type& yield,
                                 const World& world) = 0;
 
-    /**
-     * Gets Primitives from a Tactic given the path planner factory, the world, and the
-     * tactic
-     *
-     * @param path_planner_factory The path planner factory
-     * @param world The updated world
-     * @param tactic the Tactic
-     *
-     * @return the PrimitiveSet to execute
-     */
-    std::unique_ptr<TbotsProto::PrimitiveSet> getPrimitivesFromTactic(
-        const GlobalPathPlannerFactory& path_planner_factory, const World& world,
-        std::shared_ptr<Tactic> tactic) const;
-
     // Stop tactic common to all plays for robots that don't have tactics assigned
     TacticVector stop_tactics;
 
@@ -171,6 +172,4 @@ class Play
 
     // TODO (#2359): remove this
     PriorityTacticVector priority_tactics;
-
-    std::map<std::shared_ptr<const Tactic>, RobotId> tactic_robot_id_assignment;
 };

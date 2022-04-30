@@ -51,6 +51,7 @@ void SimulatedErForceSimPlayTestFixture::setAIPlay(std::unique_ptr<Play> play)
 void SimulatedErForceSimPlayTestFixture::setTactic(RobotId id,
                                                    std::shared_ptr<Tactic> tactic)
 {
+    ai_config->getMutableAiControlConfig()->getMutableOverrideAiPlay()->setValue(false);
     CHECK(static_cast<bool>(tactic)) << "Tactic is invalid" << std::endl;
     std::unique_ptr<AssignedTacticsPlay> play =
         std::make_unique<AssignedTacticsPlay>(ai_config);
