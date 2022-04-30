@@ -54,10 +54,6 @@ class SensorFusion
     // started, determined experimentally with the simulator
     static constexpr double VISION_PACKET_RESET_TIME_THRESHOLD = 0.5;
 
-    //TODO This function should never see the light of day
-    //   if you see this in a PR, I've messed up, badly
-    //   you need to be protected from this horrible unsafe cod
-    void updateGameState(const GameState &game_state);
 
    private:
     /**

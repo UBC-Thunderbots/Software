@@ -437,12 +437,3 @@ void SensorFusion::resetWorldComponents()
     enemy_team_filter    = RobotTeamFilter();
     team_with_possession = TeamSide::ENEMY;
 }
-
-//TODO This function should never see the light of day
-//   if you see this in a PR, I've messed up, badly.
-//   Run for cover, hide, protect your loved ones, this code
-//   is radioactive
-void SensorFusion::updateGameState(const GameState &game_state)
-{
-    this->game_state = game_state;
-}

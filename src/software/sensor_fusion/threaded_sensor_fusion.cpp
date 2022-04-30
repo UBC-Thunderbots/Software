@@ -12,14 +12,6 @@ ThreadedSensorFusion::ThreadedSensorFusion(
     }
 }
 
-//TODO This function should never see the light of day
-//   if you see this in a PR, I've messed up, badly
-//   you need to be protected from this horrible unsafe code
-void ThreadedSensorFusion::updateGameState(const GameState &game_state)
-{
-    sensor_fusion.updateGameState(game_state);
-}
-
 void ThreadedSensorFusion::onValueReceived(SensorProto sensor_msg)
 {
     sensor_fusion.processSensorProto(sensor_msg);
