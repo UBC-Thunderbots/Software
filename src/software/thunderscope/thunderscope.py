@@ -179,17 +179,24 @@ class Thunderscope(object):
             lambda: QMessageBox.information(
                 self.window,
                 "Help",
-                "\nKeyboard Shortcuts:\n\n"
-                "Cntrl+S: Save Layout\n"
-                "Cntrl+O: Open Layout\n"
-                "Cntrl+R: will remove the file and reset the layout\n"
-                f"\nLayout file (on save) is located at \n{SAVED_LAYOUT_PATH}\n\n"
-                "I to identify robots, show their IDs\n"
-                "\nMouse Shortcuts:\n\n"
-                "Double Click Purple Bar to pop window out\n"
-                "Drag Purple Bar to rearrange docks\n"
-                "Click items in legends to select/deselect\n"
-                "Cntrl-Click and Drag: Move ball and kick\n",
+                f"""
+Keyboard Shortcuts:
+
+I to identify robots, show their IDs
+Cntrl+S: Save Layout
+Cntrl+O: Open Layout
+Cntrl+R: will remove the file and reset the layout
+
+Layout file (on save) is located at 
+        {SAVED_LAYOUT_PATH}
+
+Mouse Shortcuts:
+
+Double Click Purple Bar to pop window out
+Drag Purple Bar to rearrange docks
+Click items in legends to select/deselect
+Cntrl-Click and Drag: Move ball and kick
+""",
             )
         )
 
