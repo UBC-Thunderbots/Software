@@ -3,7 +3,7 @@ syntax = "proto2";
 package SSLSimulationProto;
 
 import "proto/ssl_gc_common.proto";
-import "proto/messages_robocup_ssl_geometry.proto";
+import "proto/ssl_vision_geometry.proto";
 import "google/protobuf/any.proto";
 
 // Movement limits for a robot

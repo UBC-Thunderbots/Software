@@ -1,22 +1,29 @@
-import queue
-
 import pyqtgraph as pg
 from proto.visualization_pb2 import PathVisualization
 from pyqtgraph.Qt import QtCore, QtGui
 
 import software.thunderscope.constants as constants
+from software.py_constants import *
+from software.thunderscope.colors import Colors
 from software.networking.threaded_unix_listener import ThreadedUnixListener
 from software.thunderscope.field.field_layer import FieldLayer
+from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 
 class PathLayer(FieldLayer):
-    def __init__(self, buffer_size=10):
+    def __init__(self, buffer_size=5):
+        """Visualizes paths from the navigator
+
+        :param buffer_size: The buffer size, set higher for smoother plots.
+                            Set lower for more realtime plots. Default is arbitrary
+
+        """
         FieldLayer.__init__(self)
-        self.cached_paths = PathVisualization()
-        self.path_visualization_buffer = queue.Queue(buffer_size)
+        self.path_visualization_buffer = ThreadSafeBuffer(
+            buffer_size, PathVisualization
+        )
 
     def paint(self, painter, option, widget):
-
         """Paint this layer
 
         :param painter: The painter object to draw with
@@ -24,19 +31,16 @@ class PathLayer(FieldLayer):
         :param widget: The widget that we are painting on
 
         """
-        try:
-            paths = self.path_visualization_buffer.get_nowait()
-        except queue.Empty as empty:
-            paths = self.cached_paths
-
-        self.cached_paths = paths
-        painter.setPen(pg.mkPen("b", width=2))
+        paths = self.path_visualization_buffer.get(block=False)
+        painter.setPen(
+            pg.mkPen(Colors.NAVIGATOR_PATH_COLOR, width=constants.LINE_WIDTH)
+        )
 
         for path in paths.path:
             polygon_points = [
                 QtCore.QPoint(
-                    int(constants.MM_PER_M * point.x_meters),
-                    int(constants.MM_PER_M * point.y_meters),
+                    int(MILLIMETERS_PER_METER * point.x_meters),
+                    int(MILLIMETERS_PER_METER * point.y_meters),
                 )
                 for point in path.point
             ]

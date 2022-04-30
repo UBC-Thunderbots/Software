@@ -2,6 +2,7 @@
 
 #include <boost/bind.hpp>
 
+#include "proto/message_translation/tbots_protobuf.h"
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/hl/stp/play/assigned_tactics_play.h"
 #include "software/ai/hl/stp/play/play_factory.h"

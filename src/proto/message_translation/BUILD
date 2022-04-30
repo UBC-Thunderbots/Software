@@ -9,6 +9,7 @@ cc_library(
         ":tbots_geometry",
         "//proto:tbots_cc_proto",
         "//proto:visualization_cc_proto",
+        "//software/ai/passing:pass_with_rating",
         "//software/geom:angle",
         "//software/geom:point",
         "//software/geom:vector",
@@ -225,5 +226,17 @@ cc_test(
         ":er_force_world",
         "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
+    ],
+)
+
+py_library(
+    name = "py_tbots_protobuf",
+    srcs = [
+        "tbots_protobuf.py",
+    ],
+    deps = [
+        "//proto:import_all_protos",
+        "//proto:software_py_proto",
+        "//proto:tbots_py_proto",
     ],
 )

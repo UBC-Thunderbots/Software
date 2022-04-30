@@ -31,8 +31,8 @@
 
 #include "extlibs/er_force_sim/src/protobuf/command.h"
 #include "extlibs/er_force_sim/src/protobuf/sslsim.h"
-#include "proto/messages_robocup_ssl_wrapper.pb.h"
 #include "proto/ssl_simulation_robot_control.pb.h"
+#include "proto/ssl_vision_wrapper.pb.h"
 
 
 // higher values break the rolling friction of the ball
