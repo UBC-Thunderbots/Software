@@ -17,4 +17,4 @@
 void robotsViolatingMotionConstraint(
     std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield,
     std::shared_ptr<RobotNavigationObstacleFactory> obstacle_factory,
-   TbotsProto::MotionConstraint constraint);
+    TbotsProto::MotionConstraint constraint);
