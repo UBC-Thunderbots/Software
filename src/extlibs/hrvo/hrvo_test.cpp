@@ -6,6 +6,7 @@
 #include "extlibs/hrvo/simulator.h"
 #include "proto/primitive/primitive_msg_factory.h"
 #include "shared/test_util/tbots_gtest_main.h"
+#include "software/test_util/test_util.h"
 
 const int SIMULATOR_FRAME_RATE = 30;
 

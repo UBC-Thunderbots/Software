@@ -147,23 +147,23 @@ TEST_F(ThreadedSimulatorTest, add_robots_and_primitives_while_simulation_running
 
     threaded_simulator.setBlueRobotPrimitive(
         1, createNanoPbPrimitive(*createMovePrimitive(
-               Point(-1, -1), 0.0, Angle::zero(), TbotsProto::DribblerMode::OFF,
+               TEST_UTIL_CREATE_MOTION_CONTROL_WITH_DEST(Point(-1, -1)), 0.0, Angle::zero(), TbotsProto::DribblerMode::OFF,
                {AutoChipOrKickMode::OFF, 0},
                TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0, robot_constants)));
     threaded_simulator.setBlueRobotPrimitive(
         2, createNanoPbPrimitive(*createMovePrimitive(
-               Point(-3, 0), 0.0, Angle::half(), TbotsProto::DribblerMode::OFF,
+               TEST_UTIL_CREATE_MOTION_CONTROL_WITH_DEST(Point(-3, 0)), 0.0, Angle::half(), TbotsProto::DribblerMode::OFF,
                {AutoChipOrKickMode::OFF, 0},
                TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0, robot_constants)));
 
     threaded_simulator.setYellowRobotPrimitive(
         1, createNanoPbPrimitive(*createMovePrimitive(
-               Point(1, 1), 0.0, Angle::zero(), TbotsProto::DribblerMode::OFF,
+               TEST_UTIL_CREATE_MOTION_CONTROL_WITH_DEST(Point(1, 1)), 0.0, Angle::zero(), TbotsProto::DribblerMode::OFF,
                {AutoChipOrKickMode::OFF, 0},
                TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0, robot_constants)));
     threaded_simulator.setYellowRobotPrimitive(
         2, createNanoPbPrimitive(*createMovePrimitive(
-               Point(3, -2), 0.0, Angle::zero(), TbotsProto::DribblerMode::OFF,
+               TEST_UTIL_CREATE_MOTION_CONTROL_WITH_DEST(Point(3, -2)), 0.0, Angle::zero(), TbotsProto::DribblerMode::OFF,
                {AutoChipOrKickMode::OFF, 0},
                TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0, robot_constants)));
 

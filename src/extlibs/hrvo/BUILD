@@ -8,6 +8,7 @@ cc_test(
     deps = [
         ":hrvo",
         "//shared/test_util:tbots_gtest_main",
+        "//software/test_util",
     ],
 )
 
