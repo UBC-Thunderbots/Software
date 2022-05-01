@@ -18,12 +18,13 @@ class ShadowEnemyTacticTest : public SimulatedErForceSimPlayTestFixture
     void SetUp() override
     {
         SimulatedErForceSimPlayTestFixture::SetUp();
-        setMotionConstraints({TbotsProto::MotionConstraint::ENEMY_DEFENSE_AREA});
     }
 
    protected:
     TbotsProto::FieldType field_type = TbotsProto::FieldType::DIV_B;
     Field field                      = Field::createField(field_type);
+    std::set<TbotsProto::MotionConstraint> motion_constraints = {
+        TbotsProto::MotionConstraint::ENEMY_DEFENSE_AREA};
 };
 
 TEST_F(ShadowEnemyTacticTest, test_block_pass)
@@ -53,7 +54,7 @@ TEST_F(ShadowEnemyTacticTest, test_block_pass)
     BallState ball_state(Point(0, 2), Vector(0, 0));
     auto tactic = std::make_shared<ShadowEnemyTactic>();
     tactic->updateControlParams(enemy_threat, 2);
-    setTactic(0, tactic);
+    setTactic(0, tactic, motion_constraints);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [tactic](std::shared_ptr<World> world_ptr,
@@ -99,7 +100,7 @@ TEST_F(ShadowEnemyTacticTest, test_block_pass_if_enemy_does_not_have_ball)
     BallState ball_state(Point(3, 0), Vector(0, 0));
     auto tactic = std::make_shared<ShadowEnemyTactic>();
     tactic->updateControlParams(enemy_threat, 1.5);
-    setTactic(0, tactic);
+    setTactic(0, tactic, motion_constraints);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [this, tactic, shadowee](std::shared_ptr<World> world_ptr,
@@ -144,9 +145,7 @@ TEST_F(ShadowEnemyTacticTest, test_block_net_then_steal_and_chip)
     BallState ball_state(Point(0, -1.75), Vector(0, 0));
     auto tactic = std::make_shared<ShadowEnemyTactic>();
     tactic->updateControlParams(enemy_threat, 2);
-    setTactic(0, tactic);
-
-
+    setTactic(0, tactic, motion_constraints);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [this, tactic](std::shared_ptr<World> world_ptr,
@@ -198,9 +197,7 @@ TEST_F(ShadowEnemyTacticTest, test_block_net_if_enemy_threat_is_null)
     BallState ball_state(Point(0, -1.75), Vector(0, 0));
     auto tactic = std::make_shared<ShadowEnemyTactic>();
     tactic->updateControlParams(std::nullopt, 2);
-    setTactic(0, tactic);
-
-
+    setTactic(0, tactic, motion_constraints);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [tactic](std::shared_ptr<World> world_ptr,

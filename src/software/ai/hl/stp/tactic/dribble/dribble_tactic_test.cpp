@@ -39,7 +39,6 @@ class DribbleTacticTest : public SimulatedErForceSimPlayTestFixture
     void SetUp() override
     {
         SimulatedErForceSimPlayTestFixture::SetUp();
-        setMotionConstraints({TbotsProto::MotionConstraint::ENEMY_DEFENSE_AREA});
     }
     TbotsProto::FieldType field_type = TbotsProto::FieldType::DIV_B;
     Field field                      = Field::createField(field_type);
@@ -50,6 +49,8 @@ class DribbleTacticTest : public SimulatedErForceSimPlayTestFixture
              field.enemyDefenseArea().negXPosYCorner()});
     std::shared_ptr<const AiConfig> ai_config =
         std::make_shared<ThunderbotsConfig>()->getAiConfig();
+    std::set<TbotsProto::MotionConstraint> motion_constraints = {
+        TbotsProto::MotionConstraint::ENEMY_DEFENSE_AREA};
 };
 
 TEST_F(DribbleTacticTest, test_intercept_ball_behind_enemy_robot)
@@ -60,7 +61,7 @@ TEST_F(DribbleTacticTest, test_intercept_ball_behind_enemy_robot)
         TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5), initial_position});
 
     auto tactic = std::make_shared<DribbleTactic>(ai_config);
-    setTactic(1, tactic);
+    setTactic(1, tactic, motion_constraints);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [this, tactic](std::shared_ptr<World> world_ptr,
@@ -83,7 +84,7 @@ TEST_F(DribbleTacticTest, test_stopped_ball)
         TestUtil::createStationaryRobotStatesWithId({Point(3, 3), initial_position});
 
     auto tactic = std::make_shared<DribbleTactic>(ai_config);
-    setTactic(1, tactic);
+    setTactic(1, tactic, motion_constraints);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [this, tactic](std::shared_ptr<World> world_ptr,
@@ -106,7 +107,7 @@ TEST_F(DribbleTacticTest, test_ball_bounce_off_of_enemy_robot)
         TestUtil::createStationaryRobotStatesWithId({Point(3, 3), initial_position});
 
     auto tactic = std::make_shared<DribbleTactic>(ai_config);
-    setTactic(1, tactic);
+    setTactic(1, tactic, motion_constraints);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [this, tactic](std::shared_ptr<World> world_ptr,
@@ -131,7 +132,7 @@ TEST_F(DribbleTacticTest, test_moving_ball_dribble_dest)
 
     auto tactic = std::make_shared<DribbleTactic>(ai_config);
     tactic->updateControlParams(dribble_destination, std::nullopt);
-    setTactic(1, tactic);
+    setTactic(1, tactic, motion_constraints);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [this, dribble_destination, tactic](std::shared_ptr<World> world_ptr,
@@ -162,7 +163,7 @@ TEST_F(DribbleTacticTest, test_moving_ball_dribble_orientation)
 
     auto tactic = std::make_shared<DribbleTactic>(ai_config);
     tactic->updateControlParams(std::nullopt, dribble_orientation);
-    setTactic(1, tactic);
+    setTactic(1, tactic, motion_constraints);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [this, dribble_orientation, tactic](std::shared_ptr<World> world_ptr,
@@ -191,7 +192,7 @@ TEST_F(DribbleTacticTest, test_moving_ball_dribble_dest_and_orientation)
 
     auto tactic = std::make_shared<DribbleTactic>(ai_config);
     tactic->updateControlParams(dribble_destination, dribble_orientation);
-    setTactic(1, tactic);
+    setTactic(1, tactic, motion_constraints);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [this, dribble_destination, dribble_orientation, tactic](
@@ -224,7 +225,7 @@ TEST_F(DribbleTacticTest, test_dribble_dest_and_orientation_around_rectangle)
         TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5), initial_position});
     auto tactic = std::make_shared<DribbleTactic>(ai_config);
     tactic->updateControlParams(dribble_destination, dribble_orientation);
-    setTactic(1, tactic);
+    setTactic(1, tactic, motion_constraints);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [this, dribble_destination, dribble_orientation, tactic](
@@ -258,7 +259,7 @@ TEST_F(DribbleTacticTest,
         TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5), initial_position});
     auto tactic = std::make_shared<DribbleTactic>(ai_config);
     tactic->updateControlParams(dribble_destination, dribble_orientation, true);
-    setTactic(1, tactic);
+    setTactic(1, tactic, motion_constraints);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [this, dribble_destination, dribble_orientation, tactic](
@@ -293,8 +294,7 @@ TEST_F(DribbleTacticTest, test_running_into_enemy_robot_knocking_ball_away)
     auto tactic = std::make_shared<DribbleTactic>(ai_config);
     tactic->updateControlParams(dribble_destination, dribble_orientation);
     // Don't avoid enemy robots to knock ball away
-    setMotionConstraints({});
-    setTactic(1, tactic);
+    setTactic(1, tactic, {});
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [this, dribble_destination, dribble_orientation, tactic](

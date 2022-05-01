@@ -39,7 +39,6 @@ class DribbleTacticPushEnemyTest : public SimulatedErForceSimPlayTestFixture,
     void SetUp() override
     {
         SimulatedErForceSimPlayTestFixture::SetUp();
-        setMotionConstraints({TbotsProto::MotionConstraint::ENEMY_DEFENSE_AREA});
     }
     TbotsProto::FieldType field_type = TbotsProto::FieldType::DIV_B;
     Field field                      = Field::createField(field_type);
@@ -64,7 +63,7 @@ TEST_P(DribbleTacticPushEnemyTest, DISABLED_test_steal_ball_from_behind_enemy)
 
     auto tactic = std::make_shared<DribbleTactic>(ai_config);
     tactic->updateControlParams(dribble_destination, dribble_orientation);
-    setTactic(1, tactic);
+    setTactic(1, tactic, {TbotsProto::MotionConstraint::ENEMY_DEFENSE_AREA});
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [this, tactic](std::shared_ptr<World> world_ptr,
