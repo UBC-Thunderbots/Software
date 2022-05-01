@@ -10,82 +10,93 @@ from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
 from proto.ssl_gc_geometry_pb2 import Vector2
 
-def test_ball_placement(simulated_test_runner):
+# TODO issue  #2599 - Remove Duration parameter from test
+@pytest.mark.parametrize("run_enemy_ai,test_duration", [(False, 10), (True, 20)])
+def test_two_ai_ball_placement(simulated_test_runner, run_enemy_ai, test_duration):
 
-    ball_initial_pos= tbots.Point(2,2) # the starting point
-    # ball_final_pos = tbots.Point(-1,0) # the placement point
-    
+    # starting point must be Point
+    ball_initial_pos = tbots.Point(2, 2)
+    # placement point must be Vector2 to work with game controller
+    ball_final_pos = Vector2(x=-3, y=-2)
+
+    # Setup Bots
     blue_bots = [
-        tbots.Point(-2,1.8),
-        tbots.Point(-2,1.2),
-        tbots.Point(-2,0.6),
-        tbots.Point(-2,-0.6),
-        tbots.Point(-2,-1.2),
-        tbots.Point(-2,-1.8),
+        tbots.Point(-3, 2.5),
+        tbots.Point(-3, 1.5),
+        tbots.Point(-3, 0.5),
+        tbots.Point(-3, -0.5),
+        tbots.Point(-3, -1.5),
+        tbots.Point(4.6, -3.1),
     ]
 
     yellow_bots = [
-
+        tbots.Point(1, 0),
+        tbots.Point(1, 2.5),
+        tbots.Point(1, -2.5),
+        tbots.Field.createSSLDivisionBField().enemyGoalCenter(),
+        tbots.Field.createSSLDivisionBField().enemyDefenseArea().negXNegYCorner(),
+        tbots.Field.createSSLDivisionBField().enemyDefenseArea().negXPosYCorner(),
     ]
 
+    # Game Controller Setup
     simulated_test_runner.gamecontroller.send_ci_input(
         gc_command=Command.Type.STOP, team=Team.UNKNOWN
     )
     simulated_test_runner.gamecontroller.send_ci_input(
         gc_command=Command.Type.FORCE_START, team=Team.BLUE
     )
+    # Pass in placement point here - not required for all play tests
     simulated_test_runner.gamecontroller.send_ci_input(
-        gc_command=Command.Type.BALL_PLACEMENT, 
+        gc_command=Command.Type.BALL_PLACEMENT,
         team=Team.BLUE,
-        ball_placement_pos_vec=Vector2(x=-1,y=0)
+        ball_placement_pos_vec=ball_final_pos,
     )
 
-    # game_state = GameState()
-    # command = Command()
-    # state = State()
+    # Force play override here
+    blue_play = Play()
+    blue_play.name = Play.BallPlacementPlay
 
-    
+    simulated_test_runner.blue_full_system_proto_unix_io.send_proto(Play, blue_play)
 
-    # game_state.command =  # ball placement us
-    # game_state.ball_placement_point.x_meters = -1
-    # game_state.ball_placement_point.y_meters = 0
-    
+    # We can parametrize running in ai_vs_ai mode
+    if run_enemy_ai:
+        yellow_play = Play()
+        yellow_play.name = Play.EnemyBallPlacementPlay
 
-    # Setup play
-    play = Play()
-    play.name = Play.BallPlacementPlay
-    simulated_test_runner.blue_full_system_proto_unix_io.send_proto(
-        Play, play
-    )
-    # Setup ball with initial velocity using our software/geom
-    
+        simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(
+            Play, yellow_play
+        )
+
+    # Create world state
     simulated_test_runner.simulator_proto_unix_io.send_proto(
         WorldState,
         create_world_state(
-            yellow_robot_locations=[],
+            yellow_robot_locations=yellow_bots,
             blue_robot_locations=blue_bots,
             ball_location=ball_initial_pos,
-            ball_velocity=tbots.Vector(0,0))
+            ball_velocity=tbots.Vector(0, 0),
+        ),
     )
 
     # Always Validation
-    always_validation_sequence_set = [
-        [
-            BallNeverEntersRegion(regions=[tbots.Field.createSSLDivisionBField().friendlyGoal()]),
-        ]
-    ]
+    always_validation_sequence_set = [[]]
 
     # Eventually Validation
     eventually_validation_sequence_set = [
         [
-            BallEventuallyEntersRegion(regions=[tbots.Field.createSSLDivisionBField().friendlyHalf()]),
+            # Ball should arrive within 5cm of placement point
+            BallEventuallyEntersRegion(
+                regions=[
+                    tbots.Circle(tbots.Point(ball_final_pos.x, ball_final_pos.y), 0.05)
+                ]
+            ),
         ]
     ]
 
     simulated_test_runner.run_test(
         eventually_validation_sequence_set=eventually_validation_sequence_set,
         always_validation_sequence_set=always_validation_sequence_set,
-        test_timeout_s=10
+        test_timeout_s=test_duration,
     )
 
 

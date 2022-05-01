@@ -15,6 +15,6 @@ TEST_F(PlayFactoryTest, test_shoot_or_pass_play)
 {
     TbotsProto::Play play_proto = TbotsProto::Play();
     play_proto.set_name(TbotsProto::Play::PlayName::Play_PlayName_ShootOrPassPlay);
-    std::unique_ptr<Play> play  = createPlay(play_proto, ai_config);
+    std::unique_ptr<Play> play = createPlay(play_proto, ai_config);
     EXPECT_EQ(objectTypeName(*play), "ShootOrPassPlay");
 }

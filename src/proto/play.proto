@@ -2,7 +2,8 @@ syntax = "proto2";
 
 package TbotsProto;
 
-message Play{
+message Play
+{
     enum PlayName
     {
         ShootOrChipPlay        = 1;

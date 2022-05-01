@@ -404,7 +404,7 @@ class Gamecontroller(object):
         self,
         gc_command: proto.ssl_gc_state_pb2.Command,
         team: proto.ssl_gc_common_pb2.Team,
-        ball_placement_pos_vec = None,
+        ball_placement_pos_vec=None,
     ):
         """Send a ci input to the gamecontroller.
 

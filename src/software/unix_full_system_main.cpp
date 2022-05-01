@@ -59,12 +59,9 @@ int main(int argc, char** argv)
                     ai->overrideTactics(input);
                 });
 
-        auto play_override_listener = 
-            ThreadedProtoUnixListener<TbotsProto::Play>(
-                runtime_path + PLAY_OVERRIDE_PATH,
-                [&ai](TbotsProto::Play input_play) {
-                    ai->overridePlay(input_play);
-                });
+        auto play_override_listener = ThreadedProtoUnixListener<TbotsProto::Play>(
+            runtime_path + PLAY_OVERRIDE_PATH,
+            [&ai](TbotsProto::Play input_play) { ai->overridePlay(input_play); });
 
         // Connect observers
         ai->Subject<TbotsProto::PrimitiveSet>::registerObserver(backend);
