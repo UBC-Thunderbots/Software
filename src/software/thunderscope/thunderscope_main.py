@@ -3,6 +3,7 @@ from software.thunderscope.binary_context_managers import *
 from proto.message_translation import tbots_protobuf
 import software.python_bindings as cpp_bindings
 
+import os
 import time
 import threading
 import argparse
@@ -119,7 +120,7 @@ if __name__ == "__main__":
         runtime_dir = "/tmp/tbots/yellow_test"
 
         try:
-            os.mkdirs(runtime_dir)
+            os.makedirs(runtime_dir)
         except OSError:
             pass
 
