@@ -1,5 +1,6 @@
 import os
 import time
+import textwrap
 import shelve
 import signal
 import platform
@@ -55,6 +56,7 @@ from software.thunderscope.robot_diagnostics.drive_and_dribbler_widget import (
     DriveAndDribblerWidget,
 )
 from software.thunderscope.replay.replay_controls import ReplayControls
+from software.thunderscope.replay.replay import ProtoPlayer
 
 SAVED_LAYOUT_PATH = "/opt/tbotspython/saved_tscope_layout"
 NUM_ROBOTS = 6
@@ -87,6 +89,8 @@ class Thunderscope(object):
         layout_path=None,
         load_blue=True,
         load_yellow=True,
+        blue_replay_log=None,
+        yellow_replay_log=None,
         refresh_interval_ms=10,
         visualization_buffer_size=5,
     ):
@@ -98,6 +102,8 @@ class Thunderscope(object):
         :param layout_path: The path to the layout to load
         :param load_blue: Whether to load the blue dock area
         :param load_yellow: Whether to load the yellow dock area
+        :param blue_replay_log: The blue replay log
+        :param yellow_replay_log: The yellow replay log
         :param refresh_interval_ms: The interval in milliseconds to refresh the simulator
         :param visualization_buffer_size: The size of the visualization buffer
 
@@ -106,6 +112,8 @@ class Thunderscope(object):
         # Setup MainApp and initialize DockArea
         self.app = pyqtgraph.mkQApp("Thunderscope")
         self.app.setStyleSheet(qdarktheme.load_stylesheet())
+        self.blue_replay_log = blue_replay_log
+        self.yellow_replay_log = yellow_replay_log
         self.refresh_interval_ms = refresh_interval_ms
         self.visualization_buffer_size = visualization_buffer_size
         self.widgets = {}
@@ -188,24 +196,26 @@ class Thunderscope(object):
             lambda: QMessageBox.information(
                 self.window,
                 "Help",
-                f"""
-Keyboard Shortcuts:
-
-I to identify robots, show their IDs
-Cntrl+S: Save Layout
-Cntrl+O: Open Layout
-Cntrl+R: will remove the file and reset the layout
-
-Layout file (on save) is located at 
-        {SAVED_LAYOUT_PATH}
-
-Mouse Shortcuts:
-
-Double Click Purple Bar to pop window out
-Drag Purple Bar to rearrange docks
-Click items in legends to select/deselect
-Cntrl-Click and Drag: Move ball and kick
-""",
+                textwrap.dedent(
+                    f"""
+                    Keyboard Shortcuts:
+                    
+                    I to identify robots, show their IDs
+                    Cntrl+S: Save Layout
+                    Cntrl+O: Open Layout
+                    Cntrl+R: will remove the file and reset the layout
+                    
+                    Layout file (on save) is located at 
+                            {SAVED_LAYOUT_PATH}
+                    
+                    Mouse Shortcuts:
+                    
+                    Double Click Purple Bar to pop window out
+                    Drag Purple Bar to rearrange docks
+                    Click items in legends to select/deselect
+                    Cntrl-Click and Drag: Move ball and kick
+                    """
+                ),
             )
         )
 
@@ -356,7 +366,9 @@ Cntrl-Click and Drag: Move ball and kick
         playinfo_dock = Dock("Play Info")
         playinfo_dock.addWidget(widgets["playinfo_widget"])
 
-        widgets["replay_widget"] = self.setup_replay_controls_widget()
+        widgets["replay_widget"] = self.setup_replay_controls_widget(
+            friendly_colour_yellow
+        )
         replay_dock = Dock("Replay", size=(100, 10))
         replay_dock.addWidget(widgets["replay_widget"])
 
@@ -439,13 +451,39 @@ Cntrl-Click and Drag: Move ball and kick
 
         return logs
 
-    def setup_replay_controls_widget(self):
+    def setup_replay_controls_widget(self, friendly_colour_yellow):
         """Setup the widget that receives logs from full system
 
+        :param friendly_colour_yellow: Whether the friendly colour is yellow
         :returns: The replay widget
+
         """
+        if not self.blue_replay_log and not friendly_colour_yellow:
+            return QLabel("No proto log path provided for blue team")
+
+        elif not friendly_colour_yellow:
+            self.blue_proto_player = ProtoPlayer(
+                self.blue_replay_log, self.blue_full_system_proto_unix_io
+            )
+
+        if not self.yellow_replay_log and friendly_colour_yellow:
+            return QLabel("No proto log path provided for yellow team")
+
+        elif friendly_colour_yellow:
+            self.yellow_proto_player = ProtoPlayer(
+                self.yellow_replay_log, self.yellow_full_system_proto_unix_io
+            )
+
         # Create widget
-        replay_controls = ReplayControls()
+        replay_controls = ReplayControls(
+            self.yellow_proto_player
+            if friendly_colour_yellow
+            else self.blue_proto_player
+        )
+        
+        # Register refresh function
+        self.register_refresh_function(replay_controls.refresh)
+
         return replay_controls
 
     def setup_performance_plot(self, proto_unix_io):

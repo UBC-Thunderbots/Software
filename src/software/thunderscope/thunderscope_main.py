@@ -164,17 +164,25 @@ if __name__ == "__main__":
     # When we are running with real robots. We want to run 1 instance of AI
     # and 1 instance of RobotCommunication which will send/recv packets over
     # the provided multicast channel.
-    tscope = Thunderscope(
-        layout_path=args.layout,
-        visualization_buffer_size=args.visualization_buffer_size,
-    )
+    if args.run_blue:
 
-    proto_unix_io = tscope.blue_full_system_proto_unix_io
-    runtime_dir = args.blue_full_system_runtime_dir
-    friendly_colour_yellow = False
-    debug = args.debug_blue_full_system
+        tscope = Thunderscope(
+            layout_path=args.layout,
+            visualization_buffer_size=args.visualization_buffer_size,
+        )
+
+        proto_unix_io = tscope.blue_full_system_proto_unix_io
+        runtime_dir = args.blue_full_system_runtime_dir
+        friendly_colour_yellow = False
+        debug = args.debug_blue_full_system
 
     if args.run_yellow:
+
+        tscope = Thunderscope(
+            layout_path=args.layout,
+            visualization_buffer_size=args.visualization_buffer_size,
+        )
+
         proto_unix_io = tscope.yellow_full_system_proto_unix_io
         runtime_dir = args.yellow_full_system_runtime_dir
         friendly_colour_yellow = True
@@ -185,9 +193,6 @@ if __name__ == "__main__":
         with RobotCommunication(
             proto_unix_io, ROBOT_MULTICAST_CHANNEL_0, args.interface
         ), FullSystem(runtime_dir, debug, friendly_colour_yellow) as full_system:
-            tscope.load_saved_layout(
-                args.layout, load_blue=args.run_blue, load_yellow=args.run_yellow
-            )
             tscope.show()
 
     ###########################################################################
@@ -200,12 +205,13 @@ if __name__ == "__main__":
     # We want to setup the proto unix io the same way, but instead use the proto
     # player to replay the logs (rather than the full system binaries)
     elif args.replay_log_blue_full_system or args.replay_log_yellow_full_system:
-        with ProtoPlayer(
-            args.replay_log_blue_full_system, tscope.blue_full_system_proto_unix_io
-        ) as blue_player, ProtoPlayer(
-            args.replay_log_yellow_full_system, tscope.yellow_full_system_proto_unix_io
-        ) as yellow_player:
-            tscope.show()
+        tscope = Thunderscope(
+            layout_path=args.layout,
+            visualization_buffer_size=args.visualization_buffer_size,
+            blue_replay_log=args.replay_log_blue_full_system,
+            yellow_replay_log=args.replay_log_yellow_full_system,
+        )
+        tscope.show()
 
     ###########################################################################
     #           Blue AI vs Yellow AI + Simulator + Gamecontroller             #

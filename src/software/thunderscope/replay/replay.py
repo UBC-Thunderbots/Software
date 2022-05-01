@@ -80,6 +80,7 @@ class ProtoLogger(object):
         self.buffer = queue.Queue(PROTOBUF_BUFFER_SIZE)
         self.time_provider = time_provider if time_provider else time.time
         self.start_time = self.time_provider()
+        self.replay_current_packet_time = 0.0
         self.stop_logging = False
 
     def __enter__(self):
@@ -175,6 +176,28 @@ class ProtoPlayer(object):
 
         self.replay_controls_mutex = threading.Lock()
 
+        # Load up all replay files in the log folder
+        replay_files = glob.glob(self.log_folder_path + f"/*.{REPLAY_FILE_EXTENSION}")
+
+        # Sort the files by their chunk index
+        def __sort_replay_chunks(file_path):
+            head, tail = os.path.split(file_path)
+            replay_index, _ = tail.split(".")
+            return int(replay_index)
+
+        self.sorted_chunks = sorted(replay_files, key=__sort_replay_chunks)
+        last_chunk_data = ProtoPlayer.load_replay_chunk(self.sorted_chunks[-1])
+
+        # Unpack metadata
+        self.end_time, _, _ = ProtoPlayer.unpack_log_entry(last_chunk_data[-1])
+        logging.info(
+            "Loaded log file with total runtime of {:.2f} seconds".format(self.end_time)
+        )
+
+        # Start playing thread
+        self.thread = threading.Thread(target=self.__play_protobufs, daemon=True)
+        self.thread.start()
+
     @staticmethod
     def load_replay_chunk(replay_chunk_path):
         """Reads a replay chunk.
@@ -222,50 +245,11 @@ class ProtoPlayer(object):
 
         return float(timestamp), proto_class, proto
 
-    def __enter__(self):
-        """Starts the player.
-        """
-
-        # Load up all replay files in the log folder
-        replay_files = glob.glob(self.log_folder_path + f"/*.{REPLAY_FILE_EXTENSION}")
-
-        # Sort the files by their chunk index
-        def __sort_replay_chunks(file_path):
-            head, tail = os.path.split(file_path)
-            replay_index, _ = tail.split(".")
-            return int(replay_index)
-
-        self.sorted_chunks = sorted(replay_files, key=__sort_replay_chunks)
-        last_chunk_data = ProtoPlayer.load_replay_chunk(self.sorted_chunks[-1])
-
-        # Unpack metadata
-        self.end_time, _, _ = ProtoPlayer.unpack_log_entry(last_chunk_data[-1])
-        logging.info(
-            "Loaded log file with total runtime of {:.2f} seconds".format(self.end_time)
-        )
-
-        # Start playing thread
-        self.thread = threading.Thread(target=self.__play_protobufs, daemon=True)
-        self.thread.start()
-
-        return self
-
-    def __exit__(self, type, value, traceback):
-        """Closes the log file.
-
-        :param type: The type of the exception.
-        :param value: The value of the exception.
-        :param traceback: The traceback of the exception.
-
-        """
-        self.stop_playing = True
-        self.exit_requested = True
-        self.thread.join()
-
     def play(self):
         """Plays back the log file."""
 
         with self.replay_controls_mutex:
+            self.start_playback_time = time.time()
             self.stop_playing = False
 
     def pause(self):
@@ -318,6 +302,7 @@ class ProtoPlayer(object):
             self.seek_offset_time = __bisect_log_entries_by_timestamp(
                 self.current_chunk[self.current_entry_index_in_chunk]
             )
+            self.replay_current_packet_time = self.seek_offset_time
 
             logging.info(
                 "Jumped to chunk {} at index {} with timestamp {:.2f}".format(
@@ -380,7 +365,7 @@ class ProtoPlayer(object):
             # Check if replay has ended
             if self.current_chunk_index >= len(self.sorted_chunks):
                 logging.info("Replay ended.")
-                self.seek(10)
+                self.stop_playing = True
                 continue
 
             # Load the next chunk and setup the current_chunk_index
@@ -392,6 +377,10 @@ class ProtoPlayer(object):
                     self.sorted_chunks[self.current_chunk_index]
                 )
                 self.current_chunk_index += 1
+
+                print("Playing: ", self.stop_playing)
+                print(self.current_entry_index_in_chunk, len(self.current_chunk))
+                print("Entry index: ",  self.current_entry_index_in_chunk < len(self.current_chunk))
 
                 if finished_playing_chunk:
                     finished_playing_chunk = False
@@ -406,12 +395,13 @@ class ProtoPlayer(object):
 
                     # Get the current entry
                     (
-                        replay_current_packet_time,
+                        self.replay_current_packet_time,
                         proto_class,
                         proto,
                     ) = ProtoPlayer.unpack_log_entry(
                         self.current_chunk[self.current_entry_index_in_chunk]
                     )
+                    print("CHUNK: ", len(self.current_chunk))
 
                     self.current_entry_index_in_chunk += 1
 
@@ -421,8 +411,8 @@ class ProtoPlayer(object):
                         time.time() - self.start_playback_time + self.seek_offset_time
                     ) / self.playback_speed
 
-                    if replay_current_packet_time > time_elapsed:
-                        time.sleep(replay_current_packet_time - time_elapsed)
+                    if self.replay_current_packet_time > time_elapsed:
+                        time.sleep(self.replay_current_packet_time - time_elapsed)
 
                     # Send protobuf
                     self.proto_unix_io.send_proto(proto_class, proto)
