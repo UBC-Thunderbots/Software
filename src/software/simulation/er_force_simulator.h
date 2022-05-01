@@ -7,7 +7,6 @@
 #include "proto/tbots_software_msgs.pb.h"
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/jetson_nano/primitive_executor.h"
-#include "software/simulation/firmware_object_deleter.h"
 #include "software/world/field.h"
 #include "software/world/team_types.h"
 #include "software/world/world.h"

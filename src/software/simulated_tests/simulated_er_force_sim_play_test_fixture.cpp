@@ -1,6 +1,5 @@
 #include "software/simulated_tests/simulated_er_force_sim_play_test_fixture.h"
 
-#include "proto/message_translation/primitive_google_to_nanopb_converter.h"
 #include "proto/message_translation/tbots_protobuf.h"
 #include "software/ai/hl/stp/play/assigned_tactics_play.h"
 #include "software/test_util/test_util.h"
