@@ -111,7 +111,7 @@ TEST_F(
     // problem since obstacles are inflated by the RobotNavigationObstacleFactory
     std::vector<ObstaclePtr> defense_area_obstacles =
         obstacle_factory.createFromMotionConstraints(
-            {MotionConstraint::FRIENDLY_DEFENSE_AREA,
+            {TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA,
              TbotsProto::MotionConstraint::ENEMY_DEFENSE_AREA},
             world.field());
     TestUtil::checkPathDoesNotIntersectObstacle(

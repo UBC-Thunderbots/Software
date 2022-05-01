@@ -39,7 +39,7 @@ class DribbleTacticTest : public SimulatedErForceSimPlayTestFixture
     void SetUp() override
     {
         SimulatedErForceSimPlayTestFixture::SetUp();
-        setMotionConstraints({MotionConstraint::ENEMY_DEFENSE_AREA});
+        setMotionConstraints({TbotsProto::MotionConstraint::ENEMY_DEFENSE_AREA});
     }
     TbotsProto::FieldType field_type = TbotsProto::FieldType::DIV_B;
     Field field                      = Field::createField(field_type);

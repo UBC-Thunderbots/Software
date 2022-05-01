@@ -48,7 +48,7 @@ TEST_F(CreaseDefenderTacticTest, DISABLED_test_chip_ball)
         std::make_shared<CreaseDefenderTactic>(robot_navigation_obstacle_config);
     tactic->updateControlParams(enemy_threat_point, alignment);
     setTactic(0, tactic);
-    setMotionConstraints({MotionConstraint::FRIENDLY_DEFENSE_AREA});
+    setMotionConstraints({TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA});
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [tactic](std::shared_ptr<World> world_ptr,
@@ -86,7 +86,7 @@ TEST_F(CreaseDefenderTacticTest, test_not_bumping_ball_towards_net)
         std::make_shared<CreaseDefenderTactic>(robot_navigation_obstacle_config);
     tactic->updateControlParams(enemy_threat_point, alignment);
     setTactic(0, tactic);
-    setMotionConstraints({MotionConstraint::FRIENDLY_DEFENSE_AREA});
+    setMotionConstraints({TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA});
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [tactic](std::shared_ptr<World> world_ptr,
@@ -131,7 +131,7 @@ TEST_P(CreaseDefenderTacticTest, crease_defender_test)
         std::make_shared<CreaseDefenderTactic>(robot_navigation_obstacle_config);
     tactic->updateControlParams(enemy_threat_point, alignment);
     setTactic(0, tactic);
-    setMotionConstraints({MotionConstraint::FRIENDLY_DEFENSE_AREA});
+    setMotionConstraints({TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA});
 
     Rectangle defense_area         = field.friendlyDefenseArea();
     Rectangle field_lines          = field.fieldLines();

@@ -18,7 +18,7 @@ class ShadowEnemyTacticTest : public SimulatedErForceSimPlayTestFixture
     void SetUp() override
     {
         SimulatedErForceSimPlayTestFixture::SetUp();
-        setMotionConstraints({MotionConstraint::ENEMY_DEFENSE_AREA});
+        setMotionConstraints({TbotsProto::MotionConstraint::ENEMY_DEFENSE_AREA});
     }
 
    protected:
