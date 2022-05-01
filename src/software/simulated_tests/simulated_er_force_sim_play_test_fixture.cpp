@@ -51,10 +51,20 @@ void SimulatedErForceSimPlayTestFixture::setAIPlay(std::unique_ptr<Play> play)
 void SimulatedErForceSimPlayTestFixture::setTactic(RobotId id,
                                                    std::shared_ptr<Tactic> tactic)
 {
+    setTactic(id, tactic, {});
+}
+
+void SimulatedErForceSimPlayTestFixture::setTactic(
+    RobotId id, std::shared_ptr<Tactic> tactic,
+    std::set<TbotsProto::MotionConstraint> motion_constraints)
+{
     ai_config->getMutableAiControlConfig()->getMutableOverrideAiPlay()->setValue(false);
     CHECK(static_cast<bool>(tactic)) << "Tactic is invalid" << std::endl;
     std::unique_ptr<AssignedTacticsPlay> play =
         std::make_unique<AssignedTacticsPlay>(ai_config);
+    std::map<RobotId, std::set<TbotsProto::MotionConstraint>>
+        motion_constraint_override_map;
+    motion_constraint_override_map[id] = motion_constraints;
     play->updateControlParams({{id, tactic}});
     setAIPlay(std::move(play));
 }
