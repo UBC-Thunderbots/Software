@@ -4,6 +4,8 @@ from proto.message_translation import tbots_protobuf
 import software.python_bindings as cpp_bindings
 from software.thunderscope.replay.replay import ProtoLogger, ProtoPlayer
 
+
+import os
 import time
 import threading
 import argparse
@@ -130,7 +132,7 @@ if __name__ == "__main__":
         runtime_dir = "/tmp/tbots/yellow_test"
 
         try:
-            os.mkdirs(runtime_dir)
+            os.makedirs(runtime_dir)
         except OSError:
             pass
 
@@ -284,7 +286,6 @@ if __name__ == "__main__":
                 target=__async_sim_ticker, args=(SIM_TICK_RATE_MS,), daemon=True,
             )
 
-            # Start the protologgers
             thread.start()
             tscope.show()
             thread.join()
