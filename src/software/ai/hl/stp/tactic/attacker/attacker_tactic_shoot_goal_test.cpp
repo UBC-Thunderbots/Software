@@ -39,7 +39,7 @@ TEST_P(AttackerTacticShootGoalTest, attacker_test_shoot_goal)
     // Make it very obvious when we decide to chip
     tactic->updateControlParams(Point(0, field.fieldLines().yMin()));
     setTactic(0, tactic);
-    setMotionConstraints({MotionConstraint::FRIENDLY_DEFENSE_AREA});
+    setMotionConstraints({TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA});
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [tactic](std::shared_ptr<World> world_ptr,

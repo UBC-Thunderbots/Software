@@ -34,14 +34,16 @@ GlobalPathPlannerFactory::GlobalPathPlannerFactory(
                 auto enum_value = motion_constraint_enum_descriptor->value(j);
                 bool parsed =
                     TbotsProto::MotionConstraint_Parse(enum_value->name(), &constraint);
+                CHECK(parsed) << "Couldn't parse MotionConstraint with value: "
+                              << enum_value->name() << std::endl;
 
                 if (enum_value->options().HasExtension(TbotsProto::dynamic) &&
                     enum_value->options().GetExtension(TbotsProto::dynamic))
                 {
+                    dynamic_motion_constraints.insert(constraint);
                     has_dynamic_constraints = true;
                     break;
                 }
-                CHECK(parsed) << "Couldn't parse " << enum_value->name() << std::endl;
                 motion_constraint_obstacles.emplace(constraint);
             }
         }
@@ -59,17 +61,21 @@ GlobalPathPlannerFactory::GlobalPathPlannerFactory(
 }
 
 std::shared_ptr<const EnlsvgPathPlanner> GlobalPathPlannerFactory::getPathPlanner(
-    const std::set<TbotsProto::MotionConstraint> &motion_constraints) const
+    std::set<TbotsProto::MotionConstraint> constraints) const
 {
+    for (const auto &dynamic_constraint : dynamic_motion_constraints)
+    {
+        constraints.erase(dynamic_constraint);
+    }
     try
     {
-        return planners.at(motion_constraints);
+        return planners.at(constraints);
     }
     catch (std::out_of_range &e)
     {
         LOG(WARNING)
             << "GlobalPathPlannerFactory is unable to obtain a path planner for the following motion constraints: ";
-        for (auto constraint : motion_constraints)
+        for (auto constraint : constraints)
         {
             LOG(WARNING) << toString(constraint);
         }
