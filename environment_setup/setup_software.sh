@@ -89,9 +89,9 @@ if [[ $(lsb_release -rs) == "18.04" ]]; then
     host_software_packages+=(python-minimal)
     host_software_packages+=(libclang-dev)
     host_software_packages+=(python2.7-dev)
-    host_software_packages+=(python3.10)
-    host_software_packages+=(python3.10-dev)
-    host_software_packages+=(python3.10-venv)
+    host_software_packages+=(python3.8)
+    host_software_packages+=(python3.8-dev)
+    host_software_packages+=(python3.8-venv)
     host_software_packages+=(python3-setuptools)
 fi
 
@@ -110,7 +110,7 @@ echo "================================================================"
 # delete tbotspython first
 sudo rm -rf /opt/tbotspython
 
-if ! sudo /usr/bin/python3.10 -m venv /opt/tbotspython ; then
+if ! sudo /usr/bin/python3.8 -m venv /opt/tbotspython ; then
     echo "##############################################################"
     echo "Error: Setting up virtual environment failed"
     echo "##############################################################"
@@ -199,7 +199,7 @@ sudo service udev restart
 sudo usermod -a -G dialout $USER
 
 # installs PlatformIO to global environment
-if ! sudo /usr/bin/python3.10 -m pip install --prefix /usr/local platformio==5.2.4; then
+if ! sudo /usr/bin/python3.8 -m pip install --prefix /usr/local platformio==5.2.4; then
     echo "##############################################################"
     echo "Error: Installing PlatformIO failed"
     echo "##############################################################"
