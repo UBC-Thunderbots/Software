@@ -225,6 +225,11 @@ if __name__ == "__main__":
     # The async sim ticket ticks the simulator at a fixed rate.
     else:
 
+        tscope = Thunderscope(
+            layout_path=args.layout,
+            visualization_buffer_size=args.visualization_buffer_size,
+        )
+
         def __async_sim_ticker(tick_rate_ms):
             """Setup the world and tick simulation forever
 

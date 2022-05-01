@@ -380,7 +380,10 @@ class ProtoPlayer(object):
 
                 print("Playing: ", self.stop_playing)
                 print(self.current_entry_index_in_chunk, len(self.current_chunk))
-                print("Entry index: ",  self.current_entry_index_in_chunk < len(self.current_chunk))
+                print(
+                    "Entry index: ",
+                    self.current_entry_index_in_chunk < len(self.current_chunk),
+                )
 
                 if finished_playing_chunk:
                     finished_playing_chunk = False

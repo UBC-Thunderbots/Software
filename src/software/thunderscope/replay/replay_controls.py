@@ -1,5 +1,4 @@
 import pyqtgraph as pg
-import time
 from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph.Qt import QtCore, QtGui
 import pyqtgraph.console as pg_console
@@ -36,7 +35,9 @@ class ReplayControls(QWidget):
             self.replay_box,
             self.replay_slider,
             self.replay_label,
-        ) = common_widgets.create_slider("Replay", 0, self.player.end_time * MILLISECONDS_PER_SECOND, 1)
+        ) = common_widgets.create_slider(
+            "Replay", 0, self.player.end_time * MILLISECONDS_PER_SECOND, 1
+        )
 
         self.layout.addWidget(self.replay_box)
         self.setLayout(self.layout)
@@ -55,4 +56,6 @@ class ReplayControls(QWidget):
 
     def refresh(self):
         if not self.pressed:
-            self.replay_slider.setValue(self.player.replay_current_packet_time * MILLISECONDS_PER_SECOND)
+            self.replay_slider.setValue(
+                self.player.replay_current_packet_time * MILLISECONDS_PER_SECOND
+            )

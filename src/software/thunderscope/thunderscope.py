@@ -480,7 +480,7 @@ class Thunderscope(object):
             if friendly_colour_yellow
             else self.blue_proto_player
         )
-        
+
         # Register refresh function
         self.register_refresh_function(replay_controls.refresh)
 
