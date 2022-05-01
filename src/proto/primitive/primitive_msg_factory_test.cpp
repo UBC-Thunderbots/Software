@@ -28,7 +28,8 @@ TEST_F(PrimitiveFactoryTest, test_auto_chip_or_kick_equality)
 TEST_F(PrimitiveFactoryTest, test_create_move_primitive)
 {
     auto move_primitive = createMovePrimitive(
-        TEST_UTIL_CREATE_MOTION_CONTROL_WITH_DEST(Point(-5, 1)), 3.0, Angle::threeQuarter(), TbotsProto::DribblerMode::INDEFINITE,
+        TestUtil::createMotionControl(Point(-5, 1)), Angle::threeQuarter(), 3.0,
+        TbotsProto::DribblerMode::INDEFINITE, TbotsProto::BallCollisionType::AVOID,
         {AutoChipOrKickMode::OFF, 0}, TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
         5.0, robot_constants);
 
@@ -50,7 +51,8 @@ TEST_F(PrimitiveFactoryTest, test_create_move_primitive)
 TEST_F(PrimitiveFactoryTest, test_create_move_primitive_with_autochip)
 {
     auto move_primitive = createMovePrimitive(
-        Point(-5, 1), 3.0, Angle::threeQuarter(), TbotsProto::DribblerMode::INDEFINITE,
+        TestUtil::createMotionControl(Point(-5, 1)), Angle::threeQuarter(), 3.0,
+        TbotsProto::DribblerMode::INDEFINITE, TbotsProto::BallCollisionType::AVOID,
         {AutoChipOrKickMode::AUTOCHIP, 2.5},
         TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0, robot_constants);
 
@@ -74,7 +76,8 @@ TEST_F(PrimitiveFactoryTest, test_create_move_primitive_with_autochip)
 TEST_F(PrimitiveFactoryTest, test_create_move_primitive_with_autokick)
 {
     auto move_primitive = createMovePrimitive(
-        Point(-5, 1), 3.0, Angle::threeQuarter(), TbotsProto::DribblerMode::INDEFINITE,
+        TestUtil::createMotionControl(Point(-5, 1)), Angle::threeQuarter(), 3.0,
+        TbotsProto::DribblerMode::INDEFINITE, TbotsProto::BallCollisionType::AVOID,
         {AutoChipOrKickMode::AUTOKICK, 3.5},
         TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND, 0.0, robot_constants);
 

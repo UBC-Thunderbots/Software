@@ -5,6 +5,7 @@
 #include <chrono>
 
 #include "proto/message_translation/tbots_protobuf.h"
+#include "proto/primitive.pb.h"
 #include "proto/robot_log_msg.nanopb.h"
 #include "shared/constants.h"
 #include "software/geom/algorithms/almost_equal.h"
@@ -27,6 +28,10 @@
 #define TEST_UTIL_CREATE_MOTION_CONTROL_WITH_DEST(DESTINATION)                           \
     [](const Robot &, const Point &) {                                                   \
         TbotsProto::MotionControl motion_control;                                        \
+        TbotsProto::Path path_proto;                                                     \
+        *(path_proto.add_point())        = *createPointProto(DESTINATION);               \
+        *(path_proto.add_point())        = *createPointProto(DESTINATION);               \
+        *(motion_control.mutable_path()) = path_proto;                                   \
         *(motion_control.mutable_requested_destination()) =                              \
             *createPointProto(DESTINATION);                                              \
         return motion_control;                                                           \
@@ -182,4 +187,13 @@ namespace TestUtil
      */
     GameState createGameState(const RefereeCommand &current_referee_command,
                               const RefereeCommand &previous_referee_command);
+
+    /** Create Motion Control from destination
+     *
+     * @param destination
+     *
+     * @return the motion control with that destination
+     */
+    TbotsProto::MotionControl createMotionControl(const Point &destination);
+
 };  // namespace TestUtil

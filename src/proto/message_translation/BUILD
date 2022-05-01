@@ -186,6 +186,7 @@ cc_test(
     deps = [
         ":primitive_google_to_nanopb_converter",
         "//shared/test_util:tbots_gtest_main",
+        "//software/test_util",
     ],
 )
 

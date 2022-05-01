@@ -6,6 +6,7 @@
 
 #include "proto/primitive/primitive_msg_factory.h"
 #include "shared/2015_robot_constants.h"
+#include "software/test_util/test_util.h"
 
 /**
  * Rather then testing every single primitive to make sure it's converted correctly,
@@ -23,7 +24,8 @@ class PrimitiveGoogleToNanoPbConverterTest : public testing::Test
 TEST_F(PrimitiveGoogleToNanoPbConverterTest, convert_move_primitive)
 {
     TbotsProto::Primitive google_primitive = *createMovePrimitive(
-        Point(1, 2), 100, Angle::half(), TbotsProto::DribblerMode::MAX_FORCE,
+        TestUtil::createMotionControl(Point(1, 2)), Angle::half(), 100,
+        TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::AVOID,
         {AutoChipOrKickMode::AUTOCHIP, 2.5},
         TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0, robot_constants);
 
@@ -46,11 +48,14 @@ TEST_F(PrimitiveGoogleToNanoPbConverterTest, convert_move_primitive)
 TEST_F(PrimitiveGoogleToNanoPbConverterTest, convert_primitive_set)
 {
     TbotsProto::Primitive google_primitive_1 = *createMovePrimitive(
-        Point(1, 2), 100, Angle::half(), TbotsProto::DribblerMode::MAX_FORCE,
-        {AutoChipOrKickMode::OFF, 0}, TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
-        0.0, robot_constants);
+        TestUtil::createMotionControl(Point(1, 2)), Angle::half(), 100,
+        TbotsProto::DribblerMode::MAX_FORCE,
+
+        TbotsProto::BallCollisionType::AVOID, {AutoChipOrKickMode::OFF, 0},
+        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0, robot_constants);
     TbotsProto::Primitive google_primitive_2 = *createMovePrimitive(
-        Point(2, 4), 50, Angle::half(), TbotsProto::DribblerMode::MAX_FORCE,
+        TestUtil::createMotionControl(Point(2, 4)), Angle::half(), 50,
+        TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::AVOID,
         {AutoChipOrKickMode::OFF, 0}, TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
         0.0, robot_constants);
 

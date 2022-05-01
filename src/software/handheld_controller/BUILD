@@ -56,5 +56,6 @@ cc_test(
         ":controller_primitive_generator",
         "//shared/parameter:cpp_configs",
         "//shared/test_util:tbots_gtest_main",
+        "//software/test_util",
     ],
 )
