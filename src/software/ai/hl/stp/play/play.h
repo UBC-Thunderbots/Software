@@ -93,12 +93,14 @@ class Play
      * @param path_planner_factory The path planner factory
      * @param world The updated world
      * @param tactic the Tactic
+     * @param motion_constraints the motion constraints to use
      *
      * @return the PrimitiveSet to execute
      */
     std::unique_ptr<TbotsProto::PrimitiveSet> getPrimitivesFromTactic(
         const GlobalPathPlannerFactory& path_planner_factory, const World& world,
-        std::shared_ptr<Tactic> tactic) const;
+        std::shared_ptr<Tactic> tactic,
+        std::set<TbotsProto::MotionConstraint> motion_constraints) const;
 
    private:
     /**

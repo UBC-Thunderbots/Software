@@ -6,7 +6,7 @@
 #include "software/util/generic_factory/generic_factory.h"
 
 AssignedTacticsPlay::AssignedTacticsPlay(std::shared_ptr<const AiConfig> config)
-    : Play(config, false), assigned_tactics()
+    : Play(config, false), assigned_tactics(), override_motion_constraints(std::nullopt)
 {
 }
 
@@ -21,9 +21,11 @@ void AssignedTacticsPlay::getNextTactics(TacticCoroutine::push_type &yield,
 }
 
 void AssignedTacticsPlay::updateControlParams(
-    std::map<RobotId, std::shared_ptr<Tactic>> assigned_tactics)
+    std::map<RobotId, std::shared_ptr<Tactic>> assigned_tactics,
+    std::optional<std::set<TbotsProto::MotionConstraint>> motion_constraints)
 {
-    this->assigned_tactics = assigned_tactics;
+    this->assigned_tactics            = assigned_tactics;
+    this->override_motion_constraints = motion_constraints;
 }
 
 std::unique_ptr<TbotsProto::PrimitiveSet> AssignedTacticsPlay::get(
@@ -37,7 +39,14 @@ std::unique_ptr<TbotsProto::PrimitiveSet> AssignedTacticsPlay::get(
         {
             auto tactic = assigned_tactics.at(robot.id());
             tactic_robot_id_assignment.emplace(tactic, robot.id());
-            auto primitives = getPrimitivesFromTactic(path_planner_factory, world, tactic)
+            auto motion_constraints =
+                buildMotionConstraintSet(world.gameState(), *goalie_tactic);
+            if (override_motion_constraints.has_value())
+            {
+                motion_constraints = override_motion_constraints.value();
+            }
+            auto primitives = getPrimitivesFromTactic(path_planner_factory, world, tactic,
+                                                      motion_constraints)
                                   ->robot_primitives();
             CHECK(primitives.contains(robot.id()))
                 << "Couldn't find a primitive for robot id " << robot.id();

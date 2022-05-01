@@ -715,7 +715,8 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_speed_test)
     // with the centre circle
     std::vector<ObstaclePtr> obstacles = {
         robot_navigation_obstacle_factory.createFromMotionConstraints(
-            {TbotsProto::MotionConstraint::CENTER_CIRCLE, MotionConstraint::FRIENDLY_DEFENSE_AREA,
+            {TbotsProto::MotionConstraint::CENTER_CIRCLE,
+             MotionConstraint::FRIENDLY_DEFENSE_AREA,
              MotionConstraint::ENEMY_DEFENSE_AREA},
             world.field()),
     };

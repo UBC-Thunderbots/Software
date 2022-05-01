@@ -18,8 +18,11 @@ class AssignedTacticsPlay : public Play
      * Update assigned tactics for this play
      *
      * @param assigned_tactics The assigned tactics to run
+     * @param motion constraints to override
      */
-    void updateControlParams(std::map<RobotId, std::shared_ptr<Tactic>> assigned_tactics);
+    void updateControlParams(std::map<RobotId, std::shared_ptr<Tactic>> assigned_tactics,
+                             std::optional<std::set<TbotsProto::MotionConstraint>>
+                                 motion_constraints = std::nullopt);
 
     std::unique_ptr<TbotsProto::PrimitiveSet> get(
         const GlobalPathPlannerFactory &path_planner_factory, const World &world,
@@ -28,4 +31,5 @@ class AssignedTacticsPlay : public Play
 
    private:
     std::map<RobotId, std::shared_ptr<Tactic>> assigned_tactics;
+    std::optional<std::set<TbotsProto::MotionConstraint>> override_motion_constraints;
 };

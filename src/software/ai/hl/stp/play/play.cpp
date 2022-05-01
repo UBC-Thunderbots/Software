@@ -113,9 +113,11 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
             robots.erase(std::remove(robots.begin(), robots.end(), goalie_robot.value()),
                          robots.end());
 
-            auto primitives =
-                getPrimitivesFromTactic(path_planner_factory, world, goalie_tactic)
-                    ->robot_primitives();
+            auto motion_constraints =
+                buildMotionConstraintSet(world.gameState(), *goalie_tactic);
+            auto primitives = getPrimitivesFromTactic(path_planner_factory, world,
+                                                      goalie_tactic, motion_constraints)
+                                  ->robot_primitives();
             CHECK(primitives.contains(goalie_robot_id))
                 << "Couldn't find a primitive for robot id " << goalie_robot_id;
             auto primitive = primitives.at(goalie_robot_id);
@@ -171,8 +173,10 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
 
         for (auto tactic : tactic_vector)
         {
-            primitive_sets.emplace_back(
-                getPrimitivesFromTactic(path_planner_factory, world, tactic));
+            auto motion_constraints =
+                buildMotionConstraintSet(world.gameState(), *goalie_tactic);
+            primitive_sets.emplace_back(getPrimitivesFromTactic(
+                path_planner_factory, world, tactic, motion_constraints));
             CHECK(primitive_sets.back()->robot_primitives().size() ==
                   world.friendlyTeam().numRobots())
                 << primitive_sets.back()->robot_primitives().size() << " primitives from "
@@ -310,10 +314,10 @@ void Play::updateTactics(const PlayUpdate &play_update)
 
 std::unique_ptr<TbotsProto::PrimitiveSet> Play::getPrimitivesFromTactic(
     const GlobalPathPlannerFactory &path_planner_factory, const World &world,
-    std::shared_ptr<Tactic> tactic) const
+    std::shared_ptr<Tactic> tactic,
+    std::set<TbotsProto::MotionConstraint> motion_constraints) const
 {
-    auto motion_constraints = buildMotionConstraintSet(world.gameState(), *tactic);
-    auto path_planner       = path_planner_factory.getPathPlanner(motion_constraints);
+    auto path_planner = path_planner_factory.getPathPlanner(motion_constraints);
     CreateMotionControl create_motion_control =
         [path_planner, motion_constraints](const Robot &robot, const Point &destination) {
             Point robot_position = robot.position();
