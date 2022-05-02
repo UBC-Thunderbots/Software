@@ -323,6 +323,7 @@ class HRVOSimulator
     // Based on the rules, if the robot is travelling <= 0.6 m/s it will not receive a
     // penalty after a collision. To be safe, the max collision speed is set to 0.5 m/s
     static constexpr float MAX_COLLISION_SPEED = 0.5f;
+    // TODO: Could remove in favor of allowed_robot_collision_speed
 
     friend class Agent;
     friend class KdTree;
