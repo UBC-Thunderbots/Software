@@ -301,7 +301,7 @@ def simulated_test_runner():
 
     # Grab the current test name to store the proto log file for the test case
     current_test = os.environ.get("PYTEST_CURRENT_TEST").split(":")[-1].split(" ")[0]
-    current_test = current_test.replace("]", "-")
+    current_test = current_test.replace("]", "")
     current_test = current_test.replace("[", "-")
 
     # Launch all binaries
@@ -358,12 +358,10 @@ def simulated_test_runner():
             # SimulatorTestRunners time provider is tied to the simulators
             # t_capture coming out of the wrapper packet rather than time.time
             with ProtoLogger(
-                args.blue_full_system_runtime_dir,
-                "blue_{}".format(current_test),
+                args.blue_full_system_runtime_dir + f"/{current_test}",
                 time_provider=runner.time_provider,
             ) as blue_logger, ProtoLogger(
-                args.yellow_full_system_runtime_dir,
-                "yellow_{}".format(current_test),
+                args.yellow_full_system_runtime_dir + f"/{current_test}",
                 time_provider=runner.time_provider,
             ) as yellow_logger:
 
