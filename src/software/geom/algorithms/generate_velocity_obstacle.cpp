@@ -59,24 +59,23 @@ VelocityObstacle generateVelocityObstacle(const Polygon &obstacle, const Circle 
             if (curr_opening > min_opening)
             {
                 min_opening = curr_opening;
-                // TODO: Update to isToTheRightOf
-                if (obstacle_to_point_vec_i.determinant(obstacle_to_point_vec_j) < 0.0)
-                {
-                    left_side = obstacle_to_point_vec_i;
-                    right_side = obstacle_to_point_vec_j;
-                }
-                else
-                {
-                    left_side = obstacle_to_point_vec_j;
-                    right_side = obstacle_to_point_vec_i;
-                }
+                left_side = obstacle_to_point_vec_i;
+                right_side = obstacle_to_point_vec_j;
             }
         }
     }
 
     // Open velocity obstacle sides by the radius of the robot
-    velocity_obstacle.side1_ = left_side.rotate(Angle::asin(robot.radius() / left_side.length()));
-    velocity_obstacle.side2_ = right_side.rotate(-Angle::asin(robot.radius() / right_side.length()));
+    // TODO Update to isToTheRightOf
+    if (left_side.determinant(right_side) < 0.0)
+    {
+        Vector temp = left_side;
+        left_side = right_side;
+        right_side = temp;
+    }
+
+    velocity_obstacle.side1_ = left_side.rotate(-Angle::asin(robot.radius() / left_side.length())).normalize();
+    velocity_obstacle.side2_ = right_side.rotate(Angle::asin(robot.radius() / right_side.length())).normalize();
 
     return velocity_obstacle;
 }
