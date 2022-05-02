@@ -51,11 +51,16 @@ class ReplayControls(QWidget):
             self.player.pause()
             self.pressed = True
 
+        def __on_value_changed():
+            if self.pressed:
+                self.player.seek(self.replay_slider.value() / MILLISECONDS_PER_SECOND)
+
+        self.replay_slider.valueChanged.connect(__on_value_changed)
         self.replay_slider.sliderReleased.connect(__on_release)
         self.replay_slider.sliderPressed.connect(__on_pressed)
 
     def refresh(self):
         if not self.pressed:
             self.replay_slider.setValue(
-                self.player.replay_current_packet_time * MILLISECONDS_PER_SECOND
+                self.player.current_packet_time * MILLISECONDS_PER_SECOND
             )

@@ -23,53 +23,50 @@ PLAY_PAUSE_POLL_INTERVAL_SECONDS = 0.1
 
 class ProtoLogger(object):
 
-    """Logs incoming protobufs with metadata to a folder for later replay.
+    """Logs incoming protobufs with metadata to a folder to be played back later.
 
     Each entry will contain
         - The timestamp
         - The protobuf type
         - The protobuf serialized as base64 (to remove newline characters)
 
-    Stored in: log_path_YYYY_MM_DD_HH_MM_SS/
-    Each entry formatted as: timestamp,protobuf_type,protobuf_base64
+    Stored in log_path/protolog_YYYY_MM_DD_HH_MM_SS/
+    With each entry in the file formatted as timestamp,protobuf_type,protobuf_base64
 
     We need to store the data in a way that we can:
         1. Replay the data chronologoically
         2. Seek to a specific time (random access)
 
-    If we store all the data into a single file, chronologoical playback
-    is trivial but it is challenging to seek to a specific time. We need
-    to load the log file into memory to search for the entry we want. If the
-    replay file is large, it won't fit into memory.
+    To seek to a specific time, we need to load the entire file into memory. To
+    do this, we store the data in chunks. Each chunk contains
+    REPLAY_MAX_CHUNK_SIZE_BYTES of serialized protos.
 
-    So we store the data in chunks. Each chunk contains REPLAY_MAX_CHUNK_SIZE_BYTES
-    of serialized protos.
-
-    We can load each chunk into memory and search for the entry we want, or
-    playback the data chronologically.
+    We can load each chunk into memory and binary search for the entry we want.
+    Or we can just play the chunks in order.
 
     """
 
-    def __init__(self, log_path, time_provider=None):
+    def __init__(self, log_path, log_prefix="protolog_", time_provider=None):
         """Creates a proto logger that logs all protos registered on the queue.
 
         Stores the files to
-            log_path_YYYY-MM-DD-HH-MM-SS/#.replay
+            logprefix_YYYY_MM_DD_HH_MM_SS/#.replay
 
         Where # is the chunk number
 
         NOTE: The files in the folder will be compressed with gzip.
-        I've looked into bz2, but loading chunks into memory was slower.
+        I've looked into bz2, but reading chunks was slower.
 
         Also NOTE: You need the entire folder to replay the data.
 
         :param log_path: The path to the log file.
         :param time_provider: A function that returns the current time
-            in seconds since epoch. Defaults to time.time
+            in seconds since epoch. Defaults to time.time.
 
         """
+        self.log_prefix = log_prefix
         self.log_folder = (
-            log_path + "/protolog_" + time.strftime(REPLAY_FILE_TIME_FORMAT) + "/"
+            log_path + "/" + log_prefix + time.strftime(REPLAY_FILE_TIME_FORMAT) + "/"
         )
 
         try:
@@ -80,7 +77,6 @@ class ProtoLogger(object):
         self.buffer = queue.Queue(PROTOBUF_BUFFER_SIZE)
         self.time_provider = time_provider if time_provider else time.time
         self.start_time = self.time_provider()
-        self.replay_current_packet_time = 0.0
         self.stop_logging = False
 
     def __enter__(self):
@@ -127,6 +123,8 @@ class ProtoLogger(object):
                 ) as self.log_file:
 
                     while self.stop_logging is False:
+
+                        # Consume the buffer and log the protobuf
                         try:
                             proto = self.buffer.get(block=True, timeout=0.01)
                         except queue.Empty:
@@ -143,6 +141,7 @@ class ProtoLogger(object):
 
                         self.log_file.write(bytes(log_entry, encoding="utf-8"))
 
+                        # Stop writing to this chunk if we've reached the max size
                         size = os.fstat(self.log_file.fileno()).st_size
                         if size >= REPLAY_MAX_CHUNK_SIZE_BYTES:
                             break
@@ -153,7 +152,31 @@ class ProtoLogger(object):
 
 class ProtoPlayer(object):
 
-    """Plays back a log file. """
+    """Plays back a log file. All the playback is handled by a worker thread
+    running in the background.
+        
+        
+                             current_chunk
+                                  │
+                                  │
+                       ┌─────┐ ┌──▼──┐            ┌─────┐
+                       │CHUNK│ │CHUNK│            │CHUNK│
+                    ┌──┼─────┼─┼─►   │ ────────── │     │
+                    │  │     │ │     │            │     │
+                    │  │     │ │     │            │     │
+                    │  └─────┘ └─────┘            └─────┘
+                    │     0       1                  N
+                    │             ▲
+                    │             └──current_chunk_index
+                    │
+             current_entry_index
+        
+    The player will load chunks in order and play back at the given playback speed.
+    If the seek function is called with a specific time, the player will update
+    the 3 variables (shown above) to point to the chunk and entry that contains
+    the data at that time and continue playing from there.
+
+    """
 
     def __init__(self, log_folder_path, proto_unix_io):
         """Creates a proto player that plays back all protos
@@ -164,17 +187,19 @@ class ProtoPlayer(object):
         """
         self.log_folder_path = log_folder_path
         self.proto_unix_io = proto_unix_io
-        self.exit_requested = False
 
         # Playback controls, see __play_protobufs
         self.stop_playing = False
         self.playback_speed = 1.0
-        self.seek_offset_time = 0.0
-        self.current_chunk_index = 0
-        self.current_chunk = []
-        self.current_entry_index_in_chunk = 0
-
         self.replay_controls_mutex = threading.Lock()
+        self.seek_offset_time = 0.0
+        self.current_packet_time = 0.0
+        self.just_seeked = False
+
+        # Chunk cache and info
+        self.current_chunk = []
+        self.current_chunk_index = 0
+        self.current_entry_index = 0
 
         # Load up all replay files in the log folder
         replay_files = glob.glob(self.log_folder_path + f"/*.{REPLAY_FILE_EXTENSION}")
@@ -274,13 +299,15 @@ class ProtoPlayer(object):
 
         """
         # Lets binary search through the chunks to find the chunk that starts
-        # with a timestamp less than but closest to the seek_time we want to seek to
+        # with a timestamp less than (but closest to) the seek_time we want
+        # to seek to.
         def __bisect_chunks_by_timestamp(chunk):
             chunk = ProtoPlayer.load_replay_chunk(chunk)
             start_timestamp, _, _ = ProtoPlayer.unpack_log_entry(chunk[0])
             return start_timestamp
 
         with self.replay_controls_mutex:
+
             self.current_chunk_index = ProtoPlayer.binary_search(
                 self.sorted_chunks, seek_time, key=__bisect_chunks_by_timestamp
             )
@@ -293,21 +320,26 @@ class ProtoPlayer(object):
 
         with self.replay_controls_mutex:
 
+            # Load the chunk that would have the entry
             self.current_chunk = ProtoPlayer.load_replay_chunk(
                 self.sorted_chunks[self.current_chunk_index]
             )
-            self.current_entry_index_in_chunk = ProtoPlayer.binary_search(
+
+            # Search through the chunk to find the entry that is closest to the seek_time
+            self.current_entry_index = ProtoPlayer.binary_search(
                 self.current_chunk, seek_time, key=__bisect_log_entries_by_timestamp
             )
+
             self.seek_offset_time = __bisect_log_entries_by_timestamp(
-                self.current_chunk[self.current_entry_index_in_chunk]
+                self.current_chunk[self.current_entry_index]
             )
-            self.replay_current_packet_time = self.seek_offset_time
+            self.current_packet_time = self.seek_offset_time
+            self.just_seeked = True
 
             logging.info(
                 "Jumped to chunk {} at index {} with timestamp {:.2f}".format(
                     self.current_chunk_index,
-                    self.current_entry_index_in_chunk,
+                    self.current_entry_index,
                     self.seek_offset_time,
                 )
             )
@@ -315,6 +347,8 @@ class ProtoPlayer(object):
     @staticmethod
     def binary_search(arr, x, key=lambda x: x):
         """Binary search for an element in an array.
+
+        Adapted from: https://www.geeksforgeeks.org/python-program-for-binary-search/
 
         :param arr: The array to search.
         :param x: The element to search for.
@@ -348,14 +382,13 @@ class ProtoPlayer(object):
 
         Playback controls:
             - Play/Pause through self.stop_playing
-            - Seek to a specific time through self.current_chunk and self.current_entry_index_in_chunk
+            - Seek to a specific time through self.current_chunk and self.current_entry_index
             - Set playback speed through self.playback_speed
 
         """
         self.start_playback_time = time.time()
-        finished_playing_chunk = False
 
-        while self.exit_requested is False:
+        while True:
 
             # Only play if we are not paused
             if self.stop_playing is True:
@@ -369,7 +402,7 @@ class ProtoPlayer(object):
                 continue
 
             # Load the next chunk and setup the current_chunk_index
-            # and current_entry_index_in_chunk.
+            # and current_entry_index.
             with self.replay_controls_mutex:
                 logging.info("Loading chunk: {}".format(self.current_chunk_index))
 
@@ -378,35 +411,22 @@ class ProtoPlayer(object):
                 )
                 self.current_chunk_index += 1
 
-                print("Playing: ", self.stop_playing)
-                print(self.current_entry_index_in_chunk, len(self.current_chunk))
-                print(
-                    "Entry index: ",
-                    self.current_entry_index_in_chunk < len(self.current_chunk),
-                )
-
-                if finished_playing_chunk:
-                    finished_playing_chunk = False
-                    self.current_entry_index_in_chunk = 0
-
             # Playback loop
-            while (
-                self.stop_playing is False
-                and self.current_entry_index_in_chunk < len(self.current_chunk)
+            while self.stop_playing is False and self.current_entry_index < len(
+                self.current_chunk
             ):
                 with self.replay_controls_mutex:
 
                     # Get the current entry
                     (
-                        self.replay_current_packet_time,
+                        self.current_packet_time,
                         proto_class,
                         proto,
                     ) = ProtoPlayer.unpack_log_entry(
-                        self.current_chunk[self.current_entry_index_in_chunk]
+                        self.current_chunk[self.current_entry_index]
                     )
-                    print("CHUNK: ", len(self.current_chunk))
 
-                    self.current_entry_index_in_chunk += 1
+                    self.current_entry_index += 1
 
                     # Manage playback speed, if this packet needs to be sent
                     # out at a later time, sleep until its time to send it.
@@ -414,10 +434,12 @@ class ProtoPlayer(object):
                         time.time() - self.start_playback_time + self.seek_offset_time
                     ) / self.playback_speed
 
-                    if self.replay_current_packet_time > time_elapsed:
-                        time.sleep(self.replay_current_packet_time - time_elapsed)
+                    if self.current_packet_time > time_elapsed:
+                        time.sleep(self.current_packet_time - time_elapsed)
 
                     # Send protobuf
                     self.proto_unix_io.send_proto(proto_class, proto)
 
-            finished_playing_chunk = True
+            else:
+                # Finished playing chunk, reset back to the start
+                self.current_entry_index = 0
