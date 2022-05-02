@@ -11,11 +11,11 @@ TEST(FsmStateTest, test_get_fsm_state)
     Robot robot = ::TestUtil::createRobotAtPos(Point(-2, -3));
     world.updateFriendlyTeamState(Team({robot}));
     Pass pass = Pass(Point(0, 0), Point(2, 0), 5);
+    tactic.setLastExecutionRobot(robot.id());
 
     EXPECT_EQ("DribbleFSM.GetPossession", tactic.getFSMState());
     tactic.updateControlParams(pass, true);
     tactic.get(world, TEST_UTIL_CREATE_MOTION_CONTROL_NO_DEST);
-    tactic.setLastExecutionRobot(robot.id());
 
     // robot at attacker point and facing the right way
     robot.updateState(RobotState(pass.passerPoint() - Vector(0.05, 0), Vector(),

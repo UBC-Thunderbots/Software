@@ -36,8 +36,8 @@ TEST_F(ControllerPrimitiveGeneratorTest, test_create_primitive_controller_input)
     double kick_speed =
         handheld_controller_config->getKickSpeedMetersPerSecond()->value();
     auto expected_kick_primitive = *createMovePrimitive(
-        TestUtil::createMotionControl(Point()), Angle::zero(), 0,
-        TbotsProto::DribblerMode::OFF, TbotsProto::BallCollisionType::ALLOW,
+        TbotsProto::MotionControl(), Angle::zero(), 0, TbotsProto::DribblerMode::OFF,
+        TbotsProto::BallCollisionType::ALLOW,
         AutoChipOrKick{
             AutoChipOrKickMode::AUTOKICK,
             kick_speed,
@@ -61,8 +61,8 @@ TEST_F(ControllerPrimitiveGeneratorTest, test_create_primitive_controller_input1
 
     double chip_distance = handheld_controller_config->getChipDistanceMeters()->value();
     auto expected_chip_primitive = *createMovePrimitive(
-        TestUtil::createMotionControl(Point()), Angle::zero(), 0,
-        TbotsProto::DribblerMode::OFF, TbotsProto::BallCollisionType::ALLOW,
+        TbotsProto::MotionControl(), Angle::zero(), 0, TbotsProto::DribblerMode::OFF,
+        TbotsProto::BallCollisionType::ALLOW,
         AutoChipOrKick{
             AutoChipOrKickMode::AUTOCHIP,
             chip_distance,
