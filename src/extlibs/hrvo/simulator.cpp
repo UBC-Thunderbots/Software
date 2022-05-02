@@ -361,6 +361,12 @@ void HRVOSimulator::visualize(unsigned int robot_id) const
         {
             *(obstacle_proto.add_circle()) = *createCircleProto(candidate_circle);
         }
+
+        auto path_point = friendly_agent->getPath().getCurrentPathPoint();
+        if (path_point.has_value())
+        {
+            *(obstacle_proto.add_circle()) = *createCircleProto(Circle(Point(path_point->getPosition()), 0.04));
+        }
     }
 
     // Add circles representing agents

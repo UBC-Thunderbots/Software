@@ -183,7 +183,8 @@ void HRVOAgent::computeNewVelocity()
     Circle circle_rep_of_agent(agent_position_point, radius_);
     for (const auto &obstacle_ptr : static_obstacles)
     {
-        if (obstacle_ptr->distance(agent_position_point) <= 0.15 && !obstacle_ptr->contains(agent_position_point))
+        const double dist_required_to_stop = std::pow(velocity_.length(), 2) / (2 * max_accel_) + 0.05;
+        if (obstacle_ptr->distance(agent_position_point) <= dist_required_to_stop && !obstacle_ptr->contains(agent_position_point))
         {
             VelocityObstacle velocity_obstacle = obstacle_ptr->generateVelocityObstacle(circle_rep_of_agent);
             velocityObstacles_.push_back(velocity_obstacle);
@@ -611,7 +612,7 @@ void HRVOAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive, cons
             // TODO (#2418): Update implementation of Primitive to support
             //               a speed per path point
             auto destination = motion_control.path().point().at(i);
-            path_points.emplace_back(createPoint(destination).toVector(), speed_at_dest);
+            path_points.emplace_back(/*Vector(destination.x_meters(), destination.y_meters())*/Vector(4.4, 0), speed_at_dest);
         }
 
         // Max distance which the robot can travel in one time step + scaling

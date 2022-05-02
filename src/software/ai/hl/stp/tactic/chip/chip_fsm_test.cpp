@@ -21,7 +21,9 @@ TEST(ChipFSMTest, test_transitions)
 
     // Transition to GetBehindBallFSM state's GetBehindBallState
     fsm.process_event(ChipFSM::Update(
-        control_params, TacticUpdate(robot, world, [](std::unique_ptr<Intent>) {})));
+        control_params, TacticUpdate(
+                            robot, world, [](std::unique_ptr<TbotsProto::Primitive>) {},
+                            TEST_UTIL_CREATE_MOTION_CONTROL_NO_DEST)));
     EXPECT_TRUE(fsm.is(boost::sml::state<GetBehindBallFSM>));
     EXPECT_TRUE(fsm.is<decltype(boost::sml::state<GetBehindBallFSM>)>(
         boost::sml::state<GetBehindBallFSM::GetBehindBallState>));
@@ -32,7 +34,9 @@ TEST(ChipFSMTest, test_transitions)
                              AngularVelocity::zero()),
                   Timestamp::fromSeconds(123));
     fsm.process_event(ChipFSM::Update(
-        control_params, TacticUpdate(robot, world, [](std::unique_ptr<Intent>) {})));
+        control_params, TacticUpdate(
+                            robot, world, [](std::unique_ptr<TbotsProto::Primitive>) {},
+                            TEST_UTIL_CREATE_MOTION_CONTROL_NO_DEST)));
     // Transition to ChipState
     EXPECT_TRUE(fsm.is(boost::sml::state<ChipFSM::ChipState>));
 
@@ -43,6 +47,8 @@ TEST(ChipFSMTest, test_transitions)
 
     // Tactic is done
     fsm.process_event(ChipFSM::Update(
-        control_params, TacticUpdate(robot, world, [](std::unique_ptr<Intent>) {})));
+        control_params, TacticUpdate(
+                            robot, world, [](std::unique_ptr<TbotsProto::Primitive>) {},
+                            TEST_UTIL_CREATE_MOTION_CONTROL_NO_DEST)));
     EXPECT_TRUE(fsm.is(boost::sml::X));
 }
