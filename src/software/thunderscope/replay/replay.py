@@ -14,7 +14,7 @@ from google.protobuf.any_pb2 import Any
 
 REPLAY_METADATA_DELIMETER = ","
 REPLAY_FILE_EXTENSION = "replay"
-REPLAY_FILE_TIME_FORMAT = "%Y_%m_%d_%H_%M_%S"
+REPLAY_FILE_TIME_FORMAT = "%Y_%m_%d_%H%M%S"
 REPLAY_MAX_CHUNK_SIZE_BYTES = 1024 * 1024 * 1  # 1 MiB
 
 PROTOBUF_BUFFER_SIZE = 1024 * 1024  # 1MB
@@ -397,15 +397,12 @@ class ProtoPlayer(object):
 
             # Check if replay has ended
             if self.current_chunk_index >= len(self.sorted_chunks):
-                logging.info("Replay ended.")
                 self.stop_playing = True
                 continue
 
             # Load the next chunk and setup the current_chunk_index
             # and current_entry_index.
             with self.replay_controls_mutex:
-                logging.info("Loading chunk: {}".format(self.current_chunk_index))
-
                 self.current_chunk = ProtoPlayer.load_replay_chunk(
                     self.sorted_chunks[self.current_chunk_index]
                 )

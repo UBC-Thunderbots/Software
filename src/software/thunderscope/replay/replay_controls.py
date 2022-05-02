@@ -1,3 +1,5 @@
+import time
+
 import pyqtgraph as pg
 from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph.Qt import QtCore, QtGui
@@ -52,8 +54,8 @@ class ReplayControls(QWidget):
             self.pressed = True
 
         def __on_value_changed():
-            if self.pressed:
-                self.player.seek(self.replay_slider.value() / MILLISECONDS_PER_SECOND)
+            current_time = time.strftime('%H:%M:%S', time.gmtime(self.replay_slider.value() / MILLISECONDS_PER_SECOND))
+            self.replay_label.setText("Current time: {}".format(current_time))
 
         self.replay_slider.valueChanged.connect(__on_value_changed)
         self.replay_slider.sliderReleased.connect(__on_release)

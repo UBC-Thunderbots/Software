@@ -69,7 +69,7 @@ def create_slider(text, min_val, max_val, tick_spacing):
     slider = QSlider(Qt.Orientation.Horizontal)
     slider.setMinimum(min_val)
     slider.setMaximum(max_val)
-    slider.setTickPosition(QSlider.TickPosition.TicksBothSides)
+    slider.setTickPosition(QSlider.TickPosition.NoTicks)
     slider.setTickInterval(tick_spacing)
 
     value_label = QLabel(str(slider.value()))
