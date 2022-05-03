@@ -37,10 +37,8 @@ class NamedValuePlotter(object):
     def refresh(self):
         """Refreshes NamedValuePlotter and updates data in the respective
         plots.
-
         """
-        self.times_visualized += 1
-        start_time = time.time()
+
         # Dump the entire buffer into a deque. This operation is fast because
         # its just consuming data from the buffer and appending it to a deque.
         for _ in range(self.named_value_buffer.queue.qsize()):
@@ -71,9 +69,7 @@ class NamedValuePlotter(object):
 
         for named_value, plot in self.plots.items():
             # Update the data
-            plot.setData(
-                self.data_x[named_value], self.data_y[named_value]
-            )
+            plot.setData(self.data_x[named_value], self.data_y[named_value])
 
         self.win.setRange(
             xRange=[
