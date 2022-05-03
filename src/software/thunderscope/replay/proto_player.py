@@ -154,6 +154,15 @@ class ProtoPlayer(object):
             self.stop_playing = True
             self.seek_offset_time = self.current_packet_time
 
+    def toggle_play_pause(self):
+        """Toggles the play/pause state."""
+
+        with self.replay_controls_mutex:
+            if self.stop_playing:
+                self.play()
+            else:
+                self.pause()
+
     def set_playback_speed(self, speed):
         """Sets the playback speed.
 

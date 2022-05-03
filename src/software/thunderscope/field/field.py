@@ -29,6 +29,7 @@ class Field(QWidget):
         self.plot_widget.setAspectLocked()
         self.plot_widget.showGrid(x=True, y=True, alpha=0.5)
         self.layout.addWidget(self.plot_widget)
+        self.setFocusPolicy(QtCore.Qt.FocusPolicy.StrongFocus)
 
         self.max_x_range = max_x_range
         self.max_y_range = max_y_range

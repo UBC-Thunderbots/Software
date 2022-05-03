@@ -23,7 +23,7 @@ from software.thunderscope.binary_context_managers import (
     Simulator,
     Gamecontroller,
 )
-from software.thunderscope.replay.replay import ProtoLogger
+from software.thunderscope.replay.proto_logger import ProtoLogger
 
 from software.logger.logger import createLogger
 

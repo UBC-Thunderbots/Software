@@ -17,6 +17,9 @@ class ReplayControls(QGroupBox):
         """
         QGroupBox.__init__(self)
 
+        self.setFocusPolicy(QtCore.Qt.FocusPolicy.StrongFocus)
+        self.setFocus()
+
         self.controls_layout = QHBoxLayout()
         self.player = player
 
@@ -104,3 +107,10 @@ class ReplayControls(QGroupBox):
             self.replay_slider.setValue(
                 self.player.current_packet_time * MILLISECONDS_PER_SECOND
             )
+
+    def keyPressEvent(self, event):
+        """When a key is pressed, pause the player.
+        
+        """
+        if event.key() == QtCore.Qt.Key.Key_P:
+            self.player.toggle_play_pause()
