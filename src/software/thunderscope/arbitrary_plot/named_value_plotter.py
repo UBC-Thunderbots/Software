@@ -34,13 +34,16 @@ class NamedValuePlotter(object):
         self.legend.setParentItem(self.win.graphicsItem())
         self.time = time.time()
         self.named_value_buffer = ThreadSafeBuffer(buffer_size, NamedValue)
-        # self.win.disableAutoRange()
+        self.total_time = 0
+        self.times_visualized = 0
+        self.win.disableAutoRange()
 
     def refresh(self):
         """Refreshes NamedValuePlotter and updates data in the respective
         plots.
 
         """
+        self.times_visualized += 1
         start_time = time.time()
 
         # Dump the entire buffer into a deque. This operation is fast because
@@ -85,16 +88,25 @@ class NamedValuePlotter(object):
         print("Plotting time: {}".format(t2 - t1))
 
         t1 = time.time()
+        self.win.setRange(
+            xRange=[
+                time.time() - self.time - TIME_WINDOW_TO_DISPLAY_S,
+                time.time() - self.time,
+            ],
+        )
         # self.win.autoRange()
-        # self.win.setRange(
-        #     xRange=[
-        #         time.time() - self.time - TIME_WINDOW_TO_DISPLAY_S,
-        #         time.time() - self.time,
-        #     ],
-        # )
         t2 = time.time()
         print("Setting range time: {}".format(t2 - t1))
 
         end_time = time.time()
-        print("Refresh time: {}".format(end_time - start_time))
+        self.total_time += end_time - start_time
+        print("Avg Refresh time: {}".format(self.total_time / self.times_visualized))
         print("================")
+
+# 0.045 No disable autorange, and no autorange, and no setrange
+# 0.016    disable autorange, and no autorange, and no setrange
+# 0.020    disable autorange, and no autorange, and    setrange
+# 0.029    disable autorange, and    autorange, and    setrange
+# 0.039 No disable autorange, and no autorange, and    setrange
+
+# Can auto range, it will automatically get updated by new data, but will also show all data instead of a certain window
