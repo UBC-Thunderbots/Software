@@ -80,13 +80,13 @@ if __name__ == "__main__":
     parser.add_argument(
         "--blue_log",
         action="store",
-        help="Replay file for the blue full_system",
+        help="Replay folder for the blue full_system",
         default=None,
     )
     parser.add_argument(
         "--yellow_log",
         action="store",
-        help="Replay file for the yellow full_system",
+        help="Replay folder for the yellow full_system",
         default=None,
     )
 
@@ -202,11 +202,7 @@ if __name__ == "__main__":
     #                              Replay                                     #
     ###########################################################################
     #
-    # Create two full systems but don't start their binaries (if we don't use
-    # with with keyword to enter the context manager, the binaries won't start)
-    #
-    # We want to setup the proto unix io the same way, but instead use the proto
-    # player to replay the logs (rather than the full system binaries)
+    # Don't start any binaries and just replay a log.
     elif args.blue_log or args.yellow_log:
         tscope = Thunderscope(
             layout_path=args.layout,

@@ -127,7 +127,7 @@ class SimulatorTestRunner(object):
 
             while time_elapsed_s < test_timeout_s:
 
-                # Update the timestamp used by replay
+                # Update the timestamp logged by the ProtoLogger
                 with self.timestamp_mutex:
                     ssl_wrapper = self.ssl_wrapper_buffer.get(block=False)
                     self.timestamp = ssl_wrapper.detection.t_capture
@@ -299,7 +299,7 @@ def simulated_test_runner():
     yellow_full_system_proto_unix_io = ProtoUnixIO()
     blue_full_system_proto_unix_io = ProtoUnixIO()
 
-    # Grab the current test name to store the proto log file for the test case
+    # Grab the current test name to store the proto log for the test case
     current_test = os.environ.get("PYTEST_CURRENT_TEST").split(":")[-1].split(" ")[0]
     current_test = current_test.replace("]", "")
     current_test = current_test.replace("[", "-")
@@ -354,9 +354,9 @@ def simulated_test_runner():
             # Setup proto loggers.
             #
             # NOTE: Its important we use the test runners time provider because
-            # test will run as fast as possible with varying speed. The
-            # SimulatorTestRunners time provider is tied to the simulators
-            # t_capture coming out of the wrapper packet rather than time.time
+            # test will run as fast as possible with a varying tick rate. The
+            # SimulatorTestRunner time provider is tied to the simulators
+            # t_capture coming out of the wrapper packet (rather than time.time).
             with ProtoLogger(
                 args.blue_full_system_runtime_dir + f"/{current_test}",
                 time_provider=runner.time_provider,

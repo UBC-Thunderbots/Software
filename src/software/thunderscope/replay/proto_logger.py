@@ -29,14 +29,16 @@ class ProtoLogger(object):
         1. Replay the data chronologoically
         2. Seek to a specific time (random access)
 
-    To seek to a specific time, we need to load the entire file into memory. To
-    do this, we store the data in chunks. Each chunk contains
+    To seek to a specific time, we need to load the entire log file into memory.
+    To make this feasible, we store the data in chunks. Each chunk contains
     REPLAY_MAX_CHUNK_SIZE_BYTES of serialized protos.
 
-    We can load each chunk into memory and binary search for the entry we want.
-    Or we can just play the chunks in order.
+    We can load each chunk into memory and perform search operations to find the
+    appropriate entry. Or we can just play the chunks in order.
 
     """
+
+    BLOCK_TIMEOUT = 0.1
 
     def __init__(self, log_path, log_prefix="protolog_", time_provider=None):
         """Creates a proto logger that logs all protos registered on the queue.
@@ -47,9 +49,7 @@ class ProtoLogger(object):
         Where # is the chunk number
 
         NOTE: The files in the folder will be compressed with gzip.
-        I've looked into bz2, but reading chunks was slower.
-
-        Also NOTE: You need the entire folder to replay the data.
+        I've looked into bz2, but gzip can read chunks from disk into memory faster.
 
         :param log_path: The path to the log file.
         :param time_provider: A function that returns the current time
@@ -117,8 +117,11 @@ class ProtoLogger(object):
                     while self.stop_logging is False:
 
                         # Consume the buffer and log the protobuf
+                        # We provide a timeout here to not block forever if we don't receive anything
                         try:
-                            proto = self.buffer.get(block=True, timeout=0.01)
+                            proto = self.buffer.get(
+                                block=True, timeout=ProtoLogger.BLOCK_TIMEOUT
+                            )
                         except queue.Empty:
                             continue
 

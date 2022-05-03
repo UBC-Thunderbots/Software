@@ -79,7 +79,7 @@ class ProtoUnixIO:
                 try:
                     buffer.put(proto, block=False)
                 except queue.Full:
-                    print("Replay packet dropped")
+                    print("Buffer registered to receive everything dropped data")
 
     def register_observer(self, proto_class, buffer):
         """Register a widget to consume from a given protobuf class
@@ -94,9 +94,9 @@ class ProtoUnixIO:
             self.proto_observers[proto_class.DESCRIPTOR.full_name] = [buffer]
 
     def register_to_observe_everything(self, buffer):
-        """Register a buffer to listen to all protobufs
+        """Register a buffer to observe all incoming protobufs
 
-        :param buffer: buffer to store data
+        :param buffer: buffer to push protos onto
         
         """
         self.all_proto_observers.append(buffer)

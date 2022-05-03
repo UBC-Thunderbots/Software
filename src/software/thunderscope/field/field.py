@@ -24,7 +24,6 @@ class Field(QWidget):
         self.plot_widget = pg.PlotWidget()
         self.player = player
         self.layout = QVBoxLayout()
-        self.layout.setSpacing(0)
 
         # Setup Field Plot
         self.plot_widget.setAspectLocked()

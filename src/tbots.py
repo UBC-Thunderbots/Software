@@ -40,9 +40,9 @@ if __name__ == "__main__":
 
     # If help was requested, print the help for the tbots script
     # and propagate the help to the underlying binary/test to
-    # see the arguments it supports
+    # also see the arguments it supports
     if args.help:
-        print(45 * "=" + " Tbots Help " + 45 * "=")
+        print(45 * "=" + " tbots.py help " + 45 * "=")
         parser.print_help()
         print(100 * "=")
         unknown_args += ["--help"]
