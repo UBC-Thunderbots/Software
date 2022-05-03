@@ -45,7 +45,6 @@ py_library(
         "//software/thunderscope/log:g3log_widget",
         "//software/thunderscope/play:playinfo_widget",
         "//software/thunderscope/replay",
-        "//software/thunderscope/replay:replay_controls",
         "//software/thunderscope/robot_diagnostics:chicker",
         "//software/thunderscope/robot_diagnostics:drive_and_dribbler_widget",
         requirement("pyqtgraph"),

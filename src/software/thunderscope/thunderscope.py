@@ -55,7 +55,6 @@ from software.thunderscope.robot_diagnostics.chicker import ChickerWidget
 from software.thunderscope.robot_diagnostics.drive_and_dribbler_widget import (
     DriveAndDribblerWidget,
 )
-from software.thunderscope.replay.replay_controls import ReplayControls
 from software.thunderscope.replay.replay import ProtoPlayer
 
 SAVED_LAYOUT_PATH = "/opt/tbotspython/saved_tscope_layout"
@@ -366,17 +365,10 @@ class Thunderscope(object):
         playinfo_dock = Dock("Play Info")
         playinfo_dock.addWidget(widgets["playinfo_widget"])
 
-        widgets["replay_widget"] = self.setup_replay_controls_widget(
-            friendly_colour_yellow
-        )
-        replay_dock = Dock("Replay", size=(100, 10))
-        replay_dock.addWidget(widgets["replay_widget"])
-
         dock_area.addDock(field_dock)
         dock_area.addDock(log_dock, "bottom", field_dock)
         dock_area.addDock(performance_dock, "right", log_dock)
         dock_area.addDock(playinfo_dock, "right", performance_dock)
-        dock_area.addDock(replay_dock, "bottom", log_dock)
 
     def setup_field_widget(
         self, sim_proto_unix_io, full_system_proto_unix_io, friendly_colour_yellow
@@ -389,7 +381,13 @@ class Thunderscope(object):
         :returns: the field widget
 
         """
-        field = Field()
+        self.player = ProtoPlayer(
+            self.blue_replay_log
+            if not friendly_colour_yellow
+            else self.yellow_replay_log,
+            full_system_proto_unix_io,
+        )
+        field = Field(player=self.player)
 
         # Create layers
         paths = path_layer.PathLayer(self.visualization_buffer_size)
@@ -450,41 +448,6 @@ class Thunderscope(object):
         self.register_refresh_function(logs.refresh)
 
         return logs
-
-    def setup_replay_controls_widget(self, friendly_colour_yellow):
-        """Setup the widget that receives logs from full system
-
-        :param friendly_colour_yellow: Whether the friendly colour is yellow
-        :returns: The replay widget
-
-        """
-        if not self.blue_replay_log and not friendly_colour_yellow:
-            return QLabel("No proto log path provided for blue team")
-
-        elif not friendly_colour_yellow:
-            self.blue_proto_player = ProtoPlayer(
-                self.blue_replay_log, self.blue_full_system_proto_unix_io
-            )
-
-        if not self.yellow_replay_log and friendly_colour_yellow:
-            return QLabel("No proto log path provided for yellow team")
-
-        elif friendly_colour_yellow:
-            self.yellow_proto_player = ProtoPlayer(
-                self.yellow_replay_log, self.yellow_full_system_proto_unix_io
-            )
-
-        # Create widget
-        replay_controls = ReplayControls(
-            self.yellow_proto_player
-            if friendly_colour_yellow
-            else self.blue_proto_player
-        )
-
-        # Register refresh function
-        self.register_refresh_function(replay_controls.refresh)
-
-        return replay_controls
 
     def setup_performance_plot(self, proto_unix_io):
         """Setup the performance plot

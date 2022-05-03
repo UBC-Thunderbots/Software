@@ -77,13 +77,13 @@ if __name__ == "__main__":
         help="Visualize C++ Tests",
     )
     parser.add_argument(
-        "--replay_log_blue_full_system",
+        "--blue_log",
         action="store",
         help="Replay file for the blue full_system",
         default=None,
     )
     parser.add_argument(
-        "--replay_log_yellow_full_system",
+        "--yellow_log",
         action="store",
         help="Replay file for the yellow full_system",
         default=None,
@@ -206,12 +206,12 @@ if __name__ == "__main__":
     #
     # We want to setup the proto unix io the same way, but instead use the proto
     # player to replay the logs (rather than the full system binaries)
-    elif args.replay_log_blue_full_system or args.replay_log_yellow_full_system:
+    elif args.blue_log or args.yellow_log:
         tscope = Thunderscope(
             layout_path=args.layout,
             visualization_buffer_size=args.visualization_buffer_size,
-            blue_replay_log=args.replay_log_blue_full_system,
-            yellow_replay_log=args.replay_log_yellow_full_system,
+            blue_replay_log=args.blue_log,
+            yellow_replay_log=args.yellow_log,
         )
         tscope.show()
 

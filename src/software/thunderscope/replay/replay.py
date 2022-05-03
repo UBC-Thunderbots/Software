@@ -186,15 +186,19 @@ class ProtoPlayer(object):
             
         """
         self.log_folder_path = log_folder_path
+        self.end_time = 0
+
+        if self.log_folder_path is None:
+            return
+
         self.proto_unix_io = proto_unix_io
 
         # Playback controls, see __play_protobufs
         self.stop_playing = False
         self.playback_speed = 1.0
-        self.replay_controls_mutex = threading.Lock()
+        self.replay_controls_mutex = threading.RLock()
         self.seek_offset_time = 0.0
         self.current_packet_time = 0.0
-        self.just_seeked = False
 
         # Chunk cache and info
         self.current_chunk = []
@@ -220,6 +224,7 @@ class ProtoPlayer(object):
         )
 
         # Start playing thread
+        self.seek(0.0)
         self.thread = threading.Thread(target=self.__play_protobufs, daemon=True)
         self.thread.start()
 
@@ -273,8 +278,11 @@ class ProtoPlayer(object):
     def play(self):
         """Plays back the log file."""
 
+        if self.stop_playing is False:
+            return
+
         with self.replay_controls_mutex:
-            self.start_playback_time = time.time()
+            self.playback_time = time.time()
             self.stop_playing = False
 
     def pause(self):
@@ -282,6 +290,7 @@ class ProtoPlayer(object):
 
         with self.replay_controls_mutex:
             self.stop_playing = True
+            self.seek_offset_time = self.current_packet_time
 
     def set_playback_speed(self, speed):
         """Sets the playback speed.
@@ -290,7 +299,9 @@ class ProtoPlayer(object):
 
         """
         with self.replay_controls_mutex:
-            self.playback_speed = speed
+            self.pause()
+            self.playback_speed = 1.0 / float(speed)
+            self.play()
 
     def seek(self, seek_time):
         """Seeks to a specific time.
@@ -307,7 +318,6 @@ class ProtoPlayer(object):
             return start_timestamp
 
         with self.replay_controls_mutex:
-
             self.current_chunk_index = ProtoPlayer.binary_search(
                 self.sorted_chunks, seek_time, key=__bisect_chunks_by_timestamp
             )
@@ -333,8 +343,8 @@ class ProtoPlayer(object):
             self.seek_offset_time = __bisect_log_entries_by_timestamp(
                 self.current_chunk[self.current_entry_index]
             )
+
             self.current_packet_time = self.seek_offset_time
-            self.just_seeked = True
 
             logging.info(
                 "Jumped to chunk {} at index {} with timestamp {:.2f}".format(
@@ -386,7 +396,8 @@ class ProtoPlayer(object):
             - Set playback speed through self.playback_speed
 
         """
-        self.start_playback_time = time.time()
+        self.playback_time = time.time()
+        self.time_elapsed = 0.0
 
         while True:
 
@@ -400,20 +411,12 @@ class ProtoPlayer(object):
                 self.stop_playing = True
                 continue
 
-            # Load the next chunk and setup the current_chunk_index
-            # and current_entry_index.
-            with self.replay_controls_mutex:
-                self.current_chunk = ProtoPlayer.load_replay_chunk(
-                    self.sorted_chunks[self.current_chunk_index]
-                )
-                self.current_chunk_index += 1
-
             # Playback loop
             while self.stop_playing is False and self.current_entry_index < len(
                 self.current_chunk
             ):
-                with self.replay_controls_mutex:
 
+                with self.replay_controls_mutex:
                     # Get the current entry
                     (
                         self.current_packet_time,
@@ -422,21 +425,29 @@ class ProtoPlayer(object):
                     ) = ProtoPlayer.unpack_log_entry(
                         self.current_chunk[self.current_entry_index]
                     )
-
                     self.current_entry_index += 1
 
                     # Manage playback speed, if this packet needs to be sent
                     # out at a later time, sleep until its time to send it.
-                    time_elapsed = (
-                        time.time() - self.start_playback_time + self.seek_offset_time
-                    ) / self.playback_speed
+                    time_elapsed = self.seek_offset_time + (
+                        (time.time() - self.playback_time) / self.playback_speed
+                    )
 
                     if self.current_packet_time > time_elapsed:
                         time.sleep(self.current_packet_time - time_elapsed)
 
-                    # Send protobuf
-                    self.proto_unix_io.send_proto(proto_class, proto)
+                # Send protobuf
+                self.proto_unix_io.send_proto(proto_class, proto)
 
-            else:
-                # Finished playing chunk, reset back to the start
-                self.current_entry_index = 0
+            # Load the next chunk and setup the current_chunk_index
+            # and current_entry_index.
+            with self.replay_controls_mutex:
+
+                if not self.stop_playing:
+                    self.current_chunk_index += 1
+
+                    if self.current_chunk_index < len(self.sorted_chunks):
+                        self.current_chunk = ProtoPlayer.load_replay_chunk(
+                            self.sorted_chunks[self.current_chunk_index]
+                        )
+                        self.current_entry_index = 0
