@@ -21,11 +21,11 @@ def test_two_ai_ball_placement(simulated_test_runner, run_enemy_ai, test_duratio
 
     # Setup Bots
     blue_bots = [
-        tbots.Point(-3, 2.5),
-        tbots.Point(-3, 1.5),
-        tbots.Point(-3, 0.5),
-        tbots.Point(-3, -0.5),
-        tbots.Point(-3, -1.5),
+        tbots.Point(-2.75, 2.5),
+        tbots.Point(-2.75, 1.5),
+        tbots.Point(-2.75, 0.5),
+        tbots.Point(-2.75, -0.5),
+        tbots.Point(-2.75, -1.5),
         tbots.Point(4.6, -3.1),
     ]
 
