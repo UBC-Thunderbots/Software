@@ -2,7 +2,8 @@ from software.thunderscope.thunderscope import Thunderscope
 from software.thunderscope.binary_context_managers import *
 from proto.message_translation import tbots_protobuf
 import software.python_bindings as cpp_bindings
-from software.thunderscope.replay.replay import ProtoLogger, ProtoPlayer
+from software.thunderscope.replay.proto_logger import ProtoLogger
+from software.thunderscope.replay.proto_player import ProtoPlayer
 
 
 import os
