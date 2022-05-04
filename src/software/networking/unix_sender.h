@@ -34,6 +34,6 @@ class UnixSender
     std::string data_buffer_;
 
     // Failed to send log throttling
-    const unsigned MAX_SEND_FAILURES_BEFORE_LOG = 1000;
+    const unsigned MAX_SEND_FAILURES_BEFORE_LOG = 100;
     unsigned log_counter                        = 0;
 };

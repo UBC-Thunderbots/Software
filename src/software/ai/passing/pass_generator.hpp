@@ -7,6 +7,7 @@
 #include <random>
 #include <thread>
 
+#include "proto/message_translation/tbots_protobuf.h"
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/passing/cost_function.h"
 #include "software/ai/passing/pass.h"
@@ -145,6 +146,17 @@ PassEvaluation<ZoneEnum> PassGenerator<ZoneEnum>::generatePassEvaluation(
     auto optimized_passes = optimizePasses(world, generated_passes);
 
     updatePasses(world, optimized_passes);
+
+
+    std::vector<PassWithRating> passes;
+    passes.reserve(current_best_passes_.size());
+
+    for (auto zone_and_pass : current_best_passes_)
+    {
+        passes.push_back(zone_and_pass.second);
+    }
+
+    LOG(VISUALIZE) << *createPassVisualization(passes);
 
     return PassEvaluation<ZoneEnum>(pitch_division_, current_best_passes_,
                                     passing_config_, world.getMostRecentTimestamp());

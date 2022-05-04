@@ -53,7 +53,7 @@ class Navigator : public IntentVisitor
      *
      * @return obstacles
      */
-    std::vector<ObstaclePtr> getObstacles();
+    std::vector<ObstaclePtr> getObstacles() const;
 
     /**
      * Registers the given Intent for navigation

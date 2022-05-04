@@ -27,6 +27,7 @@ cc_library(
     hdrs = ["corner_kick_play.h"],
     deps = [
         ":play",
+        "//proto/message_translation:tbots_protobuf",
         "//shared:constants",
         "//software/ai/evaluation:possession",
         "//software/ai/hl/stp/tactic/attacker:attacker_tactic",
@@ -237,6 +238,7 @@ cc_library(
     hdrs = ["shoot_or_chip_play.h"],
     deps = [
         ":play",
+        "//proto/message_translation:tbots_protobuf",
         "//shared:constants",
         "//shared/parameter:cpp_configs",
         "//software/ai/evaluation:enemy_threat",
@@ -282,6 +284,7 @@ cc_library(
     deps = [
         "//shared/parameter:cpp_configs",
         "//software/ai/hl/stp/tactic",
+        "//software/ai/passing:pass_with_rating",
         "//software/util/sml_fsm",
         "@boost//:coroutine2",
     ],

@@ -6,28 +6,28 @@ import software.thunderscope.constants as constants
 from google.protobuf.json_format import MessageToDict
 from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtWidgets import *
-import queue
+from proto.import_all_protos import *
 
-from proto.robot_log_msg_pb2 import RobotLog
+from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 
 class playInfoWidget(QTableWidget):
 
-    # TODO: set these values dynamically (PR: #2560)
-
+    # TODO (#2560): set these values dynamically
     NUM_ROWS = 6
     NUM_COLS = 4
 
-    def __init__(self, buffer_size=10):
+    def __init__(self, buffer_size=5):
+        """Shows the current play information including tactic and FSM state
 
+        :param buffer_size: The buffer size, set higher for smoother plots.
+                            Set lower for more realtime plots. Default is arbitrary
+
+        """
         QTableWidget.__init__(self, playInfoWidget.NUM_ROWS, playInfoWidget.NUM_COLS)
 
-        self.log_buffer = queue.Queue(buffer_size)
+        self.playinfo_buffer = ThreadSafeBuffer(buffer_size, PlayInfo, False)
         self.verticalHeader().setVisible(False)
-
-        self.setStyleSheet(
-            "QHeaderView::section {background-color: rgba(0, 0, 0, 255); color: rgba(255, 255, 255, 255);}"
-        )
 
     def set_data(self, data):
         """Data to set in the table
@@ -43,18 +43,13 @@ class playInfoWidget(QTableWidget):
             for m, item in enumerate(data[key]):
                 newitem = QTableWidgetItem(item)
                 self.setItem(m, n, newitem)
-                self.item(m, n).setBackground(QtGui.QColor(0, 0, 0))
-                self.item(m, n).setForeground(QtGui.QBrush(QtGui.QColor(255, 255, 255)))
 
         self.setHorizontalHeaderLabels(horizontal_headers)
 
     def refresh(self):
         """Update the play info widget with new play information
         """
-        try:
-            playinfo = self.log_buffer.get_nowait()
-        except queue.Empty as empty:
-            return
+        playinfo = self.playinfo_buffer.get(block=False)
 
         play_info_dict = MessageToDict(playinfo)
 
@@ -62,6 +57,9 @@ class playInfoWidget(QTableWidget):
         tactic_fsm_states = []
         tactic_names = []
         play_name = []
+
+        if "robotTacticAssignment" not in play_info_dict:
+            return
 
         play_name.append(play_info_dict["play"]["playName"])
 
@@ -82,5 +80,6 @@ class playInfoWidget(QTableWidget):
                 "Play Name": play_name,
             }
         )
+
         self.resizeColumnsToContents()
         self.resizeRowsToContents()

@@ -1,5 +1,6 @@
 #include "software/ai/hl/stp/play/shoot_or_chip_play.h"
 
+#include "proto/message_translation/tbots_protobuf.h"
 #include "shared/constants.h"
 #include "software/ai/evaluation/enemy_threat.h"
 #include "software/ai/evaluation/find_open_areas.h"
