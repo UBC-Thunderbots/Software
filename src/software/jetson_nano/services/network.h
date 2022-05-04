@@ -27,13 +27,17 @@ class NetworkService
                    unsigned short primitive_listener_port,
                    unsigned short robot_status_sender_port, bool multicast);
 
+    NetworkService();
+
+    virtual ~NetworkService();
+
     /**
      * When the network service is polled, it sends the robot_status and returns
      * a tuple of the most recent PrimitiveSet and World
      *
      * @returns a tuple of the stored primitive_set and world
      */
-    std::tuple<TbotsProto::PrimitiveSet, TbotsProto::World> poll(
+    virtual std::tuple<TbotsProto::PrimitiveSet, TbotsProto::World> poll(
         const TbotsProto::RobotStatus& robot_status);
 
    private:

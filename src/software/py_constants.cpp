@@ -65,7 +65,7 @@ PYBIND11_MODULE(py_constants, m)
     m.attr("ROBOT_MULTICAST_CHANNEL_3") = ROBOT_MULTICAST_CHANNELS[3];
 
     // Ports
-    m.attr("VISION_PORT")       = VISION_PORT;
+    m.attr("WORLD_PORT")       = WORLD_PORT;
     m.attr("PRIMITIVE_PORT")    = PRIMITIVE_PORT;
     m.attr("ROBOT_STATUS_PORT") = ROBOT_STATUS_PORT;
     m.attr("ROBOT_LOGS_PORT")   = ROBOT_LOGS_PORT;

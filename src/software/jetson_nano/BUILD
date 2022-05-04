@@ -52,3 +52,14 @@ cc_binary(
         "//shared:constants",
     ],
 )
+
+cc_test(
+    name = "thunderloop_test",
+    srcs = [
+        "thunderloop_test.cpp",
+    ],
+    deps = [
+        ":thunderloop",
+        "//shared/test_util:tbots_gtest_main",
+    ],
+)

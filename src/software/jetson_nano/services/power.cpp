@@ -12,7 +12,9 @@ PowerService::PowerService()
     this->uart = std::make_unique<BoostUartCommunication>(BAUD_RATE, DEVICE_SERIAL_PORT);
 }
 
-std::unique_ptr<TbotsProto::PowerStatus> PowerService::poll(
+PowerService::~PowerService() {}
+
+TbotsProto::PowerStatus PowerService::poll(
     const TbotsProto::PowerControl& command)
 {
     auto nanopb_command       = createNanoPbPowerControl(command);
@@ -49,5 +51,5 @@ std::unique_ptr<TbotsProto::PowerStatus> PowerService::poll(
         LOG(WARNING) << "Unmarshal failed";
     }
 
-    return createTbotsPowerStatus(status);
+    return *createTbotsPowerStatus(status);
 }

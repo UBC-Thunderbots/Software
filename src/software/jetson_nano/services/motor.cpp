@@ -124,7 +124,7 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
 
 MotorService::~MotorService() {}
 
-std::unique_ptr<TbotsProto::DriveUnitStatus> MotorService::poll(
+TbotsProto::DriveUnitStatus MotorService::poll(
     const TbotsProto::DirectControlPrimitive& direct_control)
 {
     CHECK(encoder_calibrated_[FRONT_LEFT_MOTOR_CHIP_SELECT] &&
@@ -202,7 +202,7 @@ std::unique_ptr<TbotsProto::DriveUnitStatus> MotorService::poll(
         }
     }
 
-    return std::make_unique<TbotsProto::DriveUnitStatus>();
+    return TbotsProto::DriveUnitStatus();
 }
 
 void MotorService::spiTransfer(int fd, uint8_t const* tx, uint8_t const* rx, unsigned len)

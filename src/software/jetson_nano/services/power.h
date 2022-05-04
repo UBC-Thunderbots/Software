@@ -19,7 +19,7 @@ class PowerService
      * Opens all the required ports and maintains them until destroyed.
      */
     PowerService();
-    ~PowerService() = default;
+    virtual ~PowerService();
 
     /**
      * When the power service is polled it sends the given power control msg and
@@ -28,8 +28,7 @@ class PowerService
      * @param control The power control msg to send
      * @return the latest power status
      */
-    std::unique_ptr<TbotsProto::PowerStatus> poll(
-        const TbotsProto::PowerControl& control);
+    virtual TbotsProto::PowerStatus poll(const TbotsProto::PowerControl& control);
 
    private:
     std::unique_ptr<BoostUartCommunication> uart;

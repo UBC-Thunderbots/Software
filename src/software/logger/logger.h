@@ -38,9 +38,6 @@
     else                                                                                 \
         LOG_1(level) << filename
 
-#if !defined(__aarch64__) || !defined(_M_ARM64)
-#define CHECK(LOG_F(DEBUG,
-#endif
 /**                                                                                      \
  * This class acts as a Singleton that's responsible for initializing the logger.        \
  * We use a singleton rather than a generic function in this namespace because           \

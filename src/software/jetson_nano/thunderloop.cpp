@@ -21,22 +21,23 @@ extern int clock_nanosleep(clockid_t __clock_id, int __flags,
                            __const struct timespec* __req, struct timespec* __rem);
 
 Thunderloop::Thunderloop(const RobotConstants_t& robot_constants,
-                         const WheelConstants_t& wheel_consants, std::string interface,
-                         const int loop_hz)
-    : primitive_executor_(loop_hz, robot_constants)
-{
-    robot_id_        = 0;
-    channel_id_      = 0;
-    loop_hz_         = loop_hz;
-    robot_constants_ = robot_constants;
-    wheel_consants_  = wheel_consants;
+                         const WheelConstants_t& wheel_constants,
+                         std::unique_ptr<MotorService> motor_service,
+                         std::unique_ptr<PowerService> power_service,
+                         std::unique_ptr<NetworkService> network_service,
+                         std::unique_ptr<RedisClient> redis_client, const int loop_hz)
+    : motor_service_(std::move(motor_service)),
+      power_service_(std::move(power_service)),
+      network_service_(std::move(network_service)),
+      redis_client_(std::move(redis_client)),
+      primitive_executor_(loop_hz, robot_constants),
+      robot_constants_(robot_constants),
+      wheel_constants_(wheel_constants),
+      loop_hz_(loop_hz)
 
-    motor_service_ =
-        std::make_unique<MotorService>(robot_constants, wheel_consants, loop_hz);
-    network_service_ = std::make_unique<NetworkService>(
-        std::string(ROBOT_MULTICAST_CHANNELS[channel_id_]) + "%" + interface, VISION_PORT,
-        PRIMITIVE_PORT, ROBOT_STATUS_PORT, true);
-    redis_client_ = std::make_unique<RedisClient>(REDIS_DEFAULT_HOST, REDIS_DEFAULT_PORT);
+{
+    // TODO (#2605) Don't hardcode this value, get it from redis
+    robot_id_ = 0;
 }
 
 Thunderloop::~Thunderloop() {}
@@ -151,7 +152,7 @@ void Thunderloop::runLoop()
             // Run the motor service with the direct_control_ msg
             {
                 ScopedTimespecTimer timer(&poll_time);
-                drive_units_status_ = *motor_service_->poll(direct_control_);
+                drive_units_status_ = motor_service_->poll(direct_control_);
             }
             thunderloop_status_.set_motor_service_poll_time_ns(
                 static_cast<unsigned long>(poll_time.tv_nsec));
