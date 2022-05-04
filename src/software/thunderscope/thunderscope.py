@@ -31,7 +31,6 @@ from proto.message_translation import tbots_protobuf
 
 from software.py_constants import *
 from software.networking import threaded_unix_sender
-from software.thunderscope.robot_communication import RobotCommunication
 from software.thunderscope.arbitrary_plot.named_value_plotter import NamedValuePlotter
 from software.thunderscope.binary_context_managers import *
 from extlibs.er_force_sim.src.protobuf.world_pb2 import *
