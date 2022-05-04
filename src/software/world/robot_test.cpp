@@ -299,19 +299,19 @@ TEST_F(RobotTest, get_available_capabilities)
     EXPECT_EQ(expected_capabilities, robot.getAvailableCapabilities());
 }
 
-TEST_F(RobotTest, time_to_desired_orientation_with_desired_orientation_equal_to_current_orientation)
+TEST_F(RobotTest,
+       time_to_desired_orientation_with_desired_orientation_equal_to_current_orientation)
 {
     Angle target_angle = Angle::half();
     Robot robot(0, {1, 1}, Vector(0, 0), Angle::half(), AngularVelocity::fromDegrees(0),
                 Timestamp::fromSeconds(0));
 
-    EXPECT_EQ(
-        Duration::fromSeconds(0),
-        robot.getTimeToOrientation(target_angle));
+    EXPECT_EQ(Duration::fromSeconds(0), robot.getTimeToOrientation(target_angle));
 }
 
-TEST_F(RobotTest,
-       time_to_desired_orientation_with_desired_orientation_opposite_of_current_orientation)
+TEST_F(
+    RobotTest,
+    time_to_desired_orientation_with_desired_orientation_opposite_of_current_orientation)
 {
     // Because we can't guarantee that the robot angular acceleration isn't going to
     // increase to the point where we can't reach the max angular speed within
@@ -332,12 +332,9 @@ TEST_F(RobotTest,
     // For the upper bound, just choose a time that's much greater then we would expect
     double max_time_to_rotate = 4.0;
 
-    Duration t =
-            robot.getTimeToOrientation(target_angle);
-    EXPECT_LE(
-        Duration::fromSeconds(min_time_to_rotate),
-        robot.getTimeToOrientation(target_angle));
-    EXPECT_GE(
-        Duration::fromSeconds(max_time_to_rotate),
-        robot.getTimeToOrientation(target_angle));
+    Duration t = robot.getTimeToOrientation(target_angle);
+    EXPECT_LE(Duration::fromSeconds(min_time_to_rotate),
+              robot.getTimeToOrientation(target_angle));
+    EXPECT_GE(Duration::fromSeconds(max_time_to_rotate),
+              robot.getTimeToOrientation(target_angle));
 }

@@ -9,8 +9,8 @@ cc_library(
     deps = [
         ":pass",
         "//shared/parameter:cpp_configs",
-        "//software/ai/evaluation:time_to_travel",
         "//software/ai/evaluation:calc_best_shot",
+        "//software/ai/evaluation:time_to_travel",
         "//software/logger",
         "//software/math:math_functions",
         "//software/util/make_enum",

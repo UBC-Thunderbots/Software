@@ -1,6 +1,6 @@
-#include <cmath>
-
 #include "software/ai/evaluation/time_to_travel.h"
+
+#include <cmath>
 
 Duration getTimeToTravelDistance(const double distance, const double max_velocity,
                                  const double max_acceleration,
@@ -20,7 +20,7 @@ Duration getTimeToTravelDistance(const double distance, const double max_velocit
     if (dist_required_to_reach_v_f > d_total)
     {
         // Accelerating/decelerating instantly from initial to final velocity is not
-        // possible with in the given distance, given the robot's max acceleration,
+        // possible within the given distance, given the robot's max acceleration,
         // therefore the robot can not reach the desired final velocity. Calculate how
         // long it will take for the robot to accelerate towards final velocity over
         // distance
@@ -37,9 +37,12 @@ Duration getTimeToTravelDistance(const double distance, const double max_velocit
         return Duration::fromSeconds(t_total);
     }
 
-    // Total travel time if the robot is always accelerating at max acceleration (i.e.
-    // accelerating to the highest value possible given the distance, and then
-    // decelerating to final velocity)
+    // Following equation is derived by calculating the minimum time it will take the
+    // robot to travel a set distance. Minimum time would be when the robot is constantly
+    // accelerating, and it decelerates as late as possible to reach the final velocity
+    // at the destination.
+    // The following Desmos graph showcases this formula
+    // https://www.desmos.com/calculator/exfr1e5bvp
     double t_total =
         -(v_i + v_f -
           std::sqrt(2 * (2 * a_max * d_total + std::pow(v_i, 2) + std::pow(v_f, 2)))) /
@@ -50,14 +53,15 @@ Duration getTimeToTravelDistance(const double distance, const double max_velocit
 
     if (v_max_reached > v_max)
     {
-        // If the robot is always accelerating, it will be going faster than max velocity,
-        // so instead we will divide the problem into 3 sections: The robot will be (1)
-        // accelerating, (2) cruising at max velocity, then (3) decelerating. Calculate
-        // travel time during (1) and (3):
+        // If the robot is always accelerating, it will end up going faster than max
+        // velocity, so instead we will divide the problem into 3 sections: The robot will
+        // be (1) accelerating, (2) cruising at max velocity, then (3) decelerating.
+
+        // Calculate travel time during (1) and (3):
         double t_accel = (v_max - v_i) / a_max;
         double t_decel = (v_f - v_max) / -a_max;
 
-        // To calculate (2) we will need to know the distance travelled while cruising
+        // To calculate (2) we will need to know the distance travelled while cruising:
         double d_accel    = t_accel * (v_i + v_max) / 2;
         double d_decel    = t_decel * (v_f + v_max) / 2;
         double d_cruising = d_total - d_accel - d_decel;

@@ -17,7 +17,7 @@ TEST_F(TimeToTravel, getTimeToTravelDistance_already_at_dest)
 
 TEST_F(TimeToTravel, getTimeToTravelDistance_reaches_max_velocity)
 {
-    // Check that the robot reaches the dest in the at the expected time when
+    // Check that the robot reaches the dest at the expected time when
     // it has enough time that it accelerates up to it's maximum velocity
     // We set the distance here such that it the robot *should* always have time to
     // get to the max velocity, unless our robots suddenly get *much* faster
@@ -40,10 +40,9 @@ TEST_F(TimeToTravel, getTimeToTravelDistance_reaches_max_velocity)
         getTimeToTravelDistance(distance_to_dest, 2.0, 3.0)));
 }
 
-TEST_F(TimeToTravel,
-       getTimeToTravelDistance_reaches_max_velocity_with_tolerance)
+TEST_F(TimeToTravel, getTimeToTravelDistance_reaches_max_velocity_with_tolerance)
 {
-    // Check that the robot reaches the dest in the expected time when
+    // Check that the robot reaches the dest at the expected time when
     // it has enough time that it accelerates up to it's maximum velocity
     // We set the distance here such that it the robot *should* always have time to
     // get to the max velocity, unless our robots suddenly get *much* faster
@@ -76,7 +75,7 @@ TEST_F(TimeToTravel,
     double initial_velocity = 2.0;
     double max_accel        = 3.0;
     double max_vel          = 4.0;
-    double distance_to_dest        = 5;
+    double distance_to_dest = 5;
 
     double acceleration_time = (max_vel - initial_velocity) / max_accel;
 
@@ -91,31 +90,31 @@ TEST_F(TimeToTravel,
 
     EXPECT_TRUE(TestUtil::equalWithinTolerance(
         Duration::fromSeconds(travel_time_expected),
-        getTimeToTravelDistance(distance_to_dest, max_vel, max_accel, initial_velocity, initial_velocity)));
+        getTimeToTravelDistance(distance_to_dest, max_vel, max_accel, initial_velocity,
+                                initial_velocity)));
 }
 
-TEST_F(TimeToTravel,
-       getTimeToPositionForRobot_with_robot_not_reaching_max_velocity)
+TEST_F(TimeToTravel, getTimeToPositionForRobot_with_robot_not_reaching_max_velocity)
 {
     // Check that the robot reaches the dest in the expected time when
     // it does not have enough time to accelerate up to it's maximum velocity
     double initial_velocity = 1.0;
     double final_velocity   = 3.0;
     // Relatively low acceleration so max velocity is not reachable
-    double max_accel        = 1.0;
-    double max_vel          = 4.0;
-    double distance         = 10.0;
+    double max_accel = 1.0;
+    double max_vel   = 4.0;
+    double distance  = 10.0;
 
     // Calculated graphically through Desmos, work can be found here:
     // https://www.desmos.com/calculator/4glnzfc45x
     double travel_time_expected = 3.74596669241;
     EXPECT_TRUE(TestUtil::equalWithinTolerance(
         Duration::fromSeconds(travel_time_expected),
-        getTimeToTravelDistance(distance, max_vel, max_accel, initial_velocity, final_velocity)));
+        getTimeToTravelDistance(distance, max_vel, max_accel, initial_velocity,
+                                final_velocity)));
 }
 
-TEST_F(TimeToTravel,
-       getTimeToPositionForRobot_with_initial_velocity_away_from_dest)
+TEST_F(TimeToTravel, getTimeToPositionForRobot_with_initial_velocity_away_from_dest)
 {
     // Check that the robot reaches the dest in the at the expected time when
     // it has plenty of space to accelerate to max velocity and begins with its
@@ -126,7 +125,7 @@ TEST_F(TimeToTravel,
     double final_vel   = 3.0;
     double max_accel   = 2.0;
     double max_vel     = 4.0;
-    double distance     = 30.0;
+    double distance    = 30.0;
 
     double acceleration_time = (max_vel - initial_vel) / max_accel;
     // d = (Vi + Vf) / 2 * t
@@ -158,13 +157,12 @@ TEST_F(
     double final_vel   = 4.0;
     double max_accel   = 1.0;
     double max_vel     = 4.0;
-    double distance     = 1.0;
+    double distance    = 1.0;
 
     // The robot is accelerating throughout the path (since the final velocity is too
     // great for it to reach within the distance) t = (-Vi + sqrt(Vi^2 + 2 * a * d)) / a
     double acceleration_time =
-        (-initial_vel +
-         std::sqrt(std::pow(initial_vel, 2) + 2 * max_accel * distance)) /
+        (-initial_vel + std::sqrt(std::pow(initial_vel, 2) + 2 * max_accel * distance)) /
         max_accel;
 
     // For the upper bound, just choose a time that's much greater then we would expect
@@ -188,14 +186,13 @@ TEST_F(
     double final_vel   = 0.0;
     double max_accel   = 1.0;
     double max_vel     = 4.0;
-    double distance     = 1.0;
+    double distance    = 1.0;
 
     // The robot is decelerating throughout the path (since the final velocity is too
     // small for it to reach within the distance) t = (-Vi + sqrt(Vi^2 + 2 * a * d)) / a,
     // with a being negative due to deceleration
     double acceleration_time =
-        (-initial_vel +
-         std::sqrt(std::pow(initial_vel, 2) - 2 * max_accel * distance)) /
+        (-initial_vel + std::sqrt(std::pow(initial_vel, 2) - 2 * max_accel * distance)) /
         -max_accel;
 
     // For the upper bound, just choose a time that's much greater then we would expect

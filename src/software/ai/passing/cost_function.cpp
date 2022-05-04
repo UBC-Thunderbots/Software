@@ -181,7 +181,8 @@ double calculateInterceptRisk(const Robot& enemy_robot, const Pass& pass,
     // point on the pass to the enemy's current position
     Point closest_point_on_pass_to_robot = closestPoint(
         enemy_robot.position(), Segment(pass.passerPoint(), pass.receiverPoint()));
-    Duration enemy_robot_time_to_closest_pass_point = enemy_robot.getTimeToPosition(closest_point_on_pass_to_robot);
+    Duration enemy_robot_time_to_closest_pass_point =
+        enemy_robot.getTimeToPosition(closest_point_on_pass_to_robot);
     Duration ball_time_to_closest_pass_point = Duration::fromSeconds(
         (closest_point_on_pass_to_robot - pass.passerPoint()).length() / pass.speed());
 
@@ -194,7 +195,8 @@ double calculateInterceptRisk(const Robot& enemy_robot, const Pass& pass,
 
     // Figure out how long the enemy robot and ball will take to reach the receive point
     // for the pass.
-    Duration enemy_robot_time_to_pass_receive_position = enemy_robot.getTimeToPosition(pass.receiverPoint());
+    Duration enemy_robot_time_to_pass_receive_position =
+        enemy_robot.getTimeToPosition(pass.receiverPoint());
     Duration ball_time_to_pass_receive_position = pass.estimatePassDuration();
 
     double robot_ball_time_diff_at_closest_pass_point =
@@ -251,7 +253,8 @@ double ratePassFriendlyCapability(const Team& friendly_team, const Pass& pass,
     Timestamp receive_time = best_receiver.timestamp() + ball_travel_time;
 
     // Figure out how long it would take our robot to get there
-    Duration min_robot_travel_time = best_receiver.getTimeToPosition(pass.receiverPoint());
+    Duration min_robot_travel_time =
+        best_receiver.getTimeToPosition(pass.receiverPoint());
     Timestamp earliest_time_to_receive_point =
         best_receiver.timestamp() + min_robot_travel_time;
 

@@ -5,7 +5,7 @@ cc_library(
     srcs = ["time_to_travel.cpp"],
     hdrs = ["time_to_travel.h"],
     deps = [
-        "//software/time:duration"
+        "//software/time:duration",
     ],
 )
 
@@ -173,7 +173,7 @@ cc_library(
     deps = [
         ":intercept",
         ":shot",
-        "//software/world:world"
+        "//software/world",
     ],
 )
 

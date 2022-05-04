@@ -178,11 +178,14 @@ class Robot
      * Estimate the minimum time it would take to reach the desired point
      *
      * @param destination The destination that the robot is going to
-     * @param final_velocity The desired final velocity which the robot should be moving at
+     * @param final_velocity The desired final velocity which the robot should be moving
+     * at
      *
-     * @return The minimum theoretical time it would take this robot to reach the destination
+     * @return The minimum theoretical time it would take this robot to reach the
+     * destination
      */
-    Duration getTimeToPosition(const Point &destination, const Vector &final_velocity = Vector()) const;
+    Duration getTimeToPosition(const Point &destination,
+                               const Vector &final_velocity = Vector()) const;
 
     /**
      * Defines the equality operator for a Robot. Robots are equal if their IDs and

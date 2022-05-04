@@ -1,8 +1,8 @@
 #include "software/world/robot.h"
 
 #include "shared/constants.h"
-#include "software/logger/logger.h"
 #include "software/ai/evaluation/time_to_travel.h"
+#include "software/logger/logger.h"
 
 Robot::Robot(RobotId id, const Point &position, const Vector &velocity,
              const Angle &orientation, const AngularVelocity &angular_velocity,
@@ -177,11 +177,14 @@ Duration Robot::getTimeToOrientation(const Angle &desired_orientation) const
 {
     double dist = orientation().minDiff(desired_orientation).toRadians();
     double initial_ang_vel_rad_per_sec = angularVelocity().toRadians();
-    return getTimeToTravelDistance(dist, robot_constants_.robot_max_ang_speed_rad_per_s, robot_constants_.robot_max_ang_acceleration_rad_per_s_2,
-                                   initial_ang_vel_rad_per_sec, 0);
+    return getTimeToTravelDistance(
+        dist, robot_constants_.robot_max_ang_speed_rad_per_s,
+        robot_constants_.robot_max_ang_acceleration_rad_per_s_2,
+        initial_ang_vel_rad_per_sec, 0);
 }
 
-Duration Robot::getTimeToPosition(const Point &destination, const Vector &final_velocity) const
+Duration Robot::getTimeToPosition(const Point &destination,
+                                  const Vector &final_velocity) const
 {
     Vector dist_vector = destination - position();
     double dist        = std::max(0.0, dist_vector.length());
@@ -192,6 +195,7 @@ Duration Robot::getTimeToPosition(const Point &destination, const Vector &final_
     double initial_velocity_1d = velocity().dot(dist_vector.normalize());
     double final_velocity_1d   = final_velocity.dot(dist_vector.normalize());
 
-    return getTimeToTravelDistance(dist, robot_constants_.robot_max_speed_m_per_s, robot_constants_.robot_max_acceleration_m_per_s_2,
+    return getTimeToTravelDistance(dist, robot_constants_.robot_max_speed_m_per_s,
+                                   robot_constants_.robot_max_acceleration_m_per_s_2,
                                    initial_velocity_1d, final_velocity_1d);
 }

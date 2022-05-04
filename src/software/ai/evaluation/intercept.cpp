@@ -68,7 +68,7 @@ std::optional<std::pair<Point, Duration>> findBestInterceptForBall(const Ball &b
         ball.estimateFutureState(best_ball_travel_duration).position();
 
     // Check that we can get to the best position in time
-    Duration time_to_ball_pos = robot.getTimeToPosition(best_ball_intercept_pos);
+    Duration time_to_ball_pos     = robot.getTimeToPosition(best_ball_intercept_pos);
     Duration ball_robot_time_diff = time_to_ball_pos - best_ball_travel_duration;
     // NOTE: if ball velocity is 0 then ball travel duration is infinite, so this
     // check isn't relevant in that case
