@@ -9,7 +9,7 @@
     name: min_distance_to_pass
     min: 0.0
     max: 1.0
-    value: 0.05
+    value: 0.1
     description: Used in the passAbort guard to decide if robot is too far away from ball to pass it
 
 - double:
