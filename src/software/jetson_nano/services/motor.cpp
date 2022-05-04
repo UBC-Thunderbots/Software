@@ -337,7 +337,6 @@ void MotorService::writeToDriverOrDieTrying(uint8_t motor, uint8_t address, int3
 {
     tmc6100_writeInt(motor, address, value);
     int read_value = tmc6100_readInt(motor, address);
-    LOGF(DEBUG, "%d received", read_value);
     CHECK(read_value == value) << "Couldn't write " << value
                                << " to the TMC6100 at address "
                                << static_cast<uint32_t>(address) << " on motor "

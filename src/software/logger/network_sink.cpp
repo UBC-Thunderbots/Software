@@ -1,7 +1,5 @@
 #include "software/logger/network_sink.h"
 
-#include <filesystem>
-
 #include "proto/robot_log_msg.pb.h"
 #include "shared/constants.h"
 

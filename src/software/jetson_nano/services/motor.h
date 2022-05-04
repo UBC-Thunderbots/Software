@@ -6,11 +6,10 @@
 #include "proto/tbots_software_msgs.pb.h"
 #include "shared/robot_constants.h"
 #include "software/jetson_nano/gpio.h"
-#include "software/jetson_nano/services/service.h"
 #include "software/physics/euclidean_to_wheel.h"
 
 
-class MotorService : public Service
+class MotorService
 {
    public:
     /**

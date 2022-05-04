@@ -4,8 +4,8 @@
 
 #include "proto/robot_status_msg.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
+#include "proto/world.pb.h"
 #include "shared/robot_constants.h"
-#include "software/jetson_nano/services/service.h"
 #include "software/networking/threaded_proto_udp_listener.hpp"
 #include "software/networking/threaded_proto_udp_sender.hpp"
 

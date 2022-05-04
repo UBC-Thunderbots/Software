@@ -35,6 +35,7 @@ cc_library(
     hdrs = ["gpio.h"],
     deps = [
         "//software/logger",
+        "//software/logger:network_logger",
         "//software/util/make_enum",
     ],
 )

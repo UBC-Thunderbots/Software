@@ -3,9 +3,9 @@
 #include <boost/asio.hpp>
 
 #include "proto/power_frame_msg.pb.h"
-#include "software/jetson_nano/services/service.h"
 #include "software/logger/logger.h"
 #include "software/uart/boost_uart_communication.h"
+
 extern "C"
 {
 #include "proto/power_frame_msg.nanopb.h"

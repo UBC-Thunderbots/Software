@@ -12,6 +12,7 @@
 
 // 50 millisecond timeout on receiving primitives before we emergency stop the robots
 const double PRIMITIVE_MANAGER_TIMEOUT_NS = 50.0 * MILLISECONDS_PER_NANOSECOND;
+
 /**
  * https://rt.wiki.kernel.org/index.php/Squarewave-example
  * using clock_nanosleep of librt
@@ -20,7 +21,8 @@ extern int clock_nanosleep(clockid_t __clock_id, int __flags,
                            __const struct timespec* __req, struct timespec* __rem);
 
 Thunderloop::Thunderloop(const RobotConstants_t& robot_constants,
-                         const WheelConstants_t& wheel_consants, const int loop_hz)
+                         const WheelConstants_t& wheel_consants, std::string interface,
+                         const int loop_hz)
     : primitive_executor_(loop_hz, robot_constants)
 {
     robot_id_        = 0;
@@ -32,16 +34,12 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants,
     motor_service_ =
         std::make_unique<MotorService>(robot_constants, wheel_consants, loop_hz);
     network_service_ = std::make_unique<NetworkService>(
-        std::string(ROBOT_MULTICAST_CHANNELS[channel_id_]) + "%" + "eth0", VISION_PORT,
+        std::string(ROBOT_MULTICAST_CHANNELS[channel_id_]) + "%" + interface, VISION_PORT,
         PRIMITIVE_PORT, ROBOT_STATUS_PORT, true);
     redis_client_ = std::make_unique<RedisClient>(REDIS_DEFAULT_HOST, REDIS_DEFAULT_PORT);
 }
 
-Thunderloop::~Thunderloop()
-{
-    // De-initialize Services
-    motor_service_->stop();
-}
+Thunderloop::~Thunderloop() {}
 
 /*
  * Run the main robot loop!
@@ -56,15 +54,12 @@ void Thunderloop::runLoop()
 
     // Input buffer
     TbotsProto::PrimitiveSet new_primitive_set;
-    TbotsProto::Vision new_vision;
+    TbotsProto::World new_world;
     TbotsProto::EstopPrimitive emergency_stop_override;
 
     // Loop interval
     int interval =
         static_cast<int>(1.0f / static_cast<float>(loop_hz_) * NANOSECONDS_PER_SECOND);
-
-    // Start the services
-    motor_service_->start();
 
     // Get current time
     // Note: CLOCK_MONOTONIC is used over CLOCK_REALTIME since
@@ -86,7 +81,7 @@ void Thunderloop::runLoop()
                 ScopedTimespecTimer timer(&poll_time);
                 auto result       = network_service_->poll(robot_status_);
                 new_primitive_set = std::get<0>(result);
-                new_vision        = std::get<1>(result);
+                new_world         = std::get<1>(result);
             }
 
             thunderloop_status_.set_network_service_poll_time_ns(
@@ -102,15 +97,12 @@ void Thunderloop::runLoop()
 
                 // Update primitive executor's primitive set
                 {
-                    primitive_ =
-                        new_primitive_set.mutable_robot_primitives()->at(robot_id_);
-
                     clock_gettime(CLOCK_MONOTONIC, &last_primitive_received_time);
 
                     // Start new primitive
                     {
                         ScopedTimespecTimer timer(&poll_time);
-                        primitive_executor_.startPrimitive(robot_constants_, primitive_);
+                        primitive_executor_.updatePrimitiveSet(robot_id_, primitive_set_);
                     }
 
                     thunderloop_status_.set_primitive_executor_start_time_ns(
@@ -118,20 +110,12 @@ void Thunderloop::runLoop()
                 }
             }
 
-            // TODO (#2495): Replace Vision proto with World proto in Network Service and
-            //               call PrimitiveExecutor::updateWorld
-            // If the vision msg is new, update the internal buffer
-            if (new_vision.time_sent().epoch_timestamp_seconds() >
-                vision_.time_sent().epoch_timestamp_seconds())
+            // If the world msg is new, update the internal buffer
+            if (new_world.time_sent().epoch_timestamp_seconds() >
+                world_.time_sent().epoch_timestamp_seconds())
             {
-                // Cache vision
-                vision_ = new_vision;
-
-                // If there is a detection for "this" robot, lets update it
-                if (new_vision.robot_states().count(robot_id_) != 0)
-                {
-                    robot_state_ = new_vision.mutable_robot_states()->at(robot_id_);
-                }
+                primitive_executor_.updateWorld(new_world);
+                world_ = new_world;
             }
 
             // TODO (#2333) poll redis service
@@ -156,8 +140,9 @@ void Thunderloop::runLoop()
                     *(primitive_.mutable_estop()) = emergency_stop_override;
                 }
 
-                direct_control_ =
-                    *primitive_executor_.stepPrimitive(createRobotState(robot_state_));
+                direct_control_ = *primitive_executor_.stepPrimitive(
+                    robot_id_,
+                    Angle::fromRadians(robot_state_.global_orientation().radians()));
             }
 
             thunderloop_status_.set_primitive_executor_step_time_ns(
