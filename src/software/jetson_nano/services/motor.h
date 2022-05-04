@@ -7,6 +7,7 @@
 #include "shared/robot_constants.h"
 #include "software/jetson_nano/gpio.h"
 #include "software/jetson_nano/services/service.h"
+#include "software/physics/euclidean_to_wheel.h"
 
 
 class MotorService : public Service
@@ -18,9 +19,10 @@ class MotorService : public Service
      *
      * @param RobotConstants_t The robot constants
      * @param WheelConstants_t The wheel constants
+     * @param control_loop_frequency_hz The frequency the main loop will call poll at
      */
     MotorService(const RobotConstants_t& robot_constants,
-                 const WheelConstants_t& wheel_constants);
+                 const WheelConstants_t& wheel_constants, int control_loop_frequency_hz);
 
     virtual ~MotorService();
 
@@ -183,5 +185,7 @@ class MotorService : public Service
     // SPI File Descriptors
     std::unordered_map<int, int> file_descriptors;
 
+    // Drive Motors
+    EuclideanToWheel euclidean_to_four_wheel;
     std::unordered_map<int, bool> encoder_calibrated_;
 };

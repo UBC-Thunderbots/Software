@@ -13,6 +13,7 @@
 #include <sys/ioctl.h>
 
 #include "proto/tbots_software_msgs.pb.h"
+#include "shared/constants.h"
 #include "software/logger/logger.h"
 
 extern "C"
@@ -23,7 +24,7 @@ extern "C"
 }
 
 // SPI Configs
-static uint32_t SPI_SPEED_HZ = 1000000;  // 1 Mhz
+static uint32_t SPI_SPEED_HZ = 200000;  // 1 Mhz
 static uint8_t SPI_BITS      = 8;
 static uint32_t SPI_MODE     = 0x3u;
 
@@ -40,7 +41,7 @@ static const char* SPI_PATHS[] = {"/dev/spidev0.0", "/dev/spidev0.1", "/dev/spid
                                   "/dev/spidev0.3", "/dev/spidev0.4"};
 
 static const char* SPI_CS_DRIVER_TO_CONTROLLER_MUX_GPIO = "77";
-static const char* DRIVER_CONTROL_ENABLE_GPIO           = "216";
+static const char* DRIVER_CONTROL_ENABLE_GPIO           = "38";
 
 extern "C"
 {
@@ -63,11 +64,13 @@ extern "C"
 }
 
 MotorService::MotorService(const RobotConstants_t& robot_constants,
-                           const WheelConstants_t& wheel_constants)
+                           const WheelConstants_t& wheel_constants,
+                           int control_loop_frequency_hz)
     : spi_cs_driver_to_controller_demux_gpio(SPI_CS_DRIVER_TO_CONTROLLER_MUX_GPIO,
-                                             GpioDirection::OUTPUT, GpioState::LOW),
+                                             GpioDirection::OUTPUT, GpioState::HIGH),
       driver_control_enable_gpio(DRIVER_CONTROL_ENABLE_GPIO, GpioDirection::OUTPUT,
-                                 GpioState::LOW)
+                                 GpioState::HIGH),
+      euclidean_to_four_wheel(control_loop_frequency_hz, robot_constants)
 {
     robot_constants_ = robot_constants;
     wheel_constants_ = wheel_constants;
@@ -102,7 +105,6 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
     OPEN_SPI_FILE_DESCRIPTOR(front_right, FRONT_RIGHT_MOTOR_CHIP_SELECT)
     OPEN_SPI_FILE_DESCRIPTOR(back_left, BACK_LEFT_MOTOR_CHIP_SELECT)
     OPEN_SPI_FILE_DESCRIPTOR(back_right, BACK_RIGHT_MOTOR_CHIP_SELECT)
-    OPEN_SPI_FILE_DESCRIPTOR(dribbler, DRIBBLER_MOTOR_CHIP_SELECT)
 
     // Make this instance available to the static functions above
     g_motor_service = this;
@@ -113,41 +115,78 @@ MotorService::~MotorService() {}
 std::unique_ptr<TbotsProto::DriveUnitStatus> MotorService::poll(
     const TbotsProto::DirectControlPrimitive& direct_control)
 {
-    // TODO (#2335) We can only spin 1 motor right now
-    CHECK(encoder_calibrated_[FRONT_LEFT_MOTOR_CHIP_SELECT])
-        << "Running without encoder calibration can cause serious harm";
+    //// TODO (#2335) We can only spin 1 motor right now
+    //CHECK(encoder_calibrated_[FRONT_LEFT_MOTOR_CHIP_SELECT])
+        //<< "Running without encoder calibration can cause serious harm";
 
-    switch (direct_control.wheel_control_case())
-    {
-        case TbotsProto::DirectControlPrimitive::WheelControlCase::kDirectPerWheelControl:
-        {
-            // TODO (#2456) until we figure out the right factor considering
-            // the gear ratio
-            static float RANDOM_SCALING_FACTOR = 100.0;
+    //switch (direct_control.wheel_control_case())
+    //{
+        //case TbotsProto::DirectControlPrimitive::WheelControlCase::kDirectPerWheelControl:
+        //{
+            //tmc4671_setTargetVelocity(
+                //FRONT_LEFT_MOTOR_CHIP_SELECT,
+                //static_cast<int>(
+                    //direct_control.direct_per_wheel_control().front_left_wheel_rpm() *
+                    //wheel_constants_.wheel_rotations_per_motor_rotation));
+            //tmc4671_setTargetVelocity(
+                //FRONT_RIGHT_MOTOR_CHIP_SELECT,
+                //static_cast<int>(
+                    //direct_control.direct_per_wheel_control().front_right_wheel_rpm() *
+                    //wheel_constants_.wheel_rotations_per_motor_rotation));
+            //tmc4671_setTargetVelocity(
+                //BACK_LEFT_MOTOR_CHIP_SELECT,
+                //static_cast<int>(
+                    //direct_control.direct_per_wheel_control().back_left_wheel_rpm() *
+                    //wheel_constants_.wheel_rotations_per_motor_rotation));
+            //tmc4671_setTargetVelocity(
+                //BACK_RIGHT_MOTOR_CHIP_SELECT,
+                //static_cast<int>(
+                    //direct_control.direct_per_wheel_control().back_right_wheel_rpm() *
+                    //wheel_constants_.wheel_rotations_per_motor_rotation));
+            //break;
+        //}
+        //case TbotsProto::DirectControlPrimitive::WheelControlCase::kDirectVelocityControl:
+        //{
+            //EuclideanSpace_t target_euclidean_velocity = {
+                //direct_control.direct_velocity_control().velocity().x_component_meters(),
+                //direct_control.direct_velocity_control().velocity().y_component_meters(),
+                //direct_control.direct_velocity_control()
+                    //.angular_velocity()
+                    //.radians_per_second(),
+            //};
 
-            // TODO (#2456) We can only spin 1 motor right now, figure out how
-            // to spin the rest and update the following code
-            tmc4671_setTargetVelocity(
-                FRONT_LEFT_MOTOR_CHIP_SELECT,
-                static_cast<int>(
-                    direct_control.direct_per_wheel_control().front_left_wheel_rpm() *
-                    RANDOM_SCALING_FACTOR));
+            //WheelSpace_t current_wheel_speeds = {
+                //static_cast<double>(
+                    //tmc4671_getActualVelocity(FRONT_RIGHT_MOTOR_CHIP_SELECT)),
+                //static_cast<double>(
+                    //tmc4671_getActualVelocity(FRONT_LEFT_MOTOR_CHIP_SELECT)),
+                //static_cast<double>(
+                    //tmc4671_getActualVelocity(BACK_LEFT_MOTOR_CHIP_SELECT)),
+                //static_cast<double>(
+                    //tmc4671_getActualVelocity(BACK_RIGHT_MOTOR_CHIP_SELECT))};
 
-            break;
-        }
-        case TbotsProto::DirectControlPrimitive::WheelControlCase::kDirectVelocityControl:
-        {
-            // TODO (#2335) convert local velocity to per-wheel velocity
-            // using http://robocup.mi.fu-berlin.de/buch/omnidrive.pdf and then
-            // communicate velocities to trinamic.
-            break;
-        }
-        case TbotsProto::DirectControlPrimitive::WheelControlCase::WHEEL_CONTROL_NOT_SET:
-        {
-            LOG(WARNING) << "Motor service polled with an empty DirectControlPrimitive ";
-            break;
-        }
-    }
+            //// This is a linear transformation, we don't need to convert to/from
+            //// RPM to MPS
+            //WheelSpace_t target_speeds = euclidean_to_four_wheel.getTargetWheelSpeeds(
+                //target_euclidean_velocity, current_wheel_speeds);
+
+            //tmc4671_setTargetVelocity(FRONT_RIGHT_MOTOR_CHIP_SELECT,
+                                      //static_cast<int>(target_speeds[0]));
+            //tmc4671_setTargetVelocity(FRONT_LEFT_MOTOR_CHIP_SELECT,
+                                      //static_cast<int>(target_speeds[1]));
+            //tmc4671_setTargetVelocity(BACK_LEFT_MOTOR_CHIP_SELECT,
+                                      //static_cast<int>(target_speeds[2]));
+            //tmc4671_setTargetVelocity(BACK_RIGHT_MOTOR_CHIP_SELECT,
+                                      //static_cast<int>(target_speeds[3]));
+
+            //break;
+        //}
+        //case TbotsProto::DirectControlPrimitive::WheelControlCase::WHEEL_CONTROL_NOT_SET:
+        //{
+            //LOG(WARNING) << "Motor service polled with an empty DirectControlPrimitive ";
+            //break;
+        //}
+    //}
 
     return std::make_unique<TbotsProto::DriveUnitStatus>();
 }
@@ -207,6 +246,7 @@ uint8_t MotorService::tmc4671ReadWriteByte(uint8_t motor, uint8_t data,
                                            uint8_t last_transfer)
 {
     spi_cs_driver_to_controller_demux_gpio.setValue(GpioState::LOW);
+    driver_control_enable_gpio.setValue(GpioState::HIGH);
     return readWriteByte(motor, data, last_transfer);
 }
 
@@ -214,6 +254,7 @@ uint8_t MotorService::tmc6100ReadWriteByte(uint8_t motor, uint8_t data,
                                            uint8_t last_transfer)
 {
     spi_cs_driver_to_controller_demux_gpio.setValue(GpioState::HIGH);
+    driver_control_enable_gpio.setValue(GpioState::LOW);
     return readWriteByte(motor, data, last_transfer);
 }
 
@@ -282,6 +323,7 @@ void MotorService::writeToDriverOrDieTrying(uint8_t motor, uint8_t address, int3
 {
     tmc6100_writeInt(motor, address, value);
     int read_value = tmc6100_readInt(motor, address);
+    LOGF(DEBUG, "%d received", read_value);
     CHECK(read_value == value) << "Couldn't write " << value
                                << " to the TMC6100 at address "
                                << static_cast<uint32_t>(address) << " on motor "
@@ -440,37 +482,42 @@ void MotorService::startController(uint8_t motor)
 {
     // Read the chip ID to validate the SPI connection
     tmc4671_writeInt(motor, TMC4671_CHIPINFO_ADDR, 0x000000000);
-    CHECK(0x34363731 == tmc4671_readInt(motor, TMC4671_CHIPINFO_DATA))
+    int read_something = tmc4671_readInt(motor, TMC4671_CHIPINFO_DATA);
+    LOGF(DEBUG, "%d read for motor %d", read_something, motor);
+    CHECK(0x34363731 == read_something)
         << "The TMC4671 of motor " << static_cast<uint32_t>(motor)
         << " is not responding";
+    LOGF(DEBUG, "%d motor online", motor);
 
-    // Configure to brushless DC motor with 8 pole pairs
-    writeToControllerOrDieTrying(motor, TMC4671_MOTOR_TYPE_N_POLE_PAIRS, 0x00030008);
+    //// Configure to brushless DC motor with 8 pole pairs
+    //writeToControllerOrDieTrying(motor, TMC4671_MOTOR_TYPE_N_POLE_PAIRS, 0x00030008);
 
-    // Configure other controller params
-    configurePWM(motor);
-    configureADC(motor);
-    configureEncoder(motor);
+    //// Configure other controller params
+    //configurePWM(motor);
+    //configureADC(motor);
+    //configureEncoder(motor);
 
-    // Trigger encoder calibration
-    // TODO (#2451) Don't call this here, its not safe because it moves the motors
-    calibrateEncoder(motor);
-    configurePI(motor);
+    //// Trigger encoder calibration
+    //// TODO (#2451) Don't call this here, its not safe because it moves the motors
+    //calibrateEncoder(motor);
+    //configurePI(motor);
 }
 
 void MotorService::start()
 {
-    // Enable the driver
-    driver_control_enable_gpio.setValue(GpioState::HIGH);
-
     // TMC6100 Setup
-    startDriver(FRONT_LEFT_MOTOR_CHIP_SELECT);
+    //startDriver(FRONT_LEFT_MOTOR_CHIP_SELECT);
+    //startDriver(BACK_RIGHT_MOTOR_CHIP_SELECT);
+    //startDriver(FRONT_RIGHT_MOTOR_CHIP_SELECT);
+    //startDriver(BACK_LEFT_MOTOR_CHIP_SELECT);
 
-    // TMC4671 Setup
+    ////// TMC4671 Setup
     startController(FRONT_LEFT_MOTOR_CHIP_SELECT);
+    startController(BACK_RIGHT_MOTOR_CHIP_SELECT);
+    startController(FRONT_RIGHT_MOTOR_CHIP_SELECT);
+    startController(BACK_LEFT_MOTOR_CHIP_SELECT);
 }
 
 void MotorService::stop()
 {
-    driver_control_enable_gpio.setValue(GpioState::LOW);
 }
