@@ -71,7 +71,7 @@ class Thunderscope(object):
     Users can move docks (purple bar) around, double click to pop them out into
     another window, etc. https://pyqtgraph.readthedocs.io/en/latest/
 
-    The setup_* functions return docks. See configure_default_layout for an
+    The setup_* functions return docks. See configure_full_system_layout for an
     example. The returned docks can be arranged differently based on the
     use case (robot diagnostics, simulation, robocup, demo, etc..)
 
@@ -108,12 +108,14 @@ class Thunderscope(object):
         self.tabs = QTabWidget()
         self.blue_full_system_dock_area = DockArea()
         self.yellow_full_system_dock_area = DockArea()
+        self.robot_diagnostics_dock_area = DockArea()
 
         self.web_view = QWebEngineView()
         self.web_view.load(QtCore.QUrl(GAME_CONTROLLER_URL))
 
         self.tabs.addTab(self.blue_full_system_dock_area, "Blue Fullsystem")
         self.tabs.addTab(self.yellow_full_system_dock_area, "Yellow Fullsystem")
+        self.tabs.addTab(self.robot_diagnostics_dock_area, "Robot Diagnostics")
         self.tabs.addTab(self.web_view, "Gamecontroller")
 
         self.window = QtGui.QMainWindow()
@@ -269,20 +271,24 @@ Cntrl-Click and Drag: Move ball and kick
 
         """
         if load_yellow:
-            self.configure_default_layout(
+            self.configure_full_system_layout(
                 self.yellow_full_system_dock_area,
                 self.simulator_proto_unix_io,
                 self.yellow_full_system_proto_unix_io,
                 True,
             )
+            self.configure_robot_diagnostics_layout(
+                self.yellow_full_system_proto_unix_io
+            )
 
         if load_blue:
-            self.configure_default_layout(
+            self.configure_full_system_layout(
                 self.blue_full_system_dock_area,
                 self.simulator_proto_unix_io,
                 self.blue_full_system_proto_unix_io,
                 False,
             )
+            self.configure_robot_diagnostics_layout(self.blue_full_system_proto_unix_io)
 
         path = layout_path if layout_path else SAVED_LAYOUT_PATH
 
@@ -306,7 +312,7 @@ Cntrl-Click and Drag: Move ball and kick
 
         self.refresh_timers.append(refresh_timer)
 
-    def configure_default_layout(
+    def configure_full_system_layout(
         self,
         dock_area,
         sim_proto_unix_io,
@@ -349,6 +355,28 @@ Cntrl-Click and Drag: Move ball and kick
         dock_area.addDock(log_dock, "bottom", field_dock)
         dock_area.addDock(performance_dock, "right", log_dock)
         dock_area.addDock(playinfo_dock, "right", performance_dock)
+
+    def configure_robot_diagnostics_layout(self, proto_unix_io):
+        """Configure the default layout for the robot diagnostics widget
+
+        :param proto_unix_io: The proto unix io object for the full system
+
+        """
+
+        self.diagnostics_widgets = {}
+
+        self.diagnostics_widgets["chicker"] = self.setup_chicker_widget(proto_unix_io)
+        chicker_dock = Dock("Chicker")
+        chicker_dock.addWidget(self.diagnostics_widgets["chicker"])
+
+        self.diagnostics_widgets["drive"] = self.setup_drive_and_dribbler_widget(
+            proto_unix_io
+        )
+        drive_dock = Dock("Drive and Dribbler")
+        drive_dock.addWidget(self.diagnostics_widgets["drive"])
+
+        self.robot_diagnostics_dock_area.addDock(chicker_dock)
+        self.robot_diagnostics_dock_area.addDock(drive_dock, "right", chicker_dock)
 
     def setup_field_widget(
         self, sim_proto_unix_io, full_system_proto_unix_io, friendly_colour_yellow
@@ -468,13 +496,14 @@ Cntrl-Click and Drag: Move ball and kick
         chicker_widget = ChickerWidget()
 
         # Register refresh function
-        self.register_refresh_function(self.chicker_widget.refresh)
+        self.register_refresh_function(chicker_widget.refresh)
 
         return chicker_widget
 
-    def setup_drive_and_dribbler_widget(self):
+    def setup_drive_and_dribbler_widget(self, proto_unix_io):
         """Setup the drive and dribbler widget
 
+        :param proto_unix_io: The proto unix io object
         :returns: The drive and dribbler widget
 
         """

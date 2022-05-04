@@ -21,6 +21,7 @@ cc_library(
         "network_logger.h",
     ],
     deps = [
+        ":coloured_cout_sink",
         ":network_sink",
         "@g3log",
         "@g3sinks",

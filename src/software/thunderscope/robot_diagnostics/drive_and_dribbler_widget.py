@@ -2,6 +2,7 @@ from pyqtgraph.Qt.QtCore import Qt
 from pyqtgraph.Qt.QtWidgets import *
 
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
+from software.thunderscope import common_widgets
 
 MIN_MOTOR_RPM = -100
 MAX_MOTOR_RPM = 100
@@ -27,7 +28,6 @@ class DriveAndDribblerWidget(QWidget):
         tabs = QTabWidget()
         per_wheel_tab = QWidget()
         direct_velocity_tab = QWidget()
-        tabs.setStyleSheet("background-color: black; color:white")
 
         # Add tabs
         tabs.addTab(per_wheel_tab, "Direct Per-Wheel Control")
@@ -51,38 +51,6 @@ class DriveAndDribblerWidget(QWidget):
         tabs.currentChanged.connect(self.reset_all_sliders)
         self.setLayout(layout)
 
-    def create_slider(self, title, min, max, step):
-        """Creates a slider for the widget
-
-        :param title: the name of the slider
-        :param min: the minimum value of the slider
-        :param max: the maximum value of the slider
-        :param step: singleStep of the slider
-
-        """
-        groupBox = QGroupBox(title)
-
-        # set up the slide
-        slider = QSlider(Qt.Orientation.Horizontal)
-        slider.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
-        slider.setSingleStep(step)
-        slider.setMinimum(min)
-        slider.setMaximum(max)
-
-        # create a label to display slide's value
-        label = QLabel()
-        label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-
-        slider.valueChanged.connect(lambda: label.setText(self.valuechange(slider)))
-
-        # add widgets
-        vbox = QGridLayout()
-        vbox.addWidget(slider, 0, 0)
-        vbox.addWidget(label, 0, 1)
-        groupBox.setLayout(vbox)
-
-        return groupBox, slider
-
     def value_change(self, slider):
         """Change the slider's value by 0.1 per step
 
@@ -95,17 +63,6 @@ class DriveAndDribblerWidget(QWidget):
         value_str = "%.1f" % value
         return value_str
 
-    def push_button(self, title):
-        """Create a push button
-
-        :param title: the name of the button
-
-        """
-        push_button = QPushButton(title)
-        push_button.setFixedWidth(150)
-
-        return push_button
-
     def setup_direct_per_wheel(self, title):
         """Create a widget to change the RPM per wheel
 
@@ -116,21 +73,50 @@ class DriveAndDribblerWidget(QWidget):
         dbox = QVBoxLayout()
 
         # set up the sliders
-        front_left_groupbox, self.front_left_slider = self.create_slider(
-            "Front Left", MIN_MOTOR_RPM, MAX_MOTOR_RPM, 1
+        (
+            front_left_groupbox,
+            self.front_left_slider,
+            self.front_left_label,
+        ) = common_widgets.create_slider("Front Left", MIN_MOTOR_RPM, MAX_MOTOR_RPM, 1)
+        (
+            front_right_groupbox,
+            self.front_right_slider,
+            self.front_right_label,
+        ) = common_widgets.create_slider("Front Right", MIN_MOTOR_RPM, MAX_MOTOR_RPM, 1)
+        (
+            back_left_groupbox,
+            self.back_left_slider,
+            self.back_left_label,
+        ) = common_widgets.create_slider("Back Left", MIN_MOTOR_RPM, MAX_MOTOR_RPM, 1)
+        (
+            back_right_groupbox,
+            self.back_right_slider,
+            self.back_right_label,
+        ) = common_widgets.create_slider("Back Right", MIN_MOTOR_RPM, MAX_MOTOR_RPM, 1)
+
+        self.front_left_slider.valueChanged.connect(
+            lambda: self.front_left_label.setText(
+                self.value_change(self.front_left_slider)
+            )
         )
-        front_right_groupbox, self.front_right_slider = self.create_slider(
-            "Front Right", MIN_MOTOR_RPM, MAX_MOTOR_RPM, 1
+        self.front_right_slider.valueChanged.connect(
+            lambda: self.front_right_label.setText(
+                self.value_change(self.front_right_slider)
+            )
         )
-        back_left_groupbox, self.back_left_slider = self.create_slider(
-            "Back Left", MIN_MOTOR_RPM, MAX_MOTOR_RPM, 1
+        self.back_left_slider.valueChanged.connect(
+            lambda: self.back_left_label.setText(
+                self.value_change(self.back_left_slider)
+            )
         )
-        back_right_groupbox, self.back_right_slider = self.create_slider(
-            "Back Right", MIN_MOTOR_RPM, MAX_MOTOR_RPM, 1
+        self.back_right_slider.valueChanged.connect(
+            lambda: self.back_right_label.setText(
+                self.value_change(self.back_right_slider)
+            )
         )
 
         # set up the stop and reset button
-        stop_and_reset = self.pushButton("Stop and Reset")
+        stop_and_reset = common_widgets.create_push_button("Stop and Reset")
         stop_and_reset.clicked.connect(self.reset_all_sliders)
 
         # add widget
@@ -154,17 +140,27 @@ class DriveAndDribblerWidget(QWidget):
         groupBox = QGroupBox(title)
         dbox = QVBoxLayout()
 
-        xms, self.slider_xms = self.create_slider(
+        xms, self.slider_xms, self.label_xms = common_widgets.create_slider(
             "X (m/s)", MIN_LINEAR_SPEED_MPS, MAX_LINEAR_SPEED_MPS, 10
         )
-        yms, self.slider_yms = self.create_slider(
+        yms, self.slider_yms, self.label_ymx = common_widgets.create_slider(
             "Y (m/s)", MIN_LINEAR_SPEED_MPS, MAX_LINEAR_SPEED_MPS, 10
         )
-        degree, self.slider_rpm = self.create_slider(
+        degree, self.slider_rpm, self.label_rpm = common_widgets.create_slider(
             "θ (°/s)", MIN_ANGULAR_SPEED_RPM, MAX_ANGULAR_SPEED_RPM, 1
         )
 
-        stop_and_reset = self.pushButton("Stop and Reset")
+        self.slider_xms.valueChanged.connect(
+            lambda: self.label_xms.setText(self.value_change(self.slider_xms))
+        )
+        self.slider_yms.valueChanged.connect(
+            lambda: self.label_yms.setText(self.value_change(self.slider_yms))
+        )
+        self.slider_rpm.valueChanged.connect(
+            lambda: self.label_rpm.setText(self.value_change(self.slider_rpm))
+        )
+
+        stop_and_reset = common_widgets.create_push_button("Stop and Reset")
         stop_and_reset.clicked.connect(self.reset_all_sliders)
 
         dbox.addWidget(xms)
@@ -186,11 +182,16 @@ class DriveAndDribblerWidget(QWidget):
         groupBox = QGroupBox(title)
         dbox = QVBoxLayout()
 
-        dribbler, self.sliderDribbler = self.create_slider(
-            "RPM", MIN_DRIBBLER_RPM, MAX_DRIBBLER_RPM, 1
+        (
+            dribbler,
+            self.slider_dribbler,
+            self.label_dribbler,
+        ) = common_widgets.create_slider("RPM", MIN_DRIBBLER_RPM, MAX_DRIBBLER_RPM, 1)
+        self.slider_dribbler.valueChanged.connect(
+            lambda: self.label_dribbler.setText(self.value_change(self.slider_dribbler))
         )
 
-        stop_and_reset = self.pushButton("Stop and Reset")
+        stop_and_reset = common_widgets.create_push_button("Stop and Reset")
         stop_and_reset.clicked.connect(lambda: self.sliderDribbler.setValue(0))
 
         dbox.addWidget(dribbler)

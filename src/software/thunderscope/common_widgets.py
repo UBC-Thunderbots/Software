@@ -80,3 +80,15 @@ def create_slider(text, min_val, max_val, tick_spacing):
     group_box.setLayout(vbox)
 
     return group_box, slider, value_label
+
+
+def create_push_button(title):
+    """Create a push button
+
+    :param title: the name of the button
+
+    """
+    push_button = QPushButton(title)
+    push_button.setFixedWidth(150)
+
+    return push_button

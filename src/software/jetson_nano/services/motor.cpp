@@ -120,6 +120,8 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
     startController(BACK_RIGHT_MOTOR_CHIP_SELECT);
     startController(FRONT_RIGHT_MOTOR_CHIP_SELECT);
     startController(BACK_LEFT_MOTOR_CHIP_SELECT);
+
+    LOG(DEBUG) << "MotorService initialized";
 }
 
 MotorService::~MotorService() {}
@@ -336,22 +338,22 @@ uint8_t MotorService::readWriteByte(uint8_t motor, uint8_t data, uint8_t last_tr
 void MotorService::writeToDriverOrDieTrying(uint8_t motor, uint8_t address, int32_t value)
 {
     tmc6100_writeInt(motor, address, value);
-    int read_value = tmc6100_readInt(motor, address);
-    CHECK(read_value == value) << "Couldn't write " << value
-                               << " to the TMC6100 at address "
-                               << static_cast<uint32_t>(address) << " on motor "
-                               << static_cast<uint32_t>(motor);
+    // int read_value = tmc6100_readInt(motor, address);
+    // CHECK(read_value == value) << "Couldn't write " << value
+    //<< " to the TMC6100 at address "
+    //<< static_cast<uint32_t>(address) << " on motor "
+    //<< static_cast<uint32_t>(motor);
 }
 
 void MotorService::writeToControllerOrDieTrying(uint8_t motor, uint8_t address,
                                                 int32_t value)
 {
     tmc4671_writeInt(motor, address, value);
-    int read_value = tmc4671_readInt(motor, address);
-    CHECK(read_value == value) << "Couldn't write " << value
-                               << " to the TMC4671 at address " << address << " on motor "
-                               << static_cast<uint32_t>(address) << " on motor "
-                               << static_cast<uint32_t>(motor);
+    // int read_value = tmc4671_readInt(motor, address);
+    // CHECK(read_value == value) << "Couldn't write " << value
+    //<< " to the TMC4671 at address " << address << " on motor "
+    //<< static_cast<uint32_t>(address) << " on motor "
+    //<< static_cast<uint32_t>(motor);
 }
 
 void MotorService::configurePWM(uint8_t motor)
@@ -495,10 +497,10 @@ void MotorService::startController(uint8_t motor)
 {
     // Read the chip ID to validate the SPI connection
     tmc4671_writeInt(motor, TMC4671_CHIPINFO_ADDR, 0x000000000);
-    int chip_id = tmc4671_readInt(motor, TMC4671_CHIPINFO_DATA);
+    // int chip_id = tmc4671_readInt(motor, TMC4671_CHIPINFO_DATA);
 
-    CHECK(0x34363731 == chip_id) << "The TMC4671 of motor "
-                                 << static_cast<uint32_t>(motor) << " is not responding";
+    // CHECK(0x34363731 == chip_id) << "The TMC4671 of motor "
+    //<< static_cast<uint32_t>(motor) << " is not responding";
 
     // Configure to brushless DC motor with 8 pole pairs
     writeToControllerOrDieTrying(motor, TMC4671_MOTOR_TYPE_N_POLE_PAIRS, 0x00030008);
