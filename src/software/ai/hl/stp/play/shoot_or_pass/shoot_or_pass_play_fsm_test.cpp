@@ -42,10 +42,10 @@ TEST(ShootOrPassPlayFSMTest, test_should_abort_pass_guard)
     world.updateBall(Ball(Point(-1, 0), Vector(0, 0), Timestamp::fromSeconds(1)));
 
     fsm.process_event(ShootOrPassPlayFSM::Update(
-            ShootOrPassPlayFSM::ControlParams{},
-            PlayUpdate(
-                    world, 2, [](PriorityTacticVector new_tactics) {}, InterPlayCommunication{},
-                    [](InterPlayCommunication comm) {})));
+        ShootOrPassPlayFSM::ControlParams{},
+        PlayUpdate(
+            world, 2, [](PriorityTacticVector new_tactics) {}, InterPlayCommunication{},
+            [](InterPlayCommunication comm) {})));
 
     world.setTeamWithPossession(TeamSide::FRIENDLY);
     Robot friendly_robot_1(1, Point(0, 0), Vector(0, 0), Angle::zero(),

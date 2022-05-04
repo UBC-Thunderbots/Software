@@ -171,9 +171,12 @@ bool ShootOrPassPlayFSM::shouldAbortPass(const Update& event)
 
 
     // check that no enemies are intercepting the pass
-    for (auto enemy : event.common.world.enemyTeam().getAllRobotsExceptGoalie()) {
+    for (auto enemy : event.common.world.enemyTeam().getAllRobotsExceptGoalie())
+    {
         if (intersects(Circle(enemy.position(), ROBOT_MAX_RADIUS_METERS),
-                Segment(best_pass_and_score_so_far.pass.passerPoint(), best_pass_and_score_so_far.pass.receiverPoint()))) {
+                       Segment(best_pass_and_score_so_far.pass.passerPoint(),
+                               best_pass_and_score_so_far.pass.receiverPoint())))
+        {
             return true;
         }
     }
@@ -188,5 +191,8 @@ bool ShootOrPassPlayFSM::passCompleted(const Update& event)
 
 bool ShootOrPassPlayFSM::tookShot(const Update& event)
 {
-    return (event.common.world.ball().velocity().length() > this->ai_config->getShootOrPassPlayConfig()->getBallIsInFlightThreshold()->value());
+    return (event.common.world.ball().velocity().length() >
+            this->ai_config->getShootOrPassPlayConfig()
+                ->getBallIsInFlightThreshold()
+                ->value());
 }
