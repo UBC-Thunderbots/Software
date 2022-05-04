@@ -2,42 +2,14 @@
 
 #include <boost/asio.hpp>
 
+#include "proto/power_frame_msg.pb.h"
 #include "software/jetson_nano/services/service.h"
 #include "software/logger/logger.h"
 #include "software/uart/boost_uart_communication.h"
-
-// TODO(#2537): change to protobuf/move to different file with addition of thunderloop
-struct GenevaMotorCommand
+extern "C"
 {
-    float angle_deg;
-    float rotation_speed;
-};
-
-struct ChickerCommand
-{
-    bool autochip;
-    bool autokick;
-    float chip_distance;
-    float kick_distance;
-    float pulse_width_sec;
-};
-
-struct PowerCommand
-{
-    ChickerCommand chicker;
-    GenevaMotorCommand geneva;
-};
-
-
-struct PowerStatus
-{
-    bool breakbeam_tripped;
-    bool flyback_fault;
-    float battery_voltage;
-    float current_draw;
-    float geneva_angle;
-    float high_voltage_measurement_volts;
-};
+#include "proto/power_frame_msg.nanopb.h"
+}
 
 class PowerService : public Service
 {
@@ -51,18 +23,18 @@ class PowerService : public Service
     void start() override;
     void stop() override;
     /**
-     * When the power service is polled it sends the given power command and
+     * When the power service is polled it sends the given power control msg and
      * returns the latest power status
      *
-     * @param command The power command to send
+     * @param control The power control msg to send
      * @return the latest power status
      */
-    std::unique_ptr<PowerStatus> poll(const PowerCommand& command);
+    std::unique_ptr<TbotsProto::PowerStatus> poll(
+        const TbotsProto::PowerControl& control);
 
    private:
-    boost::asio::io_service io_service;
     std::unique_ptr<BoostUartCommunication> uart;
-    PowerStatus status;
+    TbotsProto_PowerStatus status;
 
     // Constants
     const size_t READ_BUFFER_SIZE;

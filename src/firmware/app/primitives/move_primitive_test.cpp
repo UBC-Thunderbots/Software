@@ -11,7 +11,7 @@ TEST_F(FirmwareTestUtilWorld, app_move_primitive_test_autochip)
     TbotsProto_MovePrimitive move_primitive_msg = TbotsProto_MovePrimitive_init_zero;
     move_primitive_msg.dribbler_speed_rpm       = 1.0;
     move_primitive_msg.auto_chip_or_kick.which_auto_chip_or_kick =
-        TbotsProto_MovePrimitive_AutoChipOrKick_autochip_distance_meters_tag;
+        TbotsProto_AutoChipOrKick_autochip_distance_meters_tag;
     move_primitive_msg.auto_chip_or_kick.auto_chip_or_kick.autochip_distance_meters = 2.0;
     move_primitive_msg.max_speed_m_per_s                                            = 2.0;
     primitive_msg.primitive.move = move_primitive_msg;
@@ -33,7 +33,7 @@ TEST_F(FirmwareTestUtilWorld, app_move_primitive_test_autokick)
     TbotsProto_MovePrimitive move_primitive_msg = TbotsProto_MovePrimitive_init_zero;
     move_primitive_msg.dribbler_speed_rpm       = 1.0;
     move_primitive_msg.auto_chip_or_kick.which_auto_chip_or_kick =
-        TbotsProto_MovePrimitive_AutoChipOrKick_autokick_speed_m_per_s_tag;
+        TbotsProto_AutoChipOrKick_autokick_speed_m_per_s_tag;
     move_primitive_msg.auto_chip_or_kick.auto_chip_or_kick.autokick_speed_m_per_s = 3.0;
     move_primitive_msg.max_speed_m_per_s                                          = 4.0;
     primitive_msg.primitive.move = move_primitive_msg;

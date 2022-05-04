@@ -5,9 +5,13 @@ from threading import Thread
 
 from google.protobuf import text_format
 from google.protobuf.any_pb2 import Any
+from software.py_constants import UNIX_BUFFER_SIZE
 
 
 class ThreadedUnixSender:
+
+    MAX_SEND_FAILURES_BEFORE_LOG = 100
+
     def __init__(self, unix_path, max_buffer_size=3):
 
         """Send protobufs over unix sockets
@@ -22,6 +26,7 @@ class ThreadedUnixSender:
         self.proto_buffer = queue.Queue(max_buffer_size)
 
         self.socket = socket.socket(socket.AF_UNIX, type=socket.SOCK_DGRAM)
+        self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF, UNIX_BUFFER_SIZE)
 
         self.stop = False
 
@@ -29,16 +34,13 @@ class ThreadedUnixSender:
         # even if there are still unix listener threads running
         self.thread = Thread(target=self.__send_protobuf, daemon=True)
         self.thread.start()
+        self.send_failures = 0
 
     def force_stop(self):
         """Stop handling requests
         """
         self.stop = True
         self.server.server_close()
-
-    @property
-    def buffer(self):
-        return self.proto_buffer
 
     def __send_protobuf(self):
         """Send the buffered protobuf
@@ -52,7 +54,17 @@ class ThreadedUnixSender:
                 try:
                     self.socket.sendto(send, self.unix_path)
                 except Exception:
-                    logging.exception("Failed to send on {}".format(self.unix_path))
+                    self.send_failures += 1
+                    if (
+                        self.send_failures
+                        > ThreadedUnixSender.MAX_SEND_FAILURES_BEFORE_LOG
+                    ):
+                        logging.warning(
+                            "Failed to send on {}, make sure the receiver is running".format(
+                                self.unix_path
+                            )
+                        )
+                        self.send_failures = 0
 
     def send(self, proto):
         """Buffer a protobuf to be sent by the send thread

@@ -103,10 +103,6 @@ void ShootOrPassPlayFSM::startLookingForPass(const Update& event)
 
 void ShootOrPassPlayFSM::takePass(const Update& event)
 {
-    // Commit to a pass
-    LOG(DEBUG) << "Committing to pass: " << best_pass_and_score_so_far.pass;
-    LOG(DEBUG) << "Score of pass we committed to: " << best_pass_and_score_so_far.rating;
-
     auto pass_eval = pass_generator.generatePassEvaluation(event.common.world);
 
     auto ranked_zones = pass_eval.rankZonesForReceiving(
