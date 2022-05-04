@@ -12,11 +12,12 @@ BROADCAST_INTERVAL_SECONDS = 2
 
 
 def get_ip_address(ifname: str) -> str:
-    """
-    Uses the Linux SIOCGIFADDR ioctl to find the IP address associated with a network interface, given the name of that
-    interface
+    """Uses the Linux SIOCGIFADDR ioctl to find the IP address associated with a
+    network interface, given the name of that interface
+
     :param ifname: the interface to find the IP address associated with
     :return: the IP address associated with the given interface
+
     """
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     return socket.inet_ntoa(
@@ -29,11 +30,12 @@ def get_ip_address(ifname: str) -> str:
 
 
 def get_mac_address(ifname: str) -> str:
-    """
-    Uses the Linux SIOCGIFHWADDR ioctl to find the HW/mac address associated with a network interface, given the name of
-    that interface
+    """Uses the Linux SIOCGIFHWADDR ioctl to find the HW/mac address associated
+    with a network interface, given the name of that interface
+
     :param ifname: the interface to find the HW/max address associated with
     :return: the HW/mac address associated with the given interface
+
     """
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     info = fcntl.ioctl(

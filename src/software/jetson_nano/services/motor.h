@@ -27,16 +27,6 @@ class MotorService : public Service
     virtual ~MotorService();
 
     /**
-     * Starts the motor service by pulling the enable pin high.
-     */
-    void start() override;
-
-    /**
-     * Pulls the enable pin low to disable the motor board.
-     */
-    void stop() override;
-
-    /**
      * When the motor service is polled with a DirectControlPrimitive msg,
      * call the appropriate trinamic api function to spin the appropriate motor.
      *

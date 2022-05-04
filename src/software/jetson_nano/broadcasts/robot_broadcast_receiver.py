@@ -8,11 +8,13 @@ RECEIVE_TIMEOUT_SECONDS = 0.2
 
 
 def receive_announcements(port: int, duration: int) -> [Announcement]:
-    """
-    Returns a list of Announcements, without duplicates received within a time window of 4s on a specified port
-    :param duration: how long to listen for announcements
+    """Returns a list of Announcements, without duplicates received within a
+    time window of 4s on a specified port
+
     :param port: the port to listen for announcements on
+    :param duration: how long to listen for announcements
     :return: a list of Announcements, without duplicates
+
     """
     receiver = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     receiver.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)

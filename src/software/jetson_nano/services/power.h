@@ -11,7 +11,7 @@ extern "C"
 #include "proto/power_frame_msg.nanopb.h"
 }
 
-class PowerService : public Service
+class PowerService
 {
    public:
     /**
@@ -20,8 +20,7 @@ class PowerService : public Service
      */
     PowerService();
     ~PowerService() = default;
-    void start() override;
-    void stop() override;
+
     /**
      * When the power service is polled it sends the given power control msg and
      * returns the latest power status

@@ -108,6 +108,18 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
 
     // Make this instance available to the static functions above
     g_motor_service = this;
+
+    // TMC6100 Setup
+    startDriver(FRONT_LEFT_MOTOR_CHIP_SELECT);
+    startDriver(BACK_RIGHT_MOTOR_CHIP_SELECT);
+    startDriver(FRONT_RIGHT_MOTOR_CHIP_SELECT);
+    startDriver(BACK_LEFT_MOTOR_CHIP_SELECT);
+
+    // TMC4671 Setup
+    startController(FRONT_LEFT_MOTOR_CHIP_SELECT);
+    startController(BACK_RIGHT_MOTOR_CHIP_SELECT);
+    startController(FRONT_RIGHT_MOTOR_CHIP_SELECT);
+    startController(BACK_LEFT_MOTOR_CHIP_SELECT);
 }
 
 MotorService::~MotorService() {}
@@ -115,78 +127,80 @@ MotorService::~MotorService() {}
 std::unique_ptr<TbotsProto::DriveUnitStatus> MotorService::poll(
     const TbotsProto::DirectControlPrimitive& direct_control)
 {
-    //// TODO (#2335) We can only spin 1 motor right now
-    //CHECK(encoder_calibrated_[FRONT_LEFT_MOTOR_CHIP_SELECT])
-        //<< "Running without encoder calibration can cause serious harm";
+    CHECK(encoder_calibrated_[FRONT_LEFT_MOTOR_CHIP_SELECT] &&
+          encoder_calibrated_[FRONT_RIGHT_MOTOR_CHIP_SELECT] &&
+          encoder_calibrated_[BACK_LEFT_MOTOR_CHIP_SELECT] &&
+          encoder_calibrated_[BACK_RIGHT_MOTOR_CHIP_SELECT])
+        << "Running without encoder calibration can cause serious harm";
 
-    //switch (direct_control.wheel_control_case())
-    //{
-        //case TbotsProto::DirectControlPrimitive::WheelControlCase::kDirectPerWheelControl:
-        //{
-            //tmc4671_setTargetVelocity(
-                //FRONT_LEFT_MOTOR_CHIP_SELECT,
-                //static_cast<int>(
-                    //direct_control.direct_per_wheel_control().front_left_wheel_rpm() *
-                    //wheel_constants_.wheel_rotations_per_motor_rotation));
-            //tmc4671_setTargetVelocity(
-                //FRONT_RIGHT_MOTOR_CHIP_SELECT,
-                //static_cast<int>(
-                    //direct_control.direct_per_wheel_control().front_right_wheel_rpm() *
-                    //wheel_constants_.wheel_rotations_per_motor_rotation));
-            //tmc4671_setTargetVelocity(
-                //BACK_LEFT_MOTOR_CHIP_SELECT,
-                //static_cast<int>(
-                    //direct_control.direct_per_wheel_control().back_left_wheel_rpm() *
-                    //wheel_constants_.wheel_rotations_per_motor_rotation));
-            //tmc4671_setTargetVelocity(
-                //BACK_RIGHT_MOTOR_CHIP_SELECT,
-                //static_cast<int>(
-                    //direct_control.direct_per_wheel_control().back_right_wheel_rpm() *
-                    //wheel_constants_.wheel_rotations_per_motor_rotation));
-            //break;
-        //}
-        //case TbotsProto::DirectControlPrimitive::WheelControlCase::kDirectVelocityControl:
-        //{
-            //EuclideanSpace_t target_euclidean_velocity = {
-                //direct_control.direct_velocity_control().velocity().x_component_meters(),
-                //direct_control.direct_velocity_control().velocity().y_component_meters(),
-                //direct_control.direct_velocity_control()
-                    //.angular_velocity()
-                    //.radians_per_second(),
-            //};
+    switch (direct_control.wheel_control_case())
+    {
+        case TbotsProto::DirectControlPrimitive::WheelControlCase::kDirectPerWheelControl:
+        {
+            tmc4671_setTargetVelocity(
+                FRONT_LEFT_MOTOR_CHIP_SELECT,
+                static_cast<int>(
+                    direct_control.direct_per_wheel_control().front_left_wheel_rpm() *
+                    wheel_constants_.wheel_rotations_per_motor_rotation));
+            tmc4671_setTargetVelocity(
+                FRONT_RIGHT_MOTOR_CHIP_SELECT,
+                static_cast<int>(
+                    direct_control.direct_per_wheel_control().front_right_wheel_rpm() *
+                    wheel_constants_.wheel_rotations_per_motor_rotation));
+            tmc4671_setTargetVelocity(
+                BACK_LEFT_MOTOR_CHIP_SELECT,
+                static_cast<int>(
+                    direct_control.direct_per_wheel_control().back_left_wheel_rpm() *
+                    wheel_constants_.wheel_rotations_per_motor_rotation));
+            tmc4671_setTargetVelocity(
+                BACK_RIGHT_MOTOR_CHIP_SELECT,
+                static_cast<int>(
+                    direct_control.direct_per_wheel_control().back_right_wheel_rpm() *
+                    wheel_constants_.wheel_rotations_per_motor_rotation));
+            break;
+        }
+        case TbotsProto::DirectControlPrimitive::WheelControlCase::kDirectVelocityControl:
+        {
+            EuclideanSpace_t target_euclidean_velocity = {
+                direct_control.direct_velocity_control().velocity().x_component_meters(),
+                direct_control.direct_velocity_control().velocity().y_component_meters(),
+                direct_control.direct_velocity_control()
+                    .angular_velocity()
+                    .radians_per_second(),
+            };
 
-            //WheelSpace_t current_wheel_speeds = {
-                //static_cast<double>(
-                    //tmc4671_getActualVelocity(FRONT_RIGHT_MOTOR_CHIP_SELECT)),
-                //static_cast<double>(
-                    //tmc4671_getActualVelocity(FRONT_LEFT_MOTOR_CHIP_SELECT)),
-                //static_cast<double>(
-                    //tmc4671_getActualVelocity(BACK_LEFT_MOTOR_CHIP_SELECT)),
-                //static_cast<double>(
-                    //tmc4671_getActualVelocity(BACK_RIGHT_MOTOR_CHIP_SELECT))};
+            WheelSpace_t current_wheel_speeds = {
+                static_cast<double>(
+                    tmc4671_getActualVelocity(FRONT_RIGHT_MOTOR_CHIP_SELECT)),
+                static_cast<double>(
+                    tmc4671_getActualVelocity(FRONT_LEFT_MOTOR_CHIP_SELECT)),
+                static_cast<double>(
+                    tmc4671_getActualVelocity(BACK_LEFT_MOTOR_CHIP_SELECT)),
+                static_cast<double>(
+                    tmc4671_getActualVelocity(BACK_RIGHT_MOTOR_CHIP_SELECT))};
 
-            //// This is a linear transformation, we don't need to convert to/from
-            //// RPM to MPS
-            //WheelSpace_t target_speeds = euclidean_to_four_wheel.getTargetWheelSpeeds(
-                //target_euclidean_velocity, current_wheel_speeds);
+            // This is a linear transformation, we don't need to convert to/from
+            // RPM to MPS
+            WheelSpace_t target_speeds = euclidean_to_four_wheel.getTargetWheelSpeeds(
+                target_euclidean_velocity, current_wheel_speeds);
 
-            //tmc4671_setTargetVelocity(FRONT_RIGHT_MOTOR_CHIP_SELECT,
-                                      //static_cast<int>(target_speeds[0]));
-            //tmc4671_setTargetVelocity(FRONT_LEFT_MOTOR_CHIP_SELECT,
-                                      //static_cast<int>(target_speeds[1]));
-            //tmc4671_setTargetVelocity(BACK_LEFT_MOTOR_CHIP_SELECT,
-                                      //static_cast<int>(target_speeds[2]));
-            //tmc4671_setTargetVelocity(BACK_RIGHT_MOTOR_CHIP_SELECT,
-                                      //static_cast<int>(target_speeds[3]));
+            tmc4671_setTargetVelocity(FRONT_RIGHT_MOTOR_CHIP_SELECT,
+                                      static_cast<int>(target_speeds[0]));
+            tmc4671_setTargetVelocity(FRONT_LEFT_MOTOR_CHIP_SELECT,
+                                      static_cast<int>(target_speeds[1]));
+            tmc4671_setTargetVelocity(BACK_LEFT_MOTOR_CHIP_SELECT,
+                                      static_cast<int>(target_speeds[2]));
+            tmc4671_setTargetVelocity(BACK_RIGHT_MOTOR_CHIP_SELECT,
+                                      static_cast<int>(target_speeds[3]));
 
-            //break;
-        //}
-        //case TbotsProto::DirectControlPrimitive::WheelControlCase::WHEEL_CONTROL_NOT_SET:
-        //{
-            //LOG(WARNING) << "Motor service polled with an empty DirectControlPrimitive ";
-            //break;
-        //}
-    //}
+            break;
+        }
+        case TbotsProto::DirectControlPrimitive::WheelControlCase::WHEEL_CONTROL_NOT_SET:
+        {
+            LOG(WARNING) << "Motor service polled with an empty DirectControlPrimitive ";
+            break;
+        }
+    }
 
     return std::make_unique<TbotsProto::DriveUnitStatus>();
 }
@@ -482,42 +496,21 @@ void MotorService::startController(uint8_t motor)
 {
     // Read the chip ID to validate the SPI connection
     tmc4671_writeInt(motor, TMC4671_CHIPINFO_ADDR, 0x000000000);
-    int read_something = tmc4671_readInt(motor, TMC4671_CHIPINFO_DATA);
-    LOGF(DEBUG, "%d read for motor %d", read_something, motor);
-    CHECK(0x34363731 == read_something)
-        << "The TMC4671 of motor " << static_cast<uint32_t>(motor)
-        << " is not responding";
-    LOGF(DEBUG, "%d motor online", motor);
+    int chip_id = tmc4671_readInt(motor, TMC4671_CHIPINFO_DATA);
 
-    //// Configure to brushless DC motor with 8 pole pairs
-    //writeToControllerOrDieTrying(motor, TMC4671_MOTOR_TYPE_N_POLE_PAIRS, 0x00030008);
+    CHECK(0x34363731 == chip_id) << "The TMC4671 of motor "
+                                 << static_cast<uint32_t>(motor) << " is not responding";
 
-    //// Configure other controller params
-    //configurePWM(motor);
-    //configureADC(motor);
-    //configureEncoder(motor);
+    // Configure to brushless DC motor with 8 pole pairs
+    writeToControllerOrDieTrying(motor, TMC4671_MOTOR_TYPE_N_POLE_PAIRS, 0x00030008);
 
-    //// Trigger encoder calibration
-    //// TODO (#2451) Don't call this here, its not safe because it moves the motors
-    //calibrateEncoder(motor);
-    //configurePI(motor);
-}
+    // Configure other controller params
+    configurePWM(motor);
+    configureADC(motor);
+    configureEncoder(motor);
 
-void MotorService::start()
-{
-    // TMC6100 Setup
-    //startDriver(FRONT_LEFT_MOTOR_CHIP_SELECT);
-    //startDriver(BACK_RIGHT_MOTOR_CHIP_SELECT);
-    //startDriver(FRONT_RIGHT_MOTOR_CHIP_SELECT);
-    //startDriver(BACK_LEFT_MOTOR_CHIP_SELECT);
-
-    ////// TMC4671 Setup
-    startController(FRONT_LEFT_MOTOR_CHIP_SELECT);
-    startController(BACK_RIGHT_MOTOR_CHIP_SELECT);
-    startController(FRONT_RIGHT_MOTOR_CHIP_SELECT);
-    startController(BACK_LEFT_MOTOR_CHIP_SELECT);
-}
-
-void MotorService::stop()
-{
+    // Trigger encoder calibration
+    // TODO (#2451) Don't call this here, its not safe because it moves the motors
+    calibrateEncoder(motor);
+    configurePI(motor);
 }
