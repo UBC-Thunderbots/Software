@@ -92,31 +92,12 @@ int main(int argc, char** argv)
     const int pre_allocation_size = 20 * 1024 * 1024;
     reserveProcessMemory(pre_allocation_size);
 
-    // TODO (#2605) Don't hardcode these values, get them from redis
+    // TODO (#2605) Don't hardcode these values
     std::string interface = "eth0";
-    int channel           = 0;
-    int robot_id          = 0;
+    NetworkLoggerSingleton::initializeLogger(0, interface, 0);
 
-    // Initialize the logger
-    NetworkLoggerSingleton::initializeLogger(channel, interface, robot_id);
-
-    // Create services
-    auto motor_service = std::make_unique<MotorService>(
-        create2021RobotConstants(), create2021WheelConstants(), CONTROL_LOOP_HZ);
-
-    auto network_service = std::make_unique<NetworkService>(
-        std::string(ROBOT_MULTICAST_CHANNELS[channel]) + "%" + interface, WORLD_PORT,
-        PRIMITIVE_PORT, ROBOT_STATUS_PORT, true);
-
-    auto power_service = std::make_unique<PowerService>();
-
-    auto redis_client =
-        std::make_unique<RedisClient>(REDIS_DEFAULT_HOST, REDIS_DEFAULT_PORT);
-
-    auto thunderloop =
-        Thunderloop(create2021RobotConstants(), create2021WheelConstants(),
-                    std::move(motor_service), std::move(power_service),
-                    std::move(network_service), std::move(redis_client), CONTROL_LOOP_HZ);
+    auto thunderloop = Thunderloop(create2021RobotConstants(), create2021WheelConstants(),
+                                   interface, CONTROL_LOOP_HZ);
 
     thunderloop.runLoop();
 

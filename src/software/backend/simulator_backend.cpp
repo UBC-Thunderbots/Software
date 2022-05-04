@@ -76,7 +76,7 @@ void SimulatorBackend::receiveRobotLogs(TbotsProto::RobotLog log)
 void SimulatorBackend::joinMulticastChannel(int channel, const std::string& interface)
 {
     vision_output.reset(new ThreadedProtoUdpSender<TbotsProto::Vision>(
-        std::string(SIMULATOR_MULTICAST_CHANNELS[channel]) + "%" + interface, WORLD_PORT,
+        std::string(SIMULATOR_MULTICAST_CHANNELS[channel]) + "%" + interface, VISION_PORT,
         true));
 
     primitive_output.reset(new ThreadedProtoUdpSender<TbotsProto::PrimitiveSet>(

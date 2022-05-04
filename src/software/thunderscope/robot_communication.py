@@ -61,7 +61,7 @@ class RobotCommunication(object):
         )
 
         self.send_world = WorldProtoSender(
-            self.multicast_channel + "%" + self.interface, WORLD_PORT, True
+            self.multicast_channel + "%" + self.interface, VISION_PORT, True
         )
 
     def __exit__(self):

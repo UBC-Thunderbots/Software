@@ -78,7 +78,7 @@ static const char REDIS_DEFAULT_HOST[REDIS_HOST_LENGTH] = "127.0.0.1";
 static const short unsigned int REDIS_DEFAULT_PORT      = 6379;
 
 // the port robots are listening to for vision and primitives
-static const short unsigned int WORLD_PORT    = 42069;
+static const short unsigned int VISION_PORT    = 42069;
 static const short unsigned int PRIMITIVE_PORT = 42070;
 
 // the port the AI receives msgs from the robot

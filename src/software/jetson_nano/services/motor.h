@@ -23,11 +23,6 @@ class MotorService
     MotorService(const RobotConstants_t& robot_constants,
                  const WheelConstants_t& wheel_constants, int control_loop_frequency_hz);
 
-    /**
-     * Used for testing
-     */
-    MotorService();
-
     virtual ~MotorService();
 
     /**
@@ -37,7 +32,7 @@ class MotorService
      * @param direct_control The direct_control msg to unpack and execute on the motors
      * @returns DriveUnitStatus The status of all the drive units
      */
-    virtual TbotsProto::DriveUnitStatus poll(
+    std::unique_ptr<TbotsProto::DriveUnitStatus> poll(
         const TbotsProto::DirectControlPrimitive& direct_control);
 
     /**
@@ -49,10 +44,8 @@ class MotorService
      * @param last_transfer The last transfer of uint8_t data for this transaction.
      * @return A byte read from the trinamic chip
      */
-    virtual uint8_t tmc4671ReadWriteByte(uint8_t motor, uint8_t data,
-                                         uint8_t last_transfer);
-    virtual uint8_t tmc6100ReadWriteByte(uint8_t motor, uint8_t data,
-                                         uint8_t last_transfer);
+    uint8_t tmc4671ReadWriteByte(uint8_t motor, uint8_t data, uint8_t last_transfer);
+    uint8_t tmc6100ReadWriteByte(uint8_t motor, uint8_t data, uint8_t last_transfer);
 
     /*
      * For FOC to work, the controller needs to know the electical angle of the rotor
@@ -68,7 +61,7 @@ class MotorService
      *
      * @param motor The motor to initialize the encoder for
      */
-    virtual void calibrateEncoder(uint8_t motor);
+    void calibrateEncoder(uint8_t motor);
 
     /**
      * Spin the motor in openloop mode (safe to run before encoder initialization)
@@ -86,7 +79,7 @@ class MotorService
      * @param motor The motor to spin in openloop mode
      * @param num_samples The number of samples to take on each
      */
-    virtual void runOpenLoopCalibrationRoutine(uint8_t motor, size_t num_samples);
+    void runOpenLoopCalibrationRoutine(uint8_t motor, size_t num_samples);
 
    private:
     /**

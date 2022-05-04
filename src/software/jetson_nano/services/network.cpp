@@ -21,10 +21,6 @@ NetworkService::NetworkService(const std::string& ip_address,
         boost::bind(&NetworkService::worldCallback, this, _1), multicast);
 }
 
-NetworkService::~NetworkService()
-{
-}
-
 std::tuple<TbotsProto::PrimitiveSet, TbotsProto::World> NetworkService::poll(
     const TbotsProto::RobotStatus& robot_status)
 {

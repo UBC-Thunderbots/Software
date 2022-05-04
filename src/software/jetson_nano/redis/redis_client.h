@@ -13,10 +13,10 @@ class RedisClient
    public:
     /**
      * Client that communicates with the a redis server
-     * @param ip_address The IP of the Redis server, default localhost
-     * @param port the port of the Redis server, default 6379
+     * @param value The IP of the Redis server, default localhost
+     * @param key the key of the Redis server, default 6379
      */
-    explicit RedisClient(std::string ip_address, size_t port);
+    explicit RedisClient(std::string value, size_t key);
 
     virtual ~RedisClient();
 
@@ -24,16 +24,16 @@ class RedisClient
     /**
      * gets the value corresponding to the key; blocking
      * @param key
-     * @return a string containing the reply
+     * @return a redis reply object
      */
-    virtual std::string get(const std::string &key);
+    cpp_redis::reply get(const std::string &key);
 
     /**
      * sets a key value pair in the redis database
      * @param key
      * @param value
      */
-    virtual void set(const std::string &key, const std::string &value);
+    void set(const std::string &key, const std::string &value);
 
     /**
      * @return a map of all the key value pairs in redis server
