@@ -30,10 +30,13 @@ Duration getTimeToTravelDistance(const double distance, const double max_velocit
             // Robot must decelerate, so it has negative acceleration
             a_max_signed *= -1.0;
         }
-        // t = (-Vi + sqrt(Vi^2 + 2 * a * d)) / a
+        // Following formula is solved by solving for t in:
+        // d = Vi*t + 1/2*at^2  ───── solve for t ─────┐
+        // t = (-Vi + sqrt(Vi^2 + 2 * a * d)) / a  ◄───┘
         double t_total =
             (-v_i + std::sqrt(std::pow(v_i, 2) + 2 * a_max_signed * d_total)) /
             a_max_signed;
+        std::cout << t_total << std::endl;
         return Duration::fromSeconds(t_total);
     }
 
