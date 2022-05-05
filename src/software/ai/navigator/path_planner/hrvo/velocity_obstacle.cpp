@@ -1,18 +1,17 @@
 #include "software/ai/navigator/path_planner/hrvo/velocity_obstacle.h"
 
-VelocityObstacle::VelocityObstacle(Vector apex, Vector side1, Vector side2)
-		:apex(apex)
+VelocityObstacle::VelocityObstacle(Vector apex, Vector side1, Vector side2) : apex(apex)
 {
-	if (side1.isToTheRightOf(side2))
-	{
-		right_side = side1.normalize();
-		left_side = side2.normalize();
-	}
-	else
-	{
-		right_side = side2.normalize();
-		left_side = side1.normalize();
-	}
+    if (side1.isToTheRightOf(side2))
+    {
+        right_side = side1.normalize();
+        left_side  = side2.normalize();
+    }
+    else
+    {
+        right_side = side2.normalize();
+        left_side  = side1.normalize();
+    }
 }
 
 bool VelocityObstacle::containsVelocity(const Vector &velocity) const
@@ -25,15 +24,15 @@ bool VelocityObstacle::containsVelocity(const Vector &velocity) const
 
 Vector VelocityObstacle::getApex() const
 {
-	return apex;
+    return apex;
 }
 
 Vector VelocityObstacle::getLeftSide() const
 {
-	return left_side;
+    return left_side;
 }
 
 Vector VelocityObstacle::getRightSide() const
 {
-	return right_side;
+    return right_side;
 }

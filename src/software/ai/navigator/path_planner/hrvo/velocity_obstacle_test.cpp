@@ -3,10 +3,10 @@
 #include "software/test_util/test_util.h"
 
 class TestVelocityObstacle : public testing::Test
-{             
-};            
+{
+};
 
-/*               \                  / 
+/*               \                  /
  *                \                /
  *                 \              /
  *                  \            /
@@ -19,9 +19,9 @@ class TestVelocityObstacle : public testing::Test
  */
 TEST_F(TestVelocityObstacle, test_velocity_inside_vo)
 {
-    Vector apex         = Vector(0, 0);
-    Vector right_side   = Vector(1, 1);
-    Vector left_side    = Vector(1, -1);
+    Vector apex       = Vector(0, 0);
+    Vector right_side = Vector(1, 1);
+    Vector left_side  = Vector(1, -1);
 
     VelocityObstacle vo = VelocityObstacle(apex, right_side, left_side);
 
@@ -42,9 +42,9 @@ TEST_F(TestVelocityObstacle, test_velocity_inside_vo)
  */
 TEST_F(TestVelocityObstacle, test_velocity_outside_vo)
 {
-    Vector apex         = Vector(1, 1);
-    Vector right_side   = Vector(2, 2);
-    Vector left_side    = Vector(2, 0);
+    Vector apex       = Vector(1, 1);
+    Vector right_side = Vector(2, 2);
+    Vector left_side  = Vector(2, 0);
 
     VelocityObstacle vo = VelocityObstacle(apex, right_side, left_side);
 
@@ -58,17 +58,18 @@ TEST_F(TestVelocityObstacle, test_velocity_outside_vo)
  *                                       \
  *                                        \ 45°
  *                                   (apex)+ (2, 1)   (2, 2) X
- *                                         /        X: relative to obstacle, velocity is outside it
- *                                        / 
- *                                    /--- 
+ *                                         /        X: relative to obstacle, velocity is
+ * outside it
+ *                                        /
+ *                                    /---
  *                      /-------------
- * --------------------- 
+ * ---------------------
  */
 TEST_F(TestVelocityObstacle, test_velocity_outside_horizontal_vo)
 {
-    Vector apex         = Vector(2, 1);
-    Vector right_side   = Vector(-1, -1);
-    Vector left_side    = Vector(1, -1);
+    Vector apex       = Vector(2, 1);
+    Vector right_side = Vector(-1, -1);
+    Vector left_side  = Vector(1, -1);
 
     VelocityObstacle vo = VelocityObstacle(apex, right_side, left_side);
 
@@ -79,23 +80,23 @@ TEST_F(TestVelocityObstacle, test_velocity_outside_horizontal_vo)
  *          -----/
  *    -----/
  *   /  30°
- *  + apex (-1, 2)                X (-1, 2) lives inside the velocity obstacle 
+ *  + apex (-1, 2)                X (-1, 2) lives inside the velocity obstacle
  *   \
  *    -----\
  *          -----\
  *                --------------------------------
- *                                  
- */                                 
+ *
+ */
 TEST_F(TestVelocityObstacle, test_velocity_inside_horizontal_vo)
-{                                   
-    Vector apex         = Vector(-1, -2);
-    Vector right_side   = Vector::createFromAngle(Angle::fromDegrees(120));
-    Vector left_side    = Vector::createFromAngle(Angle::fromDegrees(60));
-                                    
+{
+    Vector apex       = Vector(-1, -2);
+    Vector right_side = Vector::createFromAngle(Angle::fromDegrees(120));
+    Vector left_side  = Vector::createFromAngle(Angle::fromDegrees(60));
+
     VelocityObstacle vo = VelocityObstacle(apex, right_side, left_side);
-                                    
+
     EXPECT_TRUE(vo.containsVelocity(Vector(-1, 2)));
-}    
+}
 
 TEST_F(TestVelocityObstacle, test_velocity_obstacle_contructor_right_then_left_side)
 {

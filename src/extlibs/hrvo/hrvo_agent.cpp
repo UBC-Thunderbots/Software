@@ -102,10 +102,8 @@ VelocityObstacle HRVOAgent::createVelocityObstacle(const Agent &other_agent)
             // Relative velocity is in the right half of velocity obstacle (VO)
             // Shift the VO apex to the left so the right side is smaller, making the
             // VO a Hybrid Reciprocal Velocity Obstacle (HRVO)
-            const float s = 0.5f *
-                            (other_agent.getVelocity() - velocity_)
-                                .determinant(left_side) /
-                            d;
+            const float s =
+                0.5f * (other_agent.getVelocity() - velocity_).determinant(left_side) / d;
 
             Vector apex =
                 velocity_ + s * right_side -
@@ -113,17 +111,16 @@ VelocityObstacle HRVOAgent::createVelocityObstacle(const Agent &other_agent)
                     .normalize((uncertaintyOffset_ *
                                 (position_ - other_agent.getPosition()).length() /
                                 (radius_ + other_agent.getRadius())));
-	    return VelocityObstacle(apex, right_side, left_side);
+            return VelocityObstacle(apex, right_side, left_side);
         }
         else
         {
             // Relative velocity is in the left half of velocity obstacle (VO)
             // Shift the VO apex to the right so the left side is smaller, making the
             // VO a Hybrid Reciprocal Velocity Obstacle (HRVO)
-            const float s = 0.5f *
-                            (other_agent.getVelocity() - velocity_)
-                                .determinant(right_side) /
-                            d;
+            const float s =
+                0.5f * (other_agent.getVelocity() - velocity_).determinant(right_side) /
+                d;
 
             Vector apex =
                 velocity_ + s * left_side -
@@ -131,24 +128,23 @@ VelocityObstacle HRVOAgent::createVelocityObstacle(const Agent &other_agent)
                     .normalize(uncertaintyOffset_ *
                                (position_ - other_agent.getPosition()).length() /
                                (other_agent.getRadius() + radius_));
-	    	return VelocityObstacle(apex, right_side, left_side);
+            return VelocityObstacle(apex, right_side, left_side);
         }
     }
-	// This Agent is colliding with other agent
-	// Uses Reciprocal Velocity Obstacle (RVO) with the sides being 180 degrees
-	// apart from each other
-	Vector apex =
-	    0.5f * (other_agent.getVelocity() + velocity_) -
-	    (position_ - other_agent.getPosition())
-		.normalize(uncertaintyOffset_ +
-			   0.5f *
-			       (other_agent.getRadius() + radius_ -
-				(position_ - other_agent.getPosition()).length()) /
-			       simulator_->getTimeStep());
-	Vector right_side =
-	    (other_agent.getPosition() - position_).perpendicular().normalize();
-	Vector left_side = -right_side;
-	return VelocityObstacle(apex, right_side, left_side);
+    // This Agent is colliding with other agent
+    // Uses Reciprocal Velocity Obstacle (RVO) with the sides being 180 degrees
+    // apart from each other
+    Vector apex = 0.5f * (other_agent.getVelocity() + velocity_) -
+                  (position_ - other_agent.getPosition())
+                      .normalize(uncertaintyOffset_ +
+                                 0.5f *
+                                     (other_agent.getRadius() + radius_ -
+                                      (position_ - other_agent.getPosition()).length()) /
+                                     simulator_->getTimeStep());
+    Vector right_side =
+        (other_agent.getPosition() - position_).perpendicular().normalize();
+    Vector left_side = -right_side;
+    return VelocityObstacle(apex, right_side, left_side);
 }
 
 void HRVOAgent::computeNewVelocity()
@@ -202,7 +198,8 @@ void HRVOAgent::computeNewVelocity()
     // line segment of each obstacle
     for (int i = 0; i < static_cast<int>(velocityObstacles_.size()); ++i)
     {
-        const Vector apex_to_pref_velocity = pref_velocity_ - velocityObstacles_[i].getApex();
+        const Vector apex_to_pref_velocity =
+            pref_velocity_ - velocityObstacles_[i].getApex();
 
         candidate.velocityObstacle1_ = i;
         candidate.velocityObstacle2_ = i;
@@ -236,32 +233,33 @@ void HRVOAgent::computeNewVelocity()
         candidate.velocityObstacle1_ = std::numeric_limits<int>::max();
         candidate.velocityObstacle2_ = j;
 
-        float discriminant = max_speed_ * max_speed_ -
-                             std::pow((velocityObstacles_[j].getApex())
-                                          .determinant(velocityObstacles_[j].getRightSide()),
-                                      2.f);
+        float discriminant =
+            max_speed_ * max_speed_ -
+            std::pow((velocityObstacles_[j].getApex())
+                         .determinant(velocityObstacles_[j].getRightSide()),
+                     2.f);
 
         if (discriminant > 0.0f)
         {
-            const float t1 =
-                -(velocityObstacles_[j].getApex().dot(velocityObstacles_[j].getRightSide())) +
-                std::sqrt(discriminant);
-            const float t2 =
-                -(velocityObstacles_[j].getApex().dot(velocityObstacles_[j].getRightSide())) -
-                std::sqrt(discriminant);
+            const float t1 = -(velocityObstacles_[j].getApex().dot(
+                                 velocityObstacles_[j].getRightSide())) +
+                             std::sqrt(discriminant);
+            const float t2 = -(velocityObstacles_[j].getApex().dot(
+                                 velocityObstacles_[j].getRightSide())) -
+                             std::sqrt(discriminant);
 
             if (t1 >= 0.0f)
             {
-                candidate.velocity =
-                    velocityObstacles_[j].getApex() + t1 * velocityObstacles_[j].getRightSide();
+                candidate.velocity = velocityObstacles_[j].getApex() +
+                                     t1 * velocityObstacles_[j].getRightSide();
                 candidates_.insert(std::make_pair(
                     (pref_velocity_ - candidate.velocity).lengthSquared(), candidate));
             }
 
             if (t2 >= 0.0f)
             {
-                candidate.velocity =
-                    velocityObstacles_[j].getApex() + t2 * velocityObstacles_[j].getRightSide();
+                candidate.velocity = velocityObstacles_[j].getApex() +
+                                     t2 * velocityObstacles_[j].getRightSide();
                 candidates_.insert(std::make_pair(
                     (pref_velocity_ - candidate.velocity).lengthSquared(), candidate));
             }
@@ -274,25 +272,25 @@ void HRVOAgent::computeNewVelocity()
 
         if (discriminant > 0.0f)
         {
-            const float t1 =
-                -(velocityObstacles_[j].getApex().dot(velocityObstacles_[j].getLeftSide())) +
-                std::sqrt(discriminant);
-            const float t2 =
-                -(velocityObstacles_[j].getApex().dot(velocityObstacles_[j].getLeftSide())) -
-                std::sqrt(discriminant);
+            const float t1 = -(velocityObstacles_[j].getApex().dot(
+                                 velocityObstacles_[j].getLeftSide())) +
+                             std::sqrt(discriminant);
+            const float t2 = -(velocityObstacles_[j].getApex().dot(
+                                 velocityObstacles_[j].getLeftSide())) -
+                             std::sqrt(discriminant);
 
             if (t1 >= 0.0f)
             {
-                candidate.velocity =
-                    velocityObstacles_[j].getApex() + t1 * velocityObstacles_[j].getLeftSide();
+                candidate.velocity = velocityObstacles_[j].getApex() +
+                                     t1 * velocityObstacles_[j].getLeftSide();
                 candidates_.insert(std::make_pair(
                     (pref_velocity_ - candidate.velocity).lengthSquared(), candidate));
             }
 
             if (t2 >= 0.0f)
             {
-                candidate.velocity =
-                    velocityObstacles_[j].getApex() + t2 * velocityObstacles_[j].getLeftSide();
+                candidate.velocity = velocityObstacles_[j].getApex() +
+                                     t2 * velocityObstacles_[j].getLeftSide();
                 candidates_.insert(std::make_pair(
                     (pref_velocity_ - candidate.velocity).lengthSquared(), candidate));
             }
@@ -345,8 +343,8 @@ void HRVOAgent::computeNewVelocity()
 
                 if (s >= 0.0f && t >= 0.0f)
                 {
-                    candidate.velocity =
-                        velocityObstacles_[i].getApex() + s * velocityObstacles_[i].getLeftSide();
+                    candidate.velocity = velocityObstacles_[i].getApex() +
+                                         s * velocityObstacles_[i].getLeftSide();
                     addToCandidateListIfValid(candidate);
                 }
             }
@@ -389,8 +387,8 @@ void HRVOAgent::computeNewVelocity()
 
                 if (s >= 0.0f && t >= 0.0f)
                 {
-                    candidate.velocity =
-                        velocityObstacles_[i].getApex() + s * velocityObstacles_[i].getLeftSide();
+                    candidate.velocity = velocityObstacles_[i].getApex() +
+                                         s * velocityObstacles_[i].getLeftSide();
                     addToCandidateListIfValid(candidate);
                 }
             }
@@ -427,13 +425,12 @@ void HRVOAgent::computeNewVelocity()
 
         // if this candidate velocity is flawed, but is better than the one we have so
         // far, store it until we find something better
-		if ((first_intersecting_velocity_obstacle == -1 
-								&& isCandidateSlow(candidate) 
-								&& isCandidateFasterThanCurrentSpeed(candidate))
-			|| (first_intersecting_velocity_obstacle > optimal_furthest_away_obstacle && isCandidateFast(candidate))
-			|| (first_intersecting_velocity_obstacle > optimal_furthest_away_obstacle 
-					&& isCandidateSlow(candidate) 
-					&& isCandidateFasterThanCurrentSpeed(candidate)))
+        if ((first_intersecting_velocity_obstacle == -1 && isCandidateSlow(candidate) &&
+             isCandidateFasterThanCurrentSpeed(candidate)) ||
+            (first_intersecting_velocity_obstacle > optimal_furthest_away_obstacle &&
+             isCandidateFast(candidate)) ||
+            (first_intersecting_velocity_obstacle > optimal_furthest_away_obstacle &&
+             isCandidateSlow(candidate) && isCandidateFasterThanCurrentSpeed(candidate)))
         {
             optimal_furthest_away_obstacle = first_intersecting_velocity_obstacle;
             new_velocity_                  = candidate.velocity;
@@ -443,32 +440,33 @@ void HRVOAgent::computeNewVelocity()
 
 bool HRVOAgent::isIdealCandidate(const Candidate &candidate) const
 {
-    return findIntersectingVelocityObstacle(candidate) == -1 && isCandidateFast(candidate); 
+    return findIntersectingVelocityObstacle(candidate) == -1 &&
+           isCandidateFast(candidate);
 }
 
 bool HRVOAgent::isCandidateSlow(const Candidate &candidate) const
 {
-	double min_pref_speed = std::abs(pref_velocity_.length()) * MIN_PREF_SPEED_MULTIPLER;
+    double min_pref_speed = std::abs(pref_velocity_.length()) * MIN_PREF_SPEED_MULTIPLER;
 
-	return std::abs(candidate.velocity.length()) < min_pref_speed;
+    return std::abs(candidate.velocity.length()) < min_pref_speed;
 }
 
 bool HRVOAgent::isCandidateFast(const Candidate &candidate) const
 {
-	return !isCandidateSlow(candidate);
+    return !isCandidateSlow(candidate);
 }
 
 bool HRVOAgent::isCandidateFasterThanCurrentSpeed(const Candidate &candidate) const
 {
-	return std::abs(candidate.velocity.length()) > std::abs(new_velocity_.length());
+    return std::abs(candidate.velocity.length()) > std::abs(new_velocity_.length());
 }
 
 int HRVOAgent::findIntersectingVelocityObstacle(const Candidate &candidate) const
 {
     for (int j = 0; j < static_cast<int>(velocityObstacles_.size()); ++j)
     {
-        if (j != candidate.velocityObstacle1_ && j != candidate.velocityObstacle2_ 
-						&& velocityObstacles_[j].containsVelocity(candidate.velocity))
+        if (j != candidate.velocityObstacle1_ && j != candidate.velocityObstacle2_ &&
+            velocityObstacles_[j].containsVelocity(candidate.velocity))
         {
             return j;
         }

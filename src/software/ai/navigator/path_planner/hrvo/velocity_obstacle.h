@@ -6,33 +6,36 @@
 class VelocityObstacle
 {
    public:
-	/**
-	 * Construct a velocity obstacle given two sides and an apex. The sides will be normalized to unit vectors.
-	 *
-	 * @param apex	the velocity of the obstacle (relative to ground)
-	 * @param side1	one side of the velocity obstacle (relative to apex)
-	 * @param side2	one side of the velocity obstacle (relative to apex)
-	 *
-	 * @return	velocity obstacle with respective apex and normalized unit-vector sides
-	 */
+    /**
+     * Construct a velocity obstacle given two sides and an apex. The sides will be
+     * normalized to unit vectors.
+     *
+     * @param apex	the velocity of the obstacle (relative to ground)
+     * @param side1	one side of the velocity obstacle (relative to apex)
+     * @param side2	one side of the velocity obstacle (relative to apex)
+     *
+     * @return	velocity obstacle with respective apex and normalized unit-vector sides
+     */
     VelocityObstacle(Vector apex, Vector side1, Vector side2);
 
-	/**
-	 * Getters for the unit-vectors assigned as the right and left sides of the velocity obstacle.
-	 *
-	 * @return unit vector representing the sides of the velocity obstacle
-	 */
-	Vector getRightSide() const;
-	Vector getLeftSide() const;
+    /**
+     * Getters for the unit-vectors assigned as the right and left sides of the velocity
+     * obstacle.
+     *
+     * @return unit vector representing the sides of the velocity obstacle
+     */
+    Vector getRightSide() const;
+    Vector getLeftSide() const;
 
-	/**
-	 * Get the apex of the velocity obstacle. Represents the velocity of the obstacle (if we considered it as a point) relative to the ground.
-	 *
-	 * @return vector representing the velocity of this velocity obstacle
-	 */
-	Vector getApex() const;
+    /**
+     * Get the apex of the velocity obstacle. Represents the velocity of the obstacle (if
+     * we considered it as a point) relative to the ground.
+     *
+     * @return vector representing the velocity of this velocity obstacle
+     */
+    Vector getApex() const;
 
-	/**
+    /**
      * Returns true if the given velocity is inside this VelocityObstacle, false
      * otherwise.
      *
@@ -43,13 +46,15 @@ class VelocityObstacle
      */
     bool containsVelocity(const Vector &velocity) const;
 
-   private: 
+   private:
     // The position of the apex of the hybrid reciprocal velocity obstacle.
     Vector apex;
 
-    // The direction of t(he right side of the velocity obstacle (in the frame of reference of the velocity obstacle).
+    // The direction of t(he right side of the velocity obstacle (in the frame of
+    // reference of the velocity obstacle).
     Vector right_side;
 
-    // The direction of the left side of the velocity obstacle in the frame of reference of the velocity obstacle.
+    // The direction of the left side of the velocity obstacle in the frame of reference
+    // of the velocity obstacle.
     Vector left_side;
 };

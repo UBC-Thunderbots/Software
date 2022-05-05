@@ -63,14 +63,14 @@ VelocityObstacle LinearVelocityAgent::createVelocityObstacle(const Agent &other_
             Vector(std::cos(angle - openingAngle), std::sin(angle - openingAngle));
         Vector left_side =
             Vector(std::cos(angle + openingAngle), std::sin(angle + openingAngle));
-		return VelocityObstacle(apex, right_side, left_side);
+        return VelocityObstacle(apex, right_side, left_side);
     }
-	// This Agent is colliding with other agent
-	// Creates Velocity Obstacle with the sides being 180 degrees
-	// apart from each other
-	Vector apex = velocity_;
-	Vector right_side =
+    // This Agent is colliding with other agent
+    // Creates Velocity Obstacle with the sides being 180 degrees
+    // apart from each other
+    Vector apex = velocity_;
+    Vector right_side =
         (other_agent.getPosition() - position_).perpendicular().normalize();
-	Vector left_side = -right_side;
-	return VelocityObstacle(apex, right_side, left_side);
+    Vector left_side = -right_side;
+    return VelocityObstacle(apex, right_side, left_side);
 }
