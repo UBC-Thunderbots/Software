@@ -326,7 +326,8 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::getPrimitivesFromTactic(
             *(motion_control.mutable_requested_destination()) =
                 *createPointProto(destination);
 
-            if (path.has_value())
+            // TODO: we shouldn't have to check the number of knots in the path but we do
+            if (path.has_value() && path.value().getKnots().size() > 1)
             {
                 path_points = path.value().getKnots();
                 motion_control.set_normalized_path_length(
@@ -337,6 +338,9 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::getPrimitivesFromTactic(
             {
                 motion_control.set_normalized_path_length(1.0);
             }
+
+            CHECK(path_points.size() >= 2)
+                << "Empty path: " << path_points.size() << std::endl;
 
             path_points.erase(path_points.begin());
             for (const auto &point : path_points)

@@ -69,11 +69,13 @@
 //                                    MotionConstraint::FRIENDLY_DEFENSE_AREA});
 //
 //    auto kickoff_motion_constraints = std::set<TbotsProto::MotionConstraint>(
-//        {TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA, MotionConstraint::CENTER_CIRCLE,
+//        {TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA,
+//        MotionConstraint::CENTER_CIRCLE,
 //         MotionConstraint::HALF_METER_AROUND_BALL, MotionConstraint::ENEMY_HALF});
 //
 //    auto our_penalty_motion_constraints = std::set<TbotsProto::MotionConstraint>(
-//        {TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA, MotionConstraint::ENEMY_HALF});
+//        {TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA,
+//        MotionConstraint::ENEMY_HALF});
 //
 //    auto them_penalty_motion_constraints = std::set<TbotsProto::MotionConstraint>(
 //        {TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA,
