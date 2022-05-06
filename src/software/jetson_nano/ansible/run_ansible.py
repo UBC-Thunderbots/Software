@@ -15,7 +15,7 @@ import argparse
 # documentation can be found here: https://docs.ansible.com/ansible/latest/dev_guide/developing_api.html
 
 HOST_GROUP = "THUNDERBOTS_HOSTS"
-NANO_USER = "dev"
+NANO_USER = "robot"
 ANNOUNCEMENT_LISTEN_DURATION_S = 2
 
 
