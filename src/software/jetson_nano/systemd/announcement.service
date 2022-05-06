@@ -9,7 +9,7 @@ After=thunderbots.service thunderloop.service network.target network-online.targ
 
 [Service]
 #todo add arguments (#2443)
-ExecStart=/home/robot/thunderbots_binaries/broadcasts/robot_broadcast_sender -p 45000
+ExecStart=/home/robot/thunderbots_binaries/broadcasts/robot_broadcast_sender -p 45000 -if eth0
 
 #always restart on crash
 Restart=always
