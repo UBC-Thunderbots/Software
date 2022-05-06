@@ -192,14 +192,18 @@ class Vector final
     Vector &operator=(const Vector &other);
 
     /**
-     * Returns true if this vector is to the right of the given vector.
+     * Returns true if this vector is to the right of the given vector. Geometrically, in
+     * the acute angle given by two vectors, it returns true if this vector is clockwise
+     * of the other vector.
      *
      * @param other the Vector to compare this Vector to
      */
     bool isToTheRightOf(const Vector &other) const;
 
     /**
-     * Returns true if this vector is to the left of the given vector.
+     * Returns true if this vector is to the left of the given vector. Geometrically, in
+     * the acute angle given by two vectors, it returns true if this vector is
+     * counterclockwise of the other vector.
      *
      * @param other the Vector to compare this Vector to
      */

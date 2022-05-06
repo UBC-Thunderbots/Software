@@ -425,6 +425,14 @@ void HRVOAgent::computeNewVelocity()
 
         // if this candidate velocity is flawed, but is better than the one we have so
         // far, store it until we find something better
+        // these velocities have one of the following characteristics:
+        // - the candidate velocity doesn't intersect any velocity obstacle but is slow
+        // - the candidate velocity intersects a velocity obstacle further away than the
+        // current best obstacle and is
+        //	fast
+        // - the candidate velocity intersects a velocity obstacle further away than the
+        // current best obstacle but is 	slow yet still faster than the current best
+        // velocity
         if ((first_intersecting_velocity_obstacle == -1 && isCandidateSlow(candidate) &&
              isCandidateFasterThanCurrentSpeed(candidate)) ||
             (first_intersecting_velocity_obstacle > optimal_furthest_away_obstacle &&
