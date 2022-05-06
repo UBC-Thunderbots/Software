@@ -53,7 +53,7 @@ class ProtoPlotter(object):
 
     """
 
-    def __init__(self, configuration, buffer_size=1000):
+    def __init__(self, configuration, buffer_size=50):
         """Initializes ProtoPlotter.
 
         :param configuration: A dictionary that maps protobuf types to
@@ -100,6 +100,7 @@ class ProtoPlotter(object):
                             name=name,
                             disableAutoRange=True,
                             brush=None,
+                            skipFiniteCheck=True,
                         )
 
                         self.plots[name].setDownsampling(method="peak")
