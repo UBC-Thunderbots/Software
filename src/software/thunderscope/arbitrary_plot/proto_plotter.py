@@ -2,8 +2,9 @@ import random
 import time
 from collections import deque
 
-import pyqtgraph as pg
+from time import perf_counter
 import numpy as np
+import pyqtgraph as pg
 from proto.visualization_pb2 import NamedValue
 from pyqtgraph.Qt import QtGui
 
@@ -54,7 +55,7 @@ class ProtoPlotter(object):
 
     """
 
-    def __init__(self, configuration, buffer_size=50):
+    def __init__(self, configuration, buffer_size=500):
         """Initializes ProtoPlotter.
 
         :param configuration: A dictionary that maps protobuf types to
@@ -76,93 +77,68 @@ class ProtoPlotter(object):
             key: ThreadSafeBuffer(buffer_size, key) for key in configuration.keys()
         }
 
-        # 1) Simplest approach -- update data in the array such that plot appears to scroll
-        #    In these examples, the array size is fixed.
-        self.data1 = np.random.normal(size=1000)
-        self.data2 = np.random.normal(size=1000)
-        self.data3 = np.random.normal(size=1000)
-        self.data4 = np.random.normal(size=1000)
-        self.data5 = np.random.normal(size=1000)
-        self.data6 = np.random.normal(size=1000)
-        self.data7 = np.random.normal(size=1000)
-        self.curve1 = self.win.plot(self.data1, 
-                                    pen=QtGui.QColor(
-                                        random.randint(100, 255),
-                                        random.randint(100, 255),
-                                        random.randint(100, 255),
-                                    )
-                )
-        self.curve2 = self.win.plot(self.data2,
-                                    pen=QtGui.QColor(
-                                        random.randint(100, 255),
-                                        random.randint(100, 255),
-                                        random.randint(100, 255),
-                                    )
-
-                )
-        self.curve3 = self.win.plot(self.data3,
-
-                                    pen=QtGui.QColor(
-                                        random.randint(100, 255),
-                                        random.randint(100, 255),
-                                        random.randint(100, 255),
-                                    ))
-        self.curve4 = self.win.plot(self.data4, 
-                                    pen=QtGui.QColor(
-                                        random.randint(100, 255),
-                                        random.randint(100, 255),
-                                        random.randint(100, 255),
-                                    ))
-        self.curve5 = self.win.plot(self.data5, 
-                                    pen=QtGui.QColor(
-                                        random.randint(100, 255),
-                                        random.randint(100, 255),
-                                        random.randint(100, 255),
-                                    ))
-        self.curve6 = self.win.plot(self.data6, 
-                                    pen=QtGui.QColor(
-                                        random.randint(100, 255),
-                                        random.randint(100, 255),
-                                        random.randint(100, 255),
-                                    ))
-        self.curve7 = self.win.plot(self.data7,
-                                    pen=QtGui.QColor(
-                                        random.randint(100, 255),
-                                        random.randint(100, 255),
-                                        random.randint(100, 255),
-                                    ))
-
-    def update1(self):
-        self.data1[:-1] = self.data1[1:]  # shift self.data in the array one sample left
-        self.data2[:-1] = self.data2[1:]  # shift self.data in the array one sample left
-        self.data3[:-1] = self.data3[1:]  # shift self.data in the array one sample left
-        self.data4[:-1] = self.data4[1:]  # shift self.selfself..data in the array one sample left
-        self.data5[:-1] = self.data5[1:]  # shift data in the array one sample left
-        self.data6[:-1] = self.data6[1:]  # shift data in the array one sample left
-        self.data7[:-1] = self.data7[1:]  # shift data in the array one sample left
-                                # (see also: np.roll)
-        self.data1[-1] = np.random.normal()
-        self.data2[-1] = np.random.normal()
-        self.data3[-1] = np.random.normal()
-        self.data4[-1] = np.random.normal()
-        self.data5[-1] = np.random.normal()
-        self.data6[-1] = np.random.normal()
-        self.data7[-1] = np.random.normal()
-
-        start_time = time.time()
-        self.curve1.setData(self.data1)
-        self.curve2.setData(self.data2)
-        self.curve3.setData(self.data3)
-        self.curve4.setData(self.data4)
-        self.curve5.setData(self.data5)
-        self.curve6.setData(self.data6)
-        self.curve7.setData(self.data7)
-        end_time = time.time()
-        print(end_time - start_time)
+        rollingAverageSize = 1000
+        self.elapsed = deque(maxlen=rollingAverageSize)
+        self.fpsLastUpdate = perf_counter()
 
     def refresh(self):
         """Refreshes ProtoPlotter and updates data in the respective
         plots.
 
         """
-        self.update1()
+        t_start = perf_counter()
+
+        # Dump the entire buffer into a deque. This operation is fast because
+        # its just consuming data from the buffer and appending it to a deque.
+        for proto_class, buffer in self.buffers.items():
+            for _ in range(buffer.queue.qsize()):
+
+                data = self.configuration[proto_class](buffer.get(block=False))
+
+                for name, value in data.items():
+                    if name not in self.plots:
+
+                        self.plots[name] = self.win.plot(
+                            pen=QtGui.QColor(
+                                random.randint(100, 255),
+                                random.randint(100, 255),
+                                random.randint(100, 255),
+                            ),
+                            name=name,
+                            disableAutoRange=True,
+                            brush=None,
+                            skipFiniteCheck=True,
+                        )
+
+                        self.plots[name].setDownsampling(method="subsample")
+                        self.data_x[name] = np.zeros(DEQUE_SIZE)
+                        self.data_y[name] = np.zeros(DEQUE_SIZE)
+                        self.legend.addItem(self.plots[name], name)
+
+                    self.data_x[name][0:-1] = self.data_x[name][1:]
+                    self.data_y[name][0:-1] = self.data_y[name][1:]
+
+                    self.data_x[name][-1] = time.time() - self.time
+                    self.data_y[name][-1] = value
+
+        # Update the data
+        for name, plot in self.plots.items():
+            plot.setData(self.data_x[name], self.data_y[name])
+
+        self.win.setRange(
+            xRange=[
+                time.time() - self.time - TIME_WINDOW_TO_DISPLAY_S,
+                time.time() - self.time,
+            ],
+        )
+
+        t_end = perf_counter()
+
+        # update fps at most once every 0.2 secs
+        if t_end - self.fpsLastUpdate > 0.2:
+            self.fpsLastUpdate = t_end
+            average = np.mean(self.elapsed)
+            fps = 1 / average
+            self.win.setTitle('%0.2f fps - %0.1f ms avg' % (fps, average * 1_000))
+
+        self.elapsed.append(t_end - t_start)

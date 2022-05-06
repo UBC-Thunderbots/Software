@@ -95,6 +95,13 @@ class Thunderscope(object):
 
         """
 
+        # try:
+            # import OpenGL
+            # pg.setConfigOption('useOpenGL', True)
+            # pg.setConfigOption('enableExperimental', True)
+        # except Exception as e:
+            # print(f"Enabling OpenGL failed with {e}. Will result in slow rendering. Try installing PyOpenGL.")
+
         # Setup MainApp and initialize DockArea
         self.app = pyqtgraph.mkQApp("Thunderscope")
         self.app.setStyleSheet(qdarktheme.load_stylesheet())

@@ -51,7 +51,7 @@ void UnixSimulatorBackend::onValueReceived(TbotsProto::PrimitiveSet primitives)
 
     // TODO (#2510) Find a new home once SimulatorBackend and ThreadedFullSystemGUI are
     // gone
-    for (int i = 0; i < 10; ++i)
+    for (int i = 0; i < 5; ++i)
     {
         LOG(VISUALIZE) << *createNamedValue(
             "Primitive Hz" + std::to_string(i),
