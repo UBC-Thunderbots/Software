@@ -385,6 +385,23 @@ Cntrl-Click and Drag: Move ball and kick
         log_dock = Dock("Logs")
         log_dock.addWidget(self.diagnostics_widgets["log_widget"])
 
+        def extract_encoder_data(named_value_data):
+            return {named_value_data.name: named_value_data.value}
+
+        # Create widget
+        proto_plotter = ProtoPlotter(
+            configuration={NamedValue: extract_namedvalue_data}
+        )
+
+        # Register observer
+        proto_unix_io.register_observer(NamedValue, proto_plotter.buffers[NamedValue])
+
+        # Register refresh function
+        self.register_refresh_function(proto_plotter.refresh)
+
+        return proto_plotter
+
+
         self.robot_diagnostics_dock_area.addDock(log_dock)
         self.robot_diagnostics_dock_area.addDock(drive_dock, "right", log_dock)
         self.robot_diagnostics_dock_area.addDock(chicker_dock, "bottom", drive_dock)

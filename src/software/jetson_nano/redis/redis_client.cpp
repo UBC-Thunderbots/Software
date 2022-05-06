@@ -19,19 +19,16 @@ RedisClient::RedisClient(std::string host, size_t port)
             LOG(INFO) << "Redis subscriber_ connection successful";
         }
     };
-    LOG(DEBUG) << "REDIS START";
 
     subscriber_.connect(host_, port_, connection_callback);
     client_.connect(host_, port_, connection_callback);
 
-    LOG(DEBUG) << "REDIS START 2";
     // ensure that keyspace events are configured properly
     client_.config_set("notify-keyspace-events", "KEA");
 
     // ensure that redis server is accepting connections from any host (potentially
     // unsafe)
     client_.config_set("bind", "0.0.0.0");
-    LOG(DEBUG) << "REDIS START 3";
 
     // ensure that redis server has AOF (append-only file) persistence
     client_.config_set("appendonly", "yes");
@@ -46,7 +43,6 @@ RedisClient::RedisClient(std::string host, size_t port)
                               client_.commit();
                           });
     subscriber_.commit();
-    LOG(DEBUG) << "REDIS DONE";
 }
 
 cpp_redis::reply RedisClient::get(const std::string &key)
