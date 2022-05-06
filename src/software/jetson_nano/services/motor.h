@@ -36,8 +36,8 @@ class MotorService
         const TbotsProto::DirectControlPrimitive& direct_control);
 
     /**
-     * Trinamic API binding, sets spi_cs_driver_to_controller_demux appropriately
-     * and calls readWriteByte. See C++ implementation file for more info
+     * Trinamic API binding, sets spi_demux_select_0|1 pins
+     * appropriately and calls readWriteByte. See C++ implementation file for more info
      *
      * @param motor Which motor to talk to (in our case, the chip select)
      * @param data The data to send
@@ -152,7 +152,8 @@ class MotorService
     uint8_t readWriteByte(uint8_t motor, uint8_t data, uint8_t last_transfer);
 
     // Select between driver and controller gpio
-    GPIO spi_cs_driver_to_controller_demux_gpio;
+    GPIO spi_demux_select_0;
+    GPIO spi_demux_select_1;
 
     // Enable driver gpio
     GPIO driver_control_enable_gpio;

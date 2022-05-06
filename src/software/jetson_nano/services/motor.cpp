@@ -40,8 +40,10 @@ static const uint32_t TOTAL_NUMBER_OF_MOTORS        = 5;
 static const char* SPI_PATHS[] = {"/dev/spidev0.0", "/dev/spidev0.1", "/dev/spidev0.2",
                                   "/dev/spidev0.3", "/dev/spidev0.4"};
 
-static const char* SPI_CS_DRIVER_TO_CONTROLLER_MUX_GPIO = "77";
-static const char* DRIVER_CONTROL_ENABLE_GPIO           = "38";
+static const char* SPI_CS_DRIVER_TO_CONTROLLER_MUX_0_GPIO = "51";
+static const char* SPI_CS_DRIVER_TO_CONTROLLER_MUX_1_GPIO = "76";
+static const char* MOTOR_DRIVER_RESET_GPIO                = "168";
+static const char* DRIVER_CONTROL_ENABLE_GPIO             = "194";
 
 extern "C"
 {
@@ -66,8 +68,10 @@ extern "C"
 MotorService::MotorService(const RobotConstants_t& robot_constants,
                            const WheelConstants_t& wheel_constants,
                            int control_loop_frequency_hz)
-    : spi_cs_driver_to_controller_demux_gpio(SPI_CS_DRIVER_TO_CONTROLLER_MUX_GPIO,
-                                             GpioDirection::OUTPUT, GpioState::HIGH),
+    : spi_demux_select_0(SPI_CS_DRIVER_TO_CONTROLLER_MUX_0_GPIO, GpioDirection::OUTPUT,
+                         GpioState::LOW),
+      spi_demux_select_1(SPI_CS_DRIVER_TO_CONTROLLER_MUX_1_GPIO, GpioDirection::OUTPUT,
+                         GpioState::LOW),
       driver_control_enable_gpio(DRIVER_CONTROL_ENABLE_GPIO, GpioDirection::OUTPUT,
                                  GpioState::HIGH),
       euclidean_to_four_wheel(control_loop_frequency_hz, robot_constants)
@@ -232,36 +236,39 @@ void MotorService::spiTransfer(int fd, uint8_t const* tx, uint8_t const* rx, uns
 // readWriteByte function, provided that the chip select pin is turning on
 // the right chip.
 //
-// Each TMC4671 and TMC6100 pair have their chip selects coming in from a
-// demux (see diagram below). The demux is controlled by the
-// spi_cs_driver_to_controller_demux_gpio. When low, the chip select is passed
-// to the TMC4671, and to the TMC6100 when high.
+// Each TMC4671 controller, TMC6100 driver and encoder group have their chip
+// selects coming in from a demux (see diagram below). The demux is controlled
+// by two bits {spi_demux_select_0, spi_demux_select_1}. The two bits are
+// 10 the TMC4671 is selected, when they are 01 the TMC6100 is selected and
+// when they are 00 the encoder is selected.
 //
 //
-//                                               FRONT LEFT MOTOR
-//                                              CONTROLLER + DRIVER
-//                                             ┌─────────────────┐
-//                                             │                 │
-//                            ┌───────┐        │   ┌─────────┐   │
-//                            │       │ SEL(LOW)   │         │   │
-//                            │  1:2  ├────────┬───►TMC4671  │   │
-//                            │       │        │   └─────────┘   │
-//             FRONT_LEFT_CS  │ DEMUX │        │                 │
-//             ───────────────►       │        │   ┌─────────┐   │
-//                            │       │SEL(HIGH)   │         │   │
-//                            │       ├────────┬───►TMC6100  │   │
-//                            │       │        │   └─────────┘   │
-//                            │       │        │                 │
-//                            └───▲───┘        └─────────────────┘
-//                                │
-//                                │ SEL
-//                                │
-//                  spi_cs_driver_to_controller_demux
+//                                      FRONT LEFT MOTOR
+//                                 CONTROLLER + DRIVER + ENCODER
+//
+//                    ┌───────┐        ┌───────────────┐
+//                    │       │        │               │
+//                    │  2:4  │  10    │  ┌─────────┐  │
+//                    │       ├────────┼──►TMC4671  │  │
+//     FRONT_LEFT_CS  │ DEMUX │        │  └─────────┘  │
+//     ───────────────►       │        │               │
+//                    │       │  01    │  ┌─────────┐  │
+//                    │       ├────────┼──►TMC6100  │  │
+//                    │       │        │  └─────────┘  │
+//                    │       │        │               │
+//                    │       │  11    │  ┌─────────┐  │
+//                    │       ├────────┼──►ENCODER  │  │
+//                    │       │        │  └─────────┘  │
+//                    └───▲───┘        │               │
+//                        │            └───────────────┘
+//                        │
+//                spi_demux_sel_0 & 1
 //
 uint8_t MotorService::tmc4671ReadWriteByte(uint8_t motor, uint8_t data,
                                            uint8_t last_transfer)
 {
-    spi_cs_driver_to_controller_demux_gpio.setValue(GpioState::LOW);
+    spi_demux_select_0.setValue(GpioState::HIGH);
+    spi_demux_select_1.setValue(GpioState::LOW);
     driver_control_enable_gpio.setValue(GpioState::HIGH);
     return readWriteByte(motor, data, last_transfer);
 }
@@ -269,7 +276,8 @@ uint8_t MotorService::tmc4671ReadWriteByte(uint8_t motor, uint8_t data,
 uint8_t MotorService::tmc6100ReadWriteByte(uint8_t motor, uint8_t data,
                                            uint8_t last_transfer)
 {
-    spi_cs_driver_to_controller_demux_gpio.setValue(GpioState::HIGH);
+    spi_demux_select_0.setValue(GpioState::LOW);
+    spi_demux_select_1.setValue(GpioState::HIGH);
     driver_control_enable_gpio.setValue(GpioState::LOW);
     return readWriteByte(motor, data, last_transfer);
 }

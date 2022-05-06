@@ -31,7 +31,7 @@ from proto.message_translation import tbots_protobuf
 
 from software.py_constants import *
 from software.networking import threaded_unix_sender
-from software.thunderscope.arbitrary_plot.named_value_plotter import NamedValuePlotter
+from software.thunderscope.arbitrary_plot.proto_plotter import ProtoPlotter
 from software.thunderscope.binary_context_managers import *
 from extlibs.er_force_sim.src.protobuf.world_pb2 import *
 
@@ -143,6 +143,8 @@ class Thunderscope(object):
             if blue_full_system_proto_unix_io is None
             else blue_full_system_proto_unix_io
         )
+
+        self.robot_diagnostics_proto_unix_io = ProtoUnixIO()
 
         self.refresh_timers = []
 
@@ -260,7 +262,9 @@ Cntrl-Click and Drag: Move ball and kick
                     default_shelf["yellow_dock_state"] = shelf["yellow_dock_state"]
                     default_shelf.sync()
 
-    def load_saved_layout(self, layout_path, load_blue=True, load_yellow=True):
+    def load_saved_layout(
+        self, layout_path, load_blue=True, load_yellow=True, load_diagnostics=False
+    ):
         """Load the specified layout or the default file. If the default layout
         file doesn't exist, and no layout is provided, then just configure
         the default layout.
@@ -277,9 +281,6 @@ Cntrl-Click and Drag: Move ball and kick
                 self.yellow_full_system_proto_unix_io,
                 True,
             )
-            self.configure_robot_diagnostics_layout(
-                self.yellow_full_system_proto_unix_io
-            )
 
         if load_blue:
             self.configure_full_system_layout(
@@ -288,14 +289,19 @@ Cntrl-Click and Drag: Move ball and kick
                 self.blue_full_system_proto_unix_io,
                 False,
             )
-            self.configure_robot_diagnostics_layout(self.blue_full_system_proto_unix_io)
 
-        path = layout_path if layout_path else SAVED_LAYOUT_PATH
+        if load_yellow or load_blue:
+            path = layout_path if layout_path else SAVED_LAYOUT_PATH
 
-        try:
-            self.load_layout(path)
-        except Exception:
-            pass
+            try:
+                self.load_layout(path)
+            except Exception:
+                pass
+
+        if load_diagnostics:
+            self.configure_robot_diagnostics_layout(
+                self.robot_diagnostics_proto_unix_io
+            )
 
     def register_refresh_function(self, refresh_func):
         """Register the refresh functions to run at the refresh_interval_ms
@@ -375,8 +381,13 @@ Cntrl-Click and Drag: Move ball and kick
         drive_dock = Dock("Drive and Dribbler")
         drive_dock.addWidget(self.diagnostics_widgets["drive"])
 
-        self.robot_diagnostics_dock_area.addDock(chicker_dock)
-        self.robot_diagnostics_dock_area.addDock(drive_dock, "right", chicker_dock)
+        self.diagnostics_widgets["log_widget"] = self.setup_log_widget(proto_unix_io)
+        log_dock = Dock("Logs")
+        log_dock.addWidget(self.diagnostics_widgets["log_widget"])
+
+        self.robot_diagnostics_dock_area.addDock(log_dock)
+        self.robot_diagnostics_dock_area.addDock(drive_dock, "right", log_dock)
+        self.robot_diagnostics_dock_area.addDock(chicker_dock, "bottom", drive_dock)
 
     def setup_field_widget(
         self, sim_proto_unix_io, full_system_proto_unix_io, friendly_colour_yellow
@@ -458,18 +469,22 @@ Cntrl-Click and Drag: Move ball and kick
         :returns: The performance plot widget
 
         """
-        # Create widget
-        named_value_plotter = NamedValuePlotter()
 
-        # Register observer
-        proto_unix_io.register_observer(
-            NamedValue, named_value_plotter.named_value_buffer
+        def extract_namedvalue_data(named_value_data):
+            return {named_value_data.name: named_value_data.value}
+
+        # Create widget
+        proto_plotter = ProtoPlotter(
+            configuration={NamedValue: extract_namedvalue_data}
         )
 
-        # Register refresh function
-        self.register_refresh_function(named_value_plotter.refresh)
+        # Register observer
+        proto_unix_io.register_observer(NamedValue, proto_plotter.buffers[NamedValue])
 
-        return named_value_plotter
+        # Register refresh function
+        self.register_refresh_function(proto_plotter.refresh)
+
+        return proto_plotter
 
     def setup_play_info(self, proto_unix_io):
         """Setup the play info widget
