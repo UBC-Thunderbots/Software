@@ -2,109 +2,76 @@
 
 - name: Remote flashing
   hosts: THUNDERBOTS_HOSTS
+  vars:
+   all_services:
+     - thunderloop
+     - display
+     - announcement
+     - redis
+   all_actions:
+     - stop
+     - sync
+     - start
+   binary_paths:
+     thunderloop: ../../../../../../../../jetson_nano/thunderloop_main
+     announcement: ../../../../../../../../jetson_nano/broadcasts
+     redis: ../../../../../../../../jetson_nano/redis
+     display: ../../../../../../../../jetson_nano/display
 
   tasks:
 
     - debug:
         msg: "[Robot ID = {{ inventory_hostname }}]"
+      tags: always
 
-    - name: Handling Thunderloop Service
-      tags: thunderloop
-      block:
-        - name: Stop Thunderloop Service
-          become: true
-          become_method: sudo
-          tags:
-            - stop
-          ansible.builtin.systemd:
-            name: thunderloop
-            masked: no
-            daemon_reload: yes
-            state: stopped
+    - name: extract services & actions from tags
+      set_fact:
+        services: "{{ all_services if ansible_run_tags | intersect(all_services)|length == 0 else ansible_run_tags | intersect(all_services) }}"
+        actions: "{{ all_actions if ansible_run_tags|intersect(all_actions)|length == 0 else ansible_run_tags | intersect(all_actions)}}"
+      tags: always
 
-        - name: Sync Thunderloop Binary
-          tags:
-            - sync
-          ansible.posix.synchronize:
-            src: ../../../../../../../../jetson_nano/thunderloop_main
-            dest: ~/thunderbots_binaries/
-            recursive: yes
-            copy_links: yes
+    - debug:
+        msg: "Performing the following actions: {{ actions }}
+        on the following services: {{ services }}"
+      tags: always
 
-    - name: Handling Announcement Service
-      tags: announcement
-      block:
-        - name: Stop Running Service
-          become: true
-          become_method: sudo
-          ansible.builtin.systemd:
-            name: announcement
-            masked: no
-            daemon_reload: yes
-            state: stopped
-
-        - name: Sync Announcement Binary
-          ansible.posix.synchronize:
-            src: ../../../../../../../../jetson_nano/broadcasts
-            dest: ~/thunderbots_binaries/
-            recursive: yes
-            copy_links: yes
-
-    - name: Handling Redis Service
-      tags: redis
-      block:
-        - name: Stop Redis Service
-          become: true
-          become_method: sudo
-          ansible.builtin.systemd:
-            name: redis
-            masked: no
-            daemon_reload: yes
-            state: stopped
-
-        - name: Sync Redis Binary
-          ansible.posix.synchronize:
-            src: ../../../../../../../../jetson_nano/redis
-            dest: ~/thunderbots_binaries/
-            recursive: yes
-            copy_links: yes
-
-    - name: Handling display Binary
-      tags: display
-      block:
-        - name: Stop display Service
-          become: true
-          become_method: sudo
-          ansible.builtin.systemd:
-            name: display
-            masked: no
-            daemon_reload: yes
-            state: stopped
-
-        - name: Sync display Binary
-          ansible.posix.synchronize:
-            src: ../../../../../../../../jetson_nano/display
-            dest: ~/thunderbots_binaries/
-            recursive: yes
-            copy_links: yes
-
-    - name: start binaries
+    - name: Stop Services
       become: true
       become_method: sudo
-      with_items:
-        - thunderbots
-        - redis
-        - thunderloop
-        - announcement
-        - display
+      ansible.builtin.systemd:
+        name: "{{ service_name }}"
+        masked: no
+        daemon_reload: yes
+        state: stopped
+      with_items: "{{ services }}"
       loop_control:
         loop_var: service_name
+      when: "'stop' in actions"
+      tags: always
+
+    - name: Sync Binaries
+      ansible.posix.synchronize:
+        src: "{{ binary_paths[service_name] }}"
+        dest: ~/thunderbots_binaries/
+        recursive: yes
+        copy_links: yes
+      with_items: "{{ services }}"
+      loop_control:
+        loop_var: service_name
+      when: "'sync' in actions"
+      tags: always
+
+
+    - name: Start Services
+      become: true
+      become_method: sudo
       ansible.builtin.systemd:
         name: "{{ service_name }}"
         masked: no
         daemon_reload: yes
         state: started
-      tags:
-        - always
-
-
+      with_items: "{{ services }}"
+      loop_control:
+        loop_var: service_name
+      when: "'start' in actions"
+      tags: always

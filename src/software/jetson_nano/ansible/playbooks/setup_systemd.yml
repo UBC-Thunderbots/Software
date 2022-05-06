@@ -24,7 +24,7 @@
       tags:
         - syncBinaries
 
-    - name: sync all relevant systemd files
+    - name: sync all systemd files
       become_method: sudo
       become: true
       tags:

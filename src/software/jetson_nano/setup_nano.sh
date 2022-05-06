@@ -24,7 +24,7 @@ if ! sudo /usr/bin/python3.6 -m venv /opt/tbotspython ; then
 fi
 
 echo "##############################################################"
-echo "Finished Nano Setup Script v2"
+echo "Finished Nano Setup Script"
 echo "##############################################################"
 
 exit 0

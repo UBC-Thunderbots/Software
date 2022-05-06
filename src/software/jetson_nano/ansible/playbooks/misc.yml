@@ -1,5 +1,5 @@
 ---
-#This file has a bunch of common tasks that can be reused in other playbooks or individually
+#This file has a bunch of common tasks that can be used individually
 
 - name: misc tasks (run using --tags)
   hosts: THUNDERBOTS_HOSTS
@@ -37,16 +37,8 @@
   - name: Stop All Services
     become: true
     become_method: sudo
-    with_items:
-      - thunderbots
-      - redis
-      - thunderloop
-      - ui
-      - announcement
-    loop_control:
-      loop_var: service_name
     ansible.builtin.systemd:
-      name: "{{ service_name }}"
+      name: thunderbots
       masked: no
       daemon_reload: yes
       state: stopped

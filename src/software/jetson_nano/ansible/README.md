@@ -35,9 +35,19 @@ After Ansible is setup, remote flashing, done through Systemd, can be setup by r
 
 Running the `setup_systemd.yml` playbook will copy all relevant thunderbots binaries into the Jetson Nanos and reboot the nanos. After rebooting, the binaries will automatically be run. 
 
-The `remote_flash.yml` playbook pushes new binaries to hosts and restarts services. The "--tags" argument can be used to specify which binaries to push. If no tags are specified, all binaries will be pushed. Possible tags are: thunderloop, announcement, display, redis. 
-For example, to remote flash thunderloop and redis, run the command: 
+The `remote_flash.yml` playbook stops services, syncs new binaries to hosts and restarts services. The "--tags" argument can be used to specify which actions to perform and on which services. 
+Possible service tags: thunderloop, announcement, display, redis. 
+Possible action tags: stop, sync, start
+
+if no service/action tags are specified, all service/actions will be used. 
+
+For example, to remote flash (ie stop+sync+start) thunderloop and redis, run the command: 
  ``bazel run :run_ansible --cpu=jetson_nano -- -pb remote_flash.yml -ho [list of ip addrs] -pwd {ssh_pass} -t thunderloop redis`` 
+ 
+To just stop the thunderloop and redis services, use: 
+ ``bazel run :run_ansible --cpu=jetson_nano -- -pb remote_flash.yml -ho [list of ip addrs] -pwd {ssh_pass} -t thunderloop redis stop`` 
+
+**warning** : the 'sync' action involves replacing a service's binary file, which might not work if the service is running at the time of replacement. Thus, it is best not to run the sync action unless accompanied with a stop action.
 
 ### Miscellaneous Tasks
 Individual miscellaneous tasks (ex reboot, rtt test) can be run through the `misc.yml` playbook by specifiying the corresponding tag. 
