@@ -4,6 +4,13 @@
   hosts: THUNDERBOTS_HOSTS
 
   tasks:
+
+    - name: check internet connection
+      uri:
+        url: "https://google.com"
+        timeout: 30
+        status_code: 200
+
     - name: enable passwordless sudo for rsync
       become: true
       become_method: sudo
@@ -23,12 +30,6 @@
         dest: ~/
         recursive: yes
         copy_links: yes
-
-    - name: check internet connection
-      uri:
-        url: "https://google.com"
-        timeout: 30
-        status_code: 200
 
     - name: run the setup script
       become_method: sudo
