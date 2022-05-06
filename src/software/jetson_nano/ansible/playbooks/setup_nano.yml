@@ -24,10 +24,16 @@
         recursive: yes
         copy_links: yes
 
+    - name: check internet connection
+      uri:
+        url: "https://google.com"
+        timeout: 30
+        status_code: 200
+
     - name: run the setup script
       become_method: sudo
       become: true
-      shell: bash /home/"{{ ansible_user }}"/setup_nano.sh
+      shell: bash /home/"{{ ansible_user }}"/setup_nano.sh >& /tmp/setup.log
       async: 300
       poll: 0
       register: result_async

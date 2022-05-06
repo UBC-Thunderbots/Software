@@ -5,7 +5,7 @@
 host_software_packages=(
     libjpeg-dev
     python3.8       # Python 3
-    python3-venv # Virtual Environment
+    python3.8-venv # Virtual Environment
     zlib1g-dev
 )
 
