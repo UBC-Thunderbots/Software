@@ -1,0 +1,110 @@
+---
+
+- name: Remote flashing
+  hosts: THUNDERBOTS_HOSTS
+
+  tasks:
+
+    - debug:
+        msg: "[Robot ID = {{ inventory_hostname }}]"
+
+    - name: Handling Thunderloop Service
+      tags: thunderloop
+      block:
+        - name: Stop Thunderloop Service
+          become: true
+          become_method: sudo
+          tags:
+            - stop
+          ansible.builtin.systemd:
+            name: thunderloop
+            masked: no
+            daemon_reload: yes
+            state: stopped
+
+        - name: Sync Thunderloop Binary
+          tags:
+            - sync
+          ansible.posix.synchronize:
+            src: ../../../../../../../../jetson_nano/thunderloop_main
+            dest: ~/thunderbots_binaries/
+            recursive: yes
+            copy_links: yes
+
+    - name: Handling Announcement Service
+      tags: announcement
+      block:
+        - name: Stop Running Service
+          become: true
+          become_method: sudo
+          ansible.builtin.systemd:
+            name: announcement
+            masked: no
+            daemon_reload: yes
+            state: stopped
+
+        - name: Sync Announcement Binary
+          ansible.posix.synchronize:
+            src: ../../../../../../../../jetson_nano/broadcasts
+            dest: ~/thunderbots_binaries/
+            recursive: yes
+            copy_links: yes
+
+    - name: Handling Redis Service
+      tags: redis
+      block:
+        - name: Stop Redis Service
+          become: true
+          become_method: sudo
+          ansible.builtin.systemd:
+            name: redis
+            masked: no
+            daemon_reload: yes
+            state: stopped
+
+        - name: Sync Redis Binary
+          ansible.posix.synchronize:
+            src: ../../../../../../../../jetson_nano/redis
+            dest: ~/thunderbots_binaries/
+            recursive: yes
+            copy_links: yes
+
+    - name: Handling display Binary
+      tags: display
+      block:
+        - name: Stop display Service
+          become: true
+          become_method: sudo
+          ansible.builtin.systemd:
+            name: display
+            masked: no
+            daemon_reload: yes
+            state: stopped
+
+        - name: Sync display Binary
+          ansible.posix.synchronize:
+            src: ../../../../../../../../jetson_nano/display
+            dest: ~/thunderbots_binaries/
+            recursive: yes
+            copy_links: yes
+
+    - name: start binaries
+      become: true
+      become_method: sudo
+      with_items:
+        - thunderbots
+        - redis
+        - thunderloop
+        - announcement
+        - display
+      loop_control:
+        loop_var: service_name
+      ansible.builtin.systemd:
+        name: "{{ service_name }}"
+        masked: no
+        daemon_reload: yes
+        state: started
+      tags:
+        - always
+
+

@@ -13,6 +13,7 @@
         - ../../../../../../../../jetson_nano/display
         - ../../../../../../../../jetson_nano/broadcasts
         - ../../../../../../../../jetson_nano/thunderloop_main
+        - ../../../../../../../../jetson_nano/redis
       loop_control:
         loop_var: binary_path
       ansible.posix.synchronize:
@@ -21,13 +22,12 @@
         recursive: yes
         copy_links: yes
       tags:
-        - syncAllBinaries
+        - syncBinaries
 
     - name: sync all relevant systemd files
       become_method: sudo
       become: true
       tags:
-        - systemd
         - syncSystemdFiles
       register: res
       ansible.posix.synchronize:
@@ -43,7 +43,7 @@
         - thunderbots
         - redis
         - thunderloop
-        - ui
+        - display
         - announcement
       loop_control:
         loop_var: service_name
@@ -53,7 +53,7 @@
         masked: no
         daemon_reload: yes
       tags:
-        - systemd
+        - enableSystemd
 
     - name: Reboot
       become: true
@@ -62,7 +62,6 @@
       register: res
       tags:
         - reboot
-        - systemd
       reboot:
         msg: "Reboot initiated by Ansible"
         connect_timeout: 20

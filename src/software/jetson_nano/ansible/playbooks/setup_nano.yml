@@ -13,22 +13,44 @@
         insertafter: EOF
         line: '{{ ansible_user }} ALL=NOPASSWD:/usr/bin/rsync'
 
-    - name: Copy and Execute the setup_nano script
-      script: ../../setup_nano.sh
+    - name: Sync Setup Script
       become: true
       become_method: sudo
-      async: 3600
-      poll: 10
+      tags:
+        - sync
+      ansible.posix.synchronize:
+        src: ../../setup_nano.sh
+        dest: ~/
+        recursive: yes
+        copy_links: yes
+
+    - name: run the setup script
+      become_method: sudo
+      become: true
+      shell: bash /home/"{{ ansible_user }}"/setup_nano.sh
+      async: 300
+      poll: 0
       register: result_async
+      tags:
+        - runScript
+      args:
+        chdir: ~/
 
-    - name: Check command
-      async_status: jid="{{ result_async.ansible_job_id }}"
+    - name: Check Setup Status
+      become: true
+      become_method: sudo
+      async_status:
+        jid: "{{ result_async.ansible_job_id }}"
       register: result
-      failed_when: result.finished != 1 or "Finished 'command'" not in result.stdout
+      ignore_errors: yes
+      until: result.finished
+      retries: 30
+      delay: 10
 
-    - debug:
+    - name: Setup Success Msg
+      debug:
         msg:
           - "[Robot ID = {{ inventory_hostname }}]"
-          - "stdout = {{ res.stdout_lines }} "
-          - "stderr = {{ res.stderr }}"
+          - "--- Setup successful ---"
+      when: "result.rc is defined and result.rc == 0"
 

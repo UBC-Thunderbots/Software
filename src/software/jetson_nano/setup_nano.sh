@@ -1,11 +1,13 @@
 #!/bin/bash
-sudo apt-get update
+
 
 # (sorted alphabetically)
 host_software_packages=(
     python3       # Python 3
     python3-venv # Virtual Environment
 )
+
+sudo apt-get update
 
 if ! sudo apt-get install "${host_software_packages[@]}" -y ; then
     echo "##############################################################"
@@ -20,3 +22,9 @@ if ! sudo /usr/bin/python3.6 -m venv /opt/tbotspython ; then
     echo "##############################################################"
     exit 1
 fi
+
+echo "##############################################################"
+echo "Finished Nano Setup Script v2"
+echo "##############################################################"
+
+exit 0
