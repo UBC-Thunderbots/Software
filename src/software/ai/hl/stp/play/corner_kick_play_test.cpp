@@ -20,8 +20,7 @@ class CornerKickPlayTest : public SimulatedErForceSimPlayTestFixture
     Field field                      = Field::createField(field_type);
 };
 
-// TODO (#2577): re-enable once fixed
-TEST_F(CornerKickPlayTest, DISABLED_test_corner_kick_play_bottom_left)
+TEST_F(CornerKickPlayTest, test_corner_kick_play_bottom_left)
 {
     BallState ball_state(Point(4.5, -3), Vector(0, 0));
     auto friendly_robots = TestUtil::createStationaryRobotStatesWithId(
@@ -49,8 +48,7 @@ TEST_F(CornerKickPlayTest, DISABLED_test_corner_kick_play_bottom_left)
             Duration::fromSeconds(10));
 }
 
-// TODO (#2577): re-enable once fixed
-TEST_F(CornerKickPlayTest, DISABLED_test_corner_kick_play_top_right)
+TEST_F(CornerKickPlayTest, test_corner_kick_play_top_right)
 {
     BallState ball_state(Point(4.5, 3), Vector(0, 0));
     auto friendly_robots = TestUtil::createStationaryRobotStatesWithId(
