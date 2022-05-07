@@ -49,7 +49,8 @@ TEST_F(CornerKickPlayTest, DISABLED_test_corner_kick_play_bottom_left)
             Duration::fromSeconds(10));
 }
 
-TEST_F(CornerKickPlayTest, test_corner_kick_play_top_right)
+// TODO (#2577): re-enable once fixed
+TEST_F(CornerKickPlayTest, DISABLED_test_corner_kick_play_top_right)
 {
     BallState ball_state(Point(4.5, 3), Vector(0, 0));
     auto friendly_robots = TestUtil::createStationaryRobotStatesWithId(

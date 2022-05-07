@@ -13,7 +13,6 @@ PenaltyKickEnemyPlay::PenaltyKickEnemyPlay(std::shared_ptr<const AiConfig> confi
 void PenaltyKickEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
                                           const World &world)
 {
-    auto goalie_tactic = std::make_shared<GoalieTactic>(ai_config);
     auto move_tactic_2 = std::make_shared<MoveTactic>();
     auto move_tactic_3 = std::make_shared<MoveTactic>();
     auto move_tactic_4 = std::make_shared<MoveTactic>();
