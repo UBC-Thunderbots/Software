@@ -156,18 +156,17 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
             // (aka don't assign) the tactics at the end of the vector since they are
             // considered lower priority
             tactic_vector.resize(robots.size());
-            num_tactics = tactic_vector.size();
         }
         else if (i == (priority_tactics.size() - 1))
         {
             // If assigning the last tactic vector, then assign rest of robots with
             // StopTactics
-            // TODO: make sure these tactics get assigned
-            for (unsigned int i = 0; i < (robots.size() - num_tactics); i++)
+            for (unsigned int ii = 0; ii < (robots.size() - num_tactics); ii++)
             {
-                tactic_vector.push_back(stop_tactics[i]);
+                tactic_vector.push_back(stop_tactics[ii]);
             }
         }
+        num_tactics = tactic_vector.size();
 
         std::vector<std::unique_ptr<TbotsProto::PrimitiveSet>> primitive_sets;
 
@@ -330,7 +329,6 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::getPrimitivesFromTactic(
             *(motion_control.mutable_requested_destination()) =
                 *createPointProto(destination);
 
-            // TODO: we shouldn't have to check the number of knots in the path but we do
             if (path.has_value() && path.value().getKnots().size() > 1)
             {
                 path_points = path.value().getKnots();
