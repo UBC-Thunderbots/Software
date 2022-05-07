@@ -53,7 +53,7 @@ TEST_P(PenaltyKickTacticTest, DISABLED_penalty_kick_test)
             non_terminating_validation_functions, Duration::fromSeconds(10));
 }
 
-// TODO: fix and re-enable
+// TODO (#2519): fix and re-enable
 TEST_F(PenaltyKickTacticTest, DISABLED_penalty_no_goalie)
 {
     auto tactic               = std::make_shared<PenaltyKickTactic>(ai_config);
