@@ -110,11 +110,11 @@ TEST_F(DefensePlayTest, test_defense_play_one_immediate_threat)
             // Two friendly crease defenders should be close to the goalie
             Point goalie_position = world_ptr->friendlyTeam().goalie()->position();
             Rectangle left_crease_defender_rect(
-                Point(goalie_position.x(), goalie_position.y() + 0.4),
-                Point(goalie_position.x() + 0.4, goalie_position.y()));
+                Point(goalie_position.x(), goalie_position.y() + 0.5),
+                Point(goalie_position.x() + 0.5, goalie_position.y()));
             Rectangle right_crease_defender_rect(
                 Point(goalie_position.x(), goalie_position.y()),
-                Point(goalie_position.x() + 0.4, goalie_position.y() - 0.4));
+                Point(goalie_position.x() + 0.5, goalie_position.y() - 0.5));
             robotInPolygon(left_crease_defender_rect, 1, world_ptr, yield);
             robotInPolygon(right_crease_defender_rect, 1, world_ptr, yield);
         }};
