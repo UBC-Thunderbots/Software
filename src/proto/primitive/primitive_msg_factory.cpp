@@ -126,8 +126,8 @@ std::unique_ptr<TbotsProto::Primitive> createEstopPrimitive()
 }
 
 std::unique_ptr<TbotsProto::Primitive> createDirectControlPrimitive(
-    const Vector &velocity, AngularVelocity angular_velocity, double dribbler_speed_rpm,
-    const TbotsProto::AutoChipOrKick &auto_chip_or_kick)
+    const Vector& velocity, AngularVelocity angular_velocity, double dribbler_speed_rpm,
+    const TbotsProto::AutoChipOrKick& auto_chip_or_kick)
 {
     auto direct_control_primitive_msg = std::make_unique<TbotsProto::Primitive>();
 
