@@ -107,6 +107,8 @@ cc_library(
         ":robot_capabilities",
         ":robot_state",
         "//proto:tbots_cc_proto",
+        "//software:constants",
+        "//software/geom:polygon",
         "//software/logger",
         "//software/time:duration",
         "//software/time:timestamp",

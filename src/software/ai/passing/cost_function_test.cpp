@@ -17,14 +17,16 @@ class PassingEvaluationTest : public testing::Test
     {
         entire_field =
             std::make_shared<Rectangle>(Field::createSSLDivisionBField().fieldLines());
-        passing_config         = std::make_shared<PassingConfig>();
+        passing_config = std::make_shared<PassingConfig>();
+        passing_config->getMutableMinPassSpeedMPerS()->setValue(3.5);
+        passing_config->getMutableMaxPassSpeedMPerS()->setValue(5.5);
         avg_desired_pass_speed = 3.9;
     }
 
     double avg_desired_pass_speed;
 
     std::shared_ptr<Rectangle> entire_field;
-    std::shared_ptr<const PassingConfig> passing_config;
+    std::shared_ptr<PassingConfig> passing_config;
 };
 
 // This test is disabled to speed up CI, it can be enabled by removing "DISABLED_" from

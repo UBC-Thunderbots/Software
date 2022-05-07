@@ -4,8 +4,7 @@
 
 ShootOrPassPlayFSM::ShootOrPassPlayFSM(std::shared_ptr<const AiConfig> ai_config)
     : ai_config(ai_config),
-      attacker_tactic(
-          std::make_shared<AttackerTactic>(ai_config->getAttackerTacticConfig())),
+      attacker_tactic(std::make_shared<AttackerTactic>(ai_config)),
       receiver_tactic(std::make_shared<ReceiverTactic>()),
       offensive_positioning_tactics(std::vector<std::shared_ptr<MoveTactic>>()),
       pass_generator(
@@ -96,8 +95,7 @@ void ShootOrPassPlayFSM::lookForPass(const Update& event)
 
 void ShootOrPassPlayFSM::startLookingForPass(const Update& event)
 {
-    attacker_tactic =
-        std::make_shared<AttackerTactic>(ai_config->getAttackerTacticConfig());
+    attacker_tactic              = std::make_shared<AttackerTactic>(ai_config);
     receiver_tactic              = std::make_shared<ReceiverTactic>();
     pass_optimization_start_time = event.common.world.getMostRecentTimestamp();
     lookForPass(event);
@@ -105,10 +103,6 @@ void ShootOrPassPlayFSM::startLookingForPass(const Update& event)
 
 void ShootOrPassPlayFSM::takePass(const Update& event)
 {
-    // Commit to a pass
-    LOG(DEBUG) << "Committing to pass: " << best_pass_and_score_so_far.pass;
-    LOG(DEBUG) << "Score of pass we committed to: " << best_pass_and_score_so_far.rating;
-
     auto pass_eval = pass_generator.generatePassEvaluation(event.common.world);
 
     auto ranked_zones = pass_eval.rankZonesForReceiving(
@@ -117,6 +111,8 @@ void ShootOrPassPlayFSM::takePass(const Update& event)
     // if we make it here then we have committed to the pass
     attacker_tactic->updateControlParams(best_pass_and_score_so_far.pass, true);
     receiver_tactic->updateControlParams(best_pass_and_score_so_far.pass);
+    event.common.set_inter_play_communication_fun(
+        InterPlayCommunication{.last_committed_pass = best_pass_and_score_so_far});
 
     if (!attacker_tactic->done())
     {

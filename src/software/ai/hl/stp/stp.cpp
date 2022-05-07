@@ -24,7 +24,7 @@
 STP::STP(std::shared_ptr<const AiConfig> ai_config)
     : robot_tactic_assignment(),
       ai_config(ai_config),
-      goalie_tactic(std::make_shared<GoalieTactic>(ai_config->getGoalieTacticConfig())),
+      goalie_tactic(std::make_shared<GoalieTactic>(ai_config)),
       stop_tactics(),
       current_play(std::make_unique<HaltPlay>(ai_config)),
       fsm(std::make_unique<FSM<PlaySelectionFSM>>(PlaySelectionFSM{ai_config})),
@@ -70,11 +70,19 @@ std::vector<std::unique_ptr<Intent>> STP::getIntentsFromCurrentPlay(const World&
 
     if (static_cast<bool>(override_play))
     {
-        return override_play->get(assignment_function, motion_constraint_function, world);
+        return override_play->get(assignment_function, motion_constraint_function, world,
+                                  inter_play_communication,
+                                  [this](InterPlayCommunication comm) {
+                                      inter_play_communication = std::move(comm);
+                                  });
     }
     else
     {
-        return current_play->get(assignment_function, motion_constraint_function, world);
+        return current_play->get(assignment_function, motion_constraint_function, world,
+                                 inter_play_communication,
+                                 [this](InterPlayCommunication comm) {
+                                     inter_play_communication = std::move(comm);
+                                 });
     }
 }
 

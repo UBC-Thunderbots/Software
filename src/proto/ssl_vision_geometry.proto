@@ -51,15 +51,21 @@ message SSL_FieldCircularArc
 
 message SSL_GeometryFieldSize
 {
-    required int32 field_length               = 1;
-    required int32 field_width                = 2;
-    required int32 goal_width                 = 3;
-    required int32 goal_depth                 = 4;
-    required int32 boundary_width             = 5;
-    repeated SSL_FieldLineSegment field_lines = 6;
-    repeated SSL_FieldCircularArc field_arcs  = 7;
-    optional int32 penalty_area_depth         = 8;
-    optional int32 penalty_area_width         = 9;
+    required int32 field_length                = 1;
+    required int32 field_width                 = 2;
+    required int32 goal_width                  = 3;
+    required int32 goal_depth                  = 4;
+    required int32 boundary_width              = 5;
+    repeated SSL_FieldLineSegment field_lines  = 6;
+    repeated SSL_FieldCircularArc field_arcs   = 7;
+    optional int32 penalty_area_depth          = 8;
+    optional int32 penalty_area_width          = 9;
+    optional int32 center_circle_radius        = 10;
+    optional int32 line_thickness              = 11;
+    optional int32 goal_center_to_penalty_mark = 12;
+    optional int32 goal_height                 = 13;
+    optional float ball_radius                 = 14;
+    optional float max_robot_radius            = 15;
 }
 
 message SSL_GeometryCameraCalibration
