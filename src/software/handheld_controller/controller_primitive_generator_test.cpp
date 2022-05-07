@@ -100,7 +100,7 @@ TEST_F(ControllerPrimitiveGeneratorTest, test_create_primitive_controller_input2
                               handheld_controller_config->getMaxAngularSpeed()->value();
     auto expected_direct_velocity_primitive = *createDirectControlPrimitive(
         Vector(x_velocity, y_velocity), AngularVelocity::fromRadians(angular_velocity),
-        dribbler_rpm);
+        dribbler_rpm, TbotsProto::AutoChipOrKick());
     EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
         expected_direct_velocity_primitive, actual_primitive));
 }
