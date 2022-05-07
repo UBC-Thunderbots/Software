@@ -17,7 +17,7 @@ def test_two_ai_ball_placement(simulated_test_runner, run_enemy_ai, test_duratio
     # starting point must be Point
     ball_initial_pos = tbots.Point(2, 2)
     # placement point must be Vector2 to work with game controller
-    ball_final_pos = Vector2(x=-3, y=-2)
+    ball_final_pos = tbots.Point(-3,-2)
 
     # Setup Bots
     blue_bots = [
@@ -49,7 +49,7 @@ def test_two_ai_ball_placement(simulated_test_runner, run_enemy_ai, test_duratio
     simulated_test_runner.gamecontroller.send_ci_input(
         gc_command=Command.Type.BALL_PLACEMENT,
         team=Team.BLUE,
-        ball_placement_pos_vec=ball_final_pos,
+        final_ball_placement_point=ball_final_pos,
     )
 
     # Force play override here
@@ -87,7 +87,7 @@ def test_two_ai_ball_placement(simulated_test_runner, run_enemy_ai, test_duratio
             # Ball should arrive within 5cm of placement point
             BallEventuallyEntersRegion(
                 regions=[
-                    tbots.Circle(tbots.Point(ball_final_pos.x, ball_final_pos.y), 0.05)
+                    tbots.Circle(ball_final_pos, 0.05)
                 ]
             ),
         ]

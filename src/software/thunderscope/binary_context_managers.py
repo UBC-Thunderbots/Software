@@ -404,7 +404,7 @@ class Gamecontroller(object):
         self,
         gc_command: proto.ssl_gc_state_pb2.Command,
         team: proto.ssl_gc_common_pb2.Team,
-        ball_placement_pos_vec=None,
+        final_ball_placement_point=None,
     ):
         """Send a ci input to the gamecontroller.
 
@@ -430,10 +430,12 @@ class Gamecontroller(object):
         ci_ci_input.api_inputs.append(ci_input)
 
         # Do this only if ball placement pos is specified
-        if ball_placement_pos_vec:
+        if final_ball_placement_point:
             # Set position
             ball_placement_pos = SetBallPlacementPos()
-            ball_placement_pos.pos.CopyFrom(ball_placement_pos_vec)
+            ball_placement_pos.pos.CopyFrom(
+                Vector2(x=float(final_ball_placement_point.x()),y=float(final_ball_placement_point.y()))
+            )
             ci_change = Change()
             ci_input = Input()
             ci_change.set_ball_placement_pos.CopyFrom(ball_placement_pos)
