@@ -17,7 +17,7 @@ def test_two_ai_ball_placement(simulated_test_runner, run_enemy_ai, test_duratio
     # starting point must be Point
     ball_initial_pos = tbots.Point(2, 2)
     # placement point must be Vector2 to work with game controller
-    ball_final_pos = tbots.Point(-3,-2)
+    ball_final_pos = tbots.Point(-3, -2)
 
     # Setup Bots
     blue_bots = [
@@ -85,11 +85,7 @@ def test_two_ai_ball_placement(simulated_test_runner, run_enemy_ai, test_duratio
     eventually_validation_sequence_set = [
         [
             # Ball should arrive within 5cm of placement point
-            BallEventuallyEntersRegion(
-                regions=[
-                    tbots.Circle(ball_final_pos, 0.05)
-                ]
-            ),
+            BallEventuallyEntersRegion(regions=[tbots.Circle(ball_final_pos, 0.05)]),
         ]
     ]
 

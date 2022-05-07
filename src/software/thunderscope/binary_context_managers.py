@@ -434,7 +434,10 @@ class Gamecontroller(object):
             # Set position
             ball_placement_pos = SetBallPlacementPos()
             ball_placement_pos.pos.CopyFrom(
-                Vector2(x=float(final_ball_placement_point.x()),y=float(final_ball_placement_point.y()))
+                Vector2(
+                    x=float(final_ball_placement_point.x()),
+                    y=float(final_ball_placement_point.y()),
+                )
             )
             ci_change = Change()
             ci_input = Input()
