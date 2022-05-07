@@ -45,7 +45,7 @@ TEST_F(CornerKickPlayTest, test_corner_kick_play_bottom_left)
 
     runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(10));
+            Duration::fromSeconds(15));
 }
 
 TEST_F(CornerKickPlayTest, test_corner_kick_play_top_right)
