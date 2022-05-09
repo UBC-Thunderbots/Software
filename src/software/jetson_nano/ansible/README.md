@@ -53,4 +53,4 @@ To just stop the thunderloop and redis services, use:
 **warning** : the 'sync' action involves replacing a service's binary file, which might not work if the service is running at the time of replacement. Thus, it is best not to run the sync action unless accompanied with a stop action.
 
 ### Miscellaneous Tasks
-Individual miscellaneous tasks (ex reboot, shutdown, rtt test) can be run through the `misc.yml` playbook by specifiying the corresponding tag. 
+Individual miscellaneous tasks (ex reboot, shutdown, rtt test) can be run through the `misc.yml` playbook by specifying the corresponding tag. 
