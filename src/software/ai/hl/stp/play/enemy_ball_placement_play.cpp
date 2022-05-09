@@ -81,8 +81,11 @@ void EnemyBallPlacementPlay::ballPlacementWithShadow(
             move_tactics[0]->updateControlParams(
                 placement_point + placement_to_net,
                 placement_to_net.orientation() + Angle::half(), 0);
-            shadow_enemy->updateControlParams(enemy_threats.at(0),
-                                              ROBOT_MAX_RADIUS_METERS * 3);
+            // We need a big shadow distance to avoid "bullying" the robot ball placing.
+            // Otherwise, we get a penalty
+            shadow_enemy->updateControlParams(
+                enemy_threats.at(0),
+                ROBOT_MAX_RADIUS_METERS * 4);  // Leave 2 robot widths distance (~36cm)
 
             tactics_to_run[0].emplace_back(move_tactics[0]);
             tactics_to_run[0].emplace_back(shadow_enemy);

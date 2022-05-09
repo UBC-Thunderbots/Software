@@ -83,7 +83,14 @@ void SensorFusion::updateWorld(const SSLProto::SSL_WrapperPacket &packet)
 
     if (packet.has_detection())
     {
-        checkForVisionReset(packet.detection().t_capture());
+        if (checkForVisionReset(packet.detection().t_capture()))
+        {
+            LOG(WARNING) << "Vision reset detected... Resetting SensorFusion!";
+            resetWorldComponents();
+
+            // Process the geometry again
+            updateWorld(packet.geometry());
+        }
         updateWorld(packet.detection());
     }
 }
@@ -364,7 +371,7 @@ bool SensorFusion::teamHasBall(const Team &team, const Ball &ball)
     return false;
 }
 
-void SensorFusion::checkForVisionReset(double t_capture)
+bool SensorFusion::checkForVisionReset(double t_capture)
 {
     if (t_capture < last_t_capture && t_capture < VISION_PACKET_RESET_TIME_THRESHOLD)
     {
@@ -378,11 +385,12 @@ void SensorFusion::checkForVisionReset(double t_capture)
 
     if (reset_time_vision_packets_detected > VISION_PACKET_RESET_COUNT_THRESHOLD)
     {
-        LOG(WARNING) << "Vision reset detected... Resetting SensorFusion!" << std::endl;
-        resetWorldComponents();
         last_t_capture                     = 0;
         reset_time_vision_packets_detected = 0;
+        return true;
     }
+
+    return false;
 }
 
 void SensorFusion::resetWorldComponents()

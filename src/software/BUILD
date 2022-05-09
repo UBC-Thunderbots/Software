@@ -37,20 +37,6 @@ cc_binary(
     ],
 )
 
-#cc_binary(
-#name = "network_log_listener_main",
-#srcs = ["network_log_listener_main.cpp"],
-#deps = [
-#"//proto:tbots_cc_proto",
-#"//shared:constants",
-#
-#"//software/logger:network_logger",
-#"//software/networking:threaded_proto_udp_listener",
-#"//software/networking:threaded_proto_udp_sender",
-#"@boost//:program_options",
-#],
-#)
-
 cc_library(
     name = "constants",
     hdrs = ["constants.h"],
@@ -79,11 +65,17 @@ pybind_library(
     name = "python_bindings_lib",
     srcs = ["python_bindings.cpp"],
     deps = [
+        "//proto:ssl_cc_proto",
+        "//proto:tbots_cc_proto",
         "//proto/message_translation:tbots_geometry",
+        "//software/estop:threaded_estop_reader",
         "//software/geom:angle",
         "//software/geom:point",
         "//software/geom:vector",
         "//software/geom/algorithms",
+        "//software/networking:threaded_proto_udp_listener",
+        "//software/networking:threaded_proto_udp_sender",
+        "//software/uart:boost_uart_communication",
         "//software/world",
         "//software/world:field",
         "@pybind11_protobuf//pybind11_protobuf:native_proto_caster",

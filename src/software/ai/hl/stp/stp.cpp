@@ -53,11 +53,19 @@ std::vector<std::unique_ptr<Intent>> STP::getIntentsFromCurrentPlay(const World&
 
     if (static_cast<bool>(override_play))
     {
-        return override_play->get(assignment_function, motion_constraint_function, world);
+        return override_play->get(assignment_function, motion_constraint_function, world,
+                                  inter_play_communication,
+                                  [this](InterPlayCommunication comm) {
+                                      inter_play_communication = std::move(comm);
+                                  });
     }
     else
     {
-        return current_play->get(assignment_function, motion_constraint_function, world);
+        return current_play->get(assignment_function, motion_constraint_function, world,
+                                 inter_play_communication,
+                                 [this](InterPlayCommunication comm) {
+                                     inter_play_communication = std::move(comm);
+                                 });
     }
 }
 

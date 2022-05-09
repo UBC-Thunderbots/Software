@@ -35,27 +35,31 @@ void OffensePlay::updateTactics(const PlayUpdate &play_update)
         num_defenders     = play_update.num_tactics - 1;
     }
 
-    shoot_or_pass_play->updateTactics(
-        PlayUpdate(play_update.world, num_shoot_or_pass,
-                   [&tactics_to_return](PriorityTacticVector new_tactics) {
-                       for (const auto &tactic_vector : new_tactics)
-                       {
-                           tactics_to_return.push_back(tactic_vector);
-                       }
-                   }));
+    shoot_or_pass_play->updateTactics(PlayUpdate(
+        play_update.world, num_shoot_or_pass,
+        [&tactics_to_return](PriorityTacticVector new_tactics) {
+            for (const auto &tactic_vector : new_tactics)
+            {
+                tactics_to_return.push_back(tactic_vector);
+            }
+        },
+        play_update.inter_play_communication,
+        play_update.set_inter_play_communication_fun));
 
     crease_defense_play->updateControlParams(
         play_update.world.ball().position(),
         TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
 
-    crease_defense_play->updateTactics(
-        PlayUpdate(play_update.world, num_defenders,
-                   [&tactics_to_return](PriorityTacticVector new_tactics) {
-                       for (const auto &tactic_vector : new_tactics)
-                       {
-                           tactics_to_return.push_back(tactic_vector);
-                       }
-                   }));
+    crease_defense_play->updateTactics(PlayUpdate(
+        play_update.world, num_defenders,
+        [&tactics_to_return](PriorityTacticVector new_tactics) {
+            for (const auto &tactic_vector : new_tactics)
+            {
+                tactics_to_return.push_back(tactic_vector);
+            }
+        },
+        play_update.inter_play_communication,
+        play_update.set_inter_play_communication_fun));
 
     play_update.set_tactics(tactics_to_return);
 }

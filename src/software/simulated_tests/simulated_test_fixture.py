@@ -1,7 +1,7 @@
 import threading
+import queue
 import argparse
 import time
-import queue
 
 import pytest
 import software.python_bindings as tbots
@@ -14,6 +14,7 @@ from software.simulated_tests.robot_enters_region import RobotEntersRegion
 
 from software.simulated_tests import validation
 from software.thunderscope.thunderscope import Thunderscope
+from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.py_constants import MILLISECONDS_PER_SECOND
 from software.thunderscope.binary_context_managers import (
@@ -27,6 +28,7 @@ from software.logger.logger import createLogger
 logger = createLogger(__name__)
 
 LAUNCH_DELAY_S = 0.2
+WORLD_BUFFER_TIMEOUT = 0.5
 PROCESS_BUFFER_DELAY_S = 0.01
 PAUSE_AFTER_FAIL_DELAY_S = 3
 
@@ -58,8 +60,24 @@ class SimulatorTestRunner(object):
         self.blue_full_system_proto_unix_io = blue_full_system_proto_unix_io
         self.yellow_full_system_proto_unix_io = yellow_full_system_proto_unix_io
         self.gamecontroller = gamecontroller
-        self.world_buffer = queue.Queue()
         self.last_exception = None
+
+        self.world_buffer = ThreadSafeBuffer(buffer_size=1, protobuf_type=World)
+        self.last_exception = None
+
+        self.ssl_wrapper_buffer = ThreadSafeBuffer(
+            buffer_size=1, protobuf_type=SSL_WrapperPacket
+        )
+        self.robot_status_buffer = ThreadSafeBuffer(
+            buffer_size=1, protobuf_type=RobotStatus
+        )
+
+        self.blue_full_system_proto_unix_io.register_observer(
+            SSL_WrapperPacket, self.ssl_wrapper_buffer
+        )
+        self.blue_full_system_proto_unix_io.register_observer(
+            RobotStatus, self.robot_status_buffer
+        )
 
     def run_test(
         self,
@@ -109,7 +127,26 @@ class SimulatorTestRunner(object):
                 if self.thunderscope:
                     time.sleep(tick_duration_s)
 
-                world = self.world_buffer.get()
+                while True:
+                    try:
+                        world = self.world_buffer.get(
+                            block=True, timeout=WORLD_BUFFER_TIMEOUT
+                        )
+                        break
+                    except queue.Empty as empty:
+                        # If we timeout, that means full_system missed the last
+                        # wrapper and robot status, lets resend it.
+                        logger.warning("Fullsystem missed last wrapper, resending ...")
+
+                        ssl_wrapper = self.ssl_wrapper_buffer.get(block=False)
+                        robot_status = self.robot_status_buffer.get(block=False)
+
+                        self.blue_full_system_proto_unix_io.send_proto(
+                            SSL_WrapperPacket, ssl_wrapper
+                        )
+                        self.blue_full_system_proto_unix_io.send_proto(
+                            RobotStatus, robot_status
+                        )
 
                 # Validate
                 (
@@ -189,15 +226,15 @@ def load_command_line_arguments():
         default="/tmp/tbots",
     )
     parser.add_argument(
-        "--blue_fullsystem_runtime_dir",
+        "--blue_full_system_runtime_dir",
         type=str,
-        help="blue fullsystem runtime directory",
+        help="blue full_system runtime directory",
         default="/tmp/tbots/blue",
     )
     parser.add_argument(
-        "--yellow_fullsystem_runtime_dir",
+        "--yellow_full_system_runtime_dir",
         type=str,
-        help="yellow fullsystem runtime directory",
+        help="yellow full_system runtime directory",
         default="/tmp/tbots/yellow",
     )
     parser.add_argument(
@@ -206,16 +243,35 @@ def load_command_line_arguments():
         help="Which layout to run, if not specified the last layout will run",
     )
     parser.add_argument(
-        "--debug_fullsystem",
+        "--debug_blue_full_system",
         action="store_true",
         default=False,
-        help="Debug fullsystem",
+        help="Debug blue full_system",
+    )
+    parser.add_argument(
+        "--debug_yellow_full_system",
+        action="store_true",
+        default=False,
+        help="Debug yellow full_system",
     )
     parser.add_argument(
         "--debug_simulator",
         action="store_true",
         default=False,
         help="Debug the simulator",
+    )
+    parser.add_argument(
+        "--visualization_buffer_size",
+        action="store",
+        type=int,
+        default=5,
+        help="How many packets to buffer while rendering",
+    )
+    parser.add_argument(
+        "--show_gamecontroller_logs",
+        action="store_true",
+        default=False,
+        help="How many packets to buffer while rendering",
     )
     return parser.parse_args()
 
@@ -233,11 +289,13 @@ def simulated_test_runner():
     with Simulator(
         args.simulator_runtime_dir, args.debug_simulator
     ) as simulator, FullSystem(
-        args.blue_fullsystem_runtime_dir, args.debug_fullsystem, False
+        args.blue_full_system_runtime_dir, args.debug_blue_full_system, False
     ) as blue_fs, FullSystem(
-        args.yellow_fullsystem_runtime_dir, args.debug_fullsystem, True
+        args.yellow_full_system_runtime_dir, args.debug_yellow_full_system, True
     ) as yellow_fs:
-        with Gamecontroller(ci_mode=True) as gamecontroller:
+        with Gamecontroller(
+            supress_logs=(not args.show_gamecontroller_logs), ci_mode=True
+        ) as gamecontroller:
 
             blue_fs.setup_proto_unix_io(blue_full_system_proto_unix_io)
             yellow_fs.setup_proto_unix_io(yellow_full_system_proto_unix_io)
@@ -257,6 +315,7 @@ def simulated_test_runner():
                     simulator_proto_unix_io,
                     blue_full_system_proto_unix_io,
                     yellow_full_system_proto_unix_io,
+                    visualization_buffer_size=args.visualization_buffer_size,
                 )
                 tscope.load_saved_layout(args.layout)
 

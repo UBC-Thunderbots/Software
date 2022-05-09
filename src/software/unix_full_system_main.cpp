@@ -6,7 +6,6 @@
 
 #include "proto/logging/proto_logger.h"
 #include "proto/message_translation/ssl_wrapper.h"
-// #include "proto/parameters.pb.h"
 #include "proto/parameters.pb.h"
 #include "proto/play_info_msg.pb.h"
 #include "software/ai/threaded_ai.h"
@@ -72,6 +71,10 @@ int main(int argc, char** argv)
                 [&ai](TbotsProto::AssignedTacticPlayControlParams input) {
                     ai->overrideTactics(input);
                 });
+
+        auto play_override_listener = ThreadedProtoUnixListener<TbotsProto::Play>(
+            runtime_path + PLAY_OVERRIDE_PATH,
+            [&ai](TbotsProto::Play input_play) { ai->overridePlay(input_play); });
 
         // Connect observers
         ai->Subject<TbotsProto::PrimitiveSet>::registerObserver(backend);

@@ -13,6 +13,7 @@ proto_library(
         "move_robot_and_ball_messages.proto",
         "parameters.proto",
         "play.proto",
+        "power_frame_msg.proto",
         "primitive.proto",
         "robot_log_msg.proto",
         "robot_status_msg.proto",

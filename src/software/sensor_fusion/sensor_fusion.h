@@ -107,8 +107,9 @@ class SensorFusion
      * Checks for a vision reset and if there is one, then reset SensorFusion
      *
      * @param t_capture The t_capture of a new packet
+     * @returns true if a reset is detected
      */
-    void checkForVisionReset(double t_capture);
+    bool checkForVisionReset(double t_capture);
 
     /**
      * Resets the world components to initial state

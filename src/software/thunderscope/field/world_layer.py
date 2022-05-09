@@ -7,18 +7,14 @@ from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtCore import Qt
 from pyqtgraph.Qt.QtWidgets import *
 
+from software.py_constants import *
+from software.thunderscope.constants import LINE_WIDTH
 from software.thunderscope.colors import Colors
 from software.networking.threaded_unix_listener import ThreadedUnixListener
-from software.thunderscope.constants import (
-    BALL_RADIUS,
-    MM_PER_M,
-    ROBOT_MAX_RADIUS_MM,
-    LINE_WIDTH,
-)
 from software.thunderscope.field.field_layer import FieldLayer
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
-MAX_ALLOWED_KICK_SPEED = 6.5
+MAX_ALLOWED_KICK_SPEED_M_PER_S = 6.5
 
 
 class WorldLayer(FieldLayer):
@@ -120,21 +116,30 @@ class WorldLayer(FieldLayer):
         """
         mouse_move_pos = [event.pos().x(), event.pos().y()]
 
-        ball_state = self.cached_world.ball.current_state
-
         ball_position = geom.Vector(
-            ball_state.global_position.x_meters * MM_PER_M,
-            ball_state.global_position.y_meters * MM_PER_M,
+            self.cached_world.ball.current_state.global_position.x_meters
+            * MILLIMETERS_PER_METER,
+            self.cached_world.ball.current_state.global_position.y_meters
+            * MILLIMETERS_PER_METER,
         )
 
+        # If the control key is pressed and the mouse was clicked,
+        # this means that we are dragging the mouse on the screen
+        # to apply a velocity on the ball (to kick it). We create a
+        # velocity vector that is proportional to the distance the
+        # mouse has moved away from the ball.
         if self.key_pressed[Qt.Key.Key_Control] and self.mouse_clicked:
             self.ball_velocity_vector = ball_position - geom.Vector(
                 mouse_move_pos[0], mouse_move_pos[1]
             )
 
-            if self.ball_velocity_vector.length() > MAX_ALLOWED_KICK_SPEED * MM_PER_M:
+            # Cap the maximum kick speed
+            if (
+                self.ball_velocity_vector.length()
+                > MAX_ALLOWED_KICK_SPEED_M_PER_S * MILLIMETERS_PER_METER
+            ):
                 self.ball_velocity_vector = self.ball_velocity_vector.normalize(
-                    MAX_ALLOWED_KICK_SPEED * MM_PER_M
+                    MAX_ALLOWED_KICK_SPEED_M_PER_S * MILLIMETERS_PER_METER
                 )
 
         # This is key to not break the panning/zooming features
@@ -162,13 +167,15 @@ class WorldLayer(FieldLayer):
         # determine whether a robot was clicked
         friendly_robot, enemy_robot = self.identify_robots(*self.mouse_click_pos)
 
+        # If the user was holding ctrl, send a command to the simulator to move
+        # the ball to the mouse click location.
         if self.key_pressed[Qt.Key.Key_Control]:
             world_state = WorldState()
             world_state.ball_state.CopyFrom(
                 BallState(
                     global_position=Point(
-                        x_meters=self.mouse_click_pos[0] / MM_PER_M,
-                        y_meters=self.mouse_click_pos[1] / MM_PER_M,
+                        x_meters=self.mouse_click_pos[0] / MILLIMETERS_PER_METER,
+                        y_meters=self.mouse_click_pos[1] / MILLIMETERS_PER_METER,
                     )
                 )
             )
@@ -201,12 +208,14 @@ class WorldLayer(FieldLayer):
             world_state.ball_state.CopyFrom(
                 BallState(
                     global_position=Point(
-                        x_meters=self.mouse_click_pos[0] / MM_PER_M,
-                        y_meters=self.mouse_click_pos[1] / MM_PER_M,
+                        x_meters=self.mouse_click_pos[0] / MILLIMETERS_PER_METER,
+                        y_meters=self.mouse_click_pos[1] / MILLIMETERS_PER_METER,
                     ),
                     global_velocity=Vector(
-                        x_component_meters=self.ball_velocity_vector.x() / MM_PER_M,
-                        y_component_meters=self.ball_velocity_vector.y() / MM_PER_M,
+                        x_component_meters=self.ball_velocity_vector.x()
+                        / MILLIMETERS_PER_METER,
+                        y_component_meters=self.ball_velocity_vector.y()
+                        / MILLIMETERS_PER_METER,
                     ),
                 )
             )
@@ -246,10 +255,10 @@ class WorldLayer(FieldLayer):
             pos_y = robot_.current_state.global_position.y_meters
             if (
                 math.sqrt(
-                    (pos_x - mouse_x / MM_PER_M) ** 2
-                    + (pos_y - mouse_y / MM_PER_M) ** 2
+                    (pos_x - mouse_x / MILLIMETERS_PER_METER) ** 2
+                    + (pos_y - mouse_y / MILLIMETERS_PER_METER) ** 2
                 )
-                <= ROBOT_MAX_RADIUS_MM / MM_PER_M
+                <= ROBOT_MAX_RADIUS_MILLIMETERS / MILLIMETERS_PER_METER
             ):
                 return robot_
         return None
@@ -267,36 +276,37 @@ class WorldLayer(FieldLayer):
         # Draw Field Bounds
         painter.drawRect(
             QtCore.QRectF(
-                -(field.field_x_length / 2) * MM_PER_M,
-                (field.field_y_length / 2) * MM_PER_M,
-                (field.field_x_length) * MM_PER_M,
-                -(field.field_y_length) * MM_PER_M,
+                -(field.field_x_length / 2) * MILLIMETERS_PER_METER,
+                (field.field_y_length / 2) * MILLIMETERS_PER_METER,
+                (field.field_x_length) * MILLIMETERS_PER_METER,
+                -(field.field_y_length) * MILLIMETERS_PER_METER,
             )
         )
 
         # Draw Friendly Defense
         painter.drawRect(
             QtCore.QRectF(
-                -(field.field_x_length / 2) * MM_PER_M,
-                (field.defense_y_length / 2) * MM_PER_M,
-                (field.defense_x_length) * MM_PER_M,
-                -(field.defense_y_length) * MM_PER_M,
+                -(field.field_x_length / 2) * MILLIMETERS_PER_METER,
+                (field.defense_y_length / 2) * MILLIMETERS_PER_METER,
+                (field.defense_x_length) * MILLIMETERS_PER_METER,
+                -(field.defense_y_length) * MILLIMETERS_PER_METER,
             )
         )
 
         # Draw Enemy Defense Area
         painter.drawRect(
             QtCore.QRectF(
-                ((field.field_x_length / 2) - field.defense_x_length) * MM_PER_M,
-                (field.defense_y_length / 2) * MM_PER_M,
-                (field.defense_x_length) * MM_PER_M,
-                -(field.defense_y_length) * MM_PER_M,
+                ((field.field_x_length / 2) - field.defense_x_length)
+                * MILLIMETERS_PER_METER,
+                (field.defense_y_length / 2) * MILLIMETERS_PER_METER,
+                (field.defense_x_length) * MILLIMETERS_PER_METER,
+                -(field.defense_y_length) * MILLIMETERS_PER_METER,
             )
         )
 
         # Draw Centre Circle
         painter.drawEllipse(
-            self.createCircle(0, 0, field.center_circle_radius * MM_PER_M)
+            self.createCircle(0, 0, field.center_circle_radius * MILLIMETERS_PER_METER)
         )
 
     def draw_team(self, painter, color, team, robot_id_map):
@@ -315,7 +325,7 @@ class WorldLayer(FieldLayer):
 
             if robot.id not in robot_id_map:
                 robot_id_font = painter.font()
-                robot_id_font.setPointSize(int(ROBOT_MAX_RADIUS_MM / 4))
+                robot_id_font.setPointSize(int(ROBOT_MAX_RADIUS_MILLIMETERS / 4))
 
                 # setting a black background to keep ID visible over yellow robot
                 robot_id_text = pg.TextItem(str(robot.id), fill=(0, 0, 0, 0))
@@ -324,10 +334,10 @@ class WorldLayer(FieldLayer):
                 robot_id_text.setParentItem(self)
 
             robot_id_map[robot.id].setPos(
-                (robot.current_state.global_position.x_meters * MM_PER_M)
-                - ROBOT_MAX_RADIUS_MM,
-                (robot.current_state.global_position.y_meters * MM_PER_M)
-                - ROBOT_MAX_RADIUS_MM,
+                (robot.current_state.global_position.x_meters * MILLIMETERS_PER_METER)
+                - ROBOT_MAX_RADIUS_MILLIMETERS,
+                (robot.current_state.global_position.y_meters * MILLIMETERS_PER_METER)
+                - ROBOT_MAX_RADIUS_MILLIMETERS,
             )
             robot_id_map[robot.id].setVisible(self.key_pressed[Qt.Key.Key_I])
 
@@ -336,9 +346,11 @@ class WorldLayer(FieldLayer):
 
             painter.drawChord(
                 self.createCircle(
-                    robot.current_state.global_position.x_meters * MM_PER_M,
-                    robot.current_state.global_position.y_meters * MM_PER_M,
-                    ROBOT_MAX_RADIUS_MM,
+                    robot.current_state.global_position.x_meters
+                    * MILLIMETERS_PER_METER,
+                    robot.current_state.global_position.y_meters
+                    * MILLIMETERS_PER_METER,
+                    ROBOT_MAX_RADIUS_MILLIMETERS,
                 ),
                 int((math.degrees(robot.current_state.global_orientation.radians) + 45))
                 * convert_degree,
@@ -358,9 +370,9 @@ class WorldLayer(FieldLayer):
 
         painter.drawEllipse(
             self.createCircle(
-                ball_state.global_position.x_meters * MM_PER_M,
-                ball_state.global_position.y_meters * MM_PER_M,
-                BALL_RADIUS,
+                ball_state.global_position.x_meters * MILLIMETERS_PER_METER,
+                ball_state.global_position.y_meters * MILLIMETERS_PER_METER,
+                BALL_MAX_RADIUS_MILLIMETERS,
             )
         )
 
@@ -372,13 +384,17 @@ class WorldLayer(FieldLayer):
             polyline = QtGui.QPolygon(
                 [
                     QtCore.QPoint(
-                        int(MM_PER_M * ball_state.global_position.x_meters),
-                        int(MM_PER_M * ball_state.global_position.y_meters),
+                        int(
+                            MILLIMETERS_PER_METER * ball_state.global_position.x_meters
+                        ),
+                        int(
+                            MILLIMETERS_PER_METER * ball_state.global_position.y_meters
+                        ),
                     ),
                     QtCore.QPoint(
-                        int(MM_PER_M * ball_state.global_position.x_meters)
+                        int(MILLIMETERS_PER_METER * ball_state.global_position.x_meters)
                         + vector.x(),
-                        int(MM_PER_M * ball_state.global_position.y_meters)
+                        int(MILLIMETERS_PER_METER * ball_state.global_position.y_meters)
                         + vector.y(),
                     ),
                 ]
@@ -404,9 +420,11 @@ class WorldLayer(FieldLayer):
             ):
                 painter.drawEllipse(
                     self.createCircle(
-                        robot.current_state.global_position.x_meters * MM_PER_M,
-                        robot.current_state.global_position.y_meters * MM_PER_M,
-                        ROBOT_MAX_RADIUS_MM / 2,
+                        robot.current_state.global_position.x_meters
+                        * MILLIMETERS_PER_METER,
+                        robot.current_state.global_position.y_meters
+                        * MILLIMETERS_PER_METER,
+                        ROBOT_MAX_RADIUS_MILLIMETERS / 2,
                     )
                 )
 

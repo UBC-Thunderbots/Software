@@ -6,7 +6,6 @@ import pyqtgraph as pg
 from proto.visualization_pb2 import NamedValue
 from pyqtgraph.Qt import QtGui
 
-import software.thunderscope.constants as constants
 from software.networking.threaded_unix_listener import ThreadedUnixListener
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 

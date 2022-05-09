@@ -89,6 +89,10 @@ void SimulatedTestFixture::SetUp()
     {
         run_simulation_in_realtime = true;
     }
+    if (TbotsGtestMain::run_sim_in_realtime)
+    {
+        run_simulation_in_realtime = true;
+    }
     setupReplayLogging();
 
     // Reset tick duration trackers

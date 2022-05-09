@@ -3,6 +3,7 @@ from proto.visualization_pb2 import PathVisualization
 from pyqtgraph.Qt import QtCore, QtGui
 
 import software.thunderscope.constants as constants
+from software.py_constants import *
 from software.thunderscope.colors import Colors
 from software.networking.threaded_unix_listener import ThreadedUnixListener
 from software.thunderscope.field.field_layer import FieldLayer
@@ -38,8 +39,8 @@ class PathLayer(FieldLayer):
         for path in paths.path:
             polygon_points = [
                 QtCore.QPoint(
-                    int(constants.MM_PER_M * point.x_meters),
-                    int(constants.MM_PER_M * point.y_meters),
+                    int(MILLIMETERS_PER_METER * point.x_meters),
+                    int(MILLIMETERS_PER_METER * point.y_meters),
                 )
                 for point in path.point
             ]

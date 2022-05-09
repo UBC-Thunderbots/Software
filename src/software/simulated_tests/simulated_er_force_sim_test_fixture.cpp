@@ -65,6 +65,10 @@ void SimulatedErForceSimTestFixture::SetUp()
     {
         run_simulation_in_realtime = true;
     }
+    if (TbotsGtestMain::run_sim_in_realtime)
+    {
+        run_simulation_in_realtime = true;
+    }
 
     // Reset tick duration trackers
     total_friendly_tick_duration = 0.0;

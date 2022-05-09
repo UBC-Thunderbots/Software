@@ -8,7 +8,7 @@ def create_world_state(
 
     NOTE: (index is robot id)
 
-    :param yellow_robot_locations: A list of yellowrobot locations
+    :param yellow_robot_locations: A list of yellow robot locations
     :param blue_robot_locations: A list of blue robot locations
     :param ball_location: Location of the ball
     :param ball_velocity: Velocity of the ball

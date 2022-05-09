@@ -26,6 +26,7 @@ if __name__ == "__main__":
     parser.add_argument("search_query")
     parser.add_argument("-p", "--print_command", action="store_true")
     parser.add_argument("-d", "--debug_build", action="store_true")
+    parser.add_argument("-ds", "--select_debug_binaries", action="store")
     parser.add_argument("-i", "--interactive", action="store_true")
 
     # These are shortcut args for commonly used arguments on our tests
@@ -73,14 +74,29 @@ if __name__ == "__main__":
     command = ["bazel", args.action, target]
 
     # Trigger a debug build
-    if args.debug_build:
+    if args.debug_build or args.select_debug_binaries:
         command += ["-c", "dbg"]
 
+    # Select debug binaries to run
+    if args.select_debug_binaries:
+        if "sim" in args.select_debug_binaries:
+            unknown_args += ["--debug_simulator"]
+        if "blue" in args.select_debug_binaries:
+            unknown_args += ["--debug_blue_full_system"]
+        if "yellow" in args.select_debug_binaries:
+            unknown_args += ["--debug_yellow_full_system"]
+
     # If its a binary, then run under gdb. We need to special case thunderscope
-    # because it relies on --debug_simulator and --debug_simulator and prompts
-    # the user to run the command under gdb instead.
-    if args.action in "run" and args.debug_build and "thunderscope" not in target:
-        command += ["--run_under=gdb"]
+    # because it relies on --debug_simulator, --debug_blue_full_system and
+    # --debug_yellow_full_system prompts the user to run the command under gdb
+    # instead. So we only run_under gdb if its _not_ a thunderscope debug command
+    if args.action in "run" and args.debug_build:
+        if (
+            "--debug_yellow_full_system" not in unknown_args
+            and "--debug_blue_full_system" not in unknown_args
+            and "--debug_simulator" not in unknown_args
+        ):
+            command += ["--run_under=gdb"]
 
     # Don't cache test results
     if args.action in "test":
@@ -99,6 +115,17 @@ if __name__ == "__main__":
 
     if args.action in "test":
         command += ['--test_arg="' + arg + '"' for arg in bazel_arguments]
+
+        if (
+            "--debug_blue_full_system" in unknown_args
+            or "--debug_yellow_full_system" in unknown_args
+            or "--debug_simulator" in unknown_args
+        ):
+            print(
+                "Do not run simulated pytests as a test when debugging, use ./tbots.py -d run instead"
+            )
+            sys.exit(1)
+
     else:
         command += bazel_arguments
 
