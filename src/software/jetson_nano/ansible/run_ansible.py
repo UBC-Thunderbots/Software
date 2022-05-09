@@ -69,7 +69,7 @@ def ansible_runner(playbook: str, options: dict = {}):
         start_at_task=None,
         extra_vars=vars,
         skip_tags=skip_tags,
-        timeout=60, #connection config timeout
+        timeout=60,  # connection config timeout
     )
 
     # for ansible, an inventory represents our fleet of robots. Each host in the inventory belongs to a group.
@@ -82,12 +82,10 @@ def ansible_runner(playbook: str, options: dict = {}):
 
     group = inventory.add_group(HOST_GROUP)
 
-
     # adding hosts and their aliases (robot IDs if available) to the inventory
     for host, alias in zip(hosts, host_aliases):
         inventory.add_host(host, group)
         variable_manager.set_host_variable(host, "inventory_hostname", alias)
-
 
     # playbook executor controls running the playbook
     pbex = PlaybookExecutor(
