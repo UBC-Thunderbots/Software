@@ -73,18 +73,21 @@ http_archive(
     url = "https://github.com/ReneNyffenegger/cpp-base64/archive/refs/tags/V2.rc.08.zip",
 )
 
-http_archive(
-    name = "rules_proto",
-    sha256 = "602e7161d9195e50246177e7c55b2f39950a9cf7366f74ed5f22fd45750cd208",
-    strip_prefix = "rules_proto-97d8af4dc474595af3900dd85cb3a29ad28cc313",
-    url = "https://github.com/bazelbuild/rules_proto/archive/97d8af4dc474595af3900dd85cb3a29ad28cc313.tar.gz",
+load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
+
+git_repository(
+    name = "com_google_protobuf",
+    # We need this patch to properly add generated dependencies to the protoc
+    # compiler. It also fixes an issue with the python imports.
+    patch_args = ["-p1"],
+    patches = ["@//extlibs:protobuf.patch"],
+    remote = "https://github.com/protocolbuffers/protobuf",
+    tag = "v3.19.4",
 )
 
-load("@rules_proto//proto:repositories.bzl", "rules_proto_dependencies", "rules_proto_toolchains")
+load("@com_google_protobuf//:protobuf_deps.bzl", "protobuf_deps")
 
-rules_proto_dependencies()
-
-rules_proto_toolchains()
+protobuf_deps()
 
 git_repository(
     name = "com_github_nelhage_rules_boost",
