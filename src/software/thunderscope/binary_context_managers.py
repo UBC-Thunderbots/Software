@@ -6,7 +6,7 @@ import time
 import google.protobuf.internal.encoder as encoder
 import google.protobuf.internal.decoder as decoder
 
-from software.networking import threaded_unix_sender, networking
+from software.networking import threaded_unix_sender
 from subprocess import Popen
 from software.python_bindings import *
 from proto.import_all_protos import *

@@ -8,6 +8,6 @@
 std::unique_ptr<Play> createPlay(const TbotsProto::Play& play_proto,
                                  TbotsProto::AiConfig ai_config)
 {
-    return GenericFactory<std::string, Play, AiConfig>::create(
+    return GenericFactory<std::string, Play, TbotsProto::AiConfig>::create(
         TbotsProto::Play::PlayName_Name(play_proto.name()), ai_config);
 }

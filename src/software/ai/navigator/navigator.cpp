@@ -6,7 +6,6 @@
 #include "proto/visualization.pb.h"
 #include "software/ai/navigator/navigating_primitive_creator.h"
 #include "software/geom/algorithms/distance.h"
-#include "software/gui/drawing/obstacle_artist.h"
 #include "software/logger/logger.h"
 
 Navigator::Navigator(std::unique_ptr<PathManager> path_manager,
@@ -157,19 +156,6 @@ std::unordered_set<PathObjective> Navigator::createPathObjectives(
             LOG(WARNING) << ss.str();
         }
     }
-
-    // TODO (#2584) This is a nasty hack we need to visualize the obstacles
-    // using the obstacle artist.
-    //
-    // We will be visualizing static obstacles
-    // through primitives and dynamic obstacles through the HRVO layer so
-    // we can remove this hack.
-    ObstacleArtist obstacle_artist(NULL, std::nullopt);
-    for (const auto &obstacle : getObstacles())
-    {
-        obstacle->accept(obstacle_artist);
-    }
-    obstacle_artist.visualize();
 
     return path_objectives;
 }

@@ -16,7 +16,6 @@ cc_library(
         "//software/ai/navigator/obstacle:robot_navigation_obstacle_factory",
         "//software/ai/navigator/path_manager",
         "//software/geom/algorithms",
-        "//software/gui/drawing:obstacle_artist",
         "//software/logger",
         "//software/world",
     ],

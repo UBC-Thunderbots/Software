@@ -48,6 +48,9 @@ from software.thunderscope.field import (
     passing_layer,
 )
 
+from software.thunderscope.common.proto_configuration_widget import (
+    ProtoConfigurationWidget,
+)
 from software.thunderscope.field.field import Field
 from software.thunderscope.log.g3log_widget import g3logWidget
 from software.thunderscope.proto_unix_io import ProtoUnixIO

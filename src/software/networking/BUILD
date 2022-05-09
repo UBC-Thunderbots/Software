@@ -1,7 +1,6 @@
 package(default_visibility = ["//visibility:public"])
 
 load("@python_tools_deps//:requirements.bzl", "requirement")
-load("@pybind11_bazel//:build_defs.bzl", "pybind_extension", "pybind_library")
 
 cc_library(
     name = "proto_udp_client",
@@ -155,25 +154,5 @@ py_library(
     deps = [
         "//proto:software_py_proto",
         "//software/logger:py_logger",
-    ],
-)
-
-pybind_library(
-    name = "networking_lib",
-    srcs = ["python_bindings.cpp"],
-    deps = [
-        ":threaded_proto_udp_listener",
-        ":threaded_proto_udp_sender",
-        "//proto:ssl_cc_proto",
-        "//proto:tbots_cc_proto",
-        "//proto/message_translation:tbots_geometry",
-        "@pybind11_protobuf//pybind11_protobuf:native_proto_caster",
-    ],
-)
-
-pybind_extension(
-    name = "networking",
-    deps = [
-        ":networking_lib",
     ],
 )
