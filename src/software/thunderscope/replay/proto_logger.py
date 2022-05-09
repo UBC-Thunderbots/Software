@@ -56,10 +56,8 @@ class ProtoLogger(object):
             in seconds since epoch. Defaults to time.time.
 
         """
-        self.log_prefix = log_prefix
-        self.log_folder = (
-            log_path + "/" + log_prefix + time.strftime(REPLAY_FILE_TIME_FORMAT) + "/"
-        )
+        log_timestamp = time.strftime(REPLAY_FILE_TIME_FORMAT)
+        self.log_folder = f"{log_path}/{log_prefix}{log_timestamp}/"
 
         try:
             os.makedirs(self.log_folder)

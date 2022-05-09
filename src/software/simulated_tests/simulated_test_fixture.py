@@ -358,10 +358,10 @@ def simulated_test_runner():
             # SimulatorTestRunner time provider is tied to the simulators
             # t_capture coming out of the wrapper packet (rather than time.time).
             with ProtoLogger(
-                args.blue_full_system_runtime_dir + f"/{current_test}",
+                f"{args.blue_full_system_runtime_dir}/{current_test}",
                 time_provider=runner.time_provider,
             ) as blue_logger, ProtoLogger(
-                args.yellow_full_system_runtime_dir + f"/{current_test}",
+                f"{args.yellow_full_system_runtime_dir}/{current_test}",
                 time_provider=runner.time_provider,
             ) as yellow_logger:
 

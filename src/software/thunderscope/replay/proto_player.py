@@ -56,7 +56,7 @@ class ProtoPlayer(object):
             return
 
         # Playback controls, see __play_protobufs
-        self.stop_playing = False
+        self.is_playing = True
         self.playback_speed = 1.0
         self.replay_controls_mutex = threading.RLock()
         self.seek_offset_time = 0.0
@@ -126,7 +126,7 @@ class ProtoPlayer(object):
             bytes(REPLAY_METADATA_DELIMETER, encoding="utf-8")
         )
 
-        # Convert string to type. eval is an order of mangnitude
+        # Convert string to type. eval is an order of magnitude
         # faster than iterating over the protobuf library to find
         # the type from the string.
         proto_class = eval(str(protobuf_type.split(b".")[1], encoding="utf-8"))
@@ -140,25 +140,25 @@ class ProtoPlayer(object):
         """Plays back the log file."""
 
         # Protection from spamming the play button
-        if self.stop_playing is False:
+        if self.is_playing:
             return
 
         with self.replay_controls_mutex:
             self.start_playback_time = time.time()
-            self.stop_playing = False
+            self.is_playing = True
 
     def pause(self):
         """Pauses the player."""
 
         with self.replay_controls_mutex:
-            self.stop_playing = True
+            self.is_playing = False
             self.seek_offset_time = self.current_packet_time
 
     def toggle_play_pause(self):
         """Toggles the play/pause state."""
 
         with self.replay_controls_mutex:
-            if self.stop_playing:
+            if not self.is_playing:
                 self.play()
             else:
                 self.pause()
@@ -272,7 +272,7 @@ class ProtoPlayer(object):
         """Plays all protos in the file in chronologoical order. 
 
         Playback controls:
-            - Play/Pause through self.stop_playing
+            - Play/Pause through self.is_playing
             - Seek to a specific time through self.current_chunk and self.current_entry_index
             - Set playback speed through self.playback_speed
 
@@ -283,17 +283,17 @@ class ProtoPlayer(object):
         while True:
 
             # Only play if we are not paused
-            if self.stop_playing is True:
+            if not self.is_playing:
                 time.sleep(PLAY_PAUSE_POLL_INTERVAL_SECONDS)
                 continue
 
             # Check if replay has ended and stop playing if so
             if self.current_chunk_index >= len(self.sorted_chunks):
-                self.stop_playing = True
+                self.is_playing = False
                 continue
 
             # Playback loop to play current chunk
-            while self.stop_playing is False and self.current_entry_index < len(
+            while self.is_playing and self.current_entry_index < len(
                 self.current_chunk
             ):
 
@@ -324,7 +324,7 @@ class ProtoPlayer(object):
             # Load the next chunk
             with self.replay_controls_mutex:
 
-                if not self.stop_playing:
+                if self.is_playing:
                     self.current_chunk_index += 1
 
                     if self.current_chunk_index < len(self.sorted_chunks):

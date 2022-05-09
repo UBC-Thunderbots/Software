@@ -382,9 +382,7 @@ class Thunderscope(object):
 
         """
         self.player = ProtoPlayer(
-            self.blue_replay_log
-            if not friendly_colour_yellow
-            else self.yellow_replay_log,
+            self.yellow_replay_log if friendly_colour_yellow else self.blue_replay_log,
             full_system_proto_unix_io,
         )
         field = Field(player=self.player)
