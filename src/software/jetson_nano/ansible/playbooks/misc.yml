@@ -1,5 +1,5 @@
 ---
-#This file has a bunch of common tasks that can be reused in other playbooks or individually
+#This file has a bunch of common tasks that can be used individually
 
 - name: misc tasks (run using --tags)
   hosts: THUNDERBOTS_HOSTS
@@ -11,18 +11,16 @@
     become_method: sudo
     become: true
     shell: sudo shutdown
+    register: res
     tags:
       - shutdown
-    register: res
+      - never # the never tag is a special Ansible tag. We use it so that tasks do not automatically run unless specifically requested.
 
     #reboots the host and waits until a connection is re-established
   - name: Reboot
     become: true
     become_user: root
     become_method: sudo
-    register: res
-    tags:
-      - reboot
     reboot:
       msg: "Reboot initiated by Ansible"
       connect_timeout: 20
@@ -30,12 +28,61 @@
       pre_reboot_delay: 0
       post_reboot_delay: 60
       test_command: whoami
+    register: res
+    tags:
+      - reboot
+      - never
 
-  - debug:
-      tags:
-        - systemd
+
+  - name: Stop All Services
+    become: true
+    become_method: sudo
+    ansible.builtin.systemd:
+      name: thunderbots
+      masked: no
+      daemon_reload: yes
+      state: stopped
+    register: res
+    tags:
+      - stopServices
+      - never
+
+  - name: start all services
+    become: true
+    become_method: sudo
+    with_items:
+      - thunderbots
+      - redis
+      - thunderloop
+      - ui
+      - announcement
+    loop_control:
+      loop_var: service_name
+    ansible.builtin.systemd:
+      name: "{{ service_name }}"
+      masked: no
+      daemon_reload: yes
+      state: started
+    register: res
+    tags:
+      - startServices
+      - never
+
+  - name: RTT Test
+    delegate_to: localhost
+    shell: ping -c 10 -w 2 "{{ ansible_ssh_host }}" | tail -1
+    register: res
+    tags:
+      - rtt
+      - never
+
+  - name: Command Output
+    tags:
+      - always
+    debug:
       msg:
         - "[Robot ID = {{ inventory_hostname }}]"
         - "stdout = {{ res.stdout_lines }} "
         - "stderr = {{ res.stderr }}"
+        - "{{ ansible_ssh_host }}"
 

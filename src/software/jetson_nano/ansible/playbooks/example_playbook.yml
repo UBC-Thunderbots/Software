@@ -23,14 +23,6 @@
         - "stdout = {{ res.stdout_lines }} "
         - "stderr = {{ res.stderr }}"
 
-  - name: copy file example
-    tags:
-      - copyFileExample
-    register: res
-    copy:
-      src: copiedFile.txt
-      dest: /home/robot
-
   - name: Reboot
     become: true
     become_user: root

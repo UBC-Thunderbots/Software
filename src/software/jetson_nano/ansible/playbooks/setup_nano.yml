@@ -4,14 +4,60 @@
   hosts: THUNDERBOTS_HOSTS
 
   tasks:
-    - name: Copy and Execute the setup_nano script
-      script: ../../setup_nano.sh
+
+    - name: check internet connection
+      uri:
+        url: "https://google.com"
+        timeout: 30
+        status_code: 200
+
+    - name: enable passwordless sudo for rsync
       become: true
       become_method: sudo
-      register: res
+      lineinfile:
+        path: /etc/sudoers
+        state: present
+        insertafter: EOF
+        line: '{{ ansible_user }} ALL=NOPASSWD:/usr/bin/rsync'
 
-    - debug:
+    - name: Sync Setup Script
+      become: true
+      become_method: sudo
+      tags:
+        - sync
+      ansible.posix.synchronize:
+        src: ../../setup_nano.sh
+        dest: ~/
+        recursive: yes
+        copy_links: yes
+
+    - name: run the setup script
+      become_method: sudo
+      become: true
+      shell: bash /home/"{{ ansible_user }}"/setup_nano.sh >& /tmp/setup.log
+      async: 300
+      poll: 0
+      register: result_async
+      tags:
+        - runScript
+      args:
+        chdir: ~/
+
+    - name: Check Setup Status
+      become: true
+      become_method: sudo
+      async_status:
+        jid: "{{ result_async.ansible_job_id }}"
+      register: result
+      ignore_errors: yes
+      until: result.finished
+      retries: 30
+      delay: 10
+
+    - name: Setup Success Msg
+      debug:
         msg:
           - "[Robot ID = {{ inventory_hostname }}]"
-          - "stdout = {{ res.stdout_lines }} "
-          - "stderr = {{ res.stderr }}"
+          - "--- Setup successful ---"
+      when: "result.rc is defined and result.rc == 0"
+

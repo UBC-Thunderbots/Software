@@ -10,10 +10,10 @@
 
     - name: sync binaries to the nano
       with_items:
-        - ../../../../../../../../jetson_nano/tftp
         - ../../../../../../../../jetson_nano/display
         - ../../../../../../../../jetson_nano/broadcasts
         - ../../../../../../../../jetson_nano/thunderloop_main
+        - ../../../../../../../../jetson_nano/redis
       loop_control:
         loop_var: binary_path
       ansible.posix.synchronize:
@@ -22,37 +22,18 @@
         recursive: yes
         copy_links: yes
       tags:
-        - syncAllBinaries
+        - syncBinaries
 
-    - name: sync all relevant systemd files
+    - name: sync all systemd files
       become_method: sudo
       become: true
       tags:
-        - systemd
         - syncSystemdFiles
       register: res
       ansible.posix.synchronize:
         src: ../../systemd/
         dest: /etc/systemd/system
         copy_links: yes
-
-    - name: Enable path services
-      become: true
-      become_method: sudo
-      with_items:
-        - redis_watcher.path
-        - tftp_watcher.path
-        - thunderloop_watcher.path
-        - ui_watcher.path
-        - announcement_watcher.path
-      loop_control:
-        loop_var: service_name
-      shell: systemctl enable "{{ service_name }}"
-      register: res
-      args:
-        chdir: /etc/systemd/system
-      tags:
-        - systemd
 
       #NOTE: "Enabling systems" means they will start on boot
     - name: Enable system services
@@ -61,9 +42,8 @@
       with_items:
         - thunderbots
         - redis
-        - tftp
         - thunderloop
-        - ui
+        - display
         - announcement
       loop_control:
         loop_var: service_name
@@ -73,7 +53,7 @@
         masked: no
         daemon_reload: yes
       tags:
-        - systemd
+        - enableSystemd
 
     - name: Reboot
       become: true
@@ -82,7 +62,6 @@
       register: res
       tags:
         - reboot
-        - systemd
       reboot:
         msg: "Reboot initiated by Ansible"
         connect_timeout: 20
