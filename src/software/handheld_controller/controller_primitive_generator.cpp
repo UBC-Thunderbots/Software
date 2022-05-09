@@ -65,9 +65,10 @@ ControllerPrimitiveGenerator::createPrimitiveFromControllerInput(
                             controller_input_config->getMaxLinearSpeed()->value();
         double angular_velocity = controller_input.getAngularMotion() *
                                   controller_input_config->getMaxAngularSpeed()->value();
-        auto direct_velocity_primitive = createDirectControlPrimitive(
-            Vector(x_velocity, y_velocity),
-            AngularVelocity::fromRadians(angular_velocity), dribbler_rpm);
+        auto direct_velocity_primitive =
+            createDirectControlPrimitive(Vector(x_velocity, y_velocity),
+                                         AngularVelocity::fromRadians(angular_velocity),
+                                         dribbler_rpm, TbotsProto::AutoChipOrKick());
         return direct_velocity_primitive;
     }
 }

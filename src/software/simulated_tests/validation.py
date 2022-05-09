@@ -1,7 +1,7 @@
 import pytest
 
 
-import software.geom.geometry as tbots_geom
+import software.python_bindings as tbots
 from proto.validation_pb2 import *
 
 
@@ -164,10 +164,13 @@ def run_validation_sequence_sets(
     always_validation_proto_set = ValidationProtoSet()
     eventually_validation_proto_set = ValidationProtoSet()
 
-    def create_validation_proto_helper(validation_proto_set, validation):
+    def create_validation_proto_helper(
+        validation_type, validation_proto_set, validation
+    ):
         """Helper function that computes the status and creates a
         validation_proto, and updates it in the validation_proto_set.
 
+        :param validation_type: The validation type of this proto set
         :param validation_proto_set: The validation proto set to add to
         :param validation: The validation to put into the proto
 
@@ -181,10 +184,10 @@ def run_validation_sequence_sets(
         # Create validation proto
         validation_proto.status = status
         validation_proto.failure_msg = str(validation) + " failed"
-        validation_proto.validation_type = validation.get_validation_type()
         validation_proto.geometry.CopyFrom(validation.get_validation_geometry(world))
 
         validation_proto_set.validations.append(validation_proto)
+        validation_proto_set.validation_type = validation_type
 
         return status
 
@@ -194,7 +197,7 @@ def run_validation_sequence_sets(
 
             # Add to validation_proto_set and get status
             status = create_validation_proto_helper(
-                eventually_validation_proto_set, validation
+                ValidationType.EVENTUALLY, eventually_validation_proto_set, validation
             )
 
             # If the current validation is failing, we don't care about
@@ -210,7 +213,9 @@ def run_validation_sequence_sets(
     # Validate the always validations. We need to look at all of them
     for validation_sequence in always_validation_sequence_set:
         for validation in validation_sequence:
-            create_validation_proto_helper(always_validation_proto_set, validation)
+            create_validation_proto_helper(
+                ValidationType.ALWAYS, always_validation_proto_set, validation
+            )
 
     return eventually_validation_proto_set, always_validation_proto_set
 
@@ -242,17 +247,17 @@ def create_validation_geometry(geometry=[]) -> ValidationGeometry:
     validation_geometry = ValidationGeometry()
 
     CREATE_PROTO_DISPATCH = {
-        tbots_geom.Vector.__name__: tbots_geom.createVectorProto,
-        tbots_geom.Polygon.__name__: tbots_geom.createPolygonProto,
-        tbots_geom.Rectangle.__name__: tbots_geom.createPolygonProto,
-        tbots_geom.Circle.__name__: tbots_geom.createCircleProto,
+        tbots.Vector.__name__: tbots.createVectorProto,
+        tbots.Polygon.__name__: tbots.createPolygonProto,
+        tbots.Rectangle.__name__: tbots.createPolygonProto,
+        tbots.Circle.__name__: tbots.createCircleProto,
     }
 
     ADD_TO_VALIDATION_GEOMETRY_DISPATCH = {
-        tbots_geom.Vector.__name__: validation_geometry.vectors.append,
-        tbots_geom.Polygon.__name__: validation_geometry.polygons.append,
-        tbots_geom.Rectangle.__name__: validation_geometry.polygons.append,
-        tbots_geom.Circle.__name__: validation_geometry.circles.append,
+        tbots.Vector.__name__: validation_geometry.vectors.append,
+        tbots.Polygon.__name__: validation_geometry.polygons.append,
+        tbots.Rectangle.__name__: validation_geometry.polygons.append,
+        tbots.Circle.__name__: validation_geometry.circles.append,
     }
 
     for geom in geometry:

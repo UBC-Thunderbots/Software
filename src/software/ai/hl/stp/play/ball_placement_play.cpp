@@ -14,7 +14,7 @@ BallPlacementPlay::BallPlacementPlay(std::shared_ptr<const AiConfig> config)
 void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
                                        const World &world)
 {
-    auto place_ball_tactic = std::make_shared<DribbleTactic>();
+    auto place_ball_tactic = std::make_shared<DribbleTactic>(ai_config);
 
     std::vector<std::shared_ptr<MoveTactic>> move_tactics = {
         std::make_shared<MoveTactic>(), std::make_shared<MoveTactic>(),
@@ -26,7 +26,9 @@ void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
                                  world.field().friendlyDefenseArea().posXNegYCorner();
     Point waiting_line_start_point =
         world.field().friendlyDefenseArea().posXNegYCorner() +
-        Vector(ROBOT_MAX_RADIUS_METERS * 2, 0);
+        Vector(ROBOT_MAX_RADIUS_METERS * 3,
+               0);  // Path planner can slow down when pathing through
+                    // objects - buffer zone of radius x 3 should help
     for (unsigned int i = 0; i < move_tactics.size(); i++)
     {
         Point waiting_destination =

@@ -107,8 +107,9 @@ class SensorFusion
      * Checks for a vision reset and if there is one, then reset SensorFusion
      *
      * @param t_capture The t_capture of a new packet
+     * @returns true if a reset is detected
      */
-    void checkForVisionReset(double t_capture);
+    bool checkForVisionReset(double t_capture);
 
     /**
      * Resets the world components to initial state
@@ -139,8 +140,12 @@ class SensorFusion
 
     TeamSide team_with_possession;
 
+    std::optional<RobotId> friendly_robot_id_with_ball_in_dribbler;
+
     unsigned int friendly_goalie_id;
     unsigned int enemy_goalie_id;
+    bool defending_positive_side;
+    int ball_in_dribbler_timeout;
 
     // The number of "reset packets" we have received. These indicate that the
     // vision time should be reset. Please see `checkForVisionReset` to see how

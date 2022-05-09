@@ -1,0 +1,128 @@
+syntax = "proto2";
+
+package SSLProto;
+
+import "proto/ssl_gc_common.proto";
+import "proto/ssl_gc_geometry.proto";
+import "proto/ssl_gc_game_event.proto";
+import "proto/ssl_gc_referee_message.proto";
+
+import "google/protobuf/duration.proto";
+import "google/protobuf/timestamp.proto";
+
+message YellowCard
+{
+    optional uint32 id                               = 1;
+    optional GameEvent caused_by_game_event          = 2;
+    optional google.protobuf.Duration time_remaining = 3;
+}
+
+message RedCard
+{
+    optional uint32 id                      = 1;
+    optional GameEvent caused_by_game_event = 2;
+}
+
+message Foul
+{
+    optional uint32 id                           = 1;
+    optional GameEvent caused_by_game_event      = 2;
+    optional google.protobuf.Timestamp timestamp = 3;
+}
+
+message Command
+{
+    required Type type     = 1;
+    optional Team for_team = 2;
+
+    enum Type
+    {
+        UNKNOWN        = 0;
+        HALT           = 1;
+        STOP           = 2;
+        NORMAL_START   = 3;
+        FORCE_START    = 4;
+        DIRECT         = 5;
+        INDIRECT       = 6;
+        KICKOFF        = 7;
+        PENALTY        = 8;
+        TIMEOUT        = 9;
+        BALL_PLACEMENT = 10;
+    }
+}
+
+message GameState
+{
+    required Type type     = 1;
+    optional Team for_team = 2;
+
+    enum Type
+    {
+        UNKNOWN        = 0;
+        HALT           = 1;
+        STOP           = 2;
+        RUNNING        = 3;
+        FREE_KICK      = 4;
+        KICKOFF        = 5;
+        PENALTY        = 6;
+        TIMEOUT        = 7;
+        BALL_PLACEMENT = 8;
+    }
+}
+
+message Proposal
+{
+    // The timestamp when the game event proposal occurred
+    optional google.protobuf.Timestamp timestamp = 1;
+    // The proposed game event.
+    optional GameEvent game_event = 2;
+}
+
+message ProposalGroup
+{
+    // List of proposals in this group
+    repeated Proposal proposals = 1;
+    // Whether the proposal group was accepted
+    optional bool accepted = 2;
+}
+
+message TeamInfo
+{
+    optional string name                                               = 1;
+    optional int32 goals                                               = 2;
+    optional int32 goalkeeper                                          = 3;
+    repeated YellowCard yellow_cards                                   = 4;
+    repeated RedCard red_cards                                         = 5;
+    optional int32 timeouts_left                                       = 6;
+    optional google.protobuf.Duration timeout_time_left                = 7;
+    optional bool on_positive_half                                     = 8;
+    repeated Foul fouls                                                = 9;
+    optional int32 ball_placement_failures                             = 10;
+    optional bool ball_placement_failures_reached                      = 11;
+    optional bool can_place_ball                                       = 12;
+    optional int32 max_allowed_bots                                    = 13;
+    optional google.protobuf.Timestamp requests_bot_substitution_since = 14;
+    optional google.protobuf.Timestamp requests_timeout_since          = 15;
+    optional google.protobuf.Timestamp requests_emergency_stop_since   = 16;
+    optional int32 challenge_flags                                     = 17;
+}
+
+message State
+{
+    optional Referee.Stage stage                                    = 1;
+    optional Command command                                        = 2;
+    optional GameState game_state                                   = 19;
+    optional google.protobuf.Duration stage_time_elapsed            = 4;
+    optional google.protobuf.Duration stage_time_left               = 5;
+    optional google.protobuf.Timestamp match_time_start             = 6;
+    map<string, TeamInfo> team_state                                = 8;
+    optional Vector2 placement_pos                                  = 9;
+    optional Command next_command                                   = 10;
+    optional google.protobuf.Duration current_action_time_remaining = 12;
+    repeated GameEvent game_events                                  = 13;
+    repeated ProposalGroup proposal_groups                          = 14;
+    optional Division division                                      = 15;
+    optional bool auto_continue                                     = 16;
+    optional Team first_kickoff_team                                = 17;
+    optional MatchType match_type                                   = 18;
+}

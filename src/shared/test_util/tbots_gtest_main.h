@@ -9,6 +9,9 @@ struct TbotsGtestMain
     // on the visualizer
     static bool enable_visualizer;
 
+    // Controls whether the test should run in real time
+    static bool run_sim_in_realtime;
+
     // Controls whether the AI will be stopped when the test starts only if
     // enable_visualizer is true and the test uses AI
     static bool stop_ai_on_start;

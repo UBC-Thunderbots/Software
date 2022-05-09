@@ -67,7 +67,9 @@ PriorityTacticVector Play::getTactics(const World &world)
 
 std::vector<std::unique_ptr<Intent>> Play::get(
     RobotToTacticAssignmentFunction robot_to_tactic_assignment_algorithm,
-    MotionConstraintBuildFunction motion_constraint_builder, const World &new_world)
+    MotionConstraintBuildFunction motion_constraint_builder, const World &new_world,
+    const InterPlayCommunication &inter_play_communication,
+    const SetInterPlayCommunicationCallback &set_inter_play_communication_fun)
 {
     std::vector<std::unique_ptr<Intent>> intents;
     PriorityTacticVector priority_tactics;
@@ -77,10 +79,12 @@ std::vector<std::unique_ptr<Intent>> Play::get(
     {
         num_tactics--;
     }
-    updateTactics(PlayUpdate(new_world, num_tactics,
-                             [&priority_tactics](PriorityTacticVector new_tactics) {
-                                 priority_tactics = std::move(new_tactics);
-                             }));
+    updateTactics(PlayUpdate(
+        new_world, num_tactics,
+        [&priority_tactics](PriorityTacticVector new_tactics) {
+            priority_tactics = std::move(new_tactics);
+        },
+        inter_play_communication, set_inter_play_communication_fun));
 
     ConstPriorityTacticVector const_priority_tactics;
 

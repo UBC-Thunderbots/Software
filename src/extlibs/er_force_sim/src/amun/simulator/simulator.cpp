@@ -132,8 +132,8 @@ Simulator::Simulator(const amun::SimulatorSetup &setup)
     for (const auto &camera : setup.camera_setup())
     {
         m_data->reportedCameraSetup.append(camera);
-        Vector visionPosition(camera.derived_camera_world_tx(),
-                              camera.derived_camera_world_ty());
+        ErForceVector visionPosition(camera.derived_camera_world_tx(),
+                                     camera.derived_camera_world_ty());
         btVector3 truePosition;
         coordinates::fromVision(visionPosition, truePosition);
         truePosition.setZ(camera.derived_camera_world_tz() / 1000.0f);
@@ -712,7 +712,7 @@ void Simulator::moveRobot(const sslsim::TeleportRobot &robot)
             }
             else
             {
-                Vector targetPos;
+                ErForceVector targetPos;
                 coordinates::fromVision(robot, targetPos);
                 // TODO: check if the given position is fine
                 createRobot(list, targetPos.x, targetPos.y, robot.id().id(), m_aggregator,

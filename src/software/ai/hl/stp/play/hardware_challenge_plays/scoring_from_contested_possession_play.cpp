@@ -14,7 +14,8 @@ ScoringFromContestedPossessionPlay::ScoringFromContestedPossessionPlay(
 void ScoringFromContestedPossessionPlay::getNextTactics(TacticCoroutine::push_type &yield,
                                                         const World &world)
 {
-    std::shared_ptr<DribbleTactic> dribble_tactic = std::make_shared<DribbleTactic>();
+    std::shared_ptr<DribbleTactic> dribble_tactic =
+        std::make_shared<DribbleTactic>(ai_config);
     dribble_tactic->updateControlParams(std::nullopt, std::nullopt, true);
     std::shared_ptr<MoveTactic> move_tactic = std::make_shared<MoveTactic>();
 

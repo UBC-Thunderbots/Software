@@ -7,6 +7,7 @@ cc_binary(
     name = "unix_full_system",
     srcs = ["unix_full_system_main.cpp"],
     deps = [
+        "//extlibs/er_force_sim/src/protobuf:protobuf_cc_lib",
         "//proto/logging:proto_logger",
         "//proto/message_translation:ssl_wrapper",
         "//shared/parameter:cpp_configs",
@@ -115,6 +116,9 @@ cc_binary(
 cc_library(
     name = "constants",
     hdrs = ["constants.h"],
+    deps = [
+        "//shared:constants",
+    ],
 )
 
 pybind_library(
@@ -130,6 +134,34 @@ pybind_extension(
     name = "py_constants",
     deps = [
         ":py_constants_lib",
+    ],
+)
+
+pybind_library(
+    name = "python_bindings_lib",
+    srcs = ["python_bindings.cpp"],
+    deps = [
+        "//proto:ssl_cc_proto",
+        "//proto:tbots_cc_proto",
+        "//proto/message_translation:tbots_geometry",
+        "//software/estop:threaded_estop_reader",
+        "//software/geom:angle",
+        "//software/geom:point",
+        "//software/geom:vector",
+        "//software/geom/algorithms",
+        "//software/networking:threaded_proto_udp_listener",
+        "//software/networking:threaded_proto_udp_sender",
+        "//software/uart:boost_uart_communication",
+        "//software/world",
+        "//software/world:field",
+        "@pybind11_protobuf//pybind11_protobuf:native_proto_caster",
+    ],
+)
+
+pybind_extension(
+    name = "python_bindings",
+    deps = [
+        ":python_bindings_lib",
     ],
 )
 

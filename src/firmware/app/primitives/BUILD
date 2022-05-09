@@ -20,23 +20,11 @@ cc_library(
     deps = [
         ":move",
         ":primitive",
-        ":direct_control",
         ":stop",
         "//firmware/app/world:firmware_world",
     ] + select({
         "//conditions:default": [],
     }),
-)
-
-cc_library(
-    name = "direct_control",
-    srcs = ["direct_control_primitive.c"],
-    hdrs = ["direct_control_primitive.h"],
-    deps = [
-        ":primitive",
-        "//firmware/app/control",
-        "//firmware/app/logger",
-    ],
 )
 
 cc_library(

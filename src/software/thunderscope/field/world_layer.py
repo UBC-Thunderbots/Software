@@ -1,108 +1,230 @@
 import math
-import queue
 
+import software.python_bindings as geom
 import pyqtgraph as pg
-from proto.ball_pb2 import Ball
-from proto.team_pb2 import Robot, Team
-from proto.vision_pb2 import BallState, RobotState
-from proto.world_pb2 import Field, World
+from proto.import_all_protos import *
 from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtCore import Qt
+from pyqtgraph.Qt.QtWidgets import *
 
+from software.py_constants import *
+from software.thunderscope.constants import LINE_WIDTH
 from software.thunderscope.colors import Colors
 from software.networking.threaded_unix_listener import ThreadedUnixListener
-from software.thunderscope.constants import (
-    BALL_RADIUS,
-    MM_PER_M,
-    ROBOT_MAX_RADIUS,
-    UNIX_SOCKET_BASE_PATH,
-)
 from software.thunderscope.field.field_layer import FieldLayer
+from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
+
+MAX_ALLOWED_KICK_SPEED_M_PER_S = 6.5
 
 
 class WorldLayer(FieldLayer):
-    def __init__(self, buffer_size=10):
+    def __init__(self, simulator_io, friendly_colour_yellow, buffer_size=5):
+        """The WorldLayer
+
+        :param simulator_io: The simulator io communicate with the simulator
+        :param friendly_colour_yellow: Is the friendly_colour_yellow?
+        :param buffer_size: The buffer size, set higher for smoother plots.
+                            Set lower for more realtime plots. Default is arbitrary
+
+        """
         FieldLayer.__init__(self)
+
+        self.simulator_io = simulator_io
+        self.friendly_colour_yellow = friendly_colour_yellow
+
+        self.world_buffer = ThreadSafeBuffer(buffer_size, World)
+        self.robot_status_buffer = ThreadSafeBuffer(buffer_size, RobotStatus)
+        self.referee_buffer = ThreadSafeBuffer(buffer_size, Referee, False)
         self.cached_world = World()
-        self.world_buffer = queue.Queue(buffer_size)
-        self.setAcceptHoverEvents(True)
-        self.setAcceptTouchEvents(True)
-        self.pressed_CTRL = False
-        self.pressed_M = False
-        self.pressed_R = False
+        self.cached_status = {}
+
+        self.ball_velocity_vector = None
         self.mouse_clicked = False
-        self.mouse_click_pos = [0, 0]
-        self.mouse_hover_pos = [0, 0]  # might not need later, see hoverMoveEvent
+
+        self.key_pressed = {}
+
+        self.accepted_keys = [Qt.Key.Key_Control, Qt.Key.Key_I]
+        for key in self.accepted_keys:
+            self.key_pressed[key] = False
+
+        self.friendly_robot_id_text_items = {}
+        self.enemy_robot_id_text_items = {}
 
     def keyPressEvent(self, event):
         """Detect when a key has been pressed (override)
-        Note: function name format is different due to overriding the Qt function
+
+        NOTE: function name format is different due to overriding the Qt function
 
         :param event: The event
 
         """
-        if event.key() == Qt.Key_R:
-            # TODO (#2410) enter function to rotate the robot
-            print("pressed R")
-            self.pressed_R = True
+        self.key_pressed[event.key()] = True
 
-        elif event.key() == Qt.Key_Control:
-            # TODO (#2410) enter function to move the ball
-            print("pressed CTRL")
-
-        elif event.key() == Qt.Key_M:
-            # TODO (#2410) enter function to move the robot
-            print("pressed M")
-            self.pressed_M = True
-
-    # Note: the function name formatting is different but this can't be changed since it's overriding the built-in Qt function
     def keyReleaseEvent(self, event):
         """Detect when a key has been released (override)
 
         :param event: The event
 
         """
-        if event.key() == Qt.Key_R:
-            # TODO (#2410) exit function to rotate the robot
-            print("released R")
-            self.pressed_R = False
+        self.key_pressed[event.key()] = False
 
-        elif event.key() == Qt.Key_Control:
-            # TODO (#2410) exit function to move the ball
-            self.pressed_CTRL = False
-            print("released CTRL")
+    def __should_invert_coordinate_frame(self):
+        """Our coordinate system always assumes that the friendly team is defending
+        the negative half of the field.
 
-        elif event.key() == Qt.Key_M:
-            # TODO (#2410) exit function to move the robot
-            print("released M")
-            self.pressed_M = False
+        If we are defending the positive half, we invert the coordinate frame
+        and render the inverted proto. 
 
-    def hoverMoveEvent(self, event):
-        """Detect where the mouse is hovering on the field (override)
-        NOTE: Currently not used but may be useful in next part of (#2410)
+        We can use the referee msg to determine if we are defending the positive
+        or negative half of the field.
+
+        :return: True if we should invert the coordinate frame, False otherwise
+
+        """
+        referee = self.referee_buffer.get(block=False)
+
+        if (self.friendly_colour_yellow and not referee.blue_team_on_positive_half) or (
+            not self.friendly_colour_yellow and referee.blue_team_on_positive_half
+        ):
+            return True
+        return False
+
+    def __invert_mouse_position_if_defending_negative_half(self, mouse_click):
+        """If we are defending the negative half of the field, we invert the coordinate frame
+        for the mouse click to match up with the visualization.
+
+        :param mouse_click: The mouse click location [x, y]
+        :return: The inverted mouse click location [x, y] (if needed to be inverted)
+
+        """
+        if self.__should_invert_coordinate_frame():
+            return [-mouse_click[0], -mouse_click[1]]
+
+        return mouse_click
+
+    def mouseMoveEvent(self, event):
+        """Handle mouse movement
+
+        NOTE: We want to be able to use the mouse to pan/zoom the field.
+        But we also want to be able to click on a things to interact with them.
+
+        We need to make sure that when we are not handling the mouse events,
+        the super class receives them.
 
         :param event: The event
 
         """
-        self.mouse_hover_pos = [event.pos().x(), event.pos().y()]
+        mouse_move_pos = [event.pos().x(), event.pos().y()]
 
-    def mouseClickEvent(self, event):
-        """Detect whether the mouse was clicked anywhere on the field (override)
+        ball_position = geom.Vector(
+            self.cached_world.ball.current_state.global_position.x_meters
+            * MILLIMETERS_PER_METER,
+            self.cached_world.ball.current_state.global_position.y_meters
+            * MILLIMETERS_PER_METER,
+        )
+
+        # If the control key is pressed and the mouse was clicked,
+        # this means that we are dragging the mouse on the screen
+        # to apply a velocity on the ball (to kick it). We create a
+        # velocity vector that is proportional to the distance the
+        # mouse has moved away from the ball.
+        if self.key_pressed[Qt.Key.Key_Control] and self.mouse_clicked:
+            self.ball_velocity_vector = ball_position - geom.Vector(
+                mouse_move_pos[0], mouse_move_pos[1]
+            )
+
+            # Cap the maximum kick speed
+            if (
+                self.ball_velocity_vector.length()
+                > MAX_ALLOWED_KICK_SPEED_M_PER_S * MILLIMETERS_PER_METER
+            ):
+                self.ball_velocity_vector = self.ball_velocity_vector.normalize(
+                    MAX_ALLOWED_KICK_SPEED_M_PER_S * MILLIMETERS_PER_METER
+                )
+
+        # This is key to not break the panning/zooming features
+        else:
+            super().mouseMoveEvent(event)
+
+    def mousePressEvent(self, event):
+        """Handle mouse clicks
+
+        NOTE: We want to be able to use the mouse to pan/zoom the field.
+        But we also want to be able to click on a things to interact with them.
+
+        We need to make sure that when we are not handling the mouse events,
+        the super class receives them.
 
         :param event: The event
 
         """
-        # TODO (#2410) implement robot and ball interactivity through simulator, based on mouse and keyboard events
-
-        # print the position of the mouse click
-        print("x: " + str(event.pos().x() / MM_PER_M))
-        print("y: " + str(event.pos().y() / MM_PER_M))
-
         self.mouse_clicked = True
         self.mouse_click_pos = [event.pos().x(), event.pos().y()]
+        self.mouse_click_pos = self.__invert_mouse_position_if_defending_negative_half(
+            self.mouse_click_pos
+        )
 
         # determine whether a robot was clicked
-        self.identify_robots(event.pos().x(), event.pos().y())
+        friendly_robot, enemy_robot = self.identify_robots(*self.mouse_click_pos)
+
+        # If the user was holding ctrl, send a command to the simulator to move
+        # the ball to the mouse click location.
+        if self.key_pressed[Qt.Key.Key_Control]:
+            world_state = WorldState()
+            world_state.ball_state.CopyFrom(
+                BallState(
+                    global_position=Point(
+                        x_meters=self.mouse_click_pos[0] / MILLIMETERS_PER_METER,
+                        y_meters=self.mouse_click_pos[1] / MILLIMETERS_PER_METER,
+                    )
+                )
+            )
+            self.simulator_io.send_proto(WorldState, world_state)
+
+        # This is key to not break the panning/zooming features
+        else:
+            super().mousePressEvent(event)
+
+    def mouseReleaseEvent(self, event):
+        """Handle mouse clicks
+
+        NOTE: We want to be able to use the mouse to pan/zoom the field.
+        But we also want to be able to click on a things to interact with them.
+
+        We need to make sure that when we are not handling the mouse events,
+        the super class receives them.
+
+        :param event: The event
+
+        """
+        self.mouse_clicked = False
+
+        if self.ball_velocity_vector:
+
+            if self.__should_invert_coordinate_frame():
+                self.ball_velocity_vector = -self.ball_velocity_vector
+
+            world_state = WorldState()
+            world_state.ball_state.CopyFrom(
+                BallState(
+                    global_position=Point(
+                        x_meters=self.mouse_click_pos[0] / MILLIMETERS_PER_METER,
+                        y_meters=self.mouse_click_pos[1] / MILLIMETERS_PER_METER,
+                    ),
+                    global_velocity=Vector(
+                        x_component_meters=self.ball_velocity_vector.x()
+                        / MILLIMETERS_PER_METER,
+                        y_component_meters=self.ball_velocity_vector.y()
+                        / MILLIMETERS_PER_METER,
+                    ),
+                )
+            )
+
+            self.ball_velocity_vector = None
+            self.simulator_io.send_proto(WorldState, world_state)
+
+        else:
+            super().mouseReleaseEvent(event)
 
     def identify_robots(self, mouse_x, mouse_y):
         """Identify which robot was clicked on the field
@@ -111,20 +233,21 @@ class WorldLayer(FieldLayer):
         :param mouse_y: The y position of the mouse click
         
         """
-        self.identify_robot(
-            mouse_x, mouse_y, self.cached_world.friendly_team.team_robots, "Friendly: "
+        friendly_robot = self.identify_robot(
+            mouse_x, mouse_y, self.cached_world.friendly_team.team_robots
         )
-        self.identify_robot(
-            mouse_x, mouse_y, self.cached_world.enemy_team.team_robots, "Enemy: "
+        enemy_robot = self.identify_robot(
+            mouse_x, mouse_y, self.cached_world.enemy_team.team_robots
         )
 
-    def identify_robot(self, mouse_x, mouse_y, team, side):
+        return friendly_robot, enemy_robot
+
+    def identify_robot(self, mouse_x, mouse_y, team):
         """Identify which robot was clicked on the team
 
         :param mouse_x: The x position of the mouse click
         :param mouse_y: The y position of the mouse click
         :param team: The team of robots to iterate over
-        :param side: The label of the team, "Friendly" or "Enemy"
 
         """
         for robot_ in team:
@@ -132,28 +255,13 @@ class WorldLayer(FieldLayer):
             pos_y = robot_.current_state.global_position.y_meters
             if (
                 math.sqrt(
-                    (pos_x - mouse_x / MM_PER_M) ** 2
-                    + (pos_y - mouse_y / MM_PER_M) ** 2
+                    (pos_x - mouse_x / MILLIMETERS_PER_METER) ** 2
+                    + (pos_y - mouse_y / MILLIMETERS_PER_METER) ** 2
                 )
-                <= ROBOT_MAX_RADIUS / MM_PER_M
+                <= ROBOT_MAX_RADIUS_MILLIMETERS / MILLIMETERS_PER_METER
             ):
-                print(side)
-                print(robot_.id)
-
-    # Temporary draw function for testing purposes
-    def draw_mouse_click_loc(self, painter):
-        """Draw a circle indicating where the mouse was clicked on the field
-
-        :param painter: The painter
-
-        """
-        painter.setPen(pg.mkPen("g", width=2))
-        painter.drawEllipse(
-            self.createCircle(
-                self.mouse_click_pos[0], self.mouse_click_pos[1], BALL_RADIUS * 3,
-            )
-        )
-        self.mouse_clicked = False
+                return robot_
+        return None
 
     def draw_field(self, painter, field: Field):
 
@@ -163,88 +271,162 @@ class WorldLayer(FieldLayer):
         :param field: The field proto to draw
 
         """
-        painter.setPen(pg.mkPen("w", width=2))
+        painter.setPen(pg.mkPen("w", width=LINE_WIDTH))
 
         # Draw Field Bounds
         painter.drawRect(
             QtCore.QRectF(
-                -(field.field_x_length / 2) * MM_PER_M,
-                (field.field_y_length / 2) * MM_PER_M,
-                (field.field_x_length) * MM_PER_M,
-                -(field.field_y_length) * MM_PER_M,
+                -(field.field_x_length / 2) * MILLIMETERS_PER_METER,
+                (field.field_y_length / 2) * MILLIMETERS_PER_METER,
+                (field.field_x_length) * MILLIMETERS_PER_METER,
+                -(field.field_y_length) * MILLIMETERS_PER_METER,
             )
         )
 
         # Draw Friendly Defense
         painter.drawRect(
             QtCore.QRectF(
-                -(field.field_x_length / 2) * MM_PER_M,
-                (field.defense_y_length / 2) * MM_PER_M,
-                (field.defense_x_length) * MM_PER_M,
-                -(field.defense_y_length) * MM_PER_M,
+                -(field.field_x_length / 2) * MILLIMETERS_PER_METER,
+                (field.defense_y_length / 2) * MILLIMETERS_PER_METER,
+                (field.defense_x_length) * MILLIMETERS_PER_METER,
+                -(field.defense_y_length) * MILLIMETERS_PER_METER,
             )
         )
 
         # Draw Enemy Defense Area
         painter.drawRect(
             QtCore.QRectF(
-                ((field.field_x_length / 2) - field.defense_x_length) * MM_PER_M,
-                (field.defense_y_length / 2) * MM_PER_M,
-                (field.defense_x_length) * MM_PER_M,
-                -(field.defense_y_length) * MM_PER_M,
+                ((field.field_x_length / 2) - field.defense_x_length)
+                * MILLIMETERS_PER_METER,
+                (field.defense_y_length / 2) * MILLIMETERS_PER_METER,
+                (field.defense_x_length) * MILLIMETERS_PER_METER,
+                -(field.defense_y_length) * MILLIMETERS_PER_METER,
             )
         )
 
         # Draw Centre Circle
         painter.drawEllipse(
-            self.createCircle(0, 0, field.center_circle_radius * MM_PER_M)
+            self.createCircle(0, 0, field.center_circle_radius * MILLIMETERS_PER_METER)
         )
 
-    def draw_team(self, painter, color, team: Team):
+    def draw_team(self, painter, color, team, robot_id_map):
 
-        """Draw the team
+        """Draw the team with robot IDs
 
         :param painter: The painter
         :param color: The color of the robots
         :param team: The team proto to draw
+        :param robot_id_map: map of robot_id -> text_item for the team being drawn
 
         """
         convert_degree = -16
 
         for robot in team.team_robots:
 
+            if robot.id not in robot_id_map:
+                robot_id_font = painter.font()
+                robot_id_font.setPointSize(int(ROBOT_MAX_RADIUS_MILLIMETERS / 4))
+
+                # setting a black background to keep ID visible over yellow robot
+                robot_id_text = pg.TextItem(str(robot.id), fill=(0, 0, 0, 0))
+                robot_id_text.setFont(robot_id_font)
+                robot_id_map[robot.id] = robot_id_text
+                robot_id_text.setParentItem(self)
+
+            robot_id_map[robot.id].setPos(
+                (robot.current_state.global_position.x_meters * MILLIMETERS_PER_METER)
+                - ROBOT_MAX_RADIUS_MILLIMETERS,
+                (robot.current_state.global_position.y_meters * MILLIMETERS_PER_METER)
+                - ROBOT_MAX_RADIUS_MILLIMETERS,
+            )
+            robot_id_map[robot.id].setVisible(self.key_pressed[Qt.Key.Key_I])
+
             painter.setPen(pg.mkPen(color))
             painter.setBrush(pg.mkBrush(color))
 
-            # TODO (#2396) Draw the robot IDs of the robots
             painter.drawChord(
                 self.createCircle(
-                    robot.current_state.global_position.x_meters * MM_PER_M,
-                    robot.current_state.global_position.y_meters * MM_PER_M,
-                    ROBOT_MAX_RADIUS,
+                    robot.current_state.global_position.x_meters
+                    * MILLIMETERS_PER_METER,
+                    robot.current_state.global_position.y_meters
+                    * MILLIMETERS_PER_METER,
+                    ROBOT_MAX_RADIUS_MILLIMETERS,
                 ),
                 int((math.degrees(robot.current_state.global_orientation.radians) + 45))
                 * convert_degree,
                 270 * convert_degree,
             )
 
-    def draw_ball(self, painter, ball: Ball):
+    def draw_ball_state(self, painter, ball_state: BallState):
         """Draw the ball
 
         :param painter: The painter
-        :param ball: The ball proto to draw
+        :param ball_state: The ball state proto to draw
 
         """
 
-        painter.setPen(pg.mkPen(Colors.BALL_COLOR))
+        painter.setPen(pg.mkPen(Colors.BALL_COLOR, width=LINE_WIDTH))
         painter.setBrush(pg.mkBrush(Colors.BALL_COLOR))
+
         painter.drawEllipse(
             self.createCircle(
-                ball.current_state.global_position.x_meters * MM_PER_M,
-                ball.current_state.global_position.y_meters * MM_PER_M,
-                BALL_RADIUS,
+                ball_state.global_position.x_meters * MILLIMETERS_PER_METER,
+                ball_state.global_position.y_meters * MILLIMETERS_PER_METER,
+                BALL_MAX_RADIUS_MILLIMETERS,
             )
         )
+
+        # If the mouse is being dragged on the screen, visualize
+        # the ball velocity vector. The 0.5 scaling is abitrary
+        if self.ball_velocity_vector:
+            vector = self.ball_velocity_vector
+
+            polyline = QtGui.QPolygon(
+                [
+                    QtCore.QPoint(
+                        int(
+                            MILLIMETERS_PER_METER * ball_state.global_position.x_meters
+                        ),
+                        int(
+                            MILLIMETERS_PER_METER * ball_state.global_position.y_meters
+                        ),
+                    ),
+                    QtCore.QPoint(
+                        int(MILLIMETERS_PER_METER * ball_state.global_position.x_meters)
+                        + vector.x(),
+                        int(MILLIMETERS_PER_METER * ball_state.global_position.y_meters)
+                        + vector.y(),
+                    ),
+                ]
+            )
+
+            painter.drawPolyline(polyline)
+
+    def draw_robot_status(self, painter):
+        """Draw the robot status
+
+        :param painter: The painter
+
+        """
+        self.cached_status = self.robot_status_buffer.get(block=False)
+
+        painter.setBrush(pg.mkBrush(None))
+        painter.setPen(pg.mkPen("r", width=LINE_WIDTH))
+
+        for robot in self.cached_world.friendly_team.team_robots:
+            if (
+                self.cached_status.break_beam_status.ball_in_beam is True
+                and robot.id == self.cached_status.robot_id
+            ):
+                painter.drawEllipse(
+                    self.createCircle(
+                        robot.current_state.global_position.x_meters
+                        * MILLIMETERS_PER_METER,
+                        robot.current_state.global_position.y_meters
+                        * MILLIMETERS_PER_METER,
+                        ROBOT_MAX_RADIUS_MILLIMETERS / 2,
+                    )
+                )
 
     def paint(self, painter, option, widget):
         """Paint this layer
@@ -254,20 +436,32 @@ class WorldLayer(FieldLayer):
         :param widget: The widget that we are painting on
 
         """
+        self.cached_world = self.world_buffer.get(block=False)
 
-        try:
-            world = self.world_buffer.get_nowait()
-        except queue.Empty as empty:
-            world = self.cached_world
+        self.draw_field(painter, self.cached_world.field)
+        self.draw_ball_state(painter, self.cached_world.ball.current_state)
 
-        self.cached_world = world
-        self.draw_field(painter, world.field)
-        self.draw_ball(painter, world.ball)
+        friendly_colour = (
+            Colors.YELLOW_ROBOT_COLOR
+            if self.friendly_colour_yellow
+            else Colors.BLUE_ROBOT_COLOR
+        )
+        enemy_colour = (
+            Colors.BLUE_ROBOT_COLOR
+            if self.friendly_colour_yellow
+            else Colors.YELLOW_ROBOT_COLOR
+        )
 
-        # temporary function call for testing purposes
-        self.draw_mouse_click_loc(painter)
-
-        # TODO (#2399) Figure out which team color _we_ are and update the color
-        # passed into the team.
-        self.draw_team(painter, Colors.YELLOW_ROBOT_COLOR, world.friendly_team)
-        self.draw_team(painter, Colors.BLUE_ROBOT_COLOR, world.enemy_team)
+        self.draw_team(
+            painter,
+            friendly_colour,
+            self.cached_world.friendly_team,
+            self.friendly_robot_id_text_items,
+        )
+        self.draw_team(
+            painter,
+            enemy_colour,
+            self.cached_world.enemy_team,
+            self.enemy_robot_id_text_items,
+        )
+        self.draw_robot_status(painter)
