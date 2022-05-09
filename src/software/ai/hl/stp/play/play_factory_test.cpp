@@ -13,7 +13,8 @@ class PlayFactoryTest : public testing::Test
 
 TEST_F(PlayFactoryTest, test_shoot_or_pass_play)
 {
-    TbotsProto::Play play_proto = TbotsProto::Play::ShootOrPassPlay;
-    std::unique_ptr<Play> play  = createPlay(play_proto, ai_config);
+    TbotsProto::Play play_proto = TbotsProto::Play();
+    play_proto.set_name(TbotsProto::Play::ShootOrPassPlay);
+    std::unique_ptr<Play> play = createPlay(play_proto, ai_config);
     EXPECT_EQ(objectTypeName(*play), "ShootOrPassPlay");
 }
