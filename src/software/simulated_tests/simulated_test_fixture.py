@@ -41,6 +41,7 @@ class SimulatorTestRunner(object):
 
     def __init__(
         self,
+        test_name,
         thunderscope,
         simulator_proto_unix_io,
         blue_full_system_proto_unix_io,
@@ -49,6 +50,7 @@ class SimulatorTestRunner(object):
     ):
         """Initialize the SimulatorTestRunner
         
+        :param test_name: The name of the test to run
         :param thunderscope: The thunderscope to use, None if not used
         :param simulator_proto_unix_io: The simulator proto unix io to use
         :param blue_full_system_proto_unix_io: The blue full system proto unix io to use
@@ -57,6 +59,7 @@ class SimulatorTestRunner(object):
 
         """
 
+        self.test_name = test_name
         self.thunderscope = thunderscope
         self.simulator_proto_unix_io = simulator_proto_unix_io
         self.blue_full_system_proto_unix_io = blue_full_system_proto_unix_io
@@ -173,6 +176,11 @@ class SimulatorTestRunner(object):
                 )
 
                 if self.thunderscope:
+
+                    # Set the test name
+                    eventually_validation_proto_set.test_name = self.test_name
+                    always_validation_proto_set.test_name = self.test_name
+
                     # Send out the validation proto to thunderscope
                     self.thunderscope.blue_full_system_proto_unix_io.send_proto(
                         ValidationProtoSet, eventually_validation_proto_set
@@ -341,6 +349,7 @@ def simulated_test_runner():
             time.sleep(LAUNCH_DELAY_S)
 
             runner = SimulatorTestRunner(
+                current_test,
                 tscope,
                 simulator_proto_unix_io,
                 blue_full_system_proto_unix_io,
