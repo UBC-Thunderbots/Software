@@ -23,7 +23,8 @@
  * @param max_allowed_speed_mode The mode of maximum speed allowed
  * @param target_spin_rev_per_s The target spin while moving in revolutions per second
  * @param robot_constants The robot constants
- * @param cost_override optionally override the cost of the move primitive, defaults to the path length
+ * @param cost_override optionally override the cost of the move primitive, defaults to
+ * the path length
  *
  * @return Pointer to Move Primitive Message
  */
@@ -33,7 +34,8 @@ std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
     const TbotsProto::BallCollisionType& ball_collision_type,
     const AutoChipOrKick& auto_chip_or_kick,
     const TbotsProto::MaxAllowedSpeedMode& max_allowed_speed_mode,
-    double target_spin_rev_per_s, const RobotConstants_t& robot_constants, std::optional<double> cost_override = std::nullopt);
+    double target_spin_rev_per_s, const RobotConstants_t& robot_constants,
+    std::optional<double> cost_override = std::nullopt);
 
 /**
  * Create a Stop Move Primitive Message

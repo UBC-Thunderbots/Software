@@ -9,12 +9,13 @@ std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
     const TbotsProto::BallCollisionType& ball_collision_type,
     const AutoChipOrKick& auto_chip_or_kick,
     const TbotsProto::MaxAllowedSpeedMode& max_allowed_speed_mode,
-    double target_spin_rev_per_s, const RobotConstants_t& robot_constants, std::optional<double> cost_override)
+    double target_spin_rev_per_s, const RobotConstants_t& robot_constants,
+    std::optional<double> cost_override)
 {
     auto move_primitive_msg = std::make_unique<TbotsProto::Primitive>();
 
     auto cost = motion_control.normalized_path_length();
-    if(cost_override.has_value())
+    if (cost_override.has_value())
     {
         cost = cost_override.value();
     }
