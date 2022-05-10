@@ -19,7 +19,7 @@ GlobalPathPlannerFactory::GlobalPathPlannerFactory(
          counter < std::pow(2, motion_constraint_enum_descriptor->value_count());
          ++counter)
     {
-        std::set<TbotsProto::MotionConstraint> motion_constraint_obstacles;
+        std::set<TbotsProto::MotionConstraint> static_motion_constraints;
 
         // Use the value of the counter and bit arithmetic to get the motion constraint
         // obstacles out
@@ -44,18 +44,28 @@ GlobalPathPlannerFactory::GlobalPathPlannerFactory(
                     has_dynamic_constraints = true;
                     break;
                 }
-                motion_constraint_obstacles.emplace(constraint);
+                static_motion_constraints.emplace(constraint);
             }
         }
 
         if (!has_dynamic_constraints)
         {
             auto obstacles = obstacle_factory.createStaticObstaclesFromMotionConstraints(
-                motion_constraint_obstacles, field);
+                static_motion_constraints, field);
             planners.emplace(std::make_pair(
-                motion_constraint_obstacles,
+                static_motion_constraints,
                 std::make_shared<EnlsvgPathPlanner>(field.fieldBoundary(), obstacles,
                                                     ROBOT_MAX_RADIUS_METERS)));
+
+            google::protobuf::RepeatedPtrField<TbotsProto::Obstacles>
+                repeated_obstacle_proto;
+            for (const auto &obstacle : obstacles)
+            {
+                *(repeated_obstacle_proto.Add()) = obstacle->createObstacleProto();
+            }
+
+            motion_constraint_to_obstacles.emplace(
+                std::make_pair(static_motion_constraints, repeated_obstacle_proto));
         }
     }
 }
@@ -82,4 +92,33 @@ std::shared_ptr<const EnlsvgPathPlanner> GlobalPathPlannerFactory::getPathPlanne
         LOG(WARNING) << "Returning obstacle-free planner.";
     }
     return planners.at({});
+}
+
+std::unique_ptr<google::protobuf::RepeatedPtrField<TbotsProto::Obstacles>>
+GlobalPathPlannerFactory::getObstacles(
+    std::set<TbotsProto::MotionConstraint> constraints) const
+{
+    auto obstacles = motion_constraint_to_obstacles.at({});
+    for (const auto &dynamic_constraint : dynamic_motion_constraints)
+    {
+        constraints.erase(dynamic_constraint);
+    }
+    try
+    {
+        obstacles = motion_constraint_to_obstacles.at(constraints);
+    }
+    catch (std::out_of_range &e)
+    {
+        LOG(WARNING)
+            << "GlobalPathPlannerFactory is unable to obtain obstacles for the following motion constraints: ";
+        for (auto constraint : constraints)
+        {
+            LOG(WARNING) << toString(constraint);
+        }
+        LOG(WARNING) << "Returning no obstacles.";
+    }
+    std::unique_ptr<google::protobuf::RepeatedPtrField<TbotsProto::Obstacles>>
+        obstacles_ptr;
+    *obstacles_ptr = obstacles;
+    return obstacles_ptr;
 }

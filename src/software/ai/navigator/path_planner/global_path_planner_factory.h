@@ -49,10 +49,25 @@ class GlobalPathPlannerFactory
     std::shared_ptr<const EnlsvgPathPlanner> getPathPlanner(
         std::set<TbotsProto::MotionConstraint> constraints) const;
 
+    /**
+     * Given a set of motion constraints, returns the relevant obstacles. If the
+     * obstacles not cached, then it returns no obstacles.
+     *
+     * @param constraints    the motion constraints used to get the relevant obstacles
+     *
+     * @return obstacles for the motion constraints
+     */
+    std::unique_ptr<google::protobuf::RepeatedPtrField<TbotsProto::Obstacles>>
+    getObstacles(std::set<TbotsProto::MotionConstraint> constraints) const;
+
    private:
     std::map<std::set<TbotsProto::MotionConstraint>,
              std::shared_ptr<const EnlsvgPathPlanner>>
         planners;
+
+    std::map<std::set<TbotsProto::MotionConstraint>,
+             google::protobuf::RepeatedPtrField<TbotsProto::Obstacles>>
+        motion_constraint_to_obstacles;
 
     // Cache which motion constraints are dynamic for convenience
     std::set<TbotsProto::MotionConstraint> dynamic_motion_constraints;

@@ -50,7 +50,7 @@ message MotionControl
     double normalized_path_length                = 2;
     repeated MotionConstraint motion_constraints = 3;
     Point requested_destination                  = 4;
-    Obstacles static_obstacles                   = 5;
+    repeated Obstacles static_obstacles          = 5;
 }
 
 enum DribblerMode
