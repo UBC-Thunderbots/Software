@@ -463,6 +463,10 @@ class Field
 
 namespace std
 {
+    // Implements the std::less function so Field can be used as the key in data
+    // structures, such as std::map. See:
+    // https://stackoverflow.com/questions/42762633/why-is-stdless-better-than and
+    // https://en.cppreference.com/w/cpp/utility/functional/less
     template <>
     struct less<Field>
     {

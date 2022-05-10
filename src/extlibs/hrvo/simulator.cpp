@@ -194,7 +194,7 @@ void HRVOSimulator::updatePrimitiveSet(const TbotsProto::PrimitiveSet &new_primi
                 hrvo_agent->setPreferredSpeed(new_max_speed * PREF_SPEED_SCALE);
 
                 // TODO (#2418): Update implementation of Primitive to support
-                // multiple path points
+                // multiple path points and remove this check
                 CHECK(primitive.move().motion_control().path().point().size() >= 1)
                     << "Empty path: "
                     << primitive.move().motion_control().path().point().size()

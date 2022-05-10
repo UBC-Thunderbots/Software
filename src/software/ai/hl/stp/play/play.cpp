@@ -224,6 +224,8 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
 
                 if (missing_capabilities.size() > 0)
                 {
+                    // We arbitrarily increase the cost, so that robots with missing
+                    // capabilities are not assigned
                     matrix(row, col) = robot_cost_for_tactic * 10.0 + 10.0;
                 }
                 else
@@ -342,9 +344,6 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::getPrimitivesFromTactic(
                              << destination << std::endl;
                 motion_control.set_normalized_path_length(1.0);
             }
-
-            CHECK(path_points.size() >= 2)
-                << "Empty path: " << path_points.size() << std::endl;
 
             path_points.erase(path_points.begin());
             for (const auto &point : path_points)
