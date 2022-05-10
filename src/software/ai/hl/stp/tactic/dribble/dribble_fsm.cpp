@@ -109,7 +109,7 @@ void DribbleFSM::dribble(const Update &event)
             event.control_params.dribble_destination,
             event.control_params.final_dribble_orientation);
 
-    event.common.set_primitive(createCostedMovePrimitive(
+    event.common.set_primitive(createMovePrimitive(
         CREATE_MOTION_CONTROL(target_destination), target_orientation, 0,
         TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
         AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
@@ -126,7 +126,7 @@ void DribbleFSM::loseBall(const Update &event)
         ball_position, face_ball_orientation,
         dribble_tactic_config->getLoseBallPossessionThreshold()->value() * 2);
 
-    event.common.set_primitive(createCostedMovePrimitive(
+    event.common.set_primitive(createMovePrimitive(
         CREATE_MOTION_CONTROL(away_from_ball_position), face_ball_orientation, 0,
         TbotsProto::DribblerMode::OFF, TbotsProto::BallCollisionType::AVOID,
         AutoChipOrKick{AutoChipOrKickMode::AUTOKICK, 0.5},

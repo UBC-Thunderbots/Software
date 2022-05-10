@@ -21,7 +21,7 @@ struct ChipFSM
     DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
     /**
-     * Action that updates the ChipPrimitive
+     * Action that updates the MovePrimitive
      *
      * @param event ChipFSM::Update event
      */

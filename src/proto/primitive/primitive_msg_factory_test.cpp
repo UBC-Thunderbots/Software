@@ -34,7 +34,7 @@ TEST_F(PrimitiveFactoryTest, test_create_move_primitive)
         5.0, robot_constants);
 
     ASSERT_TRUE(move_primitive->has_move());
-    auto destination = move_primitive->move().motion_control().path().point().at(0);
+    auto destination = move_primitive->move().motion_control().path().points().at(0);
     EXPECT_EQ(destination.x_meters(), -5);
     EXPECT_EQ(destination.y_meters(), 1);
     EXPECT_EQ(move_primitive->move().final_speed_m_per_s(), 3.0);
@@ -58,7 +58,7 @@ TEST_F(PrimitiveFactoryTest, test_create_move_primitive_with_autochip)
 
 
     ASSERT_TRUE(move_primitive->has_move());
-    auto destination = move_primitive->move().motion_control().path().point().at(0);
+    auto destination = move_primitive->move().motion_control().path().points().at(0);
     EXPECT_EQ(destination.x_meters(), -5);
     EXPECT_EQ(destination.y_meters(), 1);
     EXPECT_EQ(move_primitive->move().final_speed_m_per_s(), 3.0);
@@ -82,7 +82,7 @@ TEST_F(PrimitiveFactoryTest, test_create_move_primitive_with_autokick)
         TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND, 0.0, robot_constants);
 
     ASSERT_TRUE(move_primitive->has_move());
-    auto destination = move_primitive->move().motion_control().path().point().at(0);
+    auto destination = move_primitive->move().motion_control().path().points().at(0);
     EXPECT_EQ(destination.x_meters(), -5);
     EXPECT_EQ(destination.y_meters(), 1);
     EXPECT_EQ(move_primitive->move().final_speed_m_per_s(), 3.0);
