@@ -69,7 +69,7 @@ std::unique_ptr<TbotsProto::Primitive> createChipPrimitive(
     TbotsProto::MotionControl motion_control;
     TbotsProto::Path path_proto;
 
-    *(path_proto.add_point())        = *createPointProto(chip_origin);
+    *(path_proto.add_points())       = *createPointProto(chip_origin);
     *(motion_control.mutable_path()) = path_proto;
 
     return createCostedMovePrimitive(
@@ -86,7 +86,7 @@ std::unique_ptr<TbotsProto::Primitive> createKickPrimitive(
     TbotsProto::MotionControl motion_control;
     TbotsProto::Path path_proto;
 
-    *(path_proto.add_point())        = *createPointProto(kick_origin);
+    *(path_proto.add_points())       = *createPointProto(kick_origin);
     *(motion_control.mutable_path()) = path_proto;
 
     return createCostedMovePrimitive(

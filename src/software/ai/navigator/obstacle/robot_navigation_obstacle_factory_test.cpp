@@ -237,7 +237,8 @@
 //
 // TEST_F(RobotNavigationObstacleFactoryMotionConstraintTest, centre_circle)
 //{
-//    auto obstacles = robot_navigation_obstacle_factory.createFromMotionConstraint(
+//    auto obstacles =
+//    robot_navigation_obstacle_factory.createStaticObstaclesFromMotionConstraint(
 //        MotionConstraint::CENTER_CIRCLE, world);
 //    EXPECT_EQ(1, obstacles.size());
 //    try
@@ -255,7 +256,8 @@
 //
 // TEST_F(RobotNavigationObstacleFactoryMotionConstraintTest, half_metre_around_ball)
 //{
-//    auto obstacles = robot_navigation_obstacle_factory.createFromMotionConstraint(
+//    auto obstacles =
+//    robot_navigation_obstacle_factory.createStaticObstaclesFromMotionConstraint(
 //        MotionConstraint::HALF_METER_AROUND_BALL, world);
 //    EXPECT_EQ(1, obstacles.size());
 //    try
@@ -273,7 +275,8 @@
 //
 // TEST_F(RobotNavigationObstacleFactoryMotionConstraintTest, inflated_enemy_defense_area)
 //{
-//    auto obstacles = robot_navigation_obstacle_factory.createFromMotionConstraint(
+//    auto obstacles =
+//    robot_navigation_obstacle_factory.createStaticObstaclesFromMotionConstraint(
 //        MotionConstraint::INFLATED_ENEMY_DEFENSE_AREA, world);
 //    EXPECT_EQ(1, obstacles.size());
 //    try
@@ -291,7 +294,8 @@
 //
 // TEST_F(RobotNavigationObstacleFactoryMotionConstraintTest, friendly_defense_area)
 //{
-//    auto obstacles = robot_navigation_obstacle_factory.createFromMotionConstraint(
+//    auto obstacles =
+//    robot_navigation_obstacle_factory.createStaticObstaclesFromMotionConstraint(
 //        MotionConstraint::FRIENDLY_DEFENSE_AREA, world);
 //    EXPECT_EQ(1, obstacles.size());
 //    try
@@ -309,7 +313,8 @@
 //
 // TEST_F(RobotNavigationObstacleFactoryMotionConstraintTest, enemy_defense_area)
 //{
-//    auto obstacles = robot_navigation_obstacle_factory.createFromMotionConstraint(
+//    auto obstacles =
+//    robot_navigation_obstacle_factory.createStaticObstaclesFromMotionConstraint(
 //        MotionConstraint::ENEMY_DEFENSE_AREA, world);
 //    EXPECT_EQ(1, obstacles.size());
 //    try
@@ -327,7 +332,8 @@
 //
 // TEST_F(RobotNavigationObstacleFactoryMotionConstraintTest, friendly_half)
 //{
-//    auto obstacles = robot_navigation_obstacle_factory.createFromMotionConstraint(
+//    auto obstacles =
+//    robot_navigation_obstacle_factory.createStaticObstaclesFromMotionConstraint(
 //        MotionConstraint::FRIENDLY_HALF, world);
 //    EXPECT_EQ(1, obstacles.size());
 //    try
@@ -345,7 +351,8 @@
 //
 // TEST_F(RobotNavigationObstacleFactoryMotionConstraintTest, enemy_half)
 //{
-//    auto obstacles = robot_navigation_obstacle_factory.createFromMotionConstraint(
+//    auto obstacles =
+//    robot_navigation_obstacle_factory.createStaticObstaclesFromMotionConstraint(
 //        MotionConstraint::ENEMY_HALF, world);
 //    EXPECT_EQ(1, obstacles.size());
 //    try
@@ -371,7 +378,8 @@
 //    ball_placement_gs.updateBall(new_ball);
 //    world.updateBall(new_ball);
 //    world.updateGameState(ball_placement_gs);
-//    auto obstacles = robot_navigation_obstacle_factory.createFromMotionConstraint(
+//    auto obstacles =
+//    robot_navigation_obstacle_factory.createStaticObstaclesFromMotionConstraint(
 //        MotionConstraint::AVOID_BALL_PLACEMENT_INTERFERENCE, world);
 //    EXPECT_EQ(1, obstacles.size());
 //    try
@@ -409,7 +417,8 @@
 //    ball_placement_gs.updateBall(new_ball);
 //    world.updateBall(new_ball);
 //    world.updateGameState(ball_placement_gs);
-//    auto obstacles = robot_navigation_obstacle_factory.createFromMotionConstraint(
+//    auto obstacles =
+//    robot_navigation_obstacle_factory.createStaticObstaclesFromMotionConstraint(
 //        MotionConstraint::AVOID_BALL_PLACEMENT_INTERFERENCE, world);
 //    EXPECT_EQ(1, obstacles.size());
 //    try

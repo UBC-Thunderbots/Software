@@ -1,5 +1,5 @@
 import pyqtgraph as pg
-from proto.visualization_pb2 import PathVisualization
+from proto.tbots_software_msgs_pb2 import PrimitiveSet
 from pyqtgraph.Qt import QtCore, QtGui
 
 import software.thunderscope.constants as constants
@@ -19,9 +19,7 @@ class PathLayer(FieldLayer):
 
         """
         FieldLayer.__init__(self)
-        self.path_visualization_buffer = ThreadSafeBuffer(
-            buffer_size, PathVisualization
-        )
+        self.primitive_set_buffer = ThreadSafeBuffer(buffer_size, PrimitiveSet)
 
     def paint(self, painter, option, widget):
         """Paint this layer
@@ -31,7 +29,7 @@ class PathLayer(FieldLayer):
         :param widget: The widget that we are painting on
 
         """
-        paths = self.path_visualization_buffer.get(block=False)
+        paths = self.primitive_set_buffer.get(block=False)
         painter.setPen(
             pg.mkPen(Colors.NAVIGATOR_PATH_COLOR, width=constants.LINE_WIDTH)
         )

@@ -12,7 +12,8 @@ RobotNavigationObstacleFactory::RobotNavigationObstacleFactory(
         });
 }
 
-std::vector<ObstaclePtr> RobotNavigationObstacleFactory::createFromMotionConstraint(
+std::vector<ObstaclePtr>
+RobotNavigationObstacleFactory::createStaticObstaclesFromMotionConstraint(
     const TbotsProto::MotionConstraint &motion_constraint, const Field &field) const
 {
     std::vector<ObstaclePtr> obstacles;
@@ -86,14 +87,16 @@ std::vector<ObstaclePtr> RobotNavigationObstacleFactory::createFromMotionConstra
     return obstacles;
 }
 
-std::vector<ObstaclePtr> RobotNavigationObstacleFactory::createFromMotionConstraints(
+std::vector<ObstaclePtr>
+RobotNavigationObstacleFactory::createStaticObstaclesFromMotionConstraints(
     const std::set<TbotsProto::MotionConstraint> &motion_constraints,
     const Field &field) const
 {
     std::vector<ObstaclePtr> obstacles;
     for (auto motion_constraint : motion_constraints)
     {
-        auto new_obstacles = createFromMotionConstraint(motion_constraint, field);
+        auto new_obstacles =
+            createStaticObstaclesFromMotionConstraint(motion_constraint, field);
         obstacles.insert(obstacles.end(), new_obstacles.begin(), new_obstacles.end());
     }
 

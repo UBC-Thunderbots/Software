@@ -714,7 +714,7 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_speed_test)
     // Create static obstacles with friendly and enemy defense areas blocked off along
     // with the centre circle
     std::vector<ObstaclePtr> obstacles = {
-        robot_navigation_obstacle_factory.createFromMotionConstraints(
+        robot_navigation_obstacle_factory.createStaticObstaclesFromMotionConstraints(
             {TbotsProto::MotionConstraint::CENTER_CIRCLE,
              TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA,
              TbotsProto::MotionConstraint::ENEMY_DEFENSE_AREA},

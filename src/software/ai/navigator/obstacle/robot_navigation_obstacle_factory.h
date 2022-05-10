@@ -28,26 +28,26 @@ class RobotNavigationObstacleFactory
         std::shared_ptr<const RobotNavigationObstacleConfig> config);
 
     /**
-     * Create obstacles for the given motion constraints
+     * Create static obstacles for the given motion constraints
      *
      * @param motion_constraints The motion constraints to create obstacles for
      * @param field Field we're enforcing motion constraints in
      *
      * @return Obstacles representing the given motion constraints
      */
-    std::vector<ObstaclePtr> createFromMotionConstraints(
+    std::vector<ObstaclePtr> createStaticObstaclesFromMotionConstraints(
         const std::set<TbotsProto::MotionConstraint> &motion_constraints,
         const Field &field) const;
 
     /**
-     * Create obstacles for the given motion constraint
+     * Create static obstacles for the given motion constraint
      *
      * @param motion_constraint The motion constraint to create obstacles for
      * @param field Field we're enforcing motion constraints in
      *
      * @return Obstacles representing the given motion constraint
      */
-    std::vector<ObstaclePtr> createFromMotionConstraint(
+    std::vector<ObstaclePtr> createStaticObstaclesFromMotionConstraint(
         const TbotsProto::MotionConstraint &motion_constraint, const Field &field) const;
 
     /**

@@ -50,7 +50,7 @@ GlobalPathPlannerFactory::GlobalPathPlannerFactory(
 
         if (!has_dynamic_constraints)
         {
-            auto obstacles = obstacle_factory.createFromMotionConstraints(
+            auto obstacles = obstacle_factory.createStaticObstaclesFromMotionConstraints(
                 motion_constraint_obstacles, field);
             planners.emplace(std::make_pair(
                 motion_constraint_obstacles,

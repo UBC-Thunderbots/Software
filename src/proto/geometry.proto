@@ -15,7 +15,7 @@ message Point
 
 message Path
 {
-    repeated Point point = 1 [(nanopb.fieldopt).max_count = 20];
+    repeated Point points = 1 [(nanopb.fieldopt).max_count = 20];
 }
 
 message Vector

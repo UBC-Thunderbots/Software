@@ -348,7 +348,7 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::getPrimitivesFromTactic(
             path_points.erase(path_points.begin());
             for (const auto &point : path_points)
             {
-                *(path_proto.add_point()) = *createPointProto(point);
+                *(path_proto.add_points()) = *createPointProto(point);
             }
             *(motion_control.mutable_path()) = path_proto;
             for (const auto &motion_constraint : motion_constraints)
