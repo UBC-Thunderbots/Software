@@ -29,18 +29,26 @@ class PathLayer(FieldLayer):
         :param widget: The widget that we are painting on
 
         """
-        paths = self.primitive_set_buffer.get(block=False)
+        primitive_set = self.primitive_set_buffer.get(
+            block=False
+        ).robot_primitives.values()
+        paths = [
+            primitive.move.motion_control.path
+            for primitive in primitive_set
+            if primitive.HasField("move")
+        ]
+
         painter.setPen(
             pg.mkPen(Colors.NAVIGATOR_PATH_COLOR, width=constants.LINE_WIDTH)
         )
 
-        for path in paths.path:
+        for path in paths:
             polygon_points = [
                 QtCore.QPoint(
                     int(MILLIMETERS_PER_METER * point.x_meters),
                     int(MILLIMETERS_PER_METER * point.y_meters),
                 )
-                for point in path.point
+                for point in path.points
             ]
             poly = QtGui.QPolygon(polygon_points)
             painter.drawPolyline(poly)

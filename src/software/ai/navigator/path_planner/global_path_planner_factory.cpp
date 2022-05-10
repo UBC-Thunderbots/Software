@@ -94,7 +94,7 @@ std::shared_ptr<const EnlsvgPathPlanner> GlobalPathPlannerFactory::getPathPlanne
     return planners.at({});
 }
 
-std::unique_ptr<google::protobuf::RepeatedPtrField<TbotsProto::Obstacles>>
+google::protobuf::RepeatedPtrField<TbotsProto::Obstacles>
 GlobalPathPlannerFactory::getObstacles(
     std::set<TbotsProto::MotionConstraint> constraints) const
 {
@@ -117,8 +117,5 @@ GlobalPathPlannerFactory::getObstacles(
         }
         LOG(WARNING) << "Returning no obstacles.";
     }
-    std::unique_ptr<google::protobuf::RepeatedPtrField<TbotsProto::Obstacles>>
-        obstacles_ptr;
-    *obstacles_ptr = obstacles;
-    return obstacles_ptr;
+    return obstacles;
 }

@@ -318,9 +318,11 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::getPrimitivesFromTactic(
     std::shared_ptr<Tactic> tactic,
     std::set<TbotsProto::MotionConstraint> motion_constraints) const
 {
+    auto obstacles    = path_planner_factory.getObstacles(motion_constraints);
     auto path_planner = path_planner_factory.getPathPlanner(motion_constraints);
     CreateMotionControl create_motion_control =
-        [path_planner, motion_constraints](const Robot &robot, const Point &destination) {
+        [obstacles, path_planner, motion_constraints](const Robot &robot,
+                                                      const Point &destination) {
             Point robot_position = robot.position();
             TbotsProto::MotionControl motion_control;
             TbotsProto::Path path_proto;
@@ -345,7 +347,6 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::getPrimitivesFromTactic(
                 motion_control.set_normalized_path_length(1.0);
             }
 
-            path_points.erase(path_points.begin());
             for (const auto &point : path_points)
             {
                 *(path_proto.add_points()) = *createPointProto(point);
@@ -355,6 +356,8 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::getPrimitivesFromTactic(
             {
                 motion_control.add_motion_constraints(motion_constraint);
             }
+
+            *(motion_control.mutable_static_obstacles()) = obstacles;
 
             return motion_control;
         };
