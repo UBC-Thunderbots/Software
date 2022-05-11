@@ -96,14 +96,14 @@ jobs:
         with:
           name: blue-ai-proto-logs
           path: |
-            /tmp/tbots/blue
+            /tmp/tbots/blue/logs
 
       - name: Upload simulated test proto logs
         uses: actions/upload-artifact@v3
         with:
           name: yellow-ai-proto-logs
           path: |
-            /tmp/tbots/yellow
+            /tmp/tbots/yellow/logs
 
       - name: Simulated Test Run 2 (Continue on error)
         # Run a second time without checking for errors
