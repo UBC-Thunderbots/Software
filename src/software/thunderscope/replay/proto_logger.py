@@ -26,7 +26,7 @@ class ProtoLogger(object):
     With each entry in the file formatted as timestamp,protobuf_type,protobuf_base64
 
     We need to store the data in a way that we can:
-        1. Replay the data chronologoically
+        1. Replay the data chronologically
         2. Seek to a specific time (random access)
 
     To seek to a specific time, we need to load the entire log file into memory.
