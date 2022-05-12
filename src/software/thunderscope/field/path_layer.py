@@ -38,6 +38,12 @@ class PathLayer(FieldLayer):
             if primitive.HasField("move")
         ]
 
+        requested_destinations = [
+            primitive.move.motion_control.requested_destination
+            for primitive in primitive_set
+            if primitive.HasField("move")
+        ]
+
         painter.setPen(
             pg.mkPen(Colors.NAVIGATOR_PATH_COLOR, width=constants.LINE_WIDTH)
         )
@@ -52,3 +58,39 @@ class PathLayer(FieldLayer):
             ]
             poly = QtGui.QPolygon(polygon_points)
             painter.drawPolyline(poly)
+
+        offset_1 = 20
+        offset_2 = 40
+        for dest in requested_destinations:
+            x_mm = int(MILLIMETERS_PER_METER * dest.x_meters)
+            y_mm = int(MILLIMETERS_PER_METER * dest.y_meters)
+            polygon_points = [
+                QtCore.QPoint(x_mm, y_mm + offset_1),
+                QtCore.QPoint(x_mm + offset_1, y_mm + offset_2),
+                QtCore.QPoint(x_mm + offset_2, y_mm + offset_1),
+                QtCore.QPoint(x_mm + offset_1, y_mm),
+                QtCore.QPoint(x_mm - offset_1, y_mm + offset_2),
+                QtCore.QPoint(x_mm - offset_2, y_mm + offset_1),
+                QtCore.QPoint(x_mm, y_mm - offset_1),
+                QtCore.QPoint(x_mm - offset_1, y_mm - offset_2),
+                QtCore.QPoint(x_mm - offset_2, y_mm - offset_1),
+                QtCore.QPoint(x_mm - offset_1, y_mm),
+                QtCore.QPoint(x_mm + offset_1, y_mm - offset_2),
+                QtCore.QPoint(x_mm + offset_2, y_mm - offset_1),
+                QtCore.QPoint(x_mm, y_mm + offset_1),
+                QtCore.QPoint(x_mm + offset_1, y_mm - offset_2),
+                QtCore.QPoint(x_mm + offset_2, y_mm - offset_1),
+                QtCore.QPoint(x_mm + offset_1, y_mm),
+                QtCore.QPoint(x_mm - offset_1, y_mm - offset_2),
+                QtCore.QPoint(x_mm - offset_2, y_mm - offset_1),
+                QtCore.QPoint(x_mm, y_mm - offset_1),
+                QtCore.QPoint(x_mm - offset_1, y_mm + offset_2),
+                QtCore.QPoint(x_mm - offset_2, y_mm + offset_1),
+                QtCore.QPoint(x_mm - offset_1, y_mm),
+                QtCore.QPoint(x_mm + offset_1, y_mm + offset_2),
+                QtCore.QPoint(x_mm + offset_2, y_mm + offset_1),
+            ]
+
+            poly = QtGui.QPolygon(polygon_points)
+            painter.setBrush(pg.mkBrush(Colors.NAVIGATOR_PATH_COLOR))
+            painter.drawPolygon(poly)
