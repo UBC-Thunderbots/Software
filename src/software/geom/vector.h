@@ -198,16 +198,15 @@ class Vector final
      *
      * @param other the Vector to compare this Vector to
      */
-    bool isToTheRightOf(const Vector &other) const;
+    bool isClockwiseOf(const Vector &other) const;
 
     /**
-     * Returns true if this vector is to the left of the given vector. Geometrically, in
-     * the acute angle given by two vectors, it returns true if this vector is
-     * counterclockwise of the other vector.
+     * In the acute angle given by the two vectors, this function returns true if this
+     * vector is counterclockwise of the other vector.
      *
      * @param other the Vector to compare this Vector to
      */
-    bool isToTheLeftOf(const Vector &other) const;
+    bool isCounterClockwiseOf(const Vector &other) const;
 
    private:
     /**

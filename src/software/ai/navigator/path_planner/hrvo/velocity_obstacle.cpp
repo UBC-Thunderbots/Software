@@ -2,7 +2,7 @@
 
 VelocityObstacle::VelocityObstacle(Vector apex, Vector side1, Vector side2) : apex(apex)
 {
-    if (side1.isToTheRightOf(side2))
+    if (side1.isClockwiseOf(side2))
     {
         right_side = side1.normalize();
         left_side  = side2.normalize();
@@ -18,8 +18,8 @@ bool VelocityObstacle::containsVelocity(const Vector &velocity) const
 {
     Vector velocity_relative_to_obstacle = velocity - apex;
 
-    return left_side.isToTheLeftOf(velocity_relative_to_obstacle) &&
-           right_side.isToTheRightOf(velocity_relative_to_obstacle);
+    return left_side.isCounterClockwiseOf(velocity_relative_to_obstacle) &&
+           right_side.isClockwiseOf(velocity_relative_to_obstacle);
 }
 
 Vector VelocityObstacle::getApex() const

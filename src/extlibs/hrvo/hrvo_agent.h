@@ -160,10 +160,11 @@ class HRVOAgent : public Agent
      * @param candidate the candidate point to check against all velocity obstacles in
      * velocityObstacles_
      *
-     * @return the first velocity obstacle that the given candidate point intersects, or
-     * -1 if it doesn't intersect anything
+     * @return the index of the first velocity obstacle that the given candidate point
+     * intersects in velocityObstacles_, or std::nullopt if the candidate does not
+     * intersect any
      */
-    int findIntersectingVelocityObstacle(const Candidate &candidate) const;
+    std::optional<int> findIntersectingVelocityObstacle(const Candidate &candidate) const;
 
     /**
      * Returns true if the given candidate point doesn't intersct any obstacle in
