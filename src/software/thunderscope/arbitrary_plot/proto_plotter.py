@@ -139,6 +139,6 @@ class ProtoPlotter(object):
             self.fpsLastUpdate = t_end
             average = np.mean(self.elapsed)
             fps = 1 / average
-            self.win.setTitle('%0.2f fps - %0.1f ms avg' % (fps, average * 1_000))
+            self.win.setTitle("%0.2f fps - %0.1f ms avg" % (fps, average * 1_000))
 
         self.elapsed.append(t_end - t_start)

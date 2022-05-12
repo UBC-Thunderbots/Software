@@ -96,11 +96,11 @@ class Thunderscope(object):
         """
 
         # try:
-            # import OpenGL
-            # pg.setConfigOption('useOpenGL', True)
-            # pg.setConfigOption('enableExperimental', True)
+        # import OpenGL
+        # pg.setConfigOption('useOpenGL', True)
+        # pg.setConfigOption('enableExperimental', True)
         # except Exception as e:
-            # print(f"Enabling OpenGL failed with {e}. Will result in slow rendering. Try installing PyOpenGL.")
+        # print(f"Enabling OpenGL failed with {e}. Will result in slow rendering. Try installing PyOpenGL.")
 
         # Setup MainApp and initialize DockArea
         self.app = pyqtgraph.mkQApp("Thunderscope")
@@ -407,7 +407,6 @@ Cntrl-Click and Drag: Move ball and kick
         self.register_refresh_function(proto_plotter.refresh)
 
         return proto_plotter
-
 
         self.robot_diagnostics_dock_area.addDock(log_dock)
         self.robot_diagnostics_dock_area.addDock(drive_dock, "right", log_dock)

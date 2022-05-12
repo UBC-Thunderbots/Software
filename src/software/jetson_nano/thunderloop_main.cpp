@@ -94,7 +94,7 @@ int main(int argc, char** argv)
 
     // TODO (#2605) Don't hardcode these values
     std::string interface = "eth0";
-    NetworkLoggerSingleton::initializeLogger(0, interface, 0);
+    LoggerSingleton::initializeLogger("/tmp");
 
     auto thunderloop = Thunderloop(create2021RobotConstants(), create2021WheelConstants(),
                                    interface, CONTROL_LOOP_HZ);

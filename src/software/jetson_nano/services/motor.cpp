@@ -1,6 +1,7 @@
 #include "software/jetson_nano/services/motor.h"
 
 #include <errno.h>
+#include <bitset>
 #include <fcntl.h>
 #include <getopt.h>
 #include <limits.h>
@@ -40,8 +41,8 @@ static const uint32_t TOTAL_NUMBER_OF_MOTORS        = 5;
 static const char* SPI_PATHS[] = {"/dev/spidev0.0", "/dev/spidev0.1", "/dev/spidev0.2",
                                   "/dev/spidev0.3", "/dev/spidev0.4"};
 
-static const char* SPI_CS_DRIVER_TO_CONTROLLER_MUX_0_GPIO = "51";
-static const char* SPI_CS_DRIVER_TO_CONTROLLER_MUX_1_GPIO = "76";
+static const char* SPI_CS_DRIVER_TO_CONTROLLER_MUX_0_GPIO = "76";
+static const char* SPI_CS_DRIVER_TO_CONTROLLER_MUX_1_GPIO = "77";
 static const char* MOTOR_DRIVER_RESET_GPIO                = "168";
 static const char* DRIVER_CONTROL_ENABLE_GPIO             = "194";
 
@@ -74,6 +75,7 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
                          GpioState::LOW),
       driver_control_enable_gpio(DRIVER_CONTROL_ENABLE_GPIO, GpioDirection::OUTPUT,
                                  GpioState::HIGH),
+      reset_gpio(MOTOR_DRIVER_RESET_GPIO, GpioDirection::OUTPUT, GpioState::HIGH),
       euclidean_to_four_wheel(control_loop_frequency_hz, robot_constants)
 {
     robot_constants_ = robot_constants;
@@ -115,24 +117,140 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
 
     // TMC6100 Setup
     startDriver(FRONT_LEFT_MOTOR_CHIP_SELECT);
-    startDriver(BACK_RIGHT_MOTOR_CHIP_SELECT);
+    // startDriver(BACK_RIGHT_MOTOR_CHIP_SELECT);
     startDriver(FRONT_RIGHT_MOTOR_CHIP_SELECT);
     startDriver(BACK_LEFT_MOTOR_CHIP_SELECT);
 
+    sleep(1);
+
     // TMC4671 Setup
     startController(FRONT_LEFT_MOTOR_CHIP_SELECT);
-    startController(BACK_RIGHT_MOTOR_CHIP_SELECT);
+    // startController(BACK_RIGHT_MOTOR_CHIP_SELECT);
     startController(FRONT_RIGHT_MOTOR_CHIP_SELECT);
     startController(BACK_LEFT_MOTOR_CHIP_SELECT);
 
-    LOG(DEBUG) << "MotorService initialized";
+    sleep(1);
+
+    LOG(WARNING) << "Attempting to clear fault";
+    driver_control_enable_gpio.setValue(GpioState::LOW);
+    sleep(1);
+    driver_control_enable_gpio.setValue(GpioState::HIGH);
+
+    LOG(WARNING) << "Checking faults";
+    checkDriverFault(FRONT_LEFT_MOTOR_CHIP_SELECT);
+    checkDriverFault(FRONT_RIGHT_MOTOR_CHIP_SELECT);
+    checkDriverFault(BACK_LEFT_MOTOR_CHIP_SELECT);
+
+    runOpenLoopCalibrationRoutine(FRONT_RIGHT_MOTOR_CHIP_SELECT, 1000);
+    runOpenLoopCalibrationRoutine(FRONT_LEFT_MOTOR_CHIP_SELECT, 1000);
+    runOpenLoopCalibrationRoutine(BACK_LEFT_MOTOR_CHIP_SELECT, 1000);
 }
 
 MotorService::~MotorService() {}
 
+
+void MotorService::checkDriverFault(uint8_t motor)
+{
+    int gstat = tmc6100_readInt(motor, TMC6100_GSTAT);
+    std::bitset<32> gstat_bitset(gstat);
+
+    if (gstat_bitset.any())
+    {
+        LOG(WARNING) << "======= Faults For Motor " << std::to_string(motor) << "=========";
+    }
+
+    if (gstat_bitset[0])
+    {
+        LOG(WARNING)
+            << "Indicates that the IC has been reset. All registers have been cleared to reset values."
+            << "Attention: DRV_EN must be high to allow clearing reset";
+    }
+
+    if (gstat_bitset[1])
+    {
+        LOG(WARNING)
+            << "drv_otpw : Indicates, that the driver temperature has exceeded overtemperature prewarning-level."
+            << "No action is taken. This flag is latched.";
+    }
+
+    if (gstat_bitset[2])
+    {
+        LOG(WARNING)
+            << "drv_ot: Indicates, that the driver has been shut down due to overtemperature."
+            << "This flag can only be cleared when the temperature is below the limit again."
+            << "It is latched for information.";
+    }
+
+    if (gstat_bitset[3])
+    {
+        LOG(WARNING) << "uv_cp: Indicates an undervoltage on the charge pump."
+                   << "The driver is disabled during undervoltage."
+                   << "This flag is latched for information.";
+    }
+
+    if (gstat_bitset[4])
+    {
+        LOG(WARNING) << "shortdet_u: Short to GND detected on phase U."
+                   << "The driver becomes disabled until flag becomes cleared.";
+    }
+
+    if (gstat_bitset[5])
+    {
+        LOG(WARNING) << "s2gu: Short to GND detected on phase U."
+                   << "The driver becomes disabled until flag becomes cleared.";
+    }
+
+    if (gstat_bitset[6])
+    {
+        LOG(WARNING) << "s2vsu: Short to VS detected on phase U."
+                   << "The driver becomes disabled until flag becomes cleared.";
+    }
+
+    if (gstat_bitset[8])
+    {
+        LOG(WARNING) << "shortdet_v: V short counter has triggered at least once.";
+    }
+
+    if (gstat_bitset[9])
+    {
+        LOG(WARNING) << "s2gv: Short to GND detected on phase V."
+                   << "The driver becomes disabled until flag becomes cleared.";
+    }
+
+    if (gstat_bitset[10])
+    {
+        LOG(WARNING) << "s2vsv: Short to VS detected on phase V."
+                   << "The driver becomes disabled until flag becomes cleared.";
+    }
+
+    if (gstat_bitset[12])
+    {
+        LOG(WARNING) << "shortdet_w: short counter has triggered at least once.";
+    }
+
+    if (gstat_bitset[13])
+    {
+        LOG(WARNING) << "s2gw: Short to GND detected on phase W."
+                   << "The driver becomes disabled until flag becomes cleared.";
+    }
+
+    if (gstat_bitset[14])
+    {
+        LOG(WARNING) << "s2vsw: Short to VS detected on phase W."
+                   << "The driver becomes disabled until flag becomes cleared.";
+    }
+
+    if (!gstat_bitset.any())
+    {
+        LOG(DEBUG) << "Driver for motor " << motor << " has no faults";
+    }
+}
+
+
 std::unique_ptr<TbotsProto::DriveUnitStatus> MotorService::poll(
     const TbotsProto::DirectControlPrimitive& direct_control)
 {
+    return std::make_unique<TbotsProto::DriveUnitStatus>();
     CHECK(encoder_calibrated_[FRONT_LEFT_MOTOR_CHIP_SELECT] &&
           encoder_calibrated_[FRONT_RIGHT_MOTOR_CHIP_SELECT] &&
           encoder_calibrated_[BACK_LEFT_MOTOR_CHIP_SELECT] &&
@@ -249,15 +367,15 @@ void MotorService::spiTransfer(int fd, uint8_t const* tx, uint8_t const* rx, uns
 //                    ┌───────┐        ┌───────────────┐
 //                    │       │        │               │
 //                    │  2:4  │  10    │  ┌─────────┐  │
-//                    │       ├────────┼──►TMC4671  │  │
+//                    │       ├────────┼──►TMC4671  │  │  B0
 //     FRONT_LEFT_CS  │ DEMUX │        │  └─────────┘  │
 //     ───────────────►       │        │               │
 //                    │       │  01    │  ┌─────────┐  │
-//                    │       ├────────┼──►TMC6100  │  │
+//                    │       ├────────┼──►TMC6100  │  │  B1
 //                    │       │        │  └─────────┘  │
 //                    │       │        │               │
 //                    │       │  11    │  ┌─────────┐  │
-//                    │       ├────────┼──►ENCODER  │  │
+//                    │       ├────────┼──►ENCODER  │  │  B2
 //                    │       │        │  └─────────┘  │
 //                    └───▲───┘        │               │
 //                        │            └───────────────┘
@@ -269,7 +387,6 @@ uint8_t MotorService::tmc4671ReadWriteByte(uint8_t motor, uint8_t data,
 {
     spi_demux_select_0.setValue(GpioState::HIGH);
     spi_demux_select_1.setValue(GpioState::LOW);
-    driver_control_enable_gpio.setValue(GpioState::HIGH);
     return readWriteByte(motor, data, last_transfer);
 }
 
@@ -278,7 +395,6 @@ uint8_t MotorService::tmc6100ReadWriteByte(uint8_t motor, uint8_t data,
 {
     spi_demux_select_0.setValue(GpioState::LOW);
     spi_demux_select_1.setValue(GpioState::HIGH);
-    driver_control_enable_gpio.setValue(GpioState::LOW);
     return readWriteByte(motor, data, last_transfer);
 }
 
@@ -346,11 +462,10 @@ uint8_t MotorService::readWriteByte(uint8_t motor, uint8_t data, uint8_t last_tr
 void MotorService::writeToDriverOrDieTrying(uint8_t motor, uint8_t address, int32_t value)
 {
     tmc6100_writeInt(motor, address, value);
-    // TODO-AKHIL: uncomment this when we have a TMC6100
-    // int read_value = tmc6100_readInt(motor, address);
-    // CHECK(read_value == value) << "Couldn't write " << value
-    //                            << " to the TMC6100 at address "
-    //                            << static_cast<uint32_t>(address) << " on motor "
+    int read_value = tmc6100_readInt(motor, address);
+    CHECK(read_value == value) << "Couldn't write " << value
+                               << " to the TMC6100 at address "
+                               << static_cast<uint32_t>(address) << " on motor "
                                << static_cast<uint32_t>(motor);
 }
 
@@ -358,12 +473,11 @@ void MotorService::writeToControllerOrDieTrying(uint8_t motor, uint8_t address,
                                                 int32_t value)
 {
     tmc4671_writeInt(motor, address, value);
-    // TODO-AKHIL: uncomment this when we have a TMC4671
-    // int read_value = tmc4671_readInt(motor, address);
-    // CHECK(read_value == value) << "Couldn't write " << value
-    //                            << " to the TMC4671 at address " << address << " on motor "
-    //                            << static_cast<uint32_t>(address) << " on motor "
-    //                            << static_cast<uint32_t>(motor);
+    int read_value = tmc4671_readInt(motor, address);
+    CHECK(read_value == value) << "Couldn't write " << value
+                               << " to the TMC4671 at address " << address << " on motor "
+                               << static_cast<uint32_t>(address) << " on motor "
+                               << static_cast<uint32_t>(motor);
 }
 
 void MotorService::configurePWM(uint8_t motor)
@@ -444,7 +558,7 @@ void MotorService::runOpenLoopCalibrationRoutine(uint8_t motor, size_t num_sampl
 
     // Feedback selection
     tmc4671_writeInt(motor, TMC4671_PHI_E_SELECTION, 0x00000002);
-    tmc4671_writeInt(motor, TMC4671_UQ_UD_EXT, 0x00000779);
+    tmc4671_writeInt(motor, TMC4671_UQ_UD_EXT, 0x00000799);
 
     // Switch to open loop velocity mode
     tmc4671_writeInt(motor, TMC4671_MODE_RAMP_MODE_MOTION, 0x00000008);
@@ -453,9 +567,17 @@ void MotorService::runOpenLoopCalibrationRoutine(uint8_t motor, size_t num_sampl
     tmc4671_writeInt(motor, TMC4671_OPENLOOP_VELOCITY_TARGET, 0x0000004A);
 
     // Setup CSVs
-    LOG(CSV, "encoder_calibration.csv") << "actual_encoder,estimated_phi\n";
-    LOG(CSV, "phase_currents_and_voltages.csv")
+    LOG(CSV, "encoder_calibration" + std::to_string(motor) + ".csv")
+        << "actual_encoder,estimated_phi\n";
+    LOG(CSV, "phase_currents_and_voltages_" + std::to_string(motor) + ".csv")
         << "adc_iv,adc_ux,adc_wy,pwm_iv,pwm_ux,pwm_wy\n";
+
+    using std::chrono::duration;
+    using std::chrono::duration_cast;
+    using std::chrono::high_resolution_clock;
+    using std::chrono::milliseconds;
+
+    auto t1 = high_resolution_clock::now();
 
     // Take samples of the useful registers
     for (size_t num_sample = 0; num_sample < num_samples; num_sample++)
@@ -464,7 +586,7 @@ void MotorService::runOpenLoopCalibrationRoutine(uint8_t motor, size_t num_sampl
         int actual_encoder = tmc4671_readRegister16BitValue(
             motor, TMC4671_ABN_DECODER_PHI_E_PHI_M, BIT_16_TO_31);
 
-        LOG(CSV, "encoder_calibration.csv")
+        LOG(CSV, "encoder_calibration" + std::to_string(motor) + ".csv")
             << actual_encoder << "," << estimated_phi << "\n";
 
         int16_t adc_iv =
@@ -484,10 +606,21 @@ void MotorService::runOpenLoopCalibrationRoutine(uint8_t motor, size_t num_sampl
         int16_t pwm_wy =
             tmc4671_readRegister16BitValue(motor, TMC4671_INTERIM_DATA, BIT_16_TO_31);
 
-        LOG(CSV, "phase_currents_and_voltages.csv")
+        LOG(CSV, "phase_currents_and_voltages_" + std::to_string(motor) + ".csv")
             << adc_iv << "," << adc_ux << "," << adc_wy << "," << pwm_iv << "," << pwm_ux
             << "," << pwm_wy << "\n";
     }
+
+    auto t2 = high_resolution_clock::now();
+
+    /* Getting number of milliseconds as an integer. */
+    auto ms_int = duration_cast<milliseconds>(t2 - t1);
+
+    /* Getting number of milliseconds as a double. */
+    duration<double, std::milli> ms_double = t2 - t1;
+
+    std::cout << ms_int.count() << "ms\n";
+    std::cout << ms_double.count() << "ms\n";
 
     // Stop open loop rotation
     tmc4671_writeInt(motor, TMC4671_OPENLOOP_VELOCITY_TARGET, 0x00000000);
@@ -500,18 +633,19 @@ void MotorService::startDriver(uint8_t motor)
     int32_t current_drive_conf = tmc6100_readInt(motor, TMC6100_DRV_CONF);
     writeToDriverOrDieTrying(motor, TMC6100_DRV_CONF,
                              current_drive_conf & (~TMC6100_DRVSTRENGTH_MASK));
-    writeToDriverOrDieTrying(motor, TMC6100_GCONF, 32);
+    writeToDriverOrDieTrying(motor, TMC6100_GCONF, 0x40);
 }
 
 void MotorService::startController(uint8_t motor)
 {
     // Read the chip ID to validate the SPI connection
     tmc4671_writeInt(motor, TMC4671_CHIPINFO_ADDR, 0x000000000);
+    int chip_id = tmc4671_readInt(motor, TMC4671_CHIPINFO_DATA);
+    CHECK(0x34363731 == chip_id) << "The TMC4671 of motor "
+                                 << static_cast<uint32_t>(motor) << " is not responding";
 
-    // TODO-AKHIL: Uncomment this when the TMC4671 is ready
-    // int chip_id = tmc4671_readInt(motor, TMC4671_CHIPINFO_DATA);
-    // CHECK(0x34363731 == chip_id) << "The TMC4671 of motor "
-    //<< static_cast<uint32_t>(motor) << " is not responding";
+    LOG(DEBUG) << "Motor " << std::to_string(motor)
+               << " online, responded with: " << chip_id;
 
     // Configure to brushless DC motor with 8 pole pairs
     writeToControllerOrDieTrying(motor, TMC4671_MOTOR_TYPE_N_POLE_PAIRS, 0x00030008);
@@ -523,6 +657,6 @@ void MotorService::startController(uint8_t motor)
 
     // Trigger encoder calibration
     // TODO (#2451) Don't call this here, its not safe because it moves the motors
-    calibrateEncoder(motor);
-    configurePI(motor);
+    // calibrateEncoder(motor);
+    // configurePI(motor);
 }
