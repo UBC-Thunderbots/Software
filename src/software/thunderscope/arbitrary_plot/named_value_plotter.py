@@ -83,9 +83,9 @@ class NamedValuePlotter(QWidget):
                 self.win.addItem(self.traces[named_value.name])
 
             # Add incoming data to existing deques of data
-            self.last_incoming_value[named_value.name] = named_value.value
+            self.last_incoming_value[named_value.name] = -named_value.value
 
-        if self.last_update_time + 0.01 > time.time():
+        if self.last_update_time + 0.02 > time.time():
             return
 
         self.last_update_time = time.time()
