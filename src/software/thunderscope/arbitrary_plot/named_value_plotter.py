@@ -1,10 +1,15 @@
 import random
 import time
+import numpy as np
 from collections import deque
 
 import pyqtgraph as pg
+import pyqtgraph.opengl as gl
+
+from pyqtgraph.Qt.QtWidgets import *
+from pyqtgraph.Qt import QtGui, QtCore
+
 from proto.visualization_pb2 import NamedValue
-from pyqtgraph.Qt import QtGui
 
 from software.networking.threaded_unix_listener import ThreadedUnixListener
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
@@ -15,7 +20,7 @@ MAX_Y_RANGE = 100
 TIME_WINDOW_TO_DISPLAY_S = 20
 
 
-class NamedValuePlotter(object):
+class NamedValuePlotter(QWidget):
 
     """ Plot named values in real time with a scrolling plot """
 
@@ -25,57 +30,83 @@ class NamedValuePlotter(object):
         :param buffer_size: The size of the buffer to use for plotting.
 
         """
-        self.win = pg.plot()
+        QWidget.__init__(self)
+
+        self.layout = QHBoxLayout()
+
         self.plots = {}
         self.data_x = {}
         self.data_y = {}
-        self.legend = pg.LegendItem((80, 60), offset=(70, 20))
-        self.legend.setParentItem(self.win.graphicsItem())
         self.time = time.time()
         self.named_value_buffer = ThreadSafeBuffer(buffer_size, NamedValue)
+
+        self.phase = 0
+        self.lines = 50
+        self.points = 1000
+        self.y = np.linspace(-10, 10, self.lines)
+        self.x = np.linspace(-10, 10, self.points)
+
+        self.traces = dict()
+        self.win = gl.GLViewWidget()
+        self.win.setMinimumSize(640, 480)
+        self.win.setCameraPosition(distance=100, elevation=90, azimuth=0)
+
+        self.w_gl_axis = gl.GLAxisItem(
+            size=None, antialias=True, glOptions='translucent')
+        self.win.addItem(self.w_gl_axis)
+
+        self.g = gl.GLGridItem()
+        self.g.scale(10, 10, 1)
+        self.win.addItem(self.g)
+
+        self.layout.addWidget(self.win)
+        self.setLayout(self.layout)
 
     def refresh(self):
         """Refreshes NamedValuePlotter and updates data in the respective
         plots.
 
         """
-
-        # Dump the entire buffer into a deque. This operation is fast because
-        # its just consuming data from the buffer and appending it to a deque.
         for _ in range(self.named_value_buffer.queue.qsize()):
+
             named_value = self.named_value_buffer.get(block=False)
 
-            # If named_value is new, create a plot and for the new value and
-            # add it to necessary maps
-            if named_value.name not in self.plots:
-                self.plots[named_value.name] = self.win.plot(
-                    pen=QtGui.QColor(
-                        random.randint(100, 255),
-                        random.randint(100, 255),
-                        random.randint(100, 255),
-                    ),
-                    name=named_value.name,
-                    disableAutoRange=True,
-                    brush=None,
-                )
+            if named_value.name not in self.traces:
+                self.data_x[named_value.name] = np.zeros(DEQUE_SIZE)
+                self.data_y[named_value.name] = np.zeros(DEQUE_SIZE)
 
-                self.plots[named_value.name].setDownsampling(method="peak")
-                self.data_x[named_value.name] = deque([], DEQUE_SIZE)
-                self.data_y[named_value.name] = deque([], DEQUE_SIZE)
-                self.legend.addItem(self.plots[named_value.name], named_value.name)
+                self.traces[named_value.name] = gl.GLLinePlotItem(
+                    pos=np.vstack(
+                        [
+                            self.data_y[named_value.name],
+                            self.data_x[named_value.name],
+                            np.zeros(
+                                len(self.data_y[named_value.name])
+                            )
+                        ]
+                    ).transpose(),
+                    color=pg.glColor((random.randint(0,10), self.lines * 1.3)),
+                    width=1,
+                    antialias=True
+                )
+                self.win.addItem(self.traces[named_value.name])
+
 
             # Add incoming data to existing deques of data
-            self.data_x[named_value.name].append(time.time() - self.time)
-            self.data_y[named_value.name].append(named_value.value)
+            self.data_x[named_value.name][0:-1] = self.data_x[named_value.name][1:]
+            self.data_y[named_value.name][0:-1] = self.data_y[named_value.name][1:]
 
-            # Update the data
-            self.plots[named_value.name].setData(
-                self.data_x[named_value.name], self.data_y[named_value.name]
-            )
+            self.data_x[named_value.name][-1] = (time.time() - self.time) * 10
+            self.data_y[named_value.name][-1] = named_value.value
 
-        self.win.setRange(
-            xRange=[
-                time.time() - self.time - TIME_WINDOW_TO_DISPLAY_S,
-                time.time() - self.time,
-            ],
-        )
+        for name, trace in self.traces.items():
+            trace.setData(
+                    pos=np.vstack(
+                        [
+                            self.data_y[name],
+                            self.data_x[name],
+                            np.zeros(
+                                len(self.data_y[name])
+                            )
+                        ]
+                    ).transpose())
