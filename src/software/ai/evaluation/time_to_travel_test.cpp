@@ -163,16 +163,16 @@ TEST_F(
     double max_accel   = 1.0;
     double max_vel     = 4.0;
     double dist_required_to_reach_v_f =
-            std::abs(std::pow(final_vel, 2) - std::pow(initial_vel, 2)) / (2 * max_accel);
-    double distance    = dist_required_to_reach_v_f - 0.00001;
+        std::abs(std::pow(final_vel, 2) - std::pow(initial_vel, 2)) / (2 * max_accel);
+    double distance = dist_required_to_reach_v_f - 0.00001;
     std::cout << "dist=" << distance << std::endl;
 
     // The robot is decelerating throughout the path (since the final velocity is too
     // small for it to reach within the distance) t = (-Vi + sqrt(Vi^2 + 2 * a * d)) / a,
     // with a being negative due to deceleration
-//    double acceleration_time =
-//        (-initial_vel + std::sqrt(std::pow(initial_vel, 2) - 2 * max_accel * distance)) /
-//        -max_accel;
+    //    double acceleration_time =
+    //        (-initial_vel + std::sqrt(std::pow(initial_vel, 2) - 2 * max_accel *
+    //        distance)) / -max_accel;
 
     // For the upper bound, just choose a time that's much greater then we would expect
     double max_time_to_dest = 5.0;

@@ -173,14 +173,15 @@ Polygon Robot::dribblerArea() const
 }
 
 
-Duration Robot::getTimeToOrientation(const Angle &desired_orientation) const
+Duration Robot::getTimeToOrientation(const Angle &desired_orientation,
+                                     const AngularVelocity &final_angular_velocity) const
 {
     double dist = orientation().minDiff(desired_orientation).toRadians();
     double initial_ang_vel_rad_per_sec = angularVelocity().toRadians();
     return getTimeToTravelDistance(
         dist, robot_constants_.robot_max_ang_speed_rad_per_s,
         robot_constants_.robot_max_ang_acceleration_rad_per_s_2,
-        initial_ang_vel_rad_per_sec, 0);
+        initial_ang_vel_rad_per_sec, final_angular_velocity.toRadians());
 }
 
 Duration Robot::getTimeToPosition(const Point &destination,

@@ -169,10 +169,14 @@ class Robot
      * Estimate the minimum time it would take to turn to the desired orientation
      *
      * @param desired_orientation The orientation which we want the robot to be at
+     * @param final_angular_velocity The desired angular velocity which the robot
+     * will be moving at, once it reaches the desired orientation
      *
      * @return The time required for this robot to rotate to the given orientation
      */
-    Duration getTimeToOrientation(const Angle &desired_orientation) const;
+    Duration getTimeToOrientation(
+        const Angle &desired_orientation,
+        const AngularVelocity &final_angular_velocity = AngularVelocity::zero()) const;
 
     /**
      * Estimate the minimum time it would take to reach the desired point
