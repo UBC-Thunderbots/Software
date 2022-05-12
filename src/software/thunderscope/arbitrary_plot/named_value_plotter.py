@@ -10,13 +10,37 @@ from pyqtgraph.Qt import QtGui, QtCore
 
 from proto.visualization_pb2 import NamedValue
 
-from software.networking.threaded_unix_listener import ThreadedUnixListener
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 DEQUE_SIZE = 1000
-MIN_Y_RANGE = 0
-MAX_Y_RANGE = 100
+INITIAL_Y_MIN = 0
+INITIAL_Y_MAX = 100
 TIME_WINDOW_TO_DISPLAY_S = 20
+
+
+class GL2DPlotWidget(gl.GLViewWidget):
+
+    """Limit the mouse controls and fix the camera on a 3D
+    view to make it 2D"""
+
+    def __init__(self):
+        gl.GLViewWidget.__init__(self)
+
+        self.setMinimumSize(100, 100)
+        self.setCameraPosition(distance=100, elevation=90, azimuth=0)
+
+        self.grid = gl.GLGridItem()
+        self.grid.setSize(x=20, y=20, z=10)
+        self.grid.scale(50, 50, 10)
+        self.addItem(self.grid)
+
+    def mouseMoveEvent(self, event):
+        """Overridden"""
+        diff = event.position() - self.mousePos
+        self.mousePos = event.position()
+
+        if ev.buttons() == QtCore.Qt.MouseButton.LeftButton:
+            self.pan(diff.x(), diff.y(), 0, relative="view")
 
 
 class NamedValuePlotter(QWidget):
@@ -32,27 +56,13 @@ class NamedValuePlotter(QWidget):
         QWidget.__init__(self)
 
         self.layout = QHBoxLayout()
-
-        self.plots = {}
-        self.data_x = {}
-        self.data_y = {}
-        self.time = time.time()
+        self.data = {}
         self.named_value_buffer = ThreadSafeBuffer(buffer_size, NamedValue)
 
         self.traces = {}
-        self.win = gl.GLViewWidget()
-        self.win.setMinimumSize(100, 100)
-        self.win.setCameraPosition(distance=100, elevation=90, azimuth=0)
+        self.plot = GL2DPlotWidget()
 
-        # Do NOT allow orbit
-        self.win.orbit = lambda x, y: False
-
-        self.g = gl.GLGridItem()
-        self.g.setSize(x=20, y=20, z=10)
-        self.g.scale(50, 50, 10)
-        self.win.addItem(self.g)
-
-        self.layout.addWidget(self.win)
+        self.layout.addWidget(self.plot)
         self.setLayout(self.layout)
 
         self.last_update_time = time.time()
@@ -61,7 +71,6 @@ class NamedValuePlotter(QWidget):
     def refresh(self):
         """Refreshes NamedValuePlotter and updates data in the respective
         plots.
-
         """
         for _ in range(self.named_value_buffer.queue.qsize()):
 
@@ -69,7 +78,7 @@ class NamedValuePlotter(QWidget):
 
             if named_value.name not in self.traces:
                 self.last_incoming_value[named_value.name] = named_value.value
-                self.data_y[named_value.name] = np.zeros(DEQUE_SIZE)
+                self.data[named_value.name] = np.zeros(DEQUE_SIZE)
 
                 self.traces[named_value.name] = gl.GLLinePlotItem(
                     color=pg.glColor(
@@ -80,7 +89,7 @@ class NamedValuePlotter(QWidget):
                     width=1,
                     antialias=True,
                 )
-                self.win.addItem(self.traces[named_value.name])
+                self.plot.addItem(self.traces[named_value.name])
 
             # Add incoming data to existing deques of data
             self.last_incoming_value[named_value.name] = -named_value.value
@@ -92,15 +101,15 @@ class NamedValuePlotter(QWidget):
 
         for name, trace in self.traces.items():
 
-            self.data_y[name][0:-1] = self.data_y[name][1:]
-            self.data_y[name][-1] = self.last_incoming_value[name]
+            self.data[name][0:-1] = self.data[name][1:]
+            self.data[name][-1] = self.last_incoming_value[name]
 
             trace.setData(
                 pos=np.vstack(
                     [
-                        self.data_y[name],
+                        self.data[name],
                         np.array(range(int(-DEQUE_SIZE / 2), int(DEQUE_SIZE / 2))),
-                        np.zeros(len(self.data_y[name])),
+                        np.zeros(len(self.data[name])),
                     ]
                 ).transpose()
             )
