@@ -59,8 +59,8 @@ class PathLayer(FieldLayer):
             poly = QtGui.QPolygon(polygon_points)
             painter.drawPolyline(poly)
 
-        offset_1 = 20
-        offset_2 = 40
+        offset_1 = 30
+        offset_2 = 60
         for dest in requested_destinations:
             x_mm = int(MILLIMETERS_PER_METER * dest.x_meters)
             y_mm = int(MILLIMETERS_PER_METER * dest.y_meters)
@@ -77,18 +77,6 @@ class PathLayer(FieldLayer):
                 QtCore.QPoint(x_mm - offset_1, y_mm),
                 QtCore.QPoint(x_mm + offset_1, y_mm - offset_2),
                 QtCore.QPoint(x_mm + offset_2, y_mm - offset_1),
-                QtCore.QPoint(x_mm, y_mm + offset_1),
-                QtCore.QPoint(x_mm + offset_1, y_mm - offset_2),
-                QtCore.QPoint(x_mm + offset_2, y_mm - offset_1),
-                QtCore.QPoint(x_mm + offset_1, y_mm),
-                QtCore.QPoint(x_mm - offset_1, y_mm - offset_2),
-                QtCore.QPoint(x_mm - offset_2, y_mm - offset_1),
-                QtCore.QPoint(x_mm, y_mm - offset_1),
-                QtCore.QPoint(x_mm - offset_1, y_mm + offset_2),
-                QtCore.QPoint(x_mm - offset_2, y_mm + offset_1),
-                QtCore.QPoint(x_mm - offset_1, y_mm),
-                QtCore.QPoint(x_mm + offset_1, y_mm + offset_2),
-                QtCore.QPoint(x_mm + offset_2, y_mm + offset_1),
             ]
 
             poly = QtGui.QPolygon(polygon_points)
