@@ -1,4 +1,3 @@
-import random
 import time
 import numpy as np
 
@@ -13,12 +12,9 @@ from proto.visualization_pb2 import NamedValue
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 DEQUE_SIZE = 1000
-INITIAL_Y_MIN = 0
-INITIAL_Y_MAX = 100
-TIME_WINDOW_TO_DISPLAY_S = 20
 
 
-class GL2DPlotWidget(gl.GLViewWidget):
+class GLViewWidget2DPlot(gl.GLViewWidget):
 
     """Limit the mouse controls and fix the camera on a 3D
     view to make it 2D"""
@@ -26,20 +22,26 @@ class GL2DPlotWidget(gl.GLViewWidget):
     def __init__(self):
         gl.GLViewWidget.__init__(self)
 
-        self.setMinimumSize(100, 100)
-        self.setCameraPosition(distance=100, elevation=90, azimuth=0)
+        self.setMinimumSize(200, 100)
+        self.setCameraPosition(distance=2000, elevation=90, azimuth=0)
 
         self.grid = gl.GLGridItem()
-        self.grid.setSize(x=20, y=20, z=10)
-        self.grid.scale(50, 50, 10)
+        self.grid.setSize(x=20, y=40, z=10)
+        self.grid.scale(100, 100, 10)
         self.addItem(self.grid)
 
     def mouseMoveEvent(self, event):
-        """Overridden"""
+        """Overridden
+
+        We want to disable rotation and only pan the screen
+
+        :param event: The event to handle
+
+        """
         diff = event.position() - self.mousePos
         self.mousePos = event.position()
 
-        if ev.buttons() == QtCore.Qt.MouseButton.LeftButton:
+        if event.buttons() == QtCore.Qt.MouseButton.LeftButton:
             self.pan(diff.x(), diff.y(), 0, relative="view")
 
 
@@ -60,34 +62,38 @@ class NamedValuePlotter(QWidget):
         self.named_value_buffer = ThreadSafeBuffer(buffer_size, NamedValue)
 
         self.traces = {}
-        self.plot = GL2DPlotWidget()
+        self.plot = GLViewWidget2DPlot()
 
         self.layout.addWidget(self.plot)
         self.setLayout(self.layout)
 
         self.last_update_time = time.time()
         self.last_incoming_value = {}
+        self.color = 0
+
+        self.txtitem2 = gl.GLTextItem()
+        self.txtitem2.setData(
+            pos=(1.0, -1.0, 2.0), color=(127, 255, 127, 255), text="text2"
+        )
+        self.plot.addItem(self.txtitem2)
 
     def refresh(self):
         """Refreshes NamedValuePlotter and updates data in the respective
         plots.
+
         """
         for _ in range(self.named_value_buffer.queue.qsize()):
 
             named_value = self.named_value_buffer.get(block=False)
 
             if named_value.name not in self.traces:
+
                 self.last_incoming_value[named_value.name] = named_value.value
                 self.data[named_value.name] = np.zeros(DEQUE_SIZE)
 
+                self.color += 1
                 self.traces[named_value.name] = gl.GLLinePlotItem(
-                    color=pg.glColor(
-                        random.randint(0, 255),
-                        random.randint(0, 255),
-                        random.randint(0, 255),
-                    ),
-                    width=1,
-                    antialias=True,
+                    color=pg.glColor(self.color), width=1, antialias=True,
                 )
                 self.plot.addItem(self.traces[named_value.name])
 
@@ -101,7 +107,7 @@ class NamedValuePlotter(QWidget):
 
         for name, trace in self.traces.items():
 
-            self.data[name][0:-1] = self.data[name][1:]
+            self.data[name][:-1] = self.data[name][1:]
             self.data[name][-1] = self.last_incoming_value[name]
 
             trace.setData(
