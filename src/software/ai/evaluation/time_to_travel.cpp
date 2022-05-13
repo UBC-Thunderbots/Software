@@ -1,7 +1,7 @@
 #include "software/ai/evaluation/time_to_travel.h"
 
-#include <cmath>
 #include <algorithm>
+#include <cmath>
 
 Duration getTimeToTravelDistance(const double distance, const double max_velocity,
                                  const double max_acceleration,
