@@ -64,6 +64,7 @@ class PathLayer(FieldLayer):
         for dest in requested_destinations:
             x_mm = int(MILLIMETERS_PER_METER * dest.x_meters)
             y_mm = int(MILLIMETERS_PER_METER * dest.y_meters)
+            # polygon represents an X to mark the requested destination
             polygon_points = [
                 QtCore.QPoint(x_mm, y_mm + offset_1),
                 QtCore.QPoint(x_mm + offset_1, y_mm + offset_2),
