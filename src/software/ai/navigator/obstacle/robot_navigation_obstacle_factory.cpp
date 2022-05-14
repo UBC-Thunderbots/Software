@@ -88,6 +88,61 @@ RobotNavigationObstacleFactory::createStaticObstaclesFromMotionConstraint(
 }
 
 std::vector<ObstaclePtr>
+RobotNavigationObstacleFactory::createDynamicObstaclesFromMotionConstraint(
+    const TbotsProto::MotionConstraint &motion_constraint, const World &world) const
+{
+    std::vector<ObstaclePtr> obstacles;
+
+    switch (motion_constraint)
+    {
+        case TbotsProto::MotionConstraint::CENTER_CIRCLE:
+            // not handled by this obstacle factory since it's a static obstacle
+            break;
+        case TbotsProto::MotionConstraint::INFLATED_ENEMY_DEFENSE_AREA:
+            // not handled by this obstacle factory since it's a static obstacle
+            break;
+        case TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA:
+            // not handled by this obstacle factory since it's a static obstacle
+            break;
+        case TbotsProto::MotionConstraint::ENEMY_DEFENSE_AREA:
+            // not handled by this obstacle factory since it's a static obstacle
+            break;
+        case TbotsProto::MotionConstraint::FRIENDLY_HALF:
+            // not handled by this obstacle factory since it's a static obstacle
+            break;
+        case TbotsProto::MotionConstraint::ENEMY_HALF:
+            // not handled by this obstacle factory since it's a static obstacle
+            break;
+        case TbotsProto::MotionConstraint::AVOID_FIELD_BOUNDARY_ZONE:
+            // not handled by this obstacle factory since it's a static obstacle
+            break;
+        case TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL:;
+            // 0.5 represents half a metre radius
+            obstacles.push_back(createFromShape(Circle(world.ball().position(), 0.5)));
+            break;
+        case TbotsProto::MotionConstraint::AVOID_BALL_PLACEMENT_INTERFERENCE:;
+            if (world.gameState().getBallPlacementPoint().has_value())
+            {
+                obstacles.push_back(createFromBallPlacement(
+                    world.gameState().getBallPlacementPoint().value(),
+                    world.ball().position()));
+            }
+            else
+            {
+                obstacles.push_back(
+                    createFromShape(Circle(world.ball().position(), 0.5)));
+            }
+            break;
+        case TbotsProto::MotionConstraint::MotionConstraint_INT_MIN_SENTINEL_DO_NOT_USE_:;
+            break;
+        case TbotsProto::MotionConstraint::MotionConstraint_INT_MAX_SENTINEL_DO_NOT_USE_:;
+            break;
+    }
+
+    return obstacles;
+}
+
+std::vector<ObstaclePtr>
 RobotNavigationObstacleFactory::createStaticObstaclesFromMotionConstraints(
     const std::set<TbotsProto::MotionConstraint> &motion_constraints,
     const Field &field) const
