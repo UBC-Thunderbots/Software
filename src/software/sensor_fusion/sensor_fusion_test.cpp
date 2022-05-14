@@ -5,6 +5,7 @@
 #include "proto/message_translation/ssl_detection.h"
 #include "proto/message_translation/ssl_geometry.h"
 #include "proto/message_translation/ssl_wrapper.h"
+#include "proto/message_translation/tbots_protobuf.h"
 #include "shared/parameter/cpp_dynamic_parameters.h"
 
 class SensorFusionTest : public ::testing::Test
@@ -503,16 +504,26 @@ TEST_F(SensorFusionTest, test_detection_frame_wrapper_packet)
 
 TEST_F(SensorFusionTest, test_inverted_detection_frame_wrapper_packet)
 {
-    config->getMutableDefendingPositiveSide()->setValue(true);
+    EXPECT_EQ(std::nullopt, sensor_fusion.getWorld());
+
     SensorProto sensor_msg;
+    SSLProto::Referee ssl_referee_packet;
+    ssl_referee_packet.set_blue_team_on_positive_half(false);
+    *(sensor_msg.mutable_ssl_referee_msg()) = ssl_referee_packet;
+
+    sensor_fusion.processSensorProto(sensor_msg);
+
     auto ssl_wrapper_packet =
         createSSLWrapperPacket(std::move(geom_data), initDetectionFrame());
-    *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
-    EXPECT_EQ(std::nullopt, sensor_fusion.getWorld());
-    sensor_fusion.processSensorProto(sensor_msg);
+
+    SensorProto sensor_msg_2;
+    *(sensor_msg_2.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
+
+    sensor_fusion.processSensorProto(sensor_msg_2);
     auto result = sensor_fusion.getWorld();
+
     ASSERT_TRUE(result);
-    EXPECT_EQ(initInvertedWorld(), result);
+    EXPECT_EQ(initInvertedWorld(), *result);
 }
 
 TEST_F(SensorFusionTest, test_complete_wrapper_packet)

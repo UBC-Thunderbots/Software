@@ -4,10 +4,11 @@
 #include <boost/asio.hpp>
 #include <iostream>
 
-BoostUartCommunication::BoostUartCommunication(IoService& io_service, int baud_rate,
+BoostUartCommunication::BoostUartCommunication(int baud_rate,
                                                std::string device_serial_port)
+    : io_service_()
 {
-    openPort(io_service, baud_rate, device_serial_port);
+    openPort(io_service_, baud_rate, device_serial_port);
 }
 
 std::vector<unsigned char> BoostUartCommunication::serialRead(size_t num_read_bytes)

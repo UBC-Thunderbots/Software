@@ -8,12 +8,16 @@ load(
 platformio_library(
     name = "uart_framing_platformio",
     hdr = "uart_framing.hpp",
+    deps = ["//proto/message_translation:power_frame_msg_platformio"],
 )
 
 cc_library(
     name = "uart_framing",
-    hdrs = [
-        "uart_framing.hpp",
+    hdrs = ["uart_framing.hpp"],
+    deps = [
+        "//proto:tbots_nanopb_proto",
+        "//proto/message_translation:power_frame_msg",
+        "@nanopb",
     ],
 )
 
@@ -24,6 +28,7 @@ cc_test(
     ],
     deps = [
         ":uart_framing",
+        "//proto:tbots_nanopb_proto",
         "//shared/test_util:tbots_gtest_main",
     ],
 )

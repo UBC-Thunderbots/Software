@@ -1,5 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
+load("@simulated_tests_deps//:requirements.bzl", "requirement")
+
 # We force linking for all plays so that the static variables required for the
 # "factory" design pattern to work are linked in
 # https://www.bfilipek.com/2018/02/static-vars-static-lib.html
@@ -27,6 +29,7 @@ cc_library(
     hdrs = ["corner_kick_play.h"],
     deps = [
         ":play",
+        "//proto/message_translation:tbots_protobuf",
         "//shared:constants",
         "//software/ai/evaluation:possession",
         "//software/ai/hl/stp/tactic/attacker:attacker_tactic",
@@ -237,6 +240,7 @@ cc_library(
     hdrs = ["shoot_or_chip_play.h"],
     deps = [
         ":play",
+        "//proto/message_translation:tbots_protobuf",
         "//shared:constants",
         "//shared/parameter:cpp_configs",
         "//software/ai/evaluation:enemy_threat",
@@ -515,8 +519,20 @@ cc_test(
     ],
 )
 
-cc_test(
+py_test(
     name = "ball_placement_play_test",
+    srcs = [
+        "ball_placement_play_test.py",
+    ],
+    deps = [
+        "//software/simulated_tests:simulated_test_fixture",
+        "//software/simulated_tests:validation",
+        requirement("pytest"),
+    ],
+)
+
+cc_test(
+    name = "ball_placement_play_test_old",
     srcs = ["ball_placement_play_test.cpp"],
     deps = [
         "//shared/test_util:tbots_gtest_main",

@@ -5,6 +5,13 @@
         Displays simulated test on visualizer
 
 - bool:
+    name: run_sim_in_realtime
+    value: false
+    description: >-
+        Runs simulation in realtime, useful to look at simulated C++ tests in thunderscope
+        without running ThreadedFullsystemGUI
+
+- bool:
     name: stop_ai_on_start
     value: false
     description: >-
@@ -12,7 +19,7 @@
 
 - string:
     name: runtime_dir
-    value: ""
+    value: "/tmp/tbots/yellow_test"
     description: >-
         The directory to output logs to. Absolute paths are recommended as the working directory
         is inside the bazel-out directory.

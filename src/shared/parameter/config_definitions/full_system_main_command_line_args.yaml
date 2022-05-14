@@ -48,14 +48,11 @@ include:
       description: >-
           The multicast channel to join to communicate with the robots
 
-- string:
-    name: team_color
-    value: "yellow"
-    options:
-        - "yellow"
-        - "blue"
+- bool:
+    name: friendly_colour_yellow
+    value: false
     description: >-
-      Which team to play as
+      If false, friendly colour is blue
 
 - string:
       name: defending_side
