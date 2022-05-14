@@ -181,8 +181,13 @@ double calculateInterceptRisk(const Robot& enemy_robot, const Pass& pass,
     // point on the pass to the enemy's current position
     Point closest_point_on_pass_to_robot = closestPoint(
         enemy_robot.position(), Segment(pass.passerPoint(), pass.receiverPoint()));
+    // Subtracting by the max robot radius as a threshold of the enemy robot blocking the
+    // pass
+    double distance = (closest_point_on_pass_to_robot - enemy_robot.position()).length() -
+                      ROBOT_MAX_RADIUS_METERS;
     Duration enemy_robot_time_to_closest_pass_point =
-        enemy_robot.getTimeToPosition(closest_point_on_pass_to_robot);
+        getTimeToTravelDistance(distance, ENEMY_ROBOT_MAX_SPEED_METERS_PER_SECOND,
+                                ENEMY_ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
     Duration ball_time_to_closest_pass_point = Duration::fromSeconds(
         (closest_point_on_pass_to_robot - pass.passerPoint()).length() / pass.speed());
 
