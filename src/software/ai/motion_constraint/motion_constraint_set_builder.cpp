@@ -51,6 +51,7 @@ std::set<TbotsProto::MotionConstraint> buildMotionConstraintSetFromGameState(
         else
         {
             // Is their penalty
+            // TODO (#2611): implement penalty kick motion constraint
             motion_constraints.insert(TbotsProto::MotionConstraint::FRIENDLY_HALF);
         }
     }

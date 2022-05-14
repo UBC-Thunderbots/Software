@@ -118,6 +118,11 @@ struct GoalieFSM
      */
     void panic(const Update &event);
 
+    /**
+     * Move the robot to the goal line
+     *
+     * @param event GoalieFSM::Update event
+     */
     void moveToGoalLine(const Update &event);
 
     /**
