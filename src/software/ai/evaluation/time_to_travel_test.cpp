@@ -141,7 +141,7 @@ TEST_F(
         (-initial_vel + std::sqrt(std::pow(initial_vel, 2) + 2 * max_accel * distance)) /
         max_accel;
 
-    // For the upper bound, just choose a time that's much greater then we would expect
+    // For the upper bound, just choose a time that's much greater than we would expect
     double max_time_to_dest = 5.0;
 
     Duration t =
@@ -170,11 +170,8 @@ TEST_F(
     // The robot is decelerating throughout the path (since the final velocity is too
     // small for it to reach within the distance) t = (-Vi + sqrt(Vi^2 + 2 * a * d)) / a,
     // with a being negative due to deceleration
-    //    double acceleration_time =
-    //        (-initial_vel + std::sqrt(std::pow(initial_vel, 2) - 2 * max_accel *
-    //        distance)) / -max_accel;
 
-    // For the upper bound, just choose a time that's much greater then we would expect
+    // For the upper bound, just choose a time that's much greater than we would expect
     double max_time_to_dest = 5.0;
 
     Duration t =
