@@ -318,7 +318,7 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::getPrimitivesFromTactic(
     std::shared_ptr<Tactic> tactic,
     std::set<TbotsProto::MotionConstraint> motion_constraints) const
 {
-    auto obstacles    = path_planner_factory.getObstacles(motion_constraints);
+    auto obstacles    = path_planner_factory.getStaticObstacles(motion_constraints);
     auto path_planner = path_planner_factory.getPathPlanner(motion_constraints);
     CreateMotionControl create_motion_control =
         [obstacles, path_planner, motion_constraints](const Robot &robot,

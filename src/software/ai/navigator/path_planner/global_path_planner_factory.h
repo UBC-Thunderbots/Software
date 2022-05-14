@@ -57,7 +57,7 @@ class GlobalPathPlannerFactory
      *
      * @return obstacles for the motion constraints
      */
-    google::protobuf::RepeatedPtrField<TbotsProto::Obstacles> getObstacles(
+    google::protobuf::RepeatedPtrField<TbotsProto::Obstacles> getStaticObstacles(
         std::set<TbotsProto::MotionConstraint> constraints) const;
 
    private:

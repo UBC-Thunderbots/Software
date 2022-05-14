@@ -95,7 +95,7 @@ std::shared_ptr<const EnlsvgPathPlanner> GlobalPathPlannerFactory::getPathPlanne
 }
 
 google::protobuf::RepeatedPtrField<TbotsProto::Obstacles>
-GlobalPathPlannerFactory::getObstacles(
+GlobalPathPlannerFactory::getStaticObstacles(
     std::set<TbotsProto::MotionConstraint> constraints) const
 {
     auto obstacles = motion_constraint_to_obstacles.at({});
