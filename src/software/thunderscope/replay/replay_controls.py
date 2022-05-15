@@ -50,6 +50,8 @@ class ReplayControls(QGroupBox):
         self.controls_layout.addWidget(self.playback_speed_combo_box)
 
         self.slider_pressed = False
+        # tracks history of the state of is_playing before a button is pressed
+        self.was_playing = False
 
         # Setup the replay slider
         (
@@ -77,7 +79,8 @@ class ReplayControls(QGroupBox):
 
         """
         self.player.seek(self.replay_slider.value() / MILLISECONDS_PER_SECOND)
-        self.player.play()
+        if self.was_playing:
+            self.player.play()
         self.slider_pressed = False
 
     def __on_replay_slider_pressed(self):
@@ -85,6 +88,7 @@ class ReplayControls(QGroupBox):
         doesn't move away.
 
         """
+        self.was_playing = self.player.is_playing
         self.player.pause()
         self.slider_pressed = True
 
