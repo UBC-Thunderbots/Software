@@ -74,7 +74,6 @@ from proto.ssl_gc_common_pb2 import Team
             tbots.Vector(0.1, -0.1),
             tbots.Point(-3.5, 1),
         ),
-        # TODO (#2167): This test fails so disabling for Robocup
         # ball moving into goal from inside defense area
         (
             tbots.Field.createSSLDivisionBField().friendlyGoalCenter()
@@ -82,7 +81,6 @@ from proto.ssl_gc_common_pb2 import Team
             tbots.Vector(-0.5, 0),
             tbots.Point(-3.5, 0),
         ),
-        # TODO (#2167): This test fails so disabling for Robocup
         # ball moving up and out of defense area
         (
             tbots.Field.createSSLDivisionBField().friendlyGoalCenter()
@@ -90,7 +88,6 @@ from proto.ssl_gc_common_pb2 import Team
             tbots.Vector(0, 1),
             tbots.Point(-3.5, 0),
         ),
-        # TODO (#2167): This test fails so disabling for Robocup
         # ball moving down and out goal from defense area
         (
             tbots.Field.createSSLDivisionBField().friendlyGoalCenter()
