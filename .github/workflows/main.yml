@@ -91,13 +91,19 @@ jobs:
             //software/simulated_tests/...   \
             //software/ai/hl/...
 
-      - name: Upload simulated test artifacts
-        uses: actions/upload-artifact@v2
+      - name: Upload simulated test proto logs
+        uses: actions/upload-artifact@v3
         with:
-          name: simulated-test-outputs
-          # we only care about the replay logs from the STP tests
+          name: blue-ai-proto-logs
           path: |
-            src/bazel-out/k8-fastbuild/testlogs/software/ai/hl/stp
+            /tmp/tbots/blue/logs
+
+      - name: Upload simulated test proto logs
+        uses: actions/upload-artifact@v3
+        with:
+          name: yellow-ai-proto-logs
+          path: |
+            /tmp/tbots/yellow/logs
 
       - name: Simulated Test Run 2 (Continue on error)
         # Run a second time without checking for errors

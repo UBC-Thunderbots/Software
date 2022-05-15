@@ -1,5 +1,6 @@
 import os
 import time
+import textwrap
 import shelve
 import signal
 import platform
@@ -53,6 +54,7 @@ from software.thunderscope.robot_diagnostics.chicker import ChickerWidget
 from software.thunderscope.robot_diagnostics.drive_and_dribbler_widget import (
     DriveAndDribblerWidget,
 )
+from software.thunderscope.replay.proto_player import ProtoPlayer
 
 SAVED_LAYOUT_PATH = "/opt/tbotspython/saved_tscope_layout"
 NUM_ROBOTS = 6
@@ -82,6 +84,11 @@ class Thunderscope(object):
         simulator_proto_unix_io=None,
         blue_full_system_proto_unix_io=None,
         yellow_full_system_proto_unix_io=None,
+        layout_path=None,
+        load_blue=True,
+        load_yellow=True,
+        blue_replay_log=None,
+        yellow_replay_log=None,
         refresh_interval_ms=10,
         visualization_buffer_size=5,
     ):
@@ -90,6 +97,11 @@ class Thunderscope(object):
         :param simulator_proto_unix_io: The simulator's proto unix io
         :param blue_full_system_proto_unix_io: The blue full system's proto unix io
         :param yellow_full_system_proto_unix_io: The yellow full system's proto unix io
+        :param layout_path: The path to the layout to load
+        :param load_blue: Whether to load the blue dock area
+        :param load_yellow: Whether to load the yellow dock area
+        :param blue_replay_log: The blue replay log
+        :param yellow_replay_log: The yellow replay log
         :param refresh_interval_ms: The interval in milliseconds to refresh the simulator
         :param visualization_buffer_size: The size of the visualization buffer
 
@@ -105,6 +117,8 @@ class Thunderscope(object):
         # Setup MainApp and initialize DockArea
         self.app = pyqtgraph.mkQApp("Thunderscope")
         self.app.setStyleSheet(qdarktheme.load_stylesheet())
+        self.blue_replay_log = blue_replay_log
+        self.yellow_replay_log = yellow_replay_log
         self.refresh_interval_ms = refresh_interval_ms
         self.visualization_buffer_size = visualization_buffer_size
         self.widgets = {}
@@ -155,6 +169,9 @@ class Thunderscope(object):
 
         self.refresh_timers = []
 
+        # Setup the main window and  load
+        self.__setup(layout_path, load_blue, load_yellow)
+
         # Save and Load Prompts
         self.save_layout_shortcut = QtGui.QShortcut(
             QtGui.QKeySequence("Ctrl+S"), self.window
@@ -188,24 +205,26 @@ class Thunderscope(object):
             lambda: QMessageBox.information(
                 self.window,
                 "Help",
-                f"""
-Keyboard Shortcuts:
-
-I to identify robots, show their IDs
-Cntrl+S: Save Layout
-Cntrl+O: Open Layout
-Cntrl+R: will remove the file and reset the layout
-
-Layout file (on save) is located at 
-        {SAVED_LAYOUT_PATH}
-
-Mouse Shortcuts:
-
-Double Click Purple Bar to pop window out
-Drag Purple Bar to rearrange docks
-Click items in legends to select/deselect
-Cntrl-Click and Drag: Move ball and kick
-""",
+                textwrap.dedent(
+                    f"""
+                    Keyboard Shortcuts:
+                    
+                    I to identify robots, show their IDs
+                    Cntrl+S: Save Layout
+                    Cntrl+O: Open Layout
+                    Cntrl+R: will remove the file and reset the layout
+                    
+                    Layout file (on save) is located at 
+                            {SAVED_LAYOUT_PATH}
+                    
+                    Mouse Shortcuts:
+                    
+                    Double Click Purple Bar to pop window out
+                    Drag Purple Bar to rearrange docks
+                    Click items in legends to select/deselect
+                    Cntrl-Click and Drag: Move ball and kick
+                    """
+                ),
             )
         )
 
@@ -269,9 +288,7 @@ Cntrl-Click and Drag: Move ball and kick
                     default_shelf["yellow_dock_state"] = shelf["yellow_dock_state"]
                     default_shelf.sync()
 
-    def load_saved_layout(
-        self, layout_path, load_blue=True, load_yellow=True, load_diagnostics=False
-    ):
+    def __setup(self, layout_path, load_blue=True, load_yellow=True):
         """Load the specified layout or the default file. If the default layout
         file doesn't exist, and no layout is provided, then just configure
         the default layout.
@@ -423,7 +440,11 @@ Cntrl-Click and Drag: Move ball and kick
         :returns: the field widget
 
         """
-        field = Field()
+        self.player = ProtoPlayer(
+            self.yellow_replay_log if friendly_colour_yellow else self.blue_replay_log,
+            full_system_proto_unix_io,
+        )
+        field = Field(player=self.player)
 
         # Create layers
         paths = path_layer.PathLayer(self.visualization_buffer_size)

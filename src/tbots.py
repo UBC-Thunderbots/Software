@@ -20,10 +20,11 @@ NUM_FILTERED_MATCHES_TO_SHOW = 10
 
 if __name__ == "__main__":
 
-    parser = argparse.ArgumentParser(description="Run stuff")
+    parser = argparse.ArgumentParser(description="Run stuff", add_help=False)
 
     parser.add_argument("action", choices=["build", "run", "test"])
     parser.add_argument("search_query")
+    parser.add_argument("-h", "--help", action="store_true")
     parser.add_argument("-p", "--print_command", action="store_true")
     parser.add_argument("-d", "--debug_build", action="store_true")
     parser.add_argument("-ds", "--select_debug_binaries", action="store")
@@ -36,6 +37,15 @@ if __name__ == "__main__":
     parser.add_argument("-v", "--enable_visualizer", action="store_true")
     parser.add_argument("-s", "--stop_ai_on_start", action="store_true")
     args, unknown_args = parser.parse_known_args()
+
+    # If help was requested, print the help for the tbots script
+    # and propagate the help to the underlying binary/test to
+    # also see the arguments it supports
+    if args.help:
+        print(45 * "=" + " tbots.py help " + 45 * "=")
+        parser.print_help()
+        print(100 * "=")
+        unknown_args += ["--help"]
 
     test_query = ["bazel", "query", "tests(//...)"]
     binary_query = ["bazel", "query", "kind(.*_binary,//...)"]
