@@ -141,9 +141,9 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
     checkDriverFault(FRONT_RIGHT_MOTOR_CHIP_SELECT);
     checkDriverFault(BACK_LEFT_MOTOR_CHIP_SELECT);
 
-    runOpenLoopCalibrationRoutine(FRONT_RIGHT_MOTOR_CHIP_SELECT, 1000);
-    runOpenLoopCalibrationRoutine(FRONT_LEFT_MOTOR_CHIP_SELECT, 1000);
-    runOpenLoopCalibrationRoutine(BACK_LEFT_MOTOR_CHIP_SELECT, 1000);
+    //runOpenLoopCalibrationRoutine(FRONT_RIGHT_MOTOR_CHIP_SELECT, 1000);
+     runOpenLoopCalibrationRoutine(FRONT_LEFT_MOTOR_CHIP_SELECT, 1000);
+    // runOpenLoopCalibrationRoutine(BACK_LEFT_MOTOR_CHIP_SELECT, 1000);
 }
 
 MotorService::~MotorService() {}
@@ -464,9 +464,10 @@ void MotorService::writeToDriverOrDieTrying(uint8_t motor, uint8_t address, int3
     tmc6100_writeInt(motor, address, value);
     int read_value = tmc6100_readInt(motor, address);
     CHECK(read_value == value) << "Couldn't write " << value
-                               << " to the TMC6100 at address "
-                               << static_cast<uint32_t>(address) << " on motor "
-                               << static_cast<uint32_t>(motor);
+                               << " to the TMC6100 at address " << address
+                               << " at address " << static_cast<uint32_t>(address)
+                               << " on motor " << static_cast<uint32_t>(motor)
+                               << " received :" << read_value;
 }
 
 void MotorService::writeToControllerOrDieTrying(uint8_t motor, uint8_t address,
@@ -475,9 +476,10 @@ void MotorService::writeToControllerOrDieTrying(uint8_t motor, uint8_t address,
     tmc4671_writeInt(motor, address, value);
     int read_value = tmc4671_readInt(motor, address);
     CHECK(read_value == value) << "Couldn't write " << value
-                               << " to the TMC4671 at address " << address << " on motor "
-                               << static_cast<uint32_t>(address) << " on motor "
-                               << static_cast<uint32_t>(motor);
+                               << " to the TMC4671 at address " << address
+                               << " at address " << static_cast<uint32_t>(address)
+                               << " on motor " << static_cast<uint32_t>(motor)
+                               << " received :" << read_value;
 }
 
 void MotorService::configurePWM(uint8_t motor)
