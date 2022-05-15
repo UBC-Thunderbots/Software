@@ -37,6 +37,7 @@ PYBIND11_MODULE(py_constants, m)
 
 
     m.attr("TACTIC_OVERRIDE_PATH")     = TACTIC_OVERRIDE_PATH;
+    m.attr("PLAY_OVERRIDE_PATH")       = PLAY_OVERRIDE_PATH;
     m.attr("WORLD_PATH")               = WORLD_PATH;
     m.attr("PRIMITIVE_PATH")           = PRIMITIVE_PATH;
     m.attr("ROBOT_STATUS_PATH")        = ROBOT_STATUS_PATH;
