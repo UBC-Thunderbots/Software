@@ -136,6 +136,16 @@ class ProtoPlayer(object):
 
         return float(timestamp), proto_class, proto
 
+    def save_clip(self, filename, start_time, end_time):
+        if not filename:
+            print("No filename selected")
+            return
+        if start_time >= end_time:
+            print("Start time not less than end time")
+            return
+
+        logging.info(f"Saving clip from {start_time} to {end_time} to {filename}")
+
     def play(self):
         """Plays back the log file."""
 

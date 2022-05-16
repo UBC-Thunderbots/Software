@@ -67,11 +67,19 @@ class ReplayControls(QGroupBox):
             qbutton.clicked.connect(button[1])
             self.buttons_layout.addWidget(qbutton)
 
+        # Set up save clip button
+        self.save_clip = QPushButton()
+        self.save_clip.setText("Clip")
+        self.save_clip.clicked.connect(self.__on_save_clip_clicked)
+        self.buttons_layout.addWidget(self.save_clip)
+
         self.buttons.setLayout(self.buttons_layout)
 
         self.slider_pressed = False
         # tracks history of the state of is_playing before a button is pressed
         self.was_playing = False
+        self.clipping = False
+        self.clip_start = 0
 
         # Setup the replay slider
         (
@@ -139,6 +147,11 @@ class ReplayControls(QGroupBox):
             )
 
         self.play_pause.setText("⏸" if self.player.is_playing else "▶")
+        self.save_clip.setText(
+            "Save"
+            if self.clipping and self.player.current_packet_time > self.clip_start
+            else "Clip"
+        )
 
     def keyPressEvent(self, event):
         """When a key is pressed, pause the player.
@@ -160,8 +173,31 @@ class ReplayControls(QGroupBox):
             self.player.play()
 
     def seek_absolute(self, absolute_time):
+        """Seeks to an absolute time
+
+        :param absolute_time The absolute time to seek to
+
+        """
         self.was_playing = self.player.is_playing
         self.player.pause()
         self.player.seek(absolute_time)
         if self.was_playing:
             self.player.play()
+
+    def __on_save_clip_clicked(self):
+        """When the button is clicked, save clip if current time is after the clip start time
+        """
+        if self.clipping and self.player.current_packet_time > self.clip_start:
+            filename, _ = QtGui.QFileDialog.getSaveFileName(
+                self,
+                "Save layout",
+                "~/dock_layout_{}.tscopelayout".format(int(time.time())),
+                options=QFileDialog.Option.DontUseNativeDialog,
+            )
+            self.player.save_clip(
+                filename, self.clip_start, self.player.current_packet_time
+            )
+            self.clipping = False
+        else:
+            self.clipping = True
+            self.clip_start = self.player.current_packet_time
