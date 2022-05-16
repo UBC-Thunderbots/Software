@@ -178,7 +178,7 @@ class ProtoPlayer(object):
         self.pause()
         self.current_entry_index = self.current_entry_index - 1
         self.current_chunk_index = self.current_chunk_index
-        if self.current_entry_index <0:
+        if self.current_entry_index < 0:
             self.current_chunk_index -= 1
             if self.current_chunk_index < 0:
                 self.current_chunk_index = 0

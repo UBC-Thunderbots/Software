@@ -27,40 +27,32 @@ class ReplayControls(QGroupBox):
         self.buttons = QGroupBox()
         self.buttons_layout = QHBoxLayout()
 
+        for button in [
+            ("⏮", partial(self.seek_absolute, 0)),
+            ("↶\n1 min", partial(self.seek_relative, -60)),
+            ("↶\n10 s", partial(self.seek_relative, -10)),
+            ("↶\n1 frame", self.player.single_step_backward),
+        ]:
+            qbutton = QPushButton()
+            qbutton.setText(button[0])
+            qbutton.clicked.connect(button[1])
+            self.buttons_layout.addWidget(qbutton)
+
         # Set up play button
         self.play_pause = QPushButton()
         self.play_pause.setText("⏸")
         self.play_pause.clicked.connect(self.__on_play_pause_clicked)
+        self.buttons_layout.addWidget(self.play_pause)
 
-        # Set up back buttons
-        self.restart = QPushButton()
-        self.restart.setText("⏮")
-        self.restart.clicked.connect(partial(self.seek_absolute, 0))
-
-        self.back1min = QPushButton()
-        self.back1min.setText("↶\n1 min")
-        self.back1min.clicked.connect(partial(self.seek_relative, -60))
-
-        self.back10s = QPushButton()
-        self.back10s.setText("↶\n10 s")
-        self.back10s.clicked.connect(partial(self.seek_relative, -10))
-
-        self.back1entry = QPushButton()
-        self.back1entry.setText("↶\n1 frame")
-        self.back1entry.clicked.connect(self.player.single_step_backward)
-
-        # Set up forward buttons
-        self.forward1min = QPushButton()
-        self.forward1min.setText("↷\n1 min")
-        self.forward1min.clicked.connect(partial(self.seek_relative, 60))
-
-        self.forward10s = QPushButton()
-        self.forward10s.setText("↷\n10 s")
-        self.forward10s.clicked.connect(partial(self.seek_relative, 10))
-
-        self.forward1entry = QPushButton()
-        self.forward1entry.setText("↷\n1 frame")
-        self.forward1entry.clicked.connect(self.player.single_step_forward)
+        for button in [
+            ("↷\n1 frame", self.player.single_step_forward),
+            ("↷\n10 s", partial(self.seek_relative, 10)),
+            ("↷\n1 min", partial(self.seek_relative, 60)),
+        ]:
+            qbutton = QPushButton()
+            qbutton.setText(button[0])
+            qbutton.clicked.connect(button[1])
+            self.buttons_layout.addWidget(qbutton)
 
         # Setup playback speed combo box
         self.playback_speed_combo_box = QtGui.QComboBox(self)
@@ -74,15 +66,6 @@ class ReplayControls(QGroupBox):
             self.player.set_playback_speed
         )
 
-        self.buttons_layout.addWidget(self.restart)
-        self.buttons_layout.addWidget(self.back1min)
-        self.buttons_layout.addWidget(self.back10s)
-        self.buttons_layout.addWidget(self.back1entry)
-        self.buttons_layout.addWidget(self.play_pause)
-        self.buttons_layout.addWidget(self.playback_speed_combo_box)
-        self.buttons_layout.addWidget(self.forward1entry)
-        self.buttons_layout.addWidget(self.forward10s)
-        self.buttons_layout.addWidget(self.forward1min)
         self.buttons.setLayout(self.buttons_layout)
 
         self.slider_pressed = False
