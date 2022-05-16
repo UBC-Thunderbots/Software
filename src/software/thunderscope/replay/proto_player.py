@@ -166,7 +166,24 @@ class ProtoPlayer(object):
                     f"Writing to {log_file.name} starting at {self.current_packet_time}"
                 )
                 while self.current_entry_index < len(self.current_chunk):
-                    log_file.write(self.current_chunk[self.current_entry_index])
+                    (
+                        self.current_packet_time,
+                        _,
+                        proto,
+                    ) = ProtoPlayer.unpack_log_entry(
+                        self.current_chunk[self.current_entry_index]
+                    )
+
+                    serialized_proto = base64.b64encode(proto.SerializeToString())
+                    current_time = self.current_packet_time - start_time
+
+                    log_entry = (
+                        f"{current_time}{REPLAY_METADATA_DELIMETER}"
+                        + f"{proto.DESCRIPTOR.full_name}{REPLAY_METADATA_DELIMETER}"
+                        + f"{serialized_proto}\n"
+                    )
+
+                    log_file.write(bytes(log_entry, encoding="utf-8"))
 
                 # Load the next chunk
                 self.current_chunk_index += 1

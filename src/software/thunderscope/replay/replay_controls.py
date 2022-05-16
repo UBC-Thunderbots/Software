@@ -188,15 +188,14 @@ class ReplayControls(QGroupBox):
         """When the button is clicked, save clip if current time is after the clip start time
         """
         if self.clipping and self.player.current_packet_time > self.clip_start:
+            end_time = self.player.current_packet_time
             filename, _ = QtGui.QFileDialog.getSaveFileName(
                 self,
                 "Save clip",
                 "~/log_clip_{}.replay".format(int(time.time())),
                 options=QFileDialog.Option.DontUseNativeDialog,
             )
-            self.player.save_clip(
-                filename, self.clip_start, self.player.current_packet_time
-            )
+            self.player.save_clip(filename, self.clip_start, end_time)
             self.clipping = False
         else:
             self.clipping = True
