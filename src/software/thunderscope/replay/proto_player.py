@@ -174,21 +174,51 @@ class ProtoPlayer(object):
             self.playback_speed = 1.0 / float(speed)
             self.play()
 
-    def seek_relative(self, relative_time):
-        """Seeks time relative to current time
+    def single_step_backward(self):
+        self.pause()
+        self.current_entry_index = self.current_entry_index - 1
+        self.current_chunk_index = self.current_chunk_index
+        if self.current_entry_index <0:
+            self.current_chunk_index -= 1
+            if self.current_chunk_index < 0:
+                self.current_chunk_index = 0
+                self.current_entry_index = 0
+            else:
+                self.current_entry_index += len(self.current_chunk)
+                self.current_chunk = ProtoPlayer.load_replay_chunk(
+                    self.sorted_chunks[self.current_chunk_index]
+                )
 
-        :param relative_time The time relative to the current time to seek to
+        logging.info(
+            "Stepped to chunk {} at index {} with timestamp {:.2f}".format(
+                self.current_chunk_index,
+                self.current_entry_index,
+                self.seek_offset_time,
+            )
+        )
 
-        """
-        self.seek(self.current_packet_time + relative_time)
+    def single_step_forward(self):
+        self.pause()
+        self.current_entry_index = self.current_entry_index + 1
+        self.current_chunk_index = self.current_chunk_index
+        if self.current_entry_index >= len(self.current_chunk):
+            self.current_chunk_index += 1
+            if self.current_chunk_index >= len(self.sorted_chunks):
+                self.current_chunk_index = len(self.sorted_chunks) - 1
+                self.current_entry_index = len(self.current_chunk) - 1
+            else:
+                self.current_entry_index -= len(self.current_chunk)
+                self.current_chunk = ProtoPlayer.load_replay_chunk(
+                    self.sorted_chunks[self.current_chunk_index]
+                )
 
-    def seek_frame_relative(self, relative_frames):
-        """Seeks 
-
-        :param relative_time The time relative to the current time to seek to
-
-        """
-        self.seek(self.current_packet_time + relative_time)
+        logging.info(
+            "Stepped to chunk {} at index {} with timestamp {:.2f}".format(
+                self.current_chunk_index,
+                self.current_entry_index,
+                self.seek_offset_time,
+            )
+        )
 
     def seek(self, seek_time):
         """Seeks to a specific time. We binary search through the chunks
@@ -204,7 +234,7 @@ class ProtoPlayer(object):
         :param seek_time: The time to seek to.
 
         """
-        # Lets binary search through the chunks to find the chunk that starts
+        # Let's binary search through the chunks to find the chunk that starts
         # with a timestamp less than (but closest to) the seek_time we want
         # to seek to.
         def __bisect_chunks_by_timestamp(chunk):

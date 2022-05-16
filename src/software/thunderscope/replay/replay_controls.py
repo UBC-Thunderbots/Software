@@ -35,31 +35,32 @@ class ReplayControls(QGroupBox):
         # Set up back buttons
         self.restart = QPushButton()
         self.restart.setText("⏮")
-        self.restart.clicked.connect(partial(self.player.seek, 0))
+        self.restart.clicked.connect(partial(self.seek_absolute, 0))
 
         self.back1min = QPushButton()
         self.back1min.setText("↶\n1 min")
-        self.back1min.clicked.connect(partial(self.player.seek_relative, -60))
+        self.back1min.clicked.connect(partial(self.seek_relative, -60))
 
         self.back10s = QPushButton()
         self.back10s.setText("↶\n10 s")
-        self.back1min.clicked.connect(partial(self.player.seek_relative, -10))
+        self.back10s.clicked.connect(partial(self.seek_relative, -10))
 
         self.back1entry = QPushButton()
         self.back1entry.setText("↶\n1 frame")
-        self.back1entry.clicked.connect(partial(self.player.seek_relative, -10))
+        self.back1entry.clicked.connect(self.player.single_step_backward)
 
         # Set up forward buttons
         self.forward1min = QPushButton()
         self.forward1min.setText("↷\n1 min")
-        self.forward1min.clicked.connect(partial(self.player.seek_relative, 60))
+        self.forward1min.clicked.connect(partial(self.seek_relative, 60))
 
         self.forward10s = QPushButton()
         self.forward10s.setText("↷\n10 s")
-        self.forward10s.clicked.connect(partial(self.player.seek_relative, 10))
+        self.forward10s.clicked.connect(partial(self.seek_relative, 10))
 
         self.forward1entry = QPushButton()
         self.forward1entry.setText("↷\n1 frame")
+        self.forward1entry.clicked.connect(self.player.single_step_forward)
 
         # Setup playback speed combo box
         self.playback_speed_combo_box = QtGui.QComboBox(self)
@@ -113,7 +114,6 @@ class ReplayControls(QGroupBox):
         """When the play/pause button is clicked, toggle play/pause and set the text
         """
         self.player.toggle_play_pause()
-        self.play_pause.setText("⏸" if self.player.is_playing else "▶")
 
     def __on_replay_slider_released(self):
         """When the slider is released, seek to the sliders location and
@@ -154,9 +154,30 @@ class ReplayControls(QGroupBox):
                 self.player.current_packet_time * MILLISECONDS_PER_SECOND
             )
 
+        self.play_pause.setText("⏸" if self.player.is_playing else "▶")
+
     def keyPressEvent(self, event):
         """When a key is pressed, pause the player.
         
         """
         if event.key() == QtCore.Qt.Key.Key_P:
             self.__on_play_pause_clicked()
+
+    def seek_relative(self, relative_time):
+        """Seeks time relative to current time
+
+        :param relative_time The time relative to the current time to seek to
+
+        """
+        self.was_playing = self.player.is_playing
+        self.player.pause()
+        self.player.seek(self.player.current_packet_time + relative_time)
+        if self.was_playing:
+            self.player.play()
+
+    def seek_absolute(self, absolute_time):
+        self.was_playing = self.player.is_playing
+        self.player.pause()
+        self.player.seek(absolute_time)
+        if self.was_playing:
+            self.player.play()
