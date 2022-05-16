@@ -31,7 +31,8 @@ class ReplayControls(QGroupBox):
             ("⏮", partial(self.seek_absolute, 0)),
             ("↶\n1 min", partial(self.seek_relative, -60)),
             ("↶\n10 s", partial(self.seek_relative, -10)),
-            ("↶\n1 frame", self.player.single_step_backward),
+            ("↶\n1 s", partial(self.seek_relative, -1)),
+            ("↶\nStep", self.player.single_step_backward),
         ]:
             qbutton = QPushButton()
             qbutton.setText(button[0])
@@ -58,9 +59,11 @@ class ReplayControls(QGroupBox):
         self.buttons_layout.addWidget(self.playback_speed_combo_box)
 
         for button in [
-            ("↷\n1 frame", self.player.single_step_forward),
+            ("↷\nStep", self.player.single_step_forward),
+            ("↷\n1 s", partial(self.seek_relative, 1)),
             ("↷\n10 s", partial(self.seek_relative, 10)),
             ("↷\n1 min", partial(self.seek_relative, 60)),
+            ("⏭", partial(self.seek_absolute, self.player.end_time)),
         ]:
             qbutton = QPushButton()
             qbutton.setText(button[0])
@@ -69,7 +72,7 @@ class ReplayControls(QGroupBox):
 
         # Set up save clip button
         self.save_clip = QPushButton()
-        self.save_clip.setText("Clip")
+        self.save_clip.setText("Start\nClip")
         self.save_clip.clicked.connect(self.__on_save_clip_clicked)
         self.buttons_layout.addWidget(self.save_clip)
 
@@ -148,9 +151,9 @@ class ReplayControls(QGroupBox):
 
         self.play_pause.setText("⏸" if self.player.is_playing else "▶")
         self.save_clip.setText(
-            "Save"
+            "Save\nClip"
             if self.clipping and self.player.current_packet_time > self.clip_start
-            else "Clip"
+            else "Start\nClip"
         )
 
     def keyPressEvent(self, event):

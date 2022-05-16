@@ -9,6 +9,7 @@ import proto
 from proto.import_all_protos import *
 from extlibs.er_force_sim.src.protobuf.world_pb2 import *
 from software.thunderscope.replay.replay_constants import *
+from software.thunderscope.replay.proto_logger import ProtoLogger
 
 
 class ProtoPlayer(object):
@@ -137,6 +138,13 @@ class ProtoPlayer(object):
         return float(timestamp), proto_class, proto
 
     def save_clip(self, filename, start_time, end_time):
+        """Saves clip
+
+        :param filename: The file to save to
+        :param start_time: the start time for the clip
+        :param end_time: the end time for the clip
+    
+        """
         if not filename:
             print("No filename selected")
             return
@@ -174,15 +182,8 @@ class ProtoPlayer(object):
                         self.current_chunk[self.current_entry_index]
                     )
 
-                    serialized_proto = base64.b64encode(proto.SerializeToString())
                     current_time = self.current_packet_time - start_time
-
-                    log_entry = (
-                        f"{current_time}{REPLAY_METADATA_DELIMETER}"
-                        + f"{proto.DESCRIPTOR.full_name}{REPLAY_METADATA_DELIMETER}"
-                        + f"{serialized_proto}\n"
-                    )
-
+                    log_entry = ProtoLogger.create_log_entry(proto, current_time)
                     log_file.write(bytes(log_entry, encoding="utf-8"))
 
                 # Load the next chunk
@@ -236,15 +237,20 @@ class ProtoPlayer(object):
             self.play()
 
     def single_step_backward(self):
+        """Steps the player backward by one log entry
+        """
         self.pause()
         self.current_entry_index = self.current_entry_index - 1
         self.current_chunk_index = self.current_chunk_index
         if self.current_entry_index < 0:
+            # handle case that player needs to step backward to the previous chunk
             self.current_chunk_index -= 1
             if self.current_chunk_index < 0:
+                # do not step backwards beyond the beginning of the replay
                 self.current_chunk_index = 0
                 self.current_entry_index = 0
             else:
+                # adjust log entry index and fetch the right chunk
                 self.current_entry_index += len(self.current_chunk)
                 self.current_chunk = ProtoPlayer.load_replay_chunk(
                     self.sorted_chunks[self.current_chunk_index]
@@ -259,15 +265,20 @@ class ProtoPlayer(object):
         )
 
     def single_step_forward(self):
+        """Steps the player forward by one log entry
+        """
         self.pause()
         self.current_entry_index = self.current_entry_index + 1
         self.current_chunk_index = self.current_chunk_index
         if self.current_entry_index >= len(self.current_chunk):
+            # handle case that player needs to step forward to the next chunk
             self.current_chunk_index += 1
             if self.current_chunk_index >= len(self.sorted_chunks):
+                # do not step forwards beyond the end of the replay
                 self.current_chunk_index = len(self.sorted_chunks) - 1
                 self.current_entry_index = len(self.current_chunk) - 1
             else:
+                # adjust log entry index and fetch the right chunk
                 self.current_entry_index -= len(self.current_chunk)
                 self.current_chunk = ProtoPlayer.load_replay_chunk(
                     self.sorted_chunks[self.current_chunk_index]
