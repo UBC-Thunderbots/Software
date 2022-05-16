@@ -37,6 +37,7 @@ class NamedValuePlotter(object):
     def refresh(self):
         """Refreshes NamedValuePlotter and updates data in the respective
         plots.
+
         """
 
         # Dump the entire buffer into a deque. This operation is fast because
