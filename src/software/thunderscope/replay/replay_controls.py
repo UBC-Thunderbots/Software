@@ -2,6 +2,7 @@ import time
 import pyqtgraph as pg
 from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph.Qt import QtCore, QtGui
+from functools import partial
 
 from software.thunderscope.field.field_layer import FieldLayer
 from software.thunderscope import common_widgets
@@ -20,18 +21,45 @@ class ReplayControls(QGroupBox):
         self.setFocusPolicy(QtCore.Qt.FocusPolicy.StrongFocus)
         self.setFocus()
 
-        self.controls_layout = QHBoxLayout()
+        self.controls_layout = QVBoxLayout()
         self.player = player
 
-        # Setup play button
-        self.play = QPushButton()
-        self.play.setText("Play")
-        self.play.clicked.connect(self.player.play)
+        self.buttons = QGroupBox()
+        self.buttons_layout = QHBoxLayout()
 
-        # Setup pause button
-        self.pause = QPushButton()
-        self.pause.setText("Pause")
-        self.pause.clicked.connect(self.player.pause)
+        # Set up play button
+        self.play_pause = QPushButton()
+        self.play_pause.setText("⏸")
+        self.play_pause.clicked.connect(self.__on_play_pause_clicked)
+
+        # Set up back buttons
+        self.restart = QPushButton()
+        self.restart.setText("⏮")
+        self.restart.clicked.connect(partial(self.player.seek, 0))
+
+        self.back1min = QPushButton()
+        self.back1min.setText("↶\n1 min")
+        self.back1min.clicked.connect(partial(self.player.seek_relative, -60))
+
+        self.back10s = QPushButton()
+        self.back10s.setText("↶\n10 s")
+        self.back1min.clicked.connect(partial(self.player.seek_relative, -10))
+
+        self.back1entry = QPushButton()
+        self.back1entry.setText("↶\n1 frame")
+        self.back1entry.clicked.connect(partial(self.player.seek_relative, -10))
+
+        # Set up forward buttons
+        self.forward1min = QPushButton()
+        self.forward1min.setText("↷\n1 min")
+        self.forward1min.clicked.connect(partial(self.player.seek_relative, 60))
+
+        self.forward10s = QPushButton()
+        self.forward10s.setText("↷\n10 s")
+        self.forward10s.clicked.connect(partial(self.player.seek_relative, 10))
+
+        self.forward1entry = QPushButton()
+        self.forward1entry.setText("↷\n1 frame")
 
         # Setup playback speed combo box
         self.playback_speed_combo_box = QtGui.QComboBox(self)
@@ -45,9 +73,16 @@ class ReplayControls(QGroupBox):
             self.player.set_playback_speed
         )
 
-        self.controls_layout.addWidget(self.play)
-        self.controls_layout.addWidget(self.pause)
-        self.controls_layout.addWidget(self.playback_speed_combo_box)
+        self.buttons_layout.addWidget(self.restart)
+        self.buttons_layout.addWidget(self.back1min)
+        self.buttons_layout.addWidget(self.back10s)
+        self.buttons_layout.addWidget(self.back1entry)
+        self.buttons_layout.addWidget(self.play_pause)
+        self.buttons_layout.addWidget(self.playback_speed_combo_box)
+        self.buttons_layout.addWidget(self.forward1entry)
+        self.buttons_layout.addWidget(self.forward10s)
+        self.buttons_layout.addWidget(self.forward1min)
+        self.buttons.setLayout(self.buttons_layout)
 
         self.slider_pressed = False
         # tracks history of the state of is_playing before a button is pressed
@@ -71,7 +106,14 @@ class ReplayControls(QGroupBox):
         self.replay_slider.sliderPressed.connect(self.__on_replay_slider_pressed)
 
         self.controls_layout.addWidget(self.replay_box)
+        self.controls_layout.addWidget(self.buttons)
         self.setLayout(self.controls_layout)
+
+    def __on_play_pause_clicked(self):
+        """When the play/pause button is clicked, toggle play/pause and set the text
+        """
+        self.player.toggle_play_pause()
+        self.play_pause.setText("⏸" if self.player.is_playing else "▶")
 
     def __on_replay_slider_released(self):
         """When the slider is released, seek to the sliders location and
@@ -117,4 +159,4 @@ class ReplayControls(QGroupBox):
         
         """
         if event.key() == QtCore.Qt.Key.Key_P:
-            self.player.toggle_play_pause()
+            self.__on_play_pause_clicked()
