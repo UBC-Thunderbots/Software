@@ -32,7 +32,6 @@ class ReplayControls(QGroupBox):
             ("↶\n1 min", partial(self.seek_relative, -60)),
             ("↶\n10 s", partial(self.seek_relative, -10)),
             ("↶\n1 s", partial(self.seek_relative, -1)),
-            ("↶\nStep", self.player.single_step_backward),
         ]:
             qbutton = QPushButton()
             qbutton.setText(button[0])

@@ -236,34 +236,6 @@ class ProtoPlayer(object):
             self.playback_speed = 1.0 / float(speed)
             self.play()
 
-    def single_step_backward(self):
-        """Steps the player backward by one log entry
-        """
-        self.pause()
-        self.current_entry_index = self.current_entry_index - 1
-        self.current_chunk_index = self.current_chunk_index
-        if self.current_entry_index < 0:
-            # handle case that player needs to step backward to the previous chunk
-            self.current_chunk_index -= 1
-            if self.current_chunk_index < 0:
-                # do not step backwards beyond the beginning of the replay
-                self.current_chunk_index = 0
-                self.current_entry_index = 0
-            else:
-                # adjust log entry index and fetch the right chunk
-                self.current_entry_index += len(self.current_chunk)
-                self.current_chunk = ProtoPlayer.load_replay_chunk(
-                    self.sorted_chunks[self.current_chunk_index]
-                )
-
-        logging.info(
-            "Stepped to chunk {} at index {} with timestamp {:.2f}".format(
-                self.current_chunk_index,
-                self.current_entry_index,
-                self.seek_offset_time,
-            )
-        )
-
     def single_step_forward(self):
         """Steps the player forward by one log entry
         """
