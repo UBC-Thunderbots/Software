@@ -368,7 +368,7 @@ class Thunderscope(object):
             full_system_proto_unix_io
         )
         performance_dock = Dock("Performance")
-        performance_dock.addWidget(widgets["performance_widget"].win)
+        performance_dock.addWidget(widgets["performance_widget"])
 
         widgets["playinfo_widget"] = self.setup_play_info(full_system_proto_unix_io)
         playinfo_dock = Dock("Play Info")
