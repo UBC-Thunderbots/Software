@@ -190,8 +190,8 @@ class ReplayControls(QGroupBox):
         if self.clipping and self.player.current_packet_time > self.clip_start:
             filename, _ = QtGui.QFileDialog.getSaveFileName(
                 self,
-                "Save layout",
-                "~/dock_layout_{}.tscopelayout".format(int(time.time())),
+                "Save clip",
+                "~/log_clip_{}.replay".format(int(time.time())),
                 options=QFileDialog.Option.DontUseNativeDialog,
             )
             self.player.save_clip(

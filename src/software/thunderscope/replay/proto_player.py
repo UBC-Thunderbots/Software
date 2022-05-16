@@ -146,6 +146,40 @@ class ProtoPlayer(object):
 
         logging.info(f"Saving clip from {start_time} to {end_time} to {filename}")
 
+        directory = filename
+        if "." in filename:
+            directory = filename[: filename.rfind(".")]
+        try:
+            os.makedirs(directory)
+        except OSError:
+            pass
+
+        replay_index = 0
+
+        self.seek(start_time)
+
+        while self.current_packet_time <= end_time:
+            with gzip.open(
+                f"{directory}/{replay_index}.{REPLAY_FILE_EXTENSION}", "wb"
+            ) as log_file:
+                logging.info(
+                    f"Writing to {log_file.name} starting at {self.current_packet_time}"
+                )
+                while self.current_entry_index < len(self.current_chunk):
+                    log_file.write(self.current_chunk[self.current_entry_index])
+
+                # Load the next chunk
+                self.current_chunk_index += 1
+                replay_index += 1
+
+                if self.current_chunk_index < len(self.sorted_chunks):
+                    self.current_chunk = ProtoPlayer.load_replay_chunk(
+                        self.sorted_chunks[self.current_chunk_index]
+                    )
+                    self.current_entry_index = 0
+
+        logging.info("Clip saved!")
+
     def play(self):
         """Plays back the log file."""
 
@@ -257,7 +291,7 @@ class ProtoPlayer(object):
                 self.sorted_chunks, seek_time, key=__bisect_chunks_by_timestamp
             )
 
-        # Lets binary search through the entries in the chunk to find the closest
+        # Let's binary search through the entries in the chunk to find the closest
         # timestamp to seek to
         def __bisect_entries_by_timestamp(entry):
             timestamp, _, _ = ProtoPlayer.unpack_log_entry(entry)
@@ -338,7 +372,7 @@ class ProtoPlayer(object):
 
         while True:
 
-            # Only play if we are not paused
+            # Only play if we are playing
             if not self.is_playing:
                 time.sleep(PLAY_PAUSE_POLL_INTERVAL_SECONDS)
                 continue
