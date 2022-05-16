@@ -44,16 +44,6 @@ class ReplayControls(QGroupBox):
         self.play_pause.clicked.connect(self.__on_play_pause_clicked)
         self.buttons_layout.addWidget(self.play_pause)
 
-        for button in [
-            ("↷\n1 frame", self.player.single_step_forward),
-            ("↷\n10 s", partial(self.seek_relative, 10)),
-            ("↷\n1 min", partial(self.seek_relative, 60)),
-        ]:
-            qbutton = QPushButton()
-            qbutton.setText(button[0])
-            qbutton.clicked.connect(button[1])
-            self.buttons_layout.addWidget(qbutton)
-
         # Setup playback speed combo box
         self.playback_speed_combo_box = QtGui.QComboBox(self)
 
@@ -65,6 +55,17 @@ class ReplayControls(QGroupBox):
         self.playback_speed_combo_box.currentTextChanged.connect(
             self.player.set_playback_speed
         )
+        self.buttons_layout.addWidget(self.playback_speed_combo_box)
+
+        for button in [
+            ("↷\n1 frame", self.player.single_step_forward),
+            ("↷\n10 s", partial(self.seek_relative, 10)),
+            ("↷\n1 min", partial(self.seek_relative, 60)),
+        ]:
+            qbutton = QPushButton()
+            qbutton.setText(button[0])
+            qbutton.clicked.connect(button[1])
+            self.buttons_layout.addWidget(qbutton)
 
         self.buttons.setLayout(self.buttons_layout)
 
