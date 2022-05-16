@@ -1,0 +1,56 @@
+syntax = "proto2";
+
+package SSLProto;
+
+// The engine config
+message Config
+{
+    // The behavior for each game event
+    map<string, Behavior> game_event_behavior = 1;
+
+    // The config for each auto referee
+    map<string, AutoRefConfig> auto_ref_configs = 2;
+
+    // The selected tracker source
+    optional string active_tracker_source = 3;
+
+    // The list of available teams
+    repeated string teams = 4;
+
+    // Behaviors for each game event
+    enum Behavior
+    {
+        // Not set or unknown
+        BEHAVIOR_UNKNOWN = 0;
+        // Always accept the game event
+        BEHAVIOR_ACCEPT = 1;
+        // Accept the game event if was reported by a majority
+        BEHAVIOR_ACCEPT_MAJORITY = 2;
+        // Only propose the game event (can be accepted in the UI by a human)
+        BEHAVIOR_PROPOSE_ONLY = 3;
+        // Only log the game event to the protocol
+        BEHAVIOR_LOG = 4;
+        // Silently ignore the game event
+        BEHAVIOR_IGNORE = 5;
+    }
+}
+
+// The config for an auto referee
+message AutoRefConfig
+{
+    // The game event behaviors for this auto referee
+    map<string, Behavior> game_event_behavior = 1;
+
+    // Behaviors for the game events reported by this auto referee
+    enum Behavior
+    {
+        // Not set or unknown
+        BEHAVIOR_UNKNOWN = 0;
+        // Accept the game event
+        BEHAVIOR_ACCEPT = 1;
+        // Log the game event
+        BEHAVIOR_LOG = 2;
+        // Silently ignore the game event
+        BEHAVIOR_IGNORE = 3;
+    }
+}

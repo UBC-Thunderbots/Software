@@ -1,5 +1,10 @@
 package(default_visibility = ["//visibility:public"])
 
+load(
+    "@platformio_rules//platformio:platformio.bzl",
+    "platformio_library",
+)
+
 cc_library(
     name = "tbots_protobuf",
     srcs = ["tbots_protobuf.cpp"],
@@ -9,6 +14,7 @@ cc_library(
         ":tbots_geometry",
         "//proto:tbots_cc_proto",
         "//proto:visualization_cc_proto",
+        "//software/ai/passing:pass_with_rating",
         "//software/geom:angle",
         "//software/geom:point",
         "//software/geom:vector",
@@ -225,5 +231,33 @@ cc_test(
         ":er_force_world",
         "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
+    ],
+)
+
+platformio_library(
+    name = "power_frame_msg_platformio",
+    hdr = "power_frame_msg.hpp",
+)
+
+cc_library(
+    name = "power_frame_msg",
+    hdrs = ["power_frame_msg.hpp"],
+    deps = [
+        "//proto:tbots_cc_proto",
+        "//proto:tbots_nanopb_proto",
+        "//proto/primitive:primitive_msg_factory",
+        "@nanopb",
+    ],
+)
+
+py_library(
+    name = "py_tbots_protobuf",
+    srcs = [
+        "tbots_protobuf.py",
+    ],
+    deps = [
+        "//proto:import_all_protos",
+        "//proto:software_py_proto",
+        "//proto:tbots_py_proto",
     ],
 )

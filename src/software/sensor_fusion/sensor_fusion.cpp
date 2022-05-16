@@ -16,6 +16,7 @@ SensorFusion::SensorFusion(std::shared_ptr<const SensorFusionConfig> sensor_fusi
       team_with_possession(TeamSide::ENEMY),
       friendly_goalie_id(0),
       enemy_goalie_id(0),
+      defending_positive_side(false),
       ball_in_dribbler_timeout(0),
       reset_time_vision_packets_detected(0),
       last_t_capture(0)
@@ -109,7 +110,14 @@ void SensorFusion::updateWorld(const SSLProto::SSL_WrapperPacket &packet)
 
     if (packet.has_detection())
     {
-        checkForVisionReset(packet.detection().t_capture());
+        if (checkForVisionReset(packet.detection().t_capture()))
+        {
+            LOG(WARNING) << "Vision reset detected... Resetting SensorFusion!";
+            resetWorldComponents();
+
+            // Process the geometry again
+            updateWorld(packet.geometry());
+        }
         updateWorld(packet.detection());
     }
 }
@@ -132,12 +140,20 @@ void SensorFusion::updateWorld(const SSLProto::Referee &packet)
         game_state.updateRefereeCommand(createRefereeCommand(packet, TeamColour::YELLOW));
         friendly_goalie_id = packet.yellow().goalkeeper();
         enemy_goalie_id    = packet.blue().goalkeeper();
+        if (packet.has_blue_team_on_positive_half())
+        {
+            defending_positive_side = !packet.blue_team_on_positive_half();
+        }
     }
     else
     {
         game_state.updateRefereeCommand(createRefereeCommand(packet, TeamColour::BLUE));
         friendly_goalie_id = packet.blue().goalkeeper();
         enemy_goalie_id    = packet.yellow().goalkeeper();
+        if (packet.has_blue_team_on_positive_half())
+        {
+            defending_positive_side = packet.blue_team_on_positive_half();
+        }
     }
 
     if (game_state.isOurBallPlacement())
@@ -212,16 +228,6 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
     bool ignore_invalid_camera_data =
         sensor_fusion_config->getIgnoreInvalidCameraData()->value();
 
-    // We invert the field side if we explicitly choose to override the values
-    // provided by the game controller. The 'defending_positive_side' parameter dictates
-    // the side we are defending if we are overriding the value
-    const bool override_game_controller_defending_side =
-        sensor_fusion_config->getOverrideGameControllerDefendingSide()->value();
-    const bool defending_positive_side =
-        sensor_fusion_config->getDefendingPositiveSide()->value();
-    const bool should_invert_field =
-        override_game_controller_defending_side && defending_positive_side;
-
     bool friendly_team_is_yellow =
         sensor_fusion_config->getFriendlyColorYellow()->value();
 
@@ -235,7 +241,7 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
         createTeamDetection({ssl_detection_frame}, TeamColour::BLUE, min_valid_x,
                             max_valid_x, ignore_invalid_camera_data);
 
-    if (should_invert_field)
+    if (defending_positive_side)
     {
         for (auto &detection : ball_detections)
         {
@@ -396,7 +402,7 @@ bool SensorFusion::teamHasBall(const Team &team, const Ball &ball)
     return false;
 }
 
-void SensorFusion::checkForVisionReset(double t_capture)
+bool SensorFusion::checkForVisionReset(double t_capture)
 {
     if (t_capture < last_t_capture && t_capture < VISION_PACKET_RESET_TIME_THRESHOLD)
     {
@@ -410,11 +416,12 @@ void SensorFusion::checkForVisionReset(double t_capture)
 
     if (reset_time_vision_packets_detected > VISION_PACKET_RESET_COUNT_THRESHOLD)
     {
-        LOG(WARNING) << "Vision reset detected... Resetting SensorFusion!" << std::endl;
-        resetWorldComponents();
         last_t_capture                     = 0;
         reset_time_vision_packets_detected = 0;
+        return true;
     }
+
+    return false;
 }
 
 void SensorFusion::resetWorldComponents()

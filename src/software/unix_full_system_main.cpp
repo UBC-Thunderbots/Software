@@ -23,22 +23,28 @@
 
 int main(int argc, char** argv)
 {
-    // load command line arguments
-    // TODO (#2510) Remove the Arudino Config
-    auto arduino_config = std::make_shared<ArduinoConfig>();
-    auto args           = std::make_shared<FullSystemMainCommandLineArgs>(arduino_config);
-    bool help_requested = args->loadFromCommandLineArguments(argc, argv);
+    // Setup dynamic parameters
+    auto mutable_thunderbots_config = std::make_shared<ThunderbotsConfig>();
+    auto thunderbots_config =
+        std::const_pointer_cast<const ThunderbotsConfig>(mutable_thunderbots_config);
+    bool help_requested =
+        mutable_thunderbots_config->getMutableFullSystemMainCommandLineArgs()
+            ->loadFromCommandLineArguments(argc, argv);
 
-    std::string runtime_path = args->getRuntimeDir()->value();
+    std::string runtime_path =
+        thunderbots_config->getFullSystemMainCommandLineArgs()->getRuntimeDir()->value();
     LoggerSingleton::initializeLogger(runtime_path);
+
+    // TODO (#2510) remove
+    bool friendly_colour_yellow =
+        mutable_thunderbots_config->getMutableSensorFusionConfig()
+            ->getMutableFriendlyColorYellow()
+            ->setValue(thunderbots_config->getFullSystemMainCommandLineArgs()
+                           ->getFriendlyColourYellow()
+                           ->value());
 
     if (!help_requested)
     {
-        // Setup dynamic parameters
-        auto mutable_thunderbots_config = std::make_shared<ThunderbotsConfig>();
-        auto thunderbots_config =
-            std::const_pointer_cast<const ThunderbotsConfig>(mutable_thunderbots_config);
-
         auto backend = std::make_shared<UnixSimulatorBackend>(
             thunderbots_config->getBackendConfig());
         auto sensor_fusion = std::make_shared<ThreadedSensorFusion>(
@@ -52,6 +58,10 @@ int main(int argc, char** argv)
                 [&ai](TbotsProto::AssignedTacticPlayControlParams input) {
                     ai->overrideTactics(input);
                 });
+
+        auto play_override_listener = ThreadedProtoUnixListener<TbotsProto::Play>(
+            runtime_path + PLAY_OVERRIDE_PATH,
+            [&ai](TbotsProto::Play input_play) { ai->overridePlay(input_play); });
 
         // Connect observers
         ai->Subject<TbotsProto::PrimitiveSet>::registerObserver(backend);

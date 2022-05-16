@@ -164,10 +164,13 @@ def run_validation_sequence_sets(
     always_validation_proto_set = ValidationProtoSet()
     eventually_validation_proto_set = ValidationProtoSet()
 
-    def create_validation_proto_helper(validation_proto_set, validation):
+    def create_validation_proto_helper(
+        validation_type, validation_proto_set, validation
+    ):
         """Helper function that computes the status and creates a
         validation_proto, and updates it in the validation_proto_set.
 
+        :param validation_type: The validation type of this proto set
         :param validation_proto_set: The validation proto set to add to
         :param validation: The validation to put into the proto
 
@@ -181,10 +184,10 @@ def run_validation_sequence_sets(
         # Create validation proto
         validation_proto.status = status
         validation_proto.failure_msg = str(validation) + " failed"
-        validation_proto.validation_type = validation.get_validation_type()
         validation_proto.geometry.CopyFrom(validation.get_validation_geometry(world))
 
         validation_proto_set.validations.append(validation_proto)
+        validation_proto_set.validation_type = validation_type
 
         return status
 
@@ -194,7 +197,7 @@ def run_validation_sequence_sets(
 
             # Add to validation_proto_set and get status
             status = create_validation_proto_helper(
-                eventually_validation_proto_set, validation
+                ValidationType.EVENTUALLY, eventually_validation_proto_set, validation
             )
 
             # If the current validation is failing, we don't care about
@@ -210,7 +213,9 @@ def run_validation_sequence_sets(
     # Validate the always validations. We need to look at all of them
     for validation_sequence in always_validation_sequence_set:
         for validation in validation_sequence:
-            create_validation_proto_helper(always_validation_proto_set, validation)
+            create_validation_proto_helper(
+                ValidationType.ALWAYS, always_validation_proto_set, validation
+            )
 
     return eventually_validation_proto_set, always_validation_proto_set
 

@@ -2,8 +2,8 @@
 
 #include "extlibs/er_force_sim/src/amun/simulator/simulator.h"
 #include "proto/defending_side_msg.pb.h"
-#include "proto/messages_robocup_ssl_wrapper.pb.h"
 #include "proto/robot_status_msg.pb.h"
+#include "proto/ssl_vision_wrapper.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/jetson_nano/primitive_executor.h"
@@ -148,12 +148,23 @@ class ErForceSimulator
      * @param robot_primitive_executor_map The robot primitive executors to send the
      * primitive set to
      * @param world_msg The world message
+     * @param local_velocity The local velocity
      */
     static void setRobotPrimitive(
         RobotId id, const TbotsProto::PrimitiveSet& primitive_set_msg,
         std::unordered_map<unsigned int, std::shared_ptr<PrimitiveExecutor>>&
             robot_primitive_executor_map,
-        const TbotsProto::World& world_msg);
+        const TbotsProto::World& world_msg, Vector local_velocity);
+
+    /**
+     * Gets a map from robot id to local velocity from repeated sim robots
+     *
+     * @param repeated sim robots
+     *
+     * @return a map from robot id to local velocity
+     */
+    static std::map<RobotId, Vector> getRobotIdToLocalVelocityMap(
+        const google::protobuf::RepeatedPtrField<world::SimRobot>& sim_robots);
 
     /**
      * Update Simulator Robot and get the latest robot control

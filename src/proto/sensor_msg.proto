@@ -3,7 +3,7 @@ syntax = "proto3";
 import "proto/robot_status_msg.proto";
 import "proto/tbots_timestamp_msg.proto";
 import "proto/ssl_gc_referee_message.proto";
-import "proto/messages_robocup_ssl_wrapper.proto";
+import "proto/ssl_vision_wrapper.proto";
 
 message SensorProto
 {

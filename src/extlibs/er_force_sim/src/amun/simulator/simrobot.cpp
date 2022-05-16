@@ -25,7 +25,7 @@
 #include "extlibs/er_force_sim/src/core/coordinates.h"
 #include "extlibs/er_force_sim/src/core/rng.h"
 #include "mesh.h"
-#include "proto/messages_robocup_ssl_detection.pb.h"
+#include "proto/ssl_vision_detection.pb.h"
 #include "simball.h"
 #include "simulator.h"
 
