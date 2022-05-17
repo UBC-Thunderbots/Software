@@ -16,7 +16,7 @@
      thunderloop: ../../../../../../../../jetson_nano/thunderloop_main
      announcement: ../../../../../../../../jetson_nano/broadcasts
      redis: ../../../../../../../../jetson_nano/redis
-     display: ../../../../../../../../jetson_nano/display
+     display: ../../../../../../../../jetson_nano/display/robot_ui
 
   tasks:
 

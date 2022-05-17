@@ -34,7 +34,7 @@
     - name: run the setup script
       become_method: sudo
       become: true
-      shell: bash /home/"{{ ansible_user }}"/setup_nano.sh >& /tmp/setup.log
+      command: bash /home/{{ ansible_user }}/setup_nano.sh >& /tmp/setup.log
       async: 300
       poll: 0
       register: result_async
