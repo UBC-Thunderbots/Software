@@ -5,7 +5,7 @@
 #include <utility>
 
 #include "software/geom/algorithms/contains.h"
-#include "software/simulated_tests/simulated_er_force_sim_tactic_test_fixture.h"
+#include "software/simulated_tests/simulated_er_force_sim_play_test_fixture.h"
 #include "software/simulated_tests/terminating_validation_functions/ball_kicked_validation.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_state_validation.h"
 #include "software/simulated_tests/validation/validation_function.h"
@@ -13,7 +13,7 @@
 #include "software/time/duration.h"
 #include "software/world/world.h"
 
-class MoveTacticTest : public SimulatedErForceSimTacticTestFixture
+class MoveTacticTest : public SimulatedErForceSimPlayTestFixture
 {
    protected:
     TbotsProto::FieldType field_type = TbotsProto::FieldType::DIV_B;
@@ -34,8 +34,7 @@ TEST_F(MoveTacticTest, test_move_across_field)
 
     auto tactic = std::make_shared<MoveTactic>();
     tactic->updateControlParams(destination, Angle::zero(), 0);
-    setTactic(tactic);
-    setFriendlyRobotId(1);
+    setTactic(1, tactic);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [destination, tactic](std::shared_ptr<World> world_ptr,
@@ -77,8 +76,7 @@ TEST_F(MoveTacticTest, test_autochip_move)
         destination, Angle::zero(), 0, TbotsProto::DribblerMode::OFF,
         TbotsProto::BallCollisionType::ALLOW, {AutoChipOrKickMode::AUTOCHIP, 2.0},
         TbotsProto::MaxAllowedSpeedMode::COLLISIONS_ALLOWED);
-    setTactic(tactic);
-    setFriendlyRobotId(1);
+    setTactic(1, tactic);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [destination, tactic](std::shared_ptr<World> world_ptr,
@@ -123,8 +121,7 @@ TEST_F(MoveTacticTest, test_autokick_move)
         destination, Angle::threeQuarter(), 0, TbotsProto::DribblerMode::OFF,
         TbotsProto::BallCollisionType::ALLOW, {AutoChipOrKickMode::AUTOKICK, 3.0},
         TbotsProto::MaxAllowedSpeedMode::COLLISIONS_ALLOWED);
-    setTactic(tactic);
-    setFriendlyRobotId(0);
+    setTactic(0, tactic);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [destination, tactic](std::shared_ptr<World> world_ptr,
@@ -166,8 +163,7 @@ TEST_F(MoveTacticTest, test_spinning_move_clockwise)
         destination, Angle::zero(), 0, TbotsProto::DribblerMode::OFF,
         TbotsProto::BallCollisionType::ALLOW, {AutoChipOrKickMode::OFF, 0.0},
         TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 1.0);
-    setTactic(tactic);
-    setFriendlyRobotId(0);
+    setTactic(0, tactic);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [destination, tactic](std::shared_ptr<World> world_ptr,
@@ -213,8 +209,7 @@ TEST_F(MoveTacticTest, test_spinning_move_counter_clockwise)
         destination, Angle::half(), 0, TbotsProto::DribblerMode::OFF,
         TbotsProto::BallCollisionType::ALLOW, {AutoChipOrKickMode::OFF, 0.0},
         TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, -4.0);
-    setTactic(tactic);
-    setFriendlyRobotId(0);
+    setTactic(0, tactic);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [destination, tactic](std::shared_ptr<World> world_ptr,
@@ -242,17 +237,4 @@ TEST_F(MoveTacticTest, test_spinning_move_counter_clockwise)
     runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
-}
-
-TEST(MoveTacticRobotCostTest, test_calculate_robot_cost)
-{
-    World world = ::TestUtil::createBlankTestingWorld();
-
-    Robot robot = Robot(0, Point(), Vector(), Angle::zero(), AngularVelocity::zero(),
-                        Timestamp::fromSeconds(0));
-
-    MoveTactic tactic = MoveTactic();
-    tactic.updateControlParams(Point(3, -4), Angle::zero(), 0.0);
-
-    EXPECT_EQ(5 / world.field().totalXLength(), tactic.calculateRobotCost(robot, world));
 }

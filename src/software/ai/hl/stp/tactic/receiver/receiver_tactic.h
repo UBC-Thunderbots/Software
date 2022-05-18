@@ -29,17 +29,6 @@ class ReceiverTactic : public Tactic
                              bool disable_one_touch_shot = false);
 
     /**
-     * Calculates the cost of assigning the given robot to this Tactic. Prefers robots
-     * closer to the block destination
-     *
-     * @param robot The robot to evaluate the cost for
-     * @param world The state of the world with which to perform the evaluation
-     * @return A cost in the range [0,1] indicating the cost of assigning the given robot
-     * to this tactic. Lower cost values indicate a more preferred robot.
-     */
-    double calculateRobotCost(const Robot& robot, const World& world) const override;
-
-    /**
      * Calculate the angle the robot should be at in order to perform the given shot
      *
      * @param shot A Ray representing the shot we want to take
@@ -77,7 +66,9 @@ class ReceiverTactic : public Tactic
     // enemy goal with
     static constexpr Angle MAX_DEFLECTION_FOR_ONE_TOUCH_SHOT = Angle::fromDegrees(90);
 
-    void updateIntent(const TacticUpdate& tactic_update) override;
+    void updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm) override;
+
+    std::map<RobotId, std::unique_ptr<FSM<ReceiverFSM>>> fsm_map;
 
     /**
      * Finds a feasible shot for the robot, if any.
@@ -88,8 +79,6 @@ class ReceiverTactic : public Tactic
      * @return A feasible shot or std::nullopt if there is no feasible shot
      */
     std::optional<Shot> findFeasibleShot();
-
-    FSM<ReceiverFSM> fsm;
 
     ReceiverFSM::ControlParams control_params;
 };

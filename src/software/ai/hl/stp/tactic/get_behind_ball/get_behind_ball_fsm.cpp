@@ -12,8 +12,9 @@ void GetBehindBallFSM::updateMove(const Update& event)
         Vector::createFromAngle(event.control_params.chick_direction + Angle::half());
     Point point_behind_ball = event.control_params.ball_location +
                               behind_ball.normalize(size_of_region_behind_ball * 3 / 4);
-    event.common.set_intent(std::make_unique<MoveIntent>(
-        event.common.robot.id(), point_behind_ball, event.control_params.chick_direction,
+
+    event.common.set_primitive(createMovePrimitive(
+        CREATE_MOTION_CONTROL(point_behind_ball), event.control_params.chick_direction,
         0.0, TbotsProto::DribblerMode::OFF, TbotsProto::BallCollisionType::AVOID,
         AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
         TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
