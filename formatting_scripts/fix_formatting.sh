@@ -68,8 +68,8 @@ function run_python_import_formatting(){
 # Function to run black python formatting
 function run_black_formatting () {
     printf "Running black to format Python files...\n\n"
-    # suppress misleading "All done! ✨ 🍰 ✨" message
-    $CURR_DIR/black_$BLACK_VERSION $BAZEL_ROOT_DIR &>/dev/null
+
+    $CURR_DIR/black_$BLACK_VERSION $BAZEL_ROOT_DIR
 
     if [[ "$?" != 0 ]]; then
         printf "\n***Failed to format Python files!***\n\n"

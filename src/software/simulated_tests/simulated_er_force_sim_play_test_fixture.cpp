@@ -30,9 +30,10 @@ void SimulatedErForceSimPlayTestFixture::setEnemyGoalie(RobotId goalie_id)
     mutable_sensor_fusion_config->set_enemy_goalie_id(static_cast<int>(goalie_id));
 }
 
-void SimulatedErForceSimPlayTestFixture::setAIPlay(const TbotsProto::Play& ai_play)
+void SimulatedErForceSimPlayTestFixture::setAIPlay(
+    const TbotsProto::Play::PlayName& ai_play)
 {
-    mutable_ai_config->mutable_ai_control_config()->set_override_ai_play(ai_play);
+    mutable_ai_config->mutable_ai_control_config()->set_override_ai_play(ai_play_name)
 }
 
 void SimulatedErForceSimPlayTestFixture::setAIPlay(std::unique_ptr<Play> play)
@@ -50,10 +51,9 @@ void SimulatedErForceSimPlayTestFixture::setTactic(
     RobotId id, std::shared_ptr<Tactic> tactic,
     std::set<TbotsProto::MotionConstraint> motion_constraints)
 {
-    ai_config->getMutableAiControlConfig()->getMutableOverrideAiPlay()->setValue(false);
     CHECK(static_cast<bool>(tactic)) << "Tactic is invalid" << std::endl;
     std::unique_ptr<AssignedTacticsPlay> play =
-        std::make_unique<AssignedTacticsPlay>(ai_config);
+        std::make_unique<AssignedTacticsPlay>(*mutable_ai_config);
     std::map<RobotId, std::set<TbotsProto::MotionConstraint>>
         motion_constraint_override_map;
     motion_constraint_override_map[id] = motion_constraints;
@@ -99,9 +99,4 @@ const TbotsProto::AiConfig SimulatedErForceSimPlayTestFixture::getAiConfig() con
 std::optional<TbotsProto::PlayInfo> SimulatedErForceSimPlayTestFixture::getPlayInfo()
 {
     return ai.getPlayInfo();
-}
-
-AIDrawFunction SimulatedErForceSimPlayTestFixture::getDrawFunctions()
-{
-    return AIDrawFunction([](QGraphicsScene* scene) {});
 }

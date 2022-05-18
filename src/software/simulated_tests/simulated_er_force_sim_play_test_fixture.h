@@ -33,7 +33,7 @@ class SimulatedErForceSimPlayTestFixture : public SimulatedErForceSimTestFixture
      *
      * @param ai_play The AI play enum
      */
-    void setAIPlay(const TbotsProto::Play& ai_play);
+    void setAIPlay(const TbotsProto::Play::PlayName& ai_play_name);
 
     /**
      * Sets the tactic to the given tactic

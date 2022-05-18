@@ -15,12 +15,15 @@ class RobotNavigationObstacleFactoryTest : public testing::Test
 {
    public:
     RobotNavigationObstacleFactoryTest()
-        : current_time(Timestamp::fromSeconds(123)), robot_navigation_obstacle_factory()
+        : current_time(Timestamp::fromSeconds(123)),
+          robot_navigation_obstacle_factory(config)
     {
-        // TODO set value
+        config.set_robot_obstacle_inflation_factor(1.3);
+        robot_navigation_obstacle_factory = RobotNavigationObstacleFactory(config);
     }
 
     Timestamp current_time;
+    TbotsProto::RobotNavigationObstacleConfig config;
     RobotNavigationObstacleFactory robot_navigation_obstacle_factory;
 };
 
@@ -35,8 +38,11 @@ class RobotNavigationObstacleFactoryMotionConstraintTest : public testing::Test
           friendly_team(Duration::fromMilliseconds(1000)),
           enemy_team(Duration::fromMilliseconds(1000)),
           world(field, ball, friendly_team, enemy_team),
-          robot_navigation_obstacle_factory()
+          robot_navigation_obstacle_factory(robot_navigation_obstacle_config)
     {
+        robot_navigation_obstacle_config.set_robot_obstacle_inflation_factor(1.3);
+        robot_navigation_obstacle_factory =
+            RobotNavigationObstacleFactory(robot_navigation_obstacle_config);
     }
 
     void SetUp() override
@@ -70,6 +76,7 @@ class RobotNavigationObstacleFactoryMotionConstraintTest : public testing::Test
     Team enemy_team;
     World world;
     RobotNavigationObstacleFactory robot_navigation_obstacle_factory;
+    TbotsProto::RobotNavigationObstacleConfig robot_navigation_obstacle_config;
 };
 
 TEST_F(RobotNavigationObstacleFactoryTest, create_rectangle_obstacle)
