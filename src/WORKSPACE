@@ -309,12 +309,6 @@ pip_install(
 )
 
 pip_install(
-    name = "python_tools_deps",
-    python_interpreter = "/opt/tbotspython/bin/python",
-    requirements = "//python_tools:requirements.txt",
-)
-
-pip_install(
     name = "display_deps",
     python_interpreter = "/opt/tbotspython/bin/python",
     requirements = "//software/jetson_nano/display:requirements.txt",

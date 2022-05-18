@@ -1,7 +1,5 @@
 package(default_visibility = ["//visibility:public"])
 
-load("@python_tools_deps//:requirements.bzl", "requirement")
-
 cc_library(
     name = "proto_udp_client",
     hdrs = [
