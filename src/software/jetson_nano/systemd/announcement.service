@@ -9,10 +9,14 @@ After=thunderbots.service thunderloop.service network.target network-online.targ
 
 [Service]
 #todo add arguments (#2443)
-ExecStart=/home/robot/thunderbots_binaries/broadcasts/robot_broadcast_sender -p 45000 -if eth0
+ExecStart=/home/robot/thunderbots_binaries/broadcasts/robot_broadcast_sender -p 45000 -if wlan0
 
 #always restart on crash
 Restart=always
+
+# Allow restarts at 10Hz
+StartLimitIntervalSec=1
+StartLimitBurst=10
 
 [Install]
 # This unit should be run at startup
