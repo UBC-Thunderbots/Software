@@ -16,7 +16,7 @@ import argparse
 
 HOST_GROUP = "THUNDERBOTS_HOSTS"
 NANO_USER = "robot"
-ANNOUNCEMENT_LISTEN_DURATION_S = 2
+ANNOUNCEMENT_LISTEN_DURATION_S = 10
 
 
 # loads variables, inventory, and play into Ansible API, then runs it
@@ -42,6 +42,7 @@ def ansible_runner(playbook: str, options: dict = {}):
         announcements = receive_announcements(
             port=int(options["port"]), duration=ANNOUNCEMENT_LISTEN_DURATION_S
         )
+        print(announcements)
         hosts = {a.ip_addr for a in announcements}
         host_aliases = {a.robot_id for a in announcements}
 
