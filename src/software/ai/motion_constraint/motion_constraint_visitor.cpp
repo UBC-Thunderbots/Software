@@ -9,16 +9,16 @@
 // clang-format off
 void MotionConstraintVisitor::visit(const GoalieTactic &tactic)
 {
-    current_allowed_constraints = std::set<MotionConstraint>({
-        MotionConstraint::FRIENDLY_DEFENSE_AREA,
-        MotionConstraint::HALF_METER_AROUND_BALL,
-        MotionConstraint::FRIENDLY_HALF
+    current_allowed_constraints = std::set<TbotsProto::MotionConstraint>({
+        TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA,
+        TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL,
+        TbotsProto::MotionConstraint::FRIENDLY_HALF
     });
 }
 
 void MotionConstraintVisitor::visit(const CreaseDefenderTactic &tactic) {
-    current_allowed_constraints = std::set<MotionConstraint>({
-        MotionConstraint::HALF_METER_AROUND_BALL,
+    current_allowed_constraints = std::set<TbotsProto::MotionConstraint>({
+        TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL,
     });
 }
 
@@ -34,9 +34,9 @@ void MotionConstraintVisitor::visit(const PivotKickTactic &tactic) {}
 
 void MotionConstraintVisitor::visit(const KickoffChipTactic &tactic)
 {
-    current_allowed_constraints = std::set<MotionConstraint>({
-        MotionConstraint::CENTER_CIRCLE,
-        MotionConstraint::HALF_METER_AROUND_BALL
+    current_allowed_constraints = std::set<TbotsProto::MotionConstraint>({
+        TbotsProto::MotionConstraint::CENTER_CIRCLE,
+        TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL
     });
 }
 
@@ -44,20 +44,20 @@ void MotionConstraintVisitor::visit(const StopTactic &tactic) {}
 
 void MotionConstraintVisitor::visit(const PenaltyKickTactic &tactic)
 {
-    current_allowed_constraints = std::set<MotionConstraint>({
-        MotionConstraint::HALF_METER_AROUND_BALL,
-        MotionConstraint::ENEMY_DEFENSE_AREA,
-        MotionConstraint::ENEMY_HALF
+    current_allowed_constraints = std::set<TbotsProto::MotionConstraint>({
+        TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL,
+        TbotsProto::MotionConstraint::ENEMY_DEFENSE_AREA,
+        TbotsProto::MotionConstraint::ENEMY_HALF
     });
 }
 
 void MotionConstraintVisitor::visit(const PenaltySetupTactic &tactic)
 {
-    current_allowed_constraints = std::set<MotionConstraint>({
-        MotionConstraint::ENEMY_HALF,
-        MotionConstraint::ENEMY_DEFENSE_AREA,
-        MotionConstraint::FRIENDLY_HALF,
-        MotionConstraint::HALF_METER_AROUND_BALL
+    current_allowed_constraints = std::set<TbotsProto::MotionConstraint>({
+        TbotsProto::MotionConstraint::ENEMY_HALF,
+        TbotsProto::MotionConstraint::ENEMY_DEFENSE_AREA,
+        TbotsProto::MotionConstraint::FRIENDLY_HALF,
+        TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL
     });
 }
 
@@ -79,16 +79,16 @@ void MotionConstraintVisitor::visit(const GetBehindBallTactic &tactic) {}
 
 void MotionConstraintVisitor::visit(const MoveGoalieToGoalLineTactic &tactic)
 {
-    current_allowed_constraints = std::set<MotionConstraint>({
-        MotionConstraint::FRIENDLY_HALF,
-        MotionConstraint::FRIENDLY_DEFENSE_AREA
+    current_allowed_constraints = std::set<TbotsProto::MotionConstraint>({
+        TbotsProto::MotionConstraint::FRIENDLY_HALF,
+        TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA
     });
 }
 
 // clang-format on
 
-std::set<MotionConstraint> MotionConstraintVisitor::getCurrentAllowedConstraints(
-    const Tactic &tactic)
+std::set<TbotsProto::MotionConstraint>
+MotionConstraintVisitor::getCurrentAllowedConstraints(const Tactic &tactic)
 {
     tactic.accept(*this);
     return current_allowed_constraints;

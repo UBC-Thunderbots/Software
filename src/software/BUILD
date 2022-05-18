@@ -52,18 +52,6 @@ cc_binary(
 )
 
 cc_binary(
-    name = "standalone_simulator_main",
-    srcs = ["standalone_simulator_main.cpp"],
-    deps = [
-        "//shared/parameter:cpp_configs",
-        "//software/gui/standalone_simulator:threaded_standalone_simulator_gui",
-        "//software/logger",
-        "//software/simulation:standalone_simulator",
-        "@boost//:program_options",
-    ],
-)
-
-cc_binary(
     name = "er_force_simulator_main",
     srcs = ["er_force_simulator_main.cpp"],
     deps = [

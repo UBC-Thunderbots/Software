@@ -1,5 +1,5 @@
 #pragma once
-#include "software/ai/motion_constraint/motion_constraint.h"
+#include "proto/primitive.pb.h"
 #include "software/ai/navigator/obstacle/obstacle.hpp"
 #include "software/ai/navigator/obstacle/robot_navigation_obstacle_factory.h"
 #include "software/simulated_tests/validation/validation_function.h"
@@ -17,4 +17,4 @@
 void robotsViolatingMotionConstraint(
     std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield,
     std::shared_ptr<RobotNavigationObstacleFactory> obstacle_factory,
-    MotionConstraint constraint);
+    TbotsProto::MotionConstraint constraint);

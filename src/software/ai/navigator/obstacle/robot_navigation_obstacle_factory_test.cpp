@@ -146,7 +146,8 @@ TEST_F(RobotNavigationObstacleFactoryTest, stationary_robot_obstacle)
     AngularVelocity angular_velocity(AngularVelocity::fromRadians(-0.6));
     Circle expected(origin, 0.207);
     Robot robot = Robot(3, origin, velocity, orientation, angular_velocity, current_time);
-    ObstaclePtr obstacle = robot_navigation_obstacle_factory.createFromRobot(robot);
+    ObstaclePtr obstacle =
+        robot_navigation_obstacle_factory.createFromRobotPosition(robot.position());
 
     try
     {
@@ -168,7 +169,8 @@ TEST_F(RobotNavigationObstacleFactoryTest, slow_moving_robot_obstacle)
     AngularVelocity angular_velocity(AngularVelocity::fromRadians(-0.6));
     Circle expected(origin, 0.207);
     Robot robot = Robot(3, origin, velocity, orientation, angular_velocity, current_time);
-    ObstaclePtr obstacle = robot_navigation_obstacle_factory.createFromRobot(robot);
+    ObstaclePtr obstacle =
+        robot_navigation_obstacle_factory.createFromRobotPosition(robot.position());
 
     try
     {
@@ -188,20 +190,20 @@ TEST_F(RobotNavigationObstacleFactoryTest, fast_moving_robot_obstacle)
     Vector velocity(1.27, 0.34);
     Angle orientation(Angle::fromRadians(2.2));
     AngularVelocity angular_velocity(AngularVelocity::fromRadians(-0.6));
-    Polygon expected({Point(-2.161, 5.231), Point(-2.331, 5.062), Point(-2.269, 4.831),
-                      Point(-2.038, 4.769), Point(-1.671, 4.867), Point(-1.795, 5.329)});
+    Circle expected(origin, 0.207);
     Robot robot = Robot(3, origin, velocity, orientation, angular_velocity, current_time);
-    ObstaclePtr obstacle = robot_navigation_obstacle_factory.createFromRobot(robot);
+    ObstaclePtr obstacle =
+        robot_navigation_obstacle_factory.createFromRobotPosition(robot.position());
 
     try
     {
-        auto polygon_obstacle = dynamic_cast<GeomObstacle<Polygon>&>(*obstacle);
-        EXPECT_TRUE(TestUtil::equalWithinTolerance(expected, polygon_obstacle.getGeom(),
-                                                   METERS_PER_MILLIMETER));
+        auto circle_obstacle = dynamic_cast<GeomObstacle<Circle>&>(*obstacle);
+        EXPECT_EQ(expected, circle_obstacle.getGeom());
     }
     catch (std::bad_cast&)
     {
-        ADD_FAILURE() << "Polygon Obstacle was not created for a fast moving robot";
+        ADD_FAILURE()
+            << "GeomObstacle<Circle>Ptr was not created for a fast moving robot";
     }
 }
 
@@ -211,27 +213,28 @@ TEST_F(RobotNavigationObstacleFactoryTest, another_fast_moving_robot_obstacle)
     Vector velocity(-0.27, 1.34);
     Angle orientation(Angle::fromRadians(-1.2));
     AngularVelocity angular_velocity(AngularVelocity::fromRadians(1.6));
-    Polygon expected({Point(0.966, -0.247), Point(1.124, -0.427), Point(1.358, -0.379),
-                      Point(1.434, -0.153), Point(1.357, 0.230), Point(0.889, 0.135)});
+    Circle expected(origin, 0.207);
     Robot robot = Robot(4, origin, velocity, orientation, angular_velocity, current_time);
-    ObstaclePtr obstacle = robot_navigation_obstacle_factory.createFromRobot(robot);
+    ObstaclePtr obstacle =
+        robot_navigation_obstacle_factory.createFromRobotPosition(robot.position());
 
     try
     {
-        auto polygon_obstacle = dynamic_cast<GeomObstacle<Polygon>&>(*obstacle);
-        EXPECT_TRUE(TestUtil::equalWithinTolerance(expected, polygon_obstacle.getGeom(),
-                                                   METERS_PER_MILLIMETER));
+        auto circle_obstacle = dynamic_cast<GeomObstacle<Circle>&>(*obstacle);
+        EXPECT_EQ(expected, circle_obstacle.getGeom());
     }
     catch (std::bad_cast&)
     {
-        ADD_FAILURE() << "Polygon Obstacle was not created for a fast moving robot";
+        ADD_FAILURE()
+            << "GeomObstacle<Circle>Ptr was not created for a fast moving robot";
     }
 }
 
 TEST_F(RobotNavigationObstacleFactoryMotionConstraintTest, centre_circle)
 {
-    auto obstacles = robot_navigation_obstacle_factory.createFromMotionConstraint(
-        MotionConstraint::CENTER_CIRCLE, world);
+    auto obstacles =
+        robot_navigation_obstacle_factory.createStaticObstaclesFromMotionConstraint(
+            TbotsProto::MotionConstraint::CENTER_CIRCLE, world.field());
     EXPECT_EQ(1, obstacles.size());
     try
     {
@@ -248,8 +251,9 @@ TEST_F(RobotNavigationObstacleFactoryMotionConstraintTest, centre_circle)
 
 TEST_F(RobotNavigationObstacleFactoryMotionConstraintTest, half_metre_around_ball)
 {
-    auto obstacles = robot_navigation_obstacle_factory.createFromMotionConstraint(
-        MotionConstraint::HALF_METER_AROUND_BALL, world);
+    auto obstacles =
+        robot_navigation_obstacle_factory.createDynamicObstaclesFromMotionConstraint(
+            TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL, world);
     EXPECT_EQ(1, obstacles.size());
     try
     {
@@ -266,8 +270,9 @@ TEST_F(RobotNavigationObstacleFactoryMotionConstraintTest, half_metre_around_bal
 
 TEST_F(RobotNavigationObstacleFactoryMotionConstraintTest, inflated_enemy_defense_area)
 {
-    auto obstacles = robot_navigation_obstacle_factory.createFromMotionConstraint(
-        MotionConstraint::INFLATED_ENEMY_DEFENSE_AREA, world);
+    auto obstacles =
+        robot_navigation_obstacle_factory.createStaticObstaclesFromMotionConstraint(
+            TbotsProto::MotionConstraint::INFLATED_ENEMY_DEFENSE_AREA, world.field());
     EXPECT_EQ(1, obstacles.size());
     try
     {
@@ -284,8 +289,9 @@ TEST_F(RobotNavigationObstacleFactoryMotionConstraintTest, inflated_enemy_defens
 
 TEST_F(RobotNavigationObstacleFactoryMotionConstraintTest, friendly_defense_area)
 {
-    auto obstacles = robot_navigation_obstacle_factory.createFromMotionConstraint(
-        MotionConstraint::FRIENDLY_DEFENSE_AREA, world);
+    auto obstacles =
+        robot_navigation_obstacle_factory.createStaticObstaclesFromMotionConstraint(
+            TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA, world.field());
     EXPECT_EQ(1, obstacles.size());
     try
     {
@@ -302,8 +308,9 @@ TEST_F(RobotNavigationObstacleFactoryMotionConstraintTest, friendly_defense_area
 
 TEST_F(RobotNavigationObstacleFactoryMotionConstraintTest, enemy_defense_area)
 {
-    auto obstacles = robot_navigation_obstacle_factory.createFromMotionConstraint(
-        MotionConstraint::ENEMY_DEFENSE_AREA, world);
+    auto obstacles =
+        robot_navigation_obstacle_factory.createStaticObstaclesFromMotionConstraint(
+            TbotsProto::MotionConstraint::ENEMY_DEFENSE_AREA, world.field());
     EXPECT_EQ(1, obstacles.size());
     try
     {
@@ -320,8 +327,9 @@ TEST_F(RobotNavigationObstacleFactoryMotionConstraintTest, enemy_defense_area)
 
 TEST_F(RobotNavigationObstacleFactoryMotionConstraintTest, friendly_half)
 {
-    auto obstacles = robot_navigation_obstacle_factory.createFromMotionConstraint(
-        MotionConstraint::FRIENDLY_HALF, world);
+    auto obstacles =
+        robot_navigation_obstacle_factory.createStaticObstaclesFromMotionConstraint(
+            TbotsProto::MotionConstraint::FRIENDLY_HALF, world.field());
     EXPECT_EQ(1, obstacles.size());
     try
     {
@@ -338,8 +346,9 @@ TEST_F(RobotNavigationObstacleFactoryMotionConstraintTest, friendly_half)
 
 TEST_F(RobotNavigationObstacleFactoryMotionConstraintTest, enemy_half)
 {
-    auto obstacles = robot_navigation_obstacle_factory.createFromMotionConstraint(
-        MotionConstraint::ENEMY_HALF, world);
+    auto obstacles =
+        robot_navigation_obstacle_factory.createStaticObstaclesFromMotionConstraint(
+            TbotsProto::MotionConstraint::ENEMY_HALF, world.field());
     EXPECT_EQ(1, obstacles.size());
     try
     {
@@ -364,8 +373,9 @@ TEST_F(RobotNavigationObstacleFactoryMotionConstraintTest, ball_placement_rectan
     ball_placement_gs.updateBall(new_ball);
     world.updateBall(new_ball);
     world.updateGameState(ball_placement_gs);
-    auto obstacles = robot_navigation_obstacle_factory.createFromMotionConstraint(
-        MotionConstraint::AVOID_BALL_PLACEMENT_INTERFERENCE, world);
+    auto obstacles =
+        robot_navigation_obstacle_factory.createDynamicObstaclesFromMotionConstraint(
+            TbotsProto::MotionConstraint::AVOID_BALL_PLACEMENT_INTERFERENCE, world);
     EXPECT_EQ(1, obstacles.size());
     try
     {
@@ -402,8 +412,9 @@ TEST_F(RobotNavigationObstacleFactoryMotionConstraintTest, ball_placement_rotate
     ball_placement_gs.updateBall(new_ball);
     world.updateBall(new_ball);
     world.updateGameState(ball_placement_gs);
-    auto obstacles = robot_navigation_obstacle_factory.createFromMotionConstraint(
-        MotionConstraint::AVOID_BALL_PLACEMENT_INTERFERENCE, world);
+    auto obstacles =
+        robot_navigation_obstacle_factory.createDynamicObstaclesFromMotionConstraint(
+            TbotsProto::MotionConstraint::AVOID_BALL_PLACEMENT_INTERFERENCE, world);
     EXPECT_EQ(1, obstacles.size());
     try
     {

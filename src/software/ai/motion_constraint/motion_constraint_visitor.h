@@ -2,9 +2,9 @@
 
 #include <set>
 
+#include "proto/primitive.pb.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/hl/stp/tactic/tactic_visitor.h"
-#include "software/ai/motion_constraint/motion_constraint.h"
 #include "software/world/game_state.h"
 
 class MotionConstraintVisitor : public TacticVisitor
@@ -48,8 +48,9 @@ class MotionConstraintVisitor : public TacticVisitor
      * @modifies current_allowed_constraints
      * @return set of MotionConstraints
      */
-    std::set<MotionConstraint> getCurrentAllowedConstraints(const Tactic &tactic);
+    std::set<TbotsProto::MotionConstraint> getCurrentAllowedConstraints(
+        const Tactic &tactic);
 
    private:
-    std::set<MotionConstraint> current_allowed_constraints;
+    std::set<TbotsProto::MotionConstraint> current_allowed_constraints;
 };

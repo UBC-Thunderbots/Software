@@ -26,24 +26,14 @@ class ShadowEnemyTactic : public Tactic
     void updateControlParams(std::optional<EnemyThreat> enemy_threat,
                              double shadow_distance);
 
-    /**
-     * Calculates the cost of assigning the given robot to this Tactic. Prefers robots
-     * closer to the enemy being shadowed
-     *
-     * @param robot The robot to evaluate the cost for
-     * @param world The state of the world with which to perform the evaluation
-     * @return A cost in the range [0,1] indicating the cost of assigning the given robot
-     * to this tactic. Lower cost values indicate a more preferred robot.
-     */
-    double calculateRobotCost(const Robot &robot, const World &world) const override;
-
     void accept(TacticVisitor &visitor) const override;
 
     DEFINE_TACTIC_DONE_AND_GET_FSM_STATE
 
    private:
-    void updateIntent(const TacticUpdate &tactic_update) override;
+    void updatePrimitive(const TacticUpdate &tactic_update, bool reset_fsm) override;
 
-    FSM<ShadowEnemyFSM> fsm;
+    std::map<RobotId, std::unique_ptr<FSM<ShadowEnemyFSM>>> fsm_map;
+
     ShadowEnemyFSM::ControlParams control_params;
 };
