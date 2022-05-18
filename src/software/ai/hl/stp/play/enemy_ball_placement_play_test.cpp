@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-#include "software/ai/motion_constraint/motion_constraint.h"
+#include "proto/primitive.pb.h"
 #include "software/ai/navigator/obstacle/robot_navigation_obstacle_factory.h"
 #include "software/simulated_tests/non_terminating_validation_functions/robots_violating_motion_constraint.h"
 #include "software/simulated_tests/simulated_er_force_sim_play_test_fixture.h"
@@ -62,7 +62,7 @@ TEST_P(EnemyBallPlacementPlayTest, test_ball_placement)
 
             robotsViolatingMotionConstraint(
                 world_ptr, yield, obstacle_factory,
-                MotionConstraint::AVOID_BALL_PLACEMENT_INTERFERENCE);
+                TbotsProto::MotionConstraint::AVOID_BALL_PLACEMENT_INTERFERENCE);
         }};
 
     runTest(field_type, ball_state, friendly_robots, enemy_robots,
@@ -109,7 +109,7 @@ TEST_F(EnemyBallPlacementPlayTest, test_no_placement)
             }
             robotsViolatingMotionConstraint(
                 world_ptr, yield, obstacle_factory,
-                MotionConstraint::AVOID_BALL_PLACEMENT_INTERFERENCE);
+                TbotsProto::MotionConstraint::AVOID_BALL_PLACEMENT_INTERFERENCE);
         }};
 
     runTest(field_type, ball_state, friendly_robots, enemy_robots,

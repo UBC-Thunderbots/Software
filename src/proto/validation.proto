@@ -33,6 +33,7 @@ message ValidationProto
 
 message ValidationProtoSet
 {
-    required ValidationType validation_type = 1;
-    repeated ValidationProto validations    = 2;
+    required string test_name               = 1;
+    required ValidationType validation_type = 2;
+    repeated ValidationProto validations    = 3;
 }

@@ -4,7 +4,6 @@
 #include "software/ai/evaluation/enemy_threat.h"
 #include "software/ai/hl/stp/tactic/move/move_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
-#include "software/ai/intent/move_intent.h"
 #include "software/geom/algorithms/distance.h"
 #include "software/logger/logger.h"
 

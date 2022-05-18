@@ -1,7 +1,7 @@
 #include "software/simulated_tests/simulated_er_force_sim_play_test_fixture.h"
 
-#include "proto/message_translation/primitive_google_to_nanopb_converter.h"
 #include "proto/message_translation/tbots_protobuf.h"
+#include "software/ai/hl/stp/play/assigned_tactics_play.h"
 #include "software/test_util/test_util.h"
 
 SimulatedErForceSimPlayTestFixture::SimulatedErForceSimPlayTestFixture()
@@ -38,6 +38,27 @@ void SimulatedErForceSimPlayTestFixture::setAIPlay(const TbotsProto::Play& ai_pl
 void SimulatedErForceSimPlayTestFixture::setAIPlay(std::unique_ptr<Play> play)
 {
     ai.overridePlay(std::move(play));
+}
+
+void SimulatedErForceSimPlayTestFixture::setTactic(RobotId id,
+                                                   std::shared_ptr<Tactic> tactic)
+{
+    setTactic(id, tactic, {});
+}
+
+void SimulatedErForceSimPlayTestFixture::setTactic(
+    RobotId id, std::shared_ptr<Tactic> tactic,
+    std::set<TbotsProto::MotionConstraint> motion_constraints)
+{
+    ai_config->getMutableAiControlConfig()->getMutableOverrideAiPlay()->setValue(false);
+    CHECK(static_cast<bool>(tactic)) << "Tactic is invalid" << std::endl;
+    std::unique_ptr<AssignedTacticsPlay> play =
+        std::make_unique<AssignedTacticsPlay>(ai_config);
+    std::map<RobotId, std::set<TbotsProto::MotionConstraint>>
+        motion_constraint_override_map;
+    motion_constraint_override_map[id] = motion_constraints;
+    play->updateControlParams({{id, tactic}});
+    setAIPlay(std::move(play));
 }
 
 void SimulatedErForceSimPlayTestFixture::setRefereeCommand(
@@ -78,4 +99,9 @@ const TbotsProto::AiConfig SimulatedErForceSimPlayTestFixture::getAiConfig() con
 std::optional<TbotsProto::PlayInfo> SimulatedErForceSimPlayTestFixture::getPlayInfo()
 {
     return ai.getPlayInfo();
+}
+
+AIDrawFunction SimulatedErForceSimPlayTestFixture::getDrawFunctions()
+{
+    return AIDrawFunction([](QGraphicsScene* scene) {});
 }

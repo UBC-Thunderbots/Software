@@ -8,7 +8,6 @@
 #include <iostream>
 
 #include "extlibs/er_force_sim/src/protobuf/robot.h"
-#include "proto/message_translation/primitive_google_to_nanopb_converter.h"
 #include "proto/message_translation/ssl_detection.h"
 #include "proto/message_translation/ssl_geometry.h"
 #include "proto/message_translation/ssl_simulation_robot_control.h"

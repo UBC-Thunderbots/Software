@@ -5,7 +5,6 @@
 #include <fenv.h>
 
 #include "proto/message_translation/er_force_world.h"
-#include "proto/message_translation/primitive_google_to_nanopb_converter.h"
 #include "proto/message_translation/tbots_protobuf.h"
 #include "proto/primitive/primitive_msg_factory.h"
 #include "shared/2021_robot_constants.h"

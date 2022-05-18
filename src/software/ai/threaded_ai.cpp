@@ -71,3 +71,5 @@ void ThreadedAI::runAIAndSendPrimitives(const World& world)
         Subject<TbotsProto::PrimitiveSet>::sendValueToObservers(*new_primitives);
     }
 }
+
+void ThreadedAI::drawAI() {}

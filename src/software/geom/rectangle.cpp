@@ -19,6 +19,11 @@ Vector Rectangle::diagonal() const
     return points_[2] - points_[0];
 }
 
+double Rectangle::halfPerimeter() const
+{
+    return xLength() + yLength();
+}
+
 double Rectangle::xLength() const
 {
     return diagonal().x();

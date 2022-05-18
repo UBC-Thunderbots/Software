@@ -6,7 +6,6 @@
 #include "software/ai/hl/stp/tactic/chip/chip_fsm.h"
 #include "software/ai/hl/stp/tactic/pivot_kick/pivot_kick_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
-#include "software/ai/intent/move_intent.h"
 #include "software/geom/algorithms/acute_angle.h"
 #include "software/geom/algorithms/calculate_block_cone.h"
 #include "software/geom/algorithms/closest_point.h"
@@ -18,11 +17,13 @@
 struct GoalieFSM
 {
    public:
-    class PanicState;
-    class PositionToBlockState;
+    class Panic;
+    class PositionToBlock;
+    class MoveToGoalLine;
 
     struct ControlParams
     {
+        bool should_move_to_goal_line;
     };
 
     DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
@@ -86,6 +87,8 @@ struct GoalieFSM
      */
     bool shouldPanic(const Update &event);
 
+    bool shouldMoveToGoalLine(const Update &event);
+
     /**
      * Guard that checks if the ball is moving slower than the panic threshold and is
      * inside the defense area, if true then the goalie should dribble and chip the
@@ -109,11 +112,18 @@ struct GoalieFSM
     bool panicDone(const Update &event);
 
     /**
-     * Action that updates the MoveIntent to time_to_panic and stop the ball
+     * Action that updates the MovePrimitive to time_to_panic and stop the ball
      *
      * @param event GoalieFSM::Update event
      */
-    void updatePanic(const Update &event);
+    void panic(const Update &event);
+
+    /**
+     * Move the robot to the goal line
+     *
+     * @param event GoalieFSM::Update event
+     */
+    void moveToGoalLine(const Update &event);
 
     /**
      * Action that updates the PivotKickFSM
@@ -125,12 +135,12 @@ struct GoalieFSM
                          boost::sml::back::process<PivotKickFSM::Update> processEvent);
 
     /**
-     * Action that updates the MoveIntent to position the goalie in the best spot to
+     * Action that updates the MovePrimitive to position the goalie in the best spot to
      * block shots.
      *
      * @param event GoalieFSM::Update event
      */
-    void updatePositionToBlock(const Update &event);
+    void positionToBlock(const Update &event);
 
     /**
      * Checks if ball is in the friendly defense area
@@ -143,9 +153,10 @@ struct GoalieFSM
     {
         using namespace boost::sml;
 
-        DEFINE_SML_STATE(PanicState)
+        DEFINE_SML_STATE(Panic)
         DEFINE_SML_STATE(PivotKickFSM)
-        DEFINE_SML_STATE(PositionToBlockState)
+        DEFINE_SML_STATE(PositionToBlock)
+        DEFINE_SML_STATE(MoveToGoalLine)
 
         DEFINE_SML_EVENT(Update)
 
@@ -153,25 +164,37 @@ struct GoalieFSM
         DEFINE_SML_GUARD(panicDone)
         DEFINE_SML_GUARD(shouldPivotChip)
         DEFINE_SML_GUARD(shouldPanic)
+        DEFINE_SML_GUARD(shouldMoveToGoalLine)
 
-        DEFINE_SML_ACTION(updatePanic)
-        DEFINE_SML_ACTION(updatePositionToBlock)
+        DEFINE_SML_ACTION(panic)
+        DEFINE_SML_ACTION(positionToBlock)
+        DEFINE_SML_ACTION(moveToGoalLine)
         DEFINE_SML_SUB_FSM_UPDATE_ACTION(updatePivotKick, PivotKickFSM)
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *PositionToBlockState_S + Update_E[shouldPanic_G] / updatePanic_A =
-                PanicState_S,
-            PositionToBlockState_S + Update_E[shouldPivotChip_G] / updatePivotKick_A =
+            *PositionToBlock_S + Update_E[shouldMoveToGoalLine_G] / moveToGoalLine_A =
+                MoveToGoalLine_S,
+            PositionToBlock_S + Update_E[shouldPanic_G] / panic_A = Panic_S,
+            PositionToBlock_S + Update_E[shouldPivotChip_G] / updatePivotKick_A =
                 PivotKickFSM_S,
-            PositionToBlockState_S + Update_E / updatePositionToBlock_A,
-            PanicState_S + Update_E[shouldPivotChip_G] / updatePivotKick_A =
-                PivotKickFSM_S,
-            PanicState_S + Update_E[panicDone_G] = X,
-            PanicState_S + Update_E / updatePanic_A,
+            PositionToBlock_S + Update_E / positionToBlock_A,
+            Panic_S + Update_E[shouldMoveToGoalLine_G] / moveToGoalLine_A =
+                MoveToGoalLine_S,
+            Panic_S + Update_E[shouldPivotChip_G] / updatePivotKick_A = PivotKickFSM_S,
+            Panic_S + Update_E[panicDone_G] / positionToBlock_A       = PositionToBlock_S,
+            Panic_S + Update_E / panic_A,
+            PivotKickFSM_S + Update_E[shouldMoveToGoalLine_G] / moveToGoalLine_A =
+                MoveToGoalLine_S,
             PivotKickFSM_S + Update_E[ballInDefenseArea_G] / updatePivotKick_A,
-            PivotKickFSM_S + Update_E[!ballInDefenseArea_G] / updatePositionToBlock_A = X,
-            X + Update_E / updatePositionToBlock_A = PositionToBlockState_S);
+            PivotKickFSM_S + Update_E[!ballInDefenseArea_G] / positionToBlock_A =
+                PositionToBlock_S,
+            MoveToGoalLine_S + Update_E[shouldMoveToGoalLine_G] / moveToGoalLine_A =
+                MoveToGoalLine_S,
+            MoveToGoalLine_S + Update_E[!shouldMoveToGoalLine_G] / positionToBlock_A =
+                PositionToBlock_S,
+
+            X + Update_E = X);
     }
 
    private:
