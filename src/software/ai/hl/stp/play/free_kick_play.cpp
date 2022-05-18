@@ -31,8 +31,10 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const World
 
     // Setup crease defenders to help the goalie
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics = {
-        std::make_shared<CreaseDefenderTactic>(2.067 * ROBOT_MAX_RADIUS_METERS),
-        std::make_shared<CreaseDefenderTactic>(2.067 * ROBOT_MAX_RADIUS_METERS)};
+        std::make_shared<CreaseDefenderTactic>(
+            ai_config.robot_navigation_obstacle_config()),
+        std::make_shared<CreaseDefenderTactic>(
+            ai_config.robot_navigation_obstacle_config())};
 
     auto attacker = std::make_shared<AttackerTactic>(ai_config);
 

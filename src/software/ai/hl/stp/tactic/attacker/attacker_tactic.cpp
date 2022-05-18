@@ -16,8 +16,8 @@ AttackerTactic::AttackerTactic(TbotsProto::AiConfig ai_config)
     for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)
     {
         fsm_map[id] = std::make_unique<FSM<AttackerFSM>>(
-            DribbleFSM(ai_config->getDribbleTacticConfig()),
-            AttackerFSM(ai_config->getAttackerTacticConfig()));
+            DribbleFSM(ai_config.dribble_tactic_config()),
+            AttackerFSM(ai_config.attacker_tactic_config()));
     }
 }
 
@@ -44,17 +44,17 @@ void AttackerTactic::updatePrimitive(const TacticUpdate& tactic_update, bool res
     if (reset_fsm)
     {
         fsm_map[tactic_update.robot.id()] = std::make_unique<FSM<AttackerFSM>>(
-            DribbleFSM(ai_config->getDribbleTacticConfig()),
-            AttackerFSM(ai_config->getAttackerTacticConfig()));
+            DribbleFSM(ai_config.dribble_tactic_config()),
+            AttackerFSM(ai_config.attacker_tactic_config()));
     }
 
     std::optional<Shot> shot = calcBestShotOnGoal(
         tactic_update.world.field(), tactic_update.world.friendlyTeam(),
         tactic_update.world.enemyTeam(), tactic_update.world.ball().position(),
         TeamType::ENEMY, {tactic_update.robot});
-    if (shot &&
-        shot->getOpenAngle() <
-            Angle::fromDegrees(attacker_tactic_config.min_open_angle_for_shot_deg()))
+    if (shot && shot->getOpenAngle() <
+                    Angle::fromDegrees(
+                        ai_config.attacker_tactic_config().min_open_angle_for_shot_deg()))
     {
         // reject shots that have an open angle below the minimum
         shot = std::nullopt;

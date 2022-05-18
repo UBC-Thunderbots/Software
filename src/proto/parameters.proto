@@ -29,17 +29,18 @@ message ThunderbotsConfig
 
 message AiConfig
 {
-    required AiControlConfig ai_control_config                 = 1;
-    required DribbleTacticConfig dribble_tactic_config         = 2;
-    required AttackerTacticConfig attacker_tactic_config       = 3;
-    required CornerKickPlayConfig corner_kick_play_config      = 4;
-    required PassingConfig passing_config                      = 5;
-    required GoalieTacticConfig goalie_tactic_config           = 6;
-    required EnemyCapabilityConfig enemy_capability_config     = 7;
-    required ShootOrPassPlayConfig shoot_or_pass_play_config   = 8;
-    required RobotCapabilitiesConfig robot_capabilities_config = 9;
-    required SensorFusionConfig sensor_fusion_config           = 10;
-    required DefensePlayConfig defense_play_config             = 11;
+    required AiControlConfig ai_control_config                              = 1;
+    required DribbleTacticConfig dribble_tactic_config                      = 2;
+    required AttackerTacticConfig attacker_tactic_config                    = 3;
+    required CornerKickPlayConfig corner_kick_play_config                   = 4;
+    required PassingConfig passing_config                                   = 5;
+    required GoalieTacticConfig goalie_tactic_config                        = 6;
+    required EnemyCapabilityConfig enemy_capability_config                  = 7;
+    required ShootOrPassPlayConfig shoot_or_pass_play_config                = 8;
+    required RobotCapabilitiesConfig robot_capabilities_config              = 9;
+    required SensorFusionConfig sensor_fusion_config                        = 10;
+    required DefensePlayConfig defense_play_config                          = 11;
+    required RobotNavigationObstacleConfig robot_navigation_obstacle_config = 12;
 }
 
 message AiControlConfig
@@ -49,7 +50,7 @@ message AiControlConfig
 
     // If the enum exists, override the existing play
     // with the Play enum provided
-    optional Play override_ai_play = 2;
+    optional Play.PlayName override_ai_play = 2;
 }
 
 message AttackerTacticConfig
@@ -297,4 +298,13 @@ message DefensePlayConfig
     // "immediate" threat the defense play will swarm that robot with shadowers
     required double immediate_threat_distance = 1
         [default = 6.0, (bounds).min_double_value = 0.0, (bounds).max_double_value = 9.5];
+}
+
+message RobotNavigationObstacleConfig
+{
+    required double robot_obstacle_inflation_factor = 1 [
+        default                   = 0.0,
+        (bounds).min_double_value = 0.0,
+        (bounds).max_double_value = 10.0
+    ];
 }

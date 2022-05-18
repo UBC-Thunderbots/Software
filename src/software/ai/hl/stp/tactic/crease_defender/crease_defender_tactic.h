@@ -33,7 +33,8 @@ class CreaseDefenderTactic : public Tactic
      *
      * @param robot_obstacle_inflation_factor The amount to inflate the robot obstacles
      */
-    explicit CreaseDefenderTactic(double robot_obstacle_inflation_factor);
+    explicit CreaseDefenderTactic(
+        TbotsProto::RobotNavigationObstacleConfig robot_navigation_obstacle_config);
 
     CreaseDefenderTactic() = delete;
 
@@ -59,5 +60,5 @@ class CreaseDefenderTactic : public Tactic
     std::map<RobotId, std::unique_ptr<FSM<CreaseDefenderFSM>>> fsm_map;
 
     CreaseDefenderFSM::ControlParams control_params;
-    double robot_obstacle_inflation_factor_;
+    TbotsProto::RobotNavigationObstacleConfig robot_navigation_obstacle_config;
 };

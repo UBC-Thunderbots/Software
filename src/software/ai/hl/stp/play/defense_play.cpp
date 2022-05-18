@@ -21,8 +21,10 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
 
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics = {
         // TODO-AKHIL remove hardcoded values
-        std::make_shared<CreaseDefenderTactic>(2.067 * ROBOT_MAX_RADIUS_METERS),
-        std::make_shared<CreaseDefenderTactic>(2.067 * ROBOT_MAX_RADIUS_METERS)};
+        std::make_shared<CreaseDefenderTactic>(
+            ai_config.robot_navigation_obstacle_config()),
+        std::make_shared<CreaseDefenderTactic>(
+            ai_config.robot_navigation_obstacle_config())};
 
     std::array<std::shared_ptr<ShadowEnemyTactic>, 2> shadow_enemy_tactics = {
         std::make_shared<ShadowEnemyTactic>(),

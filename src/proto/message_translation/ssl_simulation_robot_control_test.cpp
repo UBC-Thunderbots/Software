@@ -107,34 +107,3 @@ TEST_F(SSLSimulationProtoTest, test_create_robot_command_unset_optional_fields)
     EXPECT_NEAR(robot_command->move_command().local_velocity().angular(), 0.0, 1e-5);
     ;
 }
-
-TEST_F(SSLSimulationProtoTest, test_create_robot_control)
-{
-    auto move_command_1 = createRobotMoveCommand(60, -60, -60, 60, 55, 45,
-                                                 wheel_constants.wheel_radius_meters);
-    auto robot_command_1 =
-        createRobotCommand(1, std::move(move_command_1), 2.0, 3.0, 4.0);
-
-    auto move_command_2 = createRobotMoveCommand(-60, 60, 60, -60, 55, 45,
-                                                 wheel_constants.wheel_radius_meters);
-    auto robot_command_2 =
-        createRobotCommand(2, std::move(move_command_2), 4.0, 6.0, 8.0);
-
-    std::vector<std::unique_ptr<SSLSimulationProto::RobotCommand>> robot_commands = {};
-    robot_commands.push_back(std::move(robot_command_1));
-    robot_commands.push_back(std::move(robot_command_2));
-
-    auto robot_control = createRobotControl(std::move(robot_commands));
-
-    unsigned robot_id = 1;
-    for (auto robot_command : *robot_control->mutable_robot_commands())
-    {
-        // Negative sign if robot id is even
-        float sign = robot_id % 2 == 0 ? -1.0f : 1.0f;
-        EXPECT_EQ(robot_id, robot_command.id());
-        EXPECT_GT(sign * robot_command.move_command().local_velocity().forward(), 0.1);
-        EXPECT_NEAR(robot_command.move_command().local_velocity().left(), 0.0, 1e-5);
-        EXPECT_NEAR(robot_command.move_command().local_velocity().angular(), 0.0, 1e-5);
-        robot_id++;
-    }
-}

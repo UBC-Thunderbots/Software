@@ -47,10 +47,11 @@ struct CreaseDefenderFSM
     /**
      * Constructor for CreaseDefenderFSM struct
      *
-     * @param robot_obstacle_inflation_factor The robot obstacle inflation factor
+     * @param robot_navigation_obstacle_config The config
      */
-    explicit CreaseDefenderFSM(double robot_obstacle_inflation_factor)
-        : robot_obstacle_inflation_factor_(robot_obstacle_inflation_factor)
+    explicit CreaseDefenderFSM(
+        TbotsProto::RobotNavigationObstacleConfig robot_navigation_obstacle_config)
+        : robot_navigation_obstacle_config(robot_navigation_obstacle_config)
     {
     }
 
@@ -95,4 +96,5 @@ struct CreaseDefenderFSM
         const Field& field, const Ray& ray, double robot_obstacle_inflation_factor);
 
    private:
+    TbotsProto::RobotNavigationObstacleConfig robot_navigation_obstacle_config;
 };

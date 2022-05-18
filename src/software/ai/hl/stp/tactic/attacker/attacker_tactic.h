@@ -56,6 +56,6 @@ class AttackerTactic : public Tactic
     // of losing the ball to an enemy
     std::optional<Point> chip_target;
 
-    // Attacker Tactic Config
-    TbotsProto::AttackerTacticConfig attacker_tactic_config;
+    // AI config
+    TbotsProto::AiConfig ai_config;
 };

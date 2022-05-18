@@ -10,8 +10,6 @@ cc_library(
     ],
     deps = [
         "//extlibs/er_force_sim/src/amun/simulator:simulator_qt",
-        "//firmware/app/primitives:primitive_manager",
-        "//firmware/app/world:firmware_world",
         "//proto:defending_side_msg_cc_proto",
         "//proto/message_translation:ssl_detection",
         "//proto/message_translation:ssl_geometry",

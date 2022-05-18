@@ -10,7 +10,6 @@ cc_library(
         "test_util.h",
     ],
     deps = [
-        "//firmware/app/logger",
         "//proto:tbots_cc_proto",
         "//proto:tbots_nanopb_proto",
         "//shared:robot_constants",

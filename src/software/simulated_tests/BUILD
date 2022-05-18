@@ -6,7 +6,6 @@ cc_library(
     srcs = ["simulated_er_force_sim_test_fixture.cpp"],
     hdrs = ["simulated_er_force_sim_test_fixture.h"],
     deps = [
-        "//software/gui/full_system:threaded_full_system_gui",
         "//software/logger",
         "//proto/message_translation:tbots_protobuf",
         "//proto:play_info_msg_cc_proto",

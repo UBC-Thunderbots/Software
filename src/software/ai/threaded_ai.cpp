@@ -23,7 +23,7 @@ ThreadedAI::ThreadedAI(TbotsProto::AiConfig ai_config)
 void ThreadedAI::overridePlay(TbotsProto::Play play_proto)
 {
     std::scoped_lock lock(ai_mutex);
-    ai.overridePlay(std::move(createPlay(play_proto, ai_config)));
+    ai.overridePlayFromProto(play_proto);
 }
 
 void ThreadedAI::overrideTactics(
@@ -71,5 +71,3 @@ void ThreadedAI::runAIAndSendPrimitives(const World& world)
         Subject<TbotsProto::PrimitiveSet>::sendValueToObservers(*new_primitives);
     }
 }
-
-void ThreadedAI::drawAI() {}

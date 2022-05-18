@@ -11,14 +11,6 @@
 #include "software/world/team_types.h"
 #include "software/world/world.h"
 
-extern "C"
-{
-#include "firmware/shared/physics.h"
-#include "proto/primitive.nanopb.h"
-#include "proto/robot_log_msg.nanopb.h"
-#include "proto/tbots_software_msgs.nanopb.h"
-}
-
 
 /**
  * The ErForceSimulator abstracts away the physics simulation of all objects in the world,

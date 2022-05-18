@@ -646,8 +646,10 @@ TEST_F(STPTacticAssignmentTest, test_multi_tier_assignment_with_tiered_assignmen
     // TODO-AKHIL: This test is failing because the robot assigned to the move tactic is
     // not
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics = {
-        std::make_shared<CreaseDefenderTactic>(2.067 * ROBOT_MAX_RADIUS_METERS),
-        std::make_shared<CreaseDefenderTactic>(2.067 * ROBOT_MAX_RADIUS_METERS)};
+        std::make_shared<CreaseDefenderTactic>(
+            ai_config.robot_navigation_obstacle_config()),
+        std::make_shared<CreaseDefenderTactic>(
+            ai_config.robot_navigation_obstacle_config())};
 
     Pass passer_pass(Point(2, 3), Point(0.5, 0.3), 2);
     auto attacker = std::make_shared<AttackerTactic>(ai_config);

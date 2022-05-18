@@ -13,7 +13,7 @@ DribbleTactic::DribbleTactic(TbotsProto::AiConfig ai_config)
     for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)
     {
         fsm_map[id] = std::make_unique<FSM<DribbleFSM>>(
-            DribbleFSM(ai_config->getDribbleTacticConfig()));
+            DribbleFSM(ai_config.dribble_tactic_config()));
     }
 }
 
@@ -36,7 +36,7 @@ void DribbleTactic::updatePrimitive(const TacticUpdate &tactic_update, bool rese
     if (reset_fsm)
     {
         fsm_map[tactic_update.robot.id()] = std::make_unique<FSM<DribbleFSM>>(
-            DribbleFSM(ai_config->getDribbleTacticConfig()));
+            DribbleFSM(ai_config.dribble_tactic_config()));
     }
     fsm_map.at(tactic_update.robot.id())
         ->process_event(DribbleFSM::Update(control_params, tactic_update));

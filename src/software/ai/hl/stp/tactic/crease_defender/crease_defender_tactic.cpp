@@ -9,12 +9,13 @@
 #include "software/geom/segment.h"
 #include "software/logger/logger.h"
 
-CreaseDefenderTactic::CreaseDefenderTactic(double robot_obstacle_inflation_factor)
+CreaseDefenderTactic::CreaseDefenderTactic(
+    TbotsProto::RobotNavigationObstacleConfig robot_navigation_obstacle_config)
     : Tactic({RobotCapability::Move}),
       fsm_map(),
       control_params({Point(0, 0), TbotsProto::CreaseDefenderAlignment::CENTRE,
                       TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT}),
-      robot_obstacle_inflation_factor_(robot_obstacle_inflation_factor)
+      robot_navigation_obstacle_config(robot_navigation_obstacle_config)
 {
     for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)
     {

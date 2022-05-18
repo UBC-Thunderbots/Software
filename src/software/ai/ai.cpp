@@ -3,6 +3,7 @@
 #include <chrono>
 
 #include "software/ai/hl/stp/play/halt_play.h"
+#include "software/ai/hl/stp/play/play_factory.h"
 
 AI::AI(TbotsProto::AiConfig ai_config)
     : ai_config(ai_config),
@@ -10,8 +11,7 @@ AI::AI(TbotsProto::AiConfig ai_config)
       override_play(nullptr),
       current_play(std::make_unique<HaltPlay>(ai_config)),
       field_to_path_planner_factory(),
-      prev_override(false),
-      prev_override_name("")
+      prev_override()
 {
 }
 
@@ -20,24 +20,26 @@ void AI::overridePlay(std::unique_ptr<Play> play)
     override_play = std::move(play);
 }
 
-void AI::overridePlayFromName(std::string name)
+void AI::overridePlayFromProto(TbotsProto::Play play_proto)
 {
-    overridePlay(GenericFactory<std::string, Play, AiConfig>::create(name, ai_config));
+    overridePlay(std::move(createPlay(play_proto, ai_config)));
 }
 
 void AI::checkAiConfig()
 {
-    bool current_override = ai_config->getAiControlConfig()->getOverrideAiPlay()->value();
-    std::string current_override_name =
-        ai_config->getAiControlConfig()->getCurrentAiPlay()->value();
-    if (current_override && (current_override != prev_override ||
-                             current_override_name != prev_override_name))
+    if (ai_config.ai_control_config().has_override_ai_play())
     {
-        overridePlayFromName(
-            ai_config->getAiControlConfig()->getCurrentAiPlay()->value());
+        auto current_override = ai_config.ai_control_config().override_ai_play();
+
+        if (current_override && (current_override != prev_override))
+        {
+            TbotsProto::Play play_proto;
+            play_proto.set_name(current_override);
+            overridePlayFromProto(play_proto);
+        }
+
+        prev_override = current_override;
     }
-    prev_override      = current_override;
-    prev_override_name = current_override_name;
 }
 
 std::unique_ptr<TbotsProto::PrimitiveSet> AI::getPrimitives(const World& world)
@@ -51,7 +53,7 @@ std::unique_ptr<TbotsProto::PrimitiveSet> AI::getPrimitives(const World& world)
     {
         field_to_path_planner_factory.emplace(
             world.field(),
-            GlobalPathPlannerFactory(ai_config->getRobotNavigationObstacleConfig(),
+            GlobalPathPlannerFactory(ai_config.robot_navigation_obstacle_config(),
                                      world.field()));
     }
 

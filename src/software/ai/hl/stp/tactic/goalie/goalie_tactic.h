@@ -43,5 +43,5 @@ class GoalieTactic : public Tactic
     TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode;
 
     GoalieFSM::ControlParams control_params;
-    std::shared_ptr<const AiConfig> ai_config;
+    TbotsProto::AiConfig ai_config;
 };

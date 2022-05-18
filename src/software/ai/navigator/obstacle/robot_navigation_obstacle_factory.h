@@ -17,6 +17,15 @@
 class RobotNavigationObstacleFactory
 {
    public:
+    RobotNavigationObstacleFactory() = delete;
+
+    /**
+     * Create an RobotNavigationObstacleFactory with the given configuration
+     *
+     * @param config The configuration used to determine how obstacles should be generated
+     */
+    RobotNavigationObstacleFactory(TbotsProto::RobotNavigationObstacleConfig config);
+
     /**
      * Create static obstacles for the given motion constraints
      *
@@ -94,8 +103,8 @@ class RobotNavigationObstacleFactory
                                         const Point &ball_point) const;
 
    private:
-    // TODO-DYNAMIC_PARAMETER
-    double robot_radius_expansion_amount = 2.0617 * ROBOT_MAX_RADIUS_METERS;
+    TbotsProto::RobotNavigationObstacleConfig config;
+    double robot_radius_expansion_amount;
 
     /**
      * Returns an obstacle for the field_rectangle expanded on all sides to account for

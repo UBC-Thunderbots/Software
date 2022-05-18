@@ -46,5 +46,5 @@ class DribbleTactic : public Tactic
 
     std::map<RobotId, std::unique_ptr<FSM<DribbleFSM>>> fsm_map;
     DribbleFSM::ControlParams control_params;
-    std::shared_ptr<const AiConfig> ai_config;
+    TbotsProto::AiConfig ai_config;
 };

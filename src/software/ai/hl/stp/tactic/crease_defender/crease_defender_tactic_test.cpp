@@ -42,7 +42,8 @@ TEST_F(CreaseDefenderTacticTest, DISABLED_test_chip_ball)
          field.enemyDefenseArea().negXPosYCorner()});
 
     // TODO-AKHIL: This is a hack to get the ball kicked.
-    auto tactic = std::make_shared<CreaseDefenderTactic>(2.067 * ROBOT_MAX_RADIUS_METERS);
+    auto tactic = std::make_shared<CreaseDefenderTactic>(
+        ai_config.robot_navigation_obstacle_config());
 
     tactic->updateControlParams(enemy_threat_point, alignment);
     setTactic(0, tactic, {TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA});
@@ -77,7 +78,8 @@ TEST_F(CreaseDefenderTacticTest, test_not_bumping_ball_towards_net)
     auto enemy_robots = TestUtil::createStationaryRobotStatesWithId({Point(4, 0)});
 
     // TODO-AKHIL: This is a hack to get the ball kicked.
-    auto tactic = std::make_shared<CreaseDefenderTactic>(2.067 * ROBOT_MAX_RADIUS_METERS);
+    auto tactic = std::make_shared<CreaseDefenderTactic>(
+        ai_config.robot_navigation_obstacle_config());
     tactic->updateControlParams(enemy_threat_point, alignment);
     setTactic(0, tactic, {TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA});
 
@@ -118,7 +120,8 @@ TEST_P(CreaseDefenderTacticTest, crease_defender_test)
          field.enemyDefenseArea().negXPosYCorner()});
 
     // TODO-AKHIL: This is a hack to get the ball kicked.
-    auto tactic = std::make_shared<CreaseDefenderTactic>(2.067 * ROBOT_MAX_RADIUS_METERS);
+    auto tactic = std::make_shared<CreaseDefenderTactic>(
+        ai_config.robot_navigation_obstacle_config());
 
     tactic->updateControlParams(enemy_threat_point, alignment);
     setTactic(0, tactic, {TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA});
