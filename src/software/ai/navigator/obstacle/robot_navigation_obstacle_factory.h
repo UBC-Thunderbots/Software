@@ -17,7 +17,6 @@
 class RobotNavigationObstacleFactory
 {
    public:
-
     /**
      * Create an RobotNavigationObstacleFactory with the given configuration
      *
