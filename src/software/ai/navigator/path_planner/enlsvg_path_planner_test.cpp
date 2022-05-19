@@ -13,12 +13,13 @@ class TestEnlsvgPathPlanner : public testing::Test
 {
    public:
     TestEnlsvgPathPlanner()
-        : robot_navigation_obstacle_factory(robot_navigation_obstacle_config)
+        : robot_navigation_obstacle_config(TbotsProto::RobotNavigationObstacleConfig()),
+          robot_navigation_obstacle_factory(robot_navigation_obstacle_config)
     {
     }
 
-    RobotNavigationObstacleFactory robot_navigation_obstacle_factory;
     TbotsProto::RobotNavigationObstacleConfig robot_navigation_obstacle_config;
+    RobotNavigationObstacleFactory robot_navigation_obstacle_factory;
 };
 
 TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_empty_grid)

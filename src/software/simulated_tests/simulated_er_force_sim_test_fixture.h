@@ -24,17 +24,6 @@ class SimulatedErForceSimTestFixture : public ::testing::Test
     void SetUp() override;
 
     /**
-     * Creates a directory to output logs to in the directory at the
-     * TEST_UNDECLARED_OUTPUTS_DIR Bazel environment variable, and sets up some
-     * ProtoLoggers to log unfiltered and filtered data.
-     *
-     * See
-     * https://docs.bazel.build/versions/master/test-encyclopedia.html#initial-conditions
-     * for an explanation of all the environment variables that Bazel passes to tests
-     */
-    void setupReplayLogging();
-
-    /**
      * Starts the simulation using the current state of the simulator, and runs
      * the given ValidationFunctions on each new state of the World. The test
      * will succeed if

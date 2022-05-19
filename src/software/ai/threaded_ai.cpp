@@ -43,6 +43,8 @@ void ThreadedAI::overrideTactics(
 
     play->updateControlParams(tactic_assignment_map);
     ai.overridePlay(std::move(play));
+
+    LOG(VISUALIZE) << ai.getPlayInfo();
 }
 
 void ThreadedAI::onValueReceived(World world)

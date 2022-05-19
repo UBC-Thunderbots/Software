@@ -54,8 +54,6 @@ void SimulatedErForceSimTestFixture::SetUp()
     enemy_thunderbots_config.mutable_sensor_fusion_config()->set_defending_positive_side(
         true);
 
-    setupReplayLogging();
-
     // reinitializing to prevent the previous test's configs from being reused
     friendly_sensor_fusion =
         SensorFusion(friendly_thunderbots_config.sensor_fusion_config());
@@ -92,38 +90,6 @@ void SimulatedErForceSimTestFixture::setCommonConfigs(
 
     mutable_thunderbots_config.mutable_sensor_fusion_config()
         ->set_override_game_controller_defending_side(true);
-}
-
-void SimulatedErForceSimTestFixture::setupReplayLogging()
-{
-    // get the name of the current test to name the replay output directory
-    auto test_name = ::testing::UnitTest::GetInstance()->current_test_info()->name();
-
-    namespace fs                                           = std::filesystem;
-    static constexpr auto SIMULATED_TEST_OUTPUT_DIR_SUFFIX = "simulated_test_outputs";
-
-    const char *test_outputs_dir_or_null = std::getenv("TEST_UNDECLARED_OUTPUTS_DIR");
-    if (!test_outputs_dir_or_null)
-    {
-        // we're not running with the Bazel test env vars set, don't set up replay logging
-        return;
-    }
-
-    fs::path bazel_test_outputs_dir(test_outputs_dir_or_null);
-    fs::path out_dir =
-        bazel_test_outputs_dir / SIMULATED_TEST_OUTPUT_DIR_SUFFIX / test_name;
-    fs::create_directories(out_dir);
-
-    LOG(INFO) << "Logging " << test_name << " replay to " << out_dir;
-
-    fs::path sensorproto_out_dir = out_dir / "ErForceSimulator_SensorProto";
-    fs::path ssl_wrapper_out_dir = out_dir / "SensorFusion_SSL_WrapperPacket";
-
-    simulator_sensorproto_logger =
-        std::make_shared<ProtoLogger<SensorProto>>(sensorproto_out_dir);
-    sensorfusion_wrapper_logger =
-        std::make_shared<ProtoLogger<SSLProto::SSL_WrapperPacket>>(ssl_wrapper_out_dir);
-    should_log_replay = true;
 }
 
 bool SimulatedErForceSimTestFixture::validateAndCheckCompletion(
@@ -387,69 +353,74 @@ void SimulatedErForceSimTestFixture::runTest(
                          robots_displacement, robots_velocity_diff);
         }
 
+        // TODO-AKHIL uncomment
         // Output the statistics for ball and robots
-        LOG(INFO) << "max ball displacement: " << ball_displacement_stats.maximum
-                  << std::endl;
-        LOG(INFO) << "min ball displacement: " << ball_displacement_stats.minimum
-                  << std::endl;
-        LOG(INFO) << "avg ball displacement: " << ball_displacement_stats.average
-                  << std::endl;
-        LOG(INFO) << "max ball velocity difference: " << ball_velocity_stats.maximum
-                  << std::endl;
-        LOG(INFO) << "min ball velocity difference: " << ball_velocity_stats.minimum
-                  << std::endl;
-        LOG(INFO) << "avg ball velocity difference: " << ball_velocity_stats.average
-                  << std::endl;
-        for (size_t i = 0; i < num_robots; i++)
-        {
-            LOG(INFO) << "Robot " << i << std::endl;
-            LOG(INFO) << "max robot displacement: " << ball_displacement_stats.maximum
-                      << std::endl;
-            LOG(INFO) << "min robot displacement: " << ball_displacement_stats.minimum
-                      << std::endl;
-            LOG(INFO) << "avg robot displacement: " << ball_displacement_stats.average
-                      << std::endl;
-            LOG(INFO) << "max robot velocity difference: " << ball_velocity_stats.maximum
-                      << std::endl;
-            LOG(INFO) << "min robot velocity difference: " << ball_velocity_stats.minimum
-                      << std::endl;
-            LOG(INFO) << "avg robot velocity difference: " << ball_velocity_stats.average
-                      << std::endl;
-        }
+        // LOG(INFO) << "max ball displacement: " << ball_displacement_stats.maximum
+        //           << std::endl;
+        // LOG(INFO) << "min ball displacement: " << ball_displacement_stats.minimum
+        //           << std::endl;
+        // LOG(INFO) << "avg ball displacement: " << ball_displacement_stats.average
+        //           << std::endl;
+        // LOG(INFO) << "max ball velocity difference: " << ball_velocity_stats.maximum
+        //           << std::endl;
+        // LOG(INFO) << "min ball velocity difference: " << ball_velocity_stats.minimum
+        //           << std::endl;
+        // LOG(INFO) << "avg ball velocity difference: " << ball_velocity_stats.average
+        //           << std::endl;
+        // for (size_t i = 0; i < num_robots; i++)
+        // {
+        //     LOG(INFO) << "Robot " << i << std::endl;
+        //     LOG(INFO) << "max robot displacement: " << ball_displacement_stats.maximum
+        //               << std::endl;
+        //     LOG(INFO) << "min robot displacement: " << ball_displacement_stats.minimum
+        //               << std::endl;
+        //     LOG(INFO) << "avg robot displacement: " << ball_displacement_stats.average
+        //               << std::endl;
+        //     LOG(INFO) << "max robot velocity difference: " <<
+        //     ball_velocity_stats.maximum
+        //               << std::endl;
+        //     LOG(INFO) << "min robot velocity difference: " <<
+        //     ball_velocity_stats.minimum
+        //               << std::endl;
+        //     LOG(INFO) << "avg robot velocity difference: " <<
+        //     ball_velocity_stats.average
+        //               << std::endl;
+        // }
 
         validation_functions_done =
             tickTest(simulation_time_step, ai_time_step, friendly_world, enemy_world,
                      simulator, ball_displacement, ball_velocity_diff,
                      robots_displacement, robots_velocity_diff);
     }
+    // TODO-AKHIL rever
     // Output the tick duration results
-    if (friendly_tick_count > 0)
-    {
-        double avg_friendly_tick_duration =
-            total_friendly_tick_duration / friendly_tick_count;
-        LOG(INFO) << "max friendly tick duration: " << max_friendly_tick_duration << "ms"
-                  << std::endl;
-        LOG(INFO) << "min friendly tick duration: " << min_friendly_tick_duration << "ms"
-                  << std::endl;
-        LOG(INFO) << "avg friendly tick duration: " << avg_friendly_tick_duration << "ms"
-                  << std::endl;
-    }
-    else
-    {
-        LOG(WARNING) << "Primitives were never updated for the friendly robots"
-                     << std::endl;
-    }
+    // if (friendly_tick_count > 0)
+    //{
+    // double avg_friendly_tick_duration =
+    // total_friendly_tick_duration / friendly_tick_count;
+    // LOG(INFO) << "max friendly tick duration: " << max_friendly_tick_duration << "ms"
+    //<< std::endl;
+    // LOG(INFO) << "min friendly tick duration: " << min_friendly_tick_duration << "ms"
+    //<< std::endl;
+    // LOG(INFO) << "avg friendly tick duration: " << avg_friendly_tick_duration << "ms"
+    //<< std::endl;
+    //}
+    // else
+    //{
+    // LOG(WARNING) << "Primitives were never updated for the friendly robots"
+    //<< std::endl;
+    //}
 
-    if (enemy_tick_count > 0)
-    {
-        double avg_enemy_tick_duration = total_enemy_tick_duration / enemy_tick_count;
-        LOG(INFO) << "max enemy tick duration: " << max_enemy_tick_duration << "ms"
-                  << std::endl;
-        LOG(INFO) << "min enemy tick duration: " << min_enemy_tick_duration << "ms"
-                  << std::endl;
-        LOG(INFO) << "avg enemy tick duration: " << avg_enemy_tick_duration << "ms"
-                  << std::endl;
-    }
+    // if (enemy_tick_count > 0)
+    //{
+    // double avg_enemy_tick_duration = total_enemy_tick_duration / enemy_tick_count;
+    // LOG(INFO) << "max enemy tick duration: " << max_enemy_tick_duration << "ms"
+    //<< std::endl;
+    // LOG(INFO) << "min enemy tick duration: " << min_enemy_tick_duration << "ms"
+    //<< std::endl;
+    // LOG(INFO) << "avg enemy tick duration: " << avg_enemy_tick_duration << "ms"
+    //<< std::endl;
+    //}
 
 
     if (!validation_functions_done && !terminating_validation_functions.empty())

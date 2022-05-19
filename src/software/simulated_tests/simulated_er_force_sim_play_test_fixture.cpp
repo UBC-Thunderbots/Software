@@ -84,11 +84,18 @@ void SimulatedErForceSimPlayTestFixture::updatePrimitives(
     auto start_tick_time = std::chrono::system_clock::now();
 
     auto primitive_set_msg = ai.getPrimitives(world_with_updated_game_state);
-    double duration_ms     = ::TestUtil::millisecondsSince(start_tick_time);
+    LOG(VISUALIZE) << ai.getPlayInfo();
+
+    double duration_ms = ::TestUtil::millisecondsSince(start_tick_time);
     registerFriendlyTickTime(duration_ms);
     auto world_msg = createWorld(world_with_updated_game_state);
     simulator_to_update->setYellowRobotPrimitiveSet(*primitive_set_msg,
                                                     std::move(world_msg));
+}
+
+const TbotsProto::AiConfig SimulatedErForceSimPlayTestFixture::getAiConfig() const
+{
+    return friendly_thunderbots_config.ai_config();
 }
 
 std::optional<TbotsProto::PlayInfo> SimulatedErForceSimPlayTestFixture::getPlayInfo()

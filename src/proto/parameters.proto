@@ -109,10 +109,10 @@ message PassingConfig
     ];
     // The minimum pass speed (in m/s)
     required double min_pass_speed_m_per_s = 6
-        [default = 3.5, (bounds).min_double_value = 0.0, (bounds).max_double_value = 5.0];
+        [default = 4.3, (bounds).min_double_value = 0.0, (bounds).max_double_value = 5.0];
     // The maximum pass speed (in m/s)
     required double max_pass_speed_m_per_s = 7 [
-        default                   = 5.5,
+        default                   = 6.0,
         (bounds).min_double_value = 0.0,
         (bounds).max_double_value = 10.0
     ];
@@ -174,7 +174,7 @@ message DribbleTacticConfig
 
     // Robot speed at which the robot is done dribbling (in m/s)
     required double robot_dribbling_done_speed = 5
-        [default = 0.0, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
+        [default = 1.0, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
 }
 
 message EnemyCapabilityConfig
@@ -303,7 +303,7 @@ message DefensePlayConfig
 message RobotNavigationObstacleConfig
 {
     required double robot_obstacle_inflation_factor = 1 [
-        default                   = 1.3,
+        default                   = 2.0167,
         (bounds).min_double_value = 0.0,
         (bounds).max_double_value = 10.0
     ];

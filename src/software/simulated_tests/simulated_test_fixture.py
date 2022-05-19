@@ -314,13 +314,21 @@ def simulated_test_runner():
     current_test = current_test.replace("]", "")
     current_test = current_test.replace("[", "-")
 
+    test_name = current_test.split("-")[0]
+
+    print(current_test)
+
     # Launch all binaries
     with Simulator(
-        args.simulator_runtime_dir, args.debug_simulator
+        f"{args.simulator_runtime_dir}/test/{test_name}", args.debug_simulator
     ) as simulator, FullSystem(
-        args.blue_full_system_runtime_dir, args.debug_blue_full_system, False
+        f"{args.blue_full_system_runtime_dir}/test/{test_name}",
+        args.debug_blue_full_system,
+        False,
     ) as blue_fs, FullSystem(
-        args.yellow_full_system_runtime_dir, args.debug_yellow_full_system, True
+        f"{args.yellow_full_system_runtime_dir}/test/{test_name}",
+        args.debug_yellow_full_system,
+        True,
     ) as yellow_fs:
         with Gamecontroller(
             supress_logs=(not args.show_gamecontroller_logs), ci_mode=True
