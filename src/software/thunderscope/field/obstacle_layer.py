@@ -1,6 +1,6 @@
 import pyqtgraph as pg
 from proto.geometry_pb2 import Circle, Polygon
-from proto.visualization_pb2 import Obstacles
+from proto.tbots_software_msgs_pb2 import PrimitiveSet
 from pyqtgraph.Qt import QtCore, QtGui
 
 from software.thunderscope.colors import Colors
@@ -20,9 +20,7 @@ class ObstacleLayer(FieldLayer):
 
         """
         FieldLayer.__init__(self)
-        self.cached_obstacles = Obstacles()
-
-        self.obstacle_buffer = ThreadSafeBuffer(buffer_size, Obstacles)
+        self.primitive_set_buffer = ThreadSafeBuffer(buffer_size, PrimitiveSet)
 
     def paint(self, painter, option, widget):
         """Paint this layer
@@ -34,27 +32,36 @@ class ObstacleLayer(FieldLayer):
         """
 
         # Draw the obstacles
-        obstacles = self.obstacle_buffer.get(block=False)
+        primitive_set = self.primitive_set_buffer.get(
+            block=False
+        ).robot_primitives.values()
+        obstacles_ptrs = [
+            primitive.move.motion_control.static_obstacles
+            for primitive in primitive_set
+            if primitive.HasField("move")
+        ]
 
         painter.setPen(pg.mkPen(Colors.NAVIGATOR_OBSTACLE_COLOR))
 
-        for polyobstacle in obstacles.polygon:
-            polygon_points = [
-                QtCore.QPoint(
-                    int(MILLIMETERS_PER_METER * point.x_meters),
-                    int(MILLIMETERS_PER_METER * point.y_meters),
-                )
-                for point in polyobstacle.points
-            ]
+        for obstacles in obstacles_ptrs:
+            for obstacle in obstacles:
+                for polyobstacle in obstacle.polygon:
+                    polygon_points = [
+                        QtCore.QPoint(
+                            int(MILLIMETERS_PER_METER * point.x_meters),
+                            int(MILLIMETERS_PER_METER * point.y_meters),
+                        )
+                        for point in polyobstacle.points
+                    ]
 
-            poly = QtGui.QPolygon(polygon_points)
-            painter.drawPolygon(poly)
+                    poly = QtGui.QPolygon(polygon_points)
+                    painter.drawPolygon(poly)
 
-        for circleobstacle in obstacles.circle:
-            painter.drawEllipse(
-                self.createCircle(
-                    int(MILLIMETERS_PER_METER * circleobstacle.origin.x_meters),
-                    int(MILLIMETERS_PER_METER * circleobstacle.origin.y_meters),
-                    int(MILLIMETERS_PER_METER * circleobstacle.radius),
-                )
-            )
+                for circleobstacle in obstacle.circle:
+                    painter.drawEllipse(
+                        self.createCircle(
+                            int(MILLIMETERS_PER_METER * circleobstacle.origin.x_meters),
+                            int(MILLIMETERS_PER_METER * circleobstacle.origin.y_meters),
+                            int(MILLIMETERS_PER_METER * circleobstacle.radius),
+                        )
+                    )

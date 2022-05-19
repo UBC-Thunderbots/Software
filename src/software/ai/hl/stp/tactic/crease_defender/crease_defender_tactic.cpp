@@ -12,30 +12,16 @@
 CreaseDefenderTactic::CreaseDefenderTactic(
     std::shared_ptr<const RobotNavigationObstacleConfig> robot_navigation_obstacle_config)
     : Tactic({RobotCapability::Move}),
-      fsm(CreaseDefenderFSM(robot_navigation_obstacle_config)),
+      fsm_map(),
       control_params({Point(0, 0), TbotsProto::CreaseDefenderAlignment::CENTRE,
                       TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT}),
       robot_navigation_obstacle_config(robot_navigation_obstacle_config)
 {
-}
-
-double CreaseDefenderTactic::calculateRobotCost(const Robot &robot,
-                                                const World &world) const
-{
-    auto block_point = CreaseDefenderFSM::findBlockThreatPoint(
-        world.field(), control_params.enemy_threat_origin,
-        control_params.crease_defender_alignment,
-        robot_navigation_obstacle_config->getRobotObstacleInflationFactor()->value());
-    // Prefer robots closer to the crease defender desired position
-    // We normalize with the total field length so that robots that are within the field
-    // have a cost less than 1
-    double cost = 1.0;
-    if (block_point)
+    for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)
     {
-        cost = (robot.position() - block_point.value()).length() /
-               world.field().totalXLength();
+        fsm_map[id] = std::make_unique<FSM<CreaseDefenderFSM>>(
+            CreaseDefenderFSM(robot_navigation_obstacle_config));
     }
-    return std::clamp<double>(cost, 0, 1);
 }
 
 void CreaseDefenderTactic::accept(TacticVisitor &visitor) const
@@ -53,7 +39,14 @@ void CreaseDefenderTactic::updateControlParams(
     control_params.max_allowed_speed_mode    = max_allowed_speed_mode;
 }
 
-void CreaseDefenderTactic::updateIntent(const TacticUpdate &tactic_update)
+void CreaseDefenderTactic::updatePrimitive(const TacticUpdate &tactic_update,
+                                           bool reset_fsm)
 {
-    fsm.process_event(CreaseDefenderFSM::Update(control_params, tactic_update));
+    if (reset_fsm)
+    {
+        fsm_map[tactic_update.robot.id()] = std::make_unique<FSM<CreaseDefenderFSM>>(
+            CreaseDefenderFSM(robot_navigation_obstacle_config));
+    }
+    fsm_map.at(tactic_update.robot.id())
+        ->process_event(CreaseDefenderFSM::Update(control_params, tactic_update));
 }

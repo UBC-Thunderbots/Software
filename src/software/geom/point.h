@@ -2,6 +2,7 @@
 
 #include <cmath>
 #include <iostream>
+#include <vector>
 
 #include "software/geom/angle.h"
 #include "software/geom/vector.h"

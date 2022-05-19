@@ -460,3 +460,26 @@ class Field
     Rectangle enemy_goal;
     Rectangle friendly_goal;
 };
+
+namespace std
+{
+    // Implements the std::less function so Field can be used as the key in data
+    // structures, such as std::map. See:
+    // https://stackoverflow.com/questions/42762633/why-is-stdless-better-than and
+    // https://en.cppreference.com/w/cpp/utility/functional/less
+    template <>
+    struct less<Field>
+    {
+        bool operator()(const Field &lhs, const Field &rhs) const
+        {
+            return lhs.friendlyDefenseArea().halfPerimeter() +
+                       lhs.enemyDefenseArea().halfPerimeter() +
+                       lhs.fieldLines().halfPerimeter() +
+                       lhs.fieldBoundary().halfPerimeter() <
+                   rhs.friendlyDefenseArea().halfPerimeter() +
+                       rhs.enemyDefenseArea().halfPerimeter() +
+                       rhs.fieldLines().halfPerimeter() +
+                       rhs.fieldBoundary().halfPerimeter();
+        }
+    };
+}  // namespace std
