@@ -31,9 +31,9 @@ void SimulatedErForceSimPlayTestFixture::setEnemyGoalie(RobotId goalie_id)
 }
 
 void SimulatedErForceSimPlayTestFixture::setAIPlay(
-    const TbotsProto::Play::PlayName& ai_play)
+    const TbotsProto::PlayName& ai_play_name)
 {
-    mutable_ai_config->mutable_ai_control_config()->set_override_ai_play(ai_play_name)
+    mutable_ai_config->mutable_ai_control_config()->set_override_ai_play(ai_play_name);
 }
 
 void SimulatedErForceSimPlayTestFixture::setAIPlay(std::unique_ptr<Play> play)

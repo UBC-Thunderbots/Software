@@ -133,6 +133,7 @@ def test_goalie_blocks_shot(
     )
     simulated_test_runner.blue_full_system_proto_unix_io.send_proto(
         AssignedTacticPlayControlParams, params
+    )
 
     # Setup no tactics on the enemy side
     params = AssignedTacticPlayControlParams()

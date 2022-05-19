@@ -50,7 +50,7 @@ message AiControlConfig
 
     // If the enum exists, override the existing play
     // with the Play enum provided
-    optional Play.PlayName override_ai_play = 2;
+    optional Play override_ai_play = 2;
 }
 
 message AttackerTacticConfig
@@ -303,7 +303,7 @@ message DefensePlayConfig
 message RobotNavigationObstacleConfig
 {
     required double robot_obstacle_inflation_factor = 1 [
-        default                   = 0.0,
+        default                   = 1.3,
         (bounds).min_double_value = 0.0,
         (bounds).max_double_value = 10.0
     ];
