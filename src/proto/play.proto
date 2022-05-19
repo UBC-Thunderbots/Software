@@ -22,6 +22,10 @@ enum PlayName
     StopPlay               = 16;
     KickoffEnemyPlay       = 17;
     AssignedTacticsPlay    = 18;
+    ScoringWithStaticDefendersPlay = 19;
+    DribblingParcourPlay = 20;
+    ScoringFromContestedPossessionPlay = 21;
+    PassEndurancePlay = 22;
 }
 
 message Play

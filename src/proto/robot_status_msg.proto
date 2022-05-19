@@ -3,7 +3,6 @@ syntax = "proto3";
 package TbotsProto;
 
 import "proto/tbots_timestamp_msg.proto";
-import "proto/geometry.proto";
 
 message RobotStatus
 {

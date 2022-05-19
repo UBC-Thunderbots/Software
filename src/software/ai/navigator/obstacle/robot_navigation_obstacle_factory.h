@@ -17,7 +17,6 @@
 class RobotNavigationObstacleFactory
 {
    public:
-    RobotNavigationObstacleFactory() = delete;
 
     /**
      * Create an RobotNavigationObstacleFactory with the given configuration

@@ -50,7 +50,7 @@ message AiControlConfig
 
     // If the enum exists, override the existing play
     // with the Play enum provided
-    optional Play override_ai_play = 2;
+    optional PlayName override_ai_play = 2;
 }
 
 message AttackerTacticConfig
