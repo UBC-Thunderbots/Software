@@ -61,6 +61,9 @@ class playInfoWidget(QTableWidget):
         if "robotTacticAssignment" not in play_info_dict:
             return
 
+        # setting table size dynamically
+        self.setRowCount(len(play_info_dict["robotTacticAssignment"]))
+
         play_name.append(play_info_dict["play"]["playName"])
 
         for robot_id in sorted(play_info_dict["robotTacticAssignment"]):
