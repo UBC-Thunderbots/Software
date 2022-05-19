@@ -11,12 +11,6 @@ message PathVisualization
     repeated Path path = 1;
 }
 
-message Obstacles
-{
-    repeated Polygon polygon = 1;
-    repeated Circle circle   = 2;
-}
-
 message NamedValue
 {
     string name = 1;

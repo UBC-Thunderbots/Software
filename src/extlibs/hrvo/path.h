@@ -6,8 +6,6 @@
 #include "extlibs/hrvo/path_point.h"
 #include "software/geom/vector.h"
 
-class PathPoint;
-
 /**
  * An agent's path
  */

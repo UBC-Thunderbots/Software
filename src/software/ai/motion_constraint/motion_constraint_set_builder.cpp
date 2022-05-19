@@ -3,13 +3,13 @@
 #include "software/ai/hl/stp/tactic/all_tactics.h"
 #include "software/ai/motion_constraint/motion_constraint_visitor.h"
 
-std::set<MotionConstraint> buildMotionConstraintSet(const GameState &game_state,
-                                                    const Tactic &tactic)
+std::set<TbotsProto::MotionConstraint> buildMotionConstraintSet(
+    const GameState &game_state, const Tactic &tactic)
 {
-    std::set<MotionConstraint> current_allowed_constraints;
+    std::set<TbotsProto::MotionConstraint> current_allowed_constraints;
     MotionConstraintVisitor motion_constraint_visitor;
 
-    std::set<MotionConstraint> current_motion_constraints =
+    std::set<TbotsProto::MotionConstraint> current_motion_constraints =
         buildMotionConstraintSetFromGameState(game_state);
     try
     {
@@ -31,45 +31,49 @@ std::set<MotionConstraint> buildMotionConstraintSet(const GameState &game_state,
 }
 
 
-std::set<MotionConstraint> buildMotionConstraintSetFromGameState(
+std::set<TbotsProto::MotionConstraint> buildMotionConstraintSetFromGameState(
     const GameState &game_state)
 {
-    std::set<MotionConstraint> motion_constraints;
-    motion_constraints.insert(MotionConstraint::FRIENDLY_DEFENSE_AREA);
+    std::set<TbotsProto::MotionConstraint> motion_constraints;
+    motion_constraints.insert(TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA);
 
     if (game_state.stayAwayFromBall())
     {
-        motion_constraints.insert(MotionConstraint::HALF_METER_AROUND_BALL);
+        motion_constraints.insert(TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL);
     }
 
     if (game_state.isPenalty())
     {
         if (game_state.isOurPenalty())
         {
-            motion_constraints.insert(MotionConstraint::ENEMY_HALF);
+            motion_constraints.insert(TbotsProto::MotionConstraint::ENEMY_HALF);
         }
         else
         {
             // Is their penalty
-            motion_constraints.insert(MotionConstraint::FRIENDLY_HALF);
+            // TODO (#2611): implement penalty kick motion constraint
+            motion_constraints.insert(TbotsProto::MotionConstraint::FRIENDLY_HALF);
         }
     }
     else if (game_state.isKickoff())
     {
-        motion_constraints.insert(
-            {MotionConstraint::CENTER_CIRCLE, MotionConstraint::ENEMY_HALF});
+        motion_constraints.insert({TbotsProto::MotionConstraint::CENTER_CIRCLE,
+                                   TbotsProto::MotionConstraint::ENEMY_HALF});
         if (game_state.isSetupState())
         {
-            motion_constraints.insert(MotionConstraint::HALF_METER_AROUND_BALL);
+            motion_constraints.insert(
+                TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL);
         }
     }
     else if (game_state.isTheirBallPlacement())
     {
-        motion_constraints.insert(MotionConstraint::AVOID_BALL_PLACEMENT_INTERFERENCE);
+        motion_constraints.insert(
+            TbotsProto::MotionConstraint::AVOID_BALL_PLACEMENT_INTERFERENCE);
     }
     else
     {
-        motion_constraints.insert(MotionConstraint::INFLATED_ENEMY_DEFENSE_AREA);
+        motion_constraints.insert(
+            TbotsProto::MotionConstraint::INFLATED_ENEMY_DEFENSE_AREA);
     }
 
     return motion_constraints;

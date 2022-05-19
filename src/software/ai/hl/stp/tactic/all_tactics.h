@@ -8,7 +8,6 @@
 #include "software/ai/hl/stp/tactic/goalie/goalie_tactic.h"
 #include "software/ai/hl/stp/tactic/kick/kick_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
-#include "software/ai/hl/stp/tactic/move_goalie_to_goal_line/move_goalie_to_goal_line_tactic.h"
 #include "software/ai/hl/stp/tactic/penalty_kick/penalty_kick_tactic.h"
 #include "software/ai/hl/stp/tactic/pivot_kick/pivot_kick_tactic.h"
 #include "software/ai/hl/stp/tactic/receiver/receiver_tactic.h"

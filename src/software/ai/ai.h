@@ -2,8 +2,9 @@
 
 #include <functional>
 
-#include "software/ai/hl/stp/stp.h"
-#include "software/ai/navigator/navigator.h"
+#include "proto/play_info_msg.pb.h"
+#include "software/ai/hl/stp/play/play.h"
+#include "software/ai/play_selection_fsm.h"
 #include "software/time/timestamp.h"
 #include "software/world/world.h"
 
@@ -17,7 +18,7 @@ class AI final
 
     /**
      * Create an AI with given configurations
-     * @param ai_config The AI configuration
+     * @param ai_config_ The AI configuration
      */
     explicit AI(std::shared_ptr<const AiConfig> ai_config);
 
@@ -37,7 +38,7 @@ class AI final
      * @return the Primitives that should be run by our Robots given the current
      * state of the world.
      */
-    std::unique_ptr<TbotsProto::PrimitiveSet> getPrimitives(const World& world) const;
+    std::unique_ptr<TbotsProto::PrimitiveSet> getPrimitives(const World& world);
 
     /**
      * Returns information about the currently running plays and tactics, including the
@@ -47,9 +48,24 @@ class AI final
      */
     TbotsProto::PlayInfo getPlayInfo() const;
 
-    std::shared_ptr<Navigator> getNavigator() const;
-
    private:
-    std::shared_ptr<Navigator> navigator;
-    std::unique_ptr<STP> stp;
+    /**
+     * Overrides the play from the name
+     *
+     * @param name the play name
+     * @param ai_config
+     */
+    void overridePlayFromName(std::string name);
+
+    void checkAiConfig();
+
+    std::shared_ptr<const AiConfig> ai_config;
+    std::unique_ptr<FSM<PlaySelectionFSM>> fsm;
+    std::unique_ptr<Play> override_play;
+    std::unique_ptr<Play> current_play;
+    std::map<Field, GlobalPathPlannerFactory> field_to_path_planner_factory;
+    bool prev_override;
+    std::string prev_override_name;
+    // inter play communication
+    InterPlayCommunication inter_play_communication;
 };

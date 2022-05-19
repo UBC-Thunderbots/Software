@@ -1,6 +1,4 @@
 package(default_visibility = ["//visibility:public"])
-# TODO (#2584):  This has to be public until we either remove
-# the obstacle artist or remove this folder, whichever is first.
 
 cc_library(
     name = "colors",
@@ -98,39 +96,6 @@ cc_library(
         "//software/ai/evaluation:calc_best_shot",
         "//software/gui:geometry_conversion",
         "//software/world",
-        "@qt//:qt_widgets",
-    ],
-)
-
-cc_library(
-    name = "obstacle_artist",
-    srcs = ["obstacle_artist.cpp"],
-    hdrs = ["obstacle_artist.h"],
-    deps = [
-        ":colors",
-        ":draw_functions",
-        ":geom",
-        "//proto:tbots_cc_proto",
-        "//proto:visualization_cc_proto",
-        "//proto/message_translation:tbots_geometry",
-        "//software/ai/navigator/obstacle",
-        "//software/ai/navigator/obstacle:obstacle_visitor",
-        "//software/gui:geometry_conversion",
-        "@qt//:qt_widgets",
-    ],
-)
-
-cc_library(
-    name = "navigator",
-    srcs = ["navigator.cpp"],
-    hdrs = ["navigator.h"],
-    deps = [
-        ":colors",
-        ":draw_functions",
-        ":geom",
-        ":obstacle_artist",
-        "//software/ai/navigator",
-        "//software/gui:geometry_conversion",
         "@qt//:qt_widgets",
     ],
 )
