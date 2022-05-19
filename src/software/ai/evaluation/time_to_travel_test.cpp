@@ -164,8 +164,7 @@ TEST_F(
     double max_vel     = 4.0;
     double dist_required_to_reach_v_f =
         std::abs(std::pow(final_vel, 2) - std::pow(initial_vel, 2)) / (2 * max_accel);
-    double distance = dist_required_to_reach_v_f - 0.00001;
-    std::cout << "dist=" << distance << std::endl;
+    double distance = dist_required_to_reach_v_f;
 
     // The robot is decelerating throughout the path (since the final velocity is too
     // small for it to reach within the distance) t = (-Vi + sqrt(Vi^2 + 2 * a * d)) / a,

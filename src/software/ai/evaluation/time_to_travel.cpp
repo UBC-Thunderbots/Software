@@ -37,7 +37,6 @@ Duration getTimeToTravelDistance(const double distance, const double max_velocit
         double t_total =
             (-v_i + std::sqrt(std::pow(v_i, 2) + 2 * a_max_signed * d_total)) /
             a_max_signed;
-        std::cout << t_total << std::endl;
         return Duration::fromSeconds(t_total);
     }
 
