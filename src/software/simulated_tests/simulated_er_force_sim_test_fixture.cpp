@@ -353,74 +353,70 @@ void SimulatedErForceSimTestFixture::runTest(
                          robots_displacement, robots_velocity_diff);
         }
 
-        // TODO-AKHIL uncomment
         // Output the statistics for ball and robots
-        // LOG(INFO) << "max ball displacement: " << ball_displacement_stats.maximum
-        //           << std::endl;
-        // LOG(INFO) << "min ball displacement: " << ball_displacement_stats.minimum
-        //           << std::endl;
-        // LOG(INFO) << "avg ball displacement: " << ball_displacement_stats.average
-        //           << std::endl;
-        // LOG(INFO) << "max ball velocity difference: " << ball_velocity_stats.maximum
-        //           << std::endl;
-        // LOG(INFO) << "min ball velocity difference: " << ball_velocity_stats.minimum
-        //           << std::endl;
-        // LOG(INFO) << "avg ball velocity difference: " << ball_velocity_stats.average
-        //           << std::endl;
-        // for (size_t i = 0; i < num_robots; i++)
-        // {
-        //     LOG(INFO) << "Robot " << i << std::endl;
-        //     LOG(INFO) << "max robot displacement: " << ball_displacement_stats.maximum
-        //               << std::endl;
-        //     LOG(INFO) << "min robot displacement: " << ball_displacement_stats.minimum
-        //               << std::endl;
-        //     LOG(INFO) << "avg robot displacement: " << ball_displacement_stats.average
-        //               << std::endl;
-        //     LOG(INFO) << "max robot velocity difference: " <<
-        //     ball_velocity_stats.maximum
-        //               << std::endl;
-        //     LOG(INFO) << "min robot velocity difference: " <<
-        //     ball_velocity_stats.minimum
-        //               << std::endl;
-        //     LOG(INFO) << "avg robot velocity difference: " <<
-        //     ball_velocity_stats.average
-        //               << std::endl;
-        // }
+        LOG(INFO) << "max ball displacement: " << ball_displacement_stats.maximum
+                  << std::endl;
+        LOG(INFO) << "min ball displacement: " << ball_displacement_stats.minimum
+                  << std::endl;
+        LOG(INFO) << "avg ball displacement: " << ball_displacement_stats.average
+                  << std::endl;
+        LOG(INFO) << "max ball velocity difference: " << ball_velocity_stats.maximum
+                  << std::endl;
+        LOG(INFO) << "min ball velocity difference: " << ball_velocity_stats.minimum
+                  << std::endl;
+        LOG(INFO) << "avg ball velocity difference: " << ball_velocity_stats.average
+                  << std::endl;
+        for (size_t i = 0; i < num_robots; i++)
+        {
+            LOG(INFO) << "Robot " << i << std::endl;
+            LOG(INFO) << "max robot displacement: " << ball_displacement_stats.maximum
+                      << std::endl;
+            LOG(INFO) << "min robot displacement: " << ball_displacement_stats.minimum
+                      << std::endl;
+            LOG(INFO) << "avg robot displacement: " << ball_displacement_stats.average
+                      << std::endl;
+            LOG(INFO) << "max robot velocity difference: " << ball_velocity_stats.maximum
+                      << std::endl;
+            LOG(INFO) << "min robot velocity difference: " << ball_velocity_stats.minimum
+                      << std::endl;
+            LOG(INFO) << "avg robot velocity difference: " << ball_velocity_stats.average
+                      << std::endl;
+        }
 
         validation_functions_done =
             tickTest(simulation_time_step, ai_time_step, friendly_world, enemy_world,
                      simulator, ball_displacement, ball_velocity_diff,
                      robots_displacement, robots_velocity_diff);
     }
-    // TODO-AKHIL rever
-    // Output the tick duration results
-    // if (friendly_tick_count > 0)
-    //{
-    // double avg_friendly_tick_duration =
-    // total_friendly_tick_duration / friendly_tick_count;
-    // LOG(INFO) << "max friendly tick duration: " << max_friendly_tick_duration << "ms"
-    //<< std::endl;
-    // LOG(INFO) << "min friendly tick duration: " << min_friendly_tick_duration << "ms"
-    //<< std::endl;
-    // LOG(INFO) << "avg friendly tick duration: " << avg_friendly_tick_duration << "ms"
-    //<< std::endl;
-    //}
-    // else
-    //{
-    // LOG(WARNING) << "Primitives were never updated for the friendly robots"
-    //<< std::endl;
-    //}
 
-    // if (enemy_tick_count > 0)
-    //{
-    // double avg_enemy_tick_duration = total_enemy_tick_duration / enemy_tick_count;
-    // LOG(INFO) << "max enemy tick duration: " << max_enemy_tick_duration << "ms"
-    //<< std::endl;
-    // LOG(INFO) << "min enemy tick duration: " << min_enemy_tick_duration << "ms"
-    //<< std::endl;
-    // LOG(INFO) << "avg enemy tick duration: " << avg_enemy_tick_duration << "ms"
-    //<< std::endl;
-    //}
+    // Output the tick duration results
+    if (friendly_tick_count > 0)
+    {
+        double avg_friendly_tick_duration =
+            total_friendly_tick_duration / friendly_tick_count;
+        LOG(INFO) << "max friendly tick duration: " << max_friendly_tick_duration << "ms"
+                  << std::endl;
+        LOG(INFO) << "min friendly tick duration: " << min_friendly_tick_duration << "ms"
+                  << std::endl;
+        LOG(INFO) << "avg friendly tick duration: " << avg_friendly_tick_duration << "ms"
+                  << std::endl;
+    }
+    else
+    {
+        LOG(WARNING) << "Primitives were never updated for the friendly robots"
+                     << std::endl;
+    }
+
+    if (enemy_tick_count > 0)
+    {
+        double avg_enemy_tick_duration = total_enemy_tick_duration / enemy_tick_count;
+        LOG(INFO) << "max enemy tick duration: " << max_enemy_tick_duration << "ms"
+                  << std::endl;
+        LOG(INFO) << "min enemy tick duration: " << min_enemy_tick_duration << "ms"
+                  << std::endl;
+        LOG(INFO) << "avg enemy tick duration: " << avg_enemy_tick_duration << "ms"
+                  << std::endl;
+    }
 
 
     if (!validation_functions_done && !terminating_validation_functions.empty())

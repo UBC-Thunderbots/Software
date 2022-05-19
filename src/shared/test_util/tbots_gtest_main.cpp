@@ -22,6 +22,7 @@ int main(int argc, char **argv)
 
     boost::program_options::options_description desc{"Options"};
 
+    // TODO #(2510) Remove this once we port over to simulated pytests entirely
     desc.add_options()("help,h",
                        boost::program_options::bool_switch(&TbotsGtestMain::help),
                        "Help screen");

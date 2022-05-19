@@ -6,7 +6,6 @@ import time
 import google.protobuf.internal.encoder as encoder
 import google.protobuf.internal.decoder as decoder
 
-from software.networking import threaded_unix_sender
 from subprocess import Popen
 from software.python_bindings import *
 from proto.import_all_protos import *
@@ -41,8 +40,6 @@ def is_cmd_running(command):
 class FullSystem(object):
 
     """ Full System Binary Context Manager """
-
-    DEBUG_MODE_POLL_INTERVAL_S = 0.1
 
     def __init__(
         self,
@@ -180,8 +177,6 @@ class Simulator(object):
 
     """ Simulator Context Manager """
 
-    DEBUG_MODE_POLL_INTERVAL_S = 0.1
-
     def __init__(self, simulator_runtime_dir=None, debug_simulator=False):
         """Run Simulator
 
@@ -216,6 +211,7 @@ class Simulator(object):
         )
 
         if self.debug_simulator:
+
             # We don't want to check the exact command because this binary could
             # be debugged from clion or somewhere other than gdb
             if not is_cmd_running(
@@ -224,8 +220,6 @@ class Simulator(object):
                     "--runtime_dir={}".format(self.simulator_runtime_dir),
                 ]
             ):
-                time.sleep(Simulator.DEBUG_MODE_POLL_INTERVAL_S)
-
                 logging.info(
                     (
                         f"""
@@ -246,7 +240,6 @@ gdb --args bazel-bin/{simulator_command}
                 # Wait for the user to exit and restart the binary
                 while True:
                     time.sleep(1)
-
         else:
             self.er_force_simulator_proc = Popen(simulator_command.split(" "))
 
@@ -359,9 +352,6 @@ class Gamecontroller(object):
 
             self.ci_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.ci_socket.connect(("", Gamecontroller.CI_MODE_PORT))
-
-        else:
-            self.gamecontroller_proc = Popen(["/opt/tbotspython/gamecontroller"])
 
         return self
 

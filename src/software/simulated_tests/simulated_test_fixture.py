@@ -316,8 +316,6 @@ def simulated_test_runner():
 
     test_name = current_test.split("-")[0]
 
-    print(current_test)
-
     # Launch all binaries
     with Simulator(
         f"{args.simulator_runtime_dir}/test/{test_name}", args.debug_simulator

@@ -1,7 +1,6 @@
 from threading import Thread
 import queue
 
-import software.thunderscope.constants as constants
 from software.networking.threaded_unix_listener import ThreadedUnixListener
 from software.networking.threaded_unix_sender import ThreadedUnixSender
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
