@@ -53,7 +53,10 @@ SimBall::SimBall(RNG *rng, btDiscreteDynamicsWorld *world) : m_rng(rng), m_world
     // see simulator.cpp
     // TODO (#2512): Check these values with real life
     m_body->setRestitution(1.f);
-    m_body->setFriction(0.7f);
+    m_body->setFriction(1.f);
+    std::cout<<"creating ball"<<std::endl;
+//    m_body->setRollingFriction(0.5f);
+    m_body->setUserPointer(this);
 
     // \mu_r = -a / g = 0.0357 (while rolling)
     // rollingFriction in bullet is too unstable to be useful
@@ -69,31 +72,42 @@ SimBall::~SimBall()
     delete m_motionState;
 }
 
-void SimBall::begin()
+void SimBall::begin(double time_s)
 {
     // custom implementation of rolling friction
     const btVector3 p = m_body->getWorldTransform().getOrigin();
     if (p.z() < BALL_RADIUS * 1.1 * SIMULATOR_SCALE)
     {  // ball is on the ground
         const btVector3 velocity = m_body->getLinearVelocity();
-        if (velocity.length() < 0.01 * SIMULATOR_SCALE)
+        if (velocity.length() < 0.1 * SIMULATOR_SCALE)
         {
             // stop the ball if it is really slow
             // -> the real ball snaps to a dimple
             m_body->setLinearVelocity(btVector3(0, 0, 0));
+            rollWhenPossible = false;
+            std::cout<<"stopping ball"<<std::endl;
         }
-        else
+        else if (rollWhenPossible && velocity.length() < rolling_speed * SIMULATOR_SCALE)
         {
             // just apply rolling friction, normal friction is somehow handled by
             // bullet this is quite a hack as it's always applied but as the strong
             // deceleration is more or less magic, some additional deceleration
             // doesn't matter
             const btScalar hackFactor          = 1.4;
-            const btScalar rollingDeceleration = hackFactor * 0.35;
+//            const btScalar rollingDeceleration = hackFactor * 0.35;
+            const btScalar rollingDeceleration = 0.5;
             btVector3 force(velocity.x(), velocity.y(), 0.0f);
             force.safeNormalize();
+//            m_body->applyCentralImpulse(-force * rollingDeceleration * SIMULATOR_SCALE *
+//                                        BALL_MASS * SUB_TIMESTEP);
             m_body->applyCentralImpulse(-force * rollingDeceleration * SIMULATOR_SCALE *
                                         BALL_MASS * SUB_TIMESTEP);
+
+
+            //maintain small friction todo maybe remove
+            m_body->setFriction(0.0);
+            //m_body->setRollingFriction(0.5);
+            std::cout<<"applying rolling frictino at s = "<<velocity.length()<<" , p = "<<p.y()<<" , step = "<<time_s<<std::endl;
         }
     }
 
@@ -179,7 +193,13 @@ void SimBall::begin()
                     vz = m_move.vz() * 1e-3;
                 }
                 const btVector3 linVel(vel.x, vel.y, vz);
+                m_body->setFriction(FRICTION_BULLET_COEFF);
+                std::cout<<"sliding friction set"<<std::endl;
+
                 m_body->setLinearVelocity(linVel * SIMULATOR_SCALE);
+                rolling_speed = linVel.length() * FRICTION_TRANSITION_FACTOR;
+                rollWhenPossible = true;
+
                 m_body->setAngularVelocity(btVector3(0, 0, 0));
             }
             m_body->activate();
@@ -409,11 +429,14 @@ bool SimBall::isInvalid() const
     return isNan || isBelowField;
 }
 
-void SimBall::kick(const btVector3 &power)
+void SimBall::kick(const btVector3 &power, double speed)
 {
     m_body->activate();
     m_body->applyCentralForce(power);
-
+    rolling_speed = speed;
+    rollWhenPossible = true;
+    m_body->setFriction(1.f);
+    std::cout<<"kicking"<<std::endl;
     // btTransform transform;
     // m_motionState->getWorldTransform(transform);
     // const btVector3 p = transform.getOrigin() / SIMULATOR_SCALE;

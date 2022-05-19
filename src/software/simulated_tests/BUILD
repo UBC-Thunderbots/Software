@@ -1,5 +1,19 @@
 package(default_visibility = ["//visibility:public"])
 
+load("@simulated_tests_deps//:requirements.bzl", "requirement")
+
+py_test(
+    name = "simulated_test_ball_model",
+    srcs = [
+        "simulated_test_ball_model.py",
+    ],
+    deps = [
+        "//software/simulated_tests:simulated_test_fixture",
+        "//software/simulated_tests:validation",
+        requirement("pytest"),
+    ],
+)
+
 cc_library(
     name = "simulated_test_fixture_cpp",
     testonly = True,

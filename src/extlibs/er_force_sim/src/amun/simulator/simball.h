@@ -61,12 +61,12 @@ class camun::simulator::SimBall : public QObject
     void sendSSLSimError(const SSLSimError &error, ErrorSource s);
 
    public:
-    void begin();
+    void begin(double time_s);
     bool update(SSLProto::SSL_DetectionBall *ball, float stddev, float stddevArea,
                 const btVector3 &cameraPosition, bool enableInvisibleBall,
                 float visibilityThreshold, btVector3 positionOffset);
     void move(const sslsim::TeleportBall &ball);
-    void kick(const btVector3 &power);
+    void kick(const btVector3 &power, double velocity);
     // returns the ball position projected onto the floor (z component is not included)
     btVector3 position() const;
     btVector3 speed() const;
@@ -84,13 +84,20 @@ class camun::simulator::SimBall : public QObject
                       bool enableInvisibleBall, float visibilityThreshold,
                       btVector3 positionOffset);
 
-   private:
+private:
     RNG *m_rng;
     btDiscreteDynamicsWorld *m_world;
     btCollisionShape *m_sphere;
     btRigidBody *m_body;
     btMotionState *m_motionState;
     sslsim::TeleportBall m_move;
+    double rolling_speed = -1;
+    bool rollWhenPossible = false;
+    double FRICTION_BULLET_COEFF = 1.f;
+    double ROLLING_FRICTION_ACCELERATION = -0.5;
+    double ROLLING_FRICTION_BULLET_COEFF = 0.1;
+    double FRICTION_TRANSITION_FACTOR = 5.0/7.0;
+
 };
 
 #endif  // SIMBALL_H

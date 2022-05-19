@@ -98,6 +98,7 @@ struct camun::simulator::SimulatorData
 static void simulatorTickCallback(btDynamicsWorld *world, btScalar timeStep)
 {
     Simulator *sim = reinterpret_cast<Simulator *>(world->getWorldUserInfo());
+//    std::cout<<"internal callback"<<std::endl;
     sim->handleSimulatorTick(timeStep);
 }
 
@@ -299,7 +300,6 @@ void Simulator::resetFlipped(Simulator::RobotMap &robots, float side)
 void Simulator::stepSimulation(double time_s)
 {
     m_data->dynamicsWorld->stepSimulation(time_s, 10, SUB_TIMESTEP);
-    handleSimulatorTick(time_s);
     m_time += time_s * 1E9;
 }
 
@@ -319,7 +319,7 @@ void Simulator::handleSimulatorTick(double time_s)
     }
 
     // apply commands and forces to ball and robots
-    m_data->ball->begin();
+    m_data->ball->begin(time_s);
     for (const auto &pair : m_data->robotsBlue)
     {
         pair.first->begin(m_data->ball, time_s);

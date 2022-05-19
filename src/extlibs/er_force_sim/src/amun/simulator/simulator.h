@@ -38,6 +38,7 @@
 // higher values break the rolling friction of the ball
 const float SIMULATOR_SCALE  = 10.0f;
 const float SUB_TIMESTEP     = 1 / 200.f;
+//const float SUB_TIMESTEP     = 1/60.f;
 const float COLLISION_MARGIN = 0.04f;
 const unsigned FOCAL_LENGTH  = 390;
 
@@ -149,7 +150,7 @@ class camun::simulator::Simulator : public QObject
                              qint64 processingStart);
     void setFlipped(bool flipped);
 
-   private:
+private:
     /**
      * Accepts and executes a blue or yellow robot control command
      *
@@ -192,6 +193,7 @@ class camun::simulator::Simulator : public QObject
     qint64 m_lastBallSendTime      = 0;
     std::map<qint64, unsigned> m_lastFrameNumber;
     ErrorAggregator *m_aggregator;
+    double vel_to_switch = -1;
 
     std::mt19937 rand_shuffle_src = std::mt19937(std::random_device()());
 };
