@@ -592,8 +592,6 @@ bool SimulatedErForceSimTestFixture::tickTest(
         *enemy_world    = enemy_sensor_fusion.getWorld().value();
         LOG(VISUALIZE) << *createWorld(*friendly_world);
 
-        LOG(VISUALIZE) << *createWorld(friendly_sensor_fusion.getWorld().value());
-
         validation_functions_done = validateAndCheckCompletion(
             terminating_function_validators, non_terminating_function_validators);
         if (validation_functions_done)
