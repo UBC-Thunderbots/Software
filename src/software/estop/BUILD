@@ -55,23 +55,3 @@ cc_test(
         "//software/uart:mock_uart_communication",
     ],
 )
-
-pybind_library(
-    name = "estop_reader_lib",
-    srcs = ["python_bindings.cpp"],
-    deps = [
-        ":threaded_estop_reader",
-        "//proto/message_translation:tbots_geometry",
-        "//software/geom/algorithms",
-        "//software/uart:boost_uart_communication",
-        "//software/world:field",
-        "@pybind11_protobuf//pybind11_protobuf:native_proto_caster",
-    ],
-)
-
-pybind_extension(
-    name = "estop_reader",
-    deps = [
-        ":estop_reader_lib",
-    ],
-)

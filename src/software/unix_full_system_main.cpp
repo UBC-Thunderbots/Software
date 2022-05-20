@@ -81,6 +81,8 @@ int main(int argc, char** argv)
         sensor_fusion->Subject<World>::registerObserver(ai);
         sensor_fusion->Subject<World>::registerObserver(backend);
         backend->Subject<SensorProto>::registerObserver(sensor_fusion);
+        backend->Subject<TbotsProto::ThunderbotsConfig>::registerObserver(ai);
+        backend->Subject<TbotsProto::ThunderbotsConfig>::registerObserver(sensor_fusion);
 
         // This blocks forever without using the CPU
         std::promise<void>().get_future().wait();

@@ -6,7 +6,7 @@
 #include "software/ai/hl/stp/play/play_factory.h"
 
 AI::AI(TbotsProto::AiConfig ai_config)
-    : ai_config(ai_config),
+    : ai_config_(ai_config),
       fsm(std::make_unique<FSM<PlaySelectionFSM>>(PlaySelectionFSM{ai_config})),
       override_play(nullptr),
       current_play(std::make_unique<HaltPlay>(ai_config)),
@@ -22,14 +22,21 @@ void AI::overridePlay(std::unique_ptr<Play> play)
 
 void AI::overridePlayFromProto(TbotsProto::Play play_proto)
 {
-    overridePlay(std::move(createPlay(play_proto, ai_config)));
+    overridePlay(std::move(createPlay(play_proto, ai_config_)));
+}
+
+void AI::updateAiConfig(TbotsProto::AiConfig ai_config)
+{
+    ai_config_        = ai_config;
+    ai_config_changed = true;
 }
 
 void AI::checkAiConfig()
 {
-    if (ai_config.ai_control_config().has_override_ai_play())
+    if (ai_config_.ai_control_config().override_ai_play() !=
+        TbotsProto::PlayName::UseAiSelection)
     {
-        auto current_override = ai_config.ai_control_config().override_ai_play();
+        auto current_override = ai_config_.ai_control_config().override_ai_play();
 
         if (current_override && (current_override != prev_override))
         {
@@ -40,6 +47,10 @@ void AI::checkAiConfig()
 
         prev_override = current_override;
     }
+    else
+    {
+        override_play.reset();
+    }
 }
 
 std::unique_ptr<TbotsProto::PrimitiveSet> AI::getPrimitives(const World& world)
@@ -47,14 +58,15 @@ std::unique_ptr<TbotsProto::PrimitiveSet> AI::getPrimitives(const World& world)
     checkAiConfig();
     fsm->process_event(PlaySelectionFSM::Update(
         [this](std::unique_ptr<Play> play) { current_play = std::move(play); },
-        world.gameState()));
+        world.gameState(), ai_config_));
 
-    if (!field_to_path_planner_factory.contains(world.field()))
+    if (!field_to_path_planner_factory.contains(world.field()) || ai_config_changed)
     {
-        field_to_path_planner_factory.emplace(
+        field_to_path_planner_factory.insert_or_assign(
             world.field(),
-            GlobalPathPlannerFactory(ai_config.robot_navigation_obstacle_config(),
+            GlobalPathPlannerFactory(ai_config_.robot_navigation_obstacle_config(),
                                      world.field()));
+        ai_config_changed = false;
     }
 
     if (static_cast<bool>(override_play))

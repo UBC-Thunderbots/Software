@@ -10,7 +10,7 @@
 #include "software/networking/threaded_proto_unix_listener.hpp"
 #include "software/networking/threaded_proto_unix_sender.hpp"
 
-class UnixSimulatorBackend : public Backend
+class UnixSimulatorBackend : public Backend, public Subject<TbotsProto::ThunderbotsConfig>
 {
    public:
     /**
@@ -21,6 +21,7 @@ class UnixSimulatorBackend : public Backend
     UnixSimulatorBackend(std::string runtime_dir);
 
    private:
+    void receiveThunderbotsConfig(TbotsProto::ThunderbotsConfig request);
     void onValueReceived(TbotsProto::PrimitiveSet primitives) override;
     void onValueReceived(World world) override;
 
@@ -32,9 +33,13 @@ class UnixSimulatorBackend : public Backend
         ssl_wrapper_input;
     std::unique_ptr<ThreadedProtoUnixListener<SSLProto::Referee>> ssl_referee_input;
     std::unique_ptr<ThreadedProtoUnixListener<SensorProto>> sensor_proto_input;
+    std::unique_ptr<ThreadedProtoUnixListener<TbotsProto::ThunderbotsConfig>>
+        dynamic_parameter_update_request_listener;
 
     // Outputs
     std::unique_ptr<ThreadedProtoUnixSender<TbotsProto::World>> world_output;
     std::unique_ptr<ThreadedProtoUnixSender<TbotsProto::PrimitiveSet>> primitive_output;
     std::unique_ptr<ThreadedProtoUnixSender<DefendingSideProto>> defending_side_output;
+    std::unique_ptr<ThreadedProtoUnixSender<TbotsProto::ThunderbotsConfig>>
+        dynamic_parameter_update_respone_sender;
 };

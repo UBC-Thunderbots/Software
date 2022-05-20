@@ -161,6 +161,10 @@ gdb --args bazel-bin/{full_system}
                 AssignedTacticPlayControlParams,
             ),
             (self.full_system_runtime_dir + PLAY_OVERRIDE_PATH, Play),
+            (
+                self.full_system_runtime_dir + DYNAMIC_PARAMETER_UPDATE_REQUEST_PATH,
+                ThunderbotsConfig,
+            ),
         ]:
             proto_unix_io.attach_unix_sender(*arg)
 

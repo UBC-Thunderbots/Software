@@ -57,6 +57,10 @@ PYBIND11_MODULE(py_constants, m)
     m.attr("YELLOW_PRIMITIVE_SET")     = YELLOW_PRIMITIVE_SET;
     m.attr("SIMULATOR_STATE_PATH")     = SIMULATOR_STATE_PATH;
     m.attr("UNIX_BUFFER_SIZE")         = UNIX_BUFFER_SIZE;
+    m.attr("DYNAMIC_PARAMETER_UPDATE_REQUEST_PATH") =
+        DYNAMIC_PARAMETER_UPDATE_REQUEST_PATH;
+    m.attr("DYNAMIC_PARAMETER_UPDATE_RESPONSE_PATH") =
+        DYNAMIC_PARAMETER_UPDATE_RESPONSE_PATH;
 
     // TODO (#2585): Change the channels to a map when we remove all legacy c code
     // Then we can have a pybind here in a 1-liner from unordered_map to py::dict

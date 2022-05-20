@@ -55,6 +55,12 @@ void ThreadedAI::onValueReceived(World world)
 void ThreadedAI::onValueReceived(TbotsProto::ThunderbotsConfig config)
 {
     std::scoped_lock lock(ai_mutex);
+
+    // Update the AI with thew new config
+    ai_config         = config.ai_config();
+    ai_control_config = config.ai_config().ai_control_config();
+
+    ai.updateAiConfig(ai_config);
 }
 
 void ThreadedAI::runAIAndSendPrimitives(const World& world)

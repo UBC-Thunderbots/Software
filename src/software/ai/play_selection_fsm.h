@@ -15,18 +15,21 @@ struct PlaySelectionFSM
     struct Update
     {
         Update(const std::function<void(std::unique_ptr<Play>)>& set_current_play,
-               const GameState& game_state)
-            : set_current_play(set_current_play), game_state(game_state)
+               const GameState& game_state, const TbotsProto::AiConfig& ai_config)
+            : set_current_play(set_current_play),
+              game_state(game_state),
+              ai_config(ai_config)
         {
         }
         std::function<void(std::unique_ptr<Play>)> set_current_play;
         GameState game_state;
+        TbotsProto::AiConfig ai_config;
     };
 
     /**
      * Creates a play selection FSM
      *
-     * @param ai_config the play config for this play fsm
+     * @param ai_config the default play config for this play fsm
      */
     explicit PlaySelectionFSM(TbotsProto::AiConfig ai_config);
 

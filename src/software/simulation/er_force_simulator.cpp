@@ -19,8 +19,7 @@
 
 ErForceSimulator::ErForceSimulator(const TbotsProto::FieldType& field_type,
                                    const RobotConstants_t& robot_constants,
-                                   const WheelConstants& wheel_constants,
-                                   const TbotsProto::SimulatorConfig simulator_config)
+                                   const WheelConstants& wheel_constants)
     : yellow_team_world_msg(std::make_unique<TbotsProto::World>()),
       blue_team_world_msg(std::make_unique<TbotsProto::World>()),
       frame_number(0),

@@ -23,7 +23,6 @@ message ThunderbotsConfig
 {
     required AiConfig ai_config                      = 1;
     required SensorFusionConfig sensor_fusion_config = 2;
-    required SimulatorConfig simulator_config        = 3;
 }
 
 
@@ -48,9 +47,8 @@ message AiControlConfig
     // Whether we should run or stop ai
     required bool run_ai = 1 [default = true];
 
-    // If the enum exists, override the existing play
-    // with the Play enum provided
-    optional PlayName override_ai_play = 2;
+    // Override the existing play with the Play enum provided
+    required PlayName override_ai_play = 2 [default = UseAiSelection];
 }
 
 message AttackerTacticConfig
@@ -245,13 +243,6 @@ message SensorFusionConfig
     required int32 enemy_goalie_id = 6
         [default = 0, (bounds).min_int_value = 0, (bounds).max_int_value = 16];
 
-    // Overrides the defending side provided by the referee,
-    // with defendingPositiveSide parameter
-    required bool override_game_controller_defending_side = 7 [default = true];
-
-    // Positive if selected, Negative if unselected
-    required bool defending_positive_side = 8 [default = false];
-
     // Yellow if selected, Blue if unselected
     required bool friendly_color_yellow = 9 [default = true];
 
@@ -266,30 +257,6 @@ message SensorFusionConfig
     // Number of dropped detections before we consider the ball not to be in the dribbler
     required int32 num_dropped_detections_before_ball_not_in_dribbler = 12
         [default = 3, (bounds).min_int_value = 0, (bounds).max_int_value = 1000];
-}
-
-message SimulatorConfig
-{
-    // The scalar friction acceleration in m/s^2 that is applied to the ball
-    // while the ball is sliding
-    required double sliding_friction_acceleration = 1 [
-        default                   = 0.0,
-        (bounds).min_double_value = 0.0,
-        (bounds).max_double_value = 10.0
-    ];
-
-    // The scalar friction acceleration in m/s^2 that is applied to the ball
-    // while the ball is rolling
-    required double rolling_friction_acceleration = 2 [
-        default                   = 0.0,
-        (bounds).min_double_value = 0.0,
-        (bounds).max_double_value = 10.0
-    ];
-
-    // The restitution is the amount of energy retained when bouncing off walls and
-    // robots, 0.0 means perfectly inelastic and 1.0 means perfectly elastic collision.
-    required double ball_restitution = 3
-        [default = 1.0, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
 }
 
 message DefensePlayConfig

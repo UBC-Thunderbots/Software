@@ -13,8 +13,6 @@
 
 UnixSimulatorBackend::UnixSimulatorBackend(std::string runtime_dir)
 {
-    const TbotsProto::SensorFusionConfig sensor_fusion_config;
-
     // Protobuf Inputs
     robot_status_input.reset(new ThreadedProtoUnixListener<TbotsProto::RobotStatus>(
         runtime_dir + ROBOT_STATUS_PATH,
@@ -32,20 +30,36 @@ UnixSimulatorBackend::UnixSimulatorBackend(std::string runtime_dir)
         runtime_dir + SENSOR_PROTO_PATH,
         boost::bind(&Backend::receiveSensorProto, this, _1)));
 
+    dynamic_parameter_update_request_listener.reset(
+        new ThreadedProtoUnixListener<TbotsProto::ThunderbotsConfig>(
+            runtime_dir + DYNAMIC_PARAMETER_UPDATE_REQUEST_PATH,
+            boost::bind(&UnixSimulatorBackend::receiveThunderbotsConfig, this, _1)));
+
     // Protobuf Outputs
     world_output.reset(
         new ThreadedProtoUnixSender<TbotsProto::World>(runtime_dir + WORLD_PATH));
 
     primitive_output.reset(new ThreadedProtoUnixSender<TbotsProto::PrimitiveSet>(
         runtime_dir + PRIMITIVE_PATH));
+
+    dynamic_parameter_update_respone_sender.reset(
+        new ThreadedProtoUnixSender<TbotsProto::ThunderbotsConfig>(
+            runtime_dir + DYNAMIC_PARAMETER_UPDATE_RESPONSE_PATH));
+}
+
+void UnixSimulatorBackend::receiveThunderbotsConfig(TbotsProto::ThunderbotsConfig request)
+{
+    // Send new config to all observers
+    Subject<TbotsProto::ThunderbotsConfig>::sendValueToObservers(request);
+
+    // Echo back the request as an acknowledge
+    dynamic_parameter_update_respone_sender->sendProto(request);
 }
 
 void UnixSimulatorBackend::onValueReceived(TbotsProto::PrimitiveSet primitives)
 {
     primitive_output->sendProto(primitives);
 
-    // TODO (#2510) Find a new home once SimulatorBackend and ThreadedFullSystemGUI are
-    // gone
     LOG(VISUALIZE) << *createNamedValue(
         "Primitive Hz",
         static_cast<float>(FirstInFirstOutThreadedObserver<
@@ -55,8 +69,7 @@ void UnixSimulatorBackend::onValueReceived(TbotsProto::PrimitiveSet primitives)
 void UnixSimulatorBackend::onValueReceived(World world)
 {
     world_output->sendProto(*createWorld(world));
-    // TODO (#2510) Find a new home once SimulatorBackend and ThreadedFullSystemGUI are
-    // gone
+
     LOG(VISUALIZE) << *createNamedValue(
         "World Hz",
         static_cast<float>(

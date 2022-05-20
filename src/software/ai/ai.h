@@ -55,10 +55,18 @@ class AI final
      */
     void overridePlayFromProto(TbotsProto::Play play_proto);
 
+    /**
+     * Update the AiConfig proto
+     *
+     * @param ai_config The new AiConfig proto
+     */
+    void updateAiConfig(TbotsProto::AiConfig ai_config);
+
    private:
     void checkAiConfig();
+    bool ai_config_changed = false;
 
-    TbotsProto::AiConfig ai_config;
+    TbotsProto::AiConfig ai_config_;
     std::unique_ptr<FSM<PlaySelectionFSM>> fsm;
     std::unique_ptr<Play> override_play;
     std::unique_ptr<Play> current_play;

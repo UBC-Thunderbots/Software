@@ -2,7 +2,6 @@
 
 #include "extlibs/er_force_sim/src/amun/simulator/simulator.h"
 #include "proto/defending_side_msg.pb.h"
-#include "proto/parameters.pb.h"
 #include "proto/robot_status_msg.pb.h"
 #include "proto/ssl_vision_wrapper.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
@@ -27,12 +26,10 @@ class ErForceSimulator
      * @param field_type The field type
      * @param robot_constants The robot constants
      * @param wheel_constants The wheel constants
-     * @param simulator_config The config to fetch parameters from
      */
     explicit ErForceSimulator(const TbotsProto::FieldType& field_type,
                               const RobotConstants_t& robot_constants,
-                              const WheelConstants& wheel_constants,
-                              const TbotsProto::SimulatorConfig simulator_config);
+                              const WheelConstants& wheel_constants);
     ErForceSimulator()  = delete;
     ~ErForceSimulator() = default;
 

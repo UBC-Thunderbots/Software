@@ -3,6 +3,7 @@ from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph import parametertree
 from google.protobuf.json_format import MessageToDict
 from thefuzz import fuzz
+from proto.import_all_protos import *
 
 
 class ProtoConfigurationWidget(QWidget):
@@ -25,8 +26,10 @@ class ProtoConfigurationWidget(QWidget):
         NOTE: This class handles the ParameterRangeOptions
 
         :param proto_to_configure: The protobuf we would like to generate
-                                   a parameter tree for.
+                                   a parameter tree for. This should be 
+                                   populated with the default values
         :param on_change_callback: The callback to trigger on change
+                                    args: name, updated_value, updated_proto
         :param convert_all_fields_to_bools: 
                         Sometimes we just want to check/uncheck the fields
                         of the protobuf (and not actually set an explicit value)
@@ -47,7 +50,7 @@ class ProtoConfigurationWidget(QWidget):
             name="params",
             type="group",
             children=self.config_proto_to_param_dict(
-                self.proto_to_configure(), None, self.convert_all_fields_to_bools
+                self.proto_to_configure, None, self.convert_all_fields_to_bools
             ),
         )
 
@@ -55,6 +58,7 @@ class ProtoConfigurationWidget(QWidget):
         self.param_tree = parametertree.ParameterTree(showHeader=False)
         self.param_tree.setParameters(self.param_group, showTop=False)
         self.param_group.sigTreeStateChanged.connect(self.__handle_parameter_changed)
+        self.param_tree.setAlternatingRowColors(False)
 
         # Create search query bar
         self.search_query = QLineEdit()
@@ -77,7 +81,7 @@ class ProtoConfigurationWidget(QWidget):
             name="params",
             type="group",
             children=self.config_proto_to_param_dict(
-                self.proto_to_configure(), search_term, self.convert_all_fields_to_bools
+                self.proto_to_configure, search_term, self.convert_all_fields_to_bools,
             ),
         )
         self.param_tree.setParameters(self.param_group, showTop=False)
@@ -95,12 +99,15 @@ class ProtoConfigurationWidget(QWidget):
                 child_name = ".".join(path)
             else:
                 child_name = param.name()
-            self.on_change_callback(child_name, data)
+
+            exec(f"self.proto_to_configure.{child_name} = {data}")
+            self.on_change_callback(child_name, data, self.proto_to_configure)
 
     @staticmethod
     def __create_int_parameter(key, value, descriptor):
         """Converts an int field of a proto to a SliderParameter with
         the min/max bounds set according to the provided ParameterRangeOptions
+
         min/vax options.
 
         :param key: The name of the parameter
@@ -204,7 +211,11 @@ class ProtoConfigurationWidget(QWidget):
         return {"name": key, "type": "bool", "value": value}
 
     def config_proto_to_param_dict(
-        self, message, search_term=None, convert_all_fields_to_bools=False
+        self,
+        message,
+        search_term=None,
+        current_attr=None,
+        convert_all_fields_to_bools=False,
     ):
         """Converts a protobuf to a pyqtgraph parameter tree dictionary
         that can loaded directly into a ParameterTree
@@ -213,6 +224,7 @@ class ProtoConfigurationWidget(QWidget):
 
         :param message: The message to convert to a dictionary
         :param search_term: The search filter
+        :param current_attr: Which attr we are currently on to set
         :param convert_all_fields_to_bools: 
                         Sometimes we just want to check/uncheck the fields
                         of the protobuf (and not actually set an explicit value)
@@ -220,6 +232,9 @@ class ProtoConfigurationWidget(QWidget):
         """
         message_dict = {}
         field_list = []
+
+        if not current_attr:
+            current_attr = "self.proto_to_configure"
 
         for descriptor in message.DESCRIPTOR.fields:
 
@@ -236,7 +251,10 @@ class ProtoConfigurationWidget(QWidget):
                         "name": key,
                         "type": "group",
                         "children": self.config_proto_to_param_dict(
-                            value, search_term, convert_all_fields_to_bools
+                            value,
+                            search_term,
+                            f"{current_attr}.{key}",
+                            convert_all_fields_to_bools,
                         ),
                     }
                 )
@@ -265,6 +283,15 @@ class ProtoConfigurationWidget(QWidget):
                 raise NotImplementedError(
                     "Unsupported type {} in parameter config".format(descriptor.type)
                 )
+
+            # Protobuf doesn't set the default values by default, and won't let
+            # us serialize the message if all the required fields are not set (even
+            # if they have a default). So lets just set the default as the value
+            if descriptor.type != descriptor.TYPE_MESSAGE:
+                if descriptor.type == descriptor.TYPE_STRING:
+                    exec(f"{current_attr}.{key} = '{value}'")
+                else:
+                    exec(f"{current_attr}.{key} = {value}")
 
         if field_list:
             return field_list

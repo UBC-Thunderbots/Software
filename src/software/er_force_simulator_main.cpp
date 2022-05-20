@@ -12,7 +12,6 @@
 
 int main(int argc, char **argv)
 {
-    // Setup dynamic parameters
     struct CommandLineArgs
     {
         bool help               = false;
@@ -76,13 +75,13 @@ int main(int argc, char **argv)
         {
             er_force_sim = std::make_shared<ErForceSimulator>(
                 TbotsProto::FieldType::DIV_A, create2021RobotConstants(),
-                create2021WheelConstants(), TbotsProto::SimulatorConfig());
+                create2021WheelConstants());
         }
         else
         {
             er_force_sim = std::make_shared<ErForceSimulator>(
                 TbotsProto::FieldType::DIV_B, create2021RobotConstants(),
-                create2021WheelConstants(), TbotsProto::SimulatorConfig());
+                create2021WheelConstants());
         }
         std::mutex simulator_mutex;
 
