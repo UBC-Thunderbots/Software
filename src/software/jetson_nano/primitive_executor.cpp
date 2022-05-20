@@ -69,13 +69,9 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
     const unsigned int robot_id, const Angle& curr_orientation)
 {
     hrvo_simulator_.doStep();
-    // TODO (#2499): Remove if and visualize the HRVO Simulator of all robots
-    if (robot_id == 1)
-    {
-        // All robots should have identical HRVO simulations. To avoid spam, only
-        // the HRVO simulation for robot 0 will be sent to Thunderscope.
-        hrvo_simulator_.visualize(robot_id);
-    }
+
+    // Visualize the HRVO Simulator for the current robot
+    hrvo_simulator_.visualize(robot_id);
 
     switch (current_primitive_.primitive_case())
     {
