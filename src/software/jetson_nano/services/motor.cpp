@@ -25,7 +25,7 @@ extern "C"
 }
 
 // SPI Configs
-static uint32_t SPI_SPEED_HZ = 200000;  // 1 Mhz
+static uint32_t SPI_SPEED_HZ = 1000000;  // 1 Mhz
 static uint8_t SPI_BITS      = 8;
 static uint32_t SPI_MODE     = 0x3u;
 
@@ -45,6 +45,7 @@ static const char* SPI_CS_DRIVER_TO_CONTROLLER_MUX_0_GPIO = "76";
 static const char* SPI_CS_DRIVER_TO_CONTROLLER_MUX_1_GPIO = "77";
 static const char* MOTOR_DRIVER_RESET_GPIO                = "168";
 static const char* DRIVER_CONTROL_ENABLE_GPIO             = "194";
+static const char* HEARTBEAT_GPIO                         = "216";
 
 extern "C"
 {
@@ -76,6 +77,7 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
       driver_control_enable_gpio(DRIVER_CONTROL_ENABLE_GPIO, GpioDirection::OUTPUT,
                                  GpioState::HIGH),
       reset_gpio(MOTOR_DRIVER_RESET_GPIO, GpioDirection::OUTPUT, GpioState::HIGH),
+      heartbeat_gpio(HEARTBEAT_GPIO, GpioDirection::OUTPUT, GpioState::HIGH),
       euclidean_to_four_wheel(control_loop_frequency_hz, robot_constants)
 {
     robot_constants_ = robot_constants;
@@ -117,33 +119,49 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
 
     // TMC6100 Setup
     startDriver(FRONT_LEFT_MOTOR_CHIP_SELECT);
+    // startDriver(FRONT_RIGHT_MOTOR_CHIP_SELECT);
+    // startDriver(BACK_LEFT_MOTOR_CHIP_SELECT);
     // startDriver(BACK_RIGHT_MOTOR_CHIP_SELECT);
-    startDriver(FRONT_RIGHT_MOTOR_CHIP_SELECT);
-    startDriver(BACK_LEFT_MOTOR_CHIP_SELECT);
 
     sleep(1);
 
     // TMC4671 Setup
     startController(FRONT_LEFT_MOTOR_CHIP_SELECT);
+    // startController(FRONT_RIGHT_MOTOR_CHIP_SELECT);
+    // startController(BACK_LEFT_MOTOR_CHIP_SELECT);
     // startController(BACK_RIGHT_MOTOR_CHIP_SELECT);
-    startController(FRONT_RIGHT_MOTOR_CHIP_SELECT);
-    startController(BACK_LEFT_MOTOR_CHIP_SELECT);
 
     sleep(1);
-
-    LOG(WARNING) << "Attempting to clear fault";
-    driver_control_enable_gpio.setValue(GpioState::LOW);
-    sleep(1);
-    driver_control_enable_gpio.setValue(GpioState::HIGH);
 
     LOG(WARNING) << "Checking faults";
     checkDriverFault(FRONT_LEFT_MOTOR_CHIP_SELECT);
-    checkDriverFault(FRONT_RIGHT_MOTOR_CHIP_SELECT);
-    checkDriverFault(BACK_LEFT_MOTOR_CHIP_SELECT);
+    // checkDriverFault(FRONT_RIGHT_MOTOR_CHIP_SELECT);
+    // checkDriverFault(BACK_LEFT_MOTOR_CHIP_SELECT);
+    // checkDriverFault(BACK_RIGHT_MOTOR_CHIP_SELECT);
 
-    //runOpenLoopCalibrationRoutine(FRONT_RIGHT_MOTOR_CHIP_SELECT, 1000);
-     runOpenLoopCalibrationRoutine(FRONT_LEFT_MOTOR_CHIP_SELECT, 1000);
+    sleep(1);
+    // runOpenLoopCalibrationRoutine(FRONT_RIGHT_MOTOR_CHIP_SELECT, 1000);
+    // runOpenLoopCalibrationRoutine(FRONT_LEFT_MOTOR_CHIP_SELECT, 1000);
     // runOpenLoopCalibrationRoutine(BACK_LEFT_MOTOR_CHIP_SELECT, 1000);
+    tmc4671_setTargetVelocity(FRONT_LEFT_MOTOR_CHIP_SELECT, 1000);
+    sleep(2);
+    tmc4671_setTargetVelocity(FRONT_LEFT_MOTOR_CHIP_SELECT, 4000);
+    sleep(2);
+    tmc4671_setTargetVelocity(FRONT_LEFT_MOTOR_CHIP_SELECT, 8000);
+    sleep(2);
+    tmc4671_setTargetVelocity(FRONT_LEFT_MOTOR_CHIP_SELECT, 10000);
+    sleep(2);
+    tmc4671_setTargetVelocity(FRONT_LEFT_MOTOR_CHIP_SELECT, 8000);
+    sleep(2);
+    tmc4671_setTargetVelocity(FRONT_LEFT_MOTOR_CHIP_SELECT, 4000);
+    sleep(2);
+    tmc4671_setTargetVelocity(FRONT_LEFT_MOTOR_CHIP_SELECT, 1000);
+    sleep(2);
+    tmc4671_setTargetVelocity(FRONT_LEFT_MOTOR_CHIP_SELECT, 500);
+    sleep(2);
+    tmc4671_setTargetVelocity(FRONT_LEFT_MOTOR_CHIP_SELECT, 0);
+    sleep(2);
+    LOG(DEBUG) << "DONE";
 }
 
 MotorService::~MotorService() {}
@@ -250,6 +268,19 @@ void MotorService::checkDriverFault(uint8_t motor)
 std::unique_ptr<TbotsProto::DriveUnitStatus> MotorService::poll(
     const TbotsProto::DirectControlPrimitive& direct_control)
 {
+    static int heartbeat_state = 0;
+
+    if (heartbeat_state == 0)
+    {
+        heartbeat_gpio.setValue(GpioState::LOW);
+        heartbeat_state = 1;
+    }
+    else if (heartbeat_state == 1)
+    {
+        heartbeat_gpio.setValue(GpioState::HIGH);
+        heartbeat_state = 0;
+    }
+
     return std::make_unique<TbotsProto::DriveUnitStatus>();
     CHECK(encoder_calibrated_[FRONT_LEFT_MOTOR_CHIP_SELECT] &&
           encoder_calibrated_[FRONT_RIGHT_MOTOR_CHIP_SELECT] &&
@@ -511,8 +542,8 @@ void MotorService::configureADC(uint8_t motor)
     // ADC configuration
     writeToControllerOrDieTrying(motor, TMC4671_ADC_I_SELECT, 0x18000100);
     writeToControllerOrDieTrying(motor, TMC4671_dsADC_MDEC_B_MDEC_A, 0x014E014E);
-    writeToControllerOrDieTrying(motor, TMC4671_ADC_I0_SCALE_OFFSET, 0x010081DD);
-    writeToControllerOrDieTrying(motor, TMC4671_ADC_I1_SCALE_OFFSET, 0x0100818E);
+    writeToControllerOrDieTrying(motor, TMC4671_ADC_I0_SCALE_OFFSET, 0x002081DD);
+    writeToControllerOrDieTrying(motor, TMC4671_ADC_I1_SCALE_OFFSET, 0x0020818E);
 }
 
 void MotorService::configureEncoder(uint8_t motor)
@@ -536,7 +567,7 @@ void MotorService::calibrateEncoder(uint8_t motor)
                                  0x00000000);
     writeToControllerOrDieTrying(motor, TMC4671_PHI_E_SELECTION, 0x00000001);
     writeToControllerOrDieTrying(motor, TMC4671_PHI_E_EXT, 0x00000000);
-    writeToControllerOrDieTrying(motor, TMC4671_UQ_UD_EXT, 0x000007D0);
+    writeToControllerOrDieTrying(motor, TMC4671_UQ_UD_EXT, 0x000007F0);
     sleep(1);
 
     writeToControllerOrDieTrying(motor, TMC4671_ABN_DECODER_COUNT, 0x00000000);
@@ -659,6 +690,6 @@ void MotorService::startController(uint8_t motor)
 
     // Trigger encoder calibration
     // TODO (#2451) Don't call this here, its not safe because it moves the motors
-    // calibrateEncoder(motor);
-    // configurePI(motor);
+    calibrateEncoder(motor);
+    configurePI(motor);
 }
