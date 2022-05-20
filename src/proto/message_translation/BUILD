@@ -37,6 +37,7 @@ cc_library(
     hdrs = ["tbots_geometry.h"],
     visibility = ["//visibility:public"],
     deps = [
+        "//extlibs/hrvo:velocity_obstacle",
         "//proto:tbots_cc_proto",
         "//software/geom:angle",
         "//software/geom:angular_velocity",

@@ -39,6 +39,7 @@
 
 #include "kd_tree.h"
 #include "path.h"
+#include "proto/message_translation/tbots_geometry.h"
 #include "software/geom/vector.h"
 
 
@@ -72,7 +73,7 @@ void HRVOAgent::computeNeighbors()
     simulator_->getKdTree()->query(this, new_neighbor_dist);
 }
 
-Agent::VelocityObstacle HRVOAgent::createVelocityObstacle(const Agent &other_agent)
+VelocityObstacle HRVOAgent::createVelocityObstacle(const Agent &other_agent)
 {
     VelocityObstacle velocityObstacle;
     if ((position_ - other_agent.getPosition()).lengthSquared() >
@@ -577,19 +578,12 @@ void HRVOAgent::insertNeighbor(std::size_t agentNo, float &rangeSq)
     }
 }
 
-std::vector<Polygon> HRVOAgent::getVelocityObstaclesAsPolygons() const
+std::vector<TbotsProto::VelocityObstacle> HRVOAgent::getVelocityObstaclesAsProto() const
 {
-    std::vector<Polygon> velocity_obstacles;
-    for (const Agent::VelocityObstacle &vo : velocityObstacles_)
+    std::vector<TbotsProto::VelocityObstacle> velocity_obstacles;
+    for (const VelocityObstacle &vo : velocityObstacles_)
     {
-        std::vector<Point> points;
-        Vector shifted_apex  = position_ + vo.apex_;
-        Vector shifted_side1 = position_ + vo.side1_;
-        Vector shifted_side2 = position_ + vo.side2_;
-        points.emplace_back(Point(shifted_apex.x(), shifted_apex.y()));
-        points.emplace_back(Point(shifted_side1.x(), shifted_side1.y()));
-        points.emplace_back(Point(shifted_side2.x(), shifted_side2.y()));
-        velocity_obstacles.emplace_back(Polygon(points));
+        velocity_obstacles.emplace_back(*createVelocityObstacleProto(vo));
     }
     return velocity_obstacles;
 }

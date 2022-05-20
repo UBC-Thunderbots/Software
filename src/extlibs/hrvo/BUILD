@@ -49,9 +49,20 @@ cc_library(
         "simulator.h",
     ],
     deps = [
+        "//extlibs/hrvo:velocity_obstacle",
         "//proto:visualization_cc_proto",
         "//proto/primitive:primitive_msg_factory",
         "//software/geom:vector",
         "//software/world",
+    ],
+)
+
+cc_library(
+    name = "velocity_obstacle",
+    hdrs = [
+        "velocity_obstacle.h",
+    ],
+    deps = [
+        "//software/geom:vector",
     ],
 )

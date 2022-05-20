@@ -36,5 +36,5 @@ class LinearVelocityAgent : public Agent
      * @param other_agent The Agent which this velocity obstacle is being generated for
      * @return The velocity obstacle which other_agent should see for this Agent
      */
-    Agent::VelocityObstacle createVelocityObstacle(const Agent &other_agent) override;
+    VelocityObstacle createVelocityObstacle(const Agent &other_agent) override;
 };

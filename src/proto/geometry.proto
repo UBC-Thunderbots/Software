@@ -50,3 +50,10 @@ message Circle
     required Point origin  = 1;
     required double radius = 2;
 }
+
+message VelocityObstacle
+{
+    required Vector apex       = 1;
+    required Vector left_side  = 2;
+    required Vector right_side = 3;
+}

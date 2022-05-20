@@ -1,6 +1,7 @@
 #pragma once
 
 #include "extlibs/hrvo/path.h"
+#include "extlibs/hrvo/velocity_obstacle.h"
 #include "software/geom/vector.h"
 
 class HRVOSimulator;
@@ -28,24 +29,6 @@ class Agent
           float maxAccel, AgentPath &path);
 
     virtual ~Agent() = default;
-
-    /**
-     * A hybrid reciprocal velocity obstacle.
-     */
-    class VelocityObstacle
-    {
-       public:
-        VelocityObstacle() = default;
-
-        // The position of the apex of the hybrid reciprocal velocity obstacle.
-        Vector apex_;
-
-        // The direction of the first side of the hybrid reciprocal velocity obstacle.
-        Vector side1_;
-
-        // The direction of the second side of the hybrid reciprocal velocity obstacle.
-        Vector side2_;
-    };
 
     /**
      * Computes the new velocity of this agent.
