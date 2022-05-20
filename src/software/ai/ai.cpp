@@ -11,7 +11,7 @@ AI::AI(TbotsProto::AiConfig ai_config)
       override_play(nullptr),
       current_play(std::make_unique<HaltPlay>(ai_config)),
       field_to_path_planner_factory(),
-      prev_override()
+      prev_override(TbotsProto::PlayName::UseAiSelection)
 {
 }
 
@@ -35,18 +35,22 @@ void AI::checkAiConfig()
 {
     auto current_override = ai_config_.ai_control_config().override_ai_play();
 
-    if (current_override && (current_override != prev_override))
+    // If we have a new override, and its not back to the Ai selection,
+    // lets override the play
+    if (current_override != prev_override &&
+        current_override != TbotsProto::PlayName::UseAiSelection)
     {
-        if (current_override != TbotsProto::PlayName::UseAiSelection)
-        {
-            TbotsProto::Play play_proto;
-            play_proto.set_name(current_override);
-            overridePlayFromProto(play_proto);
-        }
-        else
-        {
-            overridePlay(nullptr);
-        }
+        TbotsProto::Play play_proto;
+        play_proto.set_name(current_override);
+        overridePlayFromProto(play_proto);
+    }
+
+    // If we have a new override but its back to the Ai selection, lets
+    // clear the override
+    if (current_override != prev_override &&
+        current_override == TbotsProto::PlayName::UseAiSelection)
+    {
+        overridePlay(nullptr);
     }
     prev_override = current_override;
 }
