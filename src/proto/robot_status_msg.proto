@@ -7,13 +7,12 @@ import "proto/tbots_timestamp_msg.proto";
 message RobotStatus
 {
     uint32 robot_id                           = 1;
-    BreakBeamStatus break_beam_status         = 2;
-    ChipperKickerStatus chipper_kicker_status = 3;
-    DriveUnitStatus drive_units               = 4;
-    DribblerStatus dribbler_status            = 5;
+    repeated ErrorCode error_code             = 2;
+    BreakBeamStatus break_beam_status         = 3;
+    ChipperKickerStatus chipper_kicker_status = 4;
+    MotorStatus drive_units                   = 5;
     NetworkStatus network_status              = 6;
-    PowerStatus power_status                  = 7;
-    TemperatureStatus temperature_status      = 8;
+    PowerStatus power_status                  = 8;
     ThunderloopStatus thunderloop_status      = 9;
     Timestamp time_sent                       = 10;
 }
@@ -58,8 +57,47 @@ message DribblerStatus
     // The current speed of the dribbler in RPM
     float dribbler_rpm = 1;
 
-    // The temperature of the robot’s dribbler motor, in degrees Celsius.
-    float dribbler_temperature = 1;
+    // Dribbler temperature
+    float dribbler_temperature = 2;
+}
+
+/* Error codes are to be displayed in the visualizer */
+enum ErrorCode
+{
+    // Default message required for proto enums
+    NO_ERROR = 0;
+
+    // Level triggered events
+    LOW_CAP                         = 1;
+    LOW_BATTERY                     = 2;
+    HIGH_BOARD_TEMP                 = 3;
+    CHARGE_TIMEOUT                  = 4;
+    WHEEL_0_MOTOR_HOT               = 5;
+    WHEEL_1_MOTOR_HOT               = 6;
+    WHEEL_2_MOTOR_HOT               = 7;
+    WHEEL_3_MOTOR_HOT               = 8;
+    DRIBBLER_MOTOR_HOT              = 9;
+    WHEEL_0_ENCODER_NOT_COMMUTATING = 10;
+    WHEEL_1_ENCODER_NOT_COMMUTATING = 11;
+    WHEEL_2_ENCODER_NOT_COMMUTATING = 12;
+    WHEEL_3_ENCODER_NOT_COMMUTATING = 13;
+    WHEEL_0_HALL_SENSOR_STUCK_LOW   = 14;
+    WHEEL_1_HALL_SENSOR_STUCK_LOW   = 15;
+    WHEEL_2_HALL_SENSOR_STUCK_LOW   = 16;
+    WHEEL_3_HALL_SENSOR_STUCK_LOW   = 17;
+    DRIBBLER_HALL_SENSOR_STUCK_LOW  = 18;
+    WHEEL_0_HALL_SENSOR_STUCK_HIGH  = 19;
+    WHEEL_1_HALL_SENSOR_STUCK_HIGH  = 20;
+    WHEEL_2_HALL_SENSOR_STUCK_HIGH  = 21;
+    WHEEL_3_HALL_SENSOR_STUCK_HIGH  = 22;
+    DRIBBLER_HALL_SENSOR_STUCK_HIGH = 23;
+}
+
+/* Firmware build information  */
+message FirmwareStatus
+{
+    // The microcontroller firmware build ID.
+    uint32 fw_build_id = 1;
 }
 
 message DriveUnit

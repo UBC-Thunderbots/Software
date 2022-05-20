@@ -34,7 +34,6 @@ py_library(
         "//software/thunderscope:proto_unix_io",
         "//software/thunderscope:robot_communication",
         "//software/thunderscope/arbitrary_plot:proto_plotter",
-        "//software/thunderscope/arbitrary_plot:named_value_plotter",
         "//software/thunderscope/common:proto_configuration_widget",
         "//software/thunderscope/field",
         "//software/thunderscope/field:field_layer",

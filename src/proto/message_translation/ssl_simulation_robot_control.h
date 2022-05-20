@@ -10,26 +10,6 @@
 /**
  * Creates a RobotMoveCommand proto
  *
- * @param wheel_rpm_front_right Speed [rpm] of front right wheel
- * @param wheel_rpm_front_left Speed [rpm] of front left wheel
- * @param wheel_rpm_back_right Speed [rpm] of back right wheel
- * @param wheel_rpm_back_left Speed [rpm] of back left wheel
- * @param front_wheel_angle_deg angle between each front wheel and the y axis of the robot
- * in degrees
- * @param back_wheel_angle_deg angle between each back wheel and the y axis of the robot
- * in degrees
- * @param wheel_radius_meters The radius of the wheel in meters
- *
- * @return RobotMoveCommand proto
- */
-std::unique_ptr<SSLSimulationProto::RobotMoveCommand> createRobotMoveCommand(
-    double wheel_rpm_front_right, double wheel_rpm_front_left, double wheel_rpm_back_left,
-    double wheel_rpm_back_right, float front_wheel_angle_deg, float back_wheel_angle_deg,
-    float wheel_radius_meters);
-
-/**
- * Creates a RobotMoveCommand proto
- *
  * @param direct_control The DirectControlPrimitive to create from
  * @param front_wheel_angle_deg angle between each front wheel and the y axis of the robot
  * in degrees

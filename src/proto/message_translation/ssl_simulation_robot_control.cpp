@@ -14,26 +14,33 @@ std::unique_ptr<SSLSimulationProto::RobotMoveCommand> createRobotMoveCommand(
     const TbotsProto::DirectControlPrimitive& direct_control, float front_wheel_angle_deg,
     float back_wheel_angle_deg, float wheel_radius_meters)
 {
-    switch (direct_control.wheel_control_case())
+    switch (direct_control.motor().drive_control_case())
     {
-        case TbotsProto::DirectControlPrimitive::kDirectPerWheelControl:
+        case TbotsProto::MotorControl::kDirectPerWheelControl:
         {
             LOG(FATAL) << "Direct per-wheel control is not supported in simulation";
         }
 
-        case TbotsProto::DirectControlPrimitive::kDirectVelocityControl:
+        case TbotsProto::MotorControl::kOpenLoopControl:
+        {
+            LOG(FATAL) << "Open loop control is not supported in simulation";
+        }
+
+        case TbotsProto::MotorControl::kDirectVelocityControl:
         {
             auto move_local_velocity = SSLSimulationProto::MoveLocalVelocity();
             move_local_velocity.set_forward(
-                static_cast<float>(direct_control.direct_velocity_control()
+                static_cast<float>(direct_control.motor()
+                                       .direct_velocity_control()
                                        .velocity()
                                        .x_component_meters()));
-            move_local_velocity.set_left(
-                static_cast<float>(direct_control.direct_velocity_control()
-                                       .velocity()
-                                       .y_component_meters()));
+            move_local_velocity.set_left(static_cast<float>(direct_control.motor()
+                                                                .direct_velocity_control()
+                                                                .velocity()
+                                                                .y_component_meters()));
             move_local_velocity.set_angular(
-                static_cast<float>(direct_control.direct_velocity_control()
+                static_cast<float>(direct_control.motor()
+                                       .direct_velocity_control()
                                        .angular_velocity()
                                        .radians_per_second()));
 
@@ -41,10 +48,10 @@ std::unique_ptr<SSLSimulationProto::RobotMoveCommand> createRobotMoveCommand(
             *(move_command->mutable_local_velocity()) = move_local_velocity;
             return move_command;
         }
-        case TbotsProto::DirectControlPrimitive::WHEEL_CONTROL_NOT_SET:
-        {
-            return std::make_unique<SSLSimulationProto::RobotMoveCommand>();
-        }
+            // case TbotsProto::MotorControl::WHEEL_CONTROL_NOT_SET:
+            //{
+            // return std::make_unique<SSLSimulationProto::RobotMoveCommand>();
+            //}
     }
     return std::make_unique<SSLSimulationProto::RobotMoveCommand>();
 }
@@ -144,7 +151,7 @@ std::unique_ptr<SSLSimulationProto::RobotCommand> getRobotCommandFromDirectContr
     }
 
     return createRobotCommand(robot_id, std::move(move_command), kick_speed, kick_angle,
-                              direct_control->dribbler_speed_rpm());
+                              direct_control->motor().dribbler_speed_rpm());
 }
 
 std::unique_ptr<SSLSimulationProto::RobotCommand> createRobotCommand(
