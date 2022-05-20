@@ -210,7 +210,11 @@ static float positionOfVisiblePixels(btVector3 &p, const btVector3 &simulatorBal
 
     const btVector3 up = btVector3(0, 0, 1);
 
-    btVector3 axis = up.cross(cameraDirection).normalize();
+    btVector3 axis = up.cross(cameraDirection);
+    if (!axis.fuzzyZero())
+    {
+        axis = axis.normalize();
+    }
     btScalar angle = up.angle(cameraDirection);
 
     const int sampleRadius       = 7;

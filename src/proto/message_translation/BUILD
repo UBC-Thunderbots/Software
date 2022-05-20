@@ -1,5 +1,10 @@
 package(default_visibility = ["//visibility:public"])
 
+load(
+    "@platformio_rules//platformio:platformio.bzl",
+    "platformio_library",
+)
+
 cc_library(
     name = "tbots_protobuf",
     srcs = ["tbots_protobuf.cpp"],
@@ -167,29 +172,6 @@ cc_test(
 )
 
 cc_library(
-    name = "primitive_google_to_nanopb_converter",
-    srcs = ["primitive_google_to_nanopb_converter.cpp"],
-    hdrs = ["primitive_google_to_nanopb_converter.h"],
-    visibility = ["//visibility:public"],
-    deps = [
-        "//proto:tbots_cc_proto",
-        "//proto:tbots_nanopb_proto",
-        "//proto/primitive:primitive_msg_factory",
-        "//shared:constants",
-        "@nanopb",
-    ],
-)
-
-cc_test(
-    name = "primitive_google_to_nanopb_converter_test",
-    srcs = ["primitive_google_to_nanopb_converter_test.cpp"],
-    deps = [
-        ":primitive_google_to_nanopb_converter",
-        "//shared/test_util:tbots_gtest_main",
-    ],
-)
-
-cc_library(
     name = "defending_side",
     srcs = ["defending_side.cpp"],
     hdrs = ["defending_side.h"],
@@ -226,6 +208,22 @@ cc_test(
         ":er_force_world",
         "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
+    ],
+)
+
+platformio_library(
+    name = "power_frame_msg_platformio",
+    hdr = "power_frame_msg.hpp",
+)
+
+cc_library(
+    name = "power_frame_msg",
+    hdrs = ["power_frame_msg.hpp"],
+    deps = [
+        "//proto:tbots_cc_proto",
+        "//proto:tbots_nanopb_proto",
+        "//proto/primitive:primitive_msg_factory",
+        "@nanopb",
     ],
 )
 

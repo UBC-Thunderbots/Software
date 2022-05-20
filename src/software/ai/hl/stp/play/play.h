@@ -93,14 +93,31 @@ class Play
      * @param path_planner_factory The path planner factory
      * @param world The updated world
      * @param tactic the Tactic
+     * @param motion_constraints the motion constraints to use
      *
      * @return the PrimitiveSet to execute
      */
     std::unique_ptr<TbotsProto::PrimitiveSet> getPrimitivesFromTactic(
         const GlobalPathPlannerFactory& path_planner_factory, const World& world,
-        std::shared_ptr<Tactic> tactic) const;
+        std::shared_ptr<Tactic> tactic,
+        std::set<TbotsProto::MotionConstraint> motion_constraints) const;
 
    private:
+    /**
+     * Assigns the given tactics to as many of the given robots
+     *
+     * @param path_planner_factory The path planner factory
+     * @param world The world
+     * @param tactic_vector The tactic vector
+     * @param robots_to_assign The robots to assign to
+     *
+     * @return the remaining unassigned robots and the new primitives to assign
+     */
+    std::tuple<std::vector<Robot>, std::unique_ptr<TbotsProto::PrimitiveSet>>
+    assignTactics(const GlobalPathPlannerFactory& path_planner_factory,
+                  const World& world, TacticVector tactic_vector,
+                  const std::vector<Robot> robots_to_assign);
+
     /**
      * Returns a list of shared_ptrs to the Tactics the Play wants to run at this time, in
      * order of priority. The Tactic at the beginning of the vector has the highest

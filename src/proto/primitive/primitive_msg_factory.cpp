@@ -9,23 +9,16 @@ std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
     const TbotsProto::BallCollisionType& ball_collision_type,
     const AutoChipOrKick& auto_chip_or_kick,
     const TbotsProto::MaxAllowedSpeedMode& max_allowed_speed_mode,
-    double target_spin_rev_per_s, const RobotConstants_t& robot_constants)
-{
-    return createCostedMovePrimitive(
-        motion_control, final_angle, final_speed, dribbler_mode, ball_collision_type,
-        auto_chip_or_kick, max_allowed_speed_mode, target_spin_rev_per_s, robot_constants,
-        motion_control.normalized_path_length());
-}
-
-std::unique_ptr<TbotsProto::Primitive> createCostedMovePrimitive(
-    const TbotsProto::MotionControl& motion_control, const Angle& final_angle,
-    double final_speed, const TbotsProto::DribblerMode& dribbler_mode,
-    const TbotsProto::BallCollisionType& ball_collision_type,
-    const AutoChipOrKick& auto_chip_or_kick,
-    const TbotsProto::MaxAllowedSpeedMode& max_allowed_speed_mode,
-    double target_spin_rev_per_s, const RobotConstants_t& robot_constants, double cost)
+    double target_spin_rev_per_s, const RobotConstants_t& robot_constants,
+    std::optional<double> cost_override)
 {
     auto move_primitive_msg = std::make_unique<TbotsProto::Primitive>();
+
+    auto cost = motion_control.normalized_path_length();
+    if (cost_override.has_value())
+    {
+        cost = cost_override.value();
+    }
 
     *(move_primitive_msg->mutable_move()->mutable_motion_control()) = motion_control;
     move_primitive_msg->mutable_move()->set_final_speed_m_per_s(
@@ -62,40 +55,6 @@ std::unique_ptr<TbotsProto::Primitive> createCostedMovePrimitive(
     return move_primitive_msg;
 }
 
-std::unique_ptr<TbotsProto::Primitive> createChipPrimitive(
-    const Point& chip_origin, const Angle& chip_direction, double chip_distance_meters,
-    RobotConstants_t robot_constants, double cost)
-{
-    TbotsProto::MotionControl motion_control;
-    TbotsProto::Path path_proto;
-
-    *(path_proto.add_point())        = *createPointProto(chip_origin);
-    *(motion_control.mutable_path()) = path_proto;
-
-    return createCostedMovePrimitive(
-        motion_control, chip_direction, 0.0, TbotsProto::DribblerMode::OFF,
-        TbotsProto::BallCollisionType::ALLOW,
-        AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, chip_distance_meters},
-        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0, robot_constants, cost);
-}
-
-std::unique_ptr<TbotsProto::Primitive> createKickPrimitive(
-    const Point& kick_origin, const Angle& kick_direction,
-    double kick_speed_meters_per_second, RobotConstants_t robot_constants, double cost)
-{
-    TbotsProto::MotionControl motion_control;
-    TbotsProto::Path path_proto;
-
-    *(path_proto.add_point())        = *createPointProto(kick_origin);
-    *(motion_control.mutable_path()) = path_proto;
-
-    return createCostedMovePrimitive(
-        motion_control, kick_direction, 0.0, TbotsProto::DribblerMode::OFF,
-        TbotsProto::BallCollisionType::ALLOW,
-        AutoChipOrKick{AutoChipOrKickMode::AUTOKICK, kick_speed_meters_per_second},
-        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0, robot_constants, cost);
-}
-
 std::unique_ptr<TbotsProto::Primitive> createStopPrimitive(bool coast)
 {
     auto stop_primitive_msg = std::make_unique<TbotsProto::Primitive>();
@@ -126,7 +85,8 @@ std::unique_ptr<TbotsProto::Primitive> createEstopPrimitive()
 }
 
 std::unique_ptr<TbotsProto::Primitive> createDirectControlPrimitive(
-    const Vector& velocity, AngularVelocity angular_velocity, double dribbler_speed_rpm)
+    const Vector& velocity, AngularVelocity angular_velocity, double dribbler_speed_rpm,
+    const TbotsProto::AutoChipOrKick& auto_chip_or_kick)
 {
     auto direct_control_primitive_msg = std::make_unique<TbotsProto::Primitive>();
 
@@ -140,6 +100,12 @@ std::unique_ptr<TbotsProto::Primitive> createDirectControlPrimitive(
 
     direct_control_primitive_msg->mutable_direct_control()->set_dribbler_speed_rpm(
         static_cast<float>(dribbler_speed_rpm));
+
+
+    *(direct_control_primitive_msg->mutable_direct_control()
+          ->mutable_power()
+          ->mutable_chicker()
+          ->mutable_auto_chip_or_kick()) = auto_chip_or_kick;
     return direct_control_primitive_msg;
 }
 

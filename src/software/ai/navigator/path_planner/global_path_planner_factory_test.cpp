@@ -48,7 +48,8 @@ TEST_F(TestGlobalPathPlanner,
         TbotsProto::MotionConstraint::ENEMY_DEFENSE_AREA,
         TbotsProto::MotionConstraint::AVOID_FIELD_BOUNDARY_ZONE};
     std::vector<ObstaclePtr> obstacles =
-        obstacle_factory.createFromMotionConstraints(constraints, world.field());
+        obstacle_factory.createStaticObstaclesFromMotionConstraints(constraints,
+                                                                    world.field());
 
     std::shared_ptr<const EnlsvgPathPlanner> planner = gpp.getPathPlanner(constraints);
     auto path                                        = planner->findPath(start, dest);
@@ -84,7 +85,8 @@ TEST_F(
         TbotsProto::MotionConstraint::CENTER_CIRCLE,
         TbotsProto::MotionConstraint::AVOID_FIELD_BOUNDARY_ZONE};
     std::vector<ObstaclePtr> obstacles =
-        obstacle_factory.createFromMotionConstraints(constraints, world.field());
+        obstacle_factory.createStaticObstaclesFromMotionConstraints(constraints,
+                                                                    world.field());
 
     std::shared_ptr<const EnlsvgPathPlanner> planner = gpp.getPathPlanner(constraints);
     auto path                                        = planner->findPath(start, dest);
@@ -110,7 +112,7 @@ TEST_F(
     // circle while path planning (but not to a problematic degree). This won't be a
     // problem since obstacles are inflated by the RobotNavigationObstacleFactory
     std::vector<ObstaclePtr> defense_area_obstacles =
-        obstacle_factory.createFromMotionConstraints(
+        obstacle_factory.createStaticObstaclesFromMotionConstraints(
             {TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA,
              TbotsProto::MotionConstraint::ENEMY_DEFENSE_AREA},
             world.field());
@@ -132,7 +134,8 @@ TEST_F(TestGlobalPathPlanner,
         TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA,
         TbotsProto::MotionConstraint::AVOID_FIELD_BOUNDARY_ZONE};
     std::vector<ObstaclePtr> obstacles =
-        obstacle_factory.createFromMotionConstraints(constraints, world.field());
+        obstacle_factory.createStaticObstaclesFromMotionConstraints(constraints,
+                                                                    world.field());
 
     std::shared_ptr<const EnlsvgPathPlanner> planner = gpp.getPathPlanner(constraints);
     auto path                                        = planner->findPath(start, dest);
@@ -160,7 +163,8 @@ TEST_F(TestGlobalPathPlanner, test_enemy_half_blocked_starting_and_ending_in_blo
         TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA,
         TbotsProto::MotionConstraint::AVOID_FIELD_BOUNDARY_ZONE};
     std::vector<ObstaclePtr> obstacles =
-        obstacle_factory.createFromMotionConstraints(constraints, world.field());
+        obstacle_factory.createStaticObstaclesFromMotionConstraints(constraints,
+                                                                    world.field());
 
     std::shared_ptr<const EnlsvgPathPlanner> planner = gpp.getPathPlanner(constraints);
     auto path                                        = planner->findPath(start, dest);
@@ -190,7 +194,8 @@ TEST_F(TestGlobalPathPlanner, test_friendly_half_blocked_starting_in_blocked_are
         TbotsProto::MotionConstraint::ENEMY_DEFENSE_AREA,
         TbotsProto::MotionConstraint::AVOID_FIELD_BOUNDARY_ZONE};
     std::vector<ObstaclePtr> obstacles =
-        obstacle_factory.createFromMotionConstraints(constraints, world.field());
+        obstacle_factory.createStaticObstaclesFromMotionConstraints(constraints,
+                                                                    world.field());
 
     std::shared_ptr<const EnlsvgPathPlanner> planner = gpp.getPathPlanner(constraints);
     auto path                                        = planner->findPath(start, dest);
@@ -218,7 +223,8 @@ TEST_F(TestGlobalPathPlanner, test_leave_the_field)
         TbotsProto::MotionConstraint::ENEMY_DEFENSE_AREA,
         TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA};
     std::vector<ObstaclePtr> obstacles =
-        obstacle_factory.createFromMotionConstraints(constraints, world.field());
+        obstacle_factory.createStaticObstaclesFromMotionConstraints(constraints,
+                                                                    world.field());
 
     std::shared_ptr<const EnlsvgPathPlanner> planner = gpp.getPathPlanner(constraints);
     auto path                                        = planner->findPath(start, dest);

@@ -10,6 +10,7 @@
 #include "software/jetson_nano/redis/redis_client.h"
 #include "software/jetson_nano/services/motor.h"
 #include "software/jetson_nano/services/network.h"
+#include "software/jetson_nano/services/power.h"
 #include "software/logger/logger.h"
 #include "software/world/robot_state.h"
 
@@ -57,6 +58,7 @@ class Thunderloop
     // Services
     std::unique_ptr<MotorService> motor_service_;
     std::unique_ptr<NetworkService> network_service_;
+    std::unique_ptr<PowerService> power_service_;
 
     // Clients
     std::unique_ptr<RedisClient> redis_client_;

@@ -2,6 +2,7 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "obstacle",
+    srcs = ["obstacle.cpp"],
     hdrs = [
         "obstacle.hpp",
     ],
@@ -9,6 +10,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "obstacle_visitor",
+        "//proto/message_translation:tbots_protobuf",
         "//shared:constants",
         "//software/geom:point",
         "//software/geom:segment",

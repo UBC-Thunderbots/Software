@@ -33,7 +33,8 @@ ControllerPrimitiveGenerator::createPrimitiveFromControllerInput(
         double kick_speed =
             controller_input_config->getKickSpeedMetersPerSecond()->value();
         auto move_with_kick_primitive = createMovePrimitive(
-            Point(), 0, Angle::zero(), TbotsProto::DribblerMode::OFF,
+            TbotsProto::MotionControl(), Angle::zero(), 0, TbotsProto::DribblerMode::OFF,
+            TbotsProto::BallCollisionType::ALLOW,
             AutoChipOrKick{
                 AutoChipOrKickMode::AUTOKICK,
                 kick_speed,
@@ -45,7 +46,8 @@ ControllerPrimitiveGenerator::createPrimitiveFromControllerInput(
     {
         double chip_distance = controller_input_config->getChipDistanceMeters()->value();
         auto move_with_chip_primitive = createMovePrimitive(
-            Point(), 0, Angle::zero(), TbotsProto::DribblerMode::OFF,
+            TbotsProto::MotionControl(), Angle::zero(), 0, TbotsProto::DribblerMode::OFF,
+            TbotsProto::BallCollisionType::ALLOW,
             AutoChipOrKick{
                 AutoChipOrKickMode::AUTOCHIP,
                 chip_distance,
@@ -65,9 +67,10 @@ ControllerPrimitiveGenerator::createPrimitiveFromControllerInput(
                             controller_input_config->getMaxLinearSpeed()->value();
         double angular_velocity = controller_input.getAngularMotion() *
                                   controller_input_config->getMaxAngularSpeed()->value();
-        auto direct_velocity_primitive = createDirectControlPrimitive(
-            Vector(x_velocity, y_velocity),
-            AngularVelocity::fromRadians(angular_velocity), dribbler_rpm);
+        auto direct_velocity_primitive =
+            createDirectControlPrimitive(Vector(x_velocity, y_velocity),
+                                         AngularVelocity::fromRadians(angular_velocity),
+                                         dribbler_rpm, TbotsProto::AutoChipOrKick());
         return direct_velocity_primitive;
     }
 }

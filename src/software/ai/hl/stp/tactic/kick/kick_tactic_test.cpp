@@ -65,7 +65,8 @@ INSTANTIATE_TEST_CASE_P(
         // place the ball directly infront of the robot
         std::make_tuple(Vector(0.5, 0), Angle::zero()),
         // place the ball directly behind the robot
-        std::make_tuple(Vector(-0.5, 0), Angle::zero()),
+        // TODO(#2602): re-enable once fixed
+        // std::make_tuple(Vector(-0.5, 0), Angle::zero()),
         // place the ball in the robots dribbler
         std::make_tuple(Vector(ROBOT_MAX_RADIUS_METERS, 0), Angle::zero()),
         // Repeat the same tests but kick in the opposite direction
@@ -74,7 +75,8 @@ INSTANTIATE_TEST_CASE_P(
         // place the ball directly to the right of the robot
         std::make_tuple(Vector(0, -0.5), Angle::half()),
         // place the ball directly infront of the robot
-        std::make_tuple(Vector(0.5, 0), Angle::half()),
+        // TODO(#2602): re-enable once fixed
+        // std::make_tuple(Vector(0.5, 0), Angle::half()),
         // place the ball directly behind the robot
         std::make_tuple(Vector(-0.5, 0), Angle::half()),
         // place the ball in the robots dribbler
