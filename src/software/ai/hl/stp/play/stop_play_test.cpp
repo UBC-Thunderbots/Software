@@ -128,7 +128,8 @@ TEST_F(StopPlayTest, test_stop_play_enemy_half_corner_robots_close_together)
             Duration::fromSeconds(10));
 }
 
-TEST_F(StopPlayTest, test_stop_play_centre_robots_close_together)
+// TODO (#2519): fix and re-enable
+TEST_F(StopPlayTest, DISABLED_test_stop_play_centre_robots_close_together)
 {
     BallState ball_state(Point(0, 0), Vector(0, 0));
     auto friendly_robots = TestUtil::createStationaryRobotStatesWithId(

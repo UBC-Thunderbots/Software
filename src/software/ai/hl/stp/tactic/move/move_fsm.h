@@ -1,7 +1,6 @@
 #pragma once
 
 #include "software/ai/hl/stp/tactic/tactic.h"
-#include "software/ai/intent/move_intent.h"
 
 struct MoveFSM
 {
@@ -36,7 +35,7 @@ struct MoveFSM
     DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
     /**
-     * This is an Action that sets the intent to a move intent corresponding to the
+     * This is an Action that sets the primitive to a move primitive corresponding to the
      * Update_E event
      *
      * @param event MoveFSM::Update event

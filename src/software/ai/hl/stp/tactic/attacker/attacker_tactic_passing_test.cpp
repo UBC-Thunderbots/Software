@@ -5,7 +5,7 @@
 #include "software/ai/hl/stp/tactic/attacker/attacker_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/geom/algorithms/contains.h"
-#include "software/simulated_tests/simulated_er_force_sim_tactic_test_fixture.h"
+#include "software/simulated_tests/simulated_er_force_sim_play_test_fixture.h"
 #include "software/simulated_tests/terminating_validation_functions/ball_kicked_validation.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_state_validation.h"
 #include "software/simulated_tests/validation/validation_function.h"
@@ -14,7 +14,7 @@
 #include "software/world/world.h"
 
 class AttackerTacticKeepAwayTest
-    : public SimulatedErForceSimTacticTestFixture,
+    : public SimulatedErForceSimPlayTestFixture,
       public ::testing::WithParamInterface<std::tuple<Pass, RobotStateWithId, BallState>>
 {
    protected:
@@ -39,8 +39,7 @@ TEST_P(AttackerTacticKeepAwayTest, attacker_test_passing)
         ->setValue(90);
     auto tactic = std::make_shared<AttackerTactic>(ai_config);
     tactic->updateControlParams(pass, true);
-    setTactic(tactic);
-    setFriendlyRobotId(1);
+    setTactic(1, tactic);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [pass, tactic](std::shared_ptr<World> world_ptr,

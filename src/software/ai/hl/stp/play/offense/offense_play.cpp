@@ -29,10 +29,15 @@ void OffensePlay::updateTactics(const PlayUpdate &play_update)
     PriorityTacticVector tactics_to_return;
     unsigned int num_shoot_or_pass = play_update.num_tactics - 2;
     unsigned int num_defenders     = 2;
+    if (play_update.num_tactics == 0)
+    {
+        return;
+    }
     if (play_update.num_tactics <= 3)
     {
         num_shoot_or_pass = 1;
-        num_defenders     = play_update.num_tactics - 1;
+        // play_update.num_tactics == 0 is handled above
+        num_defenders = play_update.num_tactics - 1;
     }
 
     shoot_or_pass_play->updateTactics(PlayUpdate(

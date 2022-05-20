@@ -1,6 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
+<<<<<<< HEAD
     name = "simulator_robot",
     srcs = ["simulator_robot.cpp"],
     hdrs = ["simulator_robot.h"],
@@ -178,19 +179,14 @@ cc_library(
         "//extlibs/er_force_sim/config/simulator:2020B.txt",
     ],
     deps = [
-        ":physics_simulator_ball",
-        ":physics_simulator_robot",
-        ":simulator_ball_singleton",
         "//extlibs/er_force_sim/src/amun/simulator:simulator_qt",
         "//proto:defending_side_msg_cc_proto",
-        "//proto/message_translation:primitive_google_to_nanopb_converter",
         "//proto/message_translation:ssl_detection",
         "//proto/message_translation:ssl_geometry",
         "//proto/message_translation:ssl_simulation_robot_control",
         "//proto/message_translation:ssl_wrapper",
         "//shared/parameter:cpp_configs",
         "//software/jetson_nano:primitive_executor",
-        "//software/simulation/physics:physics_world",
         "//software/world",
         "//software/world:field",
         "//software/world:team_colour",
@@ -209,6 +205,7 @@ cc_test(
         "//software/world",
     ],
 )
+<<<<<<< HEAD
 
 cc_test(
     name = "simulator_test",
@@ -263,3 +260,5 @@ cc_library(
         "//software/world:field",
     ],
 )
+=======
+>>>>>>> 243b01bd4aee2b86af7f995d150a251647508142

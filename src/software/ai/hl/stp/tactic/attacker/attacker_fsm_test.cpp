@@ -21,7 +21,9 @@ TEST(AttackerFSMTest, test_transitions)
 
     // robot far from attacker point
     fsm.process_event(AttackerFSM::Update(
-        control_params, TacticUpdate(robot, world, [](std::unique_ptr<Intent>) {})));
+        control_params, TacticUpdate(
+                            robot, world, [](std::unique_ptr<TbotsProto::Primitive>) {},
+                            TEST_UTIL_CREATE_MOTION_CONTROL_NO_DEST)));
     EXPECT_TRUE(fsm.is(boost::sml::state<PivotKickFSM>));
     EXPECT_TRUE(
         fsm.is<decltype(boost::sml::state<PivotKickFSM>)>(boost::sml::state<DribbleFSM>));
@@ -29,7 +31,9 @@ TEST(AttackerFSMTest, test_transitions)
     // robot close to attacker point
     robot = ::TestUtil::createRobotAtPos(Point(2, 2));
     fsm.process_event(AttackerFSM::Update(
-        control_params, TacticUpdate(robot, world, [](std::unique_ptr<Intent>) {})));
+        control_params, TacticUpdate(
+                            robot, world, [](std::unique_ptr<TbotsProto::Primitive>) {},
+                            TEST_UTIL_CREATE_MOTION_CONTROL_NO_DEST)));
     EXPECT_TRUE(fsm.is(boost::sml::state<PivotKickFSM>));
     EXPECT_TRUE(
         fsm.is<decltype(boost::sml::state<PivotKickFSM>)>(boost::sml::state<DribbleFSM>));
@@ -41,14 +45,18 @@ TEST(AttackerFSMTest, test_transitions)
 
     // process event once to fall through the Dribble FSM
     fsm.process_event(AttackerFSM::Update(
-        control_params, TacticUpdate(robot, world, [](std::unique_ptr<Intent>) {})));
+        control_params, TacticUpdate(
+                            robot, world, [](std::unique_ptr<TbotsProto::Primitive>) {},
+                            TEST_UTIL_CREATE_MOTION_CONTROL_NO_DEST)));
     EXPECT_TRUE(fsm.is(boost::sml::state<PivotKickFSM>));
     EXPECT_TRUE(
         fsm.is<decltype(boost::sml::state<PivotKickFSM>)>(boost::sml::state<DribbleFSM>));
 
     // robot should now kick the ball
     fsm.process_event(AttackerFSM::Update(
-        control_params, TacticUpdate(robot, world, [](std::unique_ptr<Intent>) {})));
+        control_params, TacticUpdate(
+                            robot, world, [](std::unique_ptr<TbotsProto::Primitive>) {},
+                            TEST_UTIL_CREATE_MOTION_CONTROL_NO_DEST)));
     EXPECT_TRUE(fsm.is(boost::sml::state<PivotKickFSM>));
     EXPECT_TRUE(fsm.is<decltype(boost::sml::state<PivotKickFSM>)>(
         boost::sml::state<PivotKickFSM::KickState>));
@@ -58,8 +66,12 @@ TEST(AttackerFSMTest, test_transitions)
     world = ::TestUtil::setBallVelocity(world, Vector(5, 0), Timestamp::fromSeconds(223));
     EXPECT_TRUE(world.ball().hasBallBeenKicked(pass.passerOrientation()));
     fsm.process_event(AttackerFSM::Update(
-        control_params, TacticUpdate(robot, world, [](std::unique_ptr<Intent>) {})));
+        control_params, TacticUpdate(
+                            robot, world, [](std::unique_ptr<TbotsProto::Primitive>) {},
+                            TEST_UTIL_CREATE_MOTION_CONTROL_NO_DEST)));
     fsm.process_event(AttackerFSM::Update(
-        control_params, TacticUpdate(robot, world, [](std::unique_ptr<Intent>) {})));
+        control_params, TacticUpdate(
+                            robot, world, [](std::unique_ptr<TbotsProto::Primitive>) {},
+                            TEST_UTIL_CREATE_MOTION_CONTROL_NO_DEST)));
     EXPECT_TRUE(fsm.is(boost::sml::X));
 }

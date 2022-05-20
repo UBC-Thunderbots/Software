@@ -210,7 +210,6 @@ cc_library(
         "//shared/parameter:cpp_configs",
         "//software/ai/hl/stp/tactic/goalie:goalie_tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",
-        "//software/ai/hl/stp/tactic/move_goalie_to_goal_line:move_goalie_to_goal_line_tactic",
         "//software/logger",
         "//software/util/generic_factory",
     ],
@@ -286,9 +285,14 @@ cc_library(
     deps = [
         "//shared/parameter:cpp_configs",
         "//software/ai/hl/stp/tactic",
+        "//software/ai/hl/stp/tactic/goalie:goalie_tactic",
+        "//software/ai/hl/stp/tactic/stop:stop_tactic",
+        "//software/ai/motion_constraint:motion_constraint_set_builder",
+        "//software/ai/navigator/path_planner:global_path_planner_factory",
         "//software/ai/passing:pass_with_rating",
         "//software/util/sml_fsm",
         "@boost//:coroutine2",
+        "@munkres_cpp",
     ],
 )
 

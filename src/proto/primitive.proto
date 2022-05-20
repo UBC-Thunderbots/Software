@@ -3,11 +3,54 @@ syntax = "proto3";
 package TbotsProto;
 
 import "proto/geometry.proto";
+import "google/protobuf/descriptor.proto";
+
+extend google.protobuf.EnumValueOptions
+{
+    optional bool dynamic = 1000;
+}
 
 enum BallCollisionType
 {
     ALLOW = 0;
     AVOID = 1;
+}
+
+message Obstacles
+{
+    repeated Polygon polygon = 1;
+    repeated Circle circle   = 2;
+}
+
+enum MotionConstraint
+{
+    // The box around the friendly goal
+    FRIENDLY_DEFENSE_AREA = 0;
+    // The box around the enemy goal
+    ENEMY_DEFENSE_AREA = 1;
+    // The inflated box around the enemy defense area
+    INFLATED_ENEMY_DEFENSE_AREA = 2;
+    // The center circle
+    CENTER_CIRCLE = 3;
+    // The enemy half of the field
+    ENEMY_HALF = 4;
+    // The friendly half of the field
+    FRIENDLY_HALF = 5;
+    // Region around the playable zone
+    AVOID_FIELD_BOUNDARY_ZONE = 6;
+    // A half meter radius around the ball
+    HALF_METER_AROUND_BALL = 7 [(dynamic) = true];
+    // Path between ball and placement point in ball placement
+    AVOID_BALL_PLACEMENT_INTERFERENCE = 8 [(dynamic) = true];
+}
+
+message MotionControl
+{
+    Path path                                    = 1;
+    double normalized_path_length                = 2;
+    repeated MotionConstraint motion_constraints = 3;
+    Point requested_destination                  = 4;
+    repeated Obstacles static_obstacles          = 5;
 }
 
 enum DribblerMode
@@ -75,19 +118,21 @@ message Primitive
         StopPrimitive stop                    = 3;
         DirectControlPrimitive direct_control = 4;
     }
+    double cost = 5;
 }
 
 message EstopPrimitive {}
 
 message MovePrimitive
 {
-    Path path                        = 1;
-    float final_speed_m_per_s        = 2;
-    Angle final_angle                = 3;
-    float dribbler_speed_rpm         = 4;
-    float max_speed_m_per_s          = 5;
-    AutoChipOrKick auto_chip_or_kick = 6;
-    float target_spin_rev_per_s      = 7;
+    MotionControl motion_control          = 1;
+    float final_speed_m_per_s             = 2;
+    Angle final_angle                     = 3;
+    float dribbler_speed_rpm              = 4;
+    float max_speed_m_per_s               = 5;
+    AutoChipOrKick auto_chip_or_kick      = 6;
+    float target_spin_rev_per_s           = 7;
+    BallCollisionType ball_collision_type = 8;
 }
 
 message StopPrimitive

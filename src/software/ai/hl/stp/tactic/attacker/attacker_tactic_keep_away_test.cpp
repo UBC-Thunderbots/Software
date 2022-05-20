@@ -7,14 +7,14 @@
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/ai/passing/cost_function.h"
 #include "software/simulated_tests/non_terminating_validation_functions/robot_not_excessively_dribbling_validation.h"
-#include "software/simulated_tests/simulated_er_force_sim_tactic_test_fixture.h"
+#include "software/simulated_tests/simulated_er_force_sim_play_test_fixture.h"
 #include "software/simulated_tests/validation/validation_function.h"
 #include "software/test_util/test_util.h"
 #include "software/time/duration.h"
 #include "software/world/world.h"
 
 class AttackerTacticKeepAwayTest
-    : public SimulatedErForceSimTacticTestFixture,
+    : public SimulatedErForceSimPlayTestFixture,
       public ::testing::WithParamInterface<std::tuple<
           Pass, RobotStateWithId, BallState, std::vector<RobotStateWithId>, bool>>
 {
@@ -45,8 +45,7 @@ TEST_P(AttackerTacticKeepAwayTest, attacker_test_keep_away)
     auto tactic = std::make_shared<AttackerTactic>(ai_config);
     // force the keep away state
     tactic->updateControlParams(pass, false);
-    setTactic(tactic);
-    setFriendlyRobotId(1);
+    setTactic(1, tactic);
 
     // we use default parameters for testing ratePassEnemyRisk because that's (partially)
     // what the play uses to determine pass/no pass. Keep away state should try to

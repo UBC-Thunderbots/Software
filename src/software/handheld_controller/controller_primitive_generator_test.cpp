@@ -7,6 +7,7 @@
 #include "shared/2015_robot_constants.h"
 #include "shared/constants.h"
 #include "shared/parameter/cpp_dynamic_parameters.h"
+#include "software/test_util/test_util.h"
 
 class ControllerPrimitiveGeneratorTest : public testing::Test
 {
@@ -35,7 +36,8 @@ TEST_F(ControllerPrimitiveGeneratorTest, test_create_primitive_controller_input)
     double kick_speed =
         handheld_controller_config->getKickSpeedMetersPerSecond()->value();
     auto expected_kick_primitive = *createMovePrimitive(
-        Point(), 0, Angle::zero(), TbotsProto::DribblerMode::OFF,
+        TbotsProto::MotionControl(), Angle::zero(), 0, TbotsProto::DribblerMode::OFF,
+        TbotsProto::BallCollisionType::ALLOW,
         AutoChipOrKick{
             AutoChipOrKickMode::AUTOKICK,
             kick_speed,
@@ -59,7 +61,8 @@ TEST_F(ControllerPrimitiveGeneratorTest, test_create_primitive_controller_input1
 
     double chip_distance = handheld_controller_config->getChipDistanceMeters()->value();
     auto expected_chip_primitive = *createMovePrimitive(
-        Point(), 0, Angle::zero(), TbotsProto::DribblerMode::OFF,
+        TbotsProto::MotionControl(), Angle::zero(), 0, TbotsProto::DribblerMode::OFF,
+        TbotsProto::BallCollisionType::ALLOW,
         AutoChipOrKick{
             AutoChipOrKickMode::AUTOCHIP,
             chip_distance,

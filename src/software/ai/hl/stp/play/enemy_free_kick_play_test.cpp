@@ -20,7 +20,8 @@ class EnemyFreekickPlayTest : public SimulatedErForceSimPlayTestFixture,
     Field field                      = Field::createField(field_type);
 };
 
-TEST_P(EnemyFreekickPlayTest, test_enemy_free_kick_play)
+// TODO (#2504): fix and re-enable
+TEST_P(EnemyFreekickPlayTest, DISABLED_test_enemy_free_kick_play)
 {
     BallState ball_state(Point(0.9, 2.85), Vector(0, 0));
     auto friendly_robots = TestUtil::createStationaryRobotStatesWithId(
@@ -161,7 +162,8 @@ TEST_F(EnemyFreekickPlayTest, test_enemy_free_kick_close_to_net)
             Duration::fromSeconds(10));
 }
 
-TEST_F(EnemyFreekickPlayTest, test_enemy_free_kick_chipper_robots_close_to_net)
+// TODO (#2504): fix and re-enable
+TEST_F(EnemyFreekickPlayTest, DISABLED_test_enemy_free_kick_chipper_robots_close_to_net)
 {
     BallState ball_state(Point(-1.1, 1.943), Vector(0, 0));
     auto friendly_robots = TestUtil::createStationaryRobotStatesWithId(

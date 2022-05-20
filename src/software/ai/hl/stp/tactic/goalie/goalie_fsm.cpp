@@ -184,7 +184,7 @@ bool GoalieFSM::panicDone(const Update &event)
            intersections.empty();
 }
 
-void GoalieFSM::updatePanic(const Update &event)
+void GoalieFSM::panic(const Update &event)
 {
     std::vector<Point> intersections =
         getIntersectionsBetweenBallVelocityAndFullGoalSegment(event.common.world.ball(),
@@ -196,8 +196,8 @@ void GoalieFSM::updatePanic(const Update &event)
     Angle goalie_orientation =
         (event.common.world.ball().position() - goalie_pos).orientation();
 
-    event.common.set_intent(std::make_unique<MoveIntent>(
-        event.common.robot.id(), goalie_pos, goalie_orientation, 0.0,
+    event.common.set_primitive(createMovePrimitive(
+        CREATE_MOTION_CONTROL(goalie_pos), goalie_orientation, 0.0,
         TbotsProto::DribblerMode::OFF, TbotsProto::BallCollisionType::ALLOW,
         AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS},
         max_allowed_speed_mode, 0.0, event.common.robot.robotConstants()));
@@ -225,7 +225,7 @@ void GoalieFSM::updatePivotKick(
     processEvent(PivotKickFSM::Update(control_params, event.common));
 }
 
-void GoalieFSM::updatePositionToBlock(const Update &event)
+void GoalieFSM::positionToBlock(const Update &event)
 {
     Point goalie_pos = getGoaliePositionToBlock(
         event.common.world.ball(), event.common.world.field(), goalie_tactic_config);
@@ -236,8 +236,8 @@ void GoalieFSM::updatePositionToBlock(const Update &event)
     // faster
     auto goalie_final_speed = goalie_tactic_config->getGoalieFinalSpeed()->value();
 
-    event.common.set_intent(std::make_unique<MoveIntent>(
-        event.common.robot.id(), goalie_pos, goalie_orientation, goalie_final_speed,
+    event.common.set_primitive(createMovePrimitive(
+        CREATE_MOTION_CONTROL(goalie_pos), goalie_orientation, goalie_final_speed,
         TbotsProto::DribblerMode::OFF, TbotsProto::BallCollisionType::ALLOW,
         AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS},
         max_allowed_speed_mode, 0.0, event.common.robot.robotConstants()));
@@ -247,4 +247,19 @@ bool GoalieFSM::ballInDefenseArea(const Update &event)
 {
     return contains(event.common.world.field().friendlyDefenseArea(),
                     event.common.world.ball().position());
+}
+
+bool GoalieFSM::shouldMoveToGoalLine(const Update &event)
+{
+    return event.control_params.should_move_to_goal_line;
+}
+
+void GoalieFSM::moveToGoalLine(const Update &event)
+{
+    event.common.set_primitive(createMovePrimitive(
+        CREATE_MOTION_CONTROL(event.common.world.field().friendlyGoalCenter()),
+        Angle::zero(), 0, TbotsProto::DribblerMode::OFF,
+        TbotsProto::BallCollisionType::AVOID,
+        AutoChipOrKick{AutoChipOrKickMode::OFF, 0.0}, max_allowed_speed_mode, 0.0,
+        event.common.robot.robotConstants()));
 }
