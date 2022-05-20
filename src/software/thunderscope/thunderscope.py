@@ -107,13 +107,6 @@ class Thunderscope(object):
 
         """
 
-        # try:
-        # import OpenGL
-        # pg.setConfigOption('useOpenGL', True)
-        # pg.setConfigOption('enableExperimental', True)
-        # except Exception as e:
-        # print(f"Enabling OpenGL failed with {e}. Will result in slow rendering. Try installing PyOpenGL.")
-
         # Setup MainApp and initialize DockArea
         self.app = pyqtgraph.mkQApp("Thunderscope")
         self.app.setStyleSheet(qdarktheme.load_stylesheet())
@@ -375,7 +368,7 @@ class Thunderscope(object):
             full_system_proto_unix_io
         )
         performance_dock = Dock("Performance")
-        performance_dock.addWidget(widgets["performance_widget"].win)
+        performance_dock.addWidget(widgets["performance_widget"])
 
         widgets["playinfo_widget"] = self.setup_play_info(full_system_proto_unix_io)
         playinfo_dock = Dock("Play Info")
@@ -537,7 +530,6 @@ class Thunderscope(object):
         :returns: The play info widget
 
         """
-
         play_info = playInfoWidget()
         proto_unix_io.register_observer(PlayInfo, play_info.playinfo_buffer)
         self.register_refresh_function(play_info.refresh)
@@ -566,7 +558,6 @@ class Thunderscope(object):
         :returns: The drive and dribbler widget
 
         """
-
         return DriveAndDribblerWidget()
 
     def show(self):
@@ -576,4 +567,6 @@ class Thunderscope(object):
         pyqtgraph.exec()
 
     def close(self):
+        """Close the main window"""
+
         QtCore.QTimer.singleShot(0, self.window.close)

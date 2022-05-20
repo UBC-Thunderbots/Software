@@ -156,8 +156,9 @@ class MotorService
      * Log the driver fault in a human readable log msg
      *
      * @param motor The motor to log the status for
+     * @return bool true if faulted
      */
-    void checkDriverFault(uint8_t motor);
+    bool checkDriverFault(uint8_t motor);
 
     // Select between driver and controller gpio
     GPIO spi_demux_select_0;

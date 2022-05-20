@@ -14,7 +14,7 @@ from google.protobuf.any_pb2 import Any
 
 class ThreadedUnixListener:
     def __init__(
-        self, unix_path, proto_class=None, is_base64_encoded=False, max_buffer_size=1000
+        self, unix_path, proto_class=None, is_base64_encoded=False, max_buffer_size=10
     ):
 
         """Receive protobuf over unix sockets and buffers them

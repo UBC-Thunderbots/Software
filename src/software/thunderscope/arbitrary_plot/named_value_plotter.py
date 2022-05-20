@@ -1,20 +1,52 @@
-import random
 import time
-from collections import deque
+import numpy as np
 
 import pyqtgraph as pg
+import pyqtgraph.opengl as gl
+
+from pyqtgraph.Qt.QtWidgets import *
+from pyqtgraph.Qt import QtGui, QtCore
+
 from proto.visualization_pb2 import NamedValue
-from pyqtgraph.Qt import QtGui
 
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 DEQUE_SIZE = 1000
-INITIAL_Y_MIN = 0
-INITIAL_Y_MAX = 100
-TIME_WINDOW_TO_DISPLAY_S = 20
 
 
-class NamedValuePlotter(object):
+class GLViewWidget2DPlot(gl.GLViewWidget):
+
+    """Limit the mouse controls and fix the camera on a 3D
+    view to make it 2D"""
+
+    def __init__(self):
+        gl.GLViewWidget.__init__(self)
+
+        self.setMinimumSize(200, 100)
+        self.setCameraPosition(distance=2000, elevation=90, azimuth=0)
+
+        self.grid = gl.GLGridItem()
+        self.grid.setSize(x=20, y=40, z=10)
+        self.grid.scale(100, 100, 10)
+        self.addItem(self.grid)
+
+    def mouseMoveEvent(self, event):
+        """Overridden
+
+        We want to disable rotation and only pan the screen
+
+        :param event: The event to handle
+
+        """
+        diff = event.position() - self.mousePos
+        self.mousePos = event.position()
+
+        if event.buttons() == QtCore.Qt.MouseButton.LeftButton:
+            self.pan(diff.x(), diff.y(), 0, relative="view")
+
+
+class NamedValuePlotter(QWidget):
+
     """ Plot named values in real time with a scrolling plot """
 
     def __init__(self, buffer_size=1000):
@@ -23,57 +55,67 @@ class NamedValuePlotter(object):
         :param buffer_size: The size of the buffer to use for plotting.
 
         """
-        self.win = pg.plot()
-        self.win.disableAutoRange()
-        self.win.setYRange(INITIAL_Y_MIN, INITIAL_Y_MAX)
-        self.plots = {}
-        self.data_x = {}
-        self.data_y = {}
-        self.legend = pg.LegendItem((80, 60), offset=(70, 20))
-        self.legend.setParentItem(self.win.graphicsItem())
-        self.time = time.time()
+        QWidget.__init__(self)
+
+        self.layout = QHBoxLayout()
+        self.data = {}
         self.named_value_buffer = ThreadSafeBuffer(buffer_size, NamedValue)
+
+        self.traces = {}
+        self.plot = GLViewWidget2DPlot()
+
+        self.layout.addWidget(self.plot)
+        self.setLayout(self.layout)
+
+        self.last_update_time = time.time()
+        self.last_incoming_value = {}
+        self.color = 0
+
+        self.txtitem2 = gl.GLTextItem()
+        self.txtitem2.setData(
+            pos=(1.0, -1.0, 2.0), color=(127, 255, 127, 255), text="text2"
+        )
+        self.plot.addItem(self.txtitem2)
 
     def refresh(self):
         """Refreshes NamedValuePlotter and updates data in the respective
         plots.
-        """
 
-        # Dump the entire buffer into a deque. This operation is fast because
-        # its just consuming data from the buffer and appending it to a deque.
+        """
         for _ in range(self.named_value_buffer.queue.qsize()):
+
             named_value = self.named_value_buffer.get(block=False)
 
-            # If named_value is new, create a plot and for the new value and
-            # add it to necessary maps
-            if named_value.name not in self.plots:
-                self.plots[named_value.name] = self.win.plot(
-                    pen=QtGui.QColor(
-                        random.randint(100, 255),
-                        random.randint(100, 255),
-                        random.randint(100, 255),
-                    ),
-                    name=named_value.name,
-                    disableAutoRange=True,
-                    brush=None,
-                )
+            if named_value.name not in self.traces:
 
-                self.plots[named_value.name].setDownsampling(method="peak")
-                self.data_x[named_value.name] = deque([], DEQUE_SIZE)
-                self.data_y[named_value.name] = deque([], DEQUE_SIZE)
-                self.legend.addItem(self.plots[named_value.name], named_value.name)
+                self.last_incoming_value[named_value.name] = named_value.value
+                self.data[named_value.name] = np.zeros(DEQUE_SIZE)
+
+                self.color += 1
+                self.traces[named_value.name] = gl.GLLinePlotItem(
+                    color=pg.glColor(self.color), width=1, antialias=True,
+                )
+                self.plot.addItem(self.traces[named_value.name])
 
             # Add incoming data to existing deques of data
-            self.data_x[named_value.name].append(time.time() - self.time)
-            self.data_y[named_value.name].append(named_value.value)
+            self.last_incoming_value[named_value.name] = -named_value.value
 
-        for named_value, plot in self.plots.items():
-            # Update the data
-            plot.setData(self.data_x[named_value], self.data_y[named_value])
+        if self.last_update_time + 0.02 > time.time():
+            return
 
-        self.win.setRange(
-            xRange=[
-                time.time() - self.time - TIME_WINDOW_TO_DISPLAY_S,
-                time.time() - self.time,
-            ],
-        )
+        self.last_update_time = time.time()
+
+        for name, trace in self.traces.items():
+
+            self.data[name][:-1] = self.data[name][1:]
+            self.data[name][-1] = self.last_incoming_value[name]
+
+            trace.setData(
+                pos=np.vstack(
+                    [
+                        self.data[name],
+                        np.array(range(int(-DEQUE_SIZE / 2), int(DEQUE_SIZE / 2))),
+                        np.zeros(len(self.data[name])),
+                    ]
+                ).transpose()
+            )

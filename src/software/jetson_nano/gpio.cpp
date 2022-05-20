@@ -73,9 +73,7 @@ GpioState GPIO::getValue()
     std::ifstream gpio_fs("/sys/class/gpio/gpio" + gpio_number_ + "/value");
     std::string level;
 
-#if defined(__aarch64__) || defined(_M_ARM64)
     CHECK(gpio_fs.is_open()) << "Could not read GPIO pin";
-#endif
     std::getline(gpio_fs, level);
 
     if (level.compare("0") == 0)

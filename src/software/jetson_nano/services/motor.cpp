@@ -120,55 +120,31 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
 
     // TMC6100 Setup
     startDriver(FRONT_LEFT_MOTOR_CHIP_SELECT);
-    // startDriver(FRONT_RIGHT_MOTOR_CHIP_SELECT);
-    // startDriver(BACK_LEFT_MOTOR_CHIP_SELECT);
-    // startDriver(BACK_RIGHT_MOTOR_CHIP_SELECT);
-
-    sleep(1);
+    startDriver(BACK_RIGHT_MOTOR_CHIP_SELECT);
+    startDriver(FRONT_RIGHT_MOTOR_CHIP_SELECT);
+    startDriver(BACK_LEFT_MOTOR_CHIP_SELECT);
 
     // TMC4671 Setup
     startController(FRONT_LEFT_MOTOR_CHIP_SELECT);
-    // startController(FRONT_RIGHT_MOTOR_CHIP_SELECT);
-    // startController(BACK_LEFT_MOTOR_CHIP_SELECT);
-    // startController(BACK_RIGHT_MOTOR_CHIP_SELECT);
+    startController(BACK_RIGHT_MOTOR_CHIP_SELECT);
+    startController(FRONT_RIGHT_MOTOR_CHIP_SELECT);
+    startController(BACK_LEFT_MOTOR_CHIP_SELECT);
 
+    driver_control_enable_gpio.setValue(GpioState::LOW);
     sleep(1);
+    driver_control_enable_gpio.setValue(GpioState::HIGH);
 
-    LOG(WARNING) << "Checking faults";
+    // Check faults
     checkDriverFault(FRONT_LEFT_MOTOR_CHIP_SELECT);
-    // checkDriverFault(FRONT_RIGHT_MOTOR_CHIP_SELECT);
-    // checkDriverFault(BACK_LEFT_MOTOR_CHIP_SELECT);
-    // checkDriverFault(BACK_RIGHT_MOTOR_CHIP_SELECT);
-
-    sleep(1);
-    // runOpenLoopCalibrationRoutine(FRONT_RIGHT_MOTOR_CHIP_SELECT, 1000);
-    // runOpenLoopCalibrationRoutine(FRONT_LEFT_MOTOR_CHIP_SELECT, 1000);
-    // runOpenLoopCalibrationRoutine(BACK_LEFT_MOTOR_CHIP_SELECT, 1000);
-    tmc4671_setTargetVelocity(FRONT_LEFT_MOTOR_CHIP_SELECT, 1000);
-    sleep(2);
-    tmc4671_setTargetVelocity(FRONT_LEFT_MOTOR_CHIP_SELECT, 4000);
-    sleep(2);
-    tmc4671_setTargetVelocity(FRONT_LEFT_MOTOR_CHIP_SELECT, 8000);
-    sleep(2);
-    tmc4671_setTargetVelocity(FRONT_LEFT_MOTOR_CHIP_SELECT, 10000);
-    sleep(2);
-    tmc4671_setTargetVelocity(FRONT_LEFT_MOTOR_CHIP_SELECT, 8000);
-    sleep(2);
-    tmc4671_setTargetVelocity(FRONT_LEFT_MOTOR_CHIP_SELECT, 4000);
-    sleep(2);
-    tmc4671_setTargetVelocity(FRONT_LEFT_MOTOR_CHIP_SELECT, 1000);
-    sleep(2);
-    tmc4671_setTargetVelocity(FRONT_LEFT_MOTOR_CHIP_SELECT, 500);
-    sleep(2);
-    tmc4671_setTargetVelocity(FRONT_LEFT_MOTOR_CHIP_SELECT, 0);
-    sleep(2);
-    LOG(DEBUG) << "DONE";
+    checkDriverFault(FRONT_RIGHT_MOTOR_CHIP_SELECT);
+    checkDriverFault(BACK_LEFT_MOTOR_CHIP_SELECT);
+    checkDriverFault(BACK_RIGHT_MOTOR_CHIP_SELECT);
 }
 
 MotorService::~MotorService() {}
 
 
-void MotorService::checkDriverFault(uint8_t motor)
+bool MotorService::checkDriverFault(uint8_t motor)
 {
     int gstat = tmc6100_readInt(motor, TMC6100_GSTAT);
     std::bitset<32> gstat_bitset(gstat);
@@ -259,6 +235,9 @@ void MotorService::checkDriverFault(uint8_t motor)
         LOG(WARNING) << "s2vsw: Short to VS detected on phase W."
                      << "The driver becomes disabled until flag becomes cleared.";
     }
+
+    // Reset isn't really a fault, lets clear that bit
+    gstat_bitset[0] = 0;
 
     if (!gstat_bitset.any())
     {
@@ -500,7 +479,7 @@ void MotorService::writeToDriverOrDieTrying(uint8_t motor, uint8_t address, int3
                                << " to the TMC6100 at address " << address
                                << " at address " << static_cast<uint32_t>(address)
                                << " on motor " << static_cast<uint32_t>(motor)
-                               << " received :" << read_value;
+                               << " received: " << read_value;
 }
 
 void MotorService::writeToControllerOrDieTrying(uint8_t motor, uint8_t address,
@@ -512,7 +491,7 @@ void MotorService::writeToControllerOrDieTrying(uint8_t motor, uint8_t address,
                                << " to the TMC4671 at address " << address
                                << " at address " << static_cast<uint32_t>(address)
                                << " on motor " << static_cast<uint32_t>(motor)
-                               << " received :" << read_value;
+                               << " received: " << read_value;
 }
 
 void MotorService::configurePWM(uint8_t motor)
@@ -558,7 +537,6 @@ void MotorService::configureEncoder(uint8_t motor)
 void MotorService::calibrateEncoder(uint8_t motor)
 {
     LOG(WARNING) << "Calibrating the encoder, ensure the robot is lifted off the ground";
-    sleep(1);
 
     writeToControllerOrDieTrying(motor, TMC4671_PID_TORQUE_FLUX_LIMITS, 0x000003E8);
     writeToControllerOrDieTrying(motor, TMC4671_PID_TORQUE_P_TORQUE_I, 0x01000100);
@@ -602,17 +580,10 @@ void MotorService::runOpenLoopCalibrationRoutine(uint8_t motor, size_t num_sampl
     tmc4671_writeInt(motor, TMC4671_OPENLOOP_VELOCITY_TARGET, 0x0000004A);
 
     // Setup CSVs
-    LOG(CSV, "encoder_calibration" + std::to_string(motor) + ".csv")
+    LOG(CSV, "encoder_calibration_" + std::to_string(motor) + ".csv")
         << "actual_encoder,estimated_phi\n";
     LOG(CSV, "phase_currents_and_voltages_" + std::to_string(motor) + ".csv")
         << "adc_iv,adc_ux,adc_wy,pwm_iv,pwm_ux,pwm_wy\n";
-
-    using std::chrono::duration;
-    using std::chrono::duration_cast;
-    using std::chrono::high_resolution_clock;
-    using std::chrono::milliseconds;
-
-    auto t1 = high_resolution_clock::now();
 
     // Take samples of the useful registers
     for (size_t num_sample = 0; num_sample < num_samples; num_sample++)
@@ -645,17 +616,6 @@ void MotorService::runOpenLoopCalibrationRoutine(uint8_t motor, size_t num_sampl
             << adc_iv << "," << adc_ux << "," << adc_wy << "," << pwm_iv << "," << pwm_ux
             << "," << pwm_wy << "\n";
     }
-
-    auto t2 = high_resolution_clock::now();
-
-    /* Getting number of milliseconds as an integer. */
-    auto ms_int = duration_cast<milliseconds>(t2 - t1);
-
-    /* Getting number of milliseconds as a double. */
-    duration<double, std::milli> ms_double = t2 - t1;
-
-    std::cout << ms_int.count() << "ms\n";
-    std::cout << ms_double.count() << "ms\n";
 
     // Stop open loop rotation
     tmc4671_writeInt(motor, TMC4671_OPENLOOP_VELOCITY_TARGET, 0x00000000);
