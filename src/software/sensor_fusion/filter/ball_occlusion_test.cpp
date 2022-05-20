@@ -26,7 +26,7 @@ TEST_P(BallOcclusionTest, test_ball_occlusion)
     auto enemy_robots    = std::get<2>(GetParam());
     setFriendlyGoalie(0);
     setEnemyGoalie(0);
-    setAIPlay(TYPENAME(HaltPlay));
+    setAIPlay(TbotsProto::PlayName::HaltPlay);
     setRefereeCommand(RefereeCommand::HALT, RefereeCommand::HALT);
     std::vector<ValidationFunction> terminating_validating_function = {
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {

@@ -5,8 +5,9 @@
 #include "proto/message_translation/tbots_protobuf.h"
 #include "software/ai/hl/stp/tactic/stop/stop_tactic.h"
 #include "software/ai/motion_constraint/motion_constraint_set_builder.h"
+#include "software/logger/logger.h"
 
-Play::Play(std::shared_ptr<const AiConfig> ai_config, bool requires_goalie)
+Play::Play(TbotsProto::AiConfig ai_config, bool requires_goalie)
     : ai_config(ai_config),
       goalie_tactic(std::make_shared<GoalieTactic>(ai_config)),
       stop_tactics(),

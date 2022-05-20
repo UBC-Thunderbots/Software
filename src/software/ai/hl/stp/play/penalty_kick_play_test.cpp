@@ -32,7 +32,7 @@ TEST_F(PenaltyKickPlayTest, test_penalty_kick_setup)
     auto enemy_robots =
         TestUtil::createStationaryRobotStatesWithId({field.enemyGoalCenter()});
     setEnemyGoalie(0);
-    setAIPlay(TYPENAME(PenaltyKickPlay));
+    setAIPlay(TbotsProto::PlayName::PenaltyKickPlay);
     setRefereeCommand(RefereeCommand::PREPARE_PENALTY_US, RefereeCommand::NORMAL_START);
 
     RobotId shooter_id                                               = 5;
@@ -84,7 +84,7 @@ TEST_F(PenaltyKickPlayTest, DISABLED_test_penalty_kick_take)
     Point goalie      = Point(field.enemyGoalpostNeg().x(), 0);
     auto enemy_robots = TestUtil::createStationaryRobotStatesWithId({goalie});
     setEnemyGoalie(0);
-    setAIPlay(TYPENAME(PenaltyKickPlay));
+    setAIPlay(TbotsProto::PlayName::PenaltyKickPlay);
     setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::PREPARE_PENALTY_US);
 
     std::vector<ValidationFunction> terminating_validation_functions = {

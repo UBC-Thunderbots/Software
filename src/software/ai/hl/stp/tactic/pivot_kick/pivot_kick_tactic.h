@@ -1,6 +1,6 @@
 #pragma once
 
-#include "shared/parameter/cpp_dynamic_parameters.h"
+#include "proto/parameters.pb.h"
 #include "software/ai/evaluation/enemy_threat.h"
 #include "software/ai/hl/stp/tactic/pivot_kick/pivot_kick_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
@@ -14,7 +14,7 @@ class PivotKickTactic : public Tactic
      *
      * @param ai_config The AI configuration
      */
-    explicit PivotKickTactic(std::shared_ptr<const AiConfig> ai_config);
+    explicit PivotKickTactic(TbotsProto::AiConfig ai_config);
 
     PivotKickTactic() = delete;
 
@@ -38,5 +38,5 @@ class PivotKickTactic : public Tactic
     std::map<RobotId, std::unique_ptr<FSM<PivotKickFSM>>> fsm_map;
 
     PivotKickFSM::ControlParams control_params;
-    std::shared_ptr<const AiConfig> ai_config;
+    TbotsProto::AiConfig ai_config;
 };

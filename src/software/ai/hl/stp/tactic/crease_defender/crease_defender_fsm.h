@@ -1,7 +1,7 @@
 #pragma once
 
+#include "proto/parameters.pb.h"
 #include "proto/tactic.pb.h"
-#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/hl/stp/tactic/move/move_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/hl/stp/tactic/transition_conditions.h"
@@ -49,8 +49,8 @@ struct CreaseDefenderFSM
      *
      * @param robot_navigation_obstacle_config The config
      */
-    explicit CreaseDefenderFSM(std::shared_ptr<const RobotNavigationObstacleConfig>
-                                   robot_navigation_obstacle_config)
+    explicit CreaseDefenderFSM(
+        TbotsProto::RobotNavigationObstacleConfig robot_navigation_obstacle_config)
         : robot_navigation_obstacle_config(robot_navigation_obstacle_config)
     {
     }
@@ -78,6 +78,8 @@ struct CreaseDefenderFSM
     }
 
    private:
+    double robot_obstacle_inflation_factor_;
+
     /**
      * Finds the intersection with the front or sides of the defense area with the given
      * ray
@@ -94,5 +96,5 @@ struct CreaseDefenderFSM
         const Field& field, const Ray& ray, double robot_obstacle_inflation_factor);
 
    private:
-    std::shared_ptr<const RobotNavigationObstacleConfig> robot_navigation_obstacle_config;
+    TbotsProto::RobotNavigationObstacleConfig robot_navigation_obstacle_config;
 };

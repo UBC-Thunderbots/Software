@@ -36,7 +36,7 @@ class StopPlayTest : public SimulatedErForceSimPlayTestFixture
         SimulatedErForceSimPlayTestFixture::SetUp();
         setFriendlyGoalie(0);
         setEnemyGoalie(0);
-        setAIPlay(TYPENAME(StopPlay));
+        setAIPlay(TbotsProto::PlayName::StopPlay);
         setRefereeCommand(RefereeCommand::STOP, RefereeCommand::STOP);
     }
     TbotsProto::FieldType field_type = TbotsProto::FieldType::DIV_B;
