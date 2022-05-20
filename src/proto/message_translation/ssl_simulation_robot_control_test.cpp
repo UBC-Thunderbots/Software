@@ -10,32 +10,6 @@ class SSLSimulationProtoTest : public ::testing::Test
     WheelConstants wheel_constants = create2015WheelConstants();
 };
 
-TEST_F(SSLSimulationProtoTest, test_create_robot_move_command_stationary)
-{
-    auto move_command =
-        createRobotMoveCommand(0, 0, 0, 0, 55, 45, wheel_constants.wheel_radius_meters);
-    ASSERT_TRUE(move_command);
-
-    // Expect that the local velocity has some positive value, and that there is minimum
-    // left or angular velocity
-    EXPECT_NEAR(move_command->local_velocity().forward(), 0.0, 1e-5);
-    EXPECT_NEAR(move_command->local_velocity().left(), 0.0, 1e-5);
-    EXPECT_NEAR(move_command->local_velocity().angular(), 0.0, 1e-5);
-}
-
-TEST_F(SSLSimulationProtoTest, test_create_robot_move_command_forward)
-{
-    auto move_command = createRobotMoveCommand(60, -60, -60, 60, 55, 45,
-                                               wheel_constants.wheel_radius_meters);
-    ASSERT_TRUE(move_command);
-
-    // Expect that the local velocity has some positive value, and that there is minimum
-    // left or angular velocity
-    EXPECT_GT(move_command->local_velocity().forward(), 0.1);
-    EXPECT_NEAR(move_command->local_velocity().left(), 0.0, 1e-5);
-    EXPECT_NEAR(move_command->local_velocity().angular(), 0.0, 1e-5);
-}
-
 TEST_F(SSLSimulationProtoTest, test_create_robot_move_command_forward_from_primitive)
 {
     TbotsProto::DirectControlPrimitive test;
@@ -53,57 +27,4 @@ TEST_F(SSLSimulationProtoTest, test_create_robot_move_command_forward_from_primi
     EXPECT_EQ(move_command->local_velocity().left(), 5);
     EXPECT_EQ(move_command->local_velocity().forward(), 10);
     EXPECT_EQ(move_command->local_velocity().angular(), 2);
-}
-
-TEST_F(SSLSimulationProtoTest, test_create_robot_move_command_backward)
-{
-    auto move_command = createRobotMoveCommand(-60, 60, 60, -60, 55, 45,
-                                               wheel_constants.wheel_radius_meters);
-    ASSERT_TRUE(move_command);
-
-    // Expect that the local velocity has some positive value, and that there is minimum
-    // left or angular velocity
-    EXPECT_LT(move_command->local_velocity().forward(), -0.1);
-    EXPECT_NEAR(move_command->local_velocity().left(), 0.0, 1e-5);
-    EXPECT_NEAR(move_command->local_velocity().angular(), 0.0, 1e-5);
-}
-
-TEST_F(SSLSimulationProtoTest, test_create_robot_command)
-{
-    auto move_command  = createRobotMoveCommand(60, -60, -60, 60, 55, 45,
-                                               wheel_constants.wheel_radius_meters);
-    auto robot_command = createRobotCommand(1, std::move(move_command), 2.0, 3.0, 4.0);
-
-    ASSERT_TRUE(robot_command);
-    ASSERT_TRUE(robot_command->has_move_command());
-
-    EXPECT_EQ(1, robot_command->id());
-    EXPECT_FLOAT_EQ(2.0, robot_command->kick_speed());
-    EXPECT_FLOAT_EQ(3.0, robot_command->kick_angle());
-    EXPECT_FLOAT_EQ(4.0, robot_command->dribbler_speed());
-
-    EXPECT_GT(robot_command->move_command().local_velocity().forward(), 0.1);
-    EXPECT_NEAR(robot_command->move_command().local_velocity().left(), 0.0, 1e-5);
-    EXPECT_NEAR(robot_command->move_command().local_velocity().angular(), 0.0, 1e-5);
-}
-
-TEST_F(SSLSimulationProtoTest, test_create_robot_command_unset_optional_fields)
-{
-    auto move_command  = createRobotMoveCommand(60, -60, -60, 60, 55, 45,
-                                               wheel_constants.wheel_radius_meters);
-    auto robot_command = createRobotCommand(1, std::move(move_command), std::nullopt,
-                                            std::nullopt, std::nullopt);
-
-    ASSERT_TRUE(robot_command);
-    ASSERT_TRUE(robot_command->has_move_command());
-
-    EXPECT_EQ(1, robot_command->id());
-    EXPECT_FALSE(robot_command->has_kick_speed());
-    EXPECT_FALSE(robot_command->has_kick_angle());
-    EXPECT_FALSE(robot_command->has_dribbler_speed());
-
-    EXPECT_GT(robot_command->move_command().local_velocity().forward(), 0.1);
-    EXPECT_NEAR(robot_command->move_command().local_velocity().left(), 0.0, 1e-5);
-    EXPECT_NEAR(robot_command->move_command().local_velocity().angular(), 0.0, 1e-5);
-    ;
 }
