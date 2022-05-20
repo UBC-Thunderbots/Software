@@ -1,7 +1,6 @@
 #include "software/jetson_nano/services/motor.h"
 
 #include <errno.h>
-#include <bitset>
 #include <fcntl.h>
 #include <getopt.h>
 #include <limits.h>
@@ -12,6 +11,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/ioctl.h>
+
+#include <bitset>
 
 #include "proto/tbots_software_msgs.pb.h"
 #include "shared/constants.h"
@@ -174,7 +175,8 @@ void MotorService::checkDriverFault(uint8_t motor)
 
     if (gstat_bitset.any())
     {
-        LOG(WARNING) << "======= Faults For Motor " << std::to_string(motor) << "=========";
+        LOG(WARNING) << "======= Faults For Motor " << std::to_string(motor)
+                     << "=========";
     }
 
     if (gstat_bitset[0])
@@ -202,26 +204,26 @@ void MotorService::checkDriverFault(uint8_t motor)
     if (gstat_bitset[3])
     {
         LOG(WARNING) << "uv_cp: Indicates an undervoltage on the charge pump."
-                   << "The driver is disabled during undervoltage."
-                   << "This flag is latched for information.";
+                     << "The driver is disabled during undervoltage."
+                     << "This flag is latched for information.";
     }
 
     if (gstat_bitset[4])
     {
         LOG(WARNING) << "shortdet_u: Short to GND detected on phase U."
-                   << "The driver becomes disabled until flag becomes cleared.";
+                     << "The driver becomes disabled until flag becomes cleared.";
     }
 
     if (gstat_bitset[5])
     {
         LOG(WARNING) << "s2gu: Short to GND detected on phase U."
-                   << "The driver becomes disabled until flag becomes cleared.";
+                     << "The driver becomes disabled until flag becomes cleared.";
     }
 
     if (gstat_bitset[6])
     {
         LOG(WARNING) << "s2vsu: Short to VS detected on phase U."
-                   << "The driver becomes disabled until flag becomes cleared.";
+                     << "The driver becomes disabled until flag becomes cleared.";
     }
 
     if (gstat_bitset[8])
@@ -232,13 +234,13 @@ void MotorService::checkDriverFault(uint8_t motor)
     if (gstat_bitset[9])
     {
         LOG(WARNING) << "s2gv: Short to GND detected on phase V."
-                   << "The driver becomes disabled until flag becomes cleared.";
+                     << "The driver becomes disabled until flag becomes cleared.";
     }
 
     if (gstat_bitset[10])
     {
         LOG(WARNING) << "s2vsv: Short to VS detected on phase V."
-                   << "The driver becomes disabled until flag becomes cleared.";
+                     << "The driver becomes disabled until flag becomes cleared.";
     }
 
     if (gstat_bitset[12])
@@ -249,13 +251,13 @@ void MotorService::checkDriverFault(uint8_t motor)
     if (gstat_bitset[13])
     {
         LOG(WARNING) << "s2gw: Short to GND detected on phase W."
-                   << "The driver becomes disabled until flag becomes cleared.";
+                     << "The driver becomes disabled until flag becomes cleared.";
     }
 
     if (gstat_bitset[14])
     {
         LOG(WARNING) << "s2vsw: Short to VS detected on phase W."
-                   << "The driver becomes disabled until flag becomes cleared.";
+                     << "The driver becomes disabled until flag becomes cleared.";
     }
 
     if (!gstat_bitset.any())
