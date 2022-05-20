@@ -4,10 +4,6 @@ cc_library(
     name = "simulator_robot",
     srcs = ["simulator_robot.cpp"],
     hdrs = ["simulator_robot.h"],
-    deps = [
-        ":firmware_object_deleter",
-        "//firmware/app/world:firmware_world",
-    ],
 )
 
 cc_library(
@@ -23,10 +19,7 @@ cc_library(
     srcs = ["physics_simulator_robot.cpp"],
     hdrs = ["physics_simulator_robot.h"],
     deps = [
-        ":firmware_object_deleter",
         ":force_wheel_simulator_robot",
-        "//firmware/app/primitives:primitive_manager",
-        "//firmware/app/world:firmware_world",
         "//software/geom/algorithms",
         "//software/logger",
         "//software/math:math_functions",
@@ -88,13 +81,7 @@ cc_library(
     srcs = ["simulator_robot_singleton.cpp"],
     hdrs = ["simulator_robot_singleton.h"],
     deps = [
-        ":firmware_object_deleter",
         ":simulator_robot",
-        "//firmware/app/logger",
-        "//firmware/app/world:chicker",
-        "//firmware/app/world:dribbler",
-        "//firmware/app/world:firmware_robot",
-        "//firmware/shared:physics",
         "//proto:tbots_cc_proto",
         "//software/logger",
         "//software/world:field",
@@ -108,7 +95,6 @@ cc_library(
     deps = [
         ":force_wheel_simulator_robot",
         ":simulator_robot_singleton",
-        "//firmware/app/world:force_wheel",
     ],
 )
 
@@ -121,8 +107,6 @@ cc_test(
         ":physics_simulator_robot",
         ":simulator_ball",
         ":simulator_robot",
-        "//firmware/app/logger",
-        "//firmware/app/world:firmware_robot",
         "//proto:tbots_cc_proto",
         "//proto:tbots_nanopb_proto",
         "//shared/test_util",
@@ -140,9 +124,7 @@ cc_library(
     srcs = ["simulator_ball_singleton.cpp"],
     hdrs = ["simulator_ball_singleton.h"],
     deps = [
-        ":firmware_object_deleter",
         ":simulator_ball",
-        "//firmware/app/world:firmware_ball",
         "//software/logger",
         "//software/world:field",
         "@box2d",
@@ -156,7 +138,6 @@ cc_test(
         ":physics_simulator_ball",
         ":simulator_ball",
         ":simulator_ball_singleton",
-        "//firmware/app/world:firmware_ball",
         "//shared/test_util:tbots_gtest_main",
         "//software/geom:point",
         "//software/geom:vector",
@@ -171,13 +152,10 @@ cc_library(
     srcs = ["simulator.cpp"],
     hdrs = ["simulator.h"],
     deps = [
-        ":firmware_object_deleter",
         ":force_wheel_simulator_robot_singleton",
         ":physics_simulator_ball",
         ":physics_simulator_robot",
         ":simulator_ball_singleton",
-        "//firmware/app/primitives:primitive_manager",
-        "//firmware/app/world:firmware_world",
         "//proto:defending_side_msg_cc_proto",
         "//proto/message_translation:primitive_google_to_nanopb_converter",
         "//proto/message_translation:ssl_detection",
@@ -200,13 +178,10 @@ cc_library(
         "//extlibs/er_force_sim/config/simulator:2020B.txt",
     ],
     deps = [
-        ":firmware_object_deleter",
         ":physics_simulator_ball",
         ":physics_simulator_robot",
         ":simulator_ball_singleton",
         "//extlibs/er_force_sim/src/amun/simulator:simulator_qt",
-        "//firmware/app/primitives:primitive_manager",
-        "//firmware/app/world:firmware_world",
         "//proto:defending_side_msg_cc_proto",
         "//proto/message_translation:primitive_google_to_nanopb_converter",
         "//proto/message_translation:ssl_detection",
@@ -286,20 +261,5 @@ cc_library(
         "//software/networking:threaded_proto_udp_listener",
         "//software/networking:threaded_proto_udp_sender",
         "//software/world:field",
-    ],
-)
-
-cc_library(
-    name = "firmware_object_deleter",
-    hdrs = ["firmware_object_deleter.h"],
-    deps = [
-        "//firmware/app/primitives:primitive_manager",
-        "//firmware/app/world:chicker",
-        "//firmware/app/world:dribbler",
-        "//firmware/app/world:firmware_robot",
-        "//firmware/app/world:firmware_world",
-        "//firmware/app/world:force_wheel",
-        "//firmware/shared:physics",
-        "//software/logger",
     ],
 )

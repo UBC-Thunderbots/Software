@@ -36,7 +36,6 @@ static const uint32_t FRONT_RIGHT_MOTOR_CHIP_SELECT = 3;
 static const uint32_t BACK_LEFT_MOTOR_CHIP_SELECT   = 2;
 static const uint32_t BACK_RIGHT_MOTOR_CHIP_SELECT  = 1;
 static const uint32_t DRIBBLER_MOTOR_CHIP_SELECT    = 4;
-static const uint32_t TOTAL_NUMBER_OF_MOTORS        = 5;
 
 // SPI Trinamic Motor Driver Paths (indexed with chip select above)
 static const char* SPI_PATHS[] = {"/dev/spidev0.0", "/dev/spidev0.1", "/dev/spidev0.2",
@@ -130,8 +129,9 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
     startController(FRONT_RIGHT_MOTOR_CHIP_SELECT);
     startController(BACK_LEFT_MOTOR_CHIP_SELECT);
 
+    // Clear faults
     driver_control_enable_gpio.setValue(GpioState::LOW);
-    sleep(1);
+    usleep(1000);
     driver_control_enable_gpio.setValue(GpioState::HIGH);
 
     // Check faults
@@ -249,25 +249,17 @@ bool MotorService::checkDriverFault(uint8_t motor)
 std::unique_ptr<TbotsProto::DriveUnitStatus> MotorService::poll(
     const TbotsProto::DirectControlPrimitive& direct_control)
 {
-    static int heartbeat_state = 0;
-
-    if (heartbeat_state == 0)
-    {
-        heartbeat_gpio.setValue(GpioState::LOW);
-        heartbeat_state = 1;
-    }
-    else if (heartbeat_state == 1)
-    {
-        heartbeat_gpio.setValue(GpioState::HIGH);
-        heartbeat_state = 0;
-    }
-
-    return std::make_unique<TbotsProto::DriveUnitStatus>();
     CHECK(encoder_calibrated_[FRONT_LEFT_MOTOR_CHIP_SELECT] &&
           encoder_calibrated_[FRONT_RIGHT_MOTOR_CHIP_SELECT] &&
           encoder_calibrated_[BACK_LEFT_MOTOR_CHIP_SELECT] &&
           encoder_calibrated_[BACK_RIGHT_MOTOR_CHIP_SELECT])
-        << "Running without encoder calibration can cause serious harm";
+        << "Running without encoder calibration can cause serious harm, exiting";
+
+    WheelSpace_t current_wheel_speeds = {
+        static_cast<double>(tmc4671_getActualVelocity(FRONT_RIGHT_MOTOR_CHIP_SELECT)),
+        static_cast<double>(tmc4671_getActualVelocity(FRONT_LEFT_MOTOR_CHIP_SELECT)),
+        static_cast<double>(tmc4671_getActualVelocity(BACK_LEFT_MOTOR_CHIP_SELECT)),
+        static_cast<double>(tmc4671_getActualVelocity(BACK_RIGHT_MOTOR_CHIP_SELECT))};
 
     switch (direct_control.wheel_control_case())
     {
@@ -305,16 +297,6 @@ std::unique_ptr<TbotsProto::DriveUnitStatus> MotorService::poll(
                     .radians_per_second(),
             };
 
-            WheelSpace_t current_wheel_speeds = {
-                static_cast<double>(
-                    tmc4671_getActualVelocity(FRONT_RIGHT_MOTOR_CHIP_SELECT)),
-                static_cast<double>(
-                    tmc4671_getActualVelocity(FRONT_LEFT_MOTOR_CHIP_SELECT)),
-                static_cast<double>(
-                    tmc4671_getActualVelocity(BACK_LEFT_MOTOR_CHIP_SELECT)),
-                static_cast<double>(
-                    tmc4671_getActualVelocity(BACK_RIGHT_MOTOR_CHIP_SELECT))};
-
             // This is a linear transformation, we don't need to convert to/from
             // RPM to MPS
             WheelSpace_t target_speeds = euclidean_to_four_wheel.getTargetWheelSpeeds(
@@ -336,6 +318,18 @@ std::unique_ptr<TbotsProto::DriveUnitStatus> MotorService::poll(
             LOG(WARNING) << "Motor service polled with an empty DirectControlPrimitive ";
             break;
         }
+    }
+
+    // Toggle Hearbeat
+    if (heartbeat_state == 0)
+    {
+        heartbeat_gpio.setValue(GpioState::LOW);
+        heartbeat_state = 1;
+    }
+    else if (heartbeat_state == 1)
+    {
+        heartbeat_gpio.setValue(GpioState::HIGH);
+        heartbeat_state = 0;
     }
 
     return std::make_unique<TbotsProto::DriveUnitStatus>();
@@ -523,6 +517,14 @@ void MotorService::configureADC(uint8_t motor)
     // ADC configuration
     writeToControllerOrDieTrying(motor, TMC4671_ADC_I_SELECT, 0x18000100);
     writeToControllerOrDieTrying(motor, TMC4671_dsADC_MDEC_B_MDEC_A, 0x014E014E);
+
+    // These values have been calibrated for the TI INA240 current sense amplifier.
+    // If you wish to use the TMC4671+TMC6100-BOB you can use the following values,
+    // that work for the AD8418 current sense amplifier
+    //
+    // TMC4671_ADC_I0_SCALE_OFFSET = 0x010081DD
+    // TMC4671_ADC_I1_SCALE_OFFSET = 0x0100818E
+    //
     writeToControllerOrDieTrying(motor, TMC4671_ADC_I0_SCALE_OFFSET, 0x002081DD);
     writeToControllerOrDieTrying(motor, TMC4671_ADC_I1_SCALE_OFFSET, 0x0020818E);
 }
@@ -595,26 +597,26 @@ void MotorService::runOpenLoopCalibrationRoutine(uint8_t motor, size_t num_sampl
         LOG(CSV, "encoder_calibration" + std::to_string(motor) + ".csv")
             << actual_encoder << "," << estimated_phi << "\n";
 
-        int16_t adc_iv =
+        int16_t adc_v =
             tmc4671_readRegister16BitValue(motor, TMC4671_ADC_IV, BIT_0_TO_15);
-        int16_t adc_ux =
+        int16_t adc_u =
             tmc4671_readRegister16BitValue(motor, TMC4671_ADC_IWY_IUX, BIT_0_TO_15);
-        int16_t adc_wy =
+        int16_t adc_w =
             tmc4671_readRegister16BitValue(motor, TMC4671_ADC_IWY_IUX, BIT_16_TO_31);
 
         tmc4671_writeInt(motor, TMC4671_INTERIM_ADDR, INTERIM_ADDR_PWM_UV);
-        int16_t pwm_iv =
+        int16_t pwm_v =
             tmc4671_readRegister16BitValue(motor, TMC4671_INTERIM_DATA, BIT_0_TO_15);
 
         tmc4671_writeInt(motor, TMC4671_INTERIM_ADDR, INTERIM_ADDR_PWM_WY_UX);
-        int16_t pwm_ux =
+        int16_t pwm_u =
             tmc4671_readRegister16BitValue(motor, TMC4671_INTERIM_DATA, BIT_0_TO_15);
-        int16_t pwm_wy =
+        int16_t pwm_w =
             tmc4671_readRegister16BitValue(motor, TMC4671_INTERIM_DATA, BIT_16_TO_31);
 
         LOG(CSV, "phase_currents_and_voltages_" + std::to_string(motor) + ".csv")
-            << adc_iv << "," << adc_ux << "," << adc_wy << "," << pwm_iv << "," << pwm_ux
-            << "," << pwm_wy << "\n";
+            << adc_v << "," << adc_u << "," << adc_w << "," << pwm_v << "," << pwm_u
+            << "," << pwm_w << "\n";
     }
 
     // Stop open loop rotation

@@ -189,4 +189,6 @@ class MotorService
     // Drive Motors
     EuclideanToWheel euclidean_to_four_wheel;
     std::unordered_map<int, bool> encoder_calibrated_;
+
+    int heartbeat_state = 0;
 };
