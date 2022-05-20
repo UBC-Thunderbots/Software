@@ -50,3 +50,9 @@ message Circle
     required Point origin  = 1;
     required double radius = 2;
 }
+
+message Segment
+{
+    required Point start = 1;
+    required Point end = 2;
+}
