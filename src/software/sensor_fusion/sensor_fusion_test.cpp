@@ -34,8 +34,6 @@ class SensorFusionTest : public ::testing::Test
           referee_goalie_id(initRefereeGoalieId())
     {
         config.set_friendly_color_yellow(true);
-        config.set_override_game_controller_defending_side(true);
-        config.set_defending_positive_side(false);
     }
 
     TbotsProto::SensorFusionConfig config;

@@ -33,24 +33,22 @@ void AI::updateAiConfig(TbotsProto::AiConfig ai_config)
 
 void AI::checkAiConfig()
 {
-    if (ai_config_.ai_control_config().override_ai_play() !=
-        TbotsProto::PlayName::UseAiSelection)
-    {
-        auto current_override = ai_config_.ai_control_config().override_ai_play();
+    auto current_override = ai_config_.ai_control_config().override_ai_play();
 
-        if (current_override && (current_override != prev_override))
+    if (current_override && (current_override != prev_override))
+    {
+        if (current_override != TbotsProto::PlayName::UseAiSelection)
         {
             TbotsProto::Play play_proto;
             play_proto.set_name(current_override);
             overridePlayFromProto(play_proto);
         }
-
-        prev_override = current_override;
+        else
+        {
+            overridePlay(nullptr);
+        }
     }
-    else
-    {
-        override_play.reset();
-    }
+    prev_override = current_override;
 }
 
 std::unique_ptr<TbotsProto::PrimitiveSet> AI::getPrimitives(const World& world)

@@ -44,15 +44,11 @@ void SimulatedErForceSimTestFixture::SetUp()
     // and controls the yellow robots
     friendly_thunderbots_config.mutable_sensor_fusion_config()->set_friendly_color_yellow(
         true);
-    friendly_thunderbots_config.mutable_sensor_fusion_config()
-        ->set_defending_positive_side(false);
 
     // The enemy team defends the positive side of the field
     // and controls the blue robots
     enemy_thunderbots_config.mutable_sensor_fusion_config()->set_friendly_color_yellow(
         false);
-    enemy_thunderbots_config.mutable_sensor_fusion_config()->set_defending_positive_side(
-        true);
 
     // reinitializing to prevent the previous test's configs from being reused
     friendly_sensor_fusion =
@@ -87,9 +83,6 @@ void SimulatedErForceSimTestFixture::setCommonConfigs(
     mutable_thunderbots_config.mutable_ai_config()
         ->mutable_ai_control_config()
         ->set_run_ai(!TbotsGtestMain::stop_ai_on_start);
-
-    mutable_thunderbots_config.mutable_sensor_fusion_config()
-        ->set_override_game_controller_defending_side(true);
 }
 
 bool SimulatedErForceSimTestFixture::validateAndCheckCompletion(
@@ -201,8 +194,7 @@ void SimulatedErForceSimTestFixture::runTest(
         Duration::fromSeconds(1.0 / SIMULATED_CAMERA_FPS);
 
     std::shared_ptr<ErForceSimulator> simulator(std::make_shared<ErForceSimulator>(
-        field_type, create2015RobotConstants(), create2015WheelConstants(),
-        friendly_thunderbots_config.simulator_config()));
+        field_type, create2015RobotConstants(), create2015WheelConstants()));
 
     // TODO (#2419): remove this to re-enable sigfpe checks
     fedisableexcept(FE_INVALID | FE_OVERFLOW);
