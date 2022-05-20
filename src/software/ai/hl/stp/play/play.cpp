@@ -283,7 +283,7 @@ Play::assignTactics(const GlobalPathPlannerFactory &path_planner_factory,
     for (auto tactic : tactic_vector)
     {
         auto motion_constraints =
-            buildMotionConstraintSet(world.gameState(), *goalie_tactic);
+            buildMotionConstraintSet(world.gameState(), *tactic);
         primitive_sets.emplace_back(getPrimitivesFromTactic(path_planner_factory, world,
                                                             tactic, motion_constraints));
         CHECK(primitive_sets.back()->robot_primitives().size() ==
