@@ -1,6 +1,8 @@
 #pragma once
 #include <math.h>
 
+#include <unordered_map>
+
 // This file contains all constants that are shared between our software (AI)
 // and firmware code. Since this needs to be compiled by both C and C++, everything
 // should be defined in a way that's compatible with C.

@@ -62,12 +62,24 @@ PYBIND11_MODULE(python_constants, m)
     m.attr("DYNAMIC_PARAMETER_UPDATE_RESPONSE_PATH") =
         DYNAMIC_PARAMETER_UPDATE_RESPONSE_PATH;
 
-    // TODO (#2585): Change the channels to a map when we remove all legacy c code
-    // Then we can have a pybind here in a 1-liner from unordered_map to py::dict
-    m.attr("ROBOT_MULTICAST_CHANNEL_0") = ROBOT_MULTICAST_CHANNELS[0];
-    m.attr("ROBOT_MULTICAST_CHANNEL_1") = ROBOT_MULTICAST_CHANNELS[1];
-    m.attr("ROBOT_MULTICAST_CHANNEL_2") = ROBOT_MULTICAST_CHANNELS[2];
-    m.attr("ROBOT_MULTICAST_CHANNEL_3") = ROBOT_MULTICAST_CHANNELS[3];
+    // Multicast Channels
+    m.def("getRobotMulticastChanenl", [](py::args& args) {
+        if (args.size() != 1)
+        {
+            throw std::runtime_error("must provide channel number only");
+        }
+
+        return ROBOT_MULTICAST_CHANNELS.at(args[0].cast<int>());
+    });
+
+    m.def("getSimulatorMulticastChannel", [](py::args& args) {
+        if (args.size() != 1)
+        {
+            throw std::runtime_error("must provide channel number only");
+        }
+
+        return SIMULATOR_MULTICAST_CHANNELS.at(args[0].cast<int>());
+    });
 
     // Ports
     m.attr("VISION_PORT")       = VISION_PORT;
