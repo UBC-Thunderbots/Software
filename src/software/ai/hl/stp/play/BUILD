@@ -1,5 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
+load("@simulated_tests_deps//:requirements.bzl", "requirement")
+
 # We force linking for all plays so that the static variables required for the
 # "factory" design pattern to work are linked in
 # https://www.bfilipek.com/2018/02/static-vars-static-lib.html
@@ -208,7 +210,6 @@ cc_library(
         "//shared/parameter:cpp_configs",
         "//software/ai/hl/stp/tactic/goalie:goalie_tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",
-        "//software/ai/hl/stp/tactic/move_goalie_to_goal_line:move_goalie_to_goal_line_tactic",
         "//software/logger",
         "//software/util/generic_factory",
     ],
@@ -284,9 +285,14 @@ cc_library(
     deps = [
         "//shared/parameter:cpp_configs",
         "//software/ai/hl/stp/tactic",
+        "//software/ai/hl/stp/tactic/goalie:goalie_tactic",
+        "//software/ai/hl/stp/tactic/stop:stop_tactic",
+        "//software/ai/motion_constraint:motion_constraint_set_builder",
+        "//software/ai/navigator/path_planner:global_path_planner_factory",
         "//software/ai/passing:pass_with_rating",
         "//software/util/sml_fsm",
         "@boost//:coroutine2",
+        "@munkres_cpp",
     ],
 )
 
@@ -517,8 +523,20 @@ cc_test(
     ],
 )
 
-cc_test(
+py_test(
     name = "ball_placement_play_test",
+    srcs = [
+        "ball_placement_play_test.py",
+    ],
+    deps = [
+        "//software/simulated_tests:simulated_test_fixture",
+        "//software/simulated_tests:validation",
+        requirement("pytest"),
+    ],
+)
+
+cc_test(
+    name = "ball_placement_play_test_old",
     srcs = ["ball_placement_play_test.cpp"],
     deps = [
         "//shared/test_util:tbots_gtest_main",

@@ -24,6 +24,7 @@ proto_library(
         "world.proto",
     ],
     deps = [
+        "@com_google_protobuf//:descriptor_proto",
         "@nanopb//:nanopb_options_proto",
     ],
 )

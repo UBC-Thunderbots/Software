@@ -6,17 +6,15 @@ import pyqtgraph as pg
 from proto.visualization_pb2 import NamedValue
 from pyqtgraph.Qt import QtGui
 
-from software.networking.threaded_unix_listener import ThreadedUnixListener
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 DEQUE_SIZE = 1000
-MIN_Y_RANGE = 0
-MAX_Y_RANGE = 100
+INITIAL_Y_MIN = 0
+INITIAL_Y_MAX = 100
 TIME_WINDOW_TO_DISPLAY_S = 20
 
 
 class NamedValuePlotter(object):
-
     """ Plot named values in real time with a scrolling plot """
 
     def __init__(self, buffer_size=1000):
@@ -26,6 +24,8 @@ class NamedValuePlotter(object):
 
         """
         self.win = pg.plot()
+        self.win.disableAutoRange()
+        self.win.setYRange(INITIAL_Y_MIN, INITIAL_Y_MAX)
         self.plots = {}
         self.data_x = {}
         self.data_y = {}
@@ -37,7 +37,6 @@ class NamedValuePlotter(object):
     def refresh(self):
         """Refreshes NamedValuePlotter and updates data in the respective
         plots.
-
         """
 
         # Dump the entire buffer into a deque. This operation is fast because
@@ -68,10 +67,9 @@ class NamedValuePlotter(object):
             self.data_x[named_value.name].append(time.time() - self.time)
             self.data_y[named_value.name].append(named_value.value)
 
+        for named_value, plot in self.plots.items():
             # Update the data
-            self.plots[named_value.name].setData(
-                self.data_x[named_value.name], self.data_y[named_value.name]
-            )
+            plot.setData(self.data_x[named_value], self.data_y[named_value])
 
         self.win.setRange(
             xRange=[

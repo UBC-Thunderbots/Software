@@ -110,11 +110,11 @@ TEST_F(DefensePlayTest, test_defense_play_one_immediate_threat)
             // Two friendly crease defenders should be close to the goalie
             Point goalie_position = world_ptr->friendlyTeam().goalie()->position();
             Rectangle left_crease_defender_rect(
-                Point(goalie_position.x(), goalie_position.y() + 0.3),
-                Point(goalie_position.x() + 0.3, goalie_position.y()));
+                Point(goalie_position.x(), goalie_position.y() + 0.5),
+                Point(goalie_position.x() + 0.5, goalie_position.y()));
             Rectangle right_crease_defender_rect(
                 Point(goalie_position.x(), goalie_position.y()),
-                Point(goalie_position.x() + 0.3, goalie_position.y() - 0.3));
+                Point(goalie_position.x() + 0.5, goalie_position.y() - 0.5));
             robotInPolygon(left_crease_defender_rect, 1, world_ptr, yield);
             robotInPolygon(right_crease_defender_rect, 1, world_ptr, yield);
         }};
@@ -167,7 +167,6 @@ TEST_F(DefensePlayTest, test_defense_play_close_to_net)
             Rectangle left_crease_defender_and_shadow_rec(
                 Point(goalie_position.x() + 1, goalie_position.y() + 0.8),
                 Point(goalie_position.x() + 1.75, goalie_position.y() + 0.4));
-            robotInPolygon(left_crease_defender_and_shadow_rec, 3, world_ptr, yield);
 
             // Two friendly robots in position to shadow enemy robots. One is on the enemy
             // with the ball and the other is on the next highest threat

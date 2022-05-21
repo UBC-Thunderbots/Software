@@ -21,7 +21,8 @@ class KickoffFriendlyPlayTest : public SimulatedErForceSimPlayTestFixture
     Field field                      = Field::createField(field_type);
 };
 
-TEST_F(KickoffFriendlyPlayTest, test_kickoff_friendly_play)
+// TODO (#2608): re-enable when fixed
+TEST_F(KickoffFriendlyPlayTest, DISABLED_test_kickoff_friendly_play)
 {
     BallState ball_state(Point(0, 0), Vector(0, 0));
     auto friendly_robots = TestUtil::createStationaryRobotStatesWithId(

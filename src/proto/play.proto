@@ -2,24 +2,28 @@ syntax = "proto2";
 
 package TbotsProto;
 
-enum Play
+message Play
 {
-    ShootOrChipPlay        = 1;
-    KickoffFriendlyPlay    = 2;
-    OffensePlay            = 3;
-    CornerKickPlay         = 4;
-    ShootOrPassPlay        = 5;
-    BallPlacementPlay      = 6;
-    HaltPlay               = 7;
-    EnemyFreeKickPlay      = 8;
-    ExamplePlay            = 9;
-    DefensePlay            = 10;
-    EnemyBallPlacementPlay = 11;
-    PenaltyKickEnemyPlay   = 12;
-    PenaltyKickPlay        = 13;
-    FreeKickPlay           = 14;
-    CreaseDefensePlay      = 15;
-    StopPlay               = 16;
-    KickoffEnemyPlay       = 17;
-    AssignedTacticsPlay    = 18;
+    enum PlayName
+    {
+        ShootOrChipPlay        = 1;
+        KickoffFriendlyPlay    = 2;
+        OffensePlay            = 3;
+        CornerKickPlay         = 4;
+        ShootOrPassPlay        = 5;
+        BallPlacementPlay      = 6;
+        HaltPlay               = 7;
+        EnemyFreeKickPlay      = 8;
+        ExamplePlay            = 9;
+        DefensePlay            = 10;
+        EnemyBallPlacementPlay = 11;
+        PenaltyKickEnemyPlay   = 12;
+        PenaltyKickPlay        = 13;
+        FreeKickPlay           = 14;
+        CreaseDefensePlay      = 15;
+        StopPlay               = 16;
+        KickoffEnemyPlay       = 17;
+        AssignedTacticsPlay    = 18;
+    }
+    required PlayName name = 1;
 }

@@ -172,29 +172,6 @@ cc_test(
 )
 
 cc_library(
-    name = "primitive_google_to_nanopb_converter",
-    srcs = ["primitive_google_to_nanopb_converter.cpp"],
-    hdrs = ["primitive_google_to_nanopb_converter.h"],
-    visibility = ["//visibility:public"],
-    deps = [
-        "//proto:tbots_cc_proto",
-        "//proto:tbots_nanopb_proto",
-        "//proto/primitive:primitive_msg_factory",
-        "//shared:constants",
-        "@nanopb",
-    ],
-)
-
-cc_test(
-    name = "primitive_google_to_nanopb_converter_test",
-    srcs = ["primitive_google_to_nanopb_converter_test.cpp"],
-    deps = [
-        ":primitive_google_to_nanopb_converter",
-        "//shared/test_util:tbots_gtest_main",
-    ],
-)
-
-cc_library(
     name = "defending_side",
     srcs = ["defending_side.cpp"],
     hdrs = ["defending_side.h"],

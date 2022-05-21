@@ -36,6 +36,19 @@ class SimulatedErForceSimPlayTestFixture : public SimulatedErForceSimTestFixture
     void setAIPlay(const std::string& ai_play);
 
     /**
+     * Sets the tactic to the given tactic
+     *
+     * @param id the robot id of the robot to run the tactic on
+     * @param tactic The friendly tactic
+     * @param motion_constraints optionally override motion constraints
+     *
+     * @throw invalid_argument if any tactic is invalid
+     */
+    void setTactic(RobotId id, std::shared_ptr<Tactic> tactic);
+    void setTactic(RobotId id, std::shared_ptr<Tactic> tactic,
+                   std::set<TbotsProto::MotionConstraint> motion_constraints);
+
+    /**
      * Sets the AI play to be used to run in the simulated test
      *
      * @param play_ The play

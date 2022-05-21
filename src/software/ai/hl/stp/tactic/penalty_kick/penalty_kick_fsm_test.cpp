@@ -19,7 +19,9 @@ TEST(PenaltyKickFSM, DISABLED_test_transitions)
     PenaltyKickFSM::ControlParams control_params{};
 
     fsm.process_event(PenaltyKickFSM::Update(
-        control_params, TacticUpdate(robot, world, [](std::unique_ptr<Intent>) {})));
+        control_params, TacticUpdate(
+                            robot, world, [](std::unique_ptr<TbotsProto::Primitive>) {},
+                            TEST_UTIL_CREATE_MOTION_CONTROL_NO_DEST)));
     EXPECT_TRUE(fsm.is(boost::sml::state<DribbleFSM>));
 
     double shot_x_position =
@@ -29,14 +31,18 @@ TEST(PenaltyKickFSM, DISABLED_test_transitions)
     robot          = ::TestUtil::createRobotAtPos(position);
     world = ::TestUtil::setBallPosition(world, position, Timestamp::fromSeconds(1));
     fsm.process_event(PenaltyKickFSM::Update(
-        control_params, TacticUpdate(robot, world, [](std::unique_ptr<Intent>) {})));
+        control_params, TacticUpdate(
+                            robot, world, [](std::unique_ptr<TbotsProto::Primitive>) {},
+                            TEST_UTIL_CREATE_MOTION_CONTROL_NO_DEST)));
     EXPECT_TRUE(fsm.is(boost::sml::state<DribbleFSM>));
 
     position = Point(shot_x_position + 0.3, 0);
     robot    = ::TestUtil::createRobotAtPos(position);
     world    = ::TestUtil::setBallPosition(world, position, Timestamp::fromSeconds(2));
     fsm.process_event(PenaltyKickFSM::Update(
-        control_params, TacticUpdate(robot, world, [](std::unique_ptr<Intent>) {})));
+        control_params, TacticUpdate(
+                            robot, world, [](std::unique_ptr<TbotsProto::Primitive>) {},
+                            TEST_UTIL_CREATE_MOTION_CONTROL_NO_DEST)));
     EXPECT_TRUE(fsm.is(boost::sml::state<KickFSM>));
     EXPECT_TRUE(fsm.is<decltype(boost::sml::state<KickFSM>)>(
         boost::sml::state<GetBehindBallFSM>));
@@ -44,7 +50,9 @@ TEST(PenaltyKickFSM, DISABLED_test_transitions)
     world = ::TestUtil::setBallPosition(world, position + Vector(0.1, 0),
                                         Timestamp::fromSeconds(2));
     fsm.process_event(PenaltyKickFSM::Update(
-        control_params, TacticUpdate(robot, world, [](std::unique_ptr<Intent>) {})));
+        control_params, TacticUpdate(
+                            robot, world, [](std::unique_ptr<TbotsProto::Primitive>) {},
+                            TEST_UTIL_CREATE_MOTION_CONTROL_NO_DEST)));
     EXPECT_TRUE(fsm.is(boost::sml::state<KickFSM>));
     EXPECT_TRUE(fsm.is<decltype(boost::sml::state<KickFSM>)>(
         boost::sml::state<KickFSM::KickState>));
@@ -53,7 +61,9 @@ TEST(PenaltyKickFSM, DISABLED_test_transitions)
                                         Timestamp::fromSeconds(4));
     world = ::TestUtil::setBallVelocity(world, Vector(5, 0), Timestamp::fromSeconds(4));
     fsm.process_event(PenaltyKickFSM::Update(
-        control_params, TacticUpdate(robot, world, [](std::unique_ptr<Intent>) {})));
+        control_params, TacticUpdate(
+                            robot, world, [](std::unique_ptr<TbotsProto::Primitive>) {},
+                            TEST_UTIL_CREATE_MOTION_CONTROL_NO_DEST)));
 
     EXPECT_TRUE(fsm.is(boost::sml::X));
 }

@@ -7,7 +7,6 @@
 #include "software/ai/hl/stp/play/assigned_tactics_play.h"
 #include "software/ai/hl/stp/play/play_factory.h"
 #include "software/ai/hl/stp/tactic/tactic_factory.h"
-#include "software/gui/drawing/navigator.h"
 
 ThreadedAI::ThreadedAI(std::shared_ptr<const AiConfig> ai_config)
     // Disabling warnings on log buffer full, since buffer size is 1 and we always want AI
@@ -67,11 +66,4 @@ void ThreadedAI::runAIAndSendPrimitives(const World& world)
     }
 }
 
-void ThreadedAI::drawAI()
-{
-    if (ai.getNavigator())
-    {
-        auto draw_function = drawNavigator(ai.getNavigator());
-        Subject<AIDrawFunction>::sendValueToObservers(draw_function);
-    }
-}
+void ThreadedAI::drawAI() {}

@@ -1,7 +1,8 @@
-package(default_visibility = ["//software/ai/navigator:__subpackages__"])
+package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "obstacle",
+    srcs = ["obstacle.cpp"],
     hdrs = [
         "obstacle.hpp",
     ],
@@ -9,6 +10,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "obstacle_visitor",
+        "//proto/message_translation:tbots_protobuf",
         "//shared:constants",
         "//software/geom:point",
         "//software/geom:segment",
@@ -22,8 +24,8 @@ cc_library(
     hdrs = ["robot_navigation_obstacle_factory.h"],
     deps = [
         ":obstacle",
+        "//proto:tbots_cc_proto",
         "//shared/parameter:cpp_configs",
-        "//software/ai/motion_constraint",
         "//software/geom:point",
         "//software/logger",
         "//software/world",

@@ -2,7 +2,6 @@
 
 #include "software/ai/hl/stp/tactic/get_behind_ball/get_behind_ball_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
-#include "software/ai/intent/chip_intent.h"
 
 struct ChipFSM
 {
@@ -22,7 +21,7 @@ struct ChipFSM
     DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
     /**
-     * Action that updates the ChipIntent
+     * Action that updates the MovePrimitive
      *
      * @param event ChipFSM::Update event
      */

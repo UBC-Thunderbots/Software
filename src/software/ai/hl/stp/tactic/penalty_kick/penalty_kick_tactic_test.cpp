@@ -7,13 +7,13 @@
 #include "software/simulated_tests/non_terminating_validation_functions/ball_in_play_or_scored_validation.h"
 #include "software/simulated_tests/non_terminating_validation_functions/ball_never_moves_backward_validation.h"
 #include "software/simulated_tests/non_terminating_validation_functions/robot_not_excessively_dribbling_validation.h"
-#include "software/simulated_tests/simulated_er_force_sim_tactic_test_fixture.h"
+#include "software/simulated_tests/simulated_er_force_sim_play_test_fixture.h"
 #include "software/simulated_tests/terminating_validation_functions/friendly_scored_validation.h"
 #include "software/test_util/test_util.h"
 #include "software/world/field.h"
 
 // goalie
-class PenaltyKickTacticTest : public SimulatedErForceSimTacticTestFixture,
+class PenaltyKickTacticTest : public SimulatedErForceSimPlayTestFixture,
                               public ::testing::WithParamInterface<RobotStateWithId>
 {
    protected:
@@ -32,11 +32,9 @@ TEST_P(PenaltyKickTacticTest, DISABLED_penalty_kick_test)
 {
     RobotStateWithId enemy_robot = GetParam();
 
-    auto tactic = std::make_shared<PenaltyKickTactic>(ai_config);
-    setTactic(tactic);
-
+    auto tactic               = std::make_shared<PenaltyKickTactic>(ai_config);
     static RobotId shooter_id = 0;
-    setFriendlyRobotId(shooter_id);
+    setTactic(shooter_id, tactic);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         friendlyScored,
@@ -55,14 +53,12 @@ TEST_P(PenaltyKickTacticTest, DISABLED_penalty_kick_test)
             non_terminating_validation_functions, Duration::fromSeconds(10));
 }
 
-// TODO: fix and re-enable
+// TODO (#2519): fix and re-enable
 TEST_F(PenaltyKickTacticTest, DISABLED_penalty_no_goalie)
 {
-    auto tactic = std::make_shared<PenaltyKickTactic>(ai_config);
-    setTactic(tactic);
-
+    auto tactic               = std::make_shared<PenaltyKickTactic>(ai_config);
     static RobotId shooter_id = 0;
-    setFriendlyRobotId(shooter_id);
+    setTactic(shooter_id, tactic);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         friendlyScored,

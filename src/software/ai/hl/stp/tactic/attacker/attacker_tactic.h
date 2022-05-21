@@ -39,25 +39,14 @@ class AttackerTactic : public Tactic
      */
     void updateControlParams(std::optional<Point> chip_target);
 
-    /**
-     * Calculates the cost of assigning the given robot to this Tactic. Prefers robots
-     * closer to the block destination
-     *
-     * @param robot The robot to evaluate the cost for
-     * @param world The state of the world with which to perform the evaluation
-     * @return A cost in the range [0,1] indicating the cost of assigning the given robot
-     * to this tactic. Lower cost values indicate a more preferred robot.
-     */
-    double calculateRobotCost(const Robot& robot, const World& world) const override;
-
     void accept(TacticVisitor& visitor) const override;
 
     DEFINE_TACTIC_DONE_AND_GET_FSM_STATE
 
    private:
-    void updateIntent(const TacticUpdate& tactic_update) override;
+    void updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm) override;
 
-    FSM<AttackerFSM> fsm;
+    std::map<RobotId, std::unique_ptr<FSM<AttackerFSM>>> fsm_map;
 
     // The pass to execute
     std::optional<Pass> best_pass_so_far;
@@ -66,6 +55,5 @@ class AttackerTactic : public Tactic
     // The point the robot will chip towards if it is unable to shoot and is in danger
     // of losing the ball to an enemy
     std::optional<Point> chip_target;
-    // shoot goal config
-    std::shared_ptr<const AttackerTacticConfig> attacker_tactic_config;
+    std::shared_ptr<const AiConfig> ai_config;
 };

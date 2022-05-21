@@ -1,7 +1,6 @@
 #pragma once
 
 #include "software/ai/hl/stp/tactic/tactic.h"
-#include "software/ai/intent/stop_intent.h"
 
 struct StopFSM
 {
@@ -22,7 +21,7 @@ struct StopFSM
     explicit StopFSM(bool coast) : coast(coast) {}
 
     /**
-     * Action to set the StopIntent
+     * Action to set the StopPrimitive
      *
      * @param event StopFSM::Update
      */
