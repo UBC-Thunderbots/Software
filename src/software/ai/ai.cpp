@@ -11,7 +11,8 @@ AI::AI(TbotsProto::AiConfig ai_config)
       override_play(nullptr),
       current_play(std::make_unique<HaltPlay>(ai_config)),
       field_to_path_planner_factory(),
-      prev_override(TbotsProto::PlayName::UseAiSelection)
+      prev_override(TbotsProto::PlayName::UseAiSelection),
+      ai_config_changed(false)
 {
 }
 
@@ -62,6 +63,9 @@ std::unique_ptr<TbotsProto::PrimitiveSet> AI::getPrimitives(const World& world)
         [this](std::unique_ptr<Play> play) { current_play = std::move(play); },
         world.gameState(), ai_config_));
 
+    // We construct the global path planner once for the field. If the AI Config
+    // changes, there might be an update we need to reconstruct the path planner
+    // for and propagate the parameter change.
     if (!field_to_path_planner_factory.contains(world.field()) || ai_config_changed)
     {
         field_to_path_planner_factory.insert_or_assign(

@@ -49,13 +49,6 @@ class AI final
     TbotsProto::PlayInfo getPlayInfo() const;
 
     /**
-     * Overrides the play from the play proto
-     *
-     * @param play_proto the play proto
-     */
-    void overridePlayFromProto(TbotsProto::Play play_proto);
-
-    /**
      * Update the AiConfig proto
      *
      * @param ai_config The new AiConfig proto
@@ -64,7 +57,7 @@ class AI final
 
    private:
     void checkAiConfig();
-    bool ai_config_changed = false;
+    bool ai_config_changed;
 
     TbotsProto::AiConfig ai_config_;
     std::unique_ptr<FSM<PlaySelectionFSM>> fsm;

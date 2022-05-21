@@ -78,8 +78,6 @@ struct CreaseDefenderFSM
     }
 
    private:
-    double robot_obstacle_inflation_factor_;
-
     /**
      * Finds the intersection with the front or sides of the defense area with the given
      * ray
