@@ -167,8 +167,11 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
             }
         }
 
-        auto [remaining_robots, new_primitives_to_assign] =
+        auto [remaining_robots, new_primitives_to_assign,
+              current_tactic_robot_id_assignment] =
             assignTactics(path_planner_factory, world, tactic_vector, robots);
+
+        tactic_robot_id_assignment.merge(current_tactic_robot_id_assignment);
 
         for (auto &[robot_id, primitive] : new_primitives_to_assign->robot_primitives())
         {
@@ -214,7 +217,7 @@ void Play::updateTactics(const PlayUpdate &play_update)
 std::unique_ptr<TbotsProto::PrimitiveSet> Play::getPrimitivesFromTactic(
     const GlobalPathPlannerFactory &path_planner_factory, const World &world,
     std::shared_ptr<Tactic> tactic,
-    std::set<TbotsProto::MotionConstraint> motion_constraints) const
+    std::set<TbotsProto::MotionConstraint> motion_constraints)
 {
     auto obstacles    = path_planner_factory.getStaticObstacles(motion_constraints);
     auto path_planner = path_planner_factory.getPathPlanner(motion_constraints);
@@ -268,11 +271,13 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::getPrimitivesFromTactic(
 
 
 
-std::tuple<std::vector<Robot>, std::unique_ptr<TbotsProto::PrimitiveSet>>
+std::tuple<std::vector<Robot>, std::unique_ptr<TbotsProto::PrimitiveSet>,
+           std::map<std::shared_ptr<const Tactic>, RobotId>>
 Play::assignTactics(const GlobalPathPlannerFactory &path_planner_factory,
                     const World &world, TacticVector tactic_vector,
                     const std::vector<Robot> robots_to_assign)
 {
+    std::map<std::shared_ptr<const Tactic>, RobotId> current_tactic_robot_id_assignment;
     size_t num_tactics     = tactic_vector.size();
     auto primitives_to_run = std::make_unique<TbotsProto::PrimitiveSet>();
     auto remaining_robots  = robots_to_assign;
@@ -282,8 +287,7 @@ Play::assignTactics(const GlobalPathPlannerFactory &path_planner_factory,
 
     for (auto tactic : tactic_vector)
     {
-        auto motion_constraints =
-            buildMotionConstraintSet(world.gameState(), *tactic);
+        auto motion_constraints = buildMotionConstraintSet(world.gameState(), *tactic);
         primitive_sets.emplace_back(getPrimitivesFromTactic(path_planner_factory, world,
                                                             tactic, motion_constraints));
         CHECK(primitive_sets.back()->robot_primitives().size() ==
@@ -303,8 +307,10 @@ Play::assignTactics(const GlobalPathPlannerFactory &path_planner_factory,
     // robots
     if (num_rows == 0 || num_cols == 0)
     {
-        return std::tuple<std::vector<Robot>, std::unique_ptr<TbotsProto::PrimitiveSet>>{
-            remaining_robots, std::move(primitives_to_run)};
+        return std::tuple<std::vector<Robot>, std::unique_ptr<TbotsProto::PrimitiveSet>,
+                          std::map<std::shared_ptr<const Tactic>, RobotId>>{
+            remaining_robots, std::move(primitives_to_run),
+            current_tactic_robot_id_assignment};
     }
 
     // The rows of the matrix are the "workers" (the robots) and the columns are the
@@ -368,7 +374,8 @@ Play::assignTactics(const GlobalPathPlannerFactory &path_planner_factory,
             if (val == 0)
             {
                 RobotId robot_id = robots_to_assign.at(row).id();
-                tactic_robot_id_assignment.emplace(tactic_vector.at(col), robot_id);
+                current_tactic_robot_id_assignment.emplace(tactic_vector.at(col),
+                                                           robot_id);
                 tactic_vector.at(col)->setLastExecutionRobot(robot_id);
 
                 auto primitives = primitive_sets.at(col)->robot_primitives();
@@ -387,6 +394,8 @@ Play::assignTactics(const GlobalPathPlannerFactory &path_planner_factory,
         }
     }
 
-    return std::tuple<std::vector<Robot>, std::unique_ptr<TbotsProto::PrimitiveSet>>{
-        remaining_robots, std::move(primitives_to_run)};
+    return std::tuple<std::vector<Robot>, std::unique_ptr<TbotsProto::PrimitiveSet>,
+                      std::map<std::shared_ptr<const Tactic>, RobotId>>{
+        remaining_robots, std::move(primitives_to_run),
+        current_tactic_robot_id_assignment};
 }

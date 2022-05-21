@@ -97,10 +97,10 @@ class Play
      *
      * @return the PrimitiveSet to execute
      */
-    std::unique_ptr<TbotsProto::PrimitiveSet> getPrimitivesFromTactic(
+    static std::unique_ptr<TbotsProto::PrimitiveSet> getPrimitivesFromTactic(
         const GlobalPathPlannerFactory& path_planner_factory, const World& world,
         std::shared_ptr<Tactic> tactic,
-        std::set<TbotsProto::MotionConstraint> motion_constraints) const;
+        std::set<TbotsProto::MotionConstraint> motion_constraints);
 
    private:
     /**
@@ -111,12 +111,17 @@ class Play
      * @param tactic_vector The tactic vector
      * @param robots_to_assign The robots to assign to
      *
-     * @return the remaining unassigned robots and the new primitives to assign
+     * @return the remaining unassigned robots, the new primitives to assign, and robot to
+     * tactic assignment
      */
-    std::tuple<std::vector<Robot>, std::unique_ptr<TbotsProto::PrimitiveSet>>
-    assignTactics(const GlobalPathPlannerFactory& path_planner_factory,
-                  const World& world, TacticVector tactic_vector,
-                  const std::vector<Robot> robots_to_assign);
+    std::tuple<std::vector<Robot>, std::unique_ptr<TbotsProto::PrimitiveSet>,
+               std::map<std::shared_ptr<const Tactic>,
+                        RobotId>> static assignTactics(const GlobalPathPlannerFactory&
+                                                           path_planner_factory,
+                                                       const World& world,
+                                                       TacticVector tactic_vector,
+                                                       const std::vector<Robot>
+                                                           robots_to_assign);
 
     /**
      * Returns a list of shared_ptrs to the Tactics the Play wants to run at this time, in
