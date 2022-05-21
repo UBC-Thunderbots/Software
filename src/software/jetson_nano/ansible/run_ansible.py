@@ -87,7 +87,7 @@ def ansible_runner(playbook: str, options: dict = {}):
     for host, alias in zip(hosts, host_aliases):
         inventory.add_host(host, group)
 
-        #todo (#2625) investigate robot id bug
+        # todo (#2625) investigate robot id bug
 
         # variable_manager.set_host_variable(host, "inventory_hostname", alias)
 
