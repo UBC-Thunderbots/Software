@@ -71,7 +71,6 @@ void ShootOrPassPlayFSM::lookForPass(const Update& event)
                                                    ->value();
         pass_eval = pass_generator.generatePassEvaluation(event.common.world);
         best_pass_and_score_so_far = pass_eval.getBestPassOnField();
-        std::cout << "SCORE IS: " << best_pass_and_score_so_far.rating << std::endl;
 
         // update the best pass in the attacker tactic
         attacker_tactic->updateControlParams(best_pass_and_score_so_far.pass, false);
