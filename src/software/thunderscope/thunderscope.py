@@ -322,11 +322,6 @@ class Thunderscope(object):
             except Exception:
                 pass
 
-        if load_diagnostics:
-            self.configure_robot_diagnostics_layout(
-                self.robot_diagnostics_proto_unix_io
-            )
-
     def register_refresh_function(self, refresh_func):
         """Register the refresh functions to run at the refresh_interval_ms
         passed into thunderscope.
@@ -371,12 +366,6 @@ class Thunderscope(object):
         log_dock = Dock("Logs")
         log_dock.addWidget(widgets["log_widget"])
 
-        widgets["performance_widget"] = self.setup_performance_plot(
-            full_system_proto_unix_io
-        )
-        performance_dock = Dock("Performance")
-        performance_dock.addWidget(widgets["performance_widget"])
-
         widgets["parameter_widget"] = self.setup_parameter_widget(
             full_system_proto_unix_io, friendly_colour_yellow
         )
@@ -390,8 +379,7 @@ class Thunderscope(object):
         dock_area.addDock(field_dock)
         dock_area.addDock(parameter_dock, "left", field_dock)
         dock_area.addDock(log_dock, "bottom", field_dock)
-        dock_area.addDock(performance_dock, "right", log_dock)
-        dock_area.addDock(playinfo_dock, "right", performance_dock)
+        dock_area.addDock(playinfo_dock, "right", log_dock)
 
     def configure_robot_diagnostics_layout(self, proto_unix_io):
         """Configure the default layout for the robot diagnostics widget

@@ -151,7 +151,7 @@ void Thunderloop::runLoop()
             // Run the motor service with the direct_control_ msg
             {
                 ScopedTimespecTimer timer(&poll_time);
-                drive_units_status_ = *motor_service_->poll(direct_control_);
+                motor_status_ = *motor_service_->poll(direct_control_.motor_control());
             }
             thunderloop_status_.set_motor_service_poll_time_ns(
                 static_cast<unsigned long>(poll_time.tv_nsec));

@@ -178,6 +178,6 @@ message MotorControl
 
 message DirectControlPrimitive
 {
-    MotorControl motor = 1;
-    PowerControl power = 2;
+    MotorControl motor_control = 1;
+    PowerControl power_control = 2;
 }

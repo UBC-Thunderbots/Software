@@ -36,8 +36,7 @@
     {                                                                                    \
     }                                                                                    \
     else                                                                                 \
-        LOG_1(level) << filename
-
+        LOG_1(level) << filename                                                         \
 /**                                                                                      \
  * This class acts as a Singleton that's responsible for initializing the logger.        \
  * We use a singleton rather than a generic function in this namespace because           \

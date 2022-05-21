@@ -9,6 +9,7 @@ from software.thunderscope.binary_context_managers import *
 from proto.message_translation import tbots_protobuf
 import software.python_bindings as cpp_bindings
 from software.thunderscope.robot_communication import RobotCommunication
+from software.thunderscope.replay.proto_logger import ProtoLogger
 
 NUM_ROBOTS = 6
 SIM_TICK_RATE_MS = 16

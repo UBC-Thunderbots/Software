@@ -97,15 +97,15 @@ std::unique_ptr<TbotsProto::Primitive> createDirectControlPrimitive(
         *createAngularVelocityProto(angular_velocity);
 
     *(direct_control_primitive_msg->mutable_direct_control()
-          ->mutable_motor()
+          ->mutable_motor_control()
           ->mutable_direct_velocity_control()) = *direct_velocity_control;
 
     direct_control_primitive_msg->mutable_direct_control()
-        ->mutable_motor()
+        ->mutable_motor_control()
         ->set_dribbler_speed_rpm(static_cast<float>(dribbler_speed_rpm));
 
     *(direct_control_primitive_msg->mutable_direct_control()
-          ->mutable_power()
+          ->mutable_power_control()
           ->mutable_chicker()
           ->mutable_auto_chip_or_kick()) = auto_chip_or_kick;
     return direct_control_primitive_msg;

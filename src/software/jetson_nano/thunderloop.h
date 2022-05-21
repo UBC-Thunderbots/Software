@@ -89,7 +89,7 @@ class Thunderloop
     TbotsProto::RobotStatus robot_status_;
     TbotsProto::NetworkStatus network_status_;
     TbotsProto::PowerStatus power_status_;
-    TbotsProto::DriveUnitStatus drive_units_status_;
+    TbotsProto::MotorStatus motor_status_;
     TbotsProto::ThunderloopStatus thunderloop_status_;
 
     // Current State

@@ -242,12 +242,17 @@ bool MotorService::checkDriverFault(uint8_t motor)
     if (!gstat_bitset.any())
     {
         LOG(DEBUG) << "Driver for motor " << motor << " has no faults";
+        return true;
+    }
+    else
+    {
+        return false;
     }
 }
 
 
-std::unique_ptr<TbotsProto::DriveUnitStatus> MotorService::poll(
-    const TbotsProto::DirectControlPrimitive& direct_control)
+std::unique_ptr<TbotsProto::MotorStatus> MotorService::poll(
+    const TbotsProto::MotorControl& motor)
 {
     CHECK(encoder_calibrated_[FRONT_LEFT_MOTOR_CHIP_SELECT] &&
           encoder_calibrated_[FRONT_RIGHT_MOTOR_CHIP_SELECT] &&
@@ -261,40 +266,35 @@ std::unique_ptr<TbotsProto::DriveUnitStatus> MotorService::poll(
         static_cast<double>(tmc4671_getActualVelocity(BACK_LEFT_MOTOR_CHIP_SELECT)),
         static_cast<double>(tmc4671_getActualVelocity(BACK_RIGHT_MOTOR_CHIP_SELECT))};
 
-    switch (direct_control.wheel_control_case())
+    switch (motor.drive_control_case())
     {
-        case TbotsProto::DirectControlPrimitive::WheelControlCase::kDirectPerWheelControl:
+        case TbotsProto::MotorControl::DriveControlCase::kDirectPerWheelControl:
         {
             tmc4671_setTargetVelocity(
                 FRONT_LEFT_MOTOR_CHIP_SELECT,
-                static_cast<int>(
-                    direct_control.direct_per_wheel_control().front_left_wheel_rpm() *
-                    wheel_constants_.wheel_rotations_per_motor_rotation));
+                static_cast<int>(motor.direct_per_wheel_control().front_left_wheel_rpm() *
+                                 wheel_constants_.wheel_rotations_per_motor_rotation));
             tmc4671_setTargetVelocity(
                 FRONT_RIGHT_MOTOR_CHIP_SELECT,
                 static_cast<int>(
-                    direct_control.direct_per_wheel_control().front_right_wheel_rpm() *
+                    motor.direct_per_wheel_control().front_right_wheel_rpm() *
                     wheel_constants_.wheel_rotations_per_motor_rotation));
             tmc4671_setTargetVelocity(
                 BACK_LEFT_MOTOR_CHIP_SELECT,
-                static_cast<int>(
-                    direct_control.direct_per_wheel_control().back_left_wheel_rpm() *
-                    wheel_constants_.wheel_rotations_per_motor_rotation));
+                static_cast<int>(motor.direct_per_wheel_control().back_left_wheel_rpm() *
+                                 wheel_constants_.wheel_rotations_per_motor_rotation));
             tmc4671_setTargetVelocity(
                 BACK_RIGHT_MOTOR_CHIP_SELECT,
-                static_cast<int>(
-                    direct_control.direct_per_wheel_control().back_right_wheel_rpm() *
-                    wheel_constants_.wheel_rotations_per_motor_rotation));
+                static_cast<int>(motor.direct_per_wheel_control().back_right_wheel_rpm() *
+                                 wheel_constants_.wheel_rotations_per_motor_rotation));
             break;
         }
-        case TbotsProto::DirectControlPrimitive::WheelControlCase::kDirectVelocityControl:
+        case TbotsProto::MotorControl::DriveControlCase::kDirectVelocityControl:
         {
             EuclideanSpace_t target_euclidean_velocity = {
-                direct_control.direct_velocity_control().velocity().x_component_meters(),
-                direct_control.direct_velocity_control().velocity().y_component_meters(),
-                direct_control.direct_velocity_control()
-                    .angular_velocity()
-                    .radians_per_second(),
+                motor.direct_velocity_control().velocity().x_component_meters(),
+                motor.direct_velocity_control().velocity().y_component_meters(),
+                motor.direct_velocity_control().angular_velocity().radians_per_second(),
             };
 
             // This is a linear transformation, we don't need to convert to/from
@@ -313,7 +313,13 @@ std::unique_ptr<TbotsProto::DriveUnitStatus> MotorService::poll(
 
             break;
         }
-        case TbotsProto::DirectControlPrimitive::WheelControlCase::WHEEL_CONTROL_NOT_SET:
+
+        case TbotsProto::MotorControl::DriveControlCase::kOpenLoopControl:
+        {
+            break;
+        }
+
+        case TbotsProto::MotorControl::DriveControlCase::DRIVE_CONTROL_NOT_SET:
         {
             LOG(WARNING) << "Motor service polled with an empty DirectControlPrimitive ";
             break;
@@ -332,7 +338,7 @@ std::unique_ptr<TbotsProto::DriveUnitStatus> MotorService::poll(
         heartbeat_state = 0;
     }
 
-    return std::make_unique<TbotsProto::DriveUnitStatus>();
+    return std::make_unique<TbotsProto::MotorStatus>();
 }
 
 void MotorService::spiTransfer(int fd, uint8_t const* tx, uint8_t const* rx, unsigned len)

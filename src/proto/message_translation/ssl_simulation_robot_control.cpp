@@ -14,7 +14,7 @@ std::unique_ptr<SSLSimulationProto::RobotMoveCommand> createRobotMoveCommand(
     const TbotsProto::DirectControlPrimitive& direct_control, float front_wheel_angle_deg,
     float back_wheel_angle_deg, float wheel_radius_meters)
 {
-    switch (direct_control.motor().drive_control_case())
+    switch (direct_control.motor_control().drive_control_case())
     {
         case TbotsProto::MotorControl::kDirectPerWheelControl:
         {
@@ -30,16 +30,16 @@ std::unique_ptr<SSLSimulationProto::RobotMoveCommand> createRobotMoveCommand(
         {
             auto move_local_velocity = SSLSimulationProto::MoveLocalVelocity();
             move_local_velocity.set_forward(
-                static_cast<float>(direct_control.motor()
+                static_cast<float>(direct_control.motor_control()
                                        .direct_velocity_control()
                                        .velocity()
                                        .x_component_meters()));
-            move_local_velocity.set_left(static_cast<float>(direct_control.motor()
+            move_local_velocity.set_left(static_cast<float>(direct_control.motor_control()
                                                                 .direct_velocity_control()
                                                                 .velocity()
                                                                 .y_component_meters()));
             move_local_velocity.set_angular(
-                static_cast<float>(direct_control.motor()
+                static_cast<float>(direct_control.motor_control()
                                        .direct_velocity_control()
                                        .angular_velocity()
                                        .radians_per_second()));
@@ -48,10 +48,6 @@ std::unique_ptr<SSLSimulationProto::RobotMoveCommand> createRobotMoveCommand(
             *(move_command->mutable_local_velocity()) = move_local_velocity;
             return move_command;
         }
-            // case TbotsProto::MotorControl::WHEEL_CONTROL_NOT_SET:
-            //{
-            // return std::make_unique<SSLSimulationProto::RobotMoveCommand>();
-            //}
     }
     return std::make_unique<SSLSimulationProto::RobotMoveCommand>();
 }
@@ -69,11 +65,11 @@ std::unique_ptr<SSLSimulationProto::RobotCommand> getRobotCommandFromDirectContr
     std::optional<float> kick_angle;       // [degree]
     std::optional<double> dribbler_speed;  // [rpm]
 
-    switch (direct_control->power().chicker().chicker_command_case())
+    switch (direct_control->power_control().chicker().chicker_command_case())
     {
         case TbotsProto::PowerControl::ChickerControl::kKickSpeedMPerS:
         {
-            kick_speed = direct_control->power().chicker().kick_speed_m_per_s();
+            kick_speed = direct_control->power_control().chicker().kick_speed_m_per_s();
             kick_angle = std::nullopt;
             break;
         }
@@ -83,7 +79,8 @@ std::unique_ptr<SSLSimulationProto::RobotCommand> getRobotCommandFromDirectContr
             // Use the formula for the Range of a parabolic projectile
             // Rearrange to solve for the initial velocity.
             // https://courses.lumenlearning.com/boundless-physics/chapter/projectile-motion/
-            float range = direct_control->power().chicker().chip_distance_meters();
+            float range =
+                direct_control->power_control().chicker().chip_distance_meters();
             float numerator =
                 range *
                 static_cast<float>(ACCELERATION_DUE_TO_GRAVITY_METERS_PER_SECOND_SQUARED);
@@ -96,14 +93,14 @@ std::unique_ptr<SSLSimulationProto::RobotCommand> getRobotCommandFromDirectContr
         }
         case TbotsProto::PowerControl::ChickerControl::kAutoChipOrKick:
         {
-            switch (direct_control->power()
+            switch (direct_control->power_control()
                         .chicker()
                         .auto_chip_or_kick()
                         .auto_chip_or_kick_case())
             {
                 case TbotsProto::AutoChipOrKick::kAutokickSpeedMPerS:
                 {
-                    kick_speed = direct_control->power()
+                    kick_speed = direct_control->power_control()
                                      .chicker()
                                      .auto_chip_or_kick()
                                      .autokick_speed_m_per_s();
@@ -116,7 +113,7 @@ std::unique_ptr<SSLSimulationProto::RobotCommand> getRobotCommandFromDirectContr
                     // Use the formula for the Range of a parabolic projectile
                     // Rearrange to solve for the initial velocity.
                     // https://courses.lumenlearning.com/boundless-physics/chapter/projectile-motion/
-                    float range = direct_control->power()
+                    float range = direct_control->power_control()
                                       .chicker()
                                       .auto_chip_or_kick()
                                       .autochip_distance_meters();
@@ -135,7 +132,7 @@ std::unique_ptr<SSLSimulationProto::RobotCommand> getRobotCommandFromDirectContr
                 }
                 case TbotsProto::AutoChipOrKick::AUTO_CHIP_OR_KICK_NOT_SET:
                 {
-                    direct_control->mutable_power()
+                    direct_control->mutable_power_control()
                         ->mutable_chicker()
                         ->clear_chicker_command();
                     break;
@@ -145,13 +142,15 @@ std::unique_ptr<SSLSimulationProto::RobotCommand> getRobotCommandFromDirectContr
         }
         case TbotsProto::PowerControl::ChickerControl::CHICKER_COMMAND_NOT_SET:
         {
-            direct_control->mutable_power()->mutable_chicker()->clear_chicker_command();
+            direct_control->mutable_power_control()
+                ->mutable_chicker()
+                ->clear_chicker_command();
             break;
         }
     }
 
     return createRobotCommand(robot_id, std::move(move_command), kick_speed, kick_angle,
-                              direct_control->motor().dribbler_speed_rpm());
+                              direct_control->motor_control().dribbler_speed_rpm());
 }
 
 std::unique_ptr<SSLSimulationProto::RobotCommand> createRobotCommand(
