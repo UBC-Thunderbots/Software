@@ -7,7 +7,7 @@ from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtCore import Qt
 from pyqtgraph.Qt.QtWidgets import *
 
-from software.py_constants import *
+from software.python_constants import *
 from software.thunderscope.constants import LINE_WIDTH
 from software.thunderscope.colors import Colors
 from software.networking.threaded_unix_listener import ThreadedUnixListener

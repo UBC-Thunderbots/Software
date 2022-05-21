@@ -9,7 +9,7 @@ import google.protobuf.internal.decoder as decoder
 from subprocess import Popen
 from software.python_bindings import *
 from proto.import_all_protos import *
-from software.py_constants import *
+from software.python_constants import *
 from extlibs.er_force_sim.src.protobuf.world_pb2 import (
     SimulatorState,
     SimBall,

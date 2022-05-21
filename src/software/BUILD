@@ -46,8 +46,8 @@ cc_library(
 )
 
 pybind_library(
-    name = "py_constants_lib",
-    srcs = ["py_constants.cpp"],
+    name = "python_constants_lib",
+    srcs = ["python_constants.cpp"],
     deps = [
         ":constants",
         "//shared:constants",
@@ -55,9 +55,9 @@ pybind_library(
 )
 
 pybind_extension(
-    name = "py_constants",
+    name = "python_constants",
     deps = [
-        ":py_constants_lib",
+        ":python_constants_lib",
     ],
 )
 

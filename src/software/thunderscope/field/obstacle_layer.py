@@ -5,7 +5,7 @@ from pyqtgraph.Qt import QtCore, QtGui
 
 from software.thunderscope.colors import Colors
 import software.thunderscope.constants as constants
-from software.py_constants import *
+from software.python_constants import *
 from software.networking.threaded_unix_listener import ThreadedUnixListener
 from software.thunderscope.field.field_layer import FieldLayer
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer

@@ -31,7 +31,7 @@ import software.python_bindings as cpp_bindings
 from proto.import_all_protos import *
 from proto.message_translation import tbots_protobuf
 
-from software.py_constants import *
+from software.python_constants import *
 from software.networking import threaded_unix_sender
 from software.thunderscope.arbitrary_plot.proto_plotter import ProtoPlotter
 from software.thunderscope.binary_context_managers import *

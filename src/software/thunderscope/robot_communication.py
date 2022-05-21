@@ -1,4 +1,4 @@
-from software.py_constants import *
+from software.python_constants import *
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.python_bindings import *
 from proto.import_all_protos import *

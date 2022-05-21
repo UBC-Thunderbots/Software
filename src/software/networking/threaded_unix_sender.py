@@ -5,7 +5,7 @@ from threading import Thread
 
 from google.protobuf import text_format
 from google.protobuf.any_pb2 import Any
-from software.py_constants import UNIX_BUFFER_SIZE
+from software.python_constants import UNIX_BUFFER_SIZE
 
 
 class ThreadedUnixSender:

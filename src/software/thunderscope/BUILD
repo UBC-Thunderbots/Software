@@ -17,8 +17,8 @@ py_library(
     srcs = ["thunderscope.py"],
     data = [
         "//software:er_force_simulator_main",
-        "//software:py_constants.so",
         "//software:python_bindings.so",
+        "//software:python_constants.so",
         "//software:unix_full_system",
     ],
     deps = [
@@ -89,7 +89,7 @@ py_library(
     name = "robot_communication",
     srcs = ["robot_communication.py"],
     data = [
-        "//software:py_constants.so",
+        "//software:python_constants.so",
     ],
     deps = [
         "//software/thunderscope:constants",
