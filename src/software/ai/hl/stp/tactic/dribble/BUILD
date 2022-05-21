@@ -1,5 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
+load("@simulated_tests_deps//:requirements.bzl", "requirement")
+
 cc_library(
     name = "dribble_tactic",
     srcs = [
@@ -32,7 +34,7 @@ cc_test(
 )
 
 cc_test(
-    name = "dribble_tactic_test",
+    name = "dribble_tactic_cpp_test",
     srcs = ["dribble_tactic_test.cpp"],
     deps = [
         ":dribble_tactic",
@@ -60,5 +62,17 @@ cc_test(
         "//software/test_util",
         "//software/time:duration",
         "//software/world",
+    ],
+)
+
+py_test(
+    name = "dribble_tactic_test",
+    srcs = [
+        "dribble_tactic_test.py",
+    ],
+    deps = [
+        "//software/simulated_tests:simulated_test_fixture",
+        "//software/simulated_tests:validation",
+        requirement("pytest"),
     ],
 )

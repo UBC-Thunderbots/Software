@@ -97,6 +97,18 @@ class Ball final
      */
     BallState estimateFutureState(const Duration &duration_in_future) const;
 
+
+    /**
+    * Returns the estimated state of the ball at the specified amount of time in the
+    * future
+    *
+    * @param duration_in_future The Duration into the future at which to predict the
+    * ball's position
+    *
+    * @return The future state of the ball
+    */
+    Duration getTimeToPosition(const Point &destination) const;
+
     /**
      * Software approximation that finds if a ball has been kicked, regardless of whether
      * the kick was a pass, shot, or chip.
