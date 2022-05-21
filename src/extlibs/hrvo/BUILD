@@ -51,18 +51,9 @@ cc_library(
     deps = [
         "//proto:visualization_cc_proto",
         "//proto/primitive:primitive_msg_factory",
-        #TODO Remove once #2589 is merged
-        "//extlibs/hrvo:velocity_obstacle",
+        "//software/ai/navigator/path_planner/hrvo:velocity_obstacle",
         "//software/geom:vector",
         "//software/world",
         "//software/ai/navigator/obstacle:robot_navigation_obstacle_factory"
-    ],
-)
-
-cc_library(
-    name = "velocity_obstacle",
-    hdrs = ["velocity_obstacle.h"],
-    deps = [
-        "//software/geom:vector",
     ],
 )

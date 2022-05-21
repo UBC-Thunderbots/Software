@@ -42,15 +42,13 @@ void LinearVelocityAgent::computeNewVelocity()
     }
 }
 
-VelocityObstacle LinearVelocityAgent::createVelocityObstacle(
-    const Agent &other_agent)
+VelocityObstacle LinearVelocityAgent::createVelocityObstacle(const Agent &other_agent)
 {
-    VelocityObstacle velocityObstacle;
     if ((position_ - other_agent.getPosition()).lengthSquared() >
         std::pow(radius_ + other_agent.getRadius(), 2))
     {
         // This Agent is not colliding with other agent
-        velocityObstacle.apex_ = velocity_;
+        Vector apex = velocity_;
 
         const float angle =
             (position_ - other_agent.getPosition()).orientation().toRadians();
@@ -61,20 +59,18 @@ VelocityObstacle LinearVelocityAgent::createVelocityObstacle(
                       (position_ - other_agent.getPosition()).length());
 
         // Direction of the two edges of the velocity obstacle
-        velocityObstacle.side1_ =
+        Vector right_side =
             Vector(std::cos(angle - openingAngle), std::sin(angle - openingAngle));
-        velocityObstacle.side2_ =
+        Vector left_side =
             Vector(std::cos(angle + openingAngle), std::sin(angle + openingAngle));
+        return VelocityObstacle(apex, right_side, left_side);
     }
-    else
-    {
-        // This Agent is colliding with other agent
-        // Creates Velocity Obstacle with the sides being 180 degrees
-        // apart from each other
-        velocityObstacle.apex_ = velocity_;
-        velocityObstacle.side1_ =
-            (other_agent.getPosition() - position_).perpendicular().normalize();
-        velocityObstacle.side2_ = -velocityObstacle.side1_;
-    }
-    return velocityObstacle;
+    // This Agent is colliding with other agent
+    // Creates Velocity Obstacle with the sides being 180 degrees
+    // apart from each other
+    Vector apex = velocity_;
+    Vector right_side =
+        (other_agent.getPosition() - position_).perpendicular().normalize();
+    Vector left_side = -right_side;
+    return VelocityObstacle(apex, right_side, left_side);
 }

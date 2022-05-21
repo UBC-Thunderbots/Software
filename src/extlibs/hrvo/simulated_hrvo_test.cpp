@@ -195,10 +195,7 @@ TEST_F(SimulatedHRVOTest, test_single_enemy_directly_infront)
             Duration::fromSeconds(6));
 }
 
-// TODO (#2519): Re-enable tests failing due to HRVO integration
-// This test currently reaches the destination with out a problem, but start oscillating
-// up and down at the destination.
-TEST_F(SimulatedHRVOTest, DISABLED_test_zig_zag_movement)
+TEST_F(SimulatedHRVOTest, test_zig_zag_movement)
 {
     // The x value of the wall in front of the friendly robot
     int front_wall_x = -1;
@@ -279,7 +276,7 @@ TEST_F(SimulatedHRVOTest, DISABLED_test_start_in_local_minima)
 
     runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(6));
+            Duration::fromSeconds(7));
 }
 
 TEST_F(SimulatedHRVOTest, test_start_in_local_minima_with_open_end)
@@ -290,7 +287,7 @@ TEST_F(SimulatedHRVOTest, test_start_in_local_minima_with_open_end)
     auto friendly_robots =
         TestUtil::createStationaryRobotStatesWithId({Point(-3, 0), initial_position});
     auto enemy_robots = TestUtil::createStationaryRobotStatesWithId(
-        {Point(2, 0), Point(1, 0.3), Point(1, 0.6), Point(0.7, 0.6), Point(1, -0.3),
+        {Point(1.5, 0), Point(1, 0.3), Point(1, 0.6), Point(0.7, 0.6), Point(1, -0.3),
          Point(1, -0.6), Point(0.7, -0.6)});
 
     auto tactic = std::make_shared<MoveTactic>();
@@ -302,5 +299,5 @@ TEST_F(SimulatedHRVOTest, test_start_in_local_minima_with_open_end)
 
     runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(6));
+            Duration::fromSeconds(7));
 }
