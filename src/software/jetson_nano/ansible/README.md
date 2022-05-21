@@ -17,8 +17,12 @@ Before running any command, ensure that:
 2) The ip addresses for all robots/jetsons are known. If you are unsure of the IP Addresses, connect to the tbots router and go to 192.168.0.1. Look under basic/wireless clients to find the jetson IP addresses. The jetsons should be called "robot". 
 If you don't see the Jetsons, connect the Jetson to the router with an ethernet cable and check 192.168.0.1 again. The jetsons should be under wired clients. With a wired connection, you can ssh and use nmtui to connect it to the wifi. 
 
-3) all hosts have installed the necessary dependencies. This can be done by running the `setup_nano.sh` script through Ansible via the command 
+3) all hosts have installed the necessary dependencies and have setup systemd. This can be done by running the `setup_nano.sh` script through Ansible via the command 
 `bazel run :run_ansible --cpu=jetson_nano -- -pb setup_nano.yml -ho {ip addresses of hosts} -pwd {robot_ssh_password} `
+
+Notes: 
+- two tags (dependencies, systemd) can be applied to specify what kind of setup to perform. 
+- Output of the dependency setup script is streamed to the robot's `/tmp/setup.log` file
 
 ### How To Run an Ansible Playbook
 
@@ -32,11 +36,6 @@ Different arguments might need to be added to support different scenarios (ex ta
 
 
 ### Remote Flashing
-
-After Ansible is setup, remote flashing, done through Systemd, can be setup by running the `setup_systemd.yml` playbook. Ex: 
-``bazel run :run_ansible --cpu=jetson_nano -- -pb setup_systemd.yml -ho [list of ip addrs] -pwd {ssh_pass}`` 
-
-Running the `setup_systemd.yml` playbook will copy all relevant thunderbots binaries into the Jetson Nanos and reboot the nanos. After rebooting, the binaries will automatically be run. 
 
 The `remote_flash.yml` playbook stops services, syncs new binaries to hosts and restarts services. The "--tags" argument can be used to specify which actions to perform and on which services. 
 Possible service tags: thunderloop, announcement, display, redis. 

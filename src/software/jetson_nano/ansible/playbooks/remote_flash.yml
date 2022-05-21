@@ -7,16 +7,14 @@
      - thunderloop
      - display
      - announcement
-     - redis
    all_actions:
      - stop
      - sync
      - start
    binary_paths:
-     thunderloop: ../../../../../../../../jetson_nano/thunderloop_main
-     announcement: ../../../../../../../../jetson_nano/broadcasts
-     redis: ../../../../../../../../jetson_nano/redis
-     display: ../../../../../../../../jetson_nano/display/robot_ui
+     thunderloop: ../../thunderloop_main
+     announcement: ../../broadcasts
+     display: ../../display/robot_ui
 
   tasks:
 
@@ -35,43 +33,55 @@
         on the following services: {{ services }}"
       tags: always
 
-    - name: Stop Services
-      become: true
-      become_method: sudo
-      ansible.builtin.systemd:
-        name: "{{ service_name }}"
-        masked: no
-        daemon_reload: yes
-        state: stopped
-      with_items: "{{ services }}"
-      loop_control:
-        loop_var: service_name
-      when: "'stop' in actions"
-      tags: always
+    - name: Start Flash Process
+      block:
+        - name: Stop Services
+          become: true
+          become_method: sudo
+          ansible.builtin.systemd:
+            name: "{{ service_name }}"
+            masked: no
+            daemon_reload: yes
+            state: stopped
+          with_items: "{{ services }}"
+          loop_control:
+            loop_var: service_name
+          when: "'stop' in actions"
+          tags: always
 
-    - name: Sync Binaries
-      ansible.posix.synchronize:
-        src: "{{ binary_paths[service_name] }}"
-        dest: ~/thunderbots_binaries/
-        recursive: yes
-        copy_links: yes
-      with_items: "{{ services }}"
-      loop_control:
-        loop_var: service_name
-      when: "'sync' in actions"
-      tags: always
+        - name: Sync Binaries
+          ansible.posix.synchronize:
+            src: "{{ binary_paths[service_name] }}"
+            dest: ~/thunderbots_binaries/
+            recursive: yes
+            copy_links: yes
+          with_items: "{{ services }}"
+          loop_control:
+            loop_var: service_name
+          when: "'sync' in actions"
+          tags: always
 
+        - name: Start Services
+          become: true
+          become_method: sudo
+          ansible.builtin.systemd:
+            name: "{{ service_name }}"
+            masked: no
+            daemon_reload: yes
+            state: started
+          with_items: "{{ services }}"
+          loop_control:
+            loop_var: service_name
+          when: "'start' in actions"
+          tags: always
 
-    - name: Start Services
-      become: true
-      become_method: sudo
-      ansible.builtin.systemd:
-        name: "{{ service_name }}"
-        masked: no
-        daemon_reload: yes
-        state: started
-      with_items: "{{ services }}"
-      loop_control:
-        loop_var: service_name
-      when: "'start' in actions"
-      tags: always
+      # Rescue section only runs if any task in this block fails
+      rescue:
+        - name: Error Recovery - Ensure Announcement Service is Running
+          become: true
+          become_method: sudo
+          ansible.builtin.systemd:
+            name: announcement
+            masked: no
+            daemon_reload: yes
+            state: started

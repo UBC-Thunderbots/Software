@@ -86,7 +86,10 @@ def ansible_runner(playbook: str, options: dict = {}):
     # adding hosts and their aliases (robot IDs if available) to the inventory
     for host, alias in zip(hosts, host_aliases):
         inventory.add_host(host, group)
-        variable_manager.set_host_variable(host, "inventory_hostname", alias)
+
+        #todo (#2625) investigate robot id bug
+
+        # variable_manager.set_host_variable(host, "inventory_hostname", alias)
 
     # playbook executor controls running the playbook
     pbex = PlaybookExecutor(

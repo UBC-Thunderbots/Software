@@ -5,59 +5,126 @@
 
   tasks:
 
-    - name: check internet connection
-      uri:
-        url: "https://google.com"
-        timeout: 30
-        status_code: 200
+    - name: Run basic setup
+      tags: dependencies
+      block:
+        - name: check internet connection
+          uri:
+            url: "https://google.com"
+            timeout: 30
+            status_code: 200
 
-    - name: enable passwordless sudo for rsync
-      become: true
-      become_method: sudo
-      lineinfile:
-        path: /etc/sudoers
-        state: present
-        insertafter: EOF
-        line: '{{ ansible_user }} ALL=NOPASSWD:/usr/bin/rsync'
+        - name: enable passwordless sudo for rsync
+          become: true
+          become_method: sudo
+          lineinfile:
+            path: /etc/sudoers
+            state: present
+            insertafter: EOF
+            line: '{{ ansible_user }} ALL=NOPASSWD:/usr/bin/rsync'
 
-    - name: Sync Setup Script
-      become: true
-      become_method: sudo
-      tags:
-        - sync
-      ansible.posix.synchronize:
-        src: ../../setup_nano.sh
-        dest: ~/
-        recursive: yes
-        copy_links: yes
+        - name: Run Jetson Clocks
+          become: true
+          become_method: su
+          shell: /usr/bin/jetson_clocks
 
-    - name: run the setup script
-      become_method: sudo
-      become: true
-      command: bash /home/{{ ansible_user }}/setup_nano.sh >& /tmp/setup.log
-      async: 300
-      poll: 0
-      register: result_async
-      tags:
-        - runScript
-      args:
-        chdir: ~/
+        - name: Sync Setup Script
+          become: true
+          become_method: sudo
+          tags:
+            - sync
+          ansible.posix.synchronize:
+            src: ../../setup_nano.sh
+            dest: ~/
+            recursive: yes
+            copy_links: yes
 
-    - name: Check Setup Status
-      become: true
-      become_method: sudo
-      async_status:
-        jid: "{{ result_async.ansible_job_id }}"
-      register: result
-      ignore_errors: yes
-      until: result.finished
-      retries: 30
-      delay: 10
+        # output of each nano streamed to that Nano's /tmp/setup.log
+        - name: run the setup script
+          become_method: sudo
+          become: true
+          command: bash /home/{{ ansible_user }}/setup_nano.sh >& /tmp/setup.log
+          register: result
+          tags:
+            - runScript
+          args:
+            chdir: ~/
 
-    - name: Setup Success Msg
-      debug:
-        msg:
-          - "[Robot ID = {{ inventory_hostname }}]"
-          - "--- Setup successful ---"
-      when: "result.rc is defined and result.rc == 0"
+        - name: success msg
+          debug:
+            msg:
+              - "[Robot ID = {{ inventory_hostname }}]"
+              - "Setup Script run successfully"
+
+
+    - name: Run systemd setup
+      tags: systemd
+      block:
+
+        - name: sync binaries to the nano
+          with_items:
+            - ../../display
+            - ../../broadcasts
+            - ../../thunderloop_main
+          loop_control:
+            loop_var: binary_path
+          ansible.posix.synchronize:
+            src: "{{ binary_path }}"
+            dest: ~/thunderbots_binaries/
+            recursive: yes
+            copy_links: yes
+          tags:
+            - syncBinaries
+
+        - name: sync all systemd files
+          become_method: sudo
+          become: true
+          tags:
+            - syncSystemdFiles
+          register: res
+          ansible.posix.synchronize:
+            src: ../../systemd/
+            dest: /etc/systemd/system
+            copy_links: yes
+
+          #NOTE: "Enabling systems" means they will start on boot
+        - name: Enable system services
+          become: true
+          become_method: sudo
+          with_items:
+            - thunderbots
+            - thunderloop
+            - display
+            - announcement
+          loop_control:
+            loop_var: service_name
+          ansible.builtin.systemd:
+            name: "{{ service_name }}"
+            enabled: yes
+            masked: no
+            daemon_reload: yes
+          tags:
+            - enableSystemd
+
+        - name: Reboot
+          become: true
+          become_user: root
+          become_method: sudo
+          register: res
+          tags:
+            - reboot
+          reboot:
+            msg: "Reboot initiated by Ansible"
+            connect_timeout: 20
+            reboot_timeout: 1200
+            pre_reboot_delay: 0
+            post_reboot_delay: 10
+            test_command: whoami
+
+        - name: success msg
+          debug:
+            msg:
+              - "[Robot ID = {{ inventory_hostname }}]"
+              - "Systemd Setup run successfully"
+
 
