@@ -52,6 +52,16 @@ std::unique_ptr<TbotsProto::Circle> createCircleProto(const Circle& circle)
     return circle_proto;
 }
 
+std::unique_ptr<TbotsProto::VelocityObstacle> createVelocityObstacleProto(
+    const VelocityObstacle& vo)
+{
+    auto vo_proto                     = std::make_unique<TbotsProto::VelocityObstacle>();
+    *(vo_proto->mutable_apex())       = *createVectorProto(vo.apex_);
+    *(vo_proto->mutable_left_side())  = *createVectorProto(vo.side1_);
+    *(vo_proto->mutable_right_side()) = *createVectorProto(vo.side2_);
+    return vo_proto;
+}
+
 Point createPoint(const TbotsProto::Point& point)
 {
     return Point(point.x_meters(), point.y_meters());
@@ -87,4 +97,14 @@ Polygon createPolygon(const TbotsProto::Polygon& polygon)
 Circle createCircle(const TbotsProto::Circle& circle)
 {
     return Circle(createPoint(circle.origin()), circle.radius());
+}
+
+VelocityObstacle createVelocityObstacle(
+    const TbotsProto::VelocityObstacle& velocity_obstacle_msg)
+{
+    VelocityObstacle velocity_obstacle;
+    velocity_obstacle.apex_  = createVector(velocity_obstacle_msg.apex());
+    velocity_obstacle.side1_ = createVector(velocity_obstacle_msg.left_side());
+    velocity_obstacle.side2_ = createVector(velocity_obstacle_msg.right_side());
+    return velocity_obstacle;
 }
