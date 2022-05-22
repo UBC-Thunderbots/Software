@@ -185,6 +185,7 @@ class ProtoPlayer(object):
                     current_time = self.current_packet_time - start_time
                     log_entry = ProtoLogger.create_log_entry(proto, current_time)
                     log_file.write(bytes(log_entry, encoding="utf-8"))
+                    self.current_entry_index += 1
 
                 # Load the next chunk
                 self.current_chunk_index += 1
