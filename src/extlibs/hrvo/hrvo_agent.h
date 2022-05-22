@@ -84,7 +84,7 @@ class HRVOAgent : public Agent
      * @return The hybrid reciprocal velocity obstacle which other_agent should see for
      * this Agent
      */
-    Agent::VelocityObstacle createVelocityObstacle(const Agent &other_agent) override;
+    VelocityObstacle createVelocityObstacle(const Agent &other_agent) override;
 
     /**
      * Computes the maxNeighbors nearest neighbors of this agent.
@@ -117,7 +117,7 @@ class HRVOAgent : public Agent
      * which this HRVO Agent currently sees.
      * @return A list of polygons which represent velocity obstacles
      */
-    std::vector<Polygon> getVelocityObstaclesAsPolygons() const;
+    std::vector<TbotsProto::VelocityObstacle> getVelocityObstaclesAsProto() const;
 
     /**
      * Update preferred speed of Agent. The preferred speed represents the speed which we
