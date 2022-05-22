@@ -379,10 +379,10 @@ class Thunderscope(object):
         playinfo_dock.addWidget(widgets["playinfo_widget"])
 
         dock_area.addDock(field_dock)
-        dock_area.addDock(parameter_dock, "left", field_dock)
-        dock_area.addDock(log_dock, "bottom", field_dock)
-        dock_area.addDock(performance_dock, "right", log_dock)
-        dock_area.addDock(playinfo_dock, "right", performance_dock)
+        dock_area.addDock(log_dock, "left", field_dock)
+        dock_area.addDock(parameter_dock, "above", log_dock)
+        dock_area.addDock(playinfo_dock, "bottom", field_dock)
+        dock_area.addDock(performance_dock, "right", playinfo_dock)
 
     def setup_field_widget(
         self, sim_proto_unix_io, full_system_proto_unix_io, friendly_colour_yellow
