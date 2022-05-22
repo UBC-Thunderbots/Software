@@ -33,7 +33,7 @@
       - reboot
       - never
 
-
+    #Outputs computer-robot RTT statistics
   - name: RTT test
     tags:
       - rtt
