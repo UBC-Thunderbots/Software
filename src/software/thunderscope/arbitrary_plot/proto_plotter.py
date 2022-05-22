@@ -11,35 +11,28 @@ from pyqtgraph.Qt import QtGui, QtCore
 from software.networking.threaded_unix_listener import ThreadedUnixListener
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
-DEQUE_SIZE = 1000
-MIN_Y_RANGE = 0
-MAX_Y_RANGE = 100
-TIME_WINDOW_TO_DISPLAY_S = 20
-
 
 class GLViewWidget2DPlot(gl.GLViewWidget):
 
     """Limit the mouse controls and fix the camera on a 3D
     view to make it 2D"""
 
-    def __init__(self, width, min_y, max_y, grid_resolution):
+    def __init__(self, width, min_y, max_y):
         """Initialize the GLViewWidget2DPlot
 
         :param width: The width of the plot
         :param min_y: Minimum y value to display
         :param max_y: Maximum y value to display
-        :param grid_resolution: Resolution of the grid
 
         """
         gl.GLViewWidget.__init__(self)
 
         self.setMinimumSize(width, 100)
-        self.setCameraPosition(distance=2000, elevation=90, azimuth=0)
+        self.setCameraPosition(distance=width * 10, elevation=90, azimuth=0)
 
         self.grid = gl.GLGridItem()
-        self.grid.setSize(10, 10)
-        self.grid.scale(width, max_y - min_y, 1)
-        self.grid.setSpacing(x=grid_resolution, y=grid_resolution)
+        self.grid.setSize(width, max_y-min_y)
+        self.grid.scale(10, 10, 1)
         self.addItem(self.grid)
 
     def mouseMoveEvent(self, event):
@@ -96,15 +89,23 @@ class ProtoPlotter(QWidget):
     """
 
     def __init__(
-        self, width, min_y, max_y, grid_resolution, configuration, buffer_size=1000
+        self,
+        width,
+        min_y,
+        max_y,
+        window_secs,
+        configuration,
+        plot_rate_hz=60,
+        buffer_size=1000,
     ):
         """Initializes NamedValuePlotter.
 
         :param width: The width of the plot
         :param min_y: Minimum y value to display
         :param max_y: Maximum y value to display
-        :param grid_resolution: Resolution of the grid
+        :param window_secs: How many seconds to show in the x axis
         :param configuration: A dictionary of protobuf types to data extractor
+        :param plot_rate_hz: How many times per second to update the plot
         :param buffer_size: The size of the buffer to use for plotting.
 
         """
@@ -114,7 +115,7 @@ class ProtoPlotter(QWidget):
         self.data = {}
 
         self.layout = QHBoxLayout()
-        self.plot = GLViewWidget2DPlot(width, min_y, max_y, grid_resolution)
+        self.plot = GLViewWidget2DPlot(width, min_y, max_y)
 
         self.buffers = {
             key: ThreadSafeBuffer(buffer_size, key) for key in configuration.keys()
@@ -131,13 +132,15 @@ class ProtoPlotter(QWidget):
         self.last_incoming_value = {}
         self.color = 0
 
-        self.txtitem2 = gl.GLTextItem()
-        self.txtitem2.setData(
-            pos=(1.0, -1.0, 2.0), color=(127, 255, 127, 255), text="text2"
-        )
-        self.plot.addItem(self.txtitem2)
+        # self.txtitem2 = gl.GLTextItem()
+        # self.txtitem2.setData(
+        #     pos=(1.0, -1.0, 2.0), color=(127, 255, 127, 255), text="text2"
+        # )
+        # self.plot.addItem(self.txtitem2)
 
         self.configuration = configuration
+        self.deque_size = int(window_secs * plot_rate_hz)
+        self.update_interval = 1.0 / plot_rate_hz
 
     def refresh(self):
         """Refreshes NamedValuePlotter and updates data in the respective
@@ -163,7 +166,7 @@ class ProtoPlotter(QWidget):
                             self.select_plots.sizeHint().width()
                         )
 
-                        self.data[name] = np.zeros(DEQUE_SIZE)
+                        self.data[name] = np.zeros(self.deque_size)
 
                         self.color += 1
                         self.traces[name] = gl.GLLinePlotItem(
@@ -174,7 +177,7 @@ class ProtoPlotter(QWidget):
                     # Add incoming data to existing deques of data
                     self.last_incoming_value[name] = -value
 
-        if self.last_update_time + 0.02 > time.time():
+        if self.last_update_time + self.update_interval > time.time():
             return
 
         self.last_update_time = time.time()
@@ -188,7 +191,7 @@ class ProtoPlotter(QWidget):
                 pos=np.vstack(
                     [
                         self.data[name],
-                        np.array(range(int(-DEQUE_SIZE / 2), int(DEQUE_SIZE / 2))),
+                        np.array(range(int(-self.deque_size / 2), int(self.deque_size / 2))),
                         np.zeros(len(self.data[name])),
                     ]
                 ).transpose()
