@@ -68,7 +68,7 @@ class VelocityObstacle
     // The position of the apex of the hybrid reciprocal velocity obstacle.
     Vector apex;
 
-    // The direction of t(he right side of the velocity obstacle (in the frame of
+    // The direction of the right side of the velocity obstacle (in the frame of
     // reference of the velocity obstacle).
     Vector right_side;
 
