@@ -60,7 +60,7 @@ class HRVOAgent : public Agent
      * @param radius             The radius of this agent.
      * @param goalRadius         The goal radius of this agent.
      * @param prefSpeed          The preferred speed of this agent.
-     * @param meaxSpeed           The maximum speed of this agent.
+     * @param maxSpeed           The maximum speed of this agent.
      * @param uncertaintyOffset  The uncertainty offset of this agent.
      * @param maxAccel           The maximum acceleration of this agent.
      * @param velocity           The initial velocity of this agent.

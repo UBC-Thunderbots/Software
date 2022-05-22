@@ -7,11 +7,18 @@ VelocityObstacle::VelocityObstacle(Vector apex, Vector side1, Vector side2) : ap
         right_side = side1.normalize();
         left_side  = side2.normalize();
     }
-    else
+    else if (side1.isCounterClockwiseOf(side2)
     {
         right_side = side2.normalize();
         left_side  = side1.normalize();
     }
+	else
+	{
+        LOG(WARNING)
+            << "VelocityObstacle: constructing a velocity obstacle with 180 degree sides can lead to undefined behaviour. { apex: ("
+            << apex.x() << ", " << apex.y() << "), side1: (" << side1.x() << ", "
+            << side1.y() << "), side2: (" << side2.x() << ", " side2.y() << ")";
+	}
 }
 
 bool VelocityObstacle::containsVelocity(const Vector& velocity) const
