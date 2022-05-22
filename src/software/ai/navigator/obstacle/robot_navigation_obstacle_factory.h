@@ -28,6 +28,17 @@ class RobotNavigationObstacleFactory
         std::shared_ptr<const RobotNavigationObstacleConfig> config);
 
     /**
+     * Create static or dynamic obstacles for the given motion constraint
+     *
+     * @param motion_constraint The motion constraint to create obstacle for
+     * @param world World we're enforcing motion constraints in
+     *
+     * @return Obstacles representing the given motion constraint
+     */
+    std::vector<ObstaclePtr> createFromMotionConstraint(
+            const TbotsProto::MotionConstraint motion_constraint, const World &world) const;
+
+    /**
      * Create static obstacles for the given motion constraints
      *
      * @param motion_constraints The motion constraints to create obstacles for

@@ -176,10 +176,10 @@ bool operator!=(const Vector &u, const Vector &v)
 
 bool Vector::isClockwiseOf(const Vector &other) const
 {
-    return determinant(other) < 0.0f;
+    return determinant(other) > 0.0f;
 }
 
 bool Vector::isCounterClockwiseOf(const Vector &other) const
 {
-    return determinant(other) > 0.0f;
+    return determinant(other) < 0.0f;
 }

@@ -104,7 +104,7 @@ class HRVOAgent : public Agent
     void insertNeighbor(std::size_t agentNo, float &rangeSq);
 
     // TODO: Javadoc
-    void updatePrimitive(const TbotsProto::Primitive &new_primitive, const Field& field);
+    void updatePrimitive(const TbotsProto::Primitive &new_primitive, const World& world);
 
     /**
      * Get a list of circles which represent the new velocity candidates
@@ -221,6 +221,7 @@ class HRVOAgent : public Agent
     std::set<std::pair<float, std::size_t>> neighbors_;
     std::vector<VelocityObstacle> velocityObstacles_;
     std::vector<ObstaclePtr> static_obstacles;
+    std::optional<ObstaclePtr> ball_obstacle;
     RobotNavigationObstacleFactory obstacle_factory;
 
     // TODO (#2519): Remove magic numbers

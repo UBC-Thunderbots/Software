@@ -92,15 +92,14 @@ class HRVOSimulator
      *      Adds a new agent to the simulation.
      *
      * @param position           The starting position of this agent.
-     * @param goal_index          The index of the Goal which this agent should go to.
+     * @param agent_radius       The agent_radius of this agent.
+     * @param curr_velocity      The initial velocity of this agent.
+     * @param maxSpeed           The maximum speed of this agent.
+     * @param maxAccel           The maximum acceleration of this agent.
+     * @param path               The path which this agent should take.
      * @param neighborDist       The maximum neighbor distance of this agent.
      * @param maxNeighbors       The maximum neighbor count of this agent.
-     * @param agent_radius       The agent_radius of this agent.
-     * @param goalRadius         The goal agent_radius of this agent.
-     * @param maxSpeed           The maximum speed of this agent.
      * @param uncertaintyOffset  The uncertainty offset of this agent.
-     * @param maxAccel           The maximum acceleration of this agent.
-     * @param curr_velocity      The initial velocity of this agent.
      * @return The index of the agent.
      */
     std::size_t addHRVOAgent(const Vector &position, float agent_radius, const Vector &curr_velocity, float maxSpeed,
@@ -263,8 +262,8 @@ class HRVOSimulator
     // PrimitiveSet which includes the path which each friendly robot should take
     TbotsProto::PrimitiveSet primitive_set;
 
-    // Field the agent is playing on
-    Field field;
+    // Latest World which the simulator has received
+    std::optional<World> world;
 
     // True if the ball should be treated as an agent (obstacle)
     // NOTE: This will take effect the next time we receive a world, and we know

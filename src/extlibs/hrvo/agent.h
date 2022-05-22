@@ -4,7 +4,6 @@
 #include "extlibs/hrvo/path.h"
 #include "software/ai/navigator/path_planner/hrvo/velocity_obstacle.h"
 #include "software/geom/vector.h"
-#include "extlibs/hrvo/velocity_obstacle.h"
 
 class HRVOSimulator;
 

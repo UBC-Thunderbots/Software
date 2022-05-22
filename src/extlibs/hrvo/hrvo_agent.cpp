@@ -173,12 +173,24 @@ void HRVOAgent::computeNewVelocity()
     // Represent this agent with a circle of the same size and position
     Point agent_position_point(position_);
     Circle circle_rep_of_agent(agent_position_point, radius_);
+    // TODO: Maybe this should be moved to a helper?
+    //       Maybe it should be a min of this and the path point distance
+    const double dist_required_to_stop = std::pow(velocity_.length(), 2) / (2 * max_accel_) + 0.05;
     for (const auto &obstacle_ptr : static_obstacles)
     {
-        const double dist_required_to_stop = std::pow(velocity_.length(), 2) / (2 * max_accel_) + 0.05;
         if (obstacle_ptr->distance(agent_position_point) <= dist_required_to_stop && !obstacle_ptr->contains(agent_position_point))
         {
-            VelocityObstacle velocity_obstacle = obstacle_ptr->generateVelocityObstacle(circle_rep_of_agent);
+            VelocityObstacle velocity_obstacle = obstacle_ptr->generateVelocityObstacle(circle_rep_of_agent, Vector());
+            velocityObstacles_.push_back(velocity_obstacle);
+        }
+    }
+
+    if (ball_obstacle.has_value())
+    {
+        if (ball_obstacle.value()->distance(agent_position_point) <= dist_required_to_stop && !ball_obstacle.value()->contains(agent_position_point))
+        {
+            // TODO: Set the ball velocity
+            VelocityObstacle velocity_obstacle = ball_obstacle.value()->generateVelocityObstacle(circle_rep_of_agent, Vector());
             velocityObstacles_.push_back(velocity_obstacle);
         }
     }
@@ -632,9 +644,11 @@ void HRVOAgent::insertNeighbor(std::size_t agentNo, float &rangeSq)
     }
 }
 
-void HRVOAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive, const Field& field)
+void HRVOAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive, const World& world)
 {
     AgentPath path;
+    static_obstacles.clear();
+    ball_obstacle = std::nullopt;
     if (new_primitive.has_move())
     {
         const auto& motion_control = new_primitive.move().motion_control();
@@ -643,18 +657,21 @@ void HRVOAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive, cons
         setMaxSpeed(new_max_speed);
         setPreferredSpeed(new_max_speed * PREF_SPEED_SCALE);
 
-        std::vector<PathPoint> path_points;
-        for (int i = 0; i < motion_control.path().point_size(); i++)
-        {
-            // TODO (#2418): Update implementation of Primitive to support
-            //               a speed per path point
-            auto destination = motion_control.path().point().at(i);
-            path_points.emplace_back(/*Vector(destination.x_meters(), destination.y_meters())*/Vector(4.4, 0), speed_at_dest);
-        }
+
+        // TODO (#2418): Update implementation of Primitive to support
+        // multiple path points and remove this check
+        CHECK(motion_control.path().points().size() >= 2)
+            << "Empty path: "
+            << motion_control.path().points().size()
+            << std::endl;
+        auto destination =
+                motion_control.path().points().at(1);
+
 
         // Max distance which the robot can travel in one time step + scaling
         // TODO: This implementation is used in three separate places
         float path_radius = (max_speed_ * simulator_->getTimeStep()) / 2;
+        auto path_points = {PathPoint(Vector(destination.x_meters(), destination.y_meters()), speed_at_dest)};
         path = AgentPath(path_points, path_radius);
 
         // Update static obstacles
@@ -663,13 +680,22 @@ void HRVOAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive, cons
         {
             if (TbotsProto::MotionConstraint_IsValid(constraint_int))
             {
-                motion_constraints.insert(static_cast<TbotsProto::MotionConstraint>(constraint_int));
+                const auto constraint = static_cast<TbotsProto::MotionConstraint>(constraint_int);
+                if (constraint == TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL)
+                {
+                    auto new_ball_obstacle = obstacle_factory.createFromMotionConstraint(constraint, world);
+                    if (!new_ball_obstacle.empty())
+                    {
+                        ball_obstacle = new_ball_obstacle[0];
+                    }
+                }
+                else
+                {
+                    auto new_obstacles = obstacle_factory.createFromMotionConstraint(constraint, world);
+                    static_obstacles.insert(static_obstacles.end(), new_obstacles.begin(), new_obstacles.end());
+                }
             }
         }
-
-        // TODO: Does TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL create a ball obstacle? What happens if its moving...?
-        //       It has a dynamic extension (i.e. HasExtension(TbotsProto::dynamic))
-        static_obstacles = obstacle_factory.createFromMotionConstraints(motion_constraints, field);
     }
     setPath(path);
 }

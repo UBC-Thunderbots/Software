@@ -47,7 +47,7 @@ cc_library(
         "//software/geom:segment",
         "//software/geom:vector",
         "//software/logger",
-        "//extlibs/hrvo:velocity_obstacle"
+        "//software/ai/navigator/path_planner/hrvo:velocity_obstacle",
     ],
 )
 

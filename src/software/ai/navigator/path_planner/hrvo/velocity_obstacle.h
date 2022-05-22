@@ -1,3 +1,4 @@
+#pragma once
 #include "software/geom/vector.h"
 
 /**
