@@ -26,7 +26,7 @@ class RobotCommunication(object):
 
         """
         self.proto_unix_io = proto_unix_io
-        self.multicast_channel = multicast_channel
+        self.multicast_channel = str(multicast_channel)
         self.interface = interface
         self.estop_path = estop_path
         self.estop_buadrate = estop_buadrate
@@ -48,9 +48,10 @@ class RobotCommunication(object):
 
         """ Enter RobotCommunication context manager """
 
+        addy = str(self.multicast_channel + "%" + self.interface)
         # Create the multicast channels
         self.receive_robot_status = RobotStatusProtoListener(
-            self.multicast_channel + "%" + self.interface,
+            addy,
             ROBOT_STATUS_PORT,
             lambda data: self.proto_unix_io.send_proto(RobotStatus, data),
             True,

@@ -63,14 +63,14 @@ static const double MILLISECONDS_PER_NANOSECOND  = 1.0 / 1000000.0;
 // the IPv6 multicast address, only ff02 is important, the rest is random
 // see https://en.wikipedia.org/wiki/Solicited-node_multicast_address for why ff02 matters
 static const std::unordered_map<int, std::string> ROBOT_MULTICAST_CHANNELS = {
-    {0, "ff02::c3d40:42d2:bb00"},  {1, "ff02::c3d40:42d2:bb01"},
-    {2, "ff02::c3d40:42d2:bb02"},  {3, "ff02::c3d40:42d2:bb03"},
-    {4, "ff02::c3d40:42d2:bb04"},  {5, "ff02::c3d40:42d2:bb05"},
-    {6, "ff02::c3d40:42d2:bb06"},  {7, "ff02::c3d40:42d2:bb07"},
-    {8, "ff02::c3d40:42d2:bb08"},  {9, "ff02::c3d40:42d2:bb08"},
-    {10, "ff02::c3d40:42d2:bb10"}, {11, "ff02::c3d40:42d2:bb11"},
-    {12, "ff02::c3d40:42d2:bb12"}, {13, "ff02::c3d40:42d2:bb13"},
-    {14, "ff02::c3d40:42d2:bb14"}, {15, "ff02::c3d40:42d2:bb15"}};
+    {0, "ff02::c3d0:42d2:bb00"},  {1, "ff02::c3d0:42d2:bb01"},
+    {2, "ff02::c3d0:42d2:bb02"},  {3, "ff02::c3d0:42d2:bb03"},
+    {4, "ff02::c3d0:42d2:bb04"},  {5, "ff02::c3d0:42d2:bb05"},
+    {6, "ff02::c3d0:42d2:bb06"},  {7, "ff02::c3d0:42d2:bb07"},
+    {8, "ff02::c3d0:42d2:bb08"},  {9, "ff02::c3d0:42d2:bb08"},
+    {10, "ff02::c3d0:42d2:bb10"}, {11, "ff02::c3d0:42d2:bb11"},
+    {12, "ff02::c3d0:42d2:bb12"}, {13, "ff02::c3d0:42d2:bb13"},
+    {14, "ff02::c3d0:42d2:bb14"}, {15, "ff02::c3d0:42d2:bb15"}};
 
 // Redis default server connections properties
 #define REDIS_HOST_LENGTH 10

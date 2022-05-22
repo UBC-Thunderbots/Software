@@ -63,22 +63,13 @@ PYBIND11_MODULE(python_constants, m)
         DYNAMIC_PARAMETER_UPDATE_RESPONSE_PATH;
 
     // Multicast Channels
-    m.def("getRobotMulticastChanenl", [](py::args& args) {
+    m.def("getRobotMulticastChannel", [](py::args& args) {
         if (args.size() != 1)
         {
             throw std::runtime_error("must provide channel number only");
         }
 
         return ROBOT_MULTICAST_CHANNELS.at(args[0].cast<int>());
-    });
-
-    m.def("getSimulatorMulticastChannel", [](py::args& args) {
-        if (args.size() != 1)
-        {
-            throw std::runtime_error("must provide channel number only");
-        }
-
-        return SIMULATOR_MULTICAST_CHANNELS.at(args[0].cast<int>());
     });
 
     // Ports

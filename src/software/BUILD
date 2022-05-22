@@ -18,6 +18,8 @@ cc_binary(
         "//software/estop:arduino_util",
         "//software/logger",
         "//software/multithreading:observer_subject_adapter",
+        "//software/networking:threaded_proto_udp_listener",
+        "//software/networking:threaded_proto_udp_sender",
         "//software/networking:threaded_proto_unix_listener",
         "//software/sensor_fusion:threaded_sensor_fusion",
         "//software/util/generic_factory",

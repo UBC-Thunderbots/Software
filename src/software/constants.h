@@ -8,22 +8,6 @@
 // considered as "gone" and no longer reported.
 static constexpr unsigned int ROBOT_DEBOUNCE_DURATION_MILLISECONDS = 200;
 
-
-static constexpr unsigned int MAX_SIMULATOR_MULTICAST_CHANNELS = 16;
-
-// Networking
-// the IPv6 multicast address, only ff02 is important, the rest is random
-// see https://en.wikipedia.org/wiki/Solicited-node_multicast_address for why ff02 matters
-static const std::unordered_map<int, std::string> SIMULATOR_MULTICAST_CHANNELS = {
-    {0, "ff02::c3d40:42d2:cc00"},  {1, "ff02::c3d40:42d2:cc01"},
-    {2, "ff02::c3d40:42d2:cc02"},  {3, "ff02::c3d40:42d2:cc03"},
-    {4, "ff02::c3d40:42d2:cc04"},  {5, "ff02::c3d40:42d2:cc05"},
-    {6, "ff02::c3d40:42d2:cc06"},  {7, "ff02::c3d40:42d2:cc07"},
-    {8, "ff02::c3d40:42d2:cc08"},  {9, "ff02::c3d40:42d2:cc08"},
-    {10, "ff02::c3d40:42d2:cc10"}, {11, "ff02::c3d40:42d2:cc11"},
-    {12, "ff02::c3d40:42d2:cc12"}, {13, "ff02::c3d40:42d2:cc13"},
-    {14, "ff02::c3d40:42d2:cc14"}, {15, "ff02::c3d40:42d2:cc15"}};
-
 // Unix Socket Paths
 const std::string TACTIC_OVERRIDE_PATH                   = "/tactic_override";
 const std::string PLAY_OVERRIDE_PATH                     = "/play_override";

@@ -91,6 +91,7 @@ class Thunderscope(object):
         layout_path=None,
         load_blue=True,
         load_yellow=True,
+        load_diagnostics=False,
         blue_replay_log=None,
         yellow_replay_log=None,
         refresh_interval_ms=10,
@@ -165,12 +166,10 @@ class Thunderscope(object):
             else blue_full_system_proto_unix_io
         )
 
-        self.robot_diagnostics_proto_unix_io = ProtoUnixIO()
-
         self.refresh_timers = []
 
         # Setup the main window and  load
-        self.__setup(layout_path, load_blue, load_yellow)
+        self.__setup(layout_path, load_blue, load_yellow, load_diagnostics)
 
         # Save and Load Prompts
         self.save_layout_shortcut = QtGui.QShortcut(
@@ -288,7 +287,9 @@ class Thunderscope(object):
                     default_shelf["yellow_dock_state"] = shelf["yellow_dock_state"]
                     default_shelf.sync()
 
-    def __setup(self, layout_path, load_blue=True, load_yellow=True):
+    def __setup(
+        self, layout_path, load_blue=True, load_yellow=True, load_diagnostics=True
+    ):
         """Load the specified layout or the default file. If the default layout
         file doesn't exist, and no layout is provided, then just configure
         the default layout.
@@ -296,6 +297,7 @@ class Thunderscope(object):
         :param layout_path: Path to the layout file to load.
         :param load_blue: Whether to load the blue layout.
         :param load_yellow: Whether to load the yellow layout.
+        :param load_diagnostics: Whether to load the diagnostics layout.
 
         """
         if load_yellow:
@@ -321,6 +323,17 @@ class Thunderscope(object):
                 self.load_layout(path)
             except Exception:
                 pass
+
+        if load_blue and load_yellow and load_diagnostics:
+            raise Exception("Robot diagnostics can only run w/ 1 AI")
+
+        if load_diagnostics:
+            self.configure_robot_diagnostics_layout(
+                self.robot_diagnostics_dock_area,
+                self.blue_full_system_proto_unix_io
+                if load_blue
+                else self.yellow_full_system_proto_unix_io,
+            )
 
     def register_refresh_function(self, refresh_func):
         """Register the refresh functions to run at the refresh_interval_ms
@@ -381,7 +394,7 @@ class Thunderscope(object):
         dock_area.addDock(log_dock, "bottom", field_dock)
         dock_area.addDock(playinfo_dock, "right", log_dock)
 
-    def configure_robot_diagnostics_layout(self, proto_unix_io):
+    def configure_robot_diagnostics_layout(self, dock_area, proto_unix_io):
         """Configure the default layout for the robot diagnostics widget
 
         :param proto_unix_io: The proto unix io object for the full system
@@ -408,17 +421,13 @@ class Thunderscope(object):
             return {named_value_data.name: named_value_data.value}
 
         # Create widget
-        proto_plotter = ProtoPlotter(
-            configuration={NamedValue: extract_namedvalue_data}
-        )
+        proto_plotter = ProtoPlotter(configuration={NamedValue: extract_encoder_data})
 
         # Register observer
         proto_unix_io.register_observer(NamedValue, proto_plotter.buffers[NamedValue])
 
         # Register refresh function
         self.register_refresh_function(proto_plotter.refresh)
-
-        return proto_plotter
 
         self.robot_diagnostics_dock_area.addDock(log_dock)
         self.robot_diagnostics_dock_area.addDock(drive_dock, "right", log_dock)
