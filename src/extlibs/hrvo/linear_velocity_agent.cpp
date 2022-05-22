@@ -44,6 +44,7 @@ void LinearVelocityAgent::computeNewVelocity()
 
 VelocityObstacle LinearVelocityAgent::createVelocityObstacle(const Agent &other_agent)
 {
-	return VelocityObstacle::generateVelocityObstacle(Circle(Point(getPosition()), getRadius()), Circle(Point(other_agent.getPosition()), other_agent.getRadius()), getVelocity());
+    return VelocityObstacle::generateVelocityObstacle(
+        Circle(Point(getPosition()), getRadius()),
+        Circle(Point(other_agent.getPosition()), other_agent.getRadius()), getVelocity());
 }
-

@@ -7,6 +7,7 @@ cc_library(
         "velocity_obstacle.h",
     ],
     deps = [
+        "//software/geom:circle",
         "//software/geom:vector",
     ],
 )

@@ -14,7 +14,7 @@ VelocityObstacle::VelocityObstacle(Vector apex, Vector side1, Vector side2) : ap
     }
 }
 
-bool VelocityObstacle::containsVelocity(const Vector &velocity) const
+bool VelocityObstacle::containsVelocity(const Vector& velocity) const
 {
     Vector velocity_relative_to_obstacle = velocity - apex;
 
@@ -37,14 +37,15 @@ Vector VelocityObstacle::getRightSide() const
     return right_side;
 }
 
-VelocityObstacle VelocityObstacle::generateVelocityObstacle(const Circle& obstacle, const Circle &robot, const Vector& obstacle_velocity)
+VelocityObstacle VelocityObstacle::generateVelocityObstacle(
+    const Circle& obstacle, const Circle& robot, const Vector& obstacle_velocity)
 {
-    const Vector robot_to_obstacle_vector = obstacle.origin() - robot.origin();
+    const Vector robot_to_obstacle_vector        = obstacle.origin() - robot.origin();
     const Angle robot_relative_to_obstacle_angle = robot_to_obstacle_vector.orientation();
 
     // opening angle of each side relative = arcsin((rad_A + rad_B) / distance)
     Angle opening_angle = Angle::asin((robot.radius() + obstacle.radius()) /
-                                          robot_to_obstacle_vector.length());
+                                      robot_to_obstacle_vector.length());
 
     if (robot_to_obstacle_vector.lengthSquared() <
         std::pow(obstacle.radius() + robot.radius(), 2))
@@ -60,8 +61,10 @@ VelocityObstacle VelocityObstacle::generateVelocityObstacle(const Circle& obstac
     }
 
     // Direction of the two edges of the velocity obstacle
-    Vector side1 = Vector::createFromAngle(robot_relative_to_obstacle_angle - opening_angle);
-    Vector side2 = Vector::createFromAngle(robot_relative_to_obstacle_angle + opening_angle);
+    Vector side1 =
+        Vector::createFromAngle(robot_relative_to_obstacle_angle - opening_angle);
+    Vector side2 =
+        Vector::createFromAngle(robot_relative_to_obstacle_angle + opening_angle);
 
     // Since the obstacle is static, the velocity obstacle (apex) is not shifted
     return VelocityObstacle(obstacle_velocity, side1, side2);
