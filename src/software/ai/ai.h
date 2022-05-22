@@ -49,6 +49,13 @@ class AI final
     TbotsProto::PlayInfo getPlayInfo() const;
 
     /**
+     * Overrides the play from the play proto
+     *
+     * @param play_proto the play proto
+     */
+    void overridePlayFromProto(TbotsProto::Play play_proto);
+
+    /**
      * Update the AiConfig proto
      *
      * @param ai_config The new AiConfig proto
@@ -57,7 +64,6 @@ class AI final
 
    private:
     void checkAiConfig();
-    bool ai_config_changed;
 
     TbotsProto::AiConfig ai_config_;
     std::unique_ptr<FSM<PlaySelectionFSM>> fsm;
@@ -65,6 +71,7 @@ class AI final
     std::unique_ptr<Play> current_play;
     std::map<Field, GlobalPathPlannerFactory> field_to_path_planner_factory;
     TbotsProto::PlayName prev_override;
+    bool ai_config_changed;
 
     // inter play communication
     InterPlayCommunication inter_play_communication;

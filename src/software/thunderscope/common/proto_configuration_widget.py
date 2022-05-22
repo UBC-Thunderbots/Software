@@ -85,6 +85,7 @@ class ProtoConfigurationWidget(QWidget):
             ),
         )
         self.param_tree.setParameters(self.param_group, showTop=False)
+        self.param_group.sigTreeStateChanged.connect(self.__handle_parameter_changed)
 
     def __handle_parameter_changed(self, param, changes):
         """Handles the parameter change by triggering the provided callback
@@ -184,8 +185,14 @@ class ProtoConfigurationWidget(QWidget):
         for enum_desc in descriptor.enum_type.values:
             options.append(enum_desc.name)
 
+        # The list index is indexed from 1
+        current_enum_index = value - 1
+
         return parametertree.parameterTypes.ListParameter(
-            name=key, default=None, value=None, limits=options + [None]
+            name=key,
+            default=None,
+            value=descriptor.enum_type.values[current_enum_index].name,
+            limits=options,
         )
 
     @staticmethod
