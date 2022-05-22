@@ -1,12 +1,12 @@
-import random
 import time
-from collections import deque
 
-from time import perf_counter
 import numpy as np
 import pyqtgraph as pg
+import pyqtgraph.opengl as gl
+
 from proto.visualization_pb2 import NamedValue
-from pyqtgraph.Qt import QtGui
+from pyqtgraph.Qt.QtWidgets import *
+from pyqtgraph.Qt import QtGui, QtCore
 
 from software.networking.threaded_unix_listener import ThreadedUnixListener
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
@@ -17,7 +17,47 @@ MAX_Y_RANGE = 100
 TIME_WINDOW_TO_DISPLAY_S = 20
 
 
-class ProtoPlotter(object):
+class GLViewWidget2DPlot(gl.GLViewWidget):
+
+    """Limit the mouse controls and fix the camera on a 3D
+    view to make it 2D"""
+
+    def __init__(self, width, min_y, max_y, grid_resolution):
+        """Initialize the GLViewWidget2DPlot
+
+        :param width: The width of the plot
+        :param min_y: Minimum y value to display
+        :param max_y: Maximum y value to display
+        :param grid_resolution: Resolution of the grid
+
+        """
+        gl.GLViewWidget.__init__(self)
+
+        self.setMinimumSize(width, 100)
+        self.setCameraPosition(distance=2000, elevation=90, azimuth=0)
+
+        self.grid = gl.GLGridItem()
+        self.grid.setSize(10, 10)
+        self.grid.scale(width, max_y - min_y, 1)
+        self.grid.setSpacing(x=grid_resolution, y=grid_resolution)
+        self.addItem(self.grid)
+
+    def mouseMoveEvent(self, event):
+        """Overridden
+
+        We want to disable rotation and only pan the screen
+
+        :param event: The event to handle
+
+        """
+        diff = event.position() - self.mousePos
+        self.mousePos = event.position()
+
+        if event.buttons() == QtCore.Qt.MouseButton.LeftButton:
+            self.pan(diff.x(), diff.y(), 0, relative="view")
+
+
+class ProtoPlotter(QWidget):
 
     """Plot the protobuf data in a pyqtgraph plot
 
@@ -55,90 +95,101 @@ class ProtoPlotter(object):
 
     """
 
-    def __init__(self, configuration, buffer_size=500):
-        """Initializes ProtoPlotter.
+    def __init__(
+        self, width, min_y, max_y, grid_resolution, configuration, buffer_size=1000
+    ):
+        """Initializes NamedValuePlotter.
 
-        :param configuration: A dictionary that maps protobuf types to
-                              data extractor functions. See class docstring.
+        :param width: The width of the plot
+        :param min_y: Minimum y value to display
+        :param max_y: Maximum y value to display
+        :param grid_resolution: Resolution of the grid
+        :param configuration: A dictionary of protobuf types to data extractor
         :param buffer_size: The size of the buffer to use for plotting.
 
         """
-        self.time = time.time()
-        self.win = pg.plot()
-        self.plots = {}
-        self.data_x = {}
-        self.data_y = {}
-        self.legend = pg.LegendItem((80, 60), offset=(70, 20))
-        self.legend.setParentItem(self.win.graphicsItem())
+        QWidget.__init__(self)
 
-        self.configuration = configuration
+        self.traces = {}
+        self.data = {}
+
+        self.layout = QHBoxLayout()
+        self.plot = GLViewWidget2DPlot(width, min_y, max_y, grid_resolution)
 
         self.buffers = {
             key: ThreadSafeBuffer(buffer_size, key) for key in configuration.keys()
         }
 
-        rollingAverageSize = 1000
-        self.elapsed = deque(maxlen=rollingAverageSize)
-        self.fpsLastUpdate = perf_counter()
+        self.select_plots = QListWidget()
+        self.select_plots.setMaximumWidth(self.select_plots.sizeHint().width())
+
+        self.layout.addWidget(self.select_plots)
+        self.layout.addWidget(self.plot)
+        self.setLayout(self.layout)
+
+        self.last_update_time = time.time()
+        self.last_incoming_value = {}
+        self.color = 0
+
+        self.txtitem2 = gl.GLTextItem()
+        self.txtitem2.setData(
+            pos=(1.0, -1.0, 2.0), color=(127, 255, 127, 255), text="text2"
+        )
+        self.plot.addItem(self.txtitem2)
+
+        self.configuration = configuration
 
     def refresh(self):
-        """Refreshes ProtoPlotter and updates data in the respective
+        """Refreshes NamedValuePlotter and updates data in the respective
         plots.
 
         """
-        t_start = perf_counter()
-
-        # Dump the entire buffer into a deque. This operation is fast because
-        # its just consuming data from the buffer and appending it to a deque.
         for proto_class, buffer in self.buffers.items():
             for _ in range(buffer.queue.qsize()):
 
                 data = self.configuration[proto_class](buffer.get(block=False))
 
                 for name, value in data.items():
-                    if name not in self.plots:
+                    if name not in self.traces:
 
-                        self.plots[name] = self.win.plot(
-                            pen=QtGui.QColor(
-                                random.randint(100, 255),
-                                random.randint(100, 255),
-                                random.randint(100, 255),
-                            ),
-                            name=name,
-                            disableAutoRange=True,
-                            brush=None,
-                            skipFiniteCheck=True,
+                        item = QListWidgetItem(name)
+                        item.setFlags(
+                            item.flags() | QtCore.Qt.ItemFlag.ItemIsUserCheckable
+                        )
+                        item.setCheckState(QtCore.Qt.CheckState.Checked)
+
+                        self.select_plots.addItem(item)
+                        self.select_plots.setMaximumWidth(
+                            self.select_plots.sizeHint().width()
                         )
 
-                        self.plots[name].setDownsampling(method="subsample")
-                        self.data_x[name] = np.zeros(DEQUE_SIZE)
-                        self.data_y[name] = np.zeros(DEQUE_SIZE)
-                        self.legend.addItem(self.plots[name], name)
+                        self.data[name] = np.zeros(DEQUE_SIZE)
 
-                    self.data_x[name][0:-1] = self.data_x[name][1:]
-                    self.data_y[name][0:-1] = self.data_y[name][1:]
+                        self.color += 1
+                        self.traces[name] = gl.GLLinePlotItem(
+                            color=pg.glColor(self.color), width=1, antialias=True,
+                        )
+                        self.plot.addItem(self.traces[name])
 
-                    self.data_x[name][-1] = time.time() - self.time
-                    self.data_y[name][-1] = value
+                    # Add incoming data to existing deques of data
+                    self.last_incoming_value[name] = -value
 
-        # Update the data
-        for name, plot in self.plots.items():
-            plot.setData(self.data_x[name], self.data_y[name])
+        if self.last_update_time + 0.02 > time.time():
+            return
 
-        self.win.setRange(
-            xRange=[
-                time.time() - self.time - TIME_WINDOW_TO_DISPLAY_S,
-                time.time() - self.time,
-            ],
-        )
+        self.last_update_time = time.time()
 
-        t_end = perf_counter()
+        for name, trace in self.traces.items():
 
-        # update fps at most once every 0.2 secs
-        if t_end - self.fpsLastUpdate > 0.2:
-            self.fpsLastUpdate = t_end
-            average = np.mean(self.elapsed)
-            fps = 1 / average
-            self.win.setTitle("%0.2f fps - %0.1f ms avg" % (fps, average * 1_000))
+            self.data[name][:-1] = self.data[name][1:]
+            self.data[name][-1] = self.last_incoming_value[name]
 
-        self.elapsed.append(t_end - t_start)
+            trace.setData(
+                pos=np.vstack(
+                    [
+                        self.data[name],
+                        np.array(range(int(-DEQUE_SIZE / 2), int(DEQUE_SIZE / 2))),
+                        np.zeros(len(self.data[name])),
+                    ]
+                ).transpose()
+            )
