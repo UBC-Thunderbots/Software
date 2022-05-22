@@ -322,7 +322,7 @@ class HRVOSimulator
     // The maximum distance which HRVO Agents will look for neighbors, in meters.
     // A large radius picked to allow for far visibility of neighbors so Agents have
     // enough space to decelerate and avoid collisions.
-    static constexpr float MAX_NEIGHBOR_SEARCH_DIST = 2.5f;
+    static constexpr float MAX_NEIGHBOR_SEARCH_DIST = 4.5f;
 
     // The maximum number of neighbors/agents to consider when drawing velocity obstacles.
     static constexpr unsigned int MAX_NEIGHBORS = 15;
