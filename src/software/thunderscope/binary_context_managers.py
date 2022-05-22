@@ -294,6 +294,7 @@ gdb --args bazel-bin/{simulator_command}
             (self.simulator_runtime_dir + BLUE_SSL_WRAPPER_PATH, SSL_WrapperPacket),
             (self.simulator_runtime_dir + BLUE_ROBOT_STATUS_PATH, RobotStatus),
             (self.simulator_runtime_dir + SIMULATOR_STATE_PATH, SimulatorState),
+            (self.simulator_runtime_dir, HRVOVisualization, True),
         ]:
             blue_full_system_proto_unix_io.attach_unix_receiver(*arg)
 
