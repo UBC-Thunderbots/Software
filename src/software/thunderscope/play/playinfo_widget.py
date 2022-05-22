@@ -29,7 +29,6 @@ class playInfoWidget(QTableWidget):
 
         self.playinfo_buffer = ThreadSafeBuffer(buffer_size, PlayInfo, False)
         self.verticalHeader().setVisible(False)
-        self.horizontalHeader().setMinimumSectionSize(minimum_column_width)
 
     def set_data(self, data):
         """Data to set in the table
