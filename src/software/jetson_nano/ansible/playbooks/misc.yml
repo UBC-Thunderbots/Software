@@ -33,13 +33,21 @@
       - reboot
       - never
 
-  - name: RTT Test
-    delegate_to: localhost
-    shell: ping -c 10 -w 2 "{{ ansible_ssh_host }}" | tail -1
-    register: res
+
+  - name: RTT test
     tags:
       - rtt
       - never
+    block:
+      - name: extract host ipv4
+        set_fact:
+          ip: "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}"
+
+      - name: RTT command
+        delegate_to: localhost
+        shell: ping -c 10 -w 2 {{ ip }} | tail -1
+        register: res
+
 
   - name: Command Output
     tags:
@@ -49,5 +57,5 @@
         - "[Robot ID = {{ inventory_hostname }}]"
         - "stdout = {{ res.stdout_lines }} "
         - "stderr = {{ res.stderr }}"
-        - "{{ ansible_ssh_host }}"
+        - "{{ var }}"
 
