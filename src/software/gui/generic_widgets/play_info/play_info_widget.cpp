@@ -6,7 +6,7 @@ void PlayInfoWidget::updatePlayInfo(const TbotsProto::PlayInfo& play_info)
 {
     QString play_name_string =
         QString("Play Name: %1\n")
-            .arg(QString::fromStdString(play_info.play().play_name()));
+            .arg(QString::fromStdString(play_info.play().play_state().at(0)));
     QString tactics_string = QString("Tactics:\n");
     std::vector<std::string> tactics;
     for (const auto& [robot_id, tactic] : play_info.robot_tactic_assignment())

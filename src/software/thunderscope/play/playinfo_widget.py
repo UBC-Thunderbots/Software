@@ -28,6 +28,7 @@ class playInfoWidget(QTableWidget):
 
         self.playinfo_buffer = ThreadSafeBuffer(buffer_size, PlayInfo, False)
         self.verticalHeader().setVisible(False)
+        self.horizontalHeader().setVisible(False)
 
     def set_data(self, data):
         """Data to set in the table
@@ -35,18 +36,24 @@ class playInfoWidget(QTableWidget):
         :param data: dict containing {"column_name": [column_items]}
 
         """
-        horizontal_headers = []
+
+        # empirically makes even bolded items fit within columns
+        SIZE_HINT_WIDTH_EXPANSION = 10
 
         for n, key in enumerate(data.keys()):
-            horizontal_headers.append(key)
+            newitem = QTableWidgetItem(key)
+            font = newitem.font()
+            font.setBold(True)
+            newitem.setFont(font)
+            newitem.setSizeHint(QtCore.QSize(len(key) * SIZE_HINT_WIDTH_EXPANSION, 1))
+            self.setItem(0, n, newitem)
 
             for m, item in enumerate(data[key]):
                 newitem = QTableWidgetItem(item)
-                # empirically makes even bolded items fit within columns
-                newitem.setSizeHint(QtCore.QSize(len(item) * 10 + 70, 1))
-                self.setItem(m, n, newitem)
-
-        self.setHorizontalHeaderLabels(horizontal_headers)
+                newitem.setSizeHint(
+                    QtCore.QSize(len(item) * SIZE_HINT_WIDTH_EXPANSION, 1)
+                )
+                self.setItem(m + 1, n, newitem)
 
     def refresh(self):
         """Update the play info widget with new play information
@@ -63,7 +70,18 @@ class playInfoWidget(QTableWidget):
         if "robotTacticAssignment" not in play_info_dict:
             return
 
-        play_name.append(play_info_dict["play"]["playName"])
+        num_rows = (
+            max(
+                len(play_info_dict["robotTacticAssignment"]),
+                len(play_info_dict["play"]["playState"]),
+            )
+            + 1  # one more row the custom header
+        )
+
+        self.setRowCount(num_rows)
+
+        for state in play_info_dict["play"]["playState"]:
+            play_name.append(state)
 
         for robot_id in sorted(play_info_dict["robotTacticAssignment"]):
             robot_ids.append(robot_id)
