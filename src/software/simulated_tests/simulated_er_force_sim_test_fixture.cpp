@@ -35,8 +35,6 @@ SimulatedErForceSimTestFixture::SimulatedErForceSimTestFixture()
 
 void SimulatedErForceSimTestFixture::SetUp()
 {
-    LoggerSingleton::initializeLogger(TbotsGtestMain::logging_dir);
-
     // new configs so that callbacks to the previous test's AI are cleared
     friendly_mutable_thunderbots_config = std::make_shared<ThunderbotsConfig>();
     enemy_mutable_thunderbots_config    = std::make_shared<ThunderbotsConfig>();
