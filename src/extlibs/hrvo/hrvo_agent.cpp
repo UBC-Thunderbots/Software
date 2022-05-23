@@ -627,7 +627,6 @@ std::vector<TbotsProto::VelocityObstacle> HRVOAgent::getVelocityObstaclesAsProto
         points.emplace_back(Point(shifted_apex.x(), shifted_apex.y()));
         points.emplace_back(Point(shifted_side1.x(), shifted_side1.y()));
         points.emplace_back(Point(shifted_side2.x(), shifted_side2.y()));
-        velocity_obstacles.emplace_back(Polygon(points));
         velocity_obstacles.emplace_back(*createVelocityObstacleProto(vo));
     }
     return velocity_obstacles;

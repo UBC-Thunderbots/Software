@@ -9,6 +9,7 @@ cc_library(
     deps = [
         "//software/geom:circle",
         "//software/geom:vector",
+        "//software/logger",
     ],
 )
 

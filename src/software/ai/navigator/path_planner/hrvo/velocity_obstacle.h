@@ -2,6 +2,7 @@
 
 #include "software/geom/circle.h"
 #include "software/geom/vector.h"
+#include "software/logger/logger.h"
 
 /**
  * A velocity obstacle.
