@@ -1,0 +1,61 @@
+---
+#This file has a bunch of common tasks that can be used individually
+
+- name: misc tasks (run using --tags)
+  hosts: THUNDERBOTS_HOSTS
+
+  tasks:
+
+    #shutsdown a host
+  - name: Shutdown
+    become_method: sudo
+    become: true
+    shell: sudo shutdown
+    register: res
+    tags:
+      - shutdown
+      - never # the never tag is a special Ansible tag. We use it so that tasks do not automatically run unless specifically requested.
+
+    #reboots the host and waits until a connection is re-established
+  - name: Reboot
+    become: true
+    become_user: root
+    become_method: sudo
+    reboot:
+      msg: "Reboot initiated by Ansible"
+      connect_timeout: 20
+      reboot_timeout: 1200
+      pre_reboot_delay: 0
+      post_reboot_delay: 60
+      test_command: whoami
+    register: res
+    tags:
+      - reboot
+      - never
+
+    #Outputs computer-robot RTT statistics
+  - name: RTT test
+    tags:
+      - rtt
+      - never
+    block:
+      - name: extract host ipv4
+        set_fact:
+          ip: "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}"
+
+      - name: RTT command
+        delegate_to: localhost
+        shell: ping -c 10 -w 2 {{ ip }} | tail -1
+        register: res
+
+
+  - name: Command Output
+    tags:
+      - always
+    debug:
+      msg:
+        - "[Robot ID = {{ inventory_hostname }}]"
+        - "stdout = {{ res.stdout_lines }} "
+        - "stderr = {{ res.stderr }}"
+        - "{{ var }}"
+
