@@ -68,6 +68,13 @@ class Play
 
     virtual ~Play() = default;
 
+    /**
+     * Gets the state of the Play
+     *
+     * @return a vector strings representing the state
+     */
+    virtual std::vector<std::string> getState();
+
    protected:
     // The Play configuration
     std::shared_ptr<const AiConfig> ai_config;
@@ -101,13 +108,6 @@ class Play
         const GlobalPathPlannerFactory& path_planner_factory, const World& world,
         std::shared_ptr<Tactic> tactic,
         std::set<TbotsProto::MotionConstraint> motion_constraints) const;
-
-    /**
-     * Gets the state of the Play
-     *
-     * @return a vector strings representing the state
-     */
-    virtual std::vector<std::string> getState();
 
    private:
     /**

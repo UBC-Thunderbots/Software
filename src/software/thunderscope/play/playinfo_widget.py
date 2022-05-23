@@ -76,7 +76,7 @@ class playInfoWidget(QTableWidget):
 
         self.set_data(
             {
-                "Play Name": play_name,
+                "Play": play_name,
                 "Robot ID": robot_ids,
                 "Tactic Name": tactic_names,
                 "Tactic FSM State": tactic_fsm_states,
