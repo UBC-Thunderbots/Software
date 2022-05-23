@@ -13,7 +13,6 @@ from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 class playInfoWidget(QTableWidget):
 
-    # TODO (#2560): set these values dynamically
     NUM_ROWS = 6
     NUM_COLS = 4
 
