@@ -37,13 +37,11 @@ class playInfoWidget(QTableWidget):
         """
         horizontal_headers = []
 
-        for n, key in enumerate(data.keys()):
+        for n, key in enumerate(sorted(data.keys())):
             horizontal_headers.append(key)
 
             for m, item in enumerate(data[key]):
                 newitem = QTableWidgetItem(item)
-                # empirically makes even bolded items fit within columns
-                newitem.setSizeHint(QtCore.QSize(len(item) * 10 + 70, 1))
                 self.setItem(m, n, newitem)
 
         self.setHorizontalHeaderLabels(horizontal_headers)
@@ -76,10 +74,10 @@ class playInfoWidget(QTableWidget):
 
         self.set_data(
             {
-                "Play Name": play_name,
                 "Robot ID": robot_ids,
                 "Tactic Name": tactic_names,
                 "Tactic FSM State": tactic_fsm_states,
+                "Play Name": play_name,
             }
         )
 
