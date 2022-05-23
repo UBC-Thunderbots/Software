@@ -74,7 +74,7 @@ class ProtoUnixIO:
                         buffer.put(proto, block=False)
                     except queue.Full:
                         pass
-
+            print(proto.DESCRIPTOR.full_name if "Validation" in proto.DESCRIPTOR.full_name else "")
             for buffer in self.all_proto_observers:
                 try:
                     buffer.put(proto, block=False)
