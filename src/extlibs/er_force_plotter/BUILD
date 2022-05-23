@@ -9,12 +9,12 @@ qt_cc_library(
     ),
     hdrs = glob(["*.h"]),
     deps = [
+        ":plotter",
+        "//extlibs/er_force_sim/src/protobuf:protobuf_cc_lib",
         "@qt//:qt_core",
         "@qt//:qt_gui",
-        "@qt//:qt_widgets",
         "@qt//:qt_opengl",
-        "//extlibs/er_force_sim/src/protobuf:protobuf_cc_lib",
-        ":plotter",
+        "@qt//:qt_widgets",
     ],
 )
 
@@ -22,7 +22,7 @@ qt_ui_library(
     name = "plotter",
     ui = "plotter.ui",
     deps = [
-        "@qt//:qt_widgets",
         "@qt//:qt_opengl",
+        "@qt//:qt_widgets",
     ],
 )

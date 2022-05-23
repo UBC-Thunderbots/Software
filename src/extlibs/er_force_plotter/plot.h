@@ -21,10 +21,10 @@
 #ifndef PLOT_H
 #define PLOT_H
 
-#include <QtGui/QColor>
 #include <QtCore/QString>
 #include <QtCore/QVariant>
 #include <QtCore/QVector>
+#include <QtGui/QColor>
 
 class Plot : public QObject
 {

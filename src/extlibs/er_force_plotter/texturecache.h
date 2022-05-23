@@ -21,9 +21,9 @@
 #ifndef TEXTURECACHE_H
 #define TEXTURECACHE_H
 
-#include <QtOpenGL/QGLContext>
 #include <QtCore/QHash>
 #include <QtCore/QMultiMap>
+#include <QtOpenGL/QGLContext>
 
 class TextureCache
 {

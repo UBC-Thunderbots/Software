@@ -24,6 +24,7 @@
 #include <QtCore/QList>
 #include <QtCore/QSet>
 #include <QtGui/QStandardItemModel>
+#include <QtWidgets/QWidget>
 
 #include "extlibs/er_force_sim/src/protobuf/world.pb.h"
 
@@ -49,7 +50,6 @@ class Plotter : public QWidget
     void showPlotter();
 
    public slots:
-    void handleUiResponse(const amun::UiResponse &response, qint64 time);
     void setScaling(float min, float max, float timespan);
     void clearData();
 
@@ -107,7 +107,6 @@ class Plotter : public QWidget
     LeafFilterProxyModel *m_proxy;
     QMenu *m_plotMenu;
     bool m_playingBacklog;
-    QList<Status> m_backlog;
 };
 
 #endif  // PLOTTER_H

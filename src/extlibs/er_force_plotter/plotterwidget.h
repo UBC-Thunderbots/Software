@@ -23,6 +23,9 @@
 
 #include <QtCore/QHash>
 #include <QtCore/QMap>
+#include <QtCore/QObject>
+#include <QtGui/QMouseEvent>
+#include <QtOpenGL/QGLWidget>
 
 class Plot;
 class TextureCache;
@@ -31,7 +34,6 @@ class GuiTimer;
 class PlotterWidget : public QGLWidget
 {
     Q_OBJECT
-
    public:
     explicit PlotterWidget(QWidget *parent = 0);
     ~PlotterWidget() override;

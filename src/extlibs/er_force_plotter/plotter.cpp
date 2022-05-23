@@ -20,18 +20,18 @@
 
 #include "plotter.h"
 
+#include <QtCore/QSettings>
+#include <QtCore/QStringBuilder>
 #include <QtGui/QCloseEvent>
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QMenu>
-#include <QtCore/QSettings>
-#include <QtCore/QStringBuilder>
 #include <cmath>
 #include <unordered_map>
 
-#include "google/protobuf/descriptor.h"
-#include "leaffilterproxymodel.h"
-#include "plot.h"
+#include "extlibs/er_force_plotter/leaffilterproxymodel.h"
 #include "extlibs/er_force_plotter/ui_plotter.h"
+#include "google/protobuf/descriptor.h"
+#include "plot.h"
 
 Plotter::Plotter()
     : QWidget(nullptr, Qt::Window),
@@ -275,25 +275,6 @@ void Plotter::setFreeze(bool freeze)
     ui->btnFreeze->setChecked(freeze);  // update button
 }
 
-void Plotter::handleUiResponse(const amun::UiResponse &response, qint64 time)
-{
-    // TODO-AKHIL
-    m_playingBacklog = true;
-    for (const amun::Status &st : response.logger_status())
-    {
-        // Status s = Status::createArena();
-        // s->CopyFrom(st);
-        // QCoreApplication::processEvents();
-    }
-    for (int i = 0; i < m_backlog.size(); i++)
-    {
-        // handleStatus(m_backlog[i], true);
-        // QCoreApplication::processEvents();
-    }
-    m_backlog.clear();
-    m_playingBacklog = false;
-}
-
 void Plotter::showPlotter()
 {
     // all incoming data has to wait until the backlog-status are consumed
@@ -523,7 +504,7 @@ void Plotter::clearData()
     // fix loss of precision when loading multiple log files without restarting the
     // plotter
     m_startTime = 0;
-    m_guiTimer->requestTriggering();
+
     // delete everything
     foreach (QStandardItem *item, m_items)
     {
