@@ -390,3 +390,9 @@ Play::assignTactics(const GlobalPathPlannerFactory &path_planner_factory,
     return std::tuple<std::vector<Robot>, std::unique_ptr<TbotsProto::PrimitiveSet>>{
         remaining_robots, std::move(primitives_to_run)};
 }
+
+std::vector<std::string> Play::getState()
+{
+    // by default just return the name of the play
+    return {objectTypeName(*this)};
+}

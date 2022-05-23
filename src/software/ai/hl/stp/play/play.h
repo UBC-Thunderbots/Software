@@ -102,6 +102,13 @@ class Play
         std::shared_ptr<Tactic> tactic,
         std::set<TbotsProto::MotionConstraint> motion_constraints) const;
 
+    /**
+     * Gets the state of the Play
+     *
+     * @return a vector strings representing the state
+     */
+    virtual std::vector<std::string> getState();
+
    private:
     /**
      * Assigns the given tactics to as many of the given robots
