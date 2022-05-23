@@ -39,6 +39,7 @@
 
 #include "kd_tree.h"
 #include "path.h"
+#include "proto/message_translation/tbots_geometry.h"
 #include "software/geom/vector.h"
 
 HRVOAgent::HRVOAgent(HRVOSimulator *simulator, const Vector &position, float neighborDist,
@@ -614,9 +615,9 @@ void HRVOAgent::insertNeighbor(std::size_t agentNo, float &rangeSq)
     }
 }
 
-std::vector<Polygon> HRVOAgent::getVelocityObstaclesAsPolygons() const
+std::vector<TbotsProto::VelocityObstacle> HRVOAgent::getVelocityObstaclesAsProto() const
 {
-    std::vector<Polygon> velocity_obstacles;
+    std::vector<TbotsProto::VelocityObstacle> velocity_obstacles;
     for (const VelocityObstacle &vo : velocityObstacles_)
     {
         std::vector<Point> points;
@@ -627,6 +628,7 @@ std::vector<Polygon> HRVOAgent::getVelocityObstaclesAsPolygons() const
         points.emplace_back(Point(shifted_side1.x(), shifted_side1.y()));
         points.emplace_back(Point(shifted_side2.x(), shifted_side2.y()));
         velocity_obstacles.emplace_back(Polygon(points));
+        velocity_obstacles.emplace_back(*createVelocityObstacleProto(vo));
     }
     return velocity_obstacles;
 }

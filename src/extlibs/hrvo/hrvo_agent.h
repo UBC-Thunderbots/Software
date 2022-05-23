@@ -117,7 +117,7 @@ class HRVOAgent : public Agent
      * which this HRVO Agent currently sees.
      * @return A list of polygons which represent velocity obstacles
      */
-    std::vector<Polygon> getVelocityObstaclesAsPolygons() const;
+    std::vector<TbotsProto::VelocityObstacle> getVelocityObstaclesAsProto() const;
 
     /**
      * Update preferred speed of Agent. The preferred speed represents the speed which we
