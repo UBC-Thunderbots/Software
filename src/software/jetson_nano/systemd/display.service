@@ -1,16 +1,15 @@
 [Unit]
-Description=redis service
+Description=announcement service
 
 # When systemd stops or restarts the thunderbots.service, the action is propagated to this unit
 PartOf=thunderbots.service
 
 # At startup, start this unit after the thunderbots.service start
-After=thunderbots.service thunderloop.service
+After=thunderbots.service thunderloop.service network.target
 
 [Service]
-# Pretend that the component is running
-# todo: execute redis binary (#2443)
-ExecStart=/bin/sleep infinity
+# todo: execute lcd ui (#2443)
+ExecStart=/home/robot/thunderbots_binaries/display/lcd_user_interface
 
 #always restart on crash
 Restart=always
