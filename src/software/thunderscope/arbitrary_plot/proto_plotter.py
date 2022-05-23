@@ -31,7 +31,7 @@ class GLViewWidget2DPlot(gl.GLViewWidget):
         self.setCameraPosition(distance=width * 10, elevation=90, azimuth=0)
 
         self.grid = gl.GLGridItem()
-        self.grid.setSize(width, max_y-min_y)
+        self.grid.setSize(width, max_y - min_y)
         self.grid.scale(10, 10, 1)
         self.addItem(self.grid)
 
@@ -191,7 +191,9 @@ class ProtoPlotter(QWidget):
                 pos=np.vstack(
                     [
                         self.data[name],
-                        np.array(range(int(-self.deque_size / 2), int(self.deque_size / 2))),
+                        np.array(
+                            range(int(-self.deque_size / 2), int(self.deque_size / 2))
+                        ),
                         np.zeros(len(self.data[name])),
                     ]
                 ).transpose()
