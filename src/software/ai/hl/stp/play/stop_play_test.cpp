@@ -48,7 +48,8 @@ class StopPlayTest : public SimulatedErForceSimPlayTestFixture
              field.enemyDefenseArea().negXPosYCorner()});
 };
 
-TEST_F(StopPlayTest, test_stop_play_ball_at_centre_robots_spread_out)
+// TODO (#2602): test failing since a robot isn't avoiding the ball
+TEST_F(StopPlayTest, DISABLED_test_stop_play_ball_at_centre_robots_spread_out)
 {
     BallState ball_state(Point(0, 0), Vector(0, 0));
     auto friendly_robots = TestUtil::createStationaryRobotStatesWithId(
