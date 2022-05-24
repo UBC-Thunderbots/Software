@@ -714,10 +714,7 @@ TEST_F(TestEnlsvgPathPlanner,
     ASSERT_TRUE(path != std::nullopt);
 
     std::vector<Point> path_points = path->getKnots();
-	for (Point &p : path_points)
-	{
-		std::cout << "(" << p.x() << ", " << p.y() << ")\n";
-	}
+
     // Make sure the start and end points match
     EXPECT_EQ(start, path->getStartPoint());
     EXPECT_EQ(dest, path->getEndPoint());
@@ -733,11 +730,6 @@ TEST_F(TestEnlsvgPathPlanner,
 
     auto path_two = planner.findPath(start, dest);
     path_points   = path_two->getKnots();
-	for (Point &p : path_points)
-	{
-		std::cout << "(" << p.x() << ", " << p.y() << ")\n";
-	}
-
     ASSERT_TRUE(path_two != std::nullopt);
 
     path_points = path_two->getKnots();
