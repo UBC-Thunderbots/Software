@@ -162,6 +162,9 @@ echo "================================================================"
 sudo wget -nc https://github.com/bazelbuild/bazel/releases/download/5.0.0/bazel-5.0.0-installer-linux-x86_64.sh -O /tmp/bazel-installer.sh
 sudo /tmp/bazel-installer.sh --user
 
+sudo rm -f /usr/bin/bazel # remove symlink
+sudo ln -s /usr/bin/bazel-5.0.0 /usr/bin/bazel
+
 echo "================================================================"
 echo "Done Installing Bazel"
 echo "================================================================"
