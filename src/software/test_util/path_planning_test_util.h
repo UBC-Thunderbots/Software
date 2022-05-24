@@ -43,8 +43,7 @@ namespace TestUtil
                                            std::vector<Polygon> obstacles);
 
     /**
-     * Given a list of points, print it out to the console. ONLY mean to be used as a
-     * debugging tool.
+     * Given a list of points, print it out to the console.     *
      *
      * @param path_points	path formed by a vector of Points
      */
