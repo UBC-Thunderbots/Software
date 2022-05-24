@@ -28,27 +28,31 @@ class GLViewWidget2DPlot(gl.GLViewWidget):
         gl.GLViewWidget.__init__(self)
 
         self.setMinimumSize(width, 100)
-        self.setCameraPosition(distance=width * 10, elevation=90, azimuth=0)
+        self.setCameraPosition(distance=width*10, elevation=90, azimuth=0)
 
         self.grid = gl.GLGridItem()
-        self.grid.setSize(width, max_y - min_y)
-        self.grid.scale(10, 10, 1)
+        self.grid.setSize(10, width)
+        self.grid.scale(100, 100, 1)
         self.addItem(self.grid)
 
     def mouseMoveEvent(self, event):
-        """Overridden
+        """Overridden to do nothing. We don't want to move the camera
+        because we can't 
 
-        We want to disable rotation and only pan the screen
-
-        :param event: The event to handle
+        TODO (#2634) Implement dynamic grid scaling and axis adjustments
+        and allow panning when the plots been zoomed without "falling off"
+        the grid.
 
         """
-        diff = event.position() - self.mousePos
-        self.mousePos = event.position()
+        pass
 
-        if event.buttons() == QtCore.Qt.MouseButton.LeftButton:
-            self.pan(diff.x(), diff.y(), 0, relative="view")
+    def wheelEvent(self, event):
+        """Overridden to do nothing
 
+        TODO (#2634) Implement dynamic grid scaling and axis adjustments
+
+        """
+        pass
 
 class ProtoPlotter(QWidget):
 
@@ -90,7 +94,6 @@ class ProtoPlotter(QWidget):
 
     def __init__(
         self,
-        width,
         min_y,
         max_y,
         window_secs,
@@ -100,7 +103,6 @@ class ProtoPlotter(QWidget):
     ):
         """Initializes NamedValuePlotter.
 
-        :param width: The width of the plot
         :param min_y: Minimum y value to display
         :param max_y: Maximum y value to display
         :param window_secs: How many seconds to show in the x axis
@@ -115,7 +117,7 @@ class ProtoPlotter(QWidget):
         self.data = {}
 
         self.layout = QHBoxLayout()
-        self.plot = GLViewWidget2DPlot(width, min_y, max_y)
+        self.plot = GLViewWidget2DPlot(int(window_secs * plot_rate_hz), min_y, max_y)
 
         self.buffers = {
             key: ThreadSafeBuffer(buffer_size, key) for key in configuration.keys()

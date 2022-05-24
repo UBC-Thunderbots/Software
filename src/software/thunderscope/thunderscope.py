@@ -547,11 +547,10 @@ class Thunderscope(object):
 
         # Performance Plots plot HZ so the values can't be negative
         proto_plotter = ProtoPlotter(
-            configuration={NamedValue: extract_namedvalue_data},
-            width=100,
             min_y=0,
             max_y=100,
-            window_secs=20,
+            window_secs=2,
+            configuration={NamedValue: extract_namedvalue_data},
         )
 
         # Register observer
