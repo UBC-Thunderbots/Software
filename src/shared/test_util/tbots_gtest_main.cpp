@@ -23,7 +23,6 @@ int main(int argc, char **argv)
     bool help_requested = args->loadFromCommandLineArguments(argc, argv);
 
     TbotsGtestMain::logging_dir = args->getRuntimeDir()->value();
-    LoggerSingleton::initializeLogger(TbotsGtestMain::logging_dir);
 
     if (!help_requested)
     {
