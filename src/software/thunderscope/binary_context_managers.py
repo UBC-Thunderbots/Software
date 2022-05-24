@@ -151,6 +151,11 @@ gdb --args bazel-bin/{full_system}
         proto_unix_io.attach_unix_receiver(
             self.full_system_runtime_dir + "/log", RobotLog
         )
+        print("About to attach unix receiver for ValidationProtoSet") 
+        proto_unix_io.attach_unix_receiver(
+            self.full_system_runtime_dir + "/bob", ValidationProtoSet
+        )
+        print("Should be finished attaching receiver") 
 
         # Inputs to full_system
         for arg in [
