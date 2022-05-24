@@ -5,12 +5,15 @@ Description=announcement service
 PartOf=thunderbots.service
 
 # At startup, start this unit after the thunderbots.service start
-After=thunderbots.service thunderloop.service network.target
+After=thunderbots.service thunderloop.service network.target network-online.target
+
+# Allow restarts at 10Hz
+StartLimitIntervalSec=1
+StartLimitBurst=10
 
 [Service]
-# Pretend that the component is running
-# todo: execute announcement binary (#2443)
-ExecStart=/bin/sleep infinity
+#todo add arguments (#2443)
+ExecStart=/home/robot/thunderbots_binaries/broadcasts/robot_broadcast_sender -p 45000 -if wlan0
 
 #always restart on crash
 Restart=always
