@@ -43,6 +43,27 @@ class RobotCommunication(object):
             )
         except Exception:
             raise Exception("Could not find estop, make sure its plugged in")
+        
+        self.run_thread = Thread(target=self.run)
+
+    def run(self):
+        """Run the robot communication
+
+        Only sends the primitive set if the estop is not pressed
+        Always sends the latest world
+
+        NOTE: This loop runs as fast as we receive worlds and primitive sets.
+        We send out the new world and new primitive set
+
+        """
+
+        world = self.world_buffer.get(block=True)
+        primitive_set = self.primitive_buffer.get(block=True)
+
+        if self.estop_reader.isEstopPlay():
+            self.primitive_set_mcast_sender.send(primitive_set)
+
+        self.world_mcast_sender.send(world)
 
     def __enter__(self):
 
@@ -56,13 +77,16 @@ class RobotCommunication(object):
             True,
         )
 
-        self.send_primitive_set = PrimitiveSetProtoSender(
+        self.send_primitive_mcast_sender = PrimitiveSetProtoSender(
             self.multicast_channel + "%" + self.interface, PRIMITIVE_PORT, True
         )
 
-        self.send_world = WorldProtoSender(
+        self.send_world_mcast_sender = WorldProtoSender(
             self.multicast_channel + "%" + self.interface, VISION_PORT, True
         )
 
     def __exit__(self):
+
         """ Exit RobotCommunication context manager """
+
+        self.run_thread.join()

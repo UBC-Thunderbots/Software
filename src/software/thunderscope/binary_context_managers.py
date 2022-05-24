@@ -2,6 +2,7 @@ import os
 import socket
 import logging
 import psutil
+import textwrap
 import time
 import google.protobuf.internal.encoder as encoder
 import google.protobuf.internal.decoder as decoder
@@ -90,20 +91,19 @@ class FullSystem(object):
                 ]
             ):
                 logging.info(
-                    (
+                    textwrap.dedent(
                         f"""
-
-Debugging Fullsystem ==============
-1. Build the full system in debug mode:
-
-./tbots.py -d build unix_full_system
-
-2. Run the following binaries from src to debug full system:
-
-gdb --args bazel-bin/{full_system}
-
-3. Rerun this binary once the gdb instance is setup
-"""
+                        Debugging Fullsystem ==============
+                        1. Build the full system in debug mode:
+                        
+                        ./tbots.py -d build unix_full_system
+                        
+                        2. Run the following binaries from src to debug full system:
+                        
+                        gdb --args bazel-bin/{full_system}
+                        
+                        3. Rerun this binary once the gdb instance is setup
+                        """
                     )
                 )
 
@@ -225,19 +225,19 @@ class Simulator(object):
                 ]
             ):
                 logging.info(
-                    (
+                    textwrap.dedent(
                         f"""
-Debugging Simulator ==============
-1. Build the simulator in debug mode:
-
-./tbots.py -d build er_force_simulator_main
-
-2. Run the following binary from src to debug the simulator:
-
-gdb --args bazel-bin/{simulator_command}
-
-3. Rerun this binary once the gdb instance is setup
-"""
+                        Debugging Simulator ==============
+                        1. Build the simulator in debug mode:
+                        
+                        ./tbots.py -d build er_force_simulator_main
+                        
+                        2. Run the following binary from src to debug the simulator:
+                        
+                        gdb --args bazel-bin/{simulator_command}
+                        
+                        3. Rerun this binary once the gdb instance is setup
+                        """
                     )
                 )
 
