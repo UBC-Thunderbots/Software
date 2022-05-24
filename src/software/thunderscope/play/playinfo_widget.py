@@ -13,7 +13,6 @@ from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 class playInfoWidget(QTableWidget):
 
-    # TODO (#2560): set these values dynamically
     NUM_ROWS = 6
     NUM_COLS = 4
 
@@ -78,6 +77,7 @@ class playInfoWidget(QTableWidget):
             + 1  # one more row the custom header
         )
 
+        # setting table size dynamically
         self.setRowCount(num_rows)
 
         for state in play_info_dict["play"]["playState"]:
