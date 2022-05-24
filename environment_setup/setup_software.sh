@@ -160,10 +160,7 @@ echo "================================================================"
 
 # Adapted from https://docs.bazel.build/versions/main/install-ubuntu.html#install-with-installer-ubuntu
 sudo wget -nc https://github.com/bazelbuild/bazel/releases/download/5.0.0/bazel-5.0.0-installer-linux-x86_64.sh -O /tmp/bazel-installer.sh
-sudo /tmp/bazel-installer.sh --user
-
-sudo rm -f /usr/bin/bazel # remove symlink
-sudo ln -s /usr/bin/bazel-5.0.0 /usr/bin/bazel
+sudo /tmp/bazel-installer.sh --bin=/usr/bin --base=$HOME/.bazel
 
 echo "================================================================"
 echo "Done Installing Bazel"
