@@ -28,7 +28,7 @@ class GLViewWidget2DPlot(gl.GLViewWidget):
         gl.GLViewWidget.__init__(self)
 
         self.setMinimumSize(width, 100)
-        self.setCameraPosition(distance=width*10, elevation=90, azimuth=0)
+        self.setCameraPosition(distance=width * 10, elevation=90, azimuth=0)
 
         self.grid = gl.GLGridItem()
         self.grid.setSize(10, width)
@@ -44,7 +44,6 @@ class GLViewWidget2DPlot(gl.GLViewWidget):
         the grid.
 
         """
-        pass
 
     def wheelEvent(self, event):
         """Overridden to do nothing
@@ -52,7 +51,7 @@ class GLViewWidget2DPlot(gl.GLViewWidget):
         TODO (#2634) Implement dynamic grid scaling and axis adjustments
 
         """
-        pass
+
 
 class ProtoPlotter(QWidget):
 

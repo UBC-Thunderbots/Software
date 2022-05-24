@@ -28,12 +28,11 @@ py_library(
         "//software/networking:threaded_unix_listener_py",
         "//software/networking:threaded_unix_sender_py",
         "//software/thunderscope:binary_context_managers",
-        "//software/thunderscope:colors",
         "//software/thunderscope:common_widgets",
         "//software/thunderscope:constants",
         "//software/thunderscope:proto_unix_io",
         "//software/thunderscope:robot_communication",
-        "//software/thunderscope/arbitrary_plot:proto_plotter",
+        "//software/thunderscope/proto_plotter:proto_plotter",
         "//software/thunderscope/common:proto_configuration_widget",
         "//software/thunderscope/field",
         "//software/thunderscope/field:field_layer",
@@ -63,11 +62,6 @@ py_library(
 py_library(
     name = "constants",
     srcs = ["constants.py"],
-)
-
-py_library(
-    name = "colors",
-    srcs = ["colors.py"],
 )
 
 py_library(
