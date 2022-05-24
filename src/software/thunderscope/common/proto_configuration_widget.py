@@ -15,11 +15,7 @@ class ProtoConfigurationWidget(QWidget):
     """
 
     def __init__(
-        self,
-        proto_to_configure,
-        on_change_callback,
-        convert_all_fields_to_bools=False,
-        search_filter_threshold=60,
+        self, proto_to_configure, on_change_callback, search_filter_threshold=60,
     ):
         """Create a parameter widget given a protobuf
 
@@ -30,9 +26,6 @@ class ProtoConfigurationWidget(QWidget):
                                    populated with the default values
         :param on_change_callback: The callback to trigger on change
                                     args: name, updated_value, updated_proto
-        :param convert_all_fields_to_bools: 
-                        Sometimes we just want to check/uncheck the fields
-                        of the protobuf (and not actually set an explicit value)
         :param search_filter_threshold: How close should the search query be?
                         100 is an exact match (not ideal), 0 lets everything through
 
@@ -42,16 +35,13 @@ class ProtoConfigurationWidget(QWidget):
         self.setLayout(layout)
 
         self.on_change_callback = on_change_callback
-        self.convert_all_fields_to_bools = convert_all_fields_to_bools
         self.proto_to_configure = proto_to_configure
 
         # Create ParameterGroup from Protobuf
         self.param_group = parametertree.Parameter.create(
             name="params",
             type="group",
-            children=self.config_proto_to_param_dict(
-                self.proto_to_configure, None, self.convert_all_fields_to_bools
-            ),
+            children=self.config_proto_to_param_dict(self.proto_to_configure, None),
         )
 
         # Create ParameterTree
@@ -70,7 +60,7 @@ class ProtoConfigurationWidget(QWidget):
 
     def __handle_search_query_changed(self, search_term):
         """Given a new search term, reconfigure the parameter tree with parameters
-        match the term.
+        that match the term.
 
         NOTE: Messages are not searchable, only fields are searchable/filtered
 
@@ -81,7 +71,7 @@ class ProtoConfigurationWidget(QWidget):
             name="params",
             type="group",
             children=self.config_proto_to_param_dict(
-                self.proto_to_configure, search_term, self.convert_all_fields_to_bools,
+                self.proto_to_configure, search_term
             ),
         )
         self.param_tree.setParameters(self.param_group, showTop=False)
@@ -196,7 +186,7 @@ class ProtoConfigurationWidget(QWidget):
         )
 
     @staticmethod
-    def __create_bool_parameter(key, value, descriptor):
+    def __create_bool_parameter(key, value, _):
         """Convert a bool field in proto to a BoolParameter
 
         :param key: The name of the parameter
@@ -215,14 +205,10 @@ class ProtoConfigurationWidget(QWidget):
         :param descriptor: The proto descriptor
 
         """
-        return {"name": key, "type": "bool", "value": value}
+        return {"name": key, "type": "str", "value": value}
 
     def config_proto_to_param_dict(
-        self,
-        message,
-        search_term=None,
-        current_attr=None,
-        convert_all_fields_to_bools=False,
+        self, message, search_term=None, current_attr=None,
     ):
         """Converts a protobuf to a pyqtgraph parameter tree dictionary
         that can loaded directly into a ParameterTree
@@ -232,9 +218,6 @@ class ProtoConfigurationWidget(QWidget):
         :param message: The message to convert to a dictionary
         :param search_term: The search filter
         :param current_attr: Which attr we are currently on to set
-        :param convert_all_fields_to_bools: 
-                        Sometimes we just want to check/uncheck the fields
-                        of the protobuf (and not actually set an explicit value)
     
         """
         message_dict = {}
@@ -258,16 +241,12 @@ class ProtoConfigurationWidget(QWidget):
                         "name": key,
                         "type": "group",
                         "children": self.config_proto_to_param_dict(
-                            value,
-                            search_term,
-                            f"{current_attr}.{key}",
-                            convert_all_fields_to_bools,
+                            value, search_term, f"{current_attr}.{key}",
                         ),
                     }
                 )
 
-            elif convert_all_fields_to_bools or descriptor.type == descriptor.TYPE_BOOL:
-                value = False if convert_all_fields_to_bools else value
+            elif descriptor.type == descriptor.TYPE_BOOL:
                 field_list.append(self.__create_bool_parameter(key, value, descriptor))
 
             elif descriptor.type == descriptor.TYPE_ENUM:
