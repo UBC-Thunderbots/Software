@@ -13,7 +13,6 @@ from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 class playInfoWidget(QTableWidget):
 
-    # TODO (#2560): set these values dynamically
     NUM_ROWS = 6
     NUM_COLS = 4
 
@@ -61,6 +60,9 @@ class playInfoWidget(QTableWidget):
 
         if "robotTacticAssignment" not in play_info_dict:
             return
+
+        # setting table size dynamically
+        self.setRowCount(len(play_info_dict["robotTacticAssignment"]))
 
         play_name.append(play_info_dict["play"]["playName"])
 
