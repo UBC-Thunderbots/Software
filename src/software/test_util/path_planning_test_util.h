@@ -42,11 +42,12 @@ namespace TestUtil
     void checkPathDoesNotIntersectObstacle(std::vector<Point> path_points,
                                            std::vector<Polygon> obstacles);
 
-	/**
-	 * Given a list of points, print it out to the console. ONLY mean to be used as a debugging tool.
-	 *
-	 * @param path_points	path formed by a vector of Points
-	 */
+    /**
+     * Given a list of points, print it out to the console. ONLY mean to be used as a
+     * debugging tool.
+     *
+     * @param path_points	path formed by a vector of Points
+     */
     void printPathPoints(std::vector<Point> path_points);
-    
+
 }  // namespace TestUtil

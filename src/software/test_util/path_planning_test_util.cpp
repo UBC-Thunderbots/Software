@@ -72,10 +72,10 @@ void TestUtil::checkPathDoesNotExceedBoundingBox(std::vector<Point> path_points,
 
 void TestUtil::printPathPoints(std::vector<Point> path_points)
 {
-	std::cout << "Proposed path is: ";
-	for (Point &p : std::vector(path_points.begin(), path_points.end()-1))
-	{
-		std::cout << "(" << p.x() << ", " << p.y() << "), ";
-	}
-	std::cout << path_points.back() << "\n";
+    std::cout << "Proposed path is: ";
+    for (Point& p : std::vector(path_points.begin(), path_points.end() - 1))
+    {
+        std::cout << "(" << p.x() << ", " << p.y() << "), ";
+    }
+    std::cout << path_points.back() << "\n";
 }

@@ -690,16 +690,15 @@ TEST_F(TestEnlsvgPathPlanner,
     TestUtil::checkPathDoesNotIntersectObstacle(path_points, obstacles);
 }
 
-TEST_F(TestEnlsvgPathPlanner,
-       test_going_around_defense_area)
+TEST_F(TestEnlsvgPathPlanner, test_going_around_defense_area)
 {
     Field field              = Field::createSSLDivisionAField();
     Rectangle navigable_area = field.fieldBoundary();
 
     Point start{4.13, -1.97}, dest{2.02, 1.96};
 
-    std::vector<Polygon> obstacle_polygons { 
-            Rectangle(Point(3.018497, -1.481503), Point(4.8, 1.481503)),
+    std::vector<Polygon> obstacle_polygons{
+        Rectangle(Point(3.018497, -1.481503), Point(4.8, 1.481503)),
     };
 
     std::vector<ObstaclePtr> obstacles = {
