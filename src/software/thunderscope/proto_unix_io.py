@@ -68,17 +68,13 @@ class ProtoUnixIO:
         while True:
             proto = receive_buffer.get()
 
-            if "Validation" in proto.DESCRIPTOR.full_name:
-                print("__send_proto_to_observers: ",proto.DESCRIPTOR.full_name)
-
             if proto.DESCRIPTOR.full_name in self.proto_observers:
                 for buffer in self.proto_observers[proto.DESCRIPTOR.full_name]:
                     try:
                         buffer.put(proto, block=False)
                     except queue.Full:
                         pass
-            if "Validation" in proto.DESCRIPTOR.full_name:
-                print(proto.DESCRIPTOR.full_name)
+
             for buffer in self.all_proto_observers:
                 try:
                     buffer.put(proto, block=False)
@@ -114,8 +110,6 @@ class ProtoUnixIO:
         """
         if proto_class.DESCRIPTOR.full_name not in self.proto_observers:
             return
-        if "Validation" in proto_class.DESCRIPTOR.full_name:
-            print(proto_class.DESCRIPTOR.full_name, proto_class.DESCRIPTOR.full_name in self.proto_observers, len(self.proto_observers[proto_class.DESCRIPTOR.full_name]))
 
         for buffer in self.proto_observers[proto_class.DESCRIPTOR.full_name]:
             buffer.put(data)
@@ -128,9 +122,6 @@ class ProtoUnixIO:
         :param proto_class: The protobuf type to send
 
         """
-
-        if "Validation" in proto_class.DESCRIPTOR.full_name:
-            print("Attaching ", proto_class.DESCRIPTOR.full_name, unix_path)
         sender = ThreadedUnixSender(unix_path=unix_path)
         self.unix_senders[proto_class.DESCRIPTOR.full_name] = sender
         self.register_observer(proto_class, sender.proto_buffer)
@@ -158,7 +149,6 @@ class ProtoUnixIO:
             is_base64_encoded=from_log_visualize,
         )
         key = proto_class.DESCRIPTOR.full_name
-        print ("attaching to ",key)
         self.unix_listeners[key] = listener
         self.send_proto_to_observer_threads[key] = Thread(
             target=self.__send_proto_to_observers,
