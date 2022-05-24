@@ -327,6 +327,12 @@ pip_install(
 )
 
 pip_install(
+    name = "ansible_deps",
+    python_interpreter = "/opt/tbotspython/bin/python",
+    requirements = "//software/jetson_nano/ansible:requirements.txt",
+)
+
+pip_install(
     name = "simulated_tests_deps",
     python_interpreter = "/opt/tbotspython/bin/python",
     requirements = "//software/simulated_tests:requirements.txt",
