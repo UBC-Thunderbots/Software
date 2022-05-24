@@ -158,22 +158,9 @@ echo "================================================================"
 echo "Installing Bazel"
 echo "================================================================"
 
-# Adapted from https://docs.bazel.build/versions/master/install-ubuntu.html#install-on-ubuntu
-sudo apt install apt-transport-https curl gnupg -y
-curl -fsSL https://bazel.build/bazel-release.pub.gpg | gpg --dearmor >bazel-archive-keyring.gpg
-sudo mv bazel-archive-keyring.gpg /usr/share/keyrings
-echo "deb [arch=amd64 signed-by=/usr/share/keyrings/bazel-archive-keyring.gpg] https://storage.googleapis.com/bazel-apt stable jdk1.8" | sudo tee /etc/apt/sources.list.d/bazel.list
-
-sudo apt-get update
-if ! sudo apt-get install bazel-5.0.0 -y ; then
-    echo "##############################################################"
-    echo "Error: Installing Bazel failed"
-    echo "If you have a newer version installed, please manually downgrade"
-    echo "##############################################################"
-    exit 1
-fi
-sudo rm -f /usr/bin/bazel # remove symlink
-sudo ln -s /usr/bin/bazel-5.0.0 /usr/bin/bazel
+# Adapted from https://docs.bazel.build/versions/main/install-ubuntu.html#install-with-installer-ubuntu
+sudo wget -nc https://github.com/bazelbuild/bazel/releases/download/5.0.0/bazel-5.0.0-installer-linux-x86_64.sh -O /tmp/bazel-installer.sh
+sudo /tmp/bazel-installer.sh --user
 
 echo "================================================================"
 echo "Done Installing Bazel"
