@@ -698,6 +698,10 @@ TEST_F(TestEnlsvgPathPlanner,
 
     Point start{4.13, -1.97}, dest{2.02, 1.96};
 
+    std::vector<Polygon> obstacle_polygons { 
+            Rectangle(Point(3.018497, -1.481503), Point(4.8, 1.481503)),
+    };
+
     std::vector<ObstaclePtr> obstacles = {
         robot_navigation_obstacle_factory.createFromShape(
             Rectangle(Point(3.018497, -1.481503), Point(4.8, 1.481503))),
@@ -710,7 +714,10 @@ TEST_F(TestEnlsvgPathPlanner,
     ASSERT_TRUE(path != std::nullopt);
 
     std::vector<Point> path_points = path->getKnots();
-
+	for (Point &p : path_points)
+	{
+		std::cout << "(" << p.x() << ", " << p.y() << ")\n";
+	}
     // Make sure the start and end points match
     EXPECT_EQ(start, path->getStartPoint());
     EXPECT_EQ(dest, path->getEndPoint());
@@ -718,7 +725,7 @@ TEST_F(TestEnlsvgPathPlanner,
     // Make sure path does not exceed a bounding box
     Rectangle bounding_box({1, -2.5}, {5, 5});
     TestUtil::checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
-    TestUtil::checkPathDoesNotIntersectObstacle(path->getKnots(), obstacles);
+    TestUtil::checkPathDoesNotIntersectObstacle(path->getKnots(), obstacle_polygons);
 
     // Make sure that reusing the path planner still works by computing another path
     start = Point(5, 0);
@@ -726,6 +733,10 @@ TEST_F(TestEnlsvgPathPlanner,
 
     auto path_two = planner.findPath(start, dest);
     path_points   = path_two->getKnots();
+	for (Point &p : path_points)
+	{
+		std::cout << "(" << p.x() << ", " << p.y() << ")\n";
+	}
 
     ASSERT_TRUE(path_two != std::nullopt);
 
