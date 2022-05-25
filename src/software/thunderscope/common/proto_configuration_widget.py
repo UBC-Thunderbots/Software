@@ -198,7 +198,7 @@ class ProtoConfigurationWidget(QWidget):
 
     @staticmethod
     def __create_string_parameter(key, value, descriptor):
-        """Convert a string field in proto to a BoolParameter
+        """Convert a string field in proto to a StrParameter
 
         :param key: The name of the parameter
         :param value: The default value
