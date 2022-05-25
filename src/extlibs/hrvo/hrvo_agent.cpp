@@ -175,19 +175,30 @@ void HRVOAgent::computeNewVelocity()
     Circle circle_rep_of_agent(agent_position_point, radius_);
     // TODO: Maybe this should be moved to a helper?
     //       Maybe it should be a min of this and the path point distance
-    const double dist_required_to_stop = std::pow(velocity_.length(), 2) / (2 * max_accel_) + 0.05;
-    for (const auto &obstacle_ptr : static_obstacles)
+    const double dist_required_to_stop = std::pow(velocity_.length(), 2) / (2 * max_accel_) + 0.1;
+    double dist_to_obstacle_threshold = dist_required_to_stop;
+
+    const auto current_path_point = getPath().getCurrentPathPoint();
+    if (current_path_point.has_value())
     {
-        if (obstacle_ptr->distance(agent_position_point) <= dist_required_to_stop && !obstacle_ptr->contains(agent_position_point))
+        const double dist_to_path_point = (getPosition() - current_path_point.value().getPosition()).length();
+        dist_to_obstacle_threshold = std::min(dist_required_to_stop, dist_to_path_point);
+    }
+
+    for (const auto &obstacle : static_obstacles)
+    {
+        // Only consider obstacles that are nearby, and which do not contain the agent
+        double dist_to_agent = obstacle->distance(agent_position_point);
+        if (dist_to_agent <= dist_to_obstacle_threshold && !obstacle->contains(agent_position_point))
         {
-            VelocityObstacle velocity_obstacle = obstacle_ptr->generateVelocityObstacle(circle_rep_of_agent, Vector());
+            VelocityObstacle velocity_obstacle = obstacle->generateVelocityObstacle(circle_rep_of_agent, Vector());
             velocityObstacles_.push_back(velocity_obstacle);
         }
     }
 
     if (ball_obstacle.has_value())
     {
-        if (ball_obstacle.value()->distance(agent_position_point) <= dist_required_to_stop && !ball_obstacle.value()->contains(agent_position_point))
+        if (ball_obstacle.value()->distance(agent_position_point) <= dist_to_obstacle_threshold && !ball_obstacle.value()->contains(agent_position_point))
         {
             // TODO: Set the ball velocity
             VelocityObstacle velocity_obstacle = ball_obstacle.value()->generateVelocityObstacle(circle_rep_of_agent, Vector());
@@ -683,6 +694,8 @@ void HRVOAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive, cons
                 const auto constraint = static_cast<TbotsProto::MotionConstraint>(constraint_int);
                 if (constraint == TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL)
                 {
+                    // TODO: Should we store the constraints instead and run createFromMotionConstraint
+                    //       in computeNewVelocity
                     auto new_ball_obstacle = obstacle_factory.createFromMotionConstraint(constraint, world);
                     if (!new_ball_obstacle.empty())
                     {
