@@ -4,7 +4,7 @@ import textwrap
 import shelve
 import signal
 import platform
-import numpy
+import logging
 
 # PyQt5 doesn't play nicely with i3 and Ubuntu 18, PyQt6 is much more stable
 # Unfortunately, PyQt6 doesn't install on Ubuntu 18. Thankfully both
@@ -61,9 +61,6 @@ from software.thunderscope.robot_diagnostics.drive_and_dribbler_widget import (
 from software.thunderscope.replay.proto_player import ProtoPlayer
 
 SAVED_LAYOUT_PATH = "/opt/tbotspython/saved_tscope_layout"
-NUM_ROBOTS = 6
-SIM_TICK_RATE_MS = 16
-REFRESH_INTERVAL_MS = 5
 GAME_CONTROLLER_URL = "http://localhost:8081"
 
 
@@ -116,7 +113,7 @@ class Thunderscope(object):
         self.app = pyqtgraph.mkQApp("Thunderscope")
 
         # Setup stylesheet
-        apply_stylesheet(self.app, theme="dark_blue.xml")
+        apply_stylesheet(self.app, theme="light_blue.xml")
 
         self.blue_replay_log = blue_replay_log
         self.yellow_replay_log = yellow_replay_log
@@ -185,19 +182,7 @@ class Thunderscope(object):
         self.reset_layout_shortcut = QtGui.QShortcut(
             QtGui.QKeySequence("Ctrl+R"), self.window
         )
-
-        def __reset_layout():
-            if os.path.exists(SAVED_LAYOUT_PATH):
-                os.remove(SAVED_LAYOUT_PATH)
-                QMessageBox.information(
-                    self.window,
-                    "Restart Required",
-                    """
-                    Restart thunderscope to reset the layout.
-                    """,
-                )
-
-        self.reset_layout_shortcut.activated.connect(__reset_layout)
+        self.reset_layout_shortcut.activated.connect(self.reset_layout)
 
         self.show_help = QtGui.QShortcut(QtGui.QKeySequence("h"), self.window)
         self.show_help.activated.connect(
@@ -227,6 +212,17 @@ class Thunderscope(object):
             )
         )
 
+    def reset_layout(self):
+        """Reset the layout to the default layout"""
+
+        if os.path.exists(SAVED_LAYOUT_PATH):
+            os.remove(SAVED_LAYOUT_PATH)
+            QMessageBox.information(
+                self.window,
+                "Restart Required",
+                "Restart thunderscope to reset the layout.",
+            )
+
     def save_layout(self):
         """Open a file dialog to save the layout and any other
         registered state to a file
@@ -241,16 +237,22 @@ class Thunderscope(object):
         )
 
         if not filename:
-            print("No filename selected")
+            logging.warn("No filename selected")
             return
 
         with shelve.open(filename, "c") as shelf:
             shelf["blue_dock_state"] = self.blue_full_system_dock_area.saveState()
             shelf["yellow_dock_state"] = self.yellow_full_system_dock_area.saveState()
+            shelf[
+                "robot_diagnostics_dock_state"
+            ] = self.robot_diagnostics_dock_area.saveState()
 
         with shelve.open(SAVED_LAYOUT_PATH, "c") as shelf:
             shelf["blue_dock_state"] = self.blue_full_system_dock_area.saveState()
             shelf["yellow_dock_state"] = self.yellow_full_system_dock_area.saveState()
+            shelf[
+                "robot_diagnostics_dock_state"
+            ] = self.robot_diagnostics_dock_area.saveState()
 
     def load_layout(self, filename=None):
         """Open a file dialog to load the layout and state to all widgets
@@ -269,15 +271,22 @@ class Thunderscope(object):
             )
 
             if not filename:
-                print("No filename selected")
+                logging.warn("No filename selected")
                 return
 
+        # lets load the layouts from the shelf into their respective dock areas
+        # if the dock doesn't exist in the default layout, we ignore it
+        # (instead of adding a placeholder dock)
         with shelve.open(filename, "r") as shelf:
+
             self.blue_full_system_dock_area.restoreState(
                 shelf["blue_dock_state"], missing="ignore"
             )
             self.yellow_full_system_dock_area.restoreState(
                 shelf["yellow_dock_state"], missing="ignore"
+            )
+            self.robot_diagnostics_dock_area.restoreState(
+                shelf["robot_diagnostics_dock_state"], missing="ignore"
             )
 
             # Update default layout
@@ -285,6 +294,9 @@ class Thunderscope(object):
                 with shelve.open(SAVED_LAYOUT_PATH, "c") as default_shelf:
                     default_shelf["blue_dock_state"] = shelf["blue_dock_state"]
                     default_shelf["yellow_dock_state"] = shelf["yellow_dock_state"]
+                    default_shelf["robot_diagnostics_dock_state"] = shelf[
+                        "robot_diagnostics_dock_state"
+                    ]
                     default_shelf.sync()
 
     def __setup(
@@ -479,10 +491,18 @@ class Thunderscope(object):
         self.robot_diagnostics_dock_area.addDock(log_dock)
         self.robot_diagnostics_dock_area.addDock(drive_dock, "right", log_dock)
         self.robot_diagnostics_dock_area.addDock(chicker_dock, "bottom", drive_dock)
-        self.robot_diagnostics_dock_area.addDock(proto_plotter_dock_1, "right", log_dock)
-        self.robot_diagnostics_dock_area.addDock(proto_plotter_dock_2, "bottom", proto_plotter_dock_1)
-        self.robot_diagnostics_dock_area.addDock(proto_plotter_dock_3, "bottom", proto_plotter_dock_2)
-        self.robot_diagnostics_dock_area.addDock(proto_plotter_dock_4, "bottom", proto_plotter_dock_3)
+        self.robot_diagnostics_dock_area.addDock(
+            proto_plotter_dock_1, "right", log_dock
+        )
+        self.robot_diagnostics_dock_area.addDock(
+            proto_plotter_dock_2, "bottom", proto_plotter_dock_1
+        )
+        self.robot_diagnostics_dock_area.addDock(
+            proto_plotter_dock_3, "bottom", proto_plotter_dock_2
+        )
+        self.robot_diagnostics_dock_area.addDock(
+            proto_plotter_dock_4, "bottom", proto_plotter_dock_3
+        )
 
     def setup_field_widget(
         self, sim_proto_unix_io, full_system_proto_unix_io, friendly_colour_yellow

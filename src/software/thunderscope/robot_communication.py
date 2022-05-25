@@ -43,7 +43,7 @@ class RobotCommunication(object):
             )
         except Exception:
             raise Exception("Could not find estop, make sure its plugged in")
-        
+
         self.run_thread = Thread(target=self.run)
 
     def run(self):
