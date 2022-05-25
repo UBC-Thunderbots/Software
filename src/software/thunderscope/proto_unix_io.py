@@ -75,6 +75,12 @@ class ProtoUnixIO:
                     except queue.Full:
                         pass
 
+            for buffer in self.all_proto_observers:
+                try:
+                    buffer.put(proto, block=False)
+                except queue.Full:
+                    print("Buffer registered to receive everything dropped data")
+
     def register_observer(self, proto_class, buffer):
         """Register a widget to consume from a given protobuf class
 
