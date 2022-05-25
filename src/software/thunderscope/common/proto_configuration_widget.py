@@ -91,7 +91,7 @@ class ProtoConfigurationWidget(QWidget):
             else:
                 child_name = param.name()
 
-            exec(f"self.proto_to_configure.{child_name} = {data}")
+            exec(f"self.proto_to_configure.{child_name} = data")
             self.on_change_callback(child_name, data, self.proto_to_configure)
 
     @staticmethod
@@ -198,14 +198,14 @@ class ProtoConfigurationWidget(QWidget):
 
     @staticmethod
     def __create_string_parameter(key, value, descriptor):
-        """Convert a bool field in proto to a BoolParameter
+        """Convert a string field in proto to a BoolParameter
 
         :param key: The name of the parameter
         :param value: The default value
         :param descriptor: The proto descriptor
 
         """
-        return {"name": key, "type": "str", "value": value}
+        return {"name": key, "type": "text", "value": " "}
 
     def config_proto_to_param_dict(
         self, message, search_term=None, current_attr=None,
