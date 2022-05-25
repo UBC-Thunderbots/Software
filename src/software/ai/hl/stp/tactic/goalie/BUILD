@@ -14,7 +14,6 @@ cc_library(
     ],
     deps = [
         "//shared:constants",
-        "//shared/parameter:cpp_configs",
         "//software/ai/evaluation:enemy_threat",
         "//software/ai/hl/stp/tactic",
         "//software/ai/hl/stp/tactic/chip:chip_tactic",
@@ -40,6 +39,10 @@ py_test(
     name = "goalie_tactic_test",
     srcs = [
         "goalie_tactic_test.py",
+    ],
+    # TODO (#2619) Remove tag to run in parallel
+    tags = [
+        "exclusive",
     ],
     deps = [
         "//software/simulated_tests:simulated_test_fixture",

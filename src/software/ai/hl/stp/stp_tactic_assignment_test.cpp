@@ -18,18 +18,13 @@
 class STPTacticAssignmentTest : public ::testing::Test
 {
    public:
-    STPTacticAssignmentTest()
-        : thunderbots_config(std::make_shared<const ThunderbotsConfig>()),
-          stp(thunderbots_config->getAiConfig())
-    {
-    }
+    STPTacticAssignmentTest() : ai_config(TbotsProto::AiConfig()), stp(ai_config) {}
 
    protected:
     void SetUp() override
     {
-        thunderbots_config = std::make_shared<const ThunderbotsConfig>();
         // Give an explicit seed to STP so that our tests are deterministic
-        stp   = STP(thunderbots_config->getAiConfig());
+        stp   = STP(ai_config);
         world = ::TestUtil::createBlankTestingWorld();
     }
 
@@ -58,7 +53,7 @@ class STPTacticAssignmentTest : public ::testing::Test
         return all_tactics_have_robot_assigned;
     }
 
-    std::shared_ptr<const ThunderbotsConfig> thunderbots_config;
+    TbotsProto::AiConfig ai_config;
     STP stp;
     World world = ::TestUtil::createBlankTestingWorld();
 };
@@ -648,16 +643,16 @@ TEST_F(STPTacticAssignmentTest, test_multi_tier_assignment_with_tiered_assignmen
     friendly_team.assignGoalie(0);
     world.updateFriendlyTeamState(friendly_team);
 
+    // TODO-AKHIL: This test is failing because the robot assigned to the move tactic is
+    // not
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics = {
         std::make_shared<CreaseDefenderTactic>(
-            thunderbots_config->getAiConfig()->getRobotNavigationObstacleConfig()),
+            ai_config.robot_navigation_obstacle_config()),
         std::make_shared<CreaseDefenderTactic>(
-            thunderbots_config->getAiConfig()->getRobotNavigationObstacleConfig()),
-    };
+            ai_config.robot_navigation_obstacle_config())};
 
     Pass passer_pass(Point(2, 3), Point(0.5, 0.3), 2);
-    auto ai_config = std::make_shared<ThunderbotsConfig>()->getAiConfig();
-    auto attacker  = std::make_shared<AttackerTactic>(ai_config);
+    auto attacker = std::make_shared<AttackerTactic>(ai_config);
     attacker->updateControlParams(passer_pass, true);
     auto receiver = std::make_shared<ReceiverTactic>();
 

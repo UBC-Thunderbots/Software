@@ -2,53 +2,12 @@
 
 #include "shared/constants.h"
 #include "software/geom/angle.h"
-
-extern "C"
-{
-#include "firmware/shared/physics.h"
-}
+#include "software/logger/logger.h"
 
 // Converts rpm and wheel_radius_meters [m] to speed [m/s]
 float rpm_to_m_per_s(float rpm, float wheel_radius_meters)
 {
     return (2 * (float)M_PI * rpm * wheel_radius_meters) / 60.0f;
-}
-
-std::unique_ptr<SSLSimulationProto::RobotMoveCommand> createRobotMoveCommand(
-    double wheel_rpm_front_right, double wheel_rpm_front_left, double wheel_rpm_back_left,
-    double wheel_rpm_back_right, float front_wheel_angle_deg, float back_wheel_angle_deg,
-    float wheel_radius_meters)
-{
-    auto move_local_velocity = SSLSimulationProto::MoveLocalVelocity();
-
-    // Convert the units of wheel speeds to m/s
-    float front_left_m_per_s =
-        rpm_to_m_per_s(static_cast<float>(wheel_rpm_front_left), wheel_radius_meters);
-    float back_left_m_per_s =
-        rpm_to_m_per_s(static_cast<float>(wheel_rpm_back_left), wheel_radius_meters);
-    float back_right_m_per_s =
-        rpm_to_m_per_s(static_cast<float>(wheel_rpm_back_right), wheel_radius_meters);
-    float front_right_m_per_s =
-        rpm_to_m_per_s(static_cast<float>(wheel_rpm_front_right), wheel_radius_meters);
-    float wheel_speeds[4]{front_left_m_per_s, back_left_m_per_s, back_right_m_per_s,
-                          front_right_m_per_s};
-    float robot_local_speed[3]{0.0, 0.0, 0.0};
-    shared_physics_speed4ToSpeed3(wheel_speeds, robot_local_speed, front_wheel_angle_deg,
-                                  back_wheel_angle_deg);
-
-    // Convert speed [m/s] to angular velocity [rad/s]
-    robot_local_speed[2] =
-        robot_local_speed[2] / static_cast<float>(ROBOT_MAX_RADIUS_METERS);
-
-    move_local_velocity.set_forward(robot_local_speed[0]);
-    move_local_velocity.set_left(robot_local_speed[1]);
-    move_local_velocity.set_angular(robot_local_speed[2]);
-
-    auto move_command = std::make_unique<SSLSimulationProto::RobotMoveCommand>();
-
-    *(move_command->mutable_local_velocity()) = move_local_velocity;
-
-    return move_command;
 }
 
 std::unique_ptr<SSLSimulationProto::RobotMoveCommand> createRobotMoveCommand(
@@ -59,12 +18,7 @@ std::unique_ptr<SSLSimulationProto::RobotMoveCommand> createRobotMoveCommand(
     {
         case TbotsProto::DirectControlPrimitive::kDirectPerWheelControl:
         {
-            return createRobotMoveCommand(
-                direct_control.direct_per_wheel_control().front_left_wheel_rpm(),
-                direct_control.direct_per_wheel_control().back_left_wheel_rpm(),
-                direct_control.direct_per_wheel_control().front_right_wheel_rpm(),
-                direct_control.direct_per_wheel_control().back_right_wheel_rpm(),
-                front_wheel_angle_deg, back_wheel_angle_deg, wheel_radius_meters);
+            LOG(FATAL) << "Direct per-wheel control is not supported in simulation";
         }
 
         case TbotsProto::DirectControlPrimitive::kDirectVelocityControl:

@@ -1,7 +1,7 @@
 #include "software/ai/navigator/path_planner/global_path_planner_factory.h"
 
 GlobalPathPlannerFactory::GlobalPathPlannerFactory(
-    const std::shared_ptr<const RobotNavigationObstacleConfig> navigation_obstacle_config,
+    const TbotsProto::RobotNavigationObstacleConfig navigation_obstacle_config,
     const Field &field)
 {
     RobotNavigationObstacleFactory obstacle_factory =

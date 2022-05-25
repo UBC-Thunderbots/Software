@@ -1,6 +1,6 @@
 #pragma once
 
-#include "shared/parameter/cpp_dynamic_parameters.h"
+#include "proto/parameters.pb.h"
 #include "software/ai/hl/stp/play/play.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 
@@ -11,7 +11,7 @@
 class DefensePlay : public Play
 {
    public:
-    DefensePlay(std::shared_ptr<const AiConfig> config);
+    DefensePlay(TbotsProto::AiConfig config);
 
     void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
 

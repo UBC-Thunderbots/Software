@@ -1,0 +1,39 @@
+---
+# Example Ansible playbook that can be run on multiple Jetson Nanos
+
+  #plays start by defining basic setup info
+- name: Example Ansible playbook          # name of this playbook
+  hosts: THUNDERBOTS_HOSTS                # ensures that we only run on hosts defined under this group
+
+  vars:
+    - example_var: example                # variables can be set statically or at runtime
+
+
+  #once setup is done, tasks can be defined. They will be executed in order
+  tasks:
+
+  - name: echo hello world
+    register: res                         # save the result of this task in the variable "res"
+    tags: echoHelloWorld
+    shell: echo hello world
+
+  - debug:
+      msg:
+        - "[Robot ID = {{ inventory_hostname }}]"
+        - "stdout = {{ res.stdout_lines }} "
+        - "stderr = {{ res.stderr }}"
+
+  - name: Reboot
+    become: true
+    become_user: root
+    become_method: sudo
+    register: res
+    tags:
+      - reboot
+    reboot:
+      msg: "Reboot initiated by Ansible"
+      connect_timeout: 20
+      reboot_timeout: 1200
+      pre_reboot_delay: 0
+      post_reboot_delay: 6
+      test_command: whoami
