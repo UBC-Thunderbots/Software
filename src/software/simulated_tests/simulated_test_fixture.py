@@ -382,10 +382,9 @@ def simulated_test_runner():
                 )
 
                 yield runner
-                print("\n\n\n")
                 print(
-                    f"   To replay this test for the blue team, run \n./tbots.py run thunderscope --blue_log {blue_logger.log_folder}\n    from the `src` folder.\n\n"
+                    f"\n\n\nTo replay this test for the blue team, go to the `src` folder and run \n./tbots.py run thunderscope --blue_log {blue_logger.log_folder}\n\n"
                 )
                 print(
-                    f"   To replay this test for the yellow team, run \n./tbots.py run thunderscope --yellow_log {yellow_logger.log_folder}\n    from the `src` folder."
+                    f"\n\n\nTo replay this test for the yellow team, go to the `src` folder and run \n./tbots.py run thunderscope --yellow_log {yellow_logger.log_folder}\n\n"
                 )
