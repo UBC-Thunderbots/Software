@@ -113,7 +113,7 @@ class Thunderscope(object):
         self.app = pyqtgraph.mkQApp("Thunderscope")
 
         # Setup stylesheet
-        apply_stylesheet(self.app, theme="light_blue.xml")
+        apply_stylesheet(self.app, theme="dark_blue.xml")
 
         self.blue_replay_log = blue_replay_log
         self.yellow_replay_log = yellow_replay_log
@@ -396,6 +396,12 @@ class Thunderscope(object):
         )
         performance_dock = Dock("Performance")
         performance_dock.addWidget(widgets["performance_widget"])
+
+        widgets["parameter_widget"] = self.setup_parameter_widget(
+            full_system_proto_unix_io, friendly_colour_yellow
+        )
+        parameter_dock = Dock("Parameters")
+        parameter_dock.addWidget(widgets["parameter_widget"])
 
         widgets["parameter_widget"] = self.setup_parameter_widget(
             full_system_proto_unix_io, friendly_colour_yellow

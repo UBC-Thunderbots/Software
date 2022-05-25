@@ -59,6 +59,12 @@ void AI::checkAiConfig()
 std::unique_ptr<TbotsProto::PrimitiveSet> AI::getPrimitives(const World& world)
 {
     checkAiConfig();
+
+    if (ai_config_changed)
+    {
+        fsm.reset(new FSM<PlaySelectionFSM>(PlaySelectionFSM{ai_config_}));
+    }
+
     fsm->process_event(PlaySelectionFSM::Update(
         [this](std::unique_ptr<Play> play) { current_play = std::move(play); },
         world.gameState(), ai_config_));
