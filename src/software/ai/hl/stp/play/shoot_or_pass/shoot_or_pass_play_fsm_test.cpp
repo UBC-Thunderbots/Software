@@ -23,10 +23,11 @@ TEST(ShootOrPassPlayFSMTest, test_transitions)
     EXPECT_TRUE(fsm.is(boost::sml::state<ShootOrPassPlayFSM::AttemptShotState>));
 }
 
-TEST(ShootOrPassPlayFSMTest, test_abort_pass_guard_lost_posession)
+TEST(ShootOrPassPlayFSMTest, test_abort_pass_guard_lost_possession)
 {
     World world = ::TestUtil::createBlankTestingWorld();
     world.updateRefereeCommand(RefereeCommand::FORCE_START);
+    world.setTeamWithPossession(TeamSide::FRIENDLY);
 
     FSM<ShootOrPassPlayFSM> fsm(
         ShootOrPassPlayFSM{std::make_shared<const ThunderbotsConfig>()->getAiConfig()});
@@ -35,7 +36,7 @@ TEST(ShootOrPassPlayFSMTest, test_abort_pass_guard_lost_posession)
     fsm.process_event(ShootOrPassPlayFSM::Update(
         ShootOrPassPlayFSM::ControlParams{},
         PlayUpdate(
-            world, 4, [](PriorityTacticVector new_tactics) {}, InterPlayCommunication{},
+            world, 3, [](PriorityTacticVector new_tactics) {}, InterPlayCommunication{},
             [](InterPlayCommunication comm) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<ShootOrPassPlayFSM::AttemptShotState>));
 
@@ -44,21 +45,22 @@ TEST(ShootOrPassPlayFSMTest, test_abort_pass_guard_lost_posession)
     fsm.process_event(ShootOrPassPlayFSM::Update(
         ShootOrPassPlayFSM::ControlParams{},
         PlayUpdate(
-            world, 2, [](PriorityTacticVector new_tactics) {}, InterPlayCommunication{},
+            world, 3, [](PriorityTacticVector new_tactics) {}, InterPlayCommunication{},
             [](InterPlayCommunication comm) {})));
 
-    world.setTeamWithPossession(TeamSide::FRIENDLY);
+
     Robot friendly_robot_1(1, Point(3, 0), Vector(0, 0), Angle::zero(),
                            AngularVelocity::zero(), Timestamp::fromSeconds(2));
     Robot friendly_robot_2(2, Point(0, 0), Vector(0, 0), Angle::half(),
                            AngularVelocity::zero(), Timestamp::fromSeconds(2));
+
     std::vector<Robot> friendlies = {friendly_robot_1, friendly_robot_2};
     world.updateFriendlyTeamState(Team(friendlies));
 
     fsm.process_event(ShootOrPassPlayFSM::Update(
         ShootOrPassPlayFSM::ControlParams{},
         PlayUpdate(
-            world, 2, [](PriorityTacticVector new_tactics) {}, InterPlayCommunication{},
+            world, 3, [](PriorityTacticVector new_tactics) {}, InterPlayCommunication{},
             [](InterPlayCommunication comm) {})));
 
     fsm.process_event(ShootOrPassPlayFSM::Update(
@@ -74,10 +76,34 @@ TEST(ShootOrPassPlayFSMTest, test_abort_pass_guard_lost_posession)
     fsm.process_event(ShootOrPassPlayFSM::Update(
         ShootOrPassPlayFSM::ControlParams{},
         PlayUpdate(
-            world, 2, [](PriorityTacticVector new_tactics) {}, InterPlayCommunication{},
+            world, 3, [](PriorityTacticVector new_tactics) {}, InterPlayCommunication{},
             [](InterPlayCommunication comm) {})));
 
     EXPECT_TRUE(fsm.is(boost::sml::state<ShootOrPassPlayFSM::AttemptShotState>));
+
+    world.setTeamWithPossession(TeamSide::FRIENDLY);
+
+    fsm.process_event(ShootOrPassPlayFSM::Update(
+            ShootOrPassPlayFSM::ControlParams{},
+            PlayUpdate(
+                    world, 3, [](PriorityTacticVector new_tactics) {}, InterPlayCommunication{},
+                    [](InterPlayCommunication comm) {})));
+
+    world.updateTimestamp(Timestamp::fromSeconds(3));
+    world.updateRefereeCommand(RefereeCommand::FORCE_START);
+
+    fsm.process_event(ShootOrPassPlayFSM::Update(
+            ShootOrPassPlayFSM::ControlParams{},
+            PlayUpdate(
+                    world, 3, [](PriorityTacticVector new_tactics) {}, InterPlayCommunication{},
+                    [](InterPlayCommunication comm) {})));
+    fsm.process_event(ShootOrPassPlayFSM::Update(
+            ShootOrPassPlayFSM::ControlParams{},
+            PlayUpdate(
+                    world, 3, [](PriorityTacticVector new_tactics) {}, InterPlayCommunication{},
+                    [](InterPlayCommunication comm) {})));
+
+    EXPECT_TRUE(fsm.is(boost::sml::state<ShootOrPassPlayFSM::TakePassState>));
 }
 
 TEST(ShootOrPassPlayFSMTest, test_abort_pass_guard_ball_changed)
