@@ -194,8 +194,13 @@ void HRVOSimulator::updatePrimitiveSet(const TbotsProto::PrimitiveSet &new_primi
                 hrvo_agent->setPreferredSpeed(new_max_speed * PREF_SPEED_SCALE);
 
                 // TODO (#2418): Update implementation of Primitive to support
-                // multiple path points
-                auto destination = primitive.move().path().point().at(0);
+                // multiple path points and remove this check
+                CHECK(primitive.move().motion_control().path().points().size() >= 2)
+                    << "Empty path: "
+                    << primitive.move().motion_control().path().points().size()
+                    << std::endl;
+                auto destination =
+                    primitive.move().motion_control().path().points().at(1);
 
                 // Max distance which the robot can travel in one time step + scaling
                 float path_radius =
@@ -249,7 +254,13 @@ std::size_t HRVOSimulator::addHRVORobotAgent(const Robot &robot)
         if (primitive.has_move())
         {
             const auto &move_primitive = primitive.move();
-            destination_point_proto    = move_primitive.path().point().at(0);
+            // TODO (#2418): Update implementation of Primitive to support
+            // multiple path points and remove this check
+            CHECK(move_primitive.motion_control().path().points().size() >= 2)
+                << "Empty path: "
+                << move_primitive.motion_control().path().points().size() << std::endl;
+            destination_point_proto =
+                move_primitive.motion_control().path().points().at(1);
             destination_point =
                 Vector(static_cast<float>(destination_point_proto.x_meters()),
                        static_cast<float>(destination_point_proto.y_meters()));
@@ -364,34 +375,28 @@ Vector HRVOSimulator::getRobotVelocity(unsigned int robot_id) const
 
 void HRVOSimulator::visualize(unsigned int robot_id) const
 {
-    // TODO (#2499): Create a new HRVO visualization proto and uncomment/update
-    // LOG(VISUALIZE)
-    TbotsProto::Obstacles obstacle_proto;
-
-    // Add velocity obstacles and candidate new velocities to be visualized
     auto friendly_agent_opt = getFriendlyAgentFromRobotId(robot_id);
-    if (friendly_agent_opt.has_value())
+    if (!friendly_agent_opt.has_value())
     {
-        auto friendly_agent = friendly_agent_opt.value();
-        for (auto &obstacle : friendly_agent->getVelocityObstaclesAsPolygons())
-        {
-            *(obstacle_proto.add_polygon()) = *createPolygonProto(obstacle);
-        }
-
-        for (auto &candidate_circle : friendly_agent->getCandidateVelocitiesAsCircles())
-        {
-            *(obstacle_proto.add_circle()) = *createCircleProto(candidate_circle);
-        }
+        LOG(WARNING) << "HRVO friendly agent with robot id " << robot_id
+                     << " can not be visualized." << std::endl;
+        return;
     }
 
-    // Add circles representing agents
+    TbotsProto::HRVOVisualization hrvo_visualization;
+    hrvo_visualization.set_robot_id(robot_id);
+
+    auto vo_protos = friendly_agent_opt.value()->getVelocityObstaclesAsProto();
+    *(hrvo_visualization.mutable_velocity_obstacles()) = {vo_protos.begin(),
+                                                          vo_protos.end()};
+
     for (auto &agent : agents)
     {
         Point position(agent->getPosition());
-        *(obstacle_proto.add_circle()) =
+        *(hrvo_visualization.add_robots()) =
             *createCircleProto(Circle(position, agent->getRadius()));
     }
-    // LOG(VISUALIZE) << obstacle_proto;
+    LOG(VISUALIZE) << hrvo_visualization;
 }
 
 std::optional<std::shared_ptr<HRVOAgent>> HRVOSimulator::getFriendlyAgentFromRobotId(

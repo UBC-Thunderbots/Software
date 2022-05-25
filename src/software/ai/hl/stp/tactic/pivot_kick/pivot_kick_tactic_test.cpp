@@ -5,7 +5,7 @@
 #include <utility>
 
 #include "software/geom/algorithms/contains.h"
-#include "software/simulated_tests/simulated_er_force_sim_tactic_test_fixture.h"
+#include "software/simulated_tests/simulated_er_force_sim_play_test_fixture.h"
 #include "software/simulated_tests/terminating_validation_functions/ball_kicked_validation.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_state_validation.h"
 #include "software/simulated_tests/validation/validation_function.h"
@@ -14,14 +14,13 @@
 #include "software/world/world.h"
 
 class PivotKickTacticTest
-    : public SimulatedErForceSimTacticTestFixture,
+    : public SimulatedErForceSimPlayTestFixture,
       public ::testing::WithParamInterface<std::tuple<Vector, Angle>>
 {
    protected:
     TbotsProto::FieldType field_type = TbotsProto::FieldType::DIV_B;
     Field field                      = Field::createField(field_type);
-    std::shared_ptr<const AiConfig> ai_config =
-        std::make_shared<ThunderbotsConfig>()->getAiConfig();
+    TbotsProto::AiConfig ai_config;
 };
 
 TEST_P(PivotKickTacticTest, pivot_kick_test)
@@ -39,8 +38,7 @@ TEST_P(PivotKickTacticTest, pivot_kick_test)
     auto tactic = std::make_shared<PivotKickTactic>(ai_config);
     tactic->updateControlParams(robot_position + ball_offset_from_robot, angle_to_kick_at,
                                 {AutoChipOrKickMode::AUTOKICK, 5});
-    setTactic(tactic);
-    setFriendlyRobotId(1);
+    setTactic(1, tactic);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [angle_to_kick_at, tactic](std::shared_ptr<World> world_ptr,

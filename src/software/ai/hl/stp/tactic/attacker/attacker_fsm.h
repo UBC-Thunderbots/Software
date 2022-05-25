@@ -1,12 +1,11 @@
 #pragma once
 
-#include "shared/parameter/cpp_dynamic_parameters.h"
+#include "proto/parameters.pb.h"
 #include "software/ai/evaluation/keep_away.h"
 #include "software/ai/evaluation/shot.h"
 #include "software/ai/hl/stp/tactic/chip/chip_fsm.h"
 #include "software/ai/hl/stp/tactic/pivot_kick/pivot_kick_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
-#include "software/ai/intent/move_intent.h"
 #include "software/ai/passing/pass.h"
 
 struct AttackerFSM
@@ -16,8 +15,7 @@ struct AttackerFSM
      *
      * @param attacker_tactic_config The config to fetch parameters from
      */
-    explicit AttackerFSM(
-        std::shared_ptr<const AttackerTacticConfig> attacker_tactic_config)
+    explicit AttackerFSM(TbotsProto::AttackerTacticConfig attacker_tactic_config)
         : attacker_tactic_config(attacker_tactic_config)
     {
     }
@@ -87,5 +85,5 @@ struct AttackerFSM
 
    private:
     // the attacker tactic config
-    std::shared_ptr<const AttackerTacticConfig> attacker_tactic_config;
+    TbotsProto::AttackerTacticConfig attacker_tactic_config;
 };

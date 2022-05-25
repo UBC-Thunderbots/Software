@@ -3,7 +3,7 @@ import sys
 import pytest
 
 import software.python_bindings as tbots
-from proto.play_pb2 import Play
+from proto.play_pb2 import Play, PlayName
 from software.simulated_tests.ball_enters_region import *
 from software.simulated_tests.simulated_test_fixture import simulated_test_runner
 from proto.message_translation.tbots_protobuf import create_world_state
@@ -11,7 +11,7 @@ from proto.ssl_gc_common_pb2 import Team
 from proto.ssl_gc_geometry_pb2 import Vector2
 
 # TODO issue  #2599 - Remove Duration parameter from test
-@pytest.mark.parametrize("run_enemy_ai,test_duration", [(False, 10), (True, 20)])
+@pytest.mark.parametrize("run_enemy_ai,test_duration", [(False, 20), (True, 20)])
 def test_two_ai_ball_placement(simulated_test_runner, run_enemy_ai, test_duration):
 
     # starting point must be Point
@@ -54,14 +54,14 @@ def test_two_ai_ball_placement(simulated_test_runner, run_enemy_ai, test_duratio
 
     # Force play override here
     blue_play = Play()
-    blue_play.name = Play.BallPlacementPlay
+    blue_play.name = PlayName.BallPlacementPlay
 
     simulated_test_runner.blue_full_system_proto_unix_io.send_proto(Play, blue_play)
 
     # We can parametrize running in ai_vs_ai mode
     if run_enemy_ai:
         yellow_play = Play()
-        yellow_play.name = Play.EnemyBallPlacementPlay
+        yellow_play.name = PlayName.EnemyBallPlacementPlay
 
         simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(
             Play, yellow_play

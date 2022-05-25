@@ -1,13 +1,13 @@
 #include "software/ai/hl/stp/play/offense/offense_play.h"
 
+#include "proto/parameters.pb.h"
 #include "shared/constants.h"
-#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/evaluation/possession.h"
 #include "software/logger/logger.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-OffensePlay::OffensePlay(std::shared_ptr<const AiConfig> config)
+OffensePlay::OffensePlay(TbotsProto::AiConfig config)
     : Play(config, true),
       shoot_or_pass_play(std::make_shared<ShootOrPassPlay>(ai_config)),
       crease_defense_play(std::make_shared<CreaseDefensePlay>(ai_config))
@@ -29,10 +29,15 @@ void OffensePlay::updateTactics(const PlayUpdate &play_update)
     PriorityTacticVector tactics_to_return;
     unsigned int num_shoot_or_pass = play_update.num_tactics - 2;
     unsigned int num_defenders     = 2;
+    if (play_update.num_tactics == 0)
+    {
+        return;
+    }
     if (play_update.num_tactics <= 3)
     {
         num_shoot_or_pass = 1;
-        num_defenders     = play_update.num_tactics - 1;
+        // play_update.num_tactics == 0 is handled above
+        num_defenders = play_update.num_tactics - 1;
     }
 
     shoot_or_pass_play->updateTactics(PlayUpdate(
@@ -65,4 +70,4 @@ void OffensePlay::updateTactics(const PlayUpdate &play_update)
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, OffensePlay, AiConfig> factory;
+static TGenericFactory<std::string, Play, OffensePlay, TbotsProto::AiConfig> factory;

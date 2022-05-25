@@ -53,7 +53,6 @@ cc_library(
     deps = [
         ":play",
         "//shared:constants",
-        "//shared/parameter:cpp_configs",
         "//software/ai/evaluation:enemy_threat",
         "//software/ai/evaluation:possession",
         "//software/ai/hl/stp/tactic/attacker:attacker_tactic",
@@ -77,7 +76,6 @@ cc_library(
     deps = [
         ":play",
         "//shared:constants",
-        "//shared/parameter:cpp_configs",
         "//software/ai/hl/stp/tactic/crease_defender:crease_defender_tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",
         "//software/ai/hl/stp/tactic/shadow_enemy:shadow_enemy_tactic",
@@ -94,7 +92,6 @@ cc_library(
     deps = [
         ":play",
         "//shared:constants",
-        "//shared/parameter:cpp_configs",
         "//software/ai/evaluation:enemy_threat",
         "//software/ai/hl/stp/tactic/crease_defender:crease_defender_tactic",
         "//software/ai/hl/stp/tactic/goalie:goalie_tactic",
@@ -115,7 +112,6 @@ cc_library(
     deps = [
         ":play",
         "//shared:constants",
-        "//shared/parameter:cpp_configs",
         "//software/ai/hl/stp/tactic/move:move_tactic",
         "//software/logger",
         "//software/util/generic_factory",
@@ -130,7 +126,6 @@ cc_library(
     deps = [
         ":play",
         "//shared:constants",
-        "//shared/parameter:cpp_configs",
         "//software/ai/hl/stp/tactic/stop:stop_tactic",
         "//software/logger",
         "//software/util/generic_factory",
@@ -146,7 +141,6 @@ cc_library(
         ":corner_kick_play",
         ":play",
         "//shared:constants",
-        "//shared/parameter:cpp_configs",
         "//software/ai/evaluation:enemy_threat",
         "//software/ai/evaluation:find_open_areas",
         "//software/ai/evaluation:possession",
@@ -171,7 +165,6 @@ cc_library(
     deps = [
         ":play",
         "//shared:constants",
-        "//shared/parameter:cpp_configs",
         "//software/ai/evaluation:enemy_threat",
         "//software/ai/evaluation:possession",
         "//software/ai/hl/stp/tactic/goalie:goalie_tactic",
@@ -190,7 +183,6 @@ cc_library(
     deps = [
         ":play",
         "//shared:constants",
-        "//shared/parameter:cpp_configs",
         "//software/ai/evaluation:enemy_threat",
         "//software/ai/hl/stp/tactic/chip:chip_tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",
@@ -207,10 +199,8 @@ cc_library(
     deps = [
         ":play",
         "//shared:constants",
-        "//shared/parameter:cpp_configs",
         "//software/ai/hl/stp/tactic/goalie:goalie_tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",
-        "//software/ai/hl/stp/tactic/move_goalie_to_goal_line:move_goalie_to_goal_line_tactic",
         "//software/logger",
         "//software/util/generic_factory",
     ],
@@ -224,7 +214,6 @@ cc_library(
     deps = [
         ":play",
         "//shared:constants",
-        "//shared/parameter:cpp_configs",
         "//software/ai/hl/stp/tactic/goalie:goalie_tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",
         "//software/ai/hl/stp/tactic/penalty_kick:penalty_kick_tactic",
@@ -242,7 +231,6 @@ cc_library(
         ":play",
         "//proto/message_translation:tbots_protobuf",
         "//shared:constants",
-        "//shared/parameter:cpp_configs",
         "//software/ai/evaluation:enemy_threat",
         "//software/ai/evaluation:find_open_areas",
         "//software/ai/evaluation:possession",
@@ -284,11 +272,15 @@ cc_library(
         "play_fsm.h",
     ],
     deps = [
-        "//shared/parameter:cpp_configs",
         "//software/ai/hl/stp/tactic",
+        "//software/ai/hl/stp/tactic/goalie:goalie_tactic",
+        "//software/ai/hl/stp/tactic/stop:stop_tactic",
+        "//software/ai/motion_constraint:motion_constraint_set_builder",
+        "//software/ai/navigator/path_planner:global_path_planner_factory",
         "//software/ai/passing:pass_with_rating",
         "//software/util/sml_fsm",
         "@boost//:coroutine2",
+        "@munkres_cpp",
     ],
 )
 
@@ -524,6 +516,10 @@ py_test(
     srcs = [
         "ball_placement_play_test.py",
     ],
+    # TODO (#2619) Remove tag to run in parallel
+    tags = [
+        "exclusive",
+    ],
     deps = [
         "//software/simulated_tests:simulated_test_fixture",
         "//software/simulated_tests:validation",
@@ -553,7 +549,6 @@ cc_library(
     deps = [
         ":play",
         "//shared:constants",
-        "//shared/parameter:cpp_configs",
         "//software/ai/hl/stp/tactic/stop:stop_tactic",
         "//software/logger",
         "//software/util/generic_factory",

@@ -5,7 +5,7 @@
 #include "software/ai/hl/stp/tactic/dribble/dribble_tactic.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/simulated_tests/non_terminating_validation_functions/robot_not_excessively_dribbling_validation.h"
-#include "software/simulated_tests/simulated_er_force_sim_tactic_test_fixture.h"
+#include "software/simulated_tests/simulated_er_force_sim_play_test_fixture.h"
 #include "software/simulated_tests/terminating_validation_functions/ball_at_point_validation.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_received_ball_validation.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_state_validation.h"
@@ -14,7 +14,7 @@
 #include "software/time/duration.h"
 #include "software/world/world.h"
 
-class DribbleTacticPushEnemyTest : public SimulatedErForceSimTacticTestFixture,
+class DribbleTacticPushEnemyTest : public SimulatedErForceSimPlayTestFixture,
                                    public ::testing::WithParamInterface<Point>
 {
    protected:
@@ -38,8 +38,7 @@ class DribbleTacticPushEnemyTest : public SimulatedErForceSimTacticTestFixture,
 
     void SetUp() override
     {
-        SimulatedErForceSimTacticTestFixture::SetUp();
-        setMotionConstraints({MotionConstraint::ENEMY_DEFENSE_AREA});
+        SimulatedErForceSimPlayTestFixture::SetUp();
     }
     TbotsProto::FieldType field_type = TbotsProto::FieldType::DIV_B;
     Field field                      = Field::createField(field_type);
@@ -48,8 +47,8 @@ class DribbleTacticPushEnemyTest : public SimulatedErForceSimTacticTestFixture,
             {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field.enemyGoalCenter(),
              field.enemyDefenseArea().negXNegYCorner(),
              field.enemyDefenseArea().negXPosYCorner()});
-    std::shared_ptr<const AiConfig> ai_config =
-        std::make_shared<ThunderbotsConfig>()->getAiConfig();
+
+    TbotsProto::AiConfig ai_config;
 };
 
 // TODO (#2573): re-enable once fixed
@@ -64,8 +63,7 @@ TEST_P(DribbleTacticPushEnemyTest, DISABLED_test_steal_ball_from_behind_enemy)
 
     auto tactic = std::make_shared<DribbleTactic>(ai_config);
     tactic->updateControlParams(dribble_destination, dribble_orientation);
-    setTactic(tactic);
-    setFriendlyRobotId(1);
+    setTactic(1, tactic, {TbotsProto::MotionConstraint::ENEMY_DEFENSE_AREA});
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [this, tactic](std::shared_ptr<World> world_ptr,

@@ -8,6 +8,7 @@ cc_test(
     deps = [
         ":hrvo",
         "//shared/test_util:tbots_gtest_main",
+        "//software/test_util",
     ],
 )
 
@@ -18,7 +19,7 @@ cc_test(
         ":hrvo",
         "//shared/test_util:tbots_gtest_main",
         "//software/ai/hl/stp/tactic/move:move_tactic",
-        "//software/simulated_tests:simulated_er_force_sim_tactic_test_fixture",
+        "//software/simulated_tests:simulated_er_force_sim_play_test_fixture",
         "//software/simulated_tests/terminating_validation_functions",
         "//software/simulated_tests/validation:validation_function",
         "//software/test_util",
@@ -48,9 +49,20 @@ cc_library(
         "simulator.h",
     ],
     deps = [
+        "//extlibs/hrvo:velocity_obstacle",
         "//proto:visualization_cc_proto",
         "//proto/primitive:primitive_msg_factory",
         "//software/geom:vector",
         "//software/world",
+    ],
+)
+
+cc_library(
+    name = "velocity_obstacle",
+    hdrs = [
+        "velocity_obstacle.h",
+    ],
+    deps = [
+        "//software/geom:vector",
     ],
 )
