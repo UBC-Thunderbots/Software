@@ -585,9 +585,26 @@ bool SimRobot::canKickBall(SimBall *ball) const
                 btManifoldPoint &pt = contactManifold->getContactPoint(j);
                 if (pt.getDistance() < 0.001f * SIMULATOR_SCALE)
                 {
+                    ball->body()->setFriction(1.f);
+                    std::cout<<"dribbler contact"<<std::endl;
                     return true;
                 }
             }
+        }
+    }
+
+    for (int i = 0; i < numManifolds; ++i)
+    {
+        btPersistentManifold *contactManifold =
+                m_world->getDispatcher()->getManifoldByIndexInternal(i);
+        btCollisionObject *objectA = (btCollisionObject *)(contactManifold->getBody0());
+        btCollisionObject *objectB = (btCollisionObject *)(contactManifold->getBody1());
+        if ((objectA == m_body && objectB == ball->body()) ||
+            (objectA == ball->body() && objectB == m_body))
+        {
+            ball->body()->setFriction(1.f);
+
+            std::cout<<"robot contact, set friction to 0.7, v = "<<ball->body()->getLinearVelocity().length()<<std::endl;
         }
     }
     return false;

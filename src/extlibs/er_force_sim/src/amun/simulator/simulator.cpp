@@ -98,7 +98,6 @@ struct camun::simulator::SimulatorData
 static void simulatorTickCallback(btDynamicsWorld *world, btScalar timeStep)
 {
     Simulator *sim = reinterpret_cast<Simulator *>(world->getWorldUserInfo());
-//    std::cout<<"internal callback"<<std::endl;
     sim->handleSimulatorTick(timeStep);
 }
 
@@ -305,6 +304,7 @@ void Simulator::stepSimulation(double time_s)
 
 void Simulator::handleSimulatorTick(double time_s)
 {
+    std::cout<<"tick handler"<<std::endl;
     // has to be done according to bullet wiki
     m_data->dynamicsWorld->clearForces();
 

@@ -53,7 +53,7 @@ SimBall::SimBall(RNG *rng, btDiscreteDynamicsWorld *world) : m_rng(rng), m_world
     // see simulator.cpp
     // TODO (#2512): Check these values with real life
     m_body->setRestitution(1.f);
-    m_body->setFriction(1.f);
+    m_body->setFriction(0.7f);
     std::cout<<"creating ball"<<std::endl;
 //    m_body->setRollingFriction(0.5f);
     m_body->setUserPointer(this);
@@ -79,13 +79,13 @@ void SimBall::begin(double time_s)
     if (p.z() < BALL_RADIUS * 1.1 * SIMULATOR_SCALE)
     {  // ball is on the ground
         const btVector3 velocity = m_body->getLinearVelocity();
-        if (velocity.length() < 0.1 * SIMULATOR_SCALE)
+        if (velocity.length() < 0.01 * SIMULATOR_SCALE)
         {
             // stop the ball if it is really slow
             // -> the real ball snaps to a dimple
             m_body->setLinearVelocity(btVector3(0, 0, 0));
             rollWhenPossible = false;
-            std::cout<<"stopping ball"<<std::endl;
+            m_body->setFriction(1.f);
         }
         else if (rollWhenPossible && velocity.length() < rolling_speed * SIMULATOR_SCALE)
         {
@@ -98,16 +98,11 @@ void SimBall::begin(double time_s)
             const btScalar rollingDeceleration = 0.5;
             btVector3 force(velocity.x(), velocity.y(), 0.0f);
             force.safeNormalize();
-//            m_body->applyCentralImpulse(-force * rollingDeceleration * SIMULATOR_SCALE *
-//                                        BALL_MASS * SUB_TIMESTEP);
             m_body->applyCentralImpulse(-force * rollingDeceleration * SIMULATOR_SCALE *
                                         BALL_MASS * SUB_TIMESTEP);
 
-
-            //maintain small friction todo maybe remove
             m_body->setFriction(0.0);
-            //m_body->setRollingFriction(0.5);
-            std::cout<<"applying rolling frictino at s = "<<velocity.length()<<" , p = "<<p.y()<<" , step = "<<time_s<<std::endl;
+            std::cout<<"applying rolling frictino at s = "<<velocity.y()<<" , p = "<<p.y()<<" , step = "<<time_s<<std::endl;
         }
     }
 
