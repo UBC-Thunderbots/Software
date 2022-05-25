@@ -32,6 +32,5 @@ cc_library(
     ],
     deps = [
         ":constants",
-        "//firmware/shared/math:tbots_math",
     ],
 )

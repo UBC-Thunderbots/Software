@@ -303,27 +303,9 @@ new_git_repository(
 register_toolchains("//:py_toolchain")
 
 pip_install(
-    name = "python_control_deps",
-    python_interpreter = "/opt/tbotspython/bin/python",
-    requirements = "//firmware/app/control/python_controller:requirements.txt",
-)
-
-pip_install(
-    name = "dynamic_parameter_deps",
-    python_interpreter = "/opt/tbotspython/bin/python",
-    requirements = "//shared/parameter/generation_scripts:requirements.txt",
-)
-
-pip_install(
     name = "nanopb_deps",
     python_interpreter = "/opt/tbotspython/bin/python",
     requirements = "//extlibs:nanopb_requirements.txt",
-)
-
-pip_install(
-    name = "python_tools_deps",
-    python_interpreter = "/opt/tbotspython/bin/python",
-    requirements = "//python_tools:requirements.txt",
 )
 
 pip_install(

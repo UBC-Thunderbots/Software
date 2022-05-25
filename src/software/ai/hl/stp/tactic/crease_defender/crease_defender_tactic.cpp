@@ -1,7 +1,7 @@
 #include "software/ai/hl/stp/tactic/crease_defender/crease_defender_tactic.h"
 
+#include "proto/parameters.pb.h"
 #include "shared/constants.h"
-#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/evaluation/calc_best_shot.h"
 #include "software/geom/algorithms/intersection.h"
 #include "software/geom/point.h"
@@ -10,7 +10,7 @@
 #include "software/logger/logger.h"
 
 CreaseDefenderTactic::CreaseDefenderTactic(
-    std::shared_ptr<const RobotNavigationObstacleConfig> robot_navigation_obstacle_config)
+    TbotsProto::RobotNavigationObstacleConfig robot_navigation_obstacle_config)
     : Tactic({RobotCapability::Move}),
       fsm_map(),
       control_params({Point(0, 0), TbotsProto::CreaseDefenderAlignment::CENTRE,
