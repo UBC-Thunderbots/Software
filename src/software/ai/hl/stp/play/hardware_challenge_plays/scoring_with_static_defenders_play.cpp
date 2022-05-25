@@ -5,7 +5,7 @@
 #include "software/util/generic_factory/generic_factory.h"
 
 ScoringWithStaticDefendersPlay::ScoringWithStaticDefendersPlay(
-    std::shared_ptr<const AiConfig> config)
+    TbotsProto::AiConfig config)
     : Play(config, false)
 {
 }
@@ -56,5 +56,6 @@ void ScoringWithStaticDefendersPlay::getNextTactics(TacticCoroutine::push_type &
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, ScoringWithStaticDefendersPlay, AiConfig>
+static TGenericFactory<std::string, Play, ScoringWithStaticDefendersPlay,
+                       TbotsProto::AiConfig>
     factory;

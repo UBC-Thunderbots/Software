@@ -2,7 +2,7 @@
 
 #include <chrono>
 
-#include "shared/parameter/cpp_dynamic_parameters.h"
+#include "proto/parameters.pb.h"
 #include "software/test_util/path_planning_test_util.h"
 #include "software/test_util/test_util.h"
 
@@ -11,8 +11,8 @@ class TestGlobalPathPlanner : public testing::Test
    public:
     TestGlobalPathPlanner()
         : world(TestUtil::createBlankTestingWorld(TbotsProto::FieldType::DIV_A)),
-          gpp(std::make_shared<RobotNavigationObstacleConfig>(), world.field()),
-          obstacle_factory(std::make_shared<const RobotNavigationObstacleConfig>())
+          gpp(TbotsProto::RobotNavigationObstacleConfig(), world.field()),
+          obstacle_factory(TbotsProto::RobotNavigationObstacleConfig())
     {
     }
 

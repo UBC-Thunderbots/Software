@@ -2,7 +2,7 @@
 
 #include <algorithm>
 
-ShootOrPassPlayFSM::ShootOrPassPlayFSM(std::shared_ptr<const AiConfig> ai_config)
+ShootOrPassPlayFSM::ShootOrPassPlayFSM(TbotsProto::AiConfig ai_config)
     : ai_config(ai_config),
       attacker_tactic(std::make_shared<AttackerTactic>(ai_config)),
       receiver_tactic(std::make_shared<ReceiverTactic>()),
@@ -10,7 +10,7 @@ ShootOrPassPlayFSM::ShootOrPassPlayFSM(std::shared_ptr<const AiConfig> ai_config
       pass_generator(
           PassGenerator<EighteenZoneId>(std::make_shared<const EighteenZonePitchDivision>(
                                             Field::createSSLDivisionBField()),
-                                        ai_config->getPassingConfig())),
+                                        ai_config.passing_config())),
       pass_optimization_start_time(Timestamp::fromSeconds(0)),
       best_pass_and_score_so_far(
           PassWithRating{.pass = Pass(Point(), Point(), 0), .rating = 0}),
@@ -65,10 +65,9 @@ void ShootOrPassPlayFSM::lookForPass(const Update& event)
         // (with a score of 1) and decreasing this threshold over time
         // This boolean indicates if we're ready to perform a pass
         double abs_min_pass_score =
-            ai_config->getShootOrPassPlayConfig()->getAbsMinPassScore()->value();
-        double pass_score_ramp_down_duration = ai_config->getShootOrPassPlayConfig()
-                                                   ->getPassScoreRampDownDuration()
-                                                   ->value();
+            ai_config.shoot_or_pass_play_config().abs_min_pass_score();
+        double pass_score_ramp_down_duration =
+            ai_config.shoot_or_pass_play_config().pass_score_ramp_down_duration();
         pass_eval = pass_generator.generatePassEvaluation(event.common.world);
         best_pass_and_score_so_far = pass_eval.getBestPassOnField();
 
