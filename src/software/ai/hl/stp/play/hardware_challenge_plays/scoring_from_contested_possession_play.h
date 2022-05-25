@@ -1,6 +1,6 @@
 #pragma once
 
-#include "proto/parameters.pb.h"
+#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/hl/stp/play/play.h"
 
 /**
@@ -10,7 +10,7 @@
 class ScoringFromContestedPossessionPlay : public Play
 {
    public:
-    ScoringFromContestedPossessionPlay(TbotsProto::AiConfig config);
+    ScoringFromContestedPossessionPlay(std::shared_ptr<const AiConfig> config);
 
     void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
 };

@@ -19,7 +19,7 @@ class AttackerTactic : public Tactic
      *
      * @param ai_config The AI configuration
      */
-    explicit AttackerTactic(TbotsProto::AiConfig ai_config);
+    explicit AttackerTactic(std::shared_ptr<const AiConfig> ai_config);
 
     AttackerTactic() = delete;
 
@@ -55,7 +55,5 @@ class AttackerTactic : public Tactic
     // The point the robot will chip towards if it is unable to shoot and is in danger
     // of losing the ball to an enemy
     std::optional<Point> chip_target;
-
-    // AI config
-    TbotsProto::AiConfig ai_config;
+    std::shared_ptr<const AiConfig> ai_config;
 };

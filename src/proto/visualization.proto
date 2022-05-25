@@ -1,4 +1,5 @@
 syntax = 'proto3';
+import "google/protobuf/any.proto";
 
 import "proto/geometry.proto";
 import "proto/world.proto";

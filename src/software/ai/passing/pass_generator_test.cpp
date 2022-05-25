@@ -14,9 +14,9 @@ class PassGeneratorTest : public testing::Test
    protected:
     virtual void SetUp()
     {
-        passing_config.set_min_pass_speed_m_per_s(3.5);
-        passing_config.set_max_pass_speed_m_per_s(5.5);
-
+        passing_config = std::make_shared<PassingConfig>();
+        passing_config->getMutableMinPassSpeedMPerS()->setValue(3.5);
+        passing_config->getMutableMaxPassSpeedMPerS()->setValue(5.5);
         pitch_division = std::make_shared<const EighteenZonePitchDivision>(world.field());
         pass_generator = std::make_shared<PassGenerator<EighteenZoneId>>(pitch_division,
                                                                          passing_config);
@@ -44,7 +44,7 @@ class PassGeneratorTest : public testing::Test
     }
 
     World world = ::TestUtil::createBlankTestingWorld();
-    TbotsProto::PassingConfig passing_config;
+    std::shared_ptr<PassingConfig> passing_config;
     std::shared_ptr<const FieldPitchDivision<EighteenZoneId>> pitch_division;
     std::shared_ptr<PassGenerator<EighteenZoneId>> pass_generator;
 };

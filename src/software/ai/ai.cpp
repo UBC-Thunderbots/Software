@@ -3,16 +3,15 @@
 #include <chrono>
 
 #include "software/ai/hl/stp/play/halt_play.h"
-#include "software/ai/hl/stp/play/play_factory.h"
 
-AI::AI(TbotsProto::AiConfig ai_config)
-    : ai_config_(ai_config),
+AI::AI(std::shared_ptr<const AiConfig> ai_config)
+    : ai_config(ai_config),
       fsm(std::make_unique<FSM<PlaySelectionFSM>>(PlaySelectionFSM{ai_config})),
       override_play(nullptr),
       current_play(std::make_unique<HaltPlay>(ai_config)),
       field_to_path_planner_factory(),
-      prev_override(TbotsProto::PlayName::UseAiSelection),
-      ai_config_changed(false)
+      prev_override(false),
+      prev_override_name("")
 {
 }
 
@@ -21,64 +20,39 @@ void AI::overridePlay(std::unique_ptr<Play> play)
     override_play = std::move(play);
 }
 
-void AI::overridePlayFromProto(TbotsProto::Play play_proto)
+void AI::overridePlayFromName(std::string name)
 {
-    overridePlay(std::move(createPlay(play_proto, ai_config_)));
-}
-
-void AI::updateAiConfig(TbotsProto::AiConfig ai_config)
-{
-    ai_config_        = ai_config;
-    ai_config_changed = true;
+    overridePlay(GenericFactory<std::string, Play, AiConfig>::create(name, ai_config));
 }
 
 void AI::checkAiConfig()
 {
-    auto current_override = ai_config_.ai_control_config().override_ai_play();
-
-    // If we have a new override, and its not back to the Ai selection,
-    // lets override the play
-    if (current_override != prev_override &&
-        current_override != TbotsProto::PlayName::UseAiSelection)
+    bool current_override = ai_config->getAiControlConfig()->getOverrideAiPlay()->value();
+    std::string current_override_name =
+        ai_config->getAiControlConfig()->getCurrentAiPlay()->value();
+    if (current_override && (current_override != prev_override ||
+                             current_override_name != prev_override_name))
     {
-        TbotsProto::Play play_proto;
-        play_proto.set_name(current_override);
-        overridePlayFromProto(play_proto);
+        overridePlayFromName(
+            ai_config->getAiControlConfig()->getCurrentAiPlay()->value());
     }
-
-    // If we have a new override but its back to the Ai selection, lets
-    // clear the override
-    if (current_override != prev_override &&
-        current_override == TbotsProto::PlayName::UseAiSelection)
-    {
-        overridePlay(nullptr);
-    }
-    prev_override = current_override;
+    prev_override      = current_override;
+    prev_override_name = current_override_name;
 }
 
 std::unique_ptr<TbotsProto::PrimitiveSet> AI::getPrimitives(const World& world)
 {
     checkAiConfig();
-
-    if (ai_config_changed)
-    {
-        fsm.reset(new FSM<PlaySelectionFSM>(PlaySelectionFSM{ai_config_}));
-    }
-
     fsm->process_event(PlaySelectionFSM::Update(
         [this](std::unique_ptr<Play> play) { current_play = std::move(play); },
-        world.gameState(), ai_config_));
+        world.gameState()));
 
-    // We construct the global path planner once for the field. If the AI Config
-    // changes, there might be an update we need to reconstruct the path planner
-    // for and propagate the parameter change.
-    if (!field_to_path_planner_factory.contains(world.field()) || ai_config_changed)
+    if (!field_to_path_planner_factory.contains(world.field()))
     {
-        field_to_path_planner_factory.insert_or_assign(
+        field_to_path_planner_factory.emplace(
             world.field(),
-            GlobalPathPlannerFactory(ai_config_.robot_navigation_obstacle_config(),
+            GlobalPathPlannerFactory(ai_config->getRobotNavigationObstacleConfig(),
                                      world.field()));
-        ai_config_changed = false;
     }
 
     if (static_cast<bool>(override_play))

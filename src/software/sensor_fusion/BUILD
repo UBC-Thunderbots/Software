@@ -10,6 +10,7 @@ cc_library(
         "//proto/message_translation:ssl_geometry",
         "//proto/message_translation:ssl_referee",
         "//proto/message_translation:tbots_protobuf",
+        "//shared/parameter:cpp_configs",
         "//software/logger",
         "//software/sensor_fusion/filter:sensor_fusion_filters",
         "//software/sensor_fusion/filter:vision_detection",

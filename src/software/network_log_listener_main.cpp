@@ -2,10 +2,10 @@
 #include <iostream>
 #include <numeric>
 
-#include "proto/parameters.pb.h"
 #include "proto/robot_log_msg.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
 #include "shared/constants.h"
+#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/networking/threaded_proto_udp_listener.hpp"
 
 /*

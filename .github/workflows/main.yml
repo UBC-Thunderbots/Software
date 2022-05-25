@@ -37,7 +37,7 @@ jobs:
         run: |
           cd src
           bazel test --show_timestamps       \
-            -- //... -//software:unix_full_system \
+            -- //... -//software:full_system \
             -//software/simulated_tests/...  \
             -//software/ai/hl/...            \
 
@@ -87,7 +87,7 @@ jobs:
         run: |
           cd src
           bazel test --show_timestamps       \
-            //software:unix_full_system           \
+            //software:full_system           \
             //software/simulated_tests/...   \
             //software/ai/hl/...
 
@@ -111,7 +111,7 @@ jobs:
         run: |
           cd src
           bazel test --show_timestamps       \
-            //software:unix_full_system           \
+            //software:full_system           \
             //software/simulated_tests/...   \
             //software/ai/hl/...
 
@@ -120,7 +120,7 @@ jobs:
         run: |
           cd src
           bazel test --show_timestamps       \
-            //software:unix_full_system           \
+            //software:full_system           \
             //software/simulated_tests/...   \
             //software/ai/hl/...
 
@@ -139,4 +139,4 @@ jobs:
         run: |
           cd src
           bazel test --show_timestamps       \
-            //software/geom/...
+            //software/geom/... //python_tools/...

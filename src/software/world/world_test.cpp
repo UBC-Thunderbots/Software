@@ -4,7 +4,7 @@
 #include <include/gmock/gmock-matchers.h>
 
 #include "proto/message_translation/tbots_protobuf.h"
-#include "proto/parameters.pb.h"
+#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/test_util/test_util.h"
 
 class WorldTest : public ::testing::Test

@@ -2,7 +2,7 @@
 
 #include <algorithm>
 
-DribbleTactic::DribbleTactic(TbotsProto::AiConfig ai_config)
+DribbleTactic::DribbleTactic(std::shared_ptr<const AiConfig> ai_config)
     : Tactic({RobotCapability::Move, RobotCapability::Dribble, RobotCapability::Kick}),
       fsm_map(),
       control_params{DribbleFSM::ControlParams{.dribble_destination       = std::nullopt,
@@ -13,7 +13,7 @@ DribbleTactic::DribbleTactic(TbotsProto::AiConfig ai_config)
     for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)
     {
         fsm_map[id] = std::make_unique<FSM<DribbleFSM>>(
-            DribbleFSM(ai_config.dribble_tactic_config()));
+            DribbleFSM(ai_config->getDribbleTacticConfig()));
     }
 }
 
@@ -36,7 +36,7 @@ void DribbleTactic::updatePrimitive(const TacticUpdate &tactic_update, bool rese
     if (reset_fsm)
     {
         fsm_map[tactic_update.robot.id()] = std::make_unique<FSM<DribbleFSM>>(
-            DribbleFSM(ai_config.dribble_tactic_config()));
+            DribbleFSM(ai_config->getDribbleTacticConfig()));
     }
     fsm_map.at(tactic_update.robot.id())
         ->process_event(DribbleFSM::Update(control_params, tactic_update));

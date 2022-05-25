@@ -1,7 +1,7 @@
 #pragma once
 
-#include "proto/parameters.pb.h"
 #include "shared/constants.h"
+#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/hl/stp/play/play_fsm.h"
 #include "software/ai/hl/stp/tactic/crease_defender/crease_defender_tactic.h"
 #include "software/logger/logger.h"
@@ -25,7 +25,7 @@ struct CreaseDefensePlayFSM
      *
      * @param ai_config the play config for this play FSM
      */
-    explicit CreaseDefensePlayFSM(TbotsProto::AiConfig ai_config);
+    explicit CreaseDefensePlayFSM(std::shared_ptr<const AiConfig> ai_config);
 
     /**
      * Action to defend the defense area
@@ -58,6 +58,6 @@ struct CreaseDefensePlayFSM
     }
 
    private:
-    TbotsProto::AiConfig ai_config;
+    std::shared_ptr<const AiConfig> ai_config;
     std::vector<std::shared_ptr<CreaseDefenderTactic>> crease_defenders;
 };

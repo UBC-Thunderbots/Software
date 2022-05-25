@@ -1,11 +1,15 @@
 #include "software/ai/navigator/obstacle/robot_navigation_obstacle_factory.h"
 
 RobotNavigationObstacleFactory::RobotNavigationObstacleFactory(
-    TbotsProto::RobotNavigationObstacleConfig config)
+    std::shared_ptr<const RobotNavigationObstacleConfig> config)
     : config(config),
-      robot_radius_expansion_amount(config.robot_obstacle_inflation_factor() *
+      robot_radius_expansion_amount(config->getRobotObstacleInflationFactor()->value() *
                                     ROBOT_MAX_RADIUS_METERS)
 {
+    config->getRobotObstacleInflationFactor()->registerCallbackFunction(
+        [&](double new_value) {
+            robot_radius_expansion_amount = new_value * ROBOT_MAX_RADIUS_METERS;
+        });
 }
 
 std::vector<ObstaclePtr>

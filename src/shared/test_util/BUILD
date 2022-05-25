@@ -10,6 +10,7 @@ cc_library(
         "test_util.h",
     ],
     deps = [
+        "//firmware/app/logger",
         "//proto:tbots_cc_proto",
         "//proto:tbots_nanopb_proto",
         "//shared:robot_constants",
@@ -24,8 +25,8 @@ cc_library(
     srcs = ["tbots_gtest_main.cpp"],
     hdrs = ["tbots_gtest_main.h"],
     deps = [
+        "//shared/parameter:cpp_configs",
         "//software/logger",
-        "@boost//:program_options",
         "@gtest",
     ],
 )

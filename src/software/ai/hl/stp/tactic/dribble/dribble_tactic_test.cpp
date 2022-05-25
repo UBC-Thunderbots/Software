@@ -47,7 +47,8 @@ class DribbleTacticTest : public SimulatedErForceSimPlayTestFixture
             {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field.enemyGoalCenter(),
              field.enemyDefenseArea().negXNegYCorner(),
              field.enemyDefenseArea().negXPosYCorner()});
-    TbotsProto::AiConfig ai_config;
+    std::shared_ptr<const AiConfig> ai_config =
+        std::make_shared<ThunderbotsConfig>()->getAiConfig();
     std::set<TbotsProto::MotionConstraint> motion_constraints = {
         TbotsProto::MotionConstraint::ENEMY_DEFENSE_AREA};
 };

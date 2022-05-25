@@ -10,6 +10,7 @@ cc_library(
     hdrs = ["scoring_with_static_defenders_play.h"],
     deps = [
         "//shared:constants",
+        "//shared/parameter:cpp_configs",
         "//software/ai/hl/stp/play",
         "//software/ai/hl/stp/tactic/move:move_tactic",
         "//software/logger",
@@ -40,6 +41,7 @@ cc_library(
     hdrs = ["scoring_from_contested_possession_play.h"],
     deps = [
         "//shared:constants",
+        "//shared/parameter:cpp_configs",
         "//software/ai/hl/stp/play",
         "//software/ai/hl/stp/tactic/dribble:dribble_tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",
@@ -71,6 +73,7 @@ cc_library(
     hdrs = ["dribbling_parcour_play.h"],
     deps = [
         "//shared:constants",
+        "//shared/parameter:cpp_configs",
         "//software/ai/hl/stp/play",
         "//software/ai/hl/stp/tactic/dribble:dribble_tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",
@@ -102,6 +105,7 @@ cc_library(
     hdrs = ["pass_endurance_play.h"],
     deps = [
         "//shared:constants",
+        "//shared/parameter:cpp_configs",
         "//software/ai/hl/stp/play",
         "//software/ai/hl/stp/tactic/dribble:dribble_tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",

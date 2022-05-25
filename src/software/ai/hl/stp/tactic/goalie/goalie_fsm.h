@@ -1,7 +1,7 @@
 #pragma once
 
-#include "proto/parameters.pb.h"
 #include "shared/constants.h"
+#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/hl/stp/tactic/chip/chip_fsm.h"
 #include "software/ai/hl/stp/tactic/pivot_kick/pivot_kick_fsm.h"
@@ -38,7 +38,7 @@ struct GoalieFSM
      * @param goalie_tactic_config The config to fetch parameters from
      * @param max_allowed_speed_mode The maximum allowed speed mode
      */
-    explicit GoalieFSM(TbotsProto::GoalieTacticConfig goalie_tactic_config,
+    explicit GoalieFSM(std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config,
                        TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode)
         : goalie_tactic_config(goalie_tactic_config),
           max_allowed_speed_mode(max_allowed_speed_mode)
@@ -56,7 +56,7 @@ struct GoalieFSM
      */
     static Point getGoaliePositionToBlock(
         const Ball &ball, const Field &field,
-        TbotsProto::GoalieTacticConfig goalie_tactic_config);
+        std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config);
 
     /**
      * Gets intersections between the ball velocity ray and the full goal segment
@@ -215,7 +215,7 @@ struct GoalieFSM
 
    private:
     // the goalie tactic config
-    TbotsProto::GoalieTacticConfig goalie_tactic_config;
+    std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config;
     // The maximum allowed speed mode
     TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode;
 };

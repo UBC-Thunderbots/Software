@@ -3,8 +3,8 @@
 #include <map>
 #include <set>
 
-#include "proto/parameters.pb.h"
 #include "proto/primitive.pb.h"
+#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/motion_constraint/motion_constraint_set_builder.h"
 #include "software/ai/navigator/obstacle/robot_navigation_obstacle_factory.h"
@@ -33,9 +33,9 @@ class GlobalPathPlannerFactory
      * into obstacles
      * @param field the field used to create the path planner grid and obstacles
      */
-    GlobalPathPlannerFactory(
-        const TbotsProto::RobotNavigationObstacleConfig navigation_obstacle_config,
-        const Field &field);
+    GlobalPathPlannerFactory(const std::shared_ptr<const RobotNavigationObstacleConfig>
+                                 navigation_obstacle_config,
+                             const Field &field);
 
     /**
      * Given a set of motion constraints, returns the relevant EnlsvgPathPlanner. If the

@@ -1,7 +1,7 @@
 #include "software/ai/hl/stp/play/enemy_free_kick_play.h"
 
-#include "proto/parameters.pb.h"
 #include "shared/constants.h"
+#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/evaluation/enemy_threat.h"
 #include "software/ai/hl/stp/tactic/crease_defender/crease_defender_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
@@ -9,14 +9,17 @@
 #include "software/util/generic_factory/generic_factory.h"
 #include "software/world/game_state.h"
 
-EnemyFreekickPlay::EnemyFreekickPlay(TbotsProto::AiConfig config) : Play(config, true) {}
+EnemyFreekickPlay::EnemyFreekickPlay(std::shared_ptr<const AiConfig> config)
+    : Play(config, true)
+{
+}
 
 void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
                                        const World &world)
 {
     // Init a Crease Defender Tactic
     auto crease_defender_tactic = std::make_shared<CreaseDefenderTactic>(
-        ai_config.robot_navigation_obstacle_config());
+        ai_config->getRobotNavigationObstacleConfig());
 
     // These robots will both block the enemy robot taking a free kick
     std::array<std::shared_ptr<ShadowEnemyTactic>, 2> shadow_free_kicker = {
@@ -132,5 +135,4 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, EnemyFreekickPlay, TbotsProto::AiConfig>
-    factory;
+static TGenericFactory<std::string, Play, EnemyFreekickPlay, AiConfig> factory;

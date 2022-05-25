@@ -16,10 +16,9 @@ class playInfoWidget(QTableWidget):
     NUM_ROWS = 6
     NUM_COLS = 4
 
-    def __init__(self, minimum_column_width=200, buffer_size=5):
+    def __init__(self, buffer_size=5):
         """Shows the current play information including tactic and FSM state
 
-        :param minimum_column_width: minimum width of columns
         :param buffer_size: The buffer size, set higher for smoother plots.
                             Set lower for more realtime plots. Default is arbitrary
 

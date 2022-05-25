@@ -2,12 +2,12 @@
 
 #include <mutex>
 
-#include "proto/parameters.pb.h"
 #include "proto/play.pb.h"
 #include "proto/play_info_msg.pb.h"
 #include "proto/tactic.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
 #include "software/ai/ai.h"
+#include "software/gui/drawing/draw_functions.h"
 #include "software/multithreading/first_in_first_out_threaded_observer.h"
 #include "software/multithreading/subject.hpp"
 #include "software/world/world.h"
@@ -18,19 +18,19 @@
  * robots based on the World state, and sending them out.
  */
 class ThreadedAI : public FirstInFirstOutThreadedObserver<World>,
-                   public FirstInFirstOutThreadedObserver<TbotsProto::ThunderbotsConfig>,
                    public Subject<TbotsProto::PrimitiveSet>,
+                   public Subject<AIDrawFunction>,
                    public Subject<TbotsProto::PlayInfo>
 {
    public:
     ThreadedAI() = delete;
 
     /**
-     * Constructs a new ThreadedAI object.
+     * Create an AI with the given config
      *
-     * @param tbots_proto The AI configuration
+     * @param ai_config The AI configuration
      */
-    explicit ThreadedAI(TbotsProto::AiConfig ai_config);
+    explicit ThreadedAI(std::shared_ptr<const AiConfig> ai_config);
 
     /**
      * Override the AI play
@@ -49,7 +49,6 @@ class ThreadedAI : public FirstInFirstOutThreadedObserver<World>,
 
    private:
     void onValueReceived(World world) override;
-    void onValueReceived(TbotsProto::ThunderbotsConfig config) override;
 
     /**
      * Get primitives for the new world from the AI and pass them to observers
@@ -58,8 +57,13 @@ class ThreadedAI : public FirstInFirstOutThreadedObserver<World>,
      */
     void runAIAndSendPrimitives(const World &world);
 
+    /**
+     * Publishes draw functions
+     */
+    void drawAI();
+
     AI ai;
-    TbotsProto::AiConfig ai_config;
-    TbotsProto::AiControlConfig ai_control_config;
+    std::shared_ptr<const AiConfig> ai_config;
+    std::shared_ptr<const AiControlConfig> control_config;
     std::mutex ai_mutex;
 };

@@ -14,7 +14,10 @@
 #include "software/util/generic_factory/generic_factory.h"
 #include "software/world/game_state.h"
 
-ShootOrChipPlay::ShootOrChipPlay(TbotsProto::AiConfig config) : Play(config, true) {}
+ShootOrChipPlay::ShootOrChipPlay(std::shared_ptr<const AiConfig> config)
+    : Play(config, true)
+{
+}
 
 void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield,
                                      const World &world)
@@ -31,9 +34,9 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics = {
         std::make_shared<CreaseDefenderTactic>(
-            ai_config.robot_navigation_obstacle_config()),
+            ai_config->getRobotNavigationObstacleConfig()),
         std::make_shared<CreaseDefenderTactic>(
-            ai_config.robot_navigation_obstacle_config()),
+            ai_config->getRobotNavigationObstacleConfig()),
     };
 
     std::array<std::shared_ptr<MoveTactic>, 2> move_to_open_area_tactics = {
@@ -103,4 +106,4 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield,
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, ShootOrChipPlay, TbotsProto::AiConfig> factory;
+static TGenericFactory<std::string, Play, ShootOrChipPlay, AiConfig> factory;

@@ -6,13 +6,13 @@
 #include "proto/message_translation/ssl_geometry.h"
 #include "proto/message_translation/ssl_wrapper.h"
 #include "proto/message_translation/tbots_protobuf.h"
-#include "proto/parameters.pb.h"
+#include "shared/parameter/cpp_dynamic_parameters.h"
 
 class SensorFusionTest : public ::testing::Test
 {
    public:
     SensorFusionTest()
-        : config(TbotsProto::SensorFusionConfig()),
+        : config(std::make_shared<SensorFusionConfig>()),
           sensor_fusion(config),
           yellow_robot_states(initYellowRobotStates()),
           blue_robot_states(initBlueRobotStates()),
@@ -33,10 +33,13 @@ class SensorFusionTest : public ::testing::Test
           referee_ball_placement_blue(initRefereeBallPlacementBlue()),
           referee_goalie_id(initRefereeGoalieId())
     {
-        config.set_friendly_color_yellow(true);
+        config->getMutableFriendlyColorYellow()->setValue(true);
+        config->getMutableOverrideGameControllerDefendingSide()->setValue(true);
+        config->getMutableDefendingPositiveSide()->setValue(false);
+        config->getMutableOverrideRefereeCommand()->setValue(false);
     }
 
-    TbotsProto::SensorFusionConfig config;
+    std::shared_ptr<SensorFusionConfig> config;
     SensorFusion sensor_fusion;
     std::vector<RobotStateWithId> yellow_robot_states;
     std::vector<RobotStateWithId> blue_robot_states;
@@ -674,9 +677,8 @@ TEST_F(SensorFusionTest, ball_placement_enemy_set_by_referee)
 
 TEST_F(SensorFusionTest, goalie_id_set_by_referee)
 {
-    config.set_override_game_controller_friendly_goalie_id(false);
-    config.set_override_game_controller_enemy_goalie_id(false);
-    sensor_fusion = SensorFusion(config);
+    config->getMutableOverrideGameControllerFriendlyGoalieId()->setValue(false);
+    config->getMutableOverrideGameControllerEnemyGoalieId()->setValue(false);
 
     SensorProto sensor_msg;
 
@@ -699,11 +701,10 @@ TEST_F(SensorFusionTest, goalie_id_set_by_referee)
 
 TEST_F(SensorFusionTest, goalie_id_overridden)
 {
-    config.set_override_game_controller_friendly_goalie_id(true);
-    config.set_override_game_controller_enemy_goalie_id(true);
-    config.set_friendly_goalie_id(1);
-    config.set_enemy_goalie_id(3);
-    sensor_fusion = SensorFusion(config);
+    config->getMutableOverrideGameControllerFriendlyGoalieId()->setValue(true);
+    config->getMutableOverrideGameControllerEnemyGoalieId()->setValue(true);
+    config->getMutableFriendlyGoalieId()->setValue(1);
+    config->getMutableEnemyGoalieId()->setValue(3);
 
     SensorProto sensor_msg;
 
@@ -726,12 +727,10 @@ TEST_F(SensorFusionTest, goalie_id_overridden)
 
 TEST_F(SensorFusionTest, test_sensor_fusion_reset_behaviour_trigger_reset)
 {
-    config.set_override_game_controller_friendly_goalie_id(true);
-    config.set_override_game_controller_enemy_goalie_id(true);
-    config.set_friendly_goalie_id(0);
-    config.set_enemy_goalie_id(0);
-    sensor_fusion = SensorFusion(config);
-
+    config->getMutableOverrideGameControllerFriendlyGoalieId()->setValue(false);
+    config->getMutableOverrideGameControllerEnemyGoalieId()->setValue(false);
+    config->getMutableFriendlyGoalieId()->setValue(0);
+    config->getMutableEnemyGoalieId()->setValue(0);
     SensorProto sensor_msg;
     SensorProto sensor_msg_0;
     auto ssl_wrapper_packet =
@@ -762,12 +761,10 @@ TEST_F(SensorFusionTest, test_sensor_fusion_reset_behaviour_trigger_reset)
 
 TEST_F(SensorFusionTest, test_sensor_fusion_reset_behaviour_ignore_bad_packets)
 {
-    config.set_override_game_controller_friendly_goalie_id(false);
-    config.set_override_game_controller_enemy_goalie_id(false);
-    config.set_friendly_goalie_id(0);
-    config.set_enemy_goalie_id(0);
-    sensor_fusion = SensorFusion(config);
-
+    config->getMutableOverrideGameControllerFriendlyGoalieId()->setValue(false);
+    config->getMutableOverrideGameControllerEnemyGoalieId()->setValue(false);
+    config->getMutableFriendlyGoalieId()->setValue(0);
+    config->getMutableEnemyGoalieId()->setValue(0);
     SensorProto sensor_msg;
     auto ssl_wrapper_packet =
         createSSLWrapperPacket(std::move(geom_data), initDetectionFrame());

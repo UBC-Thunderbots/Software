@@ -5,8 +5,8 @@
 #include "proto/message_translation/ssl_detection.h"
 #include "proto/message_translation/ssl_geometry.h"
 #include "proto/message_translation/ssl_referee.h"
-#include "proto/parameters.pb.h"
 #include "proto/sensor_msg.pb.h"
+#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/sensor_fusion/filter/ball_filter.h"
 #include "software/sensor_fusion/filter/robot_team_filter.h"
 #include "software/sensor_fusion/filter/vision_detection.h"
@@ -24,9 +24,9 @@ class SensorFusion
     /**
      * Creates a SensorFusion with a sensor_fusion_config
      *
-     * @param sensor_fusion_config The config to fetch parameters from
+     * @param sensor_fusion_config the config to fetch parameters from
      */
-    explicit SensorFusion(TbotsProto::SensorFusionConfig sensor_fusion_config);
+    explicit SensorFusion(std::shared_ptr<const SensorFusionConfig> sensor_fusion_config);
 
     virtual ~SensorFusion() = default;
 
@@ -126,7 +126,7 @@ class SensorFusion
      */
     static bool teamHasBall(const Team &team, const Ball &ball);
 
-    TbotsProto::SensorFusionConfig sensor_fusion_config;
+    std::shared_ptr<const SensorFusionConfig> sensor_fusion_config;
     std::optional<Field> field;
     std::optional<Ball> ball;
     Team friendly_team;

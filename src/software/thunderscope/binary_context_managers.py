@@ -41,6 +41,8 @@ class FullSystem(object):
 
     """ Full System Binary Context Manager """
 
+    DEBUG_MODE_POLL_INTERVAL_S = 0.1
+
     def __init__(
         self,
         full_system_runtime_dir=None,
@@ -161,10 +163,6 @@ gdb --args bazel-bin/{full_system}
                 AssignedTacticPlayControlParams,
             ),
             (self.full_system_runtime_dir + PLAY_OVERRIDE_PATH, Play),
-            (
-                self.full_system_runtime_dir + DYNAMIC_PARAMETER_UPDATE_REQUEST_PATH,
-                ThunderbotsConfig,
-            ),
         ]:
             proto_unix_io.attach_unix_sender(*arg)
 
@@ -180,6 +178,8 @@ gdb --args bazel-bin/{full_system}
 class Simulator(object):
 
     """ Simulator Context Manager """
+
+    DEBUG_MODE_POLL_INTERVAL_S = 0.1
 
     def __init__(self, simulator_runtime_dir=None, debug_simulator=False):
         """Run Simulator
@@ -294,7 +294,6 @@ gdb --args bazel-bin/{simulator_command}
             (self.simulator_runtime_dir + BLUE_SSL_WRAPPER_PATH, SSL_WrapperPacket),
             (self.simulator_runtime_dir + BLUE_ROBOT_STATUS_PATH, RobotStatus),
             (self.simulator_runtime_dir + SIMULATOR_STATE_PATH, SimulatorState),
-            (self.simulator_runtime_dir, HRVOVisualization, True),
         ]:
             blue_full_system_proto_unix_io.attach_unix_receiver(*arg)
 

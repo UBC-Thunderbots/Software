@@ -24,9 +24,6 @@ TEST_P(ColouredCoutSinkTest, testLogInfo)
     std::unique_ptr<g3::LogWorker> logWorker = g3::LogWorker::createLogWorker();
     auto colour_cout_sink_handle             = logWorker->addSink(
         std::make_unique<ColouredCoutSink>(true), &ColouredCoutSink::displayColouredLog);
-
-    // We need to shut down logging started in tbots gtest main to setup the csv sinks
-    g3::internal::shutDownLogging();
     g3::initializeLogging(logWorker.get());
 
     LEVELS level = std::get<0>(GetParam());
@@ -51,9 +48,6 @@ TEST_P(ColouredCoutSinkTest, testLogInfoNoDetails)
     std::unique_ptr<g3::LogWorker> logWorker = g3::LogWorker::createLogWorker();
     auto colour_cout_sink_handle             = logWorker->addSink(
         std::make_unique<ColouredCoutSink>(false), &ColouredCoutSink::displayColouredLog);
-
-    // We need to shut down logging started in tbots gtest main to setup the csv sinks
-    g3::internal::shutDownLogging();
     g3::initializeLogging(logWorker.get());
 
     LEVELS level = std::get<0>(GetParam());

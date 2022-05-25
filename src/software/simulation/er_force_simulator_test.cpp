@@ -17,12 +17,15 @@ class ErForceSimulatorTest : public ::testing::Test
     {
         // TODO (#2419): remove this to re-enable sigfpe checks
         fedisableexcept(FE_INVALID | FE_OVERFLOW);
+        simulator_config = std::make_shared<const SimulatorConfig>();
         simulator = std::make_shared<ErForceSimulator>(TbotsProto::FieldType::DIV_B,
-                                                       robot_constants, wheel_constants);
+                                                       robot_constants, wheel_constants,
+                                                       simulator_config);
         simulator->resetCurrentTime();
     }
 
     std::shared_ptr<ErForceSimulator> simulator;
+    std::shared_ptr<const SimulatorConfig> simulator_config;
     RobotConstants_t robot_constants = create2021RobotConstants();
     WheelConstants wheel_constants   = create2021WheelConstants();
 };
@@ -309,10 +312,12 @@ TEST_F(ErForceSimulatorTest, yellow_robot_add_robots_and_change_position)
 
 TEST(ErForceSimulatorFieldTest, check_field_A_configuration)
 {
-    RobotConstants_t robot_constants            = create2021RobotConstants();
-    WheelConstants wheel_constants              = create2021WheelConstants();
+    std::shared_ptr<const SimulatorConfig> simulator_config;
+    RobotConstants_t robot_constants = create2021RobotConstants();
+    WheelConstants wheel_constants   = create2021WheelConstants();
+    simulator_config                 = std::make_shared<const SimulatorConfig>();
     std::shared_ptr<ErForceSimulator> simulator = std::make_shared<ErForceSimulator>(
-        TbotsProto::FieldType::DIV_A, robot_constants, wheel_constants);
+        TbotsProto::FieldType::DIV_A, robot_constants, wheel_constants, simulator_config);
     simulator->resetCurrentTime();
     simulator->getField();
 
@@ -321,10 +326,12 @@ TEST(ErForceSimulatorFieldTest, check_field_A_configuration)
 
 TEST(ErForceSimulatorFieldTest, check_field_B_configuration)
 {
-    RobotConstants_t robot_constants            = create2021RobotConstants();
-    WheelConstants wheel_constants              = create2021WheelConstants();
+    std::shared_ptr<const SimulatorConfig> simulator_config;
+    RobotConstants_t robot_constants = create2021RobotConstants();
+    WheelConstants wheel_constants   = create2021WheelConstants();
+    simulator_config                 = std::make_shared<const SimulatorConfig>();
     std::shared_ptr<ErForceSimulator> simulator = std::make_shared<ErForceSimulator>(
-        TbotsProto::FieldType::DIV_B, robot_constants, wheel_constants);
+        TbotsProto::FieldType::DIV_B, robot_constants, wheel_constants, simulator_config);
     simulator->resetCurrentTime();
     simulator->getField();
 

@@ -13,6 +13,8 @@ class STPTest : public ::testing::Test
    public:
     STPTest()
         : world(::TestUtil::createBlankTestingWorld()),
+          mutable_ai_config(std::make_shared<ThunderbotsConfig>()->getMutableAiConfig()),
+          ai_config(std::shared_ptr<const AiConfig>(mutable_ai_config)),
           // Give an explicit seed to STP so that our tests are deterministic
           stp(ai_config)
     {
@@ -22,11 +24,14 @@ class STPTest : public ::testing::Test
     void SetUp() override
     {
         // Explicitly setting override AI Play to be false
-        ai_config.mutable_ai_control_config()->clear_override_ai_play();
+        mutable_ai_config->getMutableAiControlConfig()
+            ->getMutableOverrideAiPlay()
+            ->setValue(false);
     }
 
     World world;
-    TbotsProto::AiConfig ai_config;
+    std::shared_ptr<AiConfig> mutable_ai_config;
+    std::shared_ptr<const AiConfig> ai_config;
     STP stp;
 };
 

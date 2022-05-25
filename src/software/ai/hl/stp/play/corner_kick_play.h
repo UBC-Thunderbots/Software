@@ -1,6 +1,6 @@
 #pragma once
 
-#include "proto/parameters.pb.h"
+#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/hl/stp/play/play.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/ai/passing/pass.h"
@@ -11,7 +11,7 @@
 class CornerKickPlay : public Play
 {
    public:
-    CornerKickPlay(TbotsProto::AiConfig config);
+    CornerKickPlay(std::shared_ptr<const AiConfig> config);
 
     void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
 

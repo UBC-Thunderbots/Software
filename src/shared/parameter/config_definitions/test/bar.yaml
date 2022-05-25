@@ -1,0 +1,10 @@
+- bool:
+    name: bar_bool
+    value: true
+    description: bar bool
+- int:
+    name: bar_int
+    min: 0
+    max: 5
+    value: 3
+    description: bar int

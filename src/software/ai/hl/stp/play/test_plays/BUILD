@@ -5,6 +5,7 @@ cc_library(
     srcs = ["halt_test_play.cpp"],
     hdrs = ["halt_test_play.h"],
     deps = [
+        "//shared/parameter:cpp_configs",
         "//software/ai/hl/stp/play",
         "//software/ai/hl/stp/tactic/stop:stop_tactic",
         "//software/util/generic_factory",
@@ -17,6 +18,7 @@ cc_library(
     srcs = ["move_test_play.cpp"],
     hdrs = ["move_test_play.h"],
     deps = [
+        "//shared/parameter:cpp_configs",
         "//software/ai/hl/stp/play",
         "//software/ai/hl/stp/tactic/move:move_tactic",
         "//software/util/generic_factory",

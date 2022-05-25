@@ -124,7 +124,7 @@ void DribbleFSM::loseBall(const Update &event)
         (ball_position - event.common.robot.position()).orientation();
     Point away_from_ball_position = robotPositionToFaceBall(
         ball_position, face_ball_orientation,
-        dribble_tactic_config.lose_ball_possession_threshold() * 2);
+        dribble_tactic_config->getLoseBallPossessionThreshold()->value() * 2);
 
     event.common.set_primitive(createMovePrimitive(
         CREATE_MOTION_CONTROL(away_from_ball_position), face_ball_orientation, 0,
@@ -151,7 +151,7 @@ bool DribbleFSM::lostPossession(const Update &event)
     return !event.common.robot.isNearDribbler(
         // avoid cases where ball is exactly on the edge of the robot
         event.common.world.ball().position(),
-        dribble_tactic_config.lose_ball_possession_threshold());
+        dribble_tactic_config->getLoseBallPossessionThreshold()->value());
 };
 
 bool DribbleFSM::dribblingDone(const Update &event)
@@ -160,23 +160,25 @@ bool DribbleFSM::dribblingDone(const Update &event)
                event.common.world.ball().position(),
                getDribbleBallDestination(event.common.world.ball().position(),
                                          event.control_params.dribble_destination),
-               dribble_tactic_config.ball_close_to_dest_threshold()) &&
+               dribble_tactic_config->getBallCloseToDestThreshold()->value()) &&
            compareAngles(
                event.common.robot.orientation(),
                getFinalDribbleOrientation(event.common.world.ball().position(),
                                           event.common.robot.position(),
                                           event.control_params.final_dribble_orientation),
                Angle::fromDegrees(
-                   dribble_tactic_config.final_destination_close_threshold())) &&
+                   dribble_tactic_config->getFinalDestinationCloseThreshold()
+                       ->value())) &&
            havePossession(event) &&
            robotStopped(event.common.robot,
-                        dribble_tactic_config.robot_dribbling_done_speed());
+                        dribble_tactic_config->getRobotDribblingDoneSpeed()->value());
 }
 
 bool DribbleFSM::shouldLoseBall(const Update &event)
 {
     Point ball_position = event.common.world.ball().position();
     return (!event.control_params.allow_excessive_dribbling &&
-            !comparePoints(ball_position, continuous_dribbling_start_point,
-                           dribble_tactic_config.max_continuous_dribbling_distance()));
+            !comparePoints(
+                ball_position, continuous_dribbling_start_point,
+                dribble_tactic_config->getMaxContinuousDribblingDistance()->value()));
 }

@@ -20,7 +20,7 @@ class AI final
      * Create an AI with given configurations
      * @param ai_config_ The AI configuration
      */
-    explicit AI(TbotsProto::AiConfig ai_config);
+    explicit AI(std::shared_ptr<const AiConfig> ai_config);
 
     /**
      * Overrides the play
@@ -48,31 +48,24 @@ class AI final
      */
     TbotsProto::PlayInfo getPlayInfo() const;
 
-    /**
-     * Overrides the play from the play proto
-     *
-     * @param play_proto the play proto
-     */
-    void overridePlayFromProto(TbotsProto::Play play_proto);
-
-    /**
-     * Update the AiConfig proto
-     *
-     * @param ai_config The new AiConfig proto
-     */
-    void updateAiConfig(TbotsProto::AiConfig ai_config);
-
    private:
+    /**
+     * Overrides the play from the name
+     *
+     * @param name the play name
+     * @param ai_config
+     */
+    void overridePlayFromName(std::string name);
+
     void checkAiConfig();
 
-    TbotsProto::AiConfig ai_config_;
+    std::shared_ptr<const AiConfig> ai_config;
     std::unique_ptr<FSM<PlaySelectionFSM>> fsm;
     std::unique_ptr<Play> override_play;
     std::unique_ptr<Play> current_play;
     std::map<Field, GlobalPathPlannerFactory> field_to_path_planner_factory;
-    TbotsProto::PlayName prev_override;
-    bool ai_config_changed;
-
+    bool prev_override;
+    std::string prev_override_name;
     // inter play communication
     InterPlayCommunication inter_play_communication;
 };

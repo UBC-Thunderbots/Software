@@ -1,6 +1,6 @@
 #pragma once
 
-#include "proto/parameters.pb.h"
+#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/passing/pass.h"
 #include "software/world/world.h"
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "proto/parameters.pb.h"
+#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/hl/stp/play/play.h"
 
 /**
@@ -9,7 +9,7 @@
 class ExamplePlay : public Play
 {
    public:
-    explicit ExamplePlay(TbotsProto::AiConfig config);
+    explicit ExamplePlay(std::shared_ptr<const AiConfig> config);
 
     void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
 };

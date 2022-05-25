@@ -1,0 +1,138 @@
+# This file provides an example for how to define a config file, including examples
+# of all parameter types, special attributes, and how to include other configs
+#
+# Parameter schema
+#
+# type:
+#   name:
+#   value:
+#   description:
+#   other attributes...
+#
+# Notes:
+# - All 'name' attributes must be unique per-file
+# - All 'name' attribute values should be snake_case. Spaces are not allowed.
+# - All config file names must be unique
+
+#########################################################################################
+# The following are examples of how to include other configs
+#########################################################################################
+# Config files can include other configs. This is how the parameter hierarchy is built
+# up, and allows us to share parameters between configs. For example, this makes it
+# easy to define some passing parameters in one location, and share those parameters
+# with the subset of Plays that need them.
+#
+# All included config files need to be listed under a single `include` section.
+# Because all config filenames must be unique, just the filename needs to be
+# specified (not the path).
+#
+# In the generated code, included configs and their attributes can be accessed by
+# the name of the included config.
+# Eg. foo.foo_bool
+include:
+  - "foo.yaml"
+---
+
+#########################################################################################
+# The following are example of every type of parameter that can be used
+#########################################################################################
+- bool:
+    name: example_bool_param
+    value: true
+    constant: true
+    description: >-
+      Can be true or false
+- int:
+    name: example_int_param
+    min: 0
+    max: 5
+    value: 3
+    constant: true
+    description: >-
+      Can be any integer value in the range [min, max]
+- float:
+    name: example_float_param
+    min: 1.1
+    max: 9.01
+    value: 4.04
+    constant: true
+    description: >-
+      Can be any value in the range [min, max]
+
+      For C code, this will be generated as a float.
+      For C++ code, this will be generated as a double.
+- string:
+    name: example_string_param
+    value: "Hello World"
+    constant: true
+    description: >-
+      Any string value
+- enum:
+    name: example_enum_param
+    enum: RefereeCommand
+    value: HALT
+    description: >-
+      Accepts enum values from the specified enum. For example if there was an enum defined as
+
+      enum TeamColour {
+        YELLOW,
+        BLUE
+      }
+
+      or
+
+      MAKE_ENUM(TeamColour,
+        YELLOW,
+        BLUE
+      }
+
+      Then this parameter would only accept TeamColour.YELLOW and TeamColour.BLUE as valid values.
+
+      The target that builds/defines the enum must be included in the enum_deps attribute
+      of the bazel rule (otherwise compilation should fail).
+
+      Will only generate for CPP code.
+
+- factory:
+    name: example_factory_param
+    index_type: std::string
+    type_to_create: Play
+    value: "HaltPlay"
+    description: >-
+      Accepts all registered IndexType values for the GenericFactory<index_type, type_to_create>.
+
+      For example, if there was a GenericFactory<std::string, Play> with 3 entries registered
+      as ("Stop", "Defense", "Offense"), then this parameter would only accept
+      "Stop", "Defense", and "Offense" as valid values.
+
+      Will only generate for CPP code.
+
+#########################################################################################
+# The following are example of special attributes that can be applied to any parameter
+#########################################################################################
+# Make a parameter value optional (CPP only)
+# TODO: add support for optional parameter (issue #1889)
+#- bool:
+#    name: example_optional_parameter
+#    value: false
+#    optional: true
+#    description: >-
+#      Optional parameters will generate with std::optional as their value return type.
+#      They can accept std::nullopt as a value. If optional is not specified, it is
+#      assumed to be false.
+#
+#      Will only generate for CPP code.
+# Make a parameter a constant value
+- int:
+    name: example_const_parameter
+    min: 0
+    max: 255
+    value: 50
+    constant: true
+    description: >-
+      Parameters with the constant attribute do not generate with an API to change their values.
+      They are constant. If constant is not specified, it is assumed to be false.
+
+      Only parameters that are marked as constant will be generated for C code. We assume
+      that C code is firmware that we cannot change at runtime because it is running
+      on the robots (not the main AI computer).

@@ -1,5 +1,8 @@
 package(default_visibility = ["//visibility:public"])
 
+load("@python_tools_deps//:requirements.bzl", "requirement")
+load("@pybind11_bazel//:build_defs.bzl", "pybind_extension", "pybind_library")
+
 cc_library(
     name = "proto_udp_client",
     hdrs = [

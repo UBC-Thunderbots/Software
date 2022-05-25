@@ -2,7 +2,7 @@
 
 #include <exception>
 
-#include "proto/parameters.pb.h"
+#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/hl/stp/play/halt_play.h"
 #include "software/ai/hl/stp/stp.h"
 #include "software/test_util/test_util.h"
@@ -25,11 +25,13 @@ class STPRefereeCommandPlaySelectionTestWithPositions
       public ::testing::WithParamInterface<PlaySelectionTestParams>
 {
    public:
-    STPRefereeCommandPlaySelectionTestWithPositions() : stp(ai_config) {}
+    STPRefereeCommandPlaySelectionTestWithPositions()
+        : stp(std::make_shared<const ThunderbotsConfig>()->getAiConfig())
+    {
+    }
 
    protected:
     STP stp;
-    TbotsProto::AiConfig ai_config;
     World world = ::TestUtil::createBlankTestingWorld();
 };
 
@@ -156,13 +158,16 @@ class STPRefereeCommandPlaySelectionTest
       public ::testing::WithParamInterface<RefereeCommand>
 {
    public:
-    STPRefereeCommandPlaySelectionTest() : stp(ai_config) {}
+    STPRefereeCommandPlaySelectionTest()
+        : stp(std::make_shared<const ThunderbotsConfig>()->getAiConfig())
+    {
+    }
 
    protected:
     void SetUp() override
     {
         // Give an explicit seed to STP so that our tests are deterministic
-        stp = STP(ai_config);
+        stp = STP(std::make_shared<const ThunderbotsConfig>()->getAiConfig());
 
         Robot robot_0(0, Point(-1.1, 1), Vector(), Angle::zero(), AngularVelocity::zero(),
                       Timestamp::fromSeconds(0));
@@ -181,7 +186,6 @@ class STPRefereeCommandPlaySelectionTest
         world.updateEnemyTeamState(Team({enemy_robot_0, enemy_robot_1, enemy_robot_2}));
     }
 
-    TbotsProto::AiConfig ai_config;
     STP stp;
     World world = ::TestUtil::createBlankTestingWorld();
 };

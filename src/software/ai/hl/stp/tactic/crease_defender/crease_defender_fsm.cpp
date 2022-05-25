@@ -36,7 +36,7 @@ void CreaseDefenderFSM::blockThreat(
     auto block_threat_point = findBlockThreatPoint(
         event.common.world.field(), event.control_params.enemy_threat_origin,
         event.control_params.crease_defender_alignment,
-        robot_navigation_obstacle_config.robot_obstacle_inflation_factor());
+        robot_navigation_obstacle_config->getRobotObstacleInflationFactor()->value());
     if (block_threat_point)
     {
         destination = block_threat_point.value();

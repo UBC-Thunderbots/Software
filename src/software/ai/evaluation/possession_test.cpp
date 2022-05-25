@@ -2,8 +2,8 @@
 
 #include <gtest/gtest.h>
 
-#include "proto/parameters.pb.h"
 #include "shared/constants.h"
+#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/test_util/test_util.h"
 
 

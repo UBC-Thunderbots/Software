@@ -65,8 +65,6 @@ class SimulatorTestRunner(object):
         self.blue_full_system_proto_unix_io = blue_full_system_proto_unix_io
         self.yellow_full_system_proto_unix_io = yellow_full_system_proto_unix_io
         self.gamecontroller = gamecontroller
-        self.last_exception = None
-
         self.world_buffer = ThreadSafeBuffer(buffer_size=1, protobuf_type=World)
         self.last_exception = None
 
@@ -314,19 +312,13 @@ def simulated_test_runner():
     current_test = current_test.replace("]", "")
     current_test = current_test.replace("[", "-")
 
-    test_name = current_test.split("-")[0]
-
     # Launch all binaries
     with Simulator(
-        f"{args.simulator_runtime_dir}/test/{test_name}", args.debug_simulator
+        args.simulator_runtime_dir, args.debug_simulator
     ) as simulator, FullSystem(
-        f"{args.blue_full_system_runtime_dir}/test/{test_name}",
-        args.debug_blue_full_system,
-        False,
+        args.blue_full_system_runtime_dir, args.debug_blue_full_system, False
     ) as blue_fs, FullSystem(
-        f"{args.yellow_full_system_runtime_dir}/test/{test_name}",
-        args.debug_yellow_full_system,
-        True,
+        args.yellow_full_system_runtime_dir, args.debug_yellow_full_system, True
     ) as yellow_fs:
         with Gamecontroller(
             supress_logs=(not args.show_gamecontroller_logs), ci_mode=True

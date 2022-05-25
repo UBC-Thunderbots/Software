@@ -13,7 +13,7 @@
 #include "software/util/generic_factory/generic_factory.h"
 #include "software/world/ball.h"
 
-FreeKickPlay::FreeKickPlay(TbotsProto::AiConfig config)
+FreeKickPlay::FreeKickPlay(std::shared_ptr<const AiConfig> config)
     : Play(config, true), MAX_TIME_TO_COMMIT_TO_PASS(Duration::fromSeconds(3))
 {
 }
@@ -32,9 +32,10 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const World
     // Setup crease defenders to help the goalie
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics = {
         std::make_shared<CreaseDefenderTactic>(
-            ai_config.robot_navigation_obstacle_config()),
+            ai_config->getRobotNavigationObstacleConfig()),
         std::make_shared<CreaseDefenderTactic>(
-            ai_config.robot_navigation_obstacle_config())};
+            ai_config->getRobotNavigationObstacleConfig()),
+    };
 
     auto attacker = std::make_shared<AttackerTactic>(ai_config);
 
@@ -143,7 +144,7 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
         std::make_shared<const EighteenZonePitchDivision>(world.field());
 
     PassGenerator<EighteenZoneId> pass_generator(pitch_division,
-                                                 ai_config.passing_config());
+                                                 ai_config->getPassingConfig());
 
     using Zones = std::unordered_set<EighteenZoneId>;
 
@@ -242,4 +243,4 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, FreeKickPlay, TbotsProto::AiConfig> factory;
+static TGenericFactory<std::string, Play, FreeKickPlay, AiConfig> factory;

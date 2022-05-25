@@ -16,14 +16,16 @@ class RobotNavigationObstacleFactoryTest : public testing::Test
    public:
     RobotNavigationObstacleFactoryTest()
         : current_time(Timestamp::fromSeconds(123)),
-          robot_navigation_obstacle_factory(config)
+          robot_navigation_obstacle_config(
+              std::make_shared<RobotNavigationObstacleConfig>()),
+          robot_navigation_obstacle_factory(robot_navigation_obstacle_config)
     {
-        config.set_robot_obstacle_inflation_factor(1.3);
-        robot_navigation_obstacle_factory = RobotNavigationObstacleFactory(config);
+        robot_navigation_obstacle_config->getMutableRobotObstacleInflationFactor()
+            ->setValue(1.3);
     }
 
     Timestamp current_time;
-    TbotsProto::RobotNavigationObstacleConfig config;
+    std::shared_ptr<RobotNavigationObstacleConfig> robot_navigation_obstacle_config;
     RobotNavigationObstacleFactory robot_navigation_obstacle_factory;
 };
 
@@ -38,11 +40,10 @@ class RobotNavigationObstacleFactoryMotionConstraintTest : public testing::Test
           friendly_team(Duration::fromMilliseconds(1000)),
           enemy_team(Duration::fromMilliseconds(1000)),
           world(field, ball, friendly_team, enemy_team),
+          robot_navigation_obstacle_config(
+              std::make_shared<RobotNavigationObstacleConfig>()),
           robot_navigation_obstacle_factory(robot_navigation_obstacle_config)
     {
-        robot_navigation_obstacle_config.set_robot_obstacle_inflation_factor(1.3);
-        robot_navigation_obstacle_factory =
-            RobotNavigationObstacleFactory(robot_navigation_obstacle_config);
     }
 
     void SetUp() override
@@ -67,6 +68,9 @@ class RobotNavigationObstacleFactoryMotionConstraintTest : public testing::Test
 
         // Construct the world with arguments
         world = World(field, ball, friendly_team, enemy_team);
+
+        robot_navigation_obstacle_config->getMutableRobotObstacleInflationFactor()
+            ->setValue(1.3);
     }
 
     Timestamp current_time;
@@ -75,8 +79,8 @@ class RobotNavigationObstacleFactoryMotionConstraintTest : public testing::Test
     Team friendly_team;
     Team enemy_team;
     World world;
+    std::shared_ptr<RobotNavigationObstacleConfig> robot_navigation_obstacle_config;
     RobotNavigationObstacleFactory robot_navigation_obstacle_factory;
-    TbotsProto::RobotNavigationObstacleConfig robot_navigation_obstacle_config;
 };
 
 TEST_F(RobotNavigationObstacleFactoryTest, create_rectangle_obstacle)

@@ -31,9 +31,9 @@ class SimulatedErForceSimPlayTestFixture : public SimulatedErForceSimTestFixture
     /**
      * Sets the AI play to run in the simulated test
      *
-     * @param ai_play The AI play name enum
+     * @param ai_play The name of the AI play
      */
-    void setAIPlay(const TbotsProto::PlayName& ai_play_name);
+    void setAIPlay(const std::string& ai_play);
 
     /**
      * Sets the tactic to the given tactic
@@ -77,13 +77,17 @@ class SimulatedErForceSimPlayTestFixture : public SimulatedErForceSimTestFixture
      *
      * @return the Ai Config
      */
-    const TbotsProto::AiConfig getAiConfig() const;
+    const std::shared_ptr<AiConfig> getAiConfig() const;
 
     std::optional<TbotsProto::PlayInfo> getPlayInfo() override;
+    AIDrawFunction getDrawFunctions() override;
 
    private:
     void updatePrimitives(const World& friendly_world, const World& enemy_world,
                           std::shared_ptr<ErForceSimulator> simulator_to_update) override;
+    // The configs being used in simulation
+    std::shared_ptr<AiConfig> ai_config;
+    std::shared_ptr<SensorFusionConfig> sensor_fusion_config;
 
     GameState game_state;
 

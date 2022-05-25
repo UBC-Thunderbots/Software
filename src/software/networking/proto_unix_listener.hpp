@@ -6,6 +6,7 @@
 
 #include "software/constants.h"
 #include "software/logger/logger.h"
+#include "software/util/typename/typename.h"
 
 template <class ReceiveProtoT>
 class ProtoUnixListener

@@ -1,30 +1,19 @@
 #include "software/sensor_fusion/threaded_sensor_fusion.h"
 
-#include <google/protobuf/util/message_differencer.h>
-
 ThreadedSensorFusion::ThreadedSensorFusion(
-    TbotsProto::SensorFusionConfig sensor_fusion_config)
+    std::shared_ptr<const SensorFusionConfig> sensor_fusion_config)
     : FirstInFirstOutThreadedObserver<SensorProto>(DIFFERENT_GRSIM_FRAMES_RECEIVED),
       sensor_fusion(sensor_fusion_config)
 {
-}
-
-void ThreadedSensorFusion::onValueReceived(TbotsProto::ThunderbotsConfig config)
-{
-    std::scoped_lock lock(sensor_fusion_mutex);
-
-    // If we received a new SensorFusion, restart sensor fusion
-    // with the new config
-    if (!google::protobuf::util::MessageDifferencer::Equivalent(
-            config.sensor_fusion_config(), sensor_fusion_config))
+    if (!sensor_fusion_config)
     {
-        sensor_fusion = SensorFusion(config.sensor_fusion_config());
+        throw std::invalid_argument(
+            "ThreadedSensorFusion created with null SensorFusionConfig");
     }
 }
 
 void ThreadedSensorFusion::onValueReceived(SensorProto sensor_msg)
 {
-    std::scoped_lock lock(sensor_fusion_mutex);
     sensor_fusion.processSensorProto(sensor_msg);
 
     // Limit sensor fusion to only send out worlds on ssl wrapper packets

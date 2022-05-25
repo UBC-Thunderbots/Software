@@ -2,7 +2,7 @@
 
 #include <exception>
 
-#include "proto/parameters.pb.h"
+#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/hl/stp/play/halt_play.h"
 #include "software/ai/hl/stp/stp.h"
 #include "software/test_util/test_util.h"
@@ -10,7 +10,7 @@
 
 TEST(PlaySelectionFSMTest, test_transitions)
 {
-    TbotsProto::AiConfig ai_config;
+    auto ai_config = std::make_shared<ThunderbotsConfig>()->getAiConfig();
     std::unique_ptr<Play> current_play(std::make_unique<HaltPlay>(ai_config));
     std::unique_ptr<FSM<PlaySelectionFSM>> fsm(
         std::make_unique<FSM<PlaySelectionFSM>>(PlaySelectionFSM{ai_config}));

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "proto/parameters.pb.h"
 #include "shared/constants.h"
+#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/hl/stp/play/play_fsm.h"
 #include "software/ai/hl/stp/tactic/attacker/attacker_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
@@ -30,7 +30,7 @@ struct ShootOrPassPlayFSM
      *
      * @param ai_config the play config for this play FSM
      */
-    explicit ShootOrPassPlayFSM(TbotsProto::AiConfig ai_config);
+    explicit ShootOrPassPlayFSM(std::shared_ptr<const AiConfig> ai_config);
 
     /**
      * Updates the offensive positioning tactics
@@ -134,7 +134,7 @@ struct ShootOrPassPlayFSM
     }
 
    private:
-    TbotsProto::AiConfig ai_config;
+    std::shared_ptr<const AiConfig> ai_config;
     std::shared_ptr<AttackerTactic> attacker_tactic;
     std::shared_ptr<ReceiverTactic> receiver_tactic;
     std::vector<std::shared_ptr<MoveTactic>> offensive_positioning_tactics;

@@ -1,0 +1,21 @@
+- string:
+    name: interface
+    value: ""
+    description: >-
+        The interface to send and receive packets over (can be found through ifconfig).
+
+- string:
+    name: ssl_division
+    value: "div_b"
+    options:
+        - "div_a"
+        - "div_b"
+    description: >-
+        Which ssl_division to configure the simulator to. Changes the field size and the number
+        of initial robots.
+        
+- string:
+    name: runtime_dir
+    value: "/tmp/tbots"
+    description: >-
+        The directory to output logs and setup unix sockets.

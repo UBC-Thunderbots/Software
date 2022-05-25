@@ -14,7 +14,7 @@
 #include "software/ai/hl/stp/play/stop_play.h"
 
 
-PlaySelectionFSM::PlaySelectionFSM(TbotsProto::AiConfig ai_config)
+PlaySelectionFSM::PlaySelectionFSM(std::shared_ptr<const AiConfig> ai_config)
     : ai_config(ai_config), current_play(std::make_unique<HaltPlay>(ai_config))
 {
 }

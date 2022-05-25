@@ -1,5 +1,3 @@
-#include <boost/program_options.hpp>
-
 #include "extlibs/er_force_sim/src/protobuf/world.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
 #include "proto/vision.pb.h"
@@ -12,38 +10,14 @@
 
 int main(int argc, char **argv)
 {
-    struct CommandLineArgs
+    auto args               = std::make_shared<StandaloneSimulatorMainCommandLineArgs>();
+    bool help_requested     = args->loadFromCommandLineArguments(argc, argv);
+    std::string runtime_dir = args->getRuntimeDir()->value();
+
+    LoggerSingleton::initializeLogger(runtime_dir);
+
+    if (!help_requested)
     {
-        bool help               = false;
-        std::string runtime_dir = "/tmp/tbots";
-        std::string division    = "div_b";
-    };
-
-    CommandLineArgs args;
-    boost::program_options::options_description desc{"Options"};
-
-    desc.add_options()("help,h", boost::program_options::bool_switch(&args.help),
-                       "Help screen");
-    desc.add_options()("runtime_dir",
-                       boost::program_options::value<std::string>(&args.runtime_dir),
-                       "The directory to output logs and setup unix sockets.");
-    desc.add_options()("division",
-                       boost::program_options::value<std::string>(&args.division),
-                       "div_a or div_b");
-
-    boost::program_options::variables_map vm;
-    boost::program_options::store(parse_command_line(argc, argv, desc), vm);
-    boost::program_options::notify(vm);
-
-    if (args.help)
-    {
-        std::cout << desc << std::endl;
-    }
-    else
-    {
-        std::string runtime_dir = args.runtime_dir;
-        LoggerSingleton::initializeLogger(runtime_dir);
-
         /**
          * Creates a ER force simulator and sets up the appropriate
          * communication channels (unix senders/listeners). All inputs (left) and
@@ -71,17 +45,17 @@ int main(int argc, char **argv)
         std::shared_ptr<ErForceSimulator> er_force_sim;
 
         // Setup the field
-        if (args.division == "div_a")
+        if (args->getSslDivision()->value() == "div_a")
         {
             er_force_sim = std::make_shared<ErForceSimulator>(
                 TbotsProto::FieldType::DIV_A, create2021RobotConstants(),
-                create2021WheelConstants());
+                create2021WheelConstants(), std::make_shared<const SimulatorConfig>());
         }
         else
         {
             er_force_sim = std::make_shared<ErForceSimulator>(
                 TbotsProto::FieldType::DIV_B, create2021RobotConstants(),
-                create2021WheelConstants());
+                create2021WheelConstants(), std::make_shared<const SimulatorConfig>());
         }
         std::mutex simulator_mutex;
 

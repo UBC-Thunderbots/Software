@@ -4,7 +4,7 @@
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/point.h"
 
-GoalieTactic::GoalieTactic(TbotsProto::AiConfig ai_config,
+GoalieTactic::GoalieTactic(std::shared_ptr<const AiConfig> ai_config,
                            TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode)
     : Tactic({RobotCapability::Move, RobotCapability::Dribble, RobotCapability::Chip}),
       fsm_map(),
@@ -15,8 +15,8 @@ GoalieTactic::GoalieTactic(TbotsProto::AiConfig ai_config,
     for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)
     {
         fsm_map[id] = std::make_unique<FSM<GoalieFSM>>(
-            DribbleFSM(ai_config.dribble_tactic_config()),
-            GoalieFSM(ai_config.goalie_tactic_config(), max_allowed_speed_mode));
+            DribbleFSM(ai_config->getDribbleTacticConfig()),
+            GoalieFSM(ai_config->getGoalieTacticConfig(), max_allowed_speed_mode));
     }
 }
 
@@ -35,8 +35,8 @@ void GoalieTactic::updatePrimitive(const TacticUpdate &tactic_update, bool reset
     if (reset_fsm)
     {
         fsm_map[tactic_update.robot.id()] = std::make_unique<FSM<GoalieFSM>>(
-            DribbleFSM(ai_config.dribble_tactic_config()),
-            GoalieFSM(ai_config.goalie_tactic_config(), max_allowed_speed_mode));
+            DribbleFSM(ai_config->getDribbleTacticConfig()),
+            GoalieFSM(ai_config->getGoalieTacticConfig(), max_allowed_speed_mode));
     }
     fsm_map.at(tactic_update.robot.id())
         ->process_event(GoalieFSM::Update(control_params, tactic_update));

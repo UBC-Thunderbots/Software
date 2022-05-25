@@ -1,6 +1,6 @@
 #pragma once
 
-#include "proto/parameters.pb.h"
+#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/hl/stp/play/play.h"
 #include "software/ai/hl/stp/tactic/crease_defender/crease_defender_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
@@ -12,7 +12,7 @@
 class FreeKickPlay : public Play
 {
    public:
-    FreeKickPlay(TbotsProto::AiConfig config);
+    FreeKickPlay(std::shared_ptr<const AiConfig> config);
 
     void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
 

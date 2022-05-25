@@ -15,9 +15,8 @@ TEST(AttackerFSMTest, test_transitions)
                                               .shot             = std::nullopt,
                                               .chip_target      = std::nullopt};
 
-    TbotsProto::AiConfig ai_config;
-    FSM<AttackerFSM> fsm{DribbleFSM(ai_config.dribble_tactic_config()),
-                         AttackerFSM(ai_config.attacker_tactic_config())};
+    FSM<AttackerFSM> fsm{DribbleFSM(std::make_shared<DribbleTacticConfig>()),
+                         AttackerFSM(std::make_shared<AttackerTacticConfig>())};
     EXPECT_TRUE(fsm.is(boost::sml::state<DribbleFSM>));
 
     // robot far from attacker point

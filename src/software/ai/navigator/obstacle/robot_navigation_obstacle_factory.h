@@ -1,7 +1,7 @@
 #pragma once
 
-#include "proto/parameters.pb.h"
 #include "proto/primitive.pb.h"
+#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/navigator/obstacle/obstacle.hpp"
 #include "software/geom/line.h"
 #include "software/geom/point.h"
@@ -17,12 +17,15 @@
 class RobotNavigationObstacleFactory
 {
    public:
+    RobotNavigationObstacleFactory() = delete;
+
     /**
      * Create an RobotNavigationObstacleFactory with the given configuration
      *
      * @param config The configuration used to determine how obstacles should be generated
      */
-    RobotNavigationObstacleFactory(TbotsProto::RobotNavigationObstacleConfig config);
+    RobotNavigationObstacleFactory(
+        std::shared_ptr<const RobotNavigationObstacleConfig> config);
 
     /**
      * Create static obstacles for the given motion constraints
@@ -101,7 +104,7 @@ class RobotNavigationObstacleFactory
                                         const Point &ball_point) const;
 
    private:
-    TbotsProto::RobotNavigationObstacleConfig config;
+    std::shared_ptr<const RobotNavigationObstacleConfig> config;
     double robot_radius_expansion_amount;
 
     /**

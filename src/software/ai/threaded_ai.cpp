@@ -3,27 +3,25 @@
 #include <boost/bind.hpp>
 
 #include "proto/message_translation/tbots_protobuf.h"
-#include "proto/parameters.pb.h"
+#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/hl/stp/play/assigned_tactics_play.h"
 #include "software/ai/hl/stp/play/play_factory.h"
 #include "software/ai/hl/stp/tactic/tactic_factory.h"
-#include "software/multithreading/thread_safe_buffer.hpp"
 
-ThreadedAI::ThreadedAI(TbotsProto::AiConfig ai_config)
-    // Disabling warnings on log buffer full, since buffer size is 1 and we
-    // always want AI to use the latest World
-    : FirstInFirstOutThreadedObserver<World>(),
-      FirstInFirstOutThreadedObserver<TbotsProto::ThunderbotsConfig>(),
+ThreadedAI::ThreadedAI(std::shared_ptr<const AiConfig> ai_config)
+    // Disabling warnings on log buffer full, since buffer size is 1 and we always want AI
+    // to use the latest World
+    : FirstInFirstOutThreadedObserver<World>(DEFAULT_BUFFER_SIZE, false),
       ai(ai_config),
       ai_config(ai_config),
-      ai_control_config(ai_config.ai_control_config())
+      control_config(ai_config->getAiControlConfig())
 {
 }
 
 void ThreadedAI::overridePlay(TbotsProto::Play play_proto)
 {
     std::scoped_lock lock(ai_mutex);
-    ai.overridePlayFromProto(play_proto);
+    ai.overridePlay(std::move(createPlay(play_proto, ai_config)));
 }
 
 void ThreadedAI::overrideTactics(
@@ -43,30 +41,18 @@ void ThreadedAI::overrideTactics(
 
     play->updateControlParams(tactic_assignment_map);
     ai.overridePlay(std::move(play));
-
-    LOG(VISUALIZE) << ai.getPlayInfo();
 }
 
 void ThreadedAI::onValueReceived(World world)
 {
     runAIAndSendPrimitives(world);
-}
-
-void ThreadedAI::onValueReceived(TbotsProto::ThunderbotsConfig config)
-{
-    std::scoped_lock lock(ai_mutex);
-
-    // Update the AI with thew new config
-    ai_config         = config.ai_config();
-    ai_control_config = config.ai_config().ai_control_config();
-
-    ai.updateAiConfig(ai_config);
+    drawAI();
 }
 
 void ThreadedAI::runAIAndSendPrimitives(const World& world)
 {
     std::scoped_lock lock(ai_mutex);
-    if (ai_control_config.run_ai())
+    if (control_config->getRunAi()->value())
     {
         auto new_primitives = ai.getPrimitives(world);
 
@@ -79,3 +65,5 @@ void ThreadedAI::runAIAndSendPrimitives(const World& world)
         Subject<TbotsProto::PrimitiveSet>::sendValueToObservers(*new_primitives);
     }
 }
+
+void ThreadedAI::drawAI() {}

@@ -2,7 +2,7 @@
 
 Point GoalieFSM::getGoaliePositionToBlock(
     const Ball &ball, const Field &field,
-    TbotsProto::GoalieTacticConfig goalie_tactic_config)
+    std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config)
 {
     // compute angle between two vectors, negative goal post to ball and positive
     // goal post to ball
@@ -17,7 +17,7 @@ Point GoalieFSM::getGoaliePositionToBlock(
     {
         // how far in should the goalie wedge itself into the block cone, to block
         // balls
-        auto block_cone_radius = goalie_tactic_config.block_cone_radius();
+        auto block_cone_radius = goalie_tactic_config->getBlockConeRadius()->value();
 
         // compute block cone position, allowing 1 ROBOT_MAX_RADIUS_METERS extra on
         // either side
@@ -157,7 +157,7 @@ std::optional<Point> GoalieFSM::restrainGoalieInRectangle(
 
 bool GoalieFSM::shouldPanic(const Update &event)
 {
-    double ball_speed_panic = goalie_tactic_config.ball_speed_panic();
+    double ball_speed_panic = goalie_tactic_config->getBallSpeedPanic()->value();
     std::vector<Point> intersections =
         getIntersectionsBetweenBallVelocityAndFullGoalSegment(event.common.world.ball(),
                                                               event.common.world.field());
@@ -167,7 +167,7 @@ bool GoalieFSM::shouldPanic(const Update &event)
 
 bool GoalieFSM::shouldPivotChip(const Update &event)
 {
-    double ball_speed_panic = goalie_tactic_config.ball_speed_panic();
+    double ball_speed_panic = goalie_tactic_config->getBallSpeedPanic()->value();
     return event.common.world.ball().velocity().length() <= ball_speed_panic &&
            event.common.world.field().pointInFriendlyDefenseArea(
                event.common.world.ball().position());
@@ -175,7 +175,7 @@ bool GoalieFSM::shouldPivotChip(const Update &event)
 
 bool GoalieFSM::panicDone(const Update &event)
 {
-    double ball_speed_panic = goalie_tactic_config.ball_speed_panic();
+    double ball_speed_panic = goalie_tactic_config->getBallSpeedPanic()->value();
     std::vector<Point> intersections =
         getIntersectionsBetweenBallVelocityAndFullGoalSegment(event.common.world.ball(),
                                                               event.common.world.field());
@@ -234,7 +234,7 @@ void GoalieFSM::positionToBlock(const Update &event)
 
     // what should the final goalie speed be, so that the goalie accelerates
     // faster
-    auto goalie_final_speed = goalie_tactic_config.goalie_final_speed();
+    auto goalie_final_speed = goalie_tactic_config->getGoalieFinalSpeed()->value();
 
     event.common.set_primitive(createMovePrimitive(
         CREATE_MOTION_CONTROL(goalie_pos), goalie_orientation, goalie_final_speed,

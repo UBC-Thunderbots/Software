@@ -1,6 +1,6 @@
 #include "software/ai/hl/stp/play/crease_defense/crease_defense_play_fsm.h"
 
-CreaseDefensePlayFSM ::CreaseDefensePlayFSM(TbotsProto::AiConfig ai_config)
+CreaseDefensePlayFSM ::CreaseDefensePlayFSM(std::shared_ptr<const AiConfig> ai_config)
     : ai_config(ai_config), crease_defenders({})
 {
 }
@@ -43,6 +43,6 @@ void CreaseDefensePlayFSM::setUpDefenders(unsigned int num_defenders)
     crease_defenders = std::vector<std::shared_ptr<CreaseDefenderTactic>>(num_defenders);
     std::generate(crease_defenders.begin(), crease_defenders.end(), [this]() {
         return std::make_shared<CreaseDefenderTactic>(
-            ai_config.robot_navigation_obstacle_config());
+            ai_config->getRobotNavigationObstacleConfig());
     });
 }

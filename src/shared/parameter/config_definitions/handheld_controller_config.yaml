@@ -1,0 +1,41 @@
+- int:
+    name: robot_id
+    min: 0
+    max: 32
+    value: 0
+    type: "int"
+    description: "The ID of the robot being controller by the game controller"
+- double:
+    name: kick_speed_meters_per_second
+    min: 0.0
+    max: 6.5
+    value: 4.0
+    description: "The robot's kick speed in meters per second"
+- double:
+    name: chip_distance_meters
+    min: 0.0
+    max: 5.0
+    value: 1.0
+    description: "How far in meters the robot will chip"
+- int:
+    name: dribbler_rpm
+    min: 0
+    max: 10000
+    value: 1000
+    description: "The RPM of the robot's dribbler when turned on"
+- double:
+    name: max_linear_speed
+    min: 0.0
+    max: 3.0
+    value: 1.0
+    description: "The max allowed linear speed of the robot in m/s"
+- double:
+    name: max_angular_speed
+    min: 0.0
+    max: 12.0
+    value: 6.0
+    description: "The max allowed angular speed of the robot, in rad/s"
+- string: 
+    name: device_path
+    value: "/dev/input/js0"
+    description: "The filepath to the controller on the system"

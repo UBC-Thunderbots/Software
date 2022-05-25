@@ -1,7 +1,7 @@
 #include "software/ai/hl/stp/play/defense_play.h"
 
-#include "proto/parameters.pb.h"
 #include "shared/constants.h"
+#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/evaluation/enemy_threat.h"
 #include "software/ai/evaluation/possession.h"
 #include "software/ai/hl/stp/tactic/attacker/attacker_tactic.h"
@@ -13,18 +13,18 @@
 #include "software/world/game_state.h"
 #include "software/world/team.h"
 
-DefensePlay::DefensePlay(TbotsProto::AiConfig config) : Play(config, true) {}
+DefensePlay::DefensePlay(std::shared_ptr<const AiConfig> config) : Play(config, true) {}
 
 void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World &world)
 {
     auto shoot_goal_tactic = std::make_shared<AttackerTactic>(ai_config);
 
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics = {
-        // TODO-AKHIL remove hardcoded values
         std::make_shared<CreaseDefenderTactic>(
-            ai_config.robot_navigation_obstacle_config()),
+            ai_config->getRobotNavigationObstacleConfig()),
         std::make_shared<CreaseDefenderTactic>(
-            ai_config.robot_navigation_obstacle_config())};
+            ai_config->getRobotNavigationObstacleConfig()),
+    };
 
     std::array<std::shared_ptr<ShadowEnemyTactic>, 2> shadow_enemy_tactics = {
         std::make_shared<ShadowEnemyTactic>(),
@@ -63,7 +63,9 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
             enemy_threats.begin(), enemy_threats.end(), [this, world](auto enemy_threat) {
                 return distance(world.field().friendlyGoal(),
                                 enemy_threat.robot.position()) <
-                       ai_config.defense_play_config().immediate_threat_distance();
+                       ai_config->getDefensePlayConfig()
+                           ->getImmediateThreatDistance()
+                           ->value();
             }));
 
 
@@ -129,4 +131,4 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, DefensePlay, TbotsProto::AiConfig> factory;
+static TGenericFactory<std::string, Play, DefensePlay, AiConfig> factory;

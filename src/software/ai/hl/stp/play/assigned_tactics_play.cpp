@@ -1,11 +1,11 @@
 #include "software/ai/hl/stp/play/assigned_tactics_play.h"
 
-#include "proto/parameters.pb.h"
 #include "shared/constants.h"
+#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/logger/logger.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-AssignedTacticsPlay::AssignedTacticsPlay(TbotsProto::AiConfig config)
+AssignedTacticsPlay::AssignedTacticsPlay(std::shared_ptr<const AiConfig> config)
     : Play(config, false), assigned_tactics(), override_motion_constraints()
 {
 }
@@ -62,5 +62,4 @@ std::unique_ptr<TbotsProto::PrimitiveSet> AssignedTacticsPlay::get(
 void AssignedTacticsPlay::updateTactics(const PlayUpdate &play_update) {}
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, AssignedTacticsPlay, TbotsProto::AiConfig>
-    factory;
+static TGenericFactory<std::string, Play, AssignedTacticsPlay, AiConfig> factory;

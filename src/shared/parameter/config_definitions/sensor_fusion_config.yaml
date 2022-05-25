@@ -1,0 +1,98 @@
+- bool:
+    name: vision_flipping_filter_enabled
+    value: true
+    description: Ignores frames if our goalie appears in the opponent defense area
+- bool:
+    name: ignore_invalid_camera_data
+    value: false
+    description: >-
+      Whether or not to ignore invalid camera data. If this value is true, any ball or robot detections that are not
+      within the min and max valid x coordinates will be ignored. If this value is false, all data is collected as
+      normal and not ignored.
+- double:
+    name: min_valid_x
+    min: -10.0
+    max: 10.0
+    value: -10.0
+    description: >-
+      When ignoreInvalidCameraData is true, any robot or ball detection with an x-coordinate less than this value
+      is ignored.
+- double:
+    name: max_valid_x
+    min: -10.0
+    max: 10.0
+    value: 10.0
+    description: >-
+      When ignoreInvalidCameraData is true, any robot or ball detection with an x-coordinate greater than this
+      value is ignored.
+- int:
+    name: friendly_goalie_id
+    min: 0
+    max: 16
+    value: 0
+    description: >-
+      The id of the friendly goalie
+- int:
+    name: enemy_goalie_id
+    min: 0
+    max: 16
+    value: 0
+    description: >-
+      The id of the enemy goalie
+- bool:
+    name: override_game_controller_defending_side
+    value: true
+    description: >-
+      Overrides the defending side provided by the referee,
+      with defendingPositiveSide parameter
+- bool:
+    name: defending_positive_side
+    value: false
+    description: >-
+      Positive if selected, Negative if unselected
+- bool:
+    name: friendly_color_yellow
+    value: true
+    description: >-
+      Yellow if selected, Blue if unselected
+- bool:
+    name: override_game_controller_friendly_goalie_id
+    value: true
+    description: >-
+      Overrides the friendly goalie id provided by the game controller,
+      with FriendlyGoalieId parameter
+- bool:
+    name: override_game_controller_enemy_goalie_id
+    value: true
+    description: >-
+      Overrides the enemy goalie id provided by the game controller,
+      with EnemyGoalieId parameter
+- bool:
+    name: override_referee_command
+    value: false
+    description: >-
+      Overrides the current referee command with the play 
+      specified by CurrentRefereeCommand and PreviousRefereeCommand
+      parameter
+- string:
+    name: current_referee_command
+    value: "HALT"
+    description: >-
+      Specifies the referee command that should be in use
+- string:
+    name: previous_referee_command
+    value: "HALT"
+    description: >-
+      Specifies the previous referee command to correctly set up 
+      the referee command state machine when overriding the referee command.
+      For example, if `PREPARE_KICKOFF_US` followed by `NORMAL_START`, 
+      then `isOurRestart()` will be `true`, while 
+      `PREPARE_KICKOFF_THEM` followed by `NORMAL_START` will set 
+      `isOurRestart()` to `false`
+- int:
+    name: num_dropped_detections_before_ball_not_in_dribbler
+    min: 0
+    max: 1000
+    value: 3
+    description: >-
+      Number of dropped detections before we consider the ball not to be in the dribbler

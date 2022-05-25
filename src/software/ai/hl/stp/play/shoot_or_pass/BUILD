@@ -17,6 +17,7 @@ cc_library(
     deps = [
         "//proto/message_translation:tbots_protobuf",
         "//shared:constants",
+        "//shared/parameter:cpp_configs",
         "//software/ai/evaluation:calc_best_shot",
         "//software/ai/evaluation:possession",
         "//software/ai/hl/stp/play",

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "proto/parameters.pb.h"
 #include "shared/constants.h"
+#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/hl/stp/play/play.h"
 
 struct PlaySelectionFSM
@@ -15,23 +15,20 @@ struct PlaySelectionFSM
     struct Update
     {
         Update(const std::function<void(std::unique_ptr<Play>)>& set_current_play,
-               const GameState& game_state, const TbotsProto::AiConfig& ai_config)
-            : set_current_play(set_current_play),
-              game_state(game_state),
-              ai_config(ai_config)
+               const GameState& game_state)
+            : set_current_play(set_current_play), game_state(game_state)
         {
         }
         std::function<void(std::unique_ptr<Play>)> set_current_play;
         GameState game_state;
-        TbotsProto::AiConfig ai_config;
     };
 
     /**
      * Creates a play selection FSM
      *
-     * @param ai_config the default play config for this play fsm
+     * @param ai_config the play config for this play fsm
      */
-    explicit PlaySelectionFSM(TbotsProto::AiConfig ai_config);
+    explicit PlaySelectionFSM(std::shared_ptr<const AiConfig> ai_config);
 
     /**
      * Guards for whether the game state is stopped, halted, playing, or in set up
@@ -118,6 +115,6 @@ struct PlaySelectionFSM
     }
 
    private:
-    TbotsProto::AiConfig ai_config;
+    std::shared_ptr<const AiConfig> ai_config;
     std::shared_ptr<Play> current_play;
 };
