@@ -1,7 +1,7 @@
 #include "software/ai/hl/stp/play/kickoff_enemy_play.h"
 
+#include "proto/parameters.pb.h"
 #include "shared/constants.h"
-#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/evaluation/enemy_threat.h"
 #include "software/ai/evaluation/possession.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
@@ -9,10 +9,7 @@
 #include "software/geom/algorithms/calculate_block_cone.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-KickoffEnemyPlay::KickoffEnemyPlay(std::shared_ptr<const AiConfig> config)
-    : Play(config, true)
-{
-}
+KickoffEnemyPlay::KickoffEnemyPlay(TbotsProto::AiConfig config) : Play(config, true) {}
 
 void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
                                       const World &world)
@@ -148,4 +145,4 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, KickoffEnemyPlay, AiConfig> factory;
+static TGenericFactory<std::string, Play, KickoffEnemyPlay, TbotsProto::AiConfig> factory;

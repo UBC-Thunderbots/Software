@@ -13,7 +13,8 @@ TEST(DribbleFSMTest, test_transitions)
     world =
         ::TestUtil::setBallVelocity(world, Vector(0, -1), Timestamp::fromSeconds(123));
 
-    FSM<DribbleFSM> fsm{DribbleFSM(std::make_shared<DribbleTacticConfig>())};
+    TbotsProto::DribbleTacticConfig dribble_config;
+    FSM<DribbleFSM> fsm{DribbleFSM(dribble_config)};
 
     // Start in Dribble
     EXPECT_TRUE(fsm.is(boost::sml::state<DribbleFSM::GetPossession>));

@@ -19,18 +19,18 @@ class TestGeneric
 class TestGenericA : public TestGeneric
 {
    public:
-    TestGenericA(std::shared_ptr<const TestConfig> config);
+    TestGenericA(const TestConfig config);
 };
 
-TestGenericA::TestGenericA(std::shared_ptr<const TestConfig> config) {}
+TestGenericA::TestGenericA(const TestConfig config) {}
 
 class TestGenericB : public TestGeneric
 {
    public:
-    TestGenericB(std::shared_ptr<const TestConfig> config);
+    TestGenericB(const TestConfig config);
 };
 
-TestGenericB::TestGenericB(std::shared_ptr<const TestConfig> config) {}
+TestGenericB::TestGenericB(const TestConfig config) {}
 
 static TGenericFactory<std::string, TestGeneric, TestGenericA, TestConfig> testFactoryA;
 static TGenericFactory<std::string, TestGeneric, TestGenericB, TestConfig> testFactoryB;
@@ -39,14 +39,14 @@ static TGenericFactory<std::string, TestGeneric, TestGenericB, TestConfig> testF
 TEST(GenericFactoryTest, test_create_generic_with_invalid_name)
 {
     EXPECT_THROW((GenericFactory<std::string, TestGeneric, TestConfig>::create(
-                     "_FooBar_", std::make_shared<const TestConfig>())),
+                     "_FooBar_", TestConfig())),
                  std::invalid_argument);
 }
 
 TEST(GenericFactoryTest, test_create_generic_with_valid_name)
 {
     auto type_ptr = GenericFactory<std::string, TestGeneric, TestConfig>::create(
-        "TestGenericA", std::make_shared<const TestConfig>());
+        "TestGenericA", TestConfig());
 
     EXPECT_TRUE(type_ptr);
 }

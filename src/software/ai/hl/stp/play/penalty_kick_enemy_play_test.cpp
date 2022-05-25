@@ -49,7 +49,7 @@ TEST_P(PenaltyKickEnemyPlayTest, test_penalty_kick_enemy_play_setup)
     });
     setFriendlyGoalie(0);
     setEnemyGoalie(0);
-    setAIPlay(TYPENAME(PenaltyKickEnemyPlay));
+    setAIPlay(TbotsProto::PlayName::PenaltyKickEnemyPlay);
     setRefereeCommand(current_command, previous_command);
     Polygon behind_ball_region =
         Polygon({Point(field.enemyPenaltyMark().x() + 1, field.yLength() / 2),
@@ -135,7 +135,7 @@ TEST_F(PenaltyKickEnemyPlayTest, test_penalty_kick_enemy_play_goalie)
     });
     setFriendlyGoalie(0);
     setEnemyGoalie(0);
-    setAIPlay(TYPENAME(PenaltyKickEnemyPlay));
+    setAIPlay(TbotsProto::PlayName::PenaltyKickEnemyPlay);
     setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::PREPARE_PENALTY_THEM);
     GameState gameState = GameState();
     gameState.updateRefereeCommand(RefereeCommand::FORCE_START);

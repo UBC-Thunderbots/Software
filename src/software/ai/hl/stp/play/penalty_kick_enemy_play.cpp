@@ -5,7 +5,7 @@
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-PenaltyKickEnemyPlay::PenaltyKickEnemyPlay(std::shared_ptr<const AiConfig> config)
+PenaltyKickEnemyPlay::PenaltyKickEnemyPlay(TbotsProto::AiConfig config)
     : Play(config, true)
 {
 }
@@ -60,4 +60,5 @@ void PenaltyKickEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, PenaltyKickEnemyPlay, AiConfig> factory;
+static TGenericFactory<std::string, Play, PenaltyKickEnemyPlay, TbotsProto::AiConfig>
+    factory;
