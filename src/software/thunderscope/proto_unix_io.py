@@ -108,11 +108,15 @@ class ProtoUnixIO:
         :param data: The data to send
 
         """
-        if proto_class.DESCRIPTOR.full_name not in self.proto_observers:
-            return
+        if proto_class.DESCRIPTOR.full_name in self.proto_observers:
+            for buffer in self.proto_observers[proto_class.DESCRIPTOR.full_name]:
+                buffer.put(data)
 
-        for buffer in self.proto_observers[proto_class.DESCRIPTOR.full_name]:
-            buffer.put(data)
+        for buffer in self.all_proto_observers:
+            try:
+                buffer.put(data, block=False)
+            except queue.Full:
+                print("Buffer registered to receive everything dropped data")
 
     def attach_unix_sender(self, unix_path, proto_class):
         """Creates a unix sender and registers an observer
