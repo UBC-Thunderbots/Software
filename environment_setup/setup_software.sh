@@ -139,11 +139,19 @@ sudo chown -R $USER:$USER /opt/tbotspython
 sudo wget -nc https://github.com/RoboCup-SSL/ssl-game-controller/releases/download/v2.15.2/ssl-game-controller_v2.15.2_linux_amd64 -O /opt/tbotspython/gamecontroller
 sudo chmod +x /opt/tbotspython/gamecontroller
 
-print_status_msg "Fetching game controller"
+print_status_msg "Fetching mobile-gamepad"
 
 sudo wget -nc https://github.com/UBC-Thunderbots/mobile-gamepad/archive/refs/heads/master.zip -O /opt/tbotspython/mobile-gamepad.zip
 sudo unzip /opt/tbotspython/mobile-gamepad.zip -d /opt/tbotspython/
 
+curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
+sudo apt-get install -y nodejs
+
+# Install Grunt Command Line Interface
+sudo npm install -g grunt-cli
+                            
+cd /opt/tbotspython/mobile-gamepad-master && sudo npm install
+                                                
 # Install Bazel
 print_status_msg "Installing Bazel"
 
@@ -151,6 +159,7 @@ print_status_msg "Installing Bazel"
 sudo wget -nc https://github.com/bazelbuild/bazel/releases/download/5.0.0/bazel-5.0.0-installer-linux-x86_64.sh -O /tmp/bazel-installer.sh
 sudo chmod +x /tmp/bazel-installer.sh
 sudo /tmp/bazel-installer.sh --bin=/usr/bin --base=$HOME/.bazel
+
 
 print_status_msg "Done Installing Bazel"
 print_status_msg "Setting Up PlatformIO"
