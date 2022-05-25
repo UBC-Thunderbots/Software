@@ -42,8 +42,7 @@ void LinearVelocityAgent::computeNewVelocity()
     }
 }
 
-Agent::VelocityObstacle LinearVelocityAgent::createVelocityObstacle(
-    const Agent &other_agent)
+VelocityObstacle LinearVelocityAgent::createVelocityObstacle(const Agent &other_agent)
 {
     VelocityObstacle velocityObstacle;
     if ((position_ - other_agent.getPosition()).lengthSquared() >

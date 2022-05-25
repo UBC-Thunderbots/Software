@@ -51,3 +51,8 @@ cc_binary(
         "//shared:constants",
     ],
 )
+
+sh_binary(
+    name = "setup_nano",
+    srcs = ["setup_nano.sh"],
+)
