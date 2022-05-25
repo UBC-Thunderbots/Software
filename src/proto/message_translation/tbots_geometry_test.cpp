@@ -69,11 +69,11 @@ TEST(TbotsProtobufTest, circle_msg_test)
 
 TEST(TbotsProtobufTest, velocity_obstacle_msg_test)
 {
-    Vector apex_  = Vector(3, 3);
-    Vector side1_ = Vector(-1, -2);
-    Vector side2_ = Vector(1, 2);
+    Vector apex  = Vector(3, 3);
+    Vector side1 = Vector(-1, -2);
+    Vector side2 = Vector(1, 2);
 
-    VelocityObstacle velocity_obstacle = VelocityObstacle(apex_, side1_, side2_);
+    VelocityObstacle velocity_obstacle = VelocityObstacle(apex, side1, side2);
     auto velocity_obstacle_msg_1       = createVelocityObstacleProto(velocity_obstacle);
     auto velocity_obstacle_2           = createVelocityObstacle(*velocity_obstacle_msg_1);
     auto velocity_obstacle_msg_2       = createVelocityObstacleProto(velocity_obstacle_2);
