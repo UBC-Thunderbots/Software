@@ -86,12 +86,21 @@ class ProtoConfigurationWidget(QWidget):
         """
         for param, change, data in changes:
             path = self.param_group.childPath(param)
+
             if path is not None:
                 child_name = ".".join(path)
             else:
                 child_name = param.name()
 
-            exec(f"self.proto_to_configure.{child_name} = data")
+            # We need to set the updated value, but its hard to differentiate
+            # between strings and enums. So we need to try setting the data
+            # as a enum first and then as a string. If both raise, then we 
+            # raise to the main thread because the value wasn't updated.
+            try:
+                exec(f"self.proto_to_configure.{child_name} = {data}")
+            except (TypeError, NameError) as e:
+                exec(f"self.proto_to_configure.{child_name} = data")
+
             self.on_change_callback(child_name, data, self.proto_to_configure)
 
     @staticmethod
