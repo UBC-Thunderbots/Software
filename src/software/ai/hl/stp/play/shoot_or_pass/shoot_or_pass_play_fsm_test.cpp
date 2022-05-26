@@ -29,8 +29,8 @@ TEST(ShootOrPassPlayFSMTest, test_abort_pass_guard_lost_possession)
     world.updateRefereeCommand(RefereeCommand::FORCE_START);
     world.setTeamWithPossession(TeamSide::FRIENDLY);
 
-    FSM<ShootOrPassPlayFSM> fsm(
-        ShootOrPassPlayFSM{std::make_shared<const ThunderbotsConfig>()->getAiConfig()});
+    TbotsProto::AiConfig ai_config;
+    FSM<ShootOrPassPlayFSM> fsm(ShootOrPassPlayFSM{ai_config});
     EXPECT_TRUE(fsm.is(boost::sml::state<ShootOrPassPlayFSM::StartState>));
 
     fsm.process_event(ShootOrPassPlayFSM::Update(
@@ -84,24 +84,24 @@ TEST(ShootOrPassPlayFSMTest, test_abort_pass_guard_lost_possession)
     world.setTeamWithPossession(TeamSide::FRIENDLY);
 
     fsm.process_event(ShootOrPassPlayFSM::Update(
-            ShootOrPassPlayFSM::ControlParams{},
-            PlayUpdate(
-                    world, 3, [](PriorityTacticVector new_tactics) {}, InterPlayCommunication{},
-                    [](InterPlayCommunication comm) {})));
+        ShootOrPassPlayFSM::ControlParams{},
+        PlayUpdate(
+            world, 3, [](PriorityTacticVector new_tactics) {}, InterPlayCommunication{},
+            [](InterPlayCommunication comm) {})));
 
     world.updateTimestamp(Timestamp::fromSeconds(3));
     world.updateRefereeCommand(RefereeCommand::FORCE_START);
 
     fsm.process_event(ShootOrPassPlayFSM::Update(
-            ShootOrPassPlayFSM::ControlParams{},
-            PlayUpdate(
-                    world, 3, [](PriorityTacticVector new_tactics) {}, InterPlayCommunication{},
-                    [](InterPlayCommunication comm) {})));
+        ShootOrPassPlayFSM::ControlParams{},
+        PlayUpdate(
+            world, 3, [](PriorityTacticVector new_tactics) {}, InterPlayCommunication{},
+            [](InterPlayCommunication comm) {})));
     fsm.process_event(ShootOrPassPlayFSM::Update(
-            ShootOrPassPlayFSM::ControlParams{},
-            PlayUpdate(
-                    world, 3, [](PriorityTacticVector new_tactics) {}, InterPlayCommunication{},
-                    [](InterPlayCommunication comm) {})));
+        ShootOrPassPlayFSM::ControlParams{},
+        PlayUpdate(
+            world, 3, [](PriorityTacticVector new_tactics) {}, InterPlayCommunication{},
+            [](InterPlayCommunication comm) {})));
 
     EXPECT_TRUE(fsm.is(boost::sml::state<ShootOrPassPlayFSM::TakePassState>));
 }
@@ -111,8 +111,8 @@ TEST(ShootOrPassPlayFSMTest, test_abort_pass_guard_ball_changed)
     World world = ::TestUtil::createBlankTestingWorld();
     world.updateRefereeCommand(RefereeCommand::FORCE_START);
 
-    FSM<ShootOrPassPlayFSM> fsm(
-        ShootOrPassPlayFSM{std::make_shared<const ThunderbotsConfig>()->getAiConfig()});
+    TbotsProto::AiConfig ai_config;
+    FSM<ShootOrPassPlayFSM> fsm(ShootOrPassPlayFSM{ai_config});
     EXPECT_TRUE(fsm.is(boost::sml::state<ShootOrPassPlayFSM::StartState>));
 
     fsm.process_event(ShootOrPassPlayFSM::Update(
@@ -178,8 +178,8 @@ TEST(ShootOrPassPlayFSMTest, test_took_shot_guard)
 {
     World world = ::TestUtil::createBlankTestingWorld();
 
-    FSM<ShootOrPassPlayFSM> fsm(
-        ShootOrPassPlayFSM{std::make_shared<const ThunderbotsConfig>()->getAiConfig()});
+    TbotsProto::AiConfig ai_config;
+    FSM<ShootOrPassPlayFSM> fsm(ShootOrPassPlayFSM{ai_config});
     EXPECT_TRUE(fsm.is(boost::sml::state<ShootOrPassPlayFSM::StartState>));
 
     fsm.process_event(ShootOrPassPlayFSM::Update(

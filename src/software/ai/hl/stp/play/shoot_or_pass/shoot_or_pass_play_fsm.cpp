@@ -160,11 +160,13 @@ bool ShootOrPassPlayFSM::shouldAbortPass(const Update& event)
     // distance between robot and ball is too far,
     // i.e. team might still have possession, but kicker/passer doesn't have control over
     // ball
-    if (event.common.world.ball().velocity().length() < this->ai_config->getShootOrPassPlayConfig()->getBallShotThreshold()->value()) {
+    if (event.common.world.ball().velocity().length() <
+        this->ai_config.shoot_or_pass_play_config().ball_shot_threshold())
+    {
         if ((event.common.world.ball().position() -
              best_pass_and_score_so_far.pass.passerPoint())
-                    .length() >
-            this->ai_config->getShootOrPassPlayConfig()->getMinDistanceToPass()->value())
+                .length() >
+            this->ai_config.shoot_or_pass_play_config().min_distance_to_pass())
         {
             return true;
         }
@@ -181,5 +183,5 @@ bool ShootOrPassPlayFSM::passCompleted(const Update& event)
 bool ShootOrPassPlayFSM::tookShot(const Update& event)
 {
     return (event.common.world.ball().velocity().length() >
-            this->ai_config->getShootOrPassPlayConfig()->getBallShotThreshold()->value());
+            this->ai_config.shoot_or_pass_play_config().ball_shot_threshold());
 }
