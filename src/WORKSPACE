@@ -141,11 +141,19 @@ new_git_repository(
 http_archive(
     name = "nanopb",
     build_file = "@//extlibs:nanopb.BUILD",
-    sha256 = "e98dd6403ab8c5b271d32a6bc025e7e596bb181c7bc7e0492c5daa21fc44c940",
-    strip_prefix = "nanopb-0.3.9.4-linux-x86",
+    sha256 = "0ee3ad77b0760d05cf880e13e95a8b86aaddfd883f2faa01d3b5a280d8db3e9e",
+    strip_prefix = "nanopb-nanopb-0.3.9.4",
     urls = [
-        "https://jpa.kapsi.fi/nanopb/download/nanopb-0.3.9.4-linux-x86.tar.gz",
+        "https://github.com/nanopb/nanopb/archive/refs/tags/nanopb-0.3.9.4.tar.gz",
     ],
+)
+
+new_git_repository(
+    name = "LTC4151",
+    build_file = "@//extlibs:LTC4151.BUILD",
+    commit = "729952f10bcdcf359877b6f728565c17a8f17423",
+    remote = "https://github.com/kerrydwong/LTC4151.git",
+    shallow_since = "1397951678 -0400",
 )
 
 new_git_repository(
