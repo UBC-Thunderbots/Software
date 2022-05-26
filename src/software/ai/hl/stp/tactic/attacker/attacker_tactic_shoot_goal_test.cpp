@@ -5,7 +5,7 @@
 #include "software/ai/hl/stp/tactic/attacker/attacker_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/geom/algorithms/contains.h"
-#include "software/simulated_tests/simulated_er_force_sim_tactic_test_fixture.h"
+#include "software/simulated_tests/simulated_er_force_sim_play_test_fixture.h"
 #include "software/simulated_tests/terminating_validation_functions/ball_kicked_validation.h"
 #include "software/simulated_tests/terminating_validation_functions/friendly_scored_validation.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_state_validation.h"
@@ -15,13 +15,14 @@
 #include "software/world/world.h"
 
 class AttackerTacticShootGoalTest
-    : public SimulatedErForceSimTacticTestFixture,
+    : public SimulatedErForceSimPlayTestFixture,
       // Params: initial ball state, initial robot position, enemy team, expected
       // chip/kick direction
       public ::testing::WithParamInterface<
           std::tuple<BallState, Point, std::vector<RobotStateWithId>>>
 {
    protected:
+    TbotsProto::AiConfig ai_config;
     TbotsProto::FieldType field_type = TbotsProto::FieldType::DIV_B;
     Field field                      = Field::createField(field_type);
 };
@@ -34,13 +35,10 @@ TEST_P(AttackerTacticShootGoalTest, attacker_test_shoot_goal)
 
     auto friendly_robots =
         TestUtil::createStationaryRobotStatesWithId({initial_robot_point});
-    auto ai_config = std::make_shared<ThunderbotsConfig>()->getAiConfig();
-    auto tactic    = std::make_shared<AttackerTactic>(ai_config);
+    auto tactic = std::make_shared<AttackerTactic>(ai_config);
     // Make it very obvious when we decide to chip
     tactic->updateControlParams(Point(0, field.fieldLines().yMin()));
-    setTactic(tactic);
-    setFriendlyRobotId(0);
-    setMotionConstraints({MotionConstraint::FRIENDLY_DEFENSE_AREA});
+    setTactic(0, tactic, {TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA});
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [tactic](std::shared_ptr<World> world_ptr,

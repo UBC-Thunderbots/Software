@@ -7,6 +7,8 @@ py_library(
     srcs = ["field.py"],
     deps = [
         ":field_layer",
+        "//software/thunderscope/replay:proto_player",
+        "//software/thunderscope/replay:replay_controls",
         requirement("pyqtgraph"),
     ],
 )

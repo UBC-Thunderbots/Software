@@ -41,8 +41,6 @@ class FullSystem(object):
 
     """ Full System Binary Context Manager """
 
-    DEBUG_MODE_POLL_INTERVAL_S = 0.1
-
     def __init__(
         self,
         full_system_runtime_dir=None,
@@ -162,6 +160,11 @@ gdb --args bazel-bin/{full_system}
                 self.full_system_runtime_dir + TACTIC_OVERRIDE_PATH,
                 AssignedTacticPlayControlParams,
             ),
+            (self.full_system_runtime_dir + PLAY_OVERRIDE_PATH, Play),
+            (
+                self.full_system_runtime_dir + DYNAMIC_PARAMETER_UPDATE_REQUEST_PATH,
+                ThunderbotsConfig,
+            ),
         ]:
             proto_unix_io.attach_unix_sender(*arg)
 
@@ -177,8 +180,6 @@ gdb --args bazel-bin/{full_system}
 class Simulator(object):
 
     """ Simulator Context Manager """
-
-    DEBUG_MODE_POLL_INTERVAL_S = 0.1
 
     def __init__(self, simulator_runtime_dir=None, debug_simulator=False):
         """Run Simulator
@@ -293,6 +294,7 @@ gdb --args bazel-bin/{simulator_command}
             (self.simulator_runtime_dir + BLUE_SSL_WRAPPER_PATH, SSL_WrapperPacket),
             (self.simulator_runtime_dir + BLUE_ROBOT_STATUS_PATH, RobotStatus),
             (self.simulator_runtime_dir + SIMULATOR_STATE_PATH, SimulatorState),
+            (self.simulator_runtime_dir, HRVOVisualization, True),
         ]:
             blue_full_system_proto_unix_io.attach_unix_receiver(*arg)
 
@@ -403,6 +405,7 @@ class Gamecontroller(object):
         self,
         gc_command: proto.ssl_gc_state_pb2.Command,
         team: proto.ssl_gc_common_pb2.Team,
+        final_ball_placement_point=None,
     ):
         """Send a ci input to the gamecontroller.
 
@@ -426,6 +429,30 @@ class Gamecontroller(object):
         ci_change.new_command.CopyFrom(ci_new_command)
         ci_input.change.CopyFrom(ci_change)
         ci_ci_input.api_inputs.append(ci_input)
+
+        # Do this only if ball placement pos is specified
+        if final_ball_placement_point:
+            # Set position
+            ball_placement_pos = SetBallPlacementPos()
+            ball_placement_pos.pos.CopyFrom(
+                Vector2(
+                    x=float(final_ball_placement_point.x()),
+                    y=float(final_ball_placement_point.y()),
+                )
+            )
+            ci_change = Change()
+            ci_input = Input()
+            ci_change.set_ball_placement_pos.CopyFrom(ball_placement_pos)
+            ci_input.change.CopyFrom(ci_change)
+            ci_ci_input.api_inputs.append(ci_input)
+
+            # Start Placement
+            ci_change = Change()
+            ci_input = Input()
+            start_placement = StartBallPlacement()
+            ci_change.start_ball_placement.CopyFrom(start_placement)
+            ci_input.change.CopyFrom(ci_change)
+            ci_ci_input.api_inputs.append(ci_input)
 
         # https://cwiki.apache.org/confluence/display/GEODE/Delimiting+Protobuf+Messages
         size = ci_ci_input.ByteSize()

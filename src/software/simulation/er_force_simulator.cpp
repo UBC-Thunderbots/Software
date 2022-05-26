@@ -8,19 +8,18 @@
 #include <iostream>
 
 #include "extlibs/er_force_sim/src/protobuf/robot.h"
-#include "proto/message_translation/primitive_google_to_nanopb_converter.h"
 #include "proto/message_translation/ssl_detection.h"
 #include "proto/message_translation/ssl_geometry.h"
 #include "proto/message_translation/ssl_simulation_robot_control.h"
 #include "proto/message_translation/ssl_wrapper.h"
 #include "proto/message_translation/tbots_protobuf.h"
 #include "proto/robot_status_msg.pb.h"
+#include "software/logger/logger.h"
 #include "software/world/robot_state.h"
 
-ErForceSimulator::ErForceSimulator(
-    const TbotsProto::FieldType& field_type, const RobotConstants_t& robot_constants,
-    const WheelConstants& wheel_constants,
-    std::shared_ptr<const SimulatorConfig> simulator_config)
+ErForceSimulator::ErForceSimulator(const TbotsProto::FieldType& field_type,
+                                   const RobotConstants_t& robot_constants,
+                                   const WheelConstants& wheel_constants)
     : yellow_team_world_msg(std::make_unique<TbotsProto::World>()),
       blue_team_world_msg(std::make_unique<TbotsProto::World>()),
       frame_number(0),

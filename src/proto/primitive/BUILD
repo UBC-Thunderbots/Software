@@ -26,5 +26,6 @@ cc_test(
     deps = [
         ":primitive_msg_factory",
         "//shared/test_util:tbots_gtest_main",
+        "//software/test_util",
     ],
 )

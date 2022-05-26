@@ -6,7 +6,7 @@
 
 #include "software/geom/algorithms/contains.h"
 #include "software/simulated_tests/non_terminating_validation_functions/robots_avoid_ball_validation.h"
-#include "software/simulated_tests/simulated_er_force_sim_tactic_test_fixture.h"
+#include "software/simulated_tests/simulated_er_force_sim_play_test_fixture.h"
 #include "software/simulated_tests/terminating_validation_functions/ball_kicked_validation.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_in_polygon_validation.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_state_validation.h"
@@ -16,13 +16,14 @@
 #include "software/world/world.h"
 
 class CreaseDefenderTacticTest
-    : public SimulatedErForceSimTacticTestFixture,
+    : public SimulatedErForceSimPlayTestFixture,
       public ::testing::WithParamInterface<
           std::tuple<Point, TbotsProto::CreaseDefenderAlignment, unsigned int>>
 {
    protected:
     TbotsProto::FieldType field_type = TbotsProto::FieldType::DIV_B;
     Field field                      = Field::createField(field_type);
+    TbotsProto::AiConfig ai_config;
 };
 
 // TODO (#2512): Due to friction in ErForceSim, the ball does not reach defender
@@ -41,15 +42,11 @@ TEST_F(CreaseDefenderTacticTest, DISABLED_test_chip_ball)
          field.enemyDefenseArea().negXNegYCorner(),
          field.enemyDefenseArea().negXPosYCorner()});
 
-    auto robot_navigation_obstacle_config =
-        std::make_shared<RobotNavigationObstacleConfig>();
+    auto tactic = std::make_shared<CreaseDefenderTactic>(
+        ai_config.robot_navigation_obstacle_config());
 
-    auto tactic =
-        std::make_shared<CreaseDefenderTactic>(robot_navigation_obstacle_config);
     tactic->updateControlParams(enemy_threat_point, alignment);
-    setTactic(tactic);
-    setFriendlyRobotId(0);
-    setMotionConstraints({MotionConstraint::FRIENDLY_DEFENSE_AREA});
+    setTactic(0, tactic, {TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA});
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [tactic](std::shared_ptr<World> world_ptr,
@@ -80,15 +77,10 @@ TEST_F(CreaseDefenderTacticTest, test_not_bumping_ball_towards_net)
         TestUtil::createStationaryRobotStatesWithId({initial_position});
     auto enemy_robots = TestUtil::createStationaryRobotStatesWithId({Point(4, 0)});
 
-    auto robot_navigation_obstacle_config =
-        std::make_shared<RobotNavigationObstacleConfig>();
-
-    auto tactic =
-        std::make_shared<CreaseDefenderTactic>(robot_navigation_obstacle_config);
+    auto tactic = std::make_shared<CreaseDefenderTactic>(
+        ai_config.robot_navigation_obstacle_config());
     tactic->updateControlParams(enemy_threat_point, alignment);
-    setTactic(tactic);
-    setFriendlyRobotId(0);
-    setMotionConstraints({MotionConstraint::FRIENDLY_DEFENSE_AREA});
+    setTactic(0, tactic, {TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA});
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [tactic](std::shared_ptr<World> world_ptr,
@@ -126,15 +118,11 @@ TEST_P(CreaseDefenderTacticTest, crease_defender_test)
          field.enemyDefenseArea().negXNegYCorner(),
          field.enemyDefenseArea().negXPosYCorner()});
 
-    auto robot_navigation_obstacle_config =
-        std::make_shared<RobotNavigationObstacleConfig>();
+    auto tactic = std::make_shared<CreaseDefenderTactic>(
+        ai_config.robot_navigation_obstacle_config());
 
-    auto tactic =
-        std::make_shared<CreaseDefenderTactic>(robot_navigation_obstacle_config);
     tactic->updateControlParams(enemy_threat_point, alignment);
-    setTactic(tactic);
-    setFriendlyRobotId(0);
-    setMotionConstraints({MotionConstraint::FRIENDLY_DEFENSE_AREA});
+    setTactic(0, tactic, {TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA});
 
     Rectangle defense_area         = field.friendlyDefenseArea();
     Rectangle field_lines          = field.fieldLines();

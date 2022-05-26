@@ -53,6 +53,7 @@ class ProtoUnixIO:
     def __init__(self):
         # Mapping from ProtoType.DESCRIPTOR.full_name -> buffer
         self.proto_observers = {}
+        self.all_proto_observers = []
         self.unix_senders = {}
         self.unix_listeners = {}
         self.send_proto_to_observer_threads = {}
@@ -74,6 +75,12 @@ class ProtoUnixIO:
                     except queue.Full:
                         pass
 
+            for buffer in self.all_proto_observers:
+                try:
+                    buffer.put(proto, block=False)
+                except queue.Full:
+                    print("Buffer registered to receive everything dropped data")
+
     def register_observer(self, proto_class, buffer):
         """Register a widget to consume from a given protobuf class
 
@@ -86,6 +93,14 @@ class ProtoUnixIO:
         else:
             self.proto_observers[proto_class.DESCRIPTOR.full_name] = [buffer]
 
+    def register_to_observe_everything(self, buffer):
+        """Register a buffer to observe all incoming protobufs
+
+        :param buffer: buffer to push protos onto
+        
+        """
+        self.all_proto_observers.append(buffer)
+
     def send_proto(self, proto_class, data):
         """Send the data to all register_observers
 
@@ -93,15 +108,15 @@ class ProtoUnixIO:
         :param data: The data to send
 
         """
-        if proto_class.DESCRIPTOR.full_name not in self.proto_observers:
-            raise KeyError(
-                "No observers registered for {}!".format(
-                    proto_class.DESCRIPTOR.full_name
-                )
-            )
+        if proto_class.DESCRIPTOR.full_name in self.proto_observers:
+            for buffer in self.proto_observers[proto_class.DESCRIPTOR.full_name]:
+                buffer.put(data)
 
-        for buffer in self.proto_observers[proto_class.DESCRIPTOR.full_name]:
-            buffer.put(data)
+        for buffer in self.all_proto_observers:
+            try:
+                buffer.put(data, block=False)
+            except queue.Full:
+                print("Buffer registered to receive everything dropped data")
 
     def attach_unix_sender(self, unix_path, proto_class):
         """Creates a unix sender and registers an observer

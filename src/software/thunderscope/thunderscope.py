@@ -1,5 +1,6 @@
 import os
 import time
+import textwrap
 import shelve
 import signal
 import platform
@@ -17,9 +18,10 @@ else:
     import PyQt6
     from PyQt6.QtWebEngineWidgets import QWebEngineView
 
-import qdarktheme
+from qt_material import apply_stylesheet
 
 import pyqtgraph
+import qdarktheme
 from pyqtgraph.dockarea import *
 from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtWidgets import *
@@ -46,6 +48,9 @@ from software.thunderscope.field import (
     passing_layer,
 )
 
+from software.thunderscope.common.proto_configuration_widget import (
+    ProtoConfigurationWidget,
+)
 from software.thunderscope.field.field import Field
 from software.thunderscope.log.g3log_widget import g3logWidget
 from software.thunderscope.proto_unix_io import ProtoUnixIO
@@ -54,6 +59,7 @@ from software.thunderscope.robot_diagnostics.chicker import ChickerWidget
 from software.thunderscope.robot_diagnostics.drive_and_dribbler_widget import (
     DriveAndDribblerWidget,
 )
+from software.thunderscope.replay.proto_player import ProtoPlayer
 
 SAVED_LAYOUT_PATH = "/opt/tbotspython/saved_tscope_layout"
 NUM_ROBOTS = 6
@@ -83,6 +89,11 @@ class Thunderscope(object):
         simulator_proto_unix_io=None,
         blue_full_system_proto_unix_io=None,
         yellow_full_system_proto_unix_io=None,
+        layout_path=None,
+        load_blue=True,
+        load_yellow=True,
+        blue_replay_log=None,
+        yellow_replay_log=None,
         refresh_interval_ms=10,
         visualization_buffer_size=5,
     ):
@@ -91,6 +102,11 @@ class Thunderscope(object):
         :param simulator_proto_unix_io: The simulator's proto unix io
         :param blue_full_system_proto_unix_io: The blue full system's proto unix io
         :param yellow_full_system_proto_unix_io: The yellow full system's proto unix io
+        :param layout_path: The path to the layout to load
+        :param load_blue: Whether to load the blue dock area
+        :param load_yellow: Whether to load the yellow dock area
+        :param blue_replay_log: The blue replay log
+        :param yellow_replay_log: The yellow replay log
         :param refresh_interval_ms: The interval in milliseconds to refresh the simulator
         :param visualization_buffer_size: The size of the visualization buffer
 
@@ -98,7 +114,12 @@ class Thunderscope(object):
 
         # Setup MainApp and initialize DockArea
         self.app = pyqtgraph.mkQApp("Thunderscope")
-        self.app.setStyleSheet(qdarktheme.load_stylesheet())
+
+        # Setup stylesheet
+        apply_stylesheet(self.app, theme="dark_blue.xml")
+
+        self.blue_replay_log = blue_replay_log
+        self.yellow_replay_log = yellow_replay_log
         self.refresh_interval_ms = refresh_interval_ms
         self.visualization_buffer_size = visualization_buffer_size
         self.widgets = {}
@@ -145,6 +166,9 @@ class Thunderscope(object):
 
         self.refresh_timers = []
 
+        # Setup the main window and  load
+        self.__setup(layout_path, load_blue, load_yellow)
+
         # Save and Load Prompts
         self.save_layout_shortcut = QtGui.QShortcut(
             QtGui.QKeySequence("Ctrl+S"), self.window
@@ -178,24 +202,26 @@ class Thunderscope(object):
             lambda: QMessageBox.information(
                 self.window,
                 "Help",
-                f"""
-Keyboard Shortcuts:
-
-I to identify robots, show their IDs
-Cntrl+S: Save Layout
-Cntrl+O: Open Layout
-Cntrl+R: will remove the file and reset the layout
-
-Layout file (on save) is located at 
-        {SAVED_LAYOUT_PATH}
-
-Mouse Shortcuts:
-
-Double Click Purple Bar to pop window out
-Drag Purple Bar to rearrange docks
-Click items in legends to select/deselect
-Cntrl-Click and Drag: Move ball and kick
-""",
+                textwrap.dedent(
+                    f"""
+                    Keyboard Shortcuts:
+                    
+                    I to identify robots, show their IDs
+                    Cntrl+S: Save Layout
+                    Cntrl+O: Open Layout
+                    Cntrl+R: will remove the file and reset the layout
+                    
+                    Layout file (on save) is located at 
+                            {SAVED_LAYOUT_PATH}
+                    
+                    Mouse Shortcuts:
+                    
+                    Double Click Purple Bar to pop window out
+                    Drag Purple Bar to rearrange docks
+                    Click items in legends to select/deselect
+                    Cntrl-Click and Drag: Move ball and kick
+                    """
+                ),
             )
         )
 
@@ -259,7 +285,7 @@ Cntrl-Click and Drag: Move ball and kick
                     default_shelf["yellow_dock_state"] = shelf["yellow_dock_state"]
                     default_shelf.sync()
 
-    def load_saved_layout(self, layout_path, load_blue=True, load_yellow=True):
+    def __setup(self, layout_path, load_blue=True, load_yellow=True):
         """Load the specified layout or the default file. If the default layout
         file doesn't exist, and no layout is provided, then just configure
         the default layout.
@@ -342,14 +368,21 @@ Cntrl-Click and Drag: Move ball and kick
         performance_dock = Dock("Performance")
         performance_dock.addWidget(widgets["performance_widget"].win)
 
+        widgets["parameter_widget"] = self.setup_parameter_widget(
+            full_system_proto_unix_io, friendly_colour_yellow
+        )
+        parameter_dock = Dock("Parameters")
+        parameter_dock.addWidget(widgets["parameter_widget"])
+
         widgets["playinfo_widget"] = self.setup_play_info(full_system_proto_unix_io)
         playinfo_dock = Dock("Play Info")
         playinfo_dock.addWidget(widgets["playinfo_widget"])
 
         dock_area.addDock(field_dock)
-        dock_area.addDock(log_dock, "bottom", field_dock)
-        dock_area.addDock(performance_dock, "right", log_dock)
-        dock_area.addDock(playinfo_dock, "right", performance_dock)
+        dock_area.addDock(log_dock, "left", field_dock)
+        dock_area.addDock(parameter_dock, "above", log_dock)
+        dock_area.addDock(playinfo_dock, "bottom", field_dock)
+        dock_area.addDock(performance_dock, "right", playinfo_dock)
 
     def setup_field_widget(
         self, sim_proto_unix_io, full_system_proto_unix_io, friendly_colour_yellow
@@ -362,7 +395,11 @@ Cntrl-Click and Drag: Move ball and kick
         :returns: the field widget
 
         """
-        field = Field()
+        self.player = ProtoPlayer(
+            self.yellow_replay_log if friendly_colour_yellow else self.blue_replay_log,
+            full_system_proto_unix_io,
+        )
+        field = Field(player=self.player)
 
         # Create layers
         paths = path_layer.PathLayer(self.visualization_buffer_size)
@@ -393,8 +430,8 @@ Cntrl-Click and Drag: Move ball and kick
             (World, world.world_buffer),
             (RobotStatus, world.robot_status_buffer),
             (Referee, world.referee_buffer),
-            (Obstacles, obstacles.obstacle_buffer),
-            (PathVisualization, paths.path_visualization_buffer),
+            (PrimitiveSet, obstacles.primitive_set_buffer),
+            (PrimitiveSet, paths.primitive_set_buffer),
             (PassVisualization, passing.pass_visualization_buffer),
             (ValidationProtoSet, validation.validation_set_buffer),
             (SimulatorState, sim_state.simulator_state_buffer),
@@ -405,6 +442,23 @@ Cntrl-Click and Drag: Move ball and kick
         self.register_refresh_function(field.refresh)
 
         return field
+
+    def setup_parameter_widget(self, proto_unix_io, friendly_colour_yellow):
+        """Setup the parameter widget
+
+        :param proto_unix_io: The proto unix io object
+        :param friendly_colour_yellow: 
+        :returns: The proto configuration widget
+
+        """
+
+        self.config = ThunderbotsConfig()
+        self.config.sensor_fusion_config.friendly_color_yellow = friendly_colour_yellow
+
+        def on_change_callback(attr, value, updated_proto):
+            proto_unix_io.send_proto(ThunderbotsConfig, updated_proto)
+
+        return ProtoConfigurationWidget(self.config, on_change_callback)
 
     def setup_log_widget(self, proto_unix_io):
         """Setup the wiget that receives logs from full system
