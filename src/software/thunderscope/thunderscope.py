@@ -33,7 +33,7 @@ from proto.message_translation import tbots_protobuf
 
 from software.python_constants import *
 from software.networking import threaded_unix_sender
-from software.thunderscope.proto_plotter.proto_plotter import ProtoPlotter
+from software.thunderscope.common.proto_plotter import ProtoPlotter
 from software.thunderscope.binary_context_managers import *
 from extlibs.er_force_sim.src.protobuf.world_pb2 import *
 

@@ -28,12 +28,12 @@ py_library(
         "//software/networking:threaded_unix_listener_py",
         "//software/networking:threaded_unix_sender_py",
         "//software/thunderscope:binary_context_managers",
-        "//software/thunderscope:colors",
-        "//software/thunderscope:common_widgets",
         "//software/thunderscope:constants",
         "//software/thunderscope:proto_unix_io",
         "//software/thunderscope:robot_communication",
+        "//software/thunderscope/common:common_widgets",
         "//software/thunderscope/common:proto_configuration_widget",
+        "//software/thunderscope/common:proto_plotter",
         "//software/thunderscope/field",
         "//software/thunderscope/field:field_layer",
         "//software/thunderscope/field:obstacle_layer",
@@ -45,7 +45,6 @@ py_library(
         "//software/thunderscope/log:g3log_checkboxes",
         "//software/thunderscope/log:g3log_widget",
         "//software/thunderscope/play:playinfo_widget",
-        "//software/thunderscope/proto_plotter",
         "//software/thunderscope/replay:proto_logger",
         "//software/thunderscope/replay:proto_player",
         "//software/thunderscope/robot_diagnostics:chicker",
@@ -63,16 +62,6 @@ py_library(
 py_library(
     name = "constants",
     srcs = ["constants.py"],
-)
-
-py_library(
-    name = "colors",
-    srcs = ["colors.py"],
-)
-
-py_library(
-    name = "common_widgets",
-    srcs = ["common_widgets.py"],
 )
 
 py_library(

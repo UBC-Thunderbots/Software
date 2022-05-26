@@ -7,7 +7,7 @@ py_library(
     srcs = ["drive_and_dribbler_widget.py"],
     deps = [
         "//proto:software_py_proto",
-        "//software/thunderscope:common_widgets",
+        "//software.thunderscope.common.common_widgets",
         "//software/thunderscope:constants",
         requirement("pyqtgraph"),
     ],
