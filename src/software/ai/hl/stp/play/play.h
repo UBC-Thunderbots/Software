@@ -4,7 +4,7 @@
 #include <boost/coroutine2/all.hpp>
 #include <vector>
 
-#include "shared/parameter/cpp_dynamic_parameters.h"
+#include "proto/parameters.pb.h"
 #include "software/ai/hl/stp/play/play_fsm.h"
 #include "software/ai/hl/stp/tactic/goalie/goalie_tactic.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
@@ -39,7 +39,7 @@ class Play
      * @param ai_config The AI configuration
      * @param requires_goalie Whether this plays requires a goalie
      */
-    explicit Play(std::shared_ptr<const AiConfig> ai_config, bool requires_goalie);
+    explicit Play(TbotsProto::AiConfig ai_config, bool requires_goalie);
 
     /**
      * Gets Primitives from the Play given the path planner factory, the world, and
@@ -70,7 +70,7 @@ class Play
 
    protected:
     // The Play configuration
-    std::shared_ptr<const AiConfig> ai_config;
+    TbotsProto::AiConfig ai_config;
 
     // Goalie tactic common to all plays
     std::shared_ptr<GoalieTactic> goalie_tactic;
@@ -97,10 +97,10 @@ class Play
      *
      * @return the PrimitiveSet to execute
      */
-    std::unique_ptr<TbotsProto::PrimitiveSet> getPrimitivesFromTactic(
+    static std::unique_ptr<TbotsProto::PrimitiveSet> getPrimitivesFromTactic(
         const GlobalPathPlannerFactory& path_planner_factory, const World& world,
         std::shared_ptr<Tactic> tactic,
-        std::set<TbotsProto::MotionConstraint> motion_constraints) const;
+        std::set<TbotsProto::MotionConstraint> motion_constraints);
 
    private:
     /**
@@ -111,9 +111,11 @@ class Play
      * @param tactic_vector The tactic vector
      * @param robots_to_assign The robots to assign to
      *
-     * @return the remaining unassigned robots and the new primitives to assign
+     * @return the remaining unassigned robots, the new primitives to assign, and robot to
+     * tactic assignment
      */
-    std::tuple<std::vector<Robot>, std::unique_ptr<TbotsProto::PrimitiveSet>>
+    static std::tuple<std::vector<Robot>, std::unique_ptr<TbotsProto::PrimitiveSet>,
+                      std::map<std::shared_ptr<const Tactic>, RobotId>>
     assignTactics(const GlobalPathPlannerFactory& path_planner_factory,
                   const World& world, TacticVector tactic_vector,
                   const std::vector<Robot> robots_to_assign);

@@ -1,5 +1,0 @@
-- string:
-    name: port
-    value: ""
-    description: >-
-      The device port which the Arduino is connected to (can be found by running terminal command 'pio device list' )

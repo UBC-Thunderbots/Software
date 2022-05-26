@@ -1,6 +1,6 @@
 #pragma once
 
-#include "shared/parameter/cpp_dynamic_parameters.h"
+#include "proto/parameters.pb.h"
 #include "software/ai/evaluation/enemy_threat.h"
 #include "software/ai/hl/stp/tactic/crease_defender/crease_defender_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
@@ -31,10 +31,10 @@ class CreaseDefenderTactic : public Tactic
     /**
      * Creates a new CreaseDefenderTactic
      *
-     * @param robot_navigation_obstacle_config The config
+     * @param robot_obstacle_inflation_factor The amount to inflate the robot obstacles
      */
-    explicit CreaseDefenderTactic(std::shared_ptr<const RobotNavigationObstacleConfig>
-                                      robot_navigation_obstacle_config);
+    explicit CreaseDefenderTactic(
+        TbotsProto::RobotNavigationObstacleConfig robot_navigation_obstacle_config);
 
     CreaseDefenderTactic() = delete;
 
@@ -60,5 +60,5 @@ class CreaseDefenderTactic : public Tactic
     std::map<RobotId, std::unique_ptr<FSM<CreaseDefenderFSM>>> fsm_map;
 
     CreaseDefenderFSM::ControlParams control_params;
-    std::shared_ptr<const RobotNavigationObstacleConfig> robot_navigation_obstacle_config;
+    TbotsProto::RobotNavigationObstacleConfig robot_navigation_obstacle_config;
 };

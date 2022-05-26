@@ -347,34 +347,28 @@ Vector HRVOSimulator::getRobotVelocity(unsigned int robot_id) const
 
 void HRVOSimulator::visualize(unsigned int robot_id) const
 {
-    // TODO (#2499): Create a new HRVO visualization proto and uncomment/update
-    // LOG(VISUALIZE)
-    TbotsProto::Obstacles obstacle_proto;
-
-    // Add velocity obstacles and candidate new velocities to be visualized
     auto friendly_agent_opt = getFriendlyAgentFromRobotId(robot_id);
-    if (friendly_agent_opt.has_value())
+    if (!friendly_agent_opt.has_value())
     {
-        auto friendly_agent = friendly_agent_opt.value();
-        for (auto &obstacle : friendly_agent->getVelocityObstaclesAsPolygons())
-        {
-            *(obstacle_proto.add_polygon()) = *createPolygonProto(obstacle);
-        }
-
-        for (auto &candidate_circle : friendly_agent->getCandidateVelocitiesAsCircles())
-        {
-            *(obstacle_proto.add_circle()) = *createCircleProto(candidate_circle);
-        }
+        LOG(WARNING) << "HRVO friendly agent with robot id " << robot_id
+                     << " can not be visualized." << std::endl;
+        return;
     }
 
-    // Add circles representing agents
+    TbotsProto::HRVOVisualization hrvo_visualization;
+    hrvo_visualization.set_robot_id(robot_id);
+
+    auto vo_protos = friendly_agent_opt.value()->getVelocityObstaclesAsProto();
+    *(hrvo_visualization.mutable_velocity_obstacles()) = {vo_protos.begin(),
+                                                          vo_protos.end()};
+
     for (auto &agent : agents)
     {
         Point position(agent->getPosition());
-        *(obstacle_proto.add_circle()) =
+        *(hrvo_visualization.add_robots()) =
             *createCircleProto(Circle(position, agent->getRadius()));
     }
-    // LOG(VISUALIZE) << obstacle_proto;
+    LOG(VISUALIZE) << hrvo_visualization;
 }
 
 std::optional<std::shared_ptr<HRVOAgent>> HRVOSimulator::getFriendlyAgentFromRobotId(

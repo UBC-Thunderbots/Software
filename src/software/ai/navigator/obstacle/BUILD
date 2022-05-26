@@ -25,7 +25,6 @@ cc_library(
     deps = [
         ":obstacle",
         "//proto:tbots_cc_proto",
-        "//shared/parameter:cpp_configs",
         "//software/geom:point",
         "//software/logger",
         "//software/world",

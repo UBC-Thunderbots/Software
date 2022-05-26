@@ -34,7 +34,7 @@ TEST_F(DefensePlayTest, test_defense_play)
         Point(-2, -1.25),
     });
     setEnemyGoalie(0);
-    setAIPlay(TYPENAME(DefensePlay));
+    setAIPlay(TbotsProto::PlayName::DefensePlay);
     // We set the referee command to stop so that the robots do not kick/shoot during
     // the test
     setRefereeCommand(RefereeCommand::STOP, RefereeCommand::STOP);
@@ -90,7 +90,7 @@ TEST_F(DefensePlayTest, test_defense_play_one_immediate_threat)
         Point(-1, 0),
     });
     setEnemyGoalie(0);
-    setAIPlay(TYPENAME(DefensePlay));
+    setAIPlay(TbotsProto::PlayName::DefensePlay);
     // We set the referee command to stop so that the robots do not kick/shoot during
     // the test
     setRefereeCommand(RefereeCommand::STOP, RefereeCommand::STOP);
@@ -145,7 +145,7 @@ TEST_F(DefensePlayTest, test_defense_play_close_to_net)
         Point(-3.8, -2),
     });
     setEnemyGoalie(0);
-    setAIPlay(TYPENAME(DefensePlay));
+    setAIPlay(TbotsProto::PlayName::DefensePlay);
     // We set the referee command to stop so that the robots do not kick/shoot during
     // the test
     setRefereeCommand(RefereeCommand::STOP, RefereeCommand::STOP);

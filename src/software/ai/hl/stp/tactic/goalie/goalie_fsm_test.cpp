@@ -8,8 +8,7 @@
 TEST(GoalieFSMTest, test_get_goalie_position_to_block)
 {
     Field field = Field::createSSLDivisionBField();
-    std::shared_ptr<GoalieTacticConfig> goalie_tactic_config =
-        std::make_shared<GoalieTacticConfig>();
+    TbotsProto::GoalieTacticConfig goalie_tactic_config;
 
     // ball at center field, goalie should position itself at the front of the friendly
     // defense area
@@ -85,8 +84,9 @@ TEST(GoalieFSMTest, test_transitions)
         Point(GoalieFSM::getNoChipRectangle(world.field()).xMax(), 0);
     Angle clear_ball_direction = Angle::zero();
 
-    FSM<GoalieFSM> fsm(DribbleFSM(std::make_shared<DribbleTacticConfig>()),
-                       GoalieFSM(std::make_shared<const GoalieTacticConfig>(),
+    TbotsProto::AiConfig ai_config;
+    FSM<GoalieFSM> fsm(DribbleFSM(ai_config.dribble_tactic_config()),
+                       GoalieFSM(ai_config.goalie_tactic_config(),
                                  TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT));
 
     // goalie starts in PositionToBlock
