@@ -39,7 +39,8 @@ class Charger
 
    private:
     /**
-     * Isr called when charging is done. This checks the flyback status and also calls the charge_done_callback.
+     * Isr called when charging is done. This checks the flyback status and also calls the
+     * charge_done_callback.
      */
     static void IRAM_ATTR chargeDone();
     static void (*charge_done_callback)();

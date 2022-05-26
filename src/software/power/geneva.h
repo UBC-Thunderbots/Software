@@ -21,7 +21,8 @@ class Geneva
     /**
      * Sets the angle of the geneva motor.
      * Also attaches a timer interrupt to asynchronously wait a fixed amounts of time
-     * (proportional to how much the geneva motor needs to rotate) before running the given isr
+     * (proportional to how much the geneva motor needs to rotate) before running the
+     * given isr
      *
      * @param angle_deg angle to set the geneva motor to
      * @param isr isr to run once geneva motor is in place

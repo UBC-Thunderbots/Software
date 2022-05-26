@@ -31,16 +31,19 @@ class Chicker
      */
     static bool getBreakBeamTripped();
     /**
-     * Sets the kick/chip speed/distance. Arguments can not be passed to isr's so these need to be set before calling kick/chip
+     * Sets the kick/chip speed/distance. Arguments can not be passed to isr's so these
+     * need to be set before calling kick/chip
      * @param kick_speed_m_per_s/chip_distance_meters speed/distance to kick/chip
      */
     static void setKickSpeedMPerS(float kick_speed_m_per_s);
     static void setChipDistanceMeters(float chip_distance_meters);
+
    private:
     /**
      * Converts given speed/distance into pulse width duration
      *
-     * @param speed_m_per_s/distance_meters speed/distance to convert to pulse width duration
+     * @param speed_m_per_s/distance_meters speed/distance to convert to pulse width
+     * duration
      * @return pulse width duration in microseconds
      */
     static int speedToPulseWidth(float speed_m_per_s);
@@ -52,7 +55,8 @@ class Chicker
      */
     static void oneShotPulse(int duration, int pin);
     /**
-     * Isr called when the BREAK_BEAM_PIN is tripped. Performs a kick/chip action if the break beam wasn't previously triggered
+     * Isr called when the BREAK_BEAM_PIN is tripped. Performs a kick/chip action if the
+     * break beam wasn't previously triggered
      */
     static void IRAM_ATTR autokick_isr();
     static void IRAM_ATTR autochip_isr();

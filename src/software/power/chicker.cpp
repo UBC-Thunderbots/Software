@@ -35,14 +35,14 @@ void Chicker::autochip_isr()
 void Chicker::kick()
 {
     breakbeam_tripped = false;
-    auto duration = speedToPulseWidth(kick_speed_m_per_s);
+    auto duration     = speedToPulseWidth(kick_speed_m_per_s);
     oneShotPulse(duration, KICKER_PIN);
 }
 
 void Chicker::chip()
 {
     breakbeam_tripped = false;
-    auto duration = distanceToPulseWidth(chip_distance_meters);
+    auto duration     = distanceToPulseWidth(chip_distance_meters);
     oneShotPulse(duration, CHIPPER_PIN);
 }
 
@@ -58,11 +58,13 @@ void Chicker::autochip()
     attachInterrupt(digitalPinToInterrupt(BREAK_BEAM_PIN), Chicker::autochip_isr, RISING);
 }
 
-void Chicker::setKickSpeedMPerS(float kick_speed_m_per_s) {
+void Chicker::setKickSpeedMPerS(float kick_speed_m_per_s)
+{
     Chicker::kick_speed_m_per_s = kick_speed_m_per_s;
 }
 
-void Chicker::setChipDistanceMeters(float chip_distance_meters) {
+void Chicker::setChipDistanceMeters(float chip_distance_meters)
+{
     Chicker::chip_distance_meters = chip_distance_meters;
 }
 

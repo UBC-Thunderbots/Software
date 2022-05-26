@@ -1,7 +1,7 @@
 #include "charger.h"
 
-volatile bool Charger::flyback_fault = false;
-void(*Charger::charge_done_callback)() = NULL;
+volatile bool Charger::flyback_fault    = false;
+void (*Charger::charge_done_callback)() = NULL;
 
 Charger::Charger()
 {
@@ -17,7 +17,8 @@ void Charger::chargeDone()
 {
     flyback_fault = digitalRead(FLYBACK_FAULT);
     digitalWrite(CHRG, LOW);
-    if (charge_done_callback) {
+    if (charge_done_callback)
+    {
         charge_done_callback();
         charge_done_callback = NULL;
     }
@@ -28,7 +29,8 @@ void Charger::setChargeMode(int op)
     digitalWrite(CHRG, op);
 }
 
-void Charger::setChargeDoneCallbackOnce(void (*charge_done_callback)()){
+void Charger::setChargeDoneCallbackOnce(void (*charge_done_callback)())
+{
     Charger::charge_done_callback = charge_done_callback;
 }
 
