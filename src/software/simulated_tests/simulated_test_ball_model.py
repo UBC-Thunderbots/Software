@@ -22,85 +22,16 @@ from proto.ssl_gc_common_pb2 import Team
         # stationary ball
         (
             tbots.Point(-3.5, 0),
-            tbots.Vector(6.0, 0),
+            tbots.Vector(2, 0),
         ),
 
     ],
 )
 
-# @pytest.mark.parametrize(
-#     "ball_initial_position2,ball_initial_velocity2, robot_position",
-#     [
-#         # stationary ball
-#         (
-#                 tbots.Field.createSSLDivisionBField().centerPoint(),
-#                 tbots.Vector(2.5, 0),
-#                 tbots.Point(2.5,0)
-#         ),
-#
-#     ],
-# )
-
-# def test_ball_robot_collision(ball_initial_position2,ball_initial_velocity2, robot_position, simulated_test_runner):
-#     # Setup Robot
-#     simulated_test_runner.simulator_proto_unix_io.send_proto(
-#         WorldState,
-#         create_world_state(
-#             [],
-#             blue_robot_locations=[robot_position],
-#             ball_location=ball_initial_position2,
-#             ball_velocity=ball_initial_velocity2,
-#         ),
-#     )
-#
-#     # Setup Ball
-#     simulated_test_runner.simulator_proto_unix_io.send_proto(
-#         WorldState,
-#         create_world_state(
-#             [],
-#             blue_robot_locations=[],
-#             ball_location=ball_initial_position2,
-#             ball_velocity=ball_initial_velocity2,
-#         ),
-#     )
-#
-#     # Setup Tactic
-#     params = AssignedTacticPlayControlParams()
-#
-#     simulated_test_runner.blue_full_system_proto_unix_io.send_proto(
-#         AssignedTacticPlayControlParams, params
-#     )
-#
-#     # Setup no tactics on the enemy side
-#     params = AssignedTacticPlayControlParams()
-#     simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(
-#         AssignedTacticPlayControlParams, params
-#     )
-#
-#     # Always Validation
-#     always_validation_sequence_set = [
-#         [
-#             NeverExcessivelyDribbles(),
-#         ]
-#     ]
-#
-#     # Eventually Validation
-#     eventually_validation_sequence_set = [
-#         [
-#             BallEntersRegion([tbots.Circle(robot_position, 1)]),
-#         ]
-#     ]
-#
-#     simulated_test_runner.run_test(
-#         eventually_validation_sequence_set=eventually_validation_sequence_set,
-#         always_validation_sequence_set=always_validation_sequence_set,
-#     )
-
-
 def test_robot_intercepts_ball(
-    ball_initial_position,
-    ball_initial_velocity,
-    simulated_test_runner,
+        ball_initial_position,
+        ball_initial_velocity,
+        simulated_test_runner,
 ):
     # Setup Ball
     simulated_test_runner.simulator_proto_unix_io.send_proto(
@@ -142,7 +73,7 @@ def test_robot_intercepts_ball(
     #velocity at which ball starts to roll
     rolling_v = transition_factor * initial_v
     time_until_roll = abs((rolling_v - initial_v)/sliding_a)
-    time_until_stop = abs((rolling_v - 0.5)/ rolling_a)
+    time_until_stop = abs((rolling_v - 0.01)/ rolling_a)
 
     d_slide = (initial_v+rolling_v)/2 * time_until_roll
     d_roll = (rolling_v/2) * time_until_stop
@@ -172,6 +103,76 @@ def test_robot_intercepts_ball(
         eventually_validation_sequence_set=eventually_validation_sequence_set,
         always_validation_sequence_set=always_validation_sequence_set,
     )
+
+@pytest.mark.parametrize(
+    "ball_initial_position,ball_initial_velocity, robot_position",
+    [
+        # stationary ball
+        (
+                tbots.Field.createSSLDivisionBField().centerPoint(),
+                tbots.Vector(2.5, 0),
+                tbots.Point(2.5,0)
+        ),
+
+    ],
+)
+
+def test_ball_robot_collision(ball_initial_position, ball_initial_velocity, robot_position, simulated_test_runner):
+    # Setup Robot
+    simulated_test_runner.simulator_proto_unix_io.send_proto(
+        WorldState,
+        create_world_state(
+            [],
+            blue_robot_locations=[robot_position],
+            ball_location=ball_initial_position,
+            ball_velocity=ball_initial_velocity,
+        ),
+    )
+
+    # Setup Ball
+    simulated_test_runner.simulator_proto_unix_io.send_proto(
+        WorldState,
+        create_world_state(
+            [],
+            blue_robot_locations=[],
+            ball_location=ball_initial_position,
+            ball_velocity=ball_initial_velocity,
+        ),
+    )
+
+    # Setup Tactic
+    params = AssignedTacticPlayControlParams()
+
+    simulated_test_runner.blue_full_system_proto_unix_io.send_proto(
+        AssignedTacticPlayControlParams, params
+    )
+
+    # Setup no tactics on the enemy side
+    params = AssignedTacticPlayControlParams()
+    simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(
+        AssignedTacticPlayControlParams, params
+    )
+
+    # Always Validation
+    always_validation_sequence_set = [
+        [
+            NeverExcessivelyDribbles(),
+        ]
+    ]
+
+    # Eventually Validation
+    eventually_validation_sequence_set = [
+        [
+            BallEntersRegion([tbots.Circle(robot_position, 1)]),
+        ]
+    ]
+
+    simulated_test_runner.run_test(
+        eventually_validation_sequence_set=eventually_validation_sequence_set,
+        always_validation_sequence_set=always_validation_sequence_set,
+    )
+
+
 
 
 if __name__ == "__main__":
