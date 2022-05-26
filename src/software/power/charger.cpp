@@ -16,11 +16,11 @@ Charger::Charger()
 void Charger::chargeDone()
 {
     flyback_fault = digitalRead(FLYBACK_FAULT);
-    digitalWrite(CHRG, LOW);
     if (charge_done_callback)
     {
         charge_done_callback();
         charge_done_callback = NULL;
+        setChargeMode(LOW);
     }
 }
 
