@@ -17,3 +17,5 @@ class Colors(object):
 
     VALIDATION_PASSED_COLOR = "g"
     VALIDATION_FAILED_COLOR = "r"
+
+    SPEED_COLOR = QtGui.QColor(255, 0, 255, 255)
