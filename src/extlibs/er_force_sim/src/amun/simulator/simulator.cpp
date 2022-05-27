@@ -93,6 +93,9 @@ struct camun::simulator::SimulatorData
     float robotReplyPacketLoss;
     float missingBallDetections;
     bool dribblePerfect;
+    float ballRollingFriction;
+    float ballSlidingFriction;
+
 };
 
 static void simulatorTickCallback(btDynamicsWorld *world, btScalar timeStep)

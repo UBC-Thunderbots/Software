@@ -31,7 +31,14 @@
 
 static const float BALL_RADIUS       = 0.0215f;
 static const float BALL_MASS         = 0.046f;
-static const float BALL_DECELERATION = 0.5f;
+
+//these values are set in coordination with other objects the ball will collide with
+static constexpr float BALL_SLIDING_FRICTION = 1.f;
+static constexpr float BALL_RESTITUTION = 1.f;
+
+static constexpr float BALL_ROLLING_FRICTION_DECELERATION = 0.5;
+static constexpr float FRICTION_TRANSITION_FACTOR = 5.0/7.0;
+
 
 class RNG;
 namespace SSLProto
@@ -93,10 +100,6 @@ private:
     sslsim::TeleportBall m_move;
     double rolling_speed = -1;
     bool rollWhenPossible = false;
-    double FRICTION_BULLET_COEFF = 1.f;
-    double ROLLING_FRICTION_ACCELERATION = -0.5;
-    double ROLLING_FRICTION_BULLET_COEFF = 0.1;
-    double FRICTION_TRANSITION_FACTOR = 5.0/7.0;
 
 };
 
