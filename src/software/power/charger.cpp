@@ -20,7 +20,7 @@ void Charger::chargeDone()
     {
         charge_done_callback();
         charge_done_callback = NULL;
-        setChargeMode(LOW);
+        digitalWrite(CHRG, LOW);
     }
 }
 
