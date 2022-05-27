@@ -68,7 +68,6 @@ extern "C"
 }
 
 MotorService::MotorService(const RobotConstants_t& robot_constants,
-                           const WheelConstants_t& wheel_constants,
                            int control_loop_frequency_hz)
     : spi_demux_select_0(SPI_CS_DRIVER_TO_CONTROLLER_MUX_0_GPIO, GpioDirection::OUTPUT,
                          GpioState::LOW),
@@ -81,7 +80,6 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
       euclidean_to_four_wheel(control_loop_frequency_hz, robot_constants)
 {
     robot_constants_ = robot_constants;
-    wheel_constants_ = wheel_constants;
 
     int ret = 0;
 
@@ -273,20 +271,20 @@ std::unique_ptr<TbotsProto::MotorStatus> MotorService::poll(
             tmc4671_setTargetVelocity(
                 FRONT_LEFT_MOTOR_CHIP_SELECT,
                 static_cast<int>(motor.direct_per_wheel_control().front_left_wheel_rpm() *
-                                 wheel_constants_.wheel_rotations_per_motor_rotation));
+                                 robot_constants_.wheel_rotations_per_motor_rotation));
             tmc4671_setTargetVelocity(
                 FRONT_RIGHT_MOTOR_CHIP_SELECT,
                 static_cast<int>(
                     motor.direct_per_wheel_control().front_right_wheel_rpm() *
-                    wheel_constants_.wheel_rotations_per_motor_rotation));
+                    robot_constants_.wheel_rotations_per_motor_rotation));
             tmc4671_setTargetVelocity(
                 BACK_LEFT_MOTOR_CHIP_SELECT,
                 static_cast<int>(motor.direct_per_wheel_control().back_left_wheel_rpm() *
-                                 wheel_constants_.wheel_rotations_per_motor_rotation));
+                                 robot_constants_.wheel_rotations_per_motor_rotation));
             tmc4671_setTargetVelocity(
                 BACK_RIGHT_MOTOR_CHIP_SELECT,
                 static_cast<int>(motor.direct_per_wheel_control().back_right_wheel_rpm() *
-                                 wheel_constants_.wheel_rotations_per_motor_rotation));
+                                 robot_constants_.wheel_rotations_per_motor_rotation));
             break;
         }
         case TbotsProto::MotorControl::DriveControlCase::kDirectVelocityControl:

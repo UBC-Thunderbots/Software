@@ -17,11 +17,9 @@ class MotorService
      * Opens all the required ports and maintains them until destroyed.
      *
      * @param RobotConstants_t The robot constants
-     * @param WheelConstants_t The wheel constants
      * @param control_loop_frequency_hz The frequency the main loop will call poll at
      */
-    MotorService(const RobotConstants_t& robot_constants,
-                 const WheelConstants_t& wheel_constants, int control_loop_frequency_hz);
+    MotorService(const RobotConstants_t& robot_constants, int control_loop_frequency_hz);
 
     virtual ~MotorService();
 
@@ -181,7 +179,6 @@ class MotorService
 
     // Constants
     RobotConstants_t robot_constants_;
-    WheelConstants_t wheel_constants_;
 
     // SPI File Descriptors
     std::unordered_map<int, int> file_descriptors;

@@ -25,11 +25,9 @@ class ErForceSimulator
      *
      * @param field_type The field type
      * @param robot_constants The robot constants
-     * @param wheel_constants The wheel constants
      */
     explicit ErForceSimulator(const TbotsProto::FieldType& field_type,
-                              const RobotConstants_t& robot_constants,
-                              const WheelConstants& wheel_constants);
+                              const RobotConstants_t& robot_constants);
     ErForceSimulator()  = delete;
     ~ErForceSimulator() = default;
 
@@ -186,7 +184,6 @@ class ErForceSimulator
     std::unique_ptr<camun::simulator::Simulator> er_force_sim;
 
     RobotConstants_t robot_constants;
-    WheelConstants wheel_constants;
     Field field;
 
     std::optional<RobotId> blue_robot_with_ball;

@@ -29,13 +29,12 @@ std::unique_ptr<SSLSimulationProto::RobotMoveCommand> createRobotMoveCommand(
  * @param robot_id The id this RobotCommand is for
  * @param direct_control The Direct Control Primitive to create this RobotCommand from
  * @param robot_constants The Robot Constant to create this RobotCommand from
- * @param wheel_constants The Wheel Constant to create this RobotCommand from
  * @return
  */
 std::unique_ptr<SSLSimulationProto::RobotCommand> getRobotCommandFromDirectControl(
     unsigned int robot_id,
     std::unique_ptr<TbotsProto::DirectControlPrimitive> direct_control,
-    RobotConstants_t& robot_constants, WheelConstants_t wheel_constants);
+    RobotConstants_t& robot_constants);
 
 /**
  * Creates a RobotCommand proto

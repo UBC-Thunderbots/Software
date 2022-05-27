@@ -20,8 +20,7 @@ const double PRIMITIVE_MANAGER_TIMEOUT_NS = 50.0 * MILLISECONDS_PER_NANOSECOND;
 extern int clock_nanosleep(clockid_t __clock_id, int __flags,
                            __const struct timespec* __req, struct timespec* __rem);
 
-Thunderloop::Thunderloop(const RobotConstants_t& robot_constants,
-                         const WheelConstants_t& wheel_consants, std::string interface,
+Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, std::string interface,
                          const int loop_hz)
     : primitive_executor_(loop_hz, robot_constants)
 {
@@ -29,10 +28,8 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants,
     channel_id_      = 0;
     loop_hz_         = loop_hz;
     robot_constants_ = robot_constants;
-    wheel_consants_  = wheel_consants;
 
-    motor_service_ =
-        std::make_unique<MotorService>(robot_constants, wheel_consants, loop_hz);
+    motor_service_   = std::make_unique<MotorService>(robot_constants, loop_hz);
     network_service_ = std::make_unique<NetworkService>(
         std::string(ROBOT_MULTICAST_CHANNELS.at(channel_id_)) + "%" + interface,
         VISION_PORT, PRIMITIVE_PORT, ROBOT_STATUS_PORT, true);

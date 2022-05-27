@@ -22,12 +22,10 @@ platformio_library(
 cc_library(
     name = "robot_constants",
     srcs = [
-        "2015_robot_constants.cpp",
-        "2021_robot_constants.cpp",
+        "2022_robot_constants.cpp",
     ],
     hdrs = [
-        "2015_robot_constants.h",
-        "2021_robot_constants.h",
+        "2022_robot_constants.h",
         "robot_constants.h",
     ],
     deps = [

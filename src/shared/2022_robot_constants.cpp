@@ -1,4 +1,4 @@
-#include "shared/2021_robot_constants.h"
+#include "shared/2022_robot_constants.h"
 
 #include <math.h>
 
@@ -12,7 +12,7 @@
 #define ROBOT_POINT_MASS (2.48f)
 #define ROTATIONAL_MASS (INERTIAL_FACTOR * ROBOT_POINT_MASS)
 
-RobotConstants_t create2021RobotConstants(void)
+RobotConstants_t create2022RobotConstants(void)
 {
     RobotConstants_t robot_constants = {
         .mass_kg = 2.5f,  // determined experimentally
@@ -35,21 +35,8 @@ RobotConstants_t create2021RobotConstants(void)
         // TODO (#2112): update this
         .indefinite_dribbler_speed_rpm = 10000.0f,
         // TODO (#2112): update this
-        .max_force_dribbler_speed_rpm = 16000.0f};
+        .max_force_dribbler_speed_rpm       = 16000.0f,
+        .wheel_radius_meters                = 0.03f,
+        .wheel_rotations_per_motor_rotation = 17.0f / 60.0f};
     return robot_constants;
-}
-
-WheelConstants_t create2021WheelConstants(void)
-{
-    // Motor constants from https://www.maxongroup.com/maxon/view/product/651611
-    // TODO (#2112): update this
-    static WheelConstants_t wheel_constants = {
-        .motor_current_amp_per_torque_newton_meter = 1000.0f / 36.0f,
-        .motor_phase_resistance_ohm                = 0.942f,
-        .motor_back_emf_per_rpm                    = 1.0f / 265.0f,
-        .motor_max_voltage_before_wheel_slip       = 4.25f,
-        .wheel_radius_meters                       = 0.03f,
-        .wheel_rotations_per_motor_rotation        = 17.0f / 60.0f};
-
-    return wheel_constants;
 }
