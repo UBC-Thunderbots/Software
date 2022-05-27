@@ -37,7 +37,7 @@ TEST(InterceptEvaluationTest, findBestInterceptForBall_robot_on_ball_path_ball_6
     Ball ball({0, 0}, {6, 0}, Timestamp::fromSeconds(0));
     Robot robot(0, {2, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
                 Timestamp::fromSeconds(0), std::set<RobotCapability>(),
-                create2015RobotConstants());
+                create2022RobotConstants());
 
     // We should be able to find an intercept
     auto best_intercept = findBestInterceptForBall(ball, field, robot);

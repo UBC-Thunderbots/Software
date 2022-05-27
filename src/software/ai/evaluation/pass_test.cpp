@@ -7,7 +7,7 @@
 class PassingEvaluationTest : public ::testing::Test
 {
    protected:
-    RobotConstants_t robot_constants = create2015RobotConstants();
+    RobotConstants_t robot_constants = create2022RobotConstants();
 };
 
 TEST_F(PassingEvaluationTest, getTimeToOrientationForRobot_robot_at_desired_angle)

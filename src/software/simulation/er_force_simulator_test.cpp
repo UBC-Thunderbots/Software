@@ -23,7 +23,7 @@ class ErForceSimulatorTest : public ::testing::Test
     }
 
     std::shared_ptr<ErForceSimulator> simulator;
-    RobotConstants_t robot_constants = create2021RobotConstants();
+    RobotConstants_t robot_constants = create2022RobotConstants();
 };
 
 TEST_F(ErForceSimulatorTest, set_ball_state_when_ball_does_not_already_exist)
@@ -308,7 +308,7 @@ TEST_F(ErForceSimulatorTest, yellow_robot_add_robots_and_change_position)
 
 TEST(ErForceSimulatorFieldTest, check_field_A_configuration)
 {
-    RobotConstants_t robot_constants = create2021RobotConstants();
+    RobotConstants_t robot_constants = create2022RobotConstants();
     std::shared_ptr<ErForceSimulator> simulator =
         std::make_shared<ErForceSimulator>(TbotsProto::FieldType::DIV_A, robot_constants);
     simulator->resetCurrentTime();
@@ -319,7 +319,7 @@ TEST(ErForceSimulatorFieldTest, check_field_A_configuration)
 
 TEST(ErForceSimulatorFieldTest, check_field_B_configuration)
 {
-    RobotConstants_t robot_constants = create2021RobotConstants();
+    RobotConstants_t robot_constants = create2022RobotConstants();
     std::shared_ptr<ErForceSimulator> simulator =
         std::make_shared<ErForceSimulator>(TbotsProto::FieldType::DIV_B, robot_constants);
     simulator->resetCurrentTime();

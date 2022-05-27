@@ -97,7 +97,7 @@ int main(int argc, char** argv)
     LoggerSingleton::initializeLogger("/tmp");
 
     auto thunderloop =
-        Thunderloop(create2021RobotConstants(), interface, CONTROL_LOOP_HZ);
+        Thunderloop(create2022RobotConstants(), interface, CONTROL_LOOP_HZ);
 
     thunderloop.runLoop();
 

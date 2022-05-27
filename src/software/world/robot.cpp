@@ -29,7 +29,7 @@ Robot::Robot(const TbotsProto::Robot &robot_proto)
     : id_(robot_proto.id()),
       current_state_(RobotState(robot_proto.current_state())),
       timestamp_(Timestamp::fromTimestampProto(robot_proto.timestamp())),
-      robot_constants_(create2021RobotConstants())
+      robot_constants_(create2022RobotConstants())
 {
     for (const auto &unavailable_capability : robot_proto.unavailable_capabilities())
     {

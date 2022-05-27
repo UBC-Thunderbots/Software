@@ -31,7 +31,7 @@ class HRVOTest : public ::testing::Test
     TbotsProto::PrimitiveSet primitive_set;
 
     HRVOTest()
-        : simulator(1.f / SIMULATOR_FRAME_RATE, create2021RobotConstants()),
+        : simulator(1.f / SIMULATOR_FRAME_RATE, create2022RobotConstants()),
           current_time(Timestamp::fromSeconds(123)),
           ball(Point(), Vector(), current_time),
           field(Field::createSSLDivisionBField()),
@@ -83,7 +83,7 @@ class HRVOTest : public ::testing::Test
                 TestUtil::createMotionControl(dest), Angle(), 0.0,
                 TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
                 AutoChipOrKick(), TbotsProto::MaxAllowedSpeedMode(), 1.0,
-                create2021RobotConstants());
+                create2022RobotConstants());
             (*primitive_set.mutable_robot_primitives())[i] = primitive;
         }
         friendly_team.updateRobots(friendly_robots);
