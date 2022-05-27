@@ -103,7 +103,7 @@ VelocityObstacle createVelocityObstacle(
     const TbotsProto::VelocityObstacle& velocity_obstacle_msg)
 {
     Vector apex  = createVector(velocity_obstacle_msg.apex());
-    Vector left_side = createVector(velocity_obstacle_msg.left_side());
-    Vector right_side = createVector(velocity_obstacle_msg.right_side());
-    return VelocityObstacle(apex, left_side, right_side);
+    Vector side1 = createVector(velocity_obstacle_msg.left_side());
+    Vector side2 = createVector(velocity_obstacle_msg.right_side());
+    return VelocityObstacle(apex, side1, side2);
 }

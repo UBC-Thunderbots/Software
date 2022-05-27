@@ -1,5 +1,8 @@
 #pragma once
+
+#include "software/geom/circle.h"
 #include "software/geom/vector.h"
+#include "software/logger/logger.h"
 
 /**
  * A velocity obstacle.
@@ -18,6 +21,21 @@ class VelocityObstacle
      * @return	velocity obstacle with respective apex and normalized unit-vector sides
      */
     VelocityObstacle(Vector apex, Vector side1, Vector side2);
+
+    /**
+     * Construct a velocity obstacle given the obstacle from the perspective of a robot.
+     *
+     * @param obstacle		the obstacle to consider when constructing the velocity
+     * obstacle
+     * @param robot		the robot to consider the obstacle from
+     * @param obstacle_velocity	the velocity of the obstacle
+     *
+     * @return velocity obstacle with respective apex and normalized unit-vector sides
+     * constructing an obstacle from the perspective of a robot
+     */
+    static VelocityObstacle generateVelocityObstacle(const Circle& obstacle,
+                                                     const Circle& robot,
+                                                     const Vector& obstacle_velocity);
 
     /**
      * Getters for the unit-vectors assigned as the right and left sides of the velocity
@@ -45,13 +63,13 @@ class VelocityObstacle
      * @return bool true if this VelocityObstacle contains the given velocity, false
      * otherwise
      */
-    bool containsVelocity(const Vector &velocity) const;
+    bool containsVelocity(const Vector& velocity) const;
 
    private:
     // The position of the apex of the hybrid reciprocal velocity obstacle.
     Vector apex;
 
-    // The direction of t(he right side of the velocity obstacle (in the frame of
+    // The direction of the right side of the velocity obstacle (in the frame of
     // reference of the velocity obstacle).
     Vector right_side;
 

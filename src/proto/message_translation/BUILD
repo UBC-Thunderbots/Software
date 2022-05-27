@@ -37,8 +37,8 @@ cc_library(
     hdrs = ["tbots_geometry.h"],
     visibility = ["//visibility:public"],
     deps = [
-        "//software/ai/navigator/path_planner/hrvo:velocity_obstacle",
         "//proto:tbots_cc_proto",
+        "//software/ai/navigator/path_planner/hrvo:velocity_obstacle",
         "//software/geom:angle",
         "//software/geom:angular_velocity",
         "//software/geom:circle",

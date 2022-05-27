@@ -153,7 +153,7 @@ class HRVOAgent : public Agent
 
     // Percentage of preferred speed that we accept as the lower bound of a potential new
     // velocity
-    static constexpr float MIN_PREF_SPEED_MULTIPLER = 0.4f;
+    static constexpr float MIN_PREF_SPEED_MULTIPLER = 0.5f;
 
     /**
      * Returns the first velocity obstacle intersected by the Candidate point in

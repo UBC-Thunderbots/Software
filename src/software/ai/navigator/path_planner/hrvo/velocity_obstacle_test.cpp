@@ -65,7 +65,7 @@ TEST_F(TestVelocityObstacle, test_velocity_outside_vo)
  *                      /-------------
  * ---------------------
  */
-TEST_F(TestVelocityObstacle, test_velocity_outside_horizontal_vo)
+TEST_F(TestVelocityObstacle, test_velocity_outside_y_direction_vo)
 {
     Vector apex       = Vector(2, 1);
     Vector right_side = Vector(-1, -1);
@@ -101,8 +101,8 @@ TEST_F(TestVelocityObstacle, test_velocity_inside_horizontal_vo)
 TEST_F(TestVelocityObstacle, test_velocity_obstacle_contructor_right_then_left_side)
 {
     Vector apex = Vector(0, 0);
-    Vector rs   = Vector::createFromAngle(Angle::fromDegrees(30));
-    Vector ls   = Vector::createFromAngle(Angle::fromDegrees(-30));
+    Vector ls   = Vector::createFromAngle(Angle::fromDegrees(30));
+    Vector rs   = Vector::createFromAngle(Angle::fromDegrees(-30));
 
     VelocityObstacle vo = VelocityObstacle(apex, rs, ls);
 
@@ -114,8 +114,8 @@ TEST_F(TestVelocityObstacle, test_velocity_obstacle_contructor_right_then_left_s
 TEST_F(TestVelocityObstacle, test_velocity_obstacle_contructor_left_then_right_side)
 {
     Vector apex = Vector(0, 0);
-    Vector rs   = Vector::createFromAngle(Angle::fromDegrees(45));
-    Vector ls   = Vector::createFromAngle(Angle::fromDegrees(23));
+    Vector ls   = Vector::createFromAngle(Angle::fromDegrees(45));
+    Vector rs   = Vector::createFromAngle(Angle::fromDegrees(23));
 
     VelocityObstacle vo = VelocityObstacle(apex, ls, rs);
 

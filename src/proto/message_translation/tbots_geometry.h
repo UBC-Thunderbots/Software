@@ -1,6 +1,7 @@
 #pragma once
 
 #include "proto/geometry.pb.h"
+#include "software/ai/navigator/path_planner/hrvo/velocity_obstacle.h"
 #include "software/geom/angle.h"
 #include "software/geom/angular_velocity.h"
 #include "software/geom/circle.h"
