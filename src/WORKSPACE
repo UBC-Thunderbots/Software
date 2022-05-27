@@ -86,12 +86,11 @@ load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 
 git_repository(
     name = "com_google_protobuf",
+    commit = "21027a27c4c2ec1000859ccbcfff46d83b16e1ed",
     # We need this patch to properly add generated dependencies to the protoc
     # compiler. It also fixes an issue with the python imports.
-    patch_args = ["-p1"],
-    patches = ["@//extlibs:protobuf.patch"],
     remote = "https://github.com/protocolbuffers/protobuf",
-    tag = "v3.19.4",
+    shallow_since = "1650589240 +0000",
 )
 
 load("@com_google_protobuf//:protobuf_deps.bzl", "protobuf_deps")
@@ -303,27 +302,9 @@ new_git_repository(
 register_toolchains("//:py_toolchain")
 
 pip_install(
-    name = "python_control_deps",
-    python_interpreter = "/opt/tbotspython/bin/python",
-    requirements = "//firmware/app/control/python_controller:requirements.txt",
-)
-
-pip_install(
-    name = "dynamic_parameter_deps",
-    python_interpreter = "/opt/tbotspython/bin/python",
-    requirements = "//shared/parameter/generation_scripts:requirements.txt",
-)
-
-pip_install(
     name = "nanopb_deps",
     python_interpreter = "/opt/tbotspython/bin/python",
     requirements = "//extlibs:nanopb_requirements.txt",
-)
-
-pip_install(
-    name = "python_tools_deps",
-    python_interpreter = "/opt/tbotspython/bin/python",
-    requirements = "//python_tools:requirements.txt",
 )
 
 pip_install(
@@ -342,6 +323,12 @@ pip_install(
     name = "thunderscope_deps",
     python_interpreter = "/opt/tbotspython/bin/python",
     requirements = "//software/thunderscope:requirements.txt",
+)
+
+pip_install(
+    name = "ansible_deps",
+    python_interpreter = "/opt/tbotspython/bin/python",
+    requirements = "//software/jetson_nano/ansible:requirements.txt",
 )
 
 pip_install(

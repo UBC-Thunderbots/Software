@@ -1,5 +1,4 @@
 syntax = 'proto3';
-import "google/protobuf/any.proto";
 
 import "proto/geometry.proto";
 import "proto/world.proto";
@@ -26,4 +25,11 @@ message PassWithRating
 message PassVisualization
 {
     repeated PassWithRating best_passes = 1;
+}
+
+message HRVOVisualization
+{
+    uint32 robot_id                              = 1;
+    repeated VelocityObstacle velocity_obstacles = 2;
+    repeated Circle robots                       = 3;
 }

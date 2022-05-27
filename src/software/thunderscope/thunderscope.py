@@ -18,9 +18,10 @@ else:
     import PyQt6
     from PyQt6.QtWebEngineWidgets import QWebEngineView
 
-import qdarktheme
+from qt_material import apply_stylesheet
 
 import pyqtgraph
+import qdarktheme
 from pyqtgraph.dockarea import *
 from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtWidgets import *
@@ -47,6 +48,9 @@ from software.thunderscope.field import (
     passing_layer,
 )
 
+from software.thunderscope.common.proto_configuration_widget import (
+    ProtoConfigurationWidget,
+)
 from software.thunderscope.field.field import Field
 from software.thunderscope.log.g3log_widget import g3logWidget
 from software.thunderscope.proto_unix_io import ProtoUnixIO
@@ -110,7 +114,10 @@ class Thunderscope(object):
 
         # Setup MainApp and initialize DockArea
         self.app = pyqtgraph.mkQApp("Thunderscope")
-        self.app.setStyleSheet(qdarktheme.load_stylesheet())
+
+        # Setup stylesheet
+        apply_stylesheet(self.app, theme="dark_blue.xml")
+
         self.blue_replay_log = blue_replay_log
         self.yellow_replay_log = yellow_replay_log
         self.refresh_interval_ms = refresh_interval_ms
@@ -361,14 +368,21 @@ class Thunderscope(object):
         performance_dock = Dock("Performance")
         performance_dock.addWidget(widgets["performance_widget"].win)
 
+        widgets["parameter_widget"] = self.setup_parameter_widget(
+            full_system_proto_unix_io, friendly_colour_yellow
+        )
+        parameter_dock = Dock("Parameters")
+        parameter_dock.addWidget(widgets["parameter_widget"])
+
         widgets["playinfo_widget"] = self.setup_play_info(full_system_proto_unix_io)
         playinfo_dock = Dock("Play Info")
         playinfo_dock.addWidget(widgets["playinfo_widget"])
 
         dock_area.addDock(field_dock)
-        dock_area.addDock(log_dock, "bottom", field_dock)
-        dock_area.addDock(performance_dock, "right", log_dock)
-        dock_area.addDock(playinfo_dock, "right", performance_dock)
+        dock_area.addDock(log_dock, "left", field_dock)
+        dock_area.addDock(parameter_dock, "above", log_dock)
+        dock_area.addDock(playinfo_dock, "bottom", field_dock)
+        dock_area.addDock(performance_dock, "right", playinfo_dock)
 
     def setup_field_widget(
         self, sim_proto_unix_io, full_system_proto_unix_io, friendly_colour_yellow
@@ -428,6 +442,23 @@ class Thunderscope(object):
         self.register_refresh_function(field.refresh)
 
         return field
+
+    def setup_parameter_widget(self, proto_unix_io, friendly_colour_yellow):
+        """Setup the parameter widget
+
+        :param proto_unix_io: The proto unix io object
+        :param friendly_colour_yellow: 
+        :returns: The proto configuration widget
+
+        """
+
+        self.config = ThunderbotsConfig()
+        self.config.sensor_fusion_config.friendly_color_yellow = friendly_colour_yellow
+
+        def on_change_callback(attr, value, updated_proto):
+            proto_unix_io.send_proto(ThunderbotsConfig, updated_proto)
+
+        return ProtoConfigurationWidget(self.config, on_change_callback)
 
     def setup_log_widget(self, proto_unix_io):
         """Setup the wiget that receives logs from full system

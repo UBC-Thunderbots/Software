@@ -110,7 +110,7 @@ class HRVOTest : public ::testing::Test
         // The output is stored in the logging directory
         std::string out_file_name(
             ::testing::UnitTest::GetInstance()->current_test_info()->name());
-        std::string file_directory(TbotsGtestMain::logging_dir);
+        std::string file_directory(TbotsGtestMain::runtime_dir);
         if (file_directory.empty())
         {
             file_directory = "/tmp/";

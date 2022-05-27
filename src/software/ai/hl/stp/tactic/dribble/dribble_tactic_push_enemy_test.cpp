@@ -47,8 +47,8 @@ class DribbleTacticPushEnemyTest : public SimulatedErForceSimPlayTestFixture,
             {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field.enemyGoalCenter(),
              field.enemyDefenseArea().negXNegYCorner(),
              field.enemyDefenseArea().negXPosYCorner()});
-    std::shared_ptr<const AiConfig> ai_config =
-        std::make_shared<ThunderbotsConfig>()->getAiConfig();
+
+    TbotsProto::AiConfig ai_config;
 };
 
 // TODO (#2573): re-enable once fixed
