@@ -34,15 +34,11 @@
 
 #include <algorithm>
 #include <cmath>
-#include <iostream>
 #include <limits>
 
-#include "kd_tree.h"
 #include "path.h"
 #include "proto/message_translation/tbots_geometry.h"
 #include "software/geom/vector.h"
-#include "shared/parameter/cpp_dynamic_parameters.h"
-#include "proto/message_translation/tbots_protobuf.h"
 
 HRVOAgent::HRVOAgent(HRVOSimulator *simulator, const Vector &position, float neighborDist, std::size_t maxNeighbors,
                      float radius, const Vector &velocity, float maxAccel, AgentPath &path, float maxSpeed,
@@ -53,8 +49,67 @@ HRVOAgent::HRVOAgent(HRVOSimulator *simulator, const Vector &position, float nei
       prefSpeed_(max_speed_ * PREF_SPEED_SCALE),
       uncertaintyOffset_(uncertaintyOffset),
       // TODO: Would need to be updated, add ticket number
-      obstacle_factory(std::make_shared<const RobotNavigationObstacleConfig>())
+      obstacle_factory(TbotsProto::RobotNavigationObstacleConfig())
 {
+}
+
+void HRVOAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive, const World& world)
+{
+    AgentPath path;
+    static_obstacles.clear();
+    ball_obstacle = std::nullopt;
+    if (new_primitive.has_move())
+    {
+        const auto& motion_control = new_primitive.move().motion_control();
+        float speed_at_dest = new_primitive.move().final_speed_m_per_s();
+        float new_max_speed = new_primitive.move().max_speed_m_per_s();
+        setMaxSpeed(new_max_speed);
+        setPreferredSpeed(new_max_speed * PREF_SPEED_SCALE);
+
+
+        // TODO (#2418): Update implementation of Primitive to support
+        // multiple path points and remove this check
+        CHECK(motion_control.path().points().size() >= 2)
+            << "Empty path: "
+            << motion_control.path().points().size()
+            << std::endl;
+        auto destination =
+                motion_control.path().points().at(1);
+
+
+        // Max distance which the robot can travel in one time step + scaling
+        // TODO: This implementation is used in three separate places
+        float path_radius = (max_speed_ * simulator_->getTimeStep()) / 2;
+        auto path_points = {PathPoint(Vector(destination.x_meters(), destination.y_meters()), speed_at_dest)};
+        path = AgentPath(path_points, path_radius);
+
+        // Update static obstacles
+        std::set<TbotsProto::MotionConstraint> motion_constraints;
+        for (int constraint_int : motion_control.motion_constraints())
+        {
+            if (TbotsProto::MotionConstraint_IsValid(constraint_int))
+            {
+                const auto constraint = static_cast<TbotsProto::MotionConstraint>(constraint_int);
+                if (constraint == TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL)
+                {
+                    // TODO: Should we store the constraints instead and run createFromMotionConstraint
+                    //       in computeNewVelocity
+                    auto new_ball_obstacle = obstacle_factory.createFromMotionConstraint(constraint, world);
+                    if (!new_ball_obstacle.empty())
+                    {
+//                        ball_obstacle = new_ball_obstacle[0];
+                        static_obstacles.emplace_back(new_ball_obstacle[0]);
+                    }
+                }
+                else
+                {
+                    auto new_obstacles = obstacle_factory.createFromMotionConstraint(constraint, world);
+                    static_obstacles.insert(static_obstacles.end(), new_obstacles.begin(), new_obstacles.end());
+                }
+            }
+        }
+    }
+    setPath(path);
 }
 
 void HRVOAgent::computeNeighbors()
