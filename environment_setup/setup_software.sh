@@ -50,6 +50,7 @@ host_software_packages=(
                       # properly manage this as a bazel dependency, so we have
                       # to manually install it ourselves
     python3       # Python 3
+    python3-dev # Python 3 headers
     python3-venv # Virtual Environment
     python3-pip   # Required for bazel to install python dependencies for build targets
     python3-protobuf # This is required for the "NanoPb" library, which does not
@@ -160,6 +161,7 @@ echo "================================================================"
 
 # Adapted from https://docs.bazel.build/versions/main/install-ubuntu.html#install-with-installer-ubuntu
 sudo wget -nc https://github.com/bazelbuild/bazel/releases/download/5.0.0/bazel-5.0.0-installer-linux-x86_64.sh -O /tmp/bazel-installer.sh
+sudo chmod +x /tmp/bazel-installer.sh
 sudo /tmp/bazel-installer.sh --bin=/usr/bin --base=$HOME/.bazel
 
 echo "================================================================"
