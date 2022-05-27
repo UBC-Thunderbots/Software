@@ -9,4 +9,3 @@ from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 class RobotView(QWidget):
     """ """
-    pass
