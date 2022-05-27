@@ -69,5 +69,15 @@ void OffensePlay::updateTactics(const PlayUpdate &play_update)
     play_update.set_tactics(tactics_to_return);
 }
 
+std::vector<std::string> OffensePlay::getState()
+{
+    std::vector<std::string> state = {objectTypeName(*this)};
+    auto spp_state                 = shoot_or_pass_play->getState();
+    auto cd_state                  = crease_defense_play->getState();
+    state.insert(state.end(), spp_state.begin(), spp_state.end());
+    state.insert(state.end(), cd_state.begin(), cd_state.end());
+    return state;
+}
+
 // Register this play in the genericFactory
 static TGenericFactory<std::string, Play, OffensePlay, TbotsProto::AiConfig> factory;
