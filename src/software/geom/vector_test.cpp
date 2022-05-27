@@ -244,3 +244,75 @@ TEST(VectorOperatorTests, vector_equality_inequality_test)
     EXPECT_FALSE(u == v);
     EXPECT_TRUE(u != v);
 }
+
+TEST(VectorLogicTests, vector_clockwise_of_acute_angle_test)
+{
+    Vector u = Vector::createFromAngle(Angle::fromDegrees(30));
+    Vector v = Vector::createFromAngle(Angle::fromDegrees(60));
+
+    EXPECT_TRUE(u.isClockwiseOf(v));
+}
+
+TEST(VectorLogicTests, vector_counterclockwise_of_acute_angle_test)
+{
+    Vector u = Vector::createFromAngle(Angle::zero());
+    Vector v = Vector::createFromAngle(Angle::fromDegrees(45));
+
+    EXPECT_TRUE(v.isCounterClockwiseOf(u));
+}
+
+TEST(VectorLogicTests, vector_clockwise_of_obtuse_angle_expect_failure_test)
+{
+    Vector u = Vector::createFromAngle(Angle::fromDegrees(10));
+    Vector v = Vector::createFromAngle(Angle::fromDegrees(110));
+
+    EXPECT_FALSE(v.isClockwiseOf(u));
+}
+
+TEST(VectorLogicTests, vector_clockwise_of_acute_angle_expect_failure_test)
+{
+    Vector u = Vector::createFromAngle(Angle::fromDegrees(-45));
+    Vector v = Vector::createFromAngle(Angle::fromDegrees(-60));
+
+    EXPECT_FALSE(u.isClockwiseOf(v));
+}
+
+TEST(VectorLogicTests, vector_counterclockwise_of_acute_angle_expect_failure_test)
+{
+    Vector u = Vector::createFromAngle(Angle::threeQuarter());
+    Vector v = Vector::createFromAngle(Angle::full());
+
+    EXPECT_FALSE(u.isCounterClockwiseOf(v));
+}
+
+TEST(VectorLogicTests, vector_counterclockwiseof_obtuse_angle_expect_failure_test)
+{
+    Vector u = Vector::createFromAngle(Angle::zero());
+    Vector v = Vector::createFromAngle(Angle::fromDegrees(-91));
+
+    EXPECT_FALSE(v.isCounterClockwiseOf(u));
+}
+
+TEST(VectorLogicTests, vector_clockwise_of_right_angle_expect_success_test)
+{
+    Vector u = Vector::createFromAngle(Angle::zero());
+    Vector v = Vector::createFromAngle(Angle::fromDegrees(90));
+
+    EXPECT_TRUE(u.isClockwiseOf(v));
+}
+
+TEST(VectorLogicTests, vector_counterclockwise_of_right_angle_expect_failure_test)
+{
+    Vector u = Vector::createFromAngle(Angle::fromDegrees(-90));
+    Vector v = Vector::createFromAngle(Angle::fromDegrees(-180));
+
+    EXPECT_FALSE(v.isCounterClockwiseOf(u));
+}
+
+TEST(VectorLogicTests, vector_counterclockwise_of_in_quadrant_ii_test)
+{
+    Vector u = Vector(1, -1);
+    Vector v = Vector(1, -0.1);
+
+    EXPECT_TRUE(v.isCounterClockwiseOf(u));
+}
