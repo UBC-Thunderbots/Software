@@ -34,14 +34,14 @@ TEST_P(EnemyBallPlacementPlayTest, test_ball_placement)
          field.enemyDefenseArea().negXNegYCorner(),
          field.enemyDefenseArea().negXPosYCorner()});
     setEnemyGoalie(0);
-    setAIPlay(TYPENAME(EnemyBallPlacementPlay));
+    setAIPlay(TbotsProto::PlayName::EnemyBallPlacementPlay);
     GameState game_state;
     game_state.updateRefereeCommand(RefereeCommand::BALL_PLACEMENT_THEM);
     game_state.setBallPlacementPoint(ball_placement_point);
     setGameState(game_state);
     std::shared_ptr<RobotNavigationObstacleFactory> obstacle_factory =
         std::make_shared<RobotNavigationObstacleFactory>(
-            getAiConfig()->getRobotNavigationObstacleConfig());
+            TbotsProto::RobotNavigationObstacleConfig());
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
@@ -84,13 +84,13 @@ TEST_F(EnemyBallPlacementPlayTest, test_no_placement)
          field.enemyDefenseArea().negXNegYCorner(),
          field.enemyDefenseArea().negXPosYCorner()});
     setEnemyGoalie(0);
-    setAIPlay(TYPENAME(EnemyBallPlacementPlay));
+    setAIPlay(TbotsProto::PlayName::EnemyBallPlacementPlay);
     GameState game_state;
     game_state.updateRefereeCommand(RefereeCommand::BALL_PLACEMENT_THEM);
     setGameState(game_state);
     std::shared_ptr<RobotNavigationObstacleFactory> obstacle_factory =
         std::make_shared<RobotNavigationObstacleFactory>(
-            getAiConfig()->getRobotNavigationObstacleConfig());
+            TbotsProto::RobotNavigationObstacleConfig());
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {

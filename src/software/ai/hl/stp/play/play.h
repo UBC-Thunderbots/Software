@@ -4,7 +4,7 @@
 #include <boost/coroutine2/all.hpp>
 #include <vector>
 
-#include "shared/parameter/cpp_dynamic_parameters.h"
+#include "proto/parameters.pb.h"
 #include "software/ai/hl/stp/play/play_fsm.h"
 #include "software/ai/hl/stp/tactic/goalie/goalie_tactic.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
@@ -39,7 +39,7 @@ class Play
      * @param ai_config The AI configuration
      * @param requires_goalie Whether this plays requires a goalie
      */
-    explicit Play(std::shared_ptr<const AiConfig> ai_config, bool requires_goalie);
+    explicit Play(TbotsProto::AiConfig ai_config, bool requires_goalie);
 
     /**
      * Gets Primitives from the Play given the path planner factory, the world, and
@@ -68,9 +68,16 @@ class Play
 
     virtual ~Play() = default;
 
+    /**
+     * Gets the state of the Play
+     *
+     * @return a vector strings representing the state
+     */
+    virtual std::vector<std::string> getState();
+
    protected:
     // The Play configuration
-    std::shared_ptr<const AiConfig> ai_config;
+    TbotsProto::AiConfig ai_config;
 
     // Goalie tactic common to all plays
     std::shared_ptr<GoalieTactic> goalie_tactic;

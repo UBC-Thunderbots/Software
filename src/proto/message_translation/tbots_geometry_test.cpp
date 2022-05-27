@@ -69,13 +69,14 @@ TEST(TbotsProtobufTest, circle_msg_test)
 
 TEST(TbotsProtobufTest, velocity_obstacle_msg_test)
 {
-    VelocityObstacle velocity_obstacle;
-    velocity_obstacle.apex_      = Vector(3, 3);
-    velocity_obstacle.side1_     = Vector(-1, -2);
-    velocity_obstacle.side2_     = Vector(1, 2);
-    auto velocity_obstacle_msg_1 = createVelocityObstacleProto(velocity_obstacle);
-    auto velocity_obstacle_2     = createVelocityObstacle(*velocity_obstacle_msg_1);
-    auto velocity_obstacle_msg_2 = createVelocityObstacleProto(velocity_obstacle_2);
+    Vector apex  = Vector(3, 3);
+    Vector side1 = Vector(-1, -2);
+    Vector side2 = Vector(1, 2);
+
+    VelocityObstacle velocity_obstacle = VelocityObstacle(apex, side1, side2);
+    auto velocity_obstacle_msg_1       = createVelocityObstacleProto(velocity_obstacle);
+    auto velocity_obstacle_2           = createVelocityObstacle(*velocity_obstacle_msg_1);
+    auto velocity_obstacle_msg_2       = createVelocityObstacleProto(velocity_obstacle_2);
 
     EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
         *velocity_obstacle_msg_1, *velocity_obstacle_msg_2));

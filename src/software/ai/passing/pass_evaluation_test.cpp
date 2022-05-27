@@ -16,12 +16,11 @@ class PassEvaluationTest : public ::testing::Test
 
     void SetUp() override
     {
-        passing_config = std::make_shared<PassingConfig>();
-        passing_config->getMutableMinPassSpeedMPerS()->setValue(3.5);
-        passing_config->getMutableMaxPassSpeedMPerS()->setValue(5.5);
+        passing_config.set_min_pass_speed_m_per_s(3.5);
+        passing_config.set_max_pass_speed_m_per_s(5.5);
     }
 
-    std::shared_ptr<PassingConfig> passing_config;
+    TbotsProto::PassingConfig passing_config;
 };
 
 TEST_F(PassEvaluationTest, best_pass_over_entire_field)

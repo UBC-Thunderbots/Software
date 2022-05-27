@@ -2,7 +2,7 @@
 
 #include <functional>
 
-#include "shared/parameter/cpp_dynamic_parameters.h"
+#include "proto/parameters.pb.h"
 #include "software/ai/passing/pass.h"
 #include "software/math/math_functions.h"
 #include "software/util/make_enum/make_enum.h"
@@ -22,7 +22,7 @@
  *         ideal pass, and 0 being the worst pass possible
  */
 double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
-                std::shared_ptr<const PassingConfig> passing_config);
+                TbotsProto::PassingConfig passing_config);
 
 /**
  * Calculate the quality of a given zone
@@ -37,8 +37,7 @@ double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
  *         great zone to send a cherry picker to, and 0 being a zone to avoid.
  */
 double rateZone(const Field& field, const Team& enemy_team, const Rectangle& zone,
-                const Point& ball_position,
-                std::shared_ptr<const PassingConfig> passing_config);
+                const Point& ball_position, TbotsProto::PassingConfig passing_config);
 
 /**
  * Rate pass based on the probability of scoring once we receive the pass
@@ -53,7 +52,7 @@ double rateZone(const Field& field, const Team& enemy_team, const Rectangle& zon
  *         the pass
  */
 double ratePassShootScore(const Field& field, const Team& enemy_team, const Pass& pass,
-                          std::shared_ptr<const PassingConfig> passing_config);
+                          TbotsProto::PassingConfig passing_config);
 
 /**
  * Calculates the risk of an enemy robot interfering with a given pass
@@ -114,7 +113,7 @@ double calculateInterceptRisk(const Robot& enemy_robot, const Pass& pass,
  *         being impossible
  */
 double ratePassFriendlyCapability(const Team& friendly_team, const Pass& pass,
-                                  std::shared_ptr<const PassingConfig> passing_config);
+                                  TbotsProto::PassingConfig passing_config);
 
 /**
  * Calculates the static position quality for a given position on a given field
@@ -131,7 +130,7 @@ double ratePassFriendlyCapability(const Team& friendly_team, const Pass& pass,
  *         field, with a higher value representing a more desirable position
  */
 double getStaticPositionQuality(const Field& field, const Point& position,
-                                std::shared_ptr<const PassingConfig> passing_config);
+                                TbotsProto::PassingConfig passing_config);
 
 /**
  * Returns a function that increases as the point approaches enemy robots.

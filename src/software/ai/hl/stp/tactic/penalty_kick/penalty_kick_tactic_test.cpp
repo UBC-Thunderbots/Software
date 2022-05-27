@@ -23,8 +23,7 @@ class PenaltyKickTacticTest : public SimulatedErForceSimPlayTestFixture,
     Point initial_position   = field.friendlyPenaltyMark() + Vector(-0.1, 0);
     RobotStateWithId shooter = {
         0, RobotState(initial_position, Vector(0, 0), Angle::zero(), Angle::zero())};
-    std::shared_ptr<const AiConfig> ai_config =
-        std::make_shared<ThunderbotsConfig>()->getAiConfig();
+    TbotsProto::AiConfig ai_config;
 };
 
 // TODO (#2232): Improve dribbling control so the ball is not lost during this test

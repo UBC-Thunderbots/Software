@@ -173,3 +173,13 @@ bool operator!=(const Vector &u, const Vector &v)
 {
     return !(u == v);
 }
+
+bool Vector::isClockwiseOf(const Vector &other) const
+{
+    return determinant(other) > 0.0f;
+}
+
+bool Vector::isCounterClockwiseOf(const Vector &other) const
+{
+    return determinant(other) < 0.0f;
+}
