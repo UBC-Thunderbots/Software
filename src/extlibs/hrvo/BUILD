@@ -52,6 +52,7 @@ cc_library(
         "//proto:visualization_cc_proto",
         "//proto/primitive:primitive_msg_factory",
         "//software/ai/navigator/path_planner/hrvo:velocity_obstacle",
+        "//software/ai/navigator/obstacle:robot_navigation_obstacle_factory",
         "//software/geom:vector",
         "//software/world",
     ],
