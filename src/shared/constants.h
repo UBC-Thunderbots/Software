@@ -19,7 +19,7 @@ static const std::unordered_map<int, std::string> ROBOT_MULTICAST_CHANNELS = {
     {12, "ff02::c3d0:42d2:bb12"}, {13, "ff02::c3d0:42d2:bb13"},
     {14, "ff02::c3d0:42d2:bb14"}, {15, "ff02::c3d0:42d2:bb15"}};
 
-#endif // PLATFORMIO_BUILD
+#endif  // PLATFORMIO_BUILD
 
 // Redis default server connections properties
 #define REDIS_HOST_LENGTH 10

@@ -21,11 +21,6 @@ std::unique_ptr<SSLSimulationProto::RobotMoveCommand> createRobotMoveCommand(
             LOG(FATAL) << "Direct per-wheel control is not supported in simulation";
         }
 
-        case TbotsProto::MotorControl::kOpenLoopControl:
-        {
-            LOG(FATAL) << "Open loop control is not supported in simulation";
-        }
-
         case TbotsProto::MotorControl::kDirectVelocityControl:
         {
             auto move_local_velocity = SSLSimulationProto::MoveLocalVelocity();
