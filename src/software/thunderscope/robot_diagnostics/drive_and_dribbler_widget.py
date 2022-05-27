@@ -2,7 +2,7 @@ from pyqtgraph.Qt.QtCore import Qt
 from pyqtgraph.Qt.QtWidgets import *
 
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
-from software.thunderscope import common_widgets
+from software.thunderscope.common import common_widgets
 
 MIN_MOTOR_RPM = -100
 MAX_MOTOR_RPM = 100

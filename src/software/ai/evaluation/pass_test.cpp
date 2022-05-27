@@ -56,7 +56,10 @@ TEST_F(PassingEvaluationTest,
 TEST_F(PassingEvaluationTest, getTimeToPositionForRobot_already_at_dest)
 {
     Point dest(1, 1);
-    EXPECT_EQ(Duration::fromSeconds(0), getTimeToPositionForRobot(dest, dest, 2.0, 3.0));
+    EXPECT_EQ(
+        Duration::fromSeconds(0),
+        getTimeToPositionForRobot(dest, dest, robot_constants.robot_max_speed_m_per_s,
+                                  robot_constants.robot_max_acceleration_m_per_s_2, 0.5));
 }
 
 TEST_F(PassingEvaluationTest, getTimeToPositionForRobot_reaches_max_velocity)
@@ -82,9 +85,10 @@ TEST_F(PassingEvaluationTest, getTimeToPositionForRobot_reaches_max_velocity)
 
     double travel_time = 2 * acceleration_time + time_at_max_vel;
 
-    EXPECT_TRUE(TestUtil::equalWithinTolerance(
-        Duration::fromSeconds(travel_time),
-        getTimeToPositionForRobot(robot_location, dest, 2.0, 3.0)));
+    EXPECT_EQ(Duration::fromSeconds(travel_time),
+              getTimeToPositionForRobot(
+                  robot_location, dest, robot_constants.robot_max_speed_m_per_s,
+                  robot_constants.robot_max_acceleration_m_per_s_2));
 }
 
 TEST_F(PassingEvaluationTest,
@@ -116,6 +120,9 @@ TEST_F(PassingEvaluationTest,
 
     double travel_time = 2 * acceleration_time + time_at_max_vel;
 
-    EXPECT_EQ(Duration::fromSeconds(travel_time),
-              getTimeToPositionForRobot(robot_location, target_location, 2.0, 3.0, 0.5));
+    EXPECT_EQ(
+        Duration::fromSeconds(travel_time),
+        getTimeToPositionForRobot(robot_location, target_location,
+                                  robot_constants.robot_max_speed_m_per_s,
+                                  robot_constants.robot_max_acceleration_m_per_s_2, 0.5));
 }

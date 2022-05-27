@@ -7,7 +7,7 @@
 #include <unistd.h>    // needed for sysconf(int name);
 
 #include "proto/tbots_software_msgs.pb.h"
-#include "shared/2021_robot_constants.h"
+#include "shared/2022_robot_constants.h"
 #include "shared/constants.h"
 #include "software/jetson_nano/thunderloop.h"
 #include "software/logger/network_logger.h"

@@ -11,4 +11,3 @@ psutil==5.9.0
 qt-material==2.12
 PyOpenGL==3.1.6
 PyOpenGL-accelerate==3.1.5
-

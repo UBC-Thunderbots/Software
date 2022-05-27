@@ -192,8 +192,8 @@ void SimulatedErForceSimTestFixture::runTest(
     const Duration simulation_time_step =
         Duration::fromSeconds(1.0 / SIMULATED_CAMERA_FPS);
 
-    std::shared_ptr<ErForceSimulator> simulator(std::make_shared<ErForceSimulator>(
-        field_type, create2022RobotConstants());
+    std::shared_ptr<ErForceSimulator> simulator(
+        std::make_shared<ErForceSimulator>(field_type, create2022RobotConstants()));
 
     // TODO (#2419): remove this to re-enable sigfpe checks
     fedisableexcept(FE_INVALID | FE_OVERFLOW);
