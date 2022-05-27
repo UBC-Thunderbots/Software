@@ -161,16 +161,10 @@ message MotorControl
         AngularVelocity angular_velocity = 2;
     }
 
-    message OpenLoopControl
-    {
-        bool open_loop_velocity = 1;
-    }
-
     oneof drive_control
     {
         DirectPerWheelControl direct_per_wheel_control = 1;
         DirectVelocityControl direct_velocity_control  = 2;
-        OpenLoopControl open_loop_control              = 3;
     }
 
     float dribbler_speed_rpm = 4;

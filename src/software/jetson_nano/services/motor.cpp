@@ -314,11 +314,6 @@ std::unique_ptr<TbotsProto::MotorStatus> MotorService::poll(
             break;
         }
 
-        case TbotsProto::MotorControl::DriveControlCase::kOpenLoopControl:
-        {
-            break;
-        }
-
         case TbotsProto::MotorControl::DriveControlCase::DRIVE_CONTROL_NOT_SET:
         {
             LOG(WARNING) << "Motor service polled with an empty DirectControlPrimitive ";
