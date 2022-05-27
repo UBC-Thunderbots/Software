@@ -68,6 +68,13 @@ class Play
 
     virtual ~Play() = default;
 
+    /**
+     * Gets the state of the Play
+     *
+     * @return a vector strings representing the state
+     */
+    virtual std::vector<std::string> getState();
+
    protected:
     // The Play configuration
     TbotsProto::AiConfig ai_config;
