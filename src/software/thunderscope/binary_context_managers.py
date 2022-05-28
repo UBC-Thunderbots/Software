@@ -446,14 +446,6 @@ class Gamecontroller(object):
             ci_input.change.CopyFrom(ci_change)
             ci_ci_input.api_inputs.append(ci_input)
 
-            # Start Placement
-            ci_change = Change()
-            ci_input = Input()
-            start_placement = StartBallPlacement()
-            ci_change.start_ball_placement.CopyFrom(start_placement)
-            ci_input.change.CopyFrom(ci_change)
-            ci_ci_input.api_inputs.append(ci_input)
-
         # https://cwiki.apache.org/confluence/display/GEODE/Delimiting+Protobuf+Messages
         size = ci_ci_input.ByteSize()
 
