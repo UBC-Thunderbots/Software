@@ -3,7 +3,6 @@ package(default_visibility = ["//visibility:public"])
 load("@pybind11_bazel//:build_defs.bzl", "pybind_extension", "pybind_library")
 
 cc_binary(
-    # TODO (#2510) Rename to full_system
     name = "unix_full_system",
     srcs = ["unix_full_system_main.cpp"],
     deps = [
