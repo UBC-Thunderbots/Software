@@ -444,7 +444,10 @@ class Thunderscope(object):
             (PassVisualization, passing.pass_visualization_buffer),
             (ValidationProtoSet, validation.validation_set_buffer),
             (SimulatorState, sim_state.simulator_state_buffer),
-        ] + [(HRVOVisualization, hrvo_sim_state.hrvo_buffer) for hrvo_sim_state in hrvo_sim_states]:
+        ] + [
+            (HRVOVisualization, hrvo_sim_state.hrvo_buffer)
+            for hrvo_sim_state in hrvo_sim_states
+        ]:
             full_system_proto_unix_io.register_observer(*arg)
 
         # Register refresh functions
