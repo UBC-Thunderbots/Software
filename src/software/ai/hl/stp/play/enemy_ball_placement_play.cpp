@@ -1,14 +1,14 @@
 #include "software/ai/hl/stp/play/enemy_ball_placement_play.h"
 
+#include "proto/parameters.pb.h"
 #include "shared/constants.h"
-#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/hl/stp/tactic/crease_defender/crease_defender_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/ai/hl/stp/tactic/shadow_enemy/shadow_enemy_tactic.h"
 #include "software/util/generic_factory/generic_factory.h"
 #include "software/world/game_state.h"
 
-EnemyBallPlacementPlay::EnemyBallPlacementPlay(std::shared_ptr<const AiConfig> config)
+EnemyBallPlacementPlay::EnemyBallPlacementPlay(TbotsProto::AiConfig config)
     : Play(config, true)
 {
 }
@@ -81,8 +81,11 @@ void EnemyBallPlacementPlay::ballPlacementWithShadow(
             move_tactics[0]->updateControlParams(
                 placement_point + placement_to_net,
                 placement_to_net.orientation() + Angle::half(), 0);
-            shadow_enemy->updateControlParams(enemy_threats.at(0),
-                                              ROBOT_MAX_RADIUS_METERS * 3);
+            // We need a big shadow distance to avoid "bullying" the robot ball placing.
+            // Otherwise, we get a penalty
+            shadow_enemy->updateControlParams(
+                enemy_threats.at(0),
+                ROBOT_MAX_RADIUS_METERS * 4);  // Leave 2 robot widths distance (~36cm)
 
             tactics_to_run[0].emplace_back(move_tactics[0]);
             tactics_to_run[0].emplace_back(shadow_enemy);
@@ -99,13 +102,13 @@ void EnemyBallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
     std::optional<Point> placement_point = world.gameState().getBallPlacementPoint();
 
     std::array<std::shared_ptr<CreaseDefenderTactic>, 3> crease_defenders = {
+        // TODO-AKHIL: Remove this hard-coded value
         std::make_shared<CreaseDefenderTactic>(
-            ai_config->getRobotNavigationObstacleConfig()),
+            ai_config.robot_navigation_obstacle_config()),
         std::make_shared<CreaseDefenderTactic>(
-            ai_config->getRobotNavigationObstacleConfig()),
+            ai_config.robot_navigation_obstacle_config()),
         std::make_shared<CreaseDefenderTactic>(
-            ai_config->getRobotNavigationObstacleConfig()),
-    };
+            ai_config.robot_navigation_obstacle_config())};
 
     std::array<std::shared_ptr<MoveTactic>, 2> move_tactics = {
         std::make_shared<MoveTactic>(),
@@ -125,4 +128,5 @@ void EnemyBallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
     }
 }
 
-static TGenericFactory<std::string, Play, EnemyBallPlacementPlay, AiConfig> factory;
+static TGenericFactory<std::string, Play, EnemyBallPlacementPlay, TbotsProto::AiConfig>
+    factory;

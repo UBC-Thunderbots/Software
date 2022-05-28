@@ -162,7 +162,9 @@ def run_validation_sequence_sets(
     # Proto that stores validation geometry and validation status of
     # all validations passed in
     always_validation_proto_set = ValidationProtoSet()
+    always_validation_proto_set.validation_type = ValidationType.ALWAYS
     eventually_validation_proto_set = ValidationProtoSet()
+    eventually_validation_proto_set.validation_type = ValidationType.EVENTUALLY
 
     def create_validation_proto_helper(validation_proto_set, validation):
         """Helper function that computes the status and creates a
@@ -181,7 +183,6 @@ def run_validation_sequence_sets(
         # Create validation proto
         validation_proto.status = status
         validation_proto.failure_msg = str(validation) + " failed"
-        validation_proto.validation_type = validation.get_validation_type()
         validation_proto.geometry.CopyFrom(validation.get_validation_geometry(world))
 
         validation_proto_set.validations.append(validation_proto)

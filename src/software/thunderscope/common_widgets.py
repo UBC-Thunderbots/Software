@@ -19,7 +19,6 @@ def create_button(text: list):
         button.setCheckable(True)
         buttons.append(button)
 
-    group_box.setStyleSheet("color: black")
     hbox = QHBoxLayout()
     for button in buttons:
         hbox.addWidget(button)
@@ -43,11 +42,9 @@ def create_radio(text: list, radio_group):
     for i in range(num_buttons):
         radio = QRadioButton(text[i])
         # this is so that the button is properly visible in black background
-        radio.setStyleSheet("background-color: white")
         radio_group.addButton(radio)
         radios.append(radio)
 
-    group_box.setStyleSheet("color: black")
     hbox = QHBoxLayout()
     for radio in radios:
         hbox.addWidget(radio)
@@ -72,12 +69,11 @@ def create_slider(text, min_val, max_val, tick_spacing):
     slider = QSlider(Qt.Orientation.Horizontal)
     slider.setMinimum(min_val)
     slider.setMaximum(max_val)
-    slider.setTickPosition(QSlider.TickPosition.TicksBothSides)
+    slider.setTickPosition(QSlider.TickPosition.NoTicks)
     slider.setTickInterval(tick_spacing)
 
     value_label = QLabel(str(slider.value()))
 
-    group_box.setStyleSheet("color: white")
     vbox = QVBoxLayout()
     vbox.addWidget(slider)
     vbox.addWidget(value_label)

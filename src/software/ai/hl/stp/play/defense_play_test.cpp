@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 
 #include "software/simulated_tests/non_terminating_validation_functions/ball_in_play_or_scored_validation.h"
-#include "software/simulated_tests/simulated_play_test_fixture.h"
+#include "software/simulated_tests/simulated_er_force_sim_play_test_fixture.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_halt_validation.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_in_polygon_validation.h"
 #include "software/simulated_tests/validation/validation_function.h"
@@ -11,10 +11,11 @@
 #include "software/time/duration.h"
 #include "software/world/world.h"
 
-class DefensePlayTest : public SimulatedPlayTestFixture
+class DefensePlayTest : public SimulatedErForceSimPlayTestFixture
 {
    protected:
-    Field field = Field::createSSLDivisionBField();
+    TbotsProto::FieldType field_type = TbotsProto::FieldType::DIV_B;
+    Field field                      = Field::createField(field_type);
 };
 
 TEST_F(DefensePlayTest, test_defense_play)
@@ -33,7 +34,7 @@ TEST_F(DefensePlayTest, test_defense_play)
         Point(-2, -1.25),
     });
     setEnemyGoalie(0);
-    setAIPlay(TYPENAME(DefensePlay));
+    setAIPlay(TbotsProto::PlayName::DefensePlay);
     // We set the referee command to stop so that the robots do not kick/shoot during
     // the test
     setRefereeCommand(RefereeCommand::STOP, RefereeCommand::STOP);
@@ -68,7 +69,7 @@ TEST_F(DefensePlayTest, test_defense_play)
     std::vector<ValidationFunction> non_terminating_validation_functions = {
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {}};
 
-    runTest(field, ball_state, friendly_robots, enemy_robots,
+    runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
 }
@@ -89,7 +90,7 @@ TEST_F(DefensePlayTest, test_defense_play_one_immediate_threat)
         Point(-1, 0),
     });
     setEnemyGoalie(0);
-    setAIPlay(TYPENAME(DefensePlay));
+    setAIPlay(TbotsProto::PlayName::DefensePlay);
     // We set the referee command to stop so that the robots do not kick/shoot during
     // the test
     setRefereeCommand(RefereeCommand::STOP, RefereeCommand::STOP);
@@ -109,11 +110,11 @@ TEST_F(DefensePlayTest, test_defense_play_one_immediate_threat)
             // Two friendly crease defenders should be close to the goalie
             Point goalie_position = world_ptr->friendlyTeam().goalie()->position();
             Rectangle left_crease_defender_rect(
-                Point(goalie_position.x(), goalie_position.y() + 0.3),
-                Point(goalie_position.x() + 0.3, goalie_position.y()));
+                Point(goalie_position.x(), goalie_position.y() + 0.5),
+                Point(goalie_position.x() + 0.5, goalie_position.y()));
             Rectangle right_crease_defender_rect(
                 Point(goalie_position.x(), goalie_position.y()),
-                Point(goalie_position.x() + 0.3, goalie_position.y() - 0.3));
+                Point(goalie_position.x() + 0.5, goalie_position.y() - 0.5));
             robotInPolygon(left_crease_defender_rect, 1, world_ptr, yield);
             robotInPolygon(right_crease_defender_rect, 1, world_ptr, yield);
         }};
@@ -123,7 +124,7 @@ TEST_F(DefensePlayTest, test_defense_play_one_immediate_threat)
             ballInPlay(world_ptr, yield);
         }};
 
-    runTest(field, ball_state, friendly_robots, enemy_robots,
+    runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
 }
@@ -144,7 +145,7 @@ TEST_F(DefensePlayTest, test_defense_play_close_to_net)
         Point(-3.8, -2),
     });
     setEnemyGoalie(0);
-    setAIPlay(TYPENAME(DefensePlay));
+    setAIPlay(TbotsProto::PlayName::DefensePlay);
     // We set the referee command to stop so that the robots do not kick/shoot during
     // the test
     setRefereeCommand(RefereeCommand::STOP, RefereeCommand::STOP);
@@ -166,7 +167,6 @@ TEST_F(DefensePlayTest, test_defense_play_close_to_net)
             Rectangle left_crease_defender_and_shadow_rec(
                 Point(goalie_position.x() + 1, goalie_position.y() + 0.8),
                 Point(goalie_position.x() + 1.75, goalie_position.y() + 0.4));
-            robotInPolygon(left_crease_defender_and_shadow_rec, 3, world_ptr, yield);
 
             // Two friendly robots in position to shadow enemy robots. One is on the enemy
             // with the ball and the other is on the next highest threat
@@ -179,7 +179,7 @@ TEST_F(DefensePlayTest, test_defense_play_close_to_net)
             ballInPlay(world_ptr, yield);
         }};
 
-    runTest(field, ball_state, friendly_robots, enemy_robots,
+    runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
 }

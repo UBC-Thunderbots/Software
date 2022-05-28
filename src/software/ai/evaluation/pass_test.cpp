@@ -95,7 +95,7 @@ TEST_F(PassingEvaluationTest,
     // We set the distance here such that it the robot *should* always have time to
     // get to the max velocity, unless our robots suddenly get *much* faster
 
-    // The point we're trying to move ot
+    // The point we're trying to move to
     Point target_location(0, 1);
 
     // The first point within tolerance of the goal on the path of the robot

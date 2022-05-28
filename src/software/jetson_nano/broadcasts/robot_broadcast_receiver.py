@@ -41,13 +41,13 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("-p", "--port", required=True, type=int, help="port to listen on")
     ap.add_argument(
-        "-d" "--duration",
+        "-d",
+        "--duration",
         required=True,
         type=int,
         help="how long to listen for announcements. Recommended > 2",
     )
     args = vars(ap.parse_args())
-
     port = args["port"]
     duration = args["duration"]
 

@@ -14,7 +14,6 @@ cc_library(
         "test_util.h",
     ],
     deps = [
-        "//firmware/app/logger",
         "//proto:tbots_cc_proto",
         "//proto:tbots_nanopb_proto",
         "//proto/message_translation:tbots_protobuf",
@@ -29,7 +28,6 @@ cc_library(
         "//software/geom:vector",
         "//software/geom/algorithms",
         "//software/logger",
-        "//software/simulation/physics:physics_world",
         "//software/world",
         "//software/world:robot_state",
         "@eigen",

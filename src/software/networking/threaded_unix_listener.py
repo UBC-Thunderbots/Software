@@ -1,12 +1,10 @@
 import base64
-import glob
-import importlib
-import inspect
 import os
 import queue
 import socketserver
 from threading import Thread
 from software.logger.logger import createLogger
+from software import py_constants
 
 logger = createLogger(__name__)
 
@@ -15,12 +13,19 @@ from google.protobuf.any_pb2 import Any
 
 
 class ThreadedUnixListener:
-    def __init__(self, unix_path, proto_class=None, max_buffer_size=3):
+    def __init__(
+        self, unix_path, proto_class=None, is_base64_encoded=False, max_buffer_size=100
+    ):
 
         """Receive protobuf over unix sockets and buffers them
 
         :param unix_path: The unix path to receive the new protobuf to plot
         :param proto_class: The protobuf to unpack from (None if its encoded in the payload)
+        :param is_base64_encoded: If the data is is_base64_encoded, we need to decode it first
+                               before grabbing the protobuf. This is required for
+                               LOG(VISUALIZE) calls where the data needs to be is_base64_encoded
+                               to avoid \n characters.
+
         :param max_buffer_size: The size of the buffer
 
         """
@@ -32,8 +37,10 @@ class ThreadedUnixListener:
             pass
 
         self.server = socketserver.UnixDatagramServer(
-            unix_path, handler_factory(self.__buffer_protobuf, proto_class)
+            unix_path,
+            handler_factory(self.__buffer_protobuf, proto_class, is_base64_encoded),
         )
+        self.server.max_packet_size = py_constants.UNIX_BUFFER_SIZE
         self.stop = False
 
         self.unix_path = unix_path
@@ -43,26 +50,6 @@ class ThreadedUnixListener:
         # even if there are still unix listener threads running
         self.thread = Thread(target=self.start, daemon=True)
         self.thread.start()
-
-    @property
-    def buffer(self):
-        return self.proto_buffer
-
-    def get_most_recent_message(self, block=False):
-        """Pop from the buffer if a new packet exists. If not just return None
-
-        :param block: If true, blocks until a new message is received
-        :return: proto if exists, else None
-        :rtype: proto or None
-
-        """
-        if block:
-            return self.proto_buffer.get()
-
-        try:
-            return self.proto_buffer.get_nowait()
-        except queue.Empty as empty:
-            return None
 
     def __buffer_protobuf(self, proto):
         """Buffer the protobuf, and raise a warning if we overrun the buffer
@@ -96,22 +83,17 @@ class ThreadedUnixListener:
 
 
 class Session(socketserver.BaseRequestHandler):
-    def __init__(self, handle_callback, proto_class=None, *args, **keys):
+    def __init__(self, handle_callback, proto_class, is_base64_encoded, *args, **keys):
         self.handle_callback = handle_callback
         self.proto_class = proto_class
+        self.is_base64_encoded = is_base64_encoded
         super().__init__(*args, **keys)
 
     def handle(self):
-        """Handle the two cases:
-
-        1. Given the proto_class, decode the incoming data and trigger a callback.
-           This is mostly used for direct protobuf communication.
-        2. LOG(VISUALIZE) calls from g3log in the C++ code sending over stuff to
-           visualize follows a specific format (see handle_log_visualize) we
-           need to decode.
+        """Handle proto
 
         """
-        if self.proto_class:
+        if not self.is_base64_encoded:
             self.handle_proto()
         else:
             self.handle_log_visualize()
@@ -130,66 +112,31 @@ class Session(socketserver.BaseRequestHandler):
 
     def handle_log_visualize(self):
         """We send protobufs from our C++ code to python for visualization.
-        If we used the handle_proto handler and passed in a proto_class, we
-        would need to setup a sender/receiver pair for every protobuf we want
-        to visualize. 
-        
-        So instead, we special case the communication coming from the ProtobufSink
-        (C++ side). The ProtobufSink sends the typename prefixed at the beginning
-        of the payload delimited by the TYPE_DELIMITER (!!!).
-
-                              |         -- data --            |
-        PackageName.TypeName!!!eW91Zm91bmR0aGVzZWNyZXRtZXNzYWdl
-
-        This allows us to call LOG(VISUALIZE) _anywhere_ in C++ and 
-        receive/decode here with minimum boilerplate code.
+        The C++ logger encodes a serialized anyproto with base64 and sends it over.
+        We need to apply the reverse sequence of operations to unpack the data.
 
         """
         payload = self.request[0]
-        type_name = str(payload.split(b"!!!")[0], "utf-8")
-        proto_type = self.find_proto_class(type_name.split(".")[1])
-        msg = proto_type()
+        result = base64.b64decode(payload)
+        msg = self.proto_class()
 
-        payload = base64.b64decode(payload.split(b"!!!")[1])
-
-        any_msg = Any.FromString(payload)
+        any_msg = Any.FromString(result)
         any_msg.Unpack(msg)
-
         self.handle_callback(msg)
 
-    def find_proto_class(self, proto_class_name):
-        """Search through all protobufs and return class of proto_type
 
-        :param proto_class_name: String of the proto class name to search for
-
-        """
-        proto_path = os.path.dirname(proto.__file__)
-
-        for file in glob.glob(proto_path + "**/*.py"):
-            name = os.path.splitext(os.path.basename(file))[0]
-
-            # Ignore __ files
-            if name.startswith("__"):
-                continue
-            module = importlib.import_module("proto." + name)
-
-            for member in dir(module):
-                handler_class = getattr(module, member)
-                if handler_class and inspect.isclass(handler_class):
-                    if str(member) == proto_class_name:
-                        return handler_class
-
-
-def handler_factory(handle_callback, proto_class):
+def handler_factory(handle_callback, proto_class, is_base64_encoded):
     """To pass in an arbitrary handle callback into the SocketServer,
     we need to create a constructor that can create a Session object with
     appropriate handle function.
 
     :param handle_callback: The callback to run
     :param proto_class: The protobuf to unpack from (None if its encoded in the payload)
+    :param is_base64_encoded: If sent over fom LOG(VISUALIZE) the data will be is_base64_encoded
+
     """
 
     def create_handler(*args, **keys):
-        return Session(handle_callback, proto_class, *args, **keys)
+        return Session(handle_callback, proto_class, is_base64_encoded, *args, **keys)
 
     return create_handler

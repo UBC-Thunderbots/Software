@@ -1,16 +1,25 @@
 #pragma once
 
-#include "shared/parameter/cpp_dynamic_parameters.h"
+#include "proto/parameters.pb.h"
 #include "software/ai/evaluation/keep_away.h"
 #include "software/ai/evaluation/shot.h"
 #include "software/ai/hl/stp/tactic/chip/chip_fsm.h"
 #include "software/ai/hl/stp/tactic/pivot_kick/pivot_kick_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
-#include "software/ai/intent/move_intent.h"
 #include "software/ai/passing/pass.h"
 
 struct AttackerFSM
 {
+    /**
+     * Constructor for AttackerFSM
+     *
+     * @param attacker_tactic_config The config to fetch parameters from
+     */
+    explicit AttackerFSM(TbotsProto::AttackerTacticConfig attacker_tactic_config)
+        : attacker_tactic_config(attacker_tactic_config)
+    {
+    }
+
     struct ControlParams
     {
         // The best pass so far
@@ -22,8 +31,6 @@ struct AttackerFSM
         // The point the robot will chip towards if it is unable to shoot and is in danger
         // of losing the ball to an enemy
         std::optional<Point> chip_target;
-        // shoot goal config
-        std::shared_ptr<const AttackerTacticConfig> attacker_tactic_config;
     };
 
     DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
@@ -75,4 +82,8 @@ struct AttackerFSM
             DribbleFSM_S + Update_E[!shouldKick_G] / keepAway_A,
             PivotKickFSM_S + Update_E / pivotKick_A, PivotKickFSM_S = X);
     }
+
+   private:
+    // the attacker tactic config
+    TbotsProto::AttackerTacticConfig attacker_tactic_config;
 };

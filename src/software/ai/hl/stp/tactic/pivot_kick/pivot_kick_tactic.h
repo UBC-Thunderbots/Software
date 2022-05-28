@@ -1,6 +1,6 @@
 #pragma once
 
-#include "shared/parameter/cpp_dynamic_parameters.h"
+#include "proto/parameters.pb.h"
 #include "software/ai/evaluation/enemy_threat.h"
 #include "software/ai/hl/stp/tactic/pivot_kick/pivot_kick_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
@@ -12,9 +12,11 @@ class PivotKickTactic : public Tactic
     /**
      * Creates a new PivotKickTactic
      *
-     * @param robot_navigation_obstacle_config The config
+     * @param ai_config The AI configuration
      */
-    explicit PivotKickTactic();
+    explicit PivotKickTactic(TbotsProto::AiConfig ai_config);
+
+    PivotKickTactic() = delete;
 
     DEFINE_TACTIC_DONE_AND_GET_FSM_STATE
 
@@ -28,23 +30,13 @@ class PivotKickTactic : public Tactic
     void updateControlParams(const Point& kick_origin, const Angle& kick_direction,
                              AutoChipOrKick auto_chip_or_kick);
 
-    /**
-     * Calculates the cost of assigning the given robot to this Tactic. Prefers robots
-     * closer to the destination
-     *
-     * @param robot The robot to evaluate the cost for
-     * @param world The state of the world with which to perform the evaluation
-     * @return A cost in the range [0,1] indicating the cost of assigning the given robot
-     * to this tactic. Lower cost values indicate a more preferred robot.
-     */
-    double calculateRobotCost(const Robot& robot, const World& world) const override;
-
     void accept(TacticVisitor& visitor) const override;
 
    private:
-    void updateIntent(const TacticUpdate& tactic_update) override;
+    void updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm) override;
 
-    // Tactic parameters
-    FSM<PivotKickFSM> fsm;
+    std::map<RobotId, std::unique_ptr<FSM<PivotKickFSM>>> fsm_map;
+
     PivotKickFSM::ControlParams control_params;
+    TbotsProto::AiConfig ai_config;
 };

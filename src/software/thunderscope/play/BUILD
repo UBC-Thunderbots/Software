@@ -8,6 +8,7 @@ py_library(
     deps = [
         "//proto:software_py_proto",
         "//software/thunderscope:constants",
+        "//software/thunderscope:thread_safe_buffer",
         requirement("pyqtgraph"),
     ],
 )

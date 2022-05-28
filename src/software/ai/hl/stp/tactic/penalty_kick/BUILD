@@ -39,7 +39,7 @@ cc_test(
     deps = [
         ":penalty_kick_tactic",
         "//shared/test_util:tbots_gtest_main",
-        "//software/simulated_tests:simulated_tactic_test_fixture",
+        "//software/simulated_tests:simulated_er_force_sim_play_test_fixture",
         "//software/simulated_tests/non_terminating_validation_functions",
         "//software/simulated_tests/terminating_validation_functions",
         "//software/simulated_tests/validation:validation_function",

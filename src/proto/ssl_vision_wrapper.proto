@@ -1,0 +1,14 @@
+// This file should be kept up to date with Robocup SSL's version
+// https://github.com/RoboCup-SSL/ssl-vision/blob/master/src/shared/proto/messages_robocup_ssl_wrapper.proto
+syntax = "proto2";
+
+package SSLProto;
+
+import "proto/ssl_vision_detection.proto";
+import "proto/ssl_vision_geometry.proto";
+
+message SSL_WrapperPacket
+{
+    optional SSL_DetectionFrame detection = 1;
+    optional SSL_GeometryData geometry    = 2;
+}

@@ -5,7 +5,7 @@
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-DribblingParcourPlay::DribblingParcourPlay(std::shared_ptr<const AiConfig> config)
+DribblingParcourPlay::DribblingParcourPlay(TbotsProto::AiConfig config)
     : Play(config, false)
 {
 }
@@ -13,7 +13,8 @@ DribblingParcourPlay::DribblingParcourPlay(std::shared_ptr<const AiConfig> confi
 void DribblingParcourPlay::getNextTactics(TacticCoroutine::push_type &yield,
                                           const World &world)
 {
-    std::shared_ptr<DribbleTactic> dribble_tactic = std::make_shared<DribbleTactic>();
+    std::shared_ptr<DribbleTactic> dribble_tactic =
+        std::make_shared<DribbleTactic>(ai_config);
     dribble_tactic->updateControlParams(std::nullopt, std::nullopt, true);
     std::shared_ptr<MoveTactic> move_tactic = std::make_shared<MoveTactic>();
 
@@ -35,4 +36,5 @@ void DribblingParcourPlay::getNextTactics(TacticCoroutine::push_type &yield,
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, DribblingParcourPlay, AiConfig> factory;
+static TGenericFactory<std::string, Play, DribblingParcourPlay, TbotsProto::AiConfig>
+    factory;

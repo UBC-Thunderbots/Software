@@ -26,7 +26,7 @@
 #include "extlibs/er_force_sim/src/core/coordinates.h"
 #include "extlibs/er_force_sim/src/core/rng.h"
 #include "extlibs/er_force_sim/src/core/vector.h"
-#include "proto/messages_robocup_ssl_detection.pb.h"
+#include "proto/ssl_vision_detection.pb.h"
 #include "simulator.h"
 
 using namespace camun::simulator;
@@ -51,8 +51,9 @@ SimBall::SimBall(RNG *rng, btDiscreteDynamicsWorld *world) : m_rng(rng), m_world
     // parameters seem to be ignored...
     m_body = new btRigidBody(rbInfo);
     // see simulator.cpp
+    // TODO (#2512): Check these values with real life
     m_body->setRestitution(1.f);
-    m_body->setFriction(1.f);
+    m_body->setFriction(0.7f);
 
     // \mu_r = -a / g = 0.0357 (while rolling)
     // rollingFriction in bullet is too unstable to be useful
@@ -142,7 +143,7 @@ void SimBall::begin()
     {
         if (m_move.by_force())
         {
-            Vector pos;
+            ErForceVector pos;
             coordinates::fromVision(m_move, pos);
             // move ball by hand
             btVector3 force(pos.x, pos.y, m_move.z() + BALL_RADIUS);
@@ -156,7 +157,7 @@ void SimBall::begin()
             if (m_move.has_x())
             {
                 // set position
-                Vector cPos;
+                ErForceVector cPos;
                 coordinates::fromVision(m_move, cPos);
                 float height = BALL_RADIUS;
                 if (m_move.has_z())
@@ -170,7 +171,7 @@ void SimBall::begin()
             }
             if (m_move.has_vx())
             {
-                Vector vel;
+                ErForceVector vel;
                 coordinates::fromVisionVelocity(m_move, vel);
                 float vz = 0;
                 if (m_move.has_vz())
@@ -209,7 +210,11 @@ static float positionOfVisiblePixels(btVector3 &p, const btVector3 &simulatorBal
 
     const btVector3 up = btVector3(0, 0, 1);
 
-    btVector3 axis = up.cross(cameraDirection).normalize();
+    btVector3 axis = up.cross(cameraDirection);
+    if (!axis.fuzzyZero())
+    {
+        axis = axis.normalize();
+    }
     btScalar angle = up.angle(cameraDirection);
 
     const int sampleRadius       = 7;
@@ -345,8 +350,8 @@ bool SimBall::addDetection(SSLProto::SSL_DetectionBall *ball, btVector3 pos, flo
     // add noise to coordinates
     // to convert from bullet coordinate system to ssl-vision rotate by 90 degree
     // ccw
-    const Vector noise = m_rng->normalVector(stddev);
-    coordinates::toVision(Vector(modX, modY) + noise, *ball);
+    const ErForceVector noise = m_rng->normalVector(stddev);
+    coordinates::toVision(ErForceVector(modX, modY) + noise, *ball);
     return true;
 }
 

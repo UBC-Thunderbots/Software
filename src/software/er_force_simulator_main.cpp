@@ -1,3 +1,6 @@
+#include <boost/program_options.hpp>
+
+#include "extlibs/er_force_sim/src/protobuf/world.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
 #include "proto/vision.pb.h"
 #include "proto/world.pb.h"
@@ -9,14 +12,38 @@
 
 int main(int argc, char **argv)
 {
-    auto args               = std::make_shared<StandaloneSimulatorMainCommandLineArgs>();
-    bool help_requested     = args->loadFromCommandLineArguments(argc, argv);
-    std::string runtime_dir = args->getRuntimeDir()->value();
-
-    LoggerSingleton::initializeLogger(runtime_dir);
-
-    if (!help_requested)
+    struct CommandLineArgs
     {
+        bool help               = false;
+        std::string runtime_dir = "/tmp/tbots";
+        std::string division    = "div_b";
+    };
+
+    CommandLineArgs args;
+    boost::program_options::options_description desc{"Options"};
+
+    desc.add_options()("help,h", boost::program_options::bool_switch(&args.help),
+                       "Help screen");
+    desc.add_options()("runtime_dir",
+                       boost::program_options::value<std::string>(&args.runtime_dir),
+                       "The directory to output logs and setup unix sockets.");
+    desc.add_options()("division",
+                       boost::program_options::value<std::string>(&args.division),
+                       "div_a or div_b");
+
+    boost::program_options::variables_map vm;
+    boost::program_options::store(parse_command_line(argc, argv, desc), vm);
+    boost::program_options::notify(vm);
+
+    if (args.help)
+    {
+        std::cout << desc << std::endl;
+    }
+    else
+    {
+        std::string runtime_dir = args.runtime_dir;
+        LoggerSingleton::initializeLogger(runtime_dir);
+
         /**
          * Creates a ER force simulator and sets up the appropriate
          * communication channels (unix senders/listeners). All inputs (left) and
@@ -44,17 +71,17 @@ int main(int argc, char **argv)
         std::shared_ptr<ErForceSimulator> er_force_sim;
 
         // Setup the field
-        if (args->getSslDivision()->value() == "div_a")
+        if (args.division == "div_a")
         {
             er_force_sim = std::make_shared<ErForceSimulator>(
                 TbotsProto::FieldType::DIV_A, create2021RobotConstants(),
-                create2021WheelConstants(), std::make_shared<const SimulatorConfig>());
+                create2021WheelConstants());
         }
         else
         {
             er_force_sim = std::make_shared<ErForceSimulator>(
                 TbotsProto::FieldType::DIV_B, create2021RobotConstants(),
-                create2021WheelConstants(), std::make_shared<const SimulatorConfig>());
+                create2021WheelConstants());
         }
         std::mutex simulator_mutex;
 
@@ -64,8 +91,12 @@ int main(int argc, char **argv)
 
         // Outputs
         // SSL Wrapper Output
-        auto ssl_wrapper_output = ThreadedProtoUnixSender<SSLProto::SSL_WrapperPacket>(
-            runtime_dir + SSL_WRAPPER_PACKET_PATH);
+        auto blue_ssl_wrapper_output =
+            ThreadedProtoUnixSender<SSLProto::SSL_WrapperPacket>(runtime_dir +
+                                                                 BLUE_SSL_WRAPPER_PATH);
+        auto yellow_ssl_wrapper_output =
+            ThreadedProtoUnixSender<SSLProto::SSL_WrapperPacket>(runtime_dir +
+                                                                 YELLOW_SSL_WRAPPER_PATH);
 
         // Robot Status Outputs
         auto blue_robot_status_output = ThreadedProtoUnixSender<TbotsProto::RobotStatus>(
@@ -73,6 +104,10 @@ int main(int argc, char **argv)
         auto yellow_robot_status_output =
             ThreadedProtoUnixSender<TbotsProto::RobotStatus>(runtime_dir +
                                                              YELLOW_ROBOT_STATUS_PATH);
+
+        // Simulator State as World State Output
+        auto simulator_state_output = ThreadedProtoUnixSender<world::SimulatorState>(
+            runtime_dir + SIMULATOR_STATE_PATH);
 
         // Inputs
         // World State Input: Configures the ERForceSimulator
@@ -89,6 +124,7 @@ int main(int argc, char **argv)
                 std::scoped_lock lock(simulator_mutex);
                 blue_vision = input;
             });
+
         auto yellow_world_input = ThreadedProtoUnixListener<TbotsProto::World>(
             runtime_dir + YELLOW_WORLD_PATH, [&](TbotsProto::World input) {
                 std::scoped_lock lock(simulator_mutex);
@@ -124,7 +160,8 @@ int main(int argc, char **argv)
 
                 for (const auto packet : er_force_sim->getSSLWrapperPackets())
                 {
-                    ssl_wrapper_output.sendProto(packet);
+                    blue_ssl_wrapper_output.sendProto(packet);
+                    yellow_ssl_wrapper_output.sendProto(packet);
                 }
 
                 for (const auto packet : er_force_sim->getBlueRobotStatuses())
@@ -136,6 +173,8 @@ int main(int argc, char **argv)
                 {
                     yellow_robot_status_output.sendProto(packet);
                 }
+
+                simulator_state_output.sendProto(er_force_sim->getSimulatorState());
             });
 
         // This blocks forever without using the CPU

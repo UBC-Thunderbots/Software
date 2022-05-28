@@ -1,0 +1,106 @@
+syntax = "proto2";
+
+package SSLProto;
+
+import "proto/ssl_gc_geometry.proto";
+import "proto/ssl_gc_common.proto";
+
+// The GC state contains settings and state independent of the match state
+message GcState
+{
+    // The state of each team
+    map<string, GcStateTeam> team_state = 1;
+
+    // the states of the auto referees
+    map<string, GcStateAutoRef> auto_ref_state = 2;
+
+    // the states of the attached trackers
+    map<string, GcStateTracker> tracker_state = 3;
+
+    // the state of the currently selected tracker
+    optional GcStateTracker tracker_state_gc = 4;
+
+    // can the match be continued right now?
+    optional bool ready_to_continue = 5;
+
+    // list of issues that hinders the game from continuing
+    repeated string continuation_issues = 6;
+}
+
+// The GC state for a single team
+message GcStateTeam
+{
+    // true: The team is connected
+    optional bool connected = 1;
+
+    // true: The team connected via TLS with a verified certificate
+    optional bool connection_verified = 2;
+
+    // true: The remote control for the team is connected
+    optional bool remote_control_connected = 3;
+
+    // true: The remote control for the team connected via TLS with a verified certificate
+    optional bool remote_control_connection_verified = 4;
+
+    // the advantage choice of the team
+    optional TeamAdvantageChoice advantage_choice = 5;
+}
+
+// The choice from a team regarding the advantage rule
+message TeamAdvantageChoice
+{
+    // the choice of the team
+    optional AdvantageChoice choice = 1;
+
+    // possible advantage choices
+    enum AdvantageChoice
+    {
+        // stop the game
+        STOP = 0;
+        // keep the match running
+        CONTINUE = 1;
+    }
+}
+
+// The GC state of an auto referee
+message GcStateAutoRef
+{
+    // true: The autoRef connected via TLS with a verified certificate
+    optional bool connection_verified = 1;
+}
+
+// GC state of a tracker
+message GcStateTracker
+{
+    // Name of the source
+    optional string source_name = 1;
+
+    // UUID of the source
+    optional string uuid = 4;
+
+    // Current ball
+    optional Ball ball = 2;
+
+    // Current robots
+    repeated Robot robots = 3;
+}
+
+// The ball state
+message Ball
+{
+    // ball position [m]
+    optional Vector3 pos = 1;
+
+    // ball velocity [m/s]
+    optional Vector3 vel = 2;
+}
+
+// The robot state
+message Robot
+{
+    // robot id and team
+    optional RobotId id = 1;
+
+    // robot position [m]
+    optional Vector2 pos = 2;
+}

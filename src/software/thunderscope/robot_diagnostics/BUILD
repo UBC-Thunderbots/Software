@@ -11,3 +11,13 @@ py_library(
         requirement("pyqtgraph"),
     ],
 )
+
+py_library(
+    name = "chicker",
+    srcs = ["chicker.py"],
+    deps = [
+        "//software/thunderscope:constants",
+        "//software/thunderscope:thread_safe_buffer",
+        requirement("pyqtgraph"),
+    ],
+)

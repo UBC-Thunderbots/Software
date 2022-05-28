@@ -20,19 +20,9 @@ namespace TestUtil
         return world;
     }
 
-    World createBlankTestingWorld()
+    World createBlankTestingWorld(TbotsProto::FieldType field_type)
     {
-        return createBlankTestingWorldDivB();
-    }
-
-    World createBlankTestingWorldDivA()
-    {
-        return createBlankTestingWorld(createField(Field::createSSLDivisionAField()));
-    }
-
-    World createBlankTestingWorldDivB()
-    {
-        return createBlankTestingWorld(createField(Field::createSSLDivisionBField()));
+        return createBlankTestingWorld(createField(Field::createField(field_type)));
     }
 
     Team setRobotPositionsHelper(Team team, const std::vector<Point> &robot_positions,
@@ -148,6 +138,18 @@ namespace TestUtil
         game_state.updateRefereeCommand(previous_referee_command);
         game_state.updateRefereeCommand(current_referee_command);
         return game_state;
+    }
+
+    TbotsProto::MotionControl createMotionControl(const Point &destination)
+    {
+        TbotsProto::MotionControl motion_control;
+        TbotsProto::Path path_proto;
+        *(path_proto.add_points())       = *createPointProto(destination);
+        *(path_proto.add_points())       = *createPointProto(destination);
+        *(motion_control.mutable_path()) = path_proto;
+        *(motion_control.mutable_requested_destination()) =
+            *createPointProto(destination);
+        return motion_control;
     }
 
 };  // namespace TestUtil

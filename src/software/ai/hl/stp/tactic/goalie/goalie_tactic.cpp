@@ -4,32 +4,40 @@
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/point.h"
 
-GoalieTactic::GoalieTactic(std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config,
+GoalieTactic::GoalieTactic(TbotsProto::AiConfig ai_config,
                            TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode)
     : Tactic({RobotCapability::Move, RobotCapability::Dribble, RobotCapability::Chip}),
-      fsm(DribbleFSM(), GoalieFSM(goalie_tactic_config, max_allowed_speed_mode)),
-      goalie_tactic_config(goalie_tactic_config)
+      fsm_map(),
+      max_allowed_speed_mode(max_allowed_speed_mode),
+      control_params{.should_move_to_goal_line = false},
+      ai_config(ai_config)
 {
-}
-
-double GoalieTactic::calculateRobotCost(const Robot &robot, const World &world) const
-{
-    if (world.friendlyTeam().getGoalieId() == robot.id())
+    for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)
     {
-        return 0.0;
-    }
-    else
-    {
-        return 1.0;
+        fsm_map[id] = std::make_unique<FSM<GoalieFSM>>(
+            DribbleFSM(ai_config.dribble_tactic_config()),
+            GoalieFSM(ai_config.goalie_tactic_config(), max_allowed_speed_mode));
     }
 }
 
-void GoalieTactic::updateIntent(const TacticUpdate &tactic_update)
+void GoalieTactic::updateControlParams(bool should_move_to_goal_line)
 {
-    fsm.process_event(GoalieFSM::Update({}, tactic_update));
+    control_params.should_move_to_goal_line = should_move_to_goal_line;
 }
 
 void GoalieTactic::accept(TacticVisitor &visitor) const
 {
     visitor.visit(*this);
+}
+
+void GoalieTactic::updatePrimitive(const TacticUpdate &tactic_update, bool reset_fsm)
+{
+    if (reset_fsm)
+    {
+        fsm_map[tactic_update.robot.id()] = std::make_unique<FSM<GoalieFSM>>(
+            DribbleFSM(ai_config.dribble_tactic_config()),
+            GoalieFSM(ai_config.goalie_tactic_config(), max_allowed_speed_mode));
+    }
+    fsm_map.at(tactic_update.robot.id())
+        ->process_event(GoalieFSM::Update(control_params, tactic_update));
 }
