@@ -1,6 +1,7 @@
+#include "shared/2021_robot_constants.h"
+
 #include <math.h>
 
-#include "shared/2021_robot_constants.h"
 #include "shared/constants.h"
 
 // All the interial components of the robot. This one is a little strange as it is the

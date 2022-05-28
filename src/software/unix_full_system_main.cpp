@@ -4,7 +4,6 @@
 #include <iostream>
 #include <numeric>
 
-#include "proto/logging/proto_logger.h"
 #include "proto/message_translation/ssl_wrapper.h"
 #include "proto/parameters.pb.h"
 #include "proto/play_info_msg.pb.h"

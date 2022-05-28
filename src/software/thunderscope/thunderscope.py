@@ -58,6 +58,7 @@ from software.thunderscope.robot_diagnostics.chicker import ChickerWidget
 from software.thunderscope.robot_diagnostics.drive_and_dribbler_widget import (
     DriveAndDribblerWidget,
 )
+from software.thunderscope.robot_diagnostics.robot_view import RobotView
 from software.thunderscope.replay.proto_player import ProtoPlayer
 
 SAVED_LAYOUT_PATH = "/opt/tbotspython/saved_tscope_layout"
@@ -522,8 +523,8 @@ class Thunderscope(object):
 
         dock = Dock("Label")
         dock.addWidget(bob)
+        bob.draw_robot_view(proto_unix_io)
 
-        bob.draw_something()
         self.robot_diagnostics_dock_area.addDock(dock, "bottom", proto_plotter_dock_3)
 
     def setup_field_widget(

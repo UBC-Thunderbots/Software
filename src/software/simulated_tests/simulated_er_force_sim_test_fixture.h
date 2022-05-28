@@ -1,6 +1,5 @@
 #pragma once
 
-#include "proto/logging/proto_logger.h"
 #include "proto/play_info_msg.pb.h"
 #include "shared/test_util/tbots_gtest_main.h"
 #include "software/ai/hl/stp/play/halt_play.h"
@@ -181,9 +180,6 @@ class SimulatedErForceSimTestFixture : public ::testing::Test
     // this will only be set to true if the environment variable
     // TEST_UNDECLARED_OUTPUTS_DIR is set, usually by running as a Bazel test
     bool should_log_replay;
-    // ProtoLoggers for the simulator and SensorFusion, respectively
-    std::shared_ptr<ProtoLogger<SensorProto>> simulator_sensorproto_logger;
-    std::shared_ptr<ProtoLogger<SSLProto::SSL_WrapperPacket>> sensorfusion_wrapper_logger;
 
     std::vector<NonTerminatingFunctionValidator> non_terminating_function_validators;
     std::vector<TerminatingFunctionValidator> terminating_function_validators;
