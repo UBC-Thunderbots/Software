@@ -57,7 +57,6 @@ struct TacticUpdate
     bool done() const override                                                           \
     {                                                                                    \
         bool is_done          = false;                                                   \
-        std::string state_str = "";                                                      \
         if (last_execution_robot.has_value())                                            \
         {                                                                                \
             is_done = fsm_map.at(last_execution_robot.value())->is(boost::sml::X);       \

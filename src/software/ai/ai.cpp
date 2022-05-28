@@ -14,10 +14,13 @@ AI::AI(TbotsProto::AiConfig ai_config)
       prev_override(TbotsProto::PlayName::UseAiSelection),
       ai_config_changed(false)
 {
+    LOG(WARNING)<<"AI being constructed"<<std::endl;
 }
 
 void AI::overridePlay(std::unique_ptr<Play> play)
 {
+    CHECK(static_cast<bool>(play))<<"Play is nullptr!!"<<std::endl;
+    LOG(WARNING)<<"Overriding Play with "<<objectTypeName(*play)<<std::endl;
     override_play = std::move(play);
 }
 
@@ -62,6 +65,7 @@ std::unique_ptr<TbotsProto::PrimitiveSet> AI::getPrimitives(const World& world)
 
     if (ai_config_changed)
     {
+        LOG(WARNING)<<"Play Selection FSM being reset"<<std::endl;
         fsm.reset(new FSM<PlaySelectionFSM>(PlaySelectionFSM{ai_config_}));
     }
 
@@ -83,6 +87,7 @@ std::unique_ptr<TbotsProto::PrimitiveSet> AI::getPrimitives(const World& world)
 
     if (static_cast<bool>(override_play))
     {
+    LOG(WARNING)<<"Overriding Play: "<<objectTypeName(*override_play)<<std::endl;
         return override_play->get(field_to_path_planner_factory.at(world.field()), world,
                                   inter_play_communication,
                                   [this](InterPlayCommunication comm) {
@@ -91,6 +96,8 @@ std::unique_ptr<TbotsProto::PrimitiveSet> AI::getPrimitives(const World& world)
     }
     else
     {
+    LOG(WARNING)<<"Running Current Play: "<<objectTypeName(*current_play)<<" since the override play is "<<objectTypeName(*override_play)<<std::endl;
+    //LOG(WARNING)<<"Running Current Play: "<<objectTypeName(*current_play)<<std::endl;
         return current_play->get(field_to_path_planner_factory.at(world.field()), world,
                                  inter_play_communication,
                                  [this](InterPlayCommunication comm) {

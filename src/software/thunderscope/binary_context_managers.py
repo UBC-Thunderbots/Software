@@ -442,9 +442,6 @@ class Gamecontroller(object):
             )
             ci_change = Change()
             ci_input = Input()
-            ci_change.set_ball_placement_pos.CopyFrom(ball_placement_pos)
-            ci_input.change.CopyFrom(ci_change)
-            ci_ci_input.api_inputs.append(ci_input)
 
             # Start Placement
             ci_change = Change()

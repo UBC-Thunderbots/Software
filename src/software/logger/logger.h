@@ -104,7 +104,7 @@ class LoggerSingleton
     }
 
     // levels is this vector are filtered out of the filtered log rotate sink
-    std::vector<LEVELS> level_filter = {DEBUG, INFO, ROBOT_STATUS};
+    std::vector<LEVELS> level_filter = {DEBUG, VISUALIZE, ROBOT_STATUS};
     const std::string filter_suffix  = "_filtered";
     const std::string log_name       = "thunderbots";
     std::unique_ptr<g3::LogWorker> logWorker;
