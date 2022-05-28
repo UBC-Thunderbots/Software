@@ -8,7 +8,6 @@ cc_binary(
     deps = [
         "//extlibs/er_force_sim/src/protobuf:protobuf_cc_lib",
         "//proto:tbots_cc_proto",
-        "//proto/logging:proto_logger",
         "//proto/message_translation:ssl_wrapper",
         "//software:constants",
         "//software/ai:threaded_ai",

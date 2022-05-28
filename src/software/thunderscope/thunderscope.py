@@ -136,7 +136,8 @@ class Thunderscope(object):
         self.web_view.load(QtCore.QUrl(GAME_CONTROLLER_URL))
 
         if load_blue:
-            self.tabs.addTab(self.blue_full_system_dock_area, "Blue Fullsystem")
+            pass
+            # self.tabs.addTab(self.blue_full_system_dock_area, "Blue Fullsystem")
         if load_yellow:
             self.tabs.addTab(self.yellow_full_system_dock_area, "Yellow Fullsystem")
         if load_diagnostics:
@@ -516,48 +517,6 @@ class Thunderscope(object):
         self.robot_diagnostics_dock_area.addDock(
             proto_plotter_dock_4, "bottom", proto_plotter_dock_3
         )
-
-        class RobotView(QWidget):
-            def __init__(self):
-                super().__init__()
-                self.label = QLabel()
-                self.layout = QVBoxLayout()
-                self.layout.addWidget(self.label)
-                self.setLayout(self.layout)
-
-            def draw_something(self):
-                pixmap = QtGui.QPixmap(self.label.size())
-                pixmap.fill(PyQt6.QtCore.Qt.GlobalColor.transparent)
-
-                painter = QtGui.QPainter(pixmap)
-                painter.end()
-                self.label.setPixmap(pixmap)
-
-            def draw_robot(self, painter, id, x, y, radius):
-                """Draw a robot with the given painter. The vision pattern
-                is drawn ontop of the robot.
-
-                :param id: The robot
-                :param x: The x position
-                :param y: The y position
-                :param radius: The radius of the robot
-
-                """
-                painter.setPen(pyqtgraph.mkPen("black"))
-                painter.setBrush(pyqtgraph.mkBrush("black"))
-
-                convert_degree = -16
-
-                painter.drawChord(
-                    QtCore.QRectF(
-                        int(x - radius),
-                        int(y - radius),
-                        int(radius * 2),
-                        int(radius * 2),
-                    ),
-                    -45 * convert_degree,
-                    270 * convert_degree,
-                )
 
         bob = RobotView()
 
