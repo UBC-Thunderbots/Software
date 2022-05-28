@@ -89,6 +89,7 @@ class Thunderscope(object):
         load_blue=True,
         load_yellow=True,
         load_diagnostics=False,
+        load_gamecontroller=True,
         blue_replay_log=None,
         yellow_replay_log=None,
         refresh_interval_ms=10,
@@ -102,6 +103,8 @@ class Thunderscope(object):
         :param layout_path: The path to the layout to load
         :param load_blue: Whether to load the blue dock area
         :param load_yellow: Whether to load the yellow dock area
+        :param load_diagnostics: Whether to load the diagnostics dock area
+        :param load_gamecontroller: Whether to load the gamecontroller window
         :param blue_replay_log: The blue replay log
         :param yellow_replay_log: The yellow replay log
         :param refresh_interval_ms: The interval in milliseconds to refresh the simulator
@@ -132,10 +135,14 @@ class Thunderscope(object):
         self.web_view = QWebEngineView()
         self.web_view.load(QtCore.QUrl(GAME_CONTROLLER_URL))
 
-        self.tabs.addTab(self.blue_full_system_dock_area, "Blue Fullsystem")
-        self.tabs.addTab(self.yellow_full_system_dock_area, "Yellow Fullsystem")
-        self.tabs.addTab(self.robot_diagnostics_dock_area, "Robot Diagnostics")
-        self.tabs.addTab(self.web_view, "Gamecontroller")
+        if load_blue:
+            self.tabs.addTab(self.blue_full_system_dock_area, "Blue Fullsystem")
+        if load_yellow:
+            self.tabs.addTab(self.yellow_full_system_dock_area, "Yellow Fullsystem")
+        if load_diagnostics:
+            self.tabs.addTab(self.robot_diagnostics_dock_area, "Robot Diagnostics")
+        if load_gamecontroller:
+            self.tabs.addTab(self.web_view, "Gamecontroller")
 
         self.window = QtGui.QMainWindow()
         self.window.setCentralWidget(self.tabs)
@@ -509,6 +516,56 @@ class Thunderscope(object):
         self.robot_diagnostics_dock_area.addDock(
             proto_plotter_dock_4, "bottom", proto_plotter_dock_3
         )
+
+        class RobotView(QWidget):
+            def __init__(self):
+                super().__init__()
+                self.label = QLabel()
+                self.layout = QVBoxLayout()
+                self.layout.addWidget(self.label)
+                self.setLayout(self.layout)
+
+            def draw_something(self):
+                pixmap = QtGui.QPixmap(self.label.size())
+                pixmap.fill(PyQt6.QtCore.Qt.GlobalColor.transparent)
+
+                painter = QtGui.QPainter(pixmap)
+                painter.end()
+                self.label.setPixmap(pixmap)
+
+            def draw_robot(self, painter, id, x, y, radius):
+                """Draw a robot with the given painter. The vision pattern
+                is drawn ontop of the robot.
+
+                :param id: The robot
+                :param x: The x position
+                :param y: The y position
+                :param radius: The radius of the robot
+
+                """
+                painter.setPen(pyqtgraph.mkPen("black"))
+                painter.setBrush(pyqtgraph.mkBrush("black"))
+
+                convert_degree = -16
+
+                painter.drawChord(
+                    QtCore.QRectF(
+                        int(x - radius),
+                        int(y - radius),
+                        int(radius * 2),
+                        int(radius * 2),
+                    ),
+                    -45 * convert_degree,
+                    270 * convert_degree,
+                )
+
+        bob = RobotView()
+
+        dock = Dock("Label")
+        dock.addWidget(bob)
+
+        bob.draw_something()
+        self.robot_diagnostics_dock_area.addDock(dock, "bottom", proto_plotter_dock_3)
 
     def setup_field_widget(
         self, sim_proto_unix_io, full_system_proto_unix_io, friendly_colour_yellow

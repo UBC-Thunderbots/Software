@@ -173,6 +173,7 @@ if __name__ == "__main__":
             load_blue=True,
             load_yellow=False,
             load_diagnostics=True,
+            load_gamecontroller=False,
             visualization_buffer_size=args.visualization_buffer_size,
         )
 
@@ -188,6 +189,7 @@ if __name__ == "__main__":
             load_blue=False,
             load_yellow=True,
             load_diagnostics=True,
+            load_gamecontroller=False,
             visualization_buffer_size=args.visualization_buffer_size,
         )
 
@@ -198,11 +200,10 @@ if __name__ == "__main__":
 
     if args.run_blue or args.run_yellow:
         # TODO (#2585): Support multiple channels
-        with RobotCommunication(
-            proto_unix_io, getRobotMulticastChannel(0), args.interface
-        ) as robot_comms, FullSystem(
-            runtime_dir, debug, friendly_colour_yellow
-        ) as full_system:
+        # with # RobotCommunication(
+        # proto_unix_io, getRobotMulticastChannel(0), args.interface
+        # ) as robot_comms,
+        with FullSystem(runtime_dir, debug, friendly_colour_yellow) as full_system:
             tscope.show()
 
     ###########################################################################
