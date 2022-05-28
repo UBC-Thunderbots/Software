@@ -90,7 +90,6 @@ void PlaySelectionFSM::setupStopPlay(const Update& event)
 
 void PlaySelectionFSM::setupHaltPlay(const Update& event)
 {
-    LOG(WARNING)<<"Setting up haltplay"<<std::endl;
     event.set_current_play(std::make_unique<HaltPlay>(ai_config));
 }
 

@@ -164,12 +164,9 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
             // StopTactics
             for (unsigned int ii = 0; ii < (robots.size() - num_tactics); ii++)
             {
-                LOG(WARNING)<<"adding stop tactic"<<std::endl;
                 tactic_vector.push_back(stop_tactics[ii]);
             }
         }
-
-        LOG(INFO)<<"Currently running "<<objectTypeName(*this)<<std::endl;
 
         auto [remaining_robots, new_primitives_to_assign,
               current_tactic_robot_id_assignment] =
@@ -321,8 +318,6 @@ Play::assignTactics(const GlobalPathPlannerFactory &path_planner_factory,
     // "jobs" (the Tactics).
     Matrix<double> matrix(num_rows, num_cols);
 
-    LOG(INFO)<<"==============Primitive costs for ("<<num_rows<<", "<<num_cols<<")=============="<<std::endl;
-
     // Initialize the matrix with the cost of assigning each Robot to each Tactic
     for (size_t row = 0; row < num_rows; row++)
     {
@@ -334,12 +329,6 @@ Play::assignTactics(const GlobalPathPlannerFactory &path_planner_factory,
             CHECK(primitives.contains(robot.id()))
                 << "Couldn't find a primitive for robot id " << robot.id();
             double robot_cost_for_tactic = primitives.at(robot.id()).cost();
-            if (robot_cost_for_tactic>0.99)
-            {
-                LOG(WARNING)<<"Cost is near 1, primitive is "<<primitives.at(robot.id()).DebugString()<<std::endl;
-            }
-            LOG(INFO)<<"Tactic "<<col<<" name: "<<objectTypeName(*tactic)
-                <<": Robot Id "<<robot.id()<<", Cost "<<robot_cost_for_tactic<<std::endl;
 
             std::set<RobotCapability> required_capabilities =
                 tactic->robotCapabilityRequirements();
@@ -369,8 +358,6 @@ Play::assignTactics(const GlobalPathPlannerFactory &path_planner_factory,
     Munkres<double> m;
     m.solve(matrix);
 
-    LOG(INFO)<<"==============Primitives chosen=============="<<std::endl;
-
     // The Munkres matrix gets solved such that there will be exactly one 0 in every
     // row and exactly one 0 in every column. All other values will be -1. The 0's
     // indicate the "workers" and "jobs" (robots and tactics for us) that are most
@@ -395,9 +382,8 @@ Play::assignTactics(const GlobalPathPlannerFactory &path_planner_factory,
                 auto primitives = primitive_sets.at(col)->robot_primitives();
                 CHECK(primitives.contains(robot_id))
                     << "Couldn't find a primitive for robot id " << robot_id;
-            LOG(INFO)<<"Tactic "<<col<<": Robot Id "<<robot_id<<", Cost "<<primitives.at(robot_id).cost()<<std::endl;
                 primitives_to_run->mutable_robot_primitives()->insert(
-                        google::protobuf::MapPair(robot_id, primitives.at(robot_id)));
+                    google::protobuf::MapPair(robot_id, primitives.at(robot_id)));
                 remaining_robots.erase(
                     std::remove_if(remaining_robots.begin(), remaining_robots.end(),
                                    [robots_to_assign, row](const Robot &robot) {

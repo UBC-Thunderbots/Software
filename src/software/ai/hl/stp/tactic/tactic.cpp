@@ -46,9 +46,8 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Tactic::get(
         }
         else
         {
-            LOG(WARNING)<<"defaulting to stop primitive"<<std::endl;
             primitive_set->mutable_robot_primitives()->insert(
-                    google::protobuf::MapPair(robot.id(), *createStopPrimitive(false)));
+                google::protobuf::MapPair(robot.id(), *createStopPrimitive(false)));
         }
     }
     return primitive_set;
