@@ -41,11 +41,13 @@ std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
  * Create a Stop Move Primitive Message
  *
  * @param stop_type Indicate to brake or coast to a stop
- * @param cost_override optionally override the cost of the move primitive, defaults to 1.0
+ * @param cost_override optionally override the cost of the move primitive, defaults
+ * to 1.0
  *
  * @return Pointer to Stop Primitive Message
  */
-std::unique_ptr<TbotsProto::Primitive> createStopPrimitive(bool coast, std::optional<double> cost_override = std::nullopt);
+std::unique_ptr<TbotsProto::Primitive> createStopPrimitive(
+    bool coast, std::optional<double> cost_override = std::nullopt);
 
 /**
  * Creates a new DirectControl Primitive AI could output this primitive to control the

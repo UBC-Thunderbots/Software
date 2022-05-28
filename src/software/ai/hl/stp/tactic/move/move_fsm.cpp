@@ -13,7 +13,7 @@ void MoveFSM::updateMove(const Update &event)
 
 void MoveFSM::stop(const Update &event)
 {
-    event.common.set_primitive(createStopPrimitive( true, 0.0));
+    event.common.set_primitive(createStopPrimitive(true, 0.0));
 }
 
 bool MoveFSM::moveDone(const Update &event)

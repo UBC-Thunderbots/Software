@@ -55,8 +55,8 @@ std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
     return move_primitive_msg;
 }
 
-std::unique_ptr<TbotsProto::Primitive> createStopPrimitive(bool coast,
-    std::optional<double> cost_override)
+std::unique_ptr<TbotsProto::Primitive> createStopPrimitive(
+    bool coast, std::optional<double> cost_override)
 {
     double cost = 1.0;
     if (cost_override.has_value())
