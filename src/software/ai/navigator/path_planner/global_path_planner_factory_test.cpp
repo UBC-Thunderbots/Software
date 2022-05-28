@@ -31,8 +31,6 @@ TEST_F(TestGlobalPathPlanner, test_no_motion_constraints)
 
     EXPECT_TRUE(path != std::nullopt);
 
-    std::vector<Point> path_points = path->getKnots();
-
     Rectangle bounding_box({0.9, -2.1}, {3.1, 2.1});
     TestUtil::checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
 }
@@ -54,13 +52,10 @@ TEST_F(TestGlobalPathPlanner,
 
     EXPECT_TRUE(path != std::nullopt);
 
-    std::vector<Point> path_points = path->getKnots();
+    EXPECT_EQ(start, path.front());
 
-    EXPECT_EQ(start, path->getStartPoint());
-
-    EXPECT_LE(path->getEndPoint().x(),
-              world.field().enemyDefenseArea().negXNegYCorner().x());
-    EXPECT_NEAR(path->getEndPoint().y(), 0, 0.1);
+    EXPECT_LE(path.back().x(), world.field().enemyDefenseArea().negXNegYCorner().x());
+    EXPECT_NEAR(path.back().y(), 0, 0.1);
 
     Rectangle bounding_box(world.field().enemyDefenseArea().posXPosYCorner(),
                            world.field().friendlyDefenseArea().negXNegYCorner());

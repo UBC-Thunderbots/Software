@@ -38,13 +38,12 @@ std::pair<Point, double> NavigatingPrimitiveCreator::calculateDestinationAndFina
 {
     double desired_final_speed;
     Point final_dest;
-    std::vector<Point> path_points = path.getKnots();
 
-    if (path_points.size() <= 2)
+    if (path.size() <= 2)
     {
         // we are going to destination
         desired_final_speed = final_speed;
-        final_dest          = path.getEndPoint();
+        final_dest          = path.back();
     }
     else
     {
@@ -53,16 +52,16 @@ std::pair<Point, double> NavigatingPrimitiveCreator::calculateDestinationAndFina
                                         config->getTransitionSpeedFactor()->value();
 
         desired_final_speed = calculateTransitionSpeedBetweenSegments(
-            path_points[0], path_points[1], path_points[2], transition_final_speed);
+            path[0], path[1], path[2], transition_final_speed);
 
-        final_dest = path_points[1];
+        final_dest = path[1];
     }
 
     return std::make_pair<>(
         Point(final_dest),
-        // slow down around enemy robots
-        desired_final_speed *
-            getEnemyObstacleProximityFactor(path_points[1], enemy_robot_obstacles));
+                            // slow down around enemy robots
+        desired_final_speed * 
+            getEnemyObstacleProximityFactor(path[1], enemy_robot_obstacles));
 }
 
 double NavigatingPrimitiveCreator::getEnemyObstacleProximityFactor(
