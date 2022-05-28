@@ -46,6 +46,7 @@ from software.thunderscope.field import (
     simulator_layer,
     world_layer,
     passing_layer,
+    hrvo_layer,
 )
 
 from software.thunderscope.common.proto_configuration_widget import (
@@ -420,6 +421,14 @@ class Thunderscope(object):
         field.add_layer("Validation", validation)
         field.add_layer("Passing", passing)
         field.add_layer("Simulator", sim_state)
+        hrvo_sim_states = []
+        # TODO: Hardcoded for 6 robots
+        for robot_id in range(6):
+            hrvo_sim_state = hrvo_layer.HRVOLayer(
+                friendly_colour_yellow, self.visualization_buffer_size
+            )
+            hrvo_sim_states.append(hrvo_sim_state)
+            field.add_layer(f"HRVO {robot_id}", hrvo_sim_state)
 
         # Register observers
         sim_proto_unix_io.register_observer(
@@ -435,7 +444,7 @@ class Thunderscope(object):
             (PassVisualization, passing.pass_visualization_buffer),
             (ValidationProtoSet, validation.validation_set_buffer),
             (SimulatorState, sim_state.simulator_state_buffer),
-        ]:
+        ] + [(HRVOVisualization, hrvo_sim_state.hrvo_buffer) for hrvo_sim_state in hrvo_sim_states]:
             full_system_proto_unix_io.register_observer(*arg)
 
         # Register refresh functions
