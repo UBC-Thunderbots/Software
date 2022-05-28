@@ -1,8 +1,0 @@
-syntax = 'proto3';
-import "google/protobuf/any.proto";
-
-message RepeatedAnyMsg
-{
-    string message_type                   = 1;
-    repeated google.protobuf.Any messages = 2;
-}
