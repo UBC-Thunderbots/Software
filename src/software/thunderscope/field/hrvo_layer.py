@@ -3,7 +3,6 @@ from proto.visualization_pb2 import HRVOVisualization
 from pyqtgraph.Qt import QtCore, QtGui
 
 from software.thunderscope.colors import Colors
-import software.thunderscope.constants as constants
 from software.py_constants import *
 from software.thunderscope.field.field_layer import FieldLayer
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
@@ -11,9 +10,9 @@ from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 class HRVOLayer(FieldLayer):
     def __init__(self, robot_id, buffer_size=5):
-        """Visualize the obstacles
+        """Visualize the state of the HRVO Simulator
 
-        :param robot_id:
+        :param robot_id: The id of the robot which this layer will visualize
         :param buffer_size: The buffer size, set higher for smoother plots.
                             Set lower for more realtime plots. Default is arbitrary
 

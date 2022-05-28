@@ -425,7 +425,7 @@ class Thunderscope(object):
         # TODO: Hardcoded for 6 robots
         for robot_id in range(6):
             hrvo_sim_state = hrvo_layer.HRVOLayer(
-                friendly_colour_yellow, self.visualization_buffer_size
+                robot_id, self.visualization_buffer_size
             )
             hrvo_sim_states.append(hrvo_sim_state)
             field.add_layer(f"HRVO {robot_id}", hrvo_sim_state)
