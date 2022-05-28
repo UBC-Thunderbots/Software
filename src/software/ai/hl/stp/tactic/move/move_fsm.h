@@ -43,14 +43,6 @@ struct MoveFSM
     void updateMove(const Update &event);
 
     /**
-     * This is an Action that sets the primitive to a stop primitive corresponding to the
-     * Update_E event
-     *
-     * @param event MoveFSM::Update event
-     */
-    void stop(const Update &event);
-
-    /**
      * This guard is used to check if the robot is done moving
      *
      * @param event MoveFSM::Update event
@@ -70,13 +62,11 @@ struct MoveFSM
 
         DEFINE_SML_GUARD(moveDone)
         DEFINE_SML_ACTION(updateMove)
-        DEFINE_SML_ACTION(stop)
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
             *MoveState_S + Update_E[!moveDone_G] / updateMove_A = MoveState_S,
             MoveState_S + Update_E[moveDone_G] / updateMove_A   = X,
-            X + Update_E[!moveDone_G] / updateMove_A            = MoveState_S,
-            X + Update_E / stop_A                               = X);
+            X + Update_E[!moveDone_G] / updateMove_A            = MoveState_S);
     }
 };

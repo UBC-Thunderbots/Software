@@ -11,11 +11,6 @@ void MoveFSM::updateMove(const Update &event)
         event.control_params.target_spin_rev_per_s, event.common.robot.robotConstants()));
 }
 
-void MoveFSM::stop(const Update &event)
-{
-    event.common.set_primitive(createStopPrimitive(true, 0.0));
-}
-
 bool MoveFSM::moveDone(const Update &event)
 {
     return robotReachedDestination(event.common.robot, event.control_params.destination,
