@@ -27,6 +27,6 @@ message RobotLog
 
     // the line number of where the log was generated
     uint32 line_number = 4;
-    string file_name = 5;
-    string log_msg   = 6;
+    string file_name   = 5;
+    string log_msg     = 6;
 }

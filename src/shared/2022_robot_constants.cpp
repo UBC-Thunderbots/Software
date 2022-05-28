@@ -1,7 +1,6 @@
-#include "shared/2022_robot_constants.h"
-
 #include <math.h>
 
+#include "shared/2021_robot_constants.h"
 #include "shared/constants.h"
 
 // All the interial components of the robot. This one is a little strange as it is the
@@ -12,7 +11,7 @@
 #define ROBOT_POINT_MASS (2.48f)
 #define ROTATIONAL_MASS (INERTIAL_FACTOR * ROBOT_POINT_MASS)
 
-RobotConstants_t create2022RobotConstants(void)
+RobotConstants_t create2021RobotConstants(void)
 {
     RobotConstants_t robot_constants = {
         .mass_kg = 2.5f,  // determined experimentally

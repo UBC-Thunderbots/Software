@@ -2,12 +2,12 @@
 
 #include <gtest/gtest.h>
 
-#include "shared/2022_robot_constants.h"
+#include "shared/2021_robot_constants.h"
 
 class SSLSimulationProtoTest : public ::testing::Test
 {
    protected:
-    RobotConstants_t robot_constants = create2022RobotConstants();
+    RobotConstants_t robot_constants = create2021RobotConstants();
 };
 
 TEST_F(SSLSimulationProtoTest, test_create_robot_move_command_forward_from_primitive)
