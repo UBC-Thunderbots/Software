@@ -307,7 +307,7 @@ void Simulator::stepSimulation(double time_s)
 
 void Simulator::handleSimulatorTick(double time_s)
 {
-    std::cout<<"tick handler"<<std::endl;
+    std::cout<<"tick handler, v = "<<m_data->ball->body()->getLinearVelocity().y()<<std::endl;
     // has to be done according to bullet wiki
     m_data->dynamicsWorld->clearForces();
 
@@ -321,8 +321,18 @@ void Simulator::handleSimulatorTick(double time_s)
                 &ErrorAggregator::aggregate);
     }
 
+    //find out if ball and any robots collide
+    bool ball_collision;
+    for (const auto &pair : m_data->robotsBlue)
+    {
+        ball_collision = pair.first->touchesBall(m_data->ball);
+        if (ball_collision) {
+            break;
+        }
+    }
+
     // apply commands and forces to ball and robots
-    m_data->ball->begin(time_s);
+    m_data->ball->begin(time_s, ball_collision);
     for (const auto &pair : m_data->robotsBlue)
     {
         pair.first->begin(m_data->ball, time_s);

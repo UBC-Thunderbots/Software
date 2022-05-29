@@ -585,28 +585,12 @@ bool SimRobot::canKickBall(SimBall *ball) const
                 btManifoldPoint &pt = contactManifold->getContactPoint(j);
                 if (pt.getDistance() < 0.001f * SIMULATOR_SCALE)
                 {
-                    ball->body()->setFriction(1.f);
-                    std::cout<<"dribbler contact"<<std::endl;
                     return true;
                 }
             }
         }
     }
 
-    for (int i = 0; i < numManifolds; ++i)
-    {
-        btPersistentManifold *contactManifold =
-                m_world->getDispatcher()->getManifoldByIndexInternal(i);
-        btCollisionObject *objectA = (btCollisionObject *)(contactManifold->getBody0());
-        btCollisionObject *objectB = (btCollisionObject *)(contactManifold->getBody1());
-        if ((objectA == m_body && objectB == ball->body()) ||
-            (objectA == ball->body() && objectB == m_body))
-        {
-            ball->body()->setFriction(1.f);
-
-            std::cout<<"robot contact, set friction to 0.7, v = "<<ball->body()->getLinearVelocity().length()<<std::endl;
-        }
-    }
     return false;
 }
 
@@ -666,6 +650,26 @@ void SimRobot::update(SSLProto::SSL_DetectionRobot *robot, float stddev_p,
     robot->set_orientation(atan2(dir.y(), dir.x()) + m_rng->normal(stddev_phi));
 
     m_lastSendTime = time;
+}
+
+bool SimRobot::touchesBall(SimBall *ball) const {
+    int numManifolds      = m_world->getDispatcher()->getNumManifolds();
+    for (int i = 0; i < numManifolds; ++i)
+    {
+        btPersistentManifold *contactManifold =
+                m_world->getDispatcher()->getManifoldByIndexInternal(i);
+        btCollisionObject *objectA = (btCollisionObject *)(contactManifold->getBody0());
+        btCollisionObject *objectB = (btCollisionObject *)(contactManifold->getBody1());
+        if ((objectA == m_dribblerBody && objectB == ball->body()) ||
+            (objectA == ball->body() && objectB == m_dribblerBody) ||
+            (objectA == m_body && objectB == ball->body()) ||
+            (objectA == ball->body() && objectB == m_body))
+        {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 void SimRobot::update(world::SimRobot *robot, SimBall *ball) const

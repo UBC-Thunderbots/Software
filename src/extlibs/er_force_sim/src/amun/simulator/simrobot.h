@@ -85,8 +85,10 @@ class camun::simulator::SimRobot : public QObject
     {
         return m_specs;
     }
+    bool touchesBall(SimBall *ball) const;
 
-   private:
+
+private:
     btVector3 relativeBallSpeed(SimBall *ball) const;
     float bound(float acceleration, float oldSpeed, float speedupLimit,
                 float brakeLimit) const;
@@ -127,6 +129,7 @@ class camun::simulator::SimRobot : public QObject
     bool m_perfectDribbler = false;
 
     qint64 m_lastSendTime = 0;
+
 };
 
 #endif  // SIMROBOT_H

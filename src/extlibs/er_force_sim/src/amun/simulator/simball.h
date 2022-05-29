@@ -68,7 +68,7 @@ class camun::simulator::SimBall : public QObject
     void sendSSLSimError(const SSLSimError &error, ErrorSource s);
 
    public:
-    void begin(double time_s);
+    void begin(double time_s, bool robotCollision);
     bool update(SSLProto::SSL_DetectionBall *ball, float stddev, float stddevArea,
                 const btVector3 &cameraPosition, bool enableInvisibleBall,
                 float visibilityThreshold, btVector3 positionOffset);
@@ -99,6 +99,7 @@ private:
     btMotionState *m_motionState;
     sslsim::TeleportBall m_move;
     double rolling_speed = -1;
+    double last_ground_speed = 0;
     bool rollWhenPossible = false;
 
 };
