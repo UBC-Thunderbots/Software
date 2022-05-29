@@ -39,19 +39,11 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Tactic::get(
                         !last_execution_robot.has_value() ||
                             last_execution_robot.value() != robot.id());
 
-        if (primitive)
-        {
-            primitive_set->mutable_robot_primitives()->insert(
-                google::protobuf::MapPair(robot.id(), *primitive));
-        }
-        else
-        {
-            // Defaulting to setting a stop primitive with cost 0;
-            // triggered if the tactic fsm action doesn't set a primitive or if the update
-            // doesn't match any transition in the tactic fsm
-            primitive_set->mutable_robot_primitives()->insert(
-                google::protobuf::MapPair(robot.id(), *createStopPrimitive(false, 0.0)));
-        }
+        CHECK(static_cast<bool>(primitive))
+            << "Primitive for " << objectTypeName(*this) << " in state " << getFSMState()
+            << " was not set" << std::endl;
+        primitive_set->mutable_robot_primitives()->insert(
+            google::protobuf::MapPair(robot.id(), *primitive));
     }
     return primitive_set;
 }
