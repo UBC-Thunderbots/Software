@@ -32,7 +32,7 @@
     - [Debugging from the Command line](#debugging-from-the-command-line)
   - [Profiling](#profiling)
   - [Building for Jetson Nano](#building-for-jetson-nano)
-  - [Deploying Robot Software to the Jetson Nano ](#deploying-to-jetson-nano)
+  - [Deploying Robot Software to the Jetson Nano](#deploying-to-jetson-nano)
   - [Setting up Virtual Robocup 2021](#setting-up-virtual-robocup-2021)
     - [Setting up the SSL Simulation Environment](#setting-up-the-ssl-simulation-environment)
     - [Pushing a Dockerfile to dockerhub](#pushing-a-dockerfile-to-dockerhub)
@@ -230,7 +230,7 @@ To build for the Jetson Nano, build the target with the `--cpu=jetson_nano` flag
 
 ## Deploying to Jetson Nano 
 
-We use ansible to automatically update software running on the Jetson Nano. [See these instructions.](../src/software/jetson_nano/ansible/README.md) 
+We use ansible to automatically update software running on the Jetson Nano. [See these instructions.](/src/software/jetson_nano/ansible/README.md) 
 
 ## Setting up Virtual Robocup 2021
 
