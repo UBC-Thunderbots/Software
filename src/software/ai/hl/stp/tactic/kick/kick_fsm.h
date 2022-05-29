@@ -21,7 +21,7 @@ struct KickFSM
     DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
     /**
-     * Action that updates the MovePrimitive
+     * Action that updates the KickPrimitive
      *
      * @param event KickFSM::Update event
      */
@@ -64,6 +64,7 @@ struct KickFSM
             *GetBehindBallFSM_S + Update_E / updateGetBehindBall_A,
             GetBehindBallFSM_S                                    = KickState_S,
             KickState_S + Update_E[!ballChicked_G] / updateKick_A = KickState_S,
-            KickState_S + Update_E[ballChicked_G]                 = X);
+            KickState_S + Update_E[ballChicked_G] / SET_STOP_PRIMITIVE_ACTION = X,
+            X + Update_E / SET_STOP_PRIMITIVE_ACTION                          = X);
     }
 };
