@@ -77,38 +77,92 @@ void SimBall::begin(double time_s, bool robotCollision)
     const btVector3 velocity = m_body->getLinearVelocity();
     if (p.z() < BALL_RADIUS * 1.1 * SIMULATOR_SCALE)
     {  // ball is on the ground
-        if (velocity.length() < 0.01 * SIMULATOR_SCALE)
-        {
-            // stop the ball if it is really slow
-            // -> the real ball snaps to a dimple
-            m_body->setLinearVelocity(btVector3(0, 0, 0));
-            rollWhenPossible = false;
-            m_body->setFriction(BALL_SLIDING_FRICTION);
-            std::cout<<"stopping ball"<<std::endl;
-        } else if(robotCollision){
-            // temporarily return friction to normal value so collision physics works out
-            m_body->setFriction(BALL_SLIDING_FRICTION);
-            std::cout<<"robot collission detected "<<std::endl;
-        } else if(velocity.length() > last_ground_speed * SIMULATOR_SCALE){
-            rolling_speed = FRICTION_TRANSITION_FACTOR * velocity.length() / SIMULATOR_SCALE;
-            m_body->setFriction(BALL_SLIDING_FRICTION);
-            rollWhenPossible = true;
-            std::cout<<"setting rolling speed v = "<<rolling_speed<<std::endl;
-        }
-        else if (rollWhenPossible && velocity.length() < rolling_speed * SIMULATOR_SCALE)
-        {
-            // just apply rolling friction, normal friction is somehow handled by
-            // bullet
-            const btScalar rollingDeceleration = BALL_ROLLING_FRICTION_DECELERATION;
-            btVector3 force(velocity.x(), velocity.y(), 0.0f);
-            force.safeNormalize();
-            m_body->applyCentralImpulse(-force * rollingDeceleration * SIMULATOR_SCALE *
-                                        BALL_MASS * SUB_TIMESTEP);
+        BallState nextState = currentBallState;
+        bool isStationary = velocity.length() < 0.01 * SIMULATOR_SCALE;
+        bool shouldRoll = velocity.length() < rolling_speed * SIMULATOR_SCALE;
+        switch (currentBallState){
+            case STATIONARY:
+                nextState = (robotCollision) ? ROBOT_COLLISION : (isStationary) ? STATIONARY : SLIDING;
+                break;
+            case ROBOT_COLLISION:
+                nextState = (robotCollision) ? ROBOT_COLLISION : (isStationary) ? STATIONARY : SLIDING;
+                break;
+            case SLIDING:
+                nextState = (robotCollision) ? ROBOT_COLLISION : (isStationary) ? STATIONARY : (shouldRoll) ? ROLLING : SLIDING;
+                break;
+            case ROLLING:
+                nextState = (robotCollision) ? ROBOT_COLLISION : (isStationary) ? STATIONARY : ROLLING;
+                break;
 
-            m_body->setFriction(0.0);
-            std::cout<<"applying rolling frictino at s = "<<velocity.y()<<" , p = "<<p.y()<<" , step = "<<time_s<<std::endl;
         }
-        last_ground_speed = (robotCollision) ? last_ground_speed : velocity.length() / SIMULATOR_SCALE;
+
+        currentBallState = nextState;
+
+        switch (currentBallState){
+            case STATIONARY:
+                m_body->setLinearVelocity(btVector3(0, 0, 0));
+                //std::cout<<"STATIONARY"<<std::endl;
+                m_body->setFriction(BALL_SLIDING_FRICTION);
+                setTransitionSpeed = true;
+                break;
+            case ROBOT_COLLISION:
+                m_body->setFriction(BALL_SLIDING_FRICTION);
+                setTransitionSpeed = true;
+                break;
+            case SLIDING:
+                m_body->setFriction(BALL_SLIDING_FRICTION);
+                rolling_speed = (setTransitionSpeed) ? FRICTION_TRANSITION_FACTOR * velocity.length() / SIMULATOR_SCALE : rolling_speed;
+                setTransitionSpeed = false;
+                break;
+            case ROLLING:
+
+                // just apply rolling friction, normal friction is somehow handled by
+                // bullet
+                const btScalar rollingDeceleration = BALL_ROLLING_FRICTION_DECELERATION;
+                btVector3 force(velocity.x(), velocity.y(), 0.0f);
+                force.safeNormalize();
+                m_body->applyCentralImpulse(-force * rollingDeceleration * SIMULATOR_SCALE *
+                                            BALL_MASS * SUB_TIMESTEP);
+
+                m_body->setFriction(0.0);
+                setTransitionSpeed = false;
+                break;
+        }
+
+          std::cout<<"curr state = "<<currentBallState<<" , v = "<<velocity.length()<<std::endl;
+
+//        if (velocity.length() < 0.01 * SIMULATOR_SCALE)
+//        {
+//            // stop the ball if it is really slow
+//            // -> the real ball snaps to a dimple
+//            m_body->setLinearVelocity(btVector3(0, 0, 0));
+//            rollWhenPossible = false;
+//            m_body->setFriction(BALL_SLIDING_FRICTION);
+//            std::cout<<"stopping ball"<<std::endl;
+//        } else if(robotCollision){
+//            // temporarily return friction to normal value so collision physics works out
+//            m_body->setFriction(BALL_SLIDING_FRICTION);
+//            std::cout<<"robot collission detected "<<std::endl;
+//        } else if(velocity.length() > last_ground_speed * SIMULATOR_SCALE){
+//            rolling_speed = FRICTION_TRANSITION_FACTOR * velocity.length() / SIMULATOR_SCALE;
+//            m_body->setFriction(BALL_SLIDING_FRICTION);
+//            rollWhenPossible = true;
+//            std::cout<<"setting rolling speed v = "<<rolling_speed<<std::endl;
+//        }
+//        else if (rollWhenPossible && velocity.length() < rolling_speed * SIMULATOR_SCALE)
+//        {
+//            // just apply rolling friction, normal friction is somehow handled by
+//            // bullet
+//            const btScalar rollingDeceleration = BALL_ROLLING_FRICTION_DECELERATION;
+//            btVector3 force(velocity.x(), velocity.y(), 0.0f);
+//            force.safeNormalize();
+//            m_body->applyCentralImpulse(-force * rollingDeceleration * SIMULATOR_SCALE *
+//                                        BALL_MASS * SUB_TIMESTEP);
+//
+//            m_body->setFriction(0.0);
+//            std::cout<<"applying rolling frictino at s = "<<velocity.y()<<" , p = "<<p.y()<<" , step = "<<time_s<<std::endl;
+//        }
+//        last_ground_speed = (robotCollision) ? last_ground_speed : velocity.length() / SIMULATOR_SCALE;
     }
 
     bool moveCommand           = false;
@@ -200,6 +254,11 @@ void SimBall::begin(double time_s, bool robotCollision)
 //                rolling_speed = linVel.length() * FRICTION_TRANSITION_FACTOR;
 //                rollWhenPossible = true;
 //                std::cout<<"sliding friction set, roll_s set to "<<rolling_speed<<std::endl;
+
+                //override ballState
+                currentBallState = SLIDING;
+                rolling_speed = linVel.length() * FRICTION_TRANSITION_FACTOR;
+                setTransitionSpeed = false;
 
                 m_body->setAngularVelocity(btVector3(0, 0, 0));
             }

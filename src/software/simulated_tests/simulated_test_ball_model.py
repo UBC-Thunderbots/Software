@@ -10,11 +10,19 @@ from software.simulated_tests.ball_moves_forward import *
 from software.simulated_tests.friendly_has_ball_possession import *
 from software.simulated_tests.ball_speed_threshold import *
 from software.simulated_tests.robot_speed_threshold import *
+from software.simulated_tests.ball_stops_in_region import *
 from software.simulated_tests.excessive_dribbling import *
 from software.simulated_tests.simulated_test_fixture import simulated_test_runner
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
 from proto.geometry_pb2 import Point, Angle
+
+from software.simulated_tests.validation import (
+    Validation,
+    create_validation_geometry,
+    create_validation_types,
+)
+
 
 # the friction model currently used in the simulator
 
@@ -99,7 +107,7 @@ def test_simulator_move_ball(
     # Eventually Validation
     eventually_validation_sequence_set = [
         [
-            BallEntersRegion([tbots.Circle(ball_expected_position, 0.1)]),
+            BallEventuallyStopsInRegion([tbots.Circle(ball_expected_position, 0.1)]),
         ]
     ]
 
@@ -109,11 +117,18 @@ def test_simulator_move_ball(
         always_validation_sequence_set=always_validation_sequence_set,
     )
 
+# class BallEventuallyStopsInRegion(BallEventuallyEntersRegion):
+#     def __init__(self, regions=None):
+#         super(eventuallyAlwaysBallEntersRegion, self).__init__(regions)
+#
+#     def get_validation_status(self, world) -> ValidationStatus:
+#         return super(eventuallyAlwaysBallEntersRegion, self).get_validation_status(world)
+
 def test_simulator_kick_ball(
         simulated_test_runner
 ):
 
-    ball_initial_position = tbots.Point(-3.5, 0)
+    ball_initial_position = tbots.Point(-2.5, 0)
     kick_velocity = tbots.Vector(2, 0)
 
     # rob_pos = tbots.Point(ball_initial_position.x() -0.1, ball_initial_position.y())
@@ -171,9 +186,10 @@ def test_simulator_kick_ball(
     ]
 
     # Eventually Validation
+    # use larger error margin because we cant account for robot-ball collision impact
     eventually_validation_sequence_set = [
         [
-            BallEntersRegion([tbots.Circle(ball_expected_position, 0.1)]),
+            BallEventuallyStopsInRegion([tbots.Circle(ball_expected_position, 0.5)]),
         ]
     ]
 
@@ -183,7 +199,7 @@ def test_simulator_kick_ball(
         always_validation_sequence_set=always_validation_sequence_set,
     )
 
-@pytest.mark.skip(reason="no way of currently testing this")
+#@pytest.mark.skip(reason="no way of currently testing this")
 def test_ball_robot_collision(simulated_test_runner):
 
     ball_initial_position = tbots.Field.createSSLDivisionBField().centerPoint()
@@ -250,7 +266,7 @@ def test_ball_robot_collision(simulated_test_runner):
     # Eventually Validation
     eventually_validation_sequence_set = [
         [
-            BallEntersRegion([tbots.Circle(robot_position, distance_from_robot)]),
+            BallEventuallyStopsInRegion([tbots.Circle(robot_position, distance_from_robot)]),
         ]
     ]
 

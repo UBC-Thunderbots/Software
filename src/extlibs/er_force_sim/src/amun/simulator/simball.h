@@ -52,6 +52,7 @@ namespace camun
     {
         class SimBall;
         enum class ErrorSource;
+        enum BallState {STATIONARY, ROBOT_COLLISION, SLIDING, ROLLING};
     }  // namespace simulator
 }  // namespace camun
 
@@ -101,6 +102,8 @@ private:
     double rolling_speed = -1;
     double last_ground_speed = 0;
     bool rollWhenPossible = false;
+    bool setTransitionSpeed = true;
+    BallState currentBallState = STATIONARY;
 
 };
 

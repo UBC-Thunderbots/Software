@@ -76,6 +76,7 @@ py_library(
         "ball_enters_region.py",
         "ball_moves_forward.py",
         "ball_speed_threshold.py",
+        "ball_stops_in_region.py",
         "excessive_dribbling.py",
         "friendly_has_ball_possession.py",
         "robot_enters_region.py",
