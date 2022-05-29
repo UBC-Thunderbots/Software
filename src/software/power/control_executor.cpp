@@ -45,7 +45,8 @@ void ControlExecutor::execute(const TbotsProto_PowerControl& control)
                     charger->setChargeDoneCallbackOnce(&chicker->autokick);
                     if (control.geneva.angle_deg != geneva->getCurrentAngle())
                     {
-                        geneva->setAngle(control.geneva.angle_deg, &charger->chargeCapacitors);
+                        geneva->setAngle(control.geneva.angle_deg,
+                                         &charger->chargeCapacitors);
                     }
                     else
                     {

@@ -24,11 +24,13 @@ void Charger::chargeDone()
     }
 }
 
-void Charger::chargeCapacitors() {
+void Charger::chargeCapacitors()
+{
     digitalWrite(CHRG, HIGH);
 }
 
-void Charger::dischargeCapacitors() {
+void Charger::dischargeCapacitors()
+{
     digitalWrite(CHRG, LOW);
 }
 
