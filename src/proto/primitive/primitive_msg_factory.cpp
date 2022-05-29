@@ -14,7 +14,7 @@ std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
 {
     auto move_primitive_msg = std::make_unique<TbotsProto::Primitive>();
 
-    double cost = motion_control.normalized_path_length();
+    auto cost = motion_control.normalized_path_length();
     if (cost_override.has_value())
     {
         cost = cost_override.value();
@@ -55,15 +55,8 @@ std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
     return move_primitive_msg;
 }
 
-std::unique_ptr<TbotsProto::Primitive> createStopPrimitive(
-    bool coast, std::optional<double> cost_override)
+std::unique_ptr<TbotsProto::Primitive> createStopPrimitive(bool coast)
 {
-    double cost = 1.0;
-    if (cost_override.has_value())
-    {
-        cost = cost_override.value();
-    }
-
     auto stop_primitive_msg = std::make_unique<TbotsProto::Primitive>();
 
     if (coast)
@@ -77,7 +70,7 @@ std::unique_ptr<TbotsProto::Primitive> createStopPrimitive(
             TbotsProto::StopPrimitive::BRAKE);
     }
 
-    stop_primitive_msg->set_cost(cost);
+    stop_primitive_msg->set_cost(1.0);
 
     return stop_primitive_msg;
 }
