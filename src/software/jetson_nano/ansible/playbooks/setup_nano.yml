@@ -25,7 +25,7 @@
 
         - name: Run Jetson Clocks
           become: true
-          become_method: su
+          become_method: sudo
           shell: /usr/bin/jetson_clocks
 
         - name: Sync Setup Script
@@ -39,11 +39,11 @@
             recursive: yes
             copy_links: yes
 
-        # output of each nano streamed to that Nano's /tmp/setup.log
-        - name: run the setup script
+        # Output of each nano streamed to that Nano's /tmp/setup.log
+        - name: Run the setup script, this will take a while
           become_method: sudo
           become: true
-          command: bash /home/{{ ansible_user }}/setup_nano.sh >& /tmp/setup.log
+          command: '/home/{{ ansible_user }}/setup_nano.sh >& /tmp/setup.log'
           register: result
           tags:
             - runScript
@@ -60,11 +60,21 @@
     - name: Run systemd setup
       tags: systemd
       block:
+        - name: Delete everything on ~/
+          become_method: sudo
+          become: true
+          command: 'sudo rm -rf ~/thunderbots_binaries'
+          register: result
+          tags:
+            - runScript
 
-        - name: sync binaries to the nano
+        - name: Sync binaries to the nano
           with_items:
-            - ../../display
-            - ../../broadcasts
+            # Python Binaries
+            # its important that we copy everything in the python folders
+            - ../../display/robot_ui.zip
+            - ../../broadcasts/robot_broadcast_sender.zip
+            # C++ Binaries
             - ../../thunderloop_main
           loop_control:
             loop_var: binary_path
@@ -76,7 +86,15 @@
           tags:
             - syncBinaries
 
-        - name: sync all systemd files
+        - name: Unzipping python binaries
+          command: 'unzip ~/thunderbots_binaries/*.zip -o ~/thunderbots_binaries'
+          register: result
+          tags:
+            - runScript
+          args:
+            chdir: ~/
+
+        - name: Sync all systemd files
           become_method: sudo
           become: true
           tags:
@@ -87,7 +105,7 @@
             dest: /etc/systemd/system
             copy_links: yes
 
-          #NOTE: "Enabling systems" means they will start on boot
+          # NOTE: "Enabling systems" means they will start on boot
         - name: Enable system services
           become: true
           become_method: sudo
@@ -95,7 +113,8 @@
             - thunderbots
             - thunderloop
             - display
-            - announcement
+            - wifi_announcement
+            - ethernet_announcement
           loop_control:
             loop_var: service_name
           ansible.builtin.systemd:
@@ -106,25 +125,17 @@
           tags:
             - enableSystemd
 
-        - name: Reboot
+        - name: Reload Systemd Files
           become: true
-          become_user: root
           become_method: sudo
-          register: res
+          command: 'systemctl daemon-reload'
+          register: result
           tags:
-            - reboot
-          reboot:
-            msg: "Reboot initiated by Ansible"
-            connect_timeout: 20
-            reboot_timeout: 1200
-            pre_reboot_delay: 0
-            post_reboot_delay: 10
-            test_command: whoami
+            - runScript
 
-        - name: success msg
+        - name: Success Msg
           debug:
             msg:
               - "[Robot ID = {{ inventory_hostname }}]"
               - "Systemd Setup run successfully"
-
 

@@ -308,12 +308,6 @@ pip_install(
 )
 
 pip_install(
-    name = "display_deps",
-    python_interpreter = "/opt/tbotspython/bin/python",
-    requirements = "//software/jetson_nano/display:requirements.txt",
-)
-
-pip_install(
     name = "thunderscope_deps",
     python_interpreter = "/opt/tbotspython/bin/python",
     requirements = "//software/thunderscope:requirements.txt",

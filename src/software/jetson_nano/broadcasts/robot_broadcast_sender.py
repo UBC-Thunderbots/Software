@@ -68,7 +68,7 @@ def main():
 
     print("Starting broadcast..")
     while True:
-        sender.sendto(announcement.SerializeToString(), ("<broadcast>", args["port"]))
+        sender.sendto(announcement.SerializeToString(), ("<broadcast>", int(args["port"])))
         print("Sent announcement: ", announcement)
         time.sleep(BROADCAST_INTERVAL_SECONDS)
 

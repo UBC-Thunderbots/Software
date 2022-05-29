@@ -1,0 +1,22 @@
+[Unit]
+Description=announcement service
+
+# When systemd stops or restarts the thunderbots.service, the action is propagated to this unit
+PartOf=thunderbots.service
+
+# At startup, start this unit after the thunderbots.service start
+After=thunderbots.service thunderloop.service network.target network-online.target
+
+# Allow restarts at 10Hz
+StartLimitIntervalSec=1
+StartLimitBurst=10
+
+[Service]
+ExecStart=/home/robot/thunderbots_binaries/broadcasts/robot_broadcast_sender -p 45000 -if eth0
+
+# Always restart on crash
+Restart=always
+
+[Install]
+# This unit should be run at startup
+WantedBy=multi-user.target
