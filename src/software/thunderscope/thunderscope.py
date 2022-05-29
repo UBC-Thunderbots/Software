@@ -422,12 +422,12 @@ class Thunderscope(object):
         field.add_layer("Passing", passing)
         field.add_layer("Simulator", sim_state)
         hrvo_sim_states = []
+        # Add HRVO layers to field widget and have them hidden on startup
         for robot_id in range(6):
             hrvo_sim_state = hrvo_layer.HRVOLayer(
                 robot_id, self.visualization_buffer_size
             )
             hrvo_sim_states.append(hrvo_sim_state)
-            # Add HRVO layers to field widget, and have them hidden on startup
             field.add_layer(f"HRVO {robot_id}", hrvo_sim_state, False)
 
         # Register observers
