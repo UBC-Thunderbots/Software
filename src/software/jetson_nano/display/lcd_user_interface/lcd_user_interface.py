@@ -23,12 +23,12 @@ Pin Connections:
 """
 
 # Configuration for CS and DC pins (these are PiTFT defaults):
-CS_PIN = digitalio.DigitalInOut(board.D22)
+CS_PIN = digitalio.DigitalInOut(board.D23)
 DC_PIN = digitalio.DigitalInOut(board.D21)
 RESET_PIN = digitalio.DigitalInOut(board.D24)
 
-# Config for display baudrate to 20 MHz:
-BAUDRATE = 2000000
+# Config for display baudrate to 10 MHz:
+BAUDRATE = 1000000
 
 # Config the proper screen rotation
 ROTATION = 90
@@ -105,10 +105,3 @@ class LcdDisplay:
     def show(self):
         """ Display the image """
         self.disp.image(self.image)
-
-
-if __name__ == "__main__":
-    path_to_logo = "software/jetson_nano/display/lcd_user_interface/tbots.jpg"
-
-    display = LcdDisplay()
-    display.draw_image(path_to_logo)

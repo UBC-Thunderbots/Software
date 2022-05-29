@@ -1,6 +1,7 @@
 import time, redis
 import digitalio
 import board
+import sys
 from PIL import Image, ImageDraw, ImageOps
 import adafruit_rgb_display.st7735 as st7735
 
@@ -47,7 +48,7 @@ redis_keys = [
     "br wheel speed",
 ]
 
-PATH_TO_LOGO = "software/jetson_nano/display/lcd_user_interface/tbots.jpg"
+PATH_TO_LOGO = "/home/robot/thunderbots_binaries/bazel-out/host/bin/software/jetson_nano/display/robot_ui.runfiles/__main__/software/jetson_nano/display/lcd_user_interface/tbots.jpg"
 
 
 class RobotUi:
@@ -67,6 +68,7 @@ class RobotUi:
 
     def __init__(self):
 
+        sys.stdout.flush()
         # Initialize redis server and our redis dictionary
         self.redis_client = redis.Redis(
             host="localhost", port=constants.REDIS_PORT_NUMBER, db=0
@@ -77,6 +79,7 @@ class RobotUi:
         self.shutdown = False  # This flag will be used to stop polling redis
 
         # Draw Tbots logo on first boot
+        sys.stdout.flush()
         self.lcd_display = LcdDisplay()
         self.lcd_display.draw_image(PATH_TO_LOGO)
         self.curr_screen = "Home"
@@ -108,6 +111,7 @@ class RobotUi:
                         self.redis_client.get(action["redis key"]).decode("UTF-8"),
                     )
                 )
+                sys.stdout.flush()
 
         on_click()
 
@@ -162,20 +166,9 @@ if __name__ == "__main__":
     def start_polling(robot_ui):
         robot_ui.poll_redis()
 
-    # start redis server
-    cmd = "cd ../linux_configs/redis_config && sudo docker-compose up -d"
-    st, out = subprocess.getstatusoutput(cmd)
-    init_redis()
-
     robot_ui = RobotUi()
     thread = Thread(target=start_polling, args=(robot_ui,))
     thread.start()
 
-    print("Press any key to exit...")
-    input()
-    robot_ui.stop()
-    thread.join()
-
-    # stop redis server
-    cmd = "cd ../linux_configs/redis_config && sudo docker-compose down"
-    st, out = subprocess.getstatusoutput(cmd)
+    while True:
+        time.sleep(1)

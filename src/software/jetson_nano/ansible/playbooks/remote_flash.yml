@@ -46,9 +46,11 @@
           tags: always
 
         - name: Delete everything on ~/
+          file:
+            state: absent
+            path: /home/robot/thunderbots_binaries
           become_method: sudo
           become: true
-          command: 'sudo rm -rf ~/thunderbots_binaries'
           register: result
 
         - name: Sync Binaries
