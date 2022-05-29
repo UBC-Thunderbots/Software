@@ -1,5 +1,5 @@
 [Unit]
-Description=announcement service
+Description=Robot UI Software
 
 # When systemd stops or restarts the thunderbots.service, the action is propagated to this unit
 PartOf=thunderbots.service
@@ -8,10 +8,9 @@ PartOf=thunderbots.service
 After=thunderbots.service thunderloop.service network.target
 
 [Service]
-# todo: execute lcd ui (#2443)
-ExecStart=/home/robot/thunderbots_binaries/display/lcd_user_interface
+ExecStart=/opt/tbotspython/bin/python3 /home/robot/thunderbots_binaries/robot_ui
 
-#always restart on crash
+# Always restart on crash
 Restart=always
 
 [Install]

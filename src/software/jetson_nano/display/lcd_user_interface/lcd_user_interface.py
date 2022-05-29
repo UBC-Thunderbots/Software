@@ -13,7 +13,7 @@ Pin Connections:
         Pin 6  (GND)            Pin 1  (GND)
         Pin 1  (3.3V)           Pin 2  (VCC)
         Pin 18                  Pin 3  (Reset)
-        Pin 22                  Pin 4  (D/C) 
+        Pin 40                  Pin 4  (D/C) 
         N/C                     Pin 5  (CARD_CS)
         Pin 24 (CS)             Pin 6  (TFT_CS)
         Pin 19 (MOSI)           Pin 7  (MOSI)
@@ -23,12 +23,13 @@ Pin Connections:
 """
 
 # Configuration for CS and DC pins (these are PiTFT defaults):
-CS_PIN = digitalio.DigitalInOut(board.CE0)  # Pin 24
-DC_PIN = digitalio.DigitalInOut(board.D25)  # Pin 22
-RESET_PIN = digitalio.DigitalInOut(board.D24)  # Pin 18
+CS_PIN = digitalio.DigitalInOut(board.D22)
+DC_PIN = digitalio.DigitalInOut(board.D21)
+RESET_PIN = digitalio.DigitalInOut(board.D24)
 
-# Config for display baudrate to 4MHz:
-BAUDRATE = 400000
+# Config for display baudrate to 20 MHz:
+BAUDRATE = 2000000
+
 # Config the proper screen rotation
 ROTATION = 90
 
@@ -107,7 +108,7 @@ class LcdDisplay:
 
 
 if __name__ == "__main__":
-    # path_to_logo = "./imgs/tbots.jpg"
+    path_to_logo = "./imgs/tbots.jpg"
 
     display = LcdDisplay()
     display.draw_image(path_to_logo)

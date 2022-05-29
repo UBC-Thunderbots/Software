@@ -1,17 +1,15 @@
 #!/bin/bash
 
-
-# (sorted alphabetically)
 host_software_packages=(
     libjpeg8-dev
     libjpeg-dev
-    python3.8       # Python 3
+    python3.8      # Python 3
     python3.8-venv # Virtual Environment
+    python3.8-dev  # Python 3 Headers
     zlib1g-dev
 )
 
 sudo apt-get update
-
 sudo add-apt-repository -y ppa:deadsnakes/ppa
 
 if ! sudo apt-get install "${host_software_packages[@]}" -y ; then

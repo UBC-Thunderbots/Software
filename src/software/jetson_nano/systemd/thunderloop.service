@@ -10,7 +10,7 @@ After=thunderbots.service network.target
 [Service]
 ExecStart=/home/robot/thunderbots_binaries/thunderloop_main
 
-#always restart on crash
+# Always restart on crash
 Restart=always
 
 [Install]

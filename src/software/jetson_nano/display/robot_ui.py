@@ -4,7 +4,9 @@ import board
 from PIL import Image, ImageDraw, ImageOps
 import adafruit_rgb_display.st7735 as st7735
 
-from software.jetson_nano.display.lcd_user_interface.lcd_user_interface import LcdDisplay
+from software.jetson_nano.display.lcd_user_interface.lcd_user_interface import (
+    LcdDisplay,
+)
 from software.jetson_nano.display.rotary_encoder.rotary_encoder import RotaryEncoder
 from software.jetson_nano.display.screens.home_screen import HomeScreen
 from software.jetson_nano.display.screens.menu_screen import MenuScreen
@@ -104,6 +106,7 @@ class RobotUi:
                         self.redis_client.get(action["redis key"]).decode("UTF-8"),
                     )
                 )
+
         on_click()
 
         def on_clockwise_rotate():
