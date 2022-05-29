@@ -6,7 +6,8 @@
    all_services:
      - thunderloop
      - display
-     - announcement
+     - wifi_announcement
+     - ethernet_announcement
    all_actions:
      - stop
      - sync
@@ -22,15 +23,10 @@
         msg: "[Robot ID = {{ inventory_hostname }}]"
       tags: always
 
-    - name: extract services & actions from tags
+    - name: Extract services & actions from tags
       set_fact:
         services: "{{ all_services if ansible_run_tags | intersect(all_services)|length == 0 else ansible_run_tags | intersect(all_services) }}"
         actions: "{{ all_actions if ansible_run_tags|intersect(all_actions)|length == 0 else ansible_run_tags | intersect(all_actions)}}"
-      tags: always
-
-    - debug:
-        msg: "Performing the following actions: {{ actions }}
-        on the following services: {{ services }}"
       tags: always
 
     - name: Start Flash Process
@@ -54,13 +50,12 @@
           become: true
           command: 'sudo rm -rf ~/thunderbots_binaries'
           register: result
-          tags:
-            - runScript
 
-        - name: Sync binaries to the nano
+        - name: Sync Binaries
           with_items:
-            # Python Binaries
-            # its important that we copy everything in the python folders
+            - ../../display/robot_ui.zip
+            - ../../broadcasts/robot_broadcast_sender.zip
+            - ../../thunderloop_main
           loop_control:
             loop_var: binary_path
           ansible.posix.synchronize:
@@ -71,23 +66,9 @@
           tags:
             - syncBinaries
 
-        - name: Sync Binaries
-          ansible.posix.synchronize:
-            src: "{{ binary_paths[service_name] }}"
-            dest: ~/thunderbots_binaries/
-            recursive: yes
-            copy_links: yes
-          with_items: "{{ services }}"
-          loop_control:
-            loop_var: service_name
-          when: "'sync' in actions"
-          tags: always
-
         - name: Unzipping python binaries
           command: 'unzip ~/thunderbots_binaries/*.zip'
           register: result
-          tags:
-            - runScript
           args:
             chdir: ~/thunderbots_binaries
 
@@ -107,11 +88,16 @@
 
       # Rescue section only runs if any task in this block fails
       rescue:
-        - name: Error Recovery - Ensure Announcement Service is Running
+        - name: Error Recovery - Ensure Announcement Services are Running
           become: true
           become_method: sudo
           ansible.builtin.systemd:
-            name: announcement
+            name: wifi_announcement
+            masked: no
+            daemon_reload: yes
+            state: started
+          ansible.builtin.systemd:
+            name: ethernet_announcement
             masked: no
             daemon_reload: yes
             state: started

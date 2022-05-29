@@ -108,7 +108,7 @@ class LcdDisplay:
 
 
 if __name__ == "__main__":
-    path_to_logo = "./imgs/tbots.jpg"
+    path_to_logo = "software/jetson_nano/display/lcd_user_interface/tbots.jpg"
 
     display = LcdDisplay()
     display.draw_image(path_to_logo)

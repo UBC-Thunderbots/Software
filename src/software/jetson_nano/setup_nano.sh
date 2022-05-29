@@ -1,6 +1,9 @@
 #!/bin/bash
 
+set -ex
+
 host_software_packages=(
+    redis
     libjpeg8-dev
     libjpeg-dev
     python3.8      # Python 3

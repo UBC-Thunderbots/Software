@@ -47,6 +47,8 @@ redis_keys = [
     "br wheel speed",
 ]
 
+PATH_TO_LOGO = "software/jetson_nano/display/lcd_user_interface/tbots.jpg"
+
 
 class RobotUi:
     """
@@ -76,7 +78,7 @@ class RobotUi:
 
         # Draw Tbots logo on first boot
         self.lcd_display = LcdDisplay()
-        self.lcd_display.draw_image("./lcd_user_interface/imgs/tbots.jpg")
+        self.lcd_display.draw_image(PATH_TO_LOGO)
         self.curr_screen = "Home"
 
         # All of our screens

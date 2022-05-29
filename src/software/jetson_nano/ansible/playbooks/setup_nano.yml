@@ -8,11 +8,9 @@
     - name: Run basic setup
       tags: dependencies
       block:
-        - name: check internet connection
-          uri:
-            url: "https://google.com"
-            timeout: 30
-            status_code: 200
+        - name: Check Internet
+          ansible.netcommon.net_ping:
+            dest: "https://google.com"
 
         - name: enable passwordless sudo for rsync
           become: true
@@ -43,10 +41,8 @@
         - name: Running the setup script, this will take a while
           become_method: sudo
           become: true
-          command: 'sh -x /home/{{ ansible_user }}/setup_nano.sh >& /tmp/setup.log'
+          command: '/home/{{ ansible_user }}/setup_nano.sh >& /tmp/setup.log'
           register: result
-          tags:
-            - runScript
           args:
             chdir: ~/
 
@@ -60,6 +56,34 @@
     - name: Run systemd setup
       tags: systemd
       block:
+        - name: Delete everything on ~/
+          file:
+            state: absent
+            path: /home/robot/thunderbots_binaries
+          become_method: sudo
+          become: true
+          register: result
+
+        - name: Sync Binaries
+          with_items:
+            - ../../display/robot_ui.zip
+            - ../../broadcasts/robot_broadcast_sender.zip
+            - ../../thunderloop_main
+          loop_control:
+            loop_var: binary_path
+          ansible.posix.synchronize:
+            src: "{{ binary_path }}"
+            dest: ~/thunderbots_binaries/
+            recursive: yes
+            copy_links: yes
+          tags:
+            - syncBinaries
+
+        - name: Unzipping python binaries
+          command: 'unzip ~/thunderbots_binaries/*.zip'
+          register: result
+          args:
+            chdir: ~/thunderbots_binaries
 
         - name: Sync all systemd files
           become_method: sudo
@@ -68,7 +92,7 @@
             - syncSystemdFiles
           register: res
           ansible.posix.synchronize:
-            src: ../../systemd/
+            src: ../../linux_configs/systemd/
             dest: /etc/systemd/system
             copy_links: yes
 
@@ -94,13 +118,20 @@
           tags:
             - enableSystemd
 
-        - name: Reload Systemd Files
+        - name: Reboot
           become: true
+          become_user: root
           become_method: sudo
-          command: 'systemctl daemon-reload'
-          register: result
+          register: res
           tags:
-            - runScript
+            - reboot
+          reboot:
+            msg: "Reboot initiated by Ansible"
+            connect_timeout: 20
+            reboot_timeout: 1200
+            pre_reboot_delay: 0
+            post_reboot_delay: 10
+            test_command: whoami
 
         - name: Success Msg
           debug:

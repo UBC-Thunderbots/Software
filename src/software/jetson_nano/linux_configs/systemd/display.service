@@ -8,6 +8,7 @@ PartOf=thunderbots.service
 After=thunderbots.service thunderloop.service network.target
 
 [Service]
+Environment='PYTHONPATH=$PYTHONPATH:/home/robot/thunderbots_binaries/bazel-out/host/bin'
 ExecStart=/opt/tbotspython/bin/python3 /home/robot/thunderbots_binaries/bazel-out/host/bin/software/jetson_nano/display/robot_ui
 
 # Always restart on crash
