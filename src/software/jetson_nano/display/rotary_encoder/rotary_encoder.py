@@ -109,7 +109,6 @@ class RotaryEncoder:
 
     def start(self):
         """ Start listening to GPIO pins to trigger callback functions """
-        print("STARTED ROTARY")
 
         def on_rotation(channel):
             """ Update rotation state and call user defined callback functions after complete rotation """
@@ -117,10 +116,10 @@ class RotaryEncoder:
 
             if self.count // self.transitions_per_rotation != 0:
                 if self.dir == CLOCKWISE:
-                    print("ROTATION CLOCKWISE")
+                    print("rotary_encoder: clockwise rotation")
                     self.on_clockwise_rotate()
                 elif self.dir == COUNTERCLOCKWISE:
-                    print("ROTATION CLOCKWISE")
+                    print("rotary_encoder: counter clockwise rotation")
                     self.on_counterclockwise_rotate()
 
                 self.count = 0
