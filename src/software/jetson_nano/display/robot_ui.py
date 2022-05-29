@@ -153,7 +153,6 @@ class RobotUi:
 
 # For testing
 if __name__ == "__main__":
-    import subprocess
     from threading import Thread
 
     def init_redis():

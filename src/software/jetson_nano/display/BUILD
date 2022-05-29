@@ -25,7 +25,7 @@ py_library(
 
 genrule(
     name = "robot_ui_zip",
-    outs = ["robot_ui.zip"],
+    outs = ["robot_ui_zip.zip"],
     cmd = "zip -r $@ $(location :robot_ui)*",
     tools = [":robot_ui"],
 )

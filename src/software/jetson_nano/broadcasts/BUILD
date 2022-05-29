@@ -14,7 +14,7 @@ py_binary(
 
 genrule(
     name = "robot_broadcast_sender_zip",
-    outs = ["robot_broadcast_sender.zip"],
+    outs = ["robot_broadcast_sender_zip.zip"],
     cmd = "zip -r $@ $(location :robot_broadcast_sender)*",
     tools = [":robot_broadcast_sender"],
 )
