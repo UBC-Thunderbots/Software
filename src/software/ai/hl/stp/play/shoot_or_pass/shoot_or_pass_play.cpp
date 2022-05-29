@@ -25,5 +25,12 @@ void ShootOrPassPlay::updateTactics(const PlayUpdate &play_update)
     fsm.process_event(ShootOrPassPlayFSM::Update(control_params, play_update));
 }
 
+std::vector<std::string> ShootOrPassPlay::getState()
+{
+    std::vector<std::string> state;
+    state.emplace_back(objectTypeName(*this) + " - " + getCurrentFullStateName(fsm));
+    return state;
+}
+
 // Register this play in the genericFactory
 static TGenericFactory<std::string, Play, ShootOrPassPlay, AiConfig> factory;

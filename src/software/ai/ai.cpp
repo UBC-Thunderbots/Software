@@ -75,17 +75,21 @@ std::unique_ptr<TbotsProto::PrimitiveSet> AI::getPrimitives(const World& world)
 
 TbotsProto::PlayInfo AI::getPlayInfo() const
 {
-    std::string info_play_name      = objectTypeName(*current_play);
-    auto tactic_robot_id_assignment = current_play->getTacticRobotIdAssignment();
+    std::vector<std::string> play_state = current_play->getState();
+    auto tactic_robot_id_assignment     = current_play->getTacticRobotIdAssignment();
 
     if (static_cast<bool>(override_play))
     {
-        info_play_name             = objectTypeName(*override_play);
+        play_state                 = current_play->getState();
         tactic_robot_id_assignment = override_play->getTacticRobotIdAssignment();
     }
 
     TbotsProto::PlayInfo info;
-    info.mutable_play()->set_play_name(info_play_name);
+
+    for (const auto& state : play_state)
+    {
+        info.mutable_play()->add_play_state(state);
+    }
 
     for (const auto& [tactic, robot_id] : tactic_robot_id_assignment)
     {

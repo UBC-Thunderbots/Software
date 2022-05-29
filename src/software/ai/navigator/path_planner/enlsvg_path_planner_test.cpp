@@ -690,6 +690,40 @@ TEST_F(TestEnlsvgPathPlanner,
     TestUtil::checkPathDoesNotIntersectObstacle(path_points, obstacles);
 }
 
+TEST_F(TestEnlsvgPathPlanner, test_going_around_defense_area)
+{
+    Field field              = Field::createSSLDivisionAField();
+    Rectangle navigable_area = field.fieldBoundary();
+
+    Point start{4.13, -1.97}, dest{2.02, 1.96};
+
+    std::vector<Polygon> obstacle_polygons{
+        Rectangle(Point(3.018497, -1.481503), Point(4.8, 1.481503)),
+    };
+
+    std::vector<ObstaclePtr> obstacles = {
+        robot_navigation_obstacle_factory.createFromShape(
+            Rectangle(Point(3.018497, -1.481503), Point(4.8, 1.481503))),
+    };
+
+    EnlsvgPathPlanner planner =
+        EnlsvgPathPlanner(navigable_area, obstacles, field.boundaryMargin());
+    std::optional<Path> path = planner.findPath(start, dest);
+
+    ASSERT_TRUE(path != std::nullopt);
+
+    std::vector<Point> path_points = path->getKnots();
+
+    // Make sure the start and end points match
+    EXPECT_EQ(start, path->getStartPoint());
+    EXPECT_EQ(dest, path->getEndPoint());
+
+    // Make sure path does not exceed a bounding box
+    Rectangle bounding_box({1, -2.5}, {5, 5});
+    TestUtil::checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
+    TestUtil::checkPathDoesNotIntersectObstacle(path->getKnots(), obstacle_polygons);
+}
+
 TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_speed_test)
 {
     // This test does not assert anything. It prints how long it takes to path plan 121
