@@ -86,16 +86,11 @@ class ProtoConfigurationWidget(QWidget):
         """
         for param, change, data in changes:
             path = self.param_group.childPath(param)
-<<<<<<< HEAD
-
-=======
->>>>>>> parent of 70e1dae1... revert
             if path is not None:
                 child_name = ".".join(path)
             else:
                 child_name = param.name()
 
-<<<<<<< HEAD
             # We need to set the updated value, but its hard to differentiate
             # between strings and enums. So we need to try setting the data
             # as a enum first and then as a string. If both raise, then we
@@ -106,11 +101,6 @@ class ProtoConfigurationWidget(QWidget):
                 exec(f"self.proto_to_configure.{child_name} = {data}")
             except (TypeError, NameError):
                 exec(f"self.proto_to_configure.{child_name} = data")
-
-=======
-            exec(f"self.proto_to_configure.{child_name} = data")
->>>>>>> parent of 70e1dae1... revert
-            self.on_change_callback(child_name, data, self.proto_to_configure)
 
     @staticmethod
     def __create_int_parameter(key, value, descriptor):
