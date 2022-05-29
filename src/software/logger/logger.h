@@ -110,8 +110,8 @@ class LoggerSingleton
     }
 
     // levels is this vector are filtered out of the filtered log rotate sink
-    std::vector<LEVELS> filtered_level_filter = {DEBUG, VISUALIZE, INFO, ROBOT_STATUS};
-    std::vector<LEVELS> text_level_filter     = {VISUALIZE, ROBOT_STATUS};
+    std::vector<LEVELS> filtered_level_filter = {DEBUG, VISUALIZE, CSV, INFO, ROBOT_STATUS};
+    std::vector<LEVELS> text_level_filter     = {VISUALIZE, CSV, ROBOT_STATUS};
     const std::string filter_suffix           = "_filtered";
     const std::string text_suffix             = "_text";
     const std::string log_name                = "thunderbots";
