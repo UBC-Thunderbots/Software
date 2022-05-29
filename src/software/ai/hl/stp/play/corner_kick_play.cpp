@@ -13,10 +13,7 @@
 #include "software/util/generic_factory/generic_factory.h"
 #include "software/world/ball.h"
 
-CornerKickPlay::CornerKickPlay(std::shared_ptr<const AiConfig> config)
-    : Play(config, true)
-{
-}
+CornerKickPlay::CornerKickPlay(TbotsProto::AiConfig config) : Play(config, true) {}
 
 void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const World &world)
 {
@@ -72,7 +69,7 @@ Pass CornerKickPlay::setupPass(TacticCoroutine::push_type &yield, const World &w
         std::make_shared<const EighteenZonePitchDivision>(world.field());
 
     PassGenerator<EighteenZoneId> pass_generator(pitch_division,
-                                                 ai_config->getPassingConfig());
+                                                 ai_config.passing_config());
 
     auto pass_eval = pass_generator.generatePassEvaluation(world);
     PassWithRating best_pass_and_score_so_far = pass_eval.getBestPassOnField();
@@ -145,11 +142,12 @@ Pass CornerKickPlay::setupPass(TacticCoroutine::push_type &yield, const World &w
 
         Duration time_since_commit_stage_start =
             world.getMostRecentTimestamp() - commit_stage_start_time;
-        min_score = 1 - std::min(time_since_commit_stage_start.toSeconds() /
-                                     ai_config->getCornerKickPlayConfig()
-                                         ->getMaxTimeCommitToPassSeconds()
-                                         ->value(),
-                                 1.0);
+        min_score =
+            1 -
+            std::min(
+                time_since_commit_stage_start.toSeconds() /
+                    ai_config.corner_kick_play_config().max_time_commit_to_pass_seconds(),
+                1.0);
     } while (best_pass_and_score_so_far.rating < min_score);
 
     // Commit to a pass
@@ -173,4 +171,4 @@ void CornerKickPlay::updateAlignToBallTactic(
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, CornerKickPlay, AiConfig> factory;
+static TGenericFactory<std::string, Play, CornerKickPlay, TbotsProto::AiConfig> factory;

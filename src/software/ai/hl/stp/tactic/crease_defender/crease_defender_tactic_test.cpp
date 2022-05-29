@@ -23,6 +23,7 @@ class CreaseDefenderTacticTest
    protected:
     TbotsProto::FieldType field_type = TbotsProto::FieldType::DIV_B;
     Field field                      = Field::createField(field_type);
+    TbotsProto::AiConfig ai_config;
 };
 
 // TODO (#2512): Due to friction in ErForceSim, the ball does not reach defender
@@ -41,11 +42,9 @@ TEST_F(CreaseDefenderTacticTest, test_chip_ball)
          field.enemyDefenseArea().negXNegYCorner(),
          field.enemyDefenseArea().negXPosYCorner()});
 
-    auto robot_navigation_obstacle_config =
-        std::make_shared<RobotNavigationObstacleConfig>();
+    auto tactic = std::make_shared<CreaseDefenderTactic>(
+        ai_config.robot_navigation_obstacle_config());
 
-    auto tactic =
-        std::make_shared<CreaseDefenderTactic>(robot_navigation_obstacle_config);
     tactic->updateControlParams(enemy_threat_point, alignment);
     setTactic(0, tactic, {TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA});
 
@@ -228,11 +227,9 @@ TEST_P(CreaseDefenderTacticTest, crease_defender_test)
          field.enemyDefenseArea().negXNegYCorner(),
          field.enemyDefenseArea().negXPosYCorner()});
 
-    auto robot_navigation_obstacle_config =
-        std::make_shared<RobotNavigationObstacleConfig>();
+    auto tactic = std::make_shared<CreaseDefenderTactic>(
+        ai_config.robot_navigation_obstacle_config());
 
-    auto tactic =
-        std::make_shared<CreaseDefenderTactic>(robot_navigation_obstacle_config);
     tactic->updateControlParams(enemy_threat_point, alignment);
     setTactic(0, tactic, {TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA});
 

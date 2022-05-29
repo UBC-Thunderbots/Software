@@ -135,7 +135,6 @@ cc_library(
     hdrs = ["find_open_areas.h"],
     deps = [
         ":shot",
-        "//shared/parameter:cpp_configs",
         "//software/geom/algorithms",
         "//software/world",
     ],
@@ -204,7 +203,6 @@ cc_library(
     srcs = ["keep_away.cpp"],
     hdrs = ["keep_away.h"],
     deps = [
-        "//shared/parameter:cpp_configs",
         "//software/ai/passing:cost_functions",
         "//software/geom/algorithms",
         "//software/optimization:gradient_descent",
