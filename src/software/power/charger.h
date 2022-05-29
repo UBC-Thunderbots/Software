@@ -13,11 +13,11 @@ class Charger
      */
     Charger();
     /**
-     * Sets the charge mode with a given operation. Valid operations are LOW and HIGH.
+     * Sets the charge pin to either HIGH to charge or LOW to discharge given operation.
      *
-     * @param op operation to be set
      */
-    void setChargeMode(int op);
+    static void IRAM_ATTR chargeCapacitors();
+    void dischargeCapacitors();
     /**
      * Sets up a callback for when charging is done. This callback is only called once
      *

@@ -17,29 +17,22 @@ void ControlExecutor::execute(const TbotsProto_PowerControl& control)
             detachInterrupt(digitalPinToInterrupt(BREAK_BEAM_PIN));
             chicker->setKickSpeedMPerS(
                 control.chicker.chicker_command.kick_speed_m_per_s);
+            charger->setChargeDoneCallbackOnce(&chicker->kick);
             if (control.geneva.angle_deg != geneva->getCurrentAngle())
             {
-                geneva->setAngle(control.geneva.angle_deg, &chicker->kick);
+                geneva->setAngle(control.geneva.angle_deg, &charger->chargeCapacitors);
             }
             else
             {
-                charger->setChargeDoneCallbackOnce(&chicker->kick);
+                charger->chargeCapacitors();
             }
-            charger->setChargeMode(HIGH);
             break;
         case TbotsProto_PowerControl_ChickerControl_chip_distance_meters_tag:
             detachInterrupt(digitalPinToInterrupt(BREAK_BEAM_PIN));
             chicker->setChipDistanceMeters(
                 control.chicker.chicker_command.chip_distance_meters);
-            if (control.geneva.angle_deg != geneva->getCurrentAngle())
-            {
-                geneva->setAngle(control.geneva.angle_deg, &chicker->chip);
-            }
-            else
-            {
-                charger->setChargeDoneCallbackOnce(&chicker->chip);
-            }
-            charger->setChargeMode(HIGH);
+            charger->setChargeDoneCallbackOnce(&chicker->chip);
+            charger->chargeCapacitors();
             break;
         case TbotsProto_PowerControl_ChickerControl_auto_chip_or_kick_tag:
             detachInterrupt(digitalPinToInterrupt(BREAK_BEAM_PIN));
@@ -49,28 +42,21 @@ void ControlExecutor::execute(const TbotsProto_PowerControl& control)
                 case TbotsProto_AutoChipOrKick_autokick_speed_m_per_s_tag:
                     chicker->setKickSpeedMPerS(
                         control.chicker.chicker_command.kick_speed_m_per_s);
+                    charger->setChargeDoneCallbackOnce(&chicker->autokick);
                     if (control.geneva.angle_deg != geneva->getCurrentAngle())
                     {
-                        geneva->setAngle(control.geneva.angle_deg, &chicker->autokick);
+                        geneva->setAngle(control.geneva.angle_deg, &charger->chargeCapacitors);
                     }
                     else
                     {
-                        charger->setChargeDoneCallbackOnce(&chicker->autokick);
+                        charger->chargeCapacitors();
                     }
-                    charger->setChargeMode(HIGH);
                     break;
                 case TbotsProto_AutoChipOrKick_autochip_distance_meters_tag:
                     chicker->setChipDistanceMeters(
                         control.chicker.chicker_command.chip_distance_meters);
-                    if (control.geneva.angle_deg != geneva->getCurrentAngle())
-                    {
-                        geneva->setAngle(control.geneva.angle_deg, &chicker->autochip);
-                    }
-                    else
-                    {
-                        charger->setChargeDoneCallbackOnce(&chicker->autochip);
-                    }
-                    charger->setChargeMode(HIGH);
+                    charger->setChargeDoneCallbackOnce(&chicker->autochip);
+                    charger->chargeCapacitors();
                     break;
                 default:
                     break;
@@ -80,10 +66,10 @@ void ControlExecutor::execute(const TbotsProto_PowerControl& control)
             switch (control.charge_mode)
             {
                 case TbotsProto_PowerControl_ChargeMode_CHARGE:
-                    charger->setChargeMode(HIGH);
+                    charger->chargeCapacitors();
                     break;
                 case TbotsProto_PowerControl_ChargeMode_DISCHARGE:
-                    charger->setChargeMode(LOW);
+                    charger->dischargeCapacitors();
                     break;
                 case TbotsProto_PowerControl_ChargeMode_FLOAT:
                 default:

@@ -14,7 +14,7 @@ Chicker::Chicker()
     timerAttachInterrupt(timer, stopPulse, true);
 }
 
-void Chicker::autokick_isr()
+void Chicker::autoKickISR()
 {
     if (!breakbeam_tripped)
     {
@@ -23,7 +23,7 @@ void Chicker::autokick_isr()
     }
 }
 
-void Chicker::autochip_isr()
+void Chicker::autoChipISR()
 {
     if (!breakbeam_tripped)
     {
@@ -49,13 +49,13 @@ void Chicker::chip()
 void Chicker::autokick()
 {
     breakbeam_tripped = false;
-    attachInterrupt(digitalPinToInterrupt(BREAK_BEAM_PIN), Chicker::autokick_isr, RISING);
+    attachInterrupt(digitalPinToInterrupt(BREAK_BEAM_PIN), Chicker::autoKickISR, RISING);
 }
 
 void Chicker::autochip()
 {
     breakbeam_tripped = false;
-    attachInterrupt(digitalPinToInterrupt(BREAK_BEAM_PIN), Chicker::autochip_isr, RISING);
+    attachInterrupt(digitalPinToInterrupt(BREAK_BEAM_PIN), Chicker::autoChipISR, RISING);
 }
 
 void Chicker::setKickSpeedMPerS(float kick_speed_m_per_s)
@@ -70,14 +70,14 @@ void Chicker::setChipDistanceMeters(float chip_distance_meters)
 
 int Chicker::distanceToPulseWidth(float distance_meters)
 {
-    // TODO: map distance to duration by testing
+    // TODO(#2645): map distance to duration by testing
     // 1s = 1000000
     return 0;
 }
 
 int Chicker::speedToPulseWidth(float speed_m_per_s)
 {
-    // TODO: map speed to duration by testing
+    // TODO(#2645): map speed to duration by testing
     // 1s = 1000000
     return 0;
 }

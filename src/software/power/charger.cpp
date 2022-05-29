@@ -16,7 +16,7 @@ Charger::Charger()
 void Charger::chargeDone()
 {
     flyback_fault = digitalRead(FLYBACK_FAULT);
-    if (charge_done_callback)
+    if (charge_done_callback && !flyback_fault)
     {
         charge_done_callback();
         charge_done_callback = NULL;
@@ -24,9 +24,12 @@ void Charger::chargeDone()
     }
 }
 
-void Charger::setChargeMode(int op)
-{
-    digitalWrite(CHRG, op);
+void Charger::chargeCapacitors() {
+    digitalWrite(CHRG, HIGH);
+}
+
+void Charger::dischargeCapacitors() {
+    digitalWrite(CHRG, LOW);
 }
 
 void Charger::setChargeDoneCallbackOnce(void (*charge_done_callback)())

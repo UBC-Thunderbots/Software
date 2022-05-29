@@ -58,8 +58,8 @@ class Chicker
      * Isr called when the BREAK_BEAM_PIN is tripped. Performs a kick/chip action if the
      * break beam wasn't previously triggered
      */
-    static void IRAM_ATTR autokick_isr();
-    static void IRAM_ATTR autochip_isr();
+    static void IRAM_ATTR autoKickISR();
+    static void IRAM_ATTR autoChipISR();
     /**
      * Continuously called to bring CHIPPER_PIN/KICKER_PIN low.
      */
