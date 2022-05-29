@@ -86,6 +86,7 @@ class ProtoConfigurationWidget(QWidget):
         """
         for param, change, data in changes:
             path = self.param_group.childPath(param)
+
             if path is not None:
                 child_name = ".".join(path)
             else:
@@ -101,6 +102,8 @@ class ProtoConfigurationWidget(QWidget):
                 exec(f"self.proto_to_configure.{child_name} = {data}")
             except (TypeError, NameError):
                 exec(f"self.proto_to_configure.{child_name} = data")
+
+                self.on_change_callback(child_name, data, self.proto_to_configure)
 
     @staticmethod
     def __create_int_parameter(key, value, descriptor):
