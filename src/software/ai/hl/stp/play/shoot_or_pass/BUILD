@@ -15,8 +15,8 @@ cc_library(
         "shoot_or_pass_play_fsm.h",
     ],
     deps = [
+        "//proto/message_translation:tbots_protobuf",
         "//shared:constants",
-        "//shared/parameter:cpp_configs",
         "//software/ai/evaluation:calc_best_shot",
         "//software/ai/evaluation:possession",
         "//software/ai/hl/stp/play",

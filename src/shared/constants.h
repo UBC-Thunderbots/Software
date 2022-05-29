@@ -122,8 +122,8 @@ static const long ARDUINO_BAUD_RATE = 115200;
  */
 static const int ESTOP_MESSAGE_SIZE_BYTES = 1;
 
-static const unsigned char ESTOP_PLAY_MSG = 1;
-static const unsigned char ESTOP_STOP_MSG = 0;
+static const unsigned char ESTOP_PLAY_MSG = 0;
+static const unsigned char ESTOP_STOP_MSG = 1;
 
 // product and vendor id for Arduino Uno Rev3 (retrieved from
 // http://www.linux-usb.org/usb.ids )
@@ -134,3 +134,5 @@ static const char ARDUINO_PRODUCT_ID[ARDUINO_ID_LENGTH] = "0043";
 // Number of times the control loop should tick per trajectory element
 static const unsigned NUM_TICKS_PER_TRAJECTORY_ELEMENT = 4u;
 static const unsigned CONTROL_LOOP_HZ                  = 200u;
+
+static const unsigned NUM_GENEVA_ANGLES = 5;

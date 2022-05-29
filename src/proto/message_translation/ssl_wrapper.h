@@ -2,9 +2,9 @@
 
 #include <memory>
 
-#include "proto/messages_robocup_ssl_detection.pb.h"
-#include "proto/messages_robocup_ssl_geometry.pb.h"
-#include "proto/messages_robocup_ssl_wrapper.pb.h"
+#include "proto/ssl_vision_detection.pb.h"
+#include "proto/ssl_vision_geometry.pb.h"
+#include "proto/ssl_vision_wrapper.pb.h"
 #include "software/world/world.h"
 
 /**

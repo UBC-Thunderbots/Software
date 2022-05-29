@@ -1,6 +1,19 @@
 load("@rules_proto//proto:defs.bzl", "ProtoInfo")
 load("@bazel_tools//tools/cpp:toolchain_utils.bzl", "find_cpp_toolchain")
 
+# The relative filename of the header file.
+_FILENAME = "lib/{dirname}/{filename}"
+
+_PROTO_DIR = "{path}/proto"
+_OPTIONS_DIR = "{path}/generator/nanopb"
+
+# Command that copies the source to the destination.
+_COPY_COMMAND = "cp {source} {destination}"
+
+# Command that zips files recursively. It enters the output directory first so
+# that the zipped path starts at lib/.
+_ZIP_COMMAND = "cd {output_dir} && zip -qq -r -u {zip_filename} lib/"
+
 def _nanopb_proto_library_impl(ctx):
     # This is the folder we will place all our generation artifacts in
     #
@@ -108,13 +121,63 @@ def _nanopb_proto_library_impl(ctx):
             linking_contexts = nanopb_linking_contexts,
         )
 
-    return CcInfo(
-        compilation_context = compilation_context,
-        linking_context = linking_context,
+    # platformio_* bazel rules require a provider named transitive_zip_files and an output zip file
+    # these contain all files needed for compilation with platformio.
+    name = ctx.label.name
+    commands = []
+    inputs = all_proto_hdr_files + all_proto_src_files
+    outputs = []
+
+    for hdr_file in all_proto_hdr_files:
+        dir = _PROTO_DIR.format(path = name)
+        if "options.nanopb." in hdr_file.basename:
+            dir = _OPTIONS_DIR.format(path = name)
+        file = ctx.actions.declare_file(
+            _FILENAME.format(dirname = dir, filename = hdr_file.basename),
+        )
+        outputs.append(file)
+        commands.append(_COPY_COMMAND.format(
+            source = hdr_file.path,
+            destination = file.path,
+        ))
+
+    for src_file in all_proto_src_files:
+        dir = _PROTO_DIR.format(path = name)
+        if "options.nanopb." in src_file.basename:
+            dir = _OPTIONS_DIR.format(path = name)
+        file = ctx.actions.declare_file(
+            _FILENAME.format(dirname = dir, filename = src_file.basename),
+        )
+        outputs.append(file)
+        commands.append(_COPY_COMMAND.format(
+            source = src_file.path,
+            destination = file.path,
+        ))
+
+    outputs.append(ctx.outputs.zip)
+    commands.append(_ZIP_COMMAND.format(
+        output_dir = ctx.outputs.zip.dirname,
+        zip_filename = ctx.outputs.zip.basename,
+    ))
+    ctx.actions.run_shell(
+        inputs = inputs,
+        outputs = outputs,
+        command = "\n".join(commands),
+    )
+
+    return struct(
+        transitive_zip_files = depset([ctx.outputs.zip]),
+        providers = [CcInfo(
+            compilation_context = compilation_context,
+            linking_context = linking_context,
+        )],
     )
 
 nanopb_proto_library = rule(
     implementation = _nanopb_proto_library_impl,
+    outputs = {
+        "zip": "%{name}.zip",  #output needed to be included in platformio_library
+    },
     attrs = {
         "deps": attr.label_list(
             mandatory = True,

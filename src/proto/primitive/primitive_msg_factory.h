@@ -1,5 +1,7 @@
 #pragma once
 
+#include <optional>
+
 #include "proto/primitive.pb.h"
 #include "proto/primitive/primitive_types.h"
 #include "shared/constants.h"
@@ -21,14 +23,19 @@
  * @param max_allowed_speed_mode The mode of maximum speed allowed
  * @param target_spin_rev_per_s The target spin while moving in revolutions per second
  * @param robot_constants The robot constants
+ * @param cost_override optionally override the cost of the move primitive, defaults to
+ * the path length
  *
  * @return Pointer to Move Primitive Message
  */
 std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
-    const Point &dest, double final_speed_m_per_s, const Angle &final_angle,
-    TbotsProto::DribblerMode dribbler_mode, AutoChipOrKick auto_chip_or_kick,
-    TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode, double target_spin_rev_per_s,
-    RobotConstants_t robot_constants);
+    const TbotsProto::MotionControl& motion_control, const Angle& final_angle,
+    double final_speed, const TbotsProto::DribblerMode& dribbler_mode,
+    const TbotsProto::BallCollisionType& ball_collision_type,
+    const AutoChipOrKick& auto_chip_or_kick,
+    const TbotsProto::MaxAllowedSpeedMode& max_allowed_speed_mode,
+    double target_spin_rev_per_s, const RobotConstants_t& robot_constants,
+    std::optional<double> cost_override = std::nullopt);
 
 /**
  * Create a Stop Move Primitive Message
@@ -50,7 +57,8 @@ std::unique_ptr<TbotsProto::Primitive> createStopPrimitive(bool coast);
  * @return Pointer to the DirectControl Primitive
  */
 std::unique_ptr<TbotsProto::Primitive> createDirectControlPrimitive(
-    const Vector &velocity, AngularVelocity angular_velocity, double dribbler_rpm);
+    const Vector& velocity, AngularVelocity angular_velocity, double dribbler_rpm,
+    const TbotsProto::AutoChipOrKick& auto_chip_or_kick);
 
 
 

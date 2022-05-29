@@ -6,6 +6,7 @@
 #include "extlibs/hrvo/simulator.h"
 #include "proto/primitive/primitive_msg_factory.h"
 #include "shared/test_util/tbots_gtest_main.h"
+#include "software/test_util/test_util.h"
 
 const int SIMULATOR_FRAME_RATE = 30;
 
@@ -79,8 +80,10 @@ class HRVOTest : public ::testing::Test
                                                {}));
 
             TbotsProto::Primitive primitive = *createMovePrimitive(
-                dest, 0.0, Angle(), TbotsProto::DribblerMode::MAX_FORCE, AutoChipOrKick(),
-                TbotsProto::MaxAllowedSpeedMode(), 1.0, create2021RobotConstants());
+                TestUtil::createMotionControl(dest), Angle(), 0.0,
+                TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
+                AutoChipOrKick(), TbotsProto::MaxAllowedSpeedMode(), 1.0,
+                create2021RobotConstants());
             (*primitive_set.mutable_robot_primitives())[i] = primitive;
         }
         friendly_team.updateRobots(friendly_robots);
@@ -107,7 +110,7 @@ class HRVOTest : public ::testing::Test
         // The output is stored in the logging directory
         std::string out_file_name(
             ::testing::UnitTest::GetInstance()->current_test_info()->name());
-        std::string file_directory(TbotsGtestMain::logging_dir);
+        std::string file_directory(TbotsGtestMain::runtime_dir);
         if (file_directory.empty())
         {
             file_directory = "/tmp/";

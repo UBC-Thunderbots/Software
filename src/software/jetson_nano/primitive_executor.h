@@ -1,6 +1,7 @@
 #pragma once
 #include "extlibs/hrvo/simulator.h"
 #include "proto/primitive.pb.h"
+#include "proto/robot_status_msg.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
 #include "software/geom/vector.h"
 #include "software/world/world.h"
@@ -32,6 +33,13 @@ class PrimitiveExecutor
      * of)
      */
     void updateWorld(const TbotsProto::World& world_msg);
+
+    /**
+     * Update primitive executor with the local velocity
+     *
+     * @param local_velocity The local velocity
+     */
+    void updateLocalVelocity(Vector local_velocity);
 
     /**
      * Steps the current primitive and returns a direct control primitive with the
@@ -69,18 +77,6 @@ class PrimitiveExecutor
      */
     AngularVelocity getTargetAngularVelocity(
         const TbotsProto::MovePrimitive& move_primitive, const Angle& curr_orientation);
-
-    /*
-     * The AutoKickOrChip settings from the move primitive need to get copied over
-     * to the direct control primitive.
-     *
-     * TODO (#2340) Remove
-     *
-     * @param src The move primitive to copy from
-     * @param dest The direct primitive to copy to
-     */
-    void copyAutoChipOrKick(const TbotsProto::MovePrimitive& src,
-                            TbotsProto::DirectControlPrimitive* dest);
 
     TbotsProto::Primitive current_primitive_;
     RobotConstants_t robot_constants_;

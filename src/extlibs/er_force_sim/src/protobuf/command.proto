@@ -1,10 +1,10 @@
 syntax                  = "proto2";
 option cc_enable_arenas = true;
 
+import "proto/ssl_vision_geometry.proto";
 import "extlibs/er_force_sim/src/protobuf/world.proto";
 import "extlibs/er_force_sim/src/protobuf/robot.proto";
 import "extlibs/er_force_sim/src/protobuf/logfile.proto";
-import "proto/messages_robocup_ssl_geometry.proto";
 import "extlibs/er_force_sim/src/protobuf/ssl_simulation_control.proto";
 import "extlibs/er_force_sim/src/protobuf/ssl_simulation_custom_erforce_realism.proto";
 

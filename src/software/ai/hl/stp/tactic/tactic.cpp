@@ -1,11 +1,10 @@
 #include "software/ai/hl/stp/tactic/tactic.h"
 
-#include "software/ai/intent/stop_intent.h"
 #include "software/logger/logger.h"
 #include "software/util/typename/typename.h"
 
 Tactic::Tactic(const std::set<RobotCapability> &capability_reqs_)
-    : intent(), capability_reqs(capability_reqs_)
+    : last_execution_robot(std::nullopt), capability_reqs(capability_reqs_)
 {
 }
 
@@ -19,18 +18,37 @@ std::set<RobotCapability> &Tactic::mutableRobotCapabilityRequirements()
     return capability_reqs;
 }
 
-std::unique_ptr<Intent> Tactic::get(const Robot &robot, const World &world)
+void Tactic::setLastExecutionRobot(std::optional<RobotId> last_execution_robot)
 {
-    updateIntent(TacticUpdate(robot, world, [this](std::unique_ptr<Intent> new_intent) {
-        intent = std::move(new_intent);
-    }));
+    this->last_execution_robot = last_execution_robot;
+}
 
-    if (intent)
+std::unique_ptr<TbotsProto::PrimitiveSet> Tactic::get(
+    const World &world, CreateMotionControl create_motion_control)
+{
+    auto primitive_set = std::make_unique<TbotsProto::PrimitiveSet>();
+    for (const auto &robot : world.friendlyTeam().getAllRobots())
     {
-        return std::move(intent);
+        primitive.reset();
+        updatePrimitive(TacticUpdate(
+                            robot, world,
+                            [this](std::unique_ptr<TbotsProto::Primitive> new_primitive) {
+                                primitive = std::move(new_primitive);
+                            },
+                            create_motion_control),
+                        !last_execution_robot.has_value() ||
+                            last_execution_robot.value() != robot.id());
+
+        if (primitive)
+        {
+            primitive_set->mutable_robot_primitives()->insert(
+                google::protobuf::MapPair(robot.id(), *primitive));
+        }
+        else
+        {
+            primitive_set->mutable_robot_primitives()->insert(
+                google::protobuf::MapPair(robot.id(), *createStopPrimitive(false)));
+        }
     }
-    else
-    {
-        return std::make_unique<StopIntent>(robot.id(), false);
-    }
+    return primitive_set;
 }

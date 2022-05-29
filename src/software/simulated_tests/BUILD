@@ -1,40 +1,14 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "simulated_test_fixture_cpp",
-    testonly = True,
-    srcs = ["simulated_test_fixture.cpp"],
-    hdrs = ["simulated_test_fixture.h"],
-    deps = [
-        "//software/gui/drawing:navigator",
-        "//software/gui/full_system:threaded_full_system_gui",
-        "//software/logger",
-        "//proto/message_translation:primitive_google_to_nanopb_converter",
-        "//proto/message_translation:tbots_protobuf",
-        "//software/sensor_fusion",
-        "//software/simulated_tests/validation:non_terminating_function_validator",
-        "//software/simulated_tests/validation:terminating_function_validator",
-        "//software/simulation:simulator",
-        "//software/test_util",
-        "//software/time:duration",
-        "//proto/logging:proto_logger",
-        "//shared/test_util:tbots_gtest_main",
-        # TODO (#1889) Remove this dep after optional params are implemented
-        "//software/ai/hl/stp/play:halt_play",
-    ],
-)
-
-cc_library(
     name = "simulated_er_force_sim_test_fixture",
     testonly = True,
     srcs = ["simulated_er_force_sim_test_fixture.cpp"],
     hdrs = ["simulated_er_force_sim_test_fixture.h"],
     deps = [
-        "//software/gui/drawing:navigator",
-        "//software/gui/full_system:threaded_full_system_gui",
         "//software/logger",
-        "//proto/message_translation:primitive_google_to_nanopb_converter",
         "//proto/message_translation:tbots_protobuf",
+        "//proto:play_info_msg_cc_proto",
         "//software/sensor_fusion",
         "//software/simulated_tests/validation:non_terminating_function_validator",
         "//software/simulated_tests/validation:terminating_function_validator",
@@ -51,18 +25,6 @@ cc_library(
 )
 
 cc_library(
-    name = "simulated_play_test_fixture",
-    testonly = True,
-    srcs = ["simulated_play_test_fixture.cpp"],
-    hdrs = ["simulated_play_test_fixture.h"],
-    deps = [
-        ":simulated_test_fixture_cpp",
-        "//software/ai",
-        "@gtest",
-    ],
-)
-
-cc_library(
     name = "simulated_er_force_sim_play_test_fixture",
     testonly = True,
     srcs = ["simulated_er_force_sim_play_test_fixture.cpp"],
@@ -71,48 +33,6 @@ cc_library(
         ":simulated_er_force_sim_test_fixture",
         "//software/ai",
         "@gtest",
-    ],
-)
-
-cc_library(
-    name = "simulated_tactic_test_fixture",
-    testonly = True,
-    srcs = ["simulated_tactic_test_fixture.cpp"],
-    hdrs = ["simulated_tactic_test_fixture.h"],
-    deps = [
-        ":simulated_test_fixture_cpp",
-        "//software/ai/hl/stp/tactic",
-        "//software/ai/navigator",
-        "//software/ai/navigator/path_manager:velocity_obstacle_path_manager",
-        "//software/ai/navigator/path_planner:theta_star_path_planner",
-        "@gtest",
-    ],
-)
-
-cc_library(
-    name = "simulated_er_force_sim_tactic_test_fixture",
-    testonly = True,
-    srcs = ["simulated_er_force_sim_tactic_test_fixture.cpp"],
-    hdrs = ["simulated_er_force_sim_tactic_test_fixture.h"],
-    deps = [
-        ":simulated_er_force_sim_test_fixture",
-        "//software/ai/hl/stp/tactic",
-        "//software/ai/navigator",
-        "//software/ai/navigator/path_manager:velocity_obstacle_path_manager",
-        "//software/ai/navigator/path_planner:theta_star_path_planner",
-        "@gtest",
-    ],
-)
-
-cc_test(
-    name = "simulated_play_test_fixture_test",
-    srcs = ["simulated_play_test_fixture_test.cpp"],
-    deps = [
-        ":simulated_play_test_fixture",
-        "//software/simulated_tests/validation:validation_function",
-        "//software/time:duration",
-        "//software/time:timestamp",
-        "//software/world",
     ],
 )
 
@@ -125,51 +45,14 @@ py_library(
         "//software:py_constants.so",
     ],
     deps = [
-        ":er_force_simulator",
-        ":full_system",
         "//proto:import_all_protos",
         "//software/logger:py_logger",
         "//software/networking:threaded_unix_listener_py",
         "//software/networking:threaded_unix_sender_py",
         "//software/simulated_tests:validation",
         "//software/thunderscope",
-    ],
-)
-
-py_library(
-    name = "er_force_simulator",
-    srcs = [
-        "er_force_simulator.py",
-    ],
-    data = [
-        "//software:er_force_simulator_main",
-        "//software:py_constants.so",
-    ],
-    deps = [
-        "//proto:software_py_proto",
-        "//proto:tbots_py_proto",
-        "//software/logger:py_logger",
-        "//software/networking:threaded_unix_listener_py",
-        "//software/networking:threaded_unix_sender_py",
-    ],
-)
-
-py_library(
-    name = "full_system",
-    srcs = [
-        "full_system.py",
-    ],
-    data = [
-        "//software:py_constants.so",
-        "//software:python_bindings.so",
-        "//software:unix_full_system",
-    ],
-    deps = [
-        "//proto:software_py_proto",
-        "//proto:tbots_py_proto",
-        "//software/logger:py_logger",
-        "//software/networking:threaded_unix_listener_py",
-        "//software/networking:threaded_unix_sender_py",
+        "//software/thunderscope:binary_context_managers",
+        "//software/thunderscope/replay:proto_logger",
     ],
 )
 

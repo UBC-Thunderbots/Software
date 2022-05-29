@@ -5,6 +5,7 @@
 #include <chrono>
 
 #include "proto/message_translation/tbots_protobuf.h"
+#include "proto/primitive.pb.h"
 #include "proto/robot_log_msg.nanopb.h"
 #include "shared/constants.h"
 #include "software/geom/algorithms/almost_equal.h"
@@ -16,6 +17,13 @@
 #include "software/world/field.h"
 #include "software/world/team.h"
 #include "software/world/world.h"
+
+#define TEST_UTIL_CREATE_MOTION_CONTROL_NO_DEST                                          \
+    [](const Robot &, const Point &) {                                                   \
+        TbotsProto::MotionControl motion_control;                                        \
+        *(motion_control.mutable_requested_destination()) = *createPointProto(Point());  \
+        return motion_control;                                                           \
+    }
 
 #define UNUSED(x) (void)(x)
 
@@ -30,11 +38,14 @@ namespace TestUtil
      * teams with 1000 milliseconds expiry buffers, and the Ball at the center of the
      * field with no velocity.
      *
+     * @param field_type The field type
+     *
      * @return a World object initialized with a Division B SSL field, empty teams
      * with 1000 millisecond expiry buffers, and the Ball at the center of the field
      * with no velocity.
      */
-    World createBlankTestingWorld();
+    World createBlankTestingWorld(
+        TbotsProto::FieldType field_type = TbotsProto::FieldType::DIV_B);
 
     /**
      * Creates a blank testing World given a Field.
@@ -46,28 +57,6 @@ namespace TestUtil
      * velocity.
      */
     World createBlankTestingWorld(TbotsProto::Field field_proto);
-
-    /**
-     * Creates a World object with a normal SSL Division A field, default (empty)
-     * teams with 1000 milliseconds expiry buffers, and the Ball at the center of the
-     * field with no velocity.
-     *
-     * @return a World object initialized with a Division B SSL field, empty teams
-     * with 1000 millisecond expiry buffers, and the Ball at the center of the field
-     * with no velocity.
-     */
-    World createBlankTestingWorldDivA();
-
-    /**
-     * Creates a World object with a normal SSL Division B field, default (empty)
-     * teams with 1000 milliseconds expiry buffers, and the Ball at the center of the
-     * field with no velocity.
-     *
-     * @return a World object initialized with a Division B SSL field, empty teams
-     * with 1000 millisecond expiry buffers, and the Ball at the center of the field
-     * with no velocity.
-     */
-    World createBlankTestingWorldDivB();
 
     /**
      * Returns a new World object with friendly robots in the positions specified
@@ -186,4 +175,13 @@ namespace TestUtil
      */
     GameState createGameState(const RefereeCommand &current_referee_command,
                               const RefereeCommand &previous_referee_command);
+
+    /** Create Motion Control from destination
+     *
+     * @param destination
+     *
+     * @return the motion control with that destination
+     */
+    TbotsProto::MotionControl createMotionControl(const Point &destination);
+
 };  // namespace TestUtil

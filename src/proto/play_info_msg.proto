@@ -6,7 +6,7 @@ message PlayInfo
 {
     message Play
     {
-        string play_name = 1;
+        repeated string play_state = 1;
     }
 
     message Tactic

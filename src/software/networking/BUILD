@@ -1,7 +1,5 @@
 package(default_visibility = ["//visibility:public"])
 
-load("@python_tools_deps//:requirements.bzl", "requirement")
-
 cc_library(
     name = "proto_udp_client",
     hdrs = [
@@ -68,6 +66,7 @@ cc_library(
     ],
     visibility = ["//visibility:private"],
     deps = [
+        "//software:constants",
         "@boost//:asio",
     ],
 )
@@ -91,6 +90,7 @@ cc_library(
     ],
     visibility = ["//visibility:private"],
     deps = [
+        "//software:constants",
         "@boost//:asio",
     ],
 )
@@ -134,6 +134,9 @@ cc_library(
 py_library(
     name = "threaded_unix_listener_py",
     srcs = ["threaded_unix_listener.py"],
+    data = [
+        "//software:py_constants.so",
+    ],
     deps = [
         "//proto:software_py_proto",
         "//software/logger:py_logger",
@@ -143,6 +146,9 @@ py_library(
 py_library(
     name = "threaded_unix_sender_py",
     srcs = ["threaded_unix_sender.py"],
+    data = [
+        "//software:py_constants.so",
+    ],
     deps = [
         "//proto:software_py_proto",
         "//software/logger:py_logger",

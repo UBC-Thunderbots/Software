@@ -26,7 +26,7 @@
 #include "extlibs/er_force_sim/src/core/coordinates.h"
 #include "extlibs/er_force_sim/src/core/rng.h"
 #include "extlibs/er_force_sim/src/core/vector.h"
-#include "proto/messages_robocup_ssl_detection.pb.h"
+#include "proto/ssl_vision_detection.pb.h"
 #include "simulator.h"
 
 using namespace camun::simulator;
@@ -210,7 +210,11 @@ static float positionOfVisiblePixels(btVector3 &p, const btVector3 &simulatorBal
 
     const btVector3 up = btVector3(0, 0, 1);
 
-    btVector3 axis = up.cross(cameraDirection).normalize();
+    btVector3 axis = up.cross(cameraDirection);
+    if (!axis.fuzzyZero())
+    {
+        axis = axis.normalize();
+    }
     btScalar angle = up.angle(cameraDirection);
 
     const int sampleRadius       = 7;

@@ -24,6 +24,7 @@ cc_library(
         "//software/jetson_nano/redis",
         "//software/jetson_nano/services:motor",
         "//software/jetson_nano/services:network",
+        "//software/jetson_nano/services:power",
         "//software/util/scoped_timespec_timer",
     ],
 )
@@ -49,4 +50,9 @@ cc_binary(
         ":thunderloop",
         "//shared:constants",
     ],
+)
+
+sh_binary(
+    name = "setup_nano",
+    srcs = ["setup_nano.sh"],
 )

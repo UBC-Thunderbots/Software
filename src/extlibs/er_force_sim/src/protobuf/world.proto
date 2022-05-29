@@ -2,7 +2,7 @@ syntax                  = "proto2";
 option cc_enable_arenas = true;
 
 import "extlibs/er_force_sim/src/protobuf/robot.proto";
-import "proto/messages_robocup_ssl_wrapper.proto";
+import "proto/ssl_vision_wrapper.proto";
 
 package world;
 
