@@ -12,7 +12,7 @@ StartLimitIntervalSec=1
 StartLimitBurst=10
 
 [Service]
-ExecStart=/home/robot/thunderbots_binaries/broadcasts/robot_broadcast_sender -p 45000 -if eth0
+ExecStart=/opt/tbotspython/bin/python3 /home/robot/thunderbots_binaries/bazel-out/host/bin/software/jetson_nano/broadcasts/robot_broadcast_sender -p 45000 -if eth0
 
 # Always restart on crash
 Restart=always

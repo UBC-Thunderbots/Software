@@ -16,8 +16,8 @@ py_binary(
         "//software/jetson_nano/broadcasts:robot_broadcast_receiver",
         "//software/jetson_nano/broadcasts:robot_broadcast_sender_zip",
         "//software/jetson_nano/display:robot_ui_zip",
+        "//software/jetson_nano/linux_configs/systemd:systemd_files",
         "//software/jetson_nano/redis",
-        "//software/jetson_nano/systemd:systemd_files",
     ],
     deps = [
         requirement("ansible"),

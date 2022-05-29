@@ -40,10 +40,10 @@
             copy_links: yes
 
         # Output of each nano streamed to that Nano's /tmp/setup.log
-        - name: Run the setup script, this will take a while
+        - name: Running the setup script, this will take a while
           become_method: sudo
           become: true
-          command: '/home/{{ ansible_user }}/setup_nano.sh >& /tmp/setup.log'
+          command: 'sh -x /home/{{ ansible_user }}/setup_nano.sh >& /tmp/setup.log'
           register: result
           tags:
             - runScript
@@ -60,39 +60,6 @@
     - name: Run systemd setup
       tags: systemd
       block:
-        - name: Delete everything on ~/
-          become_method: sudo
-          become: true
-          command: 'sudo rm -rf ~/thunderbots_binaries'
-          register: result
-          tags:
-            - runScript
-
-        - name: Sync binaries to the nano
-          with_items:
-            # Python Binaries
-            # its important that we copy everything in the python folders
-            - ../../display/robot_ui.zip
-            - ../../broadcasts/robot_broadcast_sender.zip
-            # C++ Binaries
-            - ../../thunderloop_main
-          loop_control:
-            loop_var: binary_path
-          ansible.posix.synchronize:
-            src: "{{ binary_path }}"
-            dest: ~/thunderbots_binaries/
-            recursive: yes
-            copy_links: yes
-          tags:
-            - syncBinaries
-
-        - name: Unzipping python binaries
-          command: 'unzip ~/thunderbots_binaries/*.zip -o ~/thunderbots_binaries'
-          register: result
-          tags:
-            - runScript
-          args:
-            chdir: ~/
 
         - name: Sync all systemd files
           become_method: sudo
@@ -110,6 +77,8 @@
           become: true
           become_method: sudo
           with_items:
+            # TODO Ask Amr: Can we parameterize this + delete the old set
+            # No residual services should exist. Is that managed by thunderbots?
             - thunderbots
             - thunderloop
             - display

@@ -13,8 +13,8 @@
      - start
    binary_paths:
      thunderloop: ../../thunderloop_main
-     announcement: ../../broadcasts
-     display: ../../display/robot_ui
+     announcement: ../../broadcasts/robot_broadcast_sender.zip
+     display: ../../display/robot_ui.zip
 
   tasks:
 
@@ -49,6 +49,28 @@
           when: "'stop' in actions"
           tags: always
 
+        - name: Delete everything on ~/
+          become_method: sudo
+          become: true
+          command: 'sudo rm -rf ~/thunderbots_binaries'
+          register: result
+          tags:
+            - runScript
+
+        - name: Sync binaries to the nano
+          with_items:
+            # Python Binaries
+            # its important that we copy everything in the python folders
+          loop_control:
+            loop_var: binary_path
+          ansible.posix.synchronize:
+            src: "{{ binary_path }}"
+            dest: ~/thunderbots_binaries/
+            recursive: yes
+            copy_links: yes
+          tags:
+            - syncBinaries
+
         - name: Sync Binaries
           ansible.posix.synchronize:
             src: "{{ binary_paths[service_name] }}"
@@ -60,6 +82,14 @@
             loop_var: service_name
           when: "'sync' in actions"
           tags: always
+
+        - name: Unzipping python binaries
+          command: 'unzip ~/thunderbots_binaries/*.zip'
+          register: result
+          tags:
+            - runScript
+          args:
+            chdir: ~/thunderbots_binaries
 
         - name: Start Services
           become: true
