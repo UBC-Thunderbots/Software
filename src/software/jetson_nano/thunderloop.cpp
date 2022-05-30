@@ -9,6 +9,7 @@
 #include "software/logger/logger.h"
 #include "software/util/scoped_timespec_timer/scoped_timespec_timer.h"
 #include "software/world/robot_state.h"
+#include "software/jetson_nano/encoder/encoder.h"
 
 /**
  * https://rt.wiki.kernel.org/index.php/Squarewave-example
@@ -27,11 +28,11 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants,
     robot_constants_ = robot_constants;
     wheel_consants_  = wheel_consants;
 
-    motor_service_   = std::make_unique<MotorService>(robot_constants, wheel_consants);
+    //motor_service_   = std::make_unique<MotorService>(robot_constants, wheel_consants);
     network_service_ = std::make_unique<NetworkService>(
         std::string(ROBOT_MULTICAST_CHANNELS[channel_id_]) + "%" + "eth0", VISION_PORT,
         PRIMITIVE_PORT, ROBOT_STATUS_PORT, true);
-    redis_client_ = std::make_unique<RedisClient>(REDIS_DEFAULT_HOST, REDIS_DEFAULT_PORT);
+    //redis_client_ = std::make_unique<RedisClient>(REDIS_DEFAULT_HOST, REDIS_DEFAULT_PORT);
 }
 
 Thunderloop::~Thunderloop()
@@ -59,12 +60,14 @@ void Thunderloop::runLoop()
         static_cast<int>(1.0f / static_cast<float>(loop_hz_) * NANOSECONDS_PER_SECOND);
 
     // Start the services
-    motor_service_->start();
+    //motor_service_->start();
 
     // Get current time
     // Note: CLOCK_MONOTONIC is used over CLOCK_REALTIME since CLOCK_REALTIME can jump
     // backwards
     clock_gettime(CLOCK_MONOTONIC, &next_shot);
+
+    Encoder encoder = Encoder(0);
 
     for (;;)
     {
@@ -76,71 +79,74 @@ void Thunderloop::runLoop()
             ScopedTimespecTimer iteration_timer(&iteration_time);
 
             // Poll network service and grab most recent messages
-            {
-                ScopedTimespecTimer timer(&poll_time);
-                auto result       = network_service_->poll(robot_status_);
-                new_primitive_set = std::get<0>(result);
-                new_vision        = std::get<1>(result);
-            }
+            //{
+            //    ScopedTimespecTimer timer(&poll_time);
+           ////     auto result       = network_service_->poll(robot_status_);
+           ////     new_primitive_set = std::get<0>(result);
+            //    new_vision        = std::get<1>(result);
+            //}
 
-            thunderloop_status_.set_network_service_poll_time_ns(
-                static_cast<unsigned long>(poll_time.tv_nsec));
+            //thunderloop_status_.set_network_service_poll_time_ns(
+            //    static_cast<unsigned long>(poll_time.tv_nsec));
 
             // If the primitive msg is new, update the internal buffer
             // and start the new primitive.
-            if (new_primitive_set.time_sent().epoch_timestamp_seconds() >
-                primitive_set_.time_sent().epoch_timestamp_seconds())
-            {
-                // Save new primitive set
-                primitive_set_ = new_primitive_set;
+            //if (new_primitive_set.time_sent().epoch_timestamp_seconds() >
+            //    primitive_set_.time_sent().epoch_timestamp_seconds())
+            //{
+            //    // Save new primitive set
+            //    primitive_set_ = new_primitive_set;
 
-                // Update primitive executor's primitive set
-                {
-                    ScopedTimespecTimer timer(&poll_time);
-                    primitive_executor_.updatePrimitiveSet(robot_id_, primitive_set_);
-                }
+            //    // Update primitive executor's primitive set
+            //    {
+            //        ScopedTimespecTimer timer(&poll_time);
+            //        primitive_executor_.updatePrimitiveSet(robot_id_, primitive_set_);
+            //    }
 
-                thunderloop_status_.set_primitive_executor_start_time_ns(
-                    static_cast<unsigned long>(poll_time.tv_nsec));
-            }
+            //    thunderloop_status_.set_primitive_executor_start_time_ns(
+            //        static_cast<unsigned long>(poll_time.tv_nsec));
+            //}
 
             // TODO (#2495): Replace Vision proto with World proto in Network Service and
             //               call PrimitiveExecutor::updateWorld
             // If the vision msg is new, update the internal buffer
-            if (new_vision.time_sent().epoch_timestamp_seconds() >
-                vision_.time_sent().epoch_timestamp_seconds())
-            {
-                // Cache vision
-                vision_ = new_vision;
+            //if (new_vision.time_sent().epoch_timestamp_seconds() >
+            //    vision_.time_sent().epoch_timestamp_seconds())
+            //{
+            //    // Cache vision
+            //    vision_ = new_vision;
 
-                // If there is a detection for "this" robot, lets update it
-                if (new_vision.robot_states().count(robot_id_) != 0)
-                {
-                    robot_state_ = new_vision.mutable_robot_states()->at(robot_id_);
-                }
-            }
+            //    // If there is a detection for "this" robot, lets update it
+            //    if (new_vision.robot_states().count(robot_id_) != 0)
+            //    {
+            //        robot_state_ = new_vision.mutable_robot_states()->at(robot_id_);
+            //    }
+            //}
 
             // TODO (#2333) poll redis service
 
-            {
-                ScopedTimespecTimer timer(&poll_time);
-                direct_control_ = *primitive_executor_.stepPrimitive(
-                    robot_id_, createRobotState(robot_state_).orientation());
-            }
-            thunderloop_status_.set_primitive_executor_step_time_ns(
-                static_cast<unsigned long>(poll_time.tv_nsec));
+            //{
+            //    ScopedTimespecTimer timer(&poll_time);
+            //    direct_control_ = *primitive_executor_.stepPrimitive(
+            //        robot_id_, createRobotState(robot_state_).orientation());
+            //}
+            //thunderloop_status_.set_primitive_executor_step_time_ns(
+            //    static_cast<unsigned long>(poll_time.tv_nsec));
 
             // Run the motor service with the direct_control_ msg
             {
                 ScopedTimespecTimer timer(&poll_time);
-                drive_units_status_ = *motor_service_->poll(direct_control_);
+                //drive_units_status_ = *motor_service_->poll(direct_control_);
             }
-            thunderloop_status_.set_motor_service_poll_time_ns(
-                static_cast<unsigned long>(poll_time.tv_nsec));
+            //thunderloop_status_.set_motor_service_poll_time_ns(
+            //    static_cast<unsigned long>(poll_time.tv_nsec));
 
-            *(robot_status_.mutable_thunderloop_status()) = thunderloop_status_;
+            //*(robot_status_.mutable_thunderloop_status()) = thunderloop_status_;
 
-            robot_status_.mutable_power_status()->set_capacitor_voltage(200);
+            //robot_status_.mutable_power_status()->set_capacitor_voltage(200);
+
+	    float angle = encoder.readAngle();
+	    std::cout << "currently reading encoder angle: " << angle << "\n";
         }
 
         auto loop_duration =
