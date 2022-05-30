@@ -3,7 +3,10 @@ import pytest
 import software.python_bindings as tbots
 from proto.play_pb2 import Play, PlayName
 from software.simulated_tests.ball_enters_region import *
-from software.simulated_tests.simulated_test_fixture import simulated_test_runner
+from software.simulated_tests.simulated_test_fixture import (
+    simulated_test_runner,
+    pytest_main,
+)
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
 from proto.ssl_gc_geometry_pb2 import Vector2
