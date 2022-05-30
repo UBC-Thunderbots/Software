@@ -128,22 +128,85 @@ class HRVOAgent : public Agent
 
    private:
     /**
-     * A candidate point.
+     * A candidate point is a internal structure used when computing new velocities. It is
+     * composed of a potential new velocity and the index of two VelocityObstacles in
+     * velocityObstacles_ that were used to compute it.
      */
     class Candidate
     {
        public:
         Candidate() : velocityObstacle1_(0), velocityObstacle2_(0) {}
 
-        // The position of the candidate point.
-        Vector position_;
+        // The velocity of the candidate.
+        Vector velocity;
 
-        // The number of the first velocity obstacle.
+        // The index of the first VelocityObstacle in velocityObstacles_ used to compute
+        // this candidate.
         int velocityObstacle1_;
 
-        // The number of the second velocity obstacle.
+        // The index of the second VelocityObstacle in velocityObstacles_ used to compute
+        // this candidate.
         int velocityObstacle2_;
     };
+
+    // Percentage of preferred speed that we accept as the lower bound of a potential new
+    // velocity
+    static constexpr float MIN_PREF_SPEED_MULTIPLER = 0.5f;
+
+    /**
+     * Returns the first velocity obstacle intersected by the Candidate point in
+     * velocityObstacles_
+     *
+     * @param candidate the candidate point to check against all velocity obstacles in
+     * velocityObstacles_
+     *
+     * @return the index of the first velocity obstacle that the given candidate point
+     * intersects in velocityObstacles_, or std::nullopt if the candidate does not
+     * intersect any
+     */
+    std::optional<int> findIntersectingVelocityObstacle(const Candidate &candidate) const;
+
+    /**
+     * Returns true if the given candidate point doesn't intersct any obstacle in
+     * velocityObstacles_ and is faster than the minimum preferred speed.
+     *
+     * @param candidate	the candidate point to consider
+     *
+     * @return true if it the candidate point doesn't intersect any obstacle and is fast
+     */
+    bool isIdealCandidate(const Candidate &candidate) const;
+
+    /**
+     * Returns true if the given candidate point is faster than the minimum preferred
+     * speed.
+     *
+     * @param candidate the candidate point to consider
+     *
+     * @return true if the candidate is faster or equal to the minimum preferred speed,
+     * false otherwise
+     */
+    bool isCandidateFast(const Candidate &candidate) const;
+
+    /**
+     * Returns true if the candidate point is slower than the minimum preferred speed.
+     *
+     * @param candidate the candidate point to consider
+     *
+     * @return true if the candidate is slower than the minimum preferred speed, false if
+     * the speed is faster or the equal to the minimum preferred speed.
+     */
+    bool isCandidateSlow(const Candidate &candidate) const;
+
+    /**
+     * Returns true if the candidate is faster than the current new_velocity_.
+     *
+     * @param candidate the candidate point to consider
+     *
+     * @return true if the candidate point is faster than new_velocity_, false if the
+     * candidate is as fast or slower
+     */
+    bool isCandidateFasterThanCurrentSpeed(const Candidate &candidate) const;
+
 
    public:
     float prefSpeed_;

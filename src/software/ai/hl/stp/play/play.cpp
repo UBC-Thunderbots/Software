@@ -404,3 +404,9 @@ Play::assignTactics(const GlobalPathPlannerFactory &path_planner_factory,
         remaining_robots, std::move(primitives_to_run),
         current_tactic_robot_id_assignment};
 }
+
+std::vector<std::string> Play::getState()
+{
+    // by default just return the name of the play
+    return {objectTypeName(*this)};
+}

@@ -4,8 +4,10 @@ EnlsvgPathPlanner::EnlsvgPathPlanner(const Rectangle &navigable_area,
                                      const std::vector<ObstaclePtr> &obstacles,
                                      double grid_boundary_offset, double resolution)
     : resolution(resolution),
-      num_grid_rows(static_cast<int>(round(navigable_area.xLength() / resolution))),
-      num_grid_cols(static_cast<int>(round(navigable_area.yLength() / resolution))),
+      num_grid_rows(
+          static_cast<unsigned int>(round(navigable_area.xLength() / resolution))),
+      num_grid_cols(
+          static_cast<unsigned int>(round(navigable_area.yLength() / resolution))),
       origin(navigable_area.negXNegYCorner()),
       max_navigable_y_enlsvg_point(
           convertPointToEnlsvgPoint(navigable_area.posXPosYCorner()).y),
