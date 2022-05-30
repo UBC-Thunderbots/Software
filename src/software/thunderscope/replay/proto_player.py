@@ -166,7 +166,7 @@ class ProtoPlayer(object):
 
         self.seek(start_time)
 
-        while self.current_packet_time <= end_time:
+        while True:
             with gzip.open(
                 f"{directory}/{replay_index}.{REPLAY_FILE_EXTENSION}", "wb"
             ) as log_file:
@@ -182,11 +182,14 @@ class ProtoPlayer(object):
                         self.current_chunk[self.current_entry_index]
                     )
 
-                    current_time = self.current_packet_time - start_time
-                    log_entry = ProtoLogger.create_log_entry(proto, current_time)
+                    log_entry = ProtoLogger.create_log_entry(
+                        proto, self.current_packet_time - start_time
+                    )
                     log_file.write(bytes(log_entry, encoding="utf-8"))
                     self.current_entry_index += 1
-
+                    if self.current_packet_time > end_time:
+                        logging.info("Clip saved!")
+                        return
                 # Load the next chunk
                 self.current_chunk_index += 1
                 replay_index += 1
@@ -196,8 +199,6 @@ class ProtoPlayer(object):
                         self.sorted_chunks[self.current_chunk_index]
                     )
                     self.current_entry_index = 0
-
-        logging.info("Clip saved!")
 
     def play(self):
         """Plays back the log file."""
