@@ -38,7 +38,8 @@ class playInfoWidget(QTableWidget):
         horizontal_headers = []
 
         # empirically makes even bolded items fit within columns
-        SIZE_HINT_WIDTH_EXPANSION = 12
+        HEADER_SIZE_HINT_WIDTH_EXPANSION = 12
+        ITEM_SIZE_HINT_WIDTH_EXPANSION = 10
 
         for n, key in enumerate(data.keys()):
             horizontal_headers.append(key)
@@ -46,7 +47,13 @@ class playInfoWidget(QTableWidget):
             for m, item in enumerate(data[key]):
                 newitem = QTableWidgetItem(item)
                 newitem.setSizeHint(
-                    QtCore.QSize(len(key) * SIZE_HINT_WIDTH_EXPANSION, 1)
+                    QtCore.QSize(
+                        max(
+                            len(key) * HEADER_SIZE_HINT_WIDTH_EXPANSION,
+                            len(item) * ITEM_SIZE_HINT_WIDTH_EXPANSION,
+                        ),
+                        1,
+                    )
                 )
                 self.setItem(m, n, newitem)
 
