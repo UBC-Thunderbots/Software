@@ -1,5 +1,3 @@
-import sys
-
 import pytest
 
 import software.python_bindings as tbots
@@ -97,5 +95,4 @@ def test_two_ai_ball_placement(simulated_test_runner, run_enemy_ai, test_duratio
 
 
 if __name__ == "__main__":
-    # Run the test, -s disables all capturing at -vv increases verbosity
-    sys.exit(pytest.main([__file__, "-svv"]))
+    pytest_main(__file__)
