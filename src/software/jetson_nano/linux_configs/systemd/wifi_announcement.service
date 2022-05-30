@@ -12,6 +12,7 @@ StartLimitIntervalSec=1
 StartLimitBurst=10
 
 [Service]
+# Setup python path to the src directory where all the bazel imports are normally setup from
 Environment='PYTHONPATH=$PYTHONPATH:/home/robot/thunderbots_binaries/bazel-out/host/bin'
 ExecStart=/opt/tbotspython/bin/python3 /home/robot/thunderbots_binaries/bazel-out/host/bin/software/jetson_nano/broadcasts/robot_broadcast_sender -p 45000 -if wlan0
 

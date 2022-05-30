@@ -12,10 +12,6 @@
      - stop
      - sync
      - start
-   binary_paths:
-     thunderloop: ../../thunderloop_main
-     announcement: ../../broadcasts/robot_broadcast_sender.zip
-     display: ../../display/robot_ui.zip
 
   tasks:
 
@@ -55,8 +51,9 @@
 
         - name: Sync Binaries
           with_items:
-            - ../../display/robot_ui.zip
-            - ../../broadcasts/robot_broadcast_sender.zip
+            # bazel makes its own zip files, we append another zip to deconflict
+            - ../../display/robot_ui_zip.zip
+            - ../../broadcasts/robot_broadcast_sender_zip.zip
             - ../../thunderloop_main
           loop_control:
             loop_var: binary_path

@@ -232,6 +232,10 @@ To build for the Jetson Nano, build the target with the `--cpu=jetson_nano` flag
 
 We use ansible to automatically update software running on the Jetson Nano. [See these instructions.](/src/software/jetson_nano/ansible/README.md) 
 
+To update binaries on a working robot, you can run:
+
+`./tbots.py run run_ansible --cpu=jetson_nano -- --playbook remote_flash.yml --port 45000 --ssh_pass our_password_here`
+
 ## Setting up Virtual Robocup 2021
 
 ### Setting up the SSL Simulation Environment

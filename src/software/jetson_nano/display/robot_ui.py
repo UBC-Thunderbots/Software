@@ -8,6 +8,9 @@ import adafruit_rgb_display.st7735 as st7735
 from software.jetson_nano.display.lcd_user_interface.lcd_user_interface import (
     LcdDisplay,
 )
+
+import argparse
+from threading import Thread
 from software.jetson_nano.display.rotary_encoder.rotary_encoder import RotaryEncoder
 from software.jetson_nano.display.screens.home_screen import HomeScreen
 from software.jetson_nano.display.screens.menu_screen import MenuScreen
@@ -48,8 +51,6 @@ redis_keys = [
     "br wheel speed",
 ]
 
-PATH_TO_LOGO = "/home/robot/thunderbots_binaries/bazel-out/host/bin/software/jetson_nano/display/robot_ui.runfiles/__main__/software/jetson_nano/display/lcd_user_interface/tbots.jpg"
-
 
 class RobotUi:
     """
@@ -66,7 +67,12 @@ class RobotUi:
     the following command: 'sudo modprobe spidev'
     """
 
-    def __init__(self):
+    def __init__(self, path_to_logo):
+        """Initialize the RoboUi
+
+        :param path_to_logo: The path to the tbots logo
+
+        """
 
         sys.stdout.flush()
         # Initialize redis server and our redis dictionary
@@ -81,7 +87,7 @@ class RobotUi:
         # Draw Tbots logo on first boot
         sys.stdout.flush()
         self.lcd_display = LcdDisplay()
-        self.lcd_display.draw_image(PATH_TO_LOGO)
+        self.lcd_display.draw_image(path_to_logo)
         self.curr_screen = "Home"
 
         # All of our screens
@@ -151,9 +157,16 @@ class RobotUi:
         self.rotary_encoder.stop()
 
 
-# For testing
 if __name__ == "__main__":
-    from threading import Thread
+
+    ap = argparse.ArgumentParser()
+    ap.add_argument(
+        "--path_to_boot_screen",
+        required=True,
+        type=str,
+        help="path to image to show on boot",
+    )
+    args = vars(ap.parse_args())
 
     def init_redis():
         redis_client = redis.Redis(
@@ -165,7 +178,7 @@ if __name__ == "__main__":
     def start_polling(robot_ui):
         robot_ui.poll_redis()
 
-    robot_ui = RobotUi()
+    robot_ui = RobotUi(path_to_logo=args["path_to_logo"])
     thread = Thread(target=start_polling, args=(robot_ui,))
     thread.start()
 

@@ -66,8 +66,9 @@
 
         - name: Sync Binaries
           with_items:
-            - ../../display/robot_ui.zip
-            - ../../broadcasts/robot_broadcast_sender.zip
+            # bazel makes its own zip files, we append another zip to deconflict
+            - ../../display/robot_ui_zip.zip
+            - ../../broadcasts/robot_broadcast_sender_zip.zip
             - ../../thunderloop_main
           loop_control:
             loop_var: binary_path
@@ -101,8 +102,6 @@
           become: true
           become_method: sudo
           with_items:
-            # TODO Ask Amr: Can we parameterize this + delete the old set
-            # No residual services should exist. Is that managed by thunderbots?
             - thunderbots
             - thunderloop
             - display
@@ -133,7 +132,7 @@
             post_reboot_delay: 10
             test_command: whoami
 
-        - name: Success Msg
+        - name: Success msg
           debug:
             msg:
               - "[Robot ID = {{ inventory_hostname }}]"
