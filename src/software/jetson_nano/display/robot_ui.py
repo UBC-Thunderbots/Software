@@ -1,7 +1,6 @@
 import time, redis
 import digitalio
 import board
-import sys
 from PIL import Image, ImageDraw, ImageOps
 import adafruit_rgb_display.st7735 as st7735
 
@@ -67,14 +66,12 @@ class RobotUi:
     the following command: 'sudo modprobe spidev'
     """
 
-    def __init__(self, path_to_logo):
+    def __init__(self, boot_screen_path):
         """Initialize the RoboUi
 
-        :param path_to_logo: The path to the tbots logo
+        :param boot_screen_path: The path to the tbots logo
 
         """
-
-        sys.stdout.flush()
         # Initialize redis server and our redis dictionary
         self.redis_client = redis.Redis(
             host="localhost", port=constants.REDIS_PORT_NUMBER, db=0
@@ -85,9 +82,8 @@ class RobotUi:
         self.shutdown = False  # This flag will be used to stop polling redis
 
         # Draw Tbots logo on first boot
-        sys.stdout.flush()
         self.lcd_display = LcdDisplay()
-        self.lcd_display.draw_image(path_to_logo)
+        self.lcd_display.draw_image(boot_screen_path)
         self.curr_screen = "Home"
 
         # All of our screens
@@ -117,7 +113,6 @@ class RobotUi:
                         self.redis_client.get(action["redis key"]).decode("UTF-8"),
                     )
                 )
-                sys.stdout.flush()
 
         on_click()
 
@@ -178,7 +173,7 @@ if __name__ == "__main__":
     def start_polling(robot_ui):
         robot_ui.poll_redis()
 
-    robot_ui = RobotUi(path_to_logo=args["path_to_logo"])
+    robot_ui = RobotUi(boot_screen_path=args["path_to_boot_screen"])
     thread = Thread(target=start_polling, args=(robot_ui,))
     thread.start()
 
