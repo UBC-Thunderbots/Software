@@ -114,8 +114,6 @@ class RobotUi:
                     )
                 )
 
-        on_click()
-
         def on_clockwise_rotate():
             """ Execute the clockwise rotate callback of curr screen """
             self.screens[self.curr_screen].on_clockwise_rotate()
