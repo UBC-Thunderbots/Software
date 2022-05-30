@@ -818,3 +818,31 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_close_start_end_but_block
     TestUtil::checkPathDoesNotIntersectObstacle(
         {path_points.begin() + 1, path_points.end()}, obstacles);
 }
+
+TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_one_point)
+{
+    Field field = Field::createSSLDivisionBField();
+    Team friendly_team = Team(Duration::fromMilliseconds(1000));
+    Team enemy_team    = Team(Duration::fromMilliseconds(1000));
+    Ball ball          = Ball(Point(), Vector(), Timestamp::fromSeconds(0));
+    World world        = World(field, ball, friendly_team, enemy_team);
+
+    Point start{-3.22959, -0.675264}, dest{-3.3184, -0.695291};
+
+    std::vector<ObstaclePtr> obstacles = {
+            robot_navigation_obstacle_factory.createStaticObstaclesFromMotionConstraints(
+                    {TbotsProto::MotionConstraint::AVOID_BALL_PLACEMENT_INTERFERENCE},
+                    world.field()),
+    };
+    Rectangle navigable_area = field.fieldBoundary();
+    EnlsvgPathPlanner planner =
+            EnlsvgPathPlanner(navigable_area, obstacles, field.boundaryMargin());
+    auto path = planner.findPath(start, dest);
+    EXPECT_TRUE(path != std::nullopt);
+    std::vector<Point> path_points = path->getKnots();
+
+    EXPECT_EQ(2, path_points.size());
+    EXPECT_EQ(start, path->getStartPoint());
+    EXPECT_EQ(dest, path->getEndPoint());
+
+}
