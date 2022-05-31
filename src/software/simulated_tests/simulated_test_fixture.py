@@ -170,7 +170,8 @@ class SimulatorTestRunner(object):
                             RobotStatus, robot_status
                         )
 
-                        _ = self.primitive_set_buffer.get(
+                        # blocking wait for primtivies to stop world being ahead of primitives
+                        self.primitive_set_buffer.get(
                             block=True, timeout=WORLD_BUFFER_TIMEOUT
                         )
 
