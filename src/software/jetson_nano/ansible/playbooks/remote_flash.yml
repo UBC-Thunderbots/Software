@@ -58,7 +58,7 @@
           loop_control:
             loop_var: binary_path
           ansible.posix.synchronize:
-            src: "{{ binary_path }}"
+            src: "{{ binary_path[service_name] }}"
             dest: ~/thunderbots_binaries/
             recursive: yes
             copy_links: yes
