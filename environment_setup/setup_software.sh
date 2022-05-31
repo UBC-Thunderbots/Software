@@ -151,7 +151,7 @@ sudo apt-get install -y nodejs
 # Install Grunt Command Line Interface
 sudo npm install -g grunt-cli
                             
-cd /opt/tbotspython/mobile-gamepad-master && sudo npm install
+cd /opt/tbotspython/mobile-gamepad-master && sudo npm install --unsafe-perm
                                                 
 # Install Bazel
 print_status_msg "Installing Bazel"

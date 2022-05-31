@@ -9,6 +9,7 @@ from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 class ChickerWidget(QWidget):
     def __init__(self):
+
         """The Chicker Widget grid is laid out in the following way:
                     ┌────────┐     ┌──────┐      ┌──────┐
                     │ Charge │     │ Kick │      │ Chip │
@@ -58,14 +59,14 @@ class ChickerWidget(QWidget):
             self.geneva_slider_box,
             self.geneva_slider,
             self.geneva_label,
-        ) = common_widgets.create_slider("Geneva Slider", 1, NUM_GENEVA_ANGLES, 1)
+        ) = common_widgets.create_slider("Geneva Position", 1, NUM_GENEVA_ANGLES, 1)
         grid.addWidget(self.geneva_slider_box, 2, 0)
 
         (
             self.power_slider_box,
             self.power_slider,
             self.power_label,
-        ) = common_widgets.create_slider("Power Slider", 1, 100, 10)
+        ) = common_widgets.create_slider("Power", 1, 100, 10)
         grid.addWidget(self.power_slider_box, 3, 0)
 
         self.setLayout(grid)
@@ -77,6 +78,9 @@ class ChickerWidget(QWidget):
         # initial values
         self.geneva_value = 3
         self.power_value = 1
+        
+        self.geneva_slider.setValue(self.geneva_value)
+        self.power_slider.setValue(self.power_value)
 
     def change_button_state(self, button, enable):
         """Change button color and clickable state.
@@ -121,56 +125,27 @@ class ChickerWidget(QWidget):
         if self.charge_button.isChecked():
             self.charge_button.toggle()
             if self.charged:
-                print("Discharge clicked")
                 self.charged = False
             else:
-                print("Charge clicked")
                 self.charged = True
-            print("Geneva:", self.geneva_value, "Power:", self.power_value)
 
         if self.kick_button.isChecked():
             self.kick_button.toggle()
             self.charged = False
-            print("Kick clicked")
-            print("Geneva:", self.geneva_value, "Power:", self.power_value)
 
         if self.chip_button.isChecked():
             self.chip_button.toggle()
             self.charged = False
-            print("Chip clicked")
-            print("Geneva:", self.geneva_value, "Power:", self.power_value)
 
         # radio colors
         if self.no_auto_button.isChecked():
-            self.radio_checkable["auto_kick"] = True
-            self.radio_checkable["auto_chip"] = True
-            if self.radio_checkable["no_auto"]:
-                print("No Auto clicked")
-                print("Geneva:", self.geneva_value, "Power:", self.power_value)
-            self.radio_checkable["no_auto"] = False
             self.change_button_state(self.charge_button, True)
+
             if self.charged:
                 self.change_button_state(self.chip_button, True)
                 self.change_button_state(self.kick_button, True)
 
-        elif self.auto_kick_button.isChecked():
-            self.radio_checkable["no_auto"] = True
-            self.radio_checkable["auto_chip"] = True
-            if self.radio_checkable["auto_kick"]:
-                print("Auto Kick clicked")
-                print("Geneva:", self.geneva_value, "Power:", self.power_value)
-            self.radio_checkable["auto_kick"] = False
-            self.change_button_state(self.chip_button, False)
-            self.change_button_state(self.kick_button, False)
-            self.change_button_state(self.charge_button, False)
-
-        elif self.auto_chip_button.isChecked():
-            self.radio_checkable["no_auto"] = True
-            self.radio_checkable["auto_kick"] = True
-            if self.radio_checkable["auto_chip"]:
-                print("Auto Chip clicked")
-                print("Geneva:", self.geneva_value, "Power:", self.power_value)
-            self.radio_checkable["auto_chip"] = False
+        elif self.auto_kick_button.isChecked() or self.auto_chip_button.isChecked():
             self.change_button_state(self.chip_button, False)
             self.change_button_state(self.kick_button, False)
             self.change_button_state(self.charge_button, False)

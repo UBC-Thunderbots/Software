@@ -26,9 +26,8 @@ class RobotView(QWidget):
 
         self.vision_pattern = QLabel()
 
-        self.vision_pattern.setSizePolicy(QSizePolicy(
-            QSizePolicy.Policy.Ignored,
-            QSizePolicy.Policy.MinimumExpanding)
+        self.vision_pattern.setSizePolicy(
+            QSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.MinimumExpanding)
         )
         self.vision_pattern.setGeometry(QtCore.QRect(0, 0, 10, 10))
 
@@ -73,7 +72,15 @@ class RobotView(QWidget):
 
         painter = QtGui.QPainter(pixmap)
         self.draw_robot(painter, 1, "blue", 50, 50, 50)
-        self.draw_voltage(painter, x=150, y=50, width=100, voltage=19.2, min_voltage=19.2, max_voltage=25.2)
+        self.draw_voltage(
+            painter,
+            x=150,
+            y=50,
+            width=100,
+            voltage=19.2,
+            min_voltage=19.2,
+            max_voltage=25.2,
+        )
         painter.end()
 
         self.vision_pattern.setPixmap(pixmap)
@@ -93,19 +100,11 @@ class RobotView(QWidget):
         painter.setPen(pg.mkPen("black", size=2))
         painter.setBrush(pg.mkBrush(None))
 
-        painter.drawRect(
-            QtCore.QRectF(
-                x, y, width, 20
-            ),
-        )
+        painter.drawRect(QtCore.QRectF(x, y, width, 20),)
 
         painter.setBrush(pg.mkBrush(self.green))
 
-        painter.drawRect(
-            QtCore.QRectF(
-                x, y, (voltage-min_voltage), 20
-            ),
-        )
+        painter.drawRect(QtCore.QRectF(x, y, (voltage - min_voltage), 20),)
 
     def draw_robot(self, painter, id, team_colour, x, y, radius):
         """Draw a robot with the given painter. The vision pattern
@@ -122,8 +121,7 @@ class RobotView(QWidget):
         painter.setBrush(pg.mkBrush("white"))
 
         painter.drawText(
-            QtCore.QPointF(0, 10),
-            "Robot str(id)",
+            QtCore.QPointF(0, 10), "Robot str(id)",
         )
 
         painter.setPen(pg.mkPen("black"))
@@ -141,7 +139,6 @@ class RobotView(QWidget):
 
         painter.setBrush(pg.mkBrush(team_colour))
         painter.drawEllipse(QtCore.QPointF(x, y), radius / 4, radius / 4)
-
 
         top_right, top_left, bottom_left, bottom_right = self.vision_pattern_lookup[id]
 
