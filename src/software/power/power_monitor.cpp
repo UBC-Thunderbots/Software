@@ -8,7 +8,7 @@ PowerMonitor::PowerMonitor()
 
 float PowerMonitor::getBatteryVoltage()
 {
-    return static_cast<float>(monitor->getInputVoltage());
+    return static_cast<float>((monitor->getInputVoltage() / RESOLUTION) * SCALE_VOLTAGE);
 }
 
 float PowerMonitor::getCurrentDraw()

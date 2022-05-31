@@ -10,23 +10,24 @@ Charger::Charger()
     pinMode(CHRG_DONE, INPUT);
     pinMode(CHRG, OUTPUT);
 
-    attachInterrupt(digitalPinToInterrupt(CHRG_DONE), chargeDone, RISING);
+    attachInterrupt(digitalPinToInterrupt(CHRG_DONE), chargeDone, FALLING);
 }
 
 void Charger::chargeDone()
 {
     flyback_fault = digitalRead(FLYBACK_FAULT);
-    if (charge_done_callback && !flyback_fault)
+    if (charge_done_callback)
     {
         charge_done_callback();
         charge_done_callback = NULL;
-        digitalWrite(CHRG, LOW);
     }
 }
 
 void Charger::chargeCapacitors()
 {
-    digitalWrite(CHRG, HIGH);
+    if (!flyback_fault) {
+        digitalWrite(CHRG, HIGH);
+    }
 }
 
 void Charger::dischargeCapacitors()
