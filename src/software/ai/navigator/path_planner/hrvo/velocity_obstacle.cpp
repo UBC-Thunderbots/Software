@@ -49,21 +49,21 @@ VelocityObstacle VelocityObstacle::generateVelocityObstacle(
     const Vector robot_to_obstacle_vector        = obstacle.origin() - robot.origin();
     const Angle robot_relative_to_obstacle_angle = robot_to_obstacle_vector.orientation();
 
-    // opening angle of each side relative = arcsin((rad_A + rad_B) / distance)
-    Angle opening_angle = Angle::asin((robot.radius() + obstacle.radius()) /
-                                      robot_to_obstacle_vector.length());
+    // The robot is colliding with obstacle.
+    // Creates Velocity Obstacle with the sides being 180 degrees
+    // apart from each other (90 degrees relative to the robot to
+    // obstacle vector) with center being the center of obstacle.
+    // Subtracting by a slight offset to avoid the velocity obstacle
+    // from being the complement of what we want (Since VOs are defined as
+    // area created between the smallest angles between the two sides.
+    Angle opening_angle = Angle::quarter() - Angle::fromRadians(0.0001);
 
-    if (robot_to_obstacle_vector.lengthSquared() <
+    if (robot_to_obstacle_vector.lengthSquared() >
         std::pow(obstacle.radius() + robot.radius(), 2))
     {
-        // The robot is colliding with obstacle.
-        // Creates Velocity Obstacle with the sides being 180 degrees
-        // apart from each other (90 degrees relative to the robot to
-        // obstacle vector) with center being the center of obstacle.
-        // Subtracting by a slight offset to avoid the velocity obstacle
-        // from being the complement of what we want (Since VOs are defined as
-        // area created between the smallest angles between the two sides.
-        opening_angle = Angle::quarter() - Angle::fromRadians(0.0001);
+        // opening angle of each side relative = arcsin((rad_A + rad_B) / distance)
+        opening_angle = Angle::asin((robot.radius() + obstacle.radius()) /
+                                    robot_to_obstacle_vector.length());
     }
 
     // Direction of the two edges of the velocity obstacle
