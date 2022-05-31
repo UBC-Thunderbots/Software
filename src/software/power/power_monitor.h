@@ -32,6 +32,6 @@ class PowerMonitor
    private:
     static constexpr uint16_t RESOLUTION = 4096;
     static constexpr float SCALE_VOLTAGE = 3.3;
-    static constexpr double RESISTANCE = 0.002;
+    static constexpr double RESISTANCE   = 0.002;
     std::shared_ptr<LTC4151> monitor;
 };

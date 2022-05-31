@@ -25,7 +25,8 @@ void Charger::chargeDone()
 
 void Charger::chargeCapacitors()
 {
-    if (!flyback_fault) {
+    if (!flyback_fault)
+    {
         digitalWrite(CHRG, HIGH);
     }
 }
