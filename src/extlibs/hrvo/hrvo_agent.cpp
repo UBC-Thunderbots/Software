@@ -716,7 +716,7 @@ std::vector<TbotsProto::VelocityObstacle> HRVOAgent::getVelocityObstaclesAsProto
     std::vector<TbotsProto::VelocityObstacle> velocity_obstacles;
     for (const VelocityObstacle &vo : velocityObstacles_)
     {
-        velocity_obstacles.emplace_back(*createVelocityObstacleProto(vo));
+        velocity_obstacles.emplace_back(*createVelocityObstacleProto(vo, getPosition()));
     }
     return velocity_obstacles;
 }

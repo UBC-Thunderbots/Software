@@ -152,6 +152,8 @@ if __name__ == "__main__":
             (runtime_dir, NamedValue, True),
             (runtime_dir, World, True),
             (runtime_dir, PlayInfo, True),
+            (runtime_dir, PrimitiveSet, True),
+            (runtime_dir, HRVOVisualization, True),
         ]:
             proto_unix_io.attach_unix_receiver(*arg)
 

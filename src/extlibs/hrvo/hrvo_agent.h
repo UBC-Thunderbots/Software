@@ -115,9 +115,10 @@ class HRVOAgent : public Agent
         const float circle_rad = 0.03f) const;
 
     /**
-     * Get a list of triangles (polygons) which represent the velocity obstacles
-     * which this HRVO Agent currently sees.
-     * @return A list of polygons which represent velocity obstacles
+     * Get a list of velocity obstacle protos which represent the velocity obstacles
+     * in position space (i.e. the velocity obstacles are shifted by the agents position)
+     * @return A list of velocity obstacles protos which represent velocity obstacles in
+     * position space (as opposed to velocity space)
      */
     std::vector<TbotsProto::VelocityObstacle> getVelocityObstaclesAsProto() const;
 

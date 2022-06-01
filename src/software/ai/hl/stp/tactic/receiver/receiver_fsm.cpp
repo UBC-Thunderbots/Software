@@ -126,6 +126,10 @@ void ReceiverFSM::updateOnetouch(const Update& event)
             TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
             event.common.robot.robotConstants()));
     }
+    else
+    {
+        event.common.set_primitive(createStopPrimitive(false));
+    }
 }
 
 void ReceiverFSM::updateReceive(const Update& event)
