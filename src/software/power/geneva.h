@@ -20,7 +20,7 @@ class Geneva
     float getCurrentAngle();
     /**
      * Sets the angle of the geneva motor.
-     * Also attaches a timer interrupt to asynchronously wait a fixed amounts of time
+     * Also attaches a timer interrupt to asynchronously wait a fixed amount of time
      * (proportional to how much the geneva motor needs to rotate) before running the
      * given isr
      *
