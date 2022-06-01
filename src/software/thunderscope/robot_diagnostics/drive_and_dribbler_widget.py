@@ -21,6 +21,7 @@ class DriveAndDribblerWidget(QWidget):
     def __init__(self):
         """Initialize the widget to control the robot's motors
         """
+
         QWidget.__init__(self)
         layout = QVBoxLayout()
 
@@ -33,22 +34,21 @@ class DriveAndDribblerWidget(QWidget):
         tabs.addTab(per_wheel_tab, "Direct Per-Wheel Control")
         tabs.addTab(direct_velocity_tab, "Direct Velocity Control")
 
-        # Create first tab
-        per_wheel_tab.grid = QVBoxLayout()
-        per_wheel_tab.grid.addWidget(self.setup_direct_per_wheel("Drive"))
-        per_wheel_tab.grid.addStretch(1)
-        per_wheel_tab.setLayout(per_wheel_tab.grid)
+        # Create per wheel tab
+        self.per_wheel_layout = QVBoxLayout()
+        self.per_wheel_layout.addWidget(self.setup_direct_per_wheel("Drive"))
+        per_wheel_tab.setLayout(self.per_wheel_layout)
 
-        # Create second tab
-        direct_velocity_tab.grid2 = QVBoxLayout()
-        direct_velocity_tab.grid2.addWidget(self.setup_direct_velocity("Drive"))
-        direct_velocity_tab.grid2.addStretch(1)
-        direct_velocity_tab.setLayout(direct_velocity_tab.grid2)
+        # Create direct velocity tab
+        self.direct_velocity_layout = QVBoxLayout()
+        self.direct_velocity_layout.addWidget(self.setup_direct_velocity("Drive"))
+        direct_velocity_tab.setLayout(self.direct_velocity_layout)
 
         # Add tabs to widget
         layout.addWidget(tabs)
         layout.addWidget(self.setup_dribbler("Dribbler"))
         tabs.currentChanged.connect(self.reset_all_sliders)
+
         self.setLayout(layout)
 
     def value_change(self, slider):
@@ -69,7 +69,7 @@ class DriveAndDribblerWidget(QWidget):
         :param title: the name of the slider
 
         """
-        groupBox = QGroupBox(title)
+        group_box = QGroupBox(title)
         dbox = QVBoxLayout()
 
         # set up the sliders
@@ -126,9 +126,9 @@ class DriveAndDribblerWidget(QWidget):
         dbox.addWidget(back_right_groupbox)
         dbox.addWidget(stop_and_reset, alignment=Qt.AlignmentFlag.AlignCenter)
 
-        groupBox.setLayout(dbox)
+        group_box.setLayout(dbox)
 
-        return groupBox
+        return group_box
 
     def setup_direct_velocity(self, title):
         """Create a widget to control the direct velocity of the robot's motors
@@ -137,7 +137,7 @@ class DriveAndDribblerWidget(QWidget):
 
         """
 
-        groupBox = QGroupBox(title)
+        group_box = QGroupBox(title)
         dbox = QVBoxLayout()
 
         xms, self.slider_xms, self.label_xms = common_widgets.create_slider(
@@ -168,9 +168,9 @@ class DriveAndDribblerWidget(QWidget):
         dbox.addWidget(degree)
         dbox.addWidget(stop_and_reset, alignment=Qt.AlignmentFlag.AlignCenter)
 
-        groupBox.setLayout(dbox)
+        group_box.setLayout(dbox)
 
-        return groupBox
+        return group_box
 
     def setup_dribbler(self, title):
         """Create a widget to control the dribbler RPM
@@ -179,7 +179,7 @@ class DriveAndDribblerWidget(QWidget):
 
         """
 
-        groupBox = QGroupBox(title)
+        group_box = QGroupBox(title)
         dbox = QVBoxLayout()
 
         (
@@ -192,13 +192,13 @@ class DriveAndDribblerWidget(QWidget):
         )
 
         stop_and_reset = common_widgets.create_push_button("Stop and Reset")
-        stop_and_reset.clicked.connect(lambda: self.sliderDribbler.setValue(0))
+        stop_and_reset.clicked.connect(lambda: self.slider_dribbler.setValue(0))
 
         dbox.addWidget(dribbler)
         dbox.addWidget(stop_and_reset, alignment=Qt.AlignmentFlag.AlignCenter)
-        groupBox.setLayout(dbox)
+        group_box.setLayout(dbox)
 
-        return groupBox
+        return group_box
 
     def reset_all_sliders(self):
         """Reset all sliders back to 0
