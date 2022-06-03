@@ -53,10 +53,10 @@ std::unique_ptr<TbotsProto::Circle> createCircleProto(const Circle& circle)
 }
 
 std::unique_ptr<TbotsProto::VelocityObstacle> createVelocityObstacleProto(
-    const VelocityObstacle& vo)
+    const VelocityObstacle& vo, const Vector& offset)
 {
     auto vo_proto                     = std::make_unique<TbotsProto::VelocityObstacle>();
-    *(vo_proto->mutable_apex())       = *createVectorProto(vo.getApex());
+    *(vo_proto->mutable_apex())       = *createVectorProto(vo.getApex() + offset);
     *(vo_proto->mutable_left_side())  = *createVectorProto(vo.getLeftSide());
     *(vo_proto->mutable_right_side()) = *createVectorProto(vo.getRightSide());
     return vo_proto;
