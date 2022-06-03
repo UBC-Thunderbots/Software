@@ -3,7 +3,7 @@ import sys
 import pytest
 
 import software.python_bindings as tbots
-from proto.play_pb2 import Play
+from proto.play_pb2 import Play, PlayName
 from software.simulated_tests.ball_enters_region import *
 from software.simulated_tests.simulated_test_fixture import simulated_test_runner
 from proto.message_translation.tbots_protobuf import create_world_state
@@ -11,10 +11,10 @@ from proto.ssl_gc_common_pb2 import Team
 
 # TODO issue  #2599 - Remove Duration parameter from test
 # @pytest.mark.parametrize("run_enemy_ai,test_duration", [(False, 20), (True, 20)])
-def test_offense_play(simulated_test_runner):
+def test_crease_defense_play(simulated_test_runner):
 
     # starting point must be Point
-    ball_initial_pos = tbots.Point(-4.4, 2.9)
+    ball_initial_pos = tbots.Point(0.9, 2.85)
     # placement point must be Vector2 to work with game controller
     tbots.Point(-3, -2)
 
@@ -47,10 +47,10 @@ def test_offense_play(simulated_test_runner):
 
     # Force play override here
     blue_play = Play()
-    blue_play.name = Play.CreaseDefensePlay
+    blue_play.name = PlayName.CreaseDefensePlay
 
     yellow_play = Play()
-    yellow_play.name = Play.HaltPlay
+    yellow_play.name = PlayName.HaltPlay
 
     simulated_test_runner.blue_full_system_proto_unix_io.send_proto(Play, blue_play)
     simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(Play, yellow_play)
@@ -79,6 +79,6 @@ def test_offense_play(simulated_test_runner):
     )
 
 
-if name == "main":
+if __name__ == "__main__":
     # Run the test, -s disables all capturing at -vv increases verbosity
-    sys.exit(pytest.main([file, "-svv"]))
+    sys.exit(pytest.main([__file__, "-svv"]))

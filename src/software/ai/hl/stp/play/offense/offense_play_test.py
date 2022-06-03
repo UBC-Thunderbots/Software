@@ -3,7 +3,7 @@ import sys
 import pytest
 
 import software.python_bindings as tbots
-from proto.play_pb2 import Play
+from proto.play_pb2 import Play, PlayName
 from software.simulated_tests.ball_enters_region import *
 from software.simulated_tests.simulated_test_fixture import simulated_test_runner
 from proto.message_translation.tbots_protobuf import create_world_state
@@ -25,6 +25,7 @@ def test_offense_play(simulated_test_runner):
         tbots.Point(-2, 0.5),
         tbots.Point(-2, -1.7),
         tbots.Point(-2, -1.5),
+        tbots.Point(-2,-0.5),
     ]
 
     yellow_bots = [
@@ -46,10 +47,10 @@ def test_offense_play(simulated_test_runner):
 
     # Force play override here
     blue_play = Play()
-    blue_play.name = Play.OffensePlay
+    blue_play.name = PlayName.OffensePlay
 
     yellow_play = Play()
-    yellow_play.name = Play.HaltPlay
+    yellow_play.name = PlayName.HaltPlay
 
     simulated_test_runner.blue_full_system_proto_unix_io.send_proto(Play, blue_play)
     simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(Play, yellow_play)
