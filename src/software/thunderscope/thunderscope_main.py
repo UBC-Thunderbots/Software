@@ -13,7 +13,7 @@ from software.thunderscope.robot_communication import RobotCommunication
 from software.thunderscope.replay.proto_logger import ProtoLogger
 
 NUM_ROBOTS = 6
-SIM_TICK_RATE_MS = 16
+SIM_TICK_RATE_MS = 32
 
 ###########################################################################
 #                         Thunderscope Main                               #

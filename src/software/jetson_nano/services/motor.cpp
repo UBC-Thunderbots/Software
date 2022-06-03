@@ -26,7 +26,7 @@ extern "C"
 }
 
 // SPI Configs
-static uint32_t SPI_SPEED_HZ = 1000000;  // 1 Mhz
+static uint32_t SPI_SPEED_HZ = 400000;  // 1 Mhz
 static uint8_t SPI_BITS      = 8;
 static uint32_t SPI_MODE     = 0x3u;
 
@@ -41,8 +41,8 @@ static const uint32_t DRIBBLER_MOTOR_CHIP_SELECT    = 4;
 static const char* SPI_PATHS[] = {"/dev/spidev0.0", "/dev/spidev0.1", "/dev/spidev0.2",
                                   "/dev/spidev0.3", "/dev/spidev0.4"};
 
-static const char* SPI_CS_DRIVER_TO_CONTROLLER_MUX_0_GPIO = "76";
-static const char* SPI_CS_DRIVER_TO_CONTROLLER_MUX_1_GPIO = "77";
+static const char* SPI_CS_DRIVER_TO_CONTROLLER_MUX_0_GPIO = "51";
+static const char* SPI_CS_DRIVER_TO_CONTROLLER_MUX_1_GPIO = "76";
 static const char* MOTOR_DRIVER_RESET_GPIO                = "168";
 static const char* DRIVER_CONTROL_ENABLE_GPIO             = "194";
 static const char* HEARTBEAT_GPIO                         = "216";
@@ -116,21 +116,27 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
     g_motor_service = this;
 
     // TMC6100 Setup
-    startDriver(FRONT_LEFT_MOTOR_CHIP_SELECT);
-    startDriver(BACK_RIGHT_MOTOR_CHIP_SELECT);
-    startDriver(FRONT_RIGHT_MOTOR_CHIP_SELECT);
-    startDriver(BACK_LEFT_MOTOR_CHIP_SELECT);
+    //startDriver(FRONT_LEFT_MOTOR_CHIP_SELECT);
+    //startDriver(BACK_RIGHT_MOTOR_CHIP_SELECT);
+    //startDriver(FRONT_RIGHT_MOTOR_CHIP_SELECT);
+    //startDriver(BACK_LEFT_MOTOR_CHIP_SELECT);
 
     // TMC4671 Setup
-    startController(FRONT_LEFT_MOTOR_CHIP_SELECT);
-    startController(BACK_RIGHT_MOTOR_CHIP_SELECT);
-    startController(FRONT_RIGHT_MOTOR_CHIP_SELECT);
-    startController(BACK_LEFT_MOTOR_CHIP_SELECT);
+    //startController(FRONT_LEFT_MOTOR_CHIP_SELECT);
+    //startController(BACK_RIGHT_MOTOR_CHIP_SELECT);
+    //startController(FRONT_RIGHT_MOTOR_CHIP_SELECT);
+    //startController(BACK_LEFT_MOTOR_CHIP_SELECT);
 
     // Clear faults
+    reset_gpio.setValue(GpioState::LOW);
+    sleep(1);
+    reset_gpio.setValue(GpioState::HIGH);
+    sleep(1);
+
     driver_control_enable_gpio.setValue(GpioState::LOW);
-    usleep(1000);
+    sleep(1);
     driver_control_enable_gpio.setValue(GpioState::HIGH);
+    sleep(1);
 
     // Check faults
     checkDriverFault(FRONT_LEFT_MOTOR_CHIP_SELECT);

@@ -173,7 +173,7 @@ class ErForceSimulator
     std::unique_ptr<TbotsProto::World> yellow_team_world_msg;
     std::unique_ptr<TbotsProto::World> blue_team_world_msg;
 
-    static constexpr double primitive_executor_time_step = 1.0 / 60.0;
+    static constexpr double primitive_executor_time_step = 1.0 / 30.0;
     unsigned int frame_number;
 
     // The current time.
