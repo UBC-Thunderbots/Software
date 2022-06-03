@@ -68,6 +68,7 @@ class SimulatorTestRunner(object):
         self.last_exception = None
 
         self.world_buffer = ThreadSafeBuffer(buffer_size=1, protobuf_type=World)
+        self.primitive_set_buffer = ThreadSafeBuffer(buffer_size=1, protobuf_type=PrimitiveSet)
         self.last_exception = None
 
         self.ssl_wrapper_buffer = ThreadSafeBuffer(
@@ -165,6 +166,9 @@ class SimulatorTestRunner(object):
                         )
                         self.blue_full_system_proto_unix_io.send_proto(
                             RobotStatus, robot_status
+                        )
+                        self.primitive_set_buffer.get(
+                            block=True, timeout=WORLD_BUFFER_TIMEOUT
                         )
 
                 # Validate
@@ -367,7 +371,8 @@ def simulated_test_runner():
 
             # Only validate on the blue worlds
             blue_full_system_proto_unix_io.register_observer(World, runner.world_buffer)
-
+            blue_full_system_proto_unix_io.register_observer(PrimitiveSet,
+                runner.primitive_set_buffer)
             # Setup proto loggers.
             #
             # NOTE: Its important we use the test runners time provider because
