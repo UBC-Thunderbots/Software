@@ -10,6 +10,7 @@
 #include "software/util/scoped_timespec_timer/scoped_timespec_timer.h"
 #include "software/world/robot_state.h"
 #include "software/jetson_nano/encoder/encoder.h"
+#include "software/jetson_nano/encoder/as5047spi.h"
 
 /**
  * https://rt.wiki.kernel.org/index.php/Squarewave-example
@@ -67,7 +68,8 @@ void Thunderloop::runLoop()
     // backwards
     clock_gettime(CLOCK_MONOTONIC, &next_shot);
 
-    Encoder encoder = Encoder(0);
+    //Encoder encoder = Encoder(0);
+    AS5047 e = AS5047("/dev/spidev1.0");
 
     for (;;)
     {
@@ -145,7 +147,8 @@ void Thunderloop::runLoop()
 
             //robot_status_.mutable_power_status()->set_capacitor_voltage(200);
 
-	    float angle = encoder.readAngle();
+	    //float angle = encoder.readAngle();
+	    uint16_t angle = e.readAngle();
 	    std::cout << "currently reading encoder angle: " << angle << "\n";
         }
 

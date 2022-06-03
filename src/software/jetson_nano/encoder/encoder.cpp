@@ -18,6 +18,7 @@ ReadDataFrame Encoder::readRegister(uint16_t registerAddress) {
 	nopCommand.values.parc = isEven(nopCommand.raw);
 
 	ReadDataFrame receivedFrame;
+	printf("sending command: %X\n", command.raw);
 	receivedFrame.raw = spi.readData(command.raw, nopCommand.raw);
 	return receivedFrame;
 }
@@ -41,6 +42,7 @@ float Encoder::readAngle() {
 	ReadDataFrame readDataFrame = readRegister(ANGLE_REG);
 	EncoderAngle angle;
 	angle.raw = readDataFrame.values.data;
+	std::cout << "raw angle: " << angle.raw;
 	return static_cast<float>(angle.values.cordicang/16384.*360.);
 }
 

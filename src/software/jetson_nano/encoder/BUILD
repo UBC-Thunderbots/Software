@@ -17,9 +17,11 @@ cc_library(
 	name = "encoder",
 	srcs = [
 		"encoder.cpp",
+		"as5047spi.cpp",
 	],
 	hdrs = [
 		"encoder.h",
+		"as5047spi.h",
 	],
 	deps = [
 		":encoder_spi"

@@ -6,7 +6,7 @@
 EncoderSpi::EncoderSpi(uint8_t chip_select_pin)
 	: chipSelectPin(chip_select_pin)
 {
-	fd = open("/dev/spidev1.0", O_RDWR); 
+	fd = open("/dev/spidev0.0", O_RDWR); 
 	CHECK(fd >= 0) << "can't open encoder, error: " << strerror(errno);	
 
 //	int ret = ioctl(fd, SPI_IOC_WR_MODE32, SPI_MODE_1);
@@ -24,6 +24,7 @@ void EncoderSpi::writeData(uint16_t command, uint16_t value) {
 	tr[0].len 		= 16;
 	tr[0].delay_usecs 	= 0;
 	tr[0].speed_hz 		= SPI_SPEED_HZ;
+	tr[0].cs_change		= true;
 
 	tr[1].tx_buf 		= value;
 	tr[1].rx_buf 	 	= 0;
@@ -47,7 +48,7 @@ uint16_t EncoderSpi::readData(uint16_t command, uint16_t nopCommand) {
 	memset(rx, 0, sizeof(rx));
 
 	unsigned char spi_mode = SPI_MODE_1;
-	ret = ioctl(fd, SPI_IOC_RD_MODE, &spi_mode);
+	ret = ioctl(fd, SPI_IOC_WR_MODE, &spi_mode);
 	CHECK(ret != -1) << "can't set spi mode for encoder, error: " << strerror(errno);
 
 	tr[0].tx_buf 		= (unsigned long) &command;

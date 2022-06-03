@@ -1,74 +1,164 @@
-/** @file AS5X47Spi.cpp
- *
- * @brief A library for Arduino boards that reads angles from AS5047 and AS5147 sensors.
- * 		  Also support configuration of the sensor parameters.
- *
- * @par
- * COPYRIGHT NOTICE: MIT License
- *
- * 	Copyright (c) 2020 Adrien Legrand <contact@adrien-legrand.com>
- *
- * 	Permission is hereby granted, free of charge, to any person obtaining a copy
- * 	of this software and associated documentation files (the "Software"), to deal
- * 	in the Software without restriction, including without limitation the rights
- * 	to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * 	copies of the Software, and to permit persons to whom the Software is
- * 	furnished to do so, subject to the following conditions:
- *
- * 	The above copyright notice and this permission notice shall be included in all
- * 	copies or substantial portions of the Software.
- *
- * 	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * 	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * 	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * 	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * 	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * 	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * 	SOFTWARE.
- *
-*/
+#include "as5047spi.h"
 
-#include "software/jetson_nano/encoder/as5047spi.h"
+#include <stdint.h>
+#include <string.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <fcntl.h>
+#include <sys/ioctl.h>
+#include <linux/spi/spidev.h>
 
-AS5X47Spi::AS5X47Spi(uint8_t _chipSelectPin) {
-	// Initialize SPI Communication
-	chipSelectPin = _chipSelectPin;
-	pinMode(chipSelectPin, OUTPUT);
-	digitalWrite(chipSelectPin, HIGH);
-	SPI.begin();
+#include <cstdio>
+#include <stdexcept>
+
+AS5047::AS5047() {
+    m_open = false;
 }
 
-
-void AS5X47Spi::writeData(uint16_t command, uint16_t value) {
-	// @todo Expose the SPI Maximum Frequency in library interface.
-	SPI.beginTransaction(SPISettings(100000, MSBFIRST, SPI_MODE1));
-	// Send command
-	digitalWrite(chipSelectPin, LOW);
-	SPI.transfer16(command);
-	digitalWrite(chipSelectPin, HIGH);
-	delayMicroseconds(1);
-	// Read data
-	digitalWrite(chipSelectPin, LOW);
-	SPI.transfer16(value);
-	digitalWrite(chipSelectPin, HIGH);
-	SPI.endTransaction();
-	delayMicroseconds(1);
-
+AS5047::AS5047(const char* p_spidev, uint32_t speed) {
+    m_spidev = NULL;
+    if (p_spidev != NULL ) {
+        m_spidev = (char *) malloc(strlen(p_spidev)+1);
+        if (m_spidev != NULL) 
+            strcpy(m_spidev,p_spidev);
+    }
+    speed_ = speed;
+    m_open = false;
 }
 
-uint16_t AS5X47Spi::readData(uint16_t command, uint16_t nopCommand) {
-	SPI.beginTransaction(SPISettings(100000, MSBFIRST, SPI_MODE1));
+AS5047::~AS5047() {
+    if (m_spidev != NULL ) {
+        free(m_spidev);
+        m_spidev = NULL;
+    }
+    if (m_open)
+        close(m_spifd);
+}
 
-	// Send Read Command
-	digitalWrite(chipSelectPin, LOW);
-	SPI.transfer16(command);
-	digitalWrite(chipSelectPin, HIGH);
-	delayMicroseconds(1);
-	// Send Nop Command while receiving data
-	digitalWrite(chipSelectPin, LOW);
-	uint16_t receivedData = SPI.transfer16(nopCommand);
-	digitalWrite(chipSelectPin, HIGH);
-	SPI.endTransaction();
-	delayMicroseconds(1);
-	return receivedData;
+void AS5047::setPort(const char* p_spidev) {
+    if (m_open) {
+        throw std::runtime_error("SPI Port was already opened. setPort before begin()");
+    }
+    m_spidev = NULL;
+    if (p_spidev != NULL ) {
+        m_spidev = (char *) malloc(strlen(p_spidev)+1);
+        if (m_spidev != NULL) 
+            strcpy(m_spidev,p_spidev);
+    }
+
+    // printf("PORT: %s", m_spidev);
+}
+
+void AS5047::setSpeed(uint32_t speed) {
+    speed_ = speed;
+    if (m_open) {
+        /* Set SPI speed*/
+        if (ioctl(m_spifd, SPI_IOC_WR_MAX_SPEED_HZ, &speed_) < 0) {
+            close(m_spifd);
+            m_open = false;
+        }
+    }
+}
+
+bool AS5047::begin() {
+    if (m_open == true )
+       return true;
+    if (m_spidev == NULL)
+       return false;
+
+    m_spifd = open(m_spidev, O_RDWR);
+    if (m_spifd < 0) {
+        return false;
+    }
+
+    uint8_t mode = SPI_MODE_1;
+    uint8_t bits_per_word = 8;
+
+    /* Set SPI_POL and SPI_PHA */
+    if (ioctl(m_spifd, SPI_IOC_WR_MODE, &mode) < 0) {
+        close(m_spifd);
+        return false;
+    }
+
+    /* Set bits per word*/
+    if (ioctl(m_spifd, SPI_IOC_WR_BITS_PER_WORD, &bits_per_word) < 0) {
+        close(m_spifd);
+        return false;
+    }
+
+    /* Set SPI speed*/
+    if (ioctl(m_spifd, SPI_IOC_WR_MAX_SPEED_HZ, &speed_) < 0) {
+        close(m_spifd);
+        return false;
+    }
+
+    m_open = true;
+
+    return true;
+}
+
+uint16_t AS5047::readAngle() {
+    struct spi_ioc_transfer spi_message_tx;
+    memset(&spi_message_tx, 0, sizeof(spi_message_tx));
+    spi_message_tx.tx_buf = (unsigned long) commands.readAngle;
+    spi_message_tx.len = 2;
+    if (!ioctl(m_spifd, SPI_IOC_MESSAGE(1), spi_message_tx))
+        return -1;
+
+    struct spi_ioc_transfer spi_message_rx;
+    memset(&spi_message_rx, 0, sizeof(spi_message_rx));
+    uint8_t rxbuf[2];
+    spi_message_rx.rx_buf = (unsigned long) rxbuf;
+    spi_message_rx.len = 2;
+    if (!ioctl(m_spifd, SPI_IOC_MESSAGE(1), spi_message_rx))
+        return -1;
+
+    uint16_t resp = static_cast<uint16_t>((rxbuf[1]) | (rxbuf[0] << 8));
+
+    if (!readSanityCheck(resp)) return -1;
+
+    return resp & 0x3FFF; // Data is present in first 14 bits.
+}
+
+uint16_t AS5047::getRelAngle() {
+    int32_t temp = readAngle()-zeroOffset;
+    if (temp < 0) temp = 16383 + temp;
+    
+    return static_cast<uint16_t>(temp);
+}
+
+void AS5047::softZero() {
+    uint32_t sum = 0;
+    uint16_t last = 0;
+    uint16_t curr = 0;
+    for (int i = 0; i < numSamples_zero; i++) {
+        curr = readAngle();
+        if (i > 0) {
+            if (curr - last > 10) {
+                i--;
+                continue;
+            }
+        }
+        last = curr;
+        sum += curr;
+    }
+    zeroOffset = static_cast<uint16_t>(sum/numSamples_zero);
+}
+
+uint8_t AS5047::calcEvenParity(uint16_t msg) {
+    int parity = 0;
+    while (msg) {
+        parity ^= msg & 0b1;
+        msg = static_cast<uint16_t>(msg >> 1);
+    }
+    return static_cast<uint8_t>(parity);
+}
+
+bool AS5047::readSanityCheck(uint16_t msg) {
+    int recParity = (msg >> 15);
+    if (calcEvenParity(msg&0x8000) != recParity) return false;
+
+    if ((msg >> 14) & 1) return false;
+
+    return true;
 }

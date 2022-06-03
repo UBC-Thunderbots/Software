@@ -2,6 +2,7 @@
 
 #include <linux/spi/spidev.h>
 #include <stdint.h>
+#include <iostream>
 #include "software/jetson_nano/encoder/encoder_spi.h"
 
 // Volatile Registers Addresses
