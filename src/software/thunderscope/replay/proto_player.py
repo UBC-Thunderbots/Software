@@ -187,7 +187,7 @@ class ProtoPlayer(object):
                     )
                     log_file.write(bytes(log_entry, encoding="utf-8"))
                     self.current_entry_index += 1
-                    if self.current_packet_time > end_time:
+                    if self.current_packet_time >= end_time:
                         logging.info("Clip saved!")
                         return
                 # Load the next chunk
