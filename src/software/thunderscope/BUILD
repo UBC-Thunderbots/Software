@@ -37,6 +37,7 @@ py_library(
         "//software/thunderscope/common:proto_configuration_widget",
         "//software/thunderscope/field",
         "//software/thunderscope/field:field_layer",
+        "//software/thunderscope/field:hrvo_layer",
         "//software/thunderscope/field:obstacle_layer",
         "//software/thunderscope/field:passing_layer",
         "//software/thunderscope/field:path_layer",
