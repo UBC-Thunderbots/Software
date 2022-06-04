@@ -15,6 +15,7 @@ platformio_project(
     src = "main.cc",
     board = "micro",
     framework = "arduino",
+    platform = "atmelavr",
     deps = [
         "//shared:constants_platformio",
     ],
