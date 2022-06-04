@@ -85,6 +85,7 @@ void SimulatedErForceSimPlayTestFixture::updatePrimitives(
 
     auto primitive_set_msg = ai.getPrimitives(world_with_updated_game_state);
     LOG(VISUALIZE) << ai.getPlayInfo();
+    LOG(VISUALIZE) << *primitive_set_msg;
 
     double duration_ms = ::TestUtil::millisecondsSince(start_tick_time);
     registerFriendlyTickTime(duration_ms);

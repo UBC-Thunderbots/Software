@@ -12,6 +12,7 @@ cc_library(
     ],
     deps = [
         "//shared:constants",
+        "//software/ai/evaluation:calc_best_shot",
         "//software/ai/hl/stp/tactic",
         "//software/ai/hl/stp/tactic/dribble:dribble_tactic",
         "//software/ai/hl/stp/tactic/kick:kick_tactic",

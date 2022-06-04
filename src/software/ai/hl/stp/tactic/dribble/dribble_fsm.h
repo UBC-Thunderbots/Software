@@ -2,7 +2,7 @@
 
 #include "proto/parameters.pb.h"
 #include "shared/constants.h"
-#include "software/ai/evaluation/pass.h"
+#include "software/ai/evaluation/time_to_travel.h"
 #include "software/ai/hl/stp/tactic/move/move_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/hl/stp/tactic/transition_conditions.h"
@@ -207,7 +207,7 @@ struct DribbleFSM
             LoseBall_S + Update_E[lostPossession_G] / getPossession_A = GetPossession_S,
             X + Update_E[lostPossession_G] / getPossession_A          = GetPossession_S,
             X + Update_E[!dribblingDone_G] / dribble_A                = Dribble_S,
-            X + Update_E / dribble_A);
+            X + Update_E / dribble_A                                  = X);
     }
 
    private:
