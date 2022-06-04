@@ -190,7 +190,7 @@ sudo service udev restart
 sudo usermod -a -G dialout $USER
 
 # installs PlatformIO to global environment
-if ! python3 -c "$(curl -fsSL https://raw.githubusercontent.com/platformio/platformio/master/scripts/get-platformio.py)"; then
+if ! sudo /usr/bin/python3.8 -m pip install --prefix /usr/local platformio==6.0.2; then
     echo "##############################################################"
     echo "Error: Installing PlatformIO failed"
     echo "##############################################################"
