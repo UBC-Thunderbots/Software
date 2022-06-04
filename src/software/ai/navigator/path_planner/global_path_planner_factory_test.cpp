@@ -54,7 +54,7 @@ TEST_F(TestGlobalPathPlanner,
 
     EXPECT_TRUE(path != std::nullopt);
 
-    EXPECT_EQ(start, path.front());
+    EXPECT_EQ(start, path.value().front());
 
     EXPECT_LE(path.value().back().x(), world.field().enemyDefenseArea().negXNegYCorner().x());
     EXPECT_NEAR(path.value().back().y(), 0, 0.1);
@@ -65,7 +65,7 @@ TEST_F(TestGlobalPathPlanner,
     // since the starting point is inside an obstacle, we need to consider the path from
     // the second point onwards
     TestUtil::checkPathDoesNotIntersectObstacle(
-        {path_points.begin() + 1, path_points.end()}, obstacles);
+        {path.value().begin() + 1, path.value().end()}, obstacles);
 }
 
 TEST_F(
@@ -137,7 +137,7 @@ TEST_F(TestGlobalPathPlanner,
 
     EXPECT_TRUE(path != std::nullopt);
 
-    std::vector<Point> path_points = path->getKnots();
+    std::vector<Point> path_points = path.value();
 
     EXPECT_EQ(start, path.value().front());
     EXPECT_LE(distance(path.value().back(), dest), planner->getResolution());
@@ -166,7 +166,7 @@ TEST_F(TestGlobalPathPlanner, test_enemy_half_blocked_starting_and_ending_in_blo
 
     EXPECT_TRUE(path != std::nullopt);
 
-    std::vector<Point> path_points = path->getKnots();
+    std::vector<Point> path_points = path.value();
 
     EXPECT_EQ(start, path.value().front());
 
@@ -197,7 +197,7 @@ TEST_F(TestGlobalPathPlanner, test_friendly_half_blocked_starting_in_blocked_are
 
     EXPECT_TRUE(path != std::nullopt);
 
-    std::vector<Point> path_points = path->getKnots();
+    std::vector<Point> path_points = path.value();
 
     EXPECT_EQ(start, path.value().front());
     EXPECT_EQ(dest, path.value().back());
@@ -226,7 +226,7 @@ TEST_F(TestGlobalPathPlanner, test_leave_the_field)
 
     EXPECT_TRUE(path != std::nullopt);
 
-    std::vector<Point> path_points = path->getKnots();
+    std::vector<Point> path_points = path.value();
 
     EXPECT_EQ(start, path.value().front());
     EXPECT_EQ(dest, path.value().back());
