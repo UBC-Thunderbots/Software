@@ -57,11 +57,10 @@ std::pair<Point, double> NavigatingPrimitiveCreator::calculateDestinationAndFina
         final_dest = path[1];
     }
 
-    return std::make_pair<>(
-        Point(final_dest),
+    return std::make_pair<>(Point(final_dest),
                             // slow down around enemy robots
-        desired_final_speed * 
-            getEnemyObstacleProximityFactor(path[1], enemy_robot_obstacles));
+                            desired_final_speed * getEnemyObstacleProximityFactor(
+                                                      path[1], enemy_robot_obstacles));
 }
 
 double NavigatingPrimitiveCreator::getEnemyObstacleProximityFactor(

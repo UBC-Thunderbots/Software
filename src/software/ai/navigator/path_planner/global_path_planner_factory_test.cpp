@@ -56,7 +56,8 @@ TEST_F(TestGlobalPathPlanner,
 
     EXPECT_EQ(start, path.value().front());
 
-    EXPECT_LE(path.value().back().x(), world.field().enemyDefenseArea().negXNegYCorner().x());
+    EXPECT_LE(path.value().back().x(),
+              world.field().enemyDefenseArea().negXNegYCorner().x());
     EXPECT_NEAR(path.value().back().y(), 0, 0.1);
 
     Rectangle bounding_box(world.field().enemyDefenseArea().posXPosYCorner(),
