@@ -103,7 +103,7 @@ class ProtoConfigurationWidget(QWidget):
             except (TypeError, NameError):
                 exec(f"self.proto_to_configure.{child_name} = data")
 
-                self.on_change_callback(child_name, data, self.proto_to_configure)
+            self.on_change_callback(child_name, data, self.proto_to_configure)
 
     @staticmethod
     def __create_int_parameter(key, value, descriptor):

@@ -129,7 +129,7 @@ void SimBall::begin(double time_s, bool robotCollision)
                 break;
         }
 
-          std::cout<<"curr state = "<<currentBallState<<" , v = "<<velocity.length()<<std::endl;
+          //std::cout<<"curr state = "<<currentBallState<<" , v = "<<velocity.length()<<std::endl;
 
 //        if (velocity.length() < 0.01 * SIMULATOR_SCALE)
 //        {
