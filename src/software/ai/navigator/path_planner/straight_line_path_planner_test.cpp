@@ -16,7 +16,7 @@ TEST(TestStraightLinePathPlanner, test_straight_line_path_planner)
 
     EXPECT_TRUE(path != std::nullopt);
 
-    std::vector<Point> path_points = path->knots();
+    std::vector<Point> path_points = path.value();
 
     EXPECT_EQ(path_points.front(), start);
     EXPECT_EQ(path_points.back(), dest);

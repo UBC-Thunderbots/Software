@@ -32,7 +32,7 @@ TEST_F(TestGlobalPathPlanner, test_no_motion_constraints)
     EXPECT_TRUE(path != std::nullopt);
 
     Rectangle bounding_box({0.9, -2.1}, {3.1, 2.1});
-    TestUtil::checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
+    TestUtil::checkPathDoesNotExceedBoundingBox(path.value(), bounding_box);
 }
 
 TEST_F(TestGlobalPathPlanner,
@@ -56,12 +56,12 @@ TEST_F(TestGlobalPathPlanner,
 
     EXPECT_EQ(start, path.front());
 
-    EXPECT_LE(path.back().x(), world.field().enemyDefenseArea().negXNegYCorner().x());
-    EXPECT_NEAR(path.back().y(), 0, 0.1);
+    EXPECT_LE(path.value().back().x(), world.field().enemyDefenseArea().negXNegYCorner().x());
+    EXPECT_NEAR(path.value().back().y(), 0, 0.1);
 
     Rectangle bounding_box(world.field().enemyDefenseArea().posXPosYCorner(),
                            world.field().friendlyDefenseArea().negXNegYCorner());
-    TestUtil::checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
+    TestUtil::checkPathDoesNotExceedBoundingBox(path.value(), bounding_box);
     // since the starting point is inside an obstacle, we need to consider the path from
     // the second point onwards
     TestUtil::checkPathDoesNotIntersectObstacle(
@@ -88,13 +88,13 @@ TEST_F(
 
     EXPECT_TRUE(path != std::nullopt);
 
-    std::vector<Point> path_points = path->getKnots();
+    std::vector<Point> path_points = path.value();
 
-    EXPECT_EQ(path->getStartPoint(), start);
+    EXPECT_EQ(path.value().front(), start);
 
-    EXPECT_LE(path->getEndPoint().x(),
+    EXPECT_LE(path.value().back().x(),
               world.field().enemyDefenseArea().negXNegYCorner().x());
-    EXPECT_NEAR(path->getEndPoint().y(), dest.y(), planner->getResolution());
+    EXPECT_NEAR(path.value().back().y(), dest.y(), planner->getResolution());
 
     Rectangle bounding_box(world.field().enemyDefenseArea().posXPosYCorner(),
                            world.field().friendlyDefenseArea().negXNegYCorner());
@@ -139,8 +139,8 @@ TEST_F(TestGlobalPathPlanner,
 
     std::vector<Point> path_points = path->getKnots();
 
-    EXPECT_EQ(start, path->getStartPoint());
-    EXPECT_LE(distance(path->getEndPoint(), dest), planner->getResolution());
+    EXPECT_EQ(start, path.value().front());
+    EXPECT_LE(distance(path.value().back(), dest), planner->getResolution());
 
     Rectangle bounding_box({-3.1, -3.1}, {3.1, 3.1});
     TestUtil::checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
@@ -168,7 +168,7 @@ TEST_F(TestGlobalPathPlanner, test_enemy_half_blocked_starting_and_ending_in_blo
 
     std::vector<Point> path_points = path->getKnots();
 
-    EXPECT_EQ(start, path->getStartPoint());
+    EXPECT_EQ(start, path.value().front());
 
     EXPECT_LE(dest.x(), 0);
     EXPECT_NEAR(dest.y(), 0, planner->getResolution());
@@ -199,8 +199,8 @@ TEST_F(TestGlobalPathPlanner, test_friendly_half_blocked_starting_in_blocked_are
 
     std::vector<Point> path_points = path->getKnots();
 
-    EXPECT_EQ(start, path->getStartPoint());
-    EXPECT_EQ(dest, path->getEndPoint());
+    EXPECT_EQ(start, path.value().front());
+    EXPECT_EQ(dest, path.value().back());
 
     Rectangle bounding_box({-3.1, -3.1}, {4.1, 1.1});
     TestUtil::checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
@@ -228,8 +228,8 @@ TEST_F(TestGlobalPathPlanner, test_leave_the_field)
 
     std::vector<Point> path_points = path->getKnots();
 
-    EXPECT_EQ(start, path->getStartPoint());
-    EXPECT_EQ(dest, path->getEndPoint());
+    EXPECT_EQ(start, path.value().front());
+    EXPECT_EQ(dest, path.value().back());
 
     Rectangle bounding_box(start, dest);
     TestUtil::checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
