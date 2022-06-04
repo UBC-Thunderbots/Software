@@ -1,7 +1,8 @@
 #pragma once
 
+#include "extlibs/hrvo/agent.h"
 #include "extlibs/hrvo/path.h"
-#include "extlibs/hrvo/velocity_obstacle.h"
+#include "software/ai/navigator/path_planner/hrvo/velocity_obstacle.h"
 #include "software/geom/vector.h"
 
 class HRVOSimulator;

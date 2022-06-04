@@ -56,8 +56,7 @@ struct TacticUpdate
 #define DEFINE_TACTIC_DONE_AND_GET_FSM_STATE                                             \
     bool done() const override                                                           \
     {                                                                                    \
-        bool is_done          = false;                                                   \
-        std::string state_str = "";                                                      \
+        bool is_done = false;                                                            \
         if (last_execution_robot.has_value())                                            \
         {                                                                                \
             is_done = fsm_map.at(last_execution_robot.value())->is(boost::sml::X);       \
@@ -76,3 +75,6 @@ struct TacticUpdate
 
 #define CREATE_MOTION_CONTROL(DESTINATION)                                               \
     event.common.create_motion_control(event.common.robot, DESTINATION)
+
+#define SET_STOP_PRIMITIVE_ACTION                                                        \
+    [this](auto event) { event.common.set_primitive(createStopPrimitive(false)); }

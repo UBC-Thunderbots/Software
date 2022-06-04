@@ -5,7 +5,7 @@
 #include "proto/parameters.pb.h"
 #include "software/../shared/constants.h"
 #include "software/ai/evaluation/calc_best_shot.h"
-#include "software/ai/evaluation/pass.h"
+#include "software/ai/evaluation/time_to_travel.h"
 #include "software/geom/algorithms/acute_angle.h"
 #include "software/geom/algorithms/closest_point.h"
 #include "software/geom/algorithms/contains.h"
@@ -180,10 +180,13 @@ double calculateInterceptRisk(const Robot& enemy_robot, const Pass& pass,
     // point on the pass to the enemy's current position
     Point closest_point_on_pass_to_robot = closestPoint(
         enemy_robot.position(), Segment(pass.passerPoint(), pass.receiverPoint()));
-    Duration enemy_robot_time_to_closest_pass_point = getTimeToPositionForRobot(
-        enemy_robot.position(), closest_point_on_pass_to_robot,
-        ENEMY_ROBOT_MAX_SPEED_METERS_PER_SECOND,
-        ENEMY_ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED, ROBOT_MAX_RADIUS_METERS);
+    // Subtracting by the max robot radius as a threshold of the enemy robot blocking the
+    // pass
+    double distance = (closest_point_on_pass_to_robot - enemy_robot.position()).length() -
+                      ROBOT_MAX_RADIUS_METERS;
+    Duration enemy_robot_time_to_closest_pass_point =
+        getTimeToTravelDistance(distance, ENEMY_ROBOT_MAX_SPEED_METERS_PER_SECOND,
+                                ENEMY_ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
     Duration ball_time_to_closest_pass_point = Duration::fromSeconds(
         (closest_point_on_pass_to_robot - pass.passerPoint()).length() / pass.speed());
 
@@ -196,10 +199,8 @@ double calculateInterceptRisk(const Robot& enemy_robot, const Pass& pass,
 
     // Figure out how long the enemy robot and ball will take to reach the receive point
     // for the pass.
-    Duration enemy_robot_time_to_pass_receive_position = getTimeToPositionForRobot(
-        enemy_robot.position(), pass.receiverPoint(),
-        ENEMY_ROBOT_MAX_SPEED_METERS_PER_SECOND,
-        ENEMY_ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED, ROBOT_MAX_RADIUS_METERS);
+    Duration enemy_robot_time_to_pass_receive_position =
+        enemy_robot.getTimeToPosition(pass.receiverPoint());
     Duration ball_time_to_pass_receive_position = pass.estimatePassDuration();
 
     double robot_ball_time_diff_at_closest_pass_point =
@@ -222,7 +223,7 @@ double calculateInterceptRisk(const Robot& enemy_robot, const Pass& pass,
     return 1 - sigmoid(min_time_diff, 0, 1);
 }
 
-double ratePassFriendlyCapability(Team friendly_team, const Pass& pass,
+double ratePassFriendlyCapability(const Team& friendly_team, const Pass& pass,
                                   TbotsProto::PassingConfig passing_config)
 {
     // We need at least one robot to pass to
@@ -256,19 +257,14 @@ double ratePassFriendlyCapability(Team friendly_team, const Pass& pass,
     Timestamp receive_time = best_receiver.timestamp() + ball_travel_time;
 
     // Figure out how long it would take our robot to get there
-    Duration min_robot_travel_time = getTimeToPositionForRobot(
-        best_receiver.position(), pass.receiverPoint(),
-        best_receiver.robotConstants().robot_max_speed_m_per_s,
-        best_receiver.robotConstants().robot_max_acceleration_m_per_s_2);
+    Duration min_robot_travel_time =
+        best_receiver.getTimeToPosition(pass.receiverPoint());
     Timestamp earliest_time_to_receive_point =
         best_receiver.timestamp() + min_robot_travel_time;
 
     // Figure out what angle the robot would have to be at to receive the ball
     Angle receive_angle = (pass.passerPoint() - best_receiver.position()).orientation();
-    Duration time_to_receive_angle = getTimeToOrientationForRobot(
-        best_receiver.orientation(), receive_angle,
-        best_receiver.robotConstants().robot_max_ang_speed_rad_per_s,
-        best_receiver.robotConstants().robot_max_ang_acceleration_rad_per_s_2);
+    Duration time_to_receive_angle = best_receiver.getTimeToOrientation(receive_angle);
     Timestamp earliest_time_to_receive_angle =
         best_receiver.timestamp() + time_to_receive_angle;
 
