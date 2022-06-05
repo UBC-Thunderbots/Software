@@ -7,7 +7,6 @@ from software.simulated_tests.validation import (
     create_validation_types,
 )
 
-
 class BallSpeedThreshold(Validation):
 
     """Checks if the ball speed is at or above some threshold."""
@@ -36,7 +35,12 @@ class BallSpeedThreshold(Validation):
     def get_validation_geometry(self, world) -> ValidationGeometry:
         """override"""
         # TODO (#2556): visualize
-        return create_validation_geometry([])
+        print("got validation geometry")
+        return create_validation_geometry(
+            [
+                # tbots.Segment(ball.current_state.global_velocity) 
+            ]
+        )
 
     def __repr__(self):
         return "Check that the ball speed is at or above above " + str(

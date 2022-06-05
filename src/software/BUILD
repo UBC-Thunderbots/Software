@@ -136,6 +136,7 @@ pybind_library(
         "//software/geom:angle",
         "//software/geom:point",
         "//software/geom:vector",
+        "//software/geom:segment",
         "//software/geom/algorithms",
         "//software/networking:threaded_proto_udp_listener",
         "//software/networking:threaded_proto_udp_sender",
