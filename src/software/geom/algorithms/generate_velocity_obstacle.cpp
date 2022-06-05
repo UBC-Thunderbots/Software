@@ -69,9 +69,11 @@ VelocityObstacle generateVelocityObstacle(const Polygon &obstacle, const Circle 
         right_side = temp;
     }
 
-    // Expand (rotate) the sides by the robot radius
-    left_side = left_side.rotate(Angle::asin(robot.radius() / left_side.length()));
-    right_side = right_side.rotate(-Angle::asin(robot.radius() / right_side.length()));
+    // Expand (i.e. rotate) velocity obstacle to take the robot radius into account
+    // Constrain the inner angle of the velocity obstacle to be less than 180 degrees
+    const Angle max_rotation = Angle::fromDegrees((179.9 - min_opening.toDegrees()) / 2.0);
+    left_side = left_side.rotate(std::min(max_rotation, Angle::asin(robot.radius() / left_side.length())));
+    right_side = right_side.rotate(-std::min(max_rotation, Angle::asin(robot.radius() / right_side.length())));
 
     return VelocityObstacle(obstacle_velocity, left_side, right_side);
 }

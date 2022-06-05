@@ -207,14 +207,12 @@ std::size_t HRVOSimulator::addHRVORobotAgent(const Robot &robot)
 
     // Max distance which the robot can travel in one time step + scaling
     float path_radius        = (max_speed * time_step) / 2;
-    float uncertainty_offset = 0.f;
 
     AgentPath path =
         AgentPath({PathPoint(destination_point, speed_at_goal)}, path_radius);
 
     return addHRVOAgent(position, agent_radius, velocity, max_speed,
-                        max_accel, path, MAX_NEIGHBOR_SEARCH_DIST, MAX_NEIGHBORS,
-                        uncertainty_offset);
+                        max_accel, path, MAX_NEIGHBOR_SEARCH_DIST, MAX_NEIGHBORS);
 }
 
 std::size_t HRVOSimulator::addLinearVelocityRobotAgent(const Robot &robot,
@@ -237,15 +235,13 @@ std::size_t HRVOSimulator::addLinearVelocityRobotAgent(const Robot &robot,
                                   path);
 }
 
-std::size_t HRVOSimulator::addHRVOAgent(const Vector &position, float agent_radius,
-                                        const Vector &curr_velocity, float maxSpeed,
-                                        float maxAccel, AgentPath &path,
-                                        float neighborDist, std::size_t maxNeighbors,
-                                        float uncertaintyOffset)
+std::size_t
+HRVOSimulator::addHRVOAgent(const Vector &position, float agent_radius, const Vector &curr_velocity, float maxSpeed,
+                            float maxAccel, AgentPath &path, float neighborDist, std::size_t maxNeighbors)
 {
     std::shared_ptr<HRVOAgent> agent = std::make_shared<HRVOAgent>(
         this, position, neighborDist, maxNeighbors, agent_radius, curr_velocity, maxAccel,
-        path, maxSpeed, uncertaintyOffset);
+        path, maxSpeed);
     agents.push_back(std::move(agent));
     return agents.size() - 1;
 }

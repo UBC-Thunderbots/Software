@@ -53,6 +53,7 @@ class HRVOAgent : public Agent
     /**
      * Constructor
      *
+     * TODO: Update Javadoc
      * @param simulator          The simulation.
      * @param position           The starting position of this agent.
      * @param goalIndex          The goal number of this agent.
@@ -61,13 +62,11 @@ class HRVOAgent : public Agent
      * @param radius             The radius of this agent.
      * @param goalRadius         The goal radius of this agent.
      * @param maxSpeed           The maximum speed of this agent.
-     * @param uncertaintyOffset  The uncertainty offset of this agent.
      * @param maxAccel           The maximum acceleration of this agent.
      * @param velocity           The initial velocity of this agent.
      */
     HRVOAgent(HRVOSimulator *simulator, const Vector &position, float neighborDist, std::size_t maxNeighbors,
-              float radius, const Vector &velocity, float maxAccel, AgentPath &path, float maxSpeed,
-              float uncertaintyOffset);
+              float radius, const Vector &velocity, float maxAccel, AgentPath &path, float maxSpeed);
 
     /**
      * Computes the new velocity of this agent.
@@ -218,7 +217,6 @@ class HRVOAgent : public Agent
 
     std::size_t maxNeighbors_;
     float neighborDist_;
-    float uncertaintyOffset_;
     std::multimap<float, Candidate> candidates_;
     // distance -> Agent Index
     std::set<std::pair<float, std::size_t>> neighbors_;

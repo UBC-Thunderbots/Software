@@ -99,12 +99,10 @@ class HRVOSimulator
      * @param path               The path which this agent should take.
      * @param neighborDist       The maximum neighbor distance of this agent.
      * @param maxNeighbors       The maximum neighbor count of this agent.
-     * @param uncertaintyOffset  The uncertainty offset of this agent.
      * @return The index of the agent.
      */
     std::size_t addHRVOAgent(const Vector &position, float agent_radius, const Vector &curr_velocity, float maxSpeed,
-                             float maxAccel, AgentPath &path, float neighborDist, std::size_t maxNeighbors,
-                             float uncertaintyOffset);
+                             float maxAccel, AgentPath &path, float neighborDist, std::size_t maxNeighbors);
 
     /**
      * Add a new LinearlyVelocityAgent
