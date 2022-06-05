@@ -137,49 +137,13 @@ void HRVOSimulator::updateWorld(const World &world)
             }
         }
     }
-
-    // TODO (#2498): Dynamically add and remove the ball as an Agent, and if needed
-    //               update its radius based on the PrimitiveSet
-    if (add_ball_agent)
-    {
-        if (ball_agent_id == -1)
-        {
-            // Ball should be treated as an agent (obstacle)
-            const Ball &ball = world.ball();
-            Vector position(ball.position().x(), ball.position().y());
-            Vector velocity(ball.velocity().x(), ball.velocity().y());
-            Vector goal_pos    = position + 100 * velocity;
-            float acceleration = ball.acceleration().length();
-            // Minimum of 0.5-meter distance away from the ball, if the ball is an
-            // obstacle
-            float ball_radius = 0.5f + BALL_AGENT_RADIUS_OFFSET;
-
-            AgentPath path          = AgentPath({PathPoint(goal_pos, 0.0f)}, 0.1f);
-            std::size_t agent_index = addLinearVelocityAgent(
-                position, ball_radius, velocity, velocity.length(), acceleration, path);
-            ball_agent_id = agent_index;
-        }
-        else
-        {
-            Point position = world.ball().position();
-            agents[ball_agent_id]->setPosition(position.toVector());
-        }
-    }
-    else if (ball_agent_id != -1)
-    {
-        agents[ball_agent_id]->setRadius(0.f);
-    }
 }
 
 void HRVOSimulator::updatePrimitiveSet(const TbotsProto::PrimitiveSet &new_primitive_set)
 {
     primitive_set = new_primitive_set;
 
-    // TODO (#2498): Dynamically add and remove the ball as an Agent, and if needed
-    //               update its radius based on the PrimitiveSet
-    add_ball_agent = primitive_set.stay_away_from_ball();
-
-    // Update all friendly agent's goal points based on the matching robot's primitive
+    // Update all friendly agent's primitives
     for (auto &[robot_id, primitive] : primitive_set.robot_primitives())
     {
         auto hrvo_agent_opt = getFriendlyAgentFromRobotId(robot_id);
@@ -350,8 +314,6 @@ void HRVOSimulator::visualize(unsigned int robot_id) const
     auto friendly_agent_opt = getFriendlyAgentFromRobotId(robot_id);
     if (!friendly_agent_opt.has_value())
     {
-        LOG(WARNING) << "HRVO friendly agent with robot id " << robot_id
-                     << " can not be visualized." << std::endl;
         return;
     }
 

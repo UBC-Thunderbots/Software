@@ -57,7 +57,6 @@ void HRVOAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive, cons
 {
     AgentPath path;
     static_obstacles.clear();
-    ball_obstacle = std::nullopt;
     if (new_primitive.has_move())
     {
         const auto& motion_control = new_primitive.move().motion_control();
@@ -76,9 +75,8 @@ void HRVOAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive, cons
         auto destination =
                 motion_control.path().points().at(1);
 
-
         // Max distance which the robot can travel in one time step + scaling
-        // TODO: This implementation is used in three separate places
+        // TODO (#2370): This constant is calculated multiple times.
         float path_radius = (max_speed_ * simulator_->getTimeStep()) / 2;
         auto path_points = {PathPoint(Vector(destination.x_meters(), destination.y_meters()), speed_at_dest)};
         path = AgentPath(path_points, path_radius);
@@ -90,44 +88,18 @@ void HRVOAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive, cons
             if (TbotsProto::MotionConstraint_IsValid(constraint_int))
             {
                 const auto constraint = static_cast<TbotsProto::MotionConstraint>(constraint_int);
-                if (constraint == TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL)
-                {
-                    // TODO: Should we store the constraints instead and run createFromMotionConstraint
-                    //       in computeNewVelocity
-                    auto new_ball_obstacle = obstacle_factory.createFromMotionConstraint(constraint, world);
-                    if (!new_ball_obstacle.empty())
-                    {
-//                        ball_obstacle = new_ball_obstacle[0];
-                        static_obstacles.emplace_back(new_ball_obstacle[0]);
-                    }
-                }
-                else
-                {
-                    auto new_obstacles = obstacle_factory.createFromMotionConstraint(constraint, world);
-                    static_obstacles.insert(static_obstacles.end(), new_obstacles.begin(), new_obstacles.end());
-                }
+                auto new_obstacles = obstacle_factory.createFromMotionConstraint(constraint, world);
+                static_obstacles.insert(static_obstacles.end(), new_obstacles.begin(), new_obstacles.end());
             }
         }
     }
     setPath(path);
 }
 
-void HRVOAgent::computeNeighbors()
+void HRVOAgent::computeNeighbors(double neighbor_dist_threshold)
 {
     neighbors_.clear();
-
-    if (path.getCurrentPathPoint() == std::nullopt)
-    {
-        return;
-    }
-
-    Vector current_dest = path.getCurrentPathPoint().value().getPosition();
-
-    float new_neighbor_dist =
-        std::min(static_cast<double>(neighborDist_),
-                 (position_ - current_dest).length() + path.getPathRadius());
-
-    simulator_->getKdTree()->query(this, new_neighbor_dist);
+    simulator_->getKdTree()->query(this, neighbor_dist_threshold);
 }
 
 // TODO: Move implementation to new file created and have this function call that!?
@@ -212,56 +184,9 @@ void HRVOAgent::computeNewVelocity()
     // Based on The Hybrid Reciprocal Velocity Obstacle paper:
     // https://gamma.cs.unc.edu/HRVO/HRVO-T-RO.pdf
     computePreferredVelocity();
-    computeNeighbors();
+    computeVelocityObstacles();
 
-    velocityObstacles_.clear();
-    velocityObstacles_.reserve(neighbors_.size());
-
-    // Create Velocity Obstacles for neighboring agents
-    for (const auto &neighbor : neighbors_)
-    {
-        std::shared_ptr<Agent> other_agent = simulator_->getAgents()[neighbor.second];
-        VelocityObstacle velocity_obstacle = other_agent->createVelocityObstacle(*this);
-        velocityObstacles_.push_back(velocity_obstacle);
-    }
-
-    // Create velocity Obstacles for neighboring static obstacles
-    // Represent this agent with a circle of the same size and position
-    Point agent_position_point(position_);
-    Circle circle_rep_of_agent(agent_position_point, radius_);
-    // TODO: Maybe this should be moved to a helper?
-    //       Maybe it should be a min of this and the path point distance
-    const double dist_required_to_stop = std::pow(velocity_.length(), 2) / (2 * max_accel_) + 0.1;
-    double dist_to_obstacle_threshold = dist_required_to_stop;
-
-    const auto current_path_point = getPath().getCurrentPathPoint();
-    if (current_path_point.has_value())
-    {
-        const double dist_to_path_point = (getPosition() - current_path_point.value().getPosition()).length();
-        dist_to_obstacle_threshold = std::min(dist_required_to_stop, dist_to_path_point);
-    }
-
-    for (const auto &obstacle : static_obstacles)
-    {
-        // Only consider obstacles that are nearby, and which do not contain the agent
-        double dist_to_agent = obstacle->distance(agent_position_point);
-        if (dist_to_agent <= dist_to_obstacle_threshold && !obstacle->contains(agent_position_point))
-        {
-            VelocityObstacle velocity_obstacle = obstacle->generateVelocityObstacle(circle_rep_of_agent, Vector());
-            velocityObstacles_.push_back(velocity_obstacle);
-        }
-    }
-
-    if (ball_obstacle.has_value())
-    {
-        if (ball_obstacle.value()->distance(agent_position_point) <= dist_to_obstacle_threshold && !ball_obstacle.value()->contains(agent_position_point))
-        {
-            // TODO: Set the ball velocity
-            VelocityObstacle velocity_obstacle = ball_obstacle.value()->generateVelocityObstacle(circle_rep_of_agent, Vector());
-            velocityObstacles_.push_back(velocity_obstacle);
-        }
-    }
-
+    // Find candidate velocities which this agent can take to avoid collision
     candidates_.clear();
     Candidate candidate;
     candidate.velocityObstacle1_ = std::numeric_limits<int>::max();
@@ -546,6 +471,48 @@ void HRVOAgent::computeNewVelocity()
                     first_intersecting_velocity_obstacle.value();
             }
             new_velocity_ = candidate.velocity;
+        }
+    }
+}
+
+void HRVOAgent::computeVelocityObstacles()
+{
+
+    velocityObstacles_.clear();
+    velocityObstacles_.reserve(neighbors_.size());
+
+    // Create velocity Obstacles for neighboring static obstacles
+    double dist_to_obstacle_threshold = neighborDist_;
+    const auto current_path_point_opt = getPath().getCurrentPathPoint();
+    if (current_path_point_opt.has_value())
+    {
+        // Only consider agents within this distance away from our position
+        auto current_destination = current_path_point_opt.value().getPosition();
+        dist_to_obstacle_threshold =
+                std::min(dist_to_obstacle_threshold,
+                         (getPosition() - current_destination).length());
+    }
+    computeNeighbors(dist_to_obstacle_threshold);
+
+    // Create Velocity Obstacles for neighboring agents
+    for (const auto &neighbor : neighbors_)
+    {
+        std::shared_ptr<Agent> other_agent = simulator_->getAgents()[neighbor.second];
+        VelocityObstacle velocity_obstacle = other_agent->createVelocityObstacle(*this);
+        velocityObstacles_.push_back(velocity_obstacle);
+    }
+
+    // Create Velocity Obstacles for nearby static obstacles
+    Point agent_position_point(getPosition());
+    Circle circle_rep_of_agent(agent_position_point, radius_);
+    for (const auto &obstacle : static_obstacles)
+    {
+        // Only consider obstacles that are nearby, and which do not contain the agent
+        double dist_to_agent = obstacle->distance(agent_position_point);
+        if (dist_to_agent <= dist_to_obstacle_threshold && !obstacle->contains(agent_position_point))
+        {
+            VelocityObstacle velocity_obstacle = obstacle->generateVelocityObstacle(circle_rep_of_agent, Vector());
+            velocityObstacles_.push_back(velocity_obstacle);
         }
     }
 }

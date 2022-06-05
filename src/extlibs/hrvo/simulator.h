@@ -265,12 +265,6 @@ class HRVOSimulator
     // Latest World which the simulator has received
     std::optional<World> world;
 
-    // True if the ball should be treated as an agent (obstacle)
-    // NOTE: This will take effect the next time we receive a world, and we know
-    //       the current ball position and velocity
-    bool add_ball_agent       = false;
-    std::size_t ball_agent_id = -1;
-
     // The robot constants which all agents will use
     RobotConstants_t robot_constants;
 

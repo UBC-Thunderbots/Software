@@ -88,7 +88,7 @@ class HRVOAgent : public Agent
     /**
      * Computes the maxNeighbors nearest neighbors of this agent.
      */
-    void computeNeighbors();
+    void computeNeighbors(double neighbor_dist_threshold);
 
     /**
      * Computes the preferred velocity of this agent.
@@ -210,6 +210,8 @@ class HRVOAgent : public Agent
      */
     bool isCandidateFasterThanCurrentSpeed(const Candidate &candidate) const;
 
+    void computeVelocityObstacles();
+
 
    public:
     float prefSpeed_;
@@ -222,7 +224,6 @@ class HRVOAgent : public Agent
     std::set<std::pair<float, std::size_t>> neighbors_;
     std::vector<VelocityObstacle> velocityObstacles_;
     std::vector<ObstaclePtr> static_obstacles;
-    std::optional<ObstaclePtr> ball_obstacle;
     RobotNavigationObstacleFactory obstacle_factory;
 
     // TODO (#2519): Remove magic numbers

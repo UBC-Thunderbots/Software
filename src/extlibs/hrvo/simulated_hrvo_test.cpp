@@ -9,6 +9,7 @@
 #include "software/test_util/test_util.h"
 #include "software/time/duration.h"
 #include "software/world/world.h"
+#include "software/simulated_tests/non_terminating_validation_functions/robots_violating_motion_constraint.h"
 
 class SimulatedHRVOTest : public SimulatedErForceSimPlayTestFixture
 {
@@ -245,6 +246,47 @@ TEST_F(SimulatedHRVOTest, test_zig_zag_movement)
     runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
+}
+
+TEST_F(SimulatedHRVOTest, test_agent_not_going_in_static_obstacles)
+{
+    Point destination      = Point(2.9, 1);
+    Point initial_position = Point(2.9, -1);
+    BallState ball_state(Point(1, 2), Vector(0, 0));
+    auto friendly_robots =
+        TestUtil::createStationaryRobotStatesWithId({initial_position});
+    auto enemy_robots = TestUtil::createStationaryRobotStatesWithId(
+        {Point(2, 0.0), Point(2.2, 0.0), Point(2.4, 0.0), Point(2.6, 0.0), Point(2.8, 0.0), Point(3, 0.0)});
+
+    auto tactic = std::make_shared<MoveTactic>();
+    tactic->updateControlParams(destination, Angle::zero(), 0);
+    setTactic(0, tactic);
+
+    std::shared_ptr<RobotNavigationObstacleFactory> obstacle_factory =
+            std::make_shared<RobotNavigationObstacleFactory>(
+                    TbotsProto::RobotNavigationObstacleConfig());
+
+    std::vector<ValidationFunction> terminating_validation_functions = {
+        [destination, tactic](std::shared_ptr<World> world_ptr,
+                              ValidationCoroutine::push_type& yield) {
+            // TODO (#2496): re-enable
+            // Small rectangle around the destination point that the robot should be
+            // stationary within for 15 ticks
+             float threshold = 0.05f;
+             Rectangle expected_final_position(
+                Point(destination.x() - threshold, destination.y() - threshold),
+                Point(destination.x() + threshold, destination.y() + threshold));
+             robotStationaryInPolygon(0, expected_final_position, 15, world_ptr, yield);
+        }};
+
+    std::vector<ValidationFunction> non_terminating_validation_functions = {
+            [obstacle_factory](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+                robotsViolatingMotionConstraint(world_ptr, yield, obstacle_factory, TbotsProto::MotionConstraint::ENEMY_DEFENSE_AREA);
+            }};
+
+    runTest(field_type, ball_state, friendly_robots, enemy_robots,
+            terminating_validation_functions, non_terminating_validation_functions,
+            Duration::fromSeconds(20));
 }
 
 // TODO (#2519): Re-enable tests failing due to HRVO integration
