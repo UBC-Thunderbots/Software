@@ -50,7 +50,7 @@ SimField::SimField(btDiscreteDynamicsWorld *world, const world::Geometry &geomet
     addObject(m_plane,
               btTransform(btQuaternion(btVector3(1, 0, 0), 0),
                           btVector3(0, 0, 0) * SIMULATOR_SCALE),
-              0.56, 0.35f);
+              0.56, 0.35);
     // others
     addObject(m_plane,
               btTransform(btQuaternion(btVector3(1, 0, 0), M_PI),

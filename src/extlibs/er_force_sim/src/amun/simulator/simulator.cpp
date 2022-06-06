@@ -93,8 +93,6 @@ struct camun::simulator::SimulatorData
     float robotReplyPacketLoss;
     float missingBallDetections;
     bool dribblePerfect;
-    float ballRollingFriction;
-    float ballSlidingFriction;
 
 };
 
@@ -307,7 +305,6 @@ void Simulator::stepSimulation(double time_s)
 
 void Simulator::handleSimulatorTick(double time_s)
 {
-//    std::cout<<"tick handler, v = "<<m_data->ball->body()->getLinearVelocity().y()<<std::endl;
     // has to be done according to bullet wiki
     m_data->dynamicsWorld->clearForces();
 

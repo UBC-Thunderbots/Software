@@ -151,7 +151,7 @@ PYBIND11_MODULE(python_bindings, m)
         .def_static("fromRadians", &Angle::fromRadians)
         .def_static("fromDegrees", &Angle::fromDegrees)
         .def("toRadians", &Angle::toRadians)
-// Overloaded
+        // Overloaded
         .def("__repr__", [](const Angle& a) {
             std::stringstream stream;
             stream << a;

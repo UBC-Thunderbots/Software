@@ -91,7 +91,6 @@ SimRobot::SimRobot(RNG *rng, const robot::Specs &specs, btDiscreteDynamicsWorld 
     // see simulator.cpp
     m_body->setRestitution(0.6f);
     m_body->setFriction(0.22f);
-    m_body->setUserPointer(this);
     m_world->addRigidBody(m_body);
 
     btCylinderShape *dribblerShape = new btCylinderShapeX(
@@ -449,7 +448,7 @@ void SimRobot::begin(SimBall *ball, double time)
         const float speedCompensation = getSpeedCompensation();
 
         ball->kick(t * btVector3(0, dirFloor * power + speedCompensation, dirUp * power) *
-                   (1 / time) * SIMULATOR_SCALE * BALL_MASS, power);
+                   (1 / time) * SIMULATOR_SCALE * BALL_MASS);
         // discharge
         m_isCharged = false;
         m_shootTime = 0.0;

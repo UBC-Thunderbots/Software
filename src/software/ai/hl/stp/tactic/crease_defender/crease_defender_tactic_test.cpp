@@ -26,7 +26,6 @@ class CreaseDefenderTacticTest
     TbotsProto::AiConfig ai_config;
 };
 
-// TODO (#2512): Due to friction in ErForceSim, the ball does not reach defender
 TEST_F(CreaseDefenderTacticTest, test_chip_ball)
 {
     Point enemy_threat_point = Point(-1.5, 0.5);

@@ -54,7 +54,6 @@ SimBall::SimBall(RNG *rng, btDiscreteDynamicsWorld *world) : m_rng(rng), m_world
     // TODO (#2512): Check these values with real life
     m_body->setRestitution(BALL_RESTITUTION);
     m_body->setFriction(BALL_SLIDING_FRICTION);
-    m_body->setUserPointer(this);
 
     // \mu_r = -a / g = 0.0357 (while rolling)
     // rollingFriction in bullet is too unstable to be useful
@@ -213,13 +212,8 @@ void SimBall::begin(bool robotCollision)
                     vz = m_move.vz() * 1e-3;
                 }
                 const btVector3 linVel(vel.x, vel.y, vz);
-//                m_body->setFriction(BALL_SLIDING_FRICTION);
-//                std::cout<<"sliding friction set, roll_s set to "<<std::endl;
 
                 m_body->setLinearVelocity(linVel * SIMULATOR_SCALE);
-//                rolling_speed = linVel.length() * FRICTION_TRANSITION_FACTOR;
-//                rollWhenPossible = true;
-//                std::cout<<"sliding friction set, roll_s set to "<<rolling_speed<<std::endl;
 
                 //override ballState
                 currentBallState = SLIDING;
@@ -459,7 +453,7 @@ bool SimBall::isInvalid() const
     return isNan || isBelowField;
 }
 
-void SimBall::kick(const btVector3 &power, double speed)
+void SimBall::kick(const btVector3 &power)
 {
     m_body->activate();
     m_body->applyCentralForce(power);

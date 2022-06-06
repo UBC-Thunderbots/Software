@@ -74,7 +74,7 @@ class camun::simulator::SimBall : public QObject
                 const btVector3 &cameraPosition, bool enableInvisibleBall,
                 float visibilityThreshold, btVector3 positionOffset);
     void move(const sslsim::TeleportBall &ball);
-    void kick(const btVector3 &power, double velocity);
+    void kick(const btVector3 &power);
     // returns the ball position projected onto the floor (z component is not included)
     btVector3 position() const;
     btVector3 speed() const;
@@ -92,7 +92,7 @@ class camun::simulator::SimBall : public QObject
                       bool enableInvisibleBall, float visibilityThreshold,
                       btVector3 positionOffset);
 
-private:
+   private:
     RNG *m_rng;
     btDiscreteDynamicsWorld *m_world;
     btCollisionShape *m_sphere;
