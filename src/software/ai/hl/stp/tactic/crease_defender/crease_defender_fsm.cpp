@@ -31,7 +31,6 @@ std::optional<Point> CreaseDefenderFSM::findBlockThreatPoint(
 void CreaseDefenderFSM::blockThreat(
     const Update& event, boost::sml::back::process<MoveFSM::Update> processEvent)
 {
-
     Point destination       = event.common.robot.position();
     auto block_threat_point = findBlockThreatPoint(
         event.common.world.field(), event.control_params.enemy_threat_origin,

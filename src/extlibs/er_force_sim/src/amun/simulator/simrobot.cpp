@@ -651,12 +651,13 @@ void SimRobot::update(SSLProto::SSL_DetectionRobot *robot, float stddev_p,
     m_lastSendTime = time;
 }
 
-bool SimRobot::touchesBall(SimBall *ball) const {
-    int numManifolds      = m_world->getDispatcher()->getNumManifolds();
+bool SimRobot::touchesBall(SimBall *ball) const
+{
+    int numManifolds = m_world->getDispatcher()->getNumManifolds();
     for (int i = 0; i < numManifolds; ++i)
     {
         btPersistentManifold *contactManifold =
-                m_world->getDispatcher()->getManifoldByIndexInternal(i);
+            m_world->getDispatcher()->getManifoldByIndexInternal(i);
         btCollisionObject *objectA = (btCollisionObject *)(contactManifold->getBody0());
         btCollisionObject *objectB = (btCollisionObject *)(contactManifold->getBody1());
         if ((objectA == m_dribblerBody && objectB == ball->body()) ||

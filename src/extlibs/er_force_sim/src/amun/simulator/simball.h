@@ -29,16 +29,16 @@
 #include "extlibs/er_force_sim/src/protobuf/sslsim.h"
 #include "simfield.h"
 
-static const float BALL_RADIUS       = 0.0215f;
-static const float BALL_MASS         = 0.046f;
+static const float BALL_RADIUS = 0.0215f;
+static const float BALL_MASS   = 0.046f;
 
-//these values are set in coordination with other objects the ball will collide with
+// these values are set in coordination with other objects the ball will collide with
 static constexpr float BALL_SLIDING_FRICTION = 1.f;
-static constexpr float BALL_RESTITUTION = 1.f;
+static constexpr float BALL_RESTITUTION      = 1.f;
 
 static constexpr float BALL_ROLLING_FRICTION_DECELERATION = 0.5;
-static constexpr float FRICTION_TRANSITION_FACTOR = 5.0/7.0;
-static constexpr float STATIONARY_BALL_SPEED = 0.01;
+static constexpr float FRICTION_TRANSITION_FACTOR         = 5.0 / 7.0;
+static constexpr float STATIONARY_BALL_SPEED              = 0.01;
 
 
 class RNG;
@@ -99,14 +99,19 @@ class camun::simulator::SimBall : public QObject
     btRigidBody *m_body;
     btMotionState *m_motionState;
     sslsim::TeleportBall m_move;
-    double rolling_speed = -1;
+    double rolling_speed     = -1;
     double last_ground_speed = 0;
-    bool rollWhenPossible = false;
-    bool setTransitionSpeed = true;
+    bool rollWhenPossible    = false;
+    bool setTransitionSpeed  = true;
 
-    enum BallState {STATIONARY, ROBOT_COLLISION, SLIDING, ROLLING};
+    enum BallState
+    {
+        STATIONARY,
+        ROBOT_COLLISION,
+        SLIDING,
+        ROLLING
+    };
     BallState currentBallState = STATIONARY;
-
 };
 
 #endif  // SIMBALL_H

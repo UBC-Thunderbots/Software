@@ -150,7 +150,7 @@ class camun::simulator::Simulator : public QObject
                              qint64 processingStart);
     void setFlipped(bool flipped);
 
-private:
+   private:
     /**
      * Accepts and executes a blue or yellow robot control command
      *

@@ -102,11 +102,11 @@ INSTANTIATE_TEST_CASE_P(
 
         // Robot facing towards pass speedy
         std::make_tuple(Pass(Point(0.0, 0.0), Point(-3, 0), 5),
-                        RobotStateWithId{1, RobotState(Point(-3, 0), Vector(0, 0),
-                                                       Angle::fromDegrees(0),
-                                                       Angle::fromDegrees(0))})
+                        RobotStateWithId{
+                            1, RobotState(Point(-3, 0), Vector(0, 0),
+                                          Angle::fromDegrees(0), Angle::fromDegrees(0))})
 
-                                                       ));
+            ));
 
 class ReceiverTacticTestOneTouch : public ReceiverTacticTest
 {

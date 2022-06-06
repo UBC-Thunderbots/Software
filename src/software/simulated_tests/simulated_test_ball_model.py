@@ -12,7 +12,7 @@ from proto.geometry_pb2 import Point, Angle
 
 # the friction model currently used in the er-force simulator
 
-SLIDING_ACCELERATION = -3.4323275 # equal to coeff_of_friction * g
+SLIDING_ACCELERATION = -3.4323275  # equal to coeff_of_friction * g
 ROLLING_ACCELERATION = -0.5
 TRANSITION_FACTOR = 5.0 / 7.0
 STOPPING_SPEED = 0.01
@@ -21,29 +21,15 @@ STOPPING_SPEED = 0.01
 @pytest.mark.parametrize(
     "ball_initial_position,ball_initial_velocity",
     [
-        (
-            tbots.Point(-3.5, 0),
-            tbots.Vector(2, 0),
-        ),
-        (
-            tbots.Point(-3.5, 2),
-            tbots.Vector(3, -2),
-        ),
-        (
-            tbots.Point(-3.5, -2),
-            tbots.Vector(3, 2),
-        ),
-        (
-            tbots.Point(4.5, 3),
-            tbots.Vector(-3.5, -2),
-        ),
+        (tbots.Point(-3.5, 0), tbots.Vector(2, 0),),
+        (tbots.Point(-3.5, 2), tbots.Vector(3, -2),),
+        (tbots.Point(-3.5, -2), tbots.Vector(3, 2),),
+        (tbots.Point(4.5, 3), tbots.Vector(-3.5, -2),),
     ],
 )
 @pytest.mark.skip(reason="no way of currently testing this")
 def test_simulator_move_ball(
-        ball_initial_position,
-        ball_initial_velocity,
-        simulated_test_runner,
+    ball_initial_position, ball_initial_velocity, simulated_test_runner,
 ):
     # Setup Ball
     simulated_test_runner.simulator_proto_unix_io.send_proto(
@@ -69,32 +55,28 @@ def test_simulator_move_ball(
         AssignedTacticPlayControlParams, params
     )
 
-    #expected ball position
+    # expected ball position
     initial_v = ball_initial_velocity.length()
 
-    #velocity at which ball starts to roll
+    # velocity at which ball starts to roll
     rolling_v = TRANSITION_FACTOR * initial_v
     time_until_roll = abs((rolling_v - initial_v) / SLIDING_ACCELERATION)
     time_until_stop = abs((rolling_v - STOPPING_SPEED) / ROLLING_ACCELERATION)
 
-    d_slide = (initial_v+rolling_v)/2 * time_until_roll
-    d_roll = (rolling_v/2) * time_until_stop
+    d_slide = (initial_v + rolling_v) / 2 * time_until_roll
+    d_roll = (rolling_v / 2) * time_until_stop
     total_distance = d_slide + d_roll
 
-    ball_expected_position = total_distance * ball_initial_velocity.normalize() + ball_initial_position
+    ball_expected_position = (
+        total_distance * ball_initial_velocity.normalize() + ball_initial_position
+    )
 
     # Always Validation
-    always_validation_sequence_set = [
-        [
-            NeverExcessivelyDribbles(),
-        ]
-    ]
+    always_validation_sequence_set = [[NeverExcessivelyDribbles(),]]
 
     # Eventually Validation
     eventually_validation_sequence_set = [
-        [
-            BallEventuallyStopsInRegion([tbots.Circle(ball_expected_position, 0.1)]),
-        ]
+        [BallEventuallyStopsInRegion([tbots.Circle(ball_expected_position, 0.1)]),]
     ]
 
     simulated_test_runner.run_test(
@@ -103,9 +85,8 @@ def test_simulator_move_ball(
         always_validation_sequence_set=always_validation_sequence_set,
     )
 
-def test_simulator_kick_ball(
-        simulated_test_runner
-):
+
+def test_simulator_kick_ball(simulated_test_runner):
 
     ball_initial_position = tbots.Point(-2.5, 0)
     kick_velocity = tbots.Vector(2, 0)
@@ -120,16 +101,22 @@ def test_simulator_kick_ball(
             [],
             blue_robot_locations=[rob_pos],
             ball_location=ball_initial_position,
-            ball_velocity=tbots.Vector(0,0),
+            ball_velocity=tbots.Vector(0, 0),
         ),
     )
 
     # Setup Tactic
     params = AssignedTacticPlayControlParams()
-    kick_origin = Point(x_meters=ball_initial_position.x(), y_meters=ball_initial_position.y())
+    kick_origin = Point(
+        x_meters=ball_initial_position.x(), y_meters=ball_initial_position.y()
+    )
 
     params.assigned_tactics[0].kick.CopyFrom(
-        KickTactic(kick_origin=kick_origin, kick_direction=Angle(radians=kick_velocity.orientation().toRadians()), kick_speed_meters_per_second=kick_velocity.length())
+        KickTactic(
+            kick_origin=kick_origin,
+            kick_direction=Angle(radians=kick_velocity.orientation().toRadians()),
+            kick_speed_meters_per_second=kick_velocity.length(),
+        )
     )
 
     simulated_test_runner.blue_full_system_proto_unix_io.send_proto(
@@ -142,34 +129,30 @@ def test_simulator_kick_ball(
         AssignedTacticPlayControlParams, params
     )
 
-    #expected ball position
+    # expected ball position
 
     initial_v = kick_velocity.length()
 
-    #velocity at which ball starts to roll
+    # velocity at which ball starts to roll
     rolling_v = TRANSITION_FACTOR * initial_v
     time_until_roll = abs((rolling_v - initial_v) / SLIDING_ACCELERATION)
     time_until_stop = abs((rolling_v - STOPPING_SPEED) / ROLLING_ACCELERATION)
 
-    d_slide = (initial_v+rolling_v)/2 * time_until_roll
-    d_roll = (rolling_v/2) * time_until_stop
+    d_slide = (initial_v + rolling_v) / 2 * time_until_roll
+    d_roll = (rolling_v / 2) * time_until_stop
     total_distance = d_slide + d_roll
 
-    ball_expected_position = total_distance * kick_velocity.normalize() + ball_initial_position
+    ball_expected_position = (
+        total_distance * kick_velocity.normalize() + ball_initial_position
+    )
 
     # Always Validation
-    always_validation_sequence_set = [
-        [
-            NeverExcessivelyDribbles(),
-        ]
-    ]
+    always_validation_sequence_set = [[NeverExcessivelyDribbles(),]]
 
     # Eventually Validation
-    # use larger error margin because we cant account for robot-ball collision impact
+    # use larger error margin because we can't account for robot-ball collision impact
     eventually_validation_sequence_set = [
-        [
-            BallEventuallyStopsInRegion([tbots.Circle(ball_expected_position, 0.5)]),
-        ]
+        [BallEventuallyStopsInRegion([tbots.Circle(ball_expected_position, 0.5)]),]
     ]
 
     simulated_test_runner.run_test(
@@ -178,12 +161,13 @@ def test_simulator_kick_ball(
         always_validation_sequence_set=always_validation_sequence_set,
     )
 
-#@pytest.mark.skip(reason="no way of currently testing this")
+
+# @pytest.mark.skip(reason="no way of currently testing this")
 def test_ball_robot_collision(simulated_test_runner):
 
     ball_initial_position = tbots.Field.createSSLDivisionBField().centerPoint()
     ball_initial_velocity = tbots.Vector(2.5, 0)
-    robot_position = tbots.Point(2.5,0)
+    robot_position = tbots.Point(2.5, 0)
 
     # Setup Robot
     simulated_test_runner.simulator_proto_unix_io.send_proto(
@@ -220,32 +204,34 @@ def test_ball_robot_collision(simulated_test_runner):
         AssignedTacticPlayControlParams, params
     )
 
-    #expected ball position
+    # expected ball position
     initial_v = ball_initial_velocity.length()
 
-    #velocity at which ball starts to roll
+    # velocity at which ball starts to roll
     rolling_v = TRANSITION_FACTOR * initial_v
     time_until_roll = abs((rolling_v - initial_v) / SLIDING_ACCELERATION)
     time_until_stop = abs((rolling_v - STOPPING_SPEED) / ROLLING_ACCELERATION)
 
-    d_slide = (initial_v+rolling_v)/2 * time_until_roll
-    d_roll = (rolling_v/2) * time_until_stop
+    d_slide = (initial_v + rolling_v) / 2 * time_until_roll
+    d_roll = (rolling_v / 2) * time_until_stop
     total_distance = d_slide + d_roll
 
     # expected position if there was no robot collision
-    ball_expected_position = total_distance * ball_initial_velocity.normalize() + ball_initial_position
+    ball_expected_position = (
+        total_distance * ball_initial_velocity.normalize() + ball_initial_position
+    )
 
     distance_from_robot = (ball_expected_position - robot_position).length()
 
     # Always Validation
-    always_validation_sequence_set = [
-        [NeverExcessivelyDribbles(),]
-    ]
+    always_validation_sequence_set = [[NeverExcessivelyDribbles(),]]
 
     # Eventually Validation
     eventually_validation_sequence_set = [
         [
-            BallEventuallyStopsInRegion([tbots.Circle(robot_position, distance_from_robot)]),
+            BallEventuallyStopsInRegion(
+                [tbots.Circle(robot_position, distance_from_robot)]
+            ),
         ]
     ]
 
