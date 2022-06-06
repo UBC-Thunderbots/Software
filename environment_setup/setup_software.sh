@@ -134,6 +134,14 @@ if [[ $(lsb_release -rs) == "20.04" ]]; then
     sudo /opt/tbotspython/bin/pip3 install -r ubuntu20_requirements.txt
 fi
 
+
+if ! sudo /opt/tbotspython/bin/pip3 install protobuf==3.20.1  ; then
+    echo "##############################################################"
+    echo "Error: Installing protobuf failed"
+    echo "##############################################################"
+    exit 1
+fi
+
 echo "================================================================"
 echo "Done Setting Up Virtual Python Environment"
 echo "================================================================"
