@@ -135,7 +135,7 @@ if [[ $(lsb_release -rs) == "20.04" ]]; then
 fi
 
 
-if ! sudo /opt/tbotspython/bin/pip3 install --upgrade protobuf  ; then
+if ! sudo /opt/tbotspython/bin/pip3 install protobuf==3.20.1  ; then
     echo "##############################################################"
     echo "Error: Installing protobuf failed"
     echo "##############################################################"
