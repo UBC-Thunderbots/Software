@@ -129,40 +129,6 @@ void SimBall::begin(double time_s, bool robotCollision)
                 break;
         }
 
-          //std::cout<<"curr state = "<<currentBallState<<" , v = "<<velocity.length()<<std::endl;
-
-//        if (velocity.length() < 0.01 * SIMULATOR_SCALE)
-//        {
-//            // stop the ball if it is really slow
-//            // -> the real ball snaps to a dimple
-//            m_body->setLinearVelocity(btVector3(0, 0, 0));
-//            rollWhenPossible = false;
-//            m_body->setFriction(BALL_SLIDING_FRICTION);
-//            std::cout<<"stopping ball"<<std::endl;
-//        } else if(robotCollision){
-//            // temporarily return friction to normal value so collision physics works out
-//            m_body->setFriction(BALL_SLIDING_FRICTION);
-//            std::cout<<"robot collission detected "<<std::endl;
-//        } else if(velocity.length() > last_ground_speed * SIMULATOR_SCALE){
-//            rolling_speed = FRICTION_TRANSITION_FACTOR * velocity.length() / SIMULATOR_SCALE;
-//            m_body->setFriction(BALL_SLIDING_FRICTION);
-//            rollWhenPossible = true;
-//            std::cout<<"setting rolling speed v = "<<rolling_speed<<std::endl;
-//        }
-//        else if (rollWhenPossible && velocity.length() < rolling_speed * SIMULATOR_SCALE)
-//        {
-//            // just apply rolling friction, normal friction is somehow handled by
-//            // bullet
-//            const btScalar rollingDeceleration = BALL_ROLLING_FRICTION_DECELERATION;
-//            btVector3 force(velocity.x(), velocity.y(), 0.0f);
-//            force.safeNormalize();
-//            m_body->applyCentralImpulse(-force * rollingDeceleration * SIMULATOR_SCALE *
-//                                        BALL_MASS * SUB_TIMESTEP);
-//
-//            m_body->setFriction(0.0);
-//            std::cout<<"applying rolling frictino at s = "<<velocity.y()<<" , p = "<<p.y()<<" , step = "<<time_s<<std::endl;
-//        }
-//        last_ground_speed = (robotCollision) ? last_ground_speed : velocity.length() / SIMULATOR_SCALE;
     }
 
     bool moveCommand           = false;
@@ -476,9 +442,6 @@ void SimBall::restoreState(const world::SimBall &ball)
     m_body->setLinearVelocity(velocity * SIMULATOR_SCALE);
     btVector3 angular(ball.angular_x(), ball.angular_y(), ball.angular_z());
     m_body->setAngularVelocity(angular);
-
-    rollWhenPossible = true;
-    rolling_speed = FRICTION_TRANSITION_FACTOR * velocity.length();
 }
 
 bool SimBall::isInvalid() const
@@ -496,17 +459,10 @@ bool SimBall::isInvalid() const
     return isNan || isBelowField;
 }
 
-//bool SimBall::handleRobotContact(){
-//    m_body->setFriction(BALL_SLIDING_FRICTION);
-//}
-
 void SimBall::kick(const btVector3 &power, double speed)
 {
     m_body->activate();
     m_body->applyCentralForce(power);
-//    rolling_speed = FRICTION_TRANSITION_FACTOR*speed;
-//    rollWhenPossible = true;
-//    m_body->setFriction(BALL_SLIDING_FRICTION);
     // btTransform transform;
     // m_motionState->getWorldTransform(transform);
     // const btVector3 p = transform.getOrigin() / SIMULATOR_SCALE;

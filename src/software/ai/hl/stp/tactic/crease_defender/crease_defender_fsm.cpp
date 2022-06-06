@@ -40,8 +40,6 @@ void CreaseDefenderFSM::blockThreat(
     if (block_threat_point)
     {
         destination = block_threat_point.value();
-        std::cout<<"enemy threat origin "<<event.control_params.enemy_threat_origin<<std::endl;
-        std::cout<<"block threat point = "<<block_threat_point.value()<<std::endl;
     }
     else
     {
