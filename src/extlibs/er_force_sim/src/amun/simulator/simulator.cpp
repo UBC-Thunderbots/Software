@@ -342,7 +342,7 @@ void Simulator::handleSimulatorTick(double time_s)
     }
 
     // apply commands and forces to ball and robots
-    m_data->ball->begin(time_s, ball_collision);
+    m_data->ball->begin(ball_collision);
     for (const auto &pair : m_data->robotsBlue)
     {
         pair.first->begin(m_data->ball, time_s);

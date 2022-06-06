@@ -4,27 +4,13 @@ import pytest
 import itertools
 
 import software.python_bindings as tbots
-from software.simulated_tests.robot_enters_region import *
-from software.simulated_tests.ball_enters_region import *
-from software.simulated_tests.ball_moves_forward import *
-from software.simulated_tests.friendly_has_ball_possession import *
-from software.simulated_tests.ball_speed_threshold import *
-from software.simulated_tests.robot_speed_threshold import *
 from software.simulated_tests.ball_stops_in_region import *
 from software.simulated_tests.excessive_dribbling import *
-from software.simulated_tests.simulated_test_fixture import simulated_test_runner
 from proto.message_translation.tbots_protobuf import create_world_state
-from proto.ssl_gc_common_pb2 import Team
 from proto.geometry_pb2 import Point, Angle
 
-from software.simulated_tests.validation import (
-    Validation,
-    create_validation_geometry,
-    create_validation_types,
-)
 
-
-# the friction model currently used in the simulator
+# the friction model currently used in the er-force simulator
 
 SLIDING_ACCELERATION = -3.4323275 # equal to coeff_of_friction * g
 ROLLING_ACCELERATION = -0.5
@@ -116,13 +102,6 @@ def test_simulator_move_ball(
         eventually_validation_sequence_set=eventually_validation_sequence_set,
         always_validation_sequence_set=always_validation_sequence_set,
     )
-
-# class BallEventuallyStopsInRegion(BallEventuallyEntersRegion):
-#     def __init__(self, regions=None):
-#         super(eventuallyAlwaysBallEntersRegion, self).__init__(regions)
-#
-#     def get_validation_status(self, world) -> ValidationStatus:
-#         return super(eventuallyAlwaysBallEntersRegion, self).get_validation_status(world)
 
 def test_simulator_kick_ball(
         simulated_test_runner

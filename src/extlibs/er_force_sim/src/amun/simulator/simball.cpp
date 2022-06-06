@@ -70,7 +70,7 @@ SimBall::~SimBall()
     delete m_motionState;
 }
 
-void SimBall::begin(double time_s, bool robotCollision)
+void SimBall::begin(bool robotCollision)
 {
     // custom implementation of rolling friction
     const btVector3 p = m_body->getWorldTransform().getOrigin();
@@ -78,7 +78,7 @@ void SimBall::begin(double time_s, bool robotCollision)
     if (p.z() < BALL_RADIUS * 1.1 * SIMULATOR_SCALE)
     {  // ball is on the ground
         BallState nextState = currentBallState;
-        bool isStationary = velocity.length() < 0.01 * SIMULATOR_SCALE;
+        bool isStationary = velocity.length() < STATIONARY_BALL_SPEED * SIMULATOR_SCALE;
         bool shouldRoll = velocity.length() < rolling_speed * SIMULATOR_SCALE;
         switch (currentBallState){
             case STATIONARY:

@@ -38,6 +38,7 @@ static constexpr float BALL_RESTITUTION = 1.f;
 
 static constexpr float BALL_ROLLING_FRICTION_DECELERATION = 0.5;
 static constexpr float FRICTION_TRANSITION_FACTOR = 5.0/7.0;
+static constexpr float STATIONARY_BALL_SPEED = 0.01;
 
 
 class RNG;
@@ -52,7 +53,6 @@ namespace camun
     {
         class SimBall;
         enum class ErrorSource;
-        enum BallState {STATIONARY, ROBOT_COLLISION, SLIDING, ROLLING};
     }  // namespace simulator
 }  // namespace camun
 
@@ -69,7 +69,7 @@ class camun::simulator::SimBall : public QObject
     void sendSSLSimError(const SSLSimError &error, ErrorSource s);
 
    public:
-    void begin(double time_s, bool robotCollision);
+    void begin(bool robotCollision);
     bool update(SSLProto::SSL_DetectionBall *ball, float stddev, float stddevArea,
                 const btVector3 &cameraPosition, bool enableInvisibleBall,
                 float visibilityThreshold, btVector3 positionOffset);
@@ -103,6 +103,8 @@ private:
     double last_ground_speed = 0;
     bool rollWhenPossible = false;
     bool setTransitionSpeed = true;
+
+    enum BallState {STATIONARY, ROBOT_COLLISION, SLIDING, ROLLING};
     BallState currentBallState = STATIONARY;
 
 };
