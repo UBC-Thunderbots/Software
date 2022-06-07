@@ -2,6 +2,7 @@ import threading
 import queue
 import argparse
 import time
+import sys
 import os
 
 import pytest
@@ -297,7 +298,25 @@ def load_command_line_arguments():
         default=False,
         help="How many packets to buffer while rendering",
     )
+    parser.add_argument(
+        "--test_filter",
+        action="store",
+        default="",
+        help="The test filter, if not specified all tests will run. "
+        + "See https://docs.pytest.org/en/latest/how-to/usage.html#specifying-tests-selecting-tests",
+    )
     return parser.parse_args()
+
+
+def pytest_main(file):
+    """Runs the pytest file
+
+    :param file: The test file to run
+
+    """
+    args = load_command_line_arguments()
+    # Run the test, -s disables all capturing at -vv increases verbosity
+    sys.exit(pytest.main(["-svv", "-k", args.test_filter, file]))
 
 
 @pytest.fixture

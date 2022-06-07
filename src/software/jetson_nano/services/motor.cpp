@@ -116,26 +116,21 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
     g_motor_service = this;
 
     // TMC6100 Setup
-    //startDriver(FRONT_LEFT_MOTOR_CHIP_SELECT);
-    //startDriver(BACK_RIGHT_MOTOR_CHIP_SELECT);
-    //startDriver(FRONT_RIGHT_MOTOR_CHIP_SELECT);
-    //startDriver(BACK_LEFT_MOTOR_CHIP_SELECT);
+    startDriver(FRONT_LEFT_MOTOR_CHIP_SELECT);
+    startDriver(BACK_RIGHT_MOTOR_CHIP_SELECT);
+    startDriver(FRONT_RIGHT_MOTOR_CHIP_SELECT);
+    startDriver(BACK_LEFT_MOTOR_CHIP_SELECT);
 
     // TMC4671 Setup
-    //startController(FRONT_LEFT_MOTOR_CHIP_SELECT);
-    //startController(BACK_RIGHT_MOTOR_CHIP_SELECT);
-    //startController(FRONT_RIGHT_MOTOR_CHIP_SELECT);
-    //startController(BACK_LEFT_MOTOR_CHIP_SELECT);
+    startController(FRONT_LEFT_MOTOR_CHIP_SELECT);
+    startController(BACK_RIGHT_MOTOR_CHIP_SELECT);
+    startController(FRONT_RIGHT_MOTOR_CHIP_SELECT);
+    startController(BACK_LEFT_MOTOR_CHIP_SELECT);
 
     // Clear faults
     reset_gpio.setValue(GpioState::LOW);
     sleep(1);
     reset_gpio.setValue(GpioState::HIGH);
-    sleep(1);
-
-    driver_control_enable_gpio.setValue(GpioState::LOW);
-    sleep(1);
-    driver_control_enable_gpio.setValue(GpioState::HIGH);
     sleep(1);
 
     // Check faults
@@ -152,7 +147,7 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
     // runOpenLoopCalibrationRoutine(FRONT_RIGHT_MOTOR_CHIP_SELECT, 1000);
     // runOpenLoopCalibrationRoutine(BACK_LEFT_MOTOR_CHIP_SELECT, 1000);
     // runOpenLoopCalibrationRoutine(BACK_RIGHT_MOTOR_CHIP_SELECT, 1000);
-    
+
     // Run closed loop
     //
     //      !!!!!!!!!!!!!!!!!!!!  WARNING  !!!!!!!!!!!!!!!!!!!!
@@ -280,18 +275,7 @@ bool MotorService::checkDriverFault(uint8_t motor)
                      << "The driver becomes disabled until flag becomes cleared.";
     }
 
-    // Reset isn't really a fault, lets clear that bit
-    gstat_bitset[0] = 0;
-
-    if (!gstat_bitset.any())
-    {
-        LOG(DEBUG) << "Driver for motor " << motor << " has no faults";
-        return true;
-    }
-    else
-    {
-        return false;
-    }
+    return !gstat_bitset.any();
 }
 
 
@@ -319,7 +303,8 @@ std::unique_ptr<TbotsProto::MotorStatus> MotorService::poll(
     //     {
     //         tmc4671_setTargetVelocity(
     //             FRONT_LEFT_MOTOR_CHIP_SELECT,
-    //             static_cast<int>(motor.direct_per_wheel_control().front_left_wheel_rpm() *
+    //             static_cast<int>(motor.direct_per_wheel_control().front_left_wheel_rpm()
+    //             *
     //                              robot_constants_.wheel_rotations_per_motor_rotation));
     //         tmc4671_setTargetVelocity(
     //             FRONT_RIGHT_MOTOR_CHIP_SELECT,
@@ -328,11 +313,13 @@ std::unique_ptr<TbotsProto::MotorStatus> MotorService::poll(
     //                 robot_constants_.wheel_rotations_per_motor_rotation));
     //         tmc4671_setTargetVelocity(
     //             BACK_LEFT_MOTOR_CHIP_SELECT,
-    //             static_cast<int>(motor.direct_per_wheel_control().back_left_wheel_rpm() *
+    //             static_cast<int>(motor.direct_per_wheel_control().back_left_wheel_rpm()
+    //             *
     //                              robot_constants_.wheel_rotations_per_motor_rotation));
     //         tmc4671_setTargetVelocity(
     //             BACK_RIGHT_MOTOR_CHIP_SELECT,
-    //             static_cast<int>(motor.direct_per_wheel_control().back_right_wheel_rpm() *
+    //             static_cast<int>(motor.direct_per_wheel_control().back_right_wheel_rpm()
+    //             *
     //                              robot_constants_.wheel_rotations_per_motor_rotation));
     //         break;
     //     }
@@ -363,8 +350,8 @@ std::unique_ptr<TbotsProto::MotorStatus> MotorService::poll(
 
     //     case TbotsProto::MotorControl::DriveControlCase::DRIVE_CONTROL_NOT_SET:
     //     {
-    //         LOG(WARNING) << "Motor service polled with an empty DirectControlPrimitive ";
-    //         break;
+    //         LOG(WARNING) << "Motor service polled with an empty DirectControlPrimitive
+    //         "; break;
     //     }
     // }
 

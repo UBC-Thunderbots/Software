@@ -89,16 +89,19 @@ class Field(QWidget):
         for layer in self.layers:
             layer.keyReleaseEvent(event)
 
-    def add_layer(self, name: str, layer: FieldLayer):
+    def add_layer(self, name: str, layer: FieldLayer, visible: bool = True):
         """Add a layer to this field and to the legend.
         
         :param name: The name of the layer
         :param layer: The FieldLayer graphics object
+        :param visible: If True, the layer will be visible on startup. If False, the layer will be hidden on startup
 
         """
         self.layers.append(layer)
         self.plot_widget.addItem(layer)
         self.legend.addItem(layer, name)
+        if not visible:
+            layer.hide()
 
     def refresh(self):
         """Trigger an update on all the layers
