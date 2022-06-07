@@ -60,6 +60,7 @@ host_software_packages=(
                     # properly manage this as a bazel dependency, so we have
                     # to manually install it ourselves
     python3-yaml # Load dynamic parameter configuration files
+    qt5-default # A GUI library used by er-force sim
     tmux        # Used by AI vs AI script
     valgrind # Checks for memory leaks
     libsqlite3-dev # needed to build Python 3 with sqlite support
