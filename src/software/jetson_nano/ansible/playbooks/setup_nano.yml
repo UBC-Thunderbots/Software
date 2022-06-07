@@ -8,9 +8,11 @@
     - name: Run basic setup
       tags: dependencies
       block:
-        - name: Check Internet
-          ansible.netcommon.net_ping:
-            dest: "https://google.com"
+        - name: check internet connection
+          uri:
+            url: "https://google.com"
+            timeout: 30
+            status_code: 200
 
         - name: enable passwordless sudo for rsync
           become: true
