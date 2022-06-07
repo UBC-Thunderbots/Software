@@ -318,7 +318,7 @@ void Simulator::handleSimulatorTick(double time_s)
     }
 
     // find out if ball and any robot collide
-    bool ball_collision;
+    bool ball_collision = false;
     for (const auto &pair : m_data->robotsBlue)
     {
         ball_collision = pair.first->touchesBall(m_data->ball);

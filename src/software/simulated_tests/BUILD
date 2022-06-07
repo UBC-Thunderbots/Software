@@ -7,6 +7,10 @@ py_test(
     srcs = [
         "simulated_test_ball_model.py",
     ],
+    # TODO (#2619) Remove tag to run in parallel
+    tags = [
+        "exclusive",
+    ],
     deps = [
         "//software/simulated_tests:simulated_test_fixture",
         "//software/simulated_tests:validation",

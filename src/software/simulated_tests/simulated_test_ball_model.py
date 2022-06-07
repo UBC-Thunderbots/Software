@@ -1,18 +1,27 @@
 import sys
 
 import pytest
-import itertools
 
 import software.python_bindings as tbots
+from software.simulated_tests.robot_enters_region import *
+from software.simulated_tests.ball_enters_region import *
+from software.simulated_tests.ball_moves_forward import *
+from software.simulated_tests.friendly_has_ball_possession import *
+from software.simulated_tests.ball_speed_threshold import *
+from software.simulated_tests.robot_speed_threshold import *
 from software.simulated_tests.ball_stops_in_region import *
 from software.simulated_tests.excessive_dribbling import *
 from proto.message_translation.tbots_protobuf import create_world_state
+from proto.ssl_gc_common_pb2 import Team
 from proto.geometry_pb2 import Point, Angle
-
+from software.simulated_tests.simulated_test_fixture import (
+    simulated_test_runner,
+    pytest_main,
+)
 
 # the friction model currently used in the er-force simulator
 
-SLIDING_ACCELERATION = -3.4323275  # equal to coeff_of_friction * g
+SLIDING_ACCELERATION = -3.432327  # equal to coeff_of_friction * g
 ROLLING_ACCELERATION = -0.5
 TRANSITION_FACTOR = 5.0 / 7.0
 STOPPING_SPEED = 0.01
@@ -27,7 +36,6 @@ STOPPING_SPEED = 0.01
         (tbots.Point(4.5, 3), tbots.Vector(-3.5, -2),),
     ],
 )
-@pytest.mark.skip(reason="no way of currently testing this")
 def test_simulator_move_ball(
     ball_initial_position, ball_initial_velocity, simulated_test_runner,
 ):
@@ -80,7 +88,7 @@ def test_simulator_move_ball(
     ]
 
     simulated_test_runner.run_test(
-        test_timeout_s=6,
+        test_timeout_s=8,
         eventually_validation_sequence_set=eventually_validation_sequence_set,
         always_validation_sequence_set=always_validation_sequence_set,
     )
@@ -91,7 +99,6 @@ def test_simulator_kick_ball(simulated_test_runner):
     ball_initial_position = tbots.Point(-2.5, 0)
     kick_velocity = tbots.Vector(2, 0)
 
-    # rob_pos = tbots.Point(ball_initial_position.x() -0.1, ball_initial_position.y())
     rob_pos = ball_initial_position - (kick_velocity.normalize() * 0.1)
 
     # Setup Ball
@@ -147,7 +154,7 @@ def test_simulator_kick_ball(simulated_test_runner):
     )
 
     # Always Validation
-    always_validation_sequence_set = [[NeverExcessivelyDribbles(),]]
+    always_validation_sequence_set = []
 
     # Eventually Validation
     # use larger error margin because we can't account for robot-ball collision impact
@@ -162,7 +169,6 @@ def test_simulator_kick_ball(simulated_test_runner):
     )
 
 
-# @pytest.mark.skip(reason="no way of currently testing this")
 def test_ball_robot_collision(simulated_test_runner):
 
     ball_initial_position = tbots.Field.createSSLDivisionBField().centerPoint()
@@ -224,7 +230,7 @@ def test_ball_robot_collision(simulated_test_runner):
     distance_from_robot = (ball_expected_position - robot_position).length()
 
     # Always Validation
-    always_validation_sequence_set = [[NeverExcessivelyDribbles(),]]
+    always_validation_sequence_set = []
 
     # Eventually Validation
     eventually_validation_sequence_set = [
@@ -243,4 +249,4 @@ def test_ball_robot_collision(simulated_test_runner):
 
 if __name__ == "__main__":
     # Run the test, -s disables all capturing at -vv increases verbosity
-    sys.exit(pytest.main([__file__, "-svv"]))
+    pytest_main(__file__)
