@@ -22,6 +22,9 @@
 CURR_DIR=$(dirname -- "$(readlink -f -- "$BASH_SOURCE")")
 cd "$CURR_DIR" || exit
 
+# Bazel key
+curl https://bazel.build/bazel-release.pub.gpg | sudo apt-key add -
+
 echo "================================================================"
 echo "Installing Utilities and Dependencies"
 echo "================================================================"
@@ -119,7 +122,7 @@ if ! sudo /usr/bin/python3.8 -m venv /opt/tbotspython ; then
     exit 1
 fi
 
-if ! sudo /opt/tbotspython/bin/python3 -m pip install --upgrade pip ; then
+if ! sudo /opt/tbotspython/bin/python3 -m pip install pip==22.0.4; then
     echo "##############################################################"
     echo "Error: Upgrading pip version in venv failed"
     echo "##############################################################"
@@ -132,14 +135,6 @@ fi
 
 if [[ $(lsb_release -rs) == "20.04" ]]; then
     sudo /opt/tbotspython/bin/pip3 install -r ubuntu20_requirements.txt
-fi
-
-
-if ! sudo /opt/tbotspython/bin/pip3 install protobuf==3.20.1  ; then
-    echo "##############################################################"
-    echo "Error: Installing protobuf failed"
-    echo "##############################################################"
-    exit 1
 fi
 
 echo "================================================================"
@@ -159,10 +154,19 @@ echo "================================================================"
 echo "Installing Bazel"
 echo "================================================================"
 
-# Adapted from https://docs.bazel.build/versions/main/install-ubuntu.html#install-with-installer-ubuntu
-sudo wget -nc https://github.com/bazelbuild/bazel/releases/download/5.0.0/bazel-5.0.0-installer-linux-x86_64.sh -O /tmp/bazel-installer.sh
-sudo chmod +x /tmp/bazel-installer.sh
-sudo /tmp/bazel-installer.sh --bin=/usr/bin --base=$HOME/.bazel
+curl -fsSL https://bazel.build/bazel-release.pub.gpg | gpg --dearmor > bazel.gpg
+sudo mv bazel.gpg /etc/apt/trusted.gpg.d/
+echo "deb [arch=amd64] https://storage.googleapis.com/bazel-apt stable jdk1.8" | sudo tee /etc/apt/sources.list.d/bazel.list
+sudo apt-get update
+if ! sudo apt-get install bazel-5.0.0 -y ; then
+    echo "##############################################################"
+    echo "Error: Installing Bazel failed"
+    echo "If you have a newer version installed, please manually downgrade"
+    echo "##############################################################"
+    exit 1
+fi
+sudo rm -f /usr/bin/bazel # remove symlink
+sudo ln -s /usr/bin/bazel-5.0.0 /usr/bin/bazel
 
 echo "================================================================"
 echo "Done Installing Bazel"
