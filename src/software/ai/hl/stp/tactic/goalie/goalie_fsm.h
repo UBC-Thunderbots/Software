@@ -193,7 +193,6 @@ struct GoalieFSM
                 MoveToGoalLine_S,
             MoveToGoalLine_S + Update_E[!shouldMoveToGoalLine_G] / positionToBlock_A =
                 PositionToBlock_S,
-
             X + Update_E = X);
     }
 

@@ -39,16 +39,11 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Tactic::get(
                         !last_execution_robot.has_value() ||
                             last_execution_robot.value() != robot.id());
 
-        if (primitive)
-        {
-            primitive_set->mutable_robot_primitives()->insert(
-                google::protobuf::MapPair(robot.id(), *primitive));
-        }
-        else
-        {
-            primitive_set->mutable_robot_primitives()->insert(
-                google::protobuf::MapPair(robot.id(), *createStopPrimitive(false)));
-        }
+        CHECK(static_cast<bool>(primitive))
+            << "Primitive for " << objectTypeName(*this) << " in state " << getFSMState()
+            << " was not set" << std::endl;
+        primitive_set->mutable_robot_primitives()->insert(
+            google::protobuf::MapPair(robot.id(), *primitive));
     }
     return primitive_set;
 }

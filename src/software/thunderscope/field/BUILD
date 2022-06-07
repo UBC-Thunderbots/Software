@@ -32,6 +32,16 @@ py_library(
 )
 
 py_library(
+    name = "hrvo_layer",
+    srcs = ["hrvo_layer.py"],
+    deps = [
+        ":field_layer",
+        "//software/thunderscope:thread_safe_buffer",
+        requirement("pyqtgraph"),
+    ],
+)
+
+py_library(
     name = "path_layer",
     srcs = ["path_layer.py"],
     deps = [
