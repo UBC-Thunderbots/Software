@@ -39,6 +39,7 @@
 #include "path.h"
 #include "proto/message_translation/tbots_geometry.h"
 #include "software/geom/vector.h"
+#include "software/geom/algorithms/intersection.h"
 
 HRVOAgent::HRVOAgent(HRVOSimulator *simulator, const Vector &position, float neighborDist, std::size_t maxNeighbors,
                      float radius, const Vector &velocity, float maxAccel, AgentPath &path, float maxSpeed)
@@ -103,31 +104,47 @@ VelocityObstacle HRVOAgent::createVelocityObstacle(const Agent &other_agent)
 {
     Circle obstacle_agent_circle(Point(getPosition()), radius_);
     Circle moving_agent_circle(Point(other_agent.getPosition()), radius_);
-    auto velocity_obstacle = generateVelocityObstacle(obstacle_agent_circle, moving_agent_circle, getVelocity());
+    auto vo = generateVelocityObstacle(obstacle_agent_circle, moving_agent_circle, getVelocity());
 
     // Convert velocity obstacle to hybrid reciprocal velocity obstacle (HRVO)
     // by shifting one side of the velocity obstacle to share the responsibility
     // of avoiding collision with other agent. This assumes that other agent will also
     // be running HRVO
-    Vector side_being_shifted;
+    // Refer to: https://gamma.cs.unc.edu/HRVO/HRVO-T-RO.pdf#page=2
+//    Vector side_being_shifted;
+    Vector vo_side;
+    Vector rvo_side;
     if ((position_ - other_agent.getPosition())
                 .isClockwiseOf(other_agent.getPrefVelocity() - pref_velocity_))
     {
-        side_being_shifted = velocity_obstacle.getLeftSide();
+//        side_being_shifted = vo.getLeftSide();
+        vo_side = vo.getLeftSide();
+        rvo_side = vo.getRightSide();
     }
     else
     {
         // Vise versa of above
-        side_being_shifted = velocity_obstacle.getRightSide();
+//        side_being_shifted = vo.getRightSide();
+        vo_side = vo.getRightSide();
+        rvo_side = vo.getLeftSide();
+    }
+    Vector rvo_apex = (pref_velocity_ + other_agent.getPrefVelocity()) / 2;
+    Line vo_side_line(Point(vo.getApex()), Point(vo.getApex() + vo_side));
+    Line rvo_side_line(Point(rvo_apex), Point(vo.getApex() + rvo_side));
+
+    Vector hrvo_apex = vo.getApex();
+    auto intersection_point_opt = intersection(vo_side_line, rvo_side_line);
+    if (intersection_point_opt.has_value())
+    {
+        hrvo_apex = intersection_point_opt.value().toVector();
     }
 
-    const float d = std::sin();
-    const float s =
-            0.5f * (other_agent.getVelocity() - velocity_).determinant(side_being_shifted) /
-            d;
-    Vector shifted_apex = velocity_ + s * side_being_shifted;
+//    const float d = std::sin();
+//    const float s =
+//            0.5f * (other_agent.getVelocity() - velocity_).determinant(side_being_shifted) /
+//            d;
 
-    return VelocityObstacle(shifted_apex, velocity_obstacle.getLeftSide(), velocity_obstacle.getRightSide());
+    return VelocityObstacle(hrvo_apex, vo.getLeftSide(), vo.getRightSide());
 }
 
 void HRVOAgent::computeNewVelocity()
