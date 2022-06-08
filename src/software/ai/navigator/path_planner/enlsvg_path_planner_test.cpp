@@ -819,7 +819,64 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_close_start_end_but_block
         {path_points.begin() + 1, path_points.end()}, obstacles);
 }
 
-TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_one_point)
+TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_simulated_hrvo)
+{
+    Field field = Field::createSSLDivisionBField();
+    Team friendly_team = Team(Duration::fromMilliseconds(1000));
+    Team enemy_team    = Team(Duration::fromMilliseconds(1000));
+    Ball ball          = Ball(Point(), Vector(), Timestamp::fromSeconds(0));
+    World world        = World(field, ball, friendly_team, enemy_team);
+
+    Point start{2.90502, 0.0315793}, dest{3,0};
+
+    std::vector<ObstaclePtr> obstacles = {
+            robot_navigation_obstacle_factory.createStaticObstaclesFromMotionConstraints(
+                    {TbotsProto::MotionConstraint::INFLATED_ENEMY_DEFENSE_AREA},
+                    world.field()),
+    };
+    Rectangle navigable_area = field.fieldBoundary();
+    EnlsvgPathPlanner planner =
+            EnlsvgPathPlanner(navigable_area, obstacles, field.boundaryMargin());
+    auto path = planner.findPath(start, dest);
+    EXPECT_TRUE(path != std::nullopt);
+    std::vector<Point> path_points = path->getKnots();
+
+    EXPECT_EQ(2, path_points.size());
+    EXPECT_EQ(start, path->getStartPoint());
+    EXPECT_EQ(dest, path->getEndPoint());
+
+}
+
+TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_defense_play)
+{
+    Field field = Field::createSSLDivisionBField();
+    Team friendly_team = Team(Duration::fromMilliseconds(1000));
+    Team enemy_team    = Team(Duration::fromMilliseconds(1000));
+    Ball ball          = Ball(Point(), Vector(), Timestamp::fromSeconds(0));
+    World world        = World(field, ball, friendly_team, enemy_team);
+
+    Point start{-3.24629, 0.892211}, dest{-3.3185, 0.891779};
+
+    std::vector<ObstaclePtr> obstacles = {
+            robot_navigation_obstacle_factory.createStaticObstaclesFromMotionConstraints(
+                    {TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA,
+                     TbotsProto::MotionConstraint::INFLATED_ENEMY_DEFENSE_AREA},
+                    world.field()),
+    };
+    Rectangle navigable_area = field.fieldBoundary();
+    EnlsvgPathPlanner planner =
+            EnlsvgPathPlanner(navigable_area, obstacles, field.boundaryMargin());
+    auto path = planner.findPath(start, dest);
+    EXPECT_TRUE(path != std::nullopt);
+    std::vector<Point> path_points = path->getKnots();
+
+    EXPECT_EQ(2, path_points.size());
+    EXPECT_EQ(start, path->getStartPoint());
+    EXPECT_EQ(dest, path->getEndPoint());
+
+}
+
+TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_enemy_ball_placement)
 {
     Field field = Field::createSSLDivisionBField();
     Team friendly_team = Team(Duration::fromMilliseconds(1000));
@@ -831,7 +888,213 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_one_point)
 
     std::vector<ObstaclePtr> obstacles = {
             robot_navigation_obstacle_factory.createStaticObstaclesFromMotionConstraints(
-                    {TbotsProto::MotionConstraint::AVOID_BALL_PLACEMENT_INTERFERENCE},
+                    { TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA,
+                      TbotsProto::MotionConstraint::AVOID_BALL_PLACEMENT_INTERFERENCE},
+                    world.field()),
+    };
+    Rectangle navigable_area = field.fieldBoundary();
+    EnlsvgPathPlanner planner =
+            EnlsvgPathPlanner(navigable_area, obstacles, field.boundaryMargin());
+    auto path = planner.findPath(start, dest);
+    EXPECT_TRUE(path != std::nullopt);
+    std::vector<Point> path_points = path->getKnots();
+
+    EXPECT_EQ(2, path_points.size());
+    EXPECT_EQ(start, path->getStartPoint());
+    EXPECT_EQ(dest, path->getEndPoint());
+
+}
+
+TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_enemy_free_kick_play_test)
+{
+    Field field = Field::createSSLDivisionBField();
+    Team friendly_team = Team(Duration::fromMilliseconds(1000));
+    Team enemy_team    = Team(Duration::fromMilliseconds(1000));
+    Ball ball          = Ball(Point(), Vector(), Timestamp::fromSeconds(0));
+    World world        = World(field, ball, friendly_team, enemy_team);
+
+    Point start{-3.22542, 0.710034}, dest{-3.3185, 0.713858};
+
+    std::vector<ObstaclePtr> obstacles = {
+            robot_navigation_obstacle_factory.createStaticObstaclesFromMotionConstraints(
+                    {TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA,
+                     TbotsProto::MotionConstraint::INFLATED_ENEMY_DEFENSE_AREA},
+                    world.field()),
+    };
+    Rectangle navigable_area = field.fieldBoundary();
+    EnlsvgPathPlanner planner =
+            EnlsvgPathPlanner(navigable_area, obstacles, field.boundaryMargin());
+    auto path = planner.findPath(start, dest);
+    EXPECT_TRUE(path != std::nullopt);
+    std::vector<Point> path_points = path->getKnots();
+
+    EXPECT_EQ(2, path_points.size());
+    EXPECT_EQ(start, path->getStartPoint());
+    EXPECT_EQ(dest, path->getEndPoint());
+
+}
+
+TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_free_kick_play_test)
+{
+    Field field = Field::createSSLDivisionBField();
+    Team friendly_team = Team(Duration::fromMilliseconds(1000));
+    Team enemy_team    = Team(Duration::fromMilliseconds(1000));
+    Ball ball          = Ball(Point(), Vector(), Timestamp::fromSeconds(0));
+    World world        = World(field, ball, friendly_team, enemy_team);
+
+    Point start{-3.22542, 0.710034}, dest{-3.3185, 0.713858};
+
+    std::vector<ObstaclePtr> obstacles = {
+            robot_navigation_obstacle_factory.createStaticObstaclesFromMotionConstraints(
+                    {TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA,
+                     TbotsProto::MotionConstraint::INFLATED_ENEMY_DEFENSE_AREA},
+                    world.field()),
+    };
+    Rectangle navigable_area = field.fieldBoundary();
+    EnlsvgPathPlanner planner =
+            EnlsvgPathPlanner(navigable_area, obstacles, field.boundaryMargin());
+    auto path = planner.findPath(start, dest);
+    EXPECT_TRUE(path != std::nullopt);
+    std::vector<Point> path_points = path->getKnots();
+
+    EXPECT_EQ(2, path_points.size());
+    EXPECT_EQ(start, path->getStartPoint());
+    EXPECT_EQ(dest, path->getEndPoint());
+
+}
+
+TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_kickoff_enemy_play_test)
+{
+    Field field = Field::createSSLDivisionBField();
+    Team friendly_team = Team(Duration::fromMilliseconds(1000));
+    Team enemy_team    = Team(Duration::fromMilliseconds(1000));
+    Ball ball          = Ball(Point(), Vector(), Timestamp::fromSeconds(0));
+    World world        = World(field, ball, friendly_team, enemy_team);
+
+    Point start{-3.25525, 0.976217}, dest{-3.32, 1};
+
+    std::vector<ObstaclePtr> obstacles = {
+            robot_navigation_obstacle_factory.createStaticObstaclesFromMotionConstraints(
+                    {TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA,
+                     TbotsProto::MotionConstraint::CENTER_CIRCLE,
+                     TbotsProto::MotionConstraint::ENEMY_HALF,
+                     TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL},
+                    world.field()),
+    };
+    Rectangle navigable_area = field.fieldBoundary();
+    EnlsvgPathPlanner planner =
+            EnlsvgPathPlanner(navigable_area, obstacles, field.boundaryMargin());
+    auto path = planner.findPath(start, dest);
+    EXPECT_TRUE(path != std::nullopt);
+    std::vector<Point> path_points = path->getKnots();
+
+    EXPECT_EQ(2, path_points.size());
+    EXPECT_EQ(start, path->getStartPoint());
+    EXPECT_EQ(dest, path->getEndPoint());
+
+}
+
+TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_penalty_kick_enemy_play_test)
+{
+    Field field = Field::createSSLDivisionBField();
+    Team friendly_team = Team(Duration::fromMilliseconds(1000));
+    Team enemy_team    = Team(Duration::fromMilliseconds(1000));
+    Ball ball          = Ball(Point(), Vector(), Timestamp::fromSeconds(0));
+    World world        = World(field, ball, friendly_team, enemy_team);
+
+    Point start{2.97936, 0.381252}, dest{3, 0.36};
+
+    std::vector<ObstaclePtr> obstacles = {
+            robot_navigation_obstacle_factory.createStaticObstaclesFromMotionConstraints(
+                    {TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA,
+                     TbotsProto::MotionConstraint::INFLATED_ENEMY_DEFENSE_AREA},
+                    world.field()),
+    };
+    Rectangle navigable_area = field.fieldBoundary();
+    EnlsvgPathPlanner planner =
+            EnlsvgPathPlanner(navigable_area, obstacles, field.boundaryMargin());
+    auto path = planner.findPath(start, dest);
+    EXPECT_TRUE(path != std::nullopt);
+    std::vector<Point> path_points = path->getKnots();
+
+    EXPECT_EQ(2, path_points.size());
+    EXPECT_EQ(start, path->getStartPoint());
+    EXPECT_EQ(dest, path->getEndPoint());
+
+}
+
+TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_shoot_or_chip_play_test)
+{
+    Field field = Field::createSSLDivisionBField();
+    Team friendly_team = Team(Duration::fromMilliseconds(1000));
+    Team enemy_team    = Team(Duration::fromMilliseconds(1000));
+    Ball ball          = Ball(Point(), Vector(), Timestamp::fromSeconds(0));
+    World world        = World(field, ball, friendly_team, enemy_team);
+
+    Point start{-3.27582, 0.696405}, dest{-3.3185, 0.673503};
+
+    std::vector<ObstaclePtr> obstacles = {
+            robot_navigation_obstacle_factory.createStaticObstaclesFromMotionConstraints(
+                    {TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA,
+                     TbotsProto::MotionConstraint::INFLATED_ENEMY_DEFENSE_AREA},
+                    world.field()),
+    };
+    Rectangle navigable_area = field.fieldBoundary();
+    EnlsvgPathPlanner planner =
+            EnlsvgPathPlanner(navigable_area, obstacles, field.boundaryMargin());
+    auto path = planner.findPath(start, dest);
+    EXPECT_TRUE(path != std::nullopt);
+    std::vector<Point> path_points = path->getKnots();
+
+    EXPECT_EQ(2, path_points.size());
+    EXPECT_EQ(start, path->getStartPoint());
+    EXPECT_EQ(dest, path->getEndPoint());
+
+}
+
+TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_crease_defense_play_test)
+{
+    Field field = Field::createSSLDivisionBField();
+    Team friendly_team = Team(Duration::fromMilliseconds(1000));
+    Team enemy_team    = Team(Duration::fromMilliseconds(1000));
+    Ball ball          = Ball(Point(), Vector(), Timestamp::fromSeconds(0));
+    World world        = World(field, ball, friendly_team, enemy_team);
+
+    Point start{-3.2311, 0.636495}, dest{-3.3185, 0.659386};
+
+    std::vector<ObstaclePtr> obstacles = {
+            robot_navigation_obstacle_factory.createStaticObstaclesFromMotionConstraints(
+                    {TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA,
+                     TbotsProto::MotionConstraint::INFLATED_ENEMY_DEFENSE_AREA},
+                    world.field()),
+    };
+    Rectangle navigable_area = field.fieldBoundary();
+    EnlsvgPathPlanner planner =
+            EnlsvgPathPlanner(navigable_area, obstacles, field.boundaryMargin());
+    auto path = planner.findPath(start, dest);
+    EXPECT_TRUE(path != std::nullopt);
+    std::vector<Point> path_points = path->getKnots();
+
+    EXPECT_EQ(2, path_points.size());
+    EXPECT_EQ(start, path->getStartPoint());
+    EXPECT_EQ(dest, path->getEndPoint());
+
+}
+
+TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_offense_play_test)
+{
+    Field field = Field::createSSLDivisionBField();
+    Team friendly_team = Team(Duration::fromMilliseconds(1000));
+    Team enemy_team    = Team(Duration::fromMilliseconds(1000));
+    Ball ball          = Ball(Point(), Vector(), Timestamp::fromSeconds(0));
+    World world        = World(field, ball, friendly_team, enemy_team);
+
+    Point start{-3.27309, 0.511735}, dest{-3.3185, 0.47394};
+
+    std::vector<ObstaclePtr> obstacles = {
+            robot_navigation_obstacle_factory.createStaticObstaclesFromMotionConstraints(
+                    {TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA,
+                     TbotsProto::MotionConstraint::INFLATED_ENEMY_DEFENSE_AREA},
                     world.field()),
     };
     Rectangle navigable_area = field.fieldBoundary();

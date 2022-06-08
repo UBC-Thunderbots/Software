@@ -229,6 +229,13 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::getPrimitivesFromTactic(
             TbotsProto::MotionControl motion_control;
             TbotsProto::Path path_proto;
 
+            for (const auto &motion_constraint : motion_constraints)
+            {
+                motion_control.add_motion_constraints(motion_constraint);
+            }
+
+            *(motion_control.mutable_static_obstacles()) = obstacles;
+
             // first point is always the robot_position
             std::vector<Point> path_points = {robot_position, robot_position};
             auto path = path_planner->findPath(robot_position, destination);
@@ -246,7 +253,7 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::getPrimitivesFromTactic(
             }
             else if (path.has_value() && path.value().getKnots().size() == 1) {
                 path_points = path.value().getKnots();
-                LOG(FATAL) << "Path Point Size: " << path_points.size() << " Point: " << path_points.at(0) << " Robot Position: " << robot_position << " Destination: " << destination << std::endl;
+                LOG(FATAL) << motion_control.DebugString() << "Path Point Size: " << path_points.size() << " Point: " << path_points.at(0) << " Robot Position: " << robot_position << " Destination: " << destination << std::endl;
             }
             else
             {
@@ -260,12 +267,7 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::getPrimitivesFromTactic(
                 *(path_proto.add_points()) = *createPointProto(point);
             }
             *(motion_control.mutable_path()) = path_proto;
-            for (const auto &motion_constraint : motion_constraints)
-            {
-                motion_control.add_motion_constraints(motion_constraint);
-            }
 
-            *(motion_control.mutable_static_obstacles()) = obstacles;
 
             return motion_control;
         };
