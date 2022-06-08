@@ -343,7 +343,6 @@ class Gamecontroller(object):
         ):
             self.full_system_proc = Popen(full_system.split(" "))
 
-
     def __enter__(self):
         """Enter the gamecontroller context manager. 
 
