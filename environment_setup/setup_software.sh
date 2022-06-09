@@ -60,6 +60,7 @@ host_software_packages=(
                     # properly manage this as a bazel dependency, so we have
                     # to manually install it ourselves
     python3-yaml # Load dynamic parameter configuration files
+    qt5-default # A GUI library used by er-force sim
     tmux        # Used by AI vs AI script
     valgrind # Checks for memory leaks
     libsqlite3-dev # needed to build Python 3 with sqlite support
@@ -128,9 +129,9 @@ if [[ $(lsb_release -rs) == "20.04" ]]; then
     sudo /opt/tbotspython/bin/pip3 install -r ubuntu20_requirements.txt
 fi
 
-if ! sudo /opt/tbotspython/bin/pip3 install --upgrade protobuf  ; then
+if ! sudo /opt/tbotspython/bin/pip3 install protobuf==3.20.1  ; then
     print_status_msg "Error: Installing protobuf failed"
-    exit 1
+    exit 1;
 fi
 
 print_status_msg "Done Setting Up Virtual Python Environment"

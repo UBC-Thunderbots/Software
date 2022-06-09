@@ -78,7 +78,7 @@ class ChickerWidget(QWidget):
         # initial values
         self.geneva_value = 3
         self.power_value = 1
-        
+
         self.geneva_slider.setValue(self.geneva_value)
         self.power_slider.setValue(self.power_value)
 
