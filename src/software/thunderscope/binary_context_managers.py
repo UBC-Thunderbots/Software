@@ -3,6 +3,7 @@ import socket
 import logging
 import psutil
 import time
+import threading
 import google.protobuf.internal.encoder as encoder
 import google.protobuf.internal.decoder as decoder
 
@@ -57,6 +58,10 @@ class FullSystem(object):
         self.debug_full_system = debug_full_system
         self.friendly_colour_yellow = friendly_colour_yellow
         self.full_system_proc = None
+
+        self.thread = Thread(target = __restart__)
+        self.thread.start()
+        self.thread.join()
 
     def __enter__(self):
         """Enter the full_system context manager. 
@@ -119,13 +124,14 @@ gdb --args bazel-bin/{full_system}
     def __restart__(self):
         "Restarts full system."
 
-        if not is_cmd_running(
+        while not is_cmd_running(
             [
                 "unix_full_system",
                 "--runtime_dir={}".format(self.full_system_runtime_dir),
             ]
         ):
             self.full_system_proc = Popen(full_system.split(" "))
+            time.sleep(1)
 
     def __exit__(self, type, value, traceback):
         """Exit the full_system context manager.
