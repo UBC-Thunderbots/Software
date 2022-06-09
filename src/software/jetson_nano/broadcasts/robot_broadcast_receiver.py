@@ -11,8 +11,8 @@ def receive_announcements(port: int, duration: int) -> [Announcement]:
     """Returns a list of Announcements, without duplicates received within a
     time window of 4s on a specified port
 
-    :param port: the port to listen for announcements on
     :param duration: how long to listen for announcements
+    :param port: the port to listen for announcements on
     :return: a list of Announcements, without duplicates
 
     """
@@ -23,6 +23,7 @@ def receive_announcements(port: int, duration: int) -> [Announcement]:
 
     announcements = []
     timeout = time() + duration
+
     while time() < timeout:
         try:
             data = receiver.recv(1024)
@@ -35,6 +36,7 @@ def receive_announcements(port: int, duration: int) -> [Announcement]:
             # filter out duplicates
             if announcement not in announcements:
                 announcements.append(announcement)
+
     return announcements
 
 
@@ -50,10 +52,8 @@ def main():
         help="how long to listen for announcements. Recommended > 2",
     )
     args = vars(ap.parse_args())
-    port = args["port"]
-    duration = args["duration"]
 
-    announcements = receive_announcements(port, duration)
+    announcements = receive_announcements(args["port"], args["duration"])
     for announcement in announcements:
         print(
             f"robot_id: {announcement.robot_id} \nip_addr: {announcement.ip_addr} \nmac_addr: {announcement.mac_addr} \n"

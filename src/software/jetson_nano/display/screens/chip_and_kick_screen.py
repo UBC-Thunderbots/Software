@@ -1,4 +1,4 @@
-from software.display.screens.screen import Screen
+from software.jetson_nano.display.screens.screen import Screen
 
 
 class ChipAndKickScreen(Screen):
