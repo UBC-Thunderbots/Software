@@ -59,10 +59,13 @@ class FullSystem(object):
         self.friendly_colour_yellow = friendly_colour_yellow
         self.full_system_proc = None
 
-        self.thread = Thread(target = __restart__)
-        self.thread.start()
-        self.thread.join()
-
+        try:
+            self.thread = Thread(target = __restart__)
+            self.thread.start()
+            self.thread.join()
+        except Exception:
+            raise Exception("Did not properly restart FullSystem.")
+        
     def __enter__(self):
         """Enter the full_system context manager. 
 
