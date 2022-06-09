@@ -1,14 +1,11 @@
 package(default_visibility = ["//visibility:public"])
 
-load("@display_deps//:requirements.bzl", "requirement")
-
 py_library(
     name = "screen",
     srcs = ["screen.py"],
     deps = [
         "//software/jetson_nano/display:constants",
         "//software/jetson_nano/display:utils",
-        requirement("Pillow"),
     ],
 )
 
