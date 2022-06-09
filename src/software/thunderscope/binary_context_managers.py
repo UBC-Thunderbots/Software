@@ -60,12 +60,12 @@ class FullSystem(object):
         self.full_system_proc = None
 
         try:
-            self.thread = Thread(target = __restart__)
+            self.thread = Thread(target=__restart__)
             self.thread.start()
             self.thread.join()
         except Exception:
             raise Exception("Did not properly restart FullSystem.")
-        
+
     def __enter__(self):
         """Enter the full_system context manager. 
 
