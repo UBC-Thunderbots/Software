@@ -116,6 +116,17 @@ gdb --args bazel-bin/{full_system}
 
         return self
 
+    def __restart__(self):
+        "Restarts full system."
+
+        if not is_cmd_running(
+            [
+                "unix_full_system",
+                "--runtime_dir={}".format(self.full_system_runtime_dir),
+            ]
+        ):
+            self.full_system_proc = Popen(full_system.split(" "))
+
     def __exit__(self, type, value, traceback):
         """Exit the full_system context manager.
 
@@ -331,17 +342,6 @@ class Gamecontroller(object):
         """
         self.supress_logs = supress_logs
         self.ci_mode = ci_mode
-
-    def __restart__(self):
-        "Restarts full system."
-
-        if not is_cmd_running(
-            [
-                "unix_full_system",
-                "--runtime_dir={}".format(self.full_system_runtime_dir),
-            ]
-        ):
-            self.full_system_proc = Popen(full_system.split(" "))
 
     def __enter__(self):
         """Enter the gamecontroller context manager. 
