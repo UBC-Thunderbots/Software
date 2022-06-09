@@ -120,15 +120,8 @@ class ProtoLogger(object):
                             )
                         except queue.Empty:
                             continue
-
-                        serialized_proto = base64.b64encode(proto.SerializeToString())
                         current_time = self.time_provider() - self.start_time
-
-                        log_entry = (
-                            f"{current_time}{REPLAY_METADATA_DELIMETER}"
-                            + f"{proto.DESCRIPTOR.full_name}{REPLAY_METADATA_DELIMETER}"
-                            + f"{serialized_proto}\n"
-                        )
+                        log_entry = ProtoLogger.create_log_entry(proto, current_time)
 
                         self.log_file.write(bytes(log_entry, encoding="utf-8"))
 
@@ -139,3 +132,13 @@ class ProtoLogger(object):
 
         except Exception:
             logging.exception("Exception detected in ProtoLogger")
+
+    @staticmethod
+    def create_log_entry(proto, current_time):
+        serialized_proto = base64.b64encode(proto.SerializeToString())
+        log_entry = (
+            f"{current_time}{REPLAY_METADATA_DELIMETER}"
+            + f"{proto.DESCRIPTOR.full_name}{REPLAY_METADATA_DELIMETER}"
+            + f"{serialized_proto}\n"
+        )
+        return log_entry
