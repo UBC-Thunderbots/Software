@@ -5,6 +5,7 @@ import pytest
 import software.python_bindings as tbots
 from proto.play_pb2 import Play, PlayName
 from software.simulated_tests.ball_enters_region import *
+from software.simulated_tests.ball_enters_region import *
 from software.simulated_tests.simulated_test_fixture import simulated_test_runner
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
@@ -204,8 +205,10 @@ def test_defense_play_close_to_net(simulated_test_runner):
     always_validation_sequence_set = [[]]
 
     # Eventually Validation
-    eventually_validation_sequence_set = [[]]
-
+    eventually_validation_sequence_set = [
+            [
+                BallEventuallyEntersRegion(regions=[]),]
+    ]
     simulated_test_runner.run_test(
         eventually_validation_sequence_set=eventually_validation_sequence_set,
         always_validation_sequence_set=always_validation_sequence_set,
