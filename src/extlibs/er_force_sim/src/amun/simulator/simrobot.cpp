@@ -425,6 +425,7 @@ void SimRobot::begin(SimBall *ball, double time)
         }
         else
         {
+            std::cout<<"chipping"<<std::endl;
             // FIXME: for now we just recalc the max distance based on the given angle
             const float maxShootSpeed =
                 coordinates::chipVelFromChipDistance(m_specs.shot_chip_max());
@@ -567,6 +568,7 @@ bool SimRobot::canKickBall(SimBall *ball) const
         return true;
     }
 
+    bool collided = false;
     // check for collision between ball and dribbler
     int numManifolds = m_world->getDispatcher()->getNumManifolds();
     for (int i = 0; i < numManifolds; ++i)
@@ -589,6 +591,7 @@ bool SimRobot::canKickBall(SimBall *ball) const
             }
         }
     }
+
 
     return false;
 }
@@ -653,6 +656,10 @@ void SimRobot::update(SSLProto::SSL_DetectionRobot *robot, float stddev_p,
 
 bool SimRobot::touchesBall(SimBall *ball) const
 {
+//    if(m_holdBallConstraint){
+//        return true;
+//    }
+
     int numManifolds = m_world->getDispatcher()->getNumManifolds();
     for (int i = 0; i < numManifolds; ++i)
     {
@@ -665,7 +672,16 @@ bool SimRobot::touchesBall(SimBall *ball) const
             (objectA == m_body && objectB == ball->body()) ||
             (objectA == ball->body() && objectB == m_body))
         {
-            return true;
+            int numContacts = contactManifold->getNumContacts();
+            for (int j = 0; j < numContacts; ++j)
+            {
+                btManifoldPoint &pt = contactManifold->getContactPoint(j);
+                if (pt.getDistance() < 0.001f * SIMULATOR_SCALE)
+                {
+                    return true;
+                }
+            }
+            //return true;
         }
     }
 

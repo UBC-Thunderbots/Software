@@ -107,7 +107,6 @@ void SimBall::begin(bool robotCollision)
         {
             case STATIONARY:
                 m_body->setLinearVelocity(btVector3(0, 0, 0));
-                // std::cout<<"STATIONARY"<<std::endl;
                 m_body->setFriction(BALL_SLIDING_FRICTION);
                 setTransitionSpeed = true;
                 break;
@@ -138,6 +137,8 @@ void SimBall::begin(bool robotCollision)
                 break;
         }
     }
+
+    std::cout<<"current state, ball position = "<<currentBallState<<" , "<<p.y()<<","<<p.x()<<std::endl;
 
     bool moveCommand           = false;
     auto sendPartialCoordError = [this](const char *msg) {
@@ -466,6 +467,7 @@ void SimBall::kick(const btVector3 &power)
 {
     m_body->activate();
     m_body->applyCentralForce(power);
+    std::cout<<"kicked with power = "<<power.length()<<std::endl;
     // btTransform transform;
     // m_motionState->getWorldTransform(transform);
     // const btVector3 p = transform.getOrigin() / SIMULATOR_SCALE;
