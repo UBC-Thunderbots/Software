@@ -1,7 +1,7 @@
 #include "software/ai/evaluation/intercept.h"
 
 #include "shared/constants.h"
-#include "software/ai/evaluation/pass.h"
+#include "software/ai/evaluation/time_to_travel.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/optimization/gradient_descent_optimizer.hpp"
 
@@ -34,10 +34,7 @@ std::optional<std::pair<Point, Duration>> findBestInterceptForBall(const Ball &b
             ball.estimateFutureState(Duration::fromSeconds(duration)).position();
 
         // Figure out how long it will take the robot to get to the new ball position
-        Duration time_to_ball_pos = getTimeToPositionForRobot(
-            robot.position(), new_ball_pos,
-            robot.robotConstants().robot_max_speed_m_per_s,
-            robot.robotConstants().robot_max_acceleration_m_per_s_2);
+        Duration time_to_ball_pos = robot.getTimeToPosition(new_ball_pos);
 
         // Figure out when the robot will reach the new ball position relative to the
         // time that the ball will get there (ie. will we get there in time?)
@@ -71,10 +68,7 @@ std::optional<std::pair<Point, Duration>> findBestInterceptForBall(const Ball &b
         ball.estimateFutureState(best_ball_travel_duration).position();
 
     // Check that we can get to the best position in time
-    Duration time_to_ball_pos = getTimeToPositionForRobot(
-        robot.position(), best_ball_intercept_pos,
-        robot.robotConstants().robot_max_speed_m_per_s,
-        robot.robotConstants().robot_max_acceleration_m_per_s_2);
+    Duration time_to_ball_pos     = robot.getTimeToPosition(best_ball_intercept_pos);
     Duration ball_robot_time_diff = time_to_ball_pos - best_ball_travel_duration;
     // NOTE: if ball velocity is 0 then ball travel duration is infinite, so this
     // check isn't relevant in that case

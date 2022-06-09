@@ -118,6 +118,7 @@ struct ShadowEnemyFSM
             StealAndChipState_S + Update_E[enemyThreatHasBall_G] / stealAndChip_A,
             StealAndChipState_S + Update_E[!enemyThreatHasBall_G] / blockPass_A = X,
             X + Update_E[!enemyThreatHasBall_G] / blockPass_A = BlockPassState_S,
-            X + Update_E[enemyThreatHasBall_G] / blockShot_A  = MoveFSM_S);
+            X + Update_E[enemyThreatHasBall_G] / blockShot_A  = MoveFSM_S,
+            X + Update_E / SET_STOP_PRIMITIVE_ACTION          = X);
     }
 };
