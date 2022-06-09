@@ -102,64 +102,41 @@ void HRVOAgent::computeNeighbors(double neighbor_dist_threshold)
 // TODO: Move implementation to new file created and have this function call that!?
 VelocityObstacle HRVOAgent::createVelocityObstacle(const Agent &other_agent)
 {
-    if ((position_ - other_agent.getPosition()).lengthSquared() >
-        std::pow(radius_ + other_agent.getRadius(), 2))
+    Circle obstacle_agent_circle(Point(getPosition()), radius_);
+    Circle moving_agent_circle(Point(other_agent.getPosition()), radius_);
+    auto vo = generateVelocityObstacle(obstacle_agent_circle, moving_agent_circle, getVelocity());
+
+    // Convert velocity obstacle to hybrid reciprocal velocity obstacle (HRVO)
+    // by shifting one side of the velocity obstacle to share the responsibility
+    // of avoiding collision with other agent. This assumes that other agent will also
+    // be running HRVO
+    // Refer to: https://gamma.cs.unc.edu/HRVO/HRVO-T-RO.pdf#page=2
+    Vector vo_side;
+    Vector rvo_side;
+    if ((position_ - other_agent.getPosition())
+            .isClockwiseOf(other_agent.getPrefVelocity() - pref_velocity_))
     {
-        // This Agent is not colliding with other agent
-        const float angle =
-                (position_ - other_agent.getPosition()).orientation().toRadians();
-
-        // The opening angle of the velocity obstacle
-        // opening angle = arcsin((rad_A + rad_B) / distance_BA)
-        const float openingAngle =
-                std::asin((radius_ + other_agent.getRadius()) /
-                          (position_ - other_agent.getPosition()).length());
-        // Direction of the two edges of the velocity obstacles
-        Vector right_side =
-                Vector::createFromAngle(Angle::fromRadians(angle - openingAngle));
-        Vector left_side =
-                Vector::createFromAngle(Angle::fromRadians(angle + openingAngle));
-
-        const float d = std::sin(2.f * openingAngle);
-
-        // This shifts one side of the velocity obstacle to share the responsibility
-        // of avoiding collision with other agent. This assumes that other agent will also
-        // be running HRVO
-        if ((position_ - other_agent.getPosition())
-                    .determinant(other_agent.getPrefVelocity() - pref_velocity_) > 0.0f)
-        {
-            // Relative velocity is in the right half of velocity obstacle (VO)
-            // Shift the VO apex to the left so the right side is smaller, making the
-            // VO a Hybrid Reciprocal Velocity Obstacle (HRVO)
-            const float s =
-                    0.5f * (other_agent.getVelocity() - velocity_).determinant(left_side) / d;
-
-            Vector apex = velocity_ + s * right_side;
-            return VelocityObstacle(apex, right_side, left_side);
-        }
-        else
-        {
-            // Relative velocity is in the left half of velocity obstacle (VO)
-            // Shift the VO apex to the right so the left side is smaller, making the
-            // VO a Hybrid Reciprocal Velocity Obstacle (HRVO)
-            const float s =
-                    0.5f * (other_agent.getVelocity() - velocity_).determinant(right_side) /
-                    d;
-
-            Vector apex = velocity_ + s * left_side;
-            return VelocityObstacle(apex, right_side, left_side);
-        }
+        vo_side = vo.getLeftSide();
+        rvo_side = vo.getRightSide();
     }
-    // This Agent is colliding with other agent
-    // Uses Reciprocal Velocity Obstacle (RVO) with the sides being 180 degrees
-    // apart from each other
-    Vector apex = 0.5f * (other_agent.getVelocity() + velocity_);
-    Vector center_line = other_agent.getPosition() - position_;
-    // Velocity obstacles must have an opening of less than 180 degrees
-    Angle max_opening = Angle::fromDegrees(179.9);
-    Vector right_side = center_line.rotate(max_opening / 2);
-    Vector left_side = center_line.rotate(-max_opening / 2);
-    return VelocityObstacle(apex, right_side, left_side);
+    else
+    {
+        // Vise versa of above
+        vo_side = vo.getRightSide();
+        rvo_side = vo.getLeftSide();
+    }
+    Vector rvo_apex = (pref_velocity_ + other_agent.getPrefVelocity()) / 2;
+    Line vo_side_line(Point(vo.getApex()), Point(vo.getApex() + vo_side));
+    Line rvo_side_line(Point(rvo_apex), Point(rvo_apex + rvo_side));
+
+    Vector hrvo_apex = vo.getApex();
+    auto intersection_point_opt = intersection(vo_side_line, rvo_side_line);
+    if (intersection_point_opt.has_value())
+    {
+        hrvo_apex = intersection_point_opt.value().toVector();
+    }
+
+    return VelocityObstacle(hrvo_apex, vo.getLeftSide(), vo.getRightSide());
 }
 
 void HRVOAgent::computeNewVelocity()
@@ -463,20 +440,24 @@ void HRVOAgent::computeVelocityObstacles()
     velocityObstacles_.clear();
     velocityObstacles_.reserve(neighbors_.size());
 
-    // Create velocity Obstacles for neighboring static obstacles
-    double dist_to_obstacle_threshold = neighborDist_;
     const auto current_path_point_opt = getPath().getCurrentPathPoint();
-    if (current_path_point_opt.has_value())
+    if (!current_path_point_opt.has_value())
     {
-        // Only consider agents within this distance away from our position
-        auto current_destination = current_path_point_opt.value().getPosition();
-        dist_to_obstacle_threshold =
-                std::min(dist_to_obstacle_threshold,
-                         (getPosition() - current_destination).length());
+        // Don't draw any velocity obstacles if we do not have a destination
+        return;
     }
-    computeNeighbors(dist_to_obstacle_threshold);
+
+    double dist_to_obstacle_threshold = neighborDist_;
+    Point agent_position_point(getPosition());
+
+    // Only consider agents within this distance away from our position
+    auto current_destination = current_path_point_opt.value().getPosition();
+    dist_to_obstacle_threshold =
+            std::min(dist_to_obstacle_threshold,
+                     (getPosition() - current_destination).length());
 
     // Create Velocity Obstacles for neighboring agents
+    computeNeighbors(dist_to_obstacle_threshold);
     for (const auto &neighbor : neighbors_)
     {
         std::shared_ptr<Agent> other_agent = simulator_->getAgents()[neighbor.second];
@@ -485,13 +466,12 @@ void HRVOAgent::computeVelocityObstacles()
     }
 
     // Create Velocity Obstacles for nearby static obstacles
-    Point agent_position_point(getPosition());
     Circle circle_rep_of_agent(agent_position_point, radius_);
+    Segment agent_to_dest_segment(agent_position_point, Point(current_destination));
     for (const auto &obstacle : static_obstacles)
     {
-        // Only consider obstacles that are nearby, and which do not contain the agent
-        double dist_to_agent = obstacle->distance(agent_position_point);
-        if (dist_to_agent <= dist_to_obstacle_threshold && !obstacle->contains(agent_position_point))
+        double dist_agent_to_obstacle = obstacle->distance(agent_position_point);
+        if (((dist_agent_to_obstacle <= dist_to_obstacle_threshold && dist_agent_to_obstacle <= ROBOT_MAX_RADIUS_METERS * 2) || obstacle->intersects(agent_to_dest_segment)) && !obstacle->contains(agent_position_point))
         {
             VelocityObstacle velocity_obstacle = obstacle->generateVelocityObstacle(circle_rep_of_agent, Vector());
             velocityObstacles_.push_back(velocity_obstacle);
