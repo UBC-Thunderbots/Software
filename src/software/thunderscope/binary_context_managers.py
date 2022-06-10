@@ -77,7 +77,7 @@ class FullSystem(object):
         except:
             pass
 
-        full_system = "software/unix_full_system --runtime_dir={} {}".format(
+        self.full_system = "software/unix_full_system --runtime_dir={} {}".format(
             self.full_system_runtime_dir,
             "--friendly_colour_yellow" if self.friendly_colour_yellow else "",
         )
