@@ -21,7 +21,7 @@ class AttackerTacticKeepAwayTest
     TbotsProto::FieldType field_type = TbotsProto::FieldType::DIV_B;
     Field field                      = Field::createField(field_type);
 };
-//
+
 TEST_P(AttackerTacticKeepAwayTest, attacker_test_passing)
 {
     Pass pass                    = std::get<0>(GetParam());
