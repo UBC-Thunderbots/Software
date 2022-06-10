@@ -57,7 +57,6 @@ std::unique_ptr<TbotsProto::PrimitiveSet> AssignedTacticsPlay::get(
         }
     }
 
-    primitives_to_run->set_pid(getpid());
     return primitives_to_run;
 }
 

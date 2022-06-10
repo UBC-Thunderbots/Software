@@ -16,9 +16,6 @@ message Vision
 
     // Ball state
     BallState ball_state = 3;
-
-    // The process ID of the AI that sent this primitive set
-    uint32 pid = 4;
 }
 
 message PrimitiveSet
@@ -33,7 +30,4 @@ message PrimitiveSet
     // NOTE: The `max_count` for this field should be set to a number that is less then
     //       or equal to the maximum number of robots we expect to run
     map<uint32, Primitive> robot_primitives = 3;
-
-    // The process ID of the AI that sent this primitive set
-    uint32 pid = 4;
 }
