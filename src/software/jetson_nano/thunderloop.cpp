@@ -29,6 +29,7 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, const int loop
     robot_constants_ = robot_constants;
 
     motor_service_ = std::make_unique<MotorService>(robot_constants, loop_hz);
+    redis_client_ = std::make_unique<RedisClient>(REDIS_DEFAULT_HOST, REDIS_DEFAULT_PORT);
 }
 
 Thunderloop::~Thunderloop() {}
@@ -69,13 +70,11 @@ void Thunderloop::runLoop()
             ScopedTimespecTimer iteration_timer(&iteration_time);
 
             // Grab the latest configs from redis
-            auto redis_key_value_pairs = redis_client_->getAllKeyValuePairs();
-
-            auto robot_id = std::stoi(redis_key_value_pairs[ROBOT_ID_REDIS_KEY]);
+            auto robot_id = std::stoi(redis_client_->get(ROBOT_ID_REDIS_KEY));
             auto channel_id =
-                std::stoi(redis_key_value_pairs[ROBOT_MULTICAST_CHANNEL_REDIS_KEY]);
+                std::stoi(redis_client_->get(ROBOT_MULTICAST_CHANNEL_REDIS_KEY));
             auto network_interface =
-                redis_key_value_pairs[ROBOT_NETWORK_INTERFACE_REDIS_KEY];
+                redis_client_->get(ROBOT_NETWORK_INTERFACE_REDIS_KEY);
 
             // If any of the configs have changed, update the network service to switch
             // to the new interface and channel with the correct robot ID

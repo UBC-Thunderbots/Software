@@ -6,6 +6,7 @@ host_software_packages=(
     redis
     libjpeg8-dev
     libjpeg-dev
+    device-tree-compiler
     python3.8      # Python 3
     python3.8-venv # Virtual Environment
     python3.8-dev  # Python 3 Headers

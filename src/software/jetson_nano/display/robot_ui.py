@@ -16,6 +16,7 @@ from software.jetson_nano.display.screens.menu_screen import MenuScreen
 from software.jetson_nano.display.screens.wheels_screen import WheelsScreen
 from software.jetson_nano.display.screens.chip_and_kick_screen import ChipAndKickScreen
 import software.jetson_nano.display.constants as constants
+from software.python_constants import *
 
 # Pins for Rotary Encoder
 BUTTON_PIN = constants.BUTTON_PIN
@@ -34,8 +35,9 @@ screen_actions = ScreenActions()
 
 # These are the keys for the redis dicationary
 redis_keys = [
-    "robot id",
-    "channel id",
+    ROBOT_ID_REDIS_KEY,
+    ROBOT_MULTICAST_CHANNEL_REDIS_KEY,
+    ROBOT_NETWORK_INTERFACE_REDIS_KEY,
     "battery voltage",
     "cap voltage",
     "packet loss",

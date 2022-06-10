@@ -22,14 +22,16 @@ class RedisClient
 
 
     /**
-     * gets the value corresponding to the key; blocking
+     * Gets the value corresponding to the key; blocking
+     *
      * @param key
-     * @return a redis reply object
+     * @return the value
      */
-    cpp_redis::reply get(const std::string &key);
+    std::string get(const std::string &key);
 
     /**
-     * sets a key value pair in the redis database
+     * Sets a key value pair in the redis database
+     *
      * @param key
      * @param value
      */
