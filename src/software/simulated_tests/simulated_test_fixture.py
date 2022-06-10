@@ -299,6 +299,12 @@ def load_command_line_arguments():
         help="How many packets to buffer while rendering",
     )
     parser.add_argument(
+        "--stop_ai_on_start",
+        action="store_true",
+        default=False,
+        help="Whether to stop the AI on start",
+    )
+    parser.add_argument(
         "--test_filter",
         action="store",
         default="",
