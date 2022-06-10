@@ -13,7 +13,6 @@
 
 // 50 millisecond timeout on receiving primitives before we emergency stop the robots
 const double PRIMITIVE_MANAGER_TIMEOUT_NS = 50.0 * MILLISECONDS_PER_NANOSECOND;
-const std::string RUNTIME_DIRECTORY       = "/tmp";
 
 /**
  * https://rt.wiki.kernel.org/index.php/Squarewave-example
@@ -84,7 +83,7 @@ void Thunderloop::runLoop()
                 network_interface != network_interface_)
             {
                 NetworkLoggerSingleton::initializeLogger(channel_id, network_interface,
-                                                         robot_id, RUNTIME_DIRECTORY);
+                                                         robot_id);
 
                 LOG(DEBUG) << "Switch over to Robot ID: " << robot_id
                            << " Channel ID: " << channel_id
