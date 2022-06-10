@@ -99,8 +99,8 @@ class camun::simulator::SimBall : public QObject
     btRigidBody *m_body;
     btMotionState *m_motionState;
     sslsim::TeleportBall m_move;
-    double rolling_speed     = -1;
-    bool setTransitionSpeed  = true;
+    double rolling_speed    = -1;
+    bool setTransitionSpeed = true;
 
     enum BallState
     {
