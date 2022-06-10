@@ -130,7 +130,7 @@ gdb --args bazel-bin/{full_system}
                     "--runtime_dir={}".format(self.full_system_runtime_dir),
                 ]
             ):
-                self.full_system_proc = Popen(full_system.split(" "))
+                self.full_system_proc = Popen(self.full_system.split(" "))
         time.sleep(1)
 
     def __exit__(self, type, value, traceback):
