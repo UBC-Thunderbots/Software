@@ -60,29 +60,32 @@ INSTANTIATE_TEST_CASE_P(
     ShootGoalEnvironment, AttackerTacticShootGoalTest,
     ::testing::Values(
         // enemy goal blocked by enemy robots with enemy threat right
-//        std::make_tuple(BallState(Point(2, 1), Vector()), Point(1, 1),
-//                        TestUtil::createStationaryRobotStatesWithId(
-//                            {Point(2.4, 1), Point(3, 0.4), Point(3, 0.8), Point(3.1, 0.6),
-//                             Point(3.1, 1), Point(4.2, 1.2)})),
+                std::make_tuple(BallState(Point(2, 1), Vector()), Point(1, 1),
+                                TestUtil::createStationaryRobotStatesWithId(
+                                    {Point(2.4, 1), Point(3, 0.4), Point(3, 0.8),
+                                    Point(3.1, 0.6),
+                                     Point(3.1, 1), Point(4.2, 1.2)})),
         // enemy goal blocked by enemy robots with enemy threat left
         std::make_tuple(BallState(Point(2, 1), Vector()), Point(1, 1),
                         TestUtil::createStationaryRobotStatesWithId(
                             {Point(1.5, 1), Point(3, 0.4), Point(3, 0.8), Point(3.1, 0.6),
-                             Point(3.1, 1), Point(4.2, 1.2)}))
-//        // small opening in enemy formation
-//        std::make_tuple(BallState(Point(2, 1), Vector()), Point(1, 1),
-//                        TestUtil::createStationaryRobotStatesWithId(
-//                            {Point(1, 0), Point(3, 0.2), Point(3, 0.8), Point(3.1, 0),
-//                             Point(3.1, 1), Point(4.2, 1.2)})),
-//        // extreme angle shot
-//        std::make_tuple(BallState(Point(3.8, -1.9), Vector()), Point(1, 1),
-//                        TestUtil::createStationaryRobotStatesWithId(
-//                            {Point(1, 0), Point(3, 1.2), Point(3, 0.8), Point(3.1, 0.6),
-//                             Point(3.1, 1), Point(4.2, 0.5)})),
-//        // enemy trying to steal
-//        std::make_tuple(BallState(Point(2.5, -1), Vector()), Point(1, 1),
-//                        TestUtil::createStationaryRobotStatesWithId(
-//                            {Point(2.5, -1.4), Point(3, 0.4), Point(3, 0.8),
-//                             Point(3.1, 0.6), Point(3.1, 1), Point(4.2, 1.2)}))
+                             Point(3.1, 1), Point(4.2, 1.2)})),
+        // small opening in enemy formation
+        std::make_tuple(BallState(Point(2, 1), Vector()), Point(1, 1),
+                        TestUtil::createStationaryRobotStatesWithId(
+                            {Point(1, 0), Point(3, 0.2), Point(3, 0.8),
+                            Point(3.1, 0),
+                             Point(3.1, 1), Point(4.2, 1.2)})),
+        // extreme angle shot
+        std::make_tuple(BallState(Point(3.8, -1.9), Vector()), Point(1, 1),
+                        TestUtil::createStationaryRobotStatesWithId(
+                            {Point(1, 0), Point(3, 1.2), Point(3, 0.8),
+                            Point(3.1, 0.6),
+                             Point(3.1, 1), Point(4.2, 0.5)})),
+        // enemy trying to steal
+        std::make_tuple(BallState(Point(2.5, -1), Vector()), Point(1, 1),
+                        TestUtil::createStationaryRobotStatesWithId(
+                            {Point(2.5, -1.4), Point(3, 0.4), Point(3, 0.8),
+                             Point(3.1, 0.6), Point(3.1, 1), Point(4.2, 1.2)}))
 
-                             ));
+        ));

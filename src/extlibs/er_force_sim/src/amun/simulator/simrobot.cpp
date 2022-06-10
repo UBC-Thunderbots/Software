@@ -425,7 +425,7 @@ void SimRobot::begin(SimBall *ball, double time)
         }
         else
         {
-            std::cout<<"chipping"<<std::endl;
+            std::cout << "chipping" << std::endl;
             // FIXME: for now we just recalc the max distance based on the given angle
             const float maxShootSpeed =
                 coordinates::chipVelFromChipDistance(m_specs.shot_chip_max());
@@ -656,7 +656,8 @@ void SimRobot::update(SSLProto::SSL_DetectionRobot *robot, float stddev_p,
 
 bool SimRobot::touchesBall(SimBall *ball) const
 {
-    if(m_holdBallConstraint){
+    if (m_holdBallConstraint)
+    {
         return true;
     }
 
@@ -681,7 +682,7 @@ bool SimRobot::touchesBall(SimBall *ball) const
                     return true;
                 }
             }
-            //return true;
+            // return true;
         }
     }
 

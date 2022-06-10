@@ -38,7 +38,7 @@ void CreaseDefenderFSM::blockThreat(
         robot_navigation_obstacle_config.robot_obstacle_inflation_factor());
     if (block_threat_point)
     {
-        std::cout<<"block threat point = "<<block_threat_point.value()<<std::endl;
+        std::cout << "block threat point = " << block_threat_point.value() << std::endl;
 
         destination = block_threat_point.value();
     }

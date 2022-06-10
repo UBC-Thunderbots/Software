@@ -1,5 +1,3 @@
-import sys
-
 import pytest
 
 import software.python_bindings as tbots
