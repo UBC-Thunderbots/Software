@@ -30,7 +30,7 @@ TEST(InterceptEvaluationTest, findBestInterceptForBall_robot_on_ball_path_ball_3
     EXPECT_LE(2 / 3, robot_time_to_move_to_intercept.toSeconds());
 }
 
-// TODO-AMR-BALL-INTERCEPTION-IMPROVEMENTS: Figure out why this is failing
+// TODO (#2540): Figure out why this is failing
 TEST(InterceptEvaluationTest,
      DISABLED_findBestInterceptForBall_robot_on_ball_path_ball_6_m_per_s)
 {

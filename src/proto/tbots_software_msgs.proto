@@ -27,7 +27,5 @@ message PrimitiveSet
     bool stay_away_from_ball = 2;
 
     // Robot ID to RadioPrimitive map
-    // NOTE: The `max_count` for this field should be set to a number that is less then
-    //       or equal to the maximum number of robots we expect to run
     map<uint32, Primitive> robot_primitives = 3;
 }
