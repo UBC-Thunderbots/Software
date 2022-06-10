@@ -17,8 +17,8 @@ py_library(
     srcs = ["thunderscope.py"],
     data = [
         "//software:er_force_simulator_main",
+        "//software:py_constants.so",
         "//software:python_bindings.so",
-        "//software:python_constants.so",
         "//software:unix_full_system",
     ],
     deps = [
@@ -28,12 +28,13 @@ py_library(
         "//software/networking:threaded_unix_listener_py",
         "//software/networking:threaded_unix_sender_py",
         "//software/thunderscope:binary_context_managers",
+        "//software/thunderscope:colors",
+        "//software/thunderscope:common_widgets",
         "//software/thunderscope:constants",
         "//software/thunderscope:proto_unix_io",
         "//software/thunderscope:robot_communication",
-        "//software/thunderscope/common:common_widgets",
+        "//software/thunderscope/arbitrary_plot:named_value_plotter",
         "//software/thunderscope/common:proto_configuration_widget",
-        "//software/thunderscope/common:proto_plotter",
         "//software/thunderscope/field",
         "//software/thunderscope/field:field_layer",
         "//software/thunderscope/field:hrvo_layer",
@@ -50,7 +51,6 @@ py_library(
         "//software/thunderscope/replay:proto_player",
         "//software/thunderscope/robot_diagnostics:chicker",
         "//software/thunderscope/robot_diagnostics:drive_and_dribbler_widget",
-        "//software/thunderscope/robot_diagnostics:robot_view",
         requirement("pyqtgraph"),
         requirement("numpy"),
     ],
@@ -67,6 +67,16 @@ py_library(
 )
 
 py_library(
+    name = "colors",
+    srcs = ["colors.py"],
+)
+
+py_library(
+    name = "common_widgets",
+    srcs = ["common_widgets.py"],
+)
+
+py_library(
     name = "thread_safe_buffer",
     srcs = ["thread_safe_buffer.py"],
 )
@@ -80,7 +90,7 @@ py_library(
     name = "robot_communication",
     srcs = ["robot_communication.py"],
     data = [
-        "//software:python_constants.so",
+        "//software:py_constants.so",
     ],
     deps = [
         "//software/thunderscope:constants",

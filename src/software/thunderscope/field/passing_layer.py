@@ -3,7 +3,7 @@ import time
 import queue
 from software.thunderscope.field.field_layer import FieldLayer
 import software.thunderscope.constants as constants
-from software.python_constants import *
+from software.py_constants import *
 from pyqtgraph.Qt import QtCore, QtGui
 from proto.import_all_protos import *
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer

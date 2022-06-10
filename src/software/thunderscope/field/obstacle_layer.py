@@ -3,9 +3,9 @@ from proto.geometry_pb2 import Circle, Polygon
 from proto.tbots_software_msgs_pb2 import PrimitiveSet
 from pyqtgraph.Qt import QtCore, QtGui
 
-from software.thunderscope.constants import Colors
+from software.thunderscope.colors import Colors
 import software.thunderscope.constants as constants
-from software.python_constants import *
+from software.py_constants import *
 from software.networking.threaded_unix_listener import ThreadedUnixListener
 from software.thunderscope.field.field_layer import FieldLayer
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer

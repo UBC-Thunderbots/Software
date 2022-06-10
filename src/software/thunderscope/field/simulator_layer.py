@@ -4,9 +4,9 @@ from proto.import_all_protos import *
 from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtCore import Qt
 
-from software.thunderscope.constants import Colors
+from software.thunderscope.colors import Colors
 from software.networking.threaded_unix_listener import ThreadedUnixListener
-from software.python_constants import *
+from software.py_constants import *
 from software.thunderscope.field.field_layer import FieldLayer
 from software.thunderscope.field.world_layer import WorldLayer
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer

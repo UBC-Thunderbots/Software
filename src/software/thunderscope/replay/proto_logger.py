@@ -7,7 +7,9 @@ import logging
 import gzip
 import proto
 from proto.import_all_protos import *
+from proto.repeated_any_msg_pb2 import RepeatedAnyMsg
 from extlibs.er_force_sim.src.protobuf.world_pb2 import *
+from google.protobuf.any_pb2 import Any
 from software.thunderscope.replay.replay_constants import *
 
 
