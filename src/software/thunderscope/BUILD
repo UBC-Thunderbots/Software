@@ -17,8 +17,7 @@ py_library(
     srcs = ["thunderscope.py"],
     data = [
         "//software:er_force_simulator_main",
-        "//software:python_bindings.so",
-        "//software:python_bindings.so",
+        "//software:py_constants.so",
         "//software:unix_full_system",
     ],
     deps = [
