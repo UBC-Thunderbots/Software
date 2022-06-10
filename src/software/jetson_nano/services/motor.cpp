@@ -26,7 +26,7 @@ extern "C"
 }
 
 // SPI Configs
-static uint32_t SPI_SPEED_HZ = 400000;  // 1 Mhz
+static uint32_t SPI_SPEED_HZ = 2000000;  // 2 Mhz
 static uint8_t SPI_BITS      = 8;
 static uint32_t SPI_MODE     = 0x3u;
 
@@ -111,6 +111,7 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
     OPEN_SPI_FILE_DESCRIPTOR(front_right, FRONT_RIGHT_MOTOR_CHIP_SELECT)
     OPEN_SPI_FILE_DESCRIPTOR(back_left, BACK_LEFT_MOTOR_CHIP_SELECT)
     OPEN_SPI_FILE_DESCRIPTOR(back_right, BACK_RIGHT_MOTOR_CHIP_SELECT)
+    // TODO (#2606) - Add Dribbler Motor support
 
     // Make this instance available to the static functions above
     g_motor_service = this;
@@ -149,8 +150,8 @@ bool MotorService::checkDriverFault(uint8_t motor)
     std::bitset<32> gstat_bitset(gstat);
 
     CHECK(gstat_bitset.any() == false)
-        << "TMC6100 offline, no fault bits detected"
-        << " (the reset bit should be set. This could indicate that the driver isn't"
+        << "TMC6100 offline, no fault bits detected."
+        << " The reset bit should be set. This could indicate that the driver isn't"
         << " communicating over SPI or the reset pin is not connected.";
 
     if (gstat_bitset.any())
