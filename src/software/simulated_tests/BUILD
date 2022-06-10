@@ -41,7 +41,7 @@ py_library(
         "simulated_test_fixture.py",
     ],
     data = [
-        "//software:python_constants.so",
+        "//software:py_constants.so",
     ],
     deps = [
         "//proto:import_all_protos",
@@ -69,7 +69,7 @@ py_library(
     ],
     data = [
         "//software:python_bindings.so",
-        "//software:python_constants.so",
+        "//software:py_constants.so",
     ],
     deps = [
         "//proto:software_py_proto",

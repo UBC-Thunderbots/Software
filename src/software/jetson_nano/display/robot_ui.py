@@ -16,7 +16,7 @@ from software.jetson_nano.display.screens.menu_screen import MenuScreen
 from software.jetson_nano.display.screens.wheels_screen import WheelsScreen
 from software.jetson_nano.display.screens.chip_and_kick_screen import ChipAndKickScreen
 import software.jetson_nano.display.constants as constants
-from software.python_constants import *
+from software.py_constants import *
 
 # Pins for Rotary Encoder
 BUTTON_PIN = constants.BUTTON_PIN
