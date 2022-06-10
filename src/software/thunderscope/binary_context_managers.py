@@ -60,7 +60,7 @@ class FullSystem(object):
         self.full_system_proc = None
 
         self.thread = Thread(target=__restart__)
-        
+
     def __enter__(self):
         """Enter the full_system context manager. 
 
@@ -125,10 +125,10 @@ gdb --args bazel-bin/{full_system}
 
         while True:
             if not is_cmd_running(
-            [
-                "unix_full_system",
-                "--runtime_dir={}".format(self.full_system_runtime_dir),
-            ]
+                [
+                    "unix_full_system",
+                    "--runtime_dir={}".format(self.full_system_runtime_dir),
+                ]
             ):
                 self.full_system_proc = Popen(full_system.split(" "))
         time.sleep(1)
@@ -144,7 +144,7 @@ gdb --args bazel-bin/{full_system}
         if self.full_system_proc:
             self.full_system_proc.kill()
             self.full_system_proc.wait()
-        
+
         self.thread.join()
 
     def setup_proto_unix_io(self, proto_unix_io):
