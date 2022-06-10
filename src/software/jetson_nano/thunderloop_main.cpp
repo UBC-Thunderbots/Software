@@ -92,12 +92,9 @@ int main(int argc, char** argv)
     const int pre_allocation_size = 20 * 1024 * 1024;
     reserveProcessMemory(pre_allocation_size);
 
-    // TODO (#2605) Don't hardcode these values
-    std::string interface = "eth0";
     LoggerSingleton::initializeLogger("/tmp");
 
-    auto thunderloop =
-        Thunderloop(create2021RobotConstants(), interface, CONTROL_LOOP_HZ);
+    auto thunderloop = Thunderloop(create2021RobotConstants(), CONTROL_LOOP_HZ);
 
     thunderloop.runLoop();
 

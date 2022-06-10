@@ -37,3 +37,8 @@ const unsigned UNIX_BUFFER_SIZE = 20000;
 static const double BALL_TO_FRONT_OF_ROBOT_DISTANCE_WHEN_DRIBBLING =
     BALL_MAX_RADIUS_METERS -
     2 * BALL_MAX_RADIUS_METERS * MAX_FRACTION_OF_BALL_COVERED_BY_ROBOT;
+
+// Redis Keys
+const std::string ROBOT_ID_REDIS_KEY                = "/robot_id";
+const std::string ROBOT_MULTICAST_CHANNEL_REDIS_KEY = "/multicast_channel";
+const std::string ROBOT_NETWORK_INTERFACE_REDIS_KEY = "/network_interface";

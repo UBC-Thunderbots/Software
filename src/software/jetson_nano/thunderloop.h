@@ -44,11 +44,9 @@ class Thunderloop
      *
      *
      * @param robot_constants The robot constants
-     * @param interface The network interface to communicate over
      * @param loop_hz The rate to run the loop
      */
-    Thunderloop(const RobotConstants_t& robot_constants, std::string interface,
-                const int loop_hz);
+    Thunderloop(const RobotConstants_t& robot_constants, const int loop_hz);
 
     ~Thunderloop();
 
@@ -91,7 +89,8 @@ class Thunderloop
 
     // Current State
     RobotConstants_t robot_constants_;
-    unsigned robot_id_;
-    unsigned channel_id_;
+    int robot_id_;
+    int channel_id_;
+    std::string network_interface_;
     int loop_hz_;
 };

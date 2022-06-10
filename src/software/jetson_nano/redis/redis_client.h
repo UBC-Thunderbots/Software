@@ -13,10 +13,10 @@ class RedisClient
    public:
     /**
      * Client that communicates with the a redis server
-     * @param value The IP of the Redis server, default localhost
-     * @param key the key of the Redis server, default 6379
+     * @param address The IP of the Redis server, default localhost
+     * @param port the key of the Redis server, default 6379
      */
-    explicit RedisClient(std::string value, size_t key);
+    explicit RedisClient(std::string address, size_t port);
 
     virtual ~RedisClient();
 

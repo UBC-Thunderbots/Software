@@ -110,6 +110,13 @@ if __name__ == "__main__":
         help="Which interface to communicate over",
     )
     parser.add_argument(
+        "--channel",
+        action="store",
+        type=int,
+        default=None,
+        help="Which channel to communicate over",
+    )
+    parser.add_argument(
         "--visualization_buffer_size",
         action="store",
         type=int,
@@ -201,11 +208,11 @@ if __name__ == "__main__":
         debug = args.debug_yellow_full_system
 
     if args.run_blue or args.run_yellow:
-        # TODO (#2585): Support multiple channels
-        # with # RobotCommunication(
-        # proto_unix_io, getRobotMulticastChannel(0), args.interface
-        # ) as robot_comms,
-        with FullSystem(runtime_dir, debug, friendly_colour_yellow) as full_system:
+        with RobotCommunication(
+            proto_unix_io, getRobotMulticastChannel(args.channel), args.interface
+        ) as robot_comms, FullSystem(
+            runtime_dir, debug, friendly_colour_yellow
+        ) as full_system:
             tscope.show()
 
     ###########################################################################

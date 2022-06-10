@@ -20,20 +20,15 @@ const double PRIMITIVE_MANAGER_TIMEOUT_NS = 50.0 * MILLISECONDS_PER_NANOSECOND;
 extern int clock_nanosleep(clockid_t __clock_id, int __flags,
                            __const struct timespec* __req, struct timespec* __rem);
 
-Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, std::string interface,
-                         const int loop_hz)
+Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, const int loop_hz)
     : primitive_executor_(loop_hz, robot_constants)
 {
-    robot_id_        = 0;
+    robot_id_        = MAX_ROBOT_IDS + 1;  // Initialize to a robot ID that is not valid
     channel_id_      = 0;
     loop_hz_         = loop_hz;
     robot_constants_ = robot_constants;
 
-    motor_service_   = std::make_unique<MotorService>(robot_constants, loop_hz);
-    network_service_ = std::make_unique<NetworkService>(
-        std::string(ROBOT_MULTICAST_CHANNELS.at(channel_id_)) + "%" + interface,
-        VISION_PORT, PRIMITIVE_PORT, ROBOT_STATUS_PORT, true);
-    redis_client_ = std::make_unique<RedisClient>(REDIS_DEFAULT_HOST, REDIS_DEFAULT_PORT);
+    motor_service_ = std::make_unique<MotorService>(robot_constants, loop_hz);
 }
 
 Thunderloop::~Thunderloop() {}
@@ -73,7 +68,37 @@ void Thunderloop::runLoop()
             clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &next_shot, NULL);
             ScopedTimespecTimer iteration_timer(&iteration_time);
 
-            // Poll network service and grab most recent messages
+            // Grab the latest configs from redis
+            auto redis_key_value_pairs = redis_client_->getAllKeyValuePairs();
+
+            auto robot_id = std::stoi(redis_key_value_pairs[ROBOT_ID_REDIS_KEY]);
+            auto channel_id =
+                std::stoi(redis_key_value_pairs[ROBOT_MULTICAST_CHANNEL_REDIS_KEY]);
+            auto network_interface =
+                redis_key_value_pairs[ROBOT_NETWORK_INTERFACE_REDIS_KEY];
+
+            // If any of the configs have changed, update the network service to switch
+            // to the new interface and channel with the correct robot ID
+            if (robot_id != robot_id_ || channel_id != channel_id_ ||
+                network_interface != network_interface_)
+            {
+                LOG(DEBUG) << "Switch over to Robot ID: " << robot_id
+                           << " Channel ID: " << channel_id
+                           << " Network Interface: " << network_interface;
+
+                // Update the robot ID and channel ID
+                robot_id_          = robot_id;
+                channel_id_        = channel_id;
+                network_interface_ = network_interface;
+
+                network_service_ = std::make_unique<NetworkService>(
+                    std::string(ROBOT_MULTICAST_CHANNELS.at(channel_id_)) + "%" +
+                        network_interface_,
+                    VISION_PORT, PRIMITIVE_PORT, ROBOT_STATUS_PORT, true);
+            }
+
+            // Network Service: receive newest world, primitives and set out the last
+            // robot status
             {
                 ScopedTimespecTimer timer(&poll_time);
                 auto result       = network_service_->poll(robot_status_);
@@ -115,11 +140,11 @@ void Thunderloop::runLoop()
                 world_ = new_world;
             }
 
-            // TODO (#2333) poll redis service
-
+            // Primitive Executor: run the last primitive if we have not timed out
             {
                 ScopedTimespecTimer timer(&poll_time);
 
+                // Handle emergency stop override
                 struct timespec result;
                 ScopedTimespecTimer::timespecDiff(&poll_time,
                                                   &last_primitive_received_time, &result);
@@ -145,17 +170,18 @@ void Thunderloop::runLoop()
             thunderloop_status_.set_primitive_executor_step_time_ns(
                 static_cast<unsigned long>(poll_time.tv_nsec));
 
-            // Run the motor service with the direct_control_ msg
+            // Motor Service: execute the motor control command
             {
                 ScopedTimespecTimer timer(&poll_time);
-                motor_status_ = *motor_service_->poll(direct_control_.motor_control());
+                motor_status_ = motor_service_->poll(direct_control_.motor_control());
             }
             thunderloop_status_.set_motor_service_poll_time_ns(
                 static_cast<unsigned long>(poll_time.tv_nsec));
 
-            *(robot_status_.mutable_thunderloop_status()) = thunderloop_status_;
 
-            robot_status_.mutable_power_status()->set_capacitor_voltage(200);
+            // Update Robot Status with poll responses
+            *(robot_status_.mutable_thunderloop_status()) = thunderloop_status_;
+            *(robot_status_.mutable_motor_status())       = motor_status_;
         }
 
         auto loop_duration =

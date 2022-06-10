@@ -115,23 +115,17 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
     // Make this instance available to the static functions above
     g_motor_service = this;
 
-    // TMC6100 Setup
-    startDriver(FRONT_LEFT_MOTOR_CHIP_SELECT);
-    startDriver(BACK_RIGHT_MOTOR_CHIP_SELECT);
-    startDriver(FRONT_RIGHT_MOTOR_CHIP_SELECT);
-    startDriver(BACK_LEFT_MOTOR_CHIP_SELECT);
-
-    // TMC4671 Setup
-    startController(FRONT_LEFT_MOTOR_CHIP_SELECT);
-    startController(BACK_RIGHT_MOTOR_CHIP_SELECT);
-    startController(FRONT_RIGHT_MOTOR_CHIP_SELECT);
-    startController(BACK_LEFT_MOTOR_CHIP_SELECT);
-
     // Clear faults
     reset_gpio.setValue(GpioState::LOW);
     sleep(1);
     reset_gpio.setValue(GpioState::HIGH);
     sleep(1);
+
+    // TMC6100 Setup
+    startDriver(FRONT_LEFT_MOTOR_CHIP_SELECT);
+    startDriver(BACK_RIGHT_MOTOR_CHIP_SELECT);
+    startDriver(FRONT_RIGHT_MOTOR_CHIP_SELECT);
+    startDriver(BACK_LEFT_MOTOR_CHIP_SELECT);
 
     // Check faults
     checkDriverFault(FRONT_LEFT_MOTOR_CHIP_SELECT);
@@ -139,45 +133,11 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
     checkDriverFault(BACK_LEFT_MOTOR_CHIP_SELECT);
     checkDriverFault(BACK_RIGHT_MOTOR_CHIP_SELECT);
 
-    // Open Loop Calibration Routines
-    //
-    // The csvs are saved to the /tmp directory @jonathan
-    //
-    // runOpenLoopCalibrationRoutine(FRONT_LEFT_MOTOR_CHIP_SELECT, 1000);
-    // runOpenLoopCalibrationRoutine(FRONT_RIGHT_MOTOR_CHIP_SELECT, 1000);
-    // runOpenLoopCalibrationRoutine(BACK_LEFT_MOTOR_CHIP_SELECT, 1000);
-    // runOpenLoopCalibrationRoutine(BACK_RIGHT_MOTOR_CHIP_SELECT, 1000);
-
-    // Run closed loop
-    //
-    //      !!!!!!!!!!!!!!!!!!!!  WARNING  !!!!!!!!!!!!!!!!!!!!
-    //
-    // WARNING: DO NOT jump the gun and uncomment these without checking everything
-    // from step 1 up until step 5 in the motor driver bringup doc. The closed
-    // loop mode will not work and could damage the motor or the driver.
-    //
-    // Manually ramping test code. Again only do this if you've checked everything
-    // else from above.
-    //
-    // tmc4671_setTargetVelocity(FRONT_LEFT_MOTOR_CHIP_SELECT, 1000);
-    // tmc4671_setTargetVelocity(FRONT_RIGHT_MOTOR_CHIP_SELECT, 1000);
-    // tmc4671_setTargetVelocity(BACK_RIGHT_MOTOR_CHIP_SELECT, 1000);
-    // tmc4671_setTargetVelocity(BACK_LEFT_MOTOR_CHIP_SELECT, 1000);
-    // sleep(2);
-    // tmc4671_setTargetVelocity(FRONT_LEFT_MOTOR_CHIP_SELECT, 2000);
-    // tmc4671_setTargetVelocity(FRONT_RIGHT_MOTOR_CHIP_SELECT, 2000);
-    // tmc4671_setTargetVelocity(BACK_RIGHT_MOTOR_CHIP_SELECT, 2000);
-    // tmc4671_setTargetVelocity(BACK_LEFT_MOTOR_CHIP_SELECT, 2000);
-    // sleep(2);
-    // tmc4671_setTargetVelocity(FRONT_LEFT_MOTOR_CHIP_SELECT, 1000);
-    // tmc4671_setTargetVelocity(FRONT_RIGHT_MOTOR_CHIP_SELECT, 1000);
-    // tmc4671_setTargetVelocity(BACK_RIGHT_MOTOR_CHIP_SELECT, 1000);
-    // tmc4671_setTargetVelocity(BACK_LEFT_MOTOR_CHIP_SELECT, 1000);
-    // sleep(2);
-    // tmc4671_setTargetVelocity(FRONT_LEFT_MOTOR_CHIP_SELECT, 0);
-    // tmc4671_setTargetVelocity(FRONT_RIGHT_MOTOR_CHIP_SELECT, 0);
-    // tmc4671_setTargetVelocity(BACK_RIGHT_MOTOR_CHIP_SELECT, 0);
-    // tmc4671_setTargetVelocity(BACK_LEFT_MOTOR_CHIP_SELECT, 0);
+    // TMC4671 Setup
+    startController(FRONT_LEFT_MOTOR_CHIP_SELECT);
+    startController(BACK_RIGHT_MOTOR_CHIP_SELECT);
+    startController(FRONT_RIGHT_MOTOR_CHIP_SELECT);
+    startController(BACK_LEFT_MOTOR_CHIP_SELECT);
 }
 
 MotorService::~MotorService() {}
@@ -187,6 +147,11 @@ bool MotorService::checkDriverFault(uint8_t motor)
 {
     int gstat = tmc6100_readInt(motor, TMC6100_GSTAT);
     std::bitset<32> gstat_bitset(gstat);
+
+    CHECK(gstat_bitset.any() == false)
+        << "TMC6100 offline, no fault bits detected"
+        << " (the reset bit should be set. This could indicate that the driver isn't"
+        << " communicating over SPI or the reset pin is not connected.";
 
     if (gstat_bitset.any())
     {
@@ -279,95 +244,89 @@ bool MotorService::checkDriverFault(uint8_t motor)
 }
 
 
-std::unique_ptr<TbotsProto::MotorStatus> MotorService::poll(
-    const TbotsProto::MotorControl& motor)
+TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor)
 {
-    // ---------------------------- WARNING ------------------------
-    // DO NOT RUN YET - THE WHEEL CONVERSION CODE IS BROKEN
-    //
-    // CHECK(encoder_calibrated_[FRONT_LEFT_MOTOR_CHIP_SELECT] &&
-    //       encoder_calibrated_[FRONT_RIGHT_MOTOR_CHIP_SELECT] &&
-    //       encoder_calibrated_[BACK_LEFT_MOTOR_CHIP_SELECT] &&
-    //       encoder_calibrated_[BACK_RIGHT_MOTOR_CHIP_SELECT])
-    //     << "Running without encoder calibration can cause serious harm, exiting";
+    CHECK(encoder_calibrated_[FRONT_LEFT_MOTOR_CHIP_SELECT] &&
+          encoder_calibrated_[FRONT_RIGHT_MOTOR_CHIP_SELECT] &&
+          encoder_calibrated_[BACK_LEFT_MOTOR_CHIP_SELECT] &&
+          encoder_calibrated_[BACK_RIGHT_MOTOR_CHIP_SELECT])
+        << "Running without encoder calibration can cause serious harm, exiting";
 
-    // WheelSpace_t current_wheel_speeds = {
-    //     static_cast<double>(tmc4671_getActualVelocity(FRONT_RIGHT_MOTOR_CHIP_SELECT)),
-    //     static_cast<double>(tmc4671_getActualVelocity(FRONT_LEFT_MOTOR_CHIP_SELECT)),
-    //     static_cast<double>(tmc4671_getActualVelocity(BACK_LEFT_MOTOR_CHIP_SELECT)),
-    //     static_cast<double>(tmc4671_getActualVelocity(BACK_RIGHT_MOTOR_CHIP_SELECT))};
+    int front_right_rpm = tmc4671_getActualVelocity(FRONT_RIGHT_MOTOR_CHIP_SELECT);
+    int front_left_rpm  = tmc4671_getActualVelocity(FRONT_LEFT_MOTOR_CHIP_SELECT);
+    int back_right_rpm  = tmc4671_getActualVelocity(BACK_RIGHT_MOTOR_CHIP_SELECT);
+    int back_left_rpm   = tmc4671_getActualVelocity(BACK_LEFT_MOTOR_CHIP_SELECT);
 
-    // switch (motor.drive_control_case())
-    // {
-    //     case TbotsProto::MotorControl::DriveControlCase::kDirectPerWheelControl:
-    //     {
-    //         tmc4671_setTargetVelocity(
-    //             FRONT_LEFT_MOTOR_CHIP_SELECT,
-    //             static_cast<int>(motor.direct_per_wheel_control().front_left_wheel_rpm()
-    //             *
-    //                              robot_constants_.wheel_rotations_per_motor_rotation));
-    //         tmc4671_setTargetVelocity(
-    //             FRONT_RIGHT_MOTOR_CHIP_SELECT,
-    //             static_cast<int>(
-    //                 motor.direct_per_wheel_control().front_right_wheel_rpm() *
-    //                 robot_constants_.wheel_rotations_per_motor_rotation));
-    //         tmc4671_setTargetVelocity(
-    //             BACK_LEFT_MOTOR_CHIP_SELECT,
-    //             static_cast<int>(motor.direct_per_wheel_control().back_left_wheel_rpm()
-    //             *
-    //                              robot_constants_.wheel_rotations_per_motor_rotation));
-    //         tmc4671_setTargetVelocity(
-    //             BACK_RIGHT_MOTOR_CHIP_SELECT,
-    //             static_cast<int>(motor.direct_per_wheel_control().back_right_wheel_rpm()
-    //             *
-    //                              robot_constants_.wheel_rotations_per_motor_rotation));
-    //         break;
-    //     }
-    //     case TbotsProto::MotorControl::DriveControlCase::kDirectVelocityControl:
-    //     {
-    //         EuclideanSpace_t target_euclidean_velocity = {
-    //             motor.direct_velocity_control().velocity().x_component_meters(),
-    //             motor.direct_velocity_control().velocity().y_component_meters(),
-    //             motor.direct_velocity_control().angular_velocity().radians_per_second(),
-    //         };
+    WheelSpace_t current_wheel_speeds = {
+        static_cast<double>(front_left_rpm), static_cast<double>(front_right_rpm),
+        static_cast<double>(back_left_rpm), static_cast<double>(back_right_rpm)};
 
-    //         // This is a linear transformation, we don't need to convert to/from
-    //         // RPM to MPS
-    //         WheelSpace_t target_speeds = euclidean_to_four_wheel.getTargetWheelSpeeds(
-    //             target_euclidean_velocity, current_wheel_speeds);
+    TbotsProto::MotorStatus motor_status;
+    motor_status.mutable_front_right()->set_wheel_rpm(front_right_rpm);
+    motor_status.mutable_front_left()->set_wheel_rpm(front_left_rpm);
+    motor_status.mutable_back_left()->set_wheel_rpm(back_left_rpm);
+    motor_status.mutable_back_right()->set_wheel_rpm(back_right_rpm);
 
-    //         tmc4671_setTargetVelocity(FRONT_RIGHT_MOTOR_CHIP_SELECT,
-    //                                   static_cast<int>(target_speeds[0]));
-    //         tmc4671_setTargetVelocity(FRONT_LEFT_MOTOR_CHIP_SELECT,
-    //                                   static_cast<int>(target_speeds[1]));
-    //         tmc4671_setTargetVelocity(BACK_LEFT_MOTOR_CHIP_SELECT,
-    //                                   static_cast<int>(target_speeds[2]));
-    //         tmc4671_setTargetVelocity(BACK_RIGHT_MOTOR_CHIP_SELECT,
-    //                                   static_cast<int>(target_speeds[3]));
+    switch (motor.drive_control_case())
+    {
+        case TbotsProto::MotorControl::DriveControlCase::kDirectPerWheelControl:
+        {
+            tmc4671_setTargetVelocity(
+                FRONT_LEFT_MOTOR_CHIP_SELECT,
+                static_cast<int>(motor.direct_per_wheel_control().front_left_wheel_rpm() *
+                                 robot_constants_.wheel_rotations_per_motor_rotation));
+            tmc4671_setTargetVelocity(
+                FRONT_RIGHT_MOTOR_CHIP_SELECT,
+                static_cast<int>(
+                    motor.direct_per_wheel_control().front_right_wheel_rpm() *
+                    robot_constants_.wheel_rotations_per_motor_rotation));
+            tmc4671_setTargetVelocity(
+                BACK_LEFT_MOTOR_CHIP_SELECT,
+                static_cast<int>(motor.direct_per_wheel_control().back_left_wheel_rpm() *
+                                 robot_constants_.wheel_rotations_per_motor_rotation));
+            tmc4671_setTargetVelocity(
+                BACK_RIGHT_MOTOR_CHIP_SELECT,
+                static_cast<int>(motor.direct_per_wheel_control().back_right_wheel_rpm() *
+                                 robot_constants_.wheel_rotations_per_motor_rotation));
+            break;
+        }
+        case TbotsProto::MotorControl::DriveControlCase::kDirectVelocityControl:
+        {
+            EuclideanSpace_t target_euclidean_velocity = {
+                motor.direct_velocity_control().velocity().x_component_meters(),
+                motor.direct_velocity_control().velocity().y_component_meters(),
+                motor.direct_velocity_control().angular_velocity().radians_per_second(),
+            };
 
-    //         break;
-    //     }
+            // This is a linear transformation, we don't need to convert to/from
+            // RPM to MPS
+            WheelSpace_t target_speeds = euclidean_to_four_wheel.getTargetWheelSpeeds(
+                target_euclidean_velocity, current_wheel_speeds);
 
-    //     case TbotsProto::MotorControl::DriveControlCase::DRIVE_CONTROL_NOT_SET:
-    //     {
-    //         LOG(WARNING) << "Motor service polled with an empty DirectControlPrimitive
-    //         "; break;
-    //     }
-    // }
+            tmc4671_setTargetVelocity(FRONT_RIGHT_MOTOR_CHIP_SELECT,
+                                      static_cast<int>(target_speeds[0]));
+            tmc4671_setTargetVelocity(FRONT_LEFT_MOTOR_CHIP_SELECT,
+                                      static_cast<int>(target_speeds[1]));
+            tmc4671_setTargetVelocity(BACK_LEFT_MOTOR_CHIP_SELECT,
+                                      static_cast<int>(target_speeds[2]));
+            tmc4671_setTargetVelocity(BACK_RIGHT_MOTOR_CHIP_SELECT,
+                                      static_cast<int>(target_speeds[3]));
+
+            break;
+        }
+
+        case TbotsProto::MotorControl::DriveControlCase::DRIVE_CONTROL_NOT_SET:
+        {
+            LOG(WARNING) << "Motor service polled with an empty DirectControlPrimitive";
+            break;
+        }
+    }
 
     // Toggle Hearbeat
-    // if (heartbeat_state == 0)
-    // {
-    //     heartbeat_gpio.setValue(GpioState::LOW);
-    //     heartbeat_state = 1;
-    // }
-    // else if (heartbeat_state == 1)
-    // {
-    //     heartbeat_gpio.setValue(GpioState::HIGH);
-    //     heartbeat_state = 0;
-    // }
+    heartbeat_gpio.setValue((heartbeat_state = !heartbeat_state) ? GpioState::HIGH
+                                                                 : GpioState::LOW);
 
-    return std::make_unique<TbotsProto::MotorStatus>();
+    return motor_status;
 }
 
 void MotorService::spiTransfer(int fd, uint8_t const* tx, uint8_t const* rx, unsigned len)
@@ -593,6 +552,9 @@ void MotorService::calibrateEncoder(uint8_t motor)
     writeToControllerOrDieTrying(motor, TMC4671_PHI_E_SELECTION, 0x00000001);
     writeToControllerOrDieTrying(motor, TMC4671_PHI_E_EXT, 0x00000000);
     writeToControllerOrDieTrying(motor, TMC4671_UQ_UD_EXT, 0x000007F0);
+
+    // Wait for the motor to align with the magnetic axis before zeroing
+    // out the encoder.
     sleep(1);
 
     writeToControllerOrDieTrying(motor, TMC4671_ABN_DECODER_COUNT, 0x00000000);
@@ -674,6 +636,7 @@ void MotorService::startDriver(uint8_t motor)
     writeToDriverOrDieTrying(motor, TMC6100_DRV_CONF,
                              current_drive_conf & (~TMC6100_DRVSTRENGTH_MASK));
     writeToDriverOrDieTrying(motor, TMC6100_GCONF, 0x40);
+    LOG(DEBUG) << "Driver " << std::to_string(motor) << " accepted conf";
 }
 
 void MotorService::startController(uint8_t motor)
@@ -681,10 +644,11 @@ void MotorService::startController(uint8_t motor)
     // Read the chip ID to validate the SPI connection
     tmc4671_writeInt(motor, TMC4671_CHIPINFO_ADDR, 0x000000000);
     int chip_id = tmc4671_readInt(motor, TMC4671_CHIPINFO_DATA);
+
     CHECK(0x34363731 == chip_id) << "The TMC4671 of motor "
                                  << static_cast<uint32_t>(motor) << " is not responding";
 
-    LOG(DEBUG) << "Motor " << std::to_string(motor)
+    LOG(DEBUG) << "Controller " << std::to_string(motor)
                << " online, responded with: " << chip_id;
 
     // Configure to brushless DC motor with 8 pole pairs

@@ -10,7 +10,7 @@ message RobotStatus
     repeated ErrorCode error_code             = 2;
     BreakBeamStatus break_beam_status         = 3;
     ChipperKickerStatus chipper_kicker_status = 4;
-    MotorStatus drive_units                   = 5;
+    MotorStatus motor_status                  = 5;
     NetworkStatus network_status              = 6;
     PowerStatus power_status                  = 8;
     ThunderloopStatus thunderloop_status      = 9;
@@ -103,20 +103,7 @@ message FirmwareStatus
 message DriveUnit
 {
     // The current RPM of the wheel
-    float wheel_rpm = 1;
-
-    // The current position of the wheel in radians
-    float wheel_encoder_phi_e = 2;
-
-    // The pwm being applied
-    float pwm_u = 3;
-    float pwm_v = 4;
-    float pwm_w = 5;
-
-    // The measured voltage on the ADC
-    float adc_u = 6;
-    float adc_v = 7;
-    float adc_w = 8;
+    uint32 wheel_rpm = 1;
 }
 
 /* Data from all four drive units */

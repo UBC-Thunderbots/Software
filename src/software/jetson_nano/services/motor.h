@@ -30,8 +30,7 @@ class MotorService
      * @param motor The motor msg to unpack and execute on the motors
      * @returns MotorStatus The status of all the drive units
      */
-    std::unique_ptr<TbotsProto::MotorStatus> poll(
-        const TbotsProto::MotorControl& motor_control);
+    TbotsProto::MotorStatus poll(const TbotsProto::MotorControl& motor_control);
 
     /**
      * Trinamic API binding, sets spi_demux_select_0|1 pins
