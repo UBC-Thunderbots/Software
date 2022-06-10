@@ -12,9 +12,9 @@ message RobotStatus
     ChipperKickerStatus chipper_kicker_status = 4;
     MotorStatus motor_status                  = 5;
     NetworkStatus network_status              = 6;
-    PowerStatus power_status                  = 8;
-    ThunderloopStatus thunderloop_status      = 9;
-    Timestamp time_sent                       = 10;
+    PowerStatus power_status                  = 7;
+    ThunderloopStatus thunderloop_status      = 8;
+    Timestamp time_sent                       = 9;
 }
 
 message ThunderloopStatus
