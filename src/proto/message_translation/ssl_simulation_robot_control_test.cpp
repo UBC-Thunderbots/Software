@@ -14,10 +14,16 @@ TEST_F(SSLSimulationProtoTest, test_create_robot_move_command_forward_from_primi
 {
     TbotsProto::DirectControlPrimitive test;
 
-    test.mutable_direct_velocity_control()->mutable_velocity()->set_x_component_meters(
-        10);
-    test.mutable_direct_velocity_control()->mutable_velocity()->set_y_component_meters(5);
-    test.mutable_direct_velocity_control()
+    test.mutable_motor_control()
+        ->mutable_direct_velocity_control()
+        ->mutable_velocity()
+        ->set_x_component_meters(10);
+    test.mutable_motor_control()
+        ->mutable_direct_velocity_control()
+        ->mutable_velocity()
+        ->set_y_component_meters(5);
+    test.mutable_motor_control()
+        ->mutable_direct_velocity_control()
         ->mutable_angular_velocity()
         ->set_radians_per_second(2);
 
