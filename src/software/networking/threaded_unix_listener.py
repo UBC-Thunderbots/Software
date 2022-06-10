@@ -4,7 +4,7 @@ import queue
 import socketserver
 from threading import Thread
 from software.logger.logger import createLogger
-from software import python_constants
+from software import py_constants
 
 logger = createLogger(__name__)
 
@@ -40,7 +40,7 @@ class ThreadedUnixListener:
             unix_path,
             handler_factory(self.__buffer_protobuf, proto_class, is_base64_encoded),
         )
-        self.server.max_packet_size = python_constants.UNIX_BUFFER_SIZE
+        self.server.max_packet_size = py_constants.UNIX_BUFFER_SIZE
         self.stop = False
 
         self.unix_path = unix_path

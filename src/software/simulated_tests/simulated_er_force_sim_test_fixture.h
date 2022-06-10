@@ -176,11 +176,6 @@ class SimulatedErForceSimTestFixture : public ::testing::Test
     SensorFusion friendly_sensor_fusion;
     SensorFusion enemy_sensor_fusion;
 
-    // whether we should log the filtered and unfiltered world states as replay logs
-    // this will only be set to true if the environment variable
-    // TEST_UNDECLARED_OUTPUTS_DIR is set, usually by running as a Bazel test
-    bool should_log_replay;
-
     std::vector<NonTerminatingFunctionValidator> non_terminating_function_validators;
     std::vector<TerminatingFunctionValidator> terminating_function_validators;
 

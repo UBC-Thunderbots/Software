@@ -92,10 +92,7 @@ int main(int argc, char** argv)
     const int pre_allocation_size = 20 * 1024 * 1024;
     reserveProcessMemory(pre_allocation_size);
 
-    LoggerSingleton::initializeLogger("/tmp");
-
     auto thunderloop = Thunderloop(create2021RobotConstants(), CONTROL_LOOP_HZ);
-
     thunderloop.runLoop();
 
     return 0;

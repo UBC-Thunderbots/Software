@@ -135,7 +135,7 @@ py_library(
     name = "threaded_unix_listener_py",
     srcs = ["threaded_unix_listener.py"],
     data = [
-        "//software:python_constants.so",
+        "//software:py_constants.so",
     ],
     deps = [
         "//proto:software_py_proto",
@@ -147,7 +147,7 @@ py_library(
     name = "threaded_unix_sender_py",
     srcs = ["threaded_unix_sender.py"],
     data = [
-        "//software:python_constants.so",
+        "//software:py_constants.so",
     ],
     deps = [
         "//proto:software_py_proto",

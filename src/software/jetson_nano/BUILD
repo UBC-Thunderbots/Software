@@ -25,6 +25,7 @@ cc_library(
         "//software/jetson_nano/services:motor",
         "//software/jetson_nano/services:network",
         "//software/jetson_nano/services:power",
+        "//software/logger:network_logger",
         "//software/util/scoped_timespec_timer",
     ],
 )

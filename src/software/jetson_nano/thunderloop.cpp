@@ -7,6 +7,7 @@
 #include "software/jetson_nano/primitive_executor.h"
 #include "software/jetson_nano/services/motor.h"
 #include "software/logger/logger.h"
+#include "software/logger/network_logger.h"
 #include "software/util/scoped_timespec_timer/scoped_timespec_timer.h"
 #include "software/world/robot_state.h"
 
@@ -81,6 +82,9 @@ void Thunderloop::runLoop()
             if (robot_id != robot_id_ || channel_id != channel_id_ ||
                 network_interface != network_interface_)
             {
+                NetworkLoggerSingleton::initializeLogger(channel_id, network_interface,
+                                                         robot_id);
+
                 LOG(DEBUG) << "Switch over to Robot ID: " << robot_id
                            << " Channel ID: " << channel_id
                            << " Network Interface: " << network_interface;
