@@ -656,9 +656,9 @@ void SimRobot::update(SSLProto::SSL_DetectionRobot *robot, float stddev_p,
 
 bool SimRobot::touchesBall(SimBall *ball) const
 {
-//    if(m_holdBallConstraint){
-//        return true;
-//    }
+    if(m_holdBallConstraint){
+        return true;
+    }
 
     int numManifolds = m_world->getDispatcher()->getNumManifolds();
     for (int i = 0; i < numManifolds; ++i)

@@ -53,7 +53,7 @@ TEST_P(AttackerTacticShootGoalTest, attacker_test_shoot_goal)
 
     runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(6));
+            Duration::fromSeconds(9));
 }
 
 INSTANTIATE_TEST_CASE_P(
