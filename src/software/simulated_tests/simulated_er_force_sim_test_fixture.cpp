@@ -23,7 +23,6 @@ SimulatedErForceSimTestFixture::SimulatedErForceSimTestFixture()
       enemy_thunderbots_config(TbotsProto::ThunderbotsConfig()),
       friendly_sensor_fusion(friendly_thunderbots_config.sensor_fusion_config()),
       enemy_sensor_fusion(enemy_thunderbots_config.sensor_fusion_config()),
-      should_log_replay(false),
       run_simulation_in_realtime(false)
 {
 }
