@@ -68,8 +68,8 @@ py_library(
         "validation.py",
     ],
     data = [
-        "//software:python_bindings.so",
         "//software:py_constants.so",
+        "//software:python_bindings.so",
     ],
     deps = [
         "//proto:software_py_proto",

@@ -148,19 +148,6 @@ void SimulatedErForceSimTestFixture::updateSensorFusion(
         {
             enemy_sensor_fusion.processSensorProto(blue_sensor_msg);
         }
-
-        if (should_log_replay)
-        {
-            simulator_sensorproto_logger->onValueReceived(yellow_sensor_msg);
-            auto friendly_world_or_null = friendly_sensor_fusion.getWorld();
-
-            if (friendly_world_or_null)
-            {
-                auto filtered_ssl_wrapper = *createSSLWrapperPacket(
-                    *friendly_sensor_fusion.getWorld(), TeamColour::YELLOW);
-                sensorfusion_wrapper_logger->onValueReceived(filtered_ssl_wrapper);
-            }
-        }
     }
 }
 
