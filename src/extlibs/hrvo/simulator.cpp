@@ -45,8 +45,7 @@
 #include "software/logger/logger.h"
 
 HRVOSimulator::HRVOSimulator(float time_step, const RobotConstants_t &robot_constants)
-    : frame(0),
-      primitive_set(),
+    : primitive_set(),
       add_ball_agent(false),
       ball_agent_id(-1),
       robot_constants(robot_constants),
