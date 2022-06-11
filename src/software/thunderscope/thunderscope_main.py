@@ -153,7 +153,10 @@ if __name__ == "__main__":
             (runtime_dir, World, True),
             (runtime_dir, PlayInfo, True),
             (runtime_dir, PrimitiveSet, True),
-            (runtime_dir, HRVOVisualization, True),
+        ] + [
+            # TODO (#2655): Add/Remove HRVO layers dynamically based on the HRVOVisualization proto messages
+            (runtime_dir + YELLOW_HRVO_PATH, HRVOVisualization)
+            for robot_id in range(6)
         ]:
             proto_unix_io.attach_unix_receiver(*arg)
 

@@ -10,10 +10,10 @@
 
 PrimitiveExecutor::PrimitiveExecutor(const double time_step,
                                      const RobotConstants_t& robot_constants,
-                                     const std::string& run_time_dir)
+                                     const std::string& hrvo_run_time_dir)
     : current_primitive_(),
       robot_constants_(robot_constants),
-      hrvo_simulator_(static_cast<float>(time_step), robot_constants, run_time_dir)
+      hrvo_simulator_(static_cast<float>(time_step), robot_constants, hrvo_run_time_dir)
 {
 }
 

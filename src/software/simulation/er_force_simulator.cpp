@@ -19,7 +19,8 @@
 
 ErForceSimulator::ErForceSimulator(const TbotsProto::FieldType& field_type,
                                    const RobotConstants_t& robot_constants,
-                                   const WheelConstants& wheel_constants)
+                                   const WheelConstants& wheel_constants,
+                                   const std::string& runtime_dir)
     : yellow_team_world_msg(std::make_unique<TbotsProto::World>()),
       blue_team_world_msg(std::make_unique<TbotsProto::World>()),
       frame_number(0),
@@ -27,7 +28,8 @@ ErForceSimulator::ErForceSimulator(const TbotsProto::FieldType& field_type,
       wheel_constants(wheel_constants),
       field(Field::createField(field_type)),
       blue_robot_with_ball(std::nullopt),
-      yellow_robot_with_ball(std::nullopt)
+      yellow_robot_with_ball(std::nullopt),
+      runtime_dir(runtime_dir)
 {
     QString full_filename = CONFIG_DIRECTORY;
 
@@ -232,10 +234,16 @@ void ErForceSimulator::setRobots(
     {
         if (side == gameController::Team::BLUE)
         {
+            auto robot_primitive_executor = std::make_shared<PrimitiveExecutor>(
+                primitive_executor_time_step, robot_constants,
+                runtime_dir + BLUE_HRVO_PATH);  //"/blue_hrvo_" + std::to_string(id));
             blue_primitive_executor_map.insert({id, robot_primitive_executor});
         }
         else
         {
+            auto robot_primitive_executor = std::make_shared<PrimitiveExecutor>(
+                primitive_executor_time_step, robot_constants,
+                runtime_dir + YELLOW_HRVO_PATH);  //"/yellow_hrvo_" + std::to_string(id));
             yellow_primitive_executor_map.insert({id, robot_primitive_executor});
         }
     }

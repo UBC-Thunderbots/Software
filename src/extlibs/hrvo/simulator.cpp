@@ -39,7 +39,6 @@
 #include "extlibs/hrvo/kd_tree.h"
 #include "extlibs/hrvo/linear_velocity_agent.h"
 #include "proto/message_translation/tbots_geometry.h"
-#include "proto/visualization.pb.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/algorithms/intersection.h"
 #include "software/logger/logger.h"
@@ -51,7 +50,9 @@ HRVOSimulator::HRVOSimulator(float time_step, const RobotConstants_t &robot_cons
       robot_constants(robot_constants),
       reached_goals(false),
       kd_tree(std::make_unique<KdTree>(this)),
-      hrvo_output(std::make_unique<ThreadedProtoUnixSender<TbotsProto::HRVOVisualization>>(run_time_dir))
+      hrvo_output(
+          std::make_unique<ThreadedProtoUnixSender<TbotsProto::HRVOVisualization>>(
+              run_time_dir))
 {
 }
 

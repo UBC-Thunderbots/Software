@@ -294,7 +294,10 @@ gdb --args bazel-bin/{simulator_command}
             (self.simulator_runtime_dir + BLUE_SSL_WRAPPER_PATH, SSL_WrapperPacket),
             (self.simulator_runtime_dir + BLUE_ROBOT_STATUS_PATH, RobotStatus),
             (self.simulator_runtime_dir + SIMULATOR_STATE_PATH, SimulatorState),
-            (self.simulator_runtime_dir, HRVOVisualization, True),
+        ] + [
+            # TODO (#2655): Add/Remove HRVO layers dynamically based on the HRVOVisualization proto messages
+            (self.simulator_runtime_dir + BLUE_HRVO_PATH, HRVOVisualization)
+            for robot_id in range(6)
         ]:
             blue_full_system_proto_unix_io.attach_unix_receiver(*arg)
 
@@ -308,6 +311,10 @@ gdb --args bazel-bin/{simulator_command}
         for arg in [
             (self.simulator_runtime_dir + YELLOW_SSL_WRAPPER_PATH, SSL_WrapperPacket),
             (self.simulator_runtime_dir + YELLOW_ROBOT_STATUS_PATH, RobotStatus),
+        ] + [
+            # TODO (#2655): Add/Remove HRVO layers dynamically based on the HRVOVisualization proto messages
+            (self.simulator_runtime_dir + YELLOW_HRVO_PATH, HRVOVisualization)
+            for robot_id in range(6)
         ]:
             yellow_full_system_proto_unix_io.attach_unix_receiver(*arg)
 

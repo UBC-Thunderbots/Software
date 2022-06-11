@@ -20,7 +20,7 @@ class HRVOLayer(FieldLayer):
         FieldLayer.__init__(self)
         self.robot_id = robot_id
         self.hrvo_buffer = ThreadSafeBuffer(buffer_size, HRVOVisualization)
-        self.prev_message = HRVOVisualization(robot_id = self.robot_id)
+        self.prev_message = HRVOVisualization(robot_id=self.robot_id)
 
     def paint(self, painter, option, widget):
         """Paint this layer
@@ -100,4 +100,3 @@ class HRVOLayer(FieldLayer):
                     int(MILLIMETERS_PER_METER * robot_circle.radius),
                 )
             )
-            painter.drawEllipse(circle_drawing)
