@@ -30,6 +30,7 @@ py_library(
         "//software/thunderscope:colors",
         "//software/thunderscope:common_widgets",
         "//software/thunderscope:constants",
+        "//software/thunderscope:dock_label_style",
         "//software/thunderscope:proto_unix_io",
         "//software/thunderscope:robot_communication",
         "//software/thunderscope/arbitrary_plot:named_value_plotter",
@@ -73,6 +74,11 @@ py_library(
 py_library(
     name = "common_widgets",
     srcs = ["common_widgets.py"],
+)
+
+py_library(
+    name = "dock_label_style",
+    srcs = ["dock_label_style.py"],
 )
 
 py_library(
