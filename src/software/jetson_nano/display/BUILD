@@ -1,7 +1,5 @@
 package(default_visibility = ["//visibility:public"])
 
-load("@display_deps//:requirements.bzl", "requirement")
-
 py_binary(
     name = "robot_ui",
     srcs = ["robot_ui.py"],
@@ -12,14 +10,6 @@ py_binary(
         "//software/jetson_nano/display/screens:home_screen",
         "//software/jetson_nano/display/screens:menu_screen",
         "//software/jetson_nano/display/screens:wheels_screen",
-        requirement("Adafruit-Blinka"),
-        requirement("adafruit-circuitpython-busdevice"),
-        requirement("adafruit-circuitpython-rgb-display"),
-        requirement("Adafruit-PlatformDetect"),
-        requirement("Adafruit-PureIO"),
-        requirement("Jetson.GPIO"),
-        requirement("Pillow"),
-        requirement("redis"),
     ],
 )
 
@@ -31,4 +21,11 @@ py_library(
 py_library(
     name = "utils",
     srcs = ["utils.py"],
+)
+
+genrule(
+    name = "robot_ui_zip",
+    outs = ["robot_ui_zip.zip"],
+    cmd = "zip -r $@ $(location :robot_ui)*",
+    tools = [":robot_ui"],
 )
