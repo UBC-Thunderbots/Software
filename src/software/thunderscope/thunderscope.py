@@ -37,6 +37,7 @@ from software.thunderscope.robot_communication import RobotCommunication
 from software.thunderscope.arbitrary_plot.named_value_plotter import NamedValuePlotter
 from software.thunderscope.binary_context_managers import *
 from extlibs.er_force_sim.src.protobuf.world_pb2 import *
+from software.thunderscope.dock_label_style import *
 
 # Import Widgets
 from software.thunderscope.field import (
