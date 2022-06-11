@@ -132,6 +132,7 @@ RobotNavigationObstacleFactory::createDynamicObstaclesFromMotionConstraint(
             break;
         case TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL:;
             // 0.5 represents half a metre radius
+            // TODO: Should this be 0.5 + ROBOT_RADIUS?
             obstacles.push_back(createFromShape(Circle(world.ball().position(), 0.5)));
             break;
         case TbotsProto::MotionConstraint::AVOID_BALL_PLACEMENT_INTERFERENCE:;

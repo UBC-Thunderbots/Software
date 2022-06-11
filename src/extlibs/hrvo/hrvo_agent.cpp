@@ -403,6 +403,7 @@ void HRVOAgent::computeNewVelocity()
         if (isIdealCandidate(candidate))
         {
             new_velocity_ = candidate.velocity;
+            new_velocity_ = new_velocity_.normalize(pref_velocity_.length());
             return;
         }
 
@@ -431,6 +432,7 @@ void HRVOAgent::computeNewVelocity()
                     first_intersecting_velocity_obstacle.value();
             }
             new_velocity_ = candidate.velocity;
+            new_velocity_ = new_velocity_.normalize(pref_velocity_.length());
         }
     }
 }
