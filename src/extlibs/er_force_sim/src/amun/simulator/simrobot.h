@@ -85,6 +85,13 @@ class camun::simulator::SimRobot : public QObject
     {
         return m_specs;
     }
+
+    /**
+     * determines whether the robot is in contact with the ball according to the bullet
+     * engine
+     * @param ball the ball in play
+     * @return true if the ball is in contact with the robot, false otherwise
+     */
     bool touchesBall(SimBall *ball) const;
 
 

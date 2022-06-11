@@ -20,10 +20,12 @@
 
 #include "simulator.h"
 
+#include <QtCore/QPair>
 #include <QtCore/QTimer>
 #include <QtCore/QVector>
 #include <QtCore/QtDebug>
 #include <algorithm>
+#include <functional>
 
 #include "erroraggregator.h"
 #include "extlibs/er_force_sim/src/core/coordinates.h"
@@ -32,6 +34,7 @@
 #include "simball.h"
 #include "simfield.h"
 #include "simrobot.h"
+
 
 using namespace camun::simulator;
 
@@ -318,27 +321,14 @@ void Simulator::handleSimulatorTick(double time_s)
     }
 
     // find out if ball and any robot collide
-    bool ball_collision = false;
-    for (const auto &pair : m_data->robotsBlue)
-    {
-        ball_collision = pair.first->touchesBall(m_data->ball);
-        if (ball_collision)
-        {
-            break;
-        }
-    }
+    auto robot_ball_collision = [this](QPair<SimRobot *, unsigned int> elem) {
+        return elem.first->touchesBall(this->m_data->ball);
+    };
 
-    if (!ball_collision)
-    {
-        for (const auto &pair : m_data->robotsYellow)
-        {
-            ball_collision = pair.first->touchesBall(m_data->ball);
-            if (ball_collision)
-            {
-                break;
-            }
-        }
-    }
+    bool ball_collision = std::any_of(m_data->robotsBlue.begin(),
+                                      m_data->robotsBlue.end(), robot_ball_collision) ||
+                          std::any_of(m_data->robotsYellow.begin(),
+                                      m_data->robotsYellow.end(), robot_ball_collision);
 
     // apply commands and forces to ball and robots
     m_data->ball->begin(ball_collision);

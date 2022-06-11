@@ -31,7 +31,12 @@
 
 using namespace camun::simulator;
 
-SimBall::SimBall(RNG *rng, btDiscreteDynamicsWorld *world) : m_rng(rng), m_world(world)
+SimBall::SimBall(RNG *rng, btDiscreteDynamicsWorld *world)
+    : m_rng(rng),
+      m_world(world),
+      current_ball_state(STATIONARY),
+      set_transition_speed(true),
+      rolling_speed(-1.0)
 {
     // see http://robocup.mi.fu-berlin.de/buch/rolling.pdf for correct modelling
     m_sphere = new btSphereShape(BALL_RADIUS * SIMULATOR_SCALE);
@@ -76,51 +81,45 @@ void SimBall::begin(bool robotCollision)
     const btVector3 velocity = m_body->getLinearVelocity();
     if (p.z() < BALL_RADIUS * 1.1 * SIMULATOR_SCALE)
     {  // ball is on the ground
-        BallState nextState = currentBallState;
-        bool isStationary   = velocity.length() < STATIONARY_BALL_SPEED * SIMULATOR_SCALE;
-        bool shouldRoll     = velocity.length() < rolling_speed * SIMULATOR_SCALE;
-        switch (currentBallState)
+        bool is_stationary = velocity.length() < STATIONARY_BALL_SPEED * SIMULATOR_SCALE;
+        bool should_roll   = velocity.length() < rolling_speed * SIMULATOR_SCALE;
+
+        if (robotCollision)
         {
-            case STATIONARY:
-                nextState = (robotCollision) ? ROBOT_COLLISION
-                                             : (isStationary) ? STATIONARY : SLIDING;
-                break;
-            case ROBOT_COLLISION:
-                nextState = (robotCollision) ? ROBOT_COLLISION
-                                             : (isStationary) ? STATIONARY : SLIDING;
-                break;
-            case SLIDING:
-                nextState =
-                    (robotCollision)
-                        ? ROBOT_COLLISION
-                        : (isStationary) ? STATIONARY : (shouldRoll) ? ROLLING : SLIDING;
-                break;
-            case ROLLING:
-                nextState = (robotCollision) ? ROBOT_COLLISION
-                                             : (isStationary) ? STATIONARY : ROLLING;
-                break;
+            current_ball_state = ROBOT_COLLISION;
+        }
+        else if (is_stationary)
+        {
+            current_ball_state = STATIONARY;
+        }
+        else if ((current_ball_state == SLIDING && should_roll) ||
+                 current_ball_state == ROLLING)
+        {
+            current_ball_state = ROLLING;
+        }
+        else
+        {
+            current_ball_state = SLIDING;
         }
 
-        currentBallState = nextState;
-
-        switch (currentBallState)
+        switch (current_ball_state)
         {
             case STATIONARY:
                 m_body->setLinearVelocity(btVector3(0, 0, 0));
                 m_body->setFriction(BALL_SLIDING_FRICTION);
-                setTransitionSpeed = true;
+                set_transition_speed = true;
                 break;
             case ROBOT_COLLISION:
                 m_body->setFriction(BALL_SLIDING_FRICTION);
-                setTransitionSpeed = true;
+                set_transition_speed = true;
                 break;
             case SLIDING:
                 m_body->setFriction(BALL_SLIDING_FRICTION);
                 rolling_speed =
-                    (setTransitionSpeed)
+                    (set_transition_speed)
                         ? FRICTION_TRANSITION_FACTOR * velocity.length() / SIMULATOR_SCALE
                         : rolling_speed;
-                setTransitionSpeed = false;
+                set_transition_speed = false;
                 break;
             case ROLLING:
 
@@ -133,7 +132,7 @@ void SimBall::begin(bool robotCollision)
                                             SIMULATOR_SCALE * BALL_MASS * SUB_TIMESTEP);
 
                 m_body->setFriction(0.0);
-                setTransitionSpeed = false;
+                set_transition_speed = false;
                 break;
         }
     }
@@ -224,9 +223,9 @@ void SimBall::begin(bool robotCollision)
                 m_body->setLinearVelocity(linVel * SIMULATOR_SCALE);
 
                 // override ballState
-                currentBallState   = SLIDING;
-                rolling_speed      = linVel.length() * FRICTION_TRANSITION_FACTOR;
-                setTransitionSpeed = false;
+                current_ball_state   = SLIDING;
+                rolling_speed        = linVel.length() * FRICTION_TRANSITION_FACTOR;
+                set_transition_speed = false;
 
                 m_body->setAngularVelocity(btVector3(0, 0, 0));
             }

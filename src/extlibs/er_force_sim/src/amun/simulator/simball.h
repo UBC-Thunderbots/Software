@@ -32,7 +32,8 @@
 static const float BALL_RADIUS = 0.0215f;
 static const float BALL_MASS   = 0.046f;
 
-// these values are set in coordination with other objects the ball will collide with
+// these values are set in coordination with other objects the ball will collide with.
+// the resulting coefficient of friction is the product of both objects friction value.
 static constexpr float BALL_SLIDING_FRICTION = 1.f;
 static constexpr float BALL_RESTITUTION      = 1.f;
 
@@ -69,6 +70,11 @@ class camun::simulator::SimBall : public QObject
     void sendSSLSimError(const SSLSimError &error, ErrorSource s);
 
    public:
+    /**
+     * processes velocity and forces to be applied on the ball
+     * @param robotCollision whether the ball collides with a robot in this simulation
+     * tick
+     */
     void begin(bool robotCollision);
     bool update(SSLProto::SSL_DetectionBall *ball, float stddev, float stddevArea,
                 const btVector3 &cameraPosition, bool enableInvisibleBall,
@@ -99,8 +105,8 @@ class camun::simulator::SimBall : public QObject
     btRigidBody *m_body;
     btMotionState *m_motionState;
     sslsim::TeleportBall m_move;
-    double rolling_speed    = -1;
-    bool setTransitionSpeed = true;
+    double rolling_speed;
+    bool set_transition_speed;
 
     enum BallState
     {
@@ -109,7 +115,7 @@ class camun::simulator::SimBall : public QObject
         SLIDING,
         ROLLING
     };
-    BallState currentBallState = STATIONARY;
+    BallState current_ball_state;
 };
 
 #endif  // SIMBALL_H
