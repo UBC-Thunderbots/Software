@@ -38,9 +38,9 @@
 
 #include "extlibs/hrvo/agent.h"
 #include "extlibs/hrvo/kd_tree.h"
-#include "proto/tbots_software_msgs.pb.h"
 #include "software/geom/vector.h"
 #include "software/world/world.h"
+#include "software/networking/threaded_proto_unix_sender.hpp"
 
 class HRVOSimulator
 {
@@ -50,8 +50,10 @@ class HRVOSimulator
      * @param time_step The time step between each step of the simulator
      * @param robot_constants The robot constants to be used for all Agents representing a
      * robot
+     * @param run_time_dir The directory to send the hrvo visualization to
      */
-    explicit HRVOSimulator(float time_step, const RobotConstants_t &robot_constants);
+    explicit HRVOSimulator(float time_step, const RobotConstants_t &robot_constants,
+                           const std::string &run_time_dir);
 
     /**
      * Reset all agents to match the state of the given world.
@@ -295,6 +297,8 @@ class HRVOSimulator
     // robot id to agent index
     std::map<unsigned int, unsigned int> friendly_robot_id_map;
     std::map<unsigned int, unsigned int> enemy_robot_id_map;
+
+    std::unique_ptr<ThreadedProtoUnixSender<TbotsProto::HRVOVisualization>> hrvo_output;
 
    public:
     // The scale which friendly robots should be larger than friendly robots

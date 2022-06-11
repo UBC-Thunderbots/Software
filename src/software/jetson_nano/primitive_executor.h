@@ -14,9 +14,11 @@ class PrimitiveExecutor
      * @param time_step Time step which this primitive executor operates in
      * @param robot_constants The robot constants for the robot which uses this primitive
      * executor
+     * @param run_time_dir The directory to send the hrvo visualization to
      */
     explicit PrimitiveExecutor(const double time_step,
-                               const RobotConstants_t& robot_constants);
+                               const RobotConstants_t& robot_constants,
+                               const std::string& run_time_dir);
 
     /**
      * Update primitive executor with a new Primitive Set

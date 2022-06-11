@@ -54,5 +54,6 @@ cc_library(
         "//software/ai/navigator/path_planner/hrvo:velocity_obstacle",
         "//software/geom:vector",
         "//software/world",
+        "//software/networking:threaded_proto_unix_sender",
     ],
 )

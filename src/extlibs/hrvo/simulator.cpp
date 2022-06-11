@@ -44,12 +44,14 @@
 #include "software/geom/algorithms/intersection.h"
 #include "software/logger/logger.h"
 
-HRVOSimulator::HRVOSimulator(float time_step, const RobotConstants_t &robot_constants)
+HRVOSimulator::HRVOSimulator(float time_step, const RobotConstants_t &robot_constants,
+                             const std::string &run_time_dir)
     : global_time(0.0f),
       time_step(time_step),
       robot_constants(robot_constants),
       reached_goals(false),
-      kd_tree(std::make_unique<KdTree>(this))
+      kd_tree(std::make_unique<KdTree>(this)),
+      hrvo_output(std::make_unique<ThreadedProtoUnixSender<TbotsProto::HRVOVisualization>>(run_time_dir))
 {
 }
 
@@ -378,8 +380,6 @@ void HRVOSimulator::visualize(unsigned int robot_id) const
     auto friendly_agent_opt = getFriendlyAgentFromRobotId(robot_id);
     if (!friendly_agent_opt.has_value())
     {
-        LOG(WARNING) << "HRVO friendly agent with robot id " << robot_id
-                     << " can not be visualized." << std::endl;
         return;
     }
 
@@ -396,7 +396,7 @@ void HRVOSimulator::visualize(unsigned int robot_id) const
         *(hrvo_visualization.add_robots()) =
             *createCircleProto(Circle(position, agent->getRadius()));
     }
-    LOG(VISUALIZE) << hrvo_visualization;
+    hrvo_output->sendProto(hrvo_visualization);
 }
 
 std::optional<std::shared_ptr<HRVOAgent>> HRVOSimulator::getFriendlyAgentFromRobotId(
