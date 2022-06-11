@@ -90,6 +90,11 @@ std::optional<Path> EnlsvgPathPlanner::findPath(const Point &start,
         return Path({start, end});
     }
 
+    // If the new unblocked points are equal, set the unblocked end point as the end point of the path
+    if (new_start == new_end) {
+        return Path({start, convertEnlsvgPointToPoint(new_end.value())});
+    }
+
     EnlsvgPath enlsvgPath =
         enlsvg_algo->computePath(*enlsvg_mem, new_start.value().x, new_start.value().y,
                                  new_end.value().x, new_end.value().y);

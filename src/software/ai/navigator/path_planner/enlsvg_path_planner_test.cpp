@@ -837,13 +837,15 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_simulated_hrvo)
     Rectangle navigable_area = field.fieldBoundary();
     EnlsvgPathPlanner planner =
             EnlsvgPathPlanner(navigable_area, obstacles, field.boundaryMargin());
+
+    //DEBUG findPath()
     auto path = planner.findPath(start, dest);
     EXPECT_TRUE(path != std::nullopt);
     std::vector<Point> path_points = path->getKnots();
 
     EXPECT_EQ(2, path_points.size());
     EXPECT_EQ(start, path->getStartPoint());
-    EXPECT_EQ(dest, path->getEndPoint());
+    EXPECT_LE(distance(path->getEndPoint(), dest), 0.1);
 
 }
 
@@ -872,7 +874,7 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_defense_play)
 
     EXPECT_EQ(2, path_points.size());
     EXPECT_EQ(start, path->getStartPoint());
-    EXPECT_EQ(dest, path->getEndPoint());
+    EXPECT_LE(distance(path->getEndPoint(), dest), 0.1);
 
 }
 
@@ -901,7 +903,7 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_enemy_ball_placement)
 
     EXPECT_EQ(2, path_points.size());
     EXPECT_EQ(start, path->getStartPoint());
-    EXPECT_EQ(dest, path->getEndPoint());
+    EXPECT_LE(distance(path->getEndPoint(), dest), 0.1);
 
 }
 
@@ -930,7 +932,7 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_enemy_free_kick_play_test
 
     EXPECT_EQ(2, path_points.size());
     EXPECT_EQ(start, path->getStartPoint());
-    EXPECT_EQ(dest, path->getEndPoint());
+    EXPECT_LE(distance(path->getEndPoint(), dest), 0.1);
 
 }
 
@@ -959,7 +961,7 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_free_kick_play_test)
 
     EXPECT_EQ(2, path_points.size());
     EXPECT_EQ(start, path->getStartPoint());
-    EXPECT_EQ(dest, path->getEndPoint());
+    EXPECT_LE(distance(path->getEndPoint(), dest), 0.1);
 
 }
 
@@ -990,7 +992,7 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_kickoff_enemy_play_test)
 
     EXPECT_EQ(2, path_points.size());
     EXPECT_EQ(start, path->getStartPoint());
-    EXPECT_EQ(dest, path->getEndPoint());
+    EXPECT_LE(distance(path->getEndPoint(), dest), 0.1);
 
 }
 
@@ -1019,7 +1021,7 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_penalty_kick_enemy_play_t
 
     EXPECT_EQ(2, path_points.size());
     EXPECT_EQ(start, path->getStartPoint());
-    EXPECT_EQ(dest, path->getEndPoint());
+    EXPECT_LE(distance(path->getEndPoint(), dest), 0.1);
 
 }
 
@@ -1048,7 +1050,7 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_shoot_or_chip_play_test)
 
     EXPECT_EQ(2, path_points.size());
     EXPECT_EQ(start, path->getStartPoint());
-    EXPECT_EQ(dest, path->getEndPoint());
+    EXPECT_LE(distance(path->getEndPoint(), dest), 0.1);
 
 }
 
@@ -1077,7 +1079,7 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_crease_defense_play_test)
 
     EXPECT_EQ(2, path_points.size());
     EXPECT_EQ(start, path->getStartPoint());
-    EXPECT_EQ(dest, path->getEndPoint());
+    EXPECT_LE(distance(path->getEndPoint(), dest), 0.1);
 
 }
 
@@ -1106,6 +1108,6 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_offense_play_test)
 
     EXPECT_EQ(2, path_points.size());
     EXPECT_EQ(start, path->getStartPoint());
-    EXPECT_EQ(dest, path->getEndPoint());
+    EXPECT_LE(distance(path->getEndPoint(), dest), 0.1);
 
 }
