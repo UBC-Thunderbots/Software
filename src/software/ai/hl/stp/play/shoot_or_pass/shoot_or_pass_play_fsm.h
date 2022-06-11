@@ -6,6 +6,7 @@
 #include "software/ai/hl/stp/tactic/attacker/attacker_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/ai/hl/stp/tactic/receiver/receiver_tactic.h"
+#include "software/ai/navigator/obstacle/robot_navigation_obstacle_factory.h"
 #include "software/ai/passing/eighteen_zone_pitch_division.h"
 #include "software/ai/passing/pass_generator.hpp"
 #include "software/geom/algorithms/intersects.h"

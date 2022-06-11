@@ -157,6 +157,43 @@ bool ShootOrPassPlayFSM::shouldAbortPass(const Update& event)
         return true;
     }
 
+    // calculate an inflated polygon along the vector from the passer to receiver
+    const auto ball_position  = event.common.world.ball().position();
+    const auto passer_point   = best_pass_and_score_so_far.pass.passerPoint();
+    const auto receiver_point = best_pass_and_score_so_far.pass.receiverPoint();
+
+    const double RADIUS = 0.5;
+
+    Vector place_to_ball = passer_point.toVector() - receiver_point.toVector();
+    Vector ball_to_place = -place_to_ball;
+
+    Point place_l = passer_point + (place_to_ball.normalize(RADIUS) +
+                                    place_to_ball.perpendicular().normalize(RADIUS));
+    Point place_r = passer_point + (place_to_ball.normalize(RADIUS) -
+                                    place_to_ball.perpendicular().normalize(RADIUS));
+
+    Point ball_l = receiver_point + (ball_to_place.normalize(RADIUS) +
+                                     ball_to_place.perpendicular().normalize(RADIUS));
+    Point ball_r = receiver_point + (ball_to_place.normalize(RADIUS) -
+                                     ball_to_place.perpendicular().normalize(RADIUS));
+
+    const auto pass_area_polygon = Polygon({
+                                               place_l,
+                                               place_r,
+                                               ball_l,
+                                               ball_r,
+                                           })
+                                       .expand(1);
+
+    // calculate a polygon that contains the receiver and passer point, and checks if the
+    // ball is inside it. if the ball isn't being passed to the receiver then we should
+    // abort
+    if (!contains(pass_area_polygon, ball_position))
+    {
+        return true;
+    }
+
+
     // distance between robot and ball is too far,
     // i.e. team might still have possession, but kicker/passer doesn't have control over
     // ball
