@@ -37,6 +37,7 @@ from software.thunderscope.robot_communication import RobotCommunication
 from software.thunderscope.arbitrary_plot.named_value_plotter import NamedValuePlotter
 from software.thunderscope.binary_context_managers import *
 from extlibs.er_force_sim.src.protobuf.world_pb2 import *
+from software.thunderscope.dock_label_style import *
 
 # Import Widgets
 from software.thunderscope.field import (
@@ -67,66 +68,6 @@ NUM_ROBOTS = 6
 SIM_TICK_RATE_MS = 16
 REFRESH_INTERVAL_MS = 5
 GAME_CONTROLLER_URL = "http://localhost:8081"
-
-from pyqtgraph.dockarea.Dock import DockLabel
-
-
-def updateStylePatched(self):
-    r = "2px"
-    if self.dim:
-        fg = "#a0a0a0"
-        bg = "#313742"
-        border = "#313742"
-    else:
-        fg = "#448aff"
-        bg = "#313742"
-        border = "#448aff"
-
-    if self.orientation == "vertical":
-        self.vStyle = """DockLabel {
-            background-color : %s;
-            color : %s;
-            border-top-right-radius: 0px;
-            border-top-left-radius: %s;
-            border-bottom-right-radius: 0px;
-            border-bottom-left-radius: %s;
-            border-width: 0px;
-            border-right: 2px solid %s;
-            padding-top: 3px;
-            padding-bottom: 3px;
-            font-size: 14px;
-        }""" % (
-            bg,
-            fg,
-            r,
-            r,
-            border,
-        )
-        self.setStyleSheet(self.vStyle)
-    else:
-        self.hStyle = """DockLabel {
-            background-color : %s;
-            color : %s;
-            border-top-right-radius: %s;
-            border-top-left-radius: %s;
-            border-bottom-right-radius: 0px;
-            border-bottom-left-radius: 0px;
-            border-width: 0px;
-            border-bottom: 2px solid %s;
-            padding-left: 13px;
-            padding-right: 13px;
-            font-size: 14px
-        }""" % (
-            bg,
-            fg,
-            r,
-            r,
-            border,
-        )
-        self.setStyleSheet(self.hStyle)
-
-
-DockLabel.updateStyle = updateStylePatched
 
 
 class Thunderscope(object):
