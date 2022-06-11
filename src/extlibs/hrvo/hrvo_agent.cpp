@@ -108,13 +108,13 @@ VelocityObstacle HRVOAgent::createVelocityObstacle(const Agent &other_agent)
 
     // Convert velocity obstacle to hybrid reciprocal velocity obstacle (HRVO)
     // by shifting one side of the velocity obstacle to share the responsibility
-    // of avoiding collision with other agent. This assumes that other agent will also
+    // of avoiding collision with other agent. This assumes that the other agent will also
     // be running HRVO
     // Refer to: https://gamma.cs.unc.edu/HRVO/HRVO-T-RO.pdf#page=2
     Vector vo_side;
     Vector rvo_side;
-    if ((position_ - other_agent.getPosition())
-            .isClockwiseOf(other_agent.getPrefVelocity() - pref_velocity_))
+    if ((other_agent.getPrefVelocity() - pref_velocity_)
+            .isClockwiseOf(position_ - other_agent.getPosition()))
     {
         vo_side = vo.getLeftSide();
         rvo_side = vo.getRightSide();
@@ -195,7 +195,7 @@ void HRVOAgent::computeNewVelocity()
             velocityObstacles_[i].getRightSide().isClockwiseOf(apex_to_pref_velocity))
         {
             candidate.velocity = velocityObstacles_[i].getApex() +
-                                 dotProduct1 * velocityObstacles_[i].getRightSide();
+                                 pref_velocity_.length() * velocityObstacles_[i].getRightSide();
 
             addToCandidateListIfValid(candidate);
         }
@@ -205,7 +205,7 @@ void HRVOAgent::computeNewVelocity()
                 apex_to_pref_velocity))
         {
             candidate.velocity = velocityObstacles_[i].getApex() +
-                                 dotProduct2 * velocityObstacles_[i].getLeftSide();
+                    pref_velocity_.length() * velocityObstacles_[i].getLeftSide();
 
             addToCandidateListIfValid(candidate);
         }
@@ -403,7 +403,6 @@ void HRVOAgent::computeNewVelocity()
         if (isIdealCandidate(candidate))
         {
             new_velocity_ = candidate.velocity;
-            new_velocity_ = new_velocity_.normalize(pref_velocity_.length());
             return;
         }
 
@@ -432,7 +431,6 @@ void HRVOAgent::computeNewVelocity()
                     first_intersecting_velocity_obstacle.value();
             }
             new_velocity_ = candidate.velocity;
-            new_velocity_ = new_velocity_.normalize(pref_velocity_.length());
         }
     }
 }
@@ -473,7 +471,7 @@ void HRVOAgent::computeVelocityObstacles()
     for (const auto &obstacle : static_obstacles)
     {
         double dist_agent_to_obstacle = obstacle->distance(agent_position_point);
-        if (((dist_agent_to_obstacle <= dist_to_obstacle_threshold && dist_agent_to_obstacle <= ROBOT_MAX_RADIUS_METERS * 2) || obstacle->intersects(agent_to_dest_segment)) && !obstacle->contains(agent_position_point))
+        if ((dist_agent_to_obstacle <= std::max(dist_to_obstacle_threshold, 2 * ROBOT_MAX_RADIUS_METERS) || obstacle->intersects(agent_to_dest_segment)) && !obstacle->contains(agent_position_point))
         {
             VelocityObstacle velocity_obstacle = obstacle->generateVelocityObstacle(circle_rep_of_agent, Vector());
             velocityObstacles_.push_back(velocity_obstacle);
