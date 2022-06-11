@@ -236,14 +236,14 @@ void ErForceSimulator::setRobots(
         {
             auto robot_primitive_executor = std::make_shared<PrimitiveExecutor>(
                 primitive_executor_time_step, robot_constants,
-                runtime_dir + BLUE_HRVO_PATH);  //"/blue_hrvo_" + std::to_string(id));
+                runtime_dir + BLUE_HRVO_PATH);
             blue_primitive_executor_map.insert({id, robot_primitive_executor});
         }
         else
         {
             auto robot_primitive_executor = std::make_shared<PrimitiveExecutor>(
                 primitive_executor_time_step, robot_constants,
-                runtime_dir + YELLOW_HRVO_PATH);  //"/yellow_hrvo_" + std::to_string(id));
+                runtime_dir + YELLOW_HRVO_PATH);
             yellow_primitive_executor_map.insert({id, robot_primitive_executor});
         }
     }
