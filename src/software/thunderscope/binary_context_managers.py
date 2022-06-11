@@ -115,7 +115,7 @@ gdb --args bazel-bin/{full_system}
                     time.sleep(1)
 
         else:
-            self.full_system_proc = Popen(full_system.split(" "))
+            self.full_system_proc = Popen(self.full_system.split(" "))
             self.thread.start()
 
         return self
