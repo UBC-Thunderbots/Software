@@ -108,6 +108,11 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
         {
             // Compute the target velocities
             Vector target_velocity = getTargetLinearVelocity(robot_id, curr_orientation);
+            if (robot_id == 1)
+            {
+                std::cout << "target_velocity: " << target_velocity.length() << std::endl;
+            }
+
             AngularVelocity target_angular_velocity =
                 getTargetAngularVelocity(current_primitive_.move(), curr_orientation);
 
