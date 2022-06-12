@@ -19,8 +19,7 @@
 
 ErForceSimulator::ErForceSimulator(const TbotsProto::FieldType& field_type,
                                    const RobotConstants_t& robot_constants,
-                                   const WheelConstants& wheel_constants,
-                                   const std::string& runtime_dir)
+                                   const WheelConstants& wheel_constants)
     : yellow_team_world_msg(std::make_unique<TbotsProto::World>()),
       blue_team_world_msg(std::make_unique<TbotsProto::World>()),
       frame_number(0),
@@ -28,8 +27,7 @@ ErForceSimulator::ErForceSimulator(const TbotsProto::FieldType& field_type,
       wheel_constants(wheel_constants),
       field(Field::createField(field_type)),
       blue_robot_with_ball(std::nullopt),
-      yellow_robot_with_ball(std::nullopt),
-      runtime_dir(runtime_dir)
+      yellow_robot_with_ball(std::nullopt)
 {
     QString full_filename = CONFIG_DIRECTORY;
 

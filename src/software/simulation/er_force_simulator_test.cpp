@@ -17,8 +17,8 @@ class ErForceSimulatorTest : public ::testing::Test
     {
         // TODO (#2419): remove this to re-enable sigfpe checks
         fedisableexcept(FE_INVALID | FE_OVERFLOW);
-        simulator = std::make_shared<ErForceSimulator>(
-            TbotsProto::FieldType::DIV_B, robot_constants, wheel_constants, "/tmp/tbots");
+        simulator = std::make_shared<ErForceSimulator>(TbotsProto::FieldType::DIV_B,
+                                                       robot_constants, wheel_constants);
         simulator->resetCurrentTime();
     }
 
@@ -312,7 +312,7 @@ TEST(ErForceSimulatorFieldTest, check_field_A_configuration)
     RobotConstants_t robot_constants            = create2021RobotConstants();
     WheelConstants wheel_constants              = create2021WheelConstants();
     std::shared_ptr<ErForceSimulator> simulator = std::make_shared<ErForceSimulator>(
-        TbotsProto::FieldType::DIV_A, robot_constants, wheel_constants, "/tmp/tbots");
+        TbotsProto::FieldType::DIV_A, robot_constants, wheel_constants);
     simulator->resetCurrentTime();
     simulator->getField();
 
@@ -324,7 +324,7 @@ TEST(ErForceSimulatorFieldTest, check_field_B_configuration)
     RobotConstants_t robot_constants            = create2021RobotConstants();
     WheelConstants wheel_constants              = create2021WheelConstants();
     std::shared_ptr<ErForceSimulator> simulator = std::make_shared<ErForceSimulator>(
-        TbotsProto::FieldType::DIV_B, robot_constants, wheel_constants, "/tmp/tbots");
+        TbotsProto::FieldType::DIV_B, robot_constants, wheel_constants);
     simulator->resetCurrentTime();
     simulator->getField();
 

@@ -26,12 +26,10 @@ class ErForceSimulator
      * @param field_type The field type
      * @param robot_constants The robot constants
      * @param wheel_constants The wheel constants
-     * @param runtime_dir The directory where the log files will be stored.
      */
     explicit ErForceSimulator(const TbotsProto::FieldType& field_type,
                               const RobotConstants_t& robot_constants,
-                              const WheelConstants& wheel_constants,
-                              const std::string& runtime_dir);
+                              const WheelConstants& wheel_constants);
     ErForceSimulator()  = delete;
     ~ErForceSimulator() = default;
 
@@ -193,8 +191,6 @@ class ErForceSimulator
 
     std::optional<RobotId> blue_robot_with_ball;
     std::optional<RobotId> yellow_robot_with_ball;
-
-    std::string runtime_dir;
 
     const QString CONFIG_FILE      = "simulator/2020";
     const QString CONFIG_DIRECTORY = "extlibs/er_force_sim/config/";

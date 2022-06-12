@@ -146,52 +146,21 @@ if __name__ == "__main__":
         # Setup LOG(VISUALIZE) handling from full system. We set from_log_visualize
         # to true to decode from base64.
         for arg in [
-            {
-                "runtime_dir": runtime_dir,
-                "proto_class": Obstacles,
-                "from_log_visualize": True,
-            },
-            {
-                "runtime_dir": runtime_dir,
-                "proto_class": PathVisualization,
-                "from_log_visualize": True,
-            },
-            {
-                "runtime_dir": runtime_dir,
-                "proto_class": PassVisualization,
-                "from_log_visualize": True,
-            },
-            {
-                "runtime_dir": runtime_dir,
-                "proto_class": NamedValue,
-                "from_log_visualize": True,
-            },
-            {
-                "runtime_dir": runtime_dir,
-                "proto_class": PrimitiveSet,
-                "from_log_visualize": True,
-            },
-            {
-                "runtime_dir": runtime_dir,
-                "proto_class": World,
-                "from_log_visualize": True,
-            },
-            {
-                "runtime_dir": runtime_dir,
-                "proto_class": PlayInfo,
-                "from_log_visualize": True,
-            },
+            {"proto_class": Obstacles},
+            {"proto_class": PathVisualization},
+            {"proto_class": PassVisualization},
+            {"proto_class": NamedValue},
+            {"proto_class": PrimitiveSet},
+            {"proto_class": World},
+            {"proto_class": PlayInfo},
         ] + [
             # TODO (#2655): Add/Remove HRVO layers dynamically based on the HRVOVisualization proto messages
-            {
-                "runtime_dir": runtime_dir,
-                "unix_path": YELLOW_HRVO_PATH,
-                "proto_class": HRVOVisualization,
-                "from_log_visualize": True,
-            }
+            {"proto_class": HRVOVisualization, "unix_path": YELLOW_HRVO_PATH}
             for robot_id in range(6)
         ]:
-            proto_unix_io.attach_unix_receiver(**arg)
+            proto_unix_io.attach_unix_receiver(
+                runtime_dir, from_log_visualize=True, **arg
+            )
 
         proto_unix_io.attach_unix_receiver(runtime_dir + "/log", proto_class=RobotLog)
 
