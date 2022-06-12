@@ -9,10 +9,12 @@
 #include "software/math/math_functions.h"
 
 PrimitiveExecutor::PrimitiveExecutor(const double time_step,
-                                     const RobotConstants_t& robot_constants)
+                                     const RobotConstants_t& robot_constants,
+                                     const TeamColour friendly_team_colour)
     : current_primitive_(),
       robot_constants_(robot_constants),
-      hrvo_simulator_(static_cast<float>(time_step), robot_constants)
+      hrvo_simulator_(static_cast<float>(time_step), robot_constants,
+                      friendly_team_colour)
 {
 }
 
