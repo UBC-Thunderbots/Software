@@ -255,8 +255,6 @@ class HRVOSimulator
     }
 
    private:
-    unsigned int frame = 0;
-
     // PrimitiveSet which includes the path which each friendly robot should take
     TbotsProto::PrimitiveSet primitive_set;
 

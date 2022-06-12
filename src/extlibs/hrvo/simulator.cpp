@@ -45,12 +45,17 @@
 #include "software/logger/logger.h"
 
 HRVOSimulator::HRVOSimulator(float time_step, const RobotConstants_t &robot_constants)
-    : global_time(0.0f),
-      time_step(time_step),
+    : primitive_set(),
       robot_constants(robot_constants),
+      global_time(0.0f),
+      time_step(time_step),
+      last_time_velocity_updated(0.0f),
       reached_goals(false),
       kd_tree(std::make_unique<KdTree>(this)),
-      world(std::nullopt)
+      world(std::nullopt),
+      agents(),
+      friendly_robot_id_map(),
+      enemy_robot_id_map()
 {
 }
 

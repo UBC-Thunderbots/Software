@@ -32,6 +32,7 @@
     - [Debugging from the Command line](#debugging-from-the-command-line)
   - [Profiling](#profiling)
   - [Building for Jetson Nano](#building-for-jetson-nano)
+  - [Deploying Robot Software to the Jetson Nano](#deploying-to-jetson-nano)
   - [Setting up Virtual Robocup 2021](#setting-up-virtual-robocup-2021)
     - [Setting up the SSL Simulation Environment](#setting-up-the-ssl-simulation-environment)
     - [Pushing a Dockerfile to dockerhub](#pushing-a-dockerfile-to-dockerhub)
@@ -225,6 +226,15 @@ This will output the file at the _absolute_ path given via the `--callgrind-out-
 ## Building for Jetson Nano 
 
 To build for the Jetson Nano, build the target with the `--cpu=jetson_nano` flag and the toolchain will automatically build using the ARM toolchain for Jetson Nano. For example, `bazel build --cpu=jetson_nano //software/geom/...`.
+
+
+## Deploying to Jetson Nano 
+
+We use ansible to automatically update software running on the Jetson Nano. [See these instructions.](/src/software/jetson_nano/ansible/README.md) 
+
+To update binaries on a working robot, you can run:
+
+`./tbots.py run run_ansible --cpu=jetson_nano -- --playbook remote_flash.yml --port 45000 --ssh_pass our_password_here`
 
 ## Setting up Virtual Robocup 2021
 
