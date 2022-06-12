@@ -44,15 +44,20 @@
 #include "software/logger/logger.h"
 
 HRVOSimulator::HRVOSimulator(float time_step, const RobotConstants_t &robot_constants,
-                             const std::string &run_time_dir)
-    : global_time(0.0f),
-      time_step(time_step),
+                             const TeamColour friendly_team_colour)
+    : primitive_set(),
+      add_ball_agent(false),
+      ball_agent_id(-1),
       robot_constants(robot_constants),
+      global_time(0.0f),
+      time_step(time_step),
+      last_time_velocity_updated(0.0f),
       reached_goals(false),
       kd_tree(std::make_unique<KdTree>(this)),
-      hrvo_output(
-          std::make_unique<ThreadedProtoUnixSender<TbotsProto::HRVOVisualization>>(
-              run_time_dir))
+      agents(),
+      friendly_robot_id_map(),
+      enemy_robot_id_map(),
+      friendly_team_colour(friendly_team_colour)
 {
 }
 
@@ -391,13 +396,21 @@ void HRVOSimulator::visualize(unsigned int robot_id) const
     *(hrvo_visualization.mutable_velocity_obstacles()) = {vo_protos.begin(),
                                                           vo_protos.end()};
 
-    for (auto &agent : agents)
+    for (const auto &agent : agents)
     {
         Point position(agent->getPosition());
         *(hrvo_visualization.add_robots()) =
             *createCircleProto(Circle(position, agent->getRadius()));
     }
-    LOG(VISUALIZE, "blue_hrvo") << hrvo_visualization;
+
+    if (friendly_team_colour == TeamColour::YELLOW)
+    {
+        LOG(VISUALIZE, YELLOW_HRVO_PATH) << hrvo_visualization;
+    }
+    else
+    {
+        LOG(VISUALIZE, BLUE_HRVO_PATH) << hrvo_visualization;
+    }
 }
 
 std::optional<std::shared_ptr<HRVOAgent>> HRVOSimulator::getFriendlyAgentFromRobotId(

@@ -235,15 +235,13 @@ void ErForceSimulator::setRobots(
         if (side == gameController::Team::BLUE)
         {
             auto robot_primitive_executor = std::make_shared<PrimitiveExecutor>(
-                primitive_executor_time_step, robot_constants,
-                runtime_dir + BLUE_HRVO_PATH);
+                primitive_executor_time_step, robot_constants, TeamColour::BLUE);
             blue_primitive_executor_map.insert({id, robot_primitive_executor});
         }
         else
         {
             auto robot_primitive_executor = std::make_shared<PrimitiveExecutor>(
-                primitive_executor_time_step, robot_constants,
-                runtime_dir + YELLOW_HRVO_PATH);
+                primitive_executor_time_step, robot_constants, TeamColour::YELLOW);
             yellow_primitive_executor_map.insert({id, robot_primitive_executor});
         }
     }

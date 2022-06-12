@@ -52,10 +52,10 @@ class HRVOSimulator
      * @param time_step The time step between each step of the simulator
      * @param robot_constants The robot constants to be used for all Agents representing a
      * robot
-     * @param run_time_dir The directory to send the hrvo visualization to
+     * @param friendly_team_colour The colour of the friendly team
      */
     explicit HRVOSimulator(float time_step, const RobotConstants_t &robot_constants,
-                           const std::string &run_time_dir);
+                           const TeamColour friendly_team_colour);
 
     /**
      * Reset all agents to match the state of the given world.
@@ -264,16 +264,14 @@ class HRVOSimulator
     }
 
    private:
-    unsigned int frame = 0;
-
     // PrimitiveSet which includes the path which each friendly robot should take
     TbotsProto::PrimitiveSet primitive_set;
 
     // True if the ball should be treated as an agent (obstacle)
     // NOTE: This will take effect the next time we receive a world, and we know
     //       the current ball position and velocity
-    bool add_ball_agent       = false;
-    std::size_t ball_agent_id = -1;
+    bool add_ball_agent;
+    std::size_t ball_agent_id;
 
     // The robot constants which all agents will use
     RobotConstants_t robot_constants;
@@ -290,6 +288,9 @@ class HRVOSimulator
     // True if all agents have reached their destination
     bool reached_goals;
 
+    // The colour of the friendly team
+    const TeamColour friendly_team_colour;
+
     // KdTree used to calculate the K nearest agents
     std::unique_ptr<KdTree> kd_tree;
 
@@ -299,8 +300,6 @@ class HRVOSimulator
     // robot id to agent index
     std::map<unsigned int, unsigned int> friendly_robot_id_map;
     std::map<unsigned int, unsigned int> enemy_robot_id_map;
-
-    std::unique_ptr<ThreadedProtoUnixSender<TbotsProto::HRVOVisualization>> hrvo_output;
 
    public:
     // The scale which friendly robots should be larger than friendly robots

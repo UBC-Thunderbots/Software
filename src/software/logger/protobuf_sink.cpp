@@ -20,28 +20,32 @@ void ProtobufSink::sendProtobuf(g3::LogMessageMover log_entry)
 
     if (level.value == VISUALIZE.value)
     {
-        std::string msg = log_entry.get().message();
-        size_t file_name_pos      = msg.find(TYPE_DELIMITER);
-        std::string file_name  = msg.substr(0, file_name_pos);
+        std::string msg       = log_entry.get().message();
+        size_t file_name_pos  = msg.find(TYPE_DELIMITER);
+        std::string file_name = msg.substr(0, file_name_pos);
+        //        std::cout << "file_name: " << file_name << std::endl;
 
-        size_t proto_type_name_pos      = msg.find(TYPE_DELIMITER, file_name_pos + 1);
-        std::string proto_type_name  = msg.substr(file_name_pos + TYPE_DELIMITER.length(), proto_type_name_pos - 3);
-        std::string serialized_proto = msg.substr(proto_type_name_pos + TYPE_DELIMITER.length());
+        size_t proto_type_name_pos = msg.find(TYPE_DELIMITER, file_name_pos + 1);
+        std::string proto_type_name =
+            msg.substr(file_name_pos + TYPE_DELIMITER.length(), proto_type_name_pos - 3);
+        std::string serialized_proto =
+            msg.substr(proto_type_name_pos + TYPE_DELIMITER.length());
 
         if (file_name.length() == 0)
         {
-            file_name = proto_type_name;
+            file_name = "/" + proto_type_name;
         }
 
         // If we don't already have a unix sender for this type, let's create it
         if (unix_senders_.count(file_name) == 0)
         {
-            unix_senders_[file_name] = std::make_unique<ThreadedUnixSender>(
-                runtime_dir_ + "/" + file_name);
+            unix_senders_[file_name] =
+                std::make_unique<ThreadedUnixSender>(runtime_dir_ + file_name);
         }
 
         // Send the protobuf
         unix_senders_[file_name]->sendString(serialized_proto);
+        //        std::cout << "sent data to: " << runtime_dir_ + file_name << std::endl;
     }
     else
     {
@@ -79,6 +83,7 @@ std::ostream& operator<<(std::ostream& os, const google::protobuf::Message& mess
     std::string serialized_any;
     any.SerializeToString(&serialized_any);
 
-    os << TYPE_DELIMITER << message.GetTypeName() << TYPE_DELIMITER << base64_encode(serialized_any);
+    os << TYPE_DELIMITER << message.GetTypeName() << TYPE_DELIMITER
+       << base64_encode(serialized_any);
     return os;
 }
