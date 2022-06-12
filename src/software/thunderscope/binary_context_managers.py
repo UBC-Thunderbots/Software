@@ -138,31 +138,31 @@ gdb --args bazel-bin/{full_system}
         # Setup LOG(VISUALIZE) handling from full system. We set from_log_visualize
         # to true to decode from base64.
         for arg in [
-            (self.full_system_runtime_dir, Obstacles, True),
-            (self.full_system_runtime_dir, PathVisualization, True),
-            (self.full_system_runtime_dir, PassVisualization, True),
-            (self.full_system_runtime_dir, NamedValue, True),
-            (self.full_system_runtime_dir, PlayInfo, True),
+            {"runtime_dir": self.full_system_runtime_dir, "proto_class": Obstacles, "from_log_visualize": True},
+        {"runtime_dir": self.full_system_runtime_dir, "proto_class": PathVisualization, "from_log_visualize": True},
+        {"runtime_dir": self.full_system_runtime_dir, "proto_class": PassVisualization, "from_log_visualize": True},
+        {"runtime_dir": self.full_system_runtime_dir, "proto_class": NamedValue, "from_log_visualize": True},
+        {"runtime_dir": self.full_system_runtime_dir, "proto_class": PlayInfo, "from_log_visualize": True},
         ]:
-            proto_unix_io.attach_unix_receiver(*arg)
+            proto_unix_io.attach_unix_receiver(**arg)
 
         proto_unix_io.attach_unix_receiver(
-            self.full_system_runtime_dir + "/log", RobotLog
+            self.full_system_runtime_dir, "/log", RobotLog
         )
 
         # Inputs to full_system
         for arg in [
-            (self.full_system_runtime_dir + ROBOT_STATUS_PATH, RobotStatus),
-            (self.full_system_runtime_dir + SSL_WRAPPER_PATH, SSL_WrapperPacket),
-            (self.full_system_runtime_dir + SSL_REFEREE_PATH, Referee),
-            (self.full_system_runtime_dir + SENSOR_PROTO_PATH, SensorProto),
+            (self.full_system_runtime_dir, ROBOT_STATUS_PATH, RobotStatus),
+            (self.full_system_runtime_dir, SSL_WRAPPER_PATH, SSL_WrapperPacket),
+            (self.full_system_runtime_dir, SSL_REFEREE_PATH, Referee),
+            (self.full_system_runtime_dir, SENSOR_PROTO_PATH, SensorProto),
             (
-                self.full_system_runtime_dir + TACTIC_OVERRIDE_PATH,
+                self.full_system_runtime_dir, TACTIC_OVERRIDE_PATH,
                 AssignedTacticPlayControlParams,
             ),
-            (self.full_system_runtime_dir + PLAY_OVERRIDE_PATH, Play),
+            (self.full_system_runtime_dir, PLAY_OVERRIDE_PATH, Play),
             (
-                self.full_system_runtime_dir + DYNAMIC_PARAMETER_UPDATE_REQUEST_PATH,
+                self.full_system_runtime_dir, DYNAMIC_PARAMETER_UPDATE_REQUEST_PATH,
                 ThunderbotsConfig,
             ),
         ]:
@@ -170,10 +170,10 @@ gdb --args bazel-bin/{full_system}
 
         # Outputs from full_system
         proto_unix_io.attach_unix_receiver(
-            self.full_system_runtime_dir + WORLD_PATH, World
+            self.full_system_runtime_dir, WORLD_PATH, World
         )
         proto_unix_io.attach_unix_receiver(
-            self.full_system_runtime_dir + PRIMITIVE_PATH, PrimitiveSet
+            self.full_system_runtime_dir, PRIMITIVE_PATH, PrimitiveSet
         )
 
 
@@ -278,42 +278,42 @@ gdb --args bazel-bin/{simulator_command}
 
         # inputs to er_force_simulator_main
         for arg in [
-            (self.simulator_runtime_dir + SIMULATION_TICK_PATH, SimulatorTick),
-            (self.simulator_runtime_dir + WORLD_STATE_PATH, WorldState),
+            (self.simulator_runtime_dir, SIMULATION_TICK_PATH, SimulatorTick),
+            (self.simulator_runtime_dir, WORLD_STATE_PATH, WorldState),
         ]:
             simulator_proto_unix_io.attach_unix_sender(*arg)
 
         # setup blue full system unix io
         for arg in [
-            (self.simulator_runtime_dir + BLUE_WORLD_PATH, World),
-            (self.simulator_runtime_dir + BLUE_PRIMITIVE_SET, PrimitiveSet),
+            (self.simulator_runtime_dir, BLUE_WORLD_PATH, World),
+            (self.simulator_runtime_dir, BLUE_PRIMITIVE_SET, PrimitiveSet),
         ]:
             blue_full_system_proto_unix_io.attach_unix_sender(*arg)
 
         for arg in [
-            (self.simulator_runtime_dir + BLUE_SSL_WRAPPER_PATH, SSL_WrapperPacket),
-            (self.simulator_runtime_dir + BLUE_ROBOT_STATUS_PATH, RobotStatus),
-            (self.simulator_runtime_dir + SIMULATOR_STATE_PATH, SimulatorState),
+            (self.simulator_runtime_dir, BLUE_SSL_WRAPPER_PATH, SSL_WrapperPacket),
+            (self.simulator_runtime_dir, BLUE_ROBOT_STATUS_PATH, RobotStatus),
+            (self.simulator_runtime_dir, SIMULATOR_STATE_PATH, SimulatorState),
         ] + [
             # TODO (#2655): Add/Remove HRVO layers dynamically based on the HRVOVisualization proto messages
-            (self.simulator_runtime_dir + BLUE_HRVO_PATH, HRVOVisualization)
+            (self.simulator_runtime_dir, BLUE_HRVO_PATH, HRVOVisualization, True)
             for robot_id in range(6)
         ]:
             blue_full_system_proto_unix_io.attach_unix_receiver(*arg)
 
         # setup yellow full system unix io
         for arg in [
-            (self.simulator_runtime_dir + YELLOW_WORLD_PATH, World),
-            (self.simulator_runtime_dir + YELLOW_PRIMITIVE_SET, PrimitiveSet),
+            (self.simulator_runtime_dir, YELLOW_WORLD_PATH, World),
+            (self.simulator_runtime_dir, YELLOW_PRIMITIVE_SET, PrimitiveSet),
         ]:
             yellow_full_system_proto_unix_io.attach_unix_sender(*arg)
 
         for arg in [
-            (self.simulator_runtime_dir + YELLOW_SSL_WRAPPER_PATH, SSL_WrapperPacket),
-            (self.simulator_runtime_dir + YELLOW_ROBOT_STATUS_PATH, RobotStatus),
+            (self.simulator_runtime_dir, YELLOW_SSL_WRAPPER_PATH, SSL_WrapperPacket),
+            (self.simulator_runtime_dir, YELLOW_ROBOT_STATUS_PATH, RobotStatus),
         ] + [
             # TODO (#2655): Add/Remove HRVO layers dynamically based on the HRVOVisualization proto messages
-            (self.simulator_runtime_dir + YELLOW_HRVO_PATH, HRVOVisualization)
+            (self.simulator_runtime_dir, YELLOW_HRVO_PATH, HRVOVisualization, True)
             for robot_id in range(6)
         ]:
             yellow_full_system_proto_unix_io.attach_unix_receiver(*arg)

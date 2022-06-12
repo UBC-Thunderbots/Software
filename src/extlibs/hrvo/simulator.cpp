@@ -397,7 +397,7 @@ void HRVOSimulator::visualize(unsigned int robot_id) const
         *(hrvo_visualization.add_robots()) =
             *createCircleProto(Circle(position, agent->getRadius()));
     }
-    hrvo_output->sendProto(hrvo_visualization);
+    LOG(VISUALIZE, "blue_hrvo") << hrvo_visualization;
 }
 
 std::optional<std::shared_ptr<HRVOAgent>> HRVOSimulator::getFriendlyAgentFromRobotId(
