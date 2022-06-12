@@ -36,7 +36,7 @@ PROCESS_BUFFER_DELAY_S = 0.01
 PAUSE_AFTER_FAIL_DELAY_S = 3
 
 
-class SimulatorTestRunner(object):
+class FieldTestRunner(object):
 
     """Run a simulated test"""
 
@@ -232,12 +232,11 @@ class SimulatorTestRunner(object):
         else:
             __runner()
 
-
 @pytest.fixture
-def simulated_test_runner():
+def field_test_runner():
     args = load_command_line_arguments()
 
-    if args.run_field_test:
+    if not args.run_field_test:
         return
 
     tscope = None
