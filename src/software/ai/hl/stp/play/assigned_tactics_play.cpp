@@ -56,7 +56,6 @@ std::unique_ptr<TbotsProto::PrimitiveSet> AssignedTacticsPlay::get(
             tactic->setLastExecutionRobot(robot.id());
         }
     }
-
     return primitives_to_run;
 }
 
