@@ -9,19 +9,20 @@ RobotNavigationObstacleFactory::RobotNavigationObstacleFactory(
 }
 
 std::vector<ObstaclePtr> RobotNavigationObstacleFactory::createFromMotionConstraint(
-        const TbotsProto::MotionConstraint motion_constraint, const World &world) const
+    const TbotsProto::MotionConstraint motion_constraint, const World &world) const
 {
     std::vector<ObstaclePtr> obstacles;
     auto static_obstacles =
-            createStaticObstaclesFromMotionConstraint(motion_constraint, world.field());
+        createStaticObstaclesFromMotionConstraint(motion_constraint, world.field());
     obstacles.insert(obstacles.end(), static_obstacles.begin(), static_obstacles.end());
 
     auto dynamic_obstacles =
-            createDynamicObstaclesFromMotionConstraint(motion_constraint, world);
+        createDynamicObstaclesFromMotionConstraint(motion_constraint, world);
     obstacles.insert(obstacles.end(), dynamic_obstacles.begin(), dynamic_obstacles.end());
 
     CHECK(dynamic_obstacles.empty() || static_obstacles.empty())
-    << "Motion constraint with value " << static_cast<int>(motion_constraint) << " has both dynamic and static obstacles." << std::endl;
+        << "Motion constraint with value " << static_cast<int>(motion_constraint)
+        << " has both dynamic and static obstacles." << std::endl;
 
     return obstacles;
 }
@@ -132,7 +133,6 @@ RobotNavigationObstacleFactory::createDynamicObstaclesFromMotionConstraint(
             break;
         case TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL:;
             // 0.5 represents half a metre radius
-            // TODO: Should this be 0.5 + ROBOT_RADIUS?
             obstacles.push_back(createFromShape(Circle(world.ball().position(), 0.5)));
             break;
         case TbotsProto::MotionConstraint::AVOID_BALL_PLACEMENT_INTERFERENCE:;

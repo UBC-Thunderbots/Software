@@ -40,8 +40,8 @@
 
 #include "agent.h"
 #include "simulator.h"
-#include "software/geom/vector.h"
 #include "software/ai/navigator/obstacle/robot_navigation_obstacle_factory.h"
+#include "software/geom/vector.h"
 
 /**
  * An agent/robot in the simulation which uses the HRVO algorithm to motion plan towards
@@ -53,20 +53,19 @@ class HRVOAgent : public Agent
     /**
      * Constructor
      *
-     * TODO: Update Javadoc
-     * @param simulator          The simulation.
+     * @param simulator          The simulation which this agent runs in.
      * @param position           The starting position of this agent.
-     * @param goalIndex          The goal number of this agent.
      * @param neighborDist       The maximum neighbor distance of this agent.
      * @param maxNeighbors       The maximum neighbor count of this agent.
      * @param radius             The radius of this agent.
-     * @param goalRadius         The goal radius of this agent.
-     * @param maxSpeed           The maximum speed of this agent.
-     * @param maxAccel           The maximum acceleration of this agent.
      * @param velocity           The initial velocity of this agent.
+     * @param maxAccel           The maximum acceleration of this agent.
+     * @param path               The path to follow.
+     * @param maxSpeed           The maximum speed of this agent.
      */
-    HRVOAgent(HRVOSimulator *simulator, const Vector &position, float neighborDist, std::size_t maxNeighbors,
-              float radius, const Vector &velocity, float maxAccel, AgentPath &path, float maxSpeed);
+    HRVOAgent(HRVOSimulator *simulator, const Vector &position, float neighborDist,
+              std::size_t maxNeighbors, float radius, const Vector &velocity,
+              float maxAccel, AgentPath &path, float maxSpeed);
 
     /**
      * Computes the new velocity of this agent.
@@ -102,8 +101,13 @@ class HRVOAgent : public Agent
      */
     void insertNeighbor(std::size_t agentNo, float &rangeSq);
 
-    // TODO: Javadoc
-    void updatePrimitive(const TbotsProto::Primitive &new_primitive, const World& world);
+    /**
+     * Update the primitive which this agent is currently pursuing.
+     *
+     * @param new_primitive The new primitive to pursue
+     * @param world The world in which the new primitive is being pursued
+     */
+    void updatePrimitive(const TbotsProto::Primitive &new_primitive, const World &world);
 
     /**
      * Get a list of circles which represent the new velocity candidates

@@ -62,7 +62,7 @@ HRVOSimulator::HRVOSimulator(float time_step, const RobotConstants_t &robot_cons
 
 void HRVOSimulator::updateWorld(const World &world)
 {
-    this->world = world;
+    this->world               = world;
     const auto &friendly_team = world.friendlyTeam().getAllRobots();
     const auto &enemy_team    = world.enemyTeam().getAllRobots();
     // TODO (#2498): Update implementation to correctly support adding and removing agents
@@ -174,10 +174,10 @@ std::size_t HRVOSimulator::addHRVORobotAgent(const Robot &robot)
                     unavailable_capabilities.end();
     if (can_move)
     {
-        velocity   = Vector(static_cast<float>(robot.velocity().x()),
+        velocity  = Vector(static_cast<float>(robot.velocity().x()),
                           static_cast<float>(robot.velocity().y()));
-        max_accel  = robot_constants.robot_max_acceleration_m_per_s_2;
-        max_speed  = robot_constants.robot_max_speed_m_per_s;
+        max_accel = robot_constants.robot_max_acceleration_m_per_s_2;
+        max_speed = robot_constants.robot_max_speed_m_per_s;
     }
 
     // TODO (#2418): Replace destination point with a list of path points
@@ -212,13 +212,13 @@ std::size_t HRVOSimulator::addHRVORobotAgent(const Robot &robot)
     }
 
     // Max distance which the robot can travel in one time step + scaling
-    float path_radius        = (max_speed * time_step) / 2;
+    float path_radius = (max_speed * time_step) / 2;
 
     AgentPath path =
         AgentPath({PathPoint(destination_point, speed_at_goal)}, path_radius);
 
-    return addHRVOAgent(position, agent_radius, velocity, max_speed,
-                        max_accel, path, MAX_NEIGHBOR_SEARCH_DIST, MAX_NEIGHBORS);
+    return addHRVOAgent(position, agent_radius, velocity, max_speed, max_accel, path,
+                        MAX_NEIGHBOR_SEARCH_DIST, MAX_NEIGHBORS);
 }
 
 std::size_t HRVOSimulator::addLinearVelocityRobotAgent(const Robot &robot,
@@ -241,9 +241,10 @@ std::size_t HRVOSimulator::addLinearVelocityRobotAgent(const Robot &robot,
                                   path);
 }
 
-std::size_t
-HRVOSimulator::addHRVOAgent(const Vector &position, float agent_radius, const Vector &curr_velocity, float maxSpeed,
-                            float maxAccel, AgentPath &path, float neighborDist, std::size_t maxNeighbors)
+std::size_t HRVOSimulator::addHRVOAgent(const Vector &position, float agent_radius,
+                                        const Vector &curr_velocity, float maxSpeed,
+                                        float maxAccel, AgentPath &path,
+                                        float neighborDist, std::size_t maxNeighbors)
 {
     std::shared_ptr<HRVOAgent> agent = std::make_shared<HRVOAgent>(
         this, position, neighborDist, maxNeighbors, agent_radius, curr_velocity, maxAccel,

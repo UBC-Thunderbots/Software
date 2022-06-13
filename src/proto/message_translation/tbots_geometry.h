@@ -7,7 +7,6 @@
 #include "software/geom/circle.h"
 #include "software/geom/point.h"
 #include "software/geom/polygon.h"
-#include "software/ai/navigator/path_planner/hrvo/velocity_obstacle.h"
 
 /**
  * Internal geometry types to protobuf msg conversions

@@ -10,9 +10,9 @@
 #include "software/ai/navigator/obstacle/obstacle_visitor.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/algorithms/distance.h"
+#include "software/geom/algorithms/generate_velocity_obstacle.h"
 #include "software/geom/algorithms/intersects.h"
 #include "software/geom/algorithms/rasterize.h"
-#include "software/geom/algorithms/generate_velocity_obstacle.h"
 #include "software/geom/point.h"
 #include "software/geom/segment.h"
 
@@ -61,7 +61,8 @@ class Obstacle
     /**
      * Draw a velocity obstacle for the given agent to this obstacle
      */
-    virtual VelocityObstacle generateVelocityObstacle(const Circle &, const Vector&) const = 0;
+    virtual VelocityObstacle generateVelocityObstacle(const Circle&,
+                                                      const Vector&) const = 0;
 
     /**
      * Output string to describe the obstacle
@@ -108,7 +109,8 @@ class GeomObstacle : public Obstacle
     std::string toString(void) const override;
     void accept(ObstacleVisitor& visitor) const override;
     std::vector<Point> rasterize(const double resolution_size) const override;
-    VelocityObstacle generateVelocityObstacle(const Circle &, const Vector&) const override;
+    VelocityObstacle generateVelocityObstacle(const Circle&,
+                                              const Vector&) const override;
 
     /**
      * Gets the underlying GEOM_TYPE
@@ -178,7 +180,8 @@ TbotsProto::Obstacles GeomObstacle<GEOM_TYPE>::createObstacleProto() const
 }
 
 template <typename GEOM_TYPE>
-VelocityObstacle GeomObstacle<GEOM_TYPE>::generateVelocityObstacle(const Circle &robot, const Vector& obstacle_velocity) const
+VelocityObstacle GeomObstacle<GEOM_TYPE>::generateVelocityObstacle(
+    const Circle& robot, const Vector& obstacle_velocity) const
 {
     return ::generateVelocityObstacle(geom_, robot, obstacle_velocity);
 }

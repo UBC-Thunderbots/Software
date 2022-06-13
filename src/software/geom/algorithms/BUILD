@@ -35,6 +35,7 @@ cc_library(
         "voronoi_diagram.h",
     ],
     deps = [
+        "//software/ai/navigator/path_planner/hrvo:velocity_obstacle",
         "//software/geom:angle",
         "//software/geom:circle",
         "//software/geom:geom_constants",
@@ -47,7 +48,6 @@ cc_library(
         "//software/geom:segment",
         "//software/geom:vector",
         "//software/logger",
-        "//software/ai/navigator/path_planner/hrvo:velocity_obstacle",
     ],
 )
 
