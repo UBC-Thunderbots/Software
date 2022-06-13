@@ -137,6 +137,10 @@ if __name__ == "__main__":
         except OSError:
             pass
 
+        tscope = Thunderscope(
+            layout_path=args.layout,
+            visualization_buffer_size=args.visualization_buffer_size,
+        )
         proto_unix_io = tscope.blue_full_system_proto_unix_io
 
         # Setup LOG(VISUALIZE) handling from full system. We set from_log_visualize
@@ -148,16 +152,13 @@ if __name__ == "__main__":
             (runtime_dir, NamedValue, True),
             (runtime_dir, World, True),
             (runtime_dir, PlayInfo, True),
+            (runtime_dir, PrimitiveSet, True),
+            (runtime_dir, HRVOVisualization, True),
         ]:
             proto_unix_io.attach_unix_receiver(*arg)
 
         proto_unix_io.attach_unix_receiver(runtime_dir + "/log", RobotLog)
 
-        tscope = Thunderscope(
-            layout_path=args.layout,
-            load_yellow=load_yellow,
-            visualization_buffer_size=args.visualization_buffer_size,
-        )
         tscope.show()
 
     ###########################################################################

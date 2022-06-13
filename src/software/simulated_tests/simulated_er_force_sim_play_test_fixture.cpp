@@ -5,41 +5,35 @@
 #include "software/test_util/test_util.h"
 
 SimulatedErForceSimPlayTestFixture::SimulatedErForceSimPlayTestFixture()
-    : ai_config(friendly_mutable_thunderbots_config->getMutableAiConfig()),
-      sensor_fusion_config(
-          friendly_mutable_thunderbots_config->getMutableSensorFusionConfig()),
-      game_state(),
-      ai(friendly_thunderbots_config->getAiConfig())
+    : game_state(), ai(friendly_thunderbots_config.ai_config())
 {
 }
 
 void SimulatedErForceSimPlayTestFixture::SetUp()
 {
     SimulatedErForceSimTestFixture::SetUp();
-
-    ai_config = friendly_mutable_thunderbots_config->getMutableAiConfig();
-    sensor_fusion_config =
-        friendly_mutable_thunderbots_config->getMutableSensorFusionConfig();
-
-    ai = AI(friendly_thunderbots_config->getAiConfig());
 }
 
 void SimulatedErForceSimPlayTestFixture::setFriendlyGoalie(RobotId goalie_id)
 {
-    sensor_fusion_config->getMutableFriendlyGoalieId()->setValue(
+    friendly_thunderbots_config.mutable_sensor_fusion_config()->set_friendly_goalie_id(
         static_cast<int>(goalie_id));
 }
 
 void SimulatedErForceSimPlayTestFixture::setEnemyGoalie(RobotId goalie_id)
 {
-    sensor_fusion_config->getMutableEnemyGoalieId()->setValue(
+    friendly_thunderbots_config.mutable_sensor_fusion_config()->set_enemy_goalie_id(
         static_cast<int>(goalie_id));
 }
 
-void SimulatedErForceSimPlayTestFixture::setAIPlay(const std::string& ai_play)
+void SimulatedErForceSimPlayTestFixture::setAIPlay(
+    const TbotsProto::PlayName& ai_play_name)
 {
-    ai_config->getMutableAiControlConfig()->getMutableOverrideAiPlay()->setValue(true);
-    ai_config->getMutableAiControlConfig()->getMutableCurrentAiPlay()->setValue(ai_play);
+    friendly_thunderbots_config.mutable_ai_config()
+        ->mutable_ai_control_config()
+        ->set_override_ai_play(ai_play_name);
+
+    ai = AI(friendly_thunderbots_config.ai_config());
 }
 
 void SimulatedErForceSimPlayTestFixture::setAIPlay(std::unique_ptr<Play> play)
@@ -57,10 +51,9 @@ void SimulatedErForceSimPlayTestFixture::setTactic(
     RobotId id, std::shared_ptr<Tactic> tactic,
     std::set<TbotsProto::MotionConstraint> motion_constraints)
 {
-    ai_config->getMutableAiControlConfig()->getMutableOverrideAiPlay()->setValue(false);
     CHECK(static_cast<bool>(tactic)) << "Tactic is invalid" << std::endl;
     std::unique_ptr<AssignedTacticsPlay> play =
-        std::make_unique<AssignedTacticsPlay>(ai_config);
+        std::make_unique<AssignedTacticsPlay>(friendly_thunderbots_config.ai_config());
     std::map<RobotId, std::set<TbotsProto::MotionConstraint>>
         motion_constraint_override_map;
     motion_constraint_override_map[id] = motion_constraints;
@@ -91,24 +84,22 @@ void SimulatedErForceSimPlayTestFixture::updatePrimitives(
     auto start_tick_time = std::chrono::system_clock::now();
 
     auto primitive_set_msg = ai.getPrimitives(world_with_updated_game_state);
-    double duration_ms     = ::TestUtil::millisecondsSince(start_tick_time);
+    LOG(VISUALIZE) << ai.getPlayInfo();
+    LOG(VISUALIZE) << *primitive_set_msg;
+
+    double duration_ms = ::TestUtil::millisecondsSince(start_tick_time);
     registerFriendlyTickTime(duration_ms);
     auto world_msg = createWorld(world_with_updated_game_state);
     simulator_to_update->setYellowRobotPrimitiveSet(*primitive_set_msg,
                                                     std::move(world_msg));
 }
 
-const std::shared_ptr<AiConfig> SimulatedErForceSimPlayTestFixture::getAiConfig() const
+const TbotsProto::AiConfig SimulatedErForceSimPlayTestFixture::getAiConfig() const
 {
-    return ai_config;
+    return friendly_thunderbots_config.ai_config();
 }
 
 std::optional<TbotsProto::PlayInfo> SimulatedErForceSimPlayTestFixture::getPlayInfo()
 {
     return ai.getPlayInfo();
-}
-
-AIDrawFunction SimulatedErForceSimPlayTestFixture::getDrawFunctions()
-{
-    return AIDrawFunction([](QGraphicsScene* scene) {});
 }

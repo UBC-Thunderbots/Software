@@ -51,6 +51,7 @@ cc_library(
     deps = [
         "//proto:visualization_cc_proto",
         "//proto/primitive:primitive_msg_factory",
+        "//software/ai/navigator/path_planner/hrvo:velocity_obstacle",
         "//software/geom:vector",
         "//software/world",
     ],

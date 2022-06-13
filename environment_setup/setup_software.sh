@@ -50,6 +50,7 @@ host_software_packages=(
                       # properly manage this as a bazel dependency, so we have
                       # to manually install it ourselves
     python3       # Python 3
+    python3-dev # Python 3 headers
     python3-venv # Virtual Environment
     python3-pip   # Required for bazel to install python dependencies for build targets
     python3-protobuf # This is required for the "NanoPb" library, which does not
@@ -63,6 +64,7 @@ host_software_packages=(
     libffi-dev # needed to use _ctypes in Python3
     libssl-dev # needed to build Python 3 with ssl support
     openssl # possibly also necessary for ssl in Python 3
+    sshpass #used to remotely ssh into robots via Ansible
 )
 
 if [[ $(lsb_release -rs) == "20.04" ]]; then
@@ -157,21 +159,10 @@ echo "================================================================"
 echo "Installing Bazel"
 echo "================================================================"
 
-# Adapted from https://docs.bazel.build/versions/master/install-ubuntu.html#install-on-ubuntu
-sudo apt install apt-transport-https curl gnupg -y
-curl -fsSL https://bazel.build/bazel-release.pub.gpg | gpg --dearmor > bazel.gpg
-sudo mv bazel.gpg /etc/apt/trusted.gpg.d/
-echo "deb [arch=amd64] https://storage.googleapis.com/bazel-apt stable jdk1.8" | sudo tee /etc/apt/sources.list.d/bazel.list
-sudo apt-get update
-if ! sudo apt-get install bazel-5.0.0 -y ; then
-    echo "##############################################################"
-    echo "Error: Installing Bazel failed"
-    echo "If you have a newer version installed, please manually downgrade"
-    echo "##############################################################"
-    exit 1
-fi
-sudo rm -f /usr/bin/bazel # remove symlink
-sudo ln -s /usr/bin/bazel-5.0.0 /usr/bin/bazel
+# Adapted from https://docs.bazel.build/versions/main/install-ubuntu.html#install-with-installer-ubuntu
+sudo wget -nc https://github.com/bazelbuild/bazel/releases/download/5.0.0/bazel-5.0.0-installer-linux-x86_64.sh -O /tmp/bazel-installer.sh
+sudo chmod +x /tmp/bazel-installer.sh
+sudo /tmp/bazel-installer.sh --bin=/usr/bin --base=$HOME/.bazel
 
 echo "================================================================"
 echo "Done Installing Bazel"
@@ -199,7 +190,7 @@ sudo service udev restart
 sudo usermod -a -G dialout $USER
 
 # installs PlatformIO to global environment
-if ! sudo /usr/bin/python3.8 -m pip install --prefix /usr/local platformio==5.2.4; then
+if ! sudo /usr/bin/python3.8 -m pip install --prefix /usr/local platformio==6.0.2; then
     echo "##############################################################"
     echo "Error: Installing PlatformIO failed"
     echo "##############################################################"

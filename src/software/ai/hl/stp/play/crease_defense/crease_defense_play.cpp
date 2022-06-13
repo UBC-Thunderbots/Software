@@ -1,11 +1,11 @@
 #include "software/ai/hl/stp/play/crease_defense/crease_defense_play.h"
 
+#include "proto/parameters.pb.h"
 #include "shared/constants.h"
-#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/logger/logger.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-CreaseDefensePlay::CreaseDefensePlay(std::shared_ptr<const AiConfig> config)
+CreaseDefensePlay::CreaseDefensePlay(TbotsProto::AiConfig config)
     : Play(config, true),
       fsm{CreaseDefensePlayFSM{config}},
       control_params{
@@ -38,4 +38,5 @@ void CreaseDefensePlay::updateTactics(const PlayUpdate &play_update)
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, CreaseDefensePlay, AiConfig> factory;
+static TGenericFactory<std::string, Play, CreaseDefensePlay, TbotsProto::AiConfig>
+    factory;
