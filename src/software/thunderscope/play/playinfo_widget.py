@@ -28,7 +28,6 @@ class playInfoWidget(QTableWidget):
 
         self.playinfo_buffer = ThreadSafeBuffer(buffer_size, PlayInfo, False)
         self.verticalHeader().setVisible(False)
-        self.horizontalHeader().setVisible(False)
 
     def set_data(self, data):
         """Data to set in the table
@@ -36,24 +35,29 @@ class playInfoWidget(QTableWidget):
         :param data: dict containing {"column_name": [column_items]}
 
         """
+        horizontal_headers = []
 
         # empirically makes even bolded items fit within columns
-        SIZE_HINT_WIDTH_EXPANSION = 10
+        HEADER_SIZE_HINT_WIDTH_EXPANSION = 12
+        ITEM_SIZE_HINT_WIDTH_EXPANSION = 10
 
         for n, key in enumerate(data.keys()):
-            newitem = QTableWidgetItem(key)
-            font = newitem.font()
-            font.setBold(True)
-            newitem.setFont(font)
-            newitem.setSizeHint(QtCore.QSize(len(key) * SIZE_HINT_WIDTH_EXPANSION, 1))
-            self.setItem(0, n, newitem)
+            horizontal_headers.append(key)
 
             for m, item in enumerate(data[key]):
                 newitem = QTableWidgetItem(item)
                 newitem.setSizeHint(
-                    QtCore.QSize(len(item) * SIZE_HINT_WIDTH_EXPANSION, 1)
+                    QtCore.QSize(
+                        max(
+                            len(key) * HEADER_SIZE_HINT_WIDTH_EXPANSION,
+                            len(item) * ITEM_SIZE_HINT_WIDTH_EXPANSION,
+                        ),
+                        1,
+                    )
                 )
-                self.setItem(m + 1, n, newitem)
+                self.setItem(m, n, newitem)
+
+        self.setHorizontalHeaderLabels(horizontal_headers)
 
     def refresh(self):
         """Update the play info widget with new play information
@@ -70,12 +74,9 @@ class playInfoWidget(QTableWidget):
         if "robotTacticAssignment" not in play_info_dict:
             return
 
-        num_rows = (
-            max(
-                len(play_info_dict["robotTacticAssignment"]),
-                len(play_info_dict["play"]["playState"]),
-            )
-            + 1  # one more row the custom header
+        num_rows = max(
+            len(play_info_dict["robotTacticAssignment"]),
+            len(play_info_dict["play"]["playState"]),
         )
 
         # setting table size dynamically

@@ -43,6 +43,7 @@ class WorldLayer(FieldLayer):
         self.mouse_clicked = False
 
         self.key_pressed = {}
+        self.display_robot_id = False
 
         self.accepted_keys = [Qt.Key.Key_Control, Qt.Key.Key_I]
         for key in self.accepted_keys:
@@ -70,6 +71,8 @@ class WorldLayer(FieldLayer):
 
         """
         self.key_pressed[event.key()] = True
+        if event.key() == QtCore.Qt.Key.Key_I:
+            self.display_robot_id = not self.display_robot_id
 
     def keyReleaseEvent(self, event):
         """Detect when a key has been released (override)
@@ -350,7 +353,7 @@ class WorldLayer(FieldLayer):
                 (robot.current_state.global_position.y_meters * MILLIMETERS_PER_METER)
                 - ROBOT_MAX_RADIUS_MILLIMETERS,
             )
-            robot_id_map[robot.id].setVisible(self.key_pressed[Qt.Key.Key_I])
+            robot_id_map[robot.id].setVisible(self.display_robot_id)
 
             painter.setPen(pg.mkPen(color))
             painter.setBrush(pg.mkBrush(color))

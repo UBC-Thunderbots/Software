@@ -4,13 +4,18 @@ import board
 from PIL import Image, ImageDraw, ImageOps
 import adafruit_rgb_display.st7735 as st7735
 
-from software.display.lcd_user_interface import LcdDisplay
-from software.display.rotary_encoder import RotaryEncoder
-from software.display.screens.home_screen import HomeScreen
-from software.display.screens.menu_screen import MenuScreen
-from software.display.screens.wheels_screen import WheelsScreen
-from software.display.screens.chip_and_kick_screen import ChipAndKickScreen
-import software.display.constants as constants
+from software.jetson_nano.display.lcd_user_interface.lcd_user_interface import (
+    LcdDisplay,
+)
+
+import argparse
+from threading import Thread
+from software.jetson_nano.display.rotary_encoder.rotary_encoder import RotaryEncoder
+from software.jetson_nano.display.screens.home_screen import HomeScreen
+from software.jetson_nano.display.screens.menu_screen import MenuScreen
+from software.jetson_nano.display.screens.wheels_screen import WheelsScreen
+from software.jetson_nano.display.screens.chip_and_kick_screen import ChipAndKickScreen
+import software.jetson_nano.display.constants as constants
 
 # Pins for Rotary Encoder
 BUTTON_PIN = constants.BUTTON_PIN
@@ -61,8 +66,12 @@ class RobotUi:
     the following command: 'sudo modprobe spidev'
     """
 
-    def __init__(self):
+    def __init__(self, boot_screen_path):
+        """Initialize the RoboUi
 
+        :param boot_screen_path: The path to the tbots logo
+
+        """
         # Initialize redis server and our redis dictionary
         self.redis_client = redis.Redis(
             host="localhost", port=constants.REDIS_PORT_NUMBER, db=0
@@ -74,7 +83,7 @@ class RobotUi:
 
         # Draw Tbots logo on first boot
         self.lcd_display = LcdDisplay()
-        self.lcd_display.draw_image("./lcd_user_interface/imgs/tbots.jpg")
+        self.lcd_display.draw_image(boot_screen_path)
         self.curr_screen = "Home"
 
         # All of our screens
@@ -141,10 +150,16 @@ class RobotUi:
         self.rotary_encoder.stop()
 
 
-# For testing
 if __name__ == "__main__":
-    import subprocess
-    from threading import Thread
+
+    ap = argparse.ArgumentParser()
+    ap.add_argument(
+        "--path_to_boot_screen",
+        required=True,
+        type=str,
+        help="path to image to show on boot",
+    )
+    args = vars(ap.parse_args())
 
     def init_redis():
         redis_client = redis.Redis(
@@ -156,20 +171,9 @@ if __name__ == "__main__":
     def start_polling(robot_ui):
         robot_ui.poll_redis()
 
-    # start redis server
-    cmd = "cd ../linux_configs/redis_config && sudo docker-compose up -d"
-    st, out = subprocess.getstatusoutput(cmd)
-    init_redis()
-
-    robot_ui = RobotUi()
+    robot_ui = RobotUi(boot_screen_path=args["path_to_boot_screen"])
     thread = Thread(target=start_polling, args=(robot_ui,))
     thread.start()
 
-    print("Press any key to exit...")
-    input()
-    robot_ui.stop()
-    thread.join()
-
-    # stop redis server
-    cmd = "cd ../linux_configs/redis_config && sudo docker-compose down"
-    st, out = subprocess.getstatusoutput(cmd)
+    while True:
+        time.sleep(1)
