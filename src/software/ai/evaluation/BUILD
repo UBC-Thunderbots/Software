@@ -1,20 +1,19 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "pass",
-    srcs = ["pass.cpp"],
-    hdrs = ["pass.h"],
+    name = "time_to_travel",
+    srcs = ["time_to_travel.cpp"],
+    hdrs = ["time_to_travel.h"],
     deps = [
-        "//software/ai/evaluation:calc_best_shot",
-        "//software/world:robot",
+        "//software/time:duration",
     ],
 )
 
 cc_test(
-    name = "pass_test",
-    srcs = ["pass_test.cpp"],
+    name = "time_to_travel_test",
+    srcs = ["time_to_travel_test.cpp"],
     deps = [
-        ":pass",
+        ":time_to_travel",
         "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
     ],
@@ -147,7 +146,7 @@ cc_library(
     deps = [
         ":shot",
         "//shared:constants",
-        "//software/ai/evaluation:pass",
+        "//software/ai/evaluation:time_to_travel",
         "//software/geom/algorithms",
         "//software/optimization:gradient_descent",
         "//software/world:ball",
@@ -173,10 +172,7 @@ cc_library(
     deps = [
         ":intercept",
         ":shot",
-        "//software/world:ball",
-        "//software/world:field",
-        "//software/world:robot",
-        "//software/world:team",
+        "//software/world",
     ],
 )
 

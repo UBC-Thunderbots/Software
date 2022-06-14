@@ -26,10 +26,7 @@ Point DribbleFSM::findInterceptionPoint(const Robot &robot, const Ball &ball,
     {
         Duration ball_time_to_position = Duration::fromSeconds(
             distance(intercept_position, ball.position()) / ball.velocity().length());
-        Duration robot_time_to_pos = getTimeToPositionForRobot(
-            robot.position(), intercept_position,
-            robot.robotConstants().robot_max_speed_m_per_s,
-            robot.robotConstants().robot_max_acceleration_m_per_s_2);
+        Duration robot_time_to_pos = robot.getTimeToPosition(intercept_position);
 
         if (robot_time_to_pos < ball_time_to_position)
         {

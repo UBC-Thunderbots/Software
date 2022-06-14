@@ -14,10 +14,10 @@ py_binary(
         "//software/jetson_nano:setup_nano",
         "//software/jetson_nano:thunderloop_main",
         "//software/jetson_nano/broadcasts:robot_broadcast_receiver",
-        "//software/jetson_nano/broadcasts:robot_broadcast_sender",
-        "//software/jetson_nano/display:robot_ui",
+        "//software/jetson_nano/broadcasts:robot_broadcast_sender_zip",
+        "//software/jetson_nano/display:robot_ui_zip",
+        "//software/jetson_nano/linux_configs/systemd:systemd_files",
         "//software/jetson_nano/redis",
-        "//software/jetson_nano/systemd:systemd_files",
     ],
     deps = [
         requirement("ansible"),

@@ -135,7 +135,7 @@ if [[ $(lsb_release -rs) == "20.04" ]]; then
 fi
 
 
-if ! sudo /opt/tbotspython/bin/pip3 install --upgrade protobuf  ; then
+if ! sudo /opt/tbotspython/bin/pip3 install protobuf==3.20.1  ; then
     echo "##############################################################"
     echo "Error: Installing protobuf failed"
     echo "##############################################################"
@@ -190,7 +190,7 @@ sudo service udev restart
 sudo usermod -a -G dialout $USER
 
 # installs PlatformIO to global environment
-if ! sudo /usr/bin/python3.8 -m pip install --prefix /usr/local platformio==5.2.4; then
+if ! sudo /usr/bin/python3.8 -m pip install --prefix /usr/local platformio==6.0.2; then
     echo "##############################################################"
     echo "Error: Installing PlatformIO failed"
     echo "##############################################################"

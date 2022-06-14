@@ -171,6 +171,7 @@ struct ReceiverFSM
             OneTouchShotState_S + Update_E[!passFinished_G && strayPass_G] /
                                       adjustReceive_A = ReceiveAndDribbleState_S,
             ReceiveAndDribbleState_S + Update_E[passFinished_G] / adjustReceive_A = X,
-            OneTouchShotState_S + Update_E[passFinished_G] / updateOnetouch_A     = X);
+            OneTouchShotState_S + Update_E[passFinished_G] / updateOnetouch_A     = X,
+            X + Update_E / SET_STOP_PRIMITIVE_ACTION                              = X);
     }
 };

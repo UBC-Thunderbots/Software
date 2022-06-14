@@ -18,7 +18,6 @@ HOST_GROUP = "THUNDERBOTS_HOSTS"
 NANO_USER = "robot"
 ANNOUNCEMENT_LISTEN_DURATION_S = 10
 
-
 # loads variables, inventory, and play into Ansible API, then runs it
 def ansible_runner(playbook: str, options: dict = {}):
     loader = DataLoader()

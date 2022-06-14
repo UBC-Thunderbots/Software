@@ -31,12 +31,14 @@ py_library(
         "//software/thunderscope:colors",
         "//software/thunderscope:common_widgets",
         "//software/thunderscope:constants",
+        "//software/thunderscope:dock_label_style",
         "//software/thunderscope:proto_unix_io",
         "//software/thunderscope:robot_communication",
         "//software/thunderscope/arbitrary_plot:named_value_plotter",
         "//software/thunderscope/common:proto_configuration_widget",
         "//software/thunderscope/field",
         "//software/thunderscope/field:field_layer",
+        "//software/thunderscope/field:hrvo_layer",
         "//software/thunderscope/field:obstacle_layer",
         "//software/thunderscope/field:passing_layer",
         "//software/thunderscope/field:path_layer",
@@ -73,6 +75,11 @@ py_library(
 py_library(
     name = "common_widgets",
     srcs = ["common_widgets.py"],
+)
+
+py_library(
+    name = "dock_label_style",
+    srcs = ["dock_label_style.py"],
 )
 
 py_library(
