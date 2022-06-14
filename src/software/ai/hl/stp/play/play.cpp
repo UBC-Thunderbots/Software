@@ -229,36 +229,18 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::getPrimitivesFromTactic(
             TbotsProto::MotionControl motion_control;
             TbotsProto::Path path_proto;
 
-            for (const auto &motion_constraint : motion_constraints)
-            {
-                motion_control.add_motion_constraints(motion_constraint);
-            }
-
-            *(motion_control.mutable_static_obstacles()) = obstacles;
-
             // first point is always the robot_position
             std::vector<Point> path_points = {robot_position, robot_position};
             auto path = path_planner->findPath(robot_position, destination);
             *(motion_control.mutable_requested_destination()) =
                 *createPointProto(destination);
 
-            // TODO (#2610): we shouldn't have to check that the path has at least two
-            // knots, since the EnlsvgPathPlanner should always find paths with two points
-            if (path.has_value() && path.value().getKnots().size() >= 2)
+            if (path.has_value())
             {
                 path_points = path.value().getKnots();
                 motion_control.set_normalized_path_length(
                     EnlsvgPathPlanner::pathLength(path_points, robot_position) /
                     EnlsvgPathPlanner::MAX_PATH_LENGTH);
-            }
-            else if (path.has_value() && path.value().getKnots().size() == 1)
-            {
-                path_points = path.value().getKnots();
-                LOG(FATAL) << motion_control.DebugString()
-                           << "Path Point Size: " << path_points.size()
-                           << " Point: " << path_points.at(0)
-                           << " Robot Position: " << robot_position
-                           << " Destination: " << destination << std::endl;
             }
             else
             {
@@ -272,7 +254,12 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::getPrimitivesFromTactic(
                 *(path_proto.add_points()) = *createPointProto(point);
             }
             *(motion_control.mutable_path()) = path_proto;
+            for (const auto &motion_constraint : motion_constraints)
+            {
+                motion_control.add_motion_constraints(motion_constraint);
+            }
 
+            *(motion_control.mutable_static_obstacles()) = obstacles;
 
             return motion_control;
         };
