@@ -251,9 +251,14 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::getPrimitivesFromTactic(
                     EnlsvgPathPlanner::pathLength(path_points, robot_position) /
                     EnlsvgPathPlanner::MAX_PATH_LENGTH);
             }
-            else if (path.has_value() && path.value().getKnots().size() == 1) {
+            else if (path.has_value() && path.value().getKnots().size() == 1)
+            {
                 path_points = path.value().getKnots();
-                LOG(FATAL) << motion_control.DebugString() << "Path Point Size: " << path_points.size() << " Point: " << path_points.at(0) << " Robot Position: " << robot_position << " Destination: " << destination << std::endl;
+                LOG(FATAL) << motion_control.DebugString()
+                           << "Path Point Size: " << path_points.size()
+                           << " Point: " << path_points.at(0)
+                           << " Robot Position: " << robot_position
+                           << " Destination: " << destination << std::endl;
             }
             else
             {
