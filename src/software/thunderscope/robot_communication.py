@@ -1,7 +1,7 @@
 from software.py_constants import *
-from proto.import_all_protos import *
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.python_bindings import *
+from proto.import_all_protos import *
 
 
 class RobotCommunication(object):
@@ -26,7 +26,7 @@ class RobotCommunication(object):
 
         """
         self.proto_unix_io = proto_unix_io
-        self.multicast_channel = multicast_channel
+        self.multicast_channel = str(multicast_channel)
         self.interface = interface
         self.estop_path = estop_path
         self.estop_buadrate = estop_buadrate
@@ -44,25 +44,49 @@ class RobotCommunication(object):
         except Exception:
             raise Exception("Could not find estop, make sure its plugged in")
 
+        self.run_thread = Thread(target=self.run)
+
+    def run(self):
+        """Run the robot communication
+
+        Only sends the primitive set if the estop is not pressed
+        Always sends the latest world
+
+        NOTE: This loop runs as fast as we receive worlds and primitive sets.
+        We send out the new world and new primitive set
+
+        """
+
+        world = self.world_buffer.get(block=True)
+        primitive_set = self.primitive_buffer.get(block=True)
+
+        if self.estop_reader.isEstopPlay():
+            self.primitive_set_mcast_sender.send(primitive_set)
+
+        self.world_mcast_sender.send(world)
+
     def __enter__(self):
 
         """ Enter RobotCommunication context manager """
 
         # Create the multicast channels
-        self.receive_robot_status = networking.RobotStatusProtoListener(
+        self.receive_robot_status = RobotStatusProtoListener(
             self.multicast_channel + "%" + self.interface,
             ROBOT_STATUS_PORT,
             lambda data: self.proto_unix_io.send_proto(RobotStatus, data),
             True,
         )
 
-        self.send_primitive_set = networking.PrimitiveSetProtoSender(
+        self.send_primitive_mcast_sender = PrimitiveSetProtoSender(
             self.multicast_channel + "%" + self.interface, PRIMITIVE_PORT, True
         )
 
-        self.send_world = networking.WorldProtoSender(
+        self.send_world_mcast_sender = WorldProtoSender(
             self.multicast_channel + "%" + self.interface, VISION_PORT, True
         )
 
     def __exit__(self):
+
         """ Exit RobotCommunication context manager """
+
+        self.run_thread.join()

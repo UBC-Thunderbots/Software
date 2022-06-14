@@ -9,7 +9,7 @@ from pyqtgraph.Qt.QtWidgets import *
 
 from software.py_constants import *
 from software.thunderscope.constants import LINE_WIDTH
-from software.thunderscope.colors import Colors
+from software.thunderscope.constants import Colors
 from software.networking.threaded_unix_listener import ThreadedUnixListener
 from software.thunderscope.field.field_layer import FieldLayer
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
