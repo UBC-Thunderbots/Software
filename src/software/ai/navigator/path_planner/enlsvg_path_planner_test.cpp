@@ -837,7 +837,6 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_simulated_hrvo)
     EnlsvgPathPlanner planner =
         EnlsvgPathPlanner(navigable_area, obstacles, field.boundaryMargin());
 
-    // DEBUG findPath()
     auto path = planner.findPath(start, dest);
     EXPECT_TRUE(path != std::nullopt);
     std::vector<Point> path_points = path->getKnots();
