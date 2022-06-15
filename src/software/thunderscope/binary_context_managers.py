@@ -118,7 +118,7 @@ gdb --args bazel-bin/{full_system}
 
         else:
             self.full_system_proc = Popen(self.full_system.split(" "))
-            if should_restart_on_crash:
+            if self.should_restart_on_crash:
                 self.thread.start()
 
         return self
