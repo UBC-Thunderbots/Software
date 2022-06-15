@@ -1,4 +1,5 @@
 import time
+import random
 
 import numpy as np
 import pyqtgraph as pg
@@ -120,41 +121,56 @@ class ProtoPlotter(QWidget):
 
         self.width = 100
         self.main_layout = QHBoxLayout()
-        self.plot_and_settings_layout = QVBoxLayout()
+        self.plot_selection_and_settings_layout = QVBoxLayout()
 
         self.plot = GLViewWidget2DPlot(
             grid_cell_size=self.width, grid_width=10, grid_height=10
         )
 
+        self.buffers = {
+            key: ThreadSafeBuffer(buffer_size, key) for key in configuration.keys()
+        }
+
         self.last_update_time = time.time()
         self.last_incoming_value = {}
-        self.color = 0
 
         self.configuration = configuration
         self.deque_size = int(window_secs * plot_rate_hz)
         self.update_interval = 1.0 / plot_rate_hz
 
-        self.graph_settings = QGroupBox()
-        self.graph_settings_layout = QHBoxLayout()
+        self.graph_settings_layout = QVBoxLayout()
 
-        self.graph_settings_layout.addWidget(QSpinBox())
-        self.graph_settings_layout.addWidget(QSpinBox())
-        self.graph_settings_layout.addWidget(QSpinBox())
-        self.graph_settings.setLayout(self.graph_settings_layout)
+        # Select Min Y range
+        self.min_y_spinbox = QSpinBox()
+        self.min_y_spinbox.setRange(-1000, 1000)
+        self.min_y_spinbox.setSingleStep(10)
+        self.min_y_spinbox.setSuffix(" y-min")
 
-        self.buffers = {
-            key: ThreadSafeBuffer(buffer_size, key) for key in configuration.keys()
-        }
+        # Select Max Y range
+        self.max_y_spinbox = QSpinBox()
+        self.max_y_spinbox.setRange(-1000, 1000)
+        self.max_y_spinbox.setSingleStep(10)
+        self.max_y_spinbox.setSuffix(" y-max")
+
+        # Select X axis range in seconds
+        self.window_spinbox = QSpinBox()
+        self.window_spinbox.setRange(5, 60)
+        self.window_spinbox.setSingleStep(1)
+        self.window_spinbox.setSuffix(" sec")
+
+        # Settings for graph
+        self.graph_settings_layout.addWidget(self.min_y_spinbox)
+        self.graph_settings_layout.addWidget(self.max_y_spinbox)
+        self.graph_settings_layout.addWidget(self.window_spinbox)
 
         # Plot Selector Widget (Legend)
-        self.select_plots = QListWidget()
-        self.select_plots.setMaximumWidth(self.select_plots.sizeHint().width())
+        self.select_plots = QVBoxLayout()
 
         # Setup Layout
-        self.plot_and_settings_layout.addWidget(self.select_plots)
-        self.plot_and_settings_layout.addWidget(self.graph_settings)
-        self.main_layout.addLayout(self.plot_and_settings_layout)
-        self.main_layout.addWidget(self.plot)
+        self.plot_selection_and_settings_layout.addLayout(self.select_plots)
+        self.plot_selection_and_settings_layout.addLayout(self.graph_settings_layout)
+        self.main_layout.addLayout(self.plot_selection_and_settings_layout, stretch=1)
+        self.main_layout.addWidget(self.plot, stretch=10)
         self.setLayout(self.main_layout)
 
     def refresh(self):
@@ -170,22 +186,20 @@ class ProtoPlotter(QWidget):
                 for name, value in data.items():
                     if name not in self.traces:
 
-                        item = QListWidgetItem(name)
-                        item.setFlags(
-                            item.flags() | QtCore.Qt.ItemFlag.ItemIsUserCheckable
-                        )
-                        item.setCheckState(QtCore.Qt.CheckState.Checked)
+                        # Pick a random color
+                        r = random.randint(100, 255)
+                        g = random.randint(100, 255)
+                        b = random.randint(100, 255)
 
-                        self.select_plots.addItem(item)
-                        self.select_plots.setMaximumWidth(
-                            self.select_plots.sizeHint().width()
-                        )
+                        item = QCheckBox(name)
+                        item.setCheckState(QtCore.Qt.CheckState.Checked)
+                        item.setStyleSheet(f"QCheckBox {{ color: rgb({r}, {g}, {b}) }}")
+                        self.select_plots.addWidget(item)
 
                         self.data[name] = np.zeros(self.deque_size)
 
-                        self.color += 1
                         self.traces[name] = gl.GLLinePlotItem(
-                            color=pg.glColor(self.color), width=1, antialias=True,
+                            color=pg.glColor(r, g, b), width=1, antialias=True,
                         )
                         self.plot.addItem(self.traces[name])
 
