@@ -47,6 +47,7 @@ class FullSystem(object):
         full_system_runtime_dir=None,
         debug_full_system=False,
         friendly_colour_yellow=False,
+        should_restart_on_crash=False,
     ):
         """Run FullSystem
 
@@ -58,6 +59,7 @@ class FullSystem(object):
         self.debug_full_system = debug_full_system
         self.friendly_colour_yellow = friendly_colour_yellow
         self.full_system_proc = None
+        self.should_restart_on_crash = should_restart_on_crash
 
         self.thread = threading.Thread(target=self.__restart__)
 
@@ -116,7 +118,8 @@ gdb --args bazel-bin/{full_system}
 
         else:
             self.full_system_proc = Popen(self.full_system.split(" "))
-            self.thread.start()
+            if(should_restart_on_crash):
+                self.thread.start()
 
         return self
 
