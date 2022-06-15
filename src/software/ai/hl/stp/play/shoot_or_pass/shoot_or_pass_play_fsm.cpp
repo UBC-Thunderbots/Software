@@ -162,28 +162,7 @@ bool ShootOrPassPlayFSM::shouldAbortPass(const Update& event)
     const auto passer_point   = best_pass_and_score_so_far.pass.passerPoint();
     const auto receiver_point = best_pass_and_score_so_far.pass.receiverPoint();
 
-    const double RADIUS = 0.5;
-
-    Vector place_to_ball = passer_point.toVector() - receiver_point.toVector();
-    Vector ball_to_place = -place_to_ball;
-
-    Point place_l = passer_point + (place_to_ball.normalize(RADIUS) +
-                                    place_to_ball.perpendicular().normalize(RADIUS));
-    Point place_r = passer_point + (place_to_ball.normalize(RADIUS) -
-                                    place_to_ball.perpendicular().normalize(RADIUS));
-
-    Point ball_l = receiver_point + (ball_to_place.normalize(RADIUS) +
-                                     ball_to_place.perpendicular().normalize(RADIUS));
-    Point ball_r = receiver_point + (ball_to_place.normalize(RADIUS) -
-                                     ball_to_place.perpendicular().normalize(RADIUS));
-
-    const auto pass_area_polygon = Polygon({
-                                               place_l,
-                                               place_r,
-                                               ball_l,
-                                               ball_r,
-                                           })
-                                       .expand(1);
+    const auto pass_area_polygon = Polygon::fromPoints(passer_point, receiver_point).expand(1);
 
     // calculate a polygon that contains the receiver and passer point, and checks if the
     // ball is inside it. if the ball isn't being passed to the receiver then we should

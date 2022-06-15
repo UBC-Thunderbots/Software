@@ -76,6 +76,49 @@ Polygon Polygon::expand(double expansion_amount) const
     return Polygon(expanded_points);
 }
 
+Polygon Polygon::fromPoints(const Point& first_point, const Point& second_point)
+{
+    /*   The Polygon is constructed as follows:
+     *
+     *         ball_l           ball_r
+     *           +-------+-------+
+     *           |               |
+     *           |    ball_c     |
+     *           +-------+-------+
+     *           |               |
+     *           |               |
+     *           |               |
+     *           |     place_c   |
+     *           +-------+-------+
+     *           |               |
+     *           |               |
+     *           +-------+-------+
+     *        place_l          place_r
+     */
+
+    const double RADIUS = 0.5;
+
+    Vector first_to_second = first_point.toVector() - second_point.toVector();
+    Vector second_to_first = -first_to_second;
+
+    Point place_l = first_point + (first_to_second.normalize(RADIUS) +
+                                   first_to_second.perpendicular().normalize(RADIUS));
+    Point place_r = first_point + (first_to_second.normalize(RADIUS) -
+                                   first_to_second.perpendicular().normalize(RADIUS));
+
+    Point ball_l = second_point + (second_to_first.normalize(RADIUS) +
+                                   second_to_first.perpendicular().normalize(RADIUS));
+    Point ball_r = second_point + (second_to_first.normalize(RADIUS) -
+                                   second_to_first.perpendicular().normalize(RADIUS));
+
+    return Polygon({
+        place_l,
+        place_r,
+        ball_l,
+        ball_r,
+    });
+}
+
 const std::vector<Segment>& Polygon::getSegments() const
 {
     return segments_;

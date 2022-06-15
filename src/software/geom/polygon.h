@@ -55,6 +55,16 @@ class Polygon : public virtual Shape
      */
     const std::vector<Point>& getPoints() const;
 
+    /**
+     * Creates a polygon that is oriented along the vector between the first and second
+     * point. The polygon contains both points as "focal" points similar to an ellipse.
+     * see definition for details
+     * @param firstPoint the first point
+     * @param secondPoint the second point.
+     * @return an oriented polygon along the 2 points that contains both points.
+     */
+    static Polygon fromPoints(const Point& first_point, const Point& second_point);
+
    protected:
     /**
      * Returns the line segments that connect a list of points.
