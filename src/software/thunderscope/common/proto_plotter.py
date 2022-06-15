@@ -1,5 +1,4 @@
 import time
-import math
 
 import numpy as np
 import pyqtgraph as pg
@@ -18,11 +17,12 @@ class GLViewWidget2DPlot(gl.GLViewWidget):
     """Limit the mouse controls and fix the camera on a 3D
     view to make it 2D"""
 
-    def __init__(self, grid_cell_size=100, grid_width=100, grid_height=10):
+    def __init__(self, grid_cell_size, grid_width, grid_height):
         """Initialize the GLViewWidget2DPlot
 
         :param grid_cell_size: The size of each grid cell
-        :param grid_size: The number of grid cells in each direction
+        :param grid_width: The number of grid cells in the x direction
+        :param grid_height: The number of grid cells in the y direction
 
         """
         gl.GLViewWidget.__init__(self)
@@ -30,15 +30,9 @@ class GLViewWidget2DPlot(gl.GLViewWidget):
         # The GL View Widget is a 3D widget, but we use a plane to display a 2D
         # plot. To see the entire plot, we need to set the distance high enough
         # that the entire grid is in view.
-
         self.setCameraPosition(
-            distance=math.hypot(
-                grid_cell_size * grid_height, grid_cell_size * grid_height
-            ),
-            elevation=90,
-            azimuth=0,
+            distance=grid_cell_size * grid_width, elevation=90, azimuth=0,
         )
-
         self.grid = gl.GLGridItem()
         self.grid.setSize(grid_height, grid_width)
         self.grid.scale(grid_cell_size, grid_cell_size, 1)
@@ -125,19 +119,12 @@ class ProtoPlotter(QWidget):
         self.data = {}
 
         self.width = 100
-        self.layout = QHBoxLayout()
-        self.plot = GLViewWidget2DPlot()
+        self.main_layout = QHBoxLayout()
+        self.plot_and_settings_layout = QVBoxLayout()
 
-        self.buffers = {
-            key: ThreadSafeBuffer(buffer_size, key) for key in configuration.keys()
-        }
-
-        self.select_plots = QListWidget()
-        self.select_plots.setMaximumWidth(self.select_plots.sizeHint().width())
-
-        self.layout.addWidget(self.select_plots)
-        self.layout.addWidget(self.plot)
-        self.setLayout(self.layout)
+        self.plot = GLViewWidget2DPlot(
+            grid_cell_size=self.width, grid_width=10, grid_height=10
+        )
 
         self.last_update_time = time.time()
         self.last_incoming_value = {}
@@ -146,6 +133,29 @@ class ProtoPlotter(QWidget):
         self.configuration = configuration
         self.deque_size = int(window_secs * plot_rate_hz)
         self.update_interval = 1.0 / plot_rate_hz
+
+        self.graph_settings = QGroupBox()
+        self.graph_settings_layout = QHBoxLayout()
+
+        self.graph_settings_layout.addWidget(QSpinBox())
+        self.graph_settings_layout.addWidget(QSpinBox())
+        self.graph_settings_layout.addWidget(QSpinBox())
+        self.graph_settings.setLayout(self.graph_settings_layout)
+
+        self.buffers = {
+            key: ThreadSafeBuffer(buffer_size, key) for key in configuration.keys()
+        }
+
+        # Plot Selector Widget (Legend)
+        self.select_plots = QListWidget()
+        self.select_plots.setMaximumWidth(self.select_plots.sizeHint().width())
+
+        # Setup Layout
+        self.plot_and_settings_layout.addWidget(self.select_plots)
+        self.plot_and_settings_layout.addWidget(self.graph_settings)
+        self.main_layout.addLayout(self.plot_and_settings_layout)
+        self.main_layout.addWidget(self.plot)
+        self.setLayout(self.main_layout)
 
     def refresh(self):
         """Refreshes NamedValuePlotter and updates data in the respective
@@ -198,7 +208,7 @@ class ProtoPlotter(QWidget):
                         self.data[name],
                         np.array(
                             np.linspace(
-                                -self.width / 2, +self.width / 2, self.deque_size
+                                -self.width * 5, self.width * 5, self.deque_size
                             )
                         ),
                         np.zeros(len(self.data[name])),
