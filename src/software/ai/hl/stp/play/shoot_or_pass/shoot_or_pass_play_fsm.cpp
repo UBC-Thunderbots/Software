@@ -155,12 +155,14 @@ bool ShootOrPassPlayFSM::shouldAbortPass(const Update& event)
     const auto passer_point   = best_pass_and_score_so_far.pass.passerPoint();
     const auto receiver_point = best_pass_and_score_so_far.pass.receiverPoint();
 
-    const auto pass_area_polygon = Polygon::fromPoints(passer_point, receiver_point).expand(1);
+    const auto pass_area_polygon =
+        Polygon::fromPoints(passer_point, receiver_point).expand(1);
 
     // calculate a polygon that contains the receiver and passer point, and checks if the
     // ball is inside it. if the ball isn't being passed to the receiver then we should
     // abort
-    if  ((receiver_point - passer_point).length() >= 0.2) {
+    if ((receiver_point - passer_point).length() >= 0.2)
+    {
         if (!contains(pass_area_polygon, ball_position))
         {
             return true;
@@ -170,11 +172,13 @@ bool ShootOrPassPlayFSM::shouldAbortPass(const Update& event)
     // distance between robot and ball is too far, and it's not in flight,
     // i.e. team might still have possession, but kicker/passer doesn't have control over
     const auto ball_velocity = event.common.world.ball().velocity().length();
-    const auto ball_shot_threshold = this->ai_config.shoot_or_pass_play_config().ball_shot_threshold();
-    const auto min_distance_to_pass = this->ai_config.shoot_or_pass_play_config().min_distance_to_pass();
+    const auto ball_shot_threshold =
+        this->ai_config.shoot_or_pass_play_config().ball_shot_threshold();
+    const auto min_distance_to_pass =
+        this->ai_config.shoot_or_pass_play_config().min_distance_to_pass();
     // ball
     return (ball_velocity < ball_shot_threshold) &&
-                               ((ball_position - passer_point).length() > min_distance_to_pass);
+           ((ball_position - passer_point).length() > min_distance_to_pass);
 }
 
 bool ShootOrPassPlayFSM::passCompleted(const Update& event)
