@@ -27,6 +27,7 @@ from software.thunderscope.binary_context_managers import (
 from software.thunderscope.replay.proto_logger import ProtoLogger
 
 from software.logger.logger import createLogger
+from software.simulated_tests.pytest_main import load_command_line_arguments
 
 logger = createLogger(__name__)
 

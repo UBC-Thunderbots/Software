@@ -1,5 +1,14 @@
 from proto.import_all_protos import *
+import software.python_bindings as tbots
 
+
+def parse_world_state(world_state):
+    yellow_robot_locations = [tbots.Point(robot.global_position.x_meters,robot.global_position.y_meters)  for robot in world_state.yellow_robots.values()]
+    blue_robot_locations = [tbots.Point(robot.global_position.x_meters,robot.global_position.y_meters) for robot in world_state.blue_robots.values()]
+    ball_location = tbots.Point(world_state.ball_state.global_position.x_meters, world_state.ball_state.global_position.y_meters)
+    ball_velocity = tbots.Vector(world_state.ball_state.global_velocity.x_component_meters, world_state.ball_state.global_velocity.y_component_meters)
+
+    return yellow_robot_locations, blue_robot_locations, ball_location, ball_velocity
 
 def create_world_state(
     yellow_robot_locations, blue_robot_locations, ball_location, ball_velocity
