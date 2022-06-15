@@ -151,13 +151,6 @@ bool ShootOrPassPlayFSM::passFound(const Update& event)
 
 bool ShootOrPassPlayFSM::shouldAbortPass(const Update& event)
 {
-    // lost possession
-    if (event.common.world.getTeamWithPossession() != TeamSide::FRIENDLY)
-    {
-        return true;
-    }
-
-    // calculate an inflated polygon along the vector from the passer to receiver
     const auto ball_position  = event.common.world.ball().position();
     const auto passer_point   = best_pass_and_score_so_far.pass.passerPoint();
     const auto receiver_point = best_pass_and_score_so_far.pass.receiverPoint();
@@ -167,28 +160,21 @@ bool ShootOrPassPlayFSM::shouldAbortPass(const Update& event)
     // calculate a polygon that contains the receiver and passer point, and checks if the
     // ball is inside it. if the ball isn't being passed to the receiver then we should
     // abort
-    if (!contains(pass_area_polygon, ball_position))
-    {
-        return true;
-    }
-
-
-    // distance between robot and ball is too far,
-    // i.e. team might still have possession, but kicker/passer doesn't have control over
-    // ball
-    if (event.common.world.ball().velocity().length() <
-        this->ai_config.shoot_or_pass_play_config().ball_shot_threshold())
-    {
-        if ((event.common.world.ball().position() -
-             best_pass_and_score_so_far.pass.passerPoint())
-                .length() >
-            this->ai_config.shoot_or_pass_play_config().min_distance_to_pass())
+    if  ((receiver_point - passer_point).length() >= 0.2) {
+        if (!contains(pass_area_polygon, ball_position))
         {
             return true;
         }
     }
 
-    return false;
+    // distance between robot and ball is too far, and it's not in flight,
+    // i.e. team might still have possession, but kicker/passer doesn't have control over
+    const auto ball_velocity = event.common.world.ball().velocity().length();
+    const auto ball_shot_threshold = this->ai_config.shoot_or_pass_play_config().ball_shot_threshold();
+    const auto min_distance_to_pass = this->ai_config.shoot_or_pass_play_config().min_distance_to_pass();
+    // ball
+    return (ball_velocity < ball_shot_threshold) &&
+                               ((ball_position - passer_point).length() > min_distance_to_pass);
 }
 
 bool ShootOrPassPlayFSM::passCompleted(const Update& event)
