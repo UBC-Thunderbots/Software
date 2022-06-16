@@ -74,22 +74,22 @@ class DriveAndDribblerWidget(QWidget):
 
         # set up the sliders
         (
-            front_left_groupbox,
+            front_left_layout,
             self.front_left_slider,
             self.front_left_label,
         ) = common_widgets.create_slider("Front Left", MIN_MOTOR_RPM, MAX_MOTOR_RPM, 1)
         (
-            front_right_groupbox,
+            front_right_layout,
             self.front_right_slider,
             self.front_right_label,
         ) = common_widgets.create_slider("Front Right", MIN_MOTOR_RPM, MAX_MOTOR_RPM, 1)
         (
-            back_left_groupbox,
+            back_left_layout,
             self.back_left_slider,
             self.back_left_label,
         ) = common_widgets.create_slider("Back Left", MIN_MOTOR_RPM, MAX_MOTOR_RPM, 1)
         (
-            back_right_groupbox,
+            back_right_layout,
             self.back_right_slider,
             self.back_right_label,
         ) = common_widgets.create_slider("Back Right", MIN_MOTOR_RPM, MAX_MOTOR_RPM, 1)
@@ -120,10 +120,10 @@ class DriveAndDribblerWidget(QWidget):
         stop_and_reset.clicked.connect(self.reset_all_sliders)
 
         # add widget
-        dbox.addWidget(front_left_groupbox)
-        dbox.addWidget(front_right_groupbox)
-        dbox.addWidget(back_left_groupbox)
-        dbox.addWidget(back_right_groupbox)
+        dbox.addLayout(front_left_layout)
+        dbox.addLayout(front_right_layout)
+        dbox.addLayout(back_left_layout)
+        dbox.addLayout(back_right_layout)
         dbox.addWidget(stop_and_reset, alignment=Qt.AlignmentFlag.AlignCenter)
 
         group_box.setLayout(dbox)
@@ -140,13 +140,13 @@ class DriveAndDribblerWidget(QWidget):
         group_box = QGroupBox(title)
         dbox = QVBoxLayout()
 
-        xms, self.slider_xms, self.label_xms = common_widgets.create_slider(
+        x_layout, self.slider_xms, self.label_xms = common_widgets.create_slider(
             "X (m/s)", MIN_LINEAR_SPEED_MPS, MAX_LINEAR_SPEED_MPS, 10
         )
-        yms, self.slider_yms, self.label_ymx = common_widgets.create_slider(
+        y_layout, self.slider_yms, self.label_ymx = common_widgets.create_slider(
             "Y (m/s)", MIN_LINEAR_SPEED_MPS, MAX_LINEAR_SPEED_MPS, 10
         )
-        degree, self.slider_rpm, self.label_rpm = common_widgets.create_slider(
+        dps_layout, self.slider_dps, self.label_dps = common_widgets.create_slider(
             "θ (°/s)", MIN_ANGULAR_SPEED_RPM, MAX_ANGULAR_SPEED_RPM, 1
         )
 
@@ -156,16 +156,16 @@ class DriveAndDribblerWidget(QWidget):
         self.slider_yms.valueChanged.connect(
             lambda: self.label_yms.setText(self.value_change(self.slider_yms))
         )
-        self.slider_rpm.valueChanged.connect(
-            lambda: self.label_rpm.setText(self.value_change(self.slider_rpm))
+        self.slider_dps.valueChanged.connect(
+            lambda: self.label_rpm.setText(self.value_change(self.slider_dps))
         )
 
         stop_and_reset = common_widgets.create_push_button("Stop and Reset")
         stop_and_reset.clicked.connect(self.reset_all_sliders)
 
-        dbox.addWidget(xms)
-        dbox.addWidget(yms)
-        dbox.addWidget(degree)
+        dbox.addLayout(x_layout)
+        dbox.addLayout(y_layout)
+        dbox.addLayout(dps_layout)
         dbox.addWidget(stop_and_reset, alignment=Qt.AlignmentFlag.AlignCenter)
 
         group_box.setLayout(dbox)
@@ -183,7 +183,7 @@ class DriveAndDribblerWidget(QWidget):
         dbox = QVBoxLayout()
 
         (
-            dribbler,
+            dribbler_layout,
             self.slider_dribbler,
             self.label_dribbler,
         ) = common_widgets.create_slider("RPM", MIN_DRIBBLER_RPM, MAX_DRIBBLER_RPM, 1)
@@ -194,7 +194,7 @@ class DriveAndDribblerWidget(QWidget):
         stop_and_reset = common_widgets.create_push_button("Stop and Reset")
         stop_and_reset.clicked.connect(lambda: self.slider_dribbler.setValue(0))
 
-        dbox.addWidget(dribbler)
+        dbox.addLayout(dribbler_layout)
         dbox.addWidget(stop_and_reset, alignment=Qt.AlignmentFlag.AlignCenter)
         group_box.setLayout(dbox)
 
@@ -211,4 +211,4 @@ class DriveAndDribblerWidget(QWidget):
 
         self.slider_xms.setValue(0)
         self.slider_yms.setValue(0)
-        self.slider_rpm.setValue(0)
+        self.slider_dps.setValue(0)

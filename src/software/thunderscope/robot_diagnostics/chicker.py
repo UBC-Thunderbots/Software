@@ -11,6 +11,7 @@ class ChickerWidget(QWidget):
     def __init__(self):
 
         """The Chicker Widget grid is laid out in the following way:
+
                     ┌────────┐     ┌──────┐      ┌──────┐
                     │ Charge │     │ Kick │      │ Chip │
                     └────────┘     └──────┘      └──────┘
@@ -30,8 +31,7 @@ class ChickerWidget(QWidget):
 
         super(ChickerWidget, self).__init__()
 
-        # grid --> groupBox --> button/slider
-        grid = QGridLayout()
+        vbox_layout = QVBoxLayout()
         self.radio_buttons_group = QButtonGroup()
 
         # push button group box
@@ -41,7 +41,7 @@ class ChickerWidget(QWidget):
         self.charge_button = self.push_buttons[0]
         self.kick_button = self.push_buttons[1]
         self.chip_button = self.push_buttons[2]
-        grid.addWidget(self.push_button_box, 0, 0)
+        vbox_layout.addWidget(self.push_button_box)
 
         # radio button group box
         self.radio_button_box, self.radio_buttons = common_widgets.create_radio(
@@ -51,25 +51,25 @@ class ChickerWidget(QWidget):
         self.auto_kick_button = self.radio_buttons[1]
         self.auto_chip_button = self.radio_buttons[2]
 
-        grid.addWidget(self.radio_button_box, 1, 0)
+        vbox_layout.addWidget(self.radio_button_box)
         self.no_auto_button.setChecked(True)
 
         # sliders
         (
-            self.geneva_slider_box,
+            self.geneva_slider_layout,
             self.geneva_slider,
             self.geneva_label,
         ) = common_widgets.create_slider("Geneva Position", 1, NUM_GENEVA_ANGLES, 1)
-        grid.addWidget(self.geneva_slider_box, 2, 0)
+        vbox_layout.addLayout(self.geneva_slider_layout)
 
         (
-            self.power_slider_box,
+            self.power_slider_layout,
             self.power_slider,
             self.power_label,
         ) = common_widgets.create_slider("Power", 1, 100, 10)
-        grid.addWidget(self.power_slider_box, 3, 0)
+        vbox_layout.addLayout(self.power_slider_layout)
 
-        self.setLayout(grid)
+        self.setLayout(vbox_layout)
 
         # to manage the state of radio buttons - to make sure message is only sent once
         self.radio_checkable = {"no_auto": True, "auto_kick": True, "auto_chip": True}
