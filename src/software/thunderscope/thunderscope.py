@@ -26,15 +26,9 @@ from pyqtgraph.dockarea import *
 from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtWidgets import *
 
-import software.python_bindings as cpp_bindings
-
-from proto.import_all_protos import *
-from proto.message_translation import tbots_protobuf
-
 from software.py_constants import *
-from software.networking import threaded_unix_sender
+from proto.import_all_protos import *
 from software.thunderscope.common.proto_plotter import ProtoPlotter
-from software.thunderscope.binary_context_managers import *
 from extlibs.er_force_sim.src.protobuf.world_pb2 import *
 from software.thunderscope.dock_label_style import *
 
@@ -110,10 +104,13 @@ class Thunderscope(object):
         :param load_gamecontroller: Whether to load the gamecontroller window
         :param blue_replay_log: The blue replay log
         :param yellow_replay_log: The yellow replay log
-        :param refresh_interval_ms: The interval in milliseconds to refresh the simulator
-        :param visualization_buffer_size: The size of the visualization buffer
+        :param refresh_interval_ms:
+            The interval in milliseconds to refresh all the widgets.
+        :param visualization_buffer_size: The size of the visualization buffer.
+            Increasing this will increase smoothness but will be less realtime. 
 
         """
+        signal.signal(signal.SIGINT, signal.SIG_DFL)
 
         # Setup MainApp and initialize DockArea
         self.app = pyqtgraph.mkQApp("Thunderscope")
@@ -126,8 +123,7 @@ class Thunderscope(object):
         self.refresh_interval_ms = refresh_interval_ms
         self.visualization_buffer_size = visualization_buffer_size
         self.widgets = {}
-
-        signal.signal(signal.SIGINT, signal.SIG_DFL)
+        self.refresh_timers = []
 
         # TODO (#2586) Improve this layout
         self.tabs = QTabWidget()
@@ -139,8 +135,7 @@ class Thunderscope(object):
         self.web_view.load(QtCore.QUrl(GAME_CONTROLLER_URL))
 
         if load_blue:
-            pass
-            # self.tabs.addTab(self.blue_full_system_dock_area, "Blue Fullsystem")
+            self.tabs.addTab(self.blue_full_system_dock_area, "Blue Fullsystem")
         if load_yellow:
             self.tabs.addTab(self.yellow_full_system_dock_area, "Yellow Fullsystem")
         if load_diagnostics:
@@ -154,10 +149,17 @@ class Thunderscope(object):
 
         # ProtoUnixIOs
         #
-        # NOTE: We have two separate IOs for each full system because the
+        # NOTE: Simulated tests need to be able to run without Thunderscope
+        # enabled, so the test fixture creates its own ProtoUnixIOs. But, we
+        # would optionally like to enable thunderscope, observe protos and plot
+        # them in thunderscope. So we need to switch over to the dependency
+        # injected ProtoUnixIOs when provided.
+        #
+        # Also NOTE: We have two separate IOs for each full system because the
         # er force simulator expects two inputs of the same protobuf type but
         # from the blue or yellow team. We also would like to visualize the same
         # protobuf types on two separate widgets.
+        #
         self.simulator_proto_unix_io = (
             ProtoUnixIO()
             if simulator_proto_unix_io is None
@@ -173,13 +175,15 @@ class Thunderscope(object):
             if blue_full_system_proto_unix_io is None
             else blue_full_system_proto_unix_io
         )
+        self.robot_diagnostics_proto_unix_io = ProtoUnixIO()
 
-        self.refresh_timers = []
-
-        # Setup the main window and  load
-        self.__setup(layout_path, load_blue, load_yellow, load_diagnostics)
+        # Setup the main window and load the requested tabs
+        self.configure_layout(layout_path, load_blue, load_yellow, load_diagnostics)
 
         # Save and Load Prompts
+        #
+        # NOTE: As long as Thunderscope has focus, the keyboard shortcuts will
+        # work because they are setup on self.window.
         self.save_layout_shortcut = QtGui.QShortcut(
             QtGui.QKeySequence("Ctrl+S"), self.window
         )
@@ -310,7 +314,7 @@ class Thunderscope(object):
                     ]
                     default_shelf.sync()
 
-    def __setup(
+    def configure_layout(
         self, layout_path, load_blue=True, load_yellow=True, load_diagnostics=True
     ):
         """Load the specified layout or the default file. If the default layout

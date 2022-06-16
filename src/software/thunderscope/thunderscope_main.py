@@ -113,7 +113,7 @@ if __name__ == "__main__":
         "--channel",
         action="store",
         type=int,
-        default=None,
+        default=0,
         help="Which channel to communicate over",
     )
     parser.add_argument(
