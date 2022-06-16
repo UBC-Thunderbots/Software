@@ -821,17 +821,13 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_close_start_end_but_block
 
 TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_simulated_hrvo)
 {
-    Field field        = Field::createSSLDivisionBField();
-    Team friendly_team = Team(Duration::fromMilliseconds(1000));
-    Team enemy_team    = Team(Duration::fromMilliseconds(1000));
-    Ball ball          = Ball(Point(), Vector(), Timestamp::fromSeconds(0));
-    World world        = World(field, ball, friendly_team, enemy_team);
+    Field field = Field::createSSLDivisionBField();
 
     Point start{2.90502, 0.0315793}, dest{3, 0};
 
     std::vector<ObstaclePtr> obstacles = {
         robot_navigation_obstacle_factory.createStaticObstaclesFromMotionConstraints(
-            {TbotsProto::MotionConstraint::INFLATED_ENEMY_DEFENSE_AREA}, world.field()),
+            {TbotsProto::MotionConstraint::INFLATED_ENEMY_DEFENSE_AREA}, field),
     };
     Rectangle navigable_area = field.fieldBoundary();
     EnlsvgPathPlanner planner =
@@ -848,11 +844,7 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_simulated_hrvo)
 
 TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_defense_play)
 {
-    Field field        = Field::createSSLDivisionBField();
-    Team friendly_team = Team(Duration::fromMilliseconds(1000));
-    Team enemy_team    = Team(Duration::fromMilliseconds(1000));
-    Ball ball          = Ball(Point(), Vector(), Timestamp::fromSeconds(0));
-    World world        = World(field, ball, friendly_team, enemy_team);
+    Field field = Field::createSSLDivisionBField();
 
     Point start{-3.24629, 0.892211}, dest{-3.3185, 0.891779};
 
@@ -860,7 +852,7 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_defense_play)
         robot_navigation_obstacle_factory.createStaticObstaclesFromMotionConstraints(
             {TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA,
              TbotsProto::MotionConstraint::INFLATED_ENEMY_DEFENSE_AREA},
-            world.field()),
+            field),
     };
     Rectangle navigable_area = field.fieldBoundary();
     EnlsvgPathPlanner planner =
@@ -876,11 +868,7 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_defense_play)
 
 TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_enemy_ball_placement)
 {
-    Field field        = Field::createSSLDivisionBField();
-    Team friendly_team = Team(Duration::fromMilliseconds(1000));
-    Team enemy_team    = Team(Duration::fromMilliseconds(1000));
-    Ball ball          = Ball(Point(), Vector(), Timestamp::fromSeconds(0));
-    World world        = World(field, ball, friendly_team, enemy_team);
+    Field field = Field::createSSLDivisionBField();
 
     Point start{-3.22959, -0.675264}, dest{-3.3184, -0.695291};
 
@@ -888,7 +876,7 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_enemy_ball_placement)
         robot_navigation_obstacle_factory.createStaticObstaclesFromMotionConstraints(
             {TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA,
              TbotsProto::MotionConstraint::AVOID_BALL_PLACEMENT_INTERFERENCE},
-            world.field()),
+            field),
     };
     Rectangle navigable_area = field.fieldBoundary();
     EnlsvgPathPlanner planner =
