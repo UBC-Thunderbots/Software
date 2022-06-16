@@ -5,16 +5,6 @@
 
 namespace TestUtil
 {
-    void handleTestRobotLog(TbotsProto_RobotLog robot_log)
-    {
-        LOG(INFO) << "[TEST ROBOT " << robot_log.robot_id << "]["
-                  << TbotsProto::LogLevel_Name(
-                         static_cast<TbotsProto::LogLevel>(robot_log.log_level))
-                  << "]"
-                  << "[" << robot_log.file_name << ":" << robot_log.line_number
-                  << "]: " << robot_log.log_msg;
-    }
-
     RobotConstants_t createMockRobotConstants()
     {
         const RobotConstants_t robot_constants = {
@@ -32,7 +22,10 @@ namespace TestUtil
             .robot_max_acceleration_m_per_s_2       = 2.1f,
             .robot_max_ang_acceleration_rad_per_s_2 = 2.2f,
             .indefinite_dribbler_speed_rpm          = 2.3f,
-            .max_force_dribbler_speed_rpm           = 2.4f};
+            .max_force_dribbler_speed_rpm           = 2.4f,
+            .wheel_radius_meters                    = 2.5f,
+            .wheel_rotations_per_motor_rotation     = 2.6f,
+        };
 
         return robot_constants;
     }

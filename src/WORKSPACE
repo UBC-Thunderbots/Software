@@ -171,15 +171,6 @@ git_repository(
     shallow_since = "1614109311 -0800",
 )
 
-# Fake Function Framework
-new_git_repository(
-    name = "fff",
-    build_file = "@//extlibs:fff.BUILD",
-    commit = "7e09f07e5b262b1cc826189dc5057379e40ce886",
-    remote = "https://github.com/meekrosoft/fff.git",
-    shallow_since = "1566392271 +0200",
-)
-
 # Right now qt5 is installed on the system using the setup_software.sh script
 # We assume we can find the headers in the "standard" path used in this rule
 new_local_repository(

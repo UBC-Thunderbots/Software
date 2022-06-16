@@ -11,7 +11,6 @@
 #include "proto/message_translation/er_force_world.h"
 #include "proto/message_translation/ssl_wrapper.h"
 #include "proto/message_translation/tbots_protobuf.h"
-#include "shared/2015_robot_constants.h"
 #include "shared/2021_robot_constants.h"
 #include "shared/test_util/test_util.h"
 #include "software/logger/logger.h"
@@ -24,7 +23,6 @@ SimulatedErForceSimTestFixture::SimulatedErForceSimTestFixture()
       enemy_thunderbots_config(TbotsProto::ThunderbotsConfig()),
       friendly_sensor_fusion(friendly_thunderbots_config.sensor_fusion_config()),
       enemy_sensor_fusion(enemy_thunderbots_config.sensor_fusion_config()),
-      should_log_replay(false),
       run_simulation_in_realtime(false)
 {
 }
@@ -149,19 +147,6 @@ void SimulatedErForceSimTestFixture::updateSensorFusion(
         {
             enemy_sensor_fusion.processSensorProto(blue_sensor_msg);
         }
-
-        if (should_log_replay)
-        {
-            simulator_sensorproto_logger->onValueReceived(yellow_sensor_msg);
-            auto friendly_world_or_null = friendly_sensor_fusion.getWorld();
-
-            if (friendly_world_or_null)
-            {
-                auto filtered_ssl_wrapper = *createSSLWrapperPacket(
-                    *friendly_sensor_fusion.getWorld(), TeamColour::YELLOW);
-                sensorfusion_wrapper_logger->onValueReceived(filtered_ssl_wrapper);
-            }
-        }
     }
 }
 
@@ -193,8 +178,8 @@ void SimulatedErForceSimTestFixture::runTest(
     const Duration simulation_time_step =
         Duration::fromSeconds(1.0 / SIMULATED_CAMERA_FPS);
 
-    std::shared_ptr<ErForceSimulator> simulator(std::make_shared<ErForceSimulator>(
-        field_type, create2015RobotConstants(), create2015WheelConstants()));
+    std::shared_ptr<ErForceSimulator> simulator(
+        std::make_shared<ErForceSimulator>(field_type, create2021RobotConstants()));
 
     // TODO (#2419): remove this to re-enable sigfpe checks
     fedisableexcept(FE_INVALID | FE_OVERFLOW);

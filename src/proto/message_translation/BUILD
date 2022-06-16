@@ -173,25 +173,6 @@ cc_test(
 )
 
 cc_library(
-    name = "defending_side",
-    srcs = ["defending_side.cpp"],
-    hdrs = ["defending_side.h"],
-    deps = [
-        "//proto:defending_side_msg_cc_proto",
-        "//software/world:field",
-    ],
-)
-
-cc_test(
-    name = "defending_side_test",
-    srcs = ["defending_side_test.cpp"],
-    deps = [
-        ":defending_side",
-        "//shared/test_util:tbots_gtest_main",
-    ],
-)
-
-cc_library(
     name = "er_force_world",
     srcs = ["er_force_world.cpp"],
     hdrs = ["er_force_world.h"],

@@ -5,6 +5,7 @@
 #include <g3log/logmessage.hpp>
 #include <g3log/logworker.hpp>
 
+#include "software/logger/coloured_cout_sink.h"
 #include "software/logger/network_sink.h"
 
 /**
@@ -32,6 +33,11 @@ class NetworkLoggerSingleton
         auto network_log_sink_handle = logWorker->addSink(
             std::make_unique<struct NetworkSink>(channel, interface, robot_id),
             &NetworkSink::sendToNetwork);
+
+        // Sink for outputting logs to the terminal
+        auto colour_cout_sink_handle =
+            logWorker->addSink(std::make_unique<ColouredCoutSink>(true),
+                               &ColouredCoutSink::displayColouredLog);
 
         g3::initializeLogging(logWorker.get());
     }

@@ -10,14 +10,11 @@ message RobotStatus
     repeated ErrorCode error_code             = 2;
     BreakBeamStatus break_beam_status         = 3;
     ChipperKickerStatus chipper_kicker_status = 4;
-    DriveUnitStatus drive_units               = 5;
-    FirmwareStatus firmware_status            = 6;
-    DribblerStatus dribbler_status            = 7;
-    NetworkStatus network_status              = 8;
-    PowerStatus power_status                  = 9;
-    TemperatureStatus temperature_status      = 10;
-    Timestamp time_sent                       = 11;
-    ThunderloopStatus thunderloop_status      = 12;
+    MotorStatus motor_status                  = 5;
+    NetworkStatus network_status              = 6;
+    PowerStatus power_status                  = 7;
+    ThunderloopStatus thunderloop_status      = 8;
+    Timestamp time_sent                       = 9;
 }
 
 message ThunderloopStatus
@@ -57,7 +54,11 @@ message ChipperKickerStatus
  */
 message DribblerStatus
 {
+    // The current speed of the dribbler in RPM
     float dribbler_rpm = 1;
+
+    // Dribbler temperature
+    float dribbler_temperature = 2;
 }
 
 /* Error codes are to be displayed in the visualizer */
@@ -90,21 +91,6 @@ enum ErrorCode
     WHEEL_2_HALL_SENSOR_STUCK_HIGH  = 21;
     WHEEL_3_HALL_SENSOR_STUCK_HIGH  = 22;
     DRIBBLER_HALL_SENSOR_STUCK_HIGH = 23;
-
-    // Edge triggered events
-    ICB_CRC_ERROR                        = 24;
-    RECEIVE_FRAME_CHECK_SEQUENCE_FAILURE = 25;
-    CRASHED_CORE_DUMPED                  = 26;
-    CRASHED_NO_CORE_DUMP                 = 27;
-
-    // Radio Dongle Errors
-    ROBOT_DEAD            = 28;
-    ESTOP_BROKEN          = 29;
-    RX_FCS_FAIL           = 30;
-    SECOND_DONGLE         = 31;
-    TRANSMIT_QUEUE_FULL   = 32;
-    RECEIVE_QUEUE_FULL    = 33;
-    PACKET_ABOVE_MAX_SIZE = 34;
 }
 
 /* Firmware build information  */
@@ -114,23 +100,20 @@ message FirmwareStatus
     uint32 fw_build_id = 1;
 }
 
-/* Encoder data from a single motor
- * Note that the rotation is from the perspective of rear of the motor, looking down
- * the shaft starting from the motor body
- */
 message DriveUnit
 {
-    float wheel_ang_vel_rad_s = 1;
-    float wheel_position_rad  = 2;
+    // The current RPM of the wheel
+    uint32 wheel_rpm = 1;
 }
 
 /* Data from all four drive units */
-message DriveUnitStatus
+message MotorStatus
 {
-    DriveUnit front_left  = 1;
-    DriveUnit front_right = 2;
-    DriveUnit back_left   = 3;
-    DriveUnit back_right  = 4;
+    DriveUnit front_left    = 1;
+    DriveUnit front_right   = 2;
+    DriveUnit back_left     = 3;
+    DriveUnit back_right    = 4;
+    DribblerStatus dribbler = 5;
 }
 
 /* Data about the network connection with the robots, including network-derived values */
@@ -157,14 +140,4 @@ message PowerStatus
     float geneva_angle_deg  = 4;
     bool breakbream_tripped = 5;
     bool flyback_fault      = 6;
-}
-
-/* Temperature of robot components */
-message TemperatureStatus
-{
-    // The temperature of the robot’s dribbler motor, in degrees Celsius.
-    float dribbler_temperature = 1;
-
-    // The temperature of the robot’s mainboard, in degrees Celsius.
-    float board_temperature = 2;
 }

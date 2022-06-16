@@ -19,7 +19,7 @@ class Thunderloop
    public:
     /**
      * Thunderloop is a giant loop that runs at CONTROL_LOOP_HZ.
-     * It receives Primitives and Vision from AI, executes the primitives with
+     * It receives Primitives and World from AI, executes the primitives with
      * the most recent vison data, and polls the services to interact with the hardware
      * peripherals.
      *
@@ -31,7 +31,7 @@ class Thunderloop
      *                   │                 │
      *  Primitives───────►                 │ Target Vel ┌────────────┐
      *                   │                 ├────────────►            │
-     *  Vision───────────►                 │            │ MotorBoard │
+     *  World ───────────►                 │            │ MotorBoard │
      *                   │    Services     ◄────────────┤            │
      *                   │                 │ Actual Vel └────────────┘
      *                   │  Primitive Exec │
@@ -44,12 +44,9 @@ class Thunderloop
      *
      *
      * @param robot_constants The robot constants
-     * @param wheel_consants The wheel constants
      * @param loop_hz The rate to run the loop
-     *
      */
-    Thunderloop(const RobotConstants_t& robot_constants,
-                const WheelConstants_t& wheel_consants, const int loop_hz);
+    Thunderloop(const RobotConstants_t& robot_constants, const int loop_hz);
 
     ~Thunderloop();
 
@@ -78,7 +75,7 @@ class Thunderloop
 
     // Input Msg Buffers
     TbotsProto::PrimitiveSet primitive_set_;
-    TbotsProto::Vision vision_;
+    TbotsProto::World world_;
     TbotsProto::RobotState robot_state_;
     TbotsProto::Primitive primitive_;
     TbotsProto::DirectControlPrimitive direct_control_;
@@ -87,13 +84,13 @@ class Thunderloop
     TbotsProto::RobotStatus robot_status_;
     TbotsProto::NetworkStatus network_status_;
     TbotsProto::PowerStatus power_status_;
-    TbotsProto::DriveUnitStatus drive_units_status_;
+    TbotsProto::MotorStatus motor_status_;
     TbotsProto::ThunderloopStatus thunderloop_status_;
 
     // Current State
     RobotConstants_t robot_constants_;
-    WheelConstants_t wheel_consants_;
-    unsigned robot_id_;
-    unsigned channel_id_;
+    int robot_id_;
+    int channel_id_;
+    std::string network_interface_;
     int loop_hz_;
 };
