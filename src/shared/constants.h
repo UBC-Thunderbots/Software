@@ -2,7 +2,7 @@
 #include <math.h>
 
 // Some platformio targets don't support STL, so we can't
-// use unordered_map. We gaurd all networking stuff with
+// use unordered_map. We guard all networking stuff with
 #ifndef PLATFORMIO_BUILD
 #include <unordered_map>
 
