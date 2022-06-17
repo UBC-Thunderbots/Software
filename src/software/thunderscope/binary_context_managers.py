@@ -47,7 +47,7 @@ class FullSystem(object):
         full_system_runtime_dir=None,
         debug_full_system=False,
         friendly_colour_yellow=False,
-        should_restart_on_crash=False,
+        should_restart_on_crash=True,
     ):
         """Run FullSystem
 
