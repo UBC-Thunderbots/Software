@@ -41,7 +41,6 @@ cc_library(
         "//proto/primitive:primitive_msg_factory",
         "//software/ai/navigator/path_planner/hrvo:velocity_obstacle",
         "//software/geom:vector",
-        "//software/networking:threaded_proto_unix_sender",
         "//software/world",
     ],
 )

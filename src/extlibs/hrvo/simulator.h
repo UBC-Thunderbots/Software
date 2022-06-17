@@ -41,7 +41,6 @@
 #include "proto/tbots_software_msgs.pb.h"
 #include "proto/visualization.pb.h"
 #include "software/geom/vector.h"
-#include "software/networking/threaded_proto_unix_sender.hpp"
 #include "software/world/world.h"
 
 class HRVOSimulator
