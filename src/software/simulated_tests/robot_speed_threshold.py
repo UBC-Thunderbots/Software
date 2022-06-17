@@ -39,8 +39,6 @@ class RobotSpeedThreshold(Validation):
 
     def get_validation_geometry(self, world) -> ValidationGeometry:
         """override"""
-        # TODO (#2556): visualize
-        #print("creating validation gemoetry")
         segments = []
         for robot in world.friendly_team.team_robots:
             robot_x = robot.current_state.global_position.x_meters * self.MILLIMETERS_PER_METER
