@@ -7,8 +7,9 @@
 RobotConstants_t create2021RobotConstants(void)
 {
     RobotConstants_t robot_constants = {
-        .mass_kg        = 2.5f,  // determined experimentally
-        .robot_radius_m = ROBOT_MAX_RADIUS_METERS,
+        .mass_kg         = 2.5f,   // determined experimentally
+        .inertial_factor = 0.37f,  // determined experimentally
+        .robot_radius_m  = ROBOT_MAX_RADIUS_METERS,
         // TODO (#2112): update this
         .jerk_limit_kg_m_per_s_3 = 40.0f,
         .front_wheel_angle_deg   = 57.95f,
