@@ -23,90 +23,7 @@ TEST(ShootOrPassPlayFSMTest, test_transitions)
     EXPECT_TRUE(fsm.is(boost::sml::state<ShootOrPassPlayFSM::AttemptShotState>));
 }
 
-TEST(ShootOrPassPlayFSMTest, test_abort_pass_guard_lost_possession)
-{
-    World world = ::TestUtil::createBlankTestingWorld();
-    world.updateRefereeCommand(RefereeCommand::FORCE_START);
-    world.setTeamWithPossession(TeamSide::FRIENDLY);
-
-    TbotsProto::AiConfig ai_config;
-    FSM<ShootOrPassPlayFSM> fsm(ShootOrPassPlayFSM{ai_config});
-    EXPECT_TRUE(fsm.is(boost::sml::state<ShootOrPassPlayFSM::StartState>));
-
-    fsm.process_event(ShootOrPassPlayFSM::Update(
-        ShootOrPassPlayFSM::ControlParams{},
-        PlayUpdate(
-            world, 3, [](PriorityTacticVector new_tactics) {}, InterPlayCommunication{},
-            [](InterPlayCommunication comm) {})));
-    EXPECT_TRUE(fsm.is(boost::sml::state<ShootOrPassPlayFSM::AttemptShotState>));
-
-    world.updateBall(Ball(Point(-1, 0), Vector(0, 0), Timestamp::fromSeconds(1)));
-
-    fsm.process_event(ShootOrPassPlayFSM::Update(
-        ShootOrPassPlayFSM::ControlParams{},
-        PlayUpdate(
-            world, 3, [](PriorityTacticVector new_tactics) {}, InterPlayCommunication{},
-            [](InterPlayCommunication comm) {})));
-
-
-    Robot friendly_robot_1(1, Point(3, 0), Vector(0, 0), Angle::zero(),
-                           AngularVelocity::zero(), Timestamp::fromSeconds(2));
-    Robot friendly_robot_2(2, Point(0, 0), Vector(0, 0), Angle::half(),
-                           AngularVelocity::zero(), Timestamp::fromSeconds(2));
-
-    std::vector<Robot> friendlies = {friendly_robot_1, friendly_robot_2};
-    world.updateFriendlyTeamState(Team(friendlies));
-
-    fsm.process_event(ShootOrPassPlayFSM::Update(
-        ShootOrPassPlayFSM::ControlParams{},
-        PlayUpdate(
-            world, 3, [](PriorityTacticVector new_tactics) {}, InterPlayCommunication{},
-            [](InterPlayCommunication comm) {})));
-
-    fsm.process_event(ShootOrPassPlayFSM::Update(
-        ShootOrPassPlayFSM::ControlParams{},
-        PlayUpdate(
-            world, 3, [](PriorityTacticVector new_tactics) {}, InterPlayCommunication{},
-            [](InterPlayCommunication comm) {})));
-
-    EXPECT_TRUE(fsm.is(boost::sml::state<ShootOrPassPlayFSM::TakePassState>));
-
-    world.setTeamWithPossession(TeamSide::ENEMY);
-
-    fsm.process_event(ShootOrPassPlayFSM::Update(
-        ShootOrPassPlayFSM::ControlParams{},
-        PlayUpdate(
-            world, 3, [](PriorityTacticVector new_tactics) {}, InterPlayCommunication{},
-            [](InterPlayCommunication comm) {})));
-
-    EXPECT_TRUE(fsm.is(boost::sml::state<ShootOrPassPlayFSM::AttemptShotState>));
-
-    world.setTeamWithPossession(TeamSide::FRIENDLY);
-
-    fsm.process_event(ShootOrPassPlayFSM::Update(
-        ShootOrPassPlayFSM::ControlParams{},
-        PlayUpdate(
-            world, 3, [](PriorityTacticVector new_tactics) {}, InterPlayCommunication{},
-            [](InterPlayCommunication comm) {})));
-
-    world.updateTimestamp(Timestamp::fromSeconds(3));
-    world.updateRefereeCommand(RefereeCommand::FORCE_START);
-
-    fsm.process_event(ShootOrPassPlayFSM::Update(
-        ShootOrPassPlayFSM::ControlParams{},
-        PlayUpdate(
-            world, 3, [](PriorityTacticVector new_tactics) {}, InterPlayCommunication{},
-            [](InterPlayCommunication comm) {})));
-    fsm.process_event(ShootOrPassPlayFSM::Update(
-        ShootOrPassPlayFSM::ControlParams{},
-        PlayUpdate(
-            world, 3, [](PriorityTacticVector new_tactics) {}, InterPlayCommunication{},
-            [](InterPlayCommunication comm) {})));
-
-    EXPECT_TRUE(fsm.is(boost::sml::state<ShootOrPassPlayFSM::TakePassState>));
-}
-
-TEST(ShootOrPassPlayFSMTest, test_abort_pass_guard_ball_changed)
+TEST(ShootOrPassPlayFSMTest, test_abort_pass_guard)
 {
     World world = ::TestUtil::createBlankTestingWorld();
     world.updateRefereeCommand(RefereeCommand::FORCE_START);
@@ -131,7 +48,7 @@ TEST(ShootOrPassPlayFSMTest, test_abort_pass_guard_ball_changed)
             [](InterPlayCommunication comm) {})));
 
     world.setTeamWithPossession(TeamSide::FRIENDLY);
-    Robot friendly_robot_1(1, Point(3, 0), Vector(0, 0), Angle::zero(),
+    Robot friendly_robot_1(1, Point(3, -1), Vector(0, 0), Angle::zero(),
                            AngularVelocity::zero(), Timestamp::fromSeconds(2));
     Robot friendly_robot_2(2, Point(0, 0), Vector(0, 0), Angle::half(),
                            AngularVelocity::zero(), Timestamp::fromSeconds(2));
@@ -152,8 +69,7 @@ TEST(ShootOrPassPlayFSMTest, test_abort_pass_guard_ball_changed)
 
     EXPECT_TRUE(fsm.is(boost::sml::state<ShootOrPassPlayFSM::TakePassState>));
 
-    world.updateBall(Ball(Point(1, 0), Vector(0, 0), Timestamp::fromSeconds(1)));
-
+    world.updateBall(Ball(Point(1, 0), Vector(0, 0), Timestamp::fromSeconds(3)));
 
     fsm.process_event(ShootOrPassPlayFSM::Update(
         ShootOrPassPlayFSM::ControlParams{},
@@ -163,14 +79,38 @@ TEST(ShootOrPassPlayFSMTest, test_abort_pass_guard_ball_changed)
 
     EXPECT_TRUE(fsm.is(boost::sml::state<ShootOrPassPlayFSM::AttemptShotState>));
 
-    fsm.process_event(ShootOrPassPlayFSM::Update(
-        ShootOrPassPlayFSM::ControlParams{},
-        PlayUpdate(
-            world, 2, [](PriorityTacticVector new_tactics) {}, InterPlayCommunication{},
-            [](InterPlayCommunication comm) {})));
+    world.updateBall(Ball(Point(-1, 0), Vector(0, 0), Timestamp::fromSeconds(4)));
 
+    fsm.process_event(ShootOrPassPlayFSM::Update(
+            ShootOrPassPlayFSM::ControlParams{},
+            PlayUpdate(
+                    world, 2, [](PriorityTacticVector new_tactics) {}, InterPlayCommunication{},
+                    [](InterPlayCommunication comm) {})));
 
     EXPECT_TRUE(fsm.is(boost::sml::state<ShootOrPassPlayFSM::AttemptShotState>));
+
+
+    world.updateBall(Ball(Point(-2, 3), Vector(-2, 0), Timestamp::fromSeconds(5)));
+
+    fsm.process_event(ShootOrPassPlayFSM::Update(
+            ShootOrPassPlayFSM::ControlParams{},
+            PlayUpdate(
+                    world, 2, [](PriorityTacticVector new_tactics) {}, InterPlayCommunication{},
+                    [](InterPlayCommunication comm) {})));
+
+    fsm.process_event(ShootOrPassPlayFSM::Update(
+            ShootOrPassPlayFSM::ControlParams{},
+            PlayUpdate(
+                    world, 2, [](PriorityTacticVector new_tactics) {}, InterPlayCommunication{},
+                    [](InterPlayCommunication comm) {})));
+    fsm.process_event(ShootOrPassPlayFSM::Update(
+            ShootOrPassPlayFSM::ControlParams{},
+            PlayUpdate(
+                    world, 2, [](PriorityTacticVector new_tactics) {}, InterPlayCommunication{},
+                    [](InterPlayCommunication comm) {})));
+
+
+    EXPECT_TRUE(fsm.is(boost::sml::state<boost::sml::back::terminate_state>));
 }
 
 
