@@ -164,6 +164,7 @@ def test_goalie_blocks_shot(
             RobotEventuallyEntersRegion(
                 regions=[tbots.Field.createSSLDivisionBField().friendlyDefenseArea()]
             ),
+            BallSpeedEventuallyBelowThreshold(1.0),
         ]
     ]
 

@@ -18,7 +18,7 @@ class BallSpeedThreshold(Validation):
         """
         self.speed_threshold = speed_threshold
         self.MILLIMETERS_PER_METER = 1000
-        self.ROBOT_MAX_RADIUS_MILLIMETERS = 90
+        self.VALIDATION_LINE_SCALE_FACTOR = 300
 
     def get_validation_status(self, world) -> ValidationStatus:
         """Checks if the ball speed is at or above some threshold
@@ -61,15 +61,15 @@ class BallSpeedThreshold(Validation):
         )
 
     def get_validation_line_endpoints(self, validation_centre_x, validation_centre_y, ball_angle):
-        start_x = validation_centre_x - math.sin(ball_angle) * self.MILLIMETERS_PER_METER / 2
-        end_x = validation_centre_x + math.sin(ball_angle) * self.MILLIMETERS_PER_METER / 2
+        start_x = validation_centre_x - math.sin(ball_angle) * self.VALIDATION_LINE_SCALE_FACTOR
+        end_x = validation_centre_x + math.sin(ball_angle) * self.VALIDATION_LINE_SCALE_FACTOR
 
-        start_y = validation_centre_y + math.cos(ball_angle) * self.MILLIMETERS_PER_METER / 2
-        end_y = validation_centre_y - math.cos(ball_angle) * self.MILLIMETERS_PER_METER / 2
+        start_y = validation_centre_y + math.cos(ball_angle) * self.VALIDATION_LINE_SCALE_FACTOR
+        end_y = validation_centre_y - math.cos(ball_angle) * self.VALIDATION_LINE_SCALE_FACTOR
 
         if ball_angle > math.pi or ball_angle < 0:
-            start_y = validation_centre_y - math.cos(ball_angle) * self.MILLIMETERS_PER_METER / 2
-            end_y = validation_centre_y + math.cos(ball_angle) * self.MILLIMETERS_PER_METER / 2
+            start_y = validation_centre_y + math.cos(ball_angle) * self.VALIDATION_LINE_SCALE_FACTOR
+            end_y = validation_centre_y - math.cos(ball_angle) * self.VALIDATION_LINE_SCALE_FACTOR
         
         return [start_x, end_x, start_y, end_y]
 
