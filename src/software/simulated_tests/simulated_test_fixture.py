@@ -350,7 +350,7 @@ def simulated_test_runner():
         should_restart_on_crash=False,
     ) as yellow_fs:
         with Gamecontroller(
-            supress_logs=(not args.show_gamecontroller_logs), ci_mode=True, 
+            supress_logs=(not args.show_gamecontroller_logs), ci_mode=True,
         ) as gamecontroller:
 
             blue_fs.setup_proto_unix_io(blue_full_system_proto_unix_io)
