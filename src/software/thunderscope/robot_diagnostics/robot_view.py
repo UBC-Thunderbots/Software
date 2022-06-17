@@ -24,13 +24,6 @@ class RobotView(QWidget):
         self.pink = QtGui.QColor(255, 0, 255)
         self.green = QtGui.QColor(0, 255, 0)
 
-        self.robot_view = QLabel()
-
-        self.robot_view.setSizePolicy(
-            QSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.MinimumExpanding)
-        )
-        self.robot_view.setGeometry(QtCore.QRect(0, 0, 10, 10))
-
         # There is no pattern to this so we just have to create
         # mapping from robot id to the four corners of the vision pattern
         #
@@ -57,81 +50,36 @@ class RobotView(QWidget):
         }
 
         self.layout = QVBoxLayout()
-        self.layout.addWidget(self.robot_view)
+
+        self.battery_voltage_progress_bar = QProgressBar()
+        self.battery_voltage_progress_bar.setMaximum(100)
+        self.battery_voltage_progress_bar.setMinimum(0)
+        self.battery_voltage_progress_bar.setValue(10)
+        self.layout.addWidget(self.battery_voltage_progress_bar)
+        for x in range(8):
+            self.layout.addWidget(self.create_vision_pattern_label(x, "b", 25))
         self.setLayout(self.layout)
 
-    def draw_robot_view(self, robot_status):
-        """Draw the robot view with the given robot status.
-
-        :param robot_status: The robot status
-
-        """
-
-        pixmap = QtGui.QPixmap(self.size())
-        pixmap.fill(QtCore.Qt.GlobalColor.transparent)
-
-        painter = QtGui.QPainter(pixmap)
-        self.draw_robot(painter, 1, "blue", 50, 50, 50)
-        self.draw_voltage(
-            painter,
-            x=150,
-            y=50,
-            width=100,
-            voltage=19.2,
-            min_voltage=19.2,
-            max_voltage=25.2,
-        )
-        painter.end()
-
-        self.robot_view.setPixmap(pixmap)
-
-    def draw_voltage(self, painter, x, y, width, voltage, min_voltage, max_voltage):
-        """Draw the given voltage on the given painter.
-
-        :param painter: The painter to draw on
-        :param x: The x coordinate of the voltage bar
-        :param y: The y coordinate of the voltage bar
-        :param width: The height of the voltage bar
-        :param voltage: The voltage to draw
-        :param min_voltage: The minimum voltage
-        :param max_voltage: The maximum voltage
-
-        """
-        painter.setPen(pg.mkPen("black", size=2))
-        painter.setBrush(pg.mkBrush(None))
-
-        painter.drawRect(QtCore.QRectF(x, y, width, 20),)
-        painter.setBrush(pg.mkBrush(self.green))
-
-        painter.drawRect(QtCore.QRectF(x, y, (voltage - min_voltage), 20),)
-
-    def draw_robot(self, painter, id, team_colour, x, y, radius):
-        """Draw a robot with the given painter. The vision pattern
-        is drawn ontop of the robot.
+    def create_vision_pattern_label(self, id, team_colour, radius):
+        """Given a robot id, team color and radius, draw the vision
+        pattern on a label and return it.
 
         :param id: The robot
         :param team_colour: The team colour
-        :param x: The x position
-        :param y: The y position
         :param radius: The radius of the robot
 
         """
-        painter.setPen(pg.mkPen("white"))
-        painter.setBrush(pg.mkBrush("white"))
+        pixmap = QtGui.QPixmap(radius * 2, radius * 2)
+        pixmap.fill(QtCore.Qt.GlobalColor.transparent)
 
-        painter.drawText(
-            QtCore.QPointF(x, y), f"Robot {id}",
-        )
-
+        painter = QtGui.QPainter(pixmap)
         painter.setPen(pg.mkPen("black"))
         painter.setBrush(pg.mkBrush("black"))
 
         convert_degree = -16
 
         painter.drawChord(
-            QtCore.QRectF(
-                int(x - radius), int(y - radius), int(radius * 2), int(radius * 2),
-            ),
+            QtCore.QRectF(0, 0, int(radius * 2), int(radius * 2),),
             -45 * convert_degree,
             270 * convert_degree,
         )
@@ -139,16 +87,16 @@ class RobotView(QWidget):
         # Draw the vision pattern
         # Draw the centre team color
         painter.setBrush(pg.mkBrush(team_colour))
-        painter.drawEllipse(QtCore.QPointF(x, y), radius / 4, radius / 4)
+        painter.drawEllipse(QtCore.QPointF(radius, radius), radius / 4, radius / 4)
 
         # Grab the collors for the vision pattern and setup the locations
         # for the four cicles in the four corners
         top_right, top_left, bottom_left, bottom_right = self.vision_pattern_lookup[id]
         top_circle_locations = [
-            QtCore.QPointF(x + radius / 2 + 5, y - radius / 2),
-            QtCore.QPointF(x - radius / 2 - 5, y - radius / 2),
-            QtCore.QPointF(x - radius / 2, y + radius / 2 + 5),
-            QtCore.QPointF(x + radius / 2, y + radius / 2 + 5),
+            QtCore.QPointF(radius + radius / 2 + 5, radius - radius / 2),
+            QtCore.QPointF(radius - radius / 2 - 5, radius - radius / 2),
+            QtCore.QPointF(radius - radius / 2, radius + radius / 2 + 5),
+            QtCore.QPointF(radius + radius / 2, radius + radius / 2 + 5),
         ]
 
         for color, location in zip(
@@ -156,3 +104,10 @@ class RobotView(QWidget):
         ):
             painter.setBrush(pg.mkBrush(color))
             painter.drawEllipse(location, radius / 5, radius / 5)
+
+        painter.end()
+
+        label = QLabel()
+        label.setPixmap(pixmap)
+
+        return label

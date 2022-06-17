@@ -529,7 +529,6 @@ class Thunderscope(object):
 
         dock = Dock("Label")
         dock.addWidget(bob)
-        bob.draw_robot_view(proto_unix_io)
 
         self.robot_diagnostics_dock_area.addDock(dock, "bottom", proto_plotter_dock_3)
 

@@ -56,7 +56,7 @@ class RobotCommunication(object):
         that the robots timeout and stop.
 
         NOTE: If disconnect_fullsystem_from_robots is called, then the packets
-        will not be forwared to the robots. 
+        will not be forwarded to the robots. 
 
         send_override_primitive_set can be used to send a primitive set, which
         is useful to dip in and out of robot diagnostics.
