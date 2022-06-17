@@ -6,15 +6,15 @@ import "proto/tbots_timestamp_msg.proto";
 
 message RobotStatus
 {
-    uint32 robot_id                           = 1;
-    repeated ErrorCode error_code             = 2;
-    BreakBeamStatus break_beam_status         = 3;
-    ChipperKickerStatus chipper_kicker_status = 4;
-    MotorStatus motor_status                  = 5;
-    NetworkStatus network_status              = 6;
-    PowerStatus power_status                  = 7;
-    ThunderloopStatus thunderloop_status      = 8;
-    Timestamp time_sent                       = 9;
+    uint32 robot_id                      = 1;
+    repeated ErrorCode error_code        = 2;
+    BreakBeamStatus break_beam_status    = 3;
+    MotorStatus motor_status             = 4;
+    NetworkStatus network_status         = 5;
+    PowerStatus power_status             = 6;
+    JetsonStatus jetson_status           = 7;
+    ThunderloopStatus thunderloop_status = 8;
+    Timestamp time_sent                  = 9;
 }
 
 message ThunderloopStatus
@@ -24,6 +24,12 @@ message ThunderloopStatus
     uint64 primitive_executor_step_time_ns  = 3;
     uint64 motor_service_poll_time_ns       = 4;
     uint64 iteration_time_ns                = 5;
+}
+
+message JetsonStatus
+{
+    // Jetson CPU temperature
+    double cpu_temperature = 3;
 }
 
 /* Data about the status of the break beam */
@@ -36,21 +42,9 @@ message BreakBeamStatus
     float break_beam_reading = 2;
 }
 
-/* Data about the status of the chipper and kicker */
-message ChipperKickerStatus
-{
-    // Indicates the time elapsed since chipper was last fired in ms
-    // UINT64_MAX indicates chipper was never fired
-    uint32 ms_since_chipper_fired = 1;
-
-    // Indicates the time elapsed since kicker was last fired in ms
-    // UINT64_MAX indicates kicker was never fired
-    uint32 ms_since_kicker_fired = 2;
-}
-
 /* Data about the status of the dribbler
- * Note that the rotation is from the perspective of rear of the motor, looking down
- * the shaft starting from the motor body
+ * Note that the rotation is from the perspective of rear of the motor,
+ * looking down the shaft starting from the motor body
  */
 message DribblerStatus
 {
@@ -68,36 +62,10 @@ enum ErrorCode
     NO_ERROR = 0;
 
     // Level triggered events
-    LOW_CAP                         = 1;
-    LOW_BATTERY                     = 2;
-    HIGH_BOARD_TEMP                 = 3;
-    CHARGE_TIMEOUT                  = 4;
-    WHEEL_0_MOTOR_HOT               = 5;
-    WHEEL_1_MOTOR_HOT               = 6;
-    WHEEL_2_MOTOR_HOT               = 7;
-    WHEEL_3_MOTOR_HOT               = 8;
-    DRIBBLER_MOTOR_HOT              = 9;
-    WHEEL_0_ENCODER_NOT_COMMUTATING = 10;
-    WHEEL_1_ENCODER_NOT_COMMUTATING = 11;
-    WHEEL_2_ENCODER_NOT_COMMUTATING = 12;
-    WHEEL_3_ENCODER_NOT_COMMUTATING = 13;
-    WHEEL_0_HALL_SENSOR_STUCK_LOW   = 14;
-    WHEEL_1_HALL_SENSOR_STUCK_LOW   = 15;
-    WHEEL_2_HALL_SENSOR_STUCK_LOW   = 16;
-    WHEEL_3_HALL_SENSOR_STUCK_LOW   = 17;
-    DRIBBLER_HALL_SENSOR_STUCK_LOW  = 18;
-    WHEEL_0_HALL_SENSOR_STUCK_HIGH  = 19;
-    WHEEL_1_HALL_SENSOR_STUCK_HIGH  = 20;
-    WHEEL_2_HALL_SENSOR_STUCK_HIGH  = 21;
-    WHEEL_3_HALL_SENSOR_STUCK_HIGH  = 22;
-    DRIBBLER_HALL_SENSOR_STUCK_HIGH = 23;
-}
-
-/* Firmware build information  */
-message FirmwareStatus
-{
-    // The microcontroller firmware build ID.
-    uint32 fw_build_id = 1;
+    LOW_CAP            = 1;
+    LOW_BATTERY        = 2;
+    HIGH_BOARD_TEMP    = 3;
+    DRIBBLER_MOTOR_HOT = 4;
 }
 
 message DriveUnit

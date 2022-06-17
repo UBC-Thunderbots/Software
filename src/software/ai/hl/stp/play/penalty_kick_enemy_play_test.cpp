@@ -76,6 +76,11 @@ TEST_P(PenaltyKickEnemyPlayTest, test_penalty_kick_enemy_play_setup)
 INSTANTIATE_TEST_CASE_P(
     RobotPositions, PenaltyKickEnemyPlayTest,
     ::testing::Values(
+        std::make_tuple(RefereeCommand::PREPARE_PENALTY_THEM, RefereeCommand::HALT,
+                        TestUtil::createStationaryRobotStatesWithId(
+                            {Point(1, 2), Point(-1, -2), Point(-2.5, 3), Point(2, -1),
+                             Point(0, 3), Point(3, 0)}),
+                        1),
         std::make_tuple(RefereeCommand::NORMAL_START,
                         RefereeCommand::PREPARE_PENALTY_THEM,
                         TestUtil::createStationaryRobotStatesWithId(
