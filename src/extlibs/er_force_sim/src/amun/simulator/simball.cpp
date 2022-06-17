@@ -74,7 +74,7 @@ SimBall::~SimBall()
     delete m_motionState;
 }
 
-void SimBall::begin(bool robotCollision)
+void SimBall::begin(bool robot_collision)
 {
     // custom implementation of rolling friction
     const btVector3 p        = m_body->getWorldTransform().getOrigin();
@@ -84,7 +84,7 @@ void SimBall::begin(bool robotCollision)
         bool is_stationary = velocity.length() < STATIONARY_BALL_SPEED * SIMULATOR_SCALE;
         bool should_roll   = velocity.length() < rolling_speed * SIMULATOR_SCALE;
 
-        if (robotCollision)
+        if (robot_collision)
         {
             current_ball_state = ROBOT_COLLISION;
         }

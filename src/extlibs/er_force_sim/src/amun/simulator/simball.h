@@ -72,10 +72,10 @@ class camun::simulator::SimBall : public QObject
    public:
     /**
      * processes velocity and forces to be applied on the ball
-     * @param robotCollision whether the ball collides with a robot in this simulation
+     * @param robot_collision whether the ball collides with a robot in this simulation
      * tick
      */
-    void begin(bool robotCollision);
+    void begin(bool robot_collision);
     bool update(SSLProto::SSL_DetectionBall *ball, float stddev, float stddevArea,
                 const btVector3 &cameraPosition, bool enableInvisibleBall,
                 float visibilityThreshold, btVector3 positionOffset);
