@@ -676,10 +676,8 @@ bool SimRobot::touchesBall(SimBall *ball) const
             (objectA == m_body && objectB == ball->body()) ||
             (objectA == ball->body() && objectB == m_body))
         {
-
-
             // check if the points are in contact now
-            int num_contacts = contact_manifold->getNumContacts();
+            int num_contacts    = contact_manifold->getNumContacts();
             auto contact_points = std::vector<btManifoldPoint>();
             for (int j = 0; j < num_contacts; ++j)
             {
@@ -687,9 +685,10 @@ bool SimRobot::touchesBall(SimBall *ball) const
                 contact_points.push_back(pt);
             }
 
-            if(std::any_of(contact_points.begin(), contact_points.end(), [=](auto &pt){
-                return (pt.getDistance() < 0.001f * SIMULATOR_SCALE);
-            })){
+            if (std::any_of(contact_points.begin(), contact_points.end(), [=](auto &pt) {
+                    return (pt.getDistance() < 0.001f * SIMULATOR_SCALE);
+                }))
+            {
                 return true;
             }
         }
