@@ -155,10 +155,9 @@ bool ShootOrPassPlayFSM::shouldAbortPass(const Update& event)
     const auto passer_point   = best_pass_and_score_so_far.pass.passerPoint();
     const auto receiver_point = best_pass_and_score_so_far.pass.receiverPoint();
     const auto short_pass_threshold =
-            this->ai_config.shoot_or_pass_play_config().short_pass_threshold();
+        this->ai_config.shoot_or_pass_play_config().short_pass_threshold();
 
-    const auto pass_area_polygon =
-        Polygon::fromPoints(passer_point, receiver_point);
+    const auto pass_area_polygon = Polygon::fromPoints(passer_point, receiver_point);
 
     // calculate a polygon that contains the receiver and passer point, and checks if the
     // ball is inside it. if the ball isn't being passed to the receiver then we should
