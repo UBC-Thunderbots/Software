@@ -1,5 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
+load("@simulated_tests_deps//:requirements.bzl", "requirement")
+
 cc_library(
     name = "kick_tactic",
     srcs = [
@@ -28,15 +30,49 @@ cc_test(
     ],
 )
 
-cc_test(
+#cc_test(
+#    name = "kick_tactic_test",
+#    srcs = ["kick_tactic_test.cpp"],
+#    deps = [
+#        ":kick_tactic",
+#        "//shared/test_util:tbots_gtest_main",
+#        "//software/simulated_tests:simulated_er_force_sim_play_test_fixture",
+#        "//software/simulated_tests/terminating_validation_functions",
+#        "//software/simulated_tests/validation:validation_function",
+#        "//software/test_util",
+#    ],
+#)
+
+py_test(
     name = "kick_tactic_test",
-    srcs = ["kick_tactic_test.cpp"],
+    srcs = [
+        "kick_tactic_test.py",
+    ],
+    # TODO (#2619) Remove tag to run in parallel
+    tags = [
+        "exclusive",
+    ],
     deps = [
-        ":kick_tactic",
-        "//shared/test_util:tbots_gtest_main",
-        "//software/simulated_tests:simulated_er_force_sim_play_test_fixture",
-        "//software/simulated_tests/terminating_validation_functions",
-        "//software/simulated_tests/validation:validation_function",
-        "//software/test_util",
+        "//software/simulated_tests:simulated_test_fixture",
+        "//software/simulated_tests:validation",
+        "//software/simulated_tests/field_tests:field_test_fixture",
+        requirement("pytest"),
+    ],
+)
+
+py_test(
+    name = "kick_tactic_test_field",
+    srcs = [
+        "kick_tactic_test_field.py",
+    ],
+    # TODO (#2619) Remove tag to run in parallel
+    tags = [
+        "exclusive",
+    ],
+    deps = [
+        "//software/simulated_tests:simulated_test_fixture",
+        "//software/simulated_tests:validation",
+        "//software/simulated_tests/field_tests:field_test_fixture",
+        requirement("pytest"),
     ],
 )

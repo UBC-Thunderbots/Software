@@ -10,8 +10,8 @@ from software.simulated_tests.robot_speed_threshold import *
 from software.simulated_tests.excessive_dribbling import *
 from software.simulated_tests.simulated_test_fixture import (
     simulated_test_runner,
-    pytest_main,
 )
+from software.simulated_tests.pytest_main import pytest_main
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
 
@@ -137,7 +137,7 @@ def test_goalie_blocks_shot(
     )
 
     # Setup no tactics on the enemy side
-    params = AssignedTacticPlayControlParams()
+    params = ()
     simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(
         AssignedTacticPlayControlParams, params
     )

@@ -33,7 +33,7 @@ from software.simulated_tests.pytest_main import load_command_line_arguments
 logger = createLogger(__name__)
 
 LAUNCH_DELAY_S = 0.1
-WORLD_BUFFER_TIMEOUT = 1.5
+WORLD_BUFFER_TIMEOUT = 0.5
 PROCESS_BUFFER_DELAY_S = 0.01
 PAUSE_AFTER_FAIL_DELAY_S = 3
 
@@ -101,6 +101,8 @@ class FieldTestRunner(object):
         self.timestamp = 0
         self.timestamp_mutex = threading.Lock()
 
+        #self.thunderscope.show()
+
         # todo possibly clear buffer
         #self.world_buffer.clear()
 
@@ -139,20 +141,24 @@ class FieldTestRunner(object):
 
             ball_position = tbots.createPoint(worldstate.ball_state.global_position)
 
-            dribble_tactic = Tactic()
-            dribble_tactic.dribble.CopyFrom(DribbleTactic(dribble_destination = worldstate.ball_state.global_position, allow_excessive_dribbling=True ))
+            dribble_tactic = DribbleTactic(dribble_destination = worldstate.ball_state.global_position, allow_excessive_dribbling=True )
+            #dribble_tactic.dribble.CopyFrom(DribbleTactic(dribble_destination = worldstate.ball_state.global_position, allow_excessive_dribbling=True ))
             print(self.friendly_robot_ids_field)
-            move_ball_tactics = AssignedTacticPlayControlParams().assigned_tactics[self.friendly_robot_ids_field[0]].CopyFrom(dribble_tactic)
+            move_ball_tactics = AssignedTacticPlayControlParams()
+            move_ball_tactics.assigned_tactics[self.friendly_robot_ids_field[0]].dribble.CopyFrom(dribble_tactic)
+            logger.info(move_ball_tactics)
+            print("sending dribble at t", time.time())
             self.blue_full_system_proto_unix_io.send_proto(
                 AssignedTacticPlayControlParams, move_ball_tactics
             )
-
+            logger.info("sent dribble")
             # validate completion
-            ball_placement_timout_s = 10
+            ball_placement_timout_s = 5
             start_time = time.time()
             timeout_time = start_time + ball_placement_timout_s
 
-            self.world_buffer.clear()
+            # self.world_buffer.clear()
+            time.sleep(3)
 
             while time.time() < timeout_time:
                 tick = SimulatorTick(
@@ -166,6 +172,7 @@ class FieldTestRunner(object):
                     )
                     if (ball_position - tbots.createPoint(current_world.ball.current_state.global_position)).length() < 0.1:
                         print("successfully moved ball")
+                        logger.info("successfully moved ball")
                         break
 
                 except queue.Empty as empty:
@@ -192,17 +199,20 @@ class FieldTestRunner(object):
 
         for team_idx, team in enumerate([worldstate.blue_robots, worldstate.yellow_robots]):
             for robot_id in team.keys():
-                robotState = worldstate.blue_robots[robot_id]
+                robotState = team[robot_id]
                 move_tactic = MoveTactic()
                 move_tactic.destination.CopyFrom(robotState.global_position)
+                print("in python creating move with destination ", robotState.global_position.x_meters)
                 move_tactic.final_orientation.CopyFrom(robotState.global_orientation if robotState.HasField('global_orientation') else Angle(radians=0.0))
                 move_tactic.final_speed = 0.0
                 move_tactic.dribbler_mode = DribblerMode.OFF
                 move_tactic.ball_collision_type = BallCollisionType.AVOID
-                move_tactic.auto_chip_or_kick.CopyFrom(AutoChipOrKick(autokick_speed_m_per_s=0.0))
+                move_tactic.auto_chip_or_kick.CopyFrom(AutoChipOrKick(autokick_speed_m_per_s=6.0))
                 move_tactic.max_allowed_speed_mode = MaxAllowedSpeedMode.PHYSICAL_LIMIT
                 move_tactic.target_spin_rev_per_s = 0.0
                 initial_position_tactics[team_idx].assigned_tactics[robot_id].move.CopyFrom(move_tactic)
+
+        print("sending movement at t", time.time())
 
         self.blue_full_system_proto_unix_io.send_proto(
             AssignedTacticPlayControlParams, initial_position_tactics[0]
@@ -218,11 +228,16 @@ class FieldTestRunner(object):
         timeout_time = start_time + ball_placement_timout_s
         self.world_buffer.clear()
 
-        while time.time() < timeout_time:
+        completed = False
+        while time.time() < timeout_time and not completed:
             try:
                 current_world = self.world_buffer.get(
                     block=True, timeout=WORLD_BUFFER_TIMEOUT
                 )
+
+                for team_idx, team in enumerate([worldstate.blue_robots, worldstate.yellow_robots]):
+                    for robot_id in team.keys():
+                        robotState = team[robot_id]
 
                 for robot_id in worldstate.blue_robots.keys():
                     expected_position = tbots.createPoint(worldstate.blue_robots[robot_id].global_position)
@@ -236,7 +251,7 @@ class FieldTestRunner(object):
 
                     print(expected_position, current_position, (expected_position - current_position).length())
                     if (expected_position - current_position).length() > 0.1:
-                        continue
+                        completed = False
 
                 for robot_id in worldstate.yellow_robots.keys():
                     expected_position = tbots.createPoint(worldstate.yellow_robots[robot_id].global_position)
@@ -251,7 +266,7 @@ class FieldTestRunner(object):
                     if (expected_position - current_position).length() > 0.1:
                         continue
 
-                break
+
 
             except queue.Empty as empty:
                 # If we timeout, that means full_system missed the last
@@ -320,7 +335,10 @@ class FieldTestRunner(object):
             """Step simulation, full_system and run validation
             """
 
+            print("__runner called at time", time.time())
+            logger.info("starting test")
             time_elapsed_s = 0
+            #self.set_worldState(self.initial_worldstate)
 
             while time_elapsed_s < test_timeout_s:
 
@@ -481,10 +499,10 @@ def field_test_runner(request):
             time.sleep(LAUNCH_DELAY_S)
 
             #todo remove when robotcommunication is merged
-            ball_initial_position = tbots.Point(-2.5, 0)
+            ball_initial_position = tbots.Point(2.5, 0)
             kick_velocity = tbots.Vector(2, 0)
 
-            rob_pos = ball_initial_position - (kick_velocity.normalize() * 0.5)
+            rob_pos = ball_initial_position - (kick_velocity.normalize() * 1.5)
 
             # Setup Ball
             simulator_proto_unix_io.send_proto(
@@ -529,6 +547,8 @@ def field_test_runner(request):
                 yellow_full_system_proto_unix_io.register_to_observe_everything(
                     yellow_logger.buffer
                 )
+                logger.info("yielding runner")
+                print("YIELDING RUNNER")
 
                 yield runner
                 print(
