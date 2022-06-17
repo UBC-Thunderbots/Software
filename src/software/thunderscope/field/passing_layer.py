@@ -58,7 +58,10 @@ class PassingLayer(FieldLayer):
             pass_vis.best_passes, key=lambda x: x.rating, reverse=True
         )
 
-        painter.setPen(pg.mkPen("red", width=2, style=QtCore.Qt.PenStyle.DotLine))
+        pen = pg.mkPen(
+            QtGui.QColor(255, 0, 0, 80), width=2, style=QtCore.Qt.PenStyle.DashLine
+        )
+        painter.setPen(pen)
 
         for pass_with_rating in sorted_pass_with_rating[0:1]:
             polygon_points = [

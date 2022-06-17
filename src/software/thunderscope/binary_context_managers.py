@@ -317,9 +317,7 @@ class Gamecontroller(object):
     """ Gamecontroller Context Manager """
 
     CI_MODE_LAUNCH_DELAY_S = 0.3
-    CI_MODE_PORT = 10009
     REFEREE_IP = "224.5.23.1"
-    REFEREE_PORT = 10003
     CI_MODE_OUTPUT_RECEIVE_BUFFER_SIZE = 9000
 
     def __init__(self, supress_logs=False, ci_mode=False):
@@ -332,6 +330,11 @@ class Gamecontroller(object):
         self.supress_logs = supress_logs
         self.ci_mode = ci_mode
 
+        # We need to find 2 free ports to use for the gamecontroller
+        # so that we can run multiple gamecontroller instances in parallel
+        self.referee_port = self.next_free_port()
+        self.ci_port = self.next_free_port()
+
     def __enter__(self):
         """Enter the gamecontroller context manager. 
 
@@ -342,6 +345,9 @@ class Gamecontroller(object):
 
         if self.ci_mode:
             command = ["/opt/tbotspython/gamecontroller", "--timeAcquisitionMode", "ci"]
+
+        command += ["-publishAddress", f"{self.REFEREE_IP}:{self.referee_port}"]
+        command += ["-ciAddress", f"localhost:{self.ci_port}"]
 
         if self.supress_logs:
             with open(os.devnull, "w") as fp:
@@ -356,7 +362,7 @@ class Gamecontroller(object):
             time.sleep(Gamecontroller.CI_MODE_LAUNCH_DELAY_S)
 
             self.ci_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.ci_socket.connect(("", Gamecontroller.CI_MODE_PORT))
+            self.ci_socket.connect(("", self.ci_port))
 
         return self
 
@@ -373,6 +379,27 @@ class Gamecontroller(object):
 
         if self.ci_socket:
             self.ci_socket.close()
+
+    def next_free_port(self, port=40000, max_port=65535):
+        """Find the next free port. We need to find 2 free ports to use for the gamecontroller
+        so that we can run multiple gamecontroller instances in parallel.
+
+        :param port: The port to start looking from
+        :param max_port: The maximum port to look up to
+        :return: The next free port
+
+        """
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+        while port <= max_port:
+            try:
+                sock.bind(("", port))
+                sock.close()
+                return port
+            except OSError:
+                port += 1
+
+        raise IOError("no free ports")
 
     def setup_proto_unix_io(
         self, blue_full_system_proto_unix_io, yellow_full_system_proto_unix_io
@@ -395,10 +422,7 @@ class Gamecontroller(object):
             yellow_full_system_proto_unix_io.send_proto(Referee, data)
 
         self.receive_referee_command = SSLRefereeProtoListener(
-            Gamecontroller.REFEREE_IP,
-            Gamecontroller.REFEREE_PORT,
-            __send_referee_command,
-            True,
+            Gamecontroller.REFEREE_IP, self.referee_port, __send_referee_command, True,
         )
 
     def send_ci_input(
