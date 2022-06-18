@@ -31,11 +31,12 @@ static uint8_t SPI_BITS      = 8;
 static uint32_t SPI_MODE     = 0x3u;
 
 // SPI Chip Selects
-static const uint32_t FRONT_LEFT_MOTOR_CHIP_SELECT  = 0;
-static const uint32_t FRONT_RIGHT_MOTOR_CHIP_SELECT = 3;
-static const uint32_t BACK_LEFT_MOTOR_CHIP_SELECT   = 2;
-static const uint32_t BACK_RIGHT_MOTOR_CHIP_SELECT  = 1;
-static const uint32_t DRIBBLER_MOTOR_CHIP_SELECT    = 4;
+static const uint8_t FRONT_LEFT_MOTOR_CHIP_SELECT  = 0;
+static const uint8_t FRONT_RIGHT_MOTOR_CHIP_SELECT = 3;
+static const uint8_t BACK_LEFT_MOTOR_CHIP_SELECT   = 2;
+static const uint8_t BACK_RIGHT_MOTOR_CHIP_SELECT  = 1;
+static const uint8_t DRIBBLER_MOTOR_CHIP_SELECT    = 4;
+static const uint8_t NUM_MOTORS                    = 5;
 
 // SPI Trinamic Motor Driver Paths (indexed with chip select above)
 static const char* SPI_PATHS[] = {"/dev/spidev0.0", "/dev/spidev0.1", "/dev/spidev0.2",
@@ -123,22 +124,12 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
     sleep(1);
 
     // TMC6100 Setup
-    startDriver(FRONT_LEFT_MOTOR_CHIP_SELECT);
-    startDriver(BACK_RIGHT_MOTOR_CHIP_SELECT);
-    startDriver(FRONT_RIGHT_MOTOR_CHIP_SELECT);
-    startDriver(BACK_LEFT_MOTOR_CHIP_SELECT);
-
-    // Check faults
-    checkDriverFault(FRONT_LEFT_MOTOR_CHIP_SELECT);
-    checkDriverFault(FRONT_RIGHT_MOTOR_CHIP_SELECT);
-    checkDriverFault(BACK_LEFT_MOTOR_CHIP_SELECT);
-    checkDriverFault(BACK_RIGHT_MOTOR_CHIP_SELECT);
-
-    // TMC4671 Setup
-    startController(FRONT_LEFT_MOTOR_CHIP_SELECT);
-    startController(BACK_RIGHT_MOTOR_CHIP_SELECT);
-    startController(FRONT_RIGHT_MOTOR_CHIP_SELECT);
-    startController(BACK_LEFT_MOTOR_CHIP_SELECT);
+    for (uint8_t i = 0; i < NUM_MOTORS; i++)
+    {
+        startDriver(i);
+        checkDriverFault(i);
+        startController(i);
+    }
 }
 
 MotorService::~MotorService() {}
@@ -324,8 +315,16 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
     }
 
     // Toggle Hearbeat
-    heartbeat_gpio.setValue((heartbeat_state = !heartbeat_state) ? GpioState::HIGH
-                                                                 : GpioState::LOW);
+    if (heartbeat_state == 1)
+    {
+        heartbeat_gpio.setValue(GpioState::LOW);
+        heartbeat_state = 0;
+    }
+    else
+    {
+        heartbeat_gpio.setValue(GpioState::HIGH);
+        heartbeat_state = 1;
+    }
 
     return motor_status;
 }

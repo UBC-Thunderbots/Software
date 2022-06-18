@@ -4,21 +4,11 @@
 
 #include "shared/constants.h"
 
-// All the interial components of the robot. This one is a little strange as it is the
-// effective rotational mass. The rotational mass * radius^2 will give the conventional
-// inertia
-// TODO (#2112): update this
-#define INERTIAL_FACTOR (0.37f)
-#define ROBOT_POINT_MASS (2.48f)
-#define ROTATIONAL_MASS (INERTIAL_FACTOR * ROBOT_POINT_MASS)
-
 RobotConstants_t create2021RobotConstants(void)
 {
     RobotConstants_t robot_constants = {
-        .mass_kg = 2.5f,  // determined experimentally
-        .moment_of_inertia_kg_m_2 =
-            ROTATIONAL_MASS * ROBOT_MAX_RADIUS_METERS * ROBOT_MAX_RADIUS_METERS,
-        .inertial_factor = INERTIAL_FACTOR,
+        .mass_kg         = 2.5f,   // determined experimentally
+        .inertial_factor = 0.37f,  // determined experimentally
         .robot_radius_m  = ROBOT_MAX_RADIUS_METERS,
         // TODO (#2112): update this
         .jerk_limit_kg_m_per_s_3 = 40.0f,
@@ -28,7 +18,7 @@ RobotConstants_t create2021RobotConstants(void)
         .front_of_robot_width_meters = 0.11f,
         // TODO (#2112): update this
         .dribbler_width_meters                  = 0.088f,
-        .robot_max_speed_m_per_s                = 4.825f,
+        .robot_max_speed_m_per_s                = 4.000f,
         .robot_max_ang_speed_rad_per_s          = 56.76f,
         .robot_max_acceleration_m_per_s_2       = 3.28f,
         .robot_max_ang_acceleration_rad_per_s_2 = 38.57f,

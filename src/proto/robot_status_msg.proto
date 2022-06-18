@@ -13,8 +13,9 @@ message RobotStatus
     MotorStatus motor_status                  = 5;
     NetworkStatus network_status              = 6;
     PowerStatus power_status                  = 7;
-    ThunderloopStatus thunderloop_status      = 8;
-    Timestamp time_sent                       = 9;
+    JetsonStatus jetson_status                = 8;
+    ThunderloopStatus thunderloop_status      = 9;
+    Timestamp time_sent                       = 10;
 }
 
 message ThunderloopStatus
@@ -24,6 +25,12 @@ message ThunderloopStatus
     uint64 primitive_executor_step_time_ns  = 3;
     uint64 motor_service_poll_time_ns       = 4;
     uint64 iteration_time_ns                = 5;
+}
+
+message JetsonStatus
+{
+    // Jetson CPU temperature
+    double cpu_temperature = 3;
 }
 
 /* Data about the status of the break beam */
@@ -49,8 +56,8 @@ message ChipperKickerStatus
 }
 
 /* Data about the status of the dribbler
- * Note that the rotation is from the perspective of rear of the motor, looking down
- * the shaft starting from the motor body
+ * Note that the rotation is from the perspective of rear of the motor,
+ * looking down the shaft starting from the motor body
  */
 message DribblerStatus
 {
@@ -68,36 +75,10 @@ enum ErrorCode
     NO_ERROR = 0;
 
     // Level triggered events
-    LOW_CAP                         = 1;
-    LOW_BATTERY                     = 2;
-    HIGH_BOARD_TEMP                 = 3;
-    CHARGE_TIMEOUT                  = 4;
-    WHEEL_0_MOTOR_HOT               = 5;
-    WHEEL_1_MOTOR_HOT               = 6;
-    WHEEL_2_MOTOR_HOT               = 7;
-    WHEEL_3_MOTOR_HOT               = 8;
-    DRIBBLER_MOTOR_HOT              = 9;
-    WHEEL_0_ENCODER_NOT_COMMUTATING = 10;
-    WHEEL_1_ENCODER_NOT_COMMUTATING = 11;
-    WHEEL_2_ENCODER_NOT_COMMUTATING = 12;
-    WHEEL_3_ENCODER_NOT_COMMUTATING = 13;
-    WHEEL_0_HALL_SENSOR_STUCK_LOW   = 14;
-    WHEEL_1_HALL_SENSOR_STUCK_LOW   = 15;
-    WHEEL_2_HALL_SENSOR_STUCK_LOW   = 16;
-    WHEEL_3_HALL_SENSOR_STUCK_LOW   = 17;
-    DRIBBLER_HALL_SENSOR_STUCK_LOW  = 18;
-    WHEEL_0_HALL_SENSOR_STUCK_HIGH  = 19;
-    WHEEL_1_HALL_SENSOR_STUCK_HIGH  = 20;
-    WHEEL_2_HALL_SENSOR_STUCK_HIGH  = 21;
-    WHEEL_3_HALL_SENSOR_STUCK_HIGH  = 22;
-    DRIBBLER_HALL_SENSOR_STUCK_HIGH = 23;
-}
-
-/* Firmware build information  */
-message FirmwareStatus
-{
-    // The microcontroller firmware build ID.
-    uint32 fw_build_id = 1;
+    LOW_CAP            = 1;
+    LOW_BATTERY        = 2;
+    HIGH_BOARD_TEMP    = 3;
+    DRIBBLER_MOTOR_HOT = 4;
 }
 
 message DriveUnit

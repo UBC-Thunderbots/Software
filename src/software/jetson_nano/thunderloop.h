@@ -70,6 +70,13 @@ class Thunderloop
      */
     void timespecNorm(struct timespec& ts);
 
+    /**
+     * Get the CPU temp thunderloop is running on
+     *
+     * @return The CPU temp.
+     */
+    double getCpuTemperature();
+
     // Primitive Executor
     PrimitiveExecutor primitive_executor_;
 
@@ -82,6 +89,7 @@ class Thunderloop
 
     // Output Msg Buffers
     TbotsProto::RobotStatus robot_status_;
+    TbotsProto::JetsonStatus jetson_status_;
     TbotsProto::NetworkStatus network_status_;
     TbotsProto::PowerStatus power_status_;
     TbotsProto::MotorStatus motor_status_;

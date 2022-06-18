@@ -14,6 +14,8 @@
 // 50 millisecond timeout on receiving primitives before we emergency stop the robots
 const double PRIMITIVE_MANAGER_TIMEOUT_NS = 50.0 * MILLISECONDS_PER_NANOSECOND;
 
+const std::string CPU_TEMP_FILE_PATH = "/sys/class/thermal/thermal_zone0/temp";
+
 /**
  * https://rt.wiki.kernel.org/index.php/Squarewave-example
  * using clock_nanosleep of librt
@@ -69,6 +71,9 @@ void Thunderloop::runLoop()
             // CLOCK_REALTIME can jump backwards
             clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &next_shot, NULL);
             ScopedTimespecTimer iteration_timer(&iteration_time);
+
+            // Collect jetson status
+            jetson_status_.set_cpu_temperature(getCpuTemperature());
 
             // Grab the latest configs from redis
             auto robot_id = std::stoi(redis_client_->get(ROBOT_ID_REDIS_KEY));
@@ -181,10 +186,10 @@ void Thunderloop::runLoop()
             thunderloop_status_.set_motor_service_poll_time_ns(
                 static_cast<unsigned long>(poll_time.tv_nsec));
 
-
             // Update Robot Status with poll responses
             *(robot_status_.mutable_thunderloop_status()) = thunderloop_status_;
             *(robot_status_.mutable_motor_status())       = motor_status_;
+            *(robot_status_.mutable_jetson_status())      = jetson_status_;
         }
 
         auto loop_duration =
@@ -209,5 +214,27 @@ void Thunderloop::timespecNorm(struct timespec& ts)
     {
         ts.tv_nsec -= static_cast<int>(NANOSECONDS_PER_SECOND);
         ts.tv_sec++;
+    }
+}
+
+double Thunderloop::getCpuTemperature()
+{
+    // Get the CPU temperature
+    std::ifstream cpu_temp_file(CPU_TEMP_FILE_PATH);
+    if (cpu_temp_file.is_open())
+    {
+        std::string cpu_temp_str;
+        std::getline(cpu_temp_file, cpu_temp_str);
+        cpu_temp_file.close();
+
+        // Convert the temperature to a double
+        // The temperature returned is in millicelcius
+        double cpu_temp = std::stod(cpu_temp_str) / 1000.0;
+        return cpu_temp;
+    }
+    else
+    {
+        LOG(WARNING) << "Could not open CPU temperature file";
+        return 0.0;
     }
 }
