@@ -115,10 +115,9 @@ void SimBall::begin(bool robot_collision)
                 break;
             case SLIDING:
                 m_body->setFriction(BALL_SLIDING_FRICTION);
-                rolling_speed =
-                    (set_transition_speed)
-                        ? FRICTION_TRANSITION_FACTOR * velocity.length() / SIMULATOR_SCALE
-                        : rolling_speed;
+                if(set_transition_speed){
+                    rolling_speed = FRICTION_TRANSITION_FACTOR * velocity.length() / SIMULATOR_SCALE;
+                }
                 set_transition_speed = false;
                 break;
             case ROLLING:

@@ -35,7 +35,7 @@ class BallStopsInRegion(Validation):
     def get_validation_geometry(self, world) -> ValidationGeometry:
         """Returns the underlying geometry this validation is checking
 
-        :param world: The world msg to create v alidation geometry from
+        :param world: The world msg to create validation geometry from
         :returns: ValidationGeometry containing geometry to visualize
 
         """
