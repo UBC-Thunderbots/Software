@@ -54,13 +54,13 @@ std::unique_ptr<TbotsProto::Circle> createCircleProto(const Circle& circle)
 
 std::unique_ptr<TbotsProto::Segment> createSegmentProto(const Segment& segment)
 {
-    auto segment_proto = std::make_unique<TbotsProto::Segment>();
+    auto segment_proto                = std::make_unique<TbotsProto::Segment>();
     *(segment_proto->mutable_start()) = *createPointProto(segment.getStart());
     *(segment_proto->mutable_end())   = *createPointProto(segment.getEnd());
 
     return segment_proto;
 }
-    
+
 std::unique_ptr<TbotsProto::VelocityObstacle> createVelocityObstacleProto(
     const VelocityObstacle& vo, const Vector& offset)
 {

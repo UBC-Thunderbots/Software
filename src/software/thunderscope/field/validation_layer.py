@@ -70,13 +70,16 @@ class ValidationLayer(FieldLayer):
 
             poly = QtGui.QPolygon(polygon_points)
             painter.drawPolygon(poly)
-        
+
         for segment in validation.geometry.segments:
             painter.drawLine(
-            QtCore.QLine(
-                segment.start.x_meters, segment.start.y_meters, segment.end.x_meters, segment.end.y_meters,
+                QtCore.QLine(
+                    segment.start.x_meters,
+                    segment.start.y_meters,
+                    segment.end.x_meters,
+                    segment.end.y_meters,
+                )
             )
-        )
 
     def paint(self, painter, option, widget):
         """Paint this layer
