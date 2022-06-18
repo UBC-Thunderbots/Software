@@ -6,15 +6,16 @@ import "proto/tbots_timestamp_msg.proto";
 
 message RobotStatus
 {
-    uint32 robot_id                      = 1;
-    repeated ErrorCode error_code        = 2;
-    BreakBeamStatus break_beam_status    = 3;
-    MotorStatus motor_status             = 4;
-    NetworkStatus network_status         = 5;
-    PowerStatus power_status             = 6;
-    JetsonStatus jetson_status           = 7;
-    ThunderloopStatus thunderloop_status = 8;
-    Timestamp time_sent                  = 9;
+    uint32 robot_id                           = 1;
+    repeated ErrorCode error_code             = 2;
+    BreakBeamStatus break_beam_status         = 3;
+    ChipperKickerStatus chipper_kicker_status = 4;
+    MotorStatus motor_status                  = 5;
+    NetworkStatus network_status              = 6;
+    PowerStatus power_status                  = 7;
+    JetsonStatus jetson_status                = 8;
+    ThunderloopStatus thunderloop_status      = 9;
+    Timestamp time_sent                       = 10;
 }
 
 message ThunderloopStatus
@@ -40,6 +41,18 @@ message BreakBeamStatus
 
     // The reading of the robot’s laser sensor, normalized to [0,1]
     float break_beam_reading = 2;
+}
+
+/* Data about the status of the chipper and kicker */
+message ChipperKickerStatus
+{
+    // Indicates the time elapsed since chipper was last fired in ms
+    // UINT64_MAX indicates chipper was never fired
+    uint32 ms_since_chipper_fired = 1;
+
+    // Indicates the time elapsed since kicker was last fired in ms
+    // UINT64_MAX indicates kicker was never fired
+    uint32 ms_since_kicker_fired = 2;
 }
 
 /* Data about the status of the dribbler
