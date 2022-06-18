@@ -818,3 +818,74 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_close_start_end_but_block
     TestUtil::checkPathDoesNotIntersectObstacle(
         {path_points.begin() + 1, path_points.end()}, obstacles);
 }
+
+TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_simulated_hrvo)
+{
+    Field field = Field::createSSLDivisionBField();
+
+    Point start{2.90502, 0.0315793}, dest{3, 0};
+
+    std::vector<ObstaclePtr> obstacles = {
+        robot_navigation_obstacle_factory.createStaticObstaclesFromMotionConstraints(
+            {TbotsProto::MotionConstraint::INFLATED_ENEMY_DEFENSE_AREA}, field),
+    };
+    Rectangle navigable_area = field.fieldBoundary();
+    EnlsvgPathPlanner planner =
+        EnlsvgPathPlanner(navigable_area, obstacles, field.boundaryMargin());
+
+    auto path = planner.findPath(start, dest);
+    EXPECT_TRUE(path != std::nullopt);
+    std::vector<Point> path_points = path->getKnots();
+
+    EXPECT_EQ(2, path_points.size());
+    EXPECT_EQ(start, path->getStartPoint());
+    EXPECT_LE(distance(path->getEndPoint(), dest), 0.1);
+}
+
+TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_defense_play)
+{
+    Field field = Field::createSSLDivisionBField();
+
+    Point start{-3.24629, 0.892211}, dest{-3.3185, 0.891779};
+
+    std::vector<ObstaclePtr> obstacles = {
+        robot_navigation_obstacle_factory.createStaticObstaclesFromMotionConstraints(
+            {TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA,
+             TbotsProto::MotionConstraint::INFLATED_ENEMY_DEFENSE_AREA},
+            field),
+    };
+    Rectangle navigable_area = field.fieldBoundary();
+    EnlsvgPathPlanner planner =
+        EnlsvgPathPlanner(navigable_area, obstacles, field.boundaryMargin());
+    auto path = planner.findPath(start, dest);
+    EXPECT_TRUE(path != std::nullopt);
+    std::vector<Point> path_points = path->getKnots();
+
+    EXPECT_EQ(2, path_points.size());
+    EXPECT_EQ(start, path->getStartPoint());
+    EXPECT_LE(distance(path->getEndPoint(), dest), 0.1);
+}
+
+TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_enemy_ball_placement)
+{
+    Field field = Field::createSSLDivisionBField();
+
+    Point start{-3.22959, -0.675264}, dest{-3.3184, -0.695291};
+
+    std::vector<ObstaclePtr> obstacles = {
+        robot_navigation_obstacle_factory.createStaticObstaclesFromMotionConstraints(
+            {TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA,
+             TbotsProto::MotionConstraint::AVOID_BALL_PLACEMENT_INTERFERENCE},
+            field),
+    };
+    Rectangle navigable_area = field.fieldBoundary();
+    EnlsvgPathPlanner planner =
+        EnlsvgPathPlanner(navigable_area, obstacles, field.boundaryMargin());
+    auto path = planner.findPath(start, dest);
+    EXPECT_TRUE(path != std::nullopt);
+    std::vector<Point> path_points = path->getKnots();
+
+    EXPECT_EQ(2, path_points.size());
+    EXPECT_EQ(start, path->getStartPoint());
+    EXPECT_LE(distance(path->getEndPoint(), dest), 0.1);
+}
