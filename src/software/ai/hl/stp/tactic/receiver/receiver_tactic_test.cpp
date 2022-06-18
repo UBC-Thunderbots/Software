@@ -25,88 +25,88 @@ class ReceiverTacticTest
     Field field                      = Field::createField(field_type);
 };
 
-//TEST_P(ReceiverTacticTest, perfect_pass_receiver_test)
-//{
-//    Pass pass                    = std::get<0>(GetParam());
-//    RobotStateWithId robot_state = std::get<1>(GetParam());
-//    BallState ball_state =
-//        BallState(pass.passerPoint(),
-//                  pass.speed() * (pass.receiverPoint() - pass.passerPoint()).normalize());
-//
-//    auto friendly_robots = TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5)});
-//    friendly_robots.emplace_back(robot_state);
-//
-//    auto tactic = std::make_shared<ReceiverTactic>();
-//    tactic->updateControlParams(pass);
-//    setTactic(1, tactic);
-//
-//    std::vector<ValidationFunction> terminating_validation_functions = {
-//        [pass, tactic](std::shared_ptr<World> world_ptr,
-//                       ValidationCoroutine::push_type& yield) {
-//            // We check if the robot reaches the desired orientation, at the
-//            // desired position before checking if the ball has been received.
-//            //
-//            // The tactic should "done" after receiving the ball.
-//            robotAtOrientation(1, world_ptr, pass.receiverOrientation(),
-//                               Angle::fromDegrees(5), yield);
-//
-//            // NOTE: we don't check robotAtPosition for receive and dribble
-//            // because the robot is free to adjust itself to best receive
-//            // the pass (and dribble). We only care if the robot received the ball.
-//            robotReceivedBall(world_ptr, yield);
-//
-//            while (!tactic->done())
-//            {
-//                yield("Receiver tactic done but did not receive pass");
-//            }
-//        }};
-//
-//    std::vector<ValidationFunction> non_terminating_validation_functions = {};
-//
-//    runTest(field_type, ball_state, friendly_robots, {}, terminating_validation_functions,
-//            non_terminating_validation_functions, Duration::fromSeconds(10));
-//}
-//
-//INSTANTIATE_TEST_CASE_P(
-//    PassEnvironmentReceiveAndDribble, ReceiverTacticTest,
-//    ::testing::Values(
-//        // Robot already at receive point
-//        std::make_tuple(Pass(Point(0.0, 0.5), Point(2, 2), 4),
-//                        RobotStateWithId{
-//                            1, RobotState(Point(2, 2), Vector(0, 0),
-//                                          Angle::fromDegrees(0), Angle::fromDegrees(0))}),
-//
-//        // Robot slighty off from receive point: test 1
-//        std::make_tuple(Pass(Point(0.0, 0.4), Point(2, 2), 4),
-//                        RobotStateWithId{
-//                            1, RobotState(Point(2, 1.5), Vector(0, 0),
-//                                          Angle::fromDegrees(0), Angle::fromDegrees(0))}),
-//
-//        // Robot slighty off from receive point: test 2
-//        std::make_tuple(Pass(Point(0.0, 0.4), Point(2, 2), 4),
-//                        RobotStateWithId{
-//                            1, RobotState(Point(2.5, 2.0), Vector(0, 0),
-//                                          Angle::fromDegrees(0), Angle::fromDegrees(0))}),
-//
-//        // Robot facing away from pass
-//        std::make_tuple(Pass(Point(0.0, 0.0), Point(-3, 0), 4),
-//                        RobotStateWithId{1, RobotState(Point(-3, 0), Vector(0, 0),
-//                                                       Angle::fromDegrees(180),
-//                                                       Angle::fromDegrees(0))}),
-//
-//        // Robot facing towards from pass
-//        std::make_tuple(Pass(Point(0.0, 0.0), Point(-3, 0), 4),
-//                        RobotStateWithId{
-//                            1, RobotState(Point(-3, 0), Vector(0, 0),
-//                                          Angle::fromDegrees(0), Angle::fromDegrees(0))}),
-//
-//        // Robot facing towards pass speedy
-//        std::make_tuple(Pass(Point(0.0, 0.0), Point(-3, 0), 5),
-//                        RobotStateWithId{
-//                            1, RobotState(Point(-3, 0), Vector(0, 0),
-//                                          Angle::fromDegrees(0), Angle::fromDegrees(0))})
-//
-//            ));
+TEST_P(ReceiverTacticTest, perfect_pass_receiver_test)
+{
+    Pass pass                    = std::get<0>(GetParam());
+    RobotStateWithId robot_state = std::get<1>(GetParam());
+    BallState ball_state =
+        BallState(pass.passerPoint(),
+                  pass.speed() * (pass.receiverPoint() - pass.passerPoint()).normalize());
+
+    auto friendly_robots = TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5)});
+    friendly_robots.emplace_back(robot_state);
+
+    auto tactic = std::make_shared<ReceiverTactic>();
+    tactic->updateControlParams(pass);
+    setTactic(1, tactic);
+
+    std::vector<ValidationFunction> terminating_validation_functions = {
+        [pass, tactic](std::shared_ptr<World> world_ptr,
+                       ValidationCoroutine::push_type& yield) {
+            // We check if the robot reaches the desired orientation, at the
+            // desired position before checking if the ball has been received.
+            //
+            // The tactic should "done" after receiving the ball.
+            robotAtOrientation(1, world_ptr, pass.receiverOrientation(),
+                               Angle::fromDegrees(5), yield);
+
+            // NOTE: we don't check robotAtPosition for receive and dribble
+            // because the robot is free to adjust itself to best receive
+            // the pass (and dribble). We only care if the robot received the ball.
+            robotReceivedBall(world_ptr, yield);
+
+            while (!tactic->done())
+            {
+                yield("Receiver tactic done but did not receive pass");
+            }
+        }};
+
+    std::vector<ValidationFunction> non_terminating_validation_functions = {};
+
+    runTest(field_type, ball_state, friendly_robots, {}, terminating_validation_functions,
+            non_terminating_validation_functions, Duration::fromSeconds(10));
+}
+
+INSTANTIATE_TEST_CASE_P(
+    PassEnvironmentReceiveAndDribble, ReceiverTacticTest,
+    ::testing::Values(
+        // Robot already at receive point
+        std::make_tuple(Pass(Point(0.0, 0.5), Point(2, 2), 4),
+                        RobotStateWithId{
+                            1, RobotState(Point(2, 2), Vector(0, 0),
+                                          Angle::fromDegrees(0), Angle::fromDegrees(0))}),
+
+        // Robot slighty off from receive point: test 1
+        std::make_tuple(Pass(Point(0.0, 0.4), Point(2, 2), 4),
+                        RobotStateWithId{
+                            1, RobotState(Point(2, 1.5), Vector(0, 0),
+                                          Angle::fromDegrees(0), Angle::fromDegrees(0))}),
+
+        // Robot slighty off from receive point: test 2
+        std::make_tuple(Pass(Point(0.0, 0.4), Point(2, 2), 4),
+                        RobotStateWithId{
+                            1, RobotState(Point(2.5, 2.0), Vector(0, 0),
+                                          Angle::fromDegrees(0), Angle::fromDegrees(0))}),
+
+        // Robot facing away from pass
+        std::make_tuple(Pass(Point(0.0, 0.0), Point(-3, 0), 4),
+                        RobotStateWithId{1, RobotState(Point(-3, 0), Vector(0, 0),
+                                                       Angle::fromDegrees(180),
+                                                       Angle::fromDegrees(0))}),
+
+        // Robot facing towards from pass
+        std::make_tuple(Pass(Point(0.0, 0.0), Point(-3, 0), 4),
+                        RobotStateWithId{
+                            1, RobotState(Point(-3, 0), Vector(0, 0),
+                                          Angle::fromDegrees(0), Angle::fromDegrees(0))}),
+
+        // Robot facing towards pass speedy
+        std::make_tuple(Pass(Point(0.0, 0.0), Point(-3, 0), 5),
+                        RobotStateWithId{
+                            1, RobotState(Point(-3, 0), Vector(0, 0),
+                                          Angle::fromDegrees(0), Angle::fromDegrees(0))})
+
+            ));
 
 class ReceiverTacticTestOneTouch : public ReceiverTacticTest
 {
