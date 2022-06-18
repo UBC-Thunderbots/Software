@@ -37,6 +37,11 @@ class BallSpeedThreshold(Validation):
 
     def get_validation_geometry(self, world) -> ValidationGeometry:
         """override"""
+        ball_speed = math.sqrt(world.ball.current_state.global_velocity.x_component_meters**2 + 
+                    world.ball.current_state.global_velocity.y_component_meters**2)
+        if ball_speed == 0:
+            return create_validation_geometry([])
+        
         ball_x = world.ball.current_state.global_position.x_meters * self.MILLIMETERS_PER_METER
         ball_y = world.ball.current_state.global_position.y_meters * self.MILLIMETERS_PER_METER
         
