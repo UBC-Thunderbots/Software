@@ -405,7 +405,7 @@ TEST_F(SensorFusionTest, test_making_all_robot_capabilities_unavailable_from_err
     ASSERT_TRUE(robot);
     std::set<RobotCapability> robot_unavailable_capabilities =
         robot.value().getUnavailableCapabilities();
-    EXPECT_EQ(4, robot_unavailable_capabilities.size());
+    EXPECT_EQ(3, robot_unavailable_capabilities.size());
 
     bool is_dribble_disabled =
         robot_unavailable_capabilities.find(RobotCapability::Dribble) !=
