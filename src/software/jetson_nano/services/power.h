@@ -28,8 +28,7 @@ class PowerService
      * @param control The power control msg to send
      * @return the latest power status
      */
-    std::unique_ptr<TbotsProto::PowerStatus> poll(
-        const TbotsProto::PowerControl& control);
+    TbotsProto::PowerStatus poll(const TbotsProto::PowerControl& control);
 
    private:
     std::unique_ptr<BoostUartCommunication> uart;

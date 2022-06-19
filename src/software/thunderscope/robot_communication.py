@@ -119,7 +119,7 @@ class RobotCommunication(object):
         self.receive_robot_log = RobotLogProtoListener(
             self.multicast_channel + "%" + self.interface,
             ROBOT_LOGS_PORT,
-            lambda data: self.proto_unix_io.send_proto(RobotLog, data),
+            lambda data: self.full_system_proto_unix_io.send_proto(RobotLog, data),
             True,
         )
 
