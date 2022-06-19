@@ -116,7 +116,18 @@ class RobotCommunication(object):
             self.multicast_channel + "%" + self.interface, PRIMITIVE_PORT, True
         )
 
-        self.send_world_mcast_sender = WorldProtoSender(
+        self.receive_robot_log = RobotLogProtoListener(
+            self.multicast_channel + "%" + self.interface,
+            ROBOT_LOGS_PORT,
+            lambda data: self.proto_unix_io.send_proto(RobotLog, data),
+            True,
+        )
+
+        self.send_primitive_set = PrimitiveSetProtoSender(
+            self.multicast_channel + "%" + self.interface, PRIMITIVE_PORT, True
+        )
+
+        self.send_world = WorldProtoSender(
             self.multicast_channel + "%" + self.interface, VISION_PORT, True
         )
 
