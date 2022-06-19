@@ -17,21 +17,19 @@ class PowerMonitor
      */
     PowerMonitor();
     /**
-     * Returns the current battery voltage
+     * Returns the current battery voltage in volts
      *
-     * @return the current battery voltage
+     * @return the current battery voltage in volts
      */
     float getBatteryVoltage();
     /**
-     * Returns the current current draw
+     * Returns the current current draw in amps
      *
-     * @return the current current draw
+     * @return the current current draw in amps
      */
-    float getCurrentDraw();
+    float getCurrentDrawAmp();
 
    private:
-    static constexpr uint16_t RESOLUTION = 4096;
-    static constexpr float SCALE_VOLTAGE = 3.3;
-    static constexpr double RESISTANCE   = 0.002;
+    static constexpr double RESISTANCE_OHMS = 0.002;
     std::shared_ptr<LTC4151> monitor;
 };

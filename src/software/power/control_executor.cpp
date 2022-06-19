@@ -41,7 +41,7 @@ void ControlExecutor::execute(const TbotsProto_PowerControl& control)
             {
                 case TbotsProto_AutoChipOrKick_autokick_speed_m_per_s_tag:
                     chicker->setKickSpeedMPerS(
-                        control.chicker.chicker_command.kick_speed_m_per_s);
+                        control.chicker.chicker_command.auto_chip_or_kick.auto_chip_or_kick.autokick_speed_m_per_s);
                     charger->setChargeDoneCallbackOnce(&chicker->autokick);
                     if (control.geneva.angle_deg != geneva->getCurrentAngle())
                     {
@@ -55,7 +55,7 @@ void ControlExecutor::execute(const TbotsProto_PowerControl& control)
                     break;
                 case TbotsProto_AutoChipOrKick_autochip_distance_meters_tag:
                     chicker->setChipDistanceMeters(
-                        control.chicker.chicker_command.chip_distance_meters);
+                        control.chicker.chicker_command.auto_chip_or_kick.auto_chip_or_kick.autochip_distance_meters);
                     charger->setChargeDoneCallbackOnce(&chicker->autochip);
                     charger->chargeCapacitors();
                     break;
