@@ -18,7 +18,8 @@ Charger::Charger()
 void IRAM_ATTR Charger::chargeDone()
 {
     flyback_fault = digitalRead(FLYBACK_FAULT);
-    if (charge_done_callback) {
+    if (charge_done_callback)
+    {
         charge_done_callback();
         charge_done_callback = NULL;
     }

@@ -47,7 +47,7 @@ class Charger
     static hw_timer_t* charge_timer;
     static void (*volatile charge_done_callback)();
     static constexpr uint32_t CHARGE_TIME_SECONDS = 3 * MICROSECONDS_IN_SECOND;
-    static constexpr float RESOLUTION = 4096.0;
-    static constexpr float SCALE_VOLTAGE = 3.3;
+    static constexpr float RESOLUTION             = 4096.0;
+    static constexpr float SCALE_VOLTAGE          = 3.3;
     static volatile bool flyback_fault;
 };

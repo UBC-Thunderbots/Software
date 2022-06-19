@@ -79,7 +79,8 @@ int IRAM_ATTR Chicker::speedToPulseWidth(float speed_m_per_s)
 {
     // TODO(#2645): map speed to duration by testing
     // 1s = 1000000
-    if (speed_m_per_s == 3) {
+    if (speed_m_per_s == 3)
+    {
         return 1000;
     }
     return 1000;

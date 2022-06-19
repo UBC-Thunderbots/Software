@@ -1,4 +1,5 @@
 #include "power_monitor.h"
+
 #include <Wire.h>
 
 PowerMonitor::PowerMonitor()

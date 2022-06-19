@@ -30,7 +30,7 @@ const uint8_t PM_SDA = 13;
 const uint8_t PM_SCL = 14;
 
 // Timers
-const uint8_t CHICKER_TIMER = 0;
-const uint8_t GENEVA_TIMER = 1;
-const uint8_t CHARGE_TIMER = 2;
+const uint8_t CHICKER_TIMER           = 0;
+const uint8_t GENEVA_TIMER            = 1;
+const uint8_t CHARGE_TIMER            = 2;
 const uint32_t MICROSECONDS_IN_SECOND = 1000000;
