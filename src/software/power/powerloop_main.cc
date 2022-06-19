@@ -69,7 +69,7 @@ void loop()
     // Read sensor values. These are all instantaneous
     auto status = createNanoPbPowerStatus(monitor->getBatteryVoltage(),
         charger->getCapacitorVoltage(),
-        monitor->getCurrentDraw(),
+        monitor->getCurrentDrawAmp(),
         geneva->getCurrentAngle(),
         chicker->getBreakBeamTripped(),
         charger->getFlybackFault());

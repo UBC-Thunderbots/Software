@@ -13,16 +13,17 @@ class Chicker
      */
     Chicker();
     /**
-     * Sets the action of the chicker.
+     * Sets the action of the chicker. Arguments can not be passed to isr's so these
+     * need to be set before calling kick/chip
      */
-    static void IRAM_ATTR kick();
-    static void IRAM_ATTR chip();
+    static void kick();
+    static void chip();
     /**
      * Attaches an interrupt on the BREAK_BEAM_PIN to kick/chip.
      * kick/chip will only be triggered once
      */
-    static void IRAM_ATTR autokick();
-    static void IRAM_ATTR autochip();
+    static void autokick();
+    static void autochip();
     /**
      * Get the current status of whether the break beam was tripped or not
      * This is reset before every kick/chip
@@ -58,14 +59,15 @@ class Chicker
      * Isr called when the BREAK_BEAM_PIN is tripped. Performs a kick/chip action if the
      * break beam wasn't previously triggered
      */
-    static void IRAM_ATTR autoKickISR();
-    static void IRAM_ATTR autoChipISR();
+    static void autoKickISR();
+    static void autoChipISR();
     /**
-     * Continuously called to bring CHIPPER_PIN/KICKER_PIN low.
+     * Called on a pulse_timer to bring the CHIPPER/KICKER pin low
      */
-    static void IRAM_ATTR stopPulse();
-    static hw_timer_t* timer;
+    static void stopPulse();
+    static hw_timer_t* pulse_timer;
     static volatile bool breakbeam_tripped;
+
     static float kick_speed_m_per_s;
     static float chip_distance_meters;
 };

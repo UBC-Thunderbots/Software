@@ -1,6 +1,6 @@
 #include "chicker.h"
 
-hw_timer_t* Chicker::timer               = nullptr;
+hw_timer_t* Chicker::pulse_timer         = nullptr;
 float Chicker::kick_speed_m_per_s        = 0;
 float Chicker::chip_distance_meters      = 0;
 volatile bool Chicker::breakbeam_tripped = false;
@@ -10,11 +10,11 @@ Chicker::Chicker()
     pinMode(CHIPPER_PIN, OUTPUT);
     pinMode(KICKER_PIN, OUTPUT);
 
-    timer = timerBegin(0, 80, true);
-    timerAttachInterrupt(timer, stopPulse, true);
+    pulse_timer = timerBegin(CHICKER_TIMER, 80, true);
+    timerAttachInterrupt(pulse_timer, &stopPulse, true);
 }
 
-void Chicker::autoKickISR()
+void IRAM_ATTR Chicker::autoKickISR()
 {
     if (!breakbeam_tripped)
     {
@@ -23,7 +23,7 @@ void Chicker::autoKickISR()
     }
 }
 
-void Chicker::autoChipISR()
+void IRAM_ATTR Chicker::autoChipISR()
 {
     if (!breakbeam_tripped)
     {
@@ -32,27 +32,27 @@ void Chicker::autoChipISR()
     }
 }
 
-void Chicker::kick()
+void IRAM_ATTR Chicker::kick()
 {
     breakbeam_tripped = false;
     auto duration     = speedToPulseWidth(kick_speed_m_per_s);
-    oneShotPulse(duration, KICKER_PIN);
+    oneShotPulse(1000, KICKER_PIN);
 }
 
-void Chicker::chip()
+void IRAM_ATTR Chicker::chip()
 {
     breakbeam_tripped = false;
     auto duration     = distanceToPulseWidth(chip_distance_meters);
     oneShotPulse(duration, CHIPPER_PIN);
 }
 
-void Chicker::autokick()
+void IRAM_ATTR Chicker::autokick()
 {
     breakbeam_tripped = false;
     attachInterrupt(digitalPinToInterrupt(BREAK_BEAM_PIN), Chicker::autoKickISR, RISING);
 }
 
-void Chicker::autochip()
+void IRAM_ATTR Chicker::autochip()
 {
     breakbeam_tripped = false;
     attachInterrupt(digitalPinToInterrupt(BREAK_BEAM_PIN), Chicker::autoChipISR, RISING);
@@ -68,27 +68,28 @@ void Chicker::setChipDistanceMeters(float chip_distance_meters)
     Chicker::chip_distance_meters = chip_distance_meters;
 }
 
-int Chicker::distanceToPulseWidth(float distance_meters)
+int IRAM_ATTR Chicker::distanceToPulseWidth(float distance_meters)
 {
     // TODO(#2645): map distance to duration by testing
     // 1s = 1000000
     return 0;
 }
 
-int Chicker::speedToPulseWidth(float speed_m_per_s)
+int IRAM_ATTR Chicker::speedToPulseWidth(float speed_m_per_s)
 {
     // TODO(#2645): map speed to duration by testing
     // 1s = 1000000
-    return 0;
+    if (speed_m_per_s == 3) {
+        return 1000;
+    }
+    return 1000;
 }
 
-void Chicker::oneShotPulse(int duration, int pin)
+void IRAM_ATTR Chicker::oneShotPulse(int duration, int pin)
 {
-    timerRestart(timer);
-
-    timerWrite(timer, 0);
-    timerAlarmWrite(timer, duration, false);
-    timerAlarmEnable(timer);
+    timerWrite(pulse_timer, 0);
+    timerAlarmWrite(pulse_timer, duration, false);
+    timerAlarmEnable(pulse_timer);
 
     digitalWrite(pin, HIGH);
 }
