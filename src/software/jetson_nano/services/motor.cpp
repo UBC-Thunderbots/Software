@@ -26,9 +26,10 @@ extern "C"
 }
 
 // SPI Configs
-static uint32_t SPI_SPEED_HZ = 2000000;  // 2 Mhz
-static uint8_t SPI_BITS      = 8;
-static uint32_t SPI_MODE     = 0x3u;
+static const uint32_t SPI_SPEED_HZ    = 2000000;  // 2 Mhz
+static const uint8_t SPI_BITS         = 8;
+static const uint32_t SPI_MODE        = 0x3u;
+static const uint32_t NUM_RETRIES_SPI = 3;
 
 // SPI Chip Selects
 static const uint8_t FRONT_LEFT_MOTOR_CHIP_SELECT  = 0;
@@ -456,12 +457,26 @@ uint8_t MotorService::readWriteByte(uint8_t motor, uint8_t data, uint8_t last_tr
 
 void MotorService::writeToDriverOrDieTrying(uint8_t motor, uint8_t address, int32_t value)
 {
-    tmc6100_writeInt(motor, address, value);
-    int read_value = tmc6100_readInt(motor, address);
-    if (read_value != value)
+    int num_retires_left = NUM_RETRIES_SPI;
+    int read_value       = 0;
+
+    // The SPI lines have a lot of noise, and sometimes a transfer will fail
+    // randomly. So we retry a few times before giving up.
+    while (num_retires_left > 0)
     {
-        reset_gpio.setValue(GpioState::LOW);
+        read_value = tmc6100_readInt(motor, address);
+        tmc6100_writeInt(motor, address, value);
+        if (read_value == value)
+        {
+            return;
+        }
+        LOG(DEBUG) << "SPI Transfer to Driver Failed, retrying...";
+        num_retires_left--;
     }
+
+    // If we get here, we have failed to write to the driver. We reset
+    // the chip to clear any bad values we just wrote and crash so everything stops.
+    reset_gpio.setValue(GpioState::LOW);
     CHECK(read_value == value) << "Couldn't write " << value
                                << " to the TMC6100 at address " << address
                                << " at address " << static_cast<uint32_t>(address)
@@ -472,12 +487,26 @@ void MotorService::writeToDriverOrDieTrying(uint8_t motor, uint8_t address, int3
 void MotorService::writeToControllerOrDieTrying(uint8_t motor, uint8_t address,
                                                 int32_t value)
 {
-    tmc4671_writeInt(motor, address, value);
-    int read_value = tmc4671_readInt(motor, address);
-    if (read_value != value)
+    int num_retires_left = NUM_RETRIES_SPI;
+    int read_value       = 0;
+
+    // The SPI lines have a lot of noise, and sometimes a transfer will fail
+    // randomly. So we retry a few times before giving up.
+    while (num_retires_left > 0)
     {
-        reset_gpio.setValue(GpioState::LOW);
+        read_value = tmc4671_readInt(motor, address);
+        tmc4671_writeInt(motor, address, value);
+        if (read_value == value)
+        {
+            return;
+        }
+        LOG(DEBUG) << "SPI Transfer to Controller Failed, retrying...";
+        num_retires_left--;
     }
+
+    // If we get here, we have failed to write to the controller. We reset
+    // the chip to clear any bad values we just wrote and crash so everything stops.
+    reset_gpio.setValue(GpioState::LOW);
     CHECK(read_value == value) << "Couldn't write " << value
                                << " to the TMC4671 at address " << address
                                << " at address " << static_cast<uint32_t>(address)
