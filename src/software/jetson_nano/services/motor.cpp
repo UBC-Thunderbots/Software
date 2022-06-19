@@ -464,8 +464,8 @@ void MotorService::writeToDriverOrDieTrying(uint8_t motor, uint8_t address, int3
     // randomly. So we retry a few times before giving up.
     while (num_retires_left > 0)
     {
-        read_value = tmc6100_readInt(motor, address);
         tmc6100_writeInt(motor, address, value);
+        read_value = tmc6100_readInt(motor, address);
         if (read_value == value)
         {
             return;
@@ -494,8 +494,8 @@ void MotorService::writeToControllerOrDieTrying(uint8_t motor, uint8_t address,
     // randomly. So we retry a few times before giving up.
     while (num_retires_left > 0)
     {
-        read_value = tmc4671_readInt(motor, address);
         tmc4671_writeInt(motor, address, value);
+        read_value = tmc4671_readInt(motor, address);
         if (read_value == value)
         {
             return;
