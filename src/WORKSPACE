@@ -148,6 +148,14 @@ http_archive(
 )
 
 new_git_repository(
+    name = "LTC4151",
+    build_file = "@//extlibs:LTC4151.BUILD",
+    commit = "729952f10bcdcf359877b6f728565c17a8f17423",
+    remote = "https://github.com/kerrydwong/LTC4151.git",
+    shallow_since = "1397951678 -0400",
+)
+
+new_git_repository(
     name = "munkres_cpp",
     build_file = "@//extlibs:munkres_cpp.BUILD",
     commit = "61086fcf5b3a8ad4bda578cdc2d1dca57b548786",
