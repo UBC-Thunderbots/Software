@@ -209,15 +209,8 @@ if __name__ == "__main__":
 
     if args.run_blue or args.run_yellow:
         with RobotCommunication(
-<<<<<<< HEAD
-            proto_unix_io, getRobotMulticastChannel(args.channel), args.interface
-        ) as robot_comms, FullSystem(
-            runtime_dir, debug, friendly_colour_yellow
-        ) as full_system:
-=======
             proto_unix_io, getRobotMulticastChannel(0), args.interface
         ), FullSystem(runtime_dir, debug, friendly_colour_yellow) as full_system:
->>>>>>> akhil/thunderloop-integration
             tscope.show()
 
     ###########################################################################

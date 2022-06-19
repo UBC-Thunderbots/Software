@@ -108,7 +108,7 @@ class RobotCommunication(object):
         self.receive_robot_status = RobotStatusProtoListener(
             self.multicast_channel + "%" + self.interface,
             ROBOT_STATUS_PORT,
-            lambda data: self.full_system_proto_unix_io.send_proto(RobotStatus, data),
+            lambda data: print(data),
             True,
         )
 
