@@ -32,13 +32,17 @@ void OffensePlay::updateTactics(const PlayUpdate &play_update)
     }
 
     PriorityTacticVector tactics_to_return;
-    unsigned int num_defenders     = 2;
-    unsigned int num_enemy_robots  = static_cast<int>(play_update.world.enemyTeam().numRobots());
+    unsigned int num_defenders = 2;
+    unsigned int num_enemy_robots =
+        static_cast<int>(play_update.world.enemyTeam().numRobots());
 
     if (num_enemy_robots <= 3)
     {
-        num_defenders = num_enemy_robots > 1 ? 1 : 0;
-    } else if (play_update.num_tactics <= 3)
+        num_defenders = 1;
+        if (num_enemy_robots < 2)
+            num_defenders--;
+    }
+    else if (play_update.num_tactics <= 3)
     {
         // play_update.num_tactics == 0 is handled above
         num_defenders = play_update.num_tactics - 1;
