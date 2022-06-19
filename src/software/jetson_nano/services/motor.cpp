@@ -36,7 +36,7 @@ static const uint8_t FRONT_RIGHT_MOTOR_CHIP_SELECT = 3;
 static const uint8_t BACK_LEFT_MOTOR_CHIP_SELECT   = 2;
 static const uint8_t BACK_RIGHT_MOTOR_CHIP_SELECT  = 1;
 static const uint8_t DRIBBLER_MOTOR_CHIP_SELECT    = 4;
-static const uint8_t NUM_MOTORS                    = 5;
+static const uint8_t NUM_MOTORS                    = 4;
 
 // SPI Trinamic Motor Driver Paths (indexed with chip select above)
 static const char* SPI_PATHS[] = {"/dev/spidev0.0", "/dev/spidev0.1", "/dev/spidev0.2",
@@ -139,11 +139,6 @@ bool MotorService::checkDriverFault(uint8_t motor)
 {
     int gstat = tmc6100_readInt(motor, TMC6100_GSTAT);
     std::bitset<32> gstat_bitset(gstat);
-
-    CHECK(gstat_bitset.any() == false)
-        << "TMC6100 offline, no fault bits detected."
-        << " The reset bit should be set. This could indicate that the driver isn't"
-        << " communicating over SPI or the reset pin is not connected.";
 
     if (gstat_bitset.any())
     {
