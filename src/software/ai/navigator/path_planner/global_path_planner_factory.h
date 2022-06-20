@@ -13,9 +13,6 @@
 #include "software/geom/point.h"
 #include "software/logger/logger.h"
 
-// TODO #2504: The GlobalPathPlanner doesn't handle
-// MotionConstraint::AVOID_BALL_PLACEMENT_INTERFERENCE and
-// MotionConstraint::HALF_METER_AROUND_BALL correctly in most situations
 /**
  * GlobalPathPlannerFactory is a module that constructs every possible path planner for
  * every possible combination of static obstacles. It pre-computes static obstacle

@@ -34,7 +34,7 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_empty_grid)
         EnlsvgPathPlanner(navigable_area, obstacles, field.boundaryMargin());
     auto path = planner.findPath(start, dest);
 
-    EXPECT_TRUE(path != std::nullopt);
+    ASSERT_TRUE(path != std::nullopt);
 
     EXPECT_EQ(2, path.value().size());
 
