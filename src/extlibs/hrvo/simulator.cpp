@@ -324,7 +324,7 @@ void HRVOSimulator::visualize(unsigned int robot_id) const
     hrvo_visualization.set_robot_id(robot_id);
 
     auto friendly_agent = friendly_agent_opt.value();
-    auto vo_protos = friendly_agent->getVelocityObstaclesAsProto();
+    auto vo_protos      = friendly_agent->getVelocityObstaclesAsProto();
     *(hrvo_visualization.mutable_velocity_obstacles()) = {vo_protos.begin(),
                                                           vo_protos.end()};
 
@@ -339,7 +339,8 @@ void HRVOSimulator::visualize(unsigned int robot_id) const
     // Visualize the ball obstacle
     if (friendly_agent->ball_obstacle.has_value())
     {
-        TbotsProto::Circle ball_circle = friendly_agent->ball_obstacle.value()->createObstacleProto().circle()[0];
+        TbotsProto::Circle ball_circle =
+            friendly_agent->ball_obstacle.value()->createObstacleProto().circle()[0];
         *(hrvo_visualization.add_robots()) = ball_circle;
     }
 

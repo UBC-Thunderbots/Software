@@ -410,8 +410,7 @@ TEST_F(SimulatedHRVOTest, test_robot_avoiding_ball_obstacle)
     BallState ball_state(Point(0, 0), Vector(0, 0));
     auto friendly_robots =
         TestUtil::createStationaryRobotStatesWithId({initial_position});
-    auto enemy_robots = TestUtil::createStationaryRobotStatesWithId(
-        {});
+    auto enemy_robots = TestUtil::createStationaryRobotStatesWithId({});
 
     auto tactic = std::make_shared<MoveTactic>();
     tactic->updateControlParams(destination, Angle::zero(), 0);

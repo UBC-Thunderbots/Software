@@ -48,7 +48,7 @@ HRVOAgent::HRVOAgent(HRVOSimulator *simulator, const Vector &position, float nei
       maxNeighbors_(maxNeighbors),
       neighborDist_(neighborDist),
       prefSpeed_(max_speed_ * PREF_SPEED_SCALE),
-        // TODO: Update this obstacle config
+      // TODO: Update this obstacle config
       obstacle_factory(TbotsProto::RobotNavigationObstacleConfig()),
       ball_obstacle(std::nullopt)
 {
@@ -91,9 +91,9 @@ void HRVOAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive,
             }
 
             const auto constraint =
-                    static_cast<TbotsProto::MotionConstraint>(constraint_int);
+                static_cast<TbotsProto::MotionConstraint>(constraint_int);
             auto new_obstacles =
-                    obstacle_factory.createFromMotionConstraint(constraint, world);
+                obstacle_factory.createFromMotionConstraint(constraint, world);
             if (constraint == TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL)
             {
                 ball_obstacle = new_obstacles[0];
@@ -151,11 +151,12 @@ void HRVOAgent::computeVelocityObstacles()
         double dist_agent_to_obstacle = obstacle->distance(agent_position_point);
 
         // Set of heuristics to minimize the amount of velocity obstacles
-        if ((obstacle->intersects(path) || dist_agent_to_obstacle < 2 * ROBOT_MAX_RADIUS_METERS) &&
+        if ((obstacle->intersects(path) ||
+             dist_agent_to_obstacle < 2 * ROBOT_MAX_RADIUS_METERS) &&
             !obstacle->contains(agent_position_point))
         {
             VelocityObstacle velocity_obstacle =
-                    obstacle->generateVelocityObstacle(circle_rep_of_agent, Vector());
+                obstacle->generateVelocityObstacle(circle_rep_of_agent, Vector());
             velocityObstacles_.push_back(velocity_obstacle);
         }
     }
@@ -170,7 +171,7 @@ void HRVOAgent::computeVelocityObstacles()
         if (obstacle->intersects(path))
         {
             VelocityObstacle velocity_obstacle =
-                    obstacle->generateVelocityObstacle(circle_rep_of_agent, Vector());
+                obstacle->generateVelocityObstacle(circle_rep_of_agent, Vector());
             velocityObstacles_.push_back(velocity_obstacle);
         }
     }
