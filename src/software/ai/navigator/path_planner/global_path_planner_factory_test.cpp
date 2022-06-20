@@ -89,8 +89,6 @@ TEST_F(
 
     EXPECT_TRUE(path != std::nullopt);
 
-    std::vector<Point> path_points = path.value();
-
     EXPECT_EQ(path.value().front(), start);
 
     EXPECT_LE(path.value().back().x(),
@@ -99,7 +97,7 @@ TEST_F(
 
     Rectangle bounding_box(world.field().enemyDefenseArea().posXPosYCorner(),
                            world.field().friendlyDefenseArea().negXNegYCorner());
-    TestUtil::checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
+    TestUtil::checkPathDoesNotExceedBoundingBox(path.value(), bounding_box);
     // since the starting point is inside an obstacle, we need to consider the path from
     // the second point onwards
 
@@ -113,10 +111,10 @@ TEST_F(
              TbotsProto::MotionConstraint::ENEMY_DEFENSE_AREA},
             world.field());
     TestUtil::checkPathDoesNotIntersectObstacle(
-        {path_points.begin() + 1, path_points.end()}, defense_area_obstacles);
+        {path.value().begin() + 1, path.value().end()}, defense_area_obstacles);
     std::vector<Polygon> centre_circle_obstacle = {
         Rectangle(Point(-0.5, -0.5), Point(0.5, 0.5))};
-    TestUtil::checkPathDoesNotIntersectObstacle(path_points, centre_circle_obstacle);
+    TestUtil::checkPathDoesNotIntersectObstacle(path.value(), centre_circle_obstacle);
 }
 
 TEST_F(TestGlobalPathPlanner,
@@ -138,16 +136,14 @@ TEST_F(TestGlobalPathPlanner,
 
     EXPECT_TRUE(path != std::nullopt);
 
-    std::vector<Point> path_points = path.value();
-
     EXPECT_EQ(start, path.value().front());
     EXPECT_LE(distance(path.value().back(), dest), planner->getResolution());
 
     Rectangle bounding_box({-3.1, -3.1}, {3.1, 3.1});
-    TestUtil::checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
+    TestUtil::checkPathDoesNotExceedBoundingBox(path.value(), bounding_box);
     // Expect the second point to be outside the obstacle
     TestUtil::checkPathDoesNotIntersectObstacle(
-        {path_points.begin() + 1, path_points.end()}, obstacles);
+        {path.value().begin() + 1, path.value().end()}, obstacles);
 }
 
 TEST_F(TestGlobalPathPlanner, test_enemy_half_blocked_starting_and_ending_in_blocked_area)
@@ -167,18 +163,16 @@ TEST_F(TestGlobalPathPlanner, test_enemy_half_blocked_starting_and_ending_in_blo
 
     EXPECT_TRUE(path != std::nullopt);
 
-    std::vector<Point> path_points = path.value();
-
     EXPECT_EQ(start, path.value().front());
 
     EXPECT_LE(dest.x(), 0);
     EXPECT_NEAR(dest.y(), 0, planner->getResolution());
 
     Rectangle bounding_box({-0.3, -0.1}, {2.1, 1.1});
-    TestUtil::checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
+    TestUtil::checkPathDoesNotExceedBoundingBox(path.value(), bounding_box);
     // Expect the second point to be outside the obstacle
     TestUtil::checkPathDoesNotIntersectObstacle(
-        {path_points.begin() + 1, path_points.end()}, obstacles);
+        {path.value().begin() + 1, path.value().end()}, obstacles);
 }
 
 TEST_F(TestGlobalPathPlanner, test_friendly_half_blocked_starting_in_blocked_area)
@@ -198,16 +192,14 @@ TEST_F(TestGlobalPathPlanner, test_friendly_half_blocked_starting_in_blocked_are
 
     EXPECT_TRUE(path != std::nullopt);
 
-    std::vector<Point> path_points = path.value();
-
     EXPECT_EQ(start, path.value().front());
     EXPECT_EQ(dest, path.value().back());
 
     Rectangle bounding_box({-3.1, -3.1}, {4.1, 1.1});
-    TestUtil::checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
+    TestUtil::checkPathDoesNotExceedBoundingBox(path.value(), bounding_box);
     // Expect the second point to be outside the obstacle
     TestUtil::checkPathDoesNotIntersectObstacle(
-        {path_points.begin() + 1, path_points.end()}, obstacles);
+        {path.value().begin() + 1, path.value().end()}, obstacles);
 }
 
 TEST_F(TestGlobalPathPlanner, test_leave_the_field)
@@ -227,12 +219,10 @@ TEST_F(TestGlobalPathPlanner, test_leave_the_field)
 
     EXPECT_TRUE(path != std::nullopt);
 
-    std::vector<Point> path_points = path.value();
-
     EXPECT_EQ(start, path.value().front());
     EXPECT_EQ(dest, path.value().back());
 
     Rectangle bounding_box(start, dest);
-    TestUtil::checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
-    TestUtil::checkPathDoesNotIntersectObstacle(path_points, obstacles);
+    TestUtil::checkPathDoesNotExceedBoundingBox(path.value(), bounding_box);
+    TestUtil::checkPathDoesNotIntersectObstacle(path.value(), obstacles);
 }
