@@ -78,8 +78,6 @@ TEST_F(TestEnlsvgPathPlanner,
 
     EXPECT_TRUE(path != std::nullopt);
 
-    std::vector<Point> path_points = path.value();
-
     // The path should start at exactly the start point and end at exactly the dest
     EXPECT_EQ(start, path.value().front());
     EXPECT_EQ(dest, path.value().back());
@@ -110,25 +108,23 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_blocked_src)
 
     EXPECT_TRUE(path != std::nullopt);
 
-    std::vector<Point> path_points = path.value();
-
     // Make sure the start and end of the path are correct
-    EXPECT_EQ(start, path.value().front());
-    EXPECT_EQ(dest, path.value().back());
+    EXPECT_EQ(start,path.value().front());
+    EXPECT_EQ(dest,path.value().back());
 
     // Make sure the path planner creates a path that exits out at the nearest edge
     // Here, the nearest edge is straight up in the x direction.
-    EXPECT_GE(path_points[1].x(), 0);
-    EXPECT_NEAR(0, path_points[1].y(), planner.getResolution());
+    EXPECT_GE(path.value()[1].x(), 0);
+    EXPECT_NEAR(0, path.value()[1].y(), planner.getResolution());
 
     // Make the sure the path does not exceed a bounding box
     Rectangle bounding_box({-2.1, -0.1}, {3.1, 3.1});
-    TestUtil::checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
+    TestUtil::checkPathDoesNotExceedBoundingBox(path.value(), bounding_box);
 
     // Make sure path does not go through any obstacles, except for the first point, which
     // is in the obstacle blocking the start position
     TestUtil::checkPathDoesNotIntersectObstacle(
-        {path_points.begin() + 1, path_points.end()}, obstacles);
+        {path.value().begin() + 1, path.value().end()}, obstacles);
 }
 
 TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_blocked_dest)
@@ -152,8 +148,6 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_blocked_dest)
 
     EXPECT_TRUE(path != std::nullopt);
 
-    std::vector<Point> path_points = path.value();
-
     // Make sure the start and end of the path are correct
     EXPECT_EQ(start, path.value().front());
 
@@ -163,12 +157,12 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_blocked_dest)
 
     // Make the sure the path does not exceed a bounding box
     Rectangle bounding_box({-0.3, -1.1}, {3.8, 2.1});
-    TestUtil::checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
+    TestUtil::checkPathDoesNotExceedBoundingBox(path.value(), bounding_box);
 
     // Make sure path does not go through any obstacles, except for the first point, which
     // is in the obstacle blocking the start position
     TestUtil::checkPathDoesNotIntersectObstacle(
-        {path_points.begin() + 1, path_points.end()}, {obstacle});
+        {path.value().begin() + 1, path.value().end()}, {obstacle});
 }
 
 TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_blocked_dest_blocked_src)
@@ -193,15 +187,13 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_blocked_dest_blocked_src)
 
     EXPECT_TRUE(path != std::nullopt);
 
-    std::vector<Point> path_points = path.value();
-
     // Make sure the start and end of the path are correct
     EXPECT_EQ(start, path.value().front());
 
     // The point following the start should be the closest point out of the obstacle,
     // which is around (0, 1)
-    EXPECT_NEAR(0, path_points[1].x(), 0.3);
-    EXPECT_NEAR(1, path_points[1].y(), 0.3);
+    EXPECT_NEAR(0, path.value()[1].x(), 0.3);
+    EXPECT_NEAR(1, path.value()[1].y(), 0.3);
 
     // The endpoint should be the closest point to the obstacle, which is around (3.5, 0)
     EXPECT_NEAR(3.5, path.value().back().x(), 0.3);
@@ -209,12 +201,12 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_blocked_dest_blocked_src)
 
     // Make the sure the path does not exceed a bounding box
     Rectangle bounding_box({-0.3, -1.1}, {3.8, 2.1});
-    TestUtil::checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
+    TestUtil::checkPathDoesNotExceedBoundingBox(path.value(), bounding_box);
 
     // Make sure path does not go through any obstacles, except for the first point, which
     // is in the obstacle blocking the start position
     TestUtil::checkPathDoesNotIntersectObstacle(
-        {path_points.begin() + 1, path_points.end()}, {obstacle});
+        {path.value().begin() + 1, path.value().end()}, {obstacle});
 }
 
 TEST_F(TestEnlsvgPathPlanner,
@@ -239,25 +231,23 @@ TEST_F(TestEnlsvgPathPlanner,
 
     EXPECT_TRUE(path != std::nullopt);
 
-    std::vector<Point> path_points = path.value();
-
     // Make sure the start and end of the path are correct
     EXPECT_EQ(start, path.value().front());
     EXPECT_EQ(dest, path.value().back());
 
     // The point following the start should be the closest point out of the obstacle,
     // which is around (0 , 2)
-    EXPECT_NEAR(0, path_points[1].x(), 0.3);
-    EXPECT_NEAR(2, path_points[1].y(), 0.3);
+    EXPECT_NEAR(0, path.value()[1].x(), 0.3);
+    EXPECT_NEAR(2, path.value()[1].y(), 0.3);
 
     // Make the sure the path does not exceed a bounding box
     Rectangle bounding_box({-0.3, 0.9}, {5.1, 5.1});
-    TestUtil::checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
+    TestUtil::checkPathDoesNotExceedBoundingBox(path.value(), bounding_box);
 
     // Make sure path does not go through any obstacles, except for the first point, which
     // is in the obstacle blocking the start position
     TestUtil::checkPathDoesNotIntersectObstacle(
-        {path_points.begin() + 1, path_points.end()}, {obstacle});
+        {path.value().begin() + 1, path.value().end()}, {obstacle});
 }
 
 TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_same_cell_dest)
@@ -277,8 +267,6 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_same_cell_dest)
     auto path = planner.findPath(start, dest);
 
     EXPECT_TRUE(path != std::nullopt);
-
-    std::vector<Point> path_points = path.value();
 
     // Make sure the start and end of the path are correct
     EXPECT_EQ(start, path.value().front());
@@ -304,22 +292,20 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_single_obstacle_outside_o
 
     EXPECT_TRUE(path != std::nullopt);
 
-    std::vector<Point> path_points = path.value();
-
     // Straight line path expected
-    EXPECT_EQ(2, path_points.size());
+    EXPECT_EQ(2, path.value().size());
 
     // Make sure the start and end of the path are correct
     EXPECT_EQ(start, path.value().front());
 
     // Make the sure the path does not exceed a bounding box
     Rectangle bounding_box({-3.1, 0.1}, {3.1, -1.0});
-    TestUtil::checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
+    TestUtil::checkPathDoesNotExceedBoundingBox(path.value(), bounding_box);
 
     // Make sure path does not go through any obstacles, except for the first point, which
     // is in the obstacle blocking the start position
     TestUtil::checkPathDoesNotIntersectObstacle(
-        {path_points.begin() + 1, path_points.end()}, {obstacle});
+        {path.value().begin() + 1, path.value().end()}, {obstacle});
 }
 
 TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_single_obstacle_along_x_axis)
@@ -342,16 +328,14 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_single_obstacle_along_x_a
 
     EXPECT_TRUE(path != std::nullopt);
 
-    std::vector<Point> path_points = path.value();
-
     // Make sure the start and end of the path are correct
     EXPECT_EQ(start, path.value().front());
     EXPECT_EQ(dest, path.value().back());
 
     // Make the sure the path does not exceed a bounding box
     Rectangle bounding_box({-0.1, -1.3}, {3.1, 1.3});
-    TestUtil::checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
-    TestUtil::checkPathDoesNotIntersectObstacle(path_points, obstacles);
+    TestUtil::checkPathDoesNotExceedBoundingBox(path.value(), bounding_box);
+    TestUtil::checkPathDoesNotIntersectObstacle(path.value(), obstacles);
 }
 
 TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_single_obstacle_along_y_axis)
@@ -374,16 +358,14 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_single_obstacle_along_y_a
 
     EXPECT_TRUE(path != std::nullopt);
 
-    std::vector<Point> path_points = path.value();
-
     // Make sure the start and end of the path are correct
     EXPECT_EQ(start, path.value().front());
     EXPECT_EQ(dest, path.value().back());
 
     // Make the sure the path does not exceed a bounding box
     Rectangle bounding_box({-0.1, -0.1}, {2.1, 3.1});
-    TestUtil::checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
-    TestUtil::checkPathDoesNotIntersectObstacle(path_points, obstacles);
+    TestUtil::checkPathDoesNotExceedBoundingBox(path.value(), bounding_box);
+    TestUtil::checkPathDoesNotIntersectObstacle(path.value(), obstacles);
 }
 
 TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_not_centered_at_origin)
@@ -404,16 +386,14 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_not_centered_at_origin)
 
     EXPECT_TRUE(path != std::nullopt);
 
-    std::vector<Point> path_points = path.value();
-
     // Make sure the start and end of the path are correct
     EXPECT_EQ(start, path.value().front());
     EXPECT_EQ(dest, path.value().back());
 
     // Make the sure the path does not exceed a bounding box
     Rectangle bounding_box({0.4, 0.4}, {2.6, 2.6});
-    TestUtil::checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
-    TestUtil::checkPathDoesNotIntersectObstacle(path_points, {obstacle});
+    TestUtil::checkPathDoesNotExceedBoundingBox(path.value(), bounding_box);
+    TestUtil::checkPathDoesNotIntersectObstacle(path.value(), {obstacle});
 }
 
 TEST_F(TestEnlsvgPathPlanner,
@@ -433,10 +413,8 @@ TEST_F(TestEnlsvgPathPlanner,
 
     EXPECT_TRUE(path != std::nullopt);
 
-    std::vector<Point> path_points = path.value();
-
     // Straight line path
-    EXPECT_EQ(2, path_points.size());
+    EXPECT_EQ(2, path.value().size());
     EXPECT_EQ(start, path.value().front());
     EXPECT_EQ(dest, path.value().back());
 }
@@ -458,16 +436,14 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_circular_obstacle)
 
     EXPECT_TRUE(path != std::nullopt);
 
-    std::vector<Point> path_points = path.value();
-
     // since endpoint ends in obstacle, make sure the endpoint is close enough
     EXPECT_EQ(start, path.value().front());
     EXPECT_LE(0.27150, distance(path.value().back(), dest));
 
     // Make sure path does not exceed a bounding box
     Rectangle bounding_box({-1.46, -2.6}, {-1, -1.31});
-    TestUtil::checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
-    TestUtil::checkPathDoesNotIntersectObstacle(path_points, obstacles);
+    TestUtil::checkPathDoesNotExceedBoundingBox(path.value(), bounding_box);
+    TestUtil::checkPathDoesNotIntersectObstacle(path.value(), obstacles);
 }
 
 TEST_F(TestEnlsvgPathPlanner, test_enslvg_path_planner_check_obstacle_edge)
@@ -487,15 +463,13 @@ TEST_F(TestEnlsvgPathPlanner, test_enslvg_path_planner_check_obstacle_edge)
 
     EXPECT_TRUE(path != std::nullopt);
 
-    std::vector<Point> path_points = path.value();
-
     EXPECT_EQ(start, path.value().front());
     EXPECT_EQ(dest, path.value().back());
 
     // Make sure path does not exceed a bounding box
     Rectangle bounding_box({-0.1, 2.9}, {3.1, 3.3});
-    TestUtil::checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
-    TestUtil::checkPathDoesNotIntersectObstacle(path_points, obstacles);
+    TestUtil::checkPathDoesNotExceedBoundingBox(path.value(), bounding_box);
+    TestUtil::checkPathDoesNotIntersectObstacle(path.value(), obstacles);
 }
 
 TEST_F(TestEnlsvgPathPlanner,
@@ -516,15 +490,13 @@ TEST_F(TestEnlsvgPathPlanner,
 
     ASSERT_TRUE(path != std::nullopt);
 
-    std::vector<Point> path_points = path.value();
-
     EXPECT_EQ(start, path.value().front());
     EXPECT_EQ(dest, path.value().back());
 
     // Make sure path does not exceed a bounding box
     Rectangle bounding_box({1.3, 2}, {-0.1, 3.1});
-    TestUtil::checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
-    TestUtil::checkPathDoesNotIntersectObstacle(path_points, obstacles);
+    TestUtil::checkPathDoesNotExceedBoundingBox(path.value(), bounding_box);
+    TestUtil::checkPathDoesNotIntersectObstacle(path.value(), obstacles);
 }
 
 TEST_F(TestEnlsvgPathPlanner, test_enslvg_path_planner_start_in_enemy_half)
@@ -545,18 +517,16 @@ TEST_F(TestEnlsvgPathPlanner, test_enslvg_path_planner_start_in_enemy_half)
 
     ASSERT_TRUE(path != std::nullopt);
 
-    std::vector<Point> path_points = path.value();
-
     // Make sure the start and end points match
     EXPECT_EQ(start, path.value().front());
 
     // Ensure path planner exits out the closest point outside the enemy half
-    EXPECT_LE(path_points[1].x(), 0);
-    EXPECT_NEAR(start.y(), path_points[1].y(), 0.1);
+    EXPECT_LE(path.value()[1].x(), 0);
+    EXPECT_NEAR(start.y(), path.value()[1].y(), 0.1);
 
     // Make sure path does not exceed a bounding box
     Rectangle bounding_box({4.1, 3.1}, {-0.3, -3});
-    TestUtil::checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
+    TestUtil::checkPathDoesNotExceedBoundingBox(path.value(), bounding_box);
 }
 
 TEST_F(TestEnlsvgPathPlanner, test_start_in_boundary_margin)
@@ -579,21 +549,19 @@ TEST_F(TestEnlsvgPathPlanner, test_start_in_boundary_margin)
 
     ASSERT_TRUE(path != std::nullopt);
 
-    std::vector<Point> path_points = path.value();
-
     // Make sure the start and end points match
     EXPECT_EQ(start, path.value().front());
     EXPECT_EQ(dest, path.value().back());
 
     // Make sure second point is not in the margins, but in the playing field and is close
     // to the start point
-    EXPECT_TRUE(contains(field.fieldLines(), path_points[1]));
-    EXPECT_LE(0.3, distance(start, path_points[1]));
+    EXPECT_TRUE(contains(field.fieldLines(), path.value()[1]));
+    EXPECT_LE(0.3, distance(start, path.value()[1]));
 
     // Make sure path does not exceed a bounding box
     Rectangle bounding_box({-1.1, -2.1}, {6.3, 4.8});
 
-    TestUtil::checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
+    TestUtil::checkPathDoesNotExceedBoundingBox(path.value(), bounding_box);
     TestUtil::checkPathDoesNotIntersectObstacle(path.value(), obstacles);
 }
 
@@ -615,8 +583,6 @@ TEST_F(TestEnlsvgPathPlanner, test_one_path_planner_object_called_twice_for_same
 
     ASSERT_TRUE(path != std::nullopt);
 
-    std::vector<Point> path_points = path.value();
-
     // Make sure the start and end points match
     EXPECT_EQ(start, path.value().front());
     EXPECT_EQ(dest, path.value().back());
@@ -624,7 +590,7 @@ TEST_F(TestEnlsvgPathPlanner, test_one_path_planner_object_called_twice_for_same
     // Make sure path does not exceed a bounding box
     Rectangle bounding_box({-3.1, -4.1}, {2.1, 3.1});
 
-    TestUtil::checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
+    TestUtil::checkPathDoesNotExceedBoundingBox(path.value(), bounding_box);
     TestUtil::checkPathDoesNotIntersectObstacle(path.value(), obstacles);
 
     // Test same path using the same path planner object to make sure it still works when
@@ -632,9 +598,9 @@ TEST_F(TestEnlsvgPathPlanner, test_one_path_planner_object_called_twice_for_same
     auto same_path                      = planner.findPath(start, dest);
     std::vector<Point> same_path_points = path.value();
 
-    for (unsigned i = 0; i < path_points.size(); ++i)
+    for (unsigned i = 0; i < path.value().size(); ++i)
     {
-        EXPECT_EQ(path_points[i], same_path_points[i]);
+        EXPECT_EQ( path.value()[i], same_path_points[i]);
     }
 }
 
@@ -657,15 +623,13 @@ TEST_F(TestEnlsvgPathPlanner,
 
     ASSERT_TRUE(path != std::nullopt);
 
-    std::vector<Point> path_points = path.value();
-
     // Make sure the start and end points match
     EXPECT_EQ(start, path.value().front());
     EXPECT_EQ(dest, path.value().back());
 
     // Make sure path does not exceed a bounding box
     Rectangle bounding_box({-2.1, -1.1}, {4.1, 4.1});
-    TestUtil::checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
+    TestUtil::checkPathDoesNotExceedBoundingBox(path.value(), bounding_box);
     TestUtil::checkPathDoesNotIntersectObstacle(path.value(), {obstacles});
 
     // Make sure that reusing the path planner still works by computing another path
@@ -673,22 +637,22 @@ TEST_F(TestEnlsvgPathPlanner,
     dest  = Point(-2, 0.5);
 
     auto path_two = planner.findPath(start, dest);
-    path_points   = path_two.value();
+    path.value()   = path_two.value();
 
     ASSERT_TRUE(path_two != std::nullopt);
 
-    path_points = path_two.value();
+    path.value() = path_two.value();
 
     // Make sure the start and end points match
     EXPECT_EQ(start, path_two.value().front());
     EXPECT_EQ(dest, path_two.value().back());
 
-    EXPECT_LE(4, path_points.size());
+    EXPECT_LE(4, path.value().size());
 
     // Make sure path does not exceed a bounding box;
     bounding_box = Rectangle(Point(5.1, 1.8), Point(-2.1, -0.1));
-    TestUtil::checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
-    TestUtil::checkPathDoesNotIntersectObstacle(path_points, obstacles);
+    TestUtil::checkPathDoesNotExceedBoundingBox(path.value(), bounding_box);
+    TestUtil::checkPathDoesNotIntersectObstacle(path.value(), obstacles);
 }
 
 TEST_F(TestEnlsvgPathPlanner, test_going_around_defense_area)
@@ -713,15 +677,13 @@ TEST_F(TestEnlsvgPathPlanner, test_going_around_defense_area)
 
     ASSERT_TRUE(path != std::nullopt);
 
-    std::vector<Point> path_points = path.value();
-
     // Make sure the start and end points match
     EXPECT_EQ(start, path.value().front());
     EXPECT_EQ(dest, path.value().back());
 
     // Make sure path does not exceed a bounding box
     Rectangle bounding_box({1, -2.5}, {5, 5});
-    TestUtil::checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
+    TestUtil::checkPathDoesNotExceedBoundingBox(path.value(), bounding_box);
     TestUtil::checkPathDoesNotIntersectObstacle(path.value(), obstacle_polygons);
 }
 
@@ -786,8 +748,7 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_close_start_end)
         EnlsvgPathPlanner(navigable_area, obstacles, field.boundaryMargin());
     auto path = planner.findPath(start, dest);
     EXPECT_TRUE(path != std::nullopt);
-    std::vector<Point> path_points = path.value();
-    EXPECT_EQ(2, path_points.size());
+    EXPECT_EQ(2, path.value().size());
     EXPECT_EQ(start, path.value().front());
     EXPECT_EQ(dest, path.value().back());
 }
@@ -805,16 +766,15 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_close_start_end_but_block
         EnlsvgPathPlanner(navigable_area, obstacles, field.boundaryMargin());
     auto path = planner.findPath(start, dest);
     EXPECT_TRUE(path != std::nullopt);
-    std::vector<Point> path_points = path.value();
 
     EXPECT_EQ(start, path.value().front());
     EXPECT_LE(0.1, distance(path.value().back(), dest));
 
     // Make sure path does not exceed a bounding box;
     Rectangle bounding_box = Rectangle(Point(4.3, -2.57), Point(4.5, -2.9));
-    TestUtil::checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
+    TestUtil::checkPathDoesNotExceedBoundingBox(path.value(), bounding_box);
     // Make sure path does not go through any obstacles, except for the first point, which
     // is in the obstacle blocking the start position
     TestUtil::checkPathDoesNotIntersectObstacle(
-        {path_points.begin() + 1, path_points.end()}, obstacles);
+        {path.value().begin() + 1, path.value().end()}, obstacles);
 }
