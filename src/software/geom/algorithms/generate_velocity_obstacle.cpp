@@ -1,6 +1,6 @@
 #include "software/geom/algorithms/generate_velocity_obstacle.h"
 
-#include "software/geom/algorithms/contains.h"
+#include "software/geom/algorithms/intersects.h"
 
 VelocityObstacle generateVelocityObstacle(const Circle& obstacle, const Circle& robot,
                                           const Vector& obstacle_velocity)
@@ -12,13 +12,12 @@ VelocityObstacle generateVelocityObstacle(const Circle& obstacle, const Circle& 
     Angle opening_angle = Angle::asin((robot.radius() + obstacle.radius()) /
                                       robot_to_obstacle_vector.length());
 
-    if (robot_to_obstacle_vector.lengthSquared() <
-        std::pow(obstacle.radius() + robot.radius(), 2))
+    if (intersects(obstacle, robot))
     {
         // The robot is colliding with obstacle.
-        // Creates Velocity Obstacle with the sides being 180 degrees
+        // Creates Velocity Obstacle with the sides being ~180 degrees
         // apart from each other (90 degrees relative to the robot to
-        // obstacle vector) with center being the center of obstacle.
+        // obstacle vector).
         // Subtracting by a slight offset to avoid the velocity obstacle
         // from being the complement of what we want (since VOs are defined as
         // area created between the smallest angles between the two sides).

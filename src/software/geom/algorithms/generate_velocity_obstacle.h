@@ -8,9 +8,6 @@
 
 /**
  * Set of functions that generate velocity obstacles for an obstacle
- * NOTE: These functions go off of the assumption that the robot (circle origin)
- *       is not contained within the obstacle. If it is, the output of the
- *       function will be undefined.
  *
  * @param obstacle Static obstacle
  * @param robot The robot which the velocity obstacle will be for, represented
@@ -20,5 +17,10 @@
  */
 VelocityObstacle generateVelocityObstacle(const Circle& obstacle, const Circle& robot,
                                           const Vector& obstacle_velocity);
+/*
+ * NOTE: The polygon implementation may return incorrect velocity obstacle if:
+ *       - the robot is intersecting or is contained by the obstacle
+ *       - the polygon is concave
+ */
 VelocityObstacle generateVelocityObstacle(const Polygon& obstacle, const Circle& robot,
                                           const Vector& obstacle_velocity);

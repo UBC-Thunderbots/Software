@@ -20,7 +20,7 @@ class SimulatedHRVOTest : public SimulatedErForceSimPlayTestFixture
 
 TEST_F(SimulatedHRVOTest, test_drive_in_straight_line_with_moving_enemy_robot_from_behind)
 {
-    Point destination      = Point(3, 0);
+    Point destination      = Point(2.8, 0);
     Point initial_position = Point(-2.3, 0);
     BallState ball_state(Point(1, 2), Vector(0, 0));
     auto friendly_robots =
@@ -56,7 +56,7 @@ TEST_F(SimulatedHRVOTest, test_drive_in_straight_line_with_moving_enemy_robot_fr
 
 TEST_F(SimulatedHRVOTest, test_drive_in_straight_line_with_moving_enemy_robot_from_side)
 {
-    Point destination      = Point(3, 0);
+    Point destination      = Point(2.8, 0);
     Point initial_position = Point(-2.5, 0);
     BallState ball_state(Point(1, 2), Vector(0, 0));
     auto friendly_robots =
@@ -93,7 +93,7 @@ TEST_F(SimulatedHRVOTest, test_drive_in_straight_line_with_moving_enemy_robot_fr
 
 TEST_F(SimulatedHRVOTest, test_drive_in_straight_line_with_no_obstacle)
 {
-    Point destination      = Point(3, 0);
+    Point destination      = Point(2.8, 0);
     Point initial_position = Point(-2.5, 0);
     BallState ball_state(Point(1, 2), Vector(0, 0));
     auto friendly_robots =
@@ -129,7 +129,7 @@ TEST_F(SimulatedHRVOTest, test_drive_in_straight_line_with_no_obstacle)
 
 TEST_F(SimulatedHRVOTest, test_drive_in_straight_line_with_friendly_robot_infront)
 {
-    Point destination      = Point(3, 0);
+    Point destination      = Point(2.8, 0);
     Point initial_position = Point(-2.5, 0);
     BallState ball_state(Point(1, 2), Vector(0, 0));
     auto friendly_robots =
@@ -196,7 +196,7 @@ TEST_F(SimulatedHRVOTest, test_single_enemy_directly_infront)
 
 TEST_F(SimulatedHRVOTest, test_three_robot_wall)
 {
-    Point destination      = Point(4, 0);
+    Point destination      = Point(2.8, 0);
     Point initial_position = Point(0, 0);
     BallState ball_state(Point(1, 2), Vector(0, 0));
     auto friendly_robots =
@@ -333,7 +333,7 @@ TEST_F(SimulatedHRVOTest, test_agent_not_going_in_static_obstacles)
 // robot gets stuck in the local minima
 TEST_F(SimulatedHRVOTest, test_start_in_local_minima)
 {
-    Point destination      = Point(3, 0);
+    Point destination      = Point(2.8, 0);
     Point initial_position = Point(0.7, 0);
     BallState ball_state(Point(1, 2), Vector(0, 0));
     auto friendly_robots =
@@ -369,7 +369,7 @@ TEST_F(SimulatedHRVOTest, test_start_in_local_minima)
 
 TEST_F(SimulatedHRVOTest, test_start_in_local_minima_with_open_end)
 {
-    Point destination      = Point(4, 0);
+    Point destination      = Point(2.8, 0);
     Point initial_position = Point(0.7, 0);
     BallState ball_state(Point(1, 2), Vector(0, 0));
     auto friendly_robots =
@@ -393,6 +393,44 @@ TEST_F(SimulatedHRVOTest, test_start_in_local_minima_with_open_end)
         //         Point(destination.x() - threshold, destination.y() - threshold),
         //         Point(destination.x() + threshold, destination.y() + threshold));
         //      robotStationaryInPolygon(1, expected_final_position, 15, world_ptr,
+        //      yield);
+        // }
+    };
+    std::vector<ValidationFunction> non_terminating_validation_functions = {};
+
+    runTest(field_type, ball_state, friendly_robots, enemy_robots,
+            terminating_validation_functions, non_terminating_validation_functions,
+            Duration::fromSeconds(7));
+}
+
+TEST_F(SimulatedHRVOTest, test_robot_avoiding_ball_obstacle)
+{
+    Point destination      = Point(0.0, 0);
+    Point initial_position = Point(0.0, 0);
+    BallState ball_state(Point(0, 0), Vector(0, 0));
+    auto friendly_robots =
+        TestUtil::createStationaryRobotStatesWithId({initial_position});
+    auto enemy_robots = TestUtil::createStationaryRobotStatesWithId(
+        {});
+
+    auto tactic = std::make_shared<MoveTactic>();
+    tactic->updateControlParams(destination, Angle::zero(), 0);
+    setTactic(0, tactic);
+    GameState game_state;
+    game_state.updateRefereeCommand(RefereeCommand::STOP);
+    setGameState(game_state);
+
+    std::vector<ValidationFunction> terminating_validation_functions = {
+        // TODO (#2496): re-enable this test
+        // [destination, tactic](std::shared_ptr<World> world_ptr,
+        //                       ValidationCoroutine::push_type& yield) {
+        //     // Small rectangle around the destination point that the robot should be
+        //     // stationary within for 15 ticks
+        //      float threshold = 0.05f;
+        //      Rectangle expected_final_position(
+        //         Point(destination.x() - threshold, destination.y() - threshold),
+        //         Point(destination.x() + threshold, destination.y() + threshold));
+        //      robotStationaryInPolygon(0, expected_final_position, 15, world_ptr,
         //      yield);
         // }
     };

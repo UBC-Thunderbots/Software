@@ -48,8 +48,9 @@ HRVOAgent::HRVOAgent(HRVOSimulator *simulator, const Vector &position, float nei
       maxNeighbors_(maxNeighbors),
       neighborDist_(neighborDist),
       prefSpeed_(max_speed_ * PREF_SPEED_SCALE),
-      // TODO: Update this obstacle config
-      obstacle_factory(TbotsProto::RobotNavigationObstacleConfig())
+        // TODO: Update this obstacle config
+      obstacle_factory(TbotsProto::RobotNavigationObstacleConfig()),
+      ball_obstacle(std::nullopt)
 {
 }
 
@@ -58,6 +59,7 @@ void HRVOAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive,
 {
     AgentPath path;
     static_obstacles.clear();
+    ball_obstacle = std::nullopt;
     if (new_primitive.has_move())
     {
         const auto &motion_control = new_primitive.move().motion_control();
@@ -83,12 +85,21 @@ void HRVOAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive,
         std::set<TbotsProto::MotionConstraint> motion_constraints;
         for (int constraint_int : motion_control.motion_constraints())
         {
-            if (TbotsProto::MotionConstraint_IsValid(constraint_int))
+            if (!TbotsProto::MotionConstraint_IsValid(constraint_int))
             {
-                const auto constraint =
+                continue;
+            }
+
+            const auto constraint =
                     static_cast<TbotsProto::MotionConstraint>(constraint_int);
-                auto new_obstacles =
+            auto new_obstacles =
                     obstacle_factory.createFromMotionConstraint(constraint, world);
+            if (constraint == TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL)
+            {
+                ball_obstacle = new_obstacles[0];
+            }
+            else
+            {
                 static_obstacles.insert(static_obstacles.end(), new_obstacles.begin(),
                                         new_obstacles.end());
             }
@@ -134,17 +145,32 @@ void HRVOAgent::computeVelocityObstacles()
 
     // Create Velocity Obstacles for nearby static obstacles
     Circle circle_rep_of_agent(agent_position_point, radius_);
-    Segment agent_to_dest_segment(agent_position_point, Point(current_destination));
+    Segment path(agent_position_point, Point(current_destination));
     for (const auto &obstacle : static_obstacles)
     {
         double dist_agent_to_obstacle = obstacle->distance(agent_position_point);
-        if ((dist_agent_to_obstacle <=
-                 std::max(dist_to_obstacle_threshold, 2 * ROBOT_MAX_RADIUS_METERS) ||
-             obstacle->intersects(agent_to_dest_segment)) &&
+
+        // Set of heuristics to minimize the amount of velocity obstacles
+        if ((obstacle->intersects(path) || dist_agent_to_obstacle < 2 * ROBOT_MAX_RADIUS_METERS) &&
             !obstacle->contains(agent_position_point))
         {
             VelocityObstacle velocity_obstacle =
-                obstacle->generateVelocityObstacle(circle_rep_of_agent, Vector());
+                    obstacle->generateVelocityObstacle(circle_rep_of_agent, Vector());
+            velocityObstacles_.push_back(velocity_obstacle);
+        }
+    }
+
+    // The conditions for creating a velocity obstacle for the ball are different,
+    // since the ball is a dynamic obstacle (not considered by the path planner)
+    // and `generateVelocityObstacle` can create valid velocity obstacles for agents
+    // contained in a circle.
+    if (ball_obstacle.has_value())
+    {
+        auto obstacle = ball_obstacle.value();
+        if (obstacle->intersects(path))
+        {
+            VelocityObstacle velocity_obstacle =
+                    obstacle->generateVelocityObstacle(circle_rep_of_agent, Vector());
             velocityObstacles_.push_back(velocity_obstacle);
         }
     }
