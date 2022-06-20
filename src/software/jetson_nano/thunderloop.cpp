@@ -14,7 +14,7 @@
 // 50 millisecond timeout on receiving primitives before we emergency stop the robots
 const double PRIMITIVE_MANAGER_TIMEOUT_NS = 50.0 * MILLISECONDS_PER_NANOSECOND;
 
-const std::string CPU_TEMP_FILE_PATH = "/sys/class/thermal/thermal_zone0/temp";
+const std::string CPU_TEMP_FILE_PATH = "/sys/class/thermal/thermal_zone1/temp";
 
 /**
  * https://rt.wiki.kernel.org/index.php/Squarewave-example
