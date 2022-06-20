@@ -41,12 +41,13 @@
 #include "software/geom/algorithms/intersection.h"
 #include "software/geom/vector.h"
 
-HRVOAgent::HRVOAgent(HRVOSimulator *simulator, const Vector &position, float neighborDist,
-                     std::size_t maxNeighbors, float radius, const Vector &velocity,
-                     float maxAccel, AgentPath &path, float maxSpeed)
+HRVOAgent::HRVOAgent(HRVOSimulator *simulator, const Vector &position,
+                     float max_neighbor_dist, std::size_t maxNeighbors, float radius,
+                     const Vector &velocity, float maxAccel, AgentPath &path,
+                     float maxSpeed)
     : Agent(simulator, position, radius, velocity, velocity, maxSpeed, maxAccel, path),
       maxNeighbors_(maxNeighbors),
-      neighborDist_(neighborDist),
+      max_neighbor_dist(max_neighbor_dist),
       prefSpeed_(max_speed_ * PREF_SPEED_SCALE),
       // TODO: Update this obstacle config
       obstacle_factory(TbotsProto::RobotNavigationObstacleConfig()),
@@ -126,13 +127,12 @@ void HRVOAgent::computeVelocityObstacles()
         return;
     }
 
-    double dist_to_obstacle_threshold = neighborDist_;
-    Point agent_position_point(getPosition());
 
     // Only consider agents within this distance away from our position
-    auto current_destination   = current_path_point_opt.value().getPosition();
-    dist_to_obstacle_threshold = std::min(dist_to_obstacle_threshold,
-                                          (getPosition() - current_destination).length());
+    auto current_destination = current_path_point_opt.value().getPosition();
+    double dist_to_obstacle_threshold =
+        std::min(static_cast<double>(max_neighbor_dist),
+                 (getPosition() - current_destination).length());
 
     // Create Velocity Obstacles for neighboring agents
     computeNeighbors(dist_to_obstacle_threshold);
@@ -144,6 +144,7 @@ void HRVOAgent::computeVelocityObstacles()
     }
 
     // Create Velocity Obstacles for nearby static obstacles
+    Point agent_position_point(getPosition());
     Circle circle_rep_of_agent(agent_position_point, radius_);
     Segment path(agent_position_point, Point(current_destination));
     for (const auto &obstacle : static_obstacles)

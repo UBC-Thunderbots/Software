@@ -14,7 +14,7 @@ class LinearVelocityAgent : public Agent
     /**
      * Constructor
      *
-     * @param simulator          The simulation which this agent runs in.
+     * @param simulator   The simulation which this agent runs in.
      * @param position    The starting position of this agent.
      * @param radius      The radius of this agent.
      * @param velocity    The initial velocity of this agent.

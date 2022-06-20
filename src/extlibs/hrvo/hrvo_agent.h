@@ -55,7 +55,9 @@ class HRVOAgent : public Agent
      *
      * @param simulator          The simulation which this agent runs in.
      * @param position           The starting position of this agent.
-     * @param neighborDist       The maximum neighbor distance of this agent.
+     * @param max_neighbor_dist  The maximum distance away which another agent can be from
+     * this agent to be considered as a neighbor (i.e. velocity obstacles for it would be
+     * generated).
      * @param maxNeighbors       The maximum neighbor count of this agent.
      * @param radius             The radius of this agent.
      * @param velocity           The initial velocity of this agent.
@@ -63,7 +65,7 @@ class HRVOAgent : public Agent
      * @param path               The path to follow.
      * @param maxSpeed           The maximum speed of this agent.
      */
-    HRVOAgent(HRVOSimulator *simulator, const Vector &position, float neighborDist,
+    HRVOAgent(HRVOSimulator *simulator, const Vector &position, float max_neighbor_dist,
               std::size_t maxNeighbors, float radius, const Vector &velocity,
               float maxAccel, AgentPath &path, float maxSpeed);
 
@@ -220,7 +222,7 @@ class HRVOAgent : public Agent
     float prefSpeed_;
 
     std::size_t maxNeighbors_;
-    float neighborDist_;
+    float max_neighbor_dist;
     std::multimap<float, Candidate> candidates_;
     // distance -> Agent Index
     std::set<std::pair<float, std::size_t>> neighbors_;

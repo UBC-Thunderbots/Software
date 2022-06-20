@@ -244,11 +244,11 @@ std::size_t HRVOSimulator::addLinearVelocityRobotAgent(const Robot &robot,
 std::size_t HRVOSimulator::addHRVOAgent(const Vector &position, float agent_radius,
                                         const Vector &curr_velocity, float maxSpeed,
                                         float maxAccel, AgentPath &path,
-                                        float neighborDist, std::size_t maxNeighbors)
+                                        float max_neighbor_dist, std::size_t maxNeighbors)
 {
     std::shared_ptr<HRVOAgent> agent = std::make_shared<HRVOAgent>(
-        this, position, neighborDist, maxNeighbors, agent_radius, curr_velocity, maxAccel,
-        path, maxSpeed);
+        this, position, max_neighbor_dist, maxNeighbors, agent_radius, curr_velocity,
+        maxAccel, path, maxSpeed);
     agents.push_back(std::move(agent));
     return agents.size() - 1;
 }

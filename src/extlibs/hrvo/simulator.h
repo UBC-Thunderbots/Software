@@ -101,13 +101,15 @@ class HRVOSimulator
      * @param maxSpeed           The maximum speed of this agent.
      * @param maxAccel           The maximum acceleration of this agent.
      * @param path               The path which this agent should take.
-     * @param neighborDist       The maximum neighbor distance of this agent.
+     * @param max_neighbor_dist  The maximum distance away which another agent can be from
+     * this agent to be considered as a neighbor (i.e. velocity obstacles for it would be
+     * generated).
      * @param maxNeighbors       The maximum neighbor count of this agent.
      * @return The index of the agent.
      */
     std::size_t addHRVOAgent(const Vector &position, float agent_radius,
                              const Vector &curr_velocity, float maxSpeed, float maxAccel,
-                             AgentPath &path, float neighborDist,
+                             AgentPath &path, float max_neighbor_dist,
                              std::size_t maxNeighbors);
 
     /**
