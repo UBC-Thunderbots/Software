@@ -150,8 +150,7 @@ bool MotorService::checkDriverFault(uint8_t motor)
 
     if (gstat_bitset.any())
     {
-        LOG(WARNING) << "======= Faults For Motor " << std::to_string(motor)
-                     << "=========";
+        LOG(WARNING) << "======= Faults For Motor " << std::to_string(motor) << "=======";
     }
 
     if (gstat_bitset[0])
@@ -368,9 +367,10 @@ void MotorService::spiTransfer(int fd, uint8_t const* tx, uint8_t const* rx, uns
 //
 // Each TMC4671 controller, TMC6100 driver and encoder group have their chip
 // selects coming in from a demux (see diagram below). The demux is controlled
-// by two bits {spi_demux_select_0, spi_demux_select_1}. The two bits are
-// 10 the TMC4671 is selected, when they are 01 the TMC6100 is selected and
-// when they are 00 the encoder is selected.
+// by two bits {spi_demux_select_0, spi_demux_select_1}. If the bits are
+// 10 the TMC4671 is selected, when the select bits are 01 the TMC6100 is
+// selected and when they are 11 the encoder is selected. 00 disconnects all
+// 3 chips.
 //
 //
 //                                      FRONT LEFT MOTOR
