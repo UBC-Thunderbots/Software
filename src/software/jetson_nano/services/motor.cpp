@@ -36,8 +36,9 @@ static const uint8_t FRONT_LEFT_MOTOR_CHIP_SELECT  = 0;
 static const uint8_t FRONT_RIGHT_MOTOR_CHIP_SELECT = 3;
 static const uint8_t BACK_LEFT_MOTOR_CHIP_SELECT   = 2;
 static const uint8_t BACK_RIGHT_MOTOR_CHIP_SELECT  = 1;
-static const uint8_t DRIBBLER_MOTOR_CHIP_SELECT    = 4;
-static const uint8_t NUM_MOTORS                    = 4;
+static const uint8_t NUM_DRIVE_MOTORS              = 4;
+
+static const uint8_t DRIBBLER_MOTOR_CHIP_SELECT = 4;
 
 // SPI Trinamic Motor Driver Paths (indexed with chip select above)
 static const char* SPI_PATHS[] = {"/dev/spidev0.0", "/dev/spidev0.1", "/dev/spidev0.2",
@@ -113,7 +114,7 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
     OPEN_SPI_FILE_DESCRIPTOR(front_right, FRONT_RIGHT_MOTOR_CHIP_SELECT)
     OPEN_SPI_FILE_DESCRIPTOR(back_left, BACK_LEFT_MOTOR_CHIP_SELECT)
     OPEN_SPI_FILE_DESCRIPTOR(back_right, BACK_RIGHT_MOTOR_CHIP_SELECT)
-    // TODO (#2606) - Add Dribbler Motor support
+    OPEN_SPI_FILE_DESCRIPTOR(dribbler, DRIBBLER_MOTOR_CHIP_SELECT)
 
     // Make this instance available to the static functions above
     g_motor_service = this;
@@ -124,13 +125,19 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
     reset_gpio.setValue(GpioState::HIGH);
     sleep(1);
 
-    // TMC6100 Setup
-    for (uint8_t i = 0; i < NUM_MOTORS; i++)
+    // Drive Motor Setup
+    for (uint8_t motor = 0; motor < NUM_DRIVE_MOTORS; motor++)
     {
-        startDriver(i);
-        checkDriverFault(i);
-        startController(i);
+        startDriver(motor);
+        checkDriverFault(motor);
+        // Start all the controllers as drive motor controllers
+        startController(motor, false);
     }
+
+    // Dribbler Motor Setup
+    startDriver(DRIBBLER_MOTOR_CHIP_SELECT);
+    checkDriverFault(DRIBBLER_MOTOR_CHIP_SELECT);
+    startController(DRIBBLER_MOTOR_CHIP_SELECT, true);
 }
 
 MotorService::~MotorService() {}
@@ -523,19 +530,40 @@ void MotorService::configurePWM(uint8_t motor)
     writeToControllerOrDieTrying(motor, TMC4671_PWM_SV_CHOP, 0x00000107);
 }
 
-void MotorService::configurePI(uint8_t motor)
+void MotorService::configureDrivePI(uint8_t motor)
 {
     // Please read the header file and the datasheet for more info
+    // These values were calibrated using the TMC-IDE
     writeToControllerOrDieTrying(motor, TMC4671_PID_FLUX_P_FLUX_I, 67109376);
     writeToControllerOrDieTrying(motor, TMC4671_PID_TORQUE_P_TORQUE_I, 67109376);
     writeToControllerOrDieTrying(motor, TMC4671_PID_VELOCITY_P_VELOCITY_I, 52428800);
+
+    // Explicitly disable the position controller
     writeToControllerOrDieTrying(motor, TMC4671_PID_POSITION_P_POSITION_I, 0);
 
-    writeToControllerOrDieTrying(motor, TMC4671_PID_TORQUE_FLUX_TARGET_DDT_LIMITS, 0);
     writeToControllerOrDieTrying(motor, TMC4671_PIDOUT_UQ_UD_LIMITS, 32767);
     writeToControllerOrDieTrying(motor, TMC4671_PID_TORQUE_FLUX_LIMITS, 5000);
     writeToControllerOrDieTrying(motor, TMC4671_PID_ACCELERATION_LIMIT, 1000);
     writeToControllerOrDieTrying(motor, TMC4671_PID_VELOCITY_LIMIT, 10000);
+}
+
+void MotorService::configureDribblerPI(uint8_t motor)
+{
+    // Please read the header file and the datasheet for more info
+    // These values were calibrated using the TMC-IDE
+    writeToControllerOrDieTrying(motor, TMC4671_PID_FLUX_P_FLUX_I, 39333600);
+    writeToControllerOrDieTrying(motor, TMC4671_PID_TORQUE_P_TORQUE_I, 39333600);
+    writeToControllerOrDieTrying(motor, TMC4671_PID_VELOCITY_P_VELOCITY_I, 2621448);
+
+    // Explicitly disable the position controller
+    writeToControllerOrDieTrying(motor, TMC4671_PID_POSITION_P_POSITION_I, 0);
+
+    writeToControllerOrDieTrying(motor, TMC4671_PIDOUT_UQ_UD_LIMITS, 32767);
+    // TODO (#2677) support MAX_FORCE mode. This value can go up to 4.8 amps but we set it
+    // to 2 for now (sufficient for INDEFINITE mode).
+    writeToControllerOrDieTrying(motor, TMC4671_PID_TORQUE_FLUX_LIMITS, 2000);
+    writeToControllerOrDieTrying(motor, TMC4671_PID_ACCELERATION_LIMIT, 40000);
+    writeToControllerOrDieTrying(motor, TMC4671_PID_VELOCITY_LIMIT, 15000);
 }
 
 void MotorService::configureADC(uint8_t motor)
@@ -560,6 +588,17 @@ void MotorService::configureEncoder(uint8_t motor)
     // ABN encoder settings
     writeToControllerOrDieTrying(motor, TMC4671_ABN_DECODER_MODE, 0x00000000);
     writeToControllerOrDieTrying(motor, TMC4671_ABN_DECODER_PPR, 0x00001000);
+}
+
+void MotorService::configureHall(uint8_t motor)
+{
+    // Digital hall settings
+    tmc4671_writeInt(motor, TMC4671_HALL_MODE, 0x00000000);
+    tmc4671_writeInt(motor, TMC4671_HALL_PHI_E_PHI_M_OFFSET, 0x00000000);
+
+    // Feedback selection
+    tmc4671_writeInt(motor, TMC4671_PHI_E_SELECTION, TMC4671_PHI_E_HALL);
+    tmc4671_writeInt(motor, TMC4671_VELOCITY_SELECTION, TMC4671_VELOCITY_PHI_E_HAL);
 }
 
 void MotorService::calibrateEncoder(uint8_t motor)
@@ -601,7 +640,7 @@ void MotorService::runOpenLoopCalibrationRoutine(uint8_t motor, size_t num_sampl
     tmc4671_writeInt(motor, TMC4671_OPENLOOP_VELOCITY_TARGET, 0xFFFFFFFB);
 
     // Feedback selection
-    tmc4671_writeInt(motor, TMC4671_PHI_E_SELECTION, 0x00000002);
+    tmc4671_writeInt(motor, TMC4671_PHI_E_SELECTION, TMC4671_PHI_E_OPEN_LOOP);
     tmc4671_writeInt(motor, TMC4671_UQ_UD_EXT, 0x00000799);
 
     // Switch to open loop velocity mode
@@ -663,7 +702,7 @@ void MotorService::startDriver(uint8_t motor)
     LOG(DEBUG) << "Driver " << std::to_string(motor) << " accepted conf";
 }
 
-void MotorService::startController(uint8_t motor)
+void MotorService::startController(uint8_t motor, bool dribbler)
 {
     // Read the chip ID to validate the SPI connection
     tmc4671_writeInt(motor, TMC4671_CHIPINFO_ADDR, 0x000000000);
@@ -675,16 +714,28 @@ void MotorService::startController(uint8_t motor)
     LOG(DEBUG) << "Controller " << std::to_string(motor)
                << " online, responded with: " << chip_id;
 
-    // Configure to brushless DC motor with 8 pole pairs
-    writeToControllerOrDieTrying(motor, TMC4671_MOTOR_TYPE_N_POLE_PAIRS, 0x00030008);
-
-    // Configure other controller params
+    // Configure common controller params
     configurePWM(motor);
     configureADC(motor);
-    configureEncoder(motor);
 
-    // Trigger encoder calibration
-    // TODO (#2451) Don't call this here, its not safe because it moves the motors
-    calibrateEncoder(motor);
-    configurePI(motor);
+    if (dribbler)
+    {
+        // Configure to brushless DC motor with 1 pole pair
+        writeToControllerOrDieTrying(motor, TMC4671_MOTOR_TYPE_N_POLE_PAIRS, 0x00030001);
+        configureHall(motor);
+
+        configureDribblerPI(motor);
+    }
+    else
+    {
+        // Configure to brushless DC motor with 8 pole pairs
+        writeToControllerOrDieTrying(motor, TMC4671_MOTOR_TYPE_N_POLE_PAIRS, 0x00030008);
+        configureEncoder(motor);
+
+        // Trigger encoder calibration
+        // TODO (#2451) Don't call this here, its not safe because it moves the motors
+        calibrateEncoder(motor);
+
+        configureDrivePI(motor);
+    }
 }
