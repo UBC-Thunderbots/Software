@@ -83,9 +83,10 @@ class MotorService
      * Calls the configuration functions below in the right sequence
      *
      * @param motor The motor setup the driver/controller for
+     * @param dribbler If true, configures the motor to be a dribbler
      */
     void startDriver(uint8_t motor);
-    void startController(uint8_t motor);
+    void startController(uint8_t motor, bool dribbler);
 
     /**
      * Configuration settings
@@ -107,9 +108,11 @@ class MotorService
      * @param motor The motor to configure (the same value as the chip select)
      */
     void configurePWM(uint8_t motor);
-    void configurePI(uint8_t motor);
+    void configureDribblerPI(uint8_t motor);
+    void configureDrivePI(uint8_t motor);
     void configureADC(uint8_t motor);
     void configureEncoder(uint8_t motor);
+    void configureHall(uint8_t motor);
 
     /**
      * A lot of initialization parameters are necessary to function. Even if

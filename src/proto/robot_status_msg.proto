@@ -88,7 +88,7 @@ message DriveUnit
     uint32 wheel_rpm = 1;
 }
 
-/* Data from all four drive units */
+/* Data from all four drive units and the dribbler */
 message MotorStatus
 {
     DriveUnit front_left    = 1;
