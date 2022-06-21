@@ -593,12 +593,13 @@ void MotorService::configureEncoder(uint8_t motor)
 void MotorService::configureHall(uint8_t motor)
 {
     // Digital hall settings
-    tmc4671_writeInt(motor, TMC4671_HALL_MODE, 0x00000000);
-    tmc4671_writeInt(motor, TMC4671_HALL_PHI_E_PHI_M_OFFSET, 0x00000000);
+    writeToControllerOrDieTrying(motor, TMC4671_HALL_MODE, 0x00000000);
+    writeToControllerOrDieTrying(motor, TMC4671_HALL_PHI_E_PHI_M_OFFSET, 0x00000000);
 
     // Feedback selection
-    tmc4671_writeInt(motor, TMC4671_PHI_E_SELECTION, TMC4671_PHI_E_HALL);
-    tmc4671_writeInt(motor, TMC4671_VELOCITY_SELECTION, TMC4671_VELOCITY_PHI_E_HAL);
+    writeToControllerOrDieTrying(motor, TMC4671_PHI_E_SELECTION, TMC4671_PHI_E_HALL);
+    writeToControllerOrDieTrying(motor, TMC4671_VELOCITY_SELECTION,
+                                 TMC4671_VELOCITY_PHI_E_HAL);
 }
 
 void MotorService::calibrateEncoder(uint8_t motor)
@@ -662,7 +663,7 @@ void MotorService::runOpenLoopCalibrationRoutine(uint8_t motor, size_t num_sampl
         int actual_encoder = tmc4671_readRegister16BitValue(
             motor, TMC4671_ABN_DECODER_PHI_E_PHI_M, BIT_16_TO_31);
 
-        LOG(CSV, "encoder_calibration" + std::to_string(motor) + ".csv")
+        LOG(CSV, "encoder_calibration_" + std::to_string(motor) + ".csv")
             << actual_encoder << "," << estimated_phi << "\n";
 
         int16_t adc_v =
