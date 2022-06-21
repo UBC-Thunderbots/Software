@@ -283,6 +283,10 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
                 BACK_RIGHT_MOTOR_CHIP_SELECT,
                 static_cast<int>(motor.direct_per_wheel_control().back_right_wheel_rpm() *
                                  robot_constants_.wheel_rotations_per_motor_rotation));
+            tmc4671_setTargetVelocity(
+                DRIBBLER_MOTOR_CHIP_SELECT,
+                static_cast<int>(motor.dribbler_speed_rpm() *
+                                 robot_constants_.wheel_rotations_per_motor_rotation));
             break;
         }
         case TbotsProto::MotorControl::DriveControlCase::kDirectVelocityControl:
@@ -306,6 +310,11 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
                                       static_cast<int>(target_speeds[2]));
             tmc4671_setTargetVelocity(BACK_RIGHT_MOTOR_CHIP_SELECT,
                                       static_cast<int>(target_speeds[3]));
+
+            tmc4671_setTargetVelocity(
+                DRIBBLER_MOTOR_CHIP_SELECT,
+                static_cast<int>(motor.dribbler_speed_rpm() *
+                                 robot_constants_.wheel_rotations_per_motor_rotation));
 
             break;
         }
@@ -573,14 +582,16 @@ void MotorService::configureADC(uint8_t motor)
     writeToControllerOrDieTrying(motor, TMC4671_dsADC_MDEC_B_MDEC_A, 0x014E014E);
 
     // These values have been calibrated for the TI INA240 current sense amplifier.
+    // The scaling is also set to work with both the drive and dribbler motors.
+    //
     // If you wish to use the TMC4671+TMC6100-BOB you can use the following values,
     // that work for the AD8418 current sense amplifier
     //
     // TMC4671_ADC_I0_SCALE_OFFSET = 0x010081DD
     // TMC4671_ADC_I1_SCALE_OFFSET = 0x0100818E
     //
-    writeToControllerOrDieTrying(motor, TMC4671_ADC_I0_SCALE_OFFSET, 0x002081DD);
-    writeToControllerOrDieTrying(motor, TMC4671_ADC_I1_SCALE_OFFSET, 0x0020818E);
+    writeToControllerOrDieTrying(motor, TMC4671_ADC_I0_SCALE_OFFSET, 0x000981DD);
+    writeToControllerOrDieTrying(motor, TMC4671_ADC_I1_SCALE_OFFSET, 0x0009818E);
 }
 
 void MotorService::configureEncoder(uint8_t motor)
