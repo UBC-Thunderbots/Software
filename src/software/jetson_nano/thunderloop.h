@@ -101,4 +101,10 @@ class Thunderloop
     int channel_id_;
     std::string network_interface_;
     int loop_hz_;
+
+    // 50 millisecond timeout on receiving primitives before we emergency stop the robots
+    const double PRIMITIVE_MANAGER_TIMEOUT_NS = 50.0 * MILLISECONDS_PER_NANOSECOND;
+
+    // Path to the CPU thermal zone temperature file
+    const std::string CPU_TEMP_FILE_PATH = "/sys/class/thermal/thermal_zone1/temp";
 };

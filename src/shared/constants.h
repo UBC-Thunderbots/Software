@@ -37,9 +37,6 @@ static const short unsigned int ROBOT_LOGS_PORT   = 42072;
 // the port to listen to for what side of the field to defend
 static const unsigned DEFENDING_SIDE_PORT = 42073;
 
-// the timeout to recv a network packet
-static const int NETWORK_TIMEOUT_MS = 1000;
-
 // maximum transfer unit of the network interface
 // this is an int to avoid Wconversion with lwip
 static const short unsigned int MAXIMUM_TRANSFER_UNIT_BYTES = 1500;

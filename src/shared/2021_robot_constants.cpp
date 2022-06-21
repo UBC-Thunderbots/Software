@@ -1,7 +1,5 @@
 #include "shared/2021_robot_constants.h"
 
-#include <math.h>
-
 #include "shared/constants.h"
 
 RobotConstants_t create2021RobotConstants(void)

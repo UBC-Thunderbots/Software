@@ -11,11 +11,6 @@
 #include "software/util/scoped_timespec_timer/scoped_timespec_timer.h"
 #include "software/world/robot_state.h"
 
-// 50 millisecond timeout on receiving primitives before we emergency stop the robots
-const double PRIMITIVE_MANAGER_TIMEOUT_NS = 50.0 * MILLISECONDS_PER_NANOSECOND;
-
-const std::string CPU_TEMP_FILE_PATH = "/sys/class/thermal/thermal_zone0/temp";
-
 /**
  * https://rt.wiki.kernel.org/index.php/Squarewave-example
  * using clock_nanosleep of librt
@@ -168,7 +163,7 @@ void Thunderloop::runLoop()
                     result.tv_sec * static_cast<int>(NANOSECONDS_PER_SECOND) +
                     result.tv_nsec;
 
-                // If we haven't received a a primitive in a while, override the
+                // If we haven't received a primitive in a while, override the
                 // current_primitive_ with an estop primitive.
                 if (nanoseconds_elapsed_since_last_primitive >
                     static_cast<long>(PRIMITIVE_MANAGER_TIMEOUT_NS))
