@@ -246,6 +246,8 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
           encoder_calibrated_[BACK_RIGHT_MOTOR_CHIP_SELECT])
         << "Running without encoder calibration can cause serious harm, exiting";
 
+    TbotsProto::MotorStatus motor_status;
+
     int front_right_rpm = tmc4671_getActualVelocity(FRONT_RIGHT_MOTOR_CHIP_SELECT);
     int front_left_rpm  = tmc4671_getActualVelocity(FRONT_LEFT_MOTOR_CHIP_SELECT);
     int back_right_rpm  = tmc4671_getActualVelocity(BACK_RIGHT_MOTOR_CHIP_SELECT);
@@ -255,11 +257,18 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
         static_cast<double>(front_left_rpm), static_cast<double>(front_right_rpm),
         static_cast<double>(back_left_rpm), static_cast<double>(back_right_rpm)};
 
-    TbotsProto::MotorStatus motor_status;
     motor_status.mutable_front_right()->set_wheel_rpm(front_right_rpm);
     motor_status.mutable_front_left()->set_wheel_rpm(front_left_rpm);
     motor_status.mutable_back_left()->set_wheel_rpm(back_left_rpm);
     motor_status.mutable_back_right()->set_wheel_rpm(back_right_rpm);
+
+    EuclideanSpace_t current_euclidean_velocity =
+        euclidean_to_four_wheel.getEuclideanVelocity(current_wheel_speeds);
+
+    motor_status.mutable_local_velocity()->set_x_component_meters(
+        static_cast<float>(current_euclidean_velocity[0]));
+    motor_status.mutable_local_velocity()->set_y_component_meters(
+        static_cast<float>(current_euclidean_velocity[1]));
 
     switch (motor.drive_control_case())
     {

@@ -184,6 +184,8 @@ void Thunderloop::runLoop()
             {
                 ScopedTimespecTimer timer(&poll_time);
                 motor_status_ = motor_service_->poll(direct_control_.motor_control());
+                primitive_executor_.updateLocalVelocity(
+                    createVector(motor_status_.local_velocity()));
             }
             thunderloop_status_.set_motor_service_poll_time_ns(
                 static_cast<unsigned long>(poll_time.tv_nsec));

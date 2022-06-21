@@ -46,6 +46,14 @@ class EuclideanToWheel
     WheelSpace_t getTargetWheelSpeeds(const EuclideanSpace_t &target_euclidean_velocity,
                                       const WheelSpace_t &current_wheel_speeds);
 
+    /**
+     * Gets the equivalent Euclidean velocity from the measured wheel speeds.
+     *
+     * @param wheel_speeds The measured wheel speeds.
+     * @return The equivalent robot Euclidean velocity.
+     */
+    EuclideanSpace_t getEuclideanVelocity(const WheelSpace_t &wheel_speeds);
+
    private:
     /**
      * The control loop time period [s].
@@ -87,14 +95,6 @@ class EuclideanToWheel
      * Wheel speed to Euclidean velocity coupling matrix.
      */
     Eigen::Matrix<double, 3, 4> wheel_speed_to_euclidean_velocity_D_inverse_;
-
-    /**
-     * Gets the equivalent Euclidean velocity from the measured wheel speeds.
-     *
-     * @param wheel_speeds The measured wheel speeds.
-     * @return The equivalent robot Euclidean velocity.
-     */
-    EuclideanSpace_t getEuclideanVelocity(const WheelSpace_t &wheel_speeds);
 
     /**
      * Gets the target Euclidean acceleration.
