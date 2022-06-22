@@ -146,7 +146,14 @@ void ShootOrPassPlayFSM::takePass(const Update& event)
 
 bool ShootOrPassPlayFSM::passFound(const Update& event)
 {
-    return best_pass_and_score_so_far.rating > min_pass_score_threshold;
+    if (event.common.world.ball().velocity().length() < 0.5)
+    {
+        return best_pass_and_score_so_far.rating > min_pass_score_threshold;
+    }
+    else
+    {
+        return false;
+    }
 }
 
 bool ShootOrPassPlayFSM::shouldAbortPass(const Update& event)
@@ -157,7 +164,8 @@ bool ShootOrPassPlayFSM::shouldAbortPass(const Update& event)
     const auto short_pass_threshold =
         this->ai_config.shoot_or_pass_play_config().short_pass_threshold();
 
-    const auto pass_area_polygon = Polygon::fromPoints(passer_point, receiver_point);
+    const auto pass_area_polygon =
+        Polygon::fromPoints(passer_point, receiver_point).expand(1.5);
 
     // calculate a polygon that contains the receiver and passer point, and checks if the
     // ball is inside it. if the ball isn't being passed to the receiver then we should
