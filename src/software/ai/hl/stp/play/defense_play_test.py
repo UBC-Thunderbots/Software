@@ -4,8 +4,8 @@ import pytest
 
 import software.python_bindings as tbots
 from proto.play_pb2 import Play, PlayName
-from software.simulated_tests.ball_enters_region import *
-from software.simulated_tests.ball_enters_region import *
+from software.simulated_tests.robot_halt import *
+from software.simulated_tests.robot_enters_region import *
 from software.simulated_tests.simulated_test_fixture import simulated_test_runner
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
@@ -40,9 +40,9 @@ def test_defense_play(simulated_test_runner):
     simulated_test_runner.gamecontroller.send_ci_input(
         gc_command=Command.Type.STOP, team=Team.UNKNOWN
     )
-    simulated_test_runner.gamecontroller.send_ci_input(
-        gc_command=Command.Type.FORCE_START, team=Team.BLUE
-    )
+    #simulated_test_runner.gamecontroller.send_ci_input(
+    #    gc_command=Command.Type.FORCE_START, team=Team.BLUE
+    #)
 
     # Force play override here
     blue_play = Play()
@@ -67,9 +67,24 @@ def test_defense_play(simulated_test_runner):
 
     # Always Validation
     always_validation_sequence_set = [[]]
-
+    
     # Eventually Validation
-    eventually_validation_sequence_set = [[]]
+    eventually_validation_sequence_set = [
+        [
+            RobotHaltEventually(),
+            RobotEventuallyEntersRegion(
+                [
+                    tbots.Rectangle(tbots.Point(0,2.85),
+                                    tbots.Point(0.9,2)),
+                    tbots.Rectangle(tbots.Point(0.5,2.5),
+                                    tbots.Point(1,2)),
+                    tbots.Rectangle(tbots.Point(-2,-0.75),
+                                    tbots.Point(-1.5,-1.25)),
+                ]
+            ),
+
+        ]
+    ]
 
     simulated_test_runner.run_test(
         eventually_validation_sequence_set=eventually_validation_sequence_set,
@@ -205,10 +220,7 @@ def test_defense_play_close_to_net(simulated_test_runner):
     always_validation_sequence_set = [[]]
 
     # Eventually Validation
-    eventually_validation_sequence_set = [
-            [
-                BallEventuallyEntersRegion(regions=[]),]
-    ]
+    eventually_validation_sequence_set = [[]]
     simulated_test_runner.run_test(
         eventually_validation_sequence_set=eventually_validation_sequence_set,
         always_validation_sequence_set=always_validation_sequence_set,

@@ -67,6 +67,8 @@ py_library(
         "robot_enters_region.py",
         "robot_speed_threshold.py",
         "validation.py",
+        "robot_halt.py",
+        "friendly_goal_scored.py"
     ],
     data = [
         "//software:py_constants.so",

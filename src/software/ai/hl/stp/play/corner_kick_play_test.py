@@ -5,6 +5,7 @@ import pytest
 import software.python_bindings as tbots
 from proto.play_pb2 import Play, PlayName
 from software.simulated_tests.ball_enters_region import *
+from software.simulated_tests.friendly_goal_scored import *
 from software.simulated_tests.simulated_test_fixture import simulated_test_runner
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
@@ -43,7 +44,7 @@ def test_corner_kick_play_bottom_left(simulated_test_runner):
         gc_command=Command.Type.NORMAL_START, team=Team.BLUE
     )
     simulated_test_runner.gamecontroller.send_ci_input(
-        gc_command=Command.Type.CORNER_KICK, team=Team.BLUE
+        gc_command=Command.Type.DIRECT, team=Team.BLUE
     )
 
     # Force play override here
@@ -68,10 +69,10 @@ def test_corner_kick_play_bottom_left(simulated_test_runner):
     )
 
     # Always Validation
-    always_validation_sequence_set = [[]]
+    always_validation_sequence_set = []
 
     # Eventually Validation
-    eventually_validation_sequence_set = [[]]
+    eventually_validation_sequence_set = [[FriendlyGoalEventuallyScored()]]
 
     simulated_test_runner.run_test(
         eventually_validation_sequence_set=eventually_validation_sequence_set,
@@ -111,7 +112,7 @@ def test_corner_kick_play_top_right(simulated_test_runner):
         gc_command=Command.Type.NORMAL_START, team=Team.BLUE
     )
     simulated_test_runner.gamecontroller.send_ci_input(
-        gc_command=Command.Type.CORNER_KICK, team=Team.BLUE
+        gc_command=Command.Type.DIRECT, team=Team.BLUE
     )
 
     # Force play override here
@@ -136,10 +137,10 @@ def test_corner_kick_play_top_right(simulated_test_runner):
     )
 
     # Always Validation
-    always_validation_sequence_set = [[]]
+    always_validation_sequence_set = []
 
     # Eventually Validation
-    eventually_validation_sequence_set = [[]]
+    eventually_validation_sequence_set = [[FriendlyGoalEventuallyScored()]]
 
     simulated_test_runner.run_test(
         eventually_validation_sequence_set=eventually_validation_sequence_set,

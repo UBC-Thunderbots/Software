@@ -101,6 +101,7 @@ class SimulatorTestRunner(object):
         eventually_validation_sequence_set=[[]],
         test_timeout_s=3,
         tick_duration_s=0.0166,  # Default to 60hz
+        ci_cmd_with_delay=[],
     ):
         """Run a test
 
@@ -111,6 +112,13 @@ class SimulatorTestRunner(object):
         :param test_timeout_s: The timeout for the test, if any eventually_validations
                                 remain after the timeout, the test fails.
         :param tick_duration_s: The simulation step duration
+        :param ci_cmd_with_delay: A list consisting of a duration, and a 
+                                tuple forming a ci command 
+                                { 
+                                    (time, command, team),
+                                    (time, command, team),
+                                    ... 
+                                }
 
         """
 
@@ -133,6 +141,18 @@ class SimulatorTestRunner(object):
             time_elapsed_s = 0
 
             while time_elapsed_s < test_timeout_s:
+                
+                # Check for new CI commands at this time step
+                for (delay,cmd,team) in ci_cmd_with_delay:
+                    # If delay matches time
+                    if delay <= time_elapsed_s:
+                        # send command
+                        self.gamecontroller.send_ci_input(
+                            cmd, team     
+                        )
+                        # remove command from the list
+                        ci_cmd_with_delay.remove((delay,cmd,team))
+
 
                 # Update the timestamp logged by the ProtoLogger
                 with self.timestamp_mutex:
