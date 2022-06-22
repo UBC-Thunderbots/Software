@@ -1,32 +1,6 @@
 #pragma once
 
 /**
- * This struct holds wheel/motor constants
- */
-typedef struct WheelConstants
-{
-    // The current per unit torque for the motor attached to this wheel [A/(N*m)]
-    float motor_current_amp_per_torque_newton_meter;
-
-    // The phase resistance for the motor attached to this wheel [Ohms]
-    float motor_phase_resistance_ohm;
-
-    // The back emf per motor rpm for the motor attached to this wheel [volt / rpm]
-    float motor_back_emf_per_rpm;
-
-    // The maximum voltage change that can be exerted on the motor attached to this
-    // wheel before the wheel will slip [Volts]
-    float motor_max_voltage_before_wheel_slip;
-
-    // The radius of the wheel, in meters
-    float wheel_radius_meters;
-
-    // The gear ratio between the motor shaft and wheel shaft
-    // [# of wheel rotations / 1 motor rotation]
-    float wheel_rotations_per_motor_rotation;
-} WheelConstants_t;
-
-/**
  * This struct represents robot constants
  */
 typedef struct RobotConstants
@@ -34,9 +8,6 @@ typedef struct RobotConstants
     // The mass of the entire robot including batteries [kg]
     // Determined experimentally by weighing the robot and battery
     float mass_kg;
-
-    // The moment of inertia of the entire robot [kg m^2]
-    float moment_of_inertia_kg_m_2;
 
     // The inertial factor
     float inertial_factor;
@@ -113,16 +84,12 @@ typedef struct RobotConstants
     // Max force dribbler mode sets the speed that applies the maximum amount of force on
     // the ball [rpm]
     float max_force_dribbler_speed_rpm;
-} RobotConstants_t;
 
-/**
- * This struct holds the state of the controller.
- * This is a carryover from legacy code, and should be deleted when the controller is
- * replaced.
- */
-typedef struct ControllerState
-{
-    float last_applied_acceleration_x;
-    float last_applied_acceleration_y;
-    float last_applied_acceleration_angular;
-} ControllerState_t;
+    // The radius of the wheel, in meters
+    float wheel_radius_meters;
+
+    // The gear ratio between the motor shaft and wheel shaft
+    // [# of wheel rotations / 1 motor rotation]
+    float wheel_rotations_per_motor_rotation;
+
+} RobotConstants_t;

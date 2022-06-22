@@ -1,6 +1,5 @@
 #include "software/backend/unix_simulator_backend.h"
 
-#include "proto/message_translation/defending_side.h"
 #include "proto/message_translation/ssl_wrapper.h"
 #include "proto/message_translation/tbots_protobuf.h"
 #include "proto/parameters.pb.h"

@@ -1,4 +1,5 @@
 from software.thunderscope.thunderscope import Thunderscope
+from software.thunderscope.robot_communication import RobotCommunication
 from software.thunderscope.binary_context_managers import *
 from proto.message_translation import tbots_protobuf
 import software.python_bindings as cpp_bindings
@@ -195,7 +196,7 @@ if __name__ == "__main__":
     if args.run_blue or args.run_yellow:
         # TODO (#2585): Support multiple channels
         with RobotCommunication(
-            proto_unix_io, ROBOT_MULTICAST_CHANNEL_0, args.interface
+            proto_unix_io, getRobotMulticastChannel(0), args.interface
         ), FullSystem(runtime_dir, debug, friendly_colour_yellow) as full_system:
             tscope.show()
 
