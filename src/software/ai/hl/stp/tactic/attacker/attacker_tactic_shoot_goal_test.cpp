@@ -53,7 +53,7 @@ TEST_P(AttackerTacticShootGoalTest, attacker_test_shoot_goal)
 
     runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(10));
+            Duration::fromSeconds(9));
 }
 
 INSTANTIATE_TEST_CASE_P(
@@ -83,4 +83,6 @@ INSTANTIATE_TEST_CASE_P(
         std::make_tuple(BallState(Point(2.5, -1), Vector()), Point(1, 1),
                         TestUtil::createStationaryRobotStatesWithId(
                             {Point(2.5, -1.4), Point(3, 0.4), Point(3, 0.8),
-                             Point(3.1, 0.6), Point(3.1, 1), Point(4.2, 1.2)}))));
+                             Point(3.1, 0.6), Point(3.1, 1), Point(4.2, 1.2)}))
+
+            ));
