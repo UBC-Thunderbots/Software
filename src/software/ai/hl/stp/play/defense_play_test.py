@@ -40,9 +40,9 @@ def test_defense_play(simulated_test_runner):
     simulated_test_runner.gamecontroller.send_ci_input(
         gc_command=Command.Type.STOP, team=Team.UNKNOWN
     )
-    #simulated_test_runner.gamecontroller.send_ci_input(
-    #    gc_command=Command.Type.FORCE_START, team=Team.BLUE
-    #)
+    simulated_test_runner.gamecontroller.send_ci_input(
+       gc_command=Command.Type.FORCE_START, team=Team.BLUE
+    )
 
     # Force play override here
     blue_play = Play()
