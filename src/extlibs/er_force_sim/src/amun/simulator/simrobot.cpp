@@ -650,6 +650,48 @@ void SimRobot::update(SSLProto::SSL_DetectionRobot *robot, float stddev_p,
     m_lastSendTime = time;
 }
 
+bool SimRobot::touchesBall(SimBall *ball) const
+{
+    // for some reason btHingeConstraints, which is used when dribbling, are not always
+    // detected as contact by bullet. so if the ball is being dribbled then we assume it
+    // is in contact with the robot.
+    if (m_holdBallConstraint)
+    {
+        return true;
+    }
+
+    // iterate through contact manifold: a cache that contains all contact points between
+    // pairs of collision objects
+    int num_manifolds = m_world->getDispatcher()->getNumManifolds();
+    for (int i = 0; i < num_manifolds; ++i)
+    {
+        btPersistentManifold *contact_manifold =
+            m_world->getDispatcher()->getManifoldByIndexInternal(i);
+
+        // determine if the two objects are the ball and robot body/dribbler
+        btCollisionObject *objectA = (btCollisionObject *)(contact_manifold->getBody0());
+        btCollisionObject *objectB = (btCollisionObject *)(contact_manifold->getBody1());
+        if ((objectA == m_dribblerBody && objectB == ball->body()) ||
+            (objectA == ball->body() && objectB == m_dribblerBody) ||
+            (objectA == m_body && objectB == ball->body()) ||
+            (objectA == ball->body() && objectB == m_body))
+        {
+            // check if the points are in contact now
+            int num_contacts = contact_manifold->getNumContacts();
+            for (int j = 0; j < num_contacts; ++j)
+            {
+                btManifoldPoint &pt = contact_manifold->getContactPoint(j);
+                if (pt.getDistance() < 0.001f * SIMULATOR_SCALE)
+                {
+                    return true;
+                }
+            }
+        }
+    }
+
+    return false;
+}
+
 void SimRobot::update(world::SimRobot *robot, SimBall *ball) const
 {
     btTransform transform;
