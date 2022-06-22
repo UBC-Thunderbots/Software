@@ -6,15 +6,17 @@
    all_services:
      - thunderloop
      - display
-     - announcement
+     - wifi_announcement
+     - ethernet_announcement
    all_actions:
      - stop
      - sync
      - start
    binary_paths:
      thunderloop: ../../thunderloop_main
-     announcement: ../../broadcasts
-     display: ../../display/robot_ui
+     wifi_announcement: ../../broadcasts/robot_broadcast_sender_zip.zip
+     ethernet_announcement: ../../broadcasts/robot_broadcast_sender_zip.zip
+     display: ../../display/robot_ui_zip.zip
 
   tasks:
 
@@ -22,7 +24,7 @@
         msg: "[Robot ID = {{ inventory_hostname }}]"
       tags: always
 
-    - name: extract services & actions from tags
+    - name: Extract services & actions from tags
       set_fact:
         services: "{{ all_services if ansible_run_tags | intersect(all_services)|length == 0 else ansible_run_tags | intersect(all_services) }}"
         actions: "{{ all_actions if ansible_run_tags|intersect(all_actions)|length == 0 else ansible_run_tags | intersect(all_actions)}}"
@@ -49,6 +51,14 @@
           when: "'stop' in actions"
           tags: always
 
+        - name: Delete everything on ~/
+          file:
+            state: absent
+            path: /home/robot/thunderbots_binaries
+          become_method: sudo
+          become: true
+          register: result
+
         - name: Sync Binaries
           ansible.posix.synchronize:
             src: "{{ binary_paths[service_name] }}"
@@ -60,6 +70,12 @@
             loop_var: service_name
           when: "'sync' in actions"
           tags: always
+
+        - name: Unzipping python binaries
+          command: 'unzip ~/thunderbots_binaries/*.zip'
+          register: result
+          args:
+            chdir: ~/thunderbots_binaries
 
         - name: Start Services
           become: true
@@ -77,11 +93,16 @@
 
       # Rescue section only runs if any task in this block fails
       rescue:
-        - name: Error Recovery - Ensure Announcement Service is Running
+        - name: Error Recovery - Ensure Announcement Services are Running
           become: true
           become_method: sudo
           ansible.builtin.systemd:
-            name: announcement
+            name: wifi_announcement
+            masked: no
+            daemon_reload: yes
+            state: started
+          ansible.builtin.systemd:
+            name: ethernet_announcement
             masked: no
             daemon_reload: yes
             state: started

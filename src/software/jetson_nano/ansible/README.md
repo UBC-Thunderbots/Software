@@ -38,7 +38,7 @@ Different arguments might need to be added to support different scenarios (ex ta
 ### Remote Flashing
 
 The `remote_flash.yml` playbook stops services, syncs new binaries to hosts and restarts services. The "--tags" argument can be used to specify which actions to perform and on which services. 
-Possible service tags: thunderloop, announcement, display, redis. 
+Possible service tags: thunderloop, wifi_announcement, ethernet_announcement, display, redis. 
 Possible action tags: stop, sync, start
 
 if no service/action tags are specified, all service/actions will be used. 

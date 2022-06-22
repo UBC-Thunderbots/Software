@@ -260,16 +260,14 @@ class HRVOSimulator
     }
 
    private:
-    unsigned int frame = 0;
-
     // PrimitiveSet which includes the path which each friendly robot should take
     TbotsProto::PrimitiveSet primitive_set;
 
     // True if the ball should be treated as an agent (obstacle)
     // NOTE: This will take effect the next time we receive a world, and we know
     //       the current ball position and velocity
-    bool add_ball_agent       = false;
-    std::size_t ball_agent_id = -1;
+    bool add_ball_agent;
+    std::size_t ball_agent_id;
 
     // The robot constants which all agents will use
     RobotConstants_t robot_constants;

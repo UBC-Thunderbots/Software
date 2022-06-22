@@ -45,11 +45,18 @@
 #include "software/logger/logger.h"
 
 HRVOSimulator::HRVOSimulator(float time_step, const RobotConstants_t &robot_constants)
-    : global_time(0.0f),
-      time_step(time_step),
+    : primitive_set(),
+      add_ball_agent(false),
+      ball_agent_id(-1),
       robot_constants(robot_constants),
+      global_time(0.0f),
+      time_step(time_step),
+      last_time_velocity_updated(0.0f),
       reached_goals(false),
-      kd_tree(std::make_unique<KdTree>(this))
+      kd_tree(std::make_unique<KdTree>(this)),
+      agents(),
+      friendly_robot_id_map(),
+      enemy_robot_id_map()
 {
 }
 
@@ -378,8 +385,7 @@ void HRVOSimulator::visualize(unsigned int robot_id) const
     auto friendly_agent_opt = getFriendlyAgentFromRobotId(robot_id);
     if (!friendly_agent_opt.has_value())
     {
-        LOG(WARNING) << "HRVO friendly agent with robot id " << robot_id
-                     << " can not be visualized." << std::endl;
+        // HRVO friendly agent with robot id can not be visualized
         return;
     }
 
