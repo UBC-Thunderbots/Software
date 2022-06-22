@@ -36,11 +36,14 @@ void OffensePlay::updateTactics(const PlayUpdate &play_update)
     unsigned int num_enemy_robots =
         static_cast<int>(play_update.world.enemyTeam().numRobots());
 
+    // enemy team has at most half a full team, so we need at most half the number of defenders
     if (num_enemy_robots <= 3)
     {
         num_defenders = 1;
         if (num_enemy_robots < 2)
-            num_defenders--;
+        {
+            num_defenders = 0;
+        }
     }
     else if (play_update.num_tactics <= 3)
     {
