@@ -3,6 +3,7 @@ syntax = "proto3";
 package TbotsProto;
 
 import "proto/tbots_timestamp_msg.proto";
+import "proto/geometry.proto";
 
 message RobotStatus
 {
@@ -96,6 +97,7 @@ message MotorStatus
     DriveUnit back_left     = 3;
     DriveUnit back_right    = 4;
     DribblerStatus dribbler = 5;
+    Vector local_velocity   = 6;
 }
 
 /* Data about the network connection with the robots, including network-derived values */
