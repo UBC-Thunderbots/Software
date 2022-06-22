@@ -190,6 +190,37 @@ bool ShootOrPassPlayFSM::passCompleted(const Update& event)
 
 bool ShootOrPassPlayFSM::tookShot(const Update& event)
 {
-    return (event.common.world.ball().velocity().length() >
-            this->ai_config.shoot_or_pass_play_config().ball_shot_threshold());
+    const auto ball_velocity_orientation =
+        event.common.world.ball().velocity().orientation();
+    const auto ball_position = event.common.world.ball().position();
+    const auto ball_velocity = event.common.world.ball().velocity().length();
+    const auto ball_shot_threshold =
+        this->ai_config.shoot_or_pass_play_config().ball_shot_threshold();
+
+    const auto enemy_goal_top_post = event.common.world.field().enemyGoalpostPos();
+    const auto enemy_goal_bot_post = event.common.world.field().enemyGoalpostNeg();
+
+    const auto ball_to_top_post_angle =
+        (enemy_goal_top_post.toVector() - ball_position.toVector()).orientation();
+    const auto ball_to_bot_post_angle =
+        (enemy_goal_bot_post.toVector() - ball_position.toVector()).orientation();
+
+    const auto enemy_goal_position = event.common.world.field().enemyGoalCenter();
+
+    bool ball_oriented_towards_goal;
+
+    if (enemy_goal_position.x() < 0)
+    {
+        ball_oriented_towards_goal =
+            (ball_velocity_orientation > ball_to_top_post_angle) &&
+            (ball_velocity_orientation < ball_to_bot_post_angle);
+    }
+    else
+    {
+        ball_oriented_towards_goal =
+            (ball_velocity_orientation < ball_to_top_post_angle) &&
+            (ball_velocity_orientation > ball_to_bot_post_angle);
+    }
+
+    return ball_oriented_towards_goal && (ball_velocity > ball_shot_threshold);
 }
