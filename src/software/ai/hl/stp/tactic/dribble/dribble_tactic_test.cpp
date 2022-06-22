@@ -185,7 +185,7 @@ TEST_F(DribbleTacticTest, test_moving_ball_dribble_dest_and_orientation)
     Point initial_position    = Point(-2, 1.5);
     Point dribble_destination = Point(-1, 2);
     Angle dribble_orientation = Angle::zero();
-    BallState ball_state(Point(2, -2), Vector(1, 2));
+    BallState ball_state(Point(1, 0), Vector(1, 2));
     auto friendly_robots =
         TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5), initial_position});
 
@@ -285,7 +285,7 @@ TEST_F(DribbleTacticTest, test_running_into_enemy_robot_knocking_ball_away)
     Point initial_position    = Point(-2, 1.5);
     Point dribble_destination = Point(-1, 2);
     Angle dribble_orientation = Angle::half();
-    BallState ball_state(Point(2, -2), Vector(1, 2));
+    BallState ball_state(Point(2, -2), Vector(2, 4));
     auto friendly_robots =
         TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5), initial_position});
     enemy_robots.emplace_back(RobotStateWithId{

@@ -116,6 +116,7 @@ PYBIND11_MODULE(python_bindings, m)
         .def("normalize", py::overload_cast<>(&Vector::normalize, py::const_))
         .def("normalize", py::overload_cast<double>(&Vector::normalize, py::const_))
         .def("rotate", &Vector::rotate)
+        .def("orientation", &Vector::orientation)
         // Overloaded
         .def(py::self + py::self)
         .def(py::self += py::self)
@@ -149,6 +150,7 @@ PYBIND11_MODULE(python_bindings, m)
         .def(py::init<>())
         .def_static("fromRadians", &Angle::fromRadians)
         .def_static("fromDegrees", &Angle::fromDegrees)
+        .def("toRadians", &Angle::toRadians)
         // Overloaded
         .def("__repr__", [](const Angle& a) {
             std::stringstream stream;

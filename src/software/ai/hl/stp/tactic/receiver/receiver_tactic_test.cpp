@@ -77,13 +77,13 @@ INSTANTIATE_TEST_CASE_P(
                                           Angle::fromDegrees(0), Angle::fromDegrees(0))}),
 
         // Robot slighty off from receive point: test 1
-        std::make_tuple(Pass(Point(0.0, 0.5), Point(2, 2), 4),
+        std::make_tuple(Pass(Point(0.0, 0.4), Point(2, 2), 4),
                         RobotStateWithId{
                             1, RobotState(Point(2, 1.5), Vector(0, 0),
                                           Angle::fromDegrees(0), Angle::fromDegrees(0))}),
 
         // Robot slighty off from receive point: test 2
-        std::make_tuple(Pass(Point(0.0, 0.5), Point(2, 2), 4),
+        std::make_tuple(Pass(Point(0.0, 0.4), Point(2, 2), 4),
                         RobotStateWithId{
                             1, RobotState(Point(2.5, 2.0), Vector(0, 0),
                                           Angle::fromDegrees(0), Angle::fromDegrees(0))}),
@@ -102,9 +102,11 @@ INSTANTIATE_TEST_CASE_P(
 
         // Robot facing towards pass speedy
         std::make_tuple(Pass(Point(0.0, 0.0), Point(-3, 0), 5),
-                        RobotStateWithId{1, RobotState(Point(-3, 0), Vector(0, 0),
-                                                       Angle::fromDegrees(0),
-                                                       Angle::fromDegrees(0))})));
+                        RobotStateWithId{
+                            1, RobotState(Point(-3, 0), Vector(0, 0),
+                                          Angle::fromDegrees(0), Angle::fromDegrees(0))})
+
+            ));
 
 class ReceiverTacticTestOneTouch : public ReceiverTacticTest
 {
@@ -135,7 +137,7 @@ TEST_P(ReceiverTacticTestOneTouch, test_one_touch)
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
     runTest(field_type, ball_state, friendly_robots, {}, terminating_validation_functions,
-            non_terminating_validation_functions, Duration::fromSeconds(3));
+            non_terminating_validation_functions, Duration::fromSeconds(5));
 }
 
 INSTANTIATE_TEST_CASE_P(
@@ -189,7 +191,7 @@ INSTANTIATE_TEST_CASE_P(
         //                                  Angle::fromDegrees(0),
         //                                  Angle::fromDegrees(0))}),
 
-        std::make_tuple(Pass(Point(4.0, 1.5), Point(3.0, -1), 5),
+        std::make_tuple(Pass(Point(4.0, 1.5), Point(3.0, -1), 4.5),
                         RobotStateWithId{1, RobotState(Point(3.0, -1), Vector(0, 0),
                                                        Angle::fromDegrees(180),
                                                        Angle::fromDegrees(0))}),
@@ -208,7 +210,7 @@ INSTANTIATE_TEST_CASE_P(
         //                                  Angle::fromDegrees(0),
         //                                  Angle::fromDegrees(0))}),
 
-        std::make_tuple(Pass(Point(4.0, -1.5), Point(3.0, 1), 5),
+        std::make_tuple(Pass(Point(4.0, -1.5), Point(3.0, 1), 4.5),
                         RobotStateWithId{
                             1, RobotState(Point(3.0, 1), Vector(0, 0),
                                           Angle::fromDegrees(0), Angle::fromDegrees(0))})
