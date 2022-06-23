@@ -54,6 +54,48 @@
               - "[Robot ID = {{ inventory_hostname }}]"
               - "Setup Script run successfully"
 
+        - name: Sync Device Tree
+          become: true
+          become_method: sudo
+          tags:
+            - sync
+            - device_tree
+          ansible.posix.synchronize:
+            src: ../../../linux_configs/device_tree.zip
+            dest: ~/
+            recursive: yes
+            copy_links: yes
+
+        - name: Unzip device tree
+          tags:
+            - sync
+            - device_tree
+          command: 'unzip -o ~/device_tree.zip'
+          register: result
+          args:
+            chdir: ~/
+
+        - name: Compile device tree
+          tags:
+            - sync
+            - device_tree
+          shell: 'dtc -q -I dts -O dtb ~/trinamic.dts > trinamic.dtb'
+          register: result
+          args:
+            chdir: ~/
+
+
+        - name: Move compiled device tree binary to boot path
+          become_method: sudo
+          become: true
+          tags:
+            - sync
+            - device_tree
+          shell: 'mv /home/robot/trinamic.dtb /boot/kernel_tegra210-p3448-0000-p3449-0000-b00-user-custom.dtb'
+          register: result
+          args:
+            chdir: ~/
+
 
     - name: Run systemd setup
       tags: systemd
@@ -126,6 +168,7 @@
           register: res
           tags:
             - reboot
+            - device_tree
           reboot:
             msg: "Reboot initiated by Ansible"
             connect_timeout: 20

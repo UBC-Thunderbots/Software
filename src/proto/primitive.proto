@@ -145,7 +145,7 @@ message StopPrimitive
     StopType stop_type = 1;
 }
 
-message DirectControlPrimitive
+message MotorControl
 {
     message DirectPerWheelControl
     {
@@ -161,12 +161,17 @@ message DirectControlPrimitive
         AngularVelocity angular_velocity = 2;
     }
 
-    oneof wheel_control
+    oneof drive_control
     {
         DirectPerWheelControl direct_per_wheel_control = 1;
         DirectVelocityControl direct_velocity_control  = 2;
     }
 
-    PowerControl power       = 3;
     float dribbler_speed_rpm = 4;
+}
+
+message DirectControlPrimitive
+{
+    MotorControl motor_control = 1;
+    PowerControl power_control = 2;
 }

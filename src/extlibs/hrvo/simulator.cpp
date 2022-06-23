@@ -385,8 +385,7 @@ void HRVOSimulator::visualize(unsigned int robot_id) const
     auto friendly_agent_opt = getFriendlyAgentFromRobotId(robot_id);
     if (!friendly_agent_opt.has_value())
     {
-        LOG(WARNING) << "HRVO friendly agent with robot id " << robot_id
-                     << " can not be visualized." << std::endl;
+        // HRVO friendly agent with robot id can not be visualized
         return;
     }
 

@@ -1,7 +1,7 @@
 from software.py_constants import *
+from software.python_bindings import *
 from proto.import_all_protos import *
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
-from software.python_bindings import *
 
 
 class RobotCommunication(object):
@@ -49,18 +49,25 @@ class RobotCommunication(object):
         """ Enter RobotCommunication context manager """
 
         # Create the multicast channels
-        self.receive_robot_status = networking.RobotStatusProtoListener(
+        self.receive_robot_status = RobotStatusProtoListener(
             self.multicast_channel + "%" + self.interface,
             ROBOT_STATUS_PORT,
             lambda data: self.proto_unix_io.send_proto(RobotStatus, data),
             True,
         )
 
-        self.send_primitive_set = networking.PrimitiveSetProtoSender(
+        self.receive_robot_log = RobotLogProtoListener(
+            self.multicast_channel + "%" + self.interface,
+            ROBOT_LOGS_PORT,
+            lambda data: self.proto_unix_io.send_proto(RobotLog, data),
+            True,
+        )
+
+        self.send_primitive_set = PrimitiveSetProtoSender(
             self.multicast_channel + "%" + self.interface, PRIMITIVE_PORT, True
         )
 
-        self.send_world = networking.WorldProtoSender(
+        self.send_world = WorldProtoSender(
             self.multicast_channel + "%" + self.interface, VISION_PORT, True
         )
 

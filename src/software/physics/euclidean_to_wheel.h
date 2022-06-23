@@ -2,6 +2,8 @@
 
 #include <Eigen/Dense>
 
+#include "shared/robot_constants.h"
+
 /**
  * Vector representation of 2D Euclidean space.
  *
@@ -30,8 +32,10 @@ class EuclideanToWheel
      * Initializes the Euclidean velocity to wheel speed conversion matrices.
      *
      * @param control_loop_frequency_Hz The frequency of the control loop.
+     * @param robot_constants The constants of the robot we are computing for.
      */
-    explicit EuclideanToWheel(const float &control_loop_frequency_Hz);
+    explicit EuclideanToWheel(const int &control_loop_frequency_Hz,
+                              const RobotConstants_t &robot_constants);
 
     /**
      * Gets wheel velocity targets from the desired Euclidean velocity.
@@ -41,6 +45,14 @@ class EuclideanToWheel
      */
     WheelSpace_t getTargetWheelSpeeds(const EuclideanSpace_t &target_euclidean_velocity,
                                       const WheelSpace_t &current_wheel_speeds);
+
+    /**
+     * Gets the equivalent Euclidean velocity from the measured wheel speeds.
+     *
+     * @param wheel_speeds The measured wheel speeds.
+     * @return The equivalent robot Euclidean velocity.
+     */
+    EuclideanSpace_t getEuclideanVelocity(const WheelSpace_t &wheel_speeds);
 
    private:
     /**
@@ -83,14 +95,6 @@ class EuclideanToWheel
      * Wheel speed to Euclidean velocity coupling matrix.
      */
     Eigen::Matrix<double, 3, 4> wheel_speed_to_euclidean_velocity_D_inverse_;
-
-    /**
-     * Gets the equivalent Euclidean velocity from the measured wheel speeds.
-     *
-     * @param wheel_speeds The measured wheel speeds.
-     * @return The equivalent robot Euclidean velocity.
-     */
-    EuclideanSpace_t getEuclideanVelocity(const WheelSpace_t &wheel_speeds);
 
     /**
      * Gets the target Euclidean acceleration.

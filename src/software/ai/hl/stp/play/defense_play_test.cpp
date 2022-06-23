@@ -47,13 +47,6 @@ TEST_F(DefensePlayTest, test_defense_play)
             Rectangle attacker_rect(Point(0, 2.85), Point(0.9, 2));
             robotInPolygon(attacker_rect, 1, world_ptr, yield);
 
-            // Two friendly robots in position to shadow enemy robots. One is on the enemy
-            // with the ball and the other is on the next highest threat
-            Rectangle shadowing_rect_1(Point(0.5, 2.5), Point(1, 2));
-            Rectangle shadowing_rect_2(Point(-2, -0.75), Point(-1.5, -1.25));
-            robotInPolygon(shadowing_rect_1, 1, world_ptr, yield);
-            robotInPolygon(shadowing_rect_2, 1, world_ptr, yield);
-
             // Two friendly crease defenders should be close to the goalie
             Point goalie_position = world_ptr->friendlyTeam().goalie()->position();
             Rectangle left_crease_defender_rect(
