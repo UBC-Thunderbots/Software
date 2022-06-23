@@ -1,5 +1,23 @@
 package(default_visibility = ["//visibility:public"])
 
+load("@simulated_tests_deps//:requirements.bzl", "requirement")
+
+py_test(
+    name = "simulated_test_ball_model",
+    srcs = [
+        "simulated_test_ball_model.py",
+    ],
+    # TODO (#2619) Remove tag to run in parallel
+    tags = [
+        "exclusive",
+    ],
+    deps = [
+        "//software/simulated_tests:simulated_test_fixture",
+        "//software/simulated_tests:validation",
+        requirement("pytest"),
+    ],
+)
+
 cc_library(
     name = "simulated_er_force_sim_test_fixture",
     testonly = True,
@@ -15,7 +33,6 @@ cc_library(
         "//software/simulation:er_force_simulator",
         "//software/test_util",
         "//software/time:duration",
-        "//proto/logging:proto_logger",
         "//shared/test_util:tbots_gtest_main",
         "//shared/test_util",
         # TODO (#1889) Remove this dep after optional params are implemented
@@ -62,6 +79,7 @@ py_library(
         "ball_enters_region.py",
         "ball_moves_forward.py",
         "ball_speed_threshold.py",
+        "ball_stops_in_region.py",
         "excessive_dribbling.py",
         "friendly_has_ball_possession.py",
         "robot_enters_region.py",

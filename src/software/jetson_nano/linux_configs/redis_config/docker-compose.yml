@@ -1,9 +1,0 @@
-version: '3'
-services:
-    redis:
-        image: redis:latest
-        ports:
-            - 6379:6379
-        volumes:
-            - ./config/redis.conf:/redis.conf
-        command: [ "redis-server", "/redis.conf" ]

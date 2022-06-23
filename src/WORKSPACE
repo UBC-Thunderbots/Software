@@ -148,6 +148,14 @@ http_archive(
 )
 
 new_git_repository(
+    name = "LTC4151",
+    build_file = "@//extlibs:LTC4151.BUILD",
+    commit = "729952f10bcdcf359877b6f728565c17a8f17423",
+    remote = "https://github.com/kerrydwong/LTC4151.git",
+    shallow_since = "1397951678 -0400",
+)
+
+new_git_repository(
     name = "munkres_cpp",
     build_file = "@//extlibs:munkres_cpp.BUILD",
     commit = "61086fcf5b3a8ad4bda578cdc2d1dca57b548786",
@@ -169,15 +177,6 @@ git_repository(
     commit = "7665177f47bf514176d5f8575a7334f030203e3d",
     remote = "https://github.com/justbuchanan/bazel_rules_qt.git",
     shallow_since = "1614109311 -0800",
-)
-
-# Fake Function Framework
-new_git_repository(
-    name = "fff",
-    build_file = "@//extlibs:fff.BUILD",
-    commit = "7e09f07e5b262b1cc826189dc5057379e40ce886",
-    remote = "https://github.com/meekrosoft/fff.git",
-    shallow_since = "1566392271 +0200",
 )
 
 # Right now qt5 is installed on the system using the setup_software.sh script

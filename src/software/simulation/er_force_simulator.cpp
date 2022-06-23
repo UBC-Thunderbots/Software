@@ -18,13 +18,11 @@
 #include "software/world/robot_state.h"
 
 ErForceSimulator::ErForceSimulator(const TbotsProto::FieldType& field_type,
-                                   const RobotConstants_t& robot_constants,
-                                   const WheelConstants& wheel_constants)
+                                   const RobotConstants_t& robot_constants)
     : yellow_team_world_msg(std::make_unique<TbotsProto::World>()),
       blue_team_world_msg(std::make_unique<TbotsProto::World>()),
       frame_number(0),
       robot_constants(robot_constants),
-      wheel_constants(wheel_constants),
       field(Field::createField(field_type)),
       blue_robot_with_ball(std::nullopt),
       yellow_robot_with_ball(std::nullopt)
@@ -340,7 +338,7 @@ SSLSimulationProto::RobotControl ErForceSimulator::updateSimulatorRobots(
                 robot_id, RobotState(robot_proto_it->current_state()).orientation());
 
             auto command = *getRobotCommandFromDirectControl(
-                robot_id, std::move(direct_control), robot_constants, wheel_constants);
+                robot_id, std::move(direct_control), robot_constants);
             *(robot_control.mutable_robot_commands()->Add()) = command;
         }
     }
