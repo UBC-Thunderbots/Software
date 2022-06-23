@@ -33,7 +33,7 @@ void Charger::chargeCapacitors()
         digitalWrite(CHRG, HIGH);
 
         timerWrite(charge_timer, 0);
-        timerAlarmWrite(charge_timer, CHARGE_TIME_SECONDS, false);
+        timerAlarmWrite(charge_timer, CHARGE_TIME_MICROSECONDS, false);
         timerAlarmEnable(charge_timer);
     }
 }
