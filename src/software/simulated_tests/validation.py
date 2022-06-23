@@ -262,3 +262,10 @@ def create_validation_geometry(geometry=[]) -> ValidationGeometry:
         )
 
     return validation_geometry
+
+def contains_failure(validation_proto_set:ValidationProtoSet):
+    for validation in validation_proto_set.validations:
+        if validation.status == ValidationStatus.FAILING:
+            return True
+
+    return False

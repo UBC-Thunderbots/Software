@@ -42,8 +42,6 @@ def test_kick(
         ),
     )
 
-    exit(0)
-
     # Setup Tactic
     params = AssignedTacticPlayControlParams()
     kick_origin = Point(

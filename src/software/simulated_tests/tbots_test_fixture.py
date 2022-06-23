@@ -36,7 +36,6 @@ WORLD_BUFFER_TIMEOUT = 0.5
 PROCESS_BUFFER_DELAY_S = 0.01
 PAUSE_AFTER_FAIL_DELAY_S = 3
 
-
 class TbotsTestRunner(object):
 
     """Run a test"""
@@ -98,15 +97,14 @@ class TbotsTestRunner(object):
             gc_command=gc_command, team=team, final_ball_placement_point=final_ball_placement_point
         )
 
-    def set_tactics(self, tactics:AssignedTacticPlayControlParams, blue_team):
+    def set_tactics(self, tactics:AssignedTacticPlayControlParams, team:Team):
         raise NotImplementedError("set_tactic unimplemented")
 
-    def set_play(self, play:Play, blue_team):
+    def set_play(self, play:Play, team:Team):
         raise NotImplementedError("set_play unimplemented")
 
     def set_worldState(self, worldstate : WorldState):
         raise NotImplementedError("set_worldstate unimplemented")
-
 
     def time_provider(self):
         """Provide the current time in seconds since the epoch"""
@@ -122,7 +120,7 @@ class TbotsTestRunner(object):
         raise NotImplementedError("run_test unimplemented")
 
 @pytest.fixture
-def simulated_test_runner():
+def tbots_test_runner():
     args = load_command_line_arguments()
 
     if args.run_field_test:

@@ -38,17 +38,16 @@ PAUSE_AFTER_FAIL_DELAY_S = 3
 
 
 class SimulatorTestRunner(object):
-
     """Run a simulated test"""
 
     def __init__(
-        self,
-        test_name,
-        thunderscope,
-        simulator_proto_unix_io,
-        blue_full_system_proto_unix_io,
-        yellow_full_system_proto_unix_io,
-        gamecontroller,
+            self,
+            test_name,
+            thunderscope,
+            simulator_proto_unix_io,
+            blue_full_system_proto_unix_io,
+            yellow_full_system_proto_unix_io,
+            gamecontroller,
     ):
         """Initialize the SimulatorTestRunner
         
@@ -61,33 +60,37 @@ class SimulatorTestRunner(object):
 
         """
 
-        self.test_name = test_name
-        self.thunderscope = thunderscope
-        self.simulator_proto_unix_io = simulator_proto_unix_io
-        self.blue_full_system_proto_unix_io = blue_full_system_proto_unix_io
-        self.yellow_full_system_proto_unix_io = yellow_full_system_proto_unix_io
-        self.gamecontroller = gamecontroller
-        self.last_exception = None
+        super(SimulatorTestRunner, self).__init__(test_name,
+                                                  thunderscope,
+                                                  simulator_proto_unix_io,
+                                                  blue_full_system_proto_unix_io,
+                                                  yellow_full_system_proto_unix_io,
+                                                  gamecontroller)
 
-        self.world_buffer = ThreadSafeBuffer(buffer_size=1, protobuf_type=World)
-        self.last_exception = None
+    def set_tactics(self, tactics:AssignedTacticPlayControlParams, team:Team):
 
-        self.ssl_wrapper_buffer = ThreadSafeBuffer(
-            buffer_size=1, protobuf_type=SSL_WrapperPacket
-        )
-        self.robot_status_buffer = ThreadSafeBuffer(
-            buffer_size=1, protobuf_type=RobotStatus
-        )
+        if team == Team.BLUE:
+            self.blue_full_system_proto_unix_io.send_proto(
+                AssignedTacticPlayControlParams, tactics
+            )
+        else:
+            self.yellow_full_system_proto_unix_io.send_proto(
+                AssignedTacticPlayControlParams, tactics
+            )
 
-        self.blue_full_system_proto_unix_io.register_observer(
-            SSL_WrapperPacket, self.ssl_wrapper_buffer
-        )
-        self.blue_full_system_proto_unix_io.register_observer(
-            RobotStatus, self.robot_status_buffer
-        )
+    def set_play(self, play:Play, team:Team):
+        if team == Team.BLUE:
+            self.blue_full_system_proto_unix_io.send_proto(Play, play)
 
-        self.timestamp = 0
-        self.timestamp_mutex = threading.Lock()
+        else:
+            self.yellow_full_system_proto_unix_io.send_proto(Play, play)
+
+
+    def set_worldState(self, worldstate : WorldState):
+        self..simulator_proto_unix_io.send_proto(
+            WorldState,
+            worldstate
+        )
 
     def time_provider(self):
         """Provide the current time in seconds since the epoch"""
@@ -96,11 +99,11 @@ class SimulatorTestRunner(object):
             return self.timestamp
 
     def run_test(
-        self,
-        always_validation_sequence_set=[[]],
-        eventually_validation_sequence_set=[[]],
-        test_timeout_s=3,
-        tick_duration_s=0.0166,  # Default to 60hz
+            self,
+            always_validation_sequence_set=[[]],
+            eventually_validation_sequence_set=[[]],
+            test_timeout_s=3,
+            tick_duration_s=0.0166,  # Default to 60hz
     ):
         """Run a test
 
@@ -180,7 +183,6 @@ class SimulatorTestRunner(object):
                 )
 
                 if self.thunderscope:
-
                     # Set the test name
                     eventually_validation_proto_set.test_name = self.test_name
                     always_validation_proto_set.test_name = self.test_name
@@ -232,105 +234,3 @@ class SimulatorTestRunner(object):
         # If thunderscope is disabled, just run the test
         else:
             __runner()
-
-
-@pytest.fixture
-def simulated_test_runner():
-    args = load_command_line_arguments()
-
-    if args.run_field_test:
-        return
-
-    tscope = None
-
-    simulator_proto_unix_io = ProtoUnixIO()
-    yellow_full_system_proto_unix_io = ProtoUnixIO()
-    blue_full_system_proto_unix_io = ProtoUnixIO()
-
-    # Grab the current test name to store the proto log for the test case
-    current_test = os.environ.get("PYTEST_CURRENT_TEST").split(":")[-1].split(" ")[0]
-    current_test = current_test.replace("]", "")
-    current_test = current_test.replace("[", "-")
-
-    test_name = current_test.split("-")[0]
-
-    # Launch all binaries
-    with Simulator(
-        f"{args.simulator_runtime_dir}/test/{test_name}", args.debug_simulator
-    ) as simulator, FullSystem(
-        f"{args.blue_full_system_runtime_dir}/test/{test_name}",
-        args.debug_blue_full_system,
-        False,
-    ) as blue_fs, FullSystem(
-        f"{args.yellow_full_system_runtime_dir}/test/{test_name}",
-        args.debug_yellow_full_system,
-        True,
-    ) as yellow_fs:
-        with Gamecontroller(
-            supress_logs=(not args.show_gamecontroller_logs), ci_mode=True
-        ) as gamecontroller:
-
-            blue_fs.setup_proto_unix_io(blue_full_system_proto_unix_io)
-            yellow_fs.setup_proto_unix_io(yellow_full_system_proto_unix_io)
-            simulator.setup_proto_unix_io(
-                simulator_proto_unix_io,
-                blue_full_system_proto_unix_io,
-                yellow_full_system_proto_unix_io,
-            )
-            gamecontroller.setup_proto_unix_io(
-                blue_full_system_proto_unix_io, yellow_full_system_proto_unix_io,
-            )
-
-            # If we want to run thunderscope, inject the proto unix ios
-            # and start the test
-            if args.enable_thunderscope:
-                tscope = Thunderscope(
-                    simulator_proto_unix_io,
-                    blue_full_system_proto_unix_io,
-                    yellow_full_system_proto_unix_io,
-                    layout_path=args.layout,
-                    visualization_buffer_size=args.visualization_buffer_size,
-                )
-
-            time.sleep(LAUNCH_DELAY_S)
-
-            runner = SimulatorTestRunner(
-                current_test,
-                tscope,
-                simulator_proto_unix_io,
-                blue_full_system_proto_unix_io,
-                yellow_full_system_proto_unix_io,
-                gamecontroller,
-            )
-
-            # Only validate on the blue worlds
-            blue_full_system_proto_unix_io.register_observer(World, runner.world_buffer)
-
-            # Setup proto loggers.
-            #
-            # NOTE: Its important we use the test runners time provider because
-            # test will run as fast as possible with a varying tick rate. The
-            # SimulatorTestRunner time provider is tied to the simulators
-            # t_capture coming out of the wrapper packet (rather than time.time).
-            with ProtoLogger(
-                f"{args.blue_full_system_runtime_dir}/logs/{current_test}",
-                time_provider=runner.time_provider,
-            ) as blue_logger, ProtoLogger(
-                f"{args.yellow_full_system_runtime_dir}/logs/{current_test}",
-                time_provider=runner.time_provider,
-            ) as yellow_logger:
-
-                blue_full_system_proto_unix_io.register_to_observe_everything(
-                    blue_logger.buffer
-                )
-                yellow_full_system_proto_unix_io.register_to_observe_everything(
-                    yellow_logger.buffer
-                )
-
-                yield runner
-                print(
-                    f"\n\nTo replay this test for the blue team, go to the `src` folder and run \n./tbots.py run thunderscope --blue_log {blue_logger.log_folder}"
-                )
-                print(
-                    f"\n\nTo replay this test for the yellow team, go to the `src` folder and run \n./tbots.py run thunderscope --yellow_log {yellow_logger.log_folder}"
-                )
