@@ -19,26 +19,30 @@ kick_velocity = tbots.Vector(6, 0)
 
 rob_pos = ball_initial_position - (kick_velocity.normalize() * 0.5)
 
-@pytest.mark.parametrize(
-    "field_test_runner",
-    [
+
+def test_kick(
+    field_test_runner,
+):
+
+    print("STARTED RUNNING TEST")
+
+    ball_initial_position = tbots.Point(-2.5, 0)
+    kick_velocity = tbots.Vector(6, 0)
+
+    rob_pos = tbots.Point(0.5, 1)
+
+    # ybots, bbots, ball_initial_position, kick_velocity = parse_world_state(field_test_runner.initial_worldstate)
+    # rob_pos = bbots[0]
+    field_test_runner.set_worldState(
         create_world_state(
             [],
             blue_robot_locations=[rob_pos],
             ball_location=ball_initial_position,
             ball_velocity=tbots.Vector(0, 0),
-        )
-    ],
-    indirect=["field_test_runner"]
-)
-def test_kick(
-        field_test_runner,
-):
+        ),
+    )
 
-    print("STARTED RUNNING TEST")
-
-    ybots, bbots, ball_initial_position, kick_velocity = parse_world_state(field_test_runner.initial_worldstate)
-    rob_pos = bbots[0]
+    exit(0)
 
     # Setup Tactic
     params = AssignedTacticPlayControlParams()

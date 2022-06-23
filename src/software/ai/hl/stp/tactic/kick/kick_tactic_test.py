@@ -19,18 +19,6 @@ kick_velocity = tbots.Vector(6, 0)
 
 rob_pos = ball_initial_position - (kick_velocity.normalize() * 0.5)
 
-# @pytest.mark.parametrize(
-#     "field_test_runner",
-#     [
-#         create_world_state(
-#             [],
-#             blue_robot_locations=[rob_pos],
-#             ball_location=ball_initial_position,
-#             ball_velocity=tbots.Vector(0, 0),
-#         )
-#     ],
-#     indirect=["field_test_runner"]
-# )
 def test_kick(
     simulated_test_runner,
 ):
