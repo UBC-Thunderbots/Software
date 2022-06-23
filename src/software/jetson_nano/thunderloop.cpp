@@ -19,7 +19,8 @@ extern int clock_nanosleep(clockid_t __clock_id, int __flags,
                            __const struct timespec* __req, struct timespec* __rem);
 
 Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, const int loop_hz)
-    : primitive_executor_(loop_hz, robot_constants)
+    // TODO (#2495): Set the friendly team colour once we receive World proto
+    : primitive_executor_(loop_hz, robot_constants, TeamColour::YELLOW)
 {
     robot_id_        = MAX_ROBOT_IDS + 1;  // Initialize to a robot ID that is not valid
     channel_id_      = 0;

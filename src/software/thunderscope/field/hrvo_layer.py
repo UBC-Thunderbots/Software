@@ -20,6 +20,7 @@ class HRVOLayer(FieldLayer):
         FieldLayer.__init__(self)
         self.robot_id = robot_id
         self.hrvo_buffer = ThreadSafeBuffer(buffer_size, HRVOVisualization)
+        self.prev_message = HRVOVisualization(robot_id=self.robot_id)
 
     def paint(self, painter, option, widget):
         """Paint this layer
@@ -31,10 +32,14 @@ class HRVOLayer(FieldLayer):
         """
 
         # Draw the HRVO velocity obstacles and agents
-        velocity_obstacle_msg = self.hrvo_buffer.get(block=False)
 
-        if velocity_obstacle_msg.robot_id != self.robot_id:
-            return
+        velocity_obstacle_msg = self.prev_message
+        while not self.hrvo_buffer.queue.empty():
+            msg = self.hrvo_buffer.get(block=False)
+            if msg.robot_id == self.robot_id:
+                velocity_obstacle_msg = msg
+
+        self.prev_message = velocity_obstacle_msg
 
         painter.setPen(pg.mkPen(Colors.NAVIGATOR_OBSTACLE_COLOR))
 
