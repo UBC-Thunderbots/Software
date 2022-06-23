@@ -11,7 +11,7 @@ RobotConstants_t create2021RobotConstants(void)
         // TODO (#2112): update this
         .jerk_limit_kg_m_per_s_3 = 40.0f,
         .front_wheel_angle_deg   = 57.95f,
-        .back_wheel_angle_deg    = 136.04f,
+        .back_wheel_angle_deg    = 45.0f,
         // TODO (#2112): update this
         .front_of_robot_width_meters = 0.11f,
         // TODO (#2112): update this

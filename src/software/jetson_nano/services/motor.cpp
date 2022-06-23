@@ -27,7 +27,7 @@ extern "C"
 }
 
 // SPI Configs
-static const uint32_t SPI_SPEED_HZ    = 2000000;  // 2 Mhz
+static const uint32_t SPI_SPEED_HZ    = 1000000;  // 2 Mhz
 static const uint8_t SPI_BITS         = 8;
 static const uint32_t SPI_MODE        = 0x3u;
 static const uint32_t NUM_RETRIES_SPI = 3;
@@ -35,8 +35,8 @@ static const uint32_t NUM_RETRIES_SPI = 3;
 // SPI Chip Selects
 static const uint8_t FRONT_LEFT_MOTOR_CHIP_SELECT  = 0;
 static const uint8_t FRONT_RIGHT_MOTOR_CHIP_SELECT = 3;
-static const uint8_t BACK_LEFT_MOTOR_CHIP_SELECT   = 2;
-static const uint8_t BACK_RIGHT_MOTOR_CHIP_SELECT  = 1;
+static const uint8_t BACK_LEFT_MOTOR_CHIP_SELECT   = 1;
+static const uint8_t BACK_RIGHT_MOTOR_CHIP_SELECT  = 2;
 static const uint8_t NUM_DRIVE_MOTORS              = 4;
 
 static const uint8_t DRIBBLER_MOTOR_CHIP_SELECT = 4;
@@ -148,6 +148,50 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
                                         robot_constants.robot_max_speed_m_per_s);
         tmc_ramp_linear_set_precision(&velocity_ramps[motor], 1000);
     }
+    EuclideanSpace_t target_euclidean_velocity = {
+        0.00,
+        0.0,
+        0.05,
+    };
+
+    static double ELECTRICAL_RPM_TO_MECHANICAL_MPS = 0.000111;
+
+
+    for (int k = 0; k < 200; k++)
+    {
+
+        //double front_right_mps = ELECTRICAL_RPM_TO_MECHANICAL_MPS * tmc4671_getActualVelocity(FRONT_RIGHT_MOTOR_CHIP_SELECT);
+        //double front_left_mps  = ELECTRICAL_RPM_TO_MECHANICAL_MPS * tmc4671_getActualVelocity(FRONT_LEFT_MOTOR_CHIP_SELECT);
+        //double back_left_mps   = ELECTRICAL_RPM_TO_MECHANICAL_MPS * tmc4671_getActualVelocity(BACK_LEFT_MOTOR_CHIP_SELECT);
+        //double back_right_mps  = ELECTRICAL_RPM_TO_MECHANICAL_MPS * tmc4671_getActualVelocity(BACK_RIGHT_MOTOR_CHIP_SELECT);
+
+        WheelSpace_t current_wheel_speeds = {0,0,0,0};
+
+        WheelSpace_t target_speeds = euclidean_to_four_wheel.getTargetWheelSpeeds(
+                target_euclidean_velocity, current_wheel_speeds);
+
+        //LOG(DEBUG) << static_cast<int>(target_speeds[0] / ELECTRICAL_RPM_TO_MECHANICAL_MPS);
+        //LOG(DEBUG) << static_cast<int>(target_speeds[1] / ELECTRICAL_RPM_TO_MECHANICAL_MPS);
+        //LOG(DEBUG) << static_cast<int>(target_speeds[2] / ELECTRICAL_RPM_TO_MECHANICAL_MPS);
+        //LOG(DEBUG) << static_cast<int>(target_speeds[3] / ELECTRICAL_RPM_TO_MECHANICAL_MPS);
+
+        tmc4671_setTargetVelocity(FRONT_RIGHT_MOTOR_CHIP_SELECT,
+                static_cast<int>(target_speeds[0] / ELECTRICAL_RPM_TO_MECHANICAL_MPS));
+        tmc4671_setTargetVelocity(FRONT_LEFT_MOTOR_CHIP_SELECT,
+                static_cast<int>(target_speeds[1] / ELECTRICAL_RPM_TO_MECHANICAL_MPS));
+        tmc4671_setTargetVelocity(BACK_LEFT_MOTOR_CHIP_SELECT,
+                static_cast<int>(target_speeds[2] / ELECTRICAL_RPM_TO_MECHANICAL_MPS));
+        tmc4671_setTargetVelocity(BACK_RIGHT_MOTOR_CHIP_SELECT,
+                static_cast<int>(target_speeds[3] / ELECTRICAL_RPM_TO_MECHANICAL_MPS));
+
+        usleep(10000);
+    }
+
+
+    tmc4671_setTargetVelocity(FRONT_LEFT_MOTOR_CHIP_SELECT,0);
+    tmc4671_setTargetVelocity(FRONT_RIGHT_MOTOR_CHIP_SELECT,0);
+    tmc4671_setTargetVelocity(BACK_LEFT_MOTOR_CHIP_SELECT, 0);
+    tmc4671_setTargetVelocity(BACK_RIGHT_MOTOR_CHIP_SELECT,0);
 }
 
 MotorService::~MotorService() {}
@@ -572,7 +616,7 @@ void MotorService::configureDrivePI(uint8_t motor)
     writeToControllerOrDieTrying(motor, TMC4671_PIDOUT_UQ_UD_LIMITS, 32767);
     writeToControllerOrDieTrying(motor, TMC4671_PID_TORQUE_FLUX_LIMITS, 5000);
     writeToControllerOrDieTrying(motor, TMC4671_PID_ACCELERATION_LIMIT, 1000);
-    writeToControllerOrDieTrying(motor, TMC4671_PID_VELOCITY_LIMIT, 10000);
+    writeToControllerOrDieTrying(motor, TMC4671_PID_VELOCITY_LIMIT, 45000);
 }
 
 void MotorService::configureDribblerPI(uint8_t motor)
