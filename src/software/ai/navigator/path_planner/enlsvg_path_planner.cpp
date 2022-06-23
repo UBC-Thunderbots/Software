@@ -101,6 +101,8 @@ std::optional<Path> EnlsvgPathPlanner::findPath(const Point &start,
         return std::nullopt;
     }
 
+    std::vector<Point> path_points = path.value();
+
     // If start was initially blocked, add the start point
     if (new_start.value() != enlsvg_start)
     {
@@ -204,12 +206,12 @@ bool EnlsvgPathPlanner::isBlocked(const EnlsvgPoint &ep) const
     return !isCoordNavigable(ep) || enlsvg_grid->isBlocked(ep.x, ep.y);
 }
 
-double EnlsvgPathPlanner::pathLength(const std::vector<Point> &path.value(),
+double EnlsvgPathPlanner::pathLength(const std::vector<Point> &path_points,
                                      const Point &robot_position)
 {
     double length = 0.0;
     Point prev_pt = robot_position;
-    for (const auto &pt : path.value())
+    for (const auto &pt : path_points)
     {
         length += (pt - prev_pt).length();
         prev_pt = pt;
