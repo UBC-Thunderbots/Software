@@ -23,6 +23,7 @@ extern "C"
 #include "external/trinamic/tmc/ic/TMC4671/TMC4671.h"
 #include "external/trinamic/tmc/ic/TMC4671/TMC4671_Variants.h"
 #include "external/trinamic/tmc/ic/TMC6100/TMC6100.h"
+#include "external/trinamic/tmc/ramp/Ramp.h"
 }
 
 // SPI Configs
@@ -138,6 +139,15 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
     startDriver(DRIBBLER_MOTOR_CHIP_SELECT);
     checkDriverFault(DRIBBLER_MOTOR_CHIP_SELECT);
     startController(DRIBBLER_MOTOR_CHIP_SELECT, true);
+
+    // Init Velocity Ramps
+    for (uint8_t motor = 0; motor < NUM_DRIVE_MOTORS; motor++)
+    {
+        tmc_ramp_init(&velocity_ramps[motor], TMC_RAMP_TYPE_LINEAR);
+        tmc_ramp_linear_set_maxVelocity(&velocity_ramps[motor],
+                                        robot_constants.robot_max_speed_m_per_s);
+        tmc_ramp_linear_set_precision(&velocity_ramps[motor], 1000);
+    }
 }
 
 MotorService::~MotorService() {}
