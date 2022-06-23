@@ -35,6 +35,12 @@ message JetsonStatus
     double cpu_temperature = 3;
 }
 
+message JetsonStatus
+{
+    // Jetson CPU temperature
+    double cpu_temperature = 3;
+}
+
 /* Data about the status of the break beam */
 message BreakBeamStatus
 {
