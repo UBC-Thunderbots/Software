@@ -49,7 +49,7 @@ HRVOAgent::HRVOAgent(HRVOSimulator *simulator, const Vector &position,
       maxNeighbors_(maxNeighbors),
       max_neighbor_dist(max_neighbor_dist),
       prefSpeed_(max_speed_ * PREF_SPEED_SCALE),
-      // TODO: Update this obstacle config
+      // TODO (#2676): This config should be dependency injected and updated when a parameter is changed
       obstacle_factory(TbotsProto::RobotNavigationObstacleConfig()),
       ball_obstacle(std::nullopt)
 {
