@@ -3,6 +3,7 @@ import socket
 import logging
 import psutil
 import time
+import threading
 import google.protobuf.internal.encoder as encoder
 import google.protobuf.internal.decoder as decoder
 
@@ -46,6 +47,7 @@ class FullSystem(object):
         full_system_runtime_dir=None,
         debug_full_system=False,
         friendly_colour_yellow=False,
+        should_restart_on_crash=True,
     ):
         """Run FullSystem
 
@@ -57,6 +59,9 @@ class FullSystem(object):
         self.debug_full_system = debug_full_system
         self.friendly_colour_yellow = friendly_colour_yellow
         self.full_system_proc = None
+        self.should_restart_on_crash = should_restart_on_crash
+
+        self.thread = threading.Thread(target=self.__restart__)
 
     def __enter__(self):
         """Enter the full_system context manager. 
@@ -74,7 +79,7 @@ class FullSystem(object):
         except:
             pass
 
-        full_system = "software/unix_full_system --runtime_dir={} {}".format(
+        self.full_system = "software/unix_full_system --runtime_dir={} {}".format(
             self.full_system_runtime_dir,
             "--friendly_colour_yellow" if self.friendly_colour_yellow else "",
         )
@@ -112,9 +117,25 @@ gdb --args bazel-bin/{full_system}
                     time.sleep(1)
 
         else:
-            self.full_system_proc = Popen(full_system.split(" "))
+            self.full_system_proc = Popen(self.full_system.split(" "))
+            if self.should_restart_on_crash:
+                self.thread.start()
 
         return self
+
+    def __restart__(self):
+        "Restarts full system."
+
+        while True:
+            if not is_cmd_running(
+                [
+                    "unix_full_system",
+                    "--runtime_dir={}".format(self.full_system_runtime_dir),
+                ]
+            ):
+                self.full_system_proc = Popen(self.full_system.split(" "))
+                logging.info("FullSystem has restarted.")
+        time.sleep(1)
 
     def __exit__(self, type, value, traceback):
         """Exit the full_system context manager.
@@ -127,6 +148,9 @@ gdb --args bazel-bin/{full_system}
         if self.full_system_proc:
             self.full_system_proc.kill()
             self.full_system_proc.wait()
+
+        if self.should_restart_on_crash:
+            self.thread.join()
 
     def setup_proto_unix_io(self, proto_unix_io):
         """Helper to run full system and attach the appropriate unix senders/listeners
