@@ -1,7 +1,6 @@
 #pragma once
 
 #include "proto/vision.pb.h"
-#include "shared/2015_robot_constants.h"
 #include "shared/2021_robot_constants.h"
 #include "shared/constants.h"
 #include "shared/robot_constants.h"

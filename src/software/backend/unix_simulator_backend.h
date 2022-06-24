@@ -1,6 +1,5 @@
 #pragma once
 
-#include "proto/defending_side_msg.pb.h"
 #include "proto/parameters.pb.h"
 #include "proto/robot_log_msg.pb.h"
 #include "proto/robot_status_msg.pb.h"
@@ -39,7 +38,6 @@ class UnixSimulatorBackend : public Backend, public Subject<TbotsProto::Thunderb
     // Outputs
     std::unique_ptr<ThreadedProtoUnixSender<TbotsProto::World>> world_output;
     std::unique_ptr<ThreadedProtoUnixSender<TbotsProto::PrimitiveSet>> primitive_output;
-    std::unique_ptr<ThreadedProtoUnixSender<DefendingSideProto>> defending_side_output;
     std::unique_ptr<ThreadedProtoUnixSender<TbotsProto::ThunderbotsConfig>>
         dynamic_parameter_update_respone_sender;
 };

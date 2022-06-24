@@ -20,9 +20,7 @@ cc_library(
     hdrs = ["unix_simulator_backend.h"],
     deps = [
         ":backend",
-        "//proto:defending_side_msg_cc_proto",
         "//proto:tbots_cc_proto",
-        "//proto/message_translation:defending_side",
         "//proto/message_translation:ssl_wrapper",
         "//proto/message_translation:tbots_protobuf",
         "//shared:constants",

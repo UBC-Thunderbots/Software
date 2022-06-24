@@ -33,7 +33,6 @@ cc_library(
         "//software/simulation:er_force_simulator",
         "//software/test_util",
         "//software/time:duration",
-        "//proto/logging:proto_logger",
         "//shared/test_util:tbots_gtest_main",
         "//shared/test_util",
         # TODO (#1889) Remove this dep after optional params are implemented

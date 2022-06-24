@@ -280,7 +280,9 @@ TEST_F(
             Duration::fromSeconds(12));
 }
 
-TEST_F(DribbleTacticTest, test_running_into_enemy_robot_knocking_ball_away)
+
+// TODO (#2673) we need to be able to get closer to the enemy robot to grab the ball
+TEST_F(DribbleTacticTest, DISABLED_test_running_into_enemy_robot_knocking_ball_away)
 {
     Point initial_position    = Point(-2, 1.5);
     Point dribble_destination = Point(-1, 2);

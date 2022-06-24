@@ -2,14 +2,14 @@
 
 #include <gtest/gtest.h>
 
-#include "shared/2015_robot_constants.h"
+#include "shared/2021_robot_constants.h"
 #include "shared/constants.h"
 #include "software/test_util/test_util.h"
 
 class PrimitiveFactoryTest : public testing::Test
 {
    protected:
-    RobotConstants_t robot_constants = create2015RobotConstants();
+    RobotConstants_t robot_constants = create2021RobotConstants();
 };
 
 TEST_F(PrimitiveFactoryTest, test_auto_chip_or_kick_equality)
@@ -105,21 +105,26 @@ TEST_F(PrimitiveFactoryTest, test_create_direct_velocity)
 
     ASSERT_TRUE(direct_velocity_primitive->has_direct_control());
     EXPECT_EQ(direct_velocity_primitive->direct_control()
+                  .motor_control()
                   .direct_velocity_control()
                   .velocity()
                   .x_component_meters(),
               2);
     EXPECT_EQ(direct_velocity_primitive->direct_control()
+                  .motor_control()
                   .direct_velocity_control()
                   .velocity()
                   .y_component_meters(),
               -4);
     EXPECT_EQ(direct_velocity_primitive->direct_control()
+                  .motor_control()
                   .direct_velocity_control()
                   .angular_velocity()
                   .radians_per_second(),
               0.5);
-    EXPECT_EQ(direct_velocity_primitive->direct_control().dribbler_speed_rpm(), 200);
+    EXPECT_EQ(
+        direct_velocity_primitive->direct_control().motor_control().dribbler_speed_rpm(),
+        200);
 }
 
 

@@ -157,15 +157,7 @@ void SensorFusion::updateWorld(
 
         for (const auto &error_code_msg : robot_status_msg.error_code())
         {
-            if (error_code_msg == TbotsProto::ErrorCode::WHEEL_0_MOTOR_HOT ||
-                error_code_msg == TbotsProto::ErrorCode::WHEEL_1_MOTOR_HOT ||
-                error_code_msg == TbotsProto::ErrorCode::WHEEL_2_MOTOR_HOT ||
-                error_code_msg == TbotsProto::ErrorCode::WHEEL_3_MOTOR_HOT)
-            {
-                unavailableCapabilities.insert(RobotCapability::Move);
-            }
-            else if (error_code_msg == TbotsProto::ErrorCode::LOW_CAP ||
-                     error_code_msg == TbotsProto::ErrorCode::CHARGE_TIMEOUT)
+            if (error_code_msg == TbotsProto::ErrorCode::LOW_CAP)
             {
                 unavailableCapabilities.insert(RobotCapability::Kick);
                 unavailableCapabilities.insert(RobotCapability::Chip);
