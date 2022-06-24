@@ -35,6 +35,7 @@ class MotorService
      * @returns MotorStatus The status of all the drive units
      */
     TbotsProto::MotorStatus poll(const TbotsProto::MotorControl& motor_control);
+    void setXYTheta(double x, double y, double rad_per_s);
 
     /**
      * Trinamic API binding, sets spi_demux_select_0|1 pins

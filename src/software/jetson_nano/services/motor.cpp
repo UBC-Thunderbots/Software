@@ -27,7 +27,7 @@ extern "C"
 }
 
 // SPI Configs
-static const uint32_t SPI_SPEED_HZ    = 1000000;  // 2 Mhz
+static const uint32_t SPI_SPEED_HZ    = 2000000;  // 2 Mhz
 static const uint8_t SPI_BITS         = 8;
 static const uint32_t SPI_MODE        = 0x3u;
 static const uint32_t NUM_RETRIES_SPI = 3;
@@ -50,6 +50,10 @@ static const char* SPI_CS_DRIVER_TO_CONTROLLER_MUX_1_GPIO = "76";
 static const char* MOTOR_DRIVER_RESET_GPIO                = "168";
 static const char* DRIVER_CONTROL_ENABLE_GPIO             = "194";
 static const char* HEARTBEAT_GPIO                         = "216";
+
+
+// TODO ADD A COMMENT ON HOW WE COMPUTED THIS VALUE
+static double MECHANICAL_MPS_PER_ELECTRICAL_RPM = 0.000111;
 
 extern "C"
 {
@@ -141,52 +145,38 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
     startController(DRIBBLER_MOTOR_CHIP_SELECT, true);
 
     // Init Velocity Ramps
-    for (uint8_t motor = 0; motor < NUM_DRIVE_MOTORS; motor++)
-    {
-        tmc_ramp_init(&velocity_ramps[motor], TMC_RAMP_TYPE_LINEAR);
-        tmc_ramp_linear_set_maxVelocity(&velocity_ramps[motor],
-                                        robot_constants.robot_max_speed_m_per_s);
-        tmc_ramp_linear_set_precision(&velocity_ramps[motor], 1000);
-    }
-    EuclideanSpace_t target_euclidean_velocity = {
-        0.00,
-        0.0,
-        0.05,
-    };
+    //
+    // Since trinamic ramps use ints, MPS doesn't give us enough precision to
+    // calculate the ramp. Instead we convert to rotations per millisecond.
+    //
+    // TODO: This is somewhat cursed
+    //for (uint8_t motor = 0; motor < NUM_DRIVE_MOTORS; motor++)
+    //{
+        //tmc_ramp_init(&velocity_ramps[motor], TMC_RAMP_TYPE_LINEAR);
 
-    static double ELECTRICAL_RPM_TO_MECHANICAL_MPS = 0.000111;
+        //tmc_ramp_linear_set_maxVelocity(&velocity_ramps[motor],
+                //static_cast<uint32_t>(robot_constants.robot_max_speed_m_per_s * 1000));
+        //tmc_ramp_linear_set_acceleration(
+                //&velocity_ramps[motor],
+                //static_cast<uint32_t>(robot_constants.robot_max_acceleration_m_per_s_2 * 1000));
 
+        //tmc_ramp_set_enabled(&velocity_ramps[motor], TMC_RAMP_TYPE_LINEAR, true);
+        ////tmc_ramp_linear_set_precision(&velocity_ramps[motor], 10);
+    //}
 
-    for (int k = 0; k < 200; k++)
-    {
+    //for (int k = 0; k < 5000; k++)
+    //{
+        //tmc_ramp_linear_set_targetVelocity(&velocity_ramps[0], 5000);
+        //tmc_ramp_compute(&velocity_ramps[0], TMC_RAMP_TYPE_LINEAR, 1);
+        //auto bob = tmc_ramp_get_rampVelocity(&velocity_ramps[0], TMC_RAMP_TYPE_LINEAR);
+        //LOG(DEBUG) << "bob: " << bob << " k: " << k;
+    //}
+    //sleep(50);
 
-        //double front_right_mps = ELECTRICAL_RPM_TO_MECHANICAL_MPS * tmc4671_getActualVelocity(FRONT_RIGHT_MOTOR_CHIP_SELECT);
-        //double front_left_mps  = ELECTRICAL_RPM_TO_MECHANICAL_MPS * tmc4671_getActualVelocity(FRONT_LEFT_MOTOR_CHIP_SELECT);
-        //double back_left_mps   = ELECTRICAL_RPM_TO_MECHANICAL_MPS * tmc4671_getActualVelocity(BACK_LEFT_MOTOR_CHIP_SELECT);
-        //double back_right_mps  = ELECTRICAL_RPM_TO_MECHANICAL_MPS * tmc4671_getActualVelocity(BACK_RIGHT_MOTOR_CHIP_SELECT);
-
-        WheelSpace_t current_wheel_speeds = {0,0,0,0};
-
-        WheelSpace_t target_speeds = euclidean_to_four_wheel.getTargetWheelSpeeds(
-                target_euclidean_velocity, current_wheel_speeds);
-
-        //LOG(DEBUG) << static_cast<int>(target_speeds[0] / ELECTRICAL_RPM_TO_MECHANICAL_MPS);
-        //LOG(DEBUG) << static_cast<int>(target_speeds[1] / ELECTRICAL_RPM_TO_MECHANICAL_MPS);
-        //LOG(DEBUG) << static_cast<int>(target_speeds[2] / ELECTRICAL_RPM_TO_MECHANICAL_MPS);
-        //LOG(DEBUG) << static_cast<int>(target_speeds[3] / ELECTRICAL_RPM_TO_MECHANICAL_MPS);
-
-        tmc4671_setTargetVelocity(FRONT_RIGHT_MOTOR_CHIP_SELECT,
-                static_cast<int>(target_speeds[0] / ELECTRICAL_RPM_TO_MECHANICAL_MPS));
-        tmc4671_setTargetVelocity(FRONT_LEFT_MOTOR_CHIP_SELECT,
-                static_cast<int>(target_speeds[1] / ELECTRICAL_RPM_TO_MECHANICAL_MPS));
-        tmc4671_setTargetVelocity(BACK_LEFT_MOTOR_CHIP_SELECT,
-                static_cast<int>(target_speeds[2] / ELECTRICAL_RPM_TO_MECHANICAL_MPS));
-        tmc4671_setTargetVelocity(BACK_RIGHT_MOTOR_CHIP_SELECT,
-                static_cast<int>(target_speeds[3] / ELECTRICAL_RPM_TO_MECHANICAL_MPS));
-
-        usleep(10000);
-    }
-
+    setXYTheta(0.0, 0.0, 6.28);
+    sleep(1);
+    setXYTheta(0.0, 0.0, 0.0);
+    sleep(1);
 
     tmc4671_setTargetVelocity(FRONT_LEFT_MOTOR_CHIP_SELECT,0);
     tmc4671_setTargetVelocity(FRONT_RIGHT_MOTOR_CHIP_SELECT,0);
@@ -195,6 +185,31 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
 }
 
 MotorService::~MotorService() {}
+
+
+void MotorService::setXYTheta(double x, double y, double rad_per_s){
+
+    EuclideanSpace_t target_euclidean_velocity = {
+        x, 
+        y, 
+        rad_per_s,
+    };
+
+    WheelSpace_t current_wheel_speeds = {0,0,0,0};
+    WheelSpace_t target_speeds = euclidean_to_four_wheel.getTargetWheelSpeeds(
+            target_euclidean_velocity, current_wheel_speeds);
+
+    tmc4671_setTargetVelocity(FRONT_RIGHT_MOTOR_CHIP_SELECT,
+            static_cast<int>(target_speeds[0] / MECHANICAL_MPS_PER_ELECTRICAL_RPM));
+    tmc4671_setTargetVelocity(FRONT_LEFT_MOTOR_CHIP_SELECT,
+            static_cast<int>(target_speeds[1] / MECHANICAL_MPS_PER_ELECTRICAL_RPM));
+    tmc4671_setTargetVelocity(BACK_LEFT_MOTOR_CHIP_SELECT,
+            static_cast<int>(target_speeds[2] / MECHANICAL_MPS_PER_ELECTRICAL_RPM));
+    tmc4671_setTargetVelocity(BACK_RIGHT_MOTOR_CHIP_SELECT,
+            static_cast<int>(target_speeds[3] / MECHANICAL_MPS_PER_ELECTRICAL_RPM));
+
+}
+
 
 
 bool MotorService::checkDriverFault(uint8_t motor)
