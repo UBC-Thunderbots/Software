@@ -3,6 +3,7 @@ import socket
 import logging
 import psutil
 import time
+import threading
 import google.protobuf.internal.encoder as encoder
 import google.protobuf.internal.decoder as decoder
 
@@ -46,6 +47,7 @@ class FullSystem(object):
         full_system_runtime_dir=None,
         debug_full_system=False,
         friendly_colour_yellow=False,
+        should_restart_on_crash=True,
     ):
         """Run FullSystem
 
@@ -57,6 +59,9 @@ class FullSystem(object):
         self.debug_full_system = debug_full_system
         self.friendly_colour_yellow = friendly_colour_yellow
         self.full_system_proc = None
+        self.should_restart_on_crash = should_restart_on_crash
+
+        self.thread = threading.Thread(target=self.__restart__)
 
     def __enter__(self):
         """Enter the full_system context manager. 
@@ -74,7 +79,7 @@ class FullSystem(object):
         except:
             pass
 
-        full_system = "software/unix_full_system --runtime_dir={} {}".format(
+        self.full_system = "software/unix_full_system --runtime_dir={} {}".format(
             self.full_system_runtime_dir,
             "--friendly_colour_yellow" if self.friendly_colour_yellow else "",
         )
@@ -112,9 +117,25 @@ gdb --args bazel-bin/{full_system}
                     time.sleep(1)
 
         else:
-            self.full_system_proc = Popen(full_system.split(" "))
+            self.full_system_proc = Popen(self.full_system.split(" "))
+            if self.should_restart_on_crash:
+                self.thread.start()
 
         return self
+
+    def __restart__(self):
+        "Restarts full system."
+
+        while True:
+            if not is_cmd_running(
+                [
+                    "unix_full_system",
+                    "--runtime_dir={}".format(self.full_system_runtime_dir),
+                ]
+            ):
+                self.full_system_proc = Popen(self.full_system.split(" "))
+                logging.info("FullSystem has restarted.")
+        time.sleep(1)
 
     def __exit__(self, type, value, traceback):
         """Exit the full_system context manager.
@@ -127,6 +148,9 @@ gdb --args bazel-bin/{full_system}
         if self.full_system_proc:
             self.full_system_proc.kill()
             self.full_system_proc.wait()
+
+        if self.should_restart_on_crash:
+            self.thread.join()
 
     def setup_proto_unix_io(self, proto_unix_io):
         """Helper to run full system and attach the appropriate unix senders/listeners
@@ -330,9 +354,7 @@ class Gamecontroller(object):
     """ Gamecontroller Context Manager """
 
     CI_MODE_LAUNCH_DELAY_S = 0.3
-    CI_MODE_PORT = 10009
     REFEREE_IP = "224.5.23.1"
-    REFEREE_PORT = 10003
     CI_MODE_OUTPUT_RECEIVE_BUFFER_SIZE = 9000
 
     def __init__(self, supress_logs=False, ci_mode=False):
@@ -345,6 +367,11 @@ class Gamecontroller(object):
         self.supress_logs = supress_logs
         self.ci_mode = ci_mode
 
+        # We need to find 2 free ports to use for the gamecontroller
+        # so that we can run multiple gamecontroller instances in parallel
+        self.referee_port = self.next_free_port()
+        self.ci_port = self.next_free_port()
+
     def __enter__(self):
         """Enter the gamecontroller context manager. 
 
@@ -355,6 +382,9 @@ class Gamecontroller(object):
 
         if self.ci_mode:
             command = ["/opt/tbotspython/gamecontroller", "--timeAcquisitionMode", "ci"]
+
+        command += ["-publishAddress", f"{self.REFEREE_IP}:{self.referee_port}"]
+        command += ["-ciAddress", f"localhost:{self.ci_port}"]
 
         if self.supress_logs:
             with open(os.devnull, "w") as fp:
@@ -369,7 +399,7 @@ class Gamecontroller(object):
             time.sleep(Gamecontroller.CI_MODE_LAUNCH_DELAY_S)
 
             self.ci_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.ci_socket.connect(("", Gamecontroller.CI_MODE_PORT))
+            self.ci_socket.connect(("", self.ci_port))
 
         return self
 
@@ -386,6 +416,27 @@ class Gamecontroller(object):
 
         if self.ci_socket:
             self.ci_socket.close()
+
+    def next_free_port(self, port=40000, max_port=65535):
+        """Find the next free port. We need to find 2 free ports to use for the gamecontroller
+        so that we can run multiple gamecontroller instances in parallel.
+
+        :param port: The port to start looking from
+        :param max_port: The maximum port to look up to
+        :return: The next free port
+
+        """
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+        while port <= max_port:
+            try:
+                sock.bind(("", port))
+                sock.close()
+                return port
+            except OSError:
+                port += 1
+
+        raise IOError("no free ports")
 
     def setup_proto_unix_io(
         self, blue_full_system_proto_unix_io, yellow_full_system_proto_unix_io
@@ -408,10 +459,7 @@ class Gamecontroller(object):
             yellow_full_system_proto_unix_io.send_proto(Referee, data)
 
         self.receive_referee_command = SSLRefereeProtoListener(
-            Gamecontroller.REFEREE_IP,
-            Gamecontroller.REFEREE_PORT,
-            __send_referee_command,
-            True,
+            Gamecontroller.REFEREE_IP, self.referee_port, __send_referee_command, True,
         )
 
     def send_ci_input(

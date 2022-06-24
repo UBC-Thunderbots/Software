@@ -26,10 +26,13 @@ void ProtobufSink::sendProtobuf(g3::LogMessageMover log_entry)
 
         size_t proto_type_name_pos = msg.find(TYPE_DELIMITER, file_name_pos + 1);
         std::string proto_type_name =
-            msg.substr(file_name_pos + TYPE_DELIMITER.length(), proto_type_name_pos - 3);
+            msg.substr(file_name_pos + TYPE_DELIMITER.length(),
+                       proto_type_name_pos - TYPE_DELIMITER.length());
         std::string serialized_proto =
             msg.substr(proto_type_name_pos + TYPE_DELIMITER.length());
 
+        // Use the protobuf type as the file name, if no file name was specified in the
+        // message
         if (file_name.length() == 0)
         {
             file_name = "/" + proto_type_name;

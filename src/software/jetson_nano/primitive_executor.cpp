@@ -86,7 +86,7 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
             auto output = std::make_unique<TbotsProto::DirectControlPrimitive>();
 
             // Discharge the capacitors
-            output->mutable_power()->set_charge_mode(
+            output->mutable_power_control()->set_charge_mode(
                 TbotsProto::PowerControl_ChargeMode_DISCHARGE);
 
             return output;

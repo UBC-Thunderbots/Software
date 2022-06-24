@@ -12,10 +12,6 @@ PowerService::PowerService()
     this->uart = std::make_unique<BoostUartCommunication>(BAUD_RATE, DEVICE_SERIAL_PORT);
 }
 
-void PowerService::start() {}
-
-void PowerService::stop() {}
-
 std::unique_ptr<TbotsProto::PowerStatus> PowerService::poll(
     const TbotsProto::PowerControl& command)
 {

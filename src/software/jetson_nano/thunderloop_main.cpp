@@ -10,7 +10,7 @@
 #include "shared/2021_robot_constants.h"
 #include "shared/constants.h"
 #include "software/jetson_nano/thunderloop.h"
-#include "software/logger/logger.h"
+#include "software/logger/network_logger.h"
 #include "software/world/robot_state.h"
 
 
@@ -92,12 +92,7 @@ int main(int argc, char** argv)
     const int pre_allocation_size = 20 * 1024 * 1024;
     reserveProcessMemory(pre_allocation_size);
 
-    // TODO (#2338) replace with network logger
-    LoggerSingleton::initializeLogger("/tmp");
-
-    auto thunderloop = Thunderloop(create2021RobotConstants(), create2021WheelConstants(),
-                                   CONTROL_LOOP_HZ);
-
+    auto thunderloop = Thunderloop(create2021RobotConstants(), CONTROL_LOOP_HZ);
     thunderloop.runLoop();
 
     return 0;
