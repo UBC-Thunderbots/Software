@@ -66,6 +66,16 @@
             recursive: yes
             copy_links: yes
 
+        - name: Sync extlinux Conf
+          become: true
+          become_method: sudo
+          tags:
+            - sync
+            - device_tree
+          ansible.posix.synchronize:
+            src: ../../../linux_configs/extlinux.conf
+            dest: ~/
+
         - name: Unzip device tree
           tags:
             - sync
@@ -92,6 +102,17 @@
             - sync
             - device_tree
           shell: 'mv /home/robot/trinamic.dtb /boot/kernel_tegra210-p3448-0000-p3449-0000-b00-user-custom.dtb'
+          register: result
+          args:
+            chdir: ~/
+
+        - name: Move extlinux file
+          become_method: sudo
+          become: true
+          tags:
+            - sync
+            - device_tree
+          shell: 'mv /home/root/extlinux.conf /boot/extlinux/extlinux.conf'
           register: result
           args:
             chdir: ~/
