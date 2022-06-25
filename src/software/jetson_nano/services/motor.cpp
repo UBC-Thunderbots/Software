@@ -150,19 +150,19 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
     // calculate the ramp. Instead we convert to rotations per millisecond.
     //
     // TODO: This is somewhat cursed
-    //for (uint8_t motor = 0; motor < NUM_DRIVE_MOTORS; motor++)
-    //{
-        //tmc_ramp_init(&velocity_ramps[motor], TMC_RAMP_TYPE_LINEAR);
+    for (uint8_t motor = 0; motor < NUM_DRIVE_MOTORS; motor++)
+    {
+        tmc_ramp_init(&velocity_ramps[motor], TMC_RAMP_TYPE_LINEAR);
 
-        //tmc_ramp_linear_set_maxVelocity(&velocity_ramps[motor],
-                //static_cast<uint32_t>(robot_constants.robot_max_speed_m_per_s * 1000));
-        //tmc_ramp_linear_set_acceleration(
-                //&velocity_ramps[motor],
-                //static_cast<uint32_t>(robot_constants.robot_max_acceleration_m_per_s_2 * 1000));
+        tmc_ramp_linear_set_maxVelocity(&velocity_ramps[motor],
+                static_cast<uint32_t>(robot_constants.robot_max_speed_m_per_s * 1000));
+        tmc_ramp_linear_set_acceleration(
+                &velocity_ramps[motor],
+                static_cast<uint32_t>(robot_constants.robot_max_acceleration_m_per_s_2 * 1000));
 
-        //tmc_ramp_set_enabled(&velocity_ramps[motor], TMC_RAMP_TYPE_LINEAR, true);
-        ////tmc_ramp_linear_set_precision(&velocity_ramps[motor], 10);
-    //}
+        tmc_ramp_set_enabled(&velocity_ramps[motor], TMC_RAMP_TYPE_LINEAR, true);
+        //tmc_ramp_linear_set_precision(&velocity_ramps[motor], 10);
+    }
 
     //for (int k = 0; k < 5000; k++)
     //{
@@ -172,16 +172,6 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
         //LOG(DEBUG) << "bob: " << bob << " k: " << k;
     //}
     //sleep(50);
-
-    setXYTheta(0.0, 0.0, 6.28);
-    sleep(1);
-    setXYTheta(0.0, 0.0, 0.0);
-    sleep(1);
-
-    tmc4671_setTargetVelocity(FRONT_LEFT_MOTOR_CHIP_SELECT,0);
-    tmc4671_setTargetVelocity(FRONT_RIGHT_MOTOR_CHIP_SELECT,0);
-    tmc4671_setTargetVelocity(BACK_LEFT_MOTOR_CHIP_SELECT, 0);
-    tmc4671_setTargetVelocity(BACK_RIGHT_MOTOR_CHIP_SELECT,0);
 }
 
 MotorService::~MotorService() {}
