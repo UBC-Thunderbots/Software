@@ -144,59 +144,40 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
     checkDriverFault(DRIBBLER_MOTOR_CHIP_SELECT);
     startController(DRIBBLER_MOTOR_CHIP_SELECT, true);
 
-    for (uint8_t motor = 0; motor < NUM_DRIVE_MOTORS; motor++)
+
+    for (int k = 0; k < 1000; k++)
     {
-        tmc_ramp_init(&velocity_ramps[motor], TMC_RAMP_TYPE_LINEAR);
-
-        tmc_ramp_linear_set_maxVelocity(&velocity_ramps[motor],
-                static_cast<uint32_t>(robot_constants.robot_max_speed_m_per_s * 1000));
-        tmc_ramp_linear_set_acceleration(
-                &velocity_ramps[motor],
-                static_cast<uint32_t>(robot_constants.robot_max_acceleration_m_per_s_2 * 1000));
-
-        tmc_ramp_set_enabled(&velocity_ramps[motor], TMC_RAMP_TYPE_LINEAR, true);
-        //tmc_ramp_linear_set_precision(&velocity_ramps[motor], 10);
+        auto curr_vel = static_cast<double>(tmc4671_getActualVelocity(FRONT_RIGHT_MOTOR_CHIP_SELECT)) * MECHANICAL_MPS_PER_ELECTRICAL_RPM;
+        double target_velocity = rampVelocity(5.0, curr_vel, 0.005);
+        LOG(DEBUG) << target_velocity;
+        tmc4671_setTargetVelocity(
+                FRONT_RIGHT_MOTOR_CHIP_SELECT, static_cast<int>(static_cast<double>(target_velocity) / MECHANICAL_MPS_PER_ELECTRICAL_RPM));
+        usleep(5000);
     }
-
-    //for (int k = 0; k < 5000; k++)
-    //{
-        //tmc_ramp_linear_set_targetVelocity(&velocity_ramps[0], 5000);
-        //tmc_ramp_compute(&velocity_ramps[0], TMC_RAMP_TYPE_LINEAR, 1);
-        //auto bob = tmc_ramp_get_rampVelocity(&velocity_ramps[0], TMC_RAMP_TYPE_LINEAR);
-        //LOG(DEBUG) << "bob: " << bob << " k: " << k;
-    //}
-    //sleep(50);
-        tmc_ramp_linear_set_maxVelocity(
-            &velocity_ramps[motor],
-            static_cast<uint32_t>(robot_constants.robot_max_speed_m_per_s *
-                                  MILLIMETERS_PER_METER));
-
-        tmc_ramp_linear_set_acceleration(
-            &velocity_ramps[motor],
-            static_cast<uint32_t>(robot_constants.robot_max_acceleration_m_per_s_2 *
-                                  MILLIMETERS_PER_METER / MILLISECONDS_PER_SECOND));
-
-        tmc_ramp_set_enabled(&velocity_ramps[motor], TMC_RAMP_TYPE_LINEAR, true);
-    }
-
-    for (int k = 0; k < 5000; k++)
+    for (int k = 0; k < 1000; k++)
     {
-        tmc_ramp_linear_set_targetVelocity(&velocity_ramps[0], 5000);
-        tmc_ramp_compute(&velocity_ramps[0], TMC_RAMP_TYPE_LINEAR, 1);
-        auto bob = tmc_ramp_get_rampVelocity(&velocity_ramps[0], TMC_RAMP_TYPE_LINEAR);
-        LOG(DEBUG) << "bob: " << bob << " k: " << k;
+        auto curr_vel = static_cast<double>(tmc4671_getActualVelocity(FRONT_RIGHT_MOTOR_CHIP_SELECT)) * MECHANICAL_MPS_PER_ELECTRICAL_RPM;
+        double target_velocity = rampVelocity(-5.0, curr_vel, 0.005);
+        LOG(DEBUG) << target_velocity;
+        tmc4671_setTargetVelocity(
+                FRONT_RIGHT_MOTOR_CHIP_SELECT, static_cast<int>(static_cast<double>(target_velocity) / MECHANICAL_MPS_PER_ELECTRICAL_RPM));
+        usleep(5000);
     }
-    sleep(50);
-
-    setXYTheta(0.0, 0.0, 6.28);
-    sleep(1);
-    setXYTheta(0.0, 0.0, 0.0);
-    sleep(1);
+    for (int k = 0; k < 1000; k++)
+    {
+        auto curr_vel = static_cast<double>(tmc4671_getActualVelocity(FRONT_RIGHT_MOTOR_CHIP_SELECT)) * MECHANICAL_MPS_PER_ELECTRICAL_RPM;
+        double target_velocity = rampVelocity(0, curr_vel, 0.005);
+        LOG(DEBUG) << target_velocity;
+        tmc4671_setTargetVelocity(
+                FRONT_RIGHT_MOTOR_CHIP_SELECT, static_cast<int>(static_cast<double>(target_velocity) / MECHANICAL_MPS_PER_ELECTRICAL_RPM));
+        usleep(5000);
+    }
 
     tmc4671_setTargetVelocity(FRONT_LEFT_MOTOR_CHIP_SELECT, 0);
     tmc4671_setTargetVelocity(FRONT_RIGHT_MOTOR_CHIP_SELECT, 0);
     tmc4671_setTargetVelocity(BACK_LEFT_MOTOR_CHIP_SELECT, 0);
     tmc4671_setTargetVelocity(BACK_RIGHT_MOTOR_CHIP_SELECT, 0);
+    sleep(50);
 }
 
 MotorService::~MotorService() {}
@@ -455,6 +436,38 @@ void MotorService::spiTransfer(int fd, uint8_t const* tx, uint8_t const* rx, uns
     CHECK(ret >= 1) << "SPI Transfer to motor failed, not safe to proceed: errno "
                     << strerror(errno);
 }
+
+double MotorService::rampVelocity(double velocity_target, double velocity_current, double time_ramp)
+{
+    // Calculate velocity delta using kinematic equation: dv = a*t
+    double velocity_delta = robot_constants_.robot_max_acceleration_m_per_s_2 * time_ramp; 
+    double ramp_velocity = 0;
+
+    // Case: accelerating
+    if (velocity_target > velocity_current + velocity_delta)
+    {
+        ramp_velocity = velocity_current + velocity_delta;
+    }
+    // Case: deccelerating
+    else if (velocity_target < velocity_current - velocity_delta)
+    {
+        ramp_velocity = velocity_current - velocity_delta;
+    }
+    // Case: ramping not required, go to target velocity
+    else
+    {
+        ramp_velocity = velocity_target;
+    }
+
+    //if(std::abs(ramp_velocity) > robot_constants_.robot_max_speed_m_per_s)
+    //{
+        //ramp_velocity = std::copysign(robot_constants_.robot_max_speed_m_per_s, ramp_velocity);
+    //}
+
+    return ramp_velocity;
+}
+
+
 
 // Both the TMC4671 (the controller) and the TMC6100 (the driver) respect
 // the same SPI interface. So when we bind the API, we can use the same
