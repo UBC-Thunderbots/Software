@@ -11,10 +11,10 @@ EuclideanToWheel::EuclideanToWheel(const int &control_loop_frequency_Hz,
     delta_t_s_ = 1.0f / static_cast<float>(control_loop_frequency_Hz);
 
     // import robot constants
-    robot_mass_M_kg_           = robot_constants.mass_kg;
-    robot_radius_R_m_          = robot_constants.robot_radius_m;
-    inertial_factor_alpha_m_   = robot_constants.inertial_factor;
-    front_wheel_angle_phi_rad_ = robot_constants.front_wheel_angle_deg * M_PI / 180.;
+    robot_mass_M_kg_            = robot_constants.mass_kg;
+    robot_radius_R_m_           = robot_constants.robot_radius_m;
+    inertial_factor_alpha_m_    = robot_constants.inertial_factor;
+    front_wheel_angle_phi_rad_  = robot_constants.front_wheel_angle_deg * M_PI / 180.;
     rear_wheel_angle_theta_rad_ = robot_constants.back_wheel_angle_deg * M_PI / 180.;
 
     // calculate DC_alpha matrix

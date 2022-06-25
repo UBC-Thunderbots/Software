@@ -11,6 +11,7 @@ from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 class EstopView(QLabel):
     """Class to show whether the estop is playing or stopped
     """
+
     def __init__(self):
         super().__init__()
 
