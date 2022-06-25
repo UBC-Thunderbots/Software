@@ -76,46 +76,49 @@ Polygon Polygon::expand(double expansion_amount) const
     return Polygon(expanded_points);
 }
 
-Polygon Polygon::fromPoints(const Point& first_point, const Point& second_point)
+Polygon Polygon::fromSegment(const Segment& segment, const double radius)
 {
     /*   The Polygon is constructed as follows:
      *
-     *         ball_l           ball_r
-     *           +-------+-------+
-     *           |               |
-     *           |    ball_c     |
-     *           +-------+-------+
-     *           |               |
-     *           |               |
-     *           |               |
-     *           |     place_c   |
-     *           +-------+-------+
-     *           |               |
-     *           |               |
-     *           +-------+-------+
-     *        place_l          place_r
+     *        start_l                start_r
+     *           +----------+----------+
+     *           |          |          |
+     *           |          | radius   |
+     *           |          |          |
+     *           +   start  X          +
+     *           |          |          |
+     *           |          |          |
+     *           |          |          |
+     *           |       segment       |
+     *           |          |          |
+     *           |          |          |
+     *           |          |   radius |
+     *           +   end    X----------+
+     *           |                     |
+     *           |                     |
+     *           |                     |
+     *           +----------+----------+
+     *         end_l                 end_r
      */
 
-    const double RADIUS = 0.5;
+    Vector start_to_end = segment.getEnd().toVector() - segment.getStart().toVector();
+    Vector end_to_start = -start_to_end;
 
-    Vector first_to_second = first_point.toVector() - second_point.toVector();
-    Vector second_to_first = -first_to_second;
+    Point end_l = segment.getEnd() + (start_to_end.normalize(radius) +
+                                      start_to_end.perpendicular().normalize(radius));
+    Point end_r = segment.getEnd() + (start_to_end.normalize(radius) -
+                                      start_to_end.perpendicular().normalize(radius));
 
-    Point place_l = first_point + (first_to_second.normalize(RADIUS) +
-                                   first_to_second.perpendicular().normalize(RADIUS));
-    Point place_r = first_point + (first_to_second.normalize(RADIUS) -
-                                   first_to_second.perpendicular().normalize(RADIUS));
-
-    Point ball_l = second_point + (second_to_first.normalize(RADIUS) +
-                                   second_to_first.perpendicular().normalize(RADIUS));
-    Point ball_r = second_point + (second_to_first.normalize(RADIUS) -
-                                   second_to_first.perpendicular().normalize(RADIUS));
+    Point start_l = segment.getStart() + (end_to_start.normalize(radius) +
+                                          end_to_start.perpendicular().normalize(radius));
+    Point start_r = segment.getStart() + (end_to_start.normalize(radius) -
+                                          end_to_start.perpendicular().normalize(radius));
 
     return Polygon({
-        place_l,
-        place_r,
-        ball_l,
-        ball_r,
+        end_l,
+        end_r,
+        start_l,
+        start_r,
     });
 }
 

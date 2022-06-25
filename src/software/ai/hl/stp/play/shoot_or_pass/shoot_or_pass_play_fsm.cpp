@@ -147,10 +147,10 @@ void ShootOrPassPlayFSM::takePass(const Update& event)
 bool ShootOrPassPlayFSM::passFound(const Update& event)
 {
     const auto ball_velocity = event.common.world.ball().velocity().length();
-    const auto ball_shot_threshold =
-        this->ai_config.shoot_or_pass_play_config().ball_shot_threshold();
+    const auto ball_kicked_threshold =
+        this->ai_config.shoot_or_pass_play_config().ball_kicked_threshold();
 
-    return (ball_velocity < ball_shot_threshold) &&
+    return (ball_velocity < ball_kicked_threshold) &&
            (best_pass_and_score_so_far.rating > min_pass_score_threshold);
 }
 
@@ -163,7 +163,7 @@ bool ShootOrPassPlayFSM::shouldAbortPass(const Update& event)
         this->ai_config.shoot_or_pass_play_config().short_pass_threshold();
 
     const auto pass_area_polygon =
-        Polygon::fromPoints(passer_point, receiver_point).expand(1.5);
+        Polygon::fromSegment(Segment(passer_point, receiver_point), 0.5).expand(1.5);
 
     // calculate a polygon that contains the receiver and passer point, and checks if the
     // ball is inside it. if the ball isn't being passed to the receiver then we should
@@ -211,22 +211,9 @@ bool ShootOrPassPlayFSM::tookShot(const Update& event)
     const auto ball_to_bot_post_angle =
         (enemy_goal_bot_post.toVector() - ball_position.toVector()).orientation();
 
-    const auto enemy_goal_position = event.common.world.field().enemyGoalCenter();
-
-    bool ball_oriented_towards_goal;
-
-    if (enemy_goal_position.x() < 0)
-    {
-        ball_oriented_towards_goal =
-            (ball_velocity_orientation > ball_to_top_post_angle) &&
-            (ball_velocity_orientation < ball_to_bot_post_angle);
-    }
-    else
-    {
-        ball_oriented_towards_goal =
-            (ball_velocity_orientation < ball_to_top_post_angle) &&
-            (ball_velocity_orientation > ball_to_bot_post_angle);
-    }
+    bool ball_oriented_towards_goal =
+        (ball_velocity_orientation < ball_to_top_post_angle) &&
+        (ball_velocity_orientation > ball_to_bot_post_angle);
 
     return ball_oriented_towards_goal && (ball_velocity > ball_shot_threshold);
 }

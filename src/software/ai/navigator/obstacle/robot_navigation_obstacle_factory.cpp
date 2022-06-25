@@ -204,5 +204,6 @@ ObstaclePtr RobotNavigationObstacleFactory::createFromFieldRectangle(
 ObstaclePtr RobotNavigationObstacleFactory::createFromBallPlacement(
     const Point &placement_point, const Point &ball_point) const
 {
-    return createFromShape(Polygon::fromPoints(placement_point, ball_point));
+    return createFromShape(
+        Polygon::fromSegment(Segment(ball_point, placement_point), 0.5));
 }

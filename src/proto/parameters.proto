@@ -208,6 +208,10 @@ message ShootOrPassPlayConfig
     // threshold for the distance between passer and receiver
     required double short_pass_threshold = 5
         [default = 0.5, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
+
+    // threshold to decide if ball hasn't been kicked
+    required double ball_kicked_threshold = 6
+        [default = 0.5, (bounds).min_double_value = 0.0, (bounds).max_double_value = 5.0];
 }
 
 

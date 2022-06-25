@@ -63,7 +63,7 @@ class Polygon : public virtual Shape
      * @param secondPoint the second point.
      * @return an oriented polygon along the 2 points that contains both points.
      */
-    static Polygon fromPoints(const Point& first_point, const Point& second_point);
+    static Polygon fromSegment(const Segment& segment, double radius);
 
    protected:
     /**
