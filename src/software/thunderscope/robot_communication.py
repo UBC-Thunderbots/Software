@@ -3,6 +3,9 @@ from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.python_bindings import *
 from proto.import_all_protos import *
 import threading
+import time
+import logging
+
 
 class RobotCommunication(object):
 
@@ -61,18 +64,50 @@ class RobotCommunication(object):
         is useful to dip in and out of robot diagnostics.
 
         """
+
+
+        #motor_control = MotorControl(MotorControl.drive_control=MotorControl.DirectPerWheelControl(), dribbler_speed_rpm=0.0)
+        speed = 0.1
+        primitive0 = Primitive(direct_control=DirectControlPrimitive(motor_control=MotorControl(direct_per_wheel_control=MotorControl.DirectPerWheelControl(front_left_wheel_rpm=0), dribbler_speed_rpm=0)))
+        primitive1 = Primitive(direct_control=DirectControlPrimitive(motor_control=MotorControl(direct_velocity_control=MotorControl.DirectVelocityControl(velocity=Vector(x_component_meters=0.0, y_component_meters=speed), angular_velocity=AngularVelocity(radians_per_second=0.0)), dribbler_speed_rpm=-10000)))
+        primitive2 = Primitive(direct_control=DirectControlPrimitive(motor_control=MotorControl(direct_velocity_control=MotorControl.DirectVelocityControl(velocity=Vector(x_component_meters=0.0, y_component_meters=-speed), angular_velocity=AngularVelocity(radians_per_second=0.0)),dribbler_speed_rpm=-10000)))
+        primitive3 = Primitive(direct_control=DirectControlPrimitive(motor_control=MotorControl(direct_velocity_control=MotorControl.DirectVelocityControl(velocity=Vector(x_component_meters=speed, y_component_meters=speed), angular_velocity=AngularVelocity(radians_per_second=0.0)), dribbler_speed_rpm=-10000)))
+        primitive4 = Primitive(direct_control=DirectControlPrimitive(motor_control=MotorControl(direct_velocity_control=MotorControl.DirectVelocityControl(velocity=Vector(x_component_meters=-speed, y_component_meters=-speed), angular_velocity=AngularVelocity(radians_per_second=0.0)), dribbler_speed_rpm=-10000)))
+
+        primitive0_dribbler = Primitive(direct_control=DirectControlPrimitive(motor_control=MotorControl(direct_per_wheel_control=MotorControl.DirectPerWheelControl(front_left_wheel_rpm=0), dribbler_speed_rpm=-10000)))
+
+
+        set = [{3:primitive1}, {3:primitive2}, {3:primitive3}, {3:primitive4}]
+        # primitiveset = PrimitiveSet(time_sent = Timestamp(),stay_away_from_ball=False, robot_primitives=set)
+
         while True:
             if self.fullsystem_connected_to_robots:
 
                 # Send the world
-                world = self.world_buffer.get(block=True)
-                self.send_world.send_proto(world)
+                # world = self.world_buffer.get(block=True)
+                # self.send_world.send_proto(world)
 
                 # Send the primitive set
-                primitive_set = self.primitive_buffer.get(block=False)
+                # primitive_set = self.primitive_buffer.get(block=False)
 
-                if self.estop_reader.isEstopPlay():
+                for i in range(4):
+                    primitiveset = PrimitiveSet(time_sent = Timestamp(),stay_away_from_ball=False, robot_primitives=set[i])
+                    primitive_set = primitiveset
                     self.send_primitive_mcast_sender.send_proto(primitive_set)
+                    logging.info(f"running index i {i}")
+                    # if self.estop_reader.isEstopPlay():
+                    #     self.send_primitive_mcast_sender.send_proto(primitive_set)
+
+                    time.sleep(2)
+                    primitiveset_stop = PrimitiveSet(time_sent = Timestamp(),stay_away_from_ball=False, robot_primitives={3:primitive0_dribbler})
+                    self.send_primitive_mcast_sender.send_proto(primitiveset_stop)
+                    time.sleep(2)
+
+
+                primitiveset_stop = PrimitiveSet(time_sent = Timestamp(),stay_away_from_ball=False, robot_primitives={3:primitive0})
+                self.send_primitive_mcast_sender.send_proto(primitiveset_stop)
+
+                exit(0)
 
     def connect_fullsystem_to_robots(self):
         """ Connect the robots to fullsystem """
@@ -104,12 +139,12 @@ class RobotCommunication(object):
 
         """
         # Create the multicast channels
-        self.receive_robot_status = RobotStatusProtoListener(
-            self.multicast_channel + "%" + self.interface,
-            ROBOT_STATUS_PORT,
-            lambda data: print(data),
-            True,
-        )
+        # self.receive_robot_status = RobotStatusProtoListener(
+        #     self.multicast_channel + "%" + self.interface,
+        #     ROBOT_STATUS_PORT,
+        #     lambda data: print(data),
+        #     True,
+        # )
 
         self.send_primitive_mcast_sender = PrimitiveSetProtoSender(
             self.multicast_channel + "%" + self.interface, PRIMITIVE_PORT, True
