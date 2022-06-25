@@ -10,6 +10,7 @@
 
 #include <cstdio>
 #include <stdexcept>
+#include "software/logger/logger.h"
 
 AS5047::AS5047() {
     m_open = false;
@@ -24,6 +25,8 @@ AS5047::AS5047(const char* p_spidev, uint32_t speed) {
     }
     speed_ = speed;
     m_open = false;
+    LOG (DEBUG) << "m_spidev: " << m_spidev;
+    LOG(DEBUG) << "speed: " << speed;
 }
 
 AS5047::~AS5047() {
@@ -66,7 +69,9 @@ bool AS5047::begin() {
     if (m_spidev == NULL)
        return false;
 
+    LOG(DEBUG) << "pre-opening O_RDWR";
     m_spifd = open(m_spidev, O_RDWR);
+    LOG(DEBUG) << "post-opening O_RDWR";
     if (m_spifd < 0) {
         return false;
     }
@@ -74,23 +79,29 @@ bool AS5047::begin() {
     uint8_t mode = SPI_MODE_1;
     uint8_t bits_per_word = 8;
 
+    LOG(DEBUG) << "pre set SPI mode";
     /* Set SPI_POL and SPI_PHA */
     if (ioctl(m_spifd, SPI_IOC_WR_MODE, &mode) < 0) {
         close(m_spifd);
         return false;
     }
+    LOG(DEBUG) << "post set SPI mode";
 
+    LOG(DEBUG) << "pre set bits per word";
     /* Set bits per word*/
     if (ioctl(m_spifd, SPI_IOC_WR_BITS_PER_WORD, &bits_per_word) < 0) {
         close(m_spifd);
         return false;
     }
+    LOG(DEBUG) << "post set bits per word";
 
+    LOG(DEBUG) << "pre set SPI speed";
     /* Set SPI speed*/
     if (ioctl(m_spifd, SPI_IOC_WR_MAX_SPEED_HZ, &speed_) < 0) {
         close(m_spifd);
         return false;
     }
+    LOG(DEBUG) << "post set SPI speed";
 
     m_open = true;
 

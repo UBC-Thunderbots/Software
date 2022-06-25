@@ -6,11 +6,23 @@
 EncoderSpi::EncoderSpi(uint8_t chip_select_pin)
 	: chipSelectPin(chip_select_pin)
 {
-	fd = open("/dev/spidev1.0", O_RDWR); 
+	LOG(DEBUG) << "open spi port";
+	int ret;
+	fd = open("/dev/spidev0.0", O_RDWR); 
 	CHECK(fd >= 0) << "can't open encoder, error: " << strerror(errno);	
 
 //	int ret = ioctl(fd, SPI_IOC_WR_MODE32, SPI_MODE_1);
 //	CHECK(ret != -1) << "can't set spi mode for encoder, error: " << strerror(errno);
+	LOG(DEBUG) << "open spi mode";
+       unsigned char spi_mode = SPI_MODE_1;
+          ret = ioctl(fd, SPI_IOC_WR_MODE, &spi_mode);
+          CHECK(ret != -1) << "can't set spi mode for encoder, error: " << strerror(errno);	
+	  LOG(DEBUG) << "finished setting spi mode";
+	  LOG(DEBUG) << "set spi speed";
+	  uint32_t speed_ = 10000;
+	  ret = ioctl(fd, SPI_IOC_WR_MAX_SPEED_HZ, &speed_);
+	  CHECK(ret != -1) << "cant set spi speed for encoder, error: " << strerror(errno);
+	  LOG(DEBUG) << "finsihed setting spi speed";
 }
 
 void EncoderSpi::writeData(uint16_t command, uint16_t value) {

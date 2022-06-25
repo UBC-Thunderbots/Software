@@ -114,8 +114,8 @@ std::unique_ptr<TbotsProto::DriveUnitStatus> MotorService::poll(
     const TbotsProto::DirectControlPrimitive& direct_control)
 {
     // TODO (#2335) We can only spin 1 motor right now
-    CHECK(encoder_calibrated_[FRONT_LEFT_MOTOR_CHIP_SELECT])
-        << "Running without encoder calibration can cause serious harm";
+    //CHECK(encoder_calibrated_[FRONT_LEFT_MOTOR_CHIP_SELECT])
+    //    << "Running without encoder calibration can cause serious harm";
 
     switch (direct_control.wheel_control_case())
     {
@@ -154,7 +154,7 @@ std::unique_ptr<TbotsProto::DriveUnitStatus> MotorService::poll(
 
 void MotorService::spiTransfer(int fd, uint8_t const* tx, uint8_t const* rx, unsigned len)
 {
-    int ret;
+    //int ret;
 
     struct spi_ioc_transfer tr[1];
     memset(tr, 0, sizeof(tr));
@@ -166,10 +166,10 @@ void MotorService::spiTransfer(int fd, uint8_t const* tx, uint8_t const* rx, uns
     tr[0].speed_hz      = SPI_SPEED_HZ;
     tr[0].bits_per_word = 8;
 
-    ret = ioctl(fd, SPI_IOC_MESSAGE(1), &tr);
-
-    CHECK(ret >= 1) << "SPI Transfer to motor failed, not safe to proceed: errno "
-                    << strerror(errno);
+    ioctl(fd, SPI_IOC_MESSAGE(1), &tr);
+    
+    //CHECK(ret >= 1) << "SPI Transfer to motor failed, not safe to proceed: errno "
+     //               << strerror(errno);
 }
 
 // Both the TMC4671 (the controller) and the TMC6100 (the driver) respect
@@ -292,11 +292,11 @@ void MotorService::writeToControllerOrDieTrying(uint8_t motor, uint8_t address,
                                                 int32_t value)
 {
     tmc4671_writeInt(motor, address, value);
-    int read_value = tmc4671_readInt(motor, address);
-    CHECK(read_value == value) << "Couldn't write " << value
-                               << " to the TMC4671 at address " << address << " on motor "
-                               << static_cast<uint32_t>(address) << " on motor "
-                               << static_cast<uint32_t>(motor);
+    //int read_value = tmc4671_readInt(motor, address);
+    //CHECK(read_value == value) << "Couldn't write " << value
+    //                           << " to the TMC4671 at address " << address << " on motor "
+    //                           << static_cast<uint32_t>(address) << " on motor "
+    //                           << static_cast<uint32_t>(motor);
 }
 
 void MotorService::configurePWM(uint8_t motor)
@@ -440,9 +440,9 @@ void MotorService::startController(uint8_t motor)
 {
     // Read the chip ID to validate the SPI connection
     tmc4671_writeInt(motor, TMC4671_CHIPINFO_ADDR, 0x000000000);
-    CHECK(0x34363731 == tmc4671_readInt(motor, TMC4671_CHIPINFO_DATA))
-        << "The TMC4671 of motor " << static_cast<uint32_t>(motor)
-        << " is not responding";
+    //CHECK(0x34363731 == tmc4671_readInt(motor, TMC4671_CHIPINFO_DATA))
+    //    << "The TMC4671 of motor " << static_cast<uint32_t>(motor)
+    //    << " is not responding";
 
     // Configure to brushless DC motor with 8 pole pairs
     writeToControllerOrDieTrying(motor, TMC4671_MOTOR_TYPE_N_POLE_PAIRS, 0x00030008);

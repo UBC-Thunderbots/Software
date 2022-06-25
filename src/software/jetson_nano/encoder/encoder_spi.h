@@ -8,7 +8,7 @@
 #include <cerrno>
 #include <stdexcept>
 
-#define SPI_SPEED_HZ 1000000
+#define SPI_SPEED_HZ 200000
 
 /**
  * Implementation of a wrapper for SPI Communication.
