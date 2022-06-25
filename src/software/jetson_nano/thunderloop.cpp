@@ -195,7 +195,7 @@ void Thunderloop::runLoop()
             // Motor Service: execute the motor control command
             {
                 ScopedTimespecTimer timer(&poll_time);
-                // motor_status_ = motor_service_->poll(direct_control_.motor_control());
+                motor_status_ = motor_service_->poll(direct_control_.motor_control(), 1.0/loop_hz_);
                 primitive_executor_.updateLocalVelocity(
                     createVector(motor_status_.local_velocity()));
             }

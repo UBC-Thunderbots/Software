@@ -307,37 +307,39 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
     {
         case TbotsProto::MotorControl::DriveControlCase::kDirectPerWheelControl:
         {
+            LOG(DEBUG) << "IN DIRECT CONTROL";
+            LOG(DEBUG) << motor.DebugString();
             double target_front_left_velocity =
                 rampVelocity(motor.direct_per_wheel_control().front_left_wheel_rpm() *
                         MECHANICAL_MPS_PER_ELECTRICAL_RPM,
-                        front_left_rpm * MECHANICAL_MS_PER_ELECTRICAL_RPM, time_elapsed_since_last_poll_s);
+                        front_left_rpm * MECHANICAL_MPS_PER_ELECTRICAL_RPM, time_elapsed_since_last_poll_s);
             double target_front_right_velocity =
                 rampVelocity(motor.direct_per_wheel_control().front_right_wheel_rpm() *
                         MECHANICAL_MPS_PER_ELECTRICAL_RPM,
-                        front_right_rpm * MECHANICAL_MS_PER_ELECTRICAL_RPM, time_elapsed_since_last_poll_s);
+                        front_right_rpm * MECHANICAL_MPS_PER_ELECTRICAL_RPM, time_elapsed_since_last_poll_s);
             double target_back_left_velocity =
-                rampVelocity(motor.direct_per_wheel_control().back_left_wheel_rom() *
+                rampVelocity(motor.direct_per_wheel_control().back_left_wheel_rpm() *
                         MECHANICAL_MPS_PER_ELECTRICAL_RPM,
-                        back_left_rpm * MECHANICAL_MS_PER_ELECTRICAL_RPM, time_elapsed_since_last_poll_s);
+                        back_left_rpm * MECHANICAL_MPS_PER_ELECTRICAL_RPM, time_elapsed_since_last_poll_s);
             double target_back_right_velocity =
                 rampVelocity(motor.direct_per_wheel_control().back_right_wheel_rpm() *
                         MECHANICAL_MPS_PER_ELECTRICAL_RPM,
-                        back_right_rpm * MECHANICAL_MS_PER_ELECTRICAL_RPM, time_elapsed_since_last_poll_s);
+                        back_right_rpm * MECHANICAL_MPS_PER_ELECTRICAL_RPM, time_elapsed_since_last_poll_s);
 
             tmc4671_setTargetVelocity(
                     FRONT_LEFT_MOTOR_CHIP_SELECT,
-                    static_cast<int>(target_front_left_velocity * MECHANICAL_MS_PER_ELECTRICAL_RPM));
+                    static_cast<int>(target_front_left_velocity * MECHANICAL_MPS_PER_ELECTRICAL_RPM));
             tmc4671_setTargetVelocity(
                     FRONT_RIGHT_MOTOR_CHIP_SELECT,
-                    static_cast<int>(target_front_right_velocity * MECHANICAL_MS_PER_ELECTRICAL_RPM));
+                    static_cast<int>(target_front_right_velocity * MECHANICAL_MPS_PER_ELECTRICAL_RPM));
             tmc4671_setTargetVelocity(
                     BACK_LEFT_MOTOR_CHIP_SELECT,
-                    static_cast<int>(target_back_left_motor_velocity * MECHANICAL_MS_PER_ELECTRICAL_RPM));
+                    static_cast<int>(target_back_left_velocity * MECHANICAL_MPS_PER_ELECTRICAL_RPM));
             tmc4671_setTargetVelocity(
                     BACK_RIGHT_MOTOR_CHIP_SELECT,
-                    static_cast<int>(target_back_right_motor_velocity * MECHANICAL_MS_PER_ELECTRICAL_RPM));
+                    static_cast<int>(target_back_right_velocity * MECHANICAL_MPS_PER_ELECTRICAL_RPM));
 
-            tmc4671_setTargetVelocity(DRIBBLER_MOTOR_CHIP_SELECT, static_cast<int>(motor.dribbler_speed_rpm());
+            tmc4671_setTargetVelocity(DRIBBLER_MOTOR_CHIP_SELECT, static_cast<int>(motor.dribbler_speed_rpm()));
 
             break;
         }
