@@ -14,9 +14,11 @@ class PrimitiveExecutor
      * @param time_step Time step which this primitive executor operates in
      * @param robot_constants The robot constants for the robot which uses this primitive
      * executor
+     * @param friendly_team_colour The colour of the friendly team
      */
     explicit PrimitiveExecutor(const double time_step,
-                               const RobotConstants_t& robot_constants);
+                               const RobotConstants_t& robot_constants,
+                               const TeamColour friendly_team_colour);
 
     /**
      * Update primitive executor with a new Primitive Set

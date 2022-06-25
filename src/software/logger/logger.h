@@ -32,7 +32,7 @@
 
 // Called when LOG() is called with 2 arguments
 #define LOG_2(level, filename)                                                           \
-    if (level != CSV)                                                                    \
+    if (level != CSV && level != VISUALIZE)                                              \
     {                                                                                    \
     }                                                                                    \
     else                                                                                 \
