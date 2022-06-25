@@ -34,7 +34,8 @@ class MotorService
      * @param motor The motor msg to unpack and execute on the motors
      * @returns MotorStatus The status of all the drive units
      */
-    TbotsProto::MotorStatus poll(const TbotsProto::MotorControl& motor_control, double time_elapsed_since_last_poll_s);
+    TbotsProto::MotorStatus poll(const TbotsProto::MotorControl& motor_control,
+                                 double time_elapsed_since_last_poll_s);
     void setXYTheta(double x, double y, double rad_per_s);
 
     /**
