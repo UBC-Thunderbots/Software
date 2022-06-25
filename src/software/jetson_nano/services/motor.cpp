@@ -369,6 +369,29 @@ void MotorService::spiTransfer(int fd, uint8_t const* tx, uint8_t const* rx, uns
                     << strerror(errno);
 }
 
+double MotorService::rampVelocity(double velocity_target, double velocity_current, double time_ramp)
+{
+	// Calculate velocity delta using kinematic equation: dv = a*t
+	double velocity_delta = robot_constants.robot_max_angular_acceleration_m_per_s_2 * time_ramp; 
+
+	// Case: accelerating
+	if (velocity_target > velocity_current + velocity_delta)
+	{
+		return velocity_current + velocity_delta;
+	}
+	// Case: deccelerating
+	else if (velocity_target < velocity_current + velocity_delta)
+	{
+		return velocity_current - velocity_delta;
+	}
+	// Case: ramping not required, go to target velocity
+	else
+	{
+		return velocity_target;
+	}
+}
+
+
 // Both the TMC4671 (the controller) and the TMC6100 (the driver) respect
 // the same SPI interface. So when we bind the API, we can use the same
 // readWriteByte function, provided that the chip select pin is turning on
