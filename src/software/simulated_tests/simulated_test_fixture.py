@@ -2,6 +2,8 @@ import threading
 import queue
 import argparse
 import time
+import sys
+import os
 
 import pytest
 import software.python_bindings as tbots
@@ -22,12 +24,13 @@ from software.thunderscope.binary_context_managers import (
     Simulator,
     Gamecontroller,
 )
+from software.thunderscope.replay.proto_logger import ProtoLogger
 
 from software.logger.logger import createLogger
 
 logger = createLogger(__name__)
 
-LAUNCH_DELAY_S = 0.2
+LAUNCH_DELAY_S = 0.1
 WORLD_BUFFER_TIMEOUT = 0.5
 PROCESS_BUFFER_DELAY_S = 0.01
 PAUSE_AFTER_FAIL_DELAY_S = 3
@@ -39,6 +42,7 @@ class SimulatorTestRunner(object):
 
     def __init__(
         self,
+        test_name,
         thunderscope,
         simulator_proto_unix_io,
         blue_full_system_proto_unix_io,
@@ -47,6 +51,7 @@ class SimulatorTestRunner(object):
     ):
         """Initialize the SimulatorTestRunner
         
+        :param test_name: The name of the test to run
         :param thunderscope: The thunderscope to use, None if not used
         :param simulator_proto_unix_io: The simulator proto unix io to use
         :param blue_full_system_proto_unix_io: The blue full system proto unix io to use
@@ -55,11 +60,14 @@ class SimulatorTestRunner(object):
 
         """
 
+        self.test_name = test_name
         self.thunderscope = thunderscope
         self.simulator_proto_unix_io = simulator_proto_unix_io
         self.blue_full_system_proto_unix_io = blue_full_system_proto_unix_io
         self.yellow_full_system_proto_unix_io = yellow_full_system_proto_unix_io
         self.gamecontroller = gamecontroller
+        self.last_exception = None
+
         self.world_buffer = ThreadSafeBuffer(buffer_size=1, protobuf_type=World)
         self.last_exception = None
 
@@ -76,6 +84,15 @@ class SimulatorTestRunner(object):
         self.blue_full_system_proto_unix_io.register_observer(
             RobotStatus, self.robot_status_buffer
         )
+
+        self.timestamp = 0
+        self.timestamp_mutex = threading.Lock()
+
+    def time_provider(self):
+        """Provide the current time in seconds since the epoch"""
+
+        with self.timestamp_mutex:
+            return self.timestamp
 
     def run_test(
         self,
@@ -115,6 +132,11 @@ class SimulatorTestRunner(object):
             time_elapsed_s = 0
 
             while time_elapsed_s < test_timeout_s:
+
+                # Update the timestamp logged by the ProtoLogger
+                with self.timestamp_mutex:
+                    ssl_wrapper = self.ssl_wrapper_buffer.get(block=False)
+                    self.timestamp = ssl_wrapper.detection.t_capture
 
                 tick = SimulatorTick(
                     milliseconds=tick_duration_s * MILLISECONDS_PER_SECOND
@@ -157,6 +179,11 @@ class SimulatorTestRunner(object):
                 )
 
                 if self.thunderscope:
+
+                    # Set the test name
+                    eventually_validation_proto_set.test_name = self.test_name
+                    always_validation_proto_set.test_name = self.test_name
+
                     # Send out the validation proto to thunderscope
                     self.thunderscope.blue_full_system_proto_unix_io.send_proto(
                         ValidationProtoSet, eventually_validation_proto_set
@@ -271,7 +298,25 @@ def load_command_line_arguments():
         default=False,
         help="How many packets to buffer while rendering",
     )
+    parser.add_argument(
+        "--test_filter",
+        action="store",
+        default="",
+        help="The test filter, if not specified all tests will run. "
+        + "See https://docs.pytest.org/en/latest/how-to/usage.html#specifying-tests-selecting-tests",
+    )
     return parser.parse_args()
+
+
+def pytest_main(file):
+    """Runs the pytest file
+
+    :param file: The test file to run
+
+    """
+    args = load_command_line_arguments()
+    # Run the test, -s disables all capturing at -vv increases verbosity
+    sys.exit(pytest.main(["-svv", "-k", args.test_filter, file]))
 
 
 @pytest.fixture
@@ -283,16 +328,29 @@ def simulated_test_runner():
     yellow_full_system_proto_unix_io = ProtoUnixIO()
     blue_full_system_proto_unix_io = ProtoUnixIO()
 
+    # Grab the current test name to store the proto log for the test case
+    current_test = os.environ.get("PYTEST_CURRENT_TEST").split(":")[-1].split(" ")[0]
+    current_test = current_test.replace("]", "")
+    current_test = current_test.replace("[", "-")
+
+    test_name = current_test.split("-")[0]
+
     # Launch all binaries
     with Simulator(
-        args.simulator_runtime_dir, args.debug_simulator
+        f"{args.simulator_runtime_dir}/test/{test_name}", args.debug_simulator
     ) as simulator, FullSystem(
-        args.blue_full_system_runtime_dir, args.debug_blue_full_system, False
+        f"{args.blue_full_system_runtime_dir}/test/{test_name}",
+        args.debug_blue_full_system,
+        False,
+        should_restart_on_crash=False,
     ) as blue_fs, FullSystem(
-        args.yellow_full_system_runtime_dir, args.debug_yellow_full_system, True
+        f"{args.yellow_full_system_runtime_dir}/test/{test_name}",
+        args.debug_yellow_full_system,
+        True,
+        should_restart_on_crash=False,
     ) as yellow_fs:
         with Gamecontroller(
-            supress_logs=(not args.show_gamecontroller_logs), ci_mode=True
+            supress_logs=(not args.show_gamecontroller_logs), ci_mode=True,
         ) as gamecontroller:
 
             blue_fs.setup_proto_unix_io(blue_full_system_proto_unix_io)
@@ -313,13 +371,14 @@ def simulated_test_runner():
                     simulator_proto_unix_io,
                     blue_full_system_proto_unix_io,
                     yellow_full_system_proto_unix_io,
+                    layout_path=args.layout,
                     visualization_buffer_size=args.visualization_buffer_size,
                 )
-                tscope.load_saved_layout(args.layout)
 
             time.sleep(LAUNCH_DELAY_S)
 
             runner = SimulatorTestRunner(
+                current_test,
                 tscope,
                 simulator_proto_unix_io,
                 blue_full_system_proto_unix_io,
@@ -330,4 +389,31 @@ def simulated_test_runner():
             # Only validate on the blue worlds
             blue_full_system_proto_unix_io.register_observer(World, runner.world_buffer)
 
-            yield runner
+            # Setup proto loggers.
+            #
+            # NOTE: Its important we use the test runners time provider because
+            # test will run as fast as possible with a varying tick rate. The
+            # SimulatorTestRunner time provider is tied to the simulators
+            # t_capture coming out of the wrapper packet (rather than time.time).
+            with ProtoLogger(
+                f"{args.blue_full_system_runtime_dir}/logs/{current_test}",
+                time_provider=runner.time_provider,
+            ) as blue_logger, ProtoLogger(
+                f"{args.yellow_full_system_runtime_dir}/logs/{current_test}",
+                time_provider=runner.time_provider,
+            ) as yellow_logger:
+
+                blue_full_system_proto_unix_io.register_to_observe_everything(
+                    blue_logger.buffer
+                )
+                yellow_full_system_proto_unix_io.register_to_observe_everything(
+                    yellow_logger.buffer
+                )
+
+                yield runner
+                print(
+                    f"\n\n To replay this test for the blue team, go to the `src` folder and run \n./tbots.py run thunderscope --blue_log {blue_logger.log_folder}"
+                )
+                print(
+                    f"\n\n To replay this test for the yellow team, go to the `src` folder and run \n./tbots.py run thunderscope --yellow_log {yellow_logger.log_folder}"
+                )

@@ -1,13 +1,16 @@
-from software.thunderscope.thunderscope import Thunderscope
-from software.thunderscope.binary_context_managers import *
-from proto.message_translation import tbots_protobuf
-import software.python_bindings as cpp_bindings
-from software.thunderscope.robot_communication import RobotCommunication
-
+import os
 import time
 import threading
 import argparse
 import numpy
+
+from software.thunderscope.thunderscope import Thunderscope
+from software.thunderscope.binary_context_managers import *
+from proto.message_translation import tbots_protobuf
+import software.python_bindings as cpp_bindings
+from software.py_constants import *
+from software.thunderscope.robot_communication import RobotCommunication
+from software.thunderscope.replay.proto_logger import ProtoLogger
 
 NUM_ROBOTS = 6
 SIM_TICK_RATE_MS = 16
@@ -74,6 +77,18 @@ if __name__ == "__main__":
         default=False,
         help="Visualize C++ Tests",
     )
+    parser.add_argument(
+        "--blue_log",
+        action="store",
+        help="Replay folder for the blue full_system",
+        default=None,
+    )
+    parser.add_argument(
+        "--yellow_log",
+        action="store",
+        help="Replay folder for the yellow full_system",
+        default=None,
+    )
 
     # Run blue or yellow full system over WiFi
     group = parser.add_mutually_exclusive_group()
@@ -95,6 +110,13 @@ if __name__ == "__main__":
         help="Which interface to communicate over",
     )
     parser.add_argument(
+        "--channel",
+        action="store",
+        type=int,
+        default=0,
+        help="Which channel to communicate over",
+    )
+    parser.add_argument(
         "--visualization_buffer_size",
         action="store",
         type=int,
@@ -109,8 +131,6 @@ if __name__ == "__main__":
         if args.interface is None:
             parser.error("Must specify interface")
 
-    tscope = Thunderscope(visualization_buffer_size=args.visualization_buffer_size)
-
     ###########################################################################
     #                      Visualize CPP Tests                                #
     ###########################################################################
@@ -120,27 +140,37 @@ if __name__ == "__main__":
         runtime_dir = "/tmp/tbots/yellow_test"
 
         try:
-            os.mkdirs(runtime_dir)
+            os.makedirs(runtime_dir)
         except OSError:
             pass
 
+        tscope = Thunderscope(
+            layout_path=args.layout,
+            visualization_buffer_size=args.visualization_buffer_size,
+        )
         proto_unix_io = tscope.blue_full_system_proto_unix_io
 
         # Setup LOG(VISUALIZE) handling from full system. We set from_log_visualize
         # to true to decode from base64.
         for arg in [
-            (runtime_dir, Obstacles, True),
-            (runtime_dir, PathVisualization, True),
-            (runtime_dir, PassVisualization, True),
-            (runtime_dir, NamedValue, True),
-            (runtime_dir, World, True),
-            (runtime_dir, PlayInfo, True),
+            {"proto_class": Obstacles},
+            {"proto_class": PathVisualization},
+            {"proto_class": PassVisualization},
+            {"proto_class": NamedValue},
+            {"proto_class": PrimitiveSet},
+            {"proto_class": World},
+            {"proto_class": PlayInfo},
+        ] + [
+            # TODO (#2655): Add/Remove HRVO layers dynamically based on the HRVOVisualization proto messages
+            {"proto_class": HRVOVisualization, "unix_path": YELLOW_HRVO_PATH}
+            for robot_id in range(6)
         ]:
-            proto_unix_io.attach_unix_receiver(*arg)
+            proto_unix_io.attach_unix_receiver(
+                runtime_dir, from_log_visualize=True, **arg
+            )
 
-        proto_unix_io.attach_unix_receiver(runtime_dir + "/log", RobotLog)
+        proto_unix_io.attach_unix_receiver(runtime_dir + "/log", proto_class=RobotLog)
 
-        tscope.load_saved_layout(args.layout, load_yellow=True)
         tscope.show()
 
     ###########################################################################
@@ -150,26 +180,57 @@ if __name__ == "__main__":
     # When we are running with real robots. We want to run 1 instance of AI
     # and 1 instance of RobotCommunication which will send/recv packets over
     # the provided multicast channel.
-    proto_unix_io = tscope.blue_full_system_proto_unix_io
-    runtime_dir = args.blue_full_system_runtime_dir
-    friendly_colour_yellow = False
-    debug = args.debug_blue_full_system
+    if args.run_blue:
+
+        tscope = Thunderscope(
+            layout_path=args.layout,
+            load_blue=True,
+            load_yellow=False,
+            load_diagnostics=True,
+            load_gamecontroller=False,
+            visualization_buffer_size=args.visualization_buffer_size,
+        )
+
+        proto_unix_io = tscope.blue_full_system_proto_unix_io
+        runtime_dir = args.blue_full_system_runtime_dir
+        friendly_colour_yellow = False
+        debug = args.debug_blue_full_system
 
     if args.run_yellow:
+
+        tscope = Thunderscope(
+            layout_path=args.layout,
+            load_blue=False,
+            load_yellow=True,
+            load_diagnostics=True,
+            load_gamecontroller=False,
+            visualization_buffer_size=args.visualization_buffer_size,
+        )
+
         proto_unix_io = tscope.yellow_full_system_proto_unix_io
         runtime_dir = args.yellow_full_system_runtime_dir
         friendly_colour_yellow = True
         debug = args.debug_yellow_full_system
 
     if args.run_blue or args.run_yellow:
-        # TODO (#2585): Support multiple channels
         with RobotCommunication(
-            proto_unix_io, ROBOT_MULTICAST_CHANNEL_0, args.interface
+            proto_unix_io, getRobotMulticastChannel(0), args.interface
         ), FullSystem(runtime_dir, debug, friendly_colour_yellow) as full_system:
-            tscope.load_saved_layout(
-                args.layout, load_blue=args.run_blue, load_yellow=args.run_yellow
-            )
             tscope.show()
+
+    ###########################################################################
+    #                              Replay                                     #
+    ###########################################################################
+    #
+    # Don't start any binaries and just replay a log.
+    elif args.blue_log or args.yellow_log:
+        tscope = Thunderscope(
+            layout_path=args.layout,
+            visualization_buffer_size=args.visualization_buffer_size,
+            blue_replay_log=args.blue_log,
+            yellow_replay_log=args.yellow_log,
+        )
+        tscope.show()
 
     ###########################################################################
     #           Blue AI vs Yellow AI + Simulator + Gamecontroller             #
@@ -180,6 +241,11 @@ if __name__ == "__main__":
     #
     # The async sim ticket ticks the simulator at a fixed rate.
     else:
+
+        tscope = Thunderscope(
+            layout_path=args.layout,
+            visualization_buffer_size=args.visualization_buffer_size,
+        )
 
         def __async_sim_ticker(tick_rate_ms):
             """Setup the world and tick simulation forever
@@ -212,7 +278,18 @@ if __name__ == "__main__":
             args.blue_full_system_runtime_dir, args.debug_blue_full_system, False
         ) as blue_fs, FullSystem(
             args.yellow_full_system_runtime_dir, args.debug_yellow_full_system, True
-        ) as yellow_fs, Gamecontroller() as gamecontroller:
+        ) as yellow_fs, ProtoLogger(
+            args.blue_full_system_runtime_dir,
+        ) as blue_logger, ProtoLogger(
+            args.yellow_full_system_runtime_dir,
+        ) as yellow_logger, Gamecontroller() as gamecontroller:
+
+            tscope.blue_full_system_proto_unix_io.register_to_observe_everything(
+                blue_logger.buffer
+            )
+            tscope.yellow_full_system_proto_unix_io.register_to_observe_everything(
+                yellow_logger.buffer
+            )
 
             blue_fs.setup_proto_unix_io(tscope.blue_full_system_proto_unix_io)
             yellow_fs.setup_proto_unix_io(tscope.yellow_full_system_proto_unix_io)
@@ -225,8 +302,6 @@ if __name__ == "__main__":
                 tscope.blue_full_system_proto_unix_io,
                 tscope.yellow_full_system_proto_unix_io,
             )
-
-            tscope.load_saved_layout(args.layout)
 
             # Start the simulator
             thread = threading.Thread(

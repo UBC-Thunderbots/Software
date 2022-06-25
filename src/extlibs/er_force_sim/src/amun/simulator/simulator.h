@@ -41,6 +41,7 @@ const float SUB_TIMESTEP     = 1 / 200.f;
 const float COLLISION_MARGIN = 0.04f;
 const unsigned FOCAL_LENGTH  = 390;
 
+
 class QByteArray;
 class QTimer;
 class Timer;
@@ -192,6 +193,8 @@ class camun::simulator::Simulator : public QObject
     qint64 m_lastBallSendTime      = 0;
     std::map<qint64, unsigned> m_lastFrameNumber;
     ErrorAggregator *m_aggregator;
+
+
 
     std::mt19937 rand_shuffle_src = std::mt19937(std::random_device()());
 };

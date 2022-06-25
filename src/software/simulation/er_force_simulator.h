@@ -1,24 +1,13 @@
 #pragma once
 
 #include "extlibs/er_force_sim/src/amun/simulator/simulator.h"
-#include "proto/defending_side_msg.pb.h"
 #include "proto/robot_status_msg.pb.h"
 #include "proto/ssl_vision_wrapper.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
-#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/jetson_nano/primitive_executor.h"
-#include "software/simulation/firmware_object_deleter.h"
 #include "software/world/field.h"
 #include "software/world/team_types.h"
 #include "software/world/world.h"
-
-extern "C"
-{
-#include "firmware/shared/physics.h"
-#include "proto/primitive.nanopb.h"
-#include "proto/robot_log_msg.nanopb.h"
-#include "proto/tbots_software_msgs.nanopb.h"
-}
 
 
 /**
@@ -35,13 +24,9 @@ class ErForceSimulator
      *
      * @param field_type The field type
      * @param robot_constants The robot constants
-     * @param wheel_constants The wheel constants
-     * @param simulator_config The config to fetch parameters from
      */
     explicit ErForceSimulator(const TbotsProto::FieldType& field_type,
-                              const RobotConstants_t& robot_constants,
-                              const WheelConstants& wheel_constants,
-                              std::shared_ptr<const SimulatorConfig> simulator_config);
+                              const RobotConstants_t& robot_constants);
     ErForceSimulator()  = delete;
     ~ErForceSimulator() = default;
 
@@ -198,7 +183,6 @@ class ErForceSimulator
     std::unique_ptr<camun::simulator::Simulator> er_force_sim;
 
     RobotConstants_t robot_constants;
-    WheelConstants wheel_constants;
     Field field;
 
     std::optional<RobotId> blue_robot_with_ball;

@@ -39,6 +39,7 @@
 #include "extlibs/hrvo/agent.h"
 #include "extlibs/hrvo/kd_tree.h"
 #include "proto/tbots_software_msgs.pb.h"
+#include "proto/visualization.pb.h"
 #include "software/geom/vector.h"
 #include "software/world/world.h"
 
@@ -50,8 +51,10 @@ class HRVOSimulator
      * @param time_step The time step between each step of the simulator
      * @param robot_constants The robot constants to be used for all Agents representing a
      * robot
+     * @param friendly_team_colour The colour of the friendly team
      */
-    explicit HRVOSimulator(float time_step, const RobotConstants_t &robot_constants);
+    explicit HRVOSimulator(float time_step, const RobotConstants_t &robot_constants,
+                           const TeamColour friendly_team_colour);
 
     /**
      * Reset all agents to match the state of the given world.
@@ -260,16 +263,14 @@ class HRVOSimulator
     }
 
    private:
-    unsigned int frame = 0;
-
     // PrimitiveSet which includes the path which each friendly robot should take
     TbotsProto::PrimitiveSet primitive_set;
 
     // True if the ball should be treated as an agent (obstacle)
     // NOTE: This will take effect the next time we receive a world, and we know
     //       the current ball position and velocity
-    bool add_ball_agent       = false;
-    std::size_t ball_agent_id = -1;
+    bool add_ball_agent;
+    std::size_t ball_agent_id;
 
     // The robot constants which all agents will use
     RobotConstants_t robot_constants;
@@ -285,6 +286,9 @@ class HRVOSimulator
 
     // True if all agents have reached their destination
     bool reached_goals;
+
+    // The colour of the friendly team
+    const TeamColour friendly_team_colour;
 
     // KdTree used to calculate the K nearest agents
     std::unique_ptr<KdTree> kd_tree;

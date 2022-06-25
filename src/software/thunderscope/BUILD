@@ -8,6 +8,7 @@ py_binary(
     deps = [
         ":thunderscope",
         "//software/thunderscope:binary_context_managers",
+        "//software/thunderscope/replay:proto_logger",
     ],
 )
 
@@ -26,14 +27,17 @@ py_library(
         "//proto/message_translation:py_tbots_protobuf",
         "//software/networking:threaded_unix_listener_py",
         "//software/networking:threaded_unix_sender_py",
-        "//software/thunderscope:colors",
-        "//software/thunderscope:common_widgets",
+        "//software/thunderscope:binary_context_managers",
         "//software/thunderscope:constants",
+        "//software/thunderscope:dock_label_style",
         "//software/thunderscope:proto_unix_io",
         "//software/thunderscope:robot_communication",
-        "//software/thunderscope/arbitrary_plot:named_value_plotter",
+        "//software/thunderscope/common:common_widgets",
+        "//software/thunderscope/common:proto_configuration_widget",
+        "//software/thunderscope/common:proto_plotter",
         "//software/thunderscope/field",
         "//software/thunderscope/field:field_layer",
+        "//software/thunderscope/field:hrvo_layer",
         "//software/thunderscope/field:obstacle_layer",
         "//software/thunderscope/field:passing_layer",
         "//software/thunderscope/field:path_layer",
@@ -43,8 +47,11 @@ py_library(
         "//software/thunderscope/log:g3log_checkboxes",
         "//software/thunderscope/log:g3log_widget",
         "//software/thunderscope/play:playinfo_widget",
+        "//software/thunderscope/replay:proto_logger",
+        "//software/thunderscope/replay:proto_player",
         "//software/thunderscope/robot_diagnostics:chicker",
         "//software/thunderscope/robot_diagnostics:drive_and_dribbler_widget",
+        "//software/thunderscope/robot_diagnostics:robot_view",
         requirement("pyqtgraph"),
         requirement("numpy"),
     ],
@@ -61,13 +68,13 @@ py_library(
 )
 
 py_library(
-    name = "colors",
-    srcs = ["colors.py"],
+    name = "common_widgets",
+    srcs = ["common_widgets.py"],
 )
 
 py_library(
-    name = "common_widgets",
-    srcs = ["common_widgets.py"],
+    name = "dock_label_style",
+    srcs = ["dock_label_style.py"],
 )
 
 py_library(

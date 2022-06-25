@@ -3,7 +3,6 @@ syntax = "proto3";
 package TbotsProto;
 
 import "proto/tbots_timestamp_msg.proto";
-import "generator/nanopb/options.proto";
 
 // the severity level of the log
 enum LogLevel
@@ -27,12 +26,6 @@ message RobotLog
 
     // the line number of where the log was generated
     uint32 line_number = 4;
-
-    // NOTE: we limit maximum size of the log_msg and file_name to know the
-    // size of the msg before hand (necessary for freertos queues)
-    //
-    // The numbers are arbitrary, but ideally the size of a RobotLog should
-    // be less than the MTU
-    string file_name = 5 [(nanopb.fieldopt).max_size = 100];
-    string log_msg   = 6 [(nanopb.fieldopt).max_size = 250];
+    string file_name   = 5;
+    string log_msg     = 6;
 }

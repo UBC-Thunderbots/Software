@@ -8,8 +8,8 @@ cc_library(
     hdrs = ["cost_function.h"],
     deps = [
         ":pass",
-        "//shared/parameter:cpp_configs",
-        "//software/ai/evaluation:pass",
+        "//software/ai/evaluation:calc_best_shot",
+        "//software/ai/evaluation:time_to_travel",
         "//software/logger",
         "//software/math:math_functions",
         "//software/util/make_enum",
@@ -100,7 +100,6 @@ cc_library(
         ":field_pitch_division",
         ":pass",
         ":pass_with_rating",
-        "//shared/parameter:cpp_configs",
         "//software/geom:point",
         "//software/geom:rectangle",
         "//software/util/make_enum",

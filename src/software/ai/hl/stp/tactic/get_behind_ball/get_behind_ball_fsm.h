@@ -1,7 +1,6 @@
 #pragma once
 
 #include "software/ai/hl/stp/tactic/tactic.h"
-#include "software/ai/intent/move_intent.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/triangle.h"
 
@@ -42,7 +41,7 @@ struct GetBehindBallFSM
     //             direction of chip/kick
 
     /**
-     * Action that updates the MoveIntent
+     * Action that updates the MovePrimitive
      *
      * @param event GetBehindBallFSM::Update event
      */
@@ -72,14 +71,15 @@ struct GetBehindBallFSM
             // src_state + event [guard] / action = dest_state
             *GetBehindBallState_S + Update_E[!behindBall_G] / updateMove_A,
             GetBehindBallState_S + Update_E[behindBall_G] / updateMove_A = X,
-            X + Update_E[!behindBall_G] / updateMove_A = GetBehindBallState_S);
+            X + Update_E[!behindBall_G] / updateMove_A = GetBehindBallState_S,
+            X + Update_E / SET_STOP_PRIMITIVE_ACTION   = X);
     }
 
    private:
     // How large the triangle is that defines the region where the robot is
     // behind the chick origin and ready to chip or kick.
     // We want to keep the region small enough that we won't use the
-    // Chip/KickIntent from too far away (since the Chip/KickIntent doesn't avoid
+    // Chip/KickPrimitive from too far away (since the Chip/KickPrimitive doesn't avoid
     // obstacles and we risk colliding with something), but large enough we can
     // reasonably get in the region and chip/kick the ball successfully. This
     // value is 'X' in the ASCII art below

@@ -39,7 +39,7 @@ TEST_F(ShootOrChipPlayTest, test_shoot_or_chip_play)
         .robot_state = RobotState(Point(1, 2), Vector(-4.6, 0), Angle::half(),
                                   AngularVelocity::zero())});
     setEnemyGoalie(0);
-    setAIPlay(TYPENAME(ShootOrChipPlay));
+    setAIPlay(TbotsProto::PlayName::ShootOrChipPlay);
     setRefereeCommand(RefereeCommand::FORCE_START, RefereeCommand::STOP);
 
     std::vector<ValidationFunction> terminating_validation_functions = {

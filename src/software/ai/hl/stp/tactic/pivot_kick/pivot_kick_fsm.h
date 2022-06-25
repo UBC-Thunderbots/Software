@@ -66,6 +66,7 @@ struct PivotKickFSM
             *StartState_S + Update_E / getPossessionAndPivot_A = DribbleFSM_S,
             DribbleFSM_S + Update_E / getPossessionAndPivot_A, DribbleFSM_S = KickState_S,
             KickState_S + Update_E[!ballKicked_G] / kickBall_A,
-            KickState_S + Update_E[ballKicked_G] = X);
+            KickState_S + Update_E[ballKicked_G] / SET_STOP_PRIMITIVE_ACTION = X,
+            X + Update_E / SET_STOP_PRIMITIVE_ACTION                         = X);
     }
 };

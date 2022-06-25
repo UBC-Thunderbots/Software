@@ -1,5 +1,4 @@
 syntax = 'proto3';
-import "google/protobuf/any.proto";
 
 import "proto/geometry.proto";
 import "proto/world.proto";
@@ -9,12 +8,6 @@ package TbotsProto;
 message PathVisualization
 {
     repeated Path path = 1;
-}
-
-message Obstacles
-{
-    repeated Polygon polygon = 1;
-    repeated Circle circle   = 2;
 }
 
 message NamedValue
@@ -32,4 +25,11 @@ message PassWithRating
 message PassVisualization
 {
     repeated PassWithRating best_passes = 1;
+}
+
+message HRVOVisualization
+{
+    uint32 robot_id                              = 1;
+    repeated VelocityObstacle velocity_obstacles = 2;
+    repeated Circle robots                       = 3;
 }

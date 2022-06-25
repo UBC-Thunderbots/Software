@@ -2,27 +2,37 @@
 
 #include <functional>
 
-#include "software/ai/intent/intent.h"
+#include "proto/primitive/primitive_msg_factory.h"
+#include "proto/tbots_software_msgs.pb.h"
+#include "software/ai/navigator/path_planner/enlsvg_path_planner.h"
 #include "software/util/sml_fsm/sml_fsm.h"
 #include "software/world/world.h"
 
-// This callback is used to return an intent from the fsm
-using SetIntentCallback = std::function<void(std::unique_ptr<Intent>)>;
+using SetPrimitiveCallback = std::function<void(std::unique_ptr<TbotsProto::Primitive>)>;
+using CreateMotionControl =
+    std::function<TbotsProto::MotionControl(const Robot &, const Point &)>;
 
-// The tactic update struct is used to update tactics and set the new intent
+// The tactic update struct is used to update tactics and set the new primitive
 struct TacticUpdate
 {
     TacticUpdate(const Robot &robot, const World &world,
-                 const SetIntentCallback &set_intent_fun)
-        : robot(robot), world(world), set_intent(set_intent_fun)
+                 const SetPrimitiveCallback &set_primitive_fun,
+                 const CreateMotionControl &create_motion_control)
+        : robot(robot),
+          world(world),
+          set_primitive(set_primitive_fun),
+          create_motion_control(create_motion_control)
     {
     }
+
     // updated robot that tactic is assigned to
     Robot robot;
     // updated world
     World world;
-    // callback to return the next intent
-    SetIntentCallback set_intent;
+    // callback to return the next primitive
+    SetPrimitiveCallback set_primitive;
+    // creator for motion control
+    CreateMotionControl create_motion_control;
 };
 
 /**
@@ -30,7 +40,7 @@ struct TacticUpdate
  * composed of the following structs:
  *
  * ControlParams - uniquely defined by each tactic to control the FSM
- * TacticUpdate - common struct that contains Robot, World, and SetIntentCallback
+ * TacticUpdate - common struct that contains Robot, World, and SetPrimitiveCallback
  */
 #define DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS                       \
     struct Update                                                                        \
@@ -46,11 +56,25 @@ struct TacticUpdate
 #define DEFINE_TACTIC_DONE_AND_GET_FSM_STATE                                             \
     bool done() const override                                                           \
     {                                                                                    \
-        return fsm.is(boost::sml::X);                                                    \
+        bool is_done = false;                                                            \
+        if (last_execution_robot.has_value())                                            \
+        {                                                                                \
+            is_done = fsm_map.at(last_execution_robot.value())->is(boost::sml::X);       \
+        }                                                                                \
+        return is_done;                                                                  \
     }                                                                                    \
                                                                                          \
     std::string getFSMState() const override                                             \
     {                                                                                    \
-        std::string state_str = getCurrentFullStateName(fsm);                            \
+        std::string state_str = "";                                                      \
+        if (last_execution_robot.has_value())                                            \
+            state_str =                                                                  \
+                getCurrentFullStateName(*fsm_map.at(last_execution_robot.value()));      \
         return state_str;                                                                \
     }
+
+#define CREATE_MOTION_CONTROL(DESTINATION)                                               \
+    event.common.create_motion_control(event.common.robot, DESTINATION)
+
+#define SET_STOP_PRIMITIVE_ACTION                                                        \
+    [this](auto event) { event.common.set_primitive(createStopPrimitive(false)); }

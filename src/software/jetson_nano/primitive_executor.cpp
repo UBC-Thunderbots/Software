@@ -9,10 +9,12 @@
 #include "software/math/math_functions.h"
 
 PrimitiveExecutor::PrimitiveExecutor(const double time_step,
-                                     const RobotConstants_t& robot_constants)
+                                     const RobotConstants_t& robot_constants,
+                                     const TeamColour friendly_team_colour)
     : current_primitive_(),
       robot_constants_(robot_constants),
-      hrvo_simulator_(static_cast<float>(time_step), robot_constants)
+      hrvo_simulator_(static_cast<float>(time_step), robot_constants,
+                      friendly_team_colour)
 {
 }
 
@@ -69,13 +71,9 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
     const unsigned int robot_id, const Angle& curr_orientation)
 {
     hrvo_simulator_.doStep();
-    // TODO (#2499): Remove if and visualize the HRVO Simulator of all robots
-    if (robot_id == 1)
-    {
-        // All robots should have identical HRVO simulations. To avoid spam, only
-        // the HRVO simulation for robot 0 will be sent to Thunderscope.
-        hrvo_simulator_.visualize(robot_id);
-    }
+
+    // Visualize the HRVO Simulator for the current robot
+    hrvo_simulator_.visualize(robot_id);
 
     switch (current_primitive_.primitive_case())
     {
@@ -88,14 +86,15 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
             auto output = std::make_unique<TbotsProto::DirectControlPrimitive>();
 
             // Discharge the capacitors
-            output->set_charge_mode(
-                TbotsProto::DirectControlPrimitive_ChargeMode_DISCHARGE);
+            output->mutable_power_control()->set_charge_mode(
+                TbotsProto::PowerControl_ChargeMode_DISCHARGE);
 
             return output;
         }
         case TbotsProto::Primitive::kStop:
         {
-            auto prim   = createDirectControlPrimitive(Vector(), AngularVelocity(), 0.0);
+            auto prim   = createDirectControlPrimitive(Vector(), AngularVelocity(), 0.0,
+                                                     TbotsProto::AutoChipOrKick());
             auto output = std::make_unique<TbotsProto::DirectControlPrimitive>(
                 prim->direct_control());
             return output;
@@ -114,11 +113,8 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
 
             auto output = createDirectControlPrimitive(
                 target_velocity, target_angular_velocity,
-                current_primitive_.move().dribbler_speed_rpm());
-
-            // Copy the AutoKickOrChip settings over
-            copyAutoChipOrKick(current_primitive_.move(),
-                               output->mutable_direct_control());
+                current_primitive_.move().dribbler_speed_rpm(),
+                current_primitive_.move().auto_chip_or_kick());
 
             return std::make_unique<TbotsProto::DirectControlPrimitive>(
                 output->direct_control());
@@ -133,30 +129,4 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
         }
     }
     return std::make_unique<TbotsProto::DirectControlPrimitive>();
-}
-
-void PrimitiveExecutor::copyAutoChipOrKick(const TbotsProto::MovePrimitive& src,
-                                           TbotsProto::DirectControlPrimitive* dest)
-{
-    switch (src.auto_chip_or_kick().auto_chip_or_kick_case())
-    {
-        case TbotsProto::AutoChipOrKick::AutoChipOrKickCase::kAutokickSpeedMPerS:
-        {
-            dest->set_autokick_speed_m_per_s(
-                src.auto_chip_or_kick().autokick_speed_m_per_s());
-
-            break;
-        }
-        case TbotsProto::AutoChipOrKick::AutoChipOrKickCase::kAutochipDistanceMeters:
-        {
-            dest->set_autochip_distance_meters(
-                src.auto_chip_or_kick().autochip_distance_meters());
-            break;
-        }
-        case TbotsProto::AutoChipOrKick::AutoChipOrKickCase::AUTO_CHIP_OR_KICK_NOT_SET:
-        {
-            dest->clear_chick_command();
-            break;
-        }
-    }
 }

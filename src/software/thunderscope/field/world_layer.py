@@ -9,7 +9,7 @@ from pyqtgraph.Qt.QtWidgets import *
 
 from software.py_constants import *
 from software.thunderscope.constants import LINE_WIDTH
-from software.thunderscope.colors import Colors
+from software.thunderscope.constants import Colors
 from software.networking.threaded_unix_listener import ThreadedUnixListener
 from software.thunderscope.field.field_layer import FieldLayer
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
@@ -42,6 +42,7 @@ class WorldLayer(FieldLayer):
         self.mouse_clicked = False
 
         self.key_pressed = {}
+        self.display_robot_id = False
 
         self.accepted_keys = [Qt.Key.Key_Control, Qt.Key.Key_I]
         for key in self.accepted_keys:
@@ -59,6 +60,8 @@ class WorldLayer(FieldLayer):
 
         """
         self.key_pressed[event.key()] = True
+        if event.key() == QtCore.Qt.Key.Key_I:
+            self.display_robot_id = not self.display_robot_id
 
     def keyReleaseEvent(self, event):
         """Detect when a key has been released (override)
@@ -304,6 +307,27 @@ class WorldLayer(FieldLayer):
             )
         )
 
+        # Draw Friendly Goal
+        painter.drawRect(
+            QtCore.QRectF(
+                -(field.field_x_length / 2 + field.goal_x_length)
+                * MILLIMETERS_PER_METER,
+                (field.goal_y_length / 2) * MILLIMETERS_PER_METER,
+                (field.goal_x_length) * MILLIMETERS_PER_METER,
+                -(field.goal_y_length) * MILLIMETERS_PER_METER,
+            )
+        )
+
+        # Draw Enemy Goal
+        painter.drawRect(
+            QtCore.QRectF(
+                (field.field_x_length / 2) * MILLIMETERS_PER_METER,
+                (field.goal_y_length / 2) * MILLIMETERS_PER_METER,
+                (field.goal_x_length) * MILLIMETERS_PER_METER,
+                -(field.goal_y_length) * MILLIMETERS_PER_METER,
+            )
+        )
+
         # Draw Centre Circle
         painter.drawEllipse(
             self.createCircle(0, 0, field.center_circle_radius * MILLIMETERS_PER_METER)
@@ -339,7 +363,7 @@ class WorldLayer(FieldLayer):
                 (robot.current_state.global_position.y_meters * MILLIMETERS_PER_METER)
                 - ROBOT_MAX_RADIUS_MILLIMETERS,
             )
-            robot_id_map[robot.id].setVisible(self.key_pressed[Qt.Key.Key_I])
+            robot_id_map[robot.id].setVisible(self.display_robot_id)
 
             painter.setPen(pg.mkPen(color))
             painter.setBrush(pg.mkBrush(color))

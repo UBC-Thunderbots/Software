@@ -1,11 +1,13 @@
-#include "enlsvg_path_planner.h"
+#include "software/ai/navigator/path_planner/enlsvg_path_planner.h"
 
 EnlsvgPathPlanner::EnlsvgPathPlanner(const Rectangle &navigable_area,
                                      const std::vector<ObstaclePtr> &obstacles,
                                      double grid_boundary_offset, double resolution)
     : resolution(resolution),
-      num_grid_rows(static_cast<int>(round(navigable_area.xLength() / resolution))),
-      num_grid_cols(static_cast<int>(round(navigable_area.yLength() / resolution))),
+      num_grid_rows(
+          static_cast<unsigned int>(round(navigable_area.xLength() / resolution))),
+      num_grid_cols(
+          static_cast<unsigned int>(round(navigable_area.yLength() / resolution))),
       origin(navigable_area.negXNegYCorner()),
       max_navigable_y_enlsvg_point(
           convertPointToEnlsvgPoint(navigable_area.posXPosYCorner()).y),
@@ -75,7 +77,8 @@ std::optional<Path> EnlsvgPathPlanner::findPath(const Point &start,
     {
         LOG(WARNING)
             << "Unable to find a path; Unable to find a nearby start and/or end point that isn't blocked "
-            << "within the navigable area; no path found" << std::endl;
+            << "within the navigable area; no path found between " << start << " and "
+            << end << std::endl;
         return std::nullopt;
     }
 
@@ -87,13 +90,21 @@ std::optional<Path> EnlsvgPathPlanner::findPath(const Point &start,
         return Path({start, end});
     }
 
+    // If the new unblocked points are equal, set the unblocked end point as the end point
+    // of the path
+    if (new_start == new_end)
+    {
+        return Path({start, convertEnlsvgPointToPoint(new_end.value())});
+    }
+
     EnlsvgPath enlsvgPath =
         enlsvg_algo->computePath(*enlsvg_mem, new_start.value().x, new_start.value().y,
                                  new_end.value().x, new_end.value().y);
     std::optional<Path> path = convertEnlsvgPathToPath(enlsvgPath);
     if (path == std::nullopt)
     {
-        LOG(WARNING) << "The path planner was unable to find a path" << std::endl;
+        LOG(WARNING) << "The path planner was unable to find a path between " << start
+                     << " and " << end << std::endl;
         return std::nullopt;
     }
 
@@ -200,4 +211,17 @@ EnlsvgPathPlanner::findClosestUnblockedEnlsvgPoint(const EnlsvgPoint &ep) const
 bool EnlsvgPathPlanner::isBlocked(const EnlsvgPoint &ep) const
 {
     return !isCoordNavigable(ep) || enlsvg_grid->isBlocked(ep.x, ep.y);
+}
+
+double EnlsvgPathPlanner::pathLength(const std::vector<Point> &path_points,
+                                     const Point &robot_position)
+{
+    double length = 0.0;
+    Point prev_pt = robot_position;
+    for (const auto &pt : path_points)
+    {
+        length += (pt - prev_pt).length();
+        prev_pt = pt;
+    }
+    return length;
 }

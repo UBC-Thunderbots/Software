@@ -7,6 +7,8 @@ py_library(
     srcs = ["field.py"],
     deps = [
         ":field_layer",
+        "//software/thunderscope/replay:proto_player",
+        "//software/thunderscope/replay:replay_controls",
         requirement("pyqtgraph"),
     ],
 )
@@ -22,6 +24,16 @@ py_library(
 py_library(
     name = "obstacle_layer",
     srcs = ["obstacle_layer.py"],
+    deps = [
+        ":field_layer",
+        "//software/thunderscope:thread_safe_buffer",
+        requirement("pyqtgraph"),
+    ],
+)
+
+py_library(
+    name = "hrvo_layer",
+    srcs = ["hrvo_layer.py"],
     deps = [
         ":field_layer",
         "//software/thunderscope:thread_safe_buffer",

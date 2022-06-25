@@ -4,7 +4,7 @@ from proto.import_all_protos import *
 
 from pyqtgraph.Qt import QtCore, QtGui
 
-from software.thunderscope.colors import Colors
+from software.thunderscope.constants import Colors
 from software.py_constants import *
 from software.networking.threaded_unix_listener import ThreadedUnixListener
 from software.thunderscope.field.field_layer import FieldLayer
@@ -15,11 +15,13 @@ class ValidationLayer(FieldLayer):
 
     PASSED_VALIDATION_PERSISTANCE_TIMEOUT_S = 1.0
 
-    def __init__(self, buffer_size=10):
+    def __init__(self, buffer_size=10, test_name_pos_x=0, test_name_pos_y=3200):
         """Visualizes validation
 
         :param buffer_size: The buffer size, set higher for smoother plots.
                             Set lower for more realtime plots. Default is arbitrary
+        :param test_name_pos_x: The x position of the test name
+        :param test_name_pos_y: The y position of the test name
 
         """
         FieldLayer.__init__(self)
@@ -28,6 +30,10 @@ class ValidationLayer(FieldLayer):
         self.validation_set_buffer = ThreadSafeBuffer(buffer_size, ValidationProtoSet)
         self.cached_eventually_validation_set = ValidationProtoSet()
         self.cached_always_validation_set = ValidationProtoSet()
+
+        self.test_name = pg.TextItem("")
+        self.test_name.setParentItem(self)
+        self.test_name.setPos(test_name_pos_x, test_name_pos_y)
 
         self.passed_validation_timeout_pairs = []
 
@@ -82,6 +88,13 @@ class ValidationLayer(FieldLayer):
                 self.cached_always_validation_set = self.validation_set
             else:
                 self.cached_eventually_validation_set = self.validation_set
+
+        # Draw test name
+        if (
+            self.test_name.toPlainText()
+            != self.cached_eventually_validation_set.test_name
+        ):
+            self.test_name.setText(self.cached_eventually_validation_set.test_name)
 
         # Draw Always Validation
         for validation in self.cached_always_validation_set.validations:

@@ -4,7 +4,7 @@
 
 MoveTactic::MoveTactic()
     : Tactic({RobotCapability::Move}),
-      fsm(),
+      fsm_map(),
       control_params{
           .destination            = Point(),
           .final_orientation      = Angle::zero(),
@@ -15,6 +15,10 @@ MoveTactic::MoveTactic()
           .max_allowed_speed_mode = TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
           .target_spin_rev_per_s  = 0.0}
 {
+    for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)
+    {
+        fsm_map[id] = std::make_unique<FSM<MoveFSM>>();
+    }
 }
 
 void MoveTactic::updateControlParams(
@@ -49,19 +53,14 @@ void MoveTactic::updateControlParams(
     control_params.target_spin_rev_per_s  = 0.0;
 }
 
-double MoveTactic::calculateRobotCost(const Robot &robot, const World &world) const
+void MoveTactic::updatePrimitive(const TacticUpdate &tactic_update, bool reset_fsm)
 {
-    // Prefer robots closer to the destination
-    // We normalize with the total field length so that robots that are within the field
-    // have a cost less than 1
-    double cost = (robot.position() - control_params.destination).length() /
-                  world.field().totalXLength();
-    return std::clamp<double>(cost, 0, 1);
-}
-
-void MoveTactic::updateIntent(const TacticUpdate &tactic_update)
-{
-    fsm.process_event(MoveFSM::Update(control_params, tactic_update));
+    if (reset_fsm)
+    {
+        fsm_map[tactic_update.robot.id()] = std::make_unique<FSM<MoveFSM>>();
+    }
+    fsm_map.at(tactic_update.robot.id())
+        ->process_event(MoveFSM::Update(control_params, tactic_update));
 }
 
 void MoveTactic::accept(TacticVisitor &visitor) const

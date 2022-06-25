@@ -15,10 +15,6 @@ class PassingLayer(FieldLayer):
     # If we no longer receive new passes, we need to stop drawing the old one.
     PASS_VISUALIZATION_TIMEOUT_S = 0.5
 
-    # We receive a list of passes, ranked by their score. We want to render the top
-    # NUM_TOP_PASSES_TO_RENDER passes.
-    NUM_TOP_PASSES_TO_RENDER = 3
-
     def __init__(self, buffer_size=5):
         """Initializes the passing layer
 
@@ -32,14 +28,6 @@ class PassingLayer(FieldLayer):
         )
         self.cached_pass_vis = PassVisualization()
         self.timeout = time.time() + PassingLayer.PASS_VISUALIZATION_TIMEOUT_S
-
-        # Test item to show scores
-        self.pass_rating_text_items = [
-            pg.TextItem() for _ in range(PassingLayer.NUM_TOP_PASSES_TO_RENDER)
-        ]
-
-        for text_item in self.pass_rating_text_items:
-            text_item.setParentItem(self)
 
     def paint(self, painter, option, widget):
         """Paint this layer
@@ -58,9 +46,6 @@ class PassingLayer(FieldLayer):
         if not pass_vis:
             pass_vis = self.cached_pass_vis
 
-            for text_item in self.pass_rating_text_items:
-                text_item.setText("")
-
             # If we haven't received pass visualizations for a bit, clear the layer
             if time.time() > self.timeout:
                 return
@@ -73,35 +58,33 @@ class PassingLayer(FieldLayer):
             pass_vis.best_passes, key=lambda x: x.rating, reverse=True
         )
 
-        for pass_num, pass_with_rating in enumerate(
-            sorted_pass_with_rating[0 : PassingLayer.NUM_TOP_PASSES_TO_RENDER]
-        ):
+        pen = pg.mkPen(
+            QtGui.QColor(255, 0, 0, 80), width=2, style=QtCore.Qt.PenStyle.DashLine
+        )
+        painter.setPen(pen)
 
-            # Lets color the best pass green and rest white
-            painter.setPen(
-                pg.mkPen(
-                    "green" if pass_num == 0 else "white", width=constants.LINE_WIDTH
-                )
-            )
-
-            painter.drawEllipse(
-                self.createCircle(
-                    pass_with_rating.pass_.receiver_point.x_meters
-                    * MILLIMETERS_PER_METER,
-                    pass_with_rating.pass_.receiver_point.y_meters
-                    * MILLIMETERS_PER_METER,
-                    ROBOT_MAX_RADIUS_MILLIMETERS * 4,
-                )
-            )
-
-            # Draw the pass rating
-            text_item = self.pass_rating_text_items[pass_num]
-            text_item.setText(
-                str("Pass {} {:.2f}".format(pass_num, pass_with_rating.rating))
-            )
-            text_item.setPos(
-                pass_with_rating.pass_.receiver_point.x_meters * MILLIMETERS_PER_METER
-                - 4 * ROBOT_MAX_RADIUS_MILLIMETERS,
-                pass_with_rating.pass_.receiver_point.y_meters * MILLIMETERS_PER_METER
-                - 4 * ROBOT_MAX_RADIUS_MILLIMETERS,
-            )
+        for pass_with_rating in sorted_pass_with_rating[0:1]:
+            polygon_points = [
+                QtCore.QPoint(
+                    int(
+                        pass_with_rating.pass_.passer_point.x_meters
+                        * MILLIMETERS_PER_METER
+                    ),
+                    int(
+                        pass_with_rating.pass_.passer_point.y_meters
+                        * MILLIMETERS_PER_METER
+                    ),
+                ),
+                QtCore.QPoint(
+                    int(
+                        pass_with_rating.pass_.receiver_point.x_meters
+                        * MILLIMETERS_PER_METER
+                    ),
+                    int(
+                        pass_with_rating.pass_.receiver_point.y_meters
+                        * MILLIMETERS_PER_METER
+                    ),
+                ),
+            ]
+            poly = QtGui.QPolygon(polygon_points)
+            painter.drawPolyline(poly)

@@ -1,26 +1,20 @@
 package(default_visibility = ["//visibility:public"])
 
-cc_library(
-    name = "simulated_test_fixture_cpp",
-    testonly = True,
-    srcs = ["simulated_test_fixture.cpp"],
-    hdrs = ["simulated_test_fixture.h"],
+load("@simulated_tests_deps//:requirements.bzl", "requirement")
+
+py_test(
+    name = "simulated_test_ball_model",
+    srcs = [
+        "simulated_test_ball_model.py",
+    ],
+    # TODO (#2619) Remove tag to run in parallel
+    tags = [
+        "exclusive",
+    ],
     deps = [
-        "//software/gui/drawing:navigator",
-        "//software/gui/full_system:threaded_full_system_gui",
-        "//software/logger",
-        "//proto/message_translation:primitive_google_to_nanopb_converter",
-        "//proto/message_translation:tbots_protobuf",
-        "//software/sensor_fusion",
-        "//software/simulated_tests/validation:non_terminating_function_validator",
-        "//software/simulated_tests/validation:terminating_function_validator",
-        "//software/simulation:simulator",
-        "//software/test_util",
-        "//software/time:duration",
-        "//proto/logging:proto_logger",
-        "//shared/test_util:tbots_gtest_main",
-        # TODO (#1889) Remove this dep after optional params are implemented
-        "//software/ai/hl/stp/play:halt_play",
+        "//software/simulated_tests:simulated_test_fixture",
+        "//software/simulated_tests:validation",
+        requirement("pytest"),
     ],
 )
 
@@ -30,18 +24,15 @@ cc_library(
     srcs = ["simulated_er_force_sim_test_fixture.cpp"],
     hdrs = ["simulated_er_force_sim_test_fixture.h"],
     deps = [
-        "//software/gui/drawing:navigator",
-        "//software/gui/full_system:threaded_full_system_gui",
         "//software/logger",
-        "//proto/message_translation:primitive_google_to_nanopb_converter",
         "//proto/message_translation:tbots_protobuf",
+        "//proto:play_info_msg_cc_proto",
         "//software/sensor_fusion",
         "//software/simulated_tests/validation:non_terminating_function_validator",
         "//software/simulated_tests/validation:terminating_function_validator",
         "//software/simulation:er_force_simulator",
         "//software/test_util",
         "//software/time:duration",
-        "//proto/logging:proto_logger",
         "//shared/test_util:tbots_gtest_main",
         "//shared/test_util",
         # TODO (#1889) Remove this dep after optional params are implemented
@@ -62,36 +53,6 @@ cc_library(
     ],
 )
 
-cc_library(
-    name = "simulated_tactic_test_fixture",
-    testonly = True,
-    srcs = ["simulated_tactic_test_fixture.cpp"],
-    hdrs = ["simulated_tactic_test_fixture.h"],
-    deps = [
-        ":simulated_test_fixture_cpp",
-        "//software/ai/hl/stp/tactic",
-        "//software/ai/navigator",
-        "//software/ai/navigator/path_manager:velocity_obstacle_path_manager",
-        "//software/ai/navigator/path_planner:theta_star_path_planner",
-        "@gtest",
-    ],
-)
-
-cc_library(
-    name = "simulated_er_force_sim_tactic_test_fixture",
-    testonly = True,
-    srcs = ["simulated_er_force_sim_tactic_test_fixture.cpp"],
-    hdrs = ["simulated_er_force_sim_tactic_test_fixture.h"],
-    deps = [
-        ":simulated_er_force_sim_test_fixture",
-        "//software/ai/hl/stp/tactic",
-        "//software/ai/navigator",
-        "//software/ai/navigator/path_manager:velocity_obstacle_path_manager",
-        "//software/ai/navigator/path_planner:theta_star_path_planner",
-        "@gtest",
-    ],
-)
-
 py_library(
     name = "simulated_test_fixture",
     srcs = [
@@ -108,6 +69,7 @@ py_library(
         "//software/simulated_tests:validation",
         "//software/thunderscope",
         "//software/thunderscope:binary_context_managers",
+        "//software/thunderscope/replay:proto_logger",
     ],
 )
 
@@ -117,6 +79,7 @@ py_library(
         "ball_enters_region.py",
         "ball_moves_forward.py",
         "ball_speed_threshold.py",
+        "ball_stops_in_region.py",
         "excessive_dribbling.py",
         "friendly_has_ball_possession.py",
         "robot_enters_region.py",

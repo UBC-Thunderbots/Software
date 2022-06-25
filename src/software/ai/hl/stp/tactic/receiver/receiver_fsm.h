@@ -6,8 +6,6 @@
 #include "software/ai/hl/stp/tactic/kick/kick_fsm.h"
 #include "software/ai/hl/stp/tactic/move/move_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
-#include "software/ai/intent/intent.h"
-#include "software/ai/intent/move_intent.h"
 #include "software/ai/passing/pass.h"
 #include "software/geom/algorithms/closest_point.h"
 #include "software/logger/logger.h"
@@ -173,6 +171,7 @@ struct ReceiverFSM
             OneTouchShotState_S + Update_E[!passFinished_G && strayPass_G] /
                                       adjustReceive_A = ReceiveAndDribbleState_S,
             ReceiveAndDribbleState_S + Update_E[passFinished_G] / adjustReceive_A = X,
-            OneTouchShotState_S + Update_E[passFinished_G] / updateOnetouch_A     = X);
+            OneTouchShotState_S + Update_E[passFinished_G] / updateOnetouch_A     = X,
+            X + Update_E / SET_STOP_PRIMITIVE_ACTION                              = X);
     }
 };

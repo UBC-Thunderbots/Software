@@ -14,9 +14,11 @@ class PrimitiveExecutor
      * @param time_step Time step which this primitive executor operates in
      * @param robot_constants The robot constants for the robot which uses this primitive
      * executor
+     * @param friendly_team_colour The colour of the friendly team
      */
     explicit PrimitiveExecutor(const double time_step,
-                               const RobotConstants_t& robot_constants);
+                               const RobotConstants_t& robot_constants,
+                               const TeamColour friendly_team_colour);
 
     /**
      * Update primitive executor with a new Primitive Set
@@ -77,18 +79,6 @@ class PrimitiveExecutor
      */
     AngularVelocity getTargetAngularVelocity(
         const TbotsProto::MovePrimitive& move_primitive, const Angle& curr_orientation);
-
-    /*
-     * The AutoKickOrChip settings from the move primitive need to get copied over
-     * to the direct control primitive.
-     *
-     * TODO (#2340) Remove
-     *
-     * @param src The move primitive to copy from
-     * @param dest The direct primitive to copy to
-     */
-    void copyAutoChipOrKick(const TbotsProto::MovePrimitive& src,
-                            TbotsProto::DirectControlPrimitive* dest);
 
     TbotsProto::Primitive current_primitive_;
     RobotConstants_t robot_constants_;

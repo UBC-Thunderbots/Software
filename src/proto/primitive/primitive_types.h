@@ -2,6 +2,7 @@
 
 #include "software/util/make_enum/make_enum.h"
 
+MAKE_ENUM(ChickerCommandMode, KICK, CHIP, AUTOCHIPORKICK);
 MAKE_ENUM(AutoChipOrKickMode, AUTOKICK, AUTOCHIP, OFF);
 
 struct AutoChipOrKick

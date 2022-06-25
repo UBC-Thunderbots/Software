@@ -12,6 +12,7 @@ cc_library(
     ],
     deps = [
         "//shared:constants",
+        "//software/ai/evaluation:calc_best_shot",
         "//software/ai/hl/stp/tactic",
         "//software/ai/hl/stp/tactic/dribble:dribble_tactic",
         "//software/ai/hl/stp/tactic/kick:kick_tactic",
@@ -38,7 +39,7 @@ cc_test(
     deps = [
         ":receiver_tactic",
         "//shared/test_util:tbots_gtest_main",
-        "//software/simulated_tests:simulated_er_force_sim_tactic_test_fixture",
+        "//software/simulated_tests:simulated_er_force_sim_play_test_fixture",
         "//software/simulated_tests/terminating_validation_functions",
         "//software/simulated_tests/validation:validation_function",
         "//software/test_util",
