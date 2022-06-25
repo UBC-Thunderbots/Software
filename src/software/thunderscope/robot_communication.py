@@ -4,7 +4,6 @@ from software.python_bindings import *
 from proto.import_all_protos import *
 import threading
 
-
 class RobotCommunication(object):
 
     """ Communicate with the robots """
@@ -47,7 +46,7 @@ class RobotCommunication(object):
         except Exception:
             raise Exception("Could not find estop, make sure its plugged in")
 
-        self.run_thread = threading.Thread(target=self.run)
+
 
     def run(self):
         """Forward World and PrimitiveSet protos from fullsystem to the robots.
@@ -67,13 +66,13 @@ class RobotCommunication(object):
 
                 # Send the world
                 world = self.world_buffer.get(block=True)
-                self.world_mcast_sender.send(world)
+                self.send_world.send_proto(world)
 
                 # Send the primitive set
                 primitive_set = self.primitive_buffer.get(block=False)
 
                 if self.estop_reader.isEstopPlay():
-                    self.primitive_set_mcast_sender.send(primitive_set)
+                    self.send_primitive_mcast_sender.send_proto(primitive_set)
 
     def connect_fullsystem_to_robots(self):
         """ Connect the robots to fullsystem """
@@ -137,6 +136,11 @@ class RobotCommunication(object):
         self.send_world = WorldProtoSender(
             self.multicast_channel + "%" + self.interface, VISION_PORT, True
         )
+
+        self.connect_fullsystem_to_robots()
+        self.run_thread = threading.Thread(target=self.run)
+        self.run_thread.start()
+
 
     def __exit__(self):
         """Exit RobotCommunication context manager
