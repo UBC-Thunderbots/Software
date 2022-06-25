@@ -40,7 +40,6 @@ TbotsProto::PowerStatus PowerService::poll(const TbotsProto::PowerControl& comma
     TbotsProto_PowerFrame status_frame = TbotsProto_PowerFrame_init_default;
     if (unmarshalUartPacket(power_status, status_frame))
     {
-        LOG(DEBUG) << "Command status read successfully";
         status = status_frame.power_msg.power_status;
     }
     else
