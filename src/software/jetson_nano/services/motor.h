@@ -34,7 +34,8 @@ class MotorService
      * @param motor The motor msg to unpack and execute on the motors
      * @returns MotorStatus The status of all the drive units
      */
-    TbotsProto::MotorStatus poll(const TbotsProto::MotorControl& motor_control, double time_elapsed_since_last_poll_s);
+    TbotsProto::MotorStatus poll(const TbotsProto::MotorControl& motor_control,
+                                 double time_elapsed_since_last_poll_s);
     void setXYTheta(double x, double y, double rad_per_s);
 
     /**
@@ -169,6 +170,22 @@ class MotorService
      */
     int wheelVelocityToElectricalRpm(double wheel_velcocity);
 
+    /**
+     * Convert electrical rpm to dribbler velocity.
+     *
+     * @param electrical_rpm The electrical rpm to convert
+     *
+     */
+    double electricalRpmToDribblerVelocity(int electrical_rpm);
+
+    /**
+     * Convert dribbler velocity to electrical rpm.
+     *
+     * @param dribbler_velocity The dribbler velocity in meters per second
+     *
+     */
+    int dribblerVelocityToElectricalRpm(double dribbler_velcocity);
+    
     /**
      * Trinamic API Binding function
      *

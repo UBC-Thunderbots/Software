@@ -271,7 +271,8 @@ bool MotorService::checkDriverFault(uint8_t motor)
 }
 
 
-TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor, double time_elapsed_since_last_poll_s)
+TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor,
+                                           double time_elapsed_since_last_poll_s)
 {
     CHECK(encoder_calibrated_[FRONT_LEFT_MOTOR_CHIP_SELECT] &&
           encoder_calibrated_[FRONT_RIGHT_MOTOR_CHIP_SELECT] &&
@@ -307,8 +308,6 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
     {
         case TbotsProto::MotorControl::DriveControlCase::kDirectPerWheelControl:
         {
-            LOG(DEBUG) << "IN DIRECT CONTROL";
-            LOG(DEBUG) << motor.DebugString();
             double target_front_left_velocity =
                 rampVelocity(electricalRpmToWheelVelocity(motor.direct_per_wheel_control().front_left_wheel_rpm()), electricalRpmToWheelVelocity(front_left_rpm), time_elapsed_since_last_poll_s);
             double target_front_right_velocity =
@@ -320,18 +319,18 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
 
             tmc4671_setTargetVelocity(
                     FRONT_LEFT_MOTOR_CHIP_SELECT,
-                    static_cast<int>(electricalRpmToWheelVelocity(target_front_left_velocity));
+                    wheelVelocityToElectricalRpm(target_front_left_velocity));
             tmc4671_setTargetVelocity(
                     FRONT_RIGHT_MOTOR_CHIP_SELECT,
-                    static_cast<int>(electricalRpmToWheelVelocity(target_front_right_velocity));
+                    wheelVelocityToElectricalRpm(target_front_right_velocity));
             tmc4671_setTargetVelocity(
                     BACK_LEFT_MOTOR_CHIP_SELECT,
-                    static_cast<int>(electricalRpmToWheelVelocity(target_back_left_velocity));
+                    wheelVelocityToElectricalRpm(target_back_left_velocity));
             tmc4671_setTargetVelocity(
                     BACK_RIGHT_MOTOR_CHIP_SELECT,
-                    static_cast<int>(electricalRpmToWheelVelocity(target_back_right_velocity));
-
-            tmc4671_setTargetVelocity(DRIBBLER_MOTOR_CHIP_SELECT, static_cast<int>(motor.dribbler_speed_rpm()));
+                    wheelVelocityToElectricalRpm(target_back_right_velocity));
+            tmc4671_setTargetVelocity(DRIBBLER_MOTOR_CHIP_SELECT,
+                                      static_cast<int>(motor.dribbler_speed_rpm()));
 
             break;
         }
@@ -349,17 +348,17 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
                 target_euclidean_velocity, current_wheel_speeds);
 
             tmc4671_setTargetVelocity(
-                    FRONT_RIGHT_MOTOR_CHIP_SELECT,
-                    static_cast<int>(target_speeds[0] / MECHANICAL_MPS_PER_ELECTRICAL_RPM));
+                FRONT_RIGHT_MOTOR_CHIP_SELECT,
+                static_cast<int>(target_speeds[0] / MECHANICAL_MPS_PER_ELECTRICAL_RPM));
             tmc4671_setTargetVelocity(
-                    FRONT_LEFT_MOTOR_CHIP_SELECT,
-                    static_cast<int>(target_speeds[1] / MECHANICAL_MPS_PER_ELECTRICAL_RPM));
+                FRONT_LEFT_MOTOR_CHIP_SELECT,
+                static_cast<int>(target_speeds[1] / MECHANICAL_MPS_PER_ELECTRICAL_RPM));
             tmc4671_setTargetVelocity(
-                    BACK_LEFT_MOTOR_CHIP_SELECT,
-                    static_cast<int>(target_speeds[2] / MECHANICAL_MPS_PER_ELECTRICAL_RPM));
+                BACK_LEFT_MOTOR_CHIP_SELECT,
+                static_cast<int>(target_speeds[2] / MECHANICAL_MPS_PER_ELECTRICAL_RPM));
             tmc4671_setTargetVelocity(
-                    BACK_RIGHT_MOTOR_CHIP_SELECT,
-                    static_cast<int>(target_speeds[3] / MECHANICAL_MPS_PER_ELECTRICAL_RPM));
+                BACK_RIGHT_MOTOR_CHIP_SELECT,
+                static_cast<int>(target_speeds[3] / MECHANICAL_MPS_PER_ELECTRICAL_RPM));
 
             tmc4671_setTargetVelocity(
                 DRIBBLER_MOTOR_CHIP_SELECT,
@@ -417,14 +416,15 @@ double MotorService::rampVelocity(double velocity_target, double velocity_curren
     // Calculate velocity delta using kinematic equation: dv = a*t
     double velocity_delta = robot_constants_.robot_max_acceleration_m_per_s_2 * time_ramp;
     double ramp_velocity  = 0;
+    double wiggle_room = 0.1;
 
     // Case: accelerating
-    if (velocity_target > velocity_current + velocity_delta)
+    if (velocity_target > velocity_current + velocity_delta + wiggle_room)
     {
         ramp_velocity = velocity_current + velocity_delta;
     }
     // Case: deccelerating
-    else if (velocity_target < velocity_current - velocity_delta)
+    else if (velocity_target < velocity_current - velocity_delta - wiggle_room)
     {
         ramp_velocity = velocity_current - velocity_delta;
     }
@@ -453,6 +453,15 @@ int MotorService::wheelVelocityToElectricalRpm(double wheel_velocity)
 	return static_cast<int>(wheel_velocity / MECHANICAL_MPS_PER_ELECTRICAL_RPM);
 }
 
+double MotorService::electricalRpmToDribblerVelocity(int electrical_rpm)
+{
+	return MECHANICAL_MPS_PER_ELECTRICAL_RPM * static_cast<double>(electrical_rpm);
+}
+
+int MotorService::dribblerVelocityToElectricalRpm(double dribbler_velocity)
+{
+	return static_cast<int>(dribbler_velocity / MECHANICAL_MPS_PER_ELECTRICAL_RPM);
+}
 
 // Both the TMC4671 (the controller) and the TMC6100 (the driver) respect
 // the same SPI interface. So when we bind the API, we can use the same

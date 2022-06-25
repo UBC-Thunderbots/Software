@@ -125,7 +125,7 @@ void Thunderloop::runLoop()
 
             // If the primitive msg is new, update the internal buffer
             // and start the new primitive.
-            if (new_primitive_set.time_sent().epoch_timestamp_seconds() >
+            if (new_primitive_set.time_sent().epoch_timestamp_seconds() >=
                 primitive_set_.time_sent().epoch_timestamp_seconds())
             {
                 // Save new primitive set
@@ -195,7 +195,8 @@ void Thunderloop::runLoop()
             // Motor Service: execute the motor control command
             {
                 ScopedTimespecTimer timer(&poll_time);
-                motor_status_ = motor_service_->poll(direct_control_.motor_control(), 1.0/loop_hz_);
+                motor_status_ =
+                    motor_service_->poll(direct_control_.motor_control(), 1.0 / loop_hz_);
                 primitive_executor_.updateLocalVelocity(
                     createVector(motor_status_.local_velocity()));
             }
