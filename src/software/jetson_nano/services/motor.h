@@ -34,7 +34,7 @@ class MotorService
      * @param motor The motor msg to unpack and execute on the motors
      * @returns MotorStatus The status of all the drive units
      */
-    TbotsProto::MotorStatus poll(const TbotsProto::MotorControl& motor_control);
+    TbotsProto::MotorStatus poll(const TbotsProto::MotorControl& motor_control, double time_elapsed_since_last_poll_s);
     void setXYTheta(double x, double y, double rad_per_s);
 
     /**
@@ -104,7 +104,10 @@ class MotorService
      * with the TMC6100 EVAL to get the motor spinning.
      *
      * Then using the exported registers as a baseline, you can use the
-     * runOpenLoopCalibrationRoutine and plot the generated csvs. These csvs capture the data for encoder calibration and adc configuration, the two most important steps for the motor to work. Page 143 (title Setup Guidelines) of the TMC4671 is very useful. @param motor The motor to configure (the same value as the chip select) */
+     * runOpenLoopCalibrationRoutine and plot the generated csvs. These csvs capture the
+     * data for encoder calibration and adc configuration, the two most important steps
+     * for the motor to work. Page 143 (title Setup Guidelines) of the TMC4671 is very
+     * useful. @param motor The motor to configure (the same value as the chip select) */
     void configurePWM(uint8_t motor);
     void configureDribblerPI(uint8_t motor);
     void configureDrivePI(uint8_t motor);
@@ -147,7 +150,8 @@ class MotorService
      * @param time_ramp The ramping time
      *
      */
-    double rampVelocity(double velocity_target, double velocity_current, double time_ramp);
+    double rampVelocity(double velocity_target, double velocity_current,
+                        double time_ramp);
 
     /**
      * Trinamic API Binding function

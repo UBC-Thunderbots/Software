@@ -69,6 +69,8 @@ void Thunderloop::runLoop()
     for (;;)
     {
         {
+            redis_client_->set("/battery_voltage",
+                               std::to_string(power_status_.battery_voltage()));
             // Wait until next shot
             //
             // Note: CLOCK_MONOTONIC is used over CLOCK_REALTIME since
@@ -186,7 +188,6 @@ void Thunderloop::runLoop()
             {
                 ScopedTimespecTimer timer(&poll_time);
                 power_status_ = power_service_->poll(direct_control_.power_control());
-                LOG(DEBUG) << power_status_.DebugString();
             }
             thunderloop_status_.set_power_service_poll_time_ns(
                 static_cast<unsigned long>(poll_time.tv_nsec));
@@ -194,7 +195,7 @@ void Thunderloop::runLoop()
             // Motor Service: execute the motor control command
             {
                 ScopedTimespecTimer timer(&poll_time);
-                //motor_status_ = motor_service_->poll(direct_control_.motor_control());
+                // motor_status_ = motor_service_->poll(direct_control_.motor_control());
                 primitive_executor_.updateLocalVelocity(
                     createVector(motor_status_.local_velocity()));
             }
@@ -203,7 +204,7 @@ void Thunderloop::runLoop()
 
             // Update Robot Status with poll responses
             *(robot_status_.mutable_thunderloop_status()) = thunderloop_status_;
-            //*(robot_status_.mutable_motor_status())       = motor_status_;
+            *(robot_status_.mutable_motor_status())       = motor_status_;
             *(robot_status_.mutable_power_status())       = power_status_;
             *(robot_status_.mutable_jetson_status())      = jetson_status_;
         }
