@@ -2,9 +2,11 @@
 
 #include <Wire.h>
 
+#include "pins.h"
+
 PowerMonitor::PowerMonitor()
 {
-    Wire.begin(PM_SDA, PM_SCL);
+    Wire.begin(13, 14);
 
     monitor = std::make_shared<LTC4151>();
     monitor->init(LTC4151::L, LTC4151::L);

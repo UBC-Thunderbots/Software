@@ -21,15 +21,15 @@ class HomeScreen(Screen):
         """
         actions = [
             {
-                "redis key": "robot id",
-                "value": redis_dict["robot id"],
+                "redis key": "/robot_id",
+                "value": redis_dict["/robot_id"],
                 "type": float,
                 "delta": 1,
                 "screen action": screen_actions.EDIT_SCREEN,
             },
             {
-                "redis key": "channel id",
-                "value": redis_dict["channel id"],
+                "redis key": "/channel_id",
+                "value": redis_dict["/channel_id"],
                 "type": float,
                 "delta": 1,
                 "screen action": screen_actions.EDIT_SCREEN,
@@ -42,9 +42,9 @@ class HomeScreen(Screen):
                 "screen action": screen_actions.CHANGE_SCREEN,
             },
         ]
-        self.battery_voltage = redis_dict["battery voltage"]
-        self.cap_voltage = redis_dict["cap voltage"]
-        self.packet_loss = redis_dict["packet loss"]
+        self.battery_voltage = redis_dict["/battery_voltage"]
+        self.cap_voltage = redis_dict["/cap_voltage"]
+        self.packet_loss = redis_dict["/packet_loss"]
 
         def draw_screen():
             """ Home Screen Layout """
@@ -189,9 +189,9 @@ class HomeScreen(Screen):
 
                 self.actions[i]["value"] = redis_dict[self.actions[i]["redis key"]]
 
-        self.battery_voltage = redis_dict["battery voltage"]
-        self.cap_voltage = redis_dict["cap voltage"]
-        self.packet_loss = redis_dict["packet loss"]
+        self.battery_voltage = redis_dict["/battery_voltage"]
+        self.cap_voltage = redis_dict["/cap_voltage"]
+        self.packet_loss = redis_dict["/packet_loss"]
 
 
 # For testing
