@@ -168,7 +168,7 @@ class MotorService
      * @param wheel_velocity The wheel velocity in meters per second
      *
      */
-    int wheelVelocityToElectricalRpm(double wheel_velcocity);
+    int wheelVelocityToElectricalRpm(double wheel_velocity);
 
     /**
      * Convert electrical rpm to dribbler velocity.

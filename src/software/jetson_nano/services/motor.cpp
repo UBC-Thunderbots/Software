@@ -162,16 +162,16 @@ void MotorService::setXYTheta(double x, double y, double rad_per_s)
 
     tmc4671_setTargetVelocity(
         FRONT_RIGHT_MOTOR_CHIP_SELECT,
-        static_cast<int>(wheelVelocityToElectricalRpm(target_speeds[0]));
+        wheelVelocityToElectricalRpm(target_speeds[0]));
     tmc4671_setTargetVelocity(
         FRONT_LEFT_MOTOR_CHIP_SELECT,
-        static_cast<int>(wheelVelocityToElectricalRpm(target_speeds[1]));
+        wheelVelocityToElectricalRpm(target_speeds[1]));
     tmc4671_setTargetVelocity(
         BACK_LEFT_MOTOR_CHIP_SELECT,
-        static_cast<int>(wheelVelocityToElectricalRpm(target_speeds[2]));
+        wheelVelocityToElectricalRpm(target_speeds[2]));
     tmc4671_setTargetVelocity(
         BACK_RIGHT_MOTOR_CHIP_SELECT,
-        static_cast<int>(wheelVelocityToElectricalRpm(target_speeds[3]));
+        wheelVelocityToElectricalRpm(target_speeds[3]));
 }
 
 
@@ -309,13 +309,13 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
         case TbotsProto::MotorControl::DriveControlCase::kDirectPerWheelControl:
         {
             double target_front_left_velocity =
-                rampVelocity(electricalRpmToWheelVelocity(motor.direct_per_wheel_control().front_left_wheel_rpm()), electricalRpmToWheelVelocity(front_left_rpm), time_elapsed_since_last_poll_s);
+                rampVelocity(electricalRpmToWheelVelocity(static_cast<int>(motor.direct_per_wheel_control().front_left_wheel_rpm())), electricalRpmToWheelVelocity(front_left_rpm), time_elapsed_since_last_poll_s);
             double target_front_right_velocity =
-                rampVelocity(electricalRpmToWheelVelocity(motor.direct_per_wheel_control().front_right_wheel_rpm()), electricalRpmToWheelVelocity(front_right_rpm), time_elapsed_since_last_poll_s);
+                rampVelocity(electricalRpmToWheelVelocity(static_cast<int>(motor.direct_per_wheel_control().front_right_wheel_rpm())), electricalRpmToWheelVelocity(front_right_rpm), time_elapsed_since_last_poll_s);
             double target_back_left_velocity =
-                rampVelocity(electricalRpmToWheelVelocity(motor.direct_per_wheel_control().back_left_wheel_rpm()), electricalRpmToWheelVelocity(back_left_rpm), time_elapsed_since_last_poll_s);
+                rampVelocity(electricalRpmToWheelVelocity(static_cast<int>(motor.direct_per_wheel_control().back_left_wheel_rpm())), electricalRpmToWheelVelocity(back_left_rpm), time_elapsed_since_last_poll_s);
             double target_back_right_velocity =
-                rampVelocity(electricalRpmToWheelVelocity(motor.direct_per_wheel_control().back_right_wheel_rpm()), electricalRpmToWheelVelocity(back_right_rpm), time_elapsed_since_last_poll_s);
+                rampVelocity(electricalRpmToWheelVelocity(static_cast<int>(motor.direct_per_wheel_control().back_right_wheel_rpm())), electricalRpmToWheelVelocity(back_right_rpm), time_elapsed_since_last_poll_s);
 
             tmc4671_setTargetVelocity(
                     FRONT_LEFT_MOTOR_CHIP_SELECT,
@@ -349,21 +349,20 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
 
             tmc4671_setTargetVelocity(
                 FRONT_RIGHT_MOTOR_CHIP_SELECT,
-                static_cast<int>(target_speeds[0] / MECHANICAL_MPS_PER_ELECTRICAL_RPM));
+		wheelVelocityToElectricalRpm(target_speeds[0]));
             tmc4671_setTargetVelocity(
                 FRONT_LEFT_MOTOR_CHIP_SELECT,
-                static_cast<int>(target_speeds[1] / MECHANICAL_MPS_PER_ELECTRICAL_RPM));
+		wheelVelocityToElectricalRpm(target_speeds[1]));
             tmc4671_setTargetVelocity(
                 BACK_LEFT_MOTOR_CHIP_SELECT,
-                static_cast<int>(target_speeds[2] / MECHANICAL_MPS_PER_ELECTRICAL_RPM));
+		wheelVelocityToElectricalRpm(target_speeds[2]));
             tmc4671_setTargetVelocity(
                 BACK_RIGHT_MOTOR_CHIP_SELECT,
-                static_cast<int>(target_speeds[3] / MECHANICAL_MPS_PER_ELECTRICAL_RPM));
+		wheelVelocityToElectricalRpm(target_speeds[3]));
 
             tmc4671_setTargetVelocity(
                 DRIBBLER_MOTOR_CHIP_SELECT,
-                static_cast<int>(motor.dribbler_speed_rpm() *
-                                 robot_constants_.wheel_rotations_per_motor_rotation));
+		dribblerVelocityToElectricalRpm(motor.dribbler_speed_rpm()));
 
             break;
         }
