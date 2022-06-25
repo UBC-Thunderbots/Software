@@ -8,6 +8,10 @@
 #include "software/jetson_nano/gpio.h"
 #include "software/physics/euclidean_to_wheel.h"
 
+extern "C"
+{
+#include "external/trinamic/tmc/ramp/Ramp.h"
+}
 
 class MotorService
 {
@@ -31,6 +35,7 @@ class MotorService
      * @returns MotorStatus The status of all the drive units
      */
     TbotsProto::MotorStatus poll(const TbotsProto::MotorControl& motor_control);
+    void setXYTheta(double x, double y, double rad_per_s);
 
     /**
      * Trinamic API binding, sets spi_demux_select_0|1 pins
@@ -187,6 +192,9 @@ class MotorService
 
     // SPI File Descriptors
     std::unordered_map<int, int> file_descriptors;
+
+    // Velocity Ramps
+    std::unordered_map<int, TMC_LinearRamp> velocity_ramps;
 
     // Drive Motors
     EuclideanToWheel euclidean_to_four_wheel;

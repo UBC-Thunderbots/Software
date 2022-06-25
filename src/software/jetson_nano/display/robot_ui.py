@@ -16,7 +16,6 @@ from software.jetson_nano.display.screens.menu_screen import MenuScreen
 from software.jetson_nano.display.screens.wheels_screen import WheelsScreen
 from software.jetson_nano.display.screens.chip_and_kick_screen import ChipAndKickScreen
 import software.jetson_nano.display.constants as constants
-from software.py_constants import *
 
 # Pins for Rotary Encoder
 BUTTON_PIN = constants.BUTTON_PIN
@@ -35,12 +34,11 @@ screen_actions = ScreenActions()
 
 # These are the keys for the redis dicationary
 redis_keys = [
-    ROBOT_ID_REDIS_KEY,
-    ROBOT_MULTICAST_CHANNEL_REDIS_KEY,
-    ROBOT_NETWORK_INTERFACE_REDIS_KEY,
-    "battery voltage",
-    "cap voltage",
-    "packet loss",
+    "/robot_id",
+    "/channel_id",
+    "/battery_voltage",
+    "/cap_voltage",
+    "/packet_loss",
     "chip enable",
     "kick enable",
     "chip speed",
@@ -98,6 +96,8 @@ class RobotUi:
             ),
         }
 
+        time.sleep(2)
+
         def on_click():
             """ Execute on click callback of curr screen """
             action = self.screens[self.curr_screen].on_click()
@@ -134,8 +134,9 @@ class RobotUi:
         )
 
         self.rotary_encoder.start()
+        self.screens[self.curr_screen].update_screen()
 
-    def poll_redis(self, timeout=3):
+    def poll_redis(self, timeout=0.1):
         """ Update redis dict every timeout seconds """
         while not self.shutdown:
             for key in redis_keys:
@@ -144,6 +145,7 @@ class RobotUi:
             for screen_name, screen in self.screens.items():
                 if screen_name != "Menu":
                     screen.update_values(self.redis_dict)
+            self.screens[self.curr_screen].update_screen()
             time.sleep(timeout)
 
     def stop(self):

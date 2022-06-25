@@ -25,7 +25,8 @@ message ThunderloopStatus
     uint64 primitive_executor_start_time_ns = 2;
     uint64 primitive_executor_step_time_ns  = 3;
     uint64 motor_service_poll_time_ns       = 4;
-    uint64 iteration_time_ns                = 5;
+    uint64 power_service_poll_time_ns       = 5;
+    uint64 iteration_time_ns                = 6;
 }
 
 message JetsonStatus
