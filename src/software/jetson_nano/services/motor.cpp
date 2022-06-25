@@ -125,19 +125,41 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
     reset_gpio.setValue(GpioState::HIGH);
     sleep(1);
 
-    // Drive Motor Setup
-    for (uint8_t motor = 0; motor < NUM_DRIVE_MOTORS; motor++)
-    {
-        startDriver(motor);
-        checkDriverFault(motor);
-        // Start all the controllers as drive motor controllers
-        startController(motor, false);
-    }
+    //// Drive Motor Setup
+    //for (uint8_t motor = 0; motor < NUM_DRIVE_MOTORS; motor++)
+    //{
+        //startDriver(motor);
+        //checkDriverFault(motor);
+        //// Start all the controllers as drive motor controllers
+        //startController(motor, false);
+    //}
 
-    // Dribbler Motor Setup
-    startDriver(DRIBBLER_MOTOR_CHIP_SELECT);
-    checkDriverFault(DRIBBLER_MOTOR_CHIP_SELECT);
-    startController(DRIBBLER_MOTOR_CHIP_SELECT, true);
+    //// Dribbler Motor Setup
+    //startDriver(DRIBBLER_MOTOR_CHIP_SELECT);
+    //checkDriverFault(DRIBBLER_MOTOR_CHIP_SELECT);
+    //startController(DRIBBLER_MOTOR_CHIP_SELECT, true);
+
+    auto curr_vel = -4.0;
+    for (int k = 0; k < 20000; k++)
+    {
+        curr_vel = rampVelocity(5.0, curr_vel, 0.005);
+        double curr_velocity = tmc4671_getActualVelocity(FRONT_RIGHT_MOTOR_CHIP_SELECT);
+        tmc4671_setTargetVelocity(
+                FRONT_LEFT_MOTOR_CHIP_SELECT,
+                static_cast<int>(motor.direct_per_wheel_control().front_left_wheel_rpm() *
+                    robot_constants_.wheel_rotations_per_motor_rotation));
+        usleep(5000);
+    }
+    for (int k = 0; k < 20000; k++)
+    {
+        curr_vel = rampVelocity(5.0, curr_vel, 0.005);
+        tmc4671_setTargetVelocity(
+                FRONT_LEFT_MOTOR_CHIP_SELECT,
+                static_cast<int>(motor.direct_per_wheel_control().front_left_wheel_rpm() *
+                    robot_constants_.wheel_rotations_per_motor_rotation));
+        usleep(5000);
+    }
+    sleep(50);
 }
 
 MotorService::~MotorService() {}
@@ -371,25 +393,34 @@ void MotorService::spiTransfer(int fd, uint8_t const* tx, uint8_t const* rx, uns
 
 double MotorService::rampVelocity(double velocity_target, double velocity_current, double time_ramp)
 {
-	// Calculate velocity delta using kinematic equation: dv = a*t
-	double velocity_delta = robot_constants.robot_max_angular_acceleration_m_per_s_2 * time_ramp; 
+    // Calculate velocity delta using kinematic equation: dv = a*t
+    double velocity_delta = robot_constants_.robot_max_acceleration_m_per_s_2   * time_ramp; 
+    double ramp_velocity = 0;
 
-	// Case: accelerating
-	if (velocity_target > velocity_current + velocity_delta)
-	{
-		return velocity_current + velocity_delta;
-	}
-	// Case: deccelerating
-	else if (velocity_target < velocity_current + velocity_delta)
-	{
-		return velocity_current - velocity_delta;
-	}
-	// Case: ramping not required, go to target velocity
-	else
-	{
-		return velocity_target;
-	}
+    // Case: accelerating
+    if (velocity_target > velocity_current + velocity_delta)
+    {
+        ramp_velocity = velocity_current + velocity_delta;
+    }
+    // Case: deccelerating
+    else if (velocity_target < velocity_current - velocity_delta)
+    {
+        ramp_velocity = velocity_current - velocity_delta;
+    }
+    // Case: ramping not required, go to target velocity
+    else
+    {
+        ramp_velocity = velocity_target;
+    }
+
+    if(std::abs(ramp_velocity) > robot_constants_.robot_max_speed_m_per_s)
+    {
+        ramp_velocity = std::copysign(robot_constants_.robot_max_speed_m_per_s, ramp_velocity);
+    }
+
+    return ramp_velocity;
 }
+
 
 
 // Both the TMC4671 (the controller) and the TMC6100 (the driver) respect
