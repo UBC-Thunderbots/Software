@@ -150,6 +150,22 @@ class MotorService
     double rampVelocity(double velocity_target, double velocity_current, double time_ramp);
 
     /**
+     * Convert electrical rpm to wheel velocity.
+     *
+     * @param electrical_rpm The electrical rpm to convert
+     *
+     */
+    double electricalRpmToWheelVelocity(double electrical_rpm);
+
+    /**
+     * Convert wheel velocity to electrical rpm.
+     *
+     * @param wheel_velocity The wheel velocity in meters per second
+     *
+     */
+    double wheelVelocityToElectricalRpm(double wheel_velcocity);
+
+    /**
      * Trinamic API Binding function
      *
      * @param motor Which motor to talk to (in our case, the chip select)

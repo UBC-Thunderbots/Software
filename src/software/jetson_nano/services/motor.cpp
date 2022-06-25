@@ -478,6 +478,15 @@ double MotorService::rampVelocity(double velocity_target, double velocity_curren
 	}
 }
 
+double MotorService::electricalRpmToWheelVelocity(double electrical_rpm)
+{
+	return MECHANICAL_MPS_PER_ELECTRICAL_RPM * electrical_rpm;
+}
+
+double MotorService::wheelVelocityToElectricalRpm(double wheel_velocity)
+{
+	return wheel_velocity / MECHANICAL_MPS_PER_ELECTRICAL_RPM;
+}
 
 // Both the TMC4671 (the controller) and the TMC6100 (the driver) respect
 // the same SPI interface. So when we bind the API, we can use the same
