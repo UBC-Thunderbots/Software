@@ -80,7 +80,8 @@ struct AttackerFSM
             // src_state + event [guard] / action = dest_state
             *DribbleFSM_S + Update_E[shouldKick_G] / pivotKick_A = PivotKickFSM_S,
             DribbleFSM_S + Update_E[!shouldKick_G] / keepAway_A,
-            PivotKickFSM_S + Update_E / pivotKick_A, PivotKickFSM_S = X);
+            PivotKickFSM_S + Update_E / pivotKick_A, PivotKickFSM_S = X,
+            X + Update_E / SET_STOP_PRIMITIVE_ACTION = X);
     }
 
    private:

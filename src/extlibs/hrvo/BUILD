@@ -1,18 +1,6 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_test(
-    name = "hrvo_test",
-    srcs = [
-        "hrvo_test.cpp",
-    ],
-    deps = [
-        ":hrvo",
-        "//shared/test_util:tbots_gtest_main",
-        "//software/test_util",
-    ],
-)
-
-cc_test(
     name = "simulated_hrvo_test",
     srcs = ["simulated_hrvo_test.cpp"],
     deps = [
@@ -49,20 +37,10 @@ cc_library(
         "simulator.h",
     ],
     deps = [
-        "//extlibs/hrvo:velocity_obstacle",
         "//proto:visualization_cc_proto",
         "//proto/primitive:primitive_msg_factory",
+        "//software/ai/navigator/path_planner/hrvo:velocity_obstacle",
         "//software/geom:vector",
         "//software/world",
-    ],
-)
-
-cc_library(
-    name = "velocity_obstacle",
-    hdrs = [
-        "velocity_obstacle.h",
-    ],
-    deps = [
-        "//software/geom:vector",
     ],
 )

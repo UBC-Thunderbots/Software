@@ -37,8 +37,8 @@ cc_library(
     hdrs = ["tbots_geometry.h"],
     visibility = ["//visibility:public"],
     deps = [
-        "//extlibs/hrvo:velocity_obstacle",
         "//proto:tbots_cc_proto",
+        "//software/ai/navigator/path_planner/hrvo:velocity_obstacle",
         "//software/geom:angle",
         "//software/geom:angular_velocity",
         "//software/geom:circle",
@@ -168,25 +168,6 @@ cc_test(
     srcs = ["ssl_simulation_robot_control_test.cpp"],
     deps = [
         ":ssl_simulation_robot_control",
-        "//shared/test_util:tbots_gtest_main",
-    ],
-)
-
-cc_library(
-    name = "defending_side",
-    srcs = ["defending_side.cpp"],
-    hdrs = ["defending_side.h"],
-    deps = [
-        "//proto:defending_side_msg_cc_proto",
-        "//software/world:field",
-    ],
-)
-
-cc_test(
-    name = "defending_side_test",
-    srcs = ["defending_side_test.cpp"],
-    deps = [
-        ":defending_side",
         "//shared/test_util:tbots_gtest_main",
     ],
 )

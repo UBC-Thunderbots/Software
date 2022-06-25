@@ -108,6 +108,7 @@ cc_library(
         ":robot_state",
         "//proto:tbots_cc_proto",
         "//software:constants",
+        "//software/ai/evaluation:time_to_travel",
         "//software/geom:polygon",
         "//software/logger",
         "//software/time:duration",

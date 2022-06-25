@@ -1,7 +1,7 @@
 #pragma once
 
-#include "extlibs/hrvo/velocity_obstacle.h"
 #include "proto/geometry.pb.h"
+#include "software/ai/navigator/path_planner/hrvo/velocity_obstacle.h"
 #include "software/geom/angle.h"
 #include "software/geom/angular_velocity.h"
 #include "software/geom/circle.h"
@@ -23,7 +23,7 @@ std::unique_ptr<TbotsProto::Vector> createVectorProto(const Vector& vector);
 std::unique_ptr<TbotsProto::Polygon> createPolygonProto(const Polygon& polygon);
 std::unique_ptr<TbotsProto::Circle> createCircleProto(const Circle& polygon);
 std::unique_ptr<TbotsProto::VelocityObstacle> createVelocityObstacleProto(
-    const VelocityObstacle& vo);
+    const VelocityObstacle& vo, const Vector& offset = Vector());
 
 /**
  * Protobuf msg types to internal geometry types conversions

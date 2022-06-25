@@ -4,8 +4,10 @@ EnlsvgPathPlanner::EnlsvgPathPlanner(const Rectangle &navigable_area,
                                      const std::vector<ObstaclePtr> &obstacles,
                                      double grid_boundary_offset, double resolution)
     : resolution(resolution),
-      num_grid_rows(static_cast<int>(round(navigable_area.xLength() / resolution))),
-      num_grid_cols(static_cast<int>(round(navigable_area.yLength() / resolution))),
+      num_grid_rows(
+          static_cast<unsigned int>(round(navigable_area.xLength() / resolution))),
+      num_grid_cols(
+          static_cast<unsigned int>(round(navigable_area.yLength() / resolution))),
       origin(navigable_area.negXNegYCorner()),
       max_navigable_y_enlsvg_point(
           convertPointToEnlsvgPoint(navigable_area.posXPosYCorner()).y),
@@ -86,6 +88,13 @@ std::optional<Path> EnlsvgPathPlanner::findPath(const Point &start,
         (new_end == enlsvg_end))
     {
         return Path({start, end});
+    }
+
+    // If the new unblocked points are equal, set the unblocked end point as the end point
+    // of the path
+    if (new_start == new_end)
+    {
+        return Path({start, convertEnlsvgPointToPoint(new_end.value())});
     }
 
     EnlsvgPath enlsvgPath =

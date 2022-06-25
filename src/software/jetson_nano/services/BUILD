@@ -1,20 +1,15 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "service",
-    hdrs = ["service.h"],
-)
-
-cc_library(
     name = "motor",
     srcs = ["motor.cpp"],
     hdrs = ["motor.h"],
     deps = [
-        ":service",
         "//proto:tbots_cc_proto",
         "//shared:robot_constants",
         "//software/jetson_nano:gpio",
         "//software/logger",
+        "//software/physics:euclidean_to_wheel",
         "@trinamic",
     ],
 )
@@ -24,7 +19,6 @@ cc_library(
     srcs = ["power.cpp"],
     hdrs = ["power.h"],
     deps = [
-        ":service",
         "//shared/uart_framing",
         "//software/logger",
         "//software/uart:boost_uart_communication",
@@ -37,7 +31,6 @@ cc_library(
     srcs = ["network.cpp"],
     hdrs = ["network.h"],
     deps = [
-        ":service",
         "//proto:tbots_cc_proto",
         "//shared:robot_constants",
         "//software/logger",

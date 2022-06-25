@@ -9,6 +9,7 @@ import proto
 from proto.import_all_protos import *
 from extlibs.er_force_sim.src.protobuf.world_pb2 import *
 from software.thunderscope.replay.replay_constants import *
+from software.thunderscope.replay.proto_logger import ProtoLogger
 
 
 class ProtoPlayer(object):
@@ -136,6 +137,69 @@ class ProtoPlayer(object):
 
         return float(timestamp), proto_class, proto
 
+    def save_clip(self, filename, start_time, end_time):
+        """Saves clip
+
+        :param filename: The file to save to
+        :param start_time: the start time for the clip
+        :param end_time: the end time for the clip
+    
+        """
+        if not filename:
+            print("No filename selected")
+            return
+        if start_time >= end_time:
+            print("Start time not less than end time")
+            return
+
+        logging.info(f"Saving clip from {start_time} to {end_time} to {filename}")
+
+        directory = filename
+        if "." in filename:
+            directory = filename[: filename.rfind(".")]
+        try:
+            os.makedirs(directory)
+        except OSError:
+            pass
+
+        replay_index = 0
+
+        self.seek(start_time)
+
+        while True:
+            with gzip.open(
+                f"{directory}/{replay_index}.{REPLAY_FILE_EXTENSION}", "wb"
+            ) as log_file:
+                logging.info(
+                    f"Writing to {log_file.name} starting at {self.current_packet_time}"
+                )
+                while self.current_entry_index < len(self.current_chunk):
+                    (
+                        self.current_packet_time,
+                        _,
+                        proto,
+                    ) = ProtoPlayer.unpack_log_entry(
+                        self.current_chunk[self.current_entry_index]
+                    )
+
+                    log_entry = ProtoLogger.create_log_entry(
+                        proto, self.current_packet_time - start_time
+                    )
+                    log_file.write(bytes(log_entry, encoding="utf-8"))
+                    self.current_entry_index += 1
+                    if self.current_packet_time >= end_time:
+                        logging.info("Clip saved!")
+                        return
+                # Load the next chunk
+                self.current_chunk_index += 1
+                replay_index += 1
+
+                if self.current_chunk_index < len(self.sorted_chunks):
+                    self.current_chunk = ProtoPlayer.load_replay_chunk(
+                        self.sorted_chunks[self.current_chunk_index]
+                    )
+                    self.current_entry_index = 0
+
     def play(self):
         """Plays back the log file."""
 
@@ -174,6 +238,34 @@ class ProtoPlayer(object):
             self.playback_speed = 1.0 / float(speed)
             self.play()
 
+    def single_step_forward(self):
+        """Steps the player forward by one log entry
+        """
+        self.pause()
+        self.current_entry_index = self.current_entry_index + 1
+        self.current_chunk_index = self.current_chunk_index
+        if self.current_entry_index >= len(self.current_chunk):
+            # handle case that player needs to step forward to the next chunk
+            self.current_chunk_index += 1
+            if self.current_chunk_index >= len(self.sorted_chunks):
+                # do not step forwards beyond the end of the replay
+                self.current_chunk_index = len(self.sorted_chunks) - 1
+                self.current_entry_index = len(self.current_chunk) - 1
+            else:
+                # adjust log entry index and fetch the right chunk
+                self.current_entry_index -= len(self.current_chunk)
+                self.current_chunk = ProtoPlayer.load_replay_chunk(
+                    self.sorted_chunks[self.current_chunk_index]
+                )
+
+        logging.info(
+            "Stepped to chunk {} at index {} with timestamp {:.2f}".format(
+                self.current_chunk_index,
+                self.current_entry_index,
+                self.seek_offset_time,
+            )
+        )
+
     def seek(self, seek_time):
         """Seeks to a specific time. We binary search through the chunks
         to find the chunk that would contain the data at the given time.
@@ -188,7 +280,7 @@ class ProtoPlayer(object):
         :param seek_time: The time to seek to.
 
         """
-        # Lets binary search through the chunks to find the chunk that starts
+        # Let's binary search through the chunks to find the chunk that starts
         # with a timestamp less than (but closest to) the seek_time we want
         # to seek to.
         def __bisect_chunks_by_timestamp(chunk):
@@ -201,7 +293,7 @@ class ProtoPlayer(object):
                 self.sorted_chunks, seek_time, key=__bisect_chunks_by_timestamp
             )
 
-        # Lets binary search through the entries in the chunk to find the closest
+        # Let's binary search through the entries in the chunk to find the closest
         # timestamp to seek to
         def __bisect_entries_by_timestamp(entry):
             timestamp, _, _ = ProtoPlayer.unpack_log_entry(entry)
@@ -282,7 +374,7 @@ class ProtoPlayer(object):
 
         while True:
 
-            # Only play if we are not paused
+            # Only play if we are playing
             if not self.is_playing:
                 time.sleep(PLAY_PAUSE_POLL_INTERVAL_SECONDS)
                 continue

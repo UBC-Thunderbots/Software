@@ -112,7 +112,7 @@ double calculateInterceptRisk(const Robot& enemy_robot, const Pass& pass,
  *         friendly team to receive the given pass, with 1 being very likely, 0
  *         being impossible
  */
-double ratePassFriendlyCapability(Team friendly_team, const Pass& pass,
+double ratePassFriendlyCapability(const Team& friendly_team, const Pass& pass,
                                   TbotsProto::PassingConfig passing_config);
 
 /**

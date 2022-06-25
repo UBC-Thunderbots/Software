@@ -26,19 +26,33 @@ void OffensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
 
 void OffensePlay::updateTactics(const PlayUpdate &play_update)
 {
-    PriorityTacticVector tactics_to_return;
-    unsigned int num_shoot_or_pass = play_update.num_tactics - 2;
-    unsigned int num_defenders     = 2;
     if (play_update.num_tactics == 0)
     {
         return;
     }
-    if (play_update.num_tactics <= 3)
+
+    PriorityTacticVector tactics_to_return;
+    unsigned int num_defenders = 2;
+    unsigned int num_enemy_robots =
+        static_cast<int>(play_update.world.enemyTeam().numRobots());
+
+    // enemy team has at most half a full team, so we need at most half the number of
+    // defenders
+    if (num_enemy_robots <= 3)
     {
-        num_shoot_or_pass = 1;
+        num_defenders = 1;
+        if (num_enemy_robots < 2)
+        {
+            num_defenders = 0;
+        }
+    }
+    else if (play_update.num_tactics <= 3)
+    {
         // play_update.num_tactics == 0 is handled above
         num_defenders = play_update.num_tactics - 1;
     }
+
+    unsigned int num_shoot_or_pass = play_update.num_tactics - num_defenders;
 
     shoot_or_pass_play->updateTactics(PlayUpdate(
         play_update.world, num_shoot_or_pass,
@@ -67,6 +81,16 @@ void OffensePlay::updateTactics(const PlayUpdate &play_update)
         play_update.set_inter_play_communication_fun));
 
     play_update.set_tactics(tactics_to_return);
+}
+
+std::vector<std::string> OffensePlay::getState()
+{
+    std::vector<std::string> state = {objectTypeName(*this)};
+    auto spp_state                 = shoot_or_pass_play->getState();
+    auto cd_state                  = crease_defense_play->getState();
+    state.insert(state.end(), spp_state.begin(), spp_state.end());
+    state.insert(state.end(), cd_state.begin(), cd_state.end());
+    return state;
 }
 
 // Register this play in the genericFactory
