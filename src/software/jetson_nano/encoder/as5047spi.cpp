@@ -26,7 +26,7 @@ AS5047::AS5047(const char* p_spidev, uint32_t speed) {
     speed_ = speed;
     m_open = false;
     LOG (DEBUG) << "m_spidev: " << m_spidev;
-    LOG(DEBUG) << "speed: " << speed;
+    std::cout << "speed: " << speed << "\n";
 }
 
 AS5047::~AS5047() {
