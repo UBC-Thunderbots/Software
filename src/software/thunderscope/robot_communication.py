@@ -56,6 +56,20 @@ class RobotCommunication(object):
             True,
         )
 
+        self.receive_ssl_packet = networking.RobotStatusProtoListener(
+            self.multicast_channel + "%" + self.interface,
+            VISION_PORT,
+            lambda data: self.proto_unix_io.send_proto(SSL_WrapperPacket, data),
+            True,
+        )
+
+        self.receive_ssl_packet = networking.RobotStatusProtoListener(
+            self.multicast_channel + "%" + self.interface,
+            VISION_PORT,
+            lambda data: self.proto_unix_io.send_proto(Referee, data),
+            True,
+        )
+
         self.send_primitive_set = networking.PrimitiveSetProtoSender(
             self.multicast_channel + "%" + self.interface, PRIMITIVE_PORT, True
         )

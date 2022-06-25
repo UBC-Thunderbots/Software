@@ -2,6 +2,7 @@ from software.thunderscope.thunderscope import Thunderscope
 from software.thunderscope.binary_context_managers import *
 from proto.message_translation import tbots_protobuf
 import software.python_bindings as cpp_bindings
+from software.thunderscope.robot_communication import RobotCommunication
 
 import time
 import threading
