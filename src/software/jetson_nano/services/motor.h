@@ -159,7 +159,7 @@ class MotorService
      * @param electrical_rpm The electrical rpm to convert
      *
      */
-    double electricalRpmToWheelVelocity(double electrical_rpm);
+    double electricalRpmToWheelVelocity(int electrical_rpm);
 
     /**
      * Convert wheel velocity to electrical rpm.
@@ -167,7 +167,7 @@ class MotorService
      * @param wheel_velocity The wheel velocity in meters per second
      *
      */
-    double wheelVelocityToElectricalRpm(double wheel_velcocity);
+    int wheelVelocityToElectricalRpm(double wheel_velcocity);
 
     /**
      * Trinamic API Binding function
