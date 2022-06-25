@@ -454,12 +454,12 @@ int MotorService::wheelVelocityToElectricalRpm(double wheel_velocity)
 
 double MotorService::electricalRpmToDribblerVelocity(int electrical_rpm)
 {
-	return MECHANICAL_MPS_PER_ELECTRICAL_RPM * static_cast<double>(electrical_rpm);
+	return static_cast<double>(electrical_rpm) / 5.31;
 }
 
 int MotorService::dribblerVelocityToElectricalRpm(double dribbler_velocity)
 {
-	return static_cast<int>(dribbler_velocity / MECHANICAL_MPS_PER_ELECTRICAL_RPM);
+	return static_cast<int>(dribbler_velocity * 5.31);
 }
 
 // Both the TMC4671 (the controller) and the TMC6100 (the driver) respect
