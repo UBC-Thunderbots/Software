@@ -4,7 +4,7 @@
 
 PowerMonitor::PowerMonitor()
 {
-    Wire.begin(PM_SDA, PM_SCL);
+    Wire.begin(static_cast<int>(PM_SDA), static_cast<int>(PM_SCL));
 
     monitor = std::make_shared<LTC4151>();
     monitor->init(LTC4151::L, LTC4151::L);
