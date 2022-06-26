@@ -80,6 +80,11 @@ PYBIND11_MODULE(py_constants, m)
     m.attr("ROBOT_STATUS_PORT") = ROBOT_STATUS_PORT;
     m.attr("ROBOT_LOGS_PORT")   = ROBOT_LOGS_PORT;
 
+    // SSL
+    m.attr("SSL_ADDRESS")   = SSL_ADDRESS;
+    m.attr("SSL_PORT")   = SSL_PORT;
+
+
     // Units
     m.attr("MILLIMETERS_PER_METER") = MILLIMETERS_PER_METER;
     m.attr("METERS_PER_MILLIMETER") = METERS_PER_MILLIMETER;
