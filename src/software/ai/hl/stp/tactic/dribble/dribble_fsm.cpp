@@ -24,20 +24,12 @@ Point DribbleFSM::findInterceptionPoint(const Robot &robot, const Ball &ball,
     Point intercept_position = ball.position();
     while (contains(field.fieldLines(), intercept_position))
     {
-<<<<<<< HEAD
 
         Duration ball_time_to_position = ball.getTimeToPosition(intercept_position);
 //        Duration ball_time_to_position = Duration::fromSeconds(
 //                distance(intercept_position, ball.position()) / ball.velocity().length());
-        Duration robot_time_to_pos = getTimeToPositionForRobot(
-            robot.position(), intercept_position,
-            robot.robotConstants().robot_max_speed_m_per_s,
-            robot.robotConstants().robot_max_acceleration_m_per_s_2);
-=======
-        Duration ball_time_to_position = Duration::fromSeconds(
-            distance(intercept_position, ball.position()) / ball.velocity().length());
+
         Duration robot_time_to_pos = robot.getTimeToPosition(intercept_position);
->>>>>>> 87b40353de19fb728ed4d740bdcc25a79c799846
 
         if (robot_time_to_pos < ball_time_to_position)
         {
