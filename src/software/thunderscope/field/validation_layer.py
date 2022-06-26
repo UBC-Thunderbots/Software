@@ -74,10 +74,10 @@ class ValidationLayer(FieldLayer):
         for segment in validation.geometry.segments:
             painter.drawLine(
                 QtCore.QLine(
-                    segment.start.x_meters,
-                    segment.start.y_meters,
-                    segment.end.x_meters,
-                    segment.end.y_meters,
+                    int(segment.start.x_meters),
+                    int(segment.start.y_meters),
+                    int(segment.end.x_meters),
+                    int(segment.end.y_meters),
                 )
             )
 

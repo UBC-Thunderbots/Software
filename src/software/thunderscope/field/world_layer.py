@@ -52,16 +52,6 @@ class WorldLayer(FieldLayer):
         self.friendly_robot_id_text_items = {}
         self.enemy_robot_id_text_items = {}
 
-        self.ball_speed_text_item = pg.TextItem()
-        self.ball_speed_text_item.setParentItem(self)
-
-        self.robot_speed_text_items = [
-            pg.TextItem() for robot in range(NUM_ROBOTS_ON_FIELD_PER_TEAM)
-        ]
-
-        for text_item in self.robot_speed_text_items:
-            text_item.setParentItem(self)
-
     def keyPressEvent(self, event):
         """Detect when a key has been pressed (override)
 
@@ -442,7 +432,7 @@ class WorldLayer(FieldLayer):
                     )
                 )
 
-    def draw_robot_speeds(self, painter, robot_speed_map):
+    def draw_robot_speeds(self, painter):
         """Draw the robot speeds
 
         :param painter: The painter
@@ -455,35 +445,16 @@ class WorldLayer(FieldLayer):
             start_y = robot.current_state.global_position.y_meters
             painter.drawLine(
                 QtCore.QLine(
-                    start_x * MILLIMETERS_PER_METER,
-                    start_y * MILLIMETERS_PER_METER,
-                    (start_x + robot.current_state.global_velocity.x_component_meters)
-                    * MILLIMETERS_PER_METER,
-                    (start_y + robot.current_state.global_velocity.y_component_meters)
-                    * MILLIMETERS_PER_METER,
+                    int(start_x * MILLIMETERS_PER_METER),
+                    int(start_y * MILLIMETERS_PER_METER),
+                    int((start_x + robot.current_state.global_velocity.x_component_meters)
+                    * MILLIMETERS_PER_METER),
+                    int((start_y + robot.current_state.global_velocity.y_component_meters)
+                    * MILLIMETERS_PER_METER),
                 )
             )
 
-            speed_str = (
-                "ID "
-                + str(robot.id)
-                + " Speed: {:.2f}".format(
-                    math.sqrt(
-                        robot.current_state.global_velocity.x_component_meters ** 2
-                        + robot.current_state.global_velocity.y_component_meters ** 2
-                    )
-                )
-            )
-
-            robot_speed_map[robot.id].setText(str(speed_str))
-            robot_speed_map[robot.id].setPos(
-                (robot.current_state.global_position.x_meters * MILLIMETERS_PER_METER)
-                + 4 * ROBOT_MAX_RADIUS_MILLIMETERS,
-                (robot.current_state.global_position.y_meters * MILLIMETERS_PER_METER)
-                + 4 * ROBOT_MAX_RADIUS_MILLIMETERS,
-            )
-
-    def draw_ball_speed(self, painter, ball_speed_text):
+    def draw_ball_speed(self, painter):
         """Draw the ball speed
 
         :param painter: The painter
@@ -496,27 +467,13 @@ class WorldLayer(FieldLayer):
         start_y = ball.current_state.global_position.y_meters
         painter.drawLine(
             QtCore.QLine(
-                start_x * MILLIMETERS_PER_METER,
-                start_y * MILLIMETERS_PER_METER,
-                (start_x + ball.current_state.global_velocity.x_component_meters)
-                * MILLIMETERS_PER_METER,
-                (start_y + ball.current_state.global_velocity.y_component_meters)
-                * MILLIMETERS_PER_METER,
+                int(start_x * MILLIMETERS_PER_METER),
+                int(start_y * MILLIMETERS_PER_METER),
+                int((start_x + ball.current_state.global_velocity.x_component_meters)
+                * MILLIMETERS_PER_METER),
+                int((start_y + ball.current_state.global_velocity.y_component_meters)
+                * MILLIMETERS_PER_METER),
             )
-        )
-
-        speed_str = "Ball speed: {:.2f}".format(
-            math.sqrt(
-                ball.current_state.global_velocity.x_component_meters ** 2
-                + ball.current_state.global_velocity.y_component_meters ** 2
-            )
-        )
-        ball_speed_text.setText(str(speed_str))
-        ball_speed_text.setPos(
-            (ball.current_state.global_position.x_meters * MILLIMETERS_PER_METER)
-            + 4 * ROBOT_MAX_RADIUS_MILLIMETERS,
-            (ball.current_state.global_position.y_meters * MILLIMETERS_PER_METER)
-            + 4 * ROBOT_MAX_RADIUS_MILLIMETERS,
         )
 
     def paint(self, painter, option, widget):
@@ -556,5 +513,5 @@ class WorldLayer(FieldLayer):
             self.enemy_robot_id_text_items,
         )
         self.draw_robot_status(painter)
-        self.draw_robot_speeds(painter, self.robot_speed_text_items)
-        self.draw_ball_speed(painter, self.ball_speed_text_item)
+        self.draw_robot_speeds(painter)
+        self.draw_ball_speed(painter)
