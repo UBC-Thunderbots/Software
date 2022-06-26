@@ -121,5 +121,5 @@ void IRAM_ATTR Chicker::offCooldown()
 
 bool Chicker::getBreakBeamTripped()
 {
-    return breakbeam_tripped;
+    return static_cast<bool>(digitalRead(BREAK_BEAM_PIN));
 }
