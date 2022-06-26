@@ -288,8 +288,10 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
     int back_left_rpm   = tmc4671_getActualVelocity(BACK_LEFT_MOTOR_CHIP_SELECT);
 
     WheelSpace_t current_wheel_speeds = {
-        static_cast<double>(front_left_rpm), static_cast<double>(front_right_rpm),
-        static_cast<double>(back_left_rpm), static_cast<double>(back_right_rpm)};
+        static_cast<double>(front_right_rpm) / MECHANICAL_MPS_PER_ELECTRICAL_RPM,
+        static_cast<double>(front_left_rpm) / MECHANICAL_MPS_PER_ELECTRICAL_RPM,
+        static_cast<double>(back_left_rpm) / MECHANICAL_MPS_PER_ELECTRICAL_RPM,
+        static_cast<double>(back_right_rpm)  / MECHANICAL_MPS_PER_ELECTRICAL_RPM};
 
     motor_status.mutable_front_right()->set_wheel_rpm(front_right_rpm);
     motor_status.mutable_front_left()->set_wheel_rpm(front_left_rpm);
@@ -303,6 +305,8 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
         static_cast<float>(current_euclidean_velocity[0]));
     motor_status.mutable_local_velocity()->set_y_component_meters(
         static_cast<float>(current_euclidean_velocity[1]));
+
+    current_wheel_speeds = {0.0, 0.0, 0.0, 0.0};
 
     switch (motor.drive_control_case())
     {
@@ -361,23 +365,37 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
             WheelSpace_t target_speeds = euclidean_to_four_wheel.getTargetWheelSpeeds(
                 target_euclidean_velocity, current_wheel_speeds);
 
-            tmc4671_setTargetVelocity(
-                FRONT_RIGHT_MOTOR_CHIP_SELECT,
-                static_cast<int>(target_speeds[0] / MECHANICAL_MPS_PER_ELECTRICAL_RPM));
-            tmc4671_setTargetVelocity(
-                FRONT_LEFT_MOTOR_CHIP_SELECT,
-                static_cast<int>(target_speeds[1] / MECHANICAL_MPS_PER_ELECTRICAL_RPM));
-            tmc4671_setTargetVelocity(
-                BACK_LEFT_MOTOR_CHIP_SELECT,
-                static_cast<int>(target_speeds[2] / MECHANICAL_MPS_PER_ELECTRICAL_RPM));
-            tmc4671_setTargetVelocity(
-                BACK_RIGHT_MOTOR_CHIP_SELECT,
-                static_cast<int>(target_speeds[3] / MECHANICAL_MPS_PER_ELECTRICAL_RPM));
+            double target_front_right_velocity =
+                rampVelocity(target_speeds[0],
+                             front_right_rpm * MECHANICAL_MPS_PER_ELECTRICAL_RPM,
+                             time_elapsed_since_last_poll_s);
+            double target_front_left_velocity =
+                rampVelocity(target_speeds[1],
+                             front_left_rpm * MECHANICAL_MPS_PER_ELECTRICAL_RPM,
+                             time_elapsed_since_last_poll_s);
+            double target_back_left_velocity =
+                rampVelocity(target_speeds[2],
+                             back_left_rpm * MECHANICAL_MPS_PER_ELECTRICAL_RPM,
+                             time_elapsed_since_last_poll_s);
+            double target_back_right_velocity =
+                rampVelocity(target_speeds[3],
+                             back_right_rpm * MECHANICAL_MPS_PER_ELECTRICAL_RPM,
+                             time_elapsed_since_last_poll_s);
 
             tmc4671_setTargetVelocity(
-                DRIBBLER_MOTOR_CHIP_SELECT,
-                static_cast<int>(motor.dribbler_speed_rpm() *
-                                 robot_constants_.wheel_rotations_per_motor_rotation));
+                    FRONT_RIGHT_MOTOR_CHIP_SELECT,
+                    static_cast<int>(target_front_right_velocity / MECHANICAL_MPS_PER_ELECTRICAL_RPM));
+            tmc4671_setTargetVelocity(
+                    FRONT_LEFT_MOTOR_CHIP_SELECT,
+                    static_cast<int>(target_front_left_velocity / MECHANICAL_MPS_PER_ELECTRICAL_RPM));
+            tmc4671_setTargetVelocity(
+                    BACK_LEFT_MOTOR_CHIP_SELECT,
+                    static_cast<int>(target_back_left_velocity / MECHANICAL_MPS_PER_ELECTRICAL_RPM));
+            tmc4671_setTargetVelocity(
+                    BACK_RIGHT_MOTOR_CHIP_SELECT,
+                    static_cast<int>(target_back_right_velocity / MECHANICAL_MPS_PER_ELECTRICAL_RPM));
+
+            tmc4671_setTargetVelocity(DRIBBLER_MOTOR_CHIP_SELECT, static_cast<int>(motor.dribbler_speed_rpm()));
 
             break;
         }
@@ -430,7 +448,7 @@ double MotorService::rampVelocity(double velocity_target, double velocity_curren
     // Calculate velocity delta using kinematic equation: dv = a*t
     double velocity_delta = robot_constants_.robot_max_acceleration_m_per_s_2 * time_ramp;
     double ramp_velocity  = 0;
-    double wiggle_room = 0.1;
+    double wiggle_room = 0.04;
 
     // Case: accelerating
     if (velocity_target > velocity_current + velocity_delta + wiggle_room)
