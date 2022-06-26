@@ -2,8 +2,6 @@
 
 #include <Wire.h>
 
-#include "pins.h"
-
 PowerMonitor::PowerMonitor()
 {
     Wire.begin(13, 14);
