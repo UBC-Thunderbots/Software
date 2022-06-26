@@ -19,14 +19,13 @@ extern int clock_nanosleep(clockid_t __clock_id, int __flags,
                            __const struct timespec* __req, struct timespec* __rem);
 
 Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, const int loop_hz)
-    // TODO (#2495): Set the friendly team colour once we receive World proto
-    : primitive_executor_(loop_hz, robot_constants, TeamColour::YELLOW)
+    : robot_id_(MAX_ROBOT_IDS + 1), // Initialize to a robot ID that is not valid
+      loop_hz_(loop_hz),
+      robot_constants_(robot_constants),
+      channel_id_(0),
+      // TODO (#2495): Set the friendly team colour once we receive World proto
+      primitive_executor_(loop_hz_, robot_id_, robot_constants_, TeamColour::YELLOW)
 {
-    robot_id_        = MAX_ROBOT_IDS + 1;  // Initialize to a robot ID that is not valid
-    channel_id_      = 0;
-    loop_hz_         = loop_hz;
-    robot_constants_ = robot_constants;
-
     redis_client_ = std::make_unique<RedisClient>(REDIS_DEFAULT_HOST, REDIS_DEFAULT_PORT);
 
     auto robot_id   = std::stoi(redis_client_->get(ROBOT_ID_REDIS_KEY));
@@ -43,7 +42,7 @@ Thunderloop::~Thunderloop() {}
 /*
  * Run the main robot loop!
  */
-void Thunderloop::runLoop()
+[[noreturn]] void Thunderloop::runLoop()
 {
     // Timing
     struct timespec next_shot;
@@ -106,6 +105,8 @@ void Thunderloop::runLoop()
                     std::string(ROBOT_MULTICAST_CHANNELS.at(channel_id_)) + "%" +
                         network_interface_,
                     VISION_PORT, PRIMITIVE_PORT, ROBOT_STATUS_PORT, true);
+
+                primitive_executor_.setRobotId(robot_id_);
             }
 
             // Network Service: receive newest world, primitives and set out the last
@@ -135,7 +136,7 @@ void Thunderloop::runLoop()
                     // Start new primitive
                     {
                         ScopedTimespecTimer timer(&poll_time);
-                        primitive_executor_.updatePrimitiveSet(robot_id_, primitive_set_);
+                        primitive_executor_.updatePrimitiveSet(primitive_set_);
                     }
 
                     thunderloop_status_.set_primitive_executor_start_time_ns(
@@ -150,6 +151,20 @@ void Thunderloop::runLoop()
                 primitive_executor_.updateWorld(new_world);
                 world_ = new_world;
             }
+
+            // Motor Service: execute the motor control command
+            {
+                ScopedTimespecTimer timer(&poll_time);
+                motor_status_ = motor_service_->poll(direct_control_.motor_control());
+
+                // Note: This overrides the velocity calculated by sensor fusion and passed to
+                //       Primitive Executor through the World, as a result, updateLocalVelocity
+                //       must be called after updateWorld and before stepPrimitive.
+                primitive_executor_.updateLocalVelocity(
+                        createVector(motor_status_.local_velocity()), <#initializer#>); // TODO: update call
+            }
+            thunderloop_status_.set_motor_service_poll_time_ns(
+                    static_cast<unsigned long>(poll_time.tv_nsec));
 
             // Primitive Executor: run the last primitive if we have not timed out
             {
@@ -174,21 +189,10 @@ void Thunderloop::runLoop()
                 }
 
                 direct_control_ = *primitive_executor_.stepPrimitive(
-                    robot_id_,
-                    Angle::fromRadians(robot_state_.global_orientation().radians()));
+                        Angle::fromRadians(robot_state_.global_orientation().radians()));
             }
 
             thunderloop_status_.set_primitive_executor_step_time_ns(
-                static_cast<unsigned long>(poll_time.tv_nsec));
-
-            // Motor Service: execute the motor control command
-            {
-                ScopedTimespecTimer timer(&poll_time);
-                motor_status_ = motor_service_->poll(direct_control_.motor_control());
-                primitive_executor_.updateLocalVelocity(
-                    createVector(motor_status_.local_velocity()));
-            }
-            thunderloop_status_.set_motor_service_poll_time_ns(
                 static_cast<unsigned long>(poll_time.tv_nsec));
 
             // Update Robot Status with poll responses

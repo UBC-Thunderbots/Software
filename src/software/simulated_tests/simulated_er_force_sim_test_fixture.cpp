@@ -253,11 +253,10 @@ void SimulatedErForceSimTestFixture::runTest(
 
     size_t num_robots         = robots_displacement.size();
     validation_functions_done = false;
+    // TODO: Whats the point of this loop
     while (simulator->getTimestamp() < timeout_time && !validation_functions_done)
     {
-        robots_displacement.clear();
-        robots_velocity_diff.clear();
-
+        // TODO: Whats the point of this tickTest
         if (!friendly_thunderbots_config.ai_config().ai_control_config().run_ai())
         {
             validation_functions_done =
@@ -268,6 +267,9 @@ void SimulatedErForceSimTestFixture::runTest(
 
         while (simulator->getTimestamp() < timeout_time && !validation_functions_done)
         {
+            robots_displacement.clear();
+            robots_velocity_diff.clear();
+
             if (!friendly_thunderbots_config.ai_config().ai_control_config().run_ai())
             {
                 auto ms_to_sleep = std::chrono::milliseconds(
@@ -304,7 +306,7 @@ void SimulatedErForceSimTestFixture::runTest(
                 robots_displacement_stats[i].minimum = std::min(
                     robots_displacement[i], robots_displacement_stats[i].minimum);
                 robots_velocity_stats[i].maximum = std::max(
-                    robots_displacement[i], robots_displacement_stats[i].maximum);
+                        robots_velocity_diff[i], robots_velocity_stats[i].maximum);
                 robots_velocity_stats[i].minimum =
                     std::min(robots_velocity_diff[i], robots_velocity_stats[i].minimum);
             }
@@ -324,6 +326,8 @@ void SimulatedErForceSimTestFixture::runTest(
                                         : sum_robots_displacement[i] / total_tick_count;
             robots_velocity_stats[i].average =
                 (total_tick_count == 0) ? 0 : sum_robots_velocity[i] / total_tick_count;
+
+            // TODO: Why do we tickTest here?
             validation_functions_done =
                 tickTest(simulation_time_step, ai_time_step, friendly_world, enemy_world,
                          simulator, ball_displacement, ball_velocity_diff,
@@ -331,35 +335,26 @@ void SimulatedErForceSimTestFixture::runTest(
         }
 
         // Output the statistics for ball and robots
-        LOG(INFO) << "max ball displacement: " << ball_displacement_stats.maximum
-                  << std::endl;
-        LOG(INFO) << "min ball displacement: " << ball_displacement_stats.minimum
-                  << std::endl;
-        LOG(INFO) << "avg ball displacement: " << ball_displacement_stats.average
-                  << std::endl;
-        LOG(INFO) << "max ball velocity difference: " << ball_velocity_stats.maximum
-                  << std::endl;
-        LOG(INFO) << "min ball velocity difference: " << ball_velocity_stats.minimum
-                  << std::endl;
+        LOG(INFO) << "max ball displacement: " << ball_displacement_stats.maximum;
+        LOG(INFO) << "min ball displacement: " << ball_displacement_stats.minimum;
+        LOG(INFO) << "avg ball displacement: " << ball_displacement_stats.average;
+        LOG(INFO) << "max ball velocity difference: " << ball_velocity_stats.maximum;
+        LOG(INFO) << "min ball velocity difference: " << ball_velocity_stats.minimum;
         LOG(INFO) << "avg ball velocity difference: " << ball_velocity_stats.average
-                  << std::endl;
+                                                      << std::endl;
         for (size_t i = 0; i < num_robots; i++)
         {
-            LOG(INFO) << "Robot " << i << std::endl;
-            LOG(INFO) << "max robot displacement: " << ball_displacement_stats.maximum
-                      << std::endl;
-            LOG(INFO) << "min robot displacement: " << ball_displacement_stats.minimum
-                      << std::endl;
-            LOG(INFO) << "avg robot displacement: " << ball_displacement_stats.average
-                      << std::endl;
-            LOG(INFO) << "max robot velocity difference: " << ball_velocity_stats.maximum
-                      << std::endl;
-            LOG(INFO) << "min robot velocity difference: " << ball_velocity_stats.minimum
-                      << std::endl;
-            LOG(INFO) << "avg robot velocity difference: " << ball_velocity_stats.average
+            LOG(INFO) << "Robot " << i;
+            LOG(INFO) << "max robot displacement: " << robots_displacement_stats[i].maximum;
+            LOG(INFO) << "min robot displacement: " << robots_displacement_stats[i].minimum;
+            LOG(INFO) << "avg robot displacement: " << robots_displacement_stats[i].average;
+            LOG(INFO) << "max robot velocity difference: " << robots_velocity_stats[i].maximum;
+            LOG(INFO) << "min robot velocity difference: " << robots_velocity_stats[i].minimum;
+            LOG(INFO) << "avg robot velocity difference: " << robots_velocity_stats[i].average
                       << std::endl;
         }
 
+        // TODO: Why do we tickTest here?
         validation_functions_done =
             tickTest(simulation_time_step, ai_time_step, friendly_world, enemy_world,
                      simulator, ball_displacement, ball_velocity_diff,
@@ -371,12 +366,10 @@ void SimulatedErForceSimTestFixture::runTest(
     {
         double avg_friendly_tick_duration =
             total_friendly_tick_duration / friendly_tick_count;
-        LOG(INFO) << "max friendly tick duration: " << max_friendly_tick_duration << "ms"
-                  << std::endl;
-        LOG(INFO) << "min friendly tick duration: " << min_friendly_tick_duration << "ms"
-                  << std::endl;
+        LOG(INFO) << "max friendly tick duration: " << max_friendly_tick_duration << "ms";
+        LOG(INFO) << "min friendly tick duration: " << min_friendly_tick_duration << "ms";
         LOG(INFO) << "avg friendly tick duration: " << avg_friendly_tick_duration << "ms"
-                  << std::endl;
+                                                                                  << std::endl;
     }
     else
     {
@@ -387,10 +380,8 @@ void SimulatedErForceSimTestFixture::runTest(
     if (enemy_tick_count > 0)
     {
         double avg_enemy_tick_duration = total_enemy_tick_duration / enemy_tick_count;
-        LOG(INFO) << "max enemy tick duration: " << max_enemy_tick_duration << "ms"
-                  << std::endl;
-        LOG(INFO) << "min enemy tick duration: " << min_enemy_tick_duration << "ms"
-                  << std::endl;
+        LOG(INFO) << "max enemy tick duration: " << max_enemy_tick_duration << "ms";
+        LOG(INFO) << "min enemy tick duration: " << min_enemy_tick_duration << "ms";
         LOG(INFO) << "avg enemy tick duration: " << avg_enemy_tick_duration << "ms"
                   << std::endl;
     }

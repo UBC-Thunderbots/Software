@@ -142,6 +142,14 @@ class HRVOSimulator
     Vector getRobotVelocity(unsigned int robot_id) const;
 
     /**
+     * Update the local velocity of the Agent which represents robot with robot_id
+     *
+     * @param robot_id The robot id of the friendly robot to update velocity of
+     * @param new_velocity New velocity of the friendly robot
+     */
+    void updateFriendlyRobotVelocity(const RobotId robot_id, const Vector &new_velocity) const;
+
+    /**
      * Get friendly HRVO agent from robot id. Returns std::nullopt if agent does not exist
      * @param robot_id Robot id as represented in the real world
      * @return Optional shared pointer to an HRVO agent
@@ -169,80 +177,6 @@ class HRVOSimulator
     const std::vector<std::shared_ptr<Agent>> &getAgents() const;
 
     /**
-     *      Returns the maximum acceleration of a specified agent.
-     *
-     * @param agentNo  The number of the agent whose maximum acceleration is to be
-     * retrieved.
-     * @return    The present maximum acceleration of the agent.
-     */
-    float getAgentMaxAccel(std::size_t agentNo) const;
-
-    /**
-     *      Returns the position of a specified agent.
-     *
-     * @param agentNo  The number of the agent whose position is to be retrieved.
-     * @return    The present position of the (center of) the agent.
-     */
-    Vector getAgentPosition(std::size_t agentNo) const;
-
-    /**
-     *      Returns the preferred velocity of a specified agent.
-     *
-     * The preferred speed of an agent is the speed it would choose
-     * to take if it were not influenced by other agents.
-     *
-     * @param agentNo  The number of the agent whose preferred velocity is to be
-     * retrieved.
-     * @return    The present preferred velocity of the agent.
-     */
-    Vector getAgentPrefVelocity(std::size_t agentNo) const;
-
-    /**
-     *      Returns the radius of a specified agent.
-     *
-     * @param agentNo  The number of the agent whose radius is to be retrieved.
-     * @return    The present radius of the agent.
-     */
-    float getAgentRadius(std::size_t agentNo) const;
-
-    /**
-     *      Returns the progress towards its goal of a specified agent.
-     *
-     * @param agentNo  The number of the agent whose progress towards its goal is to
-     * be retrieved.
-     * @return    True if the agent has reached its goal; false otherwise.
-     */
-    bool hasAgentReachedGoal(std::size_t agentNo) const;
-
-    /**
-     *      Returns the velocity of a specified agent.
-     *
-     * @param agentNo  The number of the agent whose velocity is to be retrieved.
-     * @return    The present velocity of the agent.
-     */
-    Vector getAgentVelocity(std::size_t agentNo) const;
-
-    /**
-     *   Returns the global time of the simulation.
-     *
-     * @return The present global time of the simulation (zero initially).
-     */
-    float getGlobalTime() const
-    {
-        return global_time;
-    }
-
-    /**
-     *   Returns the count of agents in the simulation.
-     *
-     * @return The count of agents in the simulation.
-     */
-    std::size_t getNumAgents() const
-    {
-        return agents.size();
-    }
-
-    /**
      *   Returns the time step of the simulation.
      *
      * @return The present time step of the simulation.
@@ -250,16 +184,6 @@ class HRVOSimulator
     float getTimeStep() const
     {
         return time_step;
-    }
-
-    /**
-     *   Returns the progress towards their goals of all agents.
-     *
-     * @return True if all agents have reached their goals; false otherwise.
-     */
-    bool haveReachedGoals() const
-    {
-        return reached_goals;
     }
 
    private:
@@ -283,9 +207,6 @@ class HRVOSimulator
 
     // The last time which the velocity of the robot was updated
     float last_time_velocity_updated;
-
-    // True if all agents have reached their destination
-    bool reached_goals;
 
     // The colour of the friendly team
     const TeamColour friendly_team_colour;

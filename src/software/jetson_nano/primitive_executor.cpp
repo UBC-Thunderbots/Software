@@ -5,24 +5,23 @@
 #include "proto/primitive/primitive_msg_factory.h"
 #include "proto/tbots_software_msgs.pb.h"
 #include "proto/visualization.pb.h"
-#include "software/logger/logger.h"
 #include "software/math/math_functions.h"
 
-PrimitiveExecutor::PrimitiveExecutor(const double time_step,
-                                     const RobotConstants_t& robot_constants,
+PrimitiveExecutor::PrimitiveExecutor(const double time_step, const RobotId robot_id,
+                                     const RobotConstants_t &robot_constants,
                                      const TeamColour friendly_team_colour)
-    : current_primitive_(),
+    : robot_id_(robot_id),
       robot_constants_(robot_constants),
+      current_primitive_(),
       hrvo_simulator_(static_cast<float>(time_step), robot_constants,
                       friendly_team_colour)
 {
 }
 
-void PrimitiveExecutor::updatePrimitiveSet(
-    const unsigned int robot_id, const TbotsProto::PrimitiveSet& primitive_set_msg)
+void PrimitiveExecutor::updatePrimitiveSet(const TbotsProto::PrimitiveSet& primitive_set_msg)
 {
     hrvo_simulator_.updatePrimitiveSet(primitive_set_msg);
-    auto primitive_set_msg_iter = primitive_set_msg.robot_primitives().find(robot_id);
+    auto primitive_set_msg_iter = primitive_set_msg.robot_primitives().find(robot_id_);
     if (primitive_set_msg_iter != primitive_set_msg.robot_primitives().end())
     {
         current_primitive_ = primitive_set_msg_iter->second;
@@ -31,15 +30,22 @@ void PrimitiveExecutor::updatePrimitiveSet(
 
 void PrimitiveExecutor::updateWorld(const TbotsProto::World& world_msg)
 {
+//    if (robot_id_ == 1)
+//        std::cout << "velocity updated from world" << std::endl;
     hrvo_simulator_.updateWorld(World(world_msg));
 }
 
-void PrimitiveExecutor::updateLocalVelocity(Vector local_velocity) {}
-
-Vector PrimitiveExecutor::getTargetLinearVelocity(const unsigned int robot_id,
-                                                  const Angle& curr_orientation)
+void PrimitiveExecutor::updateLocalVelocity(const Vector &local_velocity, const Angle &curr_orientation)
 {
-    Vector target_global_velocity = hrvo_simulator_.getRobotVelocity(robot_id);
+//    if (robot_id_ == 1)
+//        std::cout << "velocity updated from sim (actual)" << std::endl;
+
+    hrvo_simulator_.updateFriendlyRobotVelocity(robot_id_, local_velocity.rotate(-curr_orientation));
+}
+
+Vector PrimitiveExecutor::getTargetLinearVelocity(const Angle &curr_orientation)
+{
+    Vector target_global_velocity = hrvo_simulator_.getRobotVelocity(robot_id_);
     return target_global_velocity.rotate(-curr_orientation);
 }
 
@@ -67,13 +73,15 @@ AngularVelocity PrimitiveExecutor::getTargetAngularVelocity(
 }
 
 
-std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimitive(
-    const unsigned int robot_id, const Angle& curr_orientation)
+std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimitive(const Angle &curr_orientation)
 {
+//    if (robot_id_ == 1)
+//        std::cout << "hrvo sim stepped" << std::endl;
+
     hrvo_simulator_.doStep();
 
     // Visualize the HRVO Simulator for the current robot
-    hrvo_simulator_.visualize(robot_id);
+    hrvo_simulator_.visualize(robot_id_);
 
     switch (current_primitive_.primitive_case())
     {
@@ -107,7 +115,7 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
         case TbotsProto::Primitive::kMove:
         {
             // Compute the target velocities
-            Vector target_velocity = getTargetLinearVelocity(robot_id, curr_orientation);
+            Vector target_velocity = getTargetLinearVelocity(curr_orientation);
             AngularVelocity target_angular_velocity =
                 getTargetAngularVelocity(current_primitive_.move(), curr_orientation);
 
@@ -129,4 +137,9 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
         }
     }
     return std::make_unique<TbotsProto::DirectControlPrimitive>();
+}
+
+void PrimitiveExecutor::setRobotId(const RobotId robot_id)
+{
+    robot_id_ = robot_id;
 }

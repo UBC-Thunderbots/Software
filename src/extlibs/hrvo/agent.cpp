@@ -66,13 +66,11 @@ void Agent::update()
         {
             path.incrementPathIndex();
             reached_goal_             = false;
-            simulator_->reached_goals = false;
         }
     }
     else
     {
         reached_goal_             = false;
-        simulator_->reached_goals = false;
     }
 }
 

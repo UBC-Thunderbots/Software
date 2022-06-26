@@ -50,7 +50,7 @@ class Thunderloop
 
     ~Thunderloop();
 
-    void runLoop();
+    [[noreturn]] void runLoop();
 
     // Services
     std::unique_ptr<MotorService> motor_service_;
@@ -77,9 +77,6 @@ class Thunderloop
      */
     double getCpuTemperature();
 
-    // Primitive Executor
-    PrimitiveExecutor primitive_executor_;
-
     // Input Msg Buffers
     TbotsProto::PrimitiveSet primitive_set_;
     TbotsProto::World world_;
@@ -101,6 +98,9 @@ class Thunderloop
     int channel_id_;
     std::string network_interface_;
     int loop_hz_;
+
+    // Primitive Executor
+    PrimitiveExecutor primitive_executor_;
 
     // 50 millisecond timeout on receiving primitives before we emergency stop the robots
     const double PRIMITIVE_MANAGER_TIMEOUT_NS = 50.0 * MILLISECONDS_PER_NANOSECOND;

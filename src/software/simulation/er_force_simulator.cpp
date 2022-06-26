@@ -231,13 +231,13 @@ void ErForceSimulator::setRobots(
         if (side == gameController::Team::BLUE)
         {
             auto robot_primitive_executor = std::make_shared<PrimitiveExecutor>(
-                primitive_executor_time_step, robot_constants, TeamColour::BLUE);
+                primitive_executor_time_step, id, robot_constants, TeamColour::BLUE);
             blue_primitive_executor_map.insert({id, robot_primitive_executor});
         }
         else
         {
             auto robot_primitive_executor = std::make_shared<PrimitiveExecutor>(
-                primitive_executor_time_step, robot_constants, TeamColour::YELLOW);
+                primitive_executor_time_step, id, robot_constants, TeamColour::YELLOW);
             yellow_primitive_executor_map.insert({id, robot_primitive_executor});
         }
     }
@@ -298,14 +298,18 @@ void ErForceSimulator::setRobotPrimitive(
                          [&](const auto& robot) { return robot.id() == robot_id; });
         if (robot_proto_it != friendly_robots.end())
         {
-            robot_primitive_executor->updatePrimitiveSet(robot_id, primitive_set_msg);
+            robot_primitive_executor->updatePrimitiveSet(primitive_set_msg);
             robot_primitive_executor->updateWorld(world_msg);
-            robot_primitive_executor->updateLocalVelocity(local_velocity);
+            static int test = 0;
+            if (test++ % 5 == 0)
+            {
+                robot_primitive_executor->updateLocalVelocity(local_velocity, createAngle(robot_proto_it->current_state().global_orientation()));
+            }
         }
         else
         {
             LOG(WARNING) << "Robot with ID " << id
-                         << " not included in world proto message" << std::endl;
+                         << " is assigned a primitive but is not included in the world" << std::endl;
         }
     }
     else
@@ -335,7 +339,7 @@ SSLSimulationProto::RobotControl ErForceSimulator::updateSimulatorRobots(
             // Set to NEG_X because the world msg in this simulator is
             // normalized correctly
             auto direct_control = primitive_executor->stepPrimitive(
-                robot_id, RobotState(robot_proto_it->current_state()).orientation());
+                    RobotState(robot_proto_it->current_state()).orientation());
 
             auto command = *getRobotCommandFromDirectControl(
                 robot_id, std::move(direct_control), robot_constants);
