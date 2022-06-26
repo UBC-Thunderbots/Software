@@ -2,6 +2,7 @@ import threading
 import queue
 import argparse
 import time
+import sys
 import os
 
 import pytest
@@ -65,6 +66,8 @@ class SimulatorTestRunner(object):
         self.blue_full_system_proto_unix_io = blue_full_system_proto_unix_io
         self.yellow_full_system_proto_unix_io = yellow_full_system_proto_unix_io
         self.gamecontroller = gamecontroller
+        self.last_exception = None
+
         self.world_buffer = ThreadSafeBuffer(buffer_size=1, protobuf_type=World)
         self.last_exception = None
 
@@ -295,7 +298,25 @@ def load_command_line_arguments():
         default=False,
         help="How many packets to buffer while rendering",
     )
+    parser.add_argument(
+        "--test_filter",
+        action="store",
+        default="",
+        help="The test filter, if not specified all tests will run. "
+        + "See https://docs.pytest.org/en/latest/how-to/usage.html#specifying-tests-selecting-tests",
+    )
     return parser.parse_args()
+
+
+def pytest_main(file):
+    """Runs the pytest file
+
+    :param file: The test file to run
+
+    """
+    args = load_command_line_arguments()
+    # Run the test, -s disables all capturing at -vv increases verbosity
+    sys.exit(pytest.main(["-svv", "-k", args.test_filter, file]))
 
 
 @pytest.fixture
@@ -312,16 +333,24 @@ def simulated_test_runner():
     current_test = current_test.replace("]", "")
     current_test = current_test.replace("[", "-")
 
+    test_name = current_test.split("-")[0]
+
     # Launch all binaries
     with Simulator(
-        args.simulator_runtime_dir, args.debug_simulator
+        f"{args.simulator_runtime_dir}/test/{test_name}", args.debug_simulator
     ) as simulator, FullSystem(
-        args.blue_full_system_runtime_dir, args.debug_blue_full_system, False
+        f"{args.blue_full_system_runtime_dir}/test/{test_name}",
+        args.debug_blue_full_system,
+        False,
+        should_restart_on_crash=False,
     ) as blue_fs, FullSystem(
-        args.yellow_full_system_runtime_dir, args.debug_yellow_full_system, True
+        f"{args.yellow_full_system_runtime_dir}/test/{test_name}",
+        args.debug_yellow_full_system,
+        True,
+        should_restart_on_crash=False,
     ) as yellow_fs:
         with Gamecontroller(
-            supress_logs=(not args.show_gamecontroller_logs), ci_mode=True
+            supress_logs=(not args.show_gamecontroller_logs), ci_mode=True,
         ) as gamecontroller:
 
             blue_fs.setup_proto_unix_io(blue_full_system_proto_unix_io)
@@ -382,3 +411,9 @@ def simulated_test_runner():
                 )
 
                 yield runner
+                print(
+                    f"\n\nTo replay this test for the blue team, go to the `src` folder and run \n./tbots.py run thunderscope --blue_log {blue_logger.log_folder}"
+                )
+                print(
+                    f"\n\nTo replay this test for the yellow team, go to the `src` folder and run \n./tbots.py run thunderscope --yellow_log {yellow_logger.log_folder}"
+                )

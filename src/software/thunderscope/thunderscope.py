@@ -18,9 +18,10 @@ else:
     import PyQt6
     from PyQt6.QtWebEngineWidgets import QWebEngineView
 
-import qdarktheme
+from qt_material import apply_stylesheet
 
 import pyqtgraph
+import qdarktheme
 from pyqtgraph.dockarea import *
 from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtWidgets import *
@@ -36,6 +37,7 @@ from software.thunderscope.robot_communication import RobotCommunication
 from software.thunderscope.arbitrary_plot.named_value_plotter import NamedValuePlotter
 from software.thunderscope.binary_context_managers import *
 from extlibs.er_force_sim.src.protobuf.world_pb2 import *
+from software.thunderscope.dock_label_style import *
 
 # Import Widgets
 from software.thunderscope.field import (
@@ -45,8 +47,12 @@ from software.thunderscope.field import (
     simulator_layer,
     world_layer,
     passing_layer,
+    hrvo_layer,
 )
 
+from software.thunderscope.common.proto_configuration_widget import (
+    ProtoConfigurationWidget,
+)
 from software.thunderscope.field.field import Field
 from software.thunderscope.log.g3log_widget import g3logWidget
 from software.thunderscope.proto_unix_io import ProtoUnixIO
@@ -110,7 +116,10 @@ class Thunderscope(object):
 
         # Setup MainApp and initialize DockArea
         self.app = pyqtgraph.mkQApp("Thunderscope")
-        self.app.setStyleSheet(qdarktheme.load_stylesheet())
+
+        # Setup stylesheet
+        apply_stylesheet(self.app, theme="dark_blue.xml")
+
         self.blue_replay_log = blue_replay_log
         self.yellow_replay_log = yellow_replay_log
         self.refresh_interval_ms = refresh_interval_ms
@@ -361,14 +370,21 @@ class Thunderscope(object):
         performance_dock = Dock("Performance")
         performance_dock.addWidget(widgets["performance_widget"].win)
 
+        widgets["parameter_widget"] = self.setup_parameter_widget(
+            full_system_proto_unix_io, friendly_colour_yellow
+        )
+        parameter_dock = Dock("Parameters")
+        parameter_dock.addWidget(widgets["parameter_widget"])
+
         widgets["playinfo_widget"] = self.setup_play_info(full_system_proto_unix_io)
         playinfo_dock = Dock("Play Info")
         playinfo_dock.addWidget(widgets["playinfo_widget"])
 
         dock_area.addDock(field_dock)
-        dock_area.addDock(log_dock, "bottom", field_dock)
-        dock_area.addDock(performance_dock, "right", log_dock)
-        dock_area.addDock(playinfo_dock, "right", performance_dock)
+        dock_area.addDock(log_dock, "left", field_dock)
+        dock_area.addDock(parameter_dock, "above", log_dock)
+        dock_area.addDock(playinfo_dock, "bottom", field_dock)
+        dock_area.addDock(performance_dock, "right", playinfo_dock)
 
     def setup_field_widget(
         self, sim_proto_unix_io, full_system_proto_unix_io, friendly_colour_yellow
@@ -406,6 +422,15 @@ class Thunderscope(object):
         field.add_layer("Validation", validation)
         field.add_layer("Passing", passing)
         field.add_layer("Simulator", sim_state)
+        hrvo_sim_states = []
+        # Add HRVO layers to field widget and have them hidden on startup
+        # TODO (#2655): Add/Remove HRVO layers dynamically based on the HRVOVisualization proto messages
+        for robot_id in range(6):
+            hrvo_sim_state = hrvo_layer.HRVOLayer(
+                robot_id, self.visualization_buffer_size
+            )
+            hrvo_sim_states.append(hrvo_sim_state)
+            field.add_layer(f"HRVO {robot_id}", hrvo_sim_state, False)
 
         # Register observers
         sim_proto_unix_io.register_observer(
@@ -416,11 +441,14 @@ class Thunderscope(object):
             (World, world.world_buffer),
             (RobotStatus, world.robot_status_buffer),
             (Referee, world.referee_buffer),
-            (Obstacles, obstacles.obstacle_buffer),
-            (PathVisualization, paths.path_visualization_buffer),
+            (PrimitiveSet, obstacles.primitive_set_buffer),
+            (PrimitiveSet, paths.primitive_set_buffer),
             (PassVisualization, passing.pass_visualization_buffer),
             (ValidationProtoSet, validation.validation_set_buffer),
             (SimulatorState, sim_state.simulator_state_buffer),
+        ] + [
+            (HRVOVisualization, hrvo_sim_state.hrvo_buffer)
+            for hrvo_sim_state in hrvo_sim_states
         ]:
             full_system_proto_unix_io.register_observer(*arg)
 
@@ -428,6 +456,23 @@ class Thunderscope(object):
         self.register_refresh_function(field.refresh)
 
         return field
+
+    def setup_parameter_widget(self, proto_unix_io, friendly_colour_yellow):
+        """Setup the parameter widget
+
+        :param proto_unix_io: The proto unix io object
+        :param friendly_colour_yellow: 
+        :returns: The proto configuration widget
+
+        """
+
+        self.config = ThunderbotsConfig()
+        self.config.sensor_fusion_config.friendly_color_yellow = friendly_colour_yellow
+
+        def on_change_callback(attr, value, updated_proto):
+            proto_unix_io.send_proto(ThunderbotsConfig, updated_proto)
+
+        return ProtoConfigurationWidget(self.config, on_change_callback)
 
     def setup_log_widget(self, proto_unix_io):
         """Setup the wiget that receives logs from full system

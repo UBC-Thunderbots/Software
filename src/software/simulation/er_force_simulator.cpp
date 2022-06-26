@@ -8,24 +8,21 @@
 #include <iostream>
 
 #include "extlibs/er_force_sim/src/protobuf/robot.h"
-#include "proto/message_translation/primitive_google_to_nanopb_converter.h"
 #include "proto/message_translation/ssl_detection.h"
 #include "proto/message_translation/ssl_geometry.h"
 #include "proto/message_translation/ssl_simulation_robot_control.h"
 #include "proto/message_translation/ssl_wrapper.h"
 #include "proto/message_translation/tbots_protobuf.h"
 #include "proto/robot_status_msg.pb.h"
+#include "software/logger/logger.h"
 #include "software/world/robot_state.h"
 
-ErForceSimulator::ErForceSimulator(
-    const TbotsProto::FieldType& field_type, const RobotConstants_t& robot_constants,
-    const WheelConstants& wheel_constants,
-    std::shared_ptr<const SimulatorConfig> simulator_config)
+ErForceSimulator::ErForceSimulator(const TbotsProto::FieldType& field_type,
+                                   const RobotConstants_t& robot_constants)
     : yellow_team_world_msg(std::make_unique<TbotsProto::World>()),
       blue_team_world_msg(std::make_unique<TbotsProto::World>()),
       frame_number(0),
       robot_constants(robot_constants),
-      wheel_constants(wheel_constants),
       field(Field::createField(field_type)),
       blue_robot_with_ball(std::nullopt),
       yellow_robot_with_ball(std::nullopt)
@@ -231,15 +228,16 @@ void ErForceSimulator::setRobots(
 
     for (auto& [id, robot_state] : robots)
     {
-        auto robot_primitive_executor = std::make_shared<PrimitiveExecutor>(
-            primitive_executor_time_step, robot_constants);
-
         if (side == gameController::Team::BLUE)
         {
+            auto robot_primitive_executor = std::make_shared<PrimitiveExecutor>(
+                primitive_executor_time_step, robot_constants, TeamColour::BLUE);
             blue_primitive_executor_map.insert({id, robot_primitive_executor});
         }
         else
         {
+            auto robot_primitive_executor = std::make_shared<PrimitiveExecutor>(
+                primitive_executor_time_step, robot_constants, TeamColour::YELLOW);
             yellow_primitive_executor_map.insert({id, robot_primitive_executor});
         }
     }
@@ -340,7 +338,7 @@ SSLSimulationProto::RobotControl ErForceSimulator::updateSimulatorRobots(
                 robot_id, RobotState(robot_proto_it->current_state()).orientation());
 
             auto command = *getRobotCommandFromDirectControl(
-                robot_id, std::move(direct_control), robot_constants, wheel_constants);
+                robot_id, std::move(direct_control), robot_constants);
             *(robot_control.mutable_robot_commands()->Add()) = command;
         }
     }

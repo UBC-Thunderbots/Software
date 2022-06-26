@@ -1,9 +1,8 @@
 #pragma once
 
-#include "proto/logging/proto_logger.h"
+#include "proto/play_info_msg.pb.h"
 #include "shared/test_util/tbots_gtest_main.h"
 #include "software/ai/hl/stp/play/halt_play.h"
-#include "software/gui/full_system/threaded_full_system_gui.h"
 #include "software/sensor_fusion/sensor_fusion.h"
 #include "software/simulated_tests/validation/non_terminating_function_validator.h"
 #include "software/simulated_tests/validation/terminating_function_validator.h"
@@ -22,24 +21,6 @@ class SimulatedErForceSimTestFixture : public ::testing::Test
 
    protected:
     void SetUp() override;
-
-    /**
-     * This function enables the FullSystemGUI while a test is running, so that the test
-     * can be debugged Visually. Simply call this function at the start of the test(s) you
-     * want to show in the FullSystemGUI.
-     */
-    void enableVisualizer();
-
-    /**
-     * Creates a directory to output logs to in the directory at the
-     * TEST_UNDECLARED_OUTPUTS_DIR Bazel environment variable, and sets up some
-     * ProtoLoggers to log unfiltered and filtered data.
-     *
-     * See
-     * https://docs.bazel.build/versions/master/test-encyclopedia.html#initial-conditions
-     * for an explanation of all the environment variables that Bazel passes to tests
-     */
-    void setupReplayLogging();
 
     /**
      * Starts the simulation using the current state of the simulator, and runs
@@ -97,10 +78,8 @@ class SimulatedErForceSimTestFixture : public ::testing::Test
     void registerEnemyTickTime(double tick_time_ms);
 
     // The dynamic params being used in the tests
-    std::shared_ptr<ThunderbotsConfig> friendly_mutable_thunderbots_config;
-    std::shared_ptr<ThunderbotsConfig> enemy_mutable_thunderbots_config;
-    std::shared_ptr<const ThunderbotsConfig> friendly_thunderbots_config;
-    std::shared_ptr<const ThunderbotsConfig> enemy_thunderbots_config;
+    TbotsProto::ThunderbotsConfig friendly_thunderbots_config;
+    TbotsProto::ThunderbotsConfig enemy_thunderbots_config;
 
    private:
     /**
@@ -131,7 +110,7 @@ class SimulatedErForceSimTestFixture : public ::testing::Test
      * @param mutable_thunderbots_config A mutable thunderbots config
      */
     static void setCommonConfigs(
-        std::shared_ptr<ThunderbotsConfig> mutable_thunderbots_config);
+        TbotsProto::ThunderbotsConfig &mutable_thunderbots_config);
 
     /**
      * A helper function that updates SensorFusion with the latest data from the
@@ -158,13 +137,6 @@ class SimulatedErForceSimTestFixture : public ::testing::Test
      * @return play info message to display, if any
      */
     virtual std::optional<TbotsProto::PlayInfo> getPlayInfo() = 0;
-
-    /**
-     * Gets draw functions for visualizing on the FullSystemGUI
-     *
-     * @return draw functions to draw
-     */
-    virtual AIDrawFunction getDrawFunctions() = 0;
 
     /**
      * Runs the given function validators and returns whether or not the
@@ -204,18 +176,9 @@ class SimulatedErForceSimTestFixture : public ::testing::Test
     SensorFusion friendly_sensor_fusion;
     SensorFusion enemy_sensor_fusion;
 
-    // whether we should log the filtered and unfiltered world states as replay logs
-    // this will only be set to true if the environment variable
-    // TEST_UNDECLARED_OUTPUTS_DIR is set, usually by running as a Bazel test
-    bool should_log_replay;
-    // ProtoLoggers for the simulator and SensorFusion, respectively
-    std::shared_ptr<ProtoLogger<SensorProto>> simulator_sensorproto_logger;
-    std::shared_ptr<ProtoLogger<SSLProto::SSL_WrapperPacket>> sensorfusion_wrapper_logger;
-
     std::vector<NonTerminatingFunctionValidator> non_terminating_function_validators;
     std::vector<TerminatingFunctionValidator> terminating_function_validators;
 
-    std::shared_ptr<ThreadedFullSystemGUI> full_system_gui;
     // If false, runs the simulation as fast as possible.
     // If true, introduces artificial delay so that simulation
     // time passes at the same speed a real life time

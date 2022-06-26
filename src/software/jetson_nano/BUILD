@@ -25,6 +25,7 @@ cc_library(
         "//software/jetson_nano/services:motor",
         "//software/jetson_nano/services:network",
         "//software/jetson_nano/services:power",
+        "//software/logger:network_logger",
         "//software/util/scoped_timespec_timer",
     ],
 )
@@ -35,6 +36,7 @@ cc_library(
     hdrs = ["gpio.h"],
     deps = [
         "//software/logger",
+        "//software/logger:network_logger",
         "//software/util/make_enum",
     ],
 )
@@ -50,4 +52,9 @@ cc_binary(
         ":thunderloop",
         "//shared:constants",
     ],
+)
+
+sh_binary(
+    name = "setup_nano",
+    srcs = ["setup_nano.sh"],
 )

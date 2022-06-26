@@ -45,11 +45,11 @@ RedisClient::RedisClient(std::string host, size_t port)
     subscriber_.commit();
 }
 
-cpp_redis::reply RedisClient::get(const std::string &key)
+std::string RedisClient::get(const std::string &key)
 {
     auto future = client_.get(key);
     client_.commit();
-    return future.get();
+    return future.get().as_string();
 }
 
 void RedisClient::set(const std::string &key, const std::string &value)

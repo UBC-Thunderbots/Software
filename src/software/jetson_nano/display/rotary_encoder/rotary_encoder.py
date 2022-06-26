@@ -116,8 +116,10 @@ class RotaryEncoder:
 
             if self.count // self.transitions_per_rotation != 0:
                 if self.dir == CLOCKWISE:
+                    print("rotary_encoder: clockwise rotation")
                     self.on_clockwise_rotate()
                 elif self.dir == COUNTERCLOCKWISE:
+                    print("rotary_encoder: counter clockwise rotation")
                     self.on_counterclockwise_rotate()
 
                 self.count = 0

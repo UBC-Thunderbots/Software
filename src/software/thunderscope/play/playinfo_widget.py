@@ -13,13 +13,13 @@ from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 class playInfoWidget(QTableWidget):
 
-    # TODO (#2560): set these values dynamically
     NUM_ROWS = 6
     NUM_COLS = 4
 
-    def __init__(self, buffer_size=5):
+    def __init__(self, minimum_column_width=200, buffer_size=5):
         """Shows the current play information including tactic and FSM state
 
+        :param minimum_column_width: minimum width of columns
         :param buffer_size: The buffer size, set higher for smoother plots.
                             Set lower for more realtime plots. Default is arbitrary
 
@@ -37,11 +37,24 @@ class playInfoWidget(QTableWidget):
         """
         horizontal_headers = []
 
-        for n, key in enumerate(sorted(data.keys())):
+        # empirically makes even bolded items fit within columns
+        HEADER_SIZE_HINT_WIDTH_EXPANSION = 12
+        ITEM_SIZE_HINT_WIDTH_EXPANSION = 10
+
+        for n, key in enumerate(data.keys()):
             horizontal_headers.append(key)
 
             for m, item in enumerate(data[key]):
                 newitem = QTableWidgetItem(item)
+                newitem.setSizeHint(
+                    QtCore.QSize(
+                        max(
+                            len(key) * HEADER_SIZE_HINT_WIDTH_EXPANSION,
+                            len(item) * ITEM_SIZE_HINT_WIDTH_EXPANSION,
+                        ),
+                        1,
+                    )
+                )
                 self.setItem(m, n, newitem)
 
         self.setHorizontalHeaderLabels(horizontal_headers)
@@ -61,7 +74,16 @@ class playInfoWidget(QTableWidget):
         if "robotTacticAssignment" not in play_info_dict:
             return
 
-        play_name.append(play_info_dict["play"]["playName"])
+        num_rows = max(
+            len(play_info_dict["robotTacticAssignment"]),
+            len(play_info_dict["play"]["playState"]),
+        )
+
+        # setting table size dynamically
+        self.setRowCount(num_rows)
+
+        for state in play_info_dict["play"]["playState"]:
+            play_name.append(state)
 
         for robot_id in sorted(play_info_dict["robotTacticAssignment"]):
             robot_ids.append(robot_id)
@@ -74,10 +96,10 @@ class playInfoWidget(QTableWidget):
 
         self.set_data(
             {
+                "Play": play_name,
                 "Robot ID": robot_ids,
                 "Tactic Name": tactic_names,
                 "Tactic FSM State": tactic_fsm_states,
-                "Play Name": play_name,
             }
         )
 

@@ -3,6 +3,7 @@ import socket
 import logging
 import psutil
 import time
+import threading
 import google.protobuf.internal.encoder as encoder
 import google.protobuf.internal.decoder as decoder
 
@@ -41,13 +42,12 @@ class FullSystem(object):
 
     """ Full System Binary Context Manager """
 
-    DEBUG_MODE_POLL_INTERVAL_S = 0.1
-
     def __init__(
         self,
         full_system_runtime_dir=None,
         debug_full_system=False,
         friendly_colour_yellow=False,
+        should_restart_on_crash=True,
     ):
         """Run FullSystem
 
@@ -59,6 +59,9 @@ class FullSystem(object):
         self.debug_full_system = debug_full_system
         self.friendly_colour_yellow = friendly_colour_yellow
         self.full_system_proc = None
+        self.should_restart_on_crash = should_restart_on_crash
+
+        self.thread = threading.Thread(target=self.__restart__)
 
     def __enter__(self):
         """Enter the full_system context manager. 
@@ -76,7 +79,7 @@ class FullSystem(object):
         except:
             pass
 
-        full_system = "software/unix_full_system --runtime_dir={} {}".format(
+        self.full_system = "software/unix_full_system --runtime_dir={} {}".format(
             self.full_system_runtime_dir,
             "--friendly_colour_yellow" if self.friendly_colour_yellow else "",
         )
@@ -114,9 +117,25 @@ gdb --args bazel-bin/{full_system}
                     time.sleep(1)
 
         else:
-            self.full_system_proc = Popen(full_system.split(" "))
+            self.full_system_proc = Popen(self.full_system.split(" "))
+            if self.should_restart_on_crash:
+                self.thread.start()
 
         return self
+
+    def __restart__(self):
+        "Restarts full system."
+
+        while True:
+            if not is_cmd_running(
+                [
+                    "unix_full_system",
+                    "--runtime_dir={}".format(self.full_system_runtime_dir),
+                ]
+            ):
+                self.full_system_proc = Popen(self.full_system.split(" "))
+                logging.info("FullSystem has restarted.")
+        time.sleep(1)
 
     def __exit__(self, type, value, traceback):
         """Exit the full_system context manager.
@@ -130,6 +149,9 @@ gdb --args bazel-bin/{full_system}
             self.full_system_proc.kill()
             self.full_system_proc.wait()
 
+        if self.should_restart_on_crash:
+            self.thread.join()
+
     def setup_proto_unix_io(self, proto_unix_io):
         """Helper to run full system and attach the appropriate unix senders/listeners
 
@@ -139,47 +161,47 @@ gdb --args bazel-bin/{full_system}
 
         # Setup LOG(VISUALIZE) handling from full system. We set from_log_visualize
         # to true to decode from base64.
-        for arg in [
-            (self.full_system_runtime_dir, Obstacles, True),
-            (self.full_system_runtime_dir, PathVisualization, True),
-            (self.full_system_runtime_dir, PassVisualization, True),
-            (self.full_system_runtime_dir, NamedValue, True),
-            (self.full_system_runtime_dir, PlayInfo, True),
+        for proto_class in [
+            Obstacles,
+            PathVisualization,
+            PassVisualization,
+            NamedValue,
+            PlayInfo,
         ]:
-            proto_unix_io.attach_unix_receiver(*arg)
+            proto_unix_io.attach_unix_receiver(
+                runtime_dir=self.full_system_runtime_dir,
+                proto_class=proto_class,
+                from_log_visualize=True,
+            )
 
         proto_unix_io.attach_unix_receiver(
-            self.full_system_runtime_dir + "/log", RobotLog
+            self.full_system_runtime_dir, "/log", RobotLog
+        )
+
+        # Outputs from full_system
+        proto_unix_io.attach_unix_receiver(
+            self.full_system_runtime_dir, WORLD_PATH, World
+        )
+        proto_unix_io.attach_unix_receiver(
+            self.full_system_runtime_dir, PRIMITIVE_PATH, PrimitiveSet
         )
 
         # Inputs to full_system
         for arg in [
-            (self.full_system_runtime_dir + ROBOT_STATUS_PATH, RobotStatus),
-            (self.full_system_runtime_dir + SSL_WRAPPER_PATH, SSL_WrapperPacket),
-            (self.full_system_runtime_dir + SSL_REFEREE_PATH, Referee),
-            (self.full_system_runtime_dir + SENSOR_PROTO_PATH, SensorProto),
-            (
-                self.full_system_runtime_dir + TACTIC_OVERRIDE_PATH,
-                AssignedTacticPlayControlParams,
-            ),
-            (self.full_system_runtime_dir + PLAY_OVERRIDE_PATH, Play),
+            (ROBOT_STATUS_PATH, RobotStatus),
+            (SSL_WRAPPER_PATH, SSL_WrapperPacket),
+            (SSL_REFEREE_PATH, Referee),
+            (SENSOR_PROTO_PATH, SensorProto),
+            (TACTIC_OVERRIDE_PATH, AssignedTacticPlayControlParams,),
+            (PLAY_OVERRIDE_PATH, Play),
+            (DYNAMIC_PARAMETER_UPDATE_REQUEST_PATH, ThunderbotsConfig,),
         ]:
-            proto_unix_io.attach_unix_sender(*arg)
-
-        # Outputs from full_system
-        proto_unix_io.attach_unix_receiver(
-            self.full_system_runtime_dir + WORLD_PATH, World
-        )
-        proto_unix_io.attach_unix_receiver(
-            self.full_system_runtime_dir + PRIMITIVE_PATH, PrimitiveSet
-        )
+            proto_unix_io.attach_unix_sender(self.full_system_runtime_dir, *arg)
 
 
 class Simulator(object):
 
     """ Simulator Context Manager """
-
-    DEBUG_MODE_POLL_INTERVAL_S = 0.1
 
     def __init__(self, simulator_runtime_dir=None, debug_simulator=False):
         """Run Simulator
@@ -278,37 +300,53 @@ gdb --args bazel-bin/{simulator_command}
 
         # inputs to er_force_simulator_main
         for arg in [
-            (self.simulator_runtime_dir + SIMULATION_TICK_PATH, SimulatorTick),
-            (self.simulator_runtime_dir + WORLD_STATE_PATH, WorldState),
+            (SIMULATION_TICK_PATH, SimulatorTick),
+            (WORLD_STATE_PATH, WorldState),
         ]:
-            simulator_proto_unix_io.attach_unix_sender(*arg)
+            simulator_proto_unix_io.attach_unix_sender(self.simulator_runtime_dir, *arg)
 
         # setup blue full system unix io
         for arg in [
-            (self.simulator_runtime_dir + BLUE_WORLD_PATH, World),
-            (self.simulator_runtime_dir + BLUE_PRIMITIVE_SET, PrimitiveSet),
+            (BLUE_WORLD_PATH, World),
+            (BLUE_PRIMITIVE_SET, PrimitiveSet),
         ]:
-            blue_full_system_proto_unix_io.attach_unix_sender(*arg)
+            blue_full_system_proto_unix_io.attach_unix_sender(
+                self.simulator_runtime_dir, *arg
+            )
 
         for arg in [
-            (self.simulator_runtime_dir + BLUE_SSL_WRAPPER_PATH, SSL_WrapperPacket),
-            (self.simulator_runtime_dir + BLUE_ROBOT_STATUS_PATH, RobotStatus),
-            (self.simulator_runtime_dir + SIMULATOR_STATE_PATH, SimulatorState),
+            (BLUE_SSL_WRAPPER_PATH, SSL_WrapperPacket),
+            (BLUE_ROBOT_STATUS_PATH, RobotStatus),
+            (SIMULATOR_STATE_PATH, SimulatorState),
+        ] + [
+            # TODO (#2655): Add/Remove HRVO layers dynamically based on the HRVOVisualization proto messages
+            (BLUE_HRVO_PATH, HRVOVisualization, True)
+            for robot_id in range(6)
         ]:
-            blue_full_system_proto_unix_io.attach_unix_receiver(*arg)
+            blue_full_system_proto_unix_io.attach_unix_receiver(
+                self.simulator_runtime_dir, *arg
+            )
 
         # setup yellow full system unix io
         for arg in [
-            (self.simulator_runtime_dir + YELLOW_WORLD_PATH, World),
-            (self.simulator_runtime_dir + YELLOW_PRIMITIVE_SET, PrimitiveSet),
+            (YELLOW_WORLD_PATH, World),
+            (YELLOW_PRIMITIVE_SET, PrimitiveSet),
         ]:
-            yellow_full_system_proto_unix_io.attach_unix_sender(*arg)
+            yellow_full_system_proto_unix_io.attach_unix_sender(
+                self.simulator_runtime_dir, *arg
+            )
 
         for arg in [
-            (self.simulator_runtime_dir + YELLOW_SSL_WRAPPER_PATH, SSL_WrapperPacket),
-            (self.simulator_runtime_dir + YELLOW_ROBOT_STATUS_PATH, RobotStatus),
+            (YELLOW_SSL_WRAPPER_PATH, SSL_WrapperPacket),
+            (YELLOW_ROBOT_STATUS_PATH, RobotStatus),
+        ] + [
+            # TODO (#2655): Add/Remove HRVO layers dynamically based on the HRVOVisualization proto messages
+            (YELLOW_HRVO_PATH, HRVOVisualization, True)
+            for robot_id in range(6)
         ]:
-            yellow_full_system_proto_unix_io.attach_unix_receiver(*arg)
+            yellow_full_system_proto_unix_io.attach_unix_receiver(
+                self.simulator_runtime_dir, *arg
+            )
 
 
 class Gamecontroller(object):
@@ -316,9 +354,7 @@ class Gamecontroller(object):
     """ Gamecontroller Context Manager """
 
     CI_MODE_LAUNCH_DELAY_S = 0.3
-    CI_MODE_PORT = 10009
     REFEREE_IP = "224.5.23.1"
-    REFEREE_PORT = 10003
     CI_MODE_OUTPUT_RECEIVE_BUFFER_SIZE = 9000
 
     def __init__(self, supress_logs=False, ci_mode=False):
@@ -331,6 +367,11 @@ class Gamecontroller(object):
         self.supress_logs = supress_logs
         self.ci_mode = ci_mode
 
+        # We need to find 2 free ports to use for the gamecontroller
+        # so that we can run multiple gamecontroller instances in parallel
+        self.referee_port = self.next_free_port()
+        self.ci_port = self.next_free_port()
+
     def __enter__(self):
         """Enter the gamecontroller context manager. 
 
@@ -341,6 +382,9 @@ class Gamecontroller(object):
 
         if self.ci_mode:
             command = ["/opt/tbotspython/gamecontroller", "--timeAcquisitionMode", "ci"]
+
+        command += ["-publishAddress", f"{self.REFEREE_IP}:{self.referee_port}"]
+        command += ["-ciAddress", f"localhost:{self.ci_port}"]
 
         if self.supress_logs:
             with open(os.devnull, "w") as fp:
@@ -355,7 +399,7 @@ class Gamecontroller(object):
             time.sleep(Gamecontroller.CI_MODE_LAUNCH_DELAY_S)
 
             self.ci_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.ci_socket.connect(("", Gamecontroller.CI_MODE_PORT))
+            self.ci_socket.connect(("", self.ci_port))
 
         return self
 
@@ -372,6 +416,27 @@ class Gamecontroller(object):
 
         if self.ci_socket:
             self.ci_socket.close()
+
+    def next_free_port(self, port=40000, max_port=65535):
+        """Find the next free port. We need to find 2 free ports to use for the gamecontroller
+        so that we can run multiple gamecontroller instances in parallel.
+
+        :param port: The port to start looking from
+        :param max_port: The maximum port to look up to
+        :return: The next free port
+
+        """
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+        while port <= max_port:
+            try:
+                sock.bind(("", port))
+                sock.close()
+                return port
+            except OSError:
+                port += 1
+
+        raise IOError("no free ports")
 
     def setup_proto_unix_io(
         self, blue_full_system_proto_unix_io, yellow_full_system_proto_unix_io
@@ -394,10 +459,7 @@ class Gamecontroller(object):
             yellow_full_system_proto_unix_io.send_proto(Referee, data)
 
         self.receive_referee_command = SSLRefereeProtoListener(
-            Gamecontroller.REFEREE_IP,
-            Gamecontroller.REFEREE_PORT,
-            __send_referee_command,
-            True,
+            Gamecontroller.REFEREE_IP, self.referee_port, __send_referee_command, True,
         )
 
     def send_ci_input(

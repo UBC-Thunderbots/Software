@@ -16,7 +16,7 @@ CURR_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 BAZEL_ROOT_DIR="$CURR_DIR/../src"
 
 # Extensions to check formatting for clang-format
-CLANG_FORMAT_EXTENSIONS=(h cpp c hpp tpp proto)
+CLANG_FORMAT_EXTENSIONS=(h cpp c cc hpp tpp proto)
 
 # Function to run clang-format
 function run_clang_format () {
@@ -68,8 +68,8 @@ function run_python_import_formatting(){
 # Function to run black python formatting
 function run_black_formatting () {
     printf "Running black to format Python files...\n\n"
-    # suppress misleading "All done! ✨ 🍰 ✨" message
-    $CURR_DIR/black_$BLACK_VERSION $BAZEL_ROOT_DIR &>/dev/null
+
+    $CURR_DIR/black_$BLACK_VERSION $BAZEL_ROOT_DIR
 
     if [[ "$?" != 0 ]]; then
         printf "\n***Failed to format Python files!***\n\n"
@@ -95,7 +95,6 @@ function run_code_spell(){
 
     printf "Fixing spelling...\n\n"
     cd $CURR_DIR/../src/software && codespell -w --skip="1,2,0" -D $CURR_DIR/dictionary/edited_dictionary.txt # Skip binaries
-    cd $CURR_DIR/../src/firmware/app && codespell -w -D $CURR_DIR/dictionary/edited_dictionary.txt
     cd $CURR_DIR/../src/shared && codespell -w -D $CURR_DIR/dictionary/edited_dictionary.txt
     cd $CURR_DIR/../docs && codespell -w --skip="*.png" -D $CURR_DIR/dictionary/edited_dictionary.txt # Skip images
 

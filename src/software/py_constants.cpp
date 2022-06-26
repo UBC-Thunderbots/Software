@@ -53,17 +53,26 @@ PYBIND11_MODULE(py_constants, m)
     m.attr("SIMULATION_TICK_PATH")     = SIMULATION_TICK_PATH;
     m.attr("YELLOW_WORLD_PATH")        = YELLOW_WORLD_PATH;
     m.attr("BLUE_WORLD_PATH")          = BLUE_WORLD_PATH;
+    m.attr("YELLOW_HRVO_PATH")         = YELLOW_HRVO_PATH;
+    m.attr("BLUE_HRVO_PATH")           = BLUE_HRVO_PATH;
     m.attr("BLUE_PRIMITIVE_SET")       = BLUE_PRIMITIVE_SET;
     m.attr("YELLOW_PRIMITIVE_SET")     = YELLOW_PRIMITIVE_SET;
     m.attr("SIMULATOR_STATE_PATH")     = SIMULATOR_STATE_PATH;
     m.attr("UNIX_BUFFER_SIZE")         = UNIX_BUFFER_SIZE;
+    m.attr("DYNAMIC_PARAMETER_UPDATE_REQUEST_PATH") =
+        DYNAMIC_PARAMETER_UPDATE_REQUEST_PATH;
+    m.attr("DYNAMIC_PARAMETER_UPDATE_RESPONSE_PATH") =
+        DYNAMIC_PARAMETER_UPDATE_RESPONSE_PATH;
 
-    // TODO (#2585): Change the channels to a map when we remove all legacy c code
-    // Then we can have a pybind here in a 1-liner from unordered_map to py::dict
-    m.attr("ROBOT_MULTICAST_CHANNEL_0") = ROBOT_MULTICAST_CHANNELS[0];
-    m.attr("ROBOT_MULTICAST_CHANNEL_1") = ROBOT_MULTICAST_CHANNELS[1];
-    m.attr("ROBOT_MULTICAST_CHANNEL_2") = ROBOT_MULTICAST_CHANNELS[2];
-    m.attr("ROBOT_MULTICAST_CHANNEL_3") = ROBOT_MULTICAST_CHANNELS[3];
+    // Multicast Channels
+    m.def("getRobotMulticastChannel", [](py::args& args) {
+        if (args.size() != 1)
+        {
+            throw std::runtime_error("must provide channel number only");
+        }
+
+        return ROBOT_MULTICAST_CHANNELS.at(args[0].cast<int>());
+    });
 
     // Ports
     m.attr("VISION_PORT")       = VISION_PORT;
@@ -90,4 +99,11 @@ PYBIND11_MODULE(py_constants, m)
     m.attr("SECONDS_PER_MILLISECOND")      = SECONDS_PER_MILLISECOND;
     m.attr("MILLISECONDS_PER_MICROSECOND") = MILLISECONDS_PER_MICROSECOND;
     m.attr("MILLISECONDS_PER_NANOSECOND")  = MILLISECONDS_PER_NANOSECOND;
+
+    m.attr("NUM_GENEVA_ANGLES") = NUM_GENEVA_ANGLES;
+
+    // Redis Keys
+    m.attr("ROBOT_ID_REDIS_KEY")                = ROBOT_ID_REDIS_KEY;
+    m.attr("ROBOT_MULTICAST_CHANNEL_REDIS_KEY") = ROBOT_MULTICAST_CHANNEL_REDIS_KEY;
+    m.attr("ROBOT_NETWORK_INTERFACE_REDIS_KEY") = ROBOT_NETWORK_INTERFACE_REDIS_KEY;
 }

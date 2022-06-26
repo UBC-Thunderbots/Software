@@ -14,8 +14,8 @@ void PivotKickFSM::getPossessionAndPivot(
 
 void PivotKickFSM::kickBall(const Update& event)
 {
-    event.common.set_intent(std::make_unique<MoveIntent>(
-        event.common.robot.id(), event.control_params.kick_origin,
+    event.common.set_primitive(createMovePrimitive(
+        CREATE_MOTION_CONTROL(event.control_params.kick_origin),
         event.control_params.kick_direction, 0, TbotsProto::DribblerMode::OFF,
         TbotsProto::BallCollisionType::ALLOW, event.control_params.auto_chip_or_kick,
         TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
