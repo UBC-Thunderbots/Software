@@ -447,10 +447,20 @@ class WorldLayer(FieldLayer):
                 QtCore.QLine(
                     int(start_x * MILLIMETERS_PER_METER),
                     int(start_y * MILLIMETERS_PER_METER),
-                    int((start_x + robot.current_state.global_velocity.x_component_meters)
-                    * MILLIMETERS_PER_METER),
-                    int((start_y + robot.current_state.global_velocity.y_component_meters)
-                    * MILLIMETERS_PER_METER),
+                    int(
+                        (
+                            start_x
+                            + robot.current_state.global_velocity.x_component_meters
+                        )
+                        * MILLIMETERS_PER_METER
+                    ),
+                    int(
+                        (
+                            start_y
+                            + robot.current_state.global_velocity.y_component_meters
+                        )
+                        * MILLIMETERS_PER_METER
+                    ),
                 )
             )
 
@@ -469,10 +479,14 @@ class WorldLayer(FieldLayer):
             QtCore.QLine(
                 int(start_x * MILLIMETERS_PER_METER),
                 int(start_y * MILLIMETERS_PER_METER),
-                int((start_x + ball.current_state.global_velocity.x_component_meters)
-                * MILLIMETERS_PER_METER),
-                int((start_y + ball.current_state.global_velocity.y_component_meters)
-                * MILLIMETERS_PER_METER),
+                int(
+                    (start_x + ball.current_state.global_velocity.x_component_meters)
+                    * MILLIMETERS_PER_METER
+                ),
+                int(
+                    (start_y + ball.current_state.global_velocity.y_component_meters)
+                    * MILLIMETERS_PER_METER
+                ),
             )
         )
 
