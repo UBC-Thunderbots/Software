@@ -49,8 +49,6 @@ class RobotCommunication(object):
         except Exception:
             raise Exception("Could not find estop, make sure its plugged in")
 
-
-
     def run(self):
         """Forward World and PrimitiveSet protos from fullsystem to the robots.
 
@@ -65,19 +63,83 @@ class RobotCommunication(object):
 
         """
 
-
-        #motor_control = MotorControl(MotorControl.drive_control=MotorControl.DirectPerWheelControl(), dribbler_speed_rpm=0.0)
+        # motor_control = MotorControl(MotorControl.drive_control=MotorControl.DirectPerWheelControl(), dribbler_speed_rpm=0.0)
         speed = 0.1
-        primitive0 = Primitive(direct_control=DirectControlPrimitive(motor_control=MotorControl(direct_per_wheel_control=MotorControl.DirectPerWheelControl(front_left_wheel_rpm=0), dribbler_speed_rpm=0)))
-        primitive1 = Primitive(direct_control=DirectControlPrimitive(motor_control=MotorControl(direct_velocity_control=MotorControl.DirectVelocityControl(velocity=Vector(x_component_meters=0.0, y_component_meters=speed), angular_velocity=AngularVelocity(radians_per_second=0.0)), dribbler_speed_rpm=-10000)))
-        primitive2 = Primitive(direct_control=DirectControlPrimitive(motor_control=MotorControl(direct_velocity_control=MotorControl.DirectVelocityControl(velocity=Vector(x_component_meters=0.0, y_component_meters=-speed), angular_velocity=AngularVelocity(radians_per_second=0.0)),dribbler_speed_rpm=-10000)))
-        primitive3 = Primitive(direct_control=DirectControlPrimitive(motor_control=MotorControl(direct_velocity_control=MotorControl.DirectVelocityControl(velocity=Vector(x_component_meters=speed, y_component_meters=speed), angular_velocity=AngularVelocity(radians_per_second=0.0)), dribbler_speed_rpm=-10000)))
-        primitive4 = Primitive(direct_control=DirectControlPrimitive(motor_control=MotorControl(direct_velocity_control=MotorControl.DirectVelocityControl(velocity=Vector(x_component_meters=-speed, y_component_meters=-speed), angular_velocity=AngularVelocity(radians_per_second=0.0)), dribbler_speed_rpm=-10000)))
+        primitive0 = Primitive(
+            direct_control=DirectControlPrimitive(
+                motor_control=MotorControl(
+                    direct_per_wheel_control=MotorControl.DirectPerWheelControl(
+                        front_left_wheel_rpm=0
+                    ),
+                    dribbler_speed_rpm=0,
+                )
+            )
+        )
+        primitive1 = Primitive(
+            direct_control=DirectControlPrimitive(
+                motor_control=MotorControl(
+                    direct_velocity_control=MotorControl.DirectVelocityControl(
+                        velocity=Vector(
+                            x_component_meters=0.0, y_component_meters=speed
+                        ),
+                        angular_velocity=AngularVelocity(radians_per_second=0.0),
+                    ),
+                    dribbler_speed_rpm=-10000,
+                )
+            )
+        )
+        primitive2 = Primitive(
+            direct_control=DirectControlPrimitive(
+                motor_control=MotorControl(
+                    direct_velocity_control=MotorControl.DirectVelocityControl(
+                        velocity=Vector(
+                            x_component_meters=0.0, y_component_meters=-speed
+                        ),
+                        angular_velocity=AngularVelocity(radians_per_second=0.0),
+                    ),
+                    dribbler_speed_rpm=-10000,
+                )
+            )
+        )
+        primitive3 = Primitive(
+            direct_control=DirectControlPrimitive(
+                motor_control=MotorControl(
+                    direct_velocity_control=MotorControl.DirectVelocityControl(
+                        velocity=Vector(
+                            x_component_meters=speed, y_component_meters=speed
+                        ),
+                        angular_velocity=AngularVelocity(radians_per_second=0.0),
+                    ),
+                    dribbler_speed_rpm=-10000,
+                )
+            )
+        )
+        primitive4 = Primitive(
+            direct_control=DirectControlPrimitive(
+                motor_control=MotorControl(
+                    direct_velocity_control=MotorControl.DirectVelocityControl(
+                        velocity=Vector(
+                            x_component_meters=-speed, y_component_meters=-speed
+                        ),
+                        angular_velocity=AngularVelocity(radians_per_second=0.0),
+                    ),
+                    dribbler_speed_rpm=-10000,
+                )
+            )
+        )
 
-        primitive0_dribbler = Primitive(direct_control=DirectControlPrimitive(motor_control=MotorControl(direct_per_wheel_control=MotorControl.DirectPerWheelControl(front_left_wheel_rpm=0), dribbler_speed_rpm=-10000)))
+        primitive0_dribbler = Primitive(
+            direct_control=DirectControlPrimitive(
+                motor_control=MotorControl(
+                    direct_per_wheel_control=MotorControl.DirectPerWheelControl(
+                        front_left_wheel_rpm=0
+                    ),
+                    dribbler_speed_rpm=-10000,
+                )
+            )
+        )
 
-
-        set = [{3:primitive1}, {3:primitive2}, {3:primitive3}, {3:primitive4}]
+        set = [{3: primitive1}, {3: primitive2}, {3: primitive3}, {3: primitive4}]
         # primitiveset = PrimitiveSet(time_sent = Timestamp(),stay_away_from_ball=False, robot_primitives=set)
 
         while True:
@@ -91,7 +153,11 @@ class RobotCommunication(object):
                 # primitive_set = self.primitive_buffer.get(block=False)
 
                 for i in range(4):
-                    primitiveset = PrimitiveSet(time_sent = Timestamp(),stay_away_from_ball=False, robot_primitives=set[i])
+                    primitiveset = PrimitiveSet(
+                        time_sent=Timestamp(),
+                        stay_away_from_ball=False,
+                        robot_primitives=set[i],
+                    )
                     primitive_set = primitiveset
                     self.send_primitive_mcast_sender.send_proto(primitive_set)
                     logging.info(f"running index i {i}")
@@ -99,12 +165,19 @@ class RobotCommunication(object):
                     #     self.send_primitive_mcast_sender.send_proto(primitive_set)
 
                     time.sleep(2)
-                    primitiveset_stop = PrimitiveSet(time_sent = Timestamp(),stay_away_from_ball=False, robot_primitives={3:primitive0_dribbler})
+                    primitiveset_stop = PrimitiveSet(
+                        time_sent=Timestamp(),
+                        stay_away_from_ball=False,
+                        robot_primitives={3: primitive0_dribbler},
+                    )
                     self.send_primitive_mcast_sender.send_proto(primitiveset_stop)
                     time.sleep(2)
 
-
-                primitiveset_stop = PrimitiveSet(time_sent = Timestamp(),stay_away_from_ball=False, robot_primitives={3:primitive0})
+                primitiveset_stop = PrimitiveSet(
+                    time_sent=Timestamp(),
+                    stay_away_from_ball=False,
+                    robot_primitives={3: primitive0},
+                )
                 self.send_primitive_mcast_sender.send_proto(primitiveset_stop)
 
                 exit(0)
@@ -160,7 +233,9 @@ class RobotCommunication(object):
         self.receive_robot_log = SSLWrapperPacketProtoListener(
             SSL_ADDRESS,
             SSL_PORT,
-            lambda data: self.full_system_proto_unix_io.send_proto(SSL_WrapperPacket, data),
+            lambda data: self.full_system_proto_unix_io.send_proto(
+                SSL_WrapperPacket, data
+            ),
             True,
         )
 
@@ -175,7 +250,6 @@ class RobotCommunication(object):
         self.connect_fullsystem_to_robots()
         self.run_thread = threading.Thread(target=self.run)
         self.run_thread.start()
-
 
     def __exit__(self):
         """Exit RobotCommunication context manager
