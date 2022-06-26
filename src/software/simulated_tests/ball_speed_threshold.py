@@ -1,13 +1,14 @@
 import software.python_bindings as tbots
 from proto.import_all_protos import *
+from software.py_constants import *
 import math
+import speed_threshold
 
 from software.simulated_tests.validation import (
     Validation,
     create_validation_geometry,
     create_validation_types,
 )
-
 
 class BallSpeedThreshold(Validation):
 
@@ -18,7 +19,6 @@ class BallSpeedThreshold(Validation):
         :param speed_threshold: The speed threshold in m/s
         """
         self.speed_threshold = speed_threshold
-        self.MILLIMETERS_PER_METER = 1000
         self.VALIDATION_LINE_SCALE_FACTOR = 300
 
     def get_validation_status(self, world) -> ValidationStatus:
@@ -47,11 +47,11 @@ class BallSpeedThreshold(Validation):
 
         ball_x = (
             world.ball.current_state.global_position.x_meters
-            * self.MILLIMETERS_PER_METER
+            * MILLIMETERS_PER_METER
         )
         ball_y = (
             world.ball.current_state.global_position.y_meters
-            * self.MILLIMETERS_PER_METER
+            * MILLIMETERS_PER_METER
         )
 
         ball_angle = math.pi / 2
@@ -63,14 +63,14 @@ class BallSpeedThreshold(Validation):
 
         validation_centre_x = (
             ball_x
-            + self.MILLIMETERS_PER_METER * self.speed_threshold * math.cos(ball_angle)
+            + MILLIMETERS_PER_METER * self.speed_threshold * math.cos(ball_angle)
         )
         validation_centre_y = (
             ball_y
-            + self.MILLIMETERS_PER_METER * self.speed_threshold * math.sin(ball_angle)
+            + MILLIMETERS_PER_METER * self.speed_threshold * math.sin(ball_angle)
         )
 
-        endpoints = self.get_validation_line_endpoints(
+        endpoints = get_validation_line_endpoints(
             validation_centre_x, validation_centre_y, ball_angle
         )
         start_x = endpoints[0]
@@ -82,44 +82,10 @@ class BallSpeedThreshold(Validation):
             [tbots.Segment(tbots.Point(start_x, start_y), tbots.Point(end_x, end_y))]
         )
 
-    def get_validation_line_endpoints(
-        self, validation_centre_x, validation_centre_y, ball_angle
-    ):
-        start_x = (
-            validation_centre_x
-            - math.sin(ball_angle) * self.VALIDATION_LINE_SCALE_FACTOR
-        )
-        end_x = (
-            validation_centre_x
-            + math.sin(ball_angle) * self.VALIDATION_LINE_SCALE_FACTOR
-        )
-
-        start_y = (
-            validation_centre_y
-            + math.cos(ball_angle) * self.VALIDATION_LINE_SCALE_FACTOR
-        )
-        end_y = (
-            validation_centre_y
-            - math.cos(ball_angle) * self.VALIDATION_LINE_SCALE_FACTOR
-        )
-
-        if ball_angle > math.pi or ball_angle < 0:
-            start_y = (
-                validation_centre_y
-                + math.cos(ball_angle) * self.VALIDATION_LINE_SCALE_FACTOR
-            )
-            end_y = (
-                validation_centre_y
-                - math.cos(ball_angle) * self.VALIDATION_LINE_SCALE_FACTOR
-            )
-
-        return [start_x, end_x, start_y, end_y]
-
     def __repr__(self):
         return "Check that the ball speed is at or above above " + str(
             self.speed_threshold
         )
-
 
 (
     BallSpeedEventuallyAtOrAboveThreshold,

@@ -1,5 +1,7 @@
 import software.python_bindings as tbots
 from proto.import_all_protos import *
+from software.py_constants import *
+
 import math
 
 from software.simulated_tests.validation import (
@@ -18,7 +20,6 @@ class RobotSpeedThreshold(Validation):
         :param speed_threshold: The speed threshold
         """
         self.speed_threshold = speed_threshold
-        self.MILLIMETERS_PER_METER = 1000
         self.VALIDATION_LINE_SCALE_FACTOR = 300
 
     def get_validation_status(self, world) -> ValidationStatus:
@@ -43,23 +44,23 @@ class RobotSpeedThreshold(Validation):
         for robot in world.friendly_team.team_robots:
             robot_x = (
                 robot.current_state.global_position.x_meters
-                * self.MILLIMETERS_PER_METER
+                * MILLIMETERS_PER_METER
             )
             robot_y = (
                 robot.current_state.global_position.y_meters
-                * self.MILLIMETERS_PER_METER
+                * MILLIMETERS_PER_METER
             )
             robot_angle = robot.current_state.global_orientation.radians
 
             validation_centre_x = (
                 robot_x
-                + self.MILLIMETERS_PER_METER
+                + MILLIMETERS_PER_METER
                 * self.speed_threshold
                 * math.cos(robot_angle)
             )
             validation_centre_y = (
                 robot_y
-                + self.MILLIMETERS_PER_METER
+                + MILLIMETERS_PER_METER
                 * self.speed_threshold
                 * math.sin(robot_angle)
             )
