@@ -44,7 +44,7 @@ void ControlExecutor::execute(const TbotsProto_PowerControl& control)
                             .auto_chip_or_kick.autokick_speed_m_per_s);
                     if (control.geneva.angle_deg != geneva->getCurrentAngle())
                     {
-			geneva->setRotationDoneCallbackOnce(&chicker->autokick);
+                        geneva->setRotationDoneCallbackOnce(&chicker->autokick);
                         geneva->setAngle(control.geneva.angle_deg);
                     }
                     else

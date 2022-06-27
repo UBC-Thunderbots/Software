@@ -1,6 +1,6 @@
 #include "charger.h"
 
-volatile bool Charger::flyback_fault                       = false;
+volatile bool Charger::flyback_fault = false;
 
 Charger::Charger()
 {
@@ -13,7 +13,8 @@ Charger::Charger()
 }
 
 
-void IRAM_ATTR Charger::chargeDone() {
+void IRAM_ATTR Charger::chargeDone()
+{
     flyback_fault = digitalRead(FLYBACK_FAULT);
 }
 
@@ -37,5 +38,5 @@ float Charger::getCapacitorVoltage()
 
 bool Charger::getFlybackFault()
 {
-    return flyback_fault;
+    return !flyback_fault;
 }

@@ -77,7 +77,7 @@ int IRAM_ATTR Chicker::distanceToPulseWidth(float distance_meters)
 {
     // TODO(#2645): map distance to duration by testing
     // 1s = 1000000
-    return 0;
+    return 50000;
 }
 
 int IRAM_ATTR Chicker::speedToPulseWidth(float speed_m_per_s)
@@ -93,19 +93,20 @@ int IRAM_ATTR Chicker::speedToPulseWidth(float speed_m_per_s)
 
 void IRAM_ATTR Chicker::oneShotPulse(int duration, int pin)
 {
-    if (!on_cooldown) {    
-    	timerWrite(pulse_timer, 0);
-    	timerAlarmWrite(pulse_timer, duration, false);
-    	timerAlarmEnable(pulse_timer);
+    if (!on_cooldown)
+    {
+        timerWrite(pulse_timer, 0);
+        timerAlarmWrite(pulse_timer, duration, false);
+        timerAlarmEnable(pulse_timer);
 
-    	digitalWrite(pin, HIGH);
+        digitalWrite(pin, HIGH);
 
-    	on_cooldown = true;
+        on_cooldown = true;
 
-    	timerWrite(cooldown_timer, 0);
-    	timerAlarmWrite(cooldown_timer, COOLDOWN_MICROSECONDS, false);
-    	timerAlarmEnable(cooldown_timer);
-   }
+        timerWrite(cooldown_timer, 0);
+        timerAlarmWrite(cooldown_timer, COOLDOWN_MICROSECONDS, false);
+        timerAlarmEnable(cooldown_timer);
+    }
 }
 
 void IRAM_ATTR Chicker::stopPulse()
