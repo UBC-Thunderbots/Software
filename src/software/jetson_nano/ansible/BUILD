@@ -20,6 +20,7 @@ py_binary(
         "//software/jetson_nano/linux_configs:extlinux",
         "//software/jetson_nano/linux_configs/systemd:systemd_files",
         "//software/jetson_nano/redis",
+        "//software/power:powerloop_zip",
     ],
     deps = [
         requirement("ansible"),

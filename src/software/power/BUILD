@@ -78,3 +78,10 @@ platformio_project(
         "@nanopb//:nanopb_platformio",
     ],
 )
+
+genrule(
+    name = "powerloop_zip",
+    outs = ["powerloop_zip.zip"],
+    cmd = "zip -r $@ $(BINDIR)/../.*",
+    tools = [":powerloop_main"],
+)

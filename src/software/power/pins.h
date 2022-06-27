@@ -26,8 +26,8 @@ const uint8_t RXD2 = 19;
 const uint8_t TXD2 = 22;
 
 // Power Monitor
-const unsigned PM_SDA = 13;
-const unsigned PM_SCL = 14;
+const int PM_SDA = 13;
+const int PM_SCL = 14;
 
 // Timers
 const uint8_t CHICKER_TIMER           = 0;

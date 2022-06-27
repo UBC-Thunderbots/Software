@@ -1,0 +1,26 @@
+---
+
+- name: Deploy to the powerboard
+  hosts: THUNDERBOTS_HOSTS
+
+  tasks:
+    - name: Sync powerboard files
+      become: true
+      become_method: sudo
+      ansible.posix.synchronize:
+        src: ../../../../../power/powerloop_zip.zip
+        dest: ~/
+        recursive: yes
+        copy_links: yes
+
+    - name: Unzip powerboard files
+      command: 'unzip -o ~/powerloop_zip.zip'
+      register: result
+      args:
+        chdir: ~/
+
+    - name: Hold boot and press reset on the powerboards to enter bootloader mode.
+      ansible.builtin.pause:
+        prompt: "Press enter to continue"
+      echo: no
+
