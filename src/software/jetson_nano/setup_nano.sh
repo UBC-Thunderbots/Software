@@ -36,7 +36,6 @@ pip_libaries=(
     Jetson.GPIO==2.0.17
     Pillow==9.1.0
     redis==4.1.4
-    esptool==4.1
     platformio==6.0.2
 )
 

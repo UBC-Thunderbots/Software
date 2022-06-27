@@ -80,8 +80,8 @@ platformio_project(
 )
 
 genrule(
-    name = "powerloop_zip",
-    outs = ["powerloop_zip.zip"],
-    cmd = "zip -r $@ $(BINDIR)/../.*",
+    name = "powerloop_tar",
+    outs = ["powerloop_tar.tar.gz"],
+    cmd = "tar -cv -f $@ $(BINDIR)/../../host/bin/software/power",
     tools = [":powerloop_main"],
 )

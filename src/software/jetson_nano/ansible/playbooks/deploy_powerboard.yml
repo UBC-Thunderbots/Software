@@ -14,7 +14,7 @@
         copy_links: yes
 
     - name: Unzip powerboard files
-      command: 'unzip -o ~/powerloop_zip.zip'
+      command: 'unzip -o ~/powerloop_zip.zip -d powerloop'
       register: result
       args:
         chdir: ~/
@@ -22,5 +22,9 @@
     - name: Hold boot and press reset on the powerboards to enter bootloader mode.
       ansible.builtin.pause:
         prompt: "Press enter to continue"
-      echo: no
+        echo: no
+
+    - name: Flashing...
+      shell: '/opt/tbotspython/bin/platformio -s -t upload -d ~/powerloop'
+      register: result
 
