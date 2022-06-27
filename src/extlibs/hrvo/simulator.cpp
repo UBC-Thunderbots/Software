@@ -63,130 +63,186 @@ HRVOSimulator::HRVOSimulator(float time_step, const RobotConstants_t &robot_cons
 
 void HRVOSimulator::updateWorld(const World &world)
 {
-    const auto &friendly_team = world.friendlyTeam().getAllRobots();
-    const auto &enemy_team    = world.enemyTeam().getAllRobots();
-    // TODO (#2498): Update implementation to correctly support adding and removing agents
-    //               to represent the newly added and removed friendly/enemy robots in the
-    //               World.
-    if (friendly_robot_id_map.empty() && enemy_robot_id_map.empty())
-    {
-        for (const Robot &friendly_robot : friendly_team)
-        {
-            std::size_t agent_index = addHRVORobotAgent(friendly_robot, AgentType::FRIENDLY);
-            friendly_robot_id_map.emplace(friendly_robot.id(), agent_index);
-        }
+	const auto &friendly_team 	= world.friendlyTeam().getAllRobots();
+	const auto &enemy_team 		= world.enemyTeam().getAllRobots();
 
-        for (const Robot &enemy_robot : enemy_team)
-        {
-            // Set goal of enemy robot to be the farthest point, when moving in the
-            // current direction
-            Segment segment(enemy_robot.position(),
-                            enemy_robot.position() + enemy_robot.velocity() * 100);
+	updateRemovedAgents(world);
+	
+	// update agents
+	for (const Robot &friendly_robot : friendly_team)
+	{
+		auto hrvo_agent = getFriendlyAgentFromRobotId(friendly_robot.id());
+		if (hrvo_agent.has_value())
+		{
+			hrvo_agent.value()->setPosition(friendly_robot.position().toVector());
 
-            // Enemy robot should not enter the friendly defense area
-            std::unordered_set<Point> intersection_point_set =
-                intersection(world.field().friendlyDefenseArea(), segment);
-            if (intersection_point_set.empty() &&
-                contains(world.field().fieldLines(), enemy_robot.position()))
-            {
-                // If the robot is in the field, then move in the current direction
-                // towards the field edge
-                intersection_point_set =
-                    intersection(world.field().fieldLines(), segment);
-            }
-
-            if (intersection_point_set.empty())
-            {
-                // If there is no intersection point (robot is outside the field),
-                // continue moving in the current direction
-                intersection_point_set.insert(enemy_robot.position() +
-                                              enemy_robot.velocity() * 5);
-            }
-
-            Vector goal_position = intersection_point_set.begin()->toVector();
-            std::size_t agent_index =
-                addLinearVelocityRobotAgent(enemy_robot, goal_position, AgentType::ENEMY);
-            enemy_robot_id_map.emplace(enemy_robot.id(), agent_index);
-        }
-    }
-    else
-    {
-        // Update Agents
-        for (const Robot &friendly_robot : friendly_team)
-        {
-            auto hrvo_agent = getFriendlyAgentFromRobotId(friendly_robot.id());
-            if (hrvo_agent.has_value())
-            {
-                hrvo_agent.value()->setPosition(friendly_robot.position().toVector());
-
-                // Only update velocity if time has passed since the last time velocity
-                // was updated. This is to allow SensorFusion to update the actual robot
-                // velocity in World.
-                // TODO (#2531): Remove 4 multiplier and fix goal keeper moving slowly
-                if (global_time - last_time_velocity_updated >= 4 * time_step)
-                {
-                    Vector velocity = friendly_robot.velocity();
-                    hrvo_agent.value()->setVelocity(friendly_robot.velocity());
-                    last_time_velocity_updated = global_time;
-                }
-            }
-        }
-
-        for (const Robot &enemy_robot : enemy_team)
-        {
-			auto agent_iter = std::find_if(agent_list.begin(), agent_list.end(),
-								[&enemy_robot](std::shared_ptr<Agent> agent)
-								{
-									return (agent->getRobotId() == enemy_robot.id() && agent->getAgentType() == AgentType::ENEMY);
-								});	
-			if (agent_iter != agent_list.end())
+			// only update velocity if time has passed since the last time velocity
+			// was updated. this is to allow sensorfusion to update the actual robot
+			// velocity in world.
+			// todo (#2531): remove 4 multiplier and fix goal keeper moving slowly
+			if (global_time - last_time_velocity_updated >= 4 * time_step)
 			{
-				(*agent_iter)->setPosition(enemy_robot.position().toVector());
-				(*agent_iter)->setVelocity(enemy_robot.velocity());
+				Vector velocity = friendly_robot.velocity();
+				hrvo_agent.value()->setVelocity(friendly_robot.velocity());
+				last_time_velocity_updated = global_time;
 			}
+		}
+		else
+		{
+            addHRVORobotAgent(friendly_robot, AgentType::FRIENDLY);
+		}
+	}
 
-            //auto agent_index_iter = enemy_robot_id_map.find(enemy_robot.id());
-            //if (agent_index_iter != enemy_robot_id_map.end())
-            //{
-            //    unsigned int agent_index = agent_index_iter->second;
-            //    agents[agent_index]->setPosition(enemy_robot.position().toVector());
-            //    agents[agent_index]->setVelocity(enemy_robot.velocity());
-            //}
-        }
-    }
-
-    // TODO (#2498): Dynamically add and remove the ball as an Agent, and if needed
-    //               update its radius based on the PrimitiveSet
-    if (add_ball_agent)
+    for (const Robot &enemy_robot : enemy_team)
     {
-        if (ball_agent_id == -1)
-        {
-            // Ball should be treated as an agent (obstacle)
-            const Ball &ball = world.ball();
-            Vector position(ball.position().x(), ball.position().y());
-            Vector velocity(ball.velocity().x(), ball.velocity().y());
-            Vector goal_pos    = position + 100 * velocity;
-            float acceleration = ball.acceleration().length();
-            // Minimum of 0.5-meter distance away from the ball, if the ball is an
-            // obstacle
-            float ball_radius = 0.5f + BALL_AGENT_RADIUS_OFFSET;
+		auto agent_iter = std::find_if(agent_list.begin(), agent_list.end(),
+							[&enemy_robot](std::shared_ptr<Agent> agent)
+							{
+								return (agent->getRobotId() == enemy_robot.id() && agent->getAgentType() == AgentType::ENEMY);
+							});	
 
-            AgentPath path          = AgentPath({PathPoint(goal_pos, 0.0f)}, 0.1f);
-            std::size_t agent_index = addLinearVelocityAgent(
-                position, ball_radius, velocity, velocity.length(), acceleration, path, 100, AgentType::BALL);
-            ball_agent_id = agent_index;
-        }
-        else
-        {
-            Point position = world.ball().position();
-            agents[ball_agent_id]->setPosition(position.toVector());
-        }
-    }
-    else if (ball_agent_id != -1)
-    {
-        agents[ball_agent_id]->setRadius(0.f);
+		if (agent_iter != agent_list.end())
+		{
+			(*agent_iter)->setPosition(enemy_robot.position().toVector());
+			(*agent_iter)->setVelocity(enemy_robot.velocity());
+		}
+		else
+		{
+			Vector destination = (enemy_robot.position() + enemy_robot.velocity() * getTimeStep()).toVector();	
+			addLinearVelocityRobotAgent(enemy_robot, destination, AgentType::ENEMY);
+		}
     }
 }
+
+//void HRVOSimulator::updateWorld(const World &world)
+//{
+//    const auto &friendly_team = world.friendlyTeam().getAllRobots();
+//    const auto &enemy_team    = world.enemyTeam().getAllRobots();
+//    // TODO (#2498): Update implementation to correctly support adding and removing agents
+//    //               to represent the newly added and removed friendly/enemy robots in the
+//    //               World.
+//
+//	updateRemovedAgents(world); 
+//
+//    if (friendly_robot_id_map.empty() && enemy_robot_id_map.empty())
+//    {
+//        for (const Robot &friendly_robot : friendly_team)
+//        {
+//            std::size_t agent_index = addHRVORobotAgent(friendly_robot, AgentType::FRIENDLY);
+//            friendly_robot_id_map.emplace(friendly_robot.id(), agent_index);
+//        }
+//
+//        for (const Robot &enemy_robot : enemy_team)
+//        {
+//            // Set goal of enemy robot to be the farthest point, when moving in the
+//            // current direction
+//            Segment segment(enemy_robot.position(),
+//                            enemy_robot.position() + enemy_robot.velocity() * 100);
+//
+//            // Enemy robot should not enter the friendly defense area
+//            std::unordered_set<Point> intersection_point_set =
+//                intersection(world.field().friendlyDefenseArea(), segment);
+//            if (intersection_point_set.empty() &&
+//                contains(world.field().fieldLines(), enemy_robot.position()))
+//            {
+//                // If the robot is in the field, then move in the current direction
+//                // towards the field edge
+//                intersection_point_set =
+//                    intersection(world.field().fieldLines(), segment);
+//            }
+//
+//            if (intersection_point_set.empty())
+//            {
+//                // If there is no intersection point (robot is outside the field),
+//                // continue moving in the current direction
+//                intersection_point_set.insert(enemy_robot.position() +
+//                                              enemy_robot.velocity() * 5);
+//            }
+//
+//            Vector goal_position = intersection_point_set.begin()->toVector();
+//            std::size_t agent_index =
+//                addLinearVelocityRobotAgent(enemy_robot, goal_position, AgentType::ENEMY);
+//            enemy_robot_id_map.emplace(enemy_robot.id(), agent_index);
+//        }
+//    }
+//    else
+//    {
+//        // update agents
+//        for (const robot &friendly_robot : friendly_team)
+//        {
+//            auto hrvo_agent = getfriendlyagentfromrobotid(friendly_robot.id());
+//            if (hrvo_agent.has_value())
+//            {
+//                hrvo_agent.value()->setposition(friendly_robot.position().tovector());
+//
+//                // only update velocity if time has passed since the last time velocity
+//                // was updated. this is to allow sensorfusion to update the actual robot
+//                // velocity in world.
+//                // todo (#2531): remove 4 multiplier and fix goal keeper moving slowly
+//                if (global_time - last_time_velocity_updated >= 4 * time_step)
+//                {
+//                    vector velocity = friendly_robot.velocity();
+//                    hrvo_agent.value()->setvelocity(friendly_robot.velocity());
+//                    last_time_velocity_updated = global_time;
+//                }
+//            }
+//        }
+//
+//        for (const robot &enemy_robot : enemy_team)
+//        {
+//			auto agent_iter = std::find_if(agent_list.begin(), agent_list.end(),
+//								[&enemy_robot](std::shared_ptr<agent> agent)
+//								{
+//									return (agent->getrobotid() == enemy_robot.id() && agent->getagenttype() == agenttype::enemy);
+//								});	
+//			if (agent_iter != agent_list.end())
+//			{
+//				(*agent_iter)->setposition(enemy_robot.position().tovector());
+//				(*agent_iter)->setvelocity(enemy_robot.velocity());
+//			}
+//
+//            //auto agent_index_iter = enemy_robot_id_map.find(enemy_robot.id());
+//            //if (agent_index_iter != enemy_robot_id_map.end())
+//            //{
+//            //    unsigned int agent_index = agent_index_iter->second;
+//            //    agents[agent_index]->setposition(enemy_robot.position().tovector());
+//            //    agents[agent_index]->setvelocity(enemy_robot.velocity());
+//            //}
+//        }
+//    }
+//
+//    // TODO (#2498): Dynamically add and remove the ball as an Agent, and if needed
+//    //               update its radius based on the PrimitiveSet
+//    if (add_ball_agent)
+//    {
+//        if (ball_agent_id == -1)
+//        {
+//            // Ball should be treated as an agent (obstacle)
+//            const Ball &ball = world.ball();
+//            Vector position(ball.position().x(), ball.position().y());
+//            Vector velocity(ball.velocity().x(), ball.velocity().y());
+//            Vector goal_pos    = position + 100 * velocity;
+//            float acceleration = ball.acceleration().length();
+//            // Minimum of 0.5-meter distance away from the ball, if the ball is an
+//            // obstacle
+//            float ball_radius = 0.5f + BALL_AGENT_RADIUS_OFFSET;
+//
+//            AgentPath path          = AgentPath({PathPoint(goal_pos, 0.0f)}, 0.1f);
+//            std::size_t agent_index = addLinearVelocityAgent(
+//                position, ball_radius, velocity, velocity.length(), acceleration, path, 100, AgentType::BALL);
+//            ball_agent_id = agent_index;
+//        }
+//        else
+//        {
+//            Point position = world.ball().position();
+//            agents[ball_agent_id]->setPosition(position.toVector());
+//        }
+//    }
+//    else if (ball_agent_id != -1)
+//    {
+//        agents[ball_agent_id]->setRadius(0.f);
+//    }
+//}
 
 void HRVOSimulator::updatePrimitiveSet(const TbotsProto::PrimitiveSet &new_primitive_set)
 {
@@ -491,3 +547,31 @@ const std::vector<std::shared_ptr<Agent>> &HRVOSimulator::getAgents() const
 {
     return agents;
 }
+
+void HRVOSimulator::updateRemovedAgents(const World &world)
+{
+	agent_list.remove_if(
+					[&world](std::shared_ptr<Agent> agent)
+					{
+						std::unique_ptr<const std::vector<Robot>> team_to_use;
+						switch (agent->getAgentType())
+						{
+							case FRIENDLY :
+								team_to_use = std::make_unique<const std::vector<Robot>>(world.friendlyTeam().getAllRobots());
+								break;
+							case ENEMY :
+								team_to_use = std::make_unique<const std::vector<Robot>>(world.enemyTeam().getAllRobots()); 
+								break;
+							default :
+								team_to_use = std::make_unique<const std::vector<Robot>>(std::vector<Robot>());
+						}
+
+						auto team_iter = std::find_if((*team_to_use).begin(), (*team_to_use).end(),
+										[&agent](const Robot &robot)
+										{
+											return (robot.id() == agent->getRobotId());
+										});
+						return team_iter == (*team_to_use).end();
+					});
+}
+
