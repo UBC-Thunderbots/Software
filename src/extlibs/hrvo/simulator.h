@@ -39,6 +39,7 @@
 #include "extlibs/hrvo/agent.h"
 #include "extlibs/hrvo/kd_tree.h"
 #include "proto/tbots_software_msgs.pb.h"
+#include "proto/visualization.pb.h"
 #include "software/geom/vector.h"
 #include "software/world/world.h"
 
@@ -50,8 +51,10 @@ class HRVOSimulator
      * @param time_step The time step between each step of the simulator
      * @param robot_constants The robot constants to be used for all Agents representing a
      * robot
+     * @param friendly_team_colour The colour of the friendly team
      */
-    explicit HRVOSimulator(float time_step, const RobotConstants_t &robot_constants);
+    explicit HRVOSimulator(float time_step, const RobotConstants_t &robot_constants,
+                           const TeamColour friendly_team_colour);
 
     /**
      * Reset all agents to match the state of the given world.
@@ -283,6 +286,9 @@ class HRVOSimulator
 
     // True if all agents have reached their destination
     bool reached_goals;
+
+    // The colour of the friendly team
+    const TeamColour friendly_team_colour;
 
     // KdTree used to calculate the K nearest agents
     std::unique_ptr<KdTree> kd_tree;

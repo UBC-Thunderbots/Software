@@ -7,7 +7,7 @@
 class TimeToTravel : public ::testing::Test
 {
    protected:
-    RobotConstants_t robot_constants = create2015RobotConstants();
+    RobotConstants_t robot_constants = create2021RobotConstants();
 };
 
 TEST_F(TimeToTravel, getTimeToTravelDistance_already_at_dest)
@@ -37,7 +37,8 @@ TEST_F(TimeToTravel, getTimeToTravelDistance_reaches_max_velocity)
 
     EXPECT_TRUE(TestUtil::equalWithinTolerance(
         Duration::fromSeconds(travel_time),
-        getTimeToTravelDistance(distance_to_dest, 2.0, 3.0)));
+        getTimeToTravelDistance(distance_to_dest, robot_constants.robot_max_speed_m_per_s,
+                                robot_constants.robot_max_acceleration_m_per_s_2)));
 }
 
 TEST_F(TimeToTravel,

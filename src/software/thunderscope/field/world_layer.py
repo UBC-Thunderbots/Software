@@ -308,6 +308,27 @@ class WorldLayer(FieldLayer):
             )
         )
 
+        # Draw Friendly Goal
+        painter.drawRect(
+            QtCore.QRectF(
+                -(field.field_x_length / 2 + field.goal_x_length)
+                * MILLIMETERS_PER_METER,
+                (field.goal_y_length / 2) * MILLIMETERS_PER_METER,
+                (field.goal_x_length) * MILLIMETERS_PER_METER,
+                -(field.goal_y_length) * MILLIMETERS_PER_METER,
+            )
+        )
+
+        # Draw Enemy Goal
+        painter.drawRect(
+            QtCore.QRectF(
+                (field.field_x_length / 2) * MILLIMETERS_PER_METER,
+                (field.goal_y_length / 2) * MILLIMETERS_PER_METER,
+                (field.goal_x_length) * MILLIMETERS_PER_METER,
+                -(field.goal_y_length) * MILLIMETERS_PER_METER,
+            )
+        )
+
         # Draw Centre Circle
         painter.drawEllipse(
             self.createCircle(0, 0, field.center_circle_radius * MILLIMETERS_PER_METER)

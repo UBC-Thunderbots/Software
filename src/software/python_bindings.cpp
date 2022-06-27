@@ -9,6 +9,7 @@
 #include "proto/geometry.pb.h"
 #include "proto/message_translation/tbots_geometry.h"
 #include "proto/parameters.pb.h"
+#include "proto/robot_log_msg.pb.h"
 #include "proto/robot_status_msg.pb.h"
 #include "proto/ssl_gc_referee_message.pb.h"
 #include "proto/ssl_vision_wrapper.pb.h"
@@ -61,8 +62,8 @@ void declareThreadedProtoUdpListener(py::module& m, std::string name)
     std::string pyclass_name = name + "ProtoListener";
     py::class_<Class, std::shared_ptr<Class>>(m, pyclass_name.c_str(),
                                               py::buffer_protocol(), py::dynamic_attr())
-        .def(py::init<const std::string&, unsigned short, const std::function<void(T)>&,
-                      bool>());
+        .def(
+            py::init<std::string, unsigned short, const std::function<void(T)>&, bool>());
 }
 
 /**
@@ -117,6 +118,7 @@ PYBIND11_MODULE(python_bindings, m)
         .def("normalize", py::overload_cast<>(&Vector::normalize, py::const_))
         .def("normalize", py::overload_cast<double>(&Vector::normalize, py::const_))
         .def("rotate", &Vector::rotate)
+        .def("orientation", &Vector::orientation)
         // Overloaded
         .def(py::self + py::self)
         .def(py::self += py::self)
@@ -150,6 +152,7 @@ PYBIND11_MODULE(python_bindings, m)
         .def(py::init<>())
         .def_static("fromRadians", &Angle::fromRadians)
         .def_static("fromDegrees", &Angle::fromDegrees)
+        .def("toRadians", &Angle::toRadians)
         // Overloaded
         .def("__repr__", [](const Angle& a) {
             std::stringstream stream;
@@ -285,6 +288,7 @@ PYBIND11_MODULE(python_bindings, m)
     // Listeners
     declareThreadedProtoUdpListener<SSLProto::Referee>(m, "SSLReferee");
     declareThreadedProtoUdpListener<TbotsProto::RobotStatus>(m, "RobotStatus");
+    declareThreadedProtoUdpListener<TbotsProto::RobotLog>(m, "RobotLog");
     declareThreadedProtoUdpListener<SSLProto::SSL_WrapperPacket>(m, "SSLWrapperPacket");
 
     // Senders

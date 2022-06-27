@@ -39,12 +39,12 @@
 #include "extlibs/hrvo/kd_tree.h"
 #include "extlibs/hrvo/linear_velocity_agent.h"
 #include "proto/message_translation/tbots_geometry.h"
-#include "proto/visualization.pb.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/algorithms/intersection.h"
 #include "software/logger/logger.h"
 
-HRVOSimulator::HRVOSimulator(float time_step, const RobotConstants_t &robot_constants)
+HRVOSimulator::HRVOSimulator(float time_step, const RobotConstants_t &robot_constants,
+                             const TeamColour friendly_team_colour)
     : primitive_set(),
       add_ball_agent(false),
       ball_agent_id(-1),
@@ -56,7 +56,8 @@ HRVOSimulator::HRVOSimulator(float time_step, const RobotConstants_t &robot_cons
       kd_tree(std::make_unique<KdTree>(this)),
       agents(),
       friendly_robot_id_map(),
-      enemy_robot_id_map()
+      enemy_robot_id_map(),
+      friendly_team_colour(friendly_team_colour)
 {
 }
 
@@ -385,8 +386,7 @@ void HRVOSimulator::visualize(unsigned int robot_id) const
     auto friendly_agent_opt = getFriendlyAgentFromRobotId(robot_id);
     if (!friendly_agent_opt.has_value())
     {
-        LOG(WARNING) << "HRVO friendly agent with robot id " << robot_id
-                     << " can not be visualized." << std::endl;
+        // HRVO friendly agent with robot id can not be visualized
         return;
     }
 
@@ -397,13 +397,21 @@ void HRVOSimulator::visualize(unsigned int robot_id) const
     *(hrvo_visualization.mutable_velocity_obstacles()) = {vo_protos.begin(),
                                                           vo_protos.end()};
 
-    for (auto &agent : agents)
+    for (const auto &agent : agents)
     {
         Point position(agent->getPosition());
         *(hrvo_visualization.add_robots()) =
             *createCircleProto(Circle(position, agent->getRadius()));
     }
-    LOG(VISUALIZE) << hrvo_visualization;
+
+    if (friendly_team_colour == TeamColour::YELLOW)
+    {
+        LOG(VISUALIZE, YELLOW_HRVO_PATH) << hrvo_visualization;
+    }
+    else
+    {
+        LOG(VISUALIZE, BLUE_HRVO_PATH) << hrvo_visualization;
+    }
 }
 
 std::optional<std::shared_ptr<HRVOAgent>> HRVOSimulator::getFriendlyAgentFromRobotId(

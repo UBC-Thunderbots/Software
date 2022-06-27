@@ -1,4 +1,5 @@
 from software.thunderscope.thunderscope import Thunderscope
+from software.thunderscope.robot_communication import RobotCommunication
 from software.thunderscope.binary_context_managers import *
 from proto.message_translation import tbots_protobuf
 import software.python_bindings as cpp_bindings
@@ -146,18 +147,23 @@ if __name__ == "__main__":
         # Setup LOG(VISUALIZE) handling from full system. We set from_log_visualize
         # to true to decode from base64.
         for arg in [
-            (runtime_dir, Obstacles, True),
-            (runtime_dir, PathVisualization, True),
-            (runtime_dir, PassVisualization, True),
-            (runtime_dir, NamedValue, True),
-            (runtime_dir, World, True),
-            (runtime_dir, PlayInfo, True),
-            (runtime_dir, PrimitiveSet, True),
-            (runtime_dir, HRVOVisualization, True),
+            {"proto_class": Obstacles},
+            {"proto_class": PathVisualization},
+            {"proto_class": PassVisualization},
+            {"proto_class": NamedValue},
+            {"proto_class": PrimitiveSet},
+            {"proto_class": World},
+            {"proto_class": PlayInfo},
+        ] + [
+            # TODO (#2655): Add/Remove HRVO layers dynamically based on the HRVOVisualization proto messages
+            {"proto_class": HRVOVisualization, "unix_path": YELLOW_HRVO_PATH}
+            for robot_id in range(6)
         ]:
-            proto_unix_io.attach_unix_receiver(*arg)
+            proto_unix_io.attach_unix_receiver(
+                runtime_dir, from_log_visualize=True, **arg
+            )
 
-        proto_unix_io.attach_unix_receiver(runtime_dir + "/log", RobotLog)
+        proto_unix_io.attach_unix_receiver(runtime_dir + "/log", proto_class=RobotLog)
 
         tscope.show()
 
@@ -195,7 +201,7 @@ if __name__ == "__main__":
     if args.run_blue or args.run_yellow:
         # TODO (#2585): Support multiple channels
         with RobotCommunication(
-            proto_unix_io, ROBOT_MULTICAST_CHANNEL_0, args.interface
+            proto_unix_io, getRobotMulticastChannel(0), args.interface
         ), FullSystem(runtime_dir, debug, friendly_colour_yellow) as full_system:
             tscope.show()
 
