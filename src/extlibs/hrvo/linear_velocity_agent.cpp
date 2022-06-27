@@ -2,8 +2,9 @@
 
 LinearVelocityAgent::LinearVelocityAgent(HRVOSimulator *simulator, const Vector &position,
                                          float radius, const Vector &velocity,
-                                         float maxSpeed, float maxAccel, AgentPath &path)
-    : Agent(simulator, position, radius, velocity, velocity, maxSpeed, maxAccel, path)
+                                         float maxSpeed, float maxAccel, AgentPath &path,
+					 unsigned int robot_id, AgentType type)
+    : Agent(simulator, position, radius, velocity, velocity, maxSpeed, maxAccel, path, robot_id, type)
 {
 }
 

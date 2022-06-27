@@ -4,8 +4,16 @@
 #include "extlibs/hrvo/path.h"
 #include "software/ai/navigator/path_planner/hrvo/velocity_obstacle.h"
 #include "software/geom/vector.h"
+#include "software/world/robot_state.h"
 
 class HRVOSimulator;
+
+enum AgentType
+{
+	FRIENDLY,
+	ENEMY,
+	BALL
+};
 
 /**
  * An agent/robot in the HRVO simulation.
@@ -27,7 +35,7 @@ class Agent
      */
     Agent(HRVOSimulator *simulator, const Vector &position, float radius,
           const Vector &velocity, const Vector &prefVelocity, float maxSpeed,
-          float maxAccel, AgentPath &path);
+          float maxAccel, AgentPath &path, RobotId robot_id, AgentType agent_type);
 
     virtual ~Agent() = default;
 
@@ -147,6 +155,10 @@ class Agent
      */
     void setPath(const AgentPath &new_path);
 
+	RobotId getRobotId();
+
+	AgentType getAgentType();
+
    protected:
     // Agent Properties
     Vector position_;
@@ -163,9 +175,13 @@ class Agent
     // The path of this Agent
     AgentPath path;
 
+    RobotId robot_id;
+
     float max_speed_;
     float max_accel_;
     bool reached_goal_;
+
+	AgentType agent_type;
 
     HRVOSimulator *const simulator_;
 };

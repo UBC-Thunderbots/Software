@@ -68,7 +68,7 @@ class HRVOAgent : public Agent
     HRVOAgent(HRVOSimulator *simulator, const Vector &position, float neighborDist,
               std::size_t maxNeighbors, float radius, const Vector &velocity,
               float maxAccel, AgentPath &path, float prefSpeed, float maxSpeed,
-              float uncertaintyOffset);
+              float uncertaintyOffset, RobotId robot_id, AgentType type);
 
     /**
      * Computes the new velocity of this agent.

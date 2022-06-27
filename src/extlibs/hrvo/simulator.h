@@ -35,6 +35,7 @@
 #include <fstream>
 #include <limits>
 #include <vector>
+#include <list>
 
 #include "extlibs/hrvo/agent.h"
 #include "extlibs/hrvo/kd_tree.h"
@@ -79,7 +80,7 @@ class HRVOSimulator
      * @param Robot    The robot which this agent should be based on
      * @return    The index of the agent.
      */
-    std::size_t addHRVORobotAgent(const Robot &robot);
+    std::size_t addHRVORobotAgent(const Robot &robot, AgentType type);
 
     /**
      *      Adds a new Linear Velocity Agent to the simulation based on Robot.
@@ -89,7 +90,8 @@ class HRVOSimulator
      * @return    The index of the agent.
      */
     std::size_t addLinearVelocityRobotAgent(const Robot &robot,
-                                            const Vector &destination);
+                                            const Vector &destination,
+					    AgentType type);
 
     /**
      *      Adds a new agent to the simulation.
@@ -110,7 +112,8 @@ class HRVOSimulator
     std::size_t addHRVOAgent(const Vector &position, float agent_radius,
                              const Vector &curr_velocity, float maxSpeed, float prefSpeed,
                              float maxAccel, AgentPath &path, float neighborDist,
-                             std::size_t maxNeighbors, float uncertaintyOffset);
+                             std::size_t maxNeighbors, float uncertaintyOffset,
+			     RobotId robot_id, AgentType type);
 
     /**
      * Add a new LinearlyVelocityAgent
@@ -125,7 +128,8 @@ class HRVOSimulator
      */
     size_t addLinearVelocityAgent(const Vector &position, float agent_radius,
                                   const Vector &curr_velocity, float max_speed,
-                                  float max_accel, AgentPath &path);
+                                  float max_accel, AgentPath &path, 
+				  RobotId robot_id, AgentType type);
 
     /**
      * Performs a simulation step; updates the position, and velocity
@@ -295,6 +299,7 @@ class HRVOSimulator
 
     // List of agents (robots) in this simulation
     std::vector<std::shared_ptr<Agent>> agents;
+    std::list<std::shared_ptr<Agent>> agent_list;
 
     // robot id to agent index
     std::map<unsigned int, unsigned int> friendly_robot_id_map;

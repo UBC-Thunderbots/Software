@@ -72,7 +72,7 @@ void HRVOSimulator::updateWorld(const World &world)
     {
         for (const Robot &friendly_robot : friendly_team)
         {
-            std::size_t agent_index = addHRVORobotAgent(friendly_robot);
+            std::size_t agent_index = addHRVORobotAgent(friendly_robot, AgentType::FRIENDLY);
             friendly_robot_id_map.emplace(friendly_robot.id(), agent_index);
         }
 
@@ -105,7 +105,7 @@ void HRVOSimulator::updateWorld(const World &world)
 
             Vector goal_position = intersection_point_set.begin()->toVector();
             std::size_t agent_index =
-                addLinearVelocityRobotAgent(enemy_robot, goal_position);
+                addLinearVelocityRobotAgent(enemy_robot, goal_position, AgentType::ENEMY);
             enemy_robot_id_map.emplace(enemy_robot.id(), agent_index);
         }
     }
@@ -134,13 +134,24 @@ void HRVOSimulator::updateWorld(const World &world)
 
         for (const Robot &enemy_robot : enemy_team)
         {
-            auto agent_index_iter = enemy_robot_id_map.find(enemy_robot.id());
-            if (agent_index_iter != enemy_robot_id_map.end())
-            {
-                unsigned int agent_index = agent_index_iter->second;
-                agents[agent_index]->setPosition(enemy_robot.position().toVector());
-                agents[agent_index]->setVelocity(enemy_robot.velocity());
-            }
+			auto agent_iter = std::find_if(agent_list.begin(), agent_list.end(),
+								[&enemy_robot](std::shared_ptr<Agent> agent)
+								{
+									return (agent->getRobotId() == enemy_robot.id() && agent->getAgentType() == AgentType::ENEMY);
+								});	
+			if (agent_iter != agent_list.end())
+			{
+				(*agent_iter)->setPosition(enemy_robot.position().toVector());
+				(*agent_iter)->setVelocity(enemy_robot.velocity());
+			}
+
+            //auto agent_index_iter = enemy_robot_id_map.find(enemy_robot.id());
+            //if (agent_index_iter != enemy_robot_id_map.end())
+            //{
+            //    unsigned int agent_index = agent_index_iter->second;
+            //    agents[agent_index]->setPosition(enemy_robot.position().toVector());
+            //    agents[agent_index]->setVelocity(enemy_robot.velocity());
+            //}
         }
     }
 
@@ -162,7 +173,7 @@ void HRVOSimulator::updateWorld(const World &world)
 
             AgentPath path          = AgentPath({PathPoint(goal_pos, 0.0f)}, 0.1f);
             std::size_t agent_index = addLinearVelocityAgent(
-                position, ball_radius, velocity, velocity.length(), acceleration, path);
+                position, ball_radius, velocity, velocity.length(), acceleration, path, 100, AgentType::BALL);
             ball_agent_id = agent_index;
         }
         else
@@ -191,7 +202,7 @@ void HRVOSimulator::updatePrimitiveSet(const TbotsProto::PrimitiveSet &new_primi
         auto hrvo_agent_opt = getFriendlyAgentFromRobotId(robot_id);
         if (hrvo_agent_opt.has_value())
         {
-            auto hrvo_agent = hrvo_agent_opt.value();
+            auto hrvo_agent = (hrvo_agent_opt.value());
             AgentPath path;
 
             if (primitive.has_move())
@@ -224,7 +235,7 @@ void HRVOSimulator::updatePrimitiveSet(const TbotsProto::PrimitiveSet &new_primi
     }
 }
 
-std::size_t HRVOSimulator::addHRVORobotAgent(const Robot &robot)
+std::size_t HRVOSimulator::addHRVORobotAgent(const Robot &robot, AgentType type)
 {
     Vector position = robot.position().toVector();
     Vector velocity;
@@ -286,11 +297,11 @@ std::size_t HRVOSimulator::addHRVORobotAgent(const Robot &robot)
 
     return addHRVOAgent(position, agent_radius, velocity, max_speed, pref_speed,
                         max_accel, path, MAX_NEIGHBOR_SEARCH_DIST, MAX_NEIGHBORS,
-                        uncertainty_offset);
+                        uncertainty_offset, robot.id(), type);
 }
 
 std::size_t HRVOSimulator::addLinearVelocityRobotAgent(const Robot &robot,
-                                                       const Vector &destination)
+                                                       const Vector &destination, AgentType type)
 {
     // TODO (#2371): Replace Vector with Vector
     Vector position = robot.position().toVector();
@@ -306,30 +317,32 @@ std::size_t HRVOSimulator::addLinearVelocityRobotAgent(const Robot &robot,
 
     AgentPath path = AgentPath({PathPoint(destination, 0.0f)}, path_radius);
     return addLinearVelocityAgent(position, agent_radius, velocity, max_speed, max_accel,
-                                  path);
+                                  path, robot.id(), type);
 }
 
 std::size_t HRVOSimulator::addHRVOAgent(const Vector &position, float agent_radius,
                                         const Vector &curr_velocity, float maxSpeed,
                                         float prefSpeed, float maxAccel, AgentPath &path,
                                         float neighborDist, std::size_t maxNeighbors,
-                                        float uncertaintyOffset)
+                                        float uncertaintyOffset, RobotId robot_id, AgentType type)
 {
     std::shared_ptr<HRVOAgent> agent = std::make_shared<HRVOAgent>(
         this, position, neighborDist, maxNeighbors, agent_radius, curr_velocity, maxAccel,
-        path, prefSpeed, maxSpeed, uncertaintyOffset);
-    agents.push_back(std::move(agent));
+        path, prefSpeed, maxSpeed, uncertaintyOffset, robot_id, type);
+    agents.push_back(agent);
+    agent_list.push_back(agent);
     return agents.size() - 1;
 }
 
 size_t HRVOSimulator::addLinearVelocityAgent(const Vector &position, float agent_radius,
                                              const Vector &curr_velocity, float max_speed,
-                                             float max_accel, AgentPath &path)
+                                             float max_accel, AgentPath &path, RobotId robot_id, AgentType type)
 {
     std::shared_ptr<LinearVelocityAgent> agent = std::make_shared<LinearVelocityAgent>(
-        this, position, agent_radius, curr_velocity, max_speed, max_accel, path);
+        this, position, agent_radius, curr_velocity, max_speed, max_accel, path, robot_id, type);
 
-    agents.push_back(std::move(agent));
+    agents.push_back(agent);
+    agent_list.push_back(agent);
     return agents.size() - 1;
 }
 
@@ -393,7 +406,7 @@ void HRVOSimulator::visualize(unsigned int robot_id) const
     TbotsProto::HRVOVisualization hrvo_visualization;
     hrvo_visualization.set_robot_id(robot_id);
 
-    auto vo_protos = friendly_agent_opt.value()->getVelocityObstaclesAsProto();
+    auto vo_protos = ((HRVOAgent) *(friendly_agent_opt.value())).getVelocityObstaclesAsProto();
     *(hrvo_visualization.mutable_velocity_obstacles()) = {vo_protos.begin(),
                                                           vo_protos.end()};
 
@@ -417,17 +430,26 @@ void HRVOSimulator::visualize(unsigned int robot_id) const
 std::optional<std::shared_ptr<HRVOAgent>> HRVOSimulator::getFriendlyAgentFromRobotId(
     unsigned int robot_id) const
 {
-    auto agent_index_iter = friendly_robot_id_map.find(robot_id);
-    if (agent_index_iter != friendly_robot_id_map.end())
-    {
-        unsigned int agent_index = agent_index_iter->second;
-        auto hrvo_agent = std::static_pointer_cast<HRVOAgent>(agents[agent_index]);
-        if (hrvo_agent != nullptr)
-        {
-            return hrvo_agent;
-        }
-    }
-    return std::nullopt;
+    //auto agent_index_iter = friendly_robot_id_map.find(robot_id);
+    //if (agent_index_iter != friendly_robot_id_map.end())
+    //{
+    //    unsigned int agent_index = agent_index_iter->second;
+    //    auto hrvo_agent = std::static_pointer_cast<HRVOAgent>(agents[agent_index]);
+    //    if (hrvo_agent != nullptr)
+    //    {
+    //        return hrvo_agent;
+    //    }
+    //}
+	auto found = std::find_if(agent_list.begin(), agent_list.end(), 
+			[&robot_id](std::shared_ptr<Agent> agent)
+			{
+				return (agent->getRobotId() == robot_id && agent->getAgentType() == AgentType::FRIENDLY);	
+			});
+	if (found == agent_list.end())
+	{
+		return std::nullopt;
+	}
+    return std::make_optional<std::shared_ptr<HRVOAgent>>(std::static_pointer_cast<HRVOAgent>(*found));
 }
 
 float HRVOSimulator::getAgentMaxAccel(std::size_t agentNo) const

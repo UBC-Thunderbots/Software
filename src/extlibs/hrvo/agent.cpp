@@ -5,7 +5,7 @@
 
 Agent::Agent(HRVOSimulator *simulator, const Vector &position, float radius,
              const Vector &velocity, const Vector &prefVelocity, float maxSpeed,
-             float maxAccel, AgentPath &path)
+             float maxAccel, AgentPath &path, unsigned int robot_id, AgentType type)
     : simulator_(simulator),
       position_(position),
       radius_(radius),
@@ -14,7 +14,9 @@ Agent::Agent(HRVOSimulator *simulator, const Vector &position, float radius,
       max_speed_(maxSpeed),
       max_accel_(maxAccel),
       path(path),
-      reached_goal_(false)
+      reached_goal_(false),
+	robot_id(robot_id),
+	agent_type(type)
 {
 }
 
@@ -144,4 +146,14 @@ void Agent::setMaxSpeed(float max_speed)
 void Agent::setRadius(float radius)
 {
     radius_ = radius;
+}
+
+RobotId Agent::getRobotId() 
+{
+	return robot_id;
+}
+
+AgentType Agent::getAgentType()
+{
+	return agent_type;
 }
