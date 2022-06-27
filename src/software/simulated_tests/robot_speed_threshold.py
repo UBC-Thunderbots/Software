@@ -1,7 +1,6 @@
 import software.python_bindings as tbots
 from proto.import_all_protos import *
 from software.py_constants import *
-from speed_threshold_helpers import *
 
 import math
 
