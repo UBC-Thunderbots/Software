@@ -444,36 +444,32 @@ void MotorService::spiTransfer(int fd, uint8_t const* tx, uint8_t const* rx, uns
 }
 
 double MotorService::rampVelocity(double velocity_target, double velocity_current,
-                                  double time_ramp)
+        double time_ramp)
 {
     // Calculate velocity delta using kinematic equation: dv = a*t
     double velocity_delta = robot_constants_.robot_max_acceleration_m_per_s_2 * time_ramp;
-    double ramp_velocity  = 0;
-    double wiggle_room    = 0.04;
+
+    // Trinamics PID control is far more accurate than the delayed velocity input we recieve.
+    // If we set the ramp velocity with no hysterisis, we will end up not converging at the
+    // target velocity. Allowing 5cm/s of error was experimentally determined to be sufficient
+    // for smooth operation.
+    double velocity_error = 0.05;
 
     // Case: accelerating
-    if (velocity_target > velocity_current + velocity_delta + wiggle_room)
+    if (velocity_target > velocity_current + velocity_delta + velocity_error)
     {
-        ramp_velocity = velocity_current + velocity_delta;
+        return velocity_current + velocity_delta;
     }
     // Case: deccelerating
-    else if (velocity_target < velocity_current - velocity_delta - wiggle_room)
+    else if (velocity_target < velocity_current - velocity_delta - velocity_error)
     {
-        ramp_velocity = velocity_current - velocity_delta;
+        return velocity_current - velocity_delta;
     }
     // Case: ramping not required, go to target velocity
     else
     {
-        ramp_velocity = velocity_target;
+        return velocity_target;
     }
-
-    // if(std::abs(ramp_velocity) > robot_constants_.robot_max_speed_m_per_s)
-    //{
-    // ramp_velocity = std::copysign(robot_constants_.robot_max_speed_m_per_s,
-    // ramp_velocity);
-    //}
-
-    return ramp_velocity;
 }
 
 
@@ -611,11 +607,11 @@ void MotorService::writeToDriverOrDieTrying(uint8_t motor, uint8_t address, int3
     // If we get here, we have failed to write to the driver. We reset
     // the chip to clear any bad values we just wrote and crash so everything stops.
     reset_gpio.setValue(GpioState::LOW);
-    // CHECK(read_value == value) << "Couldn't write " << value
-    //<< " to the TMC6100 at address " << address
-    //<< " at address " << static_cast<uint32_t>(address)
-    //<< " on motor " << static_cast<uint32_t>(motor)
-    //<< " received: " << read_value;
+    CHECK(read_value == value) << "Couldn't write " << value
+        << " to the TMC6100 at address " << address
+        << " at address " << static_cast<uint32_t>(address)
+        << " on motor " << static_cast<uint32_t>(motor)
+        << " received: " << read_value;
 }
 
 void MotorService::writeToControllerOrDieTrying(uint8_t motor, uint8_t address,
@@ -641,11 +637,11 @@ void MotorService::writeToControllerOrDieTrying(uint8_t motor, uint8_t address,
     // If we get here, we have failed to write to the controller. We reset
     // the chip to clear any bad values we just wrote and crash so everything stops.
     reset_gpio.setValue(GpioState::LOW);
-    // CHECK(read_value == value) << "Couldn't write " << value
-    //<< " to the TMC4671 at address " << address
-    //<< " at address " << static_cast<uint32_t>(address)
-    //<< " on motor " << static_cast<uint32_t>(motor)
-    //<< " received: " << read_value;
+    CHECK(read_value == value) << "Couldn't write " << value
+        << " to the TMC4671 at address " << address
+        << " at address " << static_cast<uint32_t>(address)
+        << " on motor " << static_cast<uint32_t>(motor)
+        << " received: " << read_value;
 }
 
 void MotorService::configurePWM(uint8_t motor)
@@ -838,8 +834,8 @@ void MotorService::startController(uint8_t motor, bool dribbler)
     tmc4671_writeInt(motor, TMC4671_CHIPINFO_ADDR, 0x000000000);
     int chip_id = tmc4671_readInt(motor, TMC4671_CHIPINFO_DATA);
 
-    // CHECK(0x34363731 == chip_id) << "The TMC4671 of motor "
-    //<< static_cast<uint32_t>(motor) << " is not responding";
+    CHECK(0x34363731 == chip_id) << "The TMC4671 of motor "
+        << static_cast<uint32_t>(motor) << " is not responding";
 
     LOG(DEBUG) << "Controller " << std::to_string(motor)
                << " online, responded with: " << chip_id;

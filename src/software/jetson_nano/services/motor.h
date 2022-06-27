@@ -143,12 +143,14 @@ class MotorService
      */
     void spiTransfer(int fd, uint8_t const* tx, uint8_t const* rx, unsigned len);
 
-    /**
+    /** 
      * Ramp the velocity over the given timestep.
+     *
+     * NOTE: This funciton has no state.
      *
      * @param velocity_target The target velocity
      * @param velocity_current The current velocity
-     * @param time_ramp The ramping time
+     * @param time_ramp The time allocated for acceleration. 
      *
      */
     double rampVelocity(double velocity_target, double velocity_current,
