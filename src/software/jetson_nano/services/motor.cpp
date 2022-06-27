@@ -611,11 +611,11 @@ void MotorService::writeToDriverOrDieTrying(uint8_t motor, uint8_t address, int3
     // If we get here, we have failed to write to the driver. We reset
     // the chip to clear any bad values we just wrote and crash so everything stops.
     reset_gpio.setValue(GpioState::LOW);
-    //CHECK(read_value == value) << "Couldn't write " << value
-                               //<< " to the TMC6100 at address " << address
-                               //<< " at address " << static_cast<uint32_t>(address)
-                               //<< " on motor " << static_cast<uint32_t>(motor)
-                               //<< " received: " << read_value;
+    // CHECK(read_value == value) << "Couldn't write " << value
+    //<< " to the TMC6100 at address " << address
+    //<< " at address " << static_cast<uint32_t>(address)
+    //<< " on motor " << static_cast<uint32_t>(motor)
+    //<< " received: " << read_value;
 }
 
 void MotorService::writeToControllerOrDieTrying(uint8_t motor, uint8_t address,
@@ -641,11 +641,11 @@ void MotorService::writeToControllerOrDieTrying(uint8_t motor, uint8_t address,
     // If we get here, we have failed to write to the controller. We reset
     // the chip to clear any bad values we just wrote and crash so everything stops.
     reset_gpio.setValue(GpioState::LOW);
-    //CHECK(read_value == value) << "Couldn't write " << value
-                               //<< " to the TMC4671 at address " << address
-                               //<< " at address " << static_cast<uint32_t>(address)
-                               //<< " on motor " << static_cast<uint32_t>(motor)
-                               //<< " received: " << read_value;
+    // CHECK(read_value == value) << "Couldn't write " << value
+    //<< " to the TMC4671 at address " << address
+    //<< " at address " << static_cast<uint32_t>(address)
+    //<< " on motor " << static_cast<uint32_t>(motor)
+    //<< " received: " << read_value;
 }
 
 void MotorService::configurePWM(uint8_t motor)
@@ -838,8 +838,8 @@ void MotorService::startController(uint8_t motor, bool dribbler)
     tmc4671_writeInt(motor, TMC4671_CHIPINFO_ADDR, 0x000000000);
     int chip_id = tmc4671_readInt(motor, TMC4671_CHIPINFO_DATA);
 
-    //CHECK(0x34363731 == chip_id) << "The TMC4671 of motor "
-                                 //<< static_cast<uint32_t>(motor) << " is not responding";
+    // CHECK(0x34363731 == chip_id) << "The TMC4671 of motor "
+    //<< static_cast<uint32_t>(motor) << " is not responding";
 
     LOG(DEBUG) << "Controller " << std::to_string(motor)
                << " online, responded with: " << chip_id;

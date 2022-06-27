@@ -70,9 +70,9 @@ void Thunderloop::runLoop()
     {
         {
             redis_client_->set("/battery_voltage",
-                    std::to_string(power_status_.battery_voltage()));
+                               std::to_string(power_status_.battery_voltage()));
             redis_client_->set("/cap_voltage",
-                    std::to_string(power_status_.capacitor_voltage()));
+                               std::to_string(power_status_.capacitor_voltage()));
 
             // Wait until next shot
             //
