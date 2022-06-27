@@ -64,6 +64,10 @@ class RobotCommunication(object):
         """
 
         # motor_control = MotorControl(MotorControl.drive_control=MotorControl.DirectPerWheelControl(), dribbler_speed_rpm=0.0)
+<<<<<<< HEAD
+=======
+        speed = 0.1
+>>>>>>> 3c32ed4978231afa2235eab64dab1d4522f0bd23
         primitive0 = Primitive(
             direct_control=DirectControlPrimitive(
                 motor_control=MotorControl(
@@ -71,6 +75,7 @@ class RobotCommunication(object):
                         front_left_wheel_rpm=0
                     ),
                     dribbler_speed_rpm=0,
+<<<<<<< HEAD
                 ),
                 power_control=PowerControl(
                     charge_mode=PowerControl.ChargeMode.CHARGE,
@@ -149,6 +154,80 @@ class RobotCommunication(object):
         # )
         # )
         # )
+=======
+                )
+            )
+        )
+        primitive1 = Primitive(
+            direct_control=DirectControlPrimitive(
+                motor_control=MotorControl(
+                    direct_velocity_control=MotorControl.DirectVelocityControl(
+                        velocity=Vector(
+                            x_component_meters=0.0, y_component_meters=speed
+                        ),
+                        angular_velocity=AngularVelocity(radians_per_second=0.0),
+                    ),
+                    dribbler_speed_rpm=-10000,
+                )
+            )
+        )
+        primitive2 = Primitive(
+            direct_control=DirectControlPrimitive(
+                motor_control=MotorControl(
+                    direct_velocity_control=MotorControl.DirectVelocityControl(
+                        velocity=Vector(
+                            x_component_meters=0.0, y_component_meters=-speed
+                        ),
+                        angular_velocity=AngularVelocity(radians_per_second=0.0),
+                    ),
+                    dribbler_speed_rpm=-10000,
+                )
+            )
+        )
+        primitive3 = Primitive(
+            direct_control=DirectControlPrimitive(
+                motor_control=MotorControl(
+                    direct_velocity_control=MotorControl.DirectVelocityControl(
+                        velocity=Vector(
+                            x_component_meters=speed, y_component_meters=speed
+                        ),
+                        angular_velocity=AngularVelocity(radians_per_second=0.0),
+                    ),
+                    dribbler_speed_rpm=-10000,
+                )
+            )
+        )
+        primitive4 = Primitive(
+            direct_control=DirectControlPrimitive(
+                motor_control=MotorControl(
+                    direct_velocity_control=MotorControl.DirectVelocityControl(
+                        velocity=Vector(
+                            x_component_meters=-speed, y_component_meters=-speed
+                        ),
+                        angular_velocity=AngularVelocity(radians_per_second=0.0),
+                    ),
+                    dribbler_speed_rpm=-10000,
+                )
+            )
+        )
+
+        primitive0_dribbler = Primitive(
+            direct_control=DirectControlPrimitive(
+                motor_control=MotorControl(
+                    direct_per_wheel_control=MotorControl.DirectPerWheelControl(
+                        front_left_wheel_rpm=0
+                    ),
+                    dribbler_speed_rpm=-10000,
+                )
+            )
+        )
+
+        set = [{3: primitive1}, {3: primitive2}, {3: primitive3}, {3: primitive4}]
+        # primitiveset = PrimitiveSet(time_sent = Timestamp(),stay_away_from_ball=False, robot_primitives=set)
+
+        while True:
+            if self.fullsystem_connected_to_robots:
+>>>>>>> 3c32ed4978231afa2235eab64dab1d4522f0bd23
 
         # set = [{3: primitive1}, {3: primitive2}, {3: primitive3}, {3: primitive4}]
         # # primitiveset = PrimitiveSet(time_sent = Timestamp(),stay_away_from_ball=False, robot_primitives=set)
@@ -156,6 +235,7 @@ class RobotCommunication(object):
         # while True:
         # if self.fullsystem_connected_to_robots:
 
+<<<<<<< HEAD
         # # Send the world
         # # world = self.world_buffer.get(block=True)
         # # self.send_world.send_proto(world)
@@ -190,6 +270,35 @@ class RobotCommunication(object):
         # robot_primitives={3: primitive0},
         # )
         # self.send_primitive_mcast_sender.send_proto(primitiveset_stop)
+=======
+                for i in range(4):
+                    primitiveset = PrimitiveSet(
+                        time_sent=Timestamp(),
+                        stay_away_from_ball=False,
+                        robot_primitives=set[i],
+                    )
+                    primitive_set = primitiveset
+                    self.send_primitive_mcast_sender.send_proto(primitive_set)
+                    logging.info(f"running index i {i}")
+                    # if self.estop_reader.isEstopPlay():
+                    #     self.send_primitive_mcast_sender.send_proto(primitive_set)
+
+                    time.sleep(2)
+                    primitiveset_stop = PrimitiveSet(
+                        time_sent=Timestamp(),
+                        stay_away_from_ball=False,
+                        robot_primitives={3: primitive0_dribbler},
+                    )
+                    self.send_primitive_mcast_sender.send_proto(primitiveset_stop)
+                    time.sleep(2)
+
+                primitiveset_stop = PrimitiveSet(
+                    time_sent=Timestamp(),
+                    stay_away_from_ball=False,
+                    robot_primitives={3: primitive0},
+                )
+                self.send_primitive_mcast_sender.send_proto(primitiveset_stop)
+>>>>>>> 3c32ed4978231afa2235eab64dab1d4522f0bd23
 
         # exit(0)
 
