@@ -11,7 +11,7 @@
 #include "software/math/math_functions.h"
 
 
-BallFilter::BallFilter() : ball_detection_buffer(MAX_BUFFER_SIZE) {}
+BallFilter::BallFilter(double ball_rolling_acceleration) : ball_detection_buffer(MAX_BUFFER_SIZE), ball_rolling_acceleration(ball_rolling_acceleration) {}
 
 std::optional<Ball> BallFilter::estimateBallState(
     const std::vector<BallDetection> &new_ball_detections, const Rectangle &filter_area)
@@ -139,7 +139,15 @@ std::optional<Ball> BallFilter::estimateBallStateFromBuffer(
 
     BallState ball_state(filtered_position, estimated_velocity->average_velocity,
                          ball_detections.front().distance_from_ground);
-    return Ball(ball_state, ball_detections.front().timestamp);
+    Vector acceleration = Vector();
+
+    //todo dependency inject
+    double rolling_acceleration = -0.5;
+    if(estimated_velocity->average_velocity.length() < 0.1){
+        acceleration = -1 * std::abs(rolling_acceleration) * estimated_velocity->average_velocity;
+    }
+
+    return Ball(ball_state, ball_detections.front().timestamp, acceleration);
 }
 
 std::optional<size_t> BallFilter::getAdjustedBufferSize(

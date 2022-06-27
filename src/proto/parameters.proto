@@ -257,6 +257,10 @@ message SensorFusionConfig
     // Number of dropped detections before we consider the ball not to be in the dribbler
     required int32 num_dropped_detections_before_ball_not_in_dribbler = 12
         [default = 3, (bounds).min_int_value = 0, (bounds).max_int_value = 1000];
+
+    // Acceleration applied to the ball when it is rolling
+    required double rolling_acceleration_ms2 = 13
+    [default = -0.5, (bounds).min_double_value = -10, (bounds).max_double_value = 10];
 }
 
 message DefensePlayConfig

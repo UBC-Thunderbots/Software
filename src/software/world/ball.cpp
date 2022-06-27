@@ -3,6 +3,7 @@
 #include "shared/constants.h"
 #include "software/physics/physics.h"
 #include "software/geom/algorithms/distance.h"
+#include "software/geom/algorithms/almost_equal.h"
 #include <cmath>
 
 Ball::Ball(const Point &position, const Vector &velocity, const Timestamp &timestamp,
@@ -69,11 +70,15 @@ BallState Ball::estimateFutureState(const Duration &duration_in_future) const
     Vector future_velocity = calculateFutureVelocity(current_state_.velocity(),
                                                      acceleration_, duration_in_future);
 
-    bool velocities_in_opposite_direction = future_velocity.x() * current_state_.velocity().x() < 0 || future_velocity.y() * current_state_.velocity().y() < 0;
+//    bool velocities_in_opposite_direction = future_velocity.x() * current_state_.velocity().x() < 0 || future_velocity.y() * current_state_.velocity().y() < 0;
+    bool velocities_in_opposite_direction =  std::abs(future_velocity.cross(current_state_.velocity())) < 1e-6;
+
 
     if(acceleration_.length() > 0 && velocities_in_opposite_direction){
         // this is the time it takes for velocity to accelerate to a stop
         effective_duration        = Duration::fromSeconds(current_state_.velocity().length() / acceleration_.length());
+
+        //ball will stop
         future_velocity    = Vector();
     }
 
