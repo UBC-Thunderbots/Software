@@ -49,7 +49,9 @@ void setup()
     monitor  = std::make_shared<PowerMonitor>();
     geneva   = std::make_shared<Geneva>();
     executor = std::make_shared<ControlExecutor>(charger, chicker, geneva);
+    charger->chargeCapacitors();
 }
+
 
 void loop()
 {
