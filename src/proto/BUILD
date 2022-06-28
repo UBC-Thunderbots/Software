@@ -11,7 +11,6 @@ proto_library(
         "game_state.proto",
         "geneva_slot.proto",
         "geometry.proto",
-        "move_robot_and_ball_messages.proto",
         "parameters.proto",
         "play.proto",
         "power_frame_msg.proto",
@@ -48,7 +47,6 @@ py_proto_library(
         "game_state.proto",
         "geneva_slot.proto",
         "geometry.proto",
-        "move_robot_and_ball_messages.proto",
         "parameters.proto",
         "play.proto",
         "primitive.proto",
@@ -140,38 +138,6 @@ proto_library(
 )
 
 proto_library(
-    name = "replay_msg_proto",
-    srcs = [
-        "replay_msg.proto",
-    ],
-    visibility = ["//visibility:private"],
-    deps = [
-        ":sensor_msg_proto",
-        ":ssl_proto",
-        ":tbots_proto",
-    ],
-)
-
-proto_library(
-    name = "defending_side_msg_proto",
-    srcs = [
-        "defending_side_msg.proto",
-    ],
-    visibility = ["//visibility:private"],
-)
-
-proto_library(
-    name = "repeated_any_msg_proto",
-    srcs = [
-        "repeated_any_msg.proto",
-    ],
-    visibility = ["//visibility:private"],
-    deps = [
-        "@com_google_protobuf//:any_proto",
-    ],
-)
-
-proto_library(
     name = "visualization_proto",
     srcs = [
         "visualization.proto",
@@ -201,21 +167,6 @@ cc_proto_library(
 )
 
 cc_proto_library(
-    name = "replay_msg_cc_proto",
-    deps = [":replay_msg_proto"],
-)
-
-cc_proto_library(
-    name = "defending_side_msg_cc_proto",
-    deps = [":defending_side_msg_proto"],
-)
-
-cc_proto_library(
-    name = "repeated_any_msg_cc_proto",
-    deps = [":repeated_any_msg_proto"],
-)
-
-cc_proto_library(
     name = "visualization_cc_proto",
     deps = [":visualization_proto"],
 )
@@ -229,8 +180,6 @@ py_proto_library(
     name = "software_py_proto",
     srcs = [
         "play_info_msg.proto",
-        "repeated_any_msg.proto",
-        "replay_msg.proto",
         "robot_log_msg.proto",
         "sensor_msg.proto",
         "ssl_gc_api.proto",

@@ -14,6 +14,11 @@
 # unit tests
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 
+print_status_msg () {
+   echo "================================================================"
+   echo $1
+   echo "================================================================"
+}
 
 # Save the parent dir of this so we can always run commands relative to the
 # location of this script, no matter where it is called from. This
@@ -22,9 +27,7 @@
 CURR_DIR=$(dirname -- "$(readlink -f -- "$BASH_SOURCE")")
 cd "$CURR_DIR" || exit
 
-echo "================================================================"
-echo "Installing Utilities and Dependencies"
-echo "================================================================"
+print_status_msg "Installing Utilities and Dependencies"
 
 sudo apt-get update
 sudo apt-get install -y software-properties-common # required for add-apt-repository
@@ -57,7 +60,7 @@ host_software_packages=(
                     # properly manage this as a bazel dependency, so we have
                     # to manually install it ourselves
     python3-yaml # Load dynamic parameter configuration files
-    qt5-default # The GUI library for our visualizer
+    qt5-default # A GUI library used by er-force sim
     tmux        # Used by AI vs AI script
     valgrind # Checks for memory leaks
     libsqlite3-dev # needed to build Python 3 with sqlite support
@@ -98,31 +101,23 @@ if [[ $(lsb_release -rs) == "18.04" ]]; then
 fi
 
 if ! sudo apt-get install "${host_software_packages[@]}" -y ; then
-    echo "##############################################################"
-    echo "Error: Installing utilities and dependencies failed"
-    echo "##############################################################"
+    print_status_msg "Error: Installing utilities and dependencies failed"
     exit 1
 fi
 
 # Upgrade python3 pip, which some pip packages require
-echo "================================================================"
-echo "Setting Up Virtual Python Environment"
-echo "================================================================"
+print_status_msg "Setting Up Virtual Python Environment"
 
 # delete tbotspython first
 sudo rm -rf /opt/tbotspython
 
 if ! sudo /usr/bin/python3.8 -m venv /opt/tbotspython ; then
-    echo "##############################################################"
-    echo "Error: Setting up virtual environment failed"
-    echo "##############################################################"
+    print_status_msg "Error: Setting up virtual environment failed"
     exit 1
 fi
 
 if ! sudo /opt/tbotspython/bin/python3 -m pip install --upgrade pip ; then
-    echo "##############################################################"
-    echo "Error: Upgrading pip version in venv failed"
-    echo "##############################################################"
+    print_status_msg "Error: Upgrading pip version in venv failed"
     exit 1
 fi
 
@@ -134,43 +129,29 @@ if [[ $(lsb_release -rs) == "20.04" ]]; then
     sudo /opt/tbotspython/bin/pip3 install -r ubuntu20_requirements.txt
 fi
 
-
-if ! sudo /opt/tbotspython/bin/pip3 install --upgrade protobuf  ; then
-    echo "##############################################################"
-    echo "Error: Installing protobuf failed"
-    echo "##############################################################"
-    exit 1
+if ! sudo /opt/tbotspython/bin/pip3 install protobuf==3.20.1  ; then
+    print_status_msg "Error: Installing protobuf failed"
+    exit 1;
 fi
 
-echo "================================================================"
-echo "Done Setting Up Virtual Python Environment"
-echo "================================================================"
-
-echo "================================================================"
-echo "Fetching game controller"
-echo "================================================================"
+print_status_msg "Done Setting Up Virtual Python Environment"
+print_status_msg "Fetching game controller"
 
 sudo chown -R $USER:$USER /opt/tbotspython
 sudo wget -nc https://github.com/RoboCup-SSL/ssl-game-controller/releases/download/v2.15.2/ssl-game-controller_v2.15.2_linux_amd64 -O /opt/tbotspython/gamecontroller
 sudo chmod +x /opt/tbotspython/gamecontroller
 
 # Install Bazel
-echo "================================================================"
-echo "Installing Bazel"
-echo "================================================================"
+print_status_msg "Installing Bazel"
 
 # Adapted from https://docs.bazel.build/versions/main/install-ubuntu.html#install-with-installer-ubuntu
 sudo wget -nc https://github.com/bazelbuild/bazel/releases/download/5.0.0/bazel-5.0.0-installer-linux-x86_64.sh -O /tmp/bazel-installer.sh
 sudo chmod +x /tmp/bazel-installer.sh
 sudo /tmp/bazel-installer.sh --bin=/usr/bin --base=$HOME/.bazel
 
-echo "================================================================"
-echo "Done Installing Bazel"
-echo "================================================================"
 
-echo "================================================================"
-echo "Setting Up PlatformIO"
-echo "================================================================"
+print_status_msg "Done Installing Bazel"
+print_status_msg "Setting Up PlatformIO"
 
 # setup platformio to compile arduino code
 # link to instructions: https://docs.platformio.org/en/latest/core/installation.html
@@ -178,9 +159,7 @@ echo "================================================================"
 
 # downloading platformio udev rules
 if ! curl -fsSL https://raw.githubusercontent.com/platformio/platformio-core/master/scripts/99-platformio-udev.rules | sudo tee /etc/udev/rules.d/99-platformio-udev.rules; then
-    echo "##############################################################"
-    echo "Error: Downloading PlatformIO udev rules failed"
-    echo "##############################################################"
+    print_status_msg "Error: Downloading PlatformIO udev rules failed"
     exit 1
 fi
 
@@ -191,19 +170,9 @@ sudo usermod -a -G dialout $USER
 
 # installs PlatformIO to global environment
 if ! sudo /usr/bin/python3.8 -m pip install --prefix /usr/local platformio==6.0.2; then
-    echo "##############################################################"
-    echo "Error: Installing PlatformIO failed"
-    echo "##############################################################"
+    print_status_msg "Error: Installing PlatformIO failed"
     exit 1
 fi
 
-
-echo "================================================================"
-echo "Done PlatformIO Setup"
-echo "================================================================"
-
-# Done
-echo "================================================================"
-echo "Done Software Setup, please reboot for changes to take place"
-echo "================================================================"
-
+print_status_msg "Done PlatformIO Setup"
+print_status_msg "Done Software Setup, please reboot for changes to take place"

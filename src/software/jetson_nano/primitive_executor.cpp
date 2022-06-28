@@ -9,10 +9,12 @@
 #include "software/math/math_functions.h"
 
 PrimitiveExecutor::PrimitiveExecutor(const double time_step,
-                                     const RobotConstants_t& robot_constants)
+                                     const RobotConstants_t& robot_constants,
+                                     const TeamColour friendly_team_colour)
     : current_primitive_(),
       robot_constants_(robot_constants),
-      hrvo_simulator_(static_cast<float>(time_step), robot_constants)
+      hrvo_simulator_(static_cast<float>(time_step), robot_constants,
+                      friendly_team_colour)
 {
 }
 
@@ -84,7 +86,7 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
             auto output = std::make_unique<TbotsProto::DirectControlPrimitive>();
 
             // Discharge the capacitors
-            output->mutable_power()->set_charge_mode(
+            output->mutable_power_control()->set_charge_mode(
                 TbotsProto::PowerControl_ChargeMode_DISCHARGE);
 
             return output;

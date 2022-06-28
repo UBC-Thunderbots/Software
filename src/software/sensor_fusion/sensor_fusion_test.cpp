@@ -21,7 +21,6 @@ class SensorFusionTest : public ::testing::Test
           geom_data(initSSLDivBGeomData()),
           robot_status_msg_id_1(initRobotStatusId1()),
           robot_status_msg_id_2(initRobotStatusId2()),
-          robot_status_msg_wheel_motor_hot(initWheelMotorHotErrorCode()),
           robot_status_msg_low_cap(initLowCapErrorCode()),
           robot_status_msg_dribble_motor_hot(initDribbleMotorHotErrorCode()),
           robot_status_msg_multiple_error_codes(initMultipleErrorCode()),
@@ -46,7 +45,6 @@ class SensorFusionTest : public ::testing::Test
     // world associated with geom_data and detection_frame only
     std::unique_ptr<TbotsProto::RobotStatus> robot_status_msg_id_1;
     std::unique_ptr<TbotsProto::RobotStatus> robot_status_msg_id_2;
-    std::unique_ptr<TbotsProto::RobotStatus> robot_status_msg_wheel_motor_hot;
     std::unique_ptr<TbotsProto::RobotStatus> robot_status_msg_low_cap;
     std::unique_ptr<TbotsProto::RobotStatus> robot_status_msg_dribble_motor_hot;
     std::unique_ptr<TbotsProto::RobotStatus> robot_status_msg_multiple_error_codes;
@@ -247,16 +245,6 @@ class SensorFusionTest : public ::testing::Test
         return robot_msg;
     }
 
-    std::unique_ptr<TbotsProto::RobotStatus> initWheelMotorHotErrorCode()
-    {
-        // Adding a WHEEL_0_MOTOR_HOT error code to robotStatus of robot 2
-        auto robot_msg = std::make_unique<TbotsProto::RobotStatus>();
-        robot_msg->set_robot_id(2);
-        robot_msg->add_error_code(TbotsProto::ErrorCode::WHEEL_0_MOTOR_HOT);
-
-        return robot_msg;
-    }
-
     std::unique_ptr<TbotsProto::RobotStatus> initLowCapErrorCode()
     {
         // Adding a LOW_CAP error code to robotStatus of robot 2
@@ -281,7 +269,6 @@ class SensorFusionTest : public ::testing::Test
     {
         auto robot_msg = std::make_unique<TbotsProto::RobotStatus>();
         robot_msg->set_robot_id(2);
-        robot_msg->add_error_code(TbotsProto::ErrorCode::WHEEL_0_MOTOR_HOT);
         robot_msg->add_error_code(TbotsProto::ErrorCode::LOW_CAP);
         robot_msg->add_error_code(TbotsProto::ErrorCode::DRIBBLER_MOTOR_HOT);
 
@@ -355,27 +342,6 @@ class SensorFusionTest : public ::testing::Test
     }
 };
 
-TEST_F(SensorFusionTest, test_making_robot_move_capability_unavailable_from_error_code)
-{
-    SensorProto sensor_msg;
-    auto ssl_wrapper_packet =
-        createSSLWrapperPacket(std::move(geom_data), initDetectionFrame());
-    *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
-    *(sensor_msg.add_robot_status_msgs())  = *robot_status_msg_wheel_motor_hot;
-    sensor_fusion.processSensorProto(sensor_msg);
-
-    std::optional<Robot> robot =
-        sensor_fusion.getWorld().value().friendlyTeam().getRobotById(2);
-    ASSERT_TRUE(robot);
-    std::set<RobotCapability> robot_unavailable_capabilities =
-        robot.value().getUnavailableCapabilities();
-    EXPECT_EQ(1, robot_unavailable_capabilities.size());
-    bool is_movement_disabled =
-        robot_unavailable_capabilities.find(RobotCapability::Move) !=
-        robot_unavailable_capabilities.end();
-    ASSERT_TRUE(is_movement_disabled);
-}
-
 TEST_F(SensorFusionTest,
        test_making_chip_and_kick_robot_capabilities_unavailable_from_error_code)
 {
@@ -439,7 +405,7 @@ TEST_F(SensorFusionTest, test_making_all_robot_capabilities_unavailable_from_err
     ASSERT_TRUE(robot);
     std::set<RobotCapability> robot_unavailable_capabilities =
         robot.value().getUnavailableCapabilities();
-    EXPECT_EQ(4, robot_unavailable_capabilities.size());
+    EXPECT_EQ(3, robot_unavailable_capabilities.size());
 
     bool is_dribble_disabled =
         robot_unavailable_capabilities.find(RobotCapability::Dribble) !=
@@ -453,11 +419,6 @@ TEST_F(SensorFusionTest, test_making_all_robot_capabilities_unavailable_from_err
     bool is_chip_disabled = robot_unavailable_capabilities.find(RobotCapability::Chip) !=
                             robot_unavailable_capabilities.end();
     ASSERT_TRUE(is_chip_disabled);
-
-    bool is_movement_disabled =
-        robot_unavailable_capabilities.find(RobotCapability::Move) !=
-        robot_unavailable_capabilities.end();
-    ASSERT_TRUE(is_movement_disabled);
 }
 
 TEST_F(SensorFusionTest, test_emptying_robot_unavailable_capabilities_from_error_code)

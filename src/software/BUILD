@@ -3,13 +3,11 @@ package(default_visibility = ["//visibility:public"])
 load("@pybind11_bazel//:build_defs.bzl", "pybind_extension", "pybind_library")
 
 cc_binary(
-    # TODO (#2510) Rename to full_system
     name = "unix_full_system",
     srcs = ["unix_full_system_main.cpp"],
     deps = [
         "//extlibs/er_force_sim/src/protobuf:protobuf_cc_lib",
         "//proto:tbots_cc_proto",
-        "//proto/logging:proto_logger",
         "//proto/message_translation:ssl_wrapper",
         "//software:constants",
         "//software/ai:threaded_ai",
@@ -18,6 +16,8 @@ cc_binary(
         "//software/estop:arduino_util",
         "//software/logger",
         "//software/multithreading:observer_subject_adapter",
+        "//software/networking:threaded_proto_udp_listener",
+        "//software/networking:threaded_proto_udp_sender",
         "//software/networking:threaded_proto_unix_listener",
         "//software/sensor_fusion:threaded_sensor_fusion",
         "//software/util/generic_factory",

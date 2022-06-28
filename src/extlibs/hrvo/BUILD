@@ -1,18 +1,6 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_test(
-    name = "hrvo_test",
-    srcs = [
-        "hrvo_test.cpp",
-    ],
-    deps = [
-        ":hrvo",
-        "//shared/test_util:tbots_gtest_main",
-        "//software/test_util",
-    ],
-)
-
-cc_test(
     name = "simulated_hrvo_test",
     srcs = ["simulated_hrvo_test.cpp"],
     deps = [
