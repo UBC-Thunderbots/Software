@@ -7,25 +7,20 @@ import math
 
 VALIDATION_LINE_SCALE_FACTOR = 300
 
+
 def get_current_robot_position(robot):
-    robot_x = (
-        robot.current_state.global_position.x_meters * MILLIMETERS_PER_METER
-    )
-    robot_y = (
-        robot.current_state.global_position.y_meters * MILLIMETERS_PER_METER
-    )
+    robot_x = robot.current_state.global_position.x_meters * MILLIMETERS_PER_METER
+    robot_y = robot.current_state.global_position.y_meters * MILLIMETERS_PER_METER
 
     return robot_x, robot_y
 
+
 def get_current_ball_position(ball):
-    ball_x = (
-        ball.current_state.global_position.x_meters * MILLIMETERS_PER_METER
-    )
-    ball_y = (
-        ball.current_state.global_position.y_meters * MILLIMETERS_PER_METER
-    )
+    ball_x = ball.current_state.global_position.x_meters * MILLIMETERS_PER_METER
+    ball_y = ball.current_state.global_position.y_meters * MILLIMETERS_PER_METER
 
     return ball_x, ball_y
+
 
 def get_current_ball_angle(ball):
     ball_angle = math.pi / 2
@@ -37,6 +32,7 @@ def get_current_ball_angle(ball):
 
     return ball_angle
 
+
 def get_ball_speed(ball):
     ball_speed = math.sqrt(
         ball.current_state.global_velocity.x_component_meters ** 2
@@ -45,15 +41,17 @@ def get_ball_speed(ball):
 
     return ball_speed
 
+
 def get_validation_centre_position(x_pos, y_pos, speed_threshold, angle):
-    validation_centre_x = (
-        x_pos + MILLIMETERS_PER_METER * speed_threshold * math.cos(angle)
+    validation_centre_x = x_pos + MILLIMETERS_PER_METER * speed_threshold * math.cos(
+        angle
     )
-    validation_centre_y = (
-        y_pos + MILLIMETERS_PER_METER * speed_threshold * math.sin(angle)
+    validation_centre_y = y_pos + MILLIMETERS_PER_METER * speed_threshold * math.sin(
+        angle
     )
 
     return validation_centre_x, validation_centre_y
+
 
 def get_validation_line_endpoints(validation_centre_x, validation_centre_y, angle):
     validation_start_x = (
@@ -72,12 +70,10 @@ def get_validation_line_endpoints(validation_centre_x, validation_centre_y, angl
 
     if angle > math.pi or angle < 0:
         validation_start_y = (
-            validation_centre_y
-            + math.cos(angle) * VALIDATION_LINE_SCALE_FACTOR
+            validation_centre_y + math.cos(angle) * VALIDATION_LINE_SCALE_FACTOR
         )
         validation_end_y = (
-            validation_centre_y
-            - math.cos(angle) * VALIDATION_LINE_SCALE_FACTOR
+            validation_centre_y - math.cos(angle) * VALIDATION_LINE_SCALE_FACTOR
         )
 
     return validation_start_x, validation_end_x, validation_start_y, validation_end_y

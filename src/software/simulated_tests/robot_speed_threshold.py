@@ -3,7 +3,6 @@ from proto.import_all_protos import *
 from software.py_constants import *
 from software.thunderscope.speed_threshold_helpers import *
 
-import math
 
 from software.simulated_tests.validation import (
     Validation,
@@ -45,13 +44,25 @@ class RobotSpeedThreshold(Validation):
             robot_x, robot_y = get_current_robot_position(robot)
             robot_angle = robot.current_state.global_orientation.radians
 
-            validation_centre_x, validation_centre_y = get_validation_centre_position(robot_x, robot_y, self.speed_threshold, robot_angle)
+            validation_centre_x, validation_centre_y = get_validation_centre_position(
+                robot_x, robot_y, self.speed_threshold, robot_angle
+            )
 
-            validation_start_x, validation_end_x, validation_start_y, validation_end_y = get_validation_line_endpoints(
+            (
+                validation_start_x,
+                validation_end_x,
+                validation_start_y,
+                validation_end_y,
+            ) = get_validation_line_endpoints(
                 validation_centre_x, validation_centre_y, robot_angle
             )
 
-            segments.append([tbots.Point(validation_start_x, validation_start_y), tbots.Point(validation_end_x, validation_end_y)])
+            segments.append(
+                [
+                    tbots.Point(validation_start_x, validation_start_y),
+                    tbots.Point(validation_end_x, validation_end_y),
+                ]
+            )
 
         return create_validation_geometry(
             [tbots.Segment(points[0], points[1]) for points in segments]
