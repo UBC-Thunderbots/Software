@@ -9,6 +9,7 @@ Chicker::Chicker()
 {
     pinMode(CHIPPER_PIN, OUTPUT);
     pinMode(KICKER_PIN, OUTPUT);
+    pinMode(BREAK_BEAM_PIN, INPUT);
 
     pulse_timer = timerBegin(CHICKER_TIMER, 80, true);
     timerAttachInterrupt(pulse_timer, &stopPulse, true);
@@ -103,5 +104,5 @@ void IRAM_ATTR Chicker::stopPulse()
 
 bool Chicker::getBreakBeamTripped()
 {
-    return breakbeam_tripped;
+    return !digitalRead(BREAK_BEAM_PIN);
 }

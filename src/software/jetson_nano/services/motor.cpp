@@ -146,9 +146,9 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
     }
 
     // Dribbler Motor Setup
-    startDriver(DRIBBLER_MOTOR_CHIP_SELECT);
-    checkDriverFault(DRIBBLER_MOTOR_CHIP_SELECT);
-    startController(DRIBBLER_MOTOR_CHIP_SELECT, true);
+    // startDriver(DRIBBLER_MOTOR_CHIP_SELECT);
+    // checkDriverFault(DRIBBLER_MOTOR_CHIP_SELECT);
+    // startController(DRIBBLER_MOTOR_CHIP_SELECT, true);
 }
 
 MotorService::~MotorService() {}
@@ -339,9 +339,9 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
     }
 
     // Set target speeds accounting for acceleration
-    setTargetRampVelocity(FRONT_LEFT_MOTOR_CHIP_SELECT, target_wheel_velocities[0],
+    setTargetRampVelocity(FRONT_RIGHT_MOTOR_CHIP_SELECT, target_wheel_velocities[0],
                           current_wheel_velocities[0], time_elapsed_since_last_poll_s);
-    setTargetRampVelocity(FRONT_RIGHT_MOTOR_CHIP_SELECT, target_wheel_velocities[1],
+    setTargetRampVelocity(FRONT_LEFT_MOTOR_CHIP_SELECT, target_wheel_velocities[1],
                           current_wheel_velocities[1], time_elapsed_since_last_poll_s);
     setTargetRampVelocity(BACK_LEFT_MOTOR_CHIP_SELECT, target_wheel_velocities[2],
                           current_wheel_velocities[2], time_elapsed_since_last_poll_s);
@@ -593,6 +593,7 @@ void MotorService::writeToControllerOrDieTrying(uint8_t motor, uint8_t address,
 
 void MotorService::configurePWM(uint8_t motor)
 {
+    LOG(INFO) << "Configuring PWM for motor " << static_cast<uint32_t>(motor);
     // Please read the header file and the datasheet for more info
     writeToControllerOrDieTrying(motor, TMC4671_PWM_POLARITIES, 0x00000000);
     writeToControllerOrDieTrying(motor, TMC4671_PWM_MAXCNT, 0x00000F9F);
@@ -602,6 +603,7 @@ void MotorService::configurePWM(uint8_t motor)
 
 void MotorService::configureDrivePI(uint8_t motor)
 {
+    LOG(INFO) << "Configuring Drive PI for motor " << static_cast<uint32_t>(motor);
     // Please read the header file and the datasheet for more info
     // These values were calibrated using the TMC-IDE
     writeToControllerOrDieTrying(motor, TMC4671_PID_FLUX_P_FLUX_I, 67109376);
@@ -619,6 +621,7 @@ void MotorService::configureDrivePI(uint8_t motor)
 
 void MotorService::configureDribblerPI(uint8_t motor)
 {
+    LOG(INFO) << "Configuring Dribbler PI for motor " << static_cast<uint32_t>(motor);
     // Please read the header file and the datasheet for more info
     // These values were calibrated using the TMC-IDE
     writeToControllerOrDieTrying(motor, TMC4671_PID_FLUX_P_FLUX_I, 39333600);
@@ -638,6 +641,7 @@ void MotorService::configureDribblerPI(uint8_t motor)
 
 void MotorService::configureADC(uint8_t motor)
 {
+    LOG(INFO) << "Configuring ADC for motor " << static_cast<uint32_t>(motor);
     // ADC configuration
     writeToControllerOrDieTrying(motor, TMC4671_ADC_I_SELECT, 0x18000100);
     writeToControllerOrDieTrying(motor, TMC4671_dsADC_MDEC_B_MDEC_A, 0x014E014E);
@@ -657,6 +661,7 @@ void MotorService::configureADC(uint8_t motor)
 
 void MotorService::configureEncoder(uint8_t motor)
 {
+    LOG(INFO) << "Configuring Encoder for motor " << static_cast<uint32_t>(motor);
     // ABN encoder settings
     writeToControllerOrDieTrying(motor, TMC4671_ABN_DECODER_MODE, 0x00000000);
     writeToControllerOrDieTrying(motor, TMC4671_ABN_DECODER_PPR, 0x00001000);
@@ -664,6 +669,7 @@ void MotorService::configureEncoder(uint8_t motor)
 
 void MotorService::configureHall(uint8_t motor)
 {
+    LOG(INFO) << "Configuring Hall for motor " << static_cast<uint32_t>(motor);
     // Digital hall settings
     writeToControllerOrDieTrying(motor, TMC4671_HALL_MODE, 0x00000000);
     writeToControllerOrDieTrying(motor, TMC4671_HALL_PHI_E_PHI_M_OFFSET, 0x00000000);

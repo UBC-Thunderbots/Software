@@ -25,7 +25,7 @@
         echo: no
 
     - name: Flashing... (this will take a while on the first run)
-      shell: '/opt/tbotspython/bin/platformio run --disable-auto-clean -t upload -d ~/powerloop/power'
+      shell: '/opt/tbotspython/bin/platformio run --disable-auto-clean -t nobuild -t upload -d ~/powerloop/power'
       register: result
 
     - name: Reset powerboard to finish flashing
