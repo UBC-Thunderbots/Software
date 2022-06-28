@@ -144,17 +144,19 @@ class MotorService
     void spiTransfer(int fd, uint8_t const* tx, uint8_t const* rx, unsigned len);
 
     /**
-     * Ramp the velocity over the given timestep.
+     * Ramp the velocity over the given timestep and set the target velocity on the motor.
      *
      * NOTE: This function has no state.
+     * Also NOTE: This function handles all electrical rpm to meters/second conversion.
      *
-     * @param velocity_target The target velocity
-     * @param velocity_current The current velocity
-     * @param time_to_ramp The time allocated for acceleration.
+     * @param motor The motor to set the velocity on
+     * @param velocity_target The target velocity in m/s
+     * @param velocity_current The current velocity m/s
+     * @param time_to_ramp The time allocated for acceleration in seconds
      *
      */
-    double setTargetRampVelocity(double velocity_target, double velocity_current,
-            double time_to_ramp);
+    void setTargetRampVelocity(uint8_t motor, double velocity_target,
+                               double velocity_current, double time_to_ramp);
 
     /**
      * Trinamic API Binding function

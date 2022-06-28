@@ -51,6 +51,15 @@ static const char* MOTOR_DRIVER_RESET_GPIO                = "168";
 static const char* DRIVER_CONTROL_ENABLE_GPIO             = "194";
 static const char* HEARTBEAT_GPIO                         = "216";
 
+
+// All trinamic RPMS are electrical RPMS, they don't factor in the number of pole
+// pairs of the drive motor.
+//
+// TODO compute from robot constants (this was computed by hand and is accurate)
+static double MECHANICAL_MPS_PER_ELECTRICAL_RPM = 0.000111;
+static double ELECTRICAL_RPM_PER_MECHANICAL_MPS = 1 / MECHANICAL_MPS_PER_ELECTRICAL_RPM;
+
+
 extern "C"
 {
     // We need a static pointer here, because trinamic externs the following two
@@ -140,14 +149,6 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
     startDriver(DRIBBLER_MOTOR_CHIP_SELECT);
     checkDriverFault(DRIBBLER_MOTOR_CHIP_SELECT);
     startController(DRIBBLER_MOTOR_CHIP_SELECT, true);
-
-    // All trinamic RPMS are electrical RPMS, they don't factor in the number of pole
-    // pairs of the drive motor.
-    //
-    // TODO compute from robot constants (this was computed by hand and is accurate)
-    static double MECHANICAL_MPS_PER_ELECTRICAL_RPM = 0.000111;
-    static double ELECTRICAL_RPM_PER_MECHANICAL_MPS = 
-
 }
 
 MotorService::~MotorService() {}
@@ -259,75 +260,58 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
 
     TbotsProto::MotorStatus motor_status;
 
-    // Get current wheel electical RPMs (don't acount for pole pairs)
-    int front_right_rpm = tmc4671_getActualVelocity(FRONT_RIGHT_MOTOR_CHIP_SELECT);
-    int front_left_rpm  = tmc4671_getActualVelocity(FRONT_LEFT_MOTOR_CHIP_SELECT);
-    int back_right_rpm  = tmc4671_getActualVelocity(BACK_RIGHT_MOTOR_CHIP_SELECT);
-    int back_left_rpm   = tmc4671_getActualVelocity(BACK_LEFT_MOTOR_CHIP_SELECT);
+    // Get current wheel electical RPMs (don't account for pole pairs)
+    double front_right_velocity =
+        static_cast<double>(tmc4671_getActualVelocity(FRONT_RIGHT_MOTOR_CHIP_SELECT)) *
+        MECHANICAL_MPS_PER_ELECTRICAL_RPM;
+    double front_left_velocity =
+        static_cast<double>(tmc4671_getActualVelocity(FRONT_LEFT_MOTOR_CHIP_SELECT)) *
+        MECHANICAL_MPS_PER_ELECTRICAL_RPM;
+    double back_right_velocity =
+        static_cast<double>(tmc4671_getActualVelocity(BACK_RIGHT_MOTOR_CHIP_SELECT)) *
+        MECHANICAL_MPS_PER_ELECTRICAL_RPM;
+    double back_left_velocity =
+        static_cast<double>(tmc4671_getActualVelocity(BACK_LEFT_MOTOR_CHIP_SELECT)) *
+        MECHANICAL_MPS_PER_ELECTRICAL_RPM;
 
-    motor_status.mutable_front_right()->set_wheel_rpm(front_right_rpm);
-    motor_status.mutable_front_left()->set_wheel_rpm(front_left_rpm);
-    motor_status.mutable_back_left()->set_wheel_rpm(back_left_rpm);
-    motor_status.mutable_back_right()->set_wheel_rpm(back_right_rpm);
+    motor_status.mutable_front_right()->set_wheel_velocity(
+        static_cast<float>(front_right_velocity));
+    motor_status.mutable_front_left()->set_wheel_velocity(
+        static_cast<float>(front_left_velocity));
+    motor_status.mutable_back_left()->set_wheel_velocity(
+        static_cast<float>(back_left_velocity));
+    motor_status.mutable_back_right()->set_wheel_velocity(
+        static_cast<float>(back_right_velocity));
 
     // This order needs to match euclidean_to_four_wheel converters order
     // We also want to work in the meters per second space rather than electrical RPMs
-    WheelSpace_t current_wheel_speeds = {
-        static_cast<double>(front_right_rpm) * ELECTRICAL_RPM_PER_MECHANICAL_MPS,
-        static_cast<double>(front_left_rpm) * ELECTRICAL_RPM_PER_MECHANICAL_MPS,
-        static_cast<double>(back_left_rpm) * ELECTRICAL_RPM_PER_MECHANICAL_MPS,
-        static_cast<double>(back_right_rpm) * ELECTRICAL_RPM_PER_MECHANICAL_MPS};
+    WheelSpace_t current_wheel_velocities = {front_right_velocity, front_left_velocity,
+                                             back_left_velocity, back_right_velocity};
+
+    // TODO debug why this doesn't work
+    current_wheel_velocities = {0.0, 0.0, 0.0, 0.0};
 
     // Convert to euclidean space
     EuclideanSpace_t current_euclidean_velocity =
-        euclidean_to_four_wheel.getEuclideanVelocity(current_wheel_speeds);
+        euclidean_to_four_wheel.getEuclideanVelocity(current_wheel_velocities);
 
     motor_status.mutable_local_velocity()->set_x_component_meters(
-            static_cast<float>(current_euclidean_velocity[0]));
+        static_cast<float>(current_euclidean_velocity[0]));
     motor_status.mutable_local_velocity()->set_y_component_meters(
-            static_cast<float>(current_euclidean_velocity[1]));
+        static_cast<float>(current_euclidean_velocity[1]));
 
-    // TODO debug why this doesn't work
-    current_wheel_speeds = {0.0, 0.0, 0.0, 0.0};
+    WheelSpace_t target_wheel_velocities = {0.0, 0.0, 0.0, 0.0};
+    int target_dribbler_rpm              = motor.dribbler_speed_rpm();
 
     switch (motor.drive_control_case())
     {
         case TbotsProto::MotorControl::DriveControlCase::kDirectPerWheelControl:
-
-            double target_front_left_velocity =
-                rampVelocity(motor.direct_per_wheel_control().front_left_wheel_rpm(),
-                             front_left_rpm * MECHANICAL_MPS_PER_ELECTRICAL_RPM,
-                             time_elapsed_since_last_poll_s);
-            double target_front_right_velocity =
-                rampVelocity(motor.direct_per_wheel_control().front_right_wheel_rpm(),
-                             front_right_rpm * MECHANICAL_MPS_PER_ELECTRICAL_RPM,
-                             time_elapsed_since_last_poll_s);
-            double target_back_left_velocity =
-                rampVelocity(motor.direct_per_wheel_control().back_left_wheel_rpm(),
-                             back_left_rpm * MECHANICAL_MPS_PER_ELECTRICAL_RPM,
-                             time_elapsed_since_last_poll_s);
-            double target_back_right_velocity =
-                rampVelocity(motor.direct_per_wheel_control().back_right_wheel_rpm(),
-                             back_right_rpm * MECHANICAL_MPS_PER_ELECTRICAL_RPM,
-                             time_elapsed_since_last_poll_s);
-            LOG(DEBUG) << target_front_left_velocity;
-
-            tmc4671_setTargetVelocity(
-                FRONT_LEFT_MOTOR_CHIP_SELECT,
-                static_cast<int>(target_front_left_velocity * ELECTRICAL_RPM_PER_MECHANICAL_MPS));
-            tmc4671_setTargetVelocity(
-                FRONT_RIGHT_MOTOR_CHIP_SELECT,
-                static_cast<int>(target_front_right_velocity * ELECTRICAL_RPM_PER_MECHANICAL_MPS));
-            tmc4671_setTargetVelocity(
-                BACK_LEFT_MOTOR_CHIP_SELECT,
-                static_cast<int>(target_back_left_velocity * ELECTRICAL_RPM_PER_MECHANICAL_MPS));
-            tmc4671_setTargetVelocity(
-                BACK_RIGHT_MOTOR_CHIP_SELECT,
-                static_cast<int>(target_back_right_velocity /
-                                 MECHANICAL_MPS_PER_ELECTRICAL_RPM));
-
-            tmc4671_setTargetVelocity(DRIBBLER_MOTOR_CHIP_SELECT,
-                                      static_cast<int>(motor.dribbler_speed_rpm()));
+        {
+            target_wheel_velocities = {
+                motor.direct_per_wheel_control().front_right_wheel_velocity(),
+                motor.direct_per_wheel_control().front_left_wheel_velocity(),
+                motor.direct_per_wheel_control().back_left_wheel_velocity(),
+                motor.direct_per_wheel_control().back_right_wheel_velocity()};
 
             break;
         }
@@ -339,68 +323,35 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
                 motor.direct_velocity_control().angular_velocity().radians_per_second(),
             };
 
-            // This is a linear transformation, we don't need to convert to/from
-            // RPM to MPS
-            WheelSpace_t target_speeds = euclidean_to_four_wheel.getTargetWheelSpeeds(
-                target_euclidean_velocity, current_wheel_speeds);
-
-            double target_front_right_velocity = rampVelocity(
-                target_speeds[0], front_right_rpm * MECHANICAL_MPS_PER_ELECTRICAL_RPM,
-                time_elapsed_since_last_poll_s);
-            double target_front_left_velocity = rampVelocity(
-                target_speeds[1], front_left_rpm * MECHANICAL_MPS_PER_ELECTRICAL_RPM,
-                time_elapsed_since_last_poll_s);
-            double target_back_left_velocity = rampVelocity(
-                target_speeds[2], back_left_rpm * MECHANICAL_MPS_PER_ELECTRICAL_RPM,
-                time_elapsed_since_last_poll_s);
-            double target_back_right_velocity = rampVelocity(
-                target_speeds[3], back_right_rpm * MECHANICAL_MPS_PER_ELECTRICAL_RPM,
-                time_elapsed_since_last_poll_s);
-
-            tmc4671_setTargetVelocity(
-                FRONT_RIGHT_MOTOR_CHIP_SELECT,
-                static_cast<int>(target_front_right_velocity /
-                                 MECHANICAL_MPS_PER_ELECTRICAL_RPM));
-            tmc4671_setTargetVelocity(
-                FRONT_LEFT_MOTOR_CHIP_SELECT,
-                static_cast<int>(target_front_left_velocity /
-                                 MECHANICAL_MPS_PER_ELECTRICAL_RPM));
-            tmc4671_setTargetVelocity(
-                BACK_LEFT_MOTOR_CHIP_SELECT,
-                static_cast<int>(target_back_left_velocity /
-                                 MECHANICAL_MPS_PER_ELECTRICAL_RPM));
-            tmc4671_setTargetVelocity(
-                BACK_RIGHT_MOTOR_CHIP_SELECT,
-                static_cast<int>(target_back_right_velocity /
-                                 MECHANICAL_MPS_PER_ELECTRICAL_RPM));
-
-            tmc4671_setTargetVelocity(DRIBBLER_MOTOR_CHIP_SELECT,
-                                      static_cast<int>(motor.dribbler_speed_rpm()));
+            target_wheel_velocities = euclidean_to_four_wheel.getTargetWheelSpeeds(
+                target_euclidean_velocity, current_wheel_velocities);
 
             break;
         }
 
-        // Emergency Stop: Stop all motors with ramping. Abruptly stopping all
-        // motors can send a current back up through the mosfets into the battery
-        // and cause damage. Experimentation/protection circuitry might be required 
-        // to not damage motor boards.
         case TbotsProto::MotorControl::DriveControlCase::DRIVE_CONTROL_NOT_SET:
         {
-            double target_front_right_velocity = rampVelocity(
-                    0, front_right_rpm * MECHANICAL_MPS_PER_ELECTRICAL_RPM,
-                    time_elapsed_since_last_poll_s);
-            double target_front_left_velocity = rampVelocity(
-                    0, front_left_rpm * MECHANICAL_MPS_PER_ELECTRICAL_RPM,
-                    time_elapsed_since_last_poll_s);
-            double target_back_left_velocity = rampVelocity(
-                    0, back_left_rpm * MECHANICAL_MPS_PER_ELECTRICAL_RPM,
-                    time_elapsed_since_last_poll_s);
-            double target_back_right_velocity = rampVelocity(
-                    0, back_right_rpm * MECHANICAL_MPS_PER_ELECTRICAL_RPM,
-                    time_elapsed_since_last_poll_s);
+            target_wheel_velocities = {0.0, 0.0, 0.0, 0.0};
+            target_dribbler_rpm     = 0;
+
             break;
         }
     }
+
+    // Set target speeds accounting for acceleration
+    setTargetRampVelocity(FRONT_LEFT_MOTOR_CHIP_SELECT, target_wheel_velocities[0],
+                          front_left_velocity, time_elapsed_since_last_poll_s);
+    setTargetRampVelocity(FRONT_RIGHT_MOTOR_CHIP_SELECT,
+                          motor.direct_per_wheel_control().front_right_wheel_velocity(),
+                          target_wheel_velocities[1], time_elapsed_since_last_poll_s);
+    setTargetRampVelocity(BACK_LEFT_MOTOR_CHIP_SELECT,
+                          motor.direct_per_wheel_control().back_left_wheel_velocity(),
+                          target_wheel_velocities[2], time_elapsed_since_last_poll_s);
+    setTargetRampVelocity(BACK_RIGHT_MOTOR_CHIP_SELECT,
+                          motor.direct_per_wheel_control().back_right_wheel_velocity(),
+                          target_wheel_velocities[3], time_elapsed_since_last_poll_s);
+
+    tmc4671_setTargetVelocity(DRIBBLER_MOTOR_CHIP_SELECT, target_dribbler_rpm);
 
     // Toggle Hearbeat
     if (heartbeat_state == 1)
@@ -437,33 +388,38 @@ void MotorService::spiTransfer(int fd, uint8_t const* tx, uint8_t const* rx, uns
                     << strerror(errno);
 }
 
-void MotorService::setTargetRampVelocity(uint8_t motor, double velocity_target, double velocity_current,
-        double time_to_ramp)
+void MotorService::setTargetRampVelocity(uint8_t motor, double velocity_target,
+                                         double velocity_current, double time_to_ramp)
 {
     // Calculate velocity delta using kinematic equation: dv = a*t
-    double velocity_delta = robot_constants_.robot_max_acceleration_m_per_s_2 * time_ramp;
+    double velocity_delta =
+        robot_constants_.robot_max_acceleration_m_per_s_2 * time_to_ramp;
 
     // Trinamics PID control is far more accurate than the delayed velocity input we
     // receive. If we set the ramp velocity with no hysterisis, we will end up not
     // converging at the target velocity. Allowing 5cm/s of error was experimentally
     // determined to be sufficient for smooth operation.
     double velocity_error = 0.05;
+    double ramp_velocity = 0.0;
 
     // Case: accelerating
     if (velocity_target > velocity_current + velocity_delta + velocity_error)
     {
-        return velocity_current + velocity_delta;
+        ramp_velocity = velocity_current + velocity_delta;
     }
     // Case: deccelerating
     else if (velocity_target < velocity_current - velocity_delta - velocity_error)
     {
-        return velocity_current - velocity_delta;
+        ramp_velocity = velocity_current - velocity_delta;
     }
     // Case: ramping not required, go to target velocity
     else
     {
-        return velocity_target;
+        ramp_velocity = velocity_target;
     }
+
+    tmc4671_setTargetVelocity(motor,
+            static_cast<int>(ramp_velocity * ELECTRICAL_RPM_PER_MECHANICAL_MPS));
 }
 
 

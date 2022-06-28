@@ -86,7 +86,7 @@ enum ErrorCode
 message DriveUnit
 {
     // The current RPM of the wheel
-    uint32 wheel_rpm = 1;
+    float wheel_velocity = 1;
 }
 
 /* Data from all four drive units and the dribbler */

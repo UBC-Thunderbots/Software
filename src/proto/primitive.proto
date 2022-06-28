@@ -128,7 +128,7 @@ message MovePrimitive
     MotionControl motion_control          = 1;
     float final_speed_m_per_s             = 2;
     Angle final_angle                     = 3;
-    float dribbler_speed_rpm              = 4;
+    int32 dribbler_speed_rpm              = 4;
     float max_speed_m_per_s               = 5;
     AutoChipOrKick auto_chip_or_kick      = 6;
     float target_spin_rev_per_s           = 7;
@@ -149,10 +149,10 @@ message MotorControl
 {
     message DirectPerWheelControl
     {
-        float front_left_wheel_rpm  = 1;
-        float back_left_wheel_rpm   = 2;
-        float front_right_wheel_rpm = 3;
-        float back_right_wheel_rpm  = 4;
+        float front_left_wheel_velocity  = 1;
+        float back_left_wheel_velocity   = 2;
+        float front_right_wheel_velocity = 3;
+        float back_right_wheel_velocity  = 4;
     }
 
     message DirectVelocityControl
@@ -167,7 +167,7 @@ message MotorControl
         DirectVelocityControl direct_velocity_control  = 2;
     }
 
-    float dribbler_speed_rpm = 4;
+    int32 dribbler_speed_rpm = 4;
 }
 
 message DirectControlPrimitive
