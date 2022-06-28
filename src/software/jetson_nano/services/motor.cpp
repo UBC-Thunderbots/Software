@@ -339,14 +339,14 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
     }
 
     // Set target speeds accounting for acceleration
-    setTargetRampVelocity(FRONT_LEFT_MOTOR_CHIP_SELECT,
-            target_wheel_velocities[0], current_wheel_velocities[0], time_elapsed_since_last_poll_s);
-    setTargetRampVelocity(FRONT_RIGHT_MOTOR_CHIP_SELECT,
-            target_wheel_velocities[1], current_wheel_velocities[1], time_elapsed_since_last_poll_s);
-    setTargetRampVelocity(BACK_LEFT_MOTOR_CHIP_SELECT,
-            target_wheel_velocities[2], current_wheel_velocities[2], time_elapsed_since_last_poll_s);
-    setTargetRampVelocity(BACK_RIGHT_MOTOR_CHIP_SELECT,
-            target_wheel_velocities[3], current_wheel_velocities[3], time_elapsed_since_last_poll_s);
+    setTargetRampVelocity(FRONT_LEFT_MOTOR_CHIP_SELECT, target_wheel_velocities[0],
+                          current_wheel_velocities[0], time_elapsed_since_last_poll_s);
+    setTargetRampVelocity(FRONT_RIGHT_MOTOR_CHIP_SELECT, target_wheel_velocities[1],
+                          current_wheel_velocities[1], time_elapsed_since_last_poll_s);
+    setTargetRampVelocity(BACK_LEFT_MOTOR_CHIP_SELECT, target_wheel_velocities[2],
+                          current_wheel_velocities[2], time_elapsed_since_last_poll_s);
+    setTargetRampVelocity(BACK_RIGHT_MOTOR_CHIP_SELECT, target_wheel_velocities[3],
+                          current_wheel_velocities[3], time_elapsed_since_last_poll_s);
 
     tmc4671_setTargetVelocity(DRIBBLER_MOTOR_CHIP_SELECT, target_dribbler_rpm);
 
@@ -397,7 +397,7 @@ void MotorService::setTargetRampVelocity(uint8_t motor, double velocity_target,
     // converging at the target velocity. Allowing 5cm/s of error was experimentally
     // determined to be sufficient for smooth operation.
     double velocity_error = 0.05;
-    double ramp_velocity = 0.0;
+    double ramp_velocity  = 0.0;
 
     // Case: accelerating
     if (velocity_target > velocity_current + velocity_delta + velocity_error)
@@ -415,8 +415,8 @@ void MotorService::setTargetRampVelocity(uint8_t motor, double velocity_target,
         ramp_velocity = velocity_target;
     }
 
-    tmc4671_setTargetVelocity(motor,
-            static_cast<int>(ramp_velocity * ELECTRICAL_RPM_PER_MECHANICAL_MPS));
+    tmc4671_setTargetVelocity(
+        motor, static_cast<int>(ramp_velocity * ELECTRICAL_RPM_PER_MECHANICAL_MPS));
 }
 
 

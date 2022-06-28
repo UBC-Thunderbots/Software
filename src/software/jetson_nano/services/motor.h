@@ -8,11 +8,6 @@
 #include "software/jetson_nano/gpio.h"
 #include "software/physics/euclidean_to_wheel.h"
 
-extern "C"
-{
-#include "external/trinamic/tmc/ramp/Ramp.h"
-}
-
 class MotorService
 {
    public:
@@ -36,7 +31,6 @@ class MotorService
      */
     TbotsProto::MotorStatus poll(const TbotsProto::MotorControl& motor_control,
                                  double time_elapsed_since_last_poll_s);
-    void setXYTheta(double x, double y, double rad_per_s);
 
     /**
      * Trinamic API binding, sets spi_demux_select_0|1 pins
