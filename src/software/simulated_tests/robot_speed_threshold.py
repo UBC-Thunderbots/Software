@@ -1,6 +1,7 @@
 import software.python_bindings as tbots
 from proto.import_all_protos import *
 from software.py_constants import *
+from software.thunderscope.speed_threshold_helpers import *
 
 import math
 
@@ -20,7 +21,6 @@ class RobotSpeedThreshold(Validation):
         :param speed_threshold: The speed threshold
         """
         self.speed_threshold = speed_threshold
-        self.VALIDATION_LINE_SCALE_FACTOR = 300
 
     def get_validation_status(self, world) -> ValidationStatus:
         """Checks if the friendly robots' speed is at or above some threshold
@@ -42,69 +42,20 @@ class RobotSpeedThreshold(Validation):
         """override"""
         segments = []
         for robot in world.friendly_team.team_robots:
-            robot_x = (
-                robot.current_state.global_position.x_meters * MILLIMETERS_PER_METER
-            )
-            robot_y = (
-                robot.current_state.global_position.y_meters * MILLIMETERS_PER_METER
-            )
+            robot_x, robot_y = get_current_robot_position(robot)
             robot_angle = robot.current_state.global_orientation.radians
 
-            validation_centre_x = (
-                robot_x
-                + MILLIMETERS_PER_METER * self.speed_threshold * math.cos(robot_angle)
-            )
-            validation_centre_y = (
-                robot_y
-                + MILLIMETERS_PER_METER * self.speed_threshold * math.sin(robot_angle)
-            )
+            validation_centre_x, validation_centre_y = get_validation_centre_position(robot_x, robot_y, self.speed_threshold, robot_angle)
 
-            endpoints = self.get_validation_line_endpoints(
+            validation_start_x, validation_end_x, validation_start_y, validation_end_y = get_validation_line_endpoints(
                 validation_centre_x, validation_centre_y, robot_angle
             )
-            start_x = endpoints[0]
-            end_x = endpoints[1]
-            start_y = endpoints[2]
-            end_y = endpoints[3]
 
-            segments.append([tbots.Point(start_x, start_y), tbots.Point(end_x, end_y)])
+            segments.append([tbots.Point(validation_start_x, validation_start_y), tbots.Point(validation_end_x, validation_end_y)])
 
         return create_validation_geometry(
             [tbots.Segment(points[0], points[1]) for points in segments]
         )
-
-    def get_validation_line_endpoints(
-        self, validation_centre_x, validation_centre_y, robot_angle
-    ):
-        start_x = (
-            validation_centre_x
-            - math.sin(robot_angle) * self.VALIDATION_LINE_SCALE_FACTOR
-        )
-        end_x = (
-            validation_centre_x
-            + math.sin(robot_angle) * self.VALIDATION_LINE_SCALE_FACTOR
-        )
-
-        start_y = (
-            validation_centre_y
-            + math.cos(robot_angle) * self.VALIDATION_LINE_SCALE_FACTOR
-        )
-        end_y = (
-            validation_centre_y
-            - math.cos(robot_angle) * self.VALIDATION_LINE_SCALE_FACTOR
-        )
-
-        if robot_angle > math.pi or robot_angle < 0:
-            start_y = (
-                validation_centre_y
-                + math.cos(robot_angle) * self.VALIDATION_LINE_SCALE_FACTOR
-            )
-            end_y = (
-                validation_centre_y
-                - math.cos(robot_angle) * self.VALIDATION_LINE_SCALE_FACTOR
-            )
-
-        return [start_x, end_x, start_y, end_y]
 
     def __repr__(self):
         return "Check that the friendly robots' speed is at or above above " + str(
