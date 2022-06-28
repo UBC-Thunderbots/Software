@@ -4,9 +4,9 @@ package TbotsProto.Geneva;
 
 enum Slot
 {
-    LEFT = 0;
-    CENTRE_LEFT = 1;
-    CENTRE = 2;
+    LEFT         = 0;
+    CENTRE_LEFT  = 1;
+    CENTRE       = 2;
     CENTRE_RIGHT = 3;
-    RIGHT = 4;
+    RIGHT        = 4;
 }

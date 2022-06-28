@@ -18,7 +18,7 @@ class Geneva
      *
      * @returns the current slot of the geneva motor
      */
-     TbotsProto_Geneva_Slot getCurrentSlot();
+    TbotsProto_Geneva_Slot getCurrentSlot();
 
     /**
      * Sets the angle of the geneva motor.

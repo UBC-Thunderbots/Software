@@ -33,8 +33,8 @@ class Charger
 
    private:
     static void chargeDone();
-    static constexpr float VOLTAGE_DIVIDER        = 1003.0/13.0; 
-    static constexpr float RESOLUTION             = 4096.0;
-    static constexpr float SCALE_VOLTAGE          = 3.3;
+    static constexpr float VOLTAGE_DIVIDER = 1003.0 / 13.0;
+    static constexpr float RESOLUTION      = 4096.0;
+    static constexpr float SCALE_VOLTAGE   = 3.3;
     static volatile bool flyback_fault;
 };

@@ -105,9 +105,9 @@ message PowerControl
         FLOAT     = 2;
     }
 
-    ChickerControl chicker = 1;
+    ChickerControl chicker  = 1;
     Geneva.Slot geneva_slot = 2;
-    ChargeMode charge_mode = 3;
+    ChargeMode charge_mode  = 3;
 }
 
 message Primitive
