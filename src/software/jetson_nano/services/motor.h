@@ -196,9 +196,6 @@ class MotorService
     // SPI File Descriptors
     std::unordered_map<int, int> file_descriptors;
 
-    // Velocity Ramps
-    std::unordered_map<int, TMC_LinearRamp> velocity_ramps;
-
     // Drive Motors
     EuclideanToWheel euclidean_to_four_wheel;
     std::unordered_map<int, bool> encoder_calibrated_;

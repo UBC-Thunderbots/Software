@@ -14,7 +14,7 @@
         copy_links: yes
 
     - name: Untar powerboard files
-      command: 'mkdir -p powerloop && tar -xvf ~/powerloop.tar.gz -C powerloop'
+      shell: 'mkdir -p powerloop && tar -xvf ~/powerloop.tar.gz -C powerloop'
       register: result
       args:
         chdir: ~/
@@ -25,7 +25,7 @@
         echo: no
 
     - name: Flashing... (this will take a while on the first run)
-      shell: '/opt/tbotspython/bin/platformio run -s -t upload -d ~/powerloop/power'
+      shell: '/opt/tbotspython/bin/platformio run --disable-auto-clean -t upload -d ~/powerloop/power'
       register: result
 
     - name: Reset powerboard to finish flashing
