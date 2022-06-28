@@ -10,7 +10,7 @@ cc_library(
     ],
     deps = [
         "//shared:robot_constants",
-        "//software/logger:logger",
+        "//software/logger",
         "@eigen",
     ],
 )

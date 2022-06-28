@@ -58,10 +58,10 @@ EuclideanToWheel::EuclideanToWheel(const int &control_loop_frequency_Hz,
     wheel_speed_to_euclidean_velocity_D_inverse_ << -i, -i, i, i, j, -j, -(1.0 - j),
         (1.0 - j), k, k, (1.0 - k), (1.0 - k);
 
-    //LOG(DEBUG) << wheel_speed_to_euclidean_velocity_D_inverse_ * velocity_coupling_D;
-    //CHECK(
-        //(wheel_speed_to_euclidean_velocity_D_inverse_ * velocity_coupling_D).isIdentity())
-        //<< "D_inverse * D_alpha != I";
+    // LOG(DEBUG) << wheel_speed_to_euclidean_velocity_D_inverse_ * velocity_coupling_D;
+    // CHECK(
+    //(wheel_speed_to_euclidean_velocity_D_inverse_ * velocity_coupling_D).isIdentity())
+    //<< "D_inverse * D_alpha != I";
 }
 
 /**

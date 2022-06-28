@@ -3,6 +3,7 @@ from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.python_bindings import *
 from proto.import_all_protos import *
 import threading
+import time
 
 
 class RobotCommunication(object):
@@ -40,12 +41,22 @@ class RobotCommunication(object):
             PrimitiveSet, self.primitive_buffer
         )
 
+        self.send_estop_state_thread = threading.Thread(target=self.__send_estop_state)
+        self.run_thread = threading.Thread(target=self.run)
+
         try:
             self.estop_reader = ThreadedEstopReader(
                 self.estop_path, self.estop_buadrate
             )
         except Exception:
             raise Exception("Could not find estop, make sure its plugged in")
+
+    def __send_estop_state(self):
+        while True:
+            self.full_system_proto_unix_io.send_proto(
+                EstopState, EstopState(is_playing=self.estop_reader.isEstopPlay())
+            )
+            time.sleep(0.1)
 
     def run(self):
         """Forward World and PrimitiveSet protos from fullsystem to the robots.
@@ -60,24 +71,20 @@ class RobotCommunication(object):
         is useful to dip in and out of robot diagnostics.
 
         """
-
-        primitive1 = Primitive(
-            direct_control=DirectControlPrimitive(
-                motor_control=MotorControl(
-                    direct_velocity_control=MotorControl.DirectVelocityControl(
-                        velocity=Vector(
-                            x_component_meters=0.0, y_component_meters=speed
-                        ),
-                        angular_velocity=AngularVelocity(radians_per_second=0.0),
-                    ),
-                    dribbler_speed_rpm=-10000,
-                )
-            )
-        )
-
         while True:
             if self.fullsystem_connected_to_robots:
-                self.send_primitive_mcast_sender.send_proto(primitiveset_stop)
+
+                # Send the world
+                world = self.world_buffer.get(block=True)
+                self.world_mcast_sender.send(world)
+
+                # Send the primitive set
+                primitive_set = self.primitive_buffer.get(block=False)
+
+                if self.estop_reader.isEstopPlay():
+                    self.primitive_set_mcast_sender.send(primitive_set)
+            else:
+                time.sleep(0.1)
 
     def connect_fullsystem_to_robots(self):
         """ Connect the robots to fullsystem """
@@ -109,12 +116,12 @@ class RobotCommunication(object):
 
         """
         # Create the multicast channels
-        # self.receive_robot_status = RobotStatusProtoListener(
-        #     self.multicast_channel + "%" + self.interface,
-        #     ROBOT_STATUS_PORT,
-        #     lambda data: print(data),
-        #     True,
-        # )
+        self.receive_robot_status = RobotStatusProtoListener(
+            self.multicast_channel + "%" + self.interface,
+            ROBOT_STATUS_PORT,
+            lambda data: self.full_system_proto_unix_io.send_proto(RobotStatus, data),
+            True,
+        )
 
         self.send_primitive_mcast_sender = PrimitiveSetProtoSender(
             self.multicast_channel + "%" + self.interface, PRIMITIVE_PORT, True
@@ -127,15 +134,6 @@ class RobotCommunication(object):
             True,
         )
 
-        self.receive_robot_log = SSLWrapperPacketProtoListener(
-            SSL_ADDRESS,
-            SSL_PORT,
-            lambda data: self.full_system_proto_unix_io.send_proto(
-                SSL_WrapperPacket, data
-            ),
-            True,
-        )
-
         self.send_primitive_set = PrimitiveSetProtoSender(
             self.multicast_channel + "%" + self.interface, PRIMITIVE_PORT, True
         )
@@ -145,7 +143,8 @@ class RobotCommunication(object):
         )
 
         self.connect_fullsystem_to_robots()
-        self.run_thread = threading.Thread(target=self.run)
+
+        self.send_estop_state_thread.start()
         self.run_thread.start()
 
     def __exit__(self):
