@@ -339,17 +339,14 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
     }
 
     // Set target speeds accounting for acceleration
-    setTargetRampVelocity(FRONT_LEFT_MOTOR_CHIP_SELECT, target_wheel_velocities[0],
-                          front_left_velocity, time_elapsed_since_last_poll_s);
+    setTargetRampVelocity(FRONT_LEFT_MOTOR_CHIP_SELECT,
+            target_wheel_velocities[0], current_wheel_velocities[0], time_elapsed_since_last_poll_s);
     setTargetRampVelocity(FRONT_RIGHT_MOTOR_CHIP_SELECT,
-                          motor.direct_per_wheel_control().front_right_wheel_velocity(),
-                          target_wheel_velocities[1], time_elapsed_since_last_poll_s);
+            target_wheel_velocities[1], current_wheel_velocities[1], time_elapsed_since_last_poll_s);
     setTargetRampVelocity(BACK_LEFT_MOTOR_CHIP_SELECT,
-                          motor.direct_per_wheel_control().back_left_wheel_velocity(),
-                          target_wheel_velocities[2], time_elapsed_since_last_poll_s);
+            target_wheel_velocities[2], current_wheel_velocities[2], time_elapsed_since_last_poll_s);
     setTargetRampVelocity(BACK_RIGHT_MOTOR_CHIP_SELECT,
-                          motor.direct_per_wheel_control().back_right_wheel_velocity(),
-                          target_wheel_velocities[3], time_elapsed_since_last_poll_s);
+            target_wheel_velocities[3], current_wheel_velocities[3], time_elapsed_since_last_poll_s);
 
     tmc4671_setTargetVelocity(DRIBBLER_MOTOR_CHIP_SELECT, target_dribbler_rpm);
 
