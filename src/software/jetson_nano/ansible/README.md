@@ -58,7 +58,7 @@ NOTE: Until the UI board supports auto flashing, manual intervention will be req
 
 Flashing Steps:
 - Run ``bazel run :run_ansible --cpu=jetson_nano -- -pb deploy_powerboard.yml --port {announcement_port} -pwd {ssh_pass}``
-- Once all the required powerloop files are transfered over, ansible will pause to allow you to manually put the powerboards into bootloader mode.
+- Once all the required powerloop files are transferred over, ansible will pause to allow you to manually put the powerboards into bootloader mode.
 - You will need to hold the boot button and press reset to put the powerboard into bootloader mode. 
 - Now press y to flash the powerboards.
 - Ansible will pause again and prompt you to reset each powerboard.

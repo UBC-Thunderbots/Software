@@ -444,15 +444,15 @@ void MotorService::spiTransfer(int fd, uint8_t const* tx, uint8_t const* rx, uns
 }
 
 double MotorService::rampVelocity(double velocity_target, double velocity_current,
-        double time_ramp)
+                                  double time_ramp)
 {
     // Calculate velocity delta using kinematic equation: dv = a*t
     double velocity_delta = robot_constants_.robot_max_acceleration_m_per_s_2 * time_ramp;
 
-    // Trinamics PID control is far more accurate than the delayed velocity input we recieve.
-    // If we set the ramp velocity with no hysterisis, we will end up not converging at the
-    // target velocity. Allowing 5cm/s of error was experimentally determined to be sufficient
-    // for smooth operation.
+    // Trinamics PID control is far more accurate than the delayed velocity input we
+    // receive. If we set the ramp velocity with no hysterisis, we will end up not
+    // converging at the target velocity. Allowing 5cm/s of error was experimentally
+    // determined to be sufficient for smooth operation.
     double velocity_error = 0.05;
 
     // Case: accelerating
@@ -608,10 +608,10 @@ void MotorService::writeToDriverOrDieTrying(uint8_t motor, uint8_t address, int3
     // the chip to clear any bad values we just wrote and crash so everything stops.
     reset_gpio.setValue(GpioState::LOW);
     CHECK(read_value == value) << "Couldn't write " << value
-        << " to the TMC6100 at address " << address
-        << " at address " << static_cast<uint32_t>(address)
-        << " on motor " << static_cast<uint32_t>(motor)
-        << " received: " << read_value;
+                               << " to the TMC6100 at address " << address
+                               << " at address " << static_cast<uint32_t>(address)
+                               << " on motor " << static_cast<uint32_t>(motor)
+                               << " received: " << read_value;
 }
 
 void MotorService::writeToControllerOrDieTrying(uint8_t motor, uint8_t address,
@@ -638,10 +638,10 @@ void MotorService::writeToControllerOrDieTrying(uint8_t motor, uint8_t address,
     // the chip to clear any bad values we just wrote and crash so everything stops.
     reset_gpio.setValue(GpioState::LOW);
     CHECK(read_value == value) << "Couldn't write " << value
-        << " to the TMC4671 at address " << address
-        << " at address " << static_cast<uint32_t>(address)
-        << " on motor " << static_cast<uint32_t>(motor)
-        << " received: " << read_value;
+                               << " to the TMC4671 at address " << address
+                               << " at address " << static_cast<uint32_t>(address)
+                               << " on motor " << static_cast<uint32_t>(motor)
+                               << " received: " << read_value;
 }
 
 void MotorService::configurePWM(uint8_t motor)
@@ -835,7 +835,7 @@ void MotorService::startController(uint8_t motor, bool dribbler)
     int chip_id = tmc4671_readInt(motor, TMC4671_CHIPINFO_DATA);
 
     CHECK(0x34363731 == chip_id) << "The TMC4671 of motor "
-        << static_cast<uint32_t>(motor) << " is not responding";
+                                 << static_cast<uint32_t>(motor) << " is not responding";
 
     LOG(DEBUG) << "Controller " << std::to_string(motor)
                << " online, responded with: " << chip_id;
