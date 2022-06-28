@@ -95,13 +95,13 @@ void setPowerMsg(TbotsProto_PowerFrame& frame, const TbotsProto_PowerStatus& sta
  */
 TbotsProto_PowerStatus createNanoPbPowerStatus(float battery_voltage,
                                                float capacitor_voltage,
-                                               float current_draw, float geneva_angle_deg,
+                                               float current_draw, TbotsProto_Geneva_Slot geneva_slot,
                                                bool breakbeam_tripped, bool flyback_fault)
 {
     TbotsProto_PowerStatus status = {.battery_voltage    = battery_voltage,
                                      .capacitor_voltage  = capacitor_voltage,
                                      .current_draw       = current_draw,
-                                     .geneva_angle_deg   = geneva_angle_deg,
+                                     .geneva_slot        = geneva_slot,
                                      .breakbream_tripped = breakbeam_tripped,
                                      .flyback_fault      = flyback_fault};
     return status;
@@ -143,8 +143,7 @@ TbotsProto_PowerControl createNanoPbPowerControl(
 TbotsProto_PowerControl createNanoPbPowerControl(
     ChickerCommandMode chicker_command, float kick_speed_m_per_s,
     float chip_distance_meters, AutoChipOrKickMode auto_chip_or_kick,
-    float autochip_distance_meters, float autokick_speed_m_per_s, float angle_deg,
-    float rotation_speed_rpm, TbotsProto_PowerControl_ChargeMode charge_mode)
+    float autochip_distance_meters, float autokick_speed_m_per_s, TbotsProto_Geneva_Slot geneva_slot, TbotsProto_PowerControl_ChargeMode charge_mode)
 {
     TbotsProto_PowerControl control = TbotsProto_PowerControl_init_default;
     TbotsProto_PowerControl_ChickerControl chicker =
@@ -186,13 +185,8 @@ TbotsProto_PowerControl createNanoPbPowerControl(
             break;
     }
 
-    TbotsProto_PowerControl_GenevaControl geneva =
-        TbotsProto_PowerControl_GenevaControl_init_default;
-    geneva.angle_deg          = angle_deg;
-    geneva.rotation_speed_rpm = rotation_speed_rpm;
-
     control.chicker     = chicker;
-    control.geneva      = geneva;
+    control.geneva_slot = geneva_slot;
     control.charge_mode = charge_mode;
 
     return control;

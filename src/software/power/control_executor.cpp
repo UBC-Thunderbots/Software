@@ -18,10 +18,10 @@ void ControlExecutor::execute(const TbotsProto_PowerControl& control)
             chicker->setKickSpeedMPerS(
                 control.chicker.chicker_command.kick_speed_m_per_s);
             charger->setChargeDoneCallbackOnce(&chicker->kick);
-            if (control.geneva.angle_deg != geneva->getCurrentAngle())
+            if (control.geneva_slot != geneva->getCurrentSlot())
             {
                 geneva->setRotationDoneCallbackOnce(&charger->chargeCapacitors);
-                geneva->setAngle(control.geneva.angle_deg);
+                geneva->setSlot(control.geneva_slot);
             }
             else
             {
@@ -45,10 +45,10 @@ void ControlExecutor::execute(const TbotsProto_PowerControl& control)
                         control.chicker.chicker_command.auto_chip_or_kick
                             .auto_chip_or_kick.autokick_speed_m_per_s);
                     charger->setChargeDoneCallbackOnce(&chicker->autokick);
-                    if (control.geneva.angle_deg != geneva->getCurrentAngle())
+                    if (control.geneva_slot != geneva->getCurrentSlot())
                     {
                         geneva->setRotationDoneCallbackOnce(&charger->chargeCapacitors);
-                        geneva->setAngle(control.geneva.angle_deg);
+                        geneva->setSlot(control.geneva_slot);
                     }
                     else
                     {
@@ -79,6 +79,7 @@ void ControlExecutor::execute(const TbotsProto_PowerControl& control)
                 default:
                     break;
             }
+            geneva->setSlot(control.geneva_slot);
             break;
     }
 }

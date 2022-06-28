@@ -3,6 +3,7 @@ syntax = "proto3";
 package TbotsProto;
 
 import "proto/geometry.proto";
+import "proto/geneva_slot.proto";
 import "google/protobuf/descriptor.proto";
 
 extend google.protobuf.EnumValueOptions
@@ -105,7 +106,7 @@ message PowerControl
     }
 
     ChickerControl chicker = 1;
-    GenevaControl geneva   = 2;
+    Geneva.Slot geneva_slot = 2;
     ChargeMode charge_mode = 3;
 }
 

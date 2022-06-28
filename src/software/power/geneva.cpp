@@ -6,7 +6,7 @@ volatile int Geneva::count_a                                = 0;
 volatile int Geneva::count_b                                = 0;
 volatile int Geneva::prev_count_a                           = 0;
 volatile int Geneva::prev_count_b                           = 0;
-Slot Geneva::slot                                           = Slot::CENTER;
+TbotsProto_Geneva_Slot Geneva::currentSlot                         = TbotsProto_Geneva_Slot_CENTRE;
 void (*volatile IRAM_ATTR Geneva::rotation_done_callback)() = NULL;
 
 Geneva::Geneva()
@@ -41,10 +41,10 @@ void IRAM_ATTR Geneva::onTimer()
 {
     // stop motor when it stalls aka in side slots
     // or if its centering it should be a fixed amount
-    if (((slot == Slot::LEFT || slot == Slot::RIGHT) &&
+    if (((currentSlot == TbotsProto_Geneva_Slot_LEFT || currentSlot == TbotsProto_Geneva_Slot_RIGHT) &&
          ((count_a != 0 && prev_count_a == count_a) ||
           (count_b != 0 && prev_count_b == count_b))) ||
-        (slot == Slot::CENTER && ((dir == 1 && count_a >= CENTERING_VALUE_FROM_LEFT) ||
+        (currentSlot == TbotsProto_Geneva_Slot_CENTRE && ((dir == 1 && count_a >= CENTERING_VALUE_FROM_LEFT) ||
                                   (dir == -1 && count_a <= CENTERING_VALUE_FROM_RIGHT))))
     {
         digitalWrite(PWM, LOW);
@@ -61,18 +61,9 @@ void IRAM_ATTR Geneva::onTimer()
     prev_count_b = count_b;
 }
 
-float Geneva::getCurrentAngle()
+TbotsProto_Geneva_Slot Geneva::getCurrentSlot()
 {
-    switch (slot)
-    {
-        case Slot::LEFT:
-            return 30;
-        case Slot::CENTER:
-            return 0;
-        case Slot::RIGHT:
-            return -30;
-    }
-    return 0;
+    return currentSlot;
 }
 void Geneva::setRotationDoneCallbackOnce(void (*rotation_done_callback)())
 {
@@ -93,29 +84,39 @@ void Geneva::rotateRight()
     digitalWrite(PWM, HIGH);
 }
 
-void Geneva::setAngle(float angle_deg)
+void Geneva::setSlot(TbotsProto_Geneva_Slot slot)
 {
-    if (angle_deg > 0)
-    {
-        slot = Slot::LEFT;
-        rotateLeft();
+    switch (slot) {
+        case TbotsProto_Geneva_Slot_LEFT:
+            if (getCurrentSlot() != TbotsProto_Geneva_Slot_LEFT) {
+                rotateLeft();
+            }
+            break;
+        case TbotsProto_Geneva_Slot_CENTRE:
+            switch (getCurrentSlot()) {
+                case TbotsProto_Geneva_Slot_LEFT:
+                    rotateRight();
+                    break;
+                case TbotsProto_Geneva_Slot_CENTRE:
+                    break;
+                case TbotsProto_Geneva_Slot_RIGHT:
+                    rotateLeft();
+                    break;
+                case TbotsProto_Geneva_Slot_CENTRE_LEFT:
+                case TbotsProto_Geneva_Slot_CENTRE_RIGHT:
+                default:
+                    break;
+            }
+            break;
+        case TbotsProto_Geneva_Slot_RIGHT:
+            if (getCurrentSlot() != TbotsProto_Geneva_Slot_RIGHT) {
+                rotateRight();
+            }
+            break;
+        case TbotsProto_Geneva_Slot_CENTRE_LEFT:
+        case TbotsProto_Geneva_Slot_CENTRE_RIGHT:
+        default:
+            break;
     }
-    else if (angle_deg == 0)
-    {
-        if (angle_deg > getCurrentAngle())
-        {
-            slot = Slot::CENTER;
-            rotateLeft();
-        }
-        else if (angle_deg < getCurrentAngle())
-        {
-            slot = Slot::CENTER;
-            rotateRight();
-        }
-    }
-    else
-    {
-        slot = Slot::RIGHT;
-        rotateRight();
-    }
+    currentSlot = slot;
 }

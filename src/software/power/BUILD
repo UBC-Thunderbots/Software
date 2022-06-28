@@ -20,7 +20,10 @@ platformio_library(
     name = "geneva",
     src = "geneva.cpp",
     hdr = "geneva.h",
-    deps = [":pins"],
+    deps = [
+        ":pins",
+        "//proto:tbots_nanopb_proto",
+    ],
 )
 
 platformio_library(

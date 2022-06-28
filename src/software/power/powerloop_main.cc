@@ -1,7 +1,7 @@
 #ifdef PLATFORMIO_BUILD
 #include "charger.h"
 #include "chicker.h"
-#include "constants_platformio.h"  // PlatformIO sees and includes the library based on the bazel rule name ONLY
+#include "constants_platformio.h"
 #include "control_executor.h"
 #include "geneva.h"
 #include "power_frame_msg_platformio.h"
@@ -11,8 +11,6 @@
 #include "proto/robot_status_msg.nanopb.h"
 #include "uart_framing_platformio.h"
 #else
-#include <constants_platformio.h>
-
 #include "proto/tbots_nanopb_proto_nanopb_gen/proto/power_frame_msg.nanopb.h"
 #include "proto/tbots_nanopb_proto_nanopb_gen/proto/primitive.nanopb.h"
 #include "proto/tbots_nanopb_proto_nanopb_gen/proto/robot_status_msg.nanopb.h"
@@ -74,7 +72,7 @@ void loop()
     // Read sensor values. These are all instantaneous
     auto status = createNanoPbPowerStatus(
         monitor->getBatteryVoltage(), charger->getCapacitorVoltage(),
-        monitor->getCurrentDrawAmp(), geneva->getCurrentAngle(),
+        monitor->getCurrentDrawAmp(), geneva->getCurrentSlot(),
         chicker->getBreakBeamTripped(), charger->getFlybackFault());
     auto status_frame = createUartFrame(status);
     auto packet       = marshallUartPacket(status_frame);

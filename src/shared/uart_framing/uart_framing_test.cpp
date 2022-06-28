@@ -96,11 +96,11 @@ class UartFramingTest : public ::testing::Test
     {
         test_message = createNanoPbPowerControl(
             ChickerCommandMode::AUTOCHIPORKICK, 1.0, 2.0, AutoChipOrKickMode::AUTOCHIP,
-            3.0, 4.0, 5.0, 6.0, TbotsProto_PowerControl_ChargeMode_CHARGE);
+            3.0, 4.0, TbotsProto_Geneva_Slot_LEFT, TbotsProto_PowerControl_ChargeMode_CHARGE);
     }
 
     TbotsProto_PowerControl test_message;
-    const uint16_t TEST_MESSAGE_CRC = 4064;  // From online calculator
+    const uint16_t TEST_MESSAGE_CRC = 43431;  // From online calculator
 };
 
 bool operator==(const TbotsProto_PowerControl& lhs, const TbotsProto_PowerControl& rhs)

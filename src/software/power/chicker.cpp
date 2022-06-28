@@ -36,7 +36,7 @@ void IRAM_ATTR Chicker::kick()
 {
     breakbeam_tripped = false;
     auto duration     = speedToPulseWidth(kick_speed_m_per_s);
-    oneShotPulse(1000, KICKER_PIN);
+    oneShotPulse(duration, KICKER_PIN);
 }
 
 void IRAM_ATTR Chicker::chip()

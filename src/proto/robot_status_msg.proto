@@ -3,6 +3,7 @@ syntax = "proto3";
 package TbotsProto;
 
 import "proto/tbots_timestamp_msg.proto";
+import "proto/geneva_slot.proto";
 
 message RobotStatus
 {
@@ -154,7 +155,7 @@ message PowerStatus
     // voltage on the robot’s capacitor, in volts.
     float capacitor_voltage = 2;
     float current_draw      = 3;
-    float geneva_angle_deg  = 4;
+    Geneva.Slot geneva_slot  = 4;
     bool breakbream_tripped = 5;
     bool flyback_fault      = 6;
 }
