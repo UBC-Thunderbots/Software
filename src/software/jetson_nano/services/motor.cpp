@@ -23,7 +23,6 @@ extern "C"
 #include "external/trinamic/tmc/ic/TMC4671/TMC4671.h"
 #include "external/trinamic/tmc/ic/TMC4671/TMC4671_Variants.h"
 #include "external/trinamic/tmc/ic/TMC6100/TMC6100.h"
-#include "external/trinamic/tmc/ramp/Ramp.h"
 }
 
 // SPI Configs
