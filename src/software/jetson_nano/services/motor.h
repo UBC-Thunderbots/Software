@@ -150,11 +150,11 @@ class MotorService
      *
      * @param velocity_target The target velocity
      * @param velocity_current The current velocity
-     * @param time_ramp The time allocated for acceleration.
+     * @param time_to_ramp The time allocated for acceleration.
      *
      */
-    double rampVelocity(double velocity_target, double velocity_current,
-                        double time_ramp);
+    double setTargetRampVelocity(double velocity_target, double velocity_current,
+            double time_to_ramp);
 
     /**
      * Trinamic API Binding function
