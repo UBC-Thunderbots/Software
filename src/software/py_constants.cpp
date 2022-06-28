@@ -84,7 +84,6 @@ PYBIND11_MODULE(py_constants, m)
     m.attr("SSL_ADDRESS") = SSL_ADDRESS;
     m.attr("SSL_PORT")    = SSL_PORT;
 
-
     // Units
     m.attr("MILLIMETERS_PER_METER") = MILLIMETERS_PER_METER;
     m.attr("METERS_PER_MILLIMETER") = METERS_PER_MILLIMETER;
