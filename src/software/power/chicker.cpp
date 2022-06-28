@@ -1,17 +1,22 @@
 #include "chicker.h"
 
 hw_timer_t* Chicker::pulse_timer         = nullptr;
+hw_timer_t* Chicker::cooldown_timer      = nullptr;
 float Chicker::kick_speed_m_per_s        = 0;
 float Chicker::chip_distance_meters      = 0;
 volatile bool Chicker::breakbeam_tripped = false;
+volatile bool Chicker::on_cooldown       = false;
 
 Chicker::Chicker()
 {
     pinMode(CHIPPER_PIN, OUTPUT);
     pinMode(KICKER_PIN, OUTPUT);
 
-    pulse_timer = timerBegin(CHICKER_TIMER, 80, true);
+    pulse_timer = timerBegin(CHICKER_PULSE_TIMER, 80, true);
     timerAttachInterrupt(pulse_timer, &stopPulse, true);
+
+    cooldown_timer = timerBegin(CHICKER_COOLDOWN_TIMER, 80, true);
+    timerAttachInterrupt(cooldown_timer, &offCooldown, true);
 }
 
 void IRAM_ATTR Chicker::autoKickISR()
@@ -83,16 +88,24 @@ int IRAM_ATTR Chicker::speedToPulseWidth(float speed_m_per_s)
     {
         return 1000;
     }
-    return 1000;
+    return 0;
 }
 
 void IRAM_ATTR Chicker::oneShotPulse(int duration, int pin)
 {
-    timerWrite(pulse_timer, 0);
-    timerAlarmWrite(pulse_timer, duration, false);
-    timerAlarmEnable(pulse_timer);
+    if (!on_cooldown) {    
+    	timerWrite(pulse_timer, 0);
+    	timerAlarmWrite(pulse_timer, duration, false);
+    	timerAlarmEnable(pulse_timer);
 
-    digitalWrite(pin, HIGH);
+    	digitalWrite(pin, HIGH);
+
+    	on_cooldown = true;
+
+    	timerWrite(cooldown_timer, 0);
+    	timerAlarmWrite(cooldown_timer, COOLDOWN_MICROSECONDS, false);
+    	timerAlarmEnable(cooldown_timer);
+   }
 }
 
 void IRAM_ATTR Chicker::stopPulse()
@@ -101,7 +114,12 @@ void IRAM_ATTR Chicker::stopPulse()
     digitalWrite(KICKER_PIN, LOW);
 }
 
+void IRAM_ATTR Chicker::offCooldown()
+{
+    on_cooldown = false;
+}
+
 bool Chicker::getBreakBeamTripped()
 {
-    return breakbeam_tripped;
+    return static_cast<bool>(digitalRead(BREAK_BEAM_PIN));
 }
