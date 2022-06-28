@@ -24,7 +24,7 @@
         prompt: "Press enter to continue"
         echo: no
 
-    - name: Flashing...
+    - name: Flashing... (this will take a while on the first run)
       shell: '/opt/tbotspython/bin/platformio run -s -t upload -d ~/powerloop/power'
       register: result
 
