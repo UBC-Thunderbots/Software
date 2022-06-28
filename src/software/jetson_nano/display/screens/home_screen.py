@@ -44,7 +44,7 @@ class HomeScreen(Screen):
         ]
         self.battery_voltage = redis_dict["/battery_voltage"]
         self.cap_voltage = redis_dict["/cap_voltage"]
-        self.packet_loss = redis_dict["/packet_loss"]
+        self.current_draw = redis_dict["/current_draw"]
 
         def draw_screen():
             """ Home Screen Layout """
@@ -125,17 +125,17 @@ class HomeScreen(Screen):
 
                 return y + self.font_size
 
-            def setup_packet_loss(x, y):
-                """ Draw the packet loss diagnostic on the screen """
-                packet_loss_str = "Packet Loss %: "
+            def setup_current_draw(x, y):
+                """ Draw the current draw on screen """
+                current_draw_str = "Current Draw %: "
                 x = cursor_size
                 self.lcd_display.draw.text(
-                    (x, y), packet_loss_str, font=self.font, fill=constants.WHITE
+                    (x, y), current_draw_str, font=self.font, fill=constants.WHITE
                 )
-                x += (self.font.getsize(packet_loss_str))[0]
+                x += (self.font.getsize(current_draw_str))[0]
                 self.lcd_display.draw.text(
                     (x, y),
-                    str(round(self.packet_loss, 1)),
+                    str(round(self.current_draw, 1)),
                     font=self.font,
                     fill=constants.YELLOW,
                 )
@@ -152,7 +152,7 @@ class HomeScreen(Screen):
 
             y = setup_battery_voltage(x, y)
             y = setup_capacitor_voltage(x, y)
-            setup_packet_loss(x, y)
+            setup_current_draw(x, y)
 
             # draw the back screen
             self.lcd_display.draw.text(
@@ -191,7 +191,7 @@ class HomeScreen(Screen):
 
         self.battery_voltage = redis_dict["/battery_voltage"]
         self.cap_voltage = redis_dict["/cap_voltage"]
-        self.packet_loss = redis_dict["/packet_loss"]
+        self.current_draw = redis_dict["/current_draw"]
 
 
 # For testing

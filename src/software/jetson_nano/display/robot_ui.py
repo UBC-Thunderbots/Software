@@ -38,7 +38,7 @@ redis_keys = [
     "/channel_id",
     "/battery_voltage",
     "/cap_voltage",
-    "/packet_loss",
+    "/current_draw",
     "chip enable",
     "kick enable",
     "chip speed",

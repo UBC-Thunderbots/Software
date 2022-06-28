@@ -58,33 +58,35 @@ class DriveAndDribblerWidget(QWidget):
         """Refresh the widget and send the a MotorControl message with the current values
         """
         motor_control = MotorControl()
-        motor_control.dribbler_speed_rpm = self.dribbler_speed_rpm_slider.value()
+        motor_control.dribbler_speed_rpm = int(
+            self.dribbler_speed_rpm_slider.value() / 1000.0
+        )
 
         # If we are on the direct per-wheel control tab
         if self.tabs.currentIndex() == 0:
             motor_control.direct_per_wheel_control.front_left_wheel_velocity = (
-                self.front_left_velocity_slider.value()
+                self.front_left_velocity_slider.value() / 1000.0
             )
             motor_control.direct_per_wheel_control.front_right_wheel_velocity = (
-                self.front_right_velocity_slider.value()
+                self.front_right_velocity_slider.value() / 1000.0
             )
             motor_control.direct_per_wheel_control.back_left_wheel_velocity = (
-                self.back_left_velocity_slider.value()
+                self.back_left_velocity_slider.value() / 1000.0
             )
             motor_control.direct_per_wheel_control.back_right_wheel_velocity = (
-                self.back_right_velocity_slider.value()
+                self.back_right_velocity_slider.value() / 1000.0
             )
 
         # If we are on the direct velocity control tab
         elif self.tabs.currentIndex() == 1:
             motor_control.direct_velocity_control.velocity.x_component_meters = (
-                self.x_velocity_slider.value()
+                self.x_velocity_slider.value() / 1000.0
             )
             motor_control.direct_velocity_control.velocity.y_component_meters = (
-                self.y_velocity_slider.value()
+                self.y_velocity_slider.value() / 1000.0
             )
             motor_control.direct_velocity_control.angular_velocity.radians_per_second = (
-                self.angular_velocity_slider.value()
+                self.angular_velocity_slider.value() / 1000.0
             )
 
         self.proto_unix_io.send_proto(MotorControl, motor_control)
@@ -97,7 +99,7 @@ class DriveAndDribblerWidget(QWidget):
         """
         value = slider.value()
         value = float(value)
-        value = value / 100.0
+        value = value / 1000.0
         value_str = "%.1f" % value
         return value_str
 
@@ -116,28 +118,28 @@ class DriveAndDribblerWidget(QWidget):
             self.front_left_velocity_slider,
             self.front_left_label,
         ) = common_widgets.create_slider(
-            "Front Left", MIN_LINEAR_SPEED_MPS, MAX_LINEAR_SPEED_MPS, 1
+            "Front Left", MIN_LINEAR_SPEED_MPS * 1000, MAX_LINEAR_SPEED_MPS * 1000, 1
         )
         (
             front_right_velocity_layout,
             self.front_right_velocity_slider,
             self.front_right_velocity_label,
         ) = common_widgets.create_slider(
-            "Front Right", MIN_LINEAR_SPEED_MPS, MAX_LINEAR_SPEED_MPS, 1
+            "Front Right", MIN_LINEAR_SPEED_MPS * 1000, MAX_LINEAR_SPEED_MPS * 1000, 1
         )
         (
             back_left_velocity_layout,
             self.back_left_velocity_slider,
             self.back_left_velocity_label,
         ) = common_widgets.create_slider(
-            "Back Left", MIN_LINEAR_SPEED_MPS, MAX_LINEAR_SPEED_MPS, 1
+            "Back Left", MIN_LINEAR_SPEED_MPS * 1000, MAX_LINEAR_SPEED_MPS * 1000, 1
         )
         (
             back_right_velocity_layout,
             self.back_right_velocity_slider,
             self.back_right_velocity_label,
         ) = common_widgets.create_slider(
-            "Back Right", MIN_LINEAR_SPEED_MPS, MAX_LINEAR_SPEED_MPS, 1
+            "Back Right", MIN_LINEAR_SPEED_MPS * 1000, MAX_LINEAR_SPEED_MPS * 1000, 1
         )
 
         self.front_left_velocity_slider.valueChanged.connect(
@@ -191,21 +193,24 @@ class DriveAndDribblerWidget(QWidget):
             self.x_velocity_slider,
             self.x_velocity_label,
         ) = common_widgets.create_slider(
-            "X (m/s)", MIN_LINEAR_SPEED_MPS, MAX_LINEAR_SPEED_MPS, 10
+            "X (m/s)", MIN_LINEAR_SPEED_MPS * 1000, MAX_LINEAR_SPEED_MPS * 1000, 1
         )
         (
             y_layout,
             self.y_velocity_slider,
             self.y_velocity_label,
         ) = common_widgets.create_slider(
-            "Y (m/s)", MIN_LINEAR_SPEED_MPS, MAX_LINEAR_SPEED_MPS, 10
+            "Y (m/s)", MIN_LINEAR_SPEED_MPS * 1000, MAX_LINEAR_SPEED_MPS * 1000, 1
         )
         (
             dps_layout,
             self.angular_velocity_slider,
             self.angular_velocity_label,
         ) = common_widgets.create_slider(
-            "θ (°/s)", MIN_ANGULAR_SPEED_RAD_PER_S, MAX_ANGULAR_SPEED_RAD_PER_S, 1
+            "θ (°/s)",
+            MIN_ANGULAR_SPEED_RAD_PER_S * 1000,
+            MAX_ANGULAR_SPEED_RAD_PER_S * 1000,
+            1,
         )
 
         self.x_velocity_slider.valueChanged.connect(
@@ -250,7 +255,9 @@ class DriveAndDribblerWidget(QWidget):
             dribbler_layout,
             self.dribbler_speed_rpm_slider,
             self.dribbler_speed_rpm_label,
-        ) = common_widgets.create_slider("RPM", MIN_DRIBBLER_RPM, MAX_DRIBBLER_RPM, 1)
+        ) = common_widgets.create_slider(
+            "RPM", MIN_DRIBBLER_RPM * 1000, MAX_DRIBBLER_RPM * 1000, 1000
+        )
         self.dribbler_speed_rpm_slider.valueChanged.connect(
             lambda: self.dribbler_speed_rpm_label.setText(
                 self.value_change(self.dribbler_speed_rpm_slider)

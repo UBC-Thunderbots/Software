@@ -33,12 +33,24 @@ class RobotCommunication(object):
         self.estop_path = estop_path
         self.estop_buadrate = estop_buadrate
 
+        self.robots_connected_to_handheld_controllers = set()
+        self.robots_connected_to_diagnostics = set()
+
         self.world_buffer = ThreadSafeBuffer(1, World)
         self.primitive_buffer = ThreadSafeBuffer(1, PrimitiveSet)
+
+        self.motor_control_diagnostics_buffer = ThreadSafeBuffer(1, MotorControl)
+        self.power_control_diagnostics_buffer = ThreadSafeBuffer(1, PowerControl)
 
         self.full_system_proto_unix_io.register_observer(World, self.world_buffer)
         self.full_system_proto_unix_io.register_observer(
             PrimitiveSet, self.primitive_buffer
+        )
+        self.full_system_proto_unix_io.register_observer(
+            MotorControl, self.motor_control_diagnostics_buffer
+        )
+        self.full_system_proto_unix_io.register_observer(
+            PowerControl, self.power_control_diagnostics_buffer
         )
 
         self.send_estop_state_thread = threading.Thread(target=self.__send_estop_state)
@@ -82,33 +94,51 @@ class RobotCommunication(object):
                 primitive_set = self.primitive_buffer.get(block=False)
 
                 if self.estop_reader.isEstopPlay():
-                    self.primitive_set_mcast_sender.send(primitive_set)
+                    self.send_primitive_set.send_proto(primitive_set)
+
             else:
-                time.sleep(0.1)
+
+                diagnostics_primitive = DirectControlPrimitive(
+                    motor_control=self.motor_control_diagnostics_buffer.get(
+                        block=False
+                    ),
+                    power_control=self.power_control_diagnostics_buffer.get(
+                        block=False
+                    ),
+                )
+
+                primitive_set = PrimitiveSet(
+                    time_sent=Timestamp(epoch_timestamp_seconds=time.time()),
+                    stay_away_from_ball=False,
+                    robot_primitives={
+                        robot_id: Primitive(direct_control=diagnostics_primitive)
+                        for robot_id in self.robots_connected_to_diagnostics
+                    },
+                )
+
+                if self.estop_reader.isEstopPlay():
+                    self.send_primitive_set.send_proto(primitive_set)
+                    print(primitive_set)
+
+                time.sleep(0.01)
 
     def connect_fullsystem_to_robots(self):
         """ Connect the robots to fullsystem """
 
         self.fullsystem_connected_to_robots = True
+        self.robots_connected_to_handheld_controllers = set()
+        self.robots_connected_to_diagnostics = set()
 
     def disconnect_fullsystem_from_robots(self):
         """ Disconnect the robots from fullsystem """
 
         self.fullsystem_connected_to_robots = False
 
-    def send_override_primitive_set(self, primitive_set):
-        """Send an override primitive set to the robots
+    def connect_robot_to_diagnostics(self, robot_id):
+        self.robots_connected_to_diagnostics.add(robot_id)
 
-        NOTE: We will only send the overridden proto if the estop is enabled.
-
-        """
-        if self.robots_connected_to_fullsystem:
-            raise Exception(
-                "Currently connected to fullsystem" + " can not override primitive set"
-            )
-
-        if self.estop_reader.isEstopPlay():
-            self.primitive_set_mcast_sender.send(primitive_set)
+    def discconnect_robot_from_diagnostics(self, robot_id):
+        self.robots_connected_to_diagnostics.remove(robot_id)
 
     def __enter__(self):
         """Enter RobotCommunication context manager. Setup multicast listener
@@ -142,7 +172,8 @@ class RobotCommunication(object):
             self.multicast_channel + "%" + self.interface, VISION_PORT, True
         )
 
-        self.connect_fullsystem_to_robots()
+        self.disconnect_fullsystem_from_robots()
+        self.connect_robot_to_diagnostics(3)
 
         self.send_estop_state_thread.start()
         self.run_thread.start()
