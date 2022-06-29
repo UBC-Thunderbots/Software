@@ -85,10 +85,6 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
             // https://developers.google.com/protocol-buffers/docs/proto3#default
             auto output = std::make_unique<TbotsProto::DirectControlPrimitive>();
 
-            // Discharge the capacitors
-            output->mutable_power_control()->set_charge_mode(
-                TbotsProto::PowerControl_ChargeMode_DISCHARGE);
-
             return output;
         }
         case TbotsProto::Primitive::kStop:
