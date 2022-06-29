@@ -35,13 +35,12 @@ print(BASIC_TEST_CASE_PARAMETERS)
 @pytest.mark.parametrize(
     "ball_initial_position,ball_initial_velocity,robot_initial_position",
     [
-        # stationary ball
         (
             tbots.Field.createSSLDivisionBField().centerPoint(),
             tbots.Vector(2.0, 0),
             tbots.Field.createSSLDivisionBField().friendlyGoalpostPos() + tbots.Vector(2,0),
         ),
-        #*BASIC_TEST_CASE_PARAMETERS
+        *BASIC_TEST_CASE_PARAMETERS
         # slow ball
 
     ],
