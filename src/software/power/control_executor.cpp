@@ -19,7 +19,7 @@ void ControlExecutor::execute(const TbotsProto_PowerControl& control)
                 control.chicker.chicker_command.kick_speed_m_per_s);
             if (control.geneva_slot != geneva->getCurrentSlot())
             {
-                geneva->setRotationDoneCallbackOnce(&charger->chargeCapacitors);
+                geneva->setRotationDoneCallbackOnce(&chicker->kick);
                 geneva->setSlot(control.geneva_slot);
             }
             else
@@ -44,7 +44,7 @@ void ControlExecutor::execute(const TbotsProto_PowerControl& control)
                             .auto_chip_or_kick.autokick_speed_m_per_s);
                     if (control.geneva_slot != geneva->getCurrentSlot())
                     {
-                        geneva->setRotationDoneCallbackOnce(&charger->chargeCapacitors);
+                        geneva->setRotationDoneCallbackOnce(&chicker->autokick);
                         geneva->setSlot(control.geneva_slot);
                     }
                     else
@@ -63,16 +63,6 @@ void ControlExecutor::execute(const TbotsProto_PowerControl& control)
             }
             break;
         default:
-            switch (control.charge_mode)
-            {
-                case TbotsProto_PowerControl_ChargeMode_CHARGE:
-                    charger->chargeCapacitors();
-                    break;
-                case TbotsProto_PowerControl_ChargeMode_DISCHARGE:
-                case TbotsProto_PowerControl_ChargeMode_FLOAT:
-                default:
-                    break;
-            }
             geneva->setSlot(control.geneva_slot);
             break;
     }

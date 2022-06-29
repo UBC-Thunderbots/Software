@@ -75,6 +75,7 @@ void loop()
     auto status = createNanoPbPowerStatus(
         monitor->getBatteryVoltage(), charger->getCapacitorVoltage(),
         monitor->getCurrentDrawAmp(), geneva->getCurrentSlot(),
+        geneva->getEncoderValueA(), geneva->getEncoderValueB(),
         chicker->getBreakBeamTripped(), charger->getFlybackFault());
     auto status_frame = createUartFrame(status);
     auto packet       = marshallUartPacket(status_frame);

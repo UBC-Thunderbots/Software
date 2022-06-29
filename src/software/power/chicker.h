@@ -66,6 +66,9 @@ class Chicker
      */
     static void stopPulse();
 
+    /**
+     * Called on a cooldown_timer to set the on_cooldown variable back to false
+     */
     static void offCooldown();
 
     static hw_timer_t* pulse_timer;

@@ -122,6 +122,8 @@ message PowerStatus
     float capacitor_voltage = 2;
     float current_draw      = 3;
     Geneva.Slot geneva_slot = 4;
-    bool breakbream_tripped = 5;
-    bool flyback_fault      = 6;
+    int32 geneva_encoder_value_a   = 5;
+    int32 geneva_encoder_value_b   = 6;
+    bool breakbream_tripped = 7;
+    bool flyback_fault      = 8;
 }

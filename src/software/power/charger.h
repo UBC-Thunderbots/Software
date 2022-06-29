@@ -13,11 +13,11 @@ class Charger
      */
     Charger();
     /**
-     * Sets the charge pin to either HIGH to charge or LOW to discharge given operation.
+     * Sets the charge pin to HIGH to begin charging the capacitors.
+     * Note: we run in regulation mode meaning the capacitors will recharge continuously while charge is HIGH
      *
      */
     static void chargeCapacitors();
-    static void dischargeCapacitors();
     /**
      * Returns the voltage of the capacitors
      *
@@ -32,9 +32,7 @@ class Charger
     bool getFlybackFault();
 
    private:
-    static void chargeDone();
     static constexpr float VOLTAGE_DIVIDER = 1003.0 / 13.0;
     static constexpr float RESOLUTION      = 4096.0;
     static constexpr float SCALE_VOLTAGE   = 3.3;
-    static volatile bool flyback_fault;
 };
