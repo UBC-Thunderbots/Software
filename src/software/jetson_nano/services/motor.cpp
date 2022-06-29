@@ -145,9 +145,9 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
     }
 
     // Dribbler Motor Setup
-    //startDriver(DRIBBLER_MOTOR_CHIP_SELECT);
-    //checkDriverFault(DRIBBLER_MOTOR_CHIP_SELECT);
-    //startController(DRIBBLER_MOTOR_CHIP_SELECT, true);
+    startDriver(DRIBBLER_MOTOR_CHIP_SELECT);
+    checkDriverFault(DRIBBLER_MOTOR_CHIP_SELECT);
+    startController(DRIBBLER_MOTOR_CHIP_SELECT, true);
 }
 
 MotorService::~MotorService() {}
