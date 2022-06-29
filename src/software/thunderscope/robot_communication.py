@@ -164,6 +164,15 @@ class RobotCommunication(object):
             True,
         )
 
+        self.receive_ssl_wrapper = SSLWrapperPacketProtoListener(
+            SSL_ADDRESS,
+            SSL_PORT,
+            lambda data: self.full_system_proto_unix_io.send_proto(
+                SSL_WrapperPacket, data
+            ),
+            True,
+        )
+
         self.send_primitive_set = PrimitiveSetProtoSender(
             self.multicast_channel + "%" + self.interface, PRIMITIVE_PORT, True
         )
