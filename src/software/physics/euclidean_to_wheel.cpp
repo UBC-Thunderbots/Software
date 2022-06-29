@@ -12,6 +12,7 @@ EuclideanToWheel::EuclideanToWheel(const int &control_loop_frequency_Hz,
     delta_t_s_ = 1.0f / static_cast<float>(control_loop_frequency_Hz);
 
     // import robot constants
+    max_acceleration_m_per_s_2  = robot_constants.robot_max_acceleration_m_per_s_2;
     robot_mass_M_kg_            = robot_constants.mass_kg;
     robot_radius_R_m_           = robot_constants.robot_radius_m;
     inertial_factor_alpha_m_    = robot_constants.inertial_factor;
@@ -107,8 +108,21 @@ EuclideanSpace_t EuclideanToWheel::getEuclideanAcceleration(
     const EuclideanSpace_t &current_velocity,
     const EuclideanSpace_t &target_velocity) const
 {
-    // TODO-AKHIL can we cap the value here?
-    return (target_velocity - current_velocity) / delta_t_s_;
+    // calculate acceleration to achieve target velocity
+    auto calculated_acceleration = target_velocity - current_velocity / delta_t_s_;
+
+    auto calculated_max_acceleration = abs(calculated_acceleration.maxCoeff());
+
+    // limit max acceleration to max_acceleration_m_per_s_2
+    if (calculated_max_acceleration > max_acceleration_m_per_s_2)
+    {
+        // scale euclidean acceleration so that the max acceleration is max_acceleration_m_per_s_2
+        return max_acceleration_m_per_s_2 * (calculated_acceleration / calculated_max_acceleration);
+    }
+    else
+    {
+        return calculated_acceleration;
+    }
 }
 
 WheelSpace_t EuclideanToWheel::getTranslationalWheelForces(

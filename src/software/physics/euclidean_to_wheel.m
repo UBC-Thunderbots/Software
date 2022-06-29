@@ -11,8 +11,8 @@ delta_t = 1/200; % s
 robot_mass_M = 2.5; % kg
 robot_radius_R = 0.09; % m
 inertial_factor_alpha = 0.37; % m
-front_wheel_angle_phi = deg2rad(57.95); % rad
-rear_wheel_angle_theta = deg2rad(136.04 - 90); % rad
+front_wheel_angle_phi = deg2rad(50.0); % rad
+rear_wheel_angle_theta = deg2rad(46.04); % rad
 
 % Wheel force to acceleration coupling matrix
 a = sin(front_wheel_angle_phi)^2 - cos(front_wheel_angle_phi)^2;

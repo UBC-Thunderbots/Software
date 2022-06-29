@@ -56,6 +56,11 @@ class EuclideanToWheel
 
    private:
     /**
+     * The max robot acceleration.
+     */
+    double max_acceleration_m_per_s_2{};
+    
+    /**
      * The control loop time period [s].
      */
     double delta_t_s_{};
