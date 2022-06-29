@@ -282,13 +282,8 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
     motor_status.mutable_back_right()->set_wheel_velocity(
         static_cast<float>(back_right_velocity));
 
-    // This order needs to match euclidean_to_four_wheel converters order
-    // We also want to work in the meters per second space rather than electrical RPMs
-    WheelSpace_t current_wheel_velocities = {front_right_velocity, front_left_velocity,
-                                             back_left_velocity, back_right_velocity};
-
     // TODO debug why this doesn't work
-    current_wheel_velocities = {0.0, 0.0, 0.0, 0.0};
+    WheelSpace_t current_wheel_velocities = {0.0, 0.0, 0.0, 0.0};
 
     // Convert to euclidean space
     EuclideanSpace_t current_euclidean_velocity =
@@ -337,6 +332,13 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
         }
     }
 
+    // This order needs to match euclidean_to_four_wheel converters order
+    // We also want to work in the meters per second space rather than electrical RPMs
+    current_wheel_velocities = {front_right_velocity, front_left_velocity,
+        back_left_velocity, back_right_velocity};
+
+    LOG(DEBUG) << target_wheel_velocities;
+
     // Set target speeds accounting for acceleration
     setTargetRampVelocity(FRONT_RIGHT_MOTOR_CHIP_SELECT, target_wheel_velocities[0],
                           current_wheel_velocities[0], time_elapsed_since_last_poll_s);
@@ -347,7 +349,11 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
     setTargetRampVelocity(BACK_RIGHT_MOTOR_CHIP_SELECT, target_wheel_velocities[3],
                           current_wheel_velocities[3], time_elapsed_since_last_poll_s);
 
-    tmc4671_setTargetVelocity(DRIBBLER_MOTOR_CHIP_SELECT, target_dribbler_rpm);
+    if (previous_dribbler_rpm != target_dribbler_rpm)
+    {
+        tmc4671_setTargetVelocity(DRIBBLER_MOTOR_CHIP_SELECT, target_dribbler_rpm);
+        previous_dribbler_rpm = target_dribbler_rpm;
+    }
 
     // Toggle Hearbeat
     if (heartbeat_state == 1)
