@@ -7,8 +7,8 @@ const uint8_t DIR                  = 4;
 const uint8_t PWM                  = 15;
 const uint8_t GENEVA_ENCODER_A_PIN = 18;
 const uint8_t GENEVA_ENCODER_B_PIN = 5;
-const uint8_t LEFT_DIR = 1;
-const uint8_t RIGHT_DIR = -1;
+const uint8_t LEFT_DIR             = 1;
+const uint8_t RIGHT_DIR            = -1;
 
 // Chicker
 const uint8_t KICKER_PIN  = 32;

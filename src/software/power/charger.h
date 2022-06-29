@@ -14,7 +14,8 @@ class Charger
     Charger();
     /**
      * Sets the charge pin to HIGH to begin charging the capacitors.
-     * Note: we run in regulation mode meaning the capacitors will recharge continuously while charge is HIGH
+     * Note: we run in regulation mode meaning the capacitors will recharge continuously
+     * while charge is HIGH
      *
      */
     static void chargeCapacitors();

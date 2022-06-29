@@ -1,6 +1,7 @@
 #pragma once
 
 #include <array>
+
 #include "pins.h"
 #include "proto/geneva_slot.nanopb.h"
 
@@ -55,8 +56,8 @@ class Geneva
     // TODO: Calibration for centering geneva
     static constexpr int CENTERING_VALUE_FROM_LEFT  = 170;
     static constexpr int CENTERING_VALUE_FROM_RIGHT = -130;
-    static constexpr int RIGHTING_VALUE_FROM_LEFT = 0;
-    static constexpr int LEFTING_VALUE_FROM_RIGHT = 0;
+    static constexpr int RIGHTING_VALUE_FROM_LEFT   = 0;
+    static constexpr int LEFTING_VALUE_FROM_RIGHT   = 0;
     static std::array<int, _TbotsProto_Geneva_Slot_ARRAYSIZE> VALUE_FROM_LEFT;
     static std::array<int, _TbotsProto_Geneva_Slot_ARRAYSIZE> VALUE_FROM_RIGHT;
 };
