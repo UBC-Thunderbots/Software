@@ -10,6 +10,7 @@
 #include "software/logger/network_logger.h"
 #include "software/util/scoped_timespec_timer/scoped_timespec_timer.h"
 #include "software/world/robot_state.h"
+#include "software/world/team.h"
 
 /**
  * https://rt.wiki.kernel.org/index.php/Squarewave-example
@@ -184,9 +185,17 @@ void Thunderloop::runLoop()
                     primitive_executor_.clearCurrentPrimitive();
                 }
 
+                auto friendly_team = Team(world_.friendly_team());
+                auto robot = friendly_team.getRobotById(robot_id_);
+
+                if (robot.has_value())
+                {
+                    current_orientation_ = robot->currentState().orientation();
+                }
+
+                // TODO ROBOT COLOUR
                 direct_control_ = *primitive_executor_.stepPrimitive(
-                    robot_id_,
-                    Angle::fromRadians(robot_state_.global_orientation().radians()));
+                    robot_id_, current_orientation_);
             }
 
             thunderloop_status_.set_primitive_executor_step_time_ns(
@@ -205,6 +214,7 @@ void Thunderloop::runLoop()
                 ScopedTimespecTimer timer(&poll_time);
                 motor_status_ =
                     motor_service_->poll(direct_control_.motor_control(), 1.0 / loop_hz_);
+                LOG(DEBUG) << direct_control_.motor_control().DebugString();
                 primitive_executor_.updateLocalVelocity(
                     createVector(motor_status_.local_velocity()));
             }

@@ -88,12 +88,14 @@ class RobotCommunication(object):
 
                 # Send the world
                 world = self.world_buffer.get(block=True)
-                self.world_mcast_sender.send(world)
+                self.send_world.send_proto(world)
 
                 # Send the primitive set
                 primitive_set = self.primitive_buffer.get(block=False)
+                print("ASD")
 
                 if self.estop_reader.isEstopPlay():
+                    print("sending proto")
                     self.send_primitive_set.send_proto(primitive_set)
 
             else:
@@ -181,8 +183,8 @@ class RobotCommunication(object):
             self.multicast_channel + "%" + self.interface, VISION_PORT, True
         )
 
-        self.disconnect_fullsystem_from_robots()
-        self.connect_robot_to_diagnostics(3)
+        self.connect_fullsystem_to_robots()
+        # self.connect_robot_to_diagnostics(3)
 
         self.send_estop_state_thread.start()
         self.run_thread.start()

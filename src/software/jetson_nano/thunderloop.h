@@ -83,7 +83,6 @@ class Thunderloop
     // Input Msg Buffers
     TbotsProto::PrimitiveSet primitive_set_;
     TbotsProto::World world_;
-    TbotsProto::RobotState robot_state_;
     TbotsProto::Primitive primitive_;
     TbotsProto::DirectControlPrimitive direct_control_;
 
@@ -97,6 +96,7 @@ class Thunderloop
 
     // Current State
     RobotConstants_t robot_constants_;
+    Angle current_orientation_;
     int robot_id_;
     int channel_id_;
     std::string network_interface_;
