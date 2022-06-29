@@ -215,8 +215,11 @@ class HRVOAgent : public Agent
      */
     bool isCandidateFasterThanCurrentSpeed(const Candidate &candidate) const;
 
+    /**
+     * Compute all the velocity obstacles that this Agent should take into account and
+     * add it to `velocityObstacles_`.
+     */
     void computeVelocityObstacles();
-
 
    public:
     float prefSpeed_;
