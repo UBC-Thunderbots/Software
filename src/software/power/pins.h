@@ -19,15 +19,15 @@ const uint8_t CHRG_DONE     = 26;
 const uint8_t CHRG          = 25;
 
 // Break Beam
-const uint8_t BREAK_BEAM_PIN = 37;
+const int BREAK_BEAM_PIN = 37;
 
 // UART
 const uint8_t RXD2 = 19;
 const uint8_t TXD2 = 22;
 
 // Power Monitor
-const uint8_t PM_SDA = 13;
-const uint8_t PM_SCL = 14;
+const int PM_SDA = 13;
+const int PM_SCL = 14;
 
 // Timers
 const uint8_t CHICKER_TIMER           = 0;

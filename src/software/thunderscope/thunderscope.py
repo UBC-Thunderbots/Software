@@ -55,6 +55,7 @@ from software.thunderscope.robot_diagnostics.drive_and_dribbler_widget import (
     DriveAndDribblerWidget,
 )
 from software.thunderscope.robot_diagnostics.robot_view import RobotView
+from software.thunderscope.robot_diagnostics.estop_view import EstopView
 from software.thunderscope.replay.proto_player import ProtoPlayer
 
 SAVED_LAYOUT_PATH = "/opt/tbotspython/saved_tscope_layout"
@@ -467,7 +468,7 @@ class Thunderscope(object):
             window_secs=2,
             configuration={NamedValue: extract_encoder_data},
         )
-        proto_plotter_dock_1 = Dock("Encoder Data")
+        proto_plotter_dock_1 = Dock("Motor Status")
         proto_plotter_dock_1.addWidget(proto_plotter_1)
 
         proto_plotter_2 = ProtoPlotter(
@@ -476,7 +477,7 @@ class Thunderscope(object):
             window_secs=2,
             configuration={NamedValue: extract_encoder_data},
         )
-        proto_plotter_dock_2 = Dock("Encoder Data")
+        proto_plotter_dock_2 = Dock("Power Status")
         proto_plotter_dock_2.addWidget(proto_plotter_2)
 
         proto_plotter_3 = ProtoPlotter(
@@ -485,7 +486,7 @@ class Thunderscope(object):
             window_secs=2,
             configuration={NamedValue: extract_encoder_data},
         )
-        proto_plotter_dock_3 = Dock("Encoder Data")
+        proto_plotter_dock_3 = Dock("Thunderloop Status")
         proto_plotter_dock_3.addWidget(proto_plotter_3)
 
         proto_plotter_4 = ProtoPlotter(
@@ -494,7 +495,7 @@ class Thunderscope(object):
             window_secs=2,
             configuration={NamedValue: extract_encoder_data},
         )
-        proto_plotter_dock_4 = Dock("Encoder Data")
+        proto_plotter_dock_4 = Dock("Temperature Status")
         proto_plotter_dock_4.addWidget(proto_plotter_4)
 
         # Register observer
@@ -525,12 +526,28 @@ class Thunderscope(object):
             proto_plotter_dock_4, "bottom", proto_plotter_dock_3
         )
 
-        bob = RobotView()
+        robot_view = RobotView()
+        dock = Dock("Robot View")
+        dock.addWidget(robot_view)
+        self.robot_diagnostics_dock_area.addDock(dock, "top", log_dock)
 
-        dock = Dock("Label")
-        dock.addWidget(bob)
+        estop_view = self.setup_estop_view(proto_unix_io)
 
-        self.robot_diagnostics_dock_area.addDock(dock, "bottom", proto_plotter_dock_3)
+        dock = Dock("Estop View")
+        dock.addWidget(estop_view)
+        self.robot_diagnostics_dock_area.addDock(dock, "bottom", log_dock)
+
+    def setup_estop_view(self, proto_unix_io):
+        """Setup the estop view widget
+
+        :param proto_unix_io: The proto unix io object for the full system
+
+        """
+        estop_view = EstopView()
+        self.register_refresh_function(estop_view.refresh)
+
+        proto_unix_io.register_observer(EstopState, estop_view.estop_state_buffer)
+        return estop_view
 
     def setup_field_widget(
         self, sim_proto_unix_io, full_system_proto_unix_io, friendly_colour_yellow
@@ -700,7 +717,10 @@ class Thunderscope(object):
         :returns: The drive and dribbler widget
 
         """
-        return DriveAndDribblerWidget()
+        drive_and_dribbler_widget = DriveAndDribblerWidget(proto_unix_io)
+        self.register_refresh_function(drive_and_dribbler_widget.refresh)
+
+        return drive_and_dribbler_widget
 
     def show(self):
         """Show the main window"""

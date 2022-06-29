@@ -216,6 +216,7 @@ if __name__ == "__main__":
         with RobotCommunication(
             proto_unix_io, getRobotMulticastChannel(0), args.interface
         ), FullSystem(runtime_dir, debug, friendly_colour_yellow) as full_system:
+            full_system.setup_proto_unix_io(proto_unix_io)
             tscope.show()
 
     ###########################################################################

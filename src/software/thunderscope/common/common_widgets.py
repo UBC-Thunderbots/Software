@@ -18,7 +18,6 @@ def create_button(text: list):
 
     for i in range(num_buttons):
         button = QPushButton(text[i])
-        button.setCheckable(True)
         buttons.append(button)
 
     hbox = QHBoxLayout()

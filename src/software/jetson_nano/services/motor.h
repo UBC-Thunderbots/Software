@@ -8,11 +8,6 @@
 #include "software/jetson_nano/gpio.h"
 #include "software/physics/euclidean_to_wheel.h"
 
-extern "C"
-{
-#include "external/trinamic/tmc/ramp/Ramp.h"
-}
-
 class MotorService
 {
    public:
@@ -36,7 +31,6 @@ class MotorService
      */
     TbotsProto::MotorStatus poll(const TbotsProto::MotorControl& motor_control,
                                  double time_elapsed_since_last_poll_s);
-    void setXYTheta(double x, double y, double rad_per_s);
 
     /**
      * Trinamic API binding, sets spi_demux_select_0|1 pins
@@ -144,15 +138,19 @@ class MotorService
     void spiTransfer(int fd, uint8_t const* tx, uint8_t const* rx, unsigned len);
 
     /**
-     * Ramp the velocity over the given timestep.
+     * Ramp the velocity over the given timestep and set the target velocity on the motor.
      *
-     * @param velocity_target The target velocity
-     * @param velocity_current The current velocity
-     * @param time_ramp The ramping time
+     * NOTE: This function has no state.
+     * Also NOTE: This function handles all electrical rpm to meters/second conversion.
+     *
+     * @param motor The motor to set the velocity on
+     * @param velocity_target The target velocity in m/s
+     * @param velocity_current The current velocity m/s
+     * @param time_to_ramp The time allocated for acceleration in seconds
      *
      */
-    double rampVelocity(double velocity_target, double velocity_current,
-                        double time_ramp);
+    void setTargetRampVelocity(uint8_t motor, double velocity_target,
+                               double velocity_current, double time_to_ramp);
 
     /**
      * Convert electrical rpm to wheel velocity.
@@ -224,14 +222,13 @@ class MotorService
     bool currently_reading = false;
     uint8_t position       = 0;
 
+    double previous_dribbler_rpm = 0;
+
     // Constants
     RobotConstants_t robot_constants_;
 
     // SPI File Descriptors
     std::unordered_map<int, int> file_descriptors;
-
-    // Velocity Ramps
-    std::unordered_map<int, TMC_LinearRamp> velocity_ramps;
 
     // Drive Motors
     EuclideanToWheel euclidean_to_four_wheel;

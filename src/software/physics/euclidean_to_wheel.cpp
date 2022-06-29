@@ -3,6 +3,7 @@
 #include <cmath>
 
 #include "shared/2021_robot_constants.h"
+#include "software/logger/logger.h"
 
 EuclideanToWheel::EuclideanToWheel(const int &control_loop_frequency_Hz,
                                    const RobotConstants_t &robot_constants)
@@ -16,6 +17,17 @@ EuclideanToWheel::EuclideanToWheel(const int &control_loop_frequency_Hz,
     inertial_factor_alpha_m_    = robot_constants.inertial_factor;
     front_wheel_angle_phi_rad_  = robot_constants.front_wheel_angle_deg * M_PI / 180.;
     rear_wheel_angle_theta_rad_ = robot_constants.back_wheel_angle_deg * M_PI / 180.;
+
+    // calculate D matrix
+    // ref: http://robocup.mi.fu-berlin.de/buch/omnidrive.pdf pg 16
+    Eigen::Matrix<double, 4, 3> velocity_coupling_D;
+    // clang-format off
+    velocity_coupling_D <<
+        -sin(front_wheel_angle_phi_rad_), cos(front_wheel_angle_phi_rad_), 1,
+        -sin(front_wheel_angle_phi_rad_), -cos(front_wheel_angle_phi_rad_), 1,
+        sin(rear_wheel_angle_theta_rad_), -cos(rear_wheel_angle_theta_rad_), 1,
+        sin(rear_wheel_angle_theta_rad_), cos(rear_wheel_angle_theta_rad_), 1;
+    // clang-format on
 
     // calculate DC_alpha matrix
     // ref: http://robocup.mi.fu-berlin.de/buch/omnidrive.pdf pg 17
@@ -43,8 +55,13 @@ EuclideanToWheel::EuclideanToWheel(const int &control_loop_frequency_Hz,
                                            2 * pow(cos(rear_wheel_angle_theta_rad_), 2));
     auto k = sin(rear_wheel_angle_theta_rad_) /
              (2 * sin(front_wheel_angle_phi_rad_) + 2 * sin(rear_wheel_angle_theta_rad_));
-    wheel_speed_to_euclidean_velocity_D_inverse_ << -i, -i, i, i, j, -j, -(1. - j),
-        (1. - j), k, k, (1 - k), (1 - k);
+    wheel_speed_to_euclidean_velocity_D_inverse_ << -i, -i, i, i, j, -j, -(1.0 - j),
+        (1.0 - j), k, k, (1.0 - k), (1.0 - k);
+
+    // LOG(DEBUG) << wheel_speed_to_euclidean_velocity_D_inverse_ * velocity_coupling_D;
+    // CHECK(
+    //(wheel_speed_to_euclidean_velocity_D_inverse_ * velocity_coupling_D).isIdentity())
+    //<< "D_inverse * D_alpha != I";
 }
 
 /**
@@ -87,10 +104,11 @@ EuclideanSpace_t EuclideanToWheel::getEuclideanVelocity(const WheelSpace_t &whee
 }
 
 EuclideanSpace_t EuclideanToWheel::getEuclideanAcceleration(
-    const EuclideanSpace_t &initial_velocity,
+    const EuclideanSpace_t &current_velocity,
     const EuclideanSpace_t &target_velocity) const
 {
-    return (target_velocity - initial_velocity) / delta_t_s_;
+    // TODO-AKHIL can we cap the value here?
+    return (target_velocity - current_velocity) / delta_t_s_;
 }
 
 WheelSpace_t EuclideanToWheel::getTranslationalWheelForces(

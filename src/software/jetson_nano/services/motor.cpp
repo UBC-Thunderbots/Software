@@ -23,7 +23,6 @@ extern "C"
 #include "external/trinamic/tmc/ic/TMC4671/TMC4671.h"
 #include "external/trinamic/tmc/ic/TMC4671/TMC4671_Variants.h"
 #include "external/trinamic/tmc/ic/TMC6100/TMC6100.h"
-#include "external/trinamic/tmc/ramp/Ramp.h"
 }
 
 // SPI Configs
@@ -51,8 +50,14 @@ static const char* MOTOR_DRIVER_RESET_GPIO                = "168";
 static const char* DRIVER_CONTROL_ENABLE_GPIO             = "194";
 static const char* HEARTBEAT_GPIO                         = "216";
 
-// TODO Add a comment on this value and compute it from constants
+
+// All trinamic RPMS are electrical RPMS, they don't factor in the number of pole
+// pairs of the drive motor.
+//
+// TODO compute from robot constants (this was computed by hand and is accurate)
 static double MECHANICAL_MPS_PER_ELECTRICAL_RPM = 0.000111;
+static double ELECTRICAL_RPM_PER_MECHANICAL_MPS = 1 / MECHANICAL_MPS_PER_ELECTRICAL_RPM;
+
 
 extern "C"
 {
@@ -146,34 +151,6 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
 }
 
 MotorService::~MotorService() {}
-
-
-void MotorService::setXYTheta(double x, double y, double rad_per_s)
-{
-    EuclideanSpace_t target_euclidean_velocity = {
-        x,
-        y,
-        rad_per_s,
-    };
-
-    WheelSpace_t current_wheel_speeds = {0, 0, 0, 0};
-    WheelSpace_t target_speeds        = euclidean_to_four_wheel.getTargetWheelSpeeds(
-        target_euclidean_velocity, current_wheel_speeds);
-
-    tmc4671_setTargetVelocity(
-        FRONT_RIGHT_MOTOR_CHIP_SELECT,
-        wheelVelocityToElectricalRpm(target_speeds[0]));
-    tmc4671_setTargetVelocity(
-        FRONT_LEFT_MOTOR_CHIP_SELECT,
-        wheelVelocityToElectricalRpm(target_speeds[1]));
-    tmc4671_setTargetVelocity(
-        BACK_LEFT_MOTOR_CHIP_SELECT,
-        wheelVelocityToElectricalRpm(target_speeds[2]));
-    tmc4671_setTargetVelocity(
-        BACK_RIGHT_MOTOR_CHIP_SELECT,
-        wheelVelocityToElectricalRpm(target_speeds[3]));
-}
-
 
 
 bool MotorService::checkDriverFault(uint8_t motor)
@@ -282,55 +259,53 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
 
     TbotsProto::MotorStatus motor_status;
 
-    int front_right_rpm = tmc4671_getActualVelocity(FRONT_RIGHT_MOTOR_CHIP_SELECT);
-    int front_left_rpm  = tmc4671_getActualVelocity(FRONT_LEFT_MOTOR_CHIP_SELECT);
-    int back_right_rpm  = tmc4671_getActualVelocity(BACK_RIGHT_MOTOR_CHIP_SELECT);
-    int back_left_rpm   = tmc4671_getActualVelocity(BACK_LEFT_MOTOR_CHIP_SELECT);
+    // Get current wheel electical RPMs (don't account for pole pairs)
+    double front_right_velocity =
+        static_cast<double>(tmc4671_getActualVelocity(FRONT_RIGHT_MOTOR_CHIP_SELECT)) *
+        MECHANICAL_MPS_PER_ELECTRICAL_RPM;
+    double front_left_velocity =
+        static_cast<double>(tmc4671_getActualVelocity(FRONT_LEFT_MOTOR_CHIP_SELECT)) *
+        MECHANICAL_MPS_PER_ELECTRICAL_RPM;
+    double back_right_velocity =
+        static_cast<double>(tmc4671_getActualVelocity(BACK_RIGHT_MOTOR_CHIP_SELECT)) *
+        MECHANICAL_MPS_PER_ELECTRICAL_RPM;
+    double back_left_velocity =
+        static_cast<double>(tmc4671_getActualVelocity(BACK_LEFT_MOTOR_CHIP_SELECT)) *
+        MECHANICAL_MPS_PER_ELECTRICAL_RPM;
 
-    WheelSpace_t current_wheel_speeds = {
-        static_cast<double>(front_left_rpm), static_cast<double>(front_right_rpm),
-        static_cast<double>(back_left_rpm), static_cast<double>(back_right_rpm)};
+    motor_status.mutable_front_right()->set_wheel_velocity(
+        static_cast<float>(front_right_velocity));
+    motor_status.mutable_front_left()->set_wheel_velocity(
+        static_cast<float>(front_left_velocity));
+    motor_status.mutable_back_left()->set_wheel_velocity(
+        static_cast<float>(back_left_velocity));
+    motor_status.mutable_back_right()->set_wheel_velocity(
+        static_cast<float>(back_right_velocity));
 
-    motor_status.mutable_front_right()->set_wheel_rpm(front_right_rpm);
-    motor_status.mutable_front_left()->set_wheel_rpm(front_left_rpm);
-    motor_status.mutable_back_left()->set_wheel_rpm(back_left_rpm);
-    motor_status.mutable_back_right()->set_wheel_rpm(back_right_rpm);
+    // TODO debug why this doesn't work
+    WheelSpace_t current_wheel_velocities = {0.0, 0.0, 0.0, 0.0};
 
+    // Convert to euclidean space
     EuclideanSpace_t current_euclidean_velocity =
-        euclidean_to_four_wheel.getEuclideanVelocity(current_wheel_speeds);
+        euclidean_to_four_wheel.getEuclideanVelocity(current_wheel_velocities);
 
     motor_status.mutable_local_velocity()->set_x_component_meters(
         static_cast<float>(current_euclidean_velocity[0]));
     motor_status.mutable_local_velocity()->set_y_component_meters(
         static_cast<float>(current_euclidean_velocity[1]));
 
+    WheelSpace_t target_wheel_velocities = {0.0, 0.0, 0.0, 0.0};
+    int target_dribbler_rpm              = motor.dribbler_speed_rpm();
+
     switch (motor.drive_control_case())
     {
         case TbotsProto::MotorControl::DriveControlCase::kDirectPerWheelControl:
         {
-            double target_front_left_velocity =
-                rampVelocity(electricalRpmToWheelVelocity(static_cast<int>(motor.direct_per_wheel_control().front_left_wheel_rpm())), electricalRpmToWheelVelocity(front_left_rpm), time_elapsed_since_last_poll_s);
-            double target_front_right_velocity =
-                rampVelocity(electricalRpmToWheelVelocity(static_cast<int>(motor.direct_per_wheel_control().front_right_wheel_rpm())), electricalRpmToWheelVelocity(front_right_rpm), time_elapsed_since_last_poll_s);
-            double target_back_left_velocity =
-                rampVelocity(electricalRpmToWheelVelocity(static_cast<int>(motor.direct_per_wheel_control().back_left_wheel_rpm())), electricalRpmToWheelVelocity(back_left_rpm), time_elapsed_since_last_poll_s);
-            double target_back_right_velocity =
-                rampVelocity(electricalRpmToWheelVelocity(static_cast<int>(motor.direct_per_wheel_control().back_right_wheel_rpm())), electricalRpmToWheelVelocity(back_right_rpm), time_elapsed_since_last_poll_s);
-
-            tmc4671_setTargetVelocity(
-                    FRONT_LEFT_MOTOR_CHIP_SELECT,
-                    wheelVelocityToElectricalRpm(target_front_left_velocity));
-            tmc4671_setTargetVelocity(
-                    FRONT_RIGHT_MOTOR_CHIP_SELECT,
-                    wheelVelocityToElectricalRpm(target_front_right_velocity));
-            tmc4671_setTargetVelocity(
-                    BACK_LEFT_MOTOR_CHIP_SELECT,
-                    wheelVelocityToElectricalRpm(target_back_left_velocity));
-            tmc4671_setTargetVelocity(
-                    BACK_RIGHT_MOTOR_CHIP_SELECT,
-                    wheelVelocityToElectricalRpm(target_back_right_velocity));
-            tmc4671_setTargetVelocity(DRIBBLER_MOTOR_CHIP_SELECT,
-                                      static_cast<int>(motor.dribbler_speed_rpm()));
+            target_wheel_velocities = {
+                motor.direct_per_wheel_control().front_right_wheel_velocity(),
+                motor.direct_per_wheel_control().front_left_wheel_velocity(),
+                motor.direct_per_wheel_control().back_left_wheel_velocity(),
+                motor.direct_per_wheel_control().back_right_wheel_velocity()};
 
             break;
         }
@@ -342,36 +317,42 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
                 motor.direct_velocity_control().angular_velocity().radians_per_second(),
             };
 
-            // This is a linear transformation, we don't need to convert to/from
-            // RPM to MPS
-            WheelSpace_t target_speeds = euclidean_to_four_wheel.getTargetWheelSpeeds(
-                target_euclidean_velocity, current_wheel_speeds);
-
-            tmc4671_setTargetVelocity(
-                FRONT_RIGHT_MOTOR_CHIP_SELECT,
-		wheelVelocityToElectricalRpm(target_speeds[0]));
-            tmc4671_setTargetVelocity(
-                FRONT_LEFT_MOTOR_CHIP_SELECT,
-		wheelVelocityToElectricalRpm(target_speeds[1]));
-            tmc4671_setTargetVelocity(
-                BACK_LEFT_MOTOR_CHIP_SELECT,
-		wheelVelocityToElectricalRpm(target_speeds[2]));
-            tmc4671_setTargetVelocity(
-                BACK_RIGHT_MOTOR_CHIP_SELECT,
-		wheelVelocityToElectricalRpm(target_speeds[3]));
-
-            tmc4671_setTargetVelocity(
-                DRIBBLER_MOTOR_CHIP_SELECT,
-		dribblerVelocityToElectricalRpm(motor.dribbler_speed_rpm()));
+            target_wheel_velocities = euclidean_to_four_wheel.getTargetWheelSpeeds(
+                target_euclidean_velocity, current_wheel_velocities);
 
             break;
         }
 
         case TbotsProto::MotorControl::DriveControlCase::DRIVE_CONTROL_NOT_SET:
         {
-            LOG(WARNING) << "Motor service polled with an empty DirectControlPrimitive";
+            target_wheel_velocities = {0.0, 0.0, 0.0, 0.0};
+            target_dribbler_rpm     = 0;
+
             break;
         }
+    }
+
+    // This order needs to match euclidean_to_four_wheel converters order
+    // We also want to work in the meters per second space rather than electrical RPMs
+    current_wheel_velocities = {front_right_velocity, front_left_velocity,
+        back_left_velocity, back_right_velocity};
+
+    LOG(DEBUG) << target_wheel_velocities;
+
+    // Set target speeds accounting for acceleration
+    setTargetRampVelocity(FRONT_RIGHT_MOTOR_CHIP_SELECT, target_wheel_velocities[0],
+                          current_wheel_velocities[0], time_elapsed_since_last_poll_s);
+    setTargetRampVelocity(FRONT_LEFT_MOTOR_CHIP_SELECT, target_wheel_velocities[1],
+                          current_wheel_velocities[1], time_elapsed_since_last_poll_s);
+    setTargetRampVelocity(BACK_LEFT_MOTOR_CHIP_SELECT, target_wheel_velocities[2],
+                          current_wheel_velocities[2], time_elapsed_since_last_poll_s);
+    setTargetRampVelocity(BACK_RIGHT_MOTOR_CHIP_SELECT, target_wheel_velocities[3],
+                          current_wheel_velocities[3], time_elapsed_since_last_poll_s);
+
+    if (previous_dribbler_rpm != target_dribbler_rpm)
+    {
+        tmc4671_setTargetVelocity(DRIBBLER_MOTOR_CHIP_SELECT, target_dribbler_rpm);
+        previous_dribbler_rpm = target_dribbler_rpm;
     }
 
     // Toggle Hearbeat
@@ -409,21 +390,27 @@ void MotorService::spiTransfer(int fd, uint8_t const* tx, uint8_t const* rx, uns
                     << strerror(errno);
 }
 
-double MotorService::rampVelocity(double velocity_target, double velocity_current,
-                                  double time_ramp)
+void MotorService::setTargetRampVelocity(uint8_t motor, double velocity_target,
+                                         double velocity_current, double time_to_ramp)
 {
     // Calculate velocity delta using kinematic equation: dv = a*t
-    double velocity_delta = robot_constants_.robot_max_acceleration_m_per_s_2 * time_ramp;
-    double ramp_velocity  = 0;
-    double wiggle_room = 0.1;
+    double velocity_delta =
+        robot_constants_.robot_max_acceleration_m_per_s_2 * time_to_ramp;
+
+    // Trinamics PID control is far more accurate than the delayed velocity input we
+    // receive. If we set the ramp velocity with no hysterisis, we will end up not
+    // converging at the target velocity. Allowing 5cm/s of error was experimentally
+    // determined to be sufficient for smooth operation.
+    double velocity_error = 0.05;
+    double ramp_velocity  = 0.0;
 
     // Case: accelerating
-    if (velocity_target > velocity_current + velocity_delta + wiggle_room)
+    if (velocity_target > velocity_current + velocity_delta + velocity_error)
     {
         ramp_velocity = velocity_current + velocity_delta;
     }
     // Case: deccelerating
-    else if (velocity_target < velocity_current - velocity_delta - wiggle_room)
+    else if (velocity_target < velocity_current - velocity_delta - velocity_error)
     {
         ramp_velocity = velocity_current - velocity_delta;
     }
@@ -433,34 +420,11 @@ double MotorService::rampVelocity(double velocity_target, double velocity_curren
         ramp_velocity = velocity_target;
     }
 
-    // if(std::abs(ramp_velocity) > robot_constants_.robot_max_speed_m_per_s)
-    //{
-    // ramp_velocity = std::copysign(robot_constants_.robot_max_speed_m_per_s,
-    // ramp_velocity);
-    //}
-
-    return ramp_velocity;
+    tmc4671_setTargetVelocity(
+        motor, static_cast<int>(ramp_velocity * ELECTRICAL_RPM_PER_MECHANICAL_MPS));
 }
 
-double MotorService::electricalRpmToWheelVelocity(int electrical_rpm)
-{
-	return MECHANICAL_MPS_PER_ELECTRICAL_RPM * static_cast<double>(electrical_rpm);
-}
 
-int MotorService::wheelVelocityToElectricalRpm(double wheel_velocity)
-{
-	return static_cast<int>(wheel_velocity / MECHANICAL_MPS_PER_ELECTRICAL_RPM);
-}
-
-double MotorService::electricalRpmToDribblerVelocity(int electrical_rpm)
-{
-	return static_cast<double>(electrical_rpm) / 5.31;
-}
-
-int MotorService::dribblerVelocityToElectricalRpm(double dribbler_velocity)
-{
-	return static_cast<int>(dribbler_velocity * 5.31);
-}
 
 // Both the TMC4671 (the controller) and the TMC6100 (the driver) respect
 // the same SPI interface. So when we bind the API, we can use the same
@@ -634,6 +598,7 @@ void MotorService::writeToControllerOrDieTrying(uint8_t motor, uint8_t address,
 
 void MotorService::configurePWM(uint8_t motor)
 {
+    LOG(INFO) << "Configuring PWM for motor " << static_cast<uint32_t>(motor);
     // Please read the header file and the datasheet for more info
     writeToControllerOrDieTrying(motor, TMC4671_PWM_POLARITIES, 0x00000000);
     writeToControllerOrDieTrying(motor, TMC4671_PWM_MAXCNT, 0x00000F9F);
@@ -643,6 +608,7 @@ void MotorService::configurePWM(uint8_t motor)
 
 void MotorService::configureDrivePI(uint8_t motor)
 {
+    LOG(INFO) << "Configuring Drive PI for motor " << static_cast<uint32_t>(motor);
     // Please read the header file and the datasheet for more info
     // These values were calibrated using the TMC-IDE
     writeToControllerOrDieTrying(motor, TMC4671_PID_FLUX_P_FLUX_I, 67109376);
@@ -660,6 +626,7 @@ void MotorService::configureDrivePI(uint8_t motor)
 
 void MotorService::configureDribblerPI(uint8_t motor)
 {
+    LOG(INFO) << "Configuring Dribbler PI for motor " << static_cast<uint32_t>(motor);
     // Please read the header file and the datasheet for more info
     // These values were calibrated using the TMC-IDE
     writeToControllerOrDieTrying(motor, TMC4671_PID_FLUX_P_FLUX_I, 39333600);
@@ -679,6 +646,7 @@ void MotorService::configureDribblerPI(uint8_t motor)
 
 void MotorService::configureADC(uint8_t motor)
 {
+    LOG(INFO) << "Configuring ADC for motor " << static_cast<uint32_t>(motor);
     // ADC configuration
     writeToControllerOrDieTrying(motor, TMC4671_ADC_I_SELECT, 0x18000100);
     writeToControllerOrDieTrying(motor, TMC4671_dsADC_MDEC_B_MDEC_A, 0x014E014E);
@@ -698,6 +666,7 @@ void MotorService::configureADC(uint8_t motor)
 
 void MotorService::configureEncoder(uint8_t motor)
 {
+    LOG(INFO) << "Configuring Encoder for motor " << static_cast<uint32_t>(motor);
     // ABN encoder settings
     writeToControllerOrDieTrying(motor, TMC4671_ABN_DECODER_MODE, 0x00000000);
     writeToControllerOrDieTrying(motor, TMC4671_ABN_DECODER_PPR, 0x00001000);
@@ -705,6 +674,7 @@ void MotorService::configureEncoder(uint8_t motor)
 
 void MotorService::configureHall(uint8_t motor)
 {
+    LOG(INFO) << "Configuring Hall for motor " << static_cast<uint32_t>(motor);
     // Digital hall settings
     writeToControllerOrDieTrying(motor, TMC4671_HALL_MODE, 0x00000000);
     writeToControllerOrDieTrying(motor, TMC4671_HALL_PHI_E_PHI_M_OFFSET, 0x00000000);

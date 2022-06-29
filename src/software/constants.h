@@ -44,3 +44,6 @@ static const double BALL_TO_FRONT_OF_ROBOT_DISTANCE_WHEN_DRIBBLING =
 const std::string ROBOT_ID_REDIS_KEY                = "/robot_id";
 const std::string ROBOT_MULTICAST_CHANNEL_REDIS_KEY = "/multicast_channel";
 const std::string ROBOT_NETWORK_INTERFACE_REDIS_KEY = "/network_interface";
+
+const std::string SSL_ADDRESS          = "224.5.23.2";
+static constexpr unsigned int SSL_PORT = 10020;

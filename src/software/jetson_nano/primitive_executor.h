@@ -29,6 +29,11 @@ class PrimitiveExecutor
                             const TbotsProto::PrimitiveSet& primitive_set_msg);
 
     /**
+     * Clear the current primitive
+     **/
+    void clearCurrentPrimitive();
+
+    /**
      * Update primitive executor with a new World
      * @param world_msg Protobuf representation of the current World (World from the
      * perspective of the team which the robot with this Primitive Executor is a member

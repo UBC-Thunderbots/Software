@@ -51,11 +51,13 @@ void Thunderloop::runLoop()
     struct timespec poll_time;
     struct timespec iteration_time;
     struct timespec last_primitive_received_time;
+    struct timespec current_time;
 
     // Input buffer
     TbotsProto::PrimitiveSet new_primitive_set;
     TbotsProto::World new_world;
     TbotsProto::EstopPrimitive emergency_stop_override;
+    const TbotsProto::PrimitiveSet empty_primitive_set;
 
     // Loop interval
     int interval =
@@ -71,6 +73,11 @@ void Thunderloop::runLoop()
         {
             redis_client_->set("/battery_voltage",
                                std::to_string(power_status_.battery_voltage()));
+            redis_client_->set("/cap_voltage",
+                               std::to_string(power_status_.capacitor_voltage()));
+            redis_client_->set("/current_draw",
+                               std::to_string(power_status_.current_draw()));
+
             // Wait until next shot
             //
             // Note: CLOCK_MONOTONIC is used over CLOCK_REALTIME since
@@ -125,7 +132,7 @@ void Thunderloop::runLoop()
 
             // If the primitive msg is new, update the internal buffer
             // and start the new primitive.
-            if (new_primitive_set.time_sent().epoch_timestamp_seconds() >=
+            if (new_primitive_set.time_sent().epoch_timestamp_seconds() >
                 primitive_set_.time_sent().epoch_timestamp_seconds())
             {
                 // Save new primitive set
@@ -160,8 +167,10 @@ void Thunderloop::runLoop()
 
                 // Handle emergency stop override
                 struct timespec result;
-                ScopedTimespecTimer::timespecDiff(&poll_time,
-                                                  &last_primitive_received_time, &result);
+
+                clock_gettime(CLOCK_MONOTONIC, &current_time);
+                ScopedTimespecTimer::timespecDiff(&current_time,
+                        &last_primitive_received_time, &result);
 
                 auto nanoseconds_elapsed_since_last_primitive =
                     result.tv_sec * static_cast<int>(NANOSECONDS_PER_SECOND) +
@@ -172,8 +181,7 @@ void Thunderloop::runLoop()
                 if (nanoseconds_elapsed_since_last_primitive >
                     static_cast<long>(PRIMITIVE_MANAGER_TIMEOUT_NS))
                 {
-                    primitive_.Clear();
-                    *(primitive_.mutable_estop()) = emergency_stop_override;
+                    primitive_executor_.clearCurrentPrimitive();
                 }
 
                 direct_control_ = *primitive_executor_.stepPrimitive(

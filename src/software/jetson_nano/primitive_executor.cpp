@@ -30,6 +30,11 @@ void PrimitiveExecutor::updatePrimitiveSet(
     }
 }
 
+void PrimitiveExecutor::clearCurrentPrimitive()
+{
+    current_primitive_.Clear();
+}
+
 void PrimitiveExecutor::updateWorld(const TbotsProto::World& world_msg)
 {
     hrvo_simulator_.updateWorld(World(world_msg));
