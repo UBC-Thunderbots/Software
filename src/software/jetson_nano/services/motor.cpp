@@ -26,7 +26,7 @@ extern "C"
 }
 
 // SPI Configs
-static const uint32_t SPI_SPEED_HZ    = 2000000;  // 2 Mhz
+static const uint32_t SPI_SPEED_HZ    = 500000;  // 2 Mhz
 static const uint8_t SPI_BITS         = 8;
 static const uint32_t SPI_MODE        = 0x3u;
 static const uint32_t NUM_RETRIES_SPI = 3;
@@ -317,6 +317,11 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
                 motor.direct_velocity_control().angular_velocity().radians_per_second(),
             };
 
+            LOG(DEBUG) <<
+                "x: " << target_euclidean_velocity[0] << "," <<
+                "y: " << target_euclidean_velocity[1] << "," <<
+                "w: " << target_euclidean_velocity[2];
+
             target_wheel_velocities = euclidean_to_four_wheel.getTargetWheelSpeeds(
                 target_euclidean_velocity, current_wheel_velocities);
 
@@ -336,8 +341,6 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
     // We also want to work in the meters per second space rather than electrical RPMs
     current_wheel_velocities = {front_right_velocity, front_left_velocity,
         back_left_velocity, back_right_velocity};
-
-    LOG(DEBUG) << target_wheel_velocities;
 
     // Set target speeds accounting for acceleration
     setTargetRampVelocity(FRONT_RIGHT_MOTOR_CHIP_SELECT, target_wheel_velocities[0],

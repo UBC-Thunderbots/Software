@@ -88,12 +88,14 @@ class RobotCommunication(object):
 
                 # Send the world
                 world = self.world_buffer.get(block=True)
-                self.world_mcast_sender.send(world)
+                self.send_world.send_proto(world)
 
                 # Send the primitive set
                 primitive_set = self.primitive_buffer.get(block=False)
+                print("ASD")
 
                 if self.estop_reader.isEstopPlay():
+                    print("sending proto")
                     self.send_primitive_set.send_proto(primitive_set)
 
             else:
@@ -118,7 +120,6 @@ class RobotCommunication(object):
 
                 if self.estop_reader.isEstopPlay():
                     self.send_primitive_set.send_proto(primitive_set)
-                    print(primitive_set)
 
                 time.sleep(0.01)
 
@@ -145,16 +146,12 @@ class RobotCommunication(object):
         for RobotStatus and multicast senders for World and PrimitiveSet
 
         """
-        # Create the multicast channels
+        # Create the multicast listeners
         self.receive_robot_status = RobotStatusProtoListener(
             self.multicast_channel + "%" + self.interface,
             ROBOT_STATUS_PORT,
             lambda data: self.full_system_proto_unix_io.send_proto(RobotStatus, data),
             True,
-        )
-
-        self.send_primitive_mcast_sender = PrimitiveSetProtoSender(
-            self.multicast_channel + "%" + self.interface, PRIMITIVE_PORT, True
         )
 
         self.receive_robot_log = RobotLogProtoListener(
@@ -164,6 +161,16 @@ class RobotCommunication(object):
             True,
         )
 
+        self.receive_ssl_wrapper = SSLWrapperPacketProtoListener(
+            SSL_ADDRESS,
+            SSL_PORT,
+            lambda data: self.full_system_proto_unix_io.send_proto(
+                SSL_WrapperPacket, data
+            ),
+            True,
+        )
+
+        # Create multicast senders
         self.send_primitive_set = PrimitiveSetProtoSender(
             self.multicast_channel + "%" + self.interface, PRIMITIVE_PORT, True
         )
@@ -172,8 +179,7 @@ class RobotCommunication(object):
             self.multicast_channel + "%" + self.interface, VISION_PORT, True
         )
 
-        self.disconnect_fullsystem_from_robots()
-        self.connect_robot_to_diagnostics(3)
+        self.connect_fullsystem_to_robots()
 
         self.send_estop_state_thread.start()
         self.run_thread.start()
