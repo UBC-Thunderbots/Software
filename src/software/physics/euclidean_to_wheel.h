@@ -36,12 +36,20 @@ class EuclideanToWheel
     explicit EuclideanToWheel(const RobotConstants_t &robot_constants);
 
     /**
-     * Gets wheel velocity targets from the desired Euclidean velocity.
+     * Gets the wheel velocity from the Euclidean velocity.
      *
-     * @param target_euclidean_velocity The target Euclidean velocity.
+     * @param euclidean_velocity The Euclidean velocity.
      * @return The equivalent wheel speeds.
      */
-    WheelSpace_t getTargetWheelSpeeds(const EuclideanSpace_t &target_euclidean_velocity);
+    WheelSpace_t getWheelVelocity(const EuclideanSpace_t &euclidean_velocity);
+
+    /**
+     * Gets the Euclidean velocity from the wheel velocity.
+     *
+     * @param wheel_velocity The wheel velocity.
+     * @return The equivalent Euclidean velocity.
+     */
+    EuclideanSpace_t getEuclideanVelocity(const WheelSpace_t &wheel_velocity);
 
    private:
     /**
@@ -61,4 +69,11 @@ class EuclideanToWheel
      * ref: http://robocup.mi.fu-berlin.de/buch/omnidrive.pdf pg 16
      */
     Eigen::Matrix<double, 4, 3> euclidean_to_wheel_velocity_D;
+    
+    /**
+     * Wheel velocity to Euclidean velocity coupling matrix.
+     *
+     * ref: http://robocup.mi.fu-berlin.de/buch/omnidrive.pdf pg 16
+     */
+    Eigen::Matrix<double, 3, 4> wheel_to_euclidean_velocity_D_inverse;
 };
