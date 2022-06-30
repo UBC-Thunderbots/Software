@@ -26,7 +26,9 @@ extern "C"
 }
 
 // SPI Configs
-static const uint32_t SPI_SPEED_HZ    = 500000;  // 2 Mhz
+static const uint32_t SPI_SPEED_HZ    = 2000000;  // 2 Mhz
+static const uint32_t TMC6100_SPI_SPEED    = 1000000;  // 1 Mhz
+static const uint32_t TMC4671_SPI_SPEED    = 2000000;  // 1 Mhz
 static const uint8_t SPI_BITS         = 8;
 static const uint32_t SPI_MODE        = 0x3u;
 static const uint32_t NUM_RETRIES_SPI = 3;
@@ -148,6 +150,31 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
     startDriver(DRIBBLER_MOTOR_CHIP_SELECT);
     checkDriverFault(DRIBBLER_MOTOR_CHIP_SELECT);
     startController(DRIBBLER_MOTOR_CHIP_SELECT, true);
+
+    // Increment motor speeds by 450 over 20 cycles to test ramping
+    LOG(DEBUG) << "STARTING TEST MOTOR SPEEDS";
+    for (uint8_t motor = 0; motor < 1; motor++)
+    {
+        for (int i = 0; i < 800; i++)
+        {
+            tmc4671_setTargetVelocity(0, 500 * i);
+            tmc4671_setTargetVelocity(1, 500 * i);
+            tmc4671_setTargetVelocity(2, 500 * i);
+            tmc4671_setTargetVelocity(3, 500 * i);
+            usleep(MICROSECONDS_PER_MILLISECOND * 2.0);
+        }
+        for (int i = 80; i >= 0; i--)
+        {
+            tmc4671_setTargetVelocity(0, 500 * i);
+            tmc4671_setTargetVelocity(1, 500 * i);
+            tmc4671_setTargetVelocity(2, 500 * i);
+            tmc4671_setTargetVelocity(3, 500 * i);
+            usleep(MICROSECONDS_PER_MILLISECOND * 2.0);
+        }
+    }   
+    LOG(DEBUG) << "END TEST MOTOR SPEEDS";
+
+    //sleep(50);
 }
 
 MotorService::~MotorService() {}
@@ -373,7 +400,7 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
     return motor_status;
 }
 
-void MotorService::spiTransfer(int fd, uint8_t const* tx, uint8_t const* rx, unsigned len)
+void MotorService::spiTransfer(int fd, uint8_t const* tx, uint8_t const* rx, unsigned len, uint32_t spi_speed)
 {
     int ret;
 
@@ -384,7 +411,7 @@ void MotorService::spiTransfer(int fd, uint8_t const* tx, uint8_t const* rx, uns
     tr[0].rx_buf        = (unsigned long)rx;
     tr[0].len           = len;
     tr[0].delay_usecs   = 0;
-    tr[0].speed_hz      = SPI_SPEED_HZ;
+    tr[0].speed_hz      = spi_speed;
     tr[0].bits_per_word = 8;
 
     ret = ioctl(fd, SPI_IOC_MESSAGE(1), &tr);
@@ -393,7 +420,7 @@ void MotorService::spiTransfer(int fd, uint8_t const* tx, uint8_t const* rx, uns
                     << strerror(errno);
 }
 
-void MotorService::setTargetRampVelocity(uint8_t motor, double velocity_target,
+inline void MotorService::setTargetRampVelocity(uint8_t motor, double velocity_target,
                                          double velocity_current, double time_to_ramp)
 {
     // Calculate velocity delta using kinematic equation: dv = a*t
@@ -423,8 +450,7 @@ void MotorService::setTargetRampVelocity(uint8_t motor, double velocity_target,
         ramp_velocity = velocity_target;
     }
 
-    tmc4671_setTargetVelocity(
-        motor, static_cast<int>(ramp_velocity * ELECTRICAL_RPM_PER_MECHANICAL_MPS));
+    tmc4671_writeInt(motor, TMC4671_PID_VELOCITY_TARGET, static_cast<int>(ramp_velocity * ELECTRICAL_RPM_PER_MECHANICAL_MPS));
 }
 
 
@@ -468,7 +494,7 @@ uint8_t MotorService::tmc4671ReadWriteByte(uint8_t motor, uint8_t data,
 {
     spi_demux_select_0.setValue(GpioState::HIGH);
     spi_demux_select_1.setValue(GpioState::LOW);
-    return readWriteByte(motor, data, last_transfer);
+    return readWriteByte(motor, data, last_transfer, TMC4671_SPI_SPEED);
 }
 
 uint8_t MotorService::tmc6100ReadWriteByte(uint8_t motor, uint8_t data,
@@ -476,10 +502,10 @@ uint8_t MotorService::tmc6100ReadWriteByte(uint8_t motor, uint8_t data,
 {
     spi_demux_select_0.setValue(GpioState::LOW);
     spi_demux_select_1.setValue(GpioState::HIGH);
-    return readWriteByte(motor, data, last_transfer);
+    return readWriteByte(motor, data, last_transfer, TMC6100_SPI_SPEED);
 }
 
-uint8_t MotorService::readWriteByte(uint8_t motor, uint8_t data, uint8_t last_transfer)
+uint8_t MotorService::readWriteByte(uint8_t motor, uint8_t data, uint8_t last_transfer, uint32_t spi_speed)
 {
     uint8_t ret_byte = 0;
 
@@ -501,7 +527,7 @@ uint8_t MotorService::readWriteByte(uint8_t motor, uint8_t data, uint8_t last_tr
             // The first byte should contain the address on a read operation.
             // Trigger a transfer (1 byte) and buffer the response (4 bytes)
             tx[position] = data;
-            spiTransfer(file_descriptors[motor], tx, rx, 5);
+            spiTransfer(file_descriptors[motor], tx, rx, 5, spi_speed);
 
             currently_reading = true;
             currently_writing = false;
@@ -527,7 +553,7 @@ uint8_t MotorService::readWriteByte(uint8_t motor, uint8_t data, uint8_t last_tr
     {
         // we have all the bytes for this transfer, lets trigger the transfer and
         // reset state
-        spiTransfer(file_descriptors[motor], tx, rx, 5);
+        spiTransfer(file_descriptors[motor], tx, rx, 5, spi_speed);
         transfer_started = false;
     }
 
@@ -624,7 +650,10 @@ void MotorService::configureDrivePI(uint8_t motor)
     writeToControllerOrDieTrying(motor, TMC4671_PIDOUT_UQ_UD_LIMITS, 32767);
     writeToControllerOrDieTrying(motor, TMC4671_PID_TORQUE_FLUX_LIMITS, 5000);
     writeToControllerOrDieTrying(motor, TMC4671_PID_ACCELERATION_LIMIT, 1000);
+
     writeToControllerOrDieTrying(motor, TMC4671_PID_VELOCITY_LIMIT, 45000);
+
+    tmc4671_switchToMotionMode(motor, TMC4671_MOTION_MODE_VELOCITY);
 }
 
 void MotorService::configureDribblerPI(uint8_t motor)
