@@ -37,6 +37,7 @@ from software.thunderscope.robot_communication import RobotCommunication
 from software.thunderscope.arbitrary_plot.named_value_plotter import NamedValuePlotter
 from software.thunderscope.binary_context_managers import *
 from extlibs.er_force_sim.src.protobuf.world_pb2 import *
+from software.thunderscope.dock_label_style import *
 
 # Import Widgets
 from software.thunderscope.field import (
@@ -46,6 +47,7 @@ from software.thunderscope.field import (
     simulator_layer,
     world_layer,
     passing_layer,
+    hrvo_layer,
 )
 
 from software.thunderscope.common.proto_configuration_widget import (
@@ -420,6 +422,15 @@ class Thunderscope(object):
         field.add_layer("Validation", validation)
         field.add_layer("Passing", passing)
         field.add_layer("Simulator", sim_state)
+        hrvo_sim_states = []
+        # Add HRVO layers to field widget and have them hidden on startup
+        # TODO (#2655): Add/Remove HRVO layers dynamically based on the HRVOVisualization proto messages
+        for robot_id in range(6):
+            hrvo_sim_state = hrvo_layer.HRVOLayer(
+                robot_id, self.visualization_buffer_size
+            )
+            hrvo_sim_states.append(hrvo_sim_state)
+            field.add_layer(f"HRVO {robot_id}", hrvo_sim_state, False)
 
         # Register observers
         sim_proto_unix_io.register_observer(
@@ -435,6 +446,9 @@ class Thunderscope(object):
             (PassVisualization, passing.pass_visualization_buffer),
             (ValidationProtoSet, validation.validation_set_buffer),
             (SimulatorState, sim_state.simulator_state_buffer),
+        ] + [
+            (HRVOVisualization, hrvo_sim_state.hrvo_buffer)
+            for hrvo_sim_state in hrvo_sim_states
         ]:
             full_system_proto_unix_io.register_observer(*arg)
 

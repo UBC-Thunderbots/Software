@@ -103,7 +103,7 @@ TEST(RedisImplTests, DISABLED_redis_client_get_and_set_impl_test)
     {
         redis.set(std::to_string(i), "test_value_new");
         auto reply = redis.get(std::to_string(i));
-        ASSERT_EQ(reply.as_string(), "test_value_new");
+        ASSERT_EQ(reply, "test_value_new");
     }
 
     auto end                                      = std::chrono::system_clock::now();

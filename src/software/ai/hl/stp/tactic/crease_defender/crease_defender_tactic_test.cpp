@@ -26,15 +26,15 @@ class CreaseDefenderTacticTest
     TbotsProto::AiConfig ai_config;
 };
 
-// TODO (#2512): Due to friction in ErForceSim, the ball does not reach defender
-TEST_F(CreaseDefenderTacticTest, DISABLED_test_chip_ball)
+TEST_F(CreaseDefenderTacticTest, test_chip_ball)
 {
-    Point enemy_threat_point = Point(-1.5, 0.5);
+    Point enemy_threat_point = Point(-0.5, 0);
     TbotsProto::CreaseDefenderAlignment alignment =
         TbotsProto::CreaseDefenderAlignment::CENTRE;
 
-    Point initial_position = Point(-3, 1.5);
-    BallState ball_state(enemy_threat_point, Vector(-2, 0));
+    Point initial_position = Point(-3, 1.0);
+
+    BallState ball_state(enemy_threat_point, Vector(-2.5, 0));
     auto friendly_robots =
         TestUtil::createStationaryRobotStatesWithId({initial_position});
     auto enemy_robots = TestUtil::createStationaryRobotStatesWithId(
@@ -62,7 +62,7 @@ TEST_F(CreaseDefenderTacticTest, DISABLED_test_chip_ball)
 
     runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(10));
+            Duration::fromSeconds(5));
 }
 
 TEST_F(CreaseDefenderTacticTest, test_not_bumping_ball_towards_net)

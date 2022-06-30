@@ -29,9 +29,18 @@
 #include "extlibs/er_force_sim/src/protobuf/sslsim.h"
 #include "simfield.h"
 
-static const float BALL_RADIUS       = 0.0215f;
-static const float BALL_MASS         = 0.046f;
-static const float BALL_DECELERATION = 0.5f;
+static const float BALL_RADIUS = 0.0215f;
+static const float BALL_MASS   = 0.046f;
+
+// these values are set in coordination with other objects the ball will collide with.
+// the resulting coefficient of friction is the product of both objects friction value.
+static constexpr float BALL_SLIDING_FRICTION = 1.f;
+static constexpr float BALL_RESTITUTION      = 1.f;
+
+static constexpr float BALL_ROLLING_FRICTION_DECELERATION = 0.5;
+static constexpr float FRICTION_TRANSITION_FACTOR         = 5.0 / 7.0;
+static constexpr float STATIONARY_BALL_SPEED              = 0.01;
+
 
 class RNG;
 namespace SSLProto
@@ -61,7 +70,12 @@ class camun::simulator::SimBall : public QObject
     void sendSSLSimError(const SSLSimError &error, ErrorSource s);
 
    public:
-    void begin();
+    /**
+     * processes velocity and forces to be applied on the ball
+     * @param robot_collision whether the ball collides with a robot in this simulation
+     * tick
+     */
+    void begin(bool robot_collision);
     bool update(SSLProto::SSL_DetectionBall *ball, float stddev, float stddevArea,
                 const btVector3 &cameraPosition, bool enableInvisibleBall,
                 float visibilityThreshold, btVector3 positionOffset);
@@ -91,6 +105,17 @@ class camun::simulator::SimBall : public QObject
     btRigidBody *m_body;
     btMotionState *m_motionState;
     sslsim::TeleportBall m_move;
+    double rolling_speed;
+    bool set_transition_speed;
+
+    enum BallState
+    {
+        STATIONARY,
+        ROBOT_COLLISION,
+        SLIDING,
+        ROLLING
+    };
+    BallState current_ball_state;
 };
 
 #endif  // SIMBALL_H
