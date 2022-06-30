@@ -48,8 +48,8 @@ AllPasses findAllPasses(const Robot& robot, const Team& friendly_team,
     robot_obstacles.erase(remove(robot_obstacles.begin(), robot_obstacles.end(), robot));
 
     std::vector<Circle> obstacles = getObstacles(robot_obstacles, radius);
-    std::vector<Point> direct_passes;
-    std::vector<Point> indirect_passes;
+    std::vector<Robot> direct_passes;
+    std::vector<Robot> indirect_passes;
     for (const Robot& open_robot : open_robots)
     {
         Circle obstacle = getObstacle(open_robot, radius);
@@ -60,11 +60,11 @@ AllPasses findAllPasses(const Robot& robot, const Team& friendly_team,
                             return intersects(possible_pass, obstacle);
                         }))
         {
-            indirect_passes.push_back(open_robot.position());
+            indirect_passes.push_back(open_robot);
         }
         else
         {
-            direct_passes.push_back(open_robot.position());
+            direct_passes.push_back(open_robot);
         }
         obstacles.push_back(obstacle);
     }

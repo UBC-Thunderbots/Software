@@ -10,15 +10,15 @@
 
 struct AllPasses
 {
-    // A vector containing end positions of all indirect passes to open robots on the
-    // friendly_team, a indirect pass is a pass where there is an obstacle between the
-    // robot and end position
-    std::vector<Point> direct_passes;
+    // A vector containing the receiving robots of all indirect passes to open robots on
+    // the friendly_team, a indirect pass is a pass where there is an obstacle between the
+    // passing and receiving robots
+    std::vector<Robot> direct_passes;
 
-    // A vector containing end positions of all direct passes to open robots on the
-    // friendly_team, a direct pass is a pass where there is no obstacle between the robot
-    // and end position
-    std::vector<Point> indirect_passes;
+    // A vector containing receiving robots of all direct passes to open robots on the
+    // friendly_team, a direct pass is a pass where there is no obstacle between the
+    // passing and receiving robots
+    std::vector<Robot> indirect_passes;
 };
 
 
@@ -26,14 +26,13 @@ struct AllPasses
 /**
  * Finds all direct and indirect passes to open robots.
  *
- * @param robot The robot with possession of the ball
+ * @param robot The robot that could take the passes
  * @param friendly_team The same team of the robot with the possession of the ball
  * @param enemy_team The opposing team of the robot with the possession of the ball
  * @param radius The radius around a robot to be treated as an obstacle
  *
- * @return A vector containing end positions of all direct passes to open robots on the
- * friendly_team, a direct pass is a pass where there is no obstacle between the robot and
- * end position
+ * @return A vector containing receiving robots of all direct and indirect passes to open
+ * robots on the friendly_team
  */
 AllPasses findAllPasses(const Robot& robot, const Team& friendly_team,
                         const Team& enemy_team,
