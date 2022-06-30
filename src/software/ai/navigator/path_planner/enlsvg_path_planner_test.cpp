@@ -109,8 +109,8 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_blocked_src)
     EXPECT_TRUE(path != std::nullopt);
 
     // Make sure the start and end of the path are correct
-    EXPECT_EQ(start,path.value().front());
-    EXPECT_EQ(dest,path.value().back());
+    EXPECT_EQ(start, path.value().front());
+    EXPECT_EQ(dest, path.value().back());
 
     // Make sure the path planner creates a path that exits out at the nearest edge
     // Here, the nearest edge is straight up in the x direction.
@@ -600,7 +600,7 @@ TEST_F(TestEnlsvgPathPlanner, test_one_path_planner_object_called_twice_for_same
 
     for (unsigned i = 0; i < path.value().size(); ++i)
     {
-        EXPECT_EQ( path.value()[i], same_path_points[i]);
+        EXPECT_EQ(path.value()[i], same_path_points[i]);
     }
 }
 
@@ -637,7 +637,7 @@ TEST_F(TestEnlsvgPathPlanner,
     dest  = Point(-2, 0.5);
 
     auto path_two = planner.findPath(start, dest);
-    path.value()   = path_two.value();
+    path.value()  = path_two.value();
 
     ASSERT_TRUE(path_two != std::nullopt);
 

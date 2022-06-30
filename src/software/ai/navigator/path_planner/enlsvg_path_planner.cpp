@@ -130,7 +130,8 @@ std::optional<Path> EnlsvgPathPlanner::findPath(const Point &start,
 
     // Due to processing, it is possible that the first two points may be very close
     // together, this will fix that
-    if (path.value().size() > 2 && (path.value()[0] - path.value()[1]).length() < resolution)
+    if (path.value().size() > 2 &&
+        (path.value()[0] - path.value()[1]).length() < resolution)
     {
         path.value().erase(path.value().begin() + 1);
     }
