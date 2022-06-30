@@ -795,11 +795,10 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_simulated_hrvo)
 
     auto path = planner.findPath(start, dest);
     EXPECT_TRUE(path != std::nullopt);
-    std::vector<Point> path_points = path->getKnots();
 
-    EXPECT_EQ(2, path_points.size());
-    EXPECT_EQ(start, path->getStartPoint());
-    EXPECT_LE(distance(path->getEndPoint(), dest), 0.1);
+    EXPECT_EQ(2, path.value().size());
+    EXPECT_EQ(start, path.value().front());
+    EXPECT_LE(distance(path.value().back(), dest), 0.1);
 }
 
 TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_defense_play)
@@ -819,11 +818,10 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_defense_play)
         EnlsvgPathPlanner(navigable_area, obstacles, field.boundaryMargin());
     auto path = planner.findPath(start, dest);
     EXPECT_TRUE(path != std::nullopt);
-    std::vector<Point> path_points = path->getKnots();
 
-    EXPECT_EQ(2, path_points.size());
-    EXPECT_EQ(start, path->getStartPoint());
-    EXPECT_LE(distance(path->getEndPoint(), dest), 0.1);
+    EXPECT_EQ(2, path.value().size());
+    EXPECT_EQ(start, path.value().front());
+    EXPECT_LE(distance(path.value().back(), dest), 0.1);
 }
 
 TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_enemy_ball_placement)
@@ -843,9 +841,8 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_enemy_ball_placement)
         EnlsvgPathPlanner(navigable_area, obstacles, field.boundaryMargin());
     auto path = planner.findPath(start, dest);
     EXPECT_TRUE(path != std::nullopt);
-    std::vector<Point> path_points = path->getKnots();
 
-    EXPECT_EQ(2, path_points.size());
-    EXPECT_EQ(start, path->getStartPoint());
-    EXPECT_LE(distance(path->getEndPoint(), dest), 0.1);
+    EXPECT_EQ(2, path.value().size());
+    EXPECT_EQ(start, path.value().front());
+    EXPECT_LE(distance(path.value().back(), dest), 0.1);
 }
