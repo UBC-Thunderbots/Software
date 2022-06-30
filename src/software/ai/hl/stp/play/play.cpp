@@ -237,9 +237,9 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::getPrimitivesFromTactic(
 
             // TODO (#2610): we shouldn't have to check that the path has at least two
             // knots, since the EnlsvgPathPlanner should always find paths with two points
-            if (path.has_value() && path.value().getKnots().size() >= 2)
+            if (path.has_value() && path.value().size() >= 2)
             {
-                path_points = path.value().getKnots();
+                path_points = path.value();
                 motion_control.set_normalized_path_length(
                     EnlsvgPathPlanner::pathLength(path_points, robot_position) /
                     EnlsvgPathPlanner::MAX_PATH_LENGTH);
