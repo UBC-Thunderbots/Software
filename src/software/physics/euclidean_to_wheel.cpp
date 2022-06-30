@@ -110,6 +110,7 @@ EuclideanSpace_t EuclideanToWheel::getEuclideanAcceleration(
 {
     // calculate acceleration to achieve target velocity
     auto calculated_acceleration = target_velocity - current_velocity / delta_t_s_;
+    LOG(DEBUG) << "Calculated euclidean acceleration: " << calculated_acceleration;
 
     auto calculated_max_acceleration = abs(calculated_acceleration.maxCoeff());
 
