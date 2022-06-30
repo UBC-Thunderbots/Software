@@ -9,7 +9,6 @@ Ball createBall(world::SimBall sim_ball, Timestamp timestamp)
     return ball;
 }
 
-// correct issue #2328: avoid division by 0
 Robot createRobot(world::SimRobot sim_robot, Timestamp timestamp)
 {
     const RobotId id(sim_robot.id());

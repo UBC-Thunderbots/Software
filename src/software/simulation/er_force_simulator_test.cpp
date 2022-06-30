@@ -5,7 +5,6 @@
 #include <fenv.h>
 
 #include "proto/message_translation/er_force_world.h"
-#include "proto/message_translation/primitive_google_to_nanopb_converter.h"
 #include "proto/message_translation/tbots_protobuf.h"
 #include "proto/primitive/primitive_msg_factory.h"
 #include "shared/2021_robot_constants.h"
@@ -18,17 +17,13 @@ class ErForceSimulatorTest : public ::testing::Test
     {
         // TODO (#2419): remove this to re-enable sigfpe checks
         fedisableexcept(FE_INVALID | FE_OVERFLOW);
-        simulator_config = std::make_shared<const SimulatorConfig>();
         simulator = std::make_shared<ErForceSimulator>(TbotsProto::FieldType::DIV_B,
-                                                       robot_constants, wheel_constants,
-                                                       simulator_config);
+                                                       robot_constants);
         simulator->resetCurrentTime();
     }
 
     std::shared_ptr<ErForceSimulator> simulator;
-    std::shared_ptr<const SimulatorConfig> simulator_config;
     RobotConstants_t robot_constants = create2021RobotConstants();
-    WheelConstants wheel_constants   = create2021WheelConstants();
 };
 
 TEST_F(ErForceSimulatorTest, set_ball_state_when_ball_does_not_already_exist)
@@ -185,8 +180,7 @@ TEST_F(ErForceSimulatorTest, add_yellow_robots)
     EXPECT_TRUE(yellow_visible);
 }
 
-// TODO why does this test fail?
-TEST_F(ErForceSimulatorTest, DISABLED_yellow_robot_velocity_test)
+TEST_F(ErForceSimulatorTest, yellow_robot_velocity_test)
 {
     RobotState robot_state1(Point(1, 0), Vector(2, 0), Angle::zero(),
                             AngularVelocity::zero());
@@ -314,12 +308,9 @@ TEST_F(ErForceSimulatorTest, yellow_robot_add_robots_and_change_position)
 
 TEST(ErForceSimulatorFieldTest, check_field_A_configuration)
 {
-    std::shared_ptr<const SimulatorConfig> simulator_config;
     RobotConstants_t robot_constants = create2021RobotConstants();
-    WheelConstants wheel_constants   = create2021WheelConstants();
-    simulator_config                 = std::make_shared<const SimulatorConfig>();
-    std::shared_ptr<ErForceSimulator> simulator = std::make_shared<ErForceSimulator>(
-        TbotsProto::FieldType::DIV_A, robot_constants, wheel_constants, simulator_config);
+    std::shared_ptr<ErForceSimulator> simulator =
+        std::make_shared<ErForceSimulator>(TbotsProto::FieldType::DIV_A, robot_constants);
     simulator->resetCurrentTime();
     simulator->getField();
 
@@ -328,12 +319,9 @@ TEST(ErForceSimulatorFieldTest, check_field_A_configuration)
 
 TEST(ErForceSimulatorFieldTest, check_field_B_configuration)
 {
-    std::shared_ptr<const SimulatorConfig> simulator_config;
     RobotConstants_t robot_constants = create2021RobotConstants();
-    WheelConstants wheel_constants   = create2021WheelConstants();
-    simulator_config                 = std::make_shared<const SimulatorConfig>();
-    std::shared_ptr<ErForceSimulator> simulator = std::make_shared<ErForceSimulator>(
-        TbotsProto::FieldType::DIV_B, robot_constants, wheel_constants, simulator_config);
+    std::shared_ptr<ErForceSimulator> simulator =
+        std::make_shared<ErForceSimulator>(TbotsProto::FieldType::DIV_B, robot_constants);
     simulator->resetCurrentTime();
     simulator->getField();
 

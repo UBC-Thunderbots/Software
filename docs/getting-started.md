@@ -21,6 +21,7 @@
       - [VSCode](#vscode)
   - [Building and Running the Code](#building-and-running-the-code)
     - [Building from the command-line](#building-from-the-command-line)
+         - [Using the fuzzy finder](#using-the-fuzzy-finder)
          - [Editing with Vim or NeoVim](#editing-with-vim-or-neovim)
     - [Building with CLion](#building-with-clion)
     - [With VSCode](#with-vscode)
@@ -31,6 +32,7 @@
     - [Debugging from the Command line](#debugging-from-the-command-line)
   - [Profiling](#profiling)
   - [Building for Jetson Nano](#building-for-jetson-nano)
+  - [Deploying Robot Software to the Jetson Nano](#deploying-to-jetson-nano)
   - [Setting up Virtual Robocup 2021](#setting-up-virtual-robocup-2021)
     - [Setting up the SSL Simulation Environment](#setting-up-the-ssl-simulation-environment)
     - [Pushing a Dockerfile to dockerhub](#pushing-a-dockerfile-to-dockerhub)
@@ -130,6 +132,16 @@ VSCode is the more lightweight IDE, with support for code navigation, code compl
 6. Build everything by running `bazel build //...`
 7. Run all the tests by running `bazel test //...`
 *See the bazel [command-line docs](https://docs.bazel.build/versions/master/command-line-reference.html) for more info.*
+*Note: the targets are defined in the BUILD files in our repo*
+
+#### Using the fuzzy finder
+We have a ./tbots.py script in the src folder that will fuzzy find for targets. For example, 
+
+1. Build a specific target for running (for example): `./tbots.py build angletest`
+2. Run a specific target by running (for example): `./tbots.py run goalietest -t`
+3. Run a specific *test* by running (for example): `./tbots.py test goalietest -t`
+
+where the `-t` flag indicates whether Thunderscope should be launched. Run `./tbots.py --help` for more info
 
 #### Editing with Vim or NeoVim
 
@@ -189,8 +201,7 @@ Now that you're setup, if you can run it on the command line, you can run it in 
 
 ### Running AI vs AI
 1. Open your terminal, `cd` into `Software/src`
-2. Run `./software/run_simulated_ai_vs_ai.sh interface_name`, using the same interface as from [above](#running-our-ai-simulator-or-robot-diagnostics)
-3. If AI vs AI is not running properly (eg. the visualizer does not respond after starting a play), closed ports are likely the cause. Run `sudo ufw disable` to disable UFW and allow traffic through the visualizer ports.
+2. Run `./tbots.py run thunderscope`
 
 ## Debugging
 Debugging from the command line is certainly possible, but debugging in a full IDE is *really* nice (plz trust us). 
@@ -215,6 +226,15 @@ This will output the file at the _absolute_ path given via the `--callgrind-out-
 ## Building for Jetson Nano 
 
 To build for the Jetson Nano, build the target with the `--cpu=jetson_nano` flag and the toolchain will automatically build using the ARM toolchain for Jetson Nano. For example, `bazel build --cpu=jetson_nano //software/geom/...`.
+
+
+## Deploying to Jetson Nano 
+
+We use ansible to automatically update software running on the Jetson Nano. [See these instructions.](/src/software/jetson_nano/ansible/README.md) 
+
+To update binaries on a working robot, you can run:
+
+`./tbots.py run run_ansible --cpu=jetson_nano -- --playbook remote_flash.yml --port 45000 --ssh_pass our_password_here`
 
 ## Setting up Virtual Robocup 2021
 

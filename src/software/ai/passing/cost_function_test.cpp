@@ -5,8 +5,8 @@
 #include <chrono>
 #include <random>
 
+#include "proto/parameters.pb.h"
 #include "shared/constants.h"
-#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/math/math_functions.h"
 #include "software/test_util/test_util.h"
 
@@ -17,14 +17,15 @@ class PassingEvaluationTest : public testing::Test
     {
         entire_field =
             std::make_shared<Rectangle>(Field::createSSLDivisionBField().fieldLines());
-        passing_config         = std::make_shared<PassingConfig>();
+        passing_config.set_min_pass_speed_m_per_s(3.5);
+        passing_config.set_max_pass_speed_m_per_s(5.5);
         avg_desired_pass_speed = 3.9;
     }
 
     double avg_desired_pass_speed;
 
     std::shared_ptr<Rectangle> entire_field;
-    std::shared_ptr<const PassingConfig> passing_config;
+    TbotsProto::PassingConfig passing_config;
 };
 
 // This test is disabled to speed up CI, it can be enabled by removing "DISABLED_" from
@@ -82,8 +83,7 @@ TEST_F(PassingEvaluationTest, DISABLED_ratePass_speed_test)
                                                   world.field().yLength() / 2);
 
     std::uniform_real_distribution speed_distribution(
-        passing_config->getMinPassSpeedMPerS()->value(),
-        passing_config->getMaxPassSpeedMPerS()->value());
+        passing_config.min_pass_speed_m_per_s(), passing_config.max_pass_speed_m_per_s());
 
     std::vector<Pass> passes;
 
@@ -119,7 +119,7 @@ TEST_F(PassingEvaluationTest, ratePass_enemy_directly_on_pass_trajectory)
 {
     // A pass from halfway up the +y side of the field to the origin.
     // There is an enemy defender right on the pass trajectory
-    Pass pass({2, 2}, {0, 0}, passing_config->getMaxPassSpeedMPerS()->value() - 0.2);
+    Pass pass({2, 2}, {0, 0}, passing_config.max_pass_speed_m_per_s() - 0.2);
 
     World world = ::TestUtil::createBlankTestingWorld();
     Team friendly_team(Duration::fromSeconds(10));
@@ -173,7 +173,7 @@ TEST_F(PassingEvaluationTest, ratePass_only_friendly_marked)
     // A pass from the +y side of the field to the -y side of the field, roughly 1/2 way
     // up the enemy half of the field. There is a defender closely marking the only
     // friendly robot on the field.
-    Pass pass({2, 2}, {1, -1}, passing_config->getMaxPassSpeedMPerS()->value() - 0.2);
+    Pass pass({2, 2}, {1, -1}, passing_config.max_pass_speed_m_per_s() - 0.2);
 
     World world = ::TestUtil::createBlankTestingWorld();
     Team friendly_team(Duration::fromSeconds(10));
@@ -335,7 +335,7 @@ TEST_F(PassingEvaluationTest, ratePass_below_min_ball_speed)
     });
     world.updateFriendlyTeamState(friendly_team);
 
-    Pass pass({3, 0}, {2, 0}, passing_config->getMinPassSpeedMPerS()->value() - 0.1);
+    Pass pass({3, 0}, {2, 0}, passing_config.min_pass_speed_m_per_s() - 0.1);
 
     double pass_rating = ratePass(world, pass, *entire_field, passing_config);
     EXPECT_LE(0.0, pass_rating);
@@ -354,7 +354,7 @@ TEST_F(PassingEvaluationTest, ratePass_above_max_ball_speed)
     });
     world.updateFriendlyTeamState(friendly_team);
 
-    Pass pass({3, 0}, {2, 0}, passing_config->getMaxPassSpeedMPerS()->value() + 0.1);
+    Pass pass({3, 0}, {2, 0}, passing_config.max_pass_speed_m_per_s() + 0.1);
 
     double pass_rating = ratePass(world, pass, *entire_field, passing_config);
     EXPECT_LE(0.0, pass_rating);
@@ -517,9 +517,8 @@ TEST_F(PassingEvaluationTest, ratePassEnemyRisk_no_enemy_robots)
     Pass pass({0, 0}, {10, 10}, 3);
 
     auto enemy_reaction_time =
-        Duration::fromSeconds(passing_config->getEnemyReactionTime()->value());
-    auto enemy_proximity_importance =
-        passing_config->getEnemyProximityImportance()->value();
+        Duration::fromSeconds(passing_config.enemy_reaction_time());
+    auto enemy_proximity_importance = passing_config.enemy_proximity_importance();
 
     double pass_rating = ratePassEnemyRisk(enemy_team, pass, enemy_reaction_time,
                                            enemy_proximity_importance);
@@ -538,9 +537,8 @@ TEST_F(PassingEvaluationTest, ratePassEnemyRisk_no_robots_near)
     Pass pass({0, 0}, {10, 10}, 4);
 
     auto enemy_reaction_time =
-        Duration::fromSeconds(passing_config->getEnemyReactionTime()->value());
-    auto enemy_proximity_importance =
-        passing_config->getEnemyProximityImportance()->value();
+        Duration::fromSeconds(passing_config.enemy_reaction_time());
+    auto enemy_proximity_importance = passing_config.enemy_proximity_importance();
 
     double pass_rating = ratePassEnemyRisk(enemy_team, pass, enemy_reaction_time,
                                            enemy_proximity_importance);
@@ -556,9 +554,8 @@ TEST_F(PassingEvaluationTest, ratePassEnemyRisk_one_robot_near_receiver_point)
     Pass pass({0, 0}, {10, 10}, 3);
 
     auto enemy_reaction_time =
-        Duration::fromSeconds(passing_config->getEnemyReactionTime()->value());
-    auto enemy_proximity_importance =
-        passing_config->getEnemyProximityImportance()->value();
+        Duration::fromSeconds(passing_config.enemy_reaction_time());
+    auto enemy_proximity_importance = passing_config.enemy_proximity_importance();
 
     double pass_rating = ratePassEnemyRisk(enemy_team, pass, enemy_reaction_time,
                                            enemy_proximity_importance);
@@ -574,9 +571,8 @@ TEST_F(PassingEvaluationTest, ratePassEnemyRisk_robot_near_center_of_pass)
     Pass pass({0, 0}, {10, 10}, 3);
 
     auto enemy_reaction_time =
-        Duration::fromSeconds(passing_config->getEnemyReactionTime()->value());
-    auto enemy_proximity_importance =
-        passing_config->getEnemyProximityImportance()->value();
+        Duration::fromSeconds(passing_config.enemy_reaction_time());
+    auto enemy_proximity_importance = passing_config.enemy_proximity_importance();
 
     double pass_rating = ratePassEnemyRisk(enemy_team, pass, enemy_reaction_time,
                                            enemy_proximity_importance);
@@ -595,9 +591,8 @@ TEST_F(PassingEvaluationTest,
     Pass pass({0, 0}, {10, 10}, 3);
 
     auto enemy_reaction_time =
-        Duration::fromSeconds(passing_config->getEnemyReactionTime()->value());
-    auto enemy_proximity_importance =
-        passing_config->getEnemyProximityImportance()->value();
+        Duration::fromSeconds(passing_config.enemy_reaction_time());
+    auto enemy_proximity_importance = passing_config.enemy_proximity_importance();
 
     double pass_rating = ratePassEnemyRisk(enemy_team, pass, enemy_reaction_time,
                                            enemy_proximity_importance);
@@ -611,8 +606,7 @@ TEST_F(PassingEvaluationTest, calculateInterceptRisk_for_team_no_robots)
     Pass pass({0, 0}, {10, 10}, 3);
 
     double intercept_risk = calculateInterceptRisk(
-        enemy_team, pass,
-        Duration::fromSeconds(passing_config->getEnemyReactionTime()->value()));
+        enemy_team, pass, Duration::fromSeconds(passing_config.enemy_reaction_time()));
     EXPECT_EQ(0, intercept_risk);
 }
 
@@ -631,8 +625,7 @@ TEST_F(PassingEvaluationTest,
     Pass pass({0, 0}, {10, 10}, 3);
 
     double intercept_risk = calculateInterceptRisk(
-        enemy_team, pass,
-        Duration::fromSeconds(passing_config->getEnemyReactionTime()->value()));
+        enemy_team, pass, Duration::fromSeconds(passing_config.enemy_reaction_time()));
     EXPECT_LE(0.9, intercept_risk);
     EXPECT_GE(1, intercept_risk);
 }
@@ -652,8 +645,7 @@ TEST_F(PassingEvaluationTest,
     Pass pass({0, 0}, {10, 10}, 3);
 
     double intercept_risk = calculateInterceptRisk(
-        enemy_team, pass,
-        Duration::fromSeconds(passing_config->getEnemyReactionTime()->value()));
+        enemy_team, pass, Duration::fromSeconds(passing_config.enemy_reaction_time()));
     EXPECT_LE(0.9, intercept_risk);
     EXPECT_GE(1, intercept_risk);
 }
@@ -667,8 +659,7 @@ TEST_F(PassingEvaluationTest, calculateInterceptRisk_for_robot_sitting_on_pass_t
     Pass pass({0, 0}, {10, 10}, 3);
 
     double intercept_risk = calculateInterceptRisk(
-        enemy_robot, pass,
-        Duration::fromSeconds(passing_config->getEnemyReactionTime()->value()));
+        enemy_robot, pass, Duration::fromSeconds(passing_config.enemy_reaction_time()));
     EXPECT_LE(0.9, intercept_risk);
     EXPECT_GE(1, intercept_risk);
 }
@@ -683,8 +674,7 @@ TEST_F(PassingEvaluationTest, calculateInterceptRisk_for_robot_just_off_pass_tra
     Pass pass({0, 0}, {10, 10}, 3);
 
     double intercept_risk = calculateInterceptRisk(
-        enemy_robot, pass,
-        Duration::fromSeconds(passing_config->getEnemyReactionTime()->value()));
+        enemy_robot, pass, Duration::fromSeconds(passing_config.enemy_reaction_time()));
     EXPECT_LE(0.9, intercept_risk);
     EXPECT_GE(1, intercept_risk);
 }
@@ -698,8 +688,7 @@ TEST_F(PassingEvaluationTest, calculateInterceptRisk_for_robot_far_away_from_tra
     Pass pass({0, 0}, {10, 10}, 3);
 
     double intercept_risk = calculateInterceptRisk(
-        enemy_robot, pass,
-        Duration::fromSeconds(passing_config->getEnemyReactionTime()->value()));
+        enemy_robot, pass, Duration::fromSeconds(passing_config.enemy_reaction_time()));
     EXPECT_LE(0, intercept_risk);
     EXPECT_GE(0.1, intercept_risk);
 }
@@ -713,8 +702,7 @@ TEST_F(PassingEvaluationTest, calculateInterceptRisk_robot_at_far_end_of_field)
     Pass pass({3, -3}, {3, 3}, 3);
 
     double intercept_risk = calculateInterceptRisk(
-        enemy_robot, pass,
-        Duration::fromSeconds(passing_config->getEnemyReactionTime()->value()));
+        enemy_robot, pass, Duration::fromSeconds(passing_config.enemy_reaction_time()));
     EXPECT_LE(0, intercept_risk);
     EXPECT_GE(0.1, intercept_risk);
 }
@@ -728,8 +716,7 @@ TEST_F(PassingEvaluationTest, calculateInterceptRisk_enemy_moving_far_away)
     Pass pass({1, 1}, {4, 4}, 2);
 
     double intercept_risk = calculateInterceptRisk(
-        enemy_robot, pass,
-        Duration::fromSeconds(passing_config->getEnemyReactionTime()->value()));
+        enemy_robot, pass, Duration::fromSeconds(passing_config.enemy_reaction_time()));
     EXPECT_LE(0, intercept_risk);
     EXPECT_GE(0.1, intercept_risk);
 }
@@ -747,8 +734,7 @@ TEST_F(PassingEvaluationTest,
     Pass pass({0, 0}, {0, 2}, 0.5);
 
     double intercept_risk = calculateInterceptRisk(
-        enemy_robot, pass,
-        Duration::fromSeconds(passing_config->getEnemyReactionTime()->value()));
+        enemy_robot, pass, Duration::fromSeconds(passing_config.enemy_reaction_time()));
     EXPECT_LE(0.5, intercept_risk);
     EXPECT_GE(1, intercept_risk);
 }

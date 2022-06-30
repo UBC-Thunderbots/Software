@@ -3,6 +3,7 @@ syntax = "proto3";
 package TbotsProto;
 
 import "proto/tbots_timestamp_msg.proto";
+import "proto/geometry.proto";
 
 message RobotStatus
 {
@@ -10,14 +11,12 @@ message RobotStatus
     repeated ErrorCode error_code             = 2;
     BreakBeamStatus break_beam_status         = 3;
     ChipperKickerStatus chipper_kicker_status = 4;
-    DriveUnitStatus drive_units               = 5;
-    FirmwareStatus firmware_status            = 6;
-    DribblerStatus dribbler_status            = 7;
-    NetworkStatus network_status              = 8;
-    PowerStatus power_status                  = 9;
-    TemperatureStatus temperature_status      = 10;
-    Timestamp time_sent                       = 11;
-    ThunderloopStatus thunderloop_status      = 12;
+    MotorStatus motor_status                  = 5;
+    NetworkStatus network_status              = 6;
+    PowerStatus power_status                  = 7;
+    JetsonStatus jetson_status                = 8;
+    ThunderloopStatus thunderloop_status      = 9;
+    Timestamp time_sent                       = 10;
 }
 
 message ThunderloopStatus
@@ -27,6 +26,12 @@ message ThunderloopStatus
     uint64 primitive_executor_step_time_ns  = 3;
     uint64 motor_service_poll_time_ns       = 4;
     uint64 iteration_time_ns                = 5;
+}
+
+message JetsonStatus
+{
+    // Jetson CPU temperature
+    double cpu_temperature = 3;
 }
 
 /* Data about the status of the break beam */
@@ -52,12 +57,16 @@ message ChipperKickerStatus
 }
 
 /* Data about the status of the dribbler
- * Note that the rotation is from the perspective of rear of the motor, looking down
- * the shaft starting from the motor body
+ * Note that the rotation is from the perspective of rear of the motor,
+ * looking down the shaft starting from the motor body
  */
 message DribblerStatus
 {
+    // The current speed of the dribbler in RPM
     float dribbler_rpm = 1;
+
+    // Dribbler temperature
+    float dribbler_temperature = 2;
 }
 
 /* Error codes are to be displayed in the visualizer */
@@ -67,70 +76,27 @@ enum ErrorCode
     NO_ERROR = 0;
 
     // Level triggered events
-    LOW_CAP                         = 1;
-    LOW_BATTERY                     = 2;
-    HIGH_BOARD_TEMP                 = 3;
-    CHARGE_TIMEOUT                  = 4;
-    WHEEL_0_MOTOR_HOT               = 5;
-    WHEEL_1_MOTOR_HOT               = 6;
-    WHEEL_2_MOTOR_HOT               = 7;
-    WHEEL_3_MOTOR_HOT               = 8;
-    DRIBBLER_MOTOR_HOT              = 9;
-    WHEEL_0_ENCODER_NOT_COMMUTATING = 10;
-    WHEEL_1_ENCODER_NOT_COMMUTATING = 11;
-    WHEEL_2_ENCODER_NOT_COMMUTATING = 12;
-    WHEEL_3_ENCODER_NOT_COMMUTATING = 13;
-    WHEEL_0_HALL_SENSOR_STUCK_LOW   = 14;
-    WHEEL_1_HALL_SENSOR_STUCK_LOW   = 15;
-    WHEEL_2_HALL_SENSOR_STUCK_LOW   = 16;
-    WHEEL_3_HALL_SENSOR_STUCK_LOW   = 17;
-    DRIBBLER_HALL_SENSOR_STUCK_LOW  = 18;
-    WHEEL_0_HALL_SENSOR_STUCK_HIGH  = 19;
-    WHEEL_1_HALL_SENSOR_STUCK_HIGH  = 20;
-    WHEEL_2_HALL_SENSOR_STUCK_HIGH  = 21;
-    WHEEL_3_HALL_SENSOR_STUCK_HIGH  = 22;
-    DRIBBLER_HALL_SENSOR_STUCK_HIGH = 23;
-
-    // Edge triggered events
-    ICB_CRC_ERROR                        = 24;
-    RECEIVE_FRAME_CHECK_SEQUENCE_FAILURE = 25;
-    CRASHED_CORE_DUMPED                  = 26;
-    CRASHED_NO_CORE_DUMP                 = 27;
-
-    // Radio Dongle Errors
-    ROBOT_DEAD            = 28;
-    ESTOP_BROKEN          = 29;
-    RX_FCS_FAIL           = 30;
-    SECOND_DONGLE         = 31;
-    TRANSMIT_QUEUE_FULL   = 32;
-    RECEIVE_QUEUE_FULL    = 33;
-    PACKET_ABOVE_MAX_SIZE = 34;
+    LOW_CAP            = 1;
+    LOW_BATTERY        = 2;
+    HIGH_BOARD_TEMP    = 3;
+    DRIBBLER_MOTOR_HOT = 4;
 }
 
-/* Firmware build information  */
-message FirmwareStatus
-{
-    // The microcontroller firmware build ID.
-    uint32 fw_build_id = 1;
-}
-
-/* Encoder data from a single motor
- * Note that the rotation is from the perspective of rear of the motor, looking down
- * the shaft starting from the motor body
- */
 message DriveUnit
 {
-    float wheel_ang_vel_rad_s = 1;
-    float wheel_position_rad  = 2;
+    // The current RPM of the wheel
+    uint32 wheel_rpm = 1;
 }
 
-/* Data from all four drive units */
-message DriveUnitStatus
+/* Data from all four drive units and the dribbler */
+message MotorStatus
 {
-    DriveUnit front_left  = 1;
-    DriveUnit front_right = 2;
-    DriveUnit back_left   = 3;
-    DriveUnit back_right  = 4;
+    DriveUnit front_left    = 1;
+    DriveUnit front_right   = 2;
+    DriveUnit back_left     = 3;
+    DriveUnit back_right    = 4;
+    DribblerStatus dribbler = 5;
+    Vector local_velocity   = 6;
 }
 
 /* Data about the network connection with the robots, including network-derived values */
@@ -153,14 +119,8 @@ message PowerStatus
 
     // voltage on the robot’s capacitor, in volts.
     float capacitor_voltage = 2;
-}
-
-/* Temperature of robot components */
-message TemperatureStatus
-{
-    // The temperature of the robot’s dribbler motor, in degrees Celsius.
-    float dribbler_temperature = 1;
-
-    // The temperature of the robot’s mainboard, in degrees Celsius.
-    float board_temperature = 2;
+    float current_draw      = 3;
+    float geneva_angle_deg  = 4;
+    bool breakbream_tripped = 5;
+    bool flyback_fault      = 6;
 }

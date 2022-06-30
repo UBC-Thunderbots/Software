@@ -7,6 +7,8 @@ py_library(
     srcs = ["field.py"],
     deps = [
         ":field_layer",
+        "//software/thunderscope/replay:proto_player",
+        "//software/thunderscope/replay:replay_controls",
         requirement("pyqtgraph"),
     ],
 )
@@ -24,6 +26,17 @@ py_library(
     srcs = ["obstacle_layer.py"],
     deps = [
         ":field_layer",
+        "//software/thunderscope:thread_safe_buffer",
+        requirement("pyqtgraph"),
+    ],
+)
+
+py_library(
+    name = "hrvo_layer",
+    srcs = ["hrvo_layer.py"],
+    deps = [
+        ":field_layer",
+        "//software/thunderscope:thread_safe_buffer",
         requirement("pyqtgraph"),
     ],
 )
@@ -31,6 +44,16 @@ py_library(
 py_library(
     name = "path_layer",
     srcs = ["path_layer.py"],
+    deps = [
+        ":field_layer",
+        "//software/thunderscope:thread_safe_buffer",
+        requirement("pyqtgraph"),
+    ],
+)
+
+py_library(
+    name = "passing_layer",
+    srcs = ["passing_layer.py"],
     deps = [
         ":field_layer",
         requirement("pyqtgraph"),
@@ -42,6 +65,18 @@ py_library(
     srcs = ["world_layer.py"],
     deps = [
         ":field_layer",
+        "//software/thunderscope:thread_safe_buffer",
+        requirement("pyqtgraph"),
+    ],
+)
+
+py_library(
+    name = "simulator_layer",
+    srcs = ["simulator_layer.py"],
+    deps = [
+        ":field_layer",
+        "//extlibs/er_force_sim/src/protobuf:erforce_py_proto",
+        "//software/thunderscope:thread_safe_buffer",
         requirement("pyqtgraph"),
     ],
 )
@@ -52,6 +87,7 @@ py_library(
     deps = [
         ":field_layer",
         "//proto:import_all_protos",
+        "//software/thunderscope:thread_safe_buffer",
         requirement("pyqtgraph"),
     ],
 )

@@ -1,24 +1,13 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_test(
-    name = "hrvo_test",
-    srcs = [
-        "hrvo_test.cpp",
-    ],
-    deps = [
-        ":hrvo",
-        "//shared/test_util:tbots_gtest_main",
-    ],
-)
-
-cc_test(
     name = "simulated_hrvo_test",
     srcs = ["simulated_hrvo_test.cpp"],
     deps = [
         ":hrvo",
         "//shared/test_util:tbots_gtest_main",
         "//software/ai/hl/stp/tactic/move:move_tactic",
-        "//software/simulated_tests:simulated_er_force_sim_tactic_test_fixture",
+        "//software/simulated_tests:simulated_er_force_sim_play_test_fixture",
         "//software/simulated_tests/terminating_validation_functions",
         "//software/simulated_tests/validation:validation_function",
         "//software/test_util",
@@ -50,6 +39,7 @@ cc_library(
     deps = [
         "//proto:visualization_cc_proto",
         "//proto/primitive:primitive_msg_factory",
+        "//software/ai/navigator/path_planner/hrvo:velocity_obstacle",
         "//software/geom:vector",
         "//software/world",
     ],

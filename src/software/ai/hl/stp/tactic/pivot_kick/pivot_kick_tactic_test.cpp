@@ -5,7 +5,7 @@
 #include <utility>
 
 #include "software/geom/algorithms/contains.h"
-#include "software/simulated_tests/simulated_tactic_test_fixture.h"
+#include "software/simulated_tests/simulated_er_force_sim_play_test_fixture.h"
 #include "software/simulated_tests/terminating_validation_functions/ball_kicked_validation.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_state_validation.h"
 #include "software/simulated_tests/validation/validation_function.h"
@@ -14,11 +14,13 @@
 #include "software/world/world.h"
 
 class PivotKickTacticTest
-    : public SimulatedTacticTestFixture,
+    : public SimulatedErForceSimPlayTestFixture,
       public ::testing::WithParamInterface<std::tuple<Vector, Angle>>
 {
    protected:
-    Field field = Field::createSSLDivisionBField();
+    TbotsProto::FieldType field_type = TbotsProto::FieldType::DIV_B;
+    Field field                      = Field::createField(field_type);
+    TbotsProto::AiConfig ai_config;
 };
 
 TEST_P(PivotKickTacticTest, pivot_kick_test)
@@ -33,11 +35,10 @@ TEST_P(PivotKickTacticTest, pivot_kick_test)
         TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5), robot_position});
     auto enemy_robots = TestUtil::createStationaryRobotStatesWithId({Point(4, 0)});
 
-    auto tactic = std::make_shared<PivotKickTactic>();
+    auto tactic = std::make_shared<PivotKickTactic>(ai_config);
     tactic->updateControlParams(robot_position + ball_offset_from_robot, angle_to_kick_at,
                                 {AutoChipOrKickMode::AUTOKICK, 5});
-    setTactic(tactic);
-    setFriendlyRobotId(1);
+    setTactic(1, tactic);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [angle_to_kick_at, tactic](std::shared_ptr<World> world_ptr,
@@ -51,7 +52,7 @@ TEST_P(PivotKickTacticTest, pivot_kick_test)
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
-    runTest(field, ball_state, friendly_robots, enemy_robots,
+    runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(5));
 }

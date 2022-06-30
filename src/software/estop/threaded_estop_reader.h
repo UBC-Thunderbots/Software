@@ -25,11 +25,8 @@ class ThreadedEstopReader
      * creates and starts a threadedEstopReader with the given parameters to read estop
      * value every 5 milliseconds
      * @param uart_reader the UART device acting as source of estop values
-     * @param startup_time_ms time in milliseconds to wait before making first read
      */
-    ThreadedEstopReader(std::unique_ptr<UartCommunication> uart_reader,
-                        unsigned int startup_time_ms);
-
+    ThreadedEstopReader(std::unique_ptr<UartCommunication> uart_reader);
     ~ThreadedEstopReader();
 
     /**

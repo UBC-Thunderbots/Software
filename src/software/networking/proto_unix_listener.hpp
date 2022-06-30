@@ -4,8 +4,8 @@
 #include <boost/bind.hpp>
 #include <string>
 
+#include "software/constants.h"
 #include "software/logger/logger.h"
-#include "software/util/typename/typename.h"
 
 template <class ReceiveProtoT>
 class ProtoUnixListener
@@ -46,9 +46,7 @@ class ProtoUnixListener
 
     // The endpoint for the sender
     boost::asio::local::datagram_protocol::endpoint listen_endpoint_;
-
-    static constexpr unsigned int MAX_BUFFER_LENGTH = 9000;
-    std::array<char, MAX_BUFFER_LENGTH> raw_received_data_;
+    std::array<char, UNIX_BUFFER_SIZE> raw_received_data_;
 
     // The function to call on every received packet of ReceiveProtoT data
     std::function<void(ReceiveProtoT&)> receive_callback;
@@ -65,8 +63,13 @@ ProtoUnixListener<ReceiveProtoT>::ProtoUnixListener(
     listen_endpoint_ = boost::asio::local::datagram_protocol::endpoint(unix_path);
     unix_path_       = unix_path;
 
+
     socket_.open();
     socket_.bind(listen_endpoint_);
+
+    boost::asio::local::datagram_protocol::socket::receive_buffer_size option(
+        UNIX_BUFFER_SIZE);
+    socket_.set_option(option);
 
     startListen();
 }
@@ -77,7 +80,7 @@ void ProtoUnixListener<ReceiveProtoT>::startListen()
     // Start listening for data asynchronously
     // See here for a great explanation about asynchronous operations:
     // https://stackoverflow.com/questions/34680985/what-is-the-difference-between-asynchronous-programming-and-multithreading
-    socket_.async_receive_from(boost::asio::buffer(raw_received_data_, MAX_BUFFER_LENGTH),
+    socket_.async_receive_from(boost::asio::buffer(raw_received_data_, UNIX_BUFFER_SIZE),
                                listen_endpoint_,
                                boost::bind(&ProtoUnixListener::handleDataReception, this,
                                            boost::asio::placeholders::error,
@@ -108,12 +111,12 @@ void ProtoUnixListener<ReceiveProtoT>::handleDataReception(
             << error << std::endl;
     }
 
-    if (num_bytes_received > MAX_BUFFER_LENGTH)
+    if (num_bytes_received > UNIX_BUFFER_SIZE)
     {
         LOG(WARNING)
-            << "num_bytes_received > MAX_BUFFER_LENGTH, "
+            << "num_bytes_received > UNIX_BUFFER_SIZE, "
             << "which means that the receive buffer is full and data loss has potentially occurred. "
-            << "Consider increasing MAX_BUFFER_LENGTH";
+            << "Consider increasing UNIX_BUFFER_SIZE";
     }
 }
 

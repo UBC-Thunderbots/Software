@@ -326,7 +326,8 @@ namespace Pathfinding
                 return path;
 
             // If the last vertex is not equal to the goal vertex.
-            if (graph.nodeIndex(ex, ey) != goalParent)
+            if (!(ex == graph.vertices[goalParent].x &&
+                  ey == graph.vertices[goalParent].y))
             {
                 path.push_back(GridVertex(ex, ey));
             }

@@ -37,7 +37,7 @@ jobs:
         run: |
           cd src
           bazel test --show_timestamps       \
-            -- //... -//software:full_system \
+            -- //... -//software:unix_full_system \
             -//software/simulated_tests/...  \
             -//software/ai/hl/...            \
 
@@ -81,30 +81,46 @@ jobs:
         run: |
           "${GITHUB_WORKSPACE}"/environment_setup/setup_software.sh
 
-      - name: Simulated Test (Continue on error)
+      - name: Simulated Test Run 1 (Continue on error)
         # make sure that replays are uploaded even if tests fail
         continue-on-error: true
         run: |
           cd src
           bazel test --show_timestamps       \
-            //software:full_system           \
+            //software:unix_full_system           \
             //software/simulated_tests/...   \
             //software/ai/hl/...
 
-      - name: Upload simulated test artifacts
-        uses: actions/upload-artifact@v2
+      - name: Upload simulated test proto logs
+        uses: actions/upload-artifact@v3
         with:
-          name: simulated-test-outputs
-          # we only care about the replay logs from the STP tests
+          name: blue-ai-proto-logs
           path: |
-            src/bazel-out/k8-fastbuild/testlogs/software/ai/hl/stp
+            /tmp/tbots/blue/logs
 
-      - name: Simulated Test (Check for errors)
-        # Run Simulated Tests a second time to check for failures
+      - name: Upload simulated test proto logs
+        uses: actions/upload-artifact@v3
+        with:
+          name: yellow-ai-proto-logs
+          path: |
+            /tmp/tbots/yellow/logs
+
+      - name: Simulated Test Run 2 (Continue on error)
+        # Run a second time without checking for errors
+        continue-on-error: true
         run: |
           cd src
           bazel test --show_timestamps       \
-            //software:full_system           \
+            //software:unix_full_system           \
+            //software/simulated_tests/...   \
+            //software/ai/hl/...
+
+      - name: Simulated Test Run 3 (Check for errors)
+        # Run Simulated Tests a third time and finally check for failures
+        run: |
+          cd src
+          bazel test --show_timestamps       \
+            //software:unix_full_system           \
             //software/simulated_tests/...   \
             //software/ai/hl/...
 
@@ -123,4 +139,4 @@ jobs:
         run: |
           cd src
           bazel test --show_timestamps       \
-            //software/geom/... //python_tools/...
+            //software/geom/...

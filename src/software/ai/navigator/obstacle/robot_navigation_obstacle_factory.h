@@ -1,7 +1,7 @@
 #pragma once
 
-#include "shared/parameter/cpp_dynamic_parameters.h"
-#include "software/ai/motion_constraint/motion_constraint.h"
+#include "proto/parameters.pb.h"
+#include "proto/primitive.pb.h"
 #include "software/ai/navigator/obstacle/obstacle.hpp"
 #include "software/geom/line.h"
 #include "software/geom/point.h"
@@ -17,74 +17,46 @@
 class RobotNavigationObstacleFactory
 {
    public:
-    RobotNavigationObstacleFactory() = delete;
-
     /**
      * Create an RobotNavigationObstacleFactory with the given configuration
      *
      * @param config The configuration used to determine how obstacles should be generated
      */
-    RobotNavigationObstacleFactory(
-        std::shared_ptr<const RobotNavigationObstacleConfig> config);
+    RobotNavigationObstacleFactory(TbotsProto::RobotNavigationObstacleConfig config);
 
     /**
-     * Create obstacles for the given motion constraints
+     * Create static obstacles for the given motion constraints
      *
      * @param motion_constraints The motion constraints to create obstacles for
-     * @param world World we're enforcing motion constraints in
+     * @param field Field we're enforcing motion constraints in
      *
      * @return Obstacles representing the given motion constraints
      */
-    std::vector<ObstaclePtr> createFromMotionConstraints(
-        const std::set<MotionConstraint> &motion_constraints, const World &world) const;
+    std::vector<ObstaclePtr> createStaticObstaclesFromMotionConstraints(
+        const std::set<TbotsProto::MotionConstraint> &motion_constraints,
+        const Field &field) const;
 
     /**
-     * Create obstacles for the given motion constraint
+     * Create dynamic obstacles for the given motion constraints
      *
      * @param motion_constraint The motion constraint to create obstacles for
      * @param world World we're enforcing motion constraints in
      *
      * @return Obstacles representing the given motion constraint
      */
-    std::vector<ObstaclePtr> createFromMotionConstraint(
-        const MotionConstraint &motion_constraint, const World &world) const;
+    std::vector<ObstaclePtr> createDynamicObstaclesFromMotionConstraint(
+        const TbotsProto::MotionConstraint &motion_constraint, const World &world) const;
 
     /**
-     * Create an obstacle representing the given robot
+     * Create static obstacles for the given motion constraint
      *
-     * These obstacles take into account the velocity of the robot to extend the
-     * created obstacle in the robot's direction of travel.
+     * @param motion_constraint The motion constraint to create obstacles for
+     * @param field Field we're enforcing motion constraints in
      *
-     * @param robot The robot to get a representative obstacle for
-     *
-     * @return An obstacle representing the given robot
+     * @return Obstacles representing the given motion constraint
      */
-    ObstaclePtr createFromRobot(const Robot &robot) const;
-
-    /**
-     * Create a list of obstacles representing the given team
-     *
-     * These obstacles take into account the velocity of the robot to extend the
-     * created obstacle in the robot's direction of travel.
-     *
-     * @param team The team to get representative obstacles for
-     *
-     * @return A list of obstacles representing the given team
-     */
-    std::vector<ObstaclePtr> createFromTeam(const Team &team) const;
-
-    /**
-     * Create a list of obstacles that stop enemy robot collision. These obstacles are
-     * scaled down if friendly_robot_speed is below a threshold set in the config to allow
-     * slow collisions with enemy robots
-     *
-     * @param enemy_team The enemy team to get representative obstacles for
-     * @param friendly_robot_speed The speed of the current friendly robot
-     *
-     * @return A list of obstacles representing the given team
-     */
-    std::vector<ObstaclePtr> createEnemyCollisionAvoidance(
-        const Team &enemy_team, double friendly_robot_speed) const;
+    std::vector<ObstaclePtr> createStaticObstaclesFromMotionConstraint(
+        const TbotsProto::MotionConstraint &motion_constraint, const Field &field) const;
 
     /**
      * Create circle obstacle around robot with additional radius scaling
@@ -129,7 +101,7 @@ class RobotNavigationObstacleFactory
                                         const Point &ball_point) const;
 
    private:
-    std::shared_ptr<const RobotNavigationObstacleConfig> config;
+    TbotsProto::RobotNavigationObstacleConfig config;
     double robot_radius_expansion_amount;
 
     /**

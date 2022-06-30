@@ -1,23 +1,31 @@
 package(default_visibility = ["//visibility:public"])
 
-load("@display_deps//:requirements.bzl", "requirement")
-
 py_binary(
-    name = "rotary_encoder",
-    srcs = ["rotary_encoder/rotary_encoder.py"],
-    deps = [requirement("Jetson.GPIO")],
+    name = "robot_ui",
+    srcs = ["robot_ui.py"],
+    deps = [
+        "//software/jetson_nano/display/lcd_user_interface",
+        "//software/jetson_nano/display/rotary_encoder",
+        "//software/jetson_nano/display/screens:chip_and_kick_screen",
+        "//software/jetson_nano/display/screens:home_screen",
+        "//software/jetson_nano/display/screens:menu_screen",
+        "//software/jetson_nano/display/screens:wheels_screen",
+    ],
 )
 
-py_binary(
-    name = "lcd_user_interface",
-    srcs = ["lcd_user_interface/lcd_user_interface.py"],
-    deps = [
-        requirement("Adafruit-Blinka"),
-        requirement("adafruit-circuitpython-busdevice"),
-        requirement("adafruit-circuitpython-rgb-display"),
-        requirement("Adafruit-PlatformDetect"),
-        requirement("Adafruit-PureIO"),
-        requirement("Jetson.GPIO"),
-        requirement("Pillow"),
-    ],
+py_library(
+    name = "constants",
+    srcs = ["constants.py"],
+)
+
+py_library(
+    name = "utils",
+    srcs = ["utils.py"],
+)
+
+genrule(
+    name = "robot_ui_zip",
+    outs = ["robot_ui_zip.zip"],
+    cmd = "zip -r $@ $(location :robot_ui)*",
+    tools = [":robot_ui"],
 )

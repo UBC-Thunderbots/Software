@@ -6,10 +6,10 @@
 #include "proto/tbots_software_msgs.pb.h"
 #include "shared/robot_constants.h"
 #include "software/jetson_nano/gpio.h"
-#include "software/jetson_nano/services/service.h"
+#include "software/physics/euclidean_to_wheel.h"
 
 
-class MotorService : public Service
+class MotorService
 {
    public:
     /**
@@ -17,36 +17,24 @@ class MotorService : public Service
      * Opens all the required ports and maintains them until destroyed.
      *
      * @param RobotConstants_t The robot constants
-     * @param WheelConstants_t The wheel constants
+     * @param control_loop_frequency_hz The frequency the main loop will call poll at
      */
-    MotorService(const RobotConstants_t& robot_constants,
-                 const WheelConstants_t& wheel_constants);
+    MotorService(const RobotConstants_t& robot_constants, int control_loop_frequency_hz);
 
     virtual ~MotorService();
-
-    /**
-     * Starts the motor service by pulling the enable pin high.
-     */
-    void start() override;
-
-    /**
-     * Pulls the enable pin low to disable the motor board.
-     */
-    void stop() override;
 
     /**
      * When the motor service is polled with a DirectControlPrimitive msg,
      * call the appropriate trinamic api function to spin the appropriate motor.
      *
-     * @param direct_control The direct_control msg to unpack and execute on the motors
-     * @returns DriveUnitStatus The status of all the drive units
+     * @param motor The motor msg to unpack and execute on the motors
+     * @returns MotorStatus The status of all the drive units
      */
-    std::unique_ptr<TbotsProto::DriveUnitStatus> poll(
-        const TbotsProto::DirectControlPrimitive& direct_control);
+    TbotsProto::MotorStatus poll(const TbotsProto::MotorControl& motor_control);
 
     /**
-     * Trinamic API binding, sets spi_cs_driver_to_controller_demux appropriately
-     * and calls readWriteByte. See C++ implementation file for more info
+     * Trinamic API binding, sets spi_demux_select_0|1 pins
+     * appropriately and calls readWriteByte. See C++ implementation file for more info
      *
      * @param motor Which motor to talk to (in our case, the chip select)
      * @param data The data to send
@@ -95,9 +83,10 @@ class MotorService : public Service
      * Calls the configuration functions below in the right sequence
      *
      * @param motor The motor setup the driver/controller for
+     * @param dribbler If true, configures the motor to be a dribbler
      */
     void startDriver(uint8_t motor);
-    void startController(uint8_t motor);
+    void startController(uint8_t motor, bool dribbler);
 
     /**
      * Configuration settings
@@ -119,9 +108,11 @@ class MotorService : public Service
      * @param motor The motor to configure (the same value as the chip select)
      */
     void configurePWM(uint8_t motor);
-    void configurePI(uint8_t motor);
+    void configureDribblerPI(uint8_t motor);
+    void configureDrivePI(uint8_t motor);
     void configureADC(uint8_t motor);
     void configureEncoder(uint8_t motor);
+    void configureHall(uint8_t motor);
 
     /**
      * A lot of initialization parameters are necessary to function. Even if
@@ -160,11 +151,23 @@ class MotorService : public Service
      */
     uint8_t readWriteByte(uint8_t motor, uint8_t data, uint8_t last_transfer);
 
+
+    /**
+     * Log the driver fault in a human readable log msg
+     *
+     * @param motor The motor to log the status for
+     * @return bool true if faulted
+     */
+    bool checkDriverFault(uint8_t motor);
+
     // Select between driver and controller gpio
-    GPIO spi_cs_driver_to_controller_demux_gpio;
+    GPIO spi_demux_select_0;
+    GPIO spi_demux_select_1;
 
     // Enable driver gpio
     GPIO driver_control_enable_gpio;
+    GPIO reset_gpio;
+    GPIO heartbeat_gpio;
 
     // Transfer Buffers
     uint8_t tx[5] = {0};
@@ -178,10 +181,13 @@ class MotorService : public Service
 
     // Constants
     RobotConstants_t robot_constants_;
-    WheelConstants_t wheel_constants_;
 
     // SPI File Descriptors
     std::unordered_map<int, int> file_descriptors;
 
+    // Drive Motors
+    EuclideanToWheel euclidean_to_four_wheel;
     std::unordered_map<int, bool> encoder_calibrated_;
+
+    int heartbeat_state = 0;
 };

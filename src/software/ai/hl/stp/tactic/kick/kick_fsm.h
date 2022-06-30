@@ -2,7 +2,6 @@
 
 #include "software/ai/hl/stp/tactic/get_behind_ball/get_behind_ball_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
-#include "software/ai/intent/kick_intent.h"
 
 struct KickFSM
 {
@@ -22,7 +21,7 @@ struct KickFSM
     DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
     /**
-     * Action that updates the KickIntent
+     * Action that updates the MovePrimitive
      *
      * @param event KickFSM::Update event
      */
@@ -65,6 +64,7 @@ struct KickFSM
             *GetBehindBallFSM_S + Update_E / updateGetBehindBall_A,
             GetBehindBallFSM_S                                    = KickState_S,
             KickState_S + Update_E[!ballChicked_G] / updateKick_A = KickState_S,
-            KickState_S + Update_E[ballChicked_G]                 = X);
+            KickState_S + Update_E[ballChicked_G] / SET_STOP_PRIMITIVE_ACTION = X,
+            X + Update_E / SET_STOP_PRIMITIVE_ACTION                          = X);
     }
 };

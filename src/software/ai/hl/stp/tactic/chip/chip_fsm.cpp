@@ -13,9 +13,13 @@ void ChipFSM::updateGetBehindBall(
 
 void ChipFSM::updateChip(const Update &event)
 {
-    event.common.set_intent(std::make_unique<ChipIntent>(
-        event.common.robot.id(), event.control_params.chip_origin,
-        event.control_params.chip_direction, event.control_params.chip_distance_meters,
+    event.common.set_primitive(createMovePrimitive(
+        CREATE_MOTION_CONTROL(event.control_params.chip_origin),
+        event.control_params.chip_direction, 0.1, TbotsProto::DribblerMode::OFF,
+        TbotsProto::BallCollisionType::ALLOW,
+        AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP,
+                       event.control_params.chip_distance_meters},
+        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
         event.common.robot.robotConstants()));
 }
 

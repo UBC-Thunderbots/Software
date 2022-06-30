@@ -16,30 +16,22 @@ class PenaltyKickTactic : public Tactic
    public:
     /**
      * Creates a new PenaltyKickTactic
+     *
+     * @param ai_config The AI configuration
      */
+    explicit PenaltyKickTactic(TbotsProto::AiConfig ai_config);
 
-    explicit PenaltyKickTactic();
+    PenaltyKickTactic() = delete;
 
     void updateControlParams();
-
-    /**
-     * Calculates the cost of assigning the given robot to this Tactic. Prefers robots
-     * closer to the block destination
-     *
-     * @param robot The robot to evaluate the cost for
-     * @param world The state of the world with which to perform the evaluation
-     * @return A cost in the range [0,1] indicating the cost of assigning the given robot
-     * to this tactic. Lower cost values indicate a more preferred robot.
-     */
-    double calculateRobotCost(const Robot &robot, const World &world) const override;
 
     DEFINE_TACTIC_DONE_AND_GET_FSM_STATE
 
     void accept(TacticVisitor &visitor) const override;
 
    private:
-    void updateIntent(const TacticUpdate &tactic_update) override;
+    void updatePrimitive(const TacticUpdate &tactic_update, bool reset_fsm) override;
 
-    // Tactic parameters
-    FSM<PenaltyKickFSM> fsm;
+    std::map<RobotId, std::unique_ptr<FSM<PenaltyKickFSM>>> fsm_map;
+    TbotsProto::AiConfig ai_config;
 };

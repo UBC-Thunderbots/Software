@@ -3,6 +3,8 @@
 #include <optional>
 
 #include "proto/team.pb.h"
+#include "software/constants.h"
+#include "software/geom/polygon.h"
 #include "software/time/timestamp.h"
 #include "software/world/robot_capabilities.h"
 #include "software/world/robot_state.h"
@@ -124,6 +126,13 @@ class Robot
     const std::set<RobotCapability> &getUnavailableCapabilities() const;
 
     /**
+     * Creates and returns a rectangle representing the dribbler area
+     *
+     * @return the dribbler area rectangle
+     */
+    Polygon dribblerArea() const;
+
+    /**
      * Returns all available capabilities this robot has
      *
      * @return Returns all available capabilities this robot has
@@ -152,7 +161,35 @@ class Robot
      *
      * @return whether the test_point is near the dribbler of the robot
      */
-    bool isNearDribbler(const Point &test_point, double TOLERANCE = 0.0) const;
+    bool isNearDribbler(
+        const Point &test_point,
+        double TOLERANCE = BALL_TO_FRONT_OF_ROBOT_DISTANCE_WHEN_DRIBBLING) const;
+
+    /**
+     * Estimate the minimum time it would take to turn to the desired orientation
+     *
+     * @param desired_orientation The orientation which we want the robot to be at
+     * @param final_angular_velocity The desired angular velocity which the robot
+     * will be moving at, once it reaches the desired orientation
+     *
+     * @return The time required for this robot to rotate to the given orientation
+     */
+    Duration getTimeToOrientation(
+        const Angle &desired_orientation,
+        const AngularVelocity &final_angular_velocity = AngularVelocity::zero()) const;
+
+    /**
+     * Estimate the minimum time it would take to reach the desired point
+     *
+     * @param destination The destination that the robot is going to
+     * @param final_velocity The desired final velocity which the robot should be moving
+     * at
+     *
+     * @return The minimum theoretical time it would take this robot to reach the
+     * destination
+     */
+    Duration getTimeToPosition(const Point &destination,
+                               const Vector &final_velocity = Vector()) const;
 
     /**
      * Defines the equality operator for a Robot. Robots are equal if their IDs and

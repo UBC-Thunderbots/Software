@@ -13,9 +13,10 @@
     * [GameState](#gamestate)
   * [Intents](#intents)
   * [Dynamic Parameters](#dynamic-parameters)
-* [Important Protobuf Messages](#important-protobuf-messages)
-  * [Primitives](#primitives)
-  * [Robot Status](#robot-status)
+* [Protobuf](#protobuf)
+  * [Important Protobuf Messages](#important-protobuf-messages)
+    * [Primitives](#primitives)
+    * [Robot Status](#robot-status)
 * [Design Patterns](#design-patterns)
   * [Abstract Classes and Inheritance](#abstract-classes-and-inheritance)
   * [Singleton Design Pattern](#singleton-design-pattern)
@@ -124,10 +125,15 @@ Here's a slightly more relevant example of how we used `Dynamic Parameters` duri
 It is worth noting that constants are still useful, and should still be used whenever possible. If a value realistically doesn't need to be changed, it should be a constant (with a nice descriptive name) rather than a `Dynamic Parameter`. Having too many `Dynamic Parameters` is overwhelming because there are too many values to understand and change, and this can make it hard to tune values to get the desired behaviour while under pressure during a game.
 
 
-# Important Protobuf Messages
+# Protobuf
+Protobuf or protocol buffers are used to pass messages between components in our system.
+After building using Bazel, the `.proto` files are generated into `.pb.h` and `.pb.cc` files, which are found in `bazel-out/k8-fastbuild/bin/proto`.
+To include these files in our code, we simply include `proto/<protobuf_filename>.pb.h`
+
+## Important Protobuf Messages
 These are [protobuf](https://developers.google.com/protocol-buffers/docs/cpptutorial) messages that we define and that are important for understanding how the [AI](#ai) works.
 
-## Primitives
+### Primitives
 `TbotsProto::Primitive`s represent simple actions that robots blindly execute (e.g. send signals to motor drivers), so it's up to the [AI](#ai) to send `Primitives` that follow all the rules and avoid collisions with obstacles. Some examples are:
 * Moving in a straight line to a position
 * Pivoting around a point
@@ -135,7 +141,7 @@ These are [protobuf](https://developers.google.com/protocol-buffers/docs/cpptuto
 
 `Primitives` act as the abstraction between our [AI](#ai) and our robot firmware. It splits the responsibility such that the [AI](#ai) is responsible for sending a `Primitive` to a robot telling it what it wants it to do, and the robot is responsible for making sure it does what it's told. For every `Primitive` protobuf message, there is an equivalent `Primitive` implementation in our robot firmware. When robots receive a `Primitive` command, they perform their own logic and control in order to perform the task specified by the `Primitive`.
 
-## Robot Status
+### Robot Status
 The `TbotsProto::RobotStatus` protobuf message contains information about the status of a single robot. Examples of the information they include are:
 * Robot battery voltage
 * Whether or not the robot senses the ball in the breakbeam

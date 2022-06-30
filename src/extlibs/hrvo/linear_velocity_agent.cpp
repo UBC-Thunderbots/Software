@@ -42,39 +42,9 @@ void LinearVelocityAgent::computeNewVelocity()
     }
 }
 
-Agent::VelocityObstacle LinearVelocityAgent::createVelocityObstacle(
-    const Agent &other_agent)
+VelocityObstacle LinearVelocityAgent::createVelocityObstacle(const Agent &other_agent)
 {
-    VelocityObstacle velocityObstacle;
-    if ((position_ - other_agent.getPosition()).lengthSquared() >
-        std::pow(radius_ + other_agent.getRadius(), 2))
-    {
-        // This Agent is not colliding with other agent
-        velocityObstacle.apex_ = velocity_;
-
-        const float angle =
-            (position_ - other_agent.getPosition()).orientation().toRadians();
-
-        // opening angle = arcsin((rad_A + rad_B) / distance)
-        const float openingAngle =
-            std::asin((other_agent.getRadius() + radius_) /
-                      (position_ - other_agent.getPosition()).length());
-
-        // Direction of the two edges of the velocity obstacle
-        velocityObstacle.side1_ =
-            Vector(std::cos(angle - openingAngle), std::sin(angle - openingAngle));
-        velocityObstacle.side2_ =
-            Vector(std::cos(angle + openingAngle), std::sin(angle + openingAngle));
-    }
-    else
-    {
-        // This Agent is colliding with other agent
-        // Creates Velocity Obstacle with the sides being 180 degrees
-        // apart from each other
-        velocityObstacle.apex_ = velocity_;
-        velocityObstacle.side1_ =
-            (other_agent.getPosition() - position_).perpendicular().normalize();
-        velocityObstacle.side2_ = -velocityObstacle.side1_;
-    }
-    return velocityObstacle;
+    return VelocityObstacle::generateVelocityObstacle(
+        Circle(Point(getPosition()), getRadius()),
+        Circle(Point(other_agent.getPosition()), other_agent.getRadius()), getVelocity());
 }

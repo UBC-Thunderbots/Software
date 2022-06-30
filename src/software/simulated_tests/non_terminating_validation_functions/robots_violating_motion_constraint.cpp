@@ -5,10 +5,11 @@
 void robotsViolatingMotionConstraint(
     std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield,
     std::shared_ptr<RobotNavigationObstacleFactory> obstacle_factory,
-    MotionConstraint constraint)
+    TbotsProto::MotionConstraint constraint)
 {
     std::vector<ObstaclePtr> obstacles =
-        obstacle_factory->createFromMotionConstraint(constraint, *world_ptr);
+        obstacle_factory->createStaticObstaclesFromMotionConstraint(constraint,
+                                                                    world_ptr->field());
     for (auto robot : world_ptr->friendlyTeam().getAllRobots())
     {
         for (auto obstacle_ptr : obstacles)

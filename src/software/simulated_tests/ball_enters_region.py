@@ -1,10 +1,5 @@
-import pytest
-
-import software.geom.geometry as geom
-from proto.geometry_pb2 import Angle, AngularVelocity, Point, Vector
-from proto.tbots_software_msgs_pb2 import Vision
-from proto.validation_pb2 import ValidationGeometry, ValidationProto, ValidationStatus
-from proto.world_pb2 import SimulatorTick, World, WorldState
+import software.python_bindings as tbots
+from proto.import_all_protos import *
 
 from software.simulated_tests.validation import (
     Validation,
@@ -28,8 +23,8 @@ class BallEntersRegion(Validation):
                   PASSING when a ball enters
         """
         for region in self.regions:
-            if geom.contains(
-                region, geom.createPoint(world.ball.current_state.global_position)
+            if tbots.contains(
+                region, tbots.createPoint(world.ball.current_state.global_position)
             ):
                 return ValidationStatus.PASSING
 
@@ -53,6 +48,6 @@ class BallEntersRegion(Validation):
 (
     BallEventuallyEntersRegion,
     BallEventuallyExitsRegion,
-    BallStaysInRegion,
+    BallAlwaysStaysInRegion,
     BallNeverEntersRegion,
 ) = create_validation_types(BallEntersRegion)
