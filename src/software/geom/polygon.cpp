@@ -104,9 +104,9 @@ Polygon Polygon::fromSegment(const Segment& segment, const double radius)
     Vector start_to_end = segment.getEnd().toVector() - segment.getStart().toVector();
     Vector end_to_start = -start_to_end;
 
-    Point end_l = segment.getEnd() + (start_to_end.normalize(radius) +
+    Point end_l = segment.getEnd() + (start_to_end.normalize(radius) -
                                       start_to_end.perpendicular().normalize(radius));
-    Point end_r = segment.getEnd() + (start_to_end.normalize(radius) -
+    Point end_r = segment.getEnd() + (start_to_end.normalize(radius) +
                                       start_to_end.perpendicular().normalize(radius));
 
     Point start_l = segment.getStart() + (end_to_start.normalize(radius) +
@@ -115,10 +115,10 @@ Polygon Polygon::fromSegment(const Segment& segment, const double radius)
                                           end_to_start.perpendicular().normalize(radius));
 
     return Polygon({
-        end_l,
-        end_r,
         start_l,
         start_r,
+        end_r,
+        end_l,
     });
 }
 

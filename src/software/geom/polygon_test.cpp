@@ -105,3 +105,38 @@ TEST(PolygonExpandTest, test_invalid_modifier)
         GTEST_SUCCEED();
     }
 }
+
+TEST(PolygonExpandTest, test_from_segments)
+{
+    Segment segment(Point(0,0), Point(2,0));
+
+    const auto poly = Polygon::fromSegment(segment, 1);
+    const auto segments = poly.getSegments();
+
+    const auto points = poly.getPoints();
+    for (Point point: points) {
+        std::cout << "x: " <<  point.x() << " y: " << point.y() << std::endl;
+    }
+    Vector first_side =  segments[0].toVector();
+    Vector second_side = segments[1].toVector();
+    Vector third_side =  segments[2].toVector();
+    Vector fourth_side = segments[3].toVector();
+
+    try
+    {
+        EXPECT_EQ(first_side.orientation() - second_side.orientation(), Angle::fromDegrees(90));
+        EXPECT_EQ(second_side.orientation() - third_side.orientation(), Angle::fromDegrees(90));
+        EXPECT_EQ(third_side.orientation() - fourth_side.orientation(), Angle::fromDegrees(90));
+        EXPECT_EQ(fourth_side.orientation() - first_side.orientation(), Angle::fromDegrees(90));
+        EXPECT_EQ(first_side.length(), 2);
+        EXPECT_EQ(second_side.length(), 4);
+        EXPECT_EQ(third_side.length(), 2);
+        EXPECT_EQ(fourth_side.length(), 4);
+        EXPECT_EQ(segments.size(), 4);
+        GTEST_SUCCEED();
+    }
+    catch (const std::invalid_argument& e)
+    {
+        GTEST_FAIL();
+    }
+}
