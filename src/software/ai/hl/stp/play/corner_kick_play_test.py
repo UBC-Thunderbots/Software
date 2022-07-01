@@ -49,6 +49,12 @@ def test_corner_kick_play_bottom_left(simulated_test_runner):
         gc_command=Command.Type.DIRECT, team=Team.BLUE
     )
 
+    # override yellow play
+    yellow_play = Play()
+    yellow_play.name = PlayName.HaltPlay
+
+    simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(Play, yellow_play)
+
     # Create world state
     simulated_test_runner.simulator_proto_unix_io.send_proto(
         WorldState,
@@ -107,6 +113,12 @@ def test_corner_kick_play_top_right(simulated_test_runner):
     simulated_test_runner.gamecontroller.send_ci_input(
         gc_command=Command.Type.DIRECT, team=Team.BLUE
     )
+
+    # override yellow play
+    yellow_play = Play()
+    yellow_play.name = PlayName.HaltPlay
+
+    simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(Play, yellow_play)
 
     # Create world state
     simulated_test_runner.simulator_proto_unix_io.send_proto(
