@@ -150,7 +150,7 @@ class MotorService
      * @param time_to_ramp The time allocated for acceleration in seconds
      *
      */
-    inline void setTargetRampVelocity(uint8_t motor, double velocity_target,
+    inline double computeRampVelocity(double velocity_target,
                                double velocity_current, double time_to_ramp);
 
     /**
