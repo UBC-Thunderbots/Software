@@ -1,6 +1,7 @@
 #pragma once
 #include <memory>
 #include <string>
+#include <Eigen/Dense>
 
 #include "proto/robot_status_msg.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
@@ -144,14 +145,14 @@ class MotorService
      * NOTE: This function has no state.
      * Also NOTE: This function handles all electrical rpm to meters/second conversion.
      *
-     * @param motor The motor to set the velocity on
      * @param velocity_target The target velocity in m/s
      * @param velocity_current The current velocity m/s
      * @param time_to_ramp The time allocated for acceleration in seconds
      *
      */
-    inline double computeRampVelocity(double velocity_target,
-                               double velocity_current, double time_to_ramp);
+    inline WheelSpace_t computeRampVelocity(EuclideanSpace_t target_velocity,
+                               WheelSpace_t current_velocity, double time_to_ramp);
+    inline double rampSingleVelocity(double target, double current, double time);
 
     /**
      * Convert electrical rpm to wheel velocity.
