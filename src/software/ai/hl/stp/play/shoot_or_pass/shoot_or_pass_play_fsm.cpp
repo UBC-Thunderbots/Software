@@ -15,7 +15,8 @@ ShootOrPassPlayFSM::ShootOrPassPlayFSM(TbotsProto::AiConfig ai_config)
       best_pass_and_score_so_far(
           PassWithRating{.pass = Pass(Point(), Point(), 0), .rating = 0}),
       time_since_commit_stage_start(Duration::fromSeconds(0)),
-      min_pass_score_threshold(0)
+      min_pass_score_threshold(0),
+      pass_in_progress(Point(), Point(), 0)
 {
 }
 
@@ -164,4 +165,19 @@ bool ShootOrPassPlayFSM::tookShot(const Update& event)
 {
     // TODO (#2384): implement this
     return false;
+}
+
+bool ShootOrPassPlayFSM::hasPassInProgress(const Update& event)
+{
+    return event.common.inter_play_communication.last_committed_pass.has_value();
+}
+
+void ShootOrPassPlayFSM::maintainPassInProgress(const Update& event)
+{
+    best_pass_and_score_so_far =
+        event.common.inter_play_communication.last_committed_pass.value();
+
+    // reset interplay communication
+    event.common.set_inter_play_communication_fun(
+        InterPlayCommunication{.last_committed_pass = std::nullopt});
 }

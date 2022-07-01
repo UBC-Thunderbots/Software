@@ -74,7 +74,7 @@ void PlaySelectionFSM::setupSetPlay(const Update& event)
 
     if (event.game_state.isOurDirectFree() || event.game_state.isOurIndirectFree())
     {
-        event.set_current_play(std::make_unique<FreeKickPlay>(ai_config));
+        event.set_current_play(std::make_unique<CornerKickPlay>(ai_config));
     }
 
     if (event.game_state.isTheirDirectFree() || event.game_state.isTheirIndirectFree())
