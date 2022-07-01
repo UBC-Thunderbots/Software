@@ -91,7 +91,7 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
                                  GpioState::HIGH),
       reset_gpio(MOTOR_DRIVER_RESET_GPIO, GpioDirection::OUTPUT, GpioState::HIGH),
       heartbeat_gpio(HEARTBEAT_GPIO, GpioDirection::OUTPUT, GpioState::HIGH),
-      euclidean_to_four_wheel(control_loop_frequency_hz, robot_constants)
+      euclidean_to_four_wheel(robot_constants)
 {
     robot_constants_ = robot_constants;
 
@@ -151,30 +151,7 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
     checkDriverFault(DRIBBLER_MOTOR_CHIP_SELECT);
     startController(DRIBBLER_MOTOR_CHIP_SELECT, true);
 
-    // Increment motor speeds by 450 over 20 cycles to test ramping
-    LOG(DEBUG) << "STARTING TEST MOTOR SPEEDS";
-    for (uint8_t motor = 0; motor < 1; motor++)
-    {
-        for (int i = 0; i < 800; i++)
-        {
-            tmc4671_setTargetVelocity(0, 500 * i);
-            tmc4671_setTargetVelocity(1, 500 * i);
-            tmc4671_setTargetVelocity(2, 500 * i);
-            tmc4671_setTargetVelocity(3, 500 * i);
-            usleep(MICROSECONDS_PER_MILLISECOND * 2.0);
-        }
-        for (int i = 80; i >= 0; i--)
-        {
-            tmc4671_setTargetVelocity(0, 500 * i);
-            tmc4671_setTargetVelocity(1, 500 * i);
-            tmc4671_setTargetVelocity(2, 500 * i);
-            tmc4671_setTargetVelocity(3, 500 * i);
-            usleep(MICROSECONDS_PER_MILLISECOND * 2.0);
-        }
-    }   
-    LOG(DEBUG) << "END TEST MOTOR SPEEDS";
-
-    //sleep(50);
+    sleep(1);
 }
 
 MotorService::~MotorService() {}
@@ -309,8 +286,10 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
     motor_status.mutable_back_right()->set_wheel_velocity(
         static_cast<float>(back_right_velocity));
 
-    // TODO debug why this doesn't work
-    WheelSpace_t current_wheel_velocities = {0.0, 0.0, 0.0, 0.0};
+    // This order needs to match euclidean_to_four_wheel converters order
+    // We also want to work in the meters per second space rather than electrical RPMs
+    WheelSpace_t current_wheel_velocities = {front_right_velocity, front_left_velocity,
+        back_left_velocity, back_right_velocity};
 
     // Convert to euclidean space
     EuclideanSpace_t current_euclidean_velocity =
@@ -339,18 +318,38 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
         case TbotsProto::MotorControl::DriveControlCase::kDirectVelocityControl:
         {
             EuclideanSpace_t target_euclidean_velocity = {
-                motor.direct_velocity_control().velocity().x_component_meters(),
                 motor.direct_velocity_control().velocity().y_component_meters(),
+                motor.direct_velocity_control().velocity().x_component_meters(),
                 motor.direct_velocity_control().angular_velocity().radians_per_second(),
             };
 
+            double y_ramp = computeRampVelocity(target_euclidean_velocity[0], current_euclidean_velocity[0], time_elapsed_since_last_poll_s);
+            double x_ramp = computeRampVelocity(target_euclidean_velocity[1], current_euclidean_velocity[1], time_elapsed_since_last_poll_s);
+            double rad_ramp = computeRampVelocity(target_euclidean_velocity[2], current_euclidean_velocity[2], time_elapsed_since_last_poll_s);
+
+            EuclideanSpace_t ramp_euclidean_velocity = {
+                y_ramp,
+                x_ramp,
+                rad_ramp,
+            };
+
             LOG(DEBUG) <<
-                "x: " << target_euclidean_velocity[0] << "," <<
-                "y: " << target_euclidean_velocity[1] << "," <<
+                "target: x: " << target_euclidean_velocity[1] << "," <<
+                "y: " << target_euclidean_velocity[0] << "," <<
                 "w: " << target_euclidean_velocity[2];
 
-            target_wheel_velocities = euclidean_to_four_wheel.getTargetWheelSpeeds(
-                target_euclidean_velocity, current_wheel_velocities);
+            LOG(DEBUG) <<
+                "ramp  : x: " << ramp_euclidean_velocity[1] << "," <<
+                "y: " << ramp_euclidean_velocity[0] << "," <<
+                "w: " << ramp_euclidean_velocity[2];
+
+            target_wheel_velocities =
+                euclidean_to_four_wheel.getWheelVelocity(ramp_euclidean_velocity);
+
+            LOG(DEBUG) <<
+                "command:  x: " << target_wheel_velocities[1] << "," <<
+                "y: " << target_wheel_velocities[0] << "," <<
+                "w: " << target_wheel_velocities[2];
 
             break;
         }
@@ -364,20 +363,11 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
         }
     }
 
-    // This order needs to match euclidean_to_four_wheel converters order
-    // We also want to work in the meters per second space rather than electrical RPMs
-    current_wheel_velocities = {front_right_velocity, front_left_velocity,
-        back_left_velocity, back_right_velocity};
-
     // Set target speeds accounting for acceleration
-    setTargetRampVelocity(FRONT_RIGHT_MOTOR_CHIP_SELECT, target_wheel_velocities[0],
-                          current_wheel_velocities[0], time_elapsed_since_last_poll_s);
-    setTargetRampVelocity(FRONT_LEFT_MOTOR_CHIP_SELECT, target_wheel_velocities[1],
-                          current_wheel_velocities[1], time_elapsed_since_last_poll_s);
-    setTargetRampVelocity(BACK_LEFT_MOTOR_CHIP_SELECT, target_wheel_velocities[2],
-                          current_wheel_velocities[2], time_elapsed_since_last_poll_s);
-    setTargetRampVelocity(BACK_RIGHT_MOTOR_CHIP_SELECT, target_wheel_velocities[3],
-                          current_wheel_velocities[3], time_elapsed_since_last_poll_s);
+    tmc4671_writeInt(FRONT_RIGHT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_TARGET, static_cast<int>(target_wheel_velocities[0] * ELECTRICAL_RPM_PER_MECHANICAL_MPS));
+    tmc4671_writeInt(FRONT_LEFT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_TARGET, static_cast<int>(target_wheel_velocities[1] * ELECTRICAL_RPM_PER_MECHANICAL_MPS));
+    tmc4671_writeInt(BACK_LEFT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_TARGET, static_cast<int>(target_wheel_velocities[2] * ELECTRICAL_RPM_PER_MECHANICAL_MPS));
+    tmc4671_writeInt(BACK_RIGHT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_TARGET, static_cast<int>(target_wheel_velocities[3] * ELECTRICAL_RPM_PER_MECHANICAL_MPS));
 
     if (previous_dribbler_rpm != target_dribbler_rpm)
     {
@@ -420,8 +410,8 @@ void MotorService::spiTransfer(int fd, uint8_t const* tx, uint8_t const* rx, uns
                     << strerror(errno);
 }
 
-inline void MotorService::setTargetRampVelocity(uint8_t motor, double velocity_target,
-                                         double velocity_current, double time_to_ramp)
+inline double MotorService::computeRampVelocity(double velocity_target,
+        double velocity_current, double time_to_ramp)
 {
     // Calculate velocity delta using kinematic equation: dv = a*t
     double velocity_delta =
@@ -431,7 +421,7 @@ inline void MotorService::setTargetRampVelocity(uint8_t motor, double velocity_t
     // receive. If we set the ramp velocity with no hysterisis, we will end up not
     // converging at the target velocity. Allowing 5cm/s of error was experimentally
     // determined to be sufficient for smooth operation.
-    double velocity_error = 0.05;
+    double velocity_error = 0.01;
     double ramp_velocity  = 0.0;
 
     // Case: accelerating
@@ -450,7 +440,7 @@ inline void MotorService::setTargetRampVelocity(uint8_t motor, double velocity_t
         ramp_velocity = velocity_target;
     }
 
-    tmc4671_writeInt(motor, TMC4671_PID_VELOCITY_TARGET, static_cast<int>(ramp_velocity * ELECTRICAL_RPM_PER_MECHANICAL_MPS));
+    return ramp_velocity;
 }
 
 
