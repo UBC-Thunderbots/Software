@@ -123,30 +123,23 @@ TEST(PolygonExpandTest, test_from_segments)
     double long_side_length  = radius * 2 + segment.length();
     double short_side_length = radius * 2;
 
-    try
-    {
-        // check side lengths
-        EXPECT_TRUE(TestUtil::equalWithinTolerance(first_side.length(), short_side_length,
-                                                   0.001));
-        EXPECT_TRUE(TestUtil::equalWithinTolerance(second_side.length(), long_side_length,
-                                                   0.001));
-        EXPECT_TRUE(TestUtil::equalWithinTolerance(third_side.length(), short_side_length,
-                                                   0.001));
-        EXPECT_TRUE(TestUtil::equalWithinTolerance(fourth_side.length(), long_side_length,
-                                                   0.001));
 
-        // check there's only 4 segments
-        EXPECT_EQ(segments.size(), 4);
+    // check side lengths
+    EXPECT_TRUE(
+        TestUtil::equalWithinTolerance(first_side.length(), short_side_length, 0.001));
+    EXPECT_TRUE(
+        TestUtil::equalWithinTolerance(second_side.length(), long_side_length, 0.001));
+    EXPECT_TRUE(
+        TestUtil::equalWithinTolerance(third_side.length(), short_side_length, 0.001));
+    EXPECT_TRUE(
+        TestUtil::equalWithinTolerance(fourth_side.length(), long_side_length, 0.001));
 
-        // check that angle between all sides is ninety degrees
-        EXPECT_EQ(first_side.orientation() - second_side.orientation(), ninety_degrees);
-        EXPECT_EQ(second_side.orientation() - third_side.orientation(), ninety_degrees);
-        EXPECT_EQ(third_side.orientation() - fourth_side.orientation(), ninety_degrees);
-        EXPECT_EQ(fourth_side.orientation() - first_side.orientation(), ninety_degrees);
-        GTEST_SUCCEED();
-    }
-    catch (const std::invalid_argument& e)
-    {
-        GTEST_FAIL();
-    }
+    // check there's only 4 segments
+    EXPECT_EQ(segments.size(), 4);
+
+    // check that angle between all sides is ninety degrees
+    EXPECT_EQ(first_side.orientation() - second_side.orientation(), ninety_degrees);
+    EXPECT_EQ(second_side.orientation() - third_side.orientation(), ninety_degrees);
+    EXPECT_EQ(third_side.orientation() - fourth_side.orientation(), ninety_degrees);
+    EXPECT_EQ(fourth_side.orientation() - first_side.orientation(), ninety_degrees);
 }
