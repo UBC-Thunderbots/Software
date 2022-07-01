@@ -8,7 +8,6 @@
 #include "software/jetson_nano/gpio.h"
 #include "software/physics/euclidean_to_wheel.h"
 
-// liam wuz here
 class MotorService
 {
    public:
