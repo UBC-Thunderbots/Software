@@ -361,10 +361,6 @@ Vector HRVOSimulator::getRobotVelocity(unsigned int robot_id) const
     auto hrvo_agent = getFriendlyAgentFromRobotId(robot_id);
     if (hrvo_agent.has_value())
     {
-        if (robot_id == 5 && friendly_team_colour == TeamColour::BLUE)
-        {
-            std::cout << "Robot vel read" << std::endl;
-        }
         return hrvo_agent.value()->getVelocity();
     }
     LOG(WARNING) << "Velocity for robot " << robot_id
@@ -378,14 +374,6 @@ void HRVOSimulator::updateFriendlyRobotVelocity(const RobotId robot_id, const Ve
     auto hrvo_agent = getFriendlyAgentFromRobotId(robot_id);
     if (hrvo_agent.has_value())
     {
-        if (robot_id == 5 && friendly_team_colour == TeamColour::BLUE)
-        {
-            std::cout << "========================" << std::endl;
-            std::cout << "World vel: " << hrvo_agent.value()->getVelocity() << "   " << hrvo_agent.value()->getVelocity().length() << std::endl;
-            std::cout << "Simul vel: " << new_velocity << "   " << new_velocity.length() << std::endl;
-            std::cout << "rotat dif: " << new_velocity.orientation().minDiff(hrvo_agent.value()->getVelocity().orientation()).toDegrees() << std::endl;
-        }
-
         return hrvo_agent.value()->setVelocity(new_velocity);
     }
 }
