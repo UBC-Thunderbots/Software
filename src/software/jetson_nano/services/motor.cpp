@@ -289,9 +289,8 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
     // TODO debug why this doesn't work
     WheelSpace_t current_wheel_velocities = {0.0, 0.0, 0.0, 0.0};
 
-    // Convert to euclidean space
-    EuclideanSpace_t current_euclidean_velocity =
-        euclidean_to_four_wheel.getEuclideanVelocity(current_wheel_velocities);
+    // Convert to Euclidean velocity_delta
+    EuclideanSpace_t current_euclidean_velocity = euclidean_to_four_wheel.getEuclideanVelocity(current_wheel_velocities);
 
     motor_status.mutable_local_velocity()->set_x_component_meters(
         static_cast<float>(current_euclidean_velocity[0]));
@@ -323,8 +322,7 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
 
             LOG(DEBUG) << motor.direct_velocity_control().DebugString();
 
-            target_wheel_velocities = euclidean_to_four_wheel.getWheelVelocity(
-                target_euclidean_velocity);
+            target_wheel_velocities = rampWheelVelocity(current_wheel_velocities, target_euclidean_velocity, time_elapsed_since_last_poll_s);
 
             break;
         }
@@ -336,7 +334,7 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
 
             break;
         }
-    }
+    };
 
     // This order needs to match euclidean_to_four_wheel converters order
     // We also want to work in the meters per second space rather than electrical RPMs
@@ -396,39 +394,38 @@ void MotorService::spiTransfer(int fd, uint8_t const* tx, uint8_t const* rx, uns
                     << strerror(errno);
 }
 
-inline void MotorService::setTargetRampVelocity(uint8_t motor, double velocity_target,
-                                         double velocity_current, double time_to_ramp)
+WheelSpace_t MotorService::rampWheelVelocity(const WheelSpace_t &current_wheel_velocity,
+        const EuclideanSpace_t &target_euclidean_velocity, const double &time_to_ramp)
 {
-    // Calculate velocity delta using kinematic equation: dv = a*t
-    double velocity_delta =
-        robot_constants_.robot_max_acceleration_m_per_s_2 * time_to_ramp;
+    // ramp wheel velocity
+    WheelSpace_t ramp_wheel_velocity;
 
-    // Trinamics PID control is far more accurate than the delayed velocity input we
-    // receive. If we set the ramp velocity with no hysterisis, we will end up not
-    // converging at the target velocity. Allowing 5cm/s of error was experimentally
-    // determined to be sufficient for smooth operation.
-    double velocity_error = 0.05;
-    double ramp_velocity  = 0.0;
+    // calculate max allowable wheel velocity delta using dv = a*t
+    auto allowable_wheel_acceleration = static_cast<double>(robot_constants_.robot_max_acceleration_m_per_s_2);
+    auto allowable_delta_wheel_velocity = allowable_wheel_acceleration * time_to_ramp;
 
-    // Case: accelerating
-    if (velocity_target > velocity_current + velocity_delta + velocity_error)
+    // convert euclidean to wheel velocity
+    WheelSpace_t target_wheel_velocity = euclidean_to_four_wheel.getWheelVelocity(target_euclidean_velocity);
+
+    // Ramp wheel velocity vector
+    // Step 1: Find absolute max velocity delta 
+    auto delta_target_wheel_velocity = target_wheel_velocity - current_wheel_velocity;
+    auto max_delta_target_wheel_velocity = delta_target_wheel_velocity.cwiseAbs().maxCoeff();
+
+    // Step 2: Compare max delta velocity against the calculated maximum
+    if (max_delta_target_wheel_velocity > allowable_delta_wheel_velocity)
     {
-        ramp_velocity = velocity_current + velocity_delta;
+        // Step 3: If larger, scale down to allowable max
+        ramp_wheel_velocity = ( delta_target_wheel_velocity / max_delta_target_wheel_velocity ) * allowable_delta_wheel_velocity + current_wheel_velocity;
     }
-    // Case: deccelerating
-    else if (velocity_target < velocity_current - velocity_delta - velocity_error)
-    {
-        ramp_velocity = velocity_current - velocity_delta;
-    }
-    // Case: ramping not required, go to target velocity
     else
     {
-        ramp_velocity = velocity_target;
+        // If smaller, go straigh to target
+        ramp_wheel_velocity = target_wheel_velocity;
     }
 
-    tmc4671_writeInt(motor, TMC4671_PID_VELOCITY_TARGET, static_cast<int>(ramp_velocity * ELECTRICAL_RPM_PER_MECHANICAL_MPS));
+    return ramp_wheel_velocity;
 }
-
 
 
 // Both the TMC4671 (the controller) and the TMC6100 (the driver) respect
