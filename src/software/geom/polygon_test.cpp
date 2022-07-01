@@ -108,36 +108,41 @@ TEST(PolygonExpandTest, test_invalid_modifier)
 
 TEST(PolygonExpandTest, test_from_segments)
 {
-    Segment segment(Point(0, 0), Point(2, 0));
+    const auto segment = Segment(Point(0, 0), Point(2, 2));
+    double radius      = 1;
 
-    const auto poly     = Polygon::fromSegment(segment, 1);
+    const auto poly     = Polygon::fromSegment(segment, radius);
     const auto segments = poly.getSegments();
 
-    const auto points = poly.getPoints();
-    for (Point point : points)
-    {
-        std::cout << "x: " << point.x() << " y: " << point.y() << std::endl;
-    }
     Vector first_side  = segments[0].toVector();
     Vector second_side = segments[1].toVector();
     Vector third_side  = segments[2].toVector();
     Vector fourth_side = segments[3].toVector();
 
+    Angle ninety_degrees     = Angle::fromDegrees(90);
+    double long_side_length  = radius * 2 + segment.length();
+    double short_side_length = radius * 2;
+
     try
     {
-        EXPECT_EQ(first_side.orientation() - second_side.orientation(),
-                  Angle::fromDegrees(90));
-        EXPECT_EQ(second_side.orientation() - third_side.orientation(),
-                  Angle::fromDegrees(90));
-        EXPECT_EQ(third_side.orientation() - fourth_side.orientation(),
-                  Angle::fromDegrees(90));
-        EXPECT_EQ(fourth_side.orientation() - first_side.orientation(),
-                  Angle::fromDegrees(90));
-        EXPECT_EQ(first_side.length(), 2);
-        EXPECT_EQ(second_side.length(), 4);
-        EXPECT_EQ(third_side.length(), 2);
-        EXPECT_EQ(fourth_side.length(), 4);
+        // check side lengths
+        EXPECT_TRUE(TestUtil::equalWithinTolerance(first_side.length(), short_side_length,
+                                                   0.001));
+        EXPECT_TRUE(TestUtil::equalWithinTolerance(second_side.length(), long_side_length,
+                                                   0.001));
+        EXPECT_TRUE(TestUtil::equalWithinTolerance(third_side.length(), short_side_length,
+                                                   0.001));
+        EXPECT_TRUE(TestUtil::equalWithinTolerance(fourth_side.length(), long_side_length,
+                                                   0.001));
+
+        // check there's only 4 segments
         EXPECT_EQ(segments.size(), 4);
+
+        // check that angle between all sides is ninety degrees
+        EXPECT_EQ(first_side.orientation() - second_side.orientation(), ninety_degrees);
+        EXPECT_EQ(second_side.orientation() - third_side.orientation(), ninety_degrees);
+        EXPECT_EQ(third_side.orientation() - fourth_side.orientation(), ninety_degrees);
+        EXPECT_EQ(fourth_side.orientation() - first_side.orientation(), ninety_degrees);
         GTEST_SUCCEED();
     }
     catch (const std::invalid_argument& e)
