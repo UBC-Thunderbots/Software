@@ -39,9 +39,9 @@ def test_corner_kick_play_bottom_left(simulated_test_runner):
     simulated_test_runner.gamecontroller.send_ci_input(
         gc_command=Command.Type.STOP, team=Team.UNKNOWN
     )
-#    simulated_test_runner.gamecontroller.send_ci_input(
-#        gc_command=Command.Type.NORMAL_START, team=Team.BLUE
-#    )
+    #    simulated_test_runner.gamecontroller.send_ci_input(
+    #        gc_command=Command.Type.NORMAL_START, team=Team.BLUE
+    #    )
     simulated_test_runner.gamecontroller.send_ci_input(
         gc_command=Command.Type.DIRECT, team=Team.BLUE
     )
@@ -71,6 +71,7 @@ def test_corner_kick_play_bottom_left(simulated_test_runner):
         always_validation_sequence_set=always_validation_sequence_set,
         test_timeout_s=25,
     )
+
 
 def test_corner_kick_play_top_right(simulated_test_runner):
 
@@ -100,9 +101,9 @@ def test_corner_kick_play_top_right(simulated_test_runner):
     simulated_test_runner.gamecontroller.send_ci_input(
         gc_command=Command.Type.HALT, team=Team.UNKNOWN
     )
-#    simulated_test_runner.gamecontroller.send_ci_input(
-#        gc_command=Command.Type.NORMAL_START, team=Team.BLUE
-#    )
+    #    simulated_test_runner.gamecontroller.send_ci_input(
+    #        gc_command=Command.Type.NORMAL_START, team=Team.BLUE
+    #    )
     simulated_test_runner.gamecontroller.send_ci_input(
         gc_command=Command.Type.DIRECT, team=Team.BLUE
     )
@@ -129,6 +130,7 @@ def test_corner_kick_play_top_right(simulated_test_runner):
         always_validation_sequence_set=always_validation_sequence_set,
         test_timeout_s=25,
     )
+
 
 if __name__ == "__main__":
     # Run the test, -s disables all capturing at -vv increases verbosity
