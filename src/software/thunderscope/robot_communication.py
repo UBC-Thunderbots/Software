@@ -95,7 +95,7 @@ class RobotCommunication(object):
                 print("ASD")
 
                 if self.estop_reader.isEstopPlay():
-                    print("sending proto")
+                    print("sending proto", primitive_set)
                     self.send_primitive_set.send_proto(primitive_set)
 
             else:
@@ -179,8 +179,8 @@ class RobotCommunication(object):
             self.multicast_channel + "%" + self.interface, VISION_PORT, True
         )
 
-        self.disconnect_fullsystem_from_robots()
-        self.connect_robot_to_diagnostics(9)
+        self.connect_fullsystem_to_robots()
+        # self.connect_robot_to_diagnostics(9)
 
         self.send_estop_state_thread.start()
         self.run_thread.start()
