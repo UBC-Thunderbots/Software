@@ -26,12 +26,12 @@ extern "C"
 }
 
 // SPI Configs
-static const uint32_t SPI_SPEED_HZ    = 2000000;  // 2 Mhz
-static const uint32_t TMC6100_SPI_SPEED    = 1000000;  // 1 Mhz
-static const uint32_t TMC4671_SPI_SPEED    = 2000000;  // 1 Mhz
-static const uint8_t SPI_BITS         = 8;
-static const uint32_t SPI_MODE        = 0x3u;
-static const uint32_t NUM_RETRIES_SPI = 3;
+static const uint32_t SPI_SPEED_HZ      = 2000000;  // 2 Mhz
+static const uint32_t TMC6100_SPI_SPEED = 1000000;  // 1 Mhz
+static const uint32_t TMC4671_SPI_SPEED = 2000000;  // 1 Mhz
+static const uint8_t SPI_BITS           = 8;
+static const uint32_t SPI_MODE          = 0x3u;
+static const uint32_t NUM_RETRIES_SPI   = 3;
 
 // SPI Chip Selects
 static const uint8_t FRONT_LEFT_MOTOR_CHIP_SELECT  = 0;
@@ -290,7 +290,8 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
     WheelSpace_t current_wheel_velocities = {0.0, 0.0, 0.0, 0.0};
 
     // Convert to Euclidean velocity_delta
-    EuclideanSpace_t current_euclidean_velocity = euclidean_to_four_wheel.getEuclideanVelocity(current_wheel_velocities);
+    EuclideanSpace_t current_euclidean_velocity =
+        euclidean_to_four_wheel.getEuclideanVelocity(current_wheel_velocities);
 
     motor_status.mutable_local_velocity()->set_x_component_meters(
         static_cast<float>(current_euclidean_velocity[0]));
@@ -322,7 +323,9 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
 
             LOG(DEBUG) << motor.direct_velocity_control().DebugString();
 
-            target_wheel_velocities = rampWheelVelocity(current_wheel_velocities, target_euclidean_velocity, time_elapsed_since_last_poll_s);
+            target_wheel_velocities =
+                rampWheelVelocity(current_wheel_velocities, target_euclidean_velocity,
+                                  time_elapsed_since_last_poll_s);
 
             break;
         }
@@ -339,19 +342,24 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
     // This order needs to match euclidean_to_four_wheel converters order
     // We also want to work in the meters per second space rather than electrical RPMs
     current_wheel_velocities = {front_right_velocity, front_left_velocity,
-        back_left_velocity, back_right_velocity};
+                                back_left_velocity, back_right_velocity};
 
     // Set target speeds accounting for acceleration
-    setTargetRampVelocity(FRONT_RIGHT_MOTOR_CHIP_SELECT, target_wheel_velocities[0],
-                          current_wheel_velocities[0], time_elapsed_since_last_poll_s);
-    setTargetRampVelocity(FRONT_LEFT_MOTOR_CHIP_SELECT, target_wheel_velocities[1],
-                          current_wheel_velocities[1], time_elapsed_since_last_poll_s);
-    setTargetRampVelocity(BACK_LEFT_MOTOR_CHIP_SELECT, target_wheel_velocities[2],
-                          current_wheel_velocities[2], time_elapsed_since_last_poll_s);
-    setTargetRampVelocity(BACK_RIGHT_MOTOR_CHIP_SELECT, target_wheel_velocities[3],
-                          current_wheel_velocities[3], time_elapsed_since_last_poll_s);
+    tmc4671_writeInt(
+        FRONT_RIGHT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_TARGET,
+        static_cast<int>(target_wheel_velocities[0] * ELECTRICAL_RPM_PER_MECHANICAL_MPS));
+    tmc4671_writeInt(
+        FRONT_LEFT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_TARGET,
+        static_cast<int>(target_wheel_velocities[1] * ELECTRICAL_RPM_PER_MECHANICAL_MPS));
+    tmc4671_writeInt(
+        BACK_LEFT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_TARGET,
+        static_cast<int>(target_wheel_velocities[2] * ELECTRICAL_RPM_PER_MECHANICAL_MPS));
+    tmc4671_writeInt(
+        BACK_RIGHT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_TARGET,
+        static_cast<int>(target_wheel_velocities[3] * ELECTRICAL_RPM_PER_MECHANICAL_MPS));
 
-    LOG(CSV) << "debug.csv" << front_right_velocity << "," << front_left_velocity << "," << back_left_velocity << "," << back_right_velocity;
+    LOG(CSV) << "debug.csv" << front_right_velocity << "," << front_left_velocity << ","
+             << back_left_velocity << "," << back_right_velocity << "\n";
 
     if (previous_dribbler_rpm != target_dribbler_rpm)
     {
@@ -374,7 +382,8 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
     return motor_status;
 }
 
-void MotorService::spiTransfer(int fd, uint8_t const* tx, uint8_t const* rx, unsigned len, uint32_t spi_speed)
+void MotorService::spiTransfer(int fd, uint8_t const* tx, uint8_t const* rx, unsigned len,
+                               uint32_t spi_speed)
 {
     int ret;
 
@@ -394,35 +403,51 @@ void MotorService::spiTransfer(int fd, uint8_t const* tx, uint8_t const* rx, uns
                     << strerror(errno);
 }
 
-WheelSpace_t MotorService::rampWheelVelocity(const WheelSpace_t &current_wheel_velocity,
-        const EuclideanSpace_t &target_euclidean_velocity, const double &time_to_ramp)
+WheelSpace_t MotorService::rampWheelVelocity(
+    const WheelSpace_t& current_wheel_velocity,
+    const EuclideanSpace_t& target_euclidean_velocity, const double& time_to_ramp)
 {
     // ramp wheel velocity
     WheelSpace_t ramp_wheel_velocity;
 
     // calculate max allowable wheel velocity delta using dv = a*t
-    auto allowable_wheel_acceleration = static_cast<double>(robot_constants_.robot_max_acceleration_m_per_s_2);
+    auto allowable_wheel_acceleration =
+        static_cast<double>(robot_constants_.robot_max_acceleration_m_per_s_2);
     auto allowable_delta_wheel_velocity = allowable_wheel_acceleration * time_to_ramp;
 
     // convert euclidean to wheel velocity
-    WheelSpace_t target_wheel_velocity = euclidean_to_four_wheel.getWheelVelocity(target_euclidean_velocity);
+    WheelSpace_t target_wheel_velocity =
+        euclidean_to_four_wheel.getWheelVelocity(target_euclidean_velocity);
 
     // Ramp wheel velocity vector
-    // Step 1: Find absolute max velocity delta 
+    // Step 1: Find absolute max velocity delta
     auto delta_target_wheel_velocity = target_wheel_velocity - current_wheel_velocity;
-    auto max_delta_target_wheel_velocity = delta_target_wheel_velocity.cwiseAbs().maxCoeff();
+    auto max_delta_target_wheel_velocity =
+        delta_target_wheel_velocity.cwiseAbs().maxCoeff();
 
     // Step 2: Compare max delta velocity against the calculated maximum
     if (max_delta_target_wheel_velocity > allowable_delta_wheel_velocity)
     {
         // Step 3: If larger, scale down to allowable max
-        ramp_wheel_velocity = ( delta_target_wheel_velocity / max_delta_target_wheel_velocity ) * allowable_delta_wheel_velocity + current_wheel_velocity;
+        ramp_wheel_velocity =
+            (delta_target_wheel_velocity / max_delta_target_wheel_velocity) *
+                allowable_delta_wheel_velocity +
+            current_wheel_velocity;
     }
     else
     {
         // If smaller, go straigh to target
         ramp_wheel_velocity = target_wheel_velocity;
     }
+
+
+    LOG(CSV) << "ramp.csv" <<
+        max_delta_target_wheel_velocity <<  "," <<
+        allowable_delta_wheel_velocity << "," <<
+        ramp_wheel_velocity[0] << "," << 
+        ramp_wheel_velocity[1] << "," << 
+        ramp_wheel_velocity[2] << "," << 
+        ramp_wheel_velocity[3] << "\n";
 
     return ramp_wheel_velocity;
 }
@@ -478,7 +503,8 @@ uint8_t MotorService::tmc6100ReadWriteByte(uint8_t motor, uint8_t data,
     return readWriteByte(motor, data, last_transfer, TMC6100_SPI_SPEED);
 }
 
-uint8_t MotorService::readWriteByte(uint8_t motor, uint8_t data, uint8_t last_transfer, uint32_t spi_speed)
+uint8_t MotorService::readWriteByte(uint8_t motor, uint8_t data, uint8_t last_transfer,
+                                    uint32_t spi_speed)
 {
     uint8_t ret_byte = 0;
 

@@ -182,7 +182,7 @@ void Thunderloop::runLoop()
 
                 clock_gettime(CLOCK_MONOTONIC, &current_time);
                 ScopedTimespecTimer::timespecDiff(&current_time,
-                        &last_primitive_received_time, &result);
+                                                  &last_primitive_received_time, &result);
 
                 auto nanoseconds_elapsed_since_last_primitive =
                     result.tv_sec * static_cast<int>(NANOSECONDS_PER_SECOND) +
@@ -197,7 +197,7 @@ void Thunderloop::runLoop()
                 }
 
                 auto friendly_team = Team(world_.friendly_team());
-                auto robot = friendly_team.getRobotById(robot_id_);
+                auto robot         = friendly_team.getRobotById(robot_id_);
 
                 if (robot.has_value())
                 {
@@ -205,8 +205,8 @@ void Thunderloop::runLoop()
                 }
 
                 // TODO ROBOT COLOUR
-                direct_control_ = *primitive_executor_.stepPrimitive(
-                    robot_id_, current_orientation_);
+                direct_control_ =
+                    *primitive_executor_.stepPrimitive(robot_id_, current_orientation_);
             }
 
             thunderloop_status_.set_primitive_executor_step_time_ns(
@@ -224,8 +224,8 @@ void Thunderloop::runLoop()
             // Motor Service: execute the motor control command
             {
                 ScopedTimespecTimer timer(&poll_time);
-                motor_status_ =
-                    motor_service_->poll(direct_control_.motor_control(), loop_duration_seconds);
+                motor_status_ = motor_service_->poll(direct_control_.motor_control(),
+                                                     loop_duration_seconds);
                 primitive_executor_.updateLocalVelocity(
                     createVector(motor_status_.local_velocity()));
             }
@@ -248,7 +248,8 @@ void Thunderloop::runLoop()
         // LOG(DEBUG) << thunderloop_status_.DebugString();
 
         // Make sure the iteration can fit inside the period of the loop
-        loop_duration_seconds = static_cast<double>(loop_duration) * SECONDS_PER_NANOSECOND;
+        loop_duration_seconds =
+            static_cast<double>(loop_duration) * SECONDS_PER_NANOSECOND;
 
         // Calculate next shot taking into account how long this iteration took
         next_shot.tv_nsec += interval - loop_duration;

@@ -67,10 +67,10 @@ AngularVelocity PrimitiveExecutor::getTargetAngularVelocity(
     double next_angular_speed = std::min(max_angular_speed, deceleration_angular_speed);
 
     const double signed_delta_orientation =
-            (dest_orientation - curr_orientation).clamp().toRadians();
+        (dest_orientation - curr_orientation).clamp().toRadians();
     LOG(DEBUG) << delta_orientation;
     return AngularVelocity::fromRadians(
-            std::copysign(next_angular_speed, signed_delta_orientation));
+        std::copysign(next_angular_speed, signed_delta_orientation));
 }
 
 

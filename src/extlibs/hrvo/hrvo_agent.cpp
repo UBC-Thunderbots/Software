@@ -197,106 +197,106 @@ void HRVOAgent::computeNewVelocity()
 
     // this adds candidate points that are projections of the preferred velocity onto the
     // line segment of each obstacle
-    //for (int i = 0; i < static_cast<int>(velocityObstacles_.size()); ++i)
+    // for (int i = 0; i < static_cast<int>(velocityObstacles_.size()); ++i)
     //{
-        //const Vector apex_to_pref_velocity =
-            //pref_velocity_ - velocityObstacles_[i].getApex();
+    // const Vector apex_to_pref_velocity =
+    // pref_velocity_ - velocityObstacles_[i].getApex();
 
-        //candidate.velocityObstacle1_ = i;
-        //candidate.velocityObstacle2_ = i;
+    // candidate.velocityObstacle1_ = i;
+    // candidate.velocityObstacle2_ = i;
 
-        //const float dotProduct1 =
-            //apex_to_pref_velocity.dot(velocityObstacles_[i].getRightSide());
-        //const float dotProduct2 =
-            //apex_to_pref_velocity.dot(velocityObstacles_[i].getLeftSide());
+    // const float dotProduct1 =
+    // apex_to_pref_velocity.dot(velocityObstacles_[i].getRightSide());
+    // const float dotProduct2 =
+    // apex_to_pref_velocity.dot(velocityObstacles_[i].getLeftSide());
 
-        //if (dotProduct1 > 0.0f &&
-            //velocityObstacles_[i].getRightSide().isClockwiseOf(apex_to_pref_velocity))
-        //{
-            //candidate.velocity = velocityObstacles_[i].getApex() +
-                                 //dotProduct1 * velocityObstacles_[i].getRightSide();
+    // if (dotProduct1 > 0.0f &&
+    // velocityObstacles_[i].getRightSide().isClockwiseOf(apex_to_pref_velocity))
+    //{
+    // candidate.velocity = velocityObstacles_[i].getApex() +
+    // dotProduct1 * velocityObstacles_[i].getRightSide();
 
-            //addToCandidateListIfValid(candidate);
-        //}
-
-        //if (dotProduct2 > 0.0f &&
-            //velocityObstacles_[i].getLeftSide().isCounterClockwiseOf(
-                //apex_to_pref_velocity))
-        //{
-            //candidate.velocity = velocityObstacles_[i].getApex() +
-                                 //dotProduct2 * velocityObstacles_[i].getLeftSide();
-
-            //addToCandidateListIfValid(candidate);
-        //}
+    // addToCandidateListIfValid(candidate);
     //}
 
-    //for (int j = 0; j < static_cast<int>(velocityObstacles_.size()); ++j)
+    // if (dotProduct2 > 0.0f &&
+    // velocityObstacles_[i].getLeftSide().isCounterClockwiseOf(
+    // apex_to_pref_velocity))
     //{
-        //candidate.velocityObstacle1_ = std::numeric_limits<int>::max();
-        //candidate.velocityObstacle2_ = j;
+    // candidate.velocity = velocityObstacles_[i].getApex() +
+    // dotProduct2 * velocityObstacles_[i].getLeftSide();
 
-        //float discriminant =
-            //max_speed_ * max_speed_ -
-            //std::pow((velocityObstacles_[j].getApex())
-                         //.determinant(velocityObstacles_[j].getRightSide()),
-                     //2.f);
+    // addToCandidateListIfValid(candidate);
+    //}
+    //}
 
-        //if (discriminant > 0.0f)
-        //{
-            //const float t1 = -(velocityObstacles_[j].getApex().dot(
-                                 //velocityObstacles_[j].getRightSide())) +
-                             //std::sqrt(discriminant);
-            //const float t2 = -(velocityObstacles_[j].getApex().dot(
-                                 //velocityObstacles_[j].getRightSide())) -
-                             //std::sqrt(discriminant);
+    // for (int j = 0; j < static_cast<int>(velocityObstacles_.size()); ++j)
+    //{
+    // candidate.velocityObstacle1_ = std::numeric_limits<int>::max();
+    // candidate.velocityObstacle2_ = j;
 
-            //if (t1 >= 0.0f)
-            //{
-                //candidate.velocity = velocityObstacles_[j].getApex() +
-                                     //t1 * velocityObstacles_[j].getRightSide();
-                //candidates_.insert(std::make_pair(
-                    //(pref_velocity_ - candidate.velocity).lengthSquared(), candidate));
-            //}
+    // float discriminant =
+    // max_speed_ * max_speed_ -
+    // std::pow((velocityObstacles_[j].getApex())
+    //.determinant(velocityObstacles_[j].getRightSide()),
+    // 2.f);
 
-            //if (t2 >= 0.0f)
-            //{
-                //candidate.velocity = velocityObstacles_[j].getApex() +
-                                     //t2 * velocityObstacles_[j].getRightSide();
-                //candidates_.insert(std::make_pair(
-                    //(pref_velocity_ - candidate.velocity).lengthSquared(), candidate));
-            //}
-        //}
+    // if (discriminant > 0.0f)
+    //{
+    // const float t1 = -(velocityObstacles_[j].getApex().dot(
+    // velocityObstacles_[j].getRightSide())) +
+    // std::sqrt(discriminant);
+    // const float t2 = -(velocityObstacles_[j].getApex().dot(
+    // velocityObstacles_[j].getRightSide())) -
+    // std::sqrt(discriminant);
 
-        //discriminant = max_speed_ * max_speed_ -
-                       //std::pow((velocityObstacles_[j].getApex())
-                                    //.determinant(velocityObstacles_[j].getLeftSide()),
-                                //2.f);
+    // if (t1 >= 0.0f)
+    //{
+    // candidate.velocity = velocityObstacles_[j].getApex() +
+    // t1 * velocityObstacles_[j].getRightSide();
+    // candidates_.insert(std::make_pair(
+    //(pref_velocity_ - candidate.velocity).lengthSquared(), candidate));
+    //}
 
-        //if (discriminant > 0.0f)
-        //{
-            //const float t1 = -(velocityObstacles_[j].getApex().dot(
-                                 //velocityObstacles_[j].getLeftSide())) +
-                             //std::sqrt(discriminant);
-            //const float t2 = -(velocityObstacles_[j].getApex().dot(
-                                 //velocityObstacles_[j].getLeftSide())) -
-                             //std::sqrt(discriminant);
+    // if (t2 >= 0.0f)
+    //{
+    // candidate.velocity = velocityObstacles_[j].getApex() +
+    // t2 * velocityObstacles_[j].getRightSide();
+    // candidates_.insert(std::make_pair(
+    //(pref_velocity_ - candidate.velocity).lengthSquared(), candidate));
+    //}
+    //}
 
-            //if (t1 >= 0.0f)
-            //{
-                //candidate.velocity = velocityObstacles_[j].getApex() +
-                                     //t1 * velocityObstacles_[j].getLeftSide();
-                //candidates_.insert(std::make_pair(
-                    //(pref_velocity_ - candidate.velocity).lengthSquared(), candidate));
-            //}
+    // discriminant = max_speed_ * max_speed_ -
+    // std::pow((velocityObstacles_[j].getApex())
+    //.determinant(velocityObstacles_[j].getLeftSide()),
+    // 2.f);
 
-            //if (t2 >= 0.0f)
-            //{
-                //candidate.velocity = velocityObstacles_[j].getApex() +
-                                     //t2 * velocityObstacles_[j].getLeftSide();
-                //candidates_.insert(std::make_pair(
-                    //(pref_velocity_ - candidate.velocity).lengthSquared(), candidate));
-            //}
-        //}
+    // if (discriminant > 0.0f)
+    //{
+    // const float t1 = -(velocityObstacles_[j].getApex().dot(
+    // velocityObstacles_[j].getLeftSide())) +
+    // std::sqrt(discriminant);
+    // const float t2 = -(velocityObstacles_[j].getApex().dot(
+    // velocityObstacles_[j].getLeftSide())) -
+    // std::sqrt(discriminant);
+
+    // if (t1 >= 0.0f)
+    //{
+    // candidate.velocity = velocityObstacles_[j].getApex() +
+    // t1 * velocityObstacles_[j].getLeftSide();
+    // candidates_.insert(std::make_pair(
+    //(pref_velocity_ - candidate.velocity).lengthSquared(), candidate));
+    //}
+
+    // if (t2 >= 0.0f)
+    //{
+    // candidate.velocity = velocityObstacles_[j].getApex() +
+    // t2 * velocityObstacles_[j].getLeftSide();
+    // candidates_.insert(std::make_pair(
+    //(pref_velocity_ - candidate.velocity).lengthSquared(), candidate));
+    //}
+    //}
     //}
 
     // intersection points of all velocity obstacles with each other

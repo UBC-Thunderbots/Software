@@ -1,7 +1,7 @@
 #pragma once
+#include <Eigen/Dense>
 #include <memory>
 #include <string>
-#include <Eigen/Dense>
 
 #include "proto/robot_status_msg.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
@@ -137,7 +137,8 @@ class MotorService
      * @param spi_speed
      *
      */
-    void spiTransfer(int fd, uint8_t const* tx, uint8_t const* rx, unsigned len, uint32_t spi_speed);
+    void spiTransfer(int fd, uint8_t const* tx, uint8_t const* rx, unsigned len,
+                     uint32_t spi_speed);
 
     /**
      * Ramp the velocity over the given timestep and set the target velocity on the motor.
@@ -150,9 +151,9 @@ class MotorService
      * @param time_to_ramp The time allocated for acceleration in seconds
      *
      */
-     WheelSpace_t rampWheelVelocity(const WheelSpace_t &current_wheel_velocity,
-        const EuclideanSpace_t &target_euclidean_velocity,
-        const double &time_to_ramp);
+    WheelSpace_t rampWheelVelocity(const WheelSpace_t& current_wheel_velocity,
+                                   const EuclideanSpace_t& target_euclidean_velocity,
+                                   const double& time_to_ramp);
 
     /**
      * Convert electrical rpm to wheel velocity.
@@ -185,7 +186,7 @@ class MotorService
      *
      */
     int dribblerVelocityToElectricalRpm(double dribbler_velcocity);
-    
+
     /**
      * Trinamic API Binding function
      *
@@ -194,7 +195,8 @@ class MotorService
      * @param last_transfer The last transfer of uint8_t data for this transaction.
      * @return A byte read from the trinamic chip
      */
-    uint8_t readWriteByte(uint8_t motor, uint8_t data, uint8_t last_transfer, uint32_t spi_speed);
+    uint8_t readWriteByte(uint8_t motor, uint8_t data, uint8_t last_transfer,
+                          uint32_t spi_speed);
 
 
     /**

@@ -294,9 +294,12 @@ new_git_repository(
     name = "trinamic",
     build_file = "@//extlibs:trinamic.BUILD",
     commit = "0cd695fab6d43ceb121af4b8608e5d92b14e1ce9",
+    patch_args = [
+        "-p1",
+        "@//extlibs:trinamic.patch",
+    ],
     remote = "https://github.com/trinamic/TMC-API.git",
     shallow_since = "1631132123 +0200",
-    patch_args=["-p1","@//extlibs:trinamic.patch"],
 )
 
 register_toolchains("//:py_toolchain")

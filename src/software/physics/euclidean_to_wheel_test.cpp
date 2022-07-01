@@ -23,8 +23,7 @@ TEST_F(EuclideanToWheelTest, test_target_wheel_speeds_zero)
 
     EXPECT_TRUE(TestUtil::equalWithinTolerance(
         expected_wheel_speeds,
-        euclidean_to_four_wheel.getTargetWheelSpeeds(target_euclidean_velocity),
-        0.001));
+        euclidean_to_four_wheel.getTargetWheelSpeeds(target_euclidean_velocity), 0.001));
 }
 
 TEST_F(EuclideanToWheelTest, test_target_wheel_speeds_x)
@@ -35,8 +34,7 @@ TEST_F(EuclideanToWheelTest, test_target_wheel_speeds_x)
 
     EXPECT_TRUE(TestUtil::equalWithinTolerance(
         expected_wheel_speeds,
-        euclidean_to_four_wheel.getTargetWheelSpeeds(target_euclidean_velocity),
-        0.001));
+        euclidean_to_four_wheel.getTargetWheelSpeeds(target_euclidean_velocity), 0.001));
 
     // test -/left
     target_euclidean_velocity = {-1, 0, 0};
@@ -44,8 +42,7 @@ TEST_F(EuclideanToWheelTest, test_target_wheel_speeds_x)
 
     EXPECT_TRUE(TestUtil::equalWithinTolerance(
         expected_wheel_speeds,
-        euclidean_to_four_wheel.getTargetWheelSpeeds(target_euclidean_velocity),
-        0.001));
+        euclidean_to_four_wheel.getTargetWheelSpeeds(target_euclidean_velocity), 0.001));
 }
 
 TEST_F(EuclideanToWheelTest, test_target_wheel_speeds_y)
@@ -56,8 +53,7 @@ TEST_F(EuclideanToWheelTest, test_target_wheel_speeds_y)
 
     EXPECT_TRUE(TestUtil::equalWithinTolerance(
         expected_wheel_speeds,
-        euclidean_to_four_wheel.getTargetWheelSpeeds(target_euclidean_velocity),
-        0.001));
+        euclidean_to_four_wheel.getTargetWheelSpeeds(target_euclidean_velocity), 0.001));
 
     // test -/backwards
     target_euclidean_velocity = {0, -1, 0};
@@ -65,8 +61,7 @@ TEST_F(EuclideanToWheelTest, test_target_wheel_speeds_y)
 
     EXPECT_TRUE(TestUtil::equalWithinTolerance(
         expected_wheel_speeds,
-        euclidean_to_four_wheel.getTargetWheelSpeeds(target_euclidean_velocity),
-        0.001));
+        euclidean_to_four_wheel.getTargetWheelSpeeds(target_euclidean_velocity), 0.001));
 }
 
 TEST_F(EuclideanToWheelTest, test_target_wheel_speeds_w)
@@ -77,8 +72,7 @@ TEST_F(EuclideanToWheelTest, test_target_wheel_speeds_w)
 
     EXPECT_TRUE(TestUtil::equalWithinTolerance(
         expected_wheel_speeds,
-        euclidean_to_four_wheel.getTargetWheelSpeeds(target_euclidean_velocity),
-        0.001));
+        euclidean_to_four_wheel.getTargetWheelSpeeds(target_euclidean_velocity), 0.001));
 
     // test -/backwards
     target_euclidean_velocity = {0, 0, -1};
@@ -86,8 +80,7 @@ TEST_F(EuclideanToWheelTest, test_target_wheel_speeds_w)
 
     EXPECT_TRUE(TestUtil::equalWithinTolerance(
         expected_wheel_speeds,
-        euclidean_to_four_wheel.getTargetWheelSpeeds(target_euclidean_velocity),
-        0.001));
+        euclidean_to_four_wheel.getTargetWheelSpeeds(target_euclidean_velocity), 0.001));
 }
 
 TEST_F(EuclideanToWheelTest, test_target_wheel_speeds_all)
@@ -98,7 +91,5 @@ TEST_F(EuclideanToWheelTest, test_target_wheel_speeds_all)
 
     EXPECT_TRUE(TestUtil::equalWithinTolerance(
         expected_wheel_speeds,
-        euclidean_to_four_wheel.getTargetWheelSpeeds(target_euclidean_velocity),
-        0.001));
+        euclidean_to_four_wheel.getTargetWheelSpeeds(target_euclidean_velocity), 0.001));
 }
-

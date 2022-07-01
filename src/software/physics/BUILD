@@ -1,15 +1,6 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "ramp",
-    srcs = [ramp.cpp],
-    deps = [
-        "//shared:robot_constants",
-        "//software/physics:euclidean_to_wheel",
-        "@eigen",
-    ],
-)
-cc_library(
     name = "euclidean_to_wheel",
     srcs = [
         "euclidean_to_wheel.cpp",
