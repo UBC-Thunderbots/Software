@@ -85,5 +85,5 @@ void loop()
             Serial.write(byte);
         }
     }
-    delay(25);
+    delay(1);
 }

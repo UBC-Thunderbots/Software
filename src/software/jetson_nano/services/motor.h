@@ -134,9 +134,10 @@ class MotorService
      * @param tx The tx buffer, data to send out
      * @param rx The rx buffer, will be updated with data from the full-duplex transfer
      * @param len The length of the tx and rx buffer
+     * @param spi_speed
      *
      */
-    void spiTransfer(int fd, uint8_t const* tx, uint8_t const* rx, unsigned len);
+    void spiTransfer(int fd, uint8_t const* tx, uint8_t const* rx, unsigned len, uint32_t spi_speed);
 
     /**
      * Ramp the velocity over the given timestep and set the target velocity on the motor.
@@ -150,7 +151,7 @@ class MotorService
      * @param time_to_ramp The time allocated for acceleration in seconds
      *
      */
-    void setTargetRampVelocity(uint8_t motor, double velocity_target,
+    inline void setTargetRampVelocity(uint8_t motor, double velocity_target,
                                double velocity_current, double time_to_ramp);
 
     /**
@@ -193,7 +194,7 @@ class MotorService
      * @param last_transfer The last transfer of uint8_t data for this transaction.
      * @return A byte read from the trinamic chip
      */
-    uint8_t readWriteByte(uint8_t motor, uint8_t data, uint8_t last_transfer);
+    uint8_t readWriteByte(uint8_t motor, uint8_t data, uint8_t last_transfer, uint32_t spi_speed);
 
 
     /**

@@ -72,12 +72,21 @@ void Thunderloop::runLoop()
     for (;;)
     {
         {
-            redis_client_->set("/battery_voltage",
-                               std::to_string(power_status_.battery_voltage()));
-            redis_client_->set("/cap_voltage",
-                               std::to_string(power_status_.capacitor_voltage()));
-            redis_client_->set("/current_draw",
-                               std::to_string(power_status_.current_draw()));
+            //redis_client_->set("/battery_voltage",
+                               //std::to_string(power_status_.battery_voltage()));
+            //redis_client_->set("/cap_voltage",
+                               //std::to_string(power_status_.capacitor_voltage()));
+            //redis_client_->set("/current_draw",
+                               //std::to_string(power_status_.current_draw()));
+
+            //if (power_status_.battery_voltage() < 20.0)
+            //{
+                //LOG(FATAL) << "BATTERY LEVEL TOO LOW, GTFO";
+            //}
+            //else if (power_status_.battery_voltage() < 21.0)
+            //{
+                //LOG(WARNING) << "LOW BATTERY LEVEL!";
+            //}
 
             // Wait until next shot
             //
@@ -214,7 +223,6 @@ void Thunderloop::runLoop()
                 ScopedTimespecTimer timer(&poll_time);
                 motor_status_ =
                     motor_service_->poll(direct_control_.motor_control(), 1.0 / loop_hz_);
-                LOG(DEBUG) << direct_control_.motor_control().DebugString();
                 primitive_executor_.updateLocalVelocity(
                     createVector(motor_status_.local_velocity()));
             }
@@ -233,10 +241,15 @@ void Thunderloop::runLoop()
             iteration_time.tv_nsec;
         thunderloop_status_.set_iteration_time_ns(loop_duration);
 
+
+
+        // Only print every 5 iterations
+        LOG(DEBUG) << thunderloop_status_.DebugString();
+
         // Make sure the iteration can fit inside the period of the loop
-        CHECK(loop_duration * static_cast<int>(SECONDS_PER_NANOSECOND) <=
-              (1.0 / loop_hz_))
-            << "Thunderloop iteration took longer than 1/loop_hz_ seconds";
+        LOG(DEBUG) << "DURATION: " << static_cast<double>(loop_duration) * MILLISECONDS_PER_NANOSECOND;
+        LOG(DEBUG) << "LOOP HZ: " << loop_hz_;
+        LOG(DEBUG) << "EXPECTED DURATION: " << (1.0 / loop_hz_) * MILLISECONDS_PER_SECOND;
 
         // Calculate next shot taking into account how long this iteration took
         next_shot.tv_nsec += interval - loop_duration;
