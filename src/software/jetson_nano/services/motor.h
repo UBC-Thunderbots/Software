@@ -150,9 +150,9 @@ class MotorService
      * @param time_to_ramp The time allocated for acceleration in seconds
      *
      */
-    inline WheelSpace_t computeRampVelocity(EuclideanSpace_t target_velocity,
-                               WheelSpace_t current_velocity, double time_to_ramp);
-    inline double rampSingleVelocity(double target, double current, double time);
+     WheelSpace_t rampWheelVelocity(const WheelSpace_t &current_wheel_velocity,
+        const EuclideanSpace_t &target_euclidean_velocity,
+        const double &time_to_ramp);
 
     /**
      * Convert electrical rpm to wheel velocity.

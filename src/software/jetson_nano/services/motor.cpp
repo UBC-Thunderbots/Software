@@ -322,7 +322,7 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
                 motor.direct_velocity_control().angular_velocity().radians_per_second(),
             };
 
-            target_wheel_velocities = computeRampVelocity(target_euclidean_velocity, current_wheel_velocities, time_elapsed_since_last_poll_s);
+            target_wheel_velocities = rampWheelVelocity(current_wheel_velocities, target_euclidean_velocity, time_elapsed_since_last_poll_s);
 
             break;
         }
@@ -334,13 +334,13 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
 
             break;
         }
-    }
+    };
 
     // Set target speeds accounting for acceleration
-    tmc4671_writeInt(FRONT_RIGHT_MOTOR_CHIP_SELECT, TMC4671_PID_target_velocity, static_cast<int>(target_wheel_velocities[0] * ELECTRICAL_RPM_PER_MECHANICAL_MPS));
-    tmc4671_writeInt(FRONT_LEFT_MOTOR_CHIP_SELECT, TMC4671_PID_target_velocity, static_cast<int>(target_wheel_velocities[1] * ELECTRICAL_RPM_PER_MECHANICAL_MPS));
-    tmc4671_writeInt(BACK_LEFT_MOTOR_CHIP_SELECT, TMC4671_PID_target_velocity, static_cast<int>(target_wheel_velocities[2] * ELECTRICAL_RPM_PER_MECHANICAL_MPS));
-    tmc4671_writeInt(BACK_RIGHT_MOTOR_CHIP_SELECT, TMC4671_PID_target_velocity, static_cast<int>(target_wheel_velocities[3] * ELECTRICAL_RPM_PER_MECHANICAL_MPS));
+    tmc4671_writeInt(FRONT_RIGHT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_TARGET, static_cast<int>(target_wheel_velocities[0] * ELECTRICAL_RPM_PER_MECHANICAL_MPS));
+    tmc4671_writeInt(FRONT_LEFT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_TARGET, static_cast<int>(target_wheel_velocities[1] * ELECTRICAL_RPM_PER_MECHANICAL_MPS));
+    tmc4671_writeInt(BACK_LEFT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_TARGET, static_cast<int>(target_wheel_velocities[2] * ELECTRICAL_RPM_PER_MECHANICAL_MPS));
+    tmc4671_writeInt(BACK_RIGHT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_TARGET, static_cast<int>(target_wheel_velocities[3] * ELECTRICAL_RPM_PER_MECHANICAL_MPS));
 
     if (previous_dribbler_rpm != target_dribbler_rpm)
     {
@@ -383,84 +383,38 @@ void MotorService::spiTransfer(int fd, uint8_t const* tx, uint8_t const* rx, uns
                     << strerror(errno);
 }
 
-inline WheelSpace_t MotorService::computeRampVelocity(EuclideanSpace_t target_velocity,
-        WheelSpace_t current_velocity, double time_to_ramp)
+WheelSpace_t MotorService::rampWheelVelocity(const WheelSpace_t &current_wheel_velocity,
+        const EuclideanSpace_t &target_euclidean_velocity, const double &time_to_ramp)
 {
-    EuclideanSpace_t ramp_euclidean_velocity;
+    // ramp wheel velocity
+    WheelSpace_t ramp_wheel_velocity;
 
-    // convert current_velocity to Euclidean Space
-    EuclideanSpace_t current_euclidean_velocity = euclidean_to_four_wheel.getEuclideanVelocity(current_velocity);
-    
-    double max_component = current_euclidean_velocity.maxCoeff();
+    // calculate max allowable wheel velocity delta using dv = a*t
+    auto allowable_wheel_acceleration = static_cast<double>(robot_constants_.robot_max_acceleration_m_per_s_2);
+    auto allowable_delta_wheel_velocity = allowable_wheel_acceleration * time_to_ramp;
 
+    // convert euclidean to wheel velocity
+    WheelSpace_t target_wheel_velocity = euclidean_to_four_wheel.getWheelVelocity(target_euclidean_velocity);
 
-    // // Translational velocity component
-    // // Extract translation velocity components
-    //
-    // // Case: max acceleration
-    // if (target_translational_euclidean_velocity.array() > max_velocity.array())
-    // {
-    //     ramp_translational_euclidean_velocity = current_euclidean_velocity + max_translational_velocity_delta;
-    // }
-    // // Case: max decceleration
-    // else if (target_translational_euclidean_velocity > current_translational_euclidean_velocity - max_translational_velocity_delta)
-    // {
-    //     ramp_translational_euclidean_velocity = current_euclidean_velocity - max_translational_velocity_delta;
-    // }
-    // // Case: ramping not required, go to target velocity
-    // else
-    // {
-    //     ramp_translational_euclidean_velocity = target_translational_euclidean_velocity;
-    // }
-    //
-    // // Rotational velocity component
-    // // Case: max acceleration
-    // if (target_velocity.tail(1) > current_euclidean_velocity.tail(1) + max_rotational_velocity_delta)
-    // {
-    //     ramp_euclidean_velocity.tail(1) = current_euclidean_velocity.tail(1) + max_rotational_velocity_delta;
-    // }
-    // // Case: max decceleration
-    // else if (target_velocity.tail(1) < current_euclidean_velocity.tail(1) - max_rotational_velocity_delta)
-    // {
-    //     ramp_euclidean_velocity.tail(1) = current_euclidean_velocity.tail(1) - max_rotational_velocity_delta;
-    // }
-    // // Case: ramping not required, go to target velocity
-    // else
-    // {
-    //     ramp_euclidean_velocity.tail(1) = target_velocity.tail(1);
-    // }
+    // Ramp wheel velocity vector
+    // Step 1: Find absolute max velocity delta 
+    auto delta_target_wheel_velocity = target_wheel_velocity - current_wheel_velocity;
+    auto max_delta_target_wheel_velocity = delta_target_wheel_velocity.cwiseAbs().maxCoeff();
 
-    return euclidean_to_four_wheel.getWheelVelocity(ramp_euclidean_velocity);
-}
-
-inline double rampSingleVelocity(double target, double current, double time)
-{
-    double ramp;
-
-    // Trinamics PID control is far more accurate than the delayed velocity input we
-    // receive. If we set the ramp velocity with no hysterisis, we will end up not
-    // converging at the target velocity. Allowing 5cm/s of error was experimentally
-    // determined to be sufficient for smooth operation.
-    double velocity_error = 0.01;
-    
-    // Calculate max velocity delta using dv = a*t
-    double max_velocity = robot_constants_.robot_max_acceleration_m_per_s_2 * time + velocity_error;
-
-    // accelerating
-    if (target > current + max_velocity)
+    // Step 2: Compare max delta velocity against the calculated maximum
+    if (max_delta_target_wheel_velocity > allowable_delta_wheel_velocity)
     {
-        ramp = current + max_velocity;
-    }
-    else if (target < current - max_velocity)
-    {
-        ramp = current - max_velocity;
+        // Step 3: If larger, scale down to allowable max
+        ramp_wheel_velocity = ( delta_target_wheel_velocity / max_delta_target_wheel_velocity ) * allowable_delta_wheel_velocity + current_wheel_velocity;
     }
     else
     {
-        ramp = target;
+        // If smaller, go straigh to target
+        ramp_wheel_velocity = target_wheel_velocity;
     }
 
-    return ramp;
+    return ramp_wheel_velocity;
+}
 
 
 // Both the TMC4671 (the controller) and the TMC6100 (the driver) respect
@@ -761,7 +715,7 @@ void MotorService::runOpenLoopCalibrationRoutine(uint8_t motor, size_t num_sampl
     // Open loop settings
     tmc4671_writeInt(motor, TMC4671_OPENLOOP_MODE, 0x00000000);
     tmc4671_writeInt(motor, TMC4671_OPENLOOP_ACCELERATION, 0x0000003C);
-    tmc4671_writeInt(motor, TMC4671_OPENLOOP_target_velocity, 0xFFFFFFFB);
+    tmc4671_writeInt(motor, TMC4671_OPENLOOP_VELOCITY_TARGET, 0xFFFFFFFB);
 
     // Feedback selection
     tmc4671_writeInt(motor, TMC4671_PHI_E_SELECTION, TMC4671_PHI_E_OPEN_LOOP);
@@ -771,7 +725,7 @@ void MotorService::runOpenLoopCalibrationRoutine(uint8_t motor, size_t num_sampl
     tmc4671_writeInt(motor, TMC4671_MODE_RAMP_MODE_MOTION, 0x00000008);
 
     // Rotate right
-    tmc4671_writeInt(motor, TMC4671_OPENLOOP_target_velocity, 0x0000004A);
+    tmc4671_writeInt(motor, TMC4671_OPENLOOP_VELOCITY_TARGET, 0x0000004A);
 
     // Setup CSVs
     LOG(CSV, "encoder_calibration_" + std::to_string(motor) + ".csv")
@@ -812,7 +766,7 @@ void MotorService::runOpenLoopCalibrationRoutine(uint8_t motor, size_t num_sampl
     }
 
     // Stop open loop rotation
-    tmc4671_writeInt(motor, TMC4671_OPENLOOP_target_velocity, 0x00000000);
+    tmc4671_writeInt(motor, TMC4671_OPENLOOP_VELOCITY_TARGET, 0x00000000);
 }
 
 void MotorService::startDriver(uint8_t motor)
