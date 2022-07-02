@@ -39,10 +39,13 @@ struct ShootOrPassPlayFSM
      * @param the ranked zones to look for offensive positions in
      * @param pass_eval The pass evaluation to help find best passes
      * @param num_tactics the number of tactics to return
+     * @param current_offensive_positioning_tactics The current offensive positioning tactics
+     *
+     * @return the updated offensive positioning tactics
      */
-    void updateOffensivePositioningTactics(std::vector<EighteenZoneId> ranked_zones,
+    static std::vector<std::shared_ptr<MoveTactic>>  updateOffensivePositioningTactics(std::vector<EighteenZoneId> ranked_zones,
                                            PassEvaluation<EighteenZoneId> pass_eval,
-                                           unsigned int num_tactics);
+                                           unsigned int num_tactics, std::vector<std::shared_ptr<MoveTactic>> current_offensive_positioning_tactics);
 
     /**
      * Action that looks for a pass

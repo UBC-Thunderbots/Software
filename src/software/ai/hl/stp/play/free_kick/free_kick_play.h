@@ -18,7 +18,7 @@ class FreeKickPlay : public Play
 
     void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
     void updateTactics(const PlayUpdate &play_update) override;
-    std::vector<std::string> getState() override;
+    //std::vector<std::string> getState() override;
 
    private:
     FSM<FreeKickPlayFSM> fsm;

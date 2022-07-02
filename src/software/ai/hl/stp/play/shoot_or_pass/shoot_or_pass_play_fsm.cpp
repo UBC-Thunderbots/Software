@@ -20,29 +20,32 @@ ShootOrPassPlayFSM::ShootOrPassPlayFSM(TbotsProto::AiConfig ai_config)
 {
 }
 
-void ShootOrPassPlayFSM::updateOffensivePositioningTactics(
+std::vector<std::shared_ptr<MoveTactic>> ShootOrPassPlayFSM::updateOffensivePositioningTactics(
     std::vector<EighteenZoneId> ranked_zones, PassEvaluation<EighteenZoneId> pass_eval,
-    unsigned int num_tactics)
+    unsigned int num_tactics, std::vector<std::shared_ptr<MoveTactic>> current_offensive_positioning_tactics)
 {
+ std::vector<std::shared_ptr<MoveTactic>>    new_offensive_positioning_tactics = current_offensive_positioning_tactics;
+
     // These two tactics will set robots to roam around the field, trying to put
     // themselves into a good position to receive a pass
-    if (num_tactics != offensive_positioning_tactics.size())
+    if (num_tactics != new_offensive_positioning_tactics.size())
     {
-        offensive_positioning_tactics =
+        new_offensive_positioning_tactics =
             std::vector<std::shared_ptr<MoveTactic>>(num_tactics);
-        std::generate(offensive_positioning_tactics.begin(),
-                      offensive_positioning_tactics.end(),
+        std::generate(new_offensive_positioning_tactics.begin(),
+                      new_offensive_positioning_tactics.end(),
                       []() { return std::make_shared<MoveTactic>(); });
     }
 
-    for (unsigned int i = 0; i < offensive_positioning_tactics.size(); i++)
+    for (unsigned int i = 0; i < new_offensive_positioning_tactics.size(); i++)
     {
         auto pass1 = pass_eval.getBestPassInZones({ranked_zones[i]}).pass;
 
-        offensive_positioning_tactics[i]->updateControlParams(
+        new_offensive_positioning_tactics[i]->updateControlParams(
             pass1.receiverPoint(), pass1.receiverOrientation(), 0.0,
             TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
     }
+    return new_offensive_positioning_tactics;
 }
 
 void ShootOrPassPlayFSM::lookForPass(const Update& event)
@@ -84,8 +87,8 @@ void ShootOrPassPlayFSM::lookForPass(const Update& event)
             1 - std::min(time_since_commit_stage_start.toSeconds() /
                              pass_score_ramp_down_duration,
                          1.0 - abs_min_pass_score);
-        updateOffensivePositioningTactics(ranked_zones, pass_eval,
-                                          event.common.num_tactics - 1);
+       offensive_positioning_tactics = updateOffensivePositioningTactics(ranked_zones, pass_eval,
+                                          event.common.num_tactics - 1, offensive_positioning_tactics);
 
         ret_tactics[1].insert(ret_tactics[1].end(), offensive_positioning_tactics.begin(),
                               offensive_positioning_tactics.end());
@@ -120,8 +123,8 @@ void ShootOrPassPlayFSM::takePass(const Update& event)
 
         if (event.common.num_tactics > 2)
         {
-            updateOffensivePositioningTactics(ranked_zones, pass_eval,
-                                              event.common.num_tactics - 2);
+                  offensive_positioning_tactics =  updateOffensivePositioningTactics(ranked_zones, pass_eval,
+                                              event.common.num_tactics - 2, offensive_positioning_tactics);
             ret_tactics[1].insert(ret_tactics[1].end(),
                                   offensive_positioning_tactics.begin(),
                                   offensive_positioning_tactics.end());
@@ -134,8 +137,8 @@ void ShootOrPassPlayFSM::takePass(const Update& event)
         PriorityTacticVector ret_tactics = {{receiver_tactic}, {}};
         if (event.common.num_tactics > 1)
         {
-            updateOffensivePositioningTactics(ranked_zones, pass_eval,
-                                              event.common.num_tactics - 1);
+           offensive_positioning_tactics =  updateOffensivePositioningTactics(ranked_zones, pass_eval,
+                                              event.common.num_tactics - 1, offensive_positioning_tactics);
             ret_tactics[1].insert(ret_tactics[1].end(),
                                   offensive_positioning_tactics.begin(),
                                   offensive_positioning_tactics.end());
