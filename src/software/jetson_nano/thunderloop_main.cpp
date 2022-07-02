@@ -175,5 +175,7 @@ int main(int argc, char** argv)
     startRtThread(thunderloop.runThunderloopRealtime, &thunderloop,
                   MOTOR_SPI_COMMUNICATION_STACK_SIZE);
 
+    std::promise<void>().get_future().wait();
+
     return 0;
 }

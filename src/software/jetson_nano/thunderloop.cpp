@@ -244,9 +244,6 @@ void Thunderloop::runLoop()
             iteration_time.tv_nsec;
         thunderloop_status_.set_iteration_time_ns(loop_duration);
 
-
-        // LOG(DEBUG) << thunderloop_status_.DebugString();
-
         // Make sure the iteration can fit inside the period of the loop
         loop_duration_seconds =
             static_cast<double>(loop_duration) * SECONDS_PER_NANOSECOND;
