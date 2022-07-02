@@ -55,6 +55,18 @@ class Polygon : public virtual Shape
      */
     const std::vector<Point>& getPoints() const;
 
+    /**
+     * Creates a rectangular polygon that is oriented along the segment.
+     * The radius defines the closest distance to a edge of the rectangle parallel to the
+     * segment i.e. the radius is half the width of the rectangle. The polygon contains
+     * both points as "focal" points similar to an ellipse. see definition for details and
+     * diagram
+     * @param segment segment along which to construct the rectangular polygon
+     * @param radius the radius of the rectangle.
+     * @return an oriented polygon along the 2 points that contains both points.
+     */
+    static Polygon fromSegment(const Segment& segment, double radius);
+
    protected:
     /**
      * Returns the line segments that connect a list of points.
