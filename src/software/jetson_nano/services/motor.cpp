@@ -66,6 +66,8 @@ static const char* HEARTBEAT_GPIO                         = "216";
 static double MECHANICAL_MPS_PER_ELECTRICAL_RPM = 0.000111;
 static double ELECTRICAL_RPM_PER_MECHANICAL_MPS = 1 / MECHANICAL_MPS_PER_ELECTRICAL_RPM;
 
+static double RUNAWAY_PROTECTION_THRESHOLD_MPS = 0.10;
+
 
 extern "C"
 {
@@ -298,6 +300,33 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
     WheelSpace_t current_wheel_velocities = {front_right_velocity, front_left_velocity,
                                              back_left_velocity, back_right_velocity};
 
+
+    // Run-away protection
+    if (std::abs(current_wheel_velocities[0] - prev_wheel_velocities[0]) > 
+            RUNAWAY_PROTECTION_THRESHOLD_MPS)
+    {
+        driver_control_enable_gpio.setValue(GpioState::LOW);
+        LOG(FATAL) << "Front right motor runaway";
+    }
+    else if (std::abs(current_wheel_velocities[1] - prev_wheel_velocities[1]) > 
+            RUNAWAY_PROTECTION_THRESHOLD_MPS)
+    {
+        driver_control_enable_gpio.setValue(GpioState::LOW);
+        LOG(FATAL) << "Front left motor runaway";
+    }
+    else if (std::abs(current_wheel_velocities[2] - prev_wheel_velocities[2]) > 
+            RUNAWAY_PROTECTION_THRESHOLD_MPS)
+    {
+        driver_control_enable_gpio.setValue(GpioState::LOW);
+        LOG(FATAL) << "Back left motor runaway";
+    }
+    else if (std::abs(current_wheel_velocities[3] - prev_wheel_velocities[3]) > 
+            RUNAWAY_PROTECTION_THRESHOLD_MPS)
+    {
+        driver_control_enable_gpio.setValue(GpioState::LOW);
+        LOG(FATAL) << "Back right motor runaway";
+    }
+
     // Convert to Euclidean velocity_delta
     EuclideanSpace_t current_euclidean_velocity =
         euclidean_to_four_wheel.getEuclideanVelocity(current_wheel_velocities);
@@ -431,12 +460,12 @@ WheelSpace_t MotorService::rampWheelVelocity(
         // Step 3: If larger, scale down to allowable max
         ramp_wheel_velocity =
             (delta_target_wheel_velocity / max_delta_target_wheel_velocity) *
-                allowable_delta_wheel_velocity +
+            allowable_delta_wheel_velocity +
             current_wheel_velocity;
     }
     else
     {
-        // If smaller, go straigh to target
+        // If smaller, go straigt to target
         ramp_wheel_velocity = target_wheel_velocity;
     }
 
