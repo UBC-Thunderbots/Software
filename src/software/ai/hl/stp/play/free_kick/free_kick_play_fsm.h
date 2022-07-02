@@ -14,7 +14,7 @@ using Zones = std::unordered_set<EighteenZoneId>;
 
 struct FreeKickPlayFSM
 {
-    class AttemptShotState;
+    class AlignToBallState;
     class ShootOrFindPassState;
     class StartState;
 
@@ -45,24 +45,31 @@ struct FreeKickPlayFSM
                                            unsigned int num_tactics);
 
     /**
-     * Action that tries to shoot or find pass without dribbling
-     *
-     * @param event the FreeKickPlayFSM Update event
+     * TODO: javadocs
      */
     void shootOrFindPass(const Update& event);
+    void alignToBall(const Update& event);
+    bool freeKickerReady(const Update& event);
+
     auto operator()()
     {
         using namespace boost::sml;
 
         DEFINE_SML_STATE(ShootOrFindPassState)
         DEFINE_SML_STATE(StartState)
+        DEFINE_SML_STATE(AlignToBallState)
         DEFINE_SML_EVENT(Update)
 
         DEFINE_SML_ACTION(shootOrFindPass)
+        DEFINE_SML_ACTION(alignToBall)
+
+        DEFINE_SML_GUARD(freeKickerReady)
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *StartState_S + Update_E / shootOrFindPass_A = ShootOrFindPassState_S,
+            *StartState_S + Update_E / alignToBall_A = AlignToBallState_S,
+            AlignToBallState_S + Update_E [freeKickerReady_G] / shootOrFindPass_A = ShootOrFindPassState_S,
+            AlignToBallState_S + Update_E [!freeKickerReady_G] / alignToBall_A = AlignToBallState_S,
             X + Update_E                                 = X);
     }
 

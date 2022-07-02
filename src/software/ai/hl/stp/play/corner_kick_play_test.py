@@ -14,7 +14,7 @@ from proto.ssl_gc_common_pb2 import Team
 def test_corner_kick_play_bottom_left(simulated_test_runner):
 
     # starting point must be Point
-    ball_initial_pos = tbots.Point(4.5, -3)
+    ball_initial_pos = tbots.Point(2.5, -3)
 
     # Setup Bots
     blue_bots = [

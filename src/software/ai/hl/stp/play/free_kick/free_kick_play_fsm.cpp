@@ -1,4 +1,5 @@
 #include "software/ai/hl/stp/play/free_kick/free_kick_play_fsm.h"
+#include "software/ai/hl/stp/play/shoot_or_pass/shoot_or_pass_play_fsm.h"
 
 #include <algorithm>
 
@@ -29,29 +30,25 @@ void FreeKickPlayFSM::shootOrFindPass(const Update& event)
     PassGenerator<EighteenZoneId> pass_generator(pitch_division,
                                                  ai_config.passing_config());
 
-    using Zones = std::unordered_set<EighteenZoneId>;
+    //using Zones = std::unordered_set<EighteenZoneId>;
 
     auto pass_eval = pass_generator.generatePassEvaluation(event.common.world);
-    PassWithRating best_pass_and_score_so_far = pass_eval.getBestPassOnField();
+    best_pass_and_score_so_far = pass_eval.getBestPassOnField();
 
     auto ranked_zones = pass_eval.rankZonesForReceiving(
         event.common.world, best_pass_and_score_so_far.pass.receiverPoint());
-    Zones cherry_pick_region_1 = {ranked_zones[0]};
-    Zones cherry_pick_region_2 = {ranked_zones[1]};
-
-    // These two tactics will set robots to roam around the field, trying to put
-    // themselves into a good position to receive a pass
-    auto cherry_pick_tactic_1 = std::make_shared<MoveTactic>();
-    auto cherry_pick_tactic_2 = std::make_shared<MoveTactic>();
 
     // This tactic will move a robot into position to initially take the free-kick
     auto align_to_ball_tactic = std::make_shared<MoveTactic>();
+        updateAlignToBallTactic(align_to_ball_tactic, event.common.world);
+    
+    auto offensive_positioning_tactics = ShootOrPassPlayFSM::updateOffensivePositioningTactics(ranked_zones, pass_eval,
+                                          event.common.num_tactics - 1, {});
 
-//    // Put the robot in roughly the right position to perform the kick
-//    LOG(DEBUG) << "Aligning to ball";
+
+    // Put the robot in roughly the right position to perform the kick
 //    do
 //    {
-//        updateAlignToBallTactic(align_to_ball_tactic, event.common.world);
 //
 //        auto pass_eval = pass_generator.generatePassEvaluation(event.common.world);
 //
