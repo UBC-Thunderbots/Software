@@ -46,11 +46,17 @@ class Thunderloop
      * @param robot_constants The robot constants
      * @param loop_hz The rate to run the loop
      */
-    Thunderloop(const RobotConstants_t& robot_constants, const int loop_hz);
+    Thunderloop(const RobotConstants_t &robot_constants, const int loop_hz);
 
     ~Thunderloop();
 
     void runLoop();
+
+    static void *runThunderloopRealtime(void *context)
+    {
+        ((Thunderloop *)context)->runLoop();
+        return NULL;
+    }
 
     // Services
     std::unique_ptr<MotorService> motor_service_;
@@ -68,7 +74,7 @@ class Thunderloop
      *
      * @param ts timespec to modify
      */
-    void timespecNorm(struct timespec& ts);
+    void timespecNorm(struct timespec &ts);
 
     /**
      * Get the CPU temp thunderloop is running on

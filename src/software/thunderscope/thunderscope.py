@@ -461,15 +461,12 @@ class Thunderscope(object):
         def extract_encoder_data(named_value_data):
             return {named_value_data.name: named_value_data.value}
 
-        def extract_performance_data(robtot_status):
-            return {
-
         # Create widget
         proto_plotter_1 = ProtoPlotter(
             min_y=0,
             max_y=100,
             window_secs=2,
-            configuration={RobotStatus: extract_performance},
+            configuration={NamedValue: extract_encoder_data},
         )
         proto_plotter_dock_1 = Dock("Thunderloop Performance")
         proto_plotter_dock_1.addWidget(proto_plotter_1)

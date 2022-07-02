@@ -7,10 +7,16 @@
 #include <linux/ioctl.h>
 #include <linux/spi/spidev.h>
 #include <linux/types.h>
+#include <malloc.h>
+#include <pthread.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/ioctl.h>
+#include <sys/mman.h>      // Needed for mlockall()
+#include <sys/resource.h>  // needed for getrusage
+#include <sys/time.h>      // needed for getrusage
+#include <unistd.h>        // needed for sysconf(int name);
 
 #include <bitset>
 
@@ -26,7 +32,7 @@ extern "C"
 }
 
 // SPI Configs
-static const uint32_t SPI_SPEED_HZ      = 2000000;  // 2 Mhz
+static const uint32_t MAX_SPI_SPEED_HZ  = 2000000;  // 2 Mhz
 static const uint32_t TMC6100_SPI_SPEED = 1000000;  // 1 Mhz
 static const uint32_t TMC4671_SPI_SPEED = 2000000;  // 1 Mhz
 static const uint8_t SPI_BITS           = 8;
@@ -117,7 +123,8 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
     CHECK(ret != -1) << "can't set bits_per_word for: " << #motor_name                   \
                      << "error: " << strerror(errno);                                    \
                                                                                          \
-    ret = ioctl(file_descriptors[chip_select], SPI_IOC_WR_MAX_SPEED_HZ, &SPI_SPEED_HZ);  \
+    ret = ioctl(file_descriptors[chip_select], SPI_IOC_WR_MAX_SPEED_HZ,                  \
+                &MAX_SPI_SPEED_HZ);                                                      \
     CHECK(ret != -1) << "can't set spi max speed hz for: " << #motor_name                \
                      << "error: " << strerror(errno);
 
@@ -286,8 +293,10 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
     motor_status.mutable_back_right()->set_wheel_velocity(
         static_cast<float>(back_right_velocity));
 
-    // TODO debug why this doesn't work
-    WheelSpace_t current_wheel_velocities = {0.0, 0.0, 0.0, 0.0};
+    // This order needs to match euclidean_to_four_wheel converters order
+    // We also want to work in the meters per second space rather than electrical RPMs
+    WheelSpace_t current_wheel_velocities = {front_right_velocity, front_left_velocity,
+                                             back_left_velocity, back_right_velocity};
 
     // Convert to Euclidean velocity_delta
     EuclideanSpace_t current_euclidean_velocity =
@@ -298,8 +307,9 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
     motor_status.mutable_local_velocity()->set_y_component_meters(
         static_cast<float>(current_euclidean_velocity[1]));
 
-    WheelSpace_t target_wheel_velocities = {0.0, 0.0, 0.0, 0.0};
-    int target_dribbler_rpm              = motor.dribbler_speed_rpm();
+    WheelSpace_t target_wheel_velocities       = {0.0, 0.0, 0.0, 0.0};
+    EuclideanSpace_t target_euclidean_velocity = {0.0, 0.0, 0.0};
+    int target_dribbler_rpm                    = motor.dribbler_speed_rpm();
 
     switch (motor.drive_control_case())
     {
@@ -315,34 +325,27 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
         }
         case TbotsProto::MotorControl::DriveControlCase::kDirectVelocityControl:
         {
-            EuclideanSpace_t target_euclidean_velocity = {
+            target_euclidean_velocity = {
                 -motor.direct_velocity_control().velocity().y_component_meters(),
                 motor.direct_velocity_control().velocity().x_component_meters(),
                 motor.direct_velocity_control().angular_velocity().radians_per_second(),
             };
-
-            LOG(DEBUG) << motor.direct_velocity_control().DebugString();
-
-            target_wheel_velocities =
-                rampWheelVelocity(current_wheel_velocities, target_euclidean_velocity,
-                                  time_elapsed_since_last_poll_s);
 
             break;
         }
 
         case TbotsProto::MotorControl::DriveControlCase::DRIVE_CONTROL_NOT_SET:
         {
-            target_wheel_velocities = {0.0, 0.0, 0.0, 0.0};
-            target_dribbler_rpm     = 0;
+            target_euclidean_velocity = {0.0, 0.0, 0.0};
+            target_dribbler_rpm       = 0;
 
             break;
         }
-    };
+    }
 
-    // This order needs to match euclidean_to_four_wheel converters order
-    // We also want to work in the meters per second space rather than electrical RPMs
-    current_wheel_velocities = {front_right_velocity, front_left_velocity,
-                                back_left_velocity, back_right_velocity};
+    target_wheel_velocities = rampWheelVelocity(
+        prev_wheel_velocities, target_euclidean_velocity, time_elapsed_since_last_poll_s);
+    prev_wheel_velocities = target_wheel_velocities;
 
     // Set target speeds accounting for acceleration
     tmc4671_writeInt(
@@ -357,9 +360,6 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
     tmc4671_writeInt(
         BACK_RIGHT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_TARGET,
         static_cast<int>(target_wheel_velocities[3] * ELECTRICAL_RPM_PER_MECHANICAL_MPS));
-
-    LOG(CSV) << "debug.csv" << front_right_velocity << "," << front_left_velocity << ","
-             << back_left_velocity << "," << back_right_velocity << "\n";
 
     if (previous_dribbler_rpm != target_dribbler_rpm)
     {
@@ -439,15 +439,6 @@ WheelSpace_t MotorService::rampWheelVelocity(
         // If smaller, go straigh to target
         ramp_wheel_velocity = target_wheel_velocity;
     }
-
-
-    LOG(CSV) << "ramp.csv" <<
-        max_delta_target_wheel_velocity <<  "," <<
-        allowable_delta_wheel_velocity << "," <<
-        ramp_wheel_velocity[0] << "," << 
-        ramp_wheel_velocity[1] << "," << 
-        ramp_wheel_velocity[2] << "," << 
-        ramp_wheel_velocity[3] << "\n";
 
     return ramp_wheel_velocity;
 }

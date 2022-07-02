@@ -27,10 +27,8 @@ EuclideanToWheel::EuclideanToWheel(const RobotConstants_t &robot_constants)
     auto k = sin(rear_wheel_angle_theta_rad_) /
              (2 * sin(front_wheel_angle_phi_rad_) + 2 * sin(rear_wheel_angle_theta_rad_));
 
-    //clang-format off
     wheel_to_euclidean_velocity_D_inverse << -i, -i, i, i, j, -j, -(1 - j), (1 - j), k, k,
         (1 - k), (1 - k);
-    //clang-format on
 }
 
 WheelSpace_t EuclideanToWheel::getWheelVelocity(
