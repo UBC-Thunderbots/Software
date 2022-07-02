@@ -99,7 +99,8 @@ class HRVOSimulator
      * @param neighborDist          The maximum neighbor distance of this agent.
      * @param maxNeighbors          The maximum neighbor count of this agent.
      * @param agent_radius          The agent_radius of this agent.
-     * @param max_radius_inflation  The maximum amount which the radius of this agent can inflate.
+     * @param max_radius_inflation  The maximum amount which the radius of this agent can
+     * inflate.
      * @param goalRadius            The goal agent_radius of this agent.
      * @param prefSpeed             The preferred speed of this agent.
      * @param maxSpeed              The maximum speed of this agent.
@@ -108,16 +109,18 @@ class HRVOSimulator
      * @param curr_velocity         The initial velocity of this agent.
      * @return The index of the agent.
      */
-    std::size_t addHRVOAgent(const Vector &position, float agent_radius, float max_radius_inflation,
-                             const Vector &curr_velocity, float maxSpeed, float prefSpeed, float maxAccel,
-                             AgentPath &path, float neighborDist, std::size_t maxNeighbors,
-                             float uncertaintyOffset);
+    std::size_t addHRVOAgent(const Vector &position, float agent_radius,
+                             float max_radius_inflation, const Vector &curr_velocity,
+                             float maxSpeed, float prefSpeed, float maxAccel,
+                             AgentPath &path, float neighborDist,
+                             std::size_t maxNeighbors, float uncertaintyOffset);
 
     /**
      * Add a new LinearlyVelocityAgent
      * @param position              The starting position of this agent.
      * @param agent_radius          The agent_radius of this agent.
-     * @param max_radius_inflation  The maximum amount which the radius of this agent can inflate.
+     * @param max_radius_inflation  The maximum amount which the radius of this agent can
+     * inflate.
      * @param curr_velocity         The initial velocity of this agent.
      * @param max_speed             The maximum speed of this agent.
      * @param max_accel             The maximum acceleration of this agent.
@@ -125,9 +128,9 @@ class HRVOSimulator
      * @param goal_radius           The goal agent_radius of this agent.
      * @return The index of the agent.
      */
-    size_t addLinearVelocityAgent(const Vector &position, float agent_radius, float max_radius_inflation,
-                                  const Vector &curr_velocity, float max_speed, float max_accel,
-                                  AgentPath &path);
+    size_t addLinearVelocityAgent(const Vector &position, float agent_radius,
+                                  float max_radius_inflation, const Vector &curr_velocity,
+                                  float max_speed, float max_accel, AgentPath &path);
 
     /**
      * Performs a simulation step; updates the position, and velocity

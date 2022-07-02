@@ -214,7 +214,6 @@ TEST_F(DribbleTacticTest, test_moving_ball_dribble_dest_and_orientation)
             Duration::fromSeconds(22));
 }
 
-// TODO (#2496): robot gets stuck in place
 TEST_F(DribbleTacticTest, test_dribble_dest_and_orientation_around_rectangle)
 {
     Point initial_position    = Point(3, -3);
@@ -280,8 +279,6 @@ TEST_F(
             Duration::fromSeconds(12));
 }
 
-
-// TODO (#2673) we need to be able to get closer to the enemy robot to grab the ball
 TEST_F(DribbleTacticTest, test_running_into_enemy_robot_knocking_ball_away)
 {
     Point initial_position    = Point(-2, 1.5);

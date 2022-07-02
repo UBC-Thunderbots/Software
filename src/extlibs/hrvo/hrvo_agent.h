@@ -58,7 +58,8 @@ class HRVOAgent : public Agent
      * @param neighborDist          The maximum neighbor distance of this agent.
      * @param maxNeighbors          The maximum neighbor count of this agent.
      * @param radius                The radius of this agent.
-     * @param max_radius_inflation  The maximum amount which the radius of this agent can inflate.
+     * @param max_radius_inflation  The maximum amount which the radius of this agent can
+     * inflate.
      * @param goalRadius            The goal radius of this agent.
      * @param prefSpeed             The preferred speed of this agent.
      * @param maxSpeed              The maximum speed of this agent.
@@ -66,9 +67,10 @@ class HRVOAgent : public Agent
      * @param maxAccel              The maximum acceleration of this agent.
      * @param velocity              The initial velocity of this agent.
      */
-    HRVOAgent(HRVOSimulator *simulator, const Vector &position, float neighborDist, std::size_t maxNeighbors,
-              float radius, float max_radius_inflation, const Vector &velocity, float maxAccel, AgentPath &path,
-              float prefSpeed, float maxSpeed, float uncertaintyOffset);
+    HRVOAgent(HRVOSimulator *simulator, const Vector &position, float neighborDist,
+              std::size_t maxNeighbors, float radius, float max_radius_inflation,
+              const Vector &velocity, float maxAccel, AgentPath &path, float prefSpeed,
+              float maxSpeed, float uncertaintyOffset);
 
     /**
      * Computes the new velocity of this agent.
@@ -209,7 +211,7 @@ class HRVOAgent : public Agent
     bool isCandidateFasterThanCurrentSpeed(const Candidate &candidate) const;
 
 
-public:
+   public:
     float prefSpeed_;
 
     std::size_t maxNeighbors_;

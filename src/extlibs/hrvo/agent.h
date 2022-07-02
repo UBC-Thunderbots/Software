@@ -19,15 +19,17 @@ class Agent
      * @param simulator             The simulator which this agent is a part of
      * @param position              The starting position of this agent.
      * @param radius                The radius of this agent.
-     * @param max_radius_inflation  The maximum amount which the radius of this agent can inflate.
+     * @param max_radius_inflation  The maximum amount which the radius of this agent can
+     * inflate.
      * @param velocity              The initial velocity of this agent.
      * @param prefVelocity          The preferred velocity of this agent.
      * @param maxSpeed              The maximum speed of this agent.
      * @param maxAccel              The maximum acceleration of this agent.
      * @param path                  The path for this agent
      */
-    Agent(HRVOSimulator *simulator, const Vector &position, float radius, float max_radius_inflation,
-          const Vector &velocity, const Vector &prefVelocity, float maxSpeed, float maxAccel, AgentPath &path);
+    Agent(HRVOSimulator *simulator, const Vector &position, float radius,
+          float max_radius_inflation, const Vector &velocity, const Vector &prefVelocity,
+          float maxSpeed, float maxAccel, AgentPath &path);
 
     virtual ~Agent() = default;
 
