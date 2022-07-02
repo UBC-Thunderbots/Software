@@ -16,18 +16,18 @@ class Agent
     /**
      * Constructor
      *
-     * @param simulator          The simulator which this agent is a part of
-     * @param position           The starting position of this agent.
-     * @param radius             The radius of this agent.
-     * @param velocity           The initial velocity of this agent.
-     * @param prefVelocity       The preferred velocity of this agent.
-     * @param maxSpeed           The maximum speed of this agent.
-     * @param maxAccel           The maximum acceleration of this agent.
-     * @param path               The path for this agent
+     * @param simulator             The simulator which this agent is a part of
+     * @param position              The starting position of this agent.
+     * @param radius                The radius of this agent.
+     * @param max_radius_inflation  The maximum amount which the radius of this agent can inflate.
+     * @param velocity              The initial velocity of this agent.
+     * @param prefVelocity          The preferred velocity of this agent.
+     * @param maxSpeed              The maximum speed of this agent.
+     * @param maxAccel              The maximum acceleration of this agent.
+     * @param path                  The path for this agent
      */
-    Agent(HRVOSimulator *simulator, const Vector &position, float radius,
-          const Vector &velocity, const Vector &prefVelocity, float maxSpeed,
-          float maxAccel, AgentPath &path);
+    Agent(HRVOSimulator *simulator, const Vector &position, float radius, float max_radius_inflation,
+          const Vector &velocity, const Vector &prefVelocity, float maxSpeed, float maxAccel, AgentPath &path);
 
     virtual ~Agent() = default;
 
@@ -43,6 +43,11 @@ class Agent
      * @return The velocity obstacle which other_agent should see for this Agent
      */
     virtual VelocityObstacle createVelocityObstacle(const Agent &other_agent) = 0;
+
+    /**
+     * Update the agent's radius based on its current velocity
+     */
+    void updateRadiusFromVelocity();
 
     /**
      * Updates the position and velocity of this agent.
@@ -150,7 +155,12 @@ class Agent
    protected:
     // Agent Properties
     Vector position_;
+    // This agent's current actual radius
     float radius_;
+    // The minimum radius which this agent can be
+    const float min_radius_;
+    // The maximum amount which the radius can increase by
+    const float max_radius_inflation_;
 
     // The actual current velocity of this Agent
     Vector velocity_;
