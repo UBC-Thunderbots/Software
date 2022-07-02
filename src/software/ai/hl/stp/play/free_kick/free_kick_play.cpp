@@ -1,8 +1,7 @@
-#include "software/ai/hl/stp/play/free_kick_play.h"
+#include "software/ai/hl/stp/play/free_kick/free_kick_play.h"
 
 #include "shared/constants.h"
 #include "software/ai/evaluation/possession.h"
-#include "software/ai/hl/stp/play/corner_kick_play.h"
 #include "software/ai/hl/stp/tactic/attacker/attacker_tactic.h"
 #include "software/ai/hl/stp/tactic/chip/chip_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
@@ -14,9 +13,29 @@
 #include "software/world/ball.h"
 
 FreeKickPlay::FreeKickPlay(TbotsProto::AiConfig config)
-    : Play(config, true), MAX_TIME_TO_COMMIT_TO_PASS(Duration::fromSeconds(3))
+    : Play(config, true),
+      fsm{FreeKickPlayFSM{config}},
+      crease_defense_play(std::make_shared<CreaseDefensePlay>(ai_config)),
+      MAX_TIME_TO_COMMIT_TO_PASS(Duration::fromSeconds(3))
 {
 }
+
+void FreeKickPlay::updateTactics(const PlayUpdate &play_update)
+{
+    fsm.process_event(
+        FreeKickPlayFSM::Update(FreeKickPlayFSM::ControlParams{}, play_update));
+}
+
+// void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield,
+//                                     const World &world)
+//{
+//    // This function doesn't get called so it does nothing
+//    while (true)
+//    {
+//        yield({{}});
+//    }
+//}
+//
 
 void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const World &world)
 {

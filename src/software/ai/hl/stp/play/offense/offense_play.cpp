@@ -11,7 +11,6 @@ OffensePlay::OffensePlay(TbotsProto::AiConfig config)
     : Play(config, true),
       shoot_or_pass_play(std::make_shared<ShootOrPassPlay>(ai_config)),
       crease_defense_play(std::make_shared<CreaseDefensePlay>(ai_config))
-
 {
 }
 
