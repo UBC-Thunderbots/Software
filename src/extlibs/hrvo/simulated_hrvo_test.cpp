@@ -119,12 +119,12 @@ TEST_F(SimulatedHRVOTest, test_drive_in_straight_line_with_friendly_robot_infron
     Point initial_position = Point(-2.5, 0);
     BallState ball_state(Point(1, 2), Vector(0, 0));
     auto friendly_robots =
-        TestUtil::createStationaryRobotStatesWithId({initial_position, Point(2, 0)});
+        TestUtil::createStationaryRobotStatesWithId({Point(2, 0), initial_position});
     std::vector<RobotStateWithId> enemy_robots = {};
 
     auto tactic = std::make_shared<MoveTactic>();
     tactic->updateControlParams(destination, Angle::zero(), 0);
-    setTactic(0, tactic);
+    setTactic(1, tactic);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [destination, tactic](std::shared_ptr<World> world_ptr,
@@ -135,7 +135,7 @@ TEST_F(SimulatedHRVOTest, test_drive_in_straight_line_with_friendly_robot_infron
             Rectangle expected_final_position(
                 Point(destination.x() - threshold, destination.y() - threshold),
                 Point(destination.x() + threshold, destination.y() + threshold));
-            robotStationaryInPolygon(0, expected_final_position, 15, world_ptr, yield);
+            robotStationaryInPolygon(1, expected_final_position, 15, world_ptr, yield);
         }};
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
@@ -262,14 +262,14 @@ TEST_F(SimulatedHRVOTest, test_agent_not_going_in_static_obstacles)
     Point initial_position = Point(2.9, -1);
     BallState ball_state(Point(1, 2), Vector(0, 0));
     auto friendly_robots =
-        TestUtil::createStationaryRobotStatesWithId({initial_position});
+        TestUtil::createStationaryRobotStatesWithId({Point(2, 2), initial_position});
     auto enemy_robots = TestUtil::createStationaryRobotStatesWithId(
         {Point(2, 0.0), Point(2.2, 0.0), Point(2.4, 0.0), Point(2.6, 0.0),
          Point(2.8, 0.0), Point(3, 0.0)});
 
     auto tactic = std::make_shared<MoveTactic>();
     tactic->updateControlParams(destination, Angle::zero(), 0);
-    setTactic(0, tactic);
+    setTactic(1, tactic);
 
     std::shared_ptr<RobotNavigationObstacleFactory> obstacle_factory =
         std::make_shared<RobotNavigationObstacleFactory>(
@@ -284,7 +284,7 @@ TEST_F(SimulatedHRVOTest, test_agent_not_going_in_static_obstacles)
             Rectangle expected_final_position(
                 Point(destination.x() - threshold, destination.y() - threshold),
                 Point(destination.x() + threshold, destination.y() + threshold));
-            robotStationaryInPolygon(0, expected_final_position, 15, world_ptr, yield);
+            robotStationaryInPolygon(1, expected_final_position, 15, world_ptr, yield);
         }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
