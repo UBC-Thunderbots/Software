@@ -18,44 +18,22 @@ FreeKickPlayFSM::FreeKickPlayFSM(TbotsProto::AiConfig ai_config)
       best_pass_and_score_so_far(
           PassWithRating{.pass = Pass(Point(), Point(), 0), .rating = 0}),
       time_since_commit_stage_start(Duration::fromSeconds(0)),
-      min_pass_score_threshold(0),
-      pass_in_progress(Point(), Point(), 0)
+      min_pass_score_threshold(1.0),
+      pass_in_progress(Point(), Point(), 0),
+      MAX_TIME_TO_COMMIT_TO_PASS(Duration::fromSeconds(3))
 {
 }
 
 
 void FreeKickPlayFSM::shootOrFindPass(const Update& event)
 {
+    alignToBall(event);
         best_pass_and_score_so_far =
             pass_generator.generatePassEvaluation(event.common.world).getBestPassOnField();
         // Align the kicker to pass and wait for a good pass
         // To get the best pass possible we start by aiming for a perfect one and then
         // decrease the minimum score over time
-        double min_score                  = 1.0;
         Timestamp commit_stage_start_time = event.common.world.getMostRecentTimestamp();
-            updateAlignToBallTactic(align_to_ball_tactic, event.common.world);
-    
-            auto pass_eval = pass_generator.generatePassEvaluation(event.common.world);
-    
-            auto pass1 = pass_eval.getBestPassInZones(cherry_pick_region_1).pass;
-            auto pass2 = pass_eval.getBestPassInZones(cherry_pick_region_2).pass;
-    
-            cherry_pick_tactic_1->updateControlParams(
-                pass1.receiverPoint(), pass1.receiverOrientation(), 0.0,
-                TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
-            cherry_pick_tactic_2->updateControlParams(
-                pass2.receiverPoint(), pass2.receiverOrientation(), 0.0,
-                TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
-    
-            std::get<0>(crease_defender_tactics)
-                ->updateControlParams(event.common.world.ball().position(),
-                                      TbotsProto::CreaseDefenderAlignment::LEFT);
-            std::get<1>(crease_defender_tactics)
-                ->updateControlParams(event.common.world.ball().position(),
-                                      TbotsProto::CreaseDefenderAlignment::RIGHT);
-            yield({{align_to_ball_tactic, shoot_tactic, cherry_pick_tactic_1,
-                    cherry_pick_tactic_2, std::get<0>(crease_defender_tactics),
-                    std::get<1>(crease_defender_tactics)}});
     
             best_pass_and_score_so_far =
                 pass_generator.generatePassEvaluation(event.common.world)
@@ -66,11 +44,9 @@ void FreeKickPlayFSM::shootOrFindPass(const Update& event)
     
             Duration time_since_commit_stage_start =
                 event.common.world.getMostRecentTimestamp() - commit_stage_start_time;
-            min_score = 1 - std::min(time_since_commit_stage_start.toSeconds() /
+            min_pass_score_threshold = 1 - std::min(time_since_commit_stage_start.toSeconds() /
                                          MAX_TIME_TO_COMMIT_TO_PASS.toSeconds(),
                                      1.0);
-        } while (best_pass_and_score_so_far.rating < min_score);
-        return best_pass_and_score_so_far;
 }
 
 void FreeKickPlayFSM::updateAlignToBallTactic(
@@ -121,4 +97,4 @@ void FreeKickPlayFSM::alignToBall(const Update& event) {
 
 
     void FreeKickPlayFSM::takePass(const Update& event){}
-    bool FreeKickPlayFSM::passFound(const Update& event){return true;}
+    bool FreeKickPlayFSM::passFound(const Update& event){ return (best_pass_and_score_so_far.rating > min_pass_score_threshold); }

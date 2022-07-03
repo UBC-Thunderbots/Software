@@ -105,4 +105,7 @@ struct FreeKickPlayFSM
     Duration time_since_commit_stage_start;
     double min_pass_score_threshold;
     Pass pass_in_progress;
+
+    // The maximum time that we will wait before committing to a pass
+    const Duration MAX_TIME_TO_COMMIT_TO_PASS;
 };
