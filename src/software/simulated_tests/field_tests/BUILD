@@ -22,3 +22,20 @@ py_library(
         "//software/thunderscope/replay:proto_logger",
     ],
 )
+
+py_test(
+    name = "movement_field_test",
+    srcs = [
+        "movement_field_test.py",
+    ],
+    # TODO (#2619) Remove tag to run in parallel
+    tags = [
+        "exclusive",
+    ],
+    deps = [
+        "//software/simulated_tests:simulated_test_fixture",
+        "//software/simulated_tests:validation",
+        "//software/simulated_tests/field_tests:field_test_fixture",
+        requirement("pytest"),
+    ],
+)

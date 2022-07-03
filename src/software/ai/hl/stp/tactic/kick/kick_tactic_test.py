@@ -19,7 +19,7 @@ kick_velocity = tbots.Vector(6, 0)
 
 rob_pos = ball_initial_position - (kick_velocity.normalize() * 0.5)
 
-def test_kick(
+def test_basic_kick(
     simulated_test_runner,
 ):
 
@@ -90,5 +90,4 @@ def test_kick(
 
 
 if __name__ == "__main__":
-    print("ENTERED")
     pytest_main(__file__)

@@ -30,40 +30,23 @@ cc_test(
     ],
 )
 
-#cc_test(
-#    name = "kick_tactic_test",
-#    srcs = ["kick_tactic_test.cpp"],
-#    deps = [
-#        ":kick_tactic",
-#        "//shared/test_util:tbots_gtest_main",
-#        "//software/simulated_tests:simulated_er_force_sim_play_test_fixture",
-#        "//software/simulated_tests/terminating_validation_functions",
-#        "//software/simulated_tests/validation:validation_function",
-#        "//software/test_util",
-#    ],
-#)
-
-py_test(
+cc_test(
     name = "kick_tactic_test",
-    srcs = [
-        "kick_tactic_test.py",
-    ],
-    # TODO (#2619) Remove tag to run in parallel
-    tags = [
-        "exclusive",
-    ],
+    srcs = ["kick_tactic_test.cpp"],
     deps = [
-        "//software/simulated_tests:simulated_test_fixture",
-        "//software/simulated_tests:validation",
-        "//software/simulated_tests/field_tests:field_test_fixture",
-        requirement("pytest"),
+        ":kick_tactic",
+        "//shared/test_util:tbots_gtest_main",
+        "//software/simulated_tests:simulated_er_force_sim_play_test_fixture",
+        "//software/simulated_tests/terminating_validation_functions",
+        "//software/simulated_tests/validation:validation_function",
+        "//software/test_util",
     ],
 )
 
 py_test(
-    name = "kick_tactic_test_field",
+    name = "kick_tactic_pytest",
     srcs = [
-        "kick_tactic_test_field.py",
+        "kick_tactic_test.py",
     ],
     # TODO (#2619) Remove tag to run in parallel
     tags = [
