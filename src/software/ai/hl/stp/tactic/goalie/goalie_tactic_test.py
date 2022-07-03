@@ -6,9 +6,7 @@ from software.simulated_tests.ball_enters_region import *
 from software.simulated_tests.ball_moves_forward import *
 from software.simulated_tests.friendly_has_ball_possession import *
 from software.simulated_tests.excessive_dribbling import *
-from software.simulated_tests.simulated_test_fixture import (
-    simulated_test_runner,
-)
+from software.simulated_tests.simulated_test_fixture import simulated_test_runner
 from software.simulated_tests.pytest_main import pytest_main
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
@@ -129,15 +127,11 @@ def test_goalie_blocks_shot(
     params.assigned_tactics[0].goalie.CopyFrom(
         GoalieTactic(max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT)
     )
-    simulated_test_runner.set_tactics(
-        params, Team.BLUE
-    )
+    simulated_test_runner.set_tactics(params, Team.BLUE)
 
     # Setup no tactics on the enemy side
     params = ()
-    simulated_test_runner.set_tactics(
-        params, proto.ssl_gc_common_pb2.Team.YELLOW
-    )
+    simulated_test_runner.set_tactics(params, proto.ssl_gc_common_pb2.Team.YELLOW)
 
     # Always Validation
     always_validation_sequence_set = [

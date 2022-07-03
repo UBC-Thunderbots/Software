@@ -1,5 +1,3 @@
-
-
 class DataLogger(object):
 
     """Abstract class that can be used to log data during tests"""
@@ -12,4 +10,3 @@ class DataLogger(object):
 
     def get_data(self, world):
         raise NotImplementedError("log_data is not implemented")
-

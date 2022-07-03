@@ -14,6 +14,7 @@ WORLD_BUFFER_TIMEOUT = 5.0
 PROCESS_BUFFER_DELAY_S = 0.01
 PAUSE_AFTER_FAIL_DELAY_S = 3
 
+
 class TbotsTestRunner(object):
 
     """Run a test"""
@@ -44,7 +45,6 @@ class TbotsTestRunner(object):
         self.gamecontroller = gamecontroller
         self.world_buffer = ThreadSafeBuffer(buffer_size=20, protobuf_type=World)
 
-
         self.last_exception = None
 
         self.ssl_wrapper_buffer = ThreadSafeBuffer(
@@ -63,28 +63,35 @@ class TbotsTestRunner(object):
 
         self.blue_full_system_proto_unix_io.register_observer(World, self.world_buffer)
 
-
         self.timestamp = 0
         self.timestamp_mutex = threading.Lock()
 
         logger.info("setup runner")
 
-    def send_gamecontroller_command(self, gc_command: proto.ssl_gc_state_pb2.Command,
-                                    team: proto.ssl_gc_common_pb2.Team,
-                                    final_ball_placement_point=None,
-                                    ):
+    def send_gamecontroller_command(
+        self,
+        gc_command: proto.ssl_gc_state_pb2.Command,
+        team: proto.ssl_gc_common_pb2.Team,
+        final_ball_placement_point=None,
+    ):
 
         self.gamecontroller.send_ci_input(
-            gc_command=gc_command, team=team, final_ball_placement_point=final_ball_placement_point
+            gc_command=gc_command,
+            team=team,
+            final_ball_placement_point=final_ball_placement_point,
         )
 
-    def set_tactics(self, tactics:AssignedTacticPlayControlParams, team:proto.ssl_gc_common_pb2.Team):
+    def set_tactics(
+        self,
+        tactics: AssignedTacticPlayControlParams,
+        team: proto.ssl_gc_common_pb2.Team,
+    ):
         raise NotImplementedError("set_tactic unimplemented")
 
-    def set_play(self, play:Play, team: proto.ssl_gc_common_pb2.Team):
+    def set_play(self, play: Play, team: proto.ssl_gc_common_pb2.Team):
         raise NotImplementedError("set_play unimplemented")
 
-    def set_worldState(self, worldstate : WorldState):
+    def set_worldState(self, worldstate: WorldState):
         raise NotImplementedError("set_worldstate unimplemented")
 
     def time_provider(self):
@@ -92,11 +99,11 @@ class TbotsTestRunner(object):
         raise NotImplementedError("run_test unimplemented")
 
     def run_test(
-            self,
-            always_validation_sequence_set=[[]],
-            eventually_validation_sequence_set=[[]],
-            test_timeout_s=3,
-            tick_duration_s=0.0166,  # Default to 60hz
+        self,
+        always_validation_sequence_set=[[]],
+        eventually_validation_sequence_set=[[]],
+        test_timeout_s=3,
+        tick_duration_s=0.0166,  # Default to 60hz
     ):
         raise NotImplementedError("run_test unimplemented")
 
@@ -112,9 +119,7 @@ class TbotsTestRunner(object):
         if self.thunderscope:
             self.thunderscope.close()
 
-
-    def _run_with_tscope(self,runner):
-
+    def _run_with_tscope(self, runner):
         def excepthook(args):
             """This function is _critical_ for show_thunderscope to work.
             If the test Thread will raises an exception we won't be able to close

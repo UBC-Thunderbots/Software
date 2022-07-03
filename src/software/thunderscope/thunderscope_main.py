@@ -231,17 +231,18 @@ if __name__ == "__main__":
     if args.run_blue or args.run_yellow:
 
         try:
-            estop_reader = ThreadedEstopReader(
-                args.estop_path, args.estop_buadrate
-            )
+            estop_reader = ThreadedEstopReader(args.estop_path, args.estop_buadrate)
         except Exception:
             raise Exception("Could not find estop, make sure its plugged in")
 
         with RobotCommunication(
-                proto_unix_io, getRobotMulticastChannel(args.channel), args.interface, estop_reader=estop_reader
-            ), FullSystem(runtime_dir, debug, friendly_colour_yellow) as full_system:
-                full_system.setup_proto_unix_io(proto_unix_io)
-                tscope.show()
+            proto_unix_io,
+            getRobotMulticastChannel(args.channel),
+            args.interface,
+            estop_reader=estop_reader,
+        ), FullSystem(runtime_dir, debug, friendly_colour_yellow) as full_system:
+            full_system.setup_proto_unix_io(proto_unix_io)
+            tscope.show()
 
     ###########################################################################
     #                              Replay                                     #

@@ -1,5 +1,6 @@
 from proto.import_all_protos import *
 
+
 def create_world_state(
     yellow_robot_locations, blue_robot_locations, ball_location, ball_velocity
 ):

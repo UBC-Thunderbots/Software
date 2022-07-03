@@ -6,10 +6,12 @@ import threading
 import time
 
 from software.logger.logger import createLogger
+
 logger = createLogger(__name__)
 
-#todo remvoe
+# todo remove
 IGNORE_ESTOP = True
+
 
 class RobotCommunication(object):
 
@@ -20,7 +22,7 @@ class RobotCommunication(object):
         full_system_proto_unix_io,
         multicast_channel,
         interface,
-        estop_reader:ThreadedEstopReader,
+        estop_reader: ThreadedEstopReader,
         estop_path="/dev/ttyACM0",
         estop_buadrate=115200,
     ):
@@ -59,9 +61,10 @@ class RobotCommunication(object):
             PowerControl, self.power_control_diagnostics_buffer
         )
 
-        self.send_estop_state_thread = threading.Thread(target=self.__send_estop_state, daemon=True)
+        self.send_estop_state_thread = threading.Thread(
+            target=self.__send_estop_state, daemon=True
+        )
         self.run_thread = threading.Thread(target=self.run, daemon=True)
-
 
     def __send_estop_state(self):
         while True:
@@ -95,8 +98,7 @@ class RobotCommunication(object):
                 if IGNORE_ESTOP or self.estop_reader.isEstopPlay():
                     # primitive_set.time_sent = Timestamp(epoch_timestamp_seconds=time.time())
                     self.send_primitive_set.send_proto(primitive_set)
-                    #logger.info(primitive_set)
-
+                    # logger.info(primitive_set)
 
             else:
 
@@ -166,15 +168,10 @@ class RobotCommunication(object):
         )
 
         def func(data):
-            self.full_system_proto_unix_io.send_proto(
-                SSL_WrapperPacket, data
-            )
+            self.full_system_proto_unix_io.send_proto(SSL_WrapperPacket, data)
 
         self.receive_ssl_wrapper = SSLWrapperPacketProtoListener(
-            SSL_ADDRESS,
-            SSL_PORT,
-            func,
-            True,
+            SSL_ADDRESS, SSL_PORT, func, True,
         )
 
         self.send_primitive_set = PrimitiveSetProtoSender(
@@ -186,8 +183,8 @@ class RobotCommunication(object):
         )
 
         self.connect_fullsystem_to_robots()
-        #self.disconnect_fullsystem_from_robots()
-        #self.connect_robot_to_diagnostics(9)
+        # self.disconnect_fullsystem_from_robots()
+        # self.connect_robot_to_diagnostics(9)
 
         # self.send_estop_state_thread.start()
         self.run_thread.start()

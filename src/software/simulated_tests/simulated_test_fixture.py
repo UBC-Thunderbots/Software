@@ -1,8 +1,5 @@
-import threading
 import queue
-import argparse
 import time
-import sys
 import os
 
 import pytest
@@ -42,13 +39,13 @@ class SimulatorTestRunner(TbotsTestRunner):
     """Run a simulated test"""
 
     def __init__(
-            self,
-            test_name,
-            thunderscope,
-            simulator_proto_unix_io,
-            blue_full_system_proto_unix_io,
-            yellow_full_system_proto_unix_io,
-            gamecontroller,
+        self,
+        test_name,
+        thunderscope,
+        simulator_proto_unix_io,
+        blue_full_system_proto_unix_io,
+        yellow_full_system_proto_unix_io,
+        gamecontroller,
     ):
         """Initialize the SimulatorTestRunner
         
@@ -61,14 +58,20 @@ class SimulatorTestRunner(TbotsTestRunner):
 
         """
 
-        super(SimulatorTestRunner, self).__init__(test_name,
-                                                  thunderscope,
-                                                  blue_full_system_proto_unix_io,
-                                                  yellow_full_system_proto_unix_io,
-                                                  gamecontroller)
+        super(SimulatorTestRunner, self).__init__(
+            test_name,
+            thunderscope,
+            blue_full_system_proto_unix_io,
+            yellow_full_system_proto_unix_io,
+            gamecontroller,
+        )
         self.simulator_proto_unix_io = simulator_proto_unix_io
 
-    def set_tactics(self, tactics:AssignedTacticPlayControlParams, team:proto.ssl_gc_common_pb2.Team):
+    def set_tactics(
+        self,
+        tactics: AssignedTacticPlayControlParams,
+        team: proto.ssl_gc_common_pb2.Team,
+    ):
         if team == proto.ssl_gc_common_pb2.Team.BLUE:
             self.blue_full_system_proto_unix_io.send_proto(
                 AssignedTacticPlayControlParams, tactics
@@ -78,19 +81,15 @@ class SimulatorTestRunner(TbotsTestRunner):
                 AssignedTacticPlayControlParams, tactics
             )
 
-    def set_play(self, play:Play, team:proto.ssl_gc_common_pb2.Team):
+    def set_play(self, play: Play, team: proto.ssl_gc_common_pb2.Team):
         if team == proto.ssl_gc_common_pb2.Team.BLUE:
             self.blue_full_system_proto_unix_io.send_proto(Play, play)
 
         else:
             self.yellow_full_system_proto_unix_io.send_proto(Play, play)
 
-
-    def set_worldState(self, worldstate : WorldState):
-        self.simulator_proto_unix_io.send_proto(
-            WorldState,
-            worldstate
-        )
+    def set_worldState(self, worldstate: WorldState):
+        self.simulator_proto_unix_io.send_proto(WorldState, worldstate)
 
     def time_provider(self):
         """Provide the current time in seconds since the epoch"""
@@ -102,7 +101,7 @@ class SimulatorTestRunner(TbotsTestRunner):
         self,
         always_validation_sequence_set=[[]],
         eventually_validation_sequence_set=[[]],
-        data_loggers = [],
+        data_loggers=[],
         test_timeout_s=3,
         tick_duration_s=0.0166,  # Default to 60hz
     ):
@@ -171,7 +170,7 @@ class SimulatorTestRunner(TbotsTestRunner):
                     always_validation_sequence_set,
                 )
 
-                #log data
+                # log data
                 for logger_obj in data_loggers:
                     logger_obj.log_data(world, time_elapsed_s)
 
@@ -198,6 +197,7 @@ class SimulatorTestRunner(TbotsTestRunner):
 
         self._run_with_tscope(__runner)
 
+
 def simulated_test_initializer():
     args = load_command_line_arguments()
     tscope = None
@@ -215,7 +215,7 @@ def simulated_test_initializer():
 
     # Launch all binaries
     with Simulator(
-            f"{args.simulator_runtime_dir}/test/{test_name}", args.debug_simulator
+        f"{args.simulator_runtime_dir}/test/{test_name}", args.debug_simulator
     ) as simulator, FullSystem(
         f"{args.blue_full_system_runtime_dir}/test/{test_name}",
         args.debug_blue_full_system,
@@ -226,7 +226,7 @@ def simulated_test_initializer():
         True,
     ) as yellow_fs:
         with Gamecontroller(
-          supress_logs=(not args.show_gamecontroller_logs), ci_mode=True,
+            supress_logs=(not args.show_gamecontroller_logs), ci_mode=True,
         ) as gamecontroller:
 
             blue_fs.setup_proto_unix_io(blue_full_system_proto_unix_io)
@@ -272,8 +272,8 @@ def simulated_test_initializer():
             # SimulatorTestRunner time provider is tied to the simulators
             # t_capture coming out of the wrapper packet (rather than time.time).
             with ProtoLogger(
-                    f"{args.blue_full_system_runtime_dir}/logs/{current_test}",
-                    time_provider=runner.time_provider,
+                f"{args.blue_full_system_runtime_dir}/logs/{current_test}",
+                time_provider=runner.time_provider,
             ) as blue_logger, ProtoLogger(
                 f"{args.yellow_full_system_runtime_dir}/logs/{current_test}",
                 time_provider=runner.time_provider,
@@ -294,6 +294,7 @@ def simulated_test_initializer():
                     f"\n\nTo replay this test for the yellow team, go to the `src` folder and run \n./tbots.py run thunderscope --yellow_log {yellow_logger.log_folder}"
                 )
 
+
 @pytest.fixture
 def simulated_test_runner():
 
@@ -301,9 +302,8 @@ def simulated_test_runner():
 
     yield next(initializer)
 
-    #teardown
+    # teardown
     try:
         next(initializer)
     except StopIteration:
         pass
-

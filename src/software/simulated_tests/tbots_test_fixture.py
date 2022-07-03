@@ -1,9 +1,9 @@
-
 import pytest
 from software.simulated_tests.pytest_main import load_command_line_arguments
 from software.simulated_tests.simulated_test_fixture import simulated_test_initializer
-from software.simulated_tests.field_tests.field_test_fixture import field_test_initializer
-
+from software.simulated_tests.field_tests.field_test_fixture import (
+    field_test_initializer,
+)
 
 
 @pytest.fixture
@@ -17,9 +17,8 @@ def tbots_test_runner():
 
     yield next(runner_fixture)
 
-    #teardown
+    # teardown
     try:
         yield next(runner_fixture)
     except StopIteration:
         pass
-

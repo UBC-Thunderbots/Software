@@ -26,9 +26,23 @@ class SpecificRobotEntersRegion(Validation):
         """
         for region in self.regions:
             if team_color == Team.BLUE:
-                robot = next((robot_ for robot_ in world.friendly_team.team_robots if robot_.id == robot_id), None)
+                robot = next(
+                    (
+                        robot_
+                        for robot_ in world.friendly_team.team_robots
+                        if robot_.id == robot_id
+                    ),
+                    None,
+                )
             else:
-                robot = next((robot_ for robot_ in world.enemy_team.team_robots if robot_.id == robot_id), None)
+                robot = next(
+                    (
+                        robot_
+                        for robot_ in world.enemy_team.team_robots
+                        if robot_.id == robot_id
+                    ),
+                    None,
+                )
 
             if robot is None:
                 return ValidationStatus.FAILING

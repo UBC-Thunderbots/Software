@@ -3,6 +3,7 @@ import sys
 
 import pytest
 
+
 def load_command_line_arguments():
     """Load from command line arguments using argpase
 
@@ -79,7 +80,7 @@ def load_command_line_arguments():
         action="store",
         default="",
         help="The test filter, if not specified all tests will run. "
-             + "See https://docs.pytest.org/en/latest/how-to/usage.html#specifying-tests-selecting-tests",
+        + "See https://docs.pytest.org/en/latest/how-to/usage.html#specifying-tests-selecting-tests",
     )
 
     parser.add_argument(
@@ -107,6 +108,7 @@ def load_command_line_arguments():
     )
 
     return parser.parse_args()
+
 
 def pytest_main(file):
     """Runs the pytest file

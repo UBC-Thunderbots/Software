@@ -11,7 +11,7 @@ std::shared_ptr<Tactic> createTactic(const TbotsProto::Tactic &tactic_proto,
     case TbotsProto::Tactic::k##ONE_OF_CASE_NAME:                                        \
     {                                                                                    \
         return createTactic(tactic_proto.ONE_OF_VARIABLE_NAME(), ai_config);             \
-    }                                                                                    \
+    }
 
     switch (tactic_proto.tactic_case())
     {

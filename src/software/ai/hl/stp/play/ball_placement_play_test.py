@@ -3,9 +3,7 @@ import pytest
 import software.python_bindings as tbots
 from proto.play_pb2 import Play, PlayName
 from software.simulated_tests.ball_enters_region import *
-from software.simulated_tests.simulated_test_fixture import (
-    simulated_test_runner,
-)
+from software.simulated_tests.simulated_test_fixture import simulated_test_runner
 from software.simulated_tests.pytest_main import pytest_main
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
@@ -65,9 +63,7 @@ def test_two_ai_ball_placement(simulated_test_runner, run_enemy_ai, test_duratio
         yellow_play = Play()
         yellow_play.name = PlayName.EnemyBallPlacementPlay
 
-        simulated_test_runner.set_play(
-            yellow_play, Team.YELLOW
-        )
+        simulated_test_runner.set_play(yellow_play, Team.YELLOW)
 
     # Create world state
     simulated_test_runner.set_worldState(
