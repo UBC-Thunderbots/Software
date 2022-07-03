@@ -46,11 +46,11 @@ cc_library(
 )
 
 cc_test(
-	name = "hrvo_test",
-	srcs = ["hrvo_test.cpp"],
-	deps = [
-		":hrvo",
-		"//shared/test_util:tbots_gtest_main",
-		"//software/test_util",
-	]
+    name = "hrvo_test",
+    srcs = ["hrvo_test.cpp"],
+    deps = [
+        ":hrvo",
+        "//shared/test_util:tbots_gtest_main",
+        "//software/test_util",
+    ],
 )

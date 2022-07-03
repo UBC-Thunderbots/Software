@@ -10,9 +10,9 @@ class HRVOSimulator;
 
 enum AgentType
 {
-	FRIENDLY,
-	ENEMY,
-	BALL
+    FRIENDLY,
+    ENEMY,
+    BALL
 };
 
 /**
@@ -155,9 +155,9 @@ class Agent
      */
     void setPath(const AgentPath &new_path);
 
-	RobotId getRobotId();
+    RobotId getRobotId();
 
-	AgentType getAgentType();
+    AgentType getAgentType();
 
    protected:
     // Agent Properties
@@ -181,7 +181,7 @@ class Agent
     float max_accel_;
     bool reached_goal_;
 
-	AgentType agent_type;
+    AgentType agent_type;
 
     HRVOSimulator *const simulator_;
 };

@@ -62,58 +62,60 @@ HRVOSimulator::HRVOSimulator(float time_step, const RobotConstants_t &robot_cons
 
 void HRVOSimulator::updateWorld(const World &world)
 {
-    bool mark_changed = 0;
-	const auto &friendly_team 	= world.friendlyTeam().getAllRobots();
-	const auto &enemy_team 		= world.enemyTeam().getAllRobots();
+    bool mark_changed         = 0;
+    const auto &friendly_team = world.friendlyTeam().getAllRobots();
+    const auto &enemy_team    = world.enemyTeam().getAllRobots();
 
     int prevAgentCount = getNumAgents();
-	updateRemovedAgents(world);
-	
+    updateRemovedAgents(world);
+
     prevAgentCount = getNumAgents();
 
-	// update agents
-	for (const Robot &friendly_robot : friendly_team)
-	{
-		auto hrvo_agent = getFriendlyAgentFromRobotId(friendly_robot.id());
-		if (hrvo_agent.has_value())
-		{
-			hrvo_agent.value()->setPosition(friendly_robot.position().toVector());
+    // update agents
+    for (const Robot &friendly_robot : friendly_team)
+    {
+        auto hrvo_agent = getFriendlyAgentFromRobotId(friendly_robot.id());
+        if (hrvo_agent.has_value())
+        {
+            hrvo_agent.value()->setPosition(friendly_robot.position().toVector());
 
-			// only update velocity if time has passed since the last time velocity
-			// was updated. this is to allow sensorfusion to update the actual robot
-			// velocity in world.
-			// todo (#2531): remove 4 multiplier and fix goal keeper moving slowly
-			if (global_time - last_time_velocity_updated >= 4 * time_step)
-			{
-				Vector velocity = friendly_robot.velocity();
-				hrvo_agent.value()->setVelocity(friendly_robot.velocity());
-				last_time_velocity_updated = global_time;
-			}
-		}
-		else
-		{
+            // only update velocity if time has passed since the last time velocity
+            // was updated. this is to allow sensorfusion to update the actual robot
+            // velocity in world.
+            // todo (#2531): remove 4 multiplier and fix goal keeper moving slowly
+            if (global_time - last_time_velocity_updated >= 4 * time_step)
+            {
+                Vector velocity = friendly_robot.velocity();
+                hrvo_agent.value()->setVelocity(friendly_robot.velocity());
+                last_time_velocity_updated = global_time;
+            }
+        }
+        else
+        {
             addHRVORobotAgent(friendly_robot, AgentType::FRIENDLY);
-		}
-	}
+        }
+    }
 
     for (const Robot &enemy_robot : enemy_team)
     {
-		auto agent_iter = std::find_if(agent_list.begin(), agent_list.end(),
-							[&enemy_robot](std::shared_ptr<Agent> agent)
-							{
-								return (agent->getRobotId() == enemy_robot.id() && agent->getAgentType() == AgentType::ENEMY);
-							});	
+        auto agent_iter =
+            std::find_if(agent_list.begin(), agent_list.end(),
+                         [&enemy_robot](std::shared_ptr<Agent> agent) {
+                             return (agent->getRobotId() == enemy_robot.id() &&
+                                     agent->getAgentType() == AgentType::ENEMY);
+                         });
 
-		if (agent_iter != agent_list.end())
-		{
-			(*agent_iter)->setPosition(enemy_robot.position().toVector());
-			(*agent_iter)->setVelocity(enemy_robot.velocity());
-		}
-		else
-		{
-			Vector destination = (enemy_robot.position() + enemy_robot.velocity() * 5).toVector();	
-			addLinearVelocityRobotAgent(enemy_robot, destination, AgentType::ENEMY);
-		}
+        if (agent_iter != agent_list.end())
+        {
+            (*agent_iter)->setPosition(enemy_robot.position().toVector());
+            (*agent_iter)->setVelocity(enemy_robot.velocity());
+        }
+        else
+        {
+            Vector destination =
+                (enemy_robot.position() + enemy_robot.velocity() * 5).toVector();
+            addLinearVelocityRobotAgent(enemy_robot, destination, AgentType::ENEMY);
+        }
     }
 
     agents = {agent_list.begin(), agent_list.end()};
@@ -232,7 +234,8 @@ std::size_t HRVOSimulator::addHRVORobotAgent(const Robot &robot, AgentType type)
 }
 
 std::size_t HRVOSimulator::addLinearVelocityRobotAgent(const Robot &robot,
-                                                       const Vector &destination, AgentType type)
+                                                       const Vector &destination,
+                                                       AgentType type)
 {
     // TODO (#2371): Replace Vector with Vector
     Vector position = robot.position().toVector();
@@ -255,7 +258,8 @@ std::size_t HRVOSimulator::addHRVOAgent(const Vector &position, float agent_radi
                                         const Vector &curr_velocity, float maxSpeed,
                                         float prefSpeed, float maxAccel, AgentPath &path,
                                         float neighborDist, std::size_t maxNeighbors,
-                                        float uncertaintyOffset, RobotId robot_id, AgentType type)
+                                        float uncertaintyOffset, RobotId robot_id,
+                                        AgentType type)
 {
     std::shared_ptr<HRVOAgent> agent = std::make_shared<HRVOAgent>(
         this, position, neighborDist, maxNeighbors, agent_radius, curr_velocity, maxAccel,
@@ -266,10 +270,12 @@ std::size_t HRVOSimulator::addHRVOAgent(const Vector &position, float agent_radi
 
 size_t HRVOSimulator::addLinearVelocityAgent(const Vector &position, float agent_radius,
                                              const Vector &curr_velocity, float max_speed,
-                                             float max_accel, AgentPath &path, RobotId robot_id, AgentType type)
+                                             float max_accel, AgentPath &path,
+                                             RobotId robot_id, AgentType type)
 {
-    std::shared_ptr<LinearVelocityAgent> agent = std::make_shared<LinearVelocityAgent>(
-        this, position, agent_radius, curr_velocity, max_speed, max_accel, path, robot_id, type);
+    std::shared_ptr<LinearVelocityAgent> agent =
+        std::make_shared<LinearVelocityAgent>(this, position, agent_radius, curr_velocity,
+                                              max_speed, max_accel, path, robot_id, type);
 
     agent_list.push_back(agent);
     return agents.size() - 1;
@@ -335,7 +341,8 @@ void HRVOSimulator::visualize(unsigned int robot_id) const
     TbotsProto::HRVOVisualization hrvo_visualization;
     hrvo_visualization.set_robot_id(robot_id);
 
-    auto vo_protos = ((HRVOAgent) *(friendly_agent_opt.value())).getVelocityObstaclesAsProto();
+    auto vo_protos =
+        ((HRVOAgent) * (friendly_agent_opt.value())).getVelocityObstaclesAsProto();
     *(hrvo_visualization.mutable_velocity_obstacles()) = {vo_protos.begin(),
                                                           vo_protos.end()};
 
@@ -359,16 +366,17 @@ void HRVOSimulator::visualize(unsigned int robot_id) const
 std::optional<std::shared_ptr<HRVOAgent>> HRVOSimulator::getFriendlyAgentFromRobotId(
     unsigned int robot_id) const
 {
-	auto found = std::find_if(agent_list.begin(), agent_list.end(), 
-			[&robot_id](std::shared_ptr<Agent> agent)
-			{
-				return (agent->getRobotId() == robot_id && agent->getAgentType() == AgentType::FRIENDLY);	
-			});
-	if (found == agent_list.end())
-	{
-		return std::nullopt;
-	}
-    return std::make_optional<std::shared_ptr<HRVOAgent>>(std::static_pointer_cast<HRVOAgent>(*found));
+    auto found = std::find_if(agent_list.begin(), agent_list.end(),
+                              [&robot_id](std::shared_ptr<Agent> agent) {
+                                  return (agent->getRobotId() == robot_id &&
+                                          agent->getAgentType() == AgentType::FRIENDLY);
+                              });
+    if (found == agent_list.end())
+    {
+        return std::nullopt;
+    }
+    return std::make_optional<std::shared_ptr<HRVOAgent>>(
+        std::static_pointer_cast<HRVOAgent>(*found));
 }
 
 float HRVOSimulator::getAgentMaxAccel(std::size_t agentNo) const
@@ -418,28 +426,26 @@ const std::vector<std::shared_ptr<Agent>> HRVOSimulator::getAgentsAsVector() con
 
 void HRVOSimulator::updateRemovedAgents(const World &world)
 {
-	agent_list.remove_if(
-					[&world](std::shared_ptr<Agent> agent)
-					{
-						std::unique_ptr<const std::vector<Robot>> team_to_use;
-						switch (agent->getAgentType())
-						{
-							case FRIENDLY :
-								team_to_use = std::make_unique<const std::vector<Robot>>(world.friendlyTeam().getAllRobots());
-								break;
-							case ENEMY :
-								team_to_use = std::make_unique<const std::vector<Robot>>(world.enemyTeam().getAllRobots()); 
-								break;
-							default :
-								team_to_use = std::make_unique<const std::vector<Robot>>(std::vector<Robot>());
-						}
+    agent_list.remove_if([&world](std::shared_ptr<Agent> agent) {
+        std::unique_ptr<const std::vector<Robot>> team_to_use;
+        switch (agent->getAgentType())
+        {
+            case FRIENDLY:
+                team_to_use = std::make_unique<const std::vector<Robot>>(
+                    world.friendlyTeam().getAllRobots());
+                break;
+            case ENEMY:
+                team_to_use = std::make_unique<const std::vector<Robot>>(
+                    world.enemyTeam().getAllRobots());
+                break;
+            default:
+                team_to_use =
+                    std::make_unique<const std::vector<Robot>>(std::vector<Robot>());
+        }
 
-						auto team_iter = std::find_if((*team_to_use).begin(), (*team_to_use).end(),
-										[&agent](const Robot &robot)
-										{
-											return (robot.id() == agent->getRobotId());
-										});
-						return team_iter == (*team_to_use).end();
-					});
+        auto team_iter = std::find_if(
+            (*team_to_use).begin(), (*team_to_use).end(),
+            [&agent](const Robot &robot) { return (robot.id() == agent->getRobotId()); });
+        return team_iter == (*team_to_use).end();
+    });
 }
-

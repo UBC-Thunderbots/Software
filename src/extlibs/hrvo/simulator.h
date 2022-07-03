@@ -34,8 +34,8 @@
 
 #include <fstream>
 #include <limits>
-#include <vector>
 #include <list>
+#include <vector>
 
 #include "extlibs/hrvo/agent.h"
 #include "extlibs/hrvo/kd_tree.h"
@@ -89,9 +89,8 @@ class HRVOSimulator
      * @param destination Destination for this robot
      * @return    The index of the agent.
      */
-    std::size_t addLinearVelocityRobotAgent(const Robot &robot,
-                                            const Vector &destination,
-					    AgentType type);
+    std::size_t addLinearVelocityRobotAgent(const Robot &robot, const Vector &destination,
+                                            AgentType type);
 
     /**
      *      Adds a new agent to the simulation.
@@ -113,7 +112,7 @@ class HRVOSimulator
                              const Vector &curr_velocity, float maxSpeed, float prefSpeed,
                              float maxAccel, AgentPath &path, float neighborDist,
                              std::size_t maxNeighbors, float uncertaintyOffset,
-			     RobotId robot_id, AgentType type);
+                             RobotId robot_id, AgentType type);
 
     /**
      * Add a new LinearlyVelocityAgent
@@ -128,8 +127,8 @@ class HRVOSimulator
      */
     size_t addLinearVelocityAgent(const Vector &position, float agent_radius,
                                   const Vector &curr_velocity, float max_speed,
-                                  float max_accel, AgentPath &path, 
-				  RobotId robot_id, AgentType type);
+                                  float max_accel, AgentPath &path, RobotId robot_id,
+                                  AgentType type);
 
     /**
      * Performs a simulation step; updates the position, and velocity
@@ -172,11 +171,12 @@ class HRVOSimulator
      */
     const std::list<std::shared_ptr<Agent>> &getAgents() const;
 
-	/**
-	 * Get the Vector of agents in this simulator
-	 * @return Vector of Agents
-	 * #2688: Delete this getter when kd-trees aren't tightly coupled to indices of Agent vector and we delete the agent vector.
-	 */
+    /**
+     * Get the Vector of agents in this simulator
+     * @return Vector of Agents
+     * #2688: Delete this getter when kd-trees aren't tightly coupled to indices of Agent
+     * vector and we delete the agent vector.
+     */
     const std::vector<std::shared_ptr<Agent>> getAgentsAsVector() const;
 
     /**
@@ -273,7 +273,7 @@ class HRVOSimulator
         return reached_goals;
     }
 
-	void updateRemovedAgents(const World &world);
+    void updateRemovedAgents(const World &world);
 
    private:
     // PrimitiveSet which includes the path which each friendly robot should take
@@ -308,7 +308,8 @@ class HRVOSimulator
 
     // List of agents (robots) in this simulation
     std::list<std::shared_ptr<Agent>> agent_list;
-	//#2688: Delete this agent vector when the kd-tree is not tightly coupled to the indices of this vector
+    //#2688: Delete this agent vector when the kd-tree is not tightly coupled to the
+    //indices of this vector
     std::vector<std::shared_ptr<Agent>> agents;
 
    public:

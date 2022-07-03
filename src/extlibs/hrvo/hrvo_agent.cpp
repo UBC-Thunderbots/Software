@@ -46,7 +46,8 @@ HRVOAgent::HRVOAgent(HRVOSimulator *simulator, const Vector &position, float nei
                      std::size_t maxNeighbors, float radius, const Vector &velocity,
                      float maxAccel, AgentPath &path, float prefSpeed, float maxSpeed,
                      float uncertaintyOffset, unsigned int robot_id, AgentType type)
-    : Agent(simulator, position, radius, velocity, velocity, maxSpeed, maxAccel, path, robot_id, type),
+    : Agent(simulator, position, radius, velocity, velocity, maxSpeed, maxAccel, path,
+            robot_id, type),
       maxNeighbors_(maxNeighbors),
       neighborDist_(neighborDist),
       prefSpeed_(prefSpeed),
@@ -161,7 +162,8 @@ void HRVOAgent::computeNewVelocity()
     // Create Velocity Obstacles for neighbors
     for (const auto &neighbor : neighbors_)
     {
-        std::shared_ptr<Agent> other_agent = simulator_->getAgentsAsVector()[neighbor.second];
+        std::shared_ptr<Agent> other_agent =
+            simulator_->getAgentsAsVector()[neighbor.second];
         VelocityObstacle velocity_obstacle = other_agent->createVelocityObstacle(*this);
         velocityObstacles_.push_back(velocity_obstacle);
     }
