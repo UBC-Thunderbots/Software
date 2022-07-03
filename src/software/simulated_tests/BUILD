@@ -14,7 +14,6 @@ py_test(
     deps = [
         "//software/simulated_tests:simulated_test_fixture",
         "//software/simulated_tests:validation",
-        "//software/thunderscope:speed_threshold_helpers",
         requirement("pytest"),
     ],
 )
@@ -149,28 +148,6 @@ py_library(
         "//software:py_constants.so",
     ],
     deps = [
-    ],
-)
-
-py_test(
-    name = "friction_calibration_test",
-    srcs = [
-        "friction_calibration_test.py",
-    ],
-    # TODO (#2619) Remove tag to run in parallel
-    tags = [
-        "exclusive",
-    ],
-    deps = [
-        "//software/simulated_tests:data_logger",
-        "//software/simulated_tests:simulated_test_fixture",
-        "//software/simulated_tests:tbots_test_fixture",
-        "//software/simulated_tests:validation",
-        "//software/simulated_tests/field_tests:field_test_fixture",
-        requirement("pytest"),
-        requirement("numpy"),
-        requirement("scipy"),
-        requirement("matplotlib"),
     ],
 )
 

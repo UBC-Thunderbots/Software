@@ -46,7 +46,7 @@ cc_test(
 py_test(
     name = "kick_tactic_pytest",
     srcs = [
-        "kick_tactic_test.py",
+        "kick_tactic_pytest.py",
     ],
     # TODO (#2619) Remove tag to run in parallel
     tags = [

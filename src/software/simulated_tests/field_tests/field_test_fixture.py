@@ -371,11 +371,11 @@ def field_test_initializer():
     ) as rc_yellow, FullSystem(
         f"{args.blue_full_system_runtime_dir}/test/{test_name}",
         args.debug_blue_full_system,
-        False, should_restart_on_crash=False
+        False
     ) as blue_fs, FullSystem(
         f"{args.yellow_full_system_runtime_dir}/test/{test_name}",
         args.debug_yellow_full_system,
-        True, should_restart_on_crash=False
+        True
     ) as yellow_fs:
         with Gamecontroller(
                 supress_logs=(not args.show_gamecontroller_logs), ci_mode=True

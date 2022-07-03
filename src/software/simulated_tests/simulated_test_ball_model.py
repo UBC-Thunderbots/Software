@@ -5,8 +5,6 @@ from software.simulated_tests.robot_enters_region import *
 from software.simulated_tests.ball_enters_region import *
 from software.simulated_tests.ball_moves_forward import *
 from software.simulated_tests.friendly_has_ball_possession import *
-from software.simulated_tests.ball_speed_threshold import *
-from software.simulated_tests.robot_speed_threshold import *
 from software.simulated_tests.ball_stops_in_region import *
 from software.simulated_tests.excessive_dribbling import *
 from proto.message_translation.tbots_protobuf import create_world_state
