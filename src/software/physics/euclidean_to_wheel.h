@@ -41,7 +41,7 @@ class EuclideanToWheel
      * @param euclidean_velocity The Euclidean velocity.
      * @return The equivalent wheel speeds.
      */
-    WheelSpace_t getWheelVelocity(const EuclideanSpace_t &euclidean_velocity);
+    WheelSpace_t getWheelVelocity(EuclideanSpace_t euclidean_velocity);
 
     /**
      * Gets the Euclidean velocity from the wheel velocity.
@@ -64,16 +64,22 @@ class EuclideanToWheel
     double rear_wheel_angle_theta_rad_{};
 
     /**
+     * The radius of the wheel in meters.
+     */
+    double wheel_radius_m_{};
+
+    /**
      * Euclidean velocity to wheel velocity coupling matrix.
      *
      * ref: http://robocup.mi.fu-berlin.de/buch/omnidrive.pdf pg 16
      */
-    Eigen::Matrix<double, 4, 3> euclidean_to_wheel_velocity_D;
-
+    Eigen::Matrix<double, 4, 3> euclidean_to_wheel_velocity_D_;
+    
     /**
      * Wheel velocity to Euclidean velocity coupling matrix.
      *
      * ref: http://robocup.mi.fu-berlin.de/buch/omnidrive.pdf pg 16
      */
-    Eigen::Matrix<double, 3, 4> wheel_to_euclidean_velocity_D_inverse;
+    Eigen::Matrix<double, 3, 4> wheel_to_euclidean_velocity_D_inverse_;
+
 };
