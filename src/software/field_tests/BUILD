@@ -35,9 +35,9 @@ py_test(
         "exclusive",
     ],
     deps = [
+        "//software/field_tests:field_test_fixture",
         "//software/simulated_tests:simulated_test_fixture",
         "//software/simulated_tests:validation",
-        "//software/field_tests:field_test_fixture",
         requirement("pytest"),
     ],
 )

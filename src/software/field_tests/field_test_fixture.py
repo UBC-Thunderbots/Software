@@ -413,7 +413,7 @@ def field_test_initializer():
     test_name = current_test.split("-")[0]
 
     try:
-        estop_reader = ThreadedEstopReader(args.estop_path, args.estop_buadrate)
+        ThreadedEstopReader(args.estop_path, args.estop_buadrate)
     except Exception:
         raise Exception("Could not find estop, make sure its plugged in")
 
