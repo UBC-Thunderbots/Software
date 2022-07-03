@@ -170,7 +170,9 @@ class HRVOSimulator
      * Get the list of Agents in this simulator
      * @return List of Agents
      */
-    const std::vector<std::shared_ptr<Agent>> &getAgents() const;
+    const std::list<std::shared_ptr<Agent>> &getAgents() const;
+
+    const std::vector<std::shared_ptr<Agent>> getAgentsAsVector() const;
 
     /**
      *      Returns the maximum acceleration of a specified agent.
@@ -192,7 +194,7 @@ class HRVOSimulator
     /**
      *      Returns the preferred velocity of a specified agent.
      *
-     * The preferred speed of an agent is the speed it would choose
+     s* The preferred speed of an agent is the speed it would choose
      * to take if it were not influenced by other agents.
      *
      * @param agentNo  The number of the agent whose preferred velocity is to be
@@ -243,7 +245,7 @@ class HRVOSimulator
      */
     std::size_t getNumAgents() const
     {
-        return agents.size();
+        return agent_list.size();
     }
 
     /**

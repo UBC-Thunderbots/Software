@@ -42,14 +42,14 @@ KdTree::KdTree(HRVOSimulator *simulator) : simulator_(simulator) {}
 
 void KdTree::build()
 {
-    agents_.reserve(simulator_->agents.size());
+    agents_ = {};
 
-    for (std::size_t i = agents_.size(); i < simulator_->agents.size(); ++i)
+    for (std::size_t i = 0; i < simulator_->agents.size(); ++i)
     {
         agents_.push_back(i);
     }
 
-    nodes_.resize(2 * simulator_->agents.size() - 1);
+    nodes_.resize(std::max(2 * simulator_->agents.size() - 1, nodes_.size()));
 
     if (!agents_.empty())
     {
