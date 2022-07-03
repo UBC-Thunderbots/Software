@@ -152,9 +152,9 @@ class MotorService
      *
      */
     WheelSpace_t rampWheelVelocity(const WheelSpace_t& current_wheel_velocity,
-            const EuclideanSpace_t& target_euclidean_velocity,
-            double allowed_acceleration,
-            const double& time_to_ramp);
+                                   const EuclideanSpace_t& target_euclidean_velocity,
+                                   double allowed_acceleration,
+                                   const double& time_to_ramp);
 
     /**
      * Convert electrical rpm to wheel velocity.
@@ -243,5 +243,5 @@ class MotorService
     WheelSpace_t prev_wheel_velocities;
 
     int heartbeat_state = 0;
-    int count = 0;
+    int count           = 0;
 };

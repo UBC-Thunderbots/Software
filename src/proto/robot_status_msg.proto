@@ -17,6 +17,7 @@ message RobotStatus
     JetsonStatus jetson_status                = 8;
     ThunderloopStatus thunderloop_status      = 9;
     Timestamp time_sent                       = 10;
+    uint64 last_handled_primitive_set         = 11;
 }
 
 message ThunderloopStatus

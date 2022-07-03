@@ -165,7 +165,7 @@ void Thunderloop::runLoop()
                 }
             }
 
-            // If the world msg is new, update the internal buffer
+            //// If the world msg is new, update the internal buffer
             if (new_world.time_sent().epoch_timestamp_seconds() >
                 world_.time_sent().epoch_timestamp_seconds())
             {
@@ -190,10 +190,12 @@ void Thunderloop::runLoop()
 
                 // If we haven't received a primitive in a while, override the
                 // current_primitive_ with an estop primitive.
-                LOG(DEBUG) << static_cast<double>(nanoseconds_elapsed_since_last_primitive) / 1000000.0;
+                // LOG(DEBUG) <<
+                // static_cast<double>(nanoseconds_elapsed_since_last_primitive) /
+                // 1000000.0;
 
                 if (nanoseconds_elapsed_since_last_primitive >
-                    static_cast<long>(PRIMITIVE_MANAGER_TIMEOUT_NS))
+                        static_cast<long>(PRIMITIVE_MANAGER_TIMEOUT_NS))
                 {
                     primitive_executor_.clearCurrentPrimitive();
                 }
@@ -206,7 +208,6 @@ void Thunderloop::runLoop()
                     current_orientation_ = robot->currentState().orientation();
                 }
 
-                // TODO ROBOT COLOUR
                 direct_control_ =
                     *primitive_executor_.stepPrimitive(robot_id_, current_orientation_);
             }
