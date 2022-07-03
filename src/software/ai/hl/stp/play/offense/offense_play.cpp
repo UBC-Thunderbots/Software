@@ -35,10 +35,17 @@ void OffensePlay::updateTactics(const PlayUpdate &play_update)
     unsigned int num_enemy_robots =
         static_cast<int>(play_update.world.enemyTeam().numRobots());
 
+    if ( play_update.world.gameState().isReadyState()&& (play_update.world.gameState().isOurDirectFree() || play_update.world.gameState().isOurIndirectFree()))
+    {
+        // if we're 
+        if(play_update.world.ball().position().x() > 0){
+            num_defenders = std::max(0,2 - static_cast<int>(play_update.world.ball().position().x()/play_update.world.field().fieldLines().xMax() ));
+        }
+    }
+    else if (num_enemy_robots <= 3)
+    {
     // enemy team has at most half a full team, so we need at most half the number of
     // defenders
-    if (num_enemy_robots <= 3)
-    {
         num_defenders = 1;
         if (num_enemy_robots < 2)
         {

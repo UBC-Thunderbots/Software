@@ -74,7 +74,8 @@ void PlaySelectionFSM::setupSetPlay(const Update& event)
 
     if (event.game_state.isOurDirectFree() || event.game_state.isOurIndirectFree())
     {
-        event.set_current_play(std::make_unique<CornerKickPlay>(ai_config));
+        // free kick is handled as part of the offense play, but we need to restart it for it to handle a free kick
+        event.set_current_play(std::make_unique<OffensePlay>(ai_config));
     }
 
     if (event.game_state.isTheirDirectFree() || event.game_state.isTheirIndirectFree())

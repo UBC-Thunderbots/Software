@@ -134,3 +134,11 @@ void FreeKickPlayFSM::updateAlignToBallTactic(
             ball_to_center_vec.normalize(ROBOT_MAX_RADIUS_METERS * 2),
         ball_to_center_vec.orientation(), 0);
 }
+
+bool FreeKickPlayFSM::freeKickerReady(const Update& event)
+{
+    return true;
+}
+
+
+    void FreeKickPlayFSM::alignToBall(const Update& event){}
