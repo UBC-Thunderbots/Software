@@ -78,8 +78,6 @@ struct FreeKickPlayFSM
                 ShootOrFindPassState_S,
             AlignToBallState_S + Update_E[!freeKickerReady_G] / alignToBall_A =
                 AlignToBallState_S,
-            ShootOrFindPassState_S + Update_E[passFound_G] / takePass_A =
-                TakePassState_S,
             ShootOrFindPassState_S + Update_E[!passFound_G] / shootOrFindPass_A =
                 ShootOrFindPassState_S,
             ShootOrFindPassState_S + Update_E[passFound_G] / takePass_A = TakePassState_S,
@@ -99,6 +97,7 @@ struct FreeKickPlayFSM
     TbotsProto::AiConfig ai_config;
     std::shared_ptr<AttackerTactic> attacker_tactic;
     std::shared_ptr<ReceiverTactic> receiver_tactic;
+    std::shared_ptr<MoveTactic> align_to_ball_tactic;
     std::vector<std::shared_ptr<MoveTactic>> offensive_positioning_tactics;
     PassGenerator<EighteenZoneId> pass_generator;
     Timestamp pass_optimization_start_time;
