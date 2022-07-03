@@ -1,10 +1,10 @@
 #include "chicker.h"
 
-hw_timer_t* Chicker::pulse_timer         = nullptr;
-hw_timer_t* Chicker::cooldown_timer      = nullptr;
-float Chicker::kick_speed_m_per_s        = 0;
-float Chicker::chip_distance_meters      = 0;
-volatile bool Chicker::on_cooldown       = false;
+hw_timer_t* Chicker::pulse_timer    = nullptr;
+hw_timer_t* Chicker::cooldown_timer = nullptr;
+float Chicker::kick_speed_m_per_s   = 0;
+float Chicker::chip_distance_meters = 0;
+volatile bool Chicker::on_cooldown  = false;
 
 Chicker::Chicker()
 {
@@ -21,26 +21,28 @@ Chicker::Chicker()
 
 void IRAM_ATTR Chicker::kick()
 {
-    auto duration     = speedToPulseWidth(kick_speed_m_per_s);
+    auto duration = speedToPulseWidth(kick_speed_m_per_s);
     oneShotPulse(duration, KICKER_PIN);
 }
 
 void IRAM_ATTR Chicker::chip()
 {
-    auto duration     = distanceToPulseWidth(chip_distance_meters);
+    auto duration = distanceToPulseWidth(chip_distance_meters);
     oneShotPulse(duration, CHIPPER_PIN);
 }
 
 void IRAM_ATTR Chicker::autokick()
 {
-    if (getBreakBeamTripped()) {
+    if (getBreakBeamTripped())
+    {
         kick();
     }
 }
 
 void IRAM_ATTR Chicker::autochip()
 {
-    if (getBreakBeamTripped()) {
+    if (getBreakBeamTripped())
+    {
         chip();
     }
 }
