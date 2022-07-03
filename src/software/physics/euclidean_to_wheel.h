@@ -41,7 +41,7 @@ class EuclideanToWheel
      * @param euclidean_velocity The Euclidean velocity.
      * @return The equivalent wheel speeds.
      */
-    WheelSpace_t getWheelVelocity(const EuclideanSpace_t &euclidean_velocity);
+    WheelSpace_t getWheelVelocity(EuclideanSpace_t euclidean_velocity);
 
     /**
      * Gets the Euclidean velocity from the wheel velocity.
