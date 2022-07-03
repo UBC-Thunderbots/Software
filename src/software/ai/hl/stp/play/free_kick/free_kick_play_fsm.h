@@ -16,6 +16,7 @@ struct FreeKickPlayFSM
 {
     class AlignToBallState;
     class ShootOrFindPassState;
+    class TakePassState;
     class StartState;
 
     struct ControlParams
@@ -49,21 +50,26 @@ struct FreeKickPlayFSM
      */
     void shootOrFindPass(const Update& event);
     void alignToBall(const Update& event);
+    void takePass(const Update& event);
     bool freeKickerReady(const Update& event);
+    bool passFound(const Update& event);
 
     auto operator()()
     {
         using namespace boost::sml;
 
         DEFINE_SML_STATE(ShootOrFindPassState)
+        DEFINE_SML_STATE(TakePassState)
         DEFINE_SML_STATE(StartState)
         DEFINE_SML_STATE(AlignToBallState)
         DEFINE_SML_EVENT(Update)
 
         DEFINE_SML_ACTION(shootOrFindPass)
         DEFINE_SML_ACTION(alignToBall)
+        DEFINE_SML_ACTION(takePass)
 
         DEFINE_SML_GUARD(freeKickerReady)
+        DEFINE_SML_GUARD(passFound)
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
@@ -72,6 +78,11 @@ struct FreeKickPlayFSM
                 ShootOrFindPassState_S,
             AlignToBallState_S + Update_E[!freeKickerReady_G] / alignToBall_A =
                 AlignToBallState_S,
+            ShootOrFindPassState_S + Update_E[passFound_G] / takePass_A =
+                TakePassState_S,
+            ShootOrFindPassState_S + Update_E[!passFound_G] / shootOrFindPass_A =
+                ShootOrFindPassState_S,
+            ShootOrFindPassState_S + Update_E[passFound_G] / takePass_A = TakePassState_S,
             X + Update_E = X);
     }
 

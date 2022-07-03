@@ -145,3 +145,7 @@ bool FreeKickPlayFSM::freeKickerReady(const Update& event)
 
 
 void FreeKickPlayFSM::alignToBall(const Update& event) {}
+
+
+    void takePass(const Update& event){}
+    bool passFound(const Update& event){return true;}
