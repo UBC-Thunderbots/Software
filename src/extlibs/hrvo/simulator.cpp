@@ -160,10 +160,10 @@ void HRVOSimulator::updateWorld(const World &world)
             // obstacle
             float ball_radius = 0.5f + BALL_AGENT_RADIUS_OFFSET;
 
-            AgentPath path = AgentPath({PathPoint(goal_pos, 0.0f)}, 0.1f);
-            std::size_t agent_index =
-                addLinearVelocityAgent(position, ball_radius, ENEMY_ROBOT_RADIUS_SCALE,
-                                       velocity, velocity.length(), acceleration, path);
+            AgentPath path          = AgentPath({PathPoint(goal_pos, 0.0f)}, 0.1f);
+            std::size_t agent_index = addLinearVelocityAgent(
+                position, ball_radius, ENEMY_ROBOT_RADIUS_MAX_INFLATION, velocity,
+                velocity.length(), acceleration, path);
             ball_agent_id = agent_index;
         }
         else
@@ -284,9 +284,10 @@ std::size_t HRVOSimulator::addHRVORobotAgent(const Robot &robot)
     AgentPath path =
         AgentPath({PathPoint(destination_point, speed_at_goal)}, path_radius);
 
-    return addHRVOAgent(position, ROBOT_MAX_RADIUS_METERS, FRIENDLY_ROBOT_RADIUS_SCALE,
-                        velocity, max_speed, pref_speed, max_accel, path,
-                        MAX_NEIGHBOR_SEARCH_DIST, MAX_NEIGHBORS, uncertainty_offset);
+    return addHRVOAgent(position, ROBOT_MAX_RADIUS_METERS,
+                        FRIENDLY_ROBOT_RADIUS_MAX_INFLATION, velocity, max_speed,
+                        pref_speed, max_accel, path, MAX_NEIGHBOR_SEARCH_DIST,
+                        MAX_NEIGHBORS, uncertainty_offset);
 }
 
 std::size_t HRVOSimulator::addLinearVelocityRobotAgent(const Robot &robot,
@@ -303,7 +304,7 @@ std::size_t HRVOSimulator::addLinearVelocityRobotAgent(const Robot &robot,
 
     AgentPath path = AgentPath({PathPoint(destination, 0.0f)}, path_radius);
     return addLinearVelocityAgent(position, ROBOT_MAX_RADIUS_METERS,
-                                  ENEMY_ROBOT_RADIUS_SCALE, velocity, max_speed,
+                                  ENEMY_ROBOT_RADIUS_MAX_INFLATION, velocity, max_speed,
                                   max_accel, path);
 }
 
