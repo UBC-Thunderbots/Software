@@ -190,6 +190,8 @@ void Thunderloop::runLoop()
 
                 // If we haven't received a primitive in a while, override the
                 // current_primitive_ with an estop primitive.
+                LOG(DEBUG) << static_cast<double>(nanoseconds_elapsed_since_last_primitive) / 1000000.0;
+
                 if (nanoseconds_elapsed_since_last_primitive >
                     static_cast<long>(PRIMITIVE_MANAGER_TIMEOUT_NS))
                 {

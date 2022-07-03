@@ -27,6 +27,7 @@ class RobotCommunication(object):
         :param estop_baudrate: The baudrate of the estop
 
         """
+        self.last_time = time.time()
         self.full_system_proto_unix_io = full_system_proto_unix_io
         self.multicast_channel = str(multicast_channel)
         self.interface = interface
@@ -92,10 +93,8 @@ class RobotCommunication(object):
 
                 # Send the primitive set
                 primitive_set = self.primitive_buffer.get(block=False)
-                print("ASD")
 
                 if self.estop_reader.isEstopPlay():
-                    print("sending proto", primitive_set)
                     self.send_primitive_set.send_proto(primitive_set)
 
             else:
@@ -119,9 +118,11 @@ class RobotCommunication(object):
                 )
 
                 if self.estop_reader.isEstopPlay():
+                    print(primitive_set.time_sent.epoch_timestamp_seconds - self.last_time)
+                    self.last_time = primitive_set.time_sent.epoch_timestamp_seconds
                     self.send_primitive_set.send_proto(primitive_set)
 
-                time.sleep(0.01)
+                time.sleep(0.001)
 
     def connect_fullsystem_to_robots(self):
         """ Connect the robots to fullsystem """
@@ -180,7 +181,7 @@ class RobotCommunication(object):
         )
 
         self.disconnect_fullsystem_from_robots()
-        self.connect_robot_to_diagnostics(0)
+        self.connect_robot_to_diagnostics(1)
 
         self.send_estop_state_thread.start()
         self.run_thread.start()

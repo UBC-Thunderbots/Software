@@ -458,73 +458,9 @@ class Thunderscope(object):
         log_dock = Dock("Logs")
         log_dock.addWidget(self.diagnostics_widgets["log_widget"])
 
-        def extract_encoder_data(named_value_data):
-            return {named_value_data.name: named_value_data.value}
-
-        # Create widget
-        proto_plotter_1 = ProtoPlotter(
-            min_y=0,
-            max_y=100,
-            window_secs=2,
-            configuration={NamedValue: extract_encoder_data},
-        )
-        proto_plotter_dock_1 = Dock("Thunderloop Performance")
-        proto_plotter_dock_1.addWidget(proto_plotter_1)
-
-        proto_plotter_2 = ProtoPlotter(
-            min_y=0,
-            max_y=100,
-            window_secs=2,
-            configuration={NamedValue: extract_encoder_data},
-        )
-        proto_plotter_dock_2 = Dock("Power Status")
-        proto_plotter_dock_2.addWidget(proto_plotter_2)
-
-        proto_plotter_3 = ProtoPlotter(
-            min_y=0,
-            max_y=100,
-            window_secs=2,
-            configuration={NamedValue: extract_encoder_data},
-        )
-        proto_plotter_dock_3 = Dock("Thunderloop Status")
-        proto_plotter_dock_3.addWidget(proto_plotter_3)
-
-        proto_plotter_4 = ProtoPlotter(
-            min_y=0,
-            max_y=100,
-            window_secs=2,
-            configuration={NamedValue: extract_encoder_data},
-        )
-        proto_plotter_dock_4 = Dock("Temperature Status")
-        proto_plotter_dock_4.addWidget(proto_plotter_4)
-
-        # Register observer
-        proto_unix_io.register_observer(NamedValue, proto_plotter_1.buffers[NamedValue])
-        proto_unix_io.register_observer(NamedValue, proto_plotter_2.buffers[NamedValue])
-        proto_unix_io.register_observer(NamedValue, proto_plotter_3.buffers[NamedValue])
-        proto_unix_io.register_observer(NamedValue, proto_plotter_4.buffers[NamedValue])
-
-        # Register refresh function
-        self.register_refresh_function(proto_plotter_1.refresh)
-        self.register_refresh_function(proto_plotter_2.refresh)
-        self.register_refresh_function(proto_plotter_3.refresh)
-        self.register_refresh_function(proto_plotter_4.refresh)
-
         self.robot_diagnostics_dock_area.addDock(log_dock)
         self.robot_diagnostics_dock_area.addDock(drive_dock, "right", log_dock)
         self.robot_diagnostics_dock_area.addDock(chicker_dock, "bottom", drive_dock)
-        self.robot_diagnostics_dock_area.addDock(
-            proto_plotter_dock_1, "right", log_dock
-        )
-        self.robot_diagnostics_dock_area.addDock(
-            proto_plotter_dock_2, "bottom", proto_plotter_dock_1
-        )
-        self.robot_diagnostics_dock_area.addDock(
-            proto_plotter_dock_3, "bottom", proto_plotter_dock_2
-        )
-        self.robot_diagnostics_dock_area.addDock(
-            proto_plotter_dock_4, "bottom", proto_plotter_dock_3
-        )
 
         robot_view = RobotView()
         dock = Dock("Robot View")

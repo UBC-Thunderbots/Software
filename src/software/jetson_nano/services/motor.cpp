@@ -66,7 +66,7 @@ static const char* HEARTBEAT_GPIO                         = "216";
 static double MECHANICAL_MPS_PER_ELECTRICAL_RPM = 0.000111;
 static double ELECTRICAL_RPM_PER_MECHANICAL_MPS = 1 / MECHANICAL_MPS_PER_ELECTRICAL_RPM;
 
-static double RUNAWAY_PROTECTION_THRESHOLD_MPS = 0.10;
+static double RUNAWAY_PROTECTION_THRESHOLD_MPS = 1.00;
 
 
 extern "C"
@@ -337,13 +337,17 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
         static_cast<float>(current_euclidean_velocity[1]));
 
     WheelSpace_t target_wheel_velocities       = {0.0, 0.0, 0.0, 0.0};
-    EuclideanSpace_t target_euclidean_velocity = {0.0, 0.0, 0.0};
+
+    EuclideanSpace_t target_total_velocity = {0.0, 0.0, 0.0};
+    EuclideanSpace_t target_linear_velocity = {0.0, 0.0, 0.0};
+    EuclideanSpace_t target_angular_velocity = {0.0, 0.0, 0.0};
     int target_dribbler_rpm                    = motor.dribbler_speed_rpm();
 
     switch (motor.drive_control_case())
     {
         case TbotsProto::MotorControl::DriveControlCase::kDirectPerWheelControl:
         {
+            LOG(DEBUG) << "DIRECT";
             target_wheel_velocities = {
                 motor.direct_per_wheel_control().front_right_wheel_velocity(),
                 motor.direct_per_wheel_control().front_left_wheel_velocity(),
@@ -354,10 +358,15 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
         }
         case TbotsProto::MotorControl::DriveControlCase::kDirectVelocityControl:
         {
-            target_euclidean_velocity = {
+            target_linear_velocity = {
                 -motor.direct_velocity_control().velocity().y_component_meters(),
                 motor.direct_velocity_control().velocity().x_component_meters(),
-                motor.direct_velocity_control().angular_velocity().radians_per_second(),
+                0.0 // We don't want
+            };
+
+            target_angular_velocity = {
+                0.0, 0.0,
+                motor.direct_velocity_control().angular_velocity().radians_per_second()
             };
 
             break;
@@ -365,15 +374,31 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
 
         case TbotsProto::MotorControl::DriveControlCase::DRIVE_CONTROL_NOT_SET:
         {
-            target_euclidean_velocity = {0.0, 0.0, 0.0};
+            LOG(DEBUG) << "RESETTING";
+            target_linear_velocity = {0.0, 0.0, 0.0};
+            target_angular_velocity = {0.0, 0.0, 0.0};
             target_dribbler_rpm       = 0;
 
             break;
         }
     }
 
+    if (count++ % 2 == 0)
+    {
+        target_total_velocity = 
+            target_linear_velocity + target_angular_velocity;
+    }
+    else
+    {
+        target_total_velocity = target_linear_velocity;
+    }
+
     target_wheel_velocities = rampWheelVelocity(
-        prev_wheel_velocities, target_euclidean_velocity, time_elapsed_since_last_poll_s);
+            prev_wheel_velocities, target_total_velocity, 
+            static_cast<double>(robot_constants_.robot_max_acceleration_m_per_s_2),
+            time_elapsed_since_last_poll_s);
+
+    // TODO interleave the angular accelerations in here at some point.
     prev_wheel_velocities = target_wheel_velocities;
 
     // Set target speeds accounting for acceleration
@@ -433,16 +458,15 @@ void MotorService::spiTransfer(int fd, uint8_t const* tx, uint8_t const* rx, uns
 }
 
 WheelSpace_t MotorService::rampWheelVelocity(
-    const WheelSpace_t& current_wheel_velocity,
-    const EuclideanSpace_t& target_euclidean_velocity, const double& time_to_ramp)
+        const WheelSpace_t& current_wheel_velocity,
+        const EuclideanSpace_t& target_euclidean_velocity,
+        double allowed_acceleration, const double& time_to_ramp)
 {
     // ramp wheel velocity
     WheelSpace_t ramp_wheel_velocity;
 
     // calculate max allowable wheel velocity delta using dv = a*t
-    auto allowable_wheel_acceleration =
-        static_cast<double>(robot_constants_.robot_max_acceleration_m_per_s_2);
-    auto allowable_delta_wheel_velocity = allowable_wheel_acceleration * time_to_ramp;
+    auto allowable_delta_wheel_velocity = allowed_acceleration * time_to_ramp;
 
     // convert euclidean to wheel velocity
     WheelSpace_t target_wheel_velocity =
