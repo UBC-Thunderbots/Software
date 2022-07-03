@@ -10,9 +10,10 @@ EuclideanToWheel::EuclideanToWheel(const RobotConstants_t &robot_constants)
     // import robot constants
     front_wheel_angle_phi_rad_  = robot_constants.front_wheel_angle_deg * M_PI / 180.;
     rear_wheel_angle_theta_rad_ = robot_constants.back_wheel_angle_deg * M_PI / 180.;
+    wheel_radius_m_ = robot_constants.wheel_radius_meters;
 
     // clang-format off
-    euclidean_to_wheel_velocity_D <<
+    euclidean_to_wheel_velocity_D_ <<
         -sin(front_wheel_angle_phi_rad_), cos(front_wheel_angle_phi_rad_), 1,
         -sin(front_wheel_angle_phi_rad_), -cos(front_wheel_angle_phi_rad_), 1,
         sin(rear_wheel_angle_theta_rad_), -cos(rear_wheel_angle_theta_rad_), 1,
@@ -24,7 +25,7 @@ EuclideanToWheel::EuclideanToWheel(const RobotConstants_t &robot_constants)
     auto k = sin(rear_wheel_angle_theta_rad_) / (2*sin(front_wheel_angle_phi_rad_) + 2*sin(rear_wheel_angle_theta_rad_));
     
     //clang-format off
-    wheel_to_euclidean_velocity_D_inverse <<
+    wheel_to_euclidean_velocity_D_inverse_ <<
     -i, -i, i, i,
     j, -j, -(1 - j), (1 - j),
     k, k, (1 - k), (1 - k);
@@ -34,12 +35,22 @@ EuclideanToWheel::EuclideanToWheel(const RobotConstants_t &robot_constants)
 WheelSpace_t EuclideanToWheel::getWheelVelocity(
     const EuclideanSpace_t &euclidean_velocity)
 {
-    return euclidean_to_wheel_velocity_D * euclidean_velocity;
+    // need to multiply the angular velocity by the wheel radius
+    // ref: http://robocup.mi.fu-berlin.de/buch/omnidrive.pdf pg 8
+    euclidean_velocity(3) = euclidean_velocity(3) * wheel_radius_m_;
+
+    return euclidean_to_wheel_velocity_D_ * euclidean_velocity;
 }
 
 EuclideanSpace_t EuclideanToWheel::getEuclideanVelocity(
     const WheelSpace_t &wheel_velocity)
 {
-    return wheel_to_euclidean_velocity_D_inverse * wheel_velocity;
+    auto euclidean_velocity = wheel_to_euclidean_velocity_D_inverse_ * wheel_velocity;
+ 
+    // need to divide the angular velocity by the wheel radius
+    // ref: http://robocup.mi.fu-berlin.de/buch/omnidrive.pdf pg 8
+    euclidean_velocity(3) = euclidean_velocity(3) / wheel_radius_m_;
+
+    return euclidean_velocity;
 }
 
