@@ -26,8 +26,9 @@ void Agent::update()
         new_velocity_ = new_velocity_.normalize(max_speed_);
     }
 
-    const Vector dv = new_velocity_ - velocity_;
-    if (dv.length() < max_accel_ * simulator_->getTimeStep() || dv.length() == 0.f)
+    const Vector dv            = new_velocity_ - velocity_;
+    double max_allowed_delta_v = max_accel_ * 10 * simulator_->getTimeStep();
+    if (dv.length() < max_allowed_delta_v || dv.length() == 0.f)
     {
         velocity_ = new_velocity_;
     }
@@ -35,8 +36,7 @@ void Agent::update()
     {
         // Calculate the maximum velocity towards the preferred velocity, given the
         // acceleration constraint
-        velocity_ =
-            velocity_ + (max_accel_ * simulator_->getTimeStep()) * (dv / dv.length());
+        velocity_ = velocity_ + (max_allowed_delta_v) * (dv / dv.length());
     }
 
     position_ += velocity_ * simulator_->time_step;
