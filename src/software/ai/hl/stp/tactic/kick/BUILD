@@ -42,20 +42,3 @@ cc_test(
         "//software/test_util",
     ],
 )
-
-py_test(
-    name = "kick_tactic_pytest",
-    srcs = [
-        "kick_tactic_pytest.py",
-    ],
-    # TODO (#2619) Remove tag to run in parallel
-    tags = [
-        "exclusive",
-    ],
-    deps = [
-        "//software/simulated_tests:simulated_test_fixture",
-        "//software/simulated_tests:validation",
-        "//software/simulated_tests/field_tests:field_test_fixture",
-        requirement("pytest"),
-    ],
-)

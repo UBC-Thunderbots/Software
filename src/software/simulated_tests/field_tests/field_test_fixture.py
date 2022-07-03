@@ -93,9 +93,9 @@ class FieldTestRunner(TbotsTestRunner):
 
         logger.info("determination success")
 
-    def set_tactics(self, tactics: AssignedTacticPlayControlParams, isblue):
+    def set_tactics(self, tactics: AssignedTacticPlayControlParams, team: proto.ssl_gc_common_pb2.Team):
 
-        if isblue:
+        if team == proto.ssl_gc_common_pb2.Team.BLUE:
             self.blue_full_system_proto_unix_io.send_proto(
                 AssignedTacticPlayControlParams, tactics
             )
@@ -104,8 +104,8 @@ class FieldTestRunner(TbotsTestRunner):
                 AssignedTacticPlayControlParams, tactics
             )
 
-    def set_play(self, play: Play, team: Team):
-        if team == Team.BLUE:
+    def set_play(self, play: Play, team: proto.ssl_gc_common_pb2.Team):
+        if team == proto.ssl_gc_common_pb2.Team.BLUE:
             self.blue_full_system_proto_unix_io.send_proto(Play, play)
 
         else:
@@ -140,7 +140,7 @@ class FieldTestRunner(TbotsTestRunner):
                         ids_present = False
 
             if not ids_present:
-                self.stop_tscope()
+                self._stop_tscope()
                 raise Exception ("robotIds do not match")
 
             logger.info("starting ball placement")

@@ -5,8 +5,8 @@ from proto.play_pb2 import Play, PlayName
 from software.simulated_tests.ball_enters_region import *
 from software.simulated_tests.simulated_test_fixture import (
     simulated_test_runner,
-    pytest_main,
 )
+from software.simulated_tests.pytest_main import pytest_main
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
 from proto.ssl_gc_geometry_pb2 import Vector2
@@ -40,16 +40,17 @@ def test_two_ai_ball_placement(simulated_test_runner, run_enemy_ai, test_duratio
     ]
 
     # Game Controller Setup
-    simulated_test_runner.gamecontroller.send_ci_input(
+    simulated_test_runner.send_gamecontroller_command(
         gc_command=Command.Type.STOP, team=Team.UNKNOWN
     )
-    simulated_test_runner.gamecontroller.send_ci_input(
+    simulated_test_runner.send_gamecontroller_command(
         gc_command=Command.Type.FORCE_START, team=Team.BLUE
     )
+
     # Pass in placement point here - not required for all play tests
-    simulated_test_runner.gamecontroller.send_ci_input(
+    simulated_test_runner.send_gamecontroller_command(
         gc_command=Command.Type.BALL_PLACEMENT,
-        team=Team.BLUE,
+        team=proto.ssl_gc_common_pb2.Team.BLUE,
         final_ball_placement_point=ball_final_pos,
     )
 
@@ -57,20 +58,19 @@ def test_two_ai_ball_placement(simulated_test_runner, run_enemy_ai, test_duratio
     blue_play = Play()
     blue_play.name = PlayName.BallPlacementPlay
 
-    simulated_test_runner.blue_full_system_proto_unix_io.send_proto(Play, blue_play)
+    simulated_test_runner.set_play(blue_play, Team.BLUE)
 
     # We can parametrize running in ai_vs_ai mode
     if run_enemy_ai:
         yellow_play = Play()
         yellow_play.name = PlayName.EnemyBallPlacementPlay
 
-        simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(
-            Play, yellow_play
+        simulated_test_runner.set_play(
+            yellow_play, Team.YELLOW
         )
 
     # Create world state
-    simulated_test_runner.simulator_proto_unix_io.send_proto(
-        WorldState,
+    simulated_test_runner.set_worldState(
         create_world_state(
             yellow_robot_locations=yellow_bots,
             blue_robot_locations=blue_bots,

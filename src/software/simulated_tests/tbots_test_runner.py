@@ -101,10 +101,10 @@ class TbotsTestRunner(object):
             gc_command=gc_command, team=team, final_ball_placement_point=final_ball_placement_point
         )
 
-    def set_tactics(self, tactics:AssignedTacticPlayControlParams, team:Team):
+    def set_tactics(self, tactics:AssignedTacticPlayControlParams, team:proto.ssl_gc_common_pb2.Team):
         raise NotImplementedError("set_tactic unimplemented")
 
-    def set_play(self, play:Play, team:Team):
+    def set_play(self, play:Play, team: proto.ssl_gc_common_pb2.Team):
         raise NotImplementedError("set_play unimplemented")
 
     def set_worldState(self, worldstate : WorldState):
@@ -114,7 +114,16 @@ class TbotsTestRunner(object):
         """Provide the current time in seconds since the epoch"""
         raise NotImplementedError("run_test unimplemented")
 
-    def stop_tscope(self,delay=PROCESS_BUFFER_DELAY_S):
+    def run_test(
+            self,
+            always_validation_sequence_set=[[]],
+            eventually_validation_sequence_set=[[]],
+            test_timeout_s=3,
+            tick_duration_s=0.0166,  # Default to 60hz
+    ):
+        raise NotImplementedError("run_test unimplemented")
+
+    def _stop_tscope(self, delay=PROCESS_BUFFER_DELAY_S):
         """Stop running the test
 
         :param delay: How long to wait before closing everything, defaults
@@ -137,7 +146,7 @@ class TbotsTestRunner(object):
             :param args: The args passed in from the hook
 
             """
-            self.stop_tscope(delay=PAUSE_AFTER_FAIL_DELAY_S)
+            self._stop_tscope(delay=PAUSE_AFTER_FAIL_DELAY_S)
             self.last_exception = args.exc_value
             raise self.last_exception
 
@@ -159,13 +168,3 @@ class TbotsTestRunner(object):
         # If thunderscope is disabled, just run the test
         else:
             runner()
-
-
-    def run_test(
-        self,
-        always_validation_sequence_set=[[]],
-        eventually_validation_sequence_set=[[]],
-        test_timeout_s=3,
-        tick_duration_s=0.0166,  # Default to 60hz
-    ):
-        raise NotImplementedError("run_test unimplemented")

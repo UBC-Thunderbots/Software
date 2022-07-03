@@ -68,9 +68,8 @@ class SimulatorTestRunner(TbotsTestRunner):
                                                   gamecontroller)
         self.simulator_proto_unix_io = simulator_proto_unix_io
 
-    def set_tactics(self, tactics:AssignedTacticPlayControlParams, isblue):
-        print("IN SET TACTICS SIM")
-        if isblue:
+    def set_tactics(self, tactics:AssignedTacticPlayControlParams, team:proto.ssl_gc_common_pb2.Team):
+        if team == proto.ssl_gc_common_pb2.Team.BLUE:
             self.blue_full_system_proto_unix_io.send_proto(
                 AssignedTacticPlayControlParams, tactics
             )
@@ -79,8 +78,8 @@ class SimulatorTestRunner(TbotsTestRunner):
                 AssignedTacticPlayControlParams, tactics
             )
 
-    def set_play(self, play:Play, team:Team):
-        if team == Team.BLUE:
+    def set_play(self, play:Play, team:proto.ssl_gc_common_pb2.Team):
+        if team == proto.ssl_gc_common_pb2.Team.BLUE:
             self.blue_full_system_proto_unix_io.send_proto(Play, play)
 
         else:
@@ -195,7 +194,7 @@ class SimulatorTestRunner(TbotsTestRunner):
             # Check that all eventually validations are eventually valid
             validation.check_validation(eventually_validation_proto_set)
 
-            self.stop_tscope()
+            self._stop_tscope()
 
         self._run_with_tscope(__runner)
 

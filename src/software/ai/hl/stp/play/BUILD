@@ -521,6 +521,7 @@ py_test(
         "exclusive",
     ],
     deps = [
+        "//software/simulated_tests:pytest_main",
         "//software/simulated_tests:simulated_test_fixture",
         "//software/simulated_tests:validation",
         requirement("pytest"),
