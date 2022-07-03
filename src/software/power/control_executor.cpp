@@ -14,7 +14,6 @@ void ControlExecutor::execute(const TbotsProto_PowerControl& control)
     switch (control.chicker.which_chicker_command)
     {
         case TbotsProto_PowerControl_ChickerControl_kick_speed_m_per_s_tag:
-            detachInterrupt(digitalPinToInterrupt(BREAK_BEAM_PIN));
             chicker->setKickSpeedMPerS(
                 control.chicker.chicker_command.kick_speed_m_per_s);
             if (control.geneva_slot != geneva->getCurrentSlot())
@@ -28,7 +27,6 @@ void ControlExecutor::execute(const TbotsProto_PowerControl& control)
             }
             break;
         case TbotsProto_PowerControl_ChickerControl_chip_distance_meters_tag:
-            detachInterrupt(digitalPinToInterrupt(BREAK_BEAM_PIN));
             chicker->setChipDistanceMeters(
                 control.chicker.chicker_command.chip_distance_meters);
             chicker->chip();
