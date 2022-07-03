@@ -26,11 +26,18 @@ void PrimitiveExecutor::updatePrimitiveSet(
     if (primitive_set_msg_iter != primitive_set_msg.robot_primitives().end())
     {
         current_primitive_ = primitive_set_msg_iter->second;
+        return;
     }
+}
+
+void PrimitiveExecutor::clearCurrentPrimitive()
+{
+    current_primitive_.Clear();
 }
 
 void PrimitiveExecutor::updateWorld(const TbotsProto::World& world_msg)
 {
+    current_world_ = world_msg;
     hrvo_simulator_.updateWorld(World(world_msg));
 }
 
@@ -39,12 +46,19 @@ void PrimitiveExecutor::updateLocalVelocity(Vector local_velocity) {}
 Vector PrimitiveExecutor::getTargetLinearVelocity(const unsigned int robot_id,
                                                   const Angle& curr_orientation)
 {
-    Vector target_global_velocity = hrvo_simulator_.getRobotVelocity(robot_id);
-    return target_global_velocity.rotate(-curr_orientation);
+    if (current_primitive_.has_move())
+    {
+        //TbotsProto::MovePrimitive move_primitive = current_primitive_.move();
+        //auto friendly_team = Team(current_world_.friendly_team());
+        //auto robot         = friendly_team.getRobotById(robot_id);
+        //auto robot_state = robot->currentState();
+    
+    }
+    return Vector(0,0);
 }
 
 AngularVelocity PrimitiveExecutor::getTargetAngularVelocity(
-    const TbotsProto::MovePrimitive& move_primitive, const Angle& curr_orientation)
+        const TbotsProto::MovePrimitive& move_primitive, const Angle& curr_orientation)
 {
     const Angle dest_orientation = createAngle(move_primitive.final_angle());
     const double delta_orientation =
@@ -53,17 +67,14 @@ AngularVelocity PrimitiveExecutor::getTargetAngularVelocity(
     // angular velocity given linear deceleration and distance remaining to target
     // orientation.
     // Vi = sqrt(0^2 + 2 * a * d)
-    double deceleration_angular_speed = std::sqrt(
-        2 * robot_constants_.robot_max_ang_acceleration_rad_per_s_2 * delta_orientation);
-
     double max_angular_speed =
         static_cast<double>(robot_constants_.robot_max_ang_speed_rad_per_s);
-    double next_angular_speed = std::min(max_angular_speed, deceleration_angular_speed);
+    double next_angular_speed = std::min(max_angular_speed, delta_orientation);
 
     const double signed_delta_orientation =
         (dest_orientation - curr_orientation).clamp().toRadians();
     return AngularVelocity::fromRadians(
-        std::copysign(next_angular_speed, signed_delta_orientation));
+            std::copysign(next_angular_speed, signed_delta_orientation));
 }
 
 double PrimitiveExecutor::getTargetLinearSpeed(

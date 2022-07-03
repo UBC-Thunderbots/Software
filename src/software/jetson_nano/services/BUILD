@@ -10,6 +10,7 @@ cc_library(
         "//software/jetson_nano:gpio",
         "//software/logger",
         "//software/physics:euclidean_to_wheel",
+        "@eigen",
         "@trinamic",
     ],
 )

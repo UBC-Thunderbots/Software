@@ -17,6 +17,7 @@ message RobotStatus
     JetsonStatus jetson_status                = 8;
     ThunderloopStatus thunderloop_status      = 9;
     Timestamp time_sent                       = 10;
+    uint64 last_handled_primitive_set         = 11;
 }
 
 message ThunderloopStatus
@@ -25,7 +26,8 @@ message ThunderloopStatus
     uint64 primitive_executor_start_time_ns = 2;
     uint64 primitive_executor_step_time_ns  = 3;
     uint64 motor_service_poll_time_ns       = 4;
-    uint64 iteration_time_ns                = 5;
+    uint64 power_service_poll_time_ns       = 5;
+    uint64 iteration_time_ns                = 6;
 }
 
 message JetsonStatus
@@ -85,7 +87,7 @@ enum ErrorCode
 message DriveUnit
 {
     // The current RPM of the wheel
-    uint32 wheel_rpm = 1;
+    float wheel_velocity = 1;
 }
 
 /* Data from all four drive units and the dribbler */
@@ -121,6 +123,6 @@ message PowerStatus
     float capacitor_voltage = 2;
     float current_draw      = 3;
     float geneva_angle_deg  = 4;
-    bool breakbream_tripped = 5;
+    bool breakbeam_tripped  = 5;
     bool flyback_fault      = 6;
 }

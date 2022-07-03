@@ -1,4 +1,5 @@
 #pragma once
+#include <Eigen/Dense>
 #include <memory>
 #include <string>
 
@@ -7,7 +8,6 @@
 #include "shared/robot_constants.h"
 #include "software/jetson_nano/gpio.h"
 #include "software/physics/euclidean_to_wheel.h"
-
 
 class MotorService
 {
@@ -30,7 +30,8 @@ class MotorService
      * @param motor The motor msg to unpack and execute on the motors
      * @returns MotorStatus The status of all the drive units
      */
-    TbotsProto::MotorStatus poll(const TbotsProto::MotorControl& motor_control);
+    TbotsProto::MotorStatus poll(const TbotsProto::MotorControl& motor_control,
+                                 double time_elapsed_since_last_poll_s);
 
     /**
      * Trinamic API binding, sets spi_demux_select_0|1 pins
@@ -99,14 +100,10 @@ class MotorService
      * with the TMC6100 EVAL to get the motor spinning.
      *
      * Then using the exported registers as a baseline, you can use the
-     * runOpenLoopCalibrationRoutine and plot the generated csvs. These csvs
-     * capture the data for encoder calibration and adc configuration, the two
-     * most important steps for the motor to work.
-     *
-     * Page 143 (title Setup Guidelines) of the TMC4671 is very useful.
-     *
-     * @param motor The motor to configure (the same value as the chip select)
-     */
+     * runOpenLoopCalibrationRoutine and plot the generated csvs. These csvs capture the
+     * data for encoder calibration and adc configuration, the two most important steps
+     * for the motor to work. Page 143 (title Setup Guidelines) of the TMC4671 is very
+     * useful. @param motor The motor to configure (the same value as the chip select) */
     void configurePWM(uint8_t motor);
     void configureDribblerPI(uint8_t motor);
     void configureDrivePI(uint8_t motor);
@@ -137,9 +134,59 @@ class MotorService
      * @param tx The tx buffer, data to send out
      * @param rx The rx buffer, will be updated with data from the full-duplex transfer
      * @param len The length of the tx and rx buffer
+     * @param spi_speed
      *
      */
-    void spiTransfer(int fd, uint8_t const* tx, uint8_t const* rx, unsigned len);
+    void spiTransfer(int fd, uint8_t const* tx, uint8_t const* rx, unsigned len,
+                     uint32_t spi_speed);
+
+    /**
+     * Ramp the velocity over the given timestep and set the target velocity on the motor.
+     *
+     * NOTE: This function has no state.
+     * Also NOTE: This function handles all electrical rpm to meters/second conversion.
+     *
+     * @param velocity_target The target velocity in m/s
+     * @param velocity_current The current velocity m/s
+     * @param time_to_ramp The time allocated for acceleration in seconds
+     *
+     */
+    WheelSpace_t rampWheelVelocity(const WheelSpace_t& current_wheel_velocity,
+                                   const EuclideanSpace_t& target_euclidean_velocity,
+                                   double allowed_acceleration,
+                                   const double& time_to_ramp);
+
+    /**
+     * Convert electrical rpm to wheel velocity.
+     *
+     * @param electrical_rpm The electrical rpm to convert
+     *
+     */
+    double electricalRpmToWheelVelocity(int electrical_rpm);
+
+    /**
+     * Convert wheel velocity to electrical rpm.
+     *
+     * @param wheel_velocity The wheel velocity in meters per second
+     *
+     */
+    int wheelVelocityToElectricalRpm(double wheel_velocity);
+
+    /**
+     * Convert electrical rpm to dribbler velocity.
+     *
+     * @param electrical_rpm The electrical rpm to convert
+     *
+     */
+    double electricalRpmToDribblerVelocity(int electrical_rpm);
+
+    /**
+     * Convert dribbler velocity to electrical rpm.
+     *
+     * @param dribbler_velocity The dribbler velocity in meters per second
+     *
+     */
+    int dribblerVelocityToElectricalRpm(double dribbler_velcocity);
 
     /**
      * Trinamic API Binding function
@@ -149,7 +196,8 @@ class MotorService
      * @param last_transfer The last transfer of uint8_t data for this transaction.
      * @return A byte read from the trinamic chip
      */
-    uint8_t readWriteByte(uint8_t motor, uint8_t data, uint8_t last_transfer);
+    uint8_t readWriteByte(uint8_t motor, uint8_t data, uint8_t last_transfer,
+                          uint32_t spi_speed);
 
 
     /**
@@ -179,6 +227,8 @@ class MotorService
     bool currently_reading = false;
     uint8_t position       = 0;
 
+    double previous_dribbler_rpm = 0;
+
     // Constants
     RobotConstants_t robot_constants_;
 
@@ -189,5 +239,9 @@ class MotorService
     EuclideanToWheel euclidean_to_four_wheel;
     std::unordered_map<int, bool> encoder_calibrated_;
 
+    // Current wheel velocities
+    WheelSpace_t prev_wheel_velocities;
+
     int heartbeat_state = 0;
+    int count           = 0;
 };

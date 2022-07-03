@@ -12,8 +12,7 @@ PowerService::PowerService()
     this->uart = std::make_unique<BoostUartCommunication>(BAUD_RATE, DEVICE_SERIAL_PORT);
 }
 
-std::unique_ptr<TbotsProto::PowerStatus> PowerService::poll(
-    const TbotsProto::PowerControl& command)
+TbotsProto::PowerStatus PowerService::poll(const TbotsProto::PowerControl& command)
 {
     auto nanopb_command       = createNanoPbPowerControl(command);
     auto frame                = createUartFrame(nanopb_command);
@@ -41,7 +40,6 @@ std::unique_ptr<TbotsProto::PowerStatus> PowerService::poll(
     TbotsProto_PowerFrame status_frame = TbotsProto_PowerFrame_init_default;
     if (unmarshalUartPacket(power_status, status_frame))
     {
-        LOG(DEBUG) << "Command status read successfully";
         status = status_frame.power_msg.power_status;
     }
     else
@@ -49,5 +47,5 @@ std::unique_ptr<TbotsProto::PowerStatus> PowerService::poll(
         LOG(WARNING) << "Unmarshal failed";
     }
 
-    return createTbotsPowerStatus(status);
+    return *createTbotsPowerStatus(status);
 }

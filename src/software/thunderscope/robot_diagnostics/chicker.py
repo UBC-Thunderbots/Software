@@ -2,45 +2,37 @@ import pyqtgraph as pg
 from pyqtgraph.Qt.QtCore import Qt
 from pyqtgraph.Qt.QtWidgets import *
 from software.py_constants import *
-import software.thunderscope.common_widgets as common_widgets
+import software.thunderscope.common.common_widgets as common_widgets
 
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 
 class ChickerWidget(QWidget):
     def __init__(self):
-        """The Chicker Widget grid is laid out in the following way:
-                    ┌────────┐     ┌──────┐      ┌──────┐
-                    │ Charge │     │ Kick │      │ Chip │
-                    └────────┘     └──────┘      └──────┘
+        """Handles the robot diagnostics input to create a PowerControl message
+        to be sent to the robots.
 
-                    ┌────────┐   ┌──────────┐ ┌─────────┐
-                    │No Auto │   │Auto Kick │ │Auto Chip│
-                    └────────┘   └──────────┘ └─────────┘
+        NOTE: The powerboards run in regulation mode, which means that they are
+        always charged and do not need to be explicitly charged. 
 
-                    ┌───────────────────────────────────┐
-                    │           Geneva Slider           │
-                    └───────────────────────────────────┘
+        The powerboard also has an internal cooldown, so spamming kick or chip
+        will not work until the capacitors charge up and the cooldown is over.
 
-                    ┌───────────────────────────────────┐
-                    │           Power Slider            │
-                    └───────────────────────────────────┘
         """
 
         super(ChickerWidget, self).__init__()
 
-        # grid --> groupBox --> button/slider
-        grid = QGridLayout()
+        vbox_layout = QVBoxLayout()
         self.radio_buttons_group = QButtonGroup()
 
         # push button group box
         self.push_button_box, self.push_buttons = common_widgets.create_button(
-            ["Charge", "Kick", "Chip"]
+            ["Kick", "Chip"]
         )
-        self.charge_button = self.push_buttons[0]
-        self.kick_button = self.push_buttons[1]
-        self.chip_button = self.push_buttons[2]
-        grid.addWidget(self.push_button_box, 0, 0)
+        self.kick_button = self.push_buttons[0]
+        self.chip_button = self.push_buttons[1]
+
+        vbox_layout.addWidget(self.push_button_box)
 
         # radio button group box
         self.radio_button_box, self.radio_buttons = common_widgets.create_radio(
@@ -50,29 +42,28 @@ class ChickerWidget(QWidget):
         self.auto_kick_button = self.radio_buttons[1]
         self.auto_chip_button = self.radio_buttons[2]
 
-        grid.addWidget(self.radio_button_box, 1, 0)
+        vbox_layout.addWidget(self.radio_button_box)
         self.no_auto_button.setChecked(True)
 
         # sliders
         (
-            self.geneva_slider_box,
+            self.geneva_slider_layout,
             self.geneva_slider,
             self.geneva_label,
-        ) = common_widgets.create_slider("Geneva Slider", 1, GENEVA_NUM_POSITIONS, 1)
-        grid.addWidget(self.geneva_slider_box, 2, 0)
+        ) = common_widgets.create_slider("Geneva Position", 1, NUM_GENEVA_ANGLES, 1)
+        vbox_layout.addLayout(self.geneva_slider_layout)
 
         (
-            self.power_slider_box,
+            self.power_slider_layout,
             self.power_slider,
             self.power_label,
-        ) = common_widgets.create_slider("Power Slider", 1, 100, 10)
-        grid.addWidget(self.power_slider_box, 3, 0)
+        ) = common_widgets.create_slider("Power", 1, 100, 10)
+        vbox_layout.addLayout(self.power_slider_layout)
 
-        self.setLayout(grid)
+        self.setLayout(vbox_layout)
 
         # to manage the state of radio buttons - to make sure message is only sent once
         self.radio_checkable = {"no_auto": True, "auto_kick": True, "auto_chip": True}
-        self.charged = False
 
         # initial values
         self.geneva_value = 3
@@ -95,82 +86,16 @@ class ChickerWidget(QWidget):
 
     def refresh(self):
 
-        # set 'Charge'/'Discharge' text based on self.charged value
-        if self.charged:
-            self.charge_button.setText("Discharge")
-        else:
-            self.charge_button.setText("Charge")
-
         # slider values
         self.geneva_value = self.geneva_slider.value()
         self.geneva_label.setText(str(self.geneva_value))
+
         self.power_value = self.power_slider.value()
         self.power_label.setText(str(self.power_value))
 
-        # button colors
-        if not self.charged:
-            self.change_button_state(self.charge_button, True)
-            self.change_button_state(self.chip_button, False)
-            self.change_button_state(self.kick_button, False)
-        else:
-            self.change_button_state(self.charge_button, True)
-            self.change_button_state(self.chip_button, True)
-            self.change_button_state(self.kick_button, True)
-
-        # check all buttons
-        if self.charge_button.isChecked():
-            self.charge_button.toggle()
-            if self.charged:
-                print("Discharge clicked")
-                self.charged = False
-            else:
-                print("Charge clicked")
-                self.charged = True
-            print("Geneva:", self.geneva_value, "Power:", self.power_value)
-
-        if self.kick_button.isChecked():
-            self.kick_button.toggle()
-            self.charged = False
-            print("Kick clicked")
-            print("Geneva:", self.geneva_value, "Power:", self.power_value)
-
-        if self.chip_button.isChecked():
-            self.chip_button.toggle()
-            self.charged = False
-            print("Chip clicked")
-            print("Geneva:", self.geneva_value, "Power:", self.power_value)
-
-        # radio colors
-        if self.no_auto_button.isChecked():
-            self.radio_checkable["auto_kick"] = True
-            self.radio_checkable["auto_chip"] = True
-            if self.radio_checkable["no_auto"]:
-                print("No Auto clicked")
-                print("Geneva:", self.geneva_value, "Power:", self.power_value)
-            self.radio_checkable["no_auto"] = False
-            self.change_button_state(self.charge_button, True)
-            if self.charged:
-                self.change_button_state(self.chip_button, True)
-                self.change_button_state(self.kick_button, True)
-
-        elif self.auto_kick_button.isChecked():
-            self.radio_checkable["no_auto"] = True
-            self.radio_checkable["auto_chip"] = True
-            if self.radio_checkable["auto_kick"]:
-                print("Auto Kick clicked")
-                print("Geneva:", self.geneva_value, "Power:", self.power_value)
-            self.radio_checkable["auto_kick"] = False
-            self.change_button_state(self.chip_button, False)
-            self.change_button_state(self.kick_button, False)
-            self.change_button_state(self.charge_button, False)
-
-        elif self.auto_chip_button.isChecked():
-            self.radio_checkable["no_auto"] = True
-            self.radio_checkable["auto_kick"] = True
-            if self.radio_checkable["auto_chip"]:
-                print("Auto Chip clicked")
-                print("Geneva:", self.geneva_value, "Power:", self.power_value)
-            self.radio_checkable["auto_chip"] = False
-            self.change_button_state(self.chip_button, False)
-            self.change_button_state(self.kick_button, False)
-            self.change_button_state(self.charge_button, False)
+        # if autokick is enabled, we don't want to allow kick/chip
+        auto_kick_enabled = (
+            self.auto_kick_button.isChecked() or self.auto_chip_button.isChecked()
+        )
+        self.change_button_state(self.kick_button, not auto_kick_enabled)
+        self.change_button_state(self.chip_button, not auto_kick_enabled)

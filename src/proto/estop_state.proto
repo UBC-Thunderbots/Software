@@ -1,0 +1,6 @@
+syntax = "proto3";
+
+message EstopState
+{
+    bool is_playing = 1;
+}
