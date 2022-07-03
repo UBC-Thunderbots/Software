@@ -12,8 +12,8 @@ from proto.ssl_gc_common_pb2 import Team
 from proto.geometry_pb2 import Point, Angle
 from software.simulated_tests.simulated_test_fixture import (
     simulated_test_runner,
-    pytest_main,
 )
+from software.simulated_tests.pytest_main import pytest_main
 
 # the friction model currently used in the er-force simulator
 

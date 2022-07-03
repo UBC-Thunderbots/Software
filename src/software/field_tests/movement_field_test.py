@@ -1,15 +1,10 @@
 import pytest
 
 import software.python_bindings as tbots
-from software.simulated_tests.ball_enters_region import *
 from software.simulated_tests.pytest_main import pytest_main
-from proto.message_translation.tbots_protobuf import (
-    create_world_state,
-    parse_world_state,
-)
 from proto.ssl_gc_common_pb2 import Team
 from proto.import_all_protos import *
-from software.simulated_tests.field_tests.field_test_fixture import *
+from software.field_tests.field_test_fixture import *
 from software.simulated_tests.simulated_test_fixture import *
 from software.simulated_tests.tbots_test_fixture import tbots_test_runner
 from software.simulated_tests.data_logger import DataLogger

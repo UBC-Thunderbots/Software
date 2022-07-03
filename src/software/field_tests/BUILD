@@ -37,7 +37,7 @@ py_test(
     deps = [
         "//software/simulated_tests:simulated_test_fixture",
         "//software/simulated_tests:validation",
-        "//software/simulated_tests/field_tests:field_test_fixture",
+        "//software/field_tests:field_test_fixture",
         requirement("pytest"),
     ],
 )

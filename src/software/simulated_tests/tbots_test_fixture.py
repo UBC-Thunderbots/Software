@@ -1,7 +1,7 @@
 import pytest
 from software.simulated_tests.pytest_main import load_command_line_arguments
 from software.simulated_tests.simulated_test_fixture import simulated_test_initializer
-from software.simulated_tests.field_tests.field_test_fixture import (
+from software.field_tests.field_test_fixture import (
     field_test_initializer,
 )
 
