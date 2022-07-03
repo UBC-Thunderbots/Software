@@ -14,6 +14,7 @@ py_test(
     deps = [
         "//software/simulated_tests:simulated_test_fixture",
         "//software/simulated_tests:validation",
+        "//software/thunderscope:speed_threshold_helpers",
         requirement("pytest"),
     ],
 )
@@ -67,7 +68,52 @@ py_library(
         "//software/logger:py_logger",
         "//software/networking:threaded_unix_listener_py",
         "//software/networking:threaded_unix_sender_py",
+        "//software/simulated_tests:tbots_test_runner",
         "//software/simulated_tests:validation",
+        "//software/thunderscope",
+        "//software/thunderscope:binary_context_managers",
+        "//software/thunderscope/replay:proto_logger",
+    ],
+)
+
+py_library(
+    name = "tbots_test_runner",
+    srcs = [
+        "tbots_test_runner.py",
+    ],
+    data = [
+        "//software:py_constants.so",
+    ],
+    deps = [
+        ":pytest_main",
+        "//proto:import_all_protos",
+        "//software/logger:py_logger",
+        "//software/networking:threaded_unix_listener_py",
+        "//software/networking:threaded_unix_sender_py",
+        "//software/simulated_tests:validation",
+        "//software/thunderscope",
+        "//software/thunderscope:binary_context_managers",
+        "//software/thunderscope/replay:proto_logger",
+    ],
+)
+
+py_library(
+    name = "tbots_test_fixture",
+    srcs = [
+        "tbots_test_fixture.py",
+    ],
+    data = [
+        "//software:py_constants.so",
+    ],
+    deps = [
+        ":pytest_main",
+        "//proto:import_all_protos",
+        "//software/logger:py_logger",
+        "//software/networking:threaded_unix_listener_py",
+        "//software/networking:threaded_unix_sender_py",
+        "//software/simulated_tests:simulated_test_fixture",
+        "//software/simulated_tests:validation",
+        "//software/simulated_tests/field_tests:field_test_fixture",
         "//software/thunderscope",
         "//software/thunderscope:binary_context_managers",
         "//software/thunderscope/replay:proto_logger",
@@ -91,6 +137,40 @@ py_library(
         "//software/thunderscope",
         "//software/thunderscope:binary_context_managers",
         "//software/thunderscope/replay:proto_logger",
+    ],
+)
+
+py_library(
+    name = "data_logger",
+    srcs = [
+        "data_logger.py",
+    ],
+    data = [
+        "//software:py_constants.so",
+    ],
+    deps = [
+    ],
+)
+
+py_test(
+    name = "friction_calibration_test",
+    srcs = [
+        "friction_calibration_test.py",
+    ],
+    # TODO (#2619) Remove tag to run in parallel
+    tags = [
+        "exclusive",
+    ],
+    deps = [
+        "//software/simulated_tests:data_logger",
+        "//software/simulated_tests:simulated_test_fixture",
+        "//software/simulated_tests:tbots_test_fixture",
+        "//software/simulated_tests:validation",
+        "//software/simulated_tests/field_tests:field_test_fixture",
+        requirement("pytest"),
+        requirement("numpy"),
+        requirement("scipy"),
+        requirement("matplotlib"),
     ],
 )
 

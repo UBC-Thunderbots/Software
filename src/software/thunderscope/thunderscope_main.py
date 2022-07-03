@@ -1,17 +1,16 @@
-from software.thunderscope.thunderscope import Thunderscope
-from software.thunderscope.robot_communication import RobotCommunication
-from software.thunderscope.binary_context_managers import *
-from proto.message_translation import tbots_protobuf
-import software.python_bindings as cpp_bindings
-from software.thunderscope.replay.proto_logger import ProtoLogger
-from software.thunderscope.replay.proto_player import ProtoPlayer
-
-
 import os
 import time
 import threading
 import argparse
 import numpy
+
+from software.thunderscope.thunderscope import Thunderscope
+from software.thunderscope.binary_context_managers import *
+from proto.message_translation import tbots_protobuf
+import software.python_bindings as cpp_bindings
+from software.py_constants import *
+from software.thunderscope.robot_communication import RobotCommunication
+from software.thunderscope.replay.proto_logger import ProtoLogger
 
 NUM_ROBOTS = 6
 SIM_TICK_RATE_MS = 16
@@ -111,11 +110,34 @@ if __name__ == "__main__":
         help="Which interface to communicate over",
     )
     parser.add_argument(
+        "--channel",
+        action="store",
+        type=int,
+        default=0,
+        help="Which channel to communicate over",
+    )
+    parser.add_argument(
         "--visualization_buffer_size",
         action="store",
         type=int,
         default=5,
         help="How many packets to buffer while rendering",
+    )
+
+    parser.add_argument(
+        "--estop_path",
+        action="store",
+        type=str,
+        default="/dev/ttyACM0",
+        help="Path to the Estop",
+    )
+
+    parser.add_argument(
+        "--estop_baudrate",
+        action="store",
+        type=int,
+        default=115200,
+        help="Estop Baudrate",
     )
 
     # Sanity check that an interface was provided
@@ -147,18 +169,23 @@ if __name__ == "__main__":
         # Setup LOG(VISUALIZE) handling from full system. We set from_log_visualize
         # to true to decode from base64.
         for arg in [
-            (runtime_dir, Obstacles, True),
-            (runtime_dir, PathVisualization, True),
-            (runtime_dir, PassVisualization, True),
-            (runtime_dir, NamedValue, True),
-            (runtime_dir, World, True),
-            (runtime_dir, PlayInfo, True),
-            (runtime_dir, PrimitiveSet, True),
-            (runtime_dir, HRVOVisualization, True),
+            {"proto_class": Obstacles},
+            {"proto_class": PathVisualization},
+            {"proto_class": PassVisualization},
+            {"proto_class": NamedValue},
+            {"proto_class": PrimitiveSet},
+            {"proto_class": World},
+            {"proto_class": PlayInfo},
+        ] + [
+            # TODO (#2655): Add/Remove HRVO layers dynamically based on the HRVOVisualization proto messages
+            {"proto_class": HRVOVisualization, "unix_path": YELLOW_HRVO_PATH}
+            for robot_id in range(6)
         ]:
-            proto_unix_io.attach_unix_receiver(*arg)
+            proto_unix_io.attach_unix_receiver(
+                runtime_dir, from_log_visualize=True, **arg
+            )
 
-        proto_unix_io.attach_unix_receiver(runtime_dir + "/log", RobotLog)
+        proto_unix_io.attach_unix_receiver(runtime_dir + "/log", proto_class=RobotLog)
 
         tscope.show()
 
@@ -173,6 +200,10 @@ if __name__ == "__main__":
 
         tscope = Thunderscope(
             layout_path=args.layout,
+            load_blue=True,
+            load_yellow=False,
+            load_diagnostics=True,
+            load_gamecontroller=False,
             visualization_buffer_size=args.visualization_buffer_size,
         )
 
@@ -185,6 +216,10 @@ if __name__ == "__main__":
 
         tscope = Thunderscope(
             layout_path=args.layout,
+            load_blue=False,
+            load_yellow=True,
+            load_diagnostics=True,
+            load_gamecontroller=False,
             visualization_buffer_size=args.visualization_buffer_size,
         )
 
@@ -194,11 +229,19 @@ if __name__ == "__main__":
         debug = args.debug_yellow_full_system
 
     if args.run_blue or args.run_yellow:
-        # TODO (#2585): Support multiple channels
+
+        try:
+            estop_reader = ThreadedEstopReader(
+                args.estop_path, args.estop_buadrate
+            )
+        except Exception:
+            raise Exception("Could not find estop, make sure its plugged in")
+
         with RobotCommunication(
-            proto_unix_io, getRobotMulticastChannel(0), args.interface
-        ), FullSystem(runtime_dir, debug, friendly_colour_yellow) as full_system:
-            tscope.show()
+                proto_unix_io, getRobotMulticastChannel(args.channel), args.interface, estop_reader=estop_reader
+            ), FullSystem(runtime_dir, debug, friendly_colour_yellow) as full_system:
+                full_system.setup_proto_unix_io(proto_unix_io)
+                tscope.show()
 
     ###########################################################################
     #                              Replay                                     #

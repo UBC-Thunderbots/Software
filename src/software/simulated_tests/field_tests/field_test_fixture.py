@@ -29,27 +29,29 @@ from proto.message_translation.tbots_protobuf import create_world_state, parse_w
 
 from software.logger.logger import createLogger
 from software.simulated_tests.pytest_main import load_command_line_arguments
+from software.simulated_tests.tbots_test_runner import TbotsTestRunner
+from software.thunderscope.robot_communication import RobotCommunication
+from software.py_constants import *
+from software.simulated_tests.ball_stops_in_region import BallEventuallyStopsInRegion
 
 logger = createLogger(__name__)
 
 LAUNCH_DELAY_S = 0.1
-WORLD_BUFFER_TIMEOUT = 0.5
+WORLD_BUFFER_TIMEOUT = 5.0
 PROCESS_BUFFER_DELAY_S = 0.01
 PAUSE_AFTER_FAIL_DELAY_S = 3
 
 
-class FieldTestRunner(object):
-
+class FieldTestRunner(TbotsTestRunner):
     """Run a simulated test"""
 
     def __init__(
-        self,
-        test_name,
-        thunderscope,
-        simulator_proto_unix_io,
-        blue_full_system_proto_unix_io,
-        yellow_full_system_proto_unix_io,
-        gamecontroller,
+            self,
+            test_name,
+            thunderscope,
+            blue_full_system_proto_unix_io,
+            yellow_full_system_proto_unix_io,
+            gamecontroller,
     ):
         """Initialize the SimulatorTestRunner
         
@@ -62,27 +64,38 @@ class FieldTestRunner(object):
 
         """
 
-        super(SimulatorTestRunner, self).__init__(test_name,
-                                                  thunderscope,
-                                                  simulator_proto_unix_io,
-                                                  blue_full_system_proto_unix_io,
-                                                  yellow_full_system_proto_unix_io,
-                                                  gamecontroller)
+        logger.info("setting up runner")
 
-        #survey field for available robot ids
+        super(FieldTestRunner, self).__init__(test_name,
+                                              thunderscope,
+                                              blue_full_system_proto_unix_io,
+                                              yellow_full_system_proto_unix_io,
+                                              gamecontroller)
+
+        logger.info("determining robots on field")
+        # survey field for available robot ids
         try:
             world = self.world_buffer.get(
                 block=True, timeout=WORLD_BUFFER_TIMEOUT
             )
+            self.initial_world = world
             self.friendly_robot_ids_field = [ robot.id for robot in world.friendly_team.team_robots ]
             self.enemy_robot_ids_field = [ robot.id for robot in world.enemy_team.team_robots ]
+
+            logger.info(f"blue team ids {self.friendly_robot_ids_field}")
+
+            if len(self.friendly_robot_ids_field) == 0:
+                raise Exception("no friendly robots found on field")
+
         except queue.Empty as empty:
-            logger.fatal("unable to determine robots on the field")
+            raise Exception("unable to determine robots on the field")
 
-    #todo add virtual ids
-    def set_tactics(self, tactics:AssignedTacticPlayControlParams, team:Team):
 
-        if team == Team.BLUE:
+        logger.info("determination success")
+
+    def set_tactics(self, tactics: AssignedTacticPlayControlParams, isblue):
+
+        if isblue:
             self.blue_full_system_proto_unix_io.send_proto(
                 AssignedTacticPlayControlParams, tactics
             )
@@ -91,8 +104,7 @@ class FieldTestRunner(object):
                 AssignedTacticPlayControlParams, tactics
             )
 
-    #todo add virtual ids
-    def set_play(self, play:Play, team:Team):
+    def set_play(self, play: Play, team: Team):
         if team == Team.BLUE:
             self.blue_full_system_proto_unix_io.send_proto(Play, play)
 
@@ -108,120 +120,135 @@ class FieldTestRunner(object):
             gc_command=gc_command, team=team, final_ball_placement_point=final_ball_placement_point
         )
 
-    def set_worldState(self, worldstate : WorldState):
+    def set_worldState(self, worldstate: WorldState):
 
-        BLUE_TEAM_INDEX = 0
-        YELLOW_TEAM_INDEX = 1
+        def __set_worldState():
 
-        #validate that ids match with test setup
-        ids_present = True
-        for idx, robot_ids in enumerate([self.friendly_robot_ids_field, self.enemy_robot_ids_field]):
-            team_name = 'friendly' if idx ==0 else 'enemy'
-            team_robots = worldstate.blue_robots if idx == 0 else worldstate.yellow_robots
-            for robot_id in robot_ids:
-                if robot_id not in team_robots.keys():
-                    logger.warning(f"robot {id} from the {team_name} team present in test but not on the field")
-                    ids_present = False
+            BLUE_TEAM_INDEX = 0
+            YELLOW_TEAM_INDEX = 1
 
-        if not ids_present:
-            logger.fatal("could not continue test - robotIds do not match")
+            logger.info("testing ids matching")
 
-        print("ball placement")
+            # validate that ids match with test setup
+            ids_present = True
+            for idx, robot_ids in enumerate([worldstate.blue_robots, worldstate.yellow_robots]):
+                team_name = 'friendly' if idx == 0 else 'enemy'
+                team_robots = self.friendly_robot_ids_field if idx == 0 else self.enemy_robot_ids_field
+                for robot_id in robot_ids:
+                    if robot_id not in team_robots:
+                        logger.warning(f"robot {id} from the {team_name} team present in test but not on the field")
+                        ids_present = False
 
-        #ball placement
-        if worldstate.HasField('ball_state'):
+            if not ids_present:
+                self.stop_tscope()
+                raise Exception ("robotIds do not match")
 
-            ball_position = tbots.createPoint(worldstate.ball_state.global_position)
+            logger.info("starting ball placement")
 
-            dribble_tactic = DribbleTactic(dribble_destination = worldstate.ball_state.global_position, allow_excessive_dribbling=True )
-            move_ball_tactics = AssignedTacticPlayControlParams()
-            move_ball_tactics.assigned_tactics[self.friendly_robot_ids_field[0]].dribble.CopyFrom(dribble_tactic)
+            # ball placement
+            if worldstate.HasField('ball_state'):
+
+                ball_position = tbots.createPoint(worldstate.ball_state.global_position)
+
+                dribble_tactic = DribbleTactic(dribble_destination=worldstate.ball_state.global_position,
+                                               allow_excessive_dribbling=True)
+                move_ball_tactics = AssignedTacticPlayControlParams()
+                move_ball_tactics.assigned_tactics[self.friendly_robot_ids_field[0]].dribble.CopyFrom(dribble_tactic)
+                self.blue_full_system_proto_unix_io.send_proto(
+                    AssignedTacticPlayControlParams, move_ball_tactics
+                )
+
+                # validate completion
+                ball_placement_timout_s = 5
+                ball_placement_validation_function = BallEventuallyStopsInRegion(regions=[tbots.Circle(ball_position, 0.1)])
+
+                timeout_time = time.time()+ ball_placement_timout_s
+
+                while time.time() < timeout_time:
+                    try:
+                        current_world = self.world_buffer.get(
+                            block=True, timeout=WORLD_BUFFER_TIMEOUT
+                        )
+
+                        eventually_validation_status, always_validation_status = validation.run_validation_sequence_sets(world=current_world,
+                                                                                     eventually_validation_sequence_set=[[
+                                                                                         ball_placement_validation_function]],
+                                                                                     always_validation_sequence_set=[[]])
+
+                        if not validation.contains_failure(eventually_validation_status):
+                            logger.info("validations pass")
+                            break
+
+                    except queue.Empty as empty:
+                        logger.warning("failed to obtain world")
+
+                validation.check_validation(eventually_validation_status)
+
+            logger.info("moving robots to position")
+            # move robots to position
+            initial_position_tactics = [AssignedTacticPlayControlParams(), AssignedTacticPlayControlParams()]
+
+            robot_positions_validation_functions = [ball_placement_validation_function]
+
+            for team_idx, team in enumerate([worldstate.blue_robots, worldstate.yellow_robots]):
+                for robot_id in team.keys():
+                    robotState = team[robot_id]
+                    move_tactic = MoveTactic()
+                    move_tactic.destination.CopyFrom(robotState.global_position)
+                    move_tactic.final_orientation.CopyFrom(
+                        robotState.global_orientation if robotState.HasField('global_orientation') else Angle(radians=0.0))
+                    move_tactic.final_speed = 0.0
+                    move_tactic.dribbler_mode = DribblerMode.OFF
+                    move_tactic.ball_collision_type = BallCollisionType.AVOID
+                    move_tactic.auto_chip_or_kick.CopyFrom(AutoChipOrKick(autokick_speed_m_per_s=0.0))
+                    move_tactic.max_allowed_speed_mode = MaxAllowedSpeedMode.PHYSICAL_LIMIT
+                    move_tactic.target_spin_rev_per_s = 0.0
+                    initial_position_tactics[team_idx].assigned_tactics[robot_id].move.CopyFrom(move_tactic)
+
+                    # create validation
+                    expected_final_position = tbots.Point(robotState.global_position.x_meters,
+                                                          robotState.global_position.y_meters)
+
+                    team_color = [Team.BLUE, Team.YELLOW][team_idx]
+                    validation_func = SpecificRobotEventuallyEntersRegion(robot_id=robot_id, team=team_color,
+                                                                regions=[tbots.Circle(expected_final_position, 0.1)])
+                    robot_positions_validation_functions.append(validation_func)
+
             self.blue_full_system_proto_unix_io.send_proto(
-                AssignedTacticPlayControlParams, move_ball_tactics
+                AssignedTacticPlayControlParams, initial_position_tactics[BLUE_TEAM_INDEX]
+            )
+
+            self.yellow_full_system_proto_unix_io.send_proto(
+                AssignedTacticPlayControlParams, initial_position_tactics[YELLOW_TEAM_INDEX]
             )
 
             # validate completion
-            ball_placement_timout_s = 5
-            ball_placement_validation_function = BallStopsInRegion(regions=[tbots.Circle(ball_position, 0.1)])
-
+            movement_timout_s = 5
             start_time = time.time()
-            timeout_time = start_time + ball_placement_timout_s
+            timeout_time = start_time + movement_timout_s
 
             while time.time() < timeout_time:
                 try:
+
                     current_world = self.world_buffer.get(
                         block=True, timeout=WORLD_BUFFER_TIMEOUT
                     )
 
-                    validation_status, = validation.run_validation_sequence_sets(world=current_world, eventually_validation_sequence_set=[ball_placement_validation_function], always_validation_sequence_set=[[]])
+                    validation_status, = validation.run_validation_sequence_sets(world=current_world,
+                                                                                 eventually_validation_sequence_set=[
+                                                                                     robot_positions_validation_functions],
+                                                                                 always_validation_sequence_set=[[]])
 
                     if not validation.contains_failure(validation_status):
                         break
 
                 except queue.Empty as empty:
-                    logger.warning("failed to obtain world")
+                    logger.warning("World Missed")
 
             validation.check_validation(ball_placement_validation_function)
 
+        self._run_with_tscope(__set_worldState)
 
-        #move robots to position
-        initial_position_tactics = [AssignedTacticPlayControlParams(), AssignedTacticPlayControlParams()]
-
-        robot_positions_validation_functions = [ball_placement_validation_function]
-
-        for team_idx, team in enumerate([worldstate.blue_robots, worldstate.yellow_robots]):
-            for robot_id in team.keys():
-                robotState = team[robot_id]
-                move_tactic = MoveTactic()
-                move_tactic.destination.CopyFrom(robotState.global_position)
-                move_tactic.final_orientation.CopyFrom(robotState.global_orientation if robotState.HasField('global_orientation') else Angle(radians=0.0))
-                move_tactic.final_speed = 0.0
-                move_tactic.dribbler_mode = DribblerMode.OFF
-                move_tactic.ball_collision_type = BallCollisionType.AVOID
-                move_tactic.auto_chip_or_kick.CopyFrom(AutoChipOrKick(autokick_speed_m_per_s=0.0))
-                move_tactic.max_allowed_speed_mode = MaxAllowedSpeedMode.PHYSICAL_LIMIT
-                move_tactic.target_spin_rev_per_s = 0.0
-                initial_position_tactics[team_idx].assigned_tactics[robot_id].move.CopyFrom(move_tactic)
-
-                # create validation
-                expected_final_position = tbots.Point(robotState.global_position.x_meters, robotState.global_position.y_meters)
-
-                team_color = [Team.BLUE, Team.YELLOW][team_idx]
-                validation_func= SpecificRobotEntersRegion(robot_id=robot_id, team=team_color, regions=[tbots.Circle(expected_final_position, 0.1)])
-                robot_positions_validation_functions.append(validation_func)
-
-        self.blue_full_system_proto_unix_io.send_proto(
-            AssignedTacticPlayControlParams, initial_position_tactics[BLUE_TEAM_INDEX]
-        )
-
-        self.yellow_full_system_proto_unix_io.send_proto(
-            AssignedTacticPlayControlParams, initial_position_tactics[YELLOW_TEAM_INDEX]
-        )
-
-        #validate completion
-        ball_placement_timout_s = 10
-        start_time = time.time()
-        timeout_time = start_time + ball_placement_timout_s
-        # self.world_buffer.clear()
-
-        completed = False
-        while time.time() < timeout_time and not completed:
-            try:
-
-                current_world = self.world_buffer.get(
-                    block=True, timeout=WORLD_BUFFER_TIMEOUT
-                )
-
-                completed = True
-                validation_status, = validation.run_validation_sequence_sets(world=current_world, eventually_validation_sequence_set=[robot_positions_validation_functions], always_validation_sequence_set=[[]])
-
-                if not validation.contains_failure(validation_status):
-                    break
-
-            except queue.Empty as empty:
-                logger.warning("Fullsystem missed last wrapper, resending ...")
-
-        validation.check_validation(ball_placement_validation_function)
 
     def time_provider(self):
         """Provide the current time in seconds since the epoch"""
@@ -230,11 +257,12 @@ class FieldTestRunner(object):
             return self.timestamp
 
     def run_test(
-        self,
-        always_validation_sequence_set=[[]],
-        eventually_validation_sequence_set=[[]],
-        test_timeout_s=3,
-        tick_duration_s=0.0166,  # Default to 60hz
+            self,
+            always_validation_sequence_set=[[]],
+            eventually_validation_sequence_set=[[]],
+            data_loggers=[],
+            test_timeout_s=3,
+            tick_duration_s=0.0166,  # Default to 60hz
     ):
         """Run a test
 
@@ -250,38 +278,19 @@ class FieldTestRunner(object):
 
         """
 
-
-        def __stopper(delay=PROCESS_BUFFER_DELAY_S):
-            """Stop running the test
-
-            :param delay: How long to wait before closing everything, defaults
-                          to PROCESS_BUFFER_DELAY_S to minimize buffer warnings
-
-            """
-            time.sleep(delay)
-
-            if self.thunderscope:
-                self.thunderscope.close()
-
         def __runner():
             """Step simulation, full_system and run validation
             """
 
-            print("__runner called at time", time.time())
-            logger.info("starting test")
-            time_elapsed_s = 0
-            #self.set_worldState(self.initial_worldstate)
+            start_time = time.time()
+            test_end_time = time.time() + test_timeout_s
 
-            while time_elapsed_s < test_timeout_s:
+            while time.time() < test_end_time:
 
                 # Update the timestamp logged by the ProtoLogger
                 with self.timestamp_mutex:
                     ssl_wrapper = self.ssl_wrapper_buffer.get(block=False)
                     self.timestamp = ssl_wrapper.detection.t_capture
-
-
-                if self.thunderscope:
-                    time.sleep(tick_duration_s)
 
                 while True:
                     try:
@@ -292,7 +301,7 @@ class FieldTestRunner(object):
                     except queue.Empty as empty:
                         # If we timeout, that means full_system missed the last
                         # wrapper and robot status, lets resend it.
-                        logger.warning("Fullsystem missed last wrapper, resending ...")
+                        logger.warning("No world received")
 
                 # Validate
                 (
@@ -304,8 +313,11 @@ class FieldTestRunner(object):
                     always_validation_sequence_set,
                 )
 
-                if self.thunderscope:
+                # log data
+                for logger in data_loggers:
+                   logger.log_data(world, time_elapsed_s=time.time() - start_time)
 
+                if self.thunderscope:
                     # Set the test name
                     eventually_validation_proto_set.test_name = self.test_name
                     always_validation_proto_set.test_name = self.test_name
@@ -324,47 +336,16 @@ class FieldTestRunner(object):
             # Check that all eventually validations are eventually valid
             validation.check_validation(eventually_validation_proto_set)
 
-            __stopper()
+            self.stop_test()
 
-        def excepthook(args):
-            """This function is _critical_ for show_thunderscope to work.
-            If the test Thread will raises an exception we won't be able to close
-            the window from the main thread.
+        self._run_with_tscope(__runner)
 
-            :param args: The args passed in from the hook
-
-            """
-
-            __stopper(delay=PAUSE_AFTER_FAIL_DELAY_S)
-            self.last_exception = args.exc_value
-            raise self.last_exception
-
-        threading.excepthook = excepthook
-
-        # If thunderscope is enabled, run the test in a thread and show
-        # thunderscope on this thread. The excepthook is setup to catch
-        # any test failures and propagate them to the main thread
-        if self.thunderscope:
-
-            run_sim_thread = threading.Thread(target=__runner, daemon=True)
-            run_sim_thread.start()
-            self.thunderscope.show()
-            run_sim_thread.join()
-
-            if self.last_exception:
-                pytest.fail(str(self.last_exception))
-
-        # If thunderscope is disabled, just run the test
-        else:
-            __runner()
-
-@pytest.fixture
-def field_test_runner():
+def field_test_initializer():
     args = load_command_line_arguments()
 
     tscope = None
 
-    simulator_proto_unix_io = ProtoUnixIO()
+    logger.info("field test initializer")
     yellow_full_system_proto_unix_io = ProtoUnixIO()
     blue_full_system_proto_unix_io = ProtoUnixIO()
 
@@ -375,29 +356,35 @@ def field_test_runner():
 
     test_name = current_test.split("-")[0]
 
+    try:
+        estop_reader = ThreadedEstopReader(
+            args.estop_path, args.estop_buadrate
+        )
+    except Exception:
+        raise Exception("Could not find estop, make sure its plugged in")
+
     # Launch all binaries
-    with Simulator(
-        f"{args.simulator_runtime_dir}/test/{test_name}", args.debug_simulator
-    ) as simulator, FullSystem(
+    with RobotCommunication(
+            blue_full_system_proto_unix_io, getRobotMulticastChannel(0), args.interface
+    ) as rc_blue, RobotCommunication(
+        yellow_full_system_proto_unix_io, getRobotMulticastChannel(1), args.interface
+    ) as rc_yellow, FullSystem(
         f"{args.blue_full_system_runtime_dir}/test/{test_name}",
         args.debug_blue_full_system,
-        False,
+        False, should_restart_on_crash=False
     ) as blue_fs, FullSystem(
         f"{args.yellow_full_system_runtime_dir}/test/{test_name}",
         args.debug_yellow_full_system,
-        True,
+        True, should_restart_on_crash=False
     ) as yellow_fs:
         with Gamecontroller(
-            supress_logs=(not args.show_gamecontroller_logs), ci_mode=True
+                supress_logs=(not args.show_gamecontroller_logs), ci_mode=True
         ) as gamecontroller:
-
+            print("setup all things")
+            logger.info("field test initializer continues")
             blue_fs.setup_proto_unix_io(blue_full_system_proto_unix_io)
             yellow_fs.setup_proto_unix_io(yellow_full_system_proto_unix_io)
-            simulator.setup_proto_unix_io(
-                simulator_proto_unix_io,
-                blue_full_system_proto_unix_io,
-                yellow_full_system_proto_unix_io,
-            )
+
             gamecontroller.setup_proto_unix_io(
                 blue_full_system_proto_unix_io, yellow_full_system_proto_unix_io,
             )
@@ -406,47 +393,26 @@ def field_test_runner():
             # and start the test
             if args.enable_thunderscope:
                 tscope = Thunderscope(
-                    simulator_proto_unix_io,
-                    blue_full_system_proto_unix_io,
-                    yellow_full_system_proto_unix_io,
+                    blue_full_system_proto_unix_io=blue_full_system_proto_unix_io,
+                    yellow_full_system_proto_unix_io=yellow_full_system_proto_unix_io,
                     layout_path=args.layout,
                     visualization_buffer_size=args.visualization_buffer_size,
                 )
 
+            logger.info("tscope initialied")
+
             time.sleep(LAUNCH_DELAY_S)
 
-            #todo remove when robotcommunication is merged
-            ball_initial_position = tbots.Point(2.5, 0)
-            kick_velocity = tbots.Vector(2, 0)
-
-            rob_pos = ball_initial_position - (kick_velocity.normalize() * 1.5)
-
-            # Setup Ball to some rando position to test setup
-            simulator_proto_unix_io.send_proto(
-                WorldState,
-                create_world_state(
-                    [],
-                    blue_robot_locations=[rob_pos],
-                    ball_location=ball_initial_position,
-                    ball_velocity=tbots.Vector(0, 0),
-                ),
-            )
-
-            tick = SimulatorTick(
-                milliseconds=0.0166 * MILLISECONDS_PER_SECOND
-            )
-            simulator_proto_unix_io.send_proto(SimulatorTick, tick)
-
-            time.sleep(1)
-            #print("CALLING RUNNER")
+            # print("CALLING RUNNER")
             runner = FieldTestRunner(
                 current_test,
                 tscope,
-                simulator_proto_unix_io,
                 blue_full_system_proto_unix_io,
                 yellow_full_system_proto_unix_io,
                 gamecontroller,
             )
+
+            logger.info("runner initialized")
 
             # Setup proto loggers.
             #
@@ -455,20 +421,19 @@ def field_test_runner():
             # SimulatorTestRunner time provider is tied to the simulators
             # t_capture coming out of the wrapper packet (rather than time.time).
             with ProtoLogger(
-                f"{args.blue_full_system_runtime_dir}/logs/{current_test}",
-                time_provider=runner.time_provider,
+                    f"{args.blue_full_system_runtime_dir}/logs/{current_test}",
+                    time_provider=runner.time_provider,
             ) as blue_logger, ProtoLogger(
                 f"{args.yellow_full_system_runtime_dir}/logs/{current_test}",
                 time_provider=runner.time_provider,
             ) as yellow_logger:
-
                 blue_full_system_proto_unix_io.register_to_observe_everything(
                     blue_logger.buffer
                 )
                 yellow_full_system_proto_unix_io.register_to_observe_everything(
                     yellow_logger.buffer
                 )
-
+                logger.info("yielding")
                 yield runner
                 print(
                     f"\n\nTo replay this test for the blue team, go to the `src` folder and run \n./tbots.py run thunderscope --blue_log {blue_logger.log_folder}"
@@ -476,3 +441,15 @@ def field_test_runner():
                 print(
                     f"\n\nTo replay this test for the yellow team, go to the `src` folder and run \n./tbots.py run thunderscope --yellow_log {yellow_logger.log_folder}"
                 )
+
+@pytest.fixture
+def field_test_runner():
+    initializer = field_test_initializer()
+
+    yield next(initializer)
+
+    #test teardown
+    try:
+        next(initializer)
+    except StopIteration:
+        pass

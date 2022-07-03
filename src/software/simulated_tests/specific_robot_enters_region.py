@@ -53,8 +53,8 @@ class SpecificRobotEntersRegion(Validation):
 
 
 (
-    RobotEventuallyEntersRegion,
-    RobotEventuallyExitsRegion,
-    RobotAlwaysStaysInRegion,
-    RobotNeverEntersRegion,
-) = create_validation_types(RobotEntersRegion)
+    SpecificRobotEventuallyEntersRegion,
+    SpecificRobotEventuallyExitsRegion,
+    SpecificRobotAlwaysStaysInRegion,
+    SpecificRobotNeverEntersRegion,
+) = create_validation_types(SpecificRobotEntersRegion)

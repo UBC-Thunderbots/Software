@@ -69,7 +69,7 @@ def load_command_line_arguments():
         help="How many packets to buffer while rendering",
     )
     parser.add_argument(
-        "--run-field-test",
+        "--run_field_test",
         action="store_true",
         default=False,
         help="whether to run test as a field test instead of a simulated test",
@@ -81,6 +81,31 @@ def load_command_line_arguments():
         help="The test filter, if not specified all tests will run. "
              + "See https://docs.pytest.org/en/latest/how-to/usage.html#specifying-tests-selecting-tests",
     )
+
+    parser.add_argument(
+        "--interface",
+        action="store",
+        type=str,
+        default=None,
+        help="Which interface to communicate over",
+    )
+
+    parser.add_argument(
+        "--estop_path",
+        action="store",
+        type=str,
+        default="/dev/ttyACM0",
+        help="Path to the Estop",
+    )
+
+    parser.add_argument(
+        "--estop_baudrate",
+        action="store",
+        type=int,
+        default=115200,
+        help="Estop Baudrate",
+    )
+
     return parser.parse_args()
 
 def pytest_main(file):
