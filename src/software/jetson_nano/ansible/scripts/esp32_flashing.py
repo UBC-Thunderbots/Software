@@ -18,6 +18,8 @@ class FlashingESP32:
         GPIO.setup(self.PICO_RESET, GPIO.OUT, initial=GPIO.HIGH)
 
     def enter_bootloader_mode(self):
+        """Performs a pin sequence to change the esp32 to bootloader mode
+        """
         GPIO.output(self.PICO_BOOT, GPIO.HIGH)
         GPIO.output(self.PICO_RESET, GPIO.HIGH)
         sleep(self.DELAY_S)
@@ -30,6 +32,8 @@ class FlashingESP32:
         GPIO.output(self.PICO_BOOT, GPIO.HIGH)
 
     def reset(self):
+        """Performs a pin sequence to change the esp32 to reset mode
+        """
         GPIO.output(self.PICO_BOOT, GPIO.HIGH)
         GPIO.output(self.PICO_RESET, GPIO.HIGH)
         sleep(self.DELAY_S)
