@@ -68,9 +68,11 @@ struct FreeKickPlayFSM
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
             *StartState_S + Update_E / alignToBall_A = AlignToBallState_S,
-            AlignToBallState_S + Update_E [freeKickerReady_G] / shootOrFindPass_A = ShootOrFindPassState_S,
-            AlignToBallState_S + Update_E [!freeKickerReady_G] / alignToBall_A = AlignToBallState_S,
-            X + Update_E                                 = X);
+            AlignToBallState_S + Update_E[freeKickerReady_G] / shootOrFindPass_A =
+                ShootOrFindPassState_S,
+            AlignToBallState_S + Update_E[!freeKickerReady_G] / alignToBall_A =
+                AlignToBallState_S,
+            X + Update_E = X);
     }
 
    private:

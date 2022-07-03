@@ -19,6 +19,8 @@ struct ShootOrPassPlayFSM
     class AttemptShotState;
     class TakePassState;
     class StartState;
+    class FreeKickAlignToBallState;
+    class FreeKickFindPassState;
 
     struct ControlParams
     {
@@ -41,13 +43,15 @@ struct ShootOrPassPlayFSM
      * @param the ranked zones to look for offensive positions in
      * @param pass_eval The pass evaluation to help find best passes
      * @param num_tactics the number of tactics to return
-     * @param current_offensive_positioning_tactics The current offensive positioning tactics
+     * @param current_offensive_positioning_tactics The current offensive positioning
+     * tactics
      *
      * @return the updated offensive positioning tactics
      */
-    static std::vector<std::shared_ptr<MoveTactic>>  updateOffensivePositioningTactics(std::vector<EighteenZoneId> ranked_zones,
-                                           PassEvaluation<EighteenZoneId> pass_eval,
-                                           unsigned int num_tactics, std::vector<std::shared_ptr<MoveTactic>> current_offensive_positioning_tactics);
+    static std::vector<std::shared_ptr<MoveTactic>> updateOffensivePositioningTactics(
+        std::vector<EighteenZoneId> ranked_zones,
+        PassEvaluation<EighteenZoneId> pass_eval, unsigned int num_tactics,
+        std::vector<std::shared_ptr<MoveTactic>> current_offensive_positioning_tactics);
 
     /**
      * Action that looks for a pass
@@ -109,11 +113,17 @@ struct ShootOrPassPlayFSM
     bool hasPassInProgress(const Update& event);
 
     void maintainPassInProgress(const Update& event);
+    bool shouldFreeKick(const Update& event);
+    bool freeKickerAligned(const Update& event);
+    void freeKickFindPass(const Update& event);
+    void freeKickAlignToBall(const Update& event);
 
     auto operator()()
     {
         using namespace boost::sml;
 
+        DEFINE_SML_STATE(FreeKickAlignToBallState)
+        DEFINE_SML_STATE(FreeKickFindPassState)
         DEFINE_SML_STATE(AttemptShotState)
         DEFINE_SML_STATE(TakePassState)
         DEFINE_SML_STATE(StartState)
@@ -123,7 +133,11 @@ struct ShootOrPassPlayFSM
         DEFINE_SML_ACTION(startLookingForPass)
         DEFINE_SML_ACTION(takePass)
         DEFINE_SML_ACTION(maintainPassInProgress)
+        DEFINE_SML_ACTION(freeKickFindPass)
+        DEFINE_SML_ACTION(freeKickAlignToBall)
 
+        DEFINE_SML_GUARD(shouldFreeKick)
+        DEFINE_SML_GUARD(freeKickerAligned)
         DEFINE_SML_GUARD(passFound)
         DEFINE_SML_GUARD(shouldAbortPass)
         DEFINE_SML_GUARD(passCompleted)
@@ -132,14 +146,19 @@ struct ShootOrPassPlayFSM
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *StartState_S + Update_E[hasPassInProgress_G] / maintainPassInProgress_A =
+            *StartState_S + Update_E[shouldFreeKick_G] / freeKickAlignToBall_A =
+                FreeKickAlignToBallState_S,
+            StartState_S + Update_E[hasPassInProgress_G] / maintainPassInProgress_A =
                 TakePassState_S,
-
-            *StartState_S + Update_E[shouldFreeKick_G] / alignToBall_A = AlignToBallState_S,
-            AlignToBallState_S + Update_E [freeKickerReady_G] / shootOrFindPass_A = ShootOrFindPassState_S,
-            AlignToBallState_S + Update_E [!freeKickerReady_G] / alignToBall_A = AlignToBallState_S,
-
-            StartState_S + Update_E / startLookingForPass_A         = AttemptShotState_S,
+            FreeKickAlignToBallState_S + Update_E[freeKickerAligned_G] /
+                                             freeKickFindPass_A = FreeKickFindPassState_S,
+            FreeKickAlignToBallState_S +
+                Update_E[!freeKickerAligned_G] / freeKickAlignToBall_A =
+                FreeKickAlignToBallState_S,
+            FreeKickFindPassState_S + Update_E[passFound_G] / takePass_A =
+                TakePassState_S,
+            FreeKickFindPassState_S + Update_E[!passFound_G] / freeKickFindPass_A =
+                FreeKickFindPassState_S,
             AttemptShotState_S + Update_E[passFound_G] / takePass_A = TakePassState_S,
             AttemptShotState_S + Update_E[tookShot_G]               = X,
             AttemptShotState_S + Update_E[!passFound_G] / lookForPass_A =

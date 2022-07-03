@@ -20,11 +20,14 @@ ShootOrPassPlayFSM::ShootOrPassPlayFSM(TbotsProto::AiConfig ai_config)
 {
 }
 
-std::vector<std::shared_ptr<MoveTactic>> ShootOrPassPlayFSM::updateOffensivePositioningTactics(
+std::vector<std::shared_ptr<MoveTactic>>
+ShootOrPassPlayFSM::updateOffensivePositioningTactics(
     std::vector<EighteenZoneId> ranked_zones, PassEvaluation<EighteenZoneId> pass_eval,
-    unsigned int num_tactics, std::vector<std::shared_ptr<MoveTactic>> current_offensive_positioning_tactics)
+    unsigned int num_tactics,
+    std::vector<std::shared_ptr<MoveTactic>> current_offensive_positioning_tactics)
 {
- std::vector<std::shared_ptr<MoveTactic>>    new_offensive_positioning_tactics = current_offensive_positioning_tactics;
+    std::vector<std::shared_ptr<MoveTactic>> new_offensive_positioning_tactics =
+        current_offensive_positioning_tactics;
 
     // These two tactics will set robots to roam around the field, trying to put
     // themselves into a good position to receive a pass
@@ -87,8 +90,9 @@ void ShootOrPassPlayFSM::lookForPass(const Update& event)
             1 - std::min(time_since_commit_stage_start.toSeconds() /
                              pass_score_ramp_down_duration,
                          1.0 - abs_min_pass_score);
-       offensive_positioning_tactics = updateOffensivePositioningTactics(ranked_zones, pass_eval,
-                                          event.common.num_tactics - 1, offensive_positioning_tactics);
+        offensive_positioning_tactics = updateOffensivePositioningTactics(
+            ranked_zones, pass_eval, event.common.num_tactics - 1,
+            offensive_positioning_tactics);
 
         ret_tactics[1].insert(ret_tactics[1].end(), offensive_positioning_tactics.begin(),
                               offensive_positioning_tactics.end());
@@ -123,8 +127,9 @@ void ShootOrPassPlayFSM::takePass(const Update& event)
 
         if (event.common.num_tactics > 2)
         {
-                  offensive_positioning_tactics =  updateOffensivePositioningTactics(ranked_zones, pass_eval,
-                                              event.common.num_tactics - 2, offensive_positioning_tactics);
+            offensive_positioning_tactics = updateOffensivePositioningTactics(
+                ranked_zones, pass_eval, event.common.num_tactics - 2,
+                offensive_positioning_tactics);
             ret_tactics[1].insert(ret_tactics[1].end(),
                                   offensive_positioning_tactics.begin(),
                                   offensive_positioning_tactics.end());
@@ -137,8 +142,9 @@ void ShootOrPassPlayFSM::takePass(const Update& event)
         PriorityTacticVector ret_tactics = {{receiver_tactic}, {}};
         if (event.common.num_tactics > 1)
         {
-           offensive_positioning_tactics =  updateOffensivePositioningTactics(ranked_zones, pass_eval,
-                                              event.common.num_tactics - 1, offensive_positioning_tactics);
+            offensive_positioning_tactics = updateOffensivePositioningTactics(
+                ranked_zones, pass_eval, event.common.num_tactics - 1,
+                offensive_positioning_tactics);
             ret_tactics[1].insert(ret_tactics[1].end(),
                                   offensive_positioning_tactics.begin(),
                                   offensive_positioning_tactics.end());
@@ -235,4 +241,17 @@ void ShootOrPassPlayFSM::maintainPassInProgress(const Update& event)
     // reset interplay communication
     event.common.set_inter_play_communication_fun(
         InterPlayCommunication{.last_committed_pass = std::nullopt});
+}
+
+
+bool ShootOrPassPlayFSM::shouldFreeKick(const Update& event)
+{
+    return true;
+}
+
+void ShootOrPassPlayFSM::freeKickAlignToBall(const Update& event) {}
+void ShootOrPassPlayFSM::freeKickFindPass(const Update& event) {}
+bool ShootOrPassPlayFSM::freeKickerAligned(const Update& event)
+{
+    return true;
 }
