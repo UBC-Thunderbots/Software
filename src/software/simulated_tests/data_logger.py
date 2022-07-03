@@ -1,8 +1,8 @@
 
 
-class DataLogger:
+class DataLogger(object):
 
-    """Checks if a ball enters any of the provided regions."""
+    """Abstract class that can be used to log data during tests"""
 
     def __init__(self):
         pass

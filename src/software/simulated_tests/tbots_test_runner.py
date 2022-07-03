@@ -1,34 +1,11 @@
 import threading
-import queue
-import argparse
 import time
-import sys
-import os
 
 import pytest
-import software.python_bindings as tbots
+
 from proto.import_all_protos import *
-
-from pyqtgraph.Qt import QtCore, QtGui
-
-from software.networking.threaded_unix_sender import ThreadedUnixSender
-from software.simulated_tests.robot_enters_region import RobotEntersRegion
-
-from software.simulated_tests import validation
-from software.thunderscope.thunderscope import Thunderscope
-from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
-from software.thunderscope.proto_unix_io import ProtoUnixIO
-from software.py_constants import MILLISECONDS_PER_SECOND
-from software.thunderscope.binary_context_managers import (
-    FullSystem,
-    Simulator,
-    Gamecontroller,
-)
-from software.thunderscope.replay.proto_logger import ProtoLogger
-
 from software.logger.logger import createLogger
-from software.simulated_tests.pytest_main import load_command_line_arguments
-
+from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 logger = createLogger(__name__)
 

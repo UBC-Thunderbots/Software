@@ -10,7 +10,6 @@ std::shared_ptr<Tactic> createTactic(const TbotsProto::Tactic &tactic_proto,
 #define PROTO_CREATE_TACTIC_CASE(ONE_OF_CASE_NAME, ONE_OF_VARIABLE_NAME)                 \
     case TbotsProto::Tactic::k##ONE_OF_CASE_NAME:                                        \
     {                                                                                    \
-        std::cout<<"creating"<<tactic_proto.ONE_OF_VARIABLE_NAME()<<"tactic"<<std::endl; \
         return createTactic(tactic_proto.ONE_OF_VARIABLE_NAME(), ai_config);             \
     }                                                                                    \
 
@@ -84,7 +83,6 @@ std::shared_ptr<Tactic> createTactic(const TbotsProto::CreaseDefenderTactic &tac
 std::shared_ptr<Tactic> createTactic(const TbotsProto::DribbleTactic &tactic_proto,
                                      TbotsProto::AiConfig ai_config)
 {
-    std::cout<<"creating dribble tactic"<<std::endl;
     auto tactic                              = std::make_shared<DribbleTactic>(ai_config);
     std::optional<Point> dribble_destination = std::nullopt;
     std::optional<Angle> final_dribble_orientation = std::nullopt;
@@ -140,7 +138,6 @@ std::shared_ptr<Tactic> createTactic(
 std::shared_ptr<Tactic> createTactic(const TbotsProto::MoveTactic &tactic_proto,
                                      TbotsProto::AiConfig ai_config)
 {
-    LOG(INFO)<<"creating move with destination: "<<tactic_proto.destination().x_meters();
     auto tactic = std::make_shared<MoveTactic>();
     tactic->updateControlParams(
         createPoint(tactic_proto.destination()),
@@ -199,7 +196,6 @@ std::shared_ptr<Tactic> createTactic(const TbotsProto::ShadowEnemyTactic &tactic
 std::shared_ptr<Tactic> createTactic(const TbotsProto::StopTactic &tactic_proto,
                                      TbotsProto::AiConfig ai_config)
 {
-    std::cout<<"creating stop tactic"<<std::endl;
     auto tactic = std::make_shared<StopTactic>(tactic_proto.coast());
     return tactic;
 }
