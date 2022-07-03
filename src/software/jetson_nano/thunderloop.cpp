@@ -205,11 +205,9 @@ void Thunderloop::runLoop()
 
                 if (robot.has_value())
                 {
-                    current_orientation_ = robot->currentState().orientation();
-                }
-
                 direct_control_ =
-                    *primitive_executor_.stepPrimitive(robot_id_, current_orientation_);
+                    *primitive_executor_.stepPrimitive(robot_id_, robot->currentState());
+                }
             }
 
             thunderloop_status_.set_primitive_executor_step_time_ns(

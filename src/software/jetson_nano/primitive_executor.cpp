@@ -46,15 +46,8 @@ void PrimitiveExecutor::updateLocalVelocity(Vector local_velocity) {}
 Vector PrimitiveExecutor::getTargetLinearVelocity(const unsigned int robot_id,
                                                   const Angle& curr_orientation)
 {
-    if (current_primitive_.has_move())
-    {
-        //TbotsProto::MovePrimitive move_primitive = current_primitive_.move();
-        //auto friendly_team = Team(current_world_.friendly_team());
-        //auto robot         = friendly_team.getRobotById(robot_id);
-        //auto robot_state = robot->currentState();
-    
-    }
-    return Vector(0,0);
+    Vector target_global_velocity = hrvo_simulator_.getRobotVelocity(robot_id);
+    return target_global_velocity.rotate(-curr_orientation);
 }
 
 AngularVelocity PrimitiveExecutor::getTargetAngularVelocity(
