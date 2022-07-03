@@ -172,6 +172,11 @@ class HRVOSimulator
      */
     const std::list<std::shared_ptr<Agent>> &getAgents() const;
 
+	/**
+	 * Get the Vector of agents in this simulator
+	 * @return Vector of Agents
+	 * #2688: Delete this getter when kd-trees aren't tightly coupled to indices of Agent vector and we delete the agent vector.
+	 */
     const std::vector<std::shared_ptr<Agent>> getAgentsAsVector() const;
 
     /**
@@ -194,7 +199,7 @@ class HRVOSimulator
     /**
      *      Returns the preferred velocity of a specified agent.
      *
-     s* The preferred speed of an agent is the speed it would choose
+     * The preferred speed of an agent is the speed it would choose
      * to take if it were not influenced by other agents.
      *
      * @param agentNo  The number of the agent whose preferred velocity is to be
@@ -302,12 +307,9 @@ class HRVOSimulator
     std::unique_ptr<KdTree> kd_tree;
 
     // List of agents (robots) in this simulation
-    std::vector<std::shared_ptr<Agent>> agents;
     std::list<std::shared_ptr<Agent>> agent_list;
-
-    // robot id to agent index
-    std::map<unsigned int, unsigned int> friendly_robot_id_map;
-    std::map<unsigned int, unsigned int> enemy_robot_id_map;
+	//#2688: Delete this agent vector when the kd-tree is not tightly coupled to the indices of this vector
+    std::vector<std::shared_ptr<Agent>> agents;
 
    public:
     // The scale which friendly robots should be larger than friendly robots

@@ -56,8 +56,6 @@ HRVOSimulator::HRVOSimulator(float time_step, const RobotConstants_t &robot_cons
       kd_tree(std::make_unique<KdTree>(this)),
       agents(),
       agent_list(),
-      friendly_robot_id_map(),
-      enemy_robot_id_map(),
       friendly_team_colour(friendly_team_colour)
 {
 }
@@ -113,7 +111,7 @@ void HRVOSimulator::updateWorld(const World &world)
 		}
 		else
 		{
-			Vector destination = (enemy_robot.position() + enemy_robot.velocity() * getTimeStep()).toVector();	
+			Vector destination = (enemy_robot.position() + enemy_robot.velocity() * 5).toVector();	
 			addLinearVelocityRobotAgent(enemy_robot, destination, AgentType::ENEMY);
 		}
     }
@@ -361,16 +359,6 @@ void HRVOSimulator::visualize(unsigned int robot_id) const
 std::optional<std::shared_ptr<HRVOAgent>> HRVOSimulator::getFriendlyAgentFromRobotId(
     unsigned int robot_id) const
 {
-    //auto agent_index_iter = friendly_robot_id_map.find(robot_id);
-    //if (agent_index_iter != friendly_robot_id_map.end())
-    //{
-    //    unsigned int agent_index = agent_index_iter->second;
-    //    auto hrvo_agent = std::static_pointer_cast<HRVOAgent>(agents[agent_index]);
-    //    if (hrvo_agent != nullptr)
-    //    {
-    //        return hrvo_agent;
-    //    }
-    //}
 	auto found = std::find_if(agent_list.begin(), agent_list.end(), 
 			[&robot_id](std::shared_ptr<Agent> agent)
 			{
