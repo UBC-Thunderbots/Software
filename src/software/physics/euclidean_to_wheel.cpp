@@ -37,7 +37,7 @@ WheelSpace_t EuclideanToWheel::getWheelVelocity(
 {
     // need to multiply the angular velocity by the wheel radius
     // ref: http://robocup.mi.fu-berlin.de/buch/omnidrive.pdf pg 8
-    euclidean_velocity(3) = euclidean_velocity(3) * wheel_radius_m_;
+    euclidean_velocity[2] = euclidean_velocity[2] * wheel_radius_m_;
 
     return euclidean_to_wheel_velocity_D_ * euclidean_velocity;
 }
@@ -49,7 +49,7 @@ EuclideanSpace_t EuclideanToWheel::getEuclideanVelocity(
  
     // need to divide the angular velocity by the wheel radius
     // ref: http://robocup.mi.fu-berlin.de/buch/omnidrive.pdf pg 8
-    euclidean_velocity(3) = euclidean_velocity(3) / wheel_radius_m_;
+    euclidean_velocity[2] = euclidean_velocity[2] / wheel_radius_m_;
 
     return euclidean_velocity;
 }

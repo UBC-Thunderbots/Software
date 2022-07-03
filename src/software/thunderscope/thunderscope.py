@@ -407,12 +407,6 @@ class Thunderscope(object):
         log_dock = Dock("Logs")
         log_dock.addWidget(widgets["log_widget"])
 
-        widgets["performance_widget"] = self.setup_performance_plot(
-            full_system_proto_unix_io
-        )
-        performance_dock = Dock("Performance")
-        performance_dock.addWidget(widgets["performance_widget"])
-
         widgets["parameter_widget"] = self.setup_parameter_widget(
             full_system_proto_unix_io, friendly_colour_yellow
         )
@@ -433,7 +427,6 @@ class Thunderscope(object):
         dock_area.addDock(log_dock, "left", field_dock)
         dock_area.addDock(parameter_dock, "above", log_dock)
         dock_area.addDock(playinfo_dock, "bottom", field_dock)
-        dock_area.addDock(performance_dock, "right", playinfo_dock)
 
     def configure_robot_diagnostics_layout(self, dock_area, proto_unix_io):
         """Configure the default layout for the robot diagnostics widget
@@ -590,33 +583,6 @@ class Thunderscope(object):
         self.register_refresh_function(logs.refresh)
 
         return logs
-
-    def setup_performance_plot(self, proto_unix_io):
-        """Setup the performance plot
-
-        :param proto_unix_io: The proto unix io object
-        :returns: The performance plot widget
-
-        """
-
-        def extract_namedvalue_data(named_value_data):
-            return {named_value_data.name: named_value_data.value}
-
-        # Performance Plots plot HZ so the values can't be negative
-        proto_plotter = ProtoPlotter(
-            min_y=0,
-            max_y=100,
-            window_secs=10,
-            configuration={NamedValue: extract_namedvalue_data},
-        )
-
-        # Register observer
-        proto_unix_io.register_observer(NamedValue, proto_plotter.buffers[NamedValue])
-
-        # Register refresh function
-        self.register_refresh_function(proto_plotter.refresh)
-
-        return proto_plotter
 
     def setup_play_info(self, proto_unix_io):
         """Setup the play info widget

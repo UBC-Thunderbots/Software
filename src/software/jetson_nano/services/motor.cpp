@@ -66,7 +66,7 @@ static const char* HEARTBEAT_GPIO                         = "216";
 static double MECHANICAL_MPS_PER_ELECTRICAL_RPM = 0.000111;
 static double ELECTRICAL_RPM_PER_MECHANICAL_MPS = 1 / MECHANICAL_MPS_PER_ELECTRICAL_RPM;
 
-static double RUNAWAY_PROTECTION_THRESHOLD_MPS = 0.50;
+static double RUNAWAY_PROTECTION_THRESHOLD_MPS = 1.00;
 
 
 extern "C"
