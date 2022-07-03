@@ -134,6 +134,11 @@ struct ShootOrPassPlayFSM
             // src_state + event [guard] / action = dest_state
             *StartState_S + Update_E[hasPassInProgress_G] / maintainPassInProgress_A =
                 TakePassState_S,
+
+            *StartState_S + Update_E[shouldFreeKick_G] / alignToBall_A = AlignToBallState_S,
+            AlignToBallState_S + Update_E [freeKickerReady_G] / shootOrFindPass_A = ShootOrFindPassState_S,
+            AlignToBallState_S + Update_E [!freeKickerReady_G] / alignToBall_A = AlignToBallState_S,
+
             StartState_S + Update_E / startLookingForPass_A         = AttemptShotState_S,
             AttemptShotState_S + Update_E[passFound_G] / takePass_A = TakePassState_S,
             AttemptShotState_S + Update_E[tookShot_G]               = X,
