@@ -46,15 +46,11 @@ def test_simulator_move_ball(
     # Setup Tactic
     params = AssignedTacticPlayControlParams()
 
-    simulated_test_runner.set_tactics(
-        params, proto.ssl_gc_common_pb2.Team.BLUE
-    )
+    simulated_test_runner.set_tactics(params, proto.ssl_gc_common_pb2.Team.BLUE)
 
     # Setup no tactics on the enemy side
     params = AssignedTacticPlayControlParams()
-    simulated_test_runner.set_tactics(
-        params, proto.ssl_gc_common_pb2.Team.YELLOW
-    )
+    simulated_test_runner.set_tactics(params, proto.ssl_gc_common_pb2.Team.YELLOW)
 
     # expected ball position
     initial_v = ball_initial_velocity.length()
@@ -118,15 +114,11 @@ def test_simulator_kick_ball(simulated_test_runner):
         )
     )
 
-    simulated_test_runner.set_tactics(
-        params, proto.ssl_gc_common_pb2.Team.BLUE
-    )
+    simulated_test_runner.set_tactics(params, proto.ssl_gc_common_pb2.Team.BLUE)
 
     # Setup no tactics on the enemy side
     params = AssignedTacticPlayControlParams()
-    simulated_test_runner.set_tactics(
-        params, proto.ssl_gc_common_pb2.Team.YELLOW
-    )
+    simulated_test_runner.set_tactics(params, proto.ssl_gc_common_pb2.Team.YELLOW)
 
     # expected ball position
 
