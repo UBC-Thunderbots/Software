@@ -6,8 +6,10 @@
 #include "software/ai/hl/stp/tactic/attacker/attacker_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/ai/hl/stp/tactic/receiver/receiver_tactic.h"
+#include "software/ai/navigator/obstacle/robot_navigation_obstacle_factory.h"
 #include "software/ai/passing/eighteen_zone_pitch_division.h"
 #include "software/ai/passing/pass_generator.hpp"
+#include "software/geom/algorithms/intersects.h"
 #include "software/logger/logger.h"
 
 using Zones = std::unordered_set<EighteenZoneId>;
@@ -134,13 +136,13 @@ struct ShootOrPassPlayFSM
                 TakePassState_S,
             StartState_S + Update_E / startLookingForPass_A         = AttemptShotState_S,
             AttemptShotState_S + Update_E[passFound_G] / takePass_A = TakePassState_S,
+            AttemptShotState_S + Update_E[tookShot_G]               = X,
             AttemptShotState_S + Update_E[!passFound_G] / lookForPass_A =
                 AttemptShotState_S,
-            AttemptShotState_S + Update_E[tookShot_G]                 = X,
-            TakePassState_S + Update_E[!passCompleted_G] / takePass_A = TakePassState_S,
             TakePassState_S + Update_E[shouldAbortPass_G] / startLookingForPass_A =
                 AttemptShotState_S,
-            TakePassState_S + Update_E[passCompleted_G] / takePass_A = X,
+            TakePassState_S + Update_E[!passCompleted_G] / takePass_A = TakePassState_S,
+            TakePassState_S + Update_E[passCompleted_G] / takePass_A  = X,
             X + Update_E / startLookingForPass_A = AttemptShotState_S);
     }
 
