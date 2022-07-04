@@ -7,14 +7,20 @@ class TestHrvo : public testing::Test
 {
 };
 
-void assertRobotInAgentList(const Robot &robot, const AgentType &agent_type,
-                            const std::list<std::shared_ptr<Agent>> &agents)
+void assertRobotInAgentList(
+    const Robot &robot, const AgentType &agent_type,
+    const std::vector<std::optional<std::shared_ptr<Agent>>> &agents)
 {
-    auto agent_it = std::find_if(agents.begin(), agents.end(),
-                                 [&robot, &agent_type](std::shared_ptr<Agent> agent) {
-                                     return (agent->getRobotId() == robot.id() &&
-                                             agent->getAgentType() == agent_type);
-                                 });
+    auto agent_it =
+        std::find_if(agents.begin(), agents.end(),
+                     [&robot, &agent_type](std::optional<std::shared_ptr<Agent>> agent) {
+                         if (!agent.has_value())
+                         {
+                             return false;
+                         }
+                         return (agent.value()->getRobotId() == robot.id() &&
+                                 agent.value()->getAgentType() == agent_type);
+                     });
     ASSERT_TRUE(agent_it != agents.end());
 }
 
@@ -44,8 +50,8 @@ TEST_F(TestHrvo, test_update_world_with_one_friendly_agent)
 
     EXPECT_EQ(1, sim.getNumAgents());
 
-    auto agents = sim.getAgents();
-    assertRobotInAgentList(friendly_robot, AgentType::FRIENDLY, sim.getAgents());
+    auto agents = sim.getAgentsAsVector();
+    assertRobotInAgentList(friendly_robot, AgentType::FRIENDLY, sim.getAgentsAsVector());
 }
 
 TEST_F(TestHrvo, test_update_world_with_one_enemy_agent)
@@ -62,8 +68,8 @@ TEST_F(TestHrvo, test_update_world_with_one_enemy_agent)
 
     ASSERT_EQ(1, sim.getNumAgents());
 
-    auto agents = sim.getAgents();
-    assertRobotInAgentList(enemy_robot, AgentType::ENEMY, sim.getAgents());
+    auto agents = sim.getAgentsAsVector();
+    assertRobotInAgentList(enemy_robot, AgentType::ENEMY, sim.getAgentsAsVector());
 }
 
 TEST_F(TestHrvo, test_update_world_with_friendly_and_enemy_agent)
@@ -82,9 +88,9 @@ TEST_F(TestHrvo, test_update_world_with_friendly_and_enemy_agent)
 
     ASSERT_EQ(2, sim.getNumAgents());
 
-    auto agents = sim.getAgents();
-    assertRobotInAgentList(friendly_robot, AgentType::FRIENDLY, sim.getAgents());
-    assertRobotInAgentList(enemy_robot, AgentType::ENEMY, sim.getAgents());
+    auto agents = sim.getAgentsAsVector();
+    assertRobotInAgentList(friendly_robot, AgentType::FRIENDLY, sim.getAgentsAsVector());
+    assertRobotInAgentList(enemy_robot, AgentType::ENEMY, sim.getAgentsAsVector());
 }
 
 TEST_F(TestHrvo, test_update_world_add_friendly_robots_second_tick)
@@ -110,7 +116,7 @@ TEST_F(TestHrvo, test_update_world_add_friendly_robots_second_tick)
     sim.updateWorld(world);
 
     ASSERT_EQ(friendly_robots.size() + enemy_robots.size(), sim.getNumAgents());
-    auto agents = sim.getAgents();
+    auto agents = sim.getAgentsAsVector();
 
     for (Robot &robot : friendly_robots)
     {
@@ -131,7 +137,7 @@ TEST_F(TestHrvo, test_update_world_add_friendly_robots_second_tick)
     sim.updateWorld(world);
 
     ASSERT_EQ(friendly_robots.size() + enemy_robots.size(), sim.getNumAgents());
-    agents = sim.getAgents();
+    agents = sim.getAgentsAsVector();
 
     for (Robot &robot : friendly_robots)
     {
@@ -166,7 +172,7 @@ TEST_F(TestHrvo, test_update_world_add_enemy_robots_second_tick)
     sim.updateWorld(world);
 
     ASSERT_EQ(friendly_robots.size() + enemy_robots.size(), sim.getNumAgents());
-    auto agents = sim.getAgents();
+    auto agents = sim.getAgentsAsVector();
 
     for (Robot &robot : friendly_robots)
     {
@@ -187,7 +193,7 @@ TEST_F(TestHrvo, test_update_world_add_enemy_robots_second_tick)
     sim.updateWorld(world);
 
     ASSERT_EQ(friendly_robots.size() + enemy_robots.size(), sim.getNumAgents());
-    agents = sim.getAgents();
+    agents = sim.getAgentsAsVector();
 
     for (Robot &robot : friendly_robots)
     {
@@ -225,7 +231,7 @@ TEST_F(TestHrvo, test_update_world_remove_friendly_robots_second_tick)
     sim.updateWorld(world);
 
     ASSERT_EQ(friendly_robots.size() + enemy_robots.size(), sim.getNumAgents());
-    auto agents = sim.getAgents();
+    auto agents = sim.getAgentsAsVector();
 
     for (Robot &robot : friendly_robots)
     {
@@ -244,7 +250,7 @@ TEST_F(TestHrvo, test_update_world_remove_friendly_robots_second_tick)
     sim.updateWorld(world);
 
     ASSERT_EQ(friendly_robots.size() + enemy_robots.size(), sim.getNumAgents());
-    agents = sim.getAgents();
+    agents = sim.getAgentsAsVector();
 
     for (Robot &robot : friendly_robots)
     {
@@ -289,7 +295,7 @@ TEST_F(TestHrvo, test_update_world_remove_enemy_robots_second_tick)
     sim.updateWorld(world);
 
     ASSERT_EQ(friendly_robots.size() + enemy_robots.size(), sim.getNumAgents());
-    auto agents = sim.getAgents();
+    auto agents = sim.getAgentsAsVector();
 
     for (Robot &robot : friendly_robots)
     {
@@ -309,7 +315,7 @@ TEST_F(TestHrvo, test_update_world_remove_enemy_robots_second_tick)
     sim.updateWorld(world);
 
     ASSERT_EQ(friendly_robots.size() + enemy_robots.size(), sim.getNumAgents());
-    agents = sim.getAgents();
+    agents = sim.getAgentsAsVector();
 
     for (Robot &robot : friendly_robots)
     {
@@ -350,7 +356,7 @@ TEST_F(TestHrvo, test_update_world_add_and_remove_friendly_robots_second_tick)
     sim.updateWorld(world);
 
     ASSERT_EQ(friendly_robots.size() + enemy_robots.size(), sim.getNumAgents());
-    auto agents = sim.getAgents();
+    auto agents = sim.getAgentsAsVector();
 
     for (Robot &robot : friendly_robots)
     {
@@ -372,7 +378,7 @@ TEST_F(TestHrvo, test_update_world_add_and_remove_friendly_robots_second_tick)
     sim.updateWorld(world);
 
     ASSERT_EQ(friendly_robots.size() + enemy_robots.size(), sim.getNumAgents());
-    agents = sim.getAgents();
+    agents = sim.getAgentsAsVector();
 
     for (Robot &robot : friendly_robots)
     {
@@ -412,7 +418,7 @@ TEST_F(TestHrvo, test_update_world_add_and_remove_enemy_robots_second_tick)
     sim.updateWorld(world);
 
     ASSERT_EQ(friendly_robots.size() + enemy_robots.size(), sim.getNumAgents());
-    auto agents = sim.getAgents();
+    auto agents = sim.getAgentsAsVector();
 
     for (Robot &robot : friendly_robots)
     {
@@ -435,7 +441,7 @@ TEST_F(TestHrvo, test_update_world_add_and_remove_enemy_robots_second_tick)
     sim.updateWorld(world);
 
     ASSERT_EQ(friendly_robots.size() + enemy_robots.size(), sim.getNumAgents());
-    agents = sim.getAgents();
+    agents = sim.getAgentsAsVector();
 
     for (Robot &robot : friendly_robots)
     {
@@ -475,7 +481,7 @@ TEST_F(TestHrvo, test_update_world_add_and_remove_friendly_and_enemy_robots_seco
     sim.updateWorld(world);
 
     ASSERT_EQ(friendly_robots.size() + enemy_robots.size(), sim.getNumAgents());
-    auto agents = sim.getAgents();
+    auto agents = sim.getAgentsAsVector();
 
     for (Robot &robot : friendly_robots)
     {
@@ -503,7 +509,7 @@ TEST_F(TestHrvo, test_update_world_add_and_remove_friendly_and_enemy_robots_seco
     sim.updateWorld(world);
 
     ASSERT_EQ(friendly_robots.size() + enemy_robots.size(), sim.getNumAgents());
-    agents = sim.getAgents();
+    agents = sim.getAgentsAsVector();
 
     for (Robot &robot : friendly_robots)
     {

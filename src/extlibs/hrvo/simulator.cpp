@@ -287,6 +287,7 @@ size_t HRVOSimulator::addLinearVelocityAgent(const Vector &position, float agent
             std::make_optional<std::shared_ptr<Agent>>(agent);
         return agent_index_iter->second;
     }
+    agents.push_back(std::move(agent));
     return agents.size() - 1;
 }
 

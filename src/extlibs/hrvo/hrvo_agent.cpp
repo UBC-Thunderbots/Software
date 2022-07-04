@@ -162,10 +162,6 @@ void HRVOAgent::computeNewVelocity()
     // Create Velocity Obstacles for neighbors
     for (const auto &neighbor : neighbors_)
     {
-        if (!simulator_->getAgentsAsVector()[neighbor.second].has_value())
-        {
-            continue;
-        }
         std::shared_ptr<Agent> other_agent =
             simulator_->getAgentsAsVector()[neighbor.second].value();
         VelocityObstacle velocity_obstacle = other_agent->createVelocityObstacle(*this);
