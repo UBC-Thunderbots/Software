@@ -72,10 +72,8 @@ class PrimitiveExecutor
      */
     Vector getTargetLinearVelocity(const unsigned int robot_id,
                                    const Angle& curr_orientation);
-
     Vector getTargetLinearVelocity(const TbotsProto::MovePrimitive& move_primitive,
                                    const RobotState& robot_state);
-
     double getTargetLinearSpeed(const TbotsProto::MovePrimitive& move_primitive,
                                 const RobotState& robot_state);
 

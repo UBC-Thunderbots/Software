@@ -69,11 +69,6 @@ py_library(
 )
 
 py_library(
-    name = "common_widgets",
-    srcs = ["common_widgets.py"],
-)
-
-py_library(
     name = "dock_label_style",
     srcs = ["dock_label_style.py"],
 )
