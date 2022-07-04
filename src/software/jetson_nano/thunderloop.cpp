@@ -179,14 +179,8 @@ void Thunderloop::runLoop()
                     result.tv_sec * static_cast<int>(NANOSECONDS_PER_SECOND) +
                     result.tv_nsec;
 
-                // If we haven't received a primitive in a while, override the
-                // current_primitive_ with an estop primitive.
-                // LOG(DEBUG) <<
-                // static_cast<double>(nanoseconds_elapsed_since_last_primitive) /
-                // 1000000.0;
-
                 if (nanoseconds_elapsed_since_last_primitive >
-                        static_cast<long>(PRIMITIVE_MANAGER_TIMEOUT_NS))
+                    static_cast<long>(PRIMITIVE_MANAGER_TIMEOUT_NS))
                 {
                     primitive_executor_.clearCurrentPrimitive();
                 }
@@ -196,8 +190,8 @@ void Thunderloop::runLoop()
 
                 if (robot.has_value())
                 {
-                direct_control_ =
-                    *primitive_executor_.stepPrimitive(robot_id_, robot->currentState());
+                    direct_control_ = *primitive_executor_.stepPrimitive(
+                        robot_id_, robot->currentState());
                 }
             }
 
@@ -207,7 +201,7 @@ void Thunderloop::runLoop()
             // Power Service: execute the power control command
             {
                 ScopedTimespecTimer timer(&poll_time);
-                //power_status_ = power_service_->poll(direct_control_.power_control());
+                power_status_ = power_service_->poll(direct_control_.power_control());
             }
             thunderloop_status_.set_power_service_poll_time_ns(
                 static_cast<unsigned long>(poll_time.tv_nsec));
@@ -222,8 +216,6 @@ void Thunderloop::runLoop()
             }
             thunderloop_status_.set_motor_service_poll_time_ns(
                 static_cast<unsigned long>(poll_time.tv_nsec));
-
-            LOG(DEBUG) << static_cast<double>(thunderloop_status_.motor_service_poll_time_ns()) / 1000000.0;
 
             // Update Robot Status with poll responses
             *(robot_status_.mutable_thunderloop_status()) = thunderloop_status_;
@@ -240,6 +232,8 @@ void Thunderloop::runLoop()
         // Make sure the iteration can fit inside the period of the loop
         loop_duration_seconds =
             static_cast<double>(loop_duration) * SECONDS_PER_NANOSECOND;
+
+        CHECK(loop_duration_seconds > 0.06) << "Loop took too long to execute";
 
         // Calculate next shot taking into account how long this iteration took
         next_shot.tv_nsec += interval - loop_duration;
