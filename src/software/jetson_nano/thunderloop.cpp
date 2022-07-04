@@ -188,8 +188,16 @@ void Thunderloop::runLoop()
 
                 if (robot.has_value())
                 {
+                    // TODO-JON needs to use world in primitive executor
                     direct_control_ = *primitive_executor_.stepPrimitive(
                         robot_id_, robot->currentState());
+                }
+                else
+                {
+                    // We are in robot diagnostics
+                    auto robot_state = RobotState(Point(0,0), Vector(0,0), Angle::fromDegrees(0), Angle::fromDegrees(0));
+                    direct_control_ = *primitive_executor_.stepPrimitive(
+                            robot_id_, robot_state);
                 }
             }
 
@@ -229,8 +237,7 @@ void Thunderloop::runLoop()
 
         // Make sure the iteration can fit inside the period of the loop
         loop_duration_seconds = static_cast<double>(loop_duration) * SECONDS_PER_NANOSECOND;
-
-        CHECK(loop_duration_seconds > 0.06) << "Loop took too long to execute";
+        LOG(DEBUG) << "Loop duration: " << loop_duration_seconds << " seconds";
 
         // Calculate next shot taking into account how long this iteration took
         next_shot.tv_nsec += interval - loop_duration;
