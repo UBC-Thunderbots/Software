@@ -2,6 +2,7 @@
 
 void KickFSM::updateKick(const Update &event)
 {
+
     event.common.set_primitive(createMovePrimitive(
         CREATE_MOTION_CONTROL(event.control_params.kick_origin),
         event.control_params.kick_direction, 0.1, TbotsProto::DribblerMode::OFF,

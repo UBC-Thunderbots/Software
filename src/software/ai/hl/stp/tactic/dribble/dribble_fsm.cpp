@@ -22,12 +22,14 @@ Point DribbleFSM::findInterceptionPoint(const Robot &robot, const Ball &ball,
         return point_in_front_of_ball;
     }
     Point intercept_position = ball.position();
+    Point fallback_interception_point = ball.position();
+    double fallback_interception_final_speed = robot.robotConstants().robot_max_speed_m_per_s;
     while (contains(field.fieldLines(), intercept_position))
     {
 
-        //Duration ball_time_to_position = ball.getTimeToPosition(intercept_position);
-        Duration ball_time_to_position = Duration::fromSeconds(
-                distance(intercept_position, ball.position()) / ball.velocity().length());
+        Duration ball_time_to_position = ball.getTimeToPosition(intercept_position);
+//        Duration ball_time_to_position = Duration::fromSeconds(
+//                distance(intercept_position, ball.position()) / ball.velocity().length());
 
         Duration robot_time_to_pos = robot.getTimeToPosition(intercept_position);
 
@@ -35,8 +37,22 @@ Point DribbleFSM::findInterceptionPoint(const Robot &robot, const Ball &ball,
         {
             break;
         }
+        Vector dist_vector = intercept_position - robot.position();
+
+        double final_velocity_to_reach_in_time = 2*dist_vector.length()/(ball_time_to_position.toSeconds()) - robot.currentState().velocity().dot(dist_vector.normalize());
+        double average_acceleration_to_reacch_in_time = final_velocity_to_reach_in_time = robot.currentState().velocity().dot(dist_vector.normalize())
         intercept_position +=
             ball.velocity().normalize(INTERCEPT_POSITION_SEARCH_INTERVAL);
+    }
+
+    //if we cant reach the ball in time, find what final speed we need to be at to time an interception
+    if (contains(field.fieldLines(), intercept_position)){
+        //return to a position in the field
+        intercept_position -=
+                ball.velocity().normalize(INTERCEPT_POSITION_SEARCH_INTERVAL);
+        Duration ball_time_to_position = ball.getTimeToPosition(intercept_position);
+
+
     }
     return intercept_position;
 }
