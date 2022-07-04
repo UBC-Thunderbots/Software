@@ -15,8 +15,6 @@ from software.thunderscope.field.field_layer import FieldLayer
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 MAX_ALLOWED_KICK_SPEED_M_PER_S = 6.5
-NUM_ROBOTS_ON_FIELD_PER_TEAM = 6
-
 
 class WorldLayer(FieldLayer):
     def __init__(self, simulator_io, friendly_colour_yellow, buffer_size=5):
