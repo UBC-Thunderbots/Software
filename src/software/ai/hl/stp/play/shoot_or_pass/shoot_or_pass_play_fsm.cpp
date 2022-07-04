@@ -6,6 +6,7 @@ ShootOrPassPlayFSM::ShootOrPassPlayFSM(TbotsProto::AiConfig ai_config)
     : ai_config(ai_config),
       attacker_tactic(std::make_shared<AttackerTactic>(ai_config)),
       receiver_tactic(std::make_shared<ReceiverTactic>()),
+      align_to_ball_tactic(std::make_shared<MoveTactic>()),
       offensive_positioning_tactics(std::vector<std::shared_ptr<MoveTactic>>()),
       pass_generator(
           PassGenerator<EighteenZoneId>(std::make_shared<const EighteenZonePitchDivision>(
@@ -16,7 +17,8 @@ ShootOrPassPlayFSM::ShootOrPassPlayFSM(TbotsProto::AiConfig ai_config)
           PassWithRating{.pass = Pass(Point(), Point(), 0), .rating = 0}),
       time_since_commit_stage_start(Duration::fromSeconds(0)),
       min_pass_score_threshold(0),
-      pass_in_progress(Point(), Point(), 0)
+      pass_in_progress(Point(), Point(), 0),
+      should_keep_away(true)
 {
 }
 
@@ -102,7 +104,8 @@ void ShootOrPassPlayFSM::lookForPass(const Update& event)
 
 void ShootOrPassPlayFSM::startLookingForPass(const Update& event)
 {
-    attacker_tactic              = std::make_shared<AttackerTactic>(ai_config);
+    attacker_tactic = std::make_shared<AttackerTactic>(ai_config);
+    attacker_tactic->updateShouldKeepAway(should_keep_away);
     receiver_tactic              = std::make_shared<ReceiverTactic>();
     pass_optimization_start_time = event.common.world.getMostRecentTimestamp();
     lookForPass(event);
@@ -249,9 +252,48 @@ bool ShootOrPassPlayFSM::shouldFreeKick(const Update& event)
     return true;
 }
 
-void ShootOrPassPlayFSM::freeKickAlignToBall(const Update& event) {}
-void ShootOrPassPlayFSM::freeKickFindPass(const Update& event) {}
+void ShootOrPassPlayFSM::freeKickAlignToBall(const Update& event)
+{
+    should_keep_away = false;
+    auto pitch_division =
+        std::make_shared<const EighteenZonePitchDivision>(event.common.world.field());
+
+    PassGenerator<EighteenZoneId> pass_generator(pitch_division,
+                                                 ai_config.passing_config());
+
+    // using Zones = std::unordered_set<EighteenZoneId>;
+
+    auto pass_eval = pass_generator.generatePassEvaluation(event.common.world);
+    best_pass_and_score_so_far = pass_eval.getBestPassOnField();
+
+    auto ranked_zones = pass_eval.rankZonesForReceiving(
+        event.common.world, best_pass_and_score_so_far.pass.receiverPoint());
+
+    // This tactic will move a robot into position to initially take the free-kick
+    updateAlignToBallTactic(align_to_ball_tactic, event.common.world);
+
+    auto offensive_positioning_tactics =
+        ShootOrPassPlayFSM::updateOffensivePositioningTactics(
+            ranked_zones, pass_eval, event.common.num_tactics - 1, {});
+
+    PriorityTacticVector ret_tactics = {{align_to_ball_tactic}, {}};
+    ret_tactics[1].insert(ret_tactics[1].end(), offensive_positioning_tactics.begin(),
+                          offensive_positioning_tactics.end());
+    event.common.set_tactics(ret_tactics);
+}
 bool ShootOrPassPlayFSM::freeKickerAligned(const Update& event)
 {
-    return true;
+    return align_to_ball_tactic->done();
+}
+
+void ShootOrPassPlayFSM::updateAlignToBallTactic(
+    std::shared_ptr<MoveTactic> align_to_ball_tactic, const World& world)
+{
+    Vector ball_to_center_vec = Vector(0, 0) - world.ball().position().toVector();
+    // We want the kicker to get into position behind the ball facing the center
+    // of the field
+    align_to_ball_tactic->updateControlParams(
+        world.ball().position() -
+            ball_to_center_vec.normalize(ROBOT_MAX_RADIUS_METERS * 2),
+        ball_to_center_vec.orientation(), 0);
 }

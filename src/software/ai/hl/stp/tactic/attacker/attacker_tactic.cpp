@@ -35,7 +35,7 @@ void AttackerTactic::updateControlParams(std::optional<Point> chip_target)
     this->chip_target = chip_target;
 }
 
-    void AttackerTactic::updateShouldKeepAway(bool should_keep_away)
+void AttackerTactic::updateShouldKeepAway(bool should_keep_away)
 {
     this->should_keep_away = should_keep_away;
 }
@@ -67,11 +67,12 @@ void AttackerTactic::updatePrimitive(const TacticUpdate& tactic_update, bool res
         shot = std::nullopt;
     }
 
-    AttackerFSM::ControlParams control_params{.best_pass_so_far = best_pass_so_far,
-                                              .pass_committed   = pass_committed,
-                                              .shot             = shot,
-                                              .chip_target      = chip_target,
-                                              .should_keep_away = should_keep_away,
+    AttackerFSM::ControlParams control_params{
+        .best_pass_so_far = best_pass_so_far,
+        .pass_committed   = pass_committed,
+        .shot             = shot,
+        .chip_target      = chip_target,
+        .should_keep_away = should_keep_away,
     };
 
     fsm_map.at(tactic_update.robot.id())

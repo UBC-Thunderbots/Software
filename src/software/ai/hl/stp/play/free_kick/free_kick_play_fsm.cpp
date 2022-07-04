@@ -28,25 +28,23 @@ FreeKickPlayFSM::FreeKickPlayFSM(TbotsProto::AiConfig ai_config)
 void FreeKickPlayFSM::shootOrFindPass(const Update& event)
 {
     alignToBall(event);
-        best_pass_and_score_so_far =
-            pass_generator.generatePassEvaluation(event.common.world).getBestPassOnField();
-        // Align the kicker to pass and wait for a good pass
-        // To get the best pass possible we start by aiming for a perfect one and then
-        // decrease the minimum score over time
-        Timestamp commit_stage_start_time = event.common.world.getMostRecentTimestamp();
-    
-            best_pass_and_score_so_far =
-                pass_generator.generatePassEvaluation(event.common.world)
-                    .getBestPassOnField();
-            LOG(DEBUG) << "Best pass found so far is: " <<
-            best_pass_and_score_so_far.pass; LOG(DEBUG) << "    with score: " <<
-            best_pass_and_score_so_far.rating;
-    
-            Duration time_since_commit_stage_start =
-                event.common.world.getMostRecentTimestamp() - commit_stage_start_time;
-            min_pass_score_threshold = 1 - std::min(time_since_commit_stage_start.toSeconds() /
-                                         MAX_TIME_TO_COMMIT_TO_PASS.toSeconds(),
-                                     1.0);
+    best_pass_and_score_so_far =
+        pass_generator.generatePassEvaluation(event.common.world).getBestPassOnField();
+    // Align the kicker to pass and wait for a good pass
+    // To get the best pass possible we start by aiming for a perfect one and then
+    // decrease the minimum score over time
+    Timestamp commit_stage_start_time = event.common.world.getMostRecentTimestamp();
+
+    best_pass_and_score_so_far =
+        pass_generator.generatePassEvaluation(event.common.world).getBestPassOnField();
+    LOG(DEBUG) << "Best pass found so far is: " << best_pass_and_score_so_far.pass;
+    LOG(DEBUG) << "    with score: " << best_pass_and_score_so_far.rating;
+
+    Duration time_since_commit_stage_start =
+        event.common.world.getMostRecentTimestamp() - commit_stage_start_time;
+    min_pass_score_threshold = 1 - std::min(time_since_commit_stage_start.toSeconds() /
+                                                MAX_TIME_TO_COMMIT_TO_PASS.toSeconds(),
+                                            1.0);
 }
 
 void FreeKickPlayFSM::updateAlignToBallTactic(
@@ -67,7 +65,8 @@ bool FreeKickPlayFSM::freeKickerReady(const Update& event)
 }
 
 
-void FreeKickPlayFSM::alignToBall(const Update& event) {
+void FreeKickPlayFSM::alignToBall(const Update& event)
+{
     auto pitch_division =
         std::make_shared<const EighteenZonePitchDivision>(event.common.world.field());
 
@@ -90,11 +89,14 @@ void FreeKickPlayFSM::alignToBall(const Update& event) {
             ranked_zones, pass_eval, event.common.num_tactics - 1, {});
 
     PriorityTacticVector ret_tactics = {{align_to_ball_tactic}, {}};
-        ret_tactics[1].insert(ret_tactics[1].end(), offensive_positioning_tactics.begin(),
-                              offensive_positioning_tactics.end());
+    ret_tactics[1].insert(ret_tactics[1].end(), offensive_positioning_tactics.begin(),
+                          offensive_positioning_tactics.end());
     event.common.set_tactics(ret_tactics);
 }
 
 
-    void FreeKickPlayFSM::takePass(const Update& event){}
-    bool FreeKickPlayFSM::passFound(const Update& event){ return (best_pass_and_score_so_far.rating > min_pass_score_threshold); }
+void FreeKickPlayFSM::takePass(const Update& event) {}
+bool FreeKickPlayFSM::passFound(const Update& event)
+{
+    return (best_pass_and_score_so_far.rating > min_pass_score_threshold);
+}

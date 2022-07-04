@@ -115,7 +115,6 @@ struct ShootOrPassPlayFSM
     void maintainPassInProgress(const Update& event);
     bool shouldFreeKick(const Update& event);
     bool freeKickerAligned(const Update& event);
-    void freeKickFindPass(const Update& event);
     void freeKickAlignToBall(const Update& event);
 
     auto operator()()
@@ -123,7 +122,6 @@ struct ShootOrPassPlayFSM
         using namespace boost::sml;
 
         DEFINE_SML_STATE(FreeKickAlignToBallState)
-        DEFINE_SML_STATE(FreeKickFindPassState)
         DEFINE_SML_STATE(AttemptShotState)
         DEFINE_SML_STATE(TakePassState)
         DEFINE_SML_STATE(StartState)
@@ -133,7 +131,6 @@ struct ShootOrPassPlayFSM
         DEFINE_SML_ACTION(startLookingForPass)
         DEFINE_SML_ACTION(takePass)
         DEFINE_SML_ACTION(maintainPassInProgress)
-        DEFINE_SML_ACTION(freeKickFindPass)
         DEFINE_SML_ACTION(freeKickAlignToBall)
 
         DEFINE_SML_GUARD(shouldFreeKick)
@@ -151,14 +148,10 @@ struct ShootOrPassPlayFSM
             StartState_S + Update_E[hasPassInProgress_G] / maintainPassInProgress_A =
                 TakePassState_S,
             FreeKickAlignToBallState_S + Update_E[freeKickerAligned_G] /
-                                             freeKickFindPass_A = FreeKickFindPassState_S,
+                                             startLookingForPass_A = AttemptShotState_S,
             FreeKickAlignToBallState_S +
                 Update_E[!freeKickerAligned_G] / freeKickAlignToBall_A =
                 FreeKickAlignToBallState_S,
-            FreeKickFindPassState_S + Update_E[passFound_G] / takePass_A =
-                TakePassState_S,
-            FreeKickFindPassState_S + Update_E[!passFound_G] / freeKickFindPass_A =
-                FreeKickFindPassState_S,
             AttemptShotState_S + Update_E[passFound_G] / takePass_A = TakePassState_S,
             AttemptShotState_S + Update_E[tookShot_G]               = X,
             AttemptShotState_S + Update_E[!passFound_G] / lookForPass_A =
@@ -171,9 +164,19 @@ struct ShootOrPassPlayFSM
     }
 
    private:
+    /**
+     * Update the tactic that aligns the robot to the ball in preparation to pass
+     *
+     * @param align_to_ball_tactic
+     * @param world The current state of the world
+     */
+    void updateAlignToBallTactic(std::shared_ptr<MoveTactic> align_to_ball_tactic,
+                                 const World& world);
+
     TbotsProto::AiConfig ai_config;
     std::shared_ptr<AttackerTactic> attacker_tactic;
     std::shared_ptr<ReceiverTactic> receiver_tactic;
+    std::shared_ptr<MoveTactic> align_to_ball_tactic;
     std::vector<std::shared_ptr<MoveTactic>> offensive_positioning_tactics;
     PassGenerator<EighteenZoneId> pass_generator;
     Timestamp pass_optimization_start_time;
@@ -181,4 +184,5 @@ struct ShootOrPassPlayFSM
     Duration time_since_commit_stage_start;
     double min_pass_score_threshold;
     Pass pass_in_progress;
+    bool should_keep_away;
 };

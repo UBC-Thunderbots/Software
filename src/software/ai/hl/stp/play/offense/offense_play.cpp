@@ -43,8 +43,9 @@ void OffensePlay::updateTactics(const PlayUpdate &play_update)
         if (play_update.world.ball().position().x() > 0)
         {
             num_defenders = std::max(
-                0, 2 - static_cast<int>(play_update.world.ball().position().x() /
-                                        play_update.world.field().fieldLines().xMax()));
+                0, 2 - 2 * static_cast<int>(
+                               play_update.world.ball().position().x() /
+                               (play_update.world.field().fieldLines().xMax() / 3.0)));
         }
     }
     else if (num_enemy_robots <= 3)

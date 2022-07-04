@@ -81,7 +81,7 @@ struct FreeKickPlayFSM
             ShootOrFindPassState_S + Update_E[!passFound_G] / shootOrFindPass_A =
                 ShootOrFindPassState_S,
             ShootOrFindPassState_S + Update_E[passFound_G] / takePass_A = TakePassState_S,
-            X + Update_E = X);
+            X + Update_E                                                = X);
     }
 
    private:
