@@ -60,9 +60,6 @@ class DriveAndDribblerWidget(QWidget):
     def refresh(self):
         """Refresh the widget and send the a MotorControl message with the current values
         """
-        # print(time.time() - self.input_a, "TSCOPE SENDING")
-        self.input_a = time.time()
-
         motor_control = MotorControl()
         motor_control.dribbler_speed_rpm = int(
             self.dribbler_speed_rpm_slider.value() / 1000.0

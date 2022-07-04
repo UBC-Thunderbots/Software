@@ -639,7 +639,7 @@ class Thunderscope(object):
 
         """
         # Create widget
-        chicker_widget = ChickerWidget()
+        chicker_widget = ChickerWidget(proto_unix_io)
 
         # Register refresh function
         self.register_refresh_function(chicker_widget.refresh)

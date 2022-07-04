@@ -2,13 +2,14 @@ import pyqtgraph as pg
 from pyqtgraph.Qt.QtCore import Qt
 from pyqtgraph.Qt.QtWidgets import *
 from software.py_constants import *
+from proto.import_all_protos import *
 import software.thunderscope.common.common_widgets as common_widgets
 
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 
 class ChickerWidget(QWidget):
-    def __init__(self):
+    def __init__(self, proto_unix_io):
         """Handles the robot diagnostics input to create a PowerControl message
         to be sent to the robots.
 
@@ -18,12 +19,15 @@ class ChickerWidget(QWidget):
         The powerboard also has an internal cooldown, so spamming kick or chip
         will not work until the capacitors charge up and the cooldown is over.
 
+        :param proto_unix_io: proto_unix_io object to send messages to the robot
+
         """
 
         super(ChickerWidget, self).__init__()
 
         vbox_layout = QVBoxLayout()
         self.radio_buttons_group = QButtonGroup()
+        self.proto_unix_io = proto_unix_io
 
         # push button group box
         self.push_button_box, self.push_buttons = common_widgets.create_button(
@@ -87,11 +91,11 @@ class ChickerWidget(QWidget):
     def refresh(self):
 
         # slider values
-        self.geneva_value = self.geneva_slider.value()
-        self.geneva_label.setText(str(self.geneva_value))
+        geneva_value = self.geneva_slider.value()
+        self.geneva_label.setText(Slot.Name(geneva_value))
 
-        self.power_value = self.power_slider.value()
-        self.power_label.setText(str(self.power_value))
+        power_value = self.power_slider.value()
+        self.power_label.setText(str(power_value))
 
         # if autokick is enabled, we don't want to allow kick/chip
         auto_kick_enabled = (
@@ -99,3 +103,20 @@ class ChickerWidget(QWidget):
         )
         self.change_button_state(self.kick_button, not auto_kick_enabled)
         self.change_button_state(self.chip_button, not auto_kick_enabled)
+
+        power_control = PowerControl()
+        power_control.geneva_slot = geneva_value
+
+        # If auto is enabled, we want to populate the autochip or kick message
+        if self.auto_kick_button.isChecked():
+            power_control.chicker.auto_chip_or_kick.autokick_speed_m_per_s = power_value
+        elif self.auto_chip_button.isChecked():
+            power_control.chicker.auto_chip_or_kick.autochip_distance_meters = (
+                power_value
+            )
+        elif self.no_auto_button.isChecked():
+            pass
+            # TODO ATTACH A CALLBACK AND SENDPROTO/KICK IMMEDIATELY
+
+        print(power_control)
+        self.proto_unix_io.send_proto(PowerControl, power_control)
