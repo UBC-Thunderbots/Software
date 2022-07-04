@@ -23,7 +23,7 @@ void ExamplePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
             move_tactics[k]->updateControlParams(
                 world.ball().position() +
                     Vector::createFromAngle(angle_between_robots *
-                                            static_cast<double>(k + 1)),
+                                            static_cast<double>(k + 1)).normalize(0.2),
                 (angle_between_robots * static_cast<double>(k + 1)) + Angle::half(), 0);
         }
 
