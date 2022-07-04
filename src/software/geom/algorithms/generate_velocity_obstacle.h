@@ -9,7 +9,7 @@
 /**
  * Set of functions that generate velocity obstacles for an obstacle
  *
- * @param obstacle Static obstacle
+ * @param obstacle The obstacle which the robot is trying to avoid
  * @param robot The robot which the velocity obstacle will be for, represented
  * with a circle
  * @param obstacle_velocity The velocity which the obstacle is moving at
