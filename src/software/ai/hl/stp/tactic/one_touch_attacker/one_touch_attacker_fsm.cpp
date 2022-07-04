@@ -60,12 +60,13 @@ bool OneTouchAttackerFSM::shouldKick(const Update& event)
 void OneTouchAttackerFSM::alignToBall(
     const Update& event, boost::sml::back::process<MoveFSM::Update> processEvent)
 {
-    Vector ball_to_center_vec = Vector(0, 0) - event.common.world.ball().position().toVector();
+    Vector ball_to_center_vec =
+        Vector(0, 0) - event.common.world.ball().position().toVector();
     // We want the kicker to get into position behind the ball facing the center
     // of the field
     MoveFSM::ControlParams control_params{
-        .destination            = event.common.world.ball().position() -
-            ball_to_center_vec.normalize(ROBOT_MAX_RADIUS_METERS * 2),
+        .destination = event.common.world.ball().position() -
+                       ball_to_center_vec.normalize(ROBOT_MAX_RADIUS_METERS * 2),
         .final_orientation      = ball_to_center_vec.orientation(),
         .final_speed            = 0.0,
         .dribbler_mode          = TbotsProto::DribblerMode::OFF,

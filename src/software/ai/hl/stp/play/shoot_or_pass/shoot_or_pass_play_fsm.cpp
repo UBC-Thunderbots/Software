@@ -6,7 +6,6 @@ ShootOrPassPlayFSM::ShootOrPassPlayFSM(TbotsProto::AiConfig ai_config)
     : ai_config(ai_config),
       attacker_tactic(std::make_shared<AttackerTactic>(ai_config)),
       receiver_tactic(std::make_shared<ReceiverTactic>()),
-      align_to_ball_tactic(std::make_shared<MoveTactic>()),
       offensive_positioning_tactics(std::vector<std::shared_ptr<MoveTactic>>()),
       pass_generator(
           PassGenerator<EighteenZoneId>(std::make_shared<const EighteenZonePitchDivision>(
@@ -16,41 +15,33 @@ ShootOrPassPlayFSM::ShootOrPassPlayFSM(TbotsProto::AiConfig ai_config)
       best_pass_and_score_so_far(
           PassWithRating{.pass = Pass(Point(), Point(), 0), .rating = 0}),
       time_since_commit_stage_start(Duration::fromSeconds(0)),
-      min_pass_score_threshold(0),
-      pass_in_progress(Point(), Point(), 0),
-      should_keep_away(true)
+      min_pass_score_threshold(0)
 {
 }
 
-std::vector<std::shared_ptr<MoveTactic>>
-ShootOrPassPlayFSM::updateOffensivePositioningTactics(
+void ShootOrPassPlayFSM::updateOffensivePositioningTactics(
     std::vector<EighteenZoneId> ranked_zones, PassEvaluation<EighteenZoneId> pass_eval,
-    unsigned int num_tactics,
-    std::vector<std::shared_ptr<MoveTactic>> current_offensive_positioning_tactics)
+    unsigned int num_tactics)
 {
-    std::vector<std::shared_ptr<MoveTactic>> new_offensive_positioning_tactics =
-        current_offensive_positioning_tactics;
-
     // These two tactics will set robots to roam around the field, trying to put
     // themselves into a good position to receive a pass
-    if (num_tactics != new_offensive_positioning_tactics.size())
+    if (num_tactics != offensive_positioning_tactics.size())
     {
-        new_offensive_positioning_tactics =
+        offensive_positioning_tactics =
             std::vector<std::shared_ptr<MoveTactic>>(num_tactics);
-        std::generate(new_offensive_positioning_tactics.begin(),
-                      new_offensive_positioning_tactics.end(),
+        std::generate(offensive_positioning_tactics.begin(),
+                      offensive_positioning_tactics.end(),
                       []() { return std::make_shared<MoveTactic>(); });
     }
 
-    for (unsigned int i = 0; i < new_offensive_positioning_tactics.size(); i++)
+    for (unsigned int i = 0; i < offensive_positioning_tactics.size(); i++)
     {
         auto pass1 = pass_eval.getBestPassInZones({ranked_zones[i]}).pass;
 
-        new_offensive_positioning_tactics[i]->updateControlParams(
+        offensive_positioning_tactics[i]->updateControlParams(
             pass1.receiverPoint(), pass1.receiverOrientation(), 0.0,
             TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
     }
-    return new_offensive_positioning_tactics;
 }
 
 void ShootOrPassPlayFSM::lookForPass(const Update& event)
@@ -92,9 +83,8 @@ void ShootOrPassPlayFSM::lookForPass(const Update& event)
             1 - std::min(time_since_commit_stage_start.toSeconds() /
                              pass_score_ramp_down_duration,
                          1.0 - abs_min_pass_score);
-        offensive_positioning_tactics = updateOffensivePositioningTactics(
-            ranked_zones, pass_eval, event.common.num_tactics - 1,
-            offensive_positioning_tactics);
+        updateOffensivePositioningTactics(ranked_zones, pass_eval,
+                                          event.common.num_tactics - 1);
 
         ret_tactics[1].insert(ret_tactics[1].end(), offensive_positioning_tactics.begin(),
                               offensive_positioning_tactics.end());
@@ -104,8 +94,7 @@ void ShootOrPassPlayFSM::lookForPass(const Update& event)
 
 void ShootOrPassPlayFSM::startLookingForPass(const Update& event)
 {
-    attacker_tactic = std::make_shared<AttackerTactic>(ai_config);
-    attacker_tactic->updateShouldKeepAway(should_keep_away);
+    attacker_tactic              = std::make_shared<AttackerTactic>(ai_config);
     receiver_tactic              = std::make_shared<ReceiverTactic>();
     pass_optimization_start_time = event.common.world.getMostRecentTimestamp();
     lookForPass(event);
@@ -130,9 +119,8 @@ void ShootOrPassPlayFSM::takePass(const Update& event)
 
         if (event.common.num_tactics > 2)
         {
-            offensive_positioning_tactics = updateOffensivePositioningTactics(
-                ranked_zones, pass_eval, event.common.num_tactics - 2,
-                offensive_positioning_tactics);
+            updateOffensivePositioningTactics(ranked_zones, pass_eval,
+                                              event.common.num_tactics - 2);
             ret_tactics[1].insert(ret_tactics[1].end(),
                                   offensive_positioning_tactics.begin(),
                                   offensive_positioning_tactics.end());
@@ -145,9 +133,8 @@ void ShootOrPassPlayFSM::takePass(const Update& event)
         PriorityTacticVector ret_tactics = {{receiver_tactic}, {}};
         if (event.common.num_tactics > 1)
         {
-            offensive_positioning_tactics = updateOffensivePositioningTactics(
-                ranked_zones, pass_eval, event.common.num_tactics - 1,
-                offensive_positioning_tactics);
+            updateOffensivePositioningTactics(ranked_zones, pass_eval,
+                                              event.common.num_tactics - 1);
             ret_tactics[1].insert(ret_tactics[1].end(),
                                   offensive_positioning_tactics.begin(),
                                   offensive_positioning_tactics.end());
@@ -229,71 +216,4 @@ bool ShootOrPassPlayFSM::tookShot(const Update& event)
         (ball_velocity_orientation > ball_to_bot_post_angle);
 
     return ball_oriented_towards_goal && (ball_velocity > ball_shot_threshold);
-}
-
-bool ShootOrPassPlayFSM::hasPassInProgress(const Update& event)
-{
-    return event.common.inter_play_communication.last_committed_pass.has_value();
-}
-
-void ShootOrPassPlayFSM::maintainPassInProgress(const Update& event)
-{
-    best_pass_and_score_so_far =
-        event.common.inter_play_communication.last_committed_pass.value();
-
-    // reset interplay communication
-    event.common.set_inter_play_communication_fun(
-        InterPlayCommunication{.last_committed_pass = std::nullopt});
-}
-
-
-bool ShootOrPassPlayFSM::shouldFreeKick(const Update& event)
-{
-    return true;
-}
-
-void ShootOrPassPlayFSM::freeKickAlignToBall(const Update& event)
-{
-    should_keep_away = false;
-    auto pitch_division =
-        std::make_shared<const EighteenZonePitchDivision>(event.common.world.field());
-
-    PassGenerator<EighteenZoneId> pass_generator(pitch_division,
-                                                 ai_config.passing_config());
-
-    // using Zones = std::unordered_set<EighteenZoneId>;
-
-    auto pass_eval = pass_generator.generatePassEvaluation(event.common.world);
-    best_pass_and_score_so_far = pass_eval.getBestPassOnField();
-
-    auto ranked_zones = pass_eval.rankZonesForReceiving(
-        event.common.world, best_pass_and_score_so_far.pass.receiverPoint());
-
-    // This tactic will move a robot into position to initially take the free-kick
-    updateAlignToBallTactic(align_to_ball_tactic, event.common.world);
-
-    auto offensive_positioning_tactics =
-        ShootOrPassPlayFSM::updateOffensivePositioningTactics(
-            ranked_zones, pass_eval, event.common.num_tactics - 1, {});
-
-    PriorityTacticVector ret_tactics = {{align_to_ball_tactic}, {}};
-    ret_tactics[1].insert(ret_tactics[1].end(), offensive_positioning_tactics.begin(),
-                          offensive_positioning_tactics.end());
-    event.common.set_tactics(ret_tactics);
-}
-bool ShootOrPassPlayFSM::freeKickerAligned(const Update& event)
-{
-    return align_to_ball_tactic->done();
-}
-
-void ShootOrPassPlayFSM::updateAlignToBallTactic(
-    std::shared_ptr<MoveTactic> align_to_ball_tactic, const World& world)
-{
-    Vector ball_to_center_vec = Vector(0, 0) - world.ball().position().toVector();
-    // We want the kicker to get into position behind the ball facing the center
-    // of the field
-    align_to_ball_tactic->updateControlParams(
-        world.ball().position() -
-            ball_to_center_vec.normalize(ROBOT_MAX_RADIUS_METERS * 2),
-        ball_to_center_vec.orientation(), 0);
 }
