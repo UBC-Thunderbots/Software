@@ -84,14 +84,15 @@ void FreeKickPlayFSM::alignToBall(const Update& event)
     // This tactic will move a robot into position to initially take the free-kick
     updateAlignToBallTactic(align_to_ball_tactic, event.common.world);
 
-    auto offensive_positioning_tactics =
-        ShootOrPassPlayFSM::updateOffensivePositioningTactics(
-            ranked_zones, pass_eval, event.common.num_tactics - 1, {});
-
-    PriorityTacticVector ret_tactics = {{align_to_ball_tactic}, {}};
-    ret_tactics[1].insert(ret_tactics[1].end(), offensive_positioning_tactics.begin(),
-                          offensive_positioning_tactics.end());
-    event.common.set_tactics(ret_tactics);
+    //    auto offensive_positioning_tactics =
+    //        ShootOrPassPlayFSM::updateOffensivePositioningTactics(
+    //            ranked_zones, pass_eval, event.common.num_tactics - 1, {});
+    //
+    //    PriorityTacticVector ret_tactics = {{align_to_ball_tactic}, {}};
+    //    ret_tactics[1].insert(ret_tactics[1].end(),
+    //    offensive_positioning_tactics.begin(),
+    //                          offensive_positioning_tactics.end());
+    //    event.common.set_tactics(ret_tactics);
 }
 
 
