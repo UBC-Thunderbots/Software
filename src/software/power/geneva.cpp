@@ -16,8 +16,8 @@ Geneva::Geneva()
 {
     pinMode(DIR, OUTPUT);
     pinMode(PWM, OUTPUT);
-    pinMode(GENEVA_ENCODER_A_PIN, INPUT_PULLDOWN);
-    pinMode(GENEVA_ENCODER_B_PIN, INPUT_PULLDOWN);
+    pinMode(GENEVA_ENCODER_A_PIN, INPUT);
+    pinMode(GENEVA_ENCODER_B_PIN, INPUT);
 
     attachInterrupt(digitalPinToInterrupt(GENEVA_ENCODER_A_PIN), pulseEncoderA, RISING);
     attachInterrupt(digitalPinToInterrupt(GENEVA_ENCODER_B_PIN), pulseEncoderB, RISING);
