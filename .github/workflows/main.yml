@@ -91,7 +91,7 @@ jobs:
             //software:unix_full_system           \
             //software/simulated_tests/...   \
             //software/ai/hl/...             \
-           -//software/field_tests/...      \
+
 
       - name: Upload simulated test proto logs
         uses: actions/upload-artifact@v3
@@ -116,7 +116,7 @@ jobs:
             //software:unix_full_system           \
             //software/simulated_tests/...   \
             //software/ai/hl/...             \
-           -//software/field_tests/...      \
+
 
       - name: Simulated Test Run 3 (Check for errors)
         # Run Simulated Tests a third time and finally check for failures
@@ -126,7 +126,7 @@ jobs:
             //software:unix_full_system           \
             //software/simulated_tests/...   \
             //software/ai/hl/...             \
-           -//software/field_tests/...      \
+
 
   ubuntu-18-software-tests:
     name: Ubuntu 18 Software Tests
