@@ -108,12 +108,12 @@ py_library(
     deps = [
         ":pytest_main",
         "//proto:import_all_protos",
+        "//software/field_tests:field_test_fixture",
         "//software/logger:py_logger",
         "//software/networking:threaded_unix_listener_py",
         "//software/networking:threaded_unix_sender_py",
         "//software/simulated_tests:simulated_test_fixture",
         "//software/simulated_tests:validation",
-        "//software/field_tests:field_test_fixture",
         "//software/thunderscope",
         "//software/thunderscope:binary_context_managers",
         "//software/thunderscope/replay:proto_logger",
