@@ -66,7 +66,7 @@ static const char* HEARTBEAT_GPIO                         = "216";
 static double MECHANICAL_MPS_PER_ELECTRICAL_RPM = 0.000111;
 static double ELECTRICAL_RPM_PER_MECHANICAL_MPS = 1 / MECHANICAL_MPS_PER_ELECTRICAL_RPM;
 
-static double RUNAWAY_PROTECTION_THRESHOLD_MPS = 1.00;
+static double RUNAWAY_PROTECTION_THRESHOLD_MPS = 2.00;
 
 
 extern "C"
@@ -139,6 +139,12 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
         // Make this instance available to the static functions above
         g_motor_service = this;
 
+    // Drive Motor Setup
+    for (uint8_t motor = 0; motor < NUM_DRIVE_MOTORS; motor++)
+    {
+        checkDriverFault(motor);
+    }
+
     // Clear faults by resetting all the chips on the motor board
     reset_gpio.setValue(GpioState::LOW);
     usleep(MICROSECONDS_PER_MILLISECOND * 100);
@@ -160,7 +166,19 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
     checkDriverFault(DRIBBLER_MOTOR_CHIP_SELECT);
     startController(DRIBBLER_MOTOR_CHIP_SELECT, true);
 
+
+    // Calibrate Encoder
+    for (uint8_t motor = 0; motor < NUM_DRIVE_MOTORS; motor++)
+    {
+        startEncoderCalibration(motor);
+    }
+
     sleep(1);
+
+    for (uint8_t motor = 0; motor < NUM_DRIVE_MOTORS; motor++)
+    {
+        endEncoderCalibration(motor);
+    }
 }
 
 MotorService::~MotorService() {}
@@ -473,6 +491,25 @@ WheelSpace_t MotorService::rampWheelVelocity(
         ramp_wheel_velocity = target_wheel_velocity;
     }
 
+    //LOG(CSV) << "ramps.csv" <<
+    //ramp_wheel_velocity[0] << "," <<
+    //ramp_wheel_velocity[1] << "," <<
+    //ramp_wheel_velocity[2] << "," <<
+    //ramp_wheel_velocity[3] << "," <<
+    //delta_target_wheel_velocity [0] << "," <<
+    //delta_target_wheel_velocity[1] << "," <<
+    //delta_target_wheel_velocity[2] << "," <<
+    //delta_target_wheel_velocity[3] << "," <<
+    //current_wheel_velocity[0] << "," <<
+    //current_wheel_velocity[1] << "," <<
+    //current_wheel_velocity[2] << "," <<
+    //current_wheel_velocity[3] << "," <<
+    //target_wheel_velocity[0] << "," <<
+    //target_wheel_velocity[1] << "," <<
+    //target_wheel_velocity[2] << "," <<
+    //target_wheel_velocity[3] << "," <<
+    //max_delta_target_wheel_velocity << "\n";
+
     return ramp_wheel_velocity;
 }
 
@@ -740,7 +777,7 @@ void MotorService::configureHall(uint8_t motor)
             TMC4671_VELOCITY_PHI_E_HAL);
 }
 
-void MotorService::calibrateEncoder(uint8_t motor)
+void MotorService::startEncoderCalibration(uint8_t motor)
 {
     LOG(WARNING) << "Calibrating the encoder, ensure the robot is lifted off the ground";
 
@@ -755,15 +792,19 @@ void MotorService::calibrateEncoder(uint8_t motor)
     writeToControllerOrDieTrying(motor, TMC4671_PHI_E_EXT, 0x00000000);
     writeToControllerOrDieTrying(motor, TMC4671_UQ_UD_EXT, 0x000007F0);
 
-    // Wait for the motor to align with the magnetic axis before zeroing
-    // out the encoder.
-    sleep(1);
+}
+
+void MotorService::endEncoderCalibration(uint8_t motor)
+{
+    LOG(WARNING) << "Calibrating the encoder, ensure the robot is lifted off the ground";
 
     writeToControllerOrDieTrying(motor, TMC4671_ABN_DECODER_COUNT, 0x00000000);
     writeToControllerOrDieTrying(motor, TMC4671_UQ_UD_EXT, 0x00000000);
     writeToControllerOrDieTrying(motor, TMC4671_PHI_E_SELECTION, TMC4671_PHI_E_ABN);
 
     encoder_calibrated_[motor] = true;
+
+    configureDrivePI(motor);
 }
 
 void MotorService::runOpenLoopCalibrationRoutine(uint8_t motor, size_t num_samples)
@@ -870,11 +911,5 @@ void MotorService::startController(uint8_t motor, bool dribbler)
         // Configure to brushless DC motor with 8 pole pairs
         writeToControllerOrDieTrying(motor, TMC4671_MOTOR_TYPE_N_POLE_PAIRS, 0x00030008);
         configureEncoder(motor);
-
-        // Trigger encoder calibration
-        // TODO (#2451) Don't call this here, its not safe because it moves the motors
-        calibrateEncoder(motor);
-
-        configureDrivePI(motor);
     }
 }

@@ -59,7 +59,8 @@ class MotorService
      *
      * @param motor The motor to initialize the encoder for
      */
-    void calibrateEncoder(uint8_t motor);
+    void startEncoderCalibration(uint8_t motor);
+    void endEncoderCalibration(uint8_t motor);
 
     /**
      * Spin the motor in openloop mode (safe to run before encoder initialization)
