@@ -1,10 +1,11 @@
 #include "software/world/ball.h"
 
-#include "shared/constants.h"
-#include "software/physics/physics.h"
-#include "software/geom/algorithms/distance.h"
-#include "software/geom/algorithms/almost_equal.h"
 #include <cmath>
+
+#include "shared/constants.h"
+#include "software/geom/algorithms/almost_equal.h"
+#include "software/geom/algorithms/distance.h"
+#include "software/physics/physics.h"
 
 Ball::Ball(const Point &position, const Vector &velocity, const Timestamp &timestamp,
            const Vector &acceleration)
@@ -64,20 +65,22 @@ Vector Ball::acceleration() const
 
 BallState Ball::estimateFutureState(const Duration &duration_in_future) const
 {
-
     Duration effective_duration(duration_in_future);
 
     Vector future_velocity = calculateFutureVelocity(current_state_.velocity(),
                                                      acceleration_, duration_in_future);
 
-    bool velocities_in_opposite_direction =  std::abs(future_velocity.cross(current_state_.velocity())) < 1e-6;
+    bool velocities_in_opposite_direction =
+        std::abs(future_velocity.cross(current_state_.velocity())) < 1e-6;
 
 
-    if(acceleration_.length() > 0 && velocities_in_opposite_direction){
+    if (acceleration_.length() > 0 && velocities_in_opposite_direction)
+    {
         // this is the time it takes for velocity to accelerate to a stop
-        effective_duration        = Duration::fromSeconds(current_state_.velocity().length() / acceleration_.length());
+        effective_duration = Duration::fromSeconds(current_state_.velocity().length() /
+                                                   acceleration_.length());
 
-        future_velocity    = Vector();
+        future_velocity = Vector();
     }
 
     const Point future_position =
@@ -87,18 +90,20 @@ BallState Ball::estimateFutureState(const Duration &duration_in_future) const
     return BallState(future_position, future_velocity);
 }
 
-std::optional<Duration> Ball::getTimeToMoveDistance(const double distance) const{
+std::optional<Duration> Ball::getTimeToMoveDistance(const double distance) const
+{
     double a = -1 * std::max(1e-6, acceleration_.length());
 
-    double descriminant = std::pow(current_state_.velocity().length(), 2) + 2 * a* distance;
+    double descriminant =
+        std::pow(current_state_.velocity().length(), 2) + 2 * a * distance;
 
-    if (descriminant < 0){
-        return {} ;
+    if (descriminant < 0)
+    {
+        return {};
     }
 
-    //solving for t using quadratic formula applied to kinematic equation
-    double t_total =
-            (-current_state_.velocity().length() + std::sqrt(descriminant)) / a;
+    // solving for t using quadratic formula applied to kinematic equation
+    double t_total = (-current_state_.velocity().length() + std::sqrt(descriminant)) / a;
 
     return Duration::fromSeconds(t_total);
 }

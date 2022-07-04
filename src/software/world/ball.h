@@ -99,12 +99,13 @@ class Ball final
 
 
     /**
-    * Returns the estimated time it will take the ball to move a distance based on its current state
-    *
-    * @param distance the distance from the current position of the ball
-    *
-    * @return Duration of time to move distance
-    */
+     * Returns the estimated time it will take the ball to move a distance based on its
+     * current state
+     *
+     * @param distance the distance from the current position of the ball
+     *
+     * @return Duration of time to move distance
+     */
     std::optional<Duration> getTimeToMoveDistance(double distance) const;
 
     /**

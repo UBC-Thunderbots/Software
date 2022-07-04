@@ -47,7 +47,7 @@ class BallFilter
     /**
      * Creates a new Ball Filter
      */
-    explicit BallFilter(double ball_rolling_acceleration=0);
+    explicit BallFilter(double ball_rolling_acceleration = 0);
 
     /**
      * Update the filter with the new ball detection data, and returns the new

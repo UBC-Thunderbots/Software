@@ -40,7 +40,8 @@ struct DribbleFSM
 
     DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
-    struct InterceptionResult {
+    struct InterceptionResult
+    {
         Point point;
         double final_speed;
     };
@@ -72,7 +73,7 @@ struct DribbleFSM
     // TODO (#1968): Merge this functionality with findBestInterceptForBall in the
     // evaluation folder
     InterceptionResult findInterceptionPoint(const Robot &robot, const Ball &ball,
-                                       const Field &field);
+                                             const Field &field);
 
     /**
      * Gets the destination to dribble the ball to from the update event

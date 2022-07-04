@@ -117,11 +117,8 @@ class Thunderscope(object):
         # Setup MainApp and initialize DockArea
         self.app = pyqtgraph.mkQApp("Thunderscope")
 
-
-        import getpass
-
         # Setup stylesheet
-        #apply_stylesheet(self.app, theme="dark_amber.xml")
+        # apply_stylesheet(self.app, theme="dark_amber.xml")
 
         self.blue_replay_log = blue_replay_log
         self.yellow_replay_log = yellow_replay_log

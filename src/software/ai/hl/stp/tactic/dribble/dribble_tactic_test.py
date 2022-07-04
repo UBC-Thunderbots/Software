@@ -16,33 +16,43 @@ from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
 
 # Unit vectors that represent the angles at which the ball will be moving
-BALL_UNIT_VELOCITIES = [tbots.Vector.createFromAngle(tbots.Angle.fromDegrees(angle)) for angle in [0,5,20,30]]
+BALL_UNIT_VELOCITIES = [
+    tbots.Vector.createFromAngle(tbots.Angle.fromDegrees(angle))
+    for angle in [0, 5, 20, 30]
+]
 
 # slow, medium, and fast ball speeds
-BALL_SPEEDS = [2.0,4.0,6.0]
+BALL_SPEEDS = [2.0, 4.0, 6.0]
 
 BALL_VELOCITIES = [s * u for s in BALL_SPEEDS for u in BALL_UNIT_VELOCITIES]
 
 ROBOT_INITIAL_POSITIONS = [tbots.Field.createSSLDivisionBField().centerPoint()]
 
 # positions relative to robots initial position
-BALL_INITIAL_POSITIONS =  [tbots.Field.createSSLDivisionBField().centerPoint() + tbots.Vector(*p) for p in [(-1,0), (-2,0), (-4,0)] ]
+BALL_INITIAL_POSITIONS = [
+    tbots.Field.createSSLDivisionBField().centerPoint() + tbots.Vector(*p)
+    for p in [(-1, 0), (-2, 0), (-4, 0)]
+]
 
 # cartesian product of parameters
-BASIC_TEST_CASE_PARAMETERS = itertools.product(BALL_INITIAL_POSITIONS, BALL_VELOCITIES, ROBOT_INITIAL_POSITIONS)
+BASIC_TEST_CASE_PARAMETERS = itertools.product(
+    BALL_INITIAL_POSITIONS, BALL_VELOCITIES, ROBOT_INITIAL_POSITIONS
+)
 
 print(BASIC_TEST_CASE_PARAMETERS)
+
+
 @pytest.mark.parametrize(
     "ball_initial_position,ball_initial_velocity,robot_initial_position",
     [
         (
             tbots.Field.createSSLDivisionBField().centerPoint(),
             tbots.Vector(2.0, 0),
-            tbots.Field.createSSLDivisionBField().friendlyGoalpostPos() + tbots.Vector(2,0),
+            tbots.Field.createSSLDivisionBField().friendlyGoalpostPos()
+            + tbots.Vector(2, 0),
         ),
         *BASIC_TEST_CASE_PARAMETERS
         # slow ball
-
     ],
 )
 def test_robot_intercepts_ball(
@@ -91,18 +101,10 @@ def test_robot_intercepts_ball(
     )
 
     # Always Validation
-    always_validation_sequence_set = [
-        [
-            NeverExcessivelyDribbles(),
-        ]
-    ]
+    always_validation_sequence_set = [[NeverExcessivelyDribbles(),]]
 
     # Eventually Validation
-    eventually_validation_sequence_set = [
-        [
-            FriendlyHasBallPossession(),
-        ]
-    ]
+    eventually_validation_sequence_set = [[FriendlyHasBallPossession(),]]
 
     simulated_test_runner.run_test(
         test_timeout_s=5,
