@@ -93,11 +93,11 @@ class Thunderloop
     TbotsProto::ThunderloopStatus thunderloop_status_;
 
     // Current State
+    unsigned int robot_id_;
+    int loop_hz_;
     RobotConstants_t robot_constants_;
-    int robot_id_;
     int channel_id_;
     std::string network_interface_;
-    int loop_hz_;
 
     // Primitive Executor
     PrimitiveExecutor primitive_executor_;

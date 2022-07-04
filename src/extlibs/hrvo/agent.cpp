@@ -65,12 +65,12 @@ void Agent::update()
         else
         {
             path.incrementPathIndex();
-            reached_goal_             = false;
+            reached_goal_ = false;
         }
     }
     else
     {
-        reached_goal_             = false;
+        reached_goal_ = false;
     }
 }
 

@@ -69,7 +69,9 @@ class SimulatorTestRunner(object):
         self.last_exception = None
 
         self.world_buffer = ThreadSafeBuffer(buffer_size=1, protobuf_type=World)
-        self.primitive_set_buffer = ThreadSafeBuffer(buffer_size=1, protobuf_type=PrimitiveSet)
+        self.primitive_set_buffer = ThreadSafeBuffer(
+            buffer_size=1, protobuf_type=PrimitiveSet
+        )
         self.last_exception = None
 
         self.ssl_wrapper_buffer = ThreadSafeBuffer(
@@ -141,18 +143,15 @@ class SimulatorTestRunner(object):
             time_elapsed_s = 0
 
             while time_elapsed_s < test_timeout_s:
-                
+
                 # Check for new CI commands at this time step
-                for (delay,cmd,team) in ci_cmd_with_delay:
+                for (delay, cmd, team) in ci_cmd_with_delay:
                     # If delay matches time
                     if delay <= time_elapsed_s:
                         # send command
-                        self.gamecontroller.send_ci_input(
-                            cmd, team     
-                        )
+                        self.gamecontroller.send_ci_input(cmd, team)
                         # remove command from the list
-                        ci_cmd_with_delay.remove((delay,cmd,team))
-
+                        ci_cmd_with_delay.remove((delay, cmd, team))
 
                 # Update the timestamp logged by the ProtoLogger
                 with self.timestamp_mutex:
@@ -412,8 +411,9 @@ def simulated_test_runner():
 
             # Only validate on the blue worlds
             blue_full_system_proto_unix_io.register_observer(World, runner.world_buffer)
-            blue_full_system_proto_unix_io.register_observer(PrimitiveSet,
-                runner.primitive_set_buffer)
+            blue_full_system_proto_unix_io.register_observer(
+                PrimitiveSet, runner.primitive_set_buffer
+            )
             # Setup proto loggers.
             #
             # NOTE: Its important we use the test runners time provider because

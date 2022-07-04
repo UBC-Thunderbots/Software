@@ -25,10 +25,7 @@ class RobotHalt(Validation):
                   PASSING if the friendly robots' speed is at or below 1e-3
         """
         for robot in world.friendly_team.team_robots:
-            if (
-                    tbots.createVector(robot.current_state.global_velocity).length()
-                    > 1e-3
-            ):
+            if tbots.createVector(robot.current_state.global_velocity).length() > 1e-3:
                 return ValidationStatus.FAILING
         return ValidationStatus.PASSING
 

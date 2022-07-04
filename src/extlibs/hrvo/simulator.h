@@ -147,7 +147,8 @@ class HRVOSimulator
      * @param robot_id The robot id of the friendly robot to update velocity of
      * @param new_velocity New velocity of the friendly robot
      */
-    void updateFriendlyRobotVelocity(const RobotId robot_id, const Vector &new_velocity) const;
+    void updateFriendlyRobotVelocity(const RobotId robot_id,
+                                     const Vector &new_velocity) const;
 
     /**
      * Get friendly HRVO agent from robot id. Returns std::nullopt if agent does not exist

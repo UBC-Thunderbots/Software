@@ -80,6 +80,7 @@ def test_corner_kick_play_bottom_left(simulated_test_runner):
         test_timeout_s=25,
     )
 
+
 def test_corner_kick_play_top_right(simulated_test_runner):
 
     # starting point must be Point
@@ -147,6 +148,7 @@ def test_corner_kick_play_top_right(simulated_test_runner):
         always_validation_sequence_set=always_validation_sequence_set,
         test_timeout_s=25,
     )
+
 
 if __name__ == "__main__":
     # Run the test, -s disables all capturing at -vv increases verbosity

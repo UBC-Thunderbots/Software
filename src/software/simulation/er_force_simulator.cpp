@@ -303,13 +303,16 @@ void ErForceSimulator::setRobotPrimitive(
             static int test = 0;
             if (test++ % 5 == 0)
             {
-                robot_primitive_executor->updateLocalVelocity(local_velocity, createAngle(robot_proto_it->current_state().global_orientation()));
+                robot_primitive_executor->updateLocalVelocity(
+                    local_velocity,
+                    createAngle(robot_proto_it->current_state().global_orientation()));
             }
         }
         else
         {
             LOG(WARNING) << "Robot with ID " << id
-                         << " is assigned a primitive but is not included in the world" << std::endl;
+                         << " is assigned a primitive but is not included in the world"
+                         << std::endl;
         }
     }
     else
@@ -339,7 +342,7 @@ SSLSimulationProto::RobotControl ErForceSimulator::updateSimulatorRobots(
             // Set to NEG_X because the world msg in this simulator is
             // normalized correctly
             auto direct_control = primitive_executor->stepPrimitive(
-                    RobotState(robot_proto_it->current_state()).orientation());
+                RobotState(robot_proto_it->current_state()).orientation());
 
             auto command = *getRobotCommandFromDirectControl(
                 robot_id, std::move(direct_control), robot_constants);

@@ -532,7 +532,7 @@ cc_test(
 py_test(
     name = "free_kick_play_test",
     srcs = ["free_kick_play_test.py"],
-    tags = ["exclusive",],
+    tags = ["exclusive"],
     deps = [
         "//software/simulated_tests:simulated_test_fixture",
         "//software/simulated_tests:validation",

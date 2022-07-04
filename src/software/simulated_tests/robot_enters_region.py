@@ -50,6 +50,7 @@ class RobotEntersRegion(Validation):
     RobotNeverEntersRegion,
 ) = create_validation_types(RobotEntersRegion)
 
+
 class NumberOfRobotsEntersRegion(Validation):
 
     """Checks if a certain number of Robots enters a specific region."""
@@ -76,7 +77,7 @@ class NumberOfRobotsEntersRegion(Validation):
         curr_cnt = 0
         for robot_id in self.robot_in_zone:
             if self.robot_in_zone[robot_id]:
-                curr_cnt +=1
+                curr_cnt += 1
 
         # Validate on curr_cnt
         if curr_cnt == self.req_robot_cnt:
@@ -91,8 +92,11 @@ class NumberOfRobotsEntersRegion(Validation):
         return create_validation_geometry([self.region])
 
     def __repr__(self):
-        return "Check for " + str(self.req_robot_cnt) + " robots in region " + ",".join(
-            repr(self.region)
+        return (
+            "Check for "
+            + str(self.req_robot_cnt)
+            + " robots in region "
+            + ",".join(repr(self.region))
         )
 
 

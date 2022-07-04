@@ -40,14 +40,12 @@ class FriendlyGoalScored(Validation):
         return create_validation_geometry([self.region])
 
     def __repr__(self):
-        return "Checking ball in " + ",".join(
-            repr(self.region)
-        )
+        return "Checking ball in " + ",".join(repr(self.region))
 
 
 (
     FriendlyGoalEventuallyScored,
-    FriendlyGoalEventuallyRemoved, # These two don't make much sense
-    FriendlyGoalAlwaysScored, # These two don't make much sense
+    FriendlyGoalEventuallyRemoved,  # These two don't make much sense
+    FriendlyGoalAlwaysScored,  # These two don't make much sense
     FriendlyGoalNeverScored,
 ) = create_validation_types(FriendlyGoalScored)

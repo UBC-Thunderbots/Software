@@ -18,7 +18,8 @@ PrimitiveExecutor::PrimitiveExecutor(const double time_step, const RobotId robot
 {
 }
 
-void PrimitiveExecutor::updatePrimitiveSet(const TbotsProto::PrimitiveSet& primitive_set_msg)
+void PrimitiveExecutor::updatePrimitiveSet(
+    const TbotsProto::PrimitiveSet &primitive_set_msg)
 {
     hrvo_simulator_.updatePrimitiveSet(primitive_set_msg);
     auto primitive_set_msg_iter = primitive_set_msg.robot_primitives().find(robot_id_);
@@ -28,19 +29,21 @@ void PrimitiveExecutor::updatePrimitiveSet(const TbotsProto::PrimitiveSet& primi
     }
 }
 
-void PrimitiveExecutor::updateWorld(const TbotsProto::World& world_msg)
+void PrimitiveExecutor::updateWorld(const TbotsProto::World &world_msg)
 {
-//    if (robot_id_ == 1)
-//        std::cout << "velocity updated from world" << std::endl;
+    //    if (robot_id_ == 1)
+    //        std::cout << "velocity updated from world" << std::endl;
     hrvo_simulator_.updateWorld(World(world_msg));
 }
 
-void PrimitiveExecutor::updateLocalVelocity(const Vector &local_velocity, const Angle &curr_orientation)
+void PrimitiveExecutor::updateLocalVelocity(const Vector &local_velocity,
+                                            const Angle &curr_orientation)
 {
-//    if (robot_id_ == 1)
-//        std::cout << "velocity updated from sim (actual)" << std::endl;
+    //    if (robot_id_ == 1)
+    //        std::cout << "velocity updated from sim (actual)" << std::endl;
 
-    hrvo_simulator_.updateFriendlyRobotVelocity(robot_id_, local_velocity.rotate(-curr_orientation));
+    hrvo_simulator_.updateFriendlyRobotVelocity(robot_id_,
+                                                local_velocity.rotate(-curr_orientation));
 }
 
 Vector PrimitiveExecutor::getTargetLinearVelocity(const Angle &curr_orientation)
@@ -50,7 +53,7 @@ Vector PrimitiveExecutor::getTargetLinearVelocity(const Angle &curr_orientation)
 }
 
 AngularVelocity PrimitiveExecutor::getTargetAngularVelocity(
-    const TbotsProto::MovePrimitive& move_primitive, const Angle& curr_orientation)
+    const TbotsProto::MovePrimitive &move_primitive, const Angle &curr_orientation)
 {
     const Angle dest_orientation = createAngle(move_primitive.final_angle());
     const double delta_orientation =
@@ -73,10 +76,11 @@ AngularVelocity PrimitiveExecutor::getTargetAngularVelocity(
 }
 
 
-std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimitive(const Angle &curr_orientation)
+std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimitive(
+    const Angle &curr_orientation)
 {
-//    if (robot_id_ == 1)
-//        std::cout << "hrvo sim stepped" << std::endl;
+    //    if (robot_id_ == 1)
+    //        std::cout << "hrvo sim stepped" << std::endl;
 
     hrvo_simulator_.doStep();
 

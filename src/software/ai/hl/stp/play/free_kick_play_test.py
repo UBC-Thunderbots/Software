@@ -11,7 +11,10 @@ from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
 
 # We want to test friendly half, enemy half, and at the border of the field
-@pytest.mark.parametrize("ball_pos",[tbots.Point(1.5,-2.75),tbots.Point(-1.5,-2.75),tbots.Point(1.5,-3)])
+@pytest.mark.parametrize(
+    "ball_pos",
+    [tbots.Point(1.5, -2.75), tbots.Point(-1.5, -2.75), tbots.Point(1.5, -3)],
+)
 def test_free_kick_play(simulated_test_runner, ball_pos):
 
     # starting point must be Point
@@ -80,6 +83,7 @@ def test_free_kick_play(simulated_test_runner, ball_pos):
         always_validation_sequence_set=always_validation_sequence_set,
         test_timeout_s=10,
     )
+
 
 if __name__ == "__main__":
     # Run the test, -s disables all capturing at -vv increases verbosity

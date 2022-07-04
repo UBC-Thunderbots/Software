@@ -44,8 +44,8 @@ def test_halt_play(simulated_test_runner):
     )
 
     # Structure for a delayed call is tuple (delay in seconds, command, team)
-    blue_delayed_ci_call = (3,Command.Type.HALT, Team.BLUE)
-    yellow_delayed_ci_call = (3,Command.Type.HALT, Team.YELLOW)
+    blue_delayed_ci_call = (3, Command.Type.HALT, Team.BLUE)
+    yellow_delayed_ci_call = (3, Command.Type.HALT, Team.YELLOW)
 
     # No plays to override. AI does whatever for 3 seconds before HALT CMD
     # is issued
@@ -71,8 +71,9 @@ def test_halt_play(simulated_test_runner):
         eventually_validation_sequence_set=eventually_validation_sequence_set,
         always_validation_sequence_set=always_validation_sequence_set,
         test_timeout_s=25,
-        ci_cmd_with_delay=[blue_delayed_ci_call, yellow_delayed_ci_call]
+        ci_cmd_with_delay=[blue_delayed_ci_call, yellow_delayed_ci_call],
     )
+
 
 if __name__ == "__main__":
     # Run the test, -s disables all capturing at -vv increases verbosity

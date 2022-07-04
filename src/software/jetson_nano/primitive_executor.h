@@ -34,7 +34,7 @@ class PrimitiveExecutor
      * perspective of the team which the robot with this Primitive Executor is a member
      * of)
      */
-    void updateWorld(const TbotsProto::World& world_msg);
+    void updateWorld(const TbotsProto::World &world_msg);
 
     /**
      * Update primitive executor with the local velocity
@@ -51,7 +51,8 @@ class PrimitiveExecutor
      * Primitive Executor
      * @returns DirectPerWheelControl The per-wheel direct control primitive msg
      */
-    std::unique_ptr<TbotsProto::DirectControlPrimitive> stepPrimitive(const Angle &curr_orientation);
+    std::unique_ptr<TbotsProto::DirectControlPrimitive> stepPrimitive(
+        const Angle &curr_orientation);
 
     /**
      * Update the robot id of the robot which this primitive executor is running on
@@ -81,7 +82,7 @@ class PrimitiveExecutor
      * @returns AngularVelocity The target angular velocity
      */
     AngularVelocity getTargetAngularVelocity(
-        const TbotsProto::MovePrimitive& move_primitive, const Angle& curr_orientation);
+        const TbotsProto::MovePrimitive &move_primitive, const Angle &curr_orientation);
 
     RobotId robot_id_;
     RobotConstants_t robot_constants_;

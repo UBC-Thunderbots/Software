@@ -19,7 +19,7 @@ extern int clock_nanosleep(clockid_t __clock_id, int __flags,
                            __const struct timespec* __req, struct timespec* __rem);
 
 Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, const int loop_hz)
-    : robot_id_(MAX_ROBOT_IDS + 1), // Initialize to a robot ID that is not valid
+    : robot_id_(MAX_ROBOT_IDS + 1),  // Initialize to a robot ID that is not valid
       loop_hz_(loop_hz),
       robot_constants_(robot_constants),
       channel_id_(0),
@@ -78,7 +78,8 @@ Thunderloop::~Thunderloop() {}
             jetson_status_.set_cpu_temperature(getCpuTemperature());
 
             // Grab the latest configs from redis
-            auto robot_id = std::stoi(redis_client_->get(ROBOT_ID_REDIS_KEY));
+            auto robot_id = static_cast<unsigned int>(
+                std::stoul(redis_client_->get(ROBOT_ID_REDIS_KEY)));
             auto channel_id =
                 std::stoi(redis_client_->get(ROBOT_MULTICAST_CHANNEL_REDIS_KEY));
             auto network_interface =
@@ -155,16 +156,30 @@ Thunderloop::~Thunderloop() {}
             // Motor Service: execute the motor control command
             {
                 ScopedTimespecTimer timer(&poll_time);
-                motor_status_ = motor_service_->poll(direct_control_.motor_control());
+                const auto& friendly_robots_proto = world_.friendly_team().team_robots();
+                const auto& robot_iter            = std::find_if(
+                    friendly_robots_proto.begin(), friendly_robots_proto.end(),
+                    [this](const TbotsProto::Robot& robot_proto) {
+                        return robot_proto.id() == this->robot_id_;
+                    });
 
-                // Note: This overrides the velocity calculated by sensor fusion and passed to
-                //       Primitive Executor through the World, as a result, updateLocalVelocity
-                //       must be called after updateWorld and before stepPrimitive.
-                primitive_executor_.updateLocalVelocity(
-                        createVector(motor_status_.local_velocity()), <#initializer#>); // TODO: update call
+                if (robot_iter != friendly_robots_proto.end())
+                {
+                    motor_status_ = motor_service_->poll(direct_control_.motor_control());
+                    const auto& orientation =
+                        robot_iter->current_state().global_orientation();
+                    // Note: This overrides the velocity calculated by sensor fusion and
+                    // passed to
+                    //       Primitive Executor through the World, as a result,
+                    //       updateLocalVelocity must be called after updateWorld and
+                    //       before stepPrimitive.
+                    primitive_executor_.updateLocalVelocity(
+                        createVector(motor_status_.local_velocity()),
+                        createAngle(orientation));
+                }
             }
             thunderloop_status_.set_motor_service_poll_time_ns(
-                    static_cast<unsigned long>(poll_time.tv_nsec));
+                static_cast<unsigned long>(poll_time.tv_nsec));
 
             // Primitive Executor: run the last primitive if we have not timed out
             {
@@ -189,7 +204,7 @@ Thunderloop::~Thunderloop() {}
                 }
 
                 direct_control_ = *primitive_executor_.stepPrimitive(
-                        Angle::fromRadians(robot_state_.global_orientation().radians()));
+                    Angle::fromRadians(robot_state_.global_orientation().radians()));
             }
 
             thunderloop_status_.set_primitive_executor_step_time_ns(

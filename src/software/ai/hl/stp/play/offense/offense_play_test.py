@@ -26,7 +26,7 @@ def test_offense_play(simulated_test_runner):
         tbots.Point(-2, 0.5),
         tbots.Point(-2, -1.7),
         tbots.Point(-2, -1.5),
-        tbots.Point(-2,-0.5),
+        tbots.Point(-2, -0.5),
     ]
 
     yellow_bots = [
@@ -68,7 +68,9 @@ def test_offense_play(simulated_test_runner):
     )
 
     # Always Validation
-    always_validation_sequence_set = [[BallAlwaysStaysInRegion([tbots.Field.createSSLDivisionBField().fieldLines()])]]
+    always_validation_sequence_set = [
+        [BallAlwaysStaysInRegion([tbots.Field.createSSLDivisionBField().fieldLines()])]
+    ]
 
     # Eventually Validation
     eventually_validation_sequence_set = [[FriendlyGoalEventuallyScored()]]

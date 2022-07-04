@@ -51,7 +51,7 @@ HRVOSimulator::HRVOSimulator(float time_step, const RobotConstants_t &robot_cons
       robot_constants(robot_constants),
       global_time(0.0f),
       time_step(time_step),
-        // TODO: Remove
+      // TODO: Remove
       last_time_velocity_updated(0.0f),
       kd_tree(std::make_unique<KdTree>(this)),
       agents(),
@@ -369,7 +369,8 @@ Vector HRVOSimulator::getRobotVelocity(unsigned int robot_id) const
     return Vector();
 }
 
-void HRVOSimulator::updateFriendlyRobotVelocity(const RobotId robot_id, const Vector &new_velocity) const
+void HRVOSimulator::updateFriendlyRobotVelocity(const RobotId robot_id,
+                                                const Vector &new_velocity) const
 {
     auto hrvo_agent = getFriendlyAgentFromRobotId(robot_id);
     if (hrvo_agent.has_value())
