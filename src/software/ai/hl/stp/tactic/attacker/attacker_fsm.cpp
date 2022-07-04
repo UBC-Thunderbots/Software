@@ -79,6 +79,11 @@ void AttackerFSM::keepAway(const Update& event,
         final_dribble_orientation    = dribble_orientation_vec.orientation();
     }
 
+    if (!event.control_params.should_keep_away)
+    {
+        keepaway_dribble_dest = event.common.robot.position();
+    }
+
     control_params = {.dribble_destination       = keepaway_dribble_dest,
                       .final_dribble_orientation = final_dribble_orientation,
                       .allow_excessive_dribbling = false};

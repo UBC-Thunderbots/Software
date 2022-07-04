@@ -39,6 +39,8 @@ class AttackerTactic : public Tactic
      */
     void updateControlParams(std::optional<Point> chip_target);
 
+    void updateShouldKeepAway(bool should_keep_away);
+
     void accept(TacticVisitor& visitor) const override;
 
     DEFINE_TACTIC_DONE_AND_GET_FSM_STATE
@@ -55,6 +57,8 @@ class AttackerTactic : public Tactic
     // The point the robot will chip towards if it is unable to shoot and is in danger
     // of losing the ball to an enemy
     std::optional<Point> chip_target;
+
+    bool should_keep_away;
 
     // AI config
     TbotsProto::AiConfig ai_config;

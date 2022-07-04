@@ -31,6 +31,8 @@ struct AttackerFSM
         // The point the robot will chip towards if it is unable to shoot and is in danger
         // of losing the ball to an enemy
         std::optional<Point> chip_target;
+        // Whether we should keep away
+        bool should_keep_away = true;
     };
 
     DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
