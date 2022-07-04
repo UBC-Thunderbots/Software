@@ -119,11 +119,12 @@ const Point PenaltyKickFSM::evaluateNextShotPosition(std::optional<Robot> enemy_
 void PenaltyKickFSM::shoot(const Update &event,
                            boost::sml::back::process<KickFSM::Update> processEvent)
 {
-    KickFSM::ControlParams control_params{
-        .kick_origin                  = event.common.world.ball().position(),
-        .kick_direction               = shot_angle,
-        .kick_speed_meters_per_second = PENALTY_KICK_SHOT_SPEED};
-    processEvent(KickFSM::Update(control_params, event.common));
+    // TODO: fix this
+    //    KickFSM::ControlParams control_params{
+    //        .kick_origin                  = event.common.world.ball().position(),
+    //        .kick_direction               = shot_angle,
+    //        .kick_speed_meters_per_second = PENALTY_KICK_SHOT_SPEED};
+    //    processEvent(KickFSM::Update(control_params, event.common));
 }
 
 void PenaltyKickFSM::updateApproachKeeper(

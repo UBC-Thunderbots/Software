@@ -100,6 +100,15 @@ void ShootOrPassPlayFSM::startLookingForPass(const Update& event)
     lookForPass(event);
 }
 
+void ShootOrPassPlayFSM::freeKickStartLookingForPass(const Update& event)
+{
+    attacker_tactic = std::make_shared<AttackerTactic>(ai_config);
+    attacker_tactic->updateShouldOneTouch(true);
+    receiver_tactic              = std::make_shared<ReceiverTactic>();
+    pass_optimization_start_time = event.common.world.getMostRecentTimestamp();
+    lookForPass(event);
+}
+
 void ShootOrPassPlayFSM::takePass(const Update& event)
 {
     auto pass_eval = pass_generator.generatePassEvaluation(event.common.world);
@@ -216,4 +225,9 @@ bool ShootOrPassPlayFSM::tookShot(const Update& event)
         (ball_velocity_orientation > ball_to_bot_post_angle);
 
     return ball_oriented_towards_goal && (ball_velocity > ball_shot_threshold);
+}
+
+bool ShootOrPassPlayFSM::shouldFreeKick(const Update& event)
+{
+    return event.control_params.should_one_touch;
 }

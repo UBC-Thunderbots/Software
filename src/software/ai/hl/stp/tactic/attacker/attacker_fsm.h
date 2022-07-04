@@ -33,8 +33,8 @@ struct AttackerFSM
         // The point the robot will chip towards if it is unable to shoot and is in danger
         // of losing the ball to an enemy
         std::optional<Point> chip_target;
-        // Whether we should keep away
-        bool should_keep_away = true;
+        // Whether we should one touch the ball
+        bool should_one_touch = false;
     };
 
     DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
@@ -95,9 +95,11 @@ struct AttackerFSM
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
             *MoveFSM_S + Update_E[!shouldOneTouch_G] / keepAway_A = DribbleFSM_S,
-            MoveFSM_S + Update_E[shouldKick_G] / oneTouchKick_A   = KickFSM_S,
+            // one touch attacking
+            MoveFSM_S + Update_E[shouldKick_G] / oneTouchKick_A = KickFSM_S,
             MoveFSM_S + Update_E[!shouldKick_G] / alignToBall_A,
             KickFSM_S + Update_E / oneTouchKick_A, KickFSM_S = X,
+            // dribble allowed attacking
             DribbleFSM_S + Update_E[shouldKick_G] / pivotKick_A = PivotKickFSM_S,
             DribbleFSM_S + Update_E[!shouldKick_G] / keepAway_A,
             PivotKickFSM_S + Update_E / pivotKick_A, PivotKickFSM_S = X,

@@ -47,6 +47,8 @@ void OffensePlay::updateTactics(const PlayUpdate &play_update)
                                play_update.world.ball().position().x() /
                                (play_update.world.field().fieldLines().xMax() / 3.0)));
         }
+
+        shoot_or_pass_play->updateControlParams(true);
     }
     else if (num_enemy_robots <= 3)
     {

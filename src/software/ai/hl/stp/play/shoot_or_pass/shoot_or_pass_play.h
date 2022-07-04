@@ -16,6 +16,8 @@ class ShootOrPassPlay : public Play
     void updateTactics(const PlayUpdate &play_update) override;
     std::vector<std::string> getState() override;
 
+    void updateControlParams(bool should_one_touch);
+
    private:
     FSM<ShootOrPassPlayFSM> fsm;
     ShootOrPassPlayFSM::ControlParams control_params;
