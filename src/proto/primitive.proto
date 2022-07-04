@@ -3,6 +3,7 @@ syntax = "proto3";
 package TbotsProto;
 
 import "proto/geometry.proto";
+import "proto/geneva_slot.proto";
 import "google/protobuf/descriptor.proto";
 
 extend google.protobuf.EnumValueOptions
@@ -97,16 +98,8 @@ message PowerControl
         float rotation_speed_rpm = 2;
     }
 
-    enum ChargeMode
-    {
-        DISCHARGE = 0;
-        CHARGE    = 1;
-        FLOAT     = 2;
-    }
-
-    ChickerControl chicker = 1;
-    GenevaControl geneva   = 2;
-    ChargeMode charge_mode = 3;
+    ChickerControl chicker  = 1;
+    Geneva.Slot geneva_slot = 2;
 }
 
 message Primitive

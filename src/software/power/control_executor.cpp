@@ -14,25 +14,22 @@ void ControlExecutor::execute(const TbotsProto_PowerControl& control)
     switch (control.chicker.which_chicker_command)
     {
         case TbotsProto_PowerControl_ChickerControl_kick_speed_m_per_s_tag:
-            detachInterrupt(digitalPinToInterrupt(BREAK_BEAM_PIN));
             chicker->setKickSpeedMPerS(
                 control.chicker.chicker_command.kick_speed_m_per_s);
-            charger->setChargeDoneCallbackOnce(&chicker->kick);
-            if (control.geneva.angle_deg != geneva->getCurrentAngle())
+            if (control.geneva_slot != geneva->getCurrentSlot())
             {
-                geneva->setAngle(control.geneva.angle_deg, &charger->chargeCapacitors);
+                geneva->setRotationDoneCallbackOnce(&chicker->kick);
+                geneva->setSlot(control.geneva_slot);
             }
             else
             {
-                charger->chargeCapacitors();
+                chicker->kick();
             }
             break;
         case TbotsProto_PowerControl_ChickerControl_chip_distance_meters_tag:
-            detachInterrupt(digitalPinToInterrupt(BREAK_BEAM_PIN));
             chicker->setChipDistanceMeters(
                 control.chicker.chicker_command.chip_distance_meters);
-            charger->setChargeDoneCallbackOnce(&chicker->chip);
-            charger->chargeCapacitors();
+            chicker->chip();
             break;
         case TbotsProto_PowerControl_ChickerControl_auto_chip_or_kick_tag:
             detachInterrupt(digitalPinToInterrupt(BREAK_BEAM_PIN));
@@ -43,41 +40,28 @@ void ControlExecutor::execute(const TbotsProto_PowerControl& control)
                     chicker->setKickSpeedMPerS(
                         control.chicker.chicker_command.auto_chip_or_kick
                             .auto_chip_or_kick.autokick_speed_m_per_s);
-                    charger->setChargeDoneCallbackOnce(&chicker->autokick);
-                    if (control.geneva.angle_deg != geneva->getCurrentAngle())
+                    if (control.geneva_slot != geneva->getCurrentSlot())
                     {
-                        geneva->setAngle(control.geneva.angle_deg,
-                                         &charger->chargeCapacitors);
+                        geneva->setRotationDoneCallbackOnce(&chicker->autokick);
+                        geneva->setSlot(control.geneva_slot);
                     }
                     else
                     {
-                        charger->chargeCapacitors();
+                        chicker->autokick();
                     }
                     break;
                 case TbotsProto_AutoChipOrKick_autochip_distance_meters_tag:
                     chicker->setChipDistanceMeters(
                         control.chicker.chicker_command.auto_chip_or_kick
                             .auto_chip_or_kick.autochip_distance_meters);
-                    charger->setChargeDoneCallbackOnce(&chicker->autochip);
-                    charger->chargeCapacitors();
+                    chicker->autochip();
                     break;
                 default:
                     break;
             }
             break;
         default:
-            switch (control.charge_mode)
-            {
-                case TbotsProto_PowerControl_ChargeMode_CHARGE:
-                    charger->chargeCapacitors();
-                    break;
-                case TbotsProto_PowerControl_ChargeMode_DISCHARGE:
-                    charger->dischargeCapacitors();
-                    break;
-                case TbotsProto_PowerControl_ChargeMode_FLOAT:
-                default:
-                    break;
-            }
+            geneva->setSlot(control.geneva_slot);
             break;
     }
 }

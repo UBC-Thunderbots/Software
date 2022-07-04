@@ -65,8 +65,18 @@ class Chicker
      * Called on a pulse_timer to bring the CHIPPER/KICKER pin low
      */
     static void stopPulse();
+
+    /**
+     * Called on a cooldown_timer to set the on_cooldown variable back to false
+     */
+    static void offCooldown();
+
     static hw_timer_t* pulse_timer;
     static volatile bool breakbeam_tripped;
+
+    static hw_timer_t* cooldown_timer;
+    static volatile bool on_cooldown;
+    static constexpr int COOLDOWN_MICROSECONDS = 3 * MICROSECONDS_IN_SECOND;
 
     static float kick_speed_m_per_s;
     static float chip_distance_meters;
