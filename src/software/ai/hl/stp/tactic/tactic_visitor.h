@@ -17,6 +17,7 @@ class KickoffChipTactic;
 class MoveTactic;
 class MoveTestTactic;
 class AttackerTactic;
+class OneTouchAttackerTactic;
 class PenaltyKickTactic;
 class PenaltySetupTactic;
 class PivotKickTactic;
@@ -53,6 +54,7 @@ class TacticVisitor
     virtual void visit(const MoveTactic &tactic)                 = 0;
     virtual void visit(const MoveTestTactic &tactic)             = 0;
     virtual void visit(const AttackerTactic &tactic)             = 0;
+    virtual void visit(const OneTouchAttackerTactic &tactic)     = 0;
     virtual void visit(const PenaltyKickTactic &tactic)          = 0;
     virtual void visit(const PenaltySetupTactic &tactic)         = 0;
     virtual void visit(const PivotKickTactic &tactic)            = 0;

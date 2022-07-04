@@ -17,13 +17,12 @@ OneTouchAttackerTactic::OneTouchAttackerTactic(TbotsProto::AiConfig ai_config)
     for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)
     {
         fsm_map[id] = std::make_unique<FSM<OneTouchAttackerFSM>>(
-            DribbleFSM(ai_config.dribble_tactic_config()),
-            OneTouchAttackerFSM(ai_config.attacker_tactic_config()));
+            GetBehindBallFSM(), OneTouchAttackerFSM(ai_config.attacker_tactic_config()));
     }
 }
 
 void OneTouchAttackerTactic::updateControlParams(const Pass& best_pass_so_far,
-                                         bool pass_committed)
+                                                 bool pass_committed)
 {
     // Update the control parameters stored by this Tactic
     this->best_pass_so_far = best_pass_so_far;
@@ -46,13 +45,13 @@ void OneTouchAttackerTactic::accept(TacticVisitor& visitor) const
     visitor.visit(*this);
 }
 
-void OneTouchAttackerTactic::updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm)
+void OneTouchAttackerTactic::updatePrimitive(const TacticUpdate& tactic_update,
+                                             bool reset_fsm)
 {
     if (reset_fsm)
     {
         fsm_map[tactic_update.robot.id()] = std::make_unique<FSM<OneTouchAttackerFSM>>(
-            DribbleFSM(ai_config.dribble_tactic_config()),
-            OneTouchAttackerFSM(ai_config.attacker_tactic_config()));
+            GetBehindBallFSM(), OneTouchAttackerFSM(ai_config.attacker_tactic_config()));
     }
 
     std::optional<Shot> shot = calcBestShotOnGoal(

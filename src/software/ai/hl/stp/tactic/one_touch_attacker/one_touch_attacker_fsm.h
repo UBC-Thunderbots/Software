@@ -2,8 +2,8 @@
 
 #include "proto/parameters.pb.h"
 #include "software/ai/evaluation/shot.h"
-#include "software/ai/hl/stp/tactic/chip/chip_fsm.h"
 #include "software/ai/hl/stp/tactic/kick/kick_fsm.h"
+#include "software/ai/hl/stp/tactic/move/move_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/passing/pass.h"
 
@@ -41,24 +41,6 @@ struct OneTouchAttackerFSM
     DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
     /**
-     * Action that updates the PivotKickFSM to shoot or pass
-     *
-     * @param event OneTouchAttackerFSM::Update event
-     * @param processEvent processes the PivotKickFSM::Update
-     */
-    void pivotKick(const Update& event,
-                   boost::sml::back::process<PivotKickFSM::Update> processEvent);
-
-    /**
-     * Action that updates the DribbleFSM to keep the ball away
-     *
-     * @param event OneTouchAttackerFSM::Update event
-     * @param processEvent processes the DribbleFSM::Update
-     */
-    void keepAway(const Update& event,
-                  boost::sml::back::process<DribbleFSM::Update> processEvent);
-
-    /**
      * Guard that checks if the ball should be kicked, which is when there's a nearby
      * enemy or a good pass/shot
      *
@@ -68,8 +50,10 @@ struct OneTouchAttackerFSM
      */
     bool shouldKick(const Update& event);
 
-    void kickBall(const Update& event);
-    void alignToBall(const Update& event);
+    void kickBall(const Update& event,
+                  boost::sml::back::process<KickFSM::Update> processEvent);
+    void alignToBall(const Update& event,
+                     boost::sml::back::process<MoveFSM::Update> processEvent);
 
 
     auto operator()()
@@ -77,18 +61,18 @@ struct OneTouchAttackerFSM
         using namespace boost::sml;
 
         DEFINE_SML_STATE(KickFSM)
-        DEFINE_SML_STATE(AlignToBallState)
+        DEFINE_SML_STATE(MoveFSM)
         DEFINE_SML_EVENT(Update)
 
         DEFINE_SML_GUARD(shouldKick)
-        DEFINE_SML_ACTION(alignToBall)
-        DEFINE_SML_ACTION(kickBall)
+        DEFINE_SML_SUB_FSM_UPDATE_ACTION(kickBall, KickFSM)
+        DEFINE_SML_SUB_FSM_UPDATE_ACTION(alignToBall, MoveFSM)
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *AlignToBallState_S + Update_E[shouldKick_G] / kickBall_A = KickState_S,
-            AlignToBallState_S + Update_E[!shouldKick_G] / alignToBall_A,
-            KickState_S + Update_E / kickBall_A, KickState_S = X,
+            *MoveFSM_S + Update_E[shouldKick_G] / kickBall_A = KickFSM_S,
+            MoveFSM_S + Update_E[!shouldKick_G] / alignToBall_A,
+            KickFSM_S + Update_E / kickBall_A, KickFSM_S = X,
             X + Update_E / SET_STOP_PRIMITIVE_ACTION = X);
     }
 
