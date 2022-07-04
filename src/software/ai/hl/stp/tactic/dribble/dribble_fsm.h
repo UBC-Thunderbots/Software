@@ -40,6 +40,11 @@ struct DribbleFSM
 
     DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
+    struct InterceptionResult {
+        Point point;
+        double final_speed;
+    };
+
     /**
      * Converts the ball position to the robot's position given the direction that the
      * robot faces the ball
@@ -66,7 +71,7 @@ struct DribbleFSM
      */
     // TODO (#1968): Merge this functionality with findBestInterceptForBall in the
     // evaluation folder
-    static Point findInterceptionPoint(const Robot &robot, const Ball &ball,
+    InterceptionResult findInterceptionPoint(const Robot &robot, const Ball &ball,
                                        const Field &field);
 
     /**
