@@ -58,7 +58,7 @@ class PrimitiveExecutor
      * @returns DirectPerWheelControl The per-wheel direct control primitive msg
      */
     std::unique_ptr<TbotsProto::DirectControlPrimitive> stepPrimitive(
-        const unsigned int robot_id, const Angle& curr_orientation);
+        const unsigned int robot_id, const RobotState& robot_state);
 
    private:
     /*
@@ -72,6 +72,13 @@ class PrimitiveExecutor
      */
     Vector getTargetLinearVelocity(const unsigned int robot_id,
                                    const Angle& curr_orientation);
+
+    Vector getTargetLinearVelocity(const TbotsProto::MovePrimitive& move_primitive,
+                                   const RobotState& robot_state);
+
+    double getTargetLinearSpeed(const TbotsProto::MovePrimitive& move_primitive,
+                                const RobotState& robot_state);
+
 
     /*
      * Compute the next target angular velocity the robot should be at

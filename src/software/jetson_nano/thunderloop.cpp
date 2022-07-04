@@ -196,11 +196,9 @@ void Thunderloop::runLoop()
 
                 if (robot.has_value())
                 {
-                    current_orientation_ = robot->currentState().orientation();
-                }
-
                 direct_control_ =
-                    *primitive_executor_.stepPrimitive(robot_id_, current_orientation_);
+                    *primitive_executor_.stepPrimitive(robot_id_, robot->currentState());
+                }
             }
 
             thunderloop_status_.set_primitive_executor_step_time_ns(
@@ -209,7 +207,7 @@ void Thunderloop::runLoop()
             // Power Service: execute the power control command
             {
                 ScopedTimespecTimer timer(&poll_time);
-                power_status_ = power_service_->poll(direct_control_.power_control());
+                //power_status_ = power_service_->poll(direct_control_.power_control());
             }
             thunderloop_status_.set_power_service_poll_time_ns(
                 static_cast<unsigned long>(poll_time.tv_nsec));
