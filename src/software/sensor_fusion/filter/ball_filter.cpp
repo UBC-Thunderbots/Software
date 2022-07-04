@@ -21,7 +21,7 @@ std::optional<Ball> BallFilter::estimateBallState(
     const std::vector<BallDetection> &new_ball_detections, const Rectangle &filter_area)
 {
     addNewDetectionsToBuffer(new_ball_detections, filter_area);
-    return estimateBallStateFromBuffer(ball_detection_buffer);
+    return estimateBallStateFromBuffer(ball_detection_buffer, ball_rolling_acceleration);
 }
 
 void BallFilter::addNewDetectionsToBuffer(std::vector<BallDetection> new_ball_detections,
@@ -104,7 +104,7 @@ void BallFilter::addNewDetectionsToBuffer(std::vector<BallDetection> new_ball_de
 }
 
 std::optional<Ball> BallFilter::estimateBallStateFromBuffer(
-    boost::circular_buffer<BallDetection> ball_detections)
+    boost::circular_buffer<BallDetection> ball_detections, double ball_rolling_acceleration=0)
 {
     // Sort the detections in decreasing order before processing. This places the most
     // recent detections (with the largest timestamp) at the front of the buffer, and the
@@ -145,12 +145,11 @@ std::optional<Ball> BallFilter::estimateBallStateFromBuffer(
                          ball_detections.front().distance_from_ground);
     Vector acceleration = Vector();
 
-    // todo dependency inject
-    double rolling_acceleration = -0.5;
+
     if (estimated_velocity->average_velocity.length() < 0.1)
     {
         acceleration =
-            -1 * std::abs(rolling_acceleration) * estimated_velocity->average_velocity;
+            -1 * std::abs(ball_rolling_acceleration) * estimated_velocity->average_velocity;
     }
 
     return Ball(ball_state, ball_detections.front().timestamp, acceleration);

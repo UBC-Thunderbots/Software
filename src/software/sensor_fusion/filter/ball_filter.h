@@ -109,7 +109,7 @@ class BallFilter
      * calculated, returns std::nullopt
      */
     static std::optional<Ball> estimateBallStateFromBuffer(
-        boost::circular_buffer<BallDetection> ball_detections);
+        boost::circular_buffer<BallDetection> ball_detections, double ball_rolling_acceleration);
 
     /**
      * Returns how large the buffer of ball detections should be based on the ball's

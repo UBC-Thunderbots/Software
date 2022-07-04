@@ -51,7 +51,13 @@ print(BASIC_TEST_CASE_PARAMETERS)
             tbots.Field.createSSLDivisionBField().friendlyGoalpostPos()
             + tbots.Vector(2, 0),
         ),
-        *BASIC_TEST_CASE_PARAMETERS
+        (
+                tbots.Field.createSSLDivisionBField().centerPoint(),
+                tbots.Vector(2.0, 0),
+                tbots.Field.createSSLDivisionBField().friendlyGoalpostPos()
+                + tbots.Vector(2, 0),
+        ),
+
         # slow ball
     ],
 )

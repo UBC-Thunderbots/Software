@@ -139,6 +139,13 @@ message GoalieTacticConfig
         [default = 0.2, (bounds).min_double_value = 0.1, (bounds).max_double_value = 0.5];
 }
 
+message KickTacticConfig
+{
+    // percentage of a robots speed that is transferred to the ball in a collision
+    required double percent_robot_speed_transferred_to_ball = 1
+    [default = 0.5, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
+}
+
 message DribbleTacticConfig
 {
     // If ball and front of robot are separated by this amount, then we've lost
