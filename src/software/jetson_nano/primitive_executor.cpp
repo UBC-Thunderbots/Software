@@ -83,7 +83,7 @@ Vector PrimitiveExecutor::getTargetLinearVelocity(const unsigned int robot_id,
         float target_linear_speed = max_target_linear_speed;
         if (norm_dist_delta < start_linear_deceleration_distance)
         {
-            target_linear_speed = max_target_linear_speed * fminf(norm_dist_delta, 1.2f);
+            target_linear_speed = max_target_linear_speed * fminf(norm_dist_delta, 0.4f);
         }
 
         Vector target_global_velocity = final_position - robot_state.position();

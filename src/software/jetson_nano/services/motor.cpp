@@ -17,6 +17,7 @@
 #include <sys/resource.h>  // needed for getrusage
 #include <sys/time.h>      // needed for getrusage
 #include <unistd.h>        // needed for sysconf(int name);
+#include "software/util/scoped_timespec_timer/scoped_timespec_timer.h"
 
 #include <bitset>
 
@@ -417,18 +418,6 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
     {
         tmc4671_setTargetVelocity(DRIBBLER_MOTOR_CHIP_SELECT, target_dribbler_rpm);
         previous_dribbler_rpm = target_dribbler_rpm;
-    }
-
-    // Toggle Hearbeat
-    if (heartbeat_state == 1)
-    {
-        heartbeat_gpio.setValue(GpioState::LOW);
-        heartbeat_state = 0;
-    }
-    else
-    {
-        heartbeat_gpio.setValue(GpioState::HIGH);
-        heartbeat_state = 1;
     }
 
     return motor_status;

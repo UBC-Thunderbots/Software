@@ -81,15 +81,6 @@ void Thunderloop::runLoop()
             redis_client_->set("/current_draw",
                                std::to_string(power_status_.current_draw()));
 
-            if (power_status_.battery_voltage() < 20.0)
-            {
-                LOG(WARNING) << "BATTERY LEVEL TOO LOW, GTFO";
-            }
-            else if (power_status_.battery_voltage() < 21.0)
-            {
-                LOG(WARNING) << "LOW BATTERY LEVEL!";
-            }
-
             // Wait until next shot
             //
             // Note: CLOCK_MONOTONIC is used over CLOCK_REALTIME since

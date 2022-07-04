@@ -79,34 +79,6 @@ static const unsigned MOTOR_SPI_COMMUNICATION_STACK_SIZE = 100 * 1024;
 // showNewPagefaultCount("Caused by using thread stack", "0", "0");
 //}
 
-static void error(int at)
-{
-    /* Just exit on error */
-    fprintf(stderr, "Some error occurred at %d", at);
-    exit(1);
-}
-
-static void startRtThread(void* (*thread_main)(void*), void* arg, unsigned stack_size)
-{
-    pthread_t thread;
-    pthread_attr_t attr;
-
-    // init to default values
-    if (pthread_attr_init(&attr))
-    {
-        error(1);
-    }
-
-    // Set the requested stacksize for this thread
-    if (pthread_attr_setstacksize(&attr, PTHREAD_STACK_MIN + stack_size))
-    {
-        error(2);
-    }
-
-    // And finally start the actual thread
-    pthread_create(&thread, &attr, thread_main, arg);
-}
-
 /*
  * Configure malloc for real-time linux
  *
@@ -172,8 +144,7 @@ int main(int argc, char** argv)
     reserveProcessMemory(pre_allocation_size);
 
     static auto thunderloop = Thunderloop(create2021RobotConstants(), CONTROL_LOOP_HZ);
-    startRtThread(thunderloop.runThunderloopRealtime, &thunderloop,
-                  MOTOR_SPI_COMMUNICATION_STACK_SIZE);
+    thunderloop.runLoop();
 
     std::promise<void>().get_future().wait();
 
