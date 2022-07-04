@@ -104,7 +104,6 @@ Vector PrimitiveExecutor::getTargetLinearVelocity(const unsigned int robot_id,
 //=======
     Vector target_global_velocity = hrvo_simulator_.getRobotVelocity(robot_id);
     return target_global_velocity.rotate(-curr_orientation);
-//>>>>>>> jonathan/hrvo_responsiveness_oscillation
 }
 
 AngularVelocity PrimitiveExecutor::getTargetAngularVelocity(

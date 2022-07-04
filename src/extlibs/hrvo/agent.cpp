@@ -27,7 +27,7 @@ void Agent::update()
     }
 
     const Vector dv            = new_velocity_ - velocity_;
-    double max_allowed_delta_v = max_accel_ * 100 * simulator_->getTimeStep();
+    double max_allowed_delta_v = 1000000;
     if (dv.length() < max_allowed_delta_v || dv.length() == 0.f)
     {
         velocity_ = new_velocity_;
