@@ -46,10 +46,10 @@ void KdTree::build()
 
     for (std::size_t i = 0; i < simulator_->agents.size(); ++i)
     {
-	if (simulator_->agents[i].has_value())
-	{
-       		agents_.push_back(i);
-	}
+        if (simulator_->agents[i].has_value())
+        {
+            agents_.push_back(i);
+        }
     }
 
     nodes_.resize(std::max(2 * simulator_->agents.size() - 1, nodes_.size()));
@@ -71,10 +71,6 @@ void KdTree::buildRecursive(std::size_t begin, std::size_t end, std::size_t node
 
     for (std::size_t i = begin + 1; i < end; ++i)
     {
-	if (!simulator_->agents[agents_[i]].has_value())
-    	{
-		continue;
-	}
         float agent_x = simulator_->agents[agents_[i]].value()->getPosition().x();
         if (agent_x > nodes_[node].maxX_)
         {
@@ -111,15 +107,18 @@ void KdTree::buildRecursive(std::size_t begin, std::size_t end, std::size_t node
             while (left <= right &&
                    (vertical
                         ? simulator_->agents[agents_[left]].value()->getPosition().x()
-                        : simulator_->agents[agents_[left]].value()->getPosition().y()) < split)
+                        : simulator_->agents[agents_[left]].value()->getPosition().y()) <
+                       split)
             {
                 ++left;
             }
 
-            while (right >= left &&
-                   (vertical
-                        ? simulator_->agents[agents_[right]].value()->getPosition().x()
-                        : simulator_->agents[agents_[right]].value()->getPosition().y()) >= split)
+            while (
+                right >= left &&
+                (vertical
+                     ? simulator_->agents[agents_[right]].value()->getPosition().x()
+                     : simulator_->agents[agents_[right]].value()->getPosition().y()) >=
+                    split)
             {
                 --right;
             }

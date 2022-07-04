@@ -169,7 +169,7 @@ class HRVOSimulator
      * Get the list of Agents in this simulator
      * @return List of Agents
      */
-    //const std::list<std::shared_ptr<Agent>> &getAgents() const;
+    // const std::list<std::shared_ptr<Agent>> &getAgents() const;
 
     /**
      * Get the Vector of agents in this simulator

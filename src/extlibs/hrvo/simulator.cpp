@@ -55,8 +55,8 @@ HRVOSimulator::HRVOSimulator(float time_step, const RobotConstants_t &robot_cons
       reached_goals(false),
       kd_tree(std::make_unique<KdTree>(this)),
       agents(),
-	  friendly_robot_id_map(),
-	  enemy_robot_id_map(),
+      friendly_robot_id_map(),
+      enemy_robot_id_map(),
       friendly_team_colour(friendly_team_colour)
 {
 }
@@ -90,25 +90,30 @@ void HRVOSimulator::updateWorld(const World &world)
         }
         else
         {
-            friendly_robot_id_map[friendly_robot.id()] = addHRVORobotAgent(friendly_robot, AgentType::FRIENDLY);
+            friendly_robot_id_map[friendly_robot.id()] =
+                addHRVORobotAgent(friendly_robot, AgentType::FRIENDLY);
         }
     }
 
     for (const Robot &enemy_robot : enemy_team)
     {
-		auto agent_index_iter = enemy_robot_id_map.find(enemy_robot.id());
+        auto agent_index_iter = enemy_robot_id_map.find(enemy_robot.id());
 
-        if (agent_index_iter != enemy_robot_id_map.end() && agents[agent_index_iter->second].has_value())
+        if (agent_index_iter != enemy_robot_id_map.end() &&
+            agents[agent_index_iter->second].has_value())
         {
-            agents[agent_index_iter->second].value()->setPosition(enemy_robot.position().toVector());
+            agents[agent_index_iter->second].value()->setPosition(
+                enemy_robot.position().toVector());
             agents[agent_index_iter->second].value()->setVelocity(enemy_robot.velocity());
         }
         else
         {
-			// we arbitrarily choose a destination 5 seconds away at the currently velocity
+            // we arbitrarily choose a destination 5 seconds away at the currently
+            // velocity
             Vector destination =
                 (enemy_robot.position() + enemy_robot.velocity() * 5).toVector();
-            enemy_robot_id_map[enemy_robot.id()] = addLinearVelocityRobotAgent(enemy_robot, destination, AgentType::ENEMY);
+            enemy_robot_id_map[enemy_robot.id()] =
+                addLinearVelocityRobotAgent(enemy_robot, destination, AgentType::ENEMY);
         }
     }
 }
@@ -256,13 +261,14 @@ std::size_t HRVOSimulator::addHRVOAgent(const Vector &position, float agent_radi
     std::shared_ptr<HRVOAgent> agent = std::make_shared<HRVOAgent>(
         this, position, neighborDist, maxNeighbors, agent_radius, curr_velocity, maxAccel,
         path, prefSpeed, maxSpeed, uncertaintyOffset, robot_id, type);
-	auto agent_index_iter = friendly_robot_id_map.find(robot_id);
-	if (agent_index_iter != friendly_robot_id_map.end())
-	{
-		agents[agent_index_iter->second] = std::make_optional<std::shared_ptr<Agent>>(agent);
-		return agent_index_iter->second;
-	}
-	agents.push_back(agent);
+    auto agent_index_iter = friendly_robot_id_map.find(robot_id);
+    if (agent_index_iter != friendly_robot_id_map.end())
+    {
+        agents[agent_index_iter->second] =
+            std::make_optional<std::shared_ptr<Agent>>(agent);
+        return agent_index_iter->second;
+    }
+    agents.push_back(agent);
     return agents.size() - 1;
 }
 
@@ -274,12 +280,13 @@ size_t HRVOSimulator::addLinearVelocityAgent(const Vector &position, float agent
     std::shared_ptr<LinearVelocityAgent> agent =
         std::make_shared<LinearVelocityAgent>(this, position, agent_radius, curr_velocity,
                                               max_speed, max_accel, path, robot_id, type);
-	auto agent_index_iter = enemy_robot_id_map.find(robot_id);
-	if (agent_index_iter != enemy_robot_id_map.end())
-	{
-		agents[agent_index_iter->second] = std::make_optional<std::shared_ptr<Agent>>(agent);
-		return agent_index_iter->second;
-	}
+    auto agent_index_iter = enemy_robot_id_map.find(robot_id);
+    if (agent_index_iter != enemy_robot_id_map.end())
+    {
+        agents[agent_index_iter->second] =
+            std::make_optional<std::shared_ptr<Agent>>(agent);
+        return agent_index_iter->second;
+    }
     return agents.size() - 1;
 }
 
@@ -307,19 +314,19 @@ void HRVOSimulator::doStep()
 
     for (auto &agent : agents)
     {
-		if (!agent.has_value())
-		{
-			continue;
-		}
+        if (!agent.has_value())
+        {
+            continue;
+        }
         agent.value()->computeNewVelocity();
     }
 
     for (auto &agent : agents)
     {
-		if (!agent.has_value())
-		{
-			continue;
-		}
+        if (!agent.has_value())
+        {
+            continue;
+        }
         agent.value()->update();
     }
 
@@ -358,10 +365,10 @@ void HRVOSimulator::visualize(unsigned int robot_id) const
 
     for (const auto &agent : agents)
     {
-		if (!agent.has_value())
-		{
-			continue;
-		}
+        if (!agent.has_value())
+        {
+            continue;
+        }
         Point position(agent.value()->getPosition());
         *(hrvo_visualization.add_robots()) =
             *createCircleProto(Circle(position, agent.value()->getRadius()));
@@ -380,11 +387,13 @@ void HRVOSimulator::visualize(unsigned int robot_id) const
 std::optional<std::shared_ptr<HRVOAgent>> HRVOSimulator::getFriendlyAgentFromRobotId(
     unsigned int robot_id) const
 {
-	auto agent_index_iter = friendly_robot_id_map.find(robot_id);
-    if (agent_index_iter != friendly_robot_id_map.end())
+    auto agent_index_iter = friendly_robot_id_map.find(robot_id);
+    if (agent_index_iter != friendly_robot_id_map.end() &&
+        agents[agent_index_iter->second].has_value())
     {
         unsigned int agent_index = agent_index_iter->second;
-        auto hrvo_agent = std::static_pointer_cast<HRVOAgent>(agents[agent_index].value());
+        auto hrvo_agent =
+            std::static_pointer_cast<HRVOAgent>(agents[agent_index].value());
         return hrvo_agent;
     }
     return std::nullopt;
@@ -425,69 +434,74 @@ const std::unique_ptr<KdTree> &HRVOSimulator::getKdTree() const
     return kd_tree;
 }
 
-//const std::list<std::shared_ptr<Agent>> &HRVOSimulator::getAgents() const
+// const std::list<std::shared_ptr<Agent>> &HRVOSimulator::getAgents() const
 //{
 //    return agents;
 //}
 
-const std::vector<std::optional<std::shared_ptr<Agent>>> HRVOSimulator::getAgentsAsVector() const
+const std::vector<std::optional<std::shared_ptr<Agent>>>
+HRVOSimulator::getAgentsAsVector() const
 {
     return agents;
 }
 
 void HRVOSimulator::updateRemovedAgents(const World &world)
 {
-		std::for_each(agents.begin(), agents.end(),
-					[&world](std::optional<std::shared_ptr<Agent>> &agent) {
-						if (!agent.has_value())
-						{
-							return;
-						}
-        				std::unique_ptr<const std::vector<Robot>> team_to_use;
-        				switch (agent.value()->getAgentType())
-        				{
-        				    case FRIENDLY:
-        				        team_to_use = std::make_unique<const std::vector<Robot>>(
-        				            world.friendlyTeam().getAllRobots());
-        				        break;
-        				    case ENEMY:
-        				        team_to_use = std::make_unique<const std::vector<Robot>>(
-        				            world.enemyTeam().getAllRobots());
-        				        break;
-        				    default:
-        				        team_to_use =
-        				            std::make_unique<const std::vector<Robot>>(std::vector<Robot>());
-        				}
+    std::for_each(agents.begin(), agents.end(),
+                  [&world](std::optional<std::shared_ptr<Agent>> &agent) {
+                      if (!agent.has_value())
+                      {
+                          return;
+                      }
+                      std::unique_ptr<const std::vector<Robot>> team_to_use;
+                      switch (agent.value()->getAgentType())
+                      {
+                          case FRIENDLY:
+                              team_to_use = std::make_unique<const std::vector<Robot>>(
+                                  world.friendlyTeam().getAllRobots());
+                              break;
+                          case ENEMY:
+                              team_to_use = std::make_unique<const std::vector<Robot>>(
+                                  world.enemyTeam().getAllRobots());
+                              break;
+                          default:
+                              team_to_use = std::make_unique<const std::vector<Robot>>(
+                                  std::vector<Robot>());
+                      }
 
-        				auto team_iter = std::find_if(
-        				    (*team_to_use).begin(), (*team_to_use).end(),
-        				    [&agent](const Robot &robot) { return (robot.id() == agent.value()->getRobotId()); });
-        				if (team_iter == (*team_to_use).end())
-						{
-							agent = std::nullopt;
-						}
-    				});
+                      auto team_iter = std::find_if(
+                          (*team_to_use).begin(), (*team_to_use).end(),
+                          [&agent](const Robot &robot) {
+                              return (robot.id() == agent.value()->getRobotId());
+                          });
+                      if (team_iter == (*team_to_use).end())
+                      {
+                          agent = std::nullopt;
+                      }
+                  });
 
-//    agent_list.remove_if([&world](std::shared_ptr<Agent> agent) {
-//        std::unique_ptr<const std::vector<Robot>> team_to_use;
-//        switch (agent->getAgentType())
-//        {
-//            case FRIENDLY:
-//                team_to_use = std::make_unique<const std::vector<Robot>>(
-//                    world.friendlyTeam().getAllRobots());
-//                break;
-//            case ENEMY:
-//                team_to_use = std::make_unique<const std::vector<Robot>>(
-//                    world.enemyTeam().getAllRobots());
-//                break;
-//            default:
-//                team_to_use =
-//                    std::make_unique<const std::vector<Robot>>(std::vector<Robot>());
-//        }
-//
-//        auto team_iter = std::find_if(
-//            (*team_to_use).begin(), (*team_to_use).end(),
-//            [&agent](const Robot &robot) { return (robot.id() == agent->getRobotId()); });
-//        return team_iter == (*team_to_use).end();
-//    });
+    //    agent_list.remove_if([&world](std::shared_ptr<Agent> agent) {
+    //        std::unique_ptr<const std::vector<Robot>> team_to_use;
+    //        switch (agent->getAgentType())
+    //        {
+    //            case FRIENDLY:
+    //                team_to_use = std::make_unique<const std::vector<Robot>>(
+    //                    world.friendlyTeam().getAllRobots());
+    //                break;
+    //            case ENEMY:
+    //                team_to_use = std::make_unique<const std::vector<Robot>>(
+    //                    world.enemyTeam().getAllRobots());
+    //                break;
+    //            default:
+    //                team_to_use =
+    //                    std::make_unique<const
+    //                    std::vector<Robot>>(std::vector<Robot>());
+    //        }
+    //
+    //        auto team_iter = std::find_if(
+    //            (*team_to_use).begin(), (*team_to_use).end(),
+    //            [&agent](const Robot &robot) { return (robot.id() ==
+    //            agent->getRobotId()); });
+    //        return team_iter == (*team_to_use).end();
+    //    });
 }
