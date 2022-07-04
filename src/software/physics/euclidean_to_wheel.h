@@ -74,12 +74,11 @@ class EuclideanToWheel
      * ref: http://robocup.mi.fu-berlin.de/buch/omnidrive.pdf pg 16
      */
     Eigen::Matrix<double, 4, 3> euclidean_to_wheel_velocity_D_;
-    
+
     /**
      * Wheel velocity to Euclidean velocity coupling matrix.
      *
      * ref: http://robocup.mi.fu-berlin.de/buch/omnidrive.pdf pg 16
      */
     Eigen::Matrix<double, 3, 4> wheel_to_euclidean_velocity_D_inverse_;
-
 };
