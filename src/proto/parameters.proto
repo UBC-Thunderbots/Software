@@ -40,6 +40,8 @@ message AiConfig
     required SensorFusionConfig sensor_fusion_config                        = 10;
     required DefensePlayConfig defense_play_config                          = 11;
     required RobotNavigationObstacleConfig robot_navigation_obstacle_config = 12;
+    required KickTacticConfig kick_tactic_config = 13;
+
 }
 
 message AiControlConfig

@@ -2,8 +2,14 @@
 
 #include <algorithm>
 
-KickTactic::KickTactic()
-    : Tactic({RobotCapability::Kick, RobotCapability::Move}), fsm_map()
+KickTactic::KickFSM(TbotsProto::KickTacticConfig kick_tactic_config)
+: kick_tactic_config(kick_tactic_config)
+{
+
+}
+
+KickTactic::KickTactic(TbotsProto::AiConfig ai_config)
+    : Tactic({RobotCapability::Kick, RobotCapability::Move}), fsm_map(), ai_config(ai_config)
 {
     for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)
     {

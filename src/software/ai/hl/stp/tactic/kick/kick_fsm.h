@@ -18,6 +18,8 @@ struct KickFSM
         double kick_speed_meters_per_second;
     };
 
+    KickFSM(TbotsProto::KickTacticConfig kick_tactic_config);
+
     DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
     /**
@@ -67,4 +69,9 @@ struct KickFSM
             KickState_S + Update_E[ballChicked_G] / SET_STOP_PRIMITIVE_ACTION = X,
             X + Update_E / SET_STOP_PRIMITIVE_ACTION                          = X);
     }
+
+private:
+    // the kick tactic config
+    TbotsProto::KickTacticConfig kick_tactic_config;
+
 };

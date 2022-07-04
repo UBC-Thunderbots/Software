@@ -1,12 +1,17 @@
 #include "software/ai/hl/stp/tactic/kick/kick_fsm.h"
 
+
+KickFSM::KickFSM(TbotsProto::KickTacticConfig kick_tactic_config)
+        : kick_tactic_config(kick_tactic_config)
+{
+}
 void KickFSM::updateKick(const Update &event)
 {
     // adjust kick speed based on current robot speed
     double projected_robot_speed = event.common.robot.currentState().velocity().dot(
         event.common.world.ball().velocity().normalize());
     double adjusted_kick_speed =
-        event.control_params.kick_speed_meters_per_second - projected_robot_speed;
+        event.control_params.kick_speed_meters_per_second - (projected_robot_speed * kick_tactic_config.percent_robot_speed_transferred_to_ball());
     event.common.set_primitive(createMovePrimitive(
         CREATE_MOTION_CONTROL(event.control_params.kick_origin),
         event.control_params.kick_direction, 0.1, TbotsProto::DribblerMode::OFF,

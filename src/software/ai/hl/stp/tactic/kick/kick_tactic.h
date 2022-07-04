@@ -16,7 +16,7 @@ class KickTactic : public Tactic
     /**
      * Creates a new KickTactic
      */
-    explicit KickTactic();
+    explicit KickTactic(TbotsProto::AiConfig ai_config);
 
     /**
      * Updates the params for this tactic that cannot be derived from the world
@@ -51,4 +51,6 @@ class KickTactic : public Tactic
 
     // Tactic parameters
     KickFSM::ControlParams control_params;
+
+    TbotsProto::AiConfig ai_config;
 };
