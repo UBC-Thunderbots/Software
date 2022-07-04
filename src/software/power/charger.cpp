@@ -10,10 +10,7 @@ Charger::Charger()
 
 void Charger::chargeCapacitors()
 {
-    if (!digitalRead(FLYBACK_FAULT))
-    {
-        digitalWrite(CHRG, HIGH);
-    }
+    digitalWrite(CHRG, HIGH);
 }
 
 float Charger::getCapacitorVoltage()

@@ -36,6 +36,6 @@ class PowerService
 
     // Constants
     const size_t READ_BUFFER_SIZE;
-    const unsigned int BAUD_RATE         = 115200;
+    const unsigned int BAUD_RATE         = 500000;
     const std::string DEVICE_SERIAL_PORT = "/dev/ttyTHS1";
 };
