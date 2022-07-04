@@ -55,8 +55,5 @@ void NetworkService::worldCallback(TbotsProto::World input)
     std::scoped_lock<std::mutex> lock(world_mutex);
     world_msg = input;
 
-    LOG(DEBUG) << "interpacket delay world: "
-               << input.time_sent().epoch_timestamp_seconds() - last_primitive_time;
-
     last_world_time = input.time_sent().epoch_timestamp_seconds();
 }

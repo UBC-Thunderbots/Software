@@ -480,25 +480,6 @@ WheelSpace_t MotorService::rampWheelVelocity(
         ramp_wheel_velocity = target_wheel_velocity;
     }
 
-    //LOG(CSV) << "ramps.csv" <<
-    //ramp_wheel_velocity[0] << "," <<
-    //ramp_wheel_velocity[1] << "," <<
-    //ramp_wheel_velocity[2] << "," <<
-    //ramp_wheel_velocity[3] << "," <<
-    //delta_target_wheel_velocity [0] << "," <<
-    //delta_target_wheel_velocity[1] << "," <<
-    //delta_target_wheel_velocity[2] << "," <<
-    //delta_target_wheel_velocity[3] << "," <<
-    //current_wheel_velocity[0] << "," <<
-    //current_wheel_velocity[1] << "," <<
-    //current_wheel_velocity[2] << "," <<
-    //current_wheel_velocity[3] << "," <<
-    //target_wheel_velocity[0] << "," <<
-    //target_wheel_velocity[1] << "," <<
-    //target_wheel_velocity[2] << "," <<
-    //target_wheel_velocity[3] << "," <<
-    //max_delta_target_wheel_velocity << "\n";
-
     return ramp_wheel_velocity;
 }
 

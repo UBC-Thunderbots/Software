@@ -28,56 +28,6 @@ std::string BANNER =
 "  /'                                                                                       /'          \n";
 // clang-format on
 
-static const unsigned MOTOR_SPI_COMMUNICATION_STACK_SIZE = 100 * 1024;
-
-// static void setPriority(int prio, int sched)
-//{
-// struct sched_param param;
-//// Set realtime priority for this thread
-// param.sched_priority = prio;
-
-// if (sched_setscheduler(0, sched, &param) < 0)
-//{
-// perror("sched_setscheduler");
-//}
-//}
-
-// void showNewPagefaultCount(const char* logtext, const char* allowed_maj,
-// const char* allowed_min)
-//{
-// static long int last_majflt = 0, last_minflt = 0;
-// struct rusage usage;
-
-// getrusage(RUSAGE_SELF, &usage);
-
-// printf(
-//"%-30.30s: Pagefaults, Major:%ld (Allowed %s), "
-//"Minor:%ld (Allowed %s)\n",
-// logtext, usage.ru_majflt - last_majflt, allowed_maj,
-// usage.ru_minflt - last_minflt, allowed_min);
-
-// last_majflt = usage.ru_majflt;
-// last_minflt = usage.ru_minflt;
-//}
-
-// static void proveThreadStackUseIsSafe(int stacksize)
-//{
-//#pragma GCC diagnostic push
-//#pragma GCC diagnostic ignored "-Wvla"
-//#pragma GCC diagnostic ignored "-Wunused-but-set-variable"
-// volatile char buffer[stacksize];
-//#pragma GCC diagnostic pop
-// long int i;
-
-//[> Prove that this thread is behaving well <]
-// for (i = 0; i < stacksize; i += sysconf(_SC_PAGESIZE))
-//{
-//// Each write to this buffer shall NOT generate a pagefault.
-// buffer[i] = static_cast<char>(i);
-//}
-
-// showNewPagefaultCount("Caused by using thread stack", "0", "0");
-//}
 
 /*
  * Configure malloc for real-time linux
@@ -145,8 +95,6 @@ int main(int argc, char** argv)
 
     static auto thunderloop = Thunderloop(create2021RobotConstants(), CONTROL_LOOP_HZ);
     thunderloop.runLoop();
-
-    std::promise<void>().get_future().wait();
 
     return 0;
 }
