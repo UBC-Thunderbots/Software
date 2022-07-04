@@ -95,18 +95,19 @@ class HRVOSimulator
      *      Adds a new agent to the simulation.
      *
      * @param position              The starting position of this agent.
-     * @param goal_index            The index of the Goal which this agent should go to.
-     * @param neighborDist          The maximum neighbor distance of this agent.
-     * @param maxNeighbors          The maximum neighbor count of this agent.
-     * @param agent_radius          The agent_radius of this agent.
+     * @param agent_radius          The radius of this agent.
      * @param max_radius_inflation  The maximum amount which the radius of this agent can
      * inflate.
-     * @param goalRadius            The goal agent_radius of this agent.
-     * @param prefSpeed             The preferred speed of this agent.
-     * @param maxSpeed              The maximum speed of this agent.
-     * @param uncertaintyOffset     The uncertainty offset of this agent.
-     * @param maxAccel              The maximum acceleration of this agent.
      * @param curr_velocity         The initial velocity of this agent.
+     * @param maxSpeed              The maximum speed of this agent.
+     * @param prefSpeed             The preferred speed of this agent.
+     * @param maxAccel              The maximum acceleration of this agent.
+     * @param path                  The path which this agent should take.
+     * @param neighborDist          The maximum distance away from this agent which
+     * another agent can be to be considered as an obstacle.
+     * @param maxNeighbors          The maximum number of other agents which this agent
+     * will try to avoid collisions with at a time.
+     * @param uncertaintyOffset     The uncertainty offset of this agent.
      * @return The index of the agent.
      */
     std::size_t addHRVOAgent(const Vector &position, float agent_radius,
