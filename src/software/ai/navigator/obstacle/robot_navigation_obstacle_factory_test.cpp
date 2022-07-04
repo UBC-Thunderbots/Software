@@ -376,7 +376,7 @@ TEST_F(RobotNavigationObstacleFactoryMotionConstraintTest, ball_placement_rectan
     try
     {
         Polygon expected(
-            {{1.617, -0.617}, {-0.617, -0.617}, {-0.617, 0.617}, {1.617, 0.617}});
+            {{-0.617, 0.617}, {1.617, 0.617}, {1.617, -0.617}, {-0.617, -0.617}});
         auto polygon_obstacle = dynamic_cast<GeomObstacle<Polygon>&>(*obstacles[0]);
         EXPECT_TRUE(TestUtil::equalWithinTolerance(expected, polygon_obstacle.getGeom(),
                                                    METERS_PER_MILLIMETER));
@@ -414,7 +414,7 @@ TEST_F(RobotNavigationObstacleFactoryMotionConstraintTest, ball_placement_rotate
     EXPECT_EQ(1, obstacles.size());
     try
     {
-        Polygon expected({{1.873, 1}, {0, -0.873}, {-0.873, 0}, {1, 1.873}});
+        Polygon expected({{-0.873, 0}, {1, 1.873}, {1.873, 1}, {0, -0.873}});
         auto polygon_obstacle = dynamic_cast<GeomObstacle<Polygon>&>(*obstacles[0]);
         EXPECT_TRUE(TestUtil::equalWithinTolerance(expected, polygon_obstacle.getGeom(),
                                                    METERS_PER_MILLIMETER));
