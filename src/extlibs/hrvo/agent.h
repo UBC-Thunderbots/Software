@@ -155,6 +155,10 @@ class Agent
      */
     void setPath(const AgentPath &new_path);
 
+	/**
+	 * Gets the robot id for this Agent
+	 * @return robot id of the agent
+	 */
     RobotId getRobotId();
 
     AgentType getAgentType();

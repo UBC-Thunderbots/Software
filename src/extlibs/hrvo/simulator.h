@@ -169,7 +169,7 @@ class HRVOSimulator
      * Get the list of Agents in this simulator
      * @return List of Agents
      */
-    const std::list<std::shared_ptr<Agent>> &getAgents() const;
+    //const std::list<std::shared_ptr<Agent>> &getAgents() const;
 
     /**
      * Get the Vector of agents in this simulator
@@ -177,7 +177,7 @@ class HRVOSimulator
      * #2688: Delete this getter when kd-trees aren't tightly coupled to indices of Agent
      * vector and we delete the agent vector.
      */
-    const std::vector<std::shared_ptr<Agent>> getAgentsAsVector() const;
+    const std::vector<std::optional<std::shared_ptr<Agent>>> getAgentsAsVector() const;
 
     /**
      *      Returns the maximum acceleration of a specified agent.
@@ -250,7 +250,7 @@ class HRVOSimulator
      */
     std::size_t getNumAgents() const
     {
-        return agent_list.size();
+        return agents.size();
     }
 
     /**
@@ -307,10 +307,11 @@ class HRVOSimulator
     std::unique_ptr<KdTree> kd_tree;
 
     // List of agents (robots) in this simulation
-    std::list<std::shared_ptr<Agent>> agent_list;
-    //#2688: Delete this agent vector when the kd-tree is not tightly coupled to the
-    //indices of this vector
-    std::vector<std::shared_ptr<Agent>> agents;
+    std::vector<std::optional<std::shared_ptr<Agent>>> agents;
+
+    // robot id to agent index
+    std::map<unsigned int, unsigned int> friendly_robot_id_map;
+    std::map<unsigned int, unsigned int> enemy_robot_id_map;
 
    public:
     // The scale which friendly robots should be larger than friendly robots

@@ -162,8 +162,12 @@ void HRVOAgent::computeNewVelocity()
     // Create Velocity Obstacles for neighbors
     for (const auto &neighbor : neighbors_)
     {
+		if (!simulator_->getAgentsAsVector()[neighbor.second].has_value())
+		{
+			continue;		
+		}	
         std::shared_ptr<Agent> other_agent =
-            simulator_->getAgentsAsVector()[neighbor.second];
+            simulator_->getAgentsAsVector()[neighbor.second].value();
         VelocityObstacle velocity_obstacle = other_agent->createVelocityObstacle(*this);
         velocityObstacles_.push_back(velocity_obstacle);
     }
@@ -554,7 +558,11 @@ void HRVOAgent::computePreferredVelocity()
 
 void HRVOAgent::insertNeighbor(std::size_t agentNo, float &rangeSq)
 {
-    std::shared_ptr<Agent> other_agent = simulator_->getAgentsAsVector()[agentNo];
+	if (!simulator_->getAgentsAsVector()[agentNo].has_value())
+	{
+		return;
+	}
+    std::shared_ptr<Agent> other_agent = simulator_->getAgentsAsVector()[agentNo].value();
     auto path_point_opt                = path.getCurrentPathPoint();
 
     if (path_point_opt == std::nullopt || this == other_agent.get())
