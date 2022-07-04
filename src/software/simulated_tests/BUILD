@@ -113,7 +113,7 @@ py_library(
         "//software/networking:threaded_unix_sender_py",
         "//software/simulated_tests:simulated_test_fixture",
         "//software/simulated_tests:validation",
-        "//software/simulated_tests/field_tests:field_test_fixture",
+        "//software/field_tests:field_test_fixture",
         "//software/thunderscope",
         "//software/thunderscope:binary_context_managers",
         "//software/thunderscope/replay:proto_logger",
