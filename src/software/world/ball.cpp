@@ -70,7 +70,6 @@ BallState Ball::estimateFutureState(const Duration &duration_in_future) const
     Vector future_velocity = calculateFutureVelocity(current_state_.velocity(),
                                                      acceleration_, duration_in_future);
 
-//    bool velocities_in_opposite_direction = future_velocity.x() * current_state_.velocity().x() < 0 || future_velocity.y() * current_state_.velocity().y() < 0;
     bool velocities_in_opposite_direction =  std::abs(future_velocity.cross(current_state_.velocity())) < 1e-6;
 
 
@@ -78,7 +77,6 @@ BallState Ball::estimateFutureState(const Duration &duration_in_future) const
         // this is the time it takes for velocity to accelerate to a stop
         effective_duration        = Duration::fromSeconds(current_state_.velocity().length() / acceleration_.length());
 
-        //ball will stop
         future_velocity    = Vector();
     }
 
@@ -89,17 +87,20 @@ BallState Ball::estimateFutureState(const Duration &duration_in_future) const
     return BallState(future_position, future_velocity);
 }
 
-Duration Ball::getTimeToPosition(const Point &destination) const{
-    double time_to_stop = current_state_.velocity().length() / acceleration_.length();
-    double d = distance(destination,current_state_.position());
+std::optional<Duration> Ball::getTimeToMoveDistance(const double distance) const{
     double a = -1 * std::max(1e-6, acceleration_.length());
+
+    double descriminant = std::pow(current_state_.velocity().length(), 2) + 2 * a* distance;
+
+    if (descriminant < 0){
+        return {} ;
+    }
 
     //solving for t using quadratic formula applied to kinematic equation
     double t_total =
-            (-current_state_.velocity().length() + std::sqrt(std::pow(current_state_.velocity().length(), 2) + 2 * a* d)) /
-            a;
+            (-current_state_.velocity().length() + std::sqrt(descriminant)) / a;
 
-    return Duration::fromSeconds(std::min(time_to_stop, t_total));
+    return Duration::fromSeconds(t_total);
 }
 
 bool Ball::hasBallBeenKicked(const Angle &expected_kick_direction,

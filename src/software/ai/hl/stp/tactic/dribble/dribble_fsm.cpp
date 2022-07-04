@@ -28,19 +28,24 @@ DribbleFSM::InterceptionResult DribbleFSM::findInterceptionPoint(const Robot &ro
     while (contains(field.fieldLines(), intercept_position))
     {
 
-        Duration ball_time_to_position = ball.getTimeToPosition(intercept_position);
+        std::optional<Duration> ball_time_to_position = ball.getTimeToMoveDistance(distance(intercept_position, ball.position()));
+
+        //go to the stopping position of the ball
+        if (!ball_time_to_position.has_value()){
+            break;
+        }
 
         Duration robot_time_to_pos = robot.getTimeToPosition(intercept_position);
 
-        if (robot_time_to_pos < ball_time_to_position)
+        if (robot_time_to_pos < ball_time_to_position.value())
         {
             break;
         }
 
         Vector dist_vector = intercept_position - robot.position();
 
-        double final_speed_to_reach_in_time = 2 * dist_vector.length() / (ball_time_to_position.toSeconds()) - robot.currentState().velocity().dot(dist_vector.normalize());
-        double average_acceleration_to_reacch_in_time = final_speed_to_reach_in_time - robot.currentState().velocity().dot(dist_vector.normalize()) / ball_time_to_position.toSeconds();
+        double final_speed_to_reach_in_time = 2 * dist_vector.length() / (ball_time_to_position.value().toSeconds()) - robot.currentState().velocity().dot(dist_vector.normalize());
+        double average_acceleration_to_reacch_in_time = final_speed_to_reach_in_time - robot.currentState().velocity().dot(dist_vector.normalize()) / ball_time_to_position.value().toSeconds();
 
         if (final_speed_to_reach_in_time < fallback_interception_final_speed && average_acceleration_to_reacch_in_time < robot.robotConstants().robot_max_acceleration_m_per_s_2){
             fallback_interception_final_speed = final_speed_to_reach_in_time;
@@ -51,7 +56,7 @@ DribbleFSM::InterceptionResult DribbleFSM::findInterceptionPoint(const Robot &ro
             ball.velocity().normalize(INTERCEPT_POSITION_SEARCH_INTERVAL);
     }
 
-    //if we cant reach the ball in time, check fallback interception point
+    //if we cant reach the ball in time and we have valid fallback interception point, use it
     if (contains(field.fieldLines(), intercept_position) && fallback_interception_point != ball.position()){
         //return to a position in the field
         intercept_position = fallback_interception_point;

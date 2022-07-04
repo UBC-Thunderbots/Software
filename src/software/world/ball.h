@@ -99,15 +99,13 @@ class Ball final
 
 
     /**
-    * Returns the estimated state of the ball at the specified amount of time in the
-    * future
+    * Returns the estimated time it will take the ball to move a distance based on its current state
     *
-    * @param duration_in_future The Duration into the future at which to predict the
-    * ball's position
+    * @param distance the distance from the current position of the ball
     *
-    * @return The future state of the ball
+    * @return Duration of time to move distance
     */
-    Duration getTimeToPosition(const Point &destination) const;
+    std::optional<Duration> getTimeToMoveDistance(double distance) const;
 
     /**
      * Software approximation that finds if a ball has been kicked, regardless of whether
