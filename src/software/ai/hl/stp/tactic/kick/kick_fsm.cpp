@@ -1,10 +1,7 @@
 #include "software/ai/hl/stp/tactic/kick/kick_fsm.h"
+#include "proto/parameters.pb.h"
 
 
-KickFSM::KickFSM(TbotsProto::KickTacticConfig kick_tactic_config)
-        : kick_tactic_config(kick_tactic_config)
-{
-}
 void KickFSM::updateKick(const Update &event)
 {
     // adjust kick speed based on current robot speed

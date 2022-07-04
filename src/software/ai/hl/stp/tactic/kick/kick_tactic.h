@@ -4,6 +4,7 @@
 
 #include "software/ai/hl/stp/tactic/kick/kick_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
+#include "proto/parameters.pb.h"
 
 /**
  * The KickTactic will move the assigned robot to the given kick origin and then
@@ -17,6 +18,7 @@ class KickTactic : public Tactic
      * Creates a new KickTactic
      */
     explicit KickTactic(TbotsProto::AiConfig ai_config);
+    KickTactic() = delete;
 
     /**
      * Updates the params for this tactic that cannot be derived from the world

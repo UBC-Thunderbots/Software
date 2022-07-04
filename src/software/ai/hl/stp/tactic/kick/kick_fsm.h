@@ -2,6 +2,7 @@
 
 #include "software/ai/hl/stp/tactic/get_behind_ball/get_behind_ball_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
+#include "proto/parameters.pb.h"
 
 struct KickFSM
 {
@@ -18,7 +19,8 @@ struct KickFSM
         double kick_speed_meters_per_second;
     };
 
-    KickFSM(TbotsProto::KickTacticConfig kick_tactic_config);
+    KickFSM(TbotsProto::KickTacticConfig kick_tactic_config): kick_tactic_config(kick_tactic_config)
+    {}
 
     DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
