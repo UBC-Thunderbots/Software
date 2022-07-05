@@ -1,6 +1,7 @@
 import sys
 
 import pytest
+import time
 
 import software.python_bindings as tbots
 from proto.play_pb2 import Play, PlayName
@@ -49,6 +50,8 @@ def test_corner_kick_play_bottom_left(simulated_test_runner):
         gc_command=Command.Type.DIRECT, team=Team.BLUE
     )
 
+    time.sleep(1) 
+
     # override yellow play
     yellow_play = Play()
     yellow_play.name = PlayName.HaltPlay
@@ -75,14 +78,14 @@ def test_corner_kick_play_bottom_left(simulated_test_runner):
     simulated_test_runner.run_test(
         eventually_validation_sequence_set=eventually_validation_sequence_set,
         always_validation_sequence_set=always_validation_sequence_set,
-        test_timeout_s=25,
+        test_timeout_s=10,
     )
 
 
 def test_corner_kick_play_top_right(simulated_test_runner):
 
     # starting point must be Point
-    ball_initial_pos = tbots.Point(4.5, 3)
+    ball_initial_pos = tbots.Point(4.4, 2.9)
 
     # Setup Bots
     blue_bots = [
@@ -117,6 +120,8 @@ def test_corner_kick_play_top_right(simulated_test_runner):
         gc_command=Command.Type.DIRECT, team=Team.BLUE
     )
 
+    time.sleep(1) 
+
     # override yellow play
     yellow_play = Play()
     yellow_play.name = PlayName.HaltPlay
@@ -143,7 +148,7 @@ def test_corner_kick_play_top_right(simulated_test_runner):
     simulated_test_runner.run_test(
         eventually_validation_sequence_set=eventually_validation_sequence_set,
         always_validation_sequence_set=always_validation_sequence_set,
-        test_timeout_s=25,
+        test_timeout_s=10,
     )
 
 
