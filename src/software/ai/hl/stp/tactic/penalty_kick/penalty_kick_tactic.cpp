@@ -9,7 +9,7 @@ PenaltyKickTactic::PenaltyKickTactic(TbotsProto::AiConfig ai_config)
     {
         fsm_map[id] = std::make_unique<FSM<PenaltyKickFSM>>(
             DribbleFSM(ai_config.dribble_tactic_config()), PenaltyKickFSM(),
-            GetBehindBallFSM());
+            GetBehindBallFSM(), KickFSM(ai_config.kick_tactic_config()));
     }
 }
 
@@ -26,7 +26,7 @@ void PenaltyKickTactic::updatePrimitive(const TacticUpdate& tactic_update, bool 
     {
         fsm_map[tactic_update.robot.id()] = std::make_unique<FSM<PenaltyKickFSM>>(
             DribbleFSM(ai_config.dribble_tactic_config()), PenaltyKickFSM(),
-            GetBehindBallFSM());
+            GetBehindBallFSM(), KickFSM(ai_config.kick_tactic_config()));
     }
     fsm_map.at(tactic_update.robot.id())
         ->process_event(PenaltyKickFSM::Update({}, tactic_update));

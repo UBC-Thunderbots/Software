@@ -12,7 +12,8 @@ TEST(KickFSMTest, test_transitions)
                                           .kick_direction = Angle::threeQuarter(),
                                           .kick_speed_meters_per_second = 1.2};
 
-    FSM<KickFSM> fsm{GetBehindBallFSM()};
+    TbotsProto::AiConfig ai_config;
+    FSM<KickFSM> fsm{GetBehindBallFSM(), KickFSM(ai_config.kick_tactic_config())};
 
     // Start in GetBehindBallFSM state's GetBehindBallState
     EXPECT_TRUE(fsm.is(boost::sml::state<GetBehindBallFSM>));

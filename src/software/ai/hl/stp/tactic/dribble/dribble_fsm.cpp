@@ -27,6 +27,9 @@ DribbleFSM::InterceptionResult DribbleFSM::findInterceptionPoint(const Robot &ro
     Point fallback_interception_point = ball.position();
     double fallback_interception_final_speed =
         robot.robotConstants().robot_max_speed_m_per_s;
+
+    //todo find how quick robot can be moving for it to trap the ball in dribbler when intercepting
+    // if large enough then use fallback code with with that set as maximum speed.
     while (contains(field.fieldLines(), intercept_position))
     {
         std::optional<Duration> ball_time_to_position =
@@ -50,13 +53,13 @@ DribbleFSM::InterceptionResult DribbleFSM::findInterceptionPoint(const Robot &ro
         double final_speed_to_reach_in_time =
             2 * dist_vector.length() / (ball_time_to_position.value().toSeconds()) -
             robot.currentState().velocity().dot(dist_vector.normalize());
-        double average_acceleration_to_reacch_in_time =
+        double average_acceleration_to_reach_in_time =
             final_speed_to_reach_in_time -
             robot.currentState().velocity().dot(dist_vector.normalize()) /
                 ball_time_to_position.value().toSeconds();
 
         if (final_speed_to_reach_in_time < fallback_interception_final_speed &&
-            average_acceleration_to_reacch_in_time <
+                average_acceleration_to_reach_in_time <
                 robot.robotConstants().robot_max_acceleration_m_per_s_2)
         {
             fallback_interception_final_speed = final_speed_to_reach_in_time;
@@ -67,14 +70,15 @@ DribbleFSM::InterceptionResult DribbleFSM::findInterceptionPoint(const Robot &ro
             ball.velocity().normalize(INTERCEPT_POSITION_SEARCH_INTERVAL);
     }
 
-    // if we can't reach the ball in time and we have valid fallback interception point,
-    // use it
+//     if we can't reach the ball in time and we have valid fallback interception point,
+//     use it
     if (contains(field.fieldLines(), intercept_position) &&
         fallback_interception_point != ball.position())
     {
         // return to a position in the field
         intercept_position       = fallback_interception_point;
         interception_final_speed = fallback_interception_final_speed;
+        std::cout<<"engaging fallback interception"<<std::endl;
     }
 
 

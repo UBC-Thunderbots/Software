@@ -45,20 +45,18 @@ print(BASIC_TEST_CASE_PARAMETERS)
 @pytest.mark.parametrize(
     "ball_initial_position,ball_initial_velocity,robot_initial_position",
     [
+        # (
+        #     tbots.Field.createSSLDivisionBField().centerPoint(),
+        #     tbots.Vector(2.0, 0),
+        #     tbots.Field.createSSLDivisionBField().friendlyGoalpostPos()
+        #     + tbots.Vector(2, 0),
+        # ),
         (
-            tbots.Field.createSSLDivisionBField().centerPoint(),
-            tbots.Vector(2.0, 0),
-            tbots.Field.createSSLDivisionBField().friendlyGoalpostPos()
-            + tbots.Vector(2, 0),
-        ),
-        (
-                tbots.Field.createSSLDivisionBField().centerPoint(),
-                tbots.Vector(2.0, 0),
-                tbots.Field.createSSLDivisionBField().friendlyGoalpostPos()
-                + tbots.Vector(2, 0),
+            tbots.Point(-2,0),
+            tbots.Vector(3.0, 0.5),
+            tbots.Point(0,0)
         ),
 
-        # slow ball
     ],
 )
 def test_robot_intercepts_ball(
@@ -67,7 +65,6 @@ def test_robot_intercepts_ball(
     robot_initial_position,
     simulated_test_runner,
 ):
-    print(WorldState)
     # Setup Robot
     simulated_test_runner.simulator_proto_unix_io.send_proto(
         WorldState,

@@ -18,7 +18,6 @@ class KickTactic : public Tactic
      * Creates a new KickTactic
      */
     explicit KickTactic(TbotsProto::AiConfig ai_config);
-    KickTactic() = delete;
 
     /**
      * Updates the params for this tactic that cannot be derived from the world
