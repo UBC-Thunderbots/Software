@@ -74,10 +74,10 @@ void HRVOSimulator::updateWorld(const World &world)
         {
             hrvo_agent.value()->setPosition(friendly_robot.position().toVector());
 
-            // only update velocity if time has passed since the last time velocity
-            // was updated. this is to allow sensorfusion to update the actual robot
-            // velocity in world.
-            // todo (#2531): remove 4 multiplier and fix goal keeper moving slowly
+            // Only update velocity if time has passed since the last time velocity
+            // was updated. This is to allow SensorFusion to update the actual robot
+            // velocity in World.
+            // TODO (#2531): Remove 4 multiplier and fix goal keeper moving slowly
             if (global_time - last_time_velocity_updated >= 4 * time_step)
             {
                 Vector velocity = friendly_robot.velocity();
@@ -395,31 +395,60 @@ std::optional<std::shared_ptr<HRVOAgent>> HRVOSimulator::getFriendlyAgentFromRob
 
 float HRVOSimulator::getAgentMaxAccel(std::size_t agentNo) const
 {
+    if (!agents[agentNo].has_value())
+    {
+        return 0.0;
+    }
     return agents[agentNo].value()->getMaxAccel();
 }
 
 Vector HRVOSimulator::getAgentPosition(std::size_t agentNo) const
 {
+    if (!agents[agentNo].has_value())
+    {
+        return Vector();
+    }
+
     return agents[agentNo].value()->getPosition();
 }
 
 float HRVOSimulator::getAgentRadius(std::size_t agentNo) const
 {
+    if (!agents[agentNo].has_value())
+    {
+        return 0.0;
+    }
+
     return agents[agentNo].value()->getRadius();
 }
 
 bool HRVOSimulator::hasAgentReachedGoal(std::size_t agentNo) const
 {
+    if (!agents[agentNo].has_value())
+    {
+        return false;
+    }
+
     return agents[agentNo].value()->hasReachedGoal();
 }
 
 Vector HRVOSimulator::getAgentVelocity(std::size_t agentNo) const
 {
+    if (!agents[agentNo].has_value())
+    {
+        return Vector();
+    }
+
     return agents[agentNo].value()->getVelocity();
 }
 
 Vector HRVOSimulator::getAgentPrefVelocity(std::size_t agentNo) const
 {
+    if (!agents[agentNo].has_value())
+    {
+        return Vector();
+    }
+
     return agents[agentNo].value()->getPrefVelocity();
 }
 
