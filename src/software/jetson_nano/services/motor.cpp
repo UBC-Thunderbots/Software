@@ -282,6 +282,7 @@ bool MotorService::checkDriverFault(uint8_t motor)
 TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor,
                                            double time_elapsed_since_last_poll_s)
 {
+    LOG(DEBUG) << motor.DebugString();
     CHECK(encoder_calibrated_[FRONT_LEFT_MOTOR_CHIP_SELECT] &&
           encoder_calibrated_[FRONT_RIGHT_MOTOR_CHIP_SELECT] &&
           encoder_calibrated_[BACK_LEFT_MOTOR_CHIP_SELECT] &&
@@ -358,6 +359,7 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
     EuclideanSpace_t target_linear_velocity  = {0.0, 0.0, 0.0};
     EuclideanSpace_t target_angular_velocity = {0.0, 0.0, 0.0};
     int target_dribbler_rpm                  = motor.dribbler_speed_rpm();
+    static int test_ramp_rpm = 0;
 
     switch (motor.drive_control_case())
     {
@@ -411,10 +413,15 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
         BACK_RIGHT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_TARGET,
         static_cast<int>(target_wheel_velocities[3] * ELECTRICAL_RPM_PER_MECHANICAL_MPS));
 
-    if (previous_dribbler_rpm != target_dribbler_rpm)
+    if (target_dribbler_rpm > test_ramp_rpm + 1500)
     {
-        tmc4671_setTargetVelocity(DRIBBLER_MOTOR_CHIP_SELECT, target_dribbler_rpm);
-        previous_dribbler_rpm = target_dribbler_rpm;
+        test_ramp_rpm += 1000;
+        tmc4671_setTargetVelocity(DRIBBLER_MOTOR_CHIP_SELECT, test_ramp_rpm);
+    }
+    else if (target_dribbler_rpm < test_ramp_rpm - 1500)
+    {
+        test_ramp_rpm -= 1000;
+        tmc4671_setTargetVelocity(DRIBBLER_MOTOR_CHIP_SELECT, test_ramp_rpm);
     }
 
     return motor_status;

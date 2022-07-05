@@ -169,9 +169,10 @@ void SensorFusion::updateWorld(
         }
         friendly_team.setUnavailableRobotCapabilities(robot_id, unavailableCapabilities);
 
-        if (robot_status_msg.has_break_beam_status() &&
-            robot_status_msg.break_beam_status().ball_in_beam())
+        if (robot_status_msg.has_power_status() &&
+                robot_status_msg.power_status().breakbream_tripped())
         {
+            LOG(DEBUG) << "break beam tripped for robot : " << robot_id;
             friendly_robot_id_with_ball_in_dribbler = robot_id;
             ball_in_dribbler_timeout =
                 sensor_fusion_config.num_dropped_detections_before_ball_not_in_dribbler();

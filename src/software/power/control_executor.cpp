@@ -11,20 +11,14 @@ ControlExecutor::ControlExecutor(std::shared_ptr<Charger> charger,
 
 void ControlExecutor::execute(const TbotsProto_PowerControl& control)
 {
+    chicker->coolDownPoll();
+
     switch (control.chicker.which_chicker_command)
     {
         case TbotsProto_PowerControl_ChickerControl_kick_speed_m_per_s_tag:
             chicker->setKickSpeedMPerS(
                 control.chicker.chicker_command.kick_speed_m_per_s);
-            if (control.geneva_slot != geneva->getCurrentSlot())
-            {
-                geneva->setRotationDoneCallbackOnce(&chicker->kick);
-                geneva->setSlot(control.geneva_slot);
-            }
-            else
-            {
                 chicker->kick();
-            }
             break;
         case TbotsProto_PowerControl_ChickerControl_chip_distance_meters_tag:
             chicker->setChipDistanceMeters(
@@ -40,15 +34,7 @@ void ControlExecutor::execute(const TbotsProto_PowerControl& control)
                     chicker->setKickSpeedMPerS(
                         control.chicker.chicker_command.auto_chip_or_kick
                             .auto_chip_or_kick.autokick_speed_m_per_s);
-                    if (control.geneva_slot != geneva->getCurrentSlot())
-                    {
-                        geneva->setRotationDoneCallbackOnce(&chicker->autokick);
-                        geneva->setSlot(control.geneva_slot);
-                    }
-                    else
-                    {
                         chicker->autokick();
-                    }
                     break;
                 case TbotsProto_AutoChipOrKick_autochip_distance_meters_tag:
                     chicker->setChipDistanceMeters(
@@ -61,7 +47,6 @@ void ControlExecutor::execute(const TbotsProto_PowerControl& control)
             }
             break;
         default:
-            geneva->setSlot(control.geneva_slot);
             break;
     }
 }

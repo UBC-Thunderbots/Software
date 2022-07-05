@@ -39,6 +39,8 @@ class Chicker
     static void setKickSpeedMPerS(float kick_speed_m_per_s);
     static void setChipDistanceMeters(float chip_distance_meters);
 
+    void coolDownPoll();
+
    private:
     /**
      * Converts given speed/distance into pulse width duration
@@ -66,15 +68,9 @@ class Chicker
      */
     static void stopPulse();
 
-    /**
-     * Called on a cooldown_timer to set the on_cooldown variable back to false
-     */
-    static void offCooldown();
-
     static hw_timer_t* pulse_timer;
     static volatile bool breakbeam_tripped;
 
-    static hw_timer_t* cooldown_timer;
     static volatile bool on_cooldown;
     static constexpr int COOLDOWN_MICROSECONDS = 3 * MICROSECONDS_IN_SECOND;
 

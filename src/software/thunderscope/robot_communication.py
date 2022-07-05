@@ -183,8 +183,9 @@ class RobotCommunication(object):
             self.multicast_channel + "%" + self.interface, VISION_PORT, True
         )
 
+        # self.connect_fullsystem_to_robots()
         self.disconnect_fullsystem_from_robots()
-        self.connect_robot_to_diagnostics(2)
+        self.connect_robot_to_diagnostics(3)
 
         self.send_estop_state_thread.start()
         self.run_thread.start()

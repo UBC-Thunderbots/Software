@@ -190,7 +190,7 @@ void Thunderloop::runLoop()
                 {
                     // TODO-JON needs to use world in primitive executor
                     direct_control_ = *primitive_executor_.stepPrimitive(
-                        robot_id_, robot->currentState());
+                            robot_id_, robot->currentState());
                 }
                 else
                 {
@@ -208,6 +208,7 @@ void Thunderloop::runLoop()
             {
                 ScopedTimespecTimer timer(&poll_time);
                 power_status_ = power_service_->poll(direct_control_.power_control());
+                LOG(DEBUG) << power_status_.DebugString();
             }
             thunderloop_status_.set_power_service_poll_time_ns(
                 static_cast<unsigned long>(poll_time.tv_nsec));
