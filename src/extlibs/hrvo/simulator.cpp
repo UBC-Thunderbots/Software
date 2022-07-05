@@ -428,8 +428,7 @@ const std::unique_ptr<KdTree> &HRVOSimulator::getKdTree() const
     return kd_tree;
 }
 
-const std::vector<std::optional<std::shared_ptr<Agent>>>
-HRVOSimulator::getAgents() const
+const std::vector<std::optional<std::shared_ptr<Agent>>> HRVOSimulator::getAgents() const
 {
     return agents;
 }
@@ -445,11 +444,11 @@ void HRVOSimulator::updateRemovedAgents(const World &world)
                       std::unique_ptr<const std::vector<Robot>> team_to_use;
                       switch (agent.value()->getAgentType())
                       {
-					  	  case TeamSide::FRIENDLY:
+                          case TeamSide::FRIENDLY:
                               team_to_use = std::make_unique<const std::vector<Robot>>(
                                   world.friendlyTeam().getAllRobots());
                               break;
-						  case TeamSide::ENEMY:
+                          case TeamSide::ENEMY:
                               team_to_use = std::make_unique<const std::vector<Robot>>(
                                   world.enemyTeam().getAllRobots());
                               break;
@@ -472,9 +471,9 @@ void HRVOSimulator::updateRemovedAgents(const World &world)
 
 std::size_t HRVOSimulator::getNumAgents() const
 {
-	return agents.size() - std::count_if(agents.begin(), agents.end(), 
-					[](const std::optional<std::shared_ptr<Agent>> &agent)
-					{
-						return !agent.has_value();
-					});
+    return agents.size() -
+           std::count_if(agents.begin(), agents.end(),
+                         [](const std::optional<std::shared_ptr<Agent>> &agent) {
+                             return !agent.has_value();
+                         });
 }

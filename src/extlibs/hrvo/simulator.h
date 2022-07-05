@@ -106,9 +106,9 @@ class HRVOSimulator
      * @param uncertaintyOffset  The uncertainty offset of this agent.
      * @param maxAccel           The maximum acceleration of this agent.
      * @param curr_velocity      The initial velocity of this agent.
-	 * @param robot_id			 The robot id of this agent.
-	 * @param type				 The side that this agent is on (friendly/enemy)
-	 *
+     * @param robot_id			 The robot id of this agent.
+     * @param type				 The side that this agent is on (friendly/enemy)
+     *
      * @return The index of the agent.
      */
     std::size_t addHRVOAgent(const Vector &position, float agent_radius,
@@ -126,9 +126,9 @@ class HRVOSimulator
      * @param max_accel     The maximum acceleration of this agent.
      * @param goal_index    The index of the Goal which this agent should go to.
      * @param goal_radius   The goal agent_radius of this agent.
-	 * @param robot_id		The robot id for this agent.
-	 * @param type			The side that this agent is on (enemy/friendly).
-	 *
+     * @param robot_id		The robot id for this agent.
+     * @param type			The side that this agent is on (enemy/friendly).
+     *
      * @return The index of the agent.
      */
     size_t addLinearVelocityAgent(const Vector &position, float agent_radius,
@@ -270,11 +270,11 @@ class HRVOSimulator
     }
 
    private:
-	/** 
-	 * Updates the internal agents and removes expired agents based on the given world.
-	 *
-	 * @param world the world to update current agents with
-	 */
+    /**
+     * Updates the internal agents and removes expired agents based on the given world.
+     *
+     * @param world the world to update current agents with
+     */
     void updateRemovedAgents(const World &world);
 
     // PrimitiveSet which includes the path which each friendly robot should take

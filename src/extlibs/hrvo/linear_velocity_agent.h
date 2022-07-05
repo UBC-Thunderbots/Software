@@ -21,8 +21,8 @@ class LinearVelocityAgent : public Agent
      * @param maxSpeed    The maximum speed of this agent.
      * @param maxAccel    The maximum acceleration of this agent.
      * @param path        The path of this agent.
-	 * @param robot_id	  The robot id for this agent.
-	 * @param type		  The team side for this agent (friendly or enemy).
+     * @param robot_id	  The robot id for this agent.
+     * @param type		  The team side for this agent (friendly or enemy).
      */
     LinearVelocityAgent(HRVOSimulator *simulator, const Vector &position, float radius,
                         const Vector &velocity, float maxSpeed, float maxAccel,

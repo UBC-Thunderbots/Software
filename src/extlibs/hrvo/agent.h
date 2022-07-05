@@ -26,8 +26,8 @@ class Agent
      * @param maxSpeed           The maximum speed of this agent.
      * @param maxAccel           The maximum acceleration of this agent.
      * @param path               The path for this agent
-	 * @param robot_id			 The robot id for this agent
-	 * @param agent_type		 The friendly or enemy agent type
+     * @param robot_id			 The robot id for this agent
+     * @param agent_type		 The friendly or enemy agent type
      */
     Agent(HRVOSimulator *simulator, const Vector &position, float radius,
           const Vector &velocity, const Vector &prefVelocity, float maxSpeed,
@@ -157,11 +157,11 @@ class Agent
      */
     RobotId getRobotId();
 
-	/**
-	 * Get whether this robot is a FRIENDLY or an ENEMY robot.
-	 *
-	 * @return FRIENDLY if friendly, ENEMY if otherwise
-	 */
+    /**
+     * Get whether this robot is a FRIENDLY or an ENEMY robot.
+     *
+     * @return FRIENDLY if friendly, ENEMY if otherwise
+     */
     TeamSide getAgentType();
 
    protected:
