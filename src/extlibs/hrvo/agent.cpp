@@ -5,7 +5,7 @@
 
 Agent::Agent(HRVOSimulator *simulator, const Vector &position, float radius,
              const Vector &velocity, const Vector &prefVelocity, float maxSpeed,
-             float maxAccel, AgentPath &path, unsigned int robot_id, AgentType type)
+             float maxAccel, AgentPath &path, unsigned int robot_id, TeamSide type)
     : simulator_(simulator),
       position_(position),
       radius_(radius),
@@ -153,7 +153,7 @@ RobotId Agent::getRobotId()
     return robot_id;
 }
 
-AgentType Agent::getAgentType()
+TeamSide Agent::getAgentType()
 {
     return agent_type;
 }

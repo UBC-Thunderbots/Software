@@ -5,15 +5,9 @@
 #include "software/ai/navigator/path_planner/hrvo/velocity_obstacle.h"
 #include "software/geom/vector.h"
 #include "software/world/robot_state.h"
+#include "software/world/team_types.h"
 
 class HRVOSimulator;
-
-enum AgentType
-{
-    FRIENDLY,
-    ENEMY,
-    BALL
-};
 
 /**
  * An agent/robot in the HRVO simulation.
@@ -32,10 +26,12 @@ class Agent
      * @param maxSpeed           The maximum speed of this agent.
      * @param maxAccel           The maximum acceleration of this agent.
      * @param path               The path for this agent
+	 * @param robot_id			 The robot id for this agent
+	 * @param agent_type		 The friendly or enemy agent type
      */
     Agent(HRVOSimulator *simulator, const Vector &position, float radius,
           const Vector &velocity, const Vector &prefVelocity, float maxSpeed,
-          float maxAccel, AgentPath &path, RobotId robot_id, AgentType agent_type);
+          float maxAccel, AgentPath &path, RobotId robot_id, TeamSide agent_type);
 
     virtual ~Agent() = default;
 
@@ -161,7 +157,12 @@ class Agent
      */
     RobotId getRobotId();
 
-    AgentType getAgentType();
+	/**
+	 * Get whether this robot is a FRIENDLY or an ENEMY robot.
+	 *
+	 * @return FRIENDLY if friendly, ENEMY if otherwise
+	 */
+    TeamSide getAgentType();
 
    protected:
     // Agent Properties
@@ -180,12 +181,11 @@ class Agent
     AgentPath path;
 
     RobotId robot_id;
+    TeamSide agent_type;
 
     float max_speed_;
     float max_accel_;
     bool reached_goal_;
-
-    AgentType agent_type;
 
     HRVOSimulator *const simulator_;
 };
