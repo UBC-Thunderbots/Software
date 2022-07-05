@@ -55,7 +55,7 @@ def test_basic_movement(tbots_test_runner, robot_x_position, robot_y_position):
 
 
 # this test can only be run on the field
-def test_basic_rotation(field_test_runner,):
+def test_basic_rotation(field_test_runner):
 
     test_angles = [0, 45, 90, 180, 270, 0]
 
