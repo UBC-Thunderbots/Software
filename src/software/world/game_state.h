@@ -357,13 +357,6 @@ class GameState
     bool isReadyState() const;
 
     /**
-     * Returns true if we can kick the ball.
-     *
-     * @return  true if we can kick the ball.
-     */
-    bool canKick() const;
-
-    /**
      * Returns true if we should stay a set distance from the ball.
      * See Robocup SSL Rules Law 13.4, 5.5, 8.2.1, 9.2
      *

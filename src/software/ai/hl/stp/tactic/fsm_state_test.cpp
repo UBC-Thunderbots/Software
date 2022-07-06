@@ -14,7 +14,7 @@ TEST(FsmStateTest, test_get_fsm_state)
     Pass pass = Pass(Point(0, 0), Point(2, 0), 5);
     tactic.setLastExecutionRobot(robot.id());
 
-    EXPECT_EQ("DribbleFSM.GetPossession", tactic.getFSMState());
+    EXPECT_EQ("MoveFSM.MoveState", tactic.getFSMState());
     tactic.updateControlParams(pass, true);
     tactic.get(world, TEST_UTIL_CREATE_MOTION_CONTROL_NO_DEST);
 

@@ -250,12 +250,6 @@ bool GameState::isReadyState() const
     return play_state_ == READY;
 }
 
-// One of our robots can kick the ball
-bool GameState::canKick() const
-{
-    return play_state_ == PLAYING || (our_restart_ && play_state_ == READY);
-}
-
 bool GameState::stayAwayFromBall() const
 {
     return play_state_ != PLAYING && !our_restart_;
