@@ -16,7 +16,8 @@ TEST(AttackerFSMTest, test_transitions)
                                               .chip_target      = std::nullopt};
 
     TbotsProto::AiConfig ai_config;
-    FSM<AttackerFSM> fsm{DribbleFSM(ai_config.dribble_tactic_config()),
+    FSM<AttackerFSM> fsm{GetBehindBallFSM(),
+                         DribbleFSM(ai_config.dribble_tactic_config()),
                          AttackerFSM(ai_config.attacker_tactic_config())};
     EXPECT_TRUE(fsm.is(boost::sml::state<DribbleFSM>));
 
