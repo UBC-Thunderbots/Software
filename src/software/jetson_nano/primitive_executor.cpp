@@ -6,6 +6,7 @@
 #include "proto/tbots_software_msgs.pb.h"
 #include "proto/visualization.pb.h"
 #include "software/math/math_functions.h"
+#include "proto/message_translation/tbots_protobuf.h"
 
 PrimitiveExecutor::PrimitiveExecutor(const double time_step, const RobotId robot_id,
                                      const RobotConstants_t &robot_constants,
@@ -14,7 +15,8 @@ PrimitiveExecutor::PrimitiveExecutor(const double time_step, const RobotId robot
       robot_constants_(robot_constants),
       current_primitive_(),
       hrvo_simulator_(static_cast<float>(time_step), robot_constants,
-                      friendly_team_colour)
+                      friendly_team_colour),
+      team_colour_testing(friendly_team_colour)
 {
 }
 
@@ -31,7 +33,7 @@ void PrimitiveExecutor::updatePrimitiveSet(
 
 void PrimitiveExecutor::updateWorld(const TbotsProto::World &world_msg)
 {
-    //    if (robot_id_ == 1)
+    //    if (robot_id_ == 3 && team_colour_testing == TeamColour::BLUE)
     //        std::cout << "velocity updated from world" << std::endl;
     hrvo_simulator_.updateWorld(World(world_msg));
 }
@@ -39,8 +41,9 @@ void PrimitiveExecutor::updateWorld(const TbotsProto::World &world_msg)
 void PrimitiveExecutor::updateLocalVelocity(const Vector &local_velocity,
                                             const Angle &curr_orientation)
 {
-    //    if (robot_id_ == 1)
-    //        std::cout << "velocity updated from sim (actual)" << std::endl;
+//    Vector prev_vel = getTargetLinearVelocity(curr_orientation);
+//    if (robot_id_ == 3 && team_colour_testing == TeamColour::BLUE)
+//        std::cout << "velocity updated from sim (actual): " << local_velocity.length() <<  << std::endl;
 
     hrvo_simulator_.updateFriendlyRobotVelocity(robot_id_,
                                                 local_velocity.rotate(-curr_orientation));
@@ -79,8 +82,9 @@ AngularVelocity PrimitiveExecutor::getTargetAngularVelocity(
 std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimitive(
     const Angle &curr_orientation)
 {
-    //    if (robot_id_ == 1)
-    //        std::cout << "hrvo sim stepped" << std::endl;
+    Vector target_velocity2 = getTargetLinearVelocity(curr_orientation);
+    if (robot_id_ == 3 && team_colour_testing == TeamColour::BLUE)
+        std::cout << "hrvo velocity before doStep: " << target_velocity2.length() << std::endl;
 
     hrvo_simulator_.doStep();
 
@@ -120,6 +124,17 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
         {
             // Compute the target velocities
             Vector target_velocity = getTargetLinearVelocity(curr_orientation);
+            if (robot_id_ == 4 && team_colour_testing == TeamColour::BLUE)
+            {
+                auto accel = (target_velocity2 - target_velocity).length() * 60.0;
+                LOG(VISUALIZE) << *createNamedValue(
+                            "hrvo accel",
+                            static_cast<float>(accel));
+                LOG(VISUALIZE) << *createNamedValue(
+                            "hrvo vel",
+                            static_cast<float>(target_velocity.length()));
+            }
+
             AngularVelocity target_angular_velocity =
                 getTargetAngularVelocity(current_primitive_.move(), curr_orientation);
 

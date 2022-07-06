@@ -71,9 +71,9 @@ class NamedValuePlotter(object):
             # Update the data
             plot.setData(self.data_x[named_value], self.data_y[named_value])
 
-        self.win.setRange(
-            xRange=[
-                time.time() - self.time - TIME_WINDOW_TO_DISPLAY_S,
-                time.time() - self.time,
-            ],
-        )
+        # self.win.setRange(
+        #     xRange=[
+        #         time.time() - self.time - TIME_WINDOW_TO_DISPLAY_S,
+        #         time.time() - self.time,
+        #     ],
+        # )

@@ -169,10 +169,9 @@ Thunderloop::~Thunderloop() {}
                     const auto& orientation =
                         robot_iter->current_state().global_orientation();
                     // Note: This overrides the velocity calculated by sensor fusion and
-                    // passed to
-                    //       Primitive Executor through the World, as a result,
-                    //       updateLocalVelocity must be called after updateWorld and
-                    //       before stepPrimitive.
+                    // passed to Primitive Executor through the World, as a result,
+                    // updateLocalVelocity must be called after updateWorld and before
+                    // stepPrimitive.
                     primitive_executor_.updateLocalVelocity(
                         createVector(motor_status_.local_velocity()),
                         createAngle(orientation));

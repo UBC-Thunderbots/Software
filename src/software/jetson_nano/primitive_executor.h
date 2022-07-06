@@ -88,4 +88,5 @@ class PrimitiveExecutor
     RobotConstants_t robot_constants_;
     TbotsProto::Primitive current_primitive_;
     HRVOSimulator hrvo_simulator_;
+    const TeamColour team_colour_testing;
 };

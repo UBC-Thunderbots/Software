@@ -386,7 +386,30 @@ void ErForceSimulator::stepSimulation(const Duration& time_step)
         }
     }
 
+    unsigned int id = 4;
+    auto id_to_vel_map = getRobotIdToLocalVelocityMap(getSimulatorState().blue_robots());
+    Vector prev_vel;
+    if (id_to_vel_map.find(id) != id_to_vel_map.end())
+    {
+        prev_vel = id_to_vel_map.at(id);
+    }
+
     er_force_sim->stepSimulation(time_step.toSeconds());
+
+
+    id_to_vel_map = getRobotIdToLocalVelocityMap(getSimulatorState().blue_robots());
+    Vector after_vel;
+    if (id_to_vel_map.find(id) != id_to_vel_map.end())
+    {
+        after_vel = id_to_vel_map.at(id);
+    }
+    auto accel = (prev_vel - after_vel).length() * 60.0;
+    LOG(VISUALIZE) << *createNamedValue(
+                "erforce accel",
+                static_cast<float>(accel));
+    LOG(VISUALIZE) << *createNamedValue(
+                "erforce vel",
+                static_cast<float>(after_vel.length()));
 
     frame_number++;
 }
