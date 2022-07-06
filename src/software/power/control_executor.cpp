@@ -18,7 +18,7 @@ void ControlExecutor::execute(const TbotsProto_PowerControl& control)
         case TbotsProto_PowerControl_ChickerControl_kick_speed_m_per_s_tag:
             chicker->setKickSpeedMPerS(
                 control.chicker.chicker_command.kick_speed_m_per_s);
-                chicker->kick();
+            chicker->kick();
             break;
         case TbotsProto_PowerControl_ChickerControl_chip_distance_meters_tag:
             chicker->setChipDistanceMeters(
@@ -34,7 +34,7 @@ void ControlExecutor::execute(const TbotsProto_PowerControl& control)
                     chicker->setKickSpeedMPerS(
                         control.chicker.chicker_command.auto_chip_or_kick
                             .auto_chip_or_kick.autokick_speed_m_per_s);
-                        chicker->autokick();
+                    chicker->autokick();
                     break;
                 case TbotsProto_AutoChipOrKick_autochip_distance_meters_tag:
                     chicker->setChipDistanceMeters(

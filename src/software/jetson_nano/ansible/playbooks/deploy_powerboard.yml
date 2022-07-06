@@ -19,21 +19,26 @@
       args:
         chdir: ~/
 
-    - name: Enter bootloader mode
-      script: ../scripts/esp32_flashing.py bootloader
-      args:
-        executable: python3
+    - name: Put the powerboard in bootloader mode
+      ansible.builtin.pause:
+        prompt: "Press enter to continue"
+        echo: no
+
+    #- name: Enter bootloader mode
+      #script: ../scripts/esp32_flashing.py bootloader
+      #args:
+        #executable: python3
 
     - name: Flashing... (this will take a while on the first run)
       shell: '/opt/tbotspython/bin/platformio run --disable-auto-clean -t nobuild -t upload -d ~/powerloop/power'
       register: result
 
-    #- name: Reset powerboard to finish flashing
-    #  ansible.builtin.pause:
-    #    prompt: "Press enter to continue"
-    #    echo: no
-
     - name: Reset powerboard to finish flashing
-      script: ../scripts/esp32_flashing.py reset
-      args:
-        executable: python3
+      ansible.builtin.pause:
+        prompt: "Press enter to continue"
+        echo: no
+
+    #- name: Reset powerboard to finish flashing
+      #script: ../scripts/esp32_flashing.py reset
+      #args:
+        #executable: python3

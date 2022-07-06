@@ -72,7 +72,7 @@ void Chicker::coolDownPoll()
     if (on_cooldown && cooldown_counter >= 3000)
     {
         cooldown_counter = 0;
-        on_cooldown = false;
+        on_cooldown      = false;
     }
 }
 
@@ -83,16 +83,12 @@ int IRAM_ATTR Chicker::speedToPulseWidth(float speed_m_per_s)
 
 void IRAM_ATTR Chicker::oneShotPulse(int duration, int pin)
 {
-    //if (!on_cooldown)
-    //{
-        //on_cooldown = true;
+    // NO COOLDOWN
+    timerWrite(pulse_timer, 0);
+    timerAlarmWrite(pulse_timer, duration, false);
+    timerAlarmEnable(pulse_timer);
 
-        timerWrite(pulse_timer, 0);
-        timerAlarmWrite(pulse_timer, duration, false);
-        timerAlarmEnable(pulse_timer);
-
-        digitalWrite(pin, HIGH);
-    //}
+    digitalWrite(pin, HIGH);
 }
 
 void IRAM_ATTR Chicker::stopPulse()

@@ -2,9 +2,7 @@
 
 TbotsProto_Geneva_Slot Geneva::current_slot = TbotsProto_Geneva_Slot_CENTRE;
 
-Geneva::Geneva()
-{
-}
+Geneva::Geneva() {}
 
 TbotsProto_Geneva_Slot Geneva::getCurrentSlot()
 {

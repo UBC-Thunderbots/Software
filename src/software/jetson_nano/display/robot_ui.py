@@ -12,9 +12,6 @@ import argparse
 from threading import Thread
 from software.jetson_nano.display.rotary_encoder.rotary_encoder import RotaryEncoder
 from software.jetson_nano.display.screens.home_screen import HomeScreen
-from software.jetson_nano.display.screens.menu_screen import MenuScreen
-from software.jetson_nano.display.screens.wheels_screen import WheelsScreen
-from software.jetson_nano.display.screens.chip_and_kick_screen import ChipAndKickScreen
 import software.jetson_nano.display.constants as constants
 
 # Pins for Rotary Encoder
@@ -39,15 +36,6 @@ redis_keys = [
     "/battery_voltage",
     "/cap_voltage",
     "/current_draw",
-    "chip enable",
-    "kick enable",
-    "chip speed",
-    "kick speed",
-    "wheels enable",
-    "fl wheel speed",
-    "fr wheel speed",
-    "bl wheel speed",
-    "br wheel speed",
 ]
 
 
@@ -89,11 +77,6 @@ class RobotUi:
         # All of our screens
         self.screens = {
             "Home": HomeScreen(self.lcd_display, self.redis_dict, screen_actions),
-            "Menu": MenuScreen(self.lcd_display, screen_actions),
-            "Wheels": WheelsScreen(self.lcd_display, self.redis_dict, screen_actions),
-            "Chip and Kick": ChipAndKickScreen(
-                self.lcd_display, self.redis_dict, screen_actions
-            ),
         }
 
         time.sleep(2)
@@ -170,7 +153,9 @@ if __name__ == "__main__":
             host="localhost", port=constants.REDIS_PORT_NUMBER, db=0
         )
         for key in redis_keys:
-            redis_client.set(key, 0)
+            redis_client.set(key, "0")
+
+    init_redis()
 
     def start_polling(robot_ui):
         robot_ui.poll_redis()

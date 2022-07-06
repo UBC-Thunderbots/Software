@@ -167,6 +167,13 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
     checkDriverFault(DRIBBLER_MOTOR_CHIP_SELECT);
     startController(DRIBBLER_MOTOR_CHIP_SELECT, true);
 
+    // Enable Heart
+    heartbeat_gpio.setValue(GpioState::LOW);
+    usleep(MICROSECONDS_PER_MILLISECOND * 100);
+    heartbeat_gpio.setValue(GpioState::HIGH);
+    usleep(MICROSECONDS_PER_MILLISECOND * 100);
+    heartbeat_gpio.setValue(GpioState::LOW);
+
     // Calibrate Encoder
     for (uint8_t motor = 0; motor < NUM_DRIVE_MOTORS; motor++)
     {
@@ -174,6 +181,12 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
     }
 
     sleep(1);
+
+    heartbeat_gpio.setValue(GpioState::LOW);
+    usleep(MICROSECONDS_PER_MILLISECOND * 100);
+    heartbeat_gpio.setValue(GpioState::HIGH);
+    usleep(MICROSECONDS_PER_MILLISECOND * 100);
+    heartbeat_gpio.setValue(GpioState::LOW);
 
     for (uint8_t motor = 0; motor < NUM_DRIVE_MOTORS; motor++)
     {
@@ -359,7 +372,7 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
     EuclideanSpace_t target_linear_velocity  = {0.0, 0.0, 0.0};
     EuclideanSpace_t target_angular_velocity = {0.0, 0.0, 0.0};
     int target_dribbler_rpm                  = motor.dribbler_speed_rpm();
-    static int test_ramp_rpm = 0;
+    static int test_ramp_rpm                 = 0;
 
     switch (motor.drive_control_case())
     {
@@ -422,6 +435,18 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
     {
         test_ramp_rpm -= 1000;
         tmc4671_setTargetVelocity(DRIBBLER_MOTOR_CHIP_SELECT, test_ramp_rpm);
+    }
+
+    // Toggle Hearbeat
+    if (heartbeat_state == 1)
+    {
+        heartbeat_gpio.setValue(GpioState::LOW);
+        heartbeat_state = 0;
+    }
+    else
+    {
+        heartbeat_gpio.setValue(GpioState::HIGH);
+        heartbeat_state = 1;
     }
 
     return motor_status;

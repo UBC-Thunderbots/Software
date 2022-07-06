@@ -190,14 +190,16 @@ void Thunderloop::runLoop()
                 {
                     // TODO-JON needs to use world in primitive executor
                     direct_control_ = *primitive_executor_.stepPrimitive(
-                            robot_id_, robot->currentState());
+                        robot_id_, robot->currentState());
                 }
                 else
                 {
                     // We are in robot diagnostics
-                    auto robot_state = RobotState(Point(0,0), Vector(0,0), Angle::fromDegrees(0), Angle::fromDegrees(0));
-                    direct_control_ = *primitive_executor_.stepPrimitive(
-                            robot_id_, robot_state);
+                    auto robot_state =
+                        RobotState(Point(0, 0), Vector(0, 0), Angle::fromDegrees(0),
+                                   Angle::fromDegrees(0));
+                    direct_control_ =
+                        *primitive_executor_.stepPrimitive(robot_id_, robot_state);
                 }
             }
 
@@ -207,6 +209,7 @@ void Thunderloop::runLoop()
             // Power Service: execute the power control command
             {
                 ScopedTimespecTimer timer(&poll_time);
+                LOG(DEBUG) << direct_control_.power_control().DebugString();
                 power_status_ = power_service_->poll(direct_control_.power_control());
                 LOG(DEBUG) << power_status_.DebugString();
             }
@@ -217,7 +220,7 @@ void Thunderloop::runLoop()
             {
                 ScopedTimespecTimer timer(&poll_time);
                 motor_status_ = motor_service_->poll(direct_control_.motor_control(),
-                        loop_duration_seconds);
+                                                     loop_duration_seconds);
                 primitive_executor_.updateLocalVelocity(
                     createVector(motor_status_.local_velocity()));
             }
@@ -237,7 +240,8 @@ void Thunderloop::runLoop()
         thunderloop_status_.set_iteration_time_ns(loop_duration);
 
         // Make sure the iteration can fit inside the period of the loop
-        loop_duration_seconds = static_cast<double>(loop_duration) * SECONDS_PER_NANOSECOND;
+        loop_duration_seconds =
+            static_cast<double>(loop_duration) * SECONDS_PER_NANOSECOND;
         LOG(DEBUG) << "Loop duration: " << loop_duration_seconds << " seconds";
 
         // Calculate next shot taking into account how long this iteration took
