@@ -164,6 +164,7 @@ class ErForceSimulator
         std::unordered_map<unsigned int, std::shared_ptr<PrimitiveExecutor>>&
             robot_primitive_executor_map,
         const TbotsProto::World& world_msg);
+    void createErForceSimRobot(robot::Specs& specs, const RobotConstants_t &robot_constants);
 
     // Map of Robot id to Primitive Executor
     std::unordered_map<unsigned int, std::shared_ptr<PrimitiveExecutor>>

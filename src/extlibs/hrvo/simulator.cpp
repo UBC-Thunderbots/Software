@@ -42,6 +42,7 @@
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/algorithms/intersection.h"
 #include "software/logger/logger.h"
+#include "proto/message_translation/tbots_protobuf.h"
 
 HRVOSimulator::HRVOSimulator(float time_step, const RobotConstants_t &robot_constants,
                              const TeamColour friendly_team_colour)
@@ -375,7 +376,13 @@ void HRVOSimulator::updateFriendlyRobotVelocity(const RobotId robot_id,
     auto hrvo_agent = getFriendlyAgentFromRobotId(robot_id);
     if (hrvo_agent.has_value())
     {
-        return hrvo_agent.value()->setVelocity(new_velocity);
+        if (robot_id == 4 && friendly_team_colour == TeamColour::BLUE)
+        {
+            LOG(VISUALIZE) << *createNamedValue(
+                        "vel diff",
+                        static_cast<float>(hrvo_agent.value()->getVelocity().length() - new_velocity.length()));
+        }
+        hrvo_agent.value()->setVelocity(new_velocity);
     }
 }
 

@@ -144,6 +144,7 @@ void ErForceSimulator::setRobots(
 
     robot::Specs ERForce;
     robotSetDefault(&ERForce);
+    createErForceSimRobot(ERForce, robot_constants);
 
     // Initialize Team Robots at the bottom of the field
     ::robot::Team* team;
@@ -300,13 +301,15 @@ void ErForceSimulator::setRobotPrimitive(
         {
             robot_primitive_executor->updatePrimitiveSet(primitive_set_msg);
             robot_primitive_executor->updateWorld(world_msg);
-            static int test = 0;
-            if (test++ % 5 == 0)
-            {
-                robot_primitive_executor->updateLocalVelocity(
-                    local_velocity,
-                    createAngle(robot_proto_it->current_state().global_orientation()));
-            }
+//            static int test = 0;
+//            if (test++ % 5 == 0)
+//            {
+// TODO: MOVE THIS UPDATE TO BEFORE GETLOCALVELOCITY SO THE VEL IS UP TO DATE FROM SIM
+// TODO: MEASURE THE DIFF IN NEW VEL AND THE HRVO VEL (IDEALLY 0) Diff around 0.15
+//                robot_primitive_executor->updateLocalVelocity(
+//                    local_velocity,
+//                    createAngle(robot_proto_it->current_state().global_orientation()));
+//            }
         }
         else
         {
@@ -329,6 +332,8 @@ SSLSimulationProto::RobotControl ErForceSimulator::updateSimulatorRobots(
 {
     SSLSimulationProto::RobotControl robot_control;
 
+    auto id_to_vel_map = getRobotIdToLocalVelocityMap(getSimulatorState().blue_robots());
+    Vector prev_vel;
     for (auto& primitive_executor_with_id : robot_primitive_executor_map)
     {
         unsigned int robot_id       = primitive_executor_with_id.first;
@@ -338,15 +343,30 @@ SSLSimulationProto::RobotControl ErForceSimulator::updateSimulatorRobots(
                          [&](const auto& robot) { return robot.id() == robot_id; });
         if (robot_proto_it != friendly_robots.end())
         {
-            auto& primitive_executor = primitive_executor_with_id.second;
-            // Set to NEG_X because the world msg in this simulator is
-            // normalized correctly
-            auto direct_control = primitive_executor->stepPrimitive(
-                RobotState(robot_proto_it->current_state()).orientation());
+            auto robot_primitive_executor_iter = robot_primitive_executor_map.find(robot_id);
 
-            auto command = *getRobotCommandFromDirectControl(
-                robot_id, std::move(direct_control), robot_constants);
-            *(robot_control.mutable_robot_commands()->Add()) = command;
+            if (robot_primitive_executor_iter != robot_primitive_executor_map.end())
+            {
+                Vector local_velocity;
+                if (id_to_vel_map.find(robot_id) != id_to_vel_map.end())
+                {
+                    local_velocity = id_to_vel_map.at(robot_id);
+                }
+                auto robot_primitive_executor = robot_primitive_executor_iter->second;
+                unsigned int robot_id = robot_primitive_executor_iter->first;
+                auto& primitive_executor = primitive_executor_with_id.second;
+                // Set to NEG_X because the world msg in this simulator is
+                // normalized correctly
+                robot_primitive_executor->updateLocalVelocity(
+                        local_velocity,
+                        createAngle(robot_proto_it->current_state().global_orientation()));
+                auto direct_control = primitive_executor->stepPrimitive(
+                        RobotState(robot_proto_it->current_state()).orientation());
+
+                auto command = *getRobotCommandFromDirectControl(
+                        robot_id, std::move(direct_control), robot_constants);
+                *(robot_control.mutable_robot_commands()->Add()) = command;
+            }
         }
     }
     return robot_control;
@@ -497,4 +517,21 @@ std::map<RobotId, Vector> ErForceSimulator::getRobotIdToLocalVelocityMap(
                 .rotate(Angle::fromRadians(sim_robot.angle()));
     }
     return robot_to_local_velocity;
+}
+
+void ErForceSimulator::createErForceSimRobot(robot::Specs& specs, const RobotConstants_t &robot_constants)
+{
+    specs.set_radius(static_cast<float>(ROBOT_MAX_RADIUS_METERS));
+    specs.set_mass(robot_constants.mass_kg);
+    specs.set_v_max(robot_constants.robot_max_speed_m_per_s);
+    specs.set_omega_max(robot_constants.robot_max_ang_speed_rad_per_s);
+    specs.set_dribbler_width(robot_constants.dribbler_width_meters);
+
+    robot::LimitParameters *acceleration = specs.mutable_acceleration();
+    acceleration->set_a_speedup_f_max(7);
+    acceleration->set_a_speedup_s_max(robot_constants.robot_max_acceleration_m_per_s_2);
+    acceleration->set_a_speedup_phi_max(robot_constants.robot_max_ang_acceleration_rad_per_s_2);
+    acceleration->set_a_brake_f_max(7);
+    acceleration->set_a_brake_s_max(6);
+    acceleration->set_a_brake_phi_max(60);
 }
