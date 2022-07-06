@@ -12,7 +12,7 @@ from proto.ssl_gc_common_pb2 import Team
 
 # TODO issue  #2599 - Remove Duration parameter from test
 # @pytest.mark.parametrize("run_enemy_ai,test_duration", [(False, 20), (True, 20)])
-def DISABLED_test_corner_kick_play_bottom_left(simulated_test_runner):
+def test_corner_kick_play_bottom_left(simulated_test_runner):
 
     # starting point must be Point
     ball_initial_pos = tbots.Point(2.5, -3)

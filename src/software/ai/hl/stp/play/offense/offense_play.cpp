@@ -67,6 +67,13 @@ void OffensePlay::updateTactics(const PlayUpdate &play_update)
         // play_update.num_tactics == 0 is handled above
         num_defenders = play_update.num_tactics - 1;
     }
+    else if (play_update.world.ball().position().x() <
+             play_update.world.field().fieldLines().xMin() / 4.0)
+    {
+        // if we have more than 3 robots and the ball is on our side of the field, then we
+        // should dedicate an additional robot to defense
+        num_defenders = 3;
+    }
 
     unsigned int num_shoot_or_pass = play_update.num_tactics - num_defenders;
 
