@@ -65,8 +65,6 @@ void MotionConstraintVisitor::visit(const ReceiverTactic &tactic) {}
 
 void MotionConstraintVisitor::visit(const AttackerTactic &tactic) { }
 
-void MotionConstraintVisitor::visit(const OneTouchAttackerTactic &tactic) { }
-
 void MotionConstraintVisitor::visit(const DefenseShadowEnemyTactic &tactic) {}
 
 void MotionConstraintVisitor::visit(const MoveTestTactic &tactic) {}

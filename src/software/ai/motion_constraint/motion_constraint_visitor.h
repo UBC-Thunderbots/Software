@@ -31,7 +31,6 @@ class MotionConstraintVisitor : public TacticVisitor
     void visit(const PenaltySetupTactic &tactic) override;
     void visit(const ReceiverTactic &tactic) override;
     void visit(const AttackerTactic &tactic) override;
-    void visit(const OneTouchAttackerTactic &tactic) override;
     void visit(const DefenseShadowEnemyTactic &tactic) override;
     void visit(const MoveTestTactic &tactic) override;
     void visit(const StopTestTactic &tactic) override;
