@@ -24,29 +24,6 @@ cc_library(
 )
 
 cc_library(
-    name = "corner_kick_play",
-    srcs = ["corner_kick_play.cpp"],
-    hdrs = ["corner_kick_play.h"],
-    deps = [
-        ":play",
-        "//proto/message_translation:tbots_protobuf",
-        "//shared:constants",
-        "//software/ai/evaluation:possession",
-        "//software/ai/hl/stp/tactic/attacker:attacker_tactic",
-        "//software/ai/hl/stp/tactic/goalie:goalie_tactic",
-        "//software/ai/hl/stp/tactic/move:move_tactic",
-        "//software/ai/hl/stp/tactic/receiver:receiver_tactic",
-        "//software/ai/hl/stp/tactic/stop:stop_tactic",
-        "//software/ai/passing:eighteen_zone_pitch_division",
-        "//software/ai/passing:pass_generator",
-        "//software/logger",
-        "//software/util/generic_factory",
-        "//software/world:ball",
-    ],
-    alwayslink = True,
-)
-
-cc_library(
     name = "defense_play",
     srcs = ["defense_play.cpp"],
     hdrs = ["defense_play.h"],
@@ -263,7 +240,6 @@ cc_library(
     name = "all_plays",
     deps = [
         ":ball_placement_play",
-        ":corner_kick_play",
         ":defense_play",
         ":enemy_ball_placement_play",
         ":enemy_free_kick_play",
@@ -276,7 +252,6 @@ cc_library(
         ":shoot_or_chip_play",
         ":stop_play",
         "//software/ai/hl/stp/play/crease_defense:crease_defense_play",
-        "//software/ai/hl/stp/play/free_kick:free_kick_play",
         "//software/ai/hl/stp/play/hardware_challenge_plays:dribbling_parcour_play",
         "//software/ai/hl/stp/play/hardware_challenge_plays:pass_endurance_play",
         "//software/ai/hl/stp/play/hardware_challenge_plays:scoring_from_contested_possession_play",
@@ -330,37 +305,6 @@ cc_test(
         "//software/test_util",
         "//software/time:duration",
         "//software/world",
-    ],
-)
-
-cc_test(
-    name = "corner_kick_play_cpp_test",
-    srcs = ["corner_kick_play_test.cpp"],
-    deps = [
-        "//shared/test_util:tbots_gtest_main",
-        "//software/ai/hl/stp/play:corner_kick_play",
-        "//software/simulated_tests:simulated_er_force_sim_play_test_fixture",
-        "//software/simulated_tests/terminating_validation_functions",
-        "//software/simulated_tests/validation:validation_function",
-        "//software/test_util",
-        "//software/time:duration",
-        "//software/world",
-    ],
-)
-
-py_test(
-    name = "corner_kick_play_test",
-    srcs = [
-        "corner_kick_play_test.py",
-    ],
-    # TODO (#2619) Remove tag to run in parallel
-    tags = [
-        "exclusive",
-    ],
-    deps = [
-        "//software/simulated_tests:simulated_test_fixture",
-        "//software/simulated_tests:validation",
-        requirement("pytest"),
     ],
 )
 
