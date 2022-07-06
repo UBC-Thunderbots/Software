@@ -50,7 +50,7 @@ def DISABLED_test_corner_kick_play_bottom_left(simulated_test_runner):
         gc_command=Command.Type.DIRECT, team=Team.BLUE
     )
 
-    time.sleep(1) 
+    time.sleep(1)
 
     # override yellow play
     yellow_play = Play()
@@ -120,7 +120,7 @@ def test_corner_kick_play_top_right(simulated_test_runner):
         gc_command=Command.Type.DIRECT, team=Team.BLUE
     )
 
-    time.sleep(1) 
+    time.sleep(1)
 
     # override yellow play
     yellow_play = Play()

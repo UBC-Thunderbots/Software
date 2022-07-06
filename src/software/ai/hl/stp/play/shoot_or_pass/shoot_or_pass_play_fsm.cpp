@@ -232,16 +232,18 @@ bool ShootOrPassPlayFSM::shouldFreeKick(const Update& event)
     return event.control_params.should_one_touch;
 }
 
-bool ShootOrPassPlayFSM::hasPassInProgress(const Update &event)
+bool ShootOrPassPlayFSM::hasPassInProgress(const Update& event)
 {
-	return event.common.inter_play_communication.last_committed_pass.has_value();
+    return event.common.inter_play_communication.last_committed_pass.has_value();
 }
 
-void ShootOrPassPlayFSM::maintainPassInProgress(const Update &event)
+void ShootOrPassPlayFSM::maintainPassInProgress(const Update& event)
 {
-	best_pass_and_score_so_far = event.common.inter_play_communication.last_committed_pass.value();
+    best_pass_and_score_so_far =
+        event.common.inter_play_communication.last_committed_pass.value();
 
-	// reset interplay communication
-	event.common.set_inter_play_communication_fun(InterPlayCommunication{.last_committed_pass = std::nullopt});
+    // reset interplay communication
+    event.common.set_inter_play_communication_fun(
+        InterPlayCommunication{.last_committed_pass = std::nullopt});
     takePass(event);
 }

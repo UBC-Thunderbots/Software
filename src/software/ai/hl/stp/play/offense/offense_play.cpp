@@ -39,8 +39,9 @@ void OffensePlay::updateTactics(const PlayUpdate &play_update)
         (play_update.world.gameState().isOurDirectFree() ||
          play_update.world.gameState().isOurIndirectFree()))
     {
-        LOG(INFO)<<"FREE KICK"<<std::endl;
-        // if we're in free kick on the enemy side, then we can commit more robots in forward positions
+        LOG(INFO) << "FREE KICK" << std::endl;
+        // if we're in free kick on the enemy side, then we can commit more robots in
+        // forward positions
         if (play_update.world.ball().position().x() > 0)
         {
             num_defenders = std::max(

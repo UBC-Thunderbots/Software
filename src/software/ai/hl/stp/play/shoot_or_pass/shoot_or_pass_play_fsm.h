@@ -112,8 +112,8 @@ struct ShootOrPassPlayFSM
     bool tookShot(const Update& event);
 
     bool shouldFreeKick(const Update& event);
-	bool hasPassInProgress(const Update& event);
-	void maintainPassInProgress(const Update& event);
+    bool hasPassInProgress(const Update& event);
+    void maintainPassInProgress(const Update& event);
 
     auto operator()()
     {
@@ -128,14 +128,14 @@ struct ShootOrPassPlayFSM
         DEFINE_SML_ACTION(startLookingForPass)
         DEFINE_SML_ACTION(freeKickStartLookingForPass)
         DEFINE_SML_ACTION(takePass)
-		DEFINE_SML_ACTION(maintainPassInProgress)
+        DEFINE_SML_ACTION(maintainPassInProgress)
 
         DEFINE_SML_GUARD(shouldFreeKick)
         DEFINE_SML_GUARD(passFound)
         DEFINE_SML_GUARD(shouldAbortPass)
         DEFINE_SML_GUARD(passCompleted)
         DEFINE_SML_GUARD(tookShot)
-		DEFINE_SML_GUARD(hasPassInProgress)
+        DEFINE_SML_GUARD(hasPassInProgress)
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
