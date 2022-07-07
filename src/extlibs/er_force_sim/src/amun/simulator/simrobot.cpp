@@ -485,6 +485,10 @@ void SimRobot::begin(SimBall *ball, double time)
 
     // (1-(1-linear_damping)^timestep)/timestep - compensates damping
     const float V = 1.200f;             // keep current speed
+    // TODO: Nima - Seems to be the main factor which effects velocity.
+    //       Accel is calculated based on this weird formula... Is it just the regular kin formula of 1/2t?
+    //       Then limits it to accel/decel limits and converts the accel to force and applies it to the rigid body
+    //       v_f seems to be forward, while v_s is sideways (left)
     const float K = 1.f / time * 0.5f;  // correct half the error during each subtimestep
     const float K_I = /*0.1; //*/ 0.f;
 

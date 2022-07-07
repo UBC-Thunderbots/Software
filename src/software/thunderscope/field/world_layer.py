@@ -16,7 +16,6 @@ from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 MAX_ALLOWED_KICK_SPEED_M_PER_S = 6.5
 
-
 class WorldLayer(FieldLayer):
     def __init__(self, simulator_io, friendly_colour_yellow, buffer_size=5):
         """The WorldLayer
@@ -452,6 +451,64 @@ class WorldLayer(FieldLayer):
                     )
                 )
 
+    def draw_robot_speeds(self, painter):
+        """Draw the robot speeds
+
+        :param painter: The painter
+
+        """
+        painter.setPen(pg.mkPen(Colors.SPEED_COLOR, width=LINE_WIDTH))
+
+        for robot in self.cached_world.friendly_team.team_robots:
+            start_x = robot.current_state.global_position.x_meters
+            start_y = robot.current_state.global_position.y_meters
+            painter.drawLine(
+                QtCore.QLine(
+                    int(start_x * MILLIMETERS_PER_METER),
+                    int(start_y * MILLIMETERS_PER_METER),
+                    int(
+                        (
+                            start_x
+                            + robot.current_state.global_velocity.x_component_meters
+                        )
+                        * MILLIMETERS_PER_METER
+                    ),
+                    int(
+                        (
+                            start_y
+                            + robot.current_state.global_velocity.y_component_meters
+                        )
+                        * MILLIMETERS_PER_METER
+                    ),
+                )
+            )
+
+    def draw_ball_speed(self, painter):
+        """Draw the ball speed
+
+        :param painter: The painter
+
+        """
+        painter.setPen(pg.mkPen(Colors.SPEED_COLOR, width=LINE_WIDTH))
+
+        ball = self.cached_world.ball
+        start_x = ball.current_state.global_position.x_meters
+        start_y = ball.current_state.global_position.y_meters
+        painter.drawLine(
+            QtCore.QLine(
+                int(start_x * MILLIMETERS_PER_METER),
+                int(start_y * MILLIMETERS_PER_METER),
+                int(
+                    (start_x + ball.current_state.global_velocity.x_component_meters)
+                    * MILLIMETERS_PER_METER
+                ),
+                int(
+                    (start_y + ball.current_state.global_velocity.y_component_meters)
+                    * MILLIMETERS_PER_METER
+                ),
+            )
+        )
+
     def paint(self, painter, option, widget):
         """Paint this layer
 
@@ -489,3 +546,5 @@ class WorldLayer(FieldLayer):
             self.enemy_robot_id_text_items,
         )
         self.draw_robot_status(painter)
+        self.draw_robot_speeds(painter)
+        self.draw_ball_speed(painter)

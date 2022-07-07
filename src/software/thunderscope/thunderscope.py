@@ -430,7 +430,11 @@ class Thunderscope(object):
                 robot_id, self.visualization_buffer_size
             )
             hrvo_sim_states.append(hrvo_sim_state)
-            field.add_layer(f"HRVO {robot_id}", hrvo_sim_state, False)
+            visible = False
+            if robot_id == 0:
+                visible = True
+
+            field.add_layer(f"HRVO {robot_id}", hrvo_sim_state, visible)
 
         # Register observers
         sim_proto_unix_io.register_observer(

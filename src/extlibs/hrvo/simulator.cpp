@@ -398,15 +398,26 @@ void HRVOSimulator::visualize(unsigned int robot_id) const
     TbotsProto::HRVOVisualization hrvo_visualization;
     hrvo_visualization.set_robot_id(robot_id);
 
-    auto vo_protos = friendly_agent_opt.value()->getVelocityObstaclesAsProto();
-    *(hrvo_visualization.mutable_velocity_obstacles()) = {vo_protos.begin(),
-                                                          vo_protos.end()};
+//    auto vo_protos = friendly_agent_opt.value()->getVelocityObstaclesAsProto();
+//    *(hrvo_visualization.mutable_velocity_obstacles()) = {vo_protos.begin(),
+//                                                          vo_protos.end()};
+//
+//    for (const auto &agent : agents)
+//    {
+//        Point position(agent->getPosition());
+//        *(hrvo_visualization.add_robots()) =
+//            *createCircleProto(Circle(position, agent->getRadius()));
+//    }
 
-    for (const auto &agent : agents)
+    for (const auto&[robot_id, agent_id] : friendly_robot_id_map)
     {
-        Point position(agent->getPosition());
-        *(hrvo_visualization.add_robots()) =
-            *createCircleProto(Circle(position, agent->getRadius()));
+        Vector vel = agents[agent_id]->getVelocity();
+        Vector pos = agents[agent_id]->getPosition();
+        TbotsProto::VelocityObstacle vo_proto;
+        *(vo_proto.mutable_apex())       = *createVectorProto(pos);
+        *(vo_proto.mutable_left_side())  = *createVectorProto(vel);
+        *(vo_proto.mutable_right_side()) = *createVectorProto(vel);
+        *(hrvo_visualization.add_velocity_obstacles()) = vo_proto;
     }
 
     if (friendly_team_colour == TeamColour::YELLOW)
