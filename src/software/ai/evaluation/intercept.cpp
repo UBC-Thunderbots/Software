@@ -4,85 +4,99 @@
 #include "software/ai/evaluation/time_to_travel.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/optimization/gradient_descent_optimizer.hpp"
+#include "software/geom/algorithms/distance.h"
 
-std::optional<std::pair<Point, Duration>> findBestInterceptForBall(const Ball &ball,
-                                                                   const Field &field,
-                                                                   const Robot &robot)
+Point robotPositionToFaceBall(const Point &ball_position,
+                                          const Angle &face_ball_angle,
+                                          double additional_offset)
 {
-    static const double gradient_approx_step_size = 0.000001;
+    return ball_position - Vector::createFromAngle(face_ball_angle)
+            .normalize(DIST_TO_FRONT_OF_ROBOT_METERS +
+                       BALL_MAX_RADIUS_METERS + additional_offset);
+}
 
-    // We use this to take a smooth absolute value in our objective function
-    static const double smooth_abs_eps = 1000 * gradient_approx_step_size;
+std::optional<InterceptionResult> findBestInterceptForBall(const Ball &ball,
+                                                           const Field &field,
+                                                           const Robot &robot, bool include_fallback_interceptions)
+{
+    static constexpr double BALL_MOVING_SLOW_SPEED_THRESHOLD   = 0.3;
+    static constexpr double INTERCEPT_POSITION_SEARCH_INTERVAL = 0.1;
+    static constexpr double MAX_INTERCEPT_SPEED = 3.0;
 
-    // This is the objective function that we want to minimize, finding the
-    // shortest duration in the future at which we can feasibly intercept the
-    // ball
-    auto objective_function = [&](std::array<double, 1> x) {
-        // We take the absolute value here because a negative time makes no sense
-        double duration = std::abs(x.at(0));
+    Point intercept_position          = ball.position();
+    double interception_final_speed   = 0;
+    Point fallback_interception_point = ball.position();
+    double fallback_interception_final_speed =
+            robot.robotConstants().robot_max_speed_m_per_s;
+    Duration robot_time_to_pos = Duration();
 
-        // If the ball timestamp is less then the robot timestamp, add the difference
-        // here so that we're optimizing to a duration that is after the robot
-        // timestamp
-        if (ball.timestamp() < robot.timestamp())
+    if (ball.velocity().length() < BALL_MOVING_SLOW_SPEED_THRESHOLD)
+    {
+        auto face_ball_vector = (ball.position() - robot.position());
+        auto point_in_front_of_ball =
+                robotPositionToFaceBall(ball.position(), face_ball_vector.orientation());
+        robot_time_to_pos = robot.getTimeToPosition(intercept_position);
+
+        return std::make_optional<InterceptionResult>({point_in_front_of_ball, robot_time_to_pos, 0.0});
+    }
+
+    //todo find how quick robot can be moving for it to trap the ball in dribbler when intercepting
+    // if large enough then use fallback code with with that set as maximum speed.
+    while (contains(field.fieldLines(), intercept_position))
+    {
+        std::optional<Duration> ball_time_to_position =
+                ball.getTimeToMoveDistance(distance(intercept_position, ball.position()));
+
+        // go to the stopping position of the ball
+        if (!ball_time_to_position.has_value())
         {
-            duration += (robot.timestamp() - ball.timestamp()).toSeconds();
+            break;
         }
 
-        // Estimate the ball position
-        Point new_ball_pos =
-            ball.estimateFutureState(Duration::fromSeconds(duration)).position();
+        robot_time_to_pos = robot.getTimeToPosition(intercept_position);
 
-        // Figure out how long it will take the robot to get to the new ball position
-        Duration time_to_ball_pos = robot.getTimeToPosition(new_ball_pos);
+        if (robot_time_to_pos < ball_time_to_position.value())
+        {
+            break;
+        }
 
-        // Figure out when the robot will reach the new ball position relative to the
-        // time that the ball will get there (ie. will we get there in time?)
-        double ball_robot_time_diff = duration - time_to_ball_pos.toSeconds();
+        Vector dist_vector = intercept_position - robot.position();
 
-        // We want to get to the ball at the earliest opportunity possible, so
-        // aim for a time diff of zero. We use a smooth approximation of
-        // the maximum here
-        return std::sqrt(std::pow(ball_robot_time_diff, 2) + smooth_abs_eps);
-    };
+        double final_speed_to_reach_in_time =
+                2 * dist_vector.length() / (ball_time_to_position.value().toSeconds()) -
+                robot.currentState().velocity().dot(dist_vector.normalize());
+        double average_acceleration_to_reach_in_time =
+                final_speed_to_reach_in_time -
+                robot.currentState().velocity().dot(dist_vector.normalize()) /
+                ball_time_to_position.value().toSeconds();
 
-    // Figure out when/where to intercept the ball. We do this by optimizing over
-    // the ball position as a function of it's travel time
-    // We make the weight here an inverse of the ball speed, so that the gradient
-    // descent takes smaller steps when the ball is moving faster
-    double descent_weight = 1 / (std::exp(ball.currentState().velocity().length() * 0.5));
-    GradientDescentOptimizer<1> optimizer({descent_weight}, gradient_approx_step_size);
-    Duration best_ball_travel_duration = Duration::fromSeconds(
-        std::abs(optimizer.minimize(objective_function, {0}, 50).at(0)));
+        if (final_speed_to_reach_in_time < MAX_INTERCEPT_SPEED && final_speed_to_reach_in_time < fallback_interception_final_speed &&
+            average_acceleration_to_reach_in_time <
+            robot.robotConstants().robot_max_acceleration_m_per_s_2)
+        {
+            fallback_interception_final_speed = final_speed_to_reach_in_time;
+            fallback_interception_point       = intercept_position;
+        }
 
-    // In the objective function above, if the robot timestamp > ball timestamp, we
-    // add on the difference so we get a intercept time after the robot timestamp, so
-    // we need to do the same here to get the duration we actually optimized on
-    if (robot.timestamp() > ball.timestamp())
-    {
-        best_ball_travel_duration =
-            best_ball_travel_duration + (robot.timestamp() - ball.timestamp());
+        intercept_position +=
+                ball.velocity().normalize(INTERCEPT_POSITION_SEARCH_INTERVAL);
     }
 
-    Point best_ball_intercept_pos =
-        ball.estimateFutureState(best_ball_travel_duration).position();
-
-    // Check that we can get to the best position in time
-    Duration time_to_ball_pos     = robot.getTimeToPosition(best_ball_intercept_pos);
-    Duration ball_robot_time_diff = time_to_ball_pos - best_ball_travel_duration;
-    // NOTE: if ball velocity is 0 then ball travel duration is infinite, so this
-    // check isn't relevant in that case
-    if (ball.currentState().velocity().length() != 0 &&
-        std::abs(ball_robot_time_diff.toSeconds()) > descent_weight)
-    {
-        return std::nullopt;
+//     if we can't reach the ball in time and we have valid fallback interception point,
+//     use it
+    if (!contains(field.fieldLines(), intercept_position)){
+        if (include_fallback_interceptions &&
+            fallback_interception_point != ball.position())
+        {
+            intercept_position       = fallback_interception_point;
+            interception_final_speed = fallback_interception_final_speed;
+            robot_time_to_pos = robot.getTimeToPosition(fallback_interception_point, (ball.position() - robot.position()).normalize(fallback_interception_final_speed));
+        } else{
+            return {};
+        }
     }
 
-    // Check that the best intercept position is actually on the field
-    if (!contains(field.fieldLines(), best_ball_intercept_pos))
-    {
-        return std::nullopt;
-    }
-
-    return std::make_pair(best_ball_intercept_pos, time_to_ball_pos);
+    return std::make_optional<InterceptionResult>({intercept_position, robot_time_to_pos, interception_final_speed});
 }
+
+

@@ -1,89 +1,5 @@
 #include "software/ai/hl/stp/tactic/dribble/dribble_fsm.h"
-
-Point DribbleFSM::robotPositionToFaceBall(const Point &ball_position,
-                                          const Angle &face_ball_angle,
-                                          double additional_offset)
-{
-    return ball_position - Vector::createFromAngle(face_ball_angle)
-                               .normalize(DIST_TO_FRONT_OF_ROBOT_METERS +
-                                          BALL_MAX_RADIUS_METERS + additional_offset);
-}
-
-DribbleFSM::InterceptionResult DribbleFSM::findInterceptionPoint(const Robot &robot,
-                                                                 const Ball &ball,
-                                                                 const Field &field)
-{
-    static constexpr double BALL_MOVING_SLOW_SPEED_THRESHOLD   = 0.3;
-    static constexpr double INTERCEPT_POSITION_SEARCH_INTERVAL = 0.1;
-    if (ball.velocity().length() < BALL_MOVING_SLOW_SPEED_THRESHOLD)
-    {
-        auto face_ball_vector = (ball.position() - robot.position());
-        auto point_in_front_of_ball =
-            robotPositionToFaceBall(ball.position(), face_ball_vector.orientation());
-        return {point_in_front_of_ball, 0.0};
-    }
-    Point intercept_position          = ball.position();
-    double interception_final_speed   = 0;
-    Point fallback_interception_point = ball.position();
-    double fallback_interception_final_speed =
-        robot.robotConstants().robot_max_speed_m_per_s;
-
-    //todo find how quick robot can be moving for it to trap the ball in dribbler when intercepting
-    // if large enough then use fallback code with with that set as maximum speed.
-    while (contains(field.fieldLines(), intercept_position))
-    {
-        std::optional<Duration> ball_time_to_position =
-            ball.getTimeToMoveDistance(distance(intercept_position, ball.position()));
-
-        // go to the stopping position of the ball
-        if (!ball_time_to_position.has_value())
-        {
-            break;
-        }
-
-        Duration robot_time_to_pos = robot.getTimeToPosition(intercept_position);
-
-        if (robot_time_to_pos < ball_time_to_position.value())
-        {
-            break;
-        }
-
-        Vector dist_vector = intercept_position - robot.position();
-
-        double final_speed_to_reach_in_time =
-            2 * dist_vector.length() / (ball_time_to_position.value().toSeconds()) -
-            robot.currentState().velocity().dot(dist_vector.normalize());
-        double average_acceleration_to_reach_in_time =
-            final_speed_to_reach_in_time -
-            robot.currentState().velocity().dot(dist_vector.normalize()) /
-                ball_time_to_position.value().toSeconds();
-
-        if (final_speed_to_reach_in_time < fallback_interception_final_speed &&
-                average_acceleration_to_reach_in_time <
-                robot.robotConstants().robot_max_acceleration_m_per_s_2)
-        {
-            fallback_interception_final_speed = final_speed_to_reach_in_time;
-            fallback_interception_point       = intercept_position;
-        }
-
-        intercept_position +=
-            ball.velocity().normalize(INTERCEPT_POSITION_SEARCH_INTERVAL);
-    }
-
-//     if we can't reach the ball in time and we have valid fallback interception point,
-//     use it
-    if (contains(field.fieldLines(), intercept_position) &&
-        fallback_interception_point != ball.position())
-    {
-        // return to a position in the field
-        intercept_position       = fallback_interception_point;
-        interception_final_speed = fallback_interception_final_speed;
-        std::cout<<"engaging fallback interception"<<std::endl;
-    }
-
-
-    return {intercept_position, interception_final_speed};
-}
+#include "software//ai/evaluation/intercept.h"
 
 Point DribbleFSM::getDribbleBallDestination(const Point &ball_position,
                                             std::optional<Point> dribble_destination)
@@ -132,8 +48,9 @@ void DribbleFSM::getPossession(const Update &event)
     auto ball_position = event.common.world.ball().position();
     auto face_ball_orientation =
         (ball_position - event.common.robot.position()).orientation();
-    InterceptionResult result = findInterceptionPoint(
-        event.common.robot, event.common.world.ball(), event.common.world.field());
+    auto result = findBestInterceptForBall(
+        event.common.world.ball(), event.common.world.field(), event.common.robot, true).value_or(InterceptionResult(event.common.world.ball().position(), Duration(), 0.0));
+
     Point intercept_position =
         result.point + Vector::createFromAngle(face_ball_orientation).normalize(0.05);
 

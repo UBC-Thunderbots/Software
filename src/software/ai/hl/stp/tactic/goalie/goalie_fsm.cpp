@@ -196,8 +196,27 @@ void GoalieFSM::panic(const Update &event)
     Angle goalie_orientation =
         (event.common.world.ball().position() - goalie_pos).orientation();
 
+    Ball ball = event.common.world.ball();
+    Robot robot = event.common.robot;
+
+
+    //check if we are going to make it on time
+    std::optional<Duration> ball_time_to_position =
+            ball.getTimeToMoveDistance(distance(goalie_pos, ball.position()));
+
+
+    Duration robot_time_to_pos = robot.getTimeToPosition(goalie_pos);
+
+    if(robot_time_to_pos > ball_time_to_position){
+        std::cout<<"WERE NOT GONNA MAKE IT"<<std::endl;
+
+        //find the final speed at which we can make it
+
+    }
+
+    std::cout<<"robot speed = "<<event.common.robot.velocity().length()<<std::endl;
     event.common.set_primitive(createMovePrimitive(
-        CREATE_MOTION_CONTROL(goalie_pos), goalie_orientation, 0.0,
+        CREATE_MOTION_CONTROL(goalie_pos), goalie_orientation, 6.0,
         TbotsProto::DribblerMode::OFF, TbotsProto::BallCollisionType::ALLOW,
         AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS},
         max_allowed_speed_mode, 0.0, event.common.robot.robotConstants()));
@@ -258,7 +277,7 @@ void GoalieFSM::moveToGoalLine(const Update &event)
 {
     event.common.set_primitive(createMovePrimitive(
         CREATE_MOTION_CONTROL(event.common.world.field().friendlyGoalCenter()),
-        Angle::zero(), 0, TbotsProto::DribblerMode::OFF,
+        Angle::zero(), 10, TbotsProto::DribblerMode::OFF,
         TbotsProto::BallCollisionType::AVOID,
         AutoChipOrKick{AutoChipOrKickMode::OFF, 0.0}, max_allowed_speed_mode, 0.0,
         event.common.robot.robotConstants()));

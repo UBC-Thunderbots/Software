@@ -22,7 +22,7 @@ TEST(InterceptEvaluationTest, findBestInterceptForBall_robot_on_ball_path_ball_3
     // do the optimisation here), with y = 0, and will occur sometime between 0 and
     // 2/3 seconds in the future (the time for the ball to reach the robots initial
     // position).
-    auto [intercept_pos, robot_time_to_move_to_intercept] = *best_intercept;
+    auto [intercept_pos, robot_time_to_move_to_intercept, final_speed] = *best_intercept;
     EXPECT_DOUBLE_EQ(0, intercept_pos.y());
     EXPECT_LE(1.5, intercept_pos.x());
     EXPECT_GE(2.25, intercept_pos.x());
@@ -51,7 +51,8 @@ TEST(InterceptEvaluationTest,
     // do the optimisation here), with y = 0, and will occur sometime between 0 and
     // 2/3 seconds in the future (the time for the ball to reach the robots initial
     // position).
-    auto [intercept_pos, robot_time_to_move_to_intercept] = *best_intercept;
+    auto [intercept_pos, robot_time_to_move_to_intercept, final_speed] = *best_intercept;
+
     EXPECT_DOUBLE_EQ(0, intercept_pos.y());
     EXPECT_LE(1.75, intercept_pos.x());
     EXPECT_GE(2.25, intercept_pos.x());
@@ -76,7 +77,7 @@ TEST(InterceptEvaluationTest, findBestInterceptForBall_robot_right_beside_ball_p
     // (with some extra tolerance because of how we do the optimisation)
     // with y = 0, and will occur sometime between 0 and 2 seconds in the future
     // (the time for the ball to reach the robot)
-    auto [intercept_pos, robot_time_to_move_to_intercept] = *best_intercept;
+    auto [intercept_pos, robot_time_to_move_to_intercept, final_speed] = *best_intercept;
     EXPECT_DOUBLE_EQ(0, intercept_pos.y());
     EXPECT_LE(0, intercept_pos.x());
     EXPECT_GE(2.25, intercept_pos.x());
@@ -99,7 +100,7 @@ TEST(InterceptEvaluationTest, findBestInterceptForBall_robot_chasing_ball)
     ASSERT_TRUE(best_intercept);
 
     // We expect the intercept will occur somewhere in x:[1,2], y:[1,2], t:[0, 3]
-    auto [intercept_pos, robot_time_to_move_to_intercept] = *best_intercept;
+    auto [intercept_pos, robot_time_to_move_to_intercept, final_speed] = *best_intercept;
     EXPECT_DOUBLE_EQ(0, intercept_pos.x());
     EXPECT_GE(3, intercept_pos.y());
     EXPECT_LE(1, intercept_pos.y());
@@ -121,7 +122,7 @@ TEST(InterceptEvaluationTest, findBestInterceptForBall_ball_on_diagonal_trajecto
     ASSERT_TRUE(best_intercept);
 
     // We expect the intercept will occur somewhere in x:[1,2], y:[1,2], t:[0, 3]
-    auto [intercept_pos, robot_time_to_move_to_intercept] = *best_intercept;
+    auto [intercept_pos, robot_time_to_move_to_intercept, final_speed] = *best_intercept;
     EXPECT_LE(1, intercept_pos.x());
     EXPECT_GE(2, intercept_pos.x());
     EXPECT_LE(1, intercept_pos.y());
@@ -146,7 +147,7 @@ TEST(InterceptEvaluationTest, findBestInterceptForBall_ball_not_moving)
     // it is (at the origin)
     // The expected time is the time it will take the robot to move to the destination.
     // This is dependent on robot constants, but should be in [0,5] seconds
-    auto [intercept_pos, robot_time_to_move_to_intercept] = *best_intercept;
+    auto [intercept_pos, robot_time_to_move_to_intercept, final_speed] = *best_intercept;
     EXPECT_DOUBLE_EQ(-2, intercept_pos.x());
     EXPECT_DOUBLE_EQ(-1, intercept_pos.y());
     EXPECT_LE(0, robot_time_to_move_to_intercept.toSeconds());
@@ -169,7 +170,7 @@ TEST(InterceptEvaluationTest, findBestInterceptForBall_ball_moving_very_slowly)
     // it is (at the origin)
     // The expected time is the time it will take the robot to move to the destination.
     // This is dependent on robot constants, but should be in [0,5] seconds
-    auto [intercept_pos, robot_time_to_move_to_intercept] = *best_intercept;
+    auto [intercept_pos, robot_time_to_move_to_intercept, final_speed] = *best_intercept;
     EXPECT_NEAR(-2, intercept_pos.x(), 0.02);
     EXPECT_NEAR(-1, intercept_pos.y(), 0.02);
     EXPECT_LE(0, robot_time_to_move_to_intercept.toSeconds());
@@ -192,7 +193,7 @@ TEST(InterceptEvaluationTest, findBestInterceptForBall_robot_timestamp_ahead_of_
 
     // We expect that the best intercept is going to be somewhere between x=0 and x=2,
     // with y = 0, and will take the robot about 2 seconds
-    auto [intercept_pos, robot_time_to_move_to_intercept] = *best_intercept;
+    auto [intercept_pos, robot_time_to_move_to_intercept, final_speed] = *best_intercept;
     EXPECT_DOUBLE_EQ(0, intercept_pos.y());
     EXPECT_DOUBLE_EQ(0, intercept_pos.x());
     EXPECT_LE(1, robot_time_to_move_to_intercept.toSeconds());
@@ -214,7 +215,7 @@ TEST(InterceptEvaluationTest, findBestInterceptForBall_ball_timestamp_ahead_of_r
 
     // We expect that the best intercept is going to be somewhere between x=0 and x=2,
     // with y = 0, and will take the robot about 2 seconds
-    auto [intercept_pos, robot_time_to_move_to_intercept] = *best_intercept;
+    auto [intercept_pos, robot_time_to_move_to_intercept, final_speed] = *best_intercept;
     EXPECT_DOUBLE_EQ(0, intercept_pos.y());
     EXPECT_DOUBLE_EQ(0, intercept_pos.x());
     EXPECT_LE(1, robot_time_to_move_to_intercept.toSeconds());
@@ -236,7 +237,7 @@ TEST(InterceptEvaluationTest, findBestInterceptForBall_non_zero_robot_and_ball_t
 
     // We expect that the best intercept is going to be somewhere between x=0 and x=2,
     // with y = 0, and will take the robot about 2 seconds
-    auto [intercept_pos, robot_time_to_move_to_intercept] = *best_intercept;
+    auto [intercept_pos, robot_time_to_move_to_intercept, final_speed] = *best_intercept;
     EXPECT_DOUBLE_EQ(0, intercept_pos.y());
     EXPECT_DOUBLE_EQ(0, intercept_pos.x());
     EXPECT_LE(1, robot_time_to_move_to_intercept.toSeconds());

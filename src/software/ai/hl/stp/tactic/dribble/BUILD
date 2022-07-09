@@ -14,6 +14,7 @@ cc_library(
     ],
     deps = [
         "//shared:constants",
+        "//software/ai/evaluation:intercept",
         "//software/ai/evaluation:time_to_travel",
         "//software/ai/hl/stp/tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",

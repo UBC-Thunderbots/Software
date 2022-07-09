@@ -130,6 +130,8 @@ std::optional<Shot> calcBestShotOnGoal(const Field &field, const Team &friendly_
                 }
             }
 
+            std::cout<<"robot obstacle added to "<<robot.position()<<std::endl;
+
             obstacles.emplace_back(robot);
         }
     }
