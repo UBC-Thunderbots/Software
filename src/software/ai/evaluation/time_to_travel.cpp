@@ -16,8 +16,7 @@ Duration getTimeToTravelDistance(const double distance, const double max_velocit
     double a_max   = std::max(1e-6, max_acceleration);
 
     // Minimum distance required to accelerate/decelerate from initial to final velocity
-    double dist_required_to_reach_v_f =
-        std::abs(std::pow(v_f, 2) - std::pow(v_i, 2)) / (2 * a_max);
+    double dist_required_to_reach_v_f = std::abs(v_f * v_f - v_i * v_i) / (2 * a_max);
     if (dist_required_to_reach_v_f > d_total)
     {
         // Accelerating/decelerating instantly from initial to final velocity is not
