@@ -630,29 +630,26 @@ TEST_F(TestEnlsvgPathPlanner,
     // Make sure path does not exceed a bounding box
     Rectangle bounding_box({-2.1, -1.1}, {4.1, 4.1});
     TestUtil::checkPathDoesNotExceedBoundingBox(path.value(), bounding_box);
-    TestUtil::checkPathDoesNotIntersectObstacle(path.value(), {obstacles});
+    TestUtil::checkPathDoesNotIntersectObstacle(path.value(), obstacles);
 
     // Make sure that reusing the path planner still works by computing another path
     start = Point(5, 0);
     dest  = Point(-2, 0.5);
 
     auto path_two = planner.findPath(start, dest);
-    path.value()  = path_two.value();
 
     ASSERT_TRUE(path_two != std::nullopt);
-
-    path.value() = path_two.value();
 
     // Make sure the start and end points match
     EXPECT_EQ(start, path_two.value().front());
     EXPECT_EQ(dest, path_two.value().back());
 
-    EXPECT_LE(4, path.value().size());
+    EXPECT_LE(4, path_two.value().size());
 
     // Make sure path does not exceed a bounding box;
     bounding_box = Rectangle(Point(5.1, 1.8), Point(-2.1, -0.1));
-    TestUtil::checkPathDoesNotExceedBoundingBox(path.value(), bounding_box);
-    TestUtil::checkPathDoesNotIntersectObstacle(path.value(), obstacles);
+    TestUtil::checkPathDoesNotExceedBoundingBox(path_two.value(), bounding_box);
+    TestUtil::checkPathDoesNotIntersectObstacle(path_two.value(), obstacles);
 }
 
 TEST_F(TestEnlsvgPathPlanner, test_going_around_defense_area)

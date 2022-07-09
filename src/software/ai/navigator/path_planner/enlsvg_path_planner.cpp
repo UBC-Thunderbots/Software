@@ -108,8 +108,6 @@ std::optional<Path> EnlsvgPathPlanner::findPath(const Point &start,
         return std::nullopt;
     }
 
-    std::vector<Point> path_points = path.value();
-
     // If start was initially blocked, add the start point
     if (new_start.value() != enlsvg_start)
     {
