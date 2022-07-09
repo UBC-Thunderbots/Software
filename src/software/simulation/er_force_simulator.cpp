@@ -301,15 +301,15 @@ void ErForceSimulator::setRobotPrimitive(
         {
             robot_primitive_executor->updatePrimitiveSet(primitive_set_msg);
             robot_primitive_executor->updateWorld(world_msg);
-//            static int test = 0;
-//            if (test++ % 5 == 0)
-//            {
+            static int test = 0;
+            if (test++ % 10 == 0)
+            {
 // TODO: MOVE THIS UPDATE TO BEFORE GETLOCALVELOCITY SO THE VEL IS UP TO DATE FROM SIM
 // TODO: MEASURE THE DIFF IN NEW VEL AND THE HRVO VEL (IDEALLY 0) Diff around 0.15
-//                robot_primitive_executor->updateLocalVelocity(
-//                    local_velocity,
-//                    createAngle(robot_proto_it->current_state().global_orientation()));
-//            }
+                robot_primitive_executor->updateLocalVelocity(
+                    local_velocity,
+                    createAngle(robot_proto_it->current_state().global_orientation()));
+            }
         }
         else
         {
@@ -333,7 +333,7 @@ SSLSimulationProto::RobotControl ErForceSimulator::updateSimulatorRobots(
     SSLSimulationProto::RobotControl robot_control;
 
     auto id_to_vel_map = getRobotIdToLocalVelocityMap(getSimulatorState().blue_robots());
-    Vector prev_vel;
+//    Vector prev_vel;
     for (auto& primitive_executor_with_id : robot_primitive_executor_map)
     {
         unsigned int robot_id       = primitive_executor_with_id.first;
@@ -347,19 +347,19 @@ SSLSimulationProto::RobotControl ErForceSimulator::updateSimulatorRobots(
 
             if (robot_primitive_executor_iter != robot_primitive_executor_map.end())
             {
-                Vector local_velocity;
-                if (id_to_vel_map.find(robot_id) != id_to_vel_map.end())
-                {
-                    local_velocity = id_to_vel_map.at(robot_id);
-                }
+//                Vector local_velocity;
+//                if (id_to_vel_map.find(robot_id) != id_to_vel_map.end())
+//                {
+//                    local_velocity = id_to_vel_map.at(robot_id);
+//                }
                 auto robot_primitive_executor = robot_primitive_executor_iter->second;
                 unsigned int robot_id = robot_primitive_executor_iter->first;
                 auto& primitive_executor = primitive_executor_with_id.second;
                 // Set to NEG_X because the world msg in this simulator is
                 // normalized correctly
-                robot_primitive_executor->updateLocalVelocity(
-                        local_velocity,
-                        createAngle(robot_proto_it->current_state().global_orientation()));
+//                robot_primitive_executor->updateLocalVelocity(
+//                        local_velocity,
+//                        createAngle(robot_proto_it->current_state().global_orientation()));
                 auto direct_control = primitive_executor->stepPrimitive(
                         RobotState(robot_proto_it->current_state()).orientation());
 
