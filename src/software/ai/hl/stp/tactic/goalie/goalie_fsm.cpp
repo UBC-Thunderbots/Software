@@ -1,13 +1,30 @@
 #include "software/ai/hl/stp/tactic/goalie/goalie_fsm.h"
 
-Point GoalieFSM::getGoaliePositionToBlock(
+Point GoalieFSM::getGoaliePositionToBlock(const Team &friendly_team,
     const Ball &ball, const Field &field,
     TbotsProto::GoalieTacticConfig goalie_tactic_config)
 {
     // compute angle between two vectors, negative goal post to ball and positive
     // goal post to ball
+    Point uncovered_negative_of_goal = field.friendlyGoalpostNeg();
+    Point uncovered_positive_of_goal = field.friendlyGoalpostPos();
+
+    for (auto robot : friendly_team.getAllRobots()){
+        if (robot.id() == friendly_team.getGoalieId()){
+            continue;
+        }
+
+        Triangle triangle = Triangle(uncovered_negative_of_goal, uncovered_positive_of_goal, ball.position());
+        if (contains(triangle, robot.position())){
+            
+        }
+    }
+
     Angle block_cone_angle = acuteAngle(field.friendlyGoalpostNeg(), ball.position(),
                                         field.friendlyGoalpostPos());
+
+    //adjust the angles based on whether friendly robots block the the cone
+
 
     std::optional<Point> clamped_goalie_pos = std::nullopt;
 
@@ -246,7 +263,7 @@ void GoalieFSM::updatePivotKick(
 
 void GoalieFSM::positionToBlock(const Update &event)
 {
-    Point goalie_pos = getGoaliePositionToBlock(
+    Point goalie_pos = getGoaliePositionToBlock(event.common.world.friendlyTeam(),
         event.common.world.ball(), event.common.world.field(), goalie_tactic_config);
     Angle goalie_orientation =
         (event.common.world.ball().position() - goalie_pos).orientation();
