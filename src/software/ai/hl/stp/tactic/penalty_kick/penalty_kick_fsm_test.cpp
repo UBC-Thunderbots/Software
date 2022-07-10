@@ -15,7 +15,7 @@ TEST(PenaltyKickFSM, DISABLED_test_transitions)
     TbotsProto::AiConfig ai_config;
     FSM<PenaltyKickFSM> fsm{PenaltyKickFSM(),
                             DribbleFSM(ai_config.dribble_tactic_config()),
-                            GetBehindBallFSM()};
+                            GetBehindBallFSM(), KickFSM(ai_config.kick_tactic_config())};
 
     PenaltyKickFSM::ControlParams control_params{};
 
