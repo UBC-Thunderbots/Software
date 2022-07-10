@@ -202,7 +202,8 @@ std::vector<uint8_t> inline marshallUartPacket(const TbotsProto_PowerFrame& fram
  * @return whether the unmarshal was successful
  *
  */
-bool inline unmarshalUartPacket(const std::vector<uint8_t>& data, TbotsProto_PowerFrame& frame)
+bool inline unmarshalUartPacket(const std::vector<uint8_t>& data,
+                                TbotsProto_PowerFrame& frame)
 {
     std::vector<uint8_t> decoded;
     if (!cobsDecoding(data, decoded))

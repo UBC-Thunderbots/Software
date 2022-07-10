@@ -76,13 +76,15 @@ std::vector<uint8_t> serializeToVector(const T& data)
  * @param frame frame to set the power_msg of
  * @param control/status power_msg to set
  */
-void inline setPowerMsg(TbotsProto_PowerFrame& frame, const TbotsProto_PowerControl& control)
+void inline setPowerMsg(TbotsProto_PowerFrame& frame,
+                        const TbotsProto_PowerControl& control)
 {
     frame.which_power_msg         = TbotsProto_PowerFrame_power_control_tag;
     frame.power_msg.power_control = control;
 }
 
-void inline setPowerMsg(TbotsProto_PowerFrame& frame, const TbotsProto_PowerStatus& status)
+void inline setPowerMsg(TbotsProto_PowerFrame& frame,
+                        const TbotsProto_PowerStatus& status)
 {
     frame.which_power_msg        = TbotsProto_PowerFrame_power_status_tag;
     frame.power_msg.power_status = status;
@@ -93,9 +95,10 @@ void inline setPowerMsg(TbotsProto_PowerFrame& frame, const TbotsProto_PowerStat
  *
  * @return a nanopb power status msg with provided fields
  */
-TbotsProto_PowerStatus inline createNanoPbPowerStatus(float battery_voltage, float current_draw,
-                                               TbotsProto_Geneva_Slot geneva_slot,
-                                               bool breakbeam_tripped)
+TbotsProto_PowerStatus inline createNanoPbPowerStatus(float battery_voltage,
+                                                      float current_draw,
+                                                      TbotsProto_Geneva_Slot geneva_slot,
+                                                      bool breakbeam_tripped)
 {
     TbotsProto_PowerStatus status = {.battery_voltage    = battery_voltage,
                                      .current_draw       = current_draw,
@@ -137,13 +140,11 @@ TbotsProto_PowerControl inline createNanoPbPowerControl(
  *
  * @return a nanobp power control msg with provided fields
  */
-TbotsProto_PowerControl inline createNanoPbPowerControl(ChickerCommandMode chicker_command,
-                                                 float kick_speed_m_per_s,
-                                                 float chip_distance_meters,
-                                                 AutoChipOrKickMode auto_chip_or_kick,
-                                                 float autochip_distance_meters,
-                                                 float autokick_speed_m_per_s,
-                                                 TbotsProto_Geneva_Slot geneva_slot)
+TbotsProto_PowerControl inline createNanoPbPowerControl(
+    ChickerCommandMode chicker_command, float kick_speed_m_per_s,
+    float chip_distance_meters, AutoChipOrKickMode auto_chip_or_kick,
+    float autochip_distance_meters, float autokick_speed_m_per_s,
+    TbotsProto_Geneva_Slot geneva_slot)
 {
     TbotsProto_PowerControl control = TbotsProto_PowerControl_init_default;
     TbotsProto_PowerControl_ChickerControl chicker =

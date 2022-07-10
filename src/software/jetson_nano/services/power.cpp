@@ -18,7 +18,7 @@ PowerService::~PowerService()
 
 void PowerService::continuousRead()
 {
-    for(;;)
+    for (;;)
     {
         tick();
     }
@@ -31,7 +31,6 @@ void PowerService::tick()
     {
         uart->flushSerialPort(uart->flush_receive);
         power_status = uart->serialRead(READ_BUFFER_SIZE);
-
     }
     catch (std::exception& e)
     {
@@ -47,15 +46,12 @@ void PowerService::tick()
     {
         status = status_frame.power_msg.power_status;
     }
-}
 
-TbotsProto::PowerStatus PowerService::poll(const TbotsProto::PowerControl& command)
-{
-    auto nanopb_command       = createNanoPbPowerControl(command);
-    auto frame                = createUartFrame(nanopb_command);
+    auto command =
+        nanopb_command.load(std::memory_order_relaxed);  // get value atomically
+    auto frame                = createUartFrame(command);
     auto power_command_buffer = marshallUartPacket(frame);
 
-    std::vector<uint8_t> power_status;
     try
     {
         // Write power command
@@ -69,6 +65,11 @@ TbotsProto::PowerStatus PowerService::poll(const TbotsProto::PowerControl& comma
     {
         LOG(FATAL) << "ESP32 has disconnected. Power service has crashed" << e.what();
     }
+}
 
+TbotsProto::PowerStatus PowerService::poll(const TbotsProto::PowerControl& command)
+{
+    // Store msg for later transmission
+    nanopb_command = createNanoPbPowerControl(command);
     return *createTbotsPowerStatus(status);
 }
