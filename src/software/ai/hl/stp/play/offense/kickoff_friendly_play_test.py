@@ -36,15 +36,6 @@ def test_kickoff_friendly_play_bottom_left(simulated_test_runner):
         tbots.Field.createSSLDivisionBField().enemyDefenseArea().negXPosYCorner(),
     ]
 
-    # Game Controller Setup
-    simulated_test_runner.gamecontroller.send_ci_input(
-        gc_command=Command.Type.KICKOFF, team=Team.BLUE
-    )
-    # time.sleep(1)
-    simulated_test_runner.gamecontroller.send_ci_input(
-        gc_command=Command.Type.NORMAL_START, team=Team.BLUE
-    )
-
     time.sleep(1)
 
     # override yellow play
@@ -74,6 +65,11 @@ def test_kickoff_friendly_play_bottom_left(simulated_test_runner):
         eventually_validation_sequence_set=eventually_validation_sequence_set,
         always_validation_sequence_set=always_validation_sequence_set,
         test_timeout_s=10,
+        referee_ci_inputs=[
+            (Command.Type.KICKOFF, Team.BLUE),
+            (Command.Type.KICKOFF, Team.BLUE),
+            (Command.Type.NORMAL_START, Team.BLUE),
+        ],
     )
 
 
@@ -101,16 +97,6 @@ def test_kickoff_friendly_play_top_right(simulated_test_runner):
         tbots.Field.createSSLDivisionBField().enemyDefenseArea().negXPosYCorner(),
     ]
 
-    # Game Controller Setup
-    simulated_test_runner.gamecontroller.send_ci_input(
-        gc_command=Command.Type.KICKOFF, team=Team.BLUE
-    )
-    simulated_test_runner.gamecontroller.send_ci_input(
-        gc_command=Command.Type.NORMAL_START, team=Team.BLUE
-    )
-
-    time.sleep(1)
-
     # override yellow play
     yellow_play = Play()
     yellow_play.name = PlayName.HaltPlay
@@ -138,6 +124,11 @@ def test_kickoff_friendly_play_top_right(simulated_test_runner):
         eventually_validation_sequence_set=eventually_validation_sequence_set,
         always_validation_sequence_set=always_validation_sequence_set,
         test_timeout_s=10,
+        referee_ci_inputs=[
+            (Command.Type.KICKOFF, Team.BLUE),
+            (Command.Type.KICKOFF, Team.BLUE),
+            (Command.Type.NORMAL_START, Team.BLUE),
+        ],
     )
 
 
