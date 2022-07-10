@@ -3,6 +3,8 @@ from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtWidgets import *
 from software.py_constants import *
 import software.thunderscope.common.common_widgets as common_widgets
+from proto.import_all_protos import *
+
 
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
@@ -23,6 +25,11 @@ class RobotView(QWidget):
 
         self.pink = QtGui.QColor(255, 0, 255)
         self.green = QtGui.QColor(0, 255, 0)
+
+        self.breakbeam_buffer = ThreadSafeBuffer(1, BreakBeamStatus)
+        self.power_status_buffer = ThreadSafeBuffer(1, PowerStatus)
+        self.MIN_VOLTAGE_LEVEL = 50
+
 
         # There is no pattern to this so we just have to create
         # mapping from robot id to the four corners of the vision pattern
@@ -56,8 +63,28 @@ class RobotView(QWidget):
         self.battery_voltage_progress_bar.setMinimum(0)
         self.battery_voltage_progress_bar.setValue(10)
         self.layout.addWidget(self.battery_voltage_progress_bar)
+
+        self.robot_layouts = [QHBoxLayout() for x in range(8)]
+        self.robot_status_layouts = [QVBoxLayout() for x in range(8)]
+        self.robot_battery_progress_bars = [QProgressBar() for x in range(8)]
+        self.breakbeam_labels = [QLabel() for x in range(8)]
+
         for x in range(8):
-            self.layout.addWidget(self.create_vision_pattern_label(x, "b", 25))
+            robot_layout_status_bar = QVBoxLayout()
+            self.robot_battery_progress_bars[x].setMaximum(100)
+            self.robot_battery_progress_bars[x].setMinimum(0)
+            self.robot_battery_progress_bars[x].setValue(10)
+
+            self.breakbeam_labels[x].setText("BREAKBEAM")
+            self.breakbeam_labels[x].setStyleSheet("background-color: blue")
+
+            self.robot_status_layouts[x].addWidget(self.robot_battery_progress_bars[x])
+            self.robot_status_layouts[x].addWidget(self.breakbeam_labels[x])
+
+            self.robot_layouts[x].addWidget(self.create_vision_pattern_label(x, "b", 25))
+            self.robot_layouts[x].addLayout(self.robot_status_layouts[x])
+            self.layout.addLayout(self.robot_layouts[x])
+
         self.setLayout(self.layout)
 
     def create_vision_pattern_label(self, id, team_colour, radius):
@@ -111,3 +138,28 @@ class RobotView(QWidget):
         label.setPixmap(pixmap)
 
         return label
+
+    def refresh(self):
+        """Refresh the view
+        """
+        breakbeam_status = self.breakbeam_buffer.get(block=False)
+        for i in range(8):
+            if breakbeam_status.ball_in_beam:
+                self.breakbeam_labels[i].setText("In Beam")
+                self.breakbeam_labels[i].setStyleSheet("background-color: red")
+            else:
+                self.breakbeam_labels[i].setText("Not in Beam")
+                self.breakbeam_labels[i].setStyleSheet("background-color: green")
+
+        power_status = self.power_status_buffer.get(block=False)
+        for i in range(8):
+            self.robot_battery_progress_bars[i].setValue(power_status.battery_voltage)
+
+            if power_status.battery_voltage > self.MIN_VOLTAGE_LEVEL:
+                msg = QMessageBox()
+                msg.setIcon(QMessageBox.Information)
+                msg.setText(f"robot {i} voltage is {power_status.battery_voltage}")
+                msg.setWindowTitle("battery voltage alert")
+                msg.setDetailedText("not cool man")
+
+                msg.exec_()
