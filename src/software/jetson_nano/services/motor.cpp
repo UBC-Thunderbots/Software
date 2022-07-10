@@ -35,7 +35,7 @@ extern "C"
 // SPI Configs
 static const uint32_t MAX_SPI_SPEED_HZ  = 2000000;  // 2 Mhz
 static const uint32_t TMC6100_SPI_SPEED = 1000000;  // 1 Mhz
-static const uint32_t TMC4671_SPI_SPEED = 2000000;  // 1 Mhz
+static const uint32_t TMC4671_SPI_SPEED = 1000000;  // 1 Mhz
 static const uint8_t SPI_BITS           = 8;
 static const uint32_t SPI_MODE          = 0x3u;
 static const uint32_t NUM_RETRIES_SPI   = 3;
@@ -295,7 +295,6 @@ bool MotorService::checkDriverFault(uint8_t motor)
 TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor,
                                            double time_elapsed_since_last_poll_s)
 {
-    LOG(DEBUG) << motor.DebugString();
     CHECK(encoder_calibrated_[FRONT_LEFT_MOTOR_CHIP_SELECT] &&
           encoder_calibrated_[FRONT_RIGHT_MOTOR_CHIP_SELECT] &&
           encoder_calibrated_[BACK_LEFT_MOTOR_CHIP_SELECT] &&
