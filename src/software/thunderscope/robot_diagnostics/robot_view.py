@@ -162,4 +162,4 @@ class RobotView(QWidget):
                 msg.setWindowTitle("battery voltage alert")
                 msg.setDetailedText("not cool man")
 
-                msg.exec_()
+                msg.show()
