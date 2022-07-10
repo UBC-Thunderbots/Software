@@ -61,11 +61,10 @@ def create_slider(text, min_val, max_val, tick_spacing):
     :param min_val: lowest value of the slider
     :param max_val: highest value of the slider
     :param tick_spacing: interval between two ticks on the slider
-    :return: group_box: QGroupBox object - add this to the widget - see example
+    :return: vbox_layout: QVBoxLayout object - add this to the widget - see example
     :return: slider: QSlider object - use this to perform tasks on the button
     :return: value_label: displays value of slider, update this when value is changed
     """
-    group_box = QGroupBox(text)
     slider = QSlider(Qt.Orientation.Horizontal)
     slider.setMinimum(min_val)
     slider.setMaximum(max_val)
@@ -74,9 +73,8 @@ def create_slider(text, min_val, max_val, tick_spacing):
 
     value_label = QLabel(str(slider.value()))
 
-    vbox = QVBoxLayout()
-    vbox.addWidget(slider)
-    vbox.addWidget(value_label)
-    group_box.setLayout(vbox)
+    vbox_layout = QVBoxLayout()
+    vbox_layout.addWidget(slider)
+    vbox_layout.addWidget(value_label)
 
-    return group_box, slider, value_label
+    return vbox_layout, slider, value_label
