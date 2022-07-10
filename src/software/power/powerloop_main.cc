@@ -39,7 +39,7 @@ std::shared_ptr<ControlExecutor> executor;
 
 void setup()
 {
-    Serial.begin(115200, SERIAL_8N1, RXD2, TXD2);
+    Serial.begin(921600, SERIAL_8N1);
     read_buffer_size =
         getMarshalledSize(TbotsProto_PowerControl TbotsProto_PowerControl_init_default);
     charger  = std::make_shared<Charger>();
@@ -79,10 +79,12 @@ void loop()
     auto packet       = marshallUartPacket(status_frame);
     for (auto byte : packet)
     {
-        if (Serial.availableForWrite() > 0)
+        while (Serial.availableForWrite() <= 0)
         {
-            Serial.write(byte);
         }
+        Serial.write(byte);
     }
+    Serial.flush();
+
     delay(5);
 }

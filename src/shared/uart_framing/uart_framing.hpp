@@ -171,7 +171,7 @@ namespace
  * @return a TbotsProto_PowerFrame with the given data and computed fields
  */
 template <typename T>
-TbotsProto_PowerFrame createUartFrame(const T& power_msg)
+TbotsProto_PowerFrame inline createUartFrame(const T& power_msg)
 {
     TbotsProto_PowerFrame frame = TbotsProto_PowerFrame_init_default;
     auto buffer                 = serializeToVector(power_msg);
@@ -188,7 +188,7 @@ TbotsProto_PowerFrame createUartFrame(const T& power_msg)
  * @param frame frame being marshalled
  * @return vector of bytes to be sent over uart
  */
-std::vector<uint8_t> marshallUartPacket(const TbotsProto_PowerFrame& frame)
+std::vector<uint8_t> inline marshallUartPacket(const TbotsProto_PowerFrame& frame)
 {
     auto bytes = serializeToVector(frame);
     return cobsEncoding(bytes);
@@ -202,7 +202,7 @@ std::vector<uint8_t> marshallUartPacket(const TbotsProto_PowerFrame& frame)
  * @return whether the unmarshal was successful
  *
  */
-bool unmarshalUartPacket(const std::vector<uint8_t>& data, TbotsProto_PowerFrame& frame)
+bool inline unmarshalUartPacket(const std::vector<uint8_t>& data, TbotsProto_PowerFrame& frame)
 {
     std::vector<uint8_t> decoded;
     if (!cobsDecoding(data, decoded))
@@ -231,7 +231,7 @@ bool unmarshalUartPacket(const std::vector<uint8_t>& data, TbotsProto_PowerFrame
  * @return the expected marshalled size of the given message
  */
 template <typename T>
-size_t getMarshalledSize(const T& power_msg)
+size_t inline getMarshalledSize(const T& power_msg)
 {
     auto frame  = createUartFrame(power_msg);
     auto buffer = serializeToVector(frame);

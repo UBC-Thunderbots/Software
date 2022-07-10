@@ -46,7 +46,7 @@ void GPIO::setValue(GpioState state)
 {
     std::ofstream gpio_fs("/sys/class/gpio/gpio" + gpio_number_ + "/value");
 
-    CHECK(gpio_fs.is_open()) << "Could not set GPIO pin " << gpio_number_;
+    //CHECK(gpio_fs.is_open()) << "Could not set GPIO pin " << gpio_number_;
 
     switch (state)
     {

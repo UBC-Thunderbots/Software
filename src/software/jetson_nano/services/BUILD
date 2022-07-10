@@ -20,6 +20,7 @@ cc_library(
     name = "power",
     srcs = ["power.cpp"],
     hdrs = ["power.h"],
+    linkopts = ["-latomic"],  # Necessary due to <atomic> not containing load/store for all sizes
     deps = [
         "//shared/uart_framing",
         "//software/logger",

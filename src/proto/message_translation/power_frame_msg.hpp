@@ -76,13 +76,13 @@ std::vector<uint8_t> serializeToVector(const T& data)
  * @param frame frame to set the power_msg of
  * @param control/status power_msg to set
  */
-void setPowerMsg(TbotsProto_PowerFrame& frame, const TbotsProto_PowerControl& control)
+void inline setPowerMsg(TbotsProto_PowerFrame& frame, const TbotsProto_PowerControl& control)
 {
     frame.which_power_msg         = TbotsProto_PowerFrame_power_control_tag;
     frame.power_msg.power_control = control;
 }
 
-void setPowerMsg(TbotsProto_PowerFrame& frame, const TbotsProto_PowerStatus& status)
+void inline setPowerMsg(TbotsProto_PowerFrame& frame, const TbotsProto_PowerStatus& status)
 {
     frame.which_power_msg        = TbotsProto_PowerFrame_power_status_tag;
     frame.power_msg.power_status = status;
@@ -93,7 +93,7 @@ void setPowerMsg(TbotsProto_PowerFrame& frame, const TbotsProto_PowerStatus& sta
  *
  * @return a nanopb power status msg with provided fields
  */
-TbotsProto_PowerStatus createNanoPbPowerStatus(float battery_voltage, float current_draw,
+TbotsProto_PowerStatus inline createNanoPbPowerStatus(float battery_voltage, float current_draw,
                                                TbotsProto_Geneva_Slot geneva_slot,
                                                bool breakbeam_tripped)
 {
@@ -113,7 +113,7 @@ TbotsProto_PowerStatus createNanoPbPowerStatus(float battery_voltage, float curr
  * @param google_control protobuf message to convert
  * @return a nanopb power control msg matching provided protobuf
  */
-TbotsProto_PowerControl createNanoPbPowerControl(
+TbotsProto_PowerControl inline createNanoPbPowerControl(
     const TbotsProto::PowerControl& google_control)
 {
     std::vector<uint8_t> serialized_proto(google_control.ByteSizeLong());
@@ -137,7 +137,7 @@ TbotsProto_PowerControl createNanoPbPowerControl(
  *
  * @return a nanobp power control msg with provided fields
  */
-TbotsProto_PowerControl createNanoPbPowerControl(ChickerCommandMode chicker_command,
+TbotsProto_PowerControl inline createNanoPbPowerControl(ChickerCommandMode chicker_command,
                                                  float kick_speed_m_per_s,
                                                  float chip_distance_meters,
                                                  AutoChipOrKickMode auto_chip_or_kick,
@@ -196,7 +196,7 @@ TbotsProto_PowerControl createNanoPbPowerControl(ChickerCommandMode chicker_comm
  * @param status nanopb message to convert
  * @return a google protobuf power status matching provided nanopb
  */
-std::unique_ptr<TbotsProto::PowerStatus> createTbotsPowerStatus(
+std::unique_ptr<TbotsProto::PowerStatus> inline createTbotsPowerStatus(
     const TbotsProto_PowerStatus& status)
 {
     auto buffer       = serializeToVector(status);
