@@ -67,8 +67,10 @@ class Chicker
      * Called on a pulse_timer to bring the CHIPPER/KICKER pin low
      */
     static void stopPulse();
+    static void offCooldown();
 
     static hw_timer_t* pulse_timer;
+    static hw_timer_t* cooldown_timer;
     static volatile bool breakbeam_tripped;
 
     static volatile bool on_cooldown;

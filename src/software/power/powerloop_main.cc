@@ -39,7 +39,7 @@ std::shared_ptr<ControlExecutor> executor;
 
 void setup()
 {
-    Serial.begin(921600, SERIAL_8N1);
+    Serial.begin(230400, SERIAL_8N1);
     read_buffer_size =
         getMarshalledSize(TbotsProto_PowerControl TbotsProto_PowerControl_init_default);
     charger  = std::make_shared<Charger>();
