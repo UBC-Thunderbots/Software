@@ -6,14 +6,6 @@
 #include "software/optimization/gradient_descent_optimizer.hpp"
 #include "software/geom/algorithms/distance.h"
 
-Point robotPositionToFaceBall(const Point &ball_position,
-                                          const Angle &face_ball_angle,
-                                          double additional_offset)
-{
-    return ball_position - Vector::createFromAngle(face_ball_angle)
-            .normalize(DIST_TO_FRONT_OF_ROBOT_METERS +
-                       BALL_MAX_RADIUS_METERS + additional_offset);
-}
 
 std::optional<InterceptionResult> findBestInterceptForBall(const Ball &ball,
                                                            const Field &field,
@@ -32,13 +24,13 @@ std::optional<InterceptionResult> findBestInterceptForBall(const Ball &ball,
 
     if (ball.velocity().length() < BALL_MOVING_SLOW_SPEED_THRESHOLD)
     {
-        auto face_ball_vector = (ball.position() - robot.position());
-        auto point_in_front_of_ball =
-                robotPositionToFaceBall(ball.position(), face_ball_vector.orientation());
         robot_time_to_pos = robot.getTimeToPosition(intercept_position);
 
-        return std::make_optional<InterceptionResult>({point_in_front_of_ball, robot_time_to_pos, 0.0});
+        return std::make_optional<InterceptionResult>({intercept_position, robot_time_to_pos, 0.0});
     }
+
+    intercept_position +=
+            ball.velocity().normalize(INTERCEPT_POSITION_SEARCH_INTERVAL);
 
     //todo find how quick robot can be moving for it to trap the ball in dribbler when intercepting
     // if large enough then use fallback code with with that set as maximum speed.

@@ -21,22 +21,6 @@ struct InterceptionResult{
 
 
 /**
- * Converts the ball position to the robot's position given the direction that the
- * robot faces the ball
- *
- * @param ball_position The ball position
- * @param face_ball_angle The angle to face the ball
- * @param additional_offset Additional offset from facing the ball
- *
- * @return the point that the robot should be positioned to face the ball and dribble
- * the ball
- */
-
-Point robotPositionToFaceBall(const Point &ball_position,
-                              const Angle &face_ball_angle,
-                              double additional_offset=0.0);
-
-/**
  * Finds the best place for the given robot to intercept the given ball
  *
  * @param ball The ball to intercept

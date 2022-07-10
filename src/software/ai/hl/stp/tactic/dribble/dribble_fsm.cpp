@@ -1,6 +1,15 @@
 #include "software/ai/hl/stp/tactic/dribble/dribble_fsm.h"
 #include "software//ai/evaluation/intercept.h"
 
+Point DribbleFSM::robotPositionToFaceBall(const Point &ball_position,
+                              const Angle &face_ball_angle,
+                              double additional_offset)
+{
+    return ball_position - Vector::createFromAngle(face_ball_angle)
+            .normalize(DIST_TO_FRONT_OF_ROBOT_METERS +
+                       BALL_MAX_RADIUS_METERS + additional_offset);
+}
+
 Point DribbleFSM::getDribbleBallDestination(const Point &ball_position,
                                             std::optional<Point> dribble_destination)
 {
