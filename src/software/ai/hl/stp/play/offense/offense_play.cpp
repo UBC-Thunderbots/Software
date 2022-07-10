@@ -33,21 +33,20 @@ void OffensePlay::updateTactics(const PlayUpdate &play_update)
     PriorityTacticVector tactics_to_return;
     unsigned int num_defenders = 2;
     unsigned int num_enemy_robots =
-        static_cast<int>(play_update.world.enemyTeam().numRobots());
+        static_cast<unsigned int>(play_update.world.enemyTeam().numRobots());
 
     if (play_update.world.gameState().isSetupState() &&
         (play_update.world.gameState().isOurDirectFree() ||
          play_update.world.gameState().isOurIndirectFree()))
     {
-        LOG(INFO) << "FREE KICK" << std::endl;
         // if we're in free kick on the enemy side, then we can commit more robots in
         // forward positions
         if (play_update.world.ball().position().x() > 0)
         {
-            num_defenders = std::max(
-                0, 2 - 2 * static_cast<int>(
+            num_defenders = static_cast<unsigned int>(std::max(
+                0, static_cast<int>(2 - 2 * 
                                play_update.world.ball().position().x() /
-                               (play_update.world.field().fieldLines().xMax() / 3.0)));
+                               (play_update.world.field().fieldLines().xMax() / 3.0))));
         }
 
         shoot_or_pass_play->updateControlParams(true);

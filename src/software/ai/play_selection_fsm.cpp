@@ -34,7 +34,12 @@ bool PlaySelectionFSM::gameStatePlaying(const Update& event)
 
 bool PlaySelectionFSM::gameStateSetup(const Update& event)
 {
-    return event.game_state.isSetupState();
+    return event.game_state.isSetupState() || (event.game_state.isReadyState() && event.game_state.isOurKickoff());
+}
+
+bool PlaySelectionFSM::gameStateReady(const Update& event)
+{
+    return event.game_state.isReadyState() ;
 }
 
 void PlaySelectionFSM::setupSetPlay(const Update& event)
@@ -80,6 +85,14 @@ void PlaySelectionFSM::setupSetPlay(const Update& event)
     if (event.game_state.isTheirDirectFree() || event.game_state.isTheirIndirectFree())
     {
         event.set_current_play(std::make_unique<EnemyFreekickPlay>(ai_config));
+    }
+}
+
+void PlaySelectionFSM::readySetPlay(const Update& event)
+{
+    if (event.game_state.isOurKickoff())
+    {
+        event.set_current_play(std::make_unique<OffensePlay>(ai_config));
     }
 }
 

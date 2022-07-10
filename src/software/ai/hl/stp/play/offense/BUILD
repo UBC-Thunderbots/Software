@@ -57,3 +57,19 @@ py_test(
         requirement("pytest"),
     ],
 )
+
+py_test(
+    name = "kickoff_friendly_play_test",
+    srcs = [
+        "kickoff_friendly_play_test.py",
+    ],
+    # TODO (#2619) Remove tag to run in parallel
+    tags = [
+        "exclusive",
+    ],
+    deps = [
+        "//software/simulated_tests:simulated_test_fixture",
+        "//software/simulated_tests:validation",
+        requirement("pytest"),
+    ],
+)
