@@ -116,14 +116,15 @@ struct PlaySelectionFSM
 
             // Check for transitions to other states, if not then default to running the
             // current play
-            SetPlay_S + Update_E[gameStateReady_G] / readySetPlay_A     = SetPlayReady_S,
-            SetPlay_S + Update_E[gameStateHalted_G] / setupHaltPlay_A     = Halt_S,
-            SetPlay_S + Update_E[gameStateStopped_G] / setupStopPlay_A    = Stop_S,
+            SetPlay_S + Update_E[gameStateReady_G] / readySetPlay_A    = SetPlayReady_S,
+            SetPlay_S + Update_E[gameStateHalted_G] / setupHaltPlay_A  = Halt_S,
+            SetPlay_S + Update_E[gameStateStopped_G] / setupStopPlay_A = Stop_S,
             SetPlay_S + Update_E[gameStatePlaying_G] / setupOffensePlay_A = Playing_S,
 
-            SetPlayReady_S + Update_E[gameStateHalted_G] / setupHaltPlay_A     = Halt_S,
-            SetPlayReady_S + Update_E[gameStateStopped_G] / setupStopPlay_A    = Stop_S,
-            SetPlayReady_S + Update_E[gameStatePlaying_G] / setupOffensePlay_A = Playing_S,
+            SetPlayReady_S + Update_E[gameStateHalted_G] / setupHaltPlay_A  = Halt_S,
+            SetPlayReady_S + Update_E[gameStateStopped_G] / setupStopPlay_A = Stop_S,
+            SetPlayReady_S + Update_E[gameStatePlaying_G] / setupOffensePlay_A =
+                Playing_S,
 
             X + Update_E = X);
     }

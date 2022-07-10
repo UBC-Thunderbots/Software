@@ -35,17 +35,19 @@ void OffensePlay::updateTactics(const PlayUpdate &play_update)
     unsigned int num_enemy_robots =
         static_cast<unsigned int>(play_update.world.enemyTeam().numRobots());
 
-    if (play_update.world.gameState().isSetupState() &&
-        (play_update.world.gameState().isOurDirectFree() ||
-         play_update.world.gameState().isOurIndirectFree()))
+    if ((play_update.world.gameState().isSetupState() &&
+         (play_update.world.gameState().isOurDirectFree() ||
+          play_update.world.gameState().isOurIndirectFree())) ||
+        (play_update.world.gameState().isReadyState() &&
+         play_update.world.gameState().isOurKickoff()))
     {
         // if we're in free kick on the enemy side, then we can commit more robots in
         // forward positions
         if (play_update.world.ball().position().x() > 0)
         {
             num_defenders = static_cast<unsigned int>(std::max(
-                0, static_cast<int>(2 - 2 * 
-                               play_update.world.ball().position().x() /
+                0, static_cast<int>(
+                       2 - 2 * play_update.world.ball().position().x() /
                                (play_update.world.field().fieldLines().xMax() / 3.0))));
         }
 

@@ -34,12 +34,13 @@ bool PlaySelectionFSM::gameStatePlaying(const Update& event)
 
 bool PlaySelectionFSM::gameStateSetup(const Update& event)
 {
-    return event.game_state.isSetupState() || (event.game_state.isReadyState() && event.game_state.isOurKickoff());
+    return event.game_state.isSetupState() ||
+           (event.game_state.isReadyState() && event.game_state.isOurKickoff());
 }
 
 bool PlaySelectionFSM::gameStateReady(const Update& event)
 {
-    return event.game_state.isReadyState() ;
+    return event.game_state.isReadyState();
 }
 
 void PlaySelectionFSM::setupSetPlay(const Update& event)

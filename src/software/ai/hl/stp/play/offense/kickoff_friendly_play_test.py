@@ -15,7 +15,7 @@ from proto.ssl_gc_common_pb2 import Team
 def test_kickoff_friendly_play_bottom_left(simulated_test_runner):
 
     # starting point must be Point
-    ball_initial_pos = tbots.Point(0,0)
+    ball_initial_pos = tbots.Point(0, 0)
 
     # Setup Bots
     blue_bots = [
@@ -40,7 +40,7 @@ def test_kickoff_friendly_play_bottom_left(simulated_test_runner):
     simulated_test_runner.gamecontroller.send_ci_input(
         gc_command=Command.Type.KICKOFF, team=Team.BLUE
     )
-    #time.sleep(1)
+    # time.sleep(1)
     simulated_test_runner.gamecontroller.send_ci_input(
         gc_command=Command.Type.NORMAL_START, team=Team.BLUE
     )
@@ -80,7 +80,7 @@ def test_kickoff_friendly_play_bottom_left(simulated_test_runner):
 def test_kickoff_friendly_play_top_right(simulated_test_runner):
 
     # starting point must be Point
-    ball_initial_pos = tbots.Point(0,0)
+    ball_initial_pos = tbots.Point(0, 0)
 
     # Setup Bots
     blue_bots = [
