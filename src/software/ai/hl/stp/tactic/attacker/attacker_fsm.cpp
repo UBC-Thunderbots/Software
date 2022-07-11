@@ -125,8 +125,8 @@ void AttackerFSM::alignToBall(const Update& event,
     processEvent(MoveFSM::Update(control_params, event.common));
 }
 
-void AttackerFSM::oneTouchKick(const Update& event,
-                               boost::sml::back::process<KickFSM::Update> processEvent)
+void AttackerFSM::singleTouchKick(const Update& event,
+                                  boost::sml::back::process<KickFSM::Update> processEvent)
 {
     auto ball_position = event.common.world.ball().position();
     Point chip_target  = event.common.world.field().enemyGoalCenter();
@@ -165,7 +165,7 @@ void AttackerFSM::oneTouchKick(const Update& event,
     processEvent(KickFSM::Update(control_params, event.common));
 }
 
-bool AttackerFSM::shouldOneTouch(const Update& event)
+bool AttackerFSM::shouldSingleTouch(const Update& event)
 {
-    return event.control_params.should_one_touch;
+    return event.control_params.should_single_touch;
 }

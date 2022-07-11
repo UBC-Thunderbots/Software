@@ -39,7 +39,7 @@ class AttackerTactic : public Tactic
      */
     void updateControlParams(std::optional<Point> chip_target);
 
-    void updateShouldOneTouch(bool should_one_touch);
+    void updateShouldSingleTouch(bool should_single_touch);
 
     void accept(TacticVisitor& visitor) const override;
 
@@ -58,7 +58,7 @@ class AttackerTactic : public Tactic
     // of losing the ball to an enemy
     std::optional<Point> chip_target;
 
-    bool should_one_touch;
+    bool should_single_touch;
 
     // AI config
     TbotsProto::AiConfig ai_config;

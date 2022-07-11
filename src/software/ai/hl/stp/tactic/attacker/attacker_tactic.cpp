@@ -11,7 +11,7 @@ AttackerTactic::AttackerTactic(TbotsProto::AiConfig ai_config)
       best_pass_so_far(std::nullopt),
       pass_committed(false),
       chip_target(std::nullopt),
-      should_one_touch(false),
+      should_single_touch(false),
       ai_config(ai_config)
 {
     for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)
@@ -35,9 +35,9 @@ void AttackerTactic::updateControlParams(std::optional<Point> chip_target)
     this->chip_target = chip_target;
 }
 
-void AttackerTactic::updateShouldOneTouch(bool should_one_touch)
+void AttackerTactic::updateShouldSingleTouch(bool should_single_touch)
 {
-    this->should_one_touch = should_one_touch;
+    this->should_single_touch = should_single_touch;
 }
 
 void AttackerTactic::accept(TacticVisitor& visitor) const
@@ -67,11 +67,11 @@ void AttackerTactic::updatePrimitive(const TacticUpdate& tactic_update, bool res
     }
 
     AttackerFSM::ControlParams control_params{
-        .best_pass_so_far = best_pass_so_far,
-        .pass_committed   = pass_committed,
-        .shot             = shot,
-        .chip_target      = chip_target,
-        .should_one_touch = should_one_touch,
+        .best_pass_so_far    = best_pass_so_far,
+        .pass_committed      = pass_committed,
+        .shot                = shot,
+        .chip_target         = chip_target,
+        .should_single_touch = should_single_touch,
     };
 
     fsm_map.at(tactic_update.robot.id())
