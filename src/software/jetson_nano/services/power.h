@@ -51,5 +51,5 @@ class PowerService
     const size_t READ_BUFFER_SIZE =
         getMarshalledSize(TbotsProto_PowerStatus TbotsProto_PowerStatus_init_default);
     const std::string DEVICE_SERIAL_PORT    = "/dev/ttyUSB0";
-    static constexpr unsigned int BAUD_RATE = 230400;
+    static constexpr unsigned int BAUD_RATE = 460800;
 };

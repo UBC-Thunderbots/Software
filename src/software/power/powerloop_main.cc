@@ -39,7 +39,7 @@ std::shared_ptr<ControlExecutor> executor;
 
 void setup()
 {
-    Serial.begin(230400, SERIAL_8N1);
+    Serial.begin(460800, SERIAL_8N1);
     read_buffer_size =
         getMarshalledSize(TbotsProto_PowerPulseControl TbotsProto_PowerPulseControl_init_default);
     sequence_num = 0;
