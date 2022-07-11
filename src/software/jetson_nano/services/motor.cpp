@@ -776,7 +776,7 @@ void MotorService::startEncoderCalibration(uint8_t motor)
                                  0x00000000);
     writeToControllerOrDieTrying(motor, TMC4671_PHI_E_SELECTION, 0x00000001);
     writeToControllerOrDieTrying(motor, TMC4671_PHI_E_EXT, 0x00000000);
-    writeToControllerOrDieTrying(motor, TMC4671_UQ_UD_EXT, 0x000007F0);
+    writeToControllerOrDieTrying(motor, TMC4671_UQ_UD_EXT, 0x00000FFF);
 }
 
 void MotorService::endEncoderCalibration(uint8_t motor)
