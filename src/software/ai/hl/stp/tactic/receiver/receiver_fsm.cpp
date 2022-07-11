@@ -138,7 +138,6 @@ void ReceiverFSM::updateOnetouch(const Update& event)
 
 void ReceiverFSM::updateReceive(const Update& event)
 {
-    std::cout<<"determining receive"<<std::endl;
     if (event.control_params.pass)
     {
         event.common.set_primitive(createMovePrimitive(

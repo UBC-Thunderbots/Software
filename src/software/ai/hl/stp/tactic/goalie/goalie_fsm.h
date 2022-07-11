@@ -54,7 +54,7 @@ struct GoalieFSM
      *
      * @return the position that the goalie should move to
      */
-    static Point getGoaliePositionToBlock(
+    static Point getGoaliePositionToBlock(const Team &friendly_team,
         const Ball &ball, const Field &field,
         TbotsProto::GoalieTacticConfig goalie_tactic_config);
 

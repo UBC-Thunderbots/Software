@@ -6,24 +6,36 @@ Point GoalieFSM::getGoaliePositionToBlock(const Team &friendly_team,
 {
     // compute angle between two vectors, negative goal post to ball and positive
     // goal post to ball
-    Point uncovered_negative_of_goal = field.friendlyGoalpostNeg();
-    Point uncovered_positive_of_goal = field.friendlyGoalpostPos();
+
+    Segment s1 = Segment(ball.position(), field.friendlyGoalpostPos());
+    Segment s2 = Segment(ball.position(), field.friendlyGoalpostNeg());
+
+    static constexpr double INTERSECTION_INCREMENT_INTERVAL = 0.1;
 
     for (auto robot : friendly_team.getAllRobots()){
         if (robot.id() == friendly_team.getGoalieId()){
             continue;
         }
+        Circle robot_circle = Circle(robot.position(), robot.robotConstants().robot_radius_m);
 
-        Triangle triangle = Triangle(uncovered_negative_of_goal, uncovered_positive_of_goal, ball.position());
-        if (contains(triangle, robot.position())){
-            
+        while(intersects(robot_circle, s1) || intersects(robot_circle, s2) || s2.getEnd().y() > s1.getEnd().y()){
+            if (intersects(robot_circle, s1)){
+                Point new_end = Point(s1.getEnd().x(), s1.getEnd().y()-INTERSECTION_INCREMENT_INTERVAL);
+                s1.setEnd(new_end);
+            }
+
+            if (intersects(robot_circle, s2)){
+                Point new_end = Point(s2.getEnd().x(), s2.getEnd().y()+INTERSECTION_INCREMENT_INTERVAL);
+                s2.setEnd(new_end);
+            }
+
         }
     }
 
-    Angle block_cone_angle = acuteAngle(field.friendlyGoalpostNeg(), ball.position(),
-                                        field.friendlyGoalpostPos());
+    std::cout<<s2.getEnd()<<" , "<<s1.getEnd()<<std::endl;
 
-    //adjust the angles based on whether friendly robots block the the cone
+    Angle block_cone_angle = acuteAngle(s2.getEnd(), ball.position(),
+                                        s1.getEnd());
 
 
     std::optional<Point> clamped_goalie_pos = std::nullopt;
@@ -39,7 +51,7 @@ Point GoalieFSM::getGoaliePositionToBlock(const Team &friendly_team,
         // compute block cone position, allowing 1 ROBOT_MAX_RADIUS_METERS extra on
         // either side
         Point goalie_pos = calculateBlockCone(
-            field.friendlyGoalpostNeg(), field.friendlyGoalpostPos(), ball.position(),
+            s1.getEnd(), s2.getEnd(), ball.position(),
             block_cone_radius * block_cone_angle.toRadians());
 
         // restrain the goalie in the defense area, if the goalie cannot be
@@ -47,6 +59,7 @@ Point GoalieFSM::getGoaliePositionToBlock(const Team &friendly_team,
         // center of the goal
         clamped_goalie_pos =
             restrainGoalieInRectangle(field, goalie_pos, field.friendlyDefenseArea());
+        std::cout<<*clamped_goalie_pos<<std::endl;
     }
 
     // if the goalie could not be restrained in the defense area,
@@ -66,6 +79,7 @@ Point GoalieFSM::getGoaliePositionToBlock(const Team &friendly_team,
     }
     else
     {
+        std::cout<<"returning goalie position"<<std::endl;
         return *clamped_goalie_pos;
     }
 }
