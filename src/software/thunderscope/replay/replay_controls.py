@@ -24,7 +24,6 @@ class ReplayControls(QGroupBox):
         self.controls_layout = QVBoxLayout()
         self.player = player
 
-        self.buttons = QGroupBox()
         self.buttons_layout = QHBoxLayout()
 
         for button in [
@@ -75,8 +74,6 @@ class ReplayControls(QGroupBox):
         self.save_clip.clicked.connect(self.__on_save_clip_clicked)
         self.buttons_layout.addWidget(self.save_clip)
 
-        self.buttons.setLayout(self.buttons_layout)
-
         self.slider_pressed = False
         # tracks history of the state of is_playing before a button is pressed
         self.was_playing = False
@@ -85,7 +82,7 @@ class ReplayControls(QGroupBox):
 
         # Setup the replay slider
         (
-            self.replay_box,
+            self.replay_layout,
             self.replay_slider,
             self.replay_label,
         ) = common_widgets.create_slider(
@@ -100,8 +97,8 @@ class ReplayControls(QGroupBox):
         self.replay_slider.sliderReleased.connect(self.__on_replay_slider_released)
         self.replay_slider.sliderPressed.connect(self.__on_replay_slider_pressed)
 
-        self.controls_layout.addWidget(self.replay_box)
-        self.controls_layout.addWidget(self.buttons)
+        self.controls_layout.addLayout(self.replay_layout)
+        self.controls_layout.addLayout(self.buttons_layout)
         self.setLayout(self.controls_layout)
 
     def __on_play_pause_clicked(self):
