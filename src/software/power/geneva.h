@@ -1,9 +1,6 @@
 #pragma once
 
-#include <array>
-
 #include "pins.h"
-#include "proto/geneva_slot.nanopb.h"
 
 /**
  * Represents the geneva motor on the power board
@@ -16,11 +13,28 @@ class Geneva
      */
     Geneva();
     /**
-     * Returns the current slot of the geneva motor
+     * Returns the current angle of the geneva motor
      *
-     * @returns the current slot of the geneva motor
+     * @returns the current angle of the geneva motor
      */
-    TbotsProto_Geneva_Slot getCurrentSlot();
+    float getCurrentAngle();
+    /**
+     * Sets the angle of the geneva motor.
+     * Also attaches a timer interrupt to asynchronously wait a fixed amount of time
+     * (proportional to how much the geneva motor needs to rotate) before running the
+     * given isr
+     *
+     * @param angle_deg angle to set the geneva motor to
+     * @param isr isr to run once geneva motor is in place
+     */
+    void setAngle(float angle_deg, void (*isr)());
 
-    static TbotsProto_Geneva_Slot current_slot;
+   private:
+    /**
+     * Helper called when the geneva motor is set to the right position
+     *
+     * @param isr isr to run once geneva motor is in place
+     */
+    void performWhenDone(void (*isr)());
+    static hw_timer_t* timer;
 };
