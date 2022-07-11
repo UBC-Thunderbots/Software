@@ -4,6 +4,7 @@
 #include "software/networking/threaded_proto_udp_sender.hpp"
 
 
+const float PACKET_LOSS_WARNING_THRESHOLD = 0.1f;
 
 NetworkService::NetworkService(const std::string& ip_address,
                                unsigned short world_listener_port,
@@ -37,17 +38,21 @@ void NetworkService::primitiveSetCallback(TbotsProto::PrimitiveSet input)
     std::scoped_lock<std::mutex> lock(primitive_set_mutex);
     primitive_set_msg = input;
 
-    // LOG(DEBUG) << "interpacket delay primitives: " <<
-    // input.time_sent().epoch_timestamp_seconds() - last_primitive_time;
+    if (last_primitive_sequence_number != input.sequence_number() - 1)
+    {
+        total_primitives_lost++;
+    }
 
-    last_primitive_time     = input.time_sent().epoch_timestamp_seconds();
-    static uint64_t counter = 0;
-    counter++;
-    // if (last_sequence_number != input.sequence_number() - 1)
-    //{
-    // LOG(DEBUG) << "PACKET LOST YOU CHUMP";
-    //}
-    last_sequence_number = input.sequence_number();
+    float packet_loss = static_cast<float>(total_primitives_lost) /
+                        static_cast<float>(input.sequence_number());
+
+    if (packet_loss > PACKET_LOSS_WARNING_THRESHOLD)
+    {
+        LOG(WARNING) << "Primitive packet loss more than "
+                     << PACKET_LOSS_WARNING_THRESHOLD << "% ";
+    }
+
+    last_primitive_sequence_number = input.sequence_number();
 }
 
 void NetworkService::worldCallback(TbotsProto::World input)

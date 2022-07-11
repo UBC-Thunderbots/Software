@@ -54,7 +54,9 @@ class NetworkService
     void primitiveSetCallback(TbotsProto::PrimitiveSet input);
     void worldCallback(TbotsProto::World input);
 
-    double last_primitive_time    = 0.0;
-    double last_world_time        = 0.0;
-    uint64_t last_sequence_number = 0;
+    double last_primitive_time = 0.0;
+    double last_world_time     = 0.0;
+
+    uint64_t last_primitive_sequence_number = 0;
+    uint64_t total_primitives_lost          = 0;
 };
