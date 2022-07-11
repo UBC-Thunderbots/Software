@@ -35,11 +35,9 @@ void OffensePlay::updateTactics(const PlayUpdate &play_update)
     unsigned int num_enemy_robots =
         static_cast<unsigned int>(play_update.world.enemyTeam().numRobots());
 
-    if ((play_update.world.gameState().isSetupState() &&
-         (play_update.world.gameState().isOurDirectFree() ||
-          play_update.world.gameState().isOurIndirectFree())) ||
-        (play_update.world.gameState().isReadyState() &&
-         play_update.world.gameState().isOurKickoff()))
+    if (play_update.world.gameState().isSetupState() &&
+        (play_update.world.gameState().isOurDirectFree() ||
+         play_update.world.gameState().isOurIndirectFree()))
     {
         // if we're in free kick on the enemy side, then we can commit more robots in
         // forward positions
@@ -51,6 +49,11 @@ void OffensePlay::updateTactics(const PlayUpdate &play_update)
                                (play_update.world.field().fieldLines().xMax() / 3.0))));
         }
 
+        shoot_or_pass_play->updateControlParams(true);
+    }
+    else if (play_update.world.gameState().isReadyState() &&
+             play_update.world.gameState().isOurKickoff())
+    {
         shoot_or_pass_play->updateControlParams(true);
     }
     else if (num_enemy_robots <= 3)
