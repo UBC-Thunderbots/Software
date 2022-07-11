@@ -83,8 +83,8 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
     const Angle &curr_orientation)
 {
     Vector target_velocity2 = getTargetLinearVelocity(curr_orientation);
-    if (robot_id_ == 3 && team_colour_testing == TeamColour::BLUE)
-        std::cout << "hrvo velocity before doStep: " << target_velocity2.length() << std::endl;
+//    if (robot_id_ == 3 && team_colour_testing == TeamColour::BLUE)
+//        std::cout << "hrvo velocity before doStep: " << target_velocity2.length() << std::endl;
 
     hrvo_simulator_.doStep();
 
