@@ -3,7 +3,6 @@ syntax = "proto3";
 package TbotsProto;
 
 import "proto/geometry.proto";
-import "proto/geneva_slot.proto";
 import "google/protobuf/descriptor.proto";
 
 extend google.protobuf.EnumValueOptions
@@ -92,14 +91,7 @@ message PowerControl
         };
     }
 
-    message GenevaControl
-    {
-        float angle_deg          = 1;
-        float rotation_speed_rpm = 2;
-    }
-
     ChickerControl chicker  = 1;
-    Geneva.Slot geneva_slot = 2;
 }
 
 message Primitive

@@ -97,12 +97,10 @@ void inline setPowerMsg(TbotsProto_PowerFrame& frame,
  */
 TbotsProto_PowerStatus inline createNanoPbPowerStatus(float battery_voltage,
                                                       float current_draw,
-                                                      TbotsProto_Geneva_Slot geneva_slot,
                                                       bool breakbeam_tripped)
 {
     TbotsProto_PowerStatus status = {.battery_voltage    = battery_voltage,
                                      .current_draw       = current_draw,
-                                     .geneva_slot        = geneva_slot,
                                      .breakbream_tripped = breakbeam_tripped};
     return status;
 }
@@ -143,8 +141,7 @@ TbotsProto_PowerControl inline createNanoPbPowerControl(
 TbotsProto_PowerControl inline createNanoPbPowerControl(
     ChickerCommandMode chicker_command, float kick_speed_m_per_s,
     float chip_distance_meters, AutoChipOrKickMode auto_chip_or_kick,
-    float autochip_distance_meters, float autokick_speed_m_per_s,
-    TbotsProto_Geneva_Slot geneva_slot)
+    float autochip_distance_meters, float autokick_speed_m_per_s)
 {
     TbotsProto_PowerControl control = TbotsProto_PowerControl_init_default;
     TbotsProto_PowerControl_ChickerControl chicker =
@@ -187,7 +184,6 @@ TbotsProto_PowerControl inline createNanoPbPowerControl(
     }
 
     control.chicker     = chicker;
-    control.geneva_slot = geneva_slot;
 
     return control;
 }

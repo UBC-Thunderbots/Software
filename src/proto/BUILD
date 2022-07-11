@@ -9,7 +9,6 @@ proto_library(
     srcs = [
         "ball.proto",
         "game_state.proto",
-        "geneva_slot.proto",
         "geometry.proto",
         "parameters.proto",
         "play.proto",
@@ -46,7 +45,6 @@ py_proto_library(
         "ball.proto",
         "estop_state.proto",
         "game_state.proto",
-        "geneva_slot.proto",
         "geometry.proto",
         "parameters.proto",
         "play.proto",
