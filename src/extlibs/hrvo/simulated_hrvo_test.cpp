@@ -32,7 +32,7 @@ TEST_F(SimulatedHRVOTest, test_drive_in_straight_line_with_moving_enemy_robot_fr
     setTactic(1, tactic);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
-        // TODO (#2496): re-enable
+        // TODO (#2519): re-enable
         //     [destination, tactic](std::shared_ptr<World> world_ptr,
         //                           ValidationCoroutine::push_type& yield) {
         //         // Small rectangle around the destination point that the robot should
@@ -68,7 +68,7 @@ TEST_F(SimulatedHRVOTest, test_drive_in_straight_line_with_moving_enemy_robot_fr
     setTactic(1, tactic);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
-        // TODO (#2496): re-enable
+        // TODO (#2519): re-enable
         //        [destination, tactic](std::shared_ptr<World> world_ptr,
         //                              ValidationCoroutine::push_type& yield) {
         //            // Small rectangle around the destination point that the robot
@@ -104,7 +104,7 @@ TEST_F(SimulatedHRVOTest, test_drive_in_straight_line_with_no_obstacle)
     setTactic(1, tactic);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
-        // TODO (#2496): re-enable
+        // TODO (#2519): re-enable
         //        [destination, tactic](std::shared_ptr<World> world_ptr,
         //                              ValidationCoroutine::push_type& yield) {
         //            // Small rectangle around the destination point that the robot
@@ -141,7 +141,7 @@ TEST_F(SimulatedHRVOTest, test_three_robot_wall)
     setTactic(1, tactic);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
-        // TODO (#2496): re-enable
+        // TODO (#2519): re-enable
         //        [destination, tactic](std::shared_ptr<World> world_ptr,
         //                              ValidationCoroutine::push_type& yield) {
         //            // Small rectangle around the destination point that the robot
@@ -228,7 +228,7 @@ TEST_F(SimulatedHRVOTest, test_zig_zag_movement)
     setTactic(1, tactic);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
-        // TODO (#2496): re-enable
+        // TODO (#2519): re-enable
         // [destination, tactic](std::shared_ptr<World> world_ptr,
         //                       ValidationCoroutine::push_type& yield) {
         //     // Small rectangle around the destination point that the robot should be
@@ -264,7 +264,7 @@ TEST_F(SimulatedHRVOTest, test_start_in_local_minima)
     setTactic(1, tactic);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
-        // TODO (#2496): re-enable this test
+        // TODO (#2519): re-enable this test
         // [destination, tactic](std::shared_ptr<World> world_ptr,
         //                       ValidationCoroutine::push_type& yield) {
         //     // Small rectangle around the destination point that the robot should be
@@ -300,7 +300,7 @@ TEST_F(SimulatedHRVOTest, test_start_in_local_minima_with_open_end)
     setTactic(1, tactic);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
-        // TODO (#2496): re-enable this test
+        // TODO (#2519): re-enable this test
         // [destination, tactic](std::shared_ptr<World> world_ptr,
         //                       ValidationCoroutine::push_type& yield) {
         //     // Small rectangle around the destination point that the robot should be

@@ -62,3 +62,10 @@ std::ostream& operator<<(std::ostream& output_stream, const Pass& pass)
 
     return output_stream;
 }
+
+bool Pass::operator==(const Pass& other) const
+{
+    return this->passer_point == other.passer_point &&
+           this->receiver_point == other.receiver_point &&
+           this->pass_speed_m_per_s == other.pass_speed_m_per_s;
+}

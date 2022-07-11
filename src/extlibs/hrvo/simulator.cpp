@@ -153,7 +153,8 @@ void HRVOSimulator::updateWorld(const World &world)
 
             AgentPath path          = AgentPath({PathPoint(goal_pos, 0.0f)}, 0.1f);
             std::size_t agent_index = addLinearVelocityAgent(
-                position, ball_radius, velocity, velocity.length(), acceleration, path);
+                position, ball_radius, ENEMY_ROBOT_RADIUS_MAX_INFLATION, velocity,
+                velocity.length(), acceleration, path);
             ball_agent_id = agent_index;
         }
         else
@@ -219,10 +220,9 @@ std::size_t HRVOSimulator::addHRVORobotAgent(const Robot &robot)
 {
     Vector position = robot.position().toVector();
     Vector velocity;
-    float agent_radius = ROBOT_MAX_RADIUS_METERS * FRIENDLY_ROBOT_RADIUS_SCALE;
-    float max_accel    = 1e-4;
-    float pref_speed   = 1e-4;
-    float max_speed    = 1e-4;
+    float max_accel  = 1e-4;
+    float pref_speed = 1e-4;
+    float max_speed  = 1e-4;
 
     const std::set<RobotCapability> &unavailable_capabilities =
         robot.getUnavailableCapabilities();
@@ -275,9 +275,10 @@ std::size_t HRVOSimulator::addHRVORobotAgent(const Robot &robot)
     AgentPath path =
         AgentPath({PathPoint(destination_point, speed_at_goal)}, path_radius);
 
-    return addHRVOAgent(position, agent_radius, velocity, max_speed, pref_speed,
-                        max_accel, path, MAX_NEIGHBOR_SEARCH_DIST, MAX_NEIGHBORS,
-                        uncertainty_offset);
+    return addHRVOAgent(position, ROBOT_MAX_RADIUS_METERS,
+                        FRIENDLY_ROBOT_RADIUS_MAX_INFLATION, velocity, max_speed,
+                        pref_speed, max_accel, path, MAX_NEIGHBOR_SEARCH_DIST,
+                        MAX_NEIGHBORS, uncertainty_offset);
 }
 
 std::size_t HRVOSimulator::addLinearVelocityRobotAgent(const Robot &robot,
@@ -292,33 +293,34 @@ std::size_t HRVOSimulator::addLinearVelocityRobotAgent(const Robot &robot,
     // Max distance which the robot can travel in one time step + scaling
     float path_radius = (max_speed * time_step) / 2 * GOAL_RADIUS_SCALE;
 
-    // Enemy agents should appear larger to friendly agents to avoid collision
-    float agent_radius = ROBOT_MAX_RADIUS_METERS * ENEMY_ROBOT_RADIUS_SCALE;
-
     AgentPath path = AgentPath({PathPoint(destination, 0.0f)}, path_radius);
-    return addLinearVelocityAgent(position, agent_radius, velocity, max_speed, max_accel,
-                                  path);
+    return addLinearVelocityAgent(position, ROBOT_MAX_RADIUS_METERS,
+                                  ENEMY_ROBOT_RADIUS_MAX_INFLATION, velocity, max_speed,
+                                  max_accel, path);
 }
 
 std::size_t HRVOSimulator::addHRVOAgent(const Vector &position, float agent_radius,
+                                        float max_radius_inflation,
                                         const Vector &curr_velocity, float maxSpeed,
                                         float prefSpeed, float maxAccel, AgentPath &path,
                                         float neighborDist, std::size_t maxNeighbors,
                                         float uncertaintyOffset)
 {
     std::shared_ptr<HRVOAgent> agent = std::make_shared<HRVOAgent>(
-        this, position, neighborDist, maxNeighbors, agent_radius, curr_velocity, maxAccel,
-        path, prefSpeed, maxSpeed, uncertaintyOffset);
+        this, position, neighborDist, maxNeighbors, agent_radius, max_radius_inflation,
+        curr_velocity, maxAccel, path, prefSpeed, maxSpeed, uncertaintyOffset);
     agents.push_back(std::move(agent));
     return agents.size() - 1;
 }
 
 size_t HRVOSimulator::addLinearVelocityAgent(const Vector &position, float agent_radius,
+                                             float max_radius_inflation,
                                              const Vector &curr_velocity, float max_speed,
                                              float max_accel, AgentPath &path)
 {
     std::shared_ptr<LinearVelocityAgent> agent = std::make_shared<LinearVelocityAgent>(
-        this, position, agent_radius, curr_velocity, max_speed, max_accel, path);
+        this, position, agent_radius, max_radius_inflation, curr_velocity, max_speed,
+        max_accel, path);
 
     agents.push_back(std::move(agent));
     return agents.size() - 1;
@@ -344,11 +346,19 @@ void HRVOSimulator::doStep()
 
     kd_tree->build();
 
+    // Update all agent radii based on their velocity
+    for (auto &agent : agents)
+    {
+        agent->updateRadiusFromVelocity();
+    }
+
+    // Compute what velocity each agent will take next
     for (auto &agent : agents)
     {
         agent->computeNewVelocity();
     }
 
+    // Update the positions of all agents given their velocity
     for (auto &agent : agents)
     {
         agent->update();
