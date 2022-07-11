@@ -93,12 +93,11 @@ void HRVOSimulator::updateWorld(const World &world)
 
     for (const Robot &enemy_robot : enemy_team)
     {
-        auto agent_iter =
-            std::find_if(agents.begin(), agents.end(),
-                         [&enemy_robot](std::shared_ptr<Agent> agent) {
-                             return (agent->getRobotId() == enemy_robot.id() &&
-                                     agent->getAgentType() == TeamSide::ENEMY);
-                         });
+        auto agent_iter = std::find_if(
+            agents.begin(), agents.end(), [&enemy_robot](std::shared_ptr<Agent> agent) {
+                return (agent->getRobotId() == enemy_robot.id() &&
+                        agent->getAgentType() == TeamSide::ENEMY);
+            });
 
         if (agent_iter != agents.end())
         {
@@ -414,27 +413,26 @@ const std::vector<std::shared_ptr<Agent>> &HRVOSimulator::getAgents() const
 
 void HRVOSimulator::updateRemovedAgents(const World &world)
 {
-	std::remove_if(agents.begin(), agents.end(),
-			[&world](std::shared_ptr<Agent> agent) {
-				std::unique_ptr<const std::vector<Robot>> team_to_use;
-				switch (agent->getAgentType())
-				{
-					case TeamSide::FRIENDLY:
-						team_to_use = std::make_unique<const std::vector<Robot>>(
-							world.friendlyTeam().getAllRobots());
-						break;
-					case TeamSide::ENEMY:
-						team_to_use = std::make_unique<const std::vector<Robot>>(
-							world.enemyTeam().getAllRobots());
-						break;
-				    default:
-						team_to_use =
-							std::make_unique<const std::vector<Robot>>(std::vector<Robot>());
-				}
+    std::remove_if(agents.begin(), agents.end(), [&world](std::shared_ptr<Agent> agent) {
+        std::unique_ptr<const std::vector<Robot>> team_to_use;
+        switch (agent->getAgentType())
+        {
+            case TeamSide::FRIENDLY:
+                team_to_use = std::make_unique<const std::vector<Robot>>(
+                    world.friendlyTeam().getAllRobots());
+                break;
+            case TeamSide::ENEMY:
+                team_to_use = std::make_unique<const std::vector<Robot>>(
+                    world.enemyTeam().getAllRobots());
+                break;
+            default:
+                team_to_use =
+                    std::make_unique<const std::vector<Robot>>(std::vector<Robot>());
+        }
 
-				auto team_iter = std::find_if(
-				    (*team_to_use).begin(), (*team_to_use).end(),
-				    [&agent](const Robot &robot) { return (robot.id() == agent->getRobotId()); });
-				return team_iter == (*team_to_use).end();
-    			});			       
+        auto team_iter = std::find_if(
+            (*team_to_use).begin(), (*team_to_use).end(),
+            [&agent](const Robot &robot) { return (robot.id() == agent->getRobotId()); });
+        return team_iter == (*team_to_use).end();
+    });
 }
