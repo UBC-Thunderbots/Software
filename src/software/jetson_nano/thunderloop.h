@@ -52,12 +52,6 @@ class Thunderloop
 
     void runLoop();
 
-    static void *runThunderloopRealtime(void *context)
-    {
-        ((Thunderloop *)context)->runLoop();
-        return NULL;
-    }
-
     // Services
     std::unique_ptr<MotorService> motor_service_;
     std::unique_ptr<NetworkService> network_service_;

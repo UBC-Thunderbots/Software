@@ -30,11 +30,11 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, const int loop
 
     redis_client_ = std::make_unique<RedisClient>(REDIS_DEFAULT_HOST, REDIS_DEFAULT_PORT);
 
-    // auto robot_id   = std::stoi(redis_client_->get(ROBOT_ID_REDIS_KEY));
-    // auto channel_id = std::stoi(redis_client_->get(ROBOT_MULTICAST_CHANNEL_REDIS_KEY));
-    // auto network_interface = redis_client_->get(ROBOT_NETWORK_INTERFACE_REDIS_KEY);
+    auto robot_id   = std::stoi(redis_client_->get(ROBOT_ID_REDIS_KEY));
+    auto channel_id = std::stoi(redis_client_->get(ROBOT_MULTICAST_CHANNEL_REDIS_KEY));
+    auto network_interface = redis_client_->get(ROBOT_NETWORK_INTERFACE_REDIS_KEY);
 
-    LoggerSingleton::initializeLogger("/tmp/tbots");
+    NetworkLoggerSingleton::initializeLogger(channel_id, network_interface, robot_id);
 
     motor_service_ = std::make_unique<MotorService>(robot_constants, loop_hz);
     power_service_ = std::make_unique<PowerService>();
@@ -74,11 +74,6 @@ void Thunderloop::runLoop()
     for (;;)
     {
         {
-            redis_client_->set("/battery_voltage",
-                               std::to_string(power_status_.battery_voltage()));
-            redis_client_->set("/current_draw",
-                               std::to_string(power_status_.current_draw()));
-
             // Wait until next shot
             //
             // Note: CLOCK_MONOTONIC is used over CLOCK_REALTIME since
@@ -152,7 +147,7 @@ void Thunderloop::runLoop()
                 }
             }
 
-            //// If the world msg is new, update the internal buffer
+            // If the world msg is new, update the internal buffer
             if (new_world.time_sent().epoch_timestamp_seconds() >
                 world_.time_sent().epoch_timestamp_seconds())
             {
@@ -230,6 +225,12 @@ void Thunderloop::runLoop()
             *(robot_status_.mutable_motor_status())       = motor_status_;
             *(robot_status_.mutable_power_status())       = power_status_;
             *(robot_status_.mutable_jetson_status())      = jetson_status_;
+
+            // Update Redis
+            redis_client_->set("/battery_voltage",
+                               std::to_string(power_status_.battery_voltage()));
+            redis_client_->set("/current_draw",
+                               std::to_string(power_status_.current_draw()));
         }
 
         auto loop_duration =
