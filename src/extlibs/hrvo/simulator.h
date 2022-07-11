@@ -77,20 +77,23 @@ class HRVOSimulator
     /**
      *      Adds a new Hybrid Reciprocal Agent to the simulation based on Robot.
      *
-     * @param Robot    The robot which this agent should be based on
+     * @param robot    The robot which this agent should be based on
+     * @param type     Whether this robot is FRIENDLY or ENEMY
+     *
      * @return    The index of the agent.
      */
-    std::size_t addHRVORobotAgent(const Robot &robot, AgentType type);
+    std::size_t addHRVORobotAgent(const Robot &robot, TeamSide type);
 
     /**
      *      Adds a new Linear Velocity Agent to the simulation based on Robot.
      *
-     * @param robot       The robot which this agent should be based on
-     * @param destination Destination for this robot
+     * @param robot       	The robot which this agent should be based on
+     * @param destination 	Destination for this robot
+     * @param type 		Whether this robot is FRIENDLY or ENEMY
      * @return    The index of the agent.
      */
     std::size_t addLinearVelocityRobotAgent(const Robot &robot, const Vector &destination,
-                                            AgentType type);
+                                            TeamSide type);
 
     /**
      *      Adds a new agent to the simulation.
@@ -106,13 +109,16 @@ class HRVOSimulator
      * @param uncertaintyOffset  The uncertainty offset of this agent.
      * @param maxAccel           The maximum acceleration of this agent.
      * @param curr_velocity      The initial velocity of this agent.
+     * @param robot_id	 	 This robot's robot id
+     * @param type 	 	 Whether this robot is FRIENDLY or ENEMY
+     *
      * @return The index of the agent.
      */
     std::size_t addHRVOAgent(const Vector &position, float agent_radius,
                              const Vector &curr_velocity, float maxSpeed, float prefSpeed,
                              float maxAccel, AgentPath &path, float neighborDist,
                              std::size_t maxNeighbors, float uncertaintyOffset,
-                             RobotId robot_id, AgentType type);
+                             RobotId robot_id, TeamSide type);
 
     /**
      * Add a new LinearlyVelocityAgent
@@ -123,12 +129,15 @@ class HRVOSimulator
      * @param max_accel     The maximum acceleration of this agent.
      * @param goal_index     The index of the Goal which this agent should go to.
      * @param goal_radius   The goal agent_radius of this agent.
+     * @param robot_id	    This robot's robot id
+     * @param type	    Whether this robot is FRIENDLY or ENEMY
+     *
      * @return The index of the agent.
      */
     size_t addLinearVelocityAgent(const Vector &position, float agent_radius,
                                   const Vector &curr_velocity, float max_speed,
                                   float max_accel, AgentPath &path, RobotId robot_id,
-                                  AgentType type);
+                                  TeamSide type);
 
     /**
      * Performs a simulation step; updates the position, and velocity
@@ -166,18 +175,10 @@ class HRVOSimulator
     const std::unique_ptr<KdTree> &getKdTree() const;
 
     /**
-     * Get the list of Agents in this simulator
-     * @return List of Agents
-     */
-    const std::list<std::shared_ptr<Agent>> &getAgents() const;
-
-    /**
      * Get the Vector of agents in this simulator
      * @return Vector of Agents
-     * #2688: Delete this getter when kd-trees aren't tightly coupled to indices of Agent
-     * vector and we delete the agent vector.
      */
-    const std::vector<std::shared_ptr<Agent>> getAgentsAsVector() const;
+    const std::vector<std::shared_ptr<Agent>> &getAgents() const;
 
     /**
      *      Returns the maximum acceleration of a specified agent.
@@ -250,7 +251,7 @@ class HRVOSimulator
      */
     std::size_t getNumAgents() const
     {
-        return agent_list.size();
+        return agents.size();
     }
 
     /**
@@ -307,9 +308,6 @@ class HRVOSimulator
     std::unique_ptr<KdTree> kd_tree;
 
     // List of agents (robots) in this simulation
-    std::list<std::shared_ptr<Agent>> agent_list;
-    //#2688: Delete this agent vector when the kd-tree is not tightly coupled to the
-    //indices of this vector
     std::vector<std::shared_ptr<Agent>> agents;
 
    public:

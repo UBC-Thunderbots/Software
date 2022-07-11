@@ -49,7 +49,7 @@ void KdTree::build()
         agents_.push_back(i);
     }
 
-    nodes_.resize(std::max(2 * simulator_->agents.size() - 1, nodes_.size()));
+    nodes_.resize(2*simulator_->agents.size() + 1);
 
     if (!agents_.empty())
     {

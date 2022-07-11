@@ -45,7 +45,7 @@
 HRVOAgent::HRVOAgent(HRVOSimulator *simulator, const Vector &position, float neighborDist,
                      std::size_t maxNeighbors, float radius, const Vector &velocity,
                      float maxAccel, AgentPath &path, float prefSpeed, float maxSpeed,
-                     float uncertaintyOffset, unsigned int robot_id, AgentType type)
+                     float uncertaintyOffset, unsigned int robot_id, TeamSide type)
     : Agent(simulator, position, radius, velocity, velocity, maxSpeed, maxAccel, path,
             robot_id, type),
       maxNeighbors_(maxNeighbors),
@@ -163,7 +163,7 @@ void HRVOAgent::computeNewVelocity()
     for (const auto &neighbor : neighbors_)
     {
         std::shared_ptr<Agent> other_agent =
-            simulator_->getAgentsAsVector()[neighbor.second];
+            simulator_->getAgents()[neighbor.second];
         VelocityObstacle velocity_obstacle = other_agent->createVelocityObstacle(*this);
         velocityObstacles_.push_back(velocity_obstacle);
     }
@@ -554,7 +554,7 @@ void HRVOAgent::computePreferredVelocity()
 
 void HRVOAgent::insertNeighbor(std::size_t agentNo, float &rangeSq)
 {
-    std::shared_ptr<Agent> other_agent = simulator_->getAgentsAsVector()[agentNo];
+    std::shared_ptr<Agent> other_agent = simulator_->getAgents()[agentNo];
     auto path_point_opt                = path.getCurrentPathPoint();
 
     if (path_point_opt == std::nullopt || this == other_agent.get())
