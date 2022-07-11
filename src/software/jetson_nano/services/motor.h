@@ -156,39 +156,6 @@ class MotorService
                                    const EuclideanSpace_t& target_euclidean_velocity,
                                    double allowed_acceleration,
                                    const double& time_to_ramp);
-
-    /**
-     * Convert electrical rpm to wheel velocity.
-     *
-     * @param electrical_rpm The electrical rpm to convert
-     *
-     */
-    double electricalRpmToWheelVelocity(int electrical_rpm);
-
-    /**
-     * Convert wheel velocity to electrical rpm.
-     *
-     * @param wheel_velocity The wheel velocity in meters per second
-     *
-     */
-    int wheelVelocityToElectricalRpm(double wheel_velocity);
-
-    /**
-     * Convert electrical rpm to dribbler velocity.
-     *
-     * @param electrical_rpm The electrical rpm to convert
-     *
-     */
-    double electricalRpmToDribblerVelocity(int electrical_rpm);
-
-    /**
-     * Convert dribbler velocity to electrical rpm.
-     *
-     * @param dribbler_velocity The dribbler velocity in meters per second
-     *
-     */
-    int dribblerVelocityToElectricalRpm(double dribbler_velcocity);
-
     /**
      * Trinamic API Binding function
      *

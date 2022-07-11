@@ -193,8 +193,6 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
         case TbotsProto::Primitive::kMove:
         {
             // Compute the target velocities
-            // Vector target_velocity = getTargetLinearVelocity(current_primitive_.move(),
-            // robot_state);
             Vector target_velocity =
                 getTargetLinearVelocity(robot_id, robot_state.orientation());
 
