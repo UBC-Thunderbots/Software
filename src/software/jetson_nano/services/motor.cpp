@@ -99,7 +99,6 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
       driver_control_enable_gpio(DRIVER_CONTROL_ENABLE_GPIO, GpioDirection::OUTPUT,
                                  GpioState::HIGH),
       reset_gpio(MOTOR_DRIVER_RESET_GPIO, GpioDirection::OUTPUT, GpioState::HIGH),
-      heartbeat_gpio(HEARTBEAT_GPIO, GpioDirection::OUTPUT, GpioState::HIGH),
       euclidean_to_four_wheel(robot_constants)
 {
     robot_constants_ = robot_constants;
@@ -167,13 +166,6 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
     checkDriverFault(DRIBBLER_MOTOR_CHIP_SELECT);
     startController(DRIBBLER_MOTOR_CHIP_SELECT, true);
 
-    // Enable Heart
-    heartbeat_gpio.setValue(GpioState::LOW);
-    usleep(MICROSECONDS_PER_MILLISECOND * 100);
-    heartbeat_gpio.setValue(GpioState::HIGH);
-    usleep(MICROSECONDS_PER_MILLISECOND * 100);
-    heartbeat_gpio.setValue(GpioState::LOW);
-
     // Calibrate Encoder
     for (uint8_t motor = 0; motor < NUM_DRIVE_MOTORS; motor++)
     {
@@ -181,12 +173,6 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
     }
 
     sleep(1);
-
-    heartbeat_gpio.setValue(GpioState::LOW);
-    usleep(MICROSECONDS_PER_MILLISECOND * 100);
-    heartbeat_gpio.setValue(GpioState::HIGH);
-    usleep(MICROSECONDS_PER_MILLISECOND * 100);
-    heartbeat_gpio.setValue(GpioState::LOW);
 
     for (uint8_t motor = 0; motor < NUM_DRIVE_MOTORS; motor++)
     {

@@ -183,7 +183,6 @@ class MotorService
     // Enable driver gpio
     GPIO driver_control_enable_gpio;
     GPIO reset_gpio;
-    GPIO heartbeat_gpio;
 
     // Transfer Buffers
     uint8_t tx[5] = {0};
