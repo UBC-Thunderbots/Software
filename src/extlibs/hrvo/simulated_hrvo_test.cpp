@@ -383,7 +383,7 @@ TEST_F(SimulatedHRVOTest, test_robot_avoiding_ball_obstacle)
     setGameState(game_state);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
-        // TODO (#2496): re-enable this test
+        // TODO (#2519): re-enable this test
         // [destination, tactic](std::shared_ptr<World> world_ptr,
         //                       ValidationCoroutine::push_type& yield) {
         //     // Small rectangle around the destination point that the robot should be

@@ -53,21 +53,24 @@ class HRVOAgent : public Agent
     /**
      * Constructor
      *
-     * @param simulator          The simulation which this agent runs in.
-     * @param position           The starting position of this agent.
-     * @param max_neighbor_dist  The maximum distance away which another agent can be from
-     * this agent to be considered as a neighbor (i.e. velocity obstacles for it would be
-     * generated).
-     * @param maxNeighbors       The maximum neighbor count of this agent.
-     * @param radius             The radius of this agent.
-     * @param velocity           The initial velocity of this agent.
-     * @param maxAccel           The maximum acceleration of this agent.
-     * @param path               The path to follow.
-     * @param maxSpeed           The maximum speed of this agent.
+     * @param simulator             The simulation.
+     * @param position              The starting position of this agent.
+     * @param max_neighbor_dist     The maximum distance away which another agent can be
+     * from this agent to be considered as a neighbor (i.e. velocity obstacles for it
+     * would be
+     * @param maxNeighbors          The maximum number of other agents which this agent
+     * will try to avoid collisions with at a time.
+     * @param radius                The radius of this agent.
+     * @param max_radius_inflation  The maximum amount which the radius of this agent can
+     * inflate.
+     * @param velocity              The initial velocity of this agent.
+     * @param maxAccel              The maximum acceleration of this agent.
+     * @param path                  The path which this agent should take.
+     * @param maxSpeed              The maximum speed of this agent.
      */
     HRVOAgent(HRVOSimulator *simulator, const Vector &position, float max_neighbor_dist,
-              std::size_t maxNeighbors, float radius, const Vector &velocity,
-              float maxAccel, AgentPath &path, float maxSpeed);
+              std::size_t maxNeighbors, float radius, float max_radius_inflation,
+              const Vector &velocity, float maxAccel, AgentPath &path, float maxSpeed);
 
     /**
      * Computes the new velocity of this agent.

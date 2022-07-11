@@ -43,9 +43,10 @@
 
 HRVOAgent::HRVOAgent(HRVOSimulator *simulator, const Vector &position,
                      float max_neighbor_dist, std::size_t maxNeighbors, float radius,
-                     const Vector &velocity, float maxAccel, AgentPath &path,
-                     float maxSpeed)
-    : Agent(simulator, position, radius, velocity, velocity, maxSpeed, maxAccel, path),
+                     float max_radius_inflation, const Vector &velocity, float maxAccel,
+                     AgentPath &path, float maxSpeed)
+    : Agent(simulator, position, radius, max_radius_inflation, velocity, velocity,
+            maxSpeed, maxAccel, path),
       maxNeighbors_(maxNeighbors),
       max_neighbor_dist(max_neighbor_dist),
       prefSpeed_(max_speed_ * PREF_SPEED_SCALE),
