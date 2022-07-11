@@ -15,6 +15,7 @@ cc_library(
         "intersection.cpp",
         "intersects.cpp",
         "rasterize.cpp",
+        "tangent.cpp",
         "voronoi_diagram.cpp",
     ],
     hdrs = [
@@ -30,6 +31,7 @@ cc_library(
         "intersection.h",
         "intersects.h",
         "rasterize.h",
+        "tangent.h",
         "voronoi_diagram.h",
     ],
     deps = [

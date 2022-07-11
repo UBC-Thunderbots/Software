@@ -1,24 +1,28 @@
 #include "software/ai/hl/stp/tactic/goalie/goalie_fsm.h"
 
-Point GoalieFSM::getGoaliePositionToBlock(const Team &friendly_team,
+Point GoalieFSM::getGoaliePositionToBlock(const Robot &goalie, const Team &friendly_team,
     const Ball &ball, const Field &field,
     TbotsProto::GoalieTacticConfig goalie_tactic_config)
 {
     // compute angle between two vectors, negative goal post to ball and positive
     // goal post to ball
 
+    std::cout<<friendly_team.getAllRobots().size()<<std::endl;
     Segment s1 = Segment(ball.position(), field.friendlyGoalpostPos());
     Segment s2 = Segment(ball.position(), field.friendlyGoalpostNeg());
 
-    static constexpr double INTERSECTION_INCREMENT_INTERVAL = 0.1;
+    static constexpr double INTERSECTION_INCREMENT_INTERVAL = 0.05;
 
     for (auto robot : friendly_team.getAllRobots()){
         if (robot.id() == friendly_team.getGoalieId()){
             continue;
         }
         Circle robot_circle = Circle(robot.position(), robot.robotConstants().robot_radius_m);
+        std::cout<<"evaluating robot: ";
+        std::cout<<robot_circle.origin()<<std::endl;
 
-        while(intersects(robot_circle, s1) || intersects(robot_circle, s2) || s2.getEnd().y() > s1.getEnd().y()){
+        while((intersects(robot_circle, s1) || intersects(robot_circle, s2)) && s2.getEnd().y() < s1.getEnd().y()){
+            std::cout<<s1.getEnd()<<" , "<<s2.getEnd()<<std::endl;
             if (intersects(robot_circle, s1)){
                 Point new_end = Point(s1.getEnd().x(), s1.getEnd().y()-INTERSECTION_INCREMENT_INTERVAL);
                 s1.setEnd(new_end);
@@ -28,11 +32,10 @@ Point GoalieFSM::getGoaliePositionToBlock(const Team &friendly_team,
                 Point new_end = Point(s2.getEnd().x(), s2.getEnd().y()+INTERSECTION_INCREMENT_INTERVAL);
                 s2.setEnd(new_end);
             }
-
         }
     }
 
-    std::cout<<s2.getEnd()<<" , "<<s1.getEnd()<<std::endl;
+    std::cout<<"goalie needds to cover between: "<<s2.getEnd()<<" , "<<s1.getEnd()<<std::endl;
 
     Angle block_cone_angle = acuteAngle(s2.getEnd(), ball.position(),
                                         s1.getEnd());
@@ -46,20 +49,20 @@ Point GoalieFSM::getGoaliePositionToBlock(const Team &friendly_team,
     {
         // how far in should the goalie wedge itself into the block cone, to block
         // balls
-        auto block_cone_radius = goalie_tactic_config.block_cone_radius();
+//        auto block_cone_radius = goalie_tactic_config.block_cone_radius();
 
         // compute block cone position, allowing 1 ROBOT_MAX_RADIUS_METERS extra on
         // either side
         Point goalie_pos = calculateBlockCone(
-            s1.getEnd(), s2.getEnd(), ball.position(),
-            block_cone_radius * block_cone_angle.toRadians());
+                s1.getEnd(), s2.getEnd(), ball.position(),
+                goalie.robotConstants().robot_radius_m);
 
         // restrain the goalie in the defense area, if the goalie cannot be
         // restrained or if there is no proper intersection, then we safely default to
         // center of the goal
         clamped_goalie_pos =
             restrainGoalieInRectangle(field, goalie_pos, field.friendlyDefenseArea());
-        std::cout<<*clamped_goalie_pos<<std::endl;
+        std::cout<<"clamped goalie pos = :"<<*clamped_goalie_pos<<std::endl;
     }
 
     // if the goalie could not be restrained in the defense area,
@@ -242,12 +245,11 @@ void GoalieFSM::panic(const Update &event)
         std::cout<<"WERE NOT GONNA MAKE IT"<<std::endl;
 
         //find the final speed at which we can make it
-
     }
 
     std::cout<<"robot speed = "<<event.common.robot.velocity().length()<<std::endl;
     event.common.set_primitive(createMovePrimitive(
-        CREATE_MOTION_CONTROL(goalie_pos), goalie_orientation, 6.0,
+        CREATE_MOTION_CONTROL(goalie_pos), goalie_orientation, 0.0,
         TbotsProto::DribblerMode::OFF, TbotsProto::BallCollisionType::ALLOW,
         AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS},
         max_allowed_speed_mode, 0.0, event.common.robot.robotConstants()));
@@ -277,7 +279,7 @@ void GoalieFSM::updatePivotKick(
 
 void GoalieFSM::positionToBlock(const Update &event)
 {
-    Point goalie_pos = getGoaliePositionToBlock(event.common.world.friendlyTeam(),
+    Point goalie_pos = getGoaliePositionToBlock(event.common.robot, event.common.world.friendlyTeam(),
         event.common.world.ball(), event.common.world.field(), goalie_tactic_config);
     Angle goalie_orientation =
         (event.common.world.ball().position() - goalie_pos).orientation();

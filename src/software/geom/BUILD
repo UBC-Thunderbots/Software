@@ -74,6 +74,7 @@ cc_library(
     hdrs = ["circle.h"],
     deps = [
         ":convex_shape",
+        ":line",
         ":point",
     ],
 )
