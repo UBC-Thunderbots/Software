@@ -13,8 +13,6 @@
 #include "software/geom/point.h"
 #include "software/logger/logger.h"
 
-using Path = LinearSpline2d;
-
 /**
  * GlobalPathPlannerFactory is a module that constructs every possible path planner for
  * every possible combination of static obstacles. It pre-computes static obstacle
