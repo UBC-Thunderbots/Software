@@ -61,7 +61,7 @@ class ChickerWidget(QWidget):
             self.power_slider_layout,
             self.power_slider,
             self.power_label,
-        ) = common_widgets.create_slider("Power", 1, 100, 10)
+        ) = common_widgets.create_slider("Power", 10, 50, 10)
         vbox_layout.addLayout(self.power_slider_layout)
 
         self.setLayout(vbox_layout)
@@ -109,10 +109,10 @@ class ChickerWidget(QWidget):
 
         # If auto is enabled, we want to populate the autochip or kick message
         if self.auto_kick_button.isChecked():
-            power_control.chicker.auto_chip_or_kick.autokick_speed_m_per_s = power_value
+            power_control.chicker.auto_chip_or_kick.autokick_speed_m_per_s = power_value * 100
         elif self.auto_chip_button.isChecked():
             power_control.chicker.auto_chip_or_kick.autochip_distance_meters = (
-                power_value
+                power_value * 100
             )
         elif self.no_auto_button.isChecked():
             pass

@@ -56,7 +56,7 @@ namespace
         switch (frame.which_power_msg)
         {
             case TbotsProto_PowerFrame_power_control_tag:
-                expected_length = TbotsProto_PowerControl_size;
+                expected_length = TbotsProto_PowerPulseControl_size;
                 bytes           = serializeToVector(frame.power_msg.power_control);
                 break;
             case TbotsProto_PowerFrame_power_status_tag:
@@ -224,10 +224,10 @@ bool inline unmarshalUartPacket(const std::vector<uint8_t>& data,
     return verifyLengthAndCrc(frame);
 }
 /**
- * Finds the expected size of a TbotsProto_PowerStatus/TbotsProto_PowerControl msg once
+ * Finds the expected size of a TbotsProto_PowerStatus/TbotsProto_PowerPulseControl msg once
  * its encoded with cobs
  *
- * @tparam T type of power_msg should be TbotsProto_PowerStatus or TbotsProto_PowerControl
+ * @tparam T type of power_msg should be TbotsProto_PowerStatus or TbotsProto_PowerPulseControl
  * @param power_msg nanopb msg to get the marshalled size of
  * @return the expected marshalled size of the given message
  */

@@ -44,12 +44,12 @@ class PowerService
 
     std::thread read_thread;
     std::atomic<TbotsProto_PowerStatus> status;
-    std::atomic<TbotsProto_PowerControl> nanopb_command;
+    std::atomic<TbotsProto_PowerPulseControl> nanopb_command;
     std::unique_ptr<BoostUartCommunication> uart;
 
     // Constants
     const size_t READ_BUFFER_SIZE =
         getMarshalledSize(TbotsProto_PowerStatus TbotsProto_PowerStatus_init_default);
     const std::string DEVICE_SERIAL_PORT    = "/dev/ttyUSB0";
-    static constexpr unsigned int BAUD_RATE = 230400;
+    static constexpr unsigned int BAUD_RATE = 460800;
 };
