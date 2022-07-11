@@ -1,6 +1,7 @@
 #pragma once
 
 #include <pins.h>
+#include <Arduino.h>
 
 /**
  * Represents the chicker on the power board
@@ -16,14 +17,14 @@ class Chicker
      * Sets the action of the chicker. Arguments can not be passed to isr's so these
      * need to be set before calling kick/chip
      */
-    static void kick();
-    static void chip();
+    static void kick(uint32_t kick_pulse_width);
+    static void chip(uint32_t chip_pulse_width);
     /**
      * Attaches an interrupt on the BREAK_BEAM_PIN to kick/chip.
      * kick/chip will only be triggered once
      */
-    static void autokick();
-    static void autochip();
+    static void autokick(uint32_t kick_pulse_width);
+    static void autochip(uint32_t chip_pulse_width);
     /**
      * Get the current status of whether the break beam was tripped or not
      * This is reset before every kick/chip
@@ -31,38 +32,14 @@ class Chicker
      * @return whether the break beam has been tripped for the current action
      */
     static bool getBreakBeamTripped();
-    /**
-     * Sets the kick/chip speed/distance. Arguments can not be passed to isr's so these
-     * need to be set before calling kick/chip
-     * @param kick_speed_m_per_s/chip_distance_meters speed/distance to kick/chip
-     */
-    static void setKickSpeedMPerS(float kick_speed_m_per_s);
-    static void setChipDistanceMeters(float chip_distance_meters);
-
-    void coolDownPoll();
 
    private:
-    /**
-     * Converts given speed/distance into pulse width duration
-     *
-     * @param speed_m_per_s/distance_meters speed/distance to convert to pulse width
-     * duration
-     * @return pulse width duration in microseconds
-     */
-    static int speedToPulseWidth(float speed_m_per_s);
-    static int distanceToPulseWidth(float distance_meters);
     /**
      * Along with stopPulse creates a square wave to drive the chicker
      * @param duration pulse width duration in microseconds
      * @param pin the pin the send the pulse to
      */
     static void oneShotPulse(int duration, int pin);
-    /**
-     * Isr called when the BREAK_BEAM_PIN is tripped. Performs a kick/chip action if the
-     * break beam wasn't previously triggered
-     */
-    static void autoKickISR();
-    static void autoChipISR();
     /**
      * Called on a pulse_timer to bring the CHIPPER/KICKER pin low
      */
@@ -71,11 +48,7 @@ class Chicker
 
     static hw_timer_t* pulse_timer;
     static hw_timer_t* cooldown_timer;
-    static volatile bool breakbeam_tripped;
 
     static volatile bool on_cooldown;
     static constexpr int COOLDOWN_MICROSECONDS = 3 * MICROSECONDS_IN_SECOND;
-
-    static float kick_speed_m_per_s;
-    static float chip_distance_meters;
 };

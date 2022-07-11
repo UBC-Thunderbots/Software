@@ -52,6 +52,7 @@ platformio_library(
         ":chicker",
         ":geneva",
         ":pins",
+        "//proto:tbots_nanopb_proto",
         "@nanopb//:nanopb_platformio",
     ],
 )

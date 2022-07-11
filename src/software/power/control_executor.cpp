@@ -9,38 +9,25 @@ ControlExecutor::ControlExecutor(std::shared_ptr<Charger> charger,
 {
 }
 
-void ControlExecutor::execute(const TbotsProto_PowerControl& control)
+void ControlExecutor::execute(const TbotsProto_PowerPulseControl& control)
 {
-    chicker->coolDownPoll();
-
     switch (control.chicker.which_chicker_command)
     {
-        case TbotsProto_PowerControl_ChickerControl_kick_speed_m_per_s_tag:
-            chicker->setKickSpeedMPerS(
-                control.chicker.chicker_command.kick_speed_m_per_s);
-            chicker->kick();
+        case TbotsProto_PowerPulseControl_ChickerControl_kick_pulse_width_tag:
+            chicker->kick(control.chicker.chicker_command.kick_pulse_width);
             break;
-        case TbotsProto_PowerControl_ChickerControl_chip_distance_meters_tag:
-            chicker->setChipDistanceMeters(
-                control.chicker.chicker_command.chip_distance_meters);
-            chicker->chip();
+        case TbotsProto_PowerPulseControl_ChickerControl_chip_pulse_width_tag:
+            chicker->chip(control.chicker.chicker_command.chip_pulse_width);
             break;
-        case TbotsProto_PowerControl_ChickerControl_auto_chip_or_kick_tag:
-            detachInterrupt(digitalPinToInterrupt(BREAK_BEAM_PIN));
+        case TbotsProto_PowerPulseControl_ChickerControl_auto_chip_or_kick_tag:
             switch (
                 control.chicker.chicker_command.auto_chip_or_kick.which_auto_chip_or_kick)
             {
-                case TbotsProto_AutoChipOrKick_autokick_speed_m_per_s_tag:
-                    chicker->setKickSpeedMPerS(
-                        control.chicker.chicker_command.auto_chip_or_kick
-                            .auto_chip_or_kick.autokick_speed_m_per_s);
-                    chicker->autokick();
+                case TbotsProto_PowerPulseControl_AutoChipOrKick_autokick_pulse_width_tag:
+                    chicker->autokick(control.chicker.chicker_command.auto_chip_or_kick.auto_chip_or_kick.autokick_pulse_width);
                     break;
-                case TbotsProto_AutoChipOrKick_autochip_distance_meters_tag:
-                    chicker->setChipDistanceMeters(
-                        control.chicker.chicker_command.auto_chip_or_kick
-                            .auto_chip_or_kick.autochip_distance_meters);
-                    chicker->autochip();
+                case TbotsProto_PowerPulseControl_AutoChipOrKick_autochip_pulse_width_tag:
+                    chicker->autochip(control.chicker.chicker_command.auto_chip_or_kick.auto_chip_or_kick.autochip_pulse_width);
                     break;
                 default:
                     break;
