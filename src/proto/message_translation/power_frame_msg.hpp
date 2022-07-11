@@ -183,7 +183,7 @@ TbotsProto_PowerControl inline createNanoPbPowerControl(
             break;
     }
 
-    control.chicker     = chicker;
+    control.chicker = chicker;
 
     return control;
 }

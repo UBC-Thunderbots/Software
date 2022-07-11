@@ -91,7 +91,7 @@ message PowerControl
         };
     }
 
-    ChickerControl chicker  = 1;
+    ChickerControl chicker = 1;
 }
 
 message Primitive
