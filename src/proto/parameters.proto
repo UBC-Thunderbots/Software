@@ -205,6 +205,22 @@ message ShootOrPassPlayConfig
     // how fast we ramp down to abs_min_pass_score. This is in seconds.
     required double pass_score_ramp_down_duration = 2
         [default = 2.0, (bounds).min_double_value = 0.0, (bounds).max_double_value = 5.0];
+
+    // threshold to decide if the ball has been kicked by a robot
+    required double ball_shot_threshold = 3
+        [default = 4.0, (bounds).min_double_value = 0.0, (bounds).max_double_value = 5.0];
+
+    // threshold to decide if the ball has been kicked by a robot
+    required double min_distance_to_pass = 4
+        [default = 0.1, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
+
+    // threshold for the distance between passer and receiver
+    required double short_pass_threshold = 5
+        [default = 0.5, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
+
+    // threshold to decide if ball hasn't been kicked
+    required double ball_not_kicked_threshold = 6
+        [default = 0.3, (bounds).min_double_value = 0.0, (bounds).max_double_value = 5.0];
 }
 
 

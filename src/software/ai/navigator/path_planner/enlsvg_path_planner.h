@@ -9,7 +9,7 @@
 #include "software/logger/logger.h"
 #include "software/world/world.h"
 
-using Path = LinearSpline2d;
+using Path = std::vector<Point>;
 
 /**
  * The Edge N-Level Sparse Visibility Graph algorithm is a fast pathfinding algorithm for
