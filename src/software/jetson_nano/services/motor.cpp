@@ -164,19 +164,6 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
     startDriver(DRIBBLER_MOTOR_CHIP_SELECT);
     checkDriverFault(DRIBBLER_MOTOR_CHIP_SELECT);
     startController(DRIBBLER_MOTOR_CHIP_SELECT, true);
-
-    // Calibrate Encoder
-    for (uint8_t motor = 0; motor < NUM_DRIVE_MOTORS; motor++)
-    {
-        startEncoderCalibration(motor);
-    }
-
-    sleep(1);
-
-    for (uint8_t motor = 0; motor < NUM_DRIVE_MOTORS; motor++)
-    {
-        endEncoderCalibration(motor);
-    }
 }
 
 MotorService::~MotorService() {}
@@ -280,6 +267,27 @@ bool MotorService::checkDriverFault(uint8_t motor)
 TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor,
                                            double time_elapsed_since_last_poll_s)
 {
+    // check if encoders are calibrated
+    if (!encoder_calibrated_[FRONT_LEFT_MOTOR_CHIP_SELECT] ||
+        !encoder_calibrated_[FRONT_RIGHT_MOTOR_CHIP_SELECT] ||
+        !encoder_calibrated_[BACK_LEFT_MOTOR_CHIP_SELECT] ||
+        !encoder_calibrated_[BACK_RIGHT_MOTOR_CHIP_SELECT])
+    {
+        // if not, calibrate the encoders
+        for (uint8_t motor = 0; motor < NUM_DRIVE_MOTORS; motor++)
+        {
+            startEncoderCalibration(motor);
+        }
+
+        sleep(1);
+
+        for (uint8_t motor = 0; motor < NUM_DRIVE_MOTORS; motor++)
+        {
+            endEncoderCalibration(motor);
+        }
+    }
+
+    LOG(DEBUG) << motor.DebugString();
     CHECK(encoder_calibrated_[FRONT_LEFT_MOTOR_CHIP_SELECT] &&
           encoder_calibrated_[FRONT_RIGHT_MOTOR_CHIP_SELECT] &&
           encoder_calibrated_[BACK_LEFT_MOTOR_CHIP_SELECT] &&
@@ -692,7 +700,7 @@ void MotorService::configureDribblerPI(uint8_t motor)
     LOG(INFO) << "Configuring Dribbler PI for motor " << static_cast<uint32_t>(motor);
     // Please read the header file and the datasheet for more info
     // These values were calibrated using the TMC-IDE
-    writeToControllerOrDieTrying(motor, TMC4671_PID_FLUX_P_FLUX_I, 39333600);
+    writeToControllerOrDieTrying(motor, TMC4671_PID_FLUX_P_FLUX_I, 39337600);
     writeToControllerOrDieTrying(motor, TMC4671_PID_TORQUE_P_TORQUE_I, 39333600);
     writeToControllerOrDieTrying(motor, TMC4671_PID_VELOCITY_P_VELOCITY_I, 2621448);
 
@@ -702,7 +710,7 @@ void MotorService::configureDribblerPI(uint8_t motor)
     writeToControllerOrDieTrying(motor, TMC4671_PIDOUT_UQ_UD_LIMITS, 32767);
     // TODO (#2677) support MAX_FORCE mode. This value can go up to 4.8 amps but we set it
     // to 2 for now (sufficient for INDEFINITE mode).
-    writeToControllerOrDieTrying(motor, TMC4671_PID_TORQUE_FLUX_LIMITS, 2000);
+    writeToControllerOrDieTrying(motor, TMC4671_PID_TORQUE_FLUX_LIMITS, 4000);
     writeToControllerOrDieTrying(motor, TMC4671_PID_ACCELERATION_LIMIT, 40000);
     writeToControllerOrDieTrying(motor, TMC4671_PID_VELOCITY_LIMIT, 15000);
 }

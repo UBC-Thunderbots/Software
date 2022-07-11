@@ -486,7 +486,6 @@ class Thunderscope(object):
         proto_unix_io.register_observer(PowerStatus, robot_view.power_status_buffer)
         return robot_view
 
-
     def setup_estop_view(self, proto_unix_io):
         """Setup the estop view widget
 

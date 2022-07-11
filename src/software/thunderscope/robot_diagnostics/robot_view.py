@@ -30,7 +30,6 @@ class RobotView(QWidget):
         self.power_status_buffer = ThreadSafeBuffer(1, PowerStatus)
         self.MIN_VOLTAGE_LEVEL = 50
 
-
         # There is no pattern to this so we just have to create
         # mapping from robot id to the four corners of the vision pattern
         #
@@ -70,7 +69,7 @@ class RobotView(QWidget):
         self.breakbeam_labels = [QLabel() for x in range(8)]
 
         for x in range(8):
-            robot_layout_status_bar = QVBoxLayout()
+            QVBoxLayout()
             self.robot_battery_progress_bars[x].setMaximum(100)
             self.robot_battery_progress_bars[x].setMinimum(0)
             self.robot_battery_progress_bars[x].setValue(10)
@@ -81,7 +80,9 @@ class RobotView(QWidget):
             self.robot_status_layouts[x].addWidget(self.robot_battery_progress_bars[x])
             self.robot_status_layouts[x].addWidget(self.breakbeam_labels[x])
 
-            self.robot_layouts[x].addWidget(self.create_vision_pattern_label(x, "b", 25))
+            self.robot_layouts[x].addWidget(
+                self.create_vision_pattern_label(x, "b", 25)
+            )
             self.robot_layouts[x].addLayout(self.robot_status_layouts[x])
             self.layout.addLayout(self.robot_layouts[x])
 
