@@ -55,18 +55,18 @@ class ChickerWidget(QWidget):
 
         # sliders
         (
-            self.geneva_slider_box,
+            self.geneva_slider_layout,
             self.geneva_slider,
             self.geneva_label,
         ) = common_widgets.create_slider("Geneva Slider", 1, GENEVA_NUM_POSITIONS, 1)
-        grid.addWidget(self.geneva_slider_box, 2, 0)
+        grid.addLayout(self.geneva_slider_layout, 2, 0)
 
         (
-            self.power_slider_box,
+            self.power_slider_layout,
             self.power_slider,
             self.power_label,
         ) = common_widgets.create_slider("Power Slider", 1, 100, 10)
-        grid.addWidget(self.power_slider_box, 3, 0)
+        grid.addLayout(self.power_slider_layout, 3, 0)
 
         self.setLayout(grid)
 
