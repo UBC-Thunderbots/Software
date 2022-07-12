@@ -424,7 +424,6 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
     }
     else
     {
-        LOG(DEBUG) << "DRIVER ENABLED";
         driver_control_enable_gpio.setValue(GpioState::HIGH);
     }
 

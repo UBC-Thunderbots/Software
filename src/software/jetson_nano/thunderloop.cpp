@@ -32,7 +32,7 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, const int loop
 
     LoggerSingleton::initializeLogger("/tmp/tbots");
 
-    // power_service_ = std::make_unique<PowerService>();
+     power_service_ = std::make_unique<PowerService>();
     motor_service_ = std::make_unique<MotorService>(robot_constants, loop_hz);
 }
 
@@ -202,7 +202,7 @@ void Thunderloop::runLoop()
             // Power Service: execute the power control command
             {
                 ScopedTimespecTimer timer(&poll_time);
-                // power_status_ = power_service_->poll(direct_control_.power_control());
+                power_status_ = power_service_->poll(direct_control_.power_control());
             }
             thunderloop_status_.set_power_service_poll_time_ns(
                 static_cast<unsigned long>(poll_time.tv_nsec));

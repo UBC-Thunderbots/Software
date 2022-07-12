@@ -213,9 +213,20 @@ if __name__ == "__main__":
         debug = args.debug_yellow_full_system
 
     if args.run_blue or args.run_yellow:
-        with RobotCommunication(
+        with ProtoLogger(
+            args.blue_full_system_runtime_dir,
+        ) as blue_logger, ProtoLogger(
+            args.yellow_full_system_runtime_dir,
+        ) as yellow_logger, RobotCommunication(
             proto_unix_io, getRobotMulticastChannel(0), args.interface
         ), FullSystem(runtime_dir, debug, friendly_colour_yellow) as full_system:
+
+            proto_unix_io.register_to_observe_everything(
+                blue_logger.buffer
+            )
+            proto_unix_io.register_to_observe_everything(
+                yellow_logger.buffer
+            )
             full_system.setup_proto_unix_io(proto_unix_io)
             tscope.show()
 
