@@ -216,7 +216,6 @@ class MotorService
     // Enable driver gpio
     GPIO driver_control_enable_gpio;
     GPIO reset_gpio;
-    GPIO heartbeat_gpio;
 
     // Transfer Buffers
     uint8_t tx[5] = {0};
@@ -242,7 +241,4 @@ class MotorService
 
     // Current wheel velocities
     WheelSpace_t prev_wheel_velocities;
-
-    int heartbeat_state = 0;
-    int count           = 0;
 };

@@ -57,7 +57,6 @@ static const char* SPI_CS_DRIVER_TO_CONTROLLER_MUX_0_GPIO = "51";
 static const char* SPI_CS_DRIVER_TO_CONTROLLER_MUX_1_GPIO = "76";
 static const char* MOTOR_DRIVER_RESET_GPIO                = "168";
 static const char* DRIVER_CONTROL_ENABLE_GPIO             = "194";
-static const char* HEARTBEAT_GPIO                         = "216";
 
 
 // All trinamic RPMS are electrical RPMS, they don't factor in the number of pole
@@ -100,7 +99,6 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
       driver_control_enable_gpio(DRIVER_CONTROL_ENABLE_GPIO, GpioDirection::OUTPUT,
                                  GpioState::HIGH),
       reset_gpio(MOTOR_DRIVER_RESET_GPIO, GpioDirection::OUTPUT, GpioState::HIGH),
-      heartbeat_gpio(HEARTBEAT_GPIO, GpioDirection::OUTPUT, GpioState::HIGH),
       euclidean_to_four_wheel(robot_constants)
 {
     robot_constants_ = robot_constants;
@@ -167,32 +165,6 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
     startDriver(DRIBBLER_MOTOR_CHIP_SELECT);
     checkDriverFault(DRIBBLER_MOTOR_CHIP_SELECT);
     startController(DRIBBLER_MOTOR_CHIP_SELECT, true);
-
-    // Enable Heart
-    heartbeat_gpio.setValue(GpioState::LOW);
-    usleep(MICROSECONDS_PER_MILLISECOND * 100);
-    heartbeat_gpio.setValue(GpioState::HIGH);
-    usleep(MICROSECONDS_PER_MILLISECOND * 100);
-    heartbeat_gpio.setValue(GpioState::LOW);
-
-    // Calibrate Encoder
-    for (uint8_t motor = 0; motor < NUM_DRIVE_MOTORS; motor++)
-    {
-        startEncoderCalibration(motor);
-    }
-
-    sleep(1);
-
-    heartbeat_gpio.setValue(GpioState::LOW);
-    usleep(MICROSECONDS_PER_MILLISECOND * 100);
-    heartbeat_gpio.setValue(GpioState::HIGH);
-    usleep(MICROSECONDS_PER_MILLISECOND * 100);
-    heartbeat_gpio.setValue(GpioState::LOW);
-
-    for (uint8_t motor = 0; motor < NUM_DRIVE_MOTORS; motor++)
-    {
-        endEncoderCalibration(motor);
-    }
 }
 
 MotorService::~MotorService() {}
@@ -358,25 +330,25 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
         RUNAWAY_PROTECTION_THRESHOLD_MPS)
     {
         driver_control_enable_gpio.setValue(GpioState::LOW);
-        LOG(FATAL) << "Front right motor runaway";
+        LOG(WARNING) << "Front right motor runaway";
     }
     else if (std::abs(current_wheel_velocities[1] - prev_wheel_velocities[1]) >
              RUNAWAY_PROTECTION_THRESHOLD_MPS)
     {
         driver_control_enable_gpio.setValue(GpioState::LOW);
-        LOG(FATAL) << "Front left motor runaway";
+        LOG(WARNING) << "Front left motor runaway";
     }
     else if (std::abs(current_wheel_velocities[2] - prev_wheel_velocities[2]) >
              RUNAWAY_PROTECTION_THRESHOLD_MPS)
     {
         driver_control_enable_gpio.setValue(GpioState::LOW);
-        LOG(FATAL) << "Back left motor runaway";
+        LOG(WARNING) << "Back left motor runaway";
     }
     else if (std::abs(current_wheel_velocities[3] - prev_wheel_velocities[3]) >
              RUNAWAY_PROTECTION_THRESHOLD_MPS)
     {
         driver_control_enable_gpio.setValue(GpioState::LOW);
-        LOG(FATAL) << "Back right motor runaway";
+        LOG(WARNING) << "Back right motor runaway";
     }
 
     // Convert to Euclidean velocity_delta
@@ -752,7 +724,7 @@ void MotorService::configureDribblerPI(uint8_t motor)
     writeToControllerOrDieTrying(motor, TMC4671_PIDOUT_UQ_UD_LIMITS, 32767);
     // TODO (#2677) support MAX_FORCE mode. This value can go up to 4.8 amps but we set it
     // to 2 for now (sufficient for INDEFINITE mode).
-    writeToControllerOrDieTrying(motor, TMC4671_PID_TORQUE_FLUX_LIMITS, 2000);
+    writeToControllerOrDieTrying(motor, TMC4671_PID_TORQUE_FLUX_LIMITS, 4000);
     writeToControllerOrDieTrying(motor, TMC4671_PID_ACCELERATION_LIMIT, 40000);
     writeToControllerOrDieTrying(motor, TMC4671_PID_VELOCITY_LIMIT, 15000);
 }
