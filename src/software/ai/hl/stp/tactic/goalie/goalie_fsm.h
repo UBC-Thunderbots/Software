@@ -28,9 +28,7 @@ struct GoalieFSM
 
     DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
-    // Distance to chip the ball when trying to yeet it
-    // TODO (#1878): Replace this with a more intelligent chip distance system
-    static constexpr double YEET_CHIP_DISTANCE_METERS = 2.0;
+    static constexpr double MAX_CHIP_DISTANCE = 2.0;
 
     /**
      * Constructor for GoalieFSM struct

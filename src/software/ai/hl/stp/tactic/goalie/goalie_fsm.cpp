@@ -199,7 +199,7 @@ void GoalieFSM::panic(const Update &event)
     event.common.set_primitive(createMovePrimitive(
         CREATE_MOTION_CONTROL(goalie_pos), goalie_orientation, 0.0,
         TbotsProto::DribblerMode::OFF, TbotsProto::BallCollisionType::ALLOW,
-        AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS},
+        AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, MAX_CHIP_DISTANCE},
         max_allowed_speed_mode, 0.0, event.common.robot.robotConstants()));
 }
 
@@ -210,15 +210,22 @@ void GoalieFSM::updatePivotKick(
         getNoChipRectangle(event.common.world.field()).xMax() + ROBOT_MAX_RADIUS_METERS;
     Point clear_origin = Point(clear_origin_x, event.common.world.ball().position().y());
 
-    Angle clear_direction = (event.common.world.ball().position() -
-                             event.common.world.field().friendlyGoalCenter())
-                                .orientation();
+    Point goalie_pos     = event.robot.position();
+    Point clear_corner_1 = Point(goalie_pos.x() + MAX_CHIP_DISTANCE - 1, 1.8);
+    Point clear_corner_2 = Point(goalie_pos.x() + MAX_CHIP_DISTANCE, -1.8);
+    auto clear_area      = std::make_optional<Rectangle>(clear_corner_1, clear_corner_2);
+
+    vector<Circle> chip_targets = findGoodChipTargets(event.common.world, clear_area);
+    Point clear_target          = chip_targets[0].origin();
+
+    Angle clear_direction =
+        (event.common.world.ball().position() - clear_target).orientation();
 
     PivotKickFSM::ControlParams control_params{
         .kick_origin    = clear_origin,
         .kick_direction = clear_direction,
         .auto_chip_or_kick =
-            AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS},
+            AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, MAX_CHIP_DISTANCE},
     };
 
     // update the pivotkick fsm
@@ -239,7 +246,7 @@ void GoalieFSM::positionToBlock(const Update &event)
     event.common.set_primitive(createMovePrimitive(
         CREATE_MOTION_CONTROL(goalie_pos), goalie_orientation, goalie_final_speed,
         TbotsProto::DribblerMode::OFF, TbotsProto::BallCollisionType::ALLOW,
-        AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS},
+        AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, MAX_CHIP_DISTANCE},
         max_allowed_speed_mode, 0.0, event.common.robot.robotConstants()));
 }
 

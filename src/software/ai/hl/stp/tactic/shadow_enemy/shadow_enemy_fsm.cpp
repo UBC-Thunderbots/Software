@@ -117,7 +117,7 @@ void ShadowEnemyFSM::stealAndChip(const Update &event)
     event.common.set_primitive(createMovePrimitive(
         CREATE_MOTION_CONTROL(ball_position), face_ball_orientation, 0,
         TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
-        AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS},
+        AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, MAX_CHIP_DISTANCE},
         TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
         event.common.robot.robotConstants()));
 }
