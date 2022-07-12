@@ -1,4 +1,4 @@
-from pyqtgraph.Qt.QtCore import Qt
+f/>>rom pyqtgraph.Qt.QtCore import Qt
 from pyqtgraph.Qt.QtWidgets import *
 import time
 
@@ -171,10 +171,11 @@ class DriveAndDribblerWidget(QWidget):
         stop_and_reset.clicked.connect(self.reset_all_sliders)
 
         # add widget
-        dbox.addLayout(front_left_layout)
+        dbox.addLayout(front_left_velocity_layout)
         dbox.addLayout(front_right_velocity_layout)
         dbox.addLayout(back_left_velocity_layout)
         dbox.addLayout(back_right_velocity_layout)
+
         dbox.addWidget(stop_and_reset, alignment=Qt.AlignmentFlag.AlignCenter)
 
         group_box.setLayout(dbox)
