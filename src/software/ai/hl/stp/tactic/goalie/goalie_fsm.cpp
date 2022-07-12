@@ -1,4 +1,5 @@
 #include "software/ai/hl/stp/tactic/goalie/goalie_fsm.h"
+
 #include "software/ai/evaluation/find_open_areas.h"
 
 Point GoalieFSM::getGoaliePositionToBlock(

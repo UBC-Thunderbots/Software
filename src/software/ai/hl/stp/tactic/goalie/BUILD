@@ -15,6 +15,7 @@ cc_library(
     deps = [
         "//shared:constants",
         "//software/ai/evaluation:enemy_threat",
+        "//software/ai/evaluation:find_open_areas",
         "//software/ai/hl/stp/tactic",
         "//software/ai/hl/stp/tactic/chip:chip_tactic",
         "//software/ai/hl/stp/tactic/dribble:dribble_tactic",
@@ -22,7 +23,6 @@ cc_library(
         "//software/geom:line",
         "//software/geom/algorithms",
         "//software/logger",
-        "//software/ai/evaluation:find_open_areas",
     ],
 )
 
