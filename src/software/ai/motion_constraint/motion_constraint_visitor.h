@@ -2,6 +2,7 @@
 
 #include <numeric>
 #include <set>
+#include <numeric>
 
 #include "proto/primitive.pb.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
@@ -40,6 +41,7 @@ class MotionConstraintVisitor : public TacticVisitor
     void visit(const GetBehindBallTactic &tactic) override;
     void visit(const PivotKickTactic &tactic) override;
     void visit(const MoveGoalieToGoalLineTactic &tactic) override;
+    void visit(const BallPlacementTactic &tactic) override;
 
     /**
      * Gets the current allowed constraints from a tactic

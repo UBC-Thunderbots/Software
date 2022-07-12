@@ -13,6 +13,7 @@ from proto.ssl_gc_geometry_pb2 import Vector2
 
 # TODO (#2599): Remove Duration parameter from test
 @pytest.mark.parametrize(
+<<<<<<< HEAD
     "start_pos, end_pos, run_enemy_ai,test_duration",
     [
         (tbots.Point(2, 2), tbots.Point(-3, -2), False, 20),
@@ -30,6 +31,17 @@ from proto.ssl_gc_geometry_pb2 import Vector2
 def test_two_ai_ball_placement(
     simulated_test_runner, start_pos, end_pos, run_enemy_ai, test_duration
 ):
+=======
+    "start_pos, end_pos, run_enemy_ai,test_duration", 
+    [(tbots.Point(2, 2), tbots.Point(-3, -2), False, 20),
+    # (tbots.Point(2, 2), tbots.Point(-3, -2), True, 20), # TODO (#2690): Robot gets stuck in corner of defense area
+
+    (tbots.Field.createSSLDivisionBField().friendlyGoalCenter(), tbots.Field.createSSLDivisionBField().enemyGoalCenter() + tbots.Vector(-0.5, 0), False, 20),
+    # (tbots.Field.createSSLDivisionBField().enemyCornerPos() + tbots.Vector(0.1, 0.1), tbots.Field.createSSLDivisionBField().friendlyCornerNeg() + tbots.Vector(-0.1,-0.1), False, 20) # TODO (#2700): Re-enable when HRVO can handle the Goal obstacle
+    ]) 
+
+def test_two_ai_ball_placement(simulated_test_runner, start_pos, end_pos, run_enemy_ai, test_duration):
+>>>>>>> c7704698... ball placement can go through motion constraints
 
     # starting point must be Point
     ball_initial_pos = start_pos
