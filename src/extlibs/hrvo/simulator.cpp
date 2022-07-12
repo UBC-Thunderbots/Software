@@ -118,6 +118,8 @@ void HRVOSimulator::updateWorld(const World &world)
             if (hrvo_agent.has_value())
             {
                 hrvo_agent.value()->setPosition(friendly_robot.position().toVector());
+                // We do not use velocity feedback for friendly robots as it results
+                // in the robots not being able to accelerate properly.
             }
         }
 
