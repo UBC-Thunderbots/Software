@@ -171,7 +171,7 @@ class DriveAndDribblerWidget(QWidget):
         stop_and_reset.clicked.connect(self.reset_all_sliders)
 
         # add widget
-        dbox.addLayout(front_left_velocity_layout)
+        dbox.addLayout(front_left_layout)
         dbox.addLayout(front_right_velocity_layout)
         dbox.addLayout(back_left_velocity_layout)
         dbox.addLayout(back_right_velocity_layout)

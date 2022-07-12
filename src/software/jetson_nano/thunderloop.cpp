@@ -203,6 +203,7 @@ void Thunderloop::runLoop()
             {
                 ScopedTimespecTimer timer(&poll_time);
                 power_status_ = power_service_->poll(direct_control_.power_control());
+                LOG(DEBUG) << power_status_.DebugString();
             }
             thunderloop_status_.set_power_service_poll_time_ns(
                 static_cast<unsigned long>(poll_time.tv_nsec));
