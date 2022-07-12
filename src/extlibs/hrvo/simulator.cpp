@@ -51,7 +51,6 @@ HRVOSimulator::HRVOSimulator(float time_step, const RobotConstants_t &robot_cons
       robot_constants(robot_constants),
       global_time(0.0f),
       time_step(time_step),
-      last_time_velocity_updated(0.0f),
       reached_goals(false),
       kd_tree(std::make_unique<KdTree>(this)),
       agents(),
@@ -73,17 +72,8 @@ void HRVOSimulator::updateWorld(const World &world)
         if (hrvo_agent.has_value())
         {
             hrvo_agent.value()->setPosition(friendly_robot.position().toVector());
-
-            // only update velocity if time has passed since the last time velocity
-            // was updated. this is to allow sensorfusion to update the actual robot
-            // velocity in world.
-            // todo (#2531): remove 4 multiplier and fix goal keeper moving slowly
-            if (global_time - last_time_velocity_updated >= 4 * time_step)
-            {
-                Vector velocity = friendly_robot.velocity();
-                hrvo_agent.value()->setVelocity(friendly_robot.velocity());
-                last_time_velocity_updated = global_time;
-            }
+            // We do not use velocity feedback for friendly robots as it results
+            // in the robots not being able to accelerate properly.
         }
         else
         {
@@ -127,7 +117,7 @@ void HRVOSimulator::updatePrimitiveSet(const TbotsProto::PrimitiveSet &new_primi
         auto hrvo_agent_opt = getFriendlyAgentFromRobotId(robot_id);
         if (hrvo_agent_opt.has_value())
         {
-            auto hrvo_agent = (hrvo_agent_opt.value());
+            auto hrvo_agent = hrvo_agent_opt.value();
             AgentPath path;
 
             if (primitive.has_move())

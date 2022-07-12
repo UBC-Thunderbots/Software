@@ -298,9 +298,6 @@ class HRVOSimulator
     // The amount of time which the simulator should advance by
     const float time_step;
 
-    // The last time which the velocity of the robot was updated
-    float last_time_velocity_updated;
-
     // True if all agents have reached their destination
     bool reached_goals;
 
