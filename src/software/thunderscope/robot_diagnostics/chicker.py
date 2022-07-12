@@ -61,7 +61,7 @@ class ChickerWidget(QWidget):
             self.power_slider_layout,
             self.power_slider,
             self.power_label,
-        ) = common_widgets.create_slider("Power", 10, 50, 10)
+        ) = common_widgets.create_slider("Power", 10, 200, 10)
         vbox_layout.addLayout(self.power_slider_layout)
 
         self.setLayout(vbox_layout)
