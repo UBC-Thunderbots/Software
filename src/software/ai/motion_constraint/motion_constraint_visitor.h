@@ -2,7 +2,6 @@
 
 #include <numeric>
 #include <set>
-#include <numeric>
 
 #include "proto/primitive.pb.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
