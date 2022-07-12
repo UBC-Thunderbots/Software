@@ -188,9 +188,9 @@ void SensorFusion::updateWorld(
 
 void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection_frame)
 {
-    double min_valid_x              = 0;
-    double max_valid_x              =10;
-    bool ignore_invalid_camera_data = true;
+    double min_valid_x              = sensor_fusion_config.min_valid_x();
+    double max_valid_x              = sensor_fusion_config.max_valid_x();
+    bool ignore_invalid_camera_data = sensor_fusion_config.ignore_invalid_camera_data();
     bool friendly_team_is_yellow    = sensor_fusion_config.friendly_color_yellow();
 
     std::optional<Ball> new_ball;
