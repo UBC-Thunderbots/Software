@@ -113,6 +113,8 @@ void HRVOAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive,
 
 void HRVOAgent::computeNeighbors(double neighbor_dist_threshold)
 {
+    // Re-calculate all agents (neighbors) within the distance threshold
+    // which we want to create velocity obstacles for
     neighbors_.clear();
     simulator_->getKdTree()->query(this, neighbor_dist_threshold);
 }

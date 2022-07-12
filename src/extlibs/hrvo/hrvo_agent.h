@@ -57,7 +57,7 @@ class HRVOAgent : public Agent
      * @param position              The starting position of this agent.
      * @param max_neighbor_dist     The maximum distance away which another agent can be
      * from this agent to be considered as a neighbor (i.e. velocity obstacles for it
-     * would be
+     * would be created)
      * @param maxNeighbors          The maximum number of other agents which this agent
      * will try to avoid collisions with at a time.
      * @param radius                The radius of this agent.
