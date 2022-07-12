@@ -250,8 +250,8 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
                     Vector::createFromAngle(robot_with_ball_in_dribbler->orientation())
                         // MAX_FRACTION_OF_BALL_COVERED_BY_ROBOT of the ball should be
                         // inside the robot
-                        .normalize(DIST_TO_FRONT_OF_ROBOT_METERS +
-                                   BALL_TO_FRONT_OF_ROBOT_DISTANCE_WHEN_DRIBBLING),
+                        .normalize(DIST_TO_FRONT_OF_ROBOT_METERS -
+                                   SPECIAL_INDICATOR_DISTANCE_FOR_BREAKBEAM),
                 .distance_from_ground = 0,
                 .timestamp  = Timestamp::fromSeconds(ssl_detection_frame.t_capture()),
                 .confidence = 1}};

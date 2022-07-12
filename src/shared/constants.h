@@ -65,6 +65,8 @@ static const double BALL_MASS_KG = 0.004593;
 // The max allowed speed of the robot when the stop command is issued, in meters per
 // second
 static const double STOP_COMMAND_ROBOT_MAX_SPEED_METERS_PER_SECOND = 1.5;
+// The max allowed speed of the robot before we knock the ball away with the dribbler
+static const double DRIBBLE_GET_POSSESSION_MAX_SPEED_METERS_PER_SECOND = 1.5;
 // The max allowed speed of the robot before collisions would incur a foul
 static const double COLLISION_ALLOWED_ROBOT_MAX_SPEED_METERS_PER_SECOND = 0.5;
 // The maximum number of robots we can communicate with over radio.

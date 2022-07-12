@@ -10,7 +10,6 @@ message RobotStatus
 {
     uint32 robot_id                           = 1;
     repeated ErrorCode error_code             = 2;
-    BreakBeamStatus break_beam_status         = 3;
     ChipperKickerStatus chipper_kicker_status = 4;
     MotorStatus motor_status                  = 5;
     NetworkStatus network_status              = 6;
@@ -35,16 +34,6 @@ message JetsonStatus
 {
     // Jetson CPU temperature
     double cpu_temperature = 3;
-}
-
-/* Data about the status of the break beam */
-message BreakBeamStatus
-{
-    // Whether or not the ball is interrupting the robot’s laser beam.
-    bool ball_in_beam = 1;
-
-    // The reading of the robot’s laser sensor, normalized to [0,1]
-    float break_beam_reading = 2;
 }
 
 /* Data about the status of the chipper and kicker */
