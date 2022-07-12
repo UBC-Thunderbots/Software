@@ -132,8 +132,6 @@ class HRVOSimulator
      * @param curr_velocity         The initial velocity of this agent.
      * @param max_speed             The maximum speed of this agent.
      * @param max_accel             The maximum acceleration of this agent.
-     * @param goal_index            The index of the Goal which this agent should go to.
-     * @param goal_radius           The goal agent_radius of this agent.
      * @param robot_id	    		This robot's robot id
      * @param type	    			Whether this robot is FRIENDLY or ENEMY
      *
