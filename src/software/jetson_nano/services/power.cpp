@@ -71,11 +71,5 @@ TbotsProto::PowerStatus PowerService::poll(const TbotsProto::PowerControl& comma
 {
     // Store msg for later transmission
     nanopb_command = createNanoPbPowerPulseControl(command);
-    LOG(DEBUG) << nanopb_command.load(std::memory_order_relaxed)
-                      .chicker.chicker_command.auto_chip_or_kick.auto_chip_or_kick
-                      .autokick_pulse_width;
-    LOG(DEBUG) << nanopb_command.load(std::memory_order_relaxed)
-                      .chicker.chicker_command.auto_chip_or_kick.auto_chip_or_kick
-                      .autochip_pulse_width;
     return *createTbotsPowerStatus(status);
 }

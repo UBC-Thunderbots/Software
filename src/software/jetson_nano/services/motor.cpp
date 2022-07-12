@@ -67,7 +67,8 @@ static const char* HEARTBEAT_GPIO                         = "216";
 static double MECHANICAL_MPS_PER_ELECTRICAL_RPM = 0.000111;
 static double ELECTRICAL_RPM_PER_MECHANICAL_MPS = 1 / MECHANICAL_MPS_PER_ELECTRICAL_RPM;
 
-static double RUNAWAY_PROTECTION_THRESHOLD_MPS = 2.00;
+static double RUNAWAY_PROTECTION_THRESHOLD_MPS          = 2.00;
+static double DRIBBLER_ACCELERATION_THRESHOLD_RPM_PER_S = 1000;
 
 
 extern "C"
@@ -295,6 +296,27 @@ bool MotorService::checkDriverFault(uint8_t motor)
 TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor,
                                            double time_elapsed_since_last_poll_s)
 {
+    // check if encoders are calibrated
+    if (!encoder_calibrated_[FRONT_LEFT_MOTOR_CHIP_SELECT] ||
+        !encoder_calibrated_[FRONT_RIGHT_MOTOR_CHIP_SELECT] ||
+        !encoder_calibrated_[BACK_LEFT_MOTOR_CHIP_SELECT] ||
+        !encoder_calibrated_[BACK_RIGHT_MOTOR_CHIP_SELECT])
+    {
+        // if not, calibrate the encoders
+        for (uint8_t motor = 0; motor < NUM_DRIVE_MOTORS; motor++)
+        {
+            startEncoderCalibration(motor);
+        }
+
+        sleep(1);
+
+        for (uint8_t motor = 0; motor < NUM_DRIVE_MOTORS; motor++)
+        {
+            endEncoderCalibration(motor);
+        }
+    }
+
+
     CHECK(encoder_calibrated_[FRONT_LEFT_MOTOR_CHIP_SELECT] &&
           encoder_calibrated_[FRONT_RIGHT_MOTOR_CHIP_SELECT] &&
           encoder_calibrated_[BACK_LEFT_MOTOR_CHIP_SELECT] &&
@@ -391,6 +413,11 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
                 -motor.direct_velocity_control().velocity().y_component_meters(),
                 motor.direct_velocity_control().velocity().x_component_meters(),
                 motor.direct_velocity_control().angular_velocity().radians_per_second()};
+
+            target_wheel_velocities = rampWheelVelocity(
+                prev_wheel_velocities, target_linear_velocity,
+                static_cast<double>(robot_constants_.robot_max_acceleration_m_per_s_2),
+                time_elapsed_since_last_poll_s);
         };
 
         break;
@@ -400,13 +427,14 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
             target_angular_velocity = {0.0, 0.0, 0.0};
             target_dribbler_rpm     = 0;
 
+            target_wheel_velocities = rampWheelVelocity(
+                prev_wheel_velocities, target_linear_velocity,
+                static_cast<double>(robot_constants_.robot_max_acceleration_m_per_s_2),
+                time_elapsed_since_last_poll_s);
+
             break;
         }
     }
-    target_wheel_velocities = rampWheelVelocity(
-        prev_wheel_velocities, target_linear_velocity,
-        static_cast<double>(robot_constants_.robot_max_acceleration_m_per_s_2),
-        time_elapsed_since_last_poll_s);
 
     // TODO interleave the angular accelerations in here at some point.
     prev_wheel_velocities = target_wheel_velocities;
@@ -425,15 +453,22 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
         BACK_RIGHT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_TARGET,
         static_cast<int>(target_wheel_velocities[3] * ELECTRICAL_RPM_PER_MECHANICAL_MPS));
 
-    if (target_dribbler_rpm > test_ramp_rpm + 1500)
+    // If the dribbler only needs to change by DRIBBLER_ACCELERATION_THRESHOLD_RPM_PER_S,
+    // just set the value
+    if (std::abs(target_dribbler_rpm - ramp_rpm) <=
+        DRIBBLER_ACCELERATION_THRESHOLD_RPM_PER_S)
     {
-        test_ramp_rpm += 1000;
-        tmc4671_setTargetVelocity(DRIBBLER_MOTOR_CHIP_SELECT, test_ramp_rpm);
+        tmc4671_setTargetVelocity(DRIBBLER_MOTOR_CHIP_SELECT, target_dribbler_rpm);
     }
-    else if (target_dribbler_rpm < test_ramp_rpm - 1500)
+    else if (target_dribbler_rpm > ramp_rpm + DRIBBLER_ACCELERATION_THRESHOLD_RPM_PER_S)
     {
-        test_ramp_rpm -= 1000;
-        tmc4671_setTargetVelocity(DRIBBLER_MOTOR_CHIP_SELECT, test_ramp_rpm);
+        ramp_rpm += DRIBBLER_ACCELERATION_THRESHOLD_RPM_PER_S;
+        tmc4671_setTargetVelocity(DRIBBLER_MOTOR_CHIP_SELECT, ramp_rpm);
+    }
+    else if (target_dribbler_rpm < ramp_rpm - DRIBBLER_ACCELERATION_THRESHOLD_RPM_PER_S)
+    {
+        ramp_rpm -= DRIBBLER_ACCELERATION_THRESHOLD_RPM_PER_S;
+        tmc4671_setTargetVelocity(DRIBBLER_MOTOR_CHIP_SELECT, ramp_rpm);
     }
 
     return motor_status;

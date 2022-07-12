@@ -30,14 +30,15 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, const int loop
 
     redis_client_ = std::make_unique<RedisClient>(REDIS_DEFAULT_HOST, REDIS_DEFAULT_PORT);
 
-    // auto robot_id   = std::stoi(redis_client_->get(ROBOT_ID_REDIS_KEY));
-    // auto channel_id = std::stoi(redis_client_->get(ROBOT_MULTICAST_CHANNEL_REDIS_KEY));
-    // auto network_interface = redis_client_->get(ROBOT_NETWORK_INTERFACE_REDIS_KEY);
+    auto robot_id   = std::stoi(redis_client_->get(ROBOT_ID_REDIS_KEY));
+    auto channel_id = std::stoi(redis_client_->get(ROBOT_MULTICAST_CHANNEL_REDIS_KEY));
+    auto network_interface = redis_client_->get(ROBOT_NETWORK_INTERFACE_REDIS_KEY);
 
-    LoggerSingleton::initializeLogger("/tmp/tbots");
+    NetworkLoggerSingleton::initializeLogger(channel_id, network_interface, robot_id);
 
     power_service_ = std::make_unique<PowerService>();
     power_service_->tick();
+
     motor_service_ = std::make_unique<MotorService>(robot_constants, loop_hz);
     power_service_->tick();
 }
@@ -103,6 +104,9 @@ void Thunderloop::runLoop()
             if (robot_id != robot_id_ || channel_id != channel_id_ ||
                 network_interface != network_interface_)
             {
+                NetworkLoggerSingleton::initializeLogger(channel_id, network_interface,
+                                                         robot_id);
+
                 LOG(DEBUG) << "Switch over to Robot ID: " << robot_id
                            << " Channel ID: " << channel_id
                            << " Network Interface: " << network_interface;
@@ -125,7 +129,6 @@ void Thunderloop::runLoop()
                 auto result       = network_service_->poll(robot_status_);
                 new_primitive_set = std::get<0>(result);
                 new_world         = std::get<1>(result);
-                // LOG(DEBUG) << new_primitive_set.DebugString();
             }
 
             thunderloop_status_.set_network_service_poll_time_ns(
@@ -219,10 +222,15 @@ void Thunderloop::runLoop()
             // Motor Service: execute the motor control command
             {
                 ScopedTimespecTimer timer(&poll_time);
-                motor_status_ = motor_service_->poll(direct_control_.motor_control(),
-                                                     loop_duration_seconds);
-                primitive_executor_.updateLocalVelocity(
-                    createVector(motor_status_.local_velocity()));
+
+                // only execute motor poll if primitive time is greater than 0
+                if (primitive_set_.time_sent().epoch_timestamp_seconds() > 0.0)
+                {
+                    motor_status_ = motor_service_->poll(direct_control_.motor_control(),
+                                                         loop_duration_seconds);
+                    primitive_executor_.updateLocalVelocity(
+                        createVector(motor_status_.local_velocity()));
+                }
             }
             thunderloop_status_.set_motor_service_poll_time_ns(
                 static_cast<unsigned long>(poll_time.tv_nsec));
