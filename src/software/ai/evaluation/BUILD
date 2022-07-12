@@ -158,8 +158,8 @@ cc_library(
     deps = [
         ":shot",
         "//software/geom/algorithms",
-        "//software/geom/circle",
-        "//software/geom/rectangle",
+        "//software/geom:circle",
+        "//software/geom:rectangle",
         "//software/world",
     ],
 )
