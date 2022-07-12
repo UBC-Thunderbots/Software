@@ -1,5 +1,6 @@
 #pragma once
 
+#include <numeric>
 #include <set>
 
 #include "proto/primitive.pb.h"
