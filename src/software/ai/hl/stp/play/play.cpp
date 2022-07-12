@@ -237,9 +237,9 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::getPrimitivesFromTactic(
 
             if (path.has_value())
             {
-                CHECK(path.value().getKnots().size() >= 2)
+                CHECK(path.value().size() >= 2)
                     << "Path did not contain at least two points" << std::endl;
-                path_points = path.value().getKnots();
+                path_points = path.value();
                 motion_control.set_normalized_path_length(
                     EnlsvgPathPlanner::pathLength(path_points, robot_position) /
                     EnlsvgPathPlanner::MAX_PATH_LENGTH);

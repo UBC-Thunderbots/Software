@@ -43,11 +43,12 @@
 #include "software/geom/vector.h"
 
 HRVOAgent::HRVOAgent(HRVOSimulator *simulator, const Vector &position, float neighborDist,
-                     std::size_t maxNeighbors, float radius, const Vector &velocity,
-                     float maxAccel, AgentPath &path, float prefSpeed, float maxSpeed,
-                     float uncertaintyOffset, unsigned int robot_id, TeamSide type)
-    : Agent(simulator, position, radius, velocity, velocity, maxSpeed, maxAccel, path,
-            robot_id, type),
+                     std::size_t maxNeighbors, float radius, float max_radius_inflation,
+                     const Vector &velocity, float maxAccel, AgentPath &path,
+                     float prefSpeed, float maxSpeed, float uncertaintyOffset, 
+		     RobotId, TeamSide type)
+    : Agent(simulator, position, radius, max_radius_inflation, velocity, velocity,
+            maxSpeed, maxAccel, path, robot_id, type),
       maxNeighbors_(maxNeighbors),
       neighborDist_(neighborDist),
       prefSpeed_(prefSpeed),

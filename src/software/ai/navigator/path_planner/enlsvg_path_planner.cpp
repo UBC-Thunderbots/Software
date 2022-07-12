@@ -108,34 +108,33 @@ std::optional<Path> EnlsvgPathPlanner::findPath(const Point &start,
         return std::nullopt;
     }
 
-    std::vector<Point> path_points = path.value().getKnots();
-
     // If start was initially blocked, add the start point
     if (new_start.value() != enlsvg_start)
     {
-        path_points.insert(path_points.begin(), start);
+        path.value().insert(path.value().begin(), start);
     }
 
     // If the end point wasn't blocked, then replace the end with the actual end because
     // some details get lost due to the grid resolution
     if (new_end.value() == enlsvg_end)
     {
-        path_points.pop_back();
-        path_points.emplace_back(end);
+        path.value().pop_back();
+        path.value().emplace_back(end);
     }
 
     // Make sure start point corresponds exactly with the given start
-    path_points.erase(path_points.begin());
-    path_points.insert(path_points.begin(), start);
+    path.value().erase(path.value().begin());
+    path.value().insert(path.value().begin(), start);
 
     // Due to processing, it is possible that the first two points may be very close
     // together, this will fix that
-    if (path_points.size() > 2 && (path_points[0] - path_points[1]).length() < resolution)
+    if (path.value().size() > 2 &&
+        (path.value()[0] - path.value()[1]).length() < resolution)
     {
-        path_points.erase(path_points.begin() + 1);
+        path.value().erase(path.value().begin() + 1);
     }
 
-    return Path(path_points);
+    return Path(path.value());
 }
 
 EnlsvgPathPlanner::EnlsvgPoint EnlsvgPathPlanner::convertPointToEnlsvgPoint(
