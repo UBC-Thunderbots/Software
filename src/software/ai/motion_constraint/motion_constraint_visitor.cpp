@@ -85,6 +85,15 @@ void MotionConstraintVisitor::visit(const MoveGoalieToGoalLineTactic &tactic)
     });
 }
 
+void MotionConstraintVisitor::visit(const BallPlacementTactic &tactic)
+{
+    current_allowed_constraints = std::set<TbotsProto::MotionConstraint>();   
+    for (int i = TbotsProto::MotionConstraint_MIN; i < TbotsProto::MotionConstraint_MAX; ++i)
+    {
+        current_allowed_constraints.emplace(static_cast<TbotsProto::MotionConstraint>(i));
+    }
+}
+
 // clang-format on
 
 std::set<TbotsProto::MotionConstraint>
