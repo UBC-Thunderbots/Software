@@ -66,8 +66,8 @@ static const char* DRIVER_CONTROL_ENABLE_GPIO             = "194";
 static double MECHANICAL_MPS_PER_ELECTRICAL_RPM = 0.000111;
 static double ELECTRICAL_RPM_PER_MECHANICAL_MPS = 1 / MECHANICAL_MPS_PER_ELECTRICAL_RPM;
 
-static double RUNAWAY_PROTECTION_THRESHOLD_MPS          = 2.00;
-static double DRIBBLER_ACCELERATION_THRESHOLD_RPM_PER_S = 1000;
+static double RUNAWAY_PROTECTION_THRESHOLD_MPS       = 2.00;
+static int DRIBBLER_ACCELERATION_THRESHOLD_RPM_PER_S = 1000;
 
 
 extern "C"
@@ -365,7 +365,7 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
     EuclideanSpace_t target_linear_velocity  = {0.0, 0.0, 0.0};
     EuclideanSpace_t target_angular_velocity = {0.0, 0.0, 0.0};
     int target_dribbler_rpm                  = motor.dribbler_speed_rpm();
-    static int test_ramp_rpm                 = 0;
+    static int ramp_rpm                      = 0;
 
     switch (motor.drive_control_case())
     {
@@ -410,6 +410,24 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
 
     // TODO interleave the angular accelerations in here at some point.
     prev_wheel_velocities = target_wheel_velocities;
+
+    static const float LOCAL_EPSILON = 0.01f;
+
+    if ((std::abs(target_wheel_velocities[0]) <= LOCAL_EPSILON ||
+         std::abs(target_wheel_velocities[1]) <= LOCAL_EPSILON ||
+         std::abs(target_wheel_velocities[2]) <= LOCAL_EPSILON ||
+         std::abs(target_wheel_velocities[3]) <= LOCAL_EPSILON) &&
+        target_dribbler_rpm == 0)
+    {
+        LOG(DEBUG) << "DRIVER DISABLED";
+        driver_control_enable_gpio.setValue(GpioState::LOW);
+    }
+    else
+    {
+        LOG(DEBUG) << "DRIVER ENABLED";
+        driver_control_enable_gpio.setValue(GpioState::HIGH);
+    }
+
 
     // Set target speeds accounting for acceleration
     tmc4671_writeInt(

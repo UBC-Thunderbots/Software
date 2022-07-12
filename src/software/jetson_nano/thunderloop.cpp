@@ -30,17 +30,10 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, const int loop
 
     redis_client_ = std::make_unique<RedisClient>(REDIS_DEFAULT_HOST, REDIS_DEFAULT_PORT);
 
-    auto robot_id   = std::stoi(redis_client_->get(ROBOT_ID_REDIS_KEY));
-    auto channel_id = std::stoi(redis_client_->get(ROBOT_MULTICAST_CHANNEL_REDIS_KEY));
-    auto network_interface = redis_client_->get(ROBOT_NETWORK_INTERFACE_REDIS_KEY);
+    LoggerSingleton::initializeLogger("/tmp/tbots");
 
-    NetworkLoggerSingleton::initializeLogger(channel_id, network_interface, robot_id);
-
-    power_service_ = std::make_unique<PowerService>();
-    power_service_->tick();
-
+    // power_service_ = std::make_unique<PowerService>();
     motor_service_ = std::make_unique<MotorService>(robot_constants, loop_hz);
-    power_service_->tick();
 }
 
 Thunderloop::~Thunderloop() {}
@@ -104,9 +97,6 @@ void Thunderloop::runLoop()
             if (robot_id != robot_id_ || channel_id != channel_id_ ||
                 network_interface != network_interface_)
             {
-                NetworkLoggerSingleton::initializeLogger(channel_id, network_interface,
-                                                         robot_id);
-
                 LOG(DEBUG) << "Switch over to Robot ID: " << robot_id
                            << " Channel ID: " << channel_id
                            << " Network Interface: " << network_interface;
@@ -212,9 +202,7 @@ void Thunderloop::runLoop()
             // Power Service: execute the power control command
             {
                 ScopedTimespecTimer timer(&poll_time);
-                LOG(DEBUG) << direct_control_.power_control().DebugString();
-                power_status_ = power_service_->poll(direct_control_.power_control());
-                LOG(DEBUG) << power_status_.DebugString();
+                // power_status_ = power_service_->poll(direct_control_.power_control());
             }
             thunderloop_status_.set_power_service_poll_time_ns(
                 static_cast<unsigned long>(poll_time.tv_nsec));
