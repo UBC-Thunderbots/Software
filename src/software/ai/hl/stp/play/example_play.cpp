@@ -16,9 +16,8 @@ void ExamplePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
     {
         for (size_t k = 0; k < move_tactics.size(); k++)
         {
-            move_tactics[k]->updateControlParams(
-                    world.ball().position(),
-                    Angle::zero(), 0);
+            move_tactics[k]->updateControlParams(world.ball().position(), Angle::zero(),
+                                                 0);
         }
 
         // yield the Tactics this Play wants to run, in order of priority

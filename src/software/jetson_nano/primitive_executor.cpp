@@ -60,7 +60,7 @@ AngularVelocity PrimitiveExecutor::getTargetAngularVelocity(
     double max_angular_speed =
         static_cast<double>(robot_constants_.robot_max_ang_speed_rad_per_s);
     double next_angular_speed = max_angular_speed;
-    if(delta_orientation < M_PI/4.0)
+    if (delta_orientation < M_PI / 4.0)
     {
         next_angular_speed = delta_orientation;
     }

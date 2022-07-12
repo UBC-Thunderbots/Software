@@ -1,5 +1,6 @@
 #include "software/sensor_fusion/sensor_fusion.h"
 
+#include "proto/message_translation/tbots_protobuf.h"
 #include "software/logger/logger.h"
 
 SensorFusion::SensorFusion(TbotsProto::SensorFusionConfig sensor_fusion_config)
@@ -35,6 +36,18 @@ std::optional<World> SensorFusion::getWorld() const
             new_world.updateRefereeStage(*referee_stage);
         }
 
+        if (!new_world.friendlyTeam().getAllRobots().empty())
+        {
+            LOG(VISUALIZE) << *createNamedValue(
+                "and vel", static_cast<float>(new_world.friendlyTeam()
+                                                  .getAllRobots()[0]
+                                                  .angularVelocity()
+                                                  .toRadians()));
+            LOG(VISUALIZE) << *createNamedValue(
+                "vel",
+                static_cast<float>(
+                    new_world.friendlyTeam().getAllRobots()[0].velocity().length()));
+        }
 
         return new_world;
     }
@@ -188,9 +201,9 @@ void SensorFusion::updateWorld(
 
 void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection_frame)
 {
-    double min_valid_x              = sensor_fusion_config.min_valid_x();
-    double max_valid_x              = sensor_fusion_config.max_valid_x();
-    bool ignore_invalid_camera_data = sensor_fusion_config.ignore_invalid_camera_data();
+    double min_valid_x              = 2;
+    double max_valid_x              = 10;
+    bool ignore_invalid_camera_data = true;
     bool friendly_team_is_yellow    = sensor_fusion_config.friendly_color_yellow();
 
     std::optional<Ball> new_ball;

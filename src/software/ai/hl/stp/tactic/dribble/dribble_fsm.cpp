@@ -90,7 +90,7 @@ void DribbleFSM::getPossession(const Update &event)
                               event.common.world.field()) +
         Vector::createFromAngle(face_ball_orientation).normalize(0.05);
 
-    if((intercept_position - event.common.robot.position()).length() < 1.0)
+    if ((intercept_position - event.common.robot.position()).length() < 2.0)
     {
         event.common.set_primitive(createMovePrimitive(
             CREATE_MOTION_CONTROL(intercept_position), face_ball_orientation, 0,
@@ -152,7 +152,7 @@ void DribbleFSM::startDribble(const Update &event)
 
 bool DribbleFSM::havePossession(const Update &event)
 {
-    return event.common.robot.isNearDribbler(event.common.world.ball().position(),-0.01);
+    return event.common.robot.isNearDribbler(event.common.world.ball().position(), -0.01);
 }
 
 bool DribbleFSM::lostPossession(const Update &event)

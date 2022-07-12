@@ -387,7 +387,7 @@ void ErForceSimulator::stepSimulation(const Duration& time_step)
 std::vector<TbotsProto::RobotStatus> ErForceSimulator::getBlueRobotStatuses() const
 {
     std::vector<TbotsProto::RobotStatus> robot_statuses;
-    auto robot_status      = TbotsProto::RobotStatus();
+    auto robot_status = TbotsProto::RobotStatus();
     auto power_status = TbotsProto::PowerStatus();
 
     if (blue_robot_with_ball.has_value())
@@ -410,7 +410,7 @@ std::vector<TbotsProto::RobotStatus> ErForceSimulator::getBlueRobotStatuses() co
 std::vector<TbotsProto::RobotStatus> ErForceSimulator::getYellowRobotStatuses() const
 {
     std::vector<TbotsProto::RobotStatus> robot_statuses;
-    auto robot_status      = TbotsProto::RobotStatus();
+    auto robot_status = TbotsProto::RobotStatus();
     auto power_status = TbotsProto::PowerStatus();
 
     if (yellow_robot_with_ball.has_value())

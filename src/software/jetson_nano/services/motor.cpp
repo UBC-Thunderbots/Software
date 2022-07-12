@@ -165,6 +165,19 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
     startDriver(DRIBBLER_MOTOR_CHIP_SELECT);
     checkDriverFault(DRIBBLER_MOTOR_CHIP_SELECT);
     startController(DRIBBLER_MOTOR_CHIP_SELECT, true);
+
+    // if not, calibrate the encoders
+    for (uint8_t motor = 0; motor < NUM_DRIVE_MOTORS; motor++)
+    {
+        startEncoderCalibration(motor);
+    }
+
+    sleep(1);
+
+    for (uint8_t motor = 0; motor < NUM_DRIVE_MOTORS; motor++)
+    {
+        endEncoderCalibration(motor);
+    }
 }
 
 MotorService::~MotorService() {}
@@ -268,27 +281,6 @@ bool MotorService::checkDriverFault(uint8_t motor)
 TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor,
                                            double time_elapsed_since_last_poll_s)
 {
-    // check if encoders are calibrated
-    if (!encoder_calibrated_[FRONT_LEFT_MOTOR_CHIP_SELECT] ||
-        !encoder_calibrated_[FRONT_RIGHT_MOTOR_CHIP_SELECT] ||
-        !encoder_calibrated_[BACK_LEFT_MOTOR_CHIP_SELECT] ||
-        !encoder_calibrated_[BACK_RIGHT_MOTOR_CHIP_SELECT])
-    {
-        // if not, calibrate the encoders
-        for (uint8_t motor = 0; motor < NUM_DRIVE_MOTORS; motor++)
-        {
-            startEncoderCalibration(motor);
-        }
-
-        sleep(1);
-
-        for (uint8_t motor = 0; motor < NUM_DRIVE_MOTORS; motor++)
-        {
-            endEncoderCalibration(motor);
-        }
-    }
-
-
     CHECK(encoder_calibrated_[FRONT_LEFT_MOTOR_CHIP_SELECT] &&
           encoder_calibrated_[FRONT_RIGHT_MOTOR_CHIP_SELECT] &&
           encoder_calibrated_[BACK_LEFT_MOTOR_CHIP_SELECT] &&

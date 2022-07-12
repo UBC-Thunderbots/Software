@@ -26,7 +26,7 @@ class RobotView(QWidget):
         self.pink = QtGui.QColor(255, 0, 255)
         self.green = QtGui.QColor(0, 255, 0)
 
-        self.breakbeam_buffer = ThreadSafeBuffer(1, BreakBeamStatus)
+        self.breakbeam_buffer = ThreadSafeBuffer(1, RobotStatus)
         self.power_status_buffer = ThreadSafeBuffer(1, PowerStatus)
         self.MIN_VOLTAGE_LEVEL = 50
 
@@ -143,6 +143,7 @@ class RobotView(QWidget):
     def refresh(self):
         """Refresh the view
         """
+        return
         breakbeam_status = self.breakbeam_buffer.get(block=False)
         for i in range(8):
             if breakbeam_status.ball_in_beam:

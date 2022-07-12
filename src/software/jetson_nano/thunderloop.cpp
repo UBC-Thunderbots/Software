@@ -116,6 +116,7 @@ void Thunderloop::runLoop()
             // robot status
             {
                 ScopedTimespecTimer timer(&poll_time);
+                robot_status_.set_robot_id(robot_id_);
                 auto result       = network_service_->poll(robot_status_);
                 new_primitive_set = std::get<0>(result);
                 new_world         = std::get<1>(result);
