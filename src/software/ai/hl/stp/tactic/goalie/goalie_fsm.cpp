@@ -1,4 +1,5 @@
 #include "software/ai/hl/stp/tactic/goalie/goalie_fsm.h"
+#include "software/ai/evaluation/find_open_areas.h"
 
 Point GoalieFSM::getGoaliePositionToBlock(
     const Ball &ball, const Field &field,
@@ -210,7 +211,7 @@ void GoalieFSM::updatePivotKick(
         getNoChipRectangle(event.common.world.field()).xMax() + ROBOT_MAX_RADIUS_METERS;
     Point clear_origin = Point(clear_origin_x, event.common.world.ball().position().y());
 
-    Point goalie_pos     = event.robot.position();
+    Point goalie_pos     = event.common.robot.position();
     Point clear_corner_1 = Point(goalie_pos.x() + MAX_CHIP_DISTANCE - 1, 1.8);
     Point clear_corner_2 = Point(goalie_pos.x() + MAX_CHIP_DISTANCE, -1.8);
     auto clear_area      = std::make_optional<Rectangle>(clear_corner_1, clear_corner_2);

@@ -2,6 +2,7 @@
 
 #include "software/geom/circle.h"
 #include "software/world/world.h"
+#include "software/geom/rectangle.h"
 
 /**
  * Finds good points to chip the ball to
@@ -12,4 +13,4 @@
  * @return a vector of circles where the center is a good point to chip to, and the
  *         radius is the distance to the nearest enemy
  */
-std::vector<Circle> findGoodChipTargets(const World& world);
+std::vector<Circle> findGoodChipTargets(const World& world, std::optional<Rectangle> target_area_rectangle = std::nullopt);

@@ -159,6 +159,8 @@ cc_library(
         ":shot",
         "//software/geom/algorithms",
         "//software/world",
+        "//software/geom/circle",
+        "//software/geom/rectangle",
     ],
 )
 

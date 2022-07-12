@@ -22,6 +22,7 @@ cc_library(
         "//software/geom:line",
         "//software/geom/algorithms",
         "//software/logger",
+        "//software/ai/evaluation:find_open_areas",
     ],
 )
 
