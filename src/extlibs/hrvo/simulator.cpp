@@ -123,8 +123,8 @@ void HRVOSimulator::updateWorld(const World &world)
                 // was updated. This is to allow SensorFusion to update the actual robot
                 // velocity in World.
                 // TODO (#2531): Remove 4 multiplier and fix goal keeper moving slowly
-                //Vector velocity = friendly_robot.velocity();
-                //hrvo_agent.value()->setVelocity(friendly_robot.velocity());
+                // Vector velocity = friendly_robot.velocity();
+                // hrvo_agent.value()->setVelocity(friendly_robot.velocity());
             }
         }
 
