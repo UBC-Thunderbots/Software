@@ -10,6 +10,9 @@
  * @param world The world. We assume the ball is being chipped from its current
  * position
  *
+ * @param target_area_rectangle Optional rectangle to evaluate in. If omitted,
+ * the entire field is evaluated instead
+ *
  * @return a vector of circles where the center is a good point to chip to, and the
  *         radius is the distance to the nearest enemy
  */

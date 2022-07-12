@@ -1,10 +1,12 @@
 #include "software/ai/evaluation/find_open_areas.h"
 
+#include <optional>
+
 #include "proto/parameters.pb.h"
 #include "software/geom/algorithms/find_open_circles.h"
 
-std::vector<Circle> findGoodChipTargets(
-    const World& world, std::optional<Rectangle> target_area_rectangle = std::nullopt)
+std::vector<Circle> findGoodChipTargets(const World& world,
+                                        std::optional<Rectangle> target_area_rectangle)
 {
     double inset     = 0.3;  // Determined experimentally to be a reasonable value
     double ballX     = world.ball().position().x();

@@ -212,16 +212,33 @@ void GoalieFSM::updatePivotKick(
         getNoChipRectangle(event.common.world.field()).xMax() + ROBOT_MAX_RADIUS_METERS;
     Point clear_origin = Point(clear_origin_x, event.common.world.ball().position().y());
 
-    Point goalie_pos     = event.common.robot.position();
-    Point clear_corner_1 = Point(goalie_pos.x() + MAX_CHIP_DISTANCE - 1, 1.8);
-    Point clear_corner_2 = Point(goalie_pos.x() + MAX_CHIP_DISTANCE, -1.8);
-    auto clear_area      = std::make_optional<Rectangle>(clear_corner_1, clear_corner_2);
+    Point goalie_pos = event.common.robot.position();
+
+    double clear_area_width =
+        1.8;  // intersect between circle with radius of max chip distance and
+              // straight line 1 meter away perpendicular to chip direction
+
+    Point clear_corner_1 =
+        Point(goalie_pos.x() + MAX_CHIP_DISTANCE - 1, clear_area_width / 2);
+    Point clear_corner_2 =
+        Point(goalie_pos.x() + MAX_CHIP_DISTANCE, -clear_area_width / 2);
+    auto clear_area = std::make_optional<Rectangle>(clear_corner_1, clear_corner_2);
 
     vector<Circle> chip_targets = findGoodChipTargets(event.common.world, clear_area);
-    Point clear_target          = chip_targets[0].origin();
+
+    Point clear_target;
+
+    if (chip_targets.empty())
+    {
+        clear_target = event.common.world.field().centerPoint();
+    }
+    else
+    {
+        clear_target = chip_targets[0].origin();
+    }
 
     Angle clear_direction =
-        (event.common.world.ball().position() - clear_target).orientation();
+        (clear_target - event.common.world.ball().position()).orientation();
 
     PivotKickFSM::ControlParams control_params{
         .kick_origin    = clear_origin,
