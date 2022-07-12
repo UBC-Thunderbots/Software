@@ -81,8 +81,11 @@ PYBIND11_MODULE(py_constants, m)
     m.attr("ROBOT_LOGS_PORT")   = ROBOT_LOGS_PORT;
 
     // SSL
-    m.attr("SSL_ADDRESS") = SSL_ADDRESS;
-    m.attr("SSL_PORT")    = SSL_PORT;
+    m.attr("SSL_VISION_ADDRESS") = SSL_VISION_ADDRESS;
+    m.attr("SSL_VISION_PORT")    = SSL_VISION_PORT;
+
+    m.attr("SSL_REFEREE_ADDRESS") = SSL_REFEREE_ADDRESS;
+    m.attr("SSL_REFEREE_PORT")    = SSL_REFEREE_PORT;
 
     // Units
     m.attr("MILLIMETERS_PER_METER") = MILLIMETERS_PER_METER;

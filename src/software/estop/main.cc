@@ -26,7 +26,7 @@ void loop()
     //    - circuit is broken
     //    - the input is pulled up, we send ESTOP_STOP_MSG
     unsigned char estop_val =
-        digitalRead(ESTOP_BUTTON_PIN) == 1 ? ESTOP_STOP_MSG : ESTOP_PLAY_MSG;
+        digitalRead(ESTOP_BUTTON_PIN) == 1 ? ESTOP_PLAY_MSG : ESTOP_STOP_MSG;
 
     Serial.write(estop_val);
 }

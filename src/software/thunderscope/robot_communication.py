@@ -164,12 +164,26 @@ class RobotCommunication(object):
             True,
         )
 
+        print(
+            SSL_VISION_ADDRESS, SSL_VISION_PORT, SSL_REFEREE_ADDRESS, SSL_REFEREE_PORT
+        )
+
+        import time
+
+        time.sleep(2)
         self.receive_ssl_wrapper = SSLWrapperPacketProtoListener(
-            SSL_ADDRESS,
-            SSL_PORT,
+            SSL_VISION_ADDRESS,
+            SSL_VISION_PORT,
             lambda data: self.full_system_proto_unix_io.send_proto(
                 SSL_WrapperPacket, data
             ),
+            True,
+        )
+
+        self.receive_ssl_referee_proto = SSLRefereeProtoListener(
+            SSL_REFEREE_ADDRESS,
+            SSL_REFEREE_PORT,
+            lambda data: self.full_system_proto_unix_io.send_proto(Referee, data),
             True,
         )
 
