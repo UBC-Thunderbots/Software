@@ -46,9 +46,8 @@ class TestHrvo : public testing::Test
  * @param agent_type	the type of the agent to look for (friendly/enemy)
  * @param agents		the list of agents to look inside
  */
-void assertRobotInAgentList(
-    const Robot &robot, const TeamSide &agent_type,
-    const std::vector<std::optional<std::shared_ptr<Agent>>> &agents)
+void assertRobotInAgentList(const Robot &robot, const TeamSide &agent_type,
+                            const std::vector<std::shared_ptr<Agent>> &agents)
 {
     auto agent_it =
         std::find_if(agents.begin(), agents.end(),

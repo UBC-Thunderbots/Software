@@ -254,7 +254,8 @@ std::size_t HRVOSimulator::addHRVOAgent(const Vector &position, float agent_radi
 {
     std::shared_ptr<HRVOAgent> agent = std::make_shared<HRVOAgent>(
         this, position, neighborDist, maxNeighbors, agent_radius, max_radius_inflation,
-        curr_velocity, maxAccel, path, prefSpeed, maxSpeed, uncertaintyOffset, robot_id, type);
+        curr_velocity, maxAccel, path, prefSpeed, maxSpeed, uncertaintyOffset, robot_id,
+        type);
     agents.push_back(std::move(agent));
     return agents.size() - 1;
 }
@@ -421,28 +422,29 @@ const std::vector<std::shared_ptr<Agent>> &HRVOSimulator::getAgents() const
 
 void HRVOSimulator::updateRemovedAgents(const World &world)
 {
-    auto agents_to_remove = std::remove_if(agents.begin(), agents.end(), 
-                                    [&world](std::shared_ptr<Agent> agent) {
-                                        std::unique_ptr<const std::vector<Robot>> team_to_use;
-                                        switch (agent->getAgentType())
-                                        {
-                                            case TeamSide::FRIENDLY:
-                                                team_to_use = std::make_unique<const std::vector<Robot>>(
-                                                    world.friendlyTeam().getAllRobots());
-                                                break;
-                                            case TeamSide::ENEMY:
-                                                team_to_use = std::make_unique<const std::vector<Robot>>(
-                                                    world.enemyTeam().getAllRobots());
-                                                break;
-                                            default:
-                                                team_to_use =
-                                                    std::make_unique<const std::vector<Robot>>(std::vector<Robot>());
-                                        }
+    auto agents_to_remove = std::remove_if(
+        agents.begin(), agents.end(), [&world](std::shared_ptr<Agent> agent) {
+            std::unique_ptr<const std::vector<Robot>> team_to_use;
+            switch (agent->getAgentType())
+            {
+                case TeamSide::FRIENDLY:
+                    team_to_use = std::make_unique<const std::vector<Robot>>(
+                        world.friendlyTeam().getAllRobots());
+                    break;
+                case TeamSide::ENEMY:
+                    team_to_use = std::make_unique<const std::vector<Robot>>(
+                        world.enemyTeam().getAllRobots());
+                    break;
+                default:
+                    team_to_use =
+                        std::make_unique<const std::vector<Robot>>(std::vector<Robot>());
+            }
 
-                                        auto team_iter = std::find_if(
-                                            (*team_to_use).begin(), (*team_to_use).end(),
-                                            [&agent](const Robot &robot) { return (robot.id() == agent->getRobotId()); });
-                                        return team_iter == (*team_to_use).end();
-                                    });
+            auto team_iter = std::find_if((*team_to_use).begin(), (*team_to_use).end(),
+                                          [&agent](const Robot &robot) {
+                                              return (robot.id() == agent->getRobotId());
+                                          });
+            return team_iter == (*team_to_use).end();
+        });
     agents.erase(agents_to_remove, agents.end());
 }

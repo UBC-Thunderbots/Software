@@ -33,7 +33,8 @@ class Agent
      */
     Agent(HRVOSimulator *simulator, const Vector &position, float radius,
           float max_radius_inflation, const Vector &velocity, const Vector &prefVelocity,
-          float maxSpeed, float maxAccel, AgentPath &path, RobotId robot_id, TeamSide agent_type);
+          float maxSpeed, float maxAccel, AgentPath &path, RobotId robot_id,
+          TeamSide agent_type);
 
     virtual ~Agent() = default;
 

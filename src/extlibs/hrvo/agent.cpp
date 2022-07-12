@@ -6,7 +6,7 @@
 Agent::Agent(HRVOSimulator *simulator, const Vector &position, float radius,
              float max_radius_inflation, const Vector &velocity,
              const Vector &prefVelocity, float maxSpeed, float maxAccel, AgentPath &path,
-	     unsigned int robot_id, TeamSide type)
+             unsigned int robot_id, TeamSide type)
     : simulator_(simulator),
       position_(position),
       min_radius_(radius),

@@ -28,8 +28,8 @@ class LinearVelocityAgent : public Agent
      */
     LinearVelocityAgent(HRVOSimulator *simulator, const Vector &position, float radius,
                         float max_radius_inflation, const Vector &velocity,
-                        float maxSpeed, float maxAccel, AgentPath &path,
-						RobotId robot_id, TeamSide type);
+                        float maxSpeed, float maxAccel, AgentPath &path, RobotId robot_id,
+                        TeamSide type);
 
     /**
      * Computes the new velocity of this agent.

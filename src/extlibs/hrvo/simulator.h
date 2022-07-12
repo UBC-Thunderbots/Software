@@ -142,7 +142,7 @@ class HRVOSimulator
     size_t addLinearVelocityAgent(const Vector &position, float agent_radius,
                                   float max_radius_inflation, const Vector &curr_velocity,
                                   float max_speed, float max_accel, AgentPath &path,
-				  RobotId robot_id, TeamSide type);
+                                  RobotId robot_id, TeamSide type);
 
     /**
      * Performs a simulation step; updates the position, and velocity

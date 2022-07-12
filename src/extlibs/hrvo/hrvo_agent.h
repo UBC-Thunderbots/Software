@@ -68,7 +68,7 @@ class HRVOAgent : public Agent
      * @param maxSpeed              The maximum speed of this agent.
      * @param robot_id		 	 The robot id for this agent.
      * @param type		 		 The side that this agent is on (friendly/enemy).
-    * @param uncertaintyOffset     The uncertainty offset of this agent.
+     * @param uncertaintyOffset     The uncertainty offset of this agent.
      */
     HRVOAgent(HRVOSimulator *simulator, const Vector &position, float neighborDist,
               std::size_t maxNeighbors, float radius, float max_radius_inflation,
