@@ -30,7 +30,7 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, const int loop
 
     redis_client_ = std::make_unique<RedisClient>(REDIS_DEFAULT_HOST, REDIS_DEFAULT_PORT);
 
-    LoggerSingleton::initializeLogger("/tmp/tbots");
+    LoggerSingleton::initializeLogger("/home/robot/logs");
 
     power_service_ = std::make_unique<PowerService>();
     motor_service_ = std::make_unique<MotorService>(robot_constants, loop_hz);
