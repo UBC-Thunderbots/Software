@@ -2,9 +2,9 @@ name: Tbots CI
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, robocup_2022 ]
   pull_request:
-    branches: [ master ]
+    branches: [ master, robocup_2022 ]
 
 jobs:
   formatting-check:
