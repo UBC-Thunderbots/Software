@@ -5,6 +5,13 @@ from proto.import_all_protos import *
 import threading
 import time
 
+from software.logger.logger import createLogger
+
+logger = createLogger(__name__)
+
+# todo remove
+IGNORE_ESTOP = True
+
 
 class RobotCommunication(object):
 
@@ -59,11 +66,9 @@ class RobotCommunication(object):
         self.run_thread = threading.Thread(target=self.run)
 
         try:
-            self.estop_reader = ThreadedEstopReader(
-                self.estop_path, self.estop_buadrate
-            )
+            self.estop_reader = ThreadedEstopReader(self.estop_path, self.estop_buadrate)
         except Exception:
-            raise Exception("Could not find estop, make sure its plugged in")
+            raise Exception("connect estop - not found")
 
     def __send_estop_state(self):
         while True:
@@ -71,6 +76,7 @@ class RobotCommunication(object):
                 EstopState, EstopState(is_playing=self.estop_reader.isEstopPlay())
             )
             time.sleep(0.1)
+
 
     def run(self):
         """Forward World and PrimitiveSet protos from fullsystem to the robots.
@@ -90,13 +96,14 @@ class RobotCommunication(object):
 
                 # Send the world
                 world = self.world_buffer.get(block=True)
-                self.send_world.send_proto(world)
-
+                self.world_mcast_sender.send_proto(world)
                 # Send the primitive set
                 primitive_set = self.primitive_buffer.get(block=False)
 
-                if self.estop_reader.isEstopPlay():
+                if IGNORE_ESTOP or self.estop_reader.isEstopPlay():
+                    # primitive_set.time_sent = Timestamp(epoch_timestamp_seconds=time.time())
                     self.send_primitive_set.send_proto(primitive_set)
+                    # logger.info(primitive_set)
 
             else:
 
@@ -157,6 +164,10 @@ class RobotCommunication(object):
             True,
         )
 
+        self.send_primitive_mcast_sender = PrimitiveSetProtoSender(
+            self.multicast_channel + "%" + self.interface, PRIMITIVE_PORT, True
+        )
+
         self.receive_robot_log = RobotLogProtoListener(
             self.multicast_channel + "%" + self.interface,
             ROBOT_LOGS_PORT,
@@ -192,7 +203,7 @@ class RobotCommunication(object):
             self.multicast_channel + "%" + self.interface, PRIMITIVE_PORT, True
         )
 
-        self.send_world = WorldProtoSender(
+        self.world_mcast_sender = WorldProtoSender(
             self.multicast_channel + "%" + self.interface, VISION_PORT, True
         )
 

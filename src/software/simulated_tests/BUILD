@@ -12,6 +12,7 @@ py_test(
         "exclusive",
     ],
     deps = [
+        "//software/simulated_tests:pytest_main",
         "//software/simulated_tests:simulated_test_fixture",
         "//software/simulated_tests:validation",
         requirement("pytest"),
@@ -62,6 +63,29 @@ py_library(
         "//software:py_constants.so",
     ],
     deps = [
+        ":pytest_main",
+        "//proto:import_all_protos",
+        "//software/logger:py_logger",
+        "//software/networking:threaded_unix_listener_py",
+        "//software/networking:threaded_unix_sender_py",
+        "//software/simulated_tests:tbots_test_runner",
+        "//software/simulated_tests:validation",
+        "//software/thunderscope",
+        "//software/thunderscope:binary_context_managers",
+        "//software/thunderscope/replay:proto_logger",
+    ],
+)
+
+py_library(
+    name = "tbots_test_runner",
+    srcs = [
+        "tbots_test_runner.py",
+    ],
+    data = [
+        "//software:py_constants.so",
+    ],
+    deps = [
+        ":pytest_main",
         "//proto:import_all_protos",
         "//software/logger:py_logger",
         "//software/networking:threaded_unix_listener_py",
@@ -70,6 +94,61 @@ py_library(
         "//software/thunderscope",
         "//software/thunderscope:binary_context_managers",
         "//software/thunderscope/replay:proto_logger",
+    ],
+)
+
+py_library(
+    name = "tbots_test_fixture",
+    srcs = [
+        "tbots_test_fixture.py",
+    ],
+    data = [
+        "//software:py_constants.so",
+    ],
+    deps = [
+        ":pytest_main",
+        "//proto:import_all_protos",
+        "//software/field_tests:field_test_fixture",
+        "//software/logger:py_logger",
+        "//software/networking:threaded_unix_listener_py",
+        "//software/networking:threaded_unix_sender_py",
+        "//software/simulated_tests:simulated_test_fixture",
+        "//software/simulated_tests:validation",
+        "//software/thunderscope",
+        "//software/thunderscope:binary_context_managers",
+        "//software/thunderscope/replay:proto_logger",
+    ],
+)
+
+py_library(
+    name = "pytest_main",
+    srcs = [
+        "pytest_main.py",
+    ],
+    data = [
+        "//software:py_constants.so",
+    ],
+    deps = [
+        "//proto:import_all_protos",
+        "//software/logger:py_logger",
+        "//software/networking:threaded_unix_listener_py",
+        "//software/networking:threaded_unix_sender_py",
+        "//software/simulated_tests:validation",
+        "//software/thunderscope",
+        "//software/thunderscope:binary_context_managers",
+        "//software/thunderscope/replay:proto_logger",
+    ],
+)
+
+py_library(
+    name = "data_logger",
+    srcs = [
+        "data_logger.py",
+    ],
+    data = [
+        "//software:py_constants.so",
+    ],
+    deps = [
     ],
 )
 

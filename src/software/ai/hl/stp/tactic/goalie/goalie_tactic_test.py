@@ -5,13 +5,9 @@ from software.simulated_tests.robot_enters_region import *
 from software.simulated_tests.ball_enters_region import *
 from software.simulated_tests.ball_moves_forward import *
 from software.simulated_tests.friendly_has_ball_possession import *
-from software.simulated_tests.ball_speed_threshold import *
-from software.simulated_tests.robot_speed_threshold import *
 from software.simulated_tests.excessive_dribbling import *
-from software.simulated_tests.simulated_test_fixture import (
-    simulated_test_runner,
-    pytest_main,
-)
+from software.simulated_tests.simulated_test_fixture import simulated_test_runner
+from software.simulated_tests.pytest_main import pytest_main
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
 
@@ -105,8 +101,7 @@ def test_goalie_blocks_shot(
     simulated_test_runner,
 ):
     # Setup Robot
-    simulated_test_runner.simulator_proto_unix_io.send_proto(
-        WorldState,
+    simulated_test_runner.set_worldState(
         create_world_state(
             [],
             blue_robot_locations=[robot_initial_position],
@@ -120,11 +115,11 @@ def test_goalie_blocks_shot(
     #
     # NOTE: The gamecontroller responses are automatically handled by
     # the gamecontroller context manager class
-    simulated_test_runner.gamecontroller.send_ci_input(
-        gc_command=Command.Type.STOP, team=Team.UNKNOWN
+    simulated_test_runner.send_gamecontroller_command(
+        gc_command=Command.Type.STOP, team=proto.ssl_gc_common_pb2.Team.UNKNOWN
     )
-    simulated_test_runner.gamecontroller.send_ci_input(
-        gc_command=Command.Type.FORCE_START, team=Team.BLUE
+    simulated_test_runner.send_gamecontroller_command(
+        gc_command=Command.Type.FORCE_START, team=proto.ssl_gc_common_pb2.Team.BLUE
     )
 
     # Setup Tactic
@@ -132,15 +127,11 @@ def test_goalie_blocks_shot(
     params.assigned_tactics[0].goalie.CopyFrom(
         GoalieTactic(max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT)
     )
-    simulated_test_runner.blue_full_system_proto_unix_io.send_proto(
-        AssignedTacticPlayControlParams, params
-    )
+    simulated_test_runner.set_tactics(params, Team.BLUE)
 
     # Setup no tactics on the enemy side
-    params = AssignedTacticPlayControlParams()
-    simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(
-        AssignedTacticPlayControlParams, params
-    )
+    params = ()
+    simulated_test_runner.set_tactics(params, proto.ssl_gc_common_pb2.Team.YELLOW)
 
     # Always Validation
     always_validation_sequence_set = [

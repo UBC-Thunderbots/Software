@@ -1,8 +1,5 @@
-import threading
 import queue
-import argparse
 import time
-import sys
 import os
 
 import pytest
@@ -27,6 +24,8 @@ from software.thunderscope.binary_context_managers import (
 from software.thunderscope.replay.proto_logger import ProtoLogger
 
 from software.logger.logger import createLogger
+from software.simulated_tests.pytest_main import load_command_line_arguments
+from software.simulated_tests.tbots_test_runner import TbotsTestRunner
 
 logger = createLogger(__name__)
 
@@ -36,8 +35,7 @@ PROCESS_BUFFER_DELAY_S = 0.01
 PAUSE_AFTER_FAIL_DELAY_S = 3
 
 
-class SimulatorTestRunner(object):
-
+class SimulatorTestRunner(TbotsTestRunner):
     """Run a simulated test"""
 
     def __init__(
@@ -60,33 +58,38 @@ class SimulatorTestRunner(object):
 
         """
 
-        self.test_name = test_name
-        self.thunderscope = thunderscope
+        super(SimulatorTestRunner, self).__init__(
+            test_name,
+            thunderscope,
+            blue_full_system_proto_unix_io,
+            yellow_full_system_proto_unix_io,
+            gamecontroller,
+        )
         self.simulator_proto_unix_io = simulator_proto_unix_io
-        self.blue_full_system_proto_unix_io = blue_full_system_proto_unix_io
-        self.yellow_full_system_proto_unix_io = yellow_full_system_proto_unix_io
-        self.gamecontroller = gamecontroller
-        self.last_exception = None
 
-        self.world_buffer = ThreadSafeBuffer(buffer_size=1, protobuf_type=World)
-        self.last_exception = None
+    def set_tactics(
+        self,
+        tactics: AssignedTacticPlayControlParams,
+        team: proto.ssl_gc_common_pb2.Team,
+    ):
+        if team == proto.ssl_gc_common_pb2.Team.BLUE:
+            self.blue_full_system_proto_unix_io.send_proto(
+                AssignedTacticPlayControlParams, tactics
+            )
+        else:
+            self.yellow_full_system_proto_unix_io.send_proto(
+                AssignedTacticPlayControlParams, tactics
+            )
 
-        self.ssl_wrapper_buffer = ThreadSafeBuffer(
-            buffer_size=1, protobuf_type=SSL_WrapperPacket
-        )
-        self.robot_status_buffer = ThreadSafeBuffer(
-            buffer_size=1, protobuf_type=RobotStatus
-        )
+    def set_play(self, play: Play, team: proto.ssl_gc_common_pb2.Team):
+        if team == proto.ssl_gc_common_pb2.Team.BLUE:
+            self.blue_full_system_proto_unix_io.send_proto(Play, play)
 
-        self.blue_full_system_proto_unix_io.register_observer(
-            SSL_WrapperPacket, self.ssl_wrapper_buffer
-        )
-        self.blue_full_system_proto_unix_io.register_observer(
-            RobotStatus, self.robot_status_buffer
-        )
+        else:
+            self.yellow_full_system_proto_unix_io.send_proto(Play, play)
 
-        self.timestamp = 0
-        self.timestamp_mutex = threading.Lock()
+    def set_worldState(self, worldstate: WorldState):
+        self.simulator_proto_unix_io.send_proto(WorldState, worldstate)
 
     def time_provider(self):
         """Provide the current time in seconds since the epoch"""
@@ -98,6 +101,7 @@ class SimulatorTestRunner(object):
         self,
         always_validation_sequence_set=[[]],
         eventually_validation_sequence_set=[[]],
+        data_loggers=[],
         test_timeout_s=3,
         tick_duration_s=0.0166,  # Default to 60hz
     ):
@@ -112,18 +116,6 @@ class SimulatorTestRunner(object):
         :param tick_duration_s: The simulation step duration
 
         """
-
-        def __stopper(delay=PROCESS_BUFFER_DELAY_S):
-            """Stop running the test
-
-            :param delay: How long to wait before closing everything, defaults
-                          to PROCESS_BUFFER_DELAY_S to minimize buffer warnings
-
-            """
-            time.sleep(delay)
-
-            if self.thunderscope:
-                self.thunderscope.close()
 
         def __runner():
             """Step simulation, full_system and run validation
@@ -178,8 +170,11 @@ class SimulatorTestRunner(object):
                     always_validation_sequence_set,
                 )
 
-                if self.thunderscope:
+                # log data
+                for logger_obj in data_loggers:
+                    logger_obj.log_data(world, time_elapsed_s)
 
+                if self.thunderscope:
                     # Set the test name
                     eventually_validation_proto_set.test_name = self.test_name
                     always_validation_proto_set.test_name = self.test_name
@@ -198,129 +193,12 @@ class SimulatorTestRunner(object):
             # Check that all eventually validations are eventually valid
             validation.check_validation(eventually_validation_proto_set)
 
-            __stopper()
+            self._stop_tscope()
 
-        def excepthook(args):
-            """This function is _critical_ for show_thunderscope to work.
-            If the test Thread will raises an exception we won't be able to close
-            the window from the main thread.
-
-            :param args: The args passed in from the hook
-
-            """
-
-            __stopper(delay=PAUSE_AFTER_FAIL_DELAY_S)
-            self.last_exception = args.exc_value
-            raise self.last_exception
-
-        threading.excepthook = excepthook
-
-        # If thunderscope is enabled, run the test in a thread and show
-        # thunderscope on this thread. The excepthook is setup to catch
-        # any test failures and propagate them to the main thread
-        if self.thunderscope:
-
-            run_sim_thread = threading.Thread(target=__runner, daemon=True)
-            run_sim_thread.start()
-            self.thunderscope.show()
-            run_sim_thread.join()
-
-            if self.last_exception:
-                pytest.fail(str(self.last_exception))
-
-        # If thunderscope is disabled, just run the test
-        else:
-            __runner()
+        self._run_with_tscope(__runner)
 
 
-def load_command_line_arguments():
-    """Load from command line arguments using argpase
-
-    NOTE: Pytest has its own built in argument parser (conftest.py, pytest_addoption)
-    but it doesn't seem to play nicely with bazel. We just use argparse instead.
-
-    """
-    parser = argparse.ArgumentParser(description="Run simulated pytests")
-    parser.add_argument(
-        "--enable_thunderscope", action="store_true", help="enable thunderscope"
-    )
-    parser.add_argument(
-        "--simulator_runtime_dir",
-        type=str,
-        help="simulator runtime directory",
-        default="/tmp/tbots",
-    )
-    parser.add_argument(
-        "--blue_full_system_runtime_dir",
-        type=str,
-        help="blue full_system runtime directory",
-        default="/tmp/tbots/blue",
-    )
-    parser.add_argument(
-        "--yellow_full_system_runtime_dir",
-        type=str,
-        help="yellow full_system runtime directory",
-        default="/tmp/tbots/yellow",
-    )
-    parser.add_argument(
-        "--layout",
-        action="store",
-        help="Which layout to run, if not specified the last layout will run",
-    )
-    parser.add_argument(
-        "--debug_blue_full_system",
-        action="store_true",
-        default=False,
-        help="Debug blue full_system",
-    )
-    parser.add_argument(
-        "--debug_yellow_full_system",
-        action="store_true",
-        default=False,
-        help="Debug yellow full_system",
-    )
-    parser.add_argument(
-        "--debug_simulator",
-        action="store_true",
-        default=False,
-        help="Debug the simulator",
-    )
-    parser.add_argument(
-        "--visualization_buffer_size",
-        action="store",
-        type=int,
-        default=5,
-        help="How many packets to buffer while rendering",
-    )
-    parser.add_argument(
-        "--show_gamecontroller_logs",
-        action="store_true",
-        default=False,
-        help="How many packets to buffer while rendering",
-    )
-    parser.add_argument(
-        "--test_filter",
-        action="store",
-        default="",
-        help="The test filter, if not specified all tests will run. "
-        + "See https://docs.pytest.org/en/latest/how-to/usage.html#specifying-tests-selecting-tests",
-    )
-    return parser.parse_args()
-
-
-def pytest_main(file):
-    """Runs the pytest file
-
-    :param file: The test file to run
-
-    """
-    args = load_command_line_arguments()
-    # Run the test, -s disables all capturing at -vv increases verbosity
-    sys.exit(pytest.main(["-svv", "-k", args.test_filter, file]))
-
-
-@pytest.fixture
-def simulated_test_runner():
+def simulated_test_initializer():
     args = load_command_line_arguments()
     tscope = None
 
@@ -417,3 +295,17 @@ def simulated_test_runner():
                 print(
                     f"\n\n To replay this test for the yellow team, go to the `src` folder and run \n./tbots.py run thunderscope --yellow_log {yellow_logger.log_folder}"
                 )
+
+
+@pytest.fixture
+def simulated_test_runner():
+
+    initializer = simulated_test_initializer()
+
+    yield next(initializer)
+
+    # teardown
+    try:
+        next(initializer)
+    except StopIteration:
+        pass

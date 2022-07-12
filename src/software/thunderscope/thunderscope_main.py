@@ -124,6 +124,22 @@ if __name__ == "__main__":
         help="How many packets to buffer while rendering",
     )
 
+    parser.add_argument(
+        "--estop_path",
+        action="store",
+        type=str,
+        default="/dev/ttyACM0",
+        help="Path to the Estop",
+    )
+
+    parser.add_argument(
+        "--estop_baudrate",
+        action="store",
+        type=int,
+        default=115200,
+        help="Estop Baudrate",
+    )
+
     # Sanity check that an interface was provided
     args = parser.parse_args()
 
