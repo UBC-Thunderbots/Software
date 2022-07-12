@@ -45,7 +45,8 @@ void Chicker::autochip(uint32_t chip_pulse_width)
 
 void IRAM_ATTR Chicker::oneShotPulse(int duration, int pin)
 {
-    if (!on_cooldown) {
+    if (!on_cooldown)
+    {
         on_cooldown = true;
 
         timerWrite(pulse_timer, 0);

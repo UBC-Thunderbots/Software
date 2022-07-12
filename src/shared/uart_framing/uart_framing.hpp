@@ -224,10 +224,11 @@ bool inline unmarshalUartPacket(const std::vector<uint8_t>& data,
     return verifyLengthAndCrc(frame);
 }
 /**
- * Finds the expected size of a TbotsProto_PowerStatus/TbotsProto_PowerPulseControl msg once
- * its encoded with cobs
+ * Finds the expected size of a TbotsProto_PowerStatus/TbotsProto_PowerPulseControl msg
+ * once its encoded with cobs
  *
- * @tparam T type of power_msg should be TbotsProto_PowerStatus or TbotsProto_PowerPulseControl
+ * @tparam T type of power_msg should be TbotsProto_PowerStatus or
+ * TbotsProto_PowerPulseControl
  * @param power_msg nanopb msg to get the marshalled size of
  * @return the expected marshalled size of the given message
  */

@@ -1,7 +1,7 @@
 #pragma once
 
-#include <pins.h>
 #include <Arduino.h>
+#include <pins.h>
 
 /**
  * Represents the chicker on the power board

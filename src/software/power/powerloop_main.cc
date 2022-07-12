@@ -37,28 +37,44 @@ std::shared_ptr<PowerMonitor> monitor;
 std::shared_ptr<Geneva> geneva;
 std::shared_ptr<ControlExecutor> executor;
 
+uint32_t timeout;
+
 void setup()
 {
     Serial.begin(460800, SERIAL_8N1);
-    read_buffer_size =
-        getMarshalledSize(TbotsProto_PowerPulseControl TbotsProto_PowerPulseControl_init_default);
+    read_buffer_size = getMarshalledSize(
+        TbotsProto_PowerPulseControl TbotsProto_PowerPulseControl_init_default);
     sequence_num = 0;
-    charger  = std::make_shared<Charger>();
-    chicker  = std::make_shared<Chicker>();
-    monitor  = std::make_shared<PowerMonitor>();
-    geneva   = std::make_shared<Geneva>();
-    executor = std::make_shared<ControlExecutor>(charger, chicker, geneva);
+    charger      = std::make_shared<Charger>();
+    chicker      = std::make_shared<Chicker>();
+    monitor      = std::make_shared<PowerMonitor>();
+    geneva       = std::make_shared<Geneva>();
+    executor     = std::make_shared<ControlExecutor>(charger, chicker, geneva);
     charger->chargeCapacitors();
+
+    pinMode(23, OUTPUT);
 }
 
 
 void loop()
 {
+    if (Serial.available() > 0)
+    {
+        digitalWrite(23, HIGH);
+        timeout = 0;
+    }
+
+    if (timeout++ > 100)
+    {
+        digitalWrite(23, LOW);
+    }
+
     // Read in bytes from Serial and put them into a buffer to read
     while (Serial.available() > 0 && buffer.size() < read_buffer_size)
     {
         incomingByte = Serial.read();
         buffer.emplace_back(static_cast<uint8_t>(incomingByte));
+        digitalWrite(23, HIGH);
     }
     // Once there is enough data attempt to decode
     if (buffer.size() == read_buffer_size)
@@ -74,8 +90,9 @@ void loop()
     }
     // Read sensor values. These are all instantaneous
     auto status = createNanoPbPowerStatus(
-        monitor->getBatteryVoltage(), charger->getCapacitorVoltage(), monitor->getCurrentDrawAmp(),
-        geneva->getCurrentSlot(), sequence_num++, chicker->getBreakBeamTripped());
+        monitor->getBatteryVoltage(), charger->getCapacitorVoltage(),
+        monitor->getCurrentDrawAmp(), geneva->getCurrentSlot(), sequence_num++,
+        chicker->getBreakBeamTripped());
     auto status_frame = createUartFrame(status);
     auto packet       = marshallUartPacket(status_frame);
     for (auto byte : packet)

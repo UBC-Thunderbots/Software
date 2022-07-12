@@ -2,19 +2,19 @@
 
 #include <pb_decode.h>
 #include <pb_encode.h>
+#include <proto/power_frame_msg.nanopb.h>
 
 #include <cstdint>
 #include <memory>
 #include <unordered_map>
 #include <vector>
-#include <proto/power_frame_msg.nanopb.h>
 
 #ifdef PLATFORMIO_BUILD
 #include <proto/power_frame_msg.nanopb.h>
 #else  // PLATFORMIO_BUILD
 #include "proto/power_frame_msg.pb.h"
-#include "proto/primitive/primitive_types.h"
 #include "proto/primitive.pb.h"
+#include "proto/primitive/primitive_types.h"
 
 extern "C"
 {
@@ -26,7 +26,7 @@ extern "C"
 // TODO(#2592): Remove with upgrade to nanopb
 #undef TbotsProto_PowerFrame_size
 #define TbotsProto_PowerFrame_size                                                       \
-    std::max(TbotsProto_PowerPulseControl_size, TbotsProto_PowerStatus_size) +                \
+    std::max(TbotsProto_PowerPulseControl_size, TbotsProto_PowerStatus_size) +           \
         2 * sizeof(uint32_t) + sizeof(uint16_t)
 
 
@@ -97,20 +97,16 @@ void inline setPowerMsg(TbotsProto_PowerFrame& frame,
  *
  * @return a nanopb power status msg with provided fields
  */
-TbotsProto_PowerStatus inline createNanoPbPowerStatus(float battery_voltage,
-                                                      float capacitor_voltage,
-                                                      float current_draw,
-                                                      TbotsProto_Geneva_Slot geneva_slot,
-                                                      uint32_t sequence_num,
-                                                      bool breakbeam_tripped)
+TbotsProto_PowerStatus inline createNanoPbPowerStatus(
+    float battery_voltage, float capacitor_voltage, float current_draw,
+    TbotsProto_Geneva_Slot geneva_slot, uint32_t sequence_num, bool breakbeam_tripped)
 {
-    TbotsProto_PowerStatus status = {.battery_voltage    = battery_voltage,
-                                     .capacitor_voltage  = capacitor_voltage,
-                                     .current_draw       = current_draw,
-                                     .geneva_slot        = geneva_slot,
-                                     .sequence_num       = sequence_num,
-                                     .breakbeam_tripped = breakbeam_tripped
-                    };
+    TbotsProto_PowerStatus status = {.battery_voltage   = battery_voltage,
+                                     .capacitor_voltage = capacitor_voltage,
+                                     .current_draw      = current_draw,
+                                     .geneva_slot       = geneva_slot,
+                                     .sequence_num      = sequence_num,
+                                     .breakbeam_tripped = breakbeam_tripped};
     return status;
 }
 
@@ -126,29 +122,47 @@ TbotsProto_PowerStatus inline createNanoPbPowerStatus(float battery_voltage,
 TbotsProto_PowerPulseControl inline createNanoPbPowerPulseControl(
     const TbotsProto::PowerControl& google_control)
 {
-    TbotsProto_PowerPulseControl nanopb_control = TbotsProto_PowerPulseControl_init_default;
-    switch(google_control.chicker().chicker_command_case()) {
+    TbotsProto_PowerPulseControl nanopb_control =
+        TbotsProto_PowerPulseControl_init_default;
+    switch (google_control.chicker().chicker_command_case())
+    {
         case TbotsProto::PowerControl::ChickerControl::kKickSpeedMPerS:
-            //TODO: convert with redis
-            nanopb_control.chicker.which_chicker_command = TbotsProto_PowerPulseControl_ChickerControl_kick_pulse_width_tag;
-            nanopb_control.chicker.chicker_command.kick_pulse_width = static_cast<uint32_t>(google_control.chicker().kick_speed_m_per_s());
+            // TODO: convert with redis
+            nanopb_control.chicker.which_chicker_command =
+                TbotsProto_PowerPulseControl_ChickerControl_kick_pulse_width_tag;
+            nanopb_control.chicker.chicker_command.kick_pulse_width =
+                static_cast<uint32_t>(google_control.chicker().kick_speed_m_per_s());
             break;
         case TbotsProto::PowerControl::ChickerControl::kChipDistanceMeters:
-            nanopb_control.chicker.which_chicker_command = TbotsProto_PowerPulseControl_ChickerControl_chip_pulse_width_tag;
-            nanopb_control.chicker.chicker_command.chip_pulse_width = static_cast<uint32_t>(google_control.chicker().chip_distance_meters());
+            nanopb_control.chicker.which_chicker_command =
+                TbotsProto_PowerPulseControl_ChickerControl_chip_pulse_width_tag;
+            nanopb_control.chicker.chicker_command.chip_pulse_width =
+                static_cast<uint32_t>(google_control.chicker().chip_distance_meters());
             break;
         case TbotsProto::PowerControl::ChickerControl::kAutoChipOrKick:
-            nanopb_control.chicker.which_chicker_command = TbotsProto_PowerPulseControl_ChickerControl_auto_chip_or_kick_tag;
-            switch (google_control.chicker().auto_chip_or_kick().auto_chip_or_kick_case()) {
+            nanopb_control.chicker.which_chicker_command =
+                TbotsProto_PowerPulseControl_ChickerControl_auto_chip_or_kick_tag;
+            switch (google_control.chicker().auto_chip_or_kick().auto_chip_or_kick_case())
+            {
                 case TbotsProto::AutoChipOrKick::kAutokickSpeedMPerS:
-                    nanopb_control.chicker.chicker_command.auto_chip_or_kick.which_auto_chip_or_kick = TbotsProto_PowerPulseControl_AutoChipOrKick_autokick_pulse_width_tag;
-                    nanopb_control.chicker.chicker_command.auto_chip_or_kick.auto_chip_or_kick.autokick_pulse_width =
-                            static_cast<uint32_t>(google_control.chicker().auto_chip_or_kick().autokick_speed_m_per_s());
+                    nanopb_control.chicker.chicker_command.auto_chip_or_kick
+                        .which_auto_chip_or_kick =
+                        TbotsProto_PowerPulseControl_AutoChipOrKick_autokick_pulse_width_tag;
+                    nanopb_control.chicker.chicker_command.auto_chip_or_kick
+                        .auto_chip_or_kick.autokick_pulse_width =
+                        static_cast<uint32_t>(google_control.chicker()
+                                                  .auto_chip_or_kick()
+                                                  .autokick_speed_m_per_s());
                     break;
                 case TbotsProto::AutoChipOrKick::kAutochipDistanceMeters:
-                    nanopb_control.chicker.chicker_command.auto_chip_or_kick.which_auto_chip_or_kick = TbotsProto_PowerPulseControl_AutoChipOrKick_autochip_pulse_width_tag;
-                    nanopb_control.chicker.chicker_command.auto_chip_or_kick.auto_chip_or_kick.autochip_pulse_width =
-                            static_cast<uint32_t>(google_control.chicker().auto_chip_or_kick().autochip_distance_meters());
+                    nanopb_control.chicker.chicker_command.auto_chip_or_kick
+                        .which_auto_chip_or_kick =
+                        TbotsProto_PowerPulseControl_AutoChipOrKick_autochip_pulse_width_tag;
+                    nanopb_control.chicker.chicker_command.auto_chip_or_kick
+                        .auto_chip_or_kick.autochip_pulse_width =
+                        static_cast<uint32_t>(google_control.chicker()
+                                                  .auto_chip_or_kick()
+                                                  .autochip_distance_meters());
                     break;
                 default:
                     break;
@@ -157,7 +171,8 @@ TbotsProto_PowerPulseControl inline createNanoPbPowerPulseControl(
         default:
             break;
     }
-    switch (google_control.geneva_slot()) {
+    switch (google_control.geneva_slot())
+    {
         case TbotsProto::Geneva::LEFT:
             nanopb_control.geneva_slot = TbotsProto_Geneva_Slot_LEFT;
             break;

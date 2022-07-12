@@ -24,10 +24,12 @@ void ControlExecutor::execute(const TbotsProto_PowerPulseControl& control)
                 control.chicker.chicker_command.auto_chip_or_kick.which_auto_chip_or_kick)
             {
                 case TbotsProto_PowerPulseControl_AutoChipOrKick_autokick_pulse_width_tag:
-                    chicker->autokick(control.chicker.chicker_command.auto_chip_or_kick.auto_chip_or_kick.autokick_pulse_width);
+                    chicker->autokick(control.chicker.chicker_command.auto_chip_or_kick
+                                          .auto_chip_or_kick.autokick_pulse_width);
                     break;
                 case TbotsProto_PowerPulseControl_AutoChipOrKick_autochip_pulse_width_tag:
-                    chicker->autochip(control.chicker.chicker_command.auto_chip_or_kick.auto_chip_or_kick.autochip_pulse_width);
+                    chicker->autochip(control.chicker.chicker_command.auto_chip_or_kick
+                                          .auto_chip_or_kick.autochip_pulse_width);
                     break;
                 default:
                     break;

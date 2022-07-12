@@ -32,11 +32,12 @@ class PowerService
      */
     TbotsProto::PowerStatus poll(const TbotsProto::PowerControl& control);
 
-   private:
     /**
      * Handler method called every time the timer expires a new read is requested
      */
     void tick();
+
+   private:
     /**
      * Initiates timer for serial reading
      */

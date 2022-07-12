@@ -36,8 +36,10 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, const int loop
 
     LoggerSingleton::initializeLogger("/tmp/tbots");
 
-    motor_service_ = std::make_unique<MotorService>(robot_constants, loop_hz);
     power_service_ = std::make_unique<PowerService>();
+    power_service_->tick();
+    motor_service_ = std::make_unique<MotorService>(robot_constants, loop_hz);
+    power_service_->tick();
 }
 
 Thunderloop::~Thunderloop() {}

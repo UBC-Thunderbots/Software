@@ -94,16 +94,17 @@ class UartFramingTest : public ::testing::Test
    protected:
     void SetUp() override
     {
-        test_message = createNanoPbPowerPulseControl(ChickerCommandMode::AUTOCHIPORKICK, 1,
-                                                     2, AutoChipOrKickMode::AUTOCHIP, 3,
-                                                     4, TbotsProto_Geneva_Slot_LEFT);
+        test_message = createNanoPbPowerPulseControl(ChickerCommandMode::AUTOCHIPORKICK,
+                                                     1, 2, AutoChipOrKickMode::AUTOCHIP,
+                                                     3, 4, TbotsProto_Geneva_Slot_LEFT);
     }
 
     TbotsProto_PowerPulseControl test_message;
     const uint16_t TEST_MESSAGE_CRC = 14297;  // From online calculator
 };
 
-bool operator==(const TbotsProto_PowerPulseControl& lhs, const TbotsProto_PowerPulseControl& rhs)
+bool operator==(const TbotsProto_PowerPulseControl& lhs,
+                const TbotsProto_PowerPulseControl& rhs)
 {
     return serializeToVector(lhs) == serializeToVector(rhs);
 }
