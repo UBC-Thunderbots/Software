@@ -1,4 +1,4 @@
-f/>>rom pyqtgraph.Qt.QtCore import Qt
+from pyqtgraph.Qt.QtCore import Qt
 from pyqtgraph.Qt.QtWidgets import *
 import time
 
