@@ -9,7 +9,7 @@ NetworkSink::NetworkSink(unsigned int channel, const std::string& interface, int
     log_output.reset(new ThreadedProtoUdpSender<TbotsProto::RobotLog>(
         std::string(ROBOT_MULTICAST_CHANNELS.at(channel)) + "%" + interface,
         ROBOT_LOGS_PORT, true));
-    serialized_proto_log_output.reset(new ThreadedProtoUdpSender<std::pair<std::string, std::string>>(
+    serialized_proto_log_output.reset(new ThreadedProtoUdpSender<TbotsProto::SerializedProto>(
                             std::string(ROBOT_MULTICAST_CHANNELS.at(channel)) + "%" + interface,
                             ROBOT_LOGS_PORT, true));
 }
@@ -20,7 +20,7 @@ void NetworkSink::sendToNetwork(g3::LogMessageMover log_entry)
   
    if (level.value == VISUALIZE.value)
    {
-       auto log_msg_proto = std::make_unique<std::string>();
+       auto log_msg_proto = std::make_unique<TbotsProto::SerializedProto>();
        std::string msg       = log_entry.get().message();
        size_t file_name_pos  = msg.find(TYPE_DELIMITER);
        std::string file_name = msg.substr(0, file_name_pos);
@@ -31,7 +31,11 @@ void NetworkSink::sendToNetwork(g3::LogMessageMover log_entry)
                       proto_type_name_pos - TYPE_DELIMITER.length());
        std::string serialized_proto =
            msg.substr(proto_type_name_pos + TYPE_DELIMITER.length());
-        log_output->sendString(std::make_pair<proto_type_name, serialized_proto);
+
+       log_msg_proto->set_proto_type(proto_type_name);
+       log_msg_proto->set_serialized_proto(serialized_proto);
+
+       serialized_proto_log_output->sendProto(*log_msg_proto);
    }
    else
    {
