@@ -59,48 +59,25 @@ HRVOSimulator::HRVOSimulator(float time_step, const RobotConstants_t &robot_cons
 
 void HRVOSimulator::updateWorld(const World &world)
 {
+    agents.clear();
     this->world               = world;
     const auto &friendly_team = world.friendlyTeam().getAllRobots();
     const auto &enemy_team    = world.enemyTeam().getAllRobots();
 
-    updateRemovedAgents(world);
-
     // update agents
     for (const Robot &friendly_robot : friendly_team)
     {
-        auto hrvo_agent = getFriendlyAgentFromRobotId(friendly_robot.id());
-        if (hrvo_agent.has_value())
-        {
-            hrvo_agent.value()->setPosition(friendly_robot.position().toVector());
-            // We do not use velocity feedback for friendly robots as it results
-            // in the robots not being able to accelerate properly.
-        }
-        else
-        {
-            addHRVORobotAgent(friendly_robot, TeamSide::FRIENDLY);
-        }
+        addHRVORobotAgent(friendly_robot, TeamSide::FRIENDLY);
     }
 
     for (const Robot &enemy_robot : enemy_team)
     {
-        auto agent_iter = std::find_if(
-            agents.begin(), agents.end(), [&enemy_robot](std::shared_ptr<Agent> agent) {
-                return (agent->getRobotId() == enemy_robot.id() &&
-                        agent->getAgentType() == TeamSide::ENEMY);
-            });
-
-        if (agent_iter != agents.end())
-        {
-            (*agent_iter)->setPosition(enemy_robot.position().toVector());
-            (*agent_iter)->setVelocity(enemy_robot.velocity());
-        }
-        else
-        {
-            Vector destination =
+        Vector destination =
                 (enemy_robot.position() + enemy_robot.velocity() * 5).toVector();
-            addLinearVelocityRobotAgent(enemy_robot, destination, TeamSide::ENEMY);
-        }
+        addLinearVelocityRobotAgent(enemy_robot, destination, TeamSide::ENEMY);
     }
+
+    updatePrimitiveSet(primitive_set);
 }
 
 void HRVOSimulator::updatePrimitiveSet(const TbotsProto::PrimitiveSet &new_primitive_set)
@@ -382,33 +359,4 @@ const std::unique_ptr<KdTree> &HRVOSimulator::getKdTree() const
 const std::vector<std::shared_ptr<Agent>> &HRVOSimulator::getAgents() const
 {
     return agents;
-}
-
-void HRVOSimulator::updateRemovedAgents(const World &world)
-{
-    auto agents_to_remove = std::remove_if(
-        agents.begin(), agents.end(), [&world](std::shared_ptr<Agent> agent) {
-            std::unique_ptr<const std::vector<Robot>> team_to_use;
-            switch (agent->getAgentType())
-            {
-                case TeamSide::FRIENDLY:
-                    team_to_use = std::make_unique<const std::vector<Robot>>(
-                        world.friendlyTeam().getAllRobots());
-                    break;
-                case TeamSide::ENEMY:
-                    team_to_use = std::make_unique<const std::vector<Robot>>(
-                        world.enemyTeam().getAllRobots());
-                    break;
-                default:
-                    team_to_use =
-                        std::make_unique<const std::vector<Robot>>(std::vector<Robot>());
-            }
-
-            auto team_iter = std::find_if((*team_to_use).begin(), (*team_to_use).end(),
-                                          [&agent](const Robot &robot) {
-                                              return (robot.id() == agent->getRobotId());
-                                          });
-            return team_iter == (*team_to_use).end();
-        });
-    agents.erase(agents_to_remove, agents.end());
 }

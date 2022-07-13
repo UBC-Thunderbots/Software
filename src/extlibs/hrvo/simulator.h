@@ -277,8 +277,6 @@ class HRVOSimulator
         return reached_goals;
     }
 
-    void updateRemovedAgents(const World &world);
-
    private:
     // PrimitiveSet which includes the path which each friendly robot should take
     TbotsProto::PrimitiveSet primitive_set;
