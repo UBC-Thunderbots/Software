@@ -106,7 +106,7 @@ TbotsProto::PlayInfo AI::getPlayInfo() const
 
     if (static_cast<bool>(override_play))
     {
-        play_state                 = current_play->getState();
+        play_state                 = override_play->getState();
         tactic_robot_id_assignment = override_play->getTacticRobotIdAssignment();
     }
 

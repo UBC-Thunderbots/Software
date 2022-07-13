@@ -100,6 +100,15 @@ void ShootOrPassPlayFSM::startLookingForPass(const Update& event)
     lookForPass(event);
 }
 
+void ShootOrPassPlayFSM::freeKickStartLookingForPass(const Update& event)
+{
+    attacker_tactic = std::make_shared<AttackerTactic>(ai_config);
+    attacker_tactic->updateShouldSingleTouch(true);
+    receiver_tactic              = std::make_shared<ReceiverTactic>();
+    pass_optimization_start_time = event.common.world.getMostRecentTimestamp();
+    lookForPass(event);
+}
+
 void ShootOrPassPlayFSM::takePass(const Update& event)
 {
     auto pass_eval = pass_generator.generatePassEvaluation(event.common.world);
@@ -216,4 +225,25 @@ bool ShootOrPassPlayFSM::tookShot(const Update& event)
         (ball_velocity_orientation > ball_to_bot_post_angle);
 
     return ball_oriented_towards_goal && (ball_velocity > ball_shot_threshold);
+}
+
+bool ShootOrPassPlayFSM::shouldFreeKick(const Update& event)
+{
+    return event.control_params.should_one_touch;
+}
+
+bool ShootOrPassPlayFSM::hasPassInProgress(const Update& event)
+{
+    return event.common.inter_play_communication.last_committed_pass.has_value();
+}
+
+void ShootOrPassPlayFSM::maintainPassInProgress(const Update& event)
+{
+    best_pass_and_score_so_far =
+        event.common.inter_play_communication.last_committed_pass.value();
+
+    // reset interplay communication
+    event.common.set_inter_play_communication_fun(
+        InterPlayCommunication{.last_committed_pass = std::nullopt});
+    takePass(event);
 }
