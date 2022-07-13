@@ -105,6 +105,11 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
 
     int ret = 0;
 
+    prev_wheel_velocities[0] = 0.0;
+    prev_wheel_velocities[1] = 0.0;
+    prev_wheel_velocities[2] = 0.0;
+    prev_wheel_velocities[3] = 0.0;
+
     /**
      * Opens SPI File Descriptor
      *

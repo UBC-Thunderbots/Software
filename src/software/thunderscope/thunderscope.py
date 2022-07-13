@@ -117,7 +117,7 @@ class Thunderscope(object):
         self.app = pyqtgraph.mkQApp("Thunderscope")
 
         # Setup stylesheet
-        # apply_stylesheet(self.app, theme="dark_amber.xml")
+        apply_stylesheet(self.app, theme="dark_amber.xml")
 
         self.blue_replay_log = blue_replay_log
         self.yellow_replay_log = yellow_replay_log
