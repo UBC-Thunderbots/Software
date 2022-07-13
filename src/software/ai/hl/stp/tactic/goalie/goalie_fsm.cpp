@@ -224,7 +224,8 @@ void GoalieFSM::updatePivotKick(
         Point(goalie_pos.x() + MAX_CHIP_DISTANCE, -clear_area_width / 2);
     auto clear_area = std::make_optional<Rectangle>(clear_corner_1, clear_corner_2);
 
-    vector<Circle> chip_targets = findGoodChipTargets(event.common.world, clear_area);
+    std::vector<Circle> chip_targets =
+        findGoodChipTargets(event.common.world, clear_area);
 
     Point clear_target;
 

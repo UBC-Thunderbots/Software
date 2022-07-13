@@ -164,6 +164,19 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "find_open_areas_test",
+    srcs = [
+        "find_open_areas_test.cpp",
+    ],
+    deps = [
+        ":find_open_areas",
+        ":shot",
+        "//shared/test_util:tbots_gtest_main",
+        "//software/test_util",
+    ],
+)
+
 cc_library(
     name = "intercept",
     srcs = ["intercept.cpp"],
