@@ -135,6 +135,7 @@ message MovePrimitive
     float robot_max_ang_speed_rad_per_s = 9;
     float robot_max_acceleration_m_per_s_2 = 10;
     float robot_max_ang_acceleration_rad_per_s_2 = 11;
+    float hrvo_start_deceleration_dist = 12;
 }
 
 message StopPrimitive

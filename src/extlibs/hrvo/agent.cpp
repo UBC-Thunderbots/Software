@@ -37,7 +37,7 @@ void Agent::update()
     if (curr_path_point.has_value() && path.isGoingToFinalPathPoint())
     {
         double dist_to_destination = (curr_path_point.value().getPosition() - position_).length();
-        if (dist_to_destination < 0.4)
+        if (dist_to_destination < start_decel_dist)
         {
             velocity_ = new_velocity_.normalize(dist_to_destination);
             return;

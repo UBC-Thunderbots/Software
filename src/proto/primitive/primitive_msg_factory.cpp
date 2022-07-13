@@ -29,6 +29,7 @@ std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
     move_primitive_msg->mutable_move()->set_robot_max_ang_speed_rad_per_s(robot_constants.robot_max_ang_speed_rad_per_s);
     move_primitive_msg->mutable_move()->set_robot_max_acceleration_m_per_s_2(robot_constants.robot_max_acceleration_m_per_s_2);
     move_primitive_msg->mutable_move()->set_robot_max_ang_acceleration_rad_per_s_2(robot_constants.robot_max_ang_speed_rad_per_s);
+    move_primitive_msg->mutable_move()->set_hrvo_start_deceleration_dist(0.4);
 
     *(move_primitive_msg->mutable_move()->mutable_final_angle()) =
         *createAngleProto(final_angle);
