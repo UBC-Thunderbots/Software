@@ -73,6 +73,8 @@ enum MaxAllowedSpeedMode
     COLLISIONS_ALLOWED = 2;
     // Move at speed at which we can grab the ball
     DRIBBLE_GET_POSSESSION = 3;
+    // Move at speed at which we can safely dribble the ball
+    DRIBBLE_DRIBBLING = 4;
 }
 
 message AutoChipOrKick
