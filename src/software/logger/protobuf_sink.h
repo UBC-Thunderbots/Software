@@ -6,9 +6,8 @@
 #include "google/protobuf/any.pb.h"
 #include "software/logger/custom_logging_levels.h"
 #include "software/networking/threaded_unix_sender.h"
-
-static const std::string TYPE_DELIMITER = "!!!";
-
+#include "software/logger/constants.h"
+#include "proto/serialized_proto.pb.h"
 
 using UnixSenderMap =
     std::unordered_map<std::string, std::unique_ptr<ThreadedUnixSender>>;
