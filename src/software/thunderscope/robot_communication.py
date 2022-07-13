@@ -10,7 +10,7 @@ from software.logger.logger import createLogger
 logger = createLogger(__name__)
 
 # todo remove
-IGNORE_ESTOP = True
+IGNORE_ESTOP = False
 
 
 class RobotCommunication(object):
@@ -102,6 +102,7 @@ class RobotCommunication(object):
 
                 if IGNORE_ESTOP or self.estop_reader.isEstopPlay():
                     # primitive_set.time_sent = Timestamp(epoch_timestamp_seconds=time.time())
+                    print(primitive_set)
                     self.send_primitive_set.send_proto(primitive_set)
                     # logger.info(primitive_set)
 
@@ -158,6 +159,9 @@ class RobotCommunication(object):
 
         """
         # Create the multicast listeners
+        print("channel", (self.multicast_channel))
+        print(self.interface)
+        print(ROBOT_STATUS_PORT)
         self.receive_robot_status = RobotStatusProtoListener(
             self.multicast_channel + "%" + self.interface,
             ROBOT_STATUS_PORT,

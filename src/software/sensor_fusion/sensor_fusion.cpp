@@ -37,7 +37,7 @@ std::optional<World> SensorFusion::getWorld() const
         }
 
         const auto &friendly_robots = new_world.friendlyTeam().getAllRobots();
-        unsigned int robot_id = 1;
+        unsigned int robot_id = 7;
         const auto robot_proto_it =
                 std::find_if(friendly_robots.begin(), friendly_robots.end(),
                              [&](const auto& robot) { return robot.id() == robot_id; });
@@ -203,9 +203,9 @@ void SensorFusion::updateWorld(
 
 void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection_frame)
 {
-    double min_valid_x              = sensor_fusion_config.min_valid_x();
-    double max_valid_x              = sensor_fusion_config.max_valid_x();
-    bool ignore_invalid_camera_data = sensor_fusion_config.ignore_invalid_camera_data();
+    double min_valid_x              = -10;
+    double max_valid_x              = 0;
+    bool ignore_invalid_camera_data = true;
     bool friendly_team_is_yellow    = sensor_fusion_config.friendly_color_yellow();
 
     std::optional<Ball> new_ball;

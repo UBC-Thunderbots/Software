@@ -24,7 +24,6 @@ from software.thunderscope.binary_context_managers import (
 from software.thunderscope.replay.proto_logger import ProtoLogger
 from proto.message_translation.tbots_protobuf import (
     create_world_state,
-    parse_world_state,
 )
 
 from software.logger.logger import createLogger
@@ -412,17 +411,10 @@ def field_test_initializer():
 
     test_name = current_test.split("-")[0]
 
-    try:
-        ThreadedEstopReader(args.estop_path, args.estop_buadrate)
-    except Exception:
-        raise Exception("Could not find estop, make sure its plugged in")
-
     # Launch all binaries
     with RobotCommunication(
         blue_full_system_proto_unix_io, getRobotMulticastChannel(0), args.interface
-    ) as rc_blue, RobotCommunication(
-        yellow_full_system_proto_unix_io, getRobotMulticastChannel(1), args.interface
-    ) as rc_yellow, FullSystem(
+    ) as rc_blue, FullSystem(
         f"{args.blue_full_system_runtime_dir}/test/{test_name}",
         args.debug_blue_full_system,
         False,
