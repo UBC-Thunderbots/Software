@@ -40,35 +40,10 @@ struct DribbleFSM
 
     DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
-    /**
-     * Converts the ball position to the robot's position given the direction that the
-     * robot faces the ball
-     *
-     * @param ball_position The ball position
-     * @param face_ball_angle The angle to face the ball
-     * @param additional_offset Additional offset from facing the ball
-     *
-     * @return the point that the robot should be positioned to face the ball and dribble
-     * the ball
-     */
     static Point robotPositionToFaceBall(const Point &ball_position,
-                                         const Angle &face_ball_angle,
-                                         double additional_offset = 0.0);
-
-    /**
-     * Calculates the interception point for intercepting balls
-     *
-     * @param robot The robot to do the interception
-     * @param ball The ball to intercept
-     * @field The field to intercept on
-     *
-     * @return the best interception point
-     */
-    // TODO (#1968): Merge this functionality with findBestInterceptForBall in the
-    // evaluation folder
-    static Point findInterceptionPoint(const Robot &robot, const Ball &ball,
-                                       const Field &field);
-
+                                              const Angle &face_ball_angle,
+                                              double additional_offset=0.0);
+    
     /**
      * Gets the destination to dribble the ball to from the update event
      *

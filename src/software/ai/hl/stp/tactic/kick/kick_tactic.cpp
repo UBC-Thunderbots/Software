@@ -1,13 +1,15 @@
 #include "software/ai/hl/stp/tactic/kick/kick_tactic.h"
+#include "proto/parameters.pb.h"
 
 #include <algorithm>
+
 
 KickTactic::KickTactic()
     : Tactic({RobotCapability::Kick, RobotCapability::Move}), fsm_map()
 {
     for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)
     {
-        fsm_map[id] = std::make_unique<FSM<KickFSM>>(GetBehindBallFSM());
+        fsm_map[id] = std::make_unique<FSM<KickFSM>>(KickFSM(), GetBehindBallFSM());
     }
 }
 
@@ -37,7 +39,7 @@ void KickTactic::updatePrimitive(const TacticUpdate &tactic_update, bool reset_f
     if (reset_fsm)
     {
         fsm_map[tactic_update.robot.id()] =
-            std::make_unique<FSM<KickFSM>>(GetBehindBallFSM());
+            std::make_unique<FSM<KickFSM>>(KickFSM(), GetBehindBallFSM());
     }
     fsm_map.at(tactic_update.robot.id())
         ->process_event(KickFSM::Update(control_params, tactic_update));

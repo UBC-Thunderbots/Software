@@ -96,9 +96,13 @@ std::optional<Shot> ReceiverFSM::findFeasibleShot(const World& world,
         if (net_percent_open > MIN_SHOT_NET_PERCENT_OPEN &&
             abs_angle_between_pass_and_shot_vectors < MAX_DEFLECTION_FOR_ONE_TOUCH_SHOT)
         {
+            std::cout<<"one touch shot "<<best_shot_opt.value().getPointToShootAt()<<std::endl;
             return best_shot_opt;
         }
     }
+
+    std::cout<<"no feasible shot found "<<std::endl;
+    std::cout<<"ball at "<<world.ball().position()<<std::endl;
 
     return std::nullopt;
 }

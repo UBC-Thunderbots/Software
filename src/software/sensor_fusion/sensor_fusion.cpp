@@ -11,7 +11,7 @@ SensorFusion::SensorFusion(TbotsProto::SensorFusionConfig sensor_fusion_config)
       enemy_team(),
       game_state(),
       referee_stage(std::nullopt),
-      ball_filter(),
+      ball_filter(sensor_fusion_config.rolling_acceleration_ms2()),
       friendly_team_filter(),
       enemy_team_filter(),
       team_with_possession(TeamSide::ENEMY),
@@ -409,7 +409,7 @@ void SensorFusion::resetWorldComponents()
     enemy_team           = Team();
     game_state           = GameState();
     referee_stage        = std::nullopt;
-    ball_filter          = BallFilter();
+    ball_filter          = BallFilter(sensor_fusion_config.rolling_acceleration_ms2());
     friendly_team_filter = RobotTeamFilter();
     enemy_team_filter    = RobotTeamFilter();
     team_with_possession = TeamSide::ENEMY;

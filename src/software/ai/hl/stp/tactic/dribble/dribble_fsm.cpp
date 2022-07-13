@@ -1,41 +1,13 @@
 #include "software/ai/hl/stp/tactic/dribble/dribble_fsm.h"
+#include "software//ai/evaluation/intercept.h"
 
 Point DribbleFSM::robotPositionToFaceBall(const Point &ball_position,
-                                          const Angle &face_ball_angle,
-                                          double additional_offset)
+                              const Angle &face_ball_angle,
+                              double additional_offset)
 {
     return ball_position - Vector::createFromAngle(face_ball_angle)
-                               .normalize(DIST_TO_FRONT_OF_ROBOT_METERS +
-                                          BALL_MAX_RADIUS_METERS + additional_offset);
-}
-
-Point DribbleFSM::findInterceptionPoint(const Robot &robot, const Ball &ball,
-                                        const Field &field)
-{
-    static constexpr double BALL_MOVING_SLOW_SPEED_THRESHOLD   = 0.3;
-    static constexpr double INTERCEPT_POSITION_SEARCH_INTERVAL = 0.1;
-    if (ball.velocity().length() < BALL_MOVING_SLOW_SPEED_THRESHOLD)
-    {
-        auto face_ball_vector = (ball.position() - robot.position());
-        auto point_in_front_of_ball =
-            robotPositionToFaceBall(ball.position(), face_ball_vector.orientation());
-        return point_in_front_of_ball;
-    }
-    Point intercept_position = ball.position();
-    while (contains(field.fieldLines(), intercept_position))
-    {
-        Duration ball_time_to_position = Duration::fromSeconds(
-            distance(intercept_position, ball.position()) / ball.velocity().length());
-        Duration robot_time_to_pos = robot.getTimeToPosition(intercept_position);
-
-        if (robot_time_to_pos < ball_time_to_position)
-        {
-            break;
-        }
-        intercept_position +=
-            ball.velocity().normalize(INTERCEPT_POSITION_SEARCH_INTERVAL);
-    }
-    return intercept_position;
+            .normalize(DIST_TO_FRONT_OF_ROBOT_METERS +
+                       BALL_MAX_RADIUS_METERS + additional_offset);
 }
 
 Point DribbleFSM::getDribbleBallDestination(const Point &ball_position,
@@ -91,19 +63,18 @@ void DribbleFSM::getPossession(const Update &event)
     auto ball_position = event.common.world.ball().position();
     auto face_ball_orientation =
         (ball_position - event.common.robot.position()).orientation();
-    Point intercept_position =
-        findInterceptionPoint(event.common.robot, event.common.world.ball(),
-                              event.common.world.field()) +
-        Vector::createFromAngle(face_ball_orientation).normalize(0.05);
+    auto result = findBestInterceptForBall(
+        event.common.world.ball(), event.common.world.field(), event.common.robot, true).value_or(InterceptionResult(event.common.world.ball().position(), Duration(), 0.0));
 
-    {
-        event.common.set_primitive(createMovePrimitive(
-            CREATE_MOTION_CONTROL(intercept_position), face_ball_orientation, 0,
-            TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
-            AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
-            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
-            event.common.robot.robotConstants()));
-    }
+    Point intercept_position =
+        result.point + Vector::createFromAngle(face_ball_orientation).normalize(0.05);
+
+    event.common.set_primitive(createMovePrimitive(
+        CREATE_MOTION_CONTROL(intercept_position), face_ball_orientation,
+        result.final_speed, TbotsProto::DribblerMode::MAX_FORCE,
+        TbotsProto::BallCollisionType::ALLOW, AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
+        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
+        event.common.robot.robotConstants()));
 }
 
 void DribbleFSM::dribble(const Update &event)

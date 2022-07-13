@@ -18,7 +18,7 @@ else:
     import PyQt6
     from PyQt6.QtWebEngineWidgets import QWebEngineView
 
-from qt_material import apply_stylesheet
+from qt_material import apply_stylesheet, list_themes
 
 import pyqtgraph
 import qdarktheme
@@ -117,7 +117,7 @@ class Thunderscope(object):
         self.app = pyqtgraph.mkQApp("Thunderscope")
 
         # Setup stylesheet
-        apply_stylesheet(self.app, theme="dark_blue.xml")
+        # apply_stylesheet(self.app, theme="dark_amber.xml")
 
         self.blue_replay_log = blue_replay_log
         self.yellow_replay_log = yellow_replay_log

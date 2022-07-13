@@ -31,6 +31,7 @@ cc_test(
     deps = [
         ":goalie_tactic",
         "//shared/test_util:tbots_gtest_main",
+        "//software/ai/hl/stp/tactic/crease_defender:crease_defender_tactic",
         "//software/test_util",
     ],
 )

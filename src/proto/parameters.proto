@@ -40,6 +40,8 @@ message AiConfig
     required SensorFusionConfig sensor_fusion_config                        = 10;
     required DefensePlayConfig defense_play_config                          = 11;
     required RobotNavigationObstacleConfig robot_navigation_obstacle_config = 12;
+    required KickTacticConfig kick_tactic_config = 13;
+
 }
 
 message AiControlConfig
@@ -131,12 +133,13 @@ message GoalieTacticConfig
     // At what speed of the ball should the goalie panic and stop the ball
     required double ball_speed_panic = 2
         [default = 0.2, (bounds).min_double_value = 0.0, (bounds).max_double_value = 6.0];
-    // The radius to wedge the robot into the cone
-    required double block_cone_radius = 3
-        [default = 0.3, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
-    // How much to deflate the defense area by, larger value means closer to the net
-    required double defense_area_deflation = 4
-        [default = 0.2, (bounds).min_double_value = 0.1, (bounds).max_double_value = 0.5];
+}
+
+message KickTacticConfig
+{
+    // percentage of a robots speed that is transferred to the ball in a collision
+    required double percent_robot_speed_transferred_to_ball = 1
+    [default = 0.5, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
 }
 
 message DribbleTacticConfig
@@ -273,6 +276,10 @@ message SensorFusionConfig
     // Number of dropped detections before we consider the ball not to be in the dribbler
     required int32 num_dropped_detections_before_ball_not_in_dribbler = 12
         [default = 3, (bounds).min_int_value = 0, (bounds).max_int_value = 1000];
+
+    // Acceleration applied to the ball when it is rolling
+    required double rolling_acceleration_ms2 = 13
+        [default = -0.5, (bounds).min_double_value = -10, (bounds).max_double_value = 10];
 }
 
 message DefensePlayConfig

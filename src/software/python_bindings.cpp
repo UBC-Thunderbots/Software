@@ -117,6 +117,7 @@ PYBIND11_MODULE(python_bindings, m)
         .def("normalize", py::overload_cast<>(&Vector::normalize, py::const_))
         .def("normalize", py::overload_cast<double>(&Vector::normalize, py::const_))
         .def("rotate", &Vector::rotate)
+        .def("createFromAngle", &Vector::createFromAngle)
         .def("orientation", &Vector::orientation)
         // Overloaded
         .def(py::self + py::self)
