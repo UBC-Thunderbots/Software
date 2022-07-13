@@ -2,9 +2,9 @@ name: Tbots CI
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, robocup_2022 ]
   pull_request:
-    branches: [ master ]
+    branches: [ master, robocup_2022 ]
 
 jobs:
   formatting-check:
@@ -111,7 +111,6 @@ jobs:
         # Run a second time without checking for errors
         continue-on-error: true
         run: |
-          cd src
           bazel test --show_timestamps       \
             //software:unix_full_system           \
             //software/simulated_tests/...   \

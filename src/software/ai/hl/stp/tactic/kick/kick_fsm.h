@@ -15,12 +15,10 @@ struct KickFSM
         Point kick_origin;
         // The direction the Robot will kick in
         Angle kick_direction;
-        // How fast the Robot will kick the ball in meters per second
-        double kick_speed_meters_per_second;
+        // How the robot will chip or kick the ball
+        AutoChipOrKick auto_chip_or_kick;
     };
 
-    KickFSM(TbotsProto::KickTacticConfig kick_tactic_config): kick_tactic_config(kick_tactic_config)
-    {}
 
     DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
@@ -73,7 +71,5 @@ struct KickFSM
     }
 
 private:
-    // the kick tactic config
-    TbotsProto::KickTacticConfig kick_tactic_config;
 
 };

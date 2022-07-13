@@ -60,6 +60,12 @@ std::unique_ptr<SSLSimulationProto::RobotCommand> getRobotCommandFromDirectContr
     std::optional<float> kick_angle;       // [degree]
     std::optional<double> dribbler_speed;  // [rpm]
 
+    if (direct_control->mutable_motor_control()->dribbler_speed_rpm() < 0)
+    {
+        direct_control->mutable_motor_control()->set_dribbler_speed_rpm(
+            -direct_control->mutable_motor_control()->dribbler_speed_rpm());
+    }
+
     switch (direct_control->power_control().chicker().chicker_command_case())
     {
         case TbotsProto::PowerControl::ChickerControl::kKickSpeedMPerS:

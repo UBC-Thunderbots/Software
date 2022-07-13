@@ -108,9 +108,6 @@ message Referee
         TIMEOUT_YELLOW = 12;
         // The blue team is currently in a timeout.
         TIMEOUT_BLUE = 13;
-        // The yellow team just scored a goal.
-        // For information only.
-        // For rules compliance, teams must treat as STOP.
         // Equivalent to STOP, but the yellow team must pick up the ball and
         // drop it in the Designated Position.
         BALL_PLACEMENT_YELLOW = 16;

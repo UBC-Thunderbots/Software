@@ -5,13 +5,9 @@ from software.simulated_tests.robot_enters_region import *
 from software.simulated_tests.ball_enters_region import *
 from software.simulated_tests.ball_moves_forward import *
 from software.simulated_tests.friendly_has_ball_possession import *
-from software.simulated_tests.ball_speed_threshold import *
-from software.simulated_tests.robot_speed_threshold import *
 from software.simulated_tests.excessive_dribbling import *
-from software.simulated_tests.simulated_test_fixture import (
-    simulated_test_runner,
-    pytest_main,
-)
+from software.simulated_tests.simulated_test_fixture import simulated_test_runner
+from software.simulated_tests.pytest_main import pytest_main
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
 
@@ -25,21 +21,21 @@ neg_post = tbots.Point((tbots.Field.createSSLDivisionBField().friendlyGoalpostNe
 center_goal = tbots.Field.createSSLDivisionBField().friendlyGoalCenter()
 
 
-def gen_test_case(ball_pos, ball_speeds, target, rob_pos):
-
-    test_cases = []
-    for ball_speed in ball_speeds:
-
-        if target == 0:
-            vel = (pos_post - ball_pos).normalize(ball_speed)
-        elif target == 1:
-            vel = (center_goal - ball_pos).normalize(ball_speed)
-        elif target == 2:
-            vel = (neg_post - ball_pos).normalize(ball_speed)
-
-        test_cases.append((ball_pos, vel, rob_pos))
-
-    return test_cases
+# def gen_test_case(ball_pos, ball_speeds, target, rob_pos):
+#
+#     test_cases = []
+#     for ball_speed in ball_speeds:
+#
+#         if target == 0:
+#             vel = (pos_post - ball_pos).normalize(ball_speed)
+#         elif target == 1:
+#             vel = (center_goal - ball_pos).normalize(ball_speed)
+#         elif target == 2:
+#             vel = (neg_post - ball_pos).normalize(ball_speed)
+#
+#         test_cases.append((ball_pos, vel, rob_pos))
+#
+#     return test_cases
 
 # @pytest.mark.parametrize(
 #     "ball_initial_position,ball_initial_velocity,robot_initial_position",
@@ -206,73 +202,7 @@ def gen_test_case(ball_pos, ball_speeds, target, rob_pos):
 #     )
 
 
-def test_goalie_blocks_onetouch_shot(
-        simulated_test_runner,
-):
 
-    print("in test")
-    # Setup Robot
-    simulated_test_runner.simulator_proto_unix_io.send_proto(
-        WorldState,
-        create_world_state(
-            blue_robot_locations=[center_goal],
-            yellow_robot_locations=[tbots.Point(-2.8,-1)],
-            ball_location=tbots.Point(-2.8,2),
-            ball_velocity=tbots.Vector(0,-4),
-        ),
-    )
-
-    # Setup Tactic
-    params = AssignedTacticPlayControlParams()
-    params.assigned_tactics[0].goalie.CopyFrom(
-        GoalieTactic(max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT)
-    )
-    simulated_test_runner.blue_full_system_proto_unix_io.send_proto(
-        AssignedTacticPlayControlParams, params
-    )
-
-    # Setup no tactics on the enemy side
-    params = AssignedTacticPlayControlParams()
-    ppoint = Point(x_meters=-2.5, y_meters=3)
-    rpoint = Point(x_meters=-2.5, y_meters=-3)
-
-    p = Pass(passer_point=ppoint, receiver_point=rpoint, pass_speed_m_per_s=3)
-
-    params.assigned_tactics[0].receiver.CopyFrom(
-        ReceiverTactic(r_pass=p, disable_one_touch_shot=False)
-    )
-    simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(
-        AssignedTacticPlayControlParams, params
-    )
-
-    # Always Validation
-    always_validation_sequence_set = [
-        [
-            RobotNeverEntersRegion(
-                regions=[tbots.Field.createSSLDivisionBField().enemyDefenseArea()]
-            ),
-            # BallNeverEntersRegion(
-            #     regions=[tbots.Field.createSSLDivisionBField().friendlyGoal()]
-            # ),
-            NeverExcessivelyDribbles(),
-        ]
-    ]
-
-    # Eventually Validation
-    eventually_validation_sequence_set = [
-        [
-            # Goalie should be in the defense area
-            RobotEventuallyEntersRegion(
-                regions=[tbots.Field.createSSLDivisionBField().friendlyDefenseArea()]
-            ),
-        ]
-    ]
-
-    simulated_test_runner.run_test(
-        eventually_validation_sequence_set=eventually_validation_sequence_set,
-        always_validation_sequence_set=always_validation_sequence_set,
-        test_timeout_s=7,
-    )
 
 
 if __name__ == "__main__":

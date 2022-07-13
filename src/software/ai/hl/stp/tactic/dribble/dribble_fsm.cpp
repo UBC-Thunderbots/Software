@@ -46,6 +46,12 @@ std::tuple<Point, Angle> DribbleFSM::calculateNextDribbleDestinationAndOrientati
     // pivot to final face ball destination
     Angle target_orientation = getFinalDribbleOrientation(
         ball.position(), robot.position(), final_dribble_orientation_opt);
+    if((dribble_destination-ball.position()).length()>0.5)
+    {
+        target_orientation = (ball.position()-dribble_destination).orientation();
+    }
+
+
     Point target_destination =
         robotPositionToFaceBall(dribble_destination, target_orientation);
 
@@ -83,7 +89,7 @@ void DribbleFSM::dribble(const Update &event)
         CREATE_MOTION_CONTROL(target_destination), target_orientation, 0,
         TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
         AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
-        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
+        TbotsProto::MaxAllowedSpeedMode::DRIBBLE_DRIBBLING, 0.0,
         event.common.robot.robotConstants(), 0.0));
 }
 
@@ -113,7 +119,7 @@ void DribbleFSM::startDribble(const Update &event)
 
 bool DribbleFSM::havePossession(const Update &event)
 {
-    return event.common.robot.isNearDribbler(event.common.world.ball().position());
+    return event.common.robot.isNearDribbler(event.common.world.ball().position(), -0.01);
 }
 
 bool DribbleFSM::lostPossession(const Update &event)

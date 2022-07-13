@@ -8,9 +8,10 @@ TEST(KickFSMTest, test_transitions)
 {
     World world = ::TestUtil::createBlankTestingWorld();
     Robot robot = ::TestUtil::createRobotAtPos(Point(-2, -3));
-    KickFSM::ControlParams control_params{.kick_origin    = Point(-2, 1.5),
-                                          .kick_direction = Angle::threeQuarter(),
-                                          .kick_speed_meters_per_second = 1.2};
+    KickFSM::ControlParams control_params{
+        .kick_origin       = Point(-2, 1.5),
+        .kick_direction    = Angle::threeQuarter(),
+        .auto_chip_or_kick = {AutoChipOrKickMode::AUTOKICK, 1.2}};
 
     TbotsProto::AiConfig ai_config;
     FSM<KickFSM> fsm{GetBehindBallFSM(), KickFSM(ai_config.kick_tactic_config())};

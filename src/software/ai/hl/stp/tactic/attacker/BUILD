@@ -15,6 +15,8 @@ cc_library(
         "//software/ai/evaluation:keep_away",
         "//software/ai/hl/stp/tactic",
         "//software/ai/hl/stp/tactic/chip:chip_tactic",
+        "//software/ai/hl/stp/tactic/kick:kick_tactic",
+        "//software/ai/hl/stp/tactic/move:move_tactic",
         "//software/ai/hl/stp/tactic/pivot_kick:pivot_kick_tactic",
         "//software/ai/passing:pass",
         "//software/logger",

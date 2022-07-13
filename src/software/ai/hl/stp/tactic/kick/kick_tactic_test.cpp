@@ -37,7 +37,7 @@ TEST_P(KickTacticTest, kick_test)
 
     auto tactic = std::make_shared<KickTactic>(ai_config);
     tactic->updateControlParams(robot_position + ball_offset_from_robot, angle_to_kick_at,
-                                5);
+                                AutoChipOrKick{AutoChipOrKickMode::AUTOKICK, 5});
     setTactic(1, tactic);
 
     std::vector<ValidationFunction> terminating_validation_functions = {

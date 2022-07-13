@@ -183,6 +183,10 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
         robots = remaining_robots;
     }
 
+    static uint64_t sequence_number = 0;
+    primitives_to_run->mutable_time_sent()->set_epoch_timestamp_seconds(
+        world.getMostRecentTimestamp().toSeconds());
+    primitives_to_run->set_sequence_number(sequence_number++);
     return primitives_to_run;
 }
 

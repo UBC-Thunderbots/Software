@@ -12,6 +12,8 @@ void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
                                        const World &world)
 {
     auto place_ball_tactic = std::make_shared<DribbleTactic>(ai_config);
+    auto move_away         = std::make_shared<MoveTactic>();
+    auto stop              = std::make_shared<StopTactic>(false);
 
     std::vector<std::shared_ptr<MoveTactic>> move_tactics = {
         std::make_shared<MoveTactic>(), std::make_shared<MoveTactic>(),
@@ -40,6 +42,23 @@ void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
         place_ball_tactic->updateControlParams(world.gameState().getBallPlacementPoint(),
                                                std::nullopt, true);
         TacticVector result = {place_ball_tactic};
+        result.insert(result.end(), move_tactics.begin(), move_tactics.end());
+        yield({result});
+    } while (!place_ball_tactic->done());
+
+    static int wait_counter = 0;
+
+    while (wait_counter++ < 150)
+    {
+        TacticVector result = {stop};
+        result.insert(result.end(), move_tactics.begin(), move_tactics.end());
+        yield({result});
+    };
+
+    do
+    {
+        move_away->updateControlParams(Point(-3, 0), Angle::zero(), 0.0);
+        TacticVector result = {move_away};
         result.insert(result.end(), move_tactics.begin(), move_tactics.end());
         yield({result});
     } while (true);

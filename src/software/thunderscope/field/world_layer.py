@@ -9,7 +9,7 @@ from pyqtgraph.Qt.QtWidgets import *
 
 from software.py_constants import *
 from software.thunderscope.constants import LINE_WIDTH
-from software.thunderscope.colors import Colors
+from software.thunderscope.constants import Colors
 from software.networking.threaded_unix_listener import ThreadedUnixListener
 from software.thunderscope.field.field_layer import FieldLayer
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
@@ -439,7 +439,7 @@ class WorldLayer(FieldLayer):
 
         for robot in self.cached_world.friendly_team.team_robots:
             if (
-                self.cached_status.break_beam_status.ball_in_beam is True
+                self.cached_status.power_status.breakbeam_tripped is True
                 and robot.id == self.cached_status.robot_id
             ):
                 painter.drawEllipse(

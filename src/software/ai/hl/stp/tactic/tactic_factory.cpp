@@ -120,10 +120,12 @@ std::shared_ptr<Tactic> createTactic(const TbotsProto::GoalieTactic &tactic_prot
 std::shared_ptr<Tactic> createTactic(const TbotsProto::KickTactic &tactic_proto,
                                      TbotsProto::AiConfig ai_config)
 {
-    auto tactic = std::make_shared<KickTactic>(ai_config);
-    tactic->updateControlParams(createPoint(tactic_proto.kick_origin()),
-                                createAngle(tactic_proto.kick_direction()),
-                                tactic_proto.kick_speed_meters_per_second());
+    auto tactic = std::make_shared<KickTactic>();
+    tactic->updateControlParams(
+        createPoint(tactic_proto.kick_origin()),
+        createAngle(tactic_proto.kick_direction()),
+        AutoChipOrKick{AutoChipOrKickMode::AUTOKICK,
+                       tactic_proto.kick_speed_meters_per_second()});
     return tactic;
 }
 

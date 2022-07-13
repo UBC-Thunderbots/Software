@@ -12,14 +12,15 @@ std::optional<Point> CreaseDefenderFSM::findBlockThreatPoint(
                              6.0;
     Angle angle_to_positive_goalpost =
         (field.friendlyGoalpostPos() - enemy_threat_origin).orientation();
-    Angle angle_to_block = angle_to_positive_goalpost + shot_angle_sixth * 3.0;
+    Angle angle_to_block = angle_to_positive_goalpost + shot_angle_sixth * 1.0;
     if (crease_defender_alignment == TbotsProto::CreaseDefenderAlignment::LEFT)
     {
-        angle_to_block = angle_to_positive_goalpost + shot_angle_sixth * 1.0;
+        angle_to_block = angle_to_positive_goalpost + shot_angle_sixth * 5.0;
+        
     }
     else if (crease_defender_alignment == TbotsProto::CreaseDefenderAlignment::RIGHT)
     {
-        angle_to_block = angle_to_positive_goalpost + shot_angle_sixth * 5.0;
+        angle_to_block = angle_to_positive_goalpost + shot_angle_sixth * 6;
     }
 
     // Shot ray to block

@@ -48,15 +48,15 @@ struct GoalieFSM
     /**
      * Gets the position for the goalie to move to, to best position itself between the
      * ball and the friendly goal
+     * @param goalie the goalie
      * @param ball the ball to position the goalie relative to
      * @param field the field to position the goalie on
      * @param goalie_tactic_config the goalie tactic config
      *
      * @return the position that the goalie should move to
      */
-    static Point getGoaliePositionToBlock(const Robot &goalie, const Team &friendly_team,
-        const Ball &ball, const Field &field,
-        TbotsProto::GoalieTacticConfig goalie_tactic_config);
+    static Point getGoaliePositionToBlock(const RobotConstants_t robot_constants, const Team &friendly_team,
+        const Ball &ball, const Field &field);
 
     /**
      * Gets intersections between the ball velocity ray and the full goal segment
