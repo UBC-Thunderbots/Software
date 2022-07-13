@@ -104,6 +104,7 @@ class SimulatorTestRunner(TbotsTestRunner):
         data_loggers=[],
         test_timeout_s=3,
         tick_duration_s=0.0166,  # Default to 60hz
+        referee_ci_inputs=[],
     ):
         """Run a test
 
@@ -114,6 +115,7 @@ class SimulatorTestRunner(TbotsTestRunner):
         :param test_timeout_s: The timeout for the test, if any eventually_validations
                                 remain after the timeout, the test fails.
         :param tick_duration_s: The simulation step duration
+        :param referee_ci_inputs: A list of referee ci inputs that will be sent every second
 
         """
 
@@ -124,6 +126,15 @@ class SimulatorTestRunner(TbotsTestRunner):
             time_elapsed_s = 0
 
             while time_elapsed_s < test_timeout_s:
+
+                if time_elapsed_s % 1.0 < 2 * tick_duration_s and len(
+                    referee_ci_inputs
+                ) > int(time_elapsed_s):
+                    # we'll send referee ci input 4 ticks in a row around the second boundary
+                    # also check that referee_ci_inputs has enough inputs
+                    self.gamecontroller.send_ci_input(
+                        *referee_ci_inputs[int(time_elapsed_s)]
+                    )
 
                 # Update the timestamp logged by the ProtoLogger
                 with self.timestamp_mutex:

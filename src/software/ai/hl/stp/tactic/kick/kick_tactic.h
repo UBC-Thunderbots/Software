@@ -23,29 +23,27 @@ class KickTactic : public Tactic
      *
      * @param kick_origin The location where the kick will be taken
      * @param kick_direction The direction the Robot will kick in
-     * @param kick_speed_meters_per_second The distance between the starting location
-     * of the kick and the location of the first bounce
+     * @param auto_chip_or_kick The auto kick or chip settings
      */
-    void updateControlParams(const Point& kick_origin, const Angle& kick_direction,
-                             double kick_speed_meters_per_second);
+    void updateControlParams(const Point &kick_origin, const Angle &kick_direction,
+                             AutoChipOrKick auto_chip_or_kick);
 
     /**
      * Updates the control parameters for this KickTactic.
      *
      * @param kick_origin The location where the kick will be taken
      * @param kick_direction The direction the Robot will kick in
-     * @param kick_speed_meters_per_second The speed of how fast the Robot
-     * will kick the ball in meters per second
+     * @param auto_chip_or_kick The auto kick or chip settings
      */
-    void updateControlParams(const Point& kick_origin, const Point& kick_target,
-                             double kick_speed_meters_per_second);
+    void updateControlParams(const Point &kick_origin, const Point &kick_target,
+                             AutoChipOrKick auto_chip_or_kick);
 
-    void accept(TacticVisitor& visitor) const override;
+    void accept(TacticVisitor &visitor) const override;
 
     DEFINE_TACTIC_DONE_AND_GET_FSM_STATE
 
    private:
-    void updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm) override;
+    void updatePrimitive(const TacticUpdate &tactic_update, bool reset_fsm) override;
 
     std::map<RobotId, std::unique_ptr<FSM<KickFSM>>> fsm_map;
 

@@ -4,6 +4,8 @@
 #include "software/ai/evaluation/keep_away.h"
 #include "software/ai/evaluation/shot.h"
 #include "software/ai/hl/stp/tactic/chip/chip_fsm.h"
+#include "software/ai/hl/stp/tactic/kick/kick_fsm.h"
+#include "software/ai/hl/stp/tactic/move/move_fsm.h"
 #include "software/ai/hl/stp/tactic/pivot_kick/pivot_kick_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/passing/pass.h"
@@ -31,6 +33,8 @@ struct AttackerFSM
         // The point the robot will chip towards if it is unable to shoot and is in danger
         // of losing the ball to an enemy
         std::optional<Point> chip_target;
+        // Whether we should one touch the ball
+        bool should_single_touch = false;
     };
 
     DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
@@ -62,6 +66,12 @@ struct AttackerFSM
      * @return if the ball should be kicked
      */
     bool shouldKick(const Update& event);
+    bool shouldSingleTouch(const Update& event);
+
+    void singleTouchKick(const Update& event,
+                         boost::sml::back::process<KickFSM::Update> processEvent);
+    void alignToBall(const Update& event,
+                     boost::sml::back::process<MoveFSM::Update> processEvent);
 
 
     auto operator()()
@@ -70,15 +80,27 @@ struct AttackerFSM
 
         DEFINE_SML_STATE(PivotKickFSM)
         DEFINE_SML_STATE(DribbleFSM)
+        DEFINE_SML_STATE(KickFSM)
+        DEFINE_SML_STATE(MoveFSM)
         DEFINE_SML_EVENT(Update)
 
         DEFINE_SML_GUARD(shouldKick)
+        DEFINE_SML_GUARD(shouldSingleTouch)
         DEFINE_SML_SUB_FSM_UPDATE_ACTION(pivotKick, PivotKickFSM)
         DEFINE_SML_SUB_FSM_UPDATE_ACTION(keepAway, DribbleFSM)
+        DEFINE_SML_SUB_FSM_UPDATE_ACTION(singleTouchKick, KickFSM)
+        DEFINE_SML_SUB_FSM_UPDATE_ACTION(alignToBall, MoveFSM)
+
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *DribbleFSM_S + Update_E[shouldKick_G] / pivotKick_A = PivotKickFSM_S,
+            *MoveFSM_S + Update_E[!shouldSingleTouch_G] / keepAway_A = DribbleFSM_S,
+            // one touch attacking
+            MoveFSM_S + Update_E[shouldKick_G] / singleTouchKick_A = KickFSM_S,
+            MoveFSM_S + Update_E[!shouldKick_G] / alignToBall_A,
+            KickFSM_S + Update_E / singleTouchKick_A, KickFSM_S = X,
+            // dribble allowed attacking
+            DribbleFSM_S + Update_E[shouldKick_G] / pivotKick_A = PivotKickFSM_S,
             DribbleFSM_S + Update_E[!shouldKick_G] / keepAway_A,
             PivotKickFSM_S + Update_E / pivotKick_A, PivotKickFSM_S = X,
             X + Update_E / SET_STOP_PRIMITIVE_ACTION = X);

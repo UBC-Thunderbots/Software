@@ -43,6 +43,8 @@ enum MotionConstraint
     HALF_METER_AROUND_BALL = 7 [(dynamic) = true];
     // Path between ball and placement point in ball placement
     AVOID_BALL_PLACEMENT_INTERFERENCE = 8 [(dynamic) = true];
+    // The enemy half of the field without the centre circle
+    ENEMY_HALF_WITHOUT_CENTRE_CIRCLE = 9;
 }
 
 message MotionControl
@@ -71,6 +73,8 @@ enum MaxAllowedSpeedMode
     COLLISIONS_ALLOWED = 2;
     // Move at speed at which we can grab the ball
     DRIBBLE_GET_POSSESSION = 3;
+    // Move at speed at which we can safely dribble the ball
+    DRIBBLE_DRIBBLING = 4;
 }
 
 message AutoChipOrKick
