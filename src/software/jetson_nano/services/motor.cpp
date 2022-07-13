@@ -523,6 +523,81 @@ WheelSpace_t MotorService::rampWheelVelocity(
     return ramp_wheel_velocity;
 }
 
+EuclideanSpace_t MotorService::rampLinearVelocity(
+    const EuclideanSpace_t& current_euclidean_velocity,
+    const EuclideanSpace_t& target_euclidean_velocity, double allowed_acceleration,
+    const double& time_to_ramp)
+{
+    // ramp linear euclidean velocity
+    EuclideanSpace_t ramp_velocity;
+
+    // calculate max allowable wheel velocity delta using dv = a*t
+    auto allowable_delta_linear_velocity = allowed_acceleration * time_to_ramp;
+
+    // extract linear velocity
+    Eigen::Vector2d current_linear_velocity = current_euclidean_velocity.head(2);
+    Eigen::Vector2d target_linear_velocity  = target_euclidean_velocity.head(2);
+
+    // find absolute max velocity delta
+    auto delta_linear_velocity     = target_linear_velocity - current_linear_velocity;
+    auto max_delta_linear_velocity = delta_linear_velocity.cwiseAbs().maxCoeff();
+
+    // compare max delta against the calculated maximum
+    if (max_delta_linear_velocity > allowable_delta_linear_velocity)
+    {
+        // if larger, scale down to allowable maximum
+        ramp_velocity.head(2) = (delta_linear_velocity / max_delta_linear_velocity) *
+                                    allowable_delta_linear_velocity +
+                                current_linear_velocity;
+    }
+    else
+    {
+        // if smaller, go straight to target
+        ramp_velocity.head(2) = target_linear_velocity;
+    }
+
+    // add angular velocity unchanged
+    ramp_velocity[3] = current_euclidean_velocity[3];
+
+    return ramp_velocity;
+}
+
+EuclideanSpace_t MotorService::rampAngularVelocity(
+    const EuclideanSpace_t& current_euclidean_velocity,
+    const EuclideanSpace_t& target_euclidean_velocity, double allowed_acceleration,
+    const double& time_to_ramp)
+{
+    // ramp angular euclidean velocity
+    EuclideanSpace_t ramp_velocity;
+
+    // calculate max allowable wheel velocity delta using dv = a*t
+    auto allowable_delta_angular_velocity = allowed_acceleration * time_to_ramp;
+
+    // extract linear velocity
+    auto current_angular_velocity = current_euclidean_velocity[3];
+    auto target_angular_velocity  = target_euclidean_velocity[3];
+
+    // find absolute max velocity delta
+    auto delta_angular_velocity = target_angular_velocity - current_angular_velocity;
+
+    // compare delta against calculated maximum
+    if (std::abs(delta_angular_velocity) > allowable_delta_angular_velocity)
+    {
+        // if larger, clamp at max
+        ramp_velocity[3] =
+            std::copysign(allowable_delta_angular_velocity, delta_angular_velocity);
+    }
+    else
+    {
+        // if smaller, go straight to target
+        ramp_velocity[3] = target_angular_velocity;
+    }
+
+    // add linear velocity unchanged
+    ramp_velocity.head(2) = target_euclidean_velocity.head(2);
+
+    return ramp_velocity;
+}
 
 // Both the TMC4671 (the controller) and the TMC6100 (the driver) respect
 // the same SPI interface. So when we bind the API, we can use the same

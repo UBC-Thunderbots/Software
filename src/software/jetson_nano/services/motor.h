@@ -159,6 +159,16 @@ class MotorService
                                    double allowed_acceleration,
                                    const double& time_to_ramp);
 
+    EuclideanSpace_t rampLinearVelocity(
+        const EuclideanSpace_t& current_euclidean_velocity,
+        const EuclideanSpace_t& target_euclidean_velocity, double allowed_acceleration,
+        const double& time_to_ramp);
+
+    EuclideanSpace_t rampAngularVelocity(
+        const EuclideanSpace_t& current_euclidean_velocity,
+        const EuclideanSpace_t& target_euclidean_velocity, double allowed_acceleration,
+        const double& time_to_ramp);
+
     /**
      * Convert electrical rpm to wheel velocity.
      *
