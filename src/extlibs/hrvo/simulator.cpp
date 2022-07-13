@@ -142,6 +142,7 @@ std::size_t HRVOSimulator::addHRVORobotAgent(const Robot &robot, TeamSide type)
                        static_cast<float>(destination_point_proto.y_meters()));
             speed_at_goal = move_primitive.final_speed_m_per_s();
             max_speed     = move_primitive.max_speed_m_per_s();
+            max_accel     = move_primitive.robot_max_acceleration_m_per_s_2();
         }
     }
 
