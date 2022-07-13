@@ -36,8 +36,6 @@ class ProtoUdpSender
      */
     void sendProto(const SendProto& message);
 
-    void sendString(const std::string& message);
-
    private:
     // A UDP socket to send data over
     boost::asio::ip::udp::socket socket_;
