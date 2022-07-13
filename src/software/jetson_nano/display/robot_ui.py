@@ -148,15 +148,6 @@ if __name__ == "__main__":
     )
     args = vars(ap.parse_args())
 
-    def init_redis():
-        redis_client = redis.Redis(
-            host="localhost", port=constants.REDIS_PORT_NUMBER, db=0
-        )
-        for key in redis_keys:
-            redis_client.set(key, "0")
-
-    init_redis()
-
     def start_polling(robot_ui):
         robot_ui.poll_redis()
 
