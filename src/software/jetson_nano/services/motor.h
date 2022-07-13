@@ -28,9 +28,11 @@ class MotorService
      * call the appropriate trinamic api function to spin the appropriate motor.
      *
      * @param motor The motor msg to unpack and execute on the motors
+     * @param encoder_calibration_signal If true, calibrate the encoders once
      * @returns MotorStatus The status of all the drive units
      */
     TbotsProto::MotorStatus poll(const TbotsProto::MotorControl& motor_control,
+                                 bool encoder_calibration_signal,
                                  double time_elapsed_since_last_poll_s);
 
     /**
