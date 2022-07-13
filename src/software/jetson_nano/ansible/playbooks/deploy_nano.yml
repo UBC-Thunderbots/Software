@@ -7,7 +7,6 @@
      - thunderloop
      - display
      - wifi_announcement
-     - ethernet_announcement
    all_actions:
      - stop
      - sync
@@ -15,7 +14,6 @@
    binary_paths:
      thunderloop: ../../thunderloop_main
      wifi_announcement: ../../broadcasts/robot_broadcast_sender_zip.zip
-     ethernet_announcement: ../../broadcasts/robot_broadcast_sender_zip.zip
      display: ../../display/robot_ui_zip.zip
 
   tasks:
@@ -98,11 +96,6 @@
           become_method: sudo
           ansible.builtin.systemd:
             name: wifi_announcement
-            masked: no
-            daemon_reload: yes
-            state: started
-          ansible.builtin.systemd:
-            name: ethernet_announcement
             masked: no
             daemon_reload: yes
             state: started

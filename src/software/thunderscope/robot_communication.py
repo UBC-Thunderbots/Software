@@ -128,8 +128,9 @@ class RobotCommunication(object):
 
                 self.sequence_number += 1
 
-                self.last_time = primitive_set.time_sent.epoch_timestamp_seconds
-                self.send_primitive_set.send_proto(primitive_set)
+                if self.estop_reader.isEstopPlay():
+                    self.last_time = primitive_set.time_sent.epoch_timestamp_seconds
+                    self.send_primitive_set.send_proto(primitive_set)
 
                 time.sleep(0.001)
 
@@ -209,7 +210,6 @@ class RobotCommunication(object):
 
         self.connect_fullsystem_to_robots()
         # self.disconnect_fullsystem_from_robots()
-        # self.connect_robot_to_diagnostics(2)
         # self.connect_robot_to_diagnostics(7)
 
         self.send_estop_state_thread.start()

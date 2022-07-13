@@ -193,9 +193,7 @@
           with_items:
             - thunderbots
             - thunderloop
-            - display
             - wifi_announcement
-            - ethernet_announcement
           loop_control:
             loop_var: service_name
           ansible.builtin.systemd:
