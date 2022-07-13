@@ -6,8 +6,7 @@ bool PenaltyKickFSM::evaluatePenaltyShot(std::optional<Robot> enemy_goalie, Fiel
                                          Point ball_position, Robot robot)
 {
     double min_shot_x_position =
-        ((field.totalXLength() / 2) -
-         (field.totalXLength() * PENALTY_KICK_MIN_SHOT_X_DISTANCE_FACTOR));
+        field.xLength() * PENALTY_KICK_MIN_SHOT_X_DISTANCE_FACTOR / 2.0;
 
     // don't try to shoot if we're far from the net or we're in the middle of an
     // autokick
