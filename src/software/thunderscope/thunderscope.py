@@ -618,7 +618,7 @@ class Thunderscope(object):
         proto_plotter = ProtoPlotter(
             min_y=0,
             max_y=100,
-            window_secs=10,
+            window_secs=15,
             configuration={NamedValue: extract_namedvalue_data},
         )
 

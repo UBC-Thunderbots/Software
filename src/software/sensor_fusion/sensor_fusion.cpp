@@ -36,17 +36,19 @@ std::optional<World> SensorFusion::getWorld() const
             new_world.updateRefereeStage(*referee_stage);
         }
 
-        if (!new_world.friendlyTeam().getAllRobots().empty())
+        const auto &friendly_robots = new_world.friendlyTeam().getAllRobots();
+        unsigned int robot_id = 1;
+        const auto robot_proto_it =
+                std::find_if(friendly_robots.begin(), friendly_robots.end(),
+                             [&](const auto& robot) { return robot.id() == robot_id; });
+        if (robot_proto_it != friendly_robots.end())
         {
             LOG(VISUALIZE) << *createNamedValue(
-                "and vel", static_cast<float>(new_world.friendlyTeam()
-                                                  .getAllRobots()[0]
-                                                  .angularVelocity()
-                                                  .toRadians()));
+                        "ang vel " + std::to_string(robot_id),
+                        static_cast<float>(robot_proto_it->angularVelocity().toRadians()));
             LOG(VISUALIZE) << *createNamedValue(
-                "vel",
-                static_cast<float>(
-                    new_world.friendlyTeam().getAllRobots()[0].velocity().length()));
+                        "vel " + std::to_string(robot_id),
+                        static_cast<float>(robot_proto_it->velocity().length()));
         }
 
         return new_world;
