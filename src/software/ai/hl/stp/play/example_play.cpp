@@ -14,17 +14,12 @@ void ExamplePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
     // Continue to loop to demonstrate the example play indefinitely
     do
     {
-        // The angle between each robot spaced out in a circle around the ball
-        Angle angle_between_robots =
-            Angle::full() / static_cast<double>(move_tactics.size());
-
         for (size_t k = 0; k < move_tactics.size(); k++)
         {
-            move_tactics[k]->updateControlParams(
-                world.ball().position() +
-                    Vector::createFromAngle(angle_between_robots *
-                                            static_cast<double>(k + 1)),
-                (angle_between_robots * static_cast<double>(k + 1)) + Angle::half(), 0);
+            move_tactics[k]->updateControlParams(world.ball().position() + Vector(1,0), Angle::zero(),
+                                                 0,TbotsProto::DribblerMode::OFF,
+
+                                                          TbotsProto::BallCollisionType::ALLOW);
         }
 
         // yield the Tactics this Play wants to run, in order of priority

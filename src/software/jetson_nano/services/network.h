@@ -53,4 +53,8 @@ class NetworkService
     // Functions to callback primitiveSet and world and stores them in a variable
     void primitiveSetCallback(TbotsProto::PrimitiveSet input);
     void worldCallback(TbotsProto::World input);
+
+    double last_primitive_time    = 0.0;
+    double last_world_time        = 0.0;
+    uint64_t last_sequence_number = 0;
 };

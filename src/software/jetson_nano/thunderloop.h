@@ -46,11 +46,17 @@ class Thunderloop
      * @param robot_constants The robot constants
      * @param loop_hz The rate to run the loop
      */
-    Thunderloop(const RobotConstants_t& robot_constants, const int loop_hz);
+    Thunderloop(const RobotConstants_t &robot_constants, const int loop_hz);
 
     ~Thunderloop();
 
     void runLoop();
+
+    static void *runThunderloopRealtime(void *context)
+    {
+        ((Thunderloop *)context)->runLoop();
+        return NULL;
+    }
 
     // Services
     std::unique_ptr<MotorService> motor_service_;
@@ -68,7 +74,7 @@ class Thunderloop
      *
      * @param ts timespec to modify
      */
-    void timespecNorm(struct timespec& ts);
+    void timespecNorm(struct timespec &ts);
 
     /**
      * Get the CPU temp thunderloop is running on
@@ -83,7 +89,6 @@ class Thunderloop
     // Input Msg Buffers
     TbotsProto::PrimitiveSet primitive_set_;
     TbotsProto::World world_;
-    TbotsProto::RobotState robot_state_;
     TbotsProto::Primitive primitive_;
     TbotsProto::DirectControlPrimitive direct_control_;
 
@@ -97,13 +102,14 @@ class Thunderloop
 
     // Current State
     RobotConstants_t robot_constants_;
+    Angle current_orientation_;
     int robot_id_;
     int channel_id_;
     std::string network_interface_;
     int loop_hz_;
 
     // 50 millisecond timeout on receiving primitives before we emergency stop the robots
-    const double PRIMITIVE_MANAGER_TIMEOUT_NS = 50.0 * MILLISECONDS_PER_NANOSECOND;
+    const double PRIMITIVE_MANAGER_TIMEOUT_NS = 500.0 * NANOSECONDS_PER_MILLISECOND;
 
     // Path to the CPU thermal zone temperature file
     const std::string CPU_TEMP_FILE_PATH = "/sys/class/thermal/thermal_zone1/temp";

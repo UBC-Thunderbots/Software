@@ -29,6 +29,7 @@ message World
     required Team enemy_team      = 4;
     required Ball ball            = 5;
     required GameState game_state = 6;
+    // required uint64 sequence_number = 7;
 }
 
 enum FieldType

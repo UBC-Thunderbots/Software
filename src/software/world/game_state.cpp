@@ -250,12 +250,6 @@ bool GameState::isReadyState() const
     return play_state_ == READY;
 }
 
-// One of our robots can kick the ball
-bool GameState::canKick() const
-{
-    return play_state_ == PLAYING || (our_restart_ && play_state_ == READY);
-}
-
 bool GameState::stayAwayFromBall() const
 {
     return play_state_ != PLAYING && !our_restart_;
@@ -334,22 +328,22 @@ void GameState::updateRefereeCommand(RefereeCommand command)
                 our_restart_    = false;
                 break;
             case RefereeCommand::DIRECT_FREE_US:
-                play_state_     = READY;
+                play_state_     = SETUP;
                 restart_reason_ = DIRECT;
                 our_restart_    = true;
                 break;
             case RefereeCommand::DIRECT_FREE_THEM:
-                play_state_     = READY;
+                play_state_     = SETUP;
                 restart_reason_ = DIRECT;
                 our_restart_    = false;
                 break;
             case RefereeCommand::INDIRECT_FREE_US:
-                play_state_     = READY;
+                play_state_     = SETUP;
                 restart_reason_ = INDIRECT;
                 our_restart_    = true;
                 break;
             case RefereeCommand::INDIRECT_FREE_THEM:
-                play_state_     = READY;
+                play_state_     = SETUP;
                 restart_reason_ = INDIRECT;
                 our_restart_    = false;
                 break;
@@ -388,7 +382,8 @@ void GameState::updateRefereeCommand(RefereeCommand command)
 
 void GameState::updateBall(const Ball& ball)
 {
-    if (play_state_ == READY && restart_reason_ != PENALTY)
+    if ((play_state_ == READY && restart_reason_ != PENALTY) ||
+        restart_reason_ == DIRECT || restart_reason_ == INDIRECT)
     {
         if (!ball_)
         {

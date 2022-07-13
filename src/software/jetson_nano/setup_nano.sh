@@ -11,6 +11,7 @@ host_software_packages=(
     python3.8-venv # Virtual Environment
     python3.8-dev  # Python 3 Headers
     zlib1g-dev
+    curl
 )
 
 sudo apt-get update
@@ -36,8 +37,12 @@ pip_libaries=(
     Jetson.GPIO==2.0.17
     Pillow==9.1.0
     redis==4.1.4
+    platformio==6.0.2
 )
 
 # Install python dependencies
 sudo /opt/tbotspython/bin/pip3.8 install "${pip_libaries[@]}"
+
+# Install platformio udev rules
+curl -fsSL https://raw.githubusercontent.com/platformio/platformio-core/master/scripts/99-platformio-udev.rules | sudo tee /etc/udev/rules.d/99-platformio-udev.rules
 

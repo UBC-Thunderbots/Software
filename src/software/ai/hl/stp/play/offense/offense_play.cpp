@@ -11,7 +11,6 @@ OffensePlay::OffensePlay(TbotsProto::AiConfig config)
     : Play(config, true),
       shoot_or_pass_play(std::make_shared<ShootOrPassPlay>(ai_config)),
       crease_defense_play(std::make_shared<CreaseDefensePlay>(ai_config))
-
 {
 }
 
@@ -34,12 +33,33 @@ void OffensePlay::updateTactics(const PlayUpdate &play_update)
     PriorityTacticVector tactics_to_return;
     unsigned int num_defenders = 2;
     unsigned int num_enemy_robots =
-        static_cast<int>(play_update.world.enemyTeam().numRobots());
+        static_cast<unsigned int>(play_update.world.enemyTeam().numRobots());
 
-    // enemy team has at most half a full team, so we need at most half the number of
-    // defenders
-    if (num_enemy_robots <= 3)
+    if (play_update.world.gameState().isSetupState() &&
+        (play_update.world.gameState().isOurDirectFree() ||
+         play_update.world.gameState().isOurIndirectFree()))
     {
+        // if we're in free kick on the enemy side, then we can commit more robots in
+        // forward positions
+        if (play_update.world.ball().position().x() > 0)
+        {
+            num_defenders = static_cast<unsigned int>(std::max(
+                0, static_cast<int>(
+                       2 - 2 * play_update.world.ball().position().x() /
+                               (play_update.world.field().fieldLines().xMax() / 3.0))));
+        }
+
+        shoot_or_pass_play->updateControlParams(true);
+    }
+    else if (play_update.world.gameState().isReadyState() &&
+             play_update.world.gameState().isOurKickoff())
+    {
+        shoot_or_pass_play->updateControlParams(true);
+    }
+    else if (num_enemy_robots <= 3)
+    {
+        // enemy team has at most half a full team, so we need at most half the number of
+        // defenders
         num_defenders = 1;
         if (num_enemy_robots < 2)
         {
@@ -50,6 +70,13 @@ void OffensePlay::updateTactics(const PlayUpdate &play_update)
     {
         // play_update.num_tactics == 0 is handled above
         num_defenders = play_update.num_tactics - 1;
+    }
+    else if (play_update.world.ball().position().x() <
+             play_update.world.field().fieldLines().xMin() / 4.0)
+    {
+        // if we have more than 3 robots and the ball is on our side of the field, then we
+        // should dedicate an additional robot to defense
+        num_defenders = 3;
     }
 
     unsigned int num_shoot_or_pass = play_update.num_tactics - num_defenders;

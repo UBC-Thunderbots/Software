@@ -4,6 +4,8 @@
 #include "extlibs/hrvo/path.h"
 #include "software/ai/navigator/path_planner/hrvo/velocity_obstacle.h"
 #include "software/geom/vector.h"
+#include "software/world/robot_state.h"
+#include "software/world/team_types.h"
 
 class HRVOSimulator;
 
@@ -16,18 +18,23 @@ class Agent
     /**
      * Constructor
      *
-     * @param simulator          The simulator which this agent is a part of
-     * @param position           The starting position of this agent.
-     * @param radius             The radius of this agent.
-     * @param velocity           The initial velocity of this agent.
-     * @param prefVelocity       The preferred velocity of this agent.
-     * @param maxSpeed           The maximum speed of this agent.
-     * @param maxAccel           The maximum acceleration of this agent.
-     * @param path               The path for this agent
+     * @param simulator             The simulator which this agent is a part of
+     * @param position              The starting position of this agent.
+     * @param radius                The radius of this agent.
+     * @param max_radius_inflation  The maximum amount which the radius of this agent can
+     * inflate.
+     * @param velocity              The initial velocity of this agent.
+     * @param prefVelocity          The preferred velocity of this agent.
+     * @param maxSpeed              The maximum speed of this agent.
+     * @param maxAccel              The maximum acceleration of this agent.
+     * @param path                  The path for this agent
+     * @param robot_id		 		The robot id for this agent
+     * @param agent_type	 		The friendly or enemy agent type
      */
     Agent(HRVOSimulator *simulator, const Vector &position, float radius,
-          const Vector &velocity, const Vector &prefVelocity, float maxSpeed,
-          float maxAccel, AgentPath &path);
+          float max_radius_inflation, const Vector &velocity, const Vector &prefVelocity,
+          float maxSpeed, float maxAccel, AgentPath &path, RobotId robot_id,
+          TeamSide agent_type);
 
     virtual ~Agent() = default;
 
@@ -43,6 +50,11 @@ class Agent
      * @return The velocity obstacle which other_agent should see for this Agent
      */
     virtual VelocityObstacle createVelocityObstacle(const Agent &other_agent) = 0;
+
+    /**
+     * Update the agent's radius based on its current velocity
+     */
+    void updateRadiusFromVelocity();
 
     /**
      * Updates the position and velocity of this agent.
@@ -147,10 +159,28 @@ class Agent
      */
     void setPath(const AgentPath &new_path);
 
+    /**
+     * Gets the robot id for this Agent
+     * @return robot id of the agent
+     */
+    RobotId getRobotId();
+
+    /**
+     * Get whether this robot is a FRIENDLY or an ENEMY robot.
+     *
+     * @return FRIENDLY if friendly, ENEMY if otherwise
+     */
+    TeamSide getAgentType();
+
    protected:
     // Agent Properties
     Vector position_;
+    // This agent's current actual radius
     float radius_;
+    // The minimum radius which this agent can be
+    const float min_radius_;
+    // The maximum amount which the radius can increase by
+    const float max_radius_inflation_;
 
     // The actual current velocity of this Agent
     Vector velocity_;
@@ -162,6 +192,11 @@ class Agent
     Vector pref_velocity_;
     // The path of this Agent
     AgentPath path;
+
+    // robot id of this Agent
+    RobotId robot_id;
+    // whether this Agent is FRIENDLY or ENEMY
+    TeamSide agent_type;
 
     float max_speed_;
     float max_accel_;

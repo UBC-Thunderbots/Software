@@ -3,7 +3,32 @@ syntax = "proto3";
 package TbotsProto;
 
 import "proto/robot_status_msg.proto";
-import "proto/primitive.proto";
+import "proto/geneva_slot.proto";
+
+message PowerPulseControl
+{
+    message AutoChipOrKick
+    {
+        oneof auto_chip_or_kick
+        {
+            uint32 autokick_pulse_width = 1;
+            uint32 autochip_pulse_width = 2;
+        }
+    }
+
+    message ChickerControl
+    {
+        oneof chicker_command
+        {
+            uint32 kick_pulse_width          = 1;
+            uint32 chip_pulse_width          = 2;
+            AutoChipOrKick auto_chip_or_kick = 3;
+        }
+    }
+
+    ChickerControl chicker  = 1;
+    Geneva.Slot geneva_slot = 2;
+}
 
 message PowerFrame
 {
@@ -11,7 +36,7 @@ message PowerFrame
     uint32 crc    = 2;
     oneof power_msg
     {
-        PowerControl power_control = 3;
-        PowerStatus power_status   = 4;
+        PowerPulseControl power_control = 3;
+        PowerStatus power_status        = 4;
     }
 }

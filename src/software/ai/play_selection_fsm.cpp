@@ -1,10 +1,8 @@
 #include "software/ai/play_selection_fsm.h"
 
 #include "software/ai/hl/stp/play/ball_placement_play.h"
-#include "software/ai/hl/stp/play/corner_kick_play.h"
 #include "software/ai/hl/stp/play/enemy_ball_placement_play.h"
 #include "software/ai/hl/stp/play/enemy_free_kick_play.h"
-#include "software/ai/hl/stp/play/free_kick_play.h"
 #include "software/ai/hl/stp/play/halt_play.h"
 #include "software/ai/hl/stp/play/kickoff_enemy_play.h"
 #include "software/ai/hl/stp/play/kickoff_friendly_play.h"
@@ -36,7 +34,13 @@ bool PlaySelectionFSM::gameStatePlaying(const Update& event)
 
 bool PlaySelectionFSM::gameStateSetup(const Update& event)
 {
-    return event.game_state.isSetupState();
+    return event.game_state.isSetupState() ||
+           (event.game_state.isReadyState() && event.game_state.isOurKickoff());
+}
+
+bool PlaySelectionFSM::gameStateReady(const Update& event)
+{
+    return event.game_state.isReadyState();
 }
 
 void PlaySelectionFSM::setupSetPlay(const Update& event)
@@ -74,12 +78,22 @@ void PlaySelectionFSM::setupSetPlay(const Update& event)
 
     if (event.game_state.isOurDirectFree() || event.game_state.isOurIndirectFree())
     {
-        event.set_current_play(std::make_unique<FreeKickPlay>(ai_config));
+        // free kick is handled as part of the offense play, but we need to restart it for
+        // it to handle a free kick
+        event.set_current_play(std::make_unique<OffensePlay>(ai_config));
     }
 
     if (event.game_state.isTheirDirectFree() || event.game_state.isTheirIndirectFree())
     {
         event.set_current_play(std::make_unique<EnemyFreekickPlay>(ai_config));
+    }
+}
+
+void PlaySelectionFSM::readySetPlay(const Update& event)
+{
+    if (event.game_state.isOurKickoff())
+    {
+        event.set_current_play(std::make_unique<OffensePlay>(ai_config));
     }
 }
 
@@ -95,7 +109,5 @@ void PlaySelectionFSM::setupHaltPlay(const Update& event)
 
 void PlaySelectionFSM::setupOffensePlay(const Update& event)
 {
-    // TODO (2440): We should have smarter logic for analysing the state of play to
-    // configure which robots should do what
     event.set_current_play(std::make_unique<OffensePlay>(ai_config));
 }
