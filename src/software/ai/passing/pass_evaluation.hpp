@@ -49,6 +49,15 @@ class PassEvaluation
      */
     PassWithRating getBestPassOnField() const;
 
+
+    /**
+     * Get the best N passes on the entire field, where each pass is from a different zone
+     *
+     * @returns PassWithRating containing the best pass
+     */
+    std::vector<PassWithRating> getBestNPassesOnField(int n) const;
+
+
     /**
      * Given a set of zone_ids, returns the best PassWithRating in those zones
      *
@@ -121,6 +130,26 @@ PassWithRating PassEvaluation<ZoneEnum>::getBestPassOnField() const
 }
 
 template <class ZoneEnum>
+std::vector<PassWithRating> PassEvaluation<ZoneEnum>::getBestNPassesOnField(int n) const
+{
+    auto best_passes_copy = ZonePassMap<ZoneEnum>(best_pass_in_zones_) ;
+    std::vector<PassWithRating> best_n_passes;
+
+    for (int i = 0; i < n; i++){
+        auto best_pass =
+                std::max_element(best_passes_copy.begin(), best_passes_copy.end(),
+                                 [](const std::pair<ZoneEnum, PassWithRating>& p1,
+                                    const std::pair<ZoneEnum, PassWithRating>& p2) {
+                                     return p1.second.rating < p2.second.rating;
+                                 });
+        best_n_passes.push_back(best_pass);
+        best_passes_copy.erase(best_pass->first);
+    }
+
+    return best_n_passes;
+}
+
+template <class ZoneEnum>
 PassWithRating PassEvaluation<ZoneEnum>::getBestPassInZones(
     const std::unordered_set<ZoneEnum>& zone_ids) const
 {
@@ -168,5 +197,11 @@ std::vector<ZoneEnum> PassEvaluation<ZoneEnum>::rankZonesForReceiving(
                                   pitch_division_->getZone(z2), pass_position,
                                   passing_config_);
               });
+
+//    std::sort(cherry_pick_zones.begin(), cherry_pick_zones.end(),
+//              [this, &world, &pass_position](const ZoneEnum& z1, const ZoneEnum& z2) {
+//                  return getBestPassInZones({z1}).rating >
+//                         getBestPassInZones({z2}).rating;
+//              });
     return cherry_pick_zones;
 }
