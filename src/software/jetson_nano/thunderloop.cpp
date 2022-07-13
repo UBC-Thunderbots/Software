@@ -30,7 +30,7 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, const int loop
 
     redis_client_ = std::make_unique<RedisClient>(REDIS_DEFAULT_HOST, REDIS_DEFAULT_PORT);
 
-    LoggerSingleton::initializeLogger("/tmp/tbots");
+    LoggerSingleton::initializeLogger("/home/robot/logs");
 
     power_service_ = std::make_unique<PowerService>();
     motor_service_ = std::make_unique<MotorService>(robot_constants, loop_hz);
@@ -116,6 +116,7 @@ void Thunderloop::runLoop()
             // robot status
             {
                 ScopedTimespecTimer timer(&poll_time);
+                robot_status_.set_robot_id(robot_id_);
                 auto result       = network_service_->poll(robot_status_);
                 new_primitive_set = std::get<0>(result);
                 new_world         = std::get<1>(result);
@@ -203,6 +204,7 @@ void Thunderloop::runLoop()
             {
                 ScopedTimespecTimer timer(&poll_time);
                 power_status_ = power_service_->poll(direct_control_.power_control());
+                LOG(DEBUG) << power_status_.DebugString();
             }
             thunderloop_status_.set_power_service_poll_time_ns(
                 static_cast<unsigned long>(poll_time.tv_nsec));

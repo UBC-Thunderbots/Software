@@ -26,9 +26,8 @@ class RobotView(QWidget):
         self.pink = QtGui.QColor(255, 0, 255)
         self.green = QtGui.QColor(0, 255, 0)
 
-        self.breakbeam_buffer = ThreadSafeBuffer(1, BreakBeamStatus)
-        self.power_status_buffer = ThreadSafeBuffer(1, PowerStatus)
-        self.MIN_VOLTAGE_LEVEL = 50
+        self.robot_status_buffer = ThreadSafeBuffer(100, RobotStatus)
+        self.MIN_VOLTAGE_LEVEL = 20.5  # TODO PULL THIS OUT
 
         # There is no pattern to this so we just have to create
         # mapping from robot id to the four corners of the vision pattern
@@ -56,12 +55,6 @@ class RobotView(QWidget):
         }
 
         self.layout = QVBoxLayout()
-
-        self.battery_voltage_progress_bar = QProgressBar()
-        self.battery_voltage_progress_bar.setMaximum(100)
-        self.battery_voltage_progress_bar.setMinimum(0)
-        self.battery_voltage_progress_bar.setValue(10)
-        self.layout.addWidget(self.battery_voltage_progress_bar)
 
         self.robot_layouts = [QHBoxLayout() for x in range(8)]
         self.robot_status_layouts = [QVBoxLayout() for x in range(8)]
@@ -143,6 +136,7 @@ class RobotView(QWidget):
     def refresh(self):
         """Refresh the view
         """
+        return
         breakbeam_status = self.breakbeam_buffer.get(block=False)
         for i in range(8):
             if breakbeam_status.ball_in_beam:

@@ -212,7 +212,7 @@ if __name__ == "__main__":
         friendly_colour_yellow = False
         debug = args.debug_blue_full_system
 
-    if args.run_yellow:
+    elif args.run_yellow:
 
         tscope = Thunderscope(
             layout_path=args.layout,
@@ -229,6 +229,7 @@ if __name__ == "__main__":
         debug = args.debug_yellow_full_system
 
     if args.run_blue or args.run_yellow:
+
         with ProtoLogger(
             args.blue_full_system_runtime_dir,
         ) as blue_logger, ProtoLogger(

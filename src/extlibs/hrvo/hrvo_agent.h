@@ -40,6 +40,7 @@
 
 #include "agent.h"
 #include "simulator.h"
+#include "software/ai/navigator/obstacle/robot_navigation_obstacle_factory.h"
 #include "software/geom/vector.h"
 
 /**
@@ -54,8 +55,9 @@ class HRVOAgent : public Agent
      *
      * @param simulator             The simulation.
      * @param position              The starting position of this agent.
-     * @param neighborDist          The maximum distance away from this agent which
-     * another agent can be to be considered as an obstacle.
+     * @param max_neighbor_dist     The maximum distance away which another agent can be
+     * from this agent to be considered as a neighbor (i.e. velocity obstacles for it
+     * would be created)
      * @param maxNeighbors          The maximum number of other agents which this agent
      * will try to avoid collisions with at a time.
      * @param radius                The radius of this agent.
@@ -64,17 +66,14 @@ class HRVOAgent : public Agent
      * @param velocity              The initial velocity of this agent.
      * @param maxAccel              The maximum acceleration of this agent.
      * @param path                  The path which this agent should take.
-     * @param prefSpeed             The speed at which this agent prefers to move at.
      * @param maxSpeed              The maximum speed of this agent.
-     * @param uncertaintyOffset     The uncertainty offset of this agent.
      * @param robot_id		 	    The robot id for this agent.
      * @param type		 		    The side that this agent is on (friendly/enemy).
      */
-    HRVOAgent(HRVOSimulator *simulator, const Vector &position, float neighborDist,
+    HRVOAgent(HRVOSimulator *simulator, const Vector &position, float max_neighbor_dist,
               std::size_t maxNeighbors, float radius, float max_radius_inflation,
-              const Vector &velocity, float maxAccel, AgentPath &path, float prefSpeed,
-              float maxSpeed, float uncertaintyOffset, RobotId robot_id, TeamSide type);
-
+              const Vector &velocity, float maxAccel, AgentPath &path, float maxSpeed,
+              RobotId robot_id, TeamSide type);
     /**
      * Computes the new velocity of this agent.
      */
@@ -94,7 +93,7 @@ class HRVOAgent : public Agent
     /**
      * Computes the maxNeighbors nearest neighbors of this agent.
      */
-    void computeNeighbors();
+    void computeNeighbors(double neighbor_dist_threshold);
 
     /**
      * Computes the preferred velocity of this agent.
@@ -108,6 +107,14 @@ class HRVOAgent : public Agent
      * @param  rangeSq  The squared range around this agent.
      */
     void insertNeighbor(std::size_t agentNo, float &rangeSq);
+
+    /**
+     * Update the primitive which this agent is currently pursuing.
+     *
+     * @param new_primitive The new primitive to pursue
+     * @param world The world in which the new primitive is being pursued
+     */
+    void updatePrimitive(const TbotsProto::Primitive &new_primitive, const World &world);
 
     /**
      * Get a list of circles which represent the new velocity candidates
@@ -213,17 +220,24 @@ class HRVOAgent : public Agent
      */
     bool isCandidateFasterThanCurrentSpeed(const Candidate &candidate) const;
 
+    /**
+     * Compute all the velocity obstacles that this Agent should take into account and
+     * add it to `velocityObstacles_`.
+     */
+    void computeVelocityObstacles();
 
    public:
     float prefSpeed_;
 
     std::size_t maxNeighbors_;
-    float neighborDist_;
-    float uncertaintyOffset_;
+    float max_neighbor_dist;
     std::multimap<float, Candidate> candidates_;
     // distance -> Agent Index
     std::set<std::pair<float, std::size_t>> neighbors_;
     std::vector<VelocityObstacle> velocityObstacles_;
+    std::vector<ObstaclePtr> static_obstacles;
+    std::optional<ObstaclePtr> ball_obstacle;
+    RobotNavigationObstacleFactory obstacle_factory;
 
     // TODO (#2519): Remove magic numbers
     // Increasing deceleration distance to reduce the chance of overshooting the
@@ -232,6 +246,11 @@ class HRVOAgent : public Agent
     // Decreasing preferred speed during deceleration to reduce the chance of
     // overshooting the destination
     static constexpr float decel_pref_speed_multiplier = 0.6f;
+
+    // The scale multiple of max robot speed which the preferred speed will be set at.
+    // pref_speed = max_speed * PREF_SPEED_SCALE
+    // NOTE: This scale multiple must be <= 1
+    static constexpr float PREF_SPEED_SCALE = 0.85f;
 
     friend class KdTree;
     friend class Simulator;

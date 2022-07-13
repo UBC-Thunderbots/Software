@@ -90,12 +90,24 @@ void DribbleFSM::getPossession(const Update &event)
                               event.common.world.field()) +
         Vector::createFromAngle(face_ball_orientation).normalize(0.05);
 
-    event.common.set_primitive(createMovePrimitive(
-        CREATE_MOTION_CONTROL(intercept_position), face_ball_orientation, 0,
-        TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
-        AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
-        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
-        event.common.robot.robotConstants()));
+    if ((intercept_position - event.common.robot.position()).length() < 2.0)
+    {
+        event.common.set_primitive(createMovePrimitive(
+            CREATE_MOTION_CONTROL(intercept_position), face_ball_orientation, 0,
+            TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
+            AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
+            TbotsProto::MaxAllowedSpeedMode::DRIBBLE_GET_POSSESSION, 0.0,
+            event.common.robot.robotConstants()));
+    }
+    else
+    {
+        event.common.set_primitive(createMovePrimitive(
+            CREATE_MOTION_CONTROL(intercept_position), face_ball_orientation, 0,
+            TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
+            AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
+            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
+            event.common.robot.robotConstants()));
+    }
 }
 
 void DribbleFSM::dribble(const Update &event)
@@ -140,7 +152,7 @@ void DribbleFSM::startDribble(const Update &event)
 
 bool DribbleFSM::havePossession(const Update &event)
 {
-    return event.common.robot.isNearDribbler(event.common.world.ball().position());
+    return event.common.robot.isNearDribbler(event.common.world.ball().position(), -0.01);
 }
 
 bool DribbleFSM::lostPossession(const Update &event)

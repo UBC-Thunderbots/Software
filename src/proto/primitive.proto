@@ -69,6 +69,8 @@ enum MaxAllowedSpeedMode
     STOP_COMMAND = 1;
     // Move at speed at which collisions are allowed
     COLLISIONS_ALLOWED = 2;
+    // Move at speed at which we can grab the ball
+    DRIBBLE_GET_POSSESSION = 3;
 }
 
 message AutoChipOrKick

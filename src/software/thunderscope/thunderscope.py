@@ -482,8 +482,7 @@ class Thunderscope(object):
         """
         robot_view = RobotView()
         self.register_refresh_function(robot_view.refresh)
-        proto_unix_io.register_observer(BreakBeamStatus, robot_view.breakbeam_buffer)
-        proto_unix_io.register_observer(PowerStatus, robot_view.power_status_buffer)
+        proto_unix_io.register_observer(RobotStatus, robot_view.robot_status_buffer)
         return robot_view
 
     def setup_estop_view(self, proto_unix_io):
@@ -619,7 +618,7 @@ class Thunderscope(object):
         proto_plotter = ProtoPlotter(
             min_y=0,
             max_y=100,
-            window_secs=10,
+            window_secs=15,
             configuration={NamedValue: extract_namedvalue_data},
         )
 

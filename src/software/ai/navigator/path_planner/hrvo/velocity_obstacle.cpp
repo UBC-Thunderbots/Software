@@ -14,12 +14,9 @@ VelocityObstacle::VelocityObstacle(Vector apex, Vector side1, Vector side2) : ap
     }
     else
     {
-        // TODO (#2602): Re-enable this LOG once the implementation of the velocity
-        //               obstacle generation is updated.
-        // LOG(WARNING)
-        //     << "VelocityObstacle: constructing a velocity obstacle with 180 degree
-        //     sides can lead to undefined behaviour. { apex: "
-        //     << apex << ", side1: " << side1 << ", side2: " << side2;
+        LOG(WARNING)
+            << "VelocityObstacle: constructing a velocity obstacle with 180 degree sides can lead to undefined behaviour. { apex: "
+            << apex << ", side1: " << side1 << ", side2: " << side2;
     }
 }
 
