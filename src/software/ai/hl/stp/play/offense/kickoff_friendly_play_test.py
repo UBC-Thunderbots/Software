@@ -64,7 +64,7 @@ def test_kickoff_friendly_play_bottom_left(simulated_test_runner):
     simulated_test_runner.run_test(
         eventually_validation_sequence_set=eventually_validation_sequence_set,
         always_validation_sequence_set=always_validation_sequence_set,
-        test_timeout_s=10,
+        test_timeout_s=40,
         referee_ci_inputs=[
             (Command.Type.KICKOFF, Team.BLUE),
             (Command.Type.KICKOFF, Team.BLUE),
@@ -123,7 +123,7 @@ def test_kickoff_friendly_play_top_right(simulated_test_runner):
     simulated_test_runner.run_test(
         eventually_validation_sequence_set=eventually_validation_sequence_set,
         always_validation_sequence_set=always_validation_sequence_set,
-        test_timeout_s=10,
+        test_timeout_s=40,
         referee_ci_inputs=[
             (Command.Type.KICKOFF, Team.BLUE),
             (Command.Type.KICKOFF, Team.BLUE),

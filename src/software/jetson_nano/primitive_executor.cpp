@@ -12,7 +12,6 @@ PrimitiveExecutor::PrimitiveExecutor(const double time_step,
                                      const RobotConstants_t& robot_constants,
                                      const TeamColour friendly_team_colour)
     : current_primitive_(),
-      robot_constants_(robot_constants),
       hrvo_simulator_(static_cast<float>(time_step), robot_constants,
                       friendly_team_colour)
 {
@@ -57,29 +56,12 @@ AngularVelocity PrimitiveExecutor::getTargetAngularVelocity(
     const double delta_orientation =
         dest_orientation.minDiff(curr_orientation).toRadians();
 
-    // angular velocity given linear deceleration and distance remaining to target
-    // orientation.
-    // Vi = sqrt(0^2 + 2 * a * d)
-    //    double deceleration_angular_speed = std::sqrt(
-    //            2 * robot_constants_.robot_max_ang_acceleration_rad_per_s_2 *
-    //            delta_orientation);
-
-
-    //    double max_angular_speed =
-    //        static_cast<double>(robot_constants_.robot_max_ang_speed_rad_per_s);
-    //    double next_angular_speed = max_angular_speed;
-    //    if (delta_orientation < M_PI / 3.0)
-    //    {
-    //        next_angular_speed = delta_orientation;
-
-    // angular velocity given linear deceleration and distance remaining to target
-    // orientation.
-    // Vi = sqrt(0^2 + 2 * a * d)
     double deceleration_angular_speed = std::sqrt(
-        2 * robot_constants_.robot_max_ang_acceleration_rad_per_s_2 * delta_orientation);
+        2 * move_primitive.robot_max_ang_acceleration_rad_per_s_2() * delta_orientation);
 
     double max_angular_speed =
-        static_cast<double>(robot_constants_.robot_max_ang_speed_rad_per_s);
+        static_cast<double>(move_primitive.robot_max_ang_speed_rad_per_s());
+
     double next_angular_speed = std::min(max_angular_speed, deceleration_angular_speed);
 
     const double signed_delta_orientation =
@@ -98,7 +80,6 @@ double PrimitiveExecutor::getTargetLinearSpeed(
     const float max_speed_m_per_s = move_primitive.max_speed_m_per_s();
     const Point final_position =
         createPoint(move_primitive.motion_control().path().points().at(1));
-    std::clamp(max_speed_m_per_s, 0.0f, robot_constants_.robot_max_speed_m_per_s);
 
     const float max_target_linear_speed = fmaxf(max_speed_m_per_s, dest_linear_speed);
 
@@ -111,7 +92,7 @@ double PrimitiveExecutor::getTargetLinearSpeed(
     const float start_linear_deceleration_distance =
         (max_target_linear_speed * max_target_linear_speed -
          dest_linear_speed * dest_linear_speed) /
-        (2 * robot_constants_.robot_max_acceleration_m_per_s_2 + LOCAL_EPSILON);
+        (2 * move_primitive.robot_max_acceleration_m_per_s_2() + LOCAL_EPSILON);
 
     // When we are close enough to start decelerating, we reduce the max speed
     // by 60%. Once we get closer than 0.6 meters, we start to linearly decrease
@@ -136,7 +117,6 @@ Vector PrimitiveExecutor::getTargetLinearVelocity(
     const float max_speed_m_per_s = move_primitive.max_speed_m_per_s();
     const Point final_position =
         createPoint(move_primitive.motion_control().path().points().at(1));
-    std::clamp(max_speed_m_per_s, 0.0f, robot_constants_.robot_max_speed_m_per_s);
 
     const float max_target_linear_speed = fmaxf(max_speed_m_per_s, dest_linear_speed);
 
@@ -149,7 +129,7 @@ Vector PrimitiveExecutor::getTargetLinearVelocity(
     const float start_linear_deceleration_distance =
         (max_target_linear_speed * max_target_linear_speed -
          dest_linear_speed * dest_linear_speed) /
-        (2 * robot_constants_.robot_max_acceleration_m_per_s_2 + LOCAL_EPSILON);
+        (2 * move_primitive.robot_max_acceleration_m_per_s_2() + LOCAL_EPSILON);
 
     // When we are close enough to start decelerating, we reduce the max speed
     // by 60%. Once we get closer than 0.6 meters, we start to linearly decrease

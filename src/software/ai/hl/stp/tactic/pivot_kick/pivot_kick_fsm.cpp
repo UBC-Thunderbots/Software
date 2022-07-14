@@ -14,12 +14,16 @@ void PivotKickFSM::getPossessionAndPivot(
 
 void PivotKickFSM::kickBall(const Update& event)
 {
+    auto constants = event.common.robot.robotConstants();
+    constants.robot_max_ang_speed_rad_per_s =constants.robot_max_ang_speed_rad_per_s  / 2.0f;
+    constants.robot_max_ang_acceleration_rad_per_s_2 =constants.robot_max_ang_acceleration_rad_per_s_2/ 2.0f;
+
     event.common.set_primitive(createMovePrimitive(
-            CREATE_MOTION_CONTROL(event.control_params.kick_origin),
-            event.control_params.kick_direction, 0, TbotsProto::DribblerMode::OFF,
+                CREATE_MOTION_CONTROL(event.control_params.kick_origin),
+                event.control_params.kick_direction, 0, TbotsProto::DribblerMode::OFF,
             TbotsProto::BallCollisionType::ALLOW, event.control_params.auto_chip_or_kick,
             TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
-            event.common.robot.robotConstants(), std::optional<double>(), true));
+            constants, std::optional<double>(), true));
 }
 
 bool PivotKickFSM::ballKicked(const Update& event)
