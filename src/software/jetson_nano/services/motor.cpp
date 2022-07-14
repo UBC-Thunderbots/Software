@@ -494,6 +494,10 @@ WheelSpace_t MotorService::rampWheelVelocity(
     const EuclideanSpace_t& target_euclidean_velocity, double allowed_acceleration,
     const double& time_to_ramp)
 {
+    // max allowed velocity
+    auto max_allowable_wheel_velocity =
+        static_cast<double>(robot_constants_.robot_max_speed_m_per_s);
+
     // ramp wheel velocity
     WheelSpace_t ramp_wheel_velocity;
 
@@ -523,6 +527,17 @@ WheelSpace_t MotorService::rampWheelVelocity(
     {
         // If smaller, go straight to target
         ramp_wheel_velocity = target_wheel_velocity;
+    }
+
+    // find absolute max wheel velocity
+    auto max_ramp_wheel_velocity = ramp_wheel_velocity.cwiseAbs().maxCoeff();
+
+    // compare against max wheel velocity
+    if (max_ramp_wheel_velocity > max_allowable_wheel_velocity)
+    {
+        // if larger, scale down to max
+        ramp_wheel_velocity = (ramp_wheel_velocity / max_ramp_wheel_velocity) *
+                              max_allowable_wheel_velocity;
     }
 
     return ramp_wheel_velocity;
