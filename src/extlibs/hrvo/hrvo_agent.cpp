@@ -84,6 +84,11 @@ void HRVOAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive,
             Vector(destination.x_meters(), destination.y_meters()), speed_at_dest)};
         path              = AgentPath(path_points, path_radius);
 
+        if (new_primitive.move().ball_collision_type() == TbotsProto::AVOID)
+        {
+            ball_obstacle = obstacle_factory.createFromBallPosition(world.ball().position());
+        }
+
         // Update static obstacles
         std::set<TbotsProto::MotionConstraint> motion_constraints;
         for (int constraint_int : motion_control.motion_constraints())
