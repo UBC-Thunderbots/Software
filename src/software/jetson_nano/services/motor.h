@@ -144,30 +144,31 @@ class MotorService
                      uint32_t spi_speed);
 
     /**
-     * Ramp the velocity over the given timestep and set the target velocity on the motor.
+     * Ramp the velocity over the given timestep.
      *
      * NOTE: This function has no state.
      * Also NOTE: This function handles all electrical rpm to meters/second conversion.
      *
-     * @param velocity_target The target velocity in m/s
-     * @param velocity_current The current velocity m/s
+     * @param current_wheel_velocity The current wheel velocity in m/s
+     * @param target_euclidean_velocity The target euclidean velocity m/s
      * @param time_to_ramp The time allocated for acceleration in seconds
      *
      */
+    WheelSpace_t rampVelocity(const WheelSpace_t& current_wheel_velocity,
+                              const EuclideanSpace_t& target_euclidean_velocity,
+                              const double& time_to_ramp);
     WheelSpace_t rampWheelVelocity(const WheelSpace_t& current_wheel_velocity,
-                                   const EuclideanSpace_t& target_euclidean_velocity,
+                                   const WheelSpace_t& target_wheel_velocity,
                                    double allowed_acceleration,
                                    const double& time_to_ramp);
-
-    EuclideanSpace_t rampLinearVelocity(
-        const EuclideanSpace_t& current_euclidean_velocity,
-        const EuclideanSpace_t& target_euclidean_velocity, double allowed_acceleration,
-        const double& time_to_ramp);
-
-    EuclideanSpace_t rampAngularVelocity(
-        const EuclideanSpace_t& current_euclidean_velocity,
-        const EuclideanSpace_t& target_euclidean_velocity, double allowed_acceleration,
-        const double& time_to_ramp);
+    void rampLinearVelocity(EuclideanSpace_t& ramp_velocity,
+                            const EuclideanSpace_t& current_euclidean_velocity,
+                            const EuclideanSpace_t& target_euclidean_velocity,
+                            double allowed_acceleration, const double& time_to_ramp);
+    void rampAngularVelocity(EuclideanSpace_t& ramp_velocity,
+                             const EuclideanSpace_t& current_euclidean_velocity,
+                             const EuclideanSpace_t& target_euclidean_velocity,
+                             double allowed_acceleration, const double& time_to_ramp);
 
     /**
      * Convert electrical rpm to wheel velocity.

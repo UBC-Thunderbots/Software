@@ -70,6 +70,7 @@ void HRVOAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive,
         float new_max_speed        = new_primitive.move().max_speed_m_per_s();
         setMaxSpeed(new_max_speed);
         setPreferredSpeed(new_max_speed * PREF_SPEED_SCALE);
+        start_decel_dist = new_primitive.move().hrvo_start_deceleration_dist();
 
         // TODO (#2418): Update implementation of Primitive to support
         // multiple path points and remove this check

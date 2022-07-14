@@ -132,6 +132,11 @@ message MovePrimitive
     AutoChipOrKick auto_chip_or_kick      = 6;
     float target_spin_rev_per_s           = 7;
     BallCollisionType ball_collision_type = 8;
+    float robot_max_ang_speed_rad_per_s = 9;
+    float robot_max_acceleration_m_per_s_2 = 10;
+    float robot_max_ang_acceleration_rad_per_s_2 = 11;
+    float hrvo_start_deceleration_dist = 12;
+    bool run_hrvo = 13;
 }
 
 message StopPrimitive
