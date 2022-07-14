@@ -11,7 +11,7 @@ from proto.import_all_protos import *
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 
-class playInfoWidget(QTableWidget):
+class playInfoWidget(QWidget):
 
     NUM_ROWS = 6
     NUM_COLS = 4
@@ -24,10 +24,19 @@ class playInfoWidget(QTableWidget):
                             Set lower for more realtime plots. Default is arbitrary
 
         """
-        QTableWidget.__init__(self, playInfoWidget.NUM_ROWS, playInfoWidget.NUM_COLS)
+        QWidget.__init__(self)
+
+        self.play_table = QTableWidget(playInfoWidget.NUM_ROWS, playInfoWidget.NUM_COLS)
+        self.referee_info = QLabel()
 
         self.playinfo_buffer = ThreadSafeBuffer(buffer_size, PlayInfo, False)
-        self.verticalHeader().setVisible(False)
+        self.referee_buffer = ThreadSafeBuffer(buffer_size, Referee, False)
+        self.play_table.verticalHeader().setVisible(False)
+
+        self.vertical_layout = QVBoxLayout()
+        self.vertical_layout.addWidget(self.play_table)
+        self.vertical_layout.addWidget(self.referee_info)
+        self.setLayout(self.vertical_layout)
 
     def set_data(self, data):
         """Data to set in the table
@@ -55,16 +64,18 @@ class playInfoWidget(QTableWidget):
                         1,
                     )
                 )
-                self.setItem(m, n, newitem)
+                self.play_table.setItem(m, n, newitem)
 
-        self.setHorizontalHeaderLabels(horizontal_headers)
+        self.play_table.setHorizontalHeaderLabels(horizontal_headers)
 
     def refresh(self):
         """Update the play info widget with new play information
         """
         playinfo = self.playinfo_buffer.get(block=False)
+        referee = self.referee_buffer.get(block=False)
 
         play_info_dict = MessageToDict(playinfo)
+        referee_msg_dict = MessageToDict(referee)
 
         robot_ids = []
         tactic_fsm_states = []
@@ -80,7 +91,7 @@ class playInfoWidget(QTableWidget):
         )
 
         # setting table size dynamically
-        self.setRowCount(num_rows)
+        self.play_table.setRowCount(num_rows)
 
         for state in play_info_dict["play"]["playState"]:
             play_name.append(state)
@@ -103,5 +114,11 @@ class playInfoWidget(QTableWidget):
             }
         )
 
-        self.resizeColumnsToContents()
-        self.resizeRowsToContents()
+        self.play_table.resizeColumnsToContents()
+        self.play_table.resizeRowsToContents()
+        p = (
+            f"REFEREE {referee_msg_dict['packetTimestamp']}: "
+            + f" {referee_msg_dict['stage']} "
+            + f" -> blue team on positive half: {referee_msg_dict['blueTeamOnPositiveHalf']}"
+        )
+        self.referee_info.setText(p)

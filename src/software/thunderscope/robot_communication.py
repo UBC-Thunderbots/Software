@@ -66,7 +66,9 @@ class RobotCommunication(object):
         self.run_thread = threading.Thread(target=self.run)
 
         try:
-            self.estop_reader = ThreadedEstopReader(self.estop_path, self.estop_buadrate)
+            self.estop_reader = ThreadedEstopReader(
+                self.estop_path, self.estop_buadrate
+            )
         except Exception:
             raise Exception("connect estop - not found")
 
@@ -76,7 +78,6 @@ class RobotCommunication(object):
                 EstopState, EstopState(is_playing=self.estop_reader.isEstopPlay())
             )
             time.sleep(0.1)
-
 
     def run(self):
         """Forward World and PrimitiveSet protos from fullsystem to the robots.
@@ -203,6 +204,15 @@ class RobotCommunication(object):
             True,
         )
 
+        self.receive_robot_status = HRVOVisualizationProtoListener(
+            self.multicast_channel + "%" + self.interface,
+            ROBOT_LOGS_PORT,
+            lambda data: self.full_system_proto_unix_io.send_proto(
+                HRVOVisualization, data
+            ),
+            True,
+        )
+
         # Create multicast senders
         self.send_primitive_set = PrimitiveSetProtoSender(
             self.multicast_channel + "%" + self.interface, PRIMITIVE_PORT, True
@@ -214,7 +224,13 @@ class RobotCommunication(object):
 
         self.connect_fullsystem_to_robots()
         # self.disconnect_fullsystem_from_robots()
-        # self.connect_robot_to_diagnostics(7)
+        # self.connect_robot_to_diagnostics(0)
+        # self.connect_robot_to_diagnostics(1)
+        # self.connect_robot_to_diagnostics(2)
+        # self.connect_robot_to_diagnostics(3)
+        # self.connect_robot_to_diagnostics(4)
+        # self.connect_robot_to_diagnostics(5)
+        # self.connect_robot_to_diagnostics(6)
 
         self.send_estop_state_thread.start()
         self.run_thread.start()

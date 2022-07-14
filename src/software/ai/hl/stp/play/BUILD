@@ -97,6 +97,34 @@ cc_library(
 )
 
 cc_library(
+    name = "move_to_dest_play",
+    srcs = ["move_to_dest_play.cpp"],
+    hdrs = ["move_to_dest_play.h"],
+    deps = [
+        ":play",
+        "//shared:constants",
+        "//software/ai/hl/stp/tactic/move:move_tactic",
+        "//software/logger",
+        "//software/util/generic_factory",
+    ],
+    alwayslink = True,
+)
+
+cc_library(
+    name = "move_to_dest_and_orient_play",
+    srcs = ["move_to_dest_and_orient_play.cpp"],
+    hdrs = ["move_to_dest_and_orient_play.h"],
+    deps = [
+        ":play",
+        "//shared:constants",
+        "//software/ai/hl/stp/tactic/move:move_tactic",
+        "//software/logger",
+        "//software/util/generic_factory",
+    ],
+    alwayslink = True,
+)
+
+cc_library(
     name = "halt_play",
     srcs = ["halt_play.cpp"],
     hdrs = ["halt_play.h"],
@@ -247,6 +275,8 @@ cc_library(
         ":halt_play",
         ":kickoff_enemy_play",
         ":kickoff_friendly_play",
+        ":move_to_dest_and_orient_play",
+        ":move_to_dest_play",
         ":penalty_kick_enemy_play",
         ":penalty_kick_play",
         ":shoot_or_chip_play",

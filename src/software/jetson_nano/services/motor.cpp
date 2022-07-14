@@ -392,10 +392,9 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
                 motor.direct_velocity_control().velocity().x_component_meters(),
                 motor.direct_velocity_control().angular_velocity().radians_per_second()};
 
-            target_wheel_velocities = rampWheelVelocity(
-                prev_wheel_velocities, target_linear_velocity,
-                static_cast<double>(robot_constants_.robot_max_acceleration_m_per_s_2),
-                time_elapsed_since_last_poll_s);
+            target_wheel_velocities =
+                rampVelocity(prev_wheel_velocities, target_linear_velocity,
+                             time_elapsed_since_last_poll_s);
         };
 
         break;
@@ -405,10 +404,9 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
             target_angular_velocity = {0.0, 0.0, 0.0};
             target_dribbler_rpm     = 0;
 
-            target_wheel_velocities = rampWheelVelocity(
-                prev_wheel_velocities, target_linear_velocity,
-                static_cast<double>(robot_constants_.robot_max_acceleration_m_per_s_2),
-                time_elapsed_since_last_poll_s);
+            target_wheel_velocities =
+                rampVelocity(prev_wheel_velocities, target_linear_velocity,
+                             time_elapsed_since_last_poll_s);
 
             break;
         }
@@ -489,35 +487,64 @@ void MotorService::spiTransfer(int fd, uint8_t const* tx, uint8_t const* rx, uns
                     << strerror(errno);
 }
 
-WheelSpace_t MotorService::rampWheelVelocity(
-    const WheelSpace_t& current_wheel_velocity,
-    const EuclideanSpace_t& target_euclidean_velocity, double allowed_acceleration,
-    const double& time_to_ramp)
+WheelSpace_t MotorService::rampVelocity(const WheelSpace_t& current_wheel_velocity,
+                                        const EuclideanSpace_t& target_euclidean_velocity,
+                                        const double& time_to_ramp)
+{
+    // Initialize to 0
+    EuclideanSpace_t ramp_euclidean_velocity = {0.0, 0.0, 0.0};
+
+    // convert current velocity to euclidean
+    EuclideanSpace_t current_euclidean_velocity =
+        euclidean_to_four_wheel.getEuclideanVelocity(current_wheel_velocity);
+
+    // ramp linear velocity
+    rampLinearVelocity(
+        ramp_euclidean_velocity, current_euclidean_velocity, target_euclidean_velocity,
+        static_cast<double>(robot_constants_.robot_max_acceleration_m_per_s_2),
+        time_to_ramp);
+
+    // ramp angular velocity
+    rampAngularVelocity(
+        ramp_euclidean_velocity, current_euclidean_velocity, target_euclidean_velocity,
+        static_cast<double>(robot_constants_.robot_max_ang_acceleration_rad_per_s_2),
+        time_to_ramp);
+
+    // convert ramped target velocity to wheel
+    WheelSpace_t ramped_target_wheel_velocity =
+        euclidean_to_four_wheel.getWheelVelocity(ramp_euclidean_velocity);
+
+    // ramp wheel velocity
+    WheelSpace_t ramp_wheel_velocity = rampWheelVelocity(
+        current_wheel_velocity, ramped_target_wheel_velocity,
+        static_cast<double>(robot_constants_.robot_max_wheel_acceleration_m_per_s_2),
+        time_to_ramp);
+
+    return ramp_wheel_velocity;
+}
+
+WheelSpace_t MotorService::rampWheelVelocity(const WheelSpace_t& current_wheel_velocity,
+                                             const WheelSpace_t& target_wheel_velocity,
+                                             double allowed_acceleration,
+                                             const double& time_to_ramp)
 {
     // ramp wheel velocity
-    WheelSpace_t ramp_wheel_velocity;
+    WheelSpace_t ramp_wheel_velocity = {0, 0, 0, 0};
 
     // calculate max allowable wheel velocity delta using dv = a*t
     auto allowable_delta_wheel_velocity = allowed_acceleration * time_to_ramp;
 
-    // convert euclidean to wheel velocity
-    WheelSpace_t target_wheel_velocity =
-        euclidean_to_four_wheel.getWheelVelocity(target_euclidean_velocity);
-
-    // Ramp wheel velocity vector
-    // Step 1: Find absolute max velocity delta
-    auto delta_target_wheel_velocity = target_wheel_velocity - current_wheel_velocity;
-    auto max_delta_target_wheel_velocity =
-        delta_target_wheel_velocity.cwiseAbs().maxCoeff();
+    // calculate the max delta wheel velocity
+    auto delta_wheel_velocity     = target_wheel_velocity - current_wheel_velocity;
+    auto max_delta_wheel_velocity = delta_wheel_velocity.cwiseAbs().maxCoeff();
 
     // Step 2: Compare max delta velocity against the calculated maximum
-    if (max_delta_target_wheel_velocity > allowable_delta_wheel_velocity)
+    if (max_delta_wheel_velocity > allowable_delta_wheel_velocity)
     {
         // Step 3: If larger, scale down to allowable max
-        ramp_wheel_velocity =
-            (delta_target_wheel_velocity / max_delta_target_wheel_velocity) *
-                allowable_delta_wheel_velocity +
-            current_wheel_velocity;
+        ramp_wheel_velocity = (delta_wheel_velocity / max_delta_wheel_velocity) *
+                                  allowable_delta_wheel_velocity +
+                              current_wheel_velocity;
     }
     else
     {
@@ -525,17 +552,30 @@ WheelSpace_t MotorService::rampWheelVelocity(
         ramp_wheel_velocity = target_wheel_velocity;
     }
 
+    // max allowed velocity
+    auto max_allowable_wheel_velocity =
+        static_cast<double>(robot_constants_.robot_max_wheel_speed_m_per_s);
+
+    // find absolute max wheel velocity
+    auto max_ramp_wheel_velocity = ramp_wheel_velocity.cwiseAbs().maxCoeff();
+
+    // compare against max wheel velocity
+    if (max_ramp_wheel_velocity > max_allowable_wheel_velocity)
+    {
+        // if larger, scale down to max
+        ramp_wheel_velocity = (ramp_wheel_velocity / max_ramp_wheel_velocity) *
+                              max_allowable_wheel_velocity;
+    }
+
     return ramp_wheel_velocity;
 }
 
-EuclideanSpace_t MotorService::rampLinearVelocity(
-    const EuclideanSpace_t& current_euclidean_velocity,
-    const EuclideanSpace_t& target_euclidean_velocity, double allowed_acceleration,
-    const double& time_to_ramp)
+void MotorService::rampLinearVelocity(EuclideanSpace_t& ramp_euclidean_velocity,
+                                      const EuclideanSpace_t& current_euclidean_velocity,
+                                      const EuclideanSpace_t& target_euclidean_velocity,
+                                      double allowed_acceleration,
+                                      const double& time_to_ramp)
 {
-    // ramp linear euclidean velocity
-    EuclideanSpace_t ramp_velocity;
-
     // calculate max allowable wheel velocity delta using dv = a*t
     auto allowable_delta_linear_velocity = allowed_acceleration * time_to_ramp;
 
@@ -551,36 +591,30 @@ EuclideanSpace_t MotorService::rampLinearVelocity(
     if (max_delta_linear_velocity > allowable_delta_linear_velocity)
     {
         // if larger, scale down to allowable maximum
-        ramp_velocity.head(2) = (delta_linear_velocity / max_delta_linear_velocity) *
-                                    allowable_delta_linear_velocity +
-                                current_linear_velocity;
+        ramp_euclidean_velocity.head(2) =
+            (delta_linear_velocity / max_delta_linear_velocity) *
+                allowable_delta_linear_velocity +
+            current_linear_velocity;
     }
     else
     {
         // if smaller, go straight to target
-        ramp_velocity.head(2) = target_linear_velocity;
+        ramp_euclidean_velocity.head(2) = target_linear_velocity;
     }
-
-    // add angular velocity unchanged
-    ramp_velocity[3] = current_euclidean_velocity[3];
-
-    return ramp_velocity;
 }
 
-EuclideanSpace_t MotorService::rampAngularVelocity(
-    const EuclideanSpace_t& current_euclidean_velocity,
-    const EuclideanSpace_t& target_euclidean_velocity, double allowed_acceleration,
-    const double& time_to_ramp)
+void MotorService::rampAngularVelocity(EuclideanSpace_t& ramp_euclidean_velocity,
+                                       const EuclideanSpace_t& current_euclidean_velocity,
+                                       const EuclideanSpace_t& target_euclidean_velocity,
+                                       double allowed_acceleration,
+                                       const double& time_to_ramp)
 {
-    // ramp angular euclidean velocity
-    EuclideanSpace_t ramp_velocity;
-
     // calculate max allowable wheel velocity delta using dv = a*t
     auto allowable_delta_angular_velocity = allowed_acceleration * time_to_ramp;
 
     // extract linear velocity
-    auto current_angular_velocity = current_euclidean_velocity[3];
-    auto target_angular_velocity  = target_euclidean_velocity[3];
+    auto current_angular_velocity = current_euclidean_velocity[2];
+    auto target_angular_velocity  = target_euclidean_velocity[2];
 
     // find absolute max velocity delta
     auto delta_angular_velocity = target_angular_velocity - current_angular_velocity;
@@ -589,19 +623,14 @@ EuclideanSpace_t MotorService::rampAngularVelocity(
     if (std::abs(delta_angular_velocity) > allowable_delta_angular_velocity)
     {
         // if larger, clamp at max
-        ramp_velocity[3] =
+        ramp_euclidean_velocity[2] =
             std::copysign(allowable_delta_angular_velocity, delta_angular_velocity);
     }
     else
     {
         // if smaller, go straight to target
-        ramp_velocity[3] = target_angular_velocity;
+        ramp_euclidean_velocity[2] = target_angular_velocity;
     }
-
-    // add linear velocity unchanged
-    ramp_velocity.head(2) = target_euclidean_velocity.head(2);
-
-    return ramp_velocity;
 }
 
 // Both the TMC4671 (the controller) and the TMC6100 (the driver) respect

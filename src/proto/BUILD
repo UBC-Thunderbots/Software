@@ -23,6 +23,7 @@ proto_library(
         "team.proto",
         "vision.proto",
         "world.proto",
+        "serialized_proto.proto",
     ],
     deps = [
         "@com_google_protobuf//:descriptor_proto",
@@ -60,6 +61,7 @@ py_proto_library(
         "vision.proto",
         "visualization.proto",
         "world.proto",
+        "serialized_proto.proto",
     ],
     deps = [
         "@nanopb//:nanopb_options_py_proto",
