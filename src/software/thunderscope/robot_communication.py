@@ -185,9 +185,6 @@ class RobotCommunication(object):
             SSL_VISION_ADDRESS, SSL_VISION_PORT, SSL_REFEREE_ADDRESS, SSL_REFEREE_PORT
         )
 
-        import time
-
-        time.sleep(2)
         self.receive_ssl_wrapper = SSLWrapperPacketProtoListener(
             SSL_VISION_ADDRESS,
             SSL_VISION_PORT,
@@ -204,14 +201,14 @@ class RobotCommunication(object):
             True,
         )
 
-        self.receive_robot_status = HRVOVisualizationProtoListener(
-            self.multicast_channel + "%" + self.interface,
-            ROBOT_LOGS_PORT,
-            lambda data: self.full_system_proto_unix_io.send_proto(
-                HRVOVisualization, data
-            ),
-            True,
-        )
+        # self.receive_robot_status = HRVOVisualizationProtoListener(
+            # self.multicast_channel + "%" + self.interface,
+            # SERIALIZED_PROTO_LOGS,
+            # lambda data: self.full_system_proto_unix_io.send_proto(
+                # HRVOVisualization, data
+            # ),
+            # True,
+        # )
 
         # Create multicast senders
         self.send_primitive_set = PrimitiveSetProtoSender(
@@ -223,10 +220,10 @@ class RobotCommunication(object):
         )
 
         self.connect_fullsystem_to_robots()
-        # self.disconnect_fullsystem_from_robots()
+        self.disconnect_fullsystem_from_robots()
         # self.connect_robot_to_diagnostics(0)
         # self.connect_robot_to_diagnostics(1)
-        # self.connect_robot_to_diagnostics(2)
+        # self.connect_robot_to_diagnostics(1)
         # self.connect_robot_to_diagnostics(3)
         # self.connect_robot_to_diagnostics(4)
         # self.connect_robot_to_diagnostics(5)

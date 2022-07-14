@@ -117,7 +117,7 @@ class Thunderscope(object):
         self.app = pyqtgraph.mkQApp("Thunderscope")
 
         # Setup stylesheet
-        apply_stylesheet(self.app, theme="dark_amber.xml")
+        apply_stylesheet(self.app, theme="dark_blue.xml")
 
         self.blue_replay_log = blue_replay_log
         self.yellow_replay_log = yellow_replay_log
@@ -460,7 +460,7 @@ class Thunderscope(object):
 
         self.robot_diagnostics_dock_area.addDock(log_dock)
         self.robot_diagnostics_dock_area.addDock(drive_dock, "right", log_dock)
-        self.robot_diagnostics_dock_area.addDock(chicker_dock, "bottom", drive_dock)
+        self.robot_diagnostics_dock_area.addDock(chicker_dock, "below", drive_dock)
 
         robot_view = self.setup_robot_view(proto_unix_io)
 

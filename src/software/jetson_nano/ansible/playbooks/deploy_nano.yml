@@ -5,7 +5,6 @@
   vars:
    all_services:
      - thunderloop
-     - display
      - wifi_announcement
    all_actions:
      - stop

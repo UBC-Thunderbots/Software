@@ -105,11 +105,15 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
 
     int ret = 0;
 
-    prev_wheel_velocities[0] = 0.0;
-    prev_wheel_velocities[1] = 0.0;
-    prev_wheel_velocities[2] = 0.0;
-    prev_wheel_velocities[3] = 0.0;
+    prev_linear_wheel_velocities[0] = 0.0;
+    prev_linear_wheel_velocities[1] = 0.0;
+    prev_linear_wheel_velocities[2] = 0.0;
+    prev_linear_wheel_velocities[3] = 0.0;
 
+    prev_angular_wheel_velocities[0] = 0.0;
+    prev_angular_wheel_velocities[1] = 0.0;
+    prev_angular_wheel_velocities[2] = 0.0;
+    prev_angular_wheel_velocities[3] = 0.0;
     /**
      * Opens SPI File Descriptor
      *
@@ -150,13 +154,6 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
         checkDriverFault(motor);
     }
 
-    // Clear faults by resetting all the chips on the motor board
-    reset_gpio.setValue(GpioState::LOW);
-    usleep(MICROSECONDS_PER_MILLISECOND * 100);
-
-    reset_gpio.setValue(GpioState::HIGH);
-    usleep(MICROSECONDS_PER_MILLISECOND * 100);
-
     // Drive Motor Setup
     for (uint8_t motor = 0; motor < NUM_DRIVE_MOTORS; motor++)
     {
@@ -164,12 +161,15 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
         checkDriverFault(motor);
         // Start all the controllers as drive motor controllers
         startController(motor, false);
+        tmc4671_setTargetVelocity(motor, 0);
     }
 
     // Dribbler Motor Setup
     startDriver(DRIBBLER_MOTOR_CHIP_SELECT);
     checkDriverFault(DRIBBLER_MOTOR_CHIP_SELECT);
     startController(DRIBBLER_MOTOR_CHIP_SELECT, true);
+    tmc4671_setTargetVelocity(DRIBBLER_MOTOR_CHIP_SELECT, 0);
+
 }
 
 MotorService::~MotorService() {}
@@ -317,41 +317,32 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
         static_cast<double>(tmc4671_getActualVelocity(BACK_LEFT_MOTOR_CHIP_SELECT)) *
         MECHANICAL_MPS_PER_ELECTRICAL_RPM;
 
-    motor_status.mutable_front_right()->set_wheel_velocity(
-        static_cast<float>(front_right_velocity));
-    motor_status.mutable_front_left()->set_wheel_velocity(
-        static_cast<float>(front_left_velocity));
-    motor_status.mutable_back_left()->set_wheel_velocity(
-        static_cast<float>(back_left_velocity));
-    motor_status.mutable_back_right()->set_wheel_velocity(
-        static_cast<float>(back_right_velocity));
-
     // This order needs to match euclidean_to_four_wheel converters order
     // We also want to work in the meters per second space rather than electrical RPMs
     WheelSpace_t current_wheel_velocities = {front_right_velocity, front_left_velocity,
                                              back_left_velocity, back_right_velocity};
 
     // Run-away protection
-    if (std::abs(current_wheel_velocities[0] - prev_wheel_velocities[0]) >
-        RUNAWAY_PROTECTION_THRESHOLD_MPS)
+    if (std::abs(current_wheel_velocities[0] - (prev_linear_wheel_velocities[0] + prev_angular_wheel_velocities[0])) >
+            RUNAWAY_PROTECTION_THRESHOLD_MPS)
     {
         driver_control_enable_gpio.setValue(GpioState::LOW);
         LOG(WARNING) << "Front right motor runaway";
     }
-    else if (std::abs(current_wheel_velocities[1] - prev_wheel_velocities[1]) >
-             RUNAWAY_PROTECTION_THRESHOLD_MPS)
+    else if (std::abs(current_wheel_velocities[1] - (prev_linear_wheel_velocities[1] + prev_angular_wheel_velocities[1])) >
+            RUNAWAY_PROTECTION_THRESHOLD_MPS)
     {
         driver_control_enable_gpio.setValue(GpioState::LOW);
-        LOG(WARNING) << "Front left motor runaway";
+        LOG(WARNING) << "Front right motor runaway";
     }
-    else if (std::abs(current_wheel_velocities[2] - prev_wheel_velocities[2]) >
-             RUNAWAY_PROTECTION_THRESHOLD_MPS)
+    else if (std::abs(current_wheel_velocities[2] - (prev_linear_wheel_velocities[2] + prev_angular_wheel_velocities[2])) >
+            RUNAWAY_PROTECTION_THRESHOLD_MPS)
     {
         driver_control_enable_gpio.setValue(GpioState::LOW);
         LOG(WARNING) << "Back left motor runaway";
     }
-    else if (std::abs(current_wheel_velocities[3] - prev_wheel_velocities[3]) >
-             RUNAWAY_PROTECTION_THRESHOLD_MPS)
+    else if (std::abs(current_wheel_velocities[3] - (prev_linear_wheel_velocities[3] + prev_angular_wheel_velocities[3])) >
+            RUNAWAY_PROTECTION_THRESHOLD_MPS)
     {
         driver_control_enable_gpio.setValue(GpioState::LOW);
         LOG(WARNING) << "Back right motor runaway";
@@ -366,10 +357,11 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
     motor_status.mutable_local_velocity()->set_y_component_meters(
         static_cast<float>(current_euclidean_velocity[1]));
 
-    WheelSpace_t target_wheel_velocities = {0.0, 0.0, 0.0, 0.0};
+    WheelSpace_t target_total_wheel_velocities = {0.0, 0.0, 0.0, 0.0};
+    WheelSpace_t target_linear_wheel_velocities = {0.0, 0.0, 0.0, 0.0};
+    WheelSpace_t target_angular_wheel_velocities = {0.0, 0.0, 0.0, 0.0};
 
-    EuclideanSpace_t target_linear_velocity  = {0.0, 0.0, 0.0};
-    EuclideanSpace_t target_angular_velocity = {0.0, 0.0, 0.0};
+    EuclideanSpace_t target_velocity  = {0.0, 0.0, 0.0};
     int target_dribbler_rpm                  = motor.dribbler_speed_rpm();
     static int ramp_rpm                      = 0;
 
@@ -377,53 +369,48 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
     {
         case TbotsProto::MotorControl::DriveControlCase::kDirectPerWheelControl:
         {
-            target_wheel_velocities = {
-                motor.direct_per_wheel_control().front_right_wheel_velocity(),
-                motor.direct_per_wheel_control().front_left_wheel_velocity(),
-                motor.direct_per_wheel_control().back_left_wheel_velocity(),
-                motor.direct_per_wheel_control().back_right_wheel_velocity()};
-
+            LOG(WARNING) << "Per wheel control doesn't work";
             break;
         }
         case TbotsProto::MotorControl::DriveControlCase::kDirectVelocityControl:
         {
-            target_linear_velocity = {
+            target_velocity = {
                 -motor.direct_velocity_control().velocity().y_component_meters(),
                 motor.direct_velocity_control().velocity().x_component_meters(),
                 motor.direct_velocity_control().angular_velocity().radians_per_second()};
-
-            target_wheel_velocities = rampWheelVelocity(
-                prev_wheel_velocities, target_linear_velocity,
-                static_cast<double>(robot_constants_.robot_max_acceleration_m_per_s_2),
-                time_elapsed_since_last_poll_s);
+            break;
         };
 
-        break;
         case TbotsProto::MotorControl::DriveControlCase::DRIVE_CONTROL_NOT_SET:
         {
-            target_linear_velocity  = {0.0, 0.0, 0.0};
-            target_angular_velocity = {0.0, 0.0, 0.0};
-            target_dribbler_rpm     = 0;
-
-            target_wheel_velocities = rampWheelVelocity(
-                prev_wheel_velocities, target_linear_velocity,
-                static_cast<double>(robot_constants_.robot_max_acceleration_m_per_s_2),
-                time_elapsed_since_last_poll_s);
-
+            target_velocity = {0.0, 0.0, 0.0};
             break;
         }
     }
 
-    // TODO interleave the angular accelerations in here at some point.
-    prev_wheel_velocities = target_wheel_velocities;
+    target_linear_wheel_velocities = rampWheelVelocity(
+            prev_linear_wheel_velocities, {target_velocity[0], target_velocity[1], 0.0},
+            static_cast<double>(robot_constants_.robot_max_speed_m_per_s),
+            static_cast<double>(robot_constants_.robot_max_acceleration_m_per_s_2),
+            time_elapsed_since_last_poll_s);
 
+    target_angular_wheel_velocities = rampWheelVelocity(
+            prev_angular_wheel_velocities, {0.0, 0.0, target_velocity[2]},
+            static_cast<double>(robot_constants_.robot_max_ang_speed_rad_per_s),
+            static_cast<double>(robot_constants_.robot_max_ang_acceleration_rad_per_s_2),
+            time_elapsed_since_last_poll_s);
+
+    prev_linear_wheel_velocities = target_linear_wheel_velocities;
+    prev_angular_wheel_velocities = target_angular_wheel_velocities;
+
+    target_total_wheel_velocities = prev_linear_wheel_velocities + prev_angular_wheel_velocities;
     static const float LOCAL_EPSILON = 0.01f;
 
-    if ((std::abs(target_wheel_velocities[0]) <= LOCAL_EPSILON ||
-         std::abs(target_wheel_velocities[1]) <= LOCAL_EPSILON ||
-         std::abs(target_wheel_velocities[2]) <= LOCAL_EPSILON ||
-         std::abs(target_wheel_velocities[3]) <= LOCAL_EPSILON) &&
-        target_dribbler_rpm == 0)
+    if (std::abs(target_total_wheel_velocities[0]) <= LOCAL_EPSILON &&
+            std::abs(target_total_wheel_velocities[1]) <= LOCAL_EPSILON &&
+            std::abs(target_total_wheel_velocities[2]) <= LOCAL_EPSILON &&
+            std::abs(target_total_wheel_velocities[3]) <= LOCAL_EPSILON &&
+            target_dribbler_rpm == 0)
     {
         driver_control_enable_gpio.setValue(GpioState::LOW);
     }
@@ -436,16 +423,16 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
     // Set target speeds accounting for acceleration
     tmc4671_writeInt(
         FRONT_RIGHT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_TARGET,
-        static_cast<int>(target_wheel_velocities[0] * ELECTRICAL_RPM_PER_MECHANICAL_MPS));
+        static_cast<int>(target_total_wheel_velocities[0] * ELECTRICAL_RPM_PER_MECHANICAL_MPS));
     tmc4671_writeInt(
         FRONT_LEFT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_TARGET,
-        static_cast<int>(target_wheel_velocities[1] * ELECTRICAL_RPM_PER_MECHANICAL_MPS));
+        static_cast<int>(target_total_wheel_velocities[1] * ELECTRICAL_RPM_PER_MECHANICAL_MPS));
     tmc4671_writeInt(
         BACK_LEFT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_TARGET,
-        static_cast<int>(target_wheel_velocities[2] * ELECTRICAL_RPM_PER_MECHANICAL_MPS));
+        static_cast<int>(target_total_wheel_velocities[2] * ELECTRICAL_RPM_PER_MECHANICAL_MPS));
     tmc4671_writeInt(
         BACK_RIGHT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_TARGET,
-        static_cast<int>(target_wheel_velocities[3] * ELECTRICAL_RPM_PER_MECHANICAL_MPS));
+        static_cast<int>(target_total_wheel_velocities[3] * ELECTRICAL_RPM_PER_MECHANICAL_MPS));
 
     // If the dribbler only needs to change by DRIBBLER_ACCELERATION_THRESHOLD_RPM_PER_S,
     // just set the value
@@ -491,13 +478,9 @@ void MotorService::spiTransfer(int fd, uint8_t const* tx, uint8_t const* rx, uns
 
 WheelSpace_t MotorService::rampWheelVelocity(
     const WheelSpace_t& current_wheel_velocity,
-    const EuclideanSpace_t& target_euclidean_velocity, double allowed_acceleration,
+    const EuclideanSpace_t& target_euclidean_velocity, double max_allowable_wheel_velocity, double allowed_acceleration,
     const double& time_to_ramp)
 {
-    // max allowed velocity
-    auto max_allowable_wheel_velocity =
-        static_cast<double>(robot_constants_.robot_max_speed_m_per_s);
-
     // ramp wheel velocity
     WheelSpace_t ramp_wheel_velocity;
 
@@ -752,7 +735,7 @@ void MotorService::writeToDriverOrDieTrying(uint8_t motor, uint8_t address, int3
 
     // If we get here, we have failed to write to the driver. We reset
     // the chip to clear any bad values we just wrote and crash so everything stops.
-    reset_gpio.setValue(GpioState::LOW);
+    driver_control_enable_gpio.setValue(GpioState::LOW);
     CHECK(read_value == value) << "Couldn't write " << value
                                << " to the TMC6100 at address " << address
                                << " at address " << static_cast<uint32_t>(address)
@@ -782,7 +765,7 @@ void MotorService::writeToControllerOrDieTrying(uint8_t motor, uint8_t address,
 
     // If we get here, we have failed to write to the controller. We reset
     // the chip to clear any bad values we just wrote and crash so everything stops.
-    reset_gpio.setValue(GpioState::LOW);
+    driver_control_enable_gpio.setValue(GpioState::LOW);
     CHECK(read_value == value) << "Couldn't write " << value
                                << " to the TMC4671 at address " << address
                                << " at address " << static_cast<uint32_t>(address)

@@ -156,6 +156,7 @@ class MotorService
      */
     WheelSpace_t rampWheelVelocity(const WheelSpace_t& current_wheel_velocity,
                                    const EuclideanSpace_t& target_euclidean_velocity,
+                                   double max_allowable_wheel_velocity,
                                    double allowed_acceleration,
                                    const double& time_to_ramp);
 
@@ -252,5 +253,6 @@ class MotorService
     std::unordered_map<int, bool> encoder_calibrated_;
 
     // Current wheel velocities
-    WheelSpace_t prev_wheel_velocities;
+    WheelSpace_t prev_linear_wheel_velocities;
+    WheelSpace_t prev_angular_wheel_velocities;
 };
