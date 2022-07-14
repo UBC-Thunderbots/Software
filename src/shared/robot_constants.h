@@ -69,6 +69,9 @@ typedef struct RobotConstants
     // The maximum speed achievable by our robots, in metres per second [m/s]
     float robot_max_speed_m_per_s;
 
+    // The maximum speed achievable by one wheel, in meters per second [m/s]
+    float robot_max_wheel_speed_m_per_s;
+
     // The maximum angular speed achievable by our robots [rad/s]
     float robot_max_ang_speed_rad_per_s;
 
@@ -77,6 +80,9 @@ typedef struct RobotConstants
 
     // The maximum angular acceleration achievable by our robots [rad/s^2]
     float robot_max_ang_acceleration_rad_per_s_2;
+
+    // The maximum wheel acceleration achievable by our robots [m/s^2]
+    float robot_max_wheel_acceleration_m_per_s_2;
 
     // Indefinite dribbler mode sets a speed that can be maintained indefinitely [rpm]
     float indefinite_dribbler_speed_rpm;

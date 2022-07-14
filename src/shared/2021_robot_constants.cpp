@@ -17,10 +17,12 @@ RobotConstants_t create2021RobotConstants(void)
         .front_of_robot_width_meters = 0.11f,
         // TODO (#2112): update this
         .dribbler_width_meters                  = 0.088f,
-        .robot_max_speed_m_per_s                = 5.000f,
+        .robot_max_speed_m_per_s                = 8.000f,
+        .robot_max_wheel_speed_m_per_s          = 5.000f,
         .robot_max_ang_speed_rad_per_s          = 15.00f,
         .robot_max_acceleration_m_per_s_2       = 3.0f,
         .robot_max_ang_acceleration_rad_per_s_2 = 15.0f,
+        .robot_max_wheel_acceleration_m_per_s_2 = 10.0f,
         // TODO (#2112): update this
         .indefinite_dribbler_speed_rpm = 10000.0f,
         // TODO (#2112): update this
