@@ -172,6 +172,9 @@ class Agent
      */
     TeamSide getAgentType();
 
+    // TODO: Added for tuning
+    float start_decel_dist = 0.4f;
+
    protected:
     // Agent Properties
     Vector position_;

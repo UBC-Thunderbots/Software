@@ -107,7 +107,7 @@ class HRVOSimulator
      * @param maxSpeed              The maximum speed of this agent.
      * @param maxAccel              The maximum acceleration of this agent.
      * @param path                  The path which this agent should take.
-     * @param max_neighbor_dist  The maximum distance away which another agent can be from
+     * @param neighborDist  The maximum distance away which another agent can be from
      * this agent to be considered as a neighbor (i.e. velocity obstacles for it would be
      * generated).
      * @param maxNeighbors          The maximum number of other agents which this agent
@@ -116,12 +116,10 @@ class HRVOSimulator
      * @param type 	 	 			Whether this robot is FRIENDLY or ENEMY
      * @return The index of the agent.
      */
-    std::size_t addHRVOAgent(const Vector &position, float agent_radius,
-                             float max_radius_inflation, const Vector &curr_velocity,
-                             float maxSpeed, float maxAccel,
-                             AgentPath &path, float max_neighbor_dist,
-                             std::size_t maxNeighbors,
-                             RobotId robot_id, TeamSide type);
+    std::size_t addHRVOAgent(const Vector &position, float agent_radius, float max_radius_inflation,
+                             const Vector &curr_velocity, float maxSpeed, float maxAccel, AgentPath &path,
+                             float neighborDist, std::size_t maxNeighbors, RobotId robot_id, TeamSide type,
+                             float start_decel_dist);
 
     /**
      * Add a new LinearlyVelocityAgent

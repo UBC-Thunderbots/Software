@@ -237,10 +237,10 @@ void GoalieFSM::panic(const Update &event)
     Robot robot = event.common.robot;
 
     event.common.set_primitive(createMovePrimitive(
-        CREATE_MOTION_CONTROL(goalie_pos), goalie_orientation,0.0,
-        TbotsProto::DribblerMode::OFF, TbotsProto::BallCollisionType::ALLOW,
-        AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS},
-        max_allowed_speed_mode, 0.0, event.common.robot.robotConstants()));
+            CREATE_MOTION_CONTROL(goalie_pos), goalie_orientation, 0.0,
+            TbotsProto::DribblerMode::OFF, TbotsProto::BallCollisionType::ALLOW,
+            AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS},
+            max_allowed_speed_mode, 0.0, event.common.robot.robotConstants(), std::optional<double>(), true));
 }
 
 void GoalieFSM::updatePivotKick(
@@ -277,10 +277,10 @@ void GoalieFSM::positionToBlock(const Update &event)
     auto goalie_final_speed = goalie_tactic_config.goalie_final_speed();
 
     event.common.set_primitive(createMovePrimitive(
-        CREATE_MOTION_CONTROL(goalie_pos), goalie_orientation, goalie_final_speed,
-        TbotsProto::DribblerMode::OFF, TbotsProto::BallCollisionType::ALLOW,
-        AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS},
-        max_allowed_speed_mode, 0.0, event.common.robot.robotConstants()));
+            CREATE_MOTION_CONTROL(goalie_pos), goalie_orientation, goalie_final_speed,
+            TbotsProto::DribblerMode::OFF, TbotsProto::BallCollisionType::ALLOW,
+            AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS},
+            max_allowed_speed_mode, 0.0, event.common.robot.robotConstants(), std::optional<double>(), true));
 }
 
 bool GoalieFSM::ballInDefenseArea(const Update &event)
@@ -297,9 +297,9 @@ bool GoalieFSM::shouldMoveToGoalLine(const Update &event)
 void GoalieFSM::moveToGoalLine(const Update &event)
 {
     event.common.set_primitive(createMovePrimitive(
-        CREATE_MOTION_CONTROL(event.common.world.field().friendlyGoalCenter()),
-        Angle::zero(), 10, TbotsProto::DribblerMode::OFF,
-        TbotsProto::BallCollisionType::AVOID,
-        AutoChipOrKick{AutoChipOrKickMode::OFF, 0.0}, max_allowed_speed_mode, 0.0,
-        event.common.robot.robotConstants()));
+            CREATE_MOTION_CONTROL(event.common.world.field().friendlyGoalCenter()),
+            Angle::zero(), 10, TbotsProto::DribblerMode::OFF,
+            TbotsProto::BallCollisionType::AVOID,
+            AutoChipOrKick{AutoChipOrKickMode::OFF, 0.0}, max_allowed_speed_mode, 0.0,
+            event.common.robot.robotConstants(), std::optional<double>(), true));
 }
