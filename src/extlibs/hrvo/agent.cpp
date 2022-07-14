@@ -39,7 +39,7 @@ void Agent::update()
         double dist_to_destination = (curr_path_point.value().getPosition() - position_).length();
         if (dist_to_destination < start_decel_dist)
         {
-            velocity_ = new_velocity_.normalize(dist_to_destination);
+            velocity_ = new_velocity_.normalize(dist_to_destination + 0.1);
             return;
         }
     }
