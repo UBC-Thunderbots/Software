@@ -253,7 +253,6 @@ Vector HRVOSimulator::getRobotVelocity(unsigned int robot_id) const
     auto hrvo_agent = getFriendlyAgentFromRobotId(robot_id);
     if (hrvo_agent.has_value())
     {
-        LOG(INFO) << "VELOCITY " << robot_id << ": " << hrvo_agent.value()->getVelocity();
         return hrvo_agent.value()->getVelocity();
     }
     LOG(WARNING) << "Velocity for robot " << robot_id

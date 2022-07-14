@@ -111,7 +111,6 @@ void Thunderloop::runLoop()
                         network_interface_,
                     VISION_PORT, PRIMITIVE_PORT, ROBOT_STATUS_PORT, true);
             }
-
             // Network Service: receive newest world, primitives and set out the last
             // robot status
             {
