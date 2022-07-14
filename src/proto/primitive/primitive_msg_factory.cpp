@@ -3,14 +3,12 @@
 #include "proto/message_translation/tbots_protobuf.h"
 #include "software/logger/logger.h"
 
-std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
-    const TbotsProto::MotionControl& motion_control, const Angle& final_angle,
-    double final_speed, const TbotsProto::DribblerMode& dribbler_mode,
-    const TbotsProto::BallCollisionType& ball_collision_type,
-    const AutoChipOrKick& auto_chip_or_kick,
-    const TbotsProto::MaxAllowedSpeedMode& max_allowed_speed_mode,
-    double target_spin_rev_per_s, const RobotConstants_t& robot_constants,
-    std::optional<double> cost_override)
+std::unique_ptr<TbotsProto::Primitive>
+createMovePrimitive(const TbotsProto::MotionControl &motion_control, const Angle &final_angle, double final_speed,
+                    const TbotsProto::DribblerMode &dribbler_mode,
+                    const TbotsProto::BallCollisionType &ball_collision_type, const AutoChipOrKick &auto_chip_or_kick,
+                    const TbotsProto::MaxAllowedSpeedMode &max_allowed_speed_mode, double target_spin_rev_per_s,
+                    const RobotConstants_t &robot_constants, std::optional<double> cost_override, bool run_hrvo)
 {
     auto move_primitive_msg = std::make_unique<TbotsProto::Primitive>();
 
