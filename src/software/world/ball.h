@@ -97,6 +97,17 @@ class Ball final
      */
     BallState estimateFutureState(const Duration &duration_in_future) const;
 
+
+    /**
+     * Returns the estimated time it will take the ball to move a distance based on its
+     * current state
+     *
+     * @param distance the distance from the current position of the ball
+     *
+     * @return Duration of time to move distance
+     */
+    std::optional<Duration> getTimeToMoveDistance(double distance) const;
+
     /**
      * Software approximation that finds if a ball has been kicked, regardless of whether
      * the kick was a pass, shot, or chip.

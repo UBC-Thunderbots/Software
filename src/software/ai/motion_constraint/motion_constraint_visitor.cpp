@@ -3,23 +3,18 @@
 #include "software/ai/hl/stp/tactic/all_tactics.h"
 
 
-
-// We disable clang-format here because it makes these lists borderline unreadable,
-// and certainly way more difficult to edit
-// clang-format off
 void MotionConstraintVisitor::visit(const GoalieTactic &tactic)
 {
-    current_allowed_constraints = std::set<TbotsProto::MotionConstraint>({
-        TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA,
-        TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL,
-        TbotsProto::MotionConstraint::FRIENDLY_HALF
-    });
+    current_motion_constraints.erase(TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA);
+    current_motion_constraints.erase(
+        TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL);
+    current_motion_constraints.erase(TbotsProto::MotionConstraint::FRIENDLY_HALF);
 }
 
-void MotionConstraintVisitor::visit(const CreaseDefenderTactic &tactic) {
-    current_allowed_constraints = std::set<TbotsProto::MotionConstraint>({
-        TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL,
-    });
+void MotionConstraintVisitor::visit(const CreaseDefenderTactic &tactic)
+{
+    current_motion_constraints.erase(
+        TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL);
 }
 
 void MotionConstraintVisitor::visit(const ShadowEnemyTactic &tactic) {}
@@ -34,36 +29,42 @@ void MotionConstraintVisitor::visit(const PivotKickTactic &tactic) {}
 
 void MotionConstraintVisitor::visit(const KickoffChipTactic &tactic)
 {
-    current_allowed_constraints = std::set<TbotsProto::MotionConstraint>({
-        TbotsProto::MotionConstraint::CENTER_CIRCLE,
-        TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL
-    });
+    current_motion_constraints.erase(TbotsProto::MotionConstraint::CENTER_CIRCLE);
+    current_motion_constraints.erase(
+        TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL);
 }
 
 void MotionConstraintVisitor::visit(const StopTactic &tactic) {}
 
 void MotionConstraintVisitor::visit(const PenaltyKickTactic &tactic)
 {
-    current_allowed_constraints = std::set<TbotsProto::MotionConstraint>({
-        TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL,
-        TbotsProto::MotionConstraint::ENEMY_DEFENSE_AREA,
-        TbotsProto::MotionConstraint::ENEMY_HALF
-    });
+    current_motion_constraints.erase(
+        TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL);
+    current_motion_constraints.erase(TbotsProto::MotionConstraint::ENEMY_DEFENSE_AREA);
+    current_motion_constraints.erase(TbotsProto::MotionConstraint::ENEMY_HALF);
 }
 
 void MotionConstraintVisitor::visit(const PenaltySetupTactic &tactic)
 {
-    current_allowed_constraints = std::set<TbotsProto::MotionConstraint>({
-        TbotsProto::MotionConstraint::ENEMY_HALF,
-        TbotsProto::MotionConstraint::ENEMY_DEFENSE_AREA,
-        TbotsProto::MotionConstraint::FRIENDLY_HALF,
-        TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL
-    });
+    current_motion_constraints.erase(TbotsProto::MotionConstraint::ENEMY_HALF);
+    current_motion_constraints.erase(TbotsProto::MotionConstraint::ENEMY_DEFENSE_AREA);
+    current_motion_constraints.erase(TbotsProto::MotionConstraint::FRIENDLY_HALF);
+    current_motion_constraints.erase(
+        TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL);
 }
 
 void MotionConstraintVisitor::visit(const ReceiverTactic &tactic) {}
 
-void MotionConstraintVisitor::visit(const AttackerTactic &tactic) { }
+void MotionConstraintVisitor::visit(const AttackerTactic &tactic)
+{
+    if (current_motion_constraints.contains(TbotsProto::MotionConstraint::ENEMY_HALF))
+    {
+        current_motion_constraints.erase(TbotsProto::MotionConstraint::CENTER_CIRCLE);
+        current_motion_constraints.erase(TbotsProto::MotionConstraint::ENEMY_HALF);
+        current_motion_constraints.insert(
+            TbotsProto::MotionConstraint::ENEMY_HALF_WITHOUT_CENTRE_CIRCLE);
+    }
+}
 
 void MotionConstraintVisitor::visit(const DefenseShadowEnemyTactic &tactic) {}
 
@@ -79,17 +80,16 @@ void MotionConstraintVisitor::visit(const GetBehindBallTactic &tactic) {}
 
 void MotionConstraintVisitor::visit(const MoveGoalieToGoalLineTactic &tactic)
 {
-    current_allowed_constraints = std::set<TbotsProto::MotionConstraint>({
-        TbotsProto::MotionConstraint::FRIENDLY_HALF,
-        TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA
-    });
+    current_motion_constraints.erase(TbotsProto::MotionConstraint::FRIENDLY_HALF);
+    current_motion_constraints.erase(TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA);
 }
 
-// clang-format on
-
 std::set<TbotsProto::MotionConstraint>
-MotionConstraintVisitor::getCurrentAllowedConstraints(const Tactic &tactic)
+MotionConstraintVisitor::getUpdatedMotionConstraints(
+    const Tactic &tactic,
+    std::set<TbotsProto::MotionConstraint> existing_motion_constraints)
 {
+    current_motion_constraints = existing_motion_constraints;
     tactic.accept(*this);
-    return current_allowed_constraints;
+    return current_motion_constraints;
 }

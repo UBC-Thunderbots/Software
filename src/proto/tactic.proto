@@ -142,7 +142,7 @@ message PivotKickTactic
 message ReceiverTactic
 {
     // The pass to receive
-    optional Pass pass = 1;
+    optional Pass r_pass = 1;
     // If set to true, we will only receive and dribble
     required bool disable_one_touch_shot = 2;
 }

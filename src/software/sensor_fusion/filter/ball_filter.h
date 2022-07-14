@@ -47,7 +47,7 @@ class BallFilter
     /**
      * Creates a new Ball Filter
      */
-    explicit BallFilter();
+    explicit BallFilter(double ball_rolling_acceleration = 0);
 
     /**
      * Update the filter with the new ball detection data, and returns the new
@@ -109,7 +109,7 @@ class BallFilter
      * calculated, returns std::nullopt
      */
     static std::optional<Ball> estimateBallStateFromBuffer(
-        boost::circular_buffer<BallDetection> ball_detections);
+        boost::circular_buffer<BallDetection> ball_detections, double ball_rolling_acceleration);
 
     /**
      * Returns how large the buffer of ball detections should be based on the ball's
@@ -185,4 +185,5 @@ class BallFilter
         const std::optional<Line>& ball_regression_line = std::nullopt);
 
     boost::circular_buffer<BallDetection> ball_detection_buffer;
+    double ball_rolling_acceleration;
 };

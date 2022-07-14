@@ -8,6 +8,25 @@ RobotNavigationObstacleFactory::RobotNavigationObstacleFactory(
 {
 }
 
+std::vector<ObstaclePtr> RobotNavigationObstacleFactory::createFromMotionConstraint(
+    const TbotsProto::MotionConstraint motion_constraint, const World &world) const
+{
+    std::vector<ObstaclePtr> obstacles;
+    auto static_obstacles =
+        createStaticObstaclesFromMotionConstraint(motion_constraint, world.field());
+    obstacles.insert(obstacles.end(), static_obstacles.begin(), static_obstacles.end());
+
+    auto dynamic_obstacles =
+        createDynamicObstaclesFromMotionConstraint(motion_constraint, world);
+    obstacles.insert(obstacles.end(), dynamic_obstacles.begin(), dynamic_obstacles.end());
+
+    CHECK(dynamic_obstacles.empty() || static_obstacles.empty())
+        << "Motion constraint with value " << static_cast<int>(motion_constraint)
+        << " has both dynamic and static obstacles." << std::endl;
+
+    return obstacles;
+}
+
 std::vector<ObstaclePtr>
 RobotNavigationObstacleFactory::createStaticObstaclesFromMotionConstraint(
     const TbotsProto::MotionConstraint &motion_constraint, const Field &field) const
@@ -43,6 +62,18 @@ RobotNavigationObstacleFactory::createStaticObstaclesFromMotionConstraint(
             obstacles.push_back(createFromFieldRectangle(
                 field.enemyHalf(), field.fieldLines(), field.fieldBoundary()));
             break;
+        case TbotsProto::MotionConstraint::ENEMY_HALF_WITHOUT_CENTRE_CIRCLE:
+        {
+            double larger_radius                 = field.centerCircleRadius() + 0.2;
+            Polygon centre_circle_and_enemy_half = Polygon(
+                {Point(0, field.yLength() / 2), Point(0, larger_radius),
+                 Point(larger_radius, larger_radius), Point(larger_radius + 0.2, 0),
+                 Point(larger_radius, -larger_radius), Point(0, -larger_radius),
+                 Point(0, -field.yLength() / 2), field.fieldBoundary().posXNegYCorner(),
+                 field.fieldBoundary().posXPosYCorner()});
+            obstacles.push_back(createFromShape(centre_circle_and_enemy_half));
+            break;
+        }
         case TbotsProto::MotionConstraint::AVOID_FIELD_BOUNDARY_ZONE:
         {
             Rectangle field_walls    = field.fieldBoundary();
@@ -107,6 +138,9 @@ RobotNavigationObstacleFactory::createDynamicObstaclesFromMotionConstraint(
             // not handled by this obstacle factory since it's a static obstacle
             break;
         case TbotsProto::MotionConstraint::ENEMY_HALF:
+            // not handled by this obstacle factory since it's a static obstacle
+            break;
+        case TbotsProto::MotionConstraint::ENEMY_HALF_WITHOUT_CENTRE_CIRCLE:
             // not handled by this obstacle factory since it's a static obstacle
             break;
         case TbotsProto::MotionConstraint::AVOID_FIELD_BOUNDARY_ZONE:

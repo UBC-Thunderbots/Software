@@ -131,6 +131,7 @@ cc_library(
         ":pass_evaluation",
         ":pass_with_rating",
         "//proto/message_translation:tbots_protobuf",
+        "//software/ai/evaluation:find_passes",
         "//software/optimization:gradient_descent",
         "//software/world",
     ],

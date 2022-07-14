@@ -57,7 +57,6 @@ TEST(GameStateTest, default_constructor)
     EXPECT_FALSE(game_state.isTheirBallPlacement());
     EXPECT_FALSE(game_state.isSetupRestart());
     EXPECT_FALSE(game_state.isReadyState());
-    EXPECT_FALSE(game_state.canKick());
     EXPECT_TRUE(game_state.stayAwayFromBall());
     EXPECT_FALSE(game_state.stayOnSide());
     EXPECT_FALSE(game_state.stayBehindPenaltyLine());
@@ -355,13 +354,10 @@ PREDICATE_TEST(
 PREDICATE_TEST(isSetupState, RefereeCommand::PREPARE_KICKOFF_US,
                RefereeCommand::PREPARE_KICKOFF_THEM, RefereeCommand::BALL_PLACEMENT_US,
                RefereeCommand::BALL_PLACEMENT_THEM, RefereeCommand::PREPARE_PENALTY_US,
-               RefereeCommand::PREPARE_PENALTY_THEM)
-PREDICATE_TEST(isReadyState, RefereeCommand::NORMAL_START,
-               RefereeCommand::DIRECT_FREE_THEM, RefereeCommand::INDIRECT_FREE_THEM,
-               RefereeCommand::DIRECT_FREE_US, RefereeCommand::INDIRECT_FREE_US)
-// canKick needs to be tested with a proper restart sequence
-PREDICATE_TEST(canKick, RefereeCommand::FORCE_START, RefereeCommand::DIRECT_FREE_US,
-               RefereeCommand::INDIRECT_FREE_US)
+               RefereeCommand::PREPARE_PENALTY_THEM, RefereeCommand::DIRECT_FREE_US,
+               RefereeCommand::INDIRECT_FREE_US, RefereeCommand::DIRECT_FREE_THEM,
+               RefereeCommand::INDIRECT_FREE_THEM)
+PREDICATE_TEST(isReadyState, RefereeCommand::NORMAL_START)
 PREDICATE_TEST(stayOnSide, RefereeCommand::PREPARE_KICKOFF_THEM)
 PREDICATE_TEST(stayBehindPenaltyLine, RefereeCommand::PREPARE_PENALTY_THEM,
                RefereeCommand::PREPARE_PENALTY_US)

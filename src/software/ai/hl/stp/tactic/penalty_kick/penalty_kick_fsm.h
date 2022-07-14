@@ -114,7 +114,7 @@ struct PenaltyKickFSM
         return make_transition_table(
             // src_state + event [guard] / action = dest state
             *DribbleFSM_S + Update_E[!takePenaltyShot_G] / updateApproachKeeper_A,
-            DribbleFSM_S + Update_E[timeOutApproach_G] = KickFSM_S,
+            DribbleFSM_S + Update_E[timeOutApproach_G] / shoot_A = KickFSM_S,
             DribbleFSM_S + Update_E / adjustOrientationForShot_A,
             DribbleFSM_S = KickFSM_S, KickFSM_S + Update_E / shoot_A, KickFSM_S = X,
             X + Update_E / SET_STOP_PRIMITIVE_ACTION = X);
@@ -128,10 +128,9 @@ struct PenaltyKickFSM
     static constexpr double PENALTY_KICK_GOALIE_MAX_ACC = 1.5;
     static constexpr double SSL_VISION_DELAY            = 0.30;  // seconds
 
-    // the fraction of the enemy side of the field that we define to be the lower limit of
-    // where we choose to shoot in other words, it helps define the minimum distance at
-    // which we decide to potentially shoot
-    static constexpr double PENALTY_KICK_MIN_SHOT_X_DISTANCE_FACTOR = 1.0 / 3.0;
+    // the fraction of the enemy half of the field that we dribble through and not look
+    // for a shot
+    static constexpr double PENALTY_KICK_MIN_SHOT_X_DISTANCE_FACTOR = 0.5;
 
     // timeout that forces a shot after the robot approaches the ball and advances
     // towards the keeper

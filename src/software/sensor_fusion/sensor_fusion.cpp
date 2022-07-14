@@ -1,5 +1,6 @@
 #include "software/sensor_fusion/sensor_fusion.h"
 
+#include "proto/message_translation/tbots_protobuf.h"
 #include "software/logger/logger.h"
 
 SensorFusion::SensorFusion(TbotsProto::SensorFusionConfig sensor_fusion_config)
@@ -10,7 +11,7 @@ SensorFusion::SensorFusion(TbotsProto::SensorFusionConfig sensor_fusion_config)
       enemy_team(),
       game_state(),
       referee_stage(std::nullopt),
-      ball_filter(),
+      ball_filter(sensor_fusion_config.rolling_acceleration_ms2()),
       friendly_team_filter(),
       enemy_team_filter(),
       team_with_possession(TeamSide::ENEMY),
@@ -35,6 +36,20 @@ std::optional<World> SensorFusion::getWorld() const
             new_world.updateRefereeStage(*referee_stage);
         }
 
+        const auto &friendly_robots = new_world.friendlyTeam().getAllRobots();
+        unsigned int robot_id = 7;
+        const auto robot_proto_it =
+                std::find_if(friendly_robots.begin(), friendly_robots.end(),
+                             [&](const auto& robot) { return robot.id() == robot_id; });
+        if (robot_proto_it != friendly_robots.end())
+        {
+            LOG(VISUALIZE) << *createNamedValue(
+                        "ang vel " + std::to_string(robot_id),
+                        static_cast<float>(robot_proto_it->angularVelocity().toRadians()));
+            LOG(VISUALIZE) << *createNamedValue(
+                        "vel " + std::to_string(robot_id),
+                        static_cast<float>(robot_proto_it->velocity().length()));
+        }
 
         return new_world;
     }
@@ -169,9 +184,10 @@ void SensorFusion::updateWorld(
         }
         friendly_team.setUnavailableRobotCapabilities(robot_id, unavailableCapabilities);
 
-        if (robot_status_msg.has_break_beam_status() &&
-            robot_status_msg.break_beam_status().ball_in_beam())
+        if (robot_status_msg.has_power_status() &&
+            robot_status_msg.power_status().breakbeam_tripped())
         {
+            LOG(DEBUG) << "break beam tripped for robot : " << robot_id;
             friendly_robot_id_with_ball_in_dribbler = robot_id;
             ball_in_dribbler_timeout =
                 sensor_fusion_config.num_dropped_detections_before_ball_not_in_dribbler();
@@ -249,8 +265,8 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
                     Vector::createFromAngle(robot_with_ball_in_dribbler->orientation())
                         // MAX_FRACTION_OF_BALL_COVERED_BY_ROBOT of the ball should be
                         // inside the robot
-                        .normalize(DIST_TO_FRONT_OF_ROBOT_METERS +
-                                   BALL_TO_FRONT_OF_ROBOT_DISTANCE_WHEN_DRIBBLING),
+                        .normalize(DIST_TO_FRONT_OF_ROBOT_METERS -
+                                   SPECIAL_INDICATOR_DISTANCE_FOR_BREAKBEAM),
                 .distance_from_ground = 0,
                 .timestamp  = Timestamp::fromSeconds(ssl_detection_frame.t_capture()),
                 .confidence = 1}};
@@ -393,7 +409,7 @@ void SensorFusion::resetWorldComponents()
     enemy_team           = Team();
     game_state           = GameState();
     referee_stage        = std::nullopt;
-    ball_filter          = BallFilter();
+    ball_filter          = BallFilter(sensor_fusion_config.rolling_acceleration_ms2());
     friendly_team_filter = RobotTeamFilter();
     enemy_team_filter    = RobotTeamFilter();
     team_with_possession = TeamSide::ENEMY;

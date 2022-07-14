@@ -121,9 +121,11 @@ std::shared_ptr<Tactic> createTactic(const TbotsProto::KickTactic &tactic_proto,
                                      TbotsProto::AiConfig ai_config)
 {
     auto tactic = std::make_shared<KickTactic>();
-    tactic->updateControlParams(createPoint(tactic_proto.kick_origin()),
-                                createAngle(tactic_proto.kick_direction()),
-                                tactic_proto.kick_speed_meters_per_second());
+    tactic->updateControlParams(
+        createPoint(tactic_proto.kick_origin()),
+        createAngle(tactic_proto.kick_direction()),
+        AutoChipOrKick{AutoChipOrKickMode::AUTOKICK,
+                       tactic_proto.kick_speed_meters_per_second()});
     return tactic;
 }
 
@@ -170,9 +172,9 @@ std::shared_ptr<Tactic> createTactic(const TbotsProto::ReceiverTactic &tactic_pr
 {
     auto tactic              = std::make_shared<ReceiverTactic>();
     std::optional<Pass> pass = std::nullopt;
-    if (tactic_proto.has_pass())
+    if (tactic_proto.has_r_pass())
     {
-        pass = createPass(tactic_proto.pass());
+        pass = createPass(tactic_proto.r_pass());
     }
 
     tactic->updateControlParams(pass, tactic_proto.disable_one_touch_shot());

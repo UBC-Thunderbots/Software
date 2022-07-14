@@ -10,6 +10,7 @@
 #include "software/logger/network_logger.h"
 #include "software/util/scoped_timespec_timer/scoped_timespec_timer.h"
 #include "software/world/robot_state.h"
+#include "software/world/team.h"
 
 /**
  * https://rt.wiki.kernel.org/index.php/Squarewave-example
@@ -29,12 +30,9 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, const int loop
 
     redis_client_ = std::make_unique<RedisClient>(REDIS_DEFAULT_HOST, REDIS_DEFAULT_PORT);
 
-    auto robot_id   = std::stoi(redis_client_->get(ROBOT_ID_REDIS_KEY));
-    auto channel_id = std::stoi(redis_client_->get(ROBOT_MULTICAST_CHANNEL_REDIS_KEY));
-    auto network_interface = redis_client_->get(ROBOT_NETWORK_INTERFACE_REDIS_KEY);
+    LoggerSingleton::initializeLogger("/home/robot/logs");
 
-    NetworkLoggerSingleton::initializeLogger(channel_id, network_interface, robot_id);
-
+    power_service_ = std::make_unique<PowerService>();
     motor_service_ = std::make_unique<MotorService>(robot_constants, loop_hz);
 }
 
@@ -50,11 +48,13 @@ void Thunderloop::runLoop()
     struct timespec poll_time;
     struct timespec iteration_time;
     struct timespec last_primitive_received_time;
+    struct timespec current_time;
 
     // Input buffer
     TbotsProto::PrimitiveSet new_primitive_set;
     TbotsProto::World new_world;
     TbotsProto::EstopPrimitive emergency_stop_override;
+    const TbotsProto::PrimitiveSet empty_primitive_set;
 
     // Loop interval
     int interval =
@@ -65,9 +65,16 @@ void Thunderloop::runLoop()
     // CLOCK_REALTIME can jump backwards
     clock_gettime(CLOCK_MONOTONIC, &next_shot);
 
+    double loop_duration_seconds = 0.0;
+
     for (;;)
     {
         {
+            redis_client_->set("/battery_voltage",
+                               std::to_string(power_status_.battery_voltage()));
+            redis_client_->set("/current_draw",
+                               std::to_string(power_status_.current_draw()));
+
             // Wait until next shot
             //
             // Note: CLOCK_MONOTONIC is used over CLOCK_REALTIME since
@@ -90,9 +97,6 @@ void Thunderloop::runLoop()
             if (robot_id != robot_id_ || channel_id != channel_id_ ||
                 network_interface != network_interface_)
             {
-                NetworkLoggerSingleton::initializeLogger(channel_id, network_interface,
-                                                         robot_id);
-
                 LOG(DEBUG) << "Switch over to Robot ID: " << robot_id
                            << " Channel ID: " << channel_id
                            << " Network Interface: " << network_interface;
@@ -107,11 +111,11 @@ void Thunderloop::runLoop()
                         network_interface_,
                     VISION_PORT, PRIMITIVE_PORT, ROBOT_STATUS_PORT, true);
             }
-
             // Network Service: receive newest world, primitives and set out the last
             // robot status
             {
                 ScopedTimespecTimer timer(&poll_time);
+                robot_status_.set_robot_id(robot_id_);
                 auto result       = network_service_->poll(robot_status_);
                 new_primitive_set = std::get<0>(result);
                 new_world         = std::get<1>(result);
@@ -143,7 +147,7 @@ void Thunderloop::runLoop()
                 }
             }
 
-            // If the world msg is new, update the internal buffer
+            //// If the world msg is new, update the internal buffer
             if (new_world.time_sent().epoch_timestamp_seconds() >
                 world_.time_sent().epoch_timestamp_seconds())
             {
@@ -157,34 +161,59 @@ void Thunderloop::runLoop()
 
                 // Handle emergency stop override
                 struct timespec result;
-                ScopedTimespecTimer::timespecDiff(&poll_time,
+
+                clock_gettime(CLOCK_MONOTONIC, &current_time);
+                ScopedTimespecTimer::timespecDiff(&current_time,
                                                   &last_primitive_received_time, &result);
 
                 auto nanoseconds_elapsed_since_last_primitive =
                     result.tv_sec * static_cast<int>(NANOSECONDS_PER_SECOND) +
                     result.tv_nsec;
 
-                // If we haven't received a primitive in a while, override the
-                // current_primitive_ with an estop primitive.
                 if (nanoseconds_elapsed_since_last_primitive >
                     static_cast<long>(PRIMITIVE_MANAGER_TIMEOUT_NS))
                 {
-                    primitive_.Clear();
-                    *(primitive_.mutable_estop()) = emergency_stop_override;
+                    primitive_executor_.clearCurrentPrimitive();
                 }
 
-                direct_control_ = *primitive_executor_.stepPrimitive(
-                    robot_id_,
-                    Angle::fromRadians(robot_state_.global_orientation().radians()));
+                auto friendly_team = Team(world_.friendly_team());
+                auto robot         = friendly_team.getRobotById(robot_id_);
+
+                if (robot.has_value())
+                {
+                    // TODO-JON needs to use world in primitive executor
+                    direct_control_ = *primitive_executor_.stepPrimitive(
+                        robot_id_, robot->currentState());
+                }
+                else
+                {
+                    // We are in robot diagnostics
+                    auto robot_state =
+                        RobotState(Point(0, 0), Vector(0, 0), Angle::fromDegrees(0),
+                                   Angle::fromDegrees(0));
+                    direct_control_ =
+                        *primitive_executor_.stepPrimitive(robot_id_, robot_state);
+                }
             }
 
             thunderloop_status_.set_primitive_executor_step_time_ns(
                 static_cast<unsigned long>(poll_time.tv_nsec));
 
+            // Power Service: execute the power control command
+            {
+                ScopedTimespecTimer timer(&poll_time);
+                power_status_ = power_service_->poll(direct_control_.power_control());
+            }
+            thunderloop_status_.set_power_service_poll_time_ns(
+                static_cast<unsigned long>(poll_time.tv_nsec));
+
             // Motor Service: execute the motor control command
             {
                 ScopedTimespecTimer timer(&poll_time);
-                motor_status_ = motor_service_->poll(direct_control_.motor_control());
+
+                motor_status_ = motor_service_->poll(direct_control_.motor_control(),
+                                                     power_status_.breakbeam_tripped(),
+                                                     loop_duration_seconds);
                 primitive_executor_.updateLocalVelocity(
                     createVector(motor_status_.local_velocity()));
             }
@@ -194,6 +223,7 @@ void Thunderloop::runLoop()
             // Update Robot Status with poll responses
             *(robot_status_.mutable_thunderloop_status()) = thunderloop_status_;
             *(robot_status_.mutable_motor_status())       = motor_status_;
+            *(robot_status_.mutable_power_status())       = power_status_;
             *(robot_status_.mutable_jetson_status())      = jetson_status_;
         }
 
@@ -203,9 +233,14 @@ void Thunderloop::runLoop()
         thunderloop_status_.set_iteration_time_ns(loop_duration);
 
         // Make sure the iteration can fit inside the period of the loop
-        CHECK(loop_duration * static_cast<int>(SECONDS_PER_NANOSECOND) <=
-              (1.0 / loop_hz_))
-            << "Thunderloop iteration took longer than 1/loop_hz_ seconds";
+        loop_duration_seconds =
+            static_cast<double>(loop_duration) * SECONDS_PER_NANOSECOND;
+        static int throttly_boi = 0;
+
+        if (throttly_boi++ % 100 == 0)
+        {
+            LOG(DEBUG) << "Loop duration: " << loop_duration_seconds << " seconds";
+        }
 
         // Calculate next shot taking into account how long this iteration took
         next_shot.tv_nsec += interval - loop_duration;

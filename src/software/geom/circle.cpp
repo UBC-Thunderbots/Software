@@ -1,6 +1,9 @@
 #include "software/geom/circle.h"
+#include "software/geom/line.h"
+#include "software/geom/vector.h"
 
 Circle::Circle() : origin_(Point()), radius_(0) {}
+
 
 Circle::Circle(const Point &origin, double radius) : origin_(origin), radius_(radius)
 {

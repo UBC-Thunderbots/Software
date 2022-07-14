@@ -94,16 +94,17 @@ class UartFramingTest : public ::testing::Test
    protected:
     void SetUp() override
     {
-        test_message = createNanoPbPowerControl(
-            ChickerCommandMode::AUTOCHIPORKICK, 1.0, 2.0, AutoChipOrKickMode::AUTOCHIP,
-            3.0, 4.0, 5.0, 6.0, TbotsProto_PowerControl_ChargeMode_CHARGE);
+        test_message = createNanoPbPowerPulseControl(ChickerCommandMode::AUTOCHIPORKICK,
+                                                     1, 2, AutoChipOrKickMode::AUTOCHIP,
+                                                     3, 4, TbotsProto_Geneva_Slot_LEFT);
     }
 
-    TbotsProto_PowerControl test_message;
-    const uint16_t TEST_MESSAGE_CRC = 4064;  // From online calculator
+    TbotsProto_PowerPulseControl test_message;
+    const uint16_t TEST_MESSAGE_CRC = 14297;  // From online calculator
 };
 
-bool operator==(const TbotsProto_PowerControl& lhs, const TbotsProto_PowerControl& rhs)
+bool operator==(const TbotsProto_PowerPulseControl& lhs,
+                const TbotsProto_PowerPulseControl& rhs)
 {
     return serializeToVector(lhs) == serializeToVector(rhs);
 }
@@ -114,7 +115,7 @@ TEST_F(UartFramingTest, length_and_crc_test)
     // Check size of frame is the size of the original struct + length and crc fields
     EXPECT_EQ(sizeof(test_frame), sizeof(TbotsProto_PowerFrame));
     // Check fields of frame
-    EXPECT_EQ(test_frame.length, TbotsProto_PowerControl_size);
+    EXPECT_EQ(test_frame.length, TbotsProto_PowerPulseControl_size);
     EXPECT_EQ(test_frame.crc, TEST_MESSAGE_CRC);
     EXPECT_EQ(test_frame.power_msg.power_control, test_message);
     EXPECT_TRUE(verifyLengthAndCrc(test_frame));
@@ -143,7 +144,7 @@ TEST_F(UartFramingTest, marshalling_test)
     TbotsProto_PowerFrame test_frame_unmarshalled = TbotsProto_PowerFrame_init_default;
     EXPECT_TRUE(unmarshalUartPacket(bytes, test_frame_unmarshalled));
     // Check fields of frame
-    EXPECT_EQ(test_frame_unmarshalled.length, TbotsProto_PowerControl_size);
+    EXPECT_EQ(test_frame_unmarshalled.length, TbotsProto_PowerPulseControl_size);
     EXPECT_EQ(test_frame_unmarshalled.crc, TEST_MESSAGE_CRC);
     EXPECT_EQ(test_frame_unmarshalled.power_msg.power_control, test_message);
     EXPECT_TRUE(verifyLengthAndCrc(test_frame_unmarshalled));

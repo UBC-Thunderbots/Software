@@ -29,13 +29,15 @@ TEST_P(KickTacticTest, kick_test)
     Point robot_position = Point(0, 0);
     BallState ball_state(robot_position + ball_offset_from_robot, Vector(0, 0));
 
+    TbotsProto::AiConfig ai_config;
+
     auto friendly_robots =
         TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5), robot_position});
     auto enemy_robots = TestUtil::createStationaryRobotStatesWithId({Point(4, 0)});
 
-    auto tactic = std::make_shared<KickTactic>();
+    auto tactic = std::make_shared<KickTactic>(ai_config);
     tactic->updateControlParams(robot_position + ball_offset_from_robot, angle_to_kick_at,
-                                5);
+                                AutoChipOrKick{AutoChipOrKickMode::AUTOKICK, 5});
     setTactic(1, tactic);
 
     std::vector<ValidationFunction> terminating_validation_functions = {

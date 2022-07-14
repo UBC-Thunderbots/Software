@@ -2,6 +2,7 @@
 
 #include "software/geom/convex_shape.h"
 #include "software/geom/point.h"
+#include "software/geom/line.h"
 
 /**
  * A circle with a radius and point representing the origin of the circle.
@@ -43,6 +44,7 @@ class Circle final : public ConvexShape
      * @return the area of this Circle.
      */
     double area() const override;
+
 
    private:
     Point origin_;

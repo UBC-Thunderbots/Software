@@ -32,6 +32,7 @@ cc_test(
     deps = [
         ":goalie_tactic",
         "//shared/test_util:tbots_gtest_main",
+        "//software/ai/hl/stp/tactic/crease_defender:crease_defender_tactic",
         "//software/test_util",
     ],
 )
@@ -42,6 +43,7 @@ py_test(
         "goalie_tactic_test.py",
     ],
     deps = [
+        "//software/simulated_tests:pytest_main",
         "//software/simulated_tests:simulated_test_fixture",
         "//software/simulated_tests:validation",
         requirement("pytest"),

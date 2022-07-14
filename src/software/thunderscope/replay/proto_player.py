@@ -130,7 +130,10 @@ class ProtoPlayer(object):
         # Convert string to type. eval is an order of magnitude
         # faster than iterating over the protobuf library to find
         # the type from the string.
-        proto_class = eval(str(protobuf_type.split(b".")[1], encoding="utf-8"))
+        try:
+            proto_class = eval(str(protobuf_type.split(b".")[1], encoding="utf-8"))
+        except Exception:
+            proto_class = eval(str(protobuf_type, encoding="utf-8"))
 
         # Deserialize protobuf
         proto = proto_class.FromString(base64.b64decode(data[len("b") : -len("\n")]))

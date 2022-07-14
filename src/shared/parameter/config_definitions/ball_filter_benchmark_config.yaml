@@ -1,0 +1,31 @@
+include:
+    - arduino_config.yaml
+---
+- string:
+    name: backend
+    value: ""
+    description: >-
+        The name of the backend you would like to use. See /software/backend for options
+        ex. class WifiBackend this argument would be WifiBackend
+
+- string:
+    name: interface
+    value: ""
+    description: >-
+        The interface to send and receive packets over (can be found through ifconfig)
+
+- int:
+      name: channel
+      min: 0
+      max: 15
+      value: 0
+      description: >-
+          The multicast channel to join to communicate with the robots
+
+- int:
+    name: iterations
+    min: 0
+    max: 15
+    value: 0
+    description: >-
+      The number of ball vision messages to listen to

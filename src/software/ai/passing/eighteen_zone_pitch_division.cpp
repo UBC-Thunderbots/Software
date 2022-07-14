@@ -33,6 +33,7 @@ EighteenZoneId EighteenZonePitchDivision::getZoneId(const Point& position) const
 {
     if (!contains(*field_lines_, position))
     {
+
         throw std::invalid_argument("requested position not on field!");
     }
 

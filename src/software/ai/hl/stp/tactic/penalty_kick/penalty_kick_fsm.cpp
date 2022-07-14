@@ -6,8 +6,7 @@ bool PenaltyKickFSM::evaluatePenaltyShot(std::optional<Robot> enemy_goalie, Fiel
                                          Point ball_position, Robot robot)
 {
     double min_shot_x_position =
-        ((field.totalXLength() / 2) -
-         (field.totalXLength() * PENALTY_KICK_MIN_SHOT_X_DISTANCE_FACTOR));
+        field.xLength() * PENALTY_KICK_MIN_SHOT_X_DISTANCE_FACTOR / 2.0;
 
     // don't try to shoot if we're far from the net or we're in the middle of an
     // autokick
@@ -120,9 +119,9 @@ void PenaltyKickFSM::shoot(const Update &event,
                            boost::sml::back::process<KickFSM::Update> processEvent)
 {
     KickFSM::ControlParams control_params{
-        .kick_origin                  = event.common.world.ball().position(),
-        .kick_direction               = shot_angle,
-        .kick_speed_meters_per_second = PENALTY_KICK_SHOT_SPEED};
+        .kick_origin       = event.common.world.ball().position(),
+        .kick_direction    = shot_angle,
+        .auto_chip_or_kick = {AutoChipOrKickMode::AUTOKICK, PENALTY_KICK_SHOT_SPEED}};
     processEvent(KickFSM::Update(control_params, event.common));
 }
 
