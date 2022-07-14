@@ -134,9 +134,9 @@ class BallFilter
      *
      * @param ball_detections The ball detections to fit
      *
-     * @return The line of best fit through the given ball detection positions
+     * @return The line of best fit through the given ball detection positions, and the error
      */
-    static Line calculateLineOfBestFit(
+    static BallFilter::LinearRegressionResults  calculateLineOfBestFit(
         boost::circular_buffer<BallDetection> ball_detections);
 
     /**
