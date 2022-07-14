@@ -69,6 +69,11 @@ void DribbleFSM::getPossession(const Update &event)
     Point intercept_position =
         result.point + Vector::createFromAngle(face_ball_orientation).normalize(0.05);
 
+    if(! compareAngles(event.common.robot.orientation(), face_ball_orientation))
+    {
+        intercept_position = intercept_position - Vector::createFromAngle(face_ball_orientation).normalize(ROBOT_MAX_RADIUS_METERS * 3);
+    }
+
     event.common.set_primitive(createMovePrimitive(
             CREATE_MOTION_CONTROL(intercept_position), face_ball_orientation,
             result.final_speed, TbotsProto::DribblerMode::MAX_FORCE,
