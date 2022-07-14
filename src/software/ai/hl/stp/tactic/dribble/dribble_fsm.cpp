@@ -75,11 +75,11 @@ void DribbleFSM::getPossession(const Update &event)
     }
 
     event.common.set_primitive(createMovePrimitive(
-        CREATE_MOTION_CONTROL(intercept_position), face_ball_orientation,
-        result.final_speed, TbotsProto::DribblerMode::MAX_FORCE,
-        TbotsProto::BallCollisionType::ALLOW, AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
-        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
-        event.common.robot.robotConstants()));
+            CREATE_MOTION_CONTROL(intercept_position), face_ball_orientation,
+            result.final_speed, TbotsProto::DribblerMode::MAX_FORCE,
+            TbotsProto::BallCollisionType::ALLOW, AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
+            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
+            event.common.robot.robotConstants(), std::optional<double>(), true));
 }
 
 void DribbleFSM::dribble(const Update &event)
@@ -91,11 +91,11 @@ void DribbleFSM::dribble(const Update &event)
             event.control_params.final_dribble_orientation);
 
     event.common.set_primitive(createMovePrimitive(
-        CREATE_MOTION_CONTROL(target_destination), target_orientation, 0,
-        TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
-        AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
-        TbotsProto::MaxAllowedSpeedMode::DRIBBLE_DRIBBLING, 0.0,
-        event.common.robot.robotConstants(), 0.0));
+            CREATE_MOTION_CONTROL(target_destination), target_orientation, 0,
+            TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
+            AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
+            TbotsProto::MaxAllowedSpeedMode::DRIBBLE_DRIBBLING, 0.0,
+            event.common.robot.robotConstants(), 0.0, true));
 }
 
 void DribbleFSM::loseBall(const Update &event)
@@ -108,11 +108,11 @@ void DribbleFSM::loseBall(const Update &event)
         dribble_tactic_config.lose_ball_possession_threshold() * 2);
 
     event.common.set_primitive(createMovePrimitive(
-        CREATE_MOTION_CONTROL(away_from_ball_position), face_ball_orientation, 0,
-        TbotsProto::DribblerMode::OFF, TbotsProto::BallCollisionType::AVOID,
-        AutoChipOrKick{AutoChipOrKickMode::AUTOKICK, 0.5},
-        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
-        event.common.robot.robotConstants(), 0.0));
+            CREATE_MOTION_CONTROL(away_from_ball_position), face_ball_orientation, 0,
+            TbotsProto::DribblerMode::OFF, TbotsProto::BallCollisionType::AVOID,
+            AutoChipOrKick{AutoChipOrKickMode::AUTOKICK, 0.5},
+            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
+            event.common.robot.robotConstants(), 0.0, true));
 }
 
 void DribbleFSM::startDribble(const Update &event)

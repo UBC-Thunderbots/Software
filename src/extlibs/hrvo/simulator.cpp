@@ -101,6 +101,7 @@ std::size_t HRVOSimulator::addHRVORobotAgent(const Robot &robot, TeamSide type)
     Vector velocity;
     float max_accel = 1e-4;
     float max_speed = 1e-4;
+    float start_decel_dist = 0.4;
 
     const std::set<RobotCapability> &unavailable_capabilities =
         robot.getUnavailableCapabilities();
@@ -142,6 +143,8 @@ std::size_t HRVOSimulator::addHRVORobotAgent(const Robot &robot, TeamSide type)
                        static_cast<float>(destination_point_proto.y_meters()));
             speed_at_goal = move_primitive.final_speed_m_per_s();
             max_speed     = move_primitive.max_speed_m_per_s();
+            max_accel     = move_primitive.robot_max_acceleration_m_per_s_2();
+            start_decel_dist = move_primitive.hrvo_start_deceleration_dist();
         }
     }
 
@@ -154,7 +157,7 @@ std::size_t HRVOSimulator::addHRVORobotAgent(const Robot &robot, TeamSide type)
     return addHRVOAgent(position, ROBOT_MAX_RADIUS_METERS,
                         FRIENDLY_ROBOT_RADIUS_MAX_INFLATION, velocity, max_speed,
                         max_accel, path, MAX_NEIGHBOR_SEARCH_DIST,
-                        MAX_NEIGHBORS, robot.id(), type);
+                        MAX_NEIGHBORS, robot.id(), type, start_decel_dist);
 }
 
 std::size_t HRVOSimulator::addLinearVelocityRobotAgent(const Robot &robot,
@@ -176,17 +179,16 @@ std::size_t HRVOSimulator::addLinearVelocityRobotAgent(const Robot &robot,
                                   max_accel, path, robot.id(), type);
 }
 
-std::size_t HRVOSimulator::addHRVOAgent(const Vector &position, float agent_radius,
-                                        float max_radius_inflation,
-                                        const Vector &curr_velocity, float maxSpeed,
-                                        float maxAccel, AgentPath &path,
-                                        float neighborDist, std::size_t maxNeighbors, RobotId robot_id,
-                                        TeamSide type)
+std::size_t HRVOSimulator::addHRVOAgent(const Vector &position, float agent_radius, float max_radius_inflation,
+                                        const Vector &curr_velocity, float maxSpeed, float maxAccel, AgentPath &path,
+                                        float neighborDist, std::size_t maxNeighbors, RobotId robot_id, TeamSide type,
+                                        float start_decel_dist)
 {
     std::shared_ptr<HRVOAgent> agent = std::make_shared<HRVOAgent>(
         this, position, neighborDist, maxNeighbors, agent_radius, max_radius_inflation,
         curr_velocity, maxAccel, path, maxSpeed, robot_id,
         type);
+    agent->start_decel_dist = start_decel_dist;
     agents.push_back(std::move(agent));
     return agents.size() - 1;
 }

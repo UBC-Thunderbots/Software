@@ -70,6 +70,7 @@ void HRVOAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive,
         float new_max_speed        = new_primitive.move().max_speed_m_per_s();
         setMaxSpeed(new_max_speed);
         setPreferredSpeed(new_max_speed * PREF_SPEED_SCALE);
+        start_decel_dist = new_primitive.move().hrvo_start_deceleration_dist();
 
         // TODO (#2418): Update implementation of Primitive to support
         // multiple path points and remove this check
@@ -83,6 +84,11 @@ void HRVOAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive,
         auto path_points  = {PathPoint(
             Vector(destination.x_meters(), destination.y_meters()), speed_at_dest)};
         path              = AgentPath(path_points, path_radius);
+
+        if (new_primitive.move().ball_collision_type() == TbotsProto::AVOID)
+        {
+            ball_obstacle = obstacle_factory.createFromBallPosition(world.ball().position());
+        }
 
         // Update static obstacles
         std::set<TbotsProto::MotionConstraint> motion_constraints;

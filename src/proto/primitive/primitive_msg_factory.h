@@ -35,7 +35,7 @@ std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
     const AutoChipOrKick& auto_chip_or_kick,
     const TbotsProto::MaxAllowedSpeedMode& max_allowed_speed_mode,
     double target_spin_rev_per_s, const RobotConstants_t& robot_constants,
-    std::optional<double> cost_override = std::nullopt);
+    std::optional<double> cost_override = std::nullopt, bool run_hrvo = true);
 
 /**
  * Create a Stop Move Primitive Message
