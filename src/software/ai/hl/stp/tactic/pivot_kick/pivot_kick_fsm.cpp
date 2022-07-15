@@ -19,7 +19,7 @@ void PivotKickFSM::kickBall(const Update& event)
     constants.robot_max_ang_acceleration_rad_per_s_2 =constants.robot_max_ang_acceleration_rad_per_s_2/ 2.0f;
 
     event.common.set_primitive(createMovePrimitive(
-                CREATE_MOTION_CONTROL(event.control_params.kick_origin),
+                CREATE_MOTION_CONTROL(event.control_params.kick_origin + Vector::createFromAngle(event.control_params.kick_direction).normalize(0.1)),
                 event.control_params.kick_direction, 0, TbotsProto::DribblerMode::OFF,
             TbotsProto::BallCollisionType::ALLOW, event.control_params.auto_chip_or_kick,
             TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
