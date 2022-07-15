@@ -12,6 +12,8 @@ std::set<TbotsProto::MotionConstraint> buildMotionConstraintSet(
     std::set<TbotsProto::MotionConstraint> current_motion_constraints =
         buildMotionConstraintSetFromGameState(game_state);
 
+    current_motion_constraints.insert(TbotsProto::MotionConstraint::AVOID_FIELD_BOUNDARY_ZONE);
+
     // updates current_allowed_constraints
     current_motion_constraints = motion_constraint_visitor.getUpdatedMotionConstraints(
         tactic, current_motion_constraints);

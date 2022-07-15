@@ -44,24 +44,8 @@ void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
         TacticVector result = {place_ball_tactic};
         result.insert(result.end(), move_tactics.begin(), move_tactics.end());
         yield({result});
-    } while (!place_ball_tactic->done());
-
-    static int wait_counter = 0;
-
-    while (wait_counter++ < 150)
-    {
-        TacticVector result = {stop};
-        result.insert(result.end(), move_tactics.begin(), move_tactics.end());
-        yield({result});
-    };
-
-    do
-    {
-        move_away->updateControlParams(Point(-3, 0), Angle::zero(), 0.0);
-        TacticVector result = {move_away};
-        result.insert(result.end(), move_tactics.begin(), move_tactics.end());
-        yield({result});
     } while (true);
+
 }
 
 // Register this play in the genericFactory
