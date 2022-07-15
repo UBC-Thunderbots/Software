@@ -202,12 +202,12 @@ class RobotCommunication(object):
         )
 
         # self.receive_robot_status = HRVOVisualizationProtoListener(
-            # self.multicast_channel + "%" + self.interface,
-            # SERIALIZED_PROTO_LOGS,
-            # lambda data: self.full_system_proto_unix_io.send_proto(
-                # HRVOVisualization, data
-            # ),
-            # True,
+        # self.multicast_channel + "%" + self.interface,
+        # SERIALIZED_PROTO_LOGS,
+        # lambda data: self.full_system_proto_unix_io.send_proto(
+        # HRVOVisualization, data
+        # ),
+        # True,
         # )
 
         # Create multicast senders
@@ -219,15 +219,16 @@ class RobotCommunication(object):
             self.multicast_channel + "%" + self.interface, VISION_PORT, True
         )
 
-        self.connect_fullsystem_to_robots()
+        # self.connect_fullsystem_to_robots()
         self.disconnect_fullsystem_from_robots()
-        # self.connect_robot_to_diagnostics(0)
-        # self.connect_robot_to_diagnostics(1)
-        # self.connect_robot_to_diagnostics(1)
-        # self.connect_robot_to_diagnostics(3)
-        # self.connect_robot_to_diagnostics(4)
-        # self.connect_robot_to_diagnostics(5)
-        # self.connect_robot_to_diagnostics(6)
+        self.connect_robot_to_diagnostics(0)
+        self.connect_robot_to_diagnostics(1)
+        self.connect_robot_to_diagnostics(1)
+        self.connect_robot_to_diagnostics(3)
+        self.connect_robot_to_diagnostics(4)
+        self.connect_robot_to_diagnostics(5)
+        self.connect_robot_to_diagnostics(6)
+        self.connect_robot_to_diagnostics(7)
 
         self.send_estop_state_thread.start()
         self.run_thread.start()

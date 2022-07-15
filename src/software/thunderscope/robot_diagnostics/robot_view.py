@@ -134,10 +134,10 @@ class RobotView(QWidget):
         return label
 
     def refresh(self):
+        return
         """Refresh the view
         """
-        return
-        breakbeam_status = self.breakbeam_buffer.get(block=False)
+        robot_status_buffer = self.robot_status_buffer.get(block=False)
         for i in range(8):
             if breakbeam_status.ball_in_beam:
                 self.breakbeam_labels[i].setText("In Beam")

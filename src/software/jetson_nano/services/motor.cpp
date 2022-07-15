@@ -169,7 +169,6 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
     checkDriverFault(DRIBBLER_MOTOR_CHIP_SELECT);
     startController(DRIBBLER_MOTOR_CHIP_SELECT, true);
     tmc4671_setTargetVelocity(DRIBBLER_MOTOR_CHIP_SELECT, 0);
-
 }
 
 MotorService::~MotorService() {}
@@ -281,6 +280,37 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
                                 encoder_calibrated_[BACK_LEFT_MOTOR_CHIP_SELECT] &&
                                 encoder_calibrated_[BACK_RIGHT_MOTOR_CHIP_SELECT]);
 
+    int reset_detector_5000 = tmc4671_readInt(0, TMC4671_PID_ACCELERATION_LIMIT);
+
+    if (reset_detector_5000 == 2147483647)
+    {
+        LOG(DEBUG) << "RESET DETECTED";
+        // Drive Motor Setup
+        for (uint8_t motor = 0; motor < NUM_DRIVE_MOTORS; motor++)
+        {
+            checkDriverFault(motor);
+        }
+
+        // Drive Motor Setup
+        for (uint8_t motor = 0; motor < NUM_DRIVE_MOTORS; motor++)
+        {
+            startDriver(motor);
+            checkDriverFault(motor);
+            // Start all the controllers as drive motor controllers
+            startController(motor, false);
+            tmc4671_setTargetVelocity(motor, 0);
+        }
+
+        // Dribbler Motor Setup
+        startDriver(DRIBBLER_MOTOR_CHIP_SELECT);
+        checkDriverFault(DRIBBLER_MOTOR_CHIP_SELECT);
+        startController(DRIBBLER_MOTOR_CHIP_SELECT, true);
+        tmc4671_setTargetVelocity(DRIBBLER_MOTOR_CHIP_SELECT, 0);
+
+        encoder_calibration_signal = true;
+        encoders_calibrated        = false;
+    }
+
     // check if encoders are calibrated
     if (!encoders_calibrated && encoder_calibration_signal)
     {
@@ -323,26 +353,30 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
                                              back_left_velocity, back_right_velocity};
 
     // Run-away protection
-    if (std::abs(current_wheel_velocities[0] - (prev_linear_wheel_velocities[0] + prev_angular_wheel_velocities[0])) >
-            RUNAWAY_PROTECTION_THRESHOLD_MPS)
+    if (std::abs(current_wheel_velocities[0] -
+                 (prev_linear_wheel_velocities[0] + prev_angular_wheel_velocities[0])) >
+        RUNAWAY_PROTECTION_THRESHOLD_MPS)
     {
         driver_control_enable_gpio.setValue(GpioState::LOW);
         LOG(WARNING) << "Front right motor runaway";
     }
-    else if (std::abs(current_wheel_velocities[1] - (prev_linear_wheel_velocities[1] + prev_angular_wheel_velocities[1])) >
-            RUNAWAY_PROTECTION_THRESHOLD_MPS)
+    else if (std::abs(current_wheel_velocities[1] - (prev_linear_wheel_velocities[1] +
+                                                     prev_angular_wheel_velocities[1])) >
+             RUNAWAY_PROTECTION_THRESHOLD_MPS)
     {
         driver_control_enable_gpio.setValue(GpioState::LOW);
         LOG(WARNING) << "Front right motor runaway";
     }
-    else if (std::abs(current_wheel_velocities[2] - (prev_linear_wheel_velocities[2] + prev_angular_wheel_velocities[2])) >
-            RUNAWAY_PROTECTION_THRESHOLD_MPS)
+    else if (std::abs(current_wheel_velocities[2] - (prev_linear_wheel_velocities[2] +
+                                                     prev_angular_wheel_velocities[2])) >
+             RUNAWAY_PROTECTION_THRESHOLD_MPS)
     {
         driver_control_enable_gpio.setValue(GpioState::LOW);
         LOG(WARNING) << "Back left motor runaway";
     }
-    else if (std::abs(current_wheel_velocities[3] - (prev_linear_wheel_velocities[3] + prev_angular_wheel_velocities[3])) >
-            RUNAWAY_PROTECTION_THRESHOLD_MPS)
+    else if (std::abs(current_wheel_velocities[3] - (prev_linear_wheel_velocities[3] +
+                                                     prev_angular_wheel_velocities[3])) >
+             RUNAWAY_PROTECTION_THRESHOLD_MPS)
     {
         driver_control_enable_gpio.setValue(GpioState::LOW);
         LOG(WARNING) << "Back right motor runaway";
@@ -357,13 +391,13 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
     motor_status.mutable_local_velocity()->set_y_component_meters(
         static_cast<float>(current_euclidean_velocity[1]));
 
-    WheelSpace_t target_total_wheel_velocities = {0.0, 0.0, 0.0, 0.0};
-    WheelSpace_t target_linear_wheel_velocities = {0.0, 0.0, 0.0, 0.0};
+    WheelSpace_t target_total_wheel_velocities   = {0.0, 0.0, 0.0, 0.0};
+    WheelSpace_t target_linear_wheel_velocities  = {0.0, 0.0, 0.0, 0.0};
     WheelSpace_t target_angular_wheel_velocities = {0.0, 0.0, 0.0, 0.0};
 
-    EuclideanSpace_t target_velocity  = {0.0, 0.0, 0.0};
-    int target_dribbler_rpm                  = motor.dribbler_speed_rpm();
-    static int ramp_rpm                      = 0;
+    EuclideanSpace_t target_velocity = {0.0, 0.0, 0.0};
+    int target_dribbler_rpm          = motor.dribbler_speed_rpm();
+    static int ramp_rpm              = 0;
 
     switch (motor.drive_control_case())
     {
@@ -389,28 +423,29 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
     }
 
     target_linear_wheel_velocities = rampWheelVelocity(
-            prev_linear_wheel_velocities, {target_velocity[0], target_velocity[1], 0.0},
-            static_cast<double>(robot_constants_.robot_max_speed_m_per_s),
-            static_cast<double>(robot_constants_.robot_max_acceleration_m_per_s_2),
-            time_elapsed_since_last_poll_s);
+        prev_linear_wheel_velocities, {target_velocity[0], target_velocity[1], 0.0},
+        static_cast<double>(robot_constants_.robot_max_speed_m_per_s),
+        static_cast<double>(robot_constants_.robot_max_acceleration_m_per_s_2),
+        time_elapsed_since_last_poll_s);
 
     target_angular_wheel_velocities = rampWheelVelocity(
-            prev_angular_wheel_velocities, {0.0, 0.0, target_velocity[2]},
-            static_cast<double>(robot_constants_.robot_max_ang_speed_rad_per_s),
-            static_cast<double>(robot_constants_.robot_max_ang_acceleration_rad_per_s_2),
-            time_elapsed_since_last_poll_s);
+        prev_angular_wheel_velocities, {0.0, 0.0, target_velocity[2]},
+        static_cast<double>(robot_constants_.robot_max_ang_speed_rad_per_s),
+        static_cast<double>(robot_constants_.robot_max_ang_acceleration_rad_per_s_2),
+        time_elapsed_since_last_poll_s);
 
-    prev_linear_wheel_velocities = target_linear_wheel_velocities;
+    prev_linear_wheel_velocities  = target_linear_wheel_velocities;
     prev_angular_wheel_velocities = target_angular_wheel_velocities;
 
-    target_total_wheel_velocities = prev_linear_wheel_velocities + prev_angular_wheel_velocities;
+    target_total_wheel_velocities =
+        prev_linear_wheel_velocities + prev_angular_wheel_velocities;
     static const float LOCAL_EPSILON = 0.01f;
 
     if (std::abs(target_total_wheel_velocities[0]) <= LOCAL_EPSILON &&
-            std::abs(target_total_wheel_velocities[1]) <= LOCAL_EPSILON &&
-            std::abs(target_total_wheel_velocities[2]) <= LOCAL_EPSILON &&
-            std::abs(target_total_wheel_velocities[3]) <= LOCAL_EPSILON &&
-            target_dribbler_rpm == 0)
+        std::abs(target_total_wheel_velocities[1]) <= LOCAL_EPSILON &&
+        std::abs(target_total_wheel_velocities[2]) <= LOCAL_EPSILON &&
+        std::abs(target_total_wheel_velocities[3]) <= LOCAL_EPSILON &&
+        target_dribbler_rpm == 0)
     {
         driver_control_enable_gpio.setValue(GpioState::LOW);
     }
@@ -421,18 +456,18 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
 
 
     // Set target speeds accounting for acceleration
-    tmc4671_writeInt(
-        FRONT_RIGHT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_TARGET,
-        static_cast<int>(target_total_wheel_velocities[0] * ELECTRICAL_RPM_PER_MECHANICAL_MPS));
-    tmc4671_writeInt(
-        FRONT_LEFT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_TARGET,
-        static_cast<int>(target_total_wheel_velocities[1] * ELECTRICAL_RPM_PER_MECHANICAL_MPS));
-    tmc4671_writeInt(
-        BACK_LEFT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_TARGET,
-        static_cast<int>(target_total_wheel_velocities[2] * ELECTRICAL_RPM_PER_MECHANICAL_MPS));
-    tmc4671_writeInt(
-        BACK_RIGHT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_TARGET,
-        static_cast<int>(target_total_wheel_velocities[3] * ELECTRICAL_RPM_PER_MECHANICAL_MPS));
+    tmc4671_writeInt(FRONT_RIGHT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_TARGET,
+                     static_cast<int>(target_total_wheel_velocities[0] *
+                                      ELECTRICAL_RPM_PER_MECHANICAL_MPS));
+    tmc4671_writeInt(FRONT_LEFT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_TARGET,
+                     static_cast<int>(target_total_wheel_velocities[1] *
+                                      ELECTRICAL_RPM_PER_MECHANICAL_MPS));
+    tmc4671_writeInt(BACK_LEFT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_TARGET,
+                     static_cast<int>(target_total_wheel_velocities[2] *
+                                      ELECTRICAL_RPM_PER_MECHANICAL_MPS));
+    tmc4671_writeInt(BACK_RIGHT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_TARGET,
+                     static_cast<int>(target_total_wheel_velocities[3] *
+                                      ELECTRICAL_RPM_PER_MECHANICAL_MPS));
 
     // If the dribbler only needs to change by DRIBBLER_ACCELERATION_THRESHOLD_RPM_PER_S,
     // just set the value
@@ -478,7 +513,8 @@ void MotorService::spiTransfer(int fd, uint8_t const* tx, uint8_t const* rx, uns
 
 WheelSpace_t MotorService::rampWheelVelocity(
     const WheelSpace_t& current_wheel_velocity,
-    const EuclideanSpace_t& target_euclidean_velocity, double max_allowable_wheel_velocity, double allowed_acceleration,
+    const EuclideanSpace_t& target_euclidean_velocity,
+    double max_allowable_wheel_velocity, double allowed_acceleration,
     const double& time_to_ramp)
 {
     // ramp wheel velocity
