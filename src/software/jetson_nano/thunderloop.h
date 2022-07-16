@@ -113,4 +113,5 @@ class Thunderloop
 
     // Path to the CPU thermal zone temperature file
     const std::string CPU_TEMP_FILE_PATH = "/sys/class/thermal/thermal_zone1/temp";
+    bool first_shot= true;
 };

@@ -286,6 +286,7 @@ PYBIND11_MODULE(python_bindings, m)
 
     // Listeners
     declareThreadedProtoUdpListener<TbotsProto::HRVOVisualization>(m, "HRVOVisualization");
+    declareThreadedProtoUdpListener<TbotsProto::SerializedProto>(m, "Serialized");
     declareThreadedProtoUdpListener<SSLProto::Referee>(m, "SSLReferee");
     declareThreadedProtoUdpListener<TbotsProto::RobotStatus>(m, "RobotStatus");
     declareThreadedProtoUdpListener<TbotsProto::RobotLog>(m, "RobotLog");

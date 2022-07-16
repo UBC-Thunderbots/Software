@@ -1,6 +1,7 @@
 #pragma once
 #include <fstream>
 #include <g3log/logmessage.hpp>
+#include "software/logger/logger.h"
 #include <iostream>
 
 #include "proto/robot_log_msg.pb.h"
@@ -8,6 +9,7 @@
 #include "software/logger/custom_logging_levels.h"
 #include "software/logger/constants.h"
 #include "proto/serialized_proto.pb.h"
+#include "proto/visualization.pb.h"
 
 /**
  * This class acts as a custom sink for g3log. In particular, it allows us to log to
@@ -36,6 +38,6 @@ class NetworkSink
 
    private:
     std::unique_ptr<ThreadedProtoUdpSender<TbotsProto::RobotLog>> log_output;
-    std::unique_ptr<ThreadedProtoUdpSender<TbotsProto::SerializedProto>> serialized_proto_log_output;
+    std::unique_ptr<ThreadedProtoUdpSender<TbotsProto::HRVOVisualization>> serialized_proto_log_output;
     int robot_id;
 };

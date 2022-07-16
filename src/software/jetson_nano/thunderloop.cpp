@@ -30,7 +30,8 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, const int loop
 
     redis_client_ = std::make_unique<RedisClient>(REDIS_DEFAULT_HOST, REDIS_DEFAULT_PORT);
 
-    LoggerSingleton::initializeLogger("/home/robot/logs");
+    //LoggerSingleton::initializeLogger("/home/robot/logs");
+
 
     power_service_ = std::make_unique<PowerService>();
     motor_service_ = std::make_unique<MotorService>(robot_constants, loop_hz);
@@ -70,7 +71,7 @@ void Thunderloop::runLoop()
     for (;;)
     {
         {
-            redis_client_->set("/battery_voltage",
+                        redis_client_->set("/battery_voltage",
                                std::to_string(power_status_.battery_voltage()));
             redis_client_->set("/current_draw",
                                std::to_string(power_status_.current_draw()));
@@ -91,6 +92,24 @@ void Thunderloop::runLoop()
                 std::stoi(redis_client_->get(ROBOT_MULTICAST_CHANNEL_REDIS_KEY));
             auto network_interface =
                 redis_client_->get(ROBOT_NETWORK_INTERFACE_REDIS_KEY);
+
+            if (first_shot)
+            {
+                NetworkLoggerSingleton::initializeLogger(channel_id, network_interface, robot_id); 
+                first_shot = false;
+            }
+            
+            TbotsProto::HRVOVisualization hrvo_visualization;
+            hrvo_visualization.set_robot_id(0);
+            auto vo_proto      = *createVelocityObstacleProto(VelocityObstacle(Vector(),
+                                                                               Vector::createFromAngle(Angle::fromDegrees(45)),
+                                                                               Vector::createFromAngle(Angle::fromDegrees(-45))));
+            auto vo_protos = {vo_proto};
+            *(hrvo_visualization.mutable_velocity_obstacles()) = {vo_protos.begin(),
+                                                                  vo_protos.end()};
+            LOG(VISUALIZE) << hrvo_visualization;
+            LOG(INFO) << "Sending HRVO Visualization";
+
 
             // If any of the configs have changed, update the network service to switch
             // to the new interface and channel with the correct robot ID
