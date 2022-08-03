@@ -1,9 +1,11 @@
 #include "linear_velocity_agent.h"
 
 LinearVelocityAgent::LinearVelocityAgent(HRVOSimulator *simulator, const Vector &position,
-                                         float radius, const Vector &velocity,
-                                         float maxSpeed, float maxAccel, AgentPath &path)
-    : Agent(simulator, position, radius, velocity, velocity, maxSpeed, maxAccel, path)
+                                         float radius, float max_radius_inflation,
+                                         const Vector &velocity, float maxSpeed,
+                                         float maxAccel, AgentPath &path)
+    : Agent(simulator, position, radius, max_radius_inflation, velocity, velocity,
+            maxSpeed, maxAccel, path)
 {
 }
 
