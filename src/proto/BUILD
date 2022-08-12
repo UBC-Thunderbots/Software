@@ -43,8 +43,8 @@ py_proto_library(
     name = "tbots_py_proto",
     srcs = [
         "ball.proto",
-        "game_state.proto",
         "estop_state.proto",
+        "game_state.proto",
         "geometry.proto",
         "parameters.proto",
         "play.proto",
