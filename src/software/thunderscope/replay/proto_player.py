@@ -131,8 +131,11 @@ class ProtoPlayer(object):
         # faster than iterating over the protobuf library to find
         # the type from the string.
         try:
+            # The format of the protobuf type is:
+            # package.proto_class (e.g. TbotsProto.Primitive)
             proto_class = eval(str(protobuf_type.split(b".")[1], encoding="utf-8"))
         except Exception:
+            # The protobuf type does not follow our convention
             proto_class = eval(str(protobuf_type, encoding="utf-8"))
 
         # Deserialize protobuf
