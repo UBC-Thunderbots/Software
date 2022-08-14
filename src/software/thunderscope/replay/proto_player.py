@@ -136,15 +136,10 @@ class ProtoPlayer(object):
         # Convert string to type. eval is an order of magnitude
         # faster than iterating over the protobuf library to find
         # the type from the string.
-        protobuf_class_str = protobuf_type.split(b".")
         try:
-            if len(protobuf_class_str) == 2:
-                # The format of the protobuf type is:
-                # package.proto_class (e.g. TbotsProto.Primitive)
-                proto_class = eval(str(protobuf_class_str[1], encoding="utf-8"))
-            elif len(protobuf_class_str) == 1:
-                # The protobuf type does not follow our TbotsProto convention
-                proto_class = eval(str(protobuf_class_str[0], encoding="utf-8"))
+            # The format of the protobuf type is:
+            # package.proto_class (e.g. TbotsProto.Primitive)
+            proto_class = eval(str(protobuf_type.split(b".")[-1], encoding="utf-8"))
         except NameError:
             raise TypeError(f"Unknown proto type in replay: '{protobuf_type}'")
 
