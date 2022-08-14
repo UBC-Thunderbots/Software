@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+package TbotsProto;
+
 message EstopState
 {
     bool is_playing = 1;
