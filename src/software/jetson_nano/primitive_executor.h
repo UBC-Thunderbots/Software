@@ -12,12 +12,14 @@ class PrimitiveExecutor
     /**
      * Constructor
      * @param time_step Time step which this primitive executor operates in
+     * @param robot_id The id  for the robot which uses this primitive
+     * executor
      * @param robot_constants The robot constants for the robot which uses this primitive
      * executor
      * @param friendly_team_colour The colour of the friendly team
      */
-    explicit PrimitiveExecutor(const double time_step,
-                               const RobotConstants_t& robot_constants,
+    explicit PrimitiveExecutor(const double time_step, const RobotId robot_id,
+                               const RobotConstants_t &robot_constants,
                                const TeamColour friendly_team_colour);
 
     /**
@@ -45,8 +47,9 @@ class PrimitiveExecutor
      * Update primitive executor with the local velocity
      *
      * @param local_velocity The local velocity
+     * @param curr_orientation
      */
-    void updateLocalVelocity(Vector local_velocity);
+    void updateLocalVelocity(const Vector &local_velocity, const Angle &curr_orientation);
 
     /**
      * Steps the current primitive and returns a direct control primitive with the
@@ -60,6 +63,13 @@ class PrimitiveExecutor
     std::unique_ptr<TbotsProto::DirectControlPrimitive> stepPrimitive(
         const unsigned int robot_id, const RobotState& robot_state);
 
+    /**
+     * Update the robot id of the robot which this primitive executor is running on
+     *
+     * @param robot_id New robot id
+     */
+    void setRobotId(const RobotId robot_id);
+
    private:
     /*
      * Compute the next target linear velocity the robot should be at
@@ -70,8 +80,7 @@ class PrimitiveExecutor
      * Primitive Executor
      * @returns Vector The target linear velocity
      */
-    Vector getTargetLinearVelocity(const unsigned int robot_id,
-                                   const Angle& curr_orientation);
+    Vector getTargetLinearVelocity(const Angle& curr_orientation);
     Vector getTargetLinearVelocity(const TbotsProto::MovePrimitive& move_primitive,
                                    const RobotState& robot_state);
     double getTargetLinearSpeed(const TbotsProto::MovePrimitive& move_primitive,
@@ -90,6 +99,7 @@ class PrimitiveExecutor
     AngularVelocity getTargetAngularVelocity(
         const TbotsProto::MovePrimitive& move_primitive, const Angle& curr_orientation);
 
+    RobotId robot_id_;
     TbotsProto::Primitive current_primitive_;
     TbotsProto::MovePrimitive move_primitive_;
     TbotsProto::World current_world_;

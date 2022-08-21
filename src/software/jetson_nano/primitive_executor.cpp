@@ -8,10 +8,11 @@
 #include "software/logger/logger.h"
 #include "software/math/math_functions.h"
 
-PrimitiveExecutor::PrimitiveExecutor(const double time_step,
-                                     const RobotConstants_t& robot_constants,
+PrimitiveExecutor::PrimitiveExecutor(const double time_step, const RobotId robot_id,
+                                     const RobotConstants_t &robot_constants,
                                      const TeamColour friendly_team_colour)
-    : current_primitive_(),
+    : robot_id_(robot_id),
+      current_primitive_(),
       hrvo_simulator_(static_cast<float>(time_step), robot_constants,
                       friendly_team_colour)
 {
@@ -40,13 +41,18 @@ void PrimitiveExecutor::updateWorld(const TbotsProto::World& world_msg)
     hrvo_simulator_.updateWorld(World(world_msg));
 }
 
-void PrimitiveExecutor::updateLocalVelocity(Vector local_velocity) {}
-
-Vector PrimitiveExecutor::getTargetLinearVelocity(const unsigned int robot_id,
-                                                  const Angle& curr_orientation)
+void PrimitiveExecutor::updateLocalVelocity(const Vector &local_velocity,
+                                            const Angle &curr_orientation)
 {
-    Vector target_global_velocity = hrvo_simulator_.getRobotVelocity(robot_id);
+    hrvo_simulator_.updateFriendlyRobotVelocity(robot_id_,
+                                                local_velocity.rotate(-curr_orientation));
+}
+
+Vector PrimitiveExecutor::getTargetLinearVelocity(const Angle &curr_orientation)
+{
+    Vector target_global_velocity = hrvo_simulator_.getRobotVelocity(robot_id_);
     return target_global_velocity.rotate(-curr_orientation);
+//    return Vector(0, 0.04);
 }
 
 AngularVelocity PrimitiveExecutor::getTargetAngularVelocity(
@@ -193,15 +199,15 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
             // Compute the target velocities
             // Vector target_velocity = getTargetLinearVelocity(current_primitive_.move(),
             // robot_state);
-            Vector target_velocity =
-                getTargetLinearVelocity(robot_id, robot_state.orientation());
+//            Vector target_velocity = getTargetLinearVelocity(robot_state.orientation());
+            Vector target_velocity = getTargetLinearVelocity(current_primitive_.move(), robot_state);
 
-            double target_linear_speed =
-                getTargetLinearSpeed(current_primitive_.move(), robot_state);
-            if (target_velocity.length() > target_linear_speed)
-            {
-                target_velocity = target_velocity.normalize(target_linear_speed);
-            }
+//            double target_linear_speed =
+//                getTargetLinearSpeed(current_primitive_.move(), robot_state);
+//            if (target_velocity.length() > target_linear_speed)
+//            {
+//                target_velocity = target_velocity.normalize(target_linear_speed);
+//            }
 
             AngularVelocity target_angular_velocity = getTargetAngularVelocity(
                 current_primitive_.move(), robot_state.orientation());
@@ -224,4 +230,9 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
         }
     }
     return std::make_unique<TbotsProto::DirectControlPrimitive>();
+}
+
+void PrimitiveExecutor::setRobotId(const RobotId robot_id)
+{
+    robot_id_ = robot_id;
 }

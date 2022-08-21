@@ -67,6 +67,9 @@ class RobotCommunication(object):
         self.send_estop_state_thread = threading.Thread(target=self.__send_estop_state)
         self.run_thread = threading.Thread(target=self.run)
 
+        # TODO: ADDDDDDD
+        self.fullsystem_connected_to_robots = False
+
         try:
             self.estop_reader = ThreadedEstopReader(
                 self.estop_path, self.estop_buadrate
@@ -106,12 +109,11 @@ class RobotCommunication(object):
 
                 if IGNORE_ESTOP or self.estop_reader.isEstopPlay():
                     # primitive_set.time_sent = Timestamp(epoch_timestamp_seconds=time.time())
-                    print(primitive_set)
                     self.send_primitive_set.send_proto(primitive_set)
                     # logger.info(primitive_set)
 
             else:
-
+                # print(len(self.motor_control_diagnostics_buffer))
                 diagnostics_primitive = DirectControlPrimitive(
                     motor_control=self.motor_control_diagnostics_buffer.get(
                         block=False
@@ -222,21 +224,21 @@ class RobotCommunication(object):
             self.multicast_channel + "%" + self.interface, VISION_PORT, True
         )
 
-<<<<<<< HEAD
+# <<<<<<< HEAD
         self.connect_fullsystem_to_robots()
         #self.disconnect_fullsystem_from_robots()
-=======
+# =======
         # self.disconnect_fullsystem_from_robots()
->>>>>>> b7027873a2ff9c9881879b58b7b8de46671d837d
-        # self.connect_robot_to_diagnostics(0)
-        # self.connect_robot_to_diagnostics(1)
-        # self.connect_robot_to_diagnostics(1)
-        # self.connect_robot_to_diagnostics(3)
-        # self.connect_robot_to_diagnostics(4)
+# >>>>>>> b7027873a2ff9c9881879b58b7b8de46671d837d
+#         self.connect_robot_to_diagnostics(0)
+#         self.connect_robot_to_diagnostics(1)
+#         self.connect_robot_to_diagnostics(1)
+#         self.connect_robot_to_diagnostics(3)
+#         self.connect_robot_to_diagnostics(4) # Connect for diagnostics
         # self.connect_robot_to_diagnostics(5)
         # self.connect_robot_to_diagnostics(6)
         # self.connect_robot_to_diagnostics(7)
-        self.connect_fullsystem_to_robots()
+        # self.connect_fullsystem_to_robots()
 
         self.send_estop_state_thread.start()
         self.run_thread.start()

@@ -10,8 +10,8 @@ from proto.import_all_protos import *
 MAX_DRIBBLER_RPM = 10000
 MIN_DRIBBLER_RPM = -10000
 
-MAX_LINEAR_SPEED_MPS = 5
-MIN_LINEAR_SPEED_MPS = -5
+MAX_LINEAR_SPEED_MPS = 0.5
+MIN_LINEAR_SPEED_MPS = -0.5
 
 MAX_ANGULAR_SPEED_RAD_PER_S = 20
 MIN_ANGULAR_SPEED_RAD_PER_S = -20
@@ -82,7 +82,7 @@ class DriveAndDribblerWidget(QWidget):
         value = slider.value()
         value = float(value)
         value = value / 1000.0
-        value_str = "%.1f" % value
+        value_str = "%.3f" % value
         return value_str
 
     def setup_direct_velocity(self, title):
@@ -100,14 +100,14 @@ class DriveAndDribblerWidget(QWidget):
             self.x_velocity_slider,
             self.x_velocity_label,
         ) = common_widgets.create_slider(
-            "X (m/s)", MIN_LINEAR_SPEED_MPS * 1000, MAX_LINEAR_SPEED_MPS * 1000, 1
+            "X (m/s)", MIN_LINEAR_SPEED_MPS * 1000, MAX_LINEAR_SPEED_MPS * 1000, 10
         )
         (
             y_layout,
             self.y_velocity_slider,
             self.y_velocity_label,
         ) = common_widgets.create_slider(
-            "Y (m/s)", MIN_LINEAR_SPEED_MPS * 1000, MAX_LINEAR_SPEED_MPS * 1000, 1
+            "Y (m/s)", MIN_LINEAR_SPEED_MPS * 1000, MAX_LINEAR_SPEED_MPS * 1000, 10
         )
         (
             dps_layout,

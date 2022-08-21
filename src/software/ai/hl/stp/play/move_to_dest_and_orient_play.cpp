@@ -25,7 +25,7 @@ void MoveToDestAndOrientPlay::getNextTactics(TacticCoroutine::push_type &yield,
         {
             move_tactics[k]->updateControlParams(
                 world.ball().position() +
-                    Vector(1 + (static_cast<double>(k) / 10) * 2, 0),
+                    Vector(0.3 + (static_cast<double>(k) / 10) * 2, 0),
                 target_orientation, 0, TbotsProto::DribblerMode::OFF,
 
                 TbotsProto::BallCollisionType::ALLOW);

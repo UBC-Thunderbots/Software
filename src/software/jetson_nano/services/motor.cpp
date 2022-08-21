@@ -24,6 +24,7 @@
 #include "shared/constants.h"
 #include "software/logger/logger.h"
 #include "software/util/scoped_timespec_timer/scoped_timespec_timer.h"
+#include "proto/message_translation/tbots_geometry.h"
 
 extern "C"
 {
@@ -333,24 +334,7 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
         return motor_status;
     }
 
-    // Get current wheel electical RPMs (don't account for pole pairs)
-    double front_right_velocity =
-        static_cast<double>(tmc4671_getActualVelocity(FRONT_RIGHT_MOTOR_CHIP_SELECT)) *
-        MECHANICAL_MPS_PER_ELECTRICAL_RPM;
-    double front_left_velocity =
-        static_cast<double>(tmc4671_getActualVelocity(FRONT_LEFT_MOTOR_CHIP_SELECT)) *
-        MECHANICAL_MPS_PER_ELECTRICAL_RPM;
-    double back_right_velocity =
-        static_cast<double>(tmc4671_getActualVelocity(BACK_RIGHT_MOTOR_CHIP_SELECT)) *
-        MECHANICAL_MPS_PER_ELECTRICAL_RPM;
-    double back_left_velocity =
-        static_cast<double>(tmc4671_getActualVelocity(BACK_LEFT_MOTOR_CHIP_SELECT)) *
-        MECHANICAL_MPS_PER_ELECTRICAL_RPM;
-
-    // This order needs to match euclidean_to_four_wheel converters order
-    // We also want to work in the meters per second space rather than electrical RPMs
-    WheelSpace_t current_wheel_velocities = {front_right_velocity, front_left_velocity,
-                                             back_left_velocity, back_right_velocity};
+    WheelSpace_t current_wheel_velocities = getCurrentWheelVelocities();
 
     // Run-away protection
     if (std::abs(current_wheel_velocities[0] -
@@ -391,6 +375,12 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
     motor_status.mutable_local_velocity()->set_y_component_meters(
         static_cast<float>(current_euclidean_velocity[1]));
 
+    Vector target_vel = createVector(motor.direct_velocity_control().velocity());
+    Vector target_vel_flipped(-motor.direct_velocity_control().velocity().y_component_meters(), motor.direct_velocity_control().velocity().x_component_meters());
+    LOG(INFO) << "target_vel " << target_vel << " ==> " << target_vel.length() << " ::: target_vel_flipped " << target_vel_flipped;
+    LOG(INFO) << "Wheel vel " << current_wheel_velocities[0] << ", " << current_wheel_velocities[1] << ", " << current_wheel_velocities[2] << ", " << current_wheel_velocities[3];
+
+
     WheelSpace_t target_total_wheel_velocities   = {0.0, 0.0, 0.0, 0.0};
     WheelSpace_t target_linear_wheel_velocities  = {0.0, 0.0, 0.0, 0.0};
     WheelSpace_t target_angular_wheel_velocities = {0.0, 0.0, 0.0, 0.0};
@@ -412,6 +402,10 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
                 -motor.direct_velocity_control().velocity().y_component_meters(),
                 motor.direct_velocity_control().velocity().x_component_meters(),
                 motor.direct_velocity_control().angular_velocity().radians_per_second()};
+//            target_velocity = {
+//                    motor.direct_velocity_control().velocity().x_component_meters(),
+//                    motor.direct_velocity_control().velocity().y_component_meters(),
+//                    motor.direct_velocity_control().angular_velocity().radians_per_second()};
             break;
         };
 
@@ -453,6 +447,8 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
     {
         driver_control_enable_gpio.setValue(GpioState::HIGH);
     }
+
+    LOG(INFO) << "Target vel " << target_total_wheel_velocities[0] << ", " << target_total_wheel_velocities[1] << ", " << target_total_wheel_velocities[2] << ", " << target_total_wheel_velocities[3];
 
 
     // Set target speeds accounting for acceleration
@@ -1035,4 +1031,30 @@ void MotorService::startController(uint8_t motor, bool dribbler)
         writeToControllerOrDieTrying(motor, TMC4671_MOTOR_TYPE_N_POLE_PAIRS, 0x00030008);
         configureEncoder(motor);
     }
+}
+
+EuclideanSpace_t MotorService::getCurrentEuclideanVelocity() const
+{
+    return euclidean_to_four_wheel.getEuclideanVelocity(getCurrentWheelVelocities());
+}
+
+WheelSpace_t MotorService::getCurrentWheelVelocities() const
+{
+    // Get current wheel electical RPMs (don't account for pole pairs)
+    double front_right_velocity =
+            static_cast<double>(tmc4671_getActualVelocity(FRONT_RIGHT_MOTOR_CHIP_SELECT)) *
+            MECHANICAL_MPS_PER_ELECTRICAL_RPM;
+    double front_left_velocity =
+            static_cast<double>(tmc4671_getActualVelocity(FRONT_LEFT_MOTOR_CHIP_SELECT)) *
+            MECHANICAL_MPS_PER_ELECTRICAL_RPM;
+    double back_right_velocity =
+            static_cast<double>(tmc4671_getActualVelocity(BACK_RIGHT_MOTOR_CHIP_SELECT)) *
+            MECHANICAL_MPS_PER_ELECTRICAL_RPM;
+    double back_left_velocity =
+            static_cast<double>(tmc4671_getActualVelocity(BACK_LEFT_MOTOR_CHIP_SELECT)) *
+            MECHANICAL_MPS_PER_ELECTRICAL_RPM;
+
+    // This order needs to match euclidean_to_four_wheel converters order
+    // We also want to work in the meters per second space rather than electrical RPMs
+    return {front_right_velocity, front_left_velocity, back_left_velocity, back_right_velocity};
 }

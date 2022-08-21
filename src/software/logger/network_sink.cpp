@@ -17,7 +17,7 @@ NetworkSink::NetworkSink(unsigned int channel, const std::string& interface, int
 void NetworkSink::sendToNetwork(g3::LogMessageMover log_entry)
 {
     auto level = log_entry.get()._level;
-    LOG(INFO) << "receiving level " << level.value;
+//    LOG(INFO) << "receiving level " << level.value;
 
    if (level.value == VISUALIZE.value)
    {
@@ -32,14 +32,14 @@ void NetworkSink::sendToNetwork(g3::LogMessageMover log_entry)
                       proto_type_name_pos - TYPE_DELIMITER.length());
        std::string serialized_proto =
            msg.substr(proto_type_name_pos + TYPE_DELIMITER.length());
-       LOG(INFO) << "Received log visualize " << proto_type_name;
+//       LOG(INFO) << "Received log visualize " << proto_type_name;
        if (proto_type_name == "TbotsProto.HRVOVisualization")
        {
-           LOG(INFO) << "Parsing a HRVOVisualization";
+//           LOG(INFO) << "Parsing a HRVOVisualization";
            log_msg_proto->ParseFromString(serialized_proto);
 
            serialized_proto_log_output->sendProto(*log_msg_proto);
-           LOG(INFO) << "Sent a HRVO Visualization";
+//           LOG(INFO) << "Sent a HRVO Visualization";
        } 
    }
    else

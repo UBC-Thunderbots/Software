@@ -74,6 +74,7 @@ class g3logWidget(QWidget):
             )
         ):
             log_str = f"{log.created_timestamp.epoch_timestamp_seconds} {self.log_level_str_map[log.log_level]} [{log.file_name}->{log.line_number}] {log.log_msg}\n"
+            print(f"{log_str}")
             self.console_widget.write(log_str)
         else:
             return

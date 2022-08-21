@@ -82,6 +82,9 @@ class MotorService
      */
     void runOpenLoopCalibrationRoutine(uint8_t motor, size_t num_samples);
 
+    WheelSpace_t getCurrentWheelVelocities() const;
+    EuclideanSpace_t getCurrentEuclideanVelocity() const;
+
    private:
     /**
      * Calls the configuration functions below in the right sequence

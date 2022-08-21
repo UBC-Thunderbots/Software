@@ -21,17 +21,17 @@ extern int clock_nanosleep(clockid_t __clock_id, int __flags,
 
 Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, const int loop_hz)
     // TODO (#2495): Set the friendly team colour once we receive World proto
-    : primitive_executor_(loop_hz, robot_constants, TeamColour::YELLOW)
+    : robot_id_(MAX_ROBOT_IDS + 1),  // Initialize to a robot ID that is not valid
+      primitive_executor_(loop_hz, robot_id_, robot_constants, TeamColour::YELLOW)
 {
-    robot_id_        = MAX_ROBOT_IDS + 1;  // Initialize to a robot ID that is not valid
+    LOG(DEBUG) << "Thunderloop constructor running ";
     channel_id_      = 0;
     loop_hz_         = loop_hz;
     robot_constants_ = robot_constants;
 
     redis_client_ = std::make_unique<RedisClient>(REDIS_DEFAULT_HOST, REDIS_DEFAULT_PORT);
 
-    //LoggerSingleton::initializeLogger("/home/robot/logs");
-
+    LoggerSingleton::initializeLogger("/home/robot/logs");
 
     power_service_ = std::make_unique<PowerService>();
     motor_service_ = std::make_unique<MotorService>(robot_constants, loop_hz);
@@ -95,7 +95,7 @@ void Thunderloop::runLoop()
 
             if (first_shot)
             {
-                NetworkLoggerSingleton::initializeLogger(channel_id, network_interface, robot_id); 
+//                NetworkLoggerSingleton::initializeLogger(channel_id, network_interface, robot_id);
                 first_shot = false;
             }
             
@@ -108,8 +108,7 @@ void Thunderloop::runLoop()
             *(hrvo_visualization.mutable_velocity_obstacles()) = {vo_protos.begin(),
                                                                   vo_protos.end()};
             LOG(VISUALIZE) << hrvo_visualization;
-            LOG(INFO) << "Sending HRVO Visualization";
-
+//            LOG(INFO) << "Sending HRVO Visualization";
 
             // If any of the configs have changed, update the network service to switch
             // to the new interface and channel with the correct robot ID
@@ -129,6 +128,8 @@ void Thunderloop::runLoop()
                     std::string(ROBOT_MULTICAST_CHANNELS.at(channel_id_)) + "%" +
                         network_interface_,
                     VISION_PORT, PRIMITIVE_PORT, ROBOT_STATUS_PORT, true);
+
+                primitive_executor_.setRobotId(robot_id_);
             }
             // Network Service: receive newest world, primitives and set out the last
             // robot status
@@ -166,7 +167,7 @@ void Thunderloop::runLoop()
                 }
             }
 
-            //// If the world msg is new, update the internal buffer
+            // If the world msg is new, update the internal buffer
             if (new_world.time_sent().epoch_timestamp_seconds() >
                 world_.time_sent().epoch_timestamp_seconds())
             {
@@ -200,6 +201,14 @@ void Thunderloop::runLoop()
 
                 if (robot.has_value())
                 {
+                    // Note: This overrides the velocity calculated by sensor fusion and
+                    // passed to Primitive Executor through the World, as a result,
+                    // updateLocalVelocity must be called after updateWorld and before
+                    // stepPrimitive.
+                    EuclideanSpace_t euclidean_vel = motor_service_->getCurrentEuclideanVelocity();
+                    Vector curr_local_vel = Vector(euclidean_vel[0], euclidean_vel[1]);
+                    primitive_executor_.updateLocalVelocity(curr_local_vel, robot.value().orientation());
+
                     // TODO-JON needs to use world in primitive executor
                     direct_control_ = *primitive_executor_.stepPrimitive(
                         robot_id_, robot->currentState());
@@ -230,11 +239,11 @@ void Thunderloop::runLoop()
             {
                 ScopedTimespecTimer timer(&poll_time);
 
+//                LOG(DEBUG) << "Motor service being polled!!! ";
+//                LOG(DEBUG) << direct_control_.motor_control().DebugString();
                 motor_status_ = motor_service_->poll(direct_control_.motor_control(),
                                                      power_status_.breakbeam_tripped(),
                                                      loop_duration_seconds);
-                primitive_executor_.updateLocalVelocity(
-                    createVector(motor_status_.local_velocity()));
             }
             thunderloop_status_.set_motor_service_poll_time_ns(
                 static_cast<unsigned long>(poll_time.tv_nsec));
