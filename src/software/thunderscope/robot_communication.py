@@ -10,7 +10,7 @@ from software.logger.logger import createLogger
 logger = createLogger(__name__)
 
 # todo remove
-IGNORE_ESTOP = False
+IGNORE_ESTOP = True
 
 
 class RobotCommunication(object):
@@ -70,13 +70,13 @@ class RobotCommunication(object):
                 self.estop_path, self.estop_buadrate
             )
         except Exception:
-            raise Exception("connect estop - not found")
+            pass
 
     def __send_estop_state(self):
         while True:
-            self.full_system_proto_unix_io.send_proto(
-                EstopState, EstopState(is_playing=self.estop_reader.isEstopPlay())
-            )
+            #self.full_system_proto_unix_io.send_proto(
+            #    EstopState, EstopState(is_playing=self.estop_reader.isEstopPlay())
+            #)
             time.sleep(0.1)
 
     def run(self):
@@ -177,10 +177,18 @@ class RobotCommunication(object):
         self.receive_robot_log = RobotLogProtoListener(
             self.multicast_channel + "%" + self.interface,
             ROBOT_LOGS_PORT,
-            lambda data: self.full_system_proto_unix_io.send_proto(RobotLog, data),
+            lambda data: print("received robot log"),#self.full_system_proto_unix_io.send_proto(RobotLog, data),
             True,
         )
 
+        self.receive_hrvo_vis = HRVOVisualizationProtoListener(
+            self.multicast_channel + "%" + self.interface,
+            SERIALIZED_PROTO_LOGS_PORT,
+            lambda data: print("received proto log"),#self.full_system_proto_unix_io.send_proto(
+                #jHRVOVisualization, data
+            #),
+            True,
+        )
         print(
             SSL_VISION_ADDRESS, SSL_VISION_PORT, SSL_REFEREE_ADDRESS, SSL_REFEREE_PORT
         )
@@ -200,16 +208,7 @@ class RobotCommunication(object):
             lambda data: self.full_system_proto_unix_io.send_proto(Referee, data),
             True,
         )
-
-        # self.receive_robot_status = HRVOVisualizationProtoListener(
-        # self.multicast_channel + "%" + self.interface,
-        # SERIALIZED_PROTO_LOGS,
-        # lambda data: self.full_system_proto_unix_io.send_proto(
-        # HRVOVisualization, data
-        # ),
-        # True,
-        # )
-
+        
         # Create multicast senders
         self.send_primitive_set = PrimitiveSetProtoSender(
             self.multicast_channel + "%" + self.interface, PRIMITIVE_PORT, True

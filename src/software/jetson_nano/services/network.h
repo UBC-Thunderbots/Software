@@ -4,6 +4,8 @@
 
 #include "proto/robot_status_msg.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
+#include "proto/robot_log_msg.pb.h"
+#include "proto/visualization.pb.h"
 #include "proto/world.pb.h"
 #include "shared/robot_constants.h"
 #include "software/networking/threaded_proto_udp_listener.hpp"
@@ -25,7 +27,8 @@ class NetworkService
      */
     NetworkService(const std::string& ip_address, unsigned short world_listener_port,
                    unsigned short primitive_listener_port,
-                   unsigned short robot_status_sender_port, bool multicast);
+                   unsigned short robot_status_sender_port, 
+                   bool multicast);
 
     /**
      * When the network service is polled, it sends the robot_status and returns
@@ -48,7 +51,6 @@ class NetworkService
     std::unique_ptr<ThreadedProtoUdpListener<TbotsProto::PrimitiveSet>>
         listener_primitive_set;
     std::unique_ptr<ThreadedProtoUdpListener<TbotsProto::World>> listener_world;
-
 
     // Functions to callback primitiveSet and world and stores them in a variable
     void primitiveSetCallback(TbotsProto::PrimitiveSet input);
