@@ -57,11 +57,9 @@ class ObstacleLayer(FieldLayer):
                     poly = QtGui.QPolygon(polygon_points)
                     painter.drawPolygon(poly)
 
-                for circleobstacle in obstacle.circle:
+                for circle_obstacle in obstacle.circle:
                     painter.drawEllipse(
                         self.createCircle(
-                            int(MILLIMETERS_PER_METER * circleobstacle.origin.x_meters),
-                            int(MILLIMETERS_PER_METER * circleobstacle.origin.y_meters),
-                            int(MILLIMETERS_PER_METER * circleobstacle.radius),
+                            circle_obstacle.origin, circle_obstacle.radius
                         )
                     )
