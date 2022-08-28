@@ -51,7 +51,7 @@ Thunderloop::~Thunderloop() {}
 /*
  * Run the main robot loop!
  */
-void Thunderloop::runLoop()
+[[noreturn]] void Thunderloop::runLoop()
 {
     // Timing
     struct timespec next_shot;
@@ -126,15 +126,23 @@ void Thunderloop::runLoop()
             }
 
             TbotsProto::HRVOVisualization hrvo_visualization;
-            hrvo_visualization.set_robot_id(0);
+            TbotsProto::HRVOVisualization hrvo_visualization2;
+            hrvo_visualization.set_robot_id(4);
             auto vo_proto      = *createVelocityObstacleProto(VelocityObstacle(Vector(),
                                                                                Vector::createFromAngle(Angle::fromDegrees(45)),
                                                                                Vector::createFromAngle(Angle::fromDegrees(-45))));
             auto vo_protos = {vo_proto};
             *(hrvo_visualization.mutable_velocity_obstacles()) = {vo_protos.begin(),
                                                                   vo_protos.end()};
+            *(hrvo_visualization.add_robots()) =
+                    *createCircleProto(Circle(Point(0,0), 0.5));
+            bool success = (hrvo_visualization2).ParseFromString("CjB0eXBlLmdvb2dsZWFwaXMuY29tL1Rib3RzUHJvdG8uSFJWT1Zpc3VhbGl6YXRpb24SXD");
             LOG(VISUALIZE) << hrvo_visualization;
             LOG(INFO) << "Sending HRVO Visualization";
+            LOG(INFO) << vo_protos.size();
+            LOG(INFO) << (hrvo_visualization).robot_id();
+            LOG(INFO) << (hrvo_visualization.mutable_velocity_obstacles()->size());
+            LOG(INFO) << success;
 
             // Network Service: receive newest world, primitives and set out the last
             // robot status

@@ -36,14 +36,17 @@ class HRVOLayer(FieldLayer):
         velocity_obstacle_msg = self.prev_message
         while not self.hrvo_buffer.queue.empty():
             msg = self.hrvo_buffer.get(block=False)
+            print(str(msg))
             if msg.robot_id == self.robot_id:
                 velocity_obstacle_msg = msg
 
         self.prev_message = velocity_obstacle_msg
 
         painter.setPen(pg.mkPen(Colors.NAVIGATOR_OBSTACLE_COLOR))
-
+        print(len(velocity_obstacle_msg.robots))
         for velocity_obstacle in velocity_obstacle_msg.velocity_obstacles:
+            print("Wheel velocity x: " + str(velocity_obstacle.apex.x_component_meters))
+            print("Wheel velocity y: " + str(velocity_obstacle.apex.y_component_meters))
             polygon_points = [
                 QtCore.QPoint(
                     int(
