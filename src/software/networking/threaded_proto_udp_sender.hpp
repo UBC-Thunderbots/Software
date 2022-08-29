@@ -33,6 +33,8 @@ class ThreadedProtoUdpSender
      * @param message The protobuf message to send
      */
     void sendProto(const SendProto& message);
+    void sendProto(const std::string &message);
+
 
    private:
     // The io_service that will be used to service all network requests
@@ -70,6 +72,14 @@ ThreadedProtoUdpSender<SendProtoT>::~ThreadedProtoUdpSender()
 
 template <class SendProtoT>
 void ThreadedProtoUdpSender<SendProtoT>::sendProto(const SendProtoT& message)
+{
+    udp_sender.sendProto(message);
+}
+
+
+
+template <class SendProtoT>
+void ThreadedProtoUdpSender<SendProtoT>::sendProto(const std::string &message)
 {
     udp_sender.sendProto(message);
 }

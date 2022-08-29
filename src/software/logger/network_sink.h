@@ -10,6 +10,7 @@
 #include "proto/serialized_proto.pb.h"
 #include "software/logger/logger.h"
 #include "proto/visualization.pb.h"
+#include "base64.h"
 
 /**
  * This class acts as a custom sink for g3log. In particular, it allows us to log to

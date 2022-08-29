@@ -7,11 +7,11 @@
 #include "software/logger/logger.h"
 #include "software/networking/proto_udp_listener.hpp"
 #include "software/util/typename/typename.h"
+#include "base64.h"
 
-template <class ReceiveProtoT>
-class ProtoUdpListener
-{
-   public:
+template<class ReceiveProtoT>
+class ProtoUdpListener {
+public:
     /**
      * Creates an ProtoUdpListener that will listen for ReceiveProtoT packets from
      * the network on the multicast group of given address and port. For every
@@ -27,9 +27,9 @@ class ProtoUdpListener
      * from the network
      * @param multicast If true, joins the multicast group of given ip_address
      */
-    ProtoUdpListener(boost::asio::io_service& io_service, const std::string& ip_address,
+    ProtoUdpListener(boost::asio::io_service &io_service, const std::string &ip_address,
                      unsigned short port,
-                     std::function<void(ReceiveProtoT&)> receive_callback,
+                     std::function<void(ReceiveProtoT &)> receive_callback,
                      bool multicast);
 
     /**
@@ -43,19 +43,19 @@ class ProtoUdpListener
      * @param receive_callback The function to run for every ReceiveProtoT packet received
      * from the network
      */
-    ProtoUdpListener(boost::asio::io_service& io_service, unsigned short port,
-                     std::function<void(ReceiveProtoT&)> receive_callback);
+    ProtoUdpListener(boost::asio::io_service &io_service, unsigned short port,
+                     std::function<void(ReceiveProtoT &)> receive_callback);
 
     virtual ~ProtoUdpListener();
 
-   private:
+private:
     /**
      * This function is setup as the callback to handle packets received over the network.
      *
      * @param error The error code obtained when receiving the incoming data
      * @param num_bytes_received How many bytes of data were received
      */
-    void handleDataReception(const boost::system::error_code& error,
+    void handleDataReception(const boost::system::error_code &error,
                              size_t num_bytes_received);
 
     /**
@@ -72,26 +72,23 @@ class ProtoUdpListener
     std::array<char, MAX_BUFFER_LENGTH> raw_received_data_;
 
     // The function to call on every received packet of ReceiveProtoT data
-    std::function<void(ReceiveProtoT&)> receive_callback;
+    std::function<void(ReceiveProtoT &)> receive_callback;
 };
 
-template <class ReceiveProtoT>
+template<class ReceiveProtoT>
 ProtoUdpListener<ReceiveProtoT>::ProtoUdpListener(
-    boost::asio::io_service& io_service, const std::string& ip_address,
-    const unsigned short port, std::function<void(ReceiveProtoT&)> receive_callback,
-    bool multicast)
-    : socket_(io_service), receive_callback(receive_callback)
-{
+        boost::asio::io_service &io_service, const std::string &ip_address,
+        const unsigned short port, std::function<void(ReceiveProtoT &)> receive_callback,
+        bool multicast)
+        : socket_(io_service), receive_callback(receive_callback) {
     boost::asio::ip::udp::endpoint listen_endpoint(
-        boost::asio::ip::make_address(ip_address), port);
+            boost::asio::ip::make_address(ip_address), port);
     socket_.open(listen_endpoint.protocol());
     socket_.set_option(boost::asio::socket_base::reuse_address(true));
-    try
-    {
+    try {
         socket_.bind(listen_endpoint);
     }
-    catch (const boost::exception& ex)
-    {
+    catch (const boost::exception &ex) {
         LOG(FATAL) << "UdpListener: There was an issue binding the socket to "
                       "the listen_endpoint when trying to connect to the "
                       "address. This may be due to another instance of the "
@@ -100,32 +97,28 @@ ProtoUdpListener<ReceiveProtoT>::ProtoUdpListener(
                    << ip_address << ", port = " << port << ")" << std::endl;
     }
 
-    if (multicast)
-    {
+    if (multicast) {
         // Join the multicast group.
         socket_.set_option(boost::asio::ip::multicast::join_group(
-            boost::asio::ip::address::from_string(ip_address)));
+                boost::asio::ip::address::from_string(ip_address)));
     }
 
     startListen();
 }
 
-template <class ReceiveProtoT>
+template<class ReceiveProtoT>
 ProtoUdpListener<ReceiveProtoT>::ProtoUdpListener(
-    boost::asio::io_service& io_service, const unsigned short port,
-    std::function<void(ReceiveProtoT&)> receive_callback)
-    : socket_(io_service), receive_callback(receive_callback)
-{
+        boost::asio::io_service &io_service, const unsigned short port,
+        std::function<void(ReceiveProtoT &)> receive_callback)
+        : socket_(io_service), receive_callback(receive_callback) {
     boost::asio::ip::udp::endpoint listen_endpoint(boost::asio::ip::udp::v6(), port);
     socket_.open(listen_endpoint.protocol());
     // Explicitly set the v6_only option to be false to accept both ipv4 and ipv6 packets
     socket_.set_option(boost::asio::ip::v6_only(false));
-    try
-    {
+    try {
         socket_.bind(listen_endpoint);
     }
-    catch (const boost::exception& ex)
-    {
+    catch (const boost::exception &ex) {
         LOG(FATAL) << "UdpListener: There was an issue binding the socket to "
                       "the listen_endpoint when trying to connect to the "
                       "address. This may be due to another instance of the "
@@ -137,9 +130,8 @@ ProtoUdpListener<ReceiveProtoT>::ProtoUdpListener(
     startListen();
 }
 
-template <class ReceiveProtoT>
-void ProtoUdpListener<ReceiveProtoT>::startListen()
-{
+template<class ReceiveProtoT>
+void ProtoUdpListener<ReceiveProtoT>::startListen() {
     // Start listening for data asynchronously
     // See here for a great explanation about asynchronous operations:
     // https://stackoverflow.com/questions/34680985/what-is-the-difference-between-asynchronous-programming-and-multithreading
@@ -150,22 +142,20 @@ void ProtoUdpListener<ReceiveProtoT>::startListen()
                                            boost::asio::placeholders::bytes_transferred));
 }
 
-template <class ReceiveProtoT>
+template<class ReceiveProtoT>
 void ProtoUdpListener<ReceiveProtoT>::handleDataReception(
-    const boost::system::error_code& error, size_t num_bytes_received)
-{
-    if (!error)
-    {
+        const boost::system::error_code &error, size_t num_bytes_received) {
+    if (!error) {
         auto packet_data = ReceiveProtoT();
-        packet_data.ParseFromArray(raw_received_data_.data(),
-                                   static_cast<int>(num_bytes_received));
+//        base64_decode(packet_data);
+        const auto bruh = std::string(raw_received_data_.data(), num_bytes_received);
+
+        packet_data.ParseFromString(base64_decode(bruh));
         receive_callback(packet_data);
 
         // Once we've handled the data, start listening again
         startListen();
-    }
-    else
-    {
+    } else {
         // Start listening again to receive the next data
         startListen();
 
@@ -174,8 +164,7 @@ void ProtoUdpListener<ReceiveProtoT>::handleDataReception(
             << error << std::endl;
     }
 
-    if (num_bytes_received > MAX_BUFFER_LENGTH)
-    {
+    if (num_bytes_received > MAX_BUFFER_LENGTH) {
         LOG(WARNING)
             << "num_bytes_received > MAX_BUFFER_LENGTH, "
             << "which means that the receive buffer is full and data loss has potentially occurred. "
@@ -183,8 +172,7 @@ void ProtoUdpListener<ReceiveProtoT>::handleDataReception(
     }
 }
 
-template <class ReceiveProtoT>
-ProtoUdpListener<ReceiveProtoT>::~ProtoUdpListener()
-{
+template<class ReceiveProtoT>
+ProtoUdpListener<ReceiveProtoT>::~ProtoUdpListener() {
     socket_.close();
 }

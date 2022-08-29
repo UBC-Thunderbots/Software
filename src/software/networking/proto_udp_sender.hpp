@@ -3,6 +3,7 @@
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
 #include <string>
+#include "base64.h"
 
 template <class SendProto>
 class ProtoUdpSender
@@ -35,6 +36,7 @@ class ProtoUdpSender
      * @param message The protobuf message to send
      */
     void sendProto(const SendProto& message);
+    void sendProto(const std::string &message);
 
    private:
     // A UDP socket to send data over
@@ -71,6 +73,12 @@ void ProtoUdpSender<SendProto>::sendProto(const SendProto& message)
 {
     message.SerializeToString(&data_buffer);
     socket_.send_to(boost::asio::buffer(data_buffer), receiver_endpoint);
+}
+
+template <class SendProto>
+void ProtoUdpSender<SendProto>::sendProto(const std::string &buffer)
+{
+    socket_.send_to(boost::asio::buffer(buffer), receiver_endpoint);
 }
 
 template <class SendProto>

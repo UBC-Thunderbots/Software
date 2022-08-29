@@ -2,6 +2,7 @@ from software.py_constants import *
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.python_bindings import *
 from proto.import_all_protos import *
+from proto.visualization_pb2 import HRVOVisualization
 import threading
 import time
 
@@ -15,15 +16,22 @@ IGNORE_ESTOP = True
 
 class RobotCommunication(object):
 
+    def process_data(self, data):
+        viz = HRVOVisualization(robot_id=4)
+        str = viz.ParseFromString(b"CjB0eXBlLmdvb2dsZWFwaXMuY29tL1Rib3RzUHJvdG8uSFJWT1Zpc3VhbGl6YXRpb24SXD")
+        print(viz.robot_id)
+        print(data.velocity_obstacles)
+        self.full_system_proto_unix_io.send_proto(HRVOVisualization, data)
+
     """ Communicate with the robots """
 
     def __init__(
-        self,
-        full_system_proto_unix_io,
-        multicast_channel,
-        interface,
-        estop_path="/dev/ttyACM0",
-        estop_buadrate=115200,
+            self,
+            full_system_proto_unix_io,
+            multicast_channel,
+            interface,
+            estop_path="/dev/ttyACM0",
+            estop_buadrate=115200,
     ):
         """Initialize the communication with the robots
 
@@ -74,9 +82,9 @@ class RobotCommunication(object):
 
     def __send_estop_state(self):
         while True:
-            #self.full_system_proto_unix_io.send_proto(
+            # self.full_system_proto_unix_io.send_proto(
             #    EstopState, EstopState(is_playing=self.estop_reader.isEstopPlay())
-            #)
+            # )
             time.sleep(0.1)
 
     def run(self):
@@ -177,16 +185,20 @@ class RobotCommunication(object):
         self.receive_robot_log = RobotLogProtoListener(
             self.multicast_channel + "%" + self.interface,
             ROBOT_LOGS_PORT,
-            lambda data: print("received robot log"),#self.full_system_proto_unix_io.send_proto(RobotLog, data),
+            lambda data:  # print("received robot log"),
+            self.full_system_proto_unix_io.send_proto(RobotLog, data),
             True,
         )
 
         self.receive_hrvo_vis = HRVOVisualizationProtoListener(
             self.multicast_channel + "%" + self.interface,
             SERIALIZED_PROTO_LOGS_PORT,
-            lambda data: print("received proto log"),#self.full_system_proto_unix_io.send_proto(
-                #jHRVOVisualization, data
-            #),
+            lambda data: self.process_data(data),
+            # print("received proto log " + viz.ParseFromString(data.SerializeToString())),
+            # print("received proto log " + data),
+            # self.full_system_proto_unix_io.send_proto(
+            #     HRVOVisualization, data
+            # ),
             True,
         )
         print(
@@ -208,7 +220,7 @@ class RobotCommunication(object):
             lambda data: self.full_system_proto_unix_io.send_proto(Referee, data),
             True,
         )
-        
+
         # Create multicast senders
         self.send_primitive_set = PrimitiveSetProtoSender(
             self.multicast_channel + "%" + self.interface, PRIMITIVE_PORT, True
