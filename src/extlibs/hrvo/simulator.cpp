@@ -117,13 +117,8 @@ void HRVOSimulator::updateWorld(const World &world)
             if (hrvo_agent.has_value())
             {
                 hrvo_agent.value()->setPosition(friendly_robot.position().toVector());
-
-                // Only update velocity if time has passed since the last time velocity
-                // was updated. This is to allow SensorFusion to update the actual robot
-                // velocity in World.
-                // TODO (#2531): Remove 4 multiplier and fix goal keeper moving slowly
-                Vector velocity = friendly_robot.velocity();
-                hrvo_agent.value()->setVelocity(friendly_robot.velocity());
+                // We do not use velocity feedback for friendly robots as it results
+                // in the robots not being able to accelerate properly.
             }
         }
 

@@ -28,7 +28,7 @@ from pyqtgraph.Qt.QtWidgets import *
 
 from software.py_constants import *
 from proto.import_all_protos import *
-from software.thunderscope.common.proto_plotter import ProtoPlotter
+from software.thunderscope.arbitrary_plot.named_value_plotter import NamedValuePlotter
 from extlibs.er_force_sim.src.protobuf.world_pb2 import *
 from software.thunderscope.dock_label_style import *
 
@@ -54,7 +54,6 @@ from software.thunderscope.robot_diagnostics.chicker import ChickerWidget
 from software.thunderscope.robot_diagnostics.drive_and_dribbler_widget import (
     DriveAndDribblerWidget,
 )
-from software.thunderscope.robot_diagnostics.robot_view import RobotView
 from software.thunderscope.robot_diagnostics.estop_view import EstopView
 from software.thunderscope.replay.proto_player import ProtoPlayer
 
@@ -462,29 +461,11 @@ class Thunderscope(object):
         self.robot_diagnostics_dock_area.addDock(drive_dock, "right", log_dock)
         self.robot_diagnostics_dock_area.addDock(chicker_dock, "bottom", drive_dock)
 
-        robot_view = self.setup_robot_view(proto_unix_io)
-
-        dock = Dock("Robot View")
-        dock.addWidget(robot_view)
-        self.robot_diagnostics_dock_area.addDock(dock, "top", log_dock)
-
         estop_view = self.setup_estop_view(proto_unix_io)
 
         dock = Dock("Estop View")
         dock.addWidget(estop_view)
         self.robot_diagnostics_dock_area.addDock(dock, "bottom", log_dock)
-
-    def setup_robot_view(self, proto_unix_io):
-        """Setup the robot view widget
-
-        :param proto_unix_io: The proto unix io object for the full system
-
-        """
-        robot_view = RobotView()
-        self.register_refresh_function(robot_view.refresh)
-        proto_unix_io.register_observer(BreakBeamStatus, robot_view.breakbeam_buffer)
-        proto_unix_io.register_observer(PowerStatus, robot_view.power_status_buffer)
-        return robot_view
 
     def setup_estop_view(self, proto_unix_io):
         """Setup the estop view widget
@@ -611,25 +592,18 @@ class Thunderscope(object):
         :returns: The performance plot widget
 
         """
-
-        def extract_namedvalue_data(named_value_data):
-            return {named_value_data.name: named_value_data.value}
-
-        # Performance Plots plot HZ so the values can't be negative
-        proto_plotter = ProtoPlotter(
-            min_y=0,
-            max_y=100,
-            window_secs=10,
-            configuration={NamedValue: extract_namedvalue_data},
-        )
+        # Create widget
+        named_value_plotter = NamedValuePlotter()
 
         # Register observer
-        proto_unix_io.register_observer(NamedValue, proto_plotter.buffers[NamedValue])
+        proto_unix_io.register_observer(
+            NamedValue, named_value_plotter.named_value_buffer
+        )
 
         # Register refresh function
-        self.register_refresh_function(proto_plotter.refresh)
+        self.register_refresh_function(named_value_plotter.refresh)
 
-        return proto_plotter
+        return named_value_plotter
 
     def setup_play_info(self, proto_unix_io):
         """Setup the play info widget
@@ -638,6 +612,7 @@ class Thunderscope(object):
         :returns: The play info widget
 
         """
+
         play_info = playInfoWidget()
         proto_unix_io.register_observer(PlayInfo, play_info.playinfo_buffer)
         self.register_refresh_function(play_info.refresh)

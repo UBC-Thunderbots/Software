@@ -55,15 +55,15 @@ class RobotCommunication(object):
             PowerControl, self.power_control_diagnostics_buffer
         )
 
-        # self.send_estop_state_thread = threading.Thread(target=self.__send_estop_state)
+        self.send_estop_state_thread = threading.Thread(target=self.__send_estop_state)
         self.run_thread = threading.Thread(target=self.run)
-        #
-        # try:
-        #     self.estop_reader = ThreadedEstopReader(
-        #         self.estop_path, self.estop_buadrate
-        #     )
-        # except Exception:
-        #     raise Exception("Could not find estop, make sure its plugged in")
+        
+        try:
+            self.estop_reader = ThreadedEstopReader(
+                self.estop_path, self.estop_buadrate
+            )
+        except Exception:
+            raise Exception("Could not find estop, make sure its plugged in")
 
     def __send_estop_state(self):
         while True:
@@ -183,9 +183,12 @@ class RobotCommunication(object):
             self.multicast_channel + "%" + self.interface, VISION_PORT, True
         )
 
-        # self.connect_fullsystem_to_robots()
-        self.disconnect_fullsystem_from_robots()
-        self.connect_robot_to_diagnostics(0)
+        self.connect_fullsystem_to_robots()
+
+        # TODO-NIMA-ARUN we might not want to support robot diagnostics in tscope
+        # make a ticket here or remove
+        # self.disconnect_fullsystem_from_robots()
+        # self.connect_robot_to_diagnostics(0)
 
         self.send_estop_state_thread.start()
         self.run_thread.start()
