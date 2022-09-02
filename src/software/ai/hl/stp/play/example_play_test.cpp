@@ -29,28 +29,29 @@ TEST_F(ExamplePlayTest, test_example_play)
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-            auto friendly_robots_20_cm_from_ball = [](std::shared_ptr<World> world_ptr) {
-                Point ball_position = world_ptr->ball().position();
-                for (const auto& robot : world_ptr->friendlyTeam().getAllRobots())
-                {
-                    // Skips the robot assigned as goalie
-                    if (robot.id() == 0)
+            auto friendly_robots_1_meter_from_ball =
+                [](std::shared_ptr<World> world_ptr) {
+                    Point ball_position = world_ptr->ball().position();
+                    for (const auto& robot : world_ptr->friendlyTeam().getAllRobots())
                     {
-                        continue;
+                        // Skips the robot assigned as goalie
+                        if (robot.id() == 0)
+                        {
+                            continue;
+                        }
+                        double abs_error =
+                            std::fabs((robot.position() - ball_position).length() - 1.0);
+                        if (abs_error > 0.05)
+                        {
+                            return false;
+                        }
                     }
-                    double abs_error =
-                        std::fabs((robot.position() - ball_position).length() - 0.2);
-                    if (abs_error > 0.05)
-                    {
-                        return false;
-                    }
-                }
-                return true;
-            };
+                    return true;
+                };
 
-            while (!friendly_robots_20_cm_from_ball(world_ptr))
+            while (!friendly_robots_1_meter_from_ball(world_ptr))
             {
-                yield("Friendly robots not 20 cm away from ball");
+                yield("Friendly robots not 1 meter away from ball");
             }
         }};
 
