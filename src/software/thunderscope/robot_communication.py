@@ -57,7 +57,7 @@ class RobotCommunication(object):
 
         self.send_estop_state_thread = threading.Thread(target=self.__send_estop_state)
         self.run_thread = threading.Thread(target=self.run)
-        
+
         try:
             self.estop_reader = ThreadedEstopReader(
                 self.estop_path, self.estop_buadrate
@@ -186,7 +186,8 @@ class RobotCommunication(object):
         self.connect_fullsystem_to_robots()
 
         # TODO-NIMA-ARUN we might not want to support robot diagnostics in tscope
-        # make a ticket here or remove
+        # make a ticket here to create a widget to call these functions to detach
+        # from AI and connect to robots/or remove
         # self.disconnect_fullsystem_from_robots()
         # self.connect_robot_to_diagnostics(0)
 

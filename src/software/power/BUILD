@@ -78,3 +78,11 @@ platformio_project(
         "@nanopb//:nanopb_platformio",
     ],
 )
+
+genrule(
+    name = "powerloop_tar",
+    outs = ["powerloop.tar.gz"],
+    cmd = "tar -chf $@ $(BINDIR)/../../host/bin/software/power/.* &> /dev/null",
+    local = True,
+    tools = [":powerloop_main"],
+)

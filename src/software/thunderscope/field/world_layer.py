@@ -439,7 +439,7 @@ class WorldLayer(FieldLayer):
 
         for robot in self.cached_world.friendly_team.team_robots:
             if (
-                self.cached_status.break_beam_status.ball_in_beam is True
+                self.cached_status.power_status.breakbream_tripped is True
                 and robot.id == self.cached_status.robot_id
             ):
                 painter.drawEllipse(

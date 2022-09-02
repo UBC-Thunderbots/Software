@@ -26,7 +26,13 @@ void PrimitiveExecutor::updatePrimitiveSet(
     if (primitive_set_msg_iter != primitive_set_msg.robot_primitives().end())
     {
         current_primitive_ = primitive_set_msg_iter->second;
+        return;
     }
+}
+
+void PrimitiveExecutor::clearCurrentPrimitive()
+{
+    current_primitive_.Clear();
 }
 
 void PrimitiveExecutor::updateWorld(const TbotsProto::World& world_msg)
@@ -68,7 +74,7 @@ AngularVelocity PrimitiveExecutor::getTargetAngularVelocity(
 
 
 std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimitive(
-    const unsigned int robot_id, const Angle& curr_orientation)
+    const unsigned int robot_id, const RobotState& robot_state)
 {
     hrvo_simulator_.doStep();
 
@@ -84,10 +90,6 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
             //
             // https://developers.google.com/protocol-buffers/docs/proto3#default
             auto output = std::make_unique<TbotsProto::DirectControlPrimitive>();
-
-            // Discharge the capacitors
-            output->mutable_power_control()->set_charge_mode(
-                TbotsProto::PowerControl_ChargeMode_DISCHARGE);
 
             return output;
         }
@@ -107,9 +109,10 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
         case TbotsProto::Primitive::kMove:
         {
             // Compute the target velocities
-            Vector target_velocity = getTargetLinearVelocity(robot_id, curr_orientation);
-            AngularVelocity target_angular_velocity =
-                getTargetAngularVelocity(current_primitive_.move(), curr_orientation);
+            Vector target_velocity =
+                getTargetLinearVelocity(robot_id, robot_state.orientation());
+            AngularVelocity target_angular_velocity = getTargetAngularVelocity(
+                current_primitive_.move(), robot_state.orientation());
 
             auto output = createDirectControlPrimitive(
                 target_velocity, target_angular_velocity,

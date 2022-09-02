@@ -6,14 +6,6 @@ py_library(
 )
 
 py_library(
-    name = "proto_plotter",
-    srcs = ["proto_plotter.py"],
-    deps = [
-        "//software/thunderscope:thread_safe_buffer",
-    ],
-)
-
-py_library(
     name = "common_widgets",
     srcs = ["common_widgets.py"],
 )

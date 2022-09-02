@@ -21,10 +21,9 @@ void ExamplePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
         for (size_t k = 0; k < move_tactics.size(); k++)
         {
             move_tactics[k]->updateControlParams(
-                (world.ball().position() +
-                 Vector::createFromAngle(angle_between_robots).normalize(0.2) *
-                     static_cast<double>(k + 1)),
-                (angle_between_robots * static_cast<double>(k + 1)) + Angle::half(), 0);
+                    world.ball().position() +
+                    Vector::createFromAngle(angle_between_robots).normalize(0.2),
+                    (angle_between_robots * static_cast<double>(k + 1)) + Angle::half(), 0);
         }
 
         // yield the Tactics this Play wants to run, in order of priority

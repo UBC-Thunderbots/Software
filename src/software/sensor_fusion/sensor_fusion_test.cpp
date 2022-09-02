@@ -215,9 +215,9 @@ class SensorFusionTest : public ::testing::Test
 
         robot_msg->set_robot_id(1);
 
-        auto break_beam_msg = std::make_unique<TbotsProto::BreakBeamStatus>();
-        break_beam_msg->set_ball_in_beam(false);
-        *(robot_msg->mutable_break_beam_status()) = *break_beam_msg;
+        auto power_status_msg = std::make_unique<TbotsProto::PowerStatus>();
+        power_status_msg->set_breakbream_tripped(false);
+        *(robot_msg->mutable_power_status()) = *power_status_msg;
 
         auto chipper_kicker_status = std::make_unique<TbotsProto::ChipperKickerStatus>();
         chipper_kicker_status->set_ms_since_chipper_fired(13);
@@ -233,9 +233,9 @@ class SensorFusionTest : public ::testing::Test
 
         robot_msg->set_robot_id(2);
 
-        auto break_beam_msg = std::make_unique<TbotsProto::BreakBeamStatus>();
-        break_beam_msg->set_ball_in_beam(true);
-        *(robot_msg->mutable_break_beam_status()) = *break_beam_msg;
+        auto power_status_msg = std::make_unique<TbotsProto::PowerStatus>();
+        power_status_msg->set_breakbream_tripped(true);
+        *(robot_msg->mutable_power_status()) = *power_status_msg;
 
         auto chipper_kicker_status = std::make_unique<TbotsProto::ChipperKickerStatus>();
         chipper_kicker_status->set_ms_since_chipper_fired(11);
