@@ -102,7 +102,7 @@ TEST_F(EuclideanToWheelTest, test_target_wheel_speeds_positive_w)
 {
     // Test +w/counter-clockwise
     target_euclidean_velocity = {0, 0, 1};
-    calculated_wheel_speeds     = euclidean_to_four_wheel.getWheelVelocity(target_euclidean_velocity);
+    calculated_wheel_speeds   = euclidean_to_four_wheel.getWheelVelocity(target_euclidean_velocity);
 
     // All wheels must be + velocity.
     EXPECT_GT(calculated_wheel_speeds[0], 0);
@@ -122,7 +122,7 @@ TEST_F(EuclideanToWheelTest, test_target_wheel_speeds_negative_w)
     target_euclidean_velocity = {0, 0, -1};
     calculated_wheel_speeds     = euclidean_to_four_wheel.getWheelVelocity(target_euclidean_velocity);
 
-    // All wheels must be + velocity.
+    // All wheels must be - velocity.
     EXPECT_LT(calculated_wheel_speeds[0], 0);
     EXPECT_LT(calculated_wheel_speeds[1], 0);
     EXPECT_LT(calculated_wheel_speeds[2], 0);

@@ -53,9 +53,9 @@ class EuclideanToWheel
 
   private:
     /**
-     * The radius of the wheel in meters.
+     * The radius of the robot in meters.
      */
-    const double wheel_radius_m_{};
+    const double robot_radius_m_{};
 
     /**
      * Euclidean velocity to wheel velocity coupling matrix.

@@ -6,7 +6,7 @@
 #include "software/logger/logger.h"
 
 EuclideanToWheel::EuclideanToWheel(const RobotConstants_t &robot_constants)
-    : wheel_radius_m_(robot_constants.wheel_radius_meters)
+    : robot_radius_m_(robot_constants.robot_radius_m)
 {
     // Phi, the angle between the hemisphere line of the robot and the front wheel axles
     // [rads]
@@ -57,7 +57,7 @@ WheelSpace_t EuclideanToWheel::getWheelVelocity(EuclideanSpace_t euclidean_veloc
 {
     // need to multiply the angular velocity by the wheel radius
     // ref: http://robocup.mi.fu-berlin.de/buch/omnidrive.pdf pg 8
-    euclidean_velocity[2] = euclidean_velocity[2] * wheel_radius_m_;
+    euclidean_velocity[2] = euclidean_velocity[2] * robot_radius_m_;
 
     return euclidean_to_wheel_velocity_D_ * euclidean_velocity;
 }
@@ -70,7 +70,7 @@ EuclideanSpace_t EuclideanToWheel::getEuclideanVelocity(
 
     // need to divide the angular velocity by the wheel radius
     // ref: http://robocup.mi.fu-berlin.de/buch/omnidrive.pdf pg 8
-    euclidean_velocity[2] = euclidean_velocity[2] / wheel_radius_m_;
+    euclidean_velocity[2] = euclidean_velocity[2] / robot_radius_m_;
 
     return euclidean_velocity;
 }
