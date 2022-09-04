@@ -22,6 +22,7 @@ void NetworkSink::sendToNetwork(g3::LogMessageMover log_entry)
    {
        TbotsProto::HRVOVisualization log_msg_proto;
        std::string msg       = log_entry.get().message();
+       LOG(INFO) << msg;
        size_t file_name_pos  = msg.find(TYPE_DELIMITER);
        std::string file_name = msg.substr(0, file_name_pos);
 
@@ -79,6 +80,19 @@ std::ostream& operator<<(std::ostream& os, const google::protobuf::Message& mess
     any.SerializeToString(&serialized_any);
 
     os << TYPE_DELIMITER << message.GetTypeName() << TYPE_DELIMITER
-       << serialized_any;
+       << base64_encode(serialized_any);
+    return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const TbotsProto::HRVOVisualization& message)
+{
+    LOG(INFO) << "hrvo visualizatoin override";
+
+    // Serialize into any
+    std::string serialized_any;
+    message.SerializeToString(&serialized_any);
+
+    os << TYPE_DELIMITER << message.GetTypeName() << TYPE_DELIMITER
+       << base64_encode(serialized_any);
     return os;
 }

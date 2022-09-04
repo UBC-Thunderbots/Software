@@ -50,7 +50,7 @@ class Thunderloop
 
     ~Thunderloop();
 
-    void runLoop();
+    [[noreturn]] void runLoop();
 
     static void *runThunderloopRealtime(void *context)
     {
