@@ -95,7 +95,6 @@ cc_library(
         "//software/networking:threaded_proto_udp_sender",
         "@base64",
         "@g3log",
-        "@base64",
     ],
 )
 

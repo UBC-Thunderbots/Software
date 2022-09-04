@@ -33,7 +33,6 @@ class ThreadedProtoUdpSender
      * @param message The protobuf message to send
      */
     void sendProto(const SendProto& message);
-    void sendProto(const std::string &message);
 
 
    private:
@@ -76,10 +75,3 @@ void ThreadedProtoUdpSender<SendProtoT>::sendProto(const SendProtoT& message)
     udp_sender.sendProto(message);
 }
 
-
-
-template <class SendProtoT>
-void ThreadedProtoUdpSender<SendProtoT>::sendProto(const std::string &message)
-{
-    udp_sender.sendProto(message);
-}

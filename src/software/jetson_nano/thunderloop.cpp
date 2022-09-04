@@ -11,6 +11,7 @@
 #include "software/util/scoped_timespec_timer/scoped_timespec_timer.h"
 #include "software/world/robot_state.h"
 #include "software/world/team.h"
+#include "base64.h"
 
 /**
  * https://rt.wiki.kernel.org/index.php/Squarewave-example
@@ -126,7 +127,6 @@ Thunderloop::~Thunderloop() {}
             }
 
             TbotsProto::HRVOVisualization hrvo_visualization;
-            TbotsProto::HRVOVisualization hrvo_visualization2;
             hrvo_visualization.set_robot_id(4);
             auto vo_proto      = *createVelocityObstacleProto(VelocityObstacle(Vector(),
                                                                                Vector::createFromAngle(Angle::fromDegrees(45)),
@@ -137,16 +137,10 @@ Thunderloop::~Thunderloop() {}
  
             *(hrvo_visualization.add_robots()) = *createCircleProto(Circle(Point(), 0.5));
 
-           LOG(INFO) << "THUNDERLOOP: Serialized Proto: " << hrvo_visualization.SerializeAsString();
+            std::string serialized = hrvo_visualization.SerializeAsString();
             *(hrvo_visualization.add_robots()) =
                     *createCircleProto(Circle(Point(0,0), 0.5));
-            bool success = (hrvo_visualization2).ParseFromString("CjB0eXBlLmdvb2dsZWFwaXMuY29tL1Rib3RzUHJvdG8uSFJWT1Zpc3VhbGl6YXRpb24SXD");
             LOG(VISUALIZE) << hrvo_visualization;
-            LOG(INFO) << "Sending HRVO Visualization";
-            LOG(INFO) << vo_protos.size();
-            LOG(INFO) << (hrvo_visualization).robot_id();
-            LOG(INFO) << (hrvo_visualization.mutable_velocity_obstacles()->size());
-            LOG(INFO) << success;
 
             // Network Service: receive newest world, primitives and set out the last
             // robot status

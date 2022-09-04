@@ -22,7 +22,6 @@ void NetworkSink::sendToNetwork(g3::LogMessageMover log_entry)
    {
        TbotsProto::HRVOVisualization log_msg_proto;
        std::string msg       = log_entry.get().message();
-       LOG(INFO) << msg;
        size_t file_name_pos  = msg.find(TYPE_DELIMITER);
        std::string file_name = msg.substr(0, file_name_pos);
 
@@ -32,22 +31,16 @@ void NetworkSink::sendToNetwork(g3::LogMessageMover log_entry)
                       proto_type_name_pos - TYPE_DELIMITER.length());
        std::string serialized_proto =
            msg.substr(proto_type_name_pos + TYPE_DELIMITER.length());
-       std::cout << "NETWORK SINK: log msg entry: " << msg << "\n";
 
        if (proto_type_name == "TbotsProto.HRVOVisualization")
        {
            google::protobuf::Any any;
-           any.ParseFromString(serialized_proto);
+           any.ParseFromString(base64_decode(serialized_proto));
            any.UnpackTo(&log_msg_proto);
            std::string data_buffer;
            log_msg_proto.SerializeToString(&data_buffer);
-           if (log_msg_proto.velocity_obstacles().size() == -1) 
-           {
-               std::cout << "what the flipping heck\n";
-           }
 
            serialized_proto_log_output->sendProto(log_msg_proto);
-           std::cout << "Sent a HRVO Visualization\n";
        }
    }
    else
@@ -71,6 +64,8 @@ void NetworkSink::sendToNetwork(g3::LogMessageMover log_entry)
 
 std::ostream& operator<<(std::ostream& os, const google::protobuf::Message& message)
 {
+    std::string a = message.SerializeAsString();
+
     // Pack into Any
     google::protobuf::Any any;
     any.PackFrom(message);
@@ -78,19 +73,6 @@ std::ostream& operator<<(std::ostream& os, const google::protobuf::Message& mess
     // Serialize into any
     std::string serialized_any;
     any.SerializeToString(&serialized_any);
-
-    os << TYPE_DELIMITER << message.GetTypeName() << TYPE_DELIMITER
-       << base64_encode(serialized_any);
-    return os;
-}
-
-std::ostream& operator<<(std::ostream& os, const TbotsProto::HRVOVisualization& message)
-{
-    LOG(INFO) << "hrvo visualizatoin override";
-
-    // Serialize into any
-    std::string serialized_any;
-    message.SerializeToString(&serialized_any);
 
     os << TYPE_DELIMITER << message.GetTypeName() << TYPE_DELIMITER
        << base64_encode(serialized_any);

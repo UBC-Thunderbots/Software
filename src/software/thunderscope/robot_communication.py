@@ -17,10 +17,6 @@ IGNORE_ESTOP = True
 class RobotCommunication(object):
 
     def process_data(self, data):
-        viz = HRVOVisualization(robot_id=4)
-        str = viz.ParseFromString(b"CjB0eXBlLmdvb2dsZWFwaXMuY29tL1Rib3RzUHJvdG8uSFJWT1Zpc3VhbGl6YXRpb24SXD")
-        print(viz.robot_id)
-        print(data.velocity_obstacles)
         self.full_system_proto_unix_io.send_proto(HRVOVisualization, data)
 
     """ Communicate with the robots """
@@ -111,7 +107,6 @@ class RobotCommunication(object):
 
                 if IGNORE_ESTOP or self.estop_reader.isEstopPlay():
                     # primitive_set.time_sent = Timestamp(epoch_timestamp_seconds=time.time())
-                    print(primitive_set)
                     self.send_primitive_set.send_proto(primitive_set)
                     # logger.info(primitive_set)
 

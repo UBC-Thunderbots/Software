@@ -28,6 +28,7 @@ cc_library(
         "//software/logger:network_logger",
         "//software/util/scoped_timespec_timer",
         "//software/world:team",
+        "@base64",
     ],
 )
 
