@@ -16,10 +16,11 @@ void ExamplePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
     {
         for (size_t k = 0; k < move_tactics.size(); k++)
         {
-            move_tactics[k]->updateControlParams(world.ball().position() + Vector(1,0), Angle::zero(),
-                                                 0,TbotsProto::DribblerMode::OFF,
+            move_tactics[k]->updateControlParams(world.ball().position() + Vector(1, 0),
+                                                 Angle::zero(), 0,
+                                                 TbotsProto::DribblerMode::OFF,
 
-                                                          TbotsProto::BallCollisionType::ALLOW);
+                                                 TbotsProto::BallCollisionType::ALLOW);
         }
 
         // yield the Tactics this Play wants to run, in order of priority

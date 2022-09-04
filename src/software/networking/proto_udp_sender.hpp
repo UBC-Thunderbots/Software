@@ -3,6 +3,7 @@
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
 #include <string>
+
 #include "base64.h"
 
 template <class SendProto>

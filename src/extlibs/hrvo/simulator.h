@@ -116,10 +116,11 @@ class HRVOSimulator
      * @param type 	 	 			Whether this robot is FRIENDLY or ENEMY
      * @return The index of the agent.
      */
-    std::size_t addHRVOAgent(const Vector &position, float agent_radius, float max_radius_inflation,
-                             const Vector &curr_velocity, float maxSpeed, float maxAccel, AgentPath &path,
-                             float neighborDist, std::size_t maxNeighbors, RobotId robot_id, TeamSide type,
-                             float start_decel_dist);
+    std::size_t addHRVOAgent(const Vector &position, float agent_radius,
+                             float max_radius_inflation, const Vector &curr_velocity,
+                             float maxSpeed, float maxAccel, AgentPath &path,
+                             float neighborDist, std::size_t maxNeighbors,
+                             RobotId robot_id, TeamSide type, float start_decel_dist);
 
     /**
      * Add a new LinearlyVelocityAgent

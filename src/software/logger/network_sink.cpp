@@ -9,42 +9,43 @@ NetworkSink::NetworkSink(unsigned int channel, const std::string& interface, int
     log_output.reset(new ThreadedProtoUdpSender<TbotsProto::RobotLog>(
         std::string(ROBOT_MULTICAST_CHANNELS.at(channel)) + "%" + interface,
         ROBOT_LOGS_PORT, true));
-    serialized_proto_log_output.reset(new ThreadedProtoUdpSender<TbotsProto::HRVOVisualization>(
-                std::string(ROBOT_MULTICAST_CHANNELS.at(channel)) + "%" + interface,
-                SERIALIZED_PROTO_LOGS_PORT, true));
+    serialized_proto_log_output.reset(
+        new ThreadedProtoUdpSender<TbotsProto::HRVOVisualization>(
+            std::string(ROBOT_MULTICAST_CHANNELS.at(channel)) + "%" + interface,
+            SERIALIZED_PROTO_LOGS_PORT, true));
 }
 
 void NetworkSink::sendToNetwork(g3::LogMessageMover log_entry)
 {
     auto level = log_entry.get()._level;
-  
-   if (level.value == VISUALIZE.value)
-   {
-       TbotsProto::HRVOVisualization log_msg_proto;
-       std::string msg       = log_entry.get().message();
-       size_t file_name_pos  = msg.find(TYPE_DELIMITER);
-       std::string file_name = msg.substr(0, file_name_pos);
 
-       size_t proto_type_name_pos = msg.find(TYPE_DELIMITER, file_name_pos + 1);
-       std::string proto_type_name =
-           msg.substr(file_name_pos + TYPE_DELIMITER.length(),
-                      proto_type_name_pos - TYPE_DELIMITER.length());
-       std::string serialized_proto =
-           msg.substr(proto_type_name_pos + TYPE_DELIMITER.length());
+    if (level.value == VISUALIZE.value)
+    {
+        TbotsProto::HRVOVisualization log_msg_proto;
+        std::string msg       = log_entry.get().message();
+        size_t file_name_pos  = msg.find(TYPE_DELIMITER);
+        std::string file_name = msg.substr(0, file_name_pos);
 
-       if (proto_type_name == "TbotsProto.HRVOVisualization")
-       {
-           google::protobuf::Any any;
-           any.ParseFromString(base64_decode(serialized_proto));
-           any.UnpackTo(&log_msg_proto);
-           std::string data_buffer;
-           log_msg_proto.SerializeToString(&data_buffer);
+        size_t proto_type_name_pos = msg.find(TYPE_DELIMITER, file_name_pos + 1);
+        std::string proto_type_name =
+            msg.substr(file_name_pos + TYPE_DELIMITER.length(),
+                       proto_type_name_pos - TYPE_DELIMITER.length());
+        std::string serialized_proto =
+            msg.substr(proto_type_name_pos + TYPE_DELIMITER.length());
 
-           serialized_proto_log_output->sendProto(log_msg_proto);
-       }
-   }
-   else
-   {
+        if (proto_type_name == "TbotsProto.HRVOVisualization")
+        {
+            google::protobuf::Any any;
+            any.ParseFromString(base64_decode(serialized_proto));
+            any.UnpackTo(&log_msg_proto);
+            std::string data_buffer;
+            log_msg_proto.SerializeToString(&data_buffer);
+
+            serialized_proto_log_output->sendProto(log_msg_proto);
+        }
+    }
+    else
+    {
         auto log_msg_proto = std::make_unique<TbotsProto::RobotLog>();
         TbotsProto::LogLevel log_level_proto;
 
@@ -59,7 +60,7 @@ void NetworkSink::sendToNetwork(g3::LogMessageMover log_entry)
 
             log_output->sendProto(*log_msg_proto);
         }
-   } 
+    }
 }
 
 std::ostream& operator<<(std::ostream& os, const google::protobuf::Message& message)

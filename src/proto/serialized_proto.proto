@@ -4,6 +4,6 @@ package TbotsProto;
 
 message SerializedProto
 {
-    string proto_type = 1;
+    string proto_type       = 1;
     string serialized_proto = 2;
 }

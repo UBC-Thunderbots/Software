@@ -1,5 +1,6 @@
 #include "software/jetson_nano/thunderloop.h"
 
+#include "base64.h"
 #include "proto/message_translation/tbots_protobuf.h"
 #include "proto/tbots_software_msgs.pb.h"
 #include "shared/2021_robot_constants.h"
@@ -11,7 +12,6 @@
 #include "software/util/scoped_timespec_timer/scoped_timespec_timer.h"
 #include "software/world/robot_state.h"
 #include "software/world/team.h"
-#include "base64.h"
 
 /**
  * https://rt.wiki.kernel.org/index.php/Squarewave-example
@@ -29,22 +29,22 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, const int loop
 
     redis_client_ = std::make_unique<RedisClient>(REDIS_DEFAULT_HOST, REDIS_DEFAULT_PORT);
 
-    robot_id_   = std::stoi(redis_client_->get(ROBOT_ID_REDIS_KEY));
-    channel_id_ = std::stoi(redis_client_->get(ROBOT_MULTICAST_CHANNEL_REDIS_KEY));
+    robot_id_          = std::stoi(redis_client_->get(ROBOT_ID_REDIS_KEY));
+    channel_id_        = std::stoi(redis_client_->get(ROBOT_MULTICAST_CHANNEL_REDIS_KEY));
     network_interface_ = redis_client_->get(ROBOT_NETWORK_INTERFACE_REDIS_KEY);
-    
-    LOG(DEBUG) << "Starting network interface with robot id: " << robot_id_ << ", channel id " << channel_id_ << ", network interface: " << network_interface_;
+
+    LOG(DEBUG) << "Starting network interface with robot id: " << robot_id_
+               << ", channel id " << channel_id_
+               << ", network interface: " << network_interface_;
 
     network_service_ = std::make_unique<NetworkService>(
-                    std::string(ROBOT_MULTICAST_CHANNELS.at(channel_id_)) + "%" +
-                        network_interface_,
-                    VISION_PORT, PRIMITIVE_PORT, ROBOT_STATUS_PORT, 
-                    true);
+        std::string(ROBOT_MULTICAST_CHANNELS.at(channel_id_)) + "%" + network_interface_,
+        VISION_PORT, PRIMITIVE_PORT, ROBOT_STATUS_PORT, true);
 
     NetworkLoggerSingleton::initializeLogger(channel_id_, network_interface_, robot_id_);
 
-    //power_service_ = std::make_unique<PowerService>();
-    //motor_service_ = std::make_unique<MotorService>(robot_constants, loop_hz);
+    // power_service_ = std::make_unique<PowerService>();
+    // motor_service_ = std::make_unique<MotorService>(robot_constants, loop_hz);
 }
 
 Thunderloop::~Thunderloop() {}
@@ -56,10 +56,10 @@ Thunderloop::~Thunderloop() {}
 {
     // Timing
     struct timespec next_shot;
-    //struct timespec poll_time;
+    // struct timespec poll_time;
     struct timespec iteration_time;
-    //struct timespec last_primitive_received_time;
-    //struct timespec current_time;
+    // struct timespec last_primitive_received_time;
+    // struct timespec current_time;
 
     // Input buffer
     TbotsProto::PrimitiveSet new_primitive_set;
@@ -76,25 +76,25 @@ Thunderloop::~Thunderloop() {}
     // CLOCK_REALTIME can jump backwards
     clock_gettime(CLOCK_MONOTONIC, &next_shot);
 
-    //double loop_duration_seconds = 0.0;
+    // double loop_duration_seconds = 0.0;
 
     for (;;)
     {
         {
-            //redis_client_->set("/battery_voltage",
+            // redis_client_->set("/battery_voltage",
             //                   std::to_string(power_status_.battery_voltage()));
-            //redis_client_->set("/current_draw",
+            // redis_client_->set("/current_draw",
             //                   std::to_string(power_status_.current_draw()));
 
             //// Wait until next shot
             ////
             //// Note: CLOCK_MONOTONIC is used over CLOCK_REALTIME since
             //// CLOCK_REALTIME can jump backwards
-            //clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &next_shot, NULL);
+            // clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &next_shot, NULL);
             ScopedTimespecTimer iteration_timer(&iteration_time);
 
             //// Collect jetson status
-            //jetson_status_.set_cpu_temperature(getCpuTemperature());
+            // jetson_status_.set_cpu_temperature(getCpuTemperature());
 
             //// Grab the latest configs from redis
             auto robot_id = std::stoi(redis_client_->get(ROBOT_ID_REDIS_KEY));
@@ -122,24 +122,23 @@ Thunderloop::~Thunderloop() {}
                 network_service_ = std::make_unique<NetworkService>(
                     std::string(ROBOT_MULTICAST_CHANNELS.at(channel_id_)) + "%" +
                         network_interface_,
-                    VISION_PORT, PRIMITIVE_PORT, ROBOT_STATUS_PORT, 
-                    true);
+                    VISION_PORT, PRIMITIVE_PORT, ROBOT_STATUS_PORT, true);
             }
 
             TbotsProto::HRVOVisualization hrvo_visualization;
             hrvo_visualization.set_robot_id(4);
-            auto vo_proto      = *createVelocityObstacleProto(VelocityObstacle(Vector(),
-                                                                               Vector::createFromAngle(Angle::fromDegrees(45)),
-                                                                               Vector::createFromAngle(Angle::fromDegrees(-45))));
+            auto vo_proto  = *createVelocityObstacleProto(VelocityObstacle(
+                Vector(), Vector::createFromAngle(Angle::fromDegrees(45)),
+                Vector::createFromAngle(Angle::fromDegrees(-45))));
             auto vo_protos = {vo_proto};
             *(hrvo_visualization.mutable_velocity_obstacles()) = {vo_protos.begin(),
                                                                   vo_protos.end()};
- 
+
             *(hrvo_visualization.add_robots()) = *createCircleProto(Circle(Point(), 0.5));
 
             std::string serialized = hrvo_visualization.SerializeAsString();
             *(hrvo_visualization.add_robots()) =
-                    *createCircleProto(Circle(Point(0,0), 0.5));
+                *createCircleProto(Circle(Point(0, 0), 0.5));
             LOG(VISUALIZE) << hrvo_visualization;
 
             // Network Service: receive newest world, primitives and set out the last
@@ -152,12 +151,12 @@ Thunderloop::~Thunderloop() {}
             //    new_world         = std::get<1>(result);
             //}
 
-            //thunderloop_status_.set_network_service_poll_time_ns(
+            // thunderloop_status_.set_network_service_poll_time_ns(
             //    static_cast<unsigned long>(poll_time.tv_nsec));
 
             //// If the primitive msg is new, update the internal buffer
             //// and start the new primitive.
-            //if (new_primitive_set.time_sent().epoch_timestamp_seconds() >
+            // if (new_primitive_set.time_sent().epoch_timestamp_seconds() >
             //    primitive_set_.time_sent().epoch_timestamp_seconds())
             //{
             //    // Save new primitive set
@@ -170,7 +169,8 @@ Thunderloop::~Thunderloop() {}
             //        // Start new primitive
             //        {
             //            ScopedTimespecTimer timer(&poll_time);
-            //            primitive_executor_.updatePrimitiveSet(robot_id_, primitive_set_);
+            //            primitive_executor_.updatePrimitiveSet(robot_id_,
+            //            primitive_set_);
             //        }
 
             //        thunderloop_status_.set_primitive_executor_start_time_ns(
@@ -179,7 +179,7 @@ Thunderloop::~Thunderloop() {}
             //}
 
             ////// If the world msg is new, update the internal buffer
-            //if (new_world.time_sent().epoch_timestamp_seconds() >
+            // if (new_world.time_sent().epoch_timestamp_seconds() >
             //    world_.time_sent().epoch_timestamp_seconds())
             //{
             //    primitive_executor_.updateWorld(new_world);
@@ -195,7 +195,8 @@ Thunderloop::~Thunderloop() {}
 
             //    clock_gettime(CLOCK_MONOTONIC, &current_time);
             //    ScopedTimespecTimer::timespecDiff(&current_time,
-            //                                      &last_primitive_received_time, &result);
+            //                                      &last_primitive_received_time,
+            //                                      &result);
 
             //    auto nanoseconds_elapsed_since_last_primitive =
             //        result.tv_sec * static_cast<int>(NANOSECONDS_PER_SECOND) +
@@ -227,7 +228,7 @@ Thunderloop::~Thunderloop() {}
             //    }
             //}
 
-            //thunderloop_status_.set_primitive_executor_step_time_ns(
+            // thunderloop_status_.set_primitive_executor_step_time_ns(
             //    static_cast<unsigned long>(poll_time.tv_nsec));
 
             //// Power Service: execute the power control command
@@ -235,7 +236,7 @@ Thunderloop::~Thunderloop() {}
             //    ScopedTimespecTimer timer(&poll_time);
             //    power_status_ = power_service_->poll(direct_control_.power_control());
             //}
-            //thunderloop_status_.set_power_service_poll_time_ns(
+            // thunderloop_status_.set_power_service_poll_time_ns(
             //    static_cast<unsigned long>(poll_time.tv_nsec));
 
             //// Motor Service: execute the motor control command
@@ -248,7 +249,7 @@ Thunderloop::~Thunderloop() {}
             //    primitive_executor_.updateLocalVelocity(
             //        createVector(motor_status_.local_velocity()));
             //}
-            //thunderloop_status_.set_motor_service_poll_time_ns(
+            // thunderloop_status_.set_motor_service_poll_time_ns(
             //    static_cast<unsigned long>(poll_time.tv_nsec));
 
             //// Update Robot Status with poll responses
@@ -261,14 +262,14 @@ Thunderloop::~Thunderloop() {}
         auto loop_duration =
             iteration_time.tv_sec * static_cast<int>(NANOSECONDS_PER_SECOND) +
             iteration_time.tv_nsec;
-        //thunderloop_status_.set_iteration_time_ns(loop_duration);
+        // thunderloop_status_.set_iteration_time_ns(loop_duration);
 
         //// Make sure the iteration can fit inside the period of the loop
-        //loop_duration_seconds =
+        // loop_duration_seconds =
         //    static_cast<double>(loop_duration) * SECONDS_PER_NANOSECOND;
-        //static int throttly_boi = 0;
+        // static int throttly_boi = 0;
 
-        //if (throttly_boi++ % 100 == 0)
+        // if (throttly_boi++ % 100 == 0)
         //{
         //    LOG(DEBUG) << "Loop duration: " << loop_duration_seconds << " seconds";
         //}

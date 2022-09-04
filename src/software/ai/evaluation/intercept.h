@@ -7,10 +7,12 @@
 #include "software/world/field.h"
 #include "software/world/robot.h"
 
-struct InterceptionResult{
-    InterceptionResult(Point point, Duration duration, double final_speed){
-        this->point = point;
-        this->duration = duration;
+struct InterceptionResult
+{
+    InterceptionResult(Point point, Duration duration, double final_speed)
+    {
+        this->point       = point;
+        this->duration    = duration;
         this->final_speed = final_speed;
     }
 
@@ -32,6 +34,6 @@ struct InterceptionResult{
  *         relative to the timestamp of the robot. If no possible intercept could be
  * found within the field bounds, returns std::nullopt
  */
-std::optional<InterceptionResult> findBestInterceptForBall(const Ball &ball,
-                                                           const Field &field,
-                                                           const Robot &robot, bool include_fallback_interceptions=false);
+std::optional<InterceptionResult> findBestInterceptForBall(
+    const Ball &ball, const Field &field, const Robot &robot,
+    bool include_fallback_interceptions = false);

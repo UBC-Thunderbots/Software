@@ -104,7 +104,8 @@ void BallFilter::addNewDetectionsToBuffer(std::vector<BallDetection> new_ball_de
 }
 
 std::optional<Ball> BallFilter::estimateBallStateFromBuffer(
-    boost::circular_buffer<BallDetection> ball_detections, double ball_rolling_acceleration=0)
+    boost::circular_buffer<BallDetection> ball_detections,
+    double ball_rolling_acceleration = 0)
 {
     // Sort the detections in decreasing order before processing. This places the most
     // recent detections (with the largest timestamp) at the front of the buffer, and the
@@ -132,16 +133,18 @@ std::optional<Ball> BallFilter::estimateBallStateFromBuffer(
     }
     ball_detections.resize(*adjusted_buffer_size);
 
-    auto regression= calculateLineOfBestFit(ball_detections);
+    auto regression = calculateLineOfBestFit(ball_detections);
 
-    Point filtered_position = estimateBallPosition(ball_detections, regression.regression_line);
+    Point filtered_position =
+        estimateBallPosition(ball_detections, regression.regression_line);
 
     auto estimated_velocity = estimateBallVelocity(ball_detections, std::nullopt);
 
     // TODO: update this threshold
-    if(regression.regression_error < 1000)
+    if (regression.regression_error < 1000)
     {
-        estimated_velocity = estimateBallVelocity(ball_detections, regression.regression_line);
+        estimated_velocity =
+            estimateBallVelocity(ball_detections, regression.regression_line);
     }
     if (!estimated_velocity)
     {
@@ -155,8 +158,8 @@ std::optional<Ball> BallFilter::estimateBallStateFromBuffer(
 
     if (estimated_velocity->average_velocity.length() < 0.1)
     {
-        acceleration =
-            -1 * std::abs(ball_rolling_acceleration) * estimated_velocity->average_velocity;
+        acceleration = -1 * std::abs(ball_rolling_acceleration) *
+                       estimated_velocity->average_velocity;
     }
 
     return Ball(ball_state, ball_detections.front().timestamp, acceleration);

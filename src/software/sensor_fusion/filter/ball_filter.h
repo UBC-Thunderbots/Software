@@ -109,7 +109,8 @@ class BallFilter
      * calculated, returns std::nullopt
      */
     static std::optional<Ball> estimateBallStateFromBuffer(
-        boost::circular_buffer<BallDetection> ball_detections, double ball_rolling_acceleration);
+        boost::circular_buffer<BallDetection> ball_detections,
+        double ball_rolling_acceleration);
 
     /**
      * Returns how large the buffer of ball detections should be based on the ball's
@@ -134,9 +135,10 @@ class BallFilter
      *
      * @param ball_detections The ball detections to fit
      *
-     * @return The line of best fit through the given ball detection positions, and the error
+     * @return The line of best fit through the given ball detection positions, and the
+     * error
      */
-    static BallFilter::LinearRegressionResults  calculateLineOfBestFit(
+    static BallFilter::LinearRegressionResults calculateLineOfBestFit(
         boost::circular_buffer<BallDetection> ball_detections);
 
     /**

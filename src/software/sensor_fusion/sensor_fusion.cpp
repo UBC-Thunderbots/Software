@@ -37,18 +37,18 @@ std::optional<World> SensorFusion::getWorld() const
         }
 
         const auto &friendly_robots = new_world.friendlyTeam().getAllRobots();
-        unsigned int robot_id = 7;
+        unsigned int robot_id       = 7;
         const auto robot_proto_it =
-                std::find_if(friendly_robots.begin(), friendly_robots.end(),
-                             [&](const auto& robot) { return robot.id() == robot_id; });
+            std::find_if(friendly_robots.begin(), friendly_robots.end(),
+                         [&](const auto &robot) { return robot.id() == robot_id; });
         if (robot_proto_it != friendly_robots.end())
         {
             LOG(VISUALIZE) << *createNamedValue(
-                        "ang vel " + std::to_string(robot_id),
-                        static_cast<float>(robot_proto_it->angularVelocity().toRadians()));
+                "and vel " + std::to_string(robot_id),
+                static_cast<float>(robot_proto_it->angularVelocity().toRadians()));
             LOG(VISUALIZE) << *createNamedValue(
-                        "vel " + std::to_string(robot_id),
-                        static_cast<float>(robot_proto_it->velocity().length()));
+                "vel " + std::to_string(robot_id),
+                static_cast<float>(robot_proto_it->velocity().length()));
         }
 
         return new_world;

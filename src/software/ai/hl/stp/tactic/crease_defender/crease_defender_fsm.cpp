@@ -16,7 +16,6 @@ std::optional<Point> CreaseDefenderFSM::findBlockThreatPoint(
     if (crease_defender_alignment == TbotsProto::CreaseDefenderAlignment::LEFT)
     {
         angle_to_block = angle_to_positive_goalpost + shot_angle_sixth * 5.0;
-        
     }
     else if (crease_defender_alignment == TbotsProto::CreaseDefenderAlignment::RIGHT)
     {

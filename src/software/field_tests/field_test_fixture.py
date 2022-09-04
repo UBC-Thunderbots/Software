@@ -22,9 +22,7 @@ from software.thunderscope.binary_context_managers import (
     Gamecontroller,
 )
 from software.thunderscope.replay.proto_logger import ProtoLogger
-from proto.message_translation.tbots_protobuf import (
-    create_world_state,
-)
+from proto.message_translation.tbots_protobuf import create_world_state
 
 from software.logger.logger import createLogger
 from software.simulated_tests.pytest_main import load_command_line_arguments

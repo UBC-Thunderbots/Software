@@ -79,8 +79,8 @@ double rateZone(const Field& field, const Team& enemy_team, const Rectangle& zon
              enemy_reaction_time, enemy_proximity_importance)) /
         5.0;
 
-    double rating = pass_up_field_rating* static_pass_quality * enemy_risk_rating;
-    //std::cout<<"zone with centre"<<zone.centre()<<" has rating "<<rating<<std::endl;
+    double rating = pass_up_field_rating * static_pass_quality * enemy_risk_rating;
+    // std::cout<<"zone with centre"<<zone.centre()<<" has rating "<<rating<<std::endl;
     return rating;
 }
 
@@ -223,7 +223,8 @@ double calculateInterceptRisk(const Robot& enemy_robot, const Pass& pass,
     // on a sigmoid that is centered at 0, and goes to 1 at positive values, 0 at
     // negative values.
 
-    if (min_time_diff < 0){
+    if (min_time_diff < 0)
+    {
         return 1;
     }
     return 1 - sigmoid(min_time_diff, 0, 1);

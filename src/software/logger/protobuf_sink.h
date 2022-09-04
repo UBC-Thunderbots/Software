@@ -4,10 +4,10 @@
 #include <iostream>
 
 #include "google/protobuf/any.pb.h"
+#include "proto/serialized_proto.pb.h"
+#include "software/logger/constants.h"
 #include "software/logger/custom_logging_levels.h"
 #include "software/networking/threaded_unix_sender.h"
-#include "software/logger/constants.h"
-#include "proto/serialized_proto.pb.h"
 
 using UnixSenderMap =
     std::unordered_map<std::string, std::unique_ptr<ThreadedUnixSender>>;

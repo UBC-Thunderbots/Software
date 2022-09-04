@@ -23,7 +23,8 @@ std::optional<Robot> getRobotWithEffectiveBallPossession(const Team &team,
     for (const auto &robot : team.getAllRobots())
     {
         auto intercept = findBestInterceptForBall(ball, field, robot);
-        if (!best_intercept || (intercept && intercept.value().duration < best_intercept.value().duration))
+        if (!best_intercept ||
+            (intercept && intercept.value().duration < best_intercept.value().duration))
         {
             best_intercept = intercept;
             baller_robot   = robot;

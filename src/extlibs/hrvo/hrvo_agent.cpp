@@ -41,10 +41,10 @@
 #include "software/geom/algorithms/intersection.h"
 #include "software/geom/vector.h"
 
-HRVOAgent::HRVOAgent(HRVOSimulator *simulator, const Vector &position, float max_neighbor_dist,
-                     std::size_t maxNeighbors, float radius, float max_radius_inflation,
-                     const Vector &velocity, float maxAccel, AgentPath &path,
-                     float maxSpeed, RobotId robot_id, TeamSide type)
+HRVOAgent::HRVOAgent(HRVOSimulator *simulator, const Vector &position,
+                     float max_neighbor_dist, std::size_t maxNeighbors, float radius,
+                     float max_radius_inflation, const Vector &velocity, float maxAccel,
+                     AgentPath &path, float maxSpeed, RobotId robot_id, TeamSide type)
     : Agent(simulator, position, radius, max_radius_inflation, velocity, velocity,
             maxSpeed, maxAccel, path, robot_id, type),
       maxNeighbors_(maxNeighbors),
@@ -87,7 +87,8 @@ void HRVOAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive,
 
         if (new_primitive.move().ball_collision_type() == TbotsProto::AVOID)
         {
-            ball_obstacle = obstacle_factory.createFromBallPosition(world.ball().position());
+            ball_obstacle =
+                obstacle_factory.createFromBallPosition(world.ball().position());
         }
 
         // Update static obstacles

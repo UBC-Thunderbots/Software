@@ -84,7 +84,8 @@ std::ostream& operator<<(std::ostream& os, const google::protobuf::Message& mess
     std::string serialized_any;
     any.SerializeToString(&serialized_any);
 
-    std::cout << "PROTOBUF SINK " << "base64 encode\n";
+    std::cout << "PROTOBUF SINK "
+              << "base64 encode\n";
 
     os << TYPE_DELIMITER << message.GetTypeName() << TYPE_DELIMITER
        << base64_encode(serialized_any);

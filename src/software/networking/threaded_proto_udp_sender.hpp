@@ -74,4 +74,3 @@ void ThreadedProtoUdpSender<SendProtoT>::sendProto(const SendProtoT& message)
 {
     udp_sender.sendProto(message);
 }
-

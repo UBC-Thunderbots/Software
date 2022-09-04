@@ -2,9 +2,9 @@
 
 #include <gtest/gtest.h>
 
+#include "software/ai/hl/stp/tactic/crease_defender/crease_defender_fsm.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/test_util/test_util.h"
-#include "software/ai/hl/stp/tactic/crease_defender/crease_defender_fsm.h"
 
 TEST(GoalieFSMTest, test_get_goalie_position_to_block)
 {
@@ -41,22 +41,21 @@ TEST(GoalieFSMTest, test_get_goalie_position_to_block)
 
     // ball in friendly defense area
     ball.updateState(BallState(Point(-4, 0), Vector(0, 0)), Timestamp::fromSeconds(123));
-    EXPECT_TRUE(
-        contains(field.friendlyDefenseArea(),
-                 GoalieFSM::getGoaliePositionToBlock(robot_constants, friendly_team,ball, field)));
+    EXPECT_TRUE(contains(field.friendlyDefenseArea(),
+                         GoalieFSM::getGoaliePositionToBlock(
+                             robot_constants, friendly_team, ball, field)));
 
     // ball on positive-y side of field
     ball.updateState(BallState(Point(-4, 2), Vector(0, 0)), Timestamp::fromSeconds(123));
-    EXPECT_TRUE(
-        contains(field.friendlyDefenseArea(),
-                 GoalieFSM::getGoaliePositionToBlock(robot_constants, friendly_team,ball, field)));
+    EXPECT_TRUE(contains(field.friendlyDefenseArea(),
+                         GoalieFSM::getGoaliePositionToBlock(
+                             robot_constants, friendly_team, ball, field)));
 
     // ball on negative-y side of field
     ball.updateState(BallState(Point(-4, -2), Vector(0, 0)), Timestamp::fromSeconds(123));
-    EXPECT_TRUE(
-        contains(field.friendlyDefenseArea(),
-                 GoalieFSM::getGoaliePositionToBlock(robot_constants, friendly_team,ball, field)));
-
+    EXPECT_TRUE(contains(field.friendlyDefenseArea(),
+                         GoalieFSM::getGoaliePositionToBlock(
+                             robot_constants, friendly_team, ball, field)));
 }
 
 TEST(GoalieFSMTest, test_get_intersections_between_ball_velocity_and_full_goal_segment)

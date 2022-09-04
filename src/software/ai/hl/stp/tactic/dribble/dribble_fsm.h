@@ -41,9 +41,9 @@ struct DribbleFSM
     DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
     static Point robotPositionToFaceBall(const Point &ball_position,
-                                              const Angle &face_ball_angle,
-                                              double additional_offset=0.0);
-    
+                                         const Angle &face_ball_angle,
+                                         double additional_offset = 0.0);
+
     /**
      * Gets the destination to dribble the ball to from the update event
      *

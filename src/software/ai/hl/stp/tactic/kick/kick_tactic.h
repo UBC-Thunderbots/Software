@@ -2,9 +2,9 @@
 
 #include <queue>
 
+#include "proto/parameters.pb.h"
 #include "software/ai/hl/stp/tactic/kick/kick_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
-#include "proto/parameters.pb.h"
 
 /**
  * The KickTactic will move the assigned robot to the given kick origin and then
@@ -50,5 +50,4 @@ class KickTactic : public Tactic
 
     // Tactic parameters
     KickFSM::ControlParams control_params;
-
 };

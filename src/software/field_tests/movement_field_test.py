@@ -10,7 +10,7 @@ from software.simulated_tests.tbots_test_runner import TbotsTestRunner
 from software.simulated_tests.tbots_test_fixture import tbots_test_runner
 
 
-#this test can be run either in simulation or on the field
+# this test can be run either in simulation or on the field
 # @pytest.mark.parametrize(
 #     "robot_x_position, robot_y_position", [(-2.0, -1), (-2.0, 1.0), (0.0, 1.0), (0.0, -1.0)],
 # )
@@ -55,7 +55,7 @@ from software.simulated_tests.tbots_test_fixture import tbots_test_runner
 #     )
 
 
-#this test can only be run on the field
+# this test can only be run on the field
 def test_basic_rotation(field_test_runner):
 
     test_angles = [0, 45, 90, 180, 270, 0]
@@ -67,7 +67,7 @@ def test_basic_rotation(field_test_runner):
 
     # for fixed pos
     # rob_pos_p = robot.current_state.global_position
-    rob_pos_p = tbots.Point(-3,0)
+    rob_pos_p = tbots.Point(-3, 0)
     print("staying in pos ", rob_pos_po)
 
     for angle in test_angles:

@@ -40,8 +40,7 @@ message AiConfig
     required SensorFusionConfig sensor_fusion_config                        = 10;
     required DefensePlayConfig defense_play_config                          = 11;
     required RobotNavigationObstacleConfig robot_navigation_obstacle_config = 12;
-    required KickTacticConfig kick_tactic_config = 13;
-
+    required KickTacticConfig kick_tactic_config                            = 13;
 }
 
 message AiControlConfig
@@ -139,7 +138,7 @@ message KickTacticConfig
 {
     // percentage of a robots speed that is transferred to the ball in a collision
     required double percent_robot_speed_transferred_to_ball = 1
-    [default = 0.5, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
+        [default = 0.5, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
 }
 
 message DribbleTacticConfig

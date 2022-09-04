@@ -2,9 +2,9 @@
 
 #include <mutex>
 
+#include "proto/robot_log_msg.pb.h"
 #include "proto/robot_status_msg.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
-#include "proto/robot_log_msg.pb.h"
 #include "proto/visualization.pb.h"
 #include "proto/world.pb.h"
 #include "shared/robot_constants.h"
@@ -27,8 +27,7 @@ class NetworkService
      */
     NetworkService(const std::string& ip_address, unsigned short world_listener_port,
                    unsigned short primitive_listener_port,
-                   unsigned short robot_status_sender_port, 
-                   bool multicast);
+                   unsigned short robot_status_sender_port, bool multicast);
 
     /**
      * When the network service is polled, it sends the robot_status and returns

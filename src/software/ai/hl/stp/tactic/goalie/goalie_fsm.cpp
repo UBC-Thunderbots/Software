@@ -1,13 +1,15 @@
 #include "software/ai/hl/stp/tactic/goalie/goalie_fsm.h"
+
 #include "software/ai/evaluation/intercept.h"
 
-Point GoalieFSM::getGoaliePositionToBlock(const RobotConstants_t robot_constants, const Team &friendly_team,
-    const Ball &ball, const Field &field)
+Point GoalieFSM::getGoaliePositionToBlock(const RobotConstants_t robot_constants,
+                                          const Team &friendly_team, const Ball &ball,
+                                          const Field &field)
 {
-
-    //strategy: we assign the robot to cover the largest uncovered part of the goal, starting from the center of the goal
-    // to find this , we sweep to the positive and negative sides of the goals to find where friendly robots may be covering
-    // parts of the goal.
+    // strategy: we assign the robot to cover the largest uncovered part of the goal,
+    // starting from the center of the goal
+    // to find this , we sweep to the positive and negative sides of the goals to find
+    // where friendly robots may be covering parts of the goal.
     double INTERSECTION_INCREMENT_INTERVAL = BALL_MAX_RADIUS_METERS;
 
     Segment ball_to_pos_goal = Segment(ball.position(), field.friendlyGoalpostPos());
@@ -21,73 +23,99 @@ Point GoalieFSM::getGoaliePositionToBlock(const RobotConstants_t robot_constants
 
     auto robots = friendly_team.getAllRobotsExceptGoalie();
 
-    while((positive_sweep.getEnd().y() < ball_to_pos_goal.getEnd().y() && negative_sweep.getEnd().y() > ball_to_neg_goal.getEnd().y() )){
+    while ((positive_sweep.getEnd().y() < ball_to_pos_goal.getEnd().y() &&
+            negative_sweep.getEnd().y() > ball_to_neg_goal.getEnd().y()))
+    {
+        if (!pos_intersection_found)
+        {
+            // check if the current positive sweep will intersect with a friendly robot
+            pos_intersection_found =
+                std::any_of(robots.begin(), robots.end(), [=](Robot robot) {
+                    Circle robot_circle =
+                        Circle(robot.position(), robot_constants.robot_radius_m);
+                    return intersects(robot_circle, positive_sweep);
+                });
 
-        if (!pos_intersection_found){
-
-            //check if the current positive sweep will intersect with a friendly robot
-            pos_intersection_found = std::any_of(robots.begin(), robots.end(), [=](Robot robot){
-                Circle robot_circle = Circle(robot.position(), robot_constants.robot_radius_m);
-                return intersects(robot_circle, positive_sweep);
-            });
-
-            //if no friendly robot intersects this path to the goal, then we increase the sweep that the goalie needs to cover
-            if(!pos_intersection_found){
-                Point new_end = Point(positive_sweep.getEnd().x(), positive_sweep.getEnd().y() + INTERSECTION_INCREMENT_INTERVAL);
+            // if no friendly robot intersects this path to the goal, then we increase the
+            // sweep that the goalie needs to cover
+            if (!pos_intersection_found)
+            {
+                Point new_end =
+                    Point(positive_sweep.getEnd().x(),
+                          positive_sweep.getEnd().y() + INTERSECTION_INCREMENT_INTERVAL);
                 positive_sweep.setEnd(new_end);
             }
         }
 
-        if(!neg_intersection_found){
-            neg_intersection_found = std::any_of(robots.begin(), robots.end(), [=](Robot robot){
-                Circle robot_circle = Circle(robot.position(), robot_constants.robot_radius_m);
-                return intersects(robot_circle, negative_sweep);
-            });
+        if (!neg_intersection_found)
+        {
+            neg_intersection_found =
+                std::any_of(robots.begin(), robots.end(), [=](Robot robot) {
+                    Circle robot_circle =
+                        Circle(robot.position(), robot_constants.robot_radius_m);
+                    return intersects(robot_circle, negative_sweep);
+                });
 
-            if(!neg_intersection_found){
-                Point new_end = Point(negative_sweep.getEnd().x(), negative_sweep.getEnd().y() - INTERSECTION_INCREMENT_INTERVAL);
+            if (!neg_intersection_found)
+            {
+                Point new_end =
+                    Point(negative_sweep.getEnd().x(),
+                          negative_sweep.getEnd().y() - INTERSECTION_INCREMENT_INTERVAL);
                 negative_sweep.setEnd(new_end);
             }
         }
 
-        if(neg_intersection_found && pos_intersection_found){
+        if (neg_intersection_found && pos_intersection_found)
+        {
             break;
         }
     }
 
-    Angle angle_to_cover = acuteAngle(negative_sweep.getEnd(), ball.position(),
-                                      positive_sweep.getEnd());
+    Angle angle_to_cover =
+        acuteAngle(negative_sweep.getEnd(), ball.position(), positive_sweep.getEnd());
 
     Point clamped_goalie_pos = field.friendlyGoalCenter() + Vector(0.75, 0);
 
 
     if (distanceSquared(field.friendlyGoalpostNeg(), ball.position()) > 0 &&
-        distanceSquared(field.friendlyGoalpostPos(), ball.position()) > 0 && angle_to_cover != Angle::zero())
+        distanceSquared(field.friendlyGoalpostPos(), ball.position()) > 0 &&
+        angle_to_cover != Angle::zero())
     {
-
         // compute block cone position
-        Point goalie_pos = calculateBlockCone(
-                positive_sweep.getEnd(), negative_sweep.getEnd(), ball.position(),
-                robot_constants.robot_radius_m);
+        Point goalie_pos =
+            calculateBlockCone(positive_sweep.getEnd(), negative_sweep.getEnd(),
+                               ball.position(), robot_constants.robot_radius_m);
 
-        //restrain goalie in semi circle
-        double speed_factor = std::max(0.0, 1 - (std::abs(ball.velocity().y()) / BALL_MAX_SPEED_METERS_PER_SECOND)) ;
-        Circle semi_circle = Circle(field.friendlyGoalCenter(), field.friendlyDefenseArea().yMax() * speed_factor);
-        if (!contains(semi_circle, goalie_pos) || goalie_pos.x() < field.friendlyGoalCenter().x()){
-            //project on to semi circle
-            if(goalie_pos.x() < field.friendlyGoalCenter().x()){
-                clamped_goalie_pos = field.friendlyGoalCenter() + ((ball.position() - field.friendlyGoalCenter()) * -1 ).normalize();
-            } else {
-                clamped_goalie_pos = field.friendlyGoalCenter() + ((ball.position() - field.friendlyGoalCenter()).normalize(semi_circle.radius()));
+        // restrain goalie in semi circle
+        double speed_factor = std::max(
+            0.0, 1 - (std::abs(ball.velocity().y()) / BALL_MAX_SPEED_METERS_PER_SECOND));
+        Circle semi_circle = Circle(field.friendlyGoalCenter(),
+                                    field.friendlyDefenseArea().yMax() * speed_factor);
+        if (!contains(semi_circle, goalie_pos) ||
+            goalie_pos.x() < field.friendlyGoalCenter().x())
+        {
+            // project on to semi circle
+            if (goalie_pos.x() < field.friendlyGoalCenter().x())
+            {
+                clamped_goalie_pos =
+                    field.friendlyGoalCenter() +
+                    ((ball.position() - field.friendlyGoalCenter()) * -1).normalize();
             }
-        } else{
+            else
+            {
+                clamped_goalie_pos = field.friendlyGoalCenter() +
+                                     ((ball.position() - field.friendlyGoalCenter())
+                                          .normalize(semi_circle.radius()));
+            }
+        }
+        else
+        {
             clamped_goalie_pos = goalie_pos;
         }
     }
 
 
     return clamped_goalie_pos;
-
 }
 
 std::vector<Point> GoalieFSM::getIntersectionsBetweenBallVelocityAndFullGoalSegment(
@@ -233,11 +261,11 @@ void GoalieFSM::panic(const Update &event)
     Angle goalie_orientation =
         (event.common.world.ball().position() - goalie_pos).orientation();
 
-    Ball ball = event.common.world.ball();
+    Ball ball   = event.common.world.ball();
     Robot robot = event.common.robot;
 
     event.common.set_primitive(createMovePrimitive(
-        CREATE_MOTION_CONTROL(goalie_pos), goalie_orientation,0.0,
+        CREATE_MOTION_CONTROL(goalie_pos), goalie_orientation, 0.0,
         TbotsProto::DribblerMode::OFF, TbotsProto::BallCollisionType::ALLOW,
         AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS},
         max_allowed_speed_mode, 0.0, event.common.robot.robotConstants()));
@@ -267,7 +295,8 @@ void GoalieFSM::updatePivotKick(
 
 void GoalieFSM::positionToBlock(const Update &event)
 {
-    Point goalie_pos = getGoaliePositionToBlock(event.common.robot.robotConstants(), event.common.world.friendlyTeam(),
+    Point goalie_pos = getGoaliePositionToBlock(
+        event.common.robot.robotConstants(), event.common.world.friendlyTeam(),
         event.common.world.ball(), event.common.world.field());
     Angle goalie_orientation =
         (event.common.world.ball().position() - goalie_pos).orientation();

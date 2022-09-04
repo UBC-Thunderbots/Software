@@ -15,19 +15,18 @@ IGNORE_ESTOP = True
 
 
 class RobotCommunication(object):
-
     def process_data(self, data):
         self.full_system_proto_unix_io.send_proto(HRVOVisualization, data)
 
     """ Communicate with the robots """
 
     def __init__(
-            self,
-            full_system_proto_unix_io,
-            multicast_channel,
-            interface,
-            estop_path="/dev/ttyACM0",
-            estop_buadrate=115200,
+        self,
+        full_system_proto_unix_io,
+        multicast_channel,
+        interface,
+        estop_path="/dev/ttyACM0",
+        estop_buadrate=115200,
     ):
         """Initialize the communication with the robots
 

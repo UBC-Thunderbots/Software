@@ -67,9 +67,9 @@ pybind_library(
     deps = [
         "//proto:ssl_cc_proto",
         "//proto:tbots_cc_proto",
+        "//proto:visualization_cc_proto",
         "//proto/message_translation:tbots_geometry",
         "//software/estop:threaded_estop_reader",
-        "//proto:visualization_cc_proto",
         "//software/geom:angle",
         "//software/geom:point",
         "//software/geom:vector",

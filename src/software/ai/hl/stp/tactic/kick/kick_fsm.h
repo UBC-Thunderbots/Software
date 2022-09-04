@@ -1,8 +1,8 @@
 #pragma once
 
+#include "proto/parameters.pb.h"
 #include "software/ai/hl/stp/tactic/get_behind_ball/get_behind_ball_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
-#include "proto/parameters.pb.h"
 
 struct KickFSM
 {
@@ -70,6 +70,5 @@ struct KickFSM
             X + Update_E / SET_STOP_PRIMITIVE_ACTION                          = X);
     }
 
-private:
-
+   private:
 };

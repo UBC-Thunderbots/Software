@@ -35,11 +35,11 @@ cc_library(
     hdrs = ["network.h"],
     deps = [
         "//proto:tbots_cc_proto",
+        "//proto:visualization_cc_proto",
         "//shared:robot_constants",
         "//software/logger",
         "//software/networking:threaded_proto_udp_listener",
         "//software/networking:threaded_proto_udp_sender",
         "@boost//:asio",
-        "//proto:visualization_cc_proto",
     ],
 )

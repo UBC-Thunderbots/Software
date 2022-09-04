@@ -45,7 +45,6 @@ void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
         result.insert(result.end(), move_tactics.begin(), move_tactics.end());
         yield({result});
     } while (true);
-
 }
 
 // Register this play in the genericFactory

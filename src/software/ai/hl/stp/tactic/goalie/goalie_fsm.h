@@ -55,8 +55,9 @@ struct GoalieFSM
      *
      * @return the position that the goalie should move to
      */
-    static Point getGoaliePositionToBlock(const RobotConstants_t robot_constants, const Team &friendly_team,
-        const Ball &ball, const Field &field);
+    static Point getGoaliePositionToBlock(const RobotConstants_t robot_constants,
+                                          const Team &friendly_team, const Ball &ball,
+                                          const Field &field);
 
     /**
      * Gets intersections between the ball velocity ray and the full goal segment

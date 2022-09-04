@@ -10,9 +10,7 @@ from software.simulated_tests.friendly_has_ball_possession import *
 from software.simulated_tests.ball_speed_threshold import *
 from software.simulated_tests.robot_speed_threshold import *
 from software.simulated_tests.excessive_dribbling import *
-from software.simulated_tests.simulated_test_fixture import (
-    simulated_test_runner,
-)
+from software.simulated_tests.simulated_test_fixture import simulated_test_runner
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
 

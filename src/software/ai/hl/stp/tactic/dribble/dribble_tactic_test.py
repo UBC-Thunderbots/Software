@@ -51,12 +51,7 @@ print(BASIC_TEST_CASE_PARAMETERS)
         #     tbots.Field.createSSLDivisionBField().friendlyGoalpostPos()
         #     + tbots.Vector(2, 0),
         # ),
-        (
-            tbots.Point(-2,0),
-            tbots.Vector(3.0, 0.5),
-            tbots.Point(0,0)
-        ),
-
+        (tbots.Point(-2, 0), tbots.Vector(3.0, 0.5), tbots.Point(0, 0)),
     ],
 )
 def test_robot_intercepts_ball(

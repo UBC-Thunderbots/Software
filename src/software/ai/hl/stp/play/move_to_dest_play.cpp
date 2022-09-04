@@ -16,11 +16,13 @@ void MoveToDestPlay::getNextTactics(TacticCoroutine::push_type &yield, const Wor
     {
         for (size_t k = 0; k < move_tactics.size(); k++)
         {
-            move_tactics[k]->updateControlParams(world.ball().position() + Vector(1+(static_cast<double>(k)/10)*2,0), 
-                                                world.friendlyTeam().getAllRobots()[0].orientation(),
-                                                 0,TbotsProto::DribblerMode::OFF,
+            move_tactics[k]->updateControlParams(
+                world.ball().position() +
+                    Vector(1 + (static_cast<double>(k) / 10) * 2, 0),
+                world.friendlyTeam().getAllRobots()[0].orientation(), 0,
+                TbotsProto::DribblerMode::OFF,
 
-                                                          TbotsProto::BallCollisionType::ALLOW);
+                TbotsProto::BallCollisionType::ALLOW);
         }
 
         // yield the Tactics this Play wants to run, in order of priority

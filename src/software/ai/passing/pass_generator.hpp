@@ -9,6 +9,8 @@
 
 #include "proto/message_translation/tbots_protobuf.h"
 #include "proto/parameters.pb.h"
+#include "software/ai/evaluation/find_passes.h"
+#include "software/ai/evaluation/possession.h"
 #include "software/ai/passing/cost_function.h"
 #include "software/ai/passing/pass.h"
 #include "software/ai/passing/pass_evaluation.hpp"
@@ -17,8 +19,6 @@
 #include "software/optimization/gradient_descent_optimizer.hpp"
 #include "software/time/timestamp.h"
 #include "software/world/world.h"
-#include "software/ai/evaluation/find_passes.h"
-#include "software/ai/evaluation/possession.h"
 
 // The random seed to initialize the random number generator
 static const int PASS_GENERATOR_SEED = 14;
@@ -142,30 +142,34 @@ PassEvaluation<ZoneEnum> PassGenerator<ZoneEnum>::generatePassEvaluation(
     const World& world)
 {
     auto generated_passes = samplePasses(world);
-    generated_passes = optimizePasses(world, generated_passes);
-    std::optional<Robot> effective_robot_with_ball = getRobotWithEffectiveBallPossession(world.friendlyTeam(), world.ball(), world.field());
+    generated_passes      = optimizePasses(world, generated_passes);
+    std::optional<Robot> effective_robot_with_ball = getRobotWithEffectiveBallPossession(
+        world.friendlyTeam(), world.ball(), world.field());
 
-    if(effective_robot_with_ball.has_value()){
+    if (effective_robot_with_ball.has_value())
+    {
+        std::vector<Robot> direct_passes =
+            findAllPasses(effective_robot_with_ball.value(), world.friendlyTeam(),
+                          world.enemyTeam())
+                .direct_passes;
 
-        std::vector<Robot> direct_passes = findAllPasses(effective_robot_with_ball.value(), world.friendlyTeam(), world.enemyTeam()).direct_passes;
-
-        //create zone to pass map
+        // create zone to pass map
         ZonePassMap<ZoneEnum> direct_passes_map;
-        for (auto robot : direct_passes){
-
-            if(!contains(world.field().fieldLines(), world.ball().position()) || !contains(world.field().fieldLines(), robot.position())){
+        for (auto robot : direct_passes)
+        {
+            if (!contains(world.field().fieldLines(), world.ball().position()) ||
+                !contains(world.field().fieldLines(), robot.position()))
+            {
                 continue;
             }
             auto zone_id = pitch_division_->getZoneId(robot.position());
 
-            auto pass =
-                    Pass(world.ball().position(),
-                         robot.position(),
-                         5.0);
-            auto pass_with_rating = PassWithRating{pass, ratePass(world, pass, pitch_division_->getZone(zone_id),
-                                                                  passing_config_)};
+            auto pass             = Pass(world.ball().position(), robot.position(), 5.0);
+            auto pass_with_rating = PassWithRating{
+                pass, ratePass(world, pass, pitch_division_->getZone(zone_id),
+                               passing_config_)};
             direct_passes_map.emplace(zone_id, pass_with_rating);
-            //std::cout<<"created pass with rating "<<pass_with_rating.rating<<std::endl;
+            // std::cout<<"created pass with rating "<<pass_with_rating.rating<<std::endl;
         }
 
 
@@ -174,11 +178,11 @@ PassEvaluation<ZoneEnum> PassGenerator<ZoneEnum>::generatePassEvaluation(
             current_best_passes_ = generated_passes;
         }
 
-//        auto optimized_passes = optimizePasses(world, generated_passes);
+        //        auto optimized_passes = optimizePasses(world, generated_passes);
 
-        //std::cout<<"updating passes with generated passes"<<std::endl;
+        // std::cout<<"updating passes with generated passes"<<std::endl;
         updatePasses(world, generated_passes);
-        //std::cout<<"updating passes with direct passes"<<std::endl;
+        // std::cout<<"updating passes with direct passes"<<std::endl;
         updatePasses(world, direct_passes_map);
 
         std::vector<PassWithRating> passes;
@@ -189,26 +193,25 @@ PassEvaluation<ZoneEnum> PassGenerator<ZoneEnum>::generatePassEvaluation(
             passes.push_back(zone_and_pass.second);
         }
         LOG(VISUALIZE) << *createPassVisualization(passes);
-
     }
-//
-//        if (current_best_passes_.empty())
-//        {
-//            current_best_passes_ = generated_passes;
-//        }
-//
-//        auto optimized_passes = optimizePasses(world, generated_passes);
-//
-//        updatePasses(world, generated_passes);
-//
-//        std::vector<PassWithRating> passes;
-//        passes.reserve(current_best_passes_.size());
-//
-//        for (auto zone_and_pass : current_best_passes_)
-//        {
-//            passes.push_back(zone_and_pass.second);
-//        }
-//        LOG(VISUALIZE) << *createPassVisualization(passes);
+    //
+    //        if (current_best_passes_.empty())
+    //        {
+    //            current_best_passes_ = generated_passes;
+    //        }
+    //
+    //        auto optimized_passes = optimizePasses(world, generated_passes);
+    //
+    //        updatePasses(world, generated_passes);
+    //
+    //        std::vector<PassWithRating> passes;
+    //        passes.reserve(current_best_passes_.size());
+    //
+    //        for (auto zone_and_pass : current_best_passes_)
+    //        {
+    //            passes.push_back(zone_and_pass.second);
+    //        }
+    //        LOG(VISUALIZE) << *createPassVisualization(passes);
 
 
     return PassEvaluation<ZoneEnum>(pitch_division_, current_best_passes_,
@@ -286,7 +289,8 @@ void PassGenerator<ZoneEnum>::updatePasses(const World& world,
 {
     for (ZoneEnum zone_id : pitch_division_->getAllZoneIds())
     {
-        if(optimized_passes.find(zone_id) == optimized_passes.end()){
+        if (optimized_passes.find(zone_id) == optimized_passes.end())
+        {
             continue;
         }
 
@@ -298,7 +302,8 @@ void PassGenerator<ZoneEnum>::updatePasses(const World& world,
                      pitch_division_->getZone(zone_id),
                      passing_config_) < optimized_passes.at(zone_id).rating)
         {
-            //std::cout<<"added pass to best passes with rating "<<optimized_passes.at(zone_id).rating<<std::endl;
+            // std::cout<<"added pass to best passes with rating
+            // "<<optimized_passes.at(zone_id).rating<<std::endl;
             current_best_passes_.at(zone_id) = optimized_passes.at(zone_id);
         }
     }

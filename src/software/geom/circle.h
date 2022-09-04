@@ -1,8 +1,8 @@
 #pragma once
 
 #include "software/geom/convex_shape.h"
-#include "software/geom/point.h"
 #include "software/geom/line.h"
+#include "software/geom/point.h"
 
 /**
  * A circle with a radius and point representing the origin of the circle.

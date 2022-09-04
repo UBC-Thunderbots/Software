@@ -96,13 +96,14 @@ std::optional<Shot> ReceiverFSM::findFeasibleShot(const World& world,
         if (net_percent_open > MIN_SHOT_NET_PERCENT_OPEN &&
             abs_angle_between_pass_and_shot_vectors < MAX_DEFLECTION_FOR_ONE_TOUCH_SHOT)
         {
-            std::cout<<"one touch shot "<<best_shot_opt.value().getPointToShootAt()<<std::endl;
+            std::cout << "one touch shot " << best_shot_opt.value().getPointToShootAt()
+                      << std::endl;
             return best_shot_opt;
         }
     }
 
-    std::cout<<"no feasible shot found "<<std::endl;
-    std::cout<<"ball at "<<world.ball().position()<<std::endl;
+    std::cout << "no feasible shot found " << std::endl;
+    std::cout << "ball at " << world.ball().position() << std::endl;
 
     return std::nullopt;
 }
@@ -122,13 +123,13 @@ void ReceiverFSM::updateOnetouch(const Update& event)
     if (best_shot && event.control_params.pass)
     {
         event.common.set_primitive(createMovePrimitive(
-                CREATE_MOTION_CONTROL(one_touch.getPointToShootAt()),
-                one_touch.getOpenAngle(), 0, TbotsProto::DribblerMode::OFF,
-                TbotsProto::BallCollisionType::ALLOW,
-                AutoChipOrKick{AutoChipOrKickMode::AUTOKICK,
-                               BALL_MAX_SPEED_METERS_PER_SECOND},
-                TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
-                event.common.robot.robotConstants(), std::optional<double>(), true));
+            CREATE_MOTION_CONTROL(one_touch.getPointToShootAt()),
+            one_touch.getOpenAngle(), 0, TbotsProto::DribblerMode::OFF,
+            TbotsProto::BallCollisionType::ALLOW,
+            AutoChipOrKick{AutoChipOrKickMode::AUTOKICK,
+                           BALL_MAX_SPEED_METERS_PER_SECOND},
+            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
+            event.common.robot.robotConstants(), std::optional<double>(), true));
     }
     else
     {
@@ -141,12 +142,12 @@ void ReceiverFSM::updateReceive(const Update& event)
     if (event.control_params.pass)
     {
         event.common.set_primitive(createMovePrimitive(
-                CREATE_MOTION_CONTROL(event.control_params.pass->receiverPoint()),
-                event.control_params.pass->receiverOrientation(), 0,
-                TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
-                AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
-                TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
-                event.common.robot.robotConstants(), std::optional<double>(), true));
+            CREATE_MOTION_CONTROL(event.control_params.pass->receiverPoint()),
+            event.control_params.pass->receiverOrientation(), 0,
+            TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
+            AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
+            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
+            event.common.robot.robotConstants(), std::optional<double>(), true));
     }
 }
 
@@ -169,11 +170,11 @@ void ReceiverFSM::adjustReceive(const Update& event)
         Angle ball_receive_orientation = (ball.position() - robot_pos).orientation();
 
         event.common.set_primitive(createMovePrimitive(
-                CREATE_MOTION_CONTROL(ball_receive_pos), ball_receive_orientation, 0,
-                TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
-                AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
-                TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
-                event.common.robot.robotConstants(), std::optional<double>(), true));
+            CREATE_MOTION_CONTROL(ball_receive_pos), ball_receive_orientation, 0,
+            TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
+            AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
+            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
+            event.common.robot.robotConstants(), std::optional<double>(), true));
     }
 }
 
