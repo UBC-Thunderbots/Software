@@ -93,7 +93,7 @@ cc_library(
         "//shared:constants",
         "//software/networking:threaded_proto_udp_sender",
         "@g3log",
-        ":logger",
+        "@base64",
     ],
 )
 

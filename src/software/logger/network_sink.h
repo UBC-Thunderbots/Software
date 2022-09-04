@@ -4,12 +4,13 @@
 #include <iostream>
 
 #include "proto/robot_log_msg.pb.h"
+#include "google/protobuf/any.pb.h"
 #include "software/networking/threaded_proto_udp_sender.hpp"
 #include "software/logger/custom_logging_levels.h"
 #include "software/logger/constants.h"
 #include "proto/serialized_proto.pb.h"
-#include "software/logger/logger.h"
 #include "proto/visualization.pb.h"
+#include "base64.h"
 
 /**
  * This class acts as a custom sink for g3log. In particular, it allows us to log to

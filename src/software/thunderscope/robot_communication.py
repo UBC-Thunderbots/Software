@@ -177,16 +177,16 @@ class RobotCommunication(object):
         self.receive_robot_log = RobotLogProtoListener(
             self.multicast_channel + "%" + self.interface,
             ROBOT_LOGS_PORT,
-            lambda data: print("received robot log"),#self.full_system_proto_unix_io.send_proto(RobotLog, data),
+            lambda data: self.full_system_proto_unix_io.send_proto(RobotLog, data),
             True,
         )
 
         self.receive_hrvo_vis = HRVOVisualizationProtoListener(
             self.multicast_channel + "%" + self.interface,
             SERIALIZED_PROTO_LOGS_PORT,
-            lambda data: print("received proto log"),#self.full_system_proto_unix_io.send_proto(
-                #jHRVOVisualization, data
-            #),
+            lambda data: self.full_system_proto_unix_io.send_proto(
+                HRVOVisualization, data
+            ),
             True,
         )
         print(

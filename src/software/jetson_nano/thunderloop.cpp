@@ -133,6 +133,10 @@ void Thunderloop::runLoop()
             auto vo_protos = {vo_proto};
             *(hrvo_visualization.mutable_velocity_obstacles()) = {vo_protos.begin(),
                                                                   vo_protos.end()};
+ 
+            *(hrvo_visualization.add_robots()) = *createCircleProto(Circle(Point(), 0.5));
+
+           LOG(INFO) << "THUNDERLOOP: Serialized Proto: " << hrvo_visualization.SerializeAsString();
             LOG(VISUALIZE) << hrvo_visualization;
             LOG(INFO) << "Sending HRVO Visualization";
 

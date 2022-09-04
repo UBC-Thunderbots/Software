@@ -20,7 +20,7 @@ void NetworkSink::sendToNetwork(g3::LogMessageMover log_entry)
   
    if (level.value == VISUALIZE.value)
    {
-       auto log_msg_proto = std::make_unique<TbotsProto::HRVOVisualization>();
+       TbotsProto::HRVOVisualization log_msg_proto;
        std::string msg       = log_entry.get().message();
        size_t file_name_pos  = msg.find(TYPE_DELIMITER);
        std::string file_name = msg.substr(0, file_name_pos);
@@ -31,18 +31,22 @@ void NetworkSink::sendToNetwork(g3::LogMessageMover log_entry)
                       proto_type_name_pos - TYPE_DELIMITER.length());
        std::string serialized_proto =
            msg.substr(proto_type_name_pos + TYPE_DELIMITER.length());
+       std::cout << "NETWORK SINK: log msg entry: " << msg << "\n";
 
-       LOG(INFO) << "Received log visualize " << proto_type_name;
        if (proto_type_name == "TbotsProto.HRVOVisualization")
        {
-           LOG(INFO) << "Parsing a HRVOVisualization";
-           log_msg_proto->ParseFromString(serialized_proto);
+           google::protobuf::Any any;
+           any.ParseFromString(serialized_proto);
+           any.UnpackTo(&log_msg_proto);
            std::string data_buffer;
-           log_msg_proto->SerializeToString(&data_buffer);
+           log_msg_proto.SerializeToString(&data_buffer);
+           if (log_msg_proto.velocity_obstacles().size() == -1) 
+           {
+               std::cout << "what the flipping heck\n";
+           }
 
-           serialized_proto_log_output->sendProto(*log_msg_proto);
-           LOG(INFO) << "serialized message: " << data_buffer;
-           LOG(INFO) << "Sent a HRVO Visualization";
+           serialized_proto_log_output->sendProto(log_msg_proto);
+           std::cout << "Sent a HRVO Visualization\n";
        }
    }
    else
@@ -62,4 +66,19 @@ void NetworkSink::sendToNetwork(g3::LogMessageMover log_entry)
             log_output->sendProto(*log_msg_proto);
         }
    } 
+}
+
+std::ostream& operator<<(std::ostream& os, const google::protobuf::Message& message)
+{
+    // Pack into Any
+    google::protobuf::Any any;
+    any.PackFrom(message);
+
+    // Serialize into any
+    std::string serialized_any;
+    any.SerializeToString(&serialized_any);
+
+    os << TYPE_DELIMITER << message.GetTypeName() << TYPE_DELIMITER
+       << serialized_any;
+    return os;
 }
