@@ -11,6 +11,7 @@ class EuclideanToWheelTest : public ::testing::Test
     EuclideanSpace_t target_euclidean_velocity{};
     WheelSpace_t expected_wheel_speeds{};
     WheelSpace_t calculated_wheel_speeds{};
+    double robot_radius = create2021RobotConstants().robot_radius_m;
 
     EuclideanToWheel euclidean_to_four_wheel =
         EuclideanToWheel(create2021RobotConstants());
@@ -30,25 +31,14 @@ TEST_F(EuclideanToWheelTest, test_target_wheel_speeds_zero)
 TEST_F(EuclideanToWheelTest, test_target_wheel_speeds_positive_x)
 {
     // Test +x/right
-    target_euclidean_velocity = {0, 1, 0};
+    target_euclidean_velocity = {1, 0, 0};
     calculated_wheel_speeds     = euclidean_to_four_wheel.getWheelVelocity(target_euclidean_velocity);
-    std::cout << "calculated_wheel_speeds: " << calculated_wheel_speeds << std::endl;
-    auto max_coeff = calculated_wheel_speeds.cwiseAbs().maxCoeff();
 
-    auto max_vel = (calculated_wheel_speeds / max_coeff) *
-        create2021RobotConstants().robot_max_speed_m_per_s;
-    std::cout << "max_vel: " << max_vel << std::endl;
-    std::cout << "euclidean_vel: " << euclidean_to_four_wheel.getEuclideanVelocity(max_vel) << std::endl;
-
-    // Front wheels must be + velocity, back wheels must be - velocity.
+    // Front wheels must be - velocity, back wheels must be + velocity.
     EXPECT_LT(calculated_wheel_speeds[0], 0);
     EXPECT_LT(calculated_wheel_speeds[1], 0);
     EXPECT_GT(calculated_wheel_speeds[2], 0);
     EXPECT_GT(calculated_wheel_speeds[3], 0);
-
-    // max_speed = 4
-    // +x 5.55691
-    // +y 4.71929
 }
 
 TEST_F(EuclideanToWheelTest, test_target_wheel_speeds_negative_x)
@@ -104,16 +94,13 @@ TEST_F(EuclideanToWheelTest, test_target_wheel_speeds_positive_w)
     target_euclidean_velocity = {0, 0, 1};
     calculated_wheel_speeds   = euclidean_to_four_wheel.getWheelVelocity(target_euclidean_velocity);
 
-    // All wheels must be + velocity.
-    EXPECT_GT(calculated_wheel_speeds[0], 0);
-    EXPECT_GT(calculated_wheel_speeds[1], 0);
-    EXPECT_GT(calculated_wheel_speeds[2], 0);
-    EXPECT_GT(calculated_wheel_speeds[3], 0);
-
-    // All wheels must have same velocity.
-    EXPECT_DOUBLE_EQ(calculated_wheel_speeds[0], calculated_wheel_speeds[1]);
-    EXPECT_DOUBLE_EQ(calculated_wheel_speeds[1], calculated_wheel_speeds[2]);
-    EXPECT_DOUBLE_EQ(calculated_wheel_speeds[2], calculated_wheel_speeds[3]);
+    // Formula for the length of a segment: length = radius * angle
+    // Since angle = 1rad, the length of the segment is equal to the radius.
+    // Therefore, all wheel speeds must be equal to the robot radius.
+    EXPECT_DOUBLE_EQ(calculated_wheel_speeds[0], robot_radius);
+    EXPECT_DOUBLE_EQ(calculated_wheel_speeds[1], robot_radius);
+    EXPECT_DOUBLE_EQ(calculated_wheel_speeds[2], robot_radius);
+    EXPECT_DOUBLE_EQ(calculated_wheel_speeds[3], robot_radius);
 }
 
 TEST_F(EuclideanToWheelTest, test_target_wheel_speeds_negative_w)
@@ -122,16 +109,13 @@ TEST_F(EuclideanToWheelTest, test_target_wheel_speeds_negative_w)
     target_euclidean_velocity = {0, 0, -1};
     calculated_wheel_speeds     = euclidean_to_four_wheel.getWheelVelocity(target_euclidean_velocity);
 
-    // All wheels must be - velocity.
-    EXPECT_LT(calculated_wheel_speeds[0], 0);
-    EXPECT_LT(calculated_wheel_speeds[1], 0);
-    EXPECT_LT(calculated_wheel_speeds[2], 0);
-    EXPECT_LT(calculated_wheel_speeds[3], 0);
-
-    // All wheels must have same velocity.
-    EXPECT_DOUBLE_EQ(calculated_wheel_speeds[0], calculated_wheel_speeds[1]);
-    EXPECT_DOUBLE_EQ(calculated_wheel_speeds[1], calculated_wheel_speeds[2]);
-    EXPECT_DOUBLE_EQ(calculated_wheel_speeds[2], calculated_wheel_speeds[3]);
+    // Formula for the length of a segment: length = radius * angle
+    // Since angle = -1rad, the length of the segment is equal to the -radius.
+    // Therefore, all wheel speeds (=length of segment/sec) must be equal to the robot radius.
+    EXPECT_DOUBLE_EQ(calculated_wheel_speeds[0], -robot_radius);
+    EXPECT_DOUBLE_EQ(calculated_wheel_speeds[1], -robot_radius);
+    EXPECT_DOUBLE_EQ(calculated_wheel_speeds[2], -robot_radius);
+    EXPECT_DOUBLE_EQ(calculated_wheel_speeds[3], -robot_radius);
 }
 
 TEST_F(EuclideanToWheelTest, test_conversion_is_linear)
