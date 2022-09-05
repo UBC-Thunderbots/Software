@@ -19,7 +19,7 @@ then
         echo "================================================================"
 else
     # Download clion
-    wget -O /tmp/CLion-${clion_version}.tar.gz "https://download-cf.jetbrains.com/cpp/CLion-${clion_version}.tar.gz"
+    wget -O /tmp/CLion-${clion_version}.tar.gz "https://download.jetbrains.com/cpp/CLion-${clion_version}.tar.gz"
 
     # Unzip and symlink to usr location
     sudo tar xfz /tmp/CLion-${clion_version}.tar.gz -C /opt
