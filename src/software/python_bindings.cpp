@@ -15,6 +15,7 @@
 #include "proto/ssl_vision_wrapper.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
 #include "proto/team.pb.h"
+#include "proto/visualization.pb.h"
 #include "proto/world.pb.h"
 #include "pybind11_protobuf/native_proto_caster.h"
 #include "software/estop/threaded_estop_reader.h"
@@ -117,6 +118,7 @@ PYBIND11_MODULE(python_bindings, m)
         .def("normalize", py::overload_cast<>(&Vector::normalize, py::const_))
         .def("normalize", py::overload_cast<double>(&Vector::normalize, py::const_))
         .def("rotate", &Vector::rotate)
+        .def("createFromAngle", &Vector::createFromAngle)
         .def("orientation", &Vector::orientation)
         // Overloaded
         .def(py::self + py::self)
@@ -283,6 +285,8 @@ PYBIND11_MODULE(python_bindings, m)
         .def("field", &World::field);
 
     // Listeners
+    declareThreadedProtoUdpListener<TbotsProto::HRVOVisualization>(m,
+                                                                   "HRVOVisualization");
     declareThreadedProtoUdpListener<SSLProto::Referee>(m, "SSLReferee");
     declareThreadedProtoUdpListener<TbotsProto::RobotStatus>(m, "RobotStatus");
     declareThreadedProtoUdpListener<TbotsProto::RobotLog>(m, "RobotLog");

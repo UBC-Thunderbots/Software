@@ -3,9 +3,13 @@
 #include <g3log/logmessage.hpp>
 #include <iostream>
 
+#include "base64.h"
+#include "google/protobuf/any.pb.h"
 #include "proto/robot_log_msg.pb.h"
+#include "proto/visualization.pb.h"
+#include "software/logger/constants.h"
+#include "software/logger/custom_logging_levels.h"
 #include "software/networking/threaded_proto_udp_sender.hpp"
-
 
 /**
  * This class acts as a custom sink for g3log. In particular, it allows us to log to
@@ -34,5 +38,7 @@ class NetworkSink
 
    private:
     std::unique_ptr<ThreadedProtoUdpSender<TbotsProto::RobotLog>> log_output;
+    std::unique_ptr<ThreadedProtoUdpSender<TbotsProto::HRVOVisualization>>
+        serialized_proto_log_output;
     int robot_id;
 };

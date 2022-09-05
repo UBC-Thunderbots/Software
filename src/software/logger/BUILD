@@ -83,6 +83,8 @@ cc_library(
         "network_sink.cpp",
     ],
     hdrs = [
+        "constants.h",
+        "custom_logging_levels.h",
         "network_sink.h",
     ],
     deps = [
@@ -90,6 +92,8 @@ cc_library(
         "//shared:constants",
         "//software/networking:threaded_proto_udp_sender",
         "@g3log",
+        "//proto:visualization_cc_proto",
+        "@base64",
     ],
 )
 
@@ -99,6 +103,7 @@ cc_library(
         "protobuf_sink.cpp",
     ],
     hdrs = [
+        "constants.h",
         "custom_logging_levels.h",
         "protobuf_sink.h",
     ],

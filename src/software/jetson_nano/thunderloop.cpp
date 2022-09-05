@@ -22,18 +22,16 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, const int loop
     // TODO (#2495): Set the friendly team colour once we receive World proto
     : primitive_executor_(loop_hz, robot_constants, TeamColour::YELLOW)
 {
-    robot_id_        = MAX_ROBOT_IDS + 1;  // Initialize to a robot ID that is not valid
-    channel_id_      = 0;
     loop_hz_         = loop_hz;
     robot_constants_ = robot_constants;
 
     redis_client_ = std::make_unique<RedisClient>(REDIS_DEFAULT_HOST, REDIS_DEFAULT_PORT);
 
-    auto robot_id   = std::stoi(redis_client_->get(ROBOT_ID_REDIS_KEY));
-    auto channel_id = std::stoi(redis_client_->get(ROBOT_MULTICAST_CHANNEL_REDIS_KEY));
-    auto network_interface = redis_client_->get(ROBOT_NETWORK_INTERFACE_REDIS_KEY);
+    robot_id_   = std::stoi(redis_client_->get(ROBOT_ID_REDIS_KEY));
+    channel_id_ = std::stoi(redis_client_->get(ROBOT_MULTICAST_CHANNEL_REDIS_KEY));
+    network_interface_ = redis_client_->get(ROBOT_NETWORK_INTERFACE_REDIS_KEY);
 
-    NetworkLoggerSingleton::initializeLogger(channel_id, network_interface, robot_id);
+    NetworkLoggerSingleton::initializeLogger(channel_id_, network_interface_, robot_id_);
 
     motor_service_ = std::make_unique<MotorService>(robot_constants, loop_hz);
 }
