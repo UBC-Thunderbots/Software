@@ -89,11 +89,11 @@ cc_library(
     ],
     deps = [
         "//proto:tbots_cc_proto",
+        "//proto:visualization_cc_proto",
         "//shared:constants",
         "//software/networking:threaded_proto_udp_sender",
-        "@g3log",
-        "//proto:visualization_cc_proto",
         "@base64",
+        "@g3log",
     ],
 )
 
