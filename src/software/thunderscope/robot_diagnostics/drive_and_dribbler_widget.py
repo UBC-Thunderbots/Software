@@ -116,16 +116,16 @@ class DriveAndDribblerWidget(QWidget):
         dbox = QVBoxLayout()
 
         # set up the sliders
-        front_left_groupbox, self.front_left_slider = self.create_slider(
+        front_left_layout, self.front_left_slider = self.create_slider(
             "Front Left", MIN_MOTOR_RPM, MAX_MOTOR_RPM, 1
         )
-        front_right_groupbox, self.front_right_slider = self.create_slider(
+        front_right_layout, self.front_right_slider = self.create_slider(
             "Front Right", MIN_MOTOR_RPM, MAX_MOTOR_RPM, 1
         )
-        back_left_groupbox, self.back_left_slider = self.create_slider(
+        back_left_layout, self.back_left_slider = self.create_slider(
             "Back Left", MIN_MOTOR_RPM, MAX_MOTOR_RPM, 1
         )
-        back_right_groupbox, self.back_right_slider = self.create_slider(
+        back_right_layout, self.back_right_slider = self.create_slider(
             "Back Right", MIN_MOTOR_RPM, MAX_MOTOR_RPM, 1
         )
 
@@ -134,10 +134,10 @@ class DriveAndDribblerWidget(QWidget):
         stop_and_reset.clicked.connect(self.reset_all_sliders)
 
         # add widget
-        dbox.addWidget(front_left_groupbox)
-        dbox.addWidget(front_right_groupbox)
-        dbox.addWidget(back_left_groupbox)
-        dbox.addWidget(back_right_groupbox)
+        dbox.addLayout(front_left_layout)
+        dbox.addLayout(front_right_layout)
+        dbox.addLayout(back_left_layout)
+        dbox.addLayout(back_right_layout)
         dbox.addWidget(stop_and_reset, alignment=Qt.AlignmentFlag.AlignCenter)
 
         groupBox.setLayout(dbox)
