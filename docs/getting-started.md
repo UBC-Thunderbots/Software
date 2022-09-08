@@ -38,21 +38,23 @@
     - [Pushing a Dockerfile to dockerhub](#pushing-a-dockerfile-to-dockerhub)
 
 ## Introduction
+<details>
 These instructions assume that you have the following accounts setup:
 - [Github](https://github.com/login)
 - [Slack](https://thunderbots.slack.com/)
+</details>
 
 These instructions assume you have a basic understanding of Linux and the command-line. There are many great tutorials online, such as [LinuxCommand](http://linuxcommand.org/). The most important things you'll need to know are how to move around the filesystem, and how to run programs or scripts.
 
 ## Installation and Setup
-
-## Operating Systems
+<details>
+### Operating Systems
 
 We currently only support Linux, specifically Ubuntu 18.04 LTS and 20.04 LTS (CI tests on 20.04). You are welcome to use a different version or distribution of Linux, but may need to make some tweaks in order for things to work.
 
 You can use Ubuntu 20.04 LTS inside Windows through Windows Subsystem for Linux, by following [this guide](./getting-started-wsl.md). **Running and developing Thunderbots on Windows is experimental and not officially supported.**
 
-## Getting the Code
+### Getting the Code
 
 1. Open a new terminal
 2. Install git by running `sudo apt-get install git`
@@ -76,26 +78,26 @@ You can use Ubuntu 20.04 LTS inside Windows through Windows Subsystem for Linux,
 
 *See our [workflow document](workflow.md) for how to use git to make branches, submit Pull Requests, and track issues*
 
-## Running the setup scripts
+### Running the setup scripts
 
 We have several setup scripts to help you easily install the necessary dependencies in order to build and run our code. You will want to run the following scripts, which can all be found in `Software/environment_setup`
 
-### Installing Software Dependencies
+#### Installing Software Dependencies
 
 * Inside a terminal, navigate to the environment_setup folder. Eg. `cd path/to/the/repository/Software/environment_setup`
 * Run `./setup_software.sh`
   * You will be prompted for your admin password
   * This script will install everything necessary in order to build and run our main `AI` software 
 
-### Installing an IDE
+#### Installing an IDE
 
 For those who prefer working on C/C++ with an IDE, we provide two options: [CLion](#clion) for an integrated experience and [VSCode](vscode) for a more lightweight setup. Both support our build system `bazel`.
 
-#### CLion
+##### CLion
 
 CLion is the most full-featured IDE, with code completion, code navigation, and integrated building, testing, and debugging.
 
-##### Getting your Student License
+###### Getting your Student License
 
 CLion is free for students, and you can use your UBC alumni email address to create a student account. If you already have a student account with JetBrains, you can skip this step.
 
@@ -103,13 +105,13 @@ CLion is free for students, and you can use your UBC alumni email address to cre
 2. Using your UBC email account, get a JetBrains education account [here](https://www.jetbrains.com/shop/eform/students).
    1. _JetBrains will send an initial email to confirm the UBC email you inputted. Once you have confirmed, another email will be sent to activate your new education account. You will use this account to set up CLion later on._
 
-##### Installing CLion
+###### Installing CLion
 
 * Inside a terminal, navigate to the environment_setup folder. Eg. `cd path/to/the/repository/Software/environment_setup`
 * Run `./install_clion.sh` (* **DO NOT** download CLion yourself unless you know what you're doing. The `install_clion.sh` script will grab the correct version of CLion and the Bazel plugin to ensure everything is compatible *).
 * When you run CLion for the first time you will be prompted to enter your JetBrains account or License credentials. Use your student account.
 
-#### VSCode
+##### VSCode
 
 VSCode is the more lightweight IDE, with support for code navigation, code completion, and integrated building and testing. However, debugging isn't integrated into this IDE.
 
@@ -120,8 +122,11 @@ VSCode is the more lightweight IDE, with support for code navigation, code compl
 4. VSCode will prompt you to install recommended extensions, click `Install`, this installs necessary plugins to work on the codebase. (Bazel, C++, Python, etc..)
 5. Navigate to File -> Preferences -> Settings -> Workspace -> Extensions -> Bazel and select the `Bazel: Enable Code Lens` option.
 
+</details>
+
 ## Building and Running the Code
 
+<details>
 ### Building from the command-line
 
 1. Navigate to the root of this repository (wherever you have it cloned on your computer)
@@ -161,7 +166,7 @@ First we need to setup CLion
 6. Change the Project Name to whatever you want. Leave everything else as it is ("Use shared project view file" should be selected).
 7. Click `Finish` and you're good to go! Give CLion some time to find everything in your repo.
 
-Now that you're setup, if you can run it on the command line, you can run it in clion. There are two main ways of doing so.
+Now that you're setup, if you can run it on the command line, you can run it in CLion. There are two main ways of doing so.
 1. Open any `BUILD` file and right clight in a `cc_library()` call. This will give you the option to `Run` or `Debug` that specific target. Try it by opening `Software/src/software/geom/BUILD` and right-clicking on the `cc_library` for `angle_test`!
 2. Add a custom build configuration (more powerful, so make sure you understand this!)
     1. Select `Add Configuration` from the drop-down in the top-right of CLion
@@ -182,26 +187,42 @@ Now that you're setup, if you can run it on the command line, you can run it in 
 2. Pick the network interface you would like to use:
     1. If you are running things locally, you can pick any interface that is not `lo`
     2. If you would like to communicate with robots on the network, make sure to select the interface that is connected to the same network as the robots.
-3. Run our AI: `bazel run //software:full_system -- --interface=[interface_here] --backend=SimulatorBackend`
-    - This will launch the Visualizer, which displays what the AI is currently "seeing" and allows us to interact with the AI through the dynamic parameters.
-    - The field should be empty, as we are currently not receiving SSL Vision packets.
-4. Run our Simulator: `bazel run //software:standalone_simulator_main -- --interface=[interface_here]`
-    - The Simulator runs our firmware and Box2D (a physics engine) to simulate how our robots would behave on the field.
-    - The Simulator outputs SSL Vision packets, which contain position information of all robots and the ball.
-    - Our AI can now "see" the robots, and they should be displayed on the Visualizer.
-    - You can use ctrl-click to move the ball around in the Simulator, and try changing the Play Override on the Visualizer to see the robots move!
-5. Run Robot Diagnostics: `bazel run //software:robot_diagnostics:robot_diagnostics_main -- --interface=[interface_here] --backend=WifiBackend`
+3. Run our AI on Thunderscope:
+    - Thunderscope is the software that combines our AI, Simulator, Visualizer and RobotDiagnostics
+    - If we want to run it with real robots:
+        - If we are running the AI as "blue": `./tbots.py run thunderscope_main --interface=[interface_here] --run_blue`
+        - If we are running the AI as "yellow": `./tbots.py run thunderscope_main --interface=[interface_here] --run_yellow`
+        - This command will set up robot communication and the unix full system binary context manager. The unix full system context manager hooks up our AI, backend and sensor fusion
+    - If we want to run with simulated AI vs AI:
+        - `./tbots.py run thunderscope_main` will start Thunderscope with our Simulator, a blue FullSystem and yellow FullSystem. Each FullSystem contains the respective AI for each side. The command will start Thunderscope and set up communciation between the Simulator, GameController and FullSystems.
+        - We use ER Force's Simulator to simulate how our robots would behave on the field. This simulator is powerful because it includes vision noise, allowing us to further stress test our gameplay.
+        - You can use ctrl-click to move the ball around in the Simulator, and try changing the Play Override on the Visualizer to see the robots move!
+        - The Simulator outputs SSL Vision packets, which contain position information of all robots and the ball.
+        - Our AI can now "see" the robots, and they should be displayed on the Visualizer.
+    - After launching Thunderscope, we can see what the AI is currently "seeing" and interact with it through dynamic parameters. 
+4. Run Robot Diagnostics:
+    - (#2711) There isn't a clean way to do this at the moment.
     - The Mechanical and Electrical sub-teams use Robot Diagnostics to test specific parts of the Robot.
-6. Run our SimulatedPlayTests in the visualizer: `bazel test //software/ai/hl/stp/play:[some_target_here] --test_arg="--enable_visualizer"` or `bazel run //software/ai/hl/stp/play:[some_target_here] -- --enable_visualizer`
+5. Run our SimulatedPlayTests in Thunderscope
     - This will launch the visualizer and simulate AI Plays, allowing us to visually see the robots acting according to their roles.
-7. Run our SimulatedTacticTests in the visualizer: `bazel test //software/ai/hl/stp/tactic:[some_target_here] --test_arg="--enable_visualizer"` or `bazel run //software/ai/hl/stp/tactic:[some_target_here] -- --enable_visualizer`
+    1. For legacy C++ tests (#2581) with the visualizer:
+        1. First run Thunderscope configured for receiving protobufs over unix sockets correctly: `./tbots.py run thunderscope_main -- --visualize_cpp_test`
+        2. Then run `./tbots.py test [some_target_here] -- --run_sim_in_realtime`
+    2. For PyTests:
+        - With the visualizer: `./tbots.py test [some_target_here] -t`
+        - Without the visualizer: `./tbots.py test [some_target_here]`
+    3. For legacy C++ tests (#2581) without the visualizer:
+        - `./tbots.py test [some_target_here]`
+6. Run our SimulatedTacticTests in Thunderscope:
     - This will launch the visualizer and simulate AI Tactic on a single robot
-
-** NOTE: If you want to run SimulatedTests with the AI initially stopped, then use the `--stop_ai_on_start` flag ** 
-
-### Running AI vs AI
-1. Open your terminal, `cd` into `Software/src`
-2. Run `./tbots.py run thunderscope`
+    1. For legacy C++ tests (#2581) with the visualizer:
+        - First run Thunderscope configured for receiving protobufs over unix sockets correctly: `./tbots.py run thunderscope_main -- --visualize_cpp_test`
+        - Then run `./tbots.py test [some_target_here] -- --run_sim_in_realtime`
+    2. For PyTests:
+        - With the visualizer: `./tbots.py test [some_target_here] -t`
+        - Without the visualizer: `./tbots.py test [some_target_here]`
+    3. For legacy C++ tests (#2581) without the visualizer:
+        - `./tbots.py test [some_target_here]`
 
 ## Debugging
 Debugging from the command line is certainly possible, but debugging in a full IDE is *really* nice (plz trust us). 
@@ -211,10 +232,11 @@ Debugging in CLion is as simple as running the above instructions for building C
 
 ### Debugging from the Command line
 To debug from the command line, first you need to build your target with the debugging flag - `bazel build -c dbg //some/target:here`. When the target builds, you should see a path `bazel-bin/<target>`. Copy that path, and run `gdb <path>`. Please see [here](https://www.cs.cmu.edu/~gilpin/tutorial/) for a tutorial on how to use `gdb` if you're not familiar with it. Alternatively, you could do `bazel run -c dbg --run_under="gdb" //some/target:here`, which will run the target in `gdb`. While this is taken directly from the bazel docs, gdb may sometimes hang when using `--run_under`, so building the target first with debugging flags and running afterwards is preferred.
-
+</details>
 
 ## Profiling 
-Unfortunately profiling for Bazel targets is not supported in CLion at this time. Hence the only way is via command line. Use the following command:
+<details>
+Profiling is an optimization tool used to identify the time and space used by code, with a detailed breakdown to help identify areas of performance improvement. Unfortunately profiling for Bazel targets is not supported in CLion at this time. Hence the only way is via command line. Use the following command:
 ```
 bazel run -c dbg --run_under="valgrind --tool=callgrind --callgrind-out-file=/ABSOLUTE/PATH/TO/profile.callgrind" //target/to:run
 
@@ -235,9 +257,10 @@ We use ansible to automatically update software running on the Jetson Nano. [See
 To update binaries on a working robot, you can run:
 
 `./tbots.py run run_ansible --cpu=jetson_nano -- --playbook remote_flash.yml --port 45000 --ssh_pass our_password_here`
+</details>
 
 ## Setting up Virtual Robocup 2021
-
+<details>
 ### Setting up the SSL Simulation Environment
 
 1. Fork the [SSL-Simulation-Setup](https://github.com/RoboCup-SSL/ssl-simulation-setup) repository.  
@@ -252,4 +275,4 @@ After editing the dockerfile, build the image and push it to dockerhub with the 
 2. Now, push your image to dockerhub. Get the credentials for the thunderbots dockerhub account from a software lead.
    1. Log into the docker account with `docker login`. You will be prompted for a username and password
    2. Now, push this image by its name: `docker push ubcthunderbots/<image name>[:tag]`
-
+</details>
