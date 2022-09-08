@@ -42,12 +42,13 @@
 These instructions assume that you have the following accounts setup:
 - [Github](https://github.com/login)
 - [Slack](https://thunderbots.slack.com/)
-</details>
 
 These instructions assume you have a basic understanding of Linux and the command-line. There are many great tutorials online, such as [LinuxCommand](http://linuxcommand.org/). The most important things you'll need to know are how to move around the filesystem, and how to run programs or scripts.
 
+</details>
 ## Installation and Setup
 <details>
+
 ### Operating Systems
 
 We currently only support Linux, specifically Ubuntu 18.04 LTS and 20.04 LTS (CI tests on 20.04). You are welcome to use a different version or distribution of Linux, but may need to make some tweaks in order for things to work.
@@ -127,6 +128,7 @@ VSCode is the more lightweight IDE, with support for code navigation, code compl
 ## Building and Running the Code
 
 <details>
+
 ### Building from the command-line
 
 1. Navigate to the root of this repository (wherever you have it cloned on your computer)
