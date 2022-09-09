@@ -22,7 +22,7 @@ extern int clock_nanosleep(clockid_t __clock_id, int __flags,
 Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, const int loop_hz)
     // TODO (#2495): Set the friendly team colour once we receive World proto
     : robot_id_(MAX_ROBOT_IDS + 1),  // Initialize to a robot ID that is not valid
-      primitive_executor_(loop_hz, robot_id_, robot_constants, TeamColour::YELLOW)
+      primitive_executor_(1.0 / loop_hz, robot_id_, robot_constants, TeamColour::YELLOW)
 {
     LOG(DEBUG) << "Thunderloop constructor running ";
     channel_id_      = 0;
@@ -210,6 +210,7 @@ Thunderloop::~Thunderloop() {}
                     primitive_executor_.updateLocalVelocity(curr_local_vel, robot.value().orientation());
 
                     // TODO-JON needs to use world in primitive executor
+                    // TODO: Nima, current state changes between world receives, if this is not up to date world we should update it based on robot velocities...
                     direct_control_ = *primitive_executor_.stepPrimitive(
                         robot_id_, robot->currentState());
                 }
