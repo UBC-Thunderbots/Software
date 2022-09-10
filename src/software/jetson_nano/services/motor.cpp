@@ -25,6 +25,7 @@
 #include "software/logger/logger.h"
 #include "software/util/scoped_timespec_timer/scoped_timespec_timer.h"
 #include "proto/message_translation/tbots_geometry.h"
+#include "proto/visualization.pb.h"
 
 extern "C"
 {
@@ -375,11 +376,26 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
     motor_status.mutable_local_velocity()->set_y_component_meters(
         static_cast<float>(current_euclidean_velocity[1]));
 
-    Vector target_vel = createVector(motor.direct_velocity_control().velocity());
-    Vector target_vel_flipped(-motor.direct_velocity_control().velocity().y_component_meters(), motor.direct_velocity_control().velocity().x_component_meters());
-    LOG(INFO) << "target_vel " << target_vel << " ==> " << target_vel.length() << " ::: target_vel_flipped " << target_vel_flipped;
-    LOG(INFO) << "Wheel vel " << current_wheel_velocities[0] << ", " << current_wheel_velocities[1] << ", " << current_wheel_velocities[2] << ", " << current_wheel_velocities[3];
 
+//    Vector actual_velocity(-current_euclidean_velocity[1], current_euclidean_velocity[0]);
+//    TbotsProto::HRVOVisualization hrvo_visualization;
+//    hrvo_visualization.set_robot_id(0);
+//    auto vo_proto      = *createVelocityObstacleProto(VelocityObstacle(Vector(),
+//                                                                       actual_velocity,
+//                                                                       actual_velocity));
+//    auto vo_protos = {vo_proto};
+//    *(hrvo_visualization.mutable_velocity_obstacles()) = {vo_protos.begin(),
+//                                                          vo_protos.end()};
+//    LOG(VISUALIZE) << hrvo_visualization;
+
+//    LOG(INFO) << "Target and wheel vel difference: " << prev_target_vel -
+//    Vector target_vel = createVector(motor.direct_velocity_control().velocity());
+//    Vector target_vel_flipped(-motor.direct_velocity_control().velocity().y_component_meters(), motor.direct_velocity_control().velocity().x_component_meters());
+//    LOG(INFO) << "target_vel " << target_vel << " ==> " << target_vel.length() << " ::: target_vel_flipped " << target_vel_flipped;
+//    LOG(INFO) << "Target vel " << target_total_wheel_velocities[0] << ", " << target_total_wheel_velocities[1] << ", " << target_total_wheel_velocities[2] << ", " << target_total_wheel_velocities[3];
+
+
+    // LOG HRVOVisualization the robot velocity
 
     WheelSpace_t target_total_wheel_velocities   = {0.0, 0.0, 0.0, 0.0};
     WheelSpace_t target_linear_wheel_velocities  = {0.0, 0.0, 0.0, 0.0};
@@ -402,6 +418,8 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
                 -motor.direct_velocity_control().velocity().y_component_meters(),
                 motor.direct_velocity_control().velocity().x_component_meters(),
                 motor.direct_velocity_control().angular_velocity().radians_per_second()};
+            prev_target_vel = Vector(-motor.direct_velocity_control().velocity().y_component_meters(),
+                                     motor.direct_velocity_control().velocity().x_component_meters());
 //            target_velocity = {
 //                    motor.direct_velocity_control().velocity().x_component_meters(),
 //                    motor.direct_velocity_control().velocity().y_component_meters(),
@@ -448,8 +466,16 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
         driver_control_enable_gpio.setValue(GpioState::HIGH);
     }
 
-    LOG(INFO) << "Target vel " << target_total_wheel_velocities[0] << ", " << target_total_wheel_velocities[1] << ", " << target_total_wheel_velocities[2] << ", " << target_total_wheel_velocities[3];
-
+//    LOG(INFO) << "Target vel " << target_total_wheel_velocities[0] << ", " << target_total_wheel_velocities[1] << ", " << target_total_wheel_velocities[2] << ", " << target_total_wheel_velocities[3];
+    if (Vector(-motor.direct_velocity_control().velocity().y_component_meters(),
+           motor.direct_velocity_control().velocity().x_component_meters()).length() > 0.05)
+    {
+        LOG(INFO) << "Wheel vel diff "
+                  << current_wheel_velocities[0] - target_total_wheel_velocities[0] << ", "
+                  << current_wheel_velocities[1] - target_total_wheel_velocities[1] << ", "
+                  << current_wheel_velocities[2] - target_total_wheel_velocities[2] << ", "
+                  << current_wheel_velocities[3] - target_total_wheel_velocities[3];
+    }
 
     // Set target speeds accounting for acceleration
     tmc4671_writeInt(FRONT_RIGHT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_TARGET,
@@ -464,6 +490,12 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
     tmc4671_writeInt(BACK_RIGHT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_TARGET,
                      static_cast<int>(target_total_wheel_velocities[3] *
                                       ELECTRICAL_RPM_PER_MECHANICAL_MPS));
+
+//    auto target_rpm1 = tmc4671_readInt(FRONT_RIGHT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_TARGET);
+//    auto target_rpm2 = tmc4671_readInt(FRONT_LEFT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_TARGET);
+//    auto target_rpm3 = tmc4671_readInt(BACK_LEFT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_TARGET);
+//    auto target_rpm4 = tmc4671_readInt(BACK_RIGHT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_TARGET);
+//    LOG(INFO) << "motor target vel " << target_rpm1 << ", " << target_rpm2 << ", " << target_rpm3 << ", " << target_rpm4;
 
     // If the dribbler only needs to change by DRIBBLER_ACCELERATION_THRESHOLD_RPM_PER_S,
     // just set the value

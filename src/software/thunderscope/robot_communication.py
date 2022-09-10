@@ -225,16 +225,16 @@ class RobotCommunication(object):
         )
 
 # <<<<<<< HEAD
-        self.connect_fullsystem_to_robots()
+#         self.connect_fullsystem_to_robots()
         #self.disconnect_fullsystem_from_robots()
 # =======
         # self.disconnect_fullsystem_from_robots()
 # >>>>>>> b7027873a2ff9c9881879b58b7b8de46671d837d
 #         self.connect_robot_to_diagnostics(0)
 #         self.connect_robot_to_diagnostics(1)
-#         self.connect_robot_to_diagnostics(1)
+#         self.connect_robot_to_diagnostics(2)
 #         self.connect_robot_to_diagnostics(3)
-#         self.connect_robot_to_diagnostics(4) # Connect for diagnostics
+        self.connect_robot_to_diagnostics(4)  # Connect for diagnostics
         # self.connect_robot_to_diagnostics(5)
         # self.connect_robot_to_diagnostics(6)
         # self.connect_robot_to_diagnostics(7)

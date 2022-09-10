@@ -11,7 +11,7 @@ class PrimitiveExecutor
    public:
     /**
      * Constructor
-     * @param time_step Time step which this primitive executor operates in
+     * @param time_step Time step which this primitive executor operates in, in seconds
      * @param robot_id The id  for the robot which uses this primitive
      * executor
      * @param robot_constants The robot constants for the robot which uses this primitive
@@ -104,4 +104,6 @@ class PrimitiveExecutor
     TbotsProto::MovePrimitive move_primitive_;
     TbotsProto::World current_world_;
     HRVOSimulator hrvo_simulator_;
+    Angle curr_orientation_;
+    double time_step_;
 };

@@ -8,6 +8,7 @@
 #include "shared/robot_constants.h"
 #include "software/jetson_nano/gpio.h"
 #include "software/physics/euclidean_to_wheel.h"
+#include "software/geom/vector.h"
 
 class MotorService
 {
@@ -258,4 +259,7 @@ class MotorService
     // Current wheel velocities
     WheelSpace_t prev_linear_wheel_velocities;
     WheelSpace_t prev_angular_wheel_velocities;
+
+    // For testing
+    Vector prev_target_vel;
 };

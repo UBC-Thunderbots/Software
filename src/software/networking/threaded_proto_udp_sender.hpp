@@ -34,6 +34,8 @@ class ThreadedProtoUdpSender
      */
     void sendProto(const SendProto& message);
 
+    void sendString(const std::string& message);
+
    private:
     // The io_service that will be used to service all network requests
     boost::asio::io_service io_service;
@@ -72,4 +74,9 @@ template <class SendProtoT>
 void ThreadedProtoUdpSender<SendProtoT>::sendProto(const SendProtoT& message)
 {
     udp_sender.sendProto(message);
+}
+
+template<class SendProto>
+void ThreadedProtoUdpSender<SendProto>::sendString(const std::string &message) {
+
 }
