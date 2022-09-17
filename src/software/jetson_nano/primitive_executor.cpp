@@ -5,7 +5,6 @@
 #include "proto/primitive/primitive_msg_factory.h"
 #include "proto/tbots_software_msgs.pb.h"
 #include "proto/visualization.pb.h"
-#include "software/logger/logger.h"
 #include "software/math/math_functions.h"
 
 PrimitiveExecutor::PrimitiveExecutor(const double time_step,
@@ -74,7 +73,7 @@ AngularVelocity PrimitiveExecutor::getTargetAngularVelocity(
 
 
 std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimitive(
-    const unsigned int robot_id, const RobotState& robot_state)
+    const unsigned int robot_id, const Angle& curr_orientation)
 {
     hrvo_simulator_.doStep();
 
@@ -110,9 +109,9 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
         {
             // Compute the target velocities
             Vector target_velocity =
-                getTargetLinearVelocity(robot_id, robot_state.orientation());
+                getTargetLinearVelocity(robot_id, curr_orientation);
             AngularVelocity target_angular_velocity = getTargetAngularVelocity(
-                current_primitive_.move(), robot_state.orientation());
+                current_primitive_.move(), curr_orientation);
 
             auto output = createDirectControlPrimitive(
                 target_velocity, target_angular_velocity,

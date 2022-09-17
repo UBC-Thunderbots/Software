@@ -185,7 +185,7 @@ class RobotCommunication(object):
 
         self.connect_fullsystem_to_robots()
 
-        # TODO-NIMA-ARUN we might not want to support robot diagnostics in tscope
+        # TODO (#2741): we might not want to support robot diagnostics in tscope
         # make a ticket here to create a widget to call these functions to detach
         # from AI and connect to robots/or remove
         # self.disconnect_fullsystem_from_robots()

@@ -56,7 +56,7 @@ namespace
         switch (frame.which_power_msg)
         {
             case TbotsProto_PowerFrame_power_control_tag:
-                expected_length = TbotsProto_PowerControl_size;
+                expected_length = TbotsProto_PowerPulseControl_size;
                 bytes           = serializeToVector(frame.power_msg.power_control);
                 break;
             case TbotsProto_PowerFrame_power_status_tag:

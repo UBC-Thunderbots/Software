@@ -119,6 +119,7 @@ TEST_F(ShadowEnemyTacticTest, test_block_pass_if_enemy_does_not_have_ball)
             Duration::fromSeconds(5));
 }
 
+/** TODO (#2714): Re-enable tests
 TEST_F(ShadowEnemyTacticTest, test_block_net_then_steal_and_chip)
 {
     Robot shadower(0, Point(-2, 0), Vector(0, 0), Angle::zero(), AngularVelocity::zero(),
@@ -174,6 +175,7 @@ TEST_F(ShadowEnemyTacticTest, test_block_net_then_steal_and_chip)
             terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(5));
 }
+**/
 
 TEST_F(ShadowEnemyTacticTest, test_block_net_if_enemy_threat_is_null)
 {

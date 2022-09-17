@@ -206,7 +206,7 @@ class MotorService
     EuclideanToWheel euclidean_to_four_wheel;
     std::unordered_map<int, bool> encoder_calibrated_;
 
-    // Current wheel velocities
+    // Previous wheel velocities
     WheelSpace_t prev_wheel_velocities;
 
     int heartbeat_state = 0;

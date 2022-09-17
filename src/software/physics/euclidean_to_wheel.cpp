@@ -3,7 +3,6 @@
 #include <cmath>
 
 #include "shared/2021_robot_constants.h"
-#include "software/logger/logger.h"
 
 EuclideanToWheel::EuclideanToWheel(const RobotConstants_t &robot_constants)
 {

@@ -3,6 +3,7 @@ syntax = "proto3";
 package TbotsProto;
 
 import "proto/geometry.proto";
+import "proto/geneva_slot.proto";
 import "google/protobuf/descriptor.proto";
 
 extend google.protobuf.EnumValueOptions
@@ -79,6 +80,7 @@ message AutoChipOrKick
     };
 }
 
+// This is only used for simulation. Similar proto in power_frame_msg.proto but with pulse width instead of m_per_s
 message PowerControl
 {
     message ChickerControl
@@ -91,7 +93,14 @@ message PowerControl
         };
     }
 
-    ChickerControl chicker = 1;
+    message GenevaControl
+    {
+        float angle_deg          = 1;
+        float rotation_speed_rpm = 2;
+    }
+
+    ChickerControl chicker  = 1;
+    Geneva.Slot geneva_slot = 2;
 }
 
 message Primitive

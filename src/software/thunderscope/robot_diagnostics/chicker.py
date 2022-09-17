@@ -116,6 +116,6 @@ class ChickerWidget(QWidget):
             )
         elif self.no_auto_button.isChecked():
             pass
-            # TODO ATTACH A CALLBACK AND SENDPROTO/KICK IMMEDIATELY
+            # TODO (#2715): ATTACH A CALLBACK AND SENDPROTO/KICK IMMEDIATELY
 
         self.proto_unix_io.send_proto(PowerControl, power_control)

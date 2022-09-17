@@ -25,6 +25,7 @@ class PenaltyKickEnemyPlayTest
     Field field                      = Field::createField(field_type);
 };
 
+/** TODO (#2714): Re-enable tests
 TEST_P(PenaltyKickEnemyPlayTest, test_penalty_kick_enemy_play_setup)
 {
     RefereeCommand current_command  = std::get<0>(GetParam());
@@ -110,7 +111,7 @@ INSTANTIATE_TEST_CASE_P(
                         TestUtil::createStationaryRobotStatesWithId(
                             {Point(2.2, 1.2), Point(-0.5, -2.1), Point(-2.5, 1.3),
                              Point(1.2, -1.5), Point(0, 2), Point(1, 0)}),
-                        1.6)));
+                        1.6)));**/
 
 TEST_F(PenaltyKickEnemyPlayTest, test_penalty_kick_enemy_play_goalie)
 {

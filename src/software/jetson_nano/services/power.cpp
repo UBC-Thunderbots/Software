@@ -48,7 +48,7 @@ void PowerService::tick()
     }
 
     auto command =
-        nanopb_command.load(std::memory_order_relaxed);  // get value atomically
+            nanopb_command.load(std::memory_order_relaxed);  // get value atomically
     auto frame                = createUartFrame(command);
     auto power_command_buffer = marshallUartPacket(frame);
 
@@ -67,9 +67,9 @@ void PowerService::tick()
     }
 }
 
-TbotsProto::PowerStatus PowerService::poll(const TbotsProto::PowerControl& command)
+TbotsProto::PowerStatus PowerService::poll(const TbotsProto::PowerControl& command, int kick_slope, int kick_constant, int chip_constant)
 {
     // Store msg for later transmission
-    nanopb_command = createNanoPbPowerControl(command);
+    nanopb_command = createNanoPbPowerPulseControl(command, kick_slope, kick_constant, chip_constant);
     return *createTbotsPowerStatus(status);
 }

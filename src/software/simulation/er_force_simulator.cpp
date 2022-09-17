@@ -335,7 +335,7 @@ SSLSimulationProto::RobotControl ErForceSimulator::updateSimulatorRobots(
             // Set to NEG_X because the world msg in this simulator is
             // normalized correctly
             auto direct_control = primitive_executor->stepPrimitive(
-                robot_id, RobotState(robot_proto_it->current_state()));
+                    robot_id, createAngle(robot_proto_it->current_state().global_orientation()));
 
             auto command = *getRobotCommandFromDirectControl(
                 robot_id, std::move(direct_control), robot_constants);
@@ -393,12 +393,12 @@ std::vector<TbotsProto::RobotStatus> ErForceSimulator::getBlueRobotStatuses() co
     if (blue_robot_with_ball.has_value())
     {
         robot_status.set_robot_id(blue_robot_with_ball.value());
-        power_status.set_breakbream_tripped(true);
+        power_status.set_breakbeam_tripped(true);
     }
     else
     {
         robot_status.clear_robot_id();
-        power_status.set_breakbream_tripped(false);
+        power_status.set_breakbeam_tripped(false);
     }
 
     *(robot_status.mutable_power_status()) = power_status;
@@ -416,12 +416,12 @@ std::vector<TbotsProto::RobotStatus> ErForceSimulator::getYellowRobotStatuses() 
     if (yellow_robot_with_ball.has_value())
     {
         robot_status.set_robot_id(yellow_robot_with_ball.value());
-        power_status.set_breakbream_tripped(true);
+        power_status.set_breakbeam_tripped(true);
     }
     else
     {
         robot_status.clear_robot_id();
-        power_status.set_breakbream_tripped(false);
+        power_status.set_breakbeam_tripped(false);
     }
 
     *(robot_status.mutable_power_status()) = power_status;

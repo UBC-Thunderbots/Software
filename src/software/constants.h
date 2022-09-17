@@ -44,6 +44,9 @@ static const double BALL_TO_FRONT_OF_ROBOT_DISTANCE_WHEN_DRIBBLING =
 const std::string ROBOT_ID_REDIS_KEY                = "/robot_id";
 const std::string ROBOT_MULTICAST_CHANNEL_REDIS_KEY = "/channel_id";
 const std::string ROBOT_NETWORK_INTERFACE_REDIS_KEY = "/network_interface";
+const std::string ROBOT_KICK_SLOPE_REDIS_KEY        = "/kick_slope";
+const std::string ROBOT_KICK_CONSTANT_REDIS_KEY     = "/kick_constant";
+const std::string ROBOT_CHIP_PULSE_WIDTH_REDIS_KEY  = "/chip_pulse_width";
 
 const std::string SSL_ADDRESS          = "224.5.23.2";
 static constexpr unsigned int SSL_PORT = 10020;

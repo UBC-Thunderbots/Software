@@ -15,7 +15,7 @@ extern "C"
 
 class PowerService
 {
-   public:
+public:
     /**
      * Service that interacts with the power board.
      * Opens all the required ports and maintains them until destroyed.
@@ -30,13 +30,14 @@ class PowerService
      * @param control The power control msg to send
      * @return the latest power status
      */
-    TbotsProto::PowerStatus poll(const TbotsProto::PowerControl& control);
+    TbotsProto::PowerStatus poll(const TbotsProto::PowerControl& control, int kick_slope, int kick_constant, int chip_constant);
 
-   private:
     /**
      * Handler method called every time the timer expires a new read is requested
      */
     void tick();
+
+private:
     /**
      * Initiates timer for serial reading
      */
@@ -44,12 +45,12 @@ class PowerService
 
     std::thread read_thread;
     std::atomic<TbotsProto_PowerStatus> status;
-    std::atomic<TbotsProto_PowerControl> nanopb_command;
+    std::atomic<TbotsProto_PowerPulseControl> nanopb_command;
     std::unique_ptr<BoostUartCommunication> uart;
 
     // Constants
     const size_t READ_BUFFER_SIZE =
-        getMarshalledSize(TbotsProto_PowerStatus TbotsProto_PowerStatus_init_default);
+            getMarshalledSize(TbotsProto_PowerStatus TbotsProto_PowerStatus_init_default);
     const std::string DEVICE_SERIAL_PORT    = "/dev/ttyUSB0";
-    static constexpr unsigned int BAUD_RATE = 230400;
+    static constexpr unsigned int BAUD_RATE = 460800;
 };

@@ -118,7 +118,6 @@ void Thunderloop::runLoop()
                 auto result       = network_service_->poll(robot_status_);
                 new_primitive_set = std::get<0>(result);
                 new_world         = std::get<1>(result);
-                // LOG(DEBUG) << new_primitive_set.DebugString();
             }
 
             thunderloop_status_.set_network_service_poll_time_ns(
@@ -181,9 +180,8 @@ void Thunderloop::runLoop()
 
                 if (robot.has_value())
                 {
-                    // TODO-JON needs to use world in primitive executor
                     direct_control_ = *primitive_executor_.stepPrimitive(
-                        robot_id_, robot->currentState());
+                        robot_id_, robot->currentState().orientation());
                 }
                 else
                 {
@@ -192,7 +190,7 @@ void Thunderloop::runLoop()
                         RobotState(Point(0, 0), Vector(0, 0), Angle::fromDegrees(0),
                                    Angle::fromDegrees(0));
                     direct_control_ =
-                        *primitive_executor_.stepPrimitive(robot_id_, robot_state);
+                        *primitive_executor_.stepPrimitive(robot_id_, robot_state.orientation());
                 }
             }
 
@@ -202,9 +200,11 @@ void Thunderloop::runLoop()
             // Power Service: execute the power control command
             {
                 ScopedTimespecTimer timer(&poll_time);
-                LOG(DEBUG) << direct_control_.power_control().DebugString();
-                power_status_ = power_service_->poll(direct_control_.power_control());
-                LOG(DEBUG) << power_status_.DebugString();
+                auto kick_slope = std::stoi(redis_client_->get(ROBOT_KICK_SLOPE_REDIS_KEY));
+                auto kick_constant = std::stoi(redis_client_->get(ROBOT_KICK_CONSTANT_REDIS_KEY));
+                auto chip_pulse_width = std::stoi(redis_client_->get(ROBOT_CHIP_PULSE_WIDTH_REDIS_KEY));
+
+                power_status_ = power_service_->poll(direct_control_.power_control(), kick_slope, kick_constant, chip_pulse_width);
             }
             thunderloop_status_.set_power_service_poll_time_ns(
                 static_cast<unsigned long>(poll_time.tv_nsec));
@@ -241,7 +241,6 @@ void Thunderloop::runLoop()
         // Make sure the iteration can fit inside the period of the loop
         loop_duration_seconds =
             static_cast<double>(loop_duration) * SECONDS_PER_NANOSECOND;
-        LOG(DEBUG) << "Loop duration: " << loop_duration_seconds << " seconds";
 
         // Calculate next shot taking into account how long this iteration took
         next_shot.tv_nsec += interval - loop_duration;

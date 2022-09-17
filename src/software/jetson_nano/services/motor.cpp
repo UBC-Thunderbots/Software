@@ -287,7 +287,6 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
         }
     }
 
-    LOG(DEBUG) << motor.DebugString();
     CHECK(encoder_calibrated_[FRONT_LEFT_MOTOR_CHIP_SELECT] &&
           encoder_calibrated_[FRONT_RIGHT_MOTOR_CHIP_SELECT] &&
           encoder_calibrated_[BACK_LEFT_MOTOR_CHIP_SELECT] &&
@@ -487,6 +486,17 @@ WheelSpace_t MotorService::rampWheelVelocity(
     {
         // If smaller, go straight to target
         ramp_wheel_velocity = target_wheel_velocity;
+    }
+
+    // find absolute max wheel velocity
+    auto max_ramp_wheel_velocity = ramp_wheel_velocity.cwiseAbs().maxCoeff();
+
+    // compare against max wheel velocity
+    if (max_ramp_wheel_velocity > max_allowable_wheel_velocity)
+    {
+        // if larger, scale down to max
+        ramp_wheel_velocity = (ramp_wheel_velocity / max_ramp_wheel_velocity) *
+                              max_allowable_wheel_velocity;
     }
 
     return ramp_wheel_velocity;
@@ -774,7 +784,7 @@ void MotorService::startEncoderCalibration(uint8_t motor)
 
 void MotorService::endEncoderCalibration(uint8_t motor)
 {
-    LOG(WARNING) << "Calibrating the encoder, ensure the robot is lifted off the ground";
+    LOG(WARNING) << "Calibrating the encoder, wheels may move";
 
     writeToControllerOrDieTrying(motor, TMC4671_ABN_DECODER_COUNT, 0x00000000);
     writeToControllerOrDieTrying(motor, TMC4671_UQ_UD_EXT, 0x00000000);

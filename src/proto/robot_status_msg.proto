@@ -3,6 +3,7 @@ syntax = "proto3";
 package TbotsProto;
 
 import "proto/tbots_timestamp_msg.proto";
+import "proto/geneva_slot.proto";
 import "proto/geometry.proto";
 
 message RobotStatus
@@ -106,9 +107,11 @@ message NetworkStatus
 message PowerStatus
 {
     // The voltage on the robot’s battery, in volts.
-    float battery_voltage = 1;
-
+    float battery_voltage   = 1;
+    float capacitor_voltage = 2;
     // voltage on the robot’s capacitor, in volts.
-    float current_draw      = 2;
-    bool breakbream_tripped = 3;
+    float current_draw      = 3;
+    Geneva.Slot geneva_slot = 4;
+    uint32 sequence_num     = 5;
+    bool breakbeam_tripped  = 6;
 }
