@@ -11,6 +11,7 @@ import software.python_bindings as cpp_bindings
 from software.py_constants import *
 from software.thunderscope.robot_communication import RobotCommunication
 from software.thunderscope.replay.proto_logger import ProtoLogger
+from xbox360controller import Xbox360Controller
 
 NUM_ROBOTS = 6
 SIM_TICK_RATE_MS = 16

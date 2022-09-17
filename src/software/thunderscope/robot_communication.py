@@ -22,8 +22,8 @@ class RobotCommunication(object):
     In diagnostics mode, this enum is used to select which source the robot should receive primitives from.
     """
     class DiagosticProtoSource(enum.Enum) :
-    RobotDiagnostics
-    HandheldController
+        RobotDiagnostics
+        HandheldController
 
     def __init__(
         self,
