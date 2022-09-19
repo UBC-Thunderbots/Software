@@ -5,6 +5,7 @@ import time
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.common import common_widgets
 from proto.import_all_protos import *
+from software.thunderscope.constants import *
 
 # TODO (#2683) get these values from robot constants
 MAX_DRIBBLER_RPM = 10000

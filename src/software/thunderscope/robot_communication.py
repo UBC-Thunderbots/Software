@@ -11,7 +11,7 @@ from software.logger.logger import createLogger
 logger = createLogger(__name__)
 
 # todo remove
-IGNORE_ESTOP = False 
+IGNORE_ESTOP = True
 
 
 class RobotCommunication(object):
@@ -22,8 +22,8 @@ class RobotCommunication(object):
     In diagnostics mode, this enum is used to select which source the robot should receive primitives from.
     """
     class DiagosticProtoSource(enum.Enum) :
-        RobotDiagnostics
-        HandheldController
+        RobotDiagnostics = 1
+        HandheldController = 2
 
     def __init__(
         self,
@@ -82,19 +82,19 @@ class RobotCommunication(object):
         self.fullsystem_connected_to_robots = False
         self.robot_id_to_diagnostics_proto_source_map = dict()
 
-        try:
-            self.estop_reader = ThreadedEstopReader(
-                self.estop_path, self.estop_buadrate
-            )
-        except Exception:
-            raise Exception("connect estop - not found")
-            pass
+        #try:
+        #    self.estop_reader = ThreadedEstopReader(
+        #        self.estop_path, self.estop_buadrate
+        #    )
+        #except Exception:
+        #    raise Exception("connect estop - not found")
+        #    pass
 
     def __send_estop_state(self):
         while True:
-            self.full_system_proto_unix_io.send_proto(
-                EstopState, EstopState(is_playing=self.estop_reader.isEstopPlay())
-            )
+            #self.full_system_proto_unix_io.send_proto(
+            #    EstopState, EstopState(is_playing=self.estop_reader.isEstopPlay())
+            #)
             time.sleep(0.1)
 
     def run(self):
@@ -148,8 +148,8 @@ class RobotCommunication(object):
                     time_sent=Timestamp(epoch_timestamp_seconds=time.time()),
                     stay_away_from_ball=False,
                     robot_primitives={
-                    robot_id: Primitive(direct_control=diagnostics_primitive) if robot_id_to_diagnostics_proto_source_map[robot_id] == self.DiagosticProtoSource.RobotDiagostics
-                        else robot_id: Primitive(direct_control=controller_primitive)
+                    robot_id: Primitive(direct_control=diagnostics_primitive) if self.robot_id_to_diagnostics_proto_source_map[robot_id] == self.DiagosticProtoSource.RobotDiagnostics
+                        else Primitive(direct_control=controller_primitive)
                         for robot_id in self.robot_id_to_diagnostics_proto_source_map
                     },
                     sequence_number=self.sequence_number,
@@ -157,9 +157,11 @@ class RobotCommunication(object):
 
                 self.sequence_number += 1
 
-                if self.estop_reader.isEstopPlay():
-                    self.last_time = primitive_set.time_sent.epoch_timestamp_seconds
-                    self.send_primitive_set.send_proto(primitive_set)
+                #if self.estop_reader.isEstopPlay():
+                #    self.last_time = primitive_set.time_sent.epoch_timestamp_seconds
+                #    self.send_primitive_set.send_proto(primitive_set)
+                
+                self.send_primitive_set.send_proto(primitive_set)
 
                 time.sleep(0.001)
 
@@ -179,14 +181,12 @@ class RobotCommunication(object):
     def connect_robot_to_robot_diagnostics(self, robot_id):
         self.robot_id_to_diagnostics_proto_source_map[robot_id] = self.DiagosticProtoSource.RobotDiagnostics
 
-    def discconnect_robot_from_diagnostics(self, robot_id):
-        self.robots_connected_to_diagnostics.remove(robot_id)
-
     def disconnect_robot_from_diagnostics(self, robot_id):
         del robot_id_to_diagnostics_proto_source_map[robot_id]
 
     def connect_robot_to_handheld_controller(self, robot_id):
         self.robot_id_to_diagnostics_proto_source_map[robot_id] = self.DiagosticProtoSource.HandheldController
+        print(self.robot_id_to_diagnostics_proto_source_map)
 
     def __enter__(self):
         """Enter RobotCommunication context manager. Setup multicast listener
@@ -255,7 +255,7 @@ class RobotCommunication(object):
 
 #         self.connect_robot_to_diagnostics(2)
 #         self.connect_robot_to_diagnostics(3)
-        self.connect_robot_to_diagnostics(4)  # Connect for diagnostics
+        self.connect_robot_to_handheld_controller(4)  # Connect for diagnostics
         # self.connect_robot_to_diagnostics(5)
         # self.connect_robot_to_diagnostics(6)
         # self.connect_robot_to_diagnostics(7)
