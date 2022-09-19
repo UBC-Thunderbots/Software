@@ -1,7 +1,8 @@
 from pyqtgraph.Qt import QtCore, QtGui
 
 LINE_WIDTH = 3
-
+MAX_LINEAR_SPEED_MPS = 2.0
+MIN_LINEAR_SPEED_MPS = -2.0
 
 class Colors(object):
 

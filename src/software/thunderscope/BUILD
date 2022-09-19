@@ -9,6 +9,7 @@ py_binary(
         ":thunderscope",
         "//software/thunderscope:binary_context_managers",
         "//software/thunderscope/replay:proto_logger",
+        "//software/thunderscope:controller_demo",
     ],
 )
 
@@ -95,6 +96,14 @@ py_library(
     data = [
         "//software:py_constants.so",
     ],
+    deps = [
+        "//software/thunderscope:constants",
+    ],
+)
+
+py_library(
+    name = "controller_demo",
+    srcs = ["controller_demo.py"],
     deps = [
         "//software/thunderscope:constants",
     ],

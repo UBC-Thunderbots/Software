@@ -11,7 +11,7 @@ import software.python_bindings as cpp_bindings
 from software.py_constants import *
 from software.thunderscope.robot_communication import RobotCommunication
 from software.thunderscope.replay.proto_logger import ProtoLogger
-from xbox360controller import Xbox360Controller
+import ControllerDiagnostics
 
 NUM_ROBOTS = 6
 SIM_TICK_RATE_MS = 16
@@ -141,6 +141,14 @@ if __name__ == "__main__":
         help="Estop Baudrate",
     )
 
+    parser.add_argument(
+        "--xbox",
+        action="store",
+        type=str,
+        default='/dev/input/input1',
+        help="Path to the controller",
+    )
+
     # Sanity check that an interface was provided
     args = parser.parse_args()
 
@@ -231,20 +239,36 @@ if __name__ == "__main__":
 
     if args.run_blue or args.run_yellow:
 
-        with ProtoLogger(
-            args.blue_full_system_runtime_dir,
-        ) as blue_logger, ProtoLogger(
-            args.yellow_full_system_runtime_dir,
-        ) as yellow_logger, RobotCommunication(
-            proto_unix_io, getRobotMulticastChannel(0), args.interface
-        ), FullSystem(
-            runtime_dir, debug, friendly_colour_yellow
-        ) as full_system:
+        if args.xbox :
+            with ProtoLogger(
+                args.blue_full_system_runtime_dir,
+            ) as blue_logger, ProtoLogger(
+                args.yellow_full_system_runtime_dir,
+            ) as yellow_logger, RobotCommunication(
+                proto_unix_io, getRobotMulticastChannel(0), args.interface
+            ), FullSystem(
+                runtime_dir, debug, friendly_colour_yellow
+            ) as full_system:
 
-            proto_unix_io.register_to_observe_everything(blue_logger.buffer)
-            proto_unix_io.register_to_observe_everything(yellow_logger.buffer)
-            full_system.setup_proto_unix_io(proto_unix_io)
-            tscope.show()
+                proto_unix_io.register_to_observe_everything(blue_logger.buffer)
+                proto_unix_io.register_to_observe_everything(yellow_logger.buffer)
+                full_system.setup_proto_unix_io(proto_unix_io)
+                tscope.show()
+        else :
+            with ProtoLogger(
+                args.blue_full_system_runtime_dir,
+            ) as blue_logger, ProtoLogger(
+                args.yellow_full_system_runtime_dir,
+            ) as yellow_logger, RobotCommunication(
+                proto_unix_io, getRobotMulticastChannel(0), args.interface
+            ), FullSystem(
+                runtime_dir, debug, friendly_colour_yellow
+            ) as full_system:
+
+                proto_unix_io.register_to_observe_everything(blue_logger.buffer)
+                proto_unix_io.register_to_observe_everything(yellow_logger.buffer)
+                full_system.setup_proto_unix_io(proto_unix_io)
+                tscope.show()
 
     ###########################################################################
     #                              Replay                                     #
