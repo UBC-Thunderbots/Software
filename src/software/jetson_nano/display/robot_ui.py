@@ -78,7 +78,7 @@ class RobotUi:
         self.screens = {
             "Home": HomeScreen(self.lcd_display, self.redis_dict, screen_actions),
         }
-    
+
         time.sleep(2)
 
         def on_click():

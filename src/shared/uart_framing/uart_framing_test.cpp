@@ -103,7 +103,8 @@ class UartFramingTest : public ::testing::Test
     const uint16_t TEST_MESSAGE_CRC = 14297;  // From online calculator
 };
 
-bool operator==(const TbotsProto_PowerPulseControl& lhs, const TbotsProto_PowerPulseControl& rhs)
+bool operator==(const TbotsProto_PowerPulseControl& lhs,
+                const TbotsProto_PowerPulseControl& rhs)
 {
     return serializeToVector(lhs) == serializeToVector(rhs);
 }

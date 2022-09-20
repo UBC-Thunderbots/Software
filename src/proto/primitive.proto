@@ -80,7 +80,8 @@ message AutoChipOrKick
     };
 }
 
-// This is only used for simulation. Similar proto in power_frame_msg.proto but with pulse width instead of m_per_s
+// This is only used for simulation. Similar proto in power_frame_msg.proto but with pulse
+// width instead of m_per_s
 message PowerControl
 {
     message ChickerControl

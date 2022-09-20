@@ -108,10 +108,9 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
         case TbotsProto::Primitive::kMove:
         {
             // Compute the target velocities
-            Vector target_velocity =
-                getTargetLinearVelocity(robot_id, curr_orientation);
-            AngularVelocity target_angular_velocity = getTargetAngularVelocity(
-                current_primitive_.move(), curr_orientation);
+            Vector target_velocity = getTargetLinearVelocity(robot_id, curr_orientation);
+            AngularVelocity target_angular_velocity =
+                getTargetAngularVelocity(current_primitive_.move(), curr_orientation);
 
             auto output = createDirectControlPrimitive(
                 target_velocity, target_angular_velocity,

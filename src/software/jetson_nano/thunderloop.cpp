@@ -189,8 +189,8 @@ void Thunderloop::runLoop()
                     auto robot_state =
                         RobotState(Point(0, 0), Vector(0, 0), Angle::fromDegrees(0),
                                    Angle::fromDegrees(0));
-                    direct_control_ =
-                        *primitive_executor_.stepPrimitive(robot_id_, robot_state.orientation());
+                    direct_control_ = *primitive_executor_.stepPrimitive(
+                        robot_id_, robot_state.orientation());
                 }
             }
 
@@ -200,11 +200,16 @@ void Thunderloop::runLoop()
             // Power Service: execute the power control command
             {
                 ScopedTimespecTimer timer(&poll_time);
-                auto kick_slope = std::stoi(redis_client_->get(ROBOT_KICK_SLOPE_REDIS_KEY));
-                auto kick_constant = std::stoi(redis_client_->get(ROBOT_KICK_CONSTANT_REDIS_KEY));
-                auto chip_pulse_width = std::stoi(redis_client_->get(ROBOT_CHIP_PULSE_WIDTH_REDIS_KEY));
+                auto kick_slope =
+                    std::stoi(redis_client_->get(ROBOT_KICK_SLOPE_REDIS_KEY));
+                auto kick_constant =
+                    std::stoi(redis_client_->get(ROBOT_KICK_CONSTANT_REDIS_KEY));
+                auto chip_pulse_width =
+                    std::stoi(redis_client_->get(ROBOT_CHIP_PULSE_WIDTH_REDIS_KEY));
 
-                power_status_ = power_service_->poll(direct_control_.power_control(), kick_slope, kick_constant, chip_pulse_width);
+                power_status_ =
+                    power_service_->poll(direct_control_.power_control(), kick_slope,
+                                         kick_constant, chip_pulse_width);
             }
             thunderloop_status_.set_power_service_poll_time_ns(
                 static_cast<unsigned long>(poll_time.tv_nsec));
