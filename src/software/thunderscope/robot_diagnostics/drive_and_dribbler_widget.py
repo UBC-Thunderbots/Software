@@ -69,7 +69,7 @@ class DriveAndDribblerWidget(QWidget):
                 self.angular_velocity_slider.value() / 1000.0
             )
 
-        self.proto_unix_io.send_proto(MotorControl, motor_control)
+        #self.proto_unix_io.send_proto(MotorControl, motor_control)
 
     def value_change(self, slider):
         """Change the slider's value by 0.1 per step

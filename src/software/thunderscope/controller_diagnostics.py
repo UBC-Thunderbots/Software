@@ -43,8 +43,8 @@ class ControllerDiagnostics(object):
         motor_control.dribbler_speed_rpm = 0
         motor_control.direct_velocity_control.velocity.x_component_meters = ( self.move_x )
         motor_control.direct_velocity_control.velocity.y_component_meters = ( self.move_y )
+        motor_control.direct_velocity_control.angular_velocity.radians_per_second = ( 0 )
 
-        print(motor_control)
         self.proto_unix_io.send_proto(MotorControl, motor_control)
 
     def close(self):

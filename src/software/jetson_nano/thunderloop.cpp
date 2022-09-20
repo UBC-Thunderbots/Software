@@ -99,17 +99,6 @@ Thunderloop::~Thunderloop() {}
                 first_shot = false;
             }
             
-            TbotsProto::HRVOVisualization hrvo_visualization;
-            hrvo_visualization.set_robot_id(0);
-            auto vo_proto      = *createVelocityObstacleProto(VelocityObstacle(Vector(),
-                                                                               Vector::createFromAngle(Angle::fromDegrees(45)),
-                                                                               Vector::createFromAngle(Angle::fromDegrees(-45))));
-            auto vo_protos = {vo_proto};
-            *(hrvo_visualization.mutable_velocity_obstacles()) = {vo_protos.begin(),
-                                                                  vo_protos.end()};
-            LOG(VISUALIZE) << hrvo_visualization;
-//            LOG(INFO) << "Sending HRVO Visualization";
-
             // If any of the configs have changed, update the network service to switch
             // to the new interface and channel with the correct robot ID
             if (robot_id != robot_id_ || channel_id != channel_id_ ||
@@ -144,6 +133,8 @@ Thunderloop::~Thunderloop() {}
             thunderloop_status_.set_network_service_poll_time_ns(
                 static_cast<unsigned long>(poll_time.tv_nsec));
 
+            LOG(INFO) << "primitive set new: " << new_primitive_set.time_sent().epoch_timestamp_seconds();
+            LOG(INFO) << "primitive set old: " << primitive_set_.time_sent().epoch_timestamp_seconds();
             // If the primitive msg is new, update the internal buffer
             // and start the new primitive.
             if (new_primitive_set.time_sent().epoch_timestamp_seconds() >
