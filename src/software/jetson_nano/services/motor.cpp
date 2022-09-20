@@ -397,6 +397,7 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
     }
     target_wheel_velocities = rampWheelVelocity(
         prev_wheel_velocities, target_linear_velocity,
+        static_cast<double>(robot_constants_.robot_max_speed_m_per_s),
         static_cast<double>(robot_constants_.robot_max_acceleration_m_per_s_2),
         time_elapsed_since_last_poll_s);
 
@@ -454,7 +455,8 @@ void MotorService::spiTransfer(int fd, uint8_t const* tx, uint8_t const* rx, uns
 
 WheelSpace_t MotorService::rampWheelVelocity(
     const WheelSpace_t& current_wheel_velocity,
-    const EuclideanSpace_t& target_euclidean_velocity, double allowed_acceleration,
+    const EuclideanSpace_t& target_euclidean_velocity,
+    double max_allowable_wheel_velocity, double allowed_acceleration,
     const double& time_to_ramp)
 {
     // ramp wheel velocity

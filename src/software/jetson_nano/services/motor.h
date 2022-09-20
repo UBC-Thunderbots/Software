@@ -157,6 +157,7 @@ class MotorService
      */
     WheelSpace_t rampWheelVelocity(const WheelSpace_t& current_wheel_velocity,
                                    const EuclideanSpace_t& target_euclidean_velocity,
+                                   double max_allowable_wheel_velocity,
                                    double allowed_acceleration,
                                    const double& time_to_ramp);
     /**
