@@ -104,7 +104,10 @@ class MotorService
      * runOpenLoopCalibrationRoutine and plot the generated csvs. These csvs capture the
      * data for encoder calibration and adc configuration, the two most important steps
      * for the motor to work. Page 143 (title Setup Guidelines) of the TMC4671 is very
-     * useful. @param motor The motor to configure (the same value as the chip select) */
+     * useful.
+     *
+     * @param motor The motor to configure (the same value as the chip select)
+     */
     void configurePWM(uint8_t motor);
     void configureDribblerPI(uint8_t motor);
     void configureDrivePI(uint8_t motor);
@@ -135,7 +138,7 @@ class MotorService
      * @param tx The tx buffer, data to send out
      * @param rx The rx buffer, will be updated with data from the full-duplex transfer
      * @param len The length of the tx and rx buffer
-     * @param spi_speed
+     * @param spi_speed The speed to run spi at
      *
      */
     void spiTransfer(int fd, uint8_t const* tx, uint8_t const* rx, unsigned len,
@@ -162,6 +165,8 @@ class MotorService
      * @param motor Which motor to talk to (in our case, the chip select)
      * @param data The data to send
      * @param last_transfer The last transfer of uint8_t data for this transaction.
+     * @param spi_speed The speed to run spi at
+     *
      * @return A byte read from the trinamic chip
      */
     uint8_t readWriteByte(uint8_t motor, uint8_t data, uint8_t last_transfer,
@@ -209,6 +214,5 @@ class MotorService
     // Previous wheel velocities
     WheelSpace_t prev_wheel_velocities;
 
-    int heartbeat_state = 0;
     int count           = 0;
 };

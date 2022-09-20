@@ -62,7 +62,7 @@ static const char* DRIVER_CONTROL_ENABLE_GPIO             = "194";
 // All trinamic RPMS are electrical RPMS, they don't factor in the number of pole
 // pairs of the drive motor.
 //
-// TODO compute from robot constants (this was computed by hand and is accurate)
+// TODO (#2720): compute from robot constants (this was computed by hand and is accurate)
 static double MECHANICAL_MPS_PER_ELECTRICAL_RPM = 0.000111;
 static double ELECTRICAL_RPM_PER_MECHANICAL_MPS = 1 / MECHANICAL_MPS_PER_ELECTRICAL_RPM;
 
@@ -400,7 +400,7 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
         static_cast<double>(robot_constants_.robot_max_acceleration_m_per_s_2),
         time_elapsed_since_last_poll_s);
 
-    // TODO interleave the angular accelerations in here at some point.
+    // TODO (#2719): interleave the angular accelerations in here at some point.
     prev_wheel_velocities = target_wheel_velocities;
 
     // Set target speeds accounting for acceleration
