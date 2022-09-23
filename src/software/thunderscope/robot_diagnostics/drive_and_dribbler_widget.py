@@ -7,14 +7,6 @@ from software.thunderscope.common import common_widgets
 from proto.import_all_protos import *
 from software.thunderscope.constants import *
 
-# TODO (#2683) get these values from robot constants
-MAX_DRIBBLER_RPM = 10000
-MIN_DRIBBLER_RPM = -10000
-
-MAX_ANGULAR_SPEED_RAD_PER_S = 20
-MIN_ANGULAR_SPEED_RAD_PER_S = -20
-
-
 class DriveAndDribblerWidget(QWidget):
     def __init__(self, proto_unix_io):
         """Initialize the widget to control the robot's motors

@@ -120,4 +120,4 @@ class ChickerWidget(QWidget):
             pass
             # TODO ATTACH A CALLBACK AND SENDPROTO/KICK IMMEDIATELY
 
-        self.proto_unix_io.send_proto(PowerControl, power_control)
+        #self.proto_unix_io.send_proto(PowerControl, power_control)

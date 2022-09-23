@@ -2,8 +2,18 @@ from pyqtgraph.Qt import QtCore, QtGui
 
 LINE_WIDTH = 3
 
+# TODO (#2683) get these values from robot constants
 MAX_LINEAR_SPEED_MPS = 2.0
 MIN_LINEAR_SPEED_MPS = -2.0
+
+MAX_ANGULAR_SPEED_RAD_PER_S = 20
+MIN_ANGULAR_SPEED_RAD_PER_S = -20
+
+MAX_DRIBBLER_RPM = 10000
+MIN_DRIBBLER_RPM = -10000
+
+MIN_POWER = 1000
+MAX_POWER = 20000
 
 class Colors(object):
 
