@@ -112,7 +112,10 @@ class ControllerDiagnostics(object):
     def send_move_primitive(self):
         motor_control = MotorControl()
 
-        motor_control.dribbler_speed_rpm = self.dribbler_speed
+        motor_control.dribbler_speed_rpm = 0
+        if (self.enable_dribbler) :
+            motor_control.dribbler_speed_rpm = self.dribbler_speed
+
         motor_control.direct_velocity_control.velocity.x_component_meters = ( self.move_x )
         motor_control.direct_velocity_control.velocity.y_component_meters = ( self.move_y )
         motor_control.direct_velocity_control.angular_velocity.radians_per_second = ( self.ang_vel )
