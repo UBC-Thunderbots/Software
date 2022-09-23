@@ -220,27 +220,45 @@ Now that you're setup, if you can run it on the command line, you can run it in 
 
 <details>
 
-1. Open your terminal, `cd` into `Software/src` and run `ifconfig`.
-2. Pick the network interface you would like to use:
-    1. If you are running things locally, you can pick any interface that is not `lo`
-    2. If you would like to communicate with robots on the network, make sure to select the interface that is connected to the same network as the robots.
-3. Run our AI on Thunderscope:
+1. Run our AI on Thunderscope:
     - Thunderscope is the software that coordinates our AI, Simulator, Visualizer and RobotDiagnostics
-    - If we want to run it with real robots:
-        - If we are running the AI as "blue": `./tbots.py run thunderscope_main --interface=[interface_here] --run_blue`
-        - If we are running the AI as "yellow": `./tbots.py run thunderscope_main --interface=[interface_here] --run_yellow`
-        - This command will set up robot communication and the Unix full system binary context manager. The Unix full system context manager hooks up our AI, Backend and SensorFusion
+    - After launching Thunderscope, we can see what the AI is currently "seeing" and interact with it through dynamic parameters. 
     - If we want to run with simulated AI vs AI:
         - `./tbots.py run thunderscope_main` will start Thunderscope with our Simulator, a blue FullSystem and yellow FullSystem. Each FullSystem contains the respective AI for each side. The command will start Thunderscope and set up communication between the Simulator, GameController and FullSystems.
         - We use ER Force's Simulator to simulate how our robots would behave on the field. This simulator is powerful because it includes vision noise, allowing us to further stress test our gameplay.
         - The Simulator outputs SSL Vision packets, which contain position information of all robots and the ball.
         - Our AI can now "see" the robots, and they should be displayed on the Visualizer.
         - You can use ctrl-click to move the ball around in the Simulator, and try changing the Play Override on the Visualizer to see the robots move!
-    - After launching Thunderscope, we can see what the AI is currently "seeing" and interact with it through dynamic parameters. 
-4. Run Robot Diagnostics:
+
+    - If we want to run it with real robots:
+        - Open your terminal, `cd` into `Software/src` and run `ifconfig`.
+            - Pick the network interface you would like to use:
+                1. If you are running things locally, you can pick any interface that is not `lo`
+                2. If you would like to communicate with robots on the network, make sure to select the interface that is connected to the same network as the robots.
+            - For example, on a sample machine, the output may look like this:
+
+                ```
+                enp0s5: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+                        ...
+                        [omitted]
+                        ...
+
+                lo: flags=73<UP,LOOPBACK,RUNNING>  mtu 65536
+                        ...
+                        [omitted]
+                        ...
+                ```
+
+            - An appropriate interface I could choose is `enp0s5`
+        - If we are running the AI as "blue": `./tbots.py run thunderscope_main --interface=[interface_here] --run_blue`
+        - If we are running the AI as "yellow": `./tbots.py run thunderscope_main --interface=[interface_here] --run_yellow`
+        - `[interface_here]` corresponds to the `ifconfig` interfaces seen in the previous step
+            - For instance, a call to run the AI as blue on wifi could be: `./tbots.py run thunderscope_main --interface=enp0s5 --run_blue`
+        - This command will set up robot communication and the Unix full system binary context manager. The Unix full system context manager hooks up our AI, Backend and SensorFusion
+2. Run Robot Diagnostics:
     - (#2711) There isn't a clean way to do this at the moment.
     - The Mechanical and Electrical sub-teams use Robot Diagnostics to test specific parts of the Robot.
-5. Run our SimulatedPlayTests in Thunderscope
+3. Run our SimulatedPlayTests in Thunderscope
     - This will launch the visualizer and simulate AI Plays, allowing us to visually see the robots acting according to their roles.
     1. For legacy C++ tests (#2581) with the visualizer:
         1. First run Thunderscope configured for receiving protobufs over unix sockets correctly: `./tbots.py run thunderscope_main -- --visualize_cpp_test`
@@ -250,7 +268,7 @@ Now that you're setup, if you can run it on the command line, you can run it in 
         - Without the visualizer: `./tbots.py test [some_target_here]`
     3. For legacy C++ tests (#2581) without the visualizer:
         - `./tbots.py test [some_target_here]`
-6. Run our SimulatedTacticTests in Thunderscope:
+4. Run our SimulatedTacticTests in Thunderscope:
     - This will launch the visualizer and simulate an AI Tactic on a single robot
     1. For legacy C++ tests (#2581) with the visualizer:
         - First, run Thunderscope configured for receiving protobufs over unix sockets correctly: `./tbots.py run thunderscope_main -- --visualize_cpp_test`
