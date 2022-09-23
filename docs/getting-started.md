@@ -231,7 +231,7 @@ Now that you're setup, if you can run it on the command line, you can run it in 
         - If we are running the AI as "yellow": `./tbots.py run thunderscope_main --interface=[interface_here] --run_yellow`
         - This command will set up robot communication and the Unix full system binary context manager. The Unix full system context manager hooks up our AI, Backend and SensorFusion
     - If we want to run with simulated AI vs AI:
-        - `./tbots.py run thunderscope_main` will start Thunderscope with our Simulator, a blue FullSystem and yellow FullSystem. Each FullSystem contains the respective AI for each side. The command will start Thunderscope and set up communciation between the Simulator, GameController and FullSystems.
+        - `./tbots.py run thunderscope_main` will start Thunderscope with our Simulator, a blue FullSystem and yellow FullSystem. Each FullSystem contains the respective AI for each side. The command will start Thunderscope and set up communication between the Simulator, GameController and FullSystems.
         - We use ER Force's Simulator to simulate how our robots would behave on the field. This simulator is powerful because it includes vision noise, allowing us to further stress test our gameplay.
         - The Simulator outputs SSL Vision packets, which contain position information of all robots and the ball.
         - Our AI can now "see" the robots, and they should be displayed on the Visualizer.
