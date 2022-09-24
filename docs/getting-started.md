@@ -231,8 +231,8 @@ Now that you're setup, if you can run it on the command line, you can run it in 
 3. Run our SimulatedPlayTests in Thunderscope
     - This will launch the visualizer and simulate AI Plays, allowing us to visually see the robots acting according to their roles.
     1. For legacy C++ tests (#2581) with the visualizer:
-        1. First run Thunderscope configured for receiving protobufs over unix sockets correctly: `./tbots.py run thunderscope_main -- --visualize_cpp_test`
-        2. Then run `./tbots.py test [some_target_here] -- --run_sim_in_realtime`
+        1. First run Thunderscope configured for receiving protobufs over unix sockets correctly: `./tbots.py run thunderscope_main --visualize_cpp_test`
+        2. Then run `./tbots.py test [some_target_here] --run_sim_in_realtime`
     2. For PyTests:
         - With the visualizer: `./tbots.py test [some_target_here] -t`
         - Without the visualizer: `./tbots.py test [some_target_here]`
@@ -241,8 +241,8 @@ Now that you're setup, if you can run it on the command line, you can run it in 
 4. Run our SimulatedTacticTests in Thunderscope:
     - This will launch the visualizer and simulate an AI Tactic on a single robot
     1. For legacy C++ tests (#2581) with the visualizer:
-        - First, run Thunderscope configured for receiving protobufs over unix sockets correctly: `./tbots.py run thunderscope_main -- --visualize_cpp_test`
-        - Then run `./tbots.py test [some_target_here] -- --run_sim_in_realtime`
+        - First, run Thunderscope configured for receiving protobufs over unix sockets correctly: `./tbots.py run thunderscope_main --visualize_cpp_test`
+        - Then run `./tbots.py test [some_target_here] --run_sim_in_realtime`
     2. For PyTests:
         - With the visualizer: `./tbots.py test [some_target_here] -t`
         - Without the visualizer: `./tbots.py test [some_target_here]`
