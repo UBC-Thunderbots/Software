@@ -3,7 +3,7 @@ from software.thunderscope.constants import *
 
 from xbox360controller import Xbox360Controller
 
-AXIS_DEAD_ZONE_THRESHOLD = 0.03
+AXIS_DEAD_ZONE_THRESHOLD = 0.05
 XY_SPEED_LIMIT_MS = 2.0
 ANGULAR_SPEED_LIMIT_RAD_PER_S = 10.0
 
