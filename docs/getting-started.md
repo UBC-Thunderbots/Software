@@ -7,70 +7,43 @@
 * [Software Setup](#software-setup)
    * [Introduction](#introduction)
    * [Installation and Setup](#installation-and-setup)
-      * [Operating Systems](#operating-systems)
-      * [Getting the Code](#getting-the-code)
-      * [Running the setup scripts](#running-the-setup-scripts)
-         * [Installing Software Dependencies](#installing-software-dependencies)
-         * [Installing an IDE](#installing-an-ide)
-            * [CLion](#clion)
                * [Getting your Student License](#getting-your-student-license)
-               * [Installing CLion](#installing-clion)
-            * [VSCode](#vscode)
-   * [Building and Running the Code](#building-and-running-the-code)
-      * [Building from the command-line](#building-from-the-command-line)
-         * [Using the fuzzy finder](#using-the-fuzzy-finder)
-      * [Editing with Vim or NeoVim](#editing-with-vim-or-neovim)
-      * [Building with CLion](#building-with-clion)
-      * [With VSCode](#with-vscode)
-      * [Running our AI, Simulator, SimulatedTests or Robot Diagnostics](#running-our-ai-simulator-simulatedtests-or-robot-diagnostics)
-   * [Debugging](#debugging)
-      * [Debugging with CLion](#debugging-with-clion)
-      * [Debugging from the Command line](#debugging-from-the-command-line)
-   * [Profiling](#profiling)
-   * [Building for Jetson Nano](#building-for-jetson-nano)
-   * [Deploying to Jetson Nano](#deploying-to-jetson-nano)
-   * [Setting up Virtual Robocup 2021](#setting-up-virtual-robocup-2021)
-      * [Setting up the SSL Simulation Environment](#setting-up-the-ssl-simulation-environment)
-      * [Pushing a Dockerfile to dockerhub](#pushing-a-dockerfile-to-dockerhub)
-* [Workflow](#workflow)
-   * [Issue and Project Tracking](#issue-and-project-tracking)
-      * [Issues](#issues)
+               * [Installing CLion](#installing-clion)                                                                                                                                       
+   * [Building and Running the Code](#building-and-running-the-code)                                                                                                                         
+   * [Debugging](#debugging)                                                                                                                                                                 
+   * [Profiling](#profiling)                                                                                                                                                                 
+   * [Building for Jetson Nano](#building-for-jetson-nano)                                                                                                                                   
+   * [Deploying to Jetson Nano](#deploying-to-jetson-nano)                                                                                                                                   
+   * [Setting up Virtual Robocup 2021](#setting-up-virtual-robocup-2021)                                                                                                                     
+* [Workflow](#workflow)                                                                                                                                                                      
+   * [Issue and Project Tracking](#issue-and-project-tracking)                                                                                                                               
    * [Git Workflow](#git-workflow)
-      * [Forking and Branching](#forking-and-branching)
-      * [Creating a new Branch](#creating-a-new-branch)
-         * [Why should you only create branches from "upstream/master"?](#why-should-you-only-create-branches-from-upstreammaster)
-      * [Making Commits](#making-commits)
-      * [Updating Your Branch and Resolving Conflicts](#updating-your-branch-and-resolving-conflicts)
-      * [Formatting Your Code](#formatting-your-code)
-      * [Pull Requests](#pull-requests)
-      * [Reviewing Pull Requests](#reviewing-pull-requests)
    * [Example Workflow](#example-workflow)
    * [Testing](#testing)
 
 # Software Setup
 
 ## Introduction
-<details>
 
 These instructions assume that you have the following accounts setup:
 - [Github](https://github.com/login)
-- [Discord](https://discord.gg/dDHYyX5uJv)
+- [Discord](https://discord.com). Please contact a Thunderbots lead to receive the invite link.
 
 These instructions assume you have a basic understanding of Linux and the command-line. There are many great tutorials online, such as [LinuxCommand](http://linuxcommand.org/). The most important things you'll need to know are how to move around the filesystem, and how to run programs or scripts.
-
-</details>
 
 ## Installation and Setup
 
 <details>
-
-### Operating Systems
+<summary>Operating systems</summary>
 
 We currently only support Linux, specifically Ubuntu 20.04 LTS. You are welcome to use a different version or distribution of Linux, but may need to make some tweaks in order for things to work.
 
 You can use Ubuntu 20.04 LTS inside Windows through Windows Subsystem for Linux, by following [this guide](./getting-started-wsl.md). **Running and developing Thunderbots on Windows is experimental and not officially supported.**
 
-### Getting the Code
+</details>
+
+<details>
+<summary>Getting the Code</summary>
 
 1. Open a new terminal
 2. Install git by running `sudo apt-get install git`
@@ -94,23 +67,23 @@ You can use Ubuntu 20.04 LTS inside Windows through Windows Subsystem for Linux,
 
 *See our [workflow](#workflow) for how to use git to make branches, submit Pull Requests, and track issues*
 
-### Running the setup scripts
+</details>
+
+<details>
+<summary>Installing Software Dependencies</summary>
 
 We have several setup scripts to help you easily install the necessary dependencies in order to build and run our code. You will want to run the following scripts, which can all be found in `Software/environment_setup`
-
-#### Installing Software Dependencies
 
 * Inside a terminal, navigate to the environment_setup folder. Eg. `cd path/to/the/repository/Software/environment_setup`
 * Run `./setup_software.sh`
   * You will be prompted for your admin password
   * This script will install everything necessary in order to build and run our main `AI` software 
+</details>
 
-#### Installing an IDE
+<details>
+<summary>Installing an IDE: CLion</summary>
 
-For those who prefer working on C/C++ with an IDE, we provide two options: [CLion](#clion) for an integrated experience and [VSCode](vscode) for a more lightweight setup. Both support our build system `bazel`.
-
-##### CLion
-
+For those who prefer working on C/C++ with an IDE, we provide two options: CLion for an integrated experience and VSCode for a more lightweight setup. Both support our build system `bazel`.
 CLion is the most full-featured IDE, with code completion, code navigation, and integrated building, testing, and debugging.
 
 ###### Getting your Student License
@@ -127,7 +100,10 @@ CLion is free for students, and you can use your UBC alumni email address to cre
 * Run `./install_clion.sh` (* **DO NOT** download CLion yourself unless you know what you're doing. The `install_clion.sh` script will grab the correct version of CLion and the Bazel plugin to ensure everything is compatible *).
 * When you run CLion for the first time you will be prompted to enter your JetBrains account or License credentials. Use your student account.
 
-##### VSCode
+</details>
+
+<details>
+<summary>Installing an IDE: VSCode</summary>
 
 VSCode is the more lightweight IDE, with support for code navigation, code completion, and integrated building and testing. However, debugging isn't integrated into this IDE.
 
@@ -143,10 +119,7 @@ VSCode is the more lightweight IDE, with support for code navigation, code compl
 ## Building and Running the Code
 
 <details>
-
-### Building from the command-line
-
-<details>
+<summary>Building from the command-line (legacy)</summary>
 
 1. Navigate to the root of this repository (wherever you have it cloned on your computer)
 2. Navigate to `src`.
@@ -158,8 +131,10 @@ VSCode is the more lightweight IDE, with support for code navigation, code compl
 
 *See the Bazel [command-line docs](https://bazel.build/reference/command-line-reference) for more info.*
 *Note: the targets are defined in the BUILD files in our repo*
+</details>
 
-#### Using the fuzzy finder
+<details>
+<summary>Building from the command-line using the fuzzy finder</summary>
 We have a ./tbots.py test runner script in the src folder that will fuzzy find for targets. For example, 
 
 1. Build a specific target for running (for example): `./tbots.py build angletest`
@@ -170,9 +145,9 @@ where the `-t` flag indicates whether Thunderscope should be launched. Run `./tb
 
 </details>
 
-### Editing with Vim or NeoVim
-
 <details>
+<summary>Editing with Vim or NeoVim</summary>
+
 
 When editing with Vim or NeoVim, it's helpful to use plugins, such as [COC](https://github.com/neoclide/coc.nvim) or [LSP](https://github.com/neovim/nvim-lspconfig) to find references, go-to-definition, autocompletion, and more.
 These tools require a `compile_commands.json` file, which can be generated by following these instructions:
@@ -181,9 +156,8 @@ These tools require a `compile_commands.json` file, which can be generated by fo
 
 </details>
 
-### Building with CLion
-
 <details>
+<summary>Building with CLion</summary>
 
 First we need to setup CLion
 1. Open CLion
@@ -205,9 +179,8 @@ Now that you're setup, if you can run it on the command line, you can run it in 
 
 </details>
  
-### With VSCode
-
 <details>
+<summary>Building with VSCode</summary>
 
 1. Open VSCode
 2. Navigate to `Software/src/software/geom/BUILD`
@@ -216,9 +189,8 @@ Now that you're setup, if you can run it on the command line, you can run it in 
 
 </details>
 
-### Running our AI, Simulator, SimulatedTests or Robot Diagnostics
-
 <details>
+<summary>Running our AI, Simulator, SimulatedTests or Robot Diagnostics</summary>
 
 1. Run our AI on Thunderscope:
     - Thunderscope is the software that coordinates our AI, Simulator, Visualizer and RobotDiagnostics
@@ -279,20 +251,21 @@ Now that you're setup, if you can run it on the command line, you can run it in 
     3. For legacy C++ tests (#2581) without the visualizer:
         - `./tbots.py test [some_target_here]`
 </details>
-</details>
-
-</details>
 
 ## Debugging
 
-<details>
 Debugging from the command line is certainly possible, but debugging in a full IDE is *really* nice (plz trust us). 
 
-### Debugging with CLion
+<details>
+<summary>Debugging with CLion</summary>
 Debugging in CLion is as simple as running the above instructions for building CLion, but clicking the little green bug in the top right corner instead of the little green arrow!
+</details>
 
-### Debugging from the Command line
+<details>
+<summary>Debugging from the Command line</summary>
+
 To debug from the command line, first you need to build your target with the debugging flag - `bazel build -c dbg //some/target:here`. When the target builds, you should see a path `bazel-bin/<target>`. Copy that path, and run `gdb <path>`. Please see [here](https://www.cs.cmu.edu/~gilpin/tutorial/) for a tutorial on how to use `gdb` if you're not familiar with it. Alternatively, you could do `bazel run -c dbg --run_under="gdb" //some/target:here`, which will run the target in `gdb`. While this is taken directly from the Bazel docs, gdb may sometimes hang when using `--run_under`, so building the target first with debugging flags and running afterwards is preferred.
+
 </details>
 
 ## Profiling 
@@ -334,14 +307,16 @@ To update binaries on a working robot, you can run:
 ## Setting up Virtual Robocup 2021
 
 <details>
-
-### Setting up the SSL Simulation Environment
+<summary>Setting up the SSL Simulation Environment</summary>
 
 1. Fork the [SSL-Simulation-Setup](https://github.com/RoboCup-SSL/ssl-simulation-setup) repository.  
 2. Clone it.
 3. Follow these [instructions](https://github.com/RoboCup-SSL/ssl-simulation-setup/blob/master/Readme.md) to set up and run the repository.
 
-### Pushing a Dockerfile to dockerhub
+</details>
+
+<details>
+<summary>Pushing a Dockerfile to dockerhub</summary>
 
 After editing the dockerfile, build the image and push it to dockerhub with the following steps
 
@@ -355,11 +330,10 @@ After editing the dockerfile, build the image and push it to dockerhub with the 
 # Workflow
 ## Issue and Project Tracking
 
-<details>
-
 We try keep our issue and project tracking fairly simple, to reduce the overhead associated with tracking all the information and to make it easier to follow. If you are unfamiliar with GitHub issues, [this article](https://guides.github.com/features/issues/) gives a good overview.
 
-### Issues
+<details>
+<summary>Issues</summary>
 
 We use issues to keep track of bugs in our system, and new features or enhancements we want to add. When creating a new issue, we have a simple "Task" template that can be filled out. We *strongly* recommend using the template since it provides guiding questions/headings to make sure we have all the necessary information in each issue.
 
@@ -373,21 +347,20 @@ The same goes for feature requests. Just make sure that whatever you want to say
 
 ## Git Workflow
 
-<details>
 
-### Forking and Branching
+<details>
+<summary>Forking and Branching</summary>
 
 In general, we follow the Forking Workflow
 
 * [What it is](https://www.atlassian.com/git/tutorials/comparing-workflows#forking-workflow)
 * [How to use it](https://gist.github.com/Chaser324/ce0505fbed06b947d962)
-* Instructions on obtaining your own Fork of our repository can be found in the [Getting the Code](#getting-the-code) section.
+* Instructions on obtaining your own Fork of our repository can be found in the [Getting the Code](#building-and-running-the-code) section.
 
 </details>
 
-### Creating a new Branch
-
 <details>
+<summary>Creating a new Branch</summary>
 
 For each Issue of project you are working on, you should have a separate branch. This helps keep work organized and separate.
 
@@ -400,9 +373,10 @@ For each Issue of project you are working on, you should have a separate branch.
    
 **Example:** if you were working on a new navigation system using RRT and your name was "Bob" your branch name might look like: `bob/new_rrt_navigator`
 4. You can now commit changes to this branch, and push them to your fork with `git push origin your_branch_name` or `git push -u`
+</details> 
 
-#### Why should you only create branches from "upstream/master"? 
 <details>
+<summary>Aside: Why should you only create branches from "upstream/master"?</summary>
 
 Because we squash our commits when we merge Pull Requests, a new commit with a new hash will be created, containing the multiple commits from the PR branch. Because the hashes are different, git will not recognize that the squashed commit and the series of commits that are inside the squashed commit contain the same changes, which can result in conflicts.
 
@@ -411,11 +385,9 @@ For example, lets pretend you have _branch A_, which was originally branched fro
 tl;dr Always create new branches from upstream/master. Do not create branches from other feature branches.
 
 </details>
-</details>
-
-### Making Commits
 
 <details>
+<summary>Making Commits</summary>
 
 We don't impose any rules for how you should be committing code, just keep the following general rules in mind:
 
@@ -425,9 +397,8 @@ We don't impose any rules for how you should be committing code, just keep the f
 
 </details>
 
-### Updating Your Branch and Resolving Conflicts
-
 <details>
+<summary>Updating Your Branch and Resolving Conflicts</summary>
 
 As you are working on your code on your branch and making commits, you'll want to update your branch with the latest code on `upstream/master` to make sure you're working with the latest code. This is important in case someone else merged new code that affects the code you're working on.
 
@@ -441,9 +412,8 @@ If you do rebase or merge and get conflicts, you'll need to resolve them manuall
 
 </details>
 
-### Formatting Your Code
-
 <details>
+<summary>Formatting Your Code</summary>
 
 We use [clang-format](https://electronjs.org/docs/development/clang-format) to automatically format our code. Using an automatic tool helps keep things consistent across the codebase without developers having to change their personal style as they write. See the [code style guide](code-style-guide.md) for more information on exactly what it does.
 
@@ -453,9 +423,8 @@ We recommend running the formatting script and then committing all your changes,
 
 </details>
 
-### Pull Requests
-
 <details>
+<summary>Pull Requests</summary>
 
 Pull Requests give us a chance to run our automated tests and review the code before it gets merged. This helps us make sure our code on `upstream/master` always compiles and is as bug-free as possible.
 
@@ -464,7 +433,7 @@ The code-review process gives us a chance ask questions or suggest improvements 
 The Pull Request process usually looks like the following:
  
 1. Make sure all the changes you want to make are pushed to a branch on your fork of the repository
-2. Make sure you have [updated your branch](#updating-your-branch-and-resolving-conflicts) and [formatted your code](#formatting-your-code). This is to help make sure CI will pass.
+2. Make sure you have [updated your branch](#git-workflow) and [formatted your code](#git-workflow). This is to help make sure CI will pass.
 3. From the main page of your fork of the Software repository, click on the "code" tab and then on the "branches" tab below.
 4. Find the branch you want to open a Pull Request with and click "New Pull Request"
 5. Make sure the target (base-fork) is the `UBC-Thunderbots/Software` repository with branch `master`
@@ -496,9 +465,8 @@ The Pull Request process usually looks like the following:
 
 </details>
 
-### Reviewing Pull Requests
-
-<details>
+<details> 
+<summary>Reviewing Pull Requests</summary>
 
 When reviewing Pull Requests, it can be really difficult to phrase comments in a way that doesn't come across as aggressive or mean. That said, it's really important that we strive to keep Pull Requests friendly and open, both for the health of everyone involved, and the effectiveness of the code review process. Here are two links that everyone reviewing a pull request should _thoroughly_ read before doing reviews:
 
@@ -511,9 +479,9 @@ When reviewing Pull Requests, it can be really difficult to phrase comments in a
 
 ## Example Workflow
 
-<details>
+We find our workflow is best explained by walking through an example. We're assuming you have already cloned the repository and set up your git remotes. If not, check out the [Getting the Code](#building-and-running-the-code) instructions first and then come back.
 
-We find our workflow is best explained by walking through an example. We're assuming you have already cloned the repository and set up your git remotes. If not, check out the [Getting the Code](#getting-the-code) instructions first and then come back.
+<details>
 
 This example incorporates information from the previous sections on [Issue and Project Tracking](#issue-and-project-tracking), and [the Git Workflow](#git-workflow). Make sure you have read those sections first. This example skips over some of the smaller details.
   
