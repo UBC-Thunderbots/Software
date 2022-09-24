@@ -7,8 +7,6 @@
 * [Software Setup](#software-setup)
    * [Introduction](#introduction)
    * [Installation and Setup](#installation-and-setup)
-               * [Getting your Student License](#getting-your-student-license)
-               * [Installing CLion](#installing-clion)                                                                                                                                       
    * [Building and Running the Code](#building-and-running-the-code)                                                                                                                         
    * [Debugging](#debugging)                                                                                                                                                                 
    * [Profiling](#profiling)                                                                                                                                                                 
