@@ -143,10 +143,8 @@ if __name__ == "__main__":
 
     parser.add_argument(
         "--xbox",
-        action="store",
-        type=str,
-        default='/dev/input/input1',
-        help="Path to the controller",
+        action="store_true",
+        help="Run robot diagnostics with an Xbox controller",
     )
 
     # Sanity check that an interface was provided
@@ -237,8 +235,8 @@ if __name__ == "__main__":
         friendly_colour_yellow = True
         debug = args.debug_yellow_full_system
 
-    if args.xbox is not None :
-        controller_diagnostics = ControllerDiagnostics(args.xbox, proto_unix_io)
+    if args.xbox:
+        controller_diagnostics = ControllerDiagnostics(proto_unix_io)
 
     if args.run_blue or args.run_yellow:
 

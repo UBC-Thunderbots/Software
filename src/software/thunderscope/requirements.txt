@@ -1,1 +1,2 @@
 pyqtgraph==0.12.3
+xbox360controller==1.1.2

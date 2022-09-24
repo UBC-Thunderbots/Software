@@ -106,5 +106,6 @@ py_library(
     srcs = ["controller_diagnostics.py"],
     deps = [
         "//software/thunderscope:constants",
+        requirement("xbox360controller"),
     ],
 )
