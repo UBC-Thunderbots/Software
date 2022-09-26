@@ -1,8 +1,51 @@
-<!-- 
+Table of Contents                                                                                                                                                                            
+=================                                                                                                                                                                            
+ <!-- 
     NOTE: when creating or re-creating a table of contents like this, you can
     save a LOT of time by using this tool: 
     https://github.com/ekalinin/github-markdown-toc
 -->
+
+* [Software Setup](#software-setup)                                                                                                                                                          
+   * [Introduction](#introduction)                                                                                                                                                           
+   * [Installation and Setup](#installation-and-setup)                                                                                                                                       
+      * [Operating systems](#operating-systems)                                                                                                                                              
+      * [Getting the Code](#getting-the-code)                                                                                                                                                
+      * [Installing Software Dependencies](#installing-software-dependencies)
+      * [Installing an IDE](#installing-an-ide)
+         * [Installing an IDE: CLion](#installing-an-ide-clion)
+            * [Getting your Student License](#getting-your-student-license)
+            * [Installing CLion](#installing-clion)
+      * [Installing an IDE: VSCode](#installing-an-ide-vscode)
+      * [Editing with Vim or NeoVim](#editing-with-vim-or-neovim)
+   * [Building and Running the Code](#building-and-running-the-code)
+      * [Building from the command-line](#building-from-the-command-line)
+      * [Building from the command-line using the fuzzy finder](#building-from-the-command-line-using-the-fuzzy-finder)
+      * [Building with CLion](#building-with-clion)
+      * [Building with VSCode](#building-with-vscode)
+      * [Running our AI, Simulator, SimulatedTests or Robot Diagnostics](#running-our-ai-simulator-simulatedtests-or-robot-diagnostics)
+   * [Debugging](#debugging)
+      * [Debugging with CLion](#debugging-with-clion)
+      * [Debugging from the Command line](#debugging-from-the-command-line)
+   * [Profiling](#profiling)
+   * [Building for Jetson Nano](#building-for-jetson-nano)
+   * [Deploying to Jetson Nano](#deploying-to-jetson-nano)
+   * [Setting up Virtual Robocup 2021](#setting-up-virtual-robocup-2021)
+      * [Setting up the SSL Simulation Environment](#setting-up-the-ssl-simulation-environment)
+      * [Pushing a Dockerfile to dockerhub](#pushing-a-dockerfile-to-dockerhub)
+* [Workflow](#workflow)
+   * [Issue and Project Tracking](#issue-and-project-tracking)
+      * [Issues](#issues)
+   * [Git Workflow](#git-workflow)
+      * [Forking and Branching](#forking-and-branching)
+      * [Creating a new Branch](#creating-a-new-branch)
+      * [Making Commits](#making-commits)
+      * [Updating Your Branch and Resolving Conflicts](#updating-your-branch-and-resolving-conflicts)
+      * [Formatting Your Code](#formatting-your-code)
+      * [Pull Requests](#pull-requests)
+      * [Reviewing Pull Requests](#reviewing-pull-requests)
+   * [Example Workflow](#example-workflow)
+   * [Testing](#testing)
 
 # Software Setup
 
