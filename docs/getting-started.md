@@ -201,7 +201,10 @@ Now that you're setup, if you can run it on the command line, you can run it in 
         - We use ER Force's Simulator to simulate how our robots would behave on the field. This simulator is powerful because it includes vision noise, allowing us to further stress test our gameplay.
         - The Simulator outputs SSL Vision packets, which contain position information of all robots and the ball.
         - Our AI can now "see" the robots, and they should be displayed on the Visualizer.
-        - You can use ctrl-click to move the ball around in the Simulator, and try changing the Play Override on the Visualizer to see the robots move!
+        - Currently, there should be six blue robots and six yellow robots on screen. All these robots are probably stationary because there are no RefereeCommands to respond to. We can change this state using the GameController. In Thunderscope, navigate to the "GameController" tab at the top or alternatively, type `localhost:8081` in your browser. Here, we should see the GameController page with two columns of buttons on the left: one representing commands for the Yellow team and one for the Blue team. We can control gameplay by issuing RefereeCommands.
+            - To start normal gameplay from Kickoff, press "Stop", then "Kickoff" for either team and then "Normal Start".
+            - To learn more about how we coordinate different RefereeCommands to start special case gameplay behaviour (PenaltyKick, CornerKick, FreeKick), look at the [SSL rule documentation](https://ssl.robocup.org/rules/).
+        - In addition, you can use ctrl-click to move the ball around in the Simulator, or try changing the Play Override on the Visualizer to select specific Plays!
 
     - If we want to run it with real robots:
         - Open your terminal, `cd` into `Software/src` and run `ifconfig`.
@@ -222,7 +225,7 @@ Now that you're setup, if you can run it on the command line, you can run it in 
                         ...
                 ```
 
-            - An appropriate interface I could choose is `enp0s5`
+            - An appropriate interface we could choose is `enp0s5`
         - If we are running the AI as "blue": `./tbots.py run thunderscope_main --interface=[interface_here] --run_blue`
         - If we are running the AI as "yellow": `./tbots.py run thunderscope_main --interface=[interface_here] --run_yellow`
         - `[interface_here]` corresponds to the `ifconfig` interfaces seen in the previous step
