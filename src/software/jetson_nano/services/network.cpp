@@ -38,10 +38,8 @@ void NetworkService::primitiveSetCallback(TbotsProto::PrimitiveSet input)
     std::scoped_lock<std::mutex> lock(primitive_set_mutex);
     primitive_set_msg = input;
 
-    if (last_primitive_sequence_number != input.sequence_number() - 1)
-    {
-        total_primitives_lost++;
-    }
+    // TODO(#2727): Implement a recent packet loss instead of overall
+    total_primitives_lost += input.sequence_number() - last_primitive_sequence_number - 1;
 
     float packet_loss = static_cast<float>(total_primitives_lost) /
                         static_cast<float>(input.sequence_number());
@@ -59,6 +57,7 @@ void NetworkService::worldCallback(TbotsProto::World input)
 {
     std::scoped_lock<std::mutex> lock(world_mutex);
     world_msg = input;
+    // TODO(#2728): Implement a recent world loss count and warning
 
     last_world_time = input.time_sent().epoch_timestamp_seconds();
 }

@@ -200,8 +200,6 @@ class MotorService
     bool currently_reading = false;
     uint8_t position       = 0;
 
-    double previous_dribbler_rpm = 0;
-
     // Constants
     RobotConstants_t robot_constants_;
 
@@ -214,6 +212,4 @@ class MotorService
 
     // Previous wheel velocities
     WheelSpace_t prev_wheel_velocities;
-
-    int count = 0;
 };

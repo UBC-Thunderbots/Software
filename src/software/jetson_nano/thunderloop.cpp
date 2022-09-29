@@ -147,6 +147,7 @@ void Thunderloop::runLoop()
             }
 
             // If the world msg is new, update the internal buffer
+            // TODO (#2726): check if world has not been sent for a while
             if (new_world.time_sent().epoch_timestamp_seconds() >
                 world_.time_sent().epoch_timestamp_seconds())
             {
