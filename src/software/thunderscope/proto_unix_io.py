@@ -34,7 +34,7 @@ class ProtoUnixIO:
 
     Sending Protobuf:
 
-    - Clases can also call send_proto to send data to any registered observers
+    - Classes can also call send_proto to send data to any registered observers
 
     Unix IO:
 

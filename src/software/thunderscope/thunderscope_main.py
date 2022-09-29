@@ -83,6 +83,7 @@ if __name__ == "__main__":
         action="store",
         help="Replay folder for the blue full_system",
         default=None,
+        type=os.path.abspath,
     )
     parser.add_argument(
         "--yellow_log",
