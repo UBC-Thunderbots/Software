@@ -87,6 +87,7 @@ void MotionConstraintVisitor::visit(const MoveGoalieToGoalLineTactic &tactic)
 
 void MotionConstraintVisitor::visit(const BallPlacementTactic &tactic)
 {
+    // #TODO #2700: The robot still needs to path plan around a goalie net if it gets stuck
     current_allowed_constraints = std::set<TbotsProto::MotionConstraint>();   
     for (int i = TbotsProto::MotionConstraint_MIN; i < TbotsProto::MotionConstraint_MAX; ++i)
     {
