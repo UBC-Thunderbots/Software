@@ -5,17 +5,13 @@ from software.simulated_tests.robot_enters_region import *
 from software.simulated_tests.ball_enters_region import *
 from software.simulated_tests.ball_moves_forward import *
 from software.simulated_tests.friendly_has_ball_possession import *
-from software.simulated_tests.ball_speed_threshold import *
-from software.simulated_tests.robot_speed_threshold import *
 from software.simulated_tests.ball_stops_in_region import *
 from software.simulated_tests.excessive_dribbling import *
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
 from proto.geometry_pb2 import Point, Angle
-from software.simulated_tests.simulated_test_fixture import (
-    simulated_test_runner,
-    pytest_main,
-)
+from software.simulated_tests.simulated_test_fixture import simulated_test_runner
+from software.simulated_tests.pytest_main import pytest_main
 
 # the friction model currently used in the er-force simulator
 
@@ -38,8 +34,7 @@ def test_simulator_move_ball(
     ball_initial_position, ball_initial_velocity, simulated_test_runner,
 ):
     # Setup Ball
-    simulated_test_runner.simulator_proto_unix_io.send_proto(
-        WorldState,
+    simulated_test_runner.set_worldState(
         create_world_state(
             [],
             blue_robot_locations=[],
@@ -51,15 +46,11 @@ def test_simulator_move_ball(
     # Setup Tactic
     params = AssignedTacticPlayControlParams()
 
-    simulated_test_runner.blue_full_system_proto_unix_io.send_proto(
-        AssignedTacticPlayControlParams, params
-    )
+    simulated_test_runner.set_tactics(params, proto.ssl_gc_common_pb2.Team.BLUE)
 
     # Setup no tactics on the enemy side
     params = AssignedTacticPlayControlParams()
-    simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(
-        AssignedTacticPlayControlParams, params
-    )
+    simulated_test_runner.set_tactics(params, proto.ssl_gc_common_pb2.Team.YELLOW)
 
     # expected ball position
     initial_v = ball_initial_velocity.length()
@@ -100,8 +91,7 @@ def test_simulator_kick_ball(simulated_test_runner):
     rob_pos = ball_initial_position - (kick_velocity.normalize() * 0.1)
 
     # Setup Ball
-    simulated_test_runner.simulator_proto_unix_io.send_proto(
-        WorldState,
+    simulated_test_runner.set_worldState(
         create_world_state(
             [],
             blue_robot_locations=[rob_pos],
@@ -124,15 +114,11 @@ def test_simulator_kick_ball(simulated_test_runner):
         )
     )
 
-    simulated_test_runner.blue_full_system_proto_unix_io.send_proto(
-        AssignedTacticPlayControlParams, params
-    )
+    simulated_test_runner.set_tactics(params, proto.ssl_gc_common_pb2.Team.BLUE)
 
     # Setup no tactics on the enemy side
     params = AssignedTacticPlayControlParams()
-    simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(
-        AssignedTacticPlayControlParams, params
-    )
+    simulated_test_runner.set_tactics(params, proto.ssl_gc_common_pb2.Team.YELLOW)
 
     # expected ball position
 
@@ -242,6 +228,7 @@ def test_ball_robot_collision(simulated_test_runner):
     simulated_test_runner.run_test(
         eventually_validation_sequence_set=eventually_validation_sequence_set,
         always_validation_sequence_set=always_validation_sequence_set,
+        test_timeout_s=4,
     )
 
 
