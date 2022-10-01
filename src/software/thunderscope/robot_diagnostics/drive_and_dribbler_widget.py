@@ -62,13 +62,13 @@ class DriveAndDribblerWidget(QWidget):
         # If we are on the direct velocity control tab
         if self.tabs.currentIndex() == 0:
             motor_control.direct_velocity_control.velocity.x_component_meters = (
-                    self.x_velocity_slider.value() / 1000.0
+                self.x_velocity_slider.value() / 1000.0
             )
             motor_control.direct_velocity_control.velocity.y_component_meters = (
-                    self.y_velocity_slider.value() / 1000.0
+                self.y_velocity_slider.value() / 1000.0
             )
             motor_control.direct_velocity_control.angular_velocity.radians_per_second = (
-                    self.angular_velocity_slider.value() / 1000.0
+                self.angular_velocity_slider.value() / 1000.0
             )
 
         self.proto_unix_io.send_proto(MotorControl, motor_control)
@@ -118,7 +118,7 @@ class DriveAndDribblerWidget(QWidget):
             MIN_ANGULAR_SPEED_RAD_PER_S * 1000,
             MAX_ANGULAR_SPEED_RAD_PER_S * 1000,
             1,
-            )
+        )
 
         self.x_velocity_slider.valueChanged.connect(
             lambda: self.x_velocity_label.setText(
