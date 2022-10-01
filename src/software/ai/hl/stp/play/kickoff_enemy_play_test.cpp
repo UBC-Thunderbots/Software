@@ -32,7 +32,7 @@ TEST_F(KickoffEnemyPlayTest, test_kickoff_enemy_play)
          field.enemyDefenseArea().negXNegYCorner(),
          field.enemyDefenseArea().negXPosYCorner()});
     setEnemyGoalie(0);
-    setAIPlay(TbotsProto::PlayName::KickoffEnemyPlay);
+    setAiPlay(TbotsProto::PlayName::KickoffEnemyPlay);
     setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::PREPARE_KICKOFF_THEM);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
