@@ -16,12 +16,9 @@ logger = createLogger(__name__)
 
 
 #this test can be run either in simulation or on the field
-# @pytest.mark.parametrize(
-#     "robot_x_position, robot_y_position", [(-2.0, -1), (-2.0, 1.0), (0.0, 1.0), (0.0, -1.0)],
-# )
 @pytest.mark.parametrize(
     "robot_x_destination, robot_y_destination", [
-        (-2.0, -1)],
+        (-2.0, -1), (-2.0, 1.0), (0.0, 1.0), (0.0, -1.0)],
 )
 @enable_thunderscope
 def test_basic_movement(tbots_test_runner, robot_y_destination, robot_x_destination):
@@ -80,44 +77,44 @@ def test_basic_movement(tbots_test_runner, robot_y_destination, robot_x_destinat
 
 
 # this test can only be run on the field
-# @enable_thunderscope
-# def test_basic_rotation(field_test_runner):
+@enable_thunderscope
+def test_basic_rotation(field_test_runner):
 
-#     test_angles = [0, 45, 90, 180, 270, 0]
-#     id = 1
+    test_angles = [0, 45, 90, 180, 270, 0]
+    id = 1
 
-#     # current position
-#     world = field_test_runner.world_buffer.get(block=False, timeout=WORLD_BUFFER_TIMEOUT)
-#     robot = [robot for robot in world.friendly_team.team_robots if robot.id == id][0]
+    # current position
+    world = field_test_runner.world_buffer.get(block=False, timeout=WORLD_BUFFER_TIMEOUT)
+    robot = [robot for robot in world.friendly_team.team_robots if robot.id == id][0]
 
-#     rob_pos_p = robot.current_state.global_position
-#     # rob_pos_p = Point(x_meters=-2, y_meters=0)
-#     print("staying in pos ", rob_pos_p)
+    rob_pos_p = robot.current_state.global_position
+    # rob_pos_p = Point(x_meters=-2, y_meters=0)
+    print("staying in pos ", rob_pos_p)
 
-#     for angle in test_angles:
-#         move_tactic = MoveTactic()
-#         move_tactic.destination.CopyFrom(rob_pos_p)
-#         move_tactic.final_speed = 0.0
-#         move_tactic.dribbler_mode = DribblerMode.OFF
-#         move_tactic.final_orientation.CopyFrom(Angle(radians=angle))
-#         move_tactic.ball_collision_type = BallCollisionType.AVOID
-#         move_tactic.auto_chip_or_kick.CopyFrom(
-#             AutoChipOrKick(autokick_speed_m_per_s=0.0)
-#         )
-#         move_tactic.max_allowed_speed_mode = MaxAllowedSpeedMode.PHYSICAL_LIMIT
-#         move_tactic.target_spin_rev_per_s = 0.0
+    for angle in test_angles:
+        move_tactic = MoveTactic()
+        move_tactic.destination.CopyFrom(rob_pos_p)
+        move_tactic.final_speed = 0.0
+        move_tactic.dribbler_mode = DribblerMode.OFF
+        move_tactic.final_orientation.CopyFrom(Angle(radians=angle))
+        move_tactic.ball_collision_type = BallCollisionType.AVOID
+        move_tactic.auto_chip_or_kick.CopyFrom(
+            AutoChipOrKick(autokick_speed_m_per_s=0.0)
+        )
+        move_tactic.max_allowed_speed_mode = MaxAllowedSpeedMode.PHYSICAL_LIMIT
+        move_tactic.target_spin_rev_per_s = 0.0
 
-#         # Setup Tactic
-#         params = AssignedTacticPlayControlParams()
+        # Setup Tactic
+        params = AssignedTacticPlayControlParams()
 
-#         params.assigned_tactics[id].move.CopyFrom(move_tactic)
+        params.assigned_tactics[id].move.CopyFrom(move_tactic)
 
-#         field_test_runner.set_tactics(params, True)
+        field_test_runner.set_tactics(params, True)
 
-#         # validate by eye
-#         logger.info(f"robot set to {angle} orientation")
+        # validate by eye
+        logger.info(f"robot set to {angle} orientation")
 
-#         time.sleep(2)
+        time.sleep(2)
 
 
 

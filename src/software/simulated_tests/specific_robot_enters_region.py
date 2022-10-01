@@ -10,7 +10,7 @@ from software.simulated_tests.validation import (
 
 class SpecificRobotEntersRegion(Validation):
 
-    """Checks if a Robot enters any of the provided regions."""
+    """Checks if a Robot with a given id enters any of the provided regions."""
 
     def __init__(self, robot_id, team: Team, regions=None):
         self.regions = regions if regions else []

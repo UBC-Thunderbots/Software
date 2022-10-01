@@ -21,7 +21,7 @@ PAUSE_AFTER_FAIL_DELAY_S = 3
 
 class TbotsTestRunner(object):
 
-    """Run a test"""
+    """An abstract class that represents a test runner"""
 
     def __init__(
         self,
@@ -30,11 +30,9 @@ class TbotsTestRunner(object):
         yellow_full_system_proto_unix_io,
         gamecontroller,
     ):
-        """Initialize the TestRunner
+        """Initialize the TestRunner. 
         
         :param test_name: The name of the test to run
-        :param thunderscope: The thunderscope to use, None if not used
-        :param simulator_proto_unix_io: The simulator proto unix io to use
         :param blue_full_system_proto_unix_io: The blue full system proto unix io to use
         :param yellow_full_system_proto_unix_io: The yellow full system proto unix io to use
         :param gamecontroller: The gamecontroller context managed instance 
@@ -76,6 +74,15 @@ class TbotsTestRunner(object):
         isBlue: bool,
         final_ball_placement_point=None,
     ):
+        """sends a gamecontroller command that is to be broadcasted to the given team
+
+        param gc_command: the gamecontroller command
+        param isBlue: whether the command should be sent to the blue team
+        final_ball_placement_point: where to place the ball in ball placement
+
+        Raises:
+            NotImplementedError: _description_
+        """
         if isBlue:
             self.gamecontroller.send_ci_input(
                 gc_command=gc_command,
@@ -94,9 +101,25 @@ class TbotsTestRunner(object):
         tactics: AssignedTacticPlayControlParams,
         isBlue: bool,
     ):
+        """Overrides current AI tactic for the given team
+
+        param tactic: the tactic params proto to use
+        param isBlue: whether the play should be aplied to the blue team
+
+        Raises:
+            NotImplementedError: _description_
+        """
         raise NotImplementedError("set_tactic unimplemented")
 
     def set_play(self, play: Play, isBlue: bool):
+        """Overrides current AI play for the given team
+
+        param play: the play proto to use
+        param isBlue: whether the play should be aplied to the blue team
+
+        Raises:
+            NotImplementedError: _description_
+        """
         raise NotImplementedError("set_play unimplemented")
 
     def set_worldState(self, worldstate: WorldState):
@@ -111,6 +134,14 @@ class TbotsTestRunner(object):
         always_validation_sequence_set=[[]],
         eventually_validation_sequence_set=[[]],
         test_timeout_s=3,
-        tick_duration_s=0.0166,  # Default to 60hz
     ):
+        """Begins validating a test based on incoming world protos
+
+        param always_validation_sequence_set: validation set that must always be true
+        param eventually_validation_sequence_set: validation set that must eventually be true
+        param test_timeout_s: how long the test will run
+
+        Raises:
+            NotImplementedError: _description_
+        """
         raise NotImplementedError("run_test unimplemented")

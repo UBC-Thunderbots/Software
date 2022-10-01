@@ -42,7 +42,7 @@ PAUSE_AFTER_FAIL_DELAY_S = 3
 
 
 class FieldTestRunner(TbotsTestRunner):
-    """Run a simulated test"""
+    """Run a field test"""
 
     def __init__(
         self,
@@ -50,20 +50,17 @@ class FieldTestRunner(TbotsTestRunner):
         blue_full_system_proto_unix_io,
         yellow_full_system_proto_unix_io,
         gamecontroller,
-        using_thunderscope=True,
+        publish_validation_protos=True
     ):
-        """Initialize the SimulatorTestRunner
+        """Initialize the FieldTestRunner
         
         :param test_name: The name of the test to run
-        :param thunderscope: The thunderscope to use, None if not used
-        :param simulator_proto_unix_io: The simulator proto unix io to use
         :param blue_full_system_proto_unix_io: The blue full system proto unix io to use
         :param yellow_full_system_proto_unix_io: The yellow full system proto unix io to use
         :param gamecontroller: The gamecontroller context managed instance 
+        :param publish_validation_protos: whether to publish validation protos
 
         """
-
-        logger.info("setting up runner")
 
         super(FieldTestRunner, self).__init__(
             test_name,
@@ -71,15 +68,12 @@ class FieldTestRunner(TbotsTestRunner):
             yellow_full_system_proto_unix_io,
             gamecontroller,
         )
-
-        self.using_thunderscope = using_thunderscope
+        self.publish_validation_protos = publish_validation_protos
 
         logger.info("determining robots on field")
         # survey field for available robot ids
         try:
-            logger.info("waiting on world")
             world = self.world_buffer.get(block=True, timeout=WORLD_BUFFER_TIMEOUT)
-            logger.info("got world")
             logger.info(world)
             self.initial_world = world
             self.friendly_robot_ids_field = [
@@ -96,10 +90,8 @@ class FieldTestRunner(TbotsTestRunner):
                 #raise Exception("no friendly robots found on field")
 
         except queue.Empty as empty:
-            logger.info("no world")
-            #raise Exception("unable to determine robots on the field")
+            raise Exception("unable to determine robots on the field")
 
-        logger.info("determination success")
 
     def set_tactics(
         self,
@@ -293,25 +285,17 @@ class FieldTestRunner(TbotsTestRunner):
         always_validation_sequence_set=[[]],
         eventually_validation_sequence_set=[[]],
         test_timeout_s=3,
-        tick_duration_s=0,  # Default to 60hz
-        referee_ci_inputs=[],
     ):
-        """Run a test
+        """Run a test. In a field test this means beginning validation.
 
-        :param enemy_assigned_tactic_play_control_proto:
-        :param assigned_tactic_play_control_proto:
         :param always_validation_sequence_set: Validation functions that should
                                 hold on every tick
         :param eventually_validation_sequence_set: Validation that should
                                 eventually be true, before the test ends
         :param test_timeout_s: The timeout for the test, if any eventually_validations
                                 remain after the timeout, the test fails.
-        :param tick_duration_s: The simulation step duration
-
         """
-
-        """Step simulation, full_system and run validation
-        """
+        
 
         test_end_time = time.time() + test_timeout_s
 
@@ -343,7 +327,7 @@ class FieldTestRunner(TbotsTestRunner):
                 always_validation_sequence_set,
             )
 
-            if self.thunderscope:
+            if self.publish_validation_protos:
                 # Set the test name
                 eventually_validation_proto_set.test_name = self.test_name
                 always_validation_proto_set.test_name = self.test_name
@@ -356,21 +340,15 @@ class FieldTestRunner(TbotsTestRunner):
                     ValidationProtoSet, always_validation_proto_set
                 )
 
+
             # Check that all always validations are always valid
             validation.check_validation(always_validation_proto_set)
 
         # Check that all eventually validations are eventually valid
         validation.check_validation(eventually_validation_proto_set)
 
-def raise_exception(e):
-    logger.info("raising exception from method")
-    raise e
-
 def field_test_initializer(yellow_full_system_proto_unix_io, blue_full_system_proto_unix_io):
     args = load_command_line_arguments()
-
-
-    logger.info("field test initializer")
 
     # Grab the current test name to store the proto log for the test case
     current_test = os.environ.get("PYTEST_CURRENT_TEST").split(":")[-1].split(" ")[0]
@@ -379,7 +357,6 @@ def field_test_initializer(yellow_full_system_proto_unix_io, blue_full_system_pr
 
     test_name = current_test.split("-")[0]
 
-    logger.info("starting robot communication")
     # Launch all binaries
 
     with FullSystem(
@@ -412,9 +389,6 @@ def field_test_initializer(yellow_full_system_proto_unix_io, blue_full_system_pr
                 gamecontroller,
             )
 
-
-            logger.info("runner initialized")
-
             # Setup proto loggers.
             #
             # NOTE: Its important we use the test runners time provider because
@@ -434,9 +408,7 @@ def field_test_initializer(yellow_full_system_proto_unix_io, blue_full_system_pr
                 yellow_full_system_proto_unix_io.register_to_observe_everything(
                     yellow_logger.buffer
                 )
-                logger.info("yielding")
                 yield runner
-                logger.info("post fixture yield")
                 print(
                     f"\n\nTo replay this test for the blue team, go to the `src` folder and run \n./tbots.py run thunderscope --blue_log {blue_logger.log_folder}"
                 )

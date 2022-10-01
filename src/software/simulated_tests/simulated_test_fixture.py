@@ -50,16 +50,17 @@ class SimulatorTestRunner(TbotsTestRunner):
         blue_full_system_proto_unix_io,
         yellow_full_system_proto_unix_io,
         gamecontroller,
-        publish_validation_protos=True
+        publish_validation_protos=True,
+        simulation_tick_duration =0.0166 #default to 60HZ
     ):
         """Initialize the SimulatorTestRunner
         
         :param test_name: The name of the test to run
-        :param thunderscope: The thunderscope to use, None if not used
         :param simulator_proto_unix_io: The simulator proto unix io to use
         :param blue_full_system_proto_unix_io: The blue full system proto unix io to use
         :param yellow_full_system_proto_unix_io: The yellow full system proto unix io to use
         :param gamecontroller: The gamecontroller context managed instance 
+        :param publish_validation_protos: whether to publish validation protos
 
         """
 
@@ -71,7 +72,8 @@ class SimulatorTestRunner(TbotsTestRunner):
         )
         self.simulator_proto_unix_io = simulator_proto_unix_io
         self.publish_validation_protos= publish_validation_protos
-
+        self.tick_duration = simulation_tick_duration
+    
     def set_tactics(
         self,
         tactics: AssignedTacticPlayControlParams,
@@ -107,7 +109,6 @@ class SimulatorTestRunner(TbotsTestRunner):
         always_validation_sequence_set=[[]],
         eventually_validation_sequence_set=[[]],
         test_timeout_s=3,
-        tick_duration_s=0.0166,  # Default to 60hz
     ):
         """Run a test
 
@@ -117,9 +118,6 @@ class SimulatorTestRunner(TbotsTestRunner):
                                 eventually be true, before the test ends
         :param test_timeout_s: The timeout for the test, if any eventually_validations
                                 remain after the timeout, the test fails.
-        :param tick_duration_s: The simulation step duration
-        :param referee_ci_inputs: A list of referee ci inputs that will be sent every second
-
         """
 
         def __runner():
@@ -227,6 +225,7 @@ def simulated_test_initializer(simulator_proto_unix_io, yellow_full_system_proto
 
             blue_fs.setup_proto_unix_io(blue_full_system_proto_unix_io)
             yellow_fs.setup_proto_unix_io(yellow_full_system_proto_unix_io)
+
             simulator.setup_proto_unix_io(
                 simulator_proto_unix_io,
                 blue_full_system_proto_unix_io,
@@ -235,8 +234,6 @@ def simulated_test_initializer(simulator_proto_unix_io, yellow_full_system_proto
             gamecontroller.setup_proto_unix_io(
                 blue_full_system_proto_unix_io, yellow_full_system_proto_unix_io,
             )
-
-            logger.info(simulator_proto_unix_io.unix_listeners)
 
             runner = SimulatorTestRunner(
                 current_test,
