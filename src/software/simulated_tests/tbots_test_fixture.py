@@ -16,8 +16,9 @@ from software.logger.logger import createLogger
 
 logger = createLogger(__name__)
 
+LAUNCH_DELAY_S = 0.2
 PAUSE_AFTER_FAIL_DELAY_S = 3
-PROCESS_BUFFER_DELAY_S=0.01
+TEST_END_DELAY = 0.5
 simulator_proto_unix_io = ProtoUnixIO()
 yellow_full_system_proto_unix_io = ProtoUnixIO()
 blue_full_system_proto_unix_io = ProtoUnixIO()
@@ -25,35 +26,34 @@ blue_full_system_proto_unix_io = ProtoUnixIO()
 def enable_thunderscope(test):
     def wrapper(*args, **kw):
 
-        def __stopper(delay=PROCESS_BUFFER_DELAY_S):
-            """Stop running the test
-            :param delay: How long to wait before closing everything, defaults
-                          to PROCESS_BUFFER_DELAY_S to minimize buffer warnings
-            """
+        def stop_test(delay):
             time.sleep(delay)
-
             if thunderscope:
                 thunderscope.close()
+           
+        class Excepthook(object):
+            def __init__(self):
+                self.last_exception = None
 
-        def excepthook(args):
-            """This function is _critical_ for show_thunderscope to work.
+            def excepthook(self,args):
+                """This function is _critical_ for show_thunderscope to work.
             If the test Thread raises an exception we won't be able to close
             the window from the main thread.
 
             :param args: The args passed in from the hook
 
             """
-            __stopper(delay=PAUSE_AFTER_FAIL_DELAY_S)
-            last_exception = args.exc_value
-            raise last_exception
+                logger.info("exception caught ")
+                logger.info(args.exc_value)
+                stop_test(PAUSE_AFTER_FAIL_DELAY_S)
+                self.last_exception = args.exc_value
+                raise self.last_exception
 
-        def __runner():
-            LAUNCH_DELAY_S = 0.5
-
-            time.sleep(LAUNCH_DELAY)
+        def run_test():
+            time.sleep(LAUNCH_DELAY_S)
             #first argument is test itself
             test(*args[1:], **kw)
-            __stopper()
+            stop_test(TEST_END_DELAY)
             return
 
         cli_args = load_command_line_arguments()
@@ -64,18 +64,20 @@ def enable_thunderscope(test):
                 blue_full_system_proto_unix_io=blue_full_system_proto_unix_io,
                 yellow_full_system_proto_unix_io=yellow_full_system_proto_unix_io,
             )
-            
+            ex = Excepthook()
+            threading.excepthook = ex.excepthook
+            run_sim_thread = threading.Thread(target=run_test)
+            run_sim_thread.start()
+
+            thunderscope.show()
+            run_sim_thread.join()
+
+            if ex.last_exception:
+                pytest.fail(str(ex.last_exception))
+
         else:
             thunderscope = None
-
-        threading.excepthook = excepthook
-        run_sim_thread = threading.Thread(target=__runner)
-        run_sim_thread.start()
-
-        if cli_args.enable_thunderscope:
-            thunderscope.show()
-
-        run_sim_thread.join()
+            run_test()
 
     return decorator.decorator(wrapper, test)
 
@@ -87,22 +89,25 @@ def field_test_runner():
 
     yield_val = next(initializer)
 
-    if isinstance(yield_val, Exception):
-        raise yield_val
+    logger.info("yielding field test")
+
+    yield yield_val
 
     logger.info("test teardown")
     # test teardown
     try:
         next(initializer)
-    except StopIteration:
-        pass
+    except StopIteration as e:
+        raise e
 
 
 @pytest.fixture
 def simulated_test_runner():
     initializer = simulated_test_initializer(blue_full_system_proto_unix_io=blue_full_system_proto_unix_io, yellow_full_system_proto_unix_io=yellow_full_system_proto_unix_io, simulator_proto_unix_io=simulator_proto_unix_io)
 
-    yield next(initializer)
+    yield_val = next(initializer)
+
+    yield yield_val
 
     # teardown
     try:
@@ -113,6 +118,7 @@ def simulated_test_runner():
 
 @pytest.fixture
 def tbots_test_runner():
+    
     args = load_command_line_arguments()
 
     if args.run_field_test:
@@ -121,7 +127,9 @@ def tbots_test_runner():
     else:
         runner_fixture = simulated_test_initializer(blue_full_system_proto_unix_io=blue_full_system_proto_unix_io, yellow_full_system_proto_unix_io=yellow_full_system_proto_unix_io, simulator_proto_unix_io=simulator_proto_unix_io)
 
-    yield next(runner_fixture)
+    yield_val = next(runner_fixture)
+
+    yield yield_val
 
     # teardown
     try:

@@ -10,7 +10,7 @@ from software.simulated_tests.excessive_dribbling import *
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
 from proto.geometry_pb2 import Point, Angle
-from software.simulated_tests.simulated_test_fixture import simulated_test_runner
+from software.simulated_tests.tbots_test_fixture import *
 from software.simulated_tests.pytest_main import pytest_main
 
 # the friction model currently used in the er-force simulator
@@ -30,6 +30,7 @@ STOPPING_SPEED = 0.01
         (tbots.Point(4.5, 3), tbots.Vector(-3.5, -2),),
     ],
 )
+@enable_thunderscope
 def test_simulator_move_ball(
     ball_initial_position, ball_initial_velocity, simulated_test_runner,
 ):
@@ -83,6 +84,7 @@ def test_simulator_move_ball(
     )
 
 
+@enable_thunderscope
 def test_simulator_kick_ball(simulated_test_runner):
 
     ball_initial_position = tbots.Point(-2.5, 0)
@@ -153,6 +155,7 @@ def test_simulator_kick_ball(simulated_test_runner):
     )
 
 
+@enable_thunderscope
 def test_ball_robot_collision(simulated_test_runner):
 
     ball_initial_position = tbots.Field.createSSLDivisionBField().centerPoint()

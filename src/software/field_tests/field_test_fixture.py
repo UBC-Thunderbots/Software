@@ -92,11 +92,12 @@ class FieldTestRunner(TbotsTestRunner):
             logger.info(f"blue team ids {self.friendly_robot_ids_field}")
 
             if len(self.friendly_robot_ids_field) == 0:
-                raise Exception("no friendly robots found on field")
+                pass
+                #raise Exception("no friendly robots found on field")
 
         except queue.Empty as empty:
             logger.info("no world")
-            raise Exception("unable to determine robots on the field")
+            #raise Exception("unable to determine robots on the field")
 
         logger.info("determination success")
 
@@ -404,17 +405,12 @@ def field_test_initializer(yellow_full_system_proto_unix_io, blue_full_system_pr
                 blue_full_system_proto_unix_io, yellow_full_system_proto_unix_io,
             )
             
-            try:
-                runner = FieldTestRunner(
-                    current_test,
-                    blue_full_system_proto_unix_io,
-                    yellow_full_system_proto_unix_io,
-                    gamecontroller,
-                )
-
-            except Exception as e:
-                logger.info("Exception logged")
-                raise_exception(e)
+            runner = FieldTestRunner(
+                current_test,
+                blue_full_system_proto_unix_io,
+                yellow_full_system_proto_unix_io,
+                gamecontroller,
+            )
 
 
             logger.info("runner initialized")
@@ -440,11 +436,13 @@ def field_test_initializer(yellow_full_system_proto_unix_io, blue_full_system_pr
                 )
                 logger.info("yielding")
                 yield runner
+                logger.info("post fixture yield")
                 print(
                     f"\n\nTo replay this test for the blue team, go to the `src` folder and run \n./tbots.py run thunderscope --blue_log {blue_logger.log_folder}"
                 )
                 print(
                     f"\n\nTo replay this test for the yellow team, go to the `src` folder and run \n./tbots.py run thunderscope --yellow_log {yellow_logger.log_folder}"
                 )
+
 
 

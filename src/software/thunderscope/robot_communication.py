@@ -62,8 +62,10 @@ class RobotCommunication(object):
             PowerControl, self.power_control_diagnostics_buffer
         )
 
-        self.send_estop_state_thread = threading.Thread(target=self.__send_estop_state)
+        self.send_estop_state_thread = threading.Thread(target=self.__send_estop_state, daemon=True)
         self.run_thread = threading.Thread(target=self.run, daemon=True)
+
+        self.keep_running = True
 
         try:
             self.estop_reader = ThreadedEstopReader(
@@ -93,7 +95,7 @@ class RobotCommunication(object):
         is useful to dip in and out of robot diagnostics.
 
         """
-        while True:
+        while self.keep_running:
             if self.fullsystem_connected_to_robots:
 
                 # Send the world
@@ -215,4 +217,5 @@ class RobotCommunication(object):
         """Exit RobotCommunication context manager
 
         """
+        self.keep_running = False
         self.run_thread.join()

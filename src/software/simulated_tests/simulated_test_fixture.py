@@ -75,9 +75,9 @@ class SimulatorTestRunner(TbotsTestRunner):
     def set_tactics(
         self,
         tactics: AssignedTacticPlayControlParams,
-        team: proto.ssl_gc_common_pb2.Team,
+        isBlue: bool,
     ):
-        if team == proto.ssl_gc_common_pb2.Team.BLUE:
+        if isBlue:
             self.blue_full_system_proto_unix_io.send_proto(
                 AssignedTacticPlayControlParams, tactics
             )
@@ -86,8 +86,8 @@ class SimulatorTestRunner(TbotsTestRunner):
                 AssignedTacticPlayControlParams, tactics
             )
 
-    def set_play(self, play: Play, team: proto.ssl_gc_common_pb2.Team):
-        if team == proto.ssl_gc_common_pb2.Team.BLUE:
+    def set_play(self, play: Play, isBlue: bool):
+        if isBlue:
             self.blue_full_system_proto_unix_io.send_proto(Play, play)
 
         else:

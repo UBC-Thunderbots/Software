@@ -8,6 +8,7 @@ from proto.import_all_protos import *
 from software.logger.logger import createLogger
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.thunderscope import Thunderscope
+from proto.ssl_gc_common_pb2 import Team
 
 
 logger = createLogger(__name__)
@@ -72,24 +73,30 @@ class TbotsTestRunner(object):
     def send_gamecontroller_command(
         self,
         gc_command: proto.ssl_gc_state_pb2.Command,
-        team: proto.ssl_gc_common_pb2.Team,
+        isBlue: bool,
         final_ball_placement_point=None,
     ):
-
-        self.gamecontroller.send_ci_input(
-            gc_command=gc_command,
-            team=team,
-            final_ball_placement_point=final_ball_placement_point,
-        )
+        if isBlue:
+            self.gamecontroller.send_ci_input(
+                gc_command=gc_command,
+                team=Team.BLUE,
+                final_ball_placement_point=final_ball_placement_point,
+            )
+        else:
+            self.gamecontroller.send_ci_input(
+                gc_command=gc_command,
+                team=Team.YELLOW,
+                final_ball_placement_point=final_ball_placement_point,
+            )
 
     def set_tactics(
         self,
         tactics: AssignedTacticPlayControlParams,
-        isBlue,
+        isBlue: bool,
     ):
         raise NotImplementedError("set_tactic unimplemented")
 
-    def set_play(self, play: Play, isBlue):
+    def set_play(self, play: Play, isBlue: bool):
         raise NotImplementedError("set_play unimplemented")
 
     def set_worldState(self, worldstate: WorldState):
