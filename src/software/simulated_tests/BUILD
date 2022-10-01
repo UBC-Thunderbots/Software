@@ -142,18 +142,6 @@ py_library(
 )
 
 py_library(
-    name = "data_logger",
-    srcs = [
-        "data_logger.py",
-    ],
-    data = [
-        "//software:py_constants.so",
-    ],
-    deps = [
-    ],
-)
-
-py_library(
     name = "validation",
     srcs = [
         "ball_enters_region.py",
