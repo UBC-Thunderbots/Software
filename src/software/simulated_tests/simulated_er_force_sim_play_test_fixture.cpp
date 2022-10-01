@@ -26,7 +26,7 @@ void SimulatedErForceSimPlayTestFixture::setEnemyGoalie(RobotId goalie_id)
         static_cast<int>(goalie_id));
 }
 
-void SimulatedErForceSimPlayTestFixture::setAIPlay(
+void SimulatedErForceSimPlayTestFixture::setAiPlay(
     const TbotsProto::PlayName& ai_play_name)
 {
     friendly_thunderbots_config.mutable_ai_config()
@@ -36,7 +36,7 @@ void SimulatedErForceSimPlayTestFixture::setAIPlay(
     ai = Ai(friendly_thunderbots_config.ai_config());
 }
 
-void SimulatedErForceSimPlayTestFixture::setAIPlay(std::unique_ptr<Play> play)
+void SimulatedErForceSimPlayTestFixture::setAiPlay(std::unique_ptr<Play> play)
 {
     ai.overridePlay(std::move(play));
 }
@@ -58,7 +58,7 @@ void SimulatedErForceSimPlayTestFixture::setTactic(
         motion_constraint_override_map;
     motion_constraint_override_map[id] = motion_constraints;
     play->updateControlParams({{id, tactic}});
-    setAIPlay(std::move(play));
+    setAiPlay(std::move(play));
 }
 
 void SimulatedErForceSimPlayTestFixture::setRefereeCommand(
