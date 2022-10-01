@@ -33,17 +33,10 @@ class DriveAndDribblerWidget(QWidget):
 
         # Initialize tab screen
         self.tabs = QTabWidget()
-        per_wheel_tab = QWidget()
         direct_velocity_tab = QWidget()
 
         # Add tabs
-        self.tabs.addTab(per_wheel_tab, "Direct Per-Wheel Control")
         self.tabs.addTab(direct_velocity_tab, "Direct Velocity Control")
-
-        # Create per wheel tab
-        self.per_wheel_layout = QVBoxLayout()
-        self.per_wheel_layout.addWidget(self.setup_direct_per_wheel("Drive"))
-        per_wheel_tab.setLayout(self.per_wheel_layout)
 
         # Create direct velocity tab
         self.direct_velocity_layout = QVBoxLayout()
@@ -66,30 +59,16 @@ class DriveAndDribblerWidget(QWidget):
         )
 
         # If we are on the direct per-wheel control tab
-        if self.tabs.currentIndex() == 0:
-            motor_control.direct_per_wheel_control.front_left_wheel_velocity = (
-                self.front_left_velocity_slider.value() / 1000.0
-            )
-            motor_control.direct_per_wheel_control.front_right_wheel_velocity = (
-                self.front_right_velocity_slider.value() / 1000.0
-            )
-            motor_control.direct_per_wheel_control.back_left_wheel_velocity = (
-                self.back_left_velocity_slider.value() / 1000.0
-            )
-            motor_control.direct_per_wheel_control.back_right_wheel_velocity = (
-                self.back_right_velocity_slider.value() / 1000.0
-            )
-
         # If we are on the direct velocity control tab
-        elif self.tabs.currentIndex() == 1:
+        if self.tabs.currentIndex() == 0:
             motor_control.direct_velocity_control.velocity.x_component_meters = (
-                self.x_velocity_slider.value() / 1000.0
+                    self.x_velocity_slider.value() / 1000.0
             )
             motor_control.direct_velocity_control.velocity.y_component_meters = (
-                self.y_velocity_slider.value() / 1000.0
+                    self.y_velocity_slider.value() / 1000.0
             )
             motor_control.direct_velocity_control.angular_velocity.radians_per_second = (
-                self.angular_velocity_slider.value() / 1000.0
+                    self.angular_velocity_slider.value() / 1000.0
             )
 
         self.proto_unix_io.send_proto(MotorControl, motor_control)
@@ -105,81 +84,6 @@ class DriveAndDribblerWidget(QWidget):
         value = value / 1000.0
         value_str = "%.1f" % value
         return value_str
-
-    def setup_direct_per_wheel(self, title):
-        """Create a widget to change the RPM per wheel
-
-        :param title: the name of the slider
-
-        """
-        group_box = QGroupBox(title)
-        dbox = QVBoxLayout()
-
-        # set up the sliders
-        (
-            front_left_layout,
-            self.front_left_velocity_slider,
-            self.front_left_label,
-        ) = common_widgets.create_slider(
-            "Front Left", MIN_LINEAR_SPEED_MPS * 1000, MAX_LINEAR_SPEED_MPS * 1000, 1
-        )
-        (
-            front_right_velocity_layout,
-            self.front_right_velocity_slider,
-            self.front_right_velocity_label,
-        ) = common_widgets.create_slider(
-            "Front Right", MIN_LINEAR_SPEED_MPS * 1000, MAX_LINEAR_SPEED_MPS * 1000, 1
-        )
-        (
-            back_left_velocity_layout,
-            self.back_left_velocity_slider,
-            self.back_left_velocity_label,
-        ) = common_widgets.create_slider(
-            "Back Left", MIN_LINEAR_SPEED_MPS * 1000, MAX_LINEAR_SPEED_MPS * 1000, 1
-        )
-        (
-            back_right_velocity_layout,
-            self.back_right_velocity_slider,
-            self.back_right_velocity_label,
-        ) = common_widgets.create_slider(
-            "Back Right", MIN_LINEAR_SPEED_MPS * 1000, MAX_LINEAR_SPEED_MPS * 1000, 1
-        )
-
-        self.front_left_velocity_slider.valueChanged.connect(
-            lambda: self.front_left_label.setText(
-                self.value_change(self.front_left_velocity_slider)
-            )
-        )
-        self.front_right_velocity_slider.valueChanged.connect(
-            lambda: self.front_right_velocity_label.setText(
-                self.value_change(self.front_right_velocity_slider)
-            )
-        )
-        self.back_left_velocity_slider.valueChanged.connect(
-            lambda: self.back_left_velocity_label.setText(
-                self.value_change(self.back_left_velocity_slider)
-            )
-        )
-        self.back_right_velocity_slider.valueChanged.connect(
-            lambda: self.back_right_velocity_label.setText(
-                self.value_change(self.back_right_velocity_slider)
-            )
-        )
-
-        # set up the stop and reset button
-        stop_and_reset = common_widgets.create_push_button("Stop and Reset")
-        stop_and_reset.clicked.connect(self.reset_all_sliders)
-
-        # add widget
-        dbox.addLayout(front_left_layout)
-        dbox.addLayout(front_right_velocity_layout)
-        dbox.addLayout(back_left_velocity_layout)
-        dbox.addLayout(back_right_velocity_layout)
-        dbox.addWidget(stop_and_reset, alignment=Qt.AlignmentFlag.AlignCenter)
-
-        group_box.setLayout(dbox)
-
-        return group_box
 
     def setup_direct_velocity(self, title):
         """Create a widget to control the direct velocity of the robot's motors
@@ -214,7 +118,7 @@ class DriveAndDribblerWidget(QWidget):
             MIN_ANGULAR_SPEED_RAD_PER_S * 1000,
             MAX_ANGULAR_SPEED_RAD_PER_S * 1000,
             1,
-        )
+            )
 
         self.x_velocity_slider.valueChanged.connect(
             lambda: self.x_velocity_label.setText(
@@ -281,12 +185,6 @@ class DriveAndDribblerWidget(QWidget):
     def reset_all_sliders(self):
         """Reset all sliders back to 0
         """
-
-        self.front_left_velocity_slider.setValue(0)
-        self.front_right_velocity_slider.setValue(0)
-        self.back_left_velocity_slider.setValue(0)
-        self.back_right_velocity_slider.setValue(0)
-
         self.x_velocity_slider.setValue(0)
         self.y_velocity_slider.setValue(0)
         self.angular_velocity_slider.setValue(0)
