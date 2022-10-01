@@ -16,7 +16,6 @@ from software.logger.logger import createLogger
 
 logger = createLogger(__name__)
 
-LAUNCH_DELAY_S = 0.1
 PAUSE_AFTER_FAIL_DELAY_S = 3
 PROCESS_BUFFER_DELAY_S=0.01
 simulator_proto_unix_io = ProtoUnixIO()
@@ -49,7 +48,9 @@ def enable_thunderscope(test):
             raise last_exception
 
         def __runner():
-            time.sleep(5)
+            LAUNCH_DELAY_S = 0.5
+
+            time.sleep(LAUNCH_DELAY)
             #first argument is test itself
             test(*args[1:], **kw)
             __stopper()
@@ -63,6 +64,7 @@ def enable_thunderscope(test):
                 blue_full_system_proto_unix_io=blue_full_system_proto_unix_io,
                 yellow_full_system_proto_unix_io=yellow_full_system_proto_unix_io,
             )
+            
         else:
             thunderscope = None
 
@@ -81,9 +83,13 @@ def enable_thunderscope(test):
 @pytest.fixture
 def field_test_runner():
     initializer = field_test_initializer(blue_full_system_proto_unix_io=blue_full_system_proto_unix_io,
-                                         yellow_full_system_proto_unix_io=yellow_full_system_proto_unix_io)
+                                        yellow_full_system_proto_unix_io=yellow_full_system_proto_unix_io)
 
-    yield next(initializer)
+    yield_val = next(initializer)
+
+    if isinstance(yield_val, Exception):
+        raise yield_val
+
     logger.info("test teardown")
     # test teardown
     try:

@@ -151,6 +151,7 @@ gdb --args bazel-bin/{full_system}
 
         if self.should_restart_on_crash:
             self.thread.join()
+        return
 
     def setup_proto_unix_io(self, proto_unix_io):
         """Helper to run full system and attach the appropriate unix senders/listeners
@@ -282,6 +283,8 @@ gdb --args bazel-bin/{simulator_command}
         if self.er_force_simulator_proc:
             self.er_force_simulator_proc.kill()
             self.er_force_simulator_proc.wait()
+
+        return
 
     def setup_proto_unix_io(
         self,
@@ -416,6 +419,8 @@ class Gamecontroller(object):
 
         if self.ci_socket:
             self.ci_socket.close()
+
+        return
 
     def next_free_port(self, port=40000, max_port=65535):
         """Find the next free port. We need to find 2 free ports to use for the gamecontroller

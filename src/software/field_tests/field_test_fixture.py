@@ -361,6 +361,9 @@ class FieldTestRunner(TbotsTestRunner):
         # Check that all eventually validations are eventually valid
         validation.check_validation(eventually_validation_proto_set)
 
+def raise_exception(e):
+    logger.info("raising exception from method")
+    raise e
 
 def field_test_initializer(yellow_full_system_proto_unix_io, blue_full_system_proto_unix_io):
     args = load_command_line_arguments()
@@ -377,14 +380,15 @@ def field_test_initializer(yellow_full_system_proto_unix_io, blue_full_system_pr
 
     logger.info("starting robot communication")
     # Launch all binaries
-    with RobotCommunication(
-        blue_full_system_proto_unix_io, getRobotMulticastChannel(0), args.interface
-    ) as rc_blue, FullSystem(
+
+    with FullSystem(
         f"{args.blue_full_system_runtime_dir}/test/{test_name}",
         debug_full_system=args.debug_blue_full_system,
         friendly_colour_yellow=False,
         should_restart_on_crash=False,
-    ) as blue_fs, FullSystem(
+    ) as blue_fs, RobotCommunication(
+        blue_full_system_proto_unix_io, getRobotMulticastChannel(0), args.interface
+    ) as rc_blue, FullSystem(
         f"{args.yellow_full_system_runtime_dir}/test/{test_name}",
         debug_full_system=args.debug_yellow_full_system,
         friendly_colour_yellow=True,
@@ -399,13 +403,19 @@ def field_test_initializer(yellow_full_system_proto_unix_io, blue_full_system_pr
             gamecontroller.setup_proto_unix_io(
                 blue_full_system_proto_unix_io, yellow_full_system_proto_unix_io,
             )
+            
+            try:
+                runner = FieldTestRunner(
+                    current_test,
+                    blue_full_system_proto_unix_io,
+                    yellow_full_system_proto_unix_io,
+                    gamecontroller,
+                )
 
-            runner = FieldTestRunner(
-                current_test,
-                blue_full_system_proto_unix_io,
-                yellow_full_system_proto_unix_io,
-                gamecontroller,
-            )
+            except Exception as e:
+                logger.info("Exception logged")
+                raise_exception(e)
+
 
             logger.info("runner initialized")
 

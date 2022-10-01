@@ -63,14 +63,15 @@ class RobotCommunication(object):
         )
 
         self.send_estop_state_thread = threading.Thread(target=self.__send_estop_state)
-        self.run_thread = threading.Thread(target=self.run)
+        self.run_thread = threading.Thread(target=self.run, daemon=True)
 
         try:
             self.estop_reader = ThreadedEstopReader(
                 self.estop_path, self.estop_buadrate
             )
         except Exception:
-            raise Exception("connect estop - not found")
+            pass
+            #raise Exception("connect estop - not found")
 
     def __send_estop_state(self):
         while True:
@@ -180,9 +181,6 @@ class RobotCommunication(object):
             True,
         )
 
-        import time
-
-        time.sleep(2)
         self.receive_ssl_wrapper = SSLWrapperPacketProtoListener(
             SSL_VISION_ADDRESS,
             SSL_VISION_PORT,
@@ -199,15 +197,6 @@ class RobotCommunication(object):
             True,
         )
 
-        self.receive_robot_status = HRVOVisualizationProtoListener(
-            self.multicast_channel + "%" + self.interface,
-            ROBOT_LOGS_PORT,
-            lambda data: self.full_system_proto_unix_io.send_proto(
-                HRVOVisualization, data
-            ),
-            True,
-        )
-
         # Create multicast senders
         self.send_primitive_set = PrimitiveSetProtoSender(
             self.multicast_channel + "%" + self.interface, PRIMITIVE_PORT, True
@@ -218,16 +207,8 @@ class RobotCommunication(object):
         )
 
         self.connect_fullsystem_to_robots()
-        # self.disconnect_fullsystem_from_robots()
-        # self.connect_robot_to_diagnostics(0)
-        # self.connect_robot_to_diagnostics(1)
-        # self.connect_robot_to_diagnostics(2)
-        # self.connect_robot_to_diagnostics(3)
-        # self.connect_robot_to_diagnostics(4)
-        # self.connect_robot_to_diagnostics(5)
-        # self.connect_robot_to_diagnostics(6)
 
-        self.send_estop_state_thread.start()
+        #self.send_estop_state_thread.start()
         self.run_thread.start()
 
     def __exit__(self, type, value, traceback):
