@@ -233,9 +233,9 @@ void Thunderloop::runLoop()
             *(robot_status_.mutable_jetson_status())      = jetson_status_;
 
             // Update Redis
-            redis_client_->set("/battery_voltage",
+            redis_client_->set(ROBOT_BATTERY_VOLTAGE_REDIS_KEY,
                                std::to_string(power_status_.battery_voltage()));
-            redis_client_->set("/current_draw",
+            redis_client_->set(ROBOT_CURRENT_DRAW_REDIS_KEY,
                                std::to_string(power_status_.current_draw()));
         }
 

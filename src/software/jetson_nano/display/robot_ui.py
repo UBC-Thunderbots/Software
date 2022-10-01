@@ -30,6 +30,7 @@ class ScreenActions:
 screen_actions = ScreenActions()
 
 # These are the keys for the redis dicationary
+# TODO(#2728): Replace key strings with values from constants
 redis_keys = [
     "/robot_id",
     "/channel_id",
