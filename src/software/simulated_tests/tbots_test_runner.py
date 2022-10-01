@@ -1,6 +1,4 @@
 import threading
-import time
-import platform
 
 import pytest
 
@@ -97,14 +95,12 @@ class TbotsTestRunner(object):
             )
 
     def set_tactics(
-        self,
-        tactics: AssignedTacticPlayControlParams,
-        isBlue: bool,
+        self, tactics: AssignedTacticPlayControlParams, isBlue: bool,
     ):
         """Overrides current AI tactic for the given team
 
         param tactic: the tactic params proto to use
-        param isBlue: whether the play should be aplied to the blue team
+        param isBlue: whether the play should be applied to the blue team
 
         Raises:
             NotImplementedError: _description_
@@ -115,7 +111,7 @@ class TbotsTestRunner(object):
         """Overrides current AI play for the given team
 
         param play: the play proto to use
-        param isBlue: whether the play should be aplied to the blue team
+        param isBlue: whether the play should be applied to the blue team
 
         Raises:
             NotImplementedError: _description_

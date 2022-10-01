@@ -8,17 +8,15 @@ from software.simulated_tests.tbots_test_fixture import *
 from software.simulated_tests.pytest_main import pytest_main
 from software.logger.logger import createLogger
 from software.simulated_tests.robot_enters_region import RobotEventuallyEntersRegion
-from functools import partial
 from proto.message_translation.tbots_protobuf import create_world_state
 
 logger = createLogger(__name__)
 
 
-
-#this test can be run either in simulation or on the field
+# this test can be run either in simulation or on the field
 @pytest.mark.parametrize(
-    "robot_x_destination, robot_y_destination", [
-        (-2.0, -1), (-2.0, 1.0), (0.0, 1.0), (0.0, -1.0)],
+    "robot_x_destination, robot_y_destination",
+    [(-2.0, -1), (-2.0, 1.0), (0.0, 1.0), (0.0, -1.0)],
 )
 @enable_thunderscope
 def test_basic_movement(tbots_test_runner, robot_y_destination, robot_x_destination):
@@ -28,8 +26,7 @@ def test_basic_movement(tbots_test_runner, robot_y_destination, robot_x_destinat
     ROBOT_ID = 0
     angle = 0
     logger.info("in pytest sim")
-    rob_pos_p = Point(x_meters=robot_x_destination,
-                      y_meters=robot_y_destination)
+    rob_pos_p = Point(x_meters=robot_x_destination, y_meters=robot_y_destination)
 
     logger.info(angle)
     move_tactic = MoveTactic()
@@ -42,13 +39,12 @@ def test_basic_movement(tbots_test_runner, robot_y_destination, robot_x_destinat
     move_tactic.max_allowed_speed_mode = MaxAllowedSpeedMode.PHYSICAL_LIMIT
     move_tactic.target_spin_rev_per_s = 0.0
 
-    #setup world state
+    # setup world state
     initial_worldstate = create_world_state(
         yellow_robot_locations=[],
-        blue_robot_locations=[tbots.Point(
-            robot_starting_x, robot_starting_y)],
-        ball_location=tbots.Point(-3,-3),
-        ball_velocity=tbots.Point(0,0),
+        blue_robot_locations=[tbots.Point(robot_starting_x, robot_starting_y)],
+        ball_location=tbots.Point(-3, -3),
+        ball_velocity=tbots.Point(0, 0),
     )
     tbots_test_runner.set_worldState(initial_worldstate)
 
@@ -62,8 +58,9 @@ def test_basic_movement(tbots_test_runner, robot_y_destination, robot_x_destinat
         [
             RobotEventuallyEntersRegion(
                 regions=[
-                    tbots.Circle(tbots.Point(
-                        robot_x_destination, robot_y_destination), 0.2)
+                    tbots.Circle(
+                        tbots.Point(robot_x_destination, robot_y_destination), 0.2
+                    )
                 ]
             ),
         ]
@@ -84,7 +81,9 @@ def test_basic_rotation(field_test_runner):
     id = 1
 
     # current position
-    world = field_test_runner.world_buffer.get(block=False, timeout=WORLD_BUFFER_TIMEOUT)
+    world = field_test_runner.world_buffer.get(
+        block=False, timeout=WORLD_BUFFER_TIMEOUT
+    )
     robot = [robot for robot in world.friendly_team.team_robots if robot.id == id][0]
 
     rob_pos_p = robot.current_state.global_position
@@ -115,7 +114,6 @@ def test_basic_rotation(field_test_runner):
         logger.info(f"robot set to {angle} orientation")
 
         time.sleep(2)
-
 
 
 if __name__ == "__main__":

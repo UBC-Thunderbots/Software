@@ -62,7 +62,9 @@ class RobotCommunication(object):
             PowerControl, self.power_control_diagnostics_buffer
         )
 
-        self.send_estop_state_thread = threading.Thread(target=self.__send_estop_state, daemon=True)
+        self.send_estop_state_thread = threading.Thread(
+            target=self.__send_estop_state, daemon=True
+        )
         self.run_thread = threading.Thread(target=self.run, daemon=True)
 
         self.keep_running = True
@@ -73,7 +75,7 @@ class RobotCommunication(object):
             )
         except Exception:
             pass
-            #raise Exception("connect estop - not found")
+            # raise Exception("connect estop - not found")
 
     def __send_estop_state(self):
         while True:
@@ -210,7 +212,7 @@ class RobotCommunication(object):
 
         self.connect_fullsystem_to_robots()
 
-        #self.send_estop_state_thread.start()
+        # self.send_estop_state_thread.start()
         self.run_thread.start()
 
     def __exit__(self, type, value, traceback):

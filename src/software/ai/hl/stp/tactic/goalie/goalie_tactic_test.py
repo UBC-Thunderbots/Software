@@ -9,10 +9,14 @@ from software.simulated_tests.ball_speed_threshold import *
 from software.simulated_tests.robot_speed_threshold import *
 from software.simulated_tests.excessive_dribbling import *
 from software.simulated_tests.pytest_main import pytest_main
-from software.simulated_tests.tbots_test_fixture import simulated_test_runner, enable_thunderscope
+from software.simulated_tests.tbots_test_fixture import (
+    simulated_test_runner,
+    enable_thunderscope,
+)
 
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
+
 
 @pytest.mark.parametrize(
     "ball_initial_position,ball_initial_velocity,robot_initial_position",

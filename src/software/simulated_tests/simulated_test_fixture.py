@@ -1,7 +1,6 @@
 import queue
 import time
 import os
-from subprocess import Popen, run
 
 import pytest
 import software.python_bindings as tbots
@@ -27,7 +26,6 @@ from software.thunderscope.replay.proto_logger import ProtoLogger
 from software.logger.logger import createLogger
 from software.simulated_tests.pytest_main import load_command_line_arguments
 from software.simulated_tests.tbots_test_runner import TbotsTestRunner
-from multiprocessing import Process
 from proto.message_translation import tbots_protobuf
 from software.py_constants import *
 
@@ -51,7 +49,7 @@ class SimulatorTestRunner(TbotsTestRunner):
         yellow_full_system_proto_unix_io,
         gamecontroller,
         publish_validation_protos=True,
-        simulation_tick_duration =0.0166 #default to 60HZ
+        simulation_tick_duration=0.0166,  # default to 60HZ
     ):
         """Initialize the SimulatorTestRunner
         
@@ -71,13 +69,11 @@ class SimulatorTestRunner(TbotsTestRunner):
             gamecontroller,
         )
         self.simulator_proto_unix_io = simulator_proto_unix_io
-        self.publish_validation_protos= publish_validation_protos
+        self.publish_validation_protos = publish_validation_protos
         self.tick_duration = simulation_tick_duration
-    
+
     def set_tactics(
-        self,
-        tactics: AssignedTacticPlayControlParams,
-        isBlue: bool,
+        self, tactics: AssignedTacticPlayControlParams, isBlue: bool,
     ):
         if isBlue:
             self.blue_full_system_proto_unix_io.send_proto(
@@ -195,7 +191,11 @@ class SimulatorTestRunner(TbotsTestRunner):
         __runner()
 
 
-def simulated_test_initializer(simulator_proto_unix_io, yellow_full_system_proto_unix_io,blue_full_system_proto_unix_io ):
+def simulated_test_initializer(
+    simulator_proto_unix_io,
+    yellow_full_system_proto_unix_io,
+    blue_full_system_proto_unix_io,
+):
     args = load_command_line_arguments()
 
     # Grab the current test name to store the proto log for the test case

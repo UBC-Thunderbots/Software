@@ -79,7 +79,7 @@ PYBIND11_MODULE(py_constants, m)
     m.attr("PRIMITIVE_PORT")    = PRIMITIVE_PORT;
     m.attr("ROBOT_STATUS_PORT") = ROBOT_STATUS_PORT;
     m.attr("ROBOT_LOGS_PORT")   = ROBOT_LOGS_PORT;
-    
+
     // SSL
     m.attr("SSL_VISION_ADDRESS") = SSL_VISION_ADDRESS;
     m.attr("SSL_VISION_PORT")    = SSL_VISION_PORT;

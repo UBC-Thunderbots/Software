@@ -22,9 +22,7 @@ from software.thunderscope.binary_context_managers import (
     Gamecontroller,
 )
 from software.thunderscope.replay.proto_logger import ProtoLogger
-from proto.message_translation.tbots_protobuf import (
-    create_world_state,
-)
+from proto.message_translation.tbots_protobuf import create_world_state
 
 from software.logger.logger import createLogger
 from software.simulated_tests.pytest_main import load_command_line_arguments
@@ -32,7 +30,6 @@ from software.simulated_tests.tbots_test_runner import TbotsTestRunner
 from software.thunderscope.robot_communication import RobotCommunication
 from software.py_constants import *
 from software.simulated_tests.ball_stops_in_region import BallEventuallyStopsInRegion
-import threading
 
 logger = createLogger(__name__)
 
@@ -50,7 +47,7 @@ class FieldTestRunner(TbotsTestRunner):
         blue_full_system_proto_unix_io,
         yellow_full_system_proto_unix_io,
         gamecontroller,
-        publish_validation_protos=True
+        publish_validation_protos=True,
     ):
         """Initialize the FieldTestRunner
         
@@ -87,16 +84,13 @@ class FieldTestRunner(TbotsTestRunner):
 
             if len(self.friendly_robot_ids_field) == 0:
                 pass
-                #raise Exception("no friendly robots found on field")
+                # raise Exception("no friendly robots found on field")
 
         except queue.Empty as empty:
             raise Exception("unable to determine robots on the field")
 
-
     def set_tactics(
-        self,
-        tactics: AssignedTacticPlayControlParams,
-        isBlue,
+        self, tactics: AssignedTacticPlayControlParams, isBlue,
     ):
         if isBlue:
             self.blue_full_system_proto_unix_io.send_proto(
@@ -128,7 +122,6 @@ class FieldTestRunner(TbotsTestRunner):
         )
 
     def set_worldState(self, worldstate: WorldState):
-
         def __validate(eventually_validation_set, timeout):
             timeout_time = time.time() + timeout
 
@@ -149,9 +142,7 @@ class FieldTestRunner(TbotsTestRunner):
                         always_validation_sequence_set=[[]],
                     )
 
-                    if not validation.contains_failure(
-                            eventually_validation_status
-                    ):
+                    if not validation.contains_failure(eventually_validation_status):
                         break
 
                 except queue.Empty as empty:
@@ -214,7 +205,11 @@ class FieldTestRunner(TbotsTestRunner):
             try:
                 __validate(ball_placement_validation_function, ball_placement_timout_s)
             except:
-                raise Exception("ball placement by blue robot {} to position {} failed".format(self.friendly_robot_ids_field[0],ball_position))
+                raise Exception(
+                    "ball placement by blue robot {} to position {} failed".format(
+                        self.friendly_robot_ids_field[0], ball_position
+                    )
+                )
 
         logger.info("moving robots to start position")
 
@@ -258,8 +253,7 @@ class FieldTestRunner(TbotsTestRunner):
                 robot_positions_validation_functions.append(validation_func)
 
         self.blue_full_system_proto_unix_io.send_proto(
-            AssignedTacticPlayControlParams,
-            initial_position_tactics[BLUE_TEAM_INDEX],
+            AssignedTacticPlayControlParams, initial_position_tactics[BLUE_TEAM_INDEX],
         )
 
         self.yellow_full_system_proto_unix_io.send_proto(
@@ -295,7 +289,6 @@ class FieldTestRunner(TbotsTestRunner):
         :param test_timeout_s: The timeout for the test, if any eventually_validations
                                 remain after the timeout, the test fails.
         """
-        
 
         test_end_time = time.time() + test_timeout_s
 
@@ -340,14 +333,16 @@ class FieldTestRunner(TbotsTestRunner):
                     ValidationProtoSet, always_validation_proto_set
                 )
 
-
             # Check that all always validations are always valid
             validation.check_validation(always_validation_proto_set)
 
         # Check that all eventually validations are eventually valid
         validation.check_validation(eventually_validation_proto_set)
 
-def field_test_initializer(yellow_full_system_proto_unix_io, blue_full_system_proto_unix_io):
+
+def field_test_initializer(
+    yellow_full_system_proto_unix_io, blue_full_system_proto_unix_io
+):
     args = load_command_line_arguments()
 
     # Grab the current test name to store the proto log for the test case
@@ -381,7 +376,7 @@ def field_test_initializer(yellow_full_system_proto_unix_io, blue_full_system_pr
             gamecontroller.setup_proto_unix_io(
                 blue_full_system_proto_unix_io, yellow_full_system_proto_unix_io,
             )
-            
+
             runner = FieldTestRunner(
                 current_test,
                 blue_full_system_proto_unix_io,
@@ -415,6 +410,3 @@ def field_test_initializer(yellow_full_system_proto_unix_io, blue_full_system_pr
                 print(
                     f"\n\nTo replay this test for the yellow team, go to the `src` folder and run \n./tbots.py run thunderscope --yellow_log {yellow_logger.log_folder}"
                 )
-
-
-
