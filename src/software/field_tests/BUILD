@@ -42,7 +42,5 @@ py_test(
         "//software/simulated_tests:tbots_test_runner",
         "//software/simulated_tests:validation",
         requirement("pytest"),
-        requirement("matplotlib"),
-        requirement("seaborn"),
     ],
 )
