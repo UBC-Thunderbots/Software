@@ -88,5 +88,5 @@ class SimulatedErForceSimPlayTestFixture : public SimulatedErForceSimTestFixture
     GameState game_state;
 
     // The AI being tested and used in simulation
-    AI ai;
+    Ai ai;
 };

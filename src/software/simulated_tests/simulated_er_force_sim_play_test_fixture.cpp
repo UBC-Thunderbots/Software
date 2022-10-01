@@ -33,7 +33,7 @@ void SimulatedErForceSimPlayTestFixture::setAIPlay(
         ->mutable_ai_control_config()
         ->set_override_ai_play(ai_play_name);
 
-    ai = AI(friendly_thunderbots_config.ai_config());
+    ai = Ai(friendly_thunderbots_config.ai_config());
 }
 
 void SimulatedErForceSimPlayTestFixture::setAIPlay(std::unique_ptr<Play> play)
