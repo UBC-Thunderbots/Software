@@ -300,14 +300,15 @@ std::size_t HRVOSimulator::addLinearVelocityRobotAgent(const Robot &robot,
 
 std::size_t HRVOSimulator::addHRVOAgent(const Vector &position, float agent_radius,
                                         float max_radius_inflation,
-                                        const Vector &curr_velocity, float maxSpeed,
-                                        float prefSpeed, float maxAccel, AgentPath &path,
-                                        float neighborDist, std::size_t maxNeighbors,
-                                        float uncertaintyOffset)
+                                        const Vector &curr_velocity, float max_speed,
+                                        float pref_speed, float max_accel,
+                                        AgentPath &path, float neighbor_dist,
+                                        std::size_t max_neighbors,
+                                        float uncertainty_offset)
 {
     std::shared_ptr<HRVOAgent> agent = std::make_shared<HRVOAgent>(
-        this, position, neighborDist, maxNeighbors, agent_radius, max_radius_inflation,
-        curr_velocity, maxAccel, path, prefSpeed, maxSpeed, uncertaintyOffset);
+        this, position, neighbor_dist, max_neighbors, agent_radius, max_radius_inflation,
+        curr_velocity, max_accel, path, pref_speed, max_speed, uncertainty_offset);
     agents.push_back(std::move(agent));
     return agents.size() - 1;
 }
@@ -430,34 +431,34 @@ std::optional<std::shared_ptr<HRVOAgent>> HRVOSimulator::getFriendlyAgentFromRob
     return std::nullopt;
 }
 
-float HRVOSimulator::getAgentMaxAccel(std::size_t agentNo) const
+float HRVOSimulator::getAgentMaxAccel(std::size_t agent_no) const
 {
-    return agents[agentNo]->getMaxAccel();
+    return agents[agent_no]->getMaxAccel();
 }
 
-Vector HRVOSimulator::getAgentPosition(std::size_t agentNo) const
+Vector HRVOSimulator::getAgentPosition(std::size_t agent_no) const
 {
-    return agents[agentNo]->getPosition();
+    return agents[agent_no]->getPosition();
 }
 
-float HRVOSimulator::getAgentRadius(std::size_t agentNo) const
+float HRVOSimulator::getAgentRadius(std::size_t agent_no) const
 {
-    return agents[agentNo]->getRadius();
+    return agents[agent_no]->getRadius();
 }
 
-bool HRVOSimulator::hasAgentReachedGoal(std::size_t agentNo) const
+bool HRVOSimulator::hasAgentReachedGoal(std::size_t agent_no) const
 {
-    return agents[agentNo]->hasReachedGoal();
+    return agents[agent_no]->hasReachedGoal();
 }
 
-Vector HRVOSimulator::getAgentVelocity(std::size_t agentNo) const
+Vector HRVOSimulator::getAgentVelocity(std::size_t agent_no) const
 {
-    return agents[agentNo]->getVelocity();
+    return agents[agent_no]->getVelocity();
 }
 
-Vector HRVOSimulator::getAgentPrefVelocity(std::size_t agentNo) const
+Vector HRVOSimulator::getAgentPrefVelocity(std::size_t agent_no) const
 {
-    return agents[agentNo]->getPrefVelocity();
+    return agents[agent_no]->getPrefVelocity();
 }
 
 const std::unique_ptr<KdTree> &HRVOSimulator::getKdTree() const

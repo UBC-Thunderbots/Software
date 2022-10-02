@@ -122,8 +122,8 @@ class KdTree
      */
     void query(HRVOAgent *agent, float range) const
     {
-        float rangeSq = range * range;
-        queryRecursive(agent, rangeSq, 0);
+        float range_sq = range * range;
+        queryRecursive(agent, range_sq, 0);
     }
 
     /**
