@@ -143,13 +143,13 @@ void KdTree::buildRecursive(std::size_t begin, std::size_t end, std::size_t node
     }
 }
 
-void KdTree::queryRecursive(HRVOAgent *agent, float &rangeSq, std::size_t node) const
+void KdTree::queryRecursive(HRVOAgent *agent, float &range_sq, std::size_t node) const
 {
     if (nodes_[node].end_ - nodes_[node].begin_ <= HRVO_MAX_LEAF_SIZE)
     {
         for (std::size_t i = nodes_[node].begin_; i < nodes_[node].end_; ++i)
         {
-            agent->insertNeighbor(agents_[i], rangeSq);
+            agent->insertNeighbor(agents_[i], range_sq);
         }
     }
     else
@@ -203,25 +203,25 @@ void KdTree::queryRecursive(HRVOAgent *agent, float &rangeSq, std::size_t node) 
 
         if (dist_sq_left < dist_sq_right)
         {
-            if (dist_sq_left < rangeSq)
+            if (dist_sq_left < range_sq)
             {
-                queryRecursive(agent, rangeSq, nodes_[node].left_);
+                queryRecursive(agent, range_sq, nodes_[node].left_);
 
-                if (dist_sq_right < rangeSq)
+                if (dist_sq_right < range_sq)
                 {
-                    queryRecursive(agent, rangeSq, nodes_[node].right_);
+                    queryRecursive(agent, range_sq, nodes_[node].right_);
                 }
             }
         }
         else
         {
-            if (dist_sq_right < rangeSq)
+            if (dist_sq_right < range_sq)
             {
-                queryRecursive(agent, rangeSq, nodes_[node].right_);
+                queryRecursive(agent, range_sq, nodes_[node].right_);
 
-                if (dist_sq_left < rangeSq)
+                if (dist_sq_left < range_sq)
                 {
-                    queryRecursive(agent, rangeSq, nodes_[node].left_);
+                    queryRecursive(agent, range_sq, nodes_[node].left_);
                 }
             }
         }

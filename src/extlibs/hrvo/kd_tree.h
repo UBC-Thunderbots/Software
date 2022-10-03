@@ -130,10 +130,10 @@ class KdTree
      * Recursive function to compute the neighbors of the specified agent.
      *
      * @param agent    A pointer to the agent for which neighbors are to be computed.
-     * @param rangeSq  The squared range around the agent.
+     * @param range_sq  The squared range around the agent.
      * @param node     The current k-D tree node.
      */
-    void queryRecursive(HRVOAgent *agent, float &rangeSq, std::size_t node) const;
+    void queryRecursive(HRVOAgent *agent, float &range_sq, std::size_t node) const;
 
    private:
     HRVOSimulator *const simulator_;

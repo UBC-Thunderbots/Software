@@ -139,18 +139,18 @@ class HRVOAgent : public Agent
     class Candidate
     {
        public:
-        Candidate() : velocityObstacle1_(0), velocityObstacle2_(0) {}
+        Candidate() : velocity_obstacle_1_(0), velocity_obstacle_2_(0) {}
 
         // The velocity of the candidate.
         Vector velocity;
 
         // The index of the first VelocityObstacle in velocity_obstacles_ used to compute
         // this candidate.
-        int velocityObstacle1_;
+        int velocity_obstacle_1_;
 
         // The index of the second VelocityObstacle in velocity_obstacles_ used to compute
         // this candidate.
-        int velocityObstacle2_;
+        int velocity_obstacle_2_;
     };
 
     // Percentage of preferred speed that we accept as the lower bound of a potential new

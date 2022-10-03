@@ -85,16 +85,16 @@ VelocityObstacle HRVOAgent::createVelocityObstacle(const Agent &other_agent)
 
         // The opening angle of the velocity obstacle
         // opening angle = arcsin((rad_A + rad_B) / distance_BA)
-        const float openingAngle =
+        const float opening_angle =
             std::asin((radius_ + other_agent.getRadius()) /
                       (position_ - other_agent.getPosition()).length());
         // Direction of the two edges of the velocity obstacles
         Vector right_side =
-            Vector::createFromAngle(Angle::fromRadians(angle - openingAngle));
+            Vector::createFromAngle(Angle::fromRadians(angle - opening_angle));
         Vector left_side =
-            Vector::createFromAngle(Angle::fromRadians(angle + openingAngle));
+            Vector::createFromAngle(Angle::fromRadians(angle + opening_angle));
 
-        const float d = std::sin(2.f * openingAngle);
+        const float d = std::sin(2.f * opening_angle);
 
         // This shifts one side of the velocity obstacle to share the responsibility
         // of avoiding collision with other agent. This assumes that other agent will also
@@ -170,8 +170,8 @@ void HRVOAgent::computeNewVelocity()
 
     candidates_.clear();
     Candidate candidate;
-    candidate.velocityObstacle1_ = std::numeric_limits<int>::max();
-    candidate.velocityObstacle2_ = std::numeric_limits<int>::max();
+    candidate.velocity_obstacle_1_ = std::numeric_limits<int>::max();
+    candidate.velocity_obstacle_2_ = std::numeric_limits<int>::max();
 
     // verifies that the candidate speed is realistic and adds it to the possible
     // candidates
@@ -204,8 +204,8 @@ void HRVOAgent::computeNewVelocity()
         const Vector apex_to_pref_velocity =
             pref_velocity_ - velocity_obstacles_[i].getApex();
 
-        candidate.velocityObstacle1_ = i;
-        candidate.velocityObstacle2_ = i;
+        candidate.velocity_obstacle_1_ = i;
+        candidate.velocity_obstacle_2_ = i;
 
         const float dot_product_1 =
             apex_to_pref_velocity.dot(velocity_obstacles_[i].getRightSide());
@@ -234,8 +234,8 @@ void HRVOAgent::computeNewVelocity()
 
     for (int j = 0; j < static_cast<int>(velocity_obstacles_.size()); ++j)
     {
-        candidate.velocityObstacle1_ = std::numeric_limits<int>::max();
-        candidate.velocityObstacle2_ = j;
+        candidate.velocity_obstacle_1_ = std::numeric_limits<int>::max();
+        candidate.velocity_obstacle_2_ = j;
 
         float discriminant =
             max_speed_ * max_speed_ -
@@ -306,8 +306,8 @@ void HRVOAgent::computeNewVelocity()
     {
         for (int j = i + 1; j < static_cast<int>(velocity_obstacles_.size()); ++j)
         {
-            candidate.velocityObstacle1_ = i;
-            candidate.velocityObstacle2_ = j;
+            candidate.velocity_obstacle_1_ = i;
+            candidate.velocity_obstacle_2_ = j;
 
             float d = (velocity_obstacles_[i].getRightSide())
                           .determinant(velocity_obstacles_[j].getRightSide());
@@ -484,7 +484,7 @@ std::optional<int> HRVOAgent::findIntersectingVelocityObstacle(
 {
     for (int j = 0; j < static_cast<int>(velocity_obstacles_.size()); ++j)
     {
-        if (j != candidate.velocityObstacle1_ && j != candidate.velocityObstacle2_ &&
+        if (j != candidate.velocity_obstacle_1_ && j != candidate.velocity_obstacle_2_ &&
             velocity_obstacles_[j].containsVelocity(candidate.velocity))
         {
             return std::make_optional<int>(j);
