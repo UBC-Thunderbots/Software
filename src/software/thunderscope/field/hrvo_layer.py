@@ -94,9 +94,5 @@ class HRVOLayer(FieldLayer):
 
         for robot_circle in velocity_obstacle_msg.robots:
             painter.drawEllipse(
-                self.createCircle(
-                    int(MILLIMETERS_PER_METER * robot_circle.origin.x_meters),
-                    int(MILLIMETERS_PER_METER * robot_circle.origin.y_meters),
-                    int(MILLIMETERS_PER_METER * robot_circle.radius),
-                )
+                self.createCircle(robot_circle.origin, robot_circle.radius)
             )

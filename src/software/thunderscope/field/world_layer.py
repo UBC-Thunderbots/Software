@@ -7,14 +7,20 @@ from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtCore import Qt
 from pyqtgraph.Qt.QtWidgets import *
 
+from proto.geometry_pb2 import Point, Segment
 from software.py_constants import *
-from software.thunderscope.constants import LINE_WIDTH
+from software.thunderscope.constants import (
+    LINE_WIDTH,
+    SPEED_LINE_WIDTH,
+    SPEED_SEGMENT_SCALE,
+)
 from software.thunderscope.colors import Colors
 from software.networking.threaded_unix_listener import ThreadedUnixListener
 from software.thunderscope.field.field_layer import FieldLayer
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 MAX_ALLOWED_KICK_SPEED_M_PER_S = 6.5
+
 
 class WorldLayer(FieldLayer):
     def __init__(self, simulator_io, friendly_colour_yellow, buffer_size=5):
@@ -329,7 +335,7 @@ class WorldLayer(FieldLayer):
 
         # Draw Centre Circle
         painter.drawEllipse(
-            self.createCircle(0, 0, field.center_circle_radius * MILLIMETERS_PER_METER)
+            self.createCircle(Point(x_meters=0, y_meters=0), field.center_circle_radius)
         )
 
     def draw_team(self, painter, color, team, robot_id_map):
@@ -342,10 +348,9 @@ class WorldLayer(FieldLayer):
         :param robot_id_map: map of robot_id -> text_item for the team being drawn
 
         """
-        convert_degree = -16
-
         for robot in team.team_robots:
 
+            # Draw robot ID
             if robot.id not in robot_id_map:
                 robot_id_font = painter.font()
                 robot_id_font.setPointSize(int(ROBOT_MAX_RADIUS_MILLIMETERS / 4))
@@ -364,20 +369,13 @@ class WorldLayer(FieldLayer):
             )
             robot_id_map[robot.id].setVisible(self.display_robot_id)
 
+            # Draw robot
             painter.setPen(pg.mkPen(color))
             painter.setBrush(pg.mkBrush(color))
-
-            painter.drawChord(
-                self.createCircle(
-                    robot.current_state.global_position.x_meters
-                    * MILLIMETERS_PER_METER,
-                    robot.current_state.global_position.y_meters
-                    * MILLIMETERS_PER_METER,
-                    ROBOT_MAX_RADIUS_MILLIMETERS,
-                ),
-                int((math.degrees(robot.current_state.global_orientation.radians) + 45))
-                * convert_degree,
-                270 * convert_degree,
+            self.drawRobot(
+                robot.current_state.global_position,
+                robot.current_state.global_orientation,
+                painter,
             )
 
     def draw_ball_state(self, painter, ball_state: BallState):
@@ -392,11 +390,7 @@ class WorldLayer(FieldLayer):
         painter.setBrush(pg.mkBrush(Colors.BALL_COLOR))
 
         painter.drawEllipse(
-            self.createCircle(
-                ball_state.global_position.x_meters * MILLIMETERS_PER_METER,
-                ball_state.global_position.y_meters * MILLIMETERS_PER_METER,
-                BALL_MAX_RADIUS_MILLIMETERS,
-            )
+            self.createCircle(ball_state.global_position, BALL_MAX_RADIUS_METERS)
         )
 
         # If the mouse is being dragged on the screen, visualize
@@ -443,11 +437,7 @@ class WorldLayer(FieldLayer):
             ):
                 painter.drawEllipse(
                     self.createCircle(
-                        robot.current_state.global_position.x_meters
-                        * MILLIMETERS_PER_METER,
-                        robot.current_state.global_position.y_meters
-                        * MILLIMETERS_PER_METER,
-                        ROBOT_MAX_RADIUS_MILLIMETERS / 2,
+                        robot.current_state.global_position, ROBOT_MAX_RADIUS_METERS / 2
                     )
                 )
 
@@ -457,31 +447,19 @@ class WorldLayer(FieldLayer):
         :param painter: The painter
 
         """
-        painter.setPen(pg.mkPen(Colors.SPEED_COLOR, width=LINE_WIDTH))
+        painter.setPen(pg.mkPen(Colors.SPEED_COLOR, width=SPEED_LINE_WIDTH))
 
         for robot in self.cached_world.friendly_team.team_robots:
-            start_x = robot.current_state.global_position.x_meters
-            start_y = robot.current_state.global_position.y_meters
-            painter.drawLine(
-                QtCore.QLine(
-                    int(start_x * MILLIMETERS_PER_METER),
-                    int(start_y * MILLIMETERS_PER_METER),
-                    int(
-                        (
-                            start_x
-                            + robot.current_state.global_velocity.x_component_meters
-                        )
-                        * MILLIMETERS_PER_METER
-                    ),
-                    int(
-                        (
-                            start_y
-                            + robot.current_state.global_velocity.y_component_meters
-                        )
-                        * MILLIMETERS_PER_METER
-                    ),
-                )
+            velocity = robot.current_state.global_velocity
+            start = robot.current_state.global_position
+            end = Point(
+                x_meters=start.x_meters
+                + velocity.x_component_meters * SPEED_SEGMENT_SCALE,
+                y_meters=start.y_meters
+                + velocity.y_component_meters * SPEED_SEGMENT_SCALE,
             )
+            speed_line = Segment(start=start, end=end)
+            self.drawSegment(speed_line, painter)
 
     def draw_ball_speed(self, painter):
         """Draw the ball speed
@@ -489,25 +467,17 @@ class WorldLayer(FieldLayer):
         :param painter: The painter
 
         """
-        painter.setPen(pg.mkPen(Colors.SPEED_COLOR, width=LINE_WIDTH))
+        painter.setPen(pg.mkPen(Colors.SPEED_COLOR, width=SPEED_LINE_WIDTH))
 
         ball = self.cached_world.ball
-        start_x = ball.current_state.global_position.x_meters
-        start_y = ball.current_state.global_position.y_meters
-        painter.drawLine(
-            QtCore.QLine(
-                int(start_x * MILLIMETERS_PER_METER),
-                int(start_y * MILLIMETERS_PER_METER),
-                int(
-                    (start_x + ball.current_state.global_velocity.x_component_meters)
-                    * MILLIMETERS_PER_METER
-                ),
-                int(
-                    (start_y + ball.current_state.global_velocity.y_component_meters)
-                    * MILLIMETERS_PER_METER
-                ),
-            )
+        velocity = ball.current_state.global_velocity
+        start = ball.current_state.global_position
+        end = Point(
+            x_meters=start.x_meters + velocity.x_component_meters * SPEED_SEGMENT_SCALE,
+            y_meters=start.y_meters + velocity.y_component_meters * SPEED_SEGMENT_SCALE,
         )
+        speed_line = Segment(start=start, end=end)
+        self.drawSegment(speed_line, painter)
 
     def paint(self, painter, option, widget):
         """Paint this layer

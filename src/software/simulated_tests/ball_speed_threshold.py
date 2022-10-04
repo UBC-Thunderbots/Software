@@ -1,7 +1,7 @@
 import software.python_bindings as tbots
 from proto.import_all_protos import *
 from software.py_constants import *
-from software.thunderscope.speed_threshold_helpers import *
+from software.simulated_tests.speed_threshold_helpers import *
 
 from software.simulated_tests.validation import (
     Validation,

@@ -1,6 +1,7 @@
 import software.python_bindings as tbots
 from proto.import_all_protos import *
 from software.py_constants import *
+from software.thunderscope.constants import SPEED_SEGMENT_SCALE
 import math
 
 """Helper functions for robot_speed_threshold and ball_speed_threshold"""
@@ -43,11 +44,19 @@ def get_ball_speed(ball):
 
 
 def get_validation_centre_position(x_pos, y_pos, speed_threshold, angle):
-    validation_centre_x = x_pos + MILLIMETERS_PER_METER * speed_threshold * math.cos(
-        angle
+    validation_centre_x = (
+        x_pos
+        + MILLIMETERS_PER_METER
+        * speed_threshold
+        * SPEED_SEGMENT_SCALE
+        * math.cos(angle)
     )
-    validation_centre_y = y_pos + MILLIMETERS_PER_METER * speed_threshold * math.sin(
-        angle
+    validation_centre_y = (
+        y_pos
+        + MILLIMETERS_PER_METER
+        * speed_threshold
+        * SPEED_SEGMENT_SCALE
+        * math.sin(angle)
     )
 
     return validation_centre_x, validation_centre_y

@@ -51,13 +51,7 @@ class ValidationLayer(FieldLayer):
             painter.setPen(pg.mkPen(Colors.VALIDATION_FAILED_COLOR, width=3))
 
         for circle in validation.geometry.circles:
-            painter.drawEllipse(
-                self.createCircle(
-                    int(MILLIMETERS_PER_METER * circle.origin.x_meters),
-                    int(MILLIMETERS_PER_METER * circle.origin.y_meters),
-                    int(MILLIMETERS_PER_METER * circle.radius),
-                )
-            )
+            painter.drawEllipse(self.createCircle(circle.origin, circle.radius))
 
         for polygon in validation.geometry.polygons:
             polygon_points = [

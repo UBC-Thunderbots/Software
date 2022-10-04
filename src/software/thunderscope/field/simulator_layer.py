@@ -4,6 +4,7 @@ from proto.import_all_protos import *
 from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtCore import Qt
 
+from proto.geometry_pb2 import Point
 from software.thunderscope.colors import Colors
 from software.networking.threaded_unix_listener import ThreadedUnixListener
 from software.py_constants import *
@@ -45,10 +46,7 @@ class SimulatorLayer(FieldLayer):
         painter.setBrush(pg.mkBrush(Colors.SIM_BALL_COLOR))
 
         # Draw the ball from the simulator state
-        painter.drawEllipse(
-            self.createCircle(
-                sim_world_state.ball.p_y * MILLIMETERS_PER_METER,
-                -sim_world_state.ball.p_x * MILLIMETERS_PER_METER,
-                BALL_MAX_RADIUS_MILLIMETERS,
-            )
+        origin = Point(
+            x_meters=sim_world_state.ball.p_y, y_meters=-sim_world_state.ball.p_x
         )
+        painter.drawEllipse(self.createCircle(origin, BALL_MAX_RADIUS_METERS))

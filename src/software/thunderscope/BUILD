@@ -102,8 +102,3 @@ py_library(
         "//software/thunderscope:constants",
     ],
 )
-
-py_library(
-    name = "speed_threshold_helpers",
-    srcs = ["speed_threshold_helpers.py"],
-)

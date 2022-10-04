@@ -42,8 +42,8 @@ py_test(
     ],
     deps = [
         "//software/simulated_tests:simulated_test_fixture",
+        "//software/simulated_tests:speed_threshold_helpers",
         "//software/simulated_tests:validation",
-        "//software/thunderscope:speed_threshold_helpers",
         requirement("pytest"),
     ],
 )
