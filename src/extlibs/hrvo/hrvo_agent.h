@@ -89,7 +89,10 @@ class HRVOAgent : public Agent
     VelocityObstacle createVelocityObstacle(const Agent &other_agent) override;
 
     /**
-     * Computes the maxNeighbors nearest neighbors of this agent.
+     * @param neighbor_dist_threshold The max distance away which another agent can be to
+     * be considered a neighbor.
+     * Computes the `maxNeighbors` nearest neighbors of this agent which are within
+     * `neighbor_dist_threshold`.
      */
     void computeNeighbors(double neighbor_dist_threshold);
 
