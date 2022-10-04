@@ -152,8 +152,6 @@ def test_goalie_blocks_shot(
                 regions=[tbots.Field.createSSLDivisionBField().friendlyGoal()]
             ),
             NeverExcessivelyDribbles(),
-            RobotSpeedAlwaysBelowThreshold(1.5),
-            BallSpeedAlwaysBelowThreshold(6.5),
         ]
     ]
 
@@ -164,7 +162,6 @@ def test_goalie_blocks_shot(
             RobotEventuallyEntersRegion(
                 regions=[tbots.Field.createSSLDivisionBField().friendlyDefenseArea()]
             ),
-            BallSpeedEventuallyBelowThreshold(2.0),
         ]
     ]
 
