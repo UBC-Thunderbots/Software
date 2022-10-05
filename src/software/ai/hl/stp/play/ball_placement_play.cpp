@@ -11,7 +11,7 @@ BallPlacementPlay::BallPlacementPlay(TbotsProto::AiConfig config) : Play(config,
 void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
                                        const World &world)
 {
-    auto place_ball_tactic = std::make_shared<DribbleTactic>(ai_config);
+    auto place_ball_tactic = std::make_shared<BallPlacementTactic>(ai_config);
 
     std::vector<std::shared_ptr<MoveTactic>> move_tactics = {
         std::make_shared<MoveTactic>(), std::make_shared<MoveTactic>(),

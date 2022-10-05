@@ -13,14 +13,27 @@ from proto.ssl_gc_geometry_pb2 import Vector2
 
 # TODO (#2599): Remove Duration parameter from test
 @pytest.mark.parametrize(
-    "run_enemy_ai,test_duration", [(False, 20)]
-)  # , (True, 20)]) # TODO (#2690): Robot gets stuck in corner of defense area
-def test_two_ai_ball_placement(simulated_test_runner, run_enemy_ai, test_duration):
-
+    "start_pos, end_pos, run_enemy_ai,test_duration",
+    [
+        (tbots.Point(2, 2), tbots.Point(-3, -2), False, 20),
+        # (tbots.Point(2, 2), tbots.Point(-3, -2), True, 20), # TODO (#2690): Robot gets stuck in corner of defense area
+        (
+            tbots.Field.createSSLDivisionBField().friendlyGoalCenter(),
+            tbots.Field.createSSLDivisionBField().enemyGoalCenter()
+            + tbots.Vector(-0.5, 0),
+            False,
+            20,
+        ),
+        # (tbots.Field.createSSLDivisionBField().enemyCornerPos() + tbots.Vector(0.1, 0.1), tbots.Field.createSSLDivisionBField().friendlyCornerNeg() + tbots.Vector(-0.1,-0.1), False, 20) # TODO (#2700): Re-enable when HRVO can handle the Goal obstacle
+    ],
+)
+def test_two_ai_ball_placement(
+    simulated_test_runner, start_pos, end_pos, run_enemy_ai, test_duration
+):
     # starting point must be Point
-    ball_initial_pos = tbots.Point(2, 2)
+    ball_initial_pos = start_pos
     # placement point must be Vector2 to work with game controller
-    ball_final_pos = tbots.Point(-3, -2)
+    ball_final_pos = end_pos
 
     # Setup Bots
     blue_bots = [
