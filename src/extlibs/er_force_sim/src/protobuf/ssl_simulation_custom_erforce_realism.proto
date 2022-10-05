@@ -4,53 +4,54 @@ option go_package = "github.com/RoboCup-SSL/ssl-simulation-protocol/pkg/sim";
 // Realism configuration for ER-Force simulator
 // this message is stored in human readable form for saved ui settings
 // therefore do NOT modify field names without changing them in the config files
+// the values are set to 0 to simulate the ideal situation
 message RealismConfigErForce
 {
     // Standard deviation of the gaussian noise applied to the ball position [m]
-    optional float stddev_ball_p = 1;
+    optional float stddev_ball_p = 0;
     // Standard deviation of the gaussian noise applied to the robot position [m]
-    optional float stddev_robot_p = 2;
+    optional float stddev_robot_p = 0;
     // Standard deviation of the gaussian noise applied to the robot angle [rad]
-    optional float stddev_robot_phi = 3;
+    optional float stddev_robot_phi = 0;
     // Standard deviation of the gaussian noise applied to reported ball area
     // [pixel]
-    optional float stddev_ball_area = 4;
+    optional float stddev_ball_area = 0;
     // Whether or not to simulate the ball being invisible when the view from the
     // camera to it is blocked by a robot. It also simulates the slight perceived
     // motion of the ball when it is partially overshadowed by a robot as the
     // visible center of the ball shifts
-    optional bool enable_invisible_ball = 5;
+    optional bool enable_invisible_ball = 0;
     // The occlusion threshold at which the ball will no longer be visible [0-1]
     // A value of 0 would make the ball always visible
-    optional float ball_visibility_threshold = 6;
+    optional float ball_visibility_threshold = 0;
     // The overlap of the visible range of the different cameras [m]
     // For example: if there are two cameras and the overlap value is 0.5m
     // then the ball is visible in both cameras between -0.5 and 0.5 meters from
     // the centerline
-    optional float camera_overlap = 7;
+    optional float camera_overlap = 0;
     // With this probability, additional erroneous ball detections are added
     // at the edge of a robots dribbler (to emulate the red break beam lights
     // sometimes being visible from the camera). [detections/s/robot]
-    optional float dribbler_ball_detections = 8;
+    optional float dribbler_ball_detections = 0;
     // How much the reported camera positions should deviate from the actual
     // camera positions used for ball projection etc. [m]
-    optional float camera_position_error = 9;
+    optional float camera_position_error = 0;
     // The percentage of robot control commands that are "lost in transit" [0-1]
-    optional float robot_command_loss = 10;
+    optional float robot_command_loss = 0;
     // The percentage of robot reply messages that are "lost in transit" [0-1]
-    optional float robot_response_loss = 11;
+    optional float robot_response_loss = 0;
     // The percentage of times the ball is erroneously not "seen" by the camera
     // [0-1]
-    optional float missing_ball_detections = 12;
+    optional float missing_ball_detections = 0;
     // Sending out the vision data is delayed by this time after capturing the
     // positions [ns]
-    optional int64 vision_delay = 13;
+    optional int64 vision_delay = 0;
     // The difference between the reported t_capture and t_sent of the vision
     // frame [ns]
-    optional int64 vision_processing_time = 14;
+    optional int64 vision_processing_time = 0;
     // If false, 'glue' the ball during dribbling
-    optional bool simulate_dribbling = 15;
+    optional bool simulate_dribbling = false;
     // Simulates an offset of all reported object positions (robots, ball) at this
     // magnitude [m]
-    optional float object_position_offset = 16;
+    optional float object_position_offset = 0;
 }
