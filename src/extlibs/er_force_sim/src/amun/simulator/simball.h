@@ -76,9 +76,9 @@ class camun::simulator::SimBall : public QObject
      * tick
      */
     void begin(bool robot_collision);
-    bool update(SSLProto::SSL_DetectionBall *ball, float stddev, float stddevArea,
-                const btVector3 &cameraPosition, bool enableInvisibleBall,
-                float visibilityThreshold, btVector3 positionOffset);
+    bool update(SSLProto::SSL_DetectionBall *ball, float stddev, float stddev_area,
+                const btVector3 &camera_position, bool enable_invisible_ball,
+                float visibility_threshold, btVector3 position_offset);
     void move(const sslsim::TeleportBall &ball);
     void kick(const btVector3 &power);
     // returns the ball position projected onto the floor (z component is not included)
@@ -94,16 +94,16 @@ class camun::simulator::SimBall : public QObject
 
     // can be used to add ball mis-detections
     bool addDetection(SSLProto::SSL_DetectionBall *ball, btVector3 pos, float stddev,
-                      float stddevArea, const btVector3 &cameraPosition,
-                      bool enableInvisibleBall, float visibilityThreshold,
-                      btVector3 positionOffset);
+                      float stddev_area, const btVector3 &camera_position,
+                      bool enable_invisible_ball, float visibility_threshold,
+                      btVector3 position_offset);
 
    private:
     RNG *m_rng;
     btDiscreteDynamicsWorld *m_world;
     btCollisionShape *m_sphere;
     btRigidBody *m_body;
-    btMotionState *m_motionState;
+    btMotionState *m_motion_state;
     sslsim::TeleportBall m_move;
     double rolling_speed;
     bool set_transition_speed;

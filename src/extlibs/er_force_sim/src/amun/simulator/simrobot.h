@@ -64,10 +64,10 @@ class camun::simulator::SimRobot : public QObject
     bool canKickBall(SimBall *ball) const;
     void tryKick(SimBall *ball, float power, double time);
     robot::RadioResponse setCommand(const SSLSimulationProto::RobotCommand &command,
-                                    SimBall *ball, bool charge, float rxLoss,
-                                    float txLoss);
+                                    SimBall *ball, bool charge, float rx_loss,
+                                    float tx_loss);
     void update(SSLProto::SSL_DetectionRobot *robot, float stddev_p, float stddev_phi,
-                qint64 time, btVector3 positionOffset);
+                qint64 time, btVector3 position_offset);
     void update(world::SimRobot *robot, SimBall *ball) const;
     void restoreState(const world::SimRobot &robot);
     void move(const sslsim::TeleportRobot &robot);
@@ -76,9 +76,9 @@ class camun::simulator::SimRobot : public QObject
     btVector3 dribblerCorner(bool left) const;
     qint64 getLastSendTime() const
     {
-        return m_lastSendTime;
+        return m_last_send_time;
     }
-    void setDribbleMode(bool perfectDribbler);
+    void setDribbleMode(bool perfect_dribbler);
     void stopDribbling();
 
     const robot::Specs &specs() const
@@ -97,22 +97,22 @@ class camun::simulator::SimRobot : public QObject
 
    private:
     btVector3 relativeBallSpeed(SimBall *ball) const;
-    float bound(float acceleration, float oldSpeed, float speedupLimit,
-                float brakeLimit) const;
+    float bound(float acceleration, float old_speed, float speedup_limit,
+                float brake_limit) const;
     void calculateDribblerMove(const btVector3 pos, const btQuaternion rot,
-                               const btVector3 linVel, float omega);
+                               const btVector3 lin_vel, float omega);
     void dribble(SimBall *ball, float speed);
 
     RNG *m_rng;
     robot::Specs m_specs;
     btDiscreteDynamicsWorld *m_world;
     btRigidBody *m_body;
-    btRigidBody *m_dribblerBody;
-    btHingeConstraint *m_dribblerConstraint;
+    btRigidBody *m_dribbler_body;
+    btHingeConstraint *m_dribbler_constraint;
     QList<btCollisionShape *> m_shapes;
-    btMotionState *m_motionState;
-    btVector3 m_dribblerCenter;
-    std::unique_ptr<btHingeConstraint> m_holdBallConstraint;
+    btMotionState *m_motion_state;
+    btVector3 m_dribbler_center;
+    std::unique_ptr<btHingeConstraint> m_hold_ball_constraint;
 
     struct Wheel
     {
@@ -122,20 +122,20 @@ class camun::simulator::SimRobot : public QObject
     };
 
     sslsim::TeleportRobot m_move;
-    SSLSimulationProto::RobotCommand m_sslCommand;
+    SSLSimulationProto::RobotCommand m_ssl_command;
     bool m_charge;
-    bool m_isCharged;
-    bool m_inStandby;
-    double m_shootTime;
-    double m_commandTime;
+    bool m_is_charged;
+    bool m_in_standby;
+    double m_shoot_time;
+    double m_command_time;
 
     float error_sum_v_s;
     float error_sum_v_f;
     float error_sum_omega;
 
-    bool m_perfectDribbler = false;
+    bool m_perfect_dribbler = false;
 
-    qint64 m_lastSendTime = 0;
+    qint64 m_last_send_time = 0;
 };
 
 #endif  // SIMROBOT_H

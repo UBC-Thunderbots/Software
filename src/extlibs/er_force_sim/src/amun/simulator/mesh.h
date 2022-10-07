@@ -37,7 +37,7 @@ namespace camun
 class camun::simulator::Mesh
 {
    public:
-    Mesh(float radius, float height, float angle, float holeSize, float boxHeight);
+    Mesh(float radius, float height, float angle, float hole_size, float box_height);
     void createRobotMeshes(float radius, float height, float angle);
     const QList<QList<QVector3D>> &hull() const
     {
@@ -45,8 +45,8 @@ class camun::simulator::Mesh
     }
 
    private:
-    void addRobotCover(uint num, float startAngle, float endAngle);
-    void addSidePart(uint num, float angleStart, float angleStop, bool right);
+    void addRobotCover(uint num, float start_angle, float end_angle);
+    void addSidePart(uint num, float angle_start, float angle_stop, bool right);
 
    private:
     QList<QList<QVector3D>> m_hull;
@@ -54,7 +54,7 @@ class camun::simulator::Mesh
     const float m_radius;
     const float m_height;
     const float m_angle;
-    const float m_holeSize;
+    const float m_hole_size;
 };
 
 #endif  // MESH_H

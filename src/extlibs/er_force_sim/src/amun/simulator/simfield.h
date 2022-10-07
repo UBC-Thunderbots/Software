@@ -50,8 +50,8 @@ class camun::simulator::SimField
    private:
     btDiscreteDynamicsWorld *m_world;
     btCollisionShape *m_plane;
-    btCollisionShape *m_goalSide;
-    btCollisionShape *m_goalBack;
+    btCollisionShape *m_goal_side;
+    btCollisionShape *m_goal_back;
     QList<btCollisionObject *> m_objects;
 };
 

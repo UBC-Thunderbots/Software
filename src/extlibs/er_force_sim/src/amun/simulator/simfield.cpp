@@ -27,23 +27,23 @@ using namespace camun::simulator;
 SimField::SimField(btDiscreteDynamicsWorld *world, const world::Geometry &geometry)
     : m_world(world)
 {
-    const float totalWidth  = geometry.field_width() / 2.0f + geometry.boundary_width();
-    const float totalHeight = geometry.field_height() / 2.0f + geometry.boundary_width();
+    const float total_width  = geometry.field_width() / 2.0f + geometry.boundary_width();
+    const float total_height = geometry.field_height() / 2.0f + geometry.boundary_width();
     // upper boundary
-    const float roomHeight    = 8.0f;
+    const float room_height    = 8.0f;
     const float height        = geometry.field_height() / 2.0f - geometry.line_width();
-    const float goalWidthHalf = geometry.goal_width() / 2.0f + geometry.goal_wall_width();
-    const float goalHeightHalf = geometry.goal_height() / 2.0f;
-    const float goalDepth      = geometry.goal_depth() + geometry.goal_wall_width();
-    const float goalDepthHalf  = goalDepth / 2.0f;
-    const float goalWallHalf   = geometry.goal_wall_width() / 2.0f;
+    const float goal_width_half = geometry.goal_width() / 2.0f + geometry.goal_wall_width();
+    const float goal_height_half = geometry.goal_height() / 2.0f;
+    const float goal_depth      = geometry.goal_depth() + geometry.goal_wall_width();
+    const float goal_depth_half  = goal_depth / 2.0f;
+    const float goal_wall_half   = geometry.goal_wall_width() / 2.0f;
 
     // obstacle prototypes
     m_plane    = new btStaticPlaneShape(btVector3(0, 0, 1), 0);
-    m_goalSide = new btBoxShape(btVector3(goalWallHalf, goalDepthHalf, goalHeightHalf) *
-                                SIMULATOR_SCALE);
-    m_goalBack = new btBoxShape(btVector3(goalWidthHalf, goalWallHalf, goalHeightHalf) *
-                                SIMULATOR_SCALE);
+    m_goal_side = new btBoxShape(btVector3(goal_wall_half, goal_depth_half, goal_height_half) *
+                                 SIMULATOR_SCALE);
+    m_goal_back = new btBoxShape(btVector3(goal_width_half, goal_wall_half, goal_height_half) *
+                                 SIMULATOR_SCALE);
 
     // build field cube
     // floor
@@ -54,25 +54,25 @@ SimField::SimField(btDiscreteDynamicsWorld *world, const world::Geometry &geomet
     // others
     addObject(m_plane,
               btTransform(btQuaternion(btVector3(1, 0, 0), M_PI),
-                          btVector3(0, 0, roomHeight) * SIMULATOR_SCALE),
+                          btVector3(0, 0, room_height) * SIMULATOR_SCALE),
               0.3, 0.35);
 
     addObject(m_plane,
               btTransform(btQuaternion(btVector3(1, 0, 0), M_PI_2),
-                          btVector3(0, totalHeight, 0) * SIMULATOR_SCALE),
+                          btVector3(0, total_height, 0) * SIMULATOR_SCALE),
               0.3, 0.35);
     addObject(m_plane,
               btTransform(btQuaternion(btVector3(1, 0, 0), -M_PI_2),
-                          btVector3(0, -totalHeight, 0) * SIMULATOR_SCALE),
+                          btVector3(0, -total_height, 0) * SIMULATOR_SCALE),
               0.3, 0.35);
 
     addObject(m_plane,
               btTransform(btQuaternion(btVector3(0, 1, 0), M_PI_2),
-                          btVector3(-totalWidth, 0, 0) * SIMULATOR_SCALE),
+                          btVector3(-total_width, 0, 0) * SIMULATOR_SCALE),
               0.3, 0.35);
     addObject(m_plane,
               btTransform(btQuaternion(btVector3(0, 1, 0), -M_PI_2),
-                          btVector3(totalWidth, 0, 0) * SIMULATOR_SCALE),
+                          btVector3(total_width, 0, 0) * SIMULATOR_SCALE),
               0.3, 0.35);
 
     // create goals
@@ -82,23 +82,23 @@ SimField::SimField(btDiscreteDynamicsWorld *world, const world::Geometry &geomet
         const btQuaternion rot = btQuaternion::getIdentity();
 
         addObject(
-            m_goalSide,
-            btTransform(rot, btVector3((goalWidthHalf - goalWallHalf),
-                                       side * (height + goalDepthHalf), goalHeightHalf) *
-                                 SIMULATOR_SCALE),
-            0.3, 0.5);
+                m_goal_side,
+                btTransform(rot, btVector3((goal_width_half - goal_wall_half),
+                                       side * (height + goal_depth_half), goal_height_half) *
+                             SIMULATOR_SCALE),
+                0.3, 0.5);
         addObject(
-            m_goalSide,
-            btTransform(rot, btVector3(-(goalWidthHalf - goalWallHalf),
-                                       side * (height + goalDepthHalf), goalHeightHalf) *
-                                 SIMULATOR_SCALE),
-            0.3, 0.5);
+                m_goal_side,
+                btTransform(rot, btVector3(-(goal_width_half - goal_wall_half),
+                                       side * (height + goal_depth_half), goal_height_half) *
+                             SIMULATOR_SCALE),
+                0.3, 0.5);
         addObject(
-            m_goalBack,
-            btTransform(rot, btVector3(0.0f, side * (height + goalDepth - goalWallHalf),
-                                       goalHeightHalf) *
-                                 SIMULATOR_SCALE),
-            0.1, 0.5);
+                m_goal_back,
+                btTransform(rot, btVector3(0.0f, side * (height + goal_depth - goal_wall_half),
+                                       goal_height_half) *
+                             SIMULATOR_SCALE),
+                0.1, 0.5);
     }
 }
 
@@ -110,8 +110,8 @@ SimField::~SimField()
         delete object;
     }
 
-    delete m_goalSide;
-    delete m_goalBack;
+    delete m_goal_side;
+    delete m_goal_back;
     delete m_plane;
 }
 

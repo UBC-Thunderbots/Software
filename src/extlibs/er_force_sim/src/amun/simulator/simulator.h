@@ -146,8 +146,8 @@ class camun::simulator::Simulator : public QObject
     void handleSimulatorSetupCommand(const std::unique_ptr<amun::Command> &command);
 
    public slots:
-    void handleRadioCommands(const SSLSimRobotControl &control, bool isBlue,
-                             qint64 processingStart);
+    void handleRadioCommands(const SSLSimRobotControl &control, bool is_blue,
+                             qint64 processing_start);
     void setFlipped(bool flipped);
 
    private:
@@ -155,43 +155,43 @@ class camun::simulator::Simulator : public QObject
      * Accepts and executes a blue or yellow robot control command
      *
      * @param control the robot control command
-     * @param isBlue whether it's blue robots or not
+     * @param is_blue whether it's blue robots or not
      *
      * @return the radio response feedback from the simulator
      */
     std::vector<robot::RadioResponse> acceptRobotControlCommand(
-        const SSLSimulationProto::RobotControl &control, bool isBlue);
+        const SSLSimulationProto::RobotControl &control, bool is_blue);
     void sendSSLSimErrorInternal(ErrorSource source);
     void resetFlipped(RobotMap &robots, float side);
     std::tuple<QList<QByteArray>, QByteArray, qint64> createVisionPacket();
     void resetVisionPackets();
     void setTeam(RobotMap &list, float side, const robot::Team &team,
-                 QMap<uint32_t, robot::Specs> &specs);
+                 QMap<uint32_t, robot::Specs> &team_specs);
     void moveBall(const sslsim::TeleportBall &ball);
     void moveRobot(const sslsim::TeleportRobot &robot);
     void teleportRobotToFreePosition(SimRobot *robot);
     void initializeDetection(SSLProto::SSL_DetectionFrame *detection,
-                             std::size_t cameraId);
+                             std::size_t camera_id);
 
    private:
     typedef std::tuple<SSLSimRobotControl, qint64, bool> RadioCommand;
     SimulatorData *m_data;
-    QQueue<RadioCommand> m_radioCommands;
-    QQueue<std::tuple<QList<QByteArray>, QByteArray, qint64>> m_visionPackets;
-    QQueue<QTimer *> m_visionTimers;
+    QQueue<RadioCommand> m_radio_commands;
+    QQueue<std::tuple<QList<QByteArray>, QByteArray, qint64>> m_vision_packets;
+    QQueue<QTimer *> m_vision_timers;
     QTimer *m_trigger;
     qint64 m_time;
-    qint64 m_lastSentStatusTime;
+    qint64 m_last_sent_status_time;
     bool m_enabled;
     bool m_charge;
     // systemDelay + visionProcessingTime = visionDelay
-    qint64 m_visionDelay;
-    qint64 m_visionProcessingTime;
+    qint64 m_vision_delay;
+    qint64 m_vision_processing_time;
 
-    qint64 m_minRobotDetectionTime = 0;
-    qint64 m_minBallDetectionTime  = 0;
-    qint64 m_lastBallSendTime      = 0;
-    std::map<qint64, unsigned> m_lastFrameNumber;
+    qint64 m_min_robot_detection_time = 0;
+    qint64 m_min_ball_detection_time  = 0;
+    qint64 m_last_ball_send_time      = 0;
+    std::map<qint64, unsigned> m_last_frame_number;
     ErrorAggregator *m_aggregator;
 
 

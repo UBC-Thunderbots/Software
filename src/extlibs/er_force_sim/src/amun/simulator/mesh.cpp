@@ -30,43 +30,43 @@ using namespace camun::simulator;
  * \brief A 3D mesh
  */
 
-Mesh::Mesh(float radius, float height, float angle, float holeSize, float boxHeight)
-    : m_radius(radius), m_height(height), m_angle(angle), m_holeSize(holeSize)
+Mesh::Mesh(float radius, float height, float angle, float hole_size, float box_height)
+    : m_radius(radius), m_height(height), m_angle(angle), m_hole_size(hole_size)
 {
-    const float frontPlateLength = std::sin(angle / 2.0f) * radius;
-    const float frontPlatePos    = radius * std::cos(angle / 2.0f);
-    const float holePlatePos     = frontPlatePos - holeSize;
-    const float outerAngle       = std::acos(holePlatePos / radius) * 2;
-    const float angleDiff        = (outerAngle - angle) / 2.0f;
-    const float halfOuterAngle   = outerAngle / 2.0f;
-    const float outerAngleStart  = halfOuterAngle + M_PI_2;
-    const float outerAngleStop   = 2.0f * M_PI - halfOuterAngle + M_PI_2;
-    addRobotCover(20, outerAngleStart, outerAngleStop);
+    const float front_plate_length = std::sin(angle / 2.0f) * radius;
+    const float front_plate_pos    = radius * std::cos(angle / 2.0f);
+    const float hole_plate_pos     = front_plate_pos - hole_size;
+    const float outer_angle       = std::acos(hole_plate_pos / radius) * 2;
+    const float angle_diff        = (outer_angle - angle) / 2.0f;
+    const float half_outer_angle   = outer_angle / 2.0f;
+    const float outer_angle_start  = half_outer_angle + M_PI_2;
+    const float outer_angle_stop   = 2.0f * M_PI - half_outer_angle + M_PI_2;
+    addRobotCover(20, outer_angle_start, outer_angle_stop);
 
     // right pillar
-    addRobotCover(5, outerAngleStart - angleDiff, outerAngleStart);
-    m_hull.back().append(QVector3D(-frontPlateLength, holePlatePos, m_height / 2.0f));
-    m_hull.back().append(QVector3D(-frontPlateLength, holePlatePos, -m_height / 2.0f));
+    addRobotCover(5, outer_angle_start - angle_diff, outer_angle_start);
+    m_hull.back().append(QVector3D(-front_plate_length, hole_plate_pos, m_height / 2.0f));
+    m_hull.back().append(QVector3D(-front_plate_length, hole_plate_pos, -m_height / 2.0f));
 
     // left pillar
-    addRobotCover(5, outerAngleStop, outerAngleStop + angleDiff);
-    m_hull.back().append(QVector3D(frontPlateLength, holePlatePos, m_height / 2.0f));
-    m_hull.back().append(QVector3D(frontPlateLength, holePlatePos, -m_height / 2.0f));
+    addRobotCover(5, outer_angle_stop, outer_angle_stop + angle_diff);
+    m_hull.back().append(QVector3D(front_plate_length, hole_plate_pos, m_height / 2.0f));
+    m_hull.back().append(QVector3D(front_plate_length, hole_plate_pos, -m_height / 2.0f));
 
     // the remaining box
     QList<QVector3D> boxPart;
-    boxPart.append(QVector3D(frontPlateLength, holePlatePos, m_height / 2.0f));
-    boxPart.append(QVector3D(-frontPlateLength, holePlatePos, m_height / 2.0f));
+    boxPart.append(QVector3D(front_plate_length, hole_plate_pos, m_height / 2.0f));
+    boxPart.append(QVector3D(-front_plate_length, hole_plate_pos, m_height / 2.0f));
     boxPart.append(
-        QVector3D(frontPlateLength, holePlatePos, -m_height / 2.0f + boxHeight));
+        QVector3D(front_plate_length, hole_plate_pos, -m_height / 2.0f + box_height));
     boxPart.append(
-        QVector3D(-frontPlateLength, holePlatePos, -m_height / 2.0f + boxHeight));
-    boxPart.append(QVector3D(frontPlateLength, frontPlatePos, m_height / 2.0f));
-    boxPart.append(QVector3D(-frontPlateLength, frontPlatePos, m_height / 2.0f));
+        QVector3D(-front_plate_length, hole_plate_pos, -m_height / 2.0f + box_height));
+    boxPart.append(QVector3D(front_plate_length, front_plate_pos, m_height / 2.0f));
+    boxPart.append(QVector3D(-front_plate_length, front_plate_pos, m_height / 2.0f));
     boxPart.append(
-        QVector3D(frontPlateLength, frontPlatePos, -m_height / 2.0f + boxHeight));
+        QVector3D(front_plate_length, front_plate_pos, -m_height / 2.0f + box_height));
     boxPart.append(
-        QVector3D(-frontPlateLength, frontPlatePos, -m_height / 2.0f + boxHeight));
+        QVector3D(-front_plate_length, front_plate_pos, -m_height / 2.0f + box_height));
     m_hull.append(boxPart);
 }
 
@@ -78,11 +78,11 @@ Mesh::Mesh(float radius, float height, float angle, float holeSize, float boxHei
  * \param angle Angle of the hull start
  * \param angleStep Step size in rad
  */
-void Mesh::addRobotCover(uint num, float startAngle, float endAngle)
+void Mesh::addRobotCover(uint num, float start_angle, float end_angle)
 {
     QList<QVector3D> covers;
-    float angle     = startAngle;
-    float angleStep = (endAngle - startAngle) / num;
+    float angle      = start_angle;
+    float angle_step = (end_angle - start_angle) / num;
     for (uint i = 0; i <= num; i++)
     {
         covers.append(
@@ -90,7 +90,7 @@ void Mesh::addRobotCover(uint num, float startAngle, float endAngle)
         covers.append(
             QVector3D(m_radius * cos(angle), m_radius * sin(angle), -m_height / 2.0f));
 
-        angle += angleStep;
+        angle += angle_step;
     }
     m_hull.append(covers);
 }
