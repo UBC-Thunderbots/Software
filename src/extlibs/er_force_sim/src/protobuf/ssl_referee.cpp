@@ -22,16 +22,16 @@
 
 /*!
  * \brief Initializes team info with default values
- * \param teamInfo The team info to initialize
+ * \param team_info The team info to initialize
  */
-void teamInfoSetDefault(SSLProto::Referee::TeamInfo *teamInfo)
+void teamInfoSetDefault(SSLProto::Referee::TeamInfo *team_info)
 {
-    teamInfo->set_name("");
-    teamInfo->set_score(0);
-    teamInfo->set_red_cards(0);
-    teamInfo->set_yellow_cards(0);
-    teamInfo->set_timeouts(4);
-    teamInfo->set_timeout_time(5 * 60 * 1000 * 1000);
-    teamInfo->set_goalkeeper(0);
-    assert(teamInfo->IsInitialized());
+    team_info->set_name("");
+    team_info->set_score(0);
+    team_info->set_red_cards(0);
+    team_info->set_yellow_cards(0);
+    team_info->set_timeouts(4);
+    team_info->set_timeout_time(5 * 60 * 1000 * 1000);
+    team_info->set_goalkeeper(0);
+    assert(team_info->IsInitialized());
 }

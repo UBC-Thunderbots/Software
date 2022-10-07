@@ -23,6 +23,6 @@
 
 #include "proto/ssl_gc_referee_message.pb.h"
 
-void teamInfoSetDefault(SSLProto::Referee::TeamInfo *teamInfo);
+void teamInfoSetDefault(SSLProto::Referee::TeamInfo *team_info);
 
 #endif  // SSL_REFEREE_H

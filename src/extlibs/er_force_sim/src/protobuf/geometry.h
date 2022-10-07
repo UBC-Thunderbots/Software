@@ -24,11 +24,11 @@
 #include "extlibs/er_force_sim/src/protobuf/world.pb.h"
 #include "proto/ssl_vision_wrapper.pb.h"
 
-void geometrySetDefault(world::Geometry *geometry, bool useQuadField = true);
+void geometrySetDefault(world::Geometry *geometry, bool use_quad_field = true);
 
 void convertFromSSlGeometry(const SSLProto::SSL_GeometryFieldSize &g,
-                            world::Geometry &outGeometry);
+                            world::Geometry &out_geometry);
 void convertToSSlGeometry(const world::Geometry &g,
-                          SSLProto::SSL_GeometryFieldSize *outGeometry);
+                          SSLProto::SSL_GeometryFieldSize *out_geometry);
 
 #endif  // GEOMETRY_H

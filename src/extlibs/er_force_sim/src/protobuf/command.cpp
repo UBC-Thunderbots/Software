@@ -22,11 +22,11 @@
 
 #include "geometry.h"
 
-SSL_GeometryCameraCalibration createDefaultCamera(int cameraId, float x, float y, float z)
+SSL_GeometryCameraCalibration createDefaultCamera(int camera_id, float x, float y, float z)
 {
     SSL_GeometryCameraCalibration calibration;
 
-    calibration.set_camera_id(cameraId);
+    calibration.set_camera_id(camera_id);
     // DUMMY VALUES
     calibration.set_distortion(0.2);
     calibration.set_focal_length(390);
