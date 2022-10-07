@@ -195,10 +195,10 @@ namespace coordinates
 
     inline float chipVelFromChipDistance(float distance)
     {
-        const float angle    = 45.f / 180 * M_PI;
+        const float angle     = 45.f / 180 * M_PI;
         const float dir_floor = std::cos(angle);
         const float dir_up    = std::sin(angle);
-        const float gravity  = 9.81;
+        const float gravity   = 9.81;
         // airtime = 2 * (shoot_speed * dir_up) / g
         // targetDist = shoot_speed * dir_floor * airtime
         // => targetDist = shoot_speed * dir_floor * (2 * shoot_speed * dir_up) / g = 2 *
@@ -210,10 +210,10 @@ namespace coordinates
 
     inline float chipDistanceFromChipVel(float velocity)
     {
-        const float angle    = 45.f / 180 * M_PI;
+        const float angle     = 45.f / 180 * M_PI;
         const float dir_floor = std::cos(angle);
         const float dir_up    = std::sin(angle);
-        const float gravity  = 9.81;
+        const float gravity   = 9.81;
         // airtime = 2 * (shootSpeed * dir_up) / g
         // target_dist = shootSpeed * dir_floor * airtime
         // => target_dist = shootSpeed * dir_floor * (2 * shootSpeed * dir_up) / g = 2 *

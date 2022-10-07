@@ -36,8 +36,8 @@ Mesh::Mesh(float radius, float height, float angle, float hole_size, float box_h
     const float front_plate_length = std::sin(angle / 2.0f) * radius;
     const float front_plate_pos    = radius * std::cos(angle / 2.0f);
     const float hole_plate_pos     = front_plate_pos - hole_size;
-    const float outer_angle       = std::acos(hole_plate_pos / radius) * 2;
-    const float angle_diff        = (outer_angle - angle) / 2.0f;
+    const float outer_angle        = std::acos(hole_plate_pos / radius) * 2;
+    const float angle_diff         = (outer_angle - angle) / 2.0f;
     const float half_outer_angle   = outer_angle / 2.0f;
     const float outer_angle_start  = half_outer_angle + M_PI_2;
     const float outer_angle_stop   = 2.0f * M_PI - half_outer_angle + M_PI_2;

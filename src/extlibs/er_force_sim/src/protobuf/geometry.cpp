@@ -61,12 +61,12 @@ void convertFromSSlGeometry(const SSLProto::SSL_GeometryFieldSize &g,
     out_geometry.set_free_kick_from_defense_dist(0.20f);
     out_geometry.set_penalty_line_from_spot_dist(0.40f);
 
-    float min_thickness  = std::numeric_limits<float>::max();
+    float min_thickness   = std::numeric_limits<float>::max();
     bool is_2014_geometry = true;
     for (const SSLProto::SSL_FieldLineSegment &line : g.field_lines())
     {
         min_thickness     = std::min(min_thickness, line.thickness());
-        std::string name = line.name();
+        std::string name  = line.name();
         if (name == "LeftPenaltyStretch")
         {
             out_geometry.set_defense_stretch(std::abs(line.p1().y() - line.p2().y()) /
@@ -85,7 +85,7 @@ void convertFromSSlGeometry(const SSLProto::SSL_GeometryFieldSize &g,
     for (const SSLProto::SSL_FieldCircularArc &arc : g.field_arcs())
     {
         min_thickness     = std::min(min_thickness, arc.thickness());
-        std::string name = arc.name();
+        std::string name  = arc.name();
         if (name == "LeftFieldLeftPenaltyArc")
         {
             is_2014_geometry = true;
@@ -178,8 +178,8 @@ void convertToSSlGeometry(const world::Geometry &geometry,
 
     if (geometry.type() == world::Geometry::TYPE_2018)
     {
-        float defense_distance  = geometry.defense_height() * 1000.0f;
-        float defense_pos       = -field_length_half + defense_distance;
+        float defense_distance   = geometry.defense_height() * 1000.0f;
+        float defense_pos        = -field_length_half + defense_distance;
         float defense_width_half = geometry.defense_width() * 1000.0f / 2.0f;
         fieldAddLine(out_geometry, "LeftPenaltyStretch", defense_pos, -defense_width_half,
                      defense_pos, defense_width_half, geometry);
@@ -196,8 +196,8 @@ void convertToSSlGeometry(const world::Geometry &geometry,
     }
     else
     {
-        float defense_distance    = geometry.defense_radius() * 1000.0f;
-        float defense_pos         = -field_length_half + defense_distance;
+        float defense_distance     = geometry.defense_radius() * 1000.0f;
+        float defense_pos          = -field_length_half + defense_distance;
         float defense_stretch_half = geometry.defense_stretch() * 1000.0f / 2.0f;
         fieldAddLine(out_geometry, "LeftPenaltyStretch", defense_pos, -defense_stretch_half,
                      defense_pos, defense_stretch_half, geometry);

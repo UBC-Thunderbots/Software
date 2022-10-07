@@ -138,7 +138,7 @@ void SimBall::begin(bool robot_collision)
         }
     }
 
-    bool move_command           = false;
+    bool move_command             = false;
     auto send_partial_coord_error = [this](const char *msg) {
         SSLSimError error{new sslsim::SimulatorError};
         error->set_code("PARTIAL_COORD");

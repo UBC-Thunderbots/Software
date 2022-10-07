@@ -30,11 +30,11 @@ SimField::SimField(btDiscreteDynamicsWorld *world, const world::Geometry &geomet
     const float total_width  = geometry.field_width() / 2.0f + geometry.boundary_width();
     const float total_height = geometry.field_height() / 2.0f + geometry.boundary_width();
     // upper boundary
-    const float room_height    = 8.0f;
-    const float height        = geometry.field_height() / 2.0f - geometry.line_width();
-    const float goal_width_half = geometry.goal_width() / 2.0f + geometry.goal_wall_width();
+    const float room_height      = 8.0f;
+    const float height           = geometry.field_height() / 2.0f - geometry.line_width();
+    const float goal_width_half  = geometry.goal_width() / 2.0f + geometry.goal_wall_width();
     const float goal_height_half = geometry.goal_height() / 2.0f;
-    const float goal_depth      = geometry.goal_depth() + geometry.goal_wall_width();
+    const float goal_depth       = geometry.goal_depth() + geometry.goal_wall_width();
     const float goal_depth_half  = goal_depth / 2.0f;
     const float goal_wall_half   = geometry.goal_wall_width() / 2.0f;
 

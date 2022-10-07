@@ -148,21 +148,21 @@ Simulator::Simulator(const amun::SimulatorSetup &setup)
     m_data->ball  = new SimBall(&m_data->rng, m_data->dynamics_world);
     connect(m_data->ball, &SimBall::sendSSLSimError, m_aggregator,
             &ErrorAggregator::aggregate);
-    m_data->flip                     = false;
-    m_data->stddev_ball               = 0.0f;
-    m_data->stddev_ball_area           = 0.0f;
-    m_data->stddev_robot              = 0.0f;
-    m_data->stddev_robot_phi           = 0.0f;
+    m_data->flip                        = false;
+    m_data->stddev_ball                 = 0.0f;
+    m_data->stddev_ball_area            = 0.0f;
+    m_data->stddev_robot                = 0.0f;
+    m_data->stddev_robot_phi            = 0.0f;
     m_data->ball_detections_at_dribbler = 0.0f;
-    m_data->enable_invisible_ball      = true;
-    m_data->ball_visibility_threshold  = 0.4;
-    m_data->camera_overlap            = 0.3;
-    m_data->camera_position_error      = 0;
-    m_data->object_position_offset     = 0;
+    m_data->enable_invisible_ball       = true;
+    m_data->ball_visibility_threshold   = 0.4;
+    m_data->camera_overlap              = 0.3;
+    m_data->camera_position_error       = 0;
+    m_data->object_position_offset      = 0;
     m_data->robot_command_packet_loss   = 0;
     m_data->robot_reply_packet_loss     = 0;
-    m_data->missing_ball_detections    = 0;
-    m_data->dribble_perfect           = false;
+    m_data->missing_ball_detections     = 0;
+    m_data->dribble_perfect             = false;
 
     // no robots after initialisation
 }
