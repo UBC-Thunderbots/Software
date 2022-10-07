@@ -246,7 +246,8 @@ void SimBall::begin(bool robot_collision)
 
 // samples a plane rotated towards the camera, sets p to the average position of
 // the visible points and returns the relative amount of visible pixels
-static float positionOfVisiblePixels(btVector3 &p, const btVector3 &simulator_ball_position,
+static float positionOfVisiblePixels(btVector3 &p,
+                                     const btVector3 &simulator_ball_position,
                                      const btVector3 &simulator_camera_position,
                                      const btCollisionWorld *const m_world)
 {
@@ -291,7 +292,7 @@ static float positionOfVisiblePixels(btVector3 &p, const btVector3 &simulator_ba
             btVector3 sample_point = simulator_ball_position + offset;
 
             btCollisionWorld::ClosestRayResultCallback sample_result(
-                    sample_point, simulator_camera_position);
+                sample_point, simulator_camera_position);
             m_world->rayTest(sample_point, simulator_camera_position, sample_result);
 
             if (!sample_result.hasHit())
@@ -345,8 +346,8 @@ bool SimBall::addDetection(SSLProto::SSL_DetectionBall *ball, btVector3 pos, flo
     m_motion_state->getWorldTransform(transform);
 
     const btVector3 simulator_camera_position =
-            btVector3(camera_position.x(), camera_position.y(), camera_position.z()) *
-            SIMULATOR_SCALE;
+        btVector3(camera_position.x(), camera_position.y(), camera_position.z()) *
+        SIMULATOR_SCALE;
 
     float visibility = 1;
     // the camera uses the mid point of the visible pixels as the mid point of the
@@ -371,10 +372,10 @@ bool SimBall::addDetection(SSLProto::SSL_DetectionBall *ball, btVector3 pos, flo
     float mod_z = std::min(SCALING_LIMIT * camera_position.z(),
                            std::max(0.f, pos.z() - BALL_RADIUS));
     float mod_x = (pos.x() - camera_position.x()) *
-                  (camera_position.z() / (camera_position.z() - mod_z)) +
+                      (camera_position.z() / (camera_position.z() - mod_z)) +
                   camera_position.x();
     float mod_y = (pos.y() - camera_position.y()) *
-                  (camera_position.z() / (camera_position.z() - mod_z)) +
+                      (camera_position.z() / (camera_position.z() - mod_z)) +
                   camera_position.y();
 
     float dist_ball_cam =

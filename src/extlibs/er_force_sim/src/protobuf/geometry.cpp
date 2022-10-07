@@ -65,8 +65,8 @@ void convertFromSSlGeometry(const SSLProto::SSL_GeometryFieldSize &g,
     bool is_2014_geometry = true;
     for (const SSLProto::SSL_FieldLineSegment &line : g.field_lines())
     {
-        min_thickness     = std::min(min_thickness, line.thickness());
-        std::string name  = line.name();
+        min_thickness    = std::min(min_thickness, line.thickness());
+        std::string name = line.name();
         if (name == "LeftPenaltyStretch")
         {
             out_geometry.set_defense_stretch(std::abs(line.p1().y() - line.p2().y()) /
@@ -84,8 +84,8 @@ void convertFromSSlGeometry(const SSLProto::SSL_GeometryFieldSize &g,
 
     for (const SSLProto::SSL_FieldCircularArc &arc : g.field_arcs())
     {
-        min_thickness     = std::min(min_thickness, arc.thickness());
-        std::string name  = arc.name();
+        min_thickness    = std::min(min_thickness, arc.thickness());
+        std::string name = arc.name();
         if (name == "LeftFieldLeftPenaltyArc")
         {
             is_2014_geometry = true;
@@ -100,7 +100,8 @@ void convertFromSSlGeometry(const SSLProto::SSL_GeometryFieldSize &g,
 
     // fill out the other required fields
     out_geometry.set_penalty_spot_from_field_line_dist(
-            (is_2014_geometry) ? out_geometry.defense_radius() : out_geometry.defense_height());
+        (is_2014_geometry) ? out_geometry.defense_radius()
+                           : out_geometry.defense_height());
     if (!out_geometry.has_defense_radius())
     {
         out_geometry.set_defense_radius(out_geometry.defense_height());
@@ -162,16 +163,18 @@ void convertToSSlGeometry(const world::Geometry &geometry,
 
     float field_length_half = geometry.field_height() * 1000.0f / 2.0f;
     float field_width_half  = geometry.field_width() * 1000.0f / 2.0f;
-    fieldAddLine(out_geometry, "TopTouchLine", -field_length_half, field_width_half, field_length_half,
-                 field_width_half, geometry);
+    fieldAddLine(out_geometry, "TopTouchLine", -field_length_half, field_width_half,
+                 field_length_half, field_width_half, geometry);
     fieldAddLine(out_geometry, "BottomTouchLine", -field_length_half, -field_width_half,
                  field_length_half, -field_width_half, geometry);
     fieldAddLine(out_geometry, "LeftGoalLine", -field_length_half, -field_width_half,
                  -field_length_half, field_width_half, geometry);
     fieldAddLine(out_geometry, "RightGoalLine", field_length_half, -field_width_half,
                  field_length_half, field_width_half, geometry);
-    fieldAddLine(out_geometry, "HalfwayLine", 0, -field_width_half, 0, field_width_half, geometry);
-    fieldAddLine(out_geometry, "CenterLine", -field_length_half, 0, field_length_half, 0, geometry);
+    fieldAddLine(out_geometry, "HalfwayLine", 0, -field_width_half, 0, field_width_half,
+                 geometry);
+    fieldAddLine(out_geometry, "CenterLine", -field_length_half, 0, field_length_half, 0,
+                 geometry);
     fieldAddCircularArc(out_geometry, "CenterCircle", 0, 0,
                         geometry.center_circle_radius() * 1000.0f, 0, 2.0f * M_PI,
                         geometry);
@@ -183,8 +186,8 @@ void convertToSSlGeometry(const world::Geometry &geometry,
         float defense_width_half = geometry.defense_width() * 1000.0f / 2.0f;
         fieldAddLine(out_geometry, "LeftPenaltyStretch", defense_pos, -defense_width_half,
                      defense_pos, defense_width_half, geometry);
-        fieldAddLine(out_geometry, "RightPenaltyStretch", -defense_pos, -defense_width_half,
-                     -defense_pos, defense_width_half, geometry);
+        fieldAddLine(out_geometry, "RightPenaltyStretch", -defense_pos,
+                     -defense_width_half, -defense_pos, defense_width_half, geometry);
         fieldAddLine(out_geometry, "LeftFieldLeftPenaltyStretch", -field_length_half,
                      -defense_width_half, defense_pos, -defense_width_half, geometry);
         fieldAddLine(out_geometry, "LeftFieldRightPenaltyStretch", -field_length_half,
@@ -199,17 +202,17 @@ void convertToSSlGeometry(const world::Geometry &geometry,
         float defense_distance     = geometry.defense_radius() * 1000.0f;
         float defense_pos          = -field_length_half + defense_distance;
         float defense_stretch_half = geometry.defense_stretch() * 1000.0f / 2.0f;
-        fieldAddLine(out_geometry, "LeftPenaltyStretch", defense_pos, -defense_stretch_half,
-                     defense_pos, defense_stretch_half, geometry);
-        fieldAddLine(out_geometry, "RightPenaltyStretch", -defense_pos, -defense_stretch_half,
-                     -defense_pos, defense_stretch_half, geometry);
+        fieldAddLine(out_geometry, "LeftPenaltyStretch", defense_pos,
+                     -defense_stretch_half, defense_pos, defense_stretch_half, geometry);
+        fieldAddLine(out_geometry, "RightPenaltyStretch", -defense_pos,
+                     -defense_stretch_half, -defense_pos, defense_stretch_half, geometry);
 
         fieldAddCircularArc(out_geometry, "LeftFieldLeftPenaltyArc", -field_length_half,
                             -defense_stretch_half, defense_distance, 0, 0.5f * M_PI,
                             geometry);
         fieldAddCircularArc(out_geometry, "LeftFieldRightPenaltyArc", -field_length_half,
-                            defense_stretch_half, defense_distance, 1.5f * M_PI, 2.0f * M_PI,
-                            geometry);
+                            defense_stretch_half, defense_distance, 1.5f * M_PI,
+                            2.0f * M_PI, geometry);
         fieldAddCircularArc(out_geometry, "RightFieldLeftPenaltyArc", field_length_half,
                             -defense_stretch_half, defense_distance, M_PI, 1.5f * M_PI,
                             geometry);

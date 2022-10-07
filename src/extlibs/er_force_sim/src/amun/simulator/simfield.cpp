@@ -30,20 +30,21 @@ SimField::SimField(btDiscreteDynamicsWorld *world, const world::Geometry &geomet
     const float total_width  = geometry.field_width() / 2.0f + geometry.boundary_width();
     const float total_height = geometry.field_height() / 2.0f + geometry.boundary_width();
     // upper boundary
-    const float room_height      = 8.0f;
-    const float height           = geometry.field_height() / 2.0f - geometry.line_width();
-    const float goal_width_half  = geometry.goal_width() / 2.0f + geometry.goal_wall_width();
+    const float room_height = 8.0f;
+    const float height      = geometry.field_height() / 2.0f - geometry.line_width();
+    const float goal_width_half =
+        geometry.goal_width() / 2.0f + geometry.goal_wall_width();
     const float goal_height_half = geometry.goal_height() / 2.0f;
     const float goal_depth       = geometry.goal_depth() + geometry.goal_wall_width();
     const float goal_depth_half  = goal_depth / 2.0f;
     const float goal_wall_half   = geometry.goal_wall_width() / 2.0f;
 
     // obstacle prototypes
-    m_plane    = new btStaticPlaneShape(btVector3(0, 0, 1), 0);
-    m_goal_side = new btBoxShape(btVector3(goal_wall_half, goal_depth_half, goal_height_half) *
-                                 SIMULATOR_SCALE);
-    m_goal_back = new btBoxShape(btVector3(goal_width_half, goal_wall_half, goal_height_half) *
-                                 SIMULATOR_SCALE);
+    m_plane     = new btStaticPlaneShape(btVector3(0, 0, 1), 0);
+    m_goal_side = new btBoxShape(
+        btVector3(goal_wall_half, goal_depth_half, goal_height_half) * SIMULATOR_SCALE);
+    m_goal_back = new btBoxShape(
+        btVector3(goal_width_half, goal_wall_half, goal_height_half) * SIMULATOR_SCALE);
 
     // build field cube
     // floor
@@ -81,24 +82,24 @@ SimField::SimField(btDiscreteDynamicsWorld *world, const world::Geometry &geomet
         const float side       = (goal == 0) ? -1.0f : 1.0f;
         const btQuaternion rot = btQuaternion::getIdentity();
 
-        addObject(
-                m_goal_side,
-                btTransform(rot, btVector3((goal_width_half - goal_wall_half),
-                                       side * (height + goal_depth_half), goal_height_half) *
-                             SIMULATOR_SCALE),
-                0.3, 0.5);
-        addObject(
-                m_goal_side,
-                btTransform(rot, btVector3(-(goal_width_half - goal_wall_half),
-                                       side * (height + goal_depth_half), goal_height_half) *
-                             SIMULATOR_SCALE),
-                0.3, 0.5);
-        addObject(
-                m_goal_back,
-                btTransform(rot, btVector3(0.0f, side * (height + goal_depth - goal_wall_half),
-                                       goal_height_half) *
-                             SIMULATOR_SCALE),
-                0.1, 0.5);
+        addObject(m_goal_side,
+                  btTransform(rot, btVector3((goal_width_half - goal_wall_half),
+                                             side * (height + goal_depth_half),
+                                             goal_height_half) *
+                                       SIMULATOR_SCALE),
+                  0.3, 0.5);
+        addObject(m_goal_side,
+                  btTransform(rot, btVector3(-(goal_width_half - goal_wall_half),
+                                             side * (height + goal_depth_half),
+                                             goal_height_half) *
+                                       SIMULATOR_SCALE),
+                  0.3, 0.5);
+        addObject(m_goal_back,
+                  btTransform(
+                      rot, btVector3(0.0f, side * (height + goal_depth - goal_wall_half),
+                                     goal_height_half) *
+                               SIMULATOR_SCALE),
+                  0.1, 0.5);
     }
 }
 

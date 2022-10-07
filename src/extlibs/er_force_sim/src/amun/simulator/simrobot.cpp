@@ -83,9 +83,11 @@ SimRobot::SimRobot(RNG *rng, const robot::Specs &specs, btDiscreteDynamicsWorld 
     // set robot dynamics and move to start position
     btVector3 local_inertia(0, 0, 0);
     const float robot_mass_proportion = 49.0f / 50.0f;
-    whole_shape->calculateLocalInertia(robot_mass_proportion * m_specs.mass(), local_inertia);
+    whole_shape->calculateLocalInertia(robot_mass_proportion * m_specs.mass(),
+                                       local_inertia);
     btRigidBody::btRigidBodyConstructionInfo rb_info(
-            robot_mass_proportion * m_specs.mass(), m_motion_state, whole_shape, local_inertia);
+        robot_mass_proportion * m_specs.mass(), m_motion_state, whole_shape,
+        local_inertia);
 
     m_body = new btRigidBody(rb_info);
     // see simulator.cpp
@@ -111,8 +113,8 @@ SimRobot::SimRobot(RNG *rng, const robot::Specs &specs, btDiscreteDynamicsWorld 
     dribbler_shape->calculateLocalInertia((1 - robot_mass_proportion) * m_specs.mass(),
                                           dribbler_inertia);
     btRigidBody::btRigidBodyConstructionInfo rb_drib_info(
-            (1 - robot_mass_proportion) * m_specs.mass(), nullptr, dribbler_shape,
-            dribbler_inertia);
+        (1 - robot_mass_proportion) * m_specs.mass(), nullptr, dribbler_shape,
+        dribbler_inertia);
     rb_drib_info.m_startWorldTransform = dribbler_start_transform;
 
     btRigidBody *dribbler_body = new btRigidBody(rb_drib_info);
@@ -127,7 +129,8 @@ SimRobot::SimRobot(RNG *rng, const robot::Specs &specs, btDiscreteDynamicsWorld 
     local_a.setOrigin(m_dribbler_center);
     local_a.setRotation(btQuaternion(btVector3(0, 1, 0), M_PI_2));
     local_b.setRotation(btQuaternion(btVector3(0, 1, 0), M_PI_2));
-    m_dribbler_constraint = new btHingeConstraint(*m_body, *dribbler_body, local_a, local_b);
+    m_dribbler_constraint =
+        new btHingeConstraint(*m_body, *dribbler_body, local_a, local_b);
     m_dribbler_constraint->enableAngularMotor(false, 0, 0);
     m_world->addConstraint(m_dribbler_constraint, true);
 }
@@ -151,10 +154,11 @@ SimRobot::~SimRobot()
 void SimRobot::calculateDribblerMove(const btVector3 pos, const btQuaternion rot,
                                      const btVector3 lin_vel, float omega)
 {
-    const btQuaternion rotated = rot *
-                                 btQuaternion(m_dribbler_center.x(), m_dribbler_center.y(),
-                                              m_dribbler_center.z(), 0) *
-                                 rot.inverse();
+    const btQuaternion rotated =
+        rot *
+        btQuaternion(m_dribbler_center.x(), m_dribbler_center.y(), m_dribbler_center.z(),
+                     0) *
+        rot.inverse();
     const btVector3 dribbler_pos =
         btVector3(rotated.x(), rotated.y(), rotated.z()) + pos * SIMULATOR_SCALE;
     const btVector3 dribbler_direction(1, 0, 0);
@@ -177,8 +181,10 @@ void SimRobot::dribble(SimBall *ball, float speed)
 
             auto world_to_robot = m_body->getWorldTransform().inverse();
             local_a.setOrigin(world_to_robot * ball->position());
-            local_a.setRotation(btQuaternion(world_to_robot * btVector3(0, 1, 0), M_PI_2));
-            local_b.setRotation(btQuaternion(world_to_robot * btVector3(0, 1, 0), M_PI_2));
+            local_a.setRotation(
+                btQuaternion(world_to_robot * btVector3(0, 1, 0), M_PI_2));
+            local_b.setRotation(
+                btQuaternion(world_to_robot * btVector3(0, 1, 0), M_PI_2));
 
             m_hold_ball_constraint.reset(
                 new btHingeConstraint(*m_body, *ball->body(), local_a, local_b));
@@ -253,7 +259,7 @@ void SimRobot::begin(SimBall *ball, double time)
             m_move.Clear();
         }
     };
-    bool move_command    = false;
+    bool move_command   = false;
     std::string message = " for robot (";
     message += std::to_string(m_specs.id());
     message += ')';
@@ -409,11 +415,11 @@ void SimRobot::begin(SimBall *ball, double time)
         m_shoot_time = 0.0;
     }
     // check if should kick and can do that
-    if (m_is_charged && m_ssl_command.has_kick_speed() && m_ssl_command.kick_speed() > 0 &&
-        canKickBall(ball))
+    if (m_is_charged && m_ssl_command.has_kick_speed() &&
+        m_ssl_command.kick_speed() > 0 && canKickBall(ball))
     {
-        float power          = 0.0;
-        const float angle    = m_ssl_command.kick_angle() / 180 * M_PI;
+        float power           = 0.0;
+        const float angle     = m_ssl_command.kick_angle() / 180 * M_PI;
         const float dir_floor = std::cos(angle);
         const float dir_up    = std::sin(angle);
 
@@ -439,7 +445,8 @@ void SimRobot::begin(SimBall *ball, double time)
             else
             {
                 // if the ball hits the robot the chip distance actually decreases
-                const btVector3 rel_ball_speed = relativeBallSpeed(ball) / SIMULATOR_SCALE;
+                const btVector3 rel_ball_speed =
+                    relativeBallSpeed(ball) / SIMULATOR_SCALE;
                 return std::max((btScalar)0, rel_ball_speed.y()) -
                        qBound((btScalar)0, (btScalar)0.5 * rel_ball_speed.y(),
                               (btScalar)0.5 * dir_floor);
@@ -447,7 +454,8 @@ void SimRobot::begin(SimBall *ball, double time)
         };
         const float speed_compensation = get_speed_compensation();
 
-        ball->kick(t * btVector3(0, dir_floor * power + speed_compensation, dir_up * power) *
+        ball->kick(t *
+                   btVector3(0, dir_floor * power + speed_compensation, dir_up * power) *
                    (1 / time) * SIMULATOR_SCALE * BALL_MASS);
         // discharge
         m_is_charged = false;
@@ -544,11 +552,12 @@ float SimRobot::bound(float acceleration, float old_speed, float speedup_limit,
 
 btVector3 SimRobot::relativeBallSpeed(SimBall *ball) const
 {
-    btTransform t             = m_body->getWorldTransform();
+    btTransform t              = m_body->getWorldTransform();
     const btVector3 ball_speed = ball->speed();
 
     const btQuaternion robot_dir = t.getRotation();
-    const btVector3 diff = (ball_speed).rotate(robot_dir.getAxis(), -robot_dir.getAngle());
+    const btVector3 diff =
+        (ball_speed).rotate(robot_dir.getAxis(), -robot_dir.getAngle());
 
     return diff;
 }
@@ -598,7 +607,7 @@ robot::RadioResponse SimRobot::setCommand(const SSLSimulationProto::RobotCommand
 {
     m_ssl_command  = command;
     m_command_time = 0.0f;
-    m_charge      = charge;
+    m_charge       = charge;
 
     robot::RadioResponse response;
     response.set_generation(m_specs.generation());
@@ -721,7 +730,7 @@ void SimRobot::update(world::SimRobot *robot, SimBall *ball) const
     robot->set_r_z(angular.z());
 
     bool ball_touches_robot = false;
-    int num_manifolds      = m_world->getDispatcher()->getNumManifolds();
+    int num_manifolds       = m_world->getDispatcher()->getNumManifolds();
     for (int i = 0; i < num_manifolds; ++i)
     {
         btPersistentManifold *contact_manifold =
@@ -760,9 +769,9 @@ void SimRobot::move(const sslsim::TeleportRobot &robot)
 bool SimRobot::isFlipped()
 {
     btTransform t = m_body->getWorldTransform();
-    bool is_nan    = std::isnan(t.getOrigin().x()) || std::isnan(t.getOrigin().y()) ||
-                     std::isnan(t.getOrigin().z()) || std::isinf(t.getOrigin().x()) ||
-                     std::isinf(t.getOrigin().y()) || std::isinf(t.getOrigin().z());
+    bool is_nan   = std::isnan(t.getOrigin().x()) || std::isnan(t.getOrigin().y()) ||
+                  std::isnan(t.getOrigin().z()) || std::isinf(t.getOrigin().x()) ||
+                  std::isinf(t.getOrigin().y()) || std::isinf(t.getOrigin().z());
     t.setOrigin(btVector3(0, 0, 0));
     return ((t * btVector3(0, 0, 1)).z() < 0) || is_nan;
 }

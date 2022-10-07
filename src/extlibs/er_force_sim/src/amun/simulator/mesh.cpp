@@ -46,7 +46,8 @@ Mesh::Mesh(float radius, float height, float angle, float hole_size, float box_h
     // right pillar
     addRobotCover(5, outer_angle_start - angle_diff, outer_angle_start);
     m_hull.back().append(QVector3D(-front_plate_length, hole_plate_pos, m_height / 2.0f));
-    m_hull.back().append(QVector3D(-front_plate_length, hole_plate_pos, -m_height / 2.0f));
+    m_hull.back().append(
+        QVector3D(-front_plate_length, hole_plate_pos, -m_height / 2.0f));
 
     // left pillar
     addRobotCover(5, outer_angle_stop, outer_angle_stop + angle_diff);

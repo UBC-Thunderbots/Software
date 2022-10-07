@@ -22,7 +22,8 @@
 
 #include "geometry.h"
 
-SSL_GeometryCameraCalibration createDefaultCamera(int camera_id, float x, float y, float z)
+SSL_GeometryCameraCalibration createDefaultCamera(int camera_id, float x, float y,
+                                                  float z)
 {
     SSL_GeometryCameraCalibration calibration;
 
