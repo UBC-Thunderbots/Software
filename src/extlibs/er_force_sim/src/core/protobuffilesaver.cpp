@@ -22,11 +22,11 @@
 
 #include <QtCore/QDebug>
 
-ProtobufFileSaver::ProtobufFileSaver(QString filename, QString filePrefix,
+ProtobufFileSaver::ProtobufFileSaver(QString filename, QString file_prefix,
                                      QObject *parent)
     : QObject(parent),
       m_filename(filename),
-      m_filePrefix(filePrefix),
+      m_file_prefix(file_prefix),
       m_stream(&m_file),
       m_mutex(QMutex::Recursive)
 {
@@ -48,7 +48,7 @@ void ProtobufFileSaver::open()
     // ensure compatibility across qt versions
     m_stream.setVersion(QDataStream::Qt_4_6);
 
-    m_stream << QString(m_filePrefix);
+    m_stream << QString(m_file_prefix);
     m_stream << (int)0;  // file version
 }
 

@@ -34,7 +34,7 @@ class ProtobufFileSaver : QObject
     Q_OBJECT
    public:
     // The file is created once saveMessage is called for the first time
-    ProtobufFileSaver(QString filename, QString filePrefix, QObject *parent = nullptr);
+    ProtobufFileSaver(QString filename, QString file_prefix, QObject *parent = nullptr);
 
     // may be called from any thread
     void saveMessage(const google::protobuf::Message &message);
@@ -44,7 +44,7 @@ class ProtobufFileSaver : QObject
 
    private:
     QString m_filename;
-    QString m_filePrefix;
+    QString m_file_prefix;
     QFile m_file;
     QDataStream m_stream;
     QMutex m_mutex;

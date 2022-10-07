@@ -31,7 +31,7 @@ class ProtobufFileReader : public QObject
    public:
     ProtobufFileReader();
 
-    bool open(QString filename, QString filePrefix);
+    bool open(QString filename, QString file_prefix);
 
     // returns true if the message has be sucessfully parsed
     bool readNext(google::protobuf::Message &message);

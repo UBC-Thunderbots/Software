@@ -22,7 +22,7 @@
 
 ProtobufFileReader::ProtobufFileReader() : m_stream(&m_file) {}
 
-bool ProtobufFileReader::open(QString filename, QString filePrefix)
+bool ProtobufFileReader::open(QString filename, QString file_prefix)
 {
     m_file.setFileName(filename);
     if (!m_file.open(QIODevice::ReadOnly))
@@ -33,11 +33,11 @@ bool ProtobufFileReader::open(QString filename, QString filePrefix)
     // ensure compatibility across qt versions
     m_stream.setVersion(QDataStream::Qt_4_6);
 
-    QString fileType;
+    QString file_type;
     int version;
-    m_stream >> fileType >> version;
+    m_stream >> file_type >> version;
 
-    if (fileType != filePrefix || version != 0)
+    if (file_type != file_prefix || version != 0)
     {
         return false;
     }

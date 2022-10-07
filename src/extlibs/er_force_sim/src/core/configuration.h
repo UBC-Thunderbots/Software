@@ -30,14 +30,14 @@
 
 #include "src/config/config.h"
 
-inline bool loadConfiguration(const QString &configFile,
-                              google::protobuf::Message *message, bool allowPartial)
+inline bool loadConfiguration(const QString &config_file,
+                              google::protobuf::Message *message, bool allow_partial)
 {
-    QString fullFilename = QString(ERFORCE_CONFDIR) + configFile + ".txt";
-    QFile file(fullFilename);
+    QString full_filename = QString(ERFORCE_CONFDIR) + config_file + ".txt";
+    QFile file(full_filename);
     if (!file.open(QFile::ReadOnly))
     {
-        std::cout << "Could not open configuration file " << fullFilename.toStdString()
+        std::cout << "Could not open configuration file " << full_filename.toStdString()
                   << std::endl;
         return false;
     }
@@ -46,7 +46,7 @@ inline bool loadConfiguration(const QString &configFile,
     std::string s = qPrintable(str);
 
     google::protobuf::TextFormat::Parser parser;
-    parser.AllowPartialMessage(allowPartial);
+    parser.AllowPartialMessage(allow_partial);
     parser.ParseFromString(s, message);
     return true;
 }

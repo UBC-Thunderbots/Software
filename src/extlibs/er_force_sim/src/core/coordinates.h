@@ -145,10 +145,10 @@ namespace coordinates
     template <class F, class T>
     void fromVision(const F& from, T& to)
     {
-        float detectionX, detectionY;
-        core::internal::getPos(from, detectionX, detectionY);
-        float x = -detectionY / 1000.0f;
-        float y = detectionX / 1000.0f;
+        float detection_x, detection_y;
+        core::internal::getPos(from, detection_x, detection_y);
+        float x = -detection_y / 1000.0f;
+        float y = detection_x / 1000.0f;
         core::internal::setPos(to, x, y);
     }
 
@@ -157,10 +157,10 @@ namespace coordinates
     {
         float x, y;
         core::internal::getPos(from, x, y);
-        float visionX, visionY;
-        visionX = y * 1000.f;
-        visionY = -x * 1000.f;
-        core::internal::setPos(to, visionX, visionY);
+        float vision_x, vision_y;
+        vision_x = y * 1000.f;
+        vision_y = -x * 1000.f;
+        core::internal::setPos(to, vision_x, vision_y);
     }
 
     template <class F, class T>
@@ -188,39 +188,39 @@ namespace coordinates
         return vision + M_PI_2;
     }
 
-    inline float toVisionRotation(float internRotation)
+    inline float toVisionRotation(float intern_rotation)
     {
-        return internRotation - M_PI_2;
+        return intern_rotation - M_PI_2;
     }
 
     inline float chipVelFromChipDistance(float distance)
     {
         const float angle    = 45.f / 180 * M_PI;
-        const float dirFloor = std::cos(angle);
-        const float dirUp    = std::sin(angle);
+        const float dir_floor = std::cos(angle);
+        const float dir_up    = std::sin(angle);
         const float gravity  = 9.81;
-        // airtime = 2 * (shootSpeed * dirUp) / g
-        // targetDist = shootSpeed * dirFloor * airtime
-        // => targetDist = shootSpeed * dirFloor * (2 * shootSpeed * dirUp) / g = 2 *
-        // shootSpeed**2 * dirFloor * dirUp / g
-        const float shootSpeed =
-            std::sqrt(distance * gravity / (2 * std::abs(dirUp * dirFloor)));
-        return shootSpeed;
+        // airtime = 2 * (shoot_speed * dir_up) / g
+        // targetDist = shoot_speed * dir_floor * airtime
+        // => targetDist = shoot_speed * dir_floor * (2 * shoot_speed * dir_up) / g = 2 *
+        // shoot_speed**2 * dir_floor * dir_up / g
+        const float shoot_speed =
+            std::sqrt(distance * gravity / (2 * std::abs(dir_up * dir_floor)));
+        return shoot_speed;
     }
 
     inline float chipDistanceFromChipVel(float velocity)
     {
         const float angle    = 45.f / 180 * M_PI;
-        const float dirFloor = std::cos(angle);
-        const float dirUp    = std::sin(angle);
+        const float dir_floor = std::cos(angle);
+        const float dir_up    = std::sin(angle);
         const float gravity  = 9.81;
-        // airtime = 2 * (shootSpeed * dirUp) / g
-        // targetDist = shootSpeed * dirFloor * airtime
-        // => targetDist = shootSpeed * dirFloor * (2 * shootSpeed * dirUp) / g = 2 *
-        // shootSpeed**2 * dirFloor * dirUp / g
-        const float targetDist = 2 * velocity * velocity * dirFloor * dirUp / gravity;
+        // airtime = 2 * (shootSpeed * dir_up) / g
+        // target_dist = shootSpeed * dir_floor * airtime
+        // => target_dist = shootSpeed * dir_floor * (2 * shootSpeed * dir_up) / g = 2 *
+        // shootSpeed**2 * dir_floor * dir_up / g
+        const float target_dist = 2 * velocity * velocity * dir_floor * dir_up / gravity;
 
-        return targetDist;
+        return target_dist;
     }
 
 }  // namespace coordinates
