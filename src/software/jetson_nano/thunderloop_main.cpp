@@ -3,8 +3,10 @@
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/mman.h>  // Needed for mlockall()
-#include <unistd.h>    // needed for sysconf(int name);
+#include <sys/mman.h>      // Needed for mlockall()
+#include <sys/resource.h>  // needed for getrusage
+#include <sys/time.h>      // needed for getrusage
+#include <unistd.h>        // needed for sysconf(int name);
 
 #include "proto/tbots_software_msgs.pb.h"
 #include "shared/2021_robot_constants.h"
@@ -12,7 +14,6 @@
 #include "software/jetson_nano/thunderloop.h"
 #include "software/logger/network_logger.h"
 #include "software/world/robot_state.h"
-
 
 // clang-format off
 std::string BANNER =

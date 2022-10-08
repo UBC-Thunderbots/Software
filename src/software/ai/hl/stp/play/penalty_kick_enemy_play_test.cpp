@@ -25,7 +25,8 @@ class PenaltyKickEnemyPlayTest
     Field field                      = Field::createField(field_type);
 };
 
-TEST_P(PenaltyKickEnemyPlayTest, test_penalty_kick_enemy_play_setup)
+// TODO (#2714): Re-enable tests
+TEST_P(PenaltyKickEnemyPlayTest, DISABLED_test_penalty_kick_enemy_play_setup)
 {
     RefereeCommand current_command  = std::get<0>(GetParam());
     RefereeCommand previous_command = std::get<1>(GetParam());

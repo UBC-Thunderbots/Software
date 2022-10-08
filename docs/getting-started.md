@@ -285,7 +285,7 @@ To build for the Jetson Nano, build the target with the `--cpu=jetson_nano` flag
 
 ## Deploying to Jetson Nano 
 
-We use Ansible to automatically update software running on the Jetson Nano. [See these instructions.](/src/software/jetson_nano/ansible/README.md) 
+We use ansible to automatically update software running on the Jetson Nano. [See these instructions.](/docs/deploying.md) 
 
 To update binaries on a working robot, you can run:
 
