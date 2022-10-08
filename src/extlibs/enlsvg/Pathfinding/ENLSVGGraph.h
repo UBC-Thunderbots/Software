@@ -36,7 +36,10 @@ namespace Pathfinding
             const VertexID immediate_last;  // immediate vertex just before next.
 
             SkipEdge(VertexID next, double weight, VertexID imNext, VertexID imLast)
-                : next(next), weight(weight), immediate_next(imNext), immediate_last(imLast)
+                : next(next),
+                  weight(weight),
+                  immediate_next(imNext),
+                  immediate_last(imLast)
             {
             }
         };
@@ -127,9 +130,9 @@ namespace Pathfinding
             void computeAllEdgeLevels();
             void setupSkipEdges();
             void followLevelWPathToNextSkipVertex(
-                    EdgeID first_edge, double& total_weight, VertexID& next_vertex,
-                    VertexID& immediate_next, VertexID& immediate_last,
-                    const std::vector<bool>& is_skip_vertex) const;
+                EdgeID first_edge, double& total_weight, VertexID& next_vertex,
+                VertexID& immediate_next, VertexID& immediate_last,
+                const std::vector<bool>& is_skip_vertex) const;
         };
     }  // namespace ENLSVG
 }  // namespace Pathfinding

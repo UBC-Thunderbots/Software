@@ -63,14 +63,14 @@ namespace Pathfinding
             // Connect Taut Neighbours of Edges
             for (size_t i = 0; i < edges.size(); ++i)
             {
-                EdgeData& edge                         = edges[i];
+                EdgeData& edge                           = edges[i];
                 std::vector<EdgeID>& taut_outgoing_edges = edge.taut_outgoing_edges;
-                VertexID src                           = edge.source_vertex;
-                VertexID dest                          = edge.dest_vertex;
-                int s_x                                 = vertices[src].x;
-                int s_y                                 = vertices[src].y;
-                int e_x                                 = vertices[dest].x;
-                int e_y                                 = vertices[dest].y;
+                VertexID src                             = edge.source_vertex;
+                VertexID dest                            = edge.dest_vertex;
+                int s_x                                  = vertices[src].x;
+                int s_y                                  = vertices[src].y;
+                int e_x                                  = vertices[dest].x;
+                int e_y                                  = vertices[dest].y;
 
                 const std::vector<EdgeID>& outgoing_edges = edge_lists[dest];
                 for (size_t j = 0; j < outgoing_edges.size(); ++j)
@@ -95,7 +95,8 @@ namespace Pathfinding
             buildHierarchy();
         }
 
-        void VisibilityGraph::connectEdge(int i, int j, int x_i, int y_i, int x_j, int y_j)
+        void VisibilityGraph::connectEdge(int i, int j, int x_i, int y_i, int x_j,
+                                          int y_j)
         {
             EdgeID edge_ij = edges.size();
             edges.push_back(EdgeData(i, j, LEVEL_W));
@@ -129,7 +130,7 @@ namespace Pathfinding
             n_neighbours.resize(edges.size());
             for (EdgeID i = 0; i < edges.size(); ++i)
             {
-                int n          = edges[i].taut_outgoing_edges.size();
+                int n           = edges[i].taut_outgoing_edges.size();
                 n_neighbours[i] = n;
                 if (n == 0)
                     current_level_edges.push_back(i);
@@ -148,7 +149,8 @@ namespace Pathfinding
 
                     // Curr side must have no neighbours.
                     // Opp side may have neighbours.
-                    const std::vector<EdgeID>& neighbours = edges[opp].taut_outgoing_edges;
+                    const std::vector<EdgeID>& neighbours =
+                        edges[opp].taut_outgoing_edges;
                     for (size_t j = 0; j < neighbours.size(); ++j)
                     {
                         EdgeID neighbour = opposite(neighbours[j]);
@@ -177,7 +179,7 @@ namespace Pathfinding
             for (VertexID i = 0; i < vertices.size(); ++i)
             {
                 const auto& edge_list = edge_lists[i];
-                int n_level_w_edges     = 0;
+                int n_level_w_edges   = 0;
                 for (size_t j = 0; j < edge_list.size(); ++j)
                 {
                     if (edges[edge_list[j]].level == LEVEL_W)
@@ -195,7 +197,7 @@ namespace Pathfinding
 
             for (size_t i = 0; i < skip_vertices.size(); ++i)
             {
-                VertexID curr        = skip_vertices[i];
+                VertexID curr         = skip_vertices[i];
                 const auto& edge_list = edge_lists[curr];
 
                 for (size_t j = 0; j < edge_list.size(); ++j)
@@ -207,11 +209,11 @@ namespace Pathfinding
                     VertexID next_vertex;
                     VertexID immediate_next;
                     VertexID immediate_last;
-                    followLevelWPathToNextSkipVertex(edge_list[j], total_weight, next_vertex,
-                                                     immediate_next, immediate_last,
-                                                     is_skip_vertex);
-                    skip_edges[curr].push_back(
-                        SkipEdge(next_vertex, total_weight, immediate_next, immediate_last));
+                    followLevelWPathToNextSkipVertex(edge_list[j], total_weight,
+                                                     next_vertex, immediate_next,
+                                                     immediate_last, is_skip_vertex);
+                    skip_edges[curr].push_back(SkipEdge(next_vertex, total_weight,
+                                                        immediate_next, immediate_last));
                 }
             }
 
@@ -222,12 +224,12 @@ namespace Pathfinding
         }
 
         void VisibilityGraph::followLevelWPathToNextSkipVertex(
-                EdgeID first_edge, double& total_weight, VertexID& next_vertex,
-                VertexID& immediate_next, VertexID& immediate_last,
-                const std::vector<bool>& is_skip_vertex) const
+            EdgeID first_edge, double& total_weight, VertexID& next_vertex,
+            VertexID& immediate_next, VertexID& immediate_last,
+            const std::vector<bool>& is_skip_vertex) const
         {
             EdgeID curr_edge = first_edge;
-            total_weight     = weight(curr_edge);            // RETURN VALUE
+            total_weight     = weight(curr_edge);             // RETURN VALUE
             immediate_next   = edges[curr_edge].dest_vertex;  // RETURN VALUE
 
             while (!is_skip_vertex[edges[curr_edge].dest_vertex])
@@ -252,8 +254,8 @@ namespace Pathfinding
         }
 
         void VisibilityGraph::markEdgesFrom(
-                MarkedEdges& marked_edges, const int s_x, const int s_y,
-                const std::vector<GridVertex>& neighbours) const
+            MarkedEdges& marked_edges, const int s_x, const int s_y,
+            const std::vector<GridVertex>& neighbours) const
         {
             std::vector<EdgeID> edge_queue;
 
@@ -281,9 +283,9 @@ namespace Pathfinding
             {
                 EdgeID curr = edge_queue[head];
 
-                const int curr_level           = edges[curr].level;
+                const int curr_level            = edges[curr].level;
                 const auto& taut_outgoing_edges = edges[curr].taut_outgoing_edges;
-                bool skip_vertex               = isSkipVertex(edges[curr].dest_vertex);
+                bool skip_vertex                = isSkipVertex(edges[curr].dest_vertex);
 
                 for (size_t j = 0; j < taut_outgoing_edges.size(); ++j)
                 {
@@ -292,8 +294,8 @@ namespace Pathfinding
                         continue;
 
                     // Should be (curr_level != LEVEL_W && edges[next].level > curr_level)
-                    // || (!skip_vertex && edges[next].level == LEVEL_W) But we set LEVEL_W
-                    // = INT_MAX, so, "curr_level != LEVEL_W" is no longer needed.
+                    // || (!skip_vertex && edges[next].level == LEVEL_W) But we set
+                    // LEVEL_W = INT_MAX, so, "curr_level != LEVEL_W" is no longer needed.
                     if ((edges[next].level > curr_level) ||
                         (!skip_vertex && edges[next].level == LEVEL_W))
                     {

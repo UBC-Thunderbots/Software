@@ -29,7 +29,8 @@ namespace Pathfinding
         // If (x, y) is outside of the grid's boundaries, returns true.
         inline bool isBlocked(int x, int y) const
         {
-            return x < 0 || y < 0 || x >= size_x || y >= size_y || blocked[y * size_x + x];
+            return x < 0 || y < 0 || x >= size_x || y >= size_y ||
+                   blocked[y * size_x + x];
         }
 
         inline void setBlocked(int x, int y, bool value)
@@ -283,7 +284,8 @@ namespace Pathfinding
         }
 
 
-        inline bool isTautFromLeft(int x_1, int y_1, int x_2, int y_2, int x_3, int y_3) const
+        inline bool isTautFromLeft(int x_1, int y_1, int x_2, int y_2, int x_3,
+                                   int y_3) const
         {
             if (x_3 < x_2)
                 return false;
@@ -303,7 +305,8 @@ namespace Pathfinding
             }
         }
 
-        inline bool isTautFromRight(int x_1, int y_1, int x_2, int y_2, int x_3, int y_3) const
+        inline bool isTautFromRight(int x_1, int y_1, int x_2, int y_2, int x_3,
+                                    int y_3) const
         {
             if (x_3 > x_2)
                 return false;
@@ -323,7 +326,8 @@ namespace Pathfinding
             }
         }
 
-        inline bool isTautFromBottom(int x_1, int y_1, int x_2, int y_2, int x_3, int y_3) const
+        inline bool isTautFromBottom(int x_1, int y_1, int x_2, int y_2, int x_3,
+                                     int y_3) const
         {
             if (y_3 < y_2)
                 return false;
@@ -343,7 +347,8 @@ namespace Pathfinding
             }
         }
 
-        inline bool isTautFromTop(int x_1, int y_1, int x_2, int y_2, int x_3, int y_3) const
+        inline bool isTautFromTop(int x_1, int y_1, int x_2, int y_2, int x_3,
+                                  int y_3) const
         {
             if (y_3 > y_2)
                 return false;

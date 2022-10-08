@@ -123,7 +123,7 @@ namespace Pathfinding
                 {
                     break;  // Reached Goal.
                 }
-                VertexID curr             = pq.popMinIndex();
+                VertexID curr              = pq.popMinIndex();
                 const double curr_distance = memory.distance(curr);
                 const VertexID curr_parent = restorePar(memory.parent(curr));
                 memory.setVisited(curr, true);
@@ -249,7 +249,7 @@ namespace Pathfinding
                 {
                     break;  // Reached Goal, or min value = POS_INF (can't find goal)
                 }
-                VertexID curr             = pq.popMinIndex();
+                VertexID curr              = pq.popMinIndex();
                 const double curr_distance = memory.distance(curr);
                 const VertexID curr_parent = restorePar(memory.parent(curr));
                 memory.setVisited(curr, true);
@@ -370,7 +370,8 @@ namespace Pathfinding
                     path.push_back(graph.vertices[curr]);
                     while (!graph.isSkipVertex(edges[curr_edge].dest_vertex))
                     {
-                        const auto& taut_outgoing_edges = edges[curr_edge].taut_outgoing_edges;
+                        const auto& taut_outgoing_edges =
+                            edges[curr_edge].taut_outgoing_edges;
 
                         // Find next outgoing level-W edge.
                         for (size_t i = 0; i < taut_outgoing_edges.size(); ++i)
@@ -405,10 +406,10 @@ namespace Pathfinding
                                           int s_x, int s_y, int e_x, int e_y,
                                           ParentPtrs* parent_ptrs) const
         {
-            parent_ptrs->goal       = GridVertex(e_x, e_y);
+            parent_ptrs->goal        = GridVertex(e_x, e_y);
             parent_ptrs->goal_parent = (goal_parent == NO_PARENT)
-                                         ? parent_ptrs->goal
-                                         : graph.vertices[restorePar(goal_parent)];
+                                           ? parent_ptrs->goal
+                                           : graph.vertices[restorePar(goal_parent)];
 
             std::vector<GridVertex>& current = parent_ptrs->current;
             std::vector<GridVertex>& parent  = parent_ptrs->parent;

@@ -5,7 +5,10 @@
 namespace Pathfinding
 {
     LineOfSightScanner::LineOfSightScanner(const Grid& grid)
-        : grid(grid), size_x(grid.size_x), sizeY(grid.size_y), extents_size_x(grid.size_x + 1)
+        : grid(grid),
+          size_x(grid.size_x),
+          sizeY(grid.size_y),
+          extents_size_x(grid.size_x + 1)
     {
         computeExtents();
     }
@@ -37,24 +40,24 @@ namespace Pathfinding
         for (int y = 0; y < sizeY + 2; ++y)
         {
             bool last_is_blocked = true;
-            int last_x          = -1;
+            int last_x           = -1;
             for (int x = 0; x <= size_x; ++x)
             {
                 left_down_extents[y * extents_size_x + x] = last_x;
                 if (grid.isBlocked(x, y - 1) != last_is_blocked)
                 {
-                    last_x         = x;
+                    last_x          = x;
                     last_is_blocked = !last_is_blocked;
                 }
             }
             last_is_blocked = true;
-            last_x         = size_x + 1;
+            last_x          = size_x + 1;
             for (int x = size_x; x >= 0; --x)
             {
                 right_down_extents[y * extents_size_x + x] = last_x;
                 if (grid.isBlocked(x - 1, y - 1) != last_is_blocked)
                 {
-                    last_x         = x;
+                    last_x          = x;
                     last_is_blocked = !last_is_blocked;
                 }
             }
@@ -248,12 +251,14 @@ namespace Pathfinding
                      *        B     B
                      */
 
-                    int x                         = curr_state.x_L.n;
-                    int y                         = curr_state.y;
-                    bool top_right_of_blocked_tile    = grid.topRightOfBlockedTile(x, y);
-                    bool bottom_right_of_blocked_tile = grid.bottomRightOfBlockedTile(x, y);
+                    int x                          = curr_state.x_L.n;
+                    int y                          = curr_state.y;
+                    bool top_right_of_blocked_tile = grid.topRightOfBlockedTile(x, y);
+                    bool bottom_right_of_blocked_tile =
+                        grid.bottomRightOfBlockedTile(x, y);
 
-                    if (x <= s_x && top_right_of_blocked_tile && !bottom_right_of_blocked_tile)
+                    if (x <= s_x && top_right_of_blocked_tile &&
+                        !bottom_right_of_blocked_tile)
                     {
                         data.addSuccessor(GridVertex(x, y));
                         left_inclusive = false;
@@ -274,12 +279,13 @@ namespace Pathfinding
                      *      B     B
                      */
 
-                    int x                        = curr_state.x_R.n;
-                    int y                        = curr_state.y;
+                    int x                            = curr_state.x_R.n;
+                    int y                            = curr_state.y;
                     bool bottom_left_of_blocked_tile = grid.bottomLeftOfBlockedTile(x, y);
                     bool top_left_of_blocked_tile    = grid.topLeftOfBlockedTile(x, y);
 
-                    if (x <= s_x && bottom_left_of_blocked_tile && !top_left_of_blocked_tile)
+                    if (x <= s_x && bottom_left_of_blocked_tile &&
+                        !top_left_of_blocked_tile)
                     {
                         if (left_inclusive || !zero_length_interval)
                         {
@@ -287,7 +293,8 @@ namespace Pathfinding
                             right_inclusive = false;
                         }
                     }
-                    else if (s_x <= x && top_left_of_blocked_tile && !bottom_left_of_blocked_tile)
+                    else if (s_x <= x && top_left_of_blocked_tile &&
+                             !bottom_left_of_blocked_tile)
                     {
                         if (left_inclusive || !zero_length_interval)
                         {
@@ -309,7 +316,7 @@ namespace Pathfinding
                 // (Px-Bx)*(Py-By+1)/(Py-By) + Bx
                 int dy = curr_state.y - s_y;
                 Fraction left_projection =
-                        (curr_state.x_L - s_x).multiplyDivide(dy + 1, dy) + s_x;
+                    (curr_state.x_L - s_x).multiplyDivide(dy + 1, dy) + s_x;
 
                 int left_bound = leftUpExtent(curr_state.x_L.ceil(), curr_state.y);
                 if (curr_state.x_L.isWholeNumber() &&
@@ -324,7 +331,7 @@ namespace Pathfinding
 
                 // (Px-Bx)*(Py-By+1)/(Py-By) + Bx
                 Fraction right_projection =
-                        (curr_state.x_R - s_x).multiplyDivide(dy + 1, dy) + s_x;
+                    (curr_state.x_R - s_x).multiplyDivide(dy + 1, dy) + s_x;
 
                 int right_bound = rightUpExtent(curr_state.x_R.floor(), curr_state.y);
                 if (curr_state.x_R.isWholeNumber() &&
@@ -366,12 +373,14 @@ namespace Pathfinding
                      *                |X|
                      */
 
-                    int x                         = curr_state.x_L.n;
-                    int y                         = curr_state.y;
-                    bool bottom_right_of_blocked_tile = grid.bottomRightOfBlockedTile(x, y);
-                    bool top_right_of_blocked_tile    = grid.topRightOfBlockedTile(x, y);
+                    int x = curr_state.x_L.n;
+                    int y = curr_state.y;
+                    bool bottom_right_of_blocked_tile =
+                        grid.bottomRightOfBlockedTile(x, y);
+                    bool top_right_of_blocked_tile = grid.topRightOfBlockedTile(x, y);
 
-                    if (x <= s_x && bottom_right_of_blocked_tile && !top_right_of_blocked_tile)
+                    if (x <= s_x && bottom_right_of_blocked_tile &&
+                        !top_right_of_blocked_tile)
                     {
                         data.addSuccessor(GridVertex(x, y));
                         left_inclusive = false;
@@ -392,12 +401,13 @@ namespace Pathfinding
                      *  |X|
                      */
 
-                    int x                        = curr_state.x_R.n;
-                    int y                        = curr_state.y;
+                    int x                            = curr_state.x_R.n;
+                    int y                            = curr_state.y;
                     bool top_left_of_blocked_tile    = grid.topLeftOfBlockedTile(x, y);
                     bool bottom_left_of_blocked_tile = grid.bottomLeftOfBlockedTile(x, y);
 
-                    if (x <= s_x && top_left_of_blocked_tile && !bottom_left_of_blocked_tile)
+                    if (x <= s_x && top_left_of_blocked_tile &&
+                        !bottom_left_of_blocked_tile)
                     {
                         if (left_inclusive || !zero_length_interval)
                         {
@@ -405,7 +415,8 @@ namespace Pathfinding
                             right_inclusive = false;
                         }
                     }
-                    else if (s_x <= x && bottom_left_of_blocked_tile && !top_left_of_blocked_tile)
+                    else if (s_x <= x && bottom_left_of_blocked_tile &&
+                             !top_left_of_blocked_tile)
                     {
                         if (left_inclusive || !zero_length_interval)
                         {
@@ -428,7 +439,7 @@ namespace Pathfinding
                 // (Px-Bx)*(Py-By+1)/(Py-By) + Bx
                 int dy = s_y - curr_state.y;
                 Fraction left_projection =
-                        (curr_state.x_L - s_x).multiplyDivide(dy + 1, dy) + s_x;
+                    (curr_state.x_L - s_x).multiplyDivide(dy + 1, dy) + s_x;
 
                 int left_bound = leftDownExtent(curr_state.x_L.ceil(), curr_state.y);
                 if (curr_state.x_L.isWholeNumber() &&
@@ -443,7 +454,7 @@ namespace Pathfinding
 
                 // (Px-Bx)*(Py-By+1)/(Py-By) + Bx
                 Fraction right_projection =
-                        (curr_state.x_R - s_x).multiplyDivide(dy + 1, dy) + s_x;
+                    (curr_state.x_R - s_x).multiplyDivide(dy + 1, dy) + s_x;
 
                 int right_bound = rightDownExtent(curr_state.x_R.floor(), curr_state.y);
                 if (curr_state.x_R.isWholeNumber() &&
@@ -461,8 +472,8 @@ namespace Pathfinding
                 {
                     if (left_projection <= right_projection)
                     {
-                        generateDownwards(data, left_projection, right_projection, s_x, s_y,
-                                          curr_state.y, true, true);
+                        generateDownwards(data, left_projection, right_projection, s_x,
+                                          s_y, curr_state.y, true, true);
                     }
                 }
                 else if (left_projection < right_projection)
@@ -497,11 +508,14 @@ namespace Pathfinding
      * Called by generateUpwards / Downwards.
      * Note: Unlike Anya, 0-length intervals are possible.
      */
-    void LineOfSightScanner::generateAndSplitIntervals(
-            ScannerStacks& data, int check_y, int new_y, int s_x, int s_y, Rational left_bound,
-            Rational right_bound, bool left_inclusive, bool right_inclusive) const
+    void LineOfSightScanner::generateAndSplitIntervals(ScannerStacks& data, int check_y,
+                                                       int new_y, int s_x, int s_y,
+                                                       Rational left_bound,
+                                                       Rational right_bound,
+                                                       bool left_inclusive,
+                                                       bool right_inclusive) const
     {
-        Rational left = left_bound;
+        Rational left  = left_bound;
         int left_floor = left.floor();
 
         // Up: !bottomRightOfBlockedTile && bottomLeftOfBlockedTile
@@ -515,10 +529,11 @@ namespace Pathfinding
         // Divide up the intervals.
         while (true)
         {
-            int right = right_down_extents[check_y * extents_size_x +
-                                           left_floor];  // it's actually right_down_extents
-                                                      // for exploreDownwards. (thus we
-                                                      // use check_y = currY - 2)
+            int right =
+                right_down_extents[check_y * extents_size_x +
+                                   left_floor];  // it's actually right_down_extents
+                                                 // for exploreDownwards. (thus we
+                                                 // use check_y = currY - 2)
             if (right_bound <= right)
                 break;  // right < right_bound
 
@@ -530,7 +545,7 @@ namespace Pathfinding
             }
 
             left_floor     = right;
-            left          = Rational(left_floor);
+            left           = Rational(left_floor);
             left_inclusive = true;
         }
 

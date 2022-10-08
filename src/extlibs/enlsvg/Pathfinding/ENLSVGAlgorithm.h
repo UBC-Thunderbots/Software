@@ -23,10 +23,10 @@ namespace Pathfinding
 
         struct AStarData
         {
-            bool visited            = false;
+            bool visited               = false;
             double edge_weight_to_goal = -1.0;
-            VertexID parent         = NO_PARENT;
-            double distance         = POS_INF;
+            VertexID parent            = NO_PARENT;
+            double distance            = POS_INF;
 
             AStarData()
                 : visited(false),
@@ -82,8 +82,9 @@ namespace Pathfinding
             }
             inline double edgeWeightToGoal(size_t index) const
             {
-                return ticket_check[index] == ticket_number ? nodes[index].edge_weight_to_goal
-                                                            : def.edge_weight_to_goal;
+                return ticket_check[index] == ticket_number
+                           ? nodes[index].edge_weight_to_goal
+                           : def.edge_weight_to_goal;
             }
             inline VertexID parent(size_t index) const
             {
@@ -100,7 +101,7 @@ namespace Pathfinding
             {
                 if (ticket_check[index] != ticket_number)
                 {
-                    nodes[index]       = def;
+                    nodes[index]        = def;
                     ticket_check[index] = ticket_number;
                 }
             }
@@ -143,8 +144,9 @@ namespace Pathfinding
 
             Path computePath(Memory& memory, const int s_x, const int s_y, const int e_x,
                              const int e_y, ParentPtrs* parent_ptrs = nullptr) const;
-            Path computeSVGPath(Memory& memory, const int s_x, const int s_y, const int e_x,
-                                const int e_y, ParentPtrs* parent_ptrs = nullptr) const;
+            Path computeSVGPath(Memory& memory, const int s_x, const int s_y,
+                                const int e_x, const int e_y,
+                                ParentPtrs* parent_ptrs = nullptr) const;
 
             size_t nVertices() const;
             size_t nEdges() const;
@@ -180,7 +182,8 @@ namespace Pathfinding
             Path getPath(const Memory& memory, VertexID goal_parent, const int s_x,
                          const int s_y, const int e_x, const int e_y) const;
             void setParentPointers(const Memory& memory, VertexID goal_parent, int s_x,
-                                   int s_y, int e_x, int e_y, ParentPtrs* parent_ptrs) const;
+                                   int s_y, int e_x, int e_y,
+                                   ParentPtrs* parent_ptrs) const;
         };
     }  // namespace ENLSVG
 }  // namespace Pathfinding

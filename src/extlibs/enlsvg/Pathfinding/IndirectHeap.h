@@ -179,7 +179,7 @@ namespace Pathfinding
                 swapData(index, smaller_child);
 
                 // Recurse
-                index        = smaller_child;
+                index         = smaller_child;
                 left_child    = 2 * index + 1;
                 right_child   = 2 * index + 2;
                 smaller_child = smallerNode(left_child, right_child);

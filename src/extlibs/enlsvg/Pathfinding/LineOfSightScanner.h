@@ -72,7 +72,8 @@ namespace Pathfinding
 
         inline int leftUpExtent(int x_L, int y) const
         {
-            return x_L > size_x ? size_x : left_down_extents[(y + 1) * extents_size_x + x_L];
+            return x_L > size_x ? size_x
+                                : left_down_extents[(y + 1) * extents_size_x + x_L];
         }
 
         inline int leftDownExtent(int xL, int y) const
@@ -116,15 +117,16 @@ namespace Pathfinding
         void generateAllDirectionStartingStates(ScannerStacks& data, int sx,
                                                 int sy) const;
         void exploreStates(ScannerStacks& data, int sx, int sy) const;
-        void generateUpwards(ScannerStacks& data, Rational left_bound, Rational right_bound,
-                             int sx, int sy, int curr_y, bool left_inclusive,
-                             bool right_inclusive) const;
+        void generateUpwards(ScannerStacks& data, Rational left_bound,
+                             Rational right_bound, int sx, int sy, int curr_y,
+                             bool left_inclusive, bool right_inclusive) const;
         void generateDownwards(ScannerStacks& data, Rational left_bound,
                                Rational right_bound, int sx, int sy, int curr_y,
                                bool left_inclusive, bool right_inclusive) const;
-        void generateAndSplitIntervals(ScannerStacks& data, int check_y, int new_y, int sx,
-                                       int sy, Rational left_bound, Rational right_bound,
-                                       bool left_inclusive, bool right_inclusive) const;
+        void generateAndSplitIntervals(ScannerStacks& data, int check_y, int new_y,
+                                       int sx, int sy, Rational left_bound,
+                                       Rational right_bound, bool left_inclusive,
+                                       bool right_inclusive) const;
     };
 
 }  // namespace Pathfinding
