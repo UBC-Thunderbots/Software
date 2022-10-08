@@ -62,7 +62,7 @@ int main(int argc, char** argv)
         auto backend = std::make_shared<UnixSimulatorBackend>(args.runtime_dir);
         auto sensor_fusion =
             std::make_shared<ThreadedSensorFusion>(tbots_proto.sensor_fusion_config());
-        auto ai = std::make_shared<ThreadedAI>(tbots_proto.ai_config());
+        auto ai = std::make_shared<ThreadedAi>(tbots_proto.ai_config());
 
         // Overrides
         auto tactic_override_listener =
