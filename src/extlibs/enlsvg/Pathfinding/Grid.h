@@ -13,28 +13,28 @@ namespace Pathfinding
         std::vector<bool> blocked;
 
        public:
-        int sizeX;
-        int sizeY;
-        int totalSize;
+        int size_x;
+        int size_y;
+        int total_size;
 
-        Grid(int sizeX, int sizeY);
+        Grid(int size_x, int size_y);
         void printGrid() const;
 
         // isBlocked, but without boundary checks.
         inline bool isBlockedRaw(int x, int y) const
         {
-            return blocked[y * sizeX + x];
+            return blocked[y * size_x + x];
         }
 
         // If (x, y) is outside of the grid's boundaries, returns true.
         inline bool isBlocked(int x, int y) const
         {
-            return x < 0 || y < 0 || x >= sizeX || y >= sizeY || blocked[y * sizeX + x];
+            return x < 0 || y < 0 || x >= size_x || y >= size_y || blocked[y * size_x + x];
         }
 
         inline void setBlocked(int x, int y, bool value)
         {
-            blocked[y * sizeX + x] = value;
+            blocked[y * size_x + x] = value;
         }
 
         inline bool isOuterCorner(int x, int y) const
@@ -63,128 +63,128 @@ namespace Pathfinding
             return isBlocked(x, y);
         }
 
-        static inline double euclideanDistance(int x1, int y1, int x2, int y2)
+        static inline double euclideanDistance(int x_1, int y_1, int x_2, int y_2)
         {
-            int dx = x2 - x1;
-            int dy = y2 - y1;
+            int dx = x_2 - x_1;
+            int dy = y_2 - y_1;
             return sqrt(dx * dx + dy * dy);
         }
 
-        inline bool lineOfSight(int x1, int y1, int x2, int y2) const
+        inline bool lineOfSight(int x_1, int y_1, int x_2, int y_2) const
         {
-            int dy = y2 - y1;
-            int dx = x2 - x1;
+            int dy = y_2 - y_1;
+            int dx = x_2 - x_1;
 
             int f = 0;
 
-            int signY   = 1;
-            int signX   = 1;
-            int offsetX = 0;
-            int offsetY = 0;
+            int sign_y   = 1;
+            int sign_x   = 1;
+            int offset_x = 0;
+            int offset_y = 0;
 
             if (dy < 0)
             {
                 dy *= -1;
-                signY   = -1;
-                offsetY = -1;
+                sign_y   = -1;
+                offset_y = -1;
             }
             if (dx < 0)
             {
                 dx *= -1;
-                signX   = -1;
-                offsetX = -1;
+                sign_x   = -1;
+                offset_x = -1;
             }
 
             if (dx >= dy)
             {
-                while (x1 != x2)
+                while (x_1 != x_2)
                 {
                     f += dy;
                     if (f >= dx)
                     {
-                        if (isBlocked(x1 + offsetX, y1 + offsetY))
+                        if (isBlocked(x_1 + offset_x, y_1 + offset_y))
                             return false;
-                        y1 += signY;
+                        y_1 += sign_y;
                         f -= dx;
                     }
-                    if (f != 0 && isBlocked(x1 + offsetX, y1 + offsetY))
+                    if (f != 0 && isBlocked(x_1 + offset_x, y_1 + offset_y))
                         return false;
-                    if (dy == 0 && isBlocked(x1 + offsetX, y1) &&
-                        isBlocked(x1 + offsetX, y1 - 1))
+                    if (dy == 0 && isBlocked(x_1 + offset_x, y_1) &&
+                        isBlocked(x_1 + offset_x, y_1 - 1))
                         return false;
 
-                    x1 += signX;
+                    x_1 += sign_x;
                 }
             }
             else
             {
-                while (y1 != y2)
+                while (y_1 != y_2)
                 {
                     f += dx;
                     if (f >= dy)
                     {
-                        if (isBlocked(x1 + offsetX, y1 + offsetY))
+                        if (isBlocked(x_1 + offset_x, y_1 + offset_y))
                             return false;
-                        x1 += signX;
+                        x_1 += sign_x;
                         f -= dy;
                     }
-                    if (f != 0 && isBlocked(x1 + offsetX, y1 + offsetY))
+                    if (f != 0 && isBlocked(x_1 + offset_x, y_1 + offset_y))
                         return false;
-                    if (dx == 0 && isBlocked(x1, y1 + offsetY) &&
-                        isBlocked(x1 - 1, y1 + offsetY))
+                    if (dx == 0 && isBlocked(x_1, y_1 + offset_y) &&
+                        isBlocked(x_1 - 1, y_1 + offset_y))
                         return false;
 
-                    y1 += signY;
+                    y_1 += sign_y;
                 }
             }
             return true;
         }
 
-        // Checks whether the path (x1,y1),(x2,y2),(x3,y3) is taut.
-        inline bool isTaut(int x1, int y1, int x2, int y2, int x3, int y3) const
+        // Checks whether the path (x_1,y_1),(x_2,y_2),(x_3,y_3) is taut.
+        inline bool isTaut(int x_1, int y_1, int x_2, int y_2, int x_3, int y_3) const
         {
-            if (x1 < x2)
+            if (x_1 < x_2)
             {
-                if (y1 < y2)
+                if (y_1 < y_2)
                 {
-                    return isTautFromBottomLeft(x1, y1, x2, y2, x3, y3);
+                    return isTautFromBottomLeft(x_1, y_1, x_2, y_2, x_3, y_3);
                 }
-                else if (y2 < y1)
+                else if (y_2 < y_1)
                 {
-                    return isTautFromTopLeft(x1, y1, x2, y2, x3, y3);
+                    return isTautFromTopLeft(x_1, y_1, x_2, y_2, x_3, y_3);
                 }
                 else
-                {  // y1 == y2
-                    return isTautFromLeft(x1, y1, x2, y2, x3, y3);
+                {  // y_1 == y_2
+                    return isTautFromLeft(x_1, y_1, x_2, y_2, x_3, y_3);
                 }
             }
-            else if (x2 < x1)
+            else if (x_2 < x_1)
             {
-                if (y1 < y2)
+                if (y_1 < y_2)
                 {
-                    return isTautFromBottomRight(x1, y1, x2, y2, x3, y3);
+                    return isTautFromBottomRight(x_1, y_1, x_2, y_2, x_3, y_3);
                 }
-                else if (y2 < y1)
+                else if (y_2 < y_1)
                 {
-                    return isTautFromTopRight(x1, y1, x2, y2, x3, y3);
+                    return isTautFromTopRight(x_1, y_1, x_2, y_2, x_3, y_3);
                 }
                 else
-                {  // y1 == y2
-                    return isTautFromRight(x1, y1, x2, y2, x3, y3);
+                {  // y_1 == y_2
+                    return isTautFromRight(x_1, y_1, x_2, y_2, x_3, y_3);
                 }
             }
             else
-            {  // x2 == x1
-                if (y1 < y2)
+            {  // x_2 == x_1
+                if (y_1 < y_2)
                 {
-                    return isTautFromBottom(x1, y1, x2, y2, x3, y3);
+                    return isTautFromBottom(x_1, y_1, x_2, y_2, x_3, y_3);
                 }
-                else if (y2 < y1)
+                else if (y_2 < y_1)
                 {
-                    return isTautFromTop(x1, y1, x2, y2, x3, y3);
+                    return isTautFromTop(x_1, y_1, x_2, y_2, x_3, y_3);
                 }
                 else
-                {  // y1 == y2
+                {  // y_1 == y_2
                     std::cout << "ERROR: v == u?" << std::endl;
                     return true;
                 }
@@ -192,21 +192,21 @@ namespace Pathfinding
         }
 
        private:
-        inline bool isTautFromBottomLeft(int x1, int y1, int x2, int y2, int x3,
-                                         int y3) const
+        inline bool isTautFromBottomLeft(int x_1, int y_1, int x_2, int y_2, int x_3,
+                                         int y_3) const
         {
-            if (x3 < x2 || y3 < y2)
+            if (x_3 < x_2 || y_3 < y_2)
                 return false;
 
-            int compareGradients =
-                (y2 - y1) * (x3 - x2) - (y3 - y2) * (x2 - x1);  // m1 - m2
-            if (compareGradients < 0)
+            int compare_gradients =
+                (y_2 - y_1) * (x_3 - x_2) - (y_3 - y_2) * (x_2 - x_1);  // m1 - m2
+            if (compare_gradients < 0)
             {  // m1 < m2
-                return bottomRightOfBlockedTile(x2, y2);
+                return bottomRightOfBlockedTile(x_2, y_2);
             }
-            else if (compareGradients > 0)
+            else if (compare_gradients > 0)
             {  // m1 > m2
-                return topLeftOfBlockedTile(x2, y2);
+                return topLeftOfBlockedTile(x_2, y_2);
             }
             else
             {  // m1 == m2
@@ -215,21 +215,21 @@ namespace Pathfinding
         }
 
 
-        inline bool isTautFromTopLeft(int x1, int y1, int x2, int y2, int x3,
-                                      int y3) const
+        inline bool isTautFromTopLeft(int x_1, int y_1, int x_2, int y_2, int x_3,
+                                      int y_3) const
         {
-            if (x3 < x2 || y3 > y2)
+            if (x_3 < x_2 || y_3 > y_2)
                 return false;
 
-            int compareGradients =
-                (y2 - y1) * (x3 - x2) - (y3 - y2) * (x2 - x1);  // m1 - m2
-            if (compareGradients < 0)
+            int compare_gradients =
+                (y_2 - y_1) * (x_3 - x_2) - (y_3 - y_2) * (x_2 - x_1);  // m1 - m2
+            if (compare_gradients < 0)
             {  // m1 < m2
-                return bottomLeftOfBlockedTile(x2, y2);
+                return bottomLeftOfBlockedTile(x_2, y_2);
             }
-            else if (compareGradients > 0)
+            else if (compare_gradients > 0)
             {  // m1 > m2
-                return topRightOfBlockedTile(x2, y2);
+                return topRightOfBlockedTile(x_2, y_2);
             }
             else
             {  // m1 == m2
@@ -237,44 +237,21 @@ namespace Pathfinding
             }
         }
 
-        inline bool isTautFromBottomRight(int x1, int y1, int x2, int y2, int x3,
-                                          int y3) const
+        inline bool isTautFromBottomRight(int x_1, int y_1, int x_2, int y_2, int x_3,
+                                          int y_3) const
         {
-            if (x3 > x2 || y3 < y2)
+            if (x_3 > x_2 || y_3 < y_2)
                 return false;
 
-            int compareGradients =
-                (y2 - y1) * (x3 - x2) - (y3 - y2) * (x2 - x1);  // m1 - m2
-            if (compareGradients < 0)
+            int compare_gradients =
+                (y_2 - y_1) * (x_3 - x_2) - (y_3 - y_2) * (x_2 - x_1);  // m1 - m2
+            if (compare_gradients < 0)
             {  // m1 < m2
-                return topRightOfBlockedTile(x2, y2);
+                return topRightOfBlockedTile(x_2, y_2);
             }
-            else if (compareGradients > 0)
+            else if (compare_gradients > 0)
             {  // m1 > m2
-                return bottomLeftOfBlockedTile(x2, y2);
-            }
-            else
-            {  // m1 == m2
-                return true;
-            }
-        }
-
-
-        inline bool isTautFromTopRight(int x1, int y1, int x2, int y2, int x3,
-                                       int y3) const
-        {
-            if (x3 > x2 || y3 > y2)
-                return false;
-
-            int compareGradients =
-                (y2 - y1) * (x3 - x2) - (y3 - y2) * (x2 - x1);  // m1 - m2
-            if (compareGradients < 0)
-            {  // m1 < m2
-                return topLeftOfBlockedTile(x2, y2);
-            }
-            else if (compareGradients > 0)
-            {  // m1 > m2
-                return bottomRightOfBlockedTile(x2, y2);
+                return bottomLeftOfBlockedTile(x_2, y_2);
             }
             else
             {  // m1 == m2
@@ -283,82 +260,105 @@ namespace Pathfinding
         }
 
 
-        inline bool isTautFromLeft(int x1, int y1, int x2, int y2, int x3, int y3) const
+        inline bool isTautFromTopRight(int x_1, int y_1, int x_2, int y_2, int x_3,
+                                       int y_3) const
         {
-            if (x3 < x2)
+            if (x_3 > x_2 || y_3 > y_2)
                 return false;
 
-            int dy = y3 - y2;
+            int compare_gradients =
+                (y_2 - y_1) * (x_3 - x_2) - (y_3 - y_2) * (x_2 - x_1);  // m1 - m2
+            if (compare_gradients < 0)
+            {  // m1 < m2
+                return topLeftOfBlockedTile(x_2, y_2);
+            }
+            else if (compare_gradients > 0)
+            {  // m1 > m2
+                return bottomRightOfBlockedTile(x_2, y_2);
+            }
+            else
+            {  // m1 == m2
+                return true;
+            }
+        }
+
+
+        inline bool isTautFromLeft(int x_1, int y_1, int x_2, int y_2, int x_3, int y_3) const
+        {
+            if (x_3 < x_2)
+                return false;
+
+            int dy = y_3 - y_2;
             if (dy < 0)
-            {  // y3 < y2
-                return topRightOfBlockedTile(x2, y2);
+            {  // y_3 < y_2
+                return topRightOfBlockedTile(x_2, y_2);
             }
             else if (dy > 0)
-            {  // y3 > y2
-                return bottomRightOfBlockedTile(x2, y2);
+            {  // y_3 > y_2
+                return bottomRightOfBlockedTile(x_2, y_2);
             }
             else
-            {  // y3 == y2
+            {  // y_3 == y_2
                 return true;
             }
         }
 
-        inline bool isTautFromRight(int x1, int y1, int x2, int y2, int x3, int y3) const
+        inline bool isTautFromRight(int x_1, int y_1, int x_2, int y_2, int x_3, int y_3) const
         {
-            if (x3 > x2)
+            if (x_3 > x_2)
                 return false;
 
-            int dy = y3 - y2;
+            int dy = y_3 - y_2;
             if (dy < 0)
-            {  // y3 < y2
-                return topLeftOfBlockedTile(x2, y2);
+            {  // y_3 < y_2
+                return topLeftOfBlockedTile(x_2, y_2);
             }
             else if (dy > 0)
-            {  // y3 > y2
-                return bottomLeftOfBlockedTile(x2, y2);
+            {  // y_3 > y_2
+                return bottomLeftOfBlockedTile(x_2, y_2);
             }
             else
-            {  // y3 == y2
+            {  // y_3 == y_2
                 return true;
             }
         }
 
-        inline bool isTautFromBottom(int x1, int y1, int x2, int y2, int x3, int y3) const
+        inline bool isTautFromBottom(int x_1, int y_1, int x_2, int y_2, int x_3, int y_3) const
         {
-            if (y3 < y2)
+            if (y_3 < y_2)
                 return false;
 
-            int dx = x3 - x2;
+            int dx = x_3 - x_2;
             if (dx < 0)
-            {  // x3 < x2
-                return topRightOfBlockedTile(x2, y2);
+            {  // x_3 < x_2
+                return topRightOfBlockedTile(x_2, y_2);
             }
             else if (dx > 0)
-            {  // x3 > x2
-                return topLeftOfBlockedTile(x2, y2);
+            {  // x_3 > x_2
+                return topLeftOfBlockedTile(x_2, y_2);
             }
             else
-            {  // x3 == x2
+            {  // x_3 == x_2
                 return true;
             }
         }
 
-        inline bool isTautFromTop(int x1, int y1, int x2, int y2, int x3, int y3) const
+        inline bool isTautFromTop(int x_1, int y_1, int x_2, int y_2, int x_3, int y_3) const
         {
-            if (y3 > y2)
+            if (y_3 > y_2)
                 return false;
 
-            int dx = x3 - x2;
+            int dx = x_3 - x_2;
             if (dx < 0)
-            {  // x3 < x2
-                return bottomRightOfBlockedTile(x2, y2);
+            {  // x_3 < x_2
+                return bottomRightOfBlockedTile(x_2, y_2);
             }
             else if (dx > 0)
-            {  // x3 > x2
-                return bottomLeftOfBlockedTile(x2, y2);
+            {  // x_3 > x_2
+                return bottomLeftOfBlockedTile(x_2, y_2);
             }
             else
-            {  // x3 == x2
+            {  // x_3 == x_2
                 return true;
             }
         }

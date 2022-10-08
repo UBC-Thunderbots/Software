@@ -24,15 +24,15 @@ namespace Pathfinding
         }
 
         Memory::Memory(const Algorithm& algo)
-            : nEdges(algo.nEdges()),
-              nNodes(algo.nVertices()),
-              markedEdges(nEdges),
-              pq(nNodes)
+            : n_edges(algo.nEdges()),
+              n_nodes(algo.nVertices()),
+              marked_edges(n_edges),
+              pq(n_nodes)
         {
             const size_t nNodes = algo.nVertices();
             nodes.resize(nNodes);
-            ticketCheck.resize(nNodes, 0);
-            ticketNumber = 1;
+            ticket_check.resize(nNodes, 0);
+            ticket_number = 1;
         }
 
 
@@ -42,25 +42,25 @@ namespace Pathfinding
         }
 
 
-        Path Algorithm::computeSVGPath(Memory& memory, const int sx, const int sy,
-                                       const int ex, const int ey,
-                                       ParentPtrs* parentPtrs) const
+        Path Algorithm::computeSVGPath(Memory& memory, const int s_x, const int s_y,
+                                       const int e_x, const int e_y,
+                                       ParentPtrs* parent_ptrs) const
         {
             if (!memory.validate(graph))
                 std::cout << "VALIDATION ERROR: MEMORY USED IS INVALID" << std::endl;
 
             // START: SPECIAL CASES - Handle special cases first.
-            if (sx == ex && sy == ey)
+            if (s_x == e_x && s_y == e_y)
             {
                 Path path;
-                path.push_back(GridVertex(sx, sy));
+                path.push_back(GridVertex(s_x, s_y));
                 return path;
             }
-            else if (grid.lineOfSight(sx, sy, ex, ey))
+            else if (grid.lineOfSight(s_x, s_y, e_x, e_y))
             {
                 Path path;
-                path.push_back(GridVertex(sx, sy));
-                path.push_back(GridVertex(ex, ey));
+                path.push_back(GridVertex(s_x, s_y));
+                path.push_back(GridVertex(e_x, e_y));
                 return path;
             }
             // END: SPECIAL CASES
@@ -71,119 +71,119 @@ namespace Pathfinding
             IndirectHeap& pq = memory.pq;
             pq.reinitialise();
 
-            double goalDistance = POS_INF;
-            VertexID goalParent = NO_PARENT;
+            double goal_distance = POS_INF;
+            VertexID goal_parent = NO_PARENT;
             {  // START: INITIALISATION
-                ScannerStacks& data = memory.scannerStacks;
+                ScannerStacks& data = memory.scanner_stacks;
                 {
-                    const VertexID startIndex = graph.nodeIndex(sx, sy);
+                    const VertexID start_index = graph.nodeIndex(s_x, s_y);
                     // Add all visible neighbours of start vertex
-                    scanner.computeAllDirNeighbours(data, sx, sy);
+                    scanner.computeAllDirNeighbours(data, s_x, s_y);
                     const std::vector<GridVertex>& neighbours = data.neighbours;
                     for (size_t i = 0; i < neighbours.size(); ++i)
                     {
                         const GridVertex& vn = neighbours[i];
                         VertexID neighbour   = graph.nodeIndex(vn.x, vn.y);
 
-                        double dist = grid.euclideanDistance(sx, sy, vn.x, vn.y);
+                        double dist = grid.euclideanDistance(s_x, s_y, vn.x, vn.y);
                         memory.setDistance(neighbour, dist);
-                        pq.decreaseKey(neighbour, dist + heuristic(neighbour, ex, ey));
+                        pq.decreaseKey(neighbour, dist + heuristic(neighbour, e_x, e_y));
                     }
-                    if (startIndex != -1)
+                    if (start_index != -1)
                     {
                         // If start vertex is a VG node, mark it as visited so we don't
                         // waste time on it.
-                        memory.setVisited(startIndex, true);
+                        memory.setVisited(start_index, true);
                     }
                 }
                 {
-                    const VertexID goalIndex = graph.nodeIndex(ex, ey);
+                    const VertexID goal_index = graph.nodeIndex(e_x, e_y);
                     // Add all visible neighbours of goal vertex
-                    scanner.computeAllDirNeighbours(data, ex, ey);
+                    scanner.computeAllDirNeighbours(data, e_x, e_y);
                     const std::vector<GridVertex>& neighbours = data.neighbours;
                     for (size_t i = 0; i < neighbours.size(); ++i)
                     {
                         const GridVertex& vn = neighbours[i];
                         VertexID neighbour   = graph.nodeIndex(vn.x, vn.y);
                         memory.setEdgeWeightToGoal(
-                            neighbour, grid.euclideanDistance(vn.x, vn.y, ex, ey));
+                            neighbour, grid.euclideanDistance(vn.x, vn.y, e_x, e_y));
                     }
-                    if (goalIndex != -1)
+                    if (goal_index != -1)
                     {
                         // If goal vertex is a VG node, mark it as visited so we don't
                         // waste time on it.
-                        memory.setVisited(goalIndex, true);
+                        memory.setVisited(goal_index, true);
                     }
                 }
             }  // END: INITIALISATION
 
             while (pq.size() > 0)
             {
-                if (goalDistance <= pq.getMinValue())
+                if (goal_distance <= pq.getMinValue())
                 {
                     break;  // Reached Goal.
                 }
                 VertexID curr             = pq.popMinIndex();
-                const double currDistance = memory.distance(curr);
-                const VertexID currParent = restorePar(memory.parent(curr));
+                const double curr_distance = memory.distance(curr);
+                const VertexID curr_parent = restorePar(memory.parent(curr));
                 memory.setVisited(curr, true);
 
-                const std::vector<EdgeID>& neighbours = graph.edgeLists[curr];
+                const std::vector<EdgeID>& neighbours = graph.edge_lists[curr];
                 for (size_t i = 0; i < neighbours.size(); ++i)
                 {
                     const auto& edge = graph.edges[neighbours[i]];
-                    VertexID dest    = edge.destVertex;
+                    VertexID dest    = edge.dest_vertex;
                     if (memory.visited(dest))
                         continue;
                     double weight = graph.weight(edge);
 
-                    double destDistance = currDistance + weight;
-                    if (destDistance < memory.distance(dest) &&
-                        isTaut(currParent, curr, dest))
+                    double dest_distance = curr_distance + weight;
+                    if (dest_distance < memory.distance(dest) &&
+                        isTaut(curr_parent, curr, dest))
                     {
                         memory.setParent(dest, curr);
-                        memory.setDistance(dest, destDistance);
-                        pq.decreaseKey(dest, destDistance + heuristic(dest, ex, ey));
+                        memory.setDistance(dest, dest_distance);
+                        pq.decreaseKey(dest, dest_distance + heuristic(dest, e_x, e_y));
                     }
                 }
 
                 if (memory.edgeWeightToGoal(curr) != -1.0)
                 {
-                    double destDistance = currDistance + memory.edgeWeightToGoal(curr);
-                    if (destDistance < goalDistance)
+                    double dest_distance = curr_distance + memory.edgeWeightToGoal(curr);
+                    if (dest_distance < goal_distance)
                     {
-                        goalDistance = destDistance;  // heuristic of goal should be 0
-                        goalParent   = curr;
+                        goal_distance = dest_distance;  // heuristic of goal should be 0
+                        goal_parent   = curr;
                     }
                 }
             }
 
-            if (parentPtrs != nullptr)
-                setParentPointers(memory, goalParent, sx, sy, ex, ey, parentPtrs);
-            return getPath(memory, goalParent, sx, sy, ex, ey);
+            if (parent_ptrs != nullptr)
+                setParentPointers(memory, goal_parent, s_x, s_y, e_x, e_y, parent_ptrs);
+            return getPath(memory, goal_parent, s_x, s_y, e_x, e_y);
         }
 
 
 
-        Path Algorithm::computePath(Memory& memory, const int sx, const int sy,
-                                    const int ex, const int ey,
-                                    ParentPtrs* parentPtrs) const
+        Path Algorithm::computePath(Memory& memory, const int s_x, const int s_y,
+                                    const int e_x, const int e_y,
+                                    ParentPtrs* parent_ptrs) const
         {
             if (!memory.validate(graph))
                 std::cout << "VALIDATION ERROR: MEMORY USED IS INVALID" << std::endl;
 
             // START: SPECIAL CASES - Handle special cases first.
-            if (sx == ex && sy == ey)
+            if (s_x == e_x && s_y == e_y)
             {
                 Path path;
-                path.push_back(GridVertex(sx, sy));
+                path.push_back(GridVertex(s_x, s_y));
                 return path;
             }
-            else if (grid.lineOfSight(sx, sy, ex, ey))
+            else if (grid.lineOfSight(s_x, s_y, e_x, e_y))
             {
                 Path path;
-                path.push_back(GridVertex(sx, sy));
-                path.push_back(GridVertex(ex, ey));
+                path.push_back(GridVertex(s_x, s_y));
+                path.push_back(GridVertex(e_x, e_y));
                 return path;
             }
             // END: SPECIAL CASES
@@ -193,148 +193,148 @@ namespace Pathfinding
             IndirectHeap& pq = memory.pq;
             pq.reinitialise();
 
-            MarkedEdges& markedEdges = memory.markedEdges;
-            double goalDistance      = POS_INF;
-            VertexID goalParent      = NO_PARENT;
+            MarkedEdges& marked_edges = memory.marked_edges;
+            double goal_distance      = POS_INF;
+            VertexID goal_parent      = NO_PARENT;
             {  // START: INITIALISATION
-                ScannerStacks& data = memory.scannerStacks;
+                ScannerStacks& data = memory.scanner_stacks;
                 {
-                    const VertexID startIndex = graph.nodeIndex(sx, sy);
+                    const VertexID start_index = graph.nodeIndex(s_x, s_y);
                     // Add all visible neighbours of start vertex
-                    scanner.computeAllDirNeighbours(data, sx, sy);
+                    scanner.computeAllDirNeighbours(data, s_x, s_y);
                     const std::vector<GridVertex>& neighbours = data.neighbours;
                     for (size_t i = 0; i < neighbours.size(); ++i)
                     {
                         const GridVertex& vn = neighbours[i];
                         VertexID neighbour   = graph.nodeIndex(vn.x, vn.y);
 
-                        double dist = grid.euclideanDistance(sx, sy, vn.x, vn.y);
+                        double dist = grid.euclideanDistance(s_x, s_y, vn.x, vn.y);
                         memory.setDistance(neighbour, dist);
-                        pq.decreaseKey(neighbour, dist + heuristic(neighbour, ex, ey));
+                        pq.decreaseKey(neighbour, dist + heuristic(neighbour, e_x, e_y));
                     }
-                    if (startIndex != -1)
+                    if (start_index != -1)
                     {
                         // If start vertex is a VG node, mark it as visited so we don't
                         // waste time on it.
-                        memory.setVisited(startIndex, true);
+                        memory.setVisited(start_index, true);
                     }
-                    graph.markEdgesFrom(markedEdges, sx, sy, neighbours);
+                    graph.markEdgesFrom(marked_edges, s_x, s_y, neighbours);
                 }
                 {
-                    const VertexID goalIndex = graph.nodeIndex(ex, ey);
+                    const VertexID goal_index = graph.nodeIndex(e_x, e_y);
                     // Add all visible neighbours of goal vertex
-                    scanner.computeAllDirNeighbours(data, ex, ey);
+                    scanner.computeAllDirNeighbours(data, e_x, e_y);
                     const std::vector<GridVertex>& neighbours = data.neighbours;
                     for (size_t i = 0; i < neighbours.size(); ++i)
                     {
                         const GridVertex& vn = neighbours[i];
                         VertexID neighbour   = graph.nodeIndex(vn.x, vn.y);
                         memory.setEdgeWeightToGoal(
-                            neighbour, grid.euclideanDistance(vn.x, vn.y, ex, ey));
+                            neighbour, grid.euclideanDistance(vn.x, vn.y, e_x, e_y));
                     }
-                    if (goalIndex != -1)
+                    if (goal_index != -1)
                     {
                         // If goal vertex is a VG node, mark it as visited so we don't
                         // waste time on it.
-                        memory.setVisited(goalIndex, true);
+                        memory.setVisited(goal_index, true);
                     }
-                    graph.markEdgesFrom(markedEdges, ex, ey, neighbours);
+                    graph.markEdgesFrom(marked_edges, e_x, e_y, neighbours);
                 }
             }  // END: INITIALISATION
-            graph.markBothWays(markedEdges);
+            graph.markBothWays(marked_edges);
 
             while (pq.size() > 0)
             {
-                if (goalDistance <= pq.getMinValue())
+                if (goal_distance <= pq.getMinValue())
                 {
                     break;  // Reached Goal, or min value = POS_INF (can't find goal)
                 }
                 VertexID curr             = pq.popMinIndex();
-                const double currDistance = memory.distance(curr);
-                const VertexID currParent = restorePar(memory.parent(curr));
+                const double curr_distance = memory.distance(curr);
+                const VertexID curr_parent = restorePar(memory.parent(curr));
                 memory.setVisited(curr, true);
 
                 // Traverse marked edges
-                const std::vector<EdgeID>& neighbours = graph.edgeLists[curr];
+                const std::vector<EdgeID>& neighbours = graph.edge_lists[curr];
                 for (size_t i = 0; i < neighbours.size(); ++i)
                 {
-                    const EdgeID edgeId = neighbours[i];
-                    if (!markedEdges.isMarked[edgeId])
+                    const EdgeID edge_id = neighbours[i];
+                    if (!marked_edges.is_marked[edge_id])
                         continue;
-                    const auto& edge = graph.edges[edgeId];
-                    VertexID dest    = edge.destVertex;
+                    const auto& edge = graph.edges[edge_id];
+                    VertexID dest    = edge.dest_vertex;
                     if (memory.visited(dest))
                         continue;
                     double weight = graph.weight(edge);
 
-                    double destDistance = currDistance + weight;
-                    if (destDistance < memory.distance(dest) &&
-                        isTaut(currParent, curr, dest))
+                    double dest_distance = curr_distance + weight;
+                    if (dest_distance < memory.distance(dest) &&
+                        isTaut(curr_parent, curr, dest))
                     {
                         memory.setParent(dest, curr);
-                        memory.setDistance(dest, destDistance);
-                        pq.decreaseKey(dest, destDistance + heuristic(dest, ex, ey));
+                        memory.setDistance(dest, dest_distance);
+                        pq.decreaseKey(dest, dest_distance + heuristic(dest, e_x, e_y));
                     }
                 }
 
                 // Traverse skip edges
-                const std::vector<SkipEdge>& skipEdges = graph.skipEdges[curr];
-                for (size_t i = 0; i < skipEdges.size(); ++i)
+                const std::vector<SkipEdge>& skip_edges = graph.skip_edges[curr];
+                for (size_t i = 0; i < skip_edges.size(); ++i)
                 {
-                    const SkipEdge& edge = skipEdges[i];
+                    const SkipEdge& edge = skip_edges[i];
                     VertexID dest        = edge.next;
                     if (memory.visited(dest))
                         continue;
                     double weight = edge.weight;
 
-                    double destDistance = currDistance + weight;
-                    if (destDistance < memory.distance(dest) &&
-                        isTaut(currParent, curr, edge.immediateNext))
+                    double dest_distance = curr_distance + weight;
+                    if (dest_distance < memory.distance(dest) &&
+                        isTaut(curr_parent, curr, edge.immediate_next))
                     {
-                        memory.setParent(dest, negatePar(edge.immediateLast));
-                        memory.setDistance(dest, destDistance);
-                        pq.decreaseKey(dest, destDistance + heuristic(dest, ex, ey));
+                        memory.setParent(dest, negatePar(edge.immediate_last));
+                        memory.setDistance(dest, dest_distance);
+                        pq.decreaseKey(dest, dest_distance + heuristic(dest, e_x, e_y));
                     }
                 }
 
                 if (memory.edgeWeightToGoal(curr) != -1.0)
                 {
-                    double destDistance = currDistance + memory.edgeWeightToGoal(curr);
-                    if (destDistance < goalDistance)
+                    double dest_distance = curr_distance + memory.edgeWeightToGoal(curr);
+                    if (dest_distance < goal_distance)
                     {
-                        goalDistance = destDistance;  // heuristic of goal should be 0
-                        goalParent   = curr;
+                        goal_distance = dest_distance;  // heuristic of goal should be 0
+                        goal_parent   = curr;
                     }
                 }
             }
 
-            markedEdges.clear();
-            if (parentPtrs != nullptr)
-                setParentPointers(memory, goalParent, sx, sy, ex, ey, parentPtrs);
-            return getPath(memory, goalParent, sx, sy, ex, ey);
+            marked_edges.clear();
+            if (parent_ptrs != nullptr)
+                setParentPointers(memory, goal_parent, s_x, s_y, e_x, e_y, parent_ptrs);
+            return getPath(memory, goal_parent, s_x, s_y, e_x, e_y);
         }
 
 
 
-        Path Algorithm::getPath(const Memory& memory, VertexID goalParent, const int sx,
-                                const int sy, const int ex, const int ey) const
+        Path Algorithm::getPath(const Memory& memory, VertexID goal_parent, const int s_x,
+                                const int s_y, const int e_x, const int e_y) const
         {
             Path path;
 
             // no path found.
-            if (goalParent == NO_PARENT)
+            if (goal_parent == NO_PARENT)
                 return path;
 
             // If the last vertex is not equal to the goal vertex.
-            if (!(ex == graph.vertices[goalParent].x &&
-                  ey == graph.vertices[goalParent].y))
+            if (!(e_x == graph.vertices[goal_parent].x &&
+                  e_y == graph.vertices[goal_parent].y))
             {
-                path.push_back(GridVertex(ex, ey));
+                path.push_back(GridVertex(e_x, e_y));
             }
 
             const int LEVEL_W = graph.LEVEL_W;
             VertexID prev     = NO_PARENT;
-            VertexID curr     = goalParent;
+            VertexID curr     = goal_parent;
             // Assumption: first edge from goal is not a skip-edge.
             // Loop invariant: prev is nonnegative.
             while (curr != NO_PARENT)
@@ -353,69 +353,69 @@ namespace Pathfinding
                     const auto& edges = graph.edges;
 
                     // Set first edge.
-                    EdgeID currEdge;
+                    EdgeID curr_edge;
                     {
-                        const auto& edgeList = graph.edgeLists[prev];
-                        for (size_t i = 0; i < edgeList.size(); ++i)
+                        const auto& edge_list = graph.edge_lists[prev];
+                        for (size_t i = 0; i < edge_list.size(); ++i)
                         {
-                            const EdgeID id = edgeList[i];
-                            if (edges[id].destVertex != curr)
+                            const EdgeID id = edge_list[i];
+                            if (edges[id].dest_vertex != curr)
                                 continue;
-                            currEdge = id;
+                            curr_edge = id;
                             break;
                         }
                     }
 
                     // Follow level-W edges until you reach then ext skip-vertex.
                     path.push_back(graph.vertices[curr]);
-                    while (!graph.isSkipVertex(edges[currEdge].destVertex))
+                    while (!graph.isSkipVertex(edges[curr_edge].dest_vertex))
                     {
-                        const auto& tautOutgoingEdges = edges[currEdge].tautOutgoingEdges;
+                        const auto& taut_outgoing_edges = edges[curr_edge].taut_outgoing_edges;
 
                         // Find next outgoing level-W edge.
-                        for (size_t i = 0; i < tautOutgoingEdges.size(); ++i)
+                        for (size_t i = 0; i < taut_outgoing_edges.size(); ++i)
                         {
-                            EdgeID nextEdge = tautOutgoingEdges[i];
-                            if (edges[nextEdge].level == LEVEL_W)
+                            EdgeID next_edge = taut_outgoing_edges[i];
+                            if (edges[next_edge].level == LEVEL_W)
                             {
-                                currEdge = nextEdge;
+                                curr_edge = next_edge;
                                 break;
                             }
                         }
-                        path.push_back(graph.vertices[edges[currEdge].destVertex]);
+                        path.push_back(graph.vertices[edges[curr_edge].dest_vertex]);
                         // This should not infinite loop done correctly.
                     }
 
-                    prev = edges[currEdge].destVertex;
+                    prev = edges[curr_edge].dest_vertex;
                     curr = memory.parent(prev);
                 }
             }
 
             // If Start vertex is not equal to the first vertex.
-            if (sx != path.back().x || sy != path.back().y)
+            if (s_x != path.back().x || s_y != path.back().y)
             {
-                path.push_back(GridVertex(sx, sy));
+                path.push_back(GridVertex(s_x, s_y));
             }
 
             std::reverse(path.begin(), path.end());
             return path;
         }
 
-        void Algorithm::setParentPointers(const Memory& memory, VertexID goalParent,
-                                          int sx, int sy, int ex, int ey,
-                                          ParentPtrs* parentPtrs) const
+        void Algorithm::setParentPointers(const Memory& memory, VertexID goal_parent,
+                                          int s_x, int s_y, int e_x, int e_y,
+                                          ParentPtrs* parent_ptrs) const
         {
-            parentPtrs->goal       = GridVertex(ex, ey);
-            parentPtrs->goalParent = (goalParent == NO_PARENT)
-                                         ? parentPtrs->goal
-                                         : graph.vertices[restorePar(goalParent)];
+            parent_ptrs->goal       = GridVertex(e_x, e_y);
+            parent_ptrs->goal_parent = (goal_parent == NO_PARENT)
+                                         ? parent_ptrs->goal
+                                         : graph.vertices[restorePar(goal_parent)];
 
-            std::vector<GridVertex>& current = parentPtrs->current;
-            std::vector<GridVertex>& parent  = parentPtrs->parent;
+            std::vector<GridVertex>& current = parent_ptrs->current;
+            std::vector<GridVertex>& parent  = parent_ptrs->parent;
 
             current.clear();
             parent.clear();
-            for (size_t i = 0; i < memory.nNodes; ++i)
+            for (size_t i = 0; i < memory.n_nodes; ++i)
             {
                 if (memory.distance(i) == POS_INF)
                     continue;
@@ -427,7 +427,7 @@ namespace Pathfinding
                 }
                 else
                 {
-                    parent.push_back(GridVertex(sx, sy));
+                    parent.push_back(GridVertex(s_x, s_y));
                 }
             }
         }

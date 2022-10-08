@@ -24,13 +24,13 @@ namespace Pathfinding
         struct AStarData
         {
             bool visited            = false;
-            double edgeWeightToGoal = -1.0;
+            double edge_weight_to_goal = -1.0;
             VertexID parent         = NO_PARENT;
             double distance         = POS_INF;
 
             AStarData()
                 : visited(false),
-                  edgeWeightToGoal(-1.0),
+                  edge_weight_to_goal(-1.0),
                   parent(NO_PARENT),
                   distance(POS_INF)
             {
@@ -45,63 +45,63 @@ namespace Pathfinding
             Memory(const Algorithm& algo);
 
            private:
-            const size_t nEdges;
-            const size_t nNodes;
+            const size_t n_edges;
+            const size_t n_nodes;
             const AStarData def;  // default values
             std::vector<AStarData> nodes;
-            std::vector<int> ticketCheck;
-            int ticketNumber;
+            std::vector<int> ticket_check;
+            int ticket_number;
 
-            ScannerStacks scannerStacks;
-            MarkedEdges markedEdges;
+            ScannerStacks scanner_stacks;
+            MarkedEdges marked_edges;
             IndirectHeap pq;
 
 
             void initialise()
             {
-                if (ticketNumber != -1)
+                if (ticket_number != -1)
                 {
-                    ++ticketNumber;
+                    ++ticket_number;
                 }
                 else
                 {
-                    std::fill(ticketCheck.begin(), ticketCheck.end(), 0);
-                    ticketNumber = 1;
+                    std::fill(ticket_check.begin(), ticket_check.end(), 0);
+                    ticket_number = 1;
                 }
             }
 
             bool validate(const VisibilityGraph& graph)
             {
-                return nNodes == graph.vertices.size() && nEdges == graph.edges.size();
+                return n_nodes == graph.vertices.size() && n_edges == graph.edges.size();
             }
 
             inline bool visited(size_t index) const
             {
-                return ticketCheck[index] == ticketNumber ? nodes[index].visited
-                                                          : def.visited;
+                return ticket_check[index] == ticket_number ? nodes[index].visited
+                                                            : def.visited;
             }
             inline double edgeWeightToGoal(size_t index) const
             {
-                return ticketCheck[index] == ticketNumber ? nodes[index].edgeWeightToGoal
-                                                          : def.edgeWeightToGoal;
+                return ticket_check[index] == ticket_number ? nodes[index].edge_weight_to_goal
+                                                            : def.edge_weight_to_goal;
             }
             inline VertexID parent(size_t index) const
             {
-                return ticketCheck[index] == ticketNumber ? nodes[index].parent
-                                                          : def.parent;
+                return ticket_check[index] == ticket_number ? nodes[index].parent
+                                                            : def.parent;
             }
             inline double distance(size_t index) const
             {
-                return ticketCheck[index] == ticketNumber ? nodes[index].distance
-                                                          : def.distance;
+                return ticket_check[index] == ticket_number ? nodes[index].distance
+                                                            : def.distance;
             }
 
             inline void updateData(size_t index)
             {
-                if (ticketCheck[index] != ticketNumber)
+                if (ticket_check[index] != ticket_number)
                 {
                     nodes[index]       = def;
-                    ticketCheck[index] = ticketNumber;
+                    ticket_check[index] = ticket_number;
                 }
             }
 
@@ -114,7 +114,7 @@ namespace Pathfinding
             inline void setEdgeWeightToGoal(size_t index, double value)
             {
                 updateData(index);
-                nodes[index].edgeWeightToGoal = value;
+                nodes[index].edge_weight_to_goal = value;
             }
 
             inline void setParent(size_t index, VertexID value)
@@ -141,10 +141,10 @@ namespace Pathfinding
            public:
             Algorithm(const Grid& grid);
 
-            Path computePath(Memory& memory, const int sx, const int sy, const int ex,
-                             const int ey, ParentPtrs* parentPtrs = nullptr) const;
-            Path computeSVGPath(Memory& memory, const int sx, const int sy, const int ex,
-                                const int ey, ParentPtrs* parentPtrs = nullptr) const;
+            Path computePath(Memory& memory, const int s_x, const int s_y, const int e_x,
+                             const int e_y, ParentPtrs* parent_ptrs = nullptr) const;
+            Path computeSVGPath(Memory& memory, const int s_x, const int s_y, const int e_x,
+                                const int e_y, ParentPtrs* parent_ptrs = nullptr) const;
 
             size_t nVertices() const;
             size_t nEdges() const;
@@ -177,10 +177,10 @@ namespace Pathfinding
                 return grid.isTaut(x1, y1, x2, y2, x3, y3);
             }
 
-            Path getPath(const Memory& memory, VertexID goalParent, const int sx,
-                         const int sy, const int ex, const int ey) const;
-            void setParentPointers(const Memory& memory, VertexID goalParent, int sx,
-                                   int sy, int ex, int ey, ParentPtrs* parentPtrs) const;
+            Path getPath(const Memory& memory, VertexID goal_parent, const int s_x,
+                         const int s_y, const int e_x, const int e_y) const;
+            void setParentPointers(const Memory& memory, VertexID goal_parent, int s_x,
+                                   int s_y, int e_x, int e_y, ParentPtrs* parent_ptrs) const;
         };
     }  // namespace ENLSVG
 }  // namespace Pathfinding

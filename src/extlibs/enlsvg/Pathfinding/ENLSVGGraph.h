@@ -17,13 +17,13 @@ namespace Pathfinding
     {
         struct EdgeData
         {
-            const VertexID sourceVertex;
-            const VertexID destVertex;
+            const VertexID source_vertex;
+            const VertexID dest_vertex;
             int level;
-            std::vector<EdgeID> tautOutgoingEdges;
+            std::vector<EdgeID> taut_outgoing_edges;
 
             EdgeData(VertexID sourceVertex, VertexID destVertex, int level)
-                : sourceVertex(sourceVertex), destVertex(destVertex), level(level)
+                : source_vertex(sourceVertex), dest_vertex(destVertex), level(level)
             {
             }
         };
@@ -32,38 +32,38 @@ namespace Pathfinding
         {
             const VertexID next;
             const double weight;
-            const VertexID immediateNext;  // immediate vertex just after current
-            const VertexID immediateLast;  // immediate vertex just before next.
+            const VertexID immediate_next;  // immediate vertex just after current
+            const VertexID immediate_last;  // immediate vertex just before next.
 
             SkipEdge(VertexID next, double weight, VertexID imNext, VertexID imLast)
-                : next(next), weight(weight), immediateNext(imNext), immediateLast(imLast)
+                : next(next), weight(weight), immediate_next(imNext), immediate_last(imLast)
             {
             }
         };
 
         struct MarkedEdges
         {
-            std::vector<bool> isMarked;
-            std::vector<EdgeID> markedIndexes;
+            std::vector<bool> is_marked;
+            std::vector<EdgeID> marked_indexes;
 
             MarkedEdges(size_t nEdges)
             {
-                isMarked.resize(nEdges, false);
+                is_marked.resize(nEdges, false);
             }
 
             inline void mark(EdgeID index)
             {
-                isMarked[index] = true;
-                markedIndexes.push_back(index);
+                is_marked[index] = true;
+                marked_indexes.push_back(index);
             }
 
             inline void clear()
             {
-                for (size_t i = 0; i < markedIndexes.size(); ++i)
+                for (size_t i = 0; i < marked_indexes.size(); ++i)
                 {
-                    isMarked[markedIndexes[i]] = false;
+                    is_marked[marked_indexes[i]] = false;
                 }
-                markedIndexes.clear();
+                marked_indexes.clear();
             }
         };
 
@@ -71,44 +71,44 @@ namespace Pathfinding
         {
            public:
             VisibilityGraph(const Grid& grid, const LineOfSightScanner& scanner);
-            void markEdgesFrom(MarkedEdges& markedEdges, const int sx, const int sy,
+            void markEdgesFrom(MarkedEdges& marked_edges, const int s_x, const int s_y,
                                const std::vector<GridVertex>& neighbours) const;
-            void markBothWays(MarkedEdges& markedEdges) const;
-            inline bool isSkipVertex(VertexID vertexID) const
+            void markBothWays(MarkedEdges& marked_edges) const;
+            inline bool isSkipVertex(VertexID vertex_id) const
             {
-                return skipEdges[vertexID].size() > 0;
+                return skip_edges[vertex_id].size() > 0;
             }
             inline VertexID nodeIndex(int x, int y) const
             {
-                return nodeIndexes[y * nodeIndexesSizeX + x];
+                return node_indexes[y * node_indexes_size_x + x];
             }
             inline double weight(const EdgeData& edge) const
             {
-                const GridVertex& u = vertices[edge.sourceVertex];
-                const GridVertex& v = vertices[edge.destVertex];
+                const GridVertex& u = vertices[edge.source_vertex];
+                const GridVertex& v = vertices[edge.dest_vertex];
                 int dx              = v.x - u.x;
                 int dy              = v.y - u.y;
                 return sqrt(dx * dx + dy * dy);
             }
-            inline double weight(EdgeID edgeId) const
+            inline double weight(EdgeID edge_id) const
             {
-                return weight(edges[edgeId]);
+                return weight(edges[edge_id]);
             }
 
             void printStatistics() const;
 
             static constexpr int LEVEL_W = std::numeric_limits<VertexID>::max();
-            const int sizeX;
-            const int sizeY;
-            const int nodeIndexesSizeX;
+            const int size_x;
+            const int size_y;
+            const int node_indexes_size_x;
 
             // Indexed by VertexID
             std::vector<GridVertex> vertices;
-            std::vector<std::vector<EdgeID>> edgeLists;  // points to edge indexes.
-            std::vector<std::vector<SkipEdge>> skipEdges;
+            std::vector<std::vector<EdgeID>> edge_lists;  // points to edge indexes.
+            std::vector<std::vector<SkipEdge>> skip_edges;
 
             // Indexed by grid coordinates.
-            std::vector<VertexID> nodeIndexes;
+            std::vector<VertexID> node_indexes;
 
             // Indexed by EdgeID
             std::vector<EdgeData> edges;
@@ -117,19 +117,19 @@ namespace Pathfinding
             const Grid& grid;
             const LineOfSightScanner& scanner;
 
-            inline EdgeID opposite(EdgeID edgeID) const
+            inline EdgeID opposite(EdgeID edge_id) const
             {
-                return (edgeID % 2 == 0) ? edgeID + 1 : edgeID - 1;
+                return (edge_id % 2 == 0) ? edge_id + 1 : edge_id - 1;
             }
 
-            void connectEdge(int i, int j, int xi, int yi, int xj, int yj);
+            void connectEdge(int i, int j, int x_i, int y_i, int x_j, int y_j);
             void buildHierarchy();
             void computeAllEdgeLevels();
             void setupSkipEdges();
             void followLevelWPathToNextSkipVertex(
-                EdgeID firstEdge, double& totalWeight, VertexID& nextVertex,
-                VertexID& immediateNext, VertexID& immediateLast,
-                const std::vector<bool>& isSkipVertex) const;
+                    EdgeID first_edge, double& total_weight, VertexID& next_vertex,
+                    VertexID& immediate_next, VertexID& immediate_last,
+                    const std::vector<bool>& is_skip_vertex) const;
         };
     }  // namespace ENLSVG
 }  // namespace Pathfinding

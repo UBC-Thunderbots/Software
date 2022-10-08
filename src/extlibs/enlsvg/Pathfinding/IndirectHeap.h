@@ -11,22 +11,22 @@ namespace Pathfinding
     class IndirectHeap
     {
        public:
-        void initialise(int size, double defaultKey);
+        void initialise(int size, double default_key);
         void reinitialise();
         IndirectHeap(int capacity);
-        void decreaseKey(int outIndex, double newKey);
+        void decreaseKey(int out_index, double new_key);
         int popMinIndex();
 
        private:
-        std::vector<double> keyList;
-        std::vector<int> inList;
-        std::vector<int> outList;
-        int heapSize;
+        std::vector<double> key_list;
+        std::vector<int> in_list;
+        std::vector<int> out_list;
+        int heap_size;
 
-        double defaultKey = POS_INF;
+        double default_key = POS_INF;
 
-        std::vector<int> ticketCheck;
-        int ticketNumber = 0;
+        std::vector<int> ticket_check;
+        int ticket_number = 0;
 
        public:
         inline double getMinValue() const
@@ -37,61 +37,61 @@ namespace Pathfinding
        private:
         inline double getKey(int index) const
         {
-            return ticketCheck[index] == ticketNumber ? keyList[index] : defaultKey;
+            return ticket_check[index] == ticket_number ? key_list[index] : default_key;
         }
 
         inline int getIn(int index) const
         {
-            return ticketCheck[index] == ticketNumber ? inList[index] : index;
+            return ticket_check[index] == ticket_number ? in_list[index] : index;
         }
 
         inline int getOut(int index) const
         {
-            return ticketCheck[index] == ticketNumber ? outList[index] : index;
+            return ticket_check[index] == ticket_number ? out_list[index] : index;
         }
 
         inline void setKey(int index, double value)
         {
-            if (ticketCheck[index] != ticketNumber)
+            if (ticket_check[index] != ticket_number)
             {
-                keyList[index]     = value;
-                inList[index]      = index;
-                outList[index]     = index;
-                ticketCheck[index] = ticketNumber;
+                key_list[index]     = value;
+                in_list[index]      = index;
+                out_list[index]     = index;
+                ticket_check[index] = ticket_number;
             }
             else
             {
-                keyList[index] = value;
+                key_list[index] = value;
             }
         }
 
         inline void setIn(int index, int value)
         {
-            if (ticketCheck[index] != ticketNumber)
+            if (ticket_check[index] != ticket_number)
             {
-                keyList[index]     = defaultKey;
-                inList[index]      = value;
-                outList[index]     = index;
-                ticketCheck[index] = ticketNumber;
+                key_list[index]     = default_key;
+                in_list[index]      = value;
+                out_list[index]     = index;
+                ticket_check[index] = ticket_number;
             }
             else
             {
-                inList[index] = value;
+                in_list[index] = value;
             }
         }
 
         inline void setOut(int index, int value)
         {
-            if (ticketCheck[index] != ticketNumber)
+            if (ticket_check[index] != ticket_number)
             {
-                keyList[index]     = defaultKey;
-                inList[index]      = index;
-                outList[index]     = value;
-                ticketCheck[index] = ticketNumber;
+                key_list[index]     = default_key;
+                in_list[index]      = index;
+                out_list[index]     = value;
+                ticket_check[index] = ticket_number;
             }
             else
             {
-                outList[index] = value;
+                out_list[index] = value;
             }
         }
 
@@ -155,13 +155,13 @@ namespace Pathfinding
 
         inline int smallerNode(int index1, int index2) const
         {
-            if (index1 >= heapSize)
+            if (index1 >= heap_size)
             {
-                if (index2 >= heapSize)
+                if (index2 >= heap_size)
                     return -1;
                 return index2;
             }
-            if (index2 >= heapSize)
+            if (index2 >= heap_size)
                 return index1;
 
             return getKey(index1) < getKey(index2) ? index1 : index2;
@@ -169,32 +169,32 @@ namespace Pathfinding
 
         inline void bubbleDown(int index)
         {
-            int leftChild    = 2 * index + 1;
-            int rightChild   = 2 * index + 2;
-            int smallerChild = smallerNode(leftChild, rightChild);
+            int left_child    = 2 * index + 1;
+            int right_child   = 2 * index + 2;
+            int smaller_child = smallerNode(left_child, right_child);
 
-            while (smallerChild != -1 && getKey(index) > getKey(smallerChild))
+            while (smaller_child != -1 && getKey(index) > getKey(smaller_child))
             {
                 // If meets the conditions to bubble down,
-                swapData(index, smallerChild);
+                swapData(index, smaller_child);
 
                 // Recurse
-                index        = smallerChild;
-                leftChild    = 2 * index + 1;
-                rightChild   = 2 * index + 2;
-                smallerChild = smallerNode(leftChild, rightChild);
+                index        = smaller_child;
+                left_child    = 2 * index + 1;
+                right_child   = 2 * index + 2;
+                smaller_child = smallerNode(left_child, right_child);
             }
         }
 
        public:
         inline int size() const
         {
-            return heapSize;
+            return heap_size;
         }
 
         inline bool isEmpty() const
         {
-            return heapSize <= 0;
+            return heap_size <= 0;
         }
     };
 

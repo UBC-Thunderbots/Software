@@ -22,7 +22,7 @@ namespace Pathfinding
         std::vector<GridVertex> current;
         std::vector<GridVertex> parent;
         GridVertex goal;
-        GridVertex goalParent;
+        GridVertex goal_parent;
     };
 
     typedef int VertexID;
