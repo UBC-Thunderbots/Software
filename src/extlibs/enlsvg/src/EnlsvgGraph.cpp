@@ -1,4 +1,4 @@
-#include "extlibs/enlsvg/Pathfinding/ENLSVGGraph.h"
+#include "extlibs/enlsvg/Pathfinding/EnlsvgGraph.h"
 
 #include <algorithm>
 
@@ -7,7 +7,7 @@
 
 namespace Pathfinding
 {
-    namespace ENLSVG
+    namespace Enlsvg
     {
         VisibilityGraph::VisibilityGraph(const Grid& grid,
                                          const LineOfSightScanner& scanner)
@@ -354,5 +354,5 @@ namespace Pathfinding
             std::cout << "averageEdgeDegree: " << averageEdgeDegree << std::endl;
             std::cout << "averageVertexDegree: " << averageVertexDegree << std::endl;
         }
-    }  // namespace ENLSVG
+    }  // namespace Enlsvg
 }  // namespace Pathfinding

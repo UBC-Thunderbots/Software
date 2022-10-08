@@ -3,7 +3,7 @@
 #include <boost/functional/hash/hash.hpp>
 #include <queue>
 
-#include "extlibs/enlsvg/Pathfinding/ENLSVG.h"
+#include "extlibs/enlsvg/Pathfinding/Enlsvg.h"
 #include "software/ai/navigator/obstacle/obstacle.hpp"
 #include "software/geom/linear_spline2d.h"
 #include "software/logger/logger.h"
@@ -84,8 +84,8 @@ class EnlsvgPathPlanner
    private:
     using EnlsvgPath      = Pathfinding::Path;
     using EnlsvgGrid      = Pathfinding::Grid;
-    using EnlsvgAlgorithm = Pathfinding::ENLSVG::Algorithm;
-    using EnlsvgMemory    = Pathfinding::ENLSVG::Memory;
+    using EnlsvgAlgorithm = Pathfinding::Enlsvg::Algorithm;
+    using EnlsvgMemory    = Pathfinding::Enlsvg::Memory;
 
     /**
      * This struct is just the internal representation of a grid coordinate. This exists

@@ -5,7 +5,7 @@
 #include <limits>
 #include <vector>
 
-#include "ENLSVGGraph.h"
+#include "EnlsvgGraph.h"
 #include "Grid.h"
 #include "IndirectHeap.h"
 #include "LineOfSightScanner.h"
@@ -15,7 +15,7 @@ namespace Pathfinding
 {
     class Grid;
 
-    namespace ENLSVG
+    namespace Enlsvg
     {
         // NO_PARENT should be positive to be immune to restorePar
         static constexpr VertexID NO_PARENT = std::numeric_limits<VertexID>::max();
@@ -182,7 +182,7 @@ namespace Pathfinding
             void setParentPointers(const Memory& memory, VertexID goalParent, int sx,
                                    int sy, int ex, int ey, ParentPtrs* parentPtrs) const;
         };
-    }  // namespace ENLSVG
+    }  // namespace Enlsvg
 }  // namespace Pathfinding
 
 #endif
