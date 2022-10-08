@@ -12,11 +12,7 @@ import argparse
 from threading import Thread
 from software.jetson_nano.display.rotary_encoder.rotary_encoder import RotaryEncoder
 from software.jetson_nano.display.screens.home_screen import HomeScreen
-from software.jetson_nano.display.screens.menu_screen import MenuScreen
-from software.jetson_nano.display.screens.wheels_screen import WheelsScreen
-from software.jetson_nano.display.screens.chip_and_kick_screen import ChipAndKickScreen
 import software.jetson_nano.display.constants as constants
-from software.py_constants import *
 
 # Pins for Rotary Encoder
 BUTTON_PIN = constants.BUTTON_PIN
@@ -34,22 +30,13 @@ class ScreenActions:
 screen_actions = ScreenActions()
 
 # These are the keys for the redis dicationary
+# TODO(#2728): Replace key strings with values from constants
 redis_keys = [
-    ROBOT_ID_REDIS_KEY,
-    ROBOT_MULTICAST_CHANNEL_REDIS_KEY,
-    ROBOT_NETWORK_INTERFACE_REDIS_KEY,
-    "battery voltage",
-    "cap voltage",
-    "packet loss",
-    "chip enable",
-    "kick enable",
-    "chip speed",
-    "kick speed",
-    "wheels enable",
-    "fl wheel speed",
-    "fr wheel speed",
-    "bl wheel speed",
-    "br wheel speed",
+    "/robot_id",
+    "/channel_id",
+    "/battery_voltage",
+    "/cap_voltage",
+    "/current_draw",
 ]
 
 
@@ -91,12 +78,9 @@ class RobotUi:
         # All of our screens
         self.screens = {
             "Home": HomeScreen(self.lcd_display, self.redis_dict, screen_actions),
-            "Menu": MenuScreen(self.lcd_display, screen_actions),
-            "Wheels": WheelsScreen(self.lcd_display, self.redis_dict, screen_actions),
-            "Chip and Kick": ChipAndKickScreen(
-                self.lcd_display, self.redis_dict, screen_actions
-            ),
         }
+
+        time.sleep(2)
 
         def on_click():
             """ Execute on click callback of curr screen """
@@ -134,8 +118,9 @@ class RobotUi:
         )
 
         self.rotary_encoder.start()
+        self.screens[self.curr_screen].update_screen()
 
-    def poll_redis(self, timeout=3):
+    def poll_redis(self, timeout=0.1):
         """ Update redis dict every timeout seconds """
         while not self.shutdown:
             for key in redis_keys:
@@ -144,6 +129,7 @@ class RobotUi:
             for screen_name, screen in self.screens.items():
                 if screen_name != "Menu":
                     screen.update_values(self.redis_dict)
+            self.screens[self.curr_screen].update_screen()
             time.sleep(timeout)
 
     def stop(self):
@@ -168,7 +154,9 @@ if __name__ == "__main__":
             host="localhost", port=constants.REDIS_PORT_NUMBER, db=0
         )
         for key in redis_keys:
-            redis_client.set(key, 0)
+            redis_client.set(key, "0")
+
+    init_redis()
 
     def start_polling(robot_ui):
         robot_ui.poll_redis()

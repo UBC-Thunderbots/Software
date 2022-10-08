@@ -1,32 +1,6 @@
 #include "proto/message_translation/tbots_protobuf.h"
 
 
-std::unique_ptr<TbotsProto::Vision> createVision(const World& world)
-{
-    // create msg and set timestamp
-    auto vision_msg                    = std::make_unique<TbotsProto::Vision>();
-    *(vision_msg->mutable_time_sent()) = *createCurrentTimestamp();
-
-    // set robot_states map
-    auto& robot_states_map = *vision_msg->mutable_robot_states();
-    auto friendly_robots   = world.friendlyTeam().getAllRobots();
-
-    // For every friendly robot, we create a RobotState proto. The unique_ptr
-    // is dereferenced, and there is an implicit deep copy into robot_states_map
-    //
-    // Since the unique_ptr immediately loses scope after the copy, the memory is
-    // freed
-    std::for_each(friendly_robots.begin(), friendly_robots.end(),
-                  [&](const Robot& robot) {
-                      robot_states_map[robot.id()] = *createRobotStateProto(robot);
-                  });
-
-    // set ball state
-    *(vision_msg->mutable_ball_state()) = *createBallState(world.ball());
-
-    return vision_msg;
-}
-
 std::unique_ptr<TbotsProto::World> createWorld(const World& world)
 {
     // create msg

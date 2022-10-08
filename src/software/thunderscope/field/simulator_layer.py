@@ -4,8 +4,7 @@ from proto.import_all_protos import *
 from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtCore import Qt
 
-from proto.geometry_pb2 import Point
-from software.thunderscope.colors import Colors
+from software.thunderscope.constants import Colors
 from software.networking.threaded_unix_listener import ThreadedUnixListener
 from software.py_constants import *
 from software.thunderscope.field.field_layer import FieldLayer

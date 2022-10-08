@@ -37,19 +37,33 @@ Different arguments might need to be added to support different scenarios (ex ta
 
 ### Remote Flashing
 
-The `remote_flash.yml` playbook stops services, syncs new binaries to hosts and restarts services. The "--tags" argument can be used to specify which actions to perform and on which services. 
+## Jetson Nano
+The `deplay_nano.yml` playbook stops services, syncs new binaries to hosts and restarts services. The "--tags" argument can be used to specify which actions to perform and on which services. 
 Possible service tags: thunderloop, wifi_announcement, ethernet_announcement, display, redis. 
 Possible action tags: stop, sync, start
 
 if no service/action tags are specified, all service/actions will be used. 
 
 For example, to remote flash (ie stop+sync+start) thunderloop and redis, run the command: 
- ``bazel run :run_ansible --cpu=jetson_nano -- -pb remote_flash.yml -ho [list of ip addrs] -pwd {ssh_pass} -t thunderloop redis`` 
+ ``bazel run :run_ansible --cpu=jetson_nano -- -pb deploy_nano.yml -ho [list of ip addrs] -pwd {ssh_pass} -t thunderloop redis`` 
  
 To just stop the thunderloop and redis services, use: 
- ``bazel run :run_ansible --cpu=jetson_nano -- -pb remote_flash.yml -ho [list of ip addrs] -pwd {ssh_pass} -t thunderloop redis stop`` 
+ ``bazel run :run_ansible --cpu=jetson_nano -- -pb deploy_nano.yml -ho [list of ip addrs] -pwd {ssh_pass} -t thunderloop redis stop`` 
 
-**warning** : the 'sync' action involves replacing a service's binary file, which might not work if the service is running at the time of replacement. Thus, it is best not to run the sync action unless accompanied with a stop action.
+## Powerboard
+
+The `deploy_powerboard.yml` compiles powerloop and transfers the necessary files over to the jetson. The jetson will then attempt to reset + flash the powerboard. 
+
+NOTE: Until the UI board supports auto flashing, manual intervention will be required.
+
+Flashing Steps:
+- Run ``bazel run :run_ansible --cpu=jetson_nano -- -pb deploy_powerboard.yml --port {announcement_port} -pwd {ssh_pass}``
+- Once all the required powerloop files are transferred over, ansible will pause to allow you to manually put the powerboards into bootloader mode.
+- You will need to hold the boot button and press reset to put the powerboard into bootloader mode. 
+- Now press y to flash the powerboards.
+- Ansible will pause again and prompt you to reset each powerboard.
+
+Again, this process can be automated once we have a UI board + powerboard setup that can talk to the Jetson.
 
 ### Miscellaneous Tasks
 Individual miscellaneous tasks (ex reboot, shutdown, rtt test) can be run through the `misc.yml` playbook by specifying the corresponding tag. 
