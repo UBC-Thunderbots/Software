@@ -66,7 +66,8 @@ TEST_F(CubicBezierSplineTest, getValueAt__start_point)
     // as well.
     const Point just_after_start_point   = test_spline_1.getValueAt(1e-9);
     const Vector approx_tangent_at_start = just_after_start_point - start_point;
-    const Angle tangent_error_angle = convexAngle(approx_tangent_at_start, Vector(-3, -4));
+    const Angle tangent_error_angle =
+        convexAngle(approx_tangent_at_start, Vector(-3, -4));
 
     EXPECT_NEAR(0, tangent_error_angle.toRadians(), 1e-9);
 }

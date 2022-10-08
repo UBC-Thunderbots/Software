@@ -1,8 +1,8 @@
 #include "software/geom/algorithms/contains.h"
 
-#include "software/geom/algorithms/convex_angle.h"
 #include "software/geom/algorithms/almost_equal.h"
 #include "software/geom/algorithms/collinear.h"
+#include "software/geom/algorithms/convex_angle.h"
 #include "software/geom/algorithms/distance.h"
 #include "software/geom/geom_constants.h"
 
@@ -68,8 +68,8 @@ bool contains(const Ray& container, const Point& contained)
     bool point_collinear_with_ray =
         collinear(contained, container.getStart(), point_in_ray_direction);
     bool point_is_in_ray_direction =
-            convexAngle(container.toUnitVector(), contained - container.getStart()).abs() <
-            Angle::quarter();
+        convexAngle(container.toUnitVector(), contained - container.getStart()).abs() <
+        Angle::quarter();
     return point_is_ray_start || (point_collinear_with_ray && point_is_in_ray_direction);
 }
 

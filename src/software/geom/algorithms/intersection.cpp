@@ -1,9 +1,9 @@
 #include "software/geom/algorithms/intersection.h"
 
-#include "software/geom/algorithms/convex_angle.h"
 #include "software/geom/algorithms/almost_equal.h"
 #include "software/geom/algorithms/collinear.h"
 #include "software/geom/algorithms/contains.h"
+#include "software/geom/algorithms/convex_angle.h"
 
 std::optional<Point> intersection(const Point &a, const Point &b, const Point &c,
                                   const Point &d, double fixed_epsilon, int ulps_epsilon)
@@ -206,8 +206,8 @@ std::optional<Point> intersection(const Ray &first, const Ray &second)
         (point_of_intersection.value() - second.getStart());
 
     if (convexAngle(intersection_first_direction, first.toUnitVector()) <
-        Angle::quarter() &&
-            convexAngle(intersection_second_direction, second.toUnitVector()) <
+            Angle::quarter() &&
+        convexAngle(intersection_second_direction, second.toUnitVector()) <
             Angle::quarter())
     {
         return point_of_intersection.value();

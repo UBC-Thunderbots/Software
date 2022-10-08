@@ -2,8 +2,8 @@
 
 #include "shared/constants.h"
 #include "software/ai/evaluation/calc_best_shot.h"
-#include "software/geom/algorithms/convex_angle.h"
 #include "software/geom/algorithms/closest_point.h"
+#include "software/geom/algorithms/convex_angle.h"
 #include "software/logger/logger.h"
 
 ReceiverTactic::ReceiverTactic()

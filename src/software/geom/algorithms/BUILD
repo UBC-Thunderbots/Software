@@ -3,12 +3,12 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "algorithms",
     srcs = [
-        "convex_angle.cpp",
         "almost_equal.cpp",
         "calculate_block_cone.cpp",
         "closest_point.cpp",
         "collinear.cpp",
         "contains.cpp",
+        "convex_angle.cpp",
         "distance.cpp",
         "find_open_circles.cpp",
         "furthest_point.cpp",
@@ -18,12 +18,12 @@ cc_library(
         "voronoi_diagram.cpp",
     ],
     hdrs = [
-        "convex_angle.h",
         "almost_equal.h",
         "calculate_block_cone.h",
         "closest_point.h",
         "collinear.h",
         "contains.h",
+        "convex_angle.h",
         "distance.h",
         "find_open_circles.h",
         "furthest_point.h",

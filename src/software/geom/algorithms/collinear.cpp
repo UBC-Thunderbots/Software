@@ -1,7 +1,7 @@
 #include "software/geom/algorithms/collinear.h"
 
-#include "software/geom/algorithms/convex_angle.h"
 #include "software/geom/algorithms/almost_equal.h"
+#include "software/geom/algorithms/convex_angle.h"
 
 
 bool collinear(const Point &a, const Point &b, const Point &c)
