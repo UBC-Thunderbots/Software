@@ -54,6 +54,28 @@
               - "[Robot ID = {{ inventory_hostname }}]"
               - "Setup Script run successfully"
 
+        # UART setup
+        - name: Stop nvgetty
+          become: true
+          become_method: sudo
+          command: 'systemctl stop nvgetty'
+
+        - name: Disable nvgetty
+          become: true
+          become_method: sudo
+          command: 'systemctl disable nvgetty'
+
+        - name: Setup udevadm trigger
+          become: true
+          become_method: sudo
+          command: 'udevadm trigger'
+
+        - name: Add user robot to dialout
+          become: true
+          become_method: sudo
+          command: 'adduser robot dialout'
+
+        # Device tree setup
         - name: Sync Device Tree
           become: true
           become_method: sudo
@@ -62,6 +84,18 @@
             - device_tree
           ansible.posix.synchronize:
             src: ../../../linux_configs/device_tree.zip
+            dest: ~/
+            recursive: yes
+            copy_links: yes
+
+        - name: Sync extlinux conf
+          become: true
+          become_method: sudo
+          tags:
+            - sync
+            - device_tree
+          ansible.posix.synchronize:
+            src: ../../../linux_configs/extlinux.conf
             dest: ~/
             recursive: yes
             copy_links: yes
@@ -79,7 +113,7 @@
           tags:
             - sync
             - device_tree
-          shell: 'dtc -q -I dts -O dtb ~/trinamic.dts > trinamic.dtb'
+          shell: 'dtc -q -I dts -O dtb ~/device_tree.dts > device_tree.dtb'
           register: result
           args:
             chdir: ~/
@@ -91,7 +125,18 @@
           tags:
             - sync
             - device_tree
-          shell: 'mv /home/robot/trinamic.dtb /boot/kernel_tegra210-p3448-0000-p3449-0000-b00-user-custom.dtb'
+          shell: 'mv /home/robot/device_tree.dtb /boot/kernel_tegra210-p3448-0000-p3449-0000-b00-user-custom.dtb'
+          register: result
+          args:
+            chdir: ~/
+
+        - name: Move extlinux file
+          become_method: sudo
+          become: true
+          tags:
+            - sync
+            - device_tree
+          shell: 'mv /home/robot/extlinux.conf /boot/extlinux/extlinux.conf'
           register: result
           args:
             chdir: ~/

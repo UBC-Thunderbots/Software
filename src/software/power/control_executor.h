@@ -5,7 +5,7 @@
 #include "charger.h"
 #include "chicker.h"
 #include "geneva.h"
-#include "proto/primitive.nanopb.h"
+#include "proto/power_frame_msg.nanopb.h"
 
 class ControlExecutor
 {
@@ -23,7 +23,7 @@ class ControlExecutor
      *
      * @param control control command to execute
      */
-    void execute(const TbotsProto_PowerControl& control);
+    void execute(const TbotsProto_PowerPulseControl& control);
 
    private:
     std::shared_ptr<Charger> charger;
