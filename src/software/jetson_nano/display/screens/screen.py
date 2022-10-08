@@ -30,7 +30,7 @@ class Screen:
         self.curr_action = 0
 
         self.lcd_display = lcd_display
-        self.font_size = 12
+        self.font_size = 11
         self.font = ImageFont.truetype("DejaVuSans.ttf", self.font_size)
         self.big_font_size = 22
         self.big_font = ImageFont.truetype("DejaVuSans.ttf", self.big_font_size)

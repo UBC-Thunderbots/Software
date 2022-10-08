@@ -10,6 +10,8 @@ cc_library(
         "//software/jetson_nano:gpio",
         "//software/logger",
         "//software/physics:euclidean_to_wheel",
+        "//software/util/scoped_timespec_timer",
+        "@eigen",
         "@trinamic",
     ],
 )
@@ -18,6 +20,7 @@ cc_library(
     name = "power",
     srcs = ["power.cpp"],
     hdrs = ["power.h"],
+    linkopts = ["-latomic"],  # Necessary due to <atomic> not containing load/store for all sizes
     deps = [
         "//shared/uart_framing",
         "//software/logger",
