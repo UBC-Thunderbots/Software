@@ -10,8 +10,6 @@ from software.simulated_tests.simulated_test_fixture import simulated_test_runne
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
 
-# TODO issue  #2599 - Remove Duration parameter from test
-# @pytest.mark.parametrize("run_enemy_ai,test_duration", [(False, 20), (True, 20)])
 def test_corner_kick_play_bottom_left(simulated_test_runner):
 
     # starting point must be Point
@@ -77,7 +75,7 @@ def test_corner_kick_play_bottom_left(simulated_test_runner):
     simulated_test_runner.run_test(
         eventually_validation_sequence_set=eventually_validation_sequence_set,
         always_validation_sequence_set=always_validation_sequence_set,
-        test_timeout_s=25,
+        test_timeout_s=15,
     )
 
 def test_corner_kick_play_top_right(simulated_test_runner):
@@ -145,7 +143,7 @@ def test_corner_kick_play_top_right(simulated_test_runner):
     simulated_test_runner.run_test(
         eventually_validation_sequence_set=eventually_validation_sequence_set,
         always_validation_sequence_set=always_validation_sequence_set,
-        test_timeout_s=25,
+        test_timeout_s=15,
     )
 
 if __name__ == "__main__":
