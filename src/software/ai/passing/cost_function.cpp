@@ -6,7 +6,7 @@
 #include "software/../shared/constants.h"
 #include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/evaluation/time_to_travel.h"
-#include "software/geom/algorithms/acute_angle.h"
+#include "software/geom/algorithms/convex_angle.h"
 #include "software/geom/algorithms/closest_point.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/logger/logger.h"
@@ -102,8 +102,8 @@ double ratePassShootScore(const Field& field, const Team& enemy_team, const Pass
     }
 
     // Figure out what the maximum open angle of the goal could be from the receiver pos.
-    Angle goal_angle = acuteAngle(field.enemyGoalpostNeg(), pass.receiverPoint(),
-                                  field.enemyGoalpostPos())
+    Angle goal_angle = convexAngle(field.enemyGoalpostNeg(), pass.receiverPoint(),
+                                   field.enemyGoalpostPos())
                            .abs();
     double net_percent_open = 0;
     if (goal_angle > Angle::zero())

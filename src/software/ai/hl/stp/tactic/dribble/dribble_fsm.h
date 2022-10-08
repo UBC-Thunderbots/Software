@@ -6,7 +6,7 @@
 #include "software/ai/hl/stp/tactic/move/move_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/hl/stp/tactic/transition_conditions.h"
-#include "software/geom/algorithms/acute_angle.h"
+#include "software/geom/algorithms/convex_angle.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/algorithms/distance.h"
 

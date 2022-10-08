@@ -1,22 +1,22 @@
 #include "software/geom/algorithms/collinear.h"
 
-#include "software/geom/algorithms/acute_angle.h"
+#include "software/geom/algorithms/convex_angle.h"
 #include "software/geom/algorithms/almost_equal.h"
 
 
 bool collinear(const Point &a, const Point &b, const Point &c)
 {
     // NOTE: the default value is 4 * FIXED_EPSILON because of accumulation of error from
-    // subtracting 2 vectors twice and calculating acuteAngle, but the PassGenerator
+    // subtracting 2 vectors twice and calculating convexAngle, but the PassGenerator
     // requires less precision probably due to calcBestShotOnGoal
     // TODO (#1788): change fixed_epsilon to 4 * FIXED_EPSILON
     static const double fixed_epsilon = 100 * FIXED_EPSILON;
     static const int ulps_epsilon     = ULPS_EPSILON_TEN;
-    return (almostEqual(acuteAngle(b - a, c - a).toRadians(), 0, fixed_epsilon,
+    return (almostEqual(convexAngle(b - a, c - a).toRadians(), 0, fixed_epsilon,
                         ulps_epsilon) ||
-            almostEqual(acuteAngle(a - b, c - b).toRadians(), 0, fixed_epsilon,
+            almostEqual(convexAngle(a - b, c - b).toRadians(), 0, fixed_epsilon,
                         ulps_epsilon) ||
-            almostEqual(acuteAngle(a - c, b - c).toRadians(), 0, fixed_epsilon,
+            almostEqual(convexAngle(a - c, b - c).toRadians(), 0, fixed_epsilon,
                         ulps_epsilon));
 }
 
