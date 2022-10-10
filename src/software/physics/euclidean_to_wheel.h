@@ -41,7 +41,7 @@ class EuclideanToWheel
      * @param euclidean_velocity The Euclidean velocity.
      * @return The equivalent wheel speeds.
      */
-    WheelSpace_t getWheelVelocity(EuclideanSpace_t euclidean_velocity);
+    WheelSpace_t getWheelVelocity(EuclideanSpace_t euclidean_velocity) const;
 
     /**
      * Gets the Euclidean velocity from the wheel velocity.
@@ -49,24 +49,13 @@ class EuclideanToWheel
      * @param wheel_velocity The wheel velocity.
      * @return The equivalent Euclidean velocity.
      */
-    EuclideanSpace_t getEuclideanVelocity(const WheelSpace_t &wheel_velocity);
+    EuclideanSpace_t getEuclideanVelocity(const WheelSpace_t &wheel_velocity) const;
 
    private:
     /**
-     * The angle between the hemisphere line of the robot and the front wheel axles
-     * [rads].
+     * The radius of the robot in meters.
      */
-    double front_wheel_angle_phi_rad_{};
-
-    /**
-     * The angle between the hemisphere line of the robot and the rear wheel axles [rads]
-     */
-    double rear_wheel_angle_theta_rad_{};
-
-    /**
-     * The radius of the wheel in meters.
-     */
-    double wheel_radius_m_{};
+    const double robot_radius_m_{};
 
     /**
      * Euclidean velocity to wheel velocity coupling matrix.
