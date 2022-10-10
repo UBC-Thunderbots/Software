@@ -106,16 +106,14 @@ class HRVOSimulator
      * @param max_neighbor_dist  The maximum distance away which another agent can be from
      * this agent to be considered as a neighbor (i.e. velocity obstacles for it would be
      * generated).
-     * @param pref_speed          The maximum number of other agents which this agent
-     * will try to avoid collisions with at a time.
+     * @param max_neighbors  The maximum number of neighbors which this agent will
+     * consider at once.
      * @return The index of the agent.
      */
     std::size_t addHRVOAgent(const Vector &position, float agent_radius,
                              float max_radius_inflation, const Vector &curr_velocity,
-                             float max_speed, float pref_speed, float max_accel,
-                             AgentPath &path, float max_neighbor_dist,
-                             std::size_t maxNeighbors, float uncertaintyOffset);
-
+                             float max_speed, float max_accel, AgentPath &path,
+                             float max_neighbor_dist, std::size_t max_neighbors);
     /**
      * Add a new LinearlyVelocityAgent
      * @param position              The starting position of this agent.

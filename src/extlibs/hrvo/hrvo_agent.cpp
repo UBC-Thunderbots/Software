@@ -121,8 +121,8 @@ void HRVOAgent::computeNeighbors(double neighbor_dist_threshold)
 
 void HRVOAgent::computeVelocityObstacles()
 {
-    velocityObstacles_.clear();
-    velocityObstacles_.reserve(neighbors_.size());
+    velocity_obstacles_.clear();
+    velocity_obstacles_.reserve(neighbors_.size());
 
     const auto current_path_point_opt = getPath().getCurrentPathPoint();
     if (!current_path_point_opt.has_value())
@@ -143,7 +143,7 @@ void HRVOAgent::computeVelocityObstacles()
     {
         std::shared_ptr<Agent> other_agent = simulator_->getAgents()[neighbor.second];
         VelocityObstacle velocity_obstacle = other_agent->createVelocityObstacle(*this);
-        velocityObstacles_.push_back(velocity_obstacle);
+        velocity_obstacles_.push_back(velocity_obstacle);
     }
 
     // Create Velocity Obstacles for nearby static obstacles
@@ -161,7 +161,7 @@ void HRVOAgent::computeVelocityObstacles()
         {
             VelocityObstacle velocity_obstacle =
                 obstacle->generateVelocityObstacle(circle_rep_of_agent, Vector());
-            velocityObstacles_.push_back(velocity_obstacle);
+            velocity_obstacles_.push_back(velocity_obstacle);
         }
     }
 
@@ -176,7 +176,7 @@ void HRVOAgent::computeVelocityObstacles()
         {
             VelocityObstacle velocity_obstacle =
                 obstacle->generateVelocityObstacle(circle_rep_of_agent, Vector());
-            velocityObstacles_.push_back(velocity_obstacle);
+            velocity_obstacles_.push_back(velocity_obstacle);
         }
     }
 }

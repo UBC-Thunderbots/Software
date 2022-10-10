@@ -233,7 +233,8 @@ std::size_t HRVOSimulator::addHRVOAgent(const Vector &position, float agent_radi
                                         float max_radius_inflation,
                                         const Vector &curr_velocity, float max_speed,
                                         float max_accel, AgentPath &path,
-                                        float max_neighbor_dist, std::size_t max_neighbors)
+                                        float max_neighbor_dist,
+                                        std::size_t max_neighbors)
 {
     std::shared_ptr<HRVOAgent> agent = std::make_shared<HRVOAgent>(
         this, position, max_neighbor_dist, max_neighbors, agent_radius,
