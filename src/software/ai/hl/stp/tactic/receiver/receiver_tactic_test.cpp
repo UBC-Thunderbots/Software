@@ -191,10 +191,10 @@ INSTANTIATE_TEST_CASE_P(
         //                                  Angle::fromDegrees(0),
         //                                  Angle::fromDegrees(0))}),
 
-         std::make_tuple(Pass(Point(4.0, 1.5), Point(3.0, -1), 4.5),
-                         RobotStateWithId{1, RobotState(Point(3.0, -1), Vector(0, 0),
-                                                        Angle::fromDegrees(180),
-                                                        Angle::fromDegrees(0))}),
+        std::make_tuple(Pass(Point(4.0, 1.5), Point(3.0, -1), 4.5),
+                        RobotStateWithId{1, RobotState(Point(3.0, -1), Vector(0, 0),
+                                                       Angle::fromDegrees(180),
+                                                       Angle::fromDegrees(0))}),
 
         // TODO (#2577): re-enable once fixed
         //        std::make_tuple(Pass(Point(4.0, -1.5), Point(4, 1), 5),
