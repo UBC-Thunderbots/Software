@@ -49,7 +49,6 @@ HRVOSimulator::HRVOSimulator(float time_step, const RobotConstants_t &robot_cons
       robot_constants(robot_constants),
       global_time(0.0f),
       time_step(time_step),
-      last_time_velocity_updated(0.0f),
       reached_goals(false),
       kd_tree(std::make_unique<KdTree>(this)),
       world(std::nullopt),
@@ -118,17 +117,8 @@ void HRVOSimulator::updateWorld(const World &world)
             if (hrvo_agent.has_value())
             {
                 hrvo_agent.value()->setPosition(friendly_robot.position().toVector());
-
-                // Only update velocity if time has passed since the last time velocity
-                // was updated. This is to allow SensorFusion to update the actual robot
-                // velocity in World.
-                // TODO (#2531): Remove 4 multiplier and fix goal keeper moving slowly
-                if (global_time - last_time_velocity_updated >= 4 * time_step)
-                {
-                    Vector velocity = friendly_robot.velocity();
-                    hrvo_agent.value()->setVelocity(friendly_robot.velocity());
-                    last_time_velocity_updated = global_time;
-                }
+                // We do not use velocity feedback for friendly robots as it results
+                // in the robots not being able to accelerate properly.
             }
         }
 
@@ -241,13 +231,13 @@ std::size_t HRVOSimulator::addLinearVelocityRobotAgent(const Robot &robot,
 
 std::size_t HRVOSimulator::addHRVOAgent(const Vector &position, float agent_radius,
                                         float max_radius_inflation,
-                                        const Vector &curr_velocity, float maxSpeed,
-                                        float maxAccel, AgentPath &path,
-                                        float max_neighbor_dist, std::size_t maxNeighbors)
+                                        const Vector &curr_velocity, float max_speed,
+                                        float max_accel, AgentPath &path,
+                                        float max_neighbor_dist, std::size_t max_neighbors)
 {
     std::shared_ptr<HRVOAgent> agent = std::make_shared<HRVOAgent>(
-        this, position, max_neighbor_dist, maxNeighbors, agent_radius,
-        max_radius_inflation, curr_velocity, maxAccel, path, maxSpeed);
+        this, position, max_neighbor_dist, max_neighbors, agent_radius,
+        max_radius_inflation, curr_velocity, max_accel, path, max_speed);
     agents.push_back(std::move(agent));
     return agents.size() - 1;
 }
@@ -380,34 +370,34 @@ std::optional<std::shared_ptr<HRVOAgent>> HRVOSimulator::getFriendlyAgentFromRob
     return std::nullopt;
 }
 
-float HRVOSimulator::getAgentMaxAccel(std::size_t agentNo) const
+float HRVOSimulator::getAgentMaxAccel(std::size_t agent_no) const
 {
-    return agents[agentNo]->getMaxAccel();
+    return agents[agent_no]->getMaxAccel();
 }
 
-Vector HRVOSimulator::getAgentPosition(std::size_t agentNo) const
+Vector HRVOSimulator::getAgentPosition(std::size_t agent_no) const
 {
-    return agents[agentNo]->getPosition();
+    return agents[agent_no]->getPosition();
 }
 
-float HRVOSimulator::getAgentRadius(std::size_t agentNo) const
+float HRVOSimulator::getAgentRadius(std::size_t agent_no) const
 {
-    return agents[agentNo]->getRadius();
+    return agents[agent_no]->getRadius();
 }
 
-bool HRVOSimulator::hasAgentReachedGoal(std::size_t agentNo) const
+bool HRVOSimulator::hasAgentReachedGoal(std::size_t agent_no) const
 {
-    return agents[agentNo]->hasReachedGoal();
+    return agents[agent_no]->hasReachedGoal();
 }
 
-Vector HRVOSimulator::getAgentVelocity(std::size_t agentNo) const
+Vector HRVOSimulator::getAgentVelocity(std::size_t agent_no) const
 {
-    return agents[agentNo]->getVelocity();
+    return agents[agent_no]->getVelocity();
 }
 
-Vector HRVOSimulator::getAgentPrefVelocity(std::size_t agentNo) const
+Vector HRVOSimulator::getAgentPrefVelocity(std::size_t agent_no) const
 {
-    return agents[agentNo]->getPrefVelocity();
+    return agents[agent_no]->getPrefVelocity();
 }
 
 const std::unique_ptr<KdTree> &HRVOSimulator::getKdTree() const

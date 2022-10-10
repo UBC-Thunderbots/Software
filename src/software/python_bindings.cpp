@@ -162,10 +162,11 @@ PYBIND11_MODULE(python_bindings, m)
     py::class_<ConvexPolygon, Polygon>(m, "ConvexPolygon");
     py::class_<Rectangle, ConvexPolygon>(m, "Rectangle")
         .def(py::init<Point, Point>())
+        // Overloaded
         .def("__repr__",
-             [](const Rectangle& v) {
+             [](const Rectangle& r) {
                  std::stringstream stream;
-                 stream << v;
+                 stream << r;
                  return stream.str();
              })
         .def("xLength", &Rectangle::xLength)
@@ -194,6 +195,13 @@ PYBIND11_MODULE(python_bindings, m)
 
     py::class_<Circle>(m, "Circle")
         .def(py::init<Point, double>())
+        // Overloaded
+        .def("__repr__",
+             [](const Circle& c) {
+                 std::stringstream stream;
+                 stream << c;
+                 return stream.str();
+             })
         .def("origin", &Circle::origin)
         .def("radius", &Circle::radius)
         .def("area", &Circle::area);

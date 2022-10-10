@@ -20,7 +20,10 @@ platformio_library(
     name = "geneva",
     src = "geneva.cpp",
     hdr = "geneva.h",
-    deps = [":pins"],
+    deps = [
+        ":pins",
+        "//proto:tbots_nanopb_proto",
+    ],
 )
 
 platformio_library(
@@ -49,6 +52,7 @@ platformio_library(
         ":chicker",
         ":geneva",
         ":pins",
+        "//proto:tbots_nanopb_proto",
         "@nanopb//:nanopb_platformio",
     ],
 )
@@ -77,4 +81,12 @@ platformio_project(
         "//shared/uart_framing:uart_framing_platformio",
         "@nanopb//:nanopb_platformio",
     ],
+)
+
+genrule(
+    name = "powerloop_tar",
+    outs = ["powerloop.tar.gz"],
+    cmd = "tar -chf $@ $(BINDIR)/../../host/bin/software/power/.* &> /dev/null",
+    local = True,
+    tools = [":powerloop_main"],
 )
