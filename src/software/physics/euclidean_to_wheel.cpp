@@ -54,7 +54,7 @@ EuclideanToWheel::EuclideanToWheel(const RobotConstants_t &robot_constants)
 
 WheelSpace_t EuclideanToWheel::getWheelVelocity(EuclideanSpace_t euclidean_velocity) const
 {
-    // need to multiply the angular velocity by the wheel radius to
+    // need to multiply the angular velocity by the robot radius to
     // calculate the wheel velocity (robot tangential velocity)
     // ref: http://robocup.mi.fu-berlin.de/buch/omnidrive.pdf pg 8
     euclidean_velocity[2] = euclidean_velocity[2] * robot_radius_m_;
