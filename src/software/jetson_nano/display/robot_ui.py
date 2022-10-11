@@ -9,6 +9,7 @@ from software.jetson_nano.display.lcd_user_interface.lcd_user_interface import (
 )
 
 import argparse
+from threading import Thread
 from software.jetson_nano.display.rotary_encoder.rotary_encoder import RotaryEncoder
 from software.jetson_nano.display.screens.home_screen import HomeScreen
 import software.jetson_nano.display.constants as constants
@@ -79,6 +80,44 @@ class RobotUi:
             "Home": HomeScreen(self.lcd_display, self.redis_dict, screen_actions),
         }
 
+        time.sleep(2)
+
+        def on_click():
+            """ Execute on click callback of curr screen """
+            action = self.screens[self.curr_screen].on_click()
+
+            if screen_actions.CHANGE_SCREEN == action["screen action"]:
+                self.curr_screen = action["value"]
+                self.screens[self.curr_screen].update_screen()
+                self.lcd_display.show()
+            elif screen_actions.UPDATE_REDIS == action["screen action"]:
+                self.redis_client.set(action["redis key"], action["value"])
+                self.redis_dict[action["redis key"]] = action["value"]
+                print(
+                    "Key: {}, Value: {}".format(
+                        action["redis key"],
+                        self.redis_client.get(action["redis key"]).decode("UTF-8"),
+                    )
+                )
+
+        def on_clockwise_rotate():
+            """ Execute the clockwise rotate callback of curr screen """
+            self.screens[self.curr_screen].on_clockwise_rotate()
+
+        def on_counterclockwise_rotate():
+            """ Execute the counterclockwise rotate callback of curr screen """
+            self.screens[self.curr_screen].on_counterclockwise_rotate()
+
+        self.rotary_encoder = RotaryEncoder(
+            PIN_1,
+            PIN_2,
+            BUTTON_PIN,
+            on_clockwise_rotate,
+            on_counterclockwise_rotate,
+            on_click,
+        )
+
+        self.rotary_encoder.start()
         self.screens[self.curr_screen].update_screen()
 
     def poll_redis(self, timeout=0.1):
@@ -96,6 +135,7 @@ class RobotUi:
     def stop(self):
         """ Cleanup the GPIO pins """
         self.shutdown = True
+        self.rotary_encoder.stop()
 
 
 if __name__ == "__main__":
@@ -122,10 +162,8 @@ if __name__ == "__main__":
         robot_ui.poll_redis()
 
     robot_ui = RobotUi(boot_screen_path=args["path_to_boot_screen"])
-    # thread = Thread(target=start_polling, args=(robot_ui,))
-    # thread.start()
+    thread = Thread(target=start_polling, args=(robot_ui,))
+    thread.start()
 
     while True:
-        print("polling")
-        start_polling(robot_ui)
-        # time.sleep(1)
+        time.sleep(1)
