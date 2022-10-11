@@ -27,7 +27,6 @@ class RobotView(QWidget):
         self.green = QtGui.QColor(0, 255, 0)
 
         self.robot_status_buffer = ThreadSafeBuffer(100, RobotStatus)
-        self.MIN_VOLTAGE_LEVEL = 20.5  # TODO PULL THIS OUT
 
         # There is no pattern to this so we just have to create
         # mapping from robot id to the four corners of the vision pattern
@@ -56,12 +55,12 @@ class RobotView(QWidget):
 
         self.layout = QVBoxLayout()
 
-        self.robot_layouts = [QHBoxLayout() for x in range(8)]
-        self.robot_status_layouts = [QVBoxLayout() for x in range(8)]
-        self.robot_battery_progress_bars = [QProgressBar() for x in range(8)]
-        self.breakbeam_labels = [QLabel() for x in range(8)]
+        self.robot_layouts = [QHBoxLayout() for x in range(MAX_ROBOT_IDS_PER_SIDE)]
+        self.robot_status_layouts = [QVBoxLayout() for x in range(MAX_ROBOT_IDS_PER_SIDE)]
+        self.robot_battery_progress_bars = [QProgressBar() for x in range(MAX_ROBOT_IDS_PER_SIDE)]
+        self.breakbeam_labels = [QLabel() for x in range(MAX_ROBOT_IDS_PER_SIDE)]
 
-        for x in range(8):
+        for x in range(MAX_ROBOT_IDS_PER_SIDE):
             QVBoxLayout()
             self.robot_battery_progress_bars[x].setMaximum(100)
             self.robot_battery_progress_bars[x].setMinimum(0)
@@ -138,7 +137,7 @@ class RobotView(QWidget):
         """Refresh the view
         """
         robot_status_buffer = self.robot_status_buffer.get(block=False)
-        for i in range(8):
+        for i in range(MAX_ROBOT_IDS_PER_SIDE):
             if breakbeam_status.ball_in_beam:
                 self.breakbeam_labels[i].setText("In Beam")
                 self.breakbeam_labels[i].setStyleSheet("background-color: red")
@@ -147,10 +146,10 @@ class RobotView(QWidget):
                 self.breakbeam_labels[i].setStyleSheet("background-color: green")
 
         power_status = self.power_status_buffer.get(block=False)
-        for i in range(8):
+        for i in range(MAX_ROBOT_IDS_PER_SIDE):
             self.robot_battery_progress_bars[i].setValue(power_status.battery_voltage)
 
-            if power_status.battery_voltage > self.MIN_VOLTAGE_LEVEL:
+            if power_status.battery_voltage < BATTERY_WARNING_VOLTAGE:
                 msg = QMessageBox()
                 msg.setIcon(QMessageBox.Information)
                 msg.setText(f"robot {i} voltage is {power_status.battery_voltage}")

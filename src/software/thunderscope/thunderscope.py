@@ -534,7 +534,7 @@ class Thunderscope(object):
         hrvo_sim_states = []
         # Add HRVO layers to field widget and have them hidden on startup
         # TODO (#2655): Add/Remove HRVO layers dynamically based on the HRVOVisualization proto messages
-        for robot_id in range(8):
+        for robot_id in range(MAX_ROBOT_IDS_PER_SIDE):
             hrvo_sim_state = hrvo_layer.HRVOLayer(
                 robot_id, self.visualization_buffer_size
             )

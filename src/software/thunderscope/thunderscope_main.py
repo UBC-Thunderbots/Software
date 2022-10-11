@@ -178,7 +178,7 @@ if __name__ == "__main__":
         ] + [
             # TODO (#2655): Add/Remove HRVO layers dynamically based on the HRVOVisualization proto messages
             {"proto_class": HRVOVisualization, "unix_path": YELLOW_HRVO_PATH}
-            for _ in range(8)
+            for _ in range(MAX_ROBOT_IDS_PER_SIDE)
         ]:
             proto_unix_io.attach_unix_receiver(
                 runtime_dir, from_log_visualize=True, **arg
