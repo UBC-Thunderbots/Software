@@ -123,7 +123,7 @@ class TbotsTestRunner(object):
 
     def time_provider(self):
         """Provide the current time in seconds since the epoch"""
-        raise NotImplementedError("run_test unimplemented")
+        raise NotImplementedError("time_provider unimplemented")
 
     def run_test(
         self,
