@@ -1,14 +1,11 @@
 import time
 
 import decorator
-import inspect
 
 import pytest
 from software.simulated_tests.pytest_main import load_command_line_arguments
 from software.simulated_tests.simulated_test_fixture import simulated_test_initializer
 from software.field_tests.field_test_fixture import field_test_initializer
-import signal
-import os
 import threading
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.thunderscope.thunderscope import Thunderscope
@@ -29,18 +26,18 @@ def enable_thunderscope(test):
 
         test (_type_): _description_
     """
-    def wrapper(*args, **kw):
 
+    def wrapper(*args, **kw):
         def stop_test(delay):
             time.sleep(delay)
             if thunderscope:
                 thunderscope.close()
-           
+
         class Excepthook(object):
             def __init__(self):
                 self.last_exception = None
 
-            def excepthook(self,args):
+            def excepthook(self, args):
                 """This function is _critical_ for show_thunderscope to work.
             If the test Thread raises an exception we won't be able to close
             the window from the main thread.
@@ -56,7 +53,7 @@ def enable_thunderscope(test):
 
         def run_test():
             time.sleep(LAUNCH_DELAY_S)
-            #first argument is test itself
+            # first argument is test itself
             test(*args[1:], **kw)
             stop_test(TEST_END_DELAY)
             return
@@ -89,8 +86,10 @@ def enable_thunderscope(test):
 
 @pytest.fixture
 def field_test_runner():
-    initializer = field_test_initializer(blue_full_system_proto_unix_io=blue_full_system_proto_unix_io,
-                                        yellow_full_system_proto_unix_io=yellow_full_system_proto_unix_io)
+    initializer = field_test_initializer(
+        blue_full_system_proto_unix_io=blue_full_system_proto_unix_io,
+        yellow_full_system_proto_unix_io=yellow_full_system_proto_unix_io,
+    )
 
     yield_val = next(initializer)
 
@@ -108,10 +107,11 @@ def simulated_test_runner():
     args = load_command_line_arguments()
 
     initializer = simulated_test_initializer(
-        blue_full_system_proto_unix_io=blue_full_system_proto_unix_io, 
-        yellow_full_system_proto_unix_io=yellow_full_system_proto_unix_io, 
+        blue_full_system_proto_unix_io=blue_full_system_proto_unix_io,
+        yellow_full_system_proto_unix_io=yellow_full_system_proto_unix_io,
         simulator_proto_unix_io=simulator_proto_unix_io,
-        sleep_between_ticks=args.enable_thunderscope)
+        sleep_between_ticks=args.enable_thunderscope,
+    )
 
     yield_val = next(initializer)
 
@@ -126,14 +126,20 @@ def simulated_test_runner():
 
 @pytest.fixture
 def tbots_test_runner():
-    
+
     args = load_command_line_arguments()
 
     if args.run_field_test:
-        runner_fixture = field_test_initializer(blue_full_system_proto_unix_io=blue_full_system_proto_unix_io,
-                                                yellow_full_system_proto_unix_io=yellow_full_system_proto_unix_io)
+        runner_fixture = field_test_initializer(
+            blue_full_system_proto_unix_io=blue_full_system_proto_unix_io,
+            yellow_full_system_proto_unix_io=yellow_full_system_proto_unix_io,
+        )
     else:
-        runner_fixture = simulated_test_initializer(blue_full_system_proto_unix_io=blue_full_system_proto_unix_io, yellow_full_system_proto_unix_io=yellow_full_system_proto_unix_io, simulator_proto_unix_io=simulator_proto_unix_io)
+        runner_fixture = simulated_test_initializer(
+            blue_full_system_proto_unix_io=blue_full_system_proto_unix_io,
+            yellow_full_system_proto_unix_io=yellow_full_system_proto_unix_io,
+            simulator_proto_unix_io=simulator_proto_unix_io,
+        )
 
     yield_val = next(runner_fixture)
 

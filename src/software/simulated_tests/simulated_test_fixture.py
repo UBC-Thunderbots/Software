@@ -36,7 +36,7 @@ LAUNCH_DELAY_S = 0.1
 WORLD_BUFFER_TIMEOUT = 0.5
 PROCESS_BUFFER_DELAY_S = 0.01
 PAUSE_AFTER_FAIL_DELAY_S = 3
-DEFAULT_SIM_TICK_DURATION_S = 0.0166 # default to 60HZ
+DEFAULT_SIM_TICK_DURATION_S = 0.0166  # default to 60HZ
 
 
 class SimulatorTestRunner(TbotsTestRunner):
@@ -51,7 +51,7 @@ class SimulatorTestRunner(TbotsTestRunner):
         gamecontroller,
         publish_validation_protos=True,
         simulation_tick_duration_s=DEFAULT_SIM_TICK_DURATION_S,
-        sleep_between_ticks=True
+        sleep_between_ticks=True,
     ):
         """Initialize the SimulatorTestRunner
         
@@ -198,7 +198,7 @@ def simulated_test_initializer(
     simulator_proto_unix_io,
     yellow_full_system_proto_unix_io,
     blue_full_system_proto_unix_io,
-    sleep_between_ticks=True
+    sleep_between_ticks=True,
 ):
     args = load_command_line_arguments()
 
