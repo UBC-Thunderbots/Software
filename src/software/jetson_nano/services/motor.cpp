@@ -139,7 +139,14 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
     // Make this instance available to the static functions above
     g_motor_service = this;
 
-    // Drive Motor Setup
+    setUpMotors();
+}
+
+MotorService::~MotorService() {}
+
+void MotorService::setUpMotors()
+{
+    // Check for driver faults
     for (uint8_t motor = 0; motor < NUM_DRIVE_MOTORS; motor++)
     {
         checkDriverFault(motor);
@@ -159,15 +166,15 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
         checkDriverFault(motor);
         // Start all the controllers as drive motor controllers
         startController(motor, false);
+        tmc4671_setTargetVelocity(motor, 0);
     }
 
     // Dribbler Motor Setup
     startDriver(DRIBBLER_MOTOR_CHIP_SELECT);
     checkDriverFault(DRIBBLER_MOTOR_CHIP_SELECT);
     startController(DRIBBLER_MOTOR_CHIP_SELECT, true);
+    tmc4671_setTargetVelocity(DRIBBLER_MOTOR_CHIP_SELECT, 0);
 }
-
-MotorService::~MotorService() {}
 
 
 bool MotorService::checkDriverFault(uint8_t motor)
@@ -268,11 +275,23 @@ bool MotorService::checkDriverFault(uint8_t motor)
 TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor,
                                            double time_elapsed_since_last_poll_s)
 {
+    TbotsProto::MotorStatus motor_status;
+
+    bool encoders_calibrated = (encoder_calibrated_[FRONT_LEFT_MOTOR_CHIP_SELECT] ||
+                               encoder_calibrated_[FRONT_RIGHT_MOTOR_CHIP_SELECT] ||
+                               encoder_calibrated_[BACK_LEFT_MOTOR_CHIP_SELECT] ||
+                               encoder_calibrated_[BACK_RIGHT_MOTOR_CHIP_SELECT]);
+
+    int reset_detector = tmc4671_readInt(0, TMC4671_PID_ACCELERATION_LIMIT);
+
+    if (reset_detector == 2147483647)
+    {
+        LOG(DEBUG) << "RESET DETECTED";
+        setUpMotors();
+        encoders_calibrated        = false;
+    }
     // check if encoders are calibrated
-    if (!encoder_calibrated_[FRONT_LEFT_MOTOR_CHIP_SELECT] ||
-        !encoder_calibrated_[FRONT_RIGHT_MOTOR_CHIP_SELECT] ||
-        !encoder_calibrated_[BACK_LEFT_MOTOR_CHIP_SELECT] ||
-        !encoder_calibrated_[BACK_RIGHT_MOTOR_CHIP_SELECT])
+    if (!encoders_calibrated)
     {
         // if not, calibrate the encoders
         for (uint8_t motor = 0; motor < NUM_DRIVE_MOTORS; motor++)
@@ -293,8 +312,6 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
           encoder_calibrated_[BACK_LEFT_MOTOR_CHIP_SELECT] &&
           encoder_calibrated_[BACK_RIGHT_MOTOR_CHIP_SELECT])
         << "Running without encoder calibration can cause serious harm, exiting";
-
-    TbotsProto::MotorStatus motor_status;
 
     // Get current wheel electical RPMs (don't account for pole pairs)
     double front_right_velocity =
