@@ -50,13 +50,13 @@ class ProtoPlotter(QWidget):
     """
 
     def __init__(
-            self,
-            min_y,
-            max_y,
-            window_secs,
-            configuration,
-            plot_rate_hz=60,
-            buffer_size=1000,
+        self,
+        min_y,
+        max_y,
+        window_secs,
+        configuration,
+        plot_rate_hz=60,
+        buffer_size=1000,
     ):
         """Initializes NamedValuePlotter.
 
@@ -143,5 +143,5 @@ class ProtoPlotter(QWidget):
             xRange=[
                 time.time() - self.time - self.window_secs,
                 time.time() - self.time,
-                ],
+            ],
         )

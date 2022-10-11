@@ -228,7 +228,7 @@ if __name__ == "__main__":
 
     if args.run_blue or args.run_yellow:
         with ProtoLogger(
-                args.blue_full_system_runtime_dir,
+            args.blue_full_system_runtime_dir,
         ) as blue_logger, ProtoLogger(
             args.yellow_full_system_runtime_dir,
         ) as yellow_logger, RobotCommunication(

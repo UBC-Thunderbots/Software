@@ -66,7 +66,7 @@ static const char* DRIVER_CONTROL_ENABLE_GPIO             = "194";
 static double MECHANICAL_MPS_PER_ELECTRICAL_RPM = 0.000111;
 static double ELECTRICAL_RPM_PER_MECHANICAL_MPS = 1 / MECHANICAL_MPS_PER_ELECTRICAL_RPM;
 
-static double RUNAWAY_PROTECTION_THRESHOLD_MPS = 2.00;
+static double RUNAWAY_PROTECTION_THRESHOLD_MPS       = 2.00;
 static int DRIBBLER_ACCELERATION_THRESHOLD_RPM_PER_S = 1000;
 
 
@@ -364,7 +364,7 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
     EuclideanSpace_t target_linear_velocity  = {0.0, 0.0, 0.0};
     EuclideanSpace_t target_angular_velocity = {0.0, 0.0, 0.0};
     int target_dribbler_rpm                  = motor.dribbler_speed_rpm();
-    static int ramp_rpm              = 0;
+    static int ramp_rpm                      = 0;
 
     switch (motor.drive_control_case())
     {

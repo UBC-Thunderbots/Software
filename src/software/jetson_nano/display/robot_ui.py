@@ -9,7 +9,6 @@ from software.jetson_nano.display.lcd_user_interface.lcd_user_interface import (
 )
 
 import argparse
-from threading import Thread
 from software.jetson_nano.display.rotary_encoder.rotary_encoder import RotaryEncoder
 from software.jetson_nano.display.screens.home_screen import HomeScreen
 import software.jetson_nano.display.constants as constants
@@ -123,10 +122,10 @@ if __name__ == "__main__":
         robot_ui.poll_redis()
 
     robot_ui = RobotUi(boot_screen_path=args["path_to_boot_screen"])
-    #thread = Thread(target=start_polling, args=(robot_ui,))
-    #thread.start()
+    # thread = Thread(target=start_polling, args=(robot_ui,))
+    # thread.start()
 
     while True:
         print("polling")
         start_polling(robot_ui)
-        #time.sleep(1)
+        # time.sleep(1)

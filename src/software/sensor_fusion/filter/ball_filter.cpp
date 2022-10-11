@@ -130,13 +130,15 @@ std::optional<Ball> BallFilter::estimateBallStateFromBuffer(
 
     auto regression = calculateLineOfBestFit(ball_detections);
 
-    Point filtered_position = estimateBallPosition(ball_detections, regression.regression_line);
+    Point filtered_position =
+        estimateBallPosition(ball_detections, regression.regression_line);
 
     auto estimated_velocity = estimateBallVelocity(ball_detections, std::nullopt);
 
-    if(regression.regression_error < LINEAR_REGRESSION_ERROR_THRESHOLD)
+    if (regression.regression_error < LINEAR_REGRESSION_ERROR_THRESHOLD)
     {
-        estimated_velocity = estimateBallVelocity(ball_detections, regression.regression_line);
+        estimated_velocity =
+            estimateBallVelocity(ball_detections, regression.regression_line);
     }
     if (!estimated_velocity)
     {

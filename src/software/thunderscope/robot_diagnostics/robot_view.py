@@ -56,8 +56,12 @@ class RobotView(QWidget):
         self.layout = QVBoxLayout()
 
         self.robot_layouts = [QHBoxLayout() for x in range(MAX_ROBOT_IDS_PER_SIDE)]
-        self.robot_status_layouts = [QVBoxLayout() for x in range(MAX_ROBOT_IDS_PER_SIDE)]
-        self.robot_battery_progress_bars = [QProgressBar() for x in range(MAX_ROBOT_IDS_PER_SIDE)]
+        self.robot_status_layouts = [
+            QVBoxLayout() for x in range(MAX_ROBOT_IDS_PER_SIDE)
+        ]
+        self.robot_battery_progress_bars = [
+            QProgressBar() for x in range(MAX_ROBOT_IDS_PER_SIDE)
+        ]
         self.breakbeam_labels = [QLabel() for x in range(MAX_ROBOT_IDS_PER_SIDE)]
 
         for x in range(MAX_ROBOT_IDS_PER_SIDE):
@@ -102,7 +106,7 @@ class RobotView(QWidget):
             QtCore.QRectF(0, 0, int(radius * 2), int(radius * 2),),
             -45 * convert_degree,
             270 * convert_degree,
-            )
+        )
 
         # Draw the vision pattern
         # Draw the centre team color
@@ -120,7 +124,7 @@ class RobotView(QWidget):
         ]
 
         for color, location in zip(
-                self.vision_pattern_lookup[id], top_circle_locations
+            self.vision_pattern_lookup[id], top_circle_locations
         ):
             painter.setBrush(pg.mkBrush(color))
             painter.drawEllipse(location, radius / 5, radius / 5)

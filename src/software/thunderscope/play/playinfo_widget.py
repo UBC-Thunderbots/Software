@@ -60,7 +60,7 @@ class playInfoWidget(QWidget):
                         max(
                             len(key) * HEADER_SIZE_HINT_WIDTH_EXPANSION,
                             len(item) * ITEM_SIZE_HINT_WIDTH_EXPANSION,
-                            ),
+                        ),
                         1,
                     )
                 )
@@ -118,8 +118,8 @@ class playInfoWidget(QWidget):
         self.play_table.resizeRowsToContents()
         if referee_msg_dict:
             p = (
-                    f"REFEREE {referee_msg_dict['packetTimestamp']}: "
-                    + f" {referee_msg_dict['stage']} "
-                    + f" -> blue team on positive half: {referee_msg_dict['blueTeamOnPositiveHalf']}"
+                f"REFEREE {referee_msg_dict['packetTimestamp']}: "
+                + f" {referee_msg_dict['stage']} "
+                + f" -> blue team on positive half: {referee_msg_dict['blueTeamOnPositiveHalf']}"
             )
             self.referee_info.setText(p)
