@@ -87,8 +87,7 @@ def test_basic_rotation(field_test_runner):
     robot = [robot for robot in world.friendly_team.team_robots if robot.id == id][0]
 
     rob_pos_p = robot.current_state.global_position
-    # rob_pos_p = Point(x_meters=-2, y_meters=0)
-    print("staying in pos ", rob_pos_p)
+    logger.info("staying in pos {rob_pos_p}")
 
     for angle in test_angles:
         move_tactic = MoveTactic()

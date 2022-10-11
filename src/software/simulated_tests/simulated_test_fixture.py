@@ -36,6 +36,7 @@ LAUNCH_DELAY_S = 0.1
 WORLD_BUFFER_TIMEOUT = 0.5
 PROCESS_BUFFER_DELAY_S = 0.01
 PAUSE_AFTER_FAIL_DELAY_S = 3
+DEFAULT_SIM_TICK_DURATION_S = 0.0166 # default to 60HZ
 
 
 class SimulatorTestRunner(TbotsTestRunner):
@@ -49,7 +50,8 @@ class SimulatorTestRunner(TbotsTestRunner):
         yellow_full_system_proto_unix_io,
         gamecontroller,
         publish_validation_protos=True,
-        simulation_tick_duration=0.0166,  # default to 60HZ
+        simulation_tick_duration_s=DEFAULT_SIM_TICK_DURATION_S,
+        sleep_between_ticks=True
     ):
         """Initialize the SimulatorTestRunner
         
@@ -70,7 +72,8 @@ class SimulatorTestRunner(TbotsTestRunner):
         )
         self.simulator_proto_unix_io = simulator_proto_unix_io
         self.publish_validation_protos = publish_validation_protos
-        self.tick_duration = simulation_tick_duration
+        self.tick_duration_s = simulation_tick_duration_s
+        self.sleep_between_ticks = sleep_between_ticks
 
     def set_tactics(
         self, tactics: AssignedTacticPlayControlParams, isBlue: bool,
@@ -130,13 +133,13 @@ class SimulatorTestRunner(TbotsTestRunner):
                     self.timestamp = ssl_wrapper.detection.t_capture
 
                 tick = SimulatorTick(
-                    milliseconds=tick_duration_s * MILLISECONDS_PER_SECOND
+                    milliseconds=self.tick_duration_s * MILLISECONDS_PER_SECOND
                 )
                 self.simulator_proto_unix_io.send_proto(SimulatorTick, tick)
-                time_elapsed_s += tick_duration_s
+                time_elapsed_s += self.tick_duration_s
 
-                if True:
-                    time.sleep(tick_duration_s)
+                if self.sleep_between_ticks:
+                    time.sleep(self.tick_duration_s)
 
                 while True:
                     try:
@@ -195,6 +198,7 @@ def simulated_test_initializer(
     simulator_proto_unix_io,
     yellow_full_system_proto_unix_io,
     blue_full_system_proto_unix_io,
+    sleep_between_ticks=True
 ):
     args = load_command_line_arguments()
 
@@ -241,6 +245,8 @@ def simulated_test_initializer(
                 blue_full_system_proto_unix_io,
                 yellow_full_system_proto_unix_io,
                 gamecontroller,
+                simulation_tick_duration_s=DEFAULT_SIM_TICK_DURATION_S,
+                sleep_between_ticks=sleep_between_ticks,
             )
 
             # Only validate on the blue worlds
