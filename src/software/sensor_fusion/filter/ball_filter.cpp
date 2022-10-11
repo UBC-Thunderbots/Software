@@ -128,10 +128,16 @@ std::optional<Ball> BallFilter::estimateBallStateFromBuffer(
     }
     ball_detections.resize(*adjusted_buffer_size);
 
-    auto regression_line = calculateLineOfBestFit(ball_detections);
+    auto regression = calculateLineOfBestFit(ball_detections);
 
-    Point filtered_position = estimateBallPosition(ball_detections, regression_line);
-    auto estimated_velocity = estimateBallVelocity(ball_detections, regression_line);
+    Point filtered_position = estimateBallPosition(ball_detections, regression.regression_line);
+
+    auto estimated_velocity = estimateBallVelocity(ball_detections, std::nullopt);
+
+    if(regression.regression_error < LINEAR_REGRESSION_ERROR_THRESHOLD)
+    {
+        estimated_velocity = estimateBallVelocity(ball_detections, regression.regression_line);
+    }
     if (!estimated_velocity)
     {
         return std::nullopt;
@@ -188,7 +194,7 @@ std::optional<size_t> BallFilter::getAdjustedBufferSize(
     return static_cast<size_t>(buffer_size);
 }
 
-Line BallFilter::calculateLineOfBestFit(
+BallFilter::LinearRegressionResults BallFilter::calculateLineOfBestFit(
     boost::circular_buffer<BallDetection> ball_detections)
 {
     if (ball_detections.size() < 2)
@@ -214,11 +220,11 @@ Line BallFilter::calculateLineOfBestFit(
     // We use the regression from above with the least error
     if (x_vs_y_regression.regression_error < y_vs_x_regression.regression_error)
     {
-        return x_vs_y_regression.regression_line;
+        return x_vs_y_regression;
     }
     else
     {
-        return y_vs_x_regression.regression_line;
+        return y_vs_x_regression;
     }
 }
 

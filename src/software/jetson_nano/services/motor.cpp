@@ -418,15 +418,22 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
         BACK_RIGHT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_TARGET,
         static_cast<int>(target_wheel_velocities[3] * ELECTRICAL_RPM_PER_MECHANICAL_MPS));
 
-    if (target_dribbler_rpm > test_ramp_rpm + 1500)
+    // If the dribbler only needs to change by DRIBBLER_ACCELERATION_THRESHOLD_RPM_PER_S,
+    // just set the value
+    if (std::abs(target_dribbler_rpm - ramp_rpm) <=
+        DRIBBLER_ACCELERATION_THRESHOLD_RPM_PER_S)
     {
-        test_ramp_rpm += 1000;
-        tmc4671_setTargetVelocity(DRIBBLER_MOTOR_CHIP_SELECT, test_ramp_rpm);
+        tmc4671_setTargetVelocity(DRIBBLER_MOTOR_CHIP_SELECT, target_dribbler_rpm);
     }
-    else if (target_dribbler_rpm < test_ramp_rpm - 1500)
+    else if (target_dribbler_rpm > ramp_rpm + DRIBBLER_ACCELERATION_THRESHOLD_RPM_PER_S)
     {
-        test_ramp_rpm -= 1000;
-        tmc4671_setTargetVelocity(DRIBBLER_MOTOR_CHIP_SELECT, test_ramp_rpm);
+        ramp_rpm += DRIBBLER_ACCELERATION_THRESHOLD_RPM_PER_S;
+        tmc4671_setTargetVelocity(DRIBBLER_MOTOR_CHIP_SELECT, ramp_rpm);
+    }
+    else if (target_dribbler_rpm < ramp_rpm - DRIBBLER_ACCELERATION_THRESHOLD_RPM_PER_S)
+    {
+        ramp_rpm -= DRIBBLER_ACCELERATION_THRESHOLD_RPM_PER_S;
+        tmc4671_setTargetVelocity(DRIBBLER_MOTOR_CHIP_SELECT, ramp_rpm);
     }
 
     return motor_status;

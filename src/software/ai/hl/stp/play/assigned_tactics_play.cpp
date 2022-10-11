@@ -56,6 +56,8 @@ std::unique_ptr<TbotsProto::PrimitiveSet> AssignedTacticsPlay::get(
             tactic->setLastExecutionRobot(robot.id());
         }
     }
+    primitives_to_run->mutable_time_sent()->set_epoch_timestamp_seconds(
+            world.getMostRecentTimestamp().toSeconds());
     return primitives_to_run;
 }
 

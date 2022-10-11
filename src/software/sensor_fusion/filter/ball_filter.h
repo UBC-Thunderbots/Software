@@ -43,6 +43,8 @@ class BallFilter
     static constexpr double MAX_BUFFER_SIZE_VELOCITY_MAGNITUDE = 4.0;
     // The extra amount beyond the ball's max speed that we treat ball detections as valid
     static constexpr double MAX_ACCEPTABLE_BALL_SPEED_BUFFER = 2.0;
+    // The maximum error threshold to considering using the generated linear regression
+    static constexpr double LINEAR_REGRESSION_ERROR_THRESHOLD = 1000.0;
 
     /**
      * Creates a new Ball Filter
@@ -128,7 +130,8 @@ class BallFilter
 
     /**
      * Given a buffer of ball detections, returns the line of best fit through
-     * the detection positions.
+     * the detection positions, and calculate the error of this regression.
+     * Note: also considers vertical lines.
      *
      * @throws std::invalid_argument if ball_detections has less than 2 elements
      *
@@ -136,7 +139,7 @@ class BallFilter
      *
      * @return The line of best fit through the given ball detection positions
      */
-    static Line calculateLineOfBestFit(
+    static LinearRegressionResults calculateLineOfBestFit(
         boost::circular_buffer<BallDetection> ball_detections);
 
     /**
