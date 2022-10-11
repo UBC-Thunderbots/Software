@@ -278,9 +278,9 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
     TbotsProto::MotorStatus motor_status;
 
     bool encoders_calibrated = (encoder_calibrated_[FRONT_LEFT_MOTOR_CHIP_SELECT] ||
-                               encoder_calibrated_[FRONT_RIGHT_MOTOR_CHIP_SELECT] ||
-                               encoder_calibrated_[BACK_LEFT_MOTOR_CHIP_SELECT] ||
-                               encoder_calibrated_[BACK_RIGHT_MOTOR_CHIP_SELECT]);
+                                encoder_calibrated_[FRONT_RIGHT_MOTOR_CHIP_SELECT] ||
+                                encoder_calibrated_[BACK_LEFT_MOTOR_CHIP_SELECT] ||
+                                encoder_calibrated_[BACK_RIGHT_MOTOR_CHIP_SELECT]);
 
     int reset_detector = tmc4671_readInt(0, TMC4671_PID_ACCELERATION_LIMIT);
 
@@ -288,7 +288,7 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
     {
         LOG(DEBUG) << "RESET DETECTED";
         setUpMotors();
-        encoders_calibrated        = false;
+        encoders_calibrated = false;
     }
     // check if encoders are calibrated
     if (!encoders_calibrated)
