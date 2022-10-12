@@ -21,8 +21,8 @@ namespace Pathfinding
         const bool left_inclusive;
         const bool right_inclusive;
 
-        ScanInterval(int y, const Rational x_left, const Rational x_right, bool left_inclusive,
-                     bool right_inclusive)
+        ScanInterval(int y, const Rational x_left, const Rational x_right,
+                     bool left_inclusive, bool right_inclusive)
             : y(y),
               x_left(x_left),
               x_right(x_right),
@@ -73,12 +73,13 @@ namespace Pathfinding
         inline int leftUpExtent(int x_left, int y) const
         {
             return x_left > size_x ? size_x
-                                : left_down_extents[(y + 1) * extents_size_x + x_left];
+                                   : left_down_extents[(y + 1) * extents_size_x + x_left];
         }
 
         inline int leftDownExtent(int x_left, int y) const
         {
-            return x_left > size_x ? size_x : left_down_extents[y * extents_size_x + x_left];
+            return x_left > size_x ? size_x
+                                   : left_down_extents[y * extents_size_x + x_left];
         }
 
         inline int leftAnyExtent(int x_left, int y) const
@@ -89,7 +90,8 @@ namespace Pathfinding
 
         inline int rightUpExtent(int x_right, int y) const
         {
-            return x_right < 0 ? 0 : right_down_extents[(y + 1) * extents_size_x + x_right];
+            return x_right < 0 ? 0
+                               : right_down_extents[(y + 1) * extents_size_x + x_right];
         }
 
         inline int rightDownExtent(int x_right, int y) const
