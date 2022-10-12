@@ -7,7 +7,7 @@ namespace Pathfinding
     LineOfSightScanner::LineOfSightScanner(const Grid& grid)
         : grid(grid),
           size_x(grid.size_x),
-          sizeY(grid.size_y),
+          size_y(grid.size_y),
           extents_size_x(grid.size_x + 1)
     {
         computeExtents();
@@ -34,10 +34,10 @@ namespace Pathfinding
 
     void LineOfSightScanner::computeExtents()
     {
-        right_down_extents.resize(extents_size_x * (sizeY + 2));
-        left_down_extents.resize(extents_size_x * (sizeY + 2));
+        right_down_extents.resize(extents_size_x * (size_y + 2));
+        left_down_extents.resize(extents_size_x * (size_y + 2));
 
-        for (int y = 0; y < sizeY + 2; ++y)
+        for (int y = 0; y < size_y + 2; ++y)
         {
             bool last_is_blocked = true;
             int last_x           = -1;

@@ -76,37 +76,37 @@ namespace Pathfinding
                                 : left_down_extents[(y + 1) * extents_size_x + x_L];
         }
 
-        inline int leftDownExtent(int xL, int y) const
+        inline int leftDownExtent(int x_L, int y) const
         {
-            return xL > size_x ? size_x : left_down_extents[y * extents_size_x + xL];
+            return x_L > size_x ? size_x : left_down_extents[y * extents_size_x + x_L];
         }
 
-        inline int leftAnyExtent(int xL, int y) const
+        inline int leftAnyExtent(int x_L, int y) const
         {
-            return std::max(left_down_extents[y * extents_size_x + xL],
-                            left_down_extents[(y + 1) * extents_size_x + xL]);
+            return std::max(left_down_extents[y * extents_size_x + x_L],
+                            left_down_extents[(y + 1) * extents_size_x + x_L]);
         }
 
-        inline int rightUpExtent(int xR, int y) const
+        inline int rightUpExtent(int x_R, int y) const
         {
-            return xR < 0 ? 0 : right_down_extents[(y + 1) * extents_size_x + xR];
+            return x_R < 0 ? 0 : right_down_extents[(y + 1) * extents_size_x + x_R];
         }
 
-        inline int rightDownExtent(int xR, int y) const
+        inline int rightDownExtent(int x_R, int y) const
         {
-            return xR < 0 ? 0 : right_down_extents[y * extents_size_x + xR];
+            return x_R < 0 ? 0 : right_down_extents[y * extents_size_x + x_R];
         }
 
-        inline int rightAnyExtent(int xR, int y) const
+        inline int rightAnyExtent(int x_R, int y) const
         {
-            return std::min(right_down_extents[y * extents_size_x + xR],
-                            right_down_extents[(y + 1) * extents_size_x + xR]);
+            return std::min(right_down_extents[y * extents_size_x + x_R],
+                            right_down_extents[(y + 1) * extents_size_x + x_R]);
         }
 
        private:
         const Grid& grid;
         const int size_x;
-        const int sizeY;
+        const int size_y;
         const int extents_size_x;
 
         std::vector<int> right_down_extents;

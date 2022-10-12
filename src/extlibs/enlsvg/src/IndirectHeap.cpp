@@ -85,16 +85,7 @@ namespace Pathfinding
             --heap_size;
             return getOut(0);
         }
-        // nodeList.size() > 1
 
-        // s = Data at 0 = out[0]
-        // t = Data at lastIndex = out[lastIndex]
-        // key[0] = key[lastIndex], remove key[lastIndex]
-        // in[s] = -1
-        // in[t] = 0
-        // out[0] = out[lastIndex], remove out[lastIndex]
-
-        // E temp = key_list.get(0);
         int s = getOut(0);
         swapData(0, heap_size - 1);
 

@@ -22,8 +22,8 @@ namespace Pathfinding
             int level;
             std::vector<EdgeID> taut_outgoing_edges;
 
-            EdgeData(VertexID sourceVertex, VertexID destVertex, int level)
-                : source_vertex(sourceVertex), dest_vertex(destVertex), level(level)
+            EdgeData(VertexID source_vertex, VertexID dest_vertex, int level)
+                : source_vertex(source_vertex), dest_vertex(dest_vertex), level(level)
             {
             }
         };
@@ -35,11 +35,11 @@ namespace Pathfinding
             const VertexID immediate_next;  // immediate vertex just after current
             const VertexID immediate_last;  // immediate vertex just before next.
 
-            SkipEdge(VertexID next, double weight, VertexID imNext, VertexID imLast)
+            SkipEdge(VertexID next, double weight, VertexID im_next, VertexID im_last)
                 : next(next),
                   weight(weight),
-                  immediate_next(imNext),
-                  immediate_last(imLast)
+                  immediate_next(im_next),
+                  immediate_last(im_last)
             {
             }
         };
@@ -49,9 +49,9 @@ namespace Pathfinding
             std::vector<bool> is_marked;
             std::vector<EdgeID> marked_indexes;
 
-            MarkedEdges(size_t nEdges)
+            MarkedEdges(size_t n_edges)
             {
-                is_marked.resize(nEdges, false);
+                is_marked.resize(n_edges, false);
             }
 
             inline void mark(EdgeID index)
