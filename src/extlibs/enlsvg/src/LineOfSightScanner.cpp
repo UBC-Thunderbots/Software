@@ -236,13 +236,13 @@ namespace Pathfinding
             bool left_inclusive     = curr_state.left_inclusive;
             bool right_inclusive    = curr_state.right_inclusive;
 
-            bool zero_length_interval = (curr_state.x_R == curr_state.x_L);
+            bool zero_length_interval = (curr_state.x_right == curr_state.x_left);
             if (curr_state.y > s_y)
             {
                 // Upwards
 
                 // Insert endpoints if integer.
-                if (left_inclusive && curr_state.x_L.isWholeNumber())
+                if (left_inclusive && curr_state.x_left.isWholeNumber())
                 {
                     /* The two cases   _
                      *  _             |X|
@@ -251,7 +251,7 @@ namespace Pathfinding
                      *        B     B
                      */
 
-                    int x                          = curr_state.x_L.n;
+                    int x                          = curr_state.x_left.n;
                     int y                          = curr_state.y;
                     bool top_right_of_blocked_tile = grid.topRightOfBlockedTile(x, y);
                     bool bottom_right_of_blocked_tile =
@@ -270,7 +270,7 @@ namespace Pathfinding
                         left_inclusive = false;
                     }
                 }
-                if (right_inclusive && curr_state.x_R.isWholeNumber())
+                if (right_inclusive && curr_state.x_right.isWholeNumber())
                 {
                     /*   _   The two cases
                      *  |X|             _
@@ -279,7 +279,7 @@ namespace Pathfinding
                      *      B     B
                      */
 
-                    int x                            = curr_state.x_R.n;
+                    int x                            = curr_state.x_right.n;
                     int y                            = curr_state.y;
                     bool bottom_left_of_blocked_tile = grid.bottomLeftOfBlockedTile(x, y);
                     bool top_left_of_blocked_tile    = grid.topLeftOfBlockedTile(x, y);
@@ -316,12 +316,12 @@ namespace Pathfinding
                 // (Px-Bx)*(Py-By+1)/(Py-By) + Bx
                 int dy = curr_state.y - s_y;
                 Fraction left_projection =
-                    (curr_state.x_L - s_x).multiplyDivide(dy + 1, dy) + s_x;
+                    (curr_state.x_left - s_x).multiplyDivide(dy + 1, dy) + s_x;
 
-                int left_bound = leftUpExtent(curr_state.x_L.ceil(), curr_state.y);
-                if (curr_state.x_L.isWholeNumber() &&
-                    grid.bottomRightOfBlockedTile(curr_state.x_L.n, curr_state.y))
-                    left_bound = curr_state.x_L.n;
+                int left_bound = leftUpExtent(curr_state.x_left.ceil(), curr_state.y);
+                if (curr_state.x_left.isWholeNumber() &&
+                    grid.bottomRightOfBlockedTile(curr_state.x_left.n, curr_state.y))
+                    left_bound = curr_state.x_left.n;
 
                 if (left_projection < left_bound)
                 {  // left_projection < left_bound
@@ -331,12 +331,12 @@ namespace Pathfinding
 
                 // (Px-Bx)*(Py-By+1)/(Py-By) + Bx
                 Fraction right_projection =
-                    (curr_state.x_R - s_x).multiplyDivide(dy + 1, dy) + s_x;
+                    (curr_state.x_right - s_x).multiplyDivide(dy + 1, dy) + s_x;
 
-                int right_bound = rightUpExtent(curr_state.x_R.floor(), curr_state.y);
-                if (curr_state.x_R.isWholeNumber() &&
-                    grid.bottomLeftOfBlockedTile(curr_state.x_R.n, curr_state.y))
-                    right_bound = curr_state.x_R.n;
+                int right_bound = rightUpExtent(curr_state.x_right.floor(), curr_state.y);
+                if (curr_state.x_right.isWholeNumber() &&
+                    grid.bottomLeftOfBlockedTile(curr_state.x_right.n, curr_state.y))
+                    right_bound = curr_state.x_right.n;
 
                 if (right_projection > right_bound)
                 {  // right_bound < right_projection
@@ -364,7 +364,7 @@ namespace Pathfinding
                 // Upwards
 
                 // Insert endpoints if integer.
-                if (left_inclusive && curr_state.x_L.isWholeNumber())
+                if (left_inclusive && curr_state.x_left.isWholeNumber())
                 {
                     /* The two cases
                      *        B     B
@@ -373,7 +373,7 @@ namespace Pathfinding
                      *                |X|
                      */
 
-                    int x = curr_state.x_L.n;
+                    int x = curr_state.x_left.n;
                     int y = curr_state.y;
                     bool bottom_right_of_blocked_tile =
                         grid.bottomRightOfBlockedTile(x, y);
@@ -392,7 +392,7 @@ namespace Pathfinding
                         left_inclusive = false;
                     }
                 }
-                if (right_inclusive && curr_state.x_R.isWholeNumber())
+                if (right_inclusive && curr_state.x_right.isWholeNumber())
                 {
                     /*       The two cases
                      *      B     B
@@ -401,7 +401,7 @@ namespace Pathfinding
                      *  |X|
                      */
 
-                    int x                            = curr_state.x_R.n;
+                    int x                            = curr_state.x_right.n;
                     int y                            = curr_state.y;
                     bool top_left_of_blocked_tile    = grid.topLeftOfBlockedTile(x, y);
                     bool bottom_left_of_blocked_tile = grid.bottomLeftOfBlockedTile(x, y);
@@ -439,12 +439,12 @@ namespace Pathfinding
                 // (Px-Bx)*(Py-By+1)/(Py-By) + Bx
                 int dy = s_y - curr_state.y;
                 Fraction left_projection =
-                    (curr_state.x_L - s_x).multiplyDivide(dy + 1, dy) + s_x;
+                    (curr_state.x_left - s_x).multiplyDivide(dy + 1, dy) + s_x;
 
-                int left_bound = leftDownExtent(curr_state.x_L.ceil(), curr_state.y);
-                if (curr_state.x_L.isWholeNumber() &&
-                    grid.topRightOfBlockedTile(curr_state.x_L.n, curr_state.y))
-                    left_bound = curr_state.x_L.n;
+                int left_bound = leftDownExtent(curr_state.x_left.ceil(), curr_state.y);
+                if (curr_state.x_left.isWholeNumber() &&
+                    grid.topRightOfBlockedTile(curr_state.x_left.n, curr_state.y))
+                    left_bound = curr_state.x_left.n;
 
                 if (left_projection < left_bound)
                 {  // left_projection < left_bound
@@ -454,12 +454,12 @@ namespace Pathfinding
 
                 // (Px-Bx)*(Py-By+1)/(Py-By) + Bx
                 Fraction right_projection =
-                    (curr_state.x_R - s_x).multiplyDivide(dy + 1, dy) + s_x;
+                    (curr_state.x_right - s_x).multiplyDivide(dy + 1, dy) + s_x;
 
-                int right_bound = rightDownExtent(curr_state.x_R.floor(), curr_state.y);
-                if (curr_state.x_R.isWholeNumber() &&
-                    grid.topLeftOfBlockedTile(curr_state.x_R.n, curr_state.y))
-                    right_bound = curr_state.x_R.n;
+                int right_bound = rightDownExtent(curr_state.x_right.floor(), curr_state.y);
+                if (curr_state.x_right.isWholeNumber() &&
+                    grid.topLeftOfBlockedTile(curr_state.x_right.n, curr_state.y))
+                    right_bound = curr_state.x_right.n;
 
                 if (right_projection > right_bound)
                 {  // right_bound < right_projection
@@ -559,7 +559,7 @@ namespace Pathfinding
         else
         {
             // The possibility of there being one degenerate interval at the end. (
-            // !bottomLeftOfBlockedTile(x_R, check_y) )
+            // !bottomLeftOfBlockedTile(x_right, check_y) )
             if (right_inclusive && right_bound.isWholeNumber() &&
                 !grid.isBlocked(right_bound.n, check_y - 1))
             {
