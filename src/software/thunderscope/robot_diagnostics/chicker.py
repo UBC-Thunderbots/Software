@@ -110,8 +110,6 @@ class ChickerWidget(QWidget):
         # If auto is enabled, we want to populate the autochip or kick message
         if self.auto_kick_button.isChecked():
             power_control.chicker.auto_chip_or_kick.autokick_speed_m_per_s = power_value
-            print('auto kick')
-            print('nl')
         elif self.auto_chip_button.isChecked():
             power_control.chicker.auto_chip_or_kick.autochip_distance_meters = (
                 power_value
