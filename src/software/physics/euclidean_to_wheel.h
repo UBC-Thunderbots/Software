@@ -23,6 +23,11 @@ typedef Eigen::Vector3d EuclideanSpace_t;
  */
 typedef Eigen::Vector4d WheelSpace_t;
 
+static constexpr int FRONT_RIGHT_WHEEL_SPACE_INDEX = 0;
+static constexpr int FRONT_LEFT_WHEEL_SPACE_INDEX  = 1;
+static constexpr int BACK_LEFT_WHEEL_SPACE_INDEX   = 2;
+static constexpr int BACK_RIGHT_WHEEL_SPACE_INDEX  = 3;
+
 class EuclideanToWheel
 {
    public:

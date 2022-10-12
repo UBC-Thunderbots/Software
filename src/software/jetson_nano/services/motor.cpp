@@ -324,25 +324,29 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
                                              back_left_velocity, back_right_velocity};
 
     // Run-away protection
-    if (std::abs(current_wheel_velocities[0] - prev_wheel_velocities[0]) >
+    if (std::abs(current_wheel_velocities[FRONT_RIGHT_WHEEL_SPACE_INDEX] -
+                 prev_wheel_velocities[FRONT_RIGHT_WHEEL_SPACE_INDEX]) >
         RUNAWAY_PROTECTION_THRESHOLD_MPS)
     {
         driver_control_enable_gpio.setValue(GpioState::LOW);
         LOG(FATAL) << "Front right motor runaway";
     }
-    else if (std::abs(current_wheel_velocities[1] - prev_wheel_velocities[1]) >
+    else if (std::abs(current_wheel_velocities[FRONT_LEFT_WHEEL_SPACE_INDEX] -
+                      prev_wheel_velocities[FRONT_LEFT_WHEEL_SPACE_INDEX]) >
              RUNAWAY_PROTECTION_THRESHOLD_MPS)
     {
         driver_control_enable_gpio.setValue(GpioState::LOW);
         LOG(FATAL) << "Front left motor runaway";
     }
-    else if (std::abs(current_wheel_velocities[2] - prev_wheel_velocities[2]) >
+    else if (std::abs(current_wheel_velocities[BACK_LEFT_WHEEL_SPACE_INDEX] -
+                      prev_wheel_velocities[BACK_LEFT_WHEEL_SPACE_INDEX]) >
              RUNAWAY_PROTECTION_THRESHOLD_MPS)
     {
         driver_control_enable_gpio.setValue(GpioState::LOW);
         LOG(FATAL) << "Back left motor runaway";
     }
-    else if (std::abs(current_wheel_velocities[3] - prev_wheel_velocities[3]) >
+    else if (std::abs(current_wheel_velocities[BACK_RIGHT_WHEEL_SPACE_INDEX] -
+                      prev_wheel_velocities[BACK_RIGHT_WHEEL_SPACE_INDEX]) >
              RUNAWAY_PROTECTION_THRESHOLD_MPS)
     {
         driver_control_enable_gpio.setValue(GpioState::LOW);
@@ -407,16 +411,20 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
     // Set target speeds accounting for acceleration
     tmc4671_writeInt(
         FRONT_RIGHT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_TARGET,
-        static_cast<int>(target_wheel_velocities[0] * ELECTRICAL_RPM_PER_MECHANICAL_MPS));
+        static_cast<int>(target_wheel_velocities[FRONT_RIGHT_WHEEL_SPACE_INDEX] *
+                         ELECTRICAL_RPM_PER_MECHANICAL_MPS));
     tmc4671_writeInt(
         FRONT_LEFT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_TARGET,
-        static_cast<int>(target_wheel_velocities[1] * ELECTRICAL_RPM_PER_MECHANICAL_MPS));
+        static_cast<int>(target_wheel_velocities[FRONT_LEFT_WHEEL_SPACE_INDEX] *
+                         ELECTRICAL_RPM_PER_MECHANICAL_MPS));
     tmc4671_writeInt(
         BACK_LEFT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_TARGET,
-        static_cast<int>(target_wheel_velocities[2] * ELECTRICAL_RPM_PER_MECHANICAL_MPS));
+        static_cast<int>(target_wheel_velocities[BACK_LEFT_WHEEL_SPACE_INDEX] *
+                         ELECTRICAL_RPM_PER_MECHANICAL_MPS));
     tmc4671_writeInt(
         BACK_RIGHT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_TARGET,
-        static_cast<int>(target_wheel_velocities[3] * ELECTRICAL_RPM_PER_MECHANICAL_MPS));
+        static_cast<int>(target_wheel_velocities[BACK_RIGHT_WHEEL_SPACE_INDEX] *
+                         ELECTRICAL_RPM_PER_MECHANICAL_MPS));
 
     if (target_dribbler_rpm > test_ramp_rpm + 1500)
     {
