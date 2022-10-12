@@ -33,7 +33,7 @@ class SimulatedErForceSimPlayTestFixture : public SimulatedErForceSimTestFixture
      *
      * @param ai_play The AI play name enum
      */
-    void setAIPlay(const TbotsProto::PlayName& ai_play_name);
+    void setAiPlay(const TbotsProto::PlayName& ai_play_name);
 
     /**
      * Sets the tactic to the given tactic
@@ -53,7 +53,7 @@ class SimulatedErForceSimPlayTestFixture : public SimulatedErForceSimTestFixture
      *
      * @param play_ The play
      */
-    void setAIPlay(std::unique_ptr<Play> play);
+    void setAiPlay(std::unique_ptr<Play> play);
 
     /**
      * Sets the Referee command to override for the simulated test
@@ -88,5 +88,5 @@ class SimulatedErForceSimPlayTestFixture : public SimulatedErForceSimTestFixture
     GameState game_state;
 
     // The AI being tested and used in simulation
-    AI ai;
+    Ai ai;
 };

@@ -5,7 +5,7 @@
 #include "software/ai/hl/stp/play/halt_play.h"
 #include "software/ai/hl/stp/play/play_factory.h"
 
-AI::AI(TbotsProto::AiConfig ai_config)
+Ai::Ai(TbotsProto::AiConfig ai_config)
     : ai_config_(ai_config),
       fsm(std::make_unique<FSM<PlaySelectionFSM>>(PlaySelectionFSM{ai_config})),
       override_play(nullptr),
@@ -16,23 +16,23 @@ AI::AI(TbotsProto::AiConfig ai_config)
 {
 }
 
-void AI::overridePlay(std::unique_ptr<Play> play)
+void Ai::overridePlay(std::unique_ptr<Play> play)
 {
     override_play = std::move(play);
 }
 
-void AI::overridePlayFromProto(TbotsProto::Play play_proto)
+void Ai::overridePlayFromProto(TbotsProto::Play play_proto)
 {
     overridePlay(std::move(createPlay(play_proto, ai_config_)));
 }
 
-void AI::updateAiConfig(TbotsProto::AiConfig ai_config)
+void Ai::updateAiConfig(TbotsProto::AiConfig ai_config)
 {
     ai_config_        = ai_config;
     ai_config_changed = true;
 }
 
-void AI::checkAiConfig()
+void Ai::checkAiConfig()
 {
     auto current_override = ai_config_.ai_control_config().override_ai_play();
 
@@ -56,7 +56,7 @@ void AI::checkAiConfig()
     prev_override = current_override;
 }
 
-std::unique_ptr<TbotsProto::PrimitiveSet> AI::getPrimitives(const World& world)
+std::unique_ptr<TbotsProto::PrimitiveSet> Ai::getPrimitives(const World& world)
 {
     checkAiConfig();
 
@@ -99,7 +99,7 @@ std::unique_ptr<TbotsProto::PrimitiveSet> AI::getPrimitives(const World& world)
     }
 }
 
-TbotsProto::PlayInfo AI::getPlayInfo() const
+TbotsProto::PlayInfo Ai::getPlayInfo() const
 {
     std::vector<std::string> play_state = current_play->getState();
     auto tactic_robot_id_assignment     = current_play->getTacticRobotIdAssignment();

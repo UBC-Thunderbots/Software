@@ -448,7 +448,7 @@ class WorldLayer(FieldLayer):
         :param painter: The painter
 
         """
-        painter.setPen(pg.mkPen(Colors.SPEED_COLOR, width=SPEED_LINE_WIDTH))
+        painter.setPen(pg.mkPen(Colors.SPEED_VECTOR_COLOR, width=SPEED_LINE_WIDTH))
 
         for robot in self.cached_world.friendly_team.team_robots:
             velocity = robot.current_state.global_velocity
@@ -468,7 +468,7 @@ class WorldLayer(FieldLayer):
         :param painter: The painter
 
         """
-        painter.setPen(pg.mkPen(Colors.SPEED_COLOR, width=SPEED_LINE_WIDTH))
+        painter.setPen(pg.mkPen(Colors.SPEED_VECTOR_COLOR, width=SPEED_LINE_WIDTH))
 
         ball = self.cached_world.ball
         velocity = ball.current_state.global_velocity
