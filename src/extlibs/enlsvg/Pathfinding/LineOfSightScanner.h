@@ -16,16 +16,16 @@ namespace Pathfinding
     struct ScanInterval
     {
         const int y;
-        const Rational x_L;
-        const Rational x_R;
+        const Rational x_left;
+        const Rational x_right;
         const bool left_inclusive;
         const bool right_inclusive;
 
-        ScanInterval(int y, const Rational x_L, const Rational x_R, bool left_inclusive,
+        ScanInterval(int y, const Rational x_left, const Rational x_right, bool left_inclusive,
                      bool right_inclusive)
             : y(y),
-              x_L(x_L),
-              x_R(x_R),
+              x_left(x_left),
+              x_right(x_right),
               left_inclusive(left_inclusive),
               right_inclusive(right_inclusive)
         {
@@ -70,37 +70,37 @@ namespace Pathfinding
         void computeTautDirNeighbours(ScannerStacks& data, int sx, int sy) const;
         void computeExtents();
 
-        inline int leftUpExtent(int x_L, int y) const
+        inline int leftUpExtent(int x_left, int y) const
         {
-            return x_L > size_x ? size_x
-                                : left_down_extents[(y + 1) * extents_size_x + x_L];
+            return x_left > size_x ? size_x
+                                : left_down_extents[(y + 1) * extents_size_x + x_left];
         }
 
-        inline int leftDownExtent(int x_L, int y) const
+        inline int leftDownExtent(int x_left, int y) const
         {
-            return x_L > size_x ? size_x : left_down_extents[y * extents_size_x + x_L];
+            return x_left > size_x ? size_x : left_down_extents[y * extents_size_x + x_left];
         }
 
-        inline int leftAnyExtent(int x_L, int y) const
+        inline int leftAnyExtent(int x_left, int y) const
         {
-            return std::max(left_down_extents[y * extents_size_x + x_L],
-                            left_down_extents[(y + 1) * extents_size_x + x_L]);
+            return std::max(left_down_extents[y * extents_size_x + x_left],
+                            left_down_extents[(y + 1) * extents_size_x + x_left]);
         }
 
-        inline int rightUpExtent(int x_R, int y) const
+        inline int rightUpExtent(int x_right, int y) const
         {
-            return x_R < 0 ? 0 : right_down_extents[(y + 1) * extents_size_x + x_R];
+            return x_right < 0 ? 0 : right_down_extents[(y + 1) * extents_size_x + x_right];
         }
 
-        inline int rightDownExtent(int x_R, int y) const
+        inline int rightDownExtent(int x_right, int y) const
         {
-            return x_R < 0 ? 0 : right_down_extents[y * extents_size_x + x_R];
+            return x_right < 0 ? 0 : right_down_extents[y * extents_size_x + x_right];
         }
 
-        inline int rightAnyExtent(int x_R, int y) const
+        inline int rightAnyExtent(int x_right, int y) const
         {
-            return std::min(right_down_extents[y * extents_size_x + x_R],
-                            right_down_extents[(y + 1) * extents_size_x + x_R]);
+            return std::min(right_down_extents[y * extents_size_x + x_right],
+                            right_down_extents[(y + 1) * extents_size_x + x_right]);
         }
 
        private:
