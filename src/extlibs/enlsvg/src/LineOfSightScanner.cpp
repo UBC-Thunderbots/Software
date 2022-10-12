@@ -456,7 +456,8 @@ namespace Pathfinding
                 Fraction right_projection =
                     (curr_state.x_right - s_x).multiplyDivide(dy + 1, dy) + s_x;
 
-                int right_bound = rightDownExtent(curr_state.x_right.floor(), curr_state.y);
+                int right_bound =
+                    rightDownExtent(curr_state.x_right.floor(), curr_state.y);
                 if (curr_state.x_right.isWholeNumber() &&
                     grid.topLeftOfBlockedTile(curr_state.x_right.n, curr_state.y))
                     right_bound = curr_state.x_right.n;
