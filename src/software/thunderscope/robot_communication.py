@@ -9,6 +9,7 @@ from software.logger.logger import createLogger
 
 logger = createLogger(__name__)
 
+
 class RobotCommunication(object):
 
     """ Communicate with the robots """
@@ -70,7 +71,7 @@ class RobotCommunication(object):
                 self.estop_path, self.estop_buadrate
             )
         except Exception:
-            
+
             raise Exception("connect estop - not found")
 
     def __send_estop_state(self):

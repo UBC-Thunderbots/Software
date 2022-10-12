@@ -84,7 +84,6 @@ def test_simulator_move_ball(
     )
 
 
-
 @enable_thunderscope
 def test_ball_robot_collision(simulated_test_runner):
 
