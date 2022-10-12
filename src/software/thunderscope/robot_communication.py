@@ -9,10 +9,6 @@ from software.logger.logger import createLogger
 
 logger = createLogger(__name__)
 
-# todo remove
-IGNORE_ESTOP = False
-
-
 class RobotCommunication(object):
 
     """ Communicate with the robots """
@@ -74,8 +70,8 @@ class RobotCommunication(object):
                 self.estop_path, self.estop_buadrate
             )
         except Exception:
-            pass
-            # raise Exception("connect estop - not found")
+            
+            raise Exception("connect estop - not found")
 
     def __send_estop_state(self):
         while True:
@@ -106,7 +102,7 @@ class RobotCommunication(object):
                 # Send the primitive set
                 primitive_set = self.primitive_buffer.get(block=False)
 
-                if IGNORE_ESTOP or self.estop_reader.isEstopPlay():
+                if self.estop_reader.isEstopPlay():
                     # primitive_set.time_sent = Timestamp(epoch_timestamp_seconds=time.time())
                     self.send_primitive_set.send_proto(primitive_set)
                     # logger.info(primitive_set)
@@ -164,9 +160,6 @@ class RobotCommunication(object):
 
         """
         # Create the multicast listeners
-        print("channel", (self.multicast_channel))
-        print(self.interface)
-        print(ROBOT_STATUS_PORT)
         self.receive_robot_status = RobotStatusProtoListener(
             self.multicast_channel + "%" + self.interface,
             ROBOT_STATUS_PORT,
@@ -212,7 +205,13 @@ class RobotCommunication(object):
 
         self.connect_fullsystem_to_robots()
 
-        # self.send_estop_state_thread.start()
+        # TODO (#2741): we might not want to support robot diagnostics in tscope
+        # make a ticket here to create a widget to call these functions to detach
+        # from AI and connect to robots/or remove
+        # self.disconnect_fullsystem_from_robots()
+        # self.connect_robot_to_diagnostics(0)
+
+        self.send_estop_state_thread.start()
         self.run_thread.start()
 
     def __exit__(self, type, value, traceback):

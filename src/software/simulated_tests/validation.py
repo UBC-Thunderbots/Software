@@ -247,6 +247,7 @@ def create_validation_geometry(geometry=[]) -> ValidationGeometry:
         tbots.Polygon.__name__: tbots.createPolygonProto,
         tbots.Rectangle.__name__: tbots.createPolygonProto,
         tbots.Circle.__name__: tbots.createCircleProto,
+        tbots.Segment.__name__: tbots.createSegmentProto,
     }
 
     ADD_TO_VALIDATION_GEOMETRY_DISPATCH = {
@@ -254,6 +255,7 @@ def create_validation_geometry(geometry=[]) -> ValidationGeometry:
         tbots.Polygon.__name__: validation_geometry.polygons.append,
         tbots.Rectangle.__name__: validation_geometry.polygons.append,
         tbots.Circle.__name__: validation_geometry.circles.append,
+        tbots.Segment.__name__: validation_geometry.segments.append,
     }
 
     for geom in geometry:

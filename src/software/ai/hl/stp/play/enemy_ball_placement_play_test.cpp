@@ -34,7 +34,7 @@ TEST_P(EnemyBallPlacementPlayTest, test_ball_placement)
          field.enemyDefenseArea().negXNegYCorner(),
          field.enemyDefenseArea().negXPosYCorner()});
     setEnemyGoalie(0);
-    setAIPlay(TbotsProto::PlayName::EnemyBallPlacementPlay);
+    setAiPlay(TbotsProto::PlayName::EnemyBallPlacementPlay);
     GameState game_state;
     game_state.updateRefereeCommand(RefereeCommand::BALL_PLACEMENT_THEM);
     game_state.setBallPlacementPoint(ball_placement_point);
@@ -84,7 +84,7 @@ TEST_F(EnemyBallPlacementPlayTest, test_no_placement)
          field.enemyDefenseArea().negXNegYCorner(),
          field.enemyDefenseArea().negXPosYCorner()});
     setEnemyGoalie(0);
-    setAIPlay(TbotsProto::PlayName::EnemyBallPlacementPlay);
+    setAiPlay(TbotsProto::PlayName::EnemyBallPlacementPlay);
     GameState game_state;
     game_state.updateRefereeCommand(RefereeCommand::BALL_PLACEMENT_THEM);
     setGameState(game_state);

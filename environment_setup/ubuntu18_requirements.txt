@@ -1,4 +1,4 @@
-protobuf==3.19.4
+protobuf==3.19.5
 pyqtgraph==0.12.3
 autoflake==1.4
 pyqt5 # version is embedded in the package

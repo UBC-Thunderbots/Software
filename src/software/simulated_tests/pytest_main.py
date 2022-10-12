@@ -11,7 +11,7 @@ def load_command_line_arguments():
     but it doesn't seem to play nicely with bazel. We just use argparse instead.
 
     """
-    parser = argparse.ArgumentParser(description="Run simulated pytests")
+    parser = argparse.ArgumentParser(description="Run simulated or field pytests")
     parser.add_argument(
         "--enable_thunderscope", action="store_true", help="enable thunderscope"
     )

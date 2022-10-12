@@ -24,6 +24,7 @@
 #include "software/geom/point.h"
 #include "software/geom/polygon.h"
 #include "software/geom/rectangle.h"
+#include "software/geom/segment.h"
 #include "software/geom/vector.h"
 #include "software/networking/threaded_proto_udp_listener.hpp"
 #include "software/networking/threaded_proto_udp_sender.hpp"
@@ -162,10 +163,11 @@ PYBIND11_MODULE(python_bindings, m)
     py::class_<ConvexPolygon, Polygon>(m, "ConvexPolygon");
     py::class_<Rectangle, ConvexPolygon>(m, "Rectangle")
         .def(py::init<Point, Point>())
+        // Overloaded
         .def("__repr__",
-             [](const Rectangle& v) {
+             [](const Rectangle& r) {
                  std::stringstream stream;
-                 stream << v;
+                 stream << r;
                  return stream.str();
              })
         .def("xLength", &Rectangle::xLength)
@@ -194,6 +196,13 @@ PYBIND11_MODULE(python_bindings, m)
 
     py::class_<Circle>(m, "Circle")
         .def(py::init<Point, double>())
+        // Overloaded
+        .def("__repr__",
+             [](const Circle& c) {
+                 std::stringstream stream;
+                 stream << c;
+                 return stream.str();
+             })
         .def("origin", &Circle::origin)
         .def("radius", &Circle::radius)
         .def("area", &Circle::area);
@@ -203,11 +212,13 @@ PYBIND11_MODULE(python_bindings, m)
     m.def("createPolygon", &createPolygon);
     m.def("createCircle", &createCircle);
     m.def("createVector", &createVector);
+    m.def("createSegment", &createSegment);
 
     m.def("createPointProto", &createPointProto);
     m.def("createPolygonProto", &createPolygonProto);
     m.def("createCircleProto", &createCircleProto);
     m.def("createVectorProto", &createVectorProto);
+    m.def("createSegmentProto", &createSegmentProto);
 
     m.def("contains", py::overload_cast<const Circle&, const Segment&>(&contains));
     m.def("contains", py::overload_cast<const Circle&, const Point&>(&contains));
