@@ -113,8 +113,8 @@ class RobotView(QWidget):
         painter.setBrush(pg.mkBrush(team_colour))
         painter.drawEllipse(QtCore.QPointF(radius, radius), radius / 4, radius / 4)
 
-        # Grab the collors for the vision pattern and setup the locations
-        # for the four cicles in the four corners
+        # Grab the colors for the vision pattern and setup the locations
+        # for the four circles in the four corners
         top_right, top_left, bottom_left, bottom_right = self.vision_pattern_lookup[id]
         top_circle_locations = [
             QtCore.QPointF(radius + radius / 2 + 5, radius - radius / 2),

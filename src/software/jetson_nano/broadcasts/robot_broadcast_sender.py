@@ -6,6 +6,7 @@ import time
 import redis
 
 from proto.announcement_pb2 import Announcement
+from software.py_constants import *
 
 BROADCAST_INTERVAL_SECONDS = 2
 
@@ -61,7 +62,7 @@ def main():
 
     # Construct a announcement protobuf
     announcement = Announcement()
-    announcement.robot_id = int(redis_client.get("/robot_id"))
+    announcement.robot_id = int(redis_client.get(ROBOT_ID_REDIS_KEY))
     announcement.ip_addr = get_ip_address(args["interface"])
     announcement.mac_addr = get_mac_address(args["interface"])
 

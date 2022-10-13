@@ -114,6 +114,7 @@ class playInfoWidget(QWidget):
             }
         )
 
+        # TODO (#2412): Potential improvements to layout
         self.play_table.resizeColumnsToContents()
         self.play_table.resizeRowsToContents()
         if referee_msg_dict:

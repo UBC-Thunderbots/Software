@@ -284,6 +284,8 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
 
     int reset_detector = tmc4671_readInt(0, TMC4671_PID_ACCELERATION_LIMIT);
 
+    // When the motor board is reset the value in the above register is set to the maximum signed 32 bit value
+    // Please read the header file and the datasheet for more info
     if (reset_detector == 2147483647)
     {
         LOG(DEBUG) << "RESET DETECTED";
