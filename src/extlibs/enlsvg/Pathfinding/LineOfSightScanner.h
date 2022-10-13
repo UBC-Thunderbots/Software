@@ -66,8 +66,8 @@ namespace Pathfinding
        public:
         LineOfSightScanner(const Grid& grid);
 
-        void computeAllDirNeighbours(ScannerStacks& data, int sx, int sy) const;
-        void computeTautDirNeighbours(ScannerStacks& data, int sx, int sy) const;
+        void computeAllDirNeighbours(ScannerStacks& data, int s_x, int s_y) const;
+        void computeTautDirNeighbours(ScannerStacks& data, int s_x, int s_y) const;
         void computeExtents();
 
         inline int leftUpExtent(int x_left, int y) const
@@ -114,19 +114,19 @@ namespace Pathfinding
         std::vector<int> right_down_extents;
         std::vector<int> left_down_extents;
 
-        void generateTautDirectionStartingStates(ScannerStacks& data, int sx,
-                                                 int sy) const;
-        void generateAllDirectionStartingStates(ScannerStacks& data, int sx,
-                                                int sy) const;
-        void exploreStates(ScannerStacks& data, int sx, int sy) const;
+        void generateTautDirectionStartingStates(ScannerStacks& data, int s_x,
+                                                 int s_y) const;
+        void generateAllDirectionStartingStates(ScannerStacks& data, int s_x,
+                                                int s_y) const;
+        void exploreStates(ScannerStacks& data, int s_x, int s_y) const;
         void generateUpwards(ScannerStacks& data, Rational left_bound,
-                             Rational right_bound, int sx, int sy, int curr_y,
+                             Rational right_bound, int s_x, int s_y, int curr_y,
                              bool left_inclusive, bool right_inclusive) const;
         void generateDownwards(ScannerStacks& data, Rational left_bound,
-                               Rational right_bound, int sx, int sy, int curr_y,
+                               Rational right_bound, int s_x, int s_y, int curr_y,
                                bool left_inclusive, bool right_inclusive) const;
         void generateAndSplitIntervals(ScannerStacks& data, int check_y, int new_y,
-                                       int sx, int sy, Rational left_bound,
+                                       int s_x, int s_y, Rational left_bound,
                                        Rational right_bound, bool left_inclusive,
                                        bool right_inclusive) const;
     };
