@@ -11,7 +11,10 @@ from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
 
 # We want to test friendly half, enemy half, and at the border of the field
-@pytest.mark.parametrize("ball_pos",[tbots.Point(1.5,-2.75),tbots.Point(-1.5,-2.75),tbots.Point(1.5,-3)])
+@pytest.mark.parametrize(
+    "ball_pos",
+    [tbots.Point(1.5, -2.75), tbots.Point(-1.5, -2.75), tbots.Point(1.5, -3)],
+)
 def test_free_kick_play_friendly(simulated_test_runner, ball_pos):
 
     # starting point must be Point
@@ -69,12 +72,12 @@ def test_free_kick_play_friendly(simulated_test_runner, ball_pos):
     )
 
     # Always Validation
-    #TODO- #2753 Validation
+    # TODO- #2753 Validation
     always_validation_sequence_set = [[]]
 
     # Eventually Validation
     # We should always score against robots which are standing still
-    #TODO- #2753 Validation
+    # TODO- #2753 Validation
     eventually_validation_sequence_set = [[]]
 
     simulated_test_runner.run_test(
@@ -83,33 +86,39 @@ def test_free_kick_play_friendly(simulated_test_runner, ball_pos):
         test_timeout_s=10,
     )
 
-@pytest.mark.parametrize("ball_pos,yellow_bot_pos",
+
+@pytest.mark.parametrize(
+    "ball_pos,yellow_bot_pos",
     [
         # not close to our net
         (
-            tbots.Point(0.9,2.85),
+            tbots.Point(0.9, 2.85),
             [
                 tbots.Point(1, 3),
                 tbots.Point(-2, -1.25),
                 tbots.Point(-1, -0.25),
                 tbots.Field.createSSLDivisionBField().enemyGoalCenter(),
-                tbots.Field.createSSLDivisionBField().enemyDefenseArea().negXNegYCorner(),
-                tbots.Field.createSSLDivisionBField().enemyDefenseArea().negXPosYCorner(),
+                tbots.Field.createSSLDivisionBField()
+                .enemyDefenseArea()
+                .negXNegYCorner(),
+                tbots.Field.createSSLDivisionBField()
+                .enemyDefenseArea()
+                .negXPosYCorner(),
             ],
         ),
         # close to our net
         (
-            tbots.Point(-2.4,1),
+            tbots.Point(-2.4, 1),
             [
                 tbots.Point(-2.3, 1.05),
                 tbots.Point(-3.5, 2),
                 tbots.Point(-1.2, 0),
-                tbots.Point(-2.3,-1),
+                tbots.Point(-2.3, -1),
                 tbots.Point(-3.8, -2),
                 tbots.Field.createSSLDivisionBField().enemyGoalCenter(),
             ],
         ),
-    ]
+    ],
 )
 def test_free_kick_play_enemy(simulated_test_runner, ball_pos, yellow_bot_pos):
 
@@ -173,10 +182,14 @@ def test_free_kick_play_enemy(simulated_test_runner, ball_pos, yellow_bot_pos):
         test_timeout_s=10,
     )
 
-@pytest.mark.parametrize("ball_pos",[tbots.Point(1.5,-2.75),tbots.Point(-1.5,-2.75),tbots.Point(1.5,-3)])
+
+@pytest.mark.parametrize(
+    "ball_pos",
+    [tbots.Point(1.5, -2.75), tbots.Point(-1.5, -2.75), tbots.Point(1.5, -3)],
+)
 def test_free_kick_play_both(simulated_test_runner, ball_pos):
 
-    ball_initial_pos=ball_pos
+    ball_initial_pos = ball_pos
 
     blue_bots = [
         tbots.Point(-3, 0.25),
@@ -238,6 +251,7 @@ def test_free_kick_play_both(simulated_test_runner, ball_pos):
         always_validation_sequence_set=always_validation_sequence_set,
         test_timeout_s=15,
     )
+
 
 if __name__ == "__main__":
     # Run the test, -s disables all capturing at -vv increases verbosity

@@ -40,7 +40,7 @@ def test_defense_play(simulated_test_runner):
         gc_command=Command.Type.STOP, team=Team.UNKNOWN
     )
     simulated_test_runner.gamecontroller.send_ci_input(
-       gc_command=Command.Type.FORCE_START, team=Team.BLUE
+        gc_command=Command.Type.FORCE_START, team=Team.BLUE
     )
 
     # Force play override here
@@ -65,11 +65,11 @@ def test_defense_play(simulated_test_runner):
     )
 
     # Always Validation
-    #TODO- #2753 Validation
+    # TODO- #2753 Validation
     always_validation_sequence_set = [[]]
-    
+
     # Eventually Validation
-    #TODO- #2753 Validation
+    # TODO- #2753 Validation
     eventually_validation_sequence_set = [[]]
 
     simulated_test_runner.run_test(
@@ -77,6 +77,7 @@ def test_defense_play(simulated_test_runner):
         always_validation_sequence_set=always_validation_sequence_set,
         test_timeout_s=10,
     )
+
 
 def test_defense_play_one_threat(simulated_test_runner):
 
@@ -134,11 +135,11 @@ def test_defense_play_one_threat(simulated_test_runner):
     )
 
     # Always Validation
-    #TODO- #2753 Validation
+    # TODO- #2753 Validation
     always_validation_sequence_set = [[]]
 
     # Eventually Validation
-    #TODO- #2753 Validation
+    # TODO- #2753 Validation
     eventually_validation_sequence_set = [[]]
 
     simulated_test_runner.run_test(
@@ -146,6 +147,7 @@ def test_defense_play_one_threat(simulated_test_runner):
         always_validation_sequence_set=always_validation_sequence_set,
         test_timeout_s=10,
     )
+
 
 def test_defense_play_close_to_net(simulated_test_runner):
 
@@ -167,7 +169,7 @@ def test_defense_play_close_to_net(simulated_test_runner):
         tbots.Point(-3.5, 2),
         tbots.Point(-1.5, 0),
         tbots.Point(-2.3, -1),
-        tbots.Point(-3.8,-2),
+        tbots.Point(-3.8, -2),
         tbots.Field.createSSLDivisionBField().enemyGoalCenter(),
     ]
 
@@ -201,17 +203,18 @@ def test_defense_play_close_to_net(simulated_test_runner):
     )
 
     # Always Validation
-    #TODO- #2753 Validation
+    # TODO- #2753 Validation
     always_validation_sequence_set = [[]]
 
     # Eventually Validation
-    #TODO- #2753 Validation
+    # TODO- #2753 Validation
     eventually_validation_sequence_set = [[]]
     simulated_test_runner.run_test(
         eventually_validation_sequence_set=eventually_validation_sequence_set,
         always_validation_sequence_set=always_validation_sequence_set,
         test_timeout_s=10,
     )
+
 
 if __name__ == "__main__":
     # Run the test, -s disables all capturing at -vv increases verbosity

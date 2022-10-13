@@ -10,6 +10,7 @@ from software.simulated_tests.simulated_test_fixture import simulated_test_runne
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
 
+
 def test_corner_kick_play_bottom_left(simulated_test_runner):
 
     # starting point must be Point
@@ -67,11 +68,11 @@ def test_corner_kick_play_bottom_left(simulated_test_runner):
     )
 
     # Always Validation
-    #TODO- #2753 Validation
+    # TODO- #2753 Validation
     always_validation_sequence_set = [[]]
 
     # Eventually Validation
-    #TODO- #2753 Validation
+    # TODO- #2753 Validation
     eventually_validation_sequence_set = [[]]
 
     simulated_test_runner.run_test(
@@ -79,6 +80,7 @@ def test_corner_kick_play_bottom_left(simulated_test_runner):
         always_validation_sequence_set=always_validation_sequence_set,
         test_timeout_s=15,
     )
+
 
 def test_corner_kick_play_top_right(simulated_test_runner):
 
@@ -137,11 +139,11 @@ def test_corner_kick_play_top_right(simulated_test_runner):
     )
 
     # Always Validation
-    #TODO- #2753 Validation
+    # TODO- #2753 Validation
     always_validation_sequence_set = [[]]
 
     # Eventually Validation
-    #TODO- #2753 Validation
+    # TODO- #2753 Validation
     eventually_validation_sequence_set = [[]]
 
     simulated_test_runner.run_test(
@@ -149,6 +151,7 @@ def test_corner_kick_play_top_right(simulated_test_runner):
         always_validation_sequence_set=always_validation_sequence_set,
         test_timeout_s=15,
     )
+
 
 if __name__ == "__main__":
     # Run the test, -s disables all capturing at -vv increases verbosity

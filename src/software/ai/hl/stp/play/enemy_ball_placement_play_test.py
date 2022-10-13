@@ -10,6 +10,7 @@ from software.simulated_tests.simulated_test_fixture import (
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
 
+
 def test_two_ai_ball_placement(simulated_test_runner):
 
     # starting point must be Point
@@ -56,13 +57,10 @@ def test_two_ai_ball_placement(simulated_test_runner):
 
     simulated_test_runner.blue_full_system_proto_unix_io.send_proto(Play, blue_play)
 
-
     yellow_play = Play()
     yellow_play.name = PlayName.BallPlacementPlay
 
-    simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(
-        Play, yellow_play
-    )
+    simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(Play, yellow_play)
 
     # Create world state
     simulated_test_runner.simulator_proto_unix_io.send_proto(
@@ -76,11 +74,11 @@ def test_two_ai_ball_placement(simulated_test_runner):
     )
 
     # Always Validation
-    #TODO- #2753 Validation
+    # TODO- #2753 Validation
     always_validation_sequence_set = [[]]
 
     # Eventually Validation
-    #TODO- #2753 Validation
+    # TODO- #2753 Validation
     eventually_validation_sequence_set = [[]]
 
     simulated_test_runner.run_test(

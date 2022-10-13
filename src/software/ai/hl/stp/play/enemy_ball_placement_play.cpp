@@ -58,33 +58,34 @@ void EnemyBallPlacementPlay::ballPlacementWithShadow(
         tactics_to_run[0].emplace_back(crease_defenders[1]);
         tactics_to_run[0].emplace_back(crease_defenders[2]);
 
-        Vector ball_to_net = (world.ball().position() - world.field().friendlyGoalCenter())
-                                      .normalize(-0.75 - ROBOT_MAX_RADIUS_METERS);
+        Vector ball_to_net =
+            (world.ball().position() - world.field().friendlyGoalCenter())
+                .normalize(-0.75 - ROBOT_MAX_RADIUS_METERS);
 
         Vector placement_to_net = (placement_point - world.field().friendlyGoalCenter())
                                       .normalize(-0.75 - ROBOT_MAX_RADIUS_METERS);
 
         // If the enemy hasn't reached the ball yet, we use this flag to avoid shadowing
         // so that we don't interfere with the enemy robots going to pick up the ball
-        if(!enemy_at_ball)
+        if (!enemy_at_ball)
         {
             move_tactics[0]->updateControlParams(
-                    world.ball().position() + ball_to_net +
-                    ball_to_net.perpendicular().normalize(1.25 *
-                                                               ROBOT_MAX_RADIUS_METERS),
-                    ball_to_net.orientation() + Angle::half(), 0);
+                world.ball().position() + ball_to_net +
+                    ball_to_net.perpendicular().normalize(1.25 * ROBOT_MAX_RADIUS_METERS),
+                ball_to_net.orientation() + Angle::half(), 0);
             move_tactics[1]->updateControlParams(
-                    world.ball().position() + ball_to_net -
-                    ball_to_net.perpendicular().normalize(1.25 *
-                                                               ROBOT_MAX_RADIUS_METERS),
-                    ball_to_net.orientation() + Angle::half(), 0);
+                world.ball().position() + ball_to_net -
+                    ball_to_net.perpendicular().normalize(1.25 * ROBOT_MAX_RADIUS_METERS),
+                ball_to_net.orientation() + Angle::half(), 0);
             tactics_to_run[0].emplace_back(move_tactics[0]);
             tactics_to_run[0].emplace_back(move_tactics[1]);
 
             // Check to update flag
-            for(auto enemy_robot : world.enemyTeam().getAllRobotsExceptGoalie())
+            for (auto enemy_robot : world.enemyTeam().getAllRobotsExceptGoalie())
             {
-                if(std::abs((enemy_robot.position() - world.ball().position()).length()) < 0.25)
+                if (std::abs(
+                        (enemy_robot.position() - world.ball().position()).length()) <
+                    0.25)
                 {
                     enemy_at_ball = true;
                 }

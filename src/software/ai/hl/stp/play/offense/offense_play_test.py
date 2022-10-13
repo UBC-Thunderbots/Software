@@ -25,7 +25,7 @@ def test_offense_play(simulated_test_runner):
         tbots.Point(-2, 0.5),
         tbots.Point(-2, -1.7),
         tbots.Point(-2, -1.5),
-        tbots.Point(-2,-0.5),
+        tbots.Point(-2, -0.5),
     ]
 
     yellow_bots = [
@@ -67,11 +67,11 @@ def test_offense_play(simulated_test_runner):
     )
 
     # Always Validation
-    #TODO- #2753 Validation
+    # TODO- #2753 Validation
     always_validation_sequence_set = [[]]
 
     # Eventually Validation
-    #TODO- #2753 Validation
+    # TODO- #2753 Validation
     eventually_validation_sequence_set = [[]]
 
     simulated_test_runner.run_test(

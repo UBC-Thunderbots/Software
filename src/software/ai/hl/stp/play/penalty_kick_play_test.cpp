@@ -23,7 +23,7 @@ class PenaltyKickPlayTest : public SimulatedErForceSimPlayTestFixture
 };
 
 // TODO (#2602): test failing since a robot isn't avoiding the ball
-TEST_F(PenaltyKickPlayTest, /*DISABLED_*/test_penalty_kick_setup)
+TEST_F(PenaltyKickPlayTest, /*DISABLED_*/ test_penalty_kick_setup)
 {
     BallState ball_state(field.friendlyPenaltyMark(), Vector(0, 0));
     auto friendly_robots = TestUtil::createStationaryRobotStatesWithId(
@@ -67,7 +67,7 @@ TEST_F(PenaltyKickPlayTest, /*DISABLED_*/test_penalty_kick_setup)
 }
 
 // TODO (#2167): disabled due to physics simulator bug causing failure
-TEST_F(PenaltyKickPlayTest, /*DISABLED_*/test_penalty_kick_take)
+TEST_F(PenaltyKickPlayTest, /*DISABLED_*/ test_penalty_kick_take)
 {
     Vector behind_ball_direction =
         (field.friendlyPenaltyMark() - field.enemyGoalCenter()).normalize();

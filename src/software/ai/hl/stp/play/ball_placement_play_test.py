@@ -11,7 +11,8 @@ from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
 from proto.ssl_gc_geometry_pb2 import Vector2
 
-@pytest.mark.parametrize("run_enemy_ai,test_duration", [[False,10],(True, 10)])
+
+@pytest.mark.parametrize("run_enemy_ai,test_duration", [[False, 10], (True, 10)])
 def test_two_ai_ball_placement(simulated_test_runner, run_enemy_ai, test_duration):
 
     # starting point must be Point
@@ -79,11 +80,11 @@ def test_two_ai_ball_placement(simulated_test_runner, run_enemy_ai, test_duratio
     )
 
     # Always Validation
-    #TODO- #2753 Validation
+    # TODO- #2753 Validation
     always_validation_sequence_set = [[]]
 
     # Eventually Validation
-    #TODO- #2753 Validation
+    # TODO- #2753 Validation
     eventually_validation_sequence_set = [[]]
 
     simulated_test_runner.run_test(

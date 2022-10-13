@@ -14,6 +14,7 @@ from software.simulated_tests.simulated_test_fixture import simulated_test_runne
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
 
+
 def test_kickoff_play_ready(simulated_test_runner):
 
     # starting point must be Point
@@ -21,8 +22,8 @@ def test_kickoff_play_ready(simulated_test_runner):
 
     # Setup Bots
     blue_bots = [
-        tbots.Point(-2,-2),
-        tbots.Point(-3,-1),
+        tbots.Point(-2, -2),
+        tbots.Point(-3, -1),
         tbots.Point(-3, 0),
         tbots.Point(-3, 1),
         tbots.Point(-3, 2),
@@ -43,11 +44,11 @@ def test_kickoff_play_ready(simulated_test_runner):
     simulated_test_runner.gamecontroller.send_ci_input(
         gc_command=Command.Type.PENALTY, team=Team.BLUE
     )
-    # simulated_test_runner.gamecontroller.send_ci_input(
-    #     gc_command=Command.Type.NORMAL_START, team=Team.BLUE
-    # )
+    simulated_test_runner.gamecontroller.send_ci_input(
+        gc_command=Command.Type.NORMAL_START, team=Team.BLUE
+    )
 
-    # delayed_ci_call = (4, Command.Type.NORMAL_START, Team.BLUE)
+    delayed_ci_call = (4, Command.Type.NORMAL_START, Team.BLUE)
     blue_play.name = PlayName.PenaltyKickPlay
     yellow_play.name = PlayName.HaltPlay
 
@@ -77,8 +78,9 @@ def test_kickoff_play_ready(simulated_test_runner):
         eventually_validation_sequence_set=eventually_validation_sequence_set,
         always_validation_sequence_set=always_validation_sequence_set,
         test_timeout_s=15,
-        # ci_cmd_with_delay=[delayed_ci_call]
+        ci_cmd_with_delay=[delayed_ci_call],
     )
+
 
 def test_kickoff_play_kicking(simulated_test_runner):
 
@@ -87,8 +89,8 @@ def test_kickoff_play_kicking(simulated_test_runner):
 
     # Setup Bots
     blue_bots = [
-        tbots.Point(-2,-2),
-        tbots.Point(-3,-1),
+        tbots.Point(-2, -2),
+        tbots.Point(-3, -1),
         tbots.Point(-3, 0),
         tbots.Point(-3, 1),
         tbots.Point(-3, 2),
@@ -141,8 +143,9 @@ def test_kickoff_play_kicking(simulated_test_runner):
         eventually_validation_sequence_set=eventually_validation_sequence_set,
         always_validation_sequence_set=always_validation_sequence_set,
         test_timeout_s=15,
-        ci_cmd_with_delay=[delayed_ci_call]
+        ci_cmd_with_delay=[delayed_ci_call],
     )
+
 
 if __name__ == "__main__":
     # Run the test, -s disables all capturing at -vv increases verbosity
