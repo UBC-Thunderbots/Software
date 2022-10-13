@@ -3,8 +3,8 @@
 
 #include <algorithm>
 
-#include "Fraction.h"
-#include "PathfindingDataTypes.h"
+#include "fraction.h"
+#include "pathfinding_data_types.h"
 
 namespace Pathfinding
 {

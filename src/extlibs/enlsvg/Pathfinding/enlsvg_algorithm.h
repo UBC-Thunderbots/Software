@@ -5,11 +5,11 @@
 #include <limits>
 #include <vector>
 
-#include "EnlsvgGraph.h"
-#include "Grid.h"
-#include "IndirectHeap.h"
-#include "LineOfSightScanner.h"
-#include "PathfindingDataTypes.h"
+#include "enlsvg_graph.h"
+#include "grid.h"
+#include "indirect_heap.h"
+#include "line_of_sight_scanner.h"
+#include "pathfinding_data_types.h"
 
 namespace Pathfinding
 {

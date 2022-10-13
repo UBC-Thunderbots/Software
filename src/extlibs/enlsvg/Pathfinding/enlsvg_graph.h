@@ -6,7 +6,7 @@
 #include <limits>
 #include <vector>
 
-#include "PathfindingDataTypes.h"
+#include "pathfinding_data_types.h"
 
 namespace Pathfinding
 {
