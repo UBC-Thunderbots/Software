@@ -69,11 +69,13 @@ def test_free_kick_play_friendly(simulated_test_runner, ball_pos):
     )
 
     # Always Validation
-    always_validation_sequence_set = []
+    #TODO- #2753 Validation
+    always_validation_sequence_set = [[]]
 
     # Eventually Validation
     # We should always score against robots which are standing still
-    eventually_validation_sequence_set = [[FriendlyGoalEventuallyScored()]]
+    #TODO- #2753 Validation
+    eventually_validation_sequence_set = [[]]
 
     simulated_test_runner.run_test(
         eventually_validation_sequence_set=eventually_validation_sequence_set,
@@ -158,10 +160,11 @@ def test_free_kick_play_enemy(simulated_test_runner, ball_pos, yellow_bot_pos):
     )
 
     # Always Validation
-    always_validation_sequence_set = []
+    # TODO- #2753 Validation
+    always_validation_sequence_set = [[]]
 
     # Eventually Validation
-    # TODO
+    # TODO- #2753 Validation
     eventually_validation_sequence_set = [[]]
 
     simulated_test_runner.run_test(
@@ -223,10 +226,11 @@ def test_free_kick_play_both(simulated_test_runner, ball_pos):
     )
 
     # Always Validation
-    always_validation_sequence_set = []
+    # TODO- #2753 Validation
+    always_validation_sequence_set = [[]]
 
     # Eventually Validation
-    # TODO
+    # TODO- #2753 Validation
     eventually_validation_sequence_set = [[]]
 
     simulated_test_runner.run_test(

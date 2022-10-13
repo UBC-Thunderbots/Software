@@ -67,10 +67,12 @@ def test_corner_kick_play_bottom_left(simulated_test_runner):
     )
 
     # Always Validation
-    always_validation_sequence_set = []
+    #TODO- #2753 Validation
+    always_validation_sequence_set = [[]]
 
     # Eventually Validation
-    eventually_validation_sequence_set = [[FriendlyGoalEventuallyScored()]]
+    #TODO- #2753 Validation
+    eventually_validation_sequence_set = [[]]
 
     simulated_test_runner.run_test(
         eventually_validation_sequence_set=eventually_validation_sequence_set,
@@ -135,10 +137,12 @@ def test_corner_kick_play_top_right(simulated_test_runner):
     )
 
     # Always Validation
-    always_validation_sequence_set = []
+    #TODO- #2753 Validation
+    always_validation_sequence_set = [[]]
 
     # Eventually Validation
-    eventually_validation_sequence_set = [[FriendlyGoalEventuallyScored()]]
+    #TODO- #2753 Validation
+    eventually_validation_sequence_set = [[]]
 
     simulated_test_runner.run_test(
         eventually_validation_sequence_set=eventually_validation_sequence_set,

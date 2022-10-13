@@ -76,15 +76,12 @@ def test_two_ai_ball_placement(simulated_test_runner):
     )
 
     # Always Validation
+    #TODO- #2753 Validation
     always_validation_sequence_set = [[]]
 
     # Eventually Validation
-    eventually_validation_sequence_set = [
-        [
-            # Ball should arrive within 5cm of placement point
-            # BallEventuallyEntersRegion(regions=[tbots.Circle(ball_final_pos, 0.05)]),
-        ]
-    ]
+    #TODO- #2753 Validation
+    eventually_validation_sequence_set = [[]]
 
     simulated_test_runner.run_test(
         eventually_validation_sequence_set=eventually_validation_sequence_set,

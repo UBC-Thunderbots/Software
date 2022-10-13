@@ -139,10 +139,12 @@ def test_kickoff_play(simulated_test_runner, always_validation_list, eventually_
     )
 
     # Always Validation
-    always_validation_sequence_set = always_validation_list
+    # TODO- #2753 Validation
+    always_validation_sequence_set = [[]]
 
     # Eventually Validation
-    eventually_validation_sequence_set = eventually_validation_list
+    # TODO- #2753 Validation
+    eventually_validation_sequence_set = [[]]
 
     simulated_test_runner.run_test(
         eventually_validation_sequence_set=eventually_validation_sequence_set,

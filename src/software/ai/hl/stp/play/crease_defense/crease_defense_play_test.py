@@ -9,8 +9,7 @@ from software.simulated_tests.simulated_test_fixture import simulated_test_runne
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
 
-# TODO issue  #2599 - Remove Duration parameter from test
-# @pytest.mark.parametrize("run_enemy_ai,test_duration", [(False, 20), (True, 20)])
+
 def test_crease_defense_play(simulated_test_runner):
 
     # starting point must be Point
@@ -67,9 +66,11 @@ def test_crease_defense_play(simulated_test_runner):
     )
 
     # Always Validation
+    #TODO- #2753 Validation
     always_validation_sequence_set = [[]]
 
     # Eventually Validation
+    #TODO- #2753 Validation
     eventually_validation_sequence_set = [[]]
 
     simulated_test_runner.run_test(

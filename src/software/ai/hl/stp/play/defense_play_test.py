@@ -10,8 +10,7 @@ from software.simulated_tests.simulated_test_fixture import simulated_test_runne
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
 
-# TODO issue  #2599 - Remove Duration parameter from test
-# @pytest.mark.parametrize("run_enemy_ai,test_duration", [(False, 20), (True, 20)])
+
 def test_defense_play(simulated_test_runner):
 
     # starting point must be Point
@@ -66,25 +65,12 @@ def test_defense_play(simulated_test_runner):
     )
 
     # Always Validation
+    #TODO- #2753 Validation
     always_validation_sequence_set = [[]]
     
     # Eventually Validation
-    eventually_validation_sequence_set = [
-        [
-            RobotHaltEventually(),
-            RobotEventuallyEntersRegion(
-                [
-                    tbots.Rectangle(tbots.Point(0,2.85),
-                                    tbots.Point(0.9,2)),
-                    tbots.Rectangle(tbots.Point(0.5,2.5),
-                                    tbots.Point(1,2)),
-                    tbots.Rectangle(tbots.Point(-2,-0.75),
-                                    tbots.Point(-1.5,-1.25)),
-                ]
-            ),
-
-        ]
-    ]
+    #TODO- #2753 Validation
+    eventually_validation_sequence_set = [[]]
 
     simulated_test_runner.run_test(
         eventually_validation_sequence_set=eventually_validation_sequence_set,
@@ -92,8 +78,6 @@ def test_defense_play(simulated_test_runner):
         test_timeout_s=10,
     )
 
-# TODO issue  #2599 - Remove Duration parameter from test
-# @pytest.mark.parametrize("run_enemy_ai,test_duration", [(False, 20), (True, 20)])
 def test_defense_play_one_threat(simulated_test_runner):
 
     # starting point must be Point
@@ -150,9 +134,11 @@ def test_defense_play_one_threat(simulated_test_runner):
     )
 
     # Always Validation
+    #TODO- #2753 Validation
     always_validation_sequence_set = [[]]
 
     # Eventually Validation
+    #TODO- #2753 Validation
     eventually_validation_sequence_set = [[]]
 
     simulated_test_runner.run_test(
@@ -161,8 +147,6 @@ def test_defense_play_one_threat(simulated_test_runner):
         test_timeout_s=10,
     )
 
-# TODO issue  #2599 - Remove Duration parameter from test
-# @pytest.mark.parametrize("run_enemy_ai,test_duration", [(False, 20), (True, 20)])
 def test_defense_play_close_to_net(simulated_test_runner):
 
     # starting point must be Point
@@ -217,9 +201,11 @@ def test_defense_play_close_to_net(simulated_test_runner):
     )
 
     # Always Validation
+    #TODO- #2753 Validation
     always_validation_sequence_set = [[]]
 
     # Eventually Validation
+    #TODO- #2753 Validation
     eventually_validation_sequence_set = [[]]
     simulated_test_runner.run_test(
         eventually_validation_sequence_set=eventually_validation_sequence_set,
