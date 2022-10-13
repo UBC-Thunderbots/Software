@@ -8,6 +8,7 @@ py_library(
     deps = [
         "//proto:software_py_proto",
         "//software/thunderscope:constants",
+        "//software/thunderscope/common:common_widgets",
         requirement("pyqtgraph"),
     ],
 )
@@ -15,6 +16,16 @@ py_library(
 py_library(
     name = "chicker",
     srcs = ["chicker.py"],
+    deps = [
+        "//software/thunderscope:constants",
+        "//software/thunderscope:thread_safe_buffer",
+        requirement("pyqtgraph"),
+    ],
+)
+
+py_library(
+    name = "estop_view",
+    srcs = ["estop_view.py"],
     deps = [
         "//software/thunderscope:constants",
         "//software/thunderscope:thread_safe_buffer",

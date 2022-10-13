@@ -39,7 +39,7 @@ TEST_F(CreaseDefensePlayTest, test_defense_play)
         std::make_unique<CreaseDefensePlay>(getAiConfig());
     play->updateControlParams(Point(1, 3));
 
-    setAIPlay(std::move(play));
+    setAiPlay(std::move(play));
 
     // We set the referee command to stop so that the robots do not kick/shoot during the
     // test

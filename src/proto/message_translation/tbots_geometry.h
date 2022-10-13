@@ -7,6 +7,7 @@
 #include "software/geom/circle.h"
 #include "software/geom/point.h"
 #include "software/geom/polygon.h"
+#include "software/geom/segment.h"
 
 /**
  * Internal geometry types to protobuf msg conversions
@@ -22,6 +23,7 @@ std::unique_ptr<TbotsProto::AngularVelocity> createAngularVelocityProto(
 std::unique_ptr<TbotsProto::Vector> createVectorProto(const Vector& vector);
 std::unique_ptr<TbotsProto::Polygon> createPolygonProto(const Polygon& polygon);
 std::unique_ptr<TbotsProto::Circle> createCircleProto(const Circle& polygon);
+std::unique_ptr<TbotsProto::Segment> createSegmentProto(const Segment& segment);
 std::unique_ptr<TbotsProto::VelocityObstacle> createVelocityObstacleProto(
     const VelocityObstacle& vo, const Vector& offset = Vector());
 
@@ -39,5 +41,6 @@ AngularVelocity createAngularVelocity(
 Vector createVector(const TbotsProto::Vector& vector);
 Polygon createPolygon(const TbotsProto::Polygon& polygon);
 Circle createCircle(const TbotsProto::Circle& circle);
+Segment createSegment(const TbotsProto::Segment& segment);
 VelocityObstacle createVelocityObstacle(
     const TbotsProto::VelocityObstacle& velocity_obstacle_msg);
