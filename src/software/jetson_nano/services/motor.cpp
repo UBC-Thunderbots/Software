@@ -44,11 +44,11 @@ static const uint8_t DRIBBLER_MOTOR_CHIP_SELECT = 4;
 static const char* SPI_PATHS[] = {"/dev/spidev0.0", "/dev/spidev0.1", "/dev/spidev0.2",
                                   "/dev/spidev0.3", "/dev/spidev0.4"};
 
-static const char* SPI_CS_DRIVER_TO_CONTROLLER_MUX_0_GPIO = "51";
-static const char* SPI_CS_DRIVER_TO_CONTROLLER_MUX_1_GPIO = "76";
-static const char* MOTOR_DRIVER_RESET_GPIO                = "168";
-static const char* DRIVER_CONTROL_ENABLE_GPIO             = "194";
-static const char* HEARTBEAT_GPIO                         = "216";
+static const char* SPI_CS_DRIVER_TO_CONTROLLER_MUX_0_Gpio = "51";
+static const char* SPI_CS_DRIVER_TO_CONTROLLER_MUX_1_Gpio = "76";
+static const char* MOTOR_DRIVER_RESET_Gpio                = "168";
+static const char* DRIVER_CONTROL_ENABLE_Gpio             = "194";
+static const char* HEARTBEAT_Gpio                         = "216";
 
 extern "C"
 {
@@ -72,14 +72,14 @@ extern "C"
 
 MotorService::MotorService(const RobotConstants_t& robot_constants,
                            int control_loop_frequency_hz)
-    : spi_demux_select_0(SPI_CS_DRIVER_TO_CONTROLLER_MUX_0_GPIO, GpioDirection::OUTPUT,
+    : spi_demux_select_0(SPI_CS_DRIVER_TO_CONTROLLER_MUX_0_Gpio, GpioDirection::OUTPUT,
                          GpioState::LOW),
-      spi_demux_select_1(SPI_CS_DRIVER_TO_CONTROLLER_MUX_1_GPIO, GpioDirection::OUTPUT,
+      spi_demux_select_1(SPI_CS_DRIVER_TO_CONTROLLER_MUX_1_Gpio, GpioDirection::OUTPUT,
                          GpioState::LOW),
-      driver_control_enable_gpio(DRIVER_CONTROL_ENABLE_GPIO, GpioDirection::OUTPUT,
+      driver_control_enable_gpio(DRIVER_CONTROL_ENABLE_Gpio, GpioDirection::OUTPUT,
                                  GpioState::HIGH),
-      reset_gpio(MOTOR_DRIVER_RESET_GPIO, GpioDirection::OUTPUT, GpioState::HIGH),
-      heartbeat_gpio(HEARTBEAT_GPIO, GpioDirection::OUTPUT, GpioState::HIGH),
+      reset_gpio(MOTOR_DRIVER_RESET_Gpio, GpioDirection::OUTPUT, GpioState::HIGH),
+      heartbeat_gpio(HEARTBEAT_Gpio, GpioDirection::OUTPUT, GpioState::HIGH),
       euclidean_to_four_wheel(control_loop_frequency_hz, robot_constants)
 {
     robot_constants_ = robot_constants;

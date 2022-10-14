@@ -33,7 +33,7 @@ pip_libaries=(
     adafruit-circuitpython-rgb-display==3.10.9
     Adafruit-PlatformDetect==3.18.0
     Adafruit-PureIO==1.1.9
-    Jetson.GPIO==2.0.17
+    Jetson.Gpio==2.0.17
     Pillow==9.1.0
     redis==4.1.4
 )

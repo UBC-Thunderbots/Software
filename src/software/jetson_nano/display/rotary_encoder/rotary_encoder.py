@@ -1,4 +1,4 @@
-import Jetson.GPIO as GPIO  # pip install Jetson.GPIO
+import Jetson.Gpio as Gpio  # pip install Jetson.Gpio
 
 """
 The naming convention for the pins used to determine rotation state follow the labels
@@ -72,19 +72,19 @@ class RotaryEncoder:
         self.transitions_per_rotation = len(STATES) - 1
 
     def setup(self):
-        """ Initialize GPIO pins and rotary encoder state """
+        """ Initialize Gpio pins and rotary encoder state """
 
-        # Set the GPIO mode if it has not been set
-        if not GPIO.getmode():
-            GPIO.setmode(GPIO.BOARD)
+        # Set the Gpio mode if it has not been set
+        if not Gpio.getmode():
+            Gpio.setmode(Gpio.BOARD)
 
         # These pins will need external pullups set up
-        GPIO.setup(self.PIN_1, GPIO.IN)
-        GPIO.setup(self.PIN_2, GPIO.IN)
-        GPIO.setup(self.BUTTON_PIN, GPIO.IN)
+        Gpio.setup(self.PIN_1, Gpio.IN)
+        Gpio.setup(self.PIN_2, Gpio.IN)
+        Gpio.setup(self.BUTTON_PIN, Gpio.IN)
 
-        pin_1_state = GPIO.input(self.PIN_1)
-        pin_2_state = GPIO.input(self.PIN_2)
+        pin_1_state = Gpio.input(self.PIN_1)
+        pin_2_state = Gpio.input(self.PIN_2)
 
         self.curr_state = (pin_1_state, pin_2_state)
         self.dir = CLOCKWISE
@@ -93,8 +93,8 @@ class RotaryEncoder:
 
     def rot_state(self):
         """ Update the current state and count state transitions """
-        pin_1_state = GPIO.input(self.PIN_1)
-        pin_2_state = GPIO.input(self.PIN_2)
+        pin_1_state = Gpio.input(self.PIN_1)
+        pin_2_state = Gpio.input(self.PIN_2)
         next_state = (pin_1_state, pin_2_state)
         prev_state = self.curr_state
 
@@ -108,7 +108,7 @@ class RotaryEncoder:
             self.dir = COUNTERCLOCKWISE
 
     def start(self):
-        """ Start listening to GPIO pins to trigger callback functions """
+        """ Start listening to Gpio pins to trigger callback functions """
 
         def on_rotation(channel):
             """ Update rotation state and call user defined callback functions after complete rotation """
@@ -126,26 +126,26 @@ class RotaryEncoder:
 
         def button_pressed(channel):
             """ Call the user defined callback when button is pressed """
-            if not GPIO.input(self.BUTTON_PIN):
+            if not Gpio.input(self.BUTTON_PIN):
                 self.on_click()
 
         self.setup()
 
         # add callback to be called when rotating encoder
-        GPIO.add_event_detect(self.PIN_1, GPIO.BOTH, callback=on_rotation, bouncetime=0)
-        GPIO.add_event_detect(self.PIN_2, GPIO.BOTH, callback=on_rotation, bouncetime=0)
+        Gpio.add_event_detect(self.PIN_1, Gpio.BOTH, callback=on_rotation, bouncetime=0)
+        Gpio.add_event_detect(self.PIN_2, Gpio.BOTH, callback=on_rotation, bouncetime=0)
 
         # add callback to be called when button is pressed
-        GPIO.add_event_detect(
+        Gpio.add_event_detect(
             self.BUTTON_PIN,
-            GPIO.FALLING,
+            Gpio.FALLING,
             callback=button_pressed,
             bouncetime=BOUNCETIME,
         )
 
     def stop(self):
-        """ clean up the GPIO pins that we were using for this class """
-        GPIO.cleanup()
+        """ clean up the Gpio pins that we were using for this class """
+        Gpio.cleanup()
 
 
 if __name__ == "__main__":
@@ -161,7 +161,7 @@ if __name__ == "__main__":
 
     BUTTON_PIN = 40  # BOARD 35, TEGRA_SOC: 'DAP4_FS'
     PIN_1 = 33  # BOARD 40, TEGRA_SOC: 'DAP4_DOUT'
-    PIN_2 = 35  # BOARD 33, TEGRA_SOC: 'GPIO_PE6'
+    PIN_2 = 35  # BOARD 33, TEGRA_SOC: 'Gpio_PE6'
 
     rot = RotaryEncoder(
         PIN_1,

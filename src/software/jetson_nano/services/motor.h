@@ -161,13 +161,13 @@ class MotorService
     bool checkDriverFault(uint8_t motor);
 
     // Select between driver and controller gpio
-    GPIO spi_demux_select_0;
-    GPIO spi_demux_select_1;
+    Gpio spi_demux_select_0;
+    Gpio spi_demux_select_1;
 
     // Enable driver gpio
-    GPIO driver_control_enable_gpio;
-    GPIO reset_gpio;
-    GPIO heartbeat_gpio;
+    Gpio driver_control_enable_gpio;
+    Gpio reset_gpio;
+    Gpio heartbeat_gpio;
 
     // Transfer Buffers
     uint8_t tx[5] = {0};
