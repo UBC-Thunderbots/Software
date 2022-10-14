@@ -6,14 +6,14 @@
 #include <limits>
 #include <vector>
 
-#include "PathfindingDataTypes.h"
+#include "pathfinding_data_types.h"
 
 namespace Pathfinding
 {
     class Grid;
     class LineOfSightScanner;
 
-    namespace ENLSVG
+    namespace Enlsvg
     {
         struct EdgeData
         {
@@ -131,7 +131,7 @@ namespace Pathfinding
                 VertexID& immediateNext, VertexID& immediateLast,
                 const std::vector<bool>& isSkipVertex) const;
         };
-    }  // namespace ENLSVG
+    }  // namespace Enlsvg
 }  // namespace Pathfinding
 
 

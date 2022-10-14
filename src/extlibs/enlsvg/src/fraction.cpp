@@ -1,4 +1,4 @@
-#include "extlibs/enlsvg/Pathfinding/Fraction.h"
+#include "extlibs/enlsvg/Pathfinding/fraction.h"
 
 #include <iostream>
 #include <sstream>
