@@ -34,7 +34,8 @@ void PrimitiveExecutor::clearCurrentPrimitive()
     current_primitive_.Clear();
 }
 
-void PrimitiveExecutor::setStopPrimitive() {
+void PrimitiveExecutor::setStopPrimitive()
+{
     current_primitive_ = *createStopPrimitive(true);
 }
 

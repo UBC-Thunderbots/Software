@@ -156,7 +156,8 @@ void Thunderloop::runLoop()
 
             // if world not sent in a while, time out
             if (new_world.time_sent().epoch_timestamp_seconds() >
-                world_.time_sent().epoch_timestamp_seconds() + WORLD_TIMEOUT_S) {
+                world_.time_sent().epoch_timestamp_seconds() + WORLD_TIMEOUT_S)
+            {
                 primitive_executor_.setStopPrimitive();
             }
 
