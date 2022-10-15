@@ -147,12 +147,17 @@ void Thunderloop::runLoop()
             }
 
             // If the world msg is new, update the internal buffer
-            // TODO (#2726): check if world has not been sent for a while
             if (new_world.time_sent().epoch_timestamp_seconds() >
                 world_.time_sent().epoch_timestamp_seconds())
             {
                 primitive_executor_.updateWorld(new_world);
                 world_ = new_world;
+            }
+
+            // if world not sent in a while, time out
+            if (new_world.time_sent().epoch_timestamp_seconds() >
+                world_.time_sent().epoch_timestamp_seconds() + WORLD_TIMEOUT_S) {
+                primitive_executor_.setStopPrimitive();
             }
 
             // Primitive Executor: run the last primitive if we have not timed out
@@ -173,7 +178,7 @@ void Thunderloop::runLoop()
                 if (nanoseconds_elapsed_since_last_primitive >
                     static_cast<long>(PRIMITIVE_MANAGER_TIMEOUT_NS))
                 {
-                    primitive_executor_.clearCurrentPrimitive();
+                    primitive_executor_.setStopPrimitive();
                 }
 
                 auto friendly_team = Team(world_.friendly_team());
