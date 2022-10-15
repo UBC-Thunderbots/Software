@@ -1,15 +1,15 @@
-#include "extlibs/enlsvg/Pathfinding/ENLSVGAlgorithm.h"
+#include "extlibs/enlsvg/Pathfinding/enlsvg_algorithm.h"
 
 #include <algorithm>
 
-#include "extlibs/enlsvg/Pathfinding/ENLSVGGraph.h"
-#include "extlibs/enlsvg/Pathfinding/Grid.h"
-#include "extlibs/enlsvg/Pathfinding/IndirectHeap.h"
-#include "extlibs/enlsvg/Pathfinding/LineOfSightScanner.h"
+#include "extlibs/enlsvg/Pathfinding/enlsvg_graph.h"
+#include "extlibs/enlsvg/Pathfinding/grid.h"
+#include "extlibs/enlsvg/Pathfinding/indirect_heap.h"
+#include "extlibs/enlsvg/Pathfinding/line_of_sight_scanner.h"
 
 namespace Pathfinding
 {
-    namespace ENLSVG
+    namespace Enlsvg
     {
         // negatePar makes parent pointers negative to indicate that the parent is a
         // skip-edge. note that negatePar(negatePar(k)) == k.
@@ -442,5 +442,5 @@ namespace Pathfinding
         {
             return graph.edges.size();
         }
-    }  // namespace ENLSVG
+    }  // namespace Enlsvg
 }  // namespace Pathfinding
