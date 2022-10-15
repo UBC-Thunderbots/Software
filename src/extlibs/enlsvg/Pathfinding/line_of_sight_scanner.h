@@ -16,18 +16,18 @@ namespace Pathfinding
     struct ScanInterval
     {
         const int y;
-        const Rational xL;
-        const Rational xR;
-        const bool leftInclusive;
-        const bool rightInclusive;
+        const Rational x_left;
+        const Rational x_right;
+        const bool left_inclusive;
+        const bool right_inclusive;
 
-        ScanInterval(int y, const Rational xL, const Rational xR, bool leftInclusive,
-                     bool rightInclusive)
+        ScanInterval(int y, const Rational x_left, const Rational x_right,
+                     bool left_inclusive, bool right_inclusive)
             : y(y),
-              xL(xL),
-              xR(xR),
-              leftInclusive(leftInclusive),
-              rightInclusive(rightInclusive)
+              x_left(x_left),
+              x_right(x_right),
+              left_inclusive(left_inclusive),
+              right_inclusive(right_inclusive)
         {
         }
     };
@@ -35,28 +35,28 @@ namespace Pathfinding
     struct ScannerStacks
     {
         std::vector<GridVertex> neighbours;
-        std::vector<ScanInterval> intervalStack;
+        std::vector<ScanInterval> interval_stack;
 
         inline void clear()
         {
             neighbours.clear();
-            intervalStack.clear();
+            interval_stack.clear();
         }
 
-        inline void addSuccessor(GridVertex gridVertex)
+        inline void addSuccessor(GridVertex grid_vertex)
         {
-            neighbours.push_back(gridVertex);
+            neighbours.push_back(grid_vertex);
         }
 
         inline void stackPush(ScanInterval interval)
         {
-            intervalStack.push_back(interval);
+            interval_stack.push_back(interval);
         }
 
         inline ScanInterval stackPop()
         {
-            ScanInterval last = intervalStack.back();
-            intervalStack.pop_back();
+            ScanInterval last = interval_stack.back();
+            interval_stack.pop_back();
             return last;
         }
     };
@@ -66,65 +66,69 @@ namespace Pathfinding
        public:
         LineOfSightScanner(const Grid& grid);
 
-        void computeAllDirNeighbours(ScannerStacks& data, int sx, int sy) const;
-        void computeTautDirNeighbours(ScannerStacks& data, int sx, int sy) const;
+        void computeAllDirNeighbours(ScannerStacks& data, int s_x, int s_y) const;
+        void computeTautDirNeighbours(ScannerStacks& data, int s_x, int s_y) const;
         void computeExtents();
 
-        inline int leftUpExtent(int xL, int y) const
+        inline int leftUpExtent(int x_left, int y) const
         {
-            return xL > sizeX ? sizeX : leftDownExtents[(y + 1) * extentsSizeX + xL];
+            return x_left > size_x ? size_x
+                                   : left_down_extents[(y + 1) * extents_size_x + x_left];
         }
 
-        inline int leftDownExtent(int xL, int y) const
+        inline int leftDownExtent(int x_left, int y) const
         {
-            return xL > sizeX ? sizeX : leftDownExtents[y * extentsSizeX + xL];
+            return x_left > size_x ? size_x
+                                   : left_down_extents[y * extents_size_x + x_left];
         }
 
-        inline int leftAnyExtent(int xL, int y) const
+        inline int leftAnyExtent(int x_left, int y) const
         {
-            return std::max(leftDownExtents[y * extentsSizeX + xL],
-                            leftDownExtents[(y + 1) * extentsSizeX + xL]);
+            return std::max(left_down_extents[y * extents_size_x + x_left],
+                            left_down_extents[(y + 1) * extents_size_x + x_left]);
         }
 
-        inline int rightUpExtent(int xR, int y) const
+        inline int rightUpExtent(int x_right, int y) const
         {
-            return xR < 0 ? 0 : rightDownExtents[(y + 1) * extentsSizeX + xR];
+            return x_right < 0 ? 0
+                               : right_down_extents[(y + 1) * extents_size_x + x_right];
         }
 
-        inline int rightDownExtent(int xR, int y) const
+        inline int rightDownExtent(int x_right, int y) const
         {
-            return xR < 0 ? 0 : rightDownExtents[y * extentsSizeX + xR];
+            return x_right < 0 ? 0 : right_down_extents[y * extents_size_x + x_right];
         }
 
-        inline int rightAnyExtent(int xR, int y) const
+        inline int rightAnyExtent(int x_right, int y) const
         {
-            return std::min(rightDownExtents[y * extentsSizeX + xR],
-                            rightDownExtents[(y + 1) * extentsSizeX + xR]);
+            return std::min(right_down_extents[y * extents_size_x + x_right],
+                            right_down_extents[(y + 1) * extents_size_x + x_right]);
         }
 
        private:
         const Grid& grid;
-        const int sizeX;
-        const int sizeY;
-        const int extentsSizeX;
+        const int size_x;
+        const int size_y;
+        const int extents_size_x;
 
-        std::vector<int> rightDownExtents;
-        std::vector<int> leftDownExtents;
+        std::vector<int> right_down_extents;
+        std::vector<int> left_down_extents;
 
-        void generateTautDirectionStartingStates(ScannerStacks& data, int sx,
-                                                 int sy) const;
-        void generateAllDirectionStartingStates(ScannerStacks& data, int sx,
-                                                int sy) const;
-        void exploreStates(ScannerStacks& data, int sx, int sy) const;
-        void generateUpwards(ScannerStacks& data, Rational leftBound, Rational rightBound,
-                             int sx, int sy, int currY, bool leftInclusive,
-                             bool rightInclusive) const;
-        void generateDownwards(ScannerStacks& data, Rational leftBound,
-                               Rational rightBound, int sx, int sy, int currY,
-                               bool leftInclusive, bool rightInclusive) const;
-        void generateAndSplitIntervals(ScannerStacks& data, int checkY, int newY, int sx,
-                                       int sy, Rational leftBound, Rational rightBound,
-                                       bool leftInclusive, bool rightInclusive) const;
+        void generateTautDirectionStartingStates(ScannerStacks& data, int s_x,
+                                                 int s_y) const;
+        void generateAllDirectionStartingStates(ScannerStacks& data, int s_x,
+                                                int s_y) const;
+        void exploreStates(ScannerStacks& data, int s_x, int s_y) const;
+        void generateUpwards(ScannerStacks& data, Rational left_bound,
+                             Rational right_bound, int s_x, int s_y, int curr_y,
+                             bool left_inclusive, bool right_inclusive) const;
+        void generateDownwards(ScannerStacks& data, Rational left_bound,
+                               Rational right_bound, int s_x, int s_y, int curr_y,
+                               bool left_inclusive, bool right_inclusive) const;
+        void generateAndSplitIntervals(ScannerStacks& data, int check_y, int new_y,
+                                       int s_x, int s_y, Rational left_bound,
+                                       Rational right_bound, bool left_inclusive,
+                                       bool right_inclusive) const;
     };
 
 }  // namespace Pathfinding

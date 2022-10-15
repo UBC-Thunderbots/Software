@@ -4,17 +4,17 @@
 
 namespace Pathfinding
 {
-    Grid::Grid(int sizeX, int sizeY)
-        : sizeX(sizeX), sizeY(sizeY), totalSize(sizeX * sizeY)
+    Grid::Grid(int size_x, int size_y)
+        : size_x(size_x), size_y(size_y), total_size(size_x * size_y)
     {
-        blocked.resize(sizeX * sizeY);
+        blocked.resize(size_x * size_y);
     }
 
     void Grid::printGrid() const
     {
-        for (int y = 0; y < sizeY; ++y)
+        for (int y = 0; y < size_y; ++y)
         {
-            for (int x = 0; x < sizeX; ++x)
+            for (int x = 0; x < size_x; ++x)
             {
                 std::cout << (isBlockedRaw(x, y) ? "X" : " ");
             }

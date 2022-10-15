@@ -7,64 +7,64 @@ using namespace std;
 
 namespace Pathfinding
 {
-    Fraction operator*(const Fraction& o, const Fraction& o2)
+    Fraction operator*(const Fraction& o, const Fraction& o_2)
     {
-        return Fraction(o.n * o2.n, o.d * o2.d);
+        return Fraction(o.n * o_2.n, o.d * o_2.d);
     }
 
-    Fraction operator/(const Fraction& o, const Fraction& o2)
+    Fraction operator/(const Fraction& o, const Fraction& o_2)
     {
-        return Fraction(o.n * o2.d, o.d * o2.n);
+        return Fraction(o.n * o_2.d, o.d * o_2.n);
     }
 
-    Fraction operator+(const Fraction& o, const Fraction& o2)
+    Fraction operator+(const Fraction& o, const Fraction& o_2)
     {
-        return Fraction(o.n * o2.d + o2.n * o.d, o.d * o2.d);
+        return Fraction(o.n * o_2.d + o_2.n * o.d, o.d * o_2.d);
     }
 
-    Fraction operator-(const Fraction& o, const Fraction& o2)
+    Fraction operator-(const Fraction& o, const Fraction& o_2)
     {
-        return Fraction(o.n * o2.d - o2.n * o.d, o.d * o2.d);
+        return Fraction(o.n * o_2.d - o_2.n * o.d, o.d * o_2.d);
     }
 
-    Fraction operator*(const Fraction& o, long o2)
+    Fraction operator*(const Fraction& o, long o_2)
     {
-        return Fraction(o.n * o2, o.d);
+        return Fraction(o.n * o_2, o.d);
     }
 
-    Fraction operator/(const Fraction& o, long o2)
+    Fraction operator/(const Fraction& o, long o_2)
     {
-        return Fraction(o.n, o.d * o2);
+        return Fraction(o.n, o.d * o_2);
     }
 
-    Fraction operator+(const Fraction& o, long o2)
+    Fraction operator+(const Fraction& o, long o_2)
     {
-        return Fraction(o.n + o2 * o.d, o.d);
+        return Fraction(o.n + o_2 * o.d, o.d);
     }
 
-    Fraction operator-(const Fraction& o, long o2)
+    Fraction operator-(const Fraction& o, long o_2)
     {
-        return Fraction(o.n - o2 * o.d, o.d);
+        return Fraction(o.n - o_2 * o.d, o.d);
     }
 
-    Fraction operator*(long o, const Fraction& o2)
+    Fraction operator*(long o, const Fraction& o_2)
     {
-        return Fraction(o * o2.n, o2.d);
+        return Fraction(o * o_2.n, o_2.d);
     }
 
-    Fraction operator/(long o, const Fraction& o2)
+    Fraction operator/(long o, const Fraction& o_2)
     {
-        return Fraction(o * o2.d, o2.n);
+        return Fraction(o * o_2.d, o_2.n);
     }
 
-    Fraction operator+(long o, const Fraction& o2)
+    Fraction operator+(long o, const Fraction& o_2)
     {
-        return Fraction(o * o2.d + o2.n, o2.d);
+        return Fraction(o * o_2.d + o_2.n, o_2.d);
     }
 
-    Fraction operator-(long o, const Fraction& o2)
+    Fraction operator-(long o, const Fraction& o_2)
     {
-        return Fraction(o * o2.d - o2.n, o2.d);
+        return Fraction(o * o_2.d - o_2.n, o_2.d);
     }
 
     ostream& operator<<(ostream& stream, Fraction& obj)
