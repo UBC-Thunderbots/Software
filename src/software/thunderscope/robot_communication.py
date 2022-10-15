@@ -142,7 +142,7 @@ class RobotCommunication(object):
     def connect_robot_to_diagnostics(self, robot_id):
         self.robots_connected_to_diagnostics.add(robot_id)
 
-    def discconnect_robot_from_diagnostics(self, robot_id):
+    def disconnect_robot_from_diagnostics(self, robot_id):
         self.robots_connected_to_diagnostics.remove(robot_id)
 
     def __enter__(self):
@@ -199,8 +199,9 @@ class RobotCommunication(object):
         # TODO (#2741): we might not want to support robot diagnostics in tscope
         # make a ticket here to create a widget to call these functions to detach
         # from AI and connect to robots/or remove
-        # self.disconnect_fullsystem_from_robots()
-        # self.connect_robot_to_diagnostics(0)
+        self.disconnect_fullsystem_from_robots()
+        for robot_id in range(MAX_ROBOT_IDS_PER_SIDE):
+            self.connect_robot_to_diagnostics(robot_id)
 
         self.send_estop_state_thread.start()
         self.run_thread.start()
