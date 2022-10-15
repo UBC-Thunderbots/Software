@@ -5,8 +5,8 @@ cc_test(
     srcs = ["stp_play_selection_fsm_test.cpp"],
     deps = [
         "//shared/test_util:tbots_gtest_main",
-        "//software/ai:ai",
+        "//software/ai",
         "//software/test_util",
-        "//software/world"
+        "//software/world",
     ],
 )
