@@ -116,7 +116,6 @@ TEST_F(PlaySelectionFSMTest, test_transition_out_of_penalty_kick_enemy_when_goal
         [&current_play](std::unique_ptr<Play> play) { current_play = std::move(play); },
         game_state, ai_config));
     EXPECT_TRUE(game_state.isSetupState());
-    EXPECT_FALSE(game_state.isReadyState());
     EXPECT_TRUE(fsm->is(boost::sml::state<PlaySelectionFSM::SetPlay>));
     EXPECT_EQ("KickoffFriendlyPlay", objectTypeName(*current_play));
 
@@ -125,7 +124,6 @@ TEST_F(PlaySelectionFSMTest, test_transition_out_of_penalty_kick_enemy_when_goal
     fsm->process_event(PlaySelectionFSM::Update(
         [&current_play](std::unique_ptr<Play> play) { current_play = std::move(play); },
         game_state, ai_config));
-    EXPECT_FALSE(game_state.isSetupState());
     EXPECT_TRUE(game_state.isReadyState());
     EXPECT_TRUE(fsm->is(boost::sml::state<PlaySelectionFSM::SetPlay>));
     EXPECT_EQ("KickoffFriendlyPlay", objectTypeName(*current_play));
