@@ -1,9 +1,10 @@
+#include "software/ai/play_selection_fsm.h"
+
 #include <gtest/gtest.h>
 
 #include <exception>
 
 #include "software/ai/hl/stp/play/halt_play.h"
-#include "software/ai/play_selection_fsm.h"
 #include "software/test_util/test_util.h"
 #include "software/world/world.h"
 
