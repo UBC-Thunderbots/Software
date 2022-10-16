@@ -38,5 +38,5 @@ class Gpio
     GpioState getValue(void);
 
    private:
-    std::string Gpio_number_;
+    std::string gpio_number_;
 };
