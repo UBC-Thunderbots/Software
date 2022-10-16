@@ -104,9 +104,7 @@ class RobotCommunication(object):
                 primitive_set = self.primitive_buffer.get(block=False)
 
                 if self.estop_reader.isEstopPlay():
-                    # primitive_set.time_sent = Timestamp(epoch_timestamp_seconds=time.time())
                     self.send_primitive_set.send_proto(primitive_set)
-                    # logger.info(primitive_set)
 
             else:
 

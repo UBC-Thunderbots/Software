@@ -83,8 +83,7 @@ class FieldTestRunner(TbotsTestRunner):
             logger.info(f"blue team ids {self.friendly_robot_ids_field}")
 
             if len(self.friendly_robot_ids_field) == 0:
-                pass
-                # raise Exception("no friendly robots found on field")
+                raise Exception("no friendly robots found on field")
 
         except queue.Empty as empty:
             raise Exception("unable to determine robots on the field")
