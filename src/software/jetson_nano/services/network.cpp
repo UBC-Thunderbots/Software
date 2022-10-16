@@ -3,9 +3,6 @@
 #include "software/networking/threaded_proto_udp_listener.hpp"
 #include "software/networking/threaded_proto_udp_sender.hpp"
 
-
-const float PACKET_LOSS_WARNING_THRESHOLD = 0.1f;
-
 NetworkService::NetworkService(const std::string& ip_address,
                                unsigned short world_listener_port,
                                unsigned short primitive_listener_port,
@@ -36,21 +33,36 @@ std::tuple<TbotsProto::PrimitiveSet, TbotsProto::World> NetworkService::poll(
 void NetworkService::primitiveSetCallback(TbotsProto::PrimitiveSet input)
 {
     std::scoped_lock<std::mutex> lock(primitive_set_mutex);
-    primitive_set_msg = input;
+    primitive_set_msg   = input;
+    const auto& seq_num = input.sequence_number();
 
-    // TODO(#2727): Implement a recent packet loss instead of overall
-    total_primitives_lost += input.sequence_number() - last_primitive_sequence_number - 1;
-
-    float packet_loss = static_cast<float>(total_primitives_lost) /
-                        static_cast<float>(input.sequence_number());
-
-    if (packet_loss > PACKET_LOSS_WARNING_THRESHOLD)
+    // Ignore the primitive and consider it as lost if it is received out of order
+    if (!recent_primitive_seq_nums.empty() && seq_num <= recent_primitive_seq_nums.back())
     {
-        LOG(WARNING) << "Primitive packet loss more than "
-                     << PACKET_LOSS_WARNING_THRESHOLD << "% ";
+        return;
     }
 
-    last_primitive_sequence_number = input.sequence_number();
+    recent_primitive_seq_nums.push(seq_num);
+
+    // Pop sequence numbers of primitives that are no longer recent
+    while (seq_num - recent_primitive_seq_nums.front() >= RECENT_PACKET_LOSS_PERIOD)
+    {
+        recent_primitive_seq_nums.pop();
+    }
+
+    auto expected_primitives_count =
+        std::min(seq_num, static_cast<uint64_t>(RECENT_PACKET_LOSS_PERIOD));
+    auto lost_primitives_count =
+        expected_primitives_count - recent_primitive_seq_nums.size();
+    auto packet_loss_rate = static_cast<float>(lost_primitives_count) /
+                            static_cast<float>(expected_primitives_count);
+
+    if (packet_loss_rate > PACKET_LOSS_WARNING_THRESHOLD)
+    {
+        LOG(WARNING) << "Primitive packet loss in the past " << expected_primitives_count
+                     << " packets more than " << PACKET_LOSS_WARNING_THRESHOLD * 100
+                     << "% ";
+    }
 }
 
 void NetworkService::worldCallback(TbotsProto::World input)

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <mutex>
+#include <queue>
 
 #include "proto/robot_status_msg.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
@@ -8,6 +9,9 @@
 #include "shared/robot_constants.h"
 #include "software/networking/threaded_proto_udp_listener.hpp"
 #include "software/networking/threaded_proto_udp_sender.hpp"
+
+constexpr float PACKET_LOSS_WARNING_THRESHOLD = 0.1f;
+constexpr uint8_t RECENT_PACKET_LOSS_PERIOD   = 100;
 
 class NetworkService
 {
@@ -57,6 +61,5 @@ class NetworkService
     double last_primitive_time = 0.0;
     double last_world_time     = 0.0;
 
-    uint64_t last_primitive_sequence_number = 0;
-    uint64_t total_primitives_lost          = 0;
+    std::queue<uint64_t> recent_primitive_seq_nums;
 };
