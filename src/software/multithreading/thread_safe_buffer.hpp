@@ -10,6 +10,8 @@
 #include "software/logger/logger.h"
 #include "software/time/duration.h"
 #include "software/util/typename/typename.h"
+#define BOOST_STACKTRACE_USE_ADDR2LINE
+#include <boost/stacktrace.hpp>
 
 /**
  * This class represents a buffer of objects
@@ -151,8 +153,9 @@ void ThreadSafeBuffer<T>::push(const T& value)
     std::scoped_lock<std::mutex> buffer_lock(buffer_mutex);
     if (log_buffer_full && buffer.full())
     {
-        LOG(WARNING) << "Pushing to a full ThreadSafeBuffer of type: " << TYPENAME(T)
-                     << std::endl;
+            //std::cout << boost::stacktrace::stacktrace() << std::endl;
+            // LOG(WARNING) << "Pushing to a full ThreadSafeBuffer of type: " << TYPENAME(T)
+            //          << std::endl;
     }
     buffer.push_back(value);
     received_new_value.notify_all();

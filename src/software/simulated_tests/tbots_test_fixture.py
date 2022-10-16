@@ -13,7 +13,7 @@ from software.logger.logger import createLogger
 
 logger = createLogger(__name__)
 
-LAUNCH_DELAY_S = 0.2
+LAUNCH_DELAY_S = 1
 PAUSE_AFTER_FAIL_DELAY_S = 3
 TEST_END_DELAY = 0.5
 simulator_proto_unix_io = ProtoUnixIO()
@@ -45,8 +45,6 @@ def enable_thunderscope(test):
             :param args: The args passed in from the hook
 
             """
-                logger.info("exception caught ")
-                logger.info(args.exc_value)
                 stop_test(PAUSE_AFTER_FAIL_DELAY_S)
                 self.last_exception = args.exc_value
                 raise self.last_exception
@@ -139,6 +137,7 @@ def tbots_test_runner():
             blue_full_system_proto_unix_io=blue_full_system_proto_unix_io,
             yellow_full_system_proto_unix_io=yellow_full_system_proto_unix_io,
             simulator_proto_unix_io=simulator_proto_unix_io,
+            sleep_between_ticks=args.enable_thunderscope,
         )
 
     yield_val = next(runner_fixture)

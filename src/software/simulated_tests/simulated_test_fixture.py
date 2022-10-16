@@ -138,8 +138,8 @@ class SimulatorTestRunner(TbotsTestRunner):
                 self.simulator_proto_unix_io.send_proto(SimulatorTick, tick)
                 time_elapsed_s += self.tick_duration_s
 
-                if self.sleep_between_ticks:
-                    time.sleep(self.tick_duration_s)
+                # if self.sleep_between_ticks:
+                time.sleep(self.tick_duration_s)
 
                 while True:
                     try:
