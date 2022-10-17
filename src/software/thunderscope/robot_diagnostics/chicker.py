@@ -126,13 +126,13 @@ class ChickerWidget(QWidget):
         self.chip_button_enable = True
 
     def send_kick_or_chip(self, kick):
-        """Sends a kick or chip primitive dependant on boolean parameter
+        """Sends a kick or chip primitive dependent on boolean parameter
 
         :param kick: boolean to indicate whether to send Kick (True) or Chip (False) primitive
         :returns: None
 
         """
-        
+
         # gets slider values and sets label to that value
         geneva_value = self.geneva_slider.value()
         self.geneva_label.setText(Slot.Name(geneva_value))
