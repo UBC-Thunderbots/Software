@@ -26,7 +26,7 @@ This will stop the current systemd services, replace and restart them. Binaries 
 
 <b>To build this for the first time you will need to run this with internet access. Then run it again on the tbots network</b>
 
-<b>This will trigger motor callibration meaning the wheels may spin. Please put the robot on a piece of tape to mitigate this</b>
+<b>This will trigger motor calibration meaning the wheels may spin. Please put the robot on a piece of tape to mitigate this</b>
 
 `bazel run //software/jetson_nano/ansible:run_ansible --cpu=jetson_nano -- -playbook deploy_nano.yml --hosts <robot_ip> --ssh_pass thunderbots`
 
@@ -101,7 +101,7 @@ Debugging:
 
 If the serial_port is busy, screen will not launch and instead says `screen is terminating`. This may be because the port is in use either by thunderloop or another process running screen.
 
-Powerloop uart communication is encoded so you cant read it from screen and will appear as a mix of foreign characters
+Powerloop uart communication is encoded so you can't read it from screen and will appear as a mix of foreign characters
 
 Pressing the reset button once will send a status msg over its connected port. This is useful for sanity checking.
 
