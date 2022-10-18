@@ -7,8 +7,8 @@ std::optional<Point> CreaseDefenderFSM::findBlockThreatPoint(
 {
     // We increment the angle to positive goalpost by 1/6, 3/6, or 5/6 of the shot
     // cone
-    Angle shot_angle_sixth = acuteAngle(field.friendlyGoalpostPos(), enemy_threat_origin,
-                                        field.friendlyGoalpostNeg()) /
+    Angle shot_angle_sixth = convexAngle(field.friendlyGoalpostPos(), enemy_threat_origin,
+                                         field.friendlyGoalpostNeg()) /
                              6.0;
     Angle angle_to_positive_goalpost =
         (field.friendlyGoalpostPos() - enemy_threat_origin).orientation();
