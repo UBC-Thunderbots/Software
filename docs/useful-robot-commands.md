@@ -6,6 +6,7 @@
    * [Flashing the nano](#flashing-the-nano)
    * [Flashing the powerboard](#flashing-the-powerboard)
    * [Setting up nano](#setting-up-nano)
+   * [Robot Diagnostics](#robot-diagnostics)
 * [On Robot Commands](#on-robot-commands)
    * [Systemd Services](#systemd-services)
    * [Debugging Uart](#debugging-uart)
@@ -25,6 +26,8 @@ This will stop the current systemd services, replace and restart them. Binaries 
 
 <b>To build this for the first time you will need to run this with internet access. Then run it again on the tbots network</b>
 
+<b>This will trigger motor callibration meaning the wheels may spin. Please put the robot on a piece of tape to mitigate this</b>
+
 `bazel run //software/jetson_nano/ansible:run_ansible --cpu=jetson_nano -- -playbook deploy_nano.yml --hosts <robot_ip> --ssh_pass thunderbots`
 
 ## Flashing the powerboard
@@ -43,6 +46,17 @@ This refers to setting up the jetson nano for the first time. This will enable s
 
 `bazel run //software/jetson_nano/ansible:run_ansible --cpu=jetson_nano -- -playbook setup_nano.yml --hosts <robot_ip> --ssh_pass thunderbots`
 
+## Robot Diagnostics
+
+Robot Diagnostics allow users to input various commands to the robots. It can be used to move the robot in the x, y and theta direction as well as kick, chip, autokick or autochip. It can also be used to spin the dribbler. 
+
+<b>If multiple people are using robot diagnostics at the same time on the same network please have a software member modify the connected robot ids</b>
+
+From Software/src
+
+`./tbots.py run thunderscope --run_blue --interface <network_interface>`
+
+network_interface can be found with `ifconfig` commonly `wlp59s0` for wifi.
 
 # On Robot Commands
 
