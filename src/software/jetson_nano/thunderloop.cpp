@@ -30,11 +30,12 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, const int loop
 
     redis_client_ = std::make_unique<RedisClient>(REDIS_DEFAULT_HOST, REDIS_DEFAULT_PORT);
 
-    auto robot_id   = std::stoi(redis_client_->get(ROBOT_ID_REDIS_KEY));
-    auto channel_id = std::stoi(redis_client_->get(ROBOT_MULTICAST_CHANNEL_REDIS_KEY));
+    //auto robot_id   = std::stoi(redis_client_->get(ROBOT_ID_REDIS_KEY));
+    //auto channel_id = std::stoi(redis_client_->get(ROBOT_MULTICAST_CHANNEL_REDIS_KEY));
     auto network_interface = redis_client_->get(ROBOT_NETWORK_INTERFACE_REDIS_KEY);
 
-    NetworkLoggerSingleton::initializeLogger(channel_id, network_interface, robot_id);
+    //NetworkLoggerSingleton::initializeLogger(channel_id, network_interface, robot_id);
+    LoggerSingleton::initializeLogger("/home/robot/logs");
 
     motor_service_ = std::make_unique<MotorService>(robot_constants, loop_hz);
     power_service_ = std::make_unique<PowerService>();
@@ -155,9 +156,11 @@ void Thunderloop::runLoop()
             }
 
             // if world not sent in a while, time out
-            if (new_world.time_sent().epoch_timestamp_seconds() >
+            LOG(INFO) << "world_ timestamp: " << world_.time_sent().epoch_timestamp_seconds();
+            if (new_world.time_sent().epoch_timestamp_seconds() > // TODO: this should be the current time
                 world_.time_sent().epoch_timestamp_seconds() + WORLD_TIMEOUT_S)
             {
+                LOG(INFO) << "World stop";
                 primitive_executor_.setStopPrimitive();
             }
 
@@ -179,6 +182,7 @@ void Thunderloop::runLoop()
                 if (nanoseconds_elapsed_since_last_primitive >
                     static_cast<long>(PRIMITIVE_MANAGER_TIMEOUT_NS))
                 {
+                    LOG(INFO) << "Primitive stop";
                     primitive_executor_.setStopPrimitive();
                 }
 
