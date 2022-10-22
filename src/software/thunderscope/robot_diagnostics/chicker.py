@@ -2,11 +2,18 @@ import pyqtgraph as pg
 from pyqtgraph.Qt.QtCore import *
 from pyqtgraph.Qt.QtWidgets import *
 from software.py_constants import *
-from threading import Timer
 from proto.import_all_protos import *
+from enum import Enum
 import software.thunderscope.common.common_widgets as common_widgets
 
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
+
+
+class ChickerCommandMode(Enum):
+    KICK = 1
+    CHIP = 2
+    AUTOKICK = 3
+    AUTOCHIP = 4
 
 
 class ChickerWidget(QWidget):
@@ -93,23 +100,36 @@ class ChickerWidget(QWidget):
         # if button is enabled
         if self.kick_button_enable:
             # send kick primitive
-            self.send_kick_or_chip(True)
+            self.send_command(ChickerCommandMode.KICK)
             self.toggle_kick_button()
 
             # set and start timer to re-enable kick button after 3 seconds
-            t = Timer(3, lambda s: s.toggle_kick_button(), [self])
-            t.start()
+            self.start_timer_once(self.toggle_kick_button, 3000)
 
     def chip_clicked(self):
         # if button is enabled
         if self.chip_button_enable:
             # send chip primitive
-            self.send_kick_or_chip(False)
+            self.send_command(ChickerCommandMode.CHIP)
             self.toggle_chip_button()
 
             # set and start timer to re-enable chip button after 3 seconds
-            t = Timer(3, lambda s: s.toggle_chip_button(), [self])
-            t.start()
+            self.start_timer_once(self.toggle_chip_button, 3000)
+
+    def start_timer_once(self, function, duration):
+        """Starts a QTimer to call the given function once after the given duration
+
+        :param function: function to call after duration
+        :param duration: duration to call function after
+        :returns: None
+
+        """
+
+        t = QTimer(self)
+        t.setTimerType(Qt.TimerType.PreciseTimer)
+        t.timeout.connect(function)
+        t.setSingleShot(True)
+        t.start(duration)
 
     def toggle_kick_button(self):
         self.kick_button_enable = not self.kick_button_enable
@@ -125,28 +145,30 @@ class ChickerWidget(QWidget):
         self.kick_button_enable = True
         self.chip_button_enable = True
 
-    def send_kick_or_chip(self, kick):
+    def send_command(self, command):
         """Sends a kick or chip primitive dependent on boolean parameter
 
-        :param kick: boolean to indicate whether to send Kick (True) or Chip (False) primitive
+        :param command: enum int value to indicate what primitive to send
         :returns: None
 
         """
 
-        # gets slider values and sets label to that value
+        # gets slider values
         geneva_value = self.geneva_slider.value()
-        self.geneva_label.setText(Slot.Name(geneva_value))
 
         power_value = self.power_slider.value()
-        self.power_label.setText(str(power_value))
 
         power_control = PowerControl()
         power_control.geneva_slot = geneva_value
 
-        # sends kick or chip primitive
-        if kick:
+        # sends kick, chip, autokick, or autchip primitive
+        if command == ChickerCommandMode.KICK:
+            power_control.chicker.kick_speed_m_per_s = power_value
+        elif command == ChickerCommandMode.CHIP:
+            power_control.chicker.chip_distance_meters = power_value
+        elif command == ChickerCommandMode.AUTOKICK:
             power_control.chicker.auto_chip_or_kick.autokick_speed_m_per_s = power_value
-        else:
+        elif command == ChickerCommandMode.AUTOCHIP:
             power_control.chicker.auto_chip_or_kick.autochip_distance_meters = (
                 power_value
             )
@@ -171,14 +193,21 @@ class ChickerWidget(QWidget):
 
     def refresh(self):
 
+        # gets slider values and sets label to that value
+        geneva_value = self.geneva_slider.value()
+        self.geneva_label.setText(Slot.Name(geneva_value))
+
+        power_value = self.power_slider.value()
+        self.power_label.setText(str(power_value))
+
         # refreshes button state based on enable boolean
         self.change_button_state(self.kick_button, self.kick_button_enable)
         self.change_button_state(self.chip_button, self.chip_button_enable)
 
         # If auto is enabled, we want to populate the autochip or kick message
         if self.auto_kick_button.isChecked():
-            self.send_kick_or_chip(True)
+            self.send_command(ChickerCommandMode.AUTOKICK)
         elif self.auto_chip_button.isChecked():
-            self.send_kick_or_chip(False)
+            self.send_command(ChickerCommandMode.AUTOCHIP)
         elif self.no_auto_button.isChecked():
             pass
