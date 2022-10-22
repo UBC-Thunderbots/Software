@@ -106,7 +106,7 @@ class Thunderloop
     const double PRIMITIVE_MANAGER_TIMEOUT_NS = 500.0 * NANOSECONDS_PER_MILLISECOND;
 
     // 500 millisecond timeout on receiving world before we emergency stop the robots
-    const double WORLD_TIMEOUT_S = 0.5;
+    const double WORLD_TIMEOUT_NS = 500.0 * NANOSECONDS_PER_MILLISECOND;
 
     // Path to the CPU thermal zone temperature file
     const std::string CPU_TEMP_FILE_PATH = "/sys/class/thermal/thermal_zone1/temp";

@@ -30,12 +30,11 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, const int loop
 
     redis_client_ = std::make_unique<RedisClient>(REDIS_DEFAULT_HOST, REDIS_DEFAULT_PORT);
 
-    //auto robot_id   = std::stoi(redis_client_->get(ROBOT_ID_REDIS_KEY));
-    //auto channel_id = std::stoi(redis_client_->get(ROBOT_MULTICAST_CHANNEL_REDIS_KEY));
+    auto robot_id   = std::stoi(redis_client_->get(ROBOT_ID_REDIS_KEY));
+    auto channel_id = std::stoi(redis_client_->get(ROBOT_MULTICAST_CHANNEL_REDIS_KEY));
     auto network_interface = redis_client_->get(ROBOT_NETWORK_INTERFACE_REDIS_KEY);
 
-    //NetworkLoggerSingleton::initializeLogger(channel_id, network_interface, robot_id);
-    LoggerSingleton::initializeLogger("/home/robot/logs");
+    NetworkLoggerSingleton::initializeLogger(channel_id, network_interface, robot_id);
 
     motor_service_ = std::make_unique<MotorService>(robot_constants, loop_hz);
     power_service_ = std::make_unique<PowerService>();
@@ -168,12 +167,17 @@ void Thunderloop::runLoop()
                     world_result.tv_sec * static_cast<int>(NANOSECONDS_PER_SECOND) +
                     world_result.tv_nsec;
 
-            LOG(INFO) << "Nanos since last world: " << nanoseconds_elapsed_since_last_world; //TODO remove
             if (nanoseconds_elapsed_since_last_world >
-                static_cast<long>(PRIMITIVE_MANAGER_TIMEOUT_NS))
+                static_cast<long>(WORLD_TIMEOUT_NS))
             {
-                LOG(INFO) << "World stop"; //TODO remove
                 primitive_executor_.setStopPrimitive();
+
+                // log millis since last world if we are timing out
+                int milliseconds_elapsed_since_last_world =
+                    static_cast<int> (static_cast<double> (world_result.tv_sec) * MILLISECONDS_PER_SECOND +
+                    static_cast<double> (world_result.tv_nsec) * MILLISECONDS_PER_NANOSECOND);
+
+                LOG(INFO) << "Milliseconds since last world: " << milliseconds_elapsed_since_last_world;
             }
 
             // Primitive Executor: run the last primitive if we have not timed out
@@ -194,7 +198,6 @@ void Thunderloop::runLoop()
                 if (nanoseconds_elapsed_since_last_primitive >
                     static_cast<long>(PRIMITIVE_MANAGER_TIMEOUT_NS))
                 {
-                    LOG(INFO) << "Primitive stop"; //TODO remove
                     primitive_executor_.setStopPrimitive();
                 }
 
