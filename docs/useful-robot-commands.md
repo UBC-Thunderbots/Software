@@ -17,9 +17,9 @@
 
 ## Wifi Disclaimer
 
-To use most of these commands you will either need to be on the tbots wifi network( no internet access ) or on a wifi with internet access(shawopen, ubc wifi) and connected to the jetson nano through ethernet tethering. 
+To use most of these commands you will either need to be on the tbots wifi network( no internet access ) or on a wifi with internet access(shawopen, ubc wifi) and connected to the Jetson Nano through ethernet tethering. 
 
-The IP address of the robots on the tbots network is `192.168.0.20<robot_id>` so for robot id `1` the ip is `192.168.0.201`. If you are using ethernet tethering you will need to use a network utility (tshark, wireshark, arp) to determine the ip address.
+The IP address of the robots on the tbots network is `192.168.0.20<robot_id>` so for robot id `1` the IP is `192.168.0.201`. If you are using ethernet tethering you will need to use a network utility (tshark, wireshark, arp) to determine the IP address.
 
 ## Miscellaneous Ansible Tasks & Options
 
@@ -34,7 +34,7 @@ The `--tags` argument can be used to specify which actions to perform and on whi
 
 ## Flashing the nano
 
-This will stop the current systemd services, replace and restart them. Binaries that are used for systemd services are located in a folder in `home/robot` (the default directory) called `thunderbots_binaries`.
+This will stop the current Systemd services, replace and restart them. Binaries that are used for Systemd services are located in a folder in `home/robot` (the default directory) called `thunderbots_binaries`.
 
 <b>To build this for the first time you will need to run this with internet access. Then run it again on the tbots network</b>
 
@@ -52,7 +52,7 @@ Looking from the back of the robot the reset and boot buttons are on right side 
 
 ## Setting up nano 
 
-This refers to setting up the jetson nano for the first time. This will enable systemd services, modify device tree files and perform other setup necessary for the communication protocols used.
+This refers to setting up the Jetson Nano for the first time. This will enable Systemd services, modify device tree files and perform other setup necessary for the communication protocols used.
 
 <b>Setting up the nano for the first time requires internet access!!!</b>
 

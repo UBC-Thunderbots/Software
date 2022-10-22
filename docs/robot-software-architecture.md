@@ -36,7 +36,7 @@ To learn more about how it works, [see the RFC](https://docs.google.com/document
 
 # Thunderloop
 
-Thunderloop is software that runs in a loop. It continuously polls services (unrelated from systemd) sending relevant control proto (PowerControl, MotorControl) and receiving back status proto. Currently we have a Network, Power and Motor service. Thunderloop also receives World and Primitive Proto from Ai and sends back Robot Status.
+Thunderloop is software that runs in a loop. It continuously polls services (unrelated from Systemd) sending relevant control proto (PowerControl, MotorControl) and receiving back status proto. Currently we have a Network, Power and Motor service. Thunderloop also receives World and Primitive Proto from Ai and sends back Robot Status.
 
 Motor and Power service both interface with their respective electrical boards over different communication interfaces, namely SPI and UART respectively.
 
