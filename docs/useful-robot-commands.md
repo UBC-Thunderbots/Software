@@ -3,6 +3,7 @@
 # Table of Contents
 * [Off Robot Commands](#off-robot-commands)
    * [Wifi Disclaimer](#wifi-disclaimer)
+   * [Miscellaneous Ansible Tasks & Options](#miscellaneous-ansible-tasks--options)
    * [Flashing the nano](#flashing-the-nano)
    * [Flashing the powerboard](#flashing-the-powerboard)
    * [Setting up nano](#setting-up-nano)
@@ -20,15 +21,26 @@ To use most of these commands you will either need to be on the tbots wifi netwo
 
 The IP address of the robots on the tbots network is `192.168.0.20<robot_id>` so for robot id `1` the ip is `192.168.0.201`. If you are using ethernet tethering you will need to use a network utility (tshark, wireshark, arp) to determine the ip address.
 
+## Miscellaneous Ansible Tasks & Options
+
+Individual miscellaneous tasks (ex reboot, shutdown, rtt test) can be run through the `misc.yml` playbook by specifying the corresponding tag.
+
+To view a list of supported arguments, run 
+``bazel run :run_ansible --cpu=jetson_nano -- -h`` 
+
+If desired, the `--hosts` argument can be replaced with `-p`, `--port`, defining a port to listen to for Announcements from hosts.
+
+The `--tags` argument can be used to specify which actions to perform and on which services.
+
 ## Flashing the nano
 
-This will stop the current systemd services, replace and restart them. Binaries that are used for systemd services are located in a folder on home(the default directory) called thunderbots_binaries.
+This will stop the current systemd services, replace and restart them. Binaries that are used for systemd services are located in a folder in `home/robot` (the default directory) called `thunderbots_binaries`.
 
 <b>To build this for the first time you will need to run this with internet access. Then run it again on the tbots network</b>
 
 <b>This will trigger motor calibration meaning the wheels may spin. Please put the robot on a piece of tape to mitigate this</b>
 
-`bazel run //software/jetson_nano/ansible:run_ansible --cpu=jetson_nano -- -playbook deploy_nano.yml --hosts <robot_ip> --ssh_pass thunderbots`
+`./tbots.py run run_ansible --cpu=jetson_nano -- --playbook deploy_nano.yml --hosts <robot_ip> --ssh_pass thunderbots`
 
 ## Flashing the powerboard
 
@@ -36,7 +48,7 @@ This will flash powerloop, the current firmware in `software/power/`, onto the p
 
 Looking from the back of the robot the reset and boot buttons are on right side of the battery holder on the lowest board with the reset being on the left and the boot on the right. <b>Warning it may kick/chip when pressed.</b>
 
-`bazel run //software/jetson_nano/ansible:run_ansible --cpu=jetson_nano -- -playbook deploy_powerboard.yml --hosts <robot_ip> --ssh_pass thunderbots`
+`./tbots.py run run_ansible --cpu=jetson_nano -- --playbook deploy_powerboard.yml --hosts <robot_ip> --ssh_pass thunderbots`
 
 ## Setting up nano 
 
@@ -44,7 +56,7 @@ This refers to setting up the jetson nano for the first time. This will enable s
 
 <b>Setting up the nano for the first time requires internet access!!!</b>
 
-`bazel run //software/jetson_nano/ansible:run_ansible --cpu=jetson_nano -- -playbook setup_nano.yml --hosts <robot_ip> --ssh_pass thunderbots`
+`./tbots.py run run_ansible --cpu=jetson_nano -- --playbook setup_nano.yml --hosts <robot_ip> --ssh_pass thunderbots`
 
 ## Robot Diagnostics
 
