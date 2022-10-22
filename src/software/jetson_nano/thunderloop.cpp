@@ -53,6 +53,7 @@ void Thunderloop::runLoop()
     struct timespec poll_time;
     struct timespec iteration_time;
     struct timespec last_primitive_received_time;
+    struct timespec last_world_recieved_time;
     struct timespec current_time;
 
     // Input buffer
@@ -151,16 +152,27 @@ void Thunderloop::runLoop()
             if (new_world.time_sent().epoch_timestamp_seconds() >
                 world_.time_sent().epoch_timestamp_seconds())
             {
+                clock_gettime(CLOCK_MONOTONIC, &last_world_recieved_time);
                 primitive_executor_.updateWorld(new_world);
                 world_ = new_world;
             }
 
             // if world not sent in a while, time out
-            LOG(INFO) << "world_ timestamp: " << world_.time_sent().epoch_timestamp_seconds();
-            if (new_world.time_sent().epoch_timestamp_seconds() > // TODO: this should be the current time
-                world_.time_sent().epoch_timestamp_seconds() + WORLD_TIMEOUT_S)
+            struct timespec world_result;
+
+            clock_gettime(CLOCK_MONOTONIC, &current_time);
+            ScopedTimespecTimer::timespecDiff(&current_time,
+                                              &last_world_recieved_time, &world_result);
+
+            auto nanoseconds_elapsed_since_last_world =
+                    world_result.tv_sec * static_cast<int>(NANOSECONDS_PER_SECOND) +
+                    world_result.tv_nsec;
+
+            LOG(INFO) << "Nanos since last world: " << nanoseconds_elapsed_since_last_world; //TODO remove
+            if (nanoseconds_elapsed_since_last_world >
+                static_cast<long>(PRIMITIVE_MANAGER_TIMEOUT_NS))
             {
-                LOG(INFO) << "World stop";
+                LOG(INFO) << "World stop"; //TODO remove
                 primitive_executor_.setStopPrimitive();
             }
 
@@ -169,20 +181,20 @@ void Thunderloop::runLoop()
                 ScopedTimespecTimer timer(&poll_time);
 
                 // Handle emergency stop override
-                struct timespec result;
+                struct timespec primitive_result;
 
                 clock_gettime(CLOCK_MONOTONIC, &current_time);
                 ScopedTimespecTimer::timespecDiff(&current_time,
-                                                  &last_primitive_received_time, &result);
+                                                  &last_primitive_received_time, &primitive_result);
 
                 auto nanoseconds_elapsed_since_last_primitive =
-                    result.tv_sec * static_cast<int>(NANOSECONDS_PER_SECOND) +
-                    result.tv_nsec;
+                        primitive_result.tv_sec * static_cast<int>(NANOSECONDS_PER_SECOND) +
+                        primitive_result.tv_nsec;
 
                 if (nanoseconds_elapsed_since_last_primitive >
                     static_cast<long>(PRIMITIVE_MANAGER_TIMEOUT_NS))
                 {
-                    LOG(INFO) << "Primitive stop";
+                    LOG(INFO) << "Primitive stop"; //TODO remove
                     primitive_executor_.setStopPrimitive();
                 }
 
