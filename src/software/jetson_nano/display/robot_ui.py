@@ -31,12 +31,11 @@ class ScreenActions:
 screen_actions = ScreenActions()
 
 # These are the keys for the redis dicationary
-# TODO(#2728): Replace key strings with values from constants
 redis_keys = [
     ROBOT_ID_REDIS_KEY,
     ROBOT_MULTICAST_CHANNEL_REDIS_KEY,
     ROBOT_BATTERY_VOLTAGE_REDIS_KEY,
-    CAPACITOR_VOLTAGE_REDIS_KEY,
+    ROBOT_CAPACITOR_VOLTAGE_REDIS_KEY,
     ROBOT_CURRENT_DRAW_REDIS_KEY,
 ]
 
