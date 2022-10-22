@@ -13,18 +13,16 @@ from software.logger.logger import createLogger
 
 logger = createLogger(__name__)
 
-LAUNCH_DELAY_S = 1
+LAUNCH_DELAY_S = 0.1
 PAUSE_AFTER_FAIL_DELAY_S = 3
 TEST_END_DELAY = 0.5
-simulator_proto_unix_io = ProtoUnixIO()
-yellow_full_system_proto_unix_io = ProtoUnixIO()
-blue_full_system_proto_unix_io = ProtoUnixIO()
+
 
 
 def enable_thunderscope(test):
     """ A decorator that runs a test with thunderscope, based on command line arguments
 
-        test (_type_): _description_
+        test: the test to be run
     """
 
     def wrapper(*args, **kw):
@@ -66,7 +64,7 @@ def enable_thunderscope(test):
             )
             ex = Excepthook()
             threading.excepthook = ex.excepthook
-            run_sim_thread = threading.Thread(target=run_test)
+            run_sim_thread = threading.Thread(target=run_test, daemon=True)
             run_sim_thread.start()
 
             thunderscope.show()
@@ -102,6 +100,15 @@ def field_test_runner():
 
 @pytest.fixture
 def simulated_test_runner():
+    global simulator_proto_unix_io
+    simulator_proto_unix_io = ProtoUnixIO()
+
+    global yellow_full_system_proto_unix_io
+    yellow_full_system_proto_unix_io = ProtoUnixIO()
+
+    global blue_full_system_proto_unix_io
+    blue_full_system_proto_unix_io = ProtoUnixIO()
+
     args = load_command_line_arguments()
 
     initializer = simulated_test_initializer(
@@ -115,11 +122,11 @@ def simulated_test_runner():
 
     yield yield_val
 
-    # teardown
-    try:
-        next(initializer)
-    except StopIteration:
-        pass
+    # # teardown
+    # try:
+    #     next(initializer)
+    # except StopIteration:
+    #     pass
 
 
 @pytest.fixture
