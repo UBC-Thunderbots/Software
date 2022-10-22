@@ -3,16 +3,17 @@
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/mman.h>  // Needed for mlockall()
-#include <unistd.h>    // needed for sysconf(int name);
+#include <sys/mman.h>      // Needed for mlockall()
+#include <sys/resource.h>  // needed for getrusage
+#include <sys/time.h>      // needed for getrusage
+#include <unistd.h>        // needed for sysconf(int name);
 
 #include "proto/tbots_software_msgs.pb.h"
 #include "shared/2021_robot_constants.h"
 #include "shared/constants.h"
 #include "software/jetson_nano/thunderloop.h"
-#include "software/logger/logger.h"
+#include "software/logger/network_logger.h"
 #include "software/world/robot_state.h"
-
 
 // clang-format off
 std::string BANNER =
@@ -92,12 +93,7 @@ int main(int argc, char** argv)
     const int pre_allocation_size = 20 * 1024 * 1024;
     reserveProcessMemory(pre_allocation_size);
 
-    // TODO (#2338) replace with network logger
-    LoggerSingleton::initializeLogger("/tmp");
-
-    auto thunderloop = Thunderloop(create2021RobotConstants(), create2021WheelConstants(),
-                                   CONTROL_LOOP_HZ);
-
+    auto thunderloop = Thunderloop(create2021RobotConstants(), CONTROL_LOOP_HZ);
     thunderloop.runLoop();
 
     return 0;

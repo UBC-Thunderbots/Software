@@ -30,7 +30,7 @@ TEST_F(FreeKickPlayTest, test_free_kick_play_on_enemy_half)
          field.enemyDefenseArea().negXPosYCorner()});
 
     setEnemyGoalie(0);
-    setAIPlay(TYPENAME(FreeKickPlay));
+    setAiPlay(TbotsProto::PlayName::FreeKickPlay);
     setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::INDIRECT_FREE_US);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
@@ -64,7 +64,7 @@ TEST_F(FreeKickPlayTest, test_free_kick_play_on_friendly_half)
          field.enemyDefenseArea().negXNegYCorner(),
          field.enemyDefenseArea().negXPosYCorner()});
     setEnemyGoalie(0);
-    setAIPlay(TYPENAME(FreeKickPlay));
+    setAiPlay(TbotsProto::PlayName::FreeKickPlay);
     setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::INDIRECT_FREE_US);
 
     std::vector<ValidationFunction> terminating_validation_functions = {

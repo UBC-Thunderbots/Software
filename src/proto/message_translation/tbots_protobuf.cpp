@@ -1,32 +1,6 @@
 #include "proto/message_translation/tbots_protobuf.h"
 
 
-std::unique_ptr<TbotsProto::Vision> createVision(const World& world)
-{
-    // create msg and set timestamp
-    auto vision_msg                    = std::make_unique<TbotsProto::Vision>();
-    *(vision_msg->mutable_time_sent()) = *createCurrentTimestamp();
-
-    // set robot_states map
-    auto& robot_states_map = *vision_msg->mutable_robot_states();
-    auto friendly_robots   = world.friendlyTeam().getAllRobots();
-
-    // For every friendly robot, we create a RobotState proto. The unique_ptr
-    // is dereferenced, and there is an implicit deep copy into robot_states_map
-    //
-    // Since the unique_ptr immediately loses scope after the copy, the memory is
-    // freed
-    std::for_each(friendly_robots.begin(), friendly_robots.end(),
-                  [&](const Robot& robot) {
-                      robot_states_map[robot.id()] = *createRobotStateProto(robot);
-                  });
-
-    // set ball state
-    *(vision_msg->mutable_ball_state()) = *createBallState(world.ball());
-
-    return vision_msg;
-}
-
 std::unique_ptr<TbotsProto::World> createWorld(const World& world)
 {
     // create msg
@@ -350,4 +324,27 @@ BallState createBallState(const TbotsProto::BallState ball_state)
     return BallState(createPoint(ball_state.global_position()),
                      createVector(ball_state.global_velocity()),
                      ball_state.distance_from_ground());
+}
+
+std::unique_ptr<TbotsProto::PassVisualization> createPassVisualization(
+    const std::vector<PassWithRating>& passes_with_rating)
+{
+    auto pass_visualization_msg = std::make_unique<TbotsProto::PassVisualization>();
+
+    for (const auto& pass_with_rating : passes_with_rating)
+    {
+        auto pass_msg = std::make_unique<TbotsProto::Pass>();
+        *(pass_msg->mutable_passer_point()) =
+            *createPointProto(pass_with_rating.pass.passerPoint());
+        *(pass_msg->mutable_receiver_point()) =
+            *createPointProto(pass_with_rating.pass.receiverPoint());
+        pass_msg->set_pass_speed_m_per_s(pass_with_rating.pass.speed());
+
+        auto pass_with_rating_msg = std::make_unique<TbotsProto::PassWithRating>();
+        pass_with_rating_msg->set_rating(pass_with_rating.rating);
+        *(pass_with_rating_msg->mutable_pass_()) = *pass_msg;
+
+        *(pass_visualization_msg->add_best_passes()) = *pass_with_rating_msg;
+    }
+    return pass_visualization_msg;
 }

@@ -5,19 +5,6 @@ package TbotsProto;
 import "proto/vision.proto";
 import "proto/primitive.proto";
 import "proto/tbots_timestamp_msg.proto";
-import "generator/nanopb/options.proto";
-
-message Vision
-{
-    // Epoch timestamp of captured vision data
-    Timestamp time_sent = 1;
-
-    // Robot ID to RobotState map
-    map<uint32, RobotState> robot_states = 2;
-
-    // Ball state
-    BallState ball_state = 3;
-}
 
 message PrimitiveSet
 {
@@ -25,10 +12,10 @@ message PrimitiveSet
     Timestamp time_sent = 1;
 
     // Whether robots should stay away from the ball (eg. during stop play)
-    bool stay_away_from_ball = 3;
+    bool stay_away_from_ball = 2;
 
     // Robot ID to RadioPrimitive map
-    // NOTE: The `max_count` for this field should be set to a number that is less then
-    //       or equal to the maximum number of robots we expect to run
-    map<uint32, Primitive> robot_primitives = 2 [(nanopb.fieldopt).max_count = 20];
+    map<uint32, Primitive> robot_primitives = 3;
+
+    uint64 sequence_number = 4;
 }

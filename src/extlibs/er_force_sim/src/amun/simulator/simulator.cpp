@@ -20,10 +20,12 @@
 
 #include "simulator.h"
 
+#include <QtCore/QPair>
 #include <QtCore/QTimer>
 #include <QtCore/QVector>
 #include <QtCore/QtDebug>
 #include <algorithm>
+#include <functional>
 
 #include "erroraggregator.h"
 #include "extlibs/er_force_sim/src/core/coordinates.h"
@@ -32,6 +34,7 @@
 #include "simball.h"
 #include "simfield.h"
 #include "simrobot.h"
+
 
 using namespace camun::simulator;
 
@@ -132,8 +135,8 @@ Simulator::Simulator(const amun::SimulatorSetup &setup)
     for (const auto &camera : setup.camera_setup())
     {
         m_data->reportedCameraSetup.append(camera);
-        Vector visionPosition(camera.derived_camera_world_tx(),
-                              camera.derived_camera_world_ty());
+        ErForceVector visionPosition(camera.derived_camera_world_tx(),
+                                     camera.derived_camera_world_ty());
         btVector3 truePosition;
         coordinates::fromVision(visionPosition, truePosition);
         truePosition.setZ(camera.derived_camera_world_tz() / 1000.0f);
@@ -299,7 +302,6 @@ void Simulator::resetFlipped(Simulator::RobotMap &robots, float side)
 void Simulator::stepSimulation(double time_s)
 {
     m_data->dynamicsWorld->stepSimulation(time_s, 10, SUB_TIMESTEP);
-    handleSimulatorTick(time_s);
     m_time += time_s * 1E9;
 }
 
@@ -318,8 +320,18 @@ void Simulator::handleSimulatorTick(double time_s)
                 &ErrorAggregator::aggregate);
     }
 
+    // find out if ball and any robot collide
+    auto robot_ball_collision = [this](QPair<SimRobot *, unsigned int> elem) {
+        return elem.first->touchesBall(this->m_data->ball);
+    };
+
+    bool ball_collision = std::any_of(m_data->robotsBlue.begin(),
+                                      m_data->robotsBlue.end(), robot_ball_collision) ||
+                          std::any_of(m_data->robotsYellow.begin(),
+                                      m_data->robotsYellow.end(), robot_ball_collision);
+
     // apply commands and forces to ball and robots
-    m_data->ball->begin();
+    m_data->ball->begin(ball_collision);
     for (const auto &pair : m_data->robotsBlue)
     {
         pair.first->begin(m_data->ball, time_s);
@@ -712,7 +724,7 @@ void Simulator::moveRobot(const sslsim::TeleportRobot &robot)
             }
             else
             {
-                Vector targetPos;
+                ErForceVector targetPos;
                 coordinates::fromVision(robot, targetPos);
                 // TODO: check if the given position is fine
                 createRobot(list, targetPos.x, targetPos.y, robot.id().id(), m_aggregator,

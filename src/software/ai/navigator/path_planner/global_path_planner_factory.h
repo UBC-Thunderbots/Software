@@ -1,9 +1,11 @@
+#pragma once
+
 #include <map>
 #include <set>
 
-#include "shared/parameter/cpp_dynamic_parameters.h"
+#include "proto/parameters.pb.h"
+#include "proto/primitive.pb.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
-#include "software/ai/motion_constraint/motion_constraint.h"
 #include "software/ai/motion_constraint/motion_constraint_set_builder.h"
 #include "software/ai/navigator/obstacle/robot_navigation_obstacle_factory.h"
 #include "software/ai/navigator/path_planner/enlsvg_path_planner.h"
@@ -11,11 +13,6 @@
 #include "software/geom/point.h"
 #include "software/logger/logger.h"
 
-using Path = LinearSpline2d;
-
-// TODO #2504: The GlobalPathPlanner doesn't handle
-// MotionConstraint::AVOID_BALL_PLACEMENT_INTERFERENCE and
-// MotionConstraint::HALF_METER_AROUND_BALL correctly in most situations
 /**
  * GlobalPathPlannerFactory is a module that constructs every possible path planner for
  * every possible combination of static obstacles. It pre-computes static obstacle
@@ -27,17 +24,16 @@ class GlobalPathPlannerFactory
 {
    public:
     /**
-     * Creates path planners for every possible combination of obstacles using the World´s
-     * field and obstacle config's motion constraints.
+     * Creates path planners for every possible combination of obstacles using the field,
+     * obstacle config, and motion constraints.
      *
      * @param navigation_obstacle_config the config used to get motion constraints
      * into obstacles
-     * @param world                      the world used to create the path planner grid
-     * and obstacles
+     * @param field the field used to create the path planner grid and obstacles
      */
-    GlobalPathPlannerFactory(const std::shared_ptr<const RobotNavigationObstacleConfig>
-                                 navigation_obstacle_config,
-                             const World &world);
+    GlobalPathPlannerFactory(
+        const TbotsProto::RobotNavigationObstacleConfig navigation_obstacle_config,
+        const Field &field);
 
     /**
      * Given a set of motion constraints, returns the relevant EnlsvgPathPlanner. If the
@@ -49,9 +45,28 @@ class GlobalPathPlannerFactory
      * @return path planner for static obstacles created by constraints
      */
     std::shared_ptr<const EnlsvgPathPlanner> getPathPlanner(
-        const std::set<MotionConstraint> &constraints) const;
+        std::set<TbotsProto::MotionConstraint> constraints) const;
+
+    /**
+     * Given a set of motion constraints, returns the relevant obstacles. If the
+     * obstacles not cached, then it returns no obstacles.
+     *
+     * @param constraints    the motion constraints used to get the relevant obstacles
+     *
+     * @return obstacles for the motion constraints
+     */
+    google::protobuf::RepeatedPtrField<TbotsProto::Obstacles> getStaticObstacles(
+        std::set<TbotsProto::MotionConstraint> constraints) const;
 
    private:
-    std::map<std::set<MotionConstraint>, std::shared_ptr<const EnlsvgPathPlanner>>
+    std::map<std::set<TbotsProto::MotionConstraint>,
+             std::shared_ptr<const EnlsvgPathPlanner>>
         planners;
+
+    std::map<std::set<TbotsProto::MotionConstraint>,
+             google::protobuf::RepeatedPtrField<TbotsProto::Obstacles>>
+        motion_constraint_to_obstacles;
+
+    // Cache which motion constraints are dynamic for convenience
+    std::set<TbotsProto::MotionConstraint> dynamic_motion_constraints;
 };

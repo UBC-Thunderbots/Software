@@ -12,6 +12,7 @@ Angle ReceiverFSM::getOneTouchShotDirection(const Ray& shot, const Ball& ball)
     // "cancel out" in order for our shot to go in the expected direction.
     // The scaling factor of 0.3 is a magic number that was carried over from the old
     // code. It seems to work well on the field.
+    // TODO (#2570): tune this
     double lateral_speed = 0.3 * lateral_vel.length();
 
     // This kick speed is based off of the value used in the firmware `MovePrimitive`
@@ -80,11 +81,11 @@ std::optional<Shot> ReceiverFSM::findFeasibleShot(const World& world,
         Vector robot_to_shot_target =
             best_shot_opt.value().getPointToShootAt() - assigned_robot.position();
         abs_angle_between_pass_and_shot_vectors =
-            acuteAngle(robot_to_ball, robot_to_shot_target);
+            convexAngle(robot_to_ball, robot_to_shot_target);
 
         Angle goal_angle =
-            acuteAngle(world.field().friendlyGoalpostPos(), assigned_robot.position(),
-                       world.field().friendlyGoalpostNeg());
+            convexAngle(world.field().friendlyGoalpostPos(), assigned_robot.position(),
+                        world.field().friendlyGoalpostNeg());
 
         double net_percent_open =
             best_shot_opt.value().getOpenAngle().toDegrees() / goal_angle.toDegrees();
@@ -116,8 +117,8 @@ void ReceiverFSM::updateOnetouch(const Update& event)
 
     if (best_shot && event.control_params.pass)
     {
-        event.common.set_intent(std::make_unique<MoveIntent>(
-            event.common.robot.id(), one_touch.getPointToShootAt(),
+        event.common.set_primitive(createMovePrimitive(
+            CREATE_MOTION_CONTROL(one_touch.getPointToShootAt()),
             one_touch.getOpenAngle(), 0, TbotsProto::DribblerMode::OFF,
             TbotsProto::BallCollisionType::ALLOW,
             AutoChipOrKick{AutoChipOrKickMode::AUTOKICK,
@@ -125,14 +126,18 @@ void ReceiverFSM::updateOnetouch(const Update& event)
             TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
             event.common.robot.robotConstants()));
     }
+    else
+    {
+        event.common.set_primitive(createStopPrimitive(false));
+    }
 }
 
 void ReceiverFSM::updateReceive(const Update& event)
 {
     if (event.control_params.pass)
     {
-        event.common.set_intent(std::make_unique<MoveIntent>(
-            event.common.robot.id(), event.control_params.pass->receiverPoint(),
+        event.common.set_primitive(createMovePrimitive(
+            CREATE_MOTION_CONTROL(event.control_params.pass->receiverPoint()),
             event.control_params.pass->receiverOrientation(), 0,
             TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
             AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
@@ -147,7 +152,7 @@ void ReceiverFSM::adjustReceive(const Update& event)
     auto robot_pos = event.common.robot.position();
 
     if ((ball.position() - robot_pos).length() >
-        DIST_TO_FRONT_OF_ROBOT_METERS + 2 * BALL_MAX_RADIUS_METERS)
+        BALL_TO_FRONT_OF_ROBOT_DISTANCE_WHEN_DRIBBLING)
     {
         Point ball_receive_pos = ball.position();
 
@@ -159,8 +164,8 @@ void ReceiverFSM::adjustReceive(const Update& event)
 
         Angle ball_receive_orientation = (ball.position() - robot_pos).orientation();
 
-        event.common.set_intent(std::make_unique<MoveIntent>(
-            event.common.robot.id(), ball_receive_pos, ball_receive_orientation, 0,
+        event.common.set_primitive(createMovePrimitive(
+            CREATE_MOTION_CONTROL(ball_receive_pos), ball_receive_orientation, 0,
             TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
             AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
             TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,

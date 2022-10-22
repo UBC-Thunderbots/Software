@@ -5,8 +5,8 @@
 #include "proto/message_translation/ssl_detection.h"
 #include "proto/message_translation/ssl_geometry.h"
 #include "proto/message_translation/ssl_referee.h"
+#include "proto/parameters.pb.h"
 #include "proto/sensor_msg.pb.h"
-#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/sensor_fusion/filter/ball_filter.h"
 #include "software/sensor_fusion/filter/robot_team_filter.h"
 #include "software/sensor_fusion/filter/vision_detection.h"
@@ -24,9 +24,9 @@ class SensorFusion
     /**
      * Creates a SensorFusion with a sensor_fusion_config
      *
-     * @param sensor_fusion_config the config to fetch parameters from
+     * @param sensor_fusion_config The config to fetch parameters from
      */
-    explicit SensorFusion(std::shared_ptr<const SensorFusionConfig> sensor_fusion_config);
+    explicit SensorFusion(TbotsProto::SensorFusionConfig sensor_fusion_config);
 
     virtual ~SensorFusion() = default;
 
@@ -107,8 +107,9 @@ class SensorFusion
      * Checks for a vision reset and if there is one, then reset SensorFusion
      *
      * @param t_capture The t_capture of a new packet
+     * @returns true if a reset is detected
      */
-    void checkForVisionReset(double t_capture);
+    bool checkForVisionReset(double t_capture);
 
     /**
      * Resets the world components to initial state
@@ -125,7 +126,7 @@ class SensorFusion
      */
     static bool teamHasBall(const Team &team, const Ball &ball);
 
-    std::shared_ptr<const SensorFusionConfig> sensor_fusion_config;
+    TbotsProto::SensorFusionConfig sensor_fusion_config;
     std::optional<Field> field;
     std::optional<Ball> ball;
     Team friendly_team;
@@ -139,8 +140,12 @@ class SensorFusion
 
     TeamSide team_with_possession;
 
+    std::optional<RobotId> friendly_robot_id_with_ball_in_dribbler;
+
     unsigned int friendly_goalie_id;
     unsigned int enemy_goalie_id;
+    bool defending_positive_side;
+    int ball_in_dribbler_timeout;
 
     // The number of "reset packets" we have received. These indicate that the
     // vision time should be reset. Please see `checkForVisionReset` to see how

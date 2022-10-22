@@ -1,17 +1,19 @@
 import adafruit_rgb_display.st7735 as st7735
 import board
+import busio
 import digitalio
 from PIL import Image, ImageDraw, ImageOps
 
 """
-Information for the display that we are using can be found here: https://www.adafruit.com/product/358#description
+Information for the display that we are using can be found here:
+https://www.adafruit.com/product/358#description
 
 Pin Connections:
     Jetson Nano              LCD Display
         Pin 6  (GND)            Pin 1  (GND)
         Pin 1  (3.3V)           Pin 2  (VCC)
         Pin 18                  Pin 3  (Reset)
-        Pin 22                  Pin 4  (D/C) 
+        Pin 40                  Pin 4  (D/C) 
         N/C                     Pin 5  (CARD_CS)
         Pin 24 (CS)             Pin 6  (TFT_CS)
         Pin 19 (MOSI)           Pin 7  (MOSI)
@@ -21,17 +23,18 @@ Pin Connections:
 """
 
 # Configuration for CS and DC pins (these are PiTFT defaults):
-CS_PIN = digitalio.DigitalInOut(board.CE0)  # Pin 24
-DC_PIN = digitalio.DigitalInOut(board.D25)  # Pin 22
-RESET_PIN = digitalio.DigitalInOut(board.D24)  # Pin 18
+CS_PIN = digitalio.DigitalInOut(board.D23)
+DC_PIN = digitalio.DigitalInOut(board.D21)
+RESET_PIN = digitalio.DigitalInOut(board.D24)
 
-# Config for display baudrate to 4MHz:
-BAUDRATE = 4000000
+# Config for display baudrate to 10 MHz:
+BAUDRATE = 1000000
+
 # Config the proper screen rotation
 ROTATION = 90
 
 # Setup SPI bus using hardware SPI:
-SPI = board.SPI()
+SPI = busio.SPI(board.SCK_1, MOSI=board.MOSI_1, MISO=board.MISO_1)
 
 # We will use RGB colour model
 COLOUR_MODEL = "RGB"
@@ -39,7 +42,7 @@ COLOUR_MODEL = "RGB"
 
 class LcdDisplay:
     def __init__(self):
-        """ Create a lcd_dislpay object """
+        """ Create a lcd_display object """
         # Create the display for 1.8" ST7735R:
         self.disp = st7735.ST7735R(
             SPI,
@@ -55,23 +58,22 @@ class LcdDisplay:
         self.width = self.disp.height
         self.height = self.disp.width
 
+        # Create blank image for drawing
+        self.image = Image.new(COLOUR_MODEL, (self.width, self.height))
+        # Get drawing object to draw on image
+        self.draw = ImageDraw.Draw(self.image)
+
         # Initialize to an empty black screen
         self.clear_screen()
 
     def clear_screen(self):
         """ Clear this LCD display, make it black """
-        # Create blank image for drawing.
-        image = Image.new(COLOUR_MODEL, (self.width, self.height))
-
-        # Get drawing object to draw on image.
-        draw = ImageDraw.Draw(image)
-
         # Draw a black filled box to clear the image.
-        draw.rectangle((0, 0, self.width, self.height), outline=0, fill=(0, 0, 0))
-        self.disp.image(image)
+        self.draw.rectangle((0, 0, self.width, self.height), outline=0, fill=(0, 0, 0))
+        self.disp.image(self.image)
 
     def draw_image(self, path_to_image):
-        """ Draw Thunderbots Logo on this LCD display """
+        """ Draw image on this LCD display """
         self.clear_screen()
 
         image = Image.open(path_to_image)
@@ -96,9 +98,10 @@ class LcdDisplay:
         # Display image
         self.disp.image(image)
 
+    def prepare(self):
+        """ Create a blank rectangle for drawing """
+        self.draw.rectangle((0, 20, self.width, self.height), outline=0, fill=0)
 
-if __name__ == "__main__":
-    path_to_logo = "./imgs/tbots.jpg"
-
-    display = LcdDisplay()
-    display.draw_image(path_to_logo)
+    def show(self):
+        """ Display the image """
+        self.disp.image(self.image)

@@ -1,4 +1,5 @@
 #pragma once
+#include <Eigen/Dense>
 #include <memory>
 #include <string>
 
@@ -6,10 +7,9 @@
 #include "proto/tbots_software_msgs.pb.h"
 #include "shared/robot_constants.h"
 #include "software/jetson_nano/gpio.h"
-#include "software/jetson_nano/services/service.h"
+#include "software/physics/euclidean_to_wheel.h"
 
-
-class MotorService : public Service
+class MotorService
 {
    public:
     /**
@@ -17,36 +17,27 @@ class MotorService : public Service
      * Opens all the required ports and maintains them until destroyed.
      *
      * @param RobotConstants_t The robot constants
-     * @param WheelConstants_t The wheel constants
+     * @param control_loop_frequency_hz The frequency the main loop will call poll at
      */
-    MotorService(const RobotConstants_t& robot_constants,
-                 const WheelConstants_t& wheel_constants);
+    MotorService(const RobotConstants_t& robot_constants, int control_loop_frequency_hz);
 
     virtual ~MotorService();
-
-    /**
-     * Starts the motor service by pulling the enable pin high.
-     */
-    void start() override;
-
-    /**
-     * Pulls the enable pin low to disable the motor board.
-     */
-    void stop() override;
 
     /**
      * When the motor service is polled with a DirectControlPrimitive msg,
      * call the appropriate trinamic api function to spin the appropriate motor.
      *
-     * @param direct_control The direct_control msg to unpack and execute on the motors
-     * @returns DriveUnitStatus The status of all the drive units
+     * @param motor The motor msg to unpack and execute on the motors
+     * @param time_elapsed_since_last_poll_s The time since last poll was called in
+     * seconds
+     * @returns MotorStatus The status of all the drive units
      */
-    std::unique_ptr<TbotsProto::DriveUnitStatus> poll(
-        const TbotsProto::DirectControlPrimitive& direct_control);
+    TbotsProto::MotorStatus poll(const TbotsProto::MotorControl& motor_control,
+                                 double time_elapsed_since_last_poll_s);
 
     /**
-     * Trinamic API binding, sets spi_cs_driver_to_controller_demux appropriately
-     * and calls readWriteByte. See C++ implementation file for more info
+     * Trinamic API binding, sets spi_demux_select_0|1 pins
+     * appropriately and calls readWriteByte. See C++ implementation file for more info
      *
      * @param motor Which motor to talk to (in our case, the chip select)
      * @param data The data to send
@@ -70,7 +61,8 @@ class MotorService : public Service
      *
      * @param motor The motor to initialize the encoder for
      */
-    void calibrateEncoder(uint8_t motor);
+    void startEncoderCalibration(uint8_t motor);
+    void endEncoderCalibration(uint8_t motor);
 
     /**
      * Spin the motor in openloop mode (safe to run before encoder initialization)
@@ -92,12 +84,18 @@ class MotorService : public Service
 
    private:
     /**
+     * Checks for faults, clears them and sets up motors.
+     *
+     */
+    void setUpMotors();
+    /**
      * Calls the configuration functions below in the right sequence
      *
      * @param motor The motor setup the driver/controller for
+     * @param dribbler If true, configures the motor to be a dribbler
      */
     void startDriver(uint8_t motor);
-    void startController(uint8_t motor);
+    void startController(uint8_t motor, bool dribbler);
 
     /**
      * Configuration settings
@@ -110,18 +108,19 @@ class MotorService : public Service
      * with the TMC6100 EVAL to get the motor spinning.
      *
      * Then using the exported registers as a baseline, you can use the
-     * runOpenLoopCalibrationRoutine and plot the generated csvs. These csvs
-     * capture the data for encoder calibration and adc configuration, the two
-     * most important steps for the motor to work.
-     *
-     * Page 143 (title Setup Guidelines) of the TMC4671 is very useful.
+     * runOpenLoopCalibrationRoutine and plot the generated csvs. These csvs capture the
+     * data for encoder calibration and adc configuration, the two most important steps
+     * for the motor to work. Page 143 (title Setup Guidelines) of the TMC4671 is very
+     * useful.
      *
      * @param motor The motor to configure (the same value as the chip select)
      */
     void configurePWM(uint8_t motor);
-    void configurePI(uint8_t motor);
+    void configureDribblerPI(uint8_t motor);
+    void configureDrivePI(uint8_t motor);
     void configureADC(uint8_t motor);
     void configureEncoder(uint8_t motor);
+    void configureHall(uint8_t motor);
 
     /**
      * A lot of initialization parameters are necessary to function. Even if
@@ -146,25 +145,57 @@ class MotorService : public Service
      * @param tx The tx buffer, data to send out
      * @param rx The rx buffer, will be updated with data from the full-duplex transfer
      * @param len The length of the tx and rx buffer
+     * @param spi_speed The speed to run spi at
      *
      */
-    void spiTransfer(int fd, uint8_t const* tx, uint8_t const* rx, unsigned len);
+    void spiTransfer(int fd, uint8_t const* tx, uint8_t const* rx, unsigned len,
+                     uint32_t spi_speed);
 
+    /**
+     * Ramp the velocity over the given timestep and set the target velocity on the motor.
+     *
+     * NOTE: This function has no state.
+     * Also NOTE: This function handles all electrical rpm to meters/second conversion.
+     *
+     * @param velocity_target The target velocity in m/s
+     * @param velocity_current The current velocity m/s
+     * @param time_to_ramp The time allocated for acceleration in seconds
+     *
+     */
+    WheelSpace_t rampWheelVelocity(const WheelSpace_t& current_wheel_velocity,
+                                   const EuclideanSpace_t& target_euclidean_velocity,
+                                   double max_allowable_wheel_velocity,
+                                   double allowed_acceleration,
+                                   const double& time_to_ramp);
     /**
      * Trinamic API Binding function
      *
      * @param motor Which motor to talk to (in our case, the chip select)
      * @param data The data to send
      * @param last_transfer The last transfer of uint8_t data for this transaction.
+     * @param spi_speed The speed to run spi at
+     *
      * @return A byte read from the trinamic chip
      */
-    uint8_t readWriteByte(uint8_t motor, uint8_t data, uint8_t last_transfer);
+    uint8_t readWriteByte(uint8_t motor, uint8_t data, uint8_t last_transfer,
+                          uint32_t spi_speed);
+
+
+    /**
+     * Log the driver fault in a human readable log msg
+     *
+     * @param motor The motor to log the status for
+     * @return bool true if faulted
+     */
+    bool checkDriverFault(uint8_t motor);
 
     // Select between driver and controller gpio
-    GPIO spi_cs_driver_to_controller_demux_gpio;
+    GPIO spi_demux_select_0;
+    GPIO spi_demux_select_1;
 
     // Enable driver gpio
     GPIO driver_control_enable_gpio;
+    GPIO reset_gpio;
 
     // Transfer Buffers
     uint8_t tx[5] = {0};
@@ -178,10 +209,14 @@ class MotorService : public Service
 
     // Constants
     RobotConstants_t robot_constants_;
-    WheelConstants_t wheel_constants_;
 
     // SPI File Descriptors
     std::unordered_map<int, int> file_descriptors;
 
+    // Drive Motors
+    EuclideanToWheel euclidean_to_four_wheel;
     std::unordered_map<int, bool> encoder_calibrated_;
+
+    // Previous wheel velocities
+    WheelSpace_t prev_wheel_velocities;
 };

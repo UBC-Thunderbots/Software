@@ -1,4 +1,27 @@
-MM_PER_M = 1000
-ROBOT_MAX_RADIUS = 90
-BALL_RADIUS = 20
-UNIX_SOCKET_BASE_PATH = "/tmp/tbots/"
+from pyqtgraph.Qt import QtCore, QtGui
+
+LINE_WIDTH = 3
+SPEED_LINE_WIDTH = 2
+SPEED_SEGMENT_SCALE = 0.2
+
+
+class Colors(object):
+
+    FIELD_COLOR = "w"
+    FIELD_LINE_COLOR = "w"
+
+    BLUE_ROBOT = QtGui.QColor(255, 100, 0, 255)
+    BALL_COLOR = QtGui.QColor(255, 100, 0, 255)
+    SIM_BALL_COLOR = QtGui.QColor(255, 100, 0, 150)
+    YELLOW_ROBOT_COLOR = QtGui.QColor(255, 255, 0, 255)
+    BLUE_ROBOT_COLOR = QtGui.QColor(0, 75, 255, 255)
+    TRANSPARENT = QtGui.QColor(0, 0, 0, 0)
+    DESIRED_ROBOT_LOCATION_OUTLINE = QtGui.QColor(255, 0, 0, 150)
+    SPEED_VECTOR_COLOR = QtGui.QColor(255, 0, 255, 100)
+
+    ROBOT_SPEED_SLOW_COLOR = "black"
+    NAVIGATOR_PATH_COLOR = "green"
+    NAVIGATOR_OBSTACLE_COLOR = "orange"
+
+    VALIDATION_PASSED_COLOR = "g"
+    VALIDATION_FAILED_COLOR = "r"

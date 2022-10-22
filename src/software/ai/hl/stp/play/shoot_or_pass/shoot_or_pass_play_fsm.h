@@ -1,13 +1,15 @@
 #pragma once
 
+#include "proto/parameters.pb.h"
 #include "shared/constants.h"
-#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/hl/stp/play/play_fsm.h"
 #include "software/ai/hl/stp/tactic/attacker/attacker_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/ai/hl/stp/tactic/receiver/receiver_tactic.h"
+#include "software/ai/navigator/obstacle/robot_navigation_obstacle_factory.h"
 #include "software/ai/passing/eighteen_zone_pitch_division.h"
 #include "software/ai/passing/pass_generator.hpp"
+#include "software/geom/algorithms/intersects.h"
 #include "software/logger/logger.h"
 
 using Zones = std::unordered_set<EighteenZoneId>;
@@ -30,7 +32,7 @@ struct ShootOrPassPlayFSM
      *
      * @param ai_config the play config for this play FSM
      */
-    explicit ShootOrPassPlayFSM(std::shared_ptr<const AiConfig> ai_config);
+    explicit ShootOrPassPlayFSM(TbotsProto::AiConfig ai_config);
 
     /**
      * Updates the offensive positioning tactics
@@ -123,18 +125,18 @@ struct ShootOrPassPlayFSM
             // src_state + event [guard] / action = dest_state
             *StartState_S + Update_E / startLookingForPass_A        = AttemptShotState_S,
             AttemptShotState_S + Update_E[passFound_G] / takePass_A = TakePassState_S,
+            AttemptShotState_S + Update_E[tookShot_G]               = X,
             AttemptShotState_S + Update_E[!passFound_G] / lookForPass_A =
                 AttemptShotState_S,
-            AttemptShotState_S + Update_E[tookShot_G]                 = X,
-            TakePassState_S + Update_E[!passCompleted_G] / takePass_A = TakePassState_S,
             TakePassState_S + Update_E[shouldAbortPass_G] / startLookingForPass_A =
                 AttemptShotState_S,
-            TakePassState_S + Update_E[passCompleted_G] / takePass_A = X,
+            TakePassState_S + Update_E[!passCompleted_G] / takePass_A = TakePassState_S,
+            TakePassState_S + Update_E[passCompleted_G] / takePass_A  = X,
             X + Update_E / startLookingForPass_A = AttemptShotState_S);
     }
 
    private:
-    std::shared_ptr<const AiConfig> ai_config;
+    TbotsProto::AiConfig ai_config;
     std::shared_ptr<AttackerTactic> attacker_tactic;
     std::shared_ptr<ReceiverTactic> receiver_tactic;
     std::vector<std::shared_ptr<MoveTactic>> offensive_positioning_tactics;

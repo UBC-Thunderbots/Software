@@ -6,8 +6,6 @@
 #include "software/ai/hl/stp/tactic/kick/kick_fsm.h"
 #include "software/ai/hl/stp/tactic/move/move_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
-#include "software/ai/intent/intent.h"
-#include "software/ai/intent/move_intent.h"
 #include "software/ai/passing/pass.h"
 #include "software/geom/algorithms/closest_point.h"
 #include "software/logger/logger.h"
@@ -37,7 +35,8 @@ struct ReceiverFSM
 
     // The maximum deflection angle that we will attempt a one-touch kick towards the
     // enemy goal with
-    static constexpr Angle MAX_DEFLECTION_FOR_ONE_TOUCH_SHOT = Angle::fromDegrees(60);
+    // TODO (#2570): try to make it as big as possible when tuning
+    static constexpr Angle MAX_DEFLECTION_FOR_ONE_TOUCH_SHOT = Angle::fromDegrees(45);
 
     // The minimum angle between a ball's trajectory and the ball-receiver_point vector
     // for which we can consider a pass to be stray (i.e it won't make it to the receiver)
@@ -172,6 +171,7 @@ struct ReceiverFSM
             OneTouchShotState_S + Update_E[!passFinished_G && strayPass_G] /
                                       adjustReceive_A = ReceiveAndDribbleState_S,
             ReceiveAndDribbleState_S + Update_E[passFinished_G] / adjustReceive_A = X,
-            OneTouchShotState_S + Update_E[passFinished_G] / updateOnetouch_A     = X);
+            OneTouchShotState_S + Update_E[passFinished_G] / updateOnetouch_A     = X,
+            X + Update_E / SET_STOP_PRIMITIVE_ACTION                              = X);
     }
 };

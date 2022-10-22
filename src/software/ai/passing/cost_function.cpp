@@ -2,17 +2,17 @@
 
 #include <numeric>
 
-#include "shared/parameter/cpp_dynamic_parameters.h"
+#include "proto/parameters.pb.h"
 #include "software/../shared/constants.h"
 #include "software/ai/evaluation/calc_best_shot.h"
-#include "software/ai/evaluation/pass.h"
-#include "software/geom/algorithms/acute_angle.h"
+#include "software/ai/evaluation/time_to_travel.h"
 #include "software/geom/algorithms/closest_point.h"
 #include "software/geom/algorithms/contains.h"
+#include "software/geom/algorithms/convex_angle.h"
 #include "software/logger/logger.h"
 
 double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
-                std::shared_ptr<const PassingConfig> passing_config)
+                TbotsProto::PassingConfig passing_config)
 {
     double static_pass_quality =
         getStaticPositionQuality(world.field(), pass.receiverPoint(), passing_config);
@@ -20,10 +20,10 @@ double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
     double friendly_pass_rating =
         ratePassFriendlyCapability(world.friendlyTeam(), pass, passing_config);
 
-    double enemy_pass_rating = ratePassEnemyRisk(
-        world.enemyTeam(), pass,
-        Duration::fromSeconds(passing_config->getEnemyReactionTime()->value()),
-        passing_config->getEnemyProximityImportance()->value());
+    double enemy_pass_rating =
+        ratePassEnemyRisk(world.enemyTeam(), pass,
+                          Duration::fromSeconds(passing_config.enemy_reaction_time()),
+                          passing_config.enemy_proximity_importance());
 
     double shoot_pass_rating =
         ratePassShootScore(world.field(), world.enemyTeam(), pass, passing_config);
@@ -31,8 +31,8 @@ double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
     double in_region_quality = rectangleSigmoid(zone, pass.receiverPoint(), 0.2);
 
     // Place strict limits on the ball speed
-    double min_pass_speed     = passing_config->getMinPassSpeedMPerS()->value();
-    double max_pass_speed     = passing_config->getMaxPassSpeedMPerS()->value();
+    double min_pass_speed     = passing_config.min_pass_speed_m_per_s();
+    double max_pass_speed     = passing_config.max_pass_speed_m_per_s();
     double pass_speed_quality = sigmoid(pass.speed(), min_pass_speed, 0.2) *
                                 (1 - sigmoid(pass.speed(), max_pass_speed, 0.2));
 
@@ -41,8 +41,7 @@ double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
 }
 
 double rateZone(const Field& field, const Team& enemy_team, const Rectangle& zone,
-                const Point& ball_position,
-                std::shared_ptr<const PassingConfig> passing_config)
+                const Point& ball_position, TbotsProto::PassingConfig passing_config)
 {
     // TODO (#2021) improve and implement tests
     // Zones with their centers in bad positions are not good
@@ -53,41 +52,41 @@ double rateZone(const Field& field, const Team& enemy_team, const Rectangle& zon
     double pass_up_field_rating = zone.centre().x() / field.xLength();
 
     auto enemy_reaction_time =
-        Duration::fromSeconds(passing_config->getEnemyReactionTime()->value());
-    double enemy_proximity_importance =
-        passing_config->getEnemyProximityImportance()->value();
+        Duration::fromSeconds(passing_config.enemy_reaction_time());
+    double enemy_proximity_importance = passing_config.enemy_proximity_importance();
+
 
     double enemy_risk_rating =
         (ratePassEnemyRisk(enemy_team,
                            Pass(ball_position, zone.negXNegYCorner(),
-                                passing_config->getMaxPassSpeedMPerS()->value()),
+                                passing_config.max_pass_speed_m_per_s()),
                            enemy_reaction_time, enemy_proximity_importance) +
          ratePassEnemyRisk(enemy_team,
                            Pass(ball_position, zone.negXPosYCorner(),
-                                passing_config->getMaxPassSpeedMPerS()->value()),
+                                passing_config.max_pass_speed_m_per_s()),
                            enemy_reaction_time, enemy_proximity_importance) +
          ratePassEnemyRisk(enemy_team,
                            Pass(ball_position, zone.posXNegYCorner(),
-                                passing_config->getMaxPassSpeedMPerS()->value()),
+                                passing_config.max_pass_speed_m_per_s()),
                            enemy_reaction_time, enemy_proximity_importance) +
          ratePassEnemyRisk(enemy_team,
                            Pass(ball_position, zone.posXPosYCorner(),
-                                passing_config->getMaxPassSpeedMPerS()->value()),
+                                passing_config.max_pass_speed_m_per_s()),
                            enemy_reaction_time, enemy_proximity_importance) +
-         ratePassEnemyRisk(enemy_team,
-                           Pass(ball_position, zone.centre(),
-                                passing_config->getMaxPassSpeedMPerS()->value()),
-                           enemy_reaction_time, enemy_proximity_importance)) /
+         ratePassEnemyRisk(
+             enemy_team,
+             Pass(ball_position, zone.centre(), passing_config.max_pass_speed_m_per_s()),
+             enemy_reaction_time, enemy_proximity_importance)) /
         5.0;
 
     return pass_up_field_rating * static_pass_quality * enemy_risk_rating;
 }
 
 double ratePassShootScore(const Field& field, const Team& enemy_team, const Pass& pass,
-                          std::shared_ptr<const PassingConfig> passing_config)
+                          TbotsProto::PassingConfig passing_config)
 {
     double ideal_max_rotation_to_shoot_degrees =
-        passing_config->getIdealMaxRotationToShootDegrees()->value();
+        passing_config.ideal_max_rotation_to_shoot_degrees();
 
     // Figure out the range of angles for which we have an open shot to the goal after
     // receiving the pass
@@ -103,8 +102,8 @@ double ratePassShootScore(const Field& field, const Team& enemy_team, const Pass
     }
 
     // Figure out what the maximum open angle of the goal could be from the receiver pos.
-    Angle goal_angle = acuteAngle(field.enemyGoalpostNeg(), pass.receiverPoint(),
-                                  field.enemyGoalpostPos())
+    Angle goal_angle = convexAngle(field.enemyGoalpostNeg(), pass.receiverPoint(),
+                                   field.enemyGoalpostPos())
                            .abs();
     double net_percent_open = 0;
     if (goal_angle > Angle::zero())
@@ -181,10 +180,13 @@ double calculateInterceptRisk(const Robot& enemy_robot, const Pass& pass,
     // point on the pass to the enemy's current position
     Point closest_point_on_pass_to_robot = closestPoint(
         enemy_robot.position(), Segment(pass.passerPoint(), pass.receiverPoint()));
-    Duration enemy_robot_time_to_closest_pass_point = getTimeToPositionForRobot(
-        enemy_robot.position(), closest_point_on_pass_to_robot,
-        ENEMY_ROBOT_MAX_SPEED_METERS_PER_SECOND,
-        ENEMY_ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED, ROBOT_MAX_RADIUS_METERS);
+    // Subtracting by the max robot radius as a threshold of the enemy robot blocking the
+    // pass
+    double distance = (closest_point_on_pass_to_robot - enemy_robot.position()).length() -
+                      ROBOT_MAX_RADIUS_METERS;
+    Duration enemy_robot_time_to_closest_pass_point =
+        getTimeToTravelDistance(distance, ENEMY_ROBOT_MAX_SPEED_METERS_PER_SECOND,
+                                ENEMY_ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
     Duration ball_time_to_closest_pass_point = Duration::fromSeconds(
         (closest_point_on_pass_to_robot - pass.passerPoint()).length() / pass.speed());
 
@@ -197,10 +199,8 @@ double calculateInterceptRisk(const Robot& enemy_robot, const Pass& pass,
 
     // Figure out how long the enemy robot and ball will take to reach the receive point
     // for the pass.
-    Duration enemy_robot_time_to_pass_receive_position = getTimeToPositionForRobot(
-        enemy_robot.position(), pass.receiverPoint(),
-        ENEMY_ROBOT_MAX_SPEED_METERS_PER_SECOND,
-        ENEMY_ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED, ROBOT_MAX_RADIUS_METERS);
+    Duration enemy_robot_time_to_pass_receive_position =
+        enemy_robot.getTimeToPosition(pass.receiverPoint());
     Duration ball_time_to_pass_receive_position = pass.estimatePassDuration();
 
     double robot_ball_time_diff_at_closest_pass_point =
@@ -223,8 +223,8 @@ double calculateInterceptRisk(const Robot& enemy_robot, const Pass& pass,
     return 1 - sigmoid(min_time_diff, 0, 1);
 }
 
-double ratePassFriendlyCapability(Team friendly_team, const Pass& pass,
-                                  std::shared_ptr<const PassingConfig> passing_config)
+double ratePassFriendlyCapability(const Team& friendly_team, const Pass& pass,
+                                  TbotsProto::PassingConfig passing_config)
 {
     // We need at least one robot to pass to
     if (friendly_team.getAllRobots().empty())
@@ -257,19 +257,14 @@ double ratePassFriendlyCapability(Team friendly_team, const Pass& pass,
     Timestamp receive_time = best_receiver.timestamp() + ball_travel_time;
 
     // Figure out how long it would take our robot to get there
-    Duration min_robot_travel_time = getTimeToPositionForRobot(
-        best_receiver.position(), pass.receiverPoint(),
-        best_receiver.robotConstants().robot_max_speed_m_per_s,
-        best_receiver.robotConstants().robot_max_acceleration_m_per_s_2);
+    Duration min_robot_travel_time =
+        best_receiver.getTimeToPosition(pass.receiverPoint());
     Timestamp earliest_time_to_receive_point =
         best_receiver.timestamp() + min_robot_travel_time;
 
     // Figure out what angle the robot would have to be at to receive the ball
     Angle receive_angle = (pass.passerPoint() - best_receiver.position()).orientation();
-    Duration time_to_receive_angle = getTimeToOrientationForRobot(
-        best_receiver.orientation(), receive_angle,
-        best_receiver.robotConstants().robot_max_ang_speed_rad_per_s,
-        best_receiver.robotConstants().robot_max_ang_acceleration_rad_per_s_2);
+    Duration time_to_receive_angle = best_receiver.getTimeToOrientation(receive_angle);
     Timestamp earliest_time_to_receive_angle =
         best_receiver.timestamp() + time_to_receive_angle;
 
@@ -289,17 +284,16 @@ double ratePassFriendlyCapability(Team friendly_team, const Pass& pass,
 }
 
 double getStaticPositionQuality(const Field& field, const Point& position,
-                                std::shared_ptr<const PassingConfig> passing_config)
+                                TbotsProto::PassingConfig passing_config)
 {
     // This constant is used to determine how steep the sigmoid slopes below are
     static const double sig_width = 0.1;
 
     // The offset from the sides of the field for the center of the sigmoid functions
-    double x_offset = passing_config->getStaticFieldPositionQualityXOffset()->value();
-    double y_offset = passing_config->getStaticFieldPositionQualityYOffset()->value();
+    double x_offset = passing_config.static_field_position_quality_x_offset();
+    double y_offset = passing_config.static_field_position_quality_y_offset();
     double friendly_goal_weight =
-        passing_config->getStaticFieldPositionQualityFriendlyGoalDistanceWeight()
-            ->value();
+        passing_config.static_field_position_quality_friendly_goal_distance_weight();
 
     // Make a slightly smaller field, and positive weight values in this reduced field
     double half_field_length = field.xLength() / 2;

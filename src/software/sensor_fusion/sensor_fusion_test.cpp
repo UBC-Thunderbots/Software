@@ -5,13 +5,14 @@
 #include "proto/message_translation/ssl_detection.h"
 #include "proto/message_translation/ssl_geometry.h"
 #include "proto/message_translation/ssl_wrapper.h"
-#include "shared/parameter/cpp_dynamic_parameters.h"
+#include "proto/message_translation/tbots_protobuf.h"
+#include "proto/parameters.pb.h"
 
 class SensorFusionTest : public ::testing::Test
 {
    public:
     SensorFusionTest()
-        : config(std::make_shared<SensorFusionConfig>()),
+        : config(TbotsProto::SensorFusionConfig()),
           sensor_fusion(config),
           yellow_robot_states(initYellowRobotStates()),
           blue_robot_states(initBlueRobotStates()),
@@ -20,7 +21,6 @@ class SensorFusionTest : public ::testing::Test
           geom_data(initSSLDivBGeomData()),
           robot_status_msg_id_1(initRobotStatusId1()),
           robot_status_msg_id_2(initRobotStatusId2()),
-          robot_status_msg_wheel_motor_hot(initWheelMotorHotErrorCode()),
           robot_status_msg_low_cap(initLowCapErrorCode()),
           robot_status_msg_dribble_motor_hot(initDribbleMotorHotErrorCode()),
           robot_status_msg_multiple_error_codes(initMultipleErrorCode()),
@@ -32,13 +32,10 @@ class SensorFusionTest : public ::testing::Test
           referee_ball_placement_blue(initRefereeBallPlacementBlue()),
           referee_goalie_id(initRefereeGoalieId())
     {
-        config->getMutableFriendlyColorYellow()->setValue(true);
-        config->getMutableOverrideGameControllerDefendingSide()->setValue(true);
-        config->getMutableDefendingPositiveSide()->setValue(false);
-        config->getMutableOverrideRefereeCommand()->setValue(false);
+        config.set_friendly_color_yellow(true);
     }
 
-    std::shared_ptr<SensorFusionConfig> config;
+    TbotsProto::SensorFusionConfig config;
     SensorFusion sensor_fusion;
     std::vector<RobotStateWithId> yellow_robot_states;
     std::vector<RobotStateWithId> blue_robot_states;
@@ -48,7 +45,6 @@ class SensorFusionTest : public ::testing::Test
     // world associated with geom_data and detection_frame only
     std::unique_ptr<TbotsProto::RobotStatus> robot_status_msg_id_1;
     std::unique_ptr<TbotsProto::RobotStatus> robot_status_msg_id_2;
-    std::unique_ptr<TbotsProto::RobotStatus> robot_status_msg_wheel_motor_hot;
     std::unique_ptr<TbotsProto::RobotStatus> robot_status_msg_low_cap;
     std::unique_ptr<TbotsProto::RobotStatus> robot_status_msg_dribble_motor_hot;
     std::unique_ptr<TbotsProto::RobotStatus> robot_status_msg_multiple_error_codes;
@@ -219,9 +215,9 @@ class SensorFusionTest : public ::testing::Test
 
         robot_msg->set_robot_id(1);
 
-        auto break_beam_msg = std::make_unique<TbotsProto::BreakBeamStatus>();
-        break_beam_msg->set_ball_in_beam(false);
-        *(robot_msg->mutable_break_beam_status()) = *break_beam_msg;
+        auto power_status_msg = std::make_unique<TbotsProto::PowerStatus>();
+        power_status_msg->set_breakbeam_tripped(false);
+        *(robot_msg->mutable_power_status()) = *power_status_msg;
 
         auto chipper_kicker_status = std::make_unique<TbotsProto::ChipperKickerStatus>();
         chipper_kicker_status->set_ms_since_chipper_fired(13);
@@ -237,24 +233,14 @@ class SensorFusionTest : public ::testing::Test
 
         robot_msg->set_robot_id(2);
 
-        auto break_beam_msg = std::make_unique<TbotsProto::BreakBeamStatus>();
-        break_beam_msg->set_ball_in_beam(true);
-        *(robot_msg->mutable_break_beam_status()) = *break_beam_msg;
+        auto power_status_msg = std::make_unique<TbotsProto::PowerStatus>();
+        power_status_msg->set_breakbeam_tripped(true);
+        *(robot_msg->mutable_power_status()) = *power_status_msg;
 
         auto chipper_kicker_status = std::make_unique<TbotsProto::ChipperKickerStatus>();
         chipper_kicker_status->set_ms_since_chipper_fired(11);
         chipper_kicker_status->set_ms_since_kicker_fired(6);
         *(robot_msg->mutable_chipper_kicker_status()) = *chipper_kicker_status;
-
-        return robot_msg;
-    }
-
-    std::unique_ptr<TbotsProto::RobotStatus> initWheelMotorHotErrorCode()
-    {
-        // Adding a WHEEL_0_MOTOR_HOT error code to robotStatus of robot 2
-        auto robot_msg = std::make_unique<TbotsProto::RobotStatus>();
-        robot_msg->set_robot_id(2);
-        robot_msg->add_error_code(TbotsProto::ErrorCode::WHEEL_0_MOTOR_HOT);
 
         return robot_msg;
     }
@@ -283,7 +269,6 @@ class SensorFusionTest : public ::testing::Test
     {
         auto robot_msg = std::make_unique<TbotsProto::RobotStatus>();
         robot_msg->set_robot_id(2);
-        robot_msg->add_error_code(TbotsProto::ErrorCode::WHEEL_0_MOTOR_HOT);
         robot_msg->add_error_code(TbotsProto::ErrorCode::LOW_CAP);
         robot_msg->add_error_code(TbotsProto::ErrorCode::DRIBBLER_MOTOR_HOT);
 
@@ -357,27 +342,6 @@ class SensorFusionTest : public ::testing::Test
     }
 };
 
-TEST_F(SensorFusionTest, test_making_robot_move_capability_unavailable_from_error_code)
-{
-    SensorProto sensor_msg;
-    auto ssl_wrapper_packet =
-        createSSLWrapperPacket(std::move(geom_data), initDetectionFrame());
-    *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
-    *(sensor_msg.add_robot_status_msgs())  = *robot_status_msg_wheel_motor_hot;
-    sensor_fusion.processSensorProto(sensor_msg);
-
-    std::optional<Robot> robot =
-        sensor_fusion.getWorld().value().friendlyTeam().getRobotById(2);
-    ASSERT_TRUE(robot);
-    std::set<RobotCapability> robot_unavailable_capabilities =
-        robot.value().getUnavailableCapabilities();
-    EXPECT_EQ(1, robot_unavailable_capabilities.size());
-    bool is_movement_disabled =
-        robot_unavailable_capabilities.find(RobotCapability::Move) !=
-        robot_unavailable_capabilities.end();
-    ASSERT_TRUE(is_movement_disabled);
-}
-
 TEST_F(SensorFusionTest,
        test_making_chip_and_kick_robot_capabilities_unavailable_from_error_code)
 {
@@ -441,7 +405,7 @@ TEST_F(SensorFusionTest, test_making_all_robot_capabilities_unavailable_from_err
     ASSERT_TRUE(robot);
     std::set<RobotCapability> robot_unavailable_capabilities =
         robot.value().getUnavailableCapabilities();
-    EXPECT_EQ(4, robot_unavailable_capabilities.size());
+    EXPECT_EQ(3, robot_unavailable_capabilities.size());
 
     bool is_dribble_disabled =
         robot_unavailable_capabilities.find(RobotCapability::Dribble) !=
@@ -455,11 +419,6 @@ TEST_F(SensorFusionTest, test_making_all_robot_capabilities_unavailable_from_err
     bool is_chip_disabled = robot_unavailable_capabilities.find(RobotCapability::Chip) !=
                             robot_unavailable_capabilities.end();
     ASSERT_TRUE(is_chip_disabled);
-
-    bool is_movement_disabled =
-        robot_unavailable_capabilities.find(RobotCapability::Move) !=
-        robot_unavailable_capabilities.end();
-    ASSERT_TRUE(is_movement_disabled);
 }
 
 TEST_F(SensorFusionTest, test_emptying_robot_unavailable_capabilities_from_error_code)
@@ -503,16 +462,26 @@ TEST_F(SensorFusionTest, test_detection_frame_wrapper_packet)
 
 TEST_F(SensorFusionTest, test_inverted_detection_frame_wrapper_packet)
 {
-    config->getMutableDefendingPositiveSide()->setValue(true);
+    EXPECT_EQ(std::nullopt, sensor_fusion.getWorld());
+
     SensorProto sensor_msg;
+    SSLProto::Referee ssl_referee_packet;
+    ssl_referee_packet.set_blue_team_on_positive_half(false);
+    *(sensor_msg.mutable_ssl_referee_msg()) = ssl_referee_packet;
+
+    sensor_fusion.processSensorProto(sensor_msg);
+
     auto ssl_wrapper_packet =
         createSSLWrapperPacket(std::move(geom_data), initDetectionFrame());
-    *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
-    EXPECT_EQ(std::nullopt, sensor_fusion.getWorld());
-    sensor_fusion.processSensorProto(sensor_msg);
+
+    SensorProto sensor_msg_2;
+    *(sensor_msg_2.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
+
+    sensor_fusion.processSensorProto(sensor_msg_2);
     auto result = sensor_fusion.getWorld();
+
     ASSERT_TRUE(result);
-    EXPECT_EQ(initInvertedWorld(), result);
+    EXPECT_EQ(initInvertedWorld(), *result);
 }
 
 TEST_F(SensorFusionTest, test_complete_wrapper_packet)
@@ -666,8 +635,9 @@ TEST_F(SensorFusionTest, ball_placement_enemy_set_by_referee)
 
 TEST_F(SensorFusionTest, goalie_id_set_by_referee)
 {
-    config->getMutableOverrideGameControllerFriendlyGoalieId()->setValue(false);
-    config->getMutableOverrideGameControllerEnemyGoalieId()->setValue(false);
+    config.set_override_game_controller_friendly_goalie_id(false);
+    config.set_override_game_controller_enemy_goalie_id(false);
+    sensor_fusion = SensorFusion(config);
 
     SensorProto sensor_msg;
 
@@ -690,10 +660,11 @@ TEST_F(SensorFusionTest, goalie_id_set_by_referee)
 
 TEST_F(SensorFusionTest, goalie_id_overridden)
 {
-    config->getMutableOverrideGameControllerFriendlyGoalieId()->setValue(true);
-    config->getMutableOverrideGameControllerEnemyGoalieId()->setValue(true);
-    config->getMutableFriendlyGoalieId()->setValue(1);
-    config->getMutableEnemyGoalieId()->setValue(3);
+    config.set_override_game_controller_friendly_goalie_id(true);
+    config.set_override_game_controller_enemy_goalie_id(true);
+    config.set_friendly_goalie_id(1);
+    config.set_enemy_goalie_id(3);
+    sensor_fusion = SensorFusion(config);
 
     SensorProto sensor_msg;
 
@@ -716,10 +687,12 @@ TEST_F(SensorFusionTest, goalie_id_overridden)
 
 TEST_F(SensorFusionTest, test_sensor_fusion_reset_behaviour_trigger_reset)
 {
-    config->getMutableOverrideGameControllerFriendlyGoalieId()->setValue(false);
-    config->getMutableOverrideGameControllerEnemyGoalieId()->setValue(false);
-    config->getMutableFriendlyGoalieId()->setValue(0);
-    config->getMutableEnemyGoalieId()->setValue(0);
+    config.set_override_game_controller_friendly_goalie_id(true);
+    config.set_override_game_controller_enemy_goalie_id(true);
+    config.set_friendly_goalie_id(0);
+    config.set_enemy_goalie_id(0);
+    sensor_fusion = SensorFusion(config);
+
     SensorProto sensor_msg;
     SensorProto sensor_msg_0;
     auto ssl_wrapper_packet =
@@ -750,10 +723,12 @@ TEST_F(SensorFusionTest, test_sensor_fusion_reset_behaviour_trigger_reset)
 
 TEST_F(SensorFusionTest, test_sensor_fusion_reset_behaviour_ignore_bad_packets)
 {
-    config->getMutableOverrideGameControllerFriendlyGoalieId()->setValue(false);
-    config->getMutableOverrideGameControllerEnemyGoalieId()->setValue(false);
-    config->getMutableFriendlyGoalieId()->setValue(0);
-    config->getMutableEnemyGoalieId()->setValue(0);
+    config.set_override_game_controller_friendly_goalie_id(false);
+    config.set_override_game_controller_enemy_goalie_id(false);
+    config.set_friendly_goalie_id(0);
+    config.set_enemy_goalie_id(0);
+    sensor_fusion = SensorFusion(config);
+
     SensorProto sensor_msg;
     auto ssl_wrapper_packet =
         createSSLWrapperPacket(std::move(geom_data), initDetectionFrame());

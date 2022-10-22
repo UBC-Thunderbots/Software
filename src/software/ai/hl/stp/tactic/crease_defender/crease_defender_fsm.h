@@ -1,13 +1,12 @@
 #pragma once
 
+#include "proto/parameters.pb.h"
 #include "proto/tactic.pb.h"
-#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/hl/stp/tactic/move/move_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/hl/stp/tactic/transition_conditions.h"
-#include "software/ai/intent/move_intent.h"
-#include "software/geom/algorithms/acute_angle.h"
 #include "software/geom/algorithms/contains.h"
+#include "software/geom/algorithms/convex_angle.h"
 #include "software/geom/algorithms/intersection.h"
 #include "software/geom/ray.h"
 #include "software/logger/logger.h"
@@ -50,8 +49,8 @@ struct CreaseDefenderFSM
      *
      * @param robot_navigation_obstacle_config The config
      */
-    explicit CreaseDefenderFSM(std::shared_ptr<const RobotNavigationObstacleConfig>
-                                   robot_navigation_obstacle_config)
+    explicit CreaseDefenderFSM(
+        TbotsProto::RobotNavigationObstacleConfig robot_navigation_obstacle_config)
         : robot_navigation_obstacle_config(robot_navigation_obstacle_config)
     {
     }
@@ -95,5 +94,5 @@ struct CreaseDefenderFSM
         const Field& field, const Ray& ray, double robot_obstacle_inflation_factor);
 
    private:
-    std::shared_ptr<const RobotNavigationObstacleConfig> robot_navigation_obstacle_config;
+    TbotsProto::RobotNavigationObstacleConfig robot_navigation_obstacle_config;
 };

@@ -14,17 +14,18 @@ class LinearVelocityAgent : public Agent
     /**
      * Constructor
      *
-     * @param position    The starting position of this agent.
-     * @param radius      The radius of this agent.
-     * @param velocity    The initial velocity of this agent.
-     * @param maxSpeed    The maximum speed of this agent.
-     * @param maxAccel    The maximum acceleration of this agent.
-     * @param goal_index  The goal number of this agent.
-     * @param goalRadius  The goal radius of this agent.
+     * @param position              The starting position of this agent.
+     * @param radius                The radius of this agent.
+     * @param max_radius_inflation  The maximum amount which the radius of this agent can
+     * inflate.
+     * @param velocity              The initial velocity of this agent.
+     * @param max_speed              The maximum speed of this agent.
+     * @param max_accel              The maximum acceleration of this agent.
+     * @param path                  The path of this agent
      */
     LinearVelocityAgent(HRVOSimulator *simulator, const Vector &position, float radius,
-                        const Vector &velocity, float maxSpeed, float maxAccel,
-                        std::size_t goal_index, float goalRadius);
+                        float max_radius_inflation, const Vector &velocity,
+                        float max_speed, float max_accel, AgentPath &path);
 
     /**
      * Computes the new velocity of this agent.
@@ -37,5 +38,5 @@ class LinearVelocityAgent : public Agent
      * @param other_agent The Agent which this velocity obstacle is being generated for
      * @return The velocity obstacle which other_agent should see for this Agent
      */
-    Agent::VelocityObstacle createVelocityObstacle(const Agent &other_agent) override;
+    VelocityObstacle createVelocityObstacle(const Agent &other_agent) override;
 };

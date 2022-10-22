@@ -2,9 +2,9 @@
 
 #include <set>
 
+#include "proto/primitive.pb.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/hl/stp/tactic/tactic_visitor.h"
-#include "software/ai/motion_constraint/motion_constraint.h"
 #include "software/world/game_state.h"
 
 
@@ -16,8 +16,8 @@
  *
  * @return set of MotionConstraints
  */
-std::set<MotionConstraint> buildMotionConstraintSet(const GameState &game_state,
-                                                    const Tactic &tactic);
+std::set<TbotsProto::MotionConstraint> buildMotionConstraintSet(
+    const GameState &game_state, const Tactic &tactic);
 
 
 
@@ -29,5 +29,5 @@ std::set<MotionConstraint> buildMotionConstraintSet(const GameState &game_state,
  *
  * @return set of MotionConstraints
  */
-std::set<MotionConstraint> buildMotionConstraintSetFromGameState(
+std::set<TbotsProto::MotionConstraint> buildMotionConstraintSetFromGameState(
     const GameState &game_state);

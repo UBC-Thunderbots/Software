@@ -7,19 +7,20 @@
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/ai/passing/cost_function.h"
 #include "software/simulated_tests/non_terminating_validation_functions/robot_not_excessively_dribbling_validation.h"
-#include "software/simulated_tests/simulated_tactic_test_fixture.h"
+#include "software/simulated_tests/simulated_er_force_sim_play_test_fixture.h"
 #include "software/simulated_tests/validation/validation_function.h"
 #include "software/test_util/test_util.h"
 #include "software/time/duration.h"
 #include "software/world/world.h"
 
 class AttackerTacticKeepAwayTest
-    : public SimulatedTacticTestFixture,
+    : public SimulatedErForceSimPlayTestFixture,
       public ::testing::WithParamInterface<std::tuple<
           Pass, RobotStateWithId, BallState, std::vector<RobotStateWithId>, bool>>
 {
    protected:
-    Field field = Field::createSSLDivisionBField();
+    TbotsProto::FieldType field_type = TbotsProto::FieldType::DIV_B;
+    Field field                      = Field::createField(field_type);
 };
 
 TEST_P(AttackerTacticKeepAwayTest, attacker_test_keep_away)
@@ -33,24 +34,26 @@ TEST_P(AttackerTacticKeepAwayTest, attacker_test_keep_away)
     auto friendly_robots = TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5)});
     friendly_robots.emplace_back(robot_state);
 
-    auto attacker_tactic_config = std::make_shared<AttackerTacticConfig>();
+    TbotsProto::AiConfig ai_config;
+
     // force passing for this test by setting min acceptable shot angle very high
-    attacker_tactic_config->getMutableMinOpenAngleForShotDeg()->setValue(90);
-    attacker_tactic_config->getMutableEnemyAboutToStealBallRadius()->setValue(0.01);
-    auto tactic = std::make_shared<AttackerTactic>(attacker_tactic_config);
+    ai_config.mutable_attacker_tactic_config()->set_min_open_angle_for_shot_deg(90);
+    ai_config.mutable_attacker_tactic_config()->set_enemy_about_to_steal_ball_radius(
+        0.01);
+
+    auto tactic = std::make_shared<AttackerTactic>(ai_config);
+
     // force the keep away state
     tactic->updateControlParams(pass, false);
-    setTactic(tactic);
-    setFriendlyRobotId(1);
+    setTactic(1, tactic);
 
     // we use default parameters for testing ratePassEnemyRisk because that's (partially)
     // what the play uses to determine pass/no pass. Keep away state should try to
     // push the best pass in the play above the threshold to commit to passing.
-    auto passing_config = std::make_shared<PassingConfig>();
+    auto passing_config = TbotsProto::PassingConfig();
     auto enemy_reaction_time =
-        Duration::fromSeconds(passing_config->getEnemyReactionTime()->value());
-    auto enemy_proximity_importance =
-        passing_config->getEnemyProximityImportance()->value();
+        Duration::fromSeconds(passing_config.enemy_reaction_time());
+    auto enemy_proximity_importance = passing_config.enemy_proximity_importance();
 
     // we have to create a Team for the enemy here to evaluate the initial enemy risk
     // score
@@ -107,7 +110,7 @@ TEST_P(AttackerTacticKeepAwayTest, attacker_test_keep_away)
                     PASSER_ENEMY_PROXIMITY_IMPORTANCE);
 
                 // make sure we improved over the initial proximity risk score
-                if (current_enemy_proximity_risk >= initial_enemy_proximity_risk)
+                if (current_enemy_proximity_risk > initial_enemy_proximity_risk)
                 {
                     std::stringstream ss;
                     ss << "At " << last_timestamp
@@ -159,7 +162,7 @@ TEST_P(AttackerTacticKeepAwayTest, attacker_test_keep_away)
                                       enemy_proximity_importance);
 
                 // make sure we improved over the initial enemy risk score
-                if (current_enemy_risk_score <= initial_enemy_risk_score)
+                if (current_enemy_risk_score < (initial_enemy_risk_score - 0.01))
                 {
                     std::stringstream ss;
                     ss << "At " << last_timestamp
@@ -184,7 +187,7 @@ TEST_P(AttackerTacticKeepAwayTest, attacker_test_keep_away)
             }
         }};
 
-    runTest(field, ball_state, friendly_robots, enemy_robots, {},
+    runTest(field_type, ball_state, friendly_robots, enemy_robots, {},
             non_terminating_validation_functions, Duration::fromSeconds(3.0));
 }
 

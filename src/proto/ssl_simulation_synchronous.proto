@@ -2,7 +2,7 @@ syntax = "proto2";
 
 package SSLSimulationProto;
 
-import "proto/messages_robocup_ssl_detection.proto";
+import "proto/ssl_vision_detection.proto";
 import "proto/ssl_simulation_robot_feedback.proto";
 import "proto/ssl_simulation_robot_control.proto";
 import "proto/ssl_simulation_control.proto";

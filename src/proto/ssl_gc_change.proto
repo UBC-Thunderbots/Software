@@ -1,0 +1,217 @@
+syntax = "proto2";
+
+package SSLProto;
+
+import "proto/ssl_gc_state.proto";
+import "proto/ssl_gc_common.proto";
+import "proto/ssl_gc_geometry.proto";
+import "proto/ssl_gc_game_event.proto";
+import "proto/ssl_gc_referee_message.proto";
+
+import "google/protobuf/timestamp.proto";
+
+// A state change
+message StateChange
+{
+    // A unique increasing id
+    optional int32 id = 1;
+    // The previous state
+    optional State state_pre = 2;
+    // The state after the change was applied
+    optional State state = 3;
+    // The change itself
+    optional Change change = 4;
+    // The timestamp when the change was triggered
+    optional google.protobuf.Timestamp timestamp = 5;
+}
+
+// A certain change
+message Change
+{
+    // An identifier of the origin that triggered the change
+    optional string origin = 1;
+    // Is this change revertible?
+    optional bool revertible = 16;
+
+    oneof change
+    {
+        NewCommand new_command                     = 2;
+        ChangeStage change_stage                   = 3;
+        SetBallPlacementPos set_ball_placement_pos = 4;
+        AddYellowCard add_yellow_card              = 5;
+        AddRedCard add_red_card                    = 6;
+        YellowCardOver yellow_card_over            = 7;
+        AddGameEvent add_game_event                = 8;
+        AddPassiveGameEvent add_passive_game_event = 19;
+        AddProposal add_proposal                   = 9;
+        StartBallPlacement start_ball_placement    = 10;
+        Continue continue                          = 11;
+        UpdateConfig update_config                 = 12;
+        UpdateTeamState update_team_state          = 13;
+        SwitchColors switch_colors                 = 14;
+        Revert revert                              = 15;
+        NewGameState new_game_state                = 17;
+        AcceptProposalGroup accept_proposal_group  = 18;
+    }
+}
+
+// New referee command
+message NewCommand
+{
+    // The command
+    optional Command command = 1;
+}
+
+// Switch to a new stage
+message ChangeStage
+{
+    // The new stage
+    optional Referee.Stage new_stage = 1;
+}
+
+// Set the ball placement pos
+message SetBallPlacementPos
+{
+    // The position in [m]
+    optional Vector2 pos = 1;
+}
+
+// Add a new yellow card
+message AddYellowCard
+{
+    // The team that the card is for
+    optional Team for_team = 1;
+    // The game event that caused the card
+    optional GameEvent caused_by_game_event = 2;
+}
+
+// Add a new red card
+message AddRedCard
+{
+    // The team that the card is for
+    optional Team for_team = 1;
+    // The game event that caused the card
+    optional GameEvent caused_by_game_event = 2;
+}
+
+// Trigger when a yellow card timed out
+message YellowCardOver
+{
+    // The team that the card was for
+    optional Team for_team = 1;
+}
+
+// Add a new game event
+message AddGameEvent
+{
+    // The game event
+    optional GameEvent game_event = 1;
+}
+
+// Add a new passive game event (that is only logged, but does not automatically trigger
+// anything)
+message AddPassiveGameEvent
+{
+    // The game event
+    optional GameEvent game_event = 1;
+}
+
+// Add a new proposal (i.e. from an auto referee for majority voting)
+message AddProposal
+{
+    // The proposal
+    optional Proposal proposal = 1;
+}
+
+// Accept a proposal group (that contain one or more proposals of the same type)
+message AcceptProposalGroup
+{
+    // The id of the group
+    optional uint32 group_id = 1;
+    // An identifier of the acceptor
+    optional string accepted_by = 2;
+}
+
+// Initiate ball placement
+message StartBallPlacement {}
+
+// Continue with the next referee command
+message Continue {}
+
+// Update some configuration
+message UpdateConfig
+{
+    // The division to play with
+    optional Division division = 1;
+    // the team that does/did the first kick off
+    optional Team first_kickoff_team = 2;
+    // Enable automatic continuation when all conditions are met
+    optional bool auto_continue = 3;
+    // The match type
+    optional MatchType match_type = 4;
+}
+
+// Update the current state of a team (all fields that should be updated are set)
+message UpdateTeamState
+{
+    // The team
+    optional Team for_team = 1;
+
+    // Change the name of the team
+    optional string team_name = 2;
+    // Change the number of goals that the teams has at the moment
+    optional int32 goals = 3;
+    // The id of the goal keeper
+    optional int32 goalkeeper = 4;
+    // The number of timeouts that the team has left
+    optional int32 timeouts_left = 5;
+    // The timeout time that the team has left
+    optional string timeout_time_left = 6;
+    // Does the team play on the positive or the negative half (in ssl-vision
+    // coordinates)?
+    optional bool on_positive_half = 7;
+    // The number of ball placement failures
+    optional int32 ball_placement_failures = 8;
+    // Can the team place the ball, or is ball placement for this team disabled and should
+    // be skipped?
+    optional bool can_place_ball = 9;
+    // The number of challenge flags that the team has left
+    optional int32 challenge_flags_left = 21;
+    // Does the team want to substitute a robot in the next possible situation?
+    optional bool requests_bot_substitution = 10;
+    // Does the team want to take a timeout in the next possible situation?
+    optional bool requests_timeout = 17;
+    // Does the team want to challenge a recent decision of the referee?
+    optional bool requests_challenge = 18;
+    // Does the team want to request an emergency stop?
+    optional bool requests_emergency_stop = 19;
+    // Update a certain yellow card of the team
+    optional YellowCard yellow_card = 20;
+    // Update a certain red card of the team
+    optional RedCard red_card = 12;
+    // Update a certain foul of the team
+    optional Foul foul = 13;
+    // Remove the yellow card with this id
+    optional uint32 remove_yellow_card = 14;
+    // Remove the red card with this id
+    optional uint32 remove_red_card = 15;
+    // Remove the foul with this id
+    optional uint32 remove_foul = 16;
+}
+
+// Switch the team colors
+message SwitchColors {}
+
+// Revert a certain change
+message Revert
+{
+    // The id of the change
+    optional int32 change_id = 1;
+}
+
+// Change the current game state
+message NewGameState
+{
+    // The new game state
+    optional GameState game_state = 1;
+}

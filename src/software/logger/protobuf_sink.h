@@ -8,12 +8,21 @@
 #include "software/networking/threaded_unix_sender.h"
 
 static const std::string TYPE_DELIMITER = "!!!";
-static const std::string UNIX_BASE_PATH = "/tmp/tbots/";
+
+
+using UnixSenderMap =
+    std::unordered_map<std::string, std::unique_ptr<ThreadedUnixSender>>;
+
 
 class ProtobufSink
 {
    public:
-    ProtobufSink();
+    /**
+     * Creates a protobuf sink with the given runtime dir
+     *
+     * @param runtime_dir The runtime directory
+     */
+    ProtobufSink(std::string runtime_dir);
 
     /*
      * Send the protobuf to /tmp/tbots/(protobuf typename)
@@ -23,7 +32,8 @@ class ProtobufSink
     void sendProtobuf(g3::LogMessageMover log_entry);
 
    private:
-    std::unique_ptr<ThreadedUnixSender> protobuf_sender;
+    UnixSenderMap unix_senders_;
+    std::string runtime_dir_;
 };
 
 /*

@@ -1,5 +1,10 @@
 package(default_visibility = ["//visibility:public"])
 
+load(
+    "@platformio_rules//platformio:platformio.bzl",
+    "platformio_library",
+)
+
 cc_library(
     name = "tbots_protobuf",
     srcs = ["tbots_protobuf.cpp"],
@@ -9,6 +14,7 @@ cc_library(
         ":tbots_geometry",
         "//proto:tbots_cc_proto",
         "//proto:visualization_cc_proto",
+        "//software/ai/passing:pass_with_rating",
         "//software/geom:angle",
         "//software/geom:point",
         "//software/geom:vector",
@@ -32,6 +38,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//proto:tbots_cc_proto",
+        "//software/ai/navigator/path_planner/hrvo:velocity_obstacle",
         "//software/geom:angle",
         "//software/geom:angular_velocity",
         "//software/geom:circle",
@@ -147,12 +154,12 @@ cc_library(
     srcs = ["ssl_simulation_robot_control.cpp"],
     hdrs = ["ssl_simulation_robot_control.h"],
     deps = [
-        "//firmware/shared:physics",
         "//proto:ssl_simulation_cc_proto",
         "//proto:tbots_cc_proto",
         "//shared:constants",
         "//shared:robot_constants",
         "//software/geom:angle",
+        "//software/logger",
     ],
 )
 
@@ -161,48 +168,6 @@ cc_test(
     srcs = ["ssl_simulation_robot_control_test.cpp"],
     deps = [
         ":ssl_simulation_robot_control",
-        "//shared/test_util:tbots_gtest_main",
-    ],
-)
-
-cc_library(
-    name = "primitive_google_to_nanopb_converter",
-    srcs = ["primitive_google_to_nanopb_converter.cpp"],
-    hdrs = ["primitive_google_to_nanopb_converter.h"],
-    visibility = ["//visibility:public"],
-    deps = [
-        "//proto:tbots_cc_proto",
-        "//proto:tbots_nanopb_proto",
-        "//proto/primitive:primitive_msg_factory",
-        "//shared:constants",
-        "@nanopb",
-    ],
-)
-
-cc_test(
-    name = "primitive_google_to_nanopb_converter_test",
-    srcs = ["primitive_google_to_nanopb_converter_test.cpp"],
-    deps = [
-        ":primitive_google_to_nanopb_converter",
-        "//shared/test_util:tbots_gtest_main",
-    ],
-)
-
-cc_library(
-    name = "defending_side",
-    srcs = ["defending_side.cpp"],
-    hdrs = ["defending_side.h"],
-    deps = [
-        "//proto:defending_side_msg_cc_proto",
-        "//software/world:field",
-    ],
-)
-
-cc_test(
-    name = "defending_side_test",
-    srcs = ["defending_side_test.cpp"],
-    deps = [
-        ":defending_side",
         "//shared/test_util:tbots_gtest_main",
     ],
 )
@@ -225,5 +190,42 @@ cc_test(
         ":er_force_world",
         "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
+    ],
+)
+
+platformio_library(
+    name = "power_frame_msg_platformio",
+    hdr = "power_frame_msg.hpp",
+)
+
+cc_library(
+    name = "power_frame_msg",
+    hdrs = ["power_frame_msg.hpp"],
+    deps = [
+        "//proto:tbots_cc_proto",
+        "//proto:tbots_nanopb_proto",
+        "//proto/primitive:primitive_msg_factory",
+        "@nanopb",
+    ],
+)
+
+py_library(
+    name = "py_tbots_protobuf",
+    srcs = [
+        "tbots_protobuf.py",
+    ],
+    deps = [
+        "//proto:import_all_protos",
+        "//proto:software_py_proto",
+        "//proto:tbots_py_proto",
+    ],
+)
+
+cc_test(
+    name = "power_frame_msg_test",
+    srcs = ["power_frame_msg_test.cpp"],
+    deps = [
+        ":power_frame_msg",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )

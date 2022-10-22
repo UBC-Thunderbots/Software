@@ -1,0 +1,228 @@
+---
+
+- name: Setting up the jetson Nano
+  hosts: THUNDERBOTS_HOSTS
+
+  tasks:
+
+    - name: Run basic setup
+      tags: dependencies
+      block:
+        - name: check internet connection
+          uri:
+            url: "https://google.com"
+            timeout: 30
+            status_code: 200
+
+        - name: enable passwordless sudo for rsync
+          become: true
+          become_method: sudo
+          lineinfile:
+            path: /etc/sudoers
+            state: present
+            insertafter: EOF
+            line: '{{ ansible_user }} ALL=NOPASSWD:/usr/bin/rsync'
+
+        - name: Run Jetson Clocks
+          become: true
+          become_method: sudo
+          shell: /usr/bin/jetson_clocks
+
+        - name: Sync Setup Script
+          become: true
+          become_method: sudo
+          tags:
+            - sync
+          ansible.posix.synchronize:
+            src: ../../setup_nano.sh
+            dest: ~/
+            recursive: yes
+            copy_links: yes
+
+        # Output of each nano streamed to that Nano's /tmp/setup.log
+        - name: Running the setup script, this will take a while
+          become_method: sudo
+          become: true
+          command: '/home/{{ ansible_user }}/setup_nano.sh >& /tmp/setup.log'
+          register: result
+          args:
+            chdir: ~/
+
+        - name: success msg
+          debug:
+            msg:
+              - "[Robot ID = {{ inventory_hostname }}]"
+              - "Setup Script run successfully"
+
+        # UART setup
+        - name: Stop nvgetty
+          become: true
+          become_method: sudo
+          command: 'systemctl stop nvgetty'
+
+        - name: Disable nvgetty
+          become: true
+          become_method: sudo
+          command: 'systemctl disable nvgetty'
+
+        - name: Setup udevadm trigger
+          become: true
+          become_method: sudo
+          command: 'udevadm trigger'
+
+        - name: Add user robot to dialout
+          become: true
+          become_method: sudo
+          command: 'adduser robot dialout'
+
+        # Device tree setup
+        - name: Sync Device Tree
+          become: true
+          become_method: sudo
+          tags:
+            - sync
+            - device_tree
+          ansible.posix.synchronize:
+            src: ../../../linux_configs/device_tree.zip
+            dest: ~/
+            recursive: yes
+            copy_links: yes
+
+        - name: Sync extlinux conf
+          become: true
+          become_method: sudo
+          tags:
+            - sync
+            - device_tree
+          ansible.posix.synchronize:
+            src: ../../../linux_configs/extlinux.conf
+            dest: ~/
+            recursive: yes
+            copy_links: yes
+
+        - name: Unzip device tree
+          tags:
+            - sync
+            - device_tree
+          command: 'unzip -o ~/device_tree.zip'
+          register: result
+          args:
+            chdir: ~/
+
+        - name: Compile device tree
+          tags:
+            - sync
+            - device_tree
+          shell: 'dtc -q -I dts -O dtb ~/device_tree.dts > device_tree.dtb'
+          register: result
+          args:
+            chdir: ~/
+
+
+        - name: Move compiled device tree binary to boot path
+          become_method: sudo
+          become: true
+          tags:
+            - sync
+            - device_tree
+          shell: 'mv /home/robot/device_tree.dtb /boot/kernel_tegra210-p3448-0000-p3449-0000-b00-user-custom.dtb'
+          register: result
+          args:
+            chdir: ~/
+
+        - name: Move extlinux file
+          become_method: sudo
+          become: true
+          tags:
+            - sync
+            - device_tree
+          shell: 'mv /home/robot/extlinux.conf /boot/extlinux/extlinux.conf'
+          register: result
+          args:
+            chdir: ~/
+
+
+    - name: Run systemd setup
+      tags: systemd
+      block:
+        - name: Delete everything on ~/
+          file:
+            state: absent
+            path: /home/robot/thunderbots_binaries
+          become_method: sudo
+          become: true
+          register: result
+
+        - name: Sync Binaries
+          with_items:
+            # bazel makes its own zip files, we append another zip to deconflict
+            - ../../display/robot_ui_zip.zip
+            - ../../broadcasts/robot_broadcast_sender_zip.zip
+            - ../../thunderloop_main
+          loop_control:
+            loop_var: binary_path
+          ansible.posix.synchronize:
+            src: "{{ binary_path }}"
+            dest: ~/thunderbots_binaries/
+            recursive: yes
+            copy_links: yes
+          tags:
+            - syncBinaries
+
+        - name: Unzipping python binaries
+          command: 'unzip ~/thunderbots_binaries/*.zip'
+          register: result
+          args:
+            chdir: ~/thunderbots_binaries
+
+        - name: Sync all systemd files
+          become_method: sudo
+          become: true
+          tags:
+            - syncSystemdFiles
+          register: res
+          ansible.posix.synchronize:
+            src: ../../linux_configs/systemd/
+            dest: /etc/systemd/system
+            copy_links: yes
+
+          # NOTE: "Enabling systems" means they will start on boot
+        - name: Enable system services
+          become: true
+          become_method: sudo
+          with_items:
+            - thunderbots
+            - thunderloop
+            - wifi_announcement
+          loop_control:
+            loop_var: service_name
+          ansible.builtin.systemd:
+            name: "{{ service_name }}"
+            enabled: yes
+            masked: no
+            daemon_reload: yes
+          tags:
+            - enableSystemd
+
+        - name: Reboot
+          become: true
+          become_user: root
+          become_method: sudo
+          register: res
+          tags:
+            - reboot
+            - device_tree
+          reboot:
+            msg: "Reboot initiated by Ansible"
+            connect_timeout: 20
+            reboot_timeout: 1200
+            pre_reboot_delay: 0
+            post_reboot_delay: 10
+            test_command: whoami
+
+        - name: Success msg
+          debug:
+            msg:
+              - "[Robot ID = {{ inventory_hostname }}]"
+              - "Systemd Setup run successfully"
+

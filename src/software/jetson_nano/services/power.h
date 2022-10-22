@@ -1,45 +1,19 @@
 #pragma once
 
-#include <boost/asio.hpp>
+#include <atomic>
+#include <thread>
 
-#include "software/jetson_nano/services/service.h"
+#include "proto/power_frame_msg.pb.h"
+#include "shared/uart_framing/uart_framing.hpp"
 #include "software/logger/logger.h"
 #include "software/uart/boost_uart_communication.h"
 
-// TODO(#2537): change to protobuf/move to different file with addition of thunderloop
-struct GenevaMotorCommand
+extern "C"
 {
-    float angle_deg;
-    float rotation_speed;
-};
+#include "proto/power_frame_msg.nanopb.h"
+}
 
-struct ChickerCommand
-{
-    bool autochip;
-    bool autokick;
-    float chip_distance;
-    float kick_distance;
-    float pulse_width_sec;
-};
-
-struct PowerCommand
-{
-    ChickerCommand chicker;
-    GenevaMotorCommand geneva;
-};
-
-
-struct PowerStatus
-{
-    bool breakbeam_tripped;
-    bool flyback_fault;
-    float battery_voltage;
-    float current_draw;
-    float geneva_angle;
-    float high_voltage_measurement_volts;
-};
-
-class PowerService : public Service
+class PowerService
 {
    public:
     /**
@@ -47,25 +21,37 @@ class PowerService : public Service
      * Opens all the required ports and maintains them until destroyed.
      */
     PowerService();
-    ~PowerService() = default;
-    void start() override;
-    void stop() override;
+    ~PowerService();
+
     /**
-     * When the power service is polled it sends the given power command and
+     * When the power service is polled it sends the given power control msg and
      * returns the latest power status
      *
-     * @param command The power command to send
+     * @param control The power control msg to send
      * @return the latest power status
      */
-    std::unique_ptr<PowerStatus> poll(const PowerCommand& command);
+    TbotsProto::PowerStatus poll(const TbotsProto::PowerControl& control, int kick_slope,
+                                 int kick_constant, int chip_constant);
+
+    /**
+     * Handler method called every time the timer expires a new read is requested
+     */
+    void tick();
 
    private:
-    boost::asio::io_service io_service;
+    /**
+     * Initiates timer for serial reading
+     */
+    void continuousRead();
+
+    std::thread read_thread;
+    std::atomic<TbotsProto_PowerStatus> status;
+    std::atomic<TbotsProto_PowerPulseControl> nanopb_command;
     std::unique_ptr<BoostUartCommunication> uart;
-    PowerStatus status;
 
     // Constants
-    const size_t READ_BUFFER_SIZE;
-    const unsigned int BAUD_RATE         = 115200;
-    const std::string DEVICE_SERIAL_PORT = "/dev/ttyTHS1";
+    const size_t READ_BUFFER_SIZE =
+        getMarshalledSize(TbotsProto_PowerStatus TbotsProto_PowerStatus_init_default);
+    const std::string DEVICE_SERIAL_PORT    = "/dev/ttyUSB0";
+    static constexpr unsigned int BAUD_RATE = 460800;
 };

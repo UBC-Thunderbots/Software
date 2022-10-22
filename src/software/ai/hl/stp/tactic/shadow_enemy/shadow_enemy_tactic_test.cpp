@@ -5,7 +5,7 @@
 #include <utility>
 
 #include "software/geom/triangle.h"
-#include "software/simulated_tests/simulated_er_force_sim_tactic_test_fixture.h"
+#include "software/simulated_tests/simulated_er_force_sim_play_test_fixture.h"
 #include "software/simulated_tests/terminating_validation_functions/ball_kicked_validation.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_in_polygon_validation.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_state_validation.h"
@@ -13,21 +13,21 @@
 #include "software/time/duration.h"
 #include "software/world/world.h"
 
-class ShadowEnemyTacticTest : public SimulatedErForceSimTacticTestFixture
+class ShadowEnemyTacticTest : public SimulatedErForceSimPlayTestFixture
 {
     void SetUp() override
     {
-        SimulatedErForceSimTacticTestFixture::SetUp();
-        setMotionConstraints({MotionConstraint::ENEMY_DEFENSE_AREA});
+        SimulatedErForceSimPlayTestFixture::SetUp();
     }
 
    protected:
     TbotsProto::FieldType field_type = TbotsProto::FieldType::DIV_B;
     Field field                      = Field::createField(field_type);
+    std::set<TbotsProto::MotionConstraint> motion_constraints = {
+        TbotsProto::MotionConstraint::ENEMY_DEFENSE_AREA};
 };
 
-// TODO (#2519): Re-enable tests failing due to HRVO integration
-TEST_F(ShadowEnemyTacticTest, DISABLED_test_block_pass)
+TEST_F(ShadowEnemyTacticTest, test_block_pass)
 {
     Robot shadower(0, Point(-2, 0), Vector(0, 0), Angle::zero(), AngularVelocity::zero(),
                    Timestamp::fromSeconds(0));
@@ -54,8 +54,7 @@ TEST_F(ShadowEnemyTacticTest, DISABLED_test_block_pass)
     BallState ball_state(Point(0, 2), Vector(0, 0));
     auto tactic = std::make_shared<ShadowEnemyTactic>();
     tactic->updateControlParams(enemy_threat, 2);
-    setTactic(tactic);
-    setFriendlyRobotId(0);
+    setTactic(0, tactic, motion_constraints);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [tactic](std::shared_ptr<World> world_ptr,
@@ -74,8 +73,7 @@ TEST_F(ShadowEnemyTacticTest, DISABLED_test_block_pass)
             Duration::fromSeconds(5));
 }
 
-// TODO (#2519): Re-enable tests failing due to HRVO integration
-TEST_F(ShadowEnemyTacticTest, DISABLED_test_block_pass_if_enemy_does_not_have_ball)
+TEST_F(ShadowEnemyTacticTest, test_block_pass_if_enemy_does_not_have_ball)
 {
     Robot shadower(0, Point(-2, 0), Vector(0, 0), Angle::zero(), AngularVelocity::zero(),
                    Timestamp::fromSeconds(0));
@@ -102,8 +100,7 @@ TEST_F(ShadowEnemyTacticTest, DISABLED_test_block_pass_if_enemy_does_not_have_ba
     BallState ball_state(Point(3, 0), Vector(0, 0));
     auto tactic = std::make_shared<ShadowEnemyTactic>();
     tactic->updateControlParams(enemy_threat, 1.5);
-    setTactic(tactic);
-    setFriendlyRobotId(0);
+    setTactic(0, tactic, motion_constraints);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [this, tactic, shadowee](std::shared_ptr<World> world_ptr,
@@ -122,7 +119,7 @@ TEST_F(ShadowEnemyTacticTest, DISABLED_test_block_pass_if_enemy_does_not_have_ba
             Duration::fromSeconds(5));
 }
 
-// TODO (#2519): Re-enable tests failing due to HRVO integration
+// TODO (#2714): Re-enable tests
 TEST_F(ShadowEnemyTacticTest, DISABLED_test_block_net_then_steal_and_chip)
 {
     Robot shadower(0, Point(-2, 0), Vector(0, 0), Angle::zero(), AngularVelocity::zero(),
@@ -149,10 +146,7 @@ TEST_F(ShadowEnemyTacticTest, DISABLED_test_block_net_then_steal_and_chip)
     BallState ball_state(Point(0, -1.75), Vector(0, 0));
     auto tactic = std::make_shared<ShadowEnemyTactic>();
     tactic->updateControlParams(enemy_threat, 2);
-    setTactic(tactic);
-    setFriendlyRobotId(0);
-
-
+    setTactic(0, tactic, motion_constraints);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [this, tactic](std::shared_ptr<World> world_ptr,
@@ -204,10 +198,7 @@ TEST_F(ShadowEnemyTacticTest, test_block_net_if_enemy_threat_is_null)
     BallState ball_state(Point(0, -1.75), Vector(0, 0));
     auto tactic = std::make_shared<ShadowEnemyTactic>();
     tactic->updateControlParams(std::nullopt, 2);
-    setTactic(tactic);
-    setFriendlyRobotId(0);
-
-
+    setTactic(0, tactic, motion_constraints);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [tactic](std::shared_ptr<World> world_ptr,

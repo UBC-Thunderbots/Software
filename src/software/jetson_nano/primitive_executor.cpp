@@ -5,14 +5,15 @@
 #include "proto/primitive/primitive_msg_factory.h"
 #include "proto/tbots_software_msgs.pb.h"
 #include "proto/visualization.pb.h"
-#include "software/logger/logger.h"
 #include "software/math/math_functions.h"
 
 PrimitiveExecutor::PrimitiveExecutor(const double time_step,
-                                     const RobotConstants_t& robot_constants)
+                                     const RobotConstants_t& robot_constants,
+                                     const TeamColour friendly_team_colour)
     : current_primitive_(),
       robot_constants_(robot_constants),
-      hrvo_simulator_(static_cast<float>(time_step), robot_constants)
+      hrvo_simulator_(static_cast<float>(time_step), robot_constants,
+                      friendly_team_colour)
 {
 }
 
@@ -24,7 +25,13 @@ void PrimitiveExecutor::updatePrimitiveSet(
     if (primitive_set_msg_iter != primitive_set_msg.robot_primitives().end())
     {
         current_primitive_ = primitive_set_msg_iter->second;
+        return;
     }
+}
+
+void PrimitiveExecutor::clearCurrentPrimitive()
+{
+    current_primitive_.Clear();
 }
 
 void PrimitiveExecutor::updateWorld(const TbotsProto::World& world_msg)
@@ -32,60 +39,46 @@ void PrimitiveExecutor::updateWorld(const TbotsProto::World& world_msg)
     hrvo_simulator_.updateWorld(World(world_msg));
 }
 
+void PrimitiveExecutor::updateLocalVelocity(Vector local_velocity) {}
+
 Vector PrimitiveExecutor::getTargetLinearVelocity(const unsigned int robot_id,
-                                                  const Angle& orientation)
+                                                  const Angle& curr_orientation)
 {
     Vector target_global_velocity = hrvo_simulator_.getRobotVelocity(robot_id);
-
-    double local_x_velocity = orientation.cos() * target_global_velocity.x() +
-                              orientation.sin() * target_global_velocity.y();
-
-    double local_y_velocity = -orientation.sin() * target_global_velocity.x() +
-                              orientation.cos() * target_global_velocity.y();
-
-    return Vector(local_x_velocity, local_y_velocity)
-        .normalize(target_global_velocity.length());
+    return target_global_velocity.rotate(-curr_orientation);
 }
 
 AngularVelocity PrimitiveExecutor::getTargetAngularVelocity(
-    const TbotsProto::MovePrimitive& move_primitive, const Angle& orientation)
+    const TbotsProto::MovePrimitive& move_primitive, const Angle& curr_orientation)
 {
-    const float LOCAL_EPSILON = 1e-6f;  // Avoid dividing by zero
+    const Angle dest_orientation = createAngle(move_primitive.final_angle());
+    const double delta_orientation =
+        dest_orientation.minDiff(curr_orientation).toRadians();
 
-    const float dest_orientation =
-        static_cast<float>(move_primitive.final_angle().radians());
-    const float delta_orientation =
-        dest_orientation - static_cast<float>(orientation.toRadians());
-    const float max_target_angular_speed = robot_constants_.robot_max_ang_speed_rad_per_s;
+    // angular velocity given linear deceleration and distance remaining to target
+    // orientation.
+    // Vi = sqrt(0^2 + 2 * a * d)
+    double deceleration_angular_speed = std::sqrt(
+        2 * robot_constants_.robot_max_ang_acceleration_rad_per_s_2 * delta_orientation);
 
-    // Compute at what angular distance we should start decelerating angularly
-    // d = (Vf^2 - 0) / (2a + LOCAL_EPSILON)
-    const float start_angular_deceleration_distance =
-        (max_target_angular_speed * max_target_angular_speed) /
-        (2 * robot_constants_.robot_max_ang_acceleration_rad_per_s_2 + LOCAL_EPSILON);
+    double max_angular_speed =
+        static_cast<double>(robot_constants_.robot_max_ang_speed_rad_per_s);
+    double next_angular_speed = std::min(max_angular_speed, deceleration_angular_speed);
 
-    const float target_angular_speed =
-        max_target_angular_speed *
-        static_cast<float>(sigmoid(fabsf(delta_orientation),
-                                   start_angular_deceleration_distance / 2,
-                                   start_angular_deceleration_distance));
-
+    const double signed_delta_orientation =
+        (dest_orientation - curr_orientation).clamp().toRadians();
     return AngularVelocity::fromRadians(
-        copysign(target_angular_speed, delta_orientation));
+        std::copysign(next_angular_speed, signed_delta_orientation));
 }
 
 
 std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimitive(
-    const unsigned int robot_id, const Angle& orientation)
+    const unsigned int robot_id, const Angle& curr_orientation)
 {
     hrvo_simulator_.doStep();
-    // TODO (#2499): Remove if and visualize the HRVO Simulator of all robots
-    if (robot_id == 1)
-    {
-        // All robots should have identical HRVO simulations. To avoid spam, only
-        // the HRVO simulation for robot 0 will be sent to Thunderscope.
-        hrvo_simulator_.visualize(robot_id);
-    }
+
+    // Visualize the HRVO Simulator for the current robot
+    hrvo_simulator_.visualize(robot_id);
 
     switch (current_primitive_.primitive_case())
     {
@@ -97,15 +90,12 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
             // https://developers.google.com/protocol-buffers/docs/proto3#default
             auto output = std::make_unique<TbotsProto::DirectControlPrimitive>();
 
-            // Discharge the capacitors
-            output->set_charge_mode(
-                TbotsProto::DirectControlPrimitive_ChargeMode_DISCHARGE);
-
             return output;
         }
         case TbotsProto::Primitive::kStop:
         {
-            auto prim   = createDirectControlPrimitive(Vector(), AngularVelocity(), 0.0);
+            auto prim   = createDirectControlPrimitive(Vector(), AngularVelocity(), 0.0,
+                                                     TbotsProto::AutoChipOrKick());
             auto output = std::make_unique<TbotsProto::DirectControlPrimitive>(
                 prim->direct_control());
             return output;
@@ -118,17 +108,14 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
         case TbotsProto::Primitive::kMove:
         {
             // Compute the target velocities
-            Vector target_velocity = getTargetLinearVelocity(robot_id, orientation);
+            Vector target_velocity = getTargetLinearVelocity(robot_id, curr_orientation);
             AngularVelocity target_angular_velocity =
-                getTargetAngularVelocity(current_primitive_.move(), orientation);
+                getTargetAngularVelocity(current_primitive_.move(), curr_orientation);
 
             auto output = createDirectControlPrimitive(
                 target_velocity, target_angular_velocity,
-                current_primitive_.move().dribbler_speed_rpm());
-
-            // Copy the AutoKickOrChip settings over
-            copyAutoChipOrKick(current_primitive_.move(),
-                               output->mutable_direct_control());
+                current_primitive_.move().dribbler_speed_rpm(),
+                current_primitive_.move().auto_chip_or_kick());
 
             return std::make_unique<TbotsProto::DirectControlPrimitive>(
                 output->direct_control());
@@ -143,30 +130,4 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
         }
     }
     return std::make_unique<TbotsProto::DirectControlPrimitive>();
-}
-
-void PrimitiveExecutor::copyAutoChipOrKick(const TbotsProto::MovePrimitive& src,
-                                           TbotsProto::DirectControlPrimitive* dest)
-{
-    switch (src.auto_chip_or_kick().auto_chip_or_kick_case())
-    {
-        case TbotsProto::AutoChipOrKick::AutoChipOrKickCase::kAutokickSpeedMPerS:
-        {
-            dest->set_autokick_speed_m_per_s(
-                src.auto_chip_or_kick().autokick_speed_m_per_s());
-
-            break;
-        }
-        case TbotsProto::AutoChipOrKick::AutoChipOrKickCase::kAutochipDistanceMeters:
-        {
-            dest->set_autochip_distance_meters(
-                src.auto_chip_or_kick().autochip_distance_meters());
-            break;
-        }
-        case TbotsProto::AutoChipOrKick::AutoChipOrKickCase::AUTO_CHIP_OR_KICK_NOT_SET:
-        {
-            dest->clear_chick_command();
-            break;
-        }
-    }
 }

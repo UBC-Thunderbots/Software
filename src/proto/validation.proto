@@ -2,11 +2,7 @@ syntax = "proto2";
 
 package TbotsProto;
 
-import "proto/game_state.proto";
-import "proto/team.proto";
-import "proto/vision.proto";
 import "proto/geometry.proto";
-import "proto/ball.proto";
 
 enum ValidationStatus
 {
@@ -26,17 +22,19 @@ message ValidationGeometry
     repeated Polygon polygons = 1;
     repeated Circle circles   = 2;
     repeated Vector vectors   = 3;
+    repeated Segment segments = 4;
 }
 
 message ValidationProto
 {
-    required string failure_msg             = 1;
-    required ValidationType validation_type = 2;
-    required ValidationGeometry geometry    = 3;
-    required ValidationStatus status        = 4;
+    required string failure_msg          = 1;
+    required ValidationGeometry geometry = 2;
+    required ValidationStatus status     = 3;
 }
 
 message ValidationProtoSet
 {
-    repeated ValidationProto validations = 1;
+    required string test_name               = 1;
+    required ValidationType validation_type = 2;
+    repeated ValidationProto validations    = 3;
 }

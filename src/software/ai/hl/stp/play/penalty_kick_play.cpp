@@ -5,15 +5,12 @@
 #include "software/ai/hl/stp/tactic/penalty_kick/penalty_kick_tactic.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-PenaltyKickPlay::PenaltyKickPlay(std::shared_ptr<const AiConfig> config)
-    : Play(config, true)
-{
-}
+PenaltyKickPlay::PenaltyKickPlay(TbotsProto::AiConfig config) : Play(config, true) {}
 
 void PenaltyKickPlay::getNextTactics(TacticCoroutine::push_type &yield,
                                      const World &world)
 {
-    auto penalty_shot_tactic = std::make_shared<PenaltyKickTactic>();
+    auto penalty_shot_tactic = std::make_shared<PenaltyKickTactic>(ai_config);
 
     auto shooter_setup_move = std::make_shared<PenaltySetupTactic>();
 
@@ -37,7 +34,7 @@ void PenaltyKickPlay::getNextTactics(TacticCoroutine::push_type &yield,
                                                           BALL_MAX_RADIUS_METERS + 0.1);
         double ball_position_x = world.field().friendlyPenaltyMark().x();
 
-        // Move all non-shooter robots to a position behind the ball
+        // Move all non-shooter robots behind the penalty mark
         move_tactic_2->updateControlParams(
             Point(ball_position_x - 1.25, 0),
             world.field().enemyGoalCenter().toVector().orientation(), 0);
@@ -75,4 +72,4 @@ void PenaltyKickPlay::getNextTactics(TacticCoroutine::push_type &yield,
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, PenaltyKickPlay, AiConfig> factory;
+static TGenericFactory<std::string, Play, PenaltyKickPlay, TbotsProto::AiConfig> factory;

@@ -31,8 +31,8 @@
 
 #include "extlibs/er_force_sim/src/protobuf/command.h"
 #include "extlibs/er_force_sim/src/protobuf/sslsim.h"
-#include "proto/messages_robocup_ssl_wrapper.pb.h"
 #include "proto/ssl_simulation_robot_control.pb.h"
+#include "proto/ssl_vision_wrapper.pb.h"
 
 
 // higher values break the rolling friction of the ball
@@ -40,6 +40,7 @@ const float SIMULATOR_SCALE  = 10.0f;
 const float SUB_TIMESTEP     = 1 / 200.f;
 const float COLLISION_MARGIN = 0.04f;
 const unsigned FOCAL_LENGTH  = 390;
+
 
 class QByteArray;
 class QTimer;
@@ -192,6 +193,8 @@ class camun::simulator::Simulator : public QObject
     qint64 m_lastBallSendTime      = 0;
     std::map<qint64, unsigned> m_lastFrameNumber;
     ErrorAggregator *m_aggregator;
+
+
 
     std::mt19937 rand_shuffle_src = std::mt19937(std::random_device()());
 };

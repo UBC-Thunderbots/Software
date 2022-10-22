@@ -1,0 +1,293 @@
+syntax = "proto2";
+
+package TbotsProto;
+
+import "proto/play.proto";
+import "google/protobuf/descriptor.proto";
+
+message ParameterRangeOptions
+{
+    optional double min_double_value = 1;
+    optional double max_double_value = 2;
+    optional int64 min_int_value     = 3;
+    optional int64 max_int_value     = 4;
+}
+
+extend google.protobuf.FieldOptions
+{
+    // range is taken in python
+    optional ParameterRangeOptions bounds = 5000;
+}
+
+message ThunderbotsConfig
+{
+    required AiConfig ai_config                      = 1;
+    required SensorFusionConfig sensor_fusion_config = 2;
+}
+
+
+message AiConfig
+{
+    required AiControlConfig ai_control_config                              = 1;
+    required DribbleTacticConfig dribble_tactic_config                      = 2;
+    required AttackerTacticConfig attacker_tactic_config                    = 3;
+    required CornerKickPlayConfig corner_kick_play_config                   = 4;
+    required PassingConfig passing_config                                   = 5;
+    required GoalieTacticConfig goalie_tactic_config                        = 6;
+    required EnemyCapabilityConfig enemy_capability_config                  = 7;
+    required ShootOrPassPlayConfig shoot_or_pass_play_config                = 8;
+    required RobotCapabilitiesConfig robot_capabilities_config              = 9;
+    required SensorFusionConfig sensor_fusion_config                        = 10;
+    required DefensePlayConfig defense_play_config                          = 11;
+    required RobotNavigationObstacleConfig robot_navigation_obstacle_config = 12;
+}
+
+message AiControlConfig
+{
+    // Whether we should run or stop ai
+    required bool run_ai = 1 [default = true];
+
+    // Override the existing play with the Play enum provided
+    required PlayName override_ai_play = 2 [default = UseAiSelection];
+}
+
+message AttackerTacticConfig
+{
+    // The radius of the circle around a friendly robot around which
+    // we think an enemy is about to steal the ball
+    required double enemy_about_to_steal_ball_radius = 1
+        [default = 0.1, (bounds).min_double_value = 0.0, (bounds).max_double_value = 4.0];
+
+    // The minimum open angle to the goal that we require before taking a shot
+    required double min_open_angle_for_shot_deg = 2 [
+        default                   = 6.0,
+        (bounds).min_double_value = 0.0,
+        (bounds).max_double_value = 90.0
+    ];
+}
+
+message CornerKickPlayConfig
+{
+    // The maximum time that we will wait before committing to a pass
+    required double max_time_commit_to_pass_seconds = 1
+        [default = 3.0, (bounds).min_double_value = 0.0, (bounds).max_double_value = 5.0];
+}
+
+
+message PassingConfig
+{
+    // The offset from the sides of the field to place the rectangular
+    // sigmoid we use to determine what areas to pass to
+    required double static_field_position_quality_x_offset = 1
+        [default = 0.3, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
+    // The offset from the sides of the field to place the rectangular
+    // sigmoid we use to determine what areas to pass to
+    required double static_field_position_quality_y_offset = 2
+        [default = 0.3, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
+    // The weight that being close to the goal will have on the static
+    // position quality. Lower, more negative weights result in the distance
+    // to the goal having less of an effect.
+    required double static_field_position_quality_friendly_goal_distance_weight = 3
+        [default = 0.3, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
+    // This controls how heavily we weigh an enemy robot being near the pass
+    // receiver when calculating enemy risk to a pass
+    required double enemy_proximity_importance = 4 [
+        default                   = 0.5,
+        (bounds).min_double_value = 0.0,
+        (bounds).max_double_value = 10.0
+    ];
+    // The maximum angle that we have to rotate after receiving a pass to
+    // shoot that we think would likely result in a goal. Note that we may
+    // try to take shots that require us to rotate more then this, it's more
+    // of a soft limit.
+    required double ideal_max_rotation_to_shoot_degrees = 5 [
+        default                   = 60.0,
+        (bounds).min_double_value = 0.0,
+        (bounds).max_double_value = 180.0
+    ];
+    // The minimum pass speed (in m/s)
+    required double min_pass_speed_m_per_s = 6
+        [default = 4.3, (bounds).min_double_value = 0.0, (bounds).max_double_value = 5.0];
+    // The maximum pass speed (in m/s)
+    required double max_pass_speed_m_per_s = 7 [
+        default                   = 6.0,
+        (bounds).min_double_value = 0.0,
+        (bounds).max_double_value = 10.0
+    ];
+    // How long we think the enemy will take to recognize we're passing and start
+    // moving to intercept
+    required double enemy_reaction_time = 8
+        [default = 0.4, (bounds).min_double_value = 0.0, (bounds).max_double_value = 3.0];
+    // The number of steps of gradient descent to perform in each iteration
+    required int32 number_of_gradient_descent_steps_per_iter = 9
+        [default = 2, (bounds).min_int_value = 0, (bounds).max_int_value = 100];
+}
+
+message GoalieTacticConfig
+{
+    // Control the final speed of the goalie to be able to intercept shots better
+    required double goalie_final_speed = 1
+        [default = 0.0, (bounds).min_double_value = 0.0, (bounds).max_double_value = 3.0];
+    // At what speed of the ball should the goalie panic and stop the ball
+    required double ball_speed_panic = 2
+        [default = 0.2, (bounds).min_double_value = 0.0, (bounds).max_double_value = 6.0];
+    // The radius to wedge the robot into the cone
+    required double block_cone_radius = 3
+        [default = 0.3, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
+    // How much to deflate the defense area by, larger value means closer to the net
+    required double defense_area_deflation = 4
+        [default = 0.2, (bounds).min_double_value = 0.1, (bounds).max_double_value = 0.5];
+}
+
+message DribbleTacticConfig
+{
+    // If ball and front of robot are separated by this amount, then we've lost
+    // possession (in m)
+    required double lose_ball_possession_threshold = 1 [
+        default                   = 0.04,
+        (bounds).min_double_value = 0.0,
+        (bounds).max_double_value = 1.0
+    ];
+
+    // Threshold to determine if the ball is at the destination determined
+    // experimentally (in m)
+    required double ball_close_to_dest_threshold = 2
+        [default = 0.1, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
+
+    // Threshold to determine if the robot has the expected orientation when
+    // completing the dribble (in degrees)
+    required double final_destination_close_threshold = 3 [
+        default                   = 1.0,
+        (bounds).min_double_value = 0.0,
+        (bounds).max_double_value = 10.0
+    ];
+
+    // Maximum distance to continuously dribble the ball,
+    // slightly conservative to not break the 1 meter rule (in m)
+    required double max_continuous_dribbling_distance = 4 [
+        default                   = 0.78,
+        (bounds).min_double_value = 0.0,
+        (bounds).max_double_value = 2.0
+    ];
+
+    // Robot speed at which the robot is done dribbling (in m/s)
+    required double robot_dribbling_done_speed = 5
+        [default = 1.0, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
+}
+
+message EnemyCapabilityConfig
+{
+    // This value should be set based on whether or not the team we are playing against
+    // can pass the ball. This will affect how we defend against the team.
+    required bool enemy_team_can_pass = 1 [default = true];
+}
+
+message ShootOrPassPlayConfig
+{
+    // The absolute minimum pass quality we're willing to attempt
+    required double abs_min_pass_score = 1 [
+        default                   = 0.05,
+        (bounds).min_double_value = 0.0,
+        (bounds).max_double_value = 1.0
+    ];
+
+    // When we're choosing a pass, we start by looking for a pass with a perfect score
+    // of 1, and then over time lower the score we're will to accept. This parameter
+    // how fast we ramp down to abs_min_pass_score. This is in seconds.
+    required double pass_score_ramp_down_duration = 2
+        [default = 2.0, (bounds).min_double_value = 0.0, (bounds).max_double_value = 5.0];
+
+    // threshold to decide if the ball has been kicked by a robot
+    required double ball_shot_threshold = 3
+        [default = 4.0, (bounds).min_double_value = 0.0, (bounds).max_double_value = 5.0];
+
+    // threshold to decide if the ball has been kicked by a robot
+    required double min_distance_to_pass = 4
+        [default = 0.1, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
+
+    // threshold for the distance between passer and receiver
+    required double short_pass_threshold = 5
+        [default = 0.5, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
+
+    // threshold to decide if ball hasn't been kicked
+    required double ball_not_kicked_threshold = 6
+        [default = 0.3, (bounds).min_double_value = 0.0, (bounds).max_double_value = 5.0];
+}
+
+
+message RobotCapabilitiesConfig
+{
+    // Comma-separated list of numbers of robots with broken dribblers
+    required string broken_dribblers = 1;
+    // Comma-separated list of numbers of robots with broken chippers
+    required string broken_chippers = 2;
+    // Comma-separated list of numbers of robots with broken kickers
+    required string broken_kickers = 3;
+}
+
+message SensorFusionConfig
+{
+    // Ignores frames if our goalie appears in the opponent defense area
+    required bool vision_flipping_filter_enabled = 1 [default = true];
+
+    // Whether or not to ignore invalid camera data. If this value is true, any ball or
+    // robot detections that are not within the min and max valid x coordinates will be
+    // ignored. If this value is false, all data is collected as normal and not ignored.
+    required bool ignore_invalid_camera_data = 2 [default = false];
+
+    // When ignoreInvalidCameraData is true, any robot or ball detection with an
+    // x-coordinate less than this value is ignored.
+    required double min_valid_x = 3 [
+        default                   = -10.0,
+        (bounds).min_double_value = -10.0,
+        (bounds).max_double_value = 10.0
+    ];
+
+    // When ignoreInvalidCameraData is true, any robot or ball detection with an
+    // x-coordinate greater than this value is ignored.
+    required double max_valid_x = 4 [
+        default                   = -10.0,
+        (bounds).min_double_value = -10.0,
+        (bounds).max_double_value = 10.0
+    ];
+
+    // The id of the friendly goalie
+    required int32 friendly_goalie_id = 5
+        [default = 0, (bounds).min_int_value = 0, (bounds).max_int_value = 16];
+
+    // The id of the enemy goalie
+    required int32 enemy_goalie_id = 6
+        [default = 0, (bounds).min_int_value = 0, (bounds).max_int_value = 16];
+
+    // Yellow if selected, Blue if unselected
+    required bool friendly_color_yellow = 9 [default = true];
+
+    // Overrides the friendly goalie id provided by the game controller,
+    // with FriendlyGoalieId parameter
+    required bool override_game_controller_friendly_goalie_id = 10 [default = true];
+
+    // Overrides the enemy goalie id provided by the game controller,
+    // with EnemyGoalieId parameter
+    required bool override_game_controller_enemy_goalie_id = 11 [default = true];
+
+    // Number of dropped detections before we consider the ball not to be in the dribbler
+    required int32 num_dropped_detections_before_ball_not_in_dribbler = 12
+        [default = 3, (bounds).min_int_value = 0, (bounds).max_int_value = 1000];
+}
+
+message DefensePlayConfig
+{
+    // The distance at which a threat is considered "immediate" if there is only 1
+    // "immediate" threat the defense play will swarm that robot with shadowers
+    required double immediate_threat_distance = 1
+        [default = 6.0, (bounds).min_double_value = 0.0, (bounds).max_double_value = 9.5];
+}
+
+message RobotNavigationObstacleConfig
+{
+    required double robot_obstacle_inflation_factor = 1 [
+        default                   = 2.0167,
+        (bounds).min_double_value = 0.0,
+        (bounds).max_double_value = 10.0
+    ];
+}

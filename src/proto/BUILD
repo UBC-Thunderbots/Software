@@ -9,9 +9,11 @@ proto_library(
     srcs = [
         "ball.proto",
         "game_state.proto",
+        "geneva_slot.proto",
         "geometry.proto",
-        "move_robot_and_ball_messages.proto",
+        "parameters.proto",
         "play.proto",
+        "power_frame_msg.proto",
         "primitive.proto",
         "robot_log_msg.proto",
         "robot_status_msg.proto",
@@ -23,6 +25,7 @@ proto_library(
         "world.proto",
     ],
     deps = [
+        "@com_google_protobuf//:descriptor_proto",
         "@nanopb//:nanopb_options_proto",
     ],
 )
@@ -41,9 +44,11 @@ py_proto_library(
     name = "tbots_py_proto",
     srcs = [
         "ball.proto",
+        "estop_state.proto",
         "game_state.proto",
+        "geneva_slot.proto",
         "geometry.proto",
-        "move_robot_and_ball_messages.proto",
+        "parameters.proto",
         "play.proto",
         "primitive.proto",
         "robot_status_msg.proto",
@@ -69,15 +74,27 @@ py_proto_library(
 proto_library(
     name = "ssl_proto",
     srcs = [
-        "messages_robocup_ssl_detection.proto",
-        "messages_robocup_ssl_geometry.proto",
-        "messages_robocup_ssl_wrapper.proto",
+        "ssl_gc_api.proto",
+        "ssl_gc_change.proto",
+        "ssl_gc_ci.proto",
         "ssl_gc_common.proto",
+        "ssl_gc_engine.proto",
+        "ssl_gc_engine_config.proto",
         "ssl_gc_game_event.proto",
         "ssl_gc_geometry.proto",
         "ssl_gc_referee_message.proto",
+        "ssl_gc_state.proto",
+        "ssl_vision_detection.proto",
+        "ssl_vision_detection_tracked.proto",
+        "ssl_vision_geometry.proto",
+        "ssl_vision_wrapper.proto",
+        "ssl_vision_wrapper_tracked.proto",
     ],
     visibility = ["//visibility:public"],
+    deps = [
+        "@com_google_protobuf//:duration_proto",
+        "@com_google_protobuf//:timestamp_proto",
+    ],
 )
 
 # These proto files are based on the following commit:
@@ -122,38 +139,6 @@ proto_library(
 )
 
 proto_library(
-    name = "replay_msg_proto",
-    srcs = [
-        "replay_msg.proto",
-    ],
-    visibility = ["//visibility:private"],
-    deps = [
-        ":sensor_msg_proto",
-        ":ssl_proto",
-        ":tbots_proto",
-    ],
-)
-
-proto_library(
-    name = "defending_side_msg_proto",
-    srcs = [
-        "defending_side_msg.proto",
-    ],
-    visibility = ["//visibility:private"],
-)
-
-proto_library(
-    name = "repeated_any_msg_proto",
-    srcs = [
-        "repeated_any_msg.proto",
-    ],
-    visibility = ["//visibility:private"],
-    deps = [
-        "@com_google_protobuf//:any_proto",
-    ],
-)
-
-proto_library(
     name = "visualization_proto",
     srcs = [
         "visualization.proto",
@@ -183,21 +168,6 @@ cc_proto_library(
 )
 
 cc_proto_library(
-    name = "replay_msg_cc_proto",
-    deps = [":replay_msg_proto"],
-)
-
-cc_proto_library(
-    name = "defending_side_msg_cc_proto",
-    deps = [":defending_side_msg_proto"],
-)
-
-cc_proto_library(
-    name = "repeated_any_msg_cc_proto",
-    deps = [":repeated_any_msg_proto"],
-)
-
-cc_proto_library(
     name = "visualization_cc_proto",
     deps = [":visualization_proto"],
 )
@@ -210,18 +180,24 @@ cc_proto_library(
 py_proto_library(
     name = "software_py_proto",
     srcs = [
-        "messages_robocup_ssl_detection.proto",
-        "messages_robocup_ssl_geometry.proto",
-        "messages_robocup_ssl_wrapper.proto",
         "play_info_msg.proto",
-        "repeated_any_msg.proto",
-        "replay_msg.proto",
         "robot_log_msg.proto",
         "sensor_msg.proto",
+        "ssl_gc_api.proto",
+        "ssl_gc_change.proto",
+        "ssl_gc_ci.proto",
         "ssl_gc_common.proto",
+        "ssl_gc_engine.proto",
+        "ssl_gc_engine_config.proto",
         "ssl_gc_game_event.proto",
         "ssl_gc_geometry.proto",
         "ssl_gc_referee_message.proto",
+        "ssl_gc_state.proto",
+        "ssl_vision_detection.proto",
+        "ssl_vision_detection_tracked.proto",
+        "ssl_vision_geometry.proto",
+        "ssl_vision_wrapper.proto",
+        "ssl_vision_wrapper_tracked.proto",
     ],
     deps = [
         ":tbots_py_proto",

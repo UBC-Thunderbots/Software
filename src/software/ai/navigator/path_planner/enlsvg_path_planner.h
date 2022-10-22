@@ -1,13 +1,15 @@
+#pragma once
+
 #include <boost/functional/hash/hash.hpp>
 #include <queue>
 
-#include "extlibs/enlsvg/Pathfinding/ENLSVG.h"
+#include "extlibs/enlsvg/Pathfinding/enlsvg.h"
 #include "software/ai/navigator/obstacle/obstacle.hpp"
 #include "software/geom/linear_spline2d.h"
 #include "software/logger/logger.h"
 #include "software/world/world.h"
 
-using Path = LinearSpline2d;
+using Path = std::vector<Point>;
 
 /**
  * The Edge N-Level Sparse Visibility Graph algorithm is a fast pathfinding algorithm for
@@ -48,8 +50,8 @@ class EnlsvgPathPlanner
      * @param start  start point
      * @param end    end point
      *
-     * @return   a vector of points that is the optimal path avoiding obstacles
-     *           if no valid path, then return an empty vector
+     * @return   Path that is the optimal path avoiding obstacles
+     *           if no valid path, then return nullopt
      */
     std::optional<Path> findPath(const Point &start, const Point &end) const;
 
@@ -64,11 +66,26 @@ class EnlsvgPathPlanner
         return resolution;
     }
 
+    /**
+     * Compute the length of the path by summing the distance between consecutive points
+     * start with the robot_position
+     *
+     * @param path_points The points on the path
+     * @param robot_position The position of the robot
+     *
+     * @return the length of the path
+     */
+    static double pathLength(const std::vector<Point> &path_points,
+                             const Point &robot_position);
+
+    // 100 m upper limit for path length
+    static constexpr double MAX_PATH_LENGTH = 100.0;
+
    private:
     using EnlsvgPath      = Pathfinding::Path;
     using EnlsvgGrid      = Pathfinding::Grid;
-    using EnlsvgAlgorithm = Pathfinding::ENLSVG::Algorithm;
-    using EnlsvgMemory    = Pathfinding::ENLSVG::Memory;
+    using EnlsvgAlgorithm = Pathfinding::Enlsvg::Algorithm;
+    using EnlsvgMemory    = Pathfinding::Enlsvg::Memory;
 
     /**
      * This struct is just the internal representation of a grid coordinate. This exists

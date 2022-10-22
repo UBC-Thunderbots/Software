@@ -107,6 +107,13 @@ class Rectangle : public ConvexPolygon
     Vector diagonal() const;
 
     /**
+     * The half perimeter of the rectangle
+     *
+     * @return the half perimeter of the rectangle
+     */
+    double halfPerimeter() const;
+
+    /**
      * Returns the Rectangle expanded in all directions by the expansion_amount
      *
      * @param expansion_amount a non-negative expansion amount

@@ -13,83 +13,92 @@ namespace
 {
     World world = ::TestUtil::createBlankTestingWorld();
     Pass pass({1, 1}, {0.5, 0}, 2.29);
-
+    TbotsProto::AiConfig ai_config;
 
     // vector of pairs of Tactic and allowed MotionConstraints
-    std::vector<std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>>
+    std::vector<
+        std::pair<std::shared_ptr<Tactic>, std::set<TbotsProto::MotionConstraint>>>
         test_vector = {
-            std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
-                new MoveTactic(), std::set<MotionConstraint>({})),
-            std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
-                new CreaseDefenderTactic(
-                    std::make_shared<const RobotNavigationObstacleConfig>()),
-                std::set<MotionConstraint>({MotionConstraint::HALF_METER_AROUND_BALL})),
-            std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
-                new GoalieTactic(std::make_shared<const GoalieTacticConfig>()),
-                std::set<MotionConstraint>({MotionConstraint::FRIENDLY_DEFENSE_AREA,
-                                            MotionConstraint::FRIENDLY_DEFENSE_AREA,
-                                            MotionConstraint::HALF_METER_AROUND_BALL,
-                                            MotionConstraint::FRIENDLY_HALF})),
-            std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
-                new ChipTactic(), std::set<MotionConstraint>({})),
-            std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
+            std::pair<std::shared_ptr<Tactic>, std::set<TbotsProto::MotionConstraint>>(
+                new MoveTactic(), std::set<TbotsProto::MotionConstraint>({})),
+            std::pair<std::shared_ptr<Tactic>, std::set<TbotsProto::MotionConstraint>>(
+                new CreaseDefenderTactic(ai_config.robot_navigation_obstacle_config()),
+                std::set<TbotsProto::MotionConstraint>(
+                    {TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL})),
+            std::pair<std::shared_ptr<Tactic>, std::set<TbotsProto::MotionConstraint>>(
+                new GoalieTactic(ai_config),
+                std::set<TbotsProto::MotionConstraint>(
+                    {TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA,
+                     TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA,
+                     TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL,
+                     TbotsProto::MotionConstraint::FRIENDLY_HALF})),
+            std::pair<std::shared_ptr<Tactic>, std::set<TbotsProto::MotionConstraint>>(
+                new ChipTactic(), std::set<TbotsProto::MotionConstraint>({})),
+            std::pair<std::shared_ptr<Tactic>, std::set<TbotsProto::MotionConstraint>>(
                 new KickoffChipTactic(),
-                std::set<MotionConstraint>({MotionConstraint::CENTER_CIRCLE,
-                                            MotionConstraint::HALF_METER_AROUND_BALL})),
-            std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
-                new PenaltyKickTactic(),
-                std::set<MotionConstraint>({MotionConstraint::HALF_METER_AROUND_BALL,
-                                            MotionConstraint::ENEMY_DEFENSE_AREA,
-                                            MotionConstraint::ENEMY_HALF})),
-            std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
+                std::set<TbotsProto::MotionConstraint>(
+                    {TbotsProto::MotionConstraint::CENTER_CIRCLE,
+                     TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL})),
+            std::pair<std::shared_ptr<Tactic>, std::set<TbotsProto::MotionConstraint>>(
+                new PenaltyKickTactic(ai_config),
+                std::set<TbotsProto::MotionConstraint>(
+                    {TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL,
+                     TbotsProto::MotionConstraint::ENEMY_DEFENSE_AREA,
+                     TbotsProto::MotionConstraint::ENEMY_HALF})),
+            std::pair<std::shared_ptr<Tactic>, std::set<TbotsProto::MotionConstraint>>(
                 new PenaltySetupTactic(),
-                std::set<MotionConstraint>({MotionConstraint::ENEMY_HALF,
-                                            MotionConstraint::ENEMY_DEFENSE_AREA,
-                                            MotionConstraint::FRIENDLY_HALF,
-                                            MotionConstraint::HALF_METER_AROUND_BALL})),
-            std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
-                new ReceiverTactic(), std::set<MotionConstraint>({})),
-            std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
-                new ShadowEnemyTactic(), std::set<MotionConstraint>({})),
-            std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
-                new AttackerTactic(std::make_shared<const AttackerTacticConfig>()),
-                std::set<MotionConstraint>({})),
-            std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
-                new StopTactic(false), std::set<MotionConstraint>({}))};
+                std::set<TbotsProto::MotionConstraint>(
+                    {TbotsProto::MotionConstraint::ENEMY_HALF,
+                     TbotsProto::MotionConstraint::ENEMY_DEFENSE_AREA,
+                     TbotsProto::MotionConstraint::FRIENDLY_HALF,
+                     TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL})),
+            std::pair<std::shared_ptr<Tactic>, std::set<TbotsProto::MotionConstraint>>(
+                new ReceiverTactic(), std::set<TbotsProto::MotionConstraint>({})),
+            std::pair<std::shared_ptr<Tactic>, std::set<TbotsProto::MotionConstraint>>(
+                new ShadowEnemyTactic(), std::set<TbotsProto::MotionConstraint>({})),
+            std::pair<std::shared_ptr<Tactic>, std::set<TbotsProto::MotionConstraint>>(
+                new AttackerTactic(ai_config),
+                std::set<TbotsProto::MotionConstraint>({})),
+            std::pair<std::shared_ptr<Tactic>, std::set<TbotsProto::MotionConstraint>>(
+                new StopTactic(false), std::set<TbotsProto::MotionConstraint>({}))};
 
     // sets of motion constraints for each type of game state
-    auto stoppage_or_them_motion_constraints =
-        std::set<MotionConstraint>({MotionConstraint::INFLATED_ENEMY_DEFENSE_AREA,
-                                    MotionConstraint::HALF_METER_AROUND_BALL,
-                                    MotionConstraint::FRIENDLY_DEFENSE_AREA});
+    auto stoppage_or_them_motion_constraints = std::set<TbotsProto::MotionConstraint>(
+        {TbotsProto::MotionConstraint::INFLATED_ENEMY_DEFENSE_AREA,
+         TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL,
+         TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA});
 
-    auto gamestart_or_us_motion_constraints =
-        std::set<MotionConstraint>({MotionConstraint::INFLATED_ENEMY_DEFENSE_AREA,
-                                    MotionConstraint::FRIENDLY_DEFENSE_AREA});
+    auto gamestart_or_us_motion_constraints = std::set<TbotsProto::MotionConstraint>(
+        {TbotsProto::MotionConstraint::INFLATED_ENEMY_DEFENSE_AREA,
+         TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA});
 
-    auto kickoff_motion_constraints = std::set<MotionConstraint>(
-        {MotionConstraint::FRIENDLY_DEFENSE_AREA, MotionConstraint::CENTER_CIRCLE,
-         MotionConstraint::HALF_METER_AROUND_BALL, MotionConstraint::ENEMY_HALF});
+    auto kickoff_motion_constraints = std::set<TbotsProto::MotionConstraint>(
+        {TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA,
+         TbotsProto::MotionConstraint::CENTER_CIRCLE,
+         TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL,
+         TbotsProto::MotionConstraint::ENEMY_HALF});
 
-    auto our_penalty_motion_constraints = std::set<MotionConstraint>(
-        {MotionConstraint::FRIENDLY_DEFENSE_AREA, MotionConstraint::ENEMY_HALF});
+    auto our_penalty_motion_constraints = std::set<TbotsProto::MotionConstraint>(
+        {TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA,
+         TbotsProto::MotionConstraint::ENEMY_HALF});
 
-    auto them_penalty_motion_constraints = std::set<MotionConstraint>(
-        {MotionConstraint::FRIENDLY_DEFENSE_AREA,
-         MotionConstraint::HALF_METER_AROUND_BALL, MotionConstraint::FRIENDLY_HALF});
+    auto them_penalty_motion_constraints = std::set<TbotsProto::MotionConstraint>(
+        {TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA,
+         TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL,
+         TbotsProto::MotionConstraint::FRIENDLY_HALF});
 
-    auto them_ball_placement =
-        std::set<MotionConstraint>({MotionConstraint::HALF_METER_AROUND_BALL,
-                                    MotionConstraint::FRIENDLY_DEFENSE_AREA,
-                                    MotionConstraint::AVOID_BALL_PLACEMENT_INTERFERENCE});
+    auto them_ball_placement = std::set<TbotsProto::MotionConstraint>(
+        {TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL,
+         TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA,
+         TbotsProto::MotionConstraint::AVOID_BALL_PLACEMENT_INTERFERENCE});
 }  // namespace
 
 class CheckMotionConstraints
     : public ::testing::TestWithParam<
-          std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>>
+          std::pair<std::shared_ptr<Tactic>, std::set<TbotsProto::MotionConstraint>>>
 {
    public:
-    std::set<MotionConstraint> correct_motion_constraints;
+    std::set<TbotsProto::MotionConstraint> correct_motion_constraints;
     GameState game_state;
 };
 
@@ -98,7 +107,7 @@ TEST_P(CheckMotionConstraints, CycleStoppageOrThemGameStatesTest)
 {
     correct_motion_constraints = stoppage_or_them_motion_constraints;
 
-    for (MotionConstraint c : GetParam().second)
+    for (TbotsProto::MotionConstraint c : GetParam().second)
     {
         correct_motion_constraints.erase(c);
     }
@@ -144,7 +153,7 @@ TEST_P(CheckMotionConstraints, CycleGameStartOrUsGameStatesTest)
 {
     correct_motion_constraints = gamestart_or_us_motion_constraints;
 
-    for (MotionConstraint c : GetParam().second)
+    for (TbotsProto::MotionConstraint c : GetParam().second)
     {
         correct_motion_constraints.erase(c);
     }
@@ -170,7 +179,7 @@ TEST_P(CheckMotionConstraints, CycleKickoffGameStatesTest)
 {
     correct_motion_constraints = kickoff_motion_constraints;
 
-    for (MotionConstraint c : GetParam().second)
+    for (TbotsProto::MotionConstraint c : GetParam().second)
     {
         correct_motion_constraints.erase(c);
     }
@@ -188,7 +197,7 @@ TEST_P(CheckMotionConstraints, CycleOurPenaltyGameStatesTest)
 {
     correct_motion_constraints = our_penalty_motion_constraints;
 
-    for (MotionConstraint c : GetParam().second)
+    for (TbotsProto::MotionConstraint c : GetParam().second)
     {
         correct_motion_constraints.erase(c);
     }
@@ -202,7 +211,7 @@ TEST_P(CheckMotionConstraints, CycleThemPenaltyGameStatesTest)
 {
     correct_motion_constraints = them_penalty_motion_constraints;
 
-    for (MotionConstraint c : GetParam().second)
+    for (TbotsProto::MotionConstraint c : GetParam().second)
     {
         correct_motion_constraints.erase(c);
     }
@@ -216,7 +225,7 @@ TEST_P(CheckMotionConstraints, CycleThemBallPlacementTest)
 {
     correct_motion_constraints = them_ball_placement;
 
-    for (MotionConstraint c : GetParam().second)
+    for (TbotsProto::MotionConstraint c : GetParam().second)
     {
         correct_motion_constraints.erase(c);
     }

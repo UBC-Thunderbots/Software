@@ -1,0 +1,44 @@
+syntax = "proto3";
+
+package TbotsProto;
+
+import "proto/robot_status_msg.proto";
+import "proto/geneva_slot.proto";
+
+// This is used on the robots. Similar proto in primitive.proto but with m_per_s instead
+// of pulse width
+message PowerPulseControl
+{
+    message AutoChipOrKick
+    {
+        oneof auto_chip_or_kick
+        {
+            uint32 autokick_pulse_width = 1;
+            uint32 autochip_pulse_width = 2;
+        }
+    }
+
+    message ChickerControl
+    {
+        oneof chicker_command
+        {
+            uint32 kick_pulse_width          = 1;
+            uint32 chip_pulse_width          = 2;
+            AutoChipOrKick auto_chip_or_kick = 3;
+        }
+    }
+
+    ChickerControl chicker  = 1;
+    Geneva.Slot geneva_slot = 2;
+}
+
+message PowerFrame
+{
+    uint32 length = 1;
+    uint32 crc    = 2;
+    oneof power_msg
+    {
+        PowerPulseControl power_control = 3;
+        PowerStatus power_status        = 4;
+    }
+}

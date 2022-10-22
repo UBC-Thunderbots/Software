@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-#include "software/ai/motion_constraint/motion_constraint.h"
+#include "proto/primitive.pb.h"
 #include "software/ai/navigator/obstacle/robot_navigation_obstacle_factory.h"
 #include "software/simulated_tests/non_terminating_validation_functions/robots_violating_motion_constraint.h"
 #include "software/simulated_tests/simulated_er_force_sim_play_test_fixture.h"
@@ -34,14 +34,14 @@ TEST_P(EnemyBallPlacementPlayTest, test_ball_placement)
          field.enemyDefenseArea().negXNegYCorner(),
          field.enemyDefenseArea().negXPosYCorner()});
     setEnemyGoalie(0);
-    setAIPlay(TYPENAME(EnemyBallPlacementPlay));
+    setAiPlay(TbotsProto::PlayName::EnemyBallPlacementPlay);
     GameState game_state;
     game_state.updateRefereeCommand(RefereeCommand::BALL_PLACEMENT_THEM);
     game_state.setBallPlacementPoint(ball_placement_point);
     setGameState(game_state);
     std::shared_ptr<RobotNavigationObstacleFactory> obstacle_factory =
         std::make_shared<RobotNavigationObstacleFactory>(
-            getAiConfig()->getRobotNavigationObstacleConfig());
+            TbotsProto::RobotNavigationObstacleConfig());
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
@@ -63,7 +63,7 @@ TEST_P(EnemyBallPlacementPlayTest, test_ball_placement)
 
             robotsViolatingMotionConstraint(
                 world_ptr, yield, obstacle_factory,
-                MotionConstraint::AVOID_BALL_PLACEMENT_INTERFERENCE);
+                TbotsProto::MotionConstraint::AVOID_BALL_PLACEMENT_INTERFERENCE);
         }};
 
     runTest(field_type, ball_state, friendly_robots, enemy_robots,
@@ -84,13 +84,13 @@ TEST_F(EnemyBallPlacementPlayTest, test_no_placement)
          field.enemyDefenseArea().negXNegYCorner(),
          field.enemyDefenseArea().negXPosYCorner()});
     setEnemyGoalie(0);
-    setAIPlay(TYPENAME(EnemyBallPlacementPlay));
+    setAiPlay(TbotsProto::PlayName::EnemyBallPlacementPlay);
     GameState game_state;
     game_state.updateRefereeCommand(RefereeCommand::BALL_PLACEMENT_THEM);
     setGameState(game_state);
     std::shared_ptr<RobotNavigationObstacleFactory> obstacle_factory =
         std::make_shared<RobotNavigationObstacleFactory>(
-            getAiConfig()->getRobotNavigationObstacleConfig());
+            TbotsProto::RobotNavigationObstacleConfig());
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
@@ -111,7 +111,7 @@ TEST_F(EnemyBallPlacementPlayTest, test_no_placement)
             }
             robotsViolatingMotionConstraint(
                 world_ptr, yield, obstacle_factory,
-                MotionConstraint::AVOID_BALL_PLACEMENT_INTERFERENCE);
+                TbotsProto::MotionConstraint::AVOID_BALL_PLACEMENT_INTERFERENCE);
         }};
 
     runTest(field_type, ball_state, friendly_robots, enemy_robots,

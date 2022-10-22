@@ -22,7 +22,7 @@ TEST_F(ScoringWithStaticDefendersPlayTest,
     auto friendly_robots = TestUtil::createStationaryRobotStatesWithId(
         {Point(4, 0), Point(0.5, 0), Point(-3, 1)});
     setFriendlyGoalie(0);
-    setAIPlay(TYPENAME(ScoringWithStaticDefendersPlay));
+    setAiPlay(TbotsProto::PlayName::ScoringWithStaticDefendersPlay);
 
     setRefereeCommand(RefereeCommand::STOP, RefereeCommand::HALT);
 
@@ -50,7 +50,7 @@ TEST_F(ScoringWithStaticDefendersPlayTest,
     auto friendly_robots = TestUtil::createStationaryRobotStatesWithId(
         {Point(4, 0), Point(0.5, 0), Point(-3, 1)});
     setFriendlyGoalie(0);
-    setAIPlay(TYPENAME(ScoringWithStaticDefendersPlay));
+    setAiPlay(TbotsProto::PlayName::ScoringWithStaticDefendersPlay);
 
     setRefereeCommand(RefereeCommand::DIRECT_FREE_US, RefereeCommand::HALT);
 

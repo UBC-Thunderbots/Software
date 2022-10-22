@@ -3,8 +3,12 @@
 #include <algorithm>
 
 KickTactic::KickTactic()
-    : Tactic({RobotCapability::Kick, RobotCapability::Move}), fsm{GetBehindBallFSM()}
+    : Tactic({RobotCapability::Kick, RobotCapability::Move}), fsm_map()
 {
+    for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)
+    {
+        fsm_map[id] = std::make_unique<FSM<KickFSM>>(GetBehindBallFSM());
+    }
 }
 
 void KickTactic::updateControlParams(const Point &kick_origin,
@@ -23,21 +27,18 @@ void KickTactic::updateControlParams(const Point &kick_origin, const Point &kick
                         kick_speed_meters_per_second);
 }
 
-double KickTactic::calculateRobotCost(const Robot &robot, const World &world) const
-{
-    // the closer the robot is to a ball, the cheaper it is to perform the kick
-    double cost = (robot.position() - world.ball().position()).length() /
-                  world.field().totalXLength();
-
-    return std::clamp<double>(cost, 0, 1);
-}
-
 void KickTactic::accept(TacticVisitor &visitor) const
 {
     visitor.visit(*this);
 }
 
-void KickTactic::updateIntent(const TacticUpdate &tactic_update)
+void KickTactic::updatePrimitive(const TacticUpdate &tactic_update, bool reset_fsm)
 {
-    fsm.process_event(KickFSM::Update(control_params, tactic_update));
+    if (reset_fsm)
+    {
+        fsm_map[tactic_update.robot.id()] =
+            std::make_unique<FSM<KickFSM>>(GetBehindBallFSM());
+    }
+    fsm_map.at(tactic_update.robot.id())
+        ->process_event(KickFSM::Update(control_params, tactic_update));
 }

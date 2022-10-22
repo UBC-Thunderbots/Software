@@ -15,8 +15,8 @@ cc_library(
         "shoot_or_pass_play_fsm.h",
     ],
     deps = [
+        "//proto/message_translation:tbots_protobuf",
         "//shared:constants",
-        "//shared/parameter:cpp_configs",
         "//software/ai/evaluation:calc_best_shot",
         "//software/ai/evaluation:possession",
         "//software/ai/hl/stp/play",
@@ -49,7 +49,7 @@ cc_test(
     deps = [
         ":shoot_or_pass_play",
         "//shared/test_util:tbots_gtest_main",
-        "//software/simulated_tests:simulated_play_test_fixture",
+        "//software/simulated_tests:simulated_er_force_sim_play_test_fixture",
         "//software/simulated_tests/terminating_validation_functions",
         "//software/simulated_tests/validation:validation_function",
         "//software/test_util",

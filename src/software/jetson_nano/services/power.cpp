@@ -1,57 +1,78 @@
 #include "software/jetson_nano/services/power.h"
 
+#include <boost/bind/bind.hpp>
 #include <cstdint>
 
-#include "shared/uart_framing/uart_framing.hpp"
+#include "proto/power_frame_msg.nanopb.h"
 
 PowerService::PowerService()
-    : status(), READ_BUFFER_SIZE(getMarshalledSize(PowerStatus()))
 {
-    this->uart = std::make_unique<BoostUartCommunication>(io_service, BAUD_RATE,
-                                                          DEVICE_SERIAL_PORT);
+    this->uart = std::make_unique<BoostUartCommunication>(BAUD_RATE, DEVICE_SERIAL_PORT);
+    this->read_thread = std::thread(boost::bind(&PowerService::continuousRead, this));
 }
 
-void PowerService::start() {}
-
-void PowerService::stop() {}
-
-std::unique_ptr<PowerStatus> PowerService::poll(const PowerCommand& command)
+PowerService::~PowerService()
 {
-    auto frame                = createUartMessageFrame(command);
-    auto power_command_buffer = frame.marshallUartPacket();
+    read_thread.join();
+}
 
-    std::vector<uint8_t> power_status_msg;
+void PowerService::continuousRead()
+{
+    for (;;)
+    {
+        tick();
+    }
+}
+
+void PowerService::tick()
+{
+    std::vector<uint8_t> power_status;
+    try
+    {
+        uart->flushSerialPort(uart->flush_receive);
+        power_status = uart->serialRead(READ_BUFFER_SIZE);
+    }
+    catch (std::exception& e)
+    {
+        LOG(FATAL) << "Read thread has crashed" << e.what();
+    }
+
+    TbotsProto_PowerFrame status_frame = TbotsProto_PowerFrame_init_default;
+    if (!unmarshalUartPacket(power_status, status_frame))
+    {
+        LOG(WARNING) << "Unmarshal failed";
+    }
+    else
+    {
+        status = status_frame.power_msg.power_status;
+    }
+
+    auto command =
+        nanopb_command.load(std::memory_order_relaxed);  // get value atomically
+    auto frame                = createUartFrame(command);
+    auto power_command_buffer = marshallUartPacket(frame);
+
     try
     {
         // Write power command
-        if (uart->serialWrite(power_command_buffer))
-        {
-            uart->flushSerialPort(uart->flush_send);
-        }
-        else
+        uart->flushSerialPort(uart->flush_send);
+        if (!uart->serialWrite(power_command_buffer))
         {
             LOG(WARNING) << "Writing power command failed.";
         }
-
-        // Read power status
-        uart->flushSerialPort(uart->flush_receive);
-        power_status_msg = uart->serialRead(READ_BUFFER_SIZE);
     }
     catch (std::exception& e)
     {
         LOG(FATAL) << "ESP32 has disconnected. Power service has crashed" << e.what();
     }
+}
 
-    auto uart_frame = UartMessageFrame<PowerStatus>();
-    if (unmarshalUartPacket<PowerStatus>(power_status_msg, uart_frame))
-    {
-        LOG(DEBUG) << "Command status read successfully";
-        status = uart_frame.message;
-    }
-    else
-    {
-        LOG(WARNING) << "Unmarshal failed";
-    }
-
-    return std::make_unique<PowerStatus>(status);
+TbotsProto::PowerStatus PowerService::poll(const TbotsProto::PowerControl& command,
+                                           int kick_slope, int kick_constant,
+                                           int chip_constant)
+{
+    // Store msg for later transmission
+    nanopb_command =
+        createNanoPbPowerPulseControl(command, kick_slope, kick_constant, chip_constant);
+    return *createTbotsPowerStatus(status);
 }

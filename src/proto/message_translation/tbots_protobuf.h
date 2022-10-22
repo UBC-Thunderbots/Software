@@ -5,17 +5,8 @@
 #include "proto/vision.pb.h"
 #include "proto/visualization.pb.h"
 #include "proto/world.pb.h"
+#include "software/ai/passing/pass_with_rating.h"
 #include "software/world/world.h"
-
-/**
- * Returns a TbotsProto::Vision proto given a World.
- *
- * @param world The world msg to extract the TbotsProto::Vision from
- *
- * @return The unique_ptr to a TbotsProto::Vision proto containing the friendly team and
- * ball information
- */
-std::unique_ptr<TbotsProto::Vision> createVision(const World& world);
 
 /**
  * Returns a TbotsProto::World proto given a World.
@@ -124,3 +115,13 @@ RobotState createRobotState(const TbotsProto::RobotState robot_state);
  * @return the BallState
  */
 BallState createBallState(const TbotsProto::BallState ball_state);
+
+/**
+ * Returns a pass visualization given a vector of the best passes
+ *
+ * @param A vector of passes across their fields  with their ratings
+ *
+ * @return The unique_ptr to a PassVisualization proto
+ */
+std::unique_ptr<TbotsProto::PassVisualization> createPassVisualization(
+    const std::vector<PassWithRating>& passes_with_rating);

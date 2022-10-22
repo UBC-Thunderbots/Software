@@ -1,5 +1,8 @@
 #pragma once
 
+#include "extlibs/hrvo/agent.h"
+#include "extlibs/hrvo/path.h"
+#include "software/ai/navigator/path_planner/hrvo/velocity_obstacle.h"
 #include "software/geom/vector.h"
 
 class HRVOSimulator;
@@ -13,39 +16,22 @@ class Agent
     /**
      * Constructor
      *
-     * @param simulator          The simulator which this agent is a part of
-     * @param position           The starting position of this agent.
-     * @param radius             The radius of this agent.
-     * @param velocity           The initial velocity of this agent.
-     * @param prefVelocity       The preferred velocity of this agent.
-     * @param maxSpeed           The maximum speed of this agent.
-     * @param maxAccel           The maximum acceleration of this agent.
-     * @param goalIndex          The index of the Goal which this agent should go to.
-     * @param goalRadius         The goal radius of this agent.
+     * @param simulator             The simulator which this agent is a part of
+     * @param position              The starting position of this agent.
+     * @param radius                The radius of this agent.
+     * @param max_radius_inflation  The maximum amount which the radius of this agent can
+     * inflate.
+     * @param velocity              The initial velocity of this agent.
+     * @param pref_velocity          The preferred velocity of this agent.
+     * @param max_speed              The maximum speed of this agent.
+     * @param max_accel              The maximum acceleration of this agent.
+     * @param path                  The path for this agent
      */
     Agent(HRVOSimulator *simulator, const Vector &position, float radius,
-          const Vector &velocity, const Vector &prefVelocity, float maxSpeed,
-          float maxAccel, std::size_t goalIndex, float goalRadius);
+          float max_radius_inflation, const Vector &velocity, const Vector &pref_velocity,
+          float max_speed, float max_accel, AgentPath &path);
 
     virtual ~Agent() = default;
-
-    /**
-     * A hybrid reciprocal velocity obstacle.
-     */
-    class VelocityObstacle
-    {
-       public:
-        VelocityObstacle() = default;
-
-        // The position of the apex of the hybrid reciprocal velocity obstacle.
-        Vector apex_;
-
-        // The direction of the first side of the hybrid reciprocal velocity obstacle.
-        Vector side1_;
-
-        // The direction of the second side of the hybrid reciprocal velocity obstacle.
-        Vector side2_;
-    };
 
     /**
      * Computes the new velocity of this agent.
@@ -59,6 +45,11 @@ class Agent
      * @return The velocity obstacle which other_agent should see for this Agent
      */
     virtual VelocityObstacle createVelocityObstacle(const Agent &other_agent) = 0;
+
+    /**
+     * Update the agent's radius based on its current velocity
+     */
+    void updateRadiusFromVelocity();
 
     /**
      * Updates the position and velocity of this agent.
@@ -98,7 +89,7 @@ class Agent
      *
      * @return The goal radius of the agent
      */
-    float getGoalRadius() const;
+    float getPathRadius() const;
 
     /**
      * Return the preferred velocity of the agent
@@ -120,6 +111,18 @@ class Agent
      * @return True if this agent has reached its final goal, false otherwise.
      */
     bool hasReachedGoal() const;
+
+    /**
+     * Gets the the path for this agent
+     * @return Path for this agent
+     */
+    const AgentPath &getPath() const;
+
+    /**
+     * Gets the max speed for this agent
+     * @return max speed for this agent
+     */
+    float getMaxSpeed() const;
 
     /**
      * Update position of Agent
@@ -145,10 +148,21 @@ class Agent
      */
     void setMaxSpeed(float max_speed);
 
+    /**
+     * Sets a new path for this agent
+     * @param new_path new path for this agent
+     */
+    void setPath(const AgentPath &new_path);
+
    protected:
     // Agent Properties
     Vector position_;
+    // This agent's current actual radius
     float radius_;
+    // The minimum radius which this agent can be
+    const float min_radius_;
+    // The maximum amount which the radius can increase by
+    const float max_radius_inflation_;
 
     // The actual current velocity of this Agent
     Vector velocity_;
@@ -158,15 +172,12 @@ class Agent
     // NOTE: HRVO algorithm will try to pick this speed, however, it may pick a different
     // speed to avoid collisions.
     Vector pref_velocity_;
+    // The path of this Agent
+    AgentPath path;
 
     float max_speed_;
     float max_accel_;
-
-    std::size_t goal_index_;
-    float goal_radius_;
     bool reached_goal_;
 
-    // TODO (#2373): Remove once new Path class is added and add timeStep as a argument to
-    // update(time_step)
     HRVOSimulator *const simulator_;
 };

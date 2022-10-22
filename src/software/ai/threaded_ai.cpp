@@ -2,29 +2,31 @@
 
 #include <boost/bind.hpp>
 
-#include "shared/parameter/cpp_dynamic_parameters.h"
+#include "proto/message_translation/tbots_protobuf.h"
+#include "proto/parameters.pb.h"
 #include "software/ai/hl/stp/play/assigned_tactics_play.h"
 #include "software/ai/hl/stp/play/play_factory.h"
 #include "software/ai/hl/stp/tactic/tactic_factory.h"
-#include "software/gui/drawing/navigator.h"
+#include "software/multithreading/thread_safe_buffer.hpp"
 
-ThreadedAI::ThreadedAI(std::shared_ptr<const AiConfig> ai_config)
-    // Disabling warnings on log buffer full, since buffer size is 1 and we always want AI
-    // to use the latest World
-    : FirstInFirstOutThreadedObserver<World>(DEFAULT_BUFFER_SIZE, false),
+ThreadedAi::ThreadedAi(TbotsProto::AiConfig ai_config)
+    // Disabling warnings on log buffer full, since buffer size is 1 and we
+    // always want AI to use the latest World
+    : FirstInFirstOutThreadedObserver<World>(),
+      FirstInFirstOutThreadedObserver<TbotsProto::ThunderbotsConfig>(),
       ai(ai_config),
       ai_config(ai_config),
-      control_config(ai_config->getAiControlConfig())
+      ai_control_config(ai_config.ai_control_config())
 {
 }
 
-void ThreadedAI::overridePlay(TbotsProto::Play play_proto)
+void ThreadedAi::overridePlay(TbotsProto::Play play_proto)
 {
     std::scoped_lock lock(ai_mutex);
-    ai.overridePlay(std::move(createPlay(play_proto, ai_config)));
+    ai.overridePlayFromProto(play_proto);
 }
 
-void ThreadedAI::overrideTactics(
+void ThreadedAi::overrideTactics(
     TbotsProto::AssignedTacticPlayControlParams assigned_tactic_play_control_params)
 {
     std::scoped_lock lock(ai_mutex);
@@ -41,18 +43,30 @@ void ThreadedAI::overrideTactics(
 
     play->updateControlParams(tactic_assignment_map);
     ai.overridePlay(std::move(play));
+
+    LOG(VISUALIZE) << ai.getPlayInfo();
 }
 
-void ThreadedAI::onValueReceived(World world)
+void ThreadedAi::onValueReceived(World world)
 {
-    runAIAndSendPrimitives(world);
-    drawAI();
+    runAiAndSendPrimitives(world);
 }
 
-void ThreadedAI::runAIAndSendPrimitives(const World& world)
+void ThreadedAi::onValueReceived(TbotsProto::ThunderbotsConfig config)
 {
     std::scoped_lock lock(ai_mutex);
-    if (control_config->getRunAi()->value())
+
+    // Update the AI with thew new config
+    ai_config         = config.ai_config();
+    ai_control_config = config.ai_config().ai_control_config();
+
+    ai.updateAiConfig(ai_config);
+}
+
+void ThreadedAi::runAiAndSendPrimitives(const World& world)
+{
+    std::scoped_lock lock(ai_mutex);
+    if (ai_control_config.run_ai())
     {
         auto new_primitives = ai.getPrimitives(world);
 
@@ -63,14 +77,5 @@ void ThreadedAI::runAIAndSendPrimitives(const World& world)
         Subject<TbotsProto::PlayInfo>::sendValueToObservers(play_info_msg);
 
         Subject<TbotsProto::PrimitiveSet>::sendValueToObservers(*new_primitives);
-    }
-}
-
-void ThreadedAI::drawAI()
-{
-    if (ai.getNavigator())
-    {
-        auto draw_function = drawNavigator(ai.getNavigator());
-        Subject<AIDrawFunction>::sendValueToObservers(draw_function);
     }
 }

@@ -2,16 +2,15 @@
 
 #include <algorithm>
 
-ShootOrPassPlayFSM::ShootOrPassPlayFSM(std::shared_ptr<const AiConfig> ai_config)
+ShootOrPassPlayFSM::ShootOrPassPlayFSM(TbotsProto::AiConfig ai_config)
     : ai_config(ai_config),
-      attacker_tactic(
-          std::make_shared<AttackerTactic>(ai_config->getAttackerTacticConfig())),
+      attacker_tactic(std::make_shared<AttackerTactic>(ai_config)),
       receiver_tactic(std::make_shared<ReceiverTactic>()),
       offensive_positioning_tactics(std::vector<std::shared_ptr<MoveTactic>>()),
       pass_generator(
           PassGenerator<EighteenZoneId>(std::make_shared<const EighteenZonePitchDivision>(
                                             Field::createSSLDivisionBField()),
-                                        ai_config->getPassingConfig())),
+                                        ai_config.passing_config())),
       pass_optimization_start_time(Timestamp::fromSeconds(0)),
       best_pass_and_score_so_far(
           PassWithRating{.pass = Pass(Point(), Point(), 0), .rating = 0}),
@@ -66,10 +65,9 @@ void ShootOrPassPlayFSM::lookForPass(const Update& event)
         // (with a score of 1) and decreasing this threshold over time
         // This boolean indicates if we're ready to perform a pass
         double abs_min_pass_score =
-            ai_config->getShootOrPassPlayConfig()->getAbsMinPassScore()->value();
-        double pass_score_ramp_down_duration = ai_config->getShootOrPassPlayConfig()
-                                                   ->getPassScoreRampDownDuration()
-                                                   ->value();
+            ai_config.shoot_or_pass_play_config().abs_min_pass_score();
+        double pass_score_ramp_down_duration =
+            ai_config.shoot_or_pass_play_config().pass_score_ramp_down_duration();
         pass_eval = pass_generator.generatePassEvaluation(event.common.world);
         best_pass_and_score_so_far = pass_eval.getBestPassOnField();
 
@@ -96,8 +94,7 @@ void ShootOrPassPlayFSM::lookForPass(const Update& event)
 
 void ShootOrPassPlayFSM::startLookingForPass(const Update& event)
 {
-    attacker_tactic =
-        std::make_shared<AttackerTactic>(ai_config->getAttackerTacticConfig());
+    attacker_tactic              = std::make_shared<AttackerTactic>(ai_config);
     receiver_tactic              = std::make_shared<ReceiverTactic>();
     pass_optimization_start_time = event.common.world.getMostRecentTimestamp();
     lookForPass(event);
@@ -105,10 +102,6 @@ void ShootOrPassPlayFSM::startLookingForPass(const Update& event)
 
 void ShootOrPassPlayFSM::takePass(const Update& event)
 {
-    // Commit to a pass
-    LOG(DEBUG) << "Committing to pass: " << best_pass_and_score_so_far.pass;
-    LOG(DEBUG) << "Score of pass we committed to: " << best_pass_and_score_so_far.rating;
-
     auto pass_eval = pass_generator.generatePassEvaluation(event.common.world);
 
     auto ranked_zones = pass_eval.rankZonesForReceiving(
@@ -117,6 +110,8 @@ void ShootOrPassPlayFSM::takePass(const Update& event)
     // if we make it here then we have committed to the pass
     attacker_tactic->updateControlParams(best_pass_and_score_so_far.pass, true);
     receiver_tactic->updateControlParams(best_pass_and_score_so_far.pass);
+    event.common.set_inter_play_communication_fun(
+        InterPlayCommunication{.last_committed_pass = best_pass_and_score_so_far});
 
     if (!attacker_tactic->done())
     {
@@ -151,13 +146,47 @@ void ShootOrPassPlayFSM::takePass(const Update& event)
 
 bool ShootOrPassPlayFSM::passFound(const Update& event)
 {
-    return best_pass_and_score_so_far.rating > min_pass_score_threshold;
+    const auto ball_velocity = event.common.world.ball().velocity().length();
+    const auto ball_not_kicked_threshold =
+        this->ai_config.shoot_or_pass_play_config().ball_not_kicked_threshold();
+
+    return (ball_velocity < ball_not_kicked_threshold) &&
+           (best_pass_and_score_so_far.rating > min_pass_score_threshold);
 }
 
 bool ShootOrPassPlayFSM::shouldAbortPass(const Update& event)
 {
-    // TODO (#2384): implement this
-    return false;
+    const auto ball_position  = event.common.world.ball().position();
+    const auto passer_point   = best_pass_and_score_so_far.pass.passerPoint();
+    const auto receiver_point = best_pass_and_score_so_far.pass.receiverPoint();
+    const auto short_pass_threshold =
+        this->ai_config.shoot_or_pass_play_config().short_pass_threshold();
+
+    const auto pass_area_polygon =
+        Polygon::fromSegment(Segment(passer_point, receiver_point), 0.5);
+
+    // calculate a polygon that contains the receiver and passer point, and checks if the
+    // ball is inside it. if the ball isn't being passed to the receiver then we should
+    // abort
+    if ((receiver_point - passer_point).length() >= short_pass_threshold)
+    {
+        if (!contains(pass_area_polygon, ball_position))
+        {
+            return true;
+        }
+    }
+
+    // distance between robot and ball is too far, and it's not in flight,
+    // i.e. team might still have possession, but kicker/passer doesn't have control over
+    // ball
+    const auto ball_velocity = event.common.world.ball().velocity().length();
+    const auto ball_shot_threshold =
+        this->ai_config.shoot_or_pass_play_config().ball_shot_threshold();
+    const auto min_distance_to_pass =
+        this->ai_config.shoot_or_pass_play_config().min_distance_to_pass();
+
+    return (ball_velocity < ball_shot_threshold) &&
+           ((ball_position - passer_point).length() > min_distance_to_pass);
 }
 
 bool ShootOrPassPlayFSM::passCompleted(const Update& event)
@@ -167,6 +196,24 @@ bool ShootOrPassPlayFSM::passCompleted(const Update& event)
 
 bool ShootOrPassPlayFSM::tookShot(const Update& event)
 {
-    // TODO (#2384): implement this
-    return false;
+    const auto ball_velocity_orientation =
+        event.common.world.ball().velocity().orientation();
+    const auto ball_position = event.common.world.ball().position();
+    const auto ball_velocity = event.common.world.ball().velocity().length();
+    const auto ball_shot_threshold =
+        this->ai_config.shoot_or_pass_play_config().ball_shot_threshold();
+
+    const auto enemy_goal_top_post = event.common.world.field().enemyGoalpostPos();
+    const auto enemy_goal_bot_post = event.common.world.field().enemyGoalpostNeg();
+
+    const auto ball_to_top_post_angle =
+        (enemy_goal_top_post.toVector() - ball_position.toVector()).orientation();
+    const auto ball_to_bot_post_angle =
+        (enemy_goal_bot_post.toVector() - ball_position.toVector()).orientation();
+
+    bool ball_oriented_towards_goal =
+        (ball_velocity_orientation < ball_to_top_post_angle) &&
+        (ball_velocity_orientation > ball_to_bot_post_angle);
+
+    return ball_oriented_towards_goal && (ball_velocity > ball_shot_threshold);
 }

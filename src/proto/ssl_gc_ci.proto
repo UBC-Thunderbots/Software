@@ -1,0 +1,28 @@
+syntax = "proto2";
+
+package SSLProto;
+
+import "proto/ssl_vision_wrapper_tracked.proto";
+import "proto/ssl_gc_api.proto";
+import "proto/ssl_gc_referee_message.proto";
+import "proto/ssl_vision_geometry.proto";
+
+// The input format to the GC
+message CiInput
+{
+    // New unix timestamp in [ns] for the GC
+    optional int64 timestamp = 1;
+    // New tracker packet with ball and robot data
+    optional TrackerWrapperPacket tracker_packet = 2;
+    // (UI) API input
+    repeated Input api_inputs = 3;
+    // Update geometry
+    optional SSL_GeometryData geometry = 4;
+}
+
+// The output format of the GC response
+message CiOutput
+{
+    // Latest referee message
+    optional Referee referee_msg = 1;
+}

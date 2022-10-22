@@ -7,10 +7,11 @@
 #include "proto/robot_log_msg.pb.h"
 #include "shared/constants.h"
 
-ProtobufSink::ProtobufSink()
+ProtobufSink::ProtobufSink(std::string runtime_dir)
 {
     // Setup the logs
-    protobuf_sender = std::make_unique<ThreadedUnixSender>(UNIX_BASE_PATH + "protobuf");
+    unix_senders_["log"] = std::make_unique<ThreadedUnixSender>(runtime_dir + "/log");
+    runtime_dir_         = runtime_dir;
 }
 
 void ProtobufSink::sendProtobuf(g3::LogMessageMover log_entry)
@@ -19,8 +20,33 @@ void ProtobufSink::sendProtobuf(g3::LogMessageMover log_entry)
 
     if (level.value == VISUALIZE.value)
     {
+        std::string msg       = log_entry.get().message();
+        size_t file_name_pos  = msg.find(TYPE_DELIMITER);
+        std::string file_name = msg.substr(0, file_name_pos);
+
+        size_t proto_type_name_pos = msg.find(TYPE_DELIMITER, file_name_pos + 1);
+        std::string proto_type_name =
+            msg.substr(file_name_pos + TYPE_DELIMITER.length(),
+                       proto_type_name_pos - TYPE_DELIMITER.length());
+        std::string serialized_proto =
+            msg.substr(proto_type_name_pos + TYPE_DELIMITER.length());
+
+        // Use the protobuf type as the file name, if no file name was specified in the
+        // message
+        if (file_name.length() == 0)
+        {
+            file_name = "/" + proto_type_name;
+        }
+
+        // If we don't already have a unix sender for this type, let's create it
+        if (unix_senders_.count(file_name) == 0)
+        {
+            unix_senders_[file_name] =
+                std::make_unique<ThreadedUnixSender>(runtime_dir_ + file_name);
+        }
+
         // Send the protobuf
-        protobuf_sender->sendString(log_entry.get().message());
+        unix_senders_[file_name]->sendString(serialized_proto);
     }
     else
     {
@@ -41,15 +67,9 @@ void ProtobufSink::sendProtobuf(g3::LogMessageMover log_entry)
             log_msg_proto.set_line_number(
                 static_cast<uint32_t>(std::stoul(log_entry.get().line())));
 
-            // Pack into Any
-            google::protobuf::Any any;
-            any.PackFrom(log_msg_proto);
-
-            // Serialize into any
-            std::string serialized_any;
-            any.SerializeToString(&serialized_any);
-            protobuf_sender->sendString(log_msg_proto.GetTypeName() + TYPE_DELIMITER +
-                                        base64_encode(serialized_any));
+            std::string log_msg;
+            log_msg_proto.SerializeToString(&log_msg);
+            unix_senders_["log"]->sendString(log_msg);
         }
     }
 }
@@ -64,6 +84,7 @@ std::ostream& operator<<(std::ostream& os, const google::protobuf::Message& mess
     std::string serialized_any;
     any.SerializeToString(&serialized_any);
 
-    os << message.GetTypeName() << TYPE_DELIMITER << base64_encode(serialized_any);
+    os << TYPE_DELIMITER << message.GetTypeName() << TYPE_DELIMITER
+       << base64_encode(serialized_any);
     return os;
 }
