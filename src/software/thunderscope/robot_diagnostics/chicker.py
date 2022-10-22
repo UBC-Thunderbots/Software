@@ -61,7 +61,9 @@ class ChickerWidget(QWidget):
             self.power_slider_layout,
             self.power_slider,
             self.power_label,
-        ) = common_widgets.create_slider("Power", 1, 10, 1)
+        ) = common_widgets.create_slider(
+            "Power (m/s) (Chipper power is fixed)", 1, 10, 1
+        )
         vbox_layout.addLayout(self.power_slider_layout)
 
         self.setLayout(vbox_layout)

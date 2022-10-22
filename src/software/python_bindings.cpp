@@ -24,6 +24,7 @@
 #include "software/geom/point.h"
 #include "software/geom/polygon.h"
 #include "software/geom/rectangle.h"
+#include "software/geom/segment.h"
 #include "software/geom/vector.h"
 #include "software/networking/threaded_proto_udp_listener.hpp"
 #include "software/networking/threaded_proto_udp_sender.hpp"
@@ -211,11 +212,13 @@ PYBIND11_MODULE(python_bindings, m)
     m.def("createPolygon", &createPolygon);
     m.def("createCircle", &createCircle);
     m.def("createVector", &createVector);
+    m.def("createSegment", &createSegment);
 
     m.def("createPointProto", &createPointProto);
     m.def("createPolygonProto", &createPolygonProto);
     m.def("createCircleProto", &createCircleProto);
     m.def("createVectorProto", &createVectorProto);
+    m.def("createSegmentProto", &createSegmentProto);
 
     m.def("contains", py::overload_cast<const Circle&, const Segment&>(&contains));
     m.def("contains", py::overload_cast<const Circle&, const Point&>(&contains));
