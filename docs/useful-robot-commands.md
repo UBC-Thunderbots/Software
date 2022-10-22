@@ -40,7 +40,7 @@ This will stop the current systemd services, replace and restart them. Binaries 
 
 <b>This will trigger motor calibration meaning the wheels may spin. Please put the robot on a piece of tape to mitigate this</b>
 
-`./tbots.py run run_ansible --cpu=jetson_nano -- -playbook deploy_nano.yml --hosts <robot_ip> --ssh_pass thunderbots`
+`./tbots.py run run_ansible --cpu=jetson_nano -- --playbook deploy_nano.yml --hosts <robot_ip> --ssh_pass thunderbots`
 
 ## Flashing the powerboard
 
@@ -48,7 +48,7 @@ This will flash powerloop, the current firmware in `software/power/`, onto the p
 
 Looking from the back of the robot the reset and boot buttons are on right side of the battery holder on the lowest board with the reset being on the left and the boot on the right. <b>Warning it may kick/chip when pressed.</b>
 
-`./tbots.py run run_ansible --cpu=jetson_nano -- -playbook deploy_powerboard.yml --hosts <robot_ip> --ssh_pass thunderbots`
+`./tbots.py run run_ansible --cpu=jetson_nano -- --playbook deploy_powerboard.yml --hosts <robot_ip> --ssh_pass thunderbots`
 
 ## Setting up nano 
 
@@ -56,7 +56,7 @@ This refers to setting up the jetson nano for the first time. This will enable s
 
 <b>Setting up the nano for the first time requires internet access!!!</b>
 
-`./tbots.py run run_ansible --cpu=jetson_nano -- -playbook setup_nano.yml --hosts <robot_ip> --ssh_pass thunderbots`
+`./tbots.py run run_ansible --cpu=jetson_nano -- --playbook setup_nano.yml --hosts <robot_ip> --ssh_pass thunderbots`
 
 ## Robot Diagnostics
 
