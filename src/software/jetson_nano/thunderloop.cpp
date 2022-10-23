@@ -160,12 +160,12 @@ void Thunderloop::runLoop()
             struct timespec world_result;
 
             clock_gettime(CLOCK_MONOTONIC, &current_time);
-            ScopedTimespecTimer::timespecDiff(&current_time,
-                                              &last_world_recieved_time, &world_result);
+            ScopedTimespecTimer::timespecDiff(&current_time, &last_world_recieved_time,
+                                              &world_result);
 
             auto nanoseconds_elapsed_since_last_world =
-                    world_result.tv_sec * static_cast<int>(NANOSECONDS_PER_SECOND) +
-                    world_result.tv_nsec;
+                world_result.tv_sec * static_cast<int>(NANOSECONDS_PER_SECOND) +
+                world_result.tv_nsec;
 
             if (nanoseconds_elapsed_since_last_world >
                 static_cast<long>(WORLD_TIMEOUT_NS))
@@ -173,11 +173,13 @@ void Thunderloop::runLoop()
                 primitive_executor_.setStopPrimitive();
 
                 // log millis since last world if we are timing out
-                int milliseconds_elapsed_since_last_world =
-                    static_cast<int> (static_cast<double> (world_result.tv_sec) * MILLISECONDS_PER_SECOND +
-                    static_cast<double> (world_result.tv_nsec) * MILLISECONDS_PER_NANOSECOND);
+                int milliseconds_elapsed_since_last_world = static_cast<int>(
+                    static_cast<double>(world_result.tv_sec) * MILLISECONDS_PER_SECOND +
+                    static_cast<double>(world_result.tv_nsec) *
+                        MILLISECONDS_PER_NANOSECOND);
 
-                LOG(INFO) << "Milliseconds since last world: " << milliseconds_elapsed_since_last_world;
+                LOG(INFO) << "Milliseconds since last world: "
+                          << milliseconds_elapsed_since_last_world;
             }
 
             // Primitive Executor: run the last primitive if we have not timed out
@@ -188,12 +190,12 @@ void Thunderloop::runLoop()
                 struct timespec primitive_result;
 
                 clock_gettime(CLOCK_MONOTONIC, &current_time);
-                ScopedTimespecTimer::timespecDiff(&current_time,
-                                                  &last_primitive_received_time, &primitive_result);
+                ScopedTimespecTimer::timespecDiff(
+                    &current_time, &last_primitive_received_time, &primitive_result);
 
                 auto nanoseconds_elapsed_since_last_primitive =
-                        primitive_result.tv_sec * static_cast<int>(NANOSECONDS_PER_SECOND) +
-                        primitive_result.tv_nsec;
+                    primitive_result.tv_sec * static_cast<int>(NANOSECONDS_PER_SECOND) +
+                    primitive_result.tv_nsec;
 
                 if (nanoseconds_elapsed_since_last_primitive >
                     static_cast<long>(PRIMITIVE_MANAGER_TIMEOUT_NS))
