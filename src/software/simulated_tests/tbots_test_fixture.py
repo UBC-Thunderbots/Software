@@ -11,11 +11,29 @@ from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.thunderscope.thunderscope import Thunderscope
 from software.logger.logger import createLogger
 
+simulator_proto_unix_io = None
+yellow_full_system_proto_unix_io = None
+blue_full_system_proto_unix_io = None
+
 logger = createLogger(__name__)
 
 LAUNCH_DELAY_S = 0.1
 PAUSE_AFTER_FAIL_DELAY_S = 3
 TEST_END_DELAY = 0.5
+
+
+def initialize_unix_io():
+    """
+    Initializes proto unix sockets in global scope so that they are accessible from within tests
+
+    """
+    global simulator_proto_unix_io
+    global yellow_full_system_proto_unix_io
+    global blue_full_system_proto_unix_io
+
+    simulator_proto_unix_io = ProtoUnixIO()
+    yellow_full_system_proto_unix_io = ProtoUnixIO()
+    blue_full_system_proto_unix_io = ProtoUnixIO()
 
 
 
@@ -82,6 +100,9 @@ def enable_thunderscope(test):
 
 @pytest.fixture
 def field_test_runner():
+
+    initialize_unix_io()
+
     initializer = field_test_initializer(
         blue_full_system_proto_unix_io=blue_full_system_proto_unix_io,
         yellow_full_system_proto_unix_io=yellow_full_system_proto_unix_io,
@@ -100,14 +121,8 @@ def field_test_runner():
 
 @pytest.fixture
 def simulated_test_runner():
-    global simulator_proto_unix_io
-    simulator_proto_unix_io = ProtoUnixIO()
 
-    global yellow_full_system_proto_unix_io
-    yellow_full_system_proto_unix_io = ProtoUnixIO()
-
-    global blue_full_system_proto_unix_io
-    blue_full_system_proto_unix_io = ProtoUnixIO()
+    initialize_unix_io()
 
     args = load_command_line_arguments()
 
@@ -122,17 +137,19 @@ def simulated_test_runner():
 
     yield yield_val
 
-    # # teardown
-    # try:
-    #     next(initializer)
-    # except StopIteration:
-    #     pass
+    # teardown
+    try:
+        next(initializer)
+    except StopIteration:
+        pass
 
 
 @pytest.fixture
 def tbots_test_runner():
 
     args = load_command_line_arguments()
+
+    initialize_unix_io()
 
     if args.run_field_test:
         runner_fixture = field_test_initializer(
