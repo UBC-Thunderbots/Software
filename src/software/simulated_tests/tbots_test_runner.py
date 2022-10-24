@@ -64,8 +64,6 @@ class TbotsTestRunner(object):
         self.timestamp = 0
         self.timestamp_mutex = threading.Lock()
 
-        logger.info("setup runner")
-
     def send_gamecontroller_command(
         self,
         gc_command: proto.ssl_gc_state_pb2.Command,
@@ -79,7 +77,7 @@ class TbotsTestRunner(object):
         final_ball_placement_point: where to place the ball in ball placement
 
         Raises:
-            NotImplementedError: _description_
+            NotImplementedError: 
         """
         if isBlue:
             self.gamecontroller.send_ci_input(
@@ -103,9 +101,9 @@ class TbotsTestRunner(object):
         param isBlue: whether the play should be applied to the blue team
 
         Raises:
-            NotImplementedError: _description_
+            NotImplementedError
         """
-        raise NotImplementedError("set_tactic unimplemented")
+        raise NotImplementedError("abstract method set_tactics called from base class")
 
     def set_play(self, play: Play, isBlue: bool):
         """Overrides current AI play for the given team
@@ -114,16 +112,18 @@ class TbotsTestRunner(object):
         param isBlue: whether the play should be applied to the blue team
 
         Raises:
-            NotImplementedError: _description_
+            NotImplementedError
         """
-        raise NotImplementedError("set_play unimplemented")
+        raise NotImplementedError(
+            "abstract method set_play called from base class ")
 
     def set_worldState(self, worldstate: WorldState):
-        raise NotImplementedError("set_worldstate unimplemented")
+        raise NotImplementedError(
+            "abstract class method called set_worldstate")
 
     def time_provider(self):
         """Provide the current time in seconds since the epoch"""
-        raise NotImplementedError("time_provider unimplemented")
+        raise NotImplementedError("abstract method time_provider called from base class")
 
     def run_test(
         self,
@@ -138,6 +138,6 @@ class TbotsTestRunner(object):
         param test_timeout_s: how long the test will run
 
         Raises:
-            NotImplementedError: _description_
+            NotImplementedError
         """
-        raise NotImplementedError("run_test unimplemented")
+        raise NotImplementedError("abstract method run_test called from base class")
