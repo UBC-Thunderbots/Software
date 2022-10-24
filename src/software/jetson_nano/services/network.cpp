@@ -33,43 +33,48 @@ std::tuple<TbotsProto::PrimitiveSet, TbotsProto::World> NetworkService::poll(
 void NetworkService::primitiveSetCallback(TbotsProto::PrimitiveSet input)
 {
     std::scoped_lock<std::mutex> lock(primitive_set_mutex);
-    primitive_set_msg   = input;
-    const auto& seq_num = input.sequence_number();
+    const uint64_t& seq_num = input.sequence_number();
 
-    // Ignore the primitive and consider it as lost if it is received out of order
-    if (!recent_primitive_seq_nums.empty() && seq_num <= recent_primitive_seq_nums.back())
+    // If the primitive set seems very out of date, then this is likely due to an AI reset. Clear the queue
+    if (!recent_primitive_set_seq_nums.empty() && seq_num <= recent_primitive_set_seq_nums.back() - RECENT_PACKET_LOSS_PERIOD)
     {
+        recent_primitive_set_seq_nums = std::queue<uint64_t>();
+        LOG(WARNING) << "Old primitive set received. Resetting primitive set sequence number tracking";
+    }
+    else if (!recent_primitive_set_seq_nums.empty() && seq_num <= recent_primitive_set_seq_nums.back())
+    {
+        // If the primitive set is older than the last received primitive set, then ignore it
         return;
     }
+    primitive_set_msg       = input;
+    recent_primitive_set_seq_nums.push(seq_num);
 
-    recent_primitive_seq_nums.push(seq_num);
-
-    // Pop sequence numbers of primitives that are no longer recent
-    while (seq_num - recent_primitive_seq_nums.front() >= RECENT_PACKET_LOSS_PERIOD)
+    // Pop sequence numbers of primitive sets that are no longer recent
+    while (seq_num - recent_primitive_set_seq_nums.front() >= RECENT_PACKET_LOSS_PERIOD)
     {
-        recent_primitive_seq_nums.pop();
+        recent_primitive_set_seq_nums.pop();
     }
 
-    auto expected_primitives_count =
+    uint64_t expected_primitive_set_count =
         std::min(seq_num, static_cast<uint64_t>(RECENT_PACKET_LOSS_PERIOD));
-    auto lost_primitives_count =
-        expected_primitives_count - recent_primitive_seq_nums.size();
-    auto packet_loss_rate = static_cast<float>(lost_primitives_count) /
-                            static_cast<float>(expected_primitives_count);
+    uint64_t lost_primitive_set_count =
+            expected_primitive_set_count - recent_primitive_set_seq_nums.size();
+    float packet_loss_rate = static_cast<float>(lost_primitive_set_count) /
+                             static_cast<float>(expected_primitive_set_count);
 
+    LOG(INFO) << "Primitive lost rate: " << packet_loss_rate << " "
+              << recent_primitive_set_seq_nums.size();
     if (packet_loss_rate > PACKET_LOSS_WARNING_THRESHOLD)
     {
-        LOG(WARNING) << "Primitive packet loss in the past " << expected_primitives_count
-                     << " packets more than " << PACKET_LOSS_WARNING_THRESHOLD * 100
+        LOG(WARNING) << "Primitive set packet loss in the past " << expected_primitive_set_count
+                     << " packets is more than " << PACKET_LOSS_WARNING_THRESHOLD * 100
                      << "% ";
     }
 }
 
 void NetworkService::worldCallback(TbotsProto::World input)
 {
+    // TODO(#2728): Implement a recent world loss count and warning
     std::scoped_lock<std::mutex> lock(world_mutex);
     world_msg = input;
-    // TODO(#2728): Implement a recent world loss count and warning
-
-    last_world_time = input.time_sent().epoch_timestamp_seconds();
 }

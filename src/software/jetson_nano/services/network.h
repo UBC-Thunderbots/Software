@@ -58,8 +58,6 @@ class NetworkService
     void primitiveSetCallback(TbotsProto::PrimitiveSet input);
     void worldCallback(TbotsProto::World input);
 
-    double last_primitive_time = 0.0;
-    double last_world_time     = 0.0;
-
-    std::queue<uint64_t> recent_primitive_seq_nums;
+    // Queue of the sequence numbers of received primitive sets in the past RECENT_PACKET_LOSS_PERIOD primitive sets
+    std::queue<uint64_t> recent_primitive_set_seq_nums;
 };
