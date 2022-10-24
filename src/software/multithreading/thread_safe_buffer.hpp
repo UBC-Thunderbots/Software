@@ -155,7 +155,7 @@ void ThreadSafeBuffer<T>::push(const T& value)
     {
         std::cout << boost::stacktrace::stacktrace() << std::endl;
         LOG(WARNING) << "Pushing to a full ThreadSafeBuffer of type: " << TYPENAME(T)
-                 << std::endl;
+                     << std::endl;
     }
     buffer.push_back(value);
     received_new_value.notify_all();
