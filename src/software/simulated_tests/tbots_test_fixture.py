@@ -36,7 +36,6 @@ def initialize_unix_io():
     blue_full_system_proto_unix_io = ProtoUnixIO()
 
 
-
 def enable_thunderscope(test):
     """ A decorator that runs a test with thunderscope, based on command line arguments
 
