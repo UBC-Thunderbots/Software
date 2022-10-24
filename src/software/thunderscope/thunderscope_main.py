@@ -123,6 +123,20 @@ if __name__ == "__main__":
         default=5,
         help="How many packets to buffer while rendering",
     )
+    parser.add_argument(
+        "--estop_path",
+        action="store",
+        type=str,
+        default="/dev/ttyACM0",
+        help="Path to the Estop",
+    )
+    parser.add_argument(
+        "--estop_baudrate",
+        action="store",
+        type=int,
+        default=115200,
+        help="Estop Baudrate",
+    )
 
     parser.add_argument(
         "--estop_path",
@@ -179,7 +193,7 @@ if __name__ == "__main__":
         ] + [
             # TODO (#2655): Add/Remove HRVO layers dynamically based on the HRVOVisualization proto messages
             {"proto_class": HRVOVisualization, "unix_path": YELLOW_HRVO_PATH}
-            for _ in range(8)
+            for _ in range(MAX_ROBOT_IDS_PER_SIDE)
         ]:
             proto_unix_io.attach_unix_receiver(
                 runtime_dir, from_log_visualize=True, **arg
@@ -197,7 +211,6 @@ if __name__ == "__main__":
     # and 1 instance of RobotCommunication which will send/recv packets over
     # the provided multicast channel.
     if args.run_blue:
-
         tscope = Thunderscope(
             layout_path=args.layout,
             load_blue=True,
@@ -213,7 +226,6 @@ if __name__ == "__main__":
         debug = args.debug_blue_full_system
 
     elif args.run_yellow:
-
         tscope = Thunderscope(
             layout_path=args.layout,
             load_blue=False,
@@ -229,7 +241,6 @@ if __name__ == "__main__":
         debug = args.debug_yellow_full_system
 
     if args.run_blue or args.run_yellow:
-
         with ProtoLogger(
             args.blue_full_system_runtime_dir,
         ) as blue_logger, ProtoLogger(

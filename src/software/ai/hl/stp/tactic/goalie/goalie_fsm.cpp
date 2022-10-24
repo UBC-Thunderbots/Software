@@ -6,8 +6,8 @@ Point GoalieFSM::getGoaliePositionToBlock(
 {
     // compute angle between two vectors, negative goal post to ball and positive
     // goal post to ball
-    Angle block_cone_angle = acuteAngle(field.friendlyGoalpostNeg(), ball.position(),
-                                        field.friendlyGoalpostPos());
+    Angle block_cone_angle = convexAngle(field.friendlyGoalpostNeg(), ball.position(),
+                                         field.friendlyGoalpostPos());
 
     std::optional<Point> clamped_goalie_pos = std::nullopt;
 

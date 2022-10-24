@@ -150,7 +150,7 @@ class RobotCommunication(object):
     def connect_robot_to_diagnostics(self, robot_id):
         self.robots_connected_to_diagnostics.add(robot_id)
 
-    def discconnect_robot_from_diagnostics(self, robot_id):
+    def disconnect_robot_from_diagnostics(self, robot_id):
         self.robots_connected_to_diagnostics.remove(robot_id)
 
     def __enter__(self):
