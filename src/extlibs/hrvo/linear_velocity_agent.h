@@ -14,6 +14,7 @@ class LinearVelocityAgent : public Agent
     /**
      * Constructor
      *
+     * @param simulator   The simulation which this agent runs in.
      * @param position              The starting position of this agent.
      * @param radius                The radius of this agent.
      * @param max_radius_inflation  The maximum amount which the radius of this agent can

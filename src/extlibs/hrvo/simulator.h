@@ -41,6 +41,7 @@
 #include "proto/tbots_software_msgs.pb.h"
 #include "proto/visualization.pb.h"
 #include "software/geom/vector.h"
+#include "software/networking/threaded_proto_unix_sender.hpp"
 #include "software/world/world.h"
 
 class HRVOSimulator
@@ -100,22 +101,19 @@ class HRVOSimulator
      * inflate.
      * @param curr_velocity         The initial velocity of this agent.
      * @param max_speed              The maximum speed of this agent.
-     * @param pref_speed             The preferred speed of this agent.
      * @param max_accel              The maximum acceleration of this agent.
      * @param path                  The path which this agent should take.
-     * @param neighbor_dist          The maximum distance away from this agent which
-     * another agent can be to be considered as an obstacle.
-     * @param max_neighbors          The maximum number of other agents which this agent
-     * will try to avoid collisions with at a time.
-     * @param uncertainty_offset     The uncertainty offset of this agent.
+     * @param max_neighbor_dist  The maximum distance away which another agent can be from
+     * this agent to be considered as a neighbor (i.e. velocity obstacles for it would be
+     * generated).
+     * @param max_neighbors  The maximum number of neighbors which this agent will
+     * consider at once.
      * @return The index of the agent.
      */
     std::size_t addHRVOAgent(const Vector &position, float agent_radius,
                              float max_radius_inflation, const Vector &curr_velocity,
-                             float max_speed, float pref_speed, float max_accel,
-                             AgentPath &path, float neighbor_dist,
-                             std::size_t max_neighbors, float uncertainty_offset);
-
+                             float max_speed, float max_accel, AgentPath &path,
+                             float max_neighbor_dist, std::size_t max_neighbors);
     /**
      * Add a new LinearlyVelocityAgent
      * @param position              The starting position of this agent.
@@ -272,11 +270,8 @@ class HRVOSimulator
     // PrimitiveSet which includes the path which each friendly robot should take
     TbotsProto::PrimitiveSet primitive_set;
 
-    // True if the ball should be treated as an agent (obstacle)
-    // NOTE: This will take effect the next time we receive a world, and we know
-    //       the current ball position and velocity
-    bool add_ball_agent;
-    std::size_t ball_agent_id;
+    // Latest World which the simulator has received
+    std::optional<World> world;
 
     // The robot constants which all agents will use
     RobotConstants_t robot_constants;
@@ -309,19 +304,10 @@ class HRVOSimulator
     static constexpr float FRIENDLY_ROBOT_RADIUS_MAX_INFLATION = 0.05f;
     static constexpr float ENEMY_ROBOT_RADIUS_MAX_INFLATION    = 0.06f;
 
-    // How much larger should the goal radius be. This is added as a safety tolerance so
-    // robots do not "teleport" over the goal between simulation frames.
-    static constexpr float GOAL_RADIUS_SCALE = 1.05f;
-
     // How much larger should the goal radius be (in meters). This is added as a safety
     // tolerance so robots do not accidentally enter the minimum distance threshold.
     // NOTE: This value must be >= 0
     static constexpr float BALL_AGENT_RADIUS_OFFSET = 0.1f;
-
-    // The scale multiple of max robot speed which the preferred speed will be set at.
-    // pref_speed = max_speed * PREF_SPEED_SCALE
-    // NOTE: This scale multiple must be <= 1
-    static constexpr float PREF_SPEED_SCALE = 0.85f;
 
     // The maximum distance which HRVO Agents will look for neighbors, in meters.
     // A large radius picked to allow for far visibility of neighbors so Agents have
@@ -337,6 +323,5 @@ class HRVOSimulator
     static constexpr float MAX_COLLISION_SPEED = 0.5f;
 
     friend class Agent;
-    friend class Goal;
     friend class KdTree;
 };
