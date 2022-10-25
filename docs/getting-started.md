@@ -291,7 +291,7 @@ We use ansible to automatically update software running on the Jetson Nano. [Mor
 
 To update binaries on a working robot, you can run:
 
-`./tbots.py run run_ansible --cpu=jetson_nano -- -playbook deploy_nano.yml --hosts <robot_ip> --ssh_pass thunderbots`
+`bazel run //software/jetson_nano/ansible:run_ansible --cpu=jetson_nano -- --playbook deploy_nano.yml --hosts <robot_ip> --ssh_pass <jetson_nano_password>`
 
 ## Setting up Virtual Robocup 2021
 
