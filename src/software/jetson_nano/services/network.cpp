@@ -60,13 +60,14 @@ void NetworkService::primitiveSetCallback(TbotsProto::PrimitiveSet input)
         recent_primitive_set_seq_nums.pop();
     }
 
+    // seq_num + 1 is to account for the sequence numbers starting from 0
     uint64_t expected_primitive_set_count =
         std::min(seq_num + 1, static_cast<uint64_t>(RECENT_PACKET_LOSS_PERIOD));
     uint64_t lost_primitive_set_count =
         expected_primitive_set_count - recent_primitive_set_seq_nums.size();
     float packet_loss_rate = static_cast<float>(lost_primitive_set_count) /
                              static_cast<float>(expected_primitive_set_count);
-    
+
     if (packet_loss_rate > PACKET_LOSS_WARNING_THRESHOLD)
     {
         LOG(WARNING) << "Primitive set packet loss in the past "
