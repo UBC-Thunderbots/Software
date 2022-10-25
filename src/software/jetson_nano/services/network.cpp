@@ -38,7 +38,7 @@ void NetworkService::primitiveSetCallback(TbotsProto::PrimitiveSet input)
     // If the primitive set seems very out of date, then this is likely due to an AI
     // reset. Clear the queue
     if (!recent_primitive_set_seq_nums.empty() &&
-        seq_num <= recent_primitive_set_seq_nums.back() - RECENT_PACKET_LOSS_PERIOD)
+        seq_num + RECENT_PACKET_LOSS_PERIOD <= recent_primitive_set_seq_nums.back())
     {
         recent_primitive_set_seq_nums = std::queue<uint64_t>();
         LOG(WARNING)
@@ -61,14 +61,12 @@ void NetworkService::primitiveSetCallback(TbotsProto::PrimitiveSet input)
     }
 
     uint64_t expected_primitive_set_count =
-        std::min(seq_num, static_cast<uint64_t>(RECENT_PACKET_LOSS_PERIOD));
+        std::min(seq_num + 1, static_cast<uint64_t>(RECENT_PACKET_LOSS_PERIOD));
     uint64_t lost_primitive_set_count =
         expected_primitive_set_count - recent_primitive_set_seq_nums.size();
     float packet_loss_rate = static_cast<float>(lost_primitive_set_count) /
                              static_cast<float>(expected_primitive_set_count);
-
-    LOG(INFO) << "Primitive lost rate: " << packet_loss_rate << " "
-              << recent_primitive_set_seq_nums.size();
+    
     if (packet_loss_rate > PACKET_LOSS_WARNING_THRESHOLD)
     {
         LOG(WARNING) << "Primitive set packet loss in the past "
