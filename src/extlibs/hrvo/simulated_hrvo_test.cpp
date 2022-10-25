@@ -9,6 +9,10 @@
 #include "software/test_util/test_util.h"
 #include "software/time/duration.h"
 #include "software/world/world.h"
+#include "software/world/field.h"
+#include "extlibs/hrvo/frnn_brute_force.h"
+#include <random>
+#include <chrono>
 
 class SimulatedHRVOTest : public SimulatedErForceSimPlayTestFixture
 {
@@ -318,4 +322,56 @@ TEST_F(SimulatedHRVOTest, test_start_in_local_minima_with_open_end)
     runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(7));
+}
+
+TEST_F(SimulatedHRVOTest, frnn_brute_force_neighbors)
+{
+    unsigned int iterations = 1000;
+    unsigned int num_of_agents = 10;
+    float radius = 1.0;
+    double lower_x_bound = -4.5;
+    double upper_x_bound = 4.5;
+    double lower_y_bound = -3;
+    double upper_y_bound = 3;
+    std::chrono::nanoseconds duration_total(0);
+    std::chrono::nanoseconds max(0);
+    std::chrono::nanoseconds min(0);
+
+    for (unsigned int i = 0; i < iterations; i++) {
+
+        std::vector<std::pair<double, double>> agents;
+        for (unsigned int j = 0; j < num_of_agents; j++) {
+            std::uniform_real_distribution<double> x_unif(lower_x_bound,upper_x_bound);
+            std::uniform_real_distribution<double> y_unif(lower_y_bound,upper_y_bound);
+            std::default_random_engine re;
+            double random_x = x_unif(re);
+            double random_y = y_unif(re);
+            x_unif.reset();
+            y_unif.reset();
+            std::pair<double, double> agent = std::make_pair (random_x, random_y);
+            agents.push_back(agent);
+        }
+
+        int random_agent_index = rand() % num_of_agents;
+
+        auto start = std::chrono::high_resolution_clock::now();
+        std::vector<std::pair<double, double>> agent_subset = FRNN::queryClosestNeighbors(random_agent_index, radius, agents);
+        auto stop = std::chrono::high_resolution_clock::now();
+
+        auto duration = duration_cast<std::chrono::nanoseconds>(stop - start);
+        duration_total += duration;
+
+        if (duration > max) {
+            max = duration;
+        }
+
+        if (duration < min) {
+            min = duration;
+        }
+    }
+
+    std::chrono::nanoseconds average = duration_total / iterations;
+    std::cout << "average time: " << average.count() << " nanoseconds" << std::endl;
+    std::cout << "max: " << max.count() << " nanoseconds" << std::endl;
+    std::cout << "min: " << min.count() << " nanoseconds" << std::endl;
 }
