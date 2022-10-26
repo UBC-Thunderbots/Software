@@ -327,7 +327,8 @@ TEST_F(SimulatedHRVOTest, test_start_in_local_minima_with_open_end)
 TEST_F(SimulatedHRVOTest, frnn_brute_force_neighbors)
 {
     unsigned int iterations = 1000;
-    unsigned int num_of_agents = 10;
+    unsigned int num_of_agents = 22;
+    unsigned int friendly_agents = 11;
     float radius = 1.0;
     double lower_x_bound = -4.5;
     double upper_x_bound = 4.5;
@@ -337,27 +338,28 @@ TEST_F(SimulatedHRVOTest, frnn_brute_force_neighbors)
     std::chrono::nanoseconds max(0);
     std::chrono::nanoseconds min(0);
 
+    std::uniform_real_distribution<double> x_unif(lower_x_bound,upper_x_bound);
+    std::uniform_real_distribution<double> y_unif(lower_y_bound,upper_y_bound);
+    std::default_random_engine re;
+
     for (unsigned int i = 0; i < iterations; i++) {
 
         std::vector<std::pair<double, double>> agents;
         for (unsigned int j = 0; j < num_of_agents; j++) {
-            std::uniform_real_distribution<double> x_unif(lower_x_bound,upper_x_bound);
-            std::uniform_real_distribution<double> y_unif(lower_y_bound,upper_y_bound);
-            std::default_random_engine re;
             double random_x = x_unif(re);
             double random_y = y_unif(re);
-            x_unif.reset();
-            y_unif.reset();
+            std::cout << "random x value: " << random_x << std::endl;
+            std::cout << "random y value: " << random_y << std::endl;
+
             std::pair<double, double> agent = std::make_pair (random_x, random_y);
             agents.push_back(agent);
         }
 
-        int random_agent_index = rand() % num_of_agents;
-
         auto start = std::chrono::high_resolution_clock::now();
-        std::vector<std::pair<double, double>> agent_subset = FRNN::queryClosestNeighbors(random_agent_index, radius, agents);
+        for (unsigned int agent_index = 0; agent_index < friendly_agents; agent_index++) {
+            std::vector<std::pair<double, double>> agent_subset = FRNN::queryClosestNeighbors(agent_index, radius, agents);
+        }
         auto stop = std::chrono::high_resolution_clock::now();
-
         auto duration = duration_cast<std::chrono::nanoseconds>(stop - start);
         duration_total += duration;
 
