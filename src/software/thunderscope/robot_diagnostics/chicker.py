@@ -8,6 +8,8 @@ import software.thunderscope.common.common_widgets as common_widgets
 
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
+MILLISECONDS_PER_SECOND = 1000
+
 
 class ChickerCommandMode(Enum):
     KICK = 1
@@ -61,9 +63,9 @@ class ChickerWidget(QWidget):
         self.chip_button.clicked.connect(self.chip_clicked)
 
         # no auto button enables both buttons, while auto kick and auto chip disable both buttons
-        self.no_auto_button.toggled.connect(self.buttons_enable)
-        self.auto_kick_button.toggled.connect(self.buttons_disable)
-        self.auto_chip_button.toggled.connect(self.buttons_disable)
+        self.no_auto_button.toggled.connect(self.enable_kick_chip_button)
+        self.auto_kick_button.toggled.connect(self.disable_kick_chip_button)
+        self.auto_chip_button.toggled.connect(self.disable_kick_chip_button)
 
         vbox_layout.addWidget(self.radio_button_box)
         self.no_auto_button.setChecked(True)
@@ -104,7 +106,7 @@ class ChickerWidget(QWidget):
             self.toggle_kick_button()
 
             # set and start timer to re-enable kick button after 3 seconds
-            self.start_timer_once(self.toggle_kick_button, 3000)
+            self.start_timer_once(self.toggle_kick_button, 3 * MILLISECONDS_PER_SECOND)
 
     def chip_clicked(self):
         # if button is enabled
@@ -114,7 +116,7 @@ class ChickerWidget(QWidget):
             self.toggle_chip_button()
 
             # set and start timer to re-enable chip button after 3 seconds
-            self.start_timer_once(self.toggle_chip_button, 3000)
+            self.start_timer_once(self.toggle_chip_button, 3 * MILLISECONDS_PER_SECOND)
 
     def start_timer_once(self, function, duration):
         """Starts a QTimer to call the given function once after the given duration
@@ -125,11 +127,11 @@ class ChickerWidget(QWidget):
 
         """
 
-        t = QTimer(self)
-        t.setTimerType(Qt.TimerType.PreciseTimer)
-        t.timeout.connect(function)
-        t.setSingleShot(True)
-        t.start(duration)
+        timer = QTimer(self)
+        timer.setTimerType(Qt.TimerType.PreciseTimer)
+        timer.timeout.connect(function)
+        timer.setSingleShot(True)
+        timer.start(duration)
 
     def toggle_kick_button(self):
         self.kick_button_enable = not self.kick_button_enable
@@ -137,16 +139,16 @@ class ChickerWidget(QWidget):
     def toggle_chip_button(self):
         self.chip_button_enable = not self.chip_button_enable
 
-    def buttons_disable(self):
+    def disable_kick_chip_button(self):
         self.kick_button_enable = False
         self.chip_button_enable = False
 
-    def buttons_enable(self):
+    def enable_kick_chip_button(self):
         self.kick_button_enable = True
         self.chip_button_enable = True
 
     def send_command(self, command):
-        """Sends a kick or chip primitive dependent on boolean parameter
+        """Sends a [auto]kick or [auto]chip primitive
 
         :param command: enum int value to indicate what primitive to send
         :returns: None
