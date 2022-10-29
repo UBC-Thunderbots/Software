@@ -6,7 +6,7 @@
 #include <limits>
 #include <vector>
 
-#include "PathfindingDataTypes.h"
+#include "extlibs/enlsvg/PathfindingDataTypes.h"
 
 namespace Pathfinding
 {

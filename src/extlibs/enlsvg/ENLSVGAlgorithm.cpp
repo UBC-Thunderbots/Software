@@ -1,11 +1,11 @@
-#include "extlibs/enlsvg/Pathfinding/ENLSVGAlgorithm.h"
+#include "extlibs/enlsvg/ENLSVGAlgorithm.h"
 
 #include <algorithm>
 
-#include "extlibs/enlsvg/Pathfinding/ENLSVGGraph.h"
-#include "extlibs/enlsvg/Pathfinding/Grid.h"
-#include "extlibs/enlsvg/Pathfinding/IndirectHeap.h"
-#include "extlibs/enlsvg/Pathfinding/LineOfSightScanner.h"
+#include "extlibs/enlsvg/ENLSVGGraph.h"
+#include "extlibs/enlsvg/Grid.h"
+#include "extlibs/enlsvg/IndirectHeap.h"
+#include "extlibs/enlsvg/LineOfSightScanner.h"
 
 namespace Pathfinding
 {

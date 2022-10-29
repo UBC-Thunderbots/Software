@@ -1,4 +1,4 @@
-#include "extlibs/enlsvg/Pathfinding/IndirectHeap.h"
+#include "extlibs/enlsvg/IndirectHeap.h"
 
 #include <iostream>
 
