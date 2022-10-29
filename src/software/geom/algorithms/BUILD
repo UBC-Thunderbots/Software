@@ -3,36 +3,39 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "algorithms",
     srcs = [
-        "acute_angle.cpp",
         "almost_equal.cpp",
         "calculate_block_cone.cpp",
         "closest_point.cpp",
         "collinear.cpp",
         "contains.cpp",
+        "convex_angle.cpp",
         "distance.cpp",
         "find_open_circles.cpp",
         "furthest_point.cpp",
+        "generate_velocity_obstacle.cpp",
         "intersection.cpp",
         "intersects.cpp",
         "rasterize.cpp",
         "voronoi_diagram.cpp",
     ],
     hdrs = [
-        "acute_angle.h",
         "almost_equal.h",
         "calculate_block_cone.h",
         "closest_point.h",
         "collinear.h",
         "contains.h",
+        "convex_angle.h",
         "distance.h",
         "find_open_circles.h",
         "furthest_point.h",
+        "generate_velocity_obstacle.h",
         "intersection.h",
         "intersects.h",
         "rasterize.h",
         "voronoi_diagram.h",
     ],
     deps = [
+        "//software/ai/navigator/path_planner/hrvo:velocity_obstacle",
         "//software/geom:angle",
         "//software/geom:circle",
         "//software/geom:geom_constants",
@@ -174,8 +177,8 @@ cc_test(
 )
 
 cc_test(
-    name = "acute_angle_test",
-    srcs = ["acute_angle_test.cpp"],
+    name = "convex_angle_test",
+    srcs = ["convex_angle_test.cpp"],
     deps = [
         ":algorithms",
         "//shared/test_util:tbots_gtest_main",
