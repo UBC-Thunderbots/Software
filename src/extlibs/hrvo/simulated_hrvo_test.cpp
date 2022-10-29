@@ -11,6 +11,7 @@
 #include "software/world/world.h"
 #include "software/world/field.h"
 #include "extlibs/hrvo/frnn_brute_force.h"
+#include "extlibs/hrvo/Test_Agent.h"
 #include <random>
 #include <chrono>
 
@@ -360,6 +361,77 @@ TEST_F(SimulatedHRVOTest, frnn_brute_force_neighbors)
             std::vector<std::pair<double, double>> agent_subset = FRNN::queryClosestNeighbors(agent_index, radius, agents);
         }
         auto stop = std::chrono::high_resolution_clock::now();
+        auto duration = duration_cast<std::chrono::nanoseconds>(stop - start);
+        duration_total += duration;
+
+        if (duration > max) {
+            max = duration;
+        }
+
+        if (duration < min) {
+            min = duration;
+        }
+    }
+
+    std::chrono::nanoseconds average = duration_total / iterations;
+    std::cout << "average time: " << average.count() << " nanoseconds" << std::endl;
+    std::cout << "max: " << max.count() << " nanoseconds" << std::endl;
+    std::cout << "min: " << min.count() << " nanoseconds" << std::endl;
+}
+
+TEST_F(SimulatedHRVOTest, generic_frnn_brute_force_test)
+{
+    unsigned int iterations = 1000;
+    unsigned int num_of_agents = 22;
+    unsigned int friendly_agents = 11;
+    float radius = 1.0;
+    double lower_x_bound = -4.5;
+    double upper_x_bound = 4.5;
+    double lower_y_bound = -3;
+    double upper_y_bound = 3;
+    std::chrono::nanoseconds duration_total(0);
+    std::chrono::nanoseconds max(0);
+    std::chrono::nanoseconds min(0);
+
+    std::uniform_real_distribution<double> x_unif(lower_x_bound,upper_x_bound);
+    std::uniform_real_distribution<double> y_unif(lower_y_bound,upper_y_bound);
+    std::default_random_engine re;
+
+    auto lambda = [](Test_Agent robot, std::vector<Test_Agent> robots, double radius) {
+        std::vector<Test_Agent> robot_subset;
+
+        for (Test_Agent candidate_robot: robots) {
+            if ((robot.position() - candidate_robot.position()).lengthSquared() <  radius * radius && robot != candidate_robot) {
+                robot_subset.push_back(candidate_robot);
+            }
+        }
+
+        return robot_subset;
+    };
+
+    for (unsigned int i = 0; i < iterations; i++) {
+
+        vector<Test_Agent> agents;
+        for (unsigned int j = 0; j < num_of_agents; j++) {
+            double random_x = x_unif(re);
+            double random_y = y_unif(re);
+            std::cout << "random x value: " << random_x << std::endl;
+            std::cout << "random y value: " << random_y << std::endl;
+            Test_Agent agent(random_x, random_y);
+            agents.push_back(agent);
+        }
+
+        unsigned int robot_counter = 0;
+        auto start = std::chrono::high_resolution_clock::now();
+        for (Test_Agent agent : agents) {
+            if (robot_counter >= friendly_agents) {
+                break;
+            }
+            auto agent_subset = FRNN::nearestNeighbours(agent, agents, radius, lambda);
+            robot_counter++;
+        }
+        auto stop = std::chrono::high_resolution_clock::now();
+
         auto duration = duration_cast<std::chrono::nanoseconds>(stop - start);
         duration_total += duration;
 
