@@ -1,3 +1,7 @@
 [submodule "src/software/simulation/ssl_simulation_protocol"]
 	path = src/software/simulation/ssl_simulation_protocol
 	url = git@github.com:UBC-Thunderbots/SSL-Simulation-Protocol-Support.git
+[submodule "src/software/simulation/tigers_autoref"]
+	path = src/software/simulation/tigers_autoref
+	url = https://gitlab.tigers-mannheim.de/open-source/AutoReferee.git
+	branch = autoref-ci
