@@ -7,6 +7,7 @@ from software.thunderscope.common import common_widgets
 from proto.import_all_protos import *
 from software.py_constants import *
 
+
 class DriveAndDribblerWidget(QWidget):
     def __init__(self, proto_unix_io):
         """Initialize the widget to control the robot's motors

@@ -125,11 +125,11 @@ PYBIND11_MODULE(py_constants, m)
     m.attr("MAX_BATTERY_VOLTAGE")     = MAX_BATTERY_VOLTAGE;
     m.attr("BATTERY_WARNING_VOLTAGE") = BATTERY_WARNING_VOLTAGE;
 
-    //Drive and Dribbler
-    m.attr("MAX_DRIBBLER_RPM")               = MAX_DRIBBLER_RPM;
-    m.attr("MIN_DRIBBLER_RPM")               = MIN_DRIBBLER_RPM;
-    m.attr("MAX_LINEAR_SPEED_MPS")           = MAX_LINEAR_SPEED_MPS;
-    m.attr("MIN_LINEAR_SPEED_MPS")           = MIN_LINEAR_SPEED_MPS;
-    m.attr("MAX_ANGULAR_SPEED_RAD_PER_S")    = MAX_ANGULAR_SPEED_RAD_PER_S;
-    m.attr("MIN_ANGULAR_SPEED_RAD_PER_S")    = MIN_ANGULAR_SPEED_RAD_PER_S;
+    // Drive and Dribbler
+    m.attr("MAX_DRIBBLER_RPM")            = MAX_DRIBBLER_RPM;
+    m.attr("MIN_DRIBBLER_RPM")            = MIN_DRIBBLER_RPM;
+    m.attr("MAX_LINEAR_SPEED_MPS")        = MAX_LINEAR_SPEED_MPS;
+    m.attr("MIN_LINEAR_SPEED_MPS")        = MIN_LINEAR_SPEED_MPS;
+    m.attr("MAX_ANGULAR_SPEED_RAD_PER_S") = MAX_ANGULAR_SPEED_RAD_PER_S;
+    m.attr("MIN_ANGULAR_SPEED_RAD_PER_S") = MIN_ANGULAR_SPEED_RAD_PER_S;
 }
