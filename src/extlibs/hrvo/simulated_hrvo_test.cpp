@@ -20,6 +20,13 @@ class SimulatedHRVOTest : public SimulatedErForceSimPlayTestFixture
    protected:
     TbotsProto::FieldType field_type = TbotsProto::FieldType::DIV_B;
     Field field                      = Field::createField(field_type);
+
+    class Test_Agent {
+    public:
+        Point point;
+        Point position() const;
+        Test_Agent(double x, double y);
+    };
 };
 
 TEST_F(SimulatedHRVOTest, test_drive_in_straight_line_with_moving_enemy_robot_from_behind)
@@ -427,7 +434,7 @@ TEST_F(SimulatedHRVOTest, generic_frnn_brute_force_test)
             if (robot_counter >= friendly_agents) {
                 break;
             }
-            auto agent_subset = FRNN::nearestNeighbours(agent, agents, radius, lambda);
+            auto agent_subset = FRNN::nearestNeighbours(agent, agents, radius, [](Test_Agent r1, Test_Agent r2) {return (r1.position() - r2.position()).lengthSquared();});
             robot_counter++;
         }
         auto stop = std::chrono::high_resolution_clock::now();

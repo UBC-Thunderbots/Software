@@ -20,20 +20,13 @@ std::vector<std::pair<double, double>> FRNN::queryClosestNeighbors(size_t index,
 }
 
 template <class T>
-std::vector<T> FRNN::nearestNeighbours(T this_robot, std::vector<T> input, double radius, std::function<std::vector<T>(T, std::vector<T>, double)> comparator) {
-    return comparator(this_robot, input, radius);
-}
-
-template <class T>
-std::vector<T> FRNN::compare_robots(T robot, std::vector<T> robots, double radius) {
+std::vector<T> FRNN::nearestNeighbours(T this_robot, std::vector<T> input, double radius, std::function<double(const T&, const T&)> comparator) {
     std::vector<T> robot_subset;
-
-    for (T candidate_robot: robots) {
-        if ((robot.postion() - candidate_robot.position()).lengthSquared() <  radius * radius && robot != candidate_robot) {
+    for (T candidate_robot : input) {
+        if (comparator(this_robot, candidate_robot) < radius * radius && this_robot != candidate_robot) {
             robot_subset.push_back(candidate_robot);
         }
     }
-
     return robot_subset;
 }
 
