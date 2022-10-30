@@ -11,9 +11,9 @@
 #include "software/world/world.h"
 #include "software/world/field.h"
 #include "extlibs/hrvo/frnn_brute_force.h"
-#include "extlibs/hrvo/Test_Agent.h"
 #include <random>
 #include <chrono>
+#include "software/geom/algorithms/distance.h"
 
 class SimulatedHRVOTest : public SimulatedErForceSimPlayTestFixture
 {
@@ -27,7 +27,22 @@ class SimulatedHRVOTest : public SimulatedErForceSimPlayTestFixture
         Point position() const;
         Test_Agent(double x, double y);
     };
+
+    static double compare(const Test_Agent &r1, const Test_Agent &r2);
 };
+
+Point SimulatedHRVOTest::Test_Agent::position() const {
+    return point;
+}
+
+SimulatedHRVOTest::Test_Agent::Test_Agent(double x, double y) {
+    point = Point(x,y);
+}
+
+double SimulatedHRVOTest::compare(const Test_Agent &r1, const Test_Agent &r2) {
+    return distanceSquared(r1.position(), r2.position());
+}
+
 
 TEST_F(SimulatedHRVOTest, test_drive_in_straight_line_with_moving_enemy_robot_from_behind)
 {
@@ -391,7 +406,7 @@ TEST_F(SimulatedHRVOTest, generic_frnn_brute_force_test)
     unsigned int iterations = 1000;
     unsigned int num_of_agents = 22;
     unsigned int friendly_agents = 11;
-    float radius = 1.0;
+    double radius = 1.0;
     double lower_x_bound = -4.5;
     double upper_x_bound = 4.5;
     double lower_y_bound = -3;
@@ -403,18 +418,6 @@ TEST_F(SimulatedHRVOTest, generic_frnn_brute_force_test)
     std::uniform_real_distribution<double> x_unif(lower_x_bound,upper_x_bound);
     std::uniform_real_distribution<double> y_unif(lower_y_bound,upper_y_bound);
     std::default_random_engine re;
-
-    auto lambda = [](Test_Agent robot, std::vector<Test_Agent> robots, double radius) {
-        std::vector<Test_Agent> robot_subset;
-
-        for (Test_Agent candidate_robot: robots) {
-            if ((robot.position() - candidate_robot.position()).lengthSquared() <  radius * radius && robot != candidate_robot) {
-                robot_subset.push_back(candidate_robot);
-            }
-        }
-
-        return robot_subset;
-    };
 
     for (unsigned int i = 0; i < iterations; i++) {
 
@@ -434,7 +437,12 @@ TEST_F(SimulatedHRVOTest, generic_frnn_brute_force_test)
             if (robot_counter >= friendly_agents) {
                 break;
             }
-            auto agent_subset = FRNN::nearestNeighbours(agent, agents, radius, [](Test_Agent r1, Test_Agent r2) {return (r1.position() - r2.position()).lengthSquared();});
+
+            auto agent_subset = FRNN::nearestNeighbours<Test_Agent, std::function<double(T, T)>>(agent, agents, radius, SimulatedHRVOTest::compare);
+
+            /*
+             * [](const Test_Agent &r1, const Test_Agent &r2) -> double {return distanceSquared(r1.position(), r2.position());}
+             */
             robot_counter++;
         }
         auto stop = std::chrono::high_resolution_clock::now();
