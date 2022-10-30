@@ -19,8 +19,8 @@ std::vector<std::pair<double, double>> FRNN::queryClosestNeighbors(size_t index,
     return neighbors;
 }
 
-template <class T>
-std::vector<T> FRNN::nearestNeighbours(T this_robot, std::vector<T> input, double radius, std::function<double(const T&, const T&)> comparator) {
+template <class T, class Comp>
+std::vector<T> FRNN::nearestNeighbours(T this_robot, std::vector<T> input, double radius, Comp comparator) {
     std::vector<T> robot_subset;
     for (T candidate_robot : input) {
         if (comparator(this_robot, candidate_robot) < radius * radius && this_robot != candidate_robot) {
@@ -31,14 +31,7 @@ std::vector<T> FRNN::nearestNeighbours(T this_robot, std::vector<T> input, doubl
 }
 
 /**
- * Lambda Function Example?
- * nearestNeighbours(robots, 8.5, [](Robot r1, Robot r2) {
- *  return (r1.position() - r2.position()).lengthSquared();
- * }
- *
- * lambda functions: std:; function<T, T> -> double (distance)
- *
- * TODO: Add additional tests for the KDtree by timing it while running in the simulator, have it run for a minute. Run AI vs Ai simulate test with (./tbots.py run thunderscope)
+ * TODO: Add additional tests for the KDtree by timing it while running in the simulator, have it run for a minute. Run AI vs AI test with (./tbots.py run thunderscope)
  * TODO: Move the implementation of FRNN into the algorithms folder
  */
 

@@ -438,11 +438,8 @@ TEST_F(SimulatedHRVOTest, generic_frnn_brute_force_test)
                 break;
             }
 
-            auto agent_subset = FRNN::nearestNeighbours<Test_Agent, std::function<double(T, T)>>(agent, agents, radius, SimulatedHRVOTest::compare);
+            auto agent_subset = FRNN::nearestNeighbours(agent, agents, radius, [](const Test_Agent &r1, const Test_Agent &r2) -> double {return distanceSquared(r1.position(), r2.position());});
 
-            /*
-             * [](const Test_Agent &r1, const Test_Agent &r2) -> double {return distanceSquared(r1.position(), r2.position());}
-             */
             robot_counter++;
         }
         auto stop = std::chrono::high_resolution_clock::now();
