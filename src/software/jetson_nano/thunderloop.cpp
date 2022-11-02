@@ -156,7 +156,7 @@ void Thunderloop::runLoop()
                 world_ = new_world;
             }
 
-            // If world not received in a while, stop robots
+            // If world not received in a while, stop robot
             struct timespec world_result;
 
             clock_gettime(CLOCK_MONOTONIC, &current_time);
@@ -178,7 +178,8 @@ void Thunderloop::runLoop()
                     static_cast<double>(world_result.tv_nsec) *
                         MILLISECONDS_PER_NANOSECOND);
 
-                LOG(INFO) << "Milliseconds since last world: "
+                LOG(INFO) << "World timeout, overriding with StopPrimitive\n"
+                          << "Milliseconds since last world: "
                           << milliseconds_elapsed_since_last_world;
             }
 
