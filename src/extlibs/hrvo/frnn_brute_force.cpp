@@ -19,8 +19,8 @@ std::vector<std::pair<double, double>> FRNN::queryClosestNeighbors(size_t index,
     return neighbors;
 }
 
-template <class T, class Comp>
-std::vector<T> FRNN::nearestNeighbours(T this_robot, std::vector<T> input, double radius, Comp comparator) {
+template <class T, class F>
+std::vector<T> FRNN::nearestNeighbours(T this_robot, std::vector<T> input, double radius, F comparator) {
     std::vector<T> robot_subset;
     for (T candidate_robot : input) {
         if (comparator(this_robot, candidate_robot) < radius * radius && this_robot != candidate_robot) {

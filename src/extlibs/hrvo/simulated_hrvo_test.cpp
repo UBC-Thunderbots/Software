@@ -20,26 +20,24 @@ class SimulatedHRVOTest : public SimulatedErForceSimPlayTestFixture
    protected:
     TbotsProto::FieldType field_type = TbotsProto::FieldType::DIV_B;
     Field field                      = Field::createField(field_type);
-
-    class Test_Agent {
-    public:
-        Point point;
-        Point position() const;
-        Test_Agent(double x, double y);
-    };
-
-    static double compare(const Test_Agent &r1, const Test_Agent &r2);
 };
 
-Point SimulatedHRVOTest::Test_Agent::position() const {
+class Test_Agent {
+public:
+    Point point;
+    Point position() const;
+    Test_Agent(double x, double y);
+};
+
+Point Test_Agent::position() const {
     return point;
 }
 
-SimulatedHRVOTest::Test_Agent::Test_Agent(double x, double y) {
+Test_Agent::Test_Agent(double x, double y) {
     point = Point(x,y);
 }
 
-double SimulatedHRVOTest::compare(const Test_Agent &r1, const Test_Agent &r2) {
+double compare(const Test_Agent &r1, const Test_Agent &r2) {
     return distanceSquared(r1.position(), r2.position());
 }
 
@@ -438,8 +436,8 @@ TEST_F(SimulatedHRVOTest, generic_frnn_brute_force_test)
                 break;
             }
 
-            auto agent_subset = FRNN::nearestNeighbours(agent, agents, radius, [](const Test_Agent &r1, const Test_Agent &r2) -> double {return distanceSquared(r1.position(), r2.position());});
-
+            auto agent_subset = FRNN::nearestNeighbours(agent, agents, radius, compare);
+            //[](const Test_Agent &r1, const Test_Agent &r2) -> double {return distanceSquared(r1.position(), r2.position());}
             robot_counter++;
         }
         auto stop = std::chrono::high_resolution_clock::now();
