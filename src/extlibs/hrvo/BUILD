@@ -16,6 +16,17 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "nearest_neighbor_test",
+    srcs = ["nearest_neighbor_test.cpp"],
+    deps = [
+        ":hrvo",
+        "//shared/test_util:tbots_gtest_main",
+        "//software/test_util",
+        "//software/time:duration",
+    ],
+)
+
 cc_library(
     name = "hrvo",
     srcs = [

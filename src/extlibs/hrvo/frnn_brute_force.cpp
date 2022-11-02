@@ -1,10 +1,10 @@
 #include "frnn_brute_force.h"
 
-std::vector<std::pair<double, double>> FRNN::queryClosestNeighbors(size_t index, float radius, std::vector<std::pair<double, double>> &agents) {
+std::vector<std::pair<double, double>> queryClosestNeighbors(size_t index, float radius, std::vector<std::pair<double, double>> &agents) {
 
     std::vector<std::pair<double, double>> neighbors;
 
-    for (std::pair<double, double> other_agent : agents) {
+    for (const std::pair<double, double> &other_agent : agents) {
 
         double x_difference = other_agent.first - agents[index].first;
         double y_difference = other_agent.second - agents[index].second;
@@ -20,9 +20,9 @@ std::vector<std::pair<double, double>> FRNN::queryClosestNeighbors(size_t index,
 }
 
 template <class T, typename F>
-std::vector<T> FRNN::nearestNeighbours(const T& this_robot, const std::vector<T>& input, double radius, F comparator) {
+std::vector<T> nearestNeighbours(const T& this_robot, const std::vector<T>& input, double radius, F comparator) {
     std::vector<T> robot_subset;
-    for (T candidate_robot : input) {
+    for (const T &candidate_robot : input) {
         if (comparator(this_robot, candidate_robot) < radius * radius && this_robot != candidate_robot) {
             robot_subset.push_back(candidate_robot);
         }

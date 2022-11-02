@@ -389,7 +389,7 @@ TEST_F(SimulatedHRVOTest, frnn_brute_force_neighbors)
 
         auto start = std::chrono::high_resolution_clock::now();
         for (unsigned int agent_index = 0; agent_index < friendly_agents; agent_index++) {
-            std::vector<std::pair<double, double>> agent_subset = FRNN::queryClosestNeighbors(agent_index, radius, agents);
+            std::vector<std::pair<double, double>> agent_subset = queryClosestNeighbors(agent_index, radius, agents);
         }
         auto stop = std::chrono::high_resolution_clock::now();
         auto duration = duration_cast<std::chrono::nanoseconds>(stop - start);
@@ -442,7 +442,7 @@ TEST_F(SimulatedHRVOTest, generic_frnn_brute_force_test)
 
         unsigned int robot_counter = 0;
         auto start = std::chrono::high_resolution_clock::now();
-        for (const Test_Agent& agent : agents) {
+        for (const Test_Agent &agent : agents) {
             if (robot_counter >= friendly_agents) {
                 break;
             }
