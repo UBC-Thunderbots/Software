@@ -41,6 +41,17 @@ double compare(const Test_Agent &r1, const Test_Agent &r2) {
     return distanceSquared(r1.position(), r2.position());
 }
 
+template <class T, typename F>
+std::vector<T> nearestNeighbours(const T& this_robot, const std::vector<T>& input, double radius, F comparator) {
+    std::vector<T> robot_subset;
+    for (const T& candidate_robot : input) {
+        if (comparator(this_robot, candidate_robot) < radius * radius/* && this_robot != candidate_robot*/) {
+            robot_subset.push_back(candidate_robot);
+        }
+    }
+    return robot_subset;
+}
+
 
 TEST_F(SimulatedHRVOTest, test_drive_in_straight_line_with_moving_enemy_robot_from_behind)
 {
@@ -431,12 +442,12 @@ TEST_F(SimulatedHRVOTest, generic_frnn_brute_force_test)
 
         unsigned int robot_counter = 0;
         auto start = std::chrono::high_resolution_clock::now();
-        for (Test_Agent agent : agents) {
+        for (const Test_Agent& agent : agents) {
             if (robot_counter >= friendly_agents) {
                 break;
             }
 
-            auto agent_subset = FRNN::nearestNeighbours(agent, agents, radius, compare);
+            std::vector<Test_Agent> agent_subset = nearestNeighbours(agent, agents, radius, compare);
             //[](const Test_Agent &r1, const Test_Agent &r2) -> double {return distanceSquared(r1.position(), r2.position());}
             robot_counter++;
         }
