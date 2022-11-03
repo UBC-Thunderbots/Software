@@ -37,8 +37,8 @@ const std::string DYNAMIC_PARAMETER_UPDATE_RESPONSE_PATH = "/dynamic_parameter_r
 const unsigned UNIX_BUFFER_SIZE = 20000;
 
 static const double BALL_TO_FRONT_OF_ROBOT_DISTANCE_WHEN_DRIBBLING =
-    BALL_MAX_RADIUS_METERS -
-    2 * BALL_MAX_RADIUS_METERS * MAX_FRACTION_OF_BALL_COVERED_BY_ROBOT;
+        BALL_MAX_RADIUS_METERS -
+        2 * BALL_MAX_RADIUS_METERS * MAX_FRACTION_OF_BALL_COVERED_BY_ROBOT;
 
 // Redis Keys
 const std::string ROBOT_ID_REDIS_KEY                = "/robot_id";
@@ -56,11 +56,3 @@ static constexpr unsigned int SSL_VISION_PORT = 10020;
 
 const std::string SSL_REFEREE_ADDRESS          = "224.5.23.1";
 static constexpr unsigned int SSL_REFEREE_PORT = 10003;
-
-// Drive and Dribbler
-static constexpr unsigned int MAX_DRIBBLER_RPM            = 10000;
-static constexpr unsigned int MIN_DRIBBLER_RPM            = -10000;
-static constexpr unsigned int MAX_LINEAR_SPEED_MPS        = 5;
-static constexpr unsigned int MIN_LINEAR_SPEED_MPS        = -5;
-static constexpr unsigned int MAX_ANGULAR_SPEED_RAD_PER_S = 20;
-static constexpr unsigned int MIN_ANGULAR_SPEED_RAD_PER_S = -20;

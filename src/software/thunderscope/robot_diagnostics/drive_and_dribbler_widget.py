@@ -5,15 +5,22 @@ import time
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.common import common_widgets
 from proto.import_all_protos import *
-from software.py_constants import *
+
+# TODO (#2683) get these values from robot constants
+MAX_DRIBBLER_RPM = 10000
+MIN_DRIBBLER_RPM = -10000
+
+MAX_LINEAR_SPEED_MPS = 5
+MIN_LINEAR_SPEED_MPS = -5
+
+MAX_ANGULAR_SPEED_RAD_PER_S = 20
+MIN_ANGULAR_SPEED_RAD_PER_S = -20
 
 
 class DriveAndDribblerWidget(QWidget):
     def __init__(self, proto_unix_io):
         """Initialize the widget to control the robot's motors
-
         :param proto_unix_io: the proto_unix_io object
-
         """
         self.input_a = time.time()
 
@@ -66,9 +73,7 @@ class DriveAndDribblerWidget(QWidget):
 
     def value_change(self, slider):
         """Change the slider's value by 0.1 per step
-
         :param title: the name of the slider
-
         """
         value = slider.value()
         value = float(value)
@@ -78,9 +83,7 @@ class DriveAndDribblerWidget(QWidget):
 
     def setup_direct_velocity(self, title):
         """Create a widget to control the direct velocity of the robot's motors
-
         :param title: the name of the slider
-
         """
 
         group_box = QGroupBox(title)
@@ -141,9 +144,7 @@ class DriveAndDribblerWidget(QWidget):
 
     def setup_dribbler(self, title):
         """Create a widget to control the dribbler RPM
-
         :param title: the name of the slider
-
         """
 
         group_box = QGroupBox(title)
