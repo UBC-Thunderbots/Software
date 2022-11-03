@@ -101,7 +101,7 @@ class FieldTestRunner(TbotsTestRunner):
             )
 
     def set_play(self, play: Play, isBlue):
-        if team == proto.ssl_gc_common_pb2.Team.BLUE:
+        if isBlue:
             self.blue_full_system_proto_unix_io.send_proto(Play, play)
 
         else:
@@ -121,37 +121,56 @@ class FieldTestRunner(TbotsTestRunner):
         )
 
     def set_worldState(self, worldstate: WorldState):
-        def __validate(eventually_validation_set, timeout):
-            timeout_time = time.time() + timeout
+        """ Sets a world state on the field by moving robots and the ball to the given positions
 
-            while time.time() < timeout_time:
-                try:
-                    current_world = self.world_buffer.get(
-                        block=True, timeout=WORLD_BUFFER_TIMEOUT
-                    )
+        Args:
+            worldstate (WorldState): Proto which contains robot and ball positions expected on the field
 
-                    (
-                        eventually_validation_status,
-                        always_validation_status,
-                    ) = validation.run_validation_sequence_sets(
-                        world=current_world,
-                        eventually_validation_sequence_set=[
-                            [eventually_validation_set]
-                        ],
-                        always_validation_sequence_set=[[]],
-                    )
+        Raises:
+            Exception: On failing to verify that the expected position was set
+        """
 
-                    if not validation.contains_failure(eventually_validation_status):
-                        break
+        self.__validateMatchingRobotIds(worldstate)
+        self.__setBallState(worldstate)
+        self.__setRobotState(worldstate)
 
-                except queue.Empty as empty:
-                    logger.warning("failed to obtain world")
+    def __validateWorldState(self, eventually_validation_set, timeout):
+        timeout_time = time.time() + timeout
 
-            validation.check_validation(eventually_validation_status)
+        while time.time() < timeout_time:
+            try:
+                current_world = self.world_buffer.get(
+                    block=True, timeout=WORLD_BUFFER_TIMEOUT
+                )
 
-        BLUE_TEAM_INDEX = 0
-        YELLOW_TEAM_INDEX = 1
+                (
+                    eventually_validation_status,
+                    always_validation_status,
+                ) = validation.run_validation_sequence_sets(
+                    world=current_world,
+                    eventually_validation_sequence_set=[
+                        [eventually_validation_set]
+                    ],
+                    always_validation_sequence_set=[[]],
+                )
 
+                if not validation.contains_failure(eventually_validation_status):
+                    break
+
+            except queue.Empty as empty:
+                logger.warning("failed to obtain world")
+
+        validation.check_validation(eventually_validation_status)
+
+    def __validateMatchingRobotIds(self, worldstate: WorldState):
+        """Checks whether the robots to be used in this field test matches up with the robots we see on the field
+
+        Args:
+            worldstate (worldState Proto): The worldstate containing the robots to be used in the test
+
+        Raises:
+            Exception: On there existing a robot to be used in the test but is not on the field
+        """
         logger.info("testing ids matching")
 
         # validate that ids match with test setup
@@ -174,6 +193,16 @@ class FieldTestRunner(TbotsTestRunner):
 
         if not ids_present:
             raise Exception("robotIds do not match")
+
+    def __setBallState(self, worldstate: WorldState):
+        """Commands a robot to move the ball to the given position on the field
+
+        Args:
+            worldstate (worldState Proto): proto that contains ball position
+
+        Raises:
+            Exception: On failing to move the ball to the correct position
+        """
 
         logger.info("starting ball placement")
 
@@ -202,15 +231,27 @@ class FieldTestRunner(TbotsTestRunner):
             )
 
             try:
-                __validate(ball_placement_validation_function, ball_placement_timout_s)
+                self.__validateWorldState(ball_placement_validation_function, ball_placement_timout_s)
             except:
                 raise Exception(
                     "ball placement by blue robot {} to position {} failed".format(
                         self.friendly_robot_ids_field[0], ball_position
                     )
                 )
+        
+    def __setRobotState(self, worldstate: WorldState):
+        """sets friendly and enemy robots to the given position on the field
 
+        Args:
+            worldstate (worldState Proto): proto that contains robot positions
+
+        Raises:
+            Exception: On failing to set robot positions
+        """
         logger.info("moving robots to start position")
+
+        BLUE_TEAM_INDEX = 0
+        YELLOW_TEAM_INDEX = 1
 
         # creating movement tactics and associated validation functions
         initial_position_tactics = [
@@ -218,7 +259,7 @@ class FieldTestRunner(TbotsTestRunner):
             AssignedTacticPlayControlParams(),
         ]
 
-        robot_positions_validation_functions = [ball_placement_validation_function]
+        robot_positions_validation_functions = []
 
         for team_idx, team in enumerate(
             [worldstate.blue_robots, worldstate.yellow_robots]
@@ -263,7 +304,7 @@ class FieldTestRunner(TbotsTestRunner):
         # validate completion
         movement_timout_s = 10
         try:
-            __validate(robot_positions_validation_functions, movement_timout_s)
+            self.__validateWorldState(robot_positions_validation_functions, movement_timout_s)
         except:
             raise Exception("robot positioning not set")
 

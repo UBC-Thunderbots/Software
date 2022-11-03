@@ -61,6 +61,9 @@ class SimulatorTestRunner(TbotsTestRunner):
         :param yellow_full_system_proto_unix_io: The yellow full system proto unix io to use
         :param gamecontroller: The gamecontroller context managed instance 
         :param publish_validation_protos: whether to publish validation protos
+        :param simulation_tick_duration_s: duration in seconds of a simulation tick
+        :param sleep_between_ticks: whether the simulation should pause between ticks
+
 
         """
 
@@ -78,6 +81,12 @@ class SimulatorTestRunner(TbotsTestRunner):
     def set_tactics(
         self, tactics: AssignedTacticPlayControlParams, isBlue: bool,
     ):
+        """Overrides robot tactics with given assignment proto
+
+        Args:
+            tactics (AssignedTacticPlayControlParams): tactic assignment proto
+            isBlue (bool): whether the tactics should apply to blue team robots
+        """
         if isBlue:
             self.blue_full_system_proto_unix_io.send_proto(
                 AssignedTacticPlayControlParams, tactics
@@ -88,6 +97,12 @@ class SimulatorTestRunner(TbotsTestRunner):
             )
 
     def set_play(self, play: Play, isBlue: bool):
+        """Overrides robot play with given play proto
+
+        Args:
+            play (Play): the play proto to be applied on the robots
+            isBlue (bool): whether the play should be applied on the blue team
+        """
         if isBlue:
             self.blue_full_system_proto_unix_io.send_proto(Play, play)
 
@@ -95,6 +110,11 @@ class SimulatorTestRunner(TbotsTestRunner):
             self.yellow_full_system_proto_unix_io.send_proto(Play, play)
 
     def set_worldState(self, worldstate: WorldState):
+        """Sets the simulation worldstate
+
+        Args:
+            worldstate (WorldState): proto containing the desired worldstate
+        """
         self.simulator_proto_unix_io.send_proto(WorldState, worldstate)
 
     def time_provider(self):
@@ -140,6 +160,7 @@ class SimulatorTestRunner(TbotsTestRunner):
 
                 if self.sleep_between_ticks:
                     time.sleep(self.tick_duration_s)
+                time.sleep(self.tick_duration_s)
 
                 while True:
                     try:
@@ -200,6 +221,17 @@ def simulated_test_initializer(
     blue_full_system_proto_unix_io,
     sleep_between_ticks=True,
 ):
+    """Initializes a test runner object to be used as part of a pytest fixture, and which will be given as input to tests
+
+    Args:
+        simulator_proto_unix_io (_type_): simulator unix socket
+        yellow_full_system_proto_unix_io (_type_): yellow ai unix socket
+        blue_full_system_proto_unix_io (_type_): blue ai unix socket
+        sleep_between_ticks (bool, optional): whether the simulation should pause between ticks (for example to allow a gui to catchup). Defaults to True.
+
+    Yields:
+        SimulatorTestRunner: yields a test runner to the pytest fixture. Statements made after the yield will be run after the test.  
+    """
     args = load_command_line_arguments()
 
     # Grab the current test name to store the proto log for the test case

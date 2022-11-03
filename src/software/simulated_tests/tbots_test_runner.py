@@ -11,11 +11,6 @@ from proto.ssl_gc_common_pb2 import Team
 
 logger = createLogger(__name__)
 
-LAUNCH_DELAY_S = 0.1
-WORLD_BUFFER_TIMEOUT = 5.0
-PROCESS_BUFFER_DELAY_S = 0.01
-PAUSE_AFTER_FAIL_DELAY_S = 3
-
 
 class TbotsTestRunner(object):
 
@@ -114,16 +109,16 @@ class TbotsTestRunner(object):
         Raises:
             NotImplementedError
         """
-        raise NotImplementedError(
-            "abstract method set_play called from base class ")
+        raise NotImplementedError("abstract method set_play called from base class ")
 
     def set_worldState(self, worldstate: WorldState):
-        raise NotImplementedError(
-            "abstract class method called set_worldstate")
+        raise NotImplementedError("abstract class method called set_worldstate")
 
     def time_provider(self):
         """Provide the current time in seconds since the epoch"""
-        raise NotImplementedError("abstract method time_provider called from base class")
+        raise NotImplementedError(
+            "abstract method time_provider called from base class"
+        )
 
     def run_test(
         self,

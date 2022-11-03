@@ -18,8 +18,8 @@ blue_full_system_proto_unix_io = None
 logger = createLogger(__name__)
 
 LAUNCH_DELAY_S = 0.1
-PAUSE_AFTER_FAIL_DELAY_S = 3
-TEST_END_DELAY = 0.5
+PAUSE_AFTER_FAIL_DELAY_S = 2
+TEST_END_DELAY = 0.3
 
 
 def initialize_unix_io():
