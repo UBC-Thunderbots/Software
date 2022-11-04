@@ -1,9 +1,9 @@
 #pragma once
 
 #include "proto/vision.pb.h"
+#include "shared/2021_robot_constants.h"
 #include "shared/constants.h"
 #include "shared/robot_constants.h"
-#include "shared/robot_constants_2021.h"
 #include "software/geom/angle.h"
 #include "software/geom/angular_velocity.h"
 #include "software/geom/point.h"
