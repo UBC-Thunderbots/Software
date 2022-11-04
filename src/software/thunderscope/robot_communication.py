@@ -199,8 +199,8 @@ class RobotCommunication(object):
         # TODO (#2741): we might not want to support robot diagnostics in tscope
         # make a ticket here to create a widget to call these functions to detach
         # from AI and connect to robots/or remove
-        # self.disconnect_fullsystem_from_robots()
-        # self.connect_robot_to_diagnostics(0)
+        self.disconnect_fullsystem_from_robots()
+        self.connect_robot_to_diagnostics(2)
 
         self.send_estop_state_thread.start()
         self.run_thread.start()
