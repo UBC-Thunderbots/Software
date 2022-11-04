@@ -7,7 +7,7 @@
 #include "proto/message_translation/er_force_world.h"
 #include "proto/message_translation/tbots_protobuf.h"
 #include "proto/primitive/primitive_msg_factory.h"
-#include "shared/2021_robot_constants.h"
+#include "shared/robot_constants_2021.h"
 #include "software/test_util/test_util.h"
 
 class ErForceSimulatorTest : public ::testing::Test

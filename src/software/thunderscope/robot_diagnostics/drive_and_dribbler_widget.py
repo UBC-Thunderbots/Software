@@ -5,16 +5,7 @@ import time
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.common import common_widgets
 from proto.import_all_protos import *
-
-# TODO (#2683) get these values from robot constants
-MAX_DRIBBLER_RPM = 10000
-MIN_DRIBBLER_RPM = -10000
-
-MAX_LINEAR_SPEED_MPS = 5
-MIN_LINEAR_SPEED_MPS = -5
-
-MAX_ANGULAR_SPEED_RAD_PER_S = 20
-MIN_ANGULAR_SPEED_RAD_PER_S = -20
+from shared.robot_constants_2021 import *
 
 
 class DriveAndDribblerWidget(QWidget):

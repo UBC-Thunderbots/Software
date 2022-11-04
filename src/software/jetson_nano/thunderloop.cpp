@@ -2,8 +2,8 @@
 
 #include "proto/message_translation/tbots_protobuf.h"
 #include "proto/tbots_software_msgs.pb.h"
-#include "shared/2021_robot_constants.h"
 #include "shared/constants.h"
+#include "shared/robot_constants_2021.h"
 #include "software/jetson_nano/primitive_executor.h"
 #include "software/jetson_nano/services/motor.h"
 #include "software/logger/logger.h"
