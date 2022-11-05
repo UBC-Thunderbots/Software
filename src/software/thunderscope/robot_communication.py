@@ -257,7 +257,7 @@ class RobotCommunication(object):
         self.disconnect_fullsystem_from_robots()
 #         self.connect_robot_to_diagnostics(2)
 #         self.connect_robot_to_diagnostics(3)
-        self.connect_robot_to_handheld_controller(3)  # Connect for diagnostics
+        self.connect_robot_to_handheld_controller(4)  # Connect for diagnostics
         # self.connect_robot_to_diagnostics(5)
         # self.connect_robot_to_diagnostics(6)
         # self.connect_robot_to_diagnostics(7)

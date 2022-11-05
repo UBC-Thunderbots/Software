@@ -83,6 +83,7 @@ if __name__ == "__main__":
         action="store",
         help="Replay folder for the blue full_system",
         default=None,
+        type=os.path.abspath,
     )
     parser.add_argument(
         "--yellow_log",
@@ -124,7 +125,6 @@ if __name__ == "__main__":
         default=5,
         help="How many packets to buffer while rendering",
     )
-
     parser.add_argument(
         "--estop_path",
         action="store",
@@ -132,7 +132,6 @@ if __name__ == "__main__":
         default="/dev/ttyACM0",
         help="Path to the Estop",
     )
-
     parser.add_argument(
         "--estop_baudrate",
         action="store",
@@ -140,11 +139,12 @@ if __name__ == "__main__":
         default=115200,
         help="Estop Baudrate",
     )
-
     parser.add_argument(
         "--xbox",
-        action="store_true",
-        help="Run robot diagnostics with an Xbox controller",
+        action="store",
+        type=str,
+        default='/dev/input/input1',
+        help="Path to the controller",
     )
 
     # Sanity check that an interface was provided
@@ -186,7 +186,7 @@ if __name__ == "__main__":
         ] + [
             # TODO (#2655): Add/Remove HRVO layers dynamically based on the HRVOVisualization proto messages
             {"proto_class": HRVOVisualization, "unix_path": YELLOW_HRVO_PATH}
-            for _ in range(8)
+            for _ in range(MAX_ROBOT_IDS_PER_SIDE)
         ]:
             proto_unix_io.attach_unix_receiver(
                 runtime_dir, from_log_visualize=True, **arg
@@ -218,7 +218,6 @@ if __name__ == "__main__":
         runtime_dir = args.blue_full_system_runtime_dir
         friendly_colour_yellow = False
         debug = args.debug_blue_full_system
-
     elif args.run_yellow:
 
         tscope = Thunderscope(
@@ -235,11 +234,10 @@ if __name__ == "__main__":
         friendly_colour_yellow = True
         debug = args.debug_yellow_full_system
 
-    if args.xbox:
-        controller_diagnostics = ControllerDiagnostics(proto_unix_io)
+    if args.xbox is not None :
+         controller_diagnostics = ControllerDiagnostics(args.xbox, proto_unix_io)
 
     if args.run_blue or args.run_yellow:
-
         with ProtoLogger(
             args.blue_full_system_runtime_dir,
         ) as blue_logger, ProtoLogger(
