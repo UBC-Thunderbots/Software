@@ -22,3 +22,23 @@ cc_test(
         "//software/test_util",
     ],
 )
+
+cc_library(
+    name = "fixed_radius_nearest_neighbor_search",
+    srcs = ["fixed_radius_nearest_neighbor_search.cpp"],
+    hdrs = ["fixed_radius_nearest_neighbor_search.h"],
+    deps = [
+        "extlibs/hrvo/hrvo_agent.h",
+    ],
+)
+
+cc_test(
+    name = "nearest_neighbor_test",
+    srcs = ["nearest_neighbor_test.cpp"],
+    deps = [
+        "//shared/test_util:tbots_gtest_main",
+        "//software/ai/navigator/path_planner/hrvo:fixed_radius_nearest_neighbor_search.h",
+        "//software/test_util",
+        "//software/time:duration",
+    ],
+)
