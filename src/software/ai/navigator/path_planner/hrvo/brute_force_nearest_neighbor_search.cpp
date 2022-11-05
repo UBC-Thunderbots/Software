@@ -1,7 +1,5 @@
 #include "brute_force_nearest_neighbor_search.h"
 
-#include <vector>
-
 template <class T, typename F>
 std::vector<T> nearestNeighbours(const T& this_robot, const std::vector<T>& input,
                                  double radius, F comparator)
