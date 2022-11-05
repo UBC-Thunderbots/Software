@@ -25,10 +25,11 @@ cc_test(
 
 cc_library(
     name = "fixed_radius_nearest_neighbor_search",
-    srcs = ["fixed_radius_nearest_neighbor_search.cpp"],
-    hdrs = ["fixed_radius_nearest_neighbor_search.h"],
-    deps = [
-        "extlibs/hrvo/hrvo_agent.h",
+    srcs = [
+        "brute_force_nearest_neighbor_search.cpp",
+    ],
+    hdrs = [
+        "brute_force_nearest_neighbor_search.h",
     ],
 )
 
@@ -37,7 +38,7 @@ cc_test(
     srcs = ["nearest_neighbor_test.cpp"],
     deps = [
         "//shared/test_util:tbots_gtest_main",
-        "//software/ai/navigator/path_planner/hrvo:fixed_radius_nearest_neighbor_search.h",
+        "//software/ai/navigator/path_planner/hrvo:fixed_radius_nearest_neighbor_search",
         "//software/test_util",
         "//software/time:duration",
     ],

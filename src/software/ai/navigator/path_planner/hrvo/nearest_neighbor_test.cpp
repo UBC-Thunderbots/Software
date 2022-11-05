@@ -1,12 +1,12 @@
 #include <gtest/gtest.h>
 
-#include "software/ai/navigator/path_planner/hrvo/fixed_radius_nearest_neighbor_search.h"
+#include "software/ai/navigator/path_planner/hrvo/brute_force_nearest_neighbor_search.h"
 #include "software/geom/algorithms/distance.h"
 #include "software/test_util/test_util.h"
 #include <random>
 #include <chrono>
 
-class Nearest_Neighbor_Search_Test : public testing::Test{
+class NearestNeighborSearchTest : public testing::Test{
 };
 
 class Test_Agent {
@@ -28,7 +28,7 @@ double compare(const Test_Agent &r1, const Test_Agent &r2) {
     return distanceSquared(r1.position(), r2.position());
 }
 
-TEST_F(Nearest_Neighbor_Search_Test, generic_frnn_brute_force_test)
+TEST_F(NearestNeighborSearchTest, generic_frnn_brute_force_test)
 {
     unsigned int iterations = 1000;
     unsigned int num_of_agents = 22;
