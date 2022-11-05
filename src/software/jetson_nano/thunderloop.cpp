@@ -58,7 +58,6 @@ void Thunderloop::runLoop()
     // Input buffer
     TbotsProto::PrimitiveSet new_primitive_set;
     TbotsProto::World new_world;
-    TbotsProto::EstopPrimitive emergency_stop_override;
     const TbotsProto::PrimitiveSet empty_primitive_set;
 
     // Loop interval

@@ -34,7 +34,7 @@ class PrimitiveExecutor
     void clearCurrentPrimitive();
 
     /**
-     * Set the current primitive to the stop primitive with coasting enabled
+     * Set the current primitive to the stop primitive
      */
     void setStopPrimitive();
 
