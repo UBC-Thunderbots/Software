@@ -5,11 +5,9 @@ from software.py_constants import *
 from proto.import_all_protos import *
 from enum import Enum
 import software.thunderscope.common.common_widgets as common_widgets
+from software.py_constants import MILLISECONDS_PER_SECOND
 
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
-
-MILLISECONDS_PER_SECOND = 1000
-
 
 class ChickerCommandMode(Enum):
     KICK = 1
