@@ -1,19 +1,19 @@
 #include <gtest/gtest.h>
 
+#include <chrono>
+#include <random>
 #include <utility>
 
+#include "extlibs/hrvo/frnn_brute_force.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
+#include "software/geom/algorithms/distance.h"
 #include "software/simulated_tests/simulated_er_force_sim_play_test_fixture.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_stationary_in_polygon_validation.h"
 #include "software/simulated_tests/validation/validation_function.h"
 #include "software/test_util/test_util.h"
 #include "software/time/duration.h"
-#include "software/world/world.h"
 #include "software/world/field.h"
-#include "extlibs/hrvo/frnn_brute_force.h"
-#include <random>
-#include <chrono>
-#include "software/geom/algorithms/distance.h"
+#include "software/world/world.h"
 
 class SimulatedHRVOTest : public SimulatedErForceSimPlayTestFixture
 {
@@ -22,30 +22,39 @@ class SimulatedHRVOTest : public SimulatedErForceSimPlayTestFixture
     Field field                      = Field::createField(field_type);
 };
 
-class Test_Agent {
-public:
+class Test_Agent
+{
+   public:
     Point point;
     Point position() const;
     Test_Agent(double x, double y);
 };
 
-Point Test_Agent::position() const {
+Point Test_Agent::position() const
+{
     return point;
 }
 
-Test_Agent::Test_Agent(double x, double y) {
-    point = Point(x,y);
+Test_Agent::Test_Agent(double x, double y)
+{
+    point = Point(x, y);
 }
 
-double compare(const Test_Agent &r1, const Test_Agent &r2) {
+double compare(const Test_Agent& r1, const Test_Agent& r2)
+{
     return distanceSquared(r1.position(), r2.position());
 }
 
 template <class T, typename F>
-std::vector<T> nearestNeighbours(const T& this_robot, const std::vector<T>& input, double radius, F comparator) {
+std::vector<T> nearestNeighbours(const T& this_robot, const std::vector<T>& input,
+                                 double radius, F comparator)
+{
     std::vector<T> robot_subset;
-    for (const T& candidate_robot : input) {
-        if (comparator(this_robot, candidate_robot) < radius * radius/* && this_robot != candidate_robot*/) {
+    for (const T& candidate_robot : input)
+    {
+        if (comparator(this_robot, candidate_robot) <
+            radius * radius /* && this_robot != candidate_robot*/)
+        {
             robot_subset.push_back(candidate_robot);
         }
     }
@@ -358,48 +367,53 @@ TEST_F(SimulatedHRVOTest, test_start_in_local_minima_with_open_end)
 
 TEST_F(SimulatedHRVOTest, frnn_brute_force_neighbors)
 {
-    unsigned int iterations = 1000;
-    unsigned int num_of_agents = 22;
+    unsigned int iterations      = 1000;
+    unsigned int num_of_agents   = 22;
     unsigned int friendly_agents = 11;
-    float radius = 1.0;
-    double lower_x_bound = -4.5;
-    double upper_x_bound = 4.5;
-    double lower_y_bound = -3;
-    double upper_y_bound = 3;
+    float radius                 = 1.0;
+    double lower_x_bound         = -4.5;
+    double upper_x_bound         = 4.5;
+    double lower_y_bound         = -3;
+    double upper_y_bound         = 3;
     std::chrono::nanoseconds duration_total(0);
     std::chrono::nanoseconds max(0);
     std::chrono::nanoseconds min(0);
 
-    std::uniform_real_distribution<double> x_unif(lower_x_bound,upper_x_bound);
-    std::uniform_real_distribution<double> y_unif(lower_y_bound,upper_y_bound);
+    std::uniform_real_distribution<double> x_unif(lower_x_bound, upper_x_bound);
+    std::uniform_real_distribution<double> y_unif(lower_y_bound, upper_y_bound);
     std::default_random_engine re;
 
-    for (unsigned int i = 0; i < iterations; i++) {
-
+    for (unsigned int i = 0; i < iterations; i++)
+    {
         std::vector<std::pair<double, double>> agents;
-        for (unsigned int j = 0; j < num_of_agents; j++) {
+        for (unsigned int j = 0; j < num_of_agents; j++)
+        {
             double random_x = x_unif(re);
             double random_y = y_unif(re);
             std::cout << "random x value: " << random_x << std::endl;
             std::cout << "random y value: " << random_y << std::endl;
 
-            std::pair<double, double> agent = std::make_pair (random_x, random_y);
+            std::pair<double, double> agent = std::make_pair(random_x, random_y);
             agents.push_back(agent);
         }
 
         auto start = std::chrono::high_resolution_clock::now();
-        for (unsigned int agent_index = 0; agent_index < friendly_agents; agent_index++) {
-            std::vector<std::pair<double, double>> agent_subset = queryClosestNeighbors(agent_index, radius, agents);
+        for (unsigned int agent_index = 0; agent_index < friendly_agents; agent_index++)
+        {
+            std::vector<std::pair<double, double>> agent_subset =
+                queryClosestNeighbors(agent_index, radius, agents);
         }
-        auto stop = std::chrono::high_resolution_clock::now();
+        auto stop     = std::chrono::high_resolution_clock::now();
         auto duration = duration_cast<std::chrono::nanoseconds>(stop - start);
         duration_total += duration;
 
-        if (duration > max) {
+        if (duration > max)
+        {
             max = duration;
         }
 
-        if (duration < min) {
+        if (duration < min)
+        {
             min = duration;
         }
     }
@@ -412,26 +426,27 @@ TEST_F(SimulatedHRVOTest, frnn_brute_force_neighbors)
 
 TEST_F(SimulatedHRVOTest, generic_frnn_brute_force_test)
 {
-    unsigned int iterations = 1000;
-    unsigned int num_of_agents = 22;
+    unsigned int iterations      = 1000;
+    unsigned int num_of_agents   = 22;
     unsigned int friendly_agents = 11;
-    double radius = 1.0;
-    double lower_x_bound = -4.5;
-    double upper_x_bound = 4.5;
-    double lower_y_bound = -3;
-    double upper_y_bound = 3;
+    double radius                = 1.0;
+    double lower_x_bound         = -4.5;
+    double upper_x_bound         = 4.5;
+    double lower_y_bound         = -3;
+    double upper_y_bound         = 3;
     std::chrono::nanoseconds duration_total(0);
     std::chrono::nanoseconds max(0);
     std::chrono::nanoseconds min(0);
 
-    std::uniform_real_distribution<double> x_unif(lower_x_bound,upper_x_bound);
-    std::uniform_real_distribution<double> y_unif(lower_y_bound,upper_y_bound);
+    std::uniform_real_distribution<double> x_unif(lower_x_bound, upper_x_bound);
+    std::uniform_real_distribution<double> y_unif(lower_y_bound, upper_y_bound);
     std::default_random_engine re;
 
-    for (unsigned int i = 0; i < iterations; i++) {
-
+    for (unsigned int i = 0; i < iterations; i++)
+    {
         vector<Test_Agent> agents;
-        for (unsigned int j = 0; j < num_of_agents; j++) {
+        for (unsigned int j = 0; j < num_of_agents; j++)
+        {
             double random_x = x_unif(re);
             double random_y = y_unif(re);
             std::cout << "random x value: " << random_x << std::endl;
@@ -441,14 +456,18 @@ TEST_F(SimulatedHRVOTest, generic_frnn_brute_force_test)
         }
 
         unsigned int robot_counter = 0;
-        auto start = std::chrono::high_resolution_clock::now();
-        for (const Test_Agent &agent : agents) {
-            if (robot_counter >= friendly_agents) {
+        auto start                 = std::chrono::high_resolution_clock::now();
+        for (const Test_Agent& agent : agents)
+        {
+            if (robot_counter >= friendly_agents)
+            {
                 break;
             }
 
-            std::vector<Test_Agent> agent_subset = nearestNeighbours(agent, agents, radius, compare);
-            //[](const Test_Agent &r1, const Test_Agent &r2) -> double {return distanceSquared(r1.position(), r2.position());}
+            std::vector<Test_Agent> agent_subset =
+                nearestNeighbours(agent, agents, radius, compare);
+            //[](const Test_Agent &r1, const Test_Agent &r2) -> double {return
+            //distanceSquared(r1.position(), r2.position());}
             robot_counter++;
         }
         auto stop = std::chrono::high_resolution_clock::now();
@@ -456,11 +475,13 @@ TEST_F(SimulatedHRVOTest, generic_frnn_brute_force_test)
         auto duration = duration_cast<std::chrono::nanoseconds>(stop - start);
         duration_total += duration;
 
-        if (duration > max) {
+        if (duration > max)
+        {
             max = duration;
         }
 
-        if (duration < min) {
+        if (duration < min)
+        {
             min = duration;
         }
     }
