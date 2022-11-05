@@ -9,6 +9,7 @@ from software.py_constants import MILLISECONDS_PER_SECOND
 
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
+
 class ChickerCommandMode(Enum):
     KICK = 1
     CHIP = 2
