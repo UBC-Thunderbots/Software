@@ -66,7 +66,6 @@ TEST_F(NearestNeighborSearchTest, generic_frnn_brute_force_test)
     }
 
     std::vector<Test_Agent> agent_subset = nearestNeighbours(agent, agents, radius, compare);
-    //[](const Test_Agent &r1, const Test_Agent &r2) -> double {return distanceSquared(r1.position(), r2.position());}
     robot_counter++;
     }
     auto stop = std::chrono::high_resolution_clock::now();

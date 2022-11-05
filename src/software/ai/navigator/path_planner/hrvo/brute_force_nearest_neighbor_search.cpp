@@ -10,9 +10,3 @@ std::vector<T> nearestNeighbours(const T& this_robot, const std::vector<T>& inpu
     }
     return robot_subset;
 }
-
-/**
- * TODO: Add additional tests for the KDtree by timing it while running in the simulator, have it run for a minute. Run AI vs AI test with (./tbots.py run thunderscope)
- */
-
-
