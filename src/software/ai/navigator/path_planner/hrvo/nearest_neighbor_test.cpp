@@ -6,9 +6,6 @@
 #include <random>
 #include <chrono>
 
-class NearestNeighborSearchTest : public testing::Test{
-};
-
 class Test_Agent {
 public:
     Point point;
@@ -28,7 +25,7 @@ double compare(const Test_Agent &r1, const Test_Agent &r2) {
     return distanceSquared(r1.position(), r2.position());
 }
 
-TEST_F(NearestNeighborSearchTest, generic_frnn_brute_force_test)
+TEST(NearestNeighborSearchTest, generic_frnn_brute_force_test)
 {
     unsigned int iterations = 1000;
     unsigned int num_of_agents = 22;
