@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "software/ai/navigator/path_planner/hrvo/brute_force_nearest_neighbor_search.h"
+#include "brute_force_nearest_neighbor_search.h"
 #include "software/geom/algorithms/distance.h"
 #include "software/test_util/test_util.h"
 #include <random>
