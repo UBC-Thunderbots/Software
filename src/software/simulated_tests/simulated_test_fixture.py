@@ -78,37 +78,6 @@ class SimulatorTestRunner(TbotsTestRunner):
         self.tick_duration_s = simulation_tick_duration_s
         self.sleep_between_ticks = sleep_between_ticks
 
-    def set_tactics(
-        self, tactics: AssignedTacticPlayControlParams, isBlue: bool,
-    ):
-        """Overrides robot tactics with given assignment proto
-
-        Args:
-            tactics (AssignedTacticPlayControlParams): tactic assignment proto
-            isBlue (bool): whether the tactics should apply to blue team robots
-        """
-        if isBlue:
-            self.blue_full_system_proto_unix_io.send_proto(
-                AssignedTacticPlayControlParams, tactics
-            )
-        else:
-            self.yellow_full_system_proto_unix_io.send_proto(
-                AssignedTacticPlayControlParams, tactics
-            )
-
-    def set_play(self, play: Play, isBlue: bool):
-        """Overrides robot play with given play proto
-
-        Args:
-            play (Play): the play proto to be applied on the robots
-            isBlue (bool): whether the play should be applied on the blue team
-        """
-        if isBlue:
-            self.blue_full_system_proto_unix_io.send_proto(Play, play)
-
-        else:
-            self.yellow_full_system_proto_unix_io.send_proto(Play, play)
-
     def set_worldState(self, worldstate: WorldState):
         """Sets the simulation worldstate
 

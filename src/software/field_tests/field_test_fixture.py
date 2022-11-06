@@ -88,25 +88,6 @@ class FieldTestRunner(TbotsTestRunner):
         except queue.Empty as empty:
             raise Exception("unable to determine robots on the field")
 
-    def set_tactics(
-        self, tactics: AssignedTacticPlayControlParams, isBlue,
-    ):
-        if isBlue:
-            self.blue_full_system_proto_unix_io.send_proto(
-                AssignedTacticPlayControlParams, tactics
-            )
-        else:
-            self.yellow_full_system_proto_unix_io.send_proto(
-                AssignedTacticPlayControlParams, tactics
-            )
-
-    def set_play(self, play: Play, isBlue):
-        if isBlue:
-            self.blue_full_system_proto_unix_io.send_proto(Play, play)
-
-        else:
-            self.yellow_full_system_proto_unix_io.send_proto(Play, play)
-
     def send_gamecontroller_command(
         self,
         gc_command: proto.ssl_gc_state_pb2.Command,

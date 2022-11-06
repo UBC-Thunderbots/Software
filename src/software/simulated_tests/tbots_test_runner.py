@@ -98,7 +98,14 @@ class TbotsTestRunner(object):
         Raises:
             NotImplementedError
         """
-        raise NotImplementedError("abstract method set_tactics called from base class")
+        if isBlue:
+            self.blue_full_system_proto_unix_io.send_proto(
+                AssignedTacticPlayControlParams, tactics
+            )
+        else:
+            self.yellow_full_system_proto_unix_io.send_proto(
+                AssignedTacticPlayControlParams, tactics
+            )
 
     def set_play(self, play: Play, isBlue: bool):
         """Overrides current AI play for the given team
@@ -109,7 +116,11 @@ class TbotsTestRunner(object):
         Raises:
             NotImplementedError
         """
-        raise NotImplementedError("abstract method set_play called from base class ")
+        if isBlue:
+            self.blue_full_system_proto_unix_io.send_proto(Play, play)
+
+        else:
+            self.yellow_full_system_proto_unix_io.send_proto(Play, play)
 
     def set_worldState(self, worldstate: WorldState):
         raise NotImplementedError("abstract class method called set_worldstate")
