@@ -129,9 +129,7 @@ class FieldTestRunner(TbotsTestRunner):
                     always_validation_status,
                 ) = validation.run_validation_sequence_sets(
                     world=current_world,
-                    eventually_validation_sequence_set=[
-                        [eventually_validation_set]
-                    ],
+                    eventually_validation_sequence_set=[[eventually_validation_set]],
                     always_validation_sequence_set=[[]],
                 )
 
@@ -212,14 +210,16 @@ class FieldTestRunner(TbotsTestRunner):
             )
 
             try:
-                self.__validateWorldState(ball_placement_validation_function, ball_placement_timout_s)
+                self.__validateWorldState(
+                    ball_placement_validation_function, ball_placement_timout_s
+                )
             except:
                 raise Exception(
                     "ball placement by blue robot {} to position {} failed".format(
                         self.friendly_robot_ids_field[0], ball_position
                     )
                 )
-        
+
     def __setRobotState(self, worldstate: WorldState):
         """sets friendly and enemy robots to the given position on the field
 
@@ -285,7 +285,9 @@ class FieldTestRunner(TbotsTestRunner):
         # validate completion
         movement_timout_s = 10
         try:
-            self.__validateWorldState(robot_positions_validation_functions, movement_timout_s)
+            self.__validateWorldState(
+                robot_positions_validation_functions, movement_timout_s
+            )
         except:
             raise Exception("robot positioning not set")
 
