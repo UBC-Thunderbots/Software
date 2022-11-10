@@ -91,7 +91,6 @@ if __name__ == "__main__":
         help="Replay folder for the yellow full_system",
         default=None,
     )
-
     # Run blue or yellow full system over WiFi
     group = parser.add_mutually_exclusive_group()
     group.add_argument(

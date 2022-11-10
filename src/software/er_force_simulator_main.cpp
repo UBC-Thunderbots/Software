@@ -17,7 +17,7 @@ int main(int argc, char **argv)
         bool help               = false;
         std::string runtime_dir = "/tmp/tbots";
         std::string division    = "div_b";
-        bool ideal              = true;  // realism flag
+        bool realism            = false;  // realism flag
     };
 
     CommandLineArgs args;
@@ -31,7 +31,7 @@ int main(int argc, char **argv)
     desc.add_options()("division",
                        boost::program_options::value<std::string>(&args.division),
                        "div_a or div_b");
-    desc.add_options()("ideal, i", boost::program_options::bool_switch(&args.ideal),
+    desc.add_options()("realism, r", boost::program_options::bool_switch(&args.realism),
                        "realism or ideal");  // install terminal flag
 
     boost::program_options::variables_map vm;
@@ -72,18 +72,56 @@ int main(int argc, char **argv)
          *                        └────────────────────────────┘
          */
         std::shared_ptr<ErForceSimulator> er_force_sim;
+        std::unique_ptr<RealismConfigErForce> realism_config = std::make_unique<RealismConfigErForce>();
+        realism_config->set_stddev_ball_p(0.0014f);
+        realism_config->set_stddev_robot_p(0.0013f);
+        realism_config->set_stddev_robot_phi(0.01f);
+        realism_config->set_stddev_ball_area(6.5f);
+        realism_config->set_enable_invisible_ball(true);
+        realism_config->set_ball_visibility_threshold(0.4f);
+        realism_config->set_camera_overlap(1);
+        realism_config->set_dribbler_ball_detections(0.05f);
+        realism_config->set_camera_position_error(0.1f);
+        realism_config->set_robot_command_loss(0.03f);
+        realism_config->set_robot_response_loss(0.1f);
+        realism_config->set_missing_ball_detections(0.05f);
+        realism_config->set_vision_delay(35000000);
+        realism_config->set_vision_processing_time(10000000);
+        realism_config->set_missing_ball_detections(0.02f);
+        realism_config->set_simulate_dribbling(true);
 
         // Setup the field
         if (args.division == "div_a")
         {
-            er_force_sim = std::make_shared<ErForceSimulator>(
-                TbotsProto::FieldType::DIV_A, create2021RobotConstants());
+            if (args.realism)
+            {
+                er_force_sim = std::make_shared<ErForceSimulator>(
+                    TbotsProto::FieldType::DIV_A, create2021RobotConstants(),
+                    realism_config);
+            }
+            else
+            {
+                er_force_sim = std::make_shared<ErForceSimulator>(
+                    TbotsProto::FieldType::DIV_A, create2021RobotConstants(),
+                    realism_config);
+            }
         }
         else
         {
-            er_force_sim = std::make_shared<ErForceSimulator>(
-                TbotsProto::FieldType::DIV_B, create2021RobotConstants());
+            if (args.realism)
+            {
+                er_force_sim = std::make_shared<ErForceSimulator>(
+                    TbotsProto::FieldType::DIV_B, create2021RobotConstants(),
+                    realism_config);
+            }
+            else
+            {
+                er_force_sim = std::make_shared<ErForceSimulator>(
+                    TbotsProto::FieldType::DIV_B, create2021RobotConstants(),
+                    realism_config);
+            }
         }
+
         std::mutex simulator_mutex;
 
         // World Buffer

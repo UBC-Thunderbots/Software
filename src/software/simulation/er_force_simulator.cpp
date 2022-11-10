@@ -18,7 +18,8 @@
 #include "software/world/robot_state.h"
 
 ErForceSimulator::ErForceSimulator(const TbotsProto::FieldType& field_type,
-                                   const RobotConstants_t& robot_constants)
+                                   const RobotConstants_t& robot_constants,
+                                   std::unique_ptr<RealismConfigErForce> realism_config)
     : yellow_team_world_msg(std::make_unique<TbotsProto::World>()),
       blue_team_world_msg(std::make_unique<TbotsProto::World>()),
       frame_number(0),
@@ -64,37 +65,7 @@ ErForceSimulator::ErForceSimulator(const TbotsProto::FieldType& field_type,
     Ball ball          = Ball(Point(), Vector(), Timestamp::fromSeconds(0));
     World world        = World(field, ball, friendly_team, enemy_team);
 
-    auto realism_config = std::make_unique<RealismConfigErForce>();
-
-    // already done in the protobuf
-    // Sets the dribbler to be ideal
-    // realism_config->set_simulate_dribbling(false);
-
-
-    // design temporary logic
-    bool ideal;
-
-    // set all to real situation (using protobuf initial setting 1-16 for now)
-    if (!ideal)
-    {
-        realism_config->set_stddev_ball_p(1);
-        realism_config->set_stddev_robot_p(2);
-        realism_config->set_stddev_robot_phi(3);
-        realism_config->set_stddev_ball_area(4);
-        realism_config->set_enable_invisible_ball(5);
-        realism_config->set_ball_visibility_threshold(6);
-        realism_config->set_camera_overlap(7);
-        realism_config->set_dribbler_ball_detections(8);
-        realism_config->set_camera_position_error(9);
-        realism_config->set_robot_command_loss(10);
-        realism_config->set_robot_response_loss(11);
-        realism_config->set_missing_ball_detections(12);
-        realism_config->set_vision_delay(13);
-        realism_config->set_vision_processing_time(14);
-        realism_config->set_missing_ball_detections(16);
-        realism_config->set_simulate_dribbling(true);
-    }
-
+    /* configure simulator */
     auto command_simulator = std::make_unique<amun::CommandSimulator>();
     *(command_simulator->mutable_realism_config())  = *realism_config;
     *(simulator_setup_command->mutable_simulator()) = *command_simulator;
@@ -104,6 +75,27 @@ ErForceSimulator::ErForceSimulator(const TbotsProto::FieldType& field_type,
     this->resetCurrentTime();
 }
 
+std::unique_ptr <RealismConfigErForce> ErForceSimulator::createIdealRealismConfig()
+{
+    auto realism_config = std::make_unique<RealismConfigErForce>();
+    realism_config->set_stddev_ball_p(0);
+    realism_config->set_stddev_robot_p(0);
+    realism_config->set_stddev_robot_phi(0);
+    realism_config->set_stddev_ball_area(0);
+    realism_config->set_enable_invisible_ball(false);
+    realism_config->set_ball_visibility_threshold(0);
+    realism_config->set_camera_overlap(0);
+    realism_config->set_dribbler_ball_detections(0);
+    realism_config->set_camera_position_error(0);
+    realism_config->set_robot_command_loss(0);
+    realism_config->set_robot_response_loss(0);
+    realism_config->set_missing_ball_detections(0);
+    realism_config->set_vision_delay(0);
+    realism_config->set_vision_processing_time(0);
+    realism_config->set_missing_ball_detections(0);
+    realism_config->set_simulate_dribbling(false);
+    return realism_config;
+}
 void ErForceSimulator::setWorldState(const TbotsProto::WorldState& world_state)
 {
     if (world_state.has_ball_state())

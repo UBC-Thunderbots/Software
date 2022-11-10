@@ -24,9 +24,11 @@ class ErForceSimulator
      *
      * @param field_type The field type
      * @param robot_constants The robot constants
+     * @param ideal_flag Simulation realism setting
      */
-    explicit ErForceSimulator(const TbotsProto::FieldType& field_type,
-                              const RobotConstants_t& robot_constants);
+    explicit ErForceSimulator(
+        const TbotsProto::FieldType& field_type, const RobotConstants_t& robot_constants,
+        std::unique_ptr<RealismConfigErForce> realism_config); 
     ErForceSimulator()  = delete;
     ~ErForceSimulator() = default;
 
@@ -124,6 +126,10 @@ class ErForceSimulator
      */
     void resetCurrentTime();
 
+    /**
+     * Creates the ideal realism config 
+     */
+    static std::unique_ptr <RealismConfigErForce> createIdealRealismConfig();
    private:
     /**
      * Sets the primitive being simulated by the robot in simulation
