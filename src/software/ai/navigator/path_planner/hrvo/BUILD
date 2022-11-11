@@ -37,8 +37,8 @@ cc_test(
     name = "nearest_neighbor_test",
     srcs = ["nearest_neighbor_test.cpp"],
     deps = [
-        ":brute_force_nearest_neighbor_search",
         "//shared/test_util:tbots_gtest_main",
+        "//software/ai/navigator/path_planner/hrvo:brute_force_nearest_neighbor_search",
         "//software/test_util",
         "//software/time:duration",
     ],
