@@ -8,6 +8,25 @@ RobotNavigationObstacleFactory::RobotNavigationObstacleFactory(
 {
 }
 
+std::vector<ObstaclePtr> RobotNavigationObstacleFactory::createFromMotionConstraint(
+    const TbotsProto::MotionConstraint motion_constraint, const World &world) const
+{
+    std::vector<ObstaclePtr> obstacles;
+    auto static_obstacles =
+        createStaticObstaclesFromMotionConstraint(motion_constraint, world.field());
+    obstacles.insert(obstacles.end(), static_obstacles.begin(), static_obstacles.end());
+
+    auto dynamic_obstacles =
+        createDynamicObstaclesFromMotionConstraint(motion_constraint, world);
+    obstacles.insert(obstacles.end(), dynamic_obstacles.begin(), dynamic_obstacles.end());
+
+    CHECK(dynamic_obstacles.empty() || static_obstacles.empty())
+        << "Motion constraint with value " << static_cast<int>(motion_constraint)
+        << " has both dynamic and static obstacles." << std::endl;
+
+    return obstacles;
+}
+
 std::vector<ObstaclePtr>
 RobotNavigationObstacleFactory::createStaticObstaclesFromMotionConstraint(
     const TbotsProto::MotionConstraint &motion_constraint, const Field &field) const

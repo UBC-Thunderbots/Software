@@ -17,7 +17,7 @@ void robotStationaryInPolygon(RobotId robot_id, Polygon polygon, unsigned int nu
         Point position  = robot_optional.value().position();
         double velocity = robot_optional->velocity().length();
 
-        return contains(polygon, position) && velocity < 1e-3;
+        return contains(polygon, position) && velocity < 1e-2;
     };
 
     for (unsigned int stationary_tick_count = 0; stationary_tick_count < num_ticks;

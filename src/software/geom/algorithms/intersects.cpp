@@ -65,8 +65,8 @@ bool intersects(const Circle &first, const Polygon &second)
 
 bool intersects(const Circle &first, const Circle &second)
 {
-    return (first.origin() - second.origin()).length() <
-           (first.radius() + second.radius());
+    return (first.origin() - second.origin()).lengthSquared() <
+           std::pow(first.radius() + second.radius(), 2);
 }
 
 bool intersects(const Segment &first, const Circle &second)

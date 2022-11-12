@@ -11,8 +11,10 @@ from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 class RobotView(QWidget):
     """Class to show a snapshot of the robot's current state.
+
     Displays the vision pattern, capacitor/battery voltages,
     and other information about the robot state.
+
     """
 
     def __init__(self):
@@ -85,9 +87,11 @@ class RobotView(QWidget):
     def create_vision_pattern_label(self, id, team_colour, radius):
         """Given a robot id, team color and radius, draw the vision
         pattern on a label and return it.
+
         :param id: The robot
         :param team_colour: The team colour
         :param radius: The radius of the robot
+
         """
         pixmap = QtGui.QPixmap(radius * 2, radius * 2)
         pixmap.fill(QtCore.Qt.GlobalColor.transparent)
@@ -102,7 +106,7 @@ class RobotView(QWidget):
             QtCore.QRectF(0, 0, int(radius * 2), int(radius * 2),),
             -45 * convert_degree,
             270 * convert_degree,
-            )
+        )
 
         # Draw the vision pattern
         # Draw the centre team color
@@ -120,7 +124,7 @@ class RobotView(QWidget):
         ]
 
         for color, location in zip(
-                self.vision_pattern_lookup[id], top_circle_locations
+            self.vision_pattern_lookup[id], top_circle_locations
         ):
             painter.setBrush(pg.mkBrush(color))
             painter.drawEllipse(location, radius / 5, radius / 5)

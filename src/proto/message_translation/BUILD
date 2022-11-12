@@ -220,3 +220,12 @@ py_library(
         "//proto:tbots_py_proto",
     ],
 )
+
+cc_test(
+    name = "power_frame_msg_test",
+    srcs = ["power_frame_msg_test.cpp"],
+    deps = [
+        ":power_frame_msg",
+        "//shared/test_util:tbots_gtest_main",
+    ],
+)
