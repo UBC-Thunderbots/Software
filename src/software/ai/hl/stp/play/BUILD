@@ -209,8 +209,10 @@ cc_library(
 
 cc_library(
     name = "penalty_kick_play",
-    srcs = ["penalty_kick_play.cpp"],
-    hdrs = ["penalty_kick_play.h"],
+    srcs = ["penalty_kick_play.cpp",
+            "penalty_kick_play_fsm.cpp"],
+    hdrs = ["penalty_kick_play.h",
+            "penalty_kick_play_fsm.h"],
     deps = [
         ":play",
         "//shared:constants",
@@ -219,6 +221,7 @@ cc_library(
         "//software/ai/hl/stp/tactic/penalty_kick:penalty_kick_tactic",
         "//software/logger",
         "//software/util/generic_factory",
+        "@sml"
     ],
     alwayslink = True,
 )
