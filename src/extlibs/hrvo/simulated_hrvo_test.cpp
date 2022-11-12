@@ -45,22 +45,6 @@ double compare(const Test_Agent& r1, const Test_Agent& r2)
     return distanceSquared(r1.position(), r2.position());
 }
 
-template <class T, typename F>
-std::vector<T> nearestNeighbours(const T& this_robot, const std::vector<T>& input,
-                                 double radius, F comparator)
-{
-    std::vector<T> robot_subset;
-    for (const T& candidate_robot : input)
-    {
-        if (comparator(this_robot, candidate_robot) <
-            radius * radius /* && this_robot != candidate_robot*/)
-        {
-            robot_subset.push_back(candidate_robot);
-        }
-    }
-    return robot_subset;
-}
-
 
 TEST_F(SimulatedHRVOTest, test_drive_in_straight_line_with_moving_enemy_robot_from_behind)
 {

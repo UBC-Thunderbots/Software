@@ -20,7 +20,6 @@ cc_library(
     name = "hrvo",
     srcs = [
         "agent.cpp",
-        "frnn_brute_force.cpp",
         "hrvo_agent.cpp",
         "kd_tree.cpp",
         "linear_velocity_agent.cpp",
@@ -30,7 +29,6 @@ cc_library(
     ],
     hdrs = [
         "agent.h",
-        "frnn_brute_force.h",
         "hrvo_agent.h",
         "kd_tree.h",
         "linear_velocity_agent.h",
