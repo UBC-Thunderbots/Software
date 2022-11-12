@@ -53,3 +53,18 @@ TEST(RobotFilterTest, two_match_robot_data_robot_state_not_expired_test)
                            Timestamp::fromSeconds(9)));
     EXPECT_EQ(op_robot.value(), robot_filter.getFilteredData(new_robot_data).value());
 }
+
+TEST(RobotFilterTest, negative_orientation_test)
+{
+    Robot robot(1, Point(0, 0), Vector(0, 0), Angle::fromRadians(-2),
+                AngularVelocity::fromRadians(0), Timestamp::fromSeconds(0));
+    RobotFilter robot_filter(robot, Duration::fromSeconds(10));
+    std::vector<RobotDetection> new_robot_data = {
+        {1, Point(0, 0), Angle::fromRadians(-3), 0.5, Timestamp::fromSeconds(1)}};
+    std::optional<Robot> op_robot;
+    op_robot.emplace(Robot(1, Point(0, 0), Vector(0, 0), Angle::fromRadians(-3),
+                           AngularVelocity::fromRadians(-1),
+                           Timestamp::fromSeconds(1)));
+    auto filtered = robot_filter.getFilteredData(new_robot_data).value();
+    EXPECT_EQ(op_robot.value(), robot_filter.getFilteredData(new_robot_data).value());
+}
