@@ -55,6 +55,7 @@ from software.thunderscope.robot_diagnostics.fullsystem_connect_widget import Fu
 from software.thunderscope.robot_diagnostics.drive_and_dribbler_widget import (
     DriveAndDribblerWidget,
 )
+from software.thunderscope.robot_diagnostics.robot_view import RobotView
 from software.thunderscope.robot_diagnostics.estop_view import EstopView
 from software.thunderscope.replay.proto_player import ProtoPlayer
 
@@ -469,6 +470,12 @@ class Thunderscope(object):
         self.robot_diagnostics_dock_area.addDock(chicker_dock, "bottom", drive_dock)
         self.robot_diagnostics_dock_area.addDock(fullsystem_connect_dock, "top", chicker_dock)
 
+        robot_view = self.setup_robot_view(proto_unix_io)
+
+        dock = Dock("Robot View")
+        dock.addWidget(robot_view)
+        self.robot_diagnostics_dock_area.addDock(dock, "top", log_dock)
+
         estop_view = self.setup_estop_view(proto_unix_io)
 
         dock = Dock("Estop View")
@@ -641,6 +648,15 @@ class Thunderscope(object):
         self.register_refresh_function(chicker_widget.refresh)
 
         return chicker_widget
+
+    def setup_robot_view(self, proto_unix_io):
+        """Setup the robot view widget
+        :param proto_unix_io: The proto unix io object for the full system
+        """
+        robot_view = RobotView()
+        self.register_refresh_function(robot_view.refresh)
+        proto_unix_io.register_observer(RobotStatus, robot_view.robot_status_buffer)
+        return robot_view
 
     def setup_fullsystem_connect_widget(self, proto_unix_io, drive_widget):
 
