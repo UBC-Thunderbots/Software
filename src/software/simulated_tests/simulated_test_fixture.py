@@ -6,6 +6,7 @@ import sys
 import os
 
 import pytest
+from enum import Enum
 import software.python_bindings as tbots
 from proto.import_all_protos import *
 
@@ -36,6 +37,11 @@ PROCESS_BUFFER_DELAY_S = 0.01
 PAUSE_AFTER_FAIL_DELAY_S = 3
 
 
+class TestType(Enum):
+    INVARIANT = 1
+    AGGREGATE = 1
+
+
 class SimulatorTestRunner(object):
 
     """Run a simulated test"""
@@ -48,6 +54,7 @@ class SimulatorTestRunner(object):
         blue_full_system_proto_unix_io,
         yellow_full_system_proto_unix_io,
         gamecontroller,
+        aggregate
     ):
         """Initialize the SimulatorTestRunner
         
@@ -67,6 +74,7 @@ class SimulatorTestRunner(object):
         self.yellow_full_system_proto_unix_io = yellow_full_system_proto_unix_io
         self.gamecontroller = gamecontroller
         self.last_exception = None
+        self.aggregate = aggregate
 
         self.world_buffer = ThreadSafeBuffer(buffer_size=1, protobuf_type=World)
         self.last_exception = None
@@ -245,6 +253,12 @@ def load_command_line_arguments():
         "--enable_thunderscope", action="store_true", help="enable thunderscope"
     )
     parser.add_argument(
+        "--aggregate",
+        action="store_true",
+        default=False,
+        help="Run aggregate test"
+    )
+    parser.add_argument(
         "--simulator_runtime_dir",
         type=str,
         help="simulator runtime directory",
@@ -324,6 +338,8 @@ def simulated_test_runner():
     args = load_command_line_arguments()
     tscope = None
 
+    aggregate = args.aggregate
+
     simulator_proto_unix_io = ProtoUnixIO()
     yellow_full_system_proto_unix_io = ProtoUnixIO()
     blue_full_system_proto_unix_io = ProtoUnixIO()
@@ -384,6 +400,7 @@ def simulated_test_runner():
                 blue_full_system_proto_unix_io,
                 yellow_full_system_proto_unix_io,
                 gamecontroller,
+                aggregate
             )
 
             # Only validate on the blue worlds
