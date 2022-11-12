@@ -175,21 +175,6 @@ class ChickerWidget(QWidget):
         # sends proto
         self.proto_unix_io.send_proto(PowerControl, power_control)
 
-    def change_button_state(self, button, enable):
-        """Change button color and clickable state.
-
-        :param button: button to change the state of
-        :param enable: bool: if True: enable this button, if False: disable
-        :returns: None
-
-        """
-        if enable:
-            button.setStyleSheet("background-color: White")
-            button.setCheckable(True)
-        else:
-            button.setStyleSheet("background-color: Grey")
-            button.setCheckable(False)
-
     def refresh(self):
 
         # gets slider values and sets label to that value
@@ -200,8 +185,8 @@ class ChickerWidget(QWidget):
         self.power_label.setText(str(power_value))
 
         # refreshes button state based on enable boolean
-        self.change_button_state(self.kick_button, self.kick_button_enable)
-        self.change_button_state(self.chip_button, self.chip_button_enable)
+        common_widgets.change_button_state(self.kick_button, self.kick_button_enable)
+        common_widgets.change_button_state(self.chip_button, self.chip_button_enable)
 
         # If auto is enabled, we want to populate the autochip or kick message
         if self.auto_kick_button.isChecked():

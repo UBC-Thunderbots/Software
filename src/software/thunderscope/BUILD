@@ -50,6 +50,7 @@ py_library(
         "//software/thunderscope/replay:proto_logger",
         "//software/thunderscope/replay:proto_player",
         "//software/thunderscope/robot_diagnostics:chicker",
+        "//software/thunderscope/robot_diagnostics:fullsystem_connect_widget",
         "//software/thunderscope/robot_diagnostics:drive_and_dribbler_widget",
         "//software/thunderscope/robot_diagnostics:estop_view",
         requirement("pyqtgraph"),

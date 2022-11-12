@@ -98,3 +98,19 @@ def create_push_button(title):
     push_button.setFixedWidth(150)
 
     return push_button
+
+
+def change_button_state(button, enable):
+    """Change button color and clickable state.
+
+    :param button: button to change the state of
+    :param enable: bool: if True: enable this button, if False: disable
+    :returns: None
+
+    """
+    if enable:
+        button.setStyleSheet("background-color: White")
+        button.setCheckable(True)
+    else:
+        button.setStyleSheet("background-color: Grey")
+        button.setCheckable(False)
