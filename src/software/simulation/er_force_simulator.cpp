@@ -19,7 +19,7 @@
 
 ErForceSimulator::ErForceSimulator(const TbotsProto::FieldType& field_type,
                                    const RobotConstants_t& robot_constants,
-                                   std::unique_ptr<RealismConfigErForce> realism_config)
+                                   std::unique_ptr<RealismConfigErForce>& realism_config)
     : yellow_team_world_msg(std::make_unique<TbotsProto::World>()),
       blue_team_world_msg(std::make_unique<TbotsProto::World>()),
       frame_number(0),
@@ -75,7 +75,7 @@ ErForceSimulator::ErForceSimulator(const TbotsProto::FieldType& field_type,
     this->resetCurrentTime();
 }
 
-std::unique_ptr <RealismConfigErForce> ErForceSimulator::createIdealRealismConfig()
+std::unique_ptr<RealismConfigErForce> ErForceSimulator::createIdealRealismConfig()
 {
     auto realism_config = std::make_unique<RealismConfigErForce>();
     realism_config->set_stddev_ball_p(0);
@@ -96,6 +96,29 @@ std::unique_ptr <RealismConfigErForce> ErForceSimulator::createIdealRealismConfi
     realism_config->set_simulate_dribbling(false);
     return realism_config;
 }
+
+std::unique_ptr<RealismConfigErForce> ErForceSimulator::createRealisticRealismConfig()
+{
+    auto realism_config = std::make_unique<RealismConfigErForce>();
+    realism_config->set_stddev_ball_p(0.0014f);
+    realism_config->set_stddev_robot_p(0.0013f);
+    realism_config->set_stddev_robot_phi(0.01f);
+    realism_config->set_stddev_ball_area(6.5f);
+    realism_config->set_enable_invisible_ball(true);
+    realism_config->set_ball_visibility_threshold(0.4f);
+    realism_config->set_camera_overlap(1);
+    realism_config->set_dribbler_ball_detections(0.05f);
+    realism_config->set_camera_position_error(0.1f);
+    realism_config->set_robot_command_loss(0.03f);
+    realism_config->set_robot_response_loss(0.1f);
+    realism_config->set_missing_ball_detections(0.05f);
+    realism_config->set_vision_delay(35000000);
+    realism_config->set_vision_processing_time(10000000);
+    realism_config->set_missing_ball_detections(0.02f);
+    realism_config->set_simulate_dribbling(true);
+    return realism_config;
+}
+
 void ErForceSimulator::setWorldState(const TbotsProto::WorldState& world_state)
 {
     if (world_state.has_ball_state())

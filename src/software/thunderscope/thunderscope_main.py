@@ -117,6 +117,12 @@ if __name__ == "__main__":
         default=5,
         help="How many packets to buffer while rendering",
     )
+    parser.add_argument(
+        "--realism_config",
+        action = "store_true",
+        default=False,
+        help="set realism flag to use realistic config",
+    )
 
     # Sanity check that an interface was provided
     args = parser.parse_args()
