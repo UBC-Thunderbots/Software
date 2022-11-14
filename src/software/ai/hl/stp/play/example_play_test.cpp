@@ -23,7 +23,7 @@ TEST_F(ExamplePlayTest, test_example_play)
          Point(3.5, 3)});
     auto enemy_robots = TestUtil::createStationaryRobotStatesWithId({Point(4, 0)});
     setFriendlyGoalie(0);
-    setAIPlay(TbotsProto::PlayName::ExamplePlay);
+    setAiPlay(TbotsProto::PlayName::ExamplePlay);
 
     setRefereeCommand(RefereeCommand::FORCE_START, RefereeCommand::HALT);
 

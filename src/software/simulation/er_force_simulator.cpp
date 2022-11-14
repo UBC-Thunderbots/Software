@@ -378,7 +378,8 @@ SSLSimulationProto::RobotControl ErForceSimulator::updateSimulatorRobots(
             // Set to NEG_X because the world msg in this simulator is
             // normalized correctly
             auto direct_control = primitive_executor->stepPrimitive(
-                robot_id, RobotState(robot_proto_it->current_state()).orientation());
+                robot_id,
+                createAngle(robot_proto_it->current_state().global_orientation()));
 
             auto command = *getRobotCommandFromDirectControl(
                 robot_id, std::move(direct_control), robot_constants);
@@ -430,21 +431,21 @@ void ErForceSimulator::stepSimulation(const Duration& time_step)
 std::vector<TbotsProto::RobotStatus> ErForceSimulator::getBlueRobotStatuses() const
 {
     std::vector<TbotsProto::RobotStatus> robot_statuses;
-    auto robot_status      = TbotsProto::RobotStatus();
-    auto break_beam_status = TbotsProto::BreakBeamStatus();
+    auto robot_status = TbotsProto::RobotStatus();
+    auto power_status = TbotsProto::PowerStatus();
 
     if (blue_robot_with_ball.has_value())
     {
         robot_status.set_robot_id(blue_robot_with_ball.value());
-        break_beam_status.set_ball_in_beam(true);
+        power_status.set_breakbeam_tripped(true);
     }
     else
     {
         robot_status.clear_robot_id();
-        break_beam_status.set_ball_in_beam(false);
+        power_status.set_breakbeam_tripped(false);
     }
 
-    *(robot_status.mutable_break_beam_status()) = break_beam_status;
+    *(robot_status.mutable_power_status()) = power_status;
     robot_statuses.push_back(robot_status);
 
     return robot_statuses;
@@ -453,21 +454,21 @@ std::vector<TbotsProto::RobotStatus> ErForceSimulator::getBlueRobotStatuses() co
 std::vector<TbotsProto::RobotStatus> ErForceSimulator::getYellowRobotStatuses() const
 {
     std::vector<TbotsProto::RobotStatus> robot_statuses;
-    auto robot_status      = TbotsProto::RobotStatus();
-    auto break_beam_status = TbotsProto::BreakBeamStatus();
+    auto robot_status = TbotsProto::RobotStatus();
+    auto power_status = TbotsProto::PowerStatus();
 
     if (yellow_robot_with_ball.has_value())
     {
         robot_status.set_robot_id(yellow_robot_with_ball.value());
-        break_beam_status.set_ball_in_beam(true);
+        power_status.set_breakbeam_tripped(true);
     }
     else
     {
         robot_status.clear_robot_id();
-        break_beam_status.set_ball_in_beam(false);
+        power_status.set_breakbeam_tripped(false);
     }
 
-    *(robot_status.mutable_break_beam_status()) = break_beam_status;
+    *(robot_status.mutable_power_status()) = power_status;
     robot_statuses.push_back(robot_status);
 
     return robot_statuses;

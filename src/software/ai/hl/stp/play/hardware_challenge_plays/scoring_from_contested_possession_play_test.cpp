@@ -22,7 +22,7 @@ TEST_F(ScoringFromContestedPossessionPlayTest,
     auto friendly_robots = TestUtil::createStationaryRobotStatesWithId(
         {Point(4, 0), Point(0.5, 0), Point(-3, 1)});
     setFriendlyGoalie(0);
-    setAIPlay(TbotsProto::PlayName::ScoringFromContestedPossessionPlay);
+    setAiPlay(TbotsProto::PlayName::ScoringFromContestedPossessionPlay);
 
     setRefereeCommand(RefereeCommand::STOP, RefereeCommand::HALT);
 
@@ -50,7 +50,7 @@ TEST_F(ScoringFromContestedPossessionPlayTest,
     auto friendly_robots = TestUtil::createStationaryRobotStatesWithId(
         {Point(4, 0), Point(0.5, 0), Point(-3, 1)});
     setFriendlyGoalie(0);
-    setAIPlay(TbotsProto::PlayName::ScoringFromContestedPossessionPlay);
+    setAiPlay(TbotsProto::PlayName::ScoringFromContestedPossessionPlay);
 
     setRefereeCommand(RefereeCommand::FORCE_START, RefereeCommand::STOP);
 

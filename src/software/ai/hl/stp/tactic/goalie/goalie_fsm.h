@@ -6,10 +6,10 @@
 #include "software/ai/hl/stp/tactic/chip/chip_fsm.h"
 #include "software/ai/hl/stp/tactic/pivot_kick/pivot_kick_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
-#include "software/geom/algorithms/acute_angle.h"
 #include "software/geom/algorithms/calculate_block_cone.h"
 #include "software/geom/algorithms/closest_point.h"
 #include "software/geom/algorithms/contains.h"
+#include "software/geom/algorithms/convex_angle.h"
 #include "software/geom/algorithms/intersection.h"
 #include "software/geom/line.h"
 

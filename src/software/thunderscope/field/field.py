@@ -3,7 +3,7 @@ from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph.Qt import QtCore, QtGui
 
 from software.thunderscope.field.field_layer import FieldLayer
-from software.thunderscope import common_widgets
+from software.thunderscope.common import common_widgets
 from software.py_constants import *
 from software.thunderscope.replay.replay_controls import ReplayControls
 
