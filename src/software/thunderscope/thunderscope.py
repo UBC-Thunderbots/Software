@@ -468,13 +468,6 @@ class Thunderscope(object):
         self.robot_diagnostics_dock_area.addDock(log_dock)
         self.robot_diagnostics_dock_area.addDock(drive_dock, "right", log_dock)
         self.robot_diagnostics_dock_area.addDock(chicker_dock, "below", drive_dock)
-
-        robot_view = self.setup_robot_view(proto_unix_io)
-
-        dock = Dock("Robot View")
-        dock.addWidget(robot_view)
-        self.robot_diagnostics_dock_area.addDock(dock, "top", log_dock)
-        self.robot_diagnostics_dock_area.addDock(chicker_dock, "bottom", drive_dock)
         self.robot_diagnostics_dock_area.addDock(fullsystem_connect_dock, "top", chicker_dock)
 
         robot_view = self.setup_robot_view(proto_unix_io)

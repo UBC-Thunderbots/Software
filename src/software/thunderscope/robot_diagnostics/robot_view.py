@@ -137,7 +137,6 @@ class RobotView(QWidget):
         return label
 
     def refresh(self):
-        return
         """Refresh the view
         """
         robot_status_buffer = self.robot_status_buffer.get(block=False)

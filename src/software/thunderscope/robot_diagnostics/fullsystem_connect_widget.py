@@ -6,9 +6,8 @@ from enum import Enum
 
 
 class ControlMode(Enum):
-    AI = 1
-    MANUAL = 2
-    XBOX = 3
+    MANUAL = 1
+    XBOX = 2
 
 
 class FullSystemConnectWidget(QWidget):
@@ -20,19 +19,17 @@ class FullSystemConnectWidget(QWidget):
         self.connect_options_group = QButtonGroup()
 
         self.connect_options_box, self.connect_options = common_widgets.create_radio(
-            ["AI Control", "Manual Control", "XBox Control"], self.connect_options_group
+            ["Manual Control", "XBox Control"], self.connect_options_group
         )
 
-        self.ai_control_button = self.connect_options[0]
-        self.manual_control_button = self.connect_options[1]
-        self.xbox_control_button = self.connect_options[2]
+        self.manual_control_button = self.connect_options[0]
+        self.xbox_control_button = self.connect_options[1]
 
-        self.ai_control_button.toggled.connect(lambda: self.switch_control_mode(ControlMode.AI))
         self.manual_control_button.toggled.connect(lambda: self.switch_control_mode(ControlMode.MANUAL))
         self.xbox_control_button.toggled.connect(lambda: self.switch_control_mode(ControlMode.XBOX))
 
-        self.ai_control_button.setChecked(True)
-        self.control_mode = ControlMode.AI
+        self.manual_control_button.setChecked(True)
+        self.control_mode = ControlMode.MANUAL
 
         vbox_layout.addWidget(self.connect_options_box)
 
@@ -44,7 +41,7 @@ class FullSystemConnectWidget(QWidget):
         self.control_mode = mode
 
     def refresh(self):
-        if self.control_mode == ControlMode.AI or self.control_mode == ControlMode.XBOX:
+        if self.control_mode == ControlMode.XBOX:
             self.drive_widget.toggle_all(False)
         else:
             self.drive_widget.toggle_all(True)
