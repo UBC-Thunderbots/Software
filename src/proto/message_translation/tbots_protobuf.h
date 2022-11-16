@@ -9,16 +9,6 @@
 #include "software/world/world.h"
 
 /**
- * Returns a TbotsProto::Vision proto given a World.
- *
- * @param world The world msg to extract the TbotsProto::Vision from
- *
- * @return The unique_ptr to a TbotsProto::Vision proto containing the friendly team and
- * ball information
- */
-std::unique_ptr<TbotsProto::Vision> createVision(const World& world);
-
-/**
  * Returns a TbotsProto::World proto given a World.
  *
  * @param world The world msg to extract the TbotsProto::World from

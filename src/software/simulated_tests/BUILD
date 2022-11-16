@@ -13,6 +13,7 @@ py_test(
     ],
     deps = [
         "//software/simulated_tests:simulated_test_fixture",
+        "//software/simulated_tests:speed_threshold_helpers",
         "//software/simulated_tests:validation",
         requirement("pytest"),
     ],
@@ -95,4 +96,9 @@ py_library(
         "//proto:tbots_py_proto",
         "//software/logger:py_logger",
     ],
+)
+
+py_library(
+    name = "speed_threshold_helpers",
+    srcs = ["speed_threshold_helpers.py"],
 )

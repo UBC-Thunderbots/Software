@@ -9,7 +9,7 @@
 #include "software/ai/hl/stp/tactic/tactic_factory.h"
 #include "software/multithreading/thread_safe_buffer.hpp"
 
-ThreadedAI::ThreadedAI(TbotsProto::AiConfig ai_config)
+ThreadedAi::ThreadedAi(TbotsProto::AiConfig ai_config)
     // Disabling warnings on log buffer full, since buffer size is 1 and we
     // always want AI to use the latest World
     : FirstInFirstOutThreadedObserver<World>(),
@@ -20,13 +20,13 @@ ThreadedAI::ThreadedAI(TbotsProto::AiConfig ai_config)
 {
 }
 
-void ThreadedAI::overridePlay(TbotsProto::Play play_proto)
+void ThreadedAi::overridePlay(TbotsProto::Play play_proto)
 {
     std::scoped_lock lock(ai_mutex);
     ai.overridePlayFromProto(play_proto);
 }
 
-void ThreadedAI::overrideTactics(
+void ThreadedAi::overrideTactics(
     TbotsProto::AssignedTacticPlayControlParams assigned_tactic_play_control_params)
 {
     std::scoped_lock lock(ai_mutex);
@@ -47,12 +47,12 @@ void ThreadedAI::overrideTactics(
     LOG(VISUALIZE) << ai.getPlayInfo();
 }
 
-void ThreadedAI::onValueReceived(World world)
+void ThreadedAi::onValueReceived(World world)
 {
-    runAIAndSendPrimitives(world);
+    runAiAndSendPrimitives(world);
 }
 
-void ThreadedAI::onValueReceived(TbotsProto::ThunderbotsConfig config)
+void ThreadedAi::onValueReceived(TbotsProto::ThunderbotsConfig config)
 {
     std::scoped_lock lock(ai_mutex);
 
@@ -63,7 +63,7 @@ void ThreadedAI::onValueReceived(TbotsProto::ThunderbotsConfig config)
     ai.updateAiConfig(ai_config);
 }
 
-void ThreadedAI::runAIAndSendPrimitives(const World& world)
+void ThreadedAi::runAiAndSendPrimitives(const World& world)
 {
     std::scoped_lock lock(ai_mutex);
     if (ai_control_config.run_ai())
