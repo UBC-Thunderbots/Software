@@ -25,12 +25,10 @@ cc_test(
 
 cc_library(
     name = "brute_force_nearest_neighbor_search",
-    srcs = [
-        "brute_force_nearest_neighbor_search.cpp",
-    ],
     hdrs = [
-        "brute_force_nearest_neighbor_search.h",
+        "brute_force_nearest_neighbor_search.hpp",
     ],
+    deps = [],
 )
 
 cc_test(
