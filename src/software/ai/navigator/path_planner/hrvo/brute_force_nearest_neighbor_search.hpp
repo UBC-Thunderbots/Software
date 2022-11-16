@@ -2,17 +2,17 @@
 
 #include <vector>
 
-template <class T, typename F>
-std::vector<T> nearestNeighbours(const T& this_robot, const std::vector<T>& input,
-                                 double radius, F comparator)
+template <class T, typename Func>
+std::vector<T> nearestNeighbours(const T& candidate, const std::vector<T>& neighbors,
+                                 double radius, Func comparator)
 {
     std::vector<T> robot_subset;
-    for (const T& candidate_robot : input)
+    for (const T& neighbor : neighbors)
     {
-        if (comparator(this_robot, candidate_robot) < radius * radius &&
-            this_robot != candidate_robot)
+        if (comparator(candidate, neighbor) < radius * radius &&
+            candidate != neighbor)
         {
-            robot_subset.push_back(candidate_robot);
+            robot_subset.push_back(neighbor);
         }
     }
     return robot_subset;

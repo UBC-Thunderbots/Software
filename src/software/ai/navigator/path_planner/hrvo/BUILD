@@ -36,6 +36,7 @@ cc_test(
     srcs = ["nearest_neighbor_test.cpp"],
     deps = [
         ":brute_force_nearest_neighbor_search",
+        "//shared:constants",
         "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
         "//software/time:duration",
