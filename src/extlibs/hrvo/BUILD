@@ -8,6 +8,7 @@ cc_test(
         "//shared/test_util:tbots_gtest_main",
         "//software/ai/hl/stp/tactic/move:move_tactic",
         "//software/simulated_tests:simulated_er_force_sim_play_test_fixture",
+        "//software/simulated_tests/non_terminating_validation_functions",
         "//software/simulated_tests/terminating_validation_functions",
         "//software/simulated_tests/validation:validation_function",
         "//software/test_util",
@@ -39,8 +40,10 @@ cc_library(
     deps = [
         "//proto:visualization_cc_proto",
         "//proto/primitive:primitive_msg_factory",
+        "//software/ai/navigator/obstacle:robot_navigation_obstacle_factory",
         "//software/ai/navigator/path_planner/hrvo:velocity_obstacle",
         "//software/geom:vector",
+        "//software/networking:threaded_proto_unix_sender",
         "//software/world",
     ],
 )
