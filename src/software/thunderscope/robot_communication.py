@@ -66,7 +66,7 @@ class RobotCommunication(object):
         #     raise Exception("Could not find estop, make sure its plugged in")
 
     def __send_estop_state(self):
-        print('ytes')
+        print("ytes")
         # while True:
         #     self.full_system_proto_unix_io.send_proto(
         #         EstopState, EstopState(is_playing=self.estop_reader.isEstopPlay())

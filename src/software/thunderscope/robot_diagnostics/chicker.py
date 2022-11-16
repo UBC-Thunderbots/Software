@@ -60,9 +60,15 @@ class ChickerWidget(QWidget):
         self.chip_button.clicked.connect(self.chip_clicked)
 
         # no auto button enables both buttons, while auto kick and auto chip disable both buttons
-        self.no_auto_button.toggled.connect(lambda: self.toggle_should_enable_buttons(True))
-        self.auto_kick_button.toggled.connect(lambda: self.toggle_should_enable_buttons(False))
-        self.auto_chip_button.toggled.connect(lambda: self.toggle_should_enable_buttons(False))
+        self.no_auto_button.toggled.connect(
+            lambda: self.toggle_should_enable_buttons(True)
+        )
+        self.auto_kick_button.toggled.connect(
+            lambda: self.toggle_should_enable_buttons(False)
+        )
+        self.auto_chip_button.toggled.connect(
+            lambda: self.toggle_should_enable_buttons(False)
+        )
 
         vbox_layout.addWidget(self.radio_button_box)
         self.no_auto_button.setChecked(True)
@@ -108,7 +114,9 @@ class ChickerWidget(QWidget):
             self.disable_kick_chip_button()
 
             # set and start timer to re-enable kick button after 3 seconds
-            self.start_timer_once(self.enable_kick_chip_button, 3 * MILLISECONDS_PER_SECOND)
+            self.start_timer_once(
+                self.enable_kick_chip_button, 3 * MILLISECONDS_PER_SECOND
+            )
 
     def chip_clicked(self):
         """
@@ -124,7 +132,9 @@ class ChickerWidget(QWidget):
             self.disable_kick_chip_button()
 
             # set and start timer to re-enable chip button after 3 seconds
-            self.start_timer_once(self.enable_kick_chip_button, 3 * MILLISECONDS_PER_SECOND)
+            self.start_timer_once(
+                self.enable_kick_chip_button, 3 * MILLISECONDS_PER_SECOND
+            )
 
     def start_timer_once(self, function, duration):
         """Starts a QTimer to call the given function once after the given duration
@@ -236,4 +246,3 @@ class ChickerWidget(QWidget):
             self.buttons_should_enable = False
         elif self.no_auto_button.isChecked():
             self.buttons_should_enable = True
-            pass
