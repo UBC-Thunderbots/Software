@@ -67,11 +67,13 @@ class HRVOAgent : public Agent
      * @param pref_speed             The speed at which this agent prefers to move at.
      * @param max_speed              The maximum speed of this agent.
      * @param uncertainty_offset     The uncertainty offset of this agent.
+     * @param robot_id		 	    The robot id for this agent.
+     * @param type		 		    The side that this agent is on (friendly/enemy).
      */
-    HRVOAgent(HRVOSimulator *simulator, const Vector &position, float neighbor_dist,
-              std::size_t max_neighbors, float radius, float max_radius_inflation,
-              const Vector &velocity, float max_accel, AgentPath &path, float pref_speed,
-              float max_speed, float uncertainty_offset);
+    HRVOAgent(HRVOSimulator *simulator, const Vector &position, float neighborDist,
+              std::size_t maxNeighbors, float radius, float max_radius_inflation,
+              const Vector &velocity, float maxAccel, AgentPath &path, float prefSpeed,
+              float maxSpeed, float uncertaintyOffset, RobotId robot_id, TeamSide type);
 
     /**
      * Computes the new velocity of this agent.

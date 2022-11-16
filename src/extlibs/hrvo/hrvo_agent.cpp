@@ -42,13 +42,13 @@
 #include "proto/message_translation/tbots_geometry.h"
 #include "software/geom/vector.h"
 
-HRVOAgent::HRVOAgent(HRVOSimulator *simulator, const Vector &position,
-                     float neighbor_dist, std::size_t max_neighbors, float radius,
-                     float max_radius_inflation, const Vector &velocity, float max_accel,
-                     AgentPath &path, float pref_speed, float max_speed,
-                     float uncertainty_offset)
+HRVOAgent::HRVOAgent(HRVOSimulator *simulator, const Vector &position, float neighborDist,
+                     std::size_t maxNeighbors, float radius, float max_radius_inflation,
+                     const Vector &velocity, float maxAccel, AgentPath &path,
+                     float prefSpeed, float maxSpeed, float uncertaintyOffset,
+                     RobotId robot_id, TeamSide type)
     : Agent(simulator, position, radius, max_radius_inflation, velocity, velocity,
-            max_speed, max_accel, path),
+            maxSpeed, maxAccel, path, robot_id, type),
       max_neighbors_(max_neighbors),
       neighbor_dist_(neighbor_dist),
       pref_speed_(pref_speed),

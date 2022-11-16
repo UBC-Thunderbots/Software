@@ -3,6 +3,7 @@
 #include "agent.h"
 #include "simulator.h"
 #include "software/geom/vector.h"
+#include "software/world/robot_state.h"
 
 /**
  * An agent/robot in the simulation which has linear velocity.
@@ -22,10 +23,13 @@ class LinearVelocityAgent : public Agent
      * @param max_speed              The maximum speed of this agent.
      * @param max_accel              The maximum acceleration of this agent.
      * @param path                  The path of this agent
+     * @param robot_id	  The robot id for this agent.
+     * @param type	  	  The team side for this agent (friendly or enemy).
      */
     LinearVelocityAgent(HRVOSimulator *simulator, const Vector &position, float radius,
                         float max_radius_inflation, const Vector &velocity,
-                        float max_speed, float max_accel, AgentPath &path);
+                        float max_speed, float max_accel, AgentPath &path, RobotId robot_id,
+                        TeamSide type);
 
     /**
      * Computes the new velocity of this agent.
