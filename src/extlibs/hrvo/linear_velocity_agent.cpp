@@ -1,16 +1,16 @@
 #include "linear_velocity_agent.h"
 
-LinearVelocityAgent::LinearVelocityAgent(HRVOSimulator *simulator, const Vector &position,
+LinearVelocityAgent::LinearVelocityAgent(const Vector &position,
                                          float radius, float max_radius_inflation,
                                          const Vector &velocity, float max_speed,
                                          float max_accel, AgentPath &path,
                                          RobotId robot_id, TeamSide type)
-    : Agent(simulator, position, radius, max_radius_inflation, velocity, velocity,
+    : Agent(position, radius, max_radius_inflation, velocity, velocity,
             max_speed, max_accel, path, robot_id, type)
 {
 }
 
-void LinearVelocityAgent::computeNewVelocity()
+void LinearVelocityAgent::computeNewVelocity(double time_step)
 {
     // TODO (#2496): Fix bug where LinearVelocityAgents go past their destination
     // Preferring a velocity which points directly towards goal
@@ -33,7 +33,7 @@ void LinearVelocityAgent::computeNewVelocity()
     }
 
     const Vector dv = pref_velocity_ - velocity_;
-    if (dv.length() <= max_accel_ * simulator_->getTimeStep())
+    if (dv.length() <= max_accel_ * time_step)
     {
         new_velocity_ = pref_velocity_;
     }
@@ -41,7 +41,7 @@ void LinearVelocityAgent::computeNewVelocity()
     {
         // Calculate the maximum velocity towards the preferred velocity, given the
         // acceleration constraint
-        new_velocity_ = velocity_ + dv.normalize(max_accel_ * simulator_->getTimeStep());
+        new_velocity_ = velocity_ + dv.normalize(max_accel_ * time_step);
     }
 }
 

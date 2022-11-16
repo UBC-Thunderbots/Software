@@ -18,7 +18,6 @@ class Agent
     /**
      * Constructor
      *
-     * @param simulator             The simulator which this agent is a part of
      * @param position              The starting position of this agent.
      * @param radius                The radius of this agent.
      * @param max_radius_inflation  The maximum amount which the radius of this agent can
@@ -31,7 +30,7 @@ class Agent
      * @param robot_id		 		The robot id for this agent
      * @param agent_type	 		The friendly or enemy agent type
      */
-    Agent(HRVOSimulator *simulator, const Vector &position, float radius,
+    Agent(const Vector &position, float radius,
           float max_radius_inflation, const Vector &velocity, const Vector &prefVelocity,
           float maxSpeed, float maxAccel, AgentPath &path, RobotId robot_id,
           TeamSide agent_type);
@@ -41,7 +40,7 @@ class Agent
     /**
      * Computes the new velocity of this agent.
      */
-    virtual void computeNewVelocity() = 0;
+    virtual void computeNewVelocity(double time_step) = 0;
 
     /**
      * Create the velocity obstacle which other_agent should see for this Agent
@@ -58,8 +57,9 @@ class Agent
 
     /**
      * Updates the position and velocity of this agent.
+     * @param time_step the time step the simulator is currently using
      */
-    virtual void update();
+    virtual bool update(double time_step);
 
     /**
      * Returns the current position of the agent
@@ -201,6 +201,4 @@ class Agent
     float max_speed_;
     float max_accel_;
     bool reached_goal_;
-
-    HRVOSimulator *const simulator_;
 };

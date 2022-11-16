@@ -3,12 +3,11 @@
 #include "extlibs/hrvo/path.h"
 #include "extlibs/hrvo/simulator.h"
 
-Agent::Agent(HRVOSimulator *simulator, const Vector &position, float radius,
+Agent::Agent(const Vector &position, float radius,
              float max_radius_inflation, const Vector &velocity,
              const Vector &prefVelocity, float maxSpeed, float maxAccel, AgentPath &path,
              unsigned int robot_id, TeamSide type)
-    : simulator_(simulator),
-      position_(position),
+    : position_(position),
       min_radius_(radius),
       radius_(radius),
       max_radius_inflation_(max_radius_inflation),
@@ -25,7 +24,8 @@ Agent::Agent(HRVOSimulator *simulator, const Vector &position, float radius,
     updateRadiusFromVelocity();
 }
 
-void Agent::update()
+// returns  boolean on whether it reaches goal
+bool Agent::update(double time_step)
 {
     if (new_velocity_.length() >= max_speed_)
     {
@@ -34,7 +34,7 @@ void Agent::update()
     }
 
     const Vector dv = new_velocity_ - velocity_;
-    if (dv.length() < max_accel_ * simulator_->getTimeStep() || dv.length() == 0.f)
+    if (dv.length() < max_accel_ * time_step || dv.length() == 0.f)
     {
         velocity_ = new_velocity_;
     }
@@ -43,10 +43,10 @@ void Agent::update()
         // Calculate the maximum velocity towards the preferred velocity, given the
         // acceleration constraint
         velocity_ =
-            velocity_ + (max_accel_ * simulator_->getTimeStep()) * (dv / dv.length());
+            velocity_ + (max_accel_ * time_step * (dv / dv.length()));
     }
 
-    position_ += velocity_ * simulator_->time_step;
+    position_ += velocity_ * time_step;
 
     Vector current_dest;
 
@@ -68,18 +68,19 @@ void Agent::update()
         if (path.isGoingToFinalPathPoint())
         {
             reached_goal_ = true;
+            return true;
         }
         else
         {
             path.incrementPathIndex();
             reached_goal_             = false;
-            simulator_->reached_goals = false;
+            return false;
         }
     }
     else
     {
         reached_goal_             = false;
-        simulator_->reached_goals = false;
+        return false;
     }
 }
 

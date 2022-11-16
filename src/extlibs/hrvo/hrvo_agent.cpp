@@ -42,12 +42,12 @@
 #include "proto/message_translation/tbots_geometry.h"
 #include "software/geom/vector.h"
 
-HRVOAgent::HRVOAgent(HRVOSimulator *simulator, const Vector &position, float neighborDist,
+HRVOAgent::HRVOAgent(const Vector &position, float neighborDist,
                      std::size_t maxNeighbors, float radius, float max_radius_inflation,
                      const Vector &velocity, float maxAccel, AgentPath &path,
                      float prefSpeed, float maxSpeed, float uncertaintyOffset,
                      RobotId robot_id, TeamSide type)
-    : Agent(simulator, position, radius, max_radius_inflation, velocity, velocity,
+    : Agent(position, radius, max_radius_inflation, velocity, velocity,
             maxSpeed, maxAccel, path, robot_id, type),
       max_neighbors_(max_neighbors),
       neighbor_dist_(neighbor_dist),
@@ -71,7 +71,7 @@ void HRVOAgent::computeNeighbors()
         std::min(static_cast<double>(neighbor_dist_),
                  (position_ - current_dest).length() + path.getPathRadius());
 
-    simulator_->getKdTree()->query(this, new_neighbor_dist);
+    simulator_->getKdTree()->query(this, new_neighbor_dist); // blocked
 }
 
 VelocityObstacle HRVOAgent::createVelocityObstacle(const Agent &other_agent)
@@ -150,11 +150,12 @@ VelocityObstacle HRVOAgent::createVelocityObstacle(const Agent &other_agent)
     return VelocityObstacle(apex, right_side, left_side);
 }
 
-void HRVOAgent::computeNewVelocity()
+void HRVOAgent::computeNewVelocity(double time_step)
 {
+    const auto agents;
     // Based on The Hybrid Reciprocal Velocity Obstacle paper:
     // https://gamma.cs.unc.edu/HRVO/HRVO-T-RO.pdf
-    computePreferredVelocity();
+    computePreferredVelocity(time_step);
     computeNeighbors();
 
     velocity_obstacles_.clear();
@@ -494,7 +495,7 @@ std::optional<int> HRVOAgent::findIntersectingVelocityObstacle(
     return std::nullopt;
 }
 
-void HRVOAgent::computePreferredVelocity()
+void HRVOAgent::computePreferredVelocity(double time_step)
 {
     auto path_point_opt = path.getCurrentPathPoint();
 
@@ -530,7 +531,7 @@ void HRVOAgent::computePreferredVelocity()
 
         // Limit the preferred velocity to the kinematic limits
         const Vector dv = ideal_pref_velocity - velocity_;
-        if (dv.length() <= max_accel_ * simulator_->getTimeStep())
+        if (dv.length() <= max_accel_ * time_step)
         {
             pref_velocity_ = ideal_pref_velocity;
         }
@@ -539,7 +540,7 @@ void HRVOAgent::computePreferredVelocity()
             // Calculate the maximum velocity towards the preferred velocity, given the
             // acceleration constraint
             pref_velocity_ =
-                velocity_ + dv.normalize(max_accel_ * simulator_->getTimeStep());
+                velocity_ + dv.normalize(max_accel_ * time_step);
         }
     }
     else
@@ -548,6 +549,7 @@ void HRVOAgent::computePreferredVelocity()
         // v_pref = v_now + a * t
         float curr_pref_speed =
             std::min(static_cast<double>(pref_speed_),
+                     //
                      velocity_.length() + max_accel_ * simulator_->getTimeStep());
         pref_velocity_ = dist_vector_to_goal.normalize(curr_pref_speed);
     }

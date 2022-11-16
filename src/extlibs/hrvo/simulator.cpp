@@ -243,7 +243,7 @@ std::size_t HRVOSimulator::addHRVOAgent(const Vector &position, float agent_radi
                                         TeamSide type)
 {
     std::shared_ptr<HRVOAgent> agent = std::make_shared<HRVOAgent>(
-        this, position, neighborDist, maxNeighbors, agent_radius, max_radius_inflation,
+        position, neighborDist, maxNeighbors, agent_radius, max_radius_inflation,
         curr_velocity, maxAccel, path, prefSpeed, maxSpeed, uncertaintyOffset, robot_id,
         type);
     agents.push_back(std::move(agent));
@@ -257,7 +257,7 @@ size_t HRVOSimulator::addLinearVelocityAgent(const Vector &position, float agent
                                              RobotId robot_id, TeamSide type)
 {
     std::shared_ptr<LinearVelocityAgent> agent = std::make_shared<LinearVelocityAgent>(
-        this, position, agent_radius, max_radius_inflation, curr_velocity, max_speed,
+        position, agent_radius, max_radius_inflation, curr_velocity, max_speed,
         max_accel, path, robot_id, type);
 
     agents.push_back(std::move(agent));
@@ -295,13 +295,13 @@ void HRVOSimulator::doStep()
     // Compute what velocity each agent will take next
     for (auto &agent : agents)
     {
-        agent->computeNewVelocity();
+        agent->computeNewVelocity(time_step, agents);
     }
 
     // Update the positions of all agents given their velocity
     for (auto &agent : agents)
     {
-        agent->update();
+        agent->update(time_step);
     }
 
     global_time += time_step;

@@ -52,7 +52,6 @@ class HRVOAgent : public Agent
     /**
      * Constructor
      *
-     * @param simulator             The simulation.
      * @param position              The starting position of this agent.
      * @param neighbor_dist          The maximum distance away from this agent which
      * another agent can be to be considered as an obstacle.
@@ -70,7 +69,7 @@ class HRVOAgent : public Agent
      * @param robot_id		 	    The robot id for this agent.
      * @param type		 		    The side that this agent is on (friendly/enemy).
      */
-    HRVOAgent(HRVOSimulator *simulator, const Vector &position, float neighborDist,
+    HRVOAgent(const Vector &position, float neighborDist,
               std::size_t maxNeighbors, float radius, float max_radius_inflation,
               const Vector &velocity, float maxAccel, AgentPath &path, float prefSpeed,
               float maxSpeed, float uncertaintyOffset, RobotId robot_id, TeamSide type);
@@ -78,7 +77,7 @@ class HRVOAgent : public Agent
     /**
      * Computes the new velocity of this agent.
      */
-    void computeNewVelocity() override;
+    void computeNewVelocity(double time_step) override;
 
     /**
      * Create the hybrid reciprocal velocity obstacle which other_agent should see for
@@ -99,7 +98,7 @@ class HRVOAgent : public Agent
     /**
      * Computes the preferred velocity of this agent.
      */
-    void computePreferredVelocity();
+    void computePreferredVelocity(double time_step);
 
     /**
      * Inserts a neighbor into the set of neighbors of this agent.

@@ -26,7 +26,7 @@ class LinearVelocityAgent : public Agent
      * @param robot_id	  The robot id for this agent.
      * @param type	  	  The team side for this agent (friendly or enemy).
      */
-    LinearVelocityAgent(HRVOSimulator *simulator, const Vector &position, float radius,
+    LinearVelocityAgent(const Vector &position, float radius,
                         float max_radius_inflation, const Vector &velocity,
                         float max_speed, float max_accel, AgentPath &path, RobotId robot_id,
                         TeamSide type);
@@ -34,7 +34,7 @@ class LinearVelocityAgent : public Agent
     /**
      * Computes the new velocity of this agent.
      */
-    void computeNewVelocity() override;
+    void computeNewVelocity(double time_step) override;
 
     /**
      * Create the velocity obstacle which other_agent should see for this Agent
