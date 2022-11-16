@@ -31,7 +31,8 @@ int main(int argc, char **argv)
     desc.add_options()("division",
                        boost::program_options::value<std::string>(&args.division),
                        "div_a or div_b");
-    desc.add_options()("realism_config", boost::program_options::bool_switch(&args.realism),
+    desc.add_options()("realism_config",
+                       boost::program_options::bool_switch(&args.realism),
                        "realism simulator");  // install terminal flag
 
     boost::program_options::variables_map vm;
@@ -139,9 +140,7 @@ int main(int argc, char **argv)
         // Inputs
         // World State Input: Configures the ERForceSimulator
         auto world_state_input = ThreadedProtoUnixListener<TbotsProto::WorldState>(
-            runtime_dir + WORLD_STATE_PATH,
-            [&](TbotsProto::WorldState input)
-            {
+            runtime_dir + WORLD_STATE_PATH, [&](TbotsProto::WorldState input) {
                 std::scoped_lock lock(simulator_mutex);
                 er_force_sim->setWorldState(input);
             });
@@ -149,17 +148,13 @@ int main(int argc, char **argv)
         // World Input: Buffer vision until we have primitives to tick
         // the simulator with
         auto blue_world_input = ThreadedProtoUnixListener<TbotsProto::World>(
-            runtime_dir + BLUE_WORLD_PATH,
-            [&](TbotsProto::World input)
-            {
+            runtime_dir + BLUE_WORLD_PATH, [&](TbotsProto::World input) {
                 std::scoped_lock lock(simulator_mutex);
                 blue_vision = input;
             });
 
         auto yellow_world_input = ThreadedProtoUnixListener<TbotsProto::World>(
-            runtime_dir + YELLOW_WORLD_PATH,
-            [&](TbotsProto::World input)
-            {
+            runtime_dir + YELLOW_WORLD_PATH, [&](TbotsProto::World input) {
                 std::scoped_lock lock(simulator_mutex);
                 yellow_vision = input;
             });
@@ -167,9 +162,7 @@ int main(int argc, char **argv)
         // PrimitiveSet Input: set the primitive set with cached vision
         auto yellow_primitive_set_input =
             ThreadedProtoUnixListener<TbotsProto::PrimitiveSet>(
-                runtime_dir + YELLOW_PRIMITIVE_SET,
-                [&](TbotsProto::PrimitiveSet input)
-                {
+                runtime_dir + YELLOW_PRIMITIVE_SET, [&](TbotsProto::PrimitiveSet input) {
                     std::scoped_lock lock(simulator_mutex);
                     er_force_sim->setYellowRobotPrimitiveSet(
                         input, std::make_unique<TbotsProto::World>(yellow_vision));
@@ -177,9 +170,7 @@ int main(int argc, char **argv)
 
         auto blue_primitive_set_input =
             ThreadedProtoUnixListener<TbotsProto::PrimitiveSet>(
-                runtime_dir + BLUE_PRIMITIVE_SET,
-                [&](TbotsProto::PrimitiveSet input)
-                {
+                runtime_dir + BLUE_PRIMITIVE_SET, [&](TbotsProto::PrimitiveSet input) {
                     std::scoped_lock lock(simulator_mutex);
                     er_force_sim->setBlueRobotPrimitiveSet(
                         input, std::make_unique<TbotsProto::World>(blue_vision));
@@ -187,9 +178,7 @@ int main(int argc, char **argv)
 
         // Simulator Tick Input
         auto simulator_tick = ThreadedProtoUnixListener<TbotsProto::SimulatorTick>(
-            runtime_dir + SIMULATION_TICK_PATH,
-            [&](TbotsProto::SimulatorTick input)
-            {
+            runtime_dir + SIMULATION_TICK_PATH, [&](TbotsProto::SimulatorTick input) {
                 std::scoped_lock lock(simulator_mutex);
 
                 // Step the simulation and send back the wrapper packets and

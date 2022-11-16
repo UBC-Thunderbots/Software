@@ -203,7 +203,9 @@ class Simulator(object):
 
     """ Simulator Context Manager """
 
-    def __init__(self, simulator_runtime_dir=None, debug_simulator=False, realism = False):
+    def __init__(
+        self, simulator_runtime_dir=None, debug_simulator=False, realism=False
+    ):
         """Run Simulator
 
         NOTE: If any of the runtime directories are None, the corresponding binary
@@ -216,7 +218,8 @@ class Simulator(object):
         self.simulator_runtime_dir = simulator_runtime_dir
         self.debug_simulator = debug_simulator
         self.er_force_simulator_proc = None
-        self.realism = realism;
+        self.realism = realism
+
     def __enter__(self):
         """Enter the simulator context manager. 
 
@@ -237,7 +240,7 @@ class Simulator(object):
         )
 
         if self.realism:
-            simulator_command.append("--realism_config")
+            simulator_command += " --realism_config"
 
         if self.debug_simulator:
 
