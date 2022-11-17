@@ -230,6 +230,8 @@ class DriveAndDribblerWidget(QWidget):
             lambda: slider.setValue(old_val)
         )
 
+        slider.setStyleSheet("color: Grey")
+
     def enable_slider(self, slider, label):
         """
         Enables a slider by connecting a function to update label upon value change

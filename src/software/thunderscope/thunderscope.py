@@ -162,22 +162,27 @@ class Thunderscope(object):
         # from the blue or yellow team. We also would like to visualize the same
         # protobuf types on two separate widgets.
         #
+        if load_blue:
+            self.blue_full_system_proto_unix_io = (
+                ProtoUnixIO()
+                if blue_full_system_proto_unix_io is None
+                else blue_full_system_proto_unix_io
+            )
+        elif load_yellow:
+            self.yellow_full_system_proto_unix_io = (
+                ProtoUnixIO()
+                if yellow_full_system_proto_unix_io is None
+                else yellow_full_system_proto_unix_io
+            )
+        elif load_diagnostics:
+            self.robot_diagnostics_proto_unix_io = ProtoUnixIO()
+
         self.simulator_proto_unix_io = (
             ProtoUnixIO()
             if simulator_proto_unix_io is None
             else simulator_proto_unix_io
         )
-        self.yellow_full_system_proto_unix_io = (
-            ProtoUnixIO()
-            if yellow_full_system_proto_unix_io is None
-            else yellow_full_system_proto_unix_io
-        )
-        self.blue_full_system_proto_unix_io = (
-            ProtoUnixIO()
-            if blue_full_system_proto_unix_io is None
-            else blue_full_system_proto_unix_io
-        )
-        self.robot_diagnostics_proto_unix_io = ProtoUnixIO()
+
 
         # Setup the main window and load the requested tabs
         self.configure_layout(layout_path, load_blue, load_yellow, load_diagnostics)
@@ -353,15 +358,10 @@ class Thunderscope(object):
             except Exception:
                 pass
 
-        if load_blue and load_yellow and load_diagnostics:
-            raise Exception("Robot diagnostics can only run w/ 1 AI")
-
         if load_diagnostics:
             self.configure_robot_diagnostics_layout(
                 self.robot_diagnostics_dock_area,
-                self.blue_full_system_proto_unix_io
-                if load_blue
-                else self.yellow_full_system_proto_unix_io,
+                self.robot_diagnostics_proto_unix_io
             )
 
     def register_refresh_function(self, refresh_func):

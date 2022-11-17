@@ -12,7 +12,8 @@ class RobotCommunication(object):
 
     def __init__(
         self,
-        full_system_proto_unix_io,
+        input_proto_unix_io,
+        fullsystem_or_diagnostics,
         multicast_channel,
         interface,
         estop_path="/dev/ttyACM0",
@@ -20,7 +21,9 @@ class RobotCommunication(object):
     ):
         """Initialize the communication with the robots
 
-        :param full_system_proto_unix_io: full_system_proto_unix_io object
+        :param input_proto_unix_io: full_system_proto_unix_io object
+        :param fullsystem_or_diagnostics: boolean to indicate whether the proto_unix_io object
+               is from fullsystem or robot diagnostics
         :param multicast_channel: The multicast channel to use
         :param interface: The interface to use
         :param estop_path: The path to the estop
@@ -29,7 +32,8 @@ class RobotCommunication(object):
         """
         self.sequence_number = 0
         self.last_time = time.time()
-        self.full_system_proto_unix_io = full_system_proto_unix_io
+        self.input_proto_unix_io = input_proto_unix_io
+        self.fullsystem_or_diagnostics = fullsystem_or_diagnostics
         self.multicast_channel = str(multicast_channel)
         self.interface = interface
         self.estop_path = estop_path
@@ -44,19 +48,21 @@ class RobotCommunication(object):
         self.motor_control_diagnostics_buffer = ThreadSafeBuffer(1, MotorControl)
         self.power_control_diagnostics_buffer = ThreadSafeBuffer(1, PowerControl)
 
-        self.full_system_proto_unix_io.register_observer(World, self.world_buffer)
-        self.full_system_proto_unix_io.register_observer(
+        self.input_proto_unix_io.register_observer(World, self.world_buffer)
+        self.input_proto_unix_io.register_observer(
             PrimitiveSet, self.primitive_buffer
         )
-        self.full_system_proto_unix_io.register_observer(
+        self.input_proto_unix_io.register_observer(
             MotorControl, self.motor_control_diagnostics_buffer
         )
-        self.full_system_proto_unix_io.register_observer(
+        self.input_proto_unix_io.register_observer(
             PowerControl, self.power_control_diagnostics_buffer
         )
 
         self.send_estop_state_thread = threading.Thread(target=self.__send_estop_state)
         self.run_thread = threading.Thread(target=self.run)
+
+
 
         # try:
         #     self.estop_reader = ThreadedEstopReader(

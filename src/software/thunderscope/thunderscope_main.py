@@ -103,6 +103,11 @@ if __name__ == "__main__":
         action="store_true",
         help="Run full system as the yellow team, over WiFi; estop required",
     )
+    group.add_argument(
+        "--run_diagnostics",
+        action="store_true",
+        help="Run robots diagnostics for Manual or Xbox control; estop required"
+    )
     parser.add_argument(
         "--interface",
         action="store",
@@ -192,8 +197,8 @@ if __name__ == "__main__":
     #              AI + Robot Communication + Robot Diagnostics               #
     ###########################################################################
     #
-    # When we are running with real robots. We want to run 1 instance of AI
-    # and 1 instance of RobotCommunication which will send/recv packets over
+    # When we are running with real robots. We want to run either 1 instance of
+    # AI or 1 instance of RobotCommunication which will send/recv packets over
     # the provided multicast channel.
     if args.run_blue:
 
@@ -201,7 +206,7 @@ if __name__ == "__main__":
             layout_path=args.layout,
             load_blue=True,
             load_yellow=False,
-            load_diagnostics=True,
+            load_diagnostics=False,
             load_gamecontroller=False,
             visualization_buffer_size=args.visualization_buffer_size,
         )
@@ -216,7 +221,7 @@ if __name__ == "__main__":
             layout_path=args.layout,
             load_blue=False,
             load_yellow=True,
-            load_diagnostics=True,
+            load_diagnostics=False,
             load_gamecontroller=False,
             visualization_buffer_size=args.visualization_buffer_size,
         )
@@ -225,6 +230,18 @@ if __name__ == "__main__":
         runtime_dir = args.yellow_full_system_runtime_dir
         friendly_colour_yellow = True
         debug = args.debug_yellow_full_system
+    elif args.run_diagnostics:
+
+        tscope = Thunderscope(
+            layout_path=args.layout,
+            load_blue=False,
+            load_yellow=False,
+            load_diagnostics=True,
+            load_gamecontroller=False,
+            visualization_buffer_size=args.visualization_buffer_size,
+        )
+
+        proto_unix_io = tscope.robot_diagnostics_proto_unix_io
 
     if args.run_blue or args.run_yellow:
         with ProtoLogger(
@@ -241,6 +258,12 @@ if __name__ == "__main__":
             proto_unix_io.register_to_observe_everything(yellow_logger.buffer)
             full_system.setup_proto_unix_io(proto_unix_io)
             tscope.show()
+
+    if args.run_diagnostics:
+        RobotCommunication(
+            proto_unix_io, getRobotMulticastChannel(0), args.interface
+        )
+        tscope.show()
 
     ###########################################################################
     #                              Replay                                     #
