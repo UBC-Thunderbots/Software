@@ -7,23 +7,25 @@
 #include "shared/constants.h"
 #include <random>
 #include <chrono>
+#include <include/gmock/gmock-matchers.h>
 
 class NearestNeighborSearchTest : public ::testing::TestWithParam<double> {
 protected:
     NearestNeighborSearchTest() {
-        for (Point point : robot_locations) {
-            Robot agent = TestUtil::createRobotAtPos(point);
-            agents.push_back(agent);
-        }
-    }
-
-    void SetUp() override {
-        robot_locations.push_back(Point(0,0));
-        robot_locations.push_back(Point(-4, -3));
+        robot_locations.push_back(Point(0, 0));
         robot_locations.push_back(Point(1, 1));
         robot_locations.push_back(Point(-1, -1));
         robot_locations.push_back(Point(-2, 2));
         robot_locations.push_back(Point(2, -2));
+        robot_locations.push_back(Point(-4, -3));
+        robot_locations.push_back(Point(4, 3));
+    }
+
+    void SetUp() override {
+        for (Point point : robot_locations) {
+            Robot agent = TestUtil::createRobotAtPos(point);
+            agents.push_back(agent);
+        }
     }
 
     std::vector<Point> robot_locations;
@@ -34,13 +36,41 @@ double compare(const Robot &r1, const Robot &r2) {
     return distanceSquared(r1.position(), r2.position());
 }
 
-TEST_P(NearestNeighborSearchTest, num_robot_within_radius) {
-    double radius = GetParam();
+TEST_F(NearestNeighborSearchTest, no_robot_within_radius) {
+    double radius = 1.0;
+    std::vector<Robot> expected{};
     std::vector<Robot> agent_subset = nearestNeighbours(agents[0], agents, radius, compare);
+    ASSERT_EQ(expected, agent_subset);
 }
 
-TEST(NearestNeighborSearchTest, generic_frnn_brute_force_test)
-{
+TEST_F(NearestNeighborSearchTest, two_robots_within_radius) {
+    double radius = 2.0;
+    std::vector<Robot> expected{agents[1], agents[2]};
+    std::vector<Robot> agent_subset = nearestNeighbours(agents[0], agents, radius, compare);
+    std::sort(expected.begin(), expected.end(), Robot::cmpRobotByID());
+    std::sort(agent_subset.begin(), agent_subset.end(), Robot::cmpRobotByID());
+    EXPECT_THAT(expected, ::testing::ContainerEq(agent_subset));
+}
+
+TEST_F(NearestNeighborSearchTest, four_robots_within_radius) {
+    double radius = 3.0;
+    std::vector<Robot> expected{agents[1], agents[2], agents[3], agents[4]};
+    std::vector<Robot> agent_subset = nearestNeighbours(agents[0], agents, radius, compare);
+    std::sort(expected.begin(), expected.end(), Robot::cmpRobotByID());
+    std::sort(agent_subset.begin(), agent_subset.end(), Robot::cmpRobotByID());
+    EXPECT_THAT(expected, ::testing::ContainerEq(agent_subset));
+}
+
+TEST_F(NearestNeighborSearchTest, robot_on_edge_of_radius_test) {
+    double radius = 5.0;
+    std::vector<Robot> expected{agents[1], agents[2], agents[3], agents[4]};
+    std::vector<Robot> agent_subset = nearestNeighbours(agents[0], agents, radius, compare);
+    std::sort(expected.begin(), expected.end(), Robot::cmpRobotByID());
+    std::sort(agent_subset.begin(), agent_subset.end(), Robot::cmpRobotByID());
+    EXPECT_THAT(expected, ::testing::ContainerEq(agent_subset));
+}
+
+TEST(NearestNeighborSearchTest, generic_frnn_brute_force_test) {
     unsigned int iterations = 1000;
     unsigned int num_of_agents = DIV_A_NUM_ROBOTS * 2;
     unsigned int friendly_agents = DIV_A_NUM_ROBOTS;
@@ -53,8 +83,8 @@ TEST(NearestNeighborSearchTest, generic_frnn_brute_force_test)
     std::chrono::nanoseconds max(0);
     std::chrono::nanoseconds min(0);
 
-    std::uniform_real_distribution<double> x_unif(lower_x_bound,upper_x_bound);
-    std::uniform_real_distribution<double> y_unif(lower_y_bound,upper_y_bound);
+    std::uniform_real_distribution<double> x_unif(lower_x_bound, upper_x_bound);
+    std::uniform_real_distribution<double> y_unif(lower_y_bound, upper_y_bound);
     std::default_random_engine re;
 
     for (unsigned int i = 0; i < iterations; i++) {
@@ -93,10 +123,28 @@ TEST(NearestNeighborSearchTest, generic_frnn_brute_force_test)
     std::cout << "min: " << min.count() << " nanoseconds" << std::endl;
 }
 
-INSTANTIATE_TEST_CASE_P(
-        parameters,
-        NearestNeighborSearchTest,
-        ::testing::Values(
-               std::make_tuple(
-                       1, std::vector<Robot> robot {TestUtil::createRobotAtPos(point)}
-               )));
+//INSTANTIATE_TEST_CASE_P(
+//        parameters,
+//        NearestNeighborSearchTest,
+//        ::testing::Values(
+//                std::make_tuple(
+//                        1.0, std::vector<Robot>{}
+//                ),
+//                std::make_tuple(
+//                        2.0, std::vector<Robot>{TestUtil::createRobotAtPos(Point(1, 1)),
+//                                              TestUtil::createRobotAtPos(Point(-1, -1))}
+//                ),
+//                std::make_tuple(
+//                        3.0, std::vector<Robot>{TestUtil::createRobotAtPos(Point(1, 1)),
+//                                              TestUtil::createRobotAtPos(Point(-1, -1)),
+//                                              TestUtil::createRobotAtPos(Point(-2, 2)),
+//                                              TestUtil::createRobotAtPos(Point(2, -2))}
+//                ),
+//                std::make_tuple(
+//                        5.0, std::vector<Robot>{TestUtil::createRobotAtPos(Point(1, 1)),
+//                                              TestUtil::createRobotAtPos(Point(-1, -1)),
+//                                              TestUtil::createRobotAtPos(Point(-2, 2)),
+//                                              TestUtil::createRobotAtPos(Point(2, -2)),
+//                                              TestUtil::createRobotAtPos(Point(-4, -3)),
+//                                              TestUtil::createRobotAtPos(Point(4, 3))}
+//                )));
