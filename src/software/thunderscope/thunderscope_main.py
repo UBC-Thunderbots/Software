@@ -306,7 +306,7 @@ if __name__ == "__main__":
             args.blue_full_system_runtime_dir,
         ) as blue_logger, ProtoLogger(
             args.yellow_full_system_runtime_dir,
-        ) as yellow_logger, Gamecontroller() as gamecontroller:
+        ) as yellow_logger, Gamecontroller() as gamecontroller, TigersAutoref():
 
             tscope.blue_full_system_proto_unix_io.register_to_observe_everything(
                 blue_logger.buffer

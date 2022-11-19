@@ -531,3 +531,31 @@ class Gamecontroller(object):
         ci_output = CiOutput()
         ci_output.ParseFromString(response_data[new_pos : new_pos + msg_len])
         return ci_output
+
+class TigersAutoref(object):
+    def __init__(self):
+        print("autoref init")
+        self.tigers_autoref_proc    = None
+        self.thread                 = None
+
+    def __enter__(self):
+        print("autoref enter")
+        self.thread = Thread(target=self.startAutoref)
+        self.thread.start();
+        print("thread started")
+
+        return self
+
+    def startAutoref(self):
+        print(os.getcwd())
+        os.chdir("software/simulation/tigers_autoref/")
+        print(os.getcwd())
+        autoref_cmd = "./run.sh -c -a"
+        self.tigers_autoref_proc = Popen(autoref_cmd.split(" "))
+
+    def __exit__(self, type, value, traceback):
+        if self.tigers_autoref_proc:
+            self.tigers_autoref_proc.kill()
+            self.tigers_autoref_proc.wait()
+
+            self.thread.join()
