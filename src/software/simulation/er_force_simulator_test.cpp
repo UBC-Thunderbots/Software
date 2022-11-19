@@ -17,7 +17,7 @@ class ErForceSimulatorTest : public ::testing::Test
     {
         // TODO (#2419): remove this to re-enable sigfpe checks
         fedisableexcept(FE_INVALID | FE_OVERFLOW);
-        auto realism_config = ErForceSimulator::createIdealRealismConfig();
+        auto realism_config = ErForceSimulator::createDefaultRealismConfig();
         simulator = std::make_shared<ErForceSimulator>(TbotsProto::FieldType::DIV_B,
                                                        robot_constants, realism_config);
         simulator->resetCurrentTime();
@@ -310,7 +310,7 @@ TEST_F(ErForceSimulatorTest, yellow_robot_add_robots_and_change_position)
 TEST(ErForceSimulatorFieldTest, check_field_A_configuration)
 {
     RobotConstants_t robot_constants = create2021RobotConstants();
-    auto realism_config              = ErForceSimulator::createIdealRealismConfig();
+    auto realism_config              = ErForceSimulator::createDefaultRealismConfig();
     std::shared_ptr<ErForceSimulator> simulator = std::make_shared<ErForceSimulator>(
         TbotsProto::FieldType::DIV_A, robot_constants, realism_config);
     simulator->resetCurrentTime();
@@ -322,7 +322,7 @@ TEST(ErForceSimulatorFieldTest, check_field_A_configuration)
 TEST(ErForceSimulatorFieldTest, check_field_B_configuration)
 {
     RobotConstants_t robot_constants = create2021RobotConstants();
-    auto realism_config              = ErForceSimulator::createIdealRealismConfig();
+    auto realism_config              = ErForceSimulator::createDefaultRealismConfig();
     std::shared_ptr<ErForceSimulator> simulator = std::make_shared<ErForceSimulator>(
         TbotsProto::FieldType::DIV_B, robot_constants, realism_config);
     simulator->resetCurrentTime();
