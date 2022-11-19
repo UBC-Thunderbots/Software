@@ -35,6 +35,7 @@ py_library(
         "//software/thunderscope/common:common_widgets",
         "//software/thunderscope/common:proto_configuration_widget",
         "//software/thunderscope/common:proto_plotter",
+        "//software/thunderscope/cost_vis:cost_vis",
         "//software/thunderscope/field",
         "//software/thunderscope/field:field_layer",
         "//software/thunderscope/field:hrvo_layer",
