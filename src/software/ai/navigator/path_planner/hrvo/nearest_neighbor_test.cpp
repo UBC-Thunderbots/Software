@@ -4,8 +4,6 @@
 #include "software/geom/algorithms/distance.h"
 #include "software/test_util/test_util.h"
 #include "software/world/robot.h"
-#include "shared/constants.h"
-#include <random>
 #include <chrono>
 #include <include/gmock/gmock-matchers.h>
 
