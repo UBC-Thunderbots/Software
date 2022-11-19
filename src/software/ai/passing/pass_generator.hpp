@@ -89,6 +89,11 @@ class PassGenerator
     ZonePassMap<ZoneEnum> samplePasses(const World& world);
 
     /**
+     * Generates a new pass to each zone's centre and rates them to pass it to thunderscope
+     */
+    void sampleZoneCentrePasses(const World& world);
+
+    /**
      * Given a map of passes, runs a gradient descent optimizer to find
      * better passes.
      *
@@ -139,6 +144,7 @@ template <class ZoneEnum>
 PassEvaluation<ZoneEnum> PassGenerator<ZoneEnum>::generatePassEvaluation(
     const World& world)
 {
+    sampleZoneCentrePasses(world);
     auto generated_passes = samplePasses(world);
     if (current_best_passes_.empty())
     {
@@ -192,6 +198,31 @@ ZonePassMap<ZoneEnum> PassGenerator<ZoneEnum>::samplePasses(const World& world)
     }
 
     return passes;
+}
+
+template <class ZoneEnum>
+void PassGenerator<ZoneEnum>::sampleZoneCentrePasses(const World& world)
+{
+    ZonePassMap<ZoneEnum> passes;
+
+    // Sample a pass in each zone's centre
+    for (ZoneEnum zone_id : pitch_division_->getAllZoneIds())
+    {
+        auto zone = pitch_division_->getZone(zone_id);
+
+        auto pass =
+            Pass(world.ball().position(),
+                 pitch_division_->getZone(zone_id).centre(),
+                 passing_config_.max_pass_speed_m_per_s());
+
+        passes.emplace(
+            zone_id,
+            PassWithRating{pass, ratePass(world, pass, pitch_division_->getZone(zone_id),
+                                          passing_config_)});
+        
+        // std::cout << "Zone" << "centre pass: " << std::to_string(ratePass(world, pass, pitch_division_->getZone(zone_id), passing_config_)) << std::endl;
+        
+    }
 }
 
 template <class ZoneEnum>
