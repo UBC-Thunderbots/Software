@@ -122,29 +122,3 @@ TEST(NearestNeighborSearchTest, generic_frnn_brute_force_test) {
     std::cout << "max: " << max.count() << " nanoseconds" << std::endl;
     std::cout << "min: " << min.count() << " nanoseconds" << std::endl;
 }
-
-//INSTANTIATE_TEST_CASE_P(
-//        parameters,
-//        NearestNeighborSearchTest,
-//        ::testing::Values(
-//                std::make_tuple(
-//                        1.0, std::vector<Robot>{}
-//                ),
-//                std::make_tuple(
-//                        2.0, std::vector<Robot>{TestUtil::createRobotAtPos(Point(1, 1)),
-//                                              TestUtil::createRobotAtPos(Point(-1, -1))}
-//                ),
-//                std::make_tuple(
-//                        3.0, std::vector<Robot>{TestUtil::createRobotAtPos(Point(1, 1)),
-//                                              TestUtil::createRobotAtPos(Point(-1, -1)),
-//                                              TestUtil::createRobotAtPos(Point(-2, 2)),
-//                                              TestUtil::createRobotAtPos(Point(2, -2))}
-//                ),
-//                std::make_tuple(
-//                        5.0, std::vector<Robot>{TestUtil::createRobotAtPos(Point(1, 1)),
-//                                              TestUtil::createRobotAtPos(Point(-1, -1)),
-//                                              TestUtil::createRobotAtPos(Point(-2, 2)),
-//                                              TestUtil::createRobotAtPos(Point(2, -2)),
-//                                              TestUtil::createRobotAtPos(Point(-4, -3)),
-//                                              TestUtil::createRobotAtPos(Point(4, 3))}
-//                )));
