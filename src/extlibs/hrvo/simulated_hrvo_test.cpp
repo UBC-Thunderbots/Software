@@ -1,17 +1,13 @@
 #include <gtest/gtest.h>
 
-#include <chrono>
-#include <random>
 #include <utility>
 
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
-#include "software/geom/algorithms/distance.h"
 #include "software/simulated_tests/simulated_er_force_sim_play_test_fixture.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_stationary_in_polygon_validation.h"
 #include "software/simulated_tests/validation/validation_function.h"
 #include "software/test_util/test_util.h"
 #include "software/time/duration.h"
-#include "software/world/field.h"
 #include "software/world/world.h"
 
 class SimulatedHRVOTest : public SimulatedErForceSimPlayTestFixture

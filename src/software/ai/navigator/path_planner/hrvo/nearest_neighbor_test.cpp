@@ -70,7 +70,7 @@ TEST_F(NearestNeighborSearchTest, robot_on_edge_of_radius_test) {
     EXPECT_THAT(expected, ::testing::ContainerEq(agent_subset));
 }
 
-TEST(NearestNeighborSearchTest, generic_frnn_brute_force_test) {
+TEST_F(NearestNeighborSearchTest, generic_frnn_brute_force_test) {
     unsigned int iterations = 1000;
     unsigned int num_of_agents = DIV_A_NUM_ROBOTS * 2;
     unsigned int friendly_agents = DIV_A_NUM_ROBOTS;
