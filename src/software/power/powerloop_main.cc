@@ -39,7 +39,7 @@ std::shared_ptr<ControlExecutor> executor;
 
 void setup()
 {
-    Serial.begin(460800, SERIAL_8N1);
+    Serial.begin(460800, SERIAL_8N1, 19, 22);
     read_buffer_size = getMarshalledSize(
         TbotsProto_PowerPulseControl TbotsProto_PowerPulseControl_init_default);
     sequence_num = 0;
@@ -73,9 +73,9 @@ void loop()
     }
     // Read sensor values. These are all instantaneous
     auto status = createNanoPbPowerStatus(
-        monitor->getBatteryVoltage(), charger->getCapacitorVoltage(),
-        monitor->getCurrentDrawAmp(), geneva->getCurrentSlot(), sequence_num++,
-        chicker->getBreakBeamTripped());
+            monitor->getBatteryVoltage(), charger->getCapacitorVoltage(),
+       monitor->getCurrentDrawAmp(), geneva->getCurrentSlot(), sequence_num++,
+       chicker->getBreakBeamTripped());
     auto status_frame = createUartFrame(status);
     auto packet       = marshallUartPacket(status_frame);
     for (auto byte : packet)
