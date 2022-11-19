@@ -75,16 +75,16 @@ ErForceSimulator::ErForceSimulator(const TbotsProto::FieldType& field_type,
     this->resetCurrentTime();
 }
 
-std::unique_ptr<RealismConfigErForce> ErForceSimulator::createIdealRealismConfig()
+std::unique_ptr<RealismConfigErForce> ErForceSimulator::createDefaultRealismConfig()
 {
     auto realism_config = std::make_unique<RealismConfigErForce>();
     realism_config->set_stddev_ball_p(0);
     realism_config->set_stddev_robot_p(0);
     realism_config->set_stddev_robot_phi(0);
     realism_config->set_stddev_ball_area(0);
-    realism_config->set_enable_invisible_ball(false);
-    realism_config->set_ball_visibility_threshold(0);
-    realism_config->set_camera_overlap(0);
+    realism_config->set_enable_invisible_ball(true);
+    realism_config->set_ball_visibility_threshold(0.4f);
+    realism_config->set_camera_overlap(0.3f);
     realism_config->set_dribbler_ball_detections(0);
     realism_config->set_camera_position_error(0);
     realism_config->set_robot_command_loss(0);
