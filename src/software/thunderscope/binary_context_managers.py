@@ -540,7 +540,8 @@ class TigersAutoref(object):
 
     def __enter__(self):
         print("autoref enter")
-        self.thread = Thread(target=self.startAutoref)
+
+        self.thread = threading.Thread(target=self.startAutoref)
         self.thread.start();
         print("thread started")
 
@@ -548,7 +549,7 @@ class TigersAutoref(object):
 
     def startAutoref(self):
         print(os.getcwd())
-        os.chdir("software/simulation/tigers_autoref/")
+        os.chdir("/opt/tbotspython/autoref/")
         print(os.getcwd())
         autoref_cmd = "./run.sh -c -a"
         self.tigers_autoref_proc = Popen(autoref_cmd.split(" "))
