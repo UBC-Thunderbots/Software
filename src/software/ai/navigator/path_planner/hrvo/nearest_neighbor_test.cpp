@@ -40,7 +40,7 @@ TEST_F(NearestNeighborSearchTest, no_robot_within_radius) {
     double radius = 1.0;
     std::vector<Robot> expected{};
     std::vector<Robot> agent_subset = nearestNeighbours(agents[0], agents, radius, compare);
-    ASSERT_EQ(expected, agent_subset);
+    EXPECT_THAT(expected, agent_subset);
 }
 
 TEST_F(NearestNeighborSearchTest, two_robots_within_radius) {
