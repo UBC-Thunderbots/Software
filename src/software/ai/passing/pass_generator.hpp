@@ -223,8 +223,8 @@ void PassGenerator<ZoneEnum>::sampleZoneCentrePasses(const World& world)
         // std::cout << "Zone" << "centre pass: " << std::to_string(ratePass(world, pass, pitch_division_->getZone(zone_id), passing_config_)) << std::endl;
     }
 
-    double a = 0.7;
-    LOG(VISUALIZE) << createCostVisualization(a);
+    std::vector<double> a = {0.7, 0.1};
+    LOG(VISUALIZE) << *createCostVisualization(a);
 }
 
 template <class ZoneEnum>

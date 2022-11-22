@@ -349,7 +349,19 @@ std::unique_ptr<TbotsProto::PassVisualization> createPassVisualization(
     return pass_visualization_msg;
 }
 
-double createCostVisualization(double temp_num)
+std::unique_ptr<TbotsProto::CostVisualization> createCostVisualization(const std::vector<double>& temp_nums)
 {
-    return temp_num;
+    // make a CostVisualization object
+    auto cost_visualization_msg = std::make_unique<TbotsProto::CostVisualization>();
+
+    // add all numbers
+    double sum = 0.0;
+    for (const auto& num : temp_nums)
+    {
+        sum += num;
+        // add all nums
+        cost_visualization_msg->add_xyz(num);
+    }
+
+    return cost_visualization_msg;
 }

@@ -1,4 +1,6 @@
 import random
+import time
+import queue
 import numpy as np
 
 import pyqtgraph as pg
@@ -7,6 +9,8 @@ from proto.import_all_protos import *
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 class CostVisualizationWidget(QtWidgets.QMainWindow):
+
+    COST_VISUALIZATION_TIMEOUT_S = 0.5
 
     MIN_VAL = 0
     MAX_VAL = 1
@@ -18,6 +22,8 @@ class CostVisualizationWidget(QtWidgets.QMainWindow):
         self.cost_visualization_buffer = ThreadSafeBuffer(
             buffer_size, CostVisualization
         )
+        self.cached_cost_vis = CostVisualization()
+        self.timeout = time.time() + CostVisualizationWidget.COST_VISUALIZATION_TIMEOUT_S
 
         ## make pretty looping data
         frames = 200
@@ -49,6 +55,26 @@ class CostVisualizationWidget(QtWidgets.QMainWindow):
         self.imgLevels = (self.data.min(), self.data.max() * 2)
 
     def refresh(self):
+
+        try:
+            cost_vis = self.cost_visualization_buffer.queue.get_nowait()
+        except queue.Empty as empty:
+            cost_vis = None
+
+        if not cost_vis:
+            cost_vis = self.cached_cost_vis
+
+            # If we haven't received pass visualizations for a bit, clear the layer
+            if time.time() > self.timeout:
+                return
+        else:
+            # We received new pass data, so lets update our timeout
+            self.timeout = time.time() + CostVisualizationWidget.COST_VISUALIZATION_TIMEOUT_S
+            self.cached_cost_vis = cost_vis
+        
+        print(cost_vis)
+
+
         self.ptr = (self.ptr + 1) % self.data.shape[0]
         self.img.setImage(self.data[self.ptr])
         for c in self.curves:

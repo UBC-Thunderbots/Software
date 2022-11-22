@@ -128,4 +128,4 @@ std::unique_ptr<TbotsProto::PassVisualization> createPassVisualization(
 
 
 // testing right now
-double createCostVisualization(double temp_num);
+std::unique_ptr<TbotsProto::CostVisualization> createCostVisualization(const std::vector<double>& temp_nums);
