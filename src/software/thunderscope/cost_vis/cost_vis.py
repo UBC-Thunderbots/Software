@@ -3,6 +3,8 @@ import numpy as np
 
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtWidgets, mkQApp, QtCore
+from proto.import_all_protos import *
+from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 class CostVisualizationWidget(QtWidgets.QMainWindow):
 
@@ -13,6 +15,9 @@ class CostVisualizationWidget(QtWidgets.QMainWindow):
 
     def __init__(self, buffer_size=5):
         super(CostVisualizationWidget, self).__init__()
+        self.cost_visualization_buffer = ThreadSafeBuffer(
+            buffer_size, CostVisualization
+        )
 
         ## make pretty looping data
         frames = 200

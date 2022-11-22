@@ -681,7 +681,8 @@ class Thunderscope(object):
         :returns: The cost visualization widget
 
         """
-        cost_vis_widget = CostVisualizationWidget(proto_unix_io)
+        cost_vis_widget = CostVisualizationWidget()
+        proto_unix_io.register_observer(CostVisualization, cost_vis_widget.cost_visualization_buffer)
         self.register_refresh_function(cost_vis_widget.refresh)
         return cost_vis_widget
 

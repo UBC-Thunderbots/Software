@@ -33,3 +33,8 @@ message HRVOVisualization
     repeated VelocityObstacle velocity_obstacles = 2;
     repeated Circle robots                       = 3;
 }
+
+message CostVisualization
+{
+    repeated double xyz = 1;
+}

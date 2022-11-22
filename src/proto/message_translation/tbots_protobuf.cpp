@@ -348,3 +348,8 @@ std::unique_ptr<TbotsProto::PassVisualization> createPassVisualization(
     }
     return pass_visualization_msg;
 }
+
+double createCostVisualization(double temp_num)
+{
+    return temp_num;
+}

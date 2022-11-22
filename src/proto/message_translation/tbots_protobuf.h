@@ -125,3 +125,7 @@ BallState createBallState(const TbotsProto::BallState ball_state);
  */
 std::unique_ptr<TbotsProto::PassVisualization> createPassVisualization(
     const std::vector<PassWithRating>& passes_with_rating);
+
+
+// testing right now
+double createCostVisualization(double temp_num);
