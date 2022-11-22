@@ -36,5 +36,7 @@ message HRVOVisualization
 
 message CostVisualization
 {
-    repeated double xyz = 1;
+    repeated double pass_cost = 1;
+    uint32 num_rows           = 2;
+    uint32 num_cols           = 3;
 }

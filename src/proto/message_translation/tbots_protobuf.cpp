@@ -349,18 +349,16 @@ std::unique_ptr<TbotsProto::PassVisualization> createPassVisualization(
     return pass_visualization_msg;
 }
 
-std::unique_ptr<TbotsProto::CostVisualization> createCostVisualization(const std::vector<double>& temp_nums)
+std::unique_ptr<TbotsProto::CostVisualization> createCostVisualization(const std::vector<double>& ratings, int num_rows)
 {
     // make a CostVisualization object
     auto cost_visualization_msg = std::make_unique<TbotsProto::CostVisualization>();
+    cost_visualization_msg->set_num_rows(num_rows);
+    cost_visualization_msg->set_num_cols(ratings.size() / num_rows);
 
-    // add all numbers
-    double sum = 0.0;
-    for (const auto& num : temp_nums)
+    for (const auto& num : ratings)
     {
-        sum += num;
-        // add all nums
-        cost_visualization_msg->add_xyz(num);
+        cost_visualization_msg->add_pass_cost(num);
     }
 
     return cost_visualization_msg;

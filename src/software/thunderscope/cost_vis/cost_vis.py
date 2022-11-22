@@ -54,8 +54,9 @@ class CostVisualizationWidget(QtWidgets.QMainWindow):
         self.ptr = 0
         self.imgLevels = (self.data.min(), self.data.max() * 2)
 
-    def refresh(self):
+        self.data_ = [0.0, 0.0, 0.0]
 
+    def refresh(self):
         try:
             cost_vis = self.cost_visualization_buffer.queue.get_nowait()
         except queue.Empty as empty:
@@ -72,8 +73,9 @@ class CostVisualizationWidget(QtWidgets.QMainWindow):
             self.timeout = time.time() + CostVisualizationWidget.COST_VISUALIZATION_TIMEOUT_S
             self.cached_cost_vis = cost_vis
         
-        print(cost_vis)
-
+        for i in range(cost_vis.num_rows):
+            for j in range(cost_vis.num_cols):
+                self.data_[i] = cost_vis.pass_cost[i*cost_vis.num_cols : (i+1)*cost_vis.num_cols]
 
         self.ptr = (self.ptr + 1) % self.data.shape[0]
         self.img.setImage(self.data[self.ptr])

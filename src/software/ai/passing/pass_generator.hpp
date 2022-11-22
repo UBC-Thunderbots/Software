@@ -203,7 +203,11 @@ ZonePassMap<ZoneEnum> PassGenerator<ZoneEnum>::samplePasses(const World& world)
 template <class ZoneEnum>
 void PassGenerator<ZoneEnum>::sampleZoneCentrePasses(const World& world)
 {
+    // row and col count to pass to Python
+    // number of col 
+    int NUM_ROWS = 3;
     ZonePassMap<ZoneEnum> passes;
+    std::vector<double> pass_costs;
 
     // Sample a pass in each zone's centre
     for (ZoneEnum zone_id : pitch_division_->getAllZoneIds())
@@ -215,16 +219,19 @@ void PassGenerator<ZoneEnum>::sampleZoneCentrePasses(const World& world)
                  pitch_division_->getZone(zone_id).centre(),
                  passing_config_.max_pass_speed_m_per_s());
 
+        double rating = ratePass(world, pass, pitch_division_->getZone(zone_id), passing_config_);
+
         passes.emplace(
             zone_id,
-            PassWithRating{pass, ratePass(world, pass, pitch_division_->getZone(zone_id),
-                                          passing_config_)});
+            PassWithRating{pass, rating});
+
+        // add the pass cost to the vector
+        pass_costs.push_back(rating);
         
-        // std::cout << "Zone" << "centre pass: " << std::to_string(ratePass(world, pass, pitch_division_->getZone(zone_id), passing_config_)) << std::endl;
+        // std::cout << "C++: Zone" << "centre pass: " << std::to_string(rating) << std::endl;
     }
 
-    std::vector<double> a = {0.7, 0.1};
-    LOG(VISUALIZE) << *createCostVisualization(a);
+    LOG(VISUALIZE) << *createCostVisualization(pass_costs, NUM_ROWS);
 }
 
 template <class ZoneEnum>
