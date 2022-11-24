@@ -103,7 +103,8 @@ if __name__ == "__main__":
         action="store_true",
         help="Run full system as the yellow team, over WiFi; estop required",
     )
-    group.add_argument(
+
+    parser.add_argument(
         "--run_diagnostics",
         action="store_true",
         help="Run robots diagnostics for Manual or Xbox control; estop required"
