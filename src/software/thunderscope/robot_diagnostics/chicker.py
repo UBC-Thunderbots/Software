@@ -173,8 +173,12 @@ class ChickerWidget(QWidget):
         # sends kick, chip, autokick, or autchip primitive
         if command == ChickerCommandMode.KICK:
             power_control.chicker.kick_speed_m_per_s = power_value
+            self.proto_unix_io.send_proto(PowerControl, power_control)
+            power_control.chicker.kick_speed_m_per_s = 0
         elif command == ChickerCommandMode.CHIP:
             power_control.chicker.chip_distance_meters = power_value
+            self.proto_unix_io.send_proto(PowerControl, power_control)
+            power_control.chicker.chip_distance_meters = 0
         elif command == ChickerCommandMode.AUTOKICK:
             power_control.chicker.auto_chip_or_kick.autokick_speed_m_per_s = power_value
         elif command == ChickerCommandMode.AUTOCHIP:
