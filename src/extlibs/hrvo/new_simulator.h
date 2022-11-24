@@ -12,13 +12,79 @@
 #include "software/world/world.h"
 
 
-class new_simulator {
-    // List of agents (robots) in this simulation
-    std::vector<std::shared_ptr<Agent>> agents;
+class HRVOSimulatorNew {
+public:
+    /**
+     * Constructor
+     * @param time_step The time step between each step of the simulator
+     * @param robot_constants The robot constants to be used for all Agents representing a
+     * robot
+     * @param friendly_team_colour The colour of the friendly team
+     */
+    explicit HRVOSimulatorNew(float time_step, const RobotConstants_t &robot_constants,
+                           const TeamColour friendly_team_colour);
 
-    // robot id to agent index
-    std::map<unsigned int, unsigned int> friendly_robot_id_map;
-    std::map<unsigned int, unsigned int> enemy_robot_id_map;
+    /**
+     * Reset all agents to match the state of the given world.
+     * Friendly robots will use the Hybrid Reciprocal algorithm to traverse.
+     * Enemy robots will go directly towards their goal without trying to avoid any
+     * obstacles
+     *
+     * @param world The world which the simulation should be based upon
+     */
+    void updateWorld(const World &world);
+
+    /**
+     * Reset all friendly agents goal points to match the path of the given primitive set
+     *
+     * @param new_primitive_set
+     */
+    void updatePrimitiveSet(const TbotsProto::PrimitiveSet &new_primitive_set);
+
+    // comment
+    void doStep();
+    void computeNeighbors(const HRVOAgent &agent);
+
+private:
+
+    /**
+     *      Adds a new Hybrid Reciprocal Agent to the simulation based on Robot.
+     *
+     * @param robot    The robot which this agent should be based on
+     * @param type     Whether this robot is FRIENDLY or ENEMY
+     *
+     * @return    The index of the agent.
+     */
+    std::size_t addHRVORobotAgent(const Robot &robot, TeamSide type);
+
+    /**
+     *      Adds a new Linear Velocity Agent to the simulation based on Robot.
+     *
+     * @param robot       	The robot which this agent should be based on
+     * @param destination 	Destination for this robot
+     * @param type 		Whether this robot is FRIENDLY or ENEMY
+     * @return    The index of the agent.
+     */
+    std::size_t addLinearVelocityRobotAgent(const Robot &robot, const Vector &destination,
+                                            TeamSide type);
+
+    // PrimitiveSet which includes the path which each friendly robot should take
+    TbotsProto::PrimitiveSet primitive_set;
+
+    // Latest World which the simulator has received
+    std::optional<World> world;
+
+    // The robot constants which all agents will use
+    RobotConstants_t robot_constants;
+
+    // The colour of the friendly team
+    const TeamColour friendly_team_colour;
+    // will be removed
+    // KdTree used to calculate the K nearest agents
+    std::unique_ptr<KdTree> kd_tree;
+
+    // List of agents (robots) in this simulation
+    std::vector<Agent> agents;
 
     // The max amount (meters) which the friendly/enemy robot radius can increase by.
     // This scale is used to avoid close encounters, and reduce chance of collision.

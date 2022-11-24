@@ -69,10 +69,10 @@ class HRVOAgent : public Agent
      * @param robot_id		 	    The robot id for this agent.
      * @param type		 		    The side that this agent is on (friendly/enemy).
      */
-    HRVOAgent(const Vector &position, float neighbor_dist,
+    HRVOAgent(const Vector &position, float max_neighbor_dist,
               std::size_t max_neighbors, float radius, float max_radius_inflation,
-              const Vector &velocity, float max_accel, AgentPath &path, float pref_speed,
-              float max_speed, robot_Id, type);
+              const Vector &velocity, float max_accel, AgentPath &path,
+              float max_speed, RobotId robot_Id, TeamSide type);
 
     /**
      * Computes the new velocity of this agent.
@@ -231,16 +231,20 @@ class HRVOAgent : public Agent
 
    public:
     float pref_speed_;
-
+    // remove
     std::size_t max_neighbors_;
+    // move to simulator, dynamic based on speed
     float max_neighbor_dist;
-    float uncertainty_offset_;
+    // calcualte and return, should be local var
     std::multimap<float, Candidate> candidates_;
     // distance -> Agent Index
+    // caluclated by simulator
     std::set<std::pair<float, std::size_t>> neighbors_;
+    // getter, private
     std::vector<VelocityObstacle> velocity_obstacles_;
     std::vector<ObstaclePtr> static_obstacles;
     std::optional<ObstaclePtr> ball_obstacle;
+    // feels like it doesn;t belong
     RobotNavigationObstacleFactory obstacle_factory;
 
     // TODO (#2519): Remove magic numbers

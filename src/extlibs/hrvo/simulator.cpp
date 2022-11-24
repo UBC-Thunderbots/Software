@@ -258,7 +258,7 @@ void HRVOSimulator::doStep()
     // Compute what velocity each agent will take next
     for (auto &agent : agents)
     {
-        agent->computeNewVelocity(time_step, agents);
+        agent->computeNewVelocity(time_step);
     }
 
     // Update the positions of all agents given their velocity
@@ -315,7 +315,6 @@ void HRVOSimulator::visualize(unsigned int robot_id) const
             friendly_agent->ball_obstacle.value()->createObstacleProto().circle()[0];
         *(hrvo_visualization.add_robots()) = ball_circle;
     }
-
     if (friendly_team_colour == TeamColour::YELLOW)
     {
         LOG(VISUALIZE, YELLOW_HRVO_PATH) << hrvo_visualization;

@@ -6,6 +6,8 @@
 #include "software/geom/vector.h"
 #include "software/world/robot_state.h"
 #include "software/world/team_types.h"
+#include "extlibs/hrvo/agent_type.h"
+#include "extlibs/hrvo/agent_visitor.h"
 
 class HRVOSimulator;
 
@@ -40,7 +42,7 @@ class Agent
     /**
      * Computes the new velocity of this agent.
      */
-    virtual void computeNewVelocity(double time_step) = 0;
+    virtual void computeNewVelocity(std::vector<std::shared_ptr<Agent>> &agents, double time_step) = 0;
 
     /**
      * Create the velocity obstacle which other_agent should see for this Agent
@@ -173,6 +175,7 @@ class Agent
     TeamSide getAgentType();
 
    protected:
+    // TODO use RobotState instead
     // Agent Properties
     Vector position_;
     // This agent's current actual radius
@@ -184,8 +187,10 @@ class Agent
 
     // The actual current velocity of this Agent
     Vector velocity_;
+    // REMOVE
     // The requested new velocity of this Agent
     Vector new_velocity_;
+    // REMOVE: Return these values from the associated func instead
     // The desired new speed of this Agent
     // NOTE: HRVO algorithm will try to pick this speed, however, it may pick a different
     // speed to avoid collisions.
@@ -197,8 +202,9 @@ class Agent
     RobotId robot_id;
     // whether this Agent is FRIENDLY or ENEMY
     TeamSide agent_type;
+    // TODO private, const, underscored mfs
+    //remove depending on simulator impl
 
-    float max_speed_;
-    float max_accel_;
-    bool reached_goal_;
+    const float max_speed_;
+    const float max_accel_;
 };

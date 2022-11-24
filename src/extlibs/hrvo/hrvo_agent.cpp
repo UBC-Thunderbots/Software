@@ -44,8 +44,7 @@
 HRVOAgent::HRVOAgent(const Vector &position, float neighbor_dist,
                      std::size_t max_neighbors, float radius, float max_radius_inflation,
                      const Vector &velocity, float max_accel, AgentPath &path,
-                     float max_speed,
-                     RobotId robot_id, TeamSide type)
+                     float max_speed, RobotId robot_id, TeamSide type)
     : Agent(position, radius, max_radius_inflation, velocity, velocity,
             max_speed, max_accel, path, robot_id, type),
       max_neighbors_(max_neighbors),
@@ -110,14 +109,6 @@ void HRVOAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive,
         }
     }
     setPath(path);
-}
-
-void HRVOAgent::computeNeighbors(double neighbor_dist_threshold)
-{
-    // Re-calculate all agents (neighbors) within the distance threshold
-    // which we want to create velocity obstacles for
-    neighbors_.clear();
-    simulator_->getKdTree()->query(this, neighbor_dist_threshold);
 }
 
 void HRVOAgent::computeVelocityObstacles()
@@ -224,9 +215,9 @@ VelocityObstacle HRVOAgent::createVelocityObstacle(const Agent &other_agent)
 
 void HRVOAgent::computeNewVelocity(double time_step)
 {
-    const auto agents;
     // Based on The Hybrid Reciprocal Velocity Obstacle paper:
     // https://gamma.cs.unc.edu/HRVO/HRVO-T-RO.pdf
+    // these should return values instead of set fields
     computePreferredVelocity(time_step);
     computeVelocityObstacles();
 
@@ -612,7 +603,7 @@ void HRVOAgent::computePreferredVelocity(double time_step)
         float curr_pref_speed =
             std::min(static_cast<double>(pref_speed_),
                      //
-                     velocity_.length() + max_accel_ * simulator_->getTimeStep());
+                     velocity_.length() + max_accel_ * time_step);
         pref_velocity_ = dist_vector_to_goal.normalize(curr_pref_speed);
     }
 }

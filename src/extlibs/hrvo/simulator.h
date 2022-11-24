@@ -285,19 +285,19 @@ class HRVOSimulator
 
     // The robot constants which all agents will use
     RobotConstants_t robot_constants;
-
+    // dont need
     // The global time of this hrvo simulation
     float global_time;
-
+    // dont need
     // The amount of time which the simulator should advance by
     const float time_step;
-
+    // don;t need
     // True if all agents have reached their destination
     bool reached_goals;
 
     // The colour of the friendly team
     const TeamColour friendly_team_colour;
-
+    // don't need, will be replaced
     // KdTree used to calculate the K nearest agents
     std::unique_ptr<KdTree> kd_tree;
 

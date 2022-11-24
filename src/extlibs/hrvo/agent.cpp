@@ -5,7 +5,7 @@
 
 Agent::Agent(const Vector &position, float radius,
              float max_radius_inflation, const Vector &velocity,
-             const Vector &prefVelocity, float maxSpeed, float maxAccel, AgentPath &path,
+             const Vector &pref_velocity, float max_speed, float max_accel, AgentPath &path,
              unsigned int robot_id, TeamSide type)
     : position_(position),
       min_radius_(radius),
