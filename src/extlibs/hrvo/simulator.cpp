@@ -46,13 +46,12 @@
 HRVOSimulator::HRVOSimulator(float time_step, const RobotConstants_t &robot_constants,
                              const TeamColour friendly_team_colour)
     : primitive_set(),
-      add_ball_agent(false),
-      ball_agent_id(-1),
       robot_constants(robot_constants),
       global_time(0.0f),
       time_step(time_step),
       reached_goals(false),
       kd_tree(std::make_unique<KdTree>(this)),
+      world(std::nullopt),
       agents(),
       friendly_robot_id_map(),
       enemy_robot_id_map(),
@@ -62,6 +61,7 @@ HRVOSimulator::HRVOSimulator(float time_step, const RobotConstants_t &robot_cons
 
 void HRVOSimulator::updateWorld(const World &world)
 {
+    this->world               = world;
     const auto &friendly_team = world.friendlyTeam().getAllRobots();
     const auto &enemy_team    = world.enemyTeam().getAllRobots();
     // TODO (#2498): Update implementation to correctly support adding and removing agents
@@ -133,84 +133,19 @@ void HRVOSimulator::updateWorld(const World &world)
             }
         }
     }
-
-    // TODO (#2498): Dynamically add and remove the ball as an Agent, and if needed
-    //               update its radius based on the PrimitiveSet
-    if (add_ball_agent)
-    {
-        if (ball_agent_id == -1)
-        {
-            // Ball should be treated as an agent (obstacle)
-            const Ball &ball = world.ball();
-            Vector position(ball.position().x(), ball.position().y());
-            Vector velocity(ball.velocity().x(), ball.velocity().y());
-            Vector goal_pos    = position + 100 * velocity;
-            float acceleration = ball.acceleration().length();
-            // Minimum of 0.5-meter distance away from the ball, if the ball is an
-            // obstacle
-            float ball_radius = 0.5f + BALL_AGENT_RADIUS_OFFSET;
-
-            AgentPath path          = AgentPath({PathPoint(goal_pos, 0.0f)}, 0.1f);
-            std::size_t agent_index = addLinearVelocityAgent(
-                position, ball_radius, ENEMY_ROBOT_RADIUS_MAX_INFLATION, velocity,
-                velocity.length(), acceleration, path);
-            ball_agent_id = agent_index;
-        }
-        else
-        {
-            Point position = world.ball().position();
-            agents[ball_agent_id]->setPosition(position.toVector());
-        }
-    }
-    else if (ball_agent_id != -1)
-    {
-        agents[ball_agent_id]->setRadius(0.f);
-    }
 }
 
 void HRVOSimulator::updatePrimitiveSet(const TbotsProto::PrimitiveSet &new_primitive_set)
 {
     primitive_set = new_primitive_set;
 
-    // TODO (#2498): Dynamically add and remove the ball as an Agent, and if needed
-    //               update its radius based on the PrimitiveSet
-    add_ball_agent = primitive_set.stay_away_from_ball();
-
-    // Update all friendly agent's goal points based on the matching robot's primitive
+    // Update all friendly agent's primitives
     for (auto &[robot_id, primitive] : primitive_set.robot_primitives())
     {
         auto hrvo_agent_opt = getFriendlyAgentFromRobotId(robot_id);
-        if (hrvo_agent_opt.has_value())
+        if (hrvo_agent_opt.has_value() && world.has_value())
         {
-            auto hrvo_agent = hrvo_agent_opt.value();
-            AgentPath path;
-
-            if (primitive.has_move())
-            {
-                float speed_at_dest = primitive.move().final_speed_m_per_s();
-                float new_max_speed = primitive.move().max_speed_m_per_s();
-                hrvo_agent->setMaxSpeed(new_max_speed);
-                hrvo_agent->setPreferredSpeed(new_max_speed * PREF_SPEED_SCALE);
-
-                // TODO (#2418): Update implementation of Primitive to support
-                // multiple path points and remove this check
-                CHECK(primitive.move().motion_control().path().points().size() >= 2)
-                    << "Empty path: "
-                    << primitive.move().motion_control().path().points().size()
-                    << std::endl;
-                auto destination =
-                    primitive.move().motion_control().path().points().at(1);
-
-                // Max distance which the robot can travel in one time step + scaling
-                float path_radius =
-                    (hrvo_agent->getMaxSpeed() * time_step) / 2 * GOAL_RADIUS_SCALE;
-                path = AgentPath(
-                    {PathPoint(Vector(destination.x_meters(), destination.y_meters()),
-                               speed_at_dest)},
-                    path_radius);
-            }
-
-            hrvo_agent->setPath(path);
+            hrvo_agent_opt.value()->updatePrimitive(primitive, world.value());
         }
     }
 }
@@ -219,9 +154,8 @@ std::size_t HRVOSimulator::addHRVORobotAgent(const Robot &robot)
 {
     Vector position = robot.position().toVector();
     Vector velocity;
-    float max_accel  = 1e-4;
-    float pref_speed = 1e-4;
-    float max_speed  = 1e-4;
+    float max_accel = 1e-4;
+    float max_speed = 1e-4;
 
     const std::set<RobotCapability> &unavailable_capabilities =
         robot.getUnavailableCapabilities();
@@ -229,11 +163,10 @@ std::size_t HRVOSimulator::addHRVORobotAgent(const Robot &robot)
                     unavailable_capabilities.end();
     if (can_move)
     {
-        velocity   = Vector(static_cast<float>(robot.velocity().x()),
+        velocity  = Vector(static_cast<float>(robot.velocity().x()),
                           static_cast<float>(robot.velocity().y()));
-        max_accel  = robot_constants.robot_max_acceleration_m_per_s_2;
-        max_speed  = robot_constants.robot_max_speed_m_per_s;
-        pref_speed = max_speed * PREF_SPEED_SCALE;
+        max_accel = robot_constants.robot_max_acceleration_m_per_s_2;
+        max_speed = robot_constants.robot_max_speed_m_per_s;
     }
 
     // TODO (#2418): Replace destination point with a list of path points
@@ -268,16 +201,14 @@ std::size_t HRVOSimulator::addHRVORobotAgent(const Robot &robot)
     }
 
     // Max distance which the robot can travel in one time step + scaling
-    float path_radius        = (max_speed * time_step) / 2 * GOAL_RADIUS_SCALE;
-    float uncertainty_offset = 0.f;
+    float path_radius = (max_speed * time_step) / 2;
 
     AgentPath path =
         AgentPath({PathPoint(destination_point, speed_at_goal)}, path_radius);
 
     return addHRVOAgent(position, ROBOT_MAX_RADIUS_METERS,
                         FRIENDLY_ROBOT_RADIUS_MAX_INFLATION, velocity, max_speed,
-                        pref_speed, max_accel, path, MAX_NEIGHBOR_SEARCH_DIST,
-                        MAX_NEIGHBORS, uncertainty_offset);
+                        max_accel, path, MAX_NEIGHBOR_SEARCH_DIST, MAX_NEIGHBORS);
 }
 
 std::size_t HRVOSimulator::addLinearVelocityRobotAgent(const Robot &robot,
@@ -290,7 +221,7 @@ std::size_t HRVOSimulator::addLinearVelocityRobotAgent(const Robot &robot,
     float max_speed = robot_constants.robot_max_speed_m_per_s;
 
     // Max distance which the robot can travel in one time step + scaling
-    float path_radius = (max_speed * time_step) / 2 * GOAL_RADIUS_SCALE;
+    float path_radius = (max_speed * time_step) / 2;
 
     AgentPath path = AgentPath({PathPoint(destination, 0.0f)}, path_radius);
     return addLinearVelocityAgent(position, ROBOT_MAX_RADIUS_METERS,
@@ -301,14 +232,13 @@ std::size_t HRVOSimulator::addLinearVelocityRobotAgent(const Robot &robot,
 std::size_t HRVOSimulator::addHRVOAgent(const Vector &position, float agent_radius,
                                         float max_radius_inflation,
                                         const Vector &curr_velocity, float max_speed,
-                                        float pref_speed, float max_accel,
-                                        AgentPath &path, float neighbor_dist,
-                                        std::size_t max_neighbors,
-                                        float uncertainty_offset)
+                                        float max_accel, AgentPath &path,
+                                        float max_neighbor_dist,
+                                        std::size_t max_neighbors)
 {
     std::shared_ptr<HRVOAgent> agent = std::make_shared<HRVOAgent>(
-        this, position, neighbor_dist, max_neighbors, agent_radius, max_radius_inflation,
-        curr_velocity, max_accel, path, pref_speed, max_speed, uncertainty_offset);
+        this, position, max_neighbor_dist, max_neighbors, agent_radius,
+        max_radius_inflation, curr_velocity, max_accel, path, max_speed);
     agents.push_back(std::move(agent));
     return agents.size() - 1;
 }
@@ -394,15 +324,25 @@ void HRVOSimulator::visualize(unsigned int robot_id) const
     TbotsProto::HRVOVisualization hrvo_visualization;
     hrvo_visualization.set_robot_id(robot_id);
 
-    auto vo_protos = friendly_agent_opt.value()->getVelocityObstaclesAsProto();
+    auto friendly_agent = friendly_agent_opt.value();
+    auto vo_protos      = friendly_agent->getVelocityObstaclesAsProto();
     *(hrvo_visualization.mutable_velocity_obstacles()) = {vo_protos.begin(),
                                                           vo_protos.end()};
 
+    // Visualize all agents
     for (const auto &agent : agents)
     {
         Point position(agent->getPosition());
         *(hrvo_visualization.add_robots()) =
             *createCircleProto(Circle(position, agent->getRadius()));
+    }
+
+    // Visualize the ball obstacle
+    if (friendly_agent->ball_obstacle.has_value())
+    {
+        TbotsProto::Circle ball_circle =
+            friendly_agent->ball_obstacle.value()->createObstacleProto().circle()[0];
+        *(hrvo_visualization.add_robots()) = ball_circle;
     }
 
     if (friendly_team_colour == TeamColour::YELLOW)

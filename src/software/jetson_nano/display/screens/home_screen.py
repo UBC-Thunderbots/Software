@@ -19,18 +19,17 @@ class HomeScreen(Screen):
         @param redis_dict, a dict of values from redis client to init variables on this screen
         @param screen_actions, an instance of ScreenActions class
         """
-        # TODO(#2728): Replace key strings with values from constants
         actions = [
             {
-                "redis key": "/robot_id",
-                "value": redis_dict["/robot_id"],
+                "redis key": ROBOT_ID_REDIS_KEY,
+                "value": redis_dict[ROBOT_ID_REDIS_KEY],
                 "type": float,
                 "delta": 1,
                 "screen action": screen_actions.EDIT_SCREEN,
             },
             {
-                "redis key": "/channel_id",
-                "value": redis_dict["/channel_id"],
+                "redis key": ROBOT_MULTICAST_CHANNEL_REDIS_KEY,
+                "value": redis_dict[ROBOT_MULTICAST_CHANNEL_REDIS_KEY],
                 "type": float,
                 "delta": 1,
                 "screen action": screen_actions.EDIT_SCREEN,

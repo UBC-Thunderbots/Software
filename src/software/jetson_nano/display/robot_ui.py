@@ -13,6 +13,7 @@ from threading import Thread
 from software.jetson_nano.display.rotary_encoder.rotary_encoder import RotaryEncoder
 from software.jetson_nano.display.screens.home_screen import HomeScreen
 import software.jetson_nano.display.constants as constants
+from software.py_constants import *
 
 # Pins for Rotary Encoder
 BUTTON_PIN = constants.BUTTON_PIN
@@ -30,13 +31,12 @@ class ScreenActions:
 screen_actions = ScreenActions()
 
 # These are the keys for the redis dicationary
-# TODO(#2728): Replace key strings with values from constants
 redis_keys = [
-    "/robot_id",
-    "/channel_id",
-    "/battery_voltage",
-    "/cap_voltage",
-    "/current_draw",
+    ROBOT_ID_REDIS_KEY,
+    ROBOT_MULTICAST_CHANNEL_REDIS_KEY,
+    ROBOT_BATTERY_VOLTAGE_REDIS_KEY,
+    ROBOT_CAPACITOR_VOLTAGE_REDIS_KEY,
+    ROBOT_CURRENT_DRAW_REDIS_KEY,
 ]
 
 

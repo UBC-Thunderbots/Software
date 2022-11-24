@@ -49,6 +49,7 @@ const std::string ROBOT_KICK_CONSTANT_REDIS_KEY     = "/kick_constant";
 const std::string ROBOT_CHIP_PULSE_WIDTH_REDIS_KEY  = "/chip_pulse_width";
 const std::string ROBOT_CURRENT_DRAW_REDIS_KEY      = "/current_draw";
 const std::string ROBOT_BATTERY_VOLTAGE_REDIS_KEY   = "/battery_voltage";
+const std::string ROBOT_CAPACITOR_VOLTAGE_REDIS_KEY = "/cap_voltage";
 
 const std::string SSL_VISION_ADDRESS          = "224.5.23.2";
 static constexpr unsigned int SSL_VISION_PORT = 10020;
