@@ -36,6 +36,8 @@ class ChickerWidget(QWidget):
         self.radio_buttons_group = QButtonGroup()
         self.proto_unix_io = proto_unix_io
 
+        # Initialising the buttons
+
         # push button group box
         self.push_button_box, self.push_buttons = common_widgets.create_button(
             ["Kick", "Chip"]
@@ -53,23 +55,35 @@ class ChickerWidget(QWidget):
         self.auto_kick_button = self.radio_buttons[1]
         self.auto_chip_button = self.radio_buttons[2]
 
+        # set buttons to be initially enabled
+        self.kick_chip_buttons_enable = True
+
+        # indicating that no auto button is selected by default
+        self.no_auto_button.setChecked(True)
+        self.no_auto_selected = True
+
         # adding onclick functions for buttons
 
-        # kick button and chip button connected to respective functions
-        self.kick_button.clicked.connect(self.kick_clicked)
-        self.chip_button.clicked.connect(self.chip_clicked)
+        # kick button and chip button connected to send_command_and_timeout with their respective commands
+        self.kick_button.clicked.connect(
+            lambda: self.send_command_and_timeout(ChickerCommandMode.KICK)
+        )
+        self.chip_button.clicked.connect(
+            lambda: self.send_command_and_timeout(ChickerCommandMode.CHIP)
+        )
 
         # no auto button enables both buttons, while auto kick and auto chip disable both buttons
-        self.no_auto_button.toggled.connect(self.enable_kick_chip_button)
-        self.auto_kick_button.toggled.connect(self.disable_kick_chip_button)
-        self.auto_chip_button.toggled.connect(self.disable_kick_chip_button)
+        self.no_auto_button.toggled.connect(
+            lambda: self.set_should_enable_buttons(True)
+        )
+        self.auto_kick_button.toggled.connect(
+            lambda: self.set_should_enable_buttons(False)
+        )
+        self.auto_chip_button.toggled.connect(
+            lambda: self.set_should_enable_buttons(False)
+        )
 
         vbox_layout.addWidget(self.radio_button_box)
-        self.no_auto_button.setChecked(True)
-
-        # set buttons to be initially enabled
-        self.kick_button_enable = True
-        self.chip_button_enable = True
 
         # sliders
         (
@@ -83,9 +97,7 @@ class ChickerWidget(QWidget):
             self.power_slider_layout,
             self.power_slider,
             self.power_label,
-        ) = common_widgets.create_slider(
-            "Power (m/s) (Chipper power is fixed)", 1, 10, 1
-        )
+        ) = common_widgets.create_slider("Power", 1, 10, 1)
         vbox_layout.addLayout(self.power_slider_layout)
 
         self.setLayout(vbox_layout)
@@ -97,54 +109,50 @@ class ChickerWidget(QWidget):
         self.geneva_value = 3
         self.power_value = 1
 
-    def kick_clicked(self):
-        # if button is enabled
-        if self.kick_button_enable:
-            # send kick primitive
-            self.send_command(ChickerCommandMode.KICK)
-            self.toggle_kick_button()
-
-            # set and start timer to re-enable kick button after 3 seconds
-            self.start_timer_once(self.toggle_kick_button, 3 * MILLISECONDS_PER_SECOND)
-
-    def chip_clicked(self):
-        # if button is enabled
-        if self.chip_button_enable:
-            # send chip primitive
-            self.send_command(ChickerCommandMode.CHIP)
-            self.toggle_chip_button()
-
-            # set and start timer to re-enable chip button after 3 seconds
-            self.start_timer_once(self.toggle_chip_button, 3 * MILLISECONDS_PER_SECOND)
-
-    def start_timer_once(self, function, duration):
-        """Starts a QTimer to call the given function once after the given duration
-
-        :param function: function to call after duration
-        :param duration: duration to call function after
-        :returns: None
-
+    def send_command_and_timeout(self, command):
         """
+        If buttons are enabled, sends a Kick command and disables buttons
 
-        timer = QTimer(self)
-        timer.setTimerType(Qt.TimerType.PreciseTimer)
-        timer.timeout.connect(function)
-        timer.setSingleShot(True)
-        timer.start(duration)
+        Attaches a callback to re-enable buttons after 3 seconds
 
-    def toggle_kick_button(self):
-        self.kick_button_enable = not self.kick_button_enable
+        :param command: Command to send. One of ChickerCommandMode.KICK or ChickerCommandMode.CHIP
+        """
+        # if button is enabled
+        if self.kick_chip_buttons_enable:
+            # send kick primitive
+            self.send_command(command)
+            self.disable_kick_chip_buttons()
 
-    def toggle_chip_button(self):
-        self.chip_button_enable = not self.chip_button_enable
+            # set and start timer to re-enable buttons after 3 seconds
+            QTimer.singleShot(
+                3 * MILLISECONDS_PER_SECOND, self.enable_kick_chip_buttons
+            )
 
-    def disable_kick_chip_button(self):
-        self.kick_button_enable = False
-        self.chip_button_enable = False
+    def disable_kick_chip_buttons(self):
+        """
+        Disables the buttons
+        """
+        self.kick_chip_buttons_enable = False
 
-    def enable_kick_chip_button(self):
-        self.kick_button_enable = True
-        self.chip_button_enable = True
+    def enable_kick_chip_buttons(self):
+        """
+        If buttons should be enabled, enables them
+        """
+        if self.no_auto_selected:
+            self.kick_chip_buttons_enable = True
+
+    def set_should_enable_buttons(self, enable):
+        """
+        Changes if buttons are clickable or not based on boolean parameter
+
+        :param enable: boolean to indicate whether buttons should be made clickable or not
+        """
+        self.no_auto_selected = enable
+
+        if enable:
+            self.enable_kick_chip_buttons()
+        else:
+            self.disable_kick_chip_buttons()
 
     def send_command(self, command):
         """Sends a [auto]kick or [auto]chip primitive
@@ -165,8 +173,12 @@ class ChickerWidget(QWidget):
         # sends kick, chip, autokick, or autchip primitive
         if command == ChickerCommandMode.KICK:
             power_control.chicker.kick_speed_m_per_s = power_value
+            self.proto_unix_io.send_proto(PowerControl, power_control)
+            power_control.chicker.kick_speed_m_per_s = 0
         elif command == ChickerCommandMode.CHIP:
             power_control.chicker.chip_distance_meters = power_value
+            self.proto_unix_io.send_proto(PowerControl, power_control)
+            power_control.chicker.chip_distance_meters = 0
         elif command == ChickerCommandMode.AUTOKICK:
             power_control.chicker.auto_chip_or_kick.autokick_speed_m_per_s = power_value
         elif command == ChickerCommandMode.AUTOCHIP:
@@ -176,6 +188,21 @@ class ChickerWidget(QWidget):
 
         # sends proto
         self.proto_unix_io.send_proto(PowerControl, power_control)
+
+    def change_button_state(self, button, enable):
+        """Change button color and clickable state.
+
+        :param button: button to change the state of
+        :param enable: bool: if True: enable this button, if False: disable
+        :returns: None
+
+        """
+        if enable:
+            button.setStyleSheet("background-color: White")
+            button.setCheckable(True)
+        else:
+            button.setStyleSheet("background-color: Grey")
+            button.setCheckable(False)
 
     def refresh(self):
 
@@ -187,8 +214,8 @@ class ChickerWidget(QWidget):
         self.power_label.setText(str(power_value))
 
         # refreshes button state based on enable boolean
-        common_widgets.change_button_state(self.kick_button, self.kick_button_enable)
-        common_widgets.change_button_state(self.chip_button, self.chip_button_enable)
+        self.change_button_state(self.kick_button, self.kick_chip_buttons_enable)
+        self.change_button_state(self.chip_button, self.kick_chip_buttons_enable)
 
         # If auto is enabled, we want to populate the autochip or kick message
         if self.auto_kick_button.isChecked():
