@@ -34,6 +34,11 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, const int loop
     auto channel_id = std::stoi(redis_client_->get(ROBOT_MULTICAST_CHANNEL_REDIS_KEY));
     auto network_interface = redis_client_->get(ROBOT_NETWORK_INTERFACE_REDIS_KEY);
 
+    network_service_ = std::make_unique<NetworkService>(
+        std::string(ROBOT_MULTICAST_CHANNELS.at(channel_id)) + "%" +
+        network_interface,
+        VISION_PORT, PRIMITIVE_PORT, ROBOT_STATUS_PORT, true);
+
     NetworkLoggerSingleton::initializeLogger(channel_id, network_interface, robot_id);
 
     motor_service_ = std::make_unique<MotorService>(robot_constants, loop_hz);
