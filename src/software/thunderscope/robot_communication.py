@@ -95,8 +95,7 @@ class RobotCommunication(object):
                 # Send the primitive set
                 primitive_set = self.primitive_buffer.get(block=False)
 
-                if True:
-                    self.send_primitive_set.send_proto(primitive_set)
+                self.send_primitive_set.send_proto(primitive_set)
 
             else:
 
@@ -121,9 +120,8 @@ class RobotCommunication(object):
 
                 self.sequence_number += 1
 
-                if True:
-                    self.last_time = primitive_set.time_sent.epoch_timestamp_seconds
-                    self.send_primitive_set.send_proto(primitive_set)
+                self.last_time = primitive_set.time_sent.epoch_timestamp_seconds
+                self.send_primitive_set.send_proto(primitive_set)
 
                 time.sleep(0.001)
 

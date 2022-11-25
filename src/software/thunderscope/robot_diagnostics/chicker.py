@@ -14,7 +14,6 @@ class ChickerCommandMode(Enum):
     AUTOKICK = 3
     AUTOCHIP = 4
 
-
 class ChickerWidget(QWidget):
     def __init__(self, proto_unix_io):
         """Handles the robot diagnostics input to create a PowerControl message
@@ -173,12 +172,8 @@ class ChickerWidget(QWidget):
         # sends kick, chip, autokick, or autchip primitive
         if command == ChickerCommandMode.KICK:
             power_control.chicker.kick_speed_m_per_s = power_value
-            self.proto_unix_io.send_proto(PowerControl, power_control)
-            power_control.chicker.kick_speed_m_per_s = 0
         elif command == ChickerCommandMode.CHIP:
             power_control.chicker.chip_distance_meters = power_value
-            self.proto_unix_io.send_proto(PowerControl, power_control)
-            power_control.chicker.chip_distance_meters = 0
         elif command == ChickerCommandMode.AUTOKICK:
             power_control.chicker.auto_chip_or_kick.autokick_speed_m_per_s = power_value
         elif command == ChickerCommandMode.AUTOCHIP:
@@ -187,6 +182,13 @@ class ChickerWidget(QWidget):
             )
 
         # sends proto
+        self.proto_unix_io.send_proto(PowerControl, power_control)
+
+        # send empty proto
+        # this is due to a bug in robot_communication where if a new PowerControl message is not sent,
+        # the previous, cached message is resent to the robot repeatedly
+        # so sending an empty message overwrites the cache and prevents spamming commands
+        power_control = PowerControl()
         self.proto_unix_io.send_proto(PowerControl, power_control)
 
     def change_button_state(self, button, enable):
