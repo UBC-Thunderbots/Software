@@ -17,7 +17,7 @@ class RobotView(QWidget):
 
     """
 
-    def __init__(self):
+    def __init__(self, load_diagnostics):
 
         """Initialize the robot view."""
 
@@ -66,7 +66,8 @@ class RobotView(QWidget):
 
         self.other_label = [QLabel() for x in range(MAX_ROBOT_IDS_PER_SIDE)]
 
-        self.robot_checkboxes = [QCheckBox() for x in range(MAX_ROBOT_IDS_PER_SIDE)]
+        if load_diagnostics:
+            self.robot_checkboxes = [QCheckBox() for x in range(MAX_ROBOT_IDS_PER_SIDE)]
 
         for x in range(MAX_ROBOT_IDS_PER_SIDE):
             QVBoxLayout()
@@ -84,7 +85,8 @@ class RobotView(QWidget):
                 self.create_vision_pattern_label(x, "b", 25)
             )
             self.robot_layouts[x].addLayout(self.robot_status_layouts[x])
-            self.robot_layouts[x].addWidget(self.robot_checkboxes[x])
+            if load_diagnostics:
+                self.robot_layouts[x].addWidget(self.robot_checkboxes[x])
             self.layout.addLayout(self.robot_layouts[x])
 
         self.setLayout(self.layout)

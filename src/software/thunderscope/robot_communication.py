@@ -13,7 +13,6 @@ class RobotCommunication(object):
     def __init__(
         self,
         input_proto_unix_io,
-        fullsystem_or_diagnostics,
         multicast_channel,
         interface,
         estop_path="/dev/ttyACM0",
@@ -22,8 +21,6 @@ class RobotCommunication(object):
         """Initialize the communication with the robots
 
         :param input_proto_unix_io: full_system_proto_unix_io object
-        :param fullsystem_or_diagnostics: boolean to indicate whether the proto_unix_io object
-               is from fullsystem or robot diagnostics
         :param multicast_channel: The multicast channel to use
         :param interface: The interface to use
         :param estop_path: The path to the estop
@@ -33,7 +30,6 @@ class RobotCommunication(object):
         self.sequence_number = 0
         self.last_time = time.time()
         self.input_proto_unix_io = input_proto_unix_io
-        self.fullsystem_or_diagnostics = fullsystem_or_diagnostics
         self.multicast_channel = str(multicast_channel)
         self.interface = interface
         self.estop_path = estop_path
