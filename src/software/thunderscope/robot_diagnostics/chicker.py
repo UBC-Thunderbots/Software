@@ -14,6 +14,7 @@ class ChickerCommandMode(Enum):
     AUTOKICK = 3
     AUTOCHIP = 4
 
+
 class ChickerWidget(QWidget):
     def __init__(self, proto_unix_io):
         """Handles the robot diagnostics input to create a PowerControl message
