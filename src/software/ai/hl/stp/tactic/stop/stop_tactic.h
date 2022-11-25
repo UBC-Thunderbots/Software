@@ -5,17 +5,15 @@
 
 /**
  * The StopTactic will stop the robot from moving. The robot will actively try and brake
- * to come to a halt unless is it told to coast, in which case it will coast to a stop.
+ * to come to a halt.
  */
 class StopTactic : public Tactic
 {
    public:
     /**
      * Creates a new StopTactic
-     t
-     * @param coast whether the robot should coast once it's stopped
      */
-    explicit StopTactic(bool coast);
+    explicit StopTactic();
 
     StopTactic() = delete;
 
@@ -27,5 +25,4 @@ class StopTactic : public Tactic
     void updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm) override;
 
     std::map<RobotId, std::unique_ptr<FSM<StopFSM>>> fsm_map;
-    bool coast;
 };
