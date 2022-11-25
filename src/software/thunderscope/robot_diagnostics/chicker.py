@@ -225,5 +225,3 @@ class ChickerWidget(QWidget):
             self.send_command(ChickerCommandMode.AUTOKICK)
         elif self.auto_chip_button.isChecked():
             self.send_command(ChickerCommandMode.AUTOCHIP)
-        elif self.no_auto_button.isChecked():
-            pass
