@@ -14,6 +14,7 @@
 #include "shared/2021_robot_constants.h"
 #include "shared/test_util/test_util.h"
 #include "software/logger/logger.h"
+#include "software/simulation/er_force_simulator.h"
 #include "software/test_util/test_util.h"
 
 using namespace TestUtil;
@@ -178,7 +179,7 @@ void SimulatedErForceSimTestFixture::runTest(
     const Duration simulation_time_step =
         Duration::fromSeconds(1.0 / SIMULATED_CAMERA_FPS);
 
-    auto realism_config = createIdealRealismConfig();
+    auto realism_config = ErForceSimulator::createDefaultRealismConfig();
     std::shared_ptr<ErForceSimulator> simulator(std::make_shared<ErForceSimulator>(
         field_type, create2021RobotConstants(), realism_config));
 

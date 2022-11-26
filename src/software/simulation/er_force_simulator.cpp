@@ -75,6 +75,7 @@ ErForceSimulator::ErForceSimulator(const TbotsProto::FieldType& field_type,
     this->resetCurrentTime();
 }
 
+/* returns a default realism config to simulate under ideal conditions */
 std::unique_ptr<RealismConfigErForce> ErForceSimulator::createDefaultRealismConfig()
 {
     auto realism_config = std::make_unique<RealismConfigErForce>();
@@ -97,6 +98,7 @@ std::unique_ptr<RealismConfigErForce> ErForceSimulator::createDefaultRealismConf
     return realism_config;
 }
 
+/* returns a realistic realism config to simulate under realistic situation */
 std::unique_ptr<RealismConfigErForce> ErForceSimulator::createRealisticRealismConfig()
 {
     auto realism_config = std::make_unique<RealismConfigErForce>();
