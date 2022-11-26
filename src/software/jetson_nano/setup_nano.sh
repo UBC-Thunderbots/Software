@@ -38,6 +38,7 @@ pip_libaries=(
     Pillow==9.1.0
     redis==4.1.4
     platformio==6.0.2
+    esptool==4.2.1
 )
 
 # Install python dependencies

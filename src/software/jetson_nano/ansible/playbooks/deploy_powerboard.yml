@@ -19,17 +19,17 @@
       args:
         chdir: ~/
 
-    - name: Put the powerboard in bootloader mode
-      ansible.builtin.pause:
-        prompt: "Press enter to continue"
-        echo: no
+    - name: Enter bootloader mode
+      script: ../scripts/esp32_flashing.py bootloader
+      args:
+        executable: python3
 
     - name: Flashing... (this will take a while on the first run)
-      shell: '/opt/tbotspython/bin/platformio run --disable-auto-clean -t nobuild -t upload -d ~/powerloop/power --upload-port /dev/ttyTHS1 -a --no-stub'
+      shell: '/opt/tbotspython/bin/esptool.py --chip esp32 --port /dev/ttyTHS1 --baud 115200 --before default_reset --after hard_reset --no-stub write_flash -z --flash_mode dio --flash_freq 40m --flash_size 4MB --spi-connection=6,17,8,11,16 0x10000 ~/powerloop/power/.pio/build/pico32/firmware.bin'
       register: result
 
     - name: Reset powerboard to finish flashing
-      ansible.builtin.pause:
-        prompt: "Press enter to continue"
-        echo: no
+      script: ../scripts/esp32_flashing.py reset
+      args:
+        executable: python3
 
