@@ -140,3 +140,21 @@ jobs:
           cd src
           bazel test --show_timestamps       \
             //software/geom/...
+
+  autorefd-game:
+    name: AutoRef'd Game (2 Minutes)
+    runs-on: ubuntu-20.04
+    steps:
+      # checks-out the repository under $GITHUB_WORKSPACE
+      - uses: actions/checkout@v2
+
+      - name: Environment Setup
+        run: |
+          "${GITHUB_WORKSPACE}"/environment_setup/setup_software.sh
+
+      - name: AI vs AI (2 minutes)
+        timeout-minutes: 2
+        run: |
+          cd src
+          bazel run //software/thunderscope:thunderscope_main -- --ci_mode
+

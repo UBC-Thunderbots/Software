@@ -138,6 +138,12 @@ if __name__ == "__main__":
         default=115200,
         help="Estop Baudrate",
     )
+    parser.add_argument(
+        "--ci_mode",
+        action="store_true",
+        default=False,
+        help="Run in CI mode (timestamp provided)",
+    )
 
     # Sanity check that an interface was provided
     args = parser.parse_args()
@@ -306,7 +312,7 @@ if __name__ == "__main__":
             args.blue_full_system_runtime_dir,
         ) as blue_logger, ProtoLogger(
             args.yellow_full_system_runtime_dir,
-        ) as yellow_logger, Gamecontroller() as gamecontroller, TigersAutoref():
+        ) as yellow_logger, Gamecontroller() as gamecontroller, TigersAutoref(args.ci_mode):
 
             tscope.blue_full_system_proto_unix_io.register_to_observe_everything(
                 blue_logger.buffer

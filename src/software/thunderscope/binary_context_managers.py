@@ -532,17 +532,19 @@ class Gamecontroller(object):
         ci_output.ParseFromString(response_data[new_pos : new_pos + msg_len])
         return ci_output
 
+
 class TigersAutoref(object):
-    def __init__(self):
+    def __init__(self, ci_mode=False):
         print("autoref init")
-        self.tigers_autoref_proc    = None
-        self.thread                 = None
+        self.tigers_autoref_proc = None
+        self.thread = None
+        self.ci_mode = ci_mode
 
     def __enter__(self):
         print("autoref enter")
 
         self.thread = threading.Thread(target=self.startAutoref)
-        self.thread.start();
+        self.thread.start()
         print("thread started")
 
         return self
@@ -552,6 +554,10 @@ class TigersAutoref(object):
         os.chdir("/opt/tbotspython/autoref/")
         print(os.getcwd())
         autoref_cmd = "./run.sh -a -hl"
+
+        if self.ci_mode:
+            autoref_cmd += " -ci"
+
         self.tigers_autoref_proc = Popen(autoref_cmd.split(" "))
 
     def __exit__(self, type, value, traceback):

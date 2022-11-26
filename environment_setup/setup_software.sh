@@ -144,8 +144,11 @@ sudo chmod +x /opt/tbotspython/gamecontroller
 
 print_status_msg "Cloning submodules"
 git submodule update --init --recursive
-print_status_msg "Symlinking autoref"
+print_status_msg "Setting up TIGERS Autoref"
 ln -s $CURR_DIR/../src/software/simulation/tigers_autoref/ /opt/tbotspython/autoref
+cd $CURR_DIR/../src/software/simulation/tigers_autoref/
+./build.sh
+cd $CURR_DIR
 sudo chmod +x $CURR_DIR/../src/software/simulation/tigers_autoref/run.sh
 print_status_msg "Finished setting up autoref"
 
