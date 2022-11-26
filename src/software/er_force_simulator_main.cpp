@@ -75,17 +75,20 @@ int main(int argc, char **argv)
         std::shared_ptr<ErForceSimulator> er_force_sim;
         std::unique_ptr<RealismConfigErForce> realism_config;
         realism_config = ErForceSimulator::createDefaultRealismConfig();
-        if (args.realism) {
+        if (args.realism)
+        {
             realism_config = ErForceSimulator::createRealisticRealismConfig();
         }
-        
+
         if (args.division == "div_a")
         {
-            er_force_sim = std::make_shared<ErForceSimulator>(TbotsProto::FieldType::DIV_A, create2021RobotConstants(), realism_config);
+            er_force_sim = std::make_shared<ErForceSimulator>(
+                TbotsProto::FieldType::DIV_A, create2021RobotConstants(), realism_config);
         }
         else
         {
-            er_force_sim = std::make_shared<ErForceSimulator>(TbotsProto::FieldType::DIV_B, create2021RobotConstants(), realism_config);
+            er_force_sim = std::make_shared<ErForceSimulator>(
+                TbotsProto::FieldType::DIV_B, create2021RobotConstants(), realism_config);
         }
 
         // Setup the field
