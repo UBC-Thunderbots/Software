@@ -40,17 +40,19 @@ double compare(const Robot &r1, const Robot &r2)
 
 TEST_F(NearestNeighborSearchTest, no_robot_within_radius_test)
 {
-    double radius = 1.0 * 1.0;
+    double radius_squared = 1.0 * 1.0;
     std::vector<Robot> expected{};
-    std::vector<Robot> agent_subset = distanceFunc(candidate, agents, radius, compare);
+    std::vector<Robot> agent_subset =
+        findNearestNeighbours(candidate, agents, radius_squared, compare);
     EXPECT_THAT(expected, agent_subset);
 }
 
 TEST_F(NearestNeighborSearchTest, two_robots_within_radius_test)
 {
-    double radius = 2.0 * 2.0;
+    double radius_squared = 2.0 * 2.0;
     std::vector<Robot> expected{agents[0], agents[1]};
-    std::vector<Robot> agent_subset = distanceFunc(candidate, agents, radius, compare);
+    std::vector<Robot> agent_subset =
+        findNearestNeighbours(candidate, agents, radius_squared, compare);
     std::sort(expected.begin(), expected.end(), Robot::cmpRobotByID());
     std::sort(agent_subset.begin(), agent_subset.end(), Robot::cmpRobotByID());
     EXPECT_THAT(expected, ::testing::ContainerEq(agent_subset));
@@ -58,9 +60,10 @@ TEST_F(NearestNeighborSearchTest, two_robots_within_radius_test)
 
 TEST_F(NearestNeighborSearchTest, four_robots_within_radius_test)
 {
-    double radius = 3.0 * 3.0;
+    double radius_squared = 3.0 * 3.0;
     std::vector<Robot> expected{agents[0], agents[1], agents[2], agents[3]};
-    std::vector<Robot> agent_subset = distanceFunc(candidate, agents, radius, compare);
+    std::vector<Robot> agent_subset =
+        findNearestNeighbours(candidate, agents, radius_squared, compare);
     std::sort(expected.begin(), expected.end(), Robot::cmpRobotByID());
     std::sort(agent_subset.begin(), agent_subset.end(), Robot::cmpRobotByID());
     EXPECT_THAT(expected, ::testing::ContainerEq(agent_subset));
@@ -68,10 +71,11 @@ TEST_F(NearestNeighborSearchTest, four_robots_within_radius_test)
 
 TEST_F(NearestNeighborSearchTest, robot_on_edge_of_radius_test)
 {
-    double radius = 5.0 * 5.0;
+    double radius_squared = 5.0 * 5.0;
     std::vector<Robot> expected{agents[0], agents[1], agents[2],
                                 agents[3], agents[4], agents[5]};
-    std::vector<Robot> agent_subset = distanceFunc(candidate, agents, radius, compare);
+    std::vector<Robot> agent_subset =
+        findNearestNeighbours(candidate, agents, radius_squared, compare);
     std::sort(expected.begin(), expected.end(), Robot::cmpRobotByID());
     std::sort(agent_subset.begin(), agent_subset.end(), Robot::cmpRobotByID());
     EXPECT_THAT(expected, ::testing::ContainerEq(agent_subset));
