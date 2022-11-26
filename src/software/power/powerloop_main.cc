@@ -73,9 +73,9 @@ void loop()
     }
     // Read sensor values. These are all instantaneous
     auto status = createNanoPbPowerStatus(
-            monitor->getBatteryVoltage(), charger->getCapacitorVoltage(),
-       monitor->getCurrentDrawAmp(), geneva->getCurrentSlot(), sequence_num++,
-       chicker->getBreakBeamTripped());
+        monitor->getBatteryVoltage(), charger->getCapacitorVoltage(),
+        monitor->getCurrentDrawAmp(), geneva->getCurrentSlot(), sequence_num++,
+        chicker->getBreakBeamTripped());
     auto status_frame = createUartFrame(status);
     auto packet       = marshallUartPacket(status_frame);
     for (auto byte : packet)
