@@ -58,7 +58,7 @@ HRVOAgent::HRVOAgent(const Vector &position, float neighbor_dist,
 }
 
 void HRVOAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive,
-                                const World &world)
+                                const World &world, double time_step)
 {
     AgentPath path;
     static_obstacles.clear();
@@ -79,7 +79,7 @@ void HRVOAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive,
 
         // Max distance which the robot can travel in one time step + scaling
         // TODO (#2370): This constant is calculated multiple times.
-        float path_radius = (max_speed_ * simulator_->getTimeStep()) / 2;
+        float path_radius = (max_speed_ * time_step) / 2;
         auto path_points  = {PathPoint(
             Vector(destination.x_meters(), destination.y_meters()), speed_at_dest)};
         path              = AgentPath(path_points, path_radius);
@@ -111,6 +111,28 @@ void HRVOAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive,
     setPath(path);
 }
 
+std::vector<Agent> HRVOAgent::computeNeighbors(std::vector<Agent> other_agents)
+{
+    std::vector<Agent> neighbours;
+    const auto current_path_point_opt = this->path.getCurrentPathPoint();
+    if (!current_path_point_opt.has_value())
+    {
+        // Don't draw any velocity obstacles if we do not have a destination
+        return neighbours;
+    }
+
+    // Only consider agents within this distance away from our position
+    auto current_destination = current_path_point_opt.value().getPosition();
+    double dist_to_obstacle_threshold =
+            std::min(static_cast<double>(max_neighbor_dist),
+                     (getPosition() - current_destination).length());
+    // Re-calculate all agents (neighbors) within the distance threshold
+    // which we want to create velocity obstacles for
+    // TODO use brute force search
+    // kd_tree()->query(agent, neighbor_dist_threshold);
+    return neighbours;
+}
+
 void HRVOAgent::computeVelocityObstacles()
 {
     velocity_obstacles_.clear();
@@ -130,7 +152,7 @@ void HRVOAgent::computeVelocityObstacles()
                  (getPosition() - current_destination).length());
 
     // Create Velocity Obstacles for neighboring agents
-    computeNeighbors(dist_to_obstacle_threshold);
+    std::vector<Agent> neighbours = computeNeighbors();
     for (const auto &neighbor : neighbors_)
     {
         std::shared_ptr<Agent> other_agent = simulator_->getAgents()[neighbor.second];

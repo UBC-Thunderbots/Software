@@ -207,8 +207,8 @@ std::size_t HRVOSimulator::addHRVOAgent(const Vector &position, float agent_radi
                                         TeamSide type)
 {
     std::shared_ptr<HRVOAgent> agent = std::make_shared<HRVOAgent>(
-        this, position, max_neighbor_dist, max_neighbors, agent_radius,
-        max_radius_inflation, curr_velocity, max_accel, path, max_speed);
+        position, max_neighbor_dist, max_neighbors, agent_radius,
+        max_radius_inflation, curr_velocity, max_accel, path, max_speed, robot_id, type);
     agents.push_back(std::move(agent));
     return agents.size() - 1;
 }

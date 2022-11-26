@@ -27,6 +27,7 @@ cc_library(
         "path.cpp",
         "path_point.cpp",
         "simulator.cpp",
+        "new_simulator.cpp"
     ],
     hdrs = [
         "agent.h",
@@ -37,6 +38,8 @@ cc_library(
         "path.h",
         "path_point.h",
         "simulator.h",
+        "simulator_context.h"
+        "new_simulator.h"
     ],
     deps = [
         "//proto:visualization_cc_proto",

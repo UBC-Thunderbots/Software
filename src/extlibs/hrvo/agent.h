@@ -6,8 +6,6 @@
 #include "software/geom/vector.h"
 #include "software/world/robot_state.h"
 #include "software/world/team_types.h"
-#include "extlibs/hrvo/agent_type.h"
-#include "extlibs/hrvo/agent_visitor.h"
 
 class HRVOSimulator;
 
@@ -42,7 +40,7 @@ class Agent
     /**
      * Computes the new velocity of this agent.
      */
-    virtual void computeNewVelocity(std::vector<std::shared_ptr<Agent>> &agents, double time_step) = 0;
+    virtual void computeNewVelocity(double time_step, MotionPlanningSimulatorContext state) = 0;
 
     /**
      * Create the velocity obstacle which other_agent should see for this Agent

@@ -16,7 +16,6 @@ Agent::Agent(const Vector &position, float radius,
       max_speed_(max_speed),
       max_accel_(max_accel),
       path(path),
-      reached_goal_(false),
       robot_id(robot_id),
       agent_type(type)
 {

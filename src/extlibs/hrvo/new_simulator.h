@@ -11,8 +11,7 @@
 #include "software/geom/vector.h"
 #include "software/world/world.h"
 
-
-class HRVOSimulatorNew {
+class MotionPlanningSimulator {
 public:
     /**
      * Constructor
@@ -21,8 +20,8 @@ public:
      * robot
      * @param friendly_team_colour The colour of the friendly team
      */
-    explicit HRVOSimulatorNew(float time_step, const RobotConstants_t &robot_constants,
-                           const TeamColour friendly_team_colour);
+    explicit MotionPlanningSimulator(float time_step, const RobotConstants_t &robot_constants,
+                                     const TeamColour friendly_team_colour);
 
     /**
      * Reset all agents to match the state of the given world.
@@ -43,7 +42,6 @@ public:
 
     // comment
     void doStep();
-    void computeNeighbors(const HRVOAgent &agent);
 
 private:
 
@@ -86,10 +84,14 @@ private:
     // List of agents (robots) in this simulation
     std::vector<Agent> agents;
 
+    // simulator context
+    MotionPlanningSimulatorContext context;
+
+
     // The max amount (meters) which the friendly/enemy robot radius can increase by.
     // This scale is used to avoid close encounters, and reduce chance of collision.
     static constexpr float FRIENDLY_ROBOT_RADIUS_MAX_INFLATION = 0.05f;
-    static constexpr float ENEMY_ROBOT_RADIUS_MAX_INFLATION    = 0.06f;
+    static constexpr float ENEMY_ROBOT_RADIUS_MAX_INFLATION = 0.06f;
 
     // How much larger should the goal radius be. This is added as a safety tolerance so
     // robots do not "teleport" over the goal between simulation frames.

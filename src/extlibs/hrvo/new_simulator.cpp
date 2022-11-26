@@ -1,9 +1,8 @@
 #include "new_simulator.h"
 
-HRVOSimulatorNew::HRVOSimulatorNew(float time_step, const RobotConstants_t &robot_constants,
-                                   const TeamColour friendly_team_colour):
+MotionPlanningSimulator::MotionPlanningSimulator(float time_step, const RobotConstants_t &robot_constants,
+                                                 const TeamColour friendly_team_colour):
     robot_constants(robot_constants),
-    agent_visitor(3),
     primitive_set(),
     global_time(0.0f),
     time_step(time_step),
@@ -14,7 +13,7 @@ HRVOSimulatorNew::HRVOSimulatorNew(float time_step, const RobotConstants_t &robo
 {
 }
 
-void HRVOSimulatorNew::updateWorld(const World &world)
+void MotionPlanningSimulator::updateWorld(const World &world)
 {
     this->world               = world;
     const auto &friendly_team = world.friendlyTeam().getAllRobots();
@@ -60,28 +59,7 @@ void HRVOSimulatorNew::updateWorld(const World &world)
     }
 }
 
-void HRVOSimulatorNew::computeNeighbors(const HRVOAgent &agent)
-{
-    agent->
-    const auto kek = agent.pref_speed_;
-    const auto current_path_point_opt = agent.getCurrentPathPoint();
-    if (!current_path_point_opt.has_value())
-    {
-        // Don't draw any velocity obstacles if we do not have a destination
-        return;
-    }
-
-    // Only consider agents within this distance away from our position
-    auto current_destination = current_path_point_opt.value().getPosition();
-    double dist_to_obstacle_threshold =
-            std::min(static_cast<double>(max_neighbor_dist),
-                     (getPosition() - current_destination).length());
-    // Re-calculate all agents (neighbors) within the distance threshold
-    // which we want to create velocity obstacles for
-    kd_tree()->query(agent, neighbor_dist_threshold);
-}
-
-void HRVOSimulatorNew::updatePrimitiveSet(const TbotsProto::PrimitiveSet &new_primitive_set)
+void MotionPlanningSimulator::updatePrimitiveSet(const TbotsProto::PrimitiveSet &new_primitive_set)
 {
     primitive_set = new_primitive_set;
 
@@ -96,16 +74,16 @@ void HRVOSimulatorNew::updatePrimitiveSet(const TbotsProto::PrimitiveSet &new_pr
     }
 }
 
-std::size_t HRVOSimulatorNew::addHRVORobotAgent(const Robot &robot, TeamSide type) {
+std::size_t MotionPlanningSimulator::addHRVORobotAgent(const Robot &robot, TeamSide type) {
     return 0;
 }
 
 std::size_t
-HRVOSimulatorNew::addLinearVelocityRobotAgent(const Robot &robot, const Vector &destination, TeamSide type) {
+MotionPlanningSimulator::addLinearVelocityRobotAgent(const Robot &robot, const Vector &destination, TeamSide type) {
     return 0;
 }
 
-void HRVOSimulatorNew::doStep()
+void MotionPlanningSimulator::doStep()
 {
     if (kd_tree == nullptr)
     {
@@ -136,7 +114,7 @@ void HRVOSimulatorNew::doStep()
     // Compute what velocity each agent will take next
     for (auto &agent : agents)
     {
-        agent->computeNewVelocity(time_step);
+        agent->computeNewVelocity(time_step, world_state);
     }
 
     // Update the positions of all agents given their velocity

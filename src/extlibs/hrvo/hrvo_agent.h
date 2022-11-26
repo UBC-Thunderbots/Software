@@ -42,6 +42,7 @@
 #include "simulator.h"
 #include "software/ai/navigator/obstacle/robot_navigation_obstacle_factory.h"
 #include "software/geom/vector.h"
+#include "extlibs/hrvo/simulator_context.h"
 
 /**
  * An agent/robot in the simulation which uses the HRVO algorithm to motion plan towards
@@ -77,7 +78,7 @@ class HRVOAgent : public Agent
     /**
      * Computes the new velocity of this agent.
      */
-    void computeNewVelocity(double time_step) override;
+    void computeNewVelocity(double time_step, MotionPlanningSimulatorContext state) override;
 
     /**
      * Create the hybrid reciprocal velocity obstacle which other_agent should see for
@@ -91,17 +92,17 @@ class HRVOAgent : public Agent
     VelocityObstacle createVelocityObstacle(const Agent &other_agent) override;
 
     /**
+     * Computes the preferred velocity of this agent.
+     */
+    void computePreferredVelocity(double time_step);
+
+    /**
      * @param neighbor_dist_threshold The max distance away which another agent can be to
      * be considered a neighbor.
      * Computes the `maxNeighbors` nearest neighbors of this agent which are within
      * `neighbor_dist_threshold`.
      */
-    void computeNeighbors(double neighbor_dist_threshold);
-
-    /**
-     * Computes the preferred velocity of this agent.
-     */
-    void computePreferredVelocity(double time_step);
+    std::vector<Agent> computeNeighbors(std::vector<Agent> other_agents);
 
     /**
      * Inserts a neighbor into the set of neighbors of this agent.
@@ -117,7 +118,7 @@ class HRVOAgent : public Agent
      * @param new_primitive The new primitive to pursue
      * @param world The world in which the new primitive is being pursued
      */
-    void updatePrimitive(const TbotsProto::Primitive &new_primitive, const World &world);
+    void updatePrimitive(const TbotsProto::Primitive &new_primitive, const World &world, double time_step);
 
     /**
      * Get a list of circles which represent the new velocity candidates
