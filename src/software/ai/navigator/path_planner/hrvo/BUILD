@@ -22,22 +22,3 @@ cc_test(
         "//software/test_util",
     ],
 )
-
-cc_library(
-    name = "brute_force_nearest_neighbor_search",
-    hdrs = [
-        "brute_force_nearest_neighbor_search.hpp",
-    ],
-    deps = [],
-)
-
-cc_test(
-    name = "nearest_neighbor_test",
-    srcs = ["nearest_neighbor_test.cpp"],
-    deps = [
-        ":brute_force_nearest_neighbor_search",
-        "//shared/test_util:tbots_gtest_main",
-        "//software/test_util",
-        "//software/time:duration",
-    ],
-)

@@ -6,7 +6,8 @@
  * Finds the neighbors of a candidate based on a comparator and radius
  *
  * @tparam T generic type for the candidate and its neighbors
- * @tparam Func type for the comparator
+ * @tparam Func type for the function comparator. Must be in the form `double f(const T&,
+ * const T&)`
  * @param candidate cannot be null
  * @param neighbors a list of T objects neighbors, which may contain the candidate object
  * itself
@@ -16,8 +17,8 @@
  * @return a list representing a subset of neighbors
  */
 template <class T, typename Func>
-std::vector<T> nearestNeighbours(const T& candidate, const std::vector<T>& neighbors,
-                                 double radius, Func comparator)
+std::vector<T> distanceFunc(const T& candidate, const std::vector<T>& neighbors,
+                            double radius, Func comparator)
 {
     std::vector<T> subset;
     for (const T& neighbor : neighbors)

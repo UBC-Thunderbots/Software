@@ -48,6 +48,24 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "nearest_neighbor_search",
+    hdrs = [
+        "nearest_neighbor_search.hpp",
+    ],
+    deps = [],
+)
+
+cc_test(
+    name = "nearest_neighbor_test",
+    srcs = ["nearest_neighbor_test.cpp"],
+    deps = [
+        ":nearest_neighbor_search",
+        "//shared/test_util:tbots_gtest_main",
+        "//software/test_util",
+    ],
+)
+
 cc_test(
     name = "almost_equal_test",
     srcs = [
