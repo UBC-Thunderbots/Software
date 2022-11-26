@@ -551,7 +551,7 @@ class TigersAutoref(object):
         print(os.getcwd())
         os.chdir("/opt/tbotspython/autoref/")
         print(os.getcwd())
-        autoref_cmd = "./run.sh -c -a"
+        autoref_cmd = "./run.sh -a -hl"
         self.tigers_autoref_proc = Popen(autoref_cmd.split(" "))
 
     def __exit__(self, type, value, traceback):
