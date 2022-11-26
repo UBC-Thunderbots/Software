@@ -510,3 +510,4 @@ def simulated_test_runner():
                 print(
                     f"\n\n To replay this test for the yellow team, go to the `src` folder and run \n./tbots.py run thunderscope --yellow_log {yellow_logger.log_folder}"
                 )
+
