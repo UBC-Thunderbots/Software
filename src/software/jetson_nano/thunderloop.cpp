@@ -30,9 +30,9 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, const int loop
 
     redis_client_ = std::make_unique<RedisClient>(REDIS_DEFAULT_HOST, REDIS_DEFAULT_PORT);
 
-    auto robot_id   = std::stoi(redis_client_->get(ROBOT_ID_REDIS_KEY));
-    auto channel_id = std::stoi(redis_client_->get(ROBOT_MULTICAST_CHANNEL_REDIS_KEY));
-    auto network_interface = redis_client_->get(ROBOT_NETWORK_INTERFACE_REDIS_KEY);
+    auto robot_id   = std::stoi(redis_client_->getSync(ROBOT_ID_REDIS_KEY));
+    auto channel_id = std::stoi(redis_client_->getSync(ROBOT_MULTICAST_CHANNEL_REDIS_KEY));
+    auto network_interface = redis_client_->getSync(ROBOT_NETWORK_INTERFACE_REDIS_KEY);
 
     NetworkLoggerSingleton::initializeLogger(channel_id, network_interface, robot_id);
 
@@ -85,11 +85,11 @@ void Thunderloop::runLoop()
             jetson_status_.set_cpu_temperature(getCpuTemperature());
 
             // Grab the latest configs from redis
-            auto robot_id = std::stoi(redis_client_->get(ROBOT_ID_REDIS_KEY));
+            auto robot_id = std::stoi(redis_client_->getSync(ROBOT_ID_REDIS_KEY));
             auto channel_id =
-                std::stoi(redis_client_->get(ROBOT_MULTICAST_CHANNEL_REDIS_KEY));
+                std::stoi(redis_client_->getSync(ROBOT_MULTICAST_CHANNEL_REDIS_KEY));
             auto network_interface =
-                redis_client_->get(ROBOT_NETWORK_INTERFACE_REDIS_KEY);
+                redis_client_->getSync(ROBOT_NETWORK_INTERFACE_REDIS_KEY);
 
             // If any of the configs have changed, update the network service to switch
             // to the new interface and channel with the correct robot ID
@@ -202,11 +202,11 @@ void Thunderloop::runLoop()
             {
                 ScopedTimespecTimer timer(&poll_time);
                 auto kick_slope =
-                    std::stoi(redis_client_->get(ROBOT_KICK_SLOPE_REDIS_KEY));
+                    std::stoi(redis_client_->getSync(ROBOT_KICK_SLOPE_REDIS_KEY));
                 auto kick_constant =
-                    std::stoi(redis_client_->get(ROBOT_KICK_CONSTANT_REDIS_KEY));
+                    std::stoi(redis_client_->getSync(ROBOT_KICK_CONSTANT_REDIS_KEY));
                 auto chip_pulse_width =
-                    std::stoi(redis_client_->get(ROBOT_CHIP_PULSE_WIDTH_REDIS_KEY));
+                    std::stoi(redis_client_->getSync(ROBOT_CHIP_PULSE_WIDTH_REDIS_KEY));
 
                 power_status_ =
                     power_service_->poll(direct_control_.power_control(), kick_slope,
@@ -233,9 +233,9 @@ void Thunderloop::runLoop()
             *(robot_status_.mutable_jetson_status())      = jetson_status_;
 
             // Update Redis
-            redis_client_->set(ROBOT_BATTERY_VOLTAGE_REDIS_KEY,
+            redis_client_->setSync(ROBOT_BATTERY_VOLTAGE_REDIS_KEY,
                                std::to_string(power_status_.battery_voltage()));
-            redis_client_->set(ROBOT_CURRENT_DRAW_REDIS_KEY,
+            redis_client_->setSync(ROBOT_CURRENT_DRAW_REDIS_KEY,
                                std::to_string(power_status_.current_draw()));
         }
 

@@ -45,17 +45,30 @@ RedisClient::RedisClient(std::string host, size_t port)
     subscriber_.commit();
 }
 
-std::string RedisClient::get(const std::string &key)
+std::string RedisClient::getSync(const std::string &key)
 {
     auto future = client_.get(key);
     client_.commit();
     return future.get().as_string();
 }
 
-void RedisClient::set(const std::string &key, const std::string &value)
+void RedisClient::getAsync(const std::string &key, const cpp_redis::reply_callback_t &reply_callback)
+{
+    client_.get(key, reply_callback);
+    client_.commit();
+}
+
+void RedisClient::setAsync(const std::string &key, const std::string &value)
 {
     client_.set(key, value);
     client_.commit();
+}
+
+void RedisClient::setSync(const std::string &key, const std::string &value)
+{
+    client_.cluster_getkeysinslot()
+    client_.set(key, value);
+    client_.sync_commit();
 }
 
 std::unordered_map<std::string, std::string> RedisClient::getAllKeyValuePairs()
