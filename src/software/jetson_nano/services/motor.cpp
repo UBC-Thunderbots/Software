@@ -34,8 +34,8 @@ extern "C"
 
 // SPI Configs
 static const uint32_t MAX_SPI_SPEED_HZ  = 2000000;  // 2 Mhz
-static const uint32_t TMC6100_SPI_SPEED = 500000;  // 1 Mhz
-static const uint32_t TMC4671_SPI_SPEED = 500000;  // 1 Mhz
+static const uint32_t TMC6100_SPI_SPEED = 1000000;  // 1 Mhz
+static const uint32_t TMC4671_SPI_SPEED = 1000000;  // 1 Mhz
 static const uint8_t SPI_BITS           = 8;
 static const uint32_t SPI_MODE          = 0x3u;
 static const uint32_t NUM_RETRIES_SPI   = 3;
