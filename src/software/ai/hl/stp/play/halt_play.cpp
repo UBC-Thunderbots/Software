@@ -7,12 +7,12 @@ HaltPlay::HaltPlay(TbotsProto::AiConfig config) : Play(config, false) {}
 
 void HaltPlay::getNextTactics(TacticCoroutine::push_type &yield, const World &world)
 {
-    auto stop_tactic_1 = std::make_shared<StopTactic>(false);
-    auto stop_tactic_2 = std::make_shared<StopTactic>(false);
-    auto stop_tactic_3 = std::make_shared<StopTactic>(false);
-    auto stop_tactic_4 = std::make_shared<StopTactic>(false);
-    auto stop_tactic_5 = std::make_shared<StopTactic>(false);
-    auto stop_tactic_6 = std::make_shared<StopTactic>(false);
+    auto stop_tactic_1 = std::make_shared<StopTactic>();
+    auto stop_tactic_2 = std::make_shared<StopTactic>();
+    auto stop_tactic_3 = std::make_shared<StopTactic>();
+    auto stop_tactic_4 = std::make_shared<StopTactic>();
+    auto stop_tactic_5 = std::make_shared<StopTactic>();
+    auto stop_tactic_6 = std::make_shared<StopTactic>();
 
     do
     {
