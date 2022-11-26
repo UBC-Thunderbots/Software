@@ -142,6 +142,13 @@ sudo chown -R $USER:$USER /opt/tbotspython
 sudo wget -nc https://github.com/RoboCup-SSL/ssl-game-controller/releases/download/v2.15.2/ssl-game-controller_v2.15.2_linux_amd64 -O /opt/tbotspython/gamecontroller
 sudo chmod +x /opt/tbotspython/gamecontroller
 
+print_status_msg "Cloning submodules"
+git submodule update --init --recursive
+print_status_msg "Symlinking autoref"
+ln -s $CURR_DIR/../src/software/simulation/tigers_autoref/ /opt/tbotspython/autoref
+sudo chmod +x $CURR_DIR/../src/software/simulation/tigers_autoref/run.sh
+print_status_msg "Finished setting up autoref"
+
 # Install Bazel
 print_status_msg "Installing Bazel"
 
