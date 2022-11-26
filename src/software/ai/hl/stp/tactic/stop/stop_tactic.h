@@ -15,8 +15,6 @@ class StopTactic : public Tactic
      */
     explicit StopTactic();
 
-    StopTactic() = delete;
-
     void accept(TacticVisitor& visitor) const override;
 
     DEFINE_TACTIC_DONE_AND_GET_FSM_STATE
