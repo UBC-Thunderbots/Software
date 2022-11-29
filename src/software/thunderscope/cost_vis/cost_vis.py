@@ -27,7 +27,7 @@ class CostVisualizationWidget(QtWidgets.QMainWindow):
 
         # display zero at start
         self.data = np.zeros(shape=(6,3))
-        self.raw_data = np.zeros(shape=(3,6))
+        # self.raw_data = np.zeros(shape=(3,6))
 
         win = pg.GraphicsLayoutWidget(show=True)
         self.vb = win.addViewBox()
@@ -71,12 +71,10 @@ class CostVisualizationWidget(QtWidgets.QMainWindow):
             self.timeout = time.time() + CostVisualizationWidget.COST_VISUALIZATION_TIMEOUT_S
             self.cached_cost_vis = cost_vis
         
+        print(cost_vis.pass_cost)
+        
         for i in range(cost_vis.num_rows):
-            self.raw_data[i] = cost_vis.pass_cost[i*cost_vis.num_cols : (i+1)*cost_vis.num_cols]
-
-        print(self.raw_data)
-
-        self.data = np.rot90(self.raw_data, 3)
+            self.data[i] = cost_vis.pass_cost[i*cost_vis.num_cols : (i+1)*cost_vis.num_cols]
 
         print(self.data)
 

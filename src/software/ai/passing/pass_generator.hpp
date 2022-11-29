@@ -206,32 +206,58 @@ void PassGenerator<ZoneEnum>::sampleZoneCentrePasses(const World& world)
     // row and col count to pass to Python
     // number of col 
     int NUM_ROWS = 3;
-    ZonePassMap<ZoneEnum> passes;
-    std::vector<double> pass_costs;
+
+    std::unordered_map<std::string, std::vector<double>> func_to_costs;
+
+    std::vector<double> static_pos_quality_costs;
+    std::vector<double> pass_friendly_capability_costs;
+    std::vector<double> pass_enemy_risk_costs;
+    std::vector<double> pass_shoot_score_costs;
+    std::vector<double> zone_rating_costs;
 
     // Sample a pass in each zone's centre
     for (ZoneEnum zone_id : pitch_division_->getAllZoneIds())
     {
-        auto zone = pitch_division_->getZone(zone_id);
-
         auto pass =
             Pass(world.ball().position(),
                  pitch_division_->getZone(zone_id).centre(),
                  passing_config_.max_pass_speed_m_per_s());
 
-        double rating = ratePass(world, pass, pitch_division_->getZone(zone_id), passing_config_);
+        // ratePass
+        // double rating = ratePass(world, pass, pitch_division_->getZone(zone_id), passing_config_);
 
-        passes.emplace(
-            zone_id,
-            PassWithRating{pass, rating});
+        // ----- Passes ----- //
+        // getStaticPositionQuality
+        static_pos_quality_costs.push_back(
+            getStaticPositionQuality(world.field(), pass.receiverPoint(), passing_config_));
 
-        // add the pass cost to the vector
-        pass_costs.push_back(rating);
+        // ratePassFriendlyCapability
+        pass_friendly_capability_costs.push_back(
+            ratePassFriendlyCapability(world.friendlyTeam(), pass, passing_config_));
+
+        // ratePassEnemyRisk
+        pass_enemy_risk_costs.push_back(
+            ratePassEnemyRisk(world.enemyTeam(), pass,
+                            Duration::fromSeconds(passing_config_.enemy_reaction_time()),
+                            passing_config_.enemy_proximity_importance()));
+
+        // ratePassShootScore
+        pass_shoot_score_costs.push_back(
+            ratePassShootScore(world.field(), world.enemyTeam(), pass, passing_config_));
         
-        // std::cout << "C++: Zone" << "centre pass: " << std::to_string(rating) << std::endl;
+        // rateZone
+        zone_rating_costs.push_back(
+            rateZone(world.field(), world.enemyTeam(), pitch_division_->getZone(zone_id),
+            world.ball().position(), passing_config_));
     }
 
-    LOG(VISUALIZE) << *createCostVisualization(pass_costs, NUM_ROWS);
+    func_to_costs["getStaticPositionQuality"] = static_pos_quality_costs;
+    func_to_costs["ratePassFriendlyCapability"] = pass_friendly_capability_costs;
+    func_to_costs["ratePassEnemyRisk"] = pass_enemy_risk_costs;
+    func_to_costs["ratePassShootScore"] = pass_shoot_score_costs;
+    func_to_costs["rateZone"] = zone_rating_costs;
+
+    LOG(VISUALIZE) << *createCostVisualization(func_to_costs, NUM_ROWS);
 }
 
 template <class ZoneEnum>

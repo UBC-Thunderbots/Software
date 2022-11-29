@@ -349,14 +349,16 @@ std::unique_ptr<TbotsProto::PassVisualization> createPassVisualization(
     return pass_visualization_msg;
 }
 
-std::unique_ptr<TbotsProto::CostVisualization> createCostVisualization(const std::vector<double>& ratings, int num_rows)
+std::unique_ptr<TbotsProto::CostVisualization> createCostVisualization(const std::unordered_map<std::string, std::vector<double>> ratings, int num_rows)
 {
     // make a CostVisualization object
     auto cost_visualization_msg = std::make_unique<TbotsProto::CostVisualization>();
     cost_visualization_msg->set_num_rows(num_rows);
     cost_visualization_msg->set_num_cols(ratings.size() / num_rows);
 
-    for (const auto& num : ratings)
+    std::vector<double> test_zone_ratings = ratings.at("ratePassFriendlyCapability");
+
+    for (const auto& num : test_zone_ratings)
     {
         cost_visualization_msg->add_pass_cost(num);
     }

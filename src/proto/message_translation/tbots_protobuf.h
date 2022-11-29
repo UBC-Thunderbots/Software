@@ -126,6 +126,4 @@ BallState createBallState(const TbotsProto::BallState ball_state);
 std::unique_ptr<TbotsProto::PassVisualization> createPassVisualization(
     const std::vector<PassWithRating>& passes_with_rating);
 
-
-// testing right now
-std::unique_ptr<TbotsProto::CostVisualization> createCostVisualization(const std::vector<double>& ratings, int num_rows);
+std::unique_ptr<TbotsProto::CostVisualization> createCostVisualization(const std::unordered_map<std::string, std::vector<double>> ratings, int num_rows);
