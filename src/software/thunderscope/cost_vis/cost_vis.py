@@ -25,36 +25,34 @@ class CostVisualizationWidget(QtWidgets.QMainWindow):
         self.cached_cost_vis = CostVisualization()
         self.timeout = time.time() + CostVisualizationWidget.COST_VISUALIZATION_TIMEOUT_S
 
-        ## make pretty looping data
-        frames = 200
-        self.data = np.random.normal(size=(frames,30,30), loc=0, scale=100)
-        self.data = np.concatenate([self.data, self.data], axis=0)
-        self.data = pg.gaussianFilter(self.data, (10, 10, 10))[frames//2:frames + frames//2]
-        self.data[:, 15:16, 15:17] += 1
+        # display zero at start
+        self.data = np.zeros(shape=(6,3))
+        self.raw_data = np.zeros(shape=(3,6))
 
         win = pg.GraphicsLayoutWidget(show=True)
         self.vb = win.addViewBox()
-        self.img = pg.ImageItem(self.data[0])
+        self.img = pg.ImageItem(self.data)
         self.vb.addItem(self.img)
         self.vb.setAspectLocked()
         self.setCentralWidget(win)
 
+        self.test = [[1,2,3,4,5,6],[7,8,9,10,11,12],[13,14,15,16,17,18]]
+        self.test = np.array(self.test)
+
         ## generate empty curves
-        self.curves = []
-        self.levels = np.linspace(self.data.min(), self.data.max(), 10)
-        for i in range(len(self.levels)):
-            v = self.levels[i]
-            ## generate isocurve with automatic color selection
-            c = pg.IsocurveItem(level=v, pen=(i, len(self.levels)*1.5))
-            c.setParentItem(self.img)  ## make sure isocurve is always correctly displayed over image
-            c.setZValue(10)
-            self.curves.append(c)
+        # self.curves = []
+        # self.levels = np.linspace(self.data.min(), self.data.max(), 10)
+        # for i in range(len(self.levels)):
+        #     v = self.levels[i]
+        #     ## generate isocurve with automatic color selection
+        #     c = pg.IsocurveItem(level=v, pen=(i, len(self.levels)*1.5))
+        #     c.setParentItem(self.img)  ## make sure isocurve is always correctly displayed over image
+        #     c.setZValue(10)
+        #     self.curves.append(c)
 
         ## animate!
-        self.ptr = 0
-        self.imgLevels = (self.data.min(), self.data.max() * 2)
-
-        self.data_ = [0.0, 0.0, 0.0]
+        # self.ptr = 0
+        # self.imgLevels = (self.data.min(), self.data.max() * 2)
 
     def refresh(self):
         try:
@@ -74,11 +72,15 @@ class CostVisualizationWidget(QtWidgets.QMainWindow):
             self.cached_cost_vis = cost_vis
         
         for i in range(cost_vis.num_rows):
-            for j in range(cost_vis.num_cols):
-                self.data_[i] = cost_vis.pass_cost[i*cost_vis.num_cols : (i+1)*cost_vis.num_cols]
+            self.raw_data[i] = cost_vis.pass_cost[i*cost_vis.num_cols : (i+1)*cost_vis.num_cols]
 
-        self.ptr = (self.ptr + 1) % self.data.shape[0]
-        self.img.setImage(self.data[self.ptr])
-        for c in self.curves:
-            c.setParentItem(self.img)
-            c.setData(self.data[self.ptr])
+        print(self.raw_data)
+
+        self.data = np.rot90(self.raw_data, 3)
+
+        print(self.data)
+
+        self.img.setImage(self.data)
+        # for c in self.curves:
+        #     c.setParentItem(self.img)
+        #     c.setData(self.data)
