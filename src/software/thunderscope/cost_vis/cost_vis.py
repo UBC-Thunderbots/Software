@@ -25,9 +25,13 @@ class CostVisualizationWidget(QtWidgets.QMainWindow):
         self.cached_cost_vis = CostVisualization()
         self.timeout = time.time() + CostVisualizationWidget.COST_VISUALIZATION_TIMEOUT_S
 
-        # display zero at start
+        # initialize arrays with zeros
         self.data = np.zeros(shape=(6,3))
-        # self.raw_data = np.zeros(shape=(3,6))
+        self.static_position_quality = np.zeros(shape=(6,3))
+        self.pass_friendly_capability = np.zeros(shape=(6,3))
+        self.pass_enemy_risk = np.zeros(shape=(6,3))
+        self.pass_shoot_score = np.zeros(shape=(6,3))
+        self.zone_rating = np.zeros(shape=(6,3))
 
         win = pg.GraphicsLayoutWidget(show=True)
         self.vb = win.addViewBox()
@@ -35,9 +39,6 @@ class CostVisualizationWidget(QtWidgets.QMainWindow):
         self.vb.addItem(self.img)
         self.vb.setAspectLocked()
         self.setCentralWidget(win)
-
-        self.test = [[1,2,3,4,5,6],[7,8,9,10,11,12],[13,14,15,16,17,18]]
-        self.test = np.array(self.test)
 
         ## generate empty curves
         # self.curves = []
@@ -70,12 +71,15 @@ class CostVisualizationWidget(QtWidgets.QMainWindow):
             # We received new pass data, so lets update our timeout
             self.timeout = time.time() + CostVisualizationWidget.COST_VISUALIZATION_TIMEOUT_S
             self.cached_cost_vis = cost_vis
-        
-        print(cost_vis.pass_cost)
-        
-        for i in range(cost_vis.num_rows):
-            self.data[i] = cost_vis.pass_cost[i*cost_vis.num_cols : (i+1)*cost_vis.num_cols]
 
+        self.static_position_quality = np.array(cost_vis.static_position_quality.cost).reshape(6,3)
+        self.pass_friendly_capability = np.array(cost_vis.pass_friendly_capability.cost).reshape(6,3)
+        self.pass_enemy_risk = np.array(cost_vis.pass_enemy_risk.cost).reshape(6,3)
+        self.pass_shoot_score = np.array(cost_vis.pass_shoot_score.cost).reshape(6,3)
+        self.zone_rating = np.array(cost_vis.zone_rating.cost).reshape(6,3)
+
+        self.data = self.static_position_quality + self.pass_friendly_capability + self.pass_enemy_risk + self.pass_shoot_score + self.zone_rating
+        
         print(self.data)
 
         self.img.setImage(self.data)

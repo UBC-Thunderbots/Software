@@ -355,13 +355,57 @@ std::unique_ptr<TbotsProto::CostVisualization> createCostVisualization(const std
     auto cost_visualization_msg = std::make_unique<TbotsProto::CostVisualization>();
     cost_visualization_msg->set_num_rows(num_rows);
     cost_visualization_msg->set_num_cols(ratings.size() / num_rows);
+    std::vector<double> this_rating;
 
-    std::vector<double> test_zone_ratings = ratings.at("ratePassFriendlyCapability");
-
-    for (const auto& num : test_zone_ratings)
+    // getStaticPositionQuality
+    auto static_position_quality = std::make_unique<TbotsProto::NameCostsPair>();
+    static_position_quality->set_name("getStaticPositionQuality");
+    this_rating = ratings.at("getStaticPositionQuality");
+    for (auto& rating : this_rating)
     {
-        cost_visualization_msg->add_pass_cost(num);
+        static_position_quality->add_cost(rating);
     }
+    cost_visualization_msg->set_allocated_static_position_quality(static_position_quality.release());
+
+    // ratePassFriendlyCapability
+    auto pass_friendly_capability = std::make_unique<TbotsProto::NameCostsPair>();
+    pass_friendly_capability->set_name("ratePassFriendlyCapability");
+    this_rating = ratings.at("ratePassFriendlyCapability");
+    for (auto& rating : this_rating)
+    {
+        pass_friendly_capability->add_cost(rating);
+    }
+    cost_visualization_msg->set_allocated_pass_friendly_capability(pass_friendly_capability.release());
+
+    // ratePassEnemyRisk
+    auto pass_enemy_risk = std::make_unique<TbotsProto::NameCostsPair>();
+    pass_enemy_risk->set_name("ratePassEnemyRisk");
+    this_rating = ratings.at("ratePassEnemyRisk");
+    for (auto& rating : this_rating)
+    {
+        pass_enemy_risk->add_cost(rating);
+    }
+    cost_visualization_msg->set_allocated_pass_enemy_risk(pass_enemy_risk.release());
+
+    // ratePassShootScore
+    auto pass_shoot_score = std::make_unique<TbotsProto::NameCostsPair>();
+    pass_shoot_score->set_name("ratePassShootScore");
+    this_rating = ratings.at("ratePassShootScore");
+    for (auto& rating : this_rating)
+    {
+        pass_shoot_score->add_cost(rating);
+    }
+    cost_visualization_msg->set_allocated_pass_shoot_score(pass_shoot_score.release());
+
+    // rateZone
+    auto zone_rating = std::make_unique<TbotsProto::NameCostsPair>();
+    zone_rating->set_name("rateZone");
+    this_rating = ratings.at("rateZone");
+    for (auto& rating : this_rating)
+    {
+        zone_rating->add_cost(rating);
+    }
+    cost_visualization_msg->set_allocated_zone_rating(zone_rating.release());
 
     return cost_visualization_msg;
 }

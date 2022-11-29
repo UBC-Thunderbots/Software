@@ -34,9 +34,19 @@ message HRVOVisualization
     repeated Circle robots                       = 3;
 }
 
+message NameCostsPair
+{
+    string name          = 1;
+    repeated double cost = 2;
+}
+
 message CostVisualization
 {
-    repeated double pass_cost = 1;
-    uint32 num_rows           = 2;
-    uint32 num_cols           = 3;
+    uint32 num_rows                        = 1;
+    uint32 num_cols                        = 2;
+    NameCostsPair static_position_quality  = 3;
+    NameCostsPair pass_friendly_capability = 4;
+    NameCostsPair pass_enemy_risk          = 5;
+    NameCostsPair pass_shoot_score         = 6;
+    NameCostsPair zone_rating              = 7;
 }
