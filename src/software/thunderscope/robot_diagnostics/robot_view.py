@@ -17,6 +17,8 @@ class RobotView(QWidget):
 
     """
 
+    toggle_robot_connection_signal = QtCore.pyqtSignal(int)
+
     def __init__(self, load_diagnostics):
 
         """Initialize the robot view."""
@@ -85,8 +87,15 @@ class RobotView(QWidget):
                 self.create_vision_pattern_label(x, "b", 25)
             )
             self.robot_layouts[x].addLayout(self.robot_status_layouts[x])
+
             if load_diagnostics:
                 self.robot_layouts[x].addWidget(self.robot_checkboxes[x])
+
+                # connect checkboxes to emit a toggle connection signal with the corresponding robot ID
+                self.robot_checkboxes[x].stateChanged.connect(
+                    lambda state, robot_id=x: self.toggle_robot_connection_signal.emit(robot_id)
+                )
+
             self.layout.addLayout(self.robot_layouts[x])
 
         self.setLayout(self.layout)
@@ -146,6 +155,7 @@ class RobotView(QWidget):
     def refresh(self):
         """Refresh the view
         """
+        return
         robot_status_buffer = self.robot_status_buffer.get(block=False)
         for i in range(MAX_ROBOT_IDS_PER_SIDE):
             if breakbeam_status.ball_in_beam:

@@ -20,7 +20,7 @@ class RobotCommunication(object):
     ):
         """Initialize the communication with the robots
 
-        :param input_proto_unix_io: full_system_proto_unix_io object
+        :param input_proto_unix_io: The input proto_unix_io object
         :param multicast_channel: The multicast channel to use
         :param interface: The interface to use
         :param estop_path: The path to the estop
@@ -35,8 +35,7 @@ class RobotCommunication(object):
         self.estop_path = estop_path
         self.estop_buadrate = estop_buadrate
 
-        self.robots_connected_to_handheld_controllers = set()
-        self.robots_connected_to_diagnostics = set()
+        self.robots_connected = set()
 
         self.world_buffer = ThreadSafeBuffer(1, World)
         self.primitive_buffer = ThreadSafeBuffer(1, PrimitiveSet)
@@ -89,20 +88,34 @@ class RobotCommunication(object):
 
         """
         while True:
-            if self.fullsystem_connected_to_robots:
+            # Send fullsystem primitives to robots not connected to diagnostics
 
-                # Send the world
-                world = self.world_buffer.get(block=True)
-                self.world_mcast_sender.send_proto(world)
+            # Send the world
+            world = self.world_buffer.get(block=True)
+            self.world_mcast_sender.send_proto(world)
 
-                # Send the primitive set
-                primitive_set = self.primitive_buffer.get(block=False)
+            # Get the total primitive set
+            fullsystem_primitive_set = self.primitive_buffer.get(block=False)
 
-                if self.estop_reader.isEstopPlay():
-                    self.send_primitive_set.send_proto(primitive_set)
+            if self.estop_reader.isEstopPlay():
+                # Filter the primitive set to include only robots not connected to diagnostics
+                robot_primitives = fullsystem_primitive_set.robot_primitives
 
-            else:
+                for robot_id in self.robots_connected:
+                    del robot_primitives[robot_id]
 
+                # initialize filtered primitive set
+                fullsystem_primitive_set = PrimitiveSet(
+                    time_sent=Timestamp(epoch_timestamp_seconds=time.time()),
+                    stay_away_from_ball=False,
+                    robot_primitives=robot_primitives,
+                    sequence_number=self.sequence_number,
+                )
+
+                self.send_primitive_set.send_proto(fullsystem_primitive_set)
+
+            # If at least 1 robot is connected to diagnostics, send them diagnostics primitives
+            if len(self.robots_connected) != 0:
                 diagnostics_primitive = DirectControlPrimitive(
                     motor_control=self.motor_control_diagnostics_buffer.get(
                         block=False
@@ -112,12 +125,12 @@ class RobotCommunication(object):
                     ),
                 )
 
-                primitive_set = PrimitiveSet(
+                diagnostics_primitive_set = PrimitiveSet(
                     time_sent=Timestamp(epoch_timestamp_seconds=time.time()),
                     stay_away_from_ball=False,
                     robot_primitives={
                         robot_id: Primitive(direct_control=diagnostics_primitive)
-                        for robot_id in self.robots_connected_to_diagnostics
+                        for robot_id in self.robots_connected
                     },
                     sequence_number=self.sequence_number,
                 )
@@ -125,8 +138,8 @@ class RobotCommunication(object):
                 self.sequence_number += 1
 
                 if self.estop_reader.isEstopPlay():
-                    self.last_time = primitive_set.time_sent.epoch_timestamp_seconds
-                    self.send_primitive_set.send_proto(primitive_set)
+                    self.last_time = diagnostics_primitive_set.time_sent.epoch_timestamp_seconds
+                    self.send_primitive_set.send_proto(diagnostics_primitive_set)
 
                 time.sleep(0.001)
 
@@ -134,8 +147,7 @@ class RobotCommunication(object):
         """ Connect the robots to fullsystem """
 
         self.fullsystem_connected_to_robots = True
-        self.robots_connected_to_handheld_controllers = set()
-        self.robots_connected_to_diagnostics = set()
+        self.robots_connected = set()
 
     def disconnect_fullsystem_from_robots(self):
         """ Disconnect the robots from fullsystem """
@@ -143,10 +155,16 @@ class RobotCommunication(object):
         self.fullsystem_connected_to_robots = False
 
     def connect_robot_to_diagnostics(self, robot_id):
-        self.robots_connected_to_diagnostics.add(robot_id)
+        self.robots_connected.add(robot_id)
 
     def disconnect_robot_from_diagnostics(self, robot_id):
-        self.robots_connected_to_diagnostics.remove(robot_id)
+        self.robots_connected.remove(robot_id)
+
+    def toggle_robot_connection(self, robot_id):
+        if robot_id in self.robots_connected:
+            self.robots_connected.remove(robot_id)
+        else:
+            self.robots_connected.add(robot_id)
 
     def __enter__(self):
         """Enter RobotCommunication context manager. Setup multicast listener

@@ -209,46 +209,52 @@ if __name__ == "__main__":
     # We want to run either 1 instance of AI or 1 instance of RobotCommunication or both which will
     # send/recv packets over the provided multicast channel.
 
-    tscope = Thunderscope(
-        layout_path=args.layout,
-        load_blue=bool(args.run_blue),
-        load_yellow=bool(args.run_yellow),
-        load_diagnostics=bool(args.run_diagnostics),
-        load_gamecontroller=False,
-        visualization_buffer_size=args.visualization_buffer_size,
-    )
+    if args.run_blue or args.run_yellow or args.run_diagnostics:
+        tscope = Thunderscope(
+            layout_path=args.layout,
+            load_blue=bool(args.run_blue),
+            load_yellow=bool(args.run_yellow),
+            load_diagnostics=bool(args.run_diagnostics),
+            load_gamecontroller=False,
+            visualization_buffer_size=args.visualization_buffer_size,
+        )
 
-    if args.run_blue:
-        proto_unix_io = tscope.blue_full_system_proto_unix_io
-        runtime_dir = args.blue_full_system_runtime_dir
-        friendly_colour_yellow = False
-        debug = args.debug_blue_full_system
-    elif args.run_yellow:
-        proto_unix_io = tscope.yellow_full_system_proto_unix_io
-        runtime_dir = args.yellow_full_system_runtime_dir
-        friendly_colour_yellow = True
-        debug = args.debug_yellow_full_system
-    elif args.run_diagnostics:
-        proto_unix_io = tscope.robot_diagnostics_proto_unix_io
+        if args.run_blue:
+            proto_unix_io = tscope.blue_full_system_proto_unix_io
+            runtime_dir = args.blue_full_system_runtime_dir
+            friendly_colour_yellow = False
+            debug = args.debug_blue_full_system
+        elif args.run_yellow:
+            proto_unix_io = tscope.yellow_full_system_proto_unix_io
+            runtime_dir = args.yellow_full_system_runtime_dir
+            friendly_colour_yellow = True
+            debug = args.debug_yellow_full_system
+        elif args.run_diagnostics:
+            proto_unix_io = tscope.robot_diagnostics_proto_unix_io
 
-    if args.run_blue or args.run_yellow:
-        with ProtoLogger(
-            args.blue_full_system_runtime_dir,
-        ) as blue_logger, ProtoLogger(
-            args.yellow_full_system_runtime_dir,
-        ) as yellow_logger, FullSystem(
-            runtime_dir, debug, friendly_colour_yellow
-        ) as full_system:
+        if args.run_blue or args.run_yellow:
+            with ProtoLogger(
+                    args.blue_full_system_runtime_dir,
+            ) as blue_logger, ProtoLogger(
+                args.yellow_full_system_runtime_dir,
+            ) as yellow_logger, FullSystem(
+                runtime_dir, debug, friendly_colour_yellow
+            ) as full_system:
 
-            proto_unix_io.register_to_observe_everything(blue_logger.buffer)
-            proto_unix_io.register_to_observe_everything(yellow_logger.buffer)
-            full_system.setup_proto_unix_io(proto_unix_io)
+                proto_unix_io.register_to_observe_everything(blue_logger.buffer)
+                proto_unix_io.register_to_observe_everything(yellow_logger.buffer)
+                full_system.setup_proto_unix_io(proto_unix_io)
 
-    RobotCommunication(
-        proto_unix_io, getRobotMulticastChannel(0), args.interface
-    )
+        robot_communication = RobotCommunication(
+            proto_unix_io, getRobotMulticastChannel(0), args.interface
+        )
 
-    tscope.show()
+        if args.run_diagnostics:
+            tscope.toggle_robot_connection_signal.connect(
+                robot_communication.toggle_robot_connection
+            )
+
+        tscope.show()
 
 
 
@@ -257,7 +263,7 @@ if __name__ == "__main__":
     ###########################################################################
     #
     # Don't start any binaries and just replay a log.
-    if args.blue_log or args.yellow_log:
+    elif args.blue_log or args.yellow_log:
         tscope = Thunderscope(
             layout_path=args.layout,
             visualization_buffer_size=args.visualization_buffer_size,
@@ -277,6 +283,8 @@ if __name__ == "__main__":
     else:
 
         tscope = Thunderscope(
+            load_blue=True,
+            load_yellow=True,
             layout_path=args.layout,
             visualization_buffer_size=args.visualization_buffer_size,
         )

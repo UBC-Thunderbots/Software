@@ -85,8 +85,8 @@ class Thunderscope(object):
         blue_full_system_proto_unix_io=None,
         yellow_full_system_proto_unix_io=None,
         layout_path=None,
-        load_blue=True,
-        load_yellow=True,
+        load_blue=False,
+        load_yellow=False,
         load_diagnostics=False,
         load_gamecontroller=True,
         blue_replay_log=None,
@@ -168,7 +168,7 @@ class Thunderscope(object):
                 if blue_full_system_proto_unix_io is None
                 else blue_full_system_proto_unix_io
             )
-        elif load_yellow:
+        if load_yellow:
             self.yellow_full_system_proto_unix_io = (
                 ProtoUnixIO()
                 if yellow_full_system_proto_unix_io is None
@@ -323,7 +323,7 @@ class Thunderscope(object):
                     default_shelf.sync()
 
     def configure_layout(
-        self, layout_path, load_blue=True, load_yellow=True, load_diagnostics=True
+        self, layout_path, load_blue=False, load_yellow=False, load_diagnostics=False
     ):
         """Load the specified layout or the default file. If the default layout
         file doesn't exist, and no layout is provided, then just configure
@@ -333,23 +333,21 @@ class Thunderscope(object):
         :param load_blue: Whether to load the blue layout.
         :param load_yellow: Whether to load the yellow layout.
         :param load_diagnostics: Whether to load the diagnostics layout.
-
         """
         if load_yellow:
             self.configure_full_system_layout(
                 self.yellow_full_system_dock_area,
                 self.simulator_proto_unix_io,
                 self.yellow_full_system_proto_unix_io,
-                load_diagnostics,
+                load_blue != load_yellow and not load_diagnostics,
                 True,
             )
-
         if load_blue:
             self.configure_full_system_layout(
                 self.blue_full_system_dock_area,
                 self.simulator_proto_unix_io,
                 self.blue_full_system_proto_unix_io,
-                load_diagnostics,
+                load_blue != load_yellow and not load_diagnostics,
                 False,
             )
 
@@ -388,7 +386,7 @@ class Thunderscope(object):
         dock_area,
         sim_proto_unix_io,
         full_system_proto_unix_io,
-        load_diagnostics,
+        load_robot_view,
         friendly_colour_yellow,
     ):
         """Configure the default layout for thunderscope
@@ -396,6 +394,8 @@ class Thunderscope(object):
         :param dock_area: The dock area to configure the layout
         :param sim_proto_unix_io: The proto unix io object for the simulator
         :param full_system_proto_unix_io: The proto unix io object for the full system
+        :param load_robot_view: Whether robot view should be loaded or not
+                                (should not be in AI vs AI or with diagnostics)
         :param friendly_colour_yellow: Whether the friendly colour is yellow
 
         """
@@ -421,13 +421,11 @@ class Thunderscope(object):
         performance_dock = Dock("Performance")
         performance_dock.addWidget(widgets["performance_widget"].win)
 
-        widgets["robot_view"] = self.setup_robot_view(
-            full_system_proto_unix_io,
-            load_diagnostics
+        widgets["parameter_widget"] = self.setup_parameter_widget(
+            full_system_proto_unix_io, friendly_colour_yellow
         )
-
-        robot_view_dock = Dock("RobotView")
-        robot_view_dock.addWidget(widgets["robot_view"])
+        parameter_dock = Dock("Parameters")
+        parameter_dock.addWidget(widgets["parameter_widget"])
 
         widgets["playinfo_widget"] = self.setup_play_info(full_system_proto_unix_io)
         playinfo_dock = Dock("Play Info")
@@ -435,9 +433,18 @@ class Thunderscope(object):
 
         dock_area.addDock(field_dock)
         dock_area.addDock(log_dock, "left", field_dock)
-        dock_area.addDock(robot_view_dock, "above", log_dock)
+        dock_area.addDock(parameter_dock, "above", log_dock)
         dock_area.addDock(playinfo_dock, "bottom", field_dock)
         dock_area.addDock(performance_dock, "right", playinfo_dock)
+
+        if load_robot_view:
+            widgets["robot_view"] = self.setup_robot_view(
+                full_system_proto_unix_io,
+                False
+            )
+            robot_view_dock = Dock("RobotView")
+            robot_view_dock.addWidget(widgets["robot_view"])
+            dock_area.addDock(robot_view_dock, "above", log_dock)
 
     def configure_robot_diagnostics_layout(
             self,
@@ -447,8 +454,9 @@ class Thunderscope(object):
     ):
         """Configure the default layout for the robot diagnostics widget
 
+        :param dock_area: The dock area to configure the layout
         :param proto_unix_io: The proto unix io object for the full system
-
+        :param load_fullsystem: Whether the fullsystem is also being loaded currently
         """
 
         self.diagnostics_widgets = {}
@@ -467,16 +475,32 @@ class Thunderscope(object):
         log_dock = Dock("Logs")
         log_dock.addWidget(self.diagnostics_widgets["log_widget"])
 
+        self.diagnostics_widgets["robot_view"] = self.setup_robot_view(
+            proto_unix_io,
+            True
+        )
+        robot_view_dock = Dock("RobotView")
+        robot_view_dock.addWidget(self.diagnostics_widgets["robot_view"])
+
+        self.toggle_robot_connection_signal = self.diagnostics_widgets["robot_view"].toggle_robot_connection_signal
+
         self.diagnostics_widgets["fullsystem_connect"] = self.setup_fullsystem_connect_widget(
             proto_unix_io,
-            self.diagnostics_widgets["drive"],
-            self.diagnostics_widgets["chicker"],
             load_fullsystem
         )
         fullsystem_connect_dock = Dock("Fullsystem")
         fullsystem_connect_dock.addWidget(self.diagnostics_widgets["fullsystem_connect"])
 
+        self.diagnostics_widgets["fullsystem_connect"].toggle_controls_signal.connect(
+            self.diagnostics_widgets["drive"].toggle_all
+        )
+
+        self.diagnostics_widgets["fullsystem_connect"].toggle_controls_signal.connect(
+            self.diagnostics_widgets["chicker"].set_should_enable_buttons
+        )
+
         self.robot_diagnostics_dock_area.addDock(log_dock)
+        dock_area.addDock(robot_view_dock, "above", log_dock)
         self.robot_diagnostics_dock_area.addDock(drive_dock, "right", log_dock)
         self.robot_diagnostics_dock_area.addDock(chicker_dock, "below", drive_dock)
         self.robot_diagnostics_dock_area.addDock(fullsystem_connect_dock, "top", chicker_dock)
@@ -673,22 +697,17 @@ class Thunderscope(object):
     def setup_fullsystem_connect_widget(
             self,
             proto_unix_io,
-            drive_widget,
-            chicker_widget,
             load_fullsystem
     ):
         """
 
         :param proto_unix_io: The proto unix io object
-        :param drive_widget: The drive and dribbler widget in the current diagnostics
         :param load_fullsystem: boolean to indicate if fullsystem has also been loaded or not
         :returns the fullsystem connect widget
         """
 
         fullsystem_connect_widget = FullSystemConnectWidget(
             proto_unix_io,
-            drive_widget,
-            chicker_widget,
             load_fullsystem
         )
 

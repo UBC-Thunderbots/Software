@@ -12,18 +12,18 @@ class ControlMode(Enum):
 
 
 class FullSystemConnectWidget(QWidget):
+
+    toggle_controls_signal = pyqtSignal(bool)
+
     def __init__(
             self,
             proto_unix_io,
-            drive_widget,
-            chicker_widget,
             load_fullsystem
     ):
         """
         Initialises a new Fullsystem Connect Widget to allow switching between Manual, XBox, and Fullsystem control
         :param proto_unix_io: The proto_unix_io object
-        :param drive_widget: The current drive and dribbler widget
-        :param chicker_widget: The current chicker widget
+        :param load_fullsystem: Whether the fullsystem is being loaded currently
         """
 
         super(FullSystemConnectWidget, self).__init__()
@@ -55,21 +55,18 @@ class FullSystemConnectWidget(QWidget):
 
         vbox_layout.addWidget(self.connect_options_box)
 
-        self.drive_widget = drive_widget
-        self.chicker = chicker_widget
-
         self.setLayout(vbox_layout)
+
+
 
     def switch_control_mode(self, mode):
         self.control_mode = mode
 
     def refresh(self):
         if self.control_mode == ControlMode.XBOX or self.control_mode == ControlMode.AI:
-            self.drive_widget.toggle_all(False)
-            self.chicker.set_should_enable_buttons(False)
+            self.toggle_controls_signal.emit(False)
         else:
-            self.drive_widget.toggle_all(True)
-            self.chicker.set_should_enable_buttons(True)
+            self.toggle_controls_signal.emit(True)
 
 
 
