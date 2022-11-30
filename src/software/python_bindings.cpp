@@ -17,6 +17,8 @@
 #include "proto/team.pb.h"
 #include "proto/world.pb.h"
 #include "pybind11_protobuf/native_proto_caster.h"
+#include "shared/2021_robot_constants.h"
+#include "shared/robot_constants.h"
 #include "software/estop/threaded_estop_reader.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/circle.h"
@@ -32,6 +34,7 @@
 #include "software/world/field.h"
 #include "software/world/robot.h"
 #include "software/world/world.h"
+//#include "shared/2021_robot_constants.cpp"
 
 namespace py = pybind11;
 
@@ -84,7 +87,6 @@ std::unique_ptr<ThreadedEstopReader> createThreadedEstopReader(std::string uart_
 PYBIND11_MODULE(python_bindings, m)
 {
     pybind11_protobuf::ImportNativeProtoCasters();
-
     // Operator overloading section of
     // https://pybind11.readthedocs.io/en/stable/advanced/classes.html
     py::class_<Point>(m, "Point", py::module_local())
@@ -207,6 +209,14 @@ PYBIND11_MODULE(python_bindings, m)
         .def("radius", &Circle::radius)
         .def("area", &Circle::area);
 
+    py::class_<RobotConstants>(m, "RobotConstants")
+        .def_readwrite("max_force_dribbler_speed_rpm",
+                       &RobotConstants::max_force_dribbler_speed_rpm)
+        .def_readwrite("robot_max_speed_m_per_s",
+                       &RobotConstants::robot_max_speed_m_per_s)
+        .def_readwrite("robot_max_ang_speed_rad_per_s",
+                       &RobotConstants::robot_max_ang_speed_rad_per_s);
+    m.def("create2021RobotConstants", &create2021RobotConstants);
 
     m.def("createPoint", &createPoint);
     m.def("createPolygon", &createPolygon);
@@ -292,6 +302,15 @@ PYBIND11_MODULE(python_bindings, m)
         .def("enemyTeam", &World::enemyTeam)
         .def("ball", &World::ball)
         .def("field", &World::field);
+
+    //    py::class_<Constants>(m, "Constant")
+    //        .def("MAX_DRIBBLER_RPM", &Constants::MAX_DRIBBLER_RPM)
+    //        .def("MIN_DRIBBLER_RPM", &Constants::MIN_DRIBBLER_RPM)
+    //        .def("MAX_LINEAR_SPEED_MPS", &Constants::MAX_LINEAR_SPEED_MPS)
+    //        .def("MIN_LINEAR_SPEED_MPS", &Constants::MIN_LINEAR_SPEED_MPS)
+    //        .def("MAX_ANGULAR_SPEED_RAD_PER_S", &Constants::MAX_ANGULAR_SPEED_RAD_PER_S)
+    //        .def("MIN_ANGULAR_SPEED_RAD_PER_S",
+    //        &Constants::MIN_ANGULAR_SPEED_RAD_PER_S);
 
     // Listeners
     declareThreadedProtoUdpListener<SSLProto::Referee>(m, "SSLReferee");

@@ -1,20 +1,20 @@
 from pyqtgraph.Qt.QtCore import Qt
 from pyqtgraph.Qt.QtWidgets import *
 import time
+import software.python_bindings as tbots
 
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.common import common_widgets
 from proto.import_all_protos import *
 
-# TODO (#2683) get these values from robot constants
-MAX_DRIBBLER_RPM = 10000
-MIN_DRIBBLER_RPM = -10000
+MAX_DRIBBLER_RPM = tbots.Constants("max_force_dribbler_speed_rpm")
+MIN_DRIBBLER_RPM = -MAX_DRIBBLER_RPM
 
-MAX_LINEAR_SPEED_MPS = 5
-MIN_LINEAR_SPEED_MPS = -5
+MAX_LINEAR_SPEED_MPS = tbots.Constants("robot_max_speed_m_per_s")
+MIN_LINEAR_SPEED_MPS = -MAX_LINEAR_SPEED_MPS
 
-MAX_ANGULAR_SPEED_RAD_PER_S = 20
-MIN_ANGULAR_SPEED_RAD_PER_S = -20
+MAX_ANGULAR_SPEED_RAD_PER_S = tbots.Constants("robot_max_ang_speed_rad_per_s")
+MIN_ANGULAR_SPEED_RAD_PER_S = -MAX_ANGULAR_SPEED_RAD_PER_S
 
 
 class DriveAndDribblerWidget(QWidget):
