@@ -93,7 +93,9 @@ class RobotView(QWidget):
 
                 # connect checkboxes to emit a toggle connection signal with the corresponding robot ID
                 self.robot_checkboxes[x].stateChanged.connect(
-                    lambda state, robot_id=x: self.toggle_robot_connection_signal.emit(robot_id)
+                    lambda state, robot_id=x: self.toggle_robot_connection_signal.emit(
+                        robot_id
+                    )
                 )
 
             self.layout.addLayout(self.robot_layouts[x])

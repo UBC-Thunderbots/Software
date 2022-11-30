@@ -15,11 +15,7 @@ class FullSystemConnectWidget(QWidget):
 
     toggle_controls_signal = pyqtSignal(bool)
 
-    def __init__(
-            self,
-            proto_unix_io,
-            load_fullsystem
-    ):
+    def __init__(self, proto_unix_io, load_fullsystem):
         """
         Initialises a new Fullsystem Connect Widget to allow switching between Manual, XBox, and Fullsystem control
         :param proto_unix_io: The proto_unix_io object
@@ -34,7 +30,7 @@ class FullSystemConnectWidget(QWidget):
         radio_button_names = ["Manual Control", "XBox Control"]
 
         if load_fullsystem:
-            radio_button_names.append('AI Control')
+            radio_button_names.append("AI Control")
 
         self.connect_options_box, self.connect_options = common_widgets.create_radio(
             radio_button_names, self.connect_options_group
@@ -45,10 +41,16 @@ class FullSystemConnectWidget(QWidget):
 
         if load_fullsystem:
             self.ai_control_button = self.connect_options[2]
-            self.ai_control_button.toggled.connect(lambda: self.switch_control_mode(ControlMode.AI))
+            self.ai_control_button.toggled.connect(
+                lambda: self.switch_control_mode(ControlMode.AI)
+            )
 
-        self.manual_control_button.toggled.connect(lambda: self.switch_control_mode(ControlMode.MANUAL))
-        self.xbox_control_button.toggled.connect(lambda: self.switch_control_mode(ControlMode.XBOX))
+        self.manual_control_button.toggled.connect(
+            lambda: self.switch_control_mode(ControlMode.MANUAL)
+        )
+        self.xbox_control_button.toggled.connect(
+            lambda: self.switch_control_mode(ControlMode.XBOX)
+        )
 
         self.manual_control_button.setChecked(True)
         self.control_mode = ControlMode.MANUAL
@@ -56,8 +58,6 @@ class FullSystemConnectWidget(QWidget):
         vbox_layout.addWidget(self.connect_options_box)
 
         self.setLayout(vbox_layout)
-
-
 
     def switch_control_mode(self, mode):
         self.control_mode = mode
@@ -67,8 +67,3 @@ class FullSystemConnectWidget(QWidget):
             self.toggle_controls_signal.emit(False)
         else:
             self.toggle_controls_signal.emit(True)
-
-
-
-
-

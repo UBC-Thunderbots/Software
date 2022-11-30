@@ -44,9 +44,7 @@ class RobotCommunication(object):
         self.power_control_diagnostics_buffer = ThreadSafeBuffer(1, PowerControl)
 
         self.input_proto_unix_io.register_observer(World, self.world_buffer)
-        self.input_proto_unix_io.register_observer(
-            PrimitiveSet, self.primitive_buffer
-        )
+        self.input_proto_unix_io.register_observer(PrimitiveSet, self.primitive_buffer)
         self.input_proto_unix_io.register_observer(
             MotorControl, self.motor_control_diagnostics_buffer
         )
@@ -56,8 +54,6 @@ class RobotCommunication(object):
 
         self.send_estop_state_thread = threading.Thread(target=self.__send_estop_state)
         self.run_thread = threading.Thread(target=self.run)
-
-
 
         try:
             self.estop_reader = ThreadedEstopReader(
@@ -137,7 +133,9 @@ class RobotCommunication(object):
                 self.sequence_number += 1
 
                 if self.estop_reader.isEstopPlay():
-                    self.last_time = diagnostics_primitive_set.time_sent.epoch_timestamp_seconds
+                    self.last_time = (
+                        diagnostics_primitive_set.time_sent.epoch_timestamp_seconds
+                    )
                     self.send_primitive_set.send_proto(diagnostics_primitive_set)
 
                 time.sleep(0.001)
