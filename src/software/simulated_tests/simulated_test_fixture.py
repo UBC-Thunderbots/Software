@@ -53,7 +53,7 @@ class SimulatedTestRunner(object):
         simulator_proto_unix_io,
         blue_full_system_proto_unix_io,
         yellow_full_system_proto_unix_io,
-        gamecontroller
+        gamecontroller,
     ):
         """Initialize the SimulatorTestRunner
 
@@ -125,12 +125,12 @@ class SimulatedTestRunner(object):
         if self.thunderscope:
             self.thunderscope.close()
 
-    def __runner(
-            self,
-            always_validation_sequence_set=[[]],
-            eventually_validation_sequence_set=[[]],
-            test_timeout_s=3,
-            tick_duration_s=0.0166,  # Default to 60hz
+    def runner(
+        self,
+        always_validation_sequence_set=[[]],
+        eventually_validation_sequence_set=[[]],
+        test_timeout_s=3,
+        tick_duration_s=0.0166,  # Default to 60hz
     ):
         """Step simulation, full_system and run validation
         """
@@ -144,9 +144,7 @@ class SimulatedTestRunner(object):
                 ssl_wrapper = self.ssl_wrapper_buffer.get(block=False)
                 self.timestamp = ssl_wrapper.detection.t_capture
 
-            tick = SimulatorTick(
-                milliseconds=tick_duration_s * MILLISECONDS_PER_SECOND
-            )
+            tick = SimulatorTick(milliseconds=tick_duration_s * MILLISECONDS_PER_SECOND)
             self.simulator_proto_unix_io.send_proto(SimulatorTick, tick)
             time_elapsed_s += tick_duration_s
 
@@ -211,20 +209,28 @@ class InvariantTestRunner(SimulatedTestRunner):
 
     """Run a simulated test"""
 
+    def __int__(self, *args, **kwargs):
+        super(InvariantTestRunner, self).__init__(self, *args, **kwargs)
+
     def run_test(
-            self,
-            params=[],
-            always_validation_sequence_set=[[]],
-            eventually_validation_sequence_set=[[]],
-            test_timeout_s=3,
-            tick_duration_s=0.0166,  # Default to 60hz
+        self,
+        setup=(lambda x: None),
+        params=[0],
+        inv_always_validation_sequence_set=[[]],
+        inv_eventually_validation_sequence_set=[[]],
+        test_timeout_s=3,
+        tick_duration_s=0.0166,  # Default to 60hz
+        **kwargs,
     ):
         """Run an invariant test
 
-        :param always_validation_sequence_set: Validation functions that should
-                                hold on every tick
-        :param eventually_validation_sequence_set: Validation that should
-                                eventually be true, before the test ends
+        :param setup: Function that sets up the World state and the gamecontroller before running the test
+        :param params: List of parameters for each iteration of the test
+                        (this method only uses the first element)
+        :param inv_always_validation_sequence_set: Validation functions for invariant testing
+                                that should hold on every tick
+        :param inv_eventually_validation_sequence_set: Validation functions for invariant testing
+                                that should eventually be true, before the test ends
         :param test_timeout_s: The timeout for the test, if any eventually_validations
                                 remain after the timeout, the test fails.
         :param tick_duration_s: The simulation step duration
@@ -233,12 +239,14 @@ class InvariantTestRunner(SimulatedTestRunner):
 
         threading.excepthook = self.excepthook
 
+        setup(params[0])
+
         # If thunderscope is enabled, run the test in a thread and show
         # thunderscope on this thread. The excepthook is setup to catch
         # any test failures and propagate them to the main thread
         if self.thunderscope:
 
-            run_sim_thread = threading.Thread(target=self.__runner, daemon=True)
+            run_sim_thread = threading.Thread(target=self.runner, daemon=True)
             run_sim_thread.start()
             self.thunderscope.show()
             run_sim_thread.join()
@@ -248,29 +256,36 @@ class InvariantTestRunner(SimulatedTestRunner):
 
         # If thunderscope is disabled, just run the test
         else:
-            self.__runner(
-                always_validation_sequence_set,
-                eventually_validation_sequence_set,
-                test_timeout_s,
-                tick_duration_s
+            self.runner(
+                inv_always_validation_sequence_set,
+                inv_eventually_validation_sequence_set,
+                test_timeout_s[0] if type(test_timeout_s) == list else test_timeout_s,
+                tick_duration_s,
             )
 
+
 class AggregateTestRunner(SimulatedTestRunner):
+    def __int__(self, *args, **kwargs):
+        super().__init__(self, *args, **kwargs)
+
     def run_test(
-            self,
-            params=[],
-            always_validation_sequence_set=[[]],
-            eventually_validation_sequence_set=[[]],
-            test_timeout_s=3,
-            tick_duration_s=0.0166,  # Default to 60hz
+        self,
+        setup=(lambda: None),
+        params=[],
+        ag_always_validation_sequence_set=[[]],
+        ag_eventually_validation_sequence_set=[[]],
+        test_timeout_s=3,
+        tick_duration_s=0.0166,  # Default to 60hz
+        **kwargs,
     ):
         """Run an aggregate test
 
+        :param setup: Function that sets up the World state and the gamecontroller before running the test
         :param params: List of parameters for each iteration of the test
-        :param always_validation_sequence_set: Validation functions that should
-                                hold on every tick
-        :param eventually_validation_sequence_set: Validation that should
-                                eventually be true, before the test ends
+        :param ag_always_validation_sequence_set: Validation functions for aggregate testing
+                                that should hold on every tick
+        :param ag_eventually_validation_sequence_set: Validation functions for aggregate testing
+                                that should eventually be true, before the test ends
         :param test_timeout_s: The timeout for the test, if any eventually_validations
                                 remain after the timeout, the test fails.
         :param tick_duration_s: The simulation step duration
@@ -282,39 +297,39 @@ class AggregateTestRunner(SimulatedTestRunner):
         # Runs the test once for each given parameter
         # Catches Assertion Error thrown by failing test and increments counter
         # Calculates overall results and prints them
-        for param in params:
+        for x in range(len(params)):
             # If thunderscope is enabled, run the test in a thread and show
             # thunderscope on this thread. The excepthook is setup to catch
             # any test failures and propagate them to the main thread
-            self.test_param = param
+            setup(params[x])
 
             failed_tests = 0
 
             try:
                 if self.thunderscope:
 
-                run_sim_thread = threading.Thread(target=self.__runner, daemon=True)
-                run_sim_thread.start()
-                self.thunderscope.show()
-                run_sim_thread.join()
+                    run_sim_thread = threading.Thread(target=self.runner, daemon=True)
+                    run_sim_thread.start()
+                    self.thunderscope.show()
+                    run_sim_thread.join()
 
-                if self.last_exception:
-                    pytest.fail(str(self.last_exception))
+                    if self.last_exception:
+                        pytest.fail(str(self.last_exception))
 
                 # If thunderscope is disabled, just run the test
                 else:
-                    self.__runner(
-                        always_validation_sequence_set,
-                        eventually_validation_sequence_set,
-                        test_timeout_s,
-                        tick_duration_s
+                    self.runner(
+                        ag_always_validation_sequence_set,
+                        ag_eventually_validation_sequence_set,
+                        test_timeout_s[x] if type(test_timeout_s) == list else test_timeout_s,
+                        tick_duration_s,
                     )
             except AssertionError:
                 failed_tests += 1
 
-            print(f"{failed_tests} test failed")
+        print(f"{failed_tests} test failed")
 
-            assert failed_tests > 0
+        assert failed_tests == 0
 
 
 def load_command_line_arguments():
@@ -329,10 +344,7 @@ def load_command_line_arguments():
         "--enable_thunderscope", action="store_true", help="enable thunderscope"
     )
     parser.add_argument(
-        "--aggregate",
-        action="store_true",
-        default=False,
-        help="Run aggregate test"
+        "--aggregate", action="store_true", default=False, help="Run aggregate test"
     )
     parser.add_argument(
         "--simulator_runtime_dir",
@@ -469,15 +481,27 @@ def simulated_test_runner():
 
             time.sleep(LAUNCH_DELAY_S)
 
-            runner = SimulatorTestRunner(
-                current_test,
-                tscope,
-                simulator_proto_unix_io,
-                blue_full_system_proto_unix_io,
-                yellow_full_system_proto_unix_io,
-                gamecontroller,
-                aggregate
-            )
+            runner = None
+
+            # Initialise the right runner based on which testing mode is selected
+            if aggregate:
+                runner = AggregateTestRunner(
+                    current_test,
+                    tscope,
+                    simulator_proto_unix_io,
+                    blue_full_system_proto_unix_io,
+                    yellow_full_system_proto_unix_io,
+                    gamecontroller,
+                )
+            else:
+                runner = InvariantTestRunner(
+                    current_test,
+                    tscope,
+                    simulator_proto_unix_io,
+                    blue_full_system_proto_unix_io,
+                    yellow_full_system_proto_unix_io,
+                    gamecontroller,
+                )
 
             # Only validate on the blue worlds
             blue_full_system_proto_unix_io.register_observer(World, runner.world_buffer)
@@ -510,4 +534,3 @@ def simulated_test_runner():
                 print(
                     f"\n\n To replay this test for the yellow team, go to the `src` folder and run \n./tbots.py run thunderscope --yellow_log {yellow_logger.log_folder}"
                 )
-
