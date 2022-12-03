@@ -47,13 +47,13 @@ class SimulatedTestRunner(object):
     """Run a simulated test"""
 
     def __init__(
-            self,
-            test_name,
-            thunderscope,
-            simulator_proto_unix_io,
-            blue_full_system_proto_unix_io,
-            yellow_full_system_proto_unix_io,
-            gamecontroller,
+        self,
+        test_name,
+        thunderscope,
+        simulator_proto_unix_io,
+        blue_full_system_proto_unix_io,
+        yellow_full_system_proto_unix_io,
+        gamecontroller,
     ):
         """Initialize the SimulatorTestRunner
 
@@ -126,11 +126,11 @@ class SimulatedTestRunner(object):
             self.thunderscope.close()
 
     def runner(
-            self,
-            always_validation_sequence_set=[[]],
-            eventually_validation_sequence_set=[[]],
-            test_timeout_s=3,
-            tick_duration_s=0.0166,  # Default to 60hz
+        self,
+        always_validation_sequence_set=[[]],
+        eventually_validation_sequence_set=[[]],
+        test_timeout_s=3,
+        tick_duration_s=0.0166,  # Default to 60hz
     ):
         """Step simulation, full_system and run validation
         """
@@ -213,14 +213,14 @@ class InvariantTestRunner(SimulatedTestRunner):
         super(InvariantTestRunner, self).__init__(self, *args, **kwargs)
 
     def run_test(
-            self,
-            setup=(lambda x: None),
-            params=[0],
-            inv_always_validation_sequence_set=[[]],
-            inv_eventually_validation_sequence_set=[[]],
-            test_timeout_s=3,
-            tick_duration_s=0.0166,  # Default to 60hz
-            **kwargs,
+        self,
+        setup=(lambda x: None),
+        params=[0],
+        inv_always_validation_sequence_set=[[]],
+        inv_eventually_validation_sequence_set=[[]],
+        test_timeout_s=3,
+        tick_duration_s=0.0166,  # Default to 60hz
+        **kwargs,
     ):
         """Run an invariant test
 
@@ -269,14 +269,14 @@ class AggregateTestRunner(SimulatedTestRunner):
         super().__init__(self, *args, **kwargs)
 
     def run_test(
-            self,
-            setup=(lambda: None),
-            params=[],
-            ag_always_validation_sequence_set=[[]],
-            ag_eventually_validation_sequence_set=[[]],
-            test_timeout_s=3,
-            tick_duration_s=0.0166,  # Default to 60hz
-            **kwargs,
+        self,
+        setup=(lambda: None),
+        params=[],
+        ag_always_validation_sequence_set=[[]],
+        ag_eventually_validation_sequence_set=[[]],
+        test_timeout_s=3,
+        tick_duration_s=0.0166,  # Default to 60hz
+        **kwargs,
     ):
         """Run an aggregate test
 
@@ -321,7 +321,9 @@ class AggregateTestRunner(SimulatedTestRunner):
                     self.runner(
                         ag_always_validation_sequence_set,
                         ag_eventually_validation_sequence_set,
-                        test_timeout_s[x] if type(test_timeout_s) == list else test_timeout_s,
+                        test_timeout_s[x]
+                        if type(test_timeout_s) == list
+                        else test_timeout_s,
                         tick_duration_s,
                     )
             except AssertionError:
@@ -405,7 +407,7 @@ def load_command_line_arguments():
         action="store",
         default="",
         help="The test filter, if not specified all tests will run. "
-             + "See https://docs.pytest.org/en/latest/how-to/usage.html#specifying-tests-selecting-tests",
+        + "See https://docs.pytest.org/en/latest/how-to/usage.html#specifying-tests-selecting-tests",
     )
     return parser.parse_args()
 
@@ -441,7 +443,7 @@ def simulated_test_runner():
 
     # Launch all binaries
     with Simulator(
-            f"{args.simulator_runtime_dir}/test/{test_name}", args.debug_simulator
+        f"{args.simulator_runtime_dir}/test/{test_name}", args.debug_simulator
     ) as simulator, FullSystem(
         f"{args.blue_full_system_runtime_dir}/test/{test_name}",
         args.debug_blue_full_system,
@@ -454,7 +456,7 @@ def simulated_test_runner():
         should_restart_on_crash=False,
     ) as yellow_fs:
         with Gamecontroller(
-                supress_logs=(not args.show_gamecontroller_logs), ci_mode=True,
+            supress_logs=(not args.show_gamecontroller_logs), ci_mode=True,
         ) as gamecontroller:
 
             blue_fs.setup_proto_unix_io(blue_full_system_proto_unix_io)
@@ -513,8 +515,8 @@ def simulated_test_runner():
             # SimulatorTestRunner time provider is tied to the simulators
             # t_capture coming out of the wrapper packet (rather than time.time).
             with ProtoLogger(
-                    f"{args.blue_full_system_runtime_dir}/logs/{current_test}",
-                    time_provider=runner.time_provider,
+                f"{args.blue_full_system_runtime_dir}/logs/{current_test}",
+                time_provider=runner.time_provider,
             ) as blue_logger, ProtoLogger(
                 f"{args.yellow_full_system_runtime_dir}/logs/{current_test}",
                 time_provider=runner.time_provider,

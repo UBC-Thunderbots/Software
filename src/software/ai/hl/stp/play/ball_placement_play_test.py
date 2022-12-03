@@ -90,14 +90,18 @@ def test_two_ai_ball_placement(simulated_test_runner):
         inv_eventually_validation_sequence_set=[
             [
                 # Ball should arrive within 5cm of placement point
-                BallEventuallyEntersRegion(regions=[tbots.Circle(ball_final_pos, 0.05)]),
+                BallEventuallyEntersRegion(
+                    regions=[tbots.Circle(ball_final_pos, 0.05)]
+                ),
             ]
         ],
         ag_always_validation_sequence_set=[[]],
         ag_eventually_validation_sequence_set=[
             [
                 # Ball should arrive within 5cm of placement point
-                BallEventuallyEntersRegion(regions=[tbots.Circle(ball_final_pos, 0.05)]),
+                BallEventuallyEntersRegion(
+                    regions=[tbots.Circle(ball_final_pos, 0.05)]
+                ),
             ]
         ],
         test_timeout_s=[20, 20, 20, 20],
