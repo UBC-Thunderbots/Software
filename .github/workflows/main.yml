@@ -152,6 +152,11 @@ jobs:
         run: |
           "${GITHUB_WORKSPACE}"/environment_setup/setup_software.sh
 
+      - name: Build Thunderscope
+        run: |
+          cd src
+          bazel build //software/thunderscope:thunderscope_main
+
       - name: AI vs AI (2 minutes)
         timeout-minutes: 2
         run: |

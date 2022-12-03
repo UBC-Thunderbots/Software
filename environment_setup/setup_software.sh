@@ -68,7 +68,9 @@ host_software_packages=(
     libssl-dev # needed to build Python 3 with ssl support
     openssl # possibly also necessary for ssl in Python 3
     sshpass #used to remotely ssh into robots via Ansible
+
     openjdk-17-jdk # dependency for tigers autoref
+    unzip # installing tigers autoref
 )
 
 if [[ $(lsb_release -rs) == "20.04" ]]; then
@@ -139,17 +141,15 @@ print_status_msg "Done Setting Up Virtual Python Environment"
 print_status_msg "Fetching game controller"
 
 sudo chown -R $USER:$USER /opt/tbotspython
-sudo wget -nc https://github.com/RoboCup-SSL/ssl-game-controller/releases/download/v2.15.2/ssl-game-controller_v2.15.2_linux_amd64 -O /opt/tbotspython/gamecontroller
+sudo wget -N https://github.com/RoboCup-SSL/ssl-game-controller/releases/download/v2.15.2/ssl-game-controller_v2.15.2_linux_amd64 -O /opt/tbotspython/gamecontroller
 sudo chmod +x /opt/tbotspython/gamecontroller
 
-print_status_msg "Cloning submodules"
-git submodule update --init --recursive
 print_status_msg "Setting up TIGERS Autoref"
-ln -s $CURR_DIR/../src/software/simulation/tigers_autoref/ /opt/tbotspython/autoref
-cd $CURR_DIR/../src/software/simulation/tigers_autoref/
-./build.sh
-cd $CURR_DIR
-sudo chmod +x $CURR_DIR/../src/software/simulation/tigers_autoref/run.sh
+sudo wget -N https://gitlab.tigers-mannheim.de/open-source/AutoReferee/-/archive/autoref-ci/AutoReferee-autoref-ci.zip -O /tmp/autoref-ci.zip
+unzip -q -o -d /tmp/ /tmp/autoref-ci.zip
+touch /tmp/AutoReferee-autoref-ci/.git # a hacky way to make gradle happy when it tries to find a dependency
+/tmp/AutoReferee-autoref-ci/./gradlew installDist -p /tmp/AutoReferee-autoref-ci/
+cp -r /tmp/AutoReferee-autoref-ci/build/install/autoReferee/ /opt/tbotspython/autoReferee
 print_status_msg "Finished setting up autoref"
 
 # Install Bazel

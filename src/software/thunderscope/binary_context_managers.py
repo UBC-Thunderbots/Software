@@ -551,9 +551,9 @@ class TigersAutoref(object):
 
     def startAutoref(self):
         print(os.getcwd())
-        os.chdir("/opt/tbotspython/autoref/")
+        os.chdir("/opt/tbotspython/autoReferee/")
         print(os.getcwd())
-        autoref_cmd = "./run.sh -a -hl"
+        autoref_cmd = "bin/./autoReferee -hl -a"
 
         if self.ci_mode:
             autoref_cmd += " -ci"
