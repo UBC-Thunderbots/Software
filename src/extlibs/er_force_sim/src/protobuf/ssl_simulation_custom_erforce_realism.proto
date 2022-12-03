@@ -4,7 +4,6 @@ option go_package = "github.com/RoboCup-SSL/ssl-simulation-protocol/pkg/sim";
 // Realism configuration for ER-Force simulator
 // this message is stored in human readable form for saved ui settings
 // therefore do NOT modify field names without changing them in the config files
-// the values are set to 0 to simulate the ideal situation
 message RealismConfigErForce
 {
     // Standard deviation of the gaussian noise applied to the ball position [m]

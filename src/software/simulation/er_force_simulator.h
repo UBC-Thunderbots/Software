@@ -127,12 +127,14 @@ class ErForceSimulator
     void resetCurrentTime();
 
     /**
-     * Creates the default realism config
+     * Creates the default realism config using erforce simulator's default config
+     * @return a pointer to default realism config
      */
     static std::unique_ptr<RealismConfigErForce> createDefaultRealismConfig();
 
     /**
      * Creates the realistic realism config
+     * @return a pointer to realistic realism config
      */
     static std::unique_ptr<RealismConfigErForce> createRealisticRealismConfig();
 
