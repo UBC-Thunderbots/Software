@@ -50,6 +50,7 @@ from software.thunderscope.field.field import Field
 from software.thunderscope.log.g3log_widget import g3logWidget
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.thunderscope.play.playinfo_widget import playInfoWidget
+from software.thunderscope.play.refereeinfo_widget import refereeInfoWidget
 from software.thunderscope.robot_diagnostics.chicker import ChickerWidget
 from software.thunderscope.robot_diagnostics.drive_and_dribbler_widget import (
     DriveAndDribblerWidget,
@@ -429,10 +430,15 @@ class Thunderscope(object):
         playinfo_dock = Dock("Play Info")
         playinfo_dock.addWidget(widgets["playinfo_widget"])
 
+        widgets["refereeinfo_widget"] = self.setup_referee_info(full_system_proto_unix_io)
+        refereeinfo_dock = Dock("Referee Info")
+        refereeinfo_dock.addWidget(widgets["refereeinfo_widget"])
+
         dock_area.addDock(field_dock)
         dock_area.addDock(log_dock, "left", field_dock)
         dock_area.addDock(parameter_dock, "above", log_dock)
         dock_area.addDock(playinfo_dock, "bottom", field_dock)
+        dock_area.addDock(refereeinfo_dock, "bottom", field_dock)
         dock_area.addDock(performance_dock, "right", playinfo_dock)
 
     def configure_robot_diagnostics_layout(self, dock_area, proto_unix_io):
@@ -640,6 +646,20 @@ class Thunderscope(object):
         self.register_refresh_function(play_info.refresh)
 
         return play_info
+
+    def setup_referee_info(self, proto_unix_io):
+        """Setup the referee info widget
+
+        :param proto_unix_io: The proto unix io object
+        :returns: The referee info widget
+
+        """
+
+        referee_info = refereeInfoWidget()
+        proto_unix_io.register_observer(Referee, referee_info.referee_buffer)
+        self.register_refresh_function(referee_info.refresh)
+
+        return referee_info
 
     def setup_chicker_widget(self, proto_unix_io):
         """Setup the chicker widget for robot diagnostics

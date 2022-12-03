@@ -124,6 +124,12 @@ class playInfoWidget(QWidget):
                 + referee_msg_dict["command"]
                 + f" {referee_msg_dict['blue']['goalkeeper']}"
                 + f" {referee_msg_dict['yellow']['goalkeeper']}"
+                + f" {referee_msg_dict['blue']['yellowCards']}"
+                + f" {referee_msg_dict['yellow']['yellowCards']}"
+                + f" {referee_msg_dict['blue']['redCards']}"
+                + f" {referee_msg_dict['yellow']['redCards']}"
                 + f" -> blue team on positive half: {referee_msg_dict['blueTeamOnPositiveHalf']}"
             )
             self.referee_info.setText(p)
+
+
