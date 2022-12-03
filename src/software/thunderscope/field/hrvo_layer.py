@@ -2,7 +2,7 @@ import pyqtgraph as pg
 from proto.visualization_pb2 import HRVOVisualization
 from pyqtgraph.Qt import QtCore, QtGui
 
-from software.thunderscope.constants import Colors
+from software.thunderscope.colors import Colors
 from software.py_constants import *
 from software.thunderscope.field.field_layer import FieldLayer
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
@@ -94,5 +94,9 @@ class HRVOLayer(FieldLayer):
 
         for robot_circle in velocity_obstacle_msg.robots:
             painter.drawEllipse(
-                self.createCircle(robot_circle.origin, robot_circle.radius)
+                self.createCircle(
+                    int(MILLIMETERS_PER_METER * robot_circle.origin.x_meters),
+                    int(MILLIMETERS_PER_METER * robot_circle.origin.y_meters),
+                    int(MILLIMETERS_PER_METER * robot_circle.radius),
+                )
             )

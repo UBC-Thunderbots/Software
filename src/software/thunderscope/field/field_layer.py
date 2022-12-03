@@ -1,8 +1,5 @@
-import math
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtCore, QtGui
-from proto.geometry_pb2 import Point, Angle, Segment
-from software.py_constants import *
 
 
 class FieldLayer(pg.GraphicsObject):
@@ -36,50 +33,16 @@ class FieldLayer(pg.GraphicsObject):
         # Instead it is bottom left x, bottom left y, width height.
         return QtCore.QRectF(-9000, -6000, 18000, 12000)
 
-    def createCircle(self, origin: Point, radius):
+    def createCircle(self, x, y, radius):
         """Creates a Rectangle that bounds the circle
 
-        :param origin: Proto Point representing the origin of the circle
-        :param radius: The radius of the circle in meters
+        :param x: The x position
+        :param y: The y position
+        :param radius: The radius of the circle
         :returns: bounding rectangle
 
         """
         # TODO (#2398) fix this to be top left coordinates, width, height
-        x_mm = int(MILLIMETERS_PER_METER * origin.x_meters)
-        y_mm = int(MILLIMETERS_PER_METER * origin.y_meters)
-        radius_mm = int(MILLIMETERS_PER_METER * radius)
         return QtCore.QRectF(
-            int(x_mm - radius_mm),
-            int(y_mm - radius_mm),
-            int(radius_mm * 2),
-            int(radius_mm * 2),
-        )
-
-    def drawRobot(self, position: Point, orientation: Angle, painter):
-        """
-        Draw a robot at the given position and orientation
-        :param position: Proto Point representing the position of robot
-        :param orientation: Proto Angle representing the orientation of robot
-        :param painter: The painter object to draw robot with
-        """
-        convert_degree = -16
-        painter.drawChord(
-            self.createCircle(position, ROBOT_MAX_RADIUS_METERS),
-            int((math.degrees(orientation.radians) + 45)) * convert_degree,
-            270 * convert_degree,
-        )
-
-    def drawSegment(self, segment: Segment, painter):
-        """
-        Draw a segment
-        :param segment: Proto Segment representing the segment to draw 
-        :param painter: The painter object to draw robot with
-        """
-        painter.drawLine(
-            QtCore.QLine(
-                int(segment.start.x_meters * MILLIMETERS_PER_METER),
-                int(segment.start.y_meters * MILLIMETERS_PER_METER),
-                int(segment.end.x_meters * MILLIMETERS_PER_METER),
-                int(segment.end.y_meters * MILLIMETERS_PER_METER),
-            )
+            int(x - radius), int(y - radius), int(radius * 2), int(radius * 2)
         )

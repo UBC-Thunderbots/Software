@@ -70,12 +70,6 @@ class ProtoPlayer(object):
         # Load up all replay files in the log folder
         replay_files = glob.glob(self.log_folder_path + f"/*.{REPLAY_FILE_EXTENSION}")
 
-        if len(replay_files) == 0:
-            raise ValueError(
-                f'No replay files found in "{self.log_folder_path}", make sure that an absolute path '
-                f"to the folder containing the replay files is provided."
-            )
-
         # Sort the files by their chunk index
         def __sort_replay_chunks(file_path):
             head, tail = os.path.split(file_path)
@@ -136,12 +130,7 @@ class ProtoPlayer(object):
         # Convert string to type. eval is an order of magnitude
         # faster than iterating over the protobuf library to find
         # the type from the string.
-        try:
-            # The format of the protobuf type is:
-            # package.proto_class (e.g. TbotsProto.Primitive)
-            proto_class = eval(str(protobuf_type.split(b".")[-1], encoding="utf-8"))
-        except NameError:
-            raise TypeError(f"Unknown proto type in replay: '{protobuf_type}'")
+        proto_class = eval(str(protobuf_type.split(b".")[1], encoding="utf-8"))
 
         # Deserialize protobuf
         proto = proto_class.FromString(base64.b64decode(data[len("b") : -len("\n")]))
