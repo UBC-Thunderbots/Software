@@ -143,85 +143,85 @@ void KdTree::buildRecursive(std::size_t begin, std::size_t end, std::size_t node
     }
 }
 
-void KdTree::queryRecursive(HRVOAgent *agent, float &rangeSq, std::size_t node) const
+void KdTree::queryRecursive(HRVOAgent *agent, float &range_sq, std::size_t node) const
 {
     if (nodes_[node].end_ - nodes_[node].begin_ <= HRVO_MAX_LEAF_SIZE)
     {
         for (std::size_t i = nodes_[node].begin_; i < nodes_[node].end_; ++i)
         {
-            agent->insertNeighbor(agents_[i], rangeSq);
+            agent->insertNeighbor(agents_[i], range_sq);
         }
     }
     else
     {
-        float distSqLeft  = 0.0f;
-        float distSqRight = 0.0f;
+        float dist_sq_left  = 0.0f;
+        float dist_sq_right = 0.0f;
 
         if (agent->position_.x() < nodes_[nodes_[node].left_].minX_)
         {
-            distSqLeft +=
+            dist_sq_left +=
                 std::pow(nodes_[nodes_[node].left_].minX_ - agent->position_.x(), 2.f);
         }
         else if (agent->position_.x() > nodes_[nodes_[node].left_].maxX_)
         {
-            distSqLeft +=
+            dist_sq_left +=
                 std::pow(agent->position_.x() - nodes_[nodes_[node].left_].maxX_, 2.f);
         }
 
         if (agent->position_.y() < nodes_[nodes_[node].left_].minY_)
         {
-            distSqLeft +=
+            dist_sq_left +=
                 std::pow(nodes_[nodes_[node].left_].minY_ - agent->position_.y(), 2.f);
         }
         else if (agent->position_.y() > nodes_[nodes_[node].left_].maxY_)
         {
-            distSqLeft +=
+            dist_sq_left +=
                 std::pow(agent->position_.y() - nodes_[nodes_[node].left_].maxY_, 2.f);
         }
 
         if (agent->position_.x() < nodes_[nodes_[node].right_].minX_)
         {
-            distSqRight +=
+            dist_sq_right +=
                 std::pow(nodes_[nodes_[node].right_].minX_ - agent->position_.x(), 2.f);
         }
         else if (agent->position_.x() > nodes_[nodes_[node].right_].maxX_)
         {
-            distSqRight +=
+            dist_sq_right +=
                 std::pow(agent->position_.x() - nodes_[nodes_[node].right_].maxX_, 2.f);
         }
 
         if (agent->position_.y() < nodes_[nodes_[node].right_].minY_)
         {
-            distSqRight +=
+            dist_sq_right +=
                 std::pow(nodes_[nodes_[node].right_].minY_ - agent->position_.y(), 2.f);
         }
         else if (agent->position_.y() > nodes_[nodes_[node].right_].maxY_)
         {
-            distSqRight +=
+            dist_sq_right +=
                 std::pow(agent->position_.y() - nodes_[nodes_[node].right_].maxY_, 2.f);
         }
 
-        if (distSqLeft < distSqRight)
+        if (dist_sq_left < dist_sq_right)
         {
-            if (distSqLeft < rangeSq)
+            if (dist_sq_left < range_sq)
             {
-                queryRecursive(agent, rangeSq, nodes_[node].left_);
+                queryRecursive(agent, range_sq, nodes_[node].left_);
 
-                if (distSqRight < rangeSq)
+                if (dist_sq_right < range_sq)
                 {
-                    queryRecursive(agent, rangeSq, nodes_[node].right_);
+                    queryRecursive(agent, range_sq, nodes_[node].right_);
                 }
             }
         }
         else
         {
-            if (distSqRight < rangeSq)
+            if (dist_sq_right < range_sq)
             {
-                queryRecursive(agent, rangeSq, nodes_[node].right_);
+                queryRecursive(agent, range_sq, nodes_[node].right_);
 
-                if (distSqLeft < rangeSq)
+                if (dist_sq_left < range_sq)
                 {
-                    queryRecursive(agent, rangeSq, nodes_[node].left_);
+                    queryRecursive(agent, range_sq, nodes_[node].left_);
                 }
             }
         }

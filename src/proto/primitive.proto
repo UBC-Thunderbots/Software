@@ -3,6 +3,7 @@ syntax = "proto3";
 package TbotsProto;
 
 import "proto/geometry.proto";
+import "proto/geneva_slot.proto";
 import "google/protobuf/descriptor.proto";
 
 extend google.protobuf.EnumValueOptions
@@ -79,6 +80,8 @@ message AutoChipOrKick
     };
 }
 
+// This is only used for simulation. Similar proto in power_frame_msg.proto but with pulse
+// width instead of m_per_s
 message PowerControl
 {
     message ChickerControl
@@ -97,16 +100,8 @@ message PowerControl
         float rotation_speed_rpm = 2;
     }
 
-    enum ChargeMode
-    {
-        DISCHARGE = 0;
-        CHARGE    = 1;
-        FLOAT     = 2;
-    }
-
-    ChickerControl chicker = 1;
-    GenevaControl geneva   = 2;
-    ChargeMode charge_mode = 3;
+    ChickerControl chicker  = 1;
+    Geneva.Slot geneva_slot = 2;
 }
 
 message Primitive
@@ -128,7 +123,7 @@ message MovePrimitive
     MotionControl motion_control          = 1;
     float final_speed_m_per_s             = 2;
     Angle final_angle                     = 3;
-    float dribbler_speed_rpm              = 4;
+    int32 dribbler_speed_rpm              = 4;
     float max_speed_m_per_s               = 5;
     AutoChipOrKick auto_chip_or_kick      = 6;
     float target_spin_rev_per_s           = 7;
@@ -149,10 +144,10 @@ message MotorControl
 {
     message DirectPerWheelControl
     {
-        float front_left_wheel_rpm  = 1;
-        float back_left_wheel_rpm   = 2;
-        float front_right_wheel_rpm = 3;
-        float back_right_wheel_rpm  = 4;
+        float front_left_wheel_velocity  = 1;
+        float back_left_wheel_velocity   = 2;
+        float front_right_wheel_velocity = 3;
+        float back_right_wheel_velocity  = 4;
     }
 
     message DirectVelocityControl
@@ -167,7 +162,7 @@ message MotorControl
         DirectVelocityControl direct_velocity_control  = 2;
     }
 
-    float dribbler_speed_rpm = 4;
+    int32 dribbler_speed_rpm = 4;
 }
 
 message DirectControlPrimitive

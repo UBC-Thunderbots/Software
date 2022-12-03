@@ -5,7 +5,6 @@
 #include "proto/primitive/primitive_msg_factory.h"
 #include "proto/tbots_software_msgs.pb.h"
 #include "proto/visualization.pb.h"
-#include "software/logger/logger.h"
 #include "software/math/math_functions.h"
 
 PrimitiveExecutor::PrimitiveExecutor(const double time_step,
@@ -26,7 +25,13 @@ void PrimitiveExecutor::updatePrimitiveSet(
     if (primitive_set_msg_iter != primitive_set_msg.robot_primitives().end())
     {
         current_primitive_ = primitive_set_msg_iter->second;
+        return;
     }
+}
+
+void PrimitiveExecutor::clearCurrentPrimitive()
+{
+    current_primitive_.Clear();
 }
 
 void PrimitiveExecutor::updateWorld(const TbotsProto::World& world_msg)
@@ -84,10 +89,6 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
             //
             // https://developers.google.com/protocol-buffers/docs/proto3#default
             auto output = std::make_unique<TbotsProto::DirectControlPrimitive>();
-
-            // Discharge the capacitors
-            output->mutable_power_control()->set_charge_mode(
-                TbotsProto::PowerControl_ChargeMode_DISCHARGE);
 
             return output;
         }

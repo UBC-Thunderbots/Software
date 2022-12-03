@@ -6,18 +6,6 @@ import "proto/vision.proto";
 import "proto/primitive.proto";
 import "proto/tbots_timestamp_msg.proto";
 
-message Vision
-{
-    // Epoch timestamp of captured vision data
-    Timestamp time_sent = 1;
-
-    // Robot ID to RobotState map
-    map<uint32, RobotState> robot_states = 2;
-
-    // Ball state
-    BallState ball_state = 3;
-}
-
 message PrimitiveSet
 {
     // Epoch timestamp when primitives were assigned
@@ -28,4 +16,6 @@ message PrimitiveSet
 
     // Robot ID to RadioPrimitive map
     map<uint32, Primitive> robot_primitives = 3;
+
+    uint64 sequence_number = 4;
 }

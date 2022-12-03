@@ -40,6 +40,7 @@
 
 #include "agent.h"
 #include "simulator.h"
+#include "software/ai/navigator/obstacle/robot_navigation_obstacle_factory.h"
 #include "software/geom/vector.h"
 
 /**
@@ -54,24 +55,22 @@ class HRVOAgent : public Agent
      *
      * @param simulator             The simulation.
      * @param position              The starting position of this agent.
-     * @param neighborDist          The maximum distance away from this agent which
-     * another agent can be to be considered as an obstacle.
-     * @param maxNeighbors          The maximum number of other agents which this agent
+     * @param max_neighbor_dist     The maximum distance away which another agent can be
+     * from this agent to be considered as a neighbor (i.e. velocity obstacles for it
+     * would be created)
+     * @param max_neighbors         The maximum number of other agents which this agent
      * will try to avoid collisions with at a time.
      * @param radius                The radius of this agent.
      * @param max_radius_inflation  The maximum amount which the radius of this agent can
      * inflate.
      * @param velocity              The initial velocity of this agent.
-     * @param maxAccel              The maximum acceleration of this agent.
+     * @param max_accel              The maximum acceleration of this agent.
      * @param path                  The path which this agent should take.
-     * @param prefSpeed             The speed at which this agent prefers to move at.
-     * @param maxSpeed              The maximum speed of this agent.
-     * @param uncertaintyOffset     The uncertainty offset of this agent.
+     * @param max_speed              The maximum speed of this agent.
      */
-    HRVOAgent(HRVOSimulator *simulator, const Vector &position, float neighborDist,
-              std::size_t maxNeighbors, float radius, float max_radius_inflation,
-              const Vector &velocity, float maxAccel, AgentPath &path, float prefSpeed,
-              float maxSpeed, float uncertaintyOffset);
+    HRVOAgent(HRVOSimulator *simulator, const Vector &position, float max_neighbor_dist,
+              std::size_t max_neighbors, float radius, float max_radius_inflation,
+              const Vector &velocity, float max_accel, AgentPath &path, float max_speed);
 
     /**
      * Computes the new velocity of this agent.
@@ -90,9 +89,12 @@ class HRVOAgent : public Agent
     VelocityObstacle createVelocityObstacle(const Agent &other_agent) override;
 
     /**
-     * Computes the maxNeighbors nearest neighbors of this agent.
+     * @param neighbor_dist_threshold The max distance away which another agent can be to
+     * be considered a neighbor.
+     * Computes the `maxNeighbors` nearest neighbors of this agent which are within
+     * `neighbor_dist_threshold`.
      */
-    void computeNeighbors();
+    void computeNeighbors(double neighbor_dist_threshold);
 
     /**
      * Computes the preferred velocity of this agent.
@@ -102,10 +104,18 @@ class HRVOAgent : public Agent
     /**
      * Inserts a neighbor into the set of neighbors of this agent.
      *
-     * @param  agentNo  The number of the agent to be inserted.
-     * @param  rangeSq  The squared range around this agent.
+     * @param  agent_no  The number of the agent to be inserted.
+     * @param  range_sq  The squared range around this agent.
      */
-    void insertNeighbor(std::size_t agentNo, float &rangeSq);
+    void insertNeighbor(std::size_t agent_no, float &range_sq);
+
+    /**
+     * Update the primitive which this agent is currently pursuing.
+     *
+     * @param new_primitive The new primitive to pursue
+     * @param world The world in which the new primitive is being pursued
+     */
+    void updatePrimitive(const TbotsProto::Primitive &new_primitive, const World &world);
 
     /**
      * Get a list of circles which represent the new velocity candidates
@@ -134,23 +144,23 @@ class HRVOAgent : public Agent
     /**
      * A candidate point is a internal structure used when computing new velocities. It is
      * composed of a potential new velocity and the index of two VelocityObstacles in
-     * velocityObstacles_ that were used to compute it.
+     * velocity_obstacles_ that were used to compute it.
      */
     class Candidate
     {
        public:
-        Candidate() : velocityObstacle1_(0), velocityObstacle2_(0) {}
+        Candidate() : velocity_obstacle_1_(0), velocity_obstacle_2_(0) {}
 
         // The velocity of the candidate.
         Vector velocity;
 
-        // The index of the first VelocityObstacle in velocityObstacles_ used to compute
+        // The index of the first VelocityObstacle in velocity_obstacles_ used to compute
         // this candidate.
-        int velocityObstacle1_;
+        int velocity_obstacle_1_;
 
-        // The index of the second VelocityObstacle in velocityObstacles_ used to compute
+        // The index of the second VelocityObstacle in velocity_obstacles_ used to compute
         // this candidate.
-        int velocityObstacle2_;
+        int velocity_obstacle_2_;
     };
 
     // Percentage of preferred speed that we accept as the lower bound of a potential new
@@ -159,20 +169,20 @@ class HRVOAgent : public Agent
 
     /**
      * Returns the first velocity obstacle intersected by the Candidate point in
-     * velocityObstacles_
+     * velocity_obstacles_
      *
      * @param candidate the candidate point to check against all velocity obstacles in
-     * velocityObstacles_
+     * velocity_obstacles_
      *
      * @return the index of the first velocity obstacle that the given candidate point
-     * intersects in velocityObstacles_, or std::nullopt if the candidate does not
+     * intersects in velocity_obstacles_, or std::nullopt if the candidate does not
      * intersect any
      */
     std::optional<int> findIntersectingVelocityObstacle(const Candidate &candidate) const;
 
     /**
      * Returns true if the given candidate point doesn't intersct any obstacle in
-     * velocityObstacles_ and is faster than the minimum preferred speed.
+     * velocity_obstacles_ and is faster than the minimum preferred speed.
      *
      * @param candidate	the candidate point to consider
      *
@@ -211,17 +221,25 @@ class HRVOAgent : public Agent
      */
     bool isCandidateFasterThanCurrentSpeed(const Candidate &candidate) const;
 
+    /**
+     * Compute all the velocity obstacles that this Agent should take into account and
+     * add it to `velocityObstacles_`.
+     */
+    void computeVelocityObstacles();
 
    public:
-    float prefSpeed_;
+    float pref_speed_;
 
-    std::size_t maxNeighbors_;
-    float neighborDist_;
-    float uncertaintyOffset_;
+    std::size_t max_neighbors_;
+    float max_neighbor_dist;
+    float uncertainty_offset_;
     std::multimap<float, Candidate> candidates_;
     // distance -> Agent Index
     std::set<std::pair<float, std::size_t>> neighbors_;
-    std::vector<VelocityObstacle> velocityObstacles_;
+    std::vector<VelocityObstacle> velocity_obstacles_;
+    std::vector<ObstaclePtr> static_obstacles;
+    std::optional<ObstaclePtr> ball_obstacle;
+    RobotNavigationObstacleFactory obstacle_factory;
 
     // TODO (#2519): Remove magic numbers
     // Increasing deceleration distance to reduce the chance of overshooting the
@@ -230,6 +248,11 @@ class HRVOAgent : public Agent
     // Decreasing preferred speed during deceleration to reduce the chance of
     // overshooting the destination
     static constexpr float decel_pref_speed_multiplier = 0.6f;
+
+    // The scale multiple of max robot speed which the preferred speed will be set at.
+    // pref_speed = max_speed * PREF_SPEED_SCALE
+    // NOTE: This scale multiple must be <= 1
+    static constexpr float PREF_SPEED_SCALE = 0.85f;
 
     friend class KdTree;
     friend class Simulator;

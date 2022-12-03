@@ -100,28 +100,3 @@ TEST(TbotsProtobufTest, ball_state_msg_test)
 
     TbotsProtobufTest::assertBallStateMessageFromBall(ball, *ball_state_msg);
 }
-
-TEST(TbotsProtobufTest, vision_msg_test)
-{
-    World world = ::TestUtil::createBlankTestingWorld();
-    world       = ::TestUtil::setFriendlyRobotPositions(
-        world,
-        {Point(4.20, 4.20), Point(4.20, 4.20), Point(4.20, 4.20), Point(4.20, 4.20)},
-        Timestamp::fromSeconds(0));
-
-    auto vision_msg = createVision(world);
-
-    TbotsProtobufTest::assertBallStateMessageFromBall(world.ball(),
-                                                      vision_msg->ball_state());
-    TbotsProtobufTest::assertSaneTimestamp(vision_msg->time_sent());
-
-    auto friendly_robots   = world.friendlyTeam().getAllRobots();
-    auto& robot_states_map = *vision_msg->mutable_robot_states();
-
-    std::for_each(friendly_robots.begin(), friendly_robots.end(),
-                  [&](const Robot& robot) {
-                      ASSERT_TRUE(robot_states_map.count(robot.id()));
-                      TbotsProtobufTest::assertRobotStateMessageFromRobot(
-                          robot, robot_states_map[robot.id()]);
-                  });
-}
