@@ -7,16 +7,10 @@ from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.common import common_widgets
 from proto.import_all_protos import *
 
-constants = tbots.create2021RobotConstants()
 
-MAX_DRIBBLER_RPM = constants.max_force_dribbler_speed_rpm
-MIN_DRIBBLER_RPM = -MAX_DRIBBLER_RPM
-
-MAX_LINEAR_SPEED_MPS = constants.robot_max_speed_m_per_s
-MIN_LINEAR_SPEED_MPS = -MAX_LINEAR_SPEED_MPS
-
-MAX_ANGULAR_SPEED_RAD_PER_S = constants.robot_max_ang_speed_rad_per_s
-MIN_ANGULAR_SPEED_RAD_PER_S = -MAX_ANGULAR_SPEED_RAD_PER_S
+class DriveAndDribblerWidget(QWidget):
+    def __init__(self, proto_unix_io):
+        self.constants = tbots.create2021RobotConstants()
 
 
 class DriveAndDribblerWidget(QWidget):
@@ -96,14 +90,20 @@ class DriveAndDribblerWidget(QWidget):
             self.x_velocity_slider,
             self.x_velocity_label,
         ) = common_widgets.create_slider(
-            "X (m/s)", MIN_LINEAR_SPEED_MPS * 1000, MAX_LINEAR_SPEED_MPS * 1000, 1
+            "X (m/s)",
+            -self.constants.robot_max_speed_m_per_s * 1000,
+            self.constants.robot_max_speed_m_per_s * 1000,
+            1,
         )
         (
             y_layout,
             self.y_velocity_slider,
             self.y_velocity_label,
         ) = common_widgets.create_slider(
-            "Y (m/s)", MIN_LINEAR_SPEED_MPS * 1000, MAX_LINEAR_SPEED_MPS * 1000, 1
+            "Y (m/s)",
+            -self.constants.robot_max_speed_m_per_s * 1000,
+            self.constants.robot_max_speed_m_per_s * 1000,
+            1,
         )
         (
             dps_layout,
@@ -111,8 +111,8 @@ class DriveAndDribblerWidget(QWidget):
             self.angular_velocity_label,
         ) = common_widgets.create_slider(
             "θ (°/s)",
-            MIN_ANGULAR_SPEED_RAD_PER_S * 1000,
-            MAX_ANGULAR_SPEED_RAD_PER_S * 1000,
+            self.constants.robot_max_ang_speed_rad_per_s * 1000,
+            self.constants.robot_max_ang_speed_rad_per_s * 1000,
             1,
         )
 
@@ -157,7 +157,10 @@ class DriveAndDribblerWidget(QWidget):
             self.dribbler_speed_rpm_slider,
             self.dribbler_speed_rpm_label,
         ) = common_widgets.create_slider(
-            "RPM", MIN_DRIBBLER_RPM * 1000, MAX_DRIBBLER_RPM * 1000, 1000
+            "RPM",
+            -self.constants.robot_max_speed_m_per_s * 1000,
+            self.constants.robot_max_speed_m_per_s * 1000,
+            1000,
         )
         self.dribbler_speed_rpm_slider.valueChanged.connect(
             lambda: self.dribbler_speed_rpm_label.setText(

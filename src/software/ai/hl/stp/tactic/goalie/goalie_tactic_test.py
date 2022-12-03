@@ -104,8 +104,6 @@ def test_goalie_blocks_shot(
     robot_initial_position,
     simulated_test_runner,
 ):
-    constants = tbots.create2021RobotConstants()
-    print(f"constants.robot_max_speed_m_per_s = {constants.robot_max_speed_m_per_s}")
 
     # Setup Robot
     simulated_test_runner.simulator_proto_unix_io.send_proto(

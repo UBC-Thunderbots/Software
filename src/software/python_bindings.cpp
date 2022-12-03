@@ -34,7 +34,6 @@
 #include "software/world/field.h"
 #include "software/world/robot.h"
 #include "software/world/world.h"
-//#include "shared/2021_robot_constants.cpp"
 
 namespace py = pybind11;
 
@@ -212,6 +211,25 @@ PYBIND11_MODULE(python_bindings, m)
     py::class_<RobotConstants>(m, "RobotConstants")
         .def_readwrite("max_force_dribbler_speed_rpm",
                        &RobotConstants::max_force_dribbler_speed_rpm)
+        .def_readwrite("robot_radius_m", &RobotConstants::robot_radius_m)
+        .def_readwrite("mass_kg", &RobotConstants::mass_kg)
+        .def_readwrite("inertial_factor", &RobotConstants::inertial_factor)
+        .def_readwrite("jerk_limit_kg_m_per_s_3",
+                       &RobotConstants::jerk_limit_kg_m_per_s_3)
+        .def_readwrite("front_wheel_angle_deg", &RobotConstants::front_wheel_angle_deg)
+        .def_readwrite("back_wheel_angle_deg", &RobotConstants::back_wheel_angle_deg)
+        .def_readwrite("front_of_robot_width_meters",
+                       &RobotConstants::front_of_robot_width_meters)
+        .def_readwrite("dribbler_width_meters", &RobotConstants::dribbler_width_meters)
+        .def_readwrite("robot_max_acceleration_m_per_s_2",
+                       &RobotConstants::robot_max_acceleration_m_per_s_2)
+        .def_readwrite("robot_max_ang_acceleration_rad_per_s_2",
+                       &RobotConstants::robot_max_ang_acceleration_rad_per_s_2)
+        .def_readwrite("indefinite_dribbler_speed_rpm",
+                       &RobotConstants::indefinite_dribbler_speed_rpm)
+        .def_readwrite("wheel_radius_meters", &RobotConstants::wheel_radius_meters)
+        .def_readwrite("wheel_rotations_per_motor_rotation",
+                       &RobotConstants::wheel_rotations_per_motor_rotation)
         .def_readwrite("robot_max_speed_m_per_s",
                        &RobotConstants::robot_max_speed_m_per_s)
         .def_readwrite("robot_max_ang_speed_rad_per_s",
@@ -302,15 +320,6 @@ PYBIND11_MODULE(python_bindings, m)
         .def("enemyTeam", &World::enemyTeam)
         .def("ball", &World::ball)
         .def("field", &World::field);
-
-    //    py::class_<Constants>(m, "Constant")
-    //        .def("MAX_DRIBBLER_RPM", &Constants::MAX_DRIBBLER_RPM)
-    //        .def("MIN_DRIBBLER_RPM", &Constants::MIN_DRIBBLER_RPM)
-    //        .def("MAX_LINEAR_SPEED_MPS", &Constants::MAX_LINEAR_SPEED_MPS)
-    //        .def("MIN_LINEAR_SPEED_MPS", &Constants::MIN_LINEAR_SPEED_MPS)
-    //        .def("MAX_ANGULAR_SPEED_RAD_PER_S", &Constants::MAX_ANGULAR_SPEED_RAD_PER_S)
-    //        .def("MIN_ANGULAR_SPEED_RAD_PER_S",
-    //        &Constants::MIN_ANGULAR_SPEED_RAD_PER_S);
 
     // Listeners
     declareThreadedProtoUdpListener<SSLProto::Referee>(m, "SSLReferee");
