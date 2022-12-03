@@ -1,91 +1,95 @@
 package(default_visibility = ["//visibility:public"])
 
-load("@pybind11_bazel//:build_defs.bzl", "pybind_extension", "pybind_library")
+load("@thunderscope_deps//:requirements.bzl", "requirement")
 
-cc_binary(
-    name = "unix_full_system",
-    srcs = ["unix_full_system_main.cpp"],
+py_binary(
+    name = "thunderscope_main",
+    srcs = ["thunderscope_main.py"],
     deps = [
-        "//extlibs/er_force_sim/src/protobuf:protobuf_cc_lib",
-        "//proto:tbots_cc_proto",
-        "//proto/message_translation:ssl_wrapper",
-        "//software:constants",
-        "//software/ai:threaded_ai",
-        "//software/backend",
-        "//software/backend:all_backends",
-        "//software/estop:arduino_util",
-        "//software/logger",
-        "//software/multithreading:observer_subject_adapter",
-        "//software/networking:threaded_proto_udp_listener",
-        "//software/networking:threaded_proto_udp_sender",
-        "//software/networking:threaded_proto_unix_listener",
-        "//software/sensor_fusion:threaded_sensor_fusion",
-        "//software/util/generic_factory",
-        "@boost//:program_options",
+        ":thunderscope",
+        "//software/thunderscope:binary_context_managers",
+        "//software/thunderscope/replay:proto_logger",
     ],
 )
 
-cc_binary(
-    name = "er_force_simulator_main",
-    srcs = ["er_force_simulator_main.cpp"],
+py_library(
+    name = "thunderscope",
+    srcs = ["thunderscope.py"],
+    data = [
+        "//software:er_force_simulator_main",
+        "//software:py_constants.so",
+        "//software:python_bindings.so",
+        "//software:unix_full_system",
+    ],
     deps = [
-        "//software:constants",
-        "//software/networking:threaded_proto_unix_listener",
-        "//software/networking:threaded_proto_unix_sender",
-        "//software/simulation:er_force_simulator",
-        "@boost//:program_options",
+        "//extlibs/er_force_sim/src/protobuf:erforce_py_proto",
+        "//proto:software_py_proto",
+        "//proto/message_translation:py_tbots_protobuf",
+        "//software/networking:threaded_unix_listener_py",
+        "//software/networking:threaded_unix_sender_py",
+        "//software/thunderscope:binary_context_managers",
+        "//software/thunderscope:constants",
+        "//software/thunderscope:dock_label_style",
+        "//software/thunderscope:proto_unix_io",
+        "//software/thunderscope:robot_communication",
+        "//software/thunderscope/common:common_widgets",
+        "//software/thunderscope/common:proto_configuration_widget",
+        "//software/thunderscope/common:proto_plotter",
+        "//software/thunderscope/field",
+        "//software/thunderscope/field:field_layer",
+        "//software/thunderscope/field:hrvo_layer",
+        "//software/thunderscope/field:obstacle_layer",
+        "//software/thunderscope/field:passing_layer",
+        "//software/thunderscope/field:path_layer",
+        "//software/thunderscope/field:simulator_layer",
+        "//software/thunderscope/field:validation_layer",
+        "//software/thunderscope/field:world_layer",
+        "//software/thunderscope/log:g3log_checkboxes",
+        "//software/thunderscope/log:g3log_widget",
+        "//software/thunderscope/play:playinfo_widget",
+        "//software/thunderscope/replay:proto_logger",
+        "//software/thunderscope/replay:proto_player",
+        "//software/thunderscope/robot_diagnostics:chicker",
+        "//software/thunderscope/robot_diagnostics:drive_and_dribbler_widget",
+        "//software/thunderscope/robot_diagnostics:estop_view",
+        "//software/thunderscope/robot_diagnostics:robot_view",
+        requirement("pyqtgraph"),
+        requirement("numpy"),
     ],
 )
 
-cc_library(
+py_library(
+    name = "proto_unix_io",
+    srcs = ["proto_unix_io.py"],
+)
+
+py_library(
     name = "constants",
-    hdrs = ["constants.h"],
-    deps = [
-        "//shared:constants",
-    ],
+    srcs = ["constants.py"],
 )
 
-pybind_library(
-    name = "py_constants_lib",
-    srcs = ["py_constants.cpp"],
-    deps = [
-        ":constants",
-        "//shared:constants",
-    ],
+py_library(
+    name = "dock_label_style",
+    srcs = ["dock_label_style.py"],
 )
 
-pybind_extension(
-    name = "py_constants",
-    deps = [
-        ":py_constants_lib",
-    ],
+py_library(
+    name = "thread_safe_buffer",
+    srcs = ["thread_safe_buffer.py"],
 )
 
-pybind_library(
-    name = "python_bindings_lib",
-    srcs = ["python_bindings.cpp"],
-    deps = [
-        "//proto:ssl_cc_proto",
-        "//proto:tbots_cc_proto",
-        "//proto/message_translation:tbots_geometry",
-        "//software/estop:threaded_estop_reader",
-        "//software/geom:angle",
-        "//software/geom:point",
-        "//software/geom:segment",
-        "//software/geom:vector",
-        "//software/geom/algorithms",
-        "//software/networking:threaded_proto_udp_listener",
-        "//software/networking:threaded_proto_udp_sender",
-        "//software/uart:boost_uart_communication",
-        "//software/world",
-        "//software/world:field",
-        "@pybind11_protobuf//pybind11_protobuf:native_proto_caster",
-    ],
+py_library(
+    name = "binary_context_managers",
+    srcs = ["binary_context_managers.py"],
 )
 
-pybind_extension(
-    name = "python_bindings",
+py_library(
+    name = "robot_communication",
+    srcs = ["robot_communication.py"],
+    data = [
+        "//software:py_constants.so",
+    ],
     deps = [
-        ":python_bindings_lib",
+        "//software/thunderscope:constants",
     ],
 )

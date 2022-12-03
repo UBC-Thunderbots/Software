@@ -24,15 +24,14 @@ py_library(
 )
 
 py_library(
-    name = "fullsystem_connect_widget",
-    srcs = ["fullsystem_connect_widget.py"],
+    name = "robot_view",
+    srcs = ["robot_view.py"],
     deps = [
         "//software/thunderscope:constants",
         "//software/thunderscope:thread_safe_buffer",
         requirement("pyqtgraph"),
     ],
 )
-
 
 py_library(
     name = "estop_view",

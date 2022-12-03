@@ -18,7 +18,7 @@ else:
     import PyQt6
     from PyQt6.QtWebEngineWidgets import QWebEngineView
 
-from qt_material import apply_stylesheet
+from qt_material import apply_stylesheet, list_themes
 
 import pyqtgraph
 import qdarktheme
@@ -28,7 +28,7 @@ from pyqtgraph.Qt.QtWidgets import *
 
 from software.py_constants import *
 from proto.import_all_protos import *
-from software.thunderscope.arbitrary_plot.named_value_plotter import NamedValuePlotter
+from software.thunderscope.common.proto_plotter import ProtoPlotter
 from extlibs.er_force_sim.src.protobuf.world_pb2 import *
 from software.thunderscope.dock_label_style import *
 
@@ -51,10 +51,10 @@ from software.thunderscope.log.g3log_widget import g3logWidget
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.thunderscope.play.playinfo_widget import playInfoWidget
 from software.thunderscope.robot_diagnostics.chicker import ChickerWidget
-from software.thunderscope.robot_diagnostics.fullsystem_connect_widget import FullSystemConnectWidget
 from software.thunderscope.robot_diagnostics.drive_and_dribbler_widget import (
     DriveAndDribblerWidget,
 )
+from software.thunderscope.robot_diagnostics.robot_view import RobotView
 from software.thunderscope.robot_diagnostics.estop_view import EstopView
 from software.thunderscope.replay.proto_player import ProtoPlayer
 
@@ -75,23 +75,23 @@ class Thunderscope(object):
     The setup_* functions return docks. See configure_full_system_layout for an
     example. The returned docks can be arranged differently based on the
     use case (robot diagnostics, simulation, robocup, demo, etc..)
-
+    
     """
 
     def __init__(
-        self,
-        simulator_proto_unix_io=None,
-        blue_full_system_proto_unix_io=None,
-        yellow_full_system_proto_unix_io=None,
-        layout_path=None,
-        load_blue=True,
-        load_yellow=True,
-        load_diagnostics=False,
-        load_gamecontroller=True,
-        blue_replay_log=None,
-        yellow_replay_log=None,
-        refresh_interval_ms=10,
-        visualization_buffer_size=5,
+            self,
+            simulator_proto_unix_io=None,
+            blue_full_system_proto_unix_io=None,
+            yellow_full_system_proto_unix_io=None,
+            layout_path=None,
+            load_blue=True,
+            load_yellow=True,
+            load_diagnostics=False,
+            load_gamecontroller=True,
+            blue_replay_log=None,
+            yellow_replay_log=None,
+            refresh_interval_ms=10,
+            visualization_buffer_size=5,
     ):
         """Initialize Thunderscope
 
@@ -108,7 +108,7 @@ class Thunderscope(object):
         :param refresh_interval_ms:
             The interval in milliseconds to refresh all the widgets.
         :param visualization_buffer_size: The size of the visualization buffer.
-            Increasing this will increase smoothness but will be less realtime. 
+            Increasing this will increase smoothness but will be less realtime.
 
         """
         signal.signal(signal.SIGINT, signal.SIG_DFL)
@@ -316,7 +316,7 @@ class Thunderscope(object):
                     default_shelf.sync()
 
     def configure_layout(
-        self, layout_path, load_blue=True, load_yellow=True, load_diagnostics=True
+            self, layout_path, load_blue=True, load_yellow=True, load_diagnostics=True
     ):
         """Load the specified layout or the default file. If the default layout
         file doesn't exist, and no layout is provided, then just configure
@@ -379,11 +379,11 @@ class Thunderscope(object):
         self.refresh_timers.append(refresh_timer)
 
     def configure_full_system_layout(
-        self,
-        dock_area,
-        sim_proto_unix_io,
-        full_system_proto_unix_io,
-        friendly_colour_yellow,
+            self,
+            dock_area,
+            sim_proto_unix_io,
+            full_system_proto_unix_io,
+            friendly_colour_yellow,
     ):
         """Configure the default layout for thunderscope
 
@@ -458,22 +458,30 @@ class Thunderscope(object):
         log_dock = Dock("Logs")
         log_dock.addWidget(self.diagnostics_widgets["log_widget"])
 
-        self.diagnostics_widgets["fullsystem_connect"] = self.setup_fullsystem_connect_widget(
-            proto_unix_io, self.diagnostics_widgets["drive"]
-        )
-        fullsystem_connect_dock = Dock("Fullsystem")
-        fullsystem_connect_dock.addWidget(self.diagnostics_widgets["fullsystem_connect"])
-
         self.robot_diagnostics_dock_area.addDock(log_dock)
         self.robot_diagnostics_dock_area.addDock(drive_dock, "right", log_dock)
-        self.robot_diagnostics_dock_area.addDock(chicker_dock, "bottom", drive_dock)
-        self.robot_diagnostics_dock_area.addDock(fullsystem_connect_dock, "top", chicker_dock)
+        self.robot_diagnostics_dock_area.addDock(chicker_dock, "below", drive_dock)
+
+        robot_view = self.setup_robot_view(proto_unix_io)
+
+        dock = Dock("Robot View")
+        dock.addWidget(robot_view)
+        self.robot_diagnostics_dock_area.addDock(dock, "top", log_dock)
 
         estop_view = self.setup_estop_view(proto_unix_io)
 
         dock = Dock("Estop View")
         dock.addWidget(estop_view)
         self.robot_diagnostics_dock_area.addDock(dock, "bottom", log_dock)
+
+    def setup_robot_view(self, proto_unix_io):
+        """Setup the robot view widget
+        :param proto_unix_io: The proto unix io object for the full system
+        """
+        robot_view = RobotView()
+        self.register_refresh_function(robot_view.refresh)
+        proto_unix_io.register_observer(RobotStatus, robot_view.robot_status_buffer)
+        return robot_view
 
     def setup_estop_view(self, proto_unix_io):
         """Setup the estop view widget
@@ -488,7 +496,7 @@ class Thunderscope(object):
         return estop_view
 
     def setup_field_widget(
-        self, sim_proto_unix_io, full_system_proto_unix_io, friendly_colour_yellow
+            self, sim_proto_unix_io, full_system_proto_unix_io, friendly_colour_yellow
     ):
         """setup the field widget with the constituent layers
 
@@ -526,7 +534,7 @@ class Thunderscope(object):
         hrvo_sim_states = []
         # Add HRVO layers to field widget and have them hidden on startup
         # TODO (#2655): Add/Remove HRVO layers dynamically based on the HRVOVisualization proto messages
-        for robot_id in range(6):
+        for robot_id in range(MAX_ROBOT_IDS_PER_SIDE):
             hrvo_sim_state = hrvo_layer.HRVOLayer(
                 robot_id, self.visualization_buffer_size
             )
@@ -539,18 +547,18 @@ class Thunderscope(object):
         )
 
         for arg in [
-            (World, world.world_buffer),
-            (RobotStatus, world.robot_status_buffer),
-            (Referee, world.referee_buffer),
-            (PrimitiveSet, obstacles.primitive_set_buffer),
-            (PrimitiveSet, paths.primitive_set_buffer),
-            (PassVisualization, passing.pass_visualization_buffer),
-            (ValidationProtoSet, validation.validation_set_buffer),
-            (SimulatorState, sim_state.simulator_state_buffer),
-        ] + [
-            (HRVOVisualization, hrvo_sim_state.hrvo_buffer)
-            for hrvo_sim_state in hrvo_sim_states
-        ]:
+                       (World, world.world_buffer),
+                       (RobotStatus, world.robot_status_buffer),
+                       (Referee, world.referee_buffer),
+                       (PrimitiveSet, obstacles.primitive_set_buffer),
+                       (PrimitiveSet, paths.primitive_set_buffer),
+                       (PassVisualization, passing.pass_visualization_buffer),
+                       (ValidationProtoSet, validation.validation_set_buffer),
+                       (SimulatorState, sim_state.simulator_state_buffer),
+                   ] + [
+                       (HRVOVisualization, hrvo_sim_state.hrvo_buffer)
+                       for hrvo_sim_state in hrvo_sim_states
+                   ]:
             full_system_proto_unix_io.register_observer(*arg)
 
         # Register refresh functions
@@ -562,7 +570,7 @@ class Thunderscope(object):
         """Setup the parameter widget
 
         :param proto_unix_io: The proto unix io object
-        :param friendly_colour_yellow: 
+        :param friendly_colour_yellow:
         :returns: The proto configuration widget
 
         """
@@ -600,18 +608,23 @@ class Thunderscope(object):
         :returns: The performance plot widget
 
         """
-        # Create widget
-        named_value_plotter = NamedValuePlotter()
 
-        # Register observer
-        proto_unix_io.register_observer(
-            NamedValue, named_value_plotter.named_value_buffer
+        def extract_namedvalue_data(named_value_data):
+            return {named_value_data.name: named_value_data.value}
+
+        # Performance Plots plot HZ so the values can't be negative
+        proto_plotter = ProtoPlotter(
+            min_y=0,
+            max_y=100,
+            window_secs=15,
+            configuration={NamedValue: extract_namedvalue_data},
         )
 
+        # Register observer
+        proto_unix_io.register_observer(NamedValue, proto_plotter.buffers[NamedValue])
         # Register refresh function
-        self.register_refresh_function(named_value_plotter.refresh)
-
-        return named_value_plotter
+        self.register_refresh_function(proto_plotter.refresh)
+        return proto_plotter
 
     def setup_play_info(self, proto_unix_io):
         """Setup the play info widget
@@ -623,6 +636,7 @@ class Thunderscope(object):
 
         play_info = playInfoWidget()
         proto_unix_io.register_observer(PlayInfo, play_info.playinfo_buffer)
+        proto_unix_io.register_observer(Referee, play_info.referee_buffer)
         self.register_refresh_function(play_info.refresh)
 
         return play_info
@@ -641,14 +655,6 @@ class Thunderscope(object):
         self.register_refresh_function(chicker_widget.refresh)
 
         return chicker_widget
-
-    def setup_fullsystem_connect_widget(self, proto_unix_io, drive_widget):
-
-        fullsystem_connect_widget = FullSystemConnectWidget(proto_unix_io, drive_widget)
-
-        self.register_refresh_function(fullsystem_connect_widget.refresh)
-
-        return fullsystem_connect_widget
 
     def setup_drive_and_dribbler_widget(self, proto_unix_io):
         """Setup the drive and dribbler widget

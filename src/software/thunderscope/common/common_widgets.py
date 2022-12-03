@@ -5,12 +5,10 @@ from pyqtgraph.Qt.QtWidgets import *
 def create_button(text: list):
     """Creates QPushButton objects inside a QGroupBox object.
     The default color of button will be white with black background.
-
     :param text: type:list - list of text for all buttons
     :return group_box, buttons:
             QGroupBox object - add this to the widget
             list of QPushButton objects - use this to perform tasks on the buttons
-
     """
     group_box = QGroupBox()
     num_buttons = len(text)
@@ -32,10 +30,9 @@ def create_button(text: list):
 def create_radio(text: list, radio_group):
     """Creates QRadioButton objects inside a QGroupBox object.
     The default color of button background will be white.
-
     :param text: - list of text for all buttons
     :param radio_group: QButtonGroup to add these buttons to
-    :return group_box, buttons: 
+    :return group_box, buttons:
                 QGroupBox object - add this to the widget
                 list of QRadioButton object - use this to perform tasks on the buttons
     """
@@ -61,7 +58,6 @@ def create_radio(text: list, radio_group):
 def create_slider(text, min_val, max_val, tick_spacing):
     """Creates a QSlider object inside a QGroupBox object, along with a value
     label on the right. The slider orientation will be horizontal.
-
     :param text: text to display above the slider
     :param min_val: lowest value of the slider
     :param max_val: highest value of the slider
@@ -90,27 +86,9 @@ def create_slider(text, min_val, max_val, tick_spacing):
 
 def create_push_button(title):
     """Create a push button
-
     :param title: the name of the button
-
     """
     push_button = QPushButton(title)
     push_button.setFixedWidth(150)
 
     return push_button
-
-
-def change_button_state(button, enable):
-    """Change button color and clickable state.
-
-    :param button: button to change the state of
-    :param enable: bool: if True: enable this button, if False: disable
-    :returns: None
-
-    """
-    if enable:
-        button.setStyleSheet("background-color: White")
-        button.setCheckable(True)
-    else:
-        button.setStyleSheet("background-color: Grey")
-        button.setCheckable(False)

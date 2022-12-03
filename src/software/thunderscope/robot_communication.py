@@ -11,12 +11,12 @@ class RobotCommunication(object):
     """ Communicate with the robots """
 
     def __init__(
-        self,
-        full_system_proto_unix_io,
-        multicast_channel,
-        interface,
-        estop_path="/dev/ttyACM0",
-        estop_buadrate=115200,
+            self,
+            full_system_proto_unix_io,
+            multicast_channel,
+            interface,
+            estop_path="/dev/ttyACM0",
+            estop_buadrate=115200,
     ):
         """Initialize the communication with the robots
 
@@ -58,20 +58,19 @@ class RobotCommunication(object):
         self.send_estop_state_thread = threading.Thread(target=self.__send_estop_state)
         self.run_thread = threading.Thread(target=self.run)
 
-        # try:
-        #     self.estop_reader = ThreadedEstopReader(
-        #         self.estop_path, self.estop_buadrate
-        #     )
-        # except Exception:
-        #     raise Exception("Could not find estop, make sure its plugged in")
+        try:
+            self.estop_reader = ThreadedEstopReader(
+                self.estop_path, self.estop_buadrate
+            )
+        except Exception:
+            raise Exception("Could not find estop, make sure its plugged in")
 
     def __send_estop_state(self):
-        print('yea')
-        # while True:
-        #     self.full_system_proto_unix_io.send_proto(
-        #         EstopState, EstopState(is_playing=self.estop_reader.isEstopPlay())
-        #     )
-        #     time.sleep(0.1)
+        while True:
+            self.full_system_proto_unix_io.send_proto(
+                EstopState, EstopState(is_playing=self.estop_reader.isEstopPlay())
+            )
+            time.sleep(0.1)
 
     def run(self):
         """Forward World and PrimitiveSet protos from fullsystem to the robots.
@@ -80,7 +79,7 @@ class RobotCommunication(object):
         that the robots timeout and stop.
 
         NOTE: If disconnect_fullsystem_from_robots is called, then the packets
-        will not be forwarded to the robots. 
+        will not be forwarded to the robots.
 
         send_override_primitive_set can be used to send a primitive set, which
         is useful to dip in and out of robot diagnostics.
@@ -91,12 +90,12 @@ class RobotCommunication(object):
 
                 # Send the world
                 world = self.world_buffer.get(block=True)
-                self.send_world.send_proto(world)
+                self.world_mcast_sender.send_proto(world)
 
                 # Send the primitive set
                 primitive_set = self.primitive_buffer.get(block=False)
 
-                if True:
+                if self.estop_reader.isEstopPlay():
                     self.send_primitive_set.send_proto(primitive_set)
 
             else:
@@ -122,7 +121,7 @@ class RobotCommunication(object):
 
                 self.sequence_number += 1
 
-                if True:
+                if self.estop_reader.isEstopPlay():
                     self.last_time = primitive_set.time_sent.epoch_timestamp_seconds
                     self.send_primitive_set.send_proto(primitive_set)
 
@@ -143,7 +142,7 @@ class RobotCommunication(object):
     def connect_robot_to_diagnostics(self, robot_id):
         self.robots_connected_to_diagnostics.add(robot_id)
 
-    def discconnect_robot_from_diagnostics(self, robot_id):
+    def disconnect_robot_from_diagnostics(self, robot_id):
         self.robots_connected_to_diagnostics.remove(robot_id)
 
     def __enter__(self):
@@ -157,6 +156,10 @@ class RobotCommunication(object):
             ROBOT_STATUS_PORT,
             lambda data: self.full_system_proto_unix_io.send_proto(RobotStatus, data),
             True,
+            )
+
+        self.send_primitive_mcast_sender = PrimitiveSetProtoSender(
+            self.multicast_channel + "%" + self.interface, PRIMITIVE_PORT, True
         )
 
         self.receive_robot_log = RobotLogProtoListener(
@@ -164,14 +167,21 @@ class RobotCommunication(object):
             ROBOT_LOGS_PORT,
             lambda data: self.full_system_proto_unix_io.send_proto(RobotLog, data),
             True,
-        )
+            )
 
         self.receive_ssl_wrapper = SSLWrapperPacketProtoListener(
-            SSL_ADDRESS,
-            SSL_PORT,
+            SSL_VISION_ADDRESS,
+            SSL_VISION_PORT,
             lambda data: self.full_system_proto_unix_io.send_proto(
                 SSL_WrapperPacket, data
             ),
+            True,
+        )
+
+        self.receive_ssl_referee_proto = SSLRefereeProtoListener(
+            SSL_REFEREE_ADDRESS,
+            SSL_REFEREE_PORT,
+            lambda data: self.full_system_proto_unix_io.send_proto(Referee, data),
             True,
         )
 
@@ -180,7 +190,7 @@ class RobotCommunication(object):
             self.multicast_channel + "%" + self.interface, PRIMITIVE_PORT, True
         )
 
-        self.send_world = WorldProtoSender(
+        self.world_mcast_sender = WorldProtoSender(
             self.multicast_channel + "%" + self.interface, VISION_PORT, True
         )
 
