@@ -74,12 +74,12 @@ int main(int argc, char **argv)
          */
         std::shared_ptr<ErForceSimulator> er_force_sim;
         std::unique_ptr<RealismConfigErForce> realism_config;
-        
+
         if (args.enable_realism)
         {
             realism_config = ErForceSimulator::createRealisticRealismConfig();
-        } 
-        else 
+        }
+        else
         {
             realism_config = ErForceSimulator::createDefaultRealismConfig();
         }
