@@ -68,8 +68,8 @@ host_software_packages=(
     libssl-dev # needed to build Python 3 with ssl support
     openssl # possibly also necessary for ssl in Python 3
     sshpass #used to remotely ssh into robots via Ansible
-
     openjdk-17-jdk # dependency for tigers autoref
+
     unzip # installing tigers autoref
 )
 
@@ -144,13 +144,20 @@ sudo chown -R $USER:$USER /opt/tbotspython
 sudo wget -N https://github.com/RoboCup-SSL/ssl-game-controller/releases/download/v2.15.2/ssl-game-controller_v2.15.2_linux_amd64 -O /opt/tbotspython/gamecontroller
 sudo chmod +x /opt/tbotspython/gamecontroller
 
-print_status_msg "Setting up TIGERS Autoref"
+print_status_msg "Setting up TIGERS AutoRef"
+
+print_status_msg "Installing TIGERS dependency: Java 17"
+sudo wget -N https://download.oracle.com/java/17/archive/jdk-17.0.5_linux-x64_bin.deb -O /tmp/jdk-17.0.5.deb
+sudo apt install ./jdk-17.0.5.deb
+echo "export PATH=$PATH:/usr/lib/jvm/jdk-17/bin/" >> ~/.bashrc
+
+print_status_msg "Compiling TIGERS AutoRef"
 sudo wget -N https://gitlab.tigers-mannheim.de/open-source/AutoReferee/-/archive/autoref-ci/AutoReferee-autoref-ci.zip -O /tmp/autoref-ci.zip
 unzip -q -o -d /tmp/ /tmp/autoref-ci.zip
 touch /tmp/AutoReferee-autoref-ci/.git # a hacky way to make gradle happy when it tries to find a dependency
 /tmp/AutoReferee-autoref-ci/./gradlew installDist -p /tmp/AutoReferee-autoref-ci/
 cp -r /tmp/AutoReferee-autoref-ci/build/install/autoReferee/ /opt/tbotspython/autoReferee
-print_status_msg "Finished setting up autoref"
+print_status_msg "Finished setting up AutoRef"
 
 # Install Bazel
 print_status_msg "Installing Bazel"
