@@ -148,7 +148,7 @@ print_status_msg "Setting up TIGERS AutoRef"
 
 print_status_msg "Installing TIGERS dependency: Java 17"
 sudo wget -N https://download.oracle.com/java/17/archive/jdk-17.0.5_linux-x64_bin.deb -O /tmp/jdk-17.0.5.deb
-sudo apt install ./jdk-17.0.5.deb
+sudo apt install /tmp/./jdk-17.0.5.deb
 echo "export PATH=$PATH:/usr/lib/jvm/jdk-17/bin/" >> ~/.bashrc
 
 print_status_msg "Compiling TIGERS AutoRef"
