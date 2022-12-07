@@ -44,6 +44,7 @@ host_software_packages=(
     libstdc++6-9-dbg
     git # required for build
     g++-9
+    jdk-17 # required for TIGERS autoref
     kcachegrind # This lets us view the profiles output by callgrind
     libeigen3-dev # A math / numerical library used for things like linear regression
     libprotobuf-dev
@@ -68,7 +69,6 @@ host_software_packages=(
     libssl-dev # needed to build Python 3 with ssl support
     openssl # possibly also necessary for ssl in Python 3
     sshpass #used to remotely ssh into robots via Ansible
-    openjdk-17-jdk # dependency for tigers autoref
 
     unzip # installing tigers autoref
 )
@@ -147,9 +147,8 @@ sudo chmod +x /opt/tbotspython/gamecontroller
 print_status_msg "Setting up TIGERS AutoRef"
 
 print_status_msg "Installing TIGERS dependency: Java 17"
-sudo wget -N https://download.oracle.com/java/17/archive/jdk-17.0.5_linux-x64_bin.deb -O /tmp/jdk-17.0.5.deb
-sudo apt install /tmp/./jdk-17.0.5.deb
-echo "export PATH=$PATH:/usr/lib/jvm/jdk-17/bin/" >> ~/.bashrc
+export JAVA_HOME=/usr/lib/jvm/jdk-17/bin/
+#echo "export PATH=$PATH:/usr/lib/jvm/jdk-17/bin/" >> ~/.bashrc
 
 print_status_msg "Compiling TIGERS AutoRef"
 sudo wget -N https://gitlab.tigers-mannheim.de/open-source/AutoReferee/-/archive/autoref-ci/AutoReferee-autoref-ci.zip -O /tmp/autoref-ci.zip
