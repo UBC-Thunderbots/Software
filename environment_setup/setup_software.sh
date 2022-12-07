@@ -150,6 +150,7 @@ sudo wget -N https://download.oracle.com/java/17/archive/jdk-17.0.5_linux-x64_bi
 sudo apt install /tmp/./jdk-17.0.5.deb
 #export JAVA_HOME=/usr/lib/jvm/jdk-17/bin/
 export PATH=$PATH:/usr/lib/jvm/jdk-17/bin/
+which java
 
 print_status_msg "Compiling TIGERS AutoRef"
 sudo wget -N https://gitlab.tigers-mannheim.de/open-source/AutoReferee/-/archive/autoref-ci/AutoReferee-autoref-ci.zip -O /tmp/autoref-ci.zip
