@@ -339,5 +339,6 @@ if __name__ == "__main__":
             )
 
             thread.start()
-            tscope.show()
+            if (args.ci_mode == False):
+                tscope.show()
             thread.join()
