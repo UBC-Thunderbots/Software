@@ -148,15 +148,12 @@ print_status_msg "Setting up TIGERS AutoRef"
 print_status_msg "Installing TIGERS dependency: Java 17"
 sudo wget -N https://download.oracle.com/java/17/archive/jdk-17.0.5_linux-x64_bin.deb -O /tmp/jdk-17.0.5.deb
 sudo apt install /tmp/./jdk-17.0.5.deb
-#export JAVA_HOME=/usr/lib/jvm/jdk-17/bin/
-export PATH=$PATH:/usr/lib/jvm/jdk-17/bin/
-which java
 
 print_status_msg "Compiling TIGERS AutoRef"
 sudo wget -N https://gitlab.tigers-mannheim.de/open-source/AutoReferee/-/archive/autoref-ci/AutoReferee-autoref-ci.zip -O /tmp/autoref-ci.zip
 unzip -q -o -d /tmp/ /tmp/autoref-ci.zip
 touch /tmp/AutoReferee-autoref-ci/.git # a hacky way to make gradle happy when it tries to find a dependency
-/tmp/AutoReferee-autoref-ci/./gradlew installDist -p /tmp/AutoReferee-autoref-ci/
+/tmp/AutoReferee-autoref-ci/./gradlew installDist -p /tmp/AutoReferee-autoref-ci/ -Dorg.gradle.java.home=/usr/lib/jvm/jdk-17/
 cp -r /tmp/AutoReferee-autoref-ci/build/install/autoReferee/ /opt/tbotspython/autoReferee
 print_status_msg "Finished setting up AutoRef"
 
