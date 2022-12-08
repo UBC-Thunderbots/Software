@@ -114,22 +114,8 @@ class playInfoWidget(QWidget):
             }
         )
 
-        # TODO (#2412): Potential improvements to layout
         self.play_table.resizeColumnsToContents()
         self.play_table.resizeRowsToContents()
-        if referee_msg_dict:
-            p = (
-                f"REFEREE {referee_msg_dict['packetTimestamp']}: "
-                + f" {referee_msg_dict['stage']} - "
-                + referee_msg_dict["command"]
-                + f" {referee_msg_dict['blue']['goalkeeper']}"
-                + f" {referee_msg_dict['yellow']['goalkeeper']}"
-                + f" {referee_msg_dict['blue']['yellowCards']}"
-                + f" {referee_msg_dict['yellow']['yellowCards']}"
-                + f" {referee_msg_dict['blue']['redCards']}"
-                + f" {referee_msg_dict['yellow']['redCards']}"
-                + f" -> blue team on positive half: {referee_msg_dict['blueTeamOnPositiveHalf']}"
-            )
-            self.referee_info.setText(p)
+        
 
 

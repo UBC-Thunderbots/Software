@@ -45,7 +45,7 @@ class refereeInfoWidget(QWidget):
 
         # empirically makes even bolded items fit within columns
         HEADER_SIZE_HINT_WIDTH_EXPANSION = 12
-        ITEM_SIZE_HINT_WIDTH_EXPANSION = 10
+        ITEM_SIZE_HINT_WIDTH_EXPANSION = 11
 
         for n, key in enumerate(data.keys()):
             horizontal_headers.append(key)
@@ -95,24 +95,21 @@ class refereeInfoWidget(QWidget):
                 team_info.append("remainingTimeouts")
             elif team_info_name == 'goalkeeper':
                 team_info.append("goalkeeperID")
-            elif team_info_name == 'yellowCardTimes':
-                continue
             else:
                 team_info.append(team_info_name)
-        team_info.append('yellowCardTimes')
         
         for info in team_info:
             if info == 'yellowCardTimes':
                 text = ''
                 for time in referee_msg_dict['blue']['yellowCardTimes']:
                     formatted_time = int(time*SECONDS_PER_MICROSECOND)
-                    text = text + str(formatted_time) 
-                    blue.append(text)
+                    text = text + str(formatted_time) + "\n"
+                blue.append(text)
                 text = ''
                 for time in referee_msg_dict['yellow']['yellowCardTimes']:
                     formatted_time = int(time*SECONDS_PER_MICROSECOND)
-                    text = text + str(formatted_time) 
-                    yellow.append(text)
+                    text = text + str(formatted_time) + "\n"
+                yellow.append(text)
             elif info == 'remainingTimeouts':
                 blue.append(referee_msg_dict['blue']['timeouts'])
                 yellow.append(referee_msg_dict['yellow']['timeouts'])
