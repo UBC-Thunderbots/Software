@@ -23,4 +23,3 @@ py_library(
         requirement("pyqtgraph"),
     ],
 )
-

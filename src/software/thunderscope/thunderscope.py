@@ -430,7 +430,9 @@ class Thunderscope(object):
         playinfo_dock = Dock("Play Info")
         playinfo_dock.addWidget(widgets["playinfo_widget"])
 
-        widgets["refereeinfo_widget"] = self.setup_referee_info(full_system_proto_unix_io)
+        widgets["refereeinfo_widget"] = self.setup_referee_info(
+            full_system_proto_unix_io
+        )
         refereeinfo_dock = Dock("Referee Info")
         refereeinfo_dock.addWidget(widgets["refereeinfo_widget"])
 

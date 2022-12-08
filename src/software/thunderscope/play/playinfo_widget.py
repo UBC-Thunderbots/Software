@@ -75,7 +75,7 @@ class playInfoWidget(QWidget):
         referee = self.referee_buffer.get(block=False)
 
         play_info_dict = MessageToDict(playinfo)
-        referee_msg_dict = MessageToDict(referee)
+        MessageToDict(referee)
 
         robot_ids = []
         tactic_fsm_states = []
@@ -116,6 +116,3 @@ class playInfoWidget(QWidget):
 
         self.play_table.resizeColumnsToContents()
         self.play_table.resizeRowsToContents()
-        
-
-
