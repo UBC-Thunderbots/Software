@@ -52,12 +52,12 @@ void Thunderloop::runLoop()
     struct timespec poll_time;
     struct timespec iteration_time;
     struct timespec last_primitive_received_time;
+    struct timespec last_world_recieved_time;
     struct timespec current_time;
 
     // Input buffer
     TbotsProto::PrimitiveSet new_primitive_set;
     TbotsProto::World new_world;
-    TbotsProto::EstopPrimitive emergency_stop_override;
     const TbotsProto::PrimitiveSet empty_primitive_set;
 
     // Loop interval
@@ -147,12 +147,39 @@ void Thunderloop::runLoop()
             }
 
             // If the world msg is new, update the internal buffer
-            // TODO (#2726): check if world has not been sent for a while
             if (new_world.time_sent().epoch_timestamp_seconds() >
                 world_.time_sent().epoch_timestamp_seconds())
             {
+                clock_gettime(CLOCK_MONOTONIC, &last_world_recieved_time);
                 primitive_executor_.updateWorld(new_world);
                 world_ = new_world;
+            }
+
+            // If world not received in a while, stop robot
+            struct timespec world_result;
+
+            clock_gettime(CLOCK_MONOTONIC, &current_time);
+            ScopedTimespecTimer::timespecDiff(&current_time, &last_world_recieved_time,
+                                              &world_result);
+
+            auto nanoseconds_elapsed_since_last_world =
+                world_result.tv_sec * static_cast<int>(NANOSECONDS_PER_SECOND) +
+                world_result.tv_nsec;
+
+            if (nanoseconds_elapsed_since_last_world >
+                static_cast<long>(WORLD_TIMEOUT_NS))
+            {
+                primitive_executor_.setStopPrimitive();
+
+                // Log milliseconds since last world received if we are timing out
+                int milliseconds_elapsed_since_last_world = static_cast<int>(
+                    static_cast<double>(world_result.tv_sec) * MILLISECONDS_PER_SECOND +
+                    static_cast<double>(world_result.tv_nsec) *
+                        MILLISECONDS_PER_NANOSECOND);
+
+                LOG(INFO) << "World timeout, overriding with StopPrimitive\n"
+                          << "Milliseconds since last world: "
+                          << milliseconds_elapsed_since_last_world;
             }
 
             // Primitive Executor: run the last primitive if we have not timed out
@@ -160,20 +187,20 @@ void Thunderloop::runLoop()
                 ScopedTimespecTimer timer(&poll_time);
 
                 // Handle emergency stop override
-                struct timespec result;
+                struct timespec primitive_result;
 
                 clock_gettime(CLOCK_MONOTONIC, &current_time);
-                ScopedTimespecTimer::timespecDiff(&current_time,
-                                                  &last_primitive_received_time, &result);
+                ScopedTimespecTimer::timespecDiff(
+                    &current_time, &last_primitive_received_time, &primitive_result);
 
                 auto nanoseconds_elapsed_since_last_primitive =
-                    result.tv_sec * static_cast<int>(NANOSECONDS_PER_SECOND) +
-                    result.tv_nsec;
+                    primitive_result.tv_sec * static_cast<int>(NANOSECONDS_PER_SECOND) +
+                    primitive_result.tv_nsec;
 
                 if (nanoseconds_elapsed_since_last_primitive >
                     static_cast<long>(PRIMITIVE_MANAGER_TIMEOUT_NS))
                 {
-                    primitive_executor_.clearCurrentPrimitive();
+                    primitive_executor_.setStopPrimitive();
                 }
 
                 auto friendly_team = Team(world_.friendly_team());
