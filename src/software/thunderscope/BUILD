@@ -16,17 +16,10 @@ py_library(
     name = "thunderscope",
     srcs = ["thunderscope.py"],
     data = [
-        "//software:er_force_simulator_main",
         "//software:py_constants.so",
         "//software:python_bindings.so",
-        "//software:unix_full_system",
     ],
     deps = [
-        "//extlibs/er_force_sim/src/protobuf:erforce_py_proto",
-        "//proto:software_py_proto",
-        "//proto/message_translation:py_tbots_protobuf",
-        "//software/networking:threaded_unix_listener_py",
-        "//software/networking:threaded_unix_sender_py",
         "//software/thunderscope:binary_context_managers",
         "//software/thunderscope:constants",
         "//software/thunderscope:dock_label_style",
@@ -61,6 +54,11 @@ py_library(
 py_library(
     name = "proto_unix_io",
     srcs = ["proto_unix_io.py"],
+    deps = [
+        "//software/networking:threaded_unix_listener_py",
+        "//software/networking:threaded_unix_sender_py",
+        ":thread_safe_buffer",
+    ]
 )
 
 py_library(
@@ -81,6 +79,14 @@ py_library(
 py_library(
     name = "binary_context_managers",
     srcs = ["binary_context_managers.py"],
+    data = [
+        "//software:er_force_simulator_main",
+        "//software:unix_full_system",
+    ],
+    deps = [
+        "//proto/message_translation:py_tbots_protobuf",
+        "//extlibs/er_force_sim/src/protobuf:erforce_py_proto",
+    ]
 )
 
 py_library(

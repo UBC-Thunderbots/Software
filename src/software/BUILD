@@ -1,6 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
 load("@pybind11_bazel//:build_defs.bzl", "pybind_extension", "pybind_library")
+load("@thunderscope_deps//:requirements.bzl", "requirement")
 
 cc_binary(
     name = "unix_full_system",
@@ -87,5 +88,20 @@ pybind_extension(
     name = "python_bindings",
     deps = [
         ":python_bindings_lib",
+    ],
+)
+
+py_binary(
+    name = "ai_vs_ai_ci",
+    srcs = ["ai_vs_ai_ci.py"],
+    data = [
+        "//software:python_bindings.so",
+    ],
+    deps = [
+        "//software/thunderscope:binary_context_managers",
+        "//software/thunderscope:proto_unix_io",
+        "//software/thunderscope/replay:proto_logger",
+        "//proto/message_translation:py_tbots_protobuf",
+        requirement("numpy"),
     ],
 )

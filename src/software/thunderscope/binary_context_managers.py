@@ -83,6 +83,7 @@ class FullSystem(object):
             self.full_system_runtime_dir,
             "--friendly_colour_yellow" if self.friendly_colour_yellow else "",
         )
+        print("Full System running " + os.getcwd())
 
         if self.debug_full_system:
 

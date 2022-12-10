@@ -108,7 +108,9 @@ PYBIND11_MODULE(py_constants, m)
 
     m.attr("NUM_GENEVA_ANGLES") = NUM_GENEVA_ANGLES;
 
-    m.attr("MAX_ROBOT_IDS_PER_SIDE") = MAX_ROBOT_IDS_PER_SIDE;
+    m.attr("MAX_ROBOT_IDS_PER_SIDE")    = MAX_ROBOT_IDS_PER_SIDE;
+    m.attr("DIV_A_NUM_ROBOTS")          = DIV_A_NUM_ROBOTS;
+    m.attr("DIV_B_NUM_ROBOTS")          = DIV_B_NUM_ROBOTS;
 
     // Redis Keys
     m.attr("ROBOT_ID_REDIS_KEY")                = ROBOT_ID_REDIS_KEY;

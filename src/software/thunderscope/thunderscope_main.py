@@ -11,6 +11,7 @@ import software.python_bindings as cpp_bindings
 from software.py_constants import *
 from software.thunderscope.robot_communication import RobotCommunication
 from software.thunderscope.replay.proto_logger import ProtoLogger
+from proto.ssl_gc_common_pb2 import Team
 
 NUM_ROBOTS = 6
 SIM_TICK_RATE_MS = 16
@@ -312,7 +313,10 @@ if __name__ == "__main__":
             args.blue_full_system_runtime_dir,
         ) as blue_logger, ProtoLogger(
             args.yellow_full_system_runtime_dir,
-        ) as yellow_logger, Gamecontroller() as gamecontroller, TigersAutoref(args.ci_mode):
+        ) as yellow_logger, Gamecontroller(
+        ) as gamecontroller, TigersAutoref(
+            args.ci_mode
+        ):
 
             tscope.blue_full_system_proto_unix_io.register_to_observe_everything(
                 blue_logger.buffer
@@ -332,6 +336,9 @@ if __name__ == "__main__":
                 tscope.blue_full_system_proto_unix_io,
                 tscope.yellow_full_system_proto_unix_io,
             )
+            #print(gamecontroller.send_ci_input(
+            #    gc_command=Command.Type.FORCE_START, team=Team.UNKNOWN
+            #))
 
             # Start the simulator
             thread = threading.Thread(
@@ -339,6 +346,5 @@ if __name__ == "__main__":
             )
 
             thread.start()
-            if (args.ci_mode == False):
-                tscope.show()
+            tscope.show()
             thread.join()
