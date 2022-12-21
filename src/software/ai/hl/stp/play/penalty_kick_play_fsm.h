@@ -56,7 +56,7 @@ struct PenaltyKickPlayFSM
             *SetupPositionState_S + Update_E [!setupPositionDone_G] / setupPosition_A   = SetupPositionState_S,
             SetupPositionState_S + Update_E [setupPositionDone_G]                       = PerformKickState_S,
             PerformKickState_S + Update_E [!kickDone_G] / performKick_A,
-            PerformKickState_S + Update_E [kickDone_G] / X,
+            PerformKickState_S + Update_E [kickDone_G]                                  = X,
             X + Update_E                                                                = X);
     }
 

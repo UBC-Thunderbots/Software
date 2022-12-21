@@ -221,7 +221,6 @@ cc_library(
         "//software/ai/hl/stp/tactic/penalty_kick:penalty_kick_tactic",
         "//software/logger",
         "//software/util/generic_factory",
-        "@sml"
     ],
     alwayslink = True,
 )
