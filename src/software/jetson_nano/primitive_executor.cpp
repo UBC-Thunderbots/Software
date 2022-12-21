@@ -34,6 +34,11 @@ void PrimitiveExecutor::clearCurrentPrimitive()
     current_primitive_.Clear();
 }
 
+void PrimitiveExecutor::setStopPrimitive()
+{
+    current_primitive_ = *createStopPrimitive();
+}
+
 void PrimitiveExecutor::updateWorld(const TbotsProto::World& world_msg)
 {
     hrvo_simulator_.updateWorld(World(world_msg));
@@ -82,16 +87,6 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
 
     switch (current_primitive_.primitive_case())
     {
-        case TbotsProto::Primitive::kEstop:
-        {
-            // Protobuf guarantees that the default values in a proto are all zero (bools
-            // are false)
-            //
-            // https://developers.google.com/protocol-buffers/docs/proto3#default
-            auto output = std::make_unique<TbotsProto::DirectControlPrimitive>();
-
-            return output;
-        }
         case TbotsProto::Primitive::kStop:
         {
             auto prim   = createDirectControlPrimitive(Vector(), AngularVelocity(), 0.0,

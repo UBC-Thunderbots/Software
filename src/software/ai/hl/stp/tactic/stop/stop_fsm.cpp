@@ -2,7 +2,7 @@
 
 void StopFSM::updateStop(const Update& event)
 {
-    event.common.set_primitive(createStopPrimitive(coast));
+    event.common.set_primitive(createStopPrimitive());
 }
 
 bool StopFSM::stopDone(const Update& event)
