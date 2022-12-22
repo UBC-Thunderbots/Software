@@ -114,3 +114,56 @@ def change_button_state(button, enable):
     else:
         button.setStyleSheet("background-color: Grey")
         button.setCheckable(False)
+
+
+def disable_slider(slider):
+    """
+    Disables a slider by getting the current value and setting the slider to that
+    value upon every value change
+
+    This results in slider value not changing even when slider is moved
+
+    :param slider: slider widget to be disabled
+    """
+    old_val = slider.value()
+    slider.valueChanged.connect(lambda: slider.setValue(old_val))
+    slider.setStyleSheet(
+        "QSlider::sub-page:horizontal"
+        "{"
+        "background-color: grey"
+        "}"
+        "QSlider::handle"
+        "{"
+        "background: grey;"
+        "color: grey;"
+        "border-radius: 5px;"
+        "}"
+    )
+
+
+def enable_slider(slider, label, get_value):
+    """
+    Enables a slider by connecting a function to update label upon value change
+    :param slider: slider widget to be enabled
+    :param label: label widget corresponding to the slider
+    :param get_value: function to translate slider value into label text
+    """
+    slider.valueChanged.connect(lambda: label.setText(get_value(slider.value())))
+    slider.setStyleSheet(
+        "QSlider::groove:horizontal"
+        "{"
+        "border-width: 0px"
+        "}"
+    )
+
+
+def disable_radio_button(button_group):
+    button_group.setExclusive(False)
+    for button in button_group.buttons():
+        button.setChecked(False)
+        button.clicked.disconnect()
+        button.clicked.connect(
+            lambda state, curr=button: curr.setChecked(False)
+        )
+
+

@@ -22,6 +22,8 @@ class FullSystemConnectWidget(QWidget):
         :param load_fullsystem: Whether the fullsystem is being loaded currently
         """
 
+        self.load_fullsystem = load_fullsystem
+
         super(FullSystemConnectWidget, self).__init__()
 
         vbox_layout = QVBoxLayout()
@@ -29,7 +31,7 @@ class FullSystemConnectWidget(QWidget):
 
         radio_button_names = ["Manual Control", "XBox Control"]
 
-        if load_fullsystem:
+        if self.load_fullsystem:
             radio_button_names.append("AI Control")
 
         self.connect_options_box, self.connect_options = common_widgets.create_radio(
@@ -39,16 +41,16 @@ class FullSystemConnectWidget(QWidget):
         self.manual_control_button = self.connect_options[0]
         self.xbox_control_button = self.connect_options[1]
 
-        if load_fullsystem:
+        if self.load_fullsystem:
             self.ai_control_button = self.connect_options[2]
-            self.ai_control_button.toggled.connect(
+            self.ai_control_button.clicked.connect(
                 lambda: self.switch_control_mode(ControlMode.AI)
             )
 
-        self.manual_control_button.toggled.connect(
+        self.manual_control_button.clicked.connect(
             lambda: self.switch_control_mode(ControlMode.MANUAL)
         )
-        self.xbox_control_button.toggled.connect(
+        self.xbox_control_button.clicked.connect(
             lambda: self.switch_control_mode(ControlMode.XBOX)
         )
 
@@ -60,10 +62,20 @@ class FullSystemConnectWidget(QWidget):
         self.setLayout(vbox_layout)
 
     def switch_control_mode(self, mode):
+        """
+        Switches the control mode to the given mode
+
+        :param mode: mode to switch to (one of ControlMode values)
+
+        """
         self.control_mode = mode
 
-    def refresh(self):
+        print(mode)
+
         if self.control_mode == ControlMode.XBOX or self.control_mode == ControlMode.AI:
             self.toggle_controls_signal.emit(False)
         else:
             self.toggle_controls_signal.emit(True)
+
+    def refresh(self):
+        pass

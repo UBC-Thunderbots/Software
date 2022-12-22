@@ -6,6 +6,7 @@ from proto.import_all_protos import *
 from enum import Enum
 import software.thunderscope.common.common_widgets as common_widgets
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
+import time
 
 
 class ChickerCommandMode(Enum):
@@ -19,15 +20,11 @@ class ChickerWidget(QWidget):
     def __init__(self, proto_unix_io):
         """Handles the robot diagnostics input to create a PowerControl message
         to be sent to the robots.
-
         NOTE: The powerboards run in regulation mode, which means that they are
-        always charged and do not need to be explicitly charged. 
-
+        always charged and do not need to be explicitly charged.
         The powerboard also has an internal cooldown, so spamming kick or chip
         will not work until the capacitors charge up and the cooldown is over.
-
         :param proto_unix_io: proto_unix_io object to send messages to the robot
-
         """
 
         super(ChickerWidget, self).__init__()
@@ -72,16 +69,8 @@ class ChickerWidget(QWidget):
             lambda: self.send_command_and_timeout(ChickerCommandMode.CHIP)
         )
 
-        # no auto button enables both buttons, while auto kick and auto chip disable both buttons
-        self.no_auto_button.toggled.connect(
-            lambda: self.set_should_enable_buttons(True)
-        )
-        self.auto_kick_button.toggled.connect(
-            lambda: self.set_should_enable_buttons(False)
-        )
-        self.auto_chip_button.toggled.connect(
-            lambda: self.set_should_enable_buttons(False)
-        )
+        # enables the radio buttons
+        self.enable_radio_buttons()
 
         vbox_layout.addWidget(self.radio_button_box)
 
@@ -109,12 +98,36 @@ class ChickerWidget(QWidget):
         self.geneva_value = 3
         self.power_value = 1
 
+        self.chicker_enabled = True
+
+    def enable_radio_buttons(self):
+        """Enables the Radio Buttons
+
+        no auto button enables both kick/chip buttons, while auto kick and auto chip disable both kick/chip buttons
+
+        """
+        self.radio_buttons_group.setExclusive(True)
+        self.no_auto_button.clicked.connect(
+            lambda: self.set_should_enable_buttons(True)
+        )
+        self.auto_kick_button.clicked.connect(
+            lambda: self.set_should_enable_buttons(False)
+        )
+        self.auto_chip_button.clicked.connect(
+            lambda: self.set_should_enable_buttons(False)
+        )
+
+        self.no_auto_button.setChecked(True)
+
+    def disable_radio_buttons(self):
+        self.no_auto_button.disconnect()
+        self.auto_kick_button.disconnect()
+        self.auto_chip_button.disconnect()
+
     def send_command_and_timeout(self, command):
         """
         If buttons are enabled, sends a Kick command and disables buttons
-
         Attaches a callback to re-enable buttons after 3 seconds
-
         :param command: Command to send. One of ChickerCommandMode.KICK or ChickerCommandMode.CHIP
         """
         # if button is enabled
@@ -144,22 +157,52 @@ class ChickerWidget(QWidget):
     def set_should_enable_buttons(self, enable):
         """
         Changes if buttons are clickable or not based on boolean parameter
-
         :param enable: boolean to indicate whether buttons should be made clickable or not
         """
         self.no_auto_selected = enable
+
+        print(f"buttons enable: {str(enable)}")
 
         if enable:
             self.enable_kick_chip_buttons()
         else:
             self.disable_kick_chip_buttons()
 
+    def set_should_enable_chicker(self, enable):
+        """
+        Changes if the entire chicker widget (kick / chip buttons + radio buttons + sliders)
+        should be enabled or not
+        :param enable: boolean to indicate whether chicker should be enabled or not
+        """
+
+        self.chicker_enabled = enable
+
+        print(f"chicker enable: {str(enable)}")
+
+        self.set_should_enable_buttons(enable)
+
+        if enable:
+            common_widgets.enable_slider(
+                self.geneva_slider,
+                self.geneva_label,
+                lambda value: Slot.Name(value)
+            )
+            common_widgets.enable_slider(
+                self.power_slider,
+                self.power_label,
+                lambda value: str(value)
+            )
+            self.enable_radio_buttons()
+        else:
+            common_widgets.disable_slider(self.geneva_slider)
+            common_widgets.disable_slider(self.power_slider)
+            common_widgets.disable_radio_button(self.radio_buttons_group)
+
+
     def send_command(self, command):
         """Sends a [auto]kick or [auto]chip primitive
-
         :param command: enum int value to indicate what primitive to send
         :returns: None
-
         """
 
         # gets slider values
@@ -173,12 +216,8 @@ class ChickerWidget(QWidget):
         # sends kick, chip, autokick, or autchip primitive
         if command == ChickerCommandMode.KICK:
             power_control.chicker.kick_speed_m_per_s = power_value
-            self.proto_unix_io.send_proto(PowerControl, power_control)
-            power_control.chicker.kick_speed_m_per_s = 0
         elif command == ChickerCommandMode.CHIP:
             power_control.chicker.chip_distance_meters = power_value
-            self.proto_unix_io.send_proto(PowerControl, power_control)
-            power_control.chicker.chip_distance_meters = 0
         elif command == ChickerCommandMode.AUTOKICK:
             power_control.chicker.auto_chip_or_kick.autokick_speed_m_per_s = power_value
         elif command == ChickerCommandMode.AUTOCHIP:
@@ -189,13 +228,20 @@ class ChickerWidget(QWidget):
         # sends proto
         self.proto_unix_io.send_proto(PowerControl, power_control)
 
+        time.sleep(0.001)
+
+        # send empty proto
+        # this is due to a bug in robot_communication where if a new PowerControl message is not sent,
+        # the previous, cached message is resent to the robot repeatedly
+        # so sending an empty message overwrites the cache and prevents spamming commands
+        power_control = PowerControl()
+        self.proto_unix_io.send_proto(PowerControl, power_control)
+
     def change_button_state(self, button, enable):
         """Change button color and clickable state.
-
         :param button: button to change the state of
         :param enable: bool: if True: enable this button, if False: disable
         :returns: None
-
         """
         if enable:
             button.setStyleSheet("background-color: White")
@@ -222,5 +268,3 @@ class ChickerWidget(QWidget):
             self.send_command(ChickerCommandMode.AUTOKICK)
         elif self.auto_chip_button.isChecked():
             self.send_command(ChickerCommandMode.AUTOCHIP)
-        elif self.no_auto_button.isChecked():
-            pass

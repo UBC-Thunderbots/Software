@@ -12,7 +12,7 @@ class RobotCommunication(object):
 
     def __init__(
         self,
-        input_proto_unix_io,
+        proto_unix_io,
         multicast_channel,
         interface,
         estop_path="/dev/ttyACM0",
@@ -20,7 +20,7 @@ class RobotCommunication(object):
     ):
         """Initialize the communication with the robots
 
-        :param input_proto_unix_io: The input proto_unix_io object
+        :param proto_unix_io: The input proto_unix_io object
         :param multicast_channel: The multicast channel to use
         :param interface: The interface to use
         :param estop_path: The path to the estop
@@ -29,13 +29,13 @@ class RobotCommunication(object):
         """
         self.sequence_number = 0
         self.last_time = time.time()
-        self.input_proto_unix_io = input_proto_unix_io
+        self.proto_unix_io = proto_unix_io
         self.multicast_channel = str(multicast_channel)
         self.interface = interface
         self.estop_path = estop_path
         self.estop_buadrate = estop_buadrate
 
-        self.robots_connected = set()
+        self.robots_connected_to_diagnostics = set()
 
         self.world_buffer = ThreadSafeBuffer(1, World)
         self.primitive_buffer = ThreadSafeBuffer(1, PrimitiveSet)
@@ -43,43 +43,41 @@ class RobotCommunication(object):
         self.motor_control_diagnostics_buffer = ThreadSafeBuffer(1, MotorControl)
         self.power_control_diagnostics_buffer = ThreadSafeBuffer(1, PowerControl)
 
-        self.input_proto_unix_io.register_observer(World, self.world_buffer)
-        self.input_proto_unix_io.register_observer(PrimitiveSet, self.primitive_buffer)
-        self.input_proto_unix_io.register_observer(
+        self.proto_unix_io.register_observer(World, self.world_buffer)
+        self.proto_unix_io.register_observer(PrimitiveSet, self.primitive_buffer)
+        self.proto_unix_io.register_observer(
             MotorControl, self.motor_control_diagnostics_buffer
         )
-        self.input_proto_unix_io.register_observer(
+        self.proto_unix_io.register_observer(
             PowerControl, self.power_control_diagnostics_buffer
         )
 
         self.send_estop_state_thread = threading.Thread(target=self.__send_estop_state)
         self.run_thread = threading.Thread(target=self.run)
 
-        try:
-            self.estop_reader = ThreadedEstopReader(
-                self.estop_path, self.estop_buadrate
-            )
-        except Exception:
-            raise Exception("Could not find estop, make sure its plugged in")
+        # try:
+        #     self.estop_reader = ThreadedEstopReader(
+        #         self.estop_path, self.estop_buadrate
+        #     )
+        # except Exception:
+        #     raise Exception("Could not find estop, make sure its plugged in")
 
     def __send_estop_state(self):
-        while True:
-            self.full_system_proto_unix_io.send_proto(
-                EstopState, EstopState(is_playing=self.estop_reader.isEstopPlay())
-            )
-            time.sleep(0.1)
+        print('yea')
+        # while True:
+        #     self.proto_unix_io.send_proto(
+        #         EstopState, EstopState(is_playing=self.estop_reader.isEstopPlay())
+        #     )
+        #     time.sleep(0.1)
 
     def run(self):
-        """Forward World and PrimitiveSet protos from fullsystem to the robots.
+        """Forward World and PrimitiveSet protos from fullsystem and diagnostics to the robots.
 
         If the emergency stop is tripped, the PrimitiveSet will not be sent so
         that the robots timeout and stop.
 
-        NOTE: If disconnect_fullsystem_from_robots is called, then the packets
-        will not be forwarded to the robots. 
-
-        send_override_primitive_set can be used to send a primitive set, which
-        is useful to dip in and out of robot diagnostics.
+        Robots can be connected to and disconnected from diagnostics and primitive sets can be
+        sent that way.
 
         """
         while True:
@@ -96,7 +94,7 @@ class RobotCommunication(object):
                 # Filter the primitive set to include only robots not connected to diagnostics
                 robot_primitives = fullsystem_primitive_set.robot_primitives
 
-                for robot_id in self.robots_connected:
+                for robot_id in self.robots_connected_to_diagnostics:
                     del robot_primitives[robot_id]
 
                 # initialize filtered primitive set
@@ -110,7 +108,7 @@ class RobotCommunication(object):
                 self.send_primitive_set.send_proto(fullsystem_primitive_set)
 
             # If at least 1 robot is connected to diagnostics, send them diagnostics primitives
-            if len(self.robots_connected) != 0:
+            if len(self.robots_connected_to_diagnostics) != 0:
                 diagnostics_primitive = DirectControlPrimitive(
                     motor_control=self.motor_control_diagnostics_buffer.get(
                         block=False
@@ -125,7 +123,7 @@ class RobotCommunication(object):
                     stay_away_from_ball=False,
                     robot_primitives={
                         robot_id: Primitive(direct_control=diagnostics_primitive)
-                        for robot_id in self.robots_connected
+                        for robot_id in self.robots_connected_to_diagnostics
                     },
                     sequence_number=self.sequence_number,
                 )
@@ -144,7 +142,7 @@ class RobotCommunication(object):
         """ Connect the robots to fullsystem """
 
         self.fullsystem_connected_to_robots = True
-        self.robots_connected = set()
+        self.robots_connected_to_diagnostics = set()
 
     def disconnect_fullsystem_from_robots(self):
         """ Disconnect the robots from fullsystem """
@@ -152,16 +150,16 @@ class RobotCommunication(object):
         self.fullsystem_connected_to_robots = False
 
     def connect_robot_to_diagnostics(self, robot_id):
-        self.robots_connected.add(robot_id)
+        self.robots_connected_to_diagnostics.add(robot_id)
 
     def disconnect_robot_from_diagnostics(self, robot_id):
-        self.robots_connected.remove(robot_id)
+        self.robots_connected_to_diagnostics.remove(robot_id)
 
     def toggle_robot_connection(self, robot_id):
-        if robot_id in self.robots_connected:
-            self.robots_connected.remove(robot_id)
+        if robot_id in self.robots_connected_to_diagnostics:
+            self.robots_connected_to_diagnostics.remove(robot_id)
         else:
-            self.robots_connected.add(robot_id)
+            self.robots_connected_to_diagnostics.add(robot_id)
 
     def __enter__(self):
         """Enter RobotCommunication context manager. Setup multicast listener

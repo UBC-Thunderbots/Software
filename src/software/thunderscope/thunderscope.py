@@ -493,7 +493,7 @@ class Thunderscope(object):
         )
 
         self.diagnostics_widgets["fullsystem_connect"].toggle_controls_signal.connect(
-            self.diagnostics_widgets["chicker"].set_should_enable_buttons
+            self.diagnostics_widgets["chicker"].set_should_enable_chicker
         )
 
         self.robot_diagnostics_dock_area.addDock(log_dock)
