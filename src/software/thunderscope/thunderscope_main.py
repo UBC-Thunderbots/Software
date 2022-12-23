@@ -198,59 +198,47 @@ if __name__ == "__main__":
     #              AI + Robot Communication + Robot Diagnostics               #
     ###########################################################################
     #
-    # When we are running with real robots. Possible Running Options:
-    #
-    #       Run Blue
-    #       Run Yellow
-    #       Run Blue + Diagnostics
-    #       Run Yellow + Diagnostics
-    #       Run Diagnostics
-    #
-    # We want to run either 1 instance of AI or 1 instance of RobotCommunication or both which will
-    # send/recv packets over the provided multicast channel.
+    # When we are running with real robots. We want to run 1 instance of AI
+    # and 1 instance of RobotCommunication which will send/recv packets over
+    # the provided multicast channel.
+    if args.run_blue:
 
-    if args.run_blue or args.run_yellow or args.run_diagnostics:
         tscope = Thunderscope(
             layout_path=args.layout,
-            load_blue=bool(args.run_blue),
-            load_yellow=bool(args.run_yellow),
-            load_diagnostics=bool(args.run_diagnostics),
+            load_blue=True,
+            load_yellow=False,
+            load_diagnostics=True,
             load_gamecontroller=False,
             visualization_buffer_size=args.visualization_buffer_size,
         )
 
-        if args.run_blue:
-            proto_unix_io = tscope.blue_full_system_proto_unix_io
-            runtime_dir = args.blue_full_system_runtime_dir
-            friendly_colour_yellow = False
-            debug = args.debug_blue_full_system
-        elif args.run_yellow:
-            proto_unix_io = tscope.yellow_full_system_proto_unix_io
-            runtime_dir = args.yellow_full_system_runtime_dir
-            friendly_colour_yellow = True
-            debug = args.debug_yellow_full_system
-        elif args.run_diagnostics:
-            proto_unix_io = tscope.robot_diagnostics_proto_unix_io
+        proto_unix_io = tscope.blue_full_system_proto_unix_io
+        runtime_dir = args.blue_full_system_runtime_dir
+        friendly_colour_yellow = False
+        debug = args.debug_blue_full_system
 
-        if args.run_blue or args.run_yellow:
-            with ProtoLogger(
-                args.blue_full_system_runtime_dir,
-            ) as blue_logger, ProtoLogger(
-                args.yellow_full_system_runtime_dir,
-            ) as yellow_logger, RobotCommunication(
+    if args.run_yellow:
+
+        tscope = Thunderscope(
+            layout_path=args.layout,
+            load_blue=False,
+            load_yellow=True,
+            load_diagnostics=True,
+            load_gamecontroller=False,
+            visualization_buffer_size=args.visualization_buffer_size,
+        )
+
+        proto_unix_io = tscope.yellow_full_system_proto_unix_io
+        runtime_dir = args.yellow_full_system_runtime_dir
+        friendly_colour_yellow = True
+        debug = args.debug_yellow_full_system
+
+    if args.run_blue or args.run_yellow:
+        with RobotCommunication(
                 proto_unix_io, getRobotMulticastChannel(0), args.interface
-            ), FullSystem(
-                runtime_dir, debug, friendly_colour_yellow
-            ) as full_system:
-
-                proto_unix_io.register_to_observe_everything(blue_logger.buffer)
-                proto_unix_io.register_to_observe_everything(yellow_logger.buffer)
-                full_system.setup_proto_unix_io(proto_unix_io)
-
-                tscope.toggle_robot_connection_signal.connect(
-                    RobotCommunication.toggle_robot_connection
-                )
-                tscope.show()
+        ), FullSystem(runtime_dir, debug, friendly_colour_yellow) as full_system:
+            full_system.setup_proto_unix_io(proto_unix_io)
+            tscope.show()
 
 
     ###########################################################################

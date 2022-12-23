@@ -20,11 +20,15 @@ class ChickerWidget(QWidget):
     def __init__(self, proto_unix_io):
         """Handles the robot diagnostics input to create a PowerControl message
         to be sent to the robots.
+
         NOTE: The powerboards run in regulation mode, which means that they are
         always charged and do not need to be explicitly charged.
+
         The powerboard also has an internal cooldown, so spamming kick or chip
         will not work until the capacitors charge up and the cooldown is over.
+
         :param proto_unix_io: proto_unix_io object to send messages to the robot
+
         """
 
         super(ChickerWidget, self).__init__()
@@ -109,7 +113,9 @@ class ChickerWidget(QWidget):
     def send_command_and_timeout(self, command):
         """
         If buttons are enabled, sends a Kick command and disables buttons
+
         Attaches a callback to re-enable buttons after 3 seconds
+
         :param command: Command to send. One of ChickerCommandMode.KICK or ChickerCommandMode.CHIP
         """
         # if button is enabled
@@ -139,6 +145,7 @@ class ChickerWidget(QWidget):
     def set_should_enable_buttons(self, enable):
         """
         Changes if buttons are clickable or not based on boolean parameter
+
         :param enable: boolean to indicate whether buttons should be made clickable or not
         """
         self.no_auto_selected = enable
@@ -150,8 +157,10 @@ class ChickerWidget(QWidget):
 
     def send_command(self, command):
         """Sends a [auto]kick or [auto]chip primitive
+
         :param command: enum int value to indicate what primitive to send
         :returns: None
+
         """
 
         # gets slider values
@@ -188,9 +197,11 @@ class ChickerWidget(QWidget):
 
     def change_button_state(self, button, enable):
         """Change button color and clickable state.
+
         :param button: button to change the state of
         :param enable: bool: if True: enable this button, if False: disable
         :returns: None
+
         """
         if enable:
             button.setStyleSheet("background-color: White")
