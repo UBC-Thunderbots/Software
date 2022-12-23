@@ -85,24 +85,24 @@ class RobotCommunication(object):
             # Initialise empty total primitives
             robot_primitives = {}
 
-            # Get the world
-            world = self.world_buffer.get(block=False)
-
-            # try sending the world proto
-            try:
-                self.world_mcast_sender.send_proto(world)
-
-                # if world is valid, get fullsystem primitives and add them to total primitives
-                fullsystem_primitive_set = self.primitive_buffer.get(block=False)
-
-                robot_primitives = fullsystem_primitive_set.robot_primitives
-
-                # filter fullsystem primitives to remove ones for robots connected to diagnostics
-                for robot_id in self.robots_connected_to_diagnostics:
-                    del robot_primitives[robot_id]
-            except RuntimeError:
-                # world is not valid, which means no vision / simulator data is being received
-                pass
+            # # Get the world
+            # world = self.world_buffer.get(block=False)
+            #
+            # # try sending the world proto
+            # try:
+            #     self.world_mcast_sender.send_proto(world)
+            #
+            #     # if world is valid, get fullsystem primitives and add them to total primitives
+            #     fullsystem_primitive_set = self.primitive_buffer.get(block=False)
+            #
+            #     robot_primitives = fullsystem_primitive_set.robot_primitives
+            #
+            #     # filter fullsystem primitives to remove ones for robots connected to diagnostics
+            #     for robot_id in self.robots_connected_to_diagnostics:
+            #         del robot_primitives[robot_id]
+            # except RuntimeError:
+            #     # world is not valid, which means no vision / simulator data is being received
+            #     pass
 
             # get the diagnostics primitive
             diagnostics_primitive = DirectControlPrimitive(
