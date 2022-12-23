@@ -15,6 +15,7 @@ class RobotCommunication(object):
             full_system_proto_unix_io,
             multicast_channel,
             interface,
+            fullsystem_running,
             estop_path="/dev/ttyACM0",
             estop_buadrate=115200,
     ):
@@ -23,6 +24,7 @@ class RobotCommunication(object):
         :param full_system_proto_unix_io: full_system_proto_unix_io object
         :param multicast_channel: The multicast channel to use
         :param interface: The interface to use
+        :param fullsystem_running: Whether fullsystem is running or not currently
         :param estop_path: The path to the estop
         :param estop_baudrate: The baudrate of the estop
 
@@ -35,7 +37,6 @@ class RobotCommunication(object):
         self.estop_path = estop_path
         self.estop_buadrate = estop_buadrate
 
-        self.robots_connected_to_handheld_controllers = set()
         self.robots_connected_to_diagnostics = set()
 
         self.world_buffer = ThreadSafeBuffer(1, World)
@@ -57,6 +58,8 @@ class RobotCommunication(object):
 
         self.send_estop_state_thread = threading.Thread(target=self.__send_estop_state)
         self.run_thread = threading.Thread(target=self.run)
+
+        self.fullsystem_connected_to_robots = fullsystem_running
 
         # try:
         #     self.estop_reader = ThreadedEstopReader(
@@ -122,7 +125,7 @@ class RobotCommunication(object):
 
                 self.sequence_number += 1
 
-                print(primitive_set)
+                # print(primitive_set)
 
                 if True:
                     self.last_time = primitive_set.time_sent.epoch_timestamp_seconds
@@ -134,19 +137,12 @@ class RobotCommunication(object):
         """ Connect the robots to fullsystem """
 
         self.fullsystem_connected_to_robots = True
-        self.robots_connected_to_handheld_controllers = set()
-        self.robots_connected_to_diagnostics = set()
+        self.robots_connected_to_diagnostics = {1, 2, 3}
 
     def disconnect_fullsystem_from_robots(self):
         """ Disconnect the robots from fullsystem """
 
         self.fullsystem_connected_to_robots = False
-
-    def connect_robot_to_diagnostics(self, robot_id):
-        self.robots_connected_to_diagnostics.add(robot_id)
-
-    def discconnect_robot_from_diagnostics(self, robot_id):
-        self.robots_connected_to_diagnostics.remove(robot_id)
 
     def toggle_robot_connection(self, robot_id):
         """
@@ -180,8 +176,8 @@ class RobotCommunication(object):
             )
 
         self.receive_ssl_wrapper = SSLWrapperPacketProtoListener(
-            SSL_ADDRESS,
-            SSL_PORT,
+            SSL_VISION_ADDRESS,
+            SSL_VISION_PORT,
             lambda data: self.full_system_proto_unix_io.send_proto(
                 SSL_WrapperPacket, data
             ),
@@ -197,13 +193,11 @@ class RobotCommunication(object):
             self.multicast_channel + "%" + self.interface, VISION_PORT, True
         )
 
-        self.connect_fullsystem_to_robots()
-
         # TODO (#2741): we might not want to support robot diagnostics in tscope
         # make a ticket here to create a widget to call these functions to detach
         # from AI and connect to robots/or remove
-        self.disconnect_fullsystem_from_robots()
-        self.connect_robot_to_diagnostics(0)
+
+        print(self.robots_connected_to_diagnostics)
 
         self.send_estop_state_thread.start()
         self.run_thread.start()

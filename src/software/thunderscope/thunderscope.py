@@ -335,6 +335,7 @@ class Thunderscope(object):
         :param load_yellow: Whether to load the yellow layout.
         :param load_diagnostics: Whether to load the diagnostics layout.
         """
+
         if load_yellow:
             self.configure_full_system_layout(
                 self.yellow_full_system_dock_area,

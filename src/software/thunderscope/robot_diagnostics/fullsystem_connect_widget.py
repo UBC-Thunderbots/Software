@@ -6,13 +6,23 @@ from enum import Enum
 
 
 class ControlMode(Enum):
+    """
+    Enum for the 3 modes of control (Manual, XBox, and Fullsystem (AI))
+    """
     MANUAL = 1
     XBOX = 2
     AI = 3
 
 
 class FullSystemConnectWidget(QWidget):
+    """
+    Class to allow the user to switch between Manual, XBox, and Fullsystem control through Thunderscope UI
 
+    Disables Manual controls in the other two modes
+
+    """
+
+    # Signal to indicate if manual controls should be disabled based on boolean parameter
     toggle_controls_signal = pyqtSignal(bool)
 
     def __init__(self, proto_unix_io, load_fullsystem):
@@ -64,6 +74,8 @@ class FullSystemConnectWidget(QWidget):
     def switch_control_mode(self, mode):
         """
         Switches the control mode to the given mode
+
+        Emits a signal to indicate whether manual controls should be disabled or not
 
         :param mode: mode to switch to (one of ControlMode values)
 
