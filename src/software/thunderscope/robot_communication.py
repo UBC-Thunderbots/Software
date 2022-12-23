@@ -81,34 +81,20 @@ class RobotCommunication(object):
 
         """
         while True:
-            # Send fullsystem primitives to robots not connected to diagnostics
+            if self.fullsystem_connected_to_robots:
 
-            # Send the world
-            world = self.world_buffer.get(block=True)
-            self.world_mcast_sender.send_proto(world)
+                # Send the world
+                world = self.world_buffer.get(block=True)
+                self.send_world.send_proto(world)
 
-            # Get the total primitive set
-            fullsystem_primitive_set = self.primitive_buffer.get(block=False)
+                # Send the primitive set
+                primitive_set = self.primitive_buffer.get(block=False)
 
-            if self.estop_reader.isEstopPlay():
-                # Filter the primitive set to include only robots not connected to diagnostics
-                robot_primitives = fullsystem_primitive_set.robot_primitives
+                if self.estop_reader.isEstopPlay():
+                    self.send_primitive_set.send_proto(primitive_set)
 
-                for robot_id in self.robots_connected_to_diagnostics:
-                    del robot_primitives[robot_id]
+            else:
 
-                # initialize filtered primitive set
-                fullsystem_primitive_set = PrimitiveSet(
-                    time_sent=Timestamp(epoch_timestamp_seconds=time.time()),
-                    stay_away_from_ball=False,
-                    robot_primitives=robot_primitives,
-                    sequence_number=self.sequence_number,
-                )
-
-                self.send_primitive_set.send_proto(fullsystem_primitive_set)
-
-            # If at least 1 robot is connected to diagnostics, send them diagnostics primitives
-            if len(self.robots_connected_to_diagnostics) != 0:
                 diagnostics_primitive = DirectControlPrimitive(
                     motor_control=self.motor_control_diagnostics_buffer.get(
                         block=False
@@ -118,7 +104,7 @@ class RobotCommunication(object):
                     ),
                 )
 
-                diagnostics_primitive_set = PrimitiveSet(
+                primitive_set = PrimitiveSet(
                     time_sent=Timestamp(epoch_timestamp_seconds=time.time()),
                     stay_away_from_ball=False,
                     robot_primitives={
@@ -131,12 +117,59 @@ class RobotCommunication(object):
                 self.sequence_number += 1
 
                 if self.estop_reader.isEstopPlay():
-                    self.last_time = (
-                        diagnostics_primitive_set.time_sent.epoch_timestamp_seconds
-                    )
-                    self.send_primitive_set.send_proto(diagnostics_primitive_set)
+                    self.last_time = primitive_set.time_sent.epoch_timestamp_seconds
+                    self.send_primitive_set.send_proto(primitive_set)
 
                 time.sleep(0.001)
+            # # Send fullsystem primitives to robots not connected to diagnostics
+            #
+            # # Send the world
+            # world = self.world_buffer.get(block=True)
+            # self.world_mcast_sender.send_proto(world)
+            #
+            # # Get the total primitive set from fullsystem
+            # fullsystem_primitive_set = self.primitive_buffer.get(block=False)
+            #
+            # print('here')
+            #
+            # if self.estop_reader.isEstopPlay():
+            #     print('here')
+            #     # Replace the primitives of robots connected to diagnostics to diagnostics ones
+            #     robot_primitives = fullsystem_primitive_set.robot_primitives
+            #
+            #     diagnostics_primitive = DirectControlPrimitive(
+            #         motor_control=self.motor_control_diagnostics_buffer.get(
+            #             block=False
+            #         ),
+            #         power_control=self.power_control_diagnostics_buffer.get(
+            #             block=False
+            #         ),
+            #     )
+            #
+            #     for robot_id in self.robots_connected_to_diagnostics:
+            #         robot_primitives[robot_id] = Primitive(direct_control=diagnostics_primitive)
+            #
+            #     # initialize total primitive set
+            #     fullsystem_primitive_set = PrimitiveSet(
+            #         time_sent=Timestamp(epoch_timestamp_seconds=time.time()),
+            #         stay_away_from_ball=False,
+            #         robot_primitives=robot_primitives,
+            #         sequence_number=self.sequence_number,
+            #     )
+            #
+            #     print(robot_primitives)
+            #
+            #     # send total primitive set
+            #     self.send_primitive_set.send_proto(fullsystem_primitive_set)
+            #
+            #     self.sequence_number += 1
+            #
+            #     self.last_time = (
+            #         diagnostics_primitive_set.time_sent.epoch_timestamp_seconds
+            #     )
+            #     self.send_primitive_set.send_proto(diagnostics_primitive_set)
+            #
+            #     time.sleep(0.001)
 
     def connect_fullsystem_to_robots(self):
         """ Connect the robots to fullsystem """
@@ -156,6 +189,7 @@ class RobotCommunication(object):
         self.robots_connected_to_diagnostics.remove(robot_id)
 
     def toggle_robot_connection(self, robot_id):
+        print(robot_id)
         if robot_id in self.robots_connected_to_diagnostics:
             self.robots_connected_to_diagnostics.remove(robot_id)
         else:

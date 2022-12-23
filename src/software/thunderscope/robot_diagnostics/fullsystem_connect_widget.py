@@ -70,8 +70,6 @@ class FullSystemConnectWidget(QWidget):
         """
         self.control_mode = mode
 
-        print(mode)
-
         if self.control_mode == ControlMode.XBOX or self.control_mode == ControlMode.AI:
             self.toggle_controls_signal.emit(False)
         else:

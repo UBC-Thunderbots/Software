@@ -71,34 +71,34 @@ class RobotView(QWidget):
         if load_diagnostics:
             self.robot_checkboxes = [QCheckBox() for x in range(MAX_ROBOT_IDS_PER_SIDE)]
 
-        for x in range(MAX_ROBOT_IDS_PER_SIDE):
+        for id in range(MAX_ROBOT_IDS_PER_SIDE):
             QVBoxLayout()
-            self.robot_battery_progress_bars[x].setMaximum(100)
-            self.robot_battery_progress_bars[x].setMinimum(0)
-            self.robot_battery_progress_bars[x].setValue(10)
+            self.robot_battery_progress_bars[id].setMaximum(100)
+            self.robot_battery_progress_bars[id].setMinimum(0)
+            self.robot_battery_progress_bars[id].setValue(10)
 
-            self.breakbeam_labels[x].setText("BREAKBEAM")
-            self.breakbeam_labels[x].setStyleSheet("background-color: blue")
+            self.breakbeam_labels[id].setText("BREAKBEAM")
+            self.breakbeam_labels[id].setStyleSheet("background-color: blue")
 
-            self.robot_status_layouts[x].addWidget(self.robot_battery_progress_bars[x])
-            self.robot_status_layouts[x].addWidget(self.breakbeam_labels[x])
+            self.robot_status_layouts[id].addWidget(self.robot_battery_progress_bars[id])
+            self.robot_status_layouts[id].addWidget(self.breakbeam_labels[id])
 
-            self.robot_layouts[x].addWidget(
-                self.create_vision_pattern_label(x, "b", 25)
+            self.robot_layouts[id].addWidget(
+                self.create_vision_pattern_label(id, "b", 25)
             )
-            self.robot_layouts[x].addLayout(self.robot_status_layouts[x])
+            self.robot_layouts[id].addLayout(self.robot_status_layouts[id])
 
             if load_diagnostics:
-                self.robot_layouts[x].addWidget(self.robot_checkboxes[x])
+                self.robot_layouts[id].addWidget(self.robot_checkboxes[id])
 
                 # connect checkboxes to emit a toggle connection signal with the corresponding robot ID
-                self.robot_checkboxes[x].stateChanged.connect(
-                    lambda state, robot_id=x: self.toggle_robot_connection_signal.emit(
+                self.robot_checkboxes[id].stateChanged.connect(
+                    lambda state, robot_id=id: self.toggle_robot_connection_signal.emit(
                         robot_id
                     )
                 )
 
-            self.layout.addLayout(self.robot_layouts[x])
+            self.layout.addLayout(self.robot_layouts[id])
 
         self.setLayout(self.layout)
 
@@ -157,6 +157,7 @@ class RobotView(QWidget):
     def refresh(self):
         """Refresh the view
         """
+        # TODO (#2791): fix robot view refresh function
         return
         robot_status_buffer = self.robot_status_buffer.get(block=False)
         for i in range(MAX_ROBOT_IDS_PER_SIDE):
