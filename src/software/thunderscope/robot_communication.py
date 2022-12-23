@@ -27,6 +27,7 @@ class RobotCommunication(object):
         :param estop_baudrate: The baudrate of the estop
 
         """
+        print('init')
         self.sequence_number = 0
         self.last_time = time.time()
         self.proto_unix_io = proto_unix_io
@@ -80,21 +81,23 @@ class RobotCommunication(object):
         sent that way.
 
         """
-        print('here')
+        print("step0")
         while True:
             # Send fullsystem primitives to robots not connected to diagnostics
 
             # Send the world
+            print("step1")
             world = self.world_buffer.get(block=True)
+            print("step1")
             self.world_mcast_sender.send_proto(world)
+            print("step1")
 
             # Get the total primitive set from fullsystem
             fullsystem_primitive_set = self.primitive_buffer.get(block=False)
+            print("step1")
 
-            print('here')
-
-            if self.estop_reader.isEstopPlay():
-                print('here')
+            print("step1")
+            if True:
                 # Replace the primitives of robots connected to diagnostics to diagnostics ones
                 robot_primitives = fullsystem_primitive_set.robot_primitives
 
@@ -211,7 +214,10 @@ class RobotCommunication(object):
         # make a ticket here to create a widget to call these functions to detach
         # from AI and connect to robots/or remove
         # self.disconnect_fullsystem_from_robots()
-        # self.connect_robot_to_diagnostics(0)
+        self.connect_robot_to_diagnostics(0)
+        self.connect_robot_to_diagnostics(1)
+        self.connect_robot_to_diagnostics(2)
+        self.connect_robot_to_diagnostics(3)
 
         self.send_estop_state_thread.start()
         self.run_thread.start()
