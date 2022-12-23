@@ -81,59 +81,65 @@ class RobotCommunication(object):
         sent that way.
 
         """
-        print("step0")
         while True:
-            # Send fullsystem primitives to robots not connected to diagnostics
+            # Initialise empty total primitives
+            robot_primitives = {}
 
-            # Send the world
-            print("step1")
-            world = self.world_buffer.get(block=True)
-            print("step1")
-            self.world_mcast_sender.send_proto(world)
-            print("step1")
+            # Get the world
+            world = self.world_buffer.get(block=False)
 
-            # Get the total primitive set from fullsystem
-            fullsystem_primitive_set = self.primitive_buffer.get(block=False)
-            print("step1")
+            # try sending the world proto
+            try:
+                self.world_mcast_sender.send_proto(world)
 
-            print("step1")
-            if True:
-                # Replace the primitives of robots connected to diagnostics to diagnostics ones
+                # if world is valid, get fullsystem primitives and add them to total primitives
+                fullsystem_primitive_set = self.primitive_buffer.get(block=False)
+
                 robot_primitives = fullsystem_primitive_set.robot_primitives
 
-                diagnostics_primitive = DirectControlPrimitive(
-                    motor_control=self.motor_control_diagnostics_buffer.get(
-                        block=False
-                    ),
-                    power_control=self.power_control_diagnostics_buffer.get(
-                        block=False
-                    ),
-                )
-
+                # filter fullsystem primitives to remove ones for robots connected to diagnostics
                 for robot_id in self.robots_connected_to_diagnostics:
-                    robot_primitives[robot_id] = Primitive(direct_control=diagnostics_primitive)
+                    del robot_primitives[robot_id]
+            except RuntimeError:
+                # world is not valid, which means no vision / simulator data is being received
+                pass
 
-                # initialize total primitive set
-                fullsystem_primitive_set = PrimitiveSet(
-                    time_sent=Timestamp(epoch_timestamp_seconds=time.time()),
-                    stay_away_from_ball=False,
-                    robot_primitives=robot_primitives,
-                    sequence_number=self.sequence_number,
-                )
+            # get the diagnostics primitive
+            diagnostics_primitive = DirectControlPrimitive(
+                motor_control=self.motor_control_diagnostics_buffer.get(
+                    block=False
+                ),
+                power_control=self.power_control_diagnostics_buffer.get(
+                    block=False
+                ),
+            )
 
-                print(robot_primitives)
+            print(diagnostics_primitive)
 
-                # send total primitive set
-                self.send_primitive_set.send_proto(fullsystem_primitive_set)
+            # for robots connected to diagnostics, add the diagnostics primitive to total primitives
+            for robot_id in self.robots_connected_to_diagnostics:
+                robot_primitives[robot_id] = Primitive(direct_control=diagnostics_primitive)
 
-                self.sequence_number += 1
+            # initialize total primitive set
+            robot_primitive_set = PrimitiveSet(
+                time_sent=Timestamp(epoch_timestamp_seconds=time.time()),
+                stay_away_from_ball=False,
+                robot_primitives=robot_primitives,
+                sequence_number=self.sequence_number,
+            )
 
+            print(robot_primitives)
+
+            self.sequence_number += 1
+
+            # send the total primitive set
+            if True:
                 self.last_time = (
-                    diagnostics_primitive_set.time_sent.epoch_timestamp_seconds
+                    robot_primitive_set.time_sent.epoch_timestamp_seconds
                 )
-                self.send_primitive_set.send_proto(diagnostics_primitive_set)
+                self.send_primitive_set.send_proto(robot_primitive_set)
 
-                time.sleep(0.001)
+            time.sleep(0.001)
 
     def connect_fullsystem_to_robots(self):
         """ Connect the robots to fullsystem """
@@ -146,13 +152,11 @@ class RobotCommunication(object):
 
         self.fullsystem_connected_to_robots = False
 
-    def connect_robot_to_diagnostics(self, robot_id):
-        self.robots_connected_to_diagnostics.add(robot_id)
-
-    def disconnect_robot_from_diagnostics(self, robot_id):
-        self.robots_connected_to_diagnostics.remove(robot_id)
-
     def toggle_robot_connection(self, robot_id):
+        """
+        Connects a robot to or disconnects a robot from diagnostics
+        :param robot_id: the id of the robot to be added or removed from the diagnostics set
+        """
         print(robot_id)
         if robot_id in self.robots_connected_to_diagnostics:
             self.robots_connected_to_diagnostics.remove(robot_id)
@@ -214,10 +218,6 @@ class RobotCommunication(object):
         # make a ticket here to create a widget to call these functions to detach
         # from AI and connect to robots/or remove
         # self.disconnect_fullsystem_from_robots()
-        self.connect_robot_to_diagnostics(0)
-        self.connect_robot_to_diagnostics(1)
-        self.connect_robot_to_diagnostics(2)
-        self.connect_robot_to_diagnostics(3)
 
         self.send_estop_state_thread.start()
         self.run_thread.start()
