@@ -219,18 +219,22 @@ if __name__ == "__main__":
             visualization_buffer_size=args.visualization_buffer_size,
         )
 
+        full_system_proto_unix_io = None
+        diagnostics_proto_unix_io = None
+
         if args.run_blue:
-            proto_unix_io = tscope.blue_full_system_proto_unix_io
+            full_system_proto_unix_io = tscope.blue_full_system_proto_unix_io
             runtime_dir = args.blue_full_system_runtime_dir
             friendly_colour_yellow = False
             debug = args.debug_blue_full_system
         elif args.run_yellow:
-            proto_unix_io = tscope.yellow_full_system_proto_unix_io
+            full_system_proto_unix_io = tscope.yellow_full_system_proto_unix_io
             runtime_dir = args.yellow_full_system_runtime_dir
             friendly_colour_yellow = True
             debug = args.debug_yellow_full_system
-        elif args.run_diagnostics:
-            proto_unix_io = tscope.robot_diagnostics_proto_unix_io
+
+        if args.run_diagnostics:
+            diagnostics_proto_unix_io = tscope.robot_diagnostics_proto_unix_io
 
         if args.run_blue or args.run_yellow:
             with ProtoLogger(
@@ -241,17 +245,20 @@ if __name__ == "__main__":
                 runtime_dir, debug, friendly_colour_yellow
             ) as full_system:
 
-                proto_unix_io.register_to_observe_everything(blue_logger.buffer)
-                proto_unix_io.register_to_observe_everything(yellow_logger.buffer)
-                full_system.setup_proto_unix_io(proto_unix_io)
+                print(type(blue_logger))
+
+                full_system_proto_unix_io.register_to_observe_everything(blue_logger.buffer)
+                full_system_proto_unix_io.register_to_observe_everything(yellow_logger.buffer)
+                full_system.setup_proto_unix_io(full_system_proto_unix_io)
 
         with RobotCommunication(
-                proto_unix_io, getRobotMulticastChannel(0), args.interface, args.run_blue or args.run_yellow
+                full_system_proto_unix_io, diagnostics_proto_unix_io, getRobotMulticastChannel(0), args.interface,
         ) as robot_communication:
-            if args.run_diagnostics:
-                tscope.toggle_robot_connection_signal.connect(
-                    robot_communication.toggle_robot_connection(robot_id)
-                )
+            print(type(robot_communication))
+            # if args.run_diagnostics:
+            #     tscope.toggle_robot_connection_signal.connect(
+            #         robot_communication.toggle_robot_connection(robot_id)
+            #     )
 
             tscope.show()
 

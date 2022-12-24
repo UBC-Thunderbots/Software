@@ -13,18 +13,18 @@ class RobotCommunication(object):
     def __init__(
             self,
             full_system_proto_unix_io,
+            diagnostics_proto_unix_io,
             multicast_channel,
             interface,
-            fullsystem_running,
             estop_path="/dev/ttyACM0",
             estop_buadrate=115200,
     ):
         """Initialize the communication with the robots
 
         :param full_system_proto_unix_io: full_system_proto_unix_io object
+        :param diagnostics_proto_unix_io: proto_unix_io object for diagnostics input
         :param multicast_channel: The multicast channel to use
         :param interface: The interface to use
-        :param fullsystem_running: Whether fullsystem is running or not currently
         :param estop_path: The path to the estop
         :param estop_baudrate: The baudrate of the estop
 
@@ -32,12 +32,13 @@ class RobotCommunication(object):
         self.sequence_number = 0
         self.last_time = time.time()
         self.full_system_proto_unix_io = full_system_proto_unix_io
+        self.diagnostics_proto_unix_io = diagnostics_proto_unix_io
         self.multicast_channel = str(multicast_channel)
         self.interface = interface
         self.estop_path = estop_path
         self.estop_buadrate = estop_buadrate
 
-        self.robots_connected_to_diagnostics = set()
+        self.robots_connected_to_diagnostics = {1, 2, 3}
 
         self.world_buffer = ThreadSafeBuffer(1, World)
         self.primitive_buffer = ThreadSafeBuffer(1, PrimitiveSet)
@@ -45,21 +46,23 @@ class RobotCommunication(object):
         self.motor_control_diagnostics_buffer = ThreadSafeBuffer(1, MotorControl)
         self.power_control_diagnostics_buffer = ThreadSafeBuffer(1, PowerControl)
 
-        self.full_system_proto_unix_io.register_observer(World, self.world_buffer)
-        self.full_system_proto_unix_io.register_observer(
-            PrimitiveSet, self.primitive_buffer
-        )
-        self.full_system_proto_unix_io.register_observer(
-            MotorControl, self.motor_control_diagnostics_buffer
-        )
-        self.full_system_proto_unix_io.register_observer(
-            PowerControl, self.power_control_diagnostics_buffer
-        )
+        if self.full_system_proto_unix_io:
+            self.full_system_proto_unix_io.register_observer(World, self.world_buffer)
+
+            self.full_system_proto_unix_io.register_observer(
+                PrimitiveSet, self.primitive_buffer
+            )
+
+        if self.diagnostics_proto_unix_io:
+            self.diagnostics_proto_unix_io.register_observer(
+                MotorControl, self.motor_control_diagnostics_buffer
+            )
+            self.diagnostics_proto_unix_io.register_observer(
+                PowerControl, self.power_control_diagnostics_buffer
+            )
 
         self.send_estop_state_thread = threading.Thread(target=self.__send_estop_state)
         self.run_thread = threading.Thread(target=self.run)
-
-        self.fullsystem_connected_to_robots = fullsystem_running
 
         # try:
         #     self.estop_reader = ThreadedEstopReader(
@@ -90,48 +93,52 @@ class RobotCommunication(object):
 
         """
         while True:
-            if self.fullsystem_connected_to_robots:
+            robot_primitives = dict()
 
-                # Send the world
-                world = self.world_buffer.get(block=True)
+            # Send the world
+            world = self.world_buffer.get(block=False)
+
+            try:
                 self.send_world.send_proto(world)
 
                 # Send the primitive set
                 primitive_set = self.primitive_buffer.get(block=False)
 
-                if self.estop_reader.isEstopPlay():
-                    self.send_primitive_set.send_proto(primitive_set)
+                for robot_id in self.robots_connected_to_diagnostics:
+                    del primitive_set[robot_id]
 
-            else:
+                robot_primitives = primitive_set
+            except RuntimeError:
+                pass
 
-                diagnostics_primitive = DirectControlPrimitive(
-                    motor_control=self.motor_control_diagnostics_buffer.get(
-                        block=False
-                    ),
-                    power_control=self.power_control_diagnostics_buffer.get(
-                        block=False
-                    ),
-                )
+            diagnostics_primitive = DirectControlPrimitive(
+                motor_control=self.motor_control_diagnostics_buffer.get(
+                    block=False
+                ),
+                power_control=self.power_control_diagnostics_buffer.get(
+                    block=False
+                ),
+            )
 
-                primitive_set = PrimitiveSet(
-                    time_sent=Timestamp(epoch_timestamp_seconds=time.time()),
-                    stay_away_from_ball=False,
-                    robot_primitives={
-                        robot_id: Primitive(direct_control=diagnostics_primitive)
-                        for robot_id in self.robots_connected_to_diagnostics
-                    },
-                    sequence_number=self.sequence_number,
-                )
+            for robot_id in self.robots_connected_to_diagnostics:
+                robot_primitives[robot_id] = Primitive(direct_control=diagnostics_primitive)
 
-                self.sequence_number += 1
+            primitive_set = PrimitiveSet(
+                time_sent=Timestamp(epoch_timestamp_seconds=time.time()),
+                stay_away_from_ball=False,
+                robot_primitives=robot_primitives,
+                sequence_number=self.sequence_number,
+            )
 
-                # print(primitive_set)
+            # print(primitive_set)
 
-                if True:
-                    self.last_time = primitive_set.time_sent.epoch_timestamp_seconds
-                    self.send_primitive_set.send_proto(primitive_set)
+            self.sequence_number += 1
 
-                time.sleep(0.001)
+            if True:
+                self.last_time = primitive_set.time_sent.epoch_timestamp_seconds
+                self.send_primitive_set.send_proto(primitive_set)
+
+            time.sleep(0.001)
 
     def connect_fullsystem_to_robots(self):
         """ Connect the robots to fullsystem """
