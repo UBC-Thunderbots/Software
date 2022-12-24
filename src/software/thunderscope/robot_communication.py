@@ -38,7 +38,7 @@ class RobotCommunication(object):
         self.estop_path = estop_path
         self.estop_buadrate = estop_buadrate
 
-        self.robots_connected_to_diagnostics = {1, 2, 3}
+        self.robots_connected_to_diagnostics = set()
 
         self.world_buffer = ThreadSafeBuffer(1, World)
         self.primitive_buffer = ThreadSafeBuffer(1, PrimitiveSet)
@@ -46,7 +46,11 @@ class RobotCommunication(object):
         self.motor_control_diagnostics_buffer = ThreadSafeBuffer(1, MotorControl)
         self.power_control_diagnostics_buffer = ThreadSafeBuffer(1, PowerControl)
 
+        self.full_system_running = False
+        self.diagnostics_running = False
+
         if self.full_system_proto_unix_io:
+            self.full_system_running = True
             self.full_system_proto_unix_io.register_observer(World, self.world_buffer)
 
             self.full_system_proto_unix_io.register_observer(
@@ -54,6 +58,7 @@ class RobotCommunication(object):
             )
 
         if self.diagnostics_proto_unix_io:
+            self.diagnostics_running = True
             self.diagnostics_proto_unix_io.register_observer(
                 MotorControl, self.motor_control_diagnostics_buffer
             )
@@ -64,20 +69,19 @@ class RobotCommunication(object):
         self.send_estop_state_thread = threading.Thread(target=self.__send_estop_state)
         self.run_thread = threading.Thread(target=self.run)
 
-        # try:
-        #     self.estop_reader = ThreadedEstopReader(
-        #         self.estop_path, self.estop_buadrate
-        #     )
-        # except Exception:
-        #     raise Exception("Could not find estop, make sure its plugged in")
+        try:
+            self.estop_reader = ThreadedEstopReader(
+                self.estop_path, self.estop_buadrate
+            )
+        except Exception:
+            raise Exception("Could not find estop, make sure its plugged in")
 
     def __send_estop_state(self):
-        print('yea')
-        # while True:
-        #     self.full_system_proto_unix_io.send_proto(
-        #         EstopState, EstopState(is_playing=self.estop_reader.isEstopPlay())
-        #     )
-        #     time.sleep(0.1)
+        while True:
+            self.full_system_proto_unix_io.send_proto(
+                EstopState, EstopState(is_playing=self.estop_reader.isEstopPlay())
+            )
+            time.sleep(0.1)
 
     def run(self):
         """Forward World and PrimitiveSet protos from fullsystem to the robots.
@@ -93,36 +97,44 @@ class RobotCommunication(object):
 
         """
         while True:
+            # total primitives for all robots
             robot_primitives = dict()
 
-            # Send the world
-            world = self.world_buffer.get(block=False)
+            # fullsystem is running, so world data is being received
+            if self.full_system_running:
+                # Get the world
+                world = self.world_buffer.get(block=True)
 
-            try:
+                # send the world proto
                 self.send_world.send_proto(world)
 
-                # Send the primitive set
+                # Get the primitives
                 primitive_set = self.primitive_buffer.get(block=False)
 
+                # Filter the primitives to only include robots not connected to diagnostics
                 for robot_id in self.robots_connected_to_diagnostics:
                     del primitive_set[robot_id]
 
                 robot_primitives = primitive_set
-            except RuntimeError:
-                pass
 
-            diagnostics_primitive = DirectControlPrimitive(
-                motor_control=self.motor_control_diagnostics_buffer.get(
-                    block=False
-                ),
-                power_control=self.power_control_diagnostics_buffer.get(
-                    block=False
-                ),
-            )
+            # diagnostics is running
+            if self.diagnostics_running:
 
-            for robot_id in self.robots_connected_to_diagnostics:
-                robot_primitives[robot_id] = Primitive(direct_control=diagnostics_primitive)
+                # get the manual control primitive
+                diagnostics_primitive = DirectControlPrimitive(
+                    motor_control=self.motor_control_diagnostics_buffer.get(
+                        block=False
+                    ),
+                    power_control=self.power_control_diagnostics_buffer.get(
+                        block=False
+                    ),
+                )
 
+                # for all robots connected to diagnostics, set their primitive
+                for robot_id in self.robots_connected_to_diagnostics:
+                    robot_primitives[robot_id] = Primitive(direct_control=diagnostics_primitive)
+
+            # initialize total primitive set and send it
             primitive_set = PrimitiveSet(
                 time_sent=Timestamp(epoch_timestamp_seconds=time.time()),
                 stay_away_from_ball=False,
@@ -130,11 +142,11 @@ class RobotCommunication(object):
                 sequence_number=self.sequence_number,
             )
 
-            # print(primitive_set)
+            print(primitive_set)
 
             self.sequence_number += 1
 
-            if True:
+            if self.estop_reader.isEstopPlay():
                 self.last_time = primitive_set.time_sent.epoch_timestamp_seconds
                 self.send_primitive_set.send_proto(primitive_set)
 
@@ -156,7 +168,6 @@ class RobotCommunication(object):
         Connects a robot to or disconnects a robot from diagnostics
         :param robot_id: the id of the robot to be added or removed from the diagnostics set
         """
-        print(robot_id)
         if robot_id in self.robots_connected_to_diagnostics:
             self.robots_connected_to_diagnostics.remove(robot_id)
         else:
@@ -204,10 +215,10 @@ class RobotCommunication(object):
         # make a ticket here to create a widget to call these functions to detach
         # from AI and connect to robots/or remove
 
-        print(self.robots_connected_to_diagnostics)
-
         self.send_estop_state_thread.start()
         self.run_thread.start()
+
+        return self
 
     def __exit__(self):
         """Exit RobotCommunication context manager

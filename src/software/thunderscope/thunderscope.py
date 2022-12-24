@@ -336,12 +336,24 @@ class Thunderscope(object):
         :param load_diagnostics: Whether to load the diagnostics layout.
         """
 
+        # whether the fullsystem tab should have the robot view widget
+        load_fullsystem_robot_view = True
+
+        # in AI vs AI mode, fullsystem tab should not have robot view
+        if load_blue == load_yellow:
+            load_fullsystem_robot_view = False
+
+        # if diagnostics is also being loaded, its tab will already have robot view
+        # so it does not need to be loaded on the fullsystem tab
+        if load_diagnostics:
+            load_fullsystem_robot_view = False
+
         if load_yellow:
             self.configure_full_system_layout(
                 self.yellow_full_system_dock_area,
                 self.simulator_proto_unix_io,
                 self.yellow_full_system_proto_unix_io,
-                load_blue != load_yellow and not load_diagnostics,
+                load_fullsystem_robot_view,
                 True,
             )
         if load_blue:
@@ -349,7 +361,7 @@ class Thunderscope(object):
                 self.blue_full_system_dock_area,
                 self.simulator_proto_unix_io,
                 self.blue_full_system_proto_unix_io,
-                load_blue != load_yellow and not load_diagnostics,
+                load_fullsystem_robot_view,
                 False,
             )
 
@@ -396,8 +408,9 @@ class Thunderscope(object):
         :param dock_area: The dock area to configure the layout
         :param sim_proto_unix_io: The proto unix io object for the simulator
         :param full_system_proto_unix_io: The proto unix io object for the full system
-        :param load_robot_view: Whether robot view should be loaded or not
-                                (should not be in AI vs AI or with diagnostics)
+        :param load_robot_view: Whether robot view should be loaded on the fullsystem tab or not
+                                - should not be loaded in AI vs AI
+                                - should not be loaded with diagnostics, will be loaded in that tab instead
         :param friendly_colour_yellow: Whether the friendly colour is yellow
 
         """

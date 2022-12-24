@@ -252,13 +252,15 @@ if __name__ == "__main__":
                 full_system.setup_proto_unix_io(full_system_proto_unix_io)
 
         with RobotCommunication(
-                full_system_proto_unix_io, diagnostics_proto_unix_io, getRobotMulticastChannel(0), args.interface,
+                full_system_proto_unix_io,
+                diagnostics_proto_unix_io,
+                getRobotMulticastChannel(0),
+                args.interface
         ) as robot_communication:
-            print(type(robot_communication))
-            # if args.run_diagnostics:
-            #     tscope.toggle_robot_connection_signal.connect(
-            #         robot_communication.toggle_robot_connection(robot_id)
-            #     )
+            if args.run_diagnostics:
+                tscope.toggle_robot_connection_signal.connect(
+                    robot_communication.toggle_robot_connection
+                )
 
             tscope.show()
 
