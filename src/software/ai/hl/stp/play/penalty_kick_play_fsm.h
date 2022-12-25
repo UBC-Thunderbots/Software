@@ -4,8 +4,8 @@
 #include "shared/constants.h"
 #include "software/ai/hl/stp/play/play_fsm.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
-#include "software/ai/hl/stp/tactic/stop/stop_tactic.h"
 #include "software/ai/hl/stp/tactic/penalty_kick/penalty_kick_tactic.h"
+#include "software/ai/hl/stp/tactic/stop/stop_tactic.h"
 #include "software/logger/logger.h"
 
 
@@ -64,7 +64,8 @@ struct PenaltyKickPlayFSM
      */
     void setPositioningTactics();
 
-    auto operator()() {
+    auto operator()()
+    {
         using namespace boost::sml;
 
         DEFINE_SML_STATE(SetupPositionState)
@@ -80,18 +81,16 @@ struct PenaltyKickPlayFSM
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *SetupPositionState_S + Update_E [!setupPositionDone_G] / setupPosition_A   = SetupPositionState_S,
-            SetupPositionState_S + Update_E [setupPositionDone_G]                       = PerformKickState_S,
-            PerformKickState_S + Update_E [!kickDone_G] / performKick_A,
-            PerformKickState_S + Update_E [kickDone_G]                                  = X,
-            X + Update_E                                                                = X);
+            *SetupPositionState_S + Update_E[!setupPositionDone_G] / setupPosition_A =
+                SetupPositionState_S,
+            SetupPositionState_S + Update_E[setupPositionDone_G] = PerformKickState_S,
+            PerformKickState_S + Update_E[!kickDone_G] / performKick_A,
+            PerformKickState_S + Update_E[kickDone_G] = X, X + Update_E = X);
     }
 
-private:
+   private:
     TbotsProto::AiConfig ai_config;
     std::shared_ptr<PenaltyKickTactic> penalty_kick_tactic;
     std::vector<std::shared_ptr<PenaltySetupTactic>> penalty_setup_tactics;
     std::vector<std::shared_ptr<StopTactic>> away_from_kick_tactics;
 };
-
-

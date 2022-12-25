@@ -9,7 +9,8 @@ PenaltyKickPlay::PenaltyKickPlay(TbotsProto::AiConfig config)
 {
 }
 
-void PenaltyKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const World &world)
+void PenaltyKickPlay::getNextTactics(TacticCoroutine::push_type &yield,
+                                     const World &world)
 {
     // This function doesn't get called so it does nothing
 }

@@ -209,10 +209,14 @@ cc_library(
 
 cc_library(
     name = "penalty_kick_play",
-    srcs = ["penalty_kick_play.cpp",
-            "penalty_kick_play_fsm.cpp"],
-    hdrs = ["penalty_kick_play.h",
-            "penalty_kick_play_fsm.h"],
+    srcs = [
+        "penalty_kick_play.cpp",
+        "penalty_kick_play_fsm.cpp",
+    ],
+    hdrs = [
+        "penalty_kick_play.h",
+        "penalty_kick_play_fsm.h",
+    ],
     deps = [
         ":play",
         "//shared:constants",
