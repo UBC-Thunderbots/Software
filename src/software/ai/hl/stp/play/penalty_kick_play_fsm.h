@@ -27,15 +27,42 @@ struct PenaltyKickPlayFSM
      */
     explicit PenaltyKickPlayFSM(TbotsProto::AiConfig ai_config);
 
+    /**
+     * Action to set up the robots in position to start the penalty kick
+     *
+     * @param event the PenaltyKickPlayFSM Update event
+     */
     void setupPosition(const Update& event);
 
+    /**
+     * Action to make the penalty kick taking robot perform the PenaltyKickTactic
+     *
+     * @param event the PenaltyKickPlayFSM Update event
+     */
     void performKick(const Update& event);
 
+    /**
+     * Guard to check if a pass has been found
+     *
+     * @param event the PenaltyKickPlayFSM Update event
+     *
+     * @return whether the robots have gotten into position to start the penalty kick
+     */
     bool setupPositionDone(const Update& event);
 
+    /**
+     * Guard to check if a pass has been found
+     *
+     * @param event the PenaltyKickPlayFSM Update event
+     *
+     * @return whether the robot has finished performing a kick
+     */
     bool kickDone(const Update& event);
 
-    void setUpPositioning();
+    /**
+     * Helper function that sets the movement tactic vector members
+     */
+    void setPositioningTactics();
 
     auto operator()() {
         using namespace boost::sml;

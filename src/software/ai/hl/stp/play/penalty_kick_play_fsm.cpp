@@ -6,7 +6,7 @@ PenaltyKickPlayFSM::PenaltyKickPlayFSM(TbotsProto::AiConfig ai_config):
         penalty_setup_tactics({}),
         away_from_kick_tactics({})
 {
-    setUpPositioning();
+    setPositioningTactics();
 }
 
 void PenaltyKickPlayFSM::performKick(const Update &event) {
@@ -60,7 +60,7 @@ bool PenaltyKickPlayFSM::kickDone(const Update &event) {
     return event.common.world.gameState().isStopped();
 }
 
-void PenaltyKickPlayFSM::setUpPositioning() {
+void PenaltyKickPlayFSM::setPositioningTactics() {
     penalty_setup_tactics = std::vector<std::shared_ptr<PenaltySetupTactic>>(5);
     std::generate(penalty_setup_tactics.begin(), penalty_setup_tactics.end(), [this]() {
         return std::make_shared<PenaltySetupTactic>();
