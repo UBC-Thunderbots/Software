@@ -644,7 +644,6 @@ class Thunderscope(object):
 
         play_info = playInfoWidget()
         proto_unix_io.register_observer(PlayInfo, play_info.playinfo_buffer)
-        proto_unix_io.register_observer(Referee, play_info.referee_buffer)
         self.register_refresh_function(play_info.refresh)
 
         return play_info

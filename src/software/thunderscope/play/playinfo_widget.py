@@ -27,15 +27,12 @@ class playInfoWidget(QWidget):
         QWidget.__init__(self)
 
         self.play_table = QTableWidget(playInfoWidget.NUM_ROWS, playInfoWidget.NUM_COLS)
-        self.referee_info = QLabel()
 
         self.playinfo_buffer = ThreadSafeBuffer(buffer_size, PlayInfo, False)
-        self.referee_buffer = ThreadSafeBuffer(buffer_size, Referee, False)
         self.play_table.verticalHeader().setVisible(False)
 
         self.vertical_layout = QVBoxLayout()
         self.vertical_layout.addWidget(self.play_table)
-        self.vertical_layout.addWidget(self.referee_info)
         self.setLayout(self.vertical_layout)
 
     def set_data(self, data):
@@ -72,10 +69,8 @@ class playInfoWidget(QWidget):
         """Update the play info widget with new play information
         """
         playinfo = self.playinfo_buffer.get(block=False)
-        referee = self.referee_buffer.get(block=False)
 
         play_info_dict = MessageToDict(playinfo)
-        MessageToDict(referee)
 
         robot_ids = []
         tactic_fsm_states = []
