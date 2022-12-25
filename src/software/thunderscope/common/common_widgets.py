@@ -1,4 +1,5 @@
 from pyqtgraph.Qt.QtCore import Qt
+from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtWidgets import *
 
 
@@ -98,3 +99,34 @@ def create_push_button(title):
     push_button.setFixedWidth(150)
 
     return push_button
+
+def set_table_data(data, table, HEADER_SIZE_HINT_WIDTH_EXPANSION, ITEM_SIZE_HINT_WIDTH_EXPANSION):
+    """Set data in a table
+
+    :param data: dict containing {"column_name": [column_items]}
+    :param HEADER_SIZE_HINT_WIDTH_EXPANSION: the factor multiplied by the length of the header
+    :param ITEM_SIZE_HINT_WIDTH_EXPANSION: the factor multiplied by the length of the item
+
+    """
+    horizontal_headers = []
+
+    for n, key in enumerate(data.keys()):
+        horizontal_headers.append(key)
+
+        for m, item in enumerate(data[key]):
+            str_item = str(item)
+            newitem = QTableWidgetItem(str_item)
+            newitem.setSizeHint(
+                QtCore.QSize(
+                    max(
+                        len(key) * HEADER_SIZE_HINT_WIDTH_EXPANSION,
+                        len(str_item) * ITEM_SIZE_HINT_WIDTH_EXPANSION,
+                    ),
+                    1,
+                )
+            )
+            table.setItem(m, n, newitem)
+
+    table.setHorizontalHeaderLabels(horizontal_headers)
+
+    

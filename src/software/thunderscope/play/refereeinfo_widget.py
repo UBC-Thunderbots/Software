@@ -8,17 +8,18 @@ from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtWidgets import *
 from proto.import_all_protos import *
 from software.py_constants import SECONDS_PER_MICROSECOND
+from software.thunderscope.common.common_widgets import set_table_data
 
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 
-class refereeInfoWidget(QWidget):
+class RefereeInfoWidget(QWidget):
 
     NUM_ROWS = 13
     NUM_COLS = 3
 
     def __init__(self, buffer_size=5):
-        """Shows the current play information including tactic and FSM state
+        """Shows the referee information 
 
         :param minimum_column_width: minimum width of columns
         :param buffer_size: The buffer size, set higher for smoother plots.
@@ -28,72 +29,42 @@ class refereeInfoWidget(QWidget):
         QWidget.__init__(self)
 
         self.referee_table = QTableWidget(
-            refereeInfoWidget.NUM_ROWS, refereeInfoWidget.NUM_COLS
+            RefereeInfoWidget.NUM_ROWS, RefereeInfoWidget.NUM_COLS
         )
         self.referee_info = QLabel()
         self.referee_buffer = ThreadSafeBuffer(buffer_size, Referee, False)
+        self.referee_table.verticalHeader().setVisible(False)
 
         self.vertical_layout = QVBoxLayout()
         self.vertical_layout.addWidget(self.referee_table)
         self.vertical_layout.addWidget(self.referee_info)
         self.setLayout(self.vertical_layout)
 
-    def set_data(self, data):
-        """Data to set in the table
-
-        :param data: dict containing {"column_name": [column_items]}
-
-        """
-        horizontal_headers = []
-
-        # empirically makes even bolded items fit within columns
-        HEADER_SIZE_HINT_WIDTH_EXPANSION = 12
-        ITEM_SIZE_HINT_WIDTH_EXPANSION = 11
-
-        for n, key in enumerate(data.keys()):
-            horizontal_headers.append(key)
-
-            for m, item in enumerate(data[key]):
-                str_item = str(item)
-                newitem = QTableWidgetItem(str_item)
-                newitem.setSizeHint(
-                    QtCore.QSize(
-                        max(
-                            len(key) * HEADER_SIZE_HINT_WIDTH_EXPANSION,
-                            len(str_item) * ITEM_SIZE_HINT_WIDTH_EXPANSION,
-                        ),
-                        1,
-                    )
-                )
-                self.referee_table.setItem(m, n, newitem)
-
-        self.referee_table.setHorizontalHeaderLabels(horizontal_headers)
-
     def refresh(self):
-        """Update the play info widget with new play information
+        """Update the referee info widget with new referee information
         """
         referee = self.referee_buffer.get(block=False)
         referee_msg_dict = MessageToDict(referee)
 
-        if referee_msg_dict:
-            p = (
-                f"Packet Timestamp: {round(float(referee_msg_dict['packetTimestamp'])*SECONDS_PER_MICROSECOND, 3)}\n"
-                + f"Stage: {referee_msg_dict['stageTimeLeft']*SECONDS_PER_MICROSECOND} {referee_msg_dict['stage']}\n"
-                + "Command: "
-                + referee_msg_dict["command"]
-                + "\n"
-                + f"Blue Team on Positive Half: {referee_msg_dict['blueTeamOnPositiveHalf']}\n"
-            )
-            self.referee_info.setText(p)
+        if not referee_msg_dict:
+            return
+        
+        SECONDS_PER_MINUTE = 60
+
+        p = (
+            f"Packet Timestamp: {round(float(referee_msg_dict['packetTimestamp']) * SECONDS_PER_MICROSECOND, 3)}\n"
+            + f"Stage Time Left: {int(referee_msg_dict['stageTimeLeft'] * SECONDS_PER_MICROSECOND / SECONDS_PER_MINUTE)}:{int(referee_msg_dict['stageTimeLeft'] * SECONDS_PER_MICROSECOND % SECONDS_PER_MINUTE)}\n"
+            + f"Stage: {referee_msg_dict['stage']}\n"
+            + "Command: " + referee_msg_dict["command"] + "\n"
+            + f"Blue Team on Positive Half: {referee_msg_dict['blueTeamOnPositiveHalf']}\n"
+        )
+        self.referee_info.setText(p)
 
         team_info = []
         blue = []
         yellow = []
 
         num_rows = len(referee_msg_dict["blue"])
-
-        # setting table size dynamically
-        self.referee_table.setRowCount(num_rows)
 
         for team_info_name in referee_msg_dict["blue"]:
             if team_info_name == "timeouts":
@@ -125,8 +96,15 @@ class refereeInfoWidget(QWidget):
                 blue.append(referee_msg_dict["blue"][info])
                 yellow.append(referee_msg_dict["yellow"][info])
 
-        self.set_data(
-            {"Team Info": team_info, "Blue": blue, "Yellow": yellow,}
+        # empirically makes even bolded items fit within columns
+        HEADER_SIZE_HINT_WIDTH_EXPANSION = 12
+        ITEM_SIZE_HINT_WIDTH_EXPANSION = 11
+
+        set_table_data(
+            {"Team Info": team_info, "Blue": blue, "Yellow": yellow,},
+            self.referee_table,
+            HEADER_SIZE_HINT_WIDTH_EXPANSION,
+            ITEM_SIZE_HINT_WIDTH_EXPANSION,
         )
 
         self.referee_table.resizeColumnsToContents()
