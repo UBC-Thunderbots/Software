@@ -238,7 +238,7 @@ if __name__ == "__main__":
 
         if args.run_blue or args.run_yellow:
             with ProtoLogger(
-                    args.blue_full_system_runtime_dir,
+                args.blue_full_system_runtime_dir,
             ) as blue_logger, ProtoLogger(
                 args.yellow_full_system_runtime_dir,
             ) as yellow_logger, FullSystem(
@@ -247,15 +247,19 @@ if __name__ == "__main__":
 
                 print(type(blue_logger))
 
-                full_system_proto_unix_io.register_to_observe_everything(blue_logger.buffer)
-                full_system_proto_unix_io.register_to_observe_everything(yellow_logger.buffer)
+                full_system_proto_unix_io.register_to_observe_everything(
+                    blue_logger.buffer
+                )
+                full_system_proto_unix_io.register_to_observe_everything(
+                    yellow_logger.buffer
+                )
                 full_system.setup_proto_unix_io(full_system_proto_unix_io)
 
         with RobotCommunication(
-                full_system_proto_unix_io,
-                diagnostics_proto_unix_io,
-                getRobotMulticastChannel(0),
-                args.interface
+            full_system_proto_unix_io,
+            diagnostics_proto_unix_io,
+            getRobotMulticastChannel(0),
+            args.interface,
         ) as robot_communication:
             if args.run_diagnostics:
                 tscope.toggle_robot_connection_signal.connect(

@@ -1,5 +1,47 @@
-from pyqtgraph.Qt.QtCore import Qt
 from pyqtgraph.Qt.QtWidgets import *
+from pyqtgraph.Qt.QtCore import *
+
+
+class FloatSlider(QSlider):
+    """
+    This class extends QSlider to offer support to float values instead of just ints
+    """
+
+    floatValueChanged = pyqtSignal(float)
+
+    def __init__(self, decimals=1, *args, **kwargs):
+        """
+        Creates a FloatSlider with the given number of decimal places
+        :param decimals: number of decimal places that value of slider should have
+        """
+        super(FloatSlider, self).__init__(*args, **kwargs)
+        self.decimals = 10 ** decimals
+
+        # slider now emits a float value signal every time its value changes
+        self.valueChanged.connect(self.emitFloatValueChanged)
+
+    def emitFloatValueChanged(self):
+        """
+        Emits a signal with the slider's float value
+        """
+        self.floatValueChanged.emit(self.value())
+
+    def value(self):
+        """
+        Gets the actual value of the slider and converts it to the float value
+        of corresponding decimal places
+        :return: the float value of the slider
+        """
+        return float(super(FloatSlider, self).value()) / self.decimals
+
+    def setMinimum(self, min_val):
+        return super(FloatSlider, self).setMinimum(min_val * self.decimals)
+
+    def setMaximum(self, max_val):
+        return super(FloatSlider, self).setMaximum(max_val * self.decimals)
+
+    def setValue(self, value):
+        super(FloatSlider, self).setValue(int(value * self.decimals))
 
 
 def create_button(text: list):
@@ -58,10 +100,13 @@ def create_radio(text: list, radio_group):
     return group_box, radios
 
 
-def create_slider(text, min_val, max_val, tick_spacing):
-    """Creates a QSlider object inside a QGroupBox object, along with a value
+def create_slider_abs(slider, text, min_val, max_val, tick_spacing):
+    """Set a given QSlider or extended slider inside a QGroupBox object, along with a value
     label on the right. The slider orientation will be horizontal.
 
+    Allows support for classes that extend QSlider to support floats, etc.
+
+    :param slider: slider of type QSlider or a child class of QSlider
     :param text: text to display above the slider
     :param min_val: lowest value of the slider
     :param max_val: highest value of the slider
@@ -71,7 +116,6 @@ def create_slider(text, min_val, max_val, tick_spacing):
             QSlider object - use this to perform tasks on the button
             displays value of slider, update this when value is changed
     """
-    slider = QSlider(Qt.Orientation.Horizontal)
     slider.setMinimum(min_val)
     slider.setMaximum(max_val)
     slider.setTickPosition(QSlider.TickPosition.NoTicks)
@@ -86,6 +130,43 @@ def create_slider(text, min_val, max_val, tick_spacing):
     vbox.addWidget(slider)
 
     return vbox, slider, value_label
+
+
+def create_slider(text, min_val, max_val, tick_spacing):
+    """Creates a QSlider object and returns a QGroupBox object with the slider and a label
+
+    :param text: text to display above the slider
+    :param min_val: lowest value of the slider
+    :param max_val: highest value of the slider
+    :param tick_spacing: interval between two ticks on the slider
+    :return vbox, slider, value_label:
+            QVBoxLayout object - add this to the widget
+            QSlider object - use this to perform tasks on the button
+            displays value of slider, update this when value is changed
+    """
+
+    slider = QSlider(Qt.Orientation.Horizontal)
+
+    return create_slider_abs(slider, text, min_val, max_val, tick_spacing)
+
+
+def create_float_slider(text, decimals, min_val, max_val, tick_spacing):
+    """Creates a FloatSlider object and returns a QGroupBox object with the slider and a label
+
+    :param decimals: number of decimals for slider values
+    :param text: text to display above the slider
+    :param min_val: lowest value of the slider
+    :param max_val: highest value of the slider
+    :param tick_spacing: interval between two ticks on the slider
+    :return vbox, slider, value_label:
+            QVBoxLayout object - add this to the widget
+            QSlider object - use this to perform tasks on the button
+            displays value of slider, update this when value is changed
+    """
+
+    slider = FloatSlider(decimals, Qt.Orientation.Horizontal)
+
+    return create_slider_abs(slider, text, min_val, max_val, tick_spacing)
 
 
 def create_push_button(title):
@@ -149,12 +230,7 @@ def enable_slider(slider, label, get_value):
     :param get_value: function to translate slider value into label text
     """
     slider.valueChanged.connect(lambda: label.setText(get_value(slider.value())))
-    slider.setStyleSheet(
-        "QSlider::groove:horizontal"
-        "{"
-        "border-width: 0px"
-        "}"
-    )
+    slider.setStyleSheet("QSlider::groove:horizontal" "{" "border-width: 0px" "}")
 
 
 def disable_radio_button(button_group):
@@ -162,8 +238,4 @@ def disable_radio_button(button_group):
     for button in button_group.buttons():
         button.setChecked(False)
         button.clicked.disconnect()
-        button.clicked.connect(
-            lambda state, curr=button: curr.setChecked(False)
-        )
-
-
+        button.clicked.connect(lambda state, curr=button: curr.setChecked(False))

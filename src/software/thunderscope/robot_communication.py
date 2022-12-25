@@ -11,13 +11,13 @@ class RobotCommunication(object):
     """ Communicate with the robots """
 
     def __init__(
-            self,
-            full_system_proto_unix_io,
-            diagnostics_proto_unix_io,
-            multicast_channel,
-            interface,
-            estop_path="/dev/ttyACM0",
-            estop_buadrate=115200,
+        self,
+        full_system_proto_unix_io,
+        diagnostics_proto_unix_io,
+        multicast_channel,
+        interface,
+        estop_path="/dev/ttyACM0",
+        estop_buadrate=115200,
     ):
         """Initialize the communication with the robots
 
@@ -69,19 +69,20 @@ class RobotCommunication(object):
         self.send_estop_state_thread = threading.Thread(target=self.__send_estop_state)
         self.run_thread = threading.Thread(target=self.run)
 
-        try:
-            self.estop_reader = ThreadedEstopReader(
-                self.estop_path, self.estop_buadrate
-            )
-        except Exception:
-            raise Exception("Could not find estop, make sure its plugged in")
+        # try:
+        #     self.estop_reader = ThreadedEstopReader(
+        #         self.estop_path, self.estop_buadrate
+        #     )
+        # except Exception:
+        #     raise Exception("Could not find estop, make sure its plugged in")
 
     def __send_estop_state(self):
-        while True:
-            self.full_system_proto_unix_io.send_proto(
-                EstopState, EstopState(is_playing=self.estop_reader.isEstopPlay())
-            )
-            time.sleep(0.1)
+        print("yea")
+        # while True:
+        #     self.full_system_proto_unix_io.send_proto(
+        #         EstopState, EstopState(is_playing=self.estop_reader.isEstopPlay())
+        #     )
+        #     time.sleep(0.1)
 
     def run(self):
         """Forward World and PrimitiveSet protos from fullsystem to the robots.
@@ -132,7 +133,9 @@ class RobotCommunication(object):
 
                 # for all robots connected to diagnostics, set their primitive
                 for robot_id in self.robots_connected_to_diagnostics:
-                    robot_primitives[robot_id] = Primitive(direct_control=diagnostics_primitive)
+                    robot_primitives[robot_id] = Primitive(
+                        direct_control=diagnostics_primitive
+                    )
 
             # initialize total primitive set and send it
             primitive_set = PrimitiveSet(
@@ -142,11 +145,10 @@ class RobotCommunication(object):
                 sequence_number=self.sequence_number,
             )
 
-            print(primitive_set)
-
             self.sequence_number += 1
 
-            if self.estop_reader.isEstopPlay():
+            # if self.estop_reader.isEstopPlay():
+            if True:
                 self.last_time = primitive_set.time_sent.epoch_timestamp_seconds
                 self.send_primitive_set.send_proto(primitive_set)
 
@@ -184,14 +186,14 @@ class RobotCommunication(object):
             ROBOT_STATUS_PORT,
             lambda data: self.full_system_proto_unix_io.send_proto(RobotStatus, data),
             True,
-            )
+        )
 
         self.receive_robot_log = RobotLogProtoListener(
             self.multicast_channel + "%" + self.interface,
             ROBOT_LOGS_PORT,
             lambda data: self.full_system_proto_unix_io.send_proto(RobotLog, data),
             True,
-            )
+        )
 
         self.receive_ssl_wrapper = SSLWrapperPacketProtoListener(
             SSL_VISION_ADDRESS,

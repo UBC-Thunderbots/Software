@@ -6,7 +6,6 @@ from proto.import_all_protos import *
 from enum import Enum
 import software.thunderscope.common.common_widgets as common_widgets
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
-import time
 
 
 class ChickerCommandMode(Enum):
@@ -186,14 +185,13 @@ class ChickerWidget(QWidget):
         # sends proto
         self.proto_unix_io.send_proto(PowerControl, power_control)
 
-        time.sleep(0.001)
-
         # send empty proto
         # this is due to a bug in robot_communication where if a new PowerControl message is not sent,
         # the previous, cached message is resent to the robot repeatedly
         # so sending an empty message overwrites the cache and prevents spamming commands
+        # if buffer is full, blocks execution until buffer has space
         power_control = PowerControl()
-        self.proto_unix_io.send_proto(PowerControl, power_control)
+        self.proto_unix_io.send_proto(PowerControl, power_control, True)
 
     def change_button_state(self, button, enable):
         """Change button color and clickable state.

@@ -9,6 +9,7 @@ class ControlMode(Enum):
     """
     Enum for the 3 modes of control (Manual, XBox, and Fullsystem (AI))
     """
+
     MANUAL = 1
     XBOX = 2
     AI = 3

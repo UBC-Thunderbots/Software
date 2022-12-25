@@ -43,18 +43,16 @@ class DriveAndDribblerWidget(QWidget):
         """Refresh the widget and send the a MotorControl message with the current values
         """
         motor_control = MotorControl()
-        motor_control.dribbler_speed_rpm = int(
-            self.dribbler_speed_rpm_slider.value() / 1000.0
-        )
+        motor_control.dribbler_speed_rpm = int(self.dribbler_speed_rpm_slider.value())
 
         motor_control.direct_velocity_control.velocity.x_component_meters = (
-            self.x_velocity_slider.value() / 1000.0
+            self.x_velocity_slider.value()
         )
         motor_control.direct_velocity_control.velocity.y_component_meters = (
-            self.y_velocity_slider.value() / 1000.0
+            self.y_velocity_slider.value()
         )
         motor_control.direct_velocity_control.angular_velocity.radians_per_second = (
-            self.angular_velocity_slider.value() / 1000.0
+            self.angular_velocity_slider.value()
         )
 
         self.proto_unix_io.send_proto(MotorControl, motor_control)
@@ -66,7 +64,6 @@ class DriveAndDribblerWidget(QWidget):
 
         """
         value = float(value)
-        value = value / 1000.0
         value_str = "%.1f" % value
         return value_str
 
@@ -84,31 +81,34 @@ class DriveAndDribblerWidget(QWidget):
             x_layout,
             self.x_velocity_slider,
             self.x_velocity_label,
-        ) = common_widgets.create_slider(
-            "X (m/s)", MIN_LINEAR_SPEED_MPS * 1000, MAX_LINEAR_SPEED_MPS * 1000, 1
+        ) = common_widgets.create_float_slider(
+            "X (m/s)", 1, MIN_LINEAR_SPEED_MPS, MAX_LINEAR_SPEED_MPS, 1
         )
         (
             y_layout,
             self.y_velocity_slider,
             self.y_velocity_label,
-        ) = common_widgets.create_slider(
-            "Y (m/s)", MIN_LINEAR_SPEED_MPS * 1000, MAX_LINEAR_SPEED_MPS * 1000, 1
+        ) = common_widgets.create_float_slider(
+            "Y (m/s)", 1, MIN_LINEAR_SPEED_MPS, MAX_LINEAR_SPEED_MPS, 1
         )
         (
             dps_layout,
             self.angular_velocity_slider,
             self.angular_velocity_label,
-        ) = common_widgets.create_slider(
-            "θ (°/s)",
-            MIN_ANGULAR_SPEED_RAD_PER_S * 1000,
-            MAX_ANGULAR_SPEED_RAD_PER_S * 1000,
-            1,
+        ) = common_widgets.create_float_slider(
+            "θ (°/s)", 1, MIN_ANGULAR_SPEED_RAD_PER_S, MAX_ANGULAR_SPEED_RAD_PER_S, 1,
         )
 
         # add listener functions for sliders to update label with slider value
-        common_widgets.enable_slider(self.x_velocity_slider, self.x_velocity_label, self.value_change)
-        common_widgets.enable_slider(self.y_velocity_slider, self.y_velocity_label, self.value_change)
-        common_widgets.enable_slider(self.angular_velocity_slider, self.angular_velocity_label, self.value_change)
+        common_widgets.enable_slider(
+            self.x_velocity_slider, self.x_velocity_label, self.value_change
+        )
+        common_widgets.enable_slider(
+            self.y_velocity_slider, self.y_velocity_label, self.value_change
+        )
+        common_widgets.enable_slider(
+            self.angular_velocity_slider, self.angular_velocity_label, self.value_change
+        )
 
         self.stop_and_reset_direct = common_widgets.create_push_button("Stop and Reset")
         self.stop_and_reset_direct.clicked.connect(self.reset_direct_sliders)
@@ -138,13 +138,15 @@ class DriveAndDribblerWidget(QWidget):
             dribbler_layout,
             self.dribbler_speed_rpm_slider,
             self.dribbler_speed_rpm_label,
-        ) = common_widgets.create_slider(
-            "RPM", MIN_DRIBBLER_RPM * 1000, MAX_DRIBBLER_RPM * 1000, 1000
+        ) = common_widgets.create_float_slider(
+            "RPM", 1, MIN_DRIBBLER_RPM, MAX_DRIBBLER_RPM, 1000
         )
 
         # add listener function to update label with slider value
         common_widgets.enable_slider(
-            self.dribbler_speed_rpm_slider, self.dribbler_speed_rpm_label, self.value_change
+            self.dribbler_speed_rpm_slider,
+            self.dribbler_speed_rpm_label,
+            self.value_change,
         )
 
         self.stop_and_reset_dribbler = common_widgets.create_push_button(
@@ -173,13 +175,21 @@ class DriveAndDribblerWidget(QWidget):
                 self.disconnect_sliders()
 
                 # enable all sliders by adding listener to update label with slider value
-                common_widgets.enable_slider(self.x_velocity_slider, self.x_velocity_label, self.value_change)
-                common_widgets.enable_slider(self.y_velocity_slider, self.y_velocity_label, self.value_change)
                 common_widgets.enable_slider(
-                    self.angular_velocity_slider, self.angular_velocity_label, self.value_change
+                    self.x_velocity_slider, self.x_velocity_label, self.value_change
                 )
                 common_widgets.enable_slider(
-                    self.dribbler_speed_rpm_slider, self.dribbler_speed_rpm_label, self.value_change
+                    self.y_velocity_slider, self.y_velocity_label, self.value_change
+                )
+                common_widgets.enable_slider(
+                    self.angular_velocity_slider,
+                    self.angular_velocity_label,
+                    self.value_change,
+                )
+                common_widgets.enable_slider(
+                    self.dribbler_speed_rpm_slider,
+                    self.dribbler_speed_rpm_label,
+                    self.value_change,
                 )
 
                 # enable buttons

@@ -339,13 +339,13 @@ class Thunderscope(object):
         # whether the fullsystem tab should have the robot view widget
         load_fullsystem_robot_view = True
 
-        # in AI vs AI mode, fullsystem tab should not have robot view
         if load_blue == load_yellow:
+            # in AI vs AI mode, fullsystem tab should not have robot view
             load_fullsystem_robot_view = False
-
-        # if diagnostics is also being loaded, its tab will already have robot view
-        # so it does not need to be loaded on the fullsystem tab
-        if load_diagnostics:
+        elif load_diagnostics:
+            # not AI vs AI mode, but
+            # if diagnostics is also being loaded, its tab will already have robot view
+            # so it does not need to be loaded on the fullsystem tab
             load_fullsystem_robot_view = False
 
         if load_yellow:

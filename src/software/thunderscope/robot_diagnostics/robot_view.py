@@ -80,7 +80,9 @@ class RobotView(QWidget):
             self.breakbeam_labels[id].setText("BREAKBEAM")
             self.breakbeam_labels[id].setStyleSheet("background-color: blue")
 
-            self.robot_status_layouts[id].addWidget(self.robot_battery_progress_bars[id])
+            self.robot_status_layouts[id].addWidget(
+                self.robot_battery_progress_bars[id]
+            )
             self.robot_status_layouts[id].addWidget(self.breakbeam_labels[id])
 
             self.robot_layouts[id].addWidget(
