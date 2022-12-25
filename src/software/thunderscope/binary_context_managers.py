@@ -6,6 +6,7 @@ import time
 import threading
 import google.protobuf.internal.encoder as encoder
 import google.protobuf.internal.decoder as decoder
+import pdb
 
 from subprocess import Popen
 from software.python_bindings import *
@@ -395,6 +396,7 @@ class Gamecontroller(object):
             self.gamecontroller_proc = Popen(command)
 
         if self.ci_mode:
+            print("ci port: " + str(self.ci_port))
             # We can't connect to the ci port right away, it takes
             # CI_MODE_LAUNCH_DELAY_S to start up the gamecontroller
             time.sleep(Gamecontroller.CI_MODE_LAUNCH_DELAY_S)
@@ -535,20 +537,33 @@ class Gamecontroller(object):
 
 
 class TigersAutoref(object):
-    def __init__(self, ci_mode=False):
+    def __init__(self, ci_mode=False, autoref_runtime_dir=None, buffer_size=5):
+        pdb.set_trace()
         print("autoref init")
         self.tigers_autoref_proc = None
-        self.thread = None
+        self.auto_ref_proc_thread = None
+        self.auto_ref_wrapper_thread = None
         self.ci_mode = ci_mode
+        self.autoref_runtime_dir = None
+        self.wrapper_buffer = ThreadSafeBuffer(buffer_size, SSL_WrapperPacket)
 
     def __enter__(self):
+        pdb.set_trace()
         print("autoref enter")
 
-        self.thread = threading.Thread(target=self.startAutoref)
-        self.thread.start()
+        self.auto_ref_proc_thread = threading.Thread(target=self.startAutoref)
+        self.auto_ref_proc_thread.start()
+
+        self.auto_ref_wrapper_thread = threading.Thread(target=self.sslWrappers)
+        self.auto_ref_wrapper_thread.start()
         print("thread started")
 
         return self
+
+    def sslWrapper(self):
+        while True:
+            ssl_wrapper = self.wrapper_buffer.get(block=True)
+            print(ssl_wrapper)
 
     def startAutoref(self):
         print(os.getcwd())
@@ -561,9 +576,17 @@ class TigersAutoref(object):
 
         self.tigers_autoref_proc = Popen(autoref_cmd.split(" "))
 
+    def setup_proto_unix_io(
+        self, proto_unix_io
+    ):
+        proto_unix_io.attach_unix_sender(self.autoref_runtime_dir, SSL_WRAPPER_PATH, SSL_WrapperPacket)
+        
+    #def send_ci_input(self):
+
     def __exit__(self, type, value, traceback):
         if self.tigers_autoref_proc:
             self.tigers_autoref_proc.kill()
             self.tigers_autoref_proc.wait()
 
-            self.thread.join()
+            self.auto_ref_proc_thread.join()
+        self.auto_ref_wrapper_thread.join()

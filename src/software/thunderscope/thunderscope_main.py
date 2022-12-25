@@ -3,6 +3,7 @@ import time
 import threading
 import argparse
 import numpy
+#import pdb
 
 from software.thunderscope.thunderscope import Thunderscope
 from software.thunderscope.binary_context_managers import *
@@ -272,6 +273,7 @@ if __name__ == "__main__":
     #
     # The async sim ticket ticks the simulator at a fixed rate.
     else:
+        #pdb.set_trace()
 
         tscope = Thunderscope(
             layout_path=args.layout,
@@ -314,9 +316,9 @@ if __name__ == "__main__":
         ) as blue_logger, ProtoLogger(
             args.yellow_full_system_runtime_dir,
         ) as yellow_logger, Gamecontroller(
+                ci_mode=args.ci_mode
         ) as gamecontroller, TigersAutoref(
-            args.ci_mode
-        ):
+        ) as autoref:
 
             tscope.blue_full_system_proto_unix_io.register_to_observe_everything(
                 blue_logger.buffer
@@ -336,9 +338,10 @@ if __name__ == "__main__":
                 tscope.blue_full_system_proto_unix_io,
                 tscope.yellow_full_system_proto_unix_io,
             )
-            #print(gamecontroller.send_ci_input(
-            #    gc_command=Command.Type.FORCE_START, team=Team.UNKNOWN
-            #))
+            autoref.setup_proto_unix_io(tscope.blue_full_system_proto_unix_io)
+            print(gamecontroller.send_ci_input(
+                gc_command=Command.Type.FORCE_START, team=Team.UNKNOWN
+            ))
 
             # Start the simulator
             thread = threading.Thread(

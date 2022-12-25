@@ -3,6 +3,7 @@ from software.thunderscope.binary_context_managers import *
 from software.thunderscope.replay.proto_logger import ProtoLogger
 from proto.message_translation import tbots_protobuf
 import software.python_bindings as cpp_bindings
+from proto.ssl_gc_common_pb2 import Team
 
 import numpy
 
@@ -46,7 +47,7 @@ def start_ai_vs_ai(simulator_runtime_dir, blue_fs_dir, yellow_fs_dir):
     ) as yellow_logger, Gamecontroller(
             ci_mode=True
     ) as gamecontroller, TigersAutoref(
-            True
+            ci_mode=True
     ):
         blue_fs_proto_unix_io   = ProtoUnixIO()
         yellow_fs_proto_unix_io = ProtoUnixIO();
@@ -70,7 +71,11 @@ def start_ai_vs_ai(simulator_runtime_dir, blue_fs_dir, yellow_fs_dir):
                 blue_fs_proto_unix_io,
                 yellow_fs_proto_unix_io
         )
-        
+
+        gamecontroller.send_ci_input(
+            gc_command=Command.Type.FORCE_START, team=Team.UNKNOWN
+        )
+
         # Start the simulator
 
         thread = threading.Thread(
@@ -79,10 +84,7 @@ def start_ai_vs_ai(simulator_runtime_dir, blue_fs_dir, yellow_fs_dir):
         thread.start()
         thread.join()
 
-        gamecontroller.send_ci_input(
-            gc_command=Command.Type.STOP, team=Team.UNKNOWN
-        )
-
+        
 if __name__ == "__main__":
     start_ai_vs_ai("/tmp/tbots/sim", "/tmp/tbots/blue", "/tmp/tbots/yellow")
 
