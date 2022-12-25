@@ -48,14 +48,16 @@ class RefereeInfoWidget(QWidget):
 
         if not referee_msg_dict:
             return
-        
+
         SECONDS_PER_MINUTE = 60
 
         p = (
             f"Packet Timestamp: {round(float(referee_msg_dict['packetTimestamp']) * SECONDS_PER_MICROSECOND, 3)}\n"
             + f"Stage Time Left: {int(referee_msg_dict['stageTimeLeft'] * SECONDS_PER_MICROSECOND / SECONDS_PER_MINUTE)}:{int(referee_msg_dict['stageTimeLeft'] * SECONDS_PER_MICROSECOND % SECONDS_PER_MINUTE)}\n"
             + f"Stage: {referee_msg_dict['stage']}\n"
-            + "Command: " + referee_msg_dict["command"] + "\n"
+            + "Command: "
+            + referee_msg_dict["command"]
+            + "\n"
             + f"Blue Team on Positive Half: {referee_msg_dict['blueTeamOnPositiveHalf']}\n"
         )
         self.referee_info.setText(p)
@@ -64,7 +66,7 @@ class RefereeInfoWidget(QWidget):
         blue = []
         yellow = []
 
-        num_rows = len(referee_msg_dict["blue"])
+        len(referee_msg_dict["blue"])
 
         for team_info_name in referee_msg_dict["blue"]:
             if team_info_name == "timeouts":

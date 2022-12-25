@@ -100,7 +100,10 @@ def create_push_button(title):
 
     return push_button
 
-def set_table_data(data, table, HEADER_SIZE_HINT_WIDTH_EXPANSION, ITEM_SIZE_HINT_WIDTH_EXPANSION):
+
+def set_table_data(
+    data, table, HEADER_SIZE_HINT_WIDTH_EXPANSION, ITEM_SIZE_HINT_WIDTH_EXPANSION
+):
     """Set data in a table
 
     :param data: dict containing {"column_name": [column_items]}
@@ -128,5 +131,3 @@ def set_table_data(data, table, HEADER_SIZE_HINT_WIDTH_EXPANSION, ITEM_SIZE_HINT
             table.setItem(m, n, newitem)
 
     table.setHorizontalHeaderLabels(horizontal_headers)
-
-    

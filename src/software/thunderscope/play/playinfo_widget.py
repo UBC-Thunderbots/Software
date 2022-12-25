@@ -84,7 +84,7 @@ class PlayInfoWidget(QWidget):
             },
             self.play_table,
             HEADER_SIZE_HINT_WIDTH_EXPANSION,
-            ITEM_SIZE_HINT_WIDTH_EXPANSION
+            ITEM_SIZE_HINT_WIDTH_EXPANSION,
         )
 
         self.play_table.resizeColumnsToContents()
