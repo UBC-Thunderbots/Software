@@ -240,7 +240,7 @@ class Simulator(object):
         )
 
         if self.enable_realism:
-            simulator_command += " --realism_config"
+            simulator_command += " --enable_realism"
 
         if self.debug_simulator:
 

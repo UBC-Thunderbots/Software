@@ -124,7 +124,7 @@ if __name__ == "__main__":
         help="How many packets to buffer while rendering",
     )
     parser.add_argument(
-        "--realism",
+        "--enable_realism",
         action="store_true",
         default=False,
         help="set realism flag to use realistic config",

@@ -31,7 +31,7 @@ int main(int argc, char **argv)
     desc.add_options()("division",
                        boost::program_options::value<std::string>(&args.division),
                        "div_a or div_b");
-    desc.add_options()("realism_config",
+    desc.add_options()("enable_realism",
                        boost::program_options::bool_switch(&args.enable_realism),
                        "realism simulator");  // install terminal flag
 
