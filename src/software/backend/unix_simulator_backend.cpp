@@ -12,6 +12,7 @@
 
 UnixSimulatorBackend::UnixSimulatorBackend(std::string runtime_dir)
 {
+    LOG(INFO) << "runtime dir " << runtime_dir;
     // Protobuf Inputs
     robot_status_input.reset(new ThreadedProtoUnixListener<TbotsProto::RobotStatus>(
         runtime_dir + ROBOT_STATUS_PATH,

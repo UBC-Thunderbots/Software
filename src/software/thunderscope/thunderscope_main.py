@@ -318,6 +318,7 @@ if __name__ == "__main__":
         ) as yellow_logger, Gamecontroller(
                 ci_mode=args.ci_mode
         ) as gamecontroller, TigersAutoref(
+                autoref_runtime_dir="/tmp/tbots/autoref"
         ) as autoref:
 
             tscope.blue_full_system_proto_unix_io.register_to_observe_everything(
@@ -338,10 +339,12 @@ if __name__ == "__main__":
                 tscope.blue_full_system_proto_unix_io,
                 tscope.yellow_full_system_proto_unix_io,
             )
-            autoref.setup_proto_unix_io(tscope.blue_full_system_proto_unix_io)
+            autoref.setup_ssl_wrapper_packets(tscope.blue_full_system_proto_unix_io)
             print(gamecontroller.send_ci_input(
                 gc_command=Command.Type.FORCE_START, team=Team.UNKNOWN
             ))
+
+            print("finished setup")
 
             # Start the simulator
             thread = threading.Thread(
@@ -349,5 +352,5 @@ if __name__ == "__main__":
             )
 
             thread.start()
-            tscope.show()
+            #tscope.show()
             thread.join()

@@ -17,6 +17,7 @@ from extlibs.er_force_sim.src.protobuf.world_pb2 import (
     SimBall,
     SimRobot,
 )
+from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 
 def is_cmd_running(command):
@@ -538,17 +539,17 @@ class Gamecontroller(object):
 
 class TigersAutoref(object):
     def __init__(self, ci_mode=False, autoref_runtime_dir=None, buffer_size=5):
-        pdb.set_trace()
+        #pdb.set_trace()
         print("autoref init")
         self.tigers_autoref_proc = None
         self.auto_ref_proc_thread = None
         self.auto_ref_wrapper_thread = None
         self.ci_mode = ci_mode
-        self.autoref_runtime_dir = None
+        self.autoref_runtime_dir = autoref_runtime_dir
         self.wrapper_buffer = ThreadSafeBuffer(buffer_size, SSL_WrapperPacket)
 
     def __enter__(self):
-        pdb.set_trace()
+        #pdb.set_trace()
         print("autoref enter")
 
         self.auto_ref_proc_thread = threading.Thread(target=self.startAutoref)
@@ -560,10 +561,16 @@ class TigersAutoref(object):
 
         return self
 
-    def sslWrapper(self):
+    def sslWrappers(self):
+        print("ssl enter")
+        #pdb.set_trace()
         while True:
             ssl_wrapper = self.wrapper_buffer.get(block=True)
+            AutoRefCiInput(detection=None)
+            #ci_input = AutoRefCiInput(detection=ssl_wrapper.detection)
+            #ci_input.detection.CopyFrom(ssl_wrapper.detection)
             print(ssl_wrapper)
+            #print(ci_input)
 
     def startAutoref(self):
         print(os.getcwd())
@@ -576,12 +583,10 @@ class TigersAutoref(object):
 
         self.tigers_autoref_proc = Popen(autoref_cmd.split(" "))
 
-    def setup_proto_unix_io(
+    def setup_ssl_wrapper_packets(
         self, proto_unix_io
     ):
-        proto_unix_io.attach_unix_sender(self.autoref_runtime_dir, SSL_WRAPPER_PATH, SSL_WrapperPacket)
-        
-    #def send_ci_input(self):
+        proto_unix_io.register_observer(SSL_WrapperPacket, self.wrapper_buffer)
 
     def __exit__(self, type, value, traceback):
         if self.tigers_autoref_proc:

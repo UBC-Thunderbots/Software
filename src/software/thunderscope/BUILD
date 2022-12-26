@@ -86,6 +86,7 @@ py_library(
     deps = [
         "//proto/message_translation:py_tbots_protobuf",
         "//extlibs/er_force_sim/src/protobuf:erforce_py_proto",
+        ":thread_safe_buffer",
     ]
 )
 
