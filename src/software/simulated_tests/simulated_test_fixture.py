@@ -207,7 +207,11 @@ class SimulatedTestRunner(object):
 
 class InvariantTestRunner(SimulatedTestRunner):
 
-    """Run a simulated test"""
+    """
+    Runs a simulated test only once with a given parameter
+
+    Test passes or fails based on the outcome of this test
+    """
 
     def __int__(self, *args, **kwargs):
         super(InvariantTestRunner, self).__init__(self, *args, **kwargs)
@@ -265,6 +269,14 @@ class InvariantTestRunner(SimulatedTestRunner):
 
 
 class AggregateTestRunner(SimulatedTestRunner):
+
+    """
+    Runs a simulated test multiple times with different given parameters
+
+    Result of the test is determined by comparing the number of
+    passing iterations to a predetermined acceptable threshold
+    """
+
     def __int__(self, *args, **kwargs):
         super().__init__(self, *args, **kwargs)
 
@@ -298,16 +310,16 @@ class AggregateTestRunner(SimulatedTestRunner):
         # Catches Assertion Error thrown by failing test and increments counter
         # Calculates overall results and prints them
         for x in range(len(params)):
-            # If thunderscope is enabled, run the test in a thread and show
-            # thunderscope on this thread. The excepthook is setup to catch
-            # any test failures and propagate them to the main thread
+
             setup(params[x])
 
             failed_tests = 0
 
             try:
                 if self.thunderscope:
-
+                    # If thunderscope is enabled, run the test in a thread and show
+                    # thunderscope on this thread. The excepthook is setup to catch
+                    # any test failures and propagate them to the main thread
                     run_sim_thread = threading.Thread(target=self.runner, daemon=True)
                     run_sim_thread.start()
                     self.thunderscope.show()

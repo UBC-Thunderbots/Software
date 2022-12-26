@@ -20,7 +20,7 @@ def test_two_ai_ball_placement(simulated_test_runner):
     # placement point must be Vector2 to work with game controller
     ball_final_pos = tbots.Point(-3, -2)
 
-    def test_setup(run_enemy_ai):
+    def setup(run_enemy_ai):
         # starting point must be Point
         ball_initial_pos = tbots.Point(2, 2)
 
@@ -84,7 +84,7 @@ def test_two_ai_ball_placement(simulated_test_runner):
         )
 
     simulated_test_runner.run_test(
-        setup=test_setup,
+        setup=setup,
         params=[False, False, False, False],
         inv_always_validation_sequence_set=[[]],
         inv_eventually_validation_sequence_set=[
@@ -106,3 +106,7 @@ def test_two_ai_ball_placement(simulated_test_runner):
         ],
         test_timeout_s=[20, 20, 20, 20],
     )
+
+
+if __name__ == "__main__":
+    pytest_main(__file__)
