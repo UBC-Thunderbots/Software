@@ -16,6 +16,7 @@
 #include "proto/tbots_software_msgs.pb.h"
 #include "proto/team.pb.h"
 #include "proto/world.pb.h"
+#include "proto/ssl_autoref_ci.pb.h"
 #include "pybind11_protobuf/native_proto_caster.h"
 #include "software/estop/threaded_estop_reader.h"
 #include "software/geom/algorithms/contains.h"
@@ -303,6 +304,7 @@ PYBIND11_MODULE(python_bindings, m)
     declareThreadedProtoUdpSender<TbotsProto::World>(m, "World");
     declareThreadedProtoUdpSender<TbotsProto::RobotStatus>(m, "RobotStatus");
     declareThreadedProtoUdpSender<TbotsProto::PrimitiveSet>(m, "PrimitiveSet");
+    declareThreadedProtoUdpSender<SSLProto::AutoRefCiInput>(m, "SSL_AutoRefCiInput");
 
     // Estop Reader
     py::class_<ThreadedEstopReader, std::unique_ptr<ThreadedEstopReader>>(

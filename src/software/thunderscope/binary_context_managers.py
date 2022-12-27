@@ -374,6 +374,7 @@ class Gamecontroller(object):
         # so that we can run multiple gamecontroller instances in parallel
         self.referee_port = self.next_free_port()
         self.ci_port = self.next_free_port()
+        #self.ci_port = 10007
 
     def __enter__(self):
         """Enter the gamecontroller context manager. 
@@ -459,6 +460,7 @@ class Gamecontroller(object):
             :param data: The referee command to send
 
             """
+            #print(data)
             blue_full_system_proto_unix_io.send_proto(Referee, data)
             yellow_full_system_proto_unix_io.send_proto(Referee, data)
 
@@ -566,10 +568,29 @@ class TigersAutoref(object):
         #pdb.set_trace()
         while True:
             ssl_wrapper = self.wrapper_buffer.get(block=True)
-            AutoRefCiInput(detection=None)
+            ci_input = AutoRefCiInput()
+            ci_input.detection.append(ssl_wrapper.detection)
             #ci_input = AutoRefCiInput(detection=ssl_wrapper.detection)
             #ci_input.detection.CopyFrom(ssl_wrapper.detection)
-            print(ssl_wrapper)
+            #self.autoref_sender.send_proto(ci_input)
+            # https://cwiki.apache.org/confluence/display/GEODE/Delimiting+Protobuf+Messages
+            size = ci_input.ByteSize()
+
+            #self.autoref_sender.send_proto(ci_input)
+
+            # Send a request to the host with the size of the message
+            self.ci_socket.send(
+                encoder._VarintBytes(size) + ci_input.SerializeToString()
+            )
+            response_data = self.ci_socket.recv(
+                Gamecontroller.CI_MODE_OUTPUT_RECEIVE_BUFFER_SIZE
+            )
+
+            msg_len, new_pos = decoder._DecodeVarint32(response_data, 0)
+            ci_output = AutoRefCiOutput()
+            ci_output.ParseFromString(response_data[new_pos : new_pos + msg_len])
+            print(ci_output)
+
             #print(ci_input)
 
     def startAutoref(self):
@@ -581,12 +602,33 @@ class TigersAutoref(object):
         if self.ci_mode:
             autoref_cmd += " -ci"
 
-        self.tigers_autoref_proc = Popen(autoref_cmd.split(" "))
+        #self.tigers_autoref_proc = Popen(autoref_cmd.split(" "))
 
     def setup_ssl_wrapper_packets(
-        self, proto_unix_io
+        self, blue_fullsystem_proto_unix_io, yellow_fullsystem_proto_unix_io
     ):
-        proto_unix_io.register_observer(SSL_WrapperPacket, self.wrapper_buffer)
+        #pdb.set_trace()
+        def __send_referee_command(data):
+            """Send a referee command from the gamecontroller to both full
+            systems.
+
+            :param data: The referee command to send
+
+            """
+            blue_fullsystem_proto_unix_io.send_proto(Referee, data)
+            yellow_fullsystem_proto_unix_io.send_proto(Referee, data)
+
+        
+        #pdb.set_trace()
+        blue_fullsystem_proto_unix_io.register_observer(SSL_WrapperPacket, self.wrapper_buffer)
+        self.ci_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.ci_socket.connect(("", 10013))
+
+        self.autoref_sender = SSL_AutoRefCiInputProtoSender(SSL_VISION_ADDRESS, 10013, True)
+        self.receive_referee_command = SSLRefereeProtoListener(
+            Gamecontroller.REFEREE_IP, 40001, __send_referee_command, True,
+        )
+
 
     def __exit__(self, type, value, traceback):
         if self.tigers_autoref_proc:

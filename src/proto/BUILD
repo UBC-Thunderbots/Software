@@ -89,6 +89,7 @@ proto_library(
         "ssl_vision_geometry.proto",
         "ssl_vision_wrapper.proto",
         "ssl_vision_wrapper_tracked.proto",
+        "ssl_autoref_ci.proto",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -198,6 +199,7 @@ py_proto_library(
         "ssl_vision_geometry.proto",
         "ssl_vision_wrapper.proto",
         "ssl_vision_wrapper_tracked.proto",
+        "ssl_autoref_ci.proto",
     ],
     deps = [
         ":tbots_py_proto",
