@@ -34,6 +34,11 @@ class PrimitiveExecutor
     void clearCurrentPrimitive();
 
     /**
+     * Set the current primitive to the stop primitive
+     */
+    void setStopPrimitive();
+
+    /**
      * Update primitive executor with a new World
      * @param world_msg Protobuf representation of the current World (World from the
      * perspective of the team which the robot with this Primitive Executor is a member
