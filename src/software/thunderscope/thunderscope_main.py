@@ -316,10 +316,11 @@ if __name__ == "__main__":
         ) as blue_logger, ProtoLogger(
             args.yellow_full_system_runtime_dir,
         ) as yellow_logger, Gamecontroller(
-                #ci_mode=args.ci_mode
+                ci_mode=args.ci_mode
         ) as gamecontroller, TigersAutoref(
                 autoref_runtime_dir="/tmp/tbots/autoref",
-                ci_mode=args.ci_mode
+                ci_mode=args.ci_mode,
+                gc=gamecontroller
         ) as autoref:
 
             tscope.blue_full_system_proto_unix_io.register_to_observe_everything(

@@ -540,8 +540,8 @@ class Gamecontroller(object):
 
 
 class TigersAutoref(object):
-    def __init__(self, ci_mode=False, autoref_runtime_dir=None, buffer_size=5):
-        #pdb.set_trace()
+    def __init__(self, ci_mode=False, autoref_runtime_dir=None, buffer_size=5, gc=Gamecontroller()):
+        pdb.set_trace()
         print("autoref init")
         self.tigers_autoref_proc = None
         self.auto_ref_proc_thread = None
@@ -549,6 +549,12 @@ class TigersAutoref(object):
         self.ci_mode = ci_mode
         self.autoref_runtime_dir = autoref_runtime_dir
         self.wrapper_buffer = ThreadSafeBuffer(buffer_size, SSL_WrapperPacket)
+        self.gamecontroller = gc
+        self.ci_socket = self.gamecontroller.ci_socket
+        #time.sleep(Gamecontroller.CI_MODE_LAUNCH_DELAY_S)
+        #self.ci_port = self.gamecontroller.next_free_port()
+        print("autoref ci port: " + str(self.ci_port))
+        #self.ci_socket.connect(("", self.ci_port))
 
     def __enter__(self):
         #pdb.set_trace()
@@ -587,21 +593,52 @@ class TigersAutoref(object):
             )
 
             msg_len, new_pos = decoder._DecodeVarint32(response_data, 0)
+            print(str(msg_len) + ", " + str(new_pos))
+            print(response_data)
             ci_output = AutoRefCiOutput()
             ci_output.ParseFromString(response_data[new_pos : new_pos + msg_len])
+            self.send_ci_input(ci_output.tracker_wrapper_packet)
             print(ci_output)
 
             #print(ci_input)
+
+    def send_ci_input(self, tracker_wrapper):
+        #pdb.set_trace()
+        ci_input = CiInput(timestamp=int(time.time_ns()))
+        ci_input.api_inputs.append(Input())
+        ci_input.tracker_packet.CopyFrom(tracker_wrapper)
+
+        # https://cwiki.apache.org/confluence/display/GEODE/Delimiting+Protobuf+Messages
+        size = ci_input.ByteSize()
+
+        # Send a request to the host with the size of the message
+        self.gamecontroller.ci_socket.send(
+            encoder._VarintBytes(size) + ci_input.SerializeToString()
+        )
+
+        print("response data from gamecontroller")
+        response_data = self.gamecontroller.ci_socket.recv(
+            Gamecontroller.CI_MODE_OUTPUT_RECEIVE_BUFFER_SIZE
+        )
+        print(response_data)
+
+        msg_len, new_pos = decoder._DecodeVarint32(response_data, 0)
+        ci_output = CiOutput()
+        ci_output.ParseFromString(response_data[new_pos : new_pos + msg_len])
+        print("gamecontroller output")
+        print(ci_output)
+
 
     def startAutoref(self):
         print(os.getcwd())
         os.chdir("/opt/tbotspython/autoReferee/")
         print(os.getcwd())
-        autoref_cmd = "bin/./autoReferee -hl -a"
+        autoref_cmd = "bin/./autoReferee -a"
 
         if self.ci_mode:
             autoref_cmd += " -ci"
 
+        #pdb.set_trace()
         #self.tigers_autoref_proc = Popen(autoref_cmd.split(" "))
 
     def setup_ssl_wrapper_packets(
