@@ -50,7 +50,7 @@ from software.thunderscope.field.field import Field
 from software.thunderscope.log.g3log_widget import g3logWidget
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.thunderscope.play.playinfo_widget import playInfoWidget
-from software.thunderscope.robot_diagnostics.chicker import ChickerWidget
+from software.thunderscope.robot_diagnostics.chicker_widget import ChickerWidget
 from software.thunderscope.robot_diagnostics.fullsystem_connect_widget import (
     FullSystemConnectWidget,
 )

@@ -44,7 +44,7 @@ class FloatSlider(QSlider):
         super(FloatSlider, self).setValue(int(value * self.decimals))
 
 
-def create_button(text: list):
+def create_buttons(text: list):
     """Creates QPushButton objects inside a QGroupBox object.
     The default color of button will be white with black background.
 

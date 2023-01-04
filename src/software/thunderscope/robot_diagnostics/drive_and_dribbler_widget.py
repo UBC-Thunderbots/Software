@@ -64,7 +64,7 @@ class DriveAndDribblerWidget(QWidget):
 
         """
         value = float(value)
-        value_str = "%.1f" % value
+        value_str = "%.2f" % value
         return value_str
 
     def setup_direct_velocity(self, title):
@@ -82,21 +82,21 @@ class DriveAndDribblerWidget(QWidget):
             self.x_velocity_slider,
             self.x_velocity_label,
         ) = common_widgets.create_float_slider(
-            "X (m/s)", 1, MIN_LINEAR_SPEED_MPS, MAX_LINEAR_SPEED_MPS, 1
+            "X (m/s)", 2, MIN_LINEAR_SPEED_MPS, MAX_LINEAR_SPEED_MPS, 1
         )
         (
             y_layout,
             self.y_velocity_slider,
             self.y_velocity_label,
         ) = common_widgets.create_float_slider(
-            "Y (m/s)", 1, MIN_LINEAR_SPEED_MPS, MAX_LINEAR_SPEED_MPS, 1
+            "Y (m/s)", 2, MIN_LINEAR_SPEED_MPS, MAX_LINEAR_SPEED_MPS, 1
         )
         (
             dps_layout,
             self.angular_velocity_slider,
             self.angular_velocity_label,
         ) = common_widgets.create_float_slider(
-            "θ (°/s)", 1, MIN_ANGULAR_SPEED_RAD_PER_S, MAX_ANGULAR_SPEED_RAD_PER_S, 1,
+            "θ (rad/s)", 2, MIN_ANGULAR_SPEED_RAD_PER_S, MAX_ANGULAR_SPEED_RAD_PER_S, 1,
         )
 
         # add listener functions for sliders to update label with slider value

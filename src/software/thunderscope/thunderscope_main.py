@@ -236,25 +236,6 @@ if __name__ == "__main__":
         if args.run_diagnostics:
             diagnostics_proto_unix_io = tscope.robot_diagnostics_proto_unix_io
 
-        if args.run_blue or args.run_yellow:
-            with ProtoLogger(
-                args.blue_full_system_runtime_dir,
-            ) as blue_logger, ProtoLogger(
-                args.yellow_full_system_runtime_dir,
-            ) as yellow_logger, FullSystem(
-                runtime_dir, debug, friendly_colour_yellow
-            ) as full_system:
-
-                print(type(blue_logger))
-
-                full_system_proto_unix_io.register_to_observe_everything(
-                    blue_logger.buffer
-                )
-                full_system_proto_unix_io.register_to_observe_everything(
-                    yellow_logger.buffer
-                )
-                full_system.setup_proto_unix_io(full_system_proto_unix_io)
-
         with RobotCommunication(
             full_system_proto_unix_io,
             diagnostics_proto_unix_io,
@@ -265,8 +246,26 @@ if __name__ == "__main__":
                 tscope.toggle_robot_connection_signal.connect(
                     robot_communication.toggle_robot_connection
                 )
+            if args.run_blue or args.run_yellow:
+                full_system_runtime_dir = args.blue_full_system_runtime_dir if args.run_blue else (
+                    args.yellow_full_system_runtime_dir
+                )
+                with ProtoLogger(
+                        full_system_runtime_dir,
+                ) as logger, FullSystem(
+                    runtime_dir, debug, friendly_colour_yellow
+                ) as full_system:
 
-            tscope.show()
+                    full_system_proto_unix_io.register_to_observe_everything(
+                        logger.buffer
+                    )
+                    full_system.setup_proto_unix_io(full_system_proto_unix_io)
+
+                    tscope.show()
+            else:
+                tscope.show()
+
+
 
     ###########################################################################
     #                              Replay                                     #
