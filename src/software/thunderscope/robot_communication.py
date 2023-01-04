@@ -58,6 +58,8 @@ class RobotCommunication(object):
         self.send_estop_state_thread = threading.Thread(target=self.__send_estop_state)
         self.run_thread = threading.Thread(target=self.run)
 
+        self.fullsystem_connected_to_robots = True
+
         try:
             self.estop_reader = ThreadedEstopReader(
                 self.estop_path, self.estop_buadrate
@@ -183,7 +185,7 @@ class RobotCommunication(object):
             self.multicast_channel + "%" + self.interface, VISION_PORT, True
         )
 
-        # self.connect_fullsystem_to_robots()
+        self.connect_fullsystem_to_robots()
 
         # TODO (#2741): we might not want to support robot diagnostics in tscope
         # make a ticket here to create a widget to call these functions to detach
