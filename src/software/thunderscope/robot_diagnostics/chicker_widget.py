@@ -192,7 +192,6 @@ class ChickerWidget(QWidget):
         power_control = PowerControl()
         self.proto_unix_io.send_proto(PowerControl, power_control, True)
 
-
     def change_button_state(self, button, enable):
         """Change button color and clickable state.
 

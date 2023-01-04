@@ -247,12 +247,12 @@ if __name__ == "__main__":
                     robot_communication.toggle_robot_connection
                 )
             if args.run_blue or args.run_yellow:
-                full_system_runtime_dir = args.blue_full_system_runtime_dir if args.run_blue else (
-                    args.yellow_full_system_runtime_dir
+                full_system_runtime_dir = (
+                    args.blue_full_system_runtime_dir
+                    if args.run_blue
+                    else (args.yellow_full_system_runtime_dir)
                 )
-                with ProtoLogger(
-                        full_system_runtime_dir,
-                ) as logger, FullSystem(
+                with ProtoLogger(full_system_runtime_dir,) as logger, FullSystem(
                     runtime_dir, debug, friendly_colour_yellow
                 ) as full_system:
 
@@ -264,8 +264,6 @@ if __name__ == "__main__":
                     tscope.show()
             else:
                 tscope.show()
-
-
 
     ###########################################################################
     #                              Replay                                     #
