@@ -21,9 +21,9 @@ extern int clock_nanosleep(clockid_t __clock_id, int __flags,
 
 Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, const int loop_hz)
     // TODO (#2495): Set the friendly team colour once we receive World proto
-    : primitive_executor_(loop_hz, robot_constants, TeamColour::YELLOW)
+    : robot_id_(MAX_ROBOT_IDS + 1),  // Initialize to a robot ID that is not valid
+      primitive_executor_(1.0 / loop_hz, robot_constants, TeamColour::YELLOW, robot_id_)
 {
-    robot_id_        = MAX_ROBOT_IDS + 1;  // Initialize to a robot ID that is not valid
     channel_id_      = 0;
     loop_hz_         = loop_hz;
     robot_constants_ = robot_constants;
@@ -45,7 +45,7 @@ Thunderloop::~Thunderloop() {}
 /*
  * Run the main robot loop!
  */
-void Thunderloop::runLoop()
+[[noreturn]] void Thunderloop::runLoop()
 {
     // Timing
     struct timespec next_shot;
@@ -105,6 +105,8 @@ void Thunderloop::runLoop()
                 channel_id_        = channel_id;
                 network_interface_ = network_interface;
 
+                primitive_executor_.setRobotId(robot_id_);
+
                 network_service_ = std::make_unique<NetworkService>(
                     std::string(ROBOT_MULTICAST_CHANNELS.at(channel_id_)) + "%" +
                         network_interface_,
@@ -138,7 +140,7 @@ void Thunderloop::runLoop()
                     // Start new primitive
                     {
                         ScopedTimespecTimer timer(&poll_time);
-                        primitive_executor_.updatePrimitiveSet(robot_id_, primitive_set_);
+                        primitive_executor_.updatePrimitiveSet(primitive_set_);
                     }
 
                     thunderloop_status_.set_primitive_executor_start_time_ns(
@@ -172,14 +174,10 @@ void Thunderloop::runLoop()
                 primitive_executor_.setStopPrimitive();
 
                 // Log milliseconds since last world received if we are timing out
-                int milliseconds_elapsed_since_last_world = static_cast<int>(
-                    static_cast<double>(world_result.tv_sec) * MILLISECONDS_PER_SECOND +
-                    static_cast<double>(world_result.tv_nsec) *
-                        MILLISECONDS_PER_NANOSECOND);
-
-                LOG(INFO) << "World timeout, overriding with StopPrimitive\n"
-                          << "Milliseconds since last world: "
-                          << milliseconds_elapsed_since_last_world;
+                LOG(WARNING) << "World timeout, overriding with StopPrimitive\n"
+                             << "Milliseconds since last world: "
+                             << static_cast<int>(nanoseconds_elapsed_since_last_world) *
+                                    MILLISECONDS_PER_NANOSECOND;
             }
 
             // Primitive Executor: run the last primitive if we have not timed out
@@ -201,25 +199,16 @@ void Thunderloop::runLoop()
                     static_cast<long>(PRIMITIVE_MANAGER_TIMEOUT_NS))
                 {
                     primitive_executor_.setStopPrimitive();
+
+                    // Log milliseconds since last world received if we are timing out
+                    LOG(WARNING)
+                        << "Primitive timeout, overriding with StopPrimitive\n"
+                        << "Milliseconds since last world: "
+                        << static_cast<int>(nanoseconds_elapsed_since_last_primitive) *
+                               MILLISECONDS_PER_NANOSECOND;
                 }
 
-                auto friendly_team = Team(world_.friendly_team());
-                auto robot         = friendly_team.getRobotById(robot_id_);
-
-                if (robot.has_value())
-                {
-                    direct_control_ = *primitive_executor_.stepPrimitive(
-                        robot_id_, robot->currentState().orientation());
-                }
-                else
-                {
-                    // We are in robot diagnostics
-                    auto robot_state =
-                        RobotState(Point(0, 0), Vector(0, 0), Angle::fromDegrees(0),
-                                   Angle::fromDegrees(0));
-                    direct_control_ = *primitive_executor_.stepPrimitive(
-                        robot_id_, robot_state.orientation());
-                }
+                direct_control_ = *primitive_executor_.stepPrimitive();
             }
 
             thunderloop_status_.set_primitive_executor_step_time_ns(
@@ -247,8 +236,9 @@ void Thunderloop::runLoop()
                 ScopedTimespecTimer timer(&poll_time);
                 motor_status_ = motor_service_->poll(direct_control_.motor_control(),
                                                      loop_duration_seconds);
-                primitive_executor_.updateLocalVelocity(
-                    createVector(motor_status_.local_velocity()));
+                primitive_executor_.updateVelocity(
+                    createVector(motor_status_.local_velocity()),
+                    createAngularVelocity(motor_status_.angular_velocity()));
             }
             thunderloop_status_.set_motor_service_poll_time_ns(
                 static_cast<unsigned long>(poll_time.tv_nsec));
