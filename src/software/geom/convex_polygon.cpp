@@ -1,26 +1,21 @@
 #include "software/geom/convex_polygon.h"
 
 #include <algorithm>
+#include <sstream>
 
 ConvexPolygon::ConvexPolygon(const std::vector<Point>& points) : Polygon(points)
 {
-    if (!isConvex())
-    {
-        throw std::invalid_argument("Points do not make a convex polygon");
-    }
+    validateConvexPolygon();
 }
 
 ConvexPolygon::ConvexPolygon(const std::initializer_list<Point>& points) : Polygon(points)
 {
-    if (!isConvex())
-    {
-        throw std::invalid_argument("Points do not make a convex polygon");
-    }
+    validateConvexPolygon();
 }
 
 // From:
 // https://math.stackexchange.com/questions/1743995/determine-whether-a-polygon-is-convex-based-on-its-vertices
-bool ConvexPolygon::isConvex()
+bool ConvexPolygon::isConvex() const
 {
     if (points_.size() < 3)
     {
@@ -164,4 +159,17 @@ double ConvexPolygon::area() const
     }
 
     return std::abs(first_term - second_term) / 2;
+}
+
+void ConvexPolygon::validateConvexPolygon() const
+{
+    if (!isConvex())
+    {
+        std::stringstream points_ss;
+        for (const Point& point : points_)
+        {
+            points_ss << point << ", ";
+        }
+        throw std::invalid_argument("Points " + points_ss.str() + " does not make a convex polygon");
+    }
 }
