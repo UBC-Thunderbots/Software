@@ -99,6 +99,9 @@ std::unique_ptr<RealismConfigErForce> ErForceSimulator::createDefaultRealismConf
 
 std::unique_ptr<RealismConfigErForce> ErForceSimulator::createRealisticRealismConfig()
 {
+    /* values from
+     * https://github.com/robotics-erlangen/framework/blob/master/config/simulator-realism/Realistic.txt
+     */
     auto realism_config = std::make_unique<RealismConfigErForce>();
     realism_config->set_stddev_ball_p(0.0014f);
     realism_config->set_stddev_robot_p(0.0013f);
