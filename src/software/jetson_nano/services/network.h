@@ -61,4 +61,7 @@ class NetworkService
     // Queue of the sequence numbers of received primitive sets in the past
     // RECENT_PACKET_LOSS_PERIOD primitive sets
     std::queue<uint64_t> recent_primitive_set_seq_nums;
+
+    // Queue of the sequence numbers of received worlds in the past RECENT_PACKET_LOSS_PERIOD worlds
+    std::queue<uint64_t> recent_world_seq_nums;
 };
