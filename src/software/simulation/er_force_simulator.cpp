@@ -270,13 +270,14 @@ void ErForceSimulator::setBlueRobotPrimitiveSet(
     const auto& sim_robots           = sim_state.blue_robots();
     const auto robot_to_vel_pair_map = getRobotIdToLocalVelocityMap(sim_robots);
 
+    blue_team_world_msg = std::move(world_msg);
+    const TbotsProto::World world_proto = *blue_team_world_msg;
     for (auto& [robot_id, primitive] : primitive_set_msg.robot_primitives())
     {
         auto& [local_vel, angular_vel] = robot_to_vel_pair_map.at(robot_id);
         setRobotPrimitive(robot_id, primitive_set_msg, blue_primitive_executor_map,
-                          *blue_team_world_msg, local_vel, angular_vel);
+                          world_proto, local_vel, angular_vel);
     }
-    blue_team_world_msg = std::move(world_msg);
 }
 
 void ErForceSimulator::setRobotPrimitive(
