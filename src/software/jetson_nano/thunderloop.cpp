@@ -41,7 +41,7 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, const int loop
 
     LOG(INFO) << "THUNDERLOOP: finished initialization with ROBOT ID: " << robot_id_
               << ", CHANNEL ID: " << channel_id_
-              << ", with NETWORK INTERFACE: " << network_interface_;
+              << ", and NETWORK INTERFACE: " << network_interface_;
     LOG(INFO)
         << "THUNDERLOOP: to update Thunderloop configuration, change REDIS store and restart Thunderloop";
 }
