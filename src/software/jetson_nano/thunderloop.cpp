@@ -21,28 +21,29 @@ extern int clock_nanosleep(clockid_t __clock_id, int __flags,
 
 Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, const int loop_hz)
     // TODO (#2495): Set the friendly team colour once we receive World proto
-    : redis_client_(std::make_unique<RedisClient>(REDIS_DEFAULT_HOST, REDIS_DEFAULT_PORT)),
-    primitive_executor_(loop_hz, robot_constants, TeamColour::YELLOW),
-    robot_constants_(robot_constants),
-    robot_id_(std::stoi(redis_client_->get(ROBOT_ID_REDIS_KEY))),
-    channel_id_(std::stoi(redis_client_->get(ROBOT_MULTICAST_CHANNEL_REDIS_KEY))),
-    network_interface_(redis_client_->get(ROBOT_NETWORK_INTERFACE_REDIS_KEY)),
-    loop_hz_(loop_hz)
+    : redis_client_(
+          std::make_unique<RedisClient>(REDIS_DEFAULT_HOST, REDIS_DEFAULT_PORT)),
+      primitive_executor_(loop_hz, robot_constants, TeamColour::YELLOW),
+      robot_constants_(robot_constants),
+      robot_id_(std::stoi(redis_client_->get(ROBOT_ID_REDIS_KEY))),
+      channel_id_(std::stoi(redis_client_->get(ROBOT_MULTICAST_CHANNEL_REDIS_KEY))),
+      network_interface_(redis_client_->get(ROBOT_NETWORK_INTERFACE_REDIS_KEY)),
+      loop_hz_(loop_hz)
 {
     NetworkLoggerSingleton::initializeLogger(channel_id_, network_interface_, robot_id_);
 
     network_service_ = std::make_unique<NetworkService>(
-        std::string(ROBOT_MULTICAST_CHANNELS.at(channel_id_)) + "%" +
-        network_interface_,
+        std::string(ROBOT_MULTICAST_CHANNELS.at(channel_id_)) + "%" + network_interface_,
         VISION_PORT, PRIMITIVE_PORT, ROBOT_STATUS_PORT, true);
 
     motor_service_ = std::make_unique<MotorService>(robot_constants, loop_hz);
     power_service_ = std::make_unique<PowerService>();
 
     LOG(INFO) << "THUNDERLOOP: finished initialization with ROBOT ID: " << robot_id_
-        << ", CHANNEL ID: " << channel_id_
-        << ", with NETWORK INTERFACE: " << network_interface_;
-    LOG(INFO) << "THUNDERLOOP: to update Thunderloop configuration, change REDIS store and restart Thunderloop";
+              << ", CHANNEL ID: " << channel_id_
+              << ", with NETWORK INTERFACE: " << network_interface_;
+    LOG(INFO)
+        << "THUNDERLOOP: to update Thunderloop configuration, change REDIS store and restart Thunderloop";
 }
 
 Thunderloop::~Thunderloop() {}
