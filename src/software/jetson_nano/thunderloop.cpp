@@ -89,33 +89,6 @@ void Thunderloop::runLoop()
             // Collect jetson status
             jetson_status_.set_cpu_temperature(getCpuTemperature());
 
-            // Grab the latest configs from redis
-            auto robot_id = std::stoi(redis_client_->get(ROBOT_ID_REDIS_KEY));
-            auto channel_id =
-                std::stoi(redis_client_->get(ROBOT_MULTICAST_CHANNEL_REDIS_KEY));
-            auto network_interface =
-                redis_client_->get(ROBOT_NETWORK_INTERFACE_REDIS_KEY);
-
-            // If any of the configs have changed, update the network service to switch
-            // to the new interface and channel with the correct robot ID
-            if (robot_id != robot_id_ || channel_id != channel_id_ ||
-                network_interface != network_interface_)
-            {
-                LOG(DEBUG) << "Switch over to Robot ID: " << robot_id
-                           << " Channel ID: " << channel_id
-                           << " Network Interface: " << network_interface;
-
-                // Update the robot ID and channel ID
-                robot_id_          = robot_id;
-                channel_id_        = channel_id;
-                network_interface_ = network_interface;
-
-                network_service_ = std::make_unique<NetworkService>(
-                    std::string(ROBOT_MULTICAST_CHANNELS.at(channel_id_)) + "%" +
-                        network_interface_,
-                    VISION_PORT, PRIMITIVE_PORT, ROBOT_STATUS_PORT, true);
-            }
-
             // Network Service: receive newest world, primitives and set out the last
             // robot status
             {
