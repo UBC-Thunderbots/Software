@@ -1,13 +1,10 @@
 import pyqtgraph as pg
-import pyqtgraph.console as pg_console
-from proto.play_info_msg_pb2 import PlayInfo
-from software.networking.threaded_unix_listener import ThreadedUnixListener
 import software.thunderscope.constants as constants
 from google.protobuf.json_format import MessageToDict
 from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtWidgets import *
 from proto.import_all_protos import *
-from software.py_constants import SECONDS_PER_MICROSECOND
+from software.py_constants import SECONDS_PER_MICROSECOND, SECONDS_PER_MINUTE
 from software.thunderscope.common.common_widgets import set_table_data
 
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
@@ -49,8 +46,6 @@ class RefereeInfoWidget(QWidget):
         if not referee_msg_dict:
             return
 
-        SECONDS_PER_MINUTE = 60
-
         p = (
             f"Packet Timestamp: {round(float(referee_msg_dict['packetTimestamp']) * SECONDS_PER_MICROSECOND, 3)}\n"
             + f"Stage Time Left: {int(referee_msg_dict['stageTimeLeft'] * SECONDS_PER_MICROSECOND / SECONDS_PER_MINUTE)}:{int(referee_msg_dict['stageTimeLeft'] * SECONDS_PER_MICROSECOND % SECONDS_PER_MINUTE)}\n"
@@ -65,8 +60,6 @@ class RefereeInfoWidget(QWidget):
         team_info = []
         blue = []
         yellow = []
-
-        len(referee_msg_dict["blue"])
 
         for team_info_name in referee_msg_dict["blue"]:
             if team_info_name == "timeouts":

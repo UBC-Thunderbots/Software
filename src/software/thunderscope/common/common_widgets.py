@@ -102,13 +102,14 @@ def create_push_button(title):
 
 
 def set_table_data(
-    data, table, HEADER_SIZE_HINT_WIDTH_EXPANSION, ITEM_SIZE_HINT_WIDTH_EXPANSION
+    data, table, header_size_hint_width_expansion, item_size_hint_width_expansion
 ):
     """Set data in a table
 
     :param data: dict containing {"column_name": [column_items]}
-    :param HEADER_SIZE_HINT_WIDTH_EXPANSION: the factor multiplied by the length of the header
-    :param ITEM_SIZE_HINT_WIDTH_EXPANSION: the factor multiplied by the length of the item
+    :param table: table widget that will contain the data
+    :param header_size_hint_width_expansion: the factor multiplied by the length of the header
+    :param item_size_hint_width_expansion: the factor multiplied by the length of the item
 
     """
     horizontal_headers = []
@@ -122,8 +123,8 @@ def set_table_data(
             newitem.setSizeHint(
                 QtCore.QSize(
                     max(
-                        len(key) * HEADER_SIZE_HINT_WIDTH_EXPANSION,
-                        len(str_item) * ITEM_SIZE_HINT_WIDTH_EXPANSION,
+                        len(key) * header_size_hint_width_expansion,
+                        len(str_item) * item_size_hint_width_expansion,
                     ),
                     1,
                 )
