@@ -461,8 +461,8 @@ class Gamecontroller(object):
 
             """
             #print(data)
-            blue_full_system_proto_unix_io.send_proto(Referee, data)
-            yellow_full_system_proto_unix_io.send_proto(Referee, data)
+            #blue_full_system_proto_unix_io.send_proto(Referee, data)
+            #yellow_full_system_proto_unix_io.send_proto(Referee, data)
 
         self.receive_referee_command = SSLRefereeProtoListener(
             Gamecontroller.REFEREE_IP, self.referee_port, __send_referee_command, True,
@@ -541,7 +541,7 @@ class Gamecontroller(object):
 
 class TigersAutoref(object):
     def __init__(self, ci_mode=False, autoref_runtime_dir=None, buffer_size=5, gc=Gamecontroller()):
-        pdb.set_trace()
+        #pdb.set_trace()
         print("autoref init")
         self.tigers_autoref_proc = None
         self.auto_ref_proc_thread = None
@@ -553,7 +553,7 @@ class TigersAutoref(object):
         self.ci_socket = self.gamecontroller.ci_socket
         #time.sleep(Gamecontroller.CI_MODE_LAUNCH_DELAY_S)
         #self.ci_port = self.gamecontroller.next_free_port()
-        print("autoref ci port: " + str(self.ci_port))
+        #print("autoref ci port: " + str(self.ci_port))
         #self.ci_socket.connect(("", self.ci_port))
 
     def __enter__(self):
@@ -589,16 +589,28 @@ class TigersAutoref(object):
                 encoder._VarintBytes(size) + ci_input.SerializeToString()
             )
             response_data = self.ci_socket.recv(
-                Gamecontroller.CI_MODE_OUTPUT_RECEIVE_BUFFER_SIZE
+                    Gamecontroller.CI_MODE_OUTPUT_RECEIVE_BUFFER_SIZE
             )
 
-            msg_len, new_pos = decoder._DecodeVarint32(response_data, 0)
-            print(str(msg_len) + ", " + str(new_pos))
-            print(response_data)
-            ci_output = AutoRefCiOutput()
-            ci_output.ParseFromString(response_data[new_pos : new_pos + msg_len])
-            self.send_ci_input(ci_output.tracker_wrapper_packet)
-            print(ci_output)
+            #self.autoref_sender.send_proto(ci_input)
+
+            #input()
+            offset = 0
+            while offset < len(response_data):
+                msg_len, new_pos = decoder._DecodeVarint32(response_data, offset)
+                offset = new_pos
+                print("offset: " + str(offset) + ", " + str(msg_len) + ", " + str(new_pos) + ", " + str(len(response_data)))
+                #print(response_data)
+                ci_output = AutoRefCiOutput()
+                if (offset + msg_len > len(response_data)):
+                    print("Must get additional data")
+                    response_data += self.ci_socket.recv(
+                            offset + msg_len - len(response_data)
+                    )
+                ci_output.ParseFromString(response_data[offset : offset + msg_len])
+                self.send_ci_input(ci_output.tracker_wrapper_packet)
+                #print(ci_output)
+                offset += msg_len
 
             #print(ci_input)
 
@@ -620,7 +632,7 @@ class TigersAutoref(object):
         response_data = self.gamecontroller.ci_socket.recv(
             Gamecontroller.CI_MODE_OUTPUT_RECEIVE_BUFFER_SIZE
         )
-        print(response_data)
+        #print(response_data)
 
         msg_len, new_pos = decoder._DecodeVarint32(response_data, 0)
         ci_output = CiOutput()
@@ -630,16 +642,18 @@ class TigersAutoref(object):
 
 
     def startAutoref(self):
+        #pdb.set_trace()
         print(os.getcwd())
         os.chdir("/opt/tbotspython/autoReferee/")
         print(os.getcwd())
-        autoref_cmd = "bin/./autoReferee -a"
+        autoref_cmd = "bin/./autoReferee -a -hl"
 
         if self.ci_mode:
             autoref_cmd += " -ci"
 
         #pdb.set_trace()
         #self.tigers_autoref_proc = Popen(autoref_cmd.split(" "))
+        time.sleep(1)
 
     def setup_ssl_wrapper_packets(
         self, blue_fullsystem_proto_unix_io, yellow_fullsystem_proto_unix_io
@@ -652,18 +666,24 @@ class TigersAutoref(object):
             :param data: The referee command to send
 
             """
+            print(data)
             blue_fullsystem_proto_unix_io.send_proto(Referee, data)
             yellow_fullsystem_proto_unix_io.send_proto(Referee, data)
 
+        def __get_autoref_ci_output(data):
+            print(data)
         
         #pdb.set_trace()
         blue_fullsystem_proto_unix_io.register_observer(SSL_WrapperPacket, self.wrapper_buffer)
         self.ci_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.ci_socket.connect(("", 10013))
 
-        self.autoref_sender = SSL_AutoRefCiInputProtoSender(SSL_VISION_ADDRESS, 10013, True)
+        #self.autoref_sender = SSL_AutoRefCiInputProtoSender("127.0.0.1", 10013, False)
+        #self.autoref_receiver = SSL_AutoRefCiOutputProtoListener(
+        #        "127.0.0.1", 10013, __get_autoref_ci_output, False,
+        #)
         self.receive_referee_command = SSLRefereeProtoListener(
-            Gamecontroller.REFEREE_IP, 40001, __send_referee_command, True,
+            Gamecontroller.REFEREE_IP, self.gamecontroller.ci_port, __send_referee_command, False,
         )
 
 
