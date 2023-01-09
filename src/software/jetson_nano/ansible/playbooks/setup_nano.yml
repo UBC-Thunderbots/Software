@@ -157,7 +157,6 @@
           with_items:
             # bazel makes its own zip files, we append another zip to deconflict
             - ../../display/robot_ui_zip.zip
-            - ../../broadcasts/robot_broadcast_sender_zip.zip
             - ../../thunderloop_main
           loop_control:
             loop_var: binary_path
@@ -193,7 +192,7 @@
           with_items:
             - thunderbots
             - thunderloop
-            - wifi_announcement
+            - display
           loop_control:
             loop_var: service_name
           ansible.builtin.systemd:

@@ -5,9 +5,6 @@ from ansible.executor.playbook_executor import PlaybookExecutor
 from ansible.parsing.dataloader import DataLoader
 from ansible.inventory.manager import InventoryManager
 from ansible.vars.manager import VariableManager
-from software.jetson_nano.broadcasts.robot_broadcast_receiver import (
-    receive_announcements,
-)
 import os
 import argparse
 
@@ -16,7 +13,6 @@ import argparse
 
 HOST_GROUP = "THUNDERBOTS_HOSTS"
 NANO_USER = "robot"
-ANNOUNCEMENT_LISTEN_DURATION_S = 10
 
 # loads variables, inventory, and play into Ansible API, then runs it
 def ansible_runner(playbook: str, options: dict = {}):
@@ -32,19 +28,6 @@ def ansible_runner(playbook: str, options: dict = {}):
 
     hosts = set(options.get("hosts", []))
     host_aliases = hosts
-
-    if not hosts:
-        if not options["port"]:
-            print("Announcement Port not defined, exiting")
-            exit()
-
-        announcements = receive_announcements(
-            port=int(options["port"]), duration=ANNOUNCEMENT_LISTEN_DURATION_S
-        )
-        print(announcements)
-        hosts = {a.ip_addr for a in announcements}
-        host_aliases = {a.robot_id for a in announcements}
-
     num_forks = len(hosts)
 
     # bunch of arguments that Ansible accepts
@@ -112,8 +95,8 @@ def main():
         "--hosts",
         "-ho",
         nargs="*",
-        required=False,
-        help="space separated list of hosts to run on, defaults to using robot announcements",
+        required=True,
+        help="space separated list of hosts to run on",
         default=[],
     )
 
@@ -140,14 +123,6 @@ def main():
         required=False,
         help="space separated list of variables to set in the form key=value",
         default=[],
-    )
-
-    ap.add_argument(
-        "--port",
-        "-p",
-        required=False,
-        help="port to listen to Announcement scripts on",
-        default=0,
     )
 
     args = vars(ap.parse_args())

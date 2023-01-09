@@ -5,14 +5,13 @@
   vars:
     all_services:
       - thunderloop
-      - wifi_announcement
+      - display
     all_actions:
       - stop
       - sync
       - start
     binary_paths:
       thunderloop: ../../thunderloop_main
-      wifi_announcement: ../../broadcasts/robot_broadcast_sender_zip.zip
       display: ../../display/robot_ui_zip.zip
 
   tasks:
@@ -87,14 +86,3 @@
             loop_var: service_name
           when: "'start' in actions"
           tags: always
-
-      # Rescue section only runs if any task in this block fails
-      rescue:
-        - name: Error Recovery - Ensure Announcement Services are Running
-          become: true
-          become_method: sudo
-          ansible.builtin.systemd:
-            name: wifi_announcement
-            masked: no
-            daemon_reload: yes
-            state: started
