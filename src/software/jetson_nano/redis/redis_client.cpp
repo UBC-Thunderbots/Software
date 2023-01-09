@@ -52,12 +52,14 @@ std::string RedisClient::getSync(const std::string &key)
     return future.get().as_string();
 }
 
-void RedisClient::getAsyncNoCommit(const std::string &key, const cpp_redis::reply_callback_t &reply_callback)
+void RedisClient::getAsyncNoCommit(const std::string &key,
+                                   const cpp_redis::reply_callback_t &reply_callback)
 {
     client_.get(key, reply_callback);
 }
 
-void RedisClient::getAsync(const std::string &key, const cpp_redis::reply_callback_t &reply_callback)
+void RedisClient::getAsync(const std::string &key,
+                           const cpp_redis::reply_callback_t &reply_callback)
 {
     client_.get(key, reply_callback);
     asyncCommit();

@@ -30,22 +30,27 @@ class RedisClient
     std::string getSync(const std::string &key);
 
     /**
-     * Gets the value corresponding to the key, non blocking - executes the callback once a reply is received.
+     * Gets the value corresponding to the key, non blocking - executes the callback once
+     * a reply is received.
      *
      * @param key
      * @param reply_callback callback function once the value is obtained
      */
-    void getAsync(const std::string &key, const cpp_redis::reply_callback_t &reply_callback);
+    void getAsync(const std::string &key,
+                  const cpp_redis::reply_callback_t &reply_callback);
 
     /**
-     * Gets the value corresponding to the key, asynchronously but doesn't commit it. Must manually call asyncCommit() to commit it to the REDIS server.
+     * Gets the value corresponding to the key, asynchronously but doesn't commit it. Must
+     * manually call asyncCommit() to commit it to the REDIS server.
      *
-     * Allows us to batch call a number of GET/SET requests to the REDIS server with one network request.
+     * Allows us to batch call a number of GET/SET requests to the REDIS server with one
+     * network request.
      *
      * @param key
      * @param reply_callback callback function once the value is obtained
      */
-    void getAsyncNoCommit(const std::string &key, const cpp_redis::reply_callback_t &reply_callback);
+    void getAsyncNoCommit(const std::string &key,
+                          const cpp_redis::reply_callback_t &reply_callback);
 
     /**
      * Sets a key value pair in the redis database asynchronously
@@ -64,9 +69,11 @@ class RedisClient
     void setSync(const std::string &key, const std::string &value);
 
     /**
-     * Sets a key value pair in the redis database but does not commit it. Waits for the next commit() to send it to the REDIS server.
+     * Sets a key value pair in the redis database but does not commit it. Waits for the
+     * next commit() to send it to the REDIS server.
      *
-     * Allows us to batch call a number of GET/SET requests to the REDIS server with one network request.
+     * Allows us to batch call a number of GET/SET requests to the REDIS server with one
+     * network request.
      *
      * @param key   key for key-value pair
      * @param value value to set to key-value pair

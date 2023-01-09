@@ -31,7 +31,8 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, const int loop
       loop_hz_(loop_hz),
       kick_slope_(std::stoi(redis_client_->getSync(ROBOT_KICK_SLOPE_REDIS_KEY))),
       kick_constant_(std::stoi(redis_client_->getSync(ROBOT_KICK_CONSTANT_REDIS_KEY))),
-      chip_pulse_width_(std::stoi(redis_client_->getSync(ROBOT_CHIP_PULSE_WIDTH_REDIS_KEY)))
+      chip_pulse_width_(
+          std::stoi(redis_client_->getSync(ROBOT_CHIP_PULSE_WIDTH_REDIS_KEY)))
 {
     NetworkLoggerSingleton::initializeLogger(channel_id_, network_interface_, robot_id_);
     LOG(INFO)
@@ -217,9 +218,9 @@ void Thunderloop::runLoop()
 
             // Update Redis
             redis_client_->setNoCommit(ROBOT_BATTERY_VOLTAGE_REDIS_KEY,
-                               std::to_string(power_status_.battery_voltage()));
+                                       std::to_string(power_status_.battery_voltage()));
             redis_client_->setNoCommit(ROBOT_CURRENT_DRAW_REDIS_KEY,
-                               std::to_string(power_status_.current_draw()));
+                                       std::to_string(power_status_.current_draw()));
             redis_client_->asyncCommit();
         }
 
