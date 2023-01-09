@@ -108,7 +108,6 @@ class Thunderloop
     int chip_pulse_width_;
 
     // 500 millisecond timeout on receiving primitives before we stop the robots
->>>>>>> 69893f6e2b5cdc070551e34e95392929dc34442a
     const double PRIMITIVE_MANAGER_TIMEOUT_NS = 500.0 * NANOSECONDS_PER_MILLISECOND;
 
     // 500 millisecond timeout on receiving world before we stop the robots

@@ -153,26 +153,6 @@ void Thunderloop::runLoop()
             ScopedTimespecTimer::timespecDiff(&current_time, &last_world_recieved_time,
                                               &world_result);
 
-            auto nanoseconds_elapsed_since_last_world =
-                world_result.tv_sec * static_cast<int>(NANOSECONDS_PER_SECOND) +
-                world_result.tv_nsec;
-
-            if (nanoseconds_elapsed_since_last_world >
-                static_cast<long>(WORLD_TIMEOUT_NS))
-            {
-                primitive_executor_.setStopPrimitive();
-
-                // Log milliseconds since last world received if we are timing out
-                int milliseconds_elapsed_since_last_world = static_cast<int>(
-                    static_cast<double>(world_result.tv_sec) * MILLISECONDS_PER_SECOND +
-                    static_cast<double>(world_result.tv_nsec) *
-                        MILLISECONDS_PER_NANOSECOND);
-
-                LOG(INFO) << "World timeout, overriding with StopPrimitive\n"
-                          << "Milliseconds since last world: "
-                          << milliseconds_elapsed_since_last_world;
-            }
-
             // Primitive Executor: run the last primitive if we have not timed out
             {
                 ScopedTimespecTimer timer(&poll_time);
