@@ -164,6 +164,7 @@ class Thunderscope(object):
         # from the blue or yellow team. We also would like to visualize the same
         # protobuf types on two separate widgets.
         #
+
         if load_blue:
             self.blue_full_system_proto_unix_io = (
                 ProtoUnixIO()
@@ -177,8 +178,17 @@ class Thunderscope(object):
                 else yellow_full_system_proto_unix_io
             )
 
-        if load_diagnostics:
-            self.robot_diagnostics_proto_unix_io = ProtoUnixIO()
+        # the proto unix io to which diagnostics protos should be sent to
+        # if one of the fullsystems is running, uses the same proto
+        # if not, initialises a new one
+        # only used if diagnostics is enabled
+        self.robot_diagnostics_proto_unix_io = (
+            self.blue_full_system_proto_unix_io
+            if load_blue
+            else self.yellow_full_system_proto_unix_io
+            if load_yellow
+            else ProtoUnixIO()
+        )
 
         self.simulator_proto_unix_io = (
             ProtoUnixIO()
@@ -342,11 +352,6 @@ class Thunderscope(object):
         if load_blue == load_yellow:
             # in AI vs AI mode, fullsystem tab should not have robot view
             load_fullsystem_robot_view = False
-        elif load_diagnostics:
-            # not AI vs AI mode, but
-            # if diagnostics is also being loaded, its tab will already have robot view
-            # so it does not need to be loaded on the fullsystem tab
-            load_fullsystem_robot_view = False
 
         if load_yellow:
             self.configure_full_system_layout(
@@ -484,15 +489,15 @@ class Thunderscope(object):
         log_dock = Dock("Logs")
         log_dock.addWidget(self.diagnostics_widgets["log_widget"])
 
-        self.diagnostics_widgets["robot_view"] = self.setup_robot_view(
-            proto_unix_io, True
-        )
-        robot_view_dock = Dock("RobotView")
-        robot_view_dock.addWidget(self.diagnostics_widgets["robot_view"])
-
-        self.toggle_robot_connection_signal = self.diagnostics_widgets[
-            "robot_view"
-        ].toggle_robot_connection_signal
+        if not load_fullsystem:
+            self.diagnostics_widgets["robot_view"] = self.setup_robot_view(
+                proto_unix_io, True
+            )
+            robot_view_dock = Dock("RobotView")
+            robot_view_dock.addWidget(self.diagnostics_widgets["robot_view"])
+            self.toggle_robot_connection_signal = self.diagnostics_widgets[
+                "robot_view"
+            ].toggle_robot_connection_signal
 
         self.diagnostics_widgets[
             "fullsystem_connect"
@@ -511,7 +516,8 @@ class Thunderscope(object):
         )
 
         self.robot_diagnostics_dock_area.addDock(log_dock)
-        dock_area.addDock(robot_view_dock, "above", log_dock)
+        if not load_fullsystem:
+            dock_area.addDock(robot_view_dock, "above", log_dock)
         self.robot_diagnostics_dock_area.addDock(drive_dock, "right", log_dock)
         self.robot_diagnostics_dock_area.addDock(chicker_dock, "below", drive_dock)
         self.robot_diagnostics_dock_area.addDock(

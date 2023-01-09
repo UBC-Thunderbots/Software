@@ -2,8 +2,20 @@ from software.py_constants import *
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.python_bindings import *
 from proto.import_all_protos import *
+from enum import Enum
 import threading
 import time
+
+
+class RobotCommunicationMode(Enum):
+    """
+    Enum for the 3 different modes robot communications can run in + 1 default mode as a null value
+    """
+
+    FULLSYSTEM = 1
+    DIAGNOSTICS = 2
+    BOTH = 3
+    NONE = 4
 
 
 class RobotCommunication(object):
@@ -12,8 +24,8 @@ class RobotCommunication(object):
 
     def __init__(
         self,
-        full_system_proto_unix_io,
-        diagnostics_proto_unix_io,
+        current_proto_unix_io,
+        current_mode,
         multicast_channel,
         interface,
         estop_path="/dev/ttyACM0",
@@ -21,8 +33,8 @@ class RobotCommunication(object):
     ):
         """Initialize the communication with the robots
 
-        :param full_system_proto_unix_io: full_system_proto_unix_io object
-        :param diagnostics_proto_unix_io: proto_unix_io object for diagnostics input
+        :param current_proto_unix_io: the current proto unix io object
+        :param current_mode: one of RobotCommunicationMode, indicates which mode is currently running
         :param multicast_channel: The multicast channel to use
         :param interface: The interface to use
         :param estop_path: The path to the estop
@@ -31,12 +43,12 @@ class RobotCommunication(object):
         """
         self.sequence_number = 0
         self.last_time = time.time()
-        self.full_system_proto_unix_io = full_system_proto_unix_io
-        self.diagnostics_proto_unix_io = diagnostics_proto_unix_io
+        self.current_proto_unix_io = current_proto_unix_io
         self.multicast_channel = str(multicast_channel)
         self.interface = interface
         self.estop_path = estop_path
         self.estop_buadrate = estop_buadrate
+        self.current_mode = current_mode
 
         self.robots_connected_to_diagnostics = set()
 
@@ -46,43 +58,35 @@ class RobotCommunication(object):
         self.motor_control_diagnostics_buffer = ThreadSafeBuffer(1, MotorControl)
         self.power_control_diagnostics_buffer = ThreadSafeBuffer(1, PowerControl)
 
-        self.full_system_running = False
-        self.diagnostics_running = False
+        self.current_proto_unix_io.register_observer(World, self.world_buffer)
 
-        if self.full_system_proto_unix_io:
-            self.full_system_running = True
-            self.full_system_proto_unix_io.register_observer(World, self.world_buffer)
+        self.current_proto_unix_io.register_observer(
+            PrimitiveSet, self.primitive_buffer
+        )
 
-            self.full_system_proto_unix_io.register_observer(
-                PrimitiveSet, self.primitive_buffer
-            )
-
-        if self.diagnostics_proto_unix_io:
-            self.diagnostics_running = True
-            self.diagnostics_proto_unix_io.register_observer(
-                MotorControl, self.motor_control_diagnostics_buffer
-            )
-            self.diagnostics_proto_unix_io.register_observer(
-                PowerControl, self.power_control_diagnostics_buffer
-            )
+        self.current_proto_unix_io.register_observer(
+            MotorControl, self.motor_control_diagnostics_buffer
+        )
+        self.current_proto_unix_io.register_observer(
+            PowerControl, self.power_control_diagnostics_buffer
+        )
 
         self.send_estop_state_thread = threading.Thread(target=self.__send_estop_state)
         self.run_thread = threading.Thread(target=self.run)
 
-        # try:
-        #     self.estop_reader = ThreadedEstopReader(
-        #         self.estop_path, self.estop_buadrate
-        #     )
-        # except Exception:
-        #     raise Exception("Could not find estop, make sure its plugged in")
+        try:
+            self.estop_reader = ThreadedEstopReader(
+                self.estop_path, self.estop_buadrate
+            )
+        except Exception:
+            raise Exception("Could not find estop, make sure its plugged in")
 
     def __send_estop_state(self):
-        print("yea")
-        # while True:
-        #     self.full_system_proto_unix_io.send_proto(
-        #         EstopState, EstopState(is_playing=self.estop_reader.isEstopPlay())
-        #     )
-        #     time.sleep(0.1)
+        while True:
+            self.current_proto_unix_io.send_proto(
+                EstopState, EstopState(is_playing=self.estop_reader.isEstopPlay())
+            )
+            time.sleep(0.1)
 
     def run(self):
         """Forward World and PrimitiveSet protos from fullsystem to the robots.
@@ -102,7 +106,10 @@ class RobotCommunication(object):
             robot_primitives = dict()
 
             # fullsystem is running, so world data is being received
-            if self.full_system_running:
+            if (
+                self.current_mode == RobotCommunicationMode.FULLSYSTEM
+                or self.current_mode == RobotCommunicationMode.BOTH
+            ):
                 # Get the world
                 world = self.world_buffer.get(block=True)
 
@@ -119,7 +126,10 @@ class RobotCommunication(object):
                 robot_primitives = primitive_set
 
             # diagnostics is running
-            if self.diagnostics_running:
+            if (
+                self.current_mode == RobotCommunicationMode.DIAGNOSTICS
+                or self.current_mode == RobotCommunicationMode.BOTH
+            ):
 
                 # get the manual control primitive
                 diagnostics_primitive = DirectControlPrimitive(
@@ -147,8 +157,7 @@ class RobotCommunication(object):
 
             self.sequence_number += 1
 
-            if True:
-                # if self.estop_reader.isEstopPlay():
+            if self.estop_reader.isEstopPlay():
                 self.last_time = primitive_set.time_sent.epoch_timestamp_seconds
                 self.send_primitive_set.send_proto(primitive_set)
 
@@ -184,25 +193,29 @@ class RobotCommunication(object):
         self.receive_robot_status = RobotStatusProtoListener(
             self.multicast_channel + "%" + self.interface,
             ROBOT_STATUS_PORT,
-            lambda data: self.full_system_proto_unix_io.send_proto(RobotStatus, data),
+            lambda data: self.current_proto_unix_io.send_proto(RobotStatus, data),
             True,
         )
 
         self.receive_robot_log = RobotLogProtoListener(
             self.multicast_channel + "%" + self.interface,
             ROBOT_LOGS_PORT,
-            lambda data: self.full_system_proto_unix_io.send_proto(RobotLog, data),
+            lambda data: self.current_proto_unix_io.send_proto(RobotLog, data),
             True,
         )
 
-        self.receive_ssl_wrapper = SSLWrapperPacketProtoListener(
-            SSL_VISION_ADDRESS,
-            SSL_VISION_PORT,
-            lambda data: self.full_system_proto_unix_io.send_proto(
-                SSL_WrapperPacket, data
-            ),
-            True,
-        )
+        if (
+            self.current_mode == RobotCommunicationMode.FULLSYSTEM
+            or self.current_mode == RobotCommunicationMode.BOTH
+        ):
+            self.receive_ssl_wrapper = SSLWrapperPacketProtoListener(
+                SSL_VISION_ADDRESS,
+                SSL_VISION_PORT,
+                lambda data: self.current_proto_unix_io.send_proto(
+                    SSL_WrapperPacket, data
+                ),
+                True,
+            )
 
         # Create multicast senders
         self.send_primitive_set = PrimitiveSetProtoSender(
@@ -212,10 +225,6 @@ class RobotCommunication(object):
         self.send_world = WorldProtoSender(
             self.multicast_channel + "%" + self.interface, VISION_PORT, True
         )
-
-        # TODO (#2741): we might not want to support robot diagnostics in tscope
-        # make a ticket here to create a widget to call these functions to detach
-        # from AI and connect to robots/or remove
 
         self.send_estop_state_thread.start()
         self.run_thread.start()
