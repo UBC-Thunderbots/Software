@@ -15,10 +15,8 @@ struct StopFSM
 
     /**
      * Constructor for StopFSM struct
-     *
-     * @param coast whether or not the StopFSM should coast
      */
-    explicit StopFSM(bool coast) : coast(coast) {}
+    explicit StopFSM() {}
 
     /**
      * Action to set the StopPrimitive
@@ -52,8 +50,4 @@ struct StopFSM
             X + Update_E[!stopDone_G] / updateStop_A            = StopState_S,
             X + Update_E[stopDone_G] / updateStop_A             = X);
     }
-
-   private:
-    // Whether or not the robot should coast to a stop
-    bool coast;
 };
