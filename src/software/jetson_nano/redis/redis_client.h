@@ -27,15 +27,33 @@ class RedisClient
      * @param key
      * @return the value
      */
-    std::string get(const std::string &key);
+    std::string getSync(const std::string &key);
 
     /**
-     * Sets a key value pair in the redis database
+     * Gets the value corresponding to the key, non blocking - executes the callback once a reply is received.
+     *
+     * @param key
+     * @return the value
+     */
+    void getAsync(const std::string &key, const cpp_redis::reply_callback_t &reply_callback);
+
+    /**
+     * Sets a key value pair in the redis database asynchronously
      *
      * @param key
      * @param value
      */
-    void set(const std::string &key, const std::string &value);
+    void setAsync(const std::string &key, const std::string &value);
+
+    /**
+     * Gets the value corresponding to the key; blocking synchronously
+     *
+     * @param key
+     * @return the value
+     */
+    void setSync(const std::string &key, const std::string &value);
+
+
 
     /**
      * @return a map of all the key value pairs in redis server
