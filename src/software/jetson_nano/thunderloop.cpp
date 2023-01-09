@@ -34,15 +34,18 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, const int loop
       chip_pulse_width_(std::stoi(redis_client_->get(ROBOT_CHIP_PULSE_WIDTH_REDIS_KEY)))
 {
     NetworkLoggerSingleton::initializeLogger(channel_id_, network_interface_, robot_id_);
-    LOG(INFO) << "THUNDERLOOP: Network Logger initialized! Next initializing Network Service";
+    LOG(INFO)
+        << "THUNDERLOOP: Network Logger initialized! Next initializing Network Service";
 
     network_service_ = std::make_unique<NetworkService>(
         std::string(ROBOT_MULTICAST_CHANNELS.at(channel_id_)) + "%" + network_interface_,
         VISION_PORT, PRIMITIVE_PORT, ROBOT_STATUS_PORT, true);
-    LOG(INFO) << "THUNDERLOOP: Network Service initialized! Next initializing Motor Service"; 
+    LOG(INFO)
+        << "THUNDERLOOP: Network Service initialized! Next initializing Motor Service";
 
     motor_service_ = std::make_unique<MotorService>(robot_constants, loop_hz);
-    LOG(INFO) << "THUNDERLOOP: Motor Service initialized! Next initializing Power Service";
+    LOG(INFO)
+        << "THUNDERLOOP: Motor Service initialized! Next initializing Power Service";
 
     power_service_ = std::make_unique<PowerService>();
     LOG(INFO) << "THUNDERLOOP: Power Service initialized!";
