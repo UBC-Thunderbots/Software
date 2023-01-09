@@ -52,8 +52,7 @@ HRVOAgent::HRVOAgent(HRVOSimulator *simulator, const Vector &position,
       pref_speed_(max_speed_ * PREF_SPEED_SCALE),
       // TODO (#2676): This config should be dependency injected and updated when a
       // parameter is changed
-      obstacle_factory(TbotsProto::RobotNavigationObstacleConfig()),
-      ball_obstacle(std::nullopt)
+      obstacle_factory(TbotsProto::RobotNavigationObstacleConfig())
 {
 }
 
@@ -62,7 +61,7 @@ void HRVOAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive,
 {
     AgentPath path;
     static_obstacles.clear();
-    ball_obstacle = std::nullopt;
+    dynamic_obstacles.clear();
     if (new_primitive.has_move())
     {
         const auto &motion_control = new_primitive.move().motion_control();
@@ -77,29 +76,30 @@ void HRVOAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive,
             << "Empty path: " << motion_control.path().points().size() << std::endl;
         auto destination = motion_control.path().points().at(1);
 
-        // Max distance which the robot can travel in one time step + scaling
-        // TODO (#2370): This constant is calculated multiple times.
-        float path_radius = (max_speed_ * simulator_->getTimeStep()) / 2;
-        auto path_points  = {PathPoint(
-            Vector(destination.x_meters(), destination.y_meters()), speed_at_dest)};
-        path              = AgentPath(path_points, path_radius);
-
         // Update static obstacles
         std::set<TbotsProto::MotionConstraint> motion_constraints;
+        auto motion_constraint_enum_descriptor = TbotsProto::MotionConstraint_descriptor();
         for (int constraint_int : motion_control.motion_constraints())
         {
-            if (!TbotsProto::MotionConstraint_IsValid(constraint_int))
+            TbotsProto::MotionConstraint constraint;
+            auto enum_value_descriptor = motion_constraint_enum_descriptor->value(constraint_int);
+            bool parsed =
+                    TbotsProto::MotionConstraint_Parse(enum_value_descriptor->name(), &constraint);
+            if (!parsed)
             {
+                LOG(WARNING) << "HRVO: Failed to parse MotionConstraint enum value: "
+                             << enum_value_descriptor->name();
                 continue;
             }
 
-            const auto constraint =
-                static_cast<TbotsProto::MotionConstraint>(constraint_int);
             auto new_obstacles =
-                obstacle_factory.createFromMotionConstraint(constraint, world);
-            if (constraint == TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL)
+                    obstacle_factory.createFromMotionConstraint(constraint, world);
+            if (enum_value_descriptor->options().HasExtension(TbotsProto::dynamic) &&
+                enum_value_descriptor->options().GetExtension(TbotsProto::dynamic))
             {
-                ball_obstacle = new_obstacles[0];
+                dynamic_obstacles.insert(dynamic_obstacles.end(), new_obstacles.begin(),
+                                        new_obstacles.end());
+                break;
             }
             else
             {
@@ -107,6 +107,13 @@ void HRVOAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive,
                                         new_obstacles.end());
             }
         }
+
+        // Max distance which the robot can travel in one time step + scaling
+        // TODO (#2370): This constant is calculated multiple times.
+        float path_radius = (max_speed_ * simulator_->getTimeStep()) / 2;
+        auto path_points  = {PathPoint(
+                Vector(destination.x_meters(), destination.y_meters()), speed_at_dest)};
+        path              = AgentPath(path_points, path_radius);
     }
     setPath(path);
 }
@@ -146,33 +153,57 @@ void HRVOAgent::computeVelocityObstacles()
         velocity_obstacles_.push_back(velocity_obstacle);
     }
 
-    // Create Velocity Obstacles for nearby static obstacles
     Point agent_position_point(getPosition());
     Circle circle_rep_of_agent(agent_position_point, radius_);
-    Segment path(agent_position_point, Point(current_destination));
+    Segment path_segment(agent_position_point, Point(current_destination));
+
+    // TODO: Update comment
+    // The conditions for creating a velocity obstacle for the ball is different,
+    // since the ball is a dynamic obstacle (not considered by the path_segment planner)
+    // and `generateVelocityObstacle` can create valid velocity obstacles for agents
+    // contained in a circle.
+    for (const auto &obstacle : dynamic_obstacles)
+    {
+        double dist_agent_to_obstacle = obstacle->distance(agent_position_point);
+
+        // Set of heuristics to minimize the amount of velocity obstacles
+        bool add_velocity_obstacle = false;
+        if (obstacle->contains(agent_position_point))
+        {
+            add_velocity_obstacle = true;
+            // TODO: Will probably have to move this logic to be above the
+            //       static_obstacle loop since it updates the path_segment
+            // TODO: Add closestPoint to obstacles
+            Point new_destination = obstacle->closestPoint(agent_position_point);
+
+            float path_radius = (max_speed_ * simulator_->getTimeStep()) / 2;
+            auto path_points  = {PathPoint(Vector(new_destination.x(), new_destination.y()), 0)};
+            path              = AgentPath(path_points, path_radius);
+            setPath(path);
+        }
+        else if (obstacle->intersects(path_segment) ||
+                 dist_agent_to_obstacle < 2 * ROBOT_MAX_RADIUS_METERS)
+        {
+            add_velocity_obstacle = true;
+        }
+
+        if (add_velocity_obstacle)
+        {
+            VelocityObstacle velocity_obstacle =
+                    obstacle->generateVelocityObstacle(circle_rep_of_agent, Vector());
+            velocity_obstacles_.push_back(velocity_obstacle);
+        }
+    }
+
+    // Create Velocity Obstacles for nearby static obstacles
     for (const auto &obstacle : static_obstacles)
     {
         double dist_agent_to_obstacle = obstacle->distance(agent_position_point);
 
         // Set of heuristics to minimize the amount of velocity obstacles
-        if ((obstacle->intersects(path) ||
+        if ((obstacle->intersects(path_segment) ||
              dist_agent_to_obstacle < 2 * ROBOT_MAX_RADIUS_METERS) &&
             !obstacle->contains(agent_position_point))
-        {
-            VelocityObstacle velocity_obstacle =
-                obstacle->generateVelocityObstacle(circle_rep_of_agent, Vector());
-            velocity_obstacles_.push_back(velocity_obstacle);
-        }
-    }
-
-    // The conditions for creating a velocity obstacle for the ball are different,
-    // since the ball is a dynamic obstacle (not considered by the path planner)
-    // and `generateVelocityObstacle` can create valid velocity obstacles for agents
-    // contained in a circle.
-    if (ball_obstacle.has_value())
-    {
-        auto obstacle = ball_obstacle.value();
-        if (obstacle->intersects(path))
         {
             VelocityObstacle velocity_obstacle =
                 obstacle->generateVelocityObstacle(circle_rep_of_agent, Vector());

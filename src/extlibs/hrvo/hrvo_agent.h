@@ -238,7 +238,7 @@ class HRVOAgent : public Agent
     std::set<std::pair<float, std::size_t>> neighbors_;
     std::vector<VelocityObstacle> velocity_obstacles_;
     std::vector<ObstaclePtr> static_obstacles;
-    std::optional<ObstaclePtr> ball_obstacle;
+    std::vector<ObstaclePtr> dynamic_obstacles;
     RobotNavigationObstacleFactory obstacle_factory;
 
     // TODO (#2519): Remove magic numbers
