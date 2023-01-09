@@ -52,22 +52,41 @@ std::string RedisClient::getSync(const std::string &key)
     return future.get().as_string();
 }
 
+void RedisClient::getAsyncNoCommit(const std::string &key, const cpp_redis::reply_callback_t &reply_callback)
+{
+    client_.get(key, reply_callback);
+}
+
 void RedisClient::getAsync(const std::string &key, const cpp_redis::reply_callback_t &reply_callback)
 {
     client_.get(key, reply_callback);
-    client_.commit();
+    asyncCommit();
 }
 
 void RedisClient::setAsync(const std::string &key, const std::string &value)
 {
     client_.set(key, value);
-    client_.commit();
+    asyncCommit();
 }
 
 void RedisClient::setSync(const std::string &key, const std::string &value)
 {
-    client_.cluster_getkeysinslot()
     client_.set(key, value);
+    syncCommit();
+}
+
+void RedisClient::setNoCommit(const std::string &key, const std::string &value)
+{
+    client_.set(key, value);
+}
+
+void RedisClient::asyncCommit()
+{
+    client_.commit();
+}
+
+void RedisClient::syncCommit()
+{
     client_.sync_commit();
 }
 
