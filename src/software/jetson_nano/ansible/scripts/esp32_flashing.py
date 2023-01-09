@@ -4,8 +4,8 @@ import argparse
 
 
 class FlashingESP32:
-    PICO_BOOT_PIN = 11
-    PICO_RESET_PIN = 18
+    PICO_BOOT_PIN = 15
+    PICO_RESET_PIN = 13
 
     DELAY = 50 / 1000  # 50 MS
 

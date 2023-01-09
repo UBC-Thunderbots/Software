@@ -3,6 +3,9 @@ package(default_visibility = ["//visibility:public"])
 py_binary(
     name = "robot_ui",
     srcs = ["robot_ui.py"],
+    data = [
+        "//software:py_constants.so",
+    ],
     deps = [
         "//software/jetson_nano/display/lcd_user_interface",
         "//software/jetson_nano/display/rotary_encoder",
