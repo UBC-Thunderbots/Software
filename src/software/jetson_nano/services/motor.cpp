@@ -905,9 +905,9 @@ void MotorService::startDriver(uint8_t motor)
                              current_drive_conf & (~TMC6100_DRVSTRENGTH_MASK));
     writeToDriverOrDieTrying(motor, TMC6100_GCONF, 0x40);
 
-   // All default but updated SHORTFILTER to 2us to avoid false positive shorts
+    // All default but updated SHORTFILTER to 2us to avoid false positive shorts
     // detection.
-    writeToDriverOrDieTrying(motor, TMC6100_SHORT_CONF, 0x13020606); 
+    writeToDriverOrDieTrying(motor, TMC6100_SHORT_CONF, 0x13020606);
 
     LOG(DEBUG) << "Driver " << std::to_string(motor) << " accepted conf";
 }
