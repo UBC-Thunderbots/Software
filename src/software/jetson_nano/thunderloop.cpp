@@ -28,16 +28,24 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, const int loop
       robot_id_(std::stoi(redis_client_->get(ROBOT_ID_REDIS_KEY))),
       channel_id_(std::stoi(redis_client_->get(ROBOT_MULTICAST_CHANNEL_REDIS_KEY))),
       network_interface_(redis_client_->get(ROBOT_NETWORK_INTERFACE_REDIS_KEY)),
-      loop_hz_(loop_hz)
+      loop_hz_(loop_hz),
+      kick_slope_(std::stoi(redis_client_->get(ROBOT_KICK_SLOPE_REDIS_KEY))),
+      kick_constant_(std::stoi(redis_client_->get(ROBOT_KICK_CONSTANT_REDIS_KEY))),
+      chip_pulse_width_(std::stoi(redis_client_->get(ROBOT_CHIP_PULSE_WIDTH_REDIS_KEY)))
 {
     NetworkLoggerSingleton::initializeLogger(channel_id_, network_interface_, robot_id_);
+    LOG(INFO) << "THUNDERLOOP: Network Logger initialized! Next initializing Network Service";
 
     network_service_ = std::make_unique<NetworkService>(
         std::string(ROBOT_MULTICAST_CHANNELS.at(channel_id_)) + "%" + network_interface_,
         VISION_PORT, PRIMITIVE_PORT, ROBOT_STATUS_PORT, true);
+    LOG(INFO) << "THUNDERLOOP: Network Service initialized! Next initializing Motor Service"; 
 
     motor_service_ = std::make_unique<MotorService>(robot_constants, loop_hz);
+    LOG(INFO) << "THUNDERLOOP: Motor Service initialized! Next initializing Power Service";
+
     power_service_ = std::make_unique<PowerService>();
+    LOG(INFO) << "THUNDERLOOP: Power Service initialized!";
 
     LOG(INFO) << "THUNDERLOOP: finished initialization with ROBOT ID: " << robot_id_
               << ", CHANNEL ID: " << channel_id_
@@ -180,16 +188,9 @@ void Thunderloop::runLoop()
             // Power Service: execute the power control command
             {
                 ScopedTimespecTimer timer(&poll_time);
-                auto kick_slope =
-                    std::stoi(redis_client_->get(ROBOT_KICK_SLOPE_REDIS_KEY));
-                auto kick_constant =
-                    std::stoi(redis_client_->get(ROBOT_KICK_CONSTANT_REDIS_KEY));
-                auto chip_pulse_width =
-                    std::stoi(redis_client_->get(ROBOT_CHIP_PULSE_WIDTH_REDIS_KEY));
-
                 power_status_ =
-                    power_service_->poll(direct_control_.power_control(), kick_slope,
-                                         kick_constant, chip_pulse_width);
+                    power_service_->poll(direct_control_.power_control(), kick_slope_,
+                                         kick_constant_, chip_pulse_width_);
             }
             thunderloop_status_.set_power_service_poll_time_ns(
                 static_cast<unsigned long>(poll_time.tv_nsec));
