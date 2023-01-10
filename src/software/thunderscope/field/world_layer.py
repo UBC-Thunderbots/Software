@@ -280,9 +280,21 @@ class WorldLayer(FieldLayer):
         :param field: The field proto to draw
 
         """
+        painter.setPen(pg.mkPen("grey", width=LINE_WIDTH))
+
+        # Draw Field Boundary
+        painter.drawRect(
+            QtCore.QRectF(
+                -(field.field_x_length / 2 + field.boundary_buffer_size) * MILLIMETERS_PER_METER,
+                (field.field_y_length / 2 + field.boundary_buffer_size) * MILLIMETERS_PER_METER,
+                (field.field_x_length + 2*field.boundary_buffer_size) * MILLIMETERS_PER_METER,
+                -(field.field_y_length + 2*field.boundary_buffer_size) * MILLIMETERS_PER_METER,
+            )
+        )
+
         painter.setPen(pg.mkPen("w", width=LINE_WIDTH))
 
-        # Draw Field Bounds
+        # Draw Playable Area
         painter.drawRect(
             QtCore.QRectF(
                 -(field.field_x_length / 2) * MILLIMETERS_PER_METER,
