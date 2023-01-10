@@ -317,7 +317,7 @@ TEST_F(SimulatedHRVOTest, test_start_in_local_minima)
     tactic->updateControlParams(destination, Angle::zero(), 0);
     setTactic(1, tactic);
 
-    std::vector<ValidationFunction> terminating_validation_functions = {};
+    std::vector<ValidationFunction> terminating_validation_functions     = {};
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
     runTest(field_type, ball_state, friendly_robots, enemy_robots,
@@ -372,18 +372,16 @@ TEST_F(SimulatedHRVOTest, test_robot_avoiding_ball_obstacle)
     setTactic(0, tactic, {TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL});
 
     std::vector<ValidationFunction> terminating_validation_functions = {
-         [destination, tactic](std::shared_ptr<World> world_ptr,
-                               ValidationCoroutine::push_type& yield) {
-             // Small rectangle around the destination point that the robot should be
-             // stationary within for 15 ticks
-              float threshold = 0.05f;
-              Rectangle expected_final_position(
-                 Point(destination.x() - threshold, destination.y() - threshold),
-                 Point(destination.x() + threshold, destination.y() + threshold));
-              robotStationaryInPolygon(0, expected_final_position, 15, world_ptr,
-              yield);
-         }
-    };
+        [destination, tactic](std::shared_ptr<World> world_ptr,
+                              ValidationCoroutine::push_type& yield) {
+            // Small rectangle around the destination point that the robot should be
+            // stationary within for 15 ticks
+            float threshold = 0.05f;
+            Rectangle expected_final_position(
+                Point(destination.x() - threshold, destination.y() - threshold),
+                Point(destination.x() + threshold, destination.y() + threshold));
+            robotStationaryInPolygon(0, expected_final_position, 15, world_ptr, yield);
+        }};
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
     runTest(field_type, ball_state, friendly_robots, enemy_robots,

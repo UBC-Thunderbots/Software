@@ -170,6 +170,7 @@ void ConvexPolygon::validateConvexPolygon() const
         {
             points_ss << point << ", ";
         }
-        throw std::invalid_argument("Points " + points_ss.str() + " does not make a convex polygon");
+        throw std::invalid_argument("Points " + points_ss.str() +
+                                    " does not make a convex polygon");
     }
 }
