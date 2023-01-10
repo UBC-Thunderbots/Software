@@ -343,13 +343,13 @@ void HRVOSimulator::visualize(unsigned int robot_id) const
             *createCircleProto(Circle(position, agent->getRadius()));
     }
 
-    // Visualize the ball obstacle
-    if (friendly_agent->dynamic_obstacles.has_value())
+    // Visualize non-robot dynamic obstacles
+    google::protobuf::RepeatedPtrField<TbotsProto::Obstacles> repeated_obstacle_proto;
+    for (const auto obstacle_ptr : friendly_agent->dynamic_obstacles)
     {
-        TbotsProto::Circle ball_circle =
-            friendly_agent->ball_obstacle.value()->createObstacleProto().circle()[0];
-        *(hrvo_visualization.add_robots()) = ball_circle;
+        *(repeated_obstacle_proto.Add()) = obstacle_ptr->createObstacleProto();
     }
+    *(hrvo_visualization.mutable_dynamic_obstacles()) = repeated_obstacle_proto;
 
     if (friendly_team_colour == TeamColour::YELLOW)
     {

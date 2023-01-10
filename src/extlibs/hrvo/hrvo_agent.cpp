@@ -54,6 +54,9 @@ HRVOAgent::HRVOAgent(HRVOSimulator *simulator, const Vector &position,
       // parameter is changed
       obstacle_factory(TbotsProto::RobotNavigationObstacleConfig())
 {
+    auto obstacle_factory_config = TbotsProto::RobotNavigationObstacleConfig();
+    obstacle_factory_config.set_robot_obstacle_inflation_factor(0.5);
+    obstacle_factory = RobotNavigationObstacleFactory(obstacle_factory_config);
 }
 
 void HRVOAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive,
@@ -76,7 +79,7 @@ void HRVOAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive,
             << "Empty path: " << motion_control.path().points().size() << std::endl;
         auto destination = motion_control.path().points().at(1);
 
-        // Update static obstacles
+        // Update non-robot obstacles
         std::set<TbotsProto::MotionConstraint> motion_constraints;
         auto motion_constraint_enum_descriptor = TbotsProto::MotionConstraint_descriptor();
         for (int constraint_int : motion_control.motion_constraints())
@@ -106,6 +109,12 @@ void HRVOAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive,
                 static_obstacles.insert(static_obstacles.end(), new_obstacles.begin(),
                                         new_obstacles.end());
             }
+        }
+
+        if (new_primitive.move().ball_collision_type() == TbotsProto::BallCollisionType::AVOID)
+        {
+            auto ball_obstacle = obstacle_factory.createFromBallPosition(world.ball().position());
+            dynamic_obstacles.push_back(ball_obstacle);
         }
 
         // Max distance which the robot can travel in one time step + scaling
@@ -139,10 +148,11 @@ void HRVOAgent::computeVelocityObstacles()
     }
 
     // Only consider agents within this distance away from our position
-    auto current_destination = current_path_point_opt.value().getPosition();
+    Point agent_position_point(getPosition());
+    Point current_destination = Point(current_path_point_opt.value().getPosition());
     double dist_to_obstacle_threshold =
         std::min(static_cast<double>(max_neighbor_dist),
-                 (getPosition() - current_destination).length());
+                 (agent_position_point - current_destination).length());
 
     // Create Velocity Obstacles for neighboring agents
     computeNeighbors(dist_to_obstacle_threshold);
@@ -153,41 +163,27 @@ void HRVOAgent::computeVelocityObstacles()
         velocity_obstacles_.push_back(velocity_obstacle);
     }
 
-    Point agent_position_point(getPosition());
     Circle circle_rep_of_agent(agent_position_point, radius_);
-    Segment path_segment(agent_position_point, Point(current_destination));
+    Segment path_segment(agent_position_point, current_destination);
 
-    // TODO: Update comment
-    // The conditions for creating a velocity obstacle for the ball is different,
-    // since the ball is a dynamic obstacle (not considered by the path_segment planner)
-    // and `generateVelocityObstacle` can create valid velocity obstacles for agents
-    // contained in a circle.
+    // Set of heuristics to minimize the amount of velocity obstacles
     for (const auto &obstacle : dynamic_obstacles)
     {
-        double dist_agent_to_obstacle = obstacle->distance(agent_position_point);
-
-        // Set of heuristics to minimize the amount of velocity obstacles
-        bool add_velocity_obstacle = false;
-        if (obstacle->contains(agent_position_point))
+        if (obstacle->contains(current_destination))
         {
-            add_velocity_obstacle = true;
-            // TODO: Will probably have to move this logic to be above the
-            //       static_obstacle loop since it updates the path_segment
-            // TODO: Add closestPoint to obstacles
-            Point new_destination = obstacle->closestPoint(agent_position_point);
-
+            // Move the destination out of the obstacle
+            Point new_destination = obstacle->closestPoint(current_destination);
             float path_radius = (max_speed_ * simulator_->getTimeStep()) / 2;
             auto path_points  = {PathPoint(Vector(new_destination.x(), new_destination.y()), 0)};
             path              = AgentPath(path_points, path_radius);
             setPath(path);
-        }
-        else if (obstacle->intersects(path_segment) ||
-                 dist_agent_to_obstacle < 2 * ROBOT_MAX_RADIUS_METERS)
-        {
-            add_velocity_obstacle = true;
+
+            path_segment = Segment(agent_position_point, new_destination);
         }
 
-        if (add_velocity_obstacle)
+        // Add obstacle if the current path goes through it, or if we're very close to it
+        if (obstacle->intersects(path_segment) ||
+                obstacle->distance(agent_position_point) < 2 * ROBOT_MAX_RADIUS_METERS)
         {
             VelocityObstacle velocity_obstacle =
                     obstacle->generateVelocityObstacle(circle_rep_of_agent, Vector());

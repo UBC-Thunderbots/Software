@@ -43,23 +43,6 @@ class ObstacleLayer(FieldLayer):
 
         painter.setPen(pg.mkPen(Colors.NAVIGATOR_OBSTACLE_COLOR))
 
-        for obstacles in obstacles_ptrs:
-            for obstacle in obstacles:
-                for polyobstacle in obstacle.polygon:
-                    polygon_points = [
-                        QtCore.QPoint(
-                            int(MILLIMETERS_PER_METER * point.x_meters),
-                            int(MILLIMETERS_PER_METER * point.y_meters),
-                        )
-                        for point in polyobstacle.points
-                    ]
-
-                    poly = QtGui.QPolygon(polygon_points)
-                    painter.drawPolygon(poly)
-
-                for circle_obstacle in obstacle.circle:
-                    painter.drawEllipse(
-                        self.createCircle(
-                            circle_obstacle.origin, circle_obstacle.radius
-                        )
-                    )
+        for obstacles_arr in obstacles_ptrs:
+            for obstacles in obstacles_arr:
+                self.drawObstacles(obstacles, painter)

@@ -2,6 +2,7 @@ syntax = 'proto3';
 
 import "proto/geometry.proto";
 import "proto/world.proto";
+import "proto/primitive.proto";
 
 package TbotsProto;
 
@@ -32,4 +33,5 @@ message HRVOVisualization
     uint32 robot_id                              = 1;
     repeated VelocityObstacle velocity_obstacles = 2;
     repeated Circle robots                       = 3;
+    repeated Obstacles dynamic_obstacles         = 4;
 }

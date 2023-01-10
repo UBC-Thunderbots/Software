@@ -1,6 +1,4 @@
 #include "software/geom/algorithms/closest_point.h"
-#include "software/geom/polygon.h"
-#include "software/geom/circle.h"
 
 Point closestPoint(const Point &p, const Line &l)
 {

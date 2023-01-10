@@ -2,6 +2,7 @@ import math
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtCore, QtGui
 from proto.geometry_pb2 import Point, Angle, Segment
+from proto.primitive_pb2 import Obstacles
 from software.py_constants import *
 
 
@@ -83,3 +84,28 @@ class FieldLayer(pg.GraphicsObject):
                 int(segment.end.y_meters * MILLIMETERS_PER_METER),
             )
         )
+
+    def drawObstacles(self, obstacles: Obstacles, painter):
+        """
+        Draw a segment
+        :param obstacles: Proto Obstacle representing a list of polygon and circle obstacles
+        :param painter: The painter object to draw robot with
+        """
+        for poly_obstacle in obstacles.polygon:
+            polygon_points = [
+                QtCore.QPoint(
+                    int(MILLIMETERS_PER_METER * point.x_meters),
+                    int(MILLIMETERS_PER_METER * point.y_meters),
+                )
+                for point in poly_obstacle.points
+            ]
+
+            poly = QtGui.QPolygon(polygon_points)
+            painter.drawPolygon(poly)
+
+        for circle_obstacle in obstacles.circle:
+            painter.drawEllipse(
+                self.createCircle(
+                    circle_obstacle.origin, circle_obstacle.radius
+                )
+            )

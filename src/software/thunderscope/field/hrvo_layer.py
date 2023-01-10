@@ -33,17 +33,17 @@ class HRVOLayer(FieldLayer):
 
         # Draw the HRVO velocity obstacles and agents
 
-        velocity_obstacle_msg = self.prev_message
+        hrvo_visualization_msg = self.prev_message
         while not self.hrvo_buffer.queue.empty():
             msg = self.hrvo_buffer.get(block=False)
             if msg.robot_id == self.robot_id:
-                velocity_obstacle_msg = msg
+                hrvo_visualization_msg = msg
 
-        self.prev_message = velocity_obstacle_msg
+        self.prev_message = hrvo_visualization_msg
 
         painter.setPen(pg.mkPen(Colors.NAVIGATOR_OBSTACLE_COLOR))
 
-        for velocity_obstacle in velocity_obstacle_msg.velocity_obstacles:
+        for velocity_obstacle in hrvo_visualization_msg.velocity_obstacles:
             polygon_points = [
                 QtCore.QPoint(
                     int(
@@ -92,7 +92,10 @@ class HRVOLayer(FieldLayer):
             velocity_obstacle_triangle = QtGui.QPolygon(polygon_points)
             painter.drawPolygon(velocity_obstacle_triangle)
 
-        for robot_circle in velocity_obstacle_msg.robots:
+        for robot_circle in hrvo_visualization_msg.robots:
             painter.drawEllipse(
                 self.createCircle(robot_circle.origin, robot_circle.radius)
             )
+
+        for obstacles in hrvo_visualization_msg.dynamic_obstacles:
+            self.drawObstacles(obstacles, painter)

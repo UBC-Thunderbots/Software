@@ -13,6 +13,7 @@
 #include "software/geom/algorithms/generate_velocity_obstacle.h"
 #include "software/geom/algorithms/intersects.h"
 #include "software/geom/algorithms/rasterize.h"
+#include "software/geom/algorithms/closest_point.h"
 #include "software/geom/point.h"
 #include "software/geom/segment.h"
 
@@ -40,6 +41,15 @@ class Obstacle
      * @return distance to point
      */
     virtual double distance(const Point& p) const = 0;
+
+    /**
+     * Gets the closest point on the obstacle to the given point
+     *
+     * @param point Point to find the closest point on the obstacle to
+     *
+     * @return closest point on the obstacle
+     */
+    virtual Point closestPoint(const Point& p) const = 0;
 
     /**
      * Determines whether the given Segment intersects this Obstacle
@@ -104,6 +114,7 @@ class GeomObstacle : public Obstacle
 
     bool contains(const Point& p) const override;
     double distance(const Point& p) const override;
+    Point closestPoint(const Point& p) const override;
     bool intersects(const Segment& segment) const override;
     TbotsProto::Obstacles createObstacleProto() const override;
     std::string toString(void) const override;
@@ -159,6 +170,12 @@ template <typename GEOM_TYPE>
 double GeomObstacle<GEOM_TYPE>::distance(const Point& p) const
 {
     return ::distance(geom_, p);
+}
+
+template <typename GEOM_TYPE>
+Point GeomObstacle<GEOM_TYPE>::closestPoint(const Point& p) const
+{
+    return ::closestPoint(geom_, p);
 }
 
 template <typename GEOM_TYPE>
