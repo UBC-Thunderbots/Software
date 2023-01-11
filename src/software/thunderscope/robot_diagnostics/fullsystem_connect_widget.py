@@ -26,11 +26,10 @@ class FullSystemConnectWidget(QWidget):
     # Signal to indicate if manual controls should be disabled based on boolean parameter
     toggle_controls_signal = pyqtSignal(bool)
 
-    def __init__(self, proto_unix_io, load_fullsystem):
+    def __init__(self, proto_unix_io):
         """
         Initialises a new Fullsystem Connect Widget to allow switching between Manual, XBox, and Fullsystem control
         :param proto_unix_io: The proto_unix_io object
-        :param load_fullsystem: Whether the fullsystem is being loaded currently
         """
 
         self.load_fullsystem = load_fullsystem
@@ -51,12 +50,6 @@ class FullSystemConnectWidget(QWidget):
 
         self.manual_control_button = self.connect_options[0]
         self.xbox_control_button = self.connect_options[1]
-
-        if self.load_fullsystem:
-            self.ai_control_button = self.connect_options[2]
-            self.ai_control_button.clicked.connect(
-                lambda: self.switch_control_mode(ControlMode.AI)
-            )
 
         self.manual_control_button.clicked.connect(
             lambda: self.switch_control_mode(ControlMode.MANUAL)

@@ -501,7 +501,7 @@ class Thunderscope(object):
 
         self.diagnostics_widgets[
             "fullsystem_connect"
-        ] = self.setup_fullsystem_connect_widget(proto_unix_io, load_fullsystem)
+        ] = self.setup_fullsystem_connect_widget(proto_unix_io)
         fullsystem_connect_dock = Dock("Fullsystem")
         fullsystem_connect_dock.addWidget(
             self.diagnostics_widgets["fullsystem_connect"]
@@ -713,17 +713,14 @@ class Thunderscope(object):
 
         return chicker_widget
 
-    def setup_fullsystem_connect_widget(self, proto_unix_io, load_fullsystem):
+    def setup_fullsystem_connect_widget(self, proto_unix_io):
         """
 
         :param proto_unix_io: The proto unix io object
-        :param load_fullsystem: boolean to indicate if fullsystem has also been loaded or not
         :returns the fullsystem connect widget
         """
 
-        fullsystem_connect_widget = FullSystemConnectWidget(
-            proto_unix_io, load_fullsystem
-        )
+        fullsystem_connect_widget = FullSystemConnectWidget(proto_unix_io)
 
         self.register_refresh_function(fullsystem_connect_widget.refresh)
 
