@@ -2,17 +2,16 @@ from pyqtgraph.Qt.QtCore import *
 from pyqtgraph.Qt.QtWidgets import *
 from software.py_constants import *
 import software.thunderscope.common.common_widgets as common_widgets
-from enum import Enum
+from enum import IntEnum
 
 
-class ControlMode(Enum):
+class ControlMode(IntEnum):
     """
     Enum for the 3 modes of control (Manual, XBox, and Fullsystem (AI))
     """
 
-    MANUAL = 1
-    XBOX = 2
-    AI = 3
+    MANUAL = 0
+    XBOX = 1
 
 
 class FullSystemConnectWidget(QWidget):
@@ -32,8 +31,6 @@ class FullSystemConnectWidget(QWidget):
         :param proto_unix_io: The proto_unix_io object
         """
 
-        self.load_fullsystem = load_fullsystem
-
         super(FullSystemConnectWidget, self).__init__()
 
         vbox_layout = QVBoxLayout()
@@ -41,15 +38,12 @@ class FullSystemConnectWidget(QWidget):
 
         radio_button_names = ["Manual Control", "XBox Control"]
 
-        if self.load_fullsystem:
-            radio_button_names.append("AI Control")
-
         self.connect_options_box, self.connect_options = common_widgets.create_radio(
             radio_button_names, self.connect_options_group
         )
 
-        self.manual_control_button = self.connect_options[0]
-        self.xbox_control_button = self.connect_options[1]
+        self.manual_control_button = self.connect_options[ControlMode.MANUAL]
+        self.xbox_control_button = self.connect_options[ControlMode.XBOX]
 
         self.manual_control_button.clicked.connect(
             lambda: self.switch_control_mode(ControlMode.MANUAL)
@@ -76,10 +70,7 @@ class FullSystemConnectWidget(QWidget):
         """
         self.control_mode = mode
 
-        if self.control_mode == ControlMode.XBOX or self.control_mode == ControlMode.AI:
-            self.toggle_controls_signal.emit(False)
-        else:
-            self.toggle_controls_signal.emit(True)
+        self.toggle_controls_signal.emit(self.control_mode == ControlMode.MANUAL)
 
     def refresh(self):
         pass
