@@ -12,11 +12,12 @@
  * Returns a TbotsProto::World proto given a World.
  *
  * @param world The world msg to extract the TbotsProto::World from
+ * @param sequence_number An optional sequence number for tracking the TbotsProto::World
  *
  * @return The unique_ptr to a TbotsProto::World proto containing the field, friendly
  * team, enemy team, ball, and the game state.
  */
-std::unique_ptr<TbotsProto::World> createWorld(const World& world);
+std::unique_ptr<TbotsProto::World> createWorld(const World& world, const uint64_t sequence_number = -1);
 
 /**
  * Returns a TbotsProto::Team proto given a Team.
