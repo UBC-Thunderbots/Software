@@ -161,18 +161,7 @@ class RobotCommunication(object):
                 self.last_time = primitive_set.time_sent.epoch_timestamp_seconds
                 self.send_primitive_set.send_proto(primitive_set)
 
-            time.sleep(0.001)
-
-    def connect_fullsystem_to_robots(self):
-        """ Connect the robots to fullsystem """
-
-        self.fullsystem_connected_to_robots = True
-        self.robots_connected_to_diagnostics = {1, 2, 3}
-
-    def disconnect_fullsystem_from_robots(self):
-        """ Disconnect the robots from fullsystem """
-
-        self.fullsystem_connected_to_robots = False
+            time.sleep(0.01)
 
     def toggle_robot_connection(self, robot_id):
         """
@@ -217,13 +206,13 @@ class RobotCommunication(object):
                 True,
             )
 
+            self.send_world = WorldProtoSender(
+                self.multicast_channel + "%" + self.interface, VISION_PORT, True
+            )
+
         # Create multicast senders
         self.send_primitive_set = PrimitiveSetProtoSender(
             self.multicast_channel + "%" + self.interface, PRIMITIVE_PORT, True
-        )
-
-        self.send_world = WorldProtoSender(
-            self.multicast_channel + "%" + self.interface, VISION_PORT, True
         )
 
         self.send_estop_state_thread.start()
