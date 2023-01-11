@@ -185,13 +185,14 @@ class ChickerWidget(QWidget):
         # sends proto
         self.proto_unix_io.send_proto(PowerControl, power_control)
 
-        # send empty proto
+        # send empty proto for kick or chip commands
         # this is due to a bug in robot_communication where if a new PowerControl message is not sent,
-        # the previous, cached message is resent to the robot repeatedly
+        # the previous, cached message is resent to the robot repeatedly which we don't want for kick/chip
         # so sending an empty message overwrites the cache and prevents spamming commands
         # if buffer is full, blocks execution until buffer has space
-        power_control = PowerControl()
-        self.proto_unix_io.send_proto(PowerControl, power_control, True)
+        if command == ChickerCommandMode.KICK or command == ChickerCommandMode.CHIP:
+            power_control = PowerControl()
+            self.proto_unix_io.send_proto(PowerControl, power_control, True)
 
     def change_button_state(self, button, enable):
         """Change button color and clickable state.
