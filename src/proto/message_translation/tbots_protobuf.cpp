@@ -1,7 +1,8 @@
 #include "proto/message_translation/tbots_protobuf.h"
 
 
-std::unique_ptr<TbotsProto::World> createWorld(const World& world, const uint64_t sequence_number)
+std::unique_ptr<TbotsProto::World> createWorld(const World& world,
+                                               const uint64_t sequence_number)
 {
     // create msg
     auto world_msg                        = std::make_unique<TbotsProto::World>();
@@ -11,7 +12,8 @@ std::unique_ptr<TbotsProto::World> createWorld(const World& world, const uint64_
     *(world_msg->mutable_enemy_team())    = *createTeam(world.enemyTeam());
     *(world_msg->mutable_ball())          = *createBall(world.ball());
     *(world_msg->mutable_game_state())    = *createGameState(world.gameState());
-    if (sequence_number != -1) {
+    if (sequence_number != -1)
+    {
         world_msg->set_sequence_number(sequence_number);
     }
 
