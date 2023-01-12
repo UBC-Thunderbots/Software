@@ -8,6 +8,7 @@
 
 #include "proto/geometry.pb.h"
 #include "proto/message_translation/tbots_geometry.h"
+#include "proto/message_translation/ssl_geometry.h"
 #include "proto/parameters.pb.h"
 #include "proto/robot_log_msg.pb.h"
 #include "proto/robot_status_msg.pb.h"
@@ -220,6 +221,8 @@ PYBIND11_MODULE(python_bindings, m)
     m.def("createCircleProto", &createCircleProto);
     m.def("createVectorProto", &createVectorProto);
     m.def("createSegmentProto", &createSegmentProto);
+
+    m.def("createGeometryData", &createGeometryData);
 
     m.def("contains", py::overload_cast<const Circle&, const Segment&>(&contains));
     m.def("contains", py::overload_cast<const Circle&, const Point&>(&contains));

@@ -10,6 +10,7 @@ import pdb
 
 from subprocess import Popen
 from software.python_bindings import *
+import software.python_bindings as tbots
 from proto.import_all_protos import *
 from software.py_constants import *
 from extlibs.er_force_sim.src.protobuf.world_pb2 import (
@@ -569,9 +570,39 @@ class TigersAutoref(object):
 
         return self
 
+    def sendGeometry(self):
+        ssl_wrapper = self.wrapper_buffer.get(block=True)
+        ci_input = AutoRefCiInput()
+        ci_input.detection.append(ssl_wrapper.detection)
+
+        field = tbots.Field.createSSLDivisionBField()  
+        ci_input.geometry.CopyFrom(createGeometryData(field, 0.3))
+
+        size = ci_input.ByteSize()
+
+        # Send a request to the host with the size of the message
+        self.ci_socket.send(
+            encoder._VarintBytes(size) + ci_input.SerializeToString()
+        )
+        response_data = self.ci_socket.recv(
+                Gamecontroller.CI_MODE_OUTPUT_RECEIVE_BUFFER_SIZE
+        )
+        pdb.set_trace()
+        msg_len, new_pos = decoder._DecodeVarint32(response_data, offset)
+        print(str(msg_len) + ", " + str(new_pos) + ", " + str(len(response_data)))
+        ci_output = AutoRefCiOutput()
+        if (msg_len > len(response_data)):
+            print("Must get additional data")
+            response_data += self.ci_socket.recv(
+                msg_len - len(response_data)
+            )
+        ci_output.ParseFromString(response_data[new_pos : new_pos + msg_len])
+        self.send_ci_input(ci_output.tracker_wrapper_packet)
+
     def sslWrappers(self):
         print("ssl enter")
         #pdb.set_trace()
+        self.sendGeometry();
         while True:
             ssl_wrapper = self.wrapper_buffer.get(block=True)
             ci_input = AutoRefCiInput()
