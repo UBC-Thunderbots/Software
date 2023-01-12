@@ -140,6 +140,8 @@ class ChickerWidget(QWidget):
         """
         if self.no_auto_selected:
             self.kick_chip_buttons_enable = True
+            power_control = PowerControl()
+            self.proto_unix_io.send_proto(PowerControl, power_control, True)
 
     def set_should_enable_buttons(self, enable):
         """
