@@ -32,6 +32,8 @@ std::shared_ptr<Tactic> createTactic(
     TbotsProto::AiConfig ai_config);
 std::shared_ptr<Tactic> createTactic(const TbotsProto::MoveTactic &tactic_proto,
                                      TbotsProto::AiConfig ai_config);
+std::shared_ptr<Tactic> createTactic(const TbotsProto::PassDefenderTactic &tactic_proto,
+                                     TbotsProto::AiConfig ai_config);
 std::shared_ptr<Tactic> createTactic(const TbotsProto::PenaltyKickTactic &tactic_proto,
                                      TbotsProto::AiConfig ai_config);
 std::shared_ptr<Tactic> createTactic(const TbotsProto::PivotKickTactic &tactic_proto,

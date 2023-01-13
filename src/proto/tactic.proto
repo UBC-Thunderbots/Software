@@ -29,6 +29,7 @@ message Tactic
         ReceiverTactic receiver                             = 12;
         ShadowEnemyTactic shadow_enemy                      = 13;
         StopTactic stop                                     = 14;
+        PassDefenderTactic pass_defender                    = 15;
     }
 }
 
@@ -125,6 +126,11 @@ message MoveTactic
     required MaxAllowedSpeedMode max_allowed_speed_mode = 7;
     // The target spin while moving in revolutions per second
     required double target_spin_rev_per_s = 8;
+}
+
+message PassDefenderTactic 
+{
+    required Point position_to_block = 1;
 }
 
 message PenaltyKickTactic {}
