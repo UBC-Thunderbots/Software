@@ -140,8 +140,10 @@ class ChickerWidget(QWidget):
         """
         if self.no_auto_selected:
             self.kick_chip_buttons_enable = True
-            power_control = PowerControl()
-            self.proto_unix_io.send_proto(PowerControl, power_control, True)
+
+            # clears the proto buffer when buttons are re-enabled
+            # just to start fresh and clear any unwanted protos
+            self.clear_proto_buffer()
 
     def set_should_enable_buttons(self, enable):
         """
@@ -187,14 +189,21 @@ class ChickerWidget(QWidget):
         # sends proto
         self.proto_unix_io.send_proto(PowerControl, power_control)
 
-        # send empty proto for kick or chip commands
-        # this is due to a bug in robot_communication where if a new PowerControl message is not sent,
-        # the previous, cached message is resent to the robot repeatedly which we don't want for kick/chip
-        # so sending an empty message overwrites the cache and prevents spamming commands
-        # if buffer is full, blocks execution until buffer has space
+        # clears the proto buffer for kick or chip commands
+        # so only one kick / chip is sent
         if command == ChickerCommandMode.KICK or command == ChickerCommandMode.CHIP:
-            power_control = PowerControl()
-            self.proto_unix_io.send_proto(PowerControl, power_control, True)
+            self.clear_proto_buffer()
+
+    def clear_proto_buffer(self):
+        """
+        Sends an empty proto to the proto unix io buffer
+        This is due to a bug in robot_communication where if a new PowerControl message is not sent,
+        The previous, cached message is resent to the robot repeatedly which we don't want for kick/chip
+        So sending an empty message overwrites the cache and prevents spamming commands
+        If buffer is full, blocks execution until buffer has space
+        """
+        power_control = PowerControl()
+        self.proto_unix_io.send_proto(PowerControl, power_control, True)
 
     def change_button_state(self, button, enable):
         """Change button color and clickable state.
