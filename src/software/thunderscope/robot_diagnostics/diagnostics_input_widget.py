@@ -7,7 +7,7 @@ from enum import IntEnum
 
 class ControlMode(IntEnum):
     """
-    Enum for the 3 modes of control (Manual, XBox, and Fullsystem (AI))
+    Enum for the 2 modes of control (Manual and XBox)
     """
 
     MANUAL = 0

@@ -51,7 +51,7 @@ from software.thunderscope.log.g3log_widget import g3logWidget
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.thunderscope.play.playinfo_widget import playInfoWidget
 from software.thunderscope.robot_diagnostics.chicker_widget import ChickerWidget
-from software.thunderscope.robot_diagnostics.fullsystem_connect_widget import (
+from software.thunderscope.robot_diagnostics.diagnostics_input_widget import (
     FullSystemConnectWidget,
 )
 from software.thunderscope.robot_diagnostics.drive_and_dribbler_widget import (
@@ -500,18 +500,18 @@ class Thunderscope(object):
             ].toggle_robot_connection_signal
 
         self.diagnostics_widgets[
-            "fullsystem_connect"
-        ] = self.setup_fullsystem_connect_widget(proto_unix_io)
-        fullsystem_connect_dock = Dock("Fullsystem")
-        fullsystem_connect_dock.addWidget(
-            self.diagnostics_widgets["fullsystem_connect"]
+            "diagnostics_input"
+        ] = self.setup_diagnostics_input_widget(proto_unix_io)
+        diagnostics_input_dock = Dock("Diagnostics_Input")
+        diagnostics_input_dock.addWidget(
+            self.diagnostics_widgets["diagnostics_input"]
         )
 
-        self.diagnostics_widgets["fullsystem_connect"].toggle_controls_signal.connect(
+        self.diagnostics_widgets["diagnostics_input"].toggle_controls_signal.connect(
             self.diagnostics_widgets["drive"].toggle_all
         )
 
-        self.diagnostics_widgets["fullsystem_connect"].toggle_controls_signal.connect(
+        self.diagnostics_widgets["diagnostics_input"].toggle_controls_signal.connect(
             self.diagnostics_widgets["chicker"].set_should_enable_buttons
         )
 
@@ -521,7 +521,7 @@ class Thunderscope(object):
         self.robot_diagnostics_dock_area.addDock(drive_dock, "right", log_dock)
         self.robot_diagnostics_dock_area.addDock(chicker_dock, "below", drive_dock)
         self.robot_diagnostics_dock_area.addDock(
-            fullsystem_connect_dock, "top", chicker_dock
+            diagnostics_input_dock, "top", chicker_dock
         )
 
         estop_view = self.setup_estop_view(proto_unix_io)
@@ -713,18 +713,18 @@ class Thunderscope(object):
 
         return chicker_widget
 
-    def setup_fullsystem_connect_widget(self, proto_unix_io):
+    def setup_diagnostics_input_widget(self, proto_unix_io):
         """
 
         :param proto_unix_io: The proto unix io object
         :returns the fullsystem connect widget
         """
 
-        fullsystem_connect_widget = FullSystemConnectWidget(proto_unix_io)
+        diagnostics_input_widget = FullSystemConnectWidget(proto_unix_io)
 
-        self.register_refresh_function(fullsystem_connect_widget.refresh)
+        self.register_refresh_function(diagnostics_input_widget.refresh)
 
-        return fullsystem_connect_widget
+        return diagnostics_input_widget
 
     def setup_drive_and_dribbler_widget(self, proto_unix_io):
         """Setup the drive and dribbler widget

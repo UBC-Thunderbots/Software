@@ -215,7 +215,6 @@ def disable_slider(slider):
         "}"
         "QSlider::handle"
         "{"
-        "background: grey;"
         "color: grey;"
         "border-radius: 5px;"
         "}"

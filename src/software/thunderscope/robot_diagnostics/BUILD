@@ -24,8 +24,8 @@ py_library(
 )
 
 py_library(
-    name = "fullsystem_connect_widget",
-    srcs = ["fullsystem_connect_widget.py"],
+    name = "diagnostics_input_widget",
+    srcs = ["diagnostics_input_widget.py"],
     deps = [
         "//software/thunderscope:constants",
         "//software/thunderscope:thread_safe_buffer",
