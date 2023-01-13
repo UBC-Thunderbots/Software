@@ -55,7 +55,7 @@ HRVOAgent::HRVOAgent(HRVOSimulator *simulator, const Vector &position,
       obstacle_factory(TbotsProto::RobotNavigationObstacleConfig())
 {
     auto obstacle_factory_config = TbotsProto::RobotNavigationObstacleConfig();
-    obstacle_factory_config.set_robot_obstacle_inflation_factor(0.5);
+    obstacle_factory_config.set_robot_obstacle_inflation_factor(1.0);
     obstacle_factory = RobotNavigationObstacleFactory(obstacle_factory_config);
 }
 
@@ -183,7 +183,7 @@ void HRVOAgent::computeVelocityObstacles()
 
         // Add obstacle if the current path goes through it, or if we're very close to it
         if (obstacle->intersects(path_segment) ||
-                obstacle->distance(agent_position_point) < 2 * ROBOT_MAX_RADIUS_METERS)
+                obstacle->distance(agent_position_point) < 4 * ROBOT_MAX_RADIUS_METERS)
         {
             VelocityObstacle velocity_obstacle =
                     obstacle->generateVelocityObstacle(circle_rep_of_agent, Vector());
