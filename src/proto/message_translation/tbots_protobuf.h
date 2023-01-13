@@ -18,7 +18,7 @@
  * team, enemy team, ball, and the game state.
  */
 std::unique_ptr<TbotsProto::World> createWorld(const World& world,
-                                               const uint64_t sequence_number = -1);
+                                               const uint64_t sequence_number = 0);
 
 /**
  * Returns a TbotsProto::Team proto given a Team.

@@ -43,7 +43,7 @@ float calculatePacketLossRate(std::queue<uint64_t> recent_proto_seq_nums,
 
     // seq_num + 1 is to account for the sequence numbers starting from 0
     uint64_t expected_proto_count =
-        std::min(seq_num + 1, static_cast<uint64_t>(RECENT_PACKET_LOSS_PERIOD));
+        std::min(seq_num, static_cast<uint64_t>(RECENT_PACKET_LOSS_PERIOD));
     uint64_t lost_proto_count = expected_proto_count - recent_proto_seq_nums.size();
     float packet_loss_rate =
         static_cast<float>(lost_proto_count) / static_cast<float>(expected_proto_count);
@@ -80,7 +80,7 @@ void NetworkService::primitiveSetCallback(TbotsProto::PrimitiveSet input)
     if (packet_loss_rate > PACKET_LOSS_WARNING_THRESHOLD)
     {
         LOG(WARNING) << "Primitive set packet loss in the past "
-                     << std::min(seq_num + 1,
+                     << std::min(seq_num,
                                  static_cast<uint64_t>(RECENT_PACKET_LOSS_PERIOD))
                      << " packets is more than " << PACKET_LOSS_WARNING_THRESHOLD * 100
                      << "% ";
@@ -113,7 +113,7 @@ void NetworkService::worldCallback(TbotsProto::World input)
     if (packet_loss_rate > PACKET_LOSS_WARNING_THRESHOLD)
     {
         LOG(WARNING) << "World loss in the past "
-                     << std::min(seq_num + 1,
+                     << std::min(seq_num,
                                  static_cast<uint64_t>(RECENT_PACKET_LOSS_PERIOD))
                      << " packets is more than " << PACKET_LOSS_WARNING_THRESHOLD * 100
                      << "% ";
