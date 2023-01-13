@@ -503,9 +503,7 @@ class Thunderscope(object):
             "diagnostics_input"
         ] = self.setup_diagnostics_input_widget(proto_unix_io)
         diagnostics_input_dock = Dock("Diagnostics_Input")
-        diagnostics_input_dock.addWidget(
-            self.diagnostics_widgets["diagnostics_input"]
-        )
+        diagnostics_input_dock.addWidget(self.diagnostics_widgets["diagnostics_input"])
 
         self.diagnostics_widgets["diagnostics_input"].toggle_controls_signal.connect(
             self.diagnostics_widgets["drive"].toggle_all
