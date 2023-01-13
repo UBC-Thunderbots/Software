@@ -50,5 +50,10 @@ class ConvexPolygon : public Polygon, public ConvexShape
      * @return true if the points of this polygon make up a Convex polygon, false
      * otherwise
      */
-    bool isConvex();
+    bool isConvex() const;
+
+    /**
+     * Validate that the given points form a convex polygon
+     */
+    void validateConvexPolygon() const;
 };
