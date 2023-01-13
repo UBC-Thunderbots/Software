@@ -40,11 +40,9 @@ std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
 /**
  * Create a Stop Move Primitive Message
  *
- * @param stop_type Indicate to brake or coast to a stop
- *
  * @return Pointer to Stop Primitive Message
  */
-std::unique_ptr<TbotsProto::Primitive> createStopPrimitive(bool coast);
+std::unique_ptr<TbotsProto::Primitive> createStopPrimitive();
 
 /**
  * Creates a new DirectControl Primitive AI could output this primitive to control the
@@ -60,14 +58,6 @@ std::unique_ptr<TbotsProto::Primitive> createDirectControlPrimitive(
     const Vector& velocity, AngularVelocity angular_velocity, double dribbler_rpm,
     const TbotsProto::AutoChipOrKick& auto_chip_or_kick);
 
-
-
-/**
- * Create a Estop Primitive Message
- *
- * @return Pointer to Stop Primitive Message
- */
-std::unique_ptr<TbotsProto::Primitive> createEstopPrimitive();
 
 /**
  * Convert dribbler mode to dribbler speed

@@ -15,23 +15,23 @@ class PrimitiveExecutor
      * @param robot_constants The robot constants for the robot which uses this primitive
      * executor
      * @param friendly_team_colour The colour of the friendly team
+     * @param robot_id The id of the robot which uses this primitive executor
      */
     explicit PrimitiveExecutor(const double time_step,
-                               const RobotConstants_t& robot_constants,
-                               const TeamColour friendly_team_colour);
+                               const RobotConstants_t &robot_constants,
+                               const TeamColour friendly_team_colour,
+                               const RobotId robot_id);
 
     /**
      * Update primitive executor with a new Primitive Set
-     * @param robot_id The id of the robot which is running this Primitive Executor
      * @param primitive_set_msg The primitive to start
      */
-    void updatePrimitiveSet(const unsigned int robot_id,
-                            const TbotsProto::PrimitiveSet& primitive_set_msg);
+    void updatePrimitiveSet(const TbotsProto::PrimitiveSet &primitive_set_msg);
 
     /**
-     * Clear the current primitive
-     **/
-    void clearCurrentPrimitive();
+     * Set the current primitive to the stop primitive
+     */
+    void setStopPrimitive();
 
     /**
      * Update primitive executor with a new World
@@ -39,39 +39,37 @@ class PrimitiveExecutor
      * perspective of the team which the robot with this Primitive Executor is a member
      * of)
      */
-    void updateWorld(const TbotsProto::World& world_msg);
+    void updateWorld(const TbotsProto::World &world_msg);
 
     /**
-     * Update primitive executor with the local velocity
+     * Update primitive executor with the current velocity of the robot
      *
-     * @param local_velocity The local velocity
+     * @param local_velocity The current _local_ velocity
+     * @param angular_velocity The current angular velocity
      */
-    void updateLocalVelocity(Vector local_velocity);
+    void updateVelocity(const Vector &local_velocity,
+                        const AngularVelocity &angular_velocity);
+
+    /**
+     * Set the robot id
+     * @param robot_id The id of the robot which uses this primitive executor
+     */
+    void setRobotId(RobotId robot_id);
 
     /**
      * Steps the current primitive and returns a direct control primitive with the
      * target wheel velocities
      *
-     * @param robot_id The id of the robot which is running this Primitive Executor
-     * @param curr_orientation The current orientation of the robot which is running this
-     * Primitive Executor
-     * @returns DirectPerWheelControl The per-wheel direct control primitive msg
+     * @returns DirectControlPrimitive The direct control primitive msg
      */
-    std::unique_ptr<TbotsProto::DirectControlPrimitive> stepPrimitive(
-        const unsigned int robot_id, const Angle& curr_orientation);
+    std::unique_ptr<TbotsProto::DirectControlPrimitive> stepPrimitive();
 
    private:
     /*
-     * Compute the next target linear velocity the robot should be at
-     * assuming max acceleration.
-     *
-     * @param robot_id The id of the robot which is running this Primitive Executor
-     * @param curr_orientation The current orientation of the robot which is running this
-     * Primitive Executor
-     * @returns Vector The target linear velocity
+     * Compute the next target linear _local_ velocity the robot should be at.
+     * @returns Vector The target linear _local_ velocity
      */
-    Vector getTargetLinearVelocity(const unsigned int robot_id,
-                                   const Angle& curr_orientation);
+    Vector getTargetLinearVelocity();
 
     /*
      * Compute the next target angular velocity the robot should be at
@@ -83,9 +81,12 @@ class PrimitiveExecutor
      * @returns AngularVelocity The target angular velocity
      */
     AngularVelocity getTargetAngularVelocity(
-        const TbotsProto::MovePrimitive& move_primitive, const Angle& curr_orientation);
+        const TbotsProto::MovePrimitive &move_primitive);
 
     TbotsProto::Primitive current_primitive_;
     RobotConstants_t robot_constants_;
     HRVOSimulator hrvo_simulator_;
+    double time_step_;
+    Angle curr_orientation_;
+    RobotId robot_id_;
 };
