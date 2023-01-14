@@ -18,7 +18,7 @@ from proto.ssl_gc_geometry_pb2 import Vector2
 
 
 def test_shoot_or_chip_play(simulated_test_runner):
-    def setup(arg):
+    def setup(*args):
         ball_initial_pos = tbots.Point(-1.4, 2)
         tbots.Vector(0, 0)
 
