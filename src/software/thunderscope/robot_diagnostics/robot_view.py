@@ -131,7 +131,10 @@ class RobotView(QWidget):
         # Draw the vision pattern
         # Draw the centre team color
         painter.setBrush(pg.mkBrush(team_colour))
-        painter.drawEllipse(QtCore.QPointF(radius, radius), radius / 4, radius / 4)
+        painter.drawEllipse(QtCore.QPointF(radius, radius), radius / 3, radius / 3)
+        painter.setPen(pg.mkPen("white"))
+        painter.drawText(QtCore.QPointF(radius - radius / 8, radius + radius / 4), str(id))
+        painter.setPen(pg.mkPen("black"))
 
         # Grab the colors for the vision pattern and setup the locations
         # for the four circles in the four corners
@@ -160,19 +163,84 @@ class RobotView(QWidget):
         """Refresh the view
         """
         # TODO (#2791): fix robot view refresh function
-        return
-        robot_status_buffer = self.robot_status_buffer.get(block=False)
+        # voltage
+        # error codes
+        # robot_status = self.robot_status_buffer.get(block=False)
+        # robot_status = RobotStatus(
+        #     robot_id=1,
+        #     error_code=NO_ERROR,
+        #     chipper_kicker_status=ChipperKickerStatus(
+        #         ms_since_chipper_fired=1,
+        #         ms_since_kicker_fired=1
+        #     ),
+        #     motor_status=MotorStatus(
+        #         front_left=DriveUnit(
+        #             wheel_velocity=1
+        #         ),
+        #         front_right=DriveUnit(
+        #             wheel_velocity=1
+        #         ),
+        #         back_left=DriveUnit(
+        #             wheel_velocity=1
+        #         ),
+        #         back_right=DriveUnit(
+        #             wheel_velocity=1
+        #         ),
+        #         dribbler=DribblerStatus(
+        #             dribbler_rpm=1,
+        #             dribbler_temperature=1
+        #         ),
+        #         local_velocity=Vector(
+        #             x_component_meters=1,
+        #             y_component_meters=1
+        #         )
+        #     ),
+        #     network_status=NetworkStatus(
+        #         ms_since_last_vision_received=1,
+        #         ms_since_last_primitive_received=1
+        #     ),
+        #     power_status=PowerStatus(
+        #         battery_voltage=10,
+        #         capacitor_voltage=10,
+        #         current_draw=2,
+        #         geneva_slot=2,
+        #         sequence_num=3,
+        #         breakbeam_tripped=True
+        #     ),
+        #     jetson_status=JetsonStatus(
+        #         cpu_temperature=1
+        #     ),
+        #     thunderloop_status=ThunderloopStatus(
+        #         network_service_poll_time_ns=1,
+        #         primitive_executor_start_time_ns=1,
+        #         primitive_executor_step_time_ns=1,
+        #         motor_service_poll_time_ns=1,
+        #         power_service_poll_time_ns=1,
+        #         iteration_time_ns=1
+        # ),
+        #     time_sent=Timestamp(
+        #         epoch_timestamp_seconds=3
+        #     ),
+        #     last_handled_primitive_set=4
+        # )
+
+        x = 0
         for i in range(MAX_ROBOT_IDS_PER_SIDE):
-            if breakbeam_status.ball_in_beam:
+            if x < 4:
                 self.breakbeam_labels[i].setText("In Beam")
                 self.breakbeam_labels[i].setStyleSheet("background-color: red")
             else:
                 self.breakbeam_labels[i].setText("Not in Beam")
                 self.breakbeam_labels[i].setStyleSheet("background-color: green")
 
-        power_status = self.power_status_buffer.get(block=False)
+        x = x + 1
+
+        power_status = robot_status.power_status
+
         for i in range(MAX_ROBOT_IDS_PER_SIDE):
             self.robot_battery_progress_bars[i].setValue(power_status.battery_voltage)
+
+            print(power_status.battery_voltage)
 
             if power_status.battery_voltage < BATTERY_WARNING_VOLTAGE:
                 msg = QMessageBox()
