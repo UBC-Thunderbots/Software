@@ -1,6 +1,6 @@
 /*
  * simulator.cpp
- * HRVO Library
+ * Hrvo Library
  *
  * Copyright 2009 University of North Carolina at Chapel Hill
  *
@@ -43,7 +43,7 @@
 #include "software/geom/algorithms/intersection.h"
 #include "software/logger/logger.h"
 
-HRVOSimulator::HRVOSimulator(float time_step, const RobotConstants_t &robot_constants,
+HrvoSimulator::HrvoSimulator(float time_step, const RobotConstants_t &robot_constants,
                              const TeamColour friendly_team_colour)
     : primitive_set(),
       robot_constants(robot_constants),
@@ -59,7 +59,7 @@ HRVOSimulator::HRVOSimulator(float time_step, const RobotConstants_t &robot_cons
 {
 }
 
-void HRVOSimulator::updateWorld(const World &world)
+void HrvoSimulator::updateWorld(const World &world)
 {
     this->world               = world;
     const auto &friendly_team = world.friendlyTeam().getAllRobots();
@@ -71,7 +71,7 @@ void HRVOSimulator::updateWorld(const World &world)
     {
         for (const Robot &friendly_robot : friendly_team)
         {
-            std::size_t agent_index = addHRVORobotAgent(friendly_robot);
+            std::size_t agent_index = addHrvoRobotAgent(friendly_robot);
             friendly_robot_id_map.emplace(friendly_robot.id(), agent_index);
         }
 
@@ -135,7 +135,7 @@ void HRVOSimulator::updateWorld(const World &world)
     }
 }
 
-void HRVOSimulator::updatePrimitiveSet(const TbotsProto::PrimitiveSet &new_primitive_set)
+void HrvoSimulator::updatePrimitiveSet(const TbotsProto::PrimitiveSet &new_primitive_set)
 {
     primitive_set = new_primitive_set;
 
@@ -150,7 +150,7 @@ void HRVOSimulator::updatePrimitiveSet(const TbotsProto::PrimitiveSet &new_primi
     }
 }
 
-std::size_t HRVOSimulator::addHRVORobotAgent(const Robot &robot)
+std::size_t HrvoSimulator::addHrvoRobotAgent(const Robot &robot)
 {
     Vector position = robot.position().toVector();
     Vector velocity;
@@ -206,12 +206,12 @@ std::size_t HRVOSimulator::addHRVORobotAgent(const Robot &robot)
     AgentPath path =
         AgentPath({PathPoint(destination_point, speed_at_goal)}, path_radius);
 
-    return addHRVOAgent(position, ROBOT_MAX_RADIUS_METERS,
+    return addHrvoAgent(position, ROBOT_MAX_RADIUS_METERS,
                         FRIENDLY_ROBOT_RADIUS_MAX_INFLATION, velocity, max_speed,
                         max_accel, path, MAX_NEIGHBOR_SEARCH_DIST, MAX_NEIGHBORS);
 }
 
-std::size_t HRVOSimulator::addLinearVelocityRobotAgent(const Robot &robot,
+std::size_t HrvoSimulator::addLinearVelocityRobotAgent(const Robot &robot,
                                                        const Vector &destination)
 {
     // TODO (#2371): Replace Vector with Vector
@@ -229,21 +229,21 @@ std::size_t HRVOSimulator::addLinearVelocityRobotAgent(const Robot &robot,
                                   max_accel, path);
 }
 
-std::size_t HRVOSimulator::addHRVOAgent(const Vector &position, float agent_radius,
+std::size_t HrvoSimulator::addHrvoAgent(const Vector &position, float agent_radius,
                                         float max_radius_inflation,
                                         const Vector &curr_velocity, float max_speed,
                                         float max_accel, AgentPath &path,
                                         float max_neighbor_dist,
                                         std::size_t max_neighbors)
 {
-    std::shared_ptr<HRVOAgent> agent = std::make_shared<HRVOAgent>(
+    std::shared_ptr<HrvoAgent> agent = std::make_shared<HrvoAgent>(
         this, position, max_neighbor_dist, max_neighbors, agent_radius,
         max_radius_inflation, curr_velocity, max_accel, path, max_speed);
     agents.push_back(std::move(agent));
     return agents.size() - 1;
 }
 
-size_t HRVOSimulator::addLinearVelocityAgent(const Vector &position, float agent_radius,
+size_t HrvoSimulator::addLinearVelocityAgent(const Vector &position, float agent_radius,
                                              float max_radius_inflation,
                                              const Vector &curr_velocity, float max_speed,
                                              float max_accel, AgentPath &path)
@@ -256,7 +256,7 @@ size_t HRVOSimulator::addLinearVelocityAgent(const Vector &position, float agent
     return agents.size() - 1;
 }
 
-void HRVOSimulator::doStep()
+void HrvoSimulator::doStep()
 {
     if (kd_tree == nullptr)
     {
@@ -299,7 +299,7 @@ void HRVOSimulator::doStep()
     global_time += time_step;
 }
 
-Vector HRVOSimulator::getRobotVelocity(unsigned int robot_id) const
+Vector HrvoSimulator::getRobotVelocity(unsigned int robot_id) const
 {
     auto hrvo_agent = getFriendlyAgentFromRobotId(robot_id);
     if (hrvo_agent.has_value())
@@ -307,21 +307,21 @@ Vector HRVOSimulator::getRobotVelocity(unsigned int robot_id) const
         return hrvo_agent.value()->getVelocity();
     }
     LOG(WARNING) << "Velocity for robot " << robot_id
-                 << " can not be found since it does not exist in HRVO Simulator"
+                 << " can not be found since it does not exist in Hrvo Simulator"
                  << std::endl;
     return Vector();
 }
 
-void HRVOSimulator::visualize(unsigned int robot_id) const
+void HrvoSimulator::visualize(unsigned int robot_id) const
 {
     auto friendly_agent_opt = getFriendlyAgentFromRobotId(robot_id);
     if (!friendly_agent_opt.has_value())
     {
-        // HRVO friendly agent with robot id can not be visualized
+        // Hrvo friendly agent with robot id can not be visualized
         return;
     }
 
-    TbotsProto::HRVOVisualization hrvo_visualization;
+    TbotsProto::HrvoVisualization hrvo_visualization;
     hrvo_visualization.set_robot_id(robot_id);
 
     auto friendly_agent = friendly_agent_opt.value();
@@ -347,22 +347,22 @@ void HRVOSimulator::visualize(unsigned int robot_id) const
 
     if (friendly_team_colour == TeamColour::YELLOW)
     {
-        LOG(VISUALIZE, YELLOW_HRVO_PATH) << hrvo_visualization;
+        LOG(VISUALIZE, YELLOW_Hrvo_PATH) << hrvo_visualization;
     }
     else
     {
-        LOG(VISUALIZE, BLUE_HRVO_PATH) << hrvo_visualization;
+        LOG(VISUALIZE, BLUE_Hrvo_PATH) << hrvo_visualization;
     }
 }
 
-std::optional<std::shared_ptr<HRVOAgent>> HRVOSimulator::getFriendlyAgentFromRobotId(
+std::optional<std::shared_ptr<HrvoAgent>> HrvoSimulator::getFriendlyAgentFromRobotId(
     unsigned int robot_id) const
 {
     auto agent_index_iter = friendly_robot_id_map.find(robot_id);
     if (agent_index_iter != friendly_robot_id_map.end())
     {
         unsigned int agent_index = agent_index_iter->second;
-        auto hrvo_agent = std::static_pointer_cast<HRVOAgent>(agents[agent_index]);
+        auto hrvo_agent = std::static_pointer_cast<HrvoAgent>(agents[agent_index]);
         if (hrvo_agent != nullptr)
         {
             return hrvo_agent;
@@ -371,42 +371,42 @@ std::optional<std::shared_ptr<HRVOAgent>> HRVOSimulator::getFriendlyAgentFromRob
     return std::nullopt;
 }
 
-float HRVOSimulator::getAgentMaxAccel(std::size_t agent_no) const
+float HrvoSimulator::getAgentMaxAccel(std::size_t agent_no) const
 {
     return agents[agent_no]->getMaxAccel();
 }
 
-Vector HRVOSimulator::getAgentPosition(std::size_t agent_no) const
+Vector HrvoSimulator::getAgentPosition(std::size_t agent_no) const
 {
     return agents[agent_no]->getPosition();
 }
 
-float HRVOSimulator::getAgentRadius(std::size_t agent_no) const
+float HrvoSimulator::getAgentRadius(std::size_t agent_no) const
 {
     return agents[agent_no]->getRadius();
 }
 
-bool HRVOSimulator::hasAgentReachedGoal(std::size_t agent_no) const
+bool HrvoSimulator::hasAgentReachedGoal(std::size_t agent_no) const
 {
     return agents[agent_no]->hasReachedGoal();
 }
 
-Vector HRVOSimulator::getAgentVelocity(std::size_t agent_no) const
+Vector HrvoSimulator::getAgentVelocity(std::size_t agent_no) const
 {
     return agents[agent_no]->getVelocity();
 }
 
-Vector HRVOSimulator::getAgentPrefVelocity(std::size_t agent_no) const
+Vector HrvoSimulator::getAgentPrefVelocity(std::size_t agent_no) const
 {
     return agents[agent_no]->getPrefVelocity();
 }
 
-const std::unique_ptr<KdTree> &HRVOSimulator::getKdTree() const
+const std::unique_ptr<KdTree> &HrvoSimulator::getKdTree() const
 {
     return kd_tree;
 }
 
-const std::vector<std::shared_ptr<Agent>> &HRVOSimulator::getAgents() const
+const std::vector<std::shared_ptr<Agent>> &HrvoSimulator::getAgents() const
 {
     return agents;
 }

@@ -27,7 +27,7 @@ message PassVisualization
     repeated PassWithRating best_passes = 1;
 }
 
-message HRVOVisualization
+message HrvoVisualization
 {
     uint32 robot_id                              = 1;
     repeated VelocityObstacle velocity_obstacles = 2;

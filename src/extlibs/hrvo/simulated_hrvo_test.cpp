@@ -11,14 +11,14 @@
 #include "software/time/duration.h"
 #include "software/world/world.h"
 
-class SimulatedHRVOTest : public SimulatedErForceSimPlayTestFixture
+class SimulatedHrvoTest : public SimulatedErForceSimPlayTestFixture
 {
    protected:
     TbotsProto::FieldType field_type = TbotsProto::FieldType::DIV_B;
     Field field                      = Field::createField(field_type);
 };
 
-TEST_F(SimulatedHRVOTest, test_drive_in_straight_line_with_moving_enemy_robot_from_behind)
+TEST_F(SimulatedHrvoTest, test_drive_in_straight_line_with_moving_enemy_robot_from_behind)
 {
     Point destination      = Point(2.8, 0);
     Point initial_position = Point(-2.3, 0);
@@ -50,7 +50,7 @@ TEST_F(SimulatedHRVOTest, test_drive_in_straight_line_with_moving_enemy_robot_fr
             Duration::fromSeconds(6));
 }
 
-TEST_F(SimulatedHRVOTest, test_drive_in_straight_line_with_moving_enemy_robot_from_side)
+TEST_F(SimulatedHrvoTest, test_drive_in_straight_line_with_moving_enemy_robot_from_side)
 {
     Point destination      = Point(2.8, 0);
     Point initial_position = Point(-2.5, 0);
@@ -82,7 +82,7 @@ TEST_F(SimulatedHRVOTest, test_drive_in_straight_line_with_moving_enemy_robot_fr
             Duration::fromSeconds(6));
 }
 
-TEST_F(SimulatedHRVOTest, test_drive_in_straight_line_with_no_obstacle)
+TEST_F(SimulatedHrvoTest, test_drive_in_straight_line_with_no_obstacle)
 {
     Point destination      = Point(2.8, 0);
     Point initial_position = Point(-2.5, 0);
@@ -113,7 +113,7 @@ TEST_F(SimulatedHRVOTest, test_drive_in_straight_line_with_no_obstacle)
             Duration::fromSeconds(6));
 }
 
-TEST_F(SimulatedHRVOTest, test_drive_in_straight_line_with_friendly_robot_infront)
+TEST_F(SimulatedHrvoTest, test_drive_in_straight_line_with_friendly_robot_infront)
 {
     Point destination      = Point(2.8, 0);
     Point initial_position = Point(-2.5, 0);
@@ -144,7 +144,7 @@ TEST_F(SimulatedHRVOTest, test_drive_in_straight_line_with_friendly_robot_infron
             Duration::fromSeconds(8));
 }
 
-TEST_F(SimulatedHRVOTest, test_single_enemy_directly_infront)
+TEST_F(SimulatedHrvoTest, test_single_enemy_directly_infront)
 {
     Point destination      = Point(2, 0);
     Point initial_position = Point(0.7, 0);
@@ -175,7 +175,7 @@ TEST_F(SimulatedHRVOTest, test_single_enemy_directly_infront)
             Duration::fromSeconds(6));
 }
 
-TEST_F(SimulatedHRVOTest, test_three_robot_wall)
+TEST_F(SimulatedHrvoTest, test_three_robot_wall)
 {
     Point destination      = Point(2.8, 0);
     Point initial_position = Point(0, 0);
@@ -207,7 +207,7 @@ TEST_F(SimulatedHRVOTest, test_three_robot_wall)
             Duration::fromSeconds(8));
 }
 
-TEST_F(SimulatedHRVOTest, test_zig_zag_movement)
+TEST_F(SimulatedHrvoTest, test_zig_zag_movement)
 {
     // The x value of the wall in front of the friendly robot
     int front_wall_x = -2;
@@ -256,7 +256,7 @@ TEST_F(SimulatedHRVOTest, test_zig_zag_movement)
             Duration::fromSeconds(10));
 }
 
-TEST_F(SimulatedHRVOTest, test_agent_not_going_in_static_obstacles)
+TEST_F(SimulatedHrvoTest, test_agent_not_going_in_static_obstacles)
 {
     Point destination      = Point(2.9, 1);
     Point initial_position = Point(2.9, -1);
@@ -300,7 +300,7 @@ TEST_F(SimulatedHRVOTest, test_agent_not_going_in_static_obstacles)
             Duration::fromSeconds(20));
 }
 
-TEST_F(SimulatedHRVOTest, test_start_in_local_minima)
+TEST_F(SimulatedHrvoTest, test_start_in_local_minima)
 {
     Point destination      = Point(2.8, 0);
     Point initial_position = Point(0.7, 0);
@@ -333,7 +333,7 @@ TEST_F(SimulatedHRVOTest, test_start_in_local_minima)
             Duration::fromSeconds(20));
 }
 
-TEST_F(SimulatedHRVOTest, test_start_in_local_minima_with_open_end)
+TEST_F(SimulatedHrvoTest, test_start_in_local_minima_with_open_end)
 {
     Point destination      = Point(2.8, 0);
     Point initial_position = Point(0.7, 0);
@@ -366,7 +366,7 @@ TEST_F(SimulatedHRVOTest, test_start_in_local_minima_with_open_end)
             Duration::fromSeconds(7));
 }
 
-TEST_F(SimulatedHRVOTest, test_robot_avoiding_ball_obstacle)
+TEST_F(SimulatedHrvoTest, test_robot_avoiding_ball_obstacle)
 {
     Point destination      = Point(0.0, 0);
     Point initial_position = Point(0.0, 0);

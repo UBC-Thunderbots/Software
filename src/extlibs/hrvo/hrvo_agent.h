@@ -1,6 +1,6 @@
 /*
  * agent.h
- * HRVO Library
+ * Hrvo Library
  *
  * Copyright 2009 University of North Carolina at Chapel Hill
  *
@@ -44,10 +44,10 @@
 #include "software/geom/vector.h"
 
 /**
- * An agent/robot in the simulation which uses the HRVO algorithm to motion plan towards
+ * An agent/robot in the simulation which uses the Hrvo algorithm to motion plan towards
  * the destination while avoiding obstacles.
  */
-class HRVOAgent : public Agent
+class HrvoAgent : public Agent
 {
    public:
     /**
@@ -68,7 +68,7 @@ class HRVOAgent : public Agent
      * @param path                  The path which this agent should take.
      * @param max_speed              The maximum speed of this agent.
      */
-    HRVOAgent(HRVOSimulator *simulator, const Vector &position, float max_neighbor_dist,
+    HrvoAgent(HrvoSimulator *simulator, const Vector &position, float max_neighbor_dist,
               std::size_t max_neighbors, float radius, float max_radius_inflation,
               const Vector &velocity, float max_accel, AgentPath &path, float max_speed);
 

@@ -5,10 +5,10 @@
 #include "software/ai/navigator/path_planner/hrvo/velocity_obstacle.h"
 #include "software/geom/vector.h"
 
-class HRVOSimulator;
+class HrvoSimulator;
 
 /**
- * An agent/robot in the HRVO simulation.
+ * An agent/robot in the Hrvo simulation.
  */
 class Agent
 {
@@ -27,7 +27,7 @@ class Agent
      * @param max_accel              The maximum acceleration of this agent.
      * @param path                  The path for this agent
      */
-    Agent(HRVOSimulator *simulator, const Vector &position, float radius,
+    Agent(HrvoSimulator *simulator, const Vector &position, float radius,
           float max_radius_inflation, const Vector &velocity, const Vector &pref_velocity,
           float max_speed, float max_accel, AgentPath &path);
 
@@ -169,7 +169,7 @@ class Agent
     // The requested new velocity of this Agent
     Vector new_velocity_;
     // The desired new speed of this Agent
-    // NOTE: HRVO algorithm will try to pick this speed, however, it may pick a different
+    // NOTE: Hrvo algorithm will try to pick this speed, however, it may pick a different
     // speed to avoid collisions.
     Vector pref_velocity_;
     // The path of this Agent
@@ -179,5 +179,5 @@ class Agent
     float max_accel_;
     bool reached_goal_;
 
-    HRVOSimulator *const simulator_;
+    HrvoSimulator *const simulator_;
 };

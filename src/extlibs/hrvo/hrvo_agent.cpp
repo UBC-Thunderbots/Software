@@ -1,6 +1,6 @@
 /*
  * agent.cpp
- * HRVO Library
+ * Hrvo Library
  *
  * Copyright 2009 University of North Carolina at Chapel Hill
  *
@@ -41,7 +41,7 @@
 #include "software/geom/algorithms/intersection.h"
 #include "software/geom/vector.h"
 
-HRVOAgent::HRVOAgent(HRVOSimulator *simulator, const Vector &position,
+HrvoAgent::HrvoAgent(HrvoSimulator *simulator, const Vector &position,
                      float neighbor_dist, std::size_t max_neighbors, float radius,
                      float max_radius_inflation, const Vector &velocity, float max_accel,
                      AgentPath &path, float max_speed)
@@ -57,7 +57,7 @@ HRVOAgent::HRVOAgent(HRVOSimulator *simulator, const Vector &position,
 {
 }
 
-void HRVOAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive,
+void HrvoAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive,
                                 const World &world)
 {
     AgentPath path;
@@ -111,7 +111,7 @@ void HRVOAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive,
     setPath(path);
 }
 
-void HRVOAgent::computeNeighbors(double neighbor_dist_threshold)
+void HrvoAgent::computeNeighbors(double neighbor_dist_threshold)
 {
     // Re-calculate all agents (neighbors) within the distance threshold
     // which we want to create velocity obstacles for
@@ -119,7 +119,7 @@ void HRVOAgent::computeNeighbors(double neighbor_dist_threshold)
     simulator_->getKdTree()->query(this, neighbor_dist_threshold);
 }
 
-void HRVOAgent::computeVelocityObstacles()
+void HrvoAgent::computeVelocityObstacles()
 {
     velocity_obstacles_.clear();
     velocity_obstacles_.reserve(neighbors_.size());
@@ -181,17 +181,17 @@ void HRVOAgent::computeVelocityObstacles()
     }
 }
 
-VelocityObstacle HRVOAgent::createVelocityObstacle(const Agent &other_agent)
+VelocityObstacle HrvoAgent::createVelocityObstacle(const Agent &other_agent)
 {
     Circle obstacle_agent_circle(Point(getPosition()), radius_);
     Circle moving_agent_circle(Point(other_agent.getPosition()), radius_);
     auto vo = generateVelocityObstacle(obstacle_agent_circle, moving_agent_circle,
                                        getVelocity());
 
-    // Convert velocity obstacle to hybrid reciprocal velocity obstacle (HRVO)
+    // Convert velocity obstacle to hybrid reciprocal velocity obstacle (Hrvo)
     // by shifting one side of the velocity obstacle to share the responsibility
     // of avoiding collision with other agent. This assumes that the other agent will also
-    // be running HRVO
+    // be running Hrvo
     // Refer to: https://gamma.cs.unc.edu/HRVO/HRVO-T-RO.pdf#page=2
     Vector vo_side;
     Vector rvo_side;
@@ -221,7 +221,7 @@ VelocityObstacle HRVOAgent::createVelocityObstacle(const Agent &other_agent)
     return VelocityObstacle(hrvo_apex, vo.getLeftSide(), vo.getRightSide());
 }
 
-void HRVOAgent::computeNewVelocity()
+void HrvoAgent::computeNewVelocity()
 {
     // Based on The Hybrid Reciprocal Velocity Obstacle paper:
     // https://gamma.cs.unc.edu/HRVO/HRVO-T-RO.pdf
@@ -517,30 +517,30 @@ void HRVOAgent::computeNewVelocity()
     }
 }
 
-bool HRVOAgent::isIdealCandidate(const Candidate &candidate) const
+bool HrvoAgent::isIdealCandidate(const Candidate &candidate) const
 {
     return !findIntersectingVelocityObstacle(candidate).has_value() &&
            isCandidateFast(candidate);
 }
 
-bool HRVOAgent::isCandidateSlow(const Candidate &candidate) const
+bool HrvoAgent::isCandidateSlow(const Candidate &candidate) const
 {
     double min_pref_speed = std::abs(pref_velocity_.length()) * MIN_PREF_SPEED_MULTIPLER;
 
     return std::abs(candidate.velocity.length()) < min_pref_speed;
 }
 
-bool HRVOAgent::isCandidateFast(const Candidate &candidate) const
+bool HrvoAgent::isCandidateFast(const Candidate &candidate) const
 {
     return !isCandidateSlow(candidate);
 }
 
-bool HRVOAgent::isCandidateFasterThanCurrentSpeed(const Candidate &candidate) const
+bool HrvoAgent::isCandidateFasterThanCurrentSpeed(const Candidate &candidate) const
 {
     return std::abs(candidate.velocity.length()) > std::abs(new_velocity_.length());
 }
 
-std::optional<int> HRVOAgent::findIntersectingVelocityObstacle(
+std::optional<int> HrvoAgent::findIntersectingVelocityObstacle(
     const Candidate &candidate) const
 {
     for (int j = 0; j < static_cast<int>(velocity_obstacles_.size()); ++j)
@@ -555,7 +555,7 @@ std::optional<int> HRVOAgent::findIntersectingVelocityObstacle(
     return std::nullopt;
 }
 
-void HRVOAgent::computePreferredVelocity()
+void HrvoAgent::computePreferredVelocity()
 {
     auto path_point_opt = path.getCurrentPathPoint();
 
@@ -614,7 +614,7 @@ void HRVOAgent::computePreferredVelocity()
     }
 }
 
-void HRVOAgent::insertNeighbor(std::size_t agent_no, float &range_sq)
+void HrvoAgent::insertNeighbor(std::size_t agent_no, float &range_sq)
 {
     std::shared_ptr<Agent> other_agent = simulator_->getAgents()[agent_no];
     auto path_point_opt                = path.getCurrentPathPoint();
@@ -679,7 +679,7 @@ void HRVOAgent::insertNeighbor(std::size_t agent_no, float &range_sq)
     }
 }
 
-std::vector<TbotsProto::VelocityObstacle> HRVOAgent::getVelocityObstaclesAsProto() const
+std::vector<TbotsProto::VelocityObstacle> HrvoAgent::getVelocityObstaclesAsProto() const
 {
     std::vector<TbotsProto::VelocityObstacle> velocity_obstacles;
     for (const VelocityObstacle &vo : velocity_obstacles_)
@@ -689,7 +689,7 @@ std::vector<TbotsProto::VelocityObstacle> HRVOAgent::getVelocityObstaclesAsProto
     return velocity_obstacles;
 }
 
-std::vector<Circle> HRVOAgent::getCandidateVelocitiesAsCircles(
+std::vector<Circle> HrvoAgent::getCandidateVelocitiesAsCircles(
     const float circle_rad) const
 {
     std::vector<Circle> candidate_circles;
@@ -701,7 +701,7 @@ std::vector<Circle> HRVOAgent::getCandidateVelocitiesAsCircles(
     return candidate_circles;
 }
 
-void HRVOAgent::setPreferredSpeed(float new_pref_speed)
+void HrvoAgent::setPreferredSpeed(float new_pref_speed)
 {
     pref_speed_ = new_pref_speed;
 }

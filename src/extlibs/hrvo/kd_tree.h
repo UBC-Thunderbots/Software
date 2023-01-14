@@ -1,6 +1,6 @@
 /*
  * kd_tree.h
- * HRVO Library
+ * Hrvo Library
  *
  * Copyright 2009 University of North Carolina at Chapel Hill
  *
@@ -37,8 +37,8 @@
 
 #include "software/geom/vector.h"
 
-class HRVOAgent;
-class HRVOSimulator;
+class HrvoAgent;
+class HrvoSimulator;
 
 /**
  * k-D trees for agents in the simulation.
@@ -90,7 +90,7 @@ class KdTree
     };
 
     // The maximum leaf size of a k-D tree.
-    static const std::size_t HRVO_MAX_LEAF_SIZE = 10;
+    static const std::size_t Hrvo_MAX_LEAF_SIZE = 10;
 
    public:
     /**
@@ -98,7 +98,7 @@ class KdTree
      *
      * @param  simulator  The simulation.
      */
-    explicit KdTree(HRVOSimulator *simulator);
+    explicit KdTree(HrvoSimulator *simulator);
 
     /**
      * Builds an agent k-D tree.
@@ -120,7 +120,7 @@ class KdTree
      * @param agent  A pointer to the agent for which neighbors are to be computed.
      * @param range  The range around the agent.
      */
-    void query(HRVOAgent *agent, float range) const
+    void query(HrvoAgent *agent, float range) const
     {
         float range_sq = range * range;
         queryRecursive(agent, range_sq, 0);
@@ -133,13 +133,13 @@ class KdTree
      * @param range_sq  The squared range around the agent.
      * @param node     The current k-D tree node.
      */
-    void queryRecursive(HRVOAgent *agent, float &range_sq, std::size_t node) const;
+    void queryRecursive(HrvoAgent *agent, float &range_sq, std::size_t node) const;
 
    private:
-    HRVOSimulator *const simulator_;
+    HrvoSimulator *const simulator_;
     std::vector<std::size_t> agents_;
     std::vector<Node> nodes_;
 
-    friend class HRVOAgent;
+    friend class HrvoAgent;
     friend class Simulator;
 };

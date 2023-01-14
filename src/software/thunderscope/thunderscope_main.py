@@ -176,8 +176,8 @@ if __name__ == "__main__":
             {"proto_class": World},
             {"proto_class": PlayInfo},
         ] + [
-            # TODO (#2655): Add/Remove HRVO layers dynamically based on the HRVOVisualization proto messages
-            {"proto_class": HRVOVisualization, "unix_path": YELLOW_HRVO_PATH}
+            # TODO (#2655): Add/Remove Hrvo layers dynamically based on the HrvoVisualization proto messages
+            {"proto_class": HrvoVisualization, "unix_path": YELLOW_Hrvo_PATH}
             for _ in range(MAX_ROBOT_IDS_PER_SIDE)
         ]:
             proto_unix_io.attach_unix_receiver(

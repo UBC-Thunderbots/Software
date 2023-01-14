@@ -532,14 +532,14 @@ class Thunderscope(object):
         field.add_layer("Passing", passing)
         field.add_layer("Simulator", sim_state)
         hrvo_sim_states = []
-        # Add HRVO layers to field widget and have them hidden on startup
-        # TODO (#2655): Add/Remove HRVO layers dynamically based on the HRVOVisualization proto messages
+        # Add Hrvo layers to field widget and have them hidden on startup
+        # TODO (#2655): Add/Remove Hrvo layers dynamically based on the HrvoVisualization proto messages
         for robot_id in range(MAX_ROBOT_IDS_PER_SIDE):
-            hrvo_sim_state = hrvo_layer.HRVOLayer(
+            hrvo_sim_state = hrvo_layer.HrvoLayer(
                 robot_id, self.visualization_buffer_size
             )
             hrvo_sim_states.append(hrvo_sim_state)
-            field.add_layer(f"HRVO {robot_id}", hrvo_sim_state, False)
+            field.add_layer(f"Hrvo {robot_id}", hrvo_sim_state, False)
 
         # Register observers
         sim_proto_unix_io.register_observer(
@@ -556,7 +556,7 @@ class Thunderscope(object):
             (ValidationProtoSet, validation.validation_set_buffer),
             (SimulatorState, sim_state.simulator_state_buffer),
         ] + [
-            (HRVOVisualization, hrvo_sim_state.hrvo_buffer)
+            (HrvoVisualization, hrvo_sim_state.hrvo_buffer)
             for hrvo_sim_state in hrvo_sim_states
         ]:
             full_system_proto_unix_io.register_observer(*arg)

@@ -1,6 +1,6 @@
 /*
  * simulator.h
- * HRVO Library
+ * Hrvo Library
  *
  * Copyright 2009 University of North Carolina at Chapel Hill
  *
@@ -44,7 +44,7 @@
 #include "software/networking/threaded_proto_unix_sender.hpp"
 #include "software/world/world.h"
 
-class HRVOSimulator
+class HrvoSimulator
 {
    public:
     /**
@@ -54,7 +54,7 @@ class HRVOSimulator
      * robot
      * @param friendly_team_colour The colour of the friendly team
      */
-    explicit HRVOSimulator(float time_step, const RobotConstants_t &robot_constants,
+    explicit HrvoSimulator(float time_step, const RobotConstants_t &robot_constants,
                            const TeamColour friendly_team_colour);
 
     /**
@@ -80,7 +80,7 @@ class HRVOSimulator
      * @param Robot    The robot which this agent should be based on
      * @return    The index of the agent.
      */
-    std::size_t addHRVORobotAgent(const Robot &robot);
+    std::size_t addHrvoRobotAgent(const Robot &robot);
 
     /**
      *      Adds a new Linear Velocity Agent to the simulation based on Robot.
@@ -110,7 +110,7 @@ class HRVOSimulator
      * consider at once.
      * @return The index of the agent.
      */
-    std::size_t addHRVOAgent(const Vector &position, float agent_radius,
+    std::size_t addHrvoAgent(const Vector &position, float agent_radius,
                              float max_radius_inflation, const Vector &curr_velocity,
                              float max_speed, float max_accel, AgentPath &path,
                              float max_neighbor_dist, std::size_t max_neighbors);
@@ -146,11 +146,11 @@ class HRVOSimulator
     Vector getRobotVelocity(unsigned int robot_id) const;
 
     /**
-     * Get friendly HRVO agent from robot id. Returns std::nullopt if agent does not exist
+     * Get friendly Hrvo agent from robot id. Returns std::nullopt if agent does not exist
      * @param robot_id Robot id as represented in the real world
-     * @return Optional shared pointer to an HRVO agent
+     * @return Optional shared pointer to an Hrvo agent
      */
-    std::optional<std::shared_ptr<HRVOAgent>> getFriendlyAgentFromRobotId(
+    std::optional<std::shared_ptr<HrvoAgent>> getFriendlyAgentFromRobotId(
         unsigned int robot_id) const;
 
     /**
@@ -309,7 +309,7 @@ class HRVOSimulator
     // NOTE: This value must be >= 0
     static constexpr float BALL_AGENT_RADIUS_OFFSET = 0.1f;
 
-    // The maximum distance which HRVO Agents will look for neighbors, in meters.
+    // The maximum distance which Hrvo Agents will look for neighbors, in meters.
     // A large radius picked to allow for far visibility of neighbors so Agents have
     // enough space to decelerate and avoid collisions.
     static constexpr float MAX_NEIGHBOR_SEARCH_DIST = 2.5f;

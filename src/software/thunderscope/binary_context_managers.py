@@ -319,8 +319,8 @@ gdb --args bazel-bin/{simulator_command}
             (BLUE_ROBOT_STATUS_PATH, RobotStatus),
             (SIMULATOR_STATE_PATH, SimulatorState),
         ] + [
-            # TODO (#2655): Add/Remove HRVO layers dynamically based on the HRVOVisualization proto messages
-            (BLUE_HRVO_PATH, HRVOVisualization, True)
+            # TODO (#2655): Add/Remove Hrvo layers dynamically based on the HrvoVisualization proto messages
+            (BLUE_Hrvo_PATH, HrvoVisualization, True)
             for _ in range(MAX_ROBOT_IDS_PER_SIDE)
         ]:
             blue_full_system_proto_unix_io.attach_unix_receiver(
@@ -340,8 +340,8 @@ gdb --args bazel-bin/{simulator_command}
             (YELLOW_SSL_WRAPPER_PATH, SSL_WrapperPacket),
             (YELLOW_ROBOT_STATUS_PATH, RobotStatus),
         ] + [
-            # TODO (#2655): Add/Remove HRVO layers dynamically based on the HRVOVisualization proto messages
-            (YELLOW_HRVO_PATH, HRVOVisualization, True)
+            # TODO (#2655): Add/Remove Hrvo layers dynamically based on the HrvoVisualization proto messages
+            (YELLOW_Hrvo_PATH, HrvoVisualization, True)
             for _ in range(MAX_ROBOT_IDS_PER_SIDE)
         ]:
             yellow_full_system_proto_unix_io.attach_unix_receiver(

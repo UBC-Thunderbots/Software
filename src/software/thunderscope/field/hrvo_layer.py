@@ -1,5 +1,5 @@
 import pyqtgraph as pg
-from proto.visualization_pb2 import HRVOVisualization
+from proto.visualization_pb2 import HrvoVisualization
 from pyqtgraph.Qt import QtCore, QtGui
 
 from software.thunderscope.constants import Colors
@@ -8,9 +8,9 @@ from software.thunderscope.field.field_layer import FieldLayer
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 
-class HRVOLayer(FieldLayer):
+class HrvoLayer(FieldLayer):
     def __init__(self, robot_id, buffer_size=5):
-        """Visualize the state of the HRVO Simulator
+        """Visualize the state of the Hrvo Simulator
 
         :param robot_id: The id of the robot which this layer will visualize
         :param buffer_size: The buffer size, set higher for smoother plots.
@@ -19,8 +19,8 @@ class HRVOLayer(FieldLayer):
         """
         FieldLayer.__init__(self)
         self.robot_id = robot_id
-        self.hrvo_buffer = ThreadSafeBuffer(buffer_size, HRVOVisualization)
-        self.prev_message = HRVOVisualization(robot_id=self.robot_id)
+        self.hrvo_buffer = ThreadSafeBuffer(buffer_size, HrvoVisualization)
+        self.prev_message = HrvoVisualization(robot_id=self.robot_id)
 
     def paint(self, painter, option, widget):
         """Paint this layer
@@ -31,7 +31,7 @@ class HRVOLayer(FieldLayer):
 
         """
 
-        # Draw the HRVO velocity obstacles and agents
+        # Draw the Hrvo velocity obstacles and agents
 
         velocity_obstacle_msg = self.prev_message
         while not self.hrvo_buffer.queue.empty():
