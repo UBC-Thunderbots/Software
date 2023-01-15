@@ -59,10 +59,15 @@ class RobotCommunication(object):
         self.current_proto_unix_io.register_observer(World, self.world_buffer)
 
         # if fullsystem is running, all robots are connected to it
-        if current_mode == RobotCommunicationMode.BOTH or current_mode == RobotCommunicationMode.FULLSYSTEM:
-            self.robots_connected_to_fullsystem = {robot_id for robot_id in range(MAX_ROBOT_IDS_PER_SIDE)}
+        if (
+            current_mode == RobotCommunicationMode.BOTH
+            or current_mode == RobotCommunicationMode.FULLSYSTEM
+        ):
+            self.robots_connected_to_fullsystem = {
+                robot_id for robot_id in range(MAX_ROBOT_IDS_PER_SIDE)
+            }
 
-        # if fullsystem is not the only thing running, diagnostics is initialised to an empty set
+        # if diagnostics is running, no robots are connected to it initially (empty set)
         if current_mode != RobotCommunicationMode.FULLSYSTEM:
             self.robots_connected_to_diagnostics = set()
 
@@ -88,20 +93,19 @@ class RobotCommunication(object):
         self.send_estop_state_thread = threading.Thread(target=self.__send_estop_state)
         self.run_thread = threading.Thread(target=self.run)
 
-        # try:
-        #     self.estop_reader = ThreadedEstopReader(
-        #         self.estop_path, self.estop_buadrate
-        #     )
-        # except Exception:
-        #     raise Exception("Could not find estop, make sure its plugged in")
+        try:
+            self.estop_reader = ThreadedEstopReader(
+                self.estop_path, self.estop_buadrate
+            )
+        except Exception:
+            raise Exception("Could not find estop, make sure its plugged in")
 
     def __send_estop_state(self):
-        print('yea')
-        # while True:
-        #     self.current_proto_unix_io.send_proto(
-        #         EstopState, EstopState(is_playing=self.estop_reader.isEstopPlay())
-        #     )
-        #     time.sleep(0.1)
+        while True:
+            self.current_proto_unix_io.send_proto(
+                EstopState, EstopState(is_playing=self.estop_reader.isEstopPlay())
+            )
+            time.sleep(0.1)
 
     def run(self):
         """Forward World and PrimitiveSet protos from fullsystem to the robots.
@@ -159,9 +163,7 @@ class RobotCommunication(object):
                     )
 
             for robot_id in self.robots_connected_to_none:
-                robot_primitives[robot_id] = Primitive(
-                    stop=StopPrimitive()
-                )
+                robot_primitives[robot_id] = Primitive(stop=StopPrimitive())
 
             # initialize total primitive set and send it
             primitive_set = PrimitiveSet(
@@ -173,9 +175,7 @@ class RobotCommunication(object):
 
             self.sequence_number += 1
 
-            print(robot_primitives)
-
-            if True:
+            if self.estop_reader.isEstopPlay():
                 self.last_time = primitive_set.time_sent.epoch_timestamp_seconds
                 self.send_primitive_set.send_proto(primitive_set)
 
