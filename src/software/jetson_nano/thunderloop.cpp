@@ -172,19 +172,14 @@ void Thunderloop::runLoop()
                     static_cast<long>(PRIMITIVE_MANAGER_TIMEOUT_NS))
                 {
                     primitive_executor_.setStopPrimitive();
-                }
 
-                auto friendly_team = Team(world_.friendly_team());
-                auto robot         = friendly_team.getRobotById(robot_id_);
+                    // Log milliseconds since last world received if we are timing out
+                    LOG(WARNING)
+                        << "Primitive timeout, overriding with StopPrimitive\n"
+                        << "Milliseconds since last world: "
+                        << static_cast<int>(nanoseconds_elapsed_since_last_primitive) *
+                               MILLISECONDS_PER_NANOSECOND;
 
-                if (robot.has_value())
-                {
-                    direct_control_ = *primitive_executor_.stepPrimitive();
-                }
-                else
-                {
-                    // We are in robot diagnostics
-                    direct_control_ = *primitive_executor_.stepPrimitive();
                 }
             }
 
