@@ -23,7 +23,6 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, const int loop
     // TODO (#2495): Set the friendly team colour once we receive World proto
     : redis_client_(
           std::make_unique<RedisClient>(REDIS_DEFAULT_HOST, REDIS_DEFAULT_PORT)),
-      primitive_executor_(loop_hz, robot_constants, TeamColour::YELLOW),
       robot_constants_(robot_constants),
       robot_id_(std::stoi(redis_client_->getSync(ROBOT_ID_REDIS_KEY))),
       channel_id_(std::stoi(redis_client_->getSync(ROBOT_MULTICAST_CHANNEL_REDIS_KEY))),
@@ -32,7 +31,8 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, const int loop
       kick_slope_(std::stoi(redis_client_->getSync(ROBOT_KICK_SLOPE_REDIS_KEY))),
       kick_constant_(std::stoi(redis_client_->getSync(ROBOT_KICK_CONSTANT_REDIS_KEY))),
       chip_pulse_width_(
-          std::stoi(redis_client_->getSync(ROBOT_CHIP_PULSE_WIDTH_REDIS_KEY)))
+          std::stoi(redis_client_->getSync(ROBOT_CHIP_PULSE_WIDTH_REDIS_KEY))),
+      primitive_executor_(loop_hz, robot_constants, TeamColour::YELLOW, robot_id_)
 {
     NetworkLoggerSingleton::initializeLogger(channel_id_, network_interface_, robot_id_);
     LOG(INFO)
@@ -129,7 +129,7 @@ void Thunderloop::runLoop()
                     // Start new primitive
                     {
                         ScopedTimespecTimer timer(&poll_time);
-                        primitive_executor_.updatePrimitiveSet(robot_id_, primitive_set_);
+                        primitive_executor_.updatePrimitiveSet(primitive_set_);
                     }
 
                     thunderloop_status_.set_primitive_executor_start_time_ns(
@@ -179,17 +179,12 @@ void Thunderloop::runLoop()
 
                 if (robot.has_value())
                 {
-                    direct_control_ = *primitive_executor_.stepPrimitive(
-                        robot_id_, robot->currentState().orientation());
+                    direct_control_ = *primitive_executor_.stepPrimitive();
                 }
                 else
                 {
                     // We are in robot diagnostics
-                    auto robot_state =
-                        RobotState(Point(0, 0), Vector(0, 0), Angle::fromDegrees(0),
-                                   Angle::fromDegrees(0));
-                    direct_control_ = *primitive_executor_.stepPrimitive(
-                        robot_id_, robot_state.orientation());
+                    direct_control_ = *primitive_executor_.stepPrimitive();
                 }
             }
 
@@ -211,8 +206,9 @@ void Thunderloop::runLoop()
                 ScopedTimespecTimer timer(&poll_time);
                 motor_status_ = motor_service_->poll(direct_control_.motor_control(),
                                                      loop_duration_seconds);
-                primitive_executor_.updateLocalVelocity(
-                    createVector(motor_status_.local_velocity()));
+                primitive_executor_.updateVelocity(
+                    createVector(motor_status_.local_velocity()),
+                    createAngularVelocity(motor_status_.angular_velocity()));
             }
             thunderloop_status_.set_motor_service_poll_time_ns(
                 static_cast<unsigned long>(poll_time.tv_nsec));
