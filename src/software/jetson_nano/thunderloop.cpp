@@ -181,6 +181,8 @@ void Thunderloop::runLoop()
                                MILLISECONDS_PER_NANOSECOND;
 
                 }
+
+                direct_control_ = *primitive_executor_.stepPrimitive();	
             }
 
             thunderloop_status_.set_primitive_executor_step_time_ns(
