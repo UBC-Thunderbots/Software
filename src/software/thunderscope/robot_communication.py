@@ -50,8 +50,6 @@ class RobotCommunication(object):
         self.estop_buadrate = estop_buadrate
         self.current_mode = current_mode
 
-        self.robots_connected_to_diagnostics = set()
-
         self.world_buffer = ThreadSafeBuffer(1, World)
         self.primitive_buffer = ThreadSafeBuffer(1, PrimitiveSet)
 
@@ -59,6 +57,22 @@ class RobotCommunication(object):
         self.power_control_diagnostics_buffer = ThreadSafeBuffer(1, PowerControl)
 
         self.current_proto_unix_io.register_observer(World, self.world_buffer)
+
+        # if fullsystem is running, all robots are connected to it
+        if current_mode == RobotCommunicationMode.BOTH or current_mode == RobotCommunicationMode.FULLSYSTEM:
+            self.robots_connected_to_fullsystem = {robot_id for robot_id in range(MAX_ROBOT_IDS_PER_SIDE)}
+
+        # if fullsystem is not the only thing running, diagnostics is initialised to an empty set
+        if current_mode != RobotCommunicationMode.FULLSYSTEM:
+            self.robots_connected_to_diagnostics = set()
+
+            # if fullsystem is running, no robots are connected to none since they're connected to fullsystem
+            # if not, all robots are connected to none
+            self.robots_connected_to_none = (
+                set()
+                if current_mode == RobotCommunicationMode.BOTH
+                else {robot_id for robot_id in range(MAX_ROBOT_IDS_PER_SIDE)}
+            )
 
         self.current_proto_unix_io.register_observer(
             PrimitiveSet, self.primitive_buffer
@@ -74,19 +88,20 @@ class RobotCommunication(object):
         self.send_estop_state_thread = threading.Thread(target=self.__send_estop_state)
         self.run_thread = threading.Thread(target=self.run)
 
-        try:
-            self.estop_reader = ThreadedEstopReader(
-                self.estop_path, self.estop_buadrate
-            )
-        except Exception:
-            raise Exception("Could not find estop, make sure its plugged in")
+        # try:
+        #     self.estop_reader = ThreadedEstopReader(
+        #         self.estop_path, self.estop_buadrate
+        #     )
+        # except Exception:
+        #     raise Exception("Could not find estop, make sure its plugged in")
 
     def __send_estop_state(self):
-        while True:
-            self.current_proto_unix_io.send_proto(
-                EstopState, EstopState(is_playing=self.estop_reader.isEstopPlay())
-            )
-            time.sleep(0.1)
+        print('yea')
+        # while True:
+        #     self.current_proto_unix_io.send_proto(
+        #         EstopState, EstopState(is_playing=self.estop_reader.isEstopPlay())
+        #     )
+        #     time.sleep(0.1)
 
     def run(self):
         """Forward World and PrimitiveSet protos from fullsystem to the robots.
@@ -119,10 +134,6 @@ class RobotCommunication(object):
                 # Get the primitives
                 primitive_set = self.primitive_buffer.get(block=False)
 
-                # Filter the primitives to only include robots not connected to diagnostics
-                for robot_id in self.robots_connected_to_diagnostics:
-                    del primitive_set[robot_id]
-
                 robot_primitives = primitive_set
 
             # diagnostics is running
@@ -147,6 +158,11 @@ class RobotCommunication(object):
                         direct_control=diagnostics_primitive
                     )
 
+            for robot_id in self.robots_connected_to_none:
+                robot_primitives[robot_id] = Primitive(
+                    stop=StopPrimitive()
+                )
+
             # initialize total primitive set and send it
             primitive_set = PrimitiveSet(
                 time_sent=Timestamp(epoch_timestamp_seconds=time.time()),
@@ -157,7 +173,9 @@ class RobotCommunication(object):
 
             self.sequence_number += 1
 
-            if self.estop_reader.isEstopPlay():
+            print(robot_primitives)
+
+            if True:
                 self.last_time = primitive_set.time_sent.epoch_timestamp_seconds
                 self.send_primitive_set.send_proto(primitive_set)
 
@@ -170,8 +188,10 @@ class RobotCommunication(object):
         """
         if robot_id in self.robots_connected_to_diagnostics:
             self.robots_connected_to_diagnostics.remove(robot_id)
-        else:
+            self.robots_connected_to_none.add(robot_id)
+        elif robot_id in self.robots_connected_to_none:
             self.robots_connected_to_diagnostics.add(robot_id)
+            self.robots_connected_to_none.remove(robot_id)
 
     def __enter__(self):
         """Enter RobotCommunication context manager. Setup multicast listener
