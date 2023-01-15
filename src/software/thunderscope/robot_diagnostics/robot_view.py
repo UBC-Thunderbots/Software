@@ -235,18 +235,30 @@ class RobotView(QWidget):
 
         x = x + 1
 
-        power_status = robot_status.power_status
+        #power_status = robot_status.power_status
 
         for i in range(MAX_ROBOT_IDS_PER_SIDE):
-            self.robot_battery_progress_bars[i].setValue(power_status.battery_voltage)
+            #self.robot_battery_progress_bars[i].setValue(power_status.battery_voltage)
+            self.robot_battery_progress_bars[i].setValue(4)
 
-            print(power_status.battery_voltage)
+            if 4 < 5:
+                QMessageBox.information(self, "Battery Voltage Alert", f"robot {i} voltage is {5}")
 
-            if power_status.battery_voltage < BATTERY_WARNING_VOLTAGE:
-                msg = QMessageBox()
-                msg.setIcon(QMessageBox.Information)
-                msg.setText(f"robot {i} voltage is {power_status.battery_voltage}")
-                msg.setWindowTitle("battery voltage alert")
-                msg.setDetailedText("not cool man")
+        robot_status = RobotStatus()
+        robot_status.error_code.extend([
+            ErrorCode.LOW_CAP,
+            ErrorCode.LOW_CAP,
+            ErrorCode.LOW_CAP,
+            ErrorCode.LOW_CAP,
+            ErrorCode.LOW_CAP
+        ])
 
-                msg.show()
+        error_codes = robot_status.error_code
+
+        for i in range(MAX_ROBOT_IDS_PER_SIDE):
+            #self.robot_battery_progress_bars[i].setValue(power_status.battery_voltage)
+            for code in error_codes:
+                if code == ErrorCode.LOW_CAP:
+                    QMessageBox.warning(self, "Warning: Low Cap", "Low Cap")
+
+
