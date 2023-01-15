@@ -179,10 +179,9 @@ void Thunderloop::runLoop()
                         << "Milliseconds since last world: "
                         << static_cast<int>(nanoseconds_elapsed_since_last_primitive) *
                                MILLISECONDS_PER_NANOSECOND;
-
                 }
 
-                direct_control_ = *primitive_executor_.stepPrimitive();	
+                direct_control_ = *primitive_executor_.stepPrimitive();
             }
 
             thunderloop_status_.set_primitive_executor_step_time_ns(
