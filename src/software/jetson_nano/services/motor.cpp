@@ -146,6 +146,8 @@ MotorService::~MotorService() {}
 
 void MotorService::setUpMotors()
 {
+    prev_wheel_velocities = {0.0, 0.0, 0.0, 0.0};
+
     // Check for driver faults
     for (uint8_t motor = 0; motor < NUM_DRIVE_MOTORS; motor++)
     {
