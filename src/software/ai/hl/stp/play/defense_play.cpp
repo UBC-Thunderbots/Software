@@ -35,7 +35,7 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
         std::make_shared<MoveTactic>(), std::make_shared<MoveTactic>()};
 
     std::vector<std::shared_ptr<StopTactic>> stop_tactics = {
-        std::make_shared<StopTactic>(false), std::make_shared<StopTactic>(false)};
+        std::make_shared<StopTactic>(), std::make_shared<StopTactic>()};
 
     do
     {
