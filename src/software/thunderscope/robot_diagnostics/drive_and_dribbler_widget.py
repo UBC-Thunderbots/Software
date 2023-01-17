@@ -12,8 +12,6 @@ class DriveAndDribblerWidget(QWidget):
     def __init__(self, proto_unix_io):
         self.constants = tbots.create2021RobotConstants()
 
-
-class DriveAndDribblerWidget(QWidget):
     def __init__(self, proto_unix_io):
         """Initialize the widget to control the robot's motors
         :param proto_unix_io: the proto_unix_io object
@@ -111,7 +109,7 @@ class DriveAndDribblerWidget(QWidget):
             self.angular_velocity_label,
         ) = common_widgets.create_slider(
             "θ (°/s)",
-            self.constants.robot_max_ang_speed_rad_per_s * 1000,
+            -self.constants.robot_max_ang_speed_rad_per_s * 1000,
             self.constants.robot_max_ang_speed_rad_per_s * 1000,
             1,
         )
@@ -158,8 +156,8 @@ class DriveAndDribblerWidget(QWidget):
             self.dribbler_speed_rpm_label,
         ) = common_widgets.create_slider(
             "RPM",
-            -self.constants.robot_max_speed_m_per_s * 1000,
-            self.constants.robot_max_speed_m_per_s * 1000,
+            -self.constants.indefinite_dribbler_speed_rpm * 1000,
+            self.constants.indefinite_dribbler_speed_rpm * 1000,
             1000,
         )
         self.dribbler_speed_rpm_slider.valueChanged.connect(
