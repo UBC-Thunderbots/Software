@@ -23,29 +23,29 @@ struct PassDefenderFSM
     // TODO (#1878): Replace this with a more intelligent chip distance system
     static constexpr double YEET_CHIP_DISTANCE_METERS = 2.0;
 
-    static constexpr double MIN_PASS_START_SPEED = 0.02;
-
-    // The minimum angle between a ball's trajectory and the ball-receiver_point vector
-    // for which we can consider a pass to be stray (i.e it won't make it to the receiver)
+    // The minimum angle between a ball's trajectory and the ball_receiver_point vector
+    // for which we can consider a pass to be stray (i.e it won't make it to the 
+    // intercepting defender)
     static constexpr Angle MIN_STRAY_PASS_ANGLE = Angle::fromDegrees(60);
 
-    // the minimum speed required for a pass to be considered stray
+    // The minimum speed required for a pass to be considered stray
     static constexpr double MIN_STRAY_PASS_SPEED = 0.3;
 
     /**
      * Guard that checks if the ball has been kicked
      *
-     * @param event PivotKickFSM::Update event
+     * @param event PassDefenderFSM::Update event
      *
      * @return if the ball has been kicked
      */
     bool passStarted(const Update& event);
 
     /**
-     * If the pass is in progress and is deviating more than MIN_STRAY_PASS_ANGLE,
-     * return true so that the receiver can react and intercept the ball.
+     * Guard that checks if the ball is deviating more than MIN_STRAY_PASS_ANGLE
+     * when the ball has been kicked and a pass is in progress.
      *
-     * @param event ReceiverFSM::Update event
+     * @param event PassDefenderFSM::Update event
+     * 
      * @return true if stray pass
      */
     bool strayPass(const Update& event);
@@ -53,8 +53,7 @@ struct PassDefenderFSM
     /**
      * Action to block the shot from our shadowee
      *
-     *
-     * @param event ShadowEnemyFSM::Update
+     * @param event PassDefenderFSM::Update
      */
     void blockPass(const Update &event);
 
@@ -63,7 +62,7 @@ struct PassDefenderFSM
      *
      * Intercept a pass and chip the ball away
      *
-     * @param event ShadowEnemyFSM::Update
+     * @param event PassDefenderFSM::Update
      */
     void interceptBall(const Update &event);
 

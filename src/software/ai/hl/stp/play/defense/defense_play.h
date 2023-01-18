@@ -5,7 +5,8 @@
 #include "software/ai/hl/stp/play/play.h"
 
 /**
- * Play that sets up defenders
+ * Play that sets up defenders to block shots on net and 
+ * intercept passes between enemy robots
  */
 class DefensePlay : public Play
 {
@@ -18,7 +19,7 @@ class DefensePlay : public Play
     /**
      * Update control params for this play
      *
-     * @param max_allowed_speed_mode The mode of maximum speed allowed
+     * @param max_allowed_speed_mode the mode of maximum speed allowed
      */
     void updateControlParams(TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode =
                                  TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);

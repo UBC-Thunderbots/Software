@@ -5,6 +5,11 @@
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/geom/point.h"
 
+/**
+ * A pass defender moves to a location on the field to block and intercept
+ * a potential pass between enemy robots.
+ *  
+ */
 class PassDefenderTactic : public Tactic
 {
    public:

@@ -55,18 +55,13 @@ void PassDefenderFSM::interceptBall(const Update &event)
     if ((ball.position() - robot_position).length() >
         BALL_TO_FRONT_OF_ROBOT_DISTANCE_WHEN_DRIBBLING)
     {
-        auto ball_position = ball.position();
-
-        if (ball.velocity().length() > MIN_PASS_START_SPEED)
-        {
-            ball_position = closestPoint(
+        auto intercept_position = closestPoint(
                 robot_position, Line(ball.position(), ball.position() + ball.velocity()));
-        }
 
         auto face_ball_orientation = (ball.position() - robot_position).orientation();
 
         event.common.set_primitive(createMovePrimitive(
-            CREATE_MOTION_CONTROL(ball_position), face_ball_orientation, 0,
+            CREATE_MOTION_CONTROL(intercept_position), face_ball_orientation, 0,
             TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
             AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS},
             TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,

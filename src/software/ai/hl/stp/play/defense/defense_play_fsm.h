@@ -19,7 +19,8 @@ struct DefensePlayFSM
 
     DEFINE_PLAY_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
-    static constexpr unsigned int SHOOTING_LANE_MULTIPLIER = 3;
+
+    static constexpr unsigned int SHOOTING_LANE_MULTIPLIER = 4;
 
     /**
      * Creates a defense play FSM
@@ -35,8 +36,18 @@ struct DefensePlayFSM
      */
     void defend(const Update& event);
 
+    /**
+     * Helper function to set up crease defender tactic vector members
+     * 
+     * @param num_crease_defenders the number of crease defender tactics to set
+     */
     void setUpCreaseDefenders(unsigned int num_crease_defenders);
 
+    /**
+     * Helper function to set up pass defender tactic vector members 
+     *
+     * @param num_pass_defenders the number of pass defender tactics to set
+     */
     void setUpPassDefenders(unsigned int num_pass_defenders);
 
     auto operator()()
