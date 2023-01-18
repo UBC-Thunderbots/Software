@@ -130,6 +130,7 @@ message MoveTactic
 
 message PassDefenderTactic
 {
+    // The location on the field to block enemy passes from
     required Point position_to_block = 1;
 }
 
