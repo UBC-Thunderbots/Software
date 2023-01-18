@@ -14,7 +14,8 @@ struct PassDefenderFSM
     // in its update
     struct ControlParams
     {
-        Point position_to_block;
+        // The location on the field to block enemy passes from
+        Point position_to_block_from;
     };
 
     DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS

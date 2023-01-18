@@ -6,8 +6,8 @@ bool PassDefenderFSM::passStarted(const Update& event)
 {
     auto ball_position = event.common.world.ball().position();
     Vector ball_receiver_point_vector(
-        event.control_params.position_to_block.x() - ball_position.x(),
-        event.control_params.position_to_block.y() - ball_position.y());
+        event.control_params.position_to_block_from.x() - ball_position.x(),
+        event.control_params.position_to_block_from.y() - ball_position.y());
 
     return event.common.world.ball().hasBallBeenKicked(
         ball_receiver_point_vector.orientation());
@@ -17,8 +17,8 @@ bool PassDefenderFSM::strayPass(const Update& event)
 {
     auto ball_position = event.common.world.ball().position();
     Vector ball_receiver_point_vector(
-        event.control_params.position_to_block.x() - ball_position.x(),
-        event.control_params.position_to_block.y() - ball_position.y());
+        event.control_params.position_to_block_from.x() - ball_position.x(),
+        event.control_params.position_to_block_from.y() - ball_position.y());
 
     auto orientation_difference = event.common.world.ball().velocity().orientation() -
                                   ball_receiver_point_vector.orientation();
@@ -34,13 +34,13 @@ bool PassDefenderFSM::strayPass(const Update& event)
 
 void PassDefenderFSM::blockPass(const Update &event)
 {
-    auto position_to_block = event.control_params.position_to_block;
+    auto position_to_block_from = event.control_params.position_to_block_from;
     auto ball_position = event.common.world.ball().position();
     auto face_ball_orientation =
         (ball_position - event.common.robot.position()).orientation();
     
     event.common.set_primitive(createMovePrimitive(
-        CREATE_MOTION_CONTROL(position_to_block), face_ball_orientation, 0,
+        CREATE_MOTION_CONTROL(position_to_block_from), face_ball_orientation, 0,
         TbotsProto::DribblerMode::OFF, TbotsProto::BallCollisionType::AVOID,
         AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
         TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,

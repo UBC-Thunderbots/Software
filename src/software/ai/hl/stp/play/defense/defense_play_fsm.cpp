@@ -8,7 +8,7 @@ DefensePlayFSM ::DefensePlayFSM(TbotsProto::AiConfig ai_config)
 {
 }
 
-void DefensePlayFSM::defend(const Update& event) 
+void DefensePlayFSM::defendAgainstThreats(const Update& event) 
 {
     auto enemy_threats = getAllEnemyThreats(
         event.common.world.field(), event.common.world.friendlyTeam(),

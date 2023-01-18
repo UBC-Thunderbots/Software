@@ -27,11 +27,12 @@ struct DefensePlayFSM
     explicit DefensePlayFSM(TbotsProto::AiConfig ai_config);
 
     /**
-     * Action to defend the defense area
+     * Action to identify all immediate enemy threats and assign
+     * defenders to block enemy shots and passes
      *
      * @param event the FSM event
      */
-    void defend(const Update& event);
+    void defendAgainstThreats(const Update& event);
 
     /**
      * Helper function to set up crease defender tactic vector members
@@ -55,11 +56,11 @@ struct DefensePlayFSM
 
         DEFINE_SML_EVENT(Update)
 
-        DEFINE_SML_ACTION(defend)
+        DEFINE_SML_ACTION(defendAgainstThreats)
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *DefenseState_S + Update_E / defend_A = DefenseState_S,
+            *DefenseState_S + Update_E / defendAgainstThreats_A = DefenseState_S,
             X + Update_E                          = X);
     }
 
