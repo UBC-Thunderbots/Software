@@ -5,7 +5,7 @@
 #include "software/ai/hl/stp/play/play.h"
 
 /**
- * Play that sets up defenders to block shots on net and intercept 
+ * Play that sets up defenders to block shots on net and intercept
  * passes between enemy robots
  */
 class DefensePlay : public Play

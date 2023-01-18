@@ -18,7 +18,7 @@ struct DefensePlayFSM
     };
 
     DEFINE_PLAY_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
-    
+
     /**
      * Creates a defense play FSM
      *
@@ -36,13 +36,13 @@ struct DefensePlayFSM
 
     /**
      * Helper function to set up crease defender tactic vector members
-     * 
+     *
      * @param num_crease_defenders the number of crease defender tactics to set
      */
     void setUpCreaseDefenders(unsigned int num_crease_defenders);
 
     /**
-     * Helper function to set up pass defender tactic vector members 
+     * Helper function to set up pass defender tactic vector members
      *
      * @param num_pass_defenders the number of pass defender tactics to set
      */
@@ -61,7 +61,7 @@ struct DefensePlayFSM
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
             *DefenseState_S + Update_E / defendAgainstThreats_A = DefenseState_S,
-            X + Update_E                          = X);
+            X + Update_E                                        = X);
     }
 
    private:

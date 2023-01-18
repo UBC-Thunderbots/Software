@@ -128,7 +128,7 @@ message MoveTactic
     required double target_spin_rev_per_s = 8;
 }
 
-message PassDefenderTactic 
+message PassDefenderTactic
 {
     required Point position_to_block = 1;
 }

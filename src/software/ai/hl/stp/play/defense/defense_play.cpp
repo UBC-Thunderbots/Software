@@ -8,14 +8,12 @@
 DefensePlay::DefensePlay(TbotsProto::AiConfig config)
     : Play(config, true),
       fsm{DefensePlayFSM{config}},
-      control_params{
-          .max_allowed_speed_mode = TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT}
+      control_params{.max_allowed_speed_mode =
+                         TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT}
 {
 }
 
-void DefensePlay::getNextTactics(
-    TacticCoroutine::push_type &yield,
-    const World &world)
+void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World &world)
 {
     // This function doesn't get called so it does nothing
     while (true)
@@ -36,5 +34,4 @@ void DefensePlay::updateTactics(const PlayUpdate &play_update)
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, DefensePlay, TbotsProto::AiConfig>
-    factory;
+static TGenericFactory<std::string, Play, DefensePlay, TbotsProto::AiConfig> factory;

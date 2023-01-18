@@ -25,7 +25,8 @@ void PassDefenderTactic::updateControlParams(const Point &position_to_block_from
     control_params.position_to_block_from = position_to_block_from;
 }
 
-void PassDefenderTactic::updatePrimitive(const TacticUpdate &tactic_update, bool reset_fsm)
+void PassDefenderTactic::updatePrimitive(const TacticUpdate &tactic_update,
+                                         bool reset_fsm)
 {
     if (reset_fsm)
     {

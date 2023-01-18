@@ -9,25 +9,28 @@ from software.simulated_tests.simulated_test_fixture import simulated_test_runne
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
 
-@pytest.mark.parametrize("blue_bots,yellow_bots", [
-    (
-        [
-            tbots.Point(-3, 1.5),
-            tbots.Point(-3, 0.5),
-            tbots.Point(-3, -0.5),
-            tbots.Point(-3, -1.5),
-            tbots.Point(-3, 1),
-            tbots.Point(-3, 0.75),
-        ], 
-        [
-            tbots.Point(1, -0.25),
-            tbots.Point(1, -1.25),
-            tbots.Point(2, -0.25),
-            tbots.Point(2, -1.25)
-        ]
-    )
-])
 
+@pytest.mark.parametrize(
+    "blue_bots,yellow_bots",
+    [
+        (
+            [
+                tbots.Point(-3, 1.5),
+                tbots.Point(-3, 0.5),
+                tbots.Point(-3, -0.5),
+                tbots.Point(-3, -1.5),
+                tbots.Point(-3, 1),
+                tbots.Point(-3, 0.75),
+            ],
+            [
+                tbots.Point(1, -0.25),
+                tbots.Point(1, -1.25),
+                tbots.Point(2, -0.25),
+                tbots.Point(2, -1.25),
+            ],
+        )
+    ],
+)
 def test_defense_play(simulated_test_runner, blue_bots, yellow_bots):
 
     # Starting point must be Point
