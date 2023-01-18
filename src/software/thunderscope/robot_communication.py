@@ -71,13 +71,7 @@ class RobotCommunication(object):
         if current_mode != RobotCommunicationMode.FULLSYSTEM:
             self.robots_connected_to_diagnostics = set()
 
-            # if fullsystem is running, no robots are connected to none since they're connected to fullsystem
-            # if not, all robots are connected to none
-            self.robots_connected_to_none = (
-                set()
-                if current_mode == RobotCommunicationMode.BOTH
-                else {robot_id for robot_id in range(MAX_ROBOT_IDS_PER_SIDE)}
-            )
+        self.robots_to_be_disconnected = set()
 
         self.current_proto_unix_io.register_observer(
             PrimitiveSet, self.primitive_buffer
@@ -138,6 +132,10 @@ class RobotCommunication(object):
                 # Get the primitives
                 primitive_set = self.primitive_buffer.get(block=False)
 
+                # Filter the primitives to only include robots not connected to diagnostics
+                for robot_id in self.robots_connected_to_diagnostics:
+                    del primitive_set[robot_id]
+
                 robot_primitives = primitive_set
 
             # diagnostics is running
@@ -162,8 +160,12 @@ class RobotCommunication(object):
                         direct_control=diagnostics_primitive
                     )
 
-            for robot_id in self.robots_connected_to_none:
-                robot_primitives[robot_id] = Primitive(stop=StopPrimitive())
+            # sends a final stop primitive to all disconnected robots and removes them from list
+            # in order to prevent robots acting on cached old primitives
+            while self.robots_to_be_disconnected:
+                robot_primitives[self.robots_to_be_disconnected.pop()] = Primitive(
+                    stop=StopPrimitive()
+                )
 
             # initialize total primitive set and send it
             primitive_set = PrimitiveSet(
@@ -188,10 +190,9 @@ class RobotCommunication(object):
         """
         if robot_id in self.robots_connected_to_diagnostics:
             self.robots_connected_to_diagnostics.remove(robot_id)
-            self.robots_connected_to_none.add(robot_id)
-        elif robot_id in self.robots_connected_to_none:
+            self.robots_to_be_disconnected.add(robot_id)
+        else:
             self.robots_connected_to_diagnostics.add(robot_id)
-            self.robots_connected_to_none.remove(robot_id)
 
     def __enter__(self):
         """Enter RobotCommunication context manager. Setup multicast listener
