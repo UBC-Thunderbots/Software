@@ -19,7 +19,7 @@ void DefensePlayFSM::defend(const Update& event)
     // friendly half and still be considered immediate
     auto field = event.common.world.field();
     enemy_threats.erase(std::remove_if(enemy_threats.begin(), enemy_threats.end(), 
-                        [&event](const auto enemy_threat) {
+                        [&field](const auto enemy_threat) {
                             return enemy_threat.robot.position().x() >= 
                                    field.centerPoint().x() + (field.xLength() / 4);
                         }), enemy_threats.end());
