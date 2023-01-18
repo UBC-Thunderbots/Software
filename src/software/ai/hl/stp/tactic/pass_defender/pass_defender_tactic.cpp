@@ -20,9 +20,9 @@ void PassDefenderTactic::accept(TacticVisitor &visitor) const
     visitor.visit(*this);
 }
 
-void PassDefenderTactic::updateControlParams(const Point &position_to_block)
+void PassDefenderTactic::updateControlParams(const Point &position_to_block_from)
 {
-    control_params.position_to_block = position_to_block;
+    control_params.position_to_block_from = position_to_block_from;
 }
 
 void PassDefenderTactic::updatePrimitive(const TacticUpdate &tactic_update, bool reset_fsm)
