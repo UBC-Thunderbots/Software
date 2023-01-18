@@ -45,13 +45,14 @@ class FloatSlider(QSlider):
 
 
 class ColorProgressBar(QProgressBar):
-
     def __init__(self, min_val, max_val, decimals=2):
         super(ColorProgressBar, self).__init__()
 
         self.decimals = 10 ** decimals
 
-        super(ColorProgressBar, self).setRange(min_val * self.decimals, max_val * self.decimals)
+        super(ColorProgressBar, self).setRange(
+            min_val * self.decimals, max_val * self.decimals
+        )
 
     def setValue(self, value):
         super(ColorProgressBar, self).setValue(value * self.decimals)
@@ -81,7 +82,6 @@ class ColorProgressBar(QProgressBar):
 
     def value(self):
         return float(super(ColorProgressBar, self).value()) / self.decimals
-
 
 
 def create_buttons(text: list):
