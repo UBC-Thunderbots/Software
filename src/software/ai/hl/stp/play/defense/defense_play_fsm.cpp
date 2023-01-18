@@ -1,7 +1,7 @@
 #include "software/ai/hl/stp/play/defense/defense_play_fsm.h"
 
 #include "software/ai/evaluation/enemy_threat.h"
-#include "software/ai/evaluation/defense_lane.h"
+#include "software/ai/evaluation/defense_position.h"
 
 DefensePlayFSM ::DefensePlayFSM(TbotsProto::AiConfig ai_config)
     : ai_config(ai_config), crease_defenders({}), pass_defenders({})
@@ -15,11 +15,13 @@ void DefensePlayFSM::defend(const Update& event)
         event.common.world.enemyTeam(), event.common.world.ball(), false);
 
     // Remove all threats which are not "immediate" (i.e not near the friendly
-    // half of the field)
+    // half of the field). Threats can be 1/4 of the field length outside of our 
+    // friendly half and still be considered immediate
+    auto field = event.common.world.field();
     enemy_threats.erase(std::remove_if(enemy_threats.begin(), enemy_threats.end(), 
                         [&event](const auto enemy_threat) {
                             return enemy_threat.robot.position().x() >= 
-                                   event.common.world.field().centerPoint().x() + 1.5; // TODO: turn this magic num to const
+                                   field.centerPoint().x() + (field.xLength() / 4);
                         }), enemy_threats.end());
 
     if (enemy_threats.size() == 0) 
@@ -29,18 +31,33 @@ void DefensePlayFSM::defend(const Update& event)
 
     auto positions = getAllDefensePositions(enemy_threats, event.common.world.field());
 
+    // Choose which defense positions to assign defenders to based on number 
+    // of tactics available to set
     std::vector<DefensePosition> crease_defense_positions;
     std::vector<DefensePosition> pass_defense_positions;
-
     for (unsigned int i = 0; i < event.common.num_tactics; i++) 
     {
-        auto defense_position = i < positions.size() ?
-                                positions.at(i) : positions.at(0);
+        DefensePosition defense_position;
+        if (i < positions.size())
+        {
+            defense_position = positions.at(i);
+        }
+        else
+        {
+            // If we have more tactics to set than determined defense positions, 
+            // assign remaining defenders to the defense position with the
+            // highest "effectiveness"
+            defense_position = positions.front();
+        }
 
         if (defense_position.is_crease_defense) 
         {
             crease_defense_positions.emplace_back(defense_position);
-            if (i == 0 && i < event.common.num_tactics - 1 && event.common.num_tactics >= 2)
+
+            // If we have at least two available defenders, two defenders should
+            // be assigned to the highest scoring crease defense position to better
+            // block the shot cone of the most threatening enemy
+            if (i == 0 && event.common.num_tactics >= 2)
             {
                 crease_defense_positions.emplace_back(defense_position);
                 i++;
@@ -52,8 +69,8 @@ void DefensePlayFSM::defend(const Update& event)
         }
     }
 
-    // Reset tactics if the number of assigned crease defenders or 
-    // pass defenders has changed
+    // Reset tactics if the number of crease defenders or pass defenders 
+    // we intend to assign has changed
     auto num_crease_defenders = static_cast<unsigned int>(crease_defense_positions.size());
     auto num_pass_defenders = static_cast<unsigned int>(pass_defense_positions.size());
     if (num_crease_defenders != crease_defenders.size())

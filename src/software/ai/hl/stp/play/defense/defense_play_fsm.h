@@ -18,7 +18,7 @@ struct DefensePlayFSM
     };
 
     DEFINE_PLAY_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
-
+    
     /**
      * Creates a defense play FSM
      *
