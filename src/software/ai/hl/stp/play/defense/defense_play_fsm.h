@@ -19,9 +19,6 @@ struct DefensePlayFSM
 
     DEFINE_PLAY_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
-
-    static constexpr unsigned int SHOOTING_LANE_MULTIPLIER = 4;
-
     /**
      * Creates a defense play FSM
      *

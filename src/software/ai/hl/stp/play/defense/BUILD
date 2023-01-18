@@ -18,11 +18,10 @@ cc_library(
     ],
     deps = [
         "//shared:constants",
-        "//software/ai/evaluation:defense_lane",
+        "//software/ai/evaluation:defense_position",
         "//software/ai/hl/stp/play",
         "//software/ai/hl/stp/tactic/crease_defender:crease_defender_tactic",
         "//software/ai/hl/stp/tactic/pass_defender:pass_defender_tactic",
-        "//software/geom/algorithms",
         "//software/logger",
         "//software/util/generic_factory",
         "@sml",

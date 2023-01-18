@@ -19,10 +19,6 @@ struct PassDefenderFSM
 
     DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
-    // Distance to chip the ball when trying to yeet it
-    // TODO (#1878): Replace this with a more intelligent chip distance system
-    static constexpr double YEET_CHIP_DISTANCE_METERS = 2.0;
-
     // The minimum angle between a ball's trajectory and the ball_receiver_point vector
     // for which we can consider a pass to be stray (i.e it won't make it to the 
     // intercepting defender)
@@ -30,6 +26,10 @@ struct PassDefenderFSM
 
     // The minimum speed required for a pass to be considered stray
     static constexpr double MIN_STRAY_PASS_SPEED = 0.3;
+
+    // Distance to chip the ball when trying to yeet it
+    // TODO (#1878): Replace this with a more intelligent chip distance system
+    static constexpr double YEET_CHIP_DISTANCE_METERS = 2.0;
 
     /**
      * Guard that checks if the ball has been kicked
@@ -51,18 +51,18 @@ struct PassDefenderFSM
     bool strayPass(const Update& event);
 
     /**
-     * Action to block the shot from our shadowee
+     * Action to move to the specified location to block a potential pass
      *
-     * @param event PassDefenderFSM::Update
+     * @param event PassDefenderFSM::Update event
      */
     void blockPass(const Update &event);
 
     /**
-     * Action to intercept the ball
-     *
-     * Intercept a pass and chip the ball away
-     *
-     * @param event PassDefenderFSM::Update
+     * Action to intercept an active pass and chip the ball away, adjusting 
+     * the defender's position to be directly in front of the ball's trajectory 
+     * for better interception.
+     * 
+     * @param event PassDefenderFSM::Update event
      */
     void interceptBall(const Update &event);
 

@@ -2,7 +2,6 @@
 
 #include "software/ai/evaluation/enemy_threat.h"
 #include "software/ai/evaluation/defense_lane.h"
-#include "software/geom/algorithms/intersection.h"
 
 DefensePlayFSM ::DefensePlayFSM(TbotsProto::AiConfig ai_config)
     : ai_config(ai_config), crease_defenders({}), pass_defenders({})
@@ -15,10 +14,12 @@ void DefensePlayFSM::defend(const Update& event)
         event.common.world.field(), event.common.world.friendlyTeam(),
         event.common.world.enemyTeam(), event.common.world.ball(), false);
 
+    // Remove all threats which are not "immediate" (i.e not near the friendly
+    // half of the field)
     enemy_threats.erase(std::remove_if(enemy_threats.begin(), enemy_threats.end(), 
                         [&event](const auto enemy_threat) {
                             return enemy_threat.robot.position().x() >= 
-                                   event.common.world.field().centerPoint().x() + 2; // TODO: turn this magic num to const
+                                   event.common.world.field().centerPoint().x() + 1.5; // TODO: turn this magic num to const
                         }), enemy_threats.end());
 
     if (enemy_threats.size() == 0) 
@@ -26,56 +27,7 @@ void DefensePlayFSM::defend(const Update& event)
         return;
     }
 
-    std::vector<DefenseLane> enemy_lanes;
-    std::vector<DefensePosition> positions;
-
-    // Construct passing lanes
-    auto primary_threat_position = enemy_threats.front().robot.position();
-    for (unsigned int i = 1; i < enemy_threats.size(); i++) 
-    {
-        auto lane = Segment(primary_threat_position, 
-                            enemy_threats.at(i).robot.position());
-        auto expected_threat = static_cast<unsigned int>(enemy_threats.size()) - i;
-        enemy_lanes.emplace_back(DefenseLane{lane, expected_threat});
-        positions.emplace_back(DefensePosition{lane.midPoint(), expected_threat, false});
-    }
-
-    // Construct shooting lanes
-    for (unsigned int i = 0; i < enemy_threats.size(); i++) 
-    {
-        auto lane = Segment(enemy_threats.at(i).robot.position(),
-                            event.common.world.field().friendlyGoalCenter());
-        auto expected_threat = (static_cast<unsigned int>(enemy_threats.size()) - i) * 
-                                SHOOTING_LANE_MULTIPLIER;
-        enemy_lanes.emplace_back(DefenseLane{lane, expected_threat});
-        positions.emplace_back(DefensePosition{lane.getStart(), expected_threat, true});
-    }
-
-    // Find points where enemy lanes intersect
-    for (unsigned int i = 0; i < enemy_lanes.size(); i++) 
-    {
-        for (unsigned int j = 0; j < enemy_lanes.size(); j++) 
-        {
-            if (i == j) 
-            {
-                continue;
-            }
-
-            auto intersections = intersection(enemy_lanes.at(i).lane, enemy_lanes.at(j).lane);
-            if (intersections.size() == 1) 
-            {
-                auto position = intersections.at(0);
-                auto expected_threat = enemy_lanes.at(i).expected_threat + 
-                                       enemy_lanes.at(j).expected_threat;
-                positions.emplace_back(DefensePosition{position, expected_threat, false}); 
-            }
-        }
-    }
-
-    // Sort the positions by expected threat in descending order
-    std::sort(positions.begin(), positions.end(), 
-              [](const auto &first, const auto &second) {
-                return first.expected_threat > second.expected_threat;});
+    auto positions = getAllDefensePositions(enemy_threats, event.common.world.field());
 
     std::vector<DefensePosition> crease_defense_positions;
     std::vector<DefensePosition> pass_defense_positions;
@@ -88,7 +40,7 @@ void DefensePlayFSM::defend(const Update& event)
         if (defense_position.is_crease_defense) 
         {
             crease_defense_positions.emplace_back(defense_position);
-            if (i == 0 && i < event.common.num_tactics - 1 && event.common.num_tactics >= 3)
+            if (i == 0 && i < event.common.num_tactics - 1 && event.common.num_tactics >= 2)
             {
                 crease_defense_positions.emplace_back(defense_position);
                 i++;
@@ -100,6 +52,8 @@ void DefensePlayFSM::defend(const Update& event)
         }
     }
 
+    // Reset tactics if the number of assigned crease defenders or 
+    // pass defenders has changed
     auto num_crease_defenders = static_cast<unsigned int>(crease_defense_positions.size());
     auto num_pass_defenders = static_cast<unsigned int>(pass_defense_positions.size());
     if (num_crease_defenders != crease_defenders.size())

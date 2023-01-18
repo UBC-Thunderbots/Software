@@ -102,12 +102,15 @@ cc_test(
 )
 
 cc_library(
-    name = "defense_lane",
-    srcs = ["defense_lane.cpp"],
-    hdrs = ["defense_lane.h"],
+    name = "defense_position",
+    srcs = ["defense_position.cpp"],
+    hdrs = ["defense_position.h"],
     deps = [
+        "//software/ai/evaluation:enemy_threat",
         "//software/geom:point",
-        "//software/geom:segment"
+        "//software/geom:segment",
+        "//software/geom/algorithms",
+        "//software/world:field"
     ]
 )
 
