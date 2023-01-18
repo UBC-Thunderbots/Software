@@ -30,6 +30,13 @@ class RobotView(QWidget):
 
         self.robot_status_buffer = ThreadSafeBuffer(100, RobotStatus)
 
+        self.error_code_messages = {
+            ErrorCode.LOW_CAP: "Low Cap",
+            ErrorCode.LOW_BATTERY: "Low Battery",
+            ErrorCode.HIGH_BOARD_TEMP: "High Board Temp",
+            ErrorCode.DRIBBLER_MOTOR_HOT: "Dribbler Motor Hot"
+        }
+
         # There is no pattern to this so we just have to create
         # mapping from robot id to the four corners of the vision pattern
         #
@@ -62,7 +69,7 @@ class RobotView(QWidget):
             QVBoxLayout() for x in range(MAX_ROBOT_IDS_PER_SIDE)
         ]
         self.robot_battery_progress_bars = [
-            QProgressBar() for x in range(MAX_ROBOT_IDS_PER_SIDE)
+            self.create_progress_bar(MAX_BATTERY_VOLTAGE, MIN_BATTERY_VOLTAGE) for x in range(MAX_ROBOT_IDS_PER_SIDE)
         ]
         self.breakbeam_labels = [QLabel() for x in range(MAX_ROBOT_IDS_PER_SIDE)]
 
@@ -72,11 +79,6 @@ class RobotView(QWidget):
             self.robot_checkboxes = [QCheckBox() for x in range(MAX_ROBOT_IDS_PER_SIDE)]
 
         for id in range(MAX_ROBOT_IDS_PER_SIDE):
-            QVBoxLayout()
-            self.robot_battery_progress_bars[id].setMaximum(100)
-            self.robot_battery_progress_bars[id].setMinimum(0)
-            self.robot_battery_progress_bars[id].setValue(10)
-
             self.breakbeam_labels[id].setText("BREAKBEAM")
             self.breakbeam_labels[id].setStyleSheet("background-color: blue")
 
@@ -103,6 +105,12 @@ class RobotView(QWidget):
             self.layout.addLayout(self.robot_layouts[id])
 
         self.setLayout(self.layout)
+
+    def create_progress_bar(self, max, min):
+        progress_bar = common_widgets.ColorProgressBar(min, max)
+        progress_bar.setValue(max)
+
+        return progress_bar
 
     def create_vision_pattern_label(self, id, team_colour, radius):
         """Given a robot id, team color and radius, draw the vision
@@ -163,102 +171,48 @@ class RobotView(QWidget):
         """Refresh the view
         """
         # TODO (#2791): fix robot view refresh function
-        # voltage
-        # error codes
-        # robot_status = self.robot_status_buffer.get(block=False)
-        # robot_status = RobotStatus(
-        #     robot_id=1,
-        #     error_code=NO_ERROR,
-        #     chipper_kicker_status=ChipperKickerStatus(
-        #         ms_since_chipper_fired=1,
-        #         ms_since_kicker_fired=1
-        #     ),
-        #     motor_status=MotorStatus(
-        #         front_left=DriveUnit(
-        #             wheel_velocity=1
-        #         ),
-        #         front_right=DriveUnit(
-        #             wheel_velocity=1
-        #         ),
-        #         back_left=DriveUnit(
-        #             wheel_velocity=1
-        #         ),
-        #         back_right=DriveUnit(
-        #             wheel_velocity=1
-        #         ),
-        #         dribbler=DribblerStatus(
-        #             dribbler_rpm=1,
-        #             dribbler_temperature=1
-        #         ),
-        #         local_velocity=Vector(
-        #             x_component_meters=1,
-        #             y_component_meters=1
-        #         )
-        #     ),
-        #     network_status=NetworkStatus(
-        #         ms_since_last_vision_received=1,
-        #         ms_since_last_primitive_received=1
-        #     ),
-        #     power_status=PowerStatus(
-        #         battery_voltage=10,
-        #         capacitor_voltage=10,
-        #         current_draw=2,
-        #         geneva_slot=2,
-        #         sequence_num=3,
-        #         breakbeam_tripped=True
-        #     ),
-        #     jetson_status=JetsonStatus(
-        #         cpu_temperature=1
-        #     ),
-        #     thunderloop_status=ThunderloopStatus(
-        #         network_service_poll_time_ns=1,
-        #         primitive_executor_start_time_ns=1,
-        #         primitive_executor_step_time_ns=1,
-        #         motor_service_poll_time_ns=1,
-        #         power_service_poll_time_ns=1,
-        #         iteration_time_ns=1
-        # ),
-        #     time_sent=Timestamp(
-        #         epoch_timestamp_seconds=3
-        #     ),
-        #     last_handled_primitive_set=4
-        # )
+        #robot_status = self.robot_status_buffer.get(block=False)
 
-        x = 0
+        robot_status = RobotStatus(
+            robot_id=1,
+            power_status=PowerStatus(
+                battery_voltage=MAX_BATTERY_VOLTAGE,
+                breakbeam_tripped=True
+            ),
+            error_code = []
+        )
+
+        robot_status.error_code.extend([
+            ErrorCode.LOW_CAP,
+            ErrorCode.LOW_BATTERY,
+            ErrorCode.HIGH_BOARD_TEMP,
+            ErrorCode.DRIBBLER_MOTOR_HOT,
+            ErrorCode.NO_ERROR
+        ])
+
+        power_status = robot_status.power_status
+
         for i in range(MAX_ROBOT_IDS_PER_SIDE):
-            if x < 4:
+            if power_status.breakbeam_tripped:
                 self.breakbeam_labels[i].setText("In Beam")
                 self.breakbeam_labels[i].setStyleSheet("background-color: red")
             else:
                 self.breakbeam_labels[i].setText("Not in Beam")
                 self.breakbeam_labels[i].setStyleSheet("background-color: green")
 
-        x = x + 1
-
-        #power_status = robot_status.power_status
-
         for i in range(MAX_ROBOT_IDS_PER_SIDE):
-            #self.robot_battery_progress_bars[i].setValue(power_status.battery_voltage)
-            self.robot_battery_progress_bars[i].setValue(4)
+            self.robot_battery_progress_bars[i].setValue(power_status.battery_voltage)
 
-            if 4 < 5:
-                QMessageBox.information(self, "Battery Voltage Alert", f"robot {i} voltage is {5}")
+            #print(power_status.battery_voltage)
 
-        robot_status = RobotStatus()
-        robot_status.error_code.extend([
-            ErrorCode.LOW_CAP,
-            ErrorCode.LOW_CAP,
-            ErrorCode.LOW_CAP,
-            ErrorCode.LOW_CAP,
-            ErrorCode.LOW_CAP
-        ])
+            if power_status.battery_voltage < BATTERY_WARNING_VOLTAGE:
+                QMessageBox.information(self, "Battery Voltage Alert", f"robot {i} voltage is {power_status.battery_voltage}")
 
         error_codes = robot_status.error_code
 
         for i in range(MAX_ROBOT_IDS_PER_SIDE):
-            #self.robot_battery_progress_bars[i].setValue(power_status.battery_voltage)
             for code in error_codes:
-                if code == ErrorCode.LOW_CAP:
-                    QMessageBox.warning(self, "Warning: Low Cap", "Low Cap")
+                if code != ErrorCode.NO_ERROR:
+                    QMessageBox.warning(self, f"Warning: {self.error_code_messages[code]}", f"{self.error_code_messages[code]} warning for robot {robot_status.robot_id}")
 
 
