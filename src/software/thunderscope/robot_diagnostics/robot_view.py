@@ -17,9 +17,9 @@ class RobotView(QWidget):
 
     """
 
-    toggle_robot_connection_signal = QtCore.pyqtSignal(int)
+    toggle_robot_connection_signal = QtCore.pyqtSignal(int, int)
 
-    def __init__(self, load_diagnostics):
+    def __init__(self, load_fullsystem):
 
         """Initialize the robot view."""
 
@@ -61,18 +61,20 @@ class RobotView(QWidget):
         self.robot_status_layouts = [
             QVBoxLayout() for x in range(MAX_ROBOT_IDS_PER_SIDE)
         ]
+        self.robot_control_mode_layouts = [
+            QHBoxLayout() for x in range(MAX_ROBOT_IDS_PER_SIDE)
+        ]
         self.robot_battery_progress_bars = [
             QProgressBar() for x in range(MAX_ROBOT_IDS_PER_SIDE)
+        ]
+        self.control_mode_menus = [
+            self.create_control_mode_menu(x, load_fullsystem) for x in range(MAX_ROBOT_IDS_PER_SIDE)
         ]
         self.breakbeam_labels = [QLabel() for x in range(MAX_ROBOT_IDS_PER_SIDE)]
 
         self.other_label = [QLabel() for x in range(MAX_ROBOT_IDS_PER_SIDE)]
 
-        if load_diagnostics:
-            self.robot_checkboxes = [QCheckBox() for x in range(MAX_ROBOT_IDS_PER_SIDE)]
-
         for id in range(MAX_ROBOT_IDS_PER_SIDE):
-            QVBoxLayout()
             self.robot_battery_progress_bars[id].setMaximum(100)
             self.robot_battery_progress_bars[id].setMinimum(0)
             self.robot_battery_progress_bars[id].setValue(10)
@@ -80,29 +82,48 @@ class RobotView(QWidget):
             self.breakbeam_labels[id].setText("BREAKBEAM")
             self.breakbeam_labels[id].setStyleSheet("background-color: blue")
 
+            self.robot_control_mode_layouts[id].addWidget(
+                self.breakbeam_labels[id]
+            )
+            self.robot_control_mode_layouts[id].addWidget(
+                self.control_mode_menus[id]
+            )
+
             self.robot_status_layouts[id].addWidget(
                 self.robot_battery_progress_bars[id]
             )
-            self.robot_status_layouts[id].addWidget(self.breakbeam_labels[id])
+            self.robot_status_layouts[id].addLayout(self.robot_control_mode_layouts[id])
 
             self.robot_layouts[id].addWidget(
                 self.create_vision_pattern_label(id, "b", 25)
             )
             self.robot_layouts[id].addLayout(self.robot_status_layouts[id])
 
-            if load_diagnostics:
-                self.robot_layouts[id].addWidget(self.robot_checkboxes[id])
-
-                # connect checkboxes to emit a toggle connection signal with the corresponding robot ID
-                self.robot_checkboxes[id].stateChanged.connect(
-                    lambda state, robot_id=id: self.toggle_robot_connection_signal.emit(
-                        robot_id
-                    )
-                )
-
             self.layout.addLayout(self.robot_layouts[id])
 
         self.setLayout(self.layout)
+
+    def create_control_mode_menu(self, robot_id, load_fullsystem):
+        control_mode_menu = QComboBox()
+
+        control_mode_menu.addItems([
+            "None",
+            "Manual",
+            "Xbox"
+        ])
+
+        if load_fullsystem:
+            control_mode_menu.addItem('AI')
+
+        control_mode_menu.setCurrentIndex(0)
+
+        control_mode_menu.currentIndexChanged.connect(
+            lambda mode, robot_id=robot_id: self.toggle_robot_connection_signal.emit(
+                mode, robot_id
+            )
+        )
+
+        return control_mode_menu
 
     def create_vision_pattern_label(self, id, team_colour, radius):
         """Given a robot id, team color and radius, draw the vision

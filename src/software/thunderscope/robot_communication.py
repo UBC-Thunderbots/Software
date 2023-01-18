@@ -2,7 +2,7 @@ from software.py_constants import *
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.python_bindings import *
 from proto.import_all_protos import *
-from enum import Enum
+from enum import Enum, IntEnum
 import threading
 import time
 
@@ -16,6 +16,13 @@ class RobotCommunicationMode(Enum):
     DIAGNOSTICS = 2
     BOTH = 3
     NONE = 4
+
+
+class IndividualRobotMode(IntEnum):
+    NONE = 0
+    DIAGNOSTICS = 1
+    XBOX = 2
+    AI = 3
 
 
 class RobotCommunication(object):
@@ -74,19 +81,20 @@ class RobotCommunication(object):
         self.send_estop_state_thread = threading.Thread(target=self.__send_estop_state)
         self.run_thread = threading.Thread(target=self.run)
 
-        try:
-            self.estop_reader = ThreadedEstopReader(
-                self.estop_path, self.estop_buadrate
-            )
-        except Exception:
-            raise Exception("Could not find estop, make sure its plugged in")
+        # try:
+        #     self.estop_reader = ThreadedEstopReader(
+        #         self.estop_path, self.estop_buadrate
+        #     )
+        # except Exception:
+        #     raise Exception("Could not find estop, make sure its plugged in")
 
     def __send_estop_state(self):
-        while True:
-            self.current_proto_unix_io.send_proto(
-                EstopState, EstopState(is_playing=self.estop_reader.isEstopPlay())
-            )
-            time.sleep(0.1)
+        print('yea')
+        # while True:
+        #     self.current_proto_unix_io.send_proto(
+        #         EstopState, EstopState(is_playing=self.estop_reader.isEstopPlay())
+        #     )
+        #     time.sleep(0.1)
 
     def run(self):
         """Forward World and PrimitiveSet protos from fullsystem to the robots.
@@ -157,21 +165,21 @@ class RobotCommunication(object):
 
             self.sequence_number += 1
 
-            if self.estop_reader.isEstopPlay():
+            if True:
                 self.last_time = primitive_set.time_sent.epoch_timestamp_seconds
                 self.send_primitive_set.send_proto(primitive_set)
 
             time.sleep(0.01)
 
-    def toggle_robot_connection(self, robot_id):
+    def toggle_robot_connection(self, mode, robot_id):
         """
         Connects a robot to or disconnects a robot from diagnostics
+
+        :param mode: the mode of input for this robot's primitives
         :param robot_id: the id of the robot to be added or removed from the diagnostics set
         """
-        if robot_id in self.robots_connected_to_diagnostics:
-            self.robots_connected_to_diagnostics.remove(robot_id)
-        else:
-            self.robots_connected_to_diagnostics.add(robot_id)
+        print(mode)
+        print(robot_id)
 
     def __enter__(self):
         """Enter RobotCommunication context manager. Setup multicast listener

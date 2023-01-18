@@ -457,7 +457,7 @@ class Thunderscope(object):
 
         if load_robot_view:
             widgets["robot_view"] = self.setup_robot_view(
-                full_system_proto_unix_io, False
+                full_system_proto_unix_io, True
             )
             robot_view_dock = Dock("RobotView")
             robot_view_dock.addWidget(widgets["robot_view"])
@@ -491,7 +491,7 @@ class Thunderscope(object):
 
         if not load_fullsystem:
             self.diagnostics_widgets["robot_view"] = self.setup_robot_view(
-                proto_unix_io, True
+                proto_unix_io, False
             )
             robot_view_dock = Dock("RobotView")
             robot_view_dock.addWidget(self.diagnostics_widgets["robot_view"])
