@@ -24,9 +24,11 @@ class ErForceSimulator
      *
      * @param field_type The field type
      * @param robot_constants The robot constants
+     * @param realism_config realism configuration
      */
     explicit ErForceSimulator(const TbotsProto::FieldType& field_type,
-                              const RobotConstants_t& robot_constants);
+                              const RobotConstants_t& robot_constants,
+                              std::unique_ptr<RealismConfigErForce>& realism_config);
     ErForceSimulator()  = delete;
     ~ErForceSimulator() = default;
 
@@ -123,6 +125,18 @@ class ErForceSimulator
      * Resets the current time to 0
      */
     void resetCurrentTime();
+
+    /**
+     * Creates the default realism config using erforce simulator's default config
+     * @return a pointer to default realism config
+     */
+    static std::unique_ptr<RealismConfigErForce> createDefaultRealismConfig();
+
+    /**
+     * Creates the realistic realism config
+     * @return a pointer to realistic realism config
+     */
+    static std::unique_ptr<RealismConfigErForce> createRealisticRealismConfig();
 
    private:
     /**

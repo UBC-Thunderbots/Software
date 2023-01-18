@@ -17,6 +17,7 @@ int main(int argc, char **argv)
         bool help               = false;
         std::string runtime_dir = "/tmp/tbots";
         std::string division    = "div_b";
+        bool enable_realism     = false;  // realism flag
     };
 
     CommandLineArgs args;
@@ -30,6 +31,9 @@ int main(int argc, char **argv)
     desc.add_options()("division",
                        boost::program_options::value<std::string>(&args.division),
                        "div_a or div_b");
+    desc.add_options()("enable_realism",
+                       boost::program_options::bool_switch(&args.enable_realism),
+                       "realism simulator");  // install terminal flag
 
     boost::program_options::variables_map vm;
     boost::program_options::store(parse_command_line(argc, argv, desc), vm);
@@ -69,18 +73,28 @@ int main(int argc, char **argv)
          *                        └────────────────────────────┘
          */
         std::shared_ptr<ErForceSimulator> er_force_sim;
+        std::unique_ptr<RealismConfigErForce> realism_config;
 
-        // Setup the field
+        if (args.enable_realism)
+        {
+            realism_config = ErForceSimulator::createRealisticRealismConfig();
+        }
+        else
+        {
+            realism_config = ErForceSimulator::createDefaultRealismConfig();
+        }
+
         if (args.division == "div_a")
         {
             er_force_sim = std::make_shared<ErForceSimulator>(
-                TbotsProto::FieldType::DIV_A, create2021RobotConstants());
+                TbotsProto::FieldType::DIV_A, create2021RobotConstants(), realism_config);
         }
         else
         {
             er_force_sim = std::make_shared<ErForceSimulator>(
-                TbotsProto::FieldType::DIV_B, create2021RobotConstants());
+                TbotsProto::FieldType::DIV_B, create2021RobotConstants(), realism_config);
         }
+
         std::mutex simulator_mutex;
 
         // World Buffer
