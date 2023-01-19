@@ -13,9 +13,9 @@ std::vector<DefensePosition> getAllDefensePositions(
     for (unsigned int i = 1; i < threats.size(); i++)
     {
         auto lane = Segment(primary_threat_position, threats.at(i).robot.position());
-        auto expected_threat = static_cast<unsigned int>(threats.size()) - i;
-        enemy_lanes.emplace_back(DefenseLane{lane, expected_threat});
-        positions.emplace_back(DefensePosition{lane.midPoint(), expected_threat, false});
+        auto threat_rating = static_cast<unsigned int>(threats.size()) - i;
+        enemy_lanes.emplace_back(DefenseLane{lane, threat_rating});
+        positions.emplace_back(DefensePosition{lane.midPoint(), threat_rating, false});
     }
 
     // Multiplier to ensure that shooting lanes are scored higher than passing lanes
@@ -25,10 +25,14 @@ std::vector<DefensePosition> getAllDefensePositions(
     for (unsigned int i = 0; i < threats.size(); i++)
     {
         auto lane = Segment(threats.at(i).robot.position(), field.friendlyGoalCenter());
-        auto expected_threat =
+        auto threat_rating =
             (static_cast<unsigned int>(threats.size()) - i) * SHOOTING_LANE_MULTIPLIER;
-        enemy_lanes.emplace_back(DefenseLane{lane, expected_threat});
-        positions.emplace_back(DefensePosition{lane.getStart(), expected_threat, true});
+        enemy_lanes.emplace_back(DefenseLane{lane, threat_rating});
+
+        // We let the position of the defense position be the location
+        // of the originating enemy threat (lane.getStart()) to cooperate
+        // with control params for CreaseDefenderTactic
+        positions.emplace_back(DefensePosition{lane.getStart(), threat_rating, true});
     }
 
     // Find points where shooting and/or passing lanes intersect --
@@ -49,13 +53,13 @@ std::vector<DefensePosition> getAllDefensePositions(
             {
                 auto position = intersections.at(0);
 
-                // Effectiveness of the position is combined expected threat of
+                // Effectiveness of the position is combined threat rating of
                 // both lanes used to create the position. This helps ensure
                 // these positions blocking multiple lanes are scored as
                 // "better" than normal pass defender positions blocking one
                 // single lane
                 auto effectiveness =
-                    enemy_lanes.at(i).expected_threat + enemy_lanes.at(j).expected_threat;
+                    enemy_lanes.at(i).threat_rating + enemy_lanes.at(j).threat_rating;
 
                 positions.emplace_back(DefensePosition{position, effectiveness, false});
             }

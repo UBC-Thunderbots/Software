@@ -36,10 +36,10 @@ struct DefenseLane
     // where the ball will be received or enter the net
     Segment lane;
 
-    // The "expected threat" of the lane, which scores the dangerousness
+    // The threat rating of the lane, which scores the dangerousness
     // of the lane relative to other lanes (i.e. how likely a pass or shot
     // along the lane will eventually result in the enemy team scoring)
-    unsigned int expected_threat;
+    unsigned int threat_rating;
 };
 
 /**
