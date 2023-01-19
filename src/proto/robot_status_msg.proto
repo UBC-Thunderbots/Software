@@ -83,12 +83,13 @@ message DriveUnit
 /* Data from all four drive units and the dribbler */
 message MotorStatus
 {
-    DriveUnit front_left    = 1;
-    DriveUnit front_right   = 2;
-    DriveUnit back_left     = 3;
-    DriveUnit back_right    = 4;
-    DribblerStatus dribbler = 5;
-    Vector local_velocity   = 6;
+    DriveUnit front_left             = 1;
+    DriveUnit front_right            = 2;
+    DriveUnit back_left              = 3;
+    DriveUnit back_right             = 4;
+    DribblerStatus dribbler          = 5;
+    Vector local_velocity            = 6;
+    AngularVelocity angular_velocity = 7;
 }
 
 /* Data about the network connection with the robots, including network-derived values */
