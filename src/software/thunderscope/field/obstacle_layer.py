@@ -3,7 +3,7 @@ from proto.geometry_pb2 import Circle, Polygon
 from proto.tbots_software_msgs_pb2 import PrimitiveSet
 from pyqtgraph.Qt import QtCore, QtGui
 
-from software.thunderscope.colors import Colors
+from software.thunderscope.constants import Colors
 import software.thunderscope.constants as constants
 from software.py_constants import *
 from software.networking.threaded_unix_listener import ThreadedUnixListener
@@ -57,11 +57,9 @@ class ObstacleLayer(FieldLayer):
                     poly = QtGui.QPolygon(polygon_points)
                     painter.drawPolygon(poly)
 
-                for circleobstacle in obstacle.circle:
+                for circle_obstacle in obstacle.circle:
                     painter.drawEllipse(
                         self.createCircle(
-                            int(MILLIMETERS_PER_METER * circleobstacle.origin.x_meters),
-                            int(MILLIMETERS_PER_METER * circleobstacle.origin.y_meters),
-                            int(MILLIMETERS_PER_METER * circleobstacle.radius),
+                            circle_obstacle.origin, circle_obstacle.radius
                         )
                     )

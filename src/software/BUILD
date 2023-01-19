@@ -71,6 +71,7 @@ pybind_library(
         "//software/estop:threaded_estop_reader",
         "//software/geom:angle",
         "//software/geom:point",
+        "//software/geom:segment",
         "//software/geom:vector",
         "//software/geom/algorithms",
         "//software/networking:threaded_proto_udp_listener",

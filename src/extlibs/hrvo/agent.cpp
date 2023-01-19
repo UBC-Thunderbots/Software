@@ -5,16 +5,17 @@
 
 Agent::Agent(HRVOSimulator *simulator, const Vector &position, float radius,
              float max_radius_inflation, const Vector &velocity,
-             const Vector &prefVelocity, float maxSpeed, float maxAccel, AgentPath &path)
+             const Vector &pref_velocity, float max_speed, float max_accel,
+             AgentPath &path)
     : simulator_(simulator),
       position_(position),
       min_radius_(radius),
       radius_(radius),
       max_radius_inflation_(max_radius_inflation),
       velocity_(velocity),
-      pref_velocity_(prefVelocity),
-      max_speed_(maxSpeed),
-      max_accel_(maxAccel),
+      pref_velocity_(pref_velocity),
+      max_speed_(max_speed),
+      max_accel_(max_accel),
       path(path),
       reached_goal_(false)
 {

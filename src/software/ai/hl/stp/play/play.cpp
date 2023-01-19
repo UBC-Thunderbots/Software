@@ -17,7 +17,7 @@ Play::Play(TbotsProto::AiConfig ai_config, bool requires_goalie)
 {
     for (unsigned int i = 0; i < MAX_ROBOT_IDS; i++)
     {
-        stop_tactics.push_back(std::make_shared<StopTactic>(false));
+        stop_tactics.push_back(std::make_shared<StopTactic>());
     }
 }
 
@@ -182,6 +182,10 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
 
         robots = remaining_robots;
     }
+
+    primitives_to_run->mutable_time_sent()->set_epoch_timestamp_seconds(
+        world.getMostRecentTimestamp().toSeconds());
+    primitives_to_run->set_sequence_number(sequence_number++);
 
     return primitives_to_run;
 }

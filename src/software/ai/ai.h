@@ -11,16 +11,16 @@
 /**
  * This class wraps all our AI logic and decision making.
  */
-class AI final
+class Ai final
 {
    public:
-    AI() = delete;
+    Ai() = delete;
 
     /**
      * Create an AI with given configurations
      * @param ai_config_ The AI configuration
      */
-    explicit AI(TbotsProto::AiConfig ai_config);
+    explicit Ai(TbotsProto::AiConfig ai_config);
 
     /**
      * Overrides the play

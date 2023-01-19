@@ -148,7 +148,7 @@ print_status_msg "Installing Bazel"
 sudo wget -nc https://github.com/bazelbuild/bazel/releases/download/5.0.0/bazel-5.0.0-installer-linux-x86_64.sh -O /tmp/bazel-installer.sh
 sudo chmod +x /tmp/bazel-installer.sh
 sudo /tmp/bazel-installer.sh --bin=/usr/bin --base=$HOME/.bazel
-
+echo "source ${HOME}/.bazel/bin/bazel-complete.bash" >> ~/.bashrc
 
 print_status_msg "Done Installing Bazel"
 print_status_msg "Setting Up PlatformIO"

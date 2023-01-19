@@ -20,7 +20,7 @@ TEST_F(DribblingParcourPlayTest, test_dribbling_parcour_play_stopped)
     BallState ball_state(Point(-0.8, 0), Vector(0, 0));
     auto friendly_robots = TestUtil::createStationaryRobotStatesWithId({Point(4, 0)});
     setFriendlyGoalie(0);
-    setAIPlay(TbotsProto::PlayName::DribblingParcourPlay);
+    setAiPlay(TbotsProto::PlayName::DribblingParcourPlay);
 
     setRefereeCommand(RefereeCommand::STOP, RefereeCommand::HALT);
 
@@ -47,7 +47,7 @@ TEST_F(DribblingParcourPlayTest, test_dribbling_parcour_play_force_start)
     auto friendly_robots = TestUtil::createStationaryRobotStatesWithId(
         {Point(4, 0), Point(0.5, 0), Point(-3, 1)});
     setFriendlyGoalie(0);
-    setAIPlay(TbotsProto::PlayName::DribblingParcourPlay);
+    setAiPlay(TbotsProto::PlayName::DribblingParcourPlay);
 
     setRefereeCommand(RefereeCommand::FORCE_START, RefereeCommand::STOP);
 
