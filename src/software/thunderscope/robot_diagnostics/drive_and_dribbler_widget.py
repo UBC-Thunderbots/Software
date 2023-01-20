@@ -10,14 +10,11 @@ from proto.import_all_protos import *
 
 class DriveAndDribblerWidget(QWidget):
     def __init__(self, proto_unix_io):
-        self.constants = tbots.create2021RobotConstants()
-
-    def __init__(self, proto_unix_io):
         """Initialize the widget to control the robot's motors
         :param proto_unix_io: the proto_unix_io object
         """
         self.input_a = time.time()
-
+        self.constants = tbots.create2021RobotConstants()
         QWidget.__init__(self)
         layout = QVBoxLayout()
 
@@ -156,8 +153,8 @@ class DriveAndDribblerWidget(QWidget):
             self.dribbler_speed_rpm_label,
         ) = common_widgets.create_slider(
             "RPM",
-            -self.constants.indefinite_dribbler_speed_rpm * 1000,
             self.constants.indefinite_dribbler_speed_rpm * 1000,
+            -self.constants.indefinite_dribbler_speed_rpm * 1000,
             1000,
         )
         self.dribbler_speed_rpm_slider.valueChanged.connect(
