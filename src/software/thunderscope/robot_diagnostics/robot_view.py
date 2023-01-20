@@ -111,11 +111,11 @@ class RobotView(QWidget):
             "Manual",
             "Xbox"
         ])
+        control_mode_menu.setCurrentIndex(0)
 
         if load_fullsystem:
             control_mode_menu.addItem('AI')
-
-        control_mode_menu.setCurrentIndex(0)
+            control_mode_menu.setCurrentIndex(3)
 
         control_mode_menu.currentIndexChanged.connect(
             lambda mode, robot_id=robot_id: self.toggle_robot_connection_signal.emit(

@@ -9,10 +9,7 @@ from software.thunderscope.binary_context_managers import *
 from proto.message_translation import tbots_protobuf
 import software.python_bindings as cpp_bindings
 from software.py_constants import *
-from software.thunderscope.robot_communication import (
-    RobotCommunication,
-    RobotCommunicationMode,
-)
+from software.thunderscope.robot_communication import RobotCommunication
 from software.thunderscope.replay.proto_logger import ProtoLogger
 
 NUM_ROBOTS = 6
@@ -223,7 +220,6 @@ if __name__ == "__main__":
         )
 
         current_proto_unix_io = None
-        current_mode = RobotCommunicationMode.NONE
 
         if args.run_blue:
             current_proto_unix_io = tscope.blue_full_system_proto_unix_io
@@ -236,32 +232,25 @@ if __name__ == "__main__":
             friendly_colour_yellow = True
             debug = args.debug_yellow_full_system
 
-        # if either fullsystem is running, mode is fullsystem
-        if args.run_blue or args.run_yellow:
-            current_mode = RobotCommunicationMode.FULLSYSTEM
-
         # this proto will be the same as the fullsystem one if fullsystem is enabled
         if args.run_diagnostics:
             current_proto_unix_io = tscope.robot_diagnostics_proto_unix_io
 
-            # switches to both mode if fullsystem enabled, or just diagnostics if not
-            current_mode = (
-                RobotCommunicationMode.BOTH
-                if current_mode == RobotCommunicationMode.FULLSYSTEM
-                else RobotCommunicationMode.DIAGNOSTICS
-            )
-
         with RobotCommunication(
             current_proto_unix_io,
-            current_mode,
             getRobotMulticastChannel(0),
             args.interface,
         ) as robot_communication:
-            if current_mode == RobotCommunicationMode.DIAGNOSTICS:
+            if args.run_diagnostics:
                 tscope.toggle_robot_connection_signal.connect(
-                    robot_communication.toggle_robot_connection
+                    lambda mode, robot_id: robot_communication.toggle_robot_connection(
+                        mode,
+                        robot_id
+                    )
                 )
+
             if args.run_blue or args.run_yellow:
+                robot_communication.setup_for_fullsystem()
                 full_system_runtime_dir = (
                     args.blue_full_system_runtime_dir
                     if args.run_blue
