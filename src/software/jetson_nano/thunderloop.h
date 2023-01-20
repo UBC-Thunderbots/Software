@@ -77,9 +77,6 @@ class Thunderloop
      */
     double getCpuTemperature();
 
-    // Primitive Executor
-    PrimitiveExecutor primitive_executor_;
-
     // Input Msg Buffers
     TbotsProto::PrimitiveSet primitive_set_;
     TbotsProto::World world_;
@@ -102,8 +99,19 @@ class Thunderloop
     std::string network_interface_;
     int loop_hz_;
 
-    // 500 millisecond timeout on receiving primitives before we emergency stop the robots
+    // Calibrated power service constants
+    int kick_slope_;
+    int kick_constant_;
+    int chip_pulse_width_;
+
+    // Primitive Executor
+    PrimitiveExecutor primitive_executor_;
+
+    // 500 millisecond timeout on receiving primitives before we stop the robots
     const double PRIMITIVE_MANAGER_TIMEOUT_NS = 500.0 * NANOSECONDS_PER_MILLISECOND;
+
+    // 500 millisecond timeout on receiving world before we stop the robots
+    const double WORLD_TIMEOUT_NS = 500.0 * NANOSECONDS_PER_MILLISECOND;
 
     // Path to the CPU thermal zone temperature file
     const std::string CPU_TEMP_FILE_PATH = "/sys/class/thermal/thermal_zone1/temp";

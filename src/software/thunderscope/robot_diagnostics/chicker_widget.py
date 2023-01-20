@@ -39,7 +39,7 @@ class ChickerWidget(QWidget):
         # Initialising the buttons
 
         # push button group box
-        self.push_button_box, self.push_buttons = common_widgets.create_buttons(
+        self.push_button_box, self.push_buttons = common_widgets.create_button(
             ["Kick", "Chip"]
         )
         self.kick_button = self.push_buttons[0]
@@ -90,14 +90,16 @@ class ChickerWidget(QWidget):
             self.geneva_slider_layout,
             self.geneva_slider,
             self.geneva_label,
-        ) = common_widgets.create_slider("Geneva Position", 0, NUM_GENEVA_ANGLES - 1, 1)
+        ) = common_widgets.create_slider("Geneva Position", 1, NUM_GENEVA_ANGLES, 1)
         vbox_layout.addLayout(self.geneva_slider_layout)
 
         (
             self.power_slider_layout,
             self.power_slider,
             self.power_label,
-        ) = common_widgets.create_slider("Power (m/s)", 1, 10, 1)
+        ) = common_widgets.create_slider(
+            "Power (m/s) (Chipper power is fixed)", 1, 10, 1
+        )
         vbox_layout.addLayout(self.power_slider_layout)
 
         self.setLayout(vbox_layout)
@@ -165,6 +167,7 @@ class ChickerWidget(QWidget):
         :returns: None
 
         """
+
         # gets slider values
         geneva_value = self.geneva_slider.value()
 

@@ -10,6 +10,7 @@ cc_library(
         "//proto/primitive:primitive_msg_factory",
         "//shared:constants",
         "//software/math:math_functions",
+        "//software/physics:velocity_conversion_util",
         "//software/world",
     ],
 )
