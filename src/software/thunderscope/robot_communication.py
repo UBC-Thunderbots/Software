@@ -3,9 +3,10 @@ from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.python_bindings import *
 from proto.import_all_protos import *
 from pyqtgraph.Qt import QtCore
-from enum import Enum, IntEnum
+from enum import IntEnum
 import threading
 import time
+
 
 class IndividualRobotMode(IntEnum):
     NONE = 0
@@ -147,7 +148,7 @@ class RobotCommunication(object):
                 )
 
             if self.robots_connected_to_xbox:
-                print('In Progress')
+                print("In Progress")
 
             # initialize total primitive set and send it
             primitive_set = PrimitiveSet(
@@ -186,15 +187,11 @@ class RobotCommunication(object):
         elif mode == IndividualRobotMode.AI:
             self.robots_connected_to_fullsystem.add(robot_id)
 
-
-
     def setup_for_fullsystem(self):
         self.receive_ssl_wrapper = SSLWrapperPacketProtoListener(
             SSL_VISION_ADDRESS,
             SSL_VISION_PORT,
-            lambda data: self.current_proto_unix_io.send_proto(
-                SSL_WrapperPacket, data
-            ),
+            lambda data: self.current_proto_unix_io.send_proto(SSL_WrapperPacket, data),
             True,
         )
 

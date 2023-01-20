@@ -68,7 +68,8 @@ class RobotView(QWidget):
             QProgressBar() for x in range(MAX_ROBOT_IDS_PER_SIDE)
         ]
         self.control_mode_menus = [
-            self.create_control_mode_menu(x, load_fullsystem) for x in range(MAX_ROBOT_IDS_PER_SIDE)
+            self.create_control_mode_menu(x, load_fullsystem)
+            for x in range(MAX_ROBOT_IDS_PER_SIDE)
         ]
         self.breakbeam_labels = [QLabel() for x in range(MAX_ROBOT_IDS_PER_SIDE)]
 
@@ -82,12 +83,8 @@ class RobotView(QWidget):
             self.breakbeam_labels[id].setText("BREAKBEAM")
             self.breakbeam_labels[id].setStyleSheet("background-color: blue")
 
-            self.robot_control_mode_layouts[id].addWidget(
-                self.breakbeam_labels[id]
-            )
-            self.robot_control_mode_layouts[id].addWidget(
-                self.control_mode_menus[id]
-            )
+            self.robot_control_mode_layouts[id].addWidget(self.breakbeam_labels[id])
+            self.robot_control_mode_layouts[id].addWidget(self.control_mode_menus[id])
 
             self.robot_status_layouts[id].addWidget(
                 self.robot_battery_progress_bars[id]
@@ -104,17 +101,19 @@ class RobotView(QWidget):
         self.setLayout(self.layout)
 
     def create_control_mode_menu(self, robot_id, load_fullsystem):
+        """
+        Creates the drop down menu to select the input for each robot
+        :param robot_id: the id of the robot this menu belongs to
+        :param load_fullsystem: whether fullsystem is also an option
+        :return: QComboBox object
+        """
         control_mode_menu = QComboBox()
 
-        control_mode_menu.addItems([
-            "None",
-            "Manual",
-            "Xbox"
-        ])
+        control_mode_menu.addItems(["None", "Manual", "Xbox"])
         control_mode_menu.setCurrentIndex(0)
 
         if load_fullsystem:
-            control_mode_menu.addItem('AI')
+            control_mode_menu.addItem("AI")
             control_mode_menu.setCurrentIndex(3)
 
         control_mode_menu.currentIndexChanged.connect(
