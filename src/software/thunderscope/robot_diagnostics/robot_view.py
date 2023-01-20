@@ -17,9 +17,7 @@ class RobotView(QWidget):
 
     """
 
-    toggle_robot_connection_signal = QtCore.pyqtSignal(int, int)
-
-    def __init__(self, load_fullsystem):
+    def __init__(self):
 
         """Initialize the robot view."""
 
@@ -61,69 +59,30 @@ class RobotView(QWidget):
         self.robot_status_layouts = [
             QVBoxLayout() for x in range(MAX_ROBOT_IDS_PER_SIDE)
         ]
-        self.robot_control_mode_layouts = [
-            QHBoxLayout() for x in range(MAX_ROBOT_IDS_PER_SIDE)
-        ]
         self.robot_battery_progress_bars = [
             QProgressBar() for x in range(MAX_ROBOT_IDS_PER_SIDE)
         ]
-        self.control_mode_menus = [
-            self.create_control_mode_menu(x, load_fullsystem) for x in range(MAX_ROBOT_IDS_PER_SIDE)
-        ]
         self.breakbeam_labels = [QLabel() for x in range(MAX_ROBOT_IDS_PER_SIDE)]
 
-        self.other_label = [QLabel() for x in range(MAX_ROBOT_IDS_PER_SIDE)]
+        for x in range(MAX_ROBOT_IDS_PER_SIDE):
+            QVBoxLayout()
+            self.robot_battery_progress_bars[x].setMaximum(100)
+            self.robot_battery_progress_bars[x].setMinimum(0)
+            self.robot_battery_progress_bars[x].setValue(10)
 
-        for id in range(MAX_ROBOT_IDS_PER_SIDE):
-            self.robot_battery_progress_bars[id].setMaximum(100)
-            self.robot_battery_progress_bars[id].setMinimum(0)
-            self.robot_battery_progress_bars[id].setValue(10)
+            self.breakbeam_labels[x].setText("BREAKBEAM")
+            self.breakbeam_labels[x].setStyleSheet("background-color: blue")
 
-            self.breakbeam_labels[id].setText("BREAKBEAM")
-            self.breakbeam_labels[id].setStyleSheet("background-color: blue")
+            self.robot_status_layouts[x].addWidget(self.robot_battery_progress_bars[x])
+            self.robot_status_layouts[x].addWidget(self.breakbeam_labels[x])
 
-            self.robot_control_mode_layouts[id].addWidget(
-                self.breakbeam_labels[id]
+            self.robot_layouts[x].addWidget(
+                self.create_vision_pattern_label(x, "b", 25)
             )
-            self.robot_control_mode_layouts[id].addWidget(
-                self.control_mode_menus[id]
-            )
-
-            self.robot_status_layouts[id].addWidget(
-                self.robot_battery_progress_bars[id]
-            )
-            self.robot_status_layouts[id].addLayout(self.robot_control_mode_layouts[id])
-
-            self.robot_layouts[id].addWidget(
-                self.create_vision_pattern_label(id, "b", 25)
-            )
-            self.robot_layouts[id].addLayout(self.robot_status_layouts[id])
-
-            self.layout.addLayout(self.robot_layouts[id])
+            self.robot_layouts[x].addLayout(self.robot_status_layouts[x])
+            self.layout.addLayout(self.robot_layouts[x])
 
         self.setLayout(self.layout)
-
-    def create_control_mode_menu(self, robot_id, load_fullsystem):
-        control_mode_menu = QComboBox()
-
-        control_mode_menu.addItems([
-            "None",
-            "Manual",
-            "Xbox"
-        ])
-        control_mode_menu.setCurrentIndex(0)
-
-        if load_fullsystem:
-            control_mode_menu.addItem('AI')
-            control_mode_menu.setCurrentIndex(3)
-
-        control_mode_menu.currentIndexChanged.connect(
-            lambda mode, robot_id=robot_id: self.toggle_robot_connection_signal.emit(
-                mode, robot_id
-            )
-        )
-
-        return control_mode_menu
 
     def create_vision_pattern_label(self, id, team_colour, radius):
         """Given a robot id, team color and radius, draw the vision
@@ -178,10 +137,9 @@ class RobotView(QWidget):
         return label
 
     def refresh(self):
+        return
         """Refresh the view
         """
-        # TODO (#2791): fix robot view refresh function
-        return
         robot_status_buffer = self.robot_status_buffer.get(block=False)
         for i in range(MAX_ROBOT_IDS_PER_SIDE):
             if breakbeam_status.ball_in_beam:
