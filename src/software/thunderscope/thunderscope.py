@@ -462,6 +462,9 @@ class Thunderscope(object):
             robot_view_dock = Dock("RobotView")
             robot_view_dock.addWidget(widgets["robot_view"])
             dock_area.addDock(robot_view_dock, "above", log_dock)
+            self.toggle_robot_connection_signal = widgets[
+                "robot_view"
+            ].toggle_robot_connection_signal
 
     def configure_robot_diagnostics_layout(
         self, dock_area, proto_unix_io, load_fullsystem,
@@ -499,28 +502,11 @@ class Thunderscope(object):
                 "robot_view"
             ].toggle_robot_connection_signal
 
-        self.diagnostics_widgets[
-            "diagnostics_input"
-        ] = self.setup_diagnostics_input_widget(proto_unix_io)
-        diagnostics_input_dock = Dock("Diagnostics_Input")
-        diagnostics_input_dock.addWidget(self.diagnostics_widgets["diagnostics_input"])
-
-        self.diagnostics_widgets["diagnostics_input"].toggle_controls_signal.connect(
-            self.diagnostics_widgets["drive"].toggle_all
-        )
-
-        self.diagnostics_widgets["diagnostics_input"].toggle_controls_signal.connect(
-            self.diagnostics_widgets["chicker"].set_should_enable_buttons
-        )
-
         self.robot_diagnostics_dock_area.addDock(log_dock)
         if not load_fullsystem:
             dock_area.addDock(robot_view_dock, "above", log_dock)
         self.robot_diagnostics_dock_area.addDock(drive_dock, "right", log_dock)
         self.robot_diagnostics_dock_area.addDock(chicker_dock, "below", drive_dock)
-        self.robot_diagnostics_dock_area.addDock(
-            diagnostics_input_dock, "top", chicker_dock
-        )
 
         estop_view = self.setup_estop_view(proto_unix_io)
 
