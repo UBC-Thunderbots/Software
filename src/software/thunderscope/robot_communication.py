@@ -74,6 +74,8 @@ class RobotCommunication(object):
         self.send_estop_state_thread = threading.Thread(target=self.__send_estop_state)
         self.run_thread = threading.Thread(target=self.run)
 
+        self.fullsystem_connected_to_robots = True
+
         try:
             self.estop_reader = ThreadedEstopReader(
                 self.estop_path, self.estop_buadrate

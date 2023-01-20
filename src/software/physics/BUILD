@@ -27,6 +27,28 @@ cc_test(
 )
 
 cc_library(
+    name = "velocity_conversion_util",
+    hdrs = [
+        "velocity_conversion_util.h",
+    ],
+    deps = [
+        "//software/geom:vector",
+    ],
+)
+
+cc_test(
+    name = "velocity_conversion_util_test",
+    srcs = [
+        "velocity_conversion_util_test.cpp",
+    ],
+    deps = [
+        ":velocity_conversion_util",
+        "//shared/test_util:tbots_gtest_main",
+        "//software/test_util",
+    ],
+)
+
+cc_library(
     name = "physics",
     srcs = [
         "physics.cpp",
