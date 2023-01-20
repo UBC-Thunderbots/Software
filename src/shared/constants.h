@@ -88,6 +88,7 @@ static const double NANOSECONDS_PER_SECOND       = 1000000000.0;
 static const double MICROSECONDS_PER_MILLISECOND = 1000.0;
 static const double MICROSECONDS_PER_SECOND      = 1000000.0;
 static const double MILLISECONDS_PER_SECOND      = 1000.0;
+static const double CHICKER_TIMEOUT              = 3 * MILLISECONDS_PER_SECOND;
 static const double SECONDS_PER_MICROSECOND      = 1.0 / 1000000.0;
 static const double SECONDS_PER_NANOSECOND       = 1.0 / 1000000000.0;
 static const double SECONDS_PER_MILLISECOND      = 1.0 / 1000.0;
