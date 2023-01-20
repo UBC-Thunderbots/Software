@@ -88,7 +88,6 @@ static const double NANOSECONDS_PER_SECOND       = 1000000000.0;
 static const double MICROSECONDS_PER_MILLISECOND = 1000.0;
 static const double MICROSECONDS_PER_SECOND      = 1000000.0;
 static const double MILLISECONDS_PER_SECOND      = 1000.0;
-static const double CHICKER_TIMEOUT              = 3 * MILLISECONDS_PER_SECOND;
 static const double SECONDS_PER_MICROSECOND      = 1.0 / 1000000.0;
 static const double SECONDS_PER_NANOSECOND       = 1.0 / 1000000000.0;
 static const double SECONDS_PER_MILLISECOND      = 1.0 / 1000.0;
@@ -117,7 +116,7 @@ static const double MIN_CAPACITOR_VOLTAGE = 0;
 static const double MAX_CAPACITOR_VOLTAGE = 250.0 + 50.0;  // +50v headroom
 
 static const unsigned int ROBOT_CHIP_ANGLE_DEGREES = 45;
-
+static const double CHICKER_TIMEOUT                = 3 * MILLISECONDS_PER_SECOND;
 // How many robots are allowed in each division
 static const unsigned DIV_A_NUM_ROBOTS = 11;
 static const unsigned DIV_B_NUM_ROBOTS = 6;

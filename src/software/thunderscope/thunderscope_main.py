@@ -134,6 +134,12 @@ if __name__ == "__main__":
         help="How many packets to buffer while rendering",
     )
     parser.add_argument(
+        "--enable_realism",
+        action="store_true",
+        default=False,
+        help="set realism flag to use realistic config",
+    )
+    parser.add_argument(
         "--estop_path",
         action="store",
         type=str,
@@ -335,7 +341,7 @@ if __name__ == "__main__":
 
         # Launch all binaries
         with Simulator(
-            args.simulator_runtime_dir, args.debug_simulator
+            args.simulator_runtime_dir, args.debug_simulator, args.enable_realism
         ) as simulator, FullSystem(
             args.blue_full_system_runtime_dir, args.debug_blue_full_system, False
         ) as blue_fs, FullSystem(
