@@ -80,11 +80,11 @@ def test_two_ai_ball_placement(simulated_test_runner, run_enemy_ai, test_duratio
     )
 
     # Always Validation
-    # TODO- #2753 Validation
+    # TODO- #2780 Validation
     always_validation_sequence_set = [[]]
 
     # Eventually Validation
-    # TODO- #2753 Validation
+    # TODO- #2780 Validation
     eventually_validation_sequence_set = [[]]
 
     simulated_test_runner.run_test(

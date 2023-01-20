@@ -4,84 +4,16 @@ import pytest
 
 import software.python_bindings as tbots
 from proto.play_pb2 import Play, PlayName
-from software.simulated_tests.friendly_has_ball_possession import *
-from software.simulated_tests.robot_enters_region import *
+from proto.import_all_protos import *
 from software.simulated_tests.simulated_test_fixture import simulated_test_runner
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
 
-kickoff_friendly_always_validation = [
-    [
-        RobotNeverEntersRegion([tbots.Field.createSSLDivisionBField().enemyHalf()]),
-        FriendlyNeverHasBallPossession(),
-    ]
-]
 
-kickoff_friendly_eventually_validation = [
-    [
-        # Robot in center circle
-        NumberOfRobotsEventuallyEntersRegion(
-            tbots.Field.createSSLDivisionBField().centerCircle(), 1
-        ),
-        # Attacking Robot Placement
-        NumberOfRobotsEventuallyEntersRegion(
-            tbots.Rectangle(tbots.Point(-0.5, 2.5), tbots.Point(-1.5, -2.5)), 2
-        ),
-        # Defending Robot Placement
-        NumberOfRobotsEventuallyEntersRegion(
-            tbots.Rectangle(tbots.Point(-3.2, 1.1), tbots.Point(-3.51, -1.1)), 3
-        ),
-    ]
-]
-
-kickoff_enemy_always_validation = [
-    [
-        RobotNeverEntersRegion(
-            [
-                tbots.Field.createSSLDivisionBField().enemyHalf(),
-                tbots.Field.createSSLDivisionBField().centerCircle(),
-            ]
-        ),
-        FriendlyNeverHasBallPossession(),
-    ]
-]
-
-kickoff_enemy_eventually_validation = [
-    [
-        # Front 3 robots spread out in 3 zones
-        NumberOfRobotsEventuallyEntersRegion(
-            tbots.Rectangle(tbots.Point(-0.2, 1), tbots.Point(-0.4, 0.25)), 1
-        ),
-        NumberOfRobotsEventuallyEntersRegion(
-            tbots.Rectangle(tbots.Point(-0.2, -1), tbots.Point(-0.4, -0.25)), 1
-        ),
-        NumberOfRobotsEventuallyEntersRegion(
-            tbots.Rectangle(tbots.Point(-0.6, 0.1), tbots.Point(-0.9, -0.1)), 1
-        ),
-        # 2 robots Defend the box
-        NumberOfRobotsEventuallyEntersRegion(
-            tbots.Rectangle(tbots.Point(-3.2, 1.1), tbots.Point(-3.5, -1.1)), 2
-        ),
-    ]
-]
-
-
-@pytest.mark.parametrize(
-    "always_validation_list,eventually_validation_list,is_friendly_test",
-    [
-        (
-            kickoff_friendly_always_validation,
-            kickoff_friendly_eventually_validation,
-            True,
-        ),
-        (kickoff_enemy_always_validation, kickoff_enemy_eventually_validation, False),
-    ],
-)
+@pytest.mark.parametrize("is_friendly_test", [True, False])
 def test_kickoff_play(
     simulated_test_runner,
-    always_validation_list,
-    eventually_validation_list,
-    is_friendly_test,
+    is_friendly_test
 ):
 
     # starting point must be Point
@@ -145,11 +77,11 @@ def test_kickoff_play(
     )
 
     # Always Validation
-    # TODO- #2753 Validation
+    # TODO- #2809 Validation
     always_validation_sequence_set = [[]]
 
     # Eventually Validation
-    # TODO- #2753 Validation
+    # TODO- #2809 Validation
     eventually_validation_sequence_set = [[]]
 
     simulated_test_runner.run_test(

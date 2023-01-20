@@ -4,7 +4,7 @@ import pytest
 
 import software.python_bindings as tbots
 from proto.play_pb2 import Play, PlayName
-from software.simulated_tests.robot_halt import *
+from software.simulated_tests.robot_speed_threshold import *
 from software.simulated_tests.simulated_test_fixture import simulated_test_runner
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
@@ -65,12 +65,12 @@ def test_halt_play(simulated_test_runner):
     always_validation_sequence_set = [[]]
 
     # Eventually Validation
-    eventually_validation_sequence_set = [[RobotEventuallyHalt()]]
+    eventually_validation_sequence_set = [[RobotSpeedEventuallyBelowThreshold(1e-3)]]
 
     simulated_test_runner.run_test(
         eventually_validation_sequence_set=eventually_validation_sequence_set,
         always_validation_sequence_set=always_validation_sequence_set,
-        test_timeout_s=25,
+        test_timeout_s=5,
         ci_cmd_with_delay=[blue_delayed_ci_call, yellow_delayed_ci_call],
     )
 

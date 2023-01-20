@@ -13,9 +13,9 @@ from proto.ssl_gc_common_pb2 import Team
 
 def test_two_ai_ball_placement(simulated_test_runner):
 
-    # starting point must be Point
+    # Initial position is from Blue's perspective
     ball_initial_pos = tbots.Point(2, 2)
-    # placement point must be Vector2 to work with game controller
+    # Final point is going to be from yellow's perspective  (since yellow will be the one placing)
     ball_final_pos = tbots.Point(-3, -2)
 
     # Setup Bots
@@ -74,17 +74,17 @@ def test_two_ai_ball_placement(simulated_test_runner):
     )
 
     # Always Validation
-    # TODO- #2753 Validation
+    # TODO- #2783 Validation
     always_validation_sequence_set = [[]]
 
     # Eventually Validation
-    # TODO- #2753 Validation
+    # TODO- #2783 Validation
     eventually_validation_sequence_set = [[]]
 
     simulated_test_runner.run_test(
         eventually_validation_sequence_set=eventually_validation_sequence_set,
         always_validation_sequence_set=always_validation_sequence_set,
-        test_timeout_s=15,
+        test_timeout_s=7.5,
     )
 
 

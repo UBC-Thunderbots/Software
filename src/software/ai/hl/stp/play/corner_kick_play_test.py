@@ -68,17 +68,17 @@ def test_corner_kick_play_bottom_left(simulated_test_runner):
     )
 
     # Always Validation
-    # TODO- #2753 Validation
+    # TODO- #2781 Validation
     always_validation_sequence_set = [[]]
 
     # Eventually Validation
-    # TODO- #2753 Validation
+    # TODO- #2781 Validation
     eventually_validation_sequence_set = [[]]
 
     simulated_test_runner.run_test(
         eventually_validation_sequence_set=eventually_validation_sequence_set,
         always_validation_sequence_set=always_validation_sequence_set,
-        test_timeout_s=15,
+        test_timeout_s=10,
     )
 
 
@@ -139,17 +139,17 @@ def test_corner_kick_play_top_right(simulated_test_runner):
     )
 
     # Always Validation
-    # TODO- #2753 Validation
+    # TODO- #2781 Validation
     always_validation_sequence_set = [[]]
 
     # Eventually Validation
-    # TODO- #2753 Validation
+    # TODO- #2781 Validation
     eventually_validation_sequence_set = [[]]
 
     simulated_test_runner.run_test(
         eventually_validation_sequence_set=eventually_validation_sequence_set,
         always_validation_sequence_set=always_validation_sequence_set,
-        test_timeout_s=15,
+        test_timeout_s=7.5,
     )
 
 

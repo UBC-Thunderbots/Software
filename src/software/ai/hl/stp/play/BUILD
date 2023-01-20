@@ -359,9 +359,9 @@ cc_test(
 )
 
 py_test(
-    name = "kickoff_test",
+    name = "kickoff_play_test",
     srcs = [
-        "kickoff_test.py",
+        "kickoff_play_test.py",
     ],
     # TODO (#2619) Remove tag to run in parallel
     tags = [

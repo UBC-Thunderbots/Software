@@ -67,17 +67,17 @@ def test_offense_play(simulated_test_runner):
     )
 
     # Always Validation
-    # TODO- #2753 Validation
+    # TODO- #2779 Validation
     always_validation_sequence_set = [[]]
 
     # Eventually Validation
-    # TODO- #2753 Validation
+    # TODO- #2779 Validation
     eventually_validation_sequence_set = [[]]
 
     simulated_test_runner.run_test(
         eventually_validation_sequence_set=eventually_validation_sequence_set,
         always_validation_sequence_set=always_validation_sequence_set,
-        test_timeout_s=25,
+        test_timeout_s=15,
     )
 
 

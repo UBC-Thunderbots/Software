@@ -4,7 +4,7 @@ import pytest
 
 import software.python_bindings as tbots
 from proto.play_pb2 import Play, PlayName
-from software.simulated_tests.ball_enters_region import *
+from proto.import_all_protos import *
 from software.simulated_tests.simulated_test_fixture import simulated_test_runner
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
@@ -66,11 +66,11 @@ def test_crease_defense_play(simulated_test_runner):
     )
 
     # Always Validation
-    # TODO- #2753 Validation
+    # TODO- #2778 Validation
     always_validation_sequence_set = [[]]
 
     # Eventually Validation
-    # TODO- #2753 Validation
+    # TODO- #2778 Validation
     eventually_validation_sequence_set = [[]]
 
     simulated_test_runner.run_test(

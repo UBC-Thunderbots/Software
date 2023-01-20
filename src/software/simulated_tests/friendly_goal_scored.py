@@ -44,8 +44,8 @@ class FriendlyGoalScored(Validation):
 
 
 (
-    FriendlyGoalEventuallyScored,
-    FriendlyGoalEventuallyRemoved,  # These two don't make much sense
-    FriendlyGoalAlwaysScored,  # These two don't make much sense
-    FriendlyGoalNeverScored,
+    FriendlyTeamEventuallyScored,
+    _FriendlyTeamGoalEventuallyRemoved,  # These two don't make much sense
+    _FriendlyTeamAlwaysScored,  # These two don't make much sense
+    FriendlyTeamNeverScored,
 ) = create_validation_types(FriendlyGoalScored)
