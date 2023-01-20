@@ -158,4 +158,7 @@ message ShadowEnemyTactic
     required double shadow_distance = 2;
 }
 
-message StopTactic {}
+message StopTactic
+{
+    required bool coast = 1;
+}

@@ -17,7 +17,7 @@ Play::Play(TbotsProto::AiConfig ai_config, bool requires_goalie)
 {
     for (unsigned int i = 0; i < MAX_ROBOT_IDS; i++)
     {
-        stop_tactics.push_back(std::make_shared<StopTactic>());
+        stop_tactics.push_back(std::make_shared<StopTactic>(false));
     }
 }
 

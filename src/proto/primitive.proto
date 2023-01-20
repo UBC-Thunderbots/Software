@@ -108,12 +108,15 @@ message Primitive
 {
     oneof primitive
     {
-        MovePrimitive move                    = 1;
-        StopPrimitive stop                    = 2;
-        DirectControlPrimitive direct_control = 3;
+        EstopPrimitive estop                  = 1;
+        MovePrimitive move                    = 2;
+        StopPrimitive stop                    = 3;
+        DirectControlPrimitive direct_control = 4;
     }
     double cost = 5;
 }
+
+message EstopPrimitive {}
 
 message MovePrimitive
 {
@@ -127,7 +130,15 @@ message MovePrimitive
     BallCollisionType ball_collision_type = 8;
 }
 
-message StopPrimitive {}
+message StopPrimitive
+{
+    enum StopType
+    {
+        BRAKE = 0;
+        COAST = 1;
+    }
+    StopType stop_type = 1;
+}
 
 message MotorControl
 {

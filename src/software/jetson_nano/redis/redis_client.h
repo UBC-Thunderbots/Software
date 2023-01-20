@@ -27,68 +27,15 @@ class RedisClient
      * @param key
      * @return the value
      */
-    std::string getSync(const std::string &key);
+    std::string get(const std::string &key);
 
     /**
-     * Gets the value corresponding to the key, non blocking - executes the callback once
-     * a reply is received.
-     *
-     * @param key
-     * @param reply_callback callback function once the value is obtained
-     */
-    void getAsync(const std::string &key,
-                  const cpp_redis::reply_callback_t &reply_callback);
-
-    /**
-     * Gets the value corresponding to the key, asynchronously but doesn't commit it. Must
-     * manually call asyncCommit() to commit it to the REDIS server.
-     *
-     * Allows us to batch call a number of GET/SET requests to the REDIS server with one
-     * network request.
-     *
-     * @param key
-     * @param reply_callback callback function once the value is obtained
-     */
-    void getAsyncNoCommit(const std::string &key,
-                          const cpp_redis::reply_callback_t &reply_callback);
-
-    /**
-     * Sets a key value pair in the redis database asynchronously
+     * Sets a key value pair in the redis database
      *
      * @param key
      * @param value
      */
-    void setAsync(const std::string &key, const std::string &value);
-
-    /**
-     * Gets the value corresponding to the key; blocking synchronously
-     *
-     * @param key
-     * @param the value
-     */
-    void setSync(const std::string &key, const std::string &value);
-
-    /**
-     * Sets a key value pair in the redis database but does not commit it. Waits for the
-     * next commit() to send it to the REDIS server.
-     *
-     * Allows us to batch call a number of GET/SET requests to the REDIS server with one
-     * network request.
-     *
-     * @param key   key for key-value pair
-     * @param value value to set to key-value pair
-     */
-    void setNoCommit(const std::string &key, const std::string &value);
-
-    /**
-     * Asynchronously commit all pending requests since last commit.
-     */
-    void asyncCommit();
-
-    /**
-     * Synchronously commit all pending requests since last commit.
-     */
-    void syncCommit();
+    void set(const std::string &key, const std::string &value);
 
     /**
      * @return a map of all the key value pairs in redis server

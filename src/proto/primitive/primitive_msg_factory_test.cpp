@@ -131,7 +131,23 @@ TEST_F(PrimitiveFactoryTest, test_create_direct_velocity)
 
 TEST_F(PrimitiveFactoryTest, test_create_stop_primitive_brake)
 {
-    auto stop_primitive = createStopPrimitive();
+    auto stop_primitive = createStopPrimitive(false);
 
     ASSERT_TRUE(stop_primitive->has_stop());
+    EXPECT_EQ(stop_primitive->stop().stop_type(), TbotsProto::StopPrimitive::BRAKE);
+}
+
+TEST_F(PrimitiveFactoryTest, test_create_stop_primitive_coast)
+{
+    auto stop_primitive = createStopPrimitive(true);
+
+    ASSERT_TRUE(stop_primitive->has_stop());
+    EXPECT_EQ(stop_primitive->stop().stop_type(), TbotsProto::StopPrimitive::COAST);
+}
+
+TEST_F(PrimitiveFactoryTest, test_create_estop_primitive)
+{
+    auto Estop_primitive = createEstopPrimitive();
+
+    ASSERT_TRUE(Estop_primitive->has_estop());
 }

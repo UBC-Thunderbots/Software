@@ -45,50 +45,16 @@ RedisClient::RedisClient(std::string host, size_t port)
     subscriber_.commit();
 }
 
-std::string RedisClient::getSync(const std::string &key)
+std::string RedisClient::get(const std::string &key)
 {
     auto future = client_.get(key);
     client_.commit();
     return future.get().as_string();
 }
 
-void RedisClient::getAsyncNoCommit(const std::string &key,
-                                   const cpp_redis::reply_callback_t &reply_callback)
-{
-    client_.get(key, reply_callback);
-}
-
-void RedisClient::getAsync(const std::string &key,
-                           const cpp_redis::reply_callback_t &reply_callback)
-{
-    client_.get(key, reply_callback);
-    asyncCommit();
-}
-
-void RedisClient::setAsync(const std::string &key, const std::string &value)
+void RedisClient::set(const std::string &key, const std::string &value)
 {
     client_.set(key, value);
-    asyncCommit();
-}
-
-void RedisClient::setSync(const std::string &key, const std::string &value)
-{
-    client_.set(key, value);
-    syncCommit();
-}
-
-void RedisClient::setNoCommit(const std::string &key, const std::string &value)
-{
-    client_.set(key, value);
-}
-
-void RedisClient::asyncCommit()
-{
-    client_.commit();
-}
-
-void RedisClient::syncCommit()
-{
     client_.sync_commit();
 }
 

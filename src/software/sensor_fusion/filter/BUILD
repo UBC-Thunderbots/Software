@@ -54,7 +54,6 @@ cc_test(
     deps = [
         ":robot_filter",
         "//shared/test_util:tbots_gtest_main",
-        "//software/test_util",
     ],
 )
 

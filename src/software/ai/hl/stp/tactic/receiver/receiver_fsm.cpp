@@ -128,7 +128,7 @@ void ReceiverFSM::updateOnetouch(const Update& event)
     }
     else
     {
-        event.common.set_primitive(createStopPrimitive());
+        event.common.set_primitive(createStopPrimitive(false));
     }
 }
 

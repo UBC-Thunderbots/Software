@@ -8,9 +8,9 @@ HaltTestPlay::HaltTestPlay(TbotsProto::AiConfig config) : Play(config, false) {}
 
 void HaltTestPlay::getNextTactics(TacticCoroutine::push_type &yield, const World &world)
 {
-    auto stop_test_tactic_1 = std::make_shared<StopTactic>();
-    auto stop_test_tactic_2 = std::make_shared<StopTactic>();
-    auto stop_test_tactic_3 = std::make_shared<StopTactic>();
+    auto stop_test_tactic_1 = std::make_shared<StopTactic>(false);
+    auto stop_test_tactic_2 = std::make_shared<StopTactic>(false);
+    auto stop_test_tactic_3 = std::make_shared<StopTactic>(false);
 
     do
     {

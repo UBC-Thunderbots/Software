@@ -57,7 +57,7 @@ void SimulatedErForceSimPlayTestFixture::setTactic(
     std::map<RobotId, std::set<TbotsProto::MotionConstraint>>
         motion_constraint_override_map;
     motion_constraint_override_map[id] = motion_constraints;
-    play->updateControlParams({{id, tactic}}, motion_constraint_override_map);
+    play->updateControlParams({{id, tactic}});
     setAiPlay(std::move(play));
 }
 

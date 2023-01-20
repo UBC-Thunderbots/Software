@@ -163,11 +163,13 @@ std::size_t HRVOSimulator::addHRVORobotAgent(const Robot &robot)
                     unavailable_capabilities.end();
     if (can_move)
     {
-        velocity  = robot.velocity();
+        velocity  = Vector(static_cast<float>(robot.velocity().x()),
+                          static_cast<float>(robot.velocity().y()));
         max_accel = robot_constants.robot_max_acceleration_m_per_s_2;
         max_speed = robot_constants.robot_max_speed_m_per_s;
     }
 
+    // TODO (#2418): Replace destination point with a list of path points
     // Get this robot's destination point, if it has a primitive
     // If this robot does not have a primitive, then set its current position as its
     // destination
@@ -212,6 +214,7 @@ std::size_t HRVOSimulator::addHRVORobotAgent(const Robot &robot)
 std::size_t HRVOSimulator::addLinearVelocityRobotAgent(const Robot &robot,
                                                        const Vector &destination)
 {
+    // TODO (#2371): Replace Vector with Vector
     Vector position = robot.position().toVector();
     Vector velocity = robot.velocity();
     float max_accel = 0.f;
@@ -307,15 +310,6 @@ Vector HRVOSimulator::getRobotVelocity(unsigned int robot_id) const
                  << " can not be found since it does not exist in HRVO Simulator"
                  << std::endl;
     return Vector();
-}
-
-void HRVOSimulator::updateRobotVelocity(RobotId robot_id, const Vector &new_velocity)
-{
-    auto hrvo_agent = getFriendlyAgentFromRobotId(robot_id);
-    if (hrvo_agent.has_value())
-    {
-        hrvo_agent.value()->setVelocity(new_velocity);
-    }
 }
 
 void HRVOSimulator::visualize(unsigned int robot_id) const

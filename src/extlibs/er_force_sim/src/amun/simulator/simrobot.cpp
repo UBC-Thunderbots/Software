@@ -708,13 +708,7 @@ void SimRobot::update(world::SimRobot *robot, SimBall *ball) const
     rotation->set_i(q.getY());
     rotation->set_j(q.getZ());
     rotation->set_k(q.getW());
-
-    // Get robot orientation relative to the Z axis
-    float x = 0;
-    float y = 0;
-    float z = 0;
-    q.getEulerZYX(z, y, x);
-    robot->set_angle(z);
+    robot->set_angle(q.getAngle());
 
     const btVector3 velocity = m_body->getLinearVelocity() / SIMULATOR_SCALE;
     robot->set_v_x(velocity.x());

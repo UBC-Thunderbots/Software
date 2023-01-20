@@ -3,8 +3,6 @@
 #include <gtest/gtest.h>
 #include <string.h>
 
-#include "software/test_util/equal_within_tolerance.h"
-
 TEST(RobotFilterTest, no_match_robot_data_robot_state_expired_test)
 {
     Robot robot(1, Point(0, 0), Vector(0, 0), Angle::fromRadians(0),
@@ -54,22 +52,4 @@ TEST(RobotFilterTest, two_match_robot_data_robot_state_not_expired_test)
                            AngularVelocity::fromRadians(1.0 / 9),
                            Timestamp::fromSeconds(9)));
     EXPECT_EQ(op_robot.value(), robot_filter.getFilteredData(new_robot_data).value());
-}
-
-TEST(RobotFilterTest, large_positive_orientation_test)
-{
-    Robot robot(1, Point(0, 0), Vector(0, 0), Angle::fromDegrees(1.0),
-                AngularVelocity::fromRadians(0), Timestamp::fromSeconds(0));
-    RobotFilter robot_filter(robot, Duration::fromSeconds(10));
-    std::vector<RobotDetection> new_robot_data = {
-        {1, Point(0, 0), Angle::fromDegrees(359), 0.5, Timestamp::fromSeconds(1)}};
-
-    Robot expected_robot(1, Point(0, 0), Vector(0, 0), Angle::fromDegrees(359.0),
-                         AngularVelocity::fromDegrees(-2.0), Timestamp::fromSeconds(1));
-    Robot filtered_robot = robot_filter.getFilteredData(new_robot_data).value();
-
-    EXPECT_TRUE(TestUtil::equalWithinTolerance(
-        expected_robot.angularVelocity().toDegrees(),
-        filtered_robot.angularVelocity().toDegrees(), 1e-6));
-    EXPECT_EQ(expected_robot, filtered_robot);
 }

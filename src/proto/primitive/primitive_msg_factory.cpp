@@ -55,15 +55,33 @@ std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
     return move_primitive_msg;
 }
 
-std::unique_ptr<TbotsProto::Primitive> createStopPrimitive()
+std::unique_ptr<TbotsProto::Primitive> createStopPrimitive(bool coast)
 {
     auto stop_primitive_msg = std::make_unique<TbotsProto::Primitive>();
 
-    stop_primitive_msg->mutable_stop();
+    if (coast)
+    {
+        stop_primitive_msg->mutable_stop()->set_stop_type(
+            TbotsProto::StopPrimitive::COAST);
+    }
+    else
+    {
+        stop_primitive_msg->mutable_stop()->set_stop_type(
+            TbotsProto::StopPrimitive::BRAKE);
+    }
 
     stop_primitive_msg->set_cost(1.0);
 
     return stop_primitive_msg;
+}
+
+std::unique_ptr<TbotsProto::Primitive> createEstopPrimitive()
+{
+    auto estop_primitive_msg = std::make_unique<TbotsProto::Primitive>();
+
+    estop_primitive_msg->mutable_estop();
+
+    return estop_primitive_msg;
 }
 
 std::unique_ptr<TbotsProto::Primitive> createDirectControlPrimitive(

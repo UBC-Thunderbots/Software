@@ -196,7 +196,7 @@ std::shared_ptr<Tactic> createTactic(const TbotsProto::ShadowEnemyTactic &tactic
 std::shared_ptr<Tactic> createTactic(const TbotsProto::StopTactic &tactic_proto,
                                      TbotsProto::AiConfig ai_config)
 {
-    auto tactic = std::make_shared<StopTactic>();
+    auto tactic = std::make_shared<StopTactic>(tactic_proto.coast());
     return tactic;
 }
 

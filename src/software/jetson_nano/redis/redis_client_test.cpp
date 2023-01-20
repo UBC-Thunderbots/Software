@@ -9,9 +9,6 @@
 #include "cpp_redis/core/subscriber.hpp"
 #include "software/test_util/test_util.h"
 
-// TODO #2805: Convert this into a test fixture so that we can start and run a REDIS
-// server during the lifetime of the test fixture. Then re-enable all tests
-
 TEST(RedisKeyValueStoreTests, DISABLED_cpp_redis_get_test)
 {
     cpp_redis::client client;
@@ -104,8 +101,8 @@ TEST(RedisImplTests, DISABLED_redis_client_get_and_set_impl_test)
 
     for (int i = 0; i <= 20; i++)
     {
-        redis.setSync(std::to_string(i), "test_value_new");
-        auto reply = redis.getSync(std::to_string(i));
+        redis.set(std::to_string(i), "test_value_new");
+        auto reply = redis.get(std::to_string(i));
         ASSERT_EQ(reply, "test_value_new");
     }
 
