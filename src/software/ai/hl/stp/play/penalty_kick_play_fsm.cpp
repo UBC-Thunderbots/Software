@@ -3,10 +3,9 @@
 PenaltyKickPlayFSM::PenaltyKickPlayFSM(TbotsProto::AiConfig ai_config)
     : ai_config(ai_config),
       penalty_kick_tactic(std::make_shared<PenaltyKickTactic>(ai_config)),
-      penalty_setup_tactics({}),
-      away_from_kick_tactics({})
+      penalty_setup_tactics(std::vector<std::shared_ptr<PenaltySetupTactic>>()),
+      away_from_kick_tactics(std::vector<std::shared_ptr<StopTactic>>())
 {
-    setPositioningTactics();
 }
 
 void PenaltyKickPlayFSM::performKick(const Update &event)
@@ -35,21 +34,28 @@ void PenaltyKickPlayFSM::setupPosition(const Update &event)
                                                         BALL_MAX_RADIUS_METERS + 0.1);
     double ball_position_x = event.common.world.field().friendlyPenaltyMark().x();
 
-    // Move all non-shooter robots behind the penalty mark
-    penalty_setup_tactics.at(0)->updateControlParams(
-        Point(ball_position_x - 1.25, 0),
-        event.common.world.field().enemyGoalCenter().toVector().orientation(), 0);
-    penalty_setup_tactics.at(1)->updateControlParams(
-        Point(ball_position_x - 1.25, 4 * ROBOT_MAX_RADIUS_METERS),
-        event.common.world.field().enemyGoalCenter().toVector().orientation(), 0);
-    penalty_setup_tactics.at(2)->updateControlParams(
-        Point(ball_position_x - 1.25, -4 * ROBOT_MAX_RADIUS_METERS),
-        event.common.world.field().enemyGoalCenter().toVector().orientation(), 0);
-    penalty_setup_tactics.at(3)->updateControlParams(
-        Point(ball_position_x - 1.25, 8 * ROBOT_MAX_RADIUS_METERS),
-        event.common.world.field().enemyGoalCenter().toVector().orientation(), 0);
+    unsigned int num_tactics = event.common.num_tactics;
+    if (num_tactics != away_from_kick_tactics.size())
+    {
+        penalty_setup_tactics =
+            std::vector<std::shared_ptr<PenaltySetupTactic>>(num_tactics);
+        std::generate(penalty_setup_tactics.begin(), penalty_setup_tactics.end(),
+                      []() { return std::make_shared<PenaltySetupTactic>(); });
+    }
 
-    penalty_setup_tactics.at(4)->updateControlParams(behind_ball, shoot_angle, 0.0);
+    // Move all non-shooter robots behind the penalty
+    for (unsigned int i = 0; i < penalty_setup_tactics.size() - 1; i++)
+    {
+        double y_offset = 4 *
+                          ((double)i - ((double)penalty_setup_tactics.size() - 1) / 2.0) *
+                          ROBOT_MAX_RADIUS_METERS;
+        penalty_setup_tactics.at(i)->updateControlParams(
+            Point(ball_position_x - 1.25, y_offset),
+            event.common.world.field().enemyGoalCenter().toVector().orientation(), 0);
+    }
+
+    // Move shooting robot behind the ball
+    penalty_setup_tactics.back()->updateControlParams(behind_ball, shoot_angle, 0.0);
 
     tactics_to_run[0].insert(tactics_to_run[0].end(), penalty_setup_tactics.begin(),
                              penalty_setup_tactics.end());
@@ -64,15 +70,4 @@ bool PenaltyKickPlayFSM::setupPositionDone(const Update &event)
 bool PenaltyKickPlayFSM::kickDone(const Update &event)
 {
     return event.common.world.gameState().isStopped();
-}
-
-void PenaltyKickPlayFSM::setPositioningTactics()
-{
-    penalty_setup_tactics = std::vector<std::shared_ptr<PenaltySetupTactic>>(5);
-    std::generate(penalty_setup_tactics.begin(), penalty_setup_tactics.end(),
-                  [this]() { return std::make_shared<PenaltySetupTactic>(); });
-
-    away_from_kick_tactics = std::vector<std::shared_ptr<StopTactic>>(4);
-    std::generate(away_from_kick_tactics.begin(), away_from_kick_tactics.end(),
-                  [this]() { return std::make_shared<StopTactic>(); });
 }

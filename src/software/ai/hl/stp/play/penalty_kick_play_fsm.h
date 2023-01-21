@@ -42,7 +42,7 @@ struct PenaltyKickPlayFSM
     void performKick(const Update& event);
 
     /**
-     * Guard to check if a pass has been found
+     * Guard to check if robots are in position to start the penalty kick
      *
      * @param event the PenaltyKickPlayFSM Update event
      *
@@ -51,18 +51,13 @@ struct PenaltyKickPlayFSM
     bool setupPositionDone(const Update& event);
 
     /**
-     * Guard to check if a pass has been found
+     * Guard to check if the robot has performed the kick
      *
      * @param event the PenaltyKickPlayFSM Update event
      *
      * @return whether the robot has finished performing a kick
      */
     bool kickDone(const Update& event);
-
-    /**
-     * Helper function that sets the movement tactic vector members
-     */
-    void setPositioningTactics();
 
     auto operator()()
     {
