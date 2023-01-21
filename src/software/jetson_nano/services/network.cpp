@@ -89,7 +89,6 @@ void NetworkService::primitiveSetCallback(TbotsProto::PrimitiveSet input)
 
 void NetworkService::worldCallback(TbotsProto::World input)
 {
-    // TODO(#2728): Implement a recent world loss count and warning
     std::scoped_lock<std::mutex> lock(world_mutex);
     const uint64_t seq_num = input.sequence_number();
 
