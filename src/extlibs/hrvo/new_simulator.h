@@ -11,6 +11,7 @@
 #include "software/geom/vector.h"
 #include "software/world/world.h"
 #include "software/geom/algorithms/intersection.h"
+#include "software/geom/algorithms/nearest_neighbor_search.hpp"
 
 class MotionPlanningSimulator {
 public:

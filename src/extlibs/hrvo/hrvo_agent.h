@@ -82,7 +82,7 @@ class HRVOAgent : public Agent
      * updates
      * velocity_obstacles_
      */
-    void computeNewVelocity(std::vector<Agent> &agents, double time_step) override;
+    void computeNewVelocity(std::vector<std::shared_ptr<Agent>> &agents, double time_step) override;
 
     /**
      * Create the hybrid reciprocal velocity obstacle which other_agent should see for
@@ -109,8 +109,10 @@ class HRVOAgent : public Agent
      * be considered a neighbor.
      * Computes the `maxNeighbors` nearest neighbors of this agent which are within
      * `neighbor_dist_threshold`.
+     * TODO should return list of agent pointers, won't need to map back to agents later.
+     *
      */
-    std::vector<Agent> computeNeighbors(std::vector<Agent> other_agents);
+    std::set<std::pair<float, std::size_t>> computeNeighbors(std::vector<std::shared_ptr<Agent>> other_agents);
 
     /**
      * Inserts a neighbor into the set of neighbors of this agent.
@@ -155,8 +157,14 @@ private:
     /**
      * Compute all the velocity obstacles that this Agent should take into account and
      * add it to `velocityObstacles_`.
+     * this only considers making VO's for relevant agents in the `neighbours_` field.
+     *
+     * relies on
+     * `ball_obstacle`, `neighbours_`
+     * updates
+     * `velocity_obstacles_`
      */
-    void computeVelocityObstacles();
+    void computeVelocityObstacles(std::vector<std::shared_ptr<Agent>> &agents);
 
     /**
      * A candidate point is a internal structure used when computing new velocities. It is

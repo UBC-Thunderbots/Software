@@ -111,9 +111,9 @@ void HRVOAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive,
     setPath(path);
 }
 
-std::vector<Agent> HRVOAgent::computeNeighbors(std::vector<Agent> other_agents)
+std::set<std::pair<float, std::size_t>> HRVOAgent::computeNeighbors(std::vector<std::shared_ptr<Agent>> other_agents)
 {
-    std::vector<Agent> neighbours;
+    std::set<std::pair<float, std::size_t>> neighbours;
     const auto current_path_point_opt = this->path.getCurrentPathPoint();
     if (!current_path_point_opt.has_value())
     {
@@ -128,12 +128,12 @@ std::vector<Agent> HRVOAgent::computeNeighbors(std::vector<Agent> other_agents)
                      (getPosition() - current_destination).length());
     // Re-calculate all agents (neighbors) within the distance threshold
     // which we want to create velocity obstacles for
-    // TODO use brute force search
+    // TODO: Use brute force search algorithm instead.
     // kd_tree()->query(agent, neighbor_dist_threshold);
     return neighbours;
 }
 
-void HRVOAgent::computeVelocityObstacles()
+void HRVOAgent::computeVelocityObstacles(std::vector<std::shared_ptr<Agent>> &agents)
 {
     velocity_obstacles_.clear();
     velocity_obstacles_.reserve(neighbors_.size());
@@ -152,10 +152,10 @@ void HRVOAgent::computeVelocityObstacles()
                  (getPosition() - current_destination).length());
 
     // Create Velocity Obstacles for neighboring agents
-    std::vector<Agent> neighbours = computeNeighbors();
-    for (const auto &neighbor : neighbors_)
+    std::set<std::pair<float, std::size_t>> neighbours = computeNeighbors(agents);
+    for (const auto &neighbor : neighbours)
     {
-        std::shared_ptr<Agent> other_agent = simulator_->getAgents()[neighbor.second];
+        std::shared_ptr<Agent> other_agent = agents[neighbor.second];
         VelocityObstacle velocity_obstacle = other_agent->createVelocityObstacle(*this);
         velocity_obstacles_.push_back(velocity_obstacle);
     }
@@ -235,13 +235,13 @@ VelocityObstacle HRVOAgent::createVelocityObstacle(const Agent &other_agent)
     return VelocityObstacle(hrvo_apex, vo.getLeftSide(), vo.getRightSide());
 }
 
-void HRVOAgent::computeNewVelocity(double time_step)
+void HRVOAgent::computeNewVelocity(std::vector<std::shared_ptr<Agent>> &agents, double time_step)
 {
     // Based on The Hybrid Reciprocal Velocity Obstacle paper:
     // https://gamma.cs.unc.edu/HRVO/HRVO-T-RO.pdf
     // these should return values instead of set fields
     computePreferredVelocity(time_step);
-    computeVelocityObstacles();
+    computeVelocityObstacles(agents);
 
     // Find candidate velocities which this agent can take to avoid collision
     candidates_.clear();
