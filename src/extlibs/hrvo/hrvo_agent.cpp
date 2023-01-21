@@ -54,8 +54,13 @@ HRVOAgent::HRVOAgent(HRVOSimulator *simulator, const Vector &position,
       // parameter is changed
       obstacle_factory(TbotsProto::RobotNavigationObstacleConfig())
 {
+    // Reduce the inflation factor by 1, since HRVO automatically takes into account the
+    // robot radius when avoiding obstacles
     auto obstacle_factory_config = TbotsProto::RobotNavigationObstacleConfig();
-    obstacle_factory_config.set_robot_obstacle_inflation_factor(1.0);
+    double default_inflation_factor =
+        obstacle_factory_config.robot_obstacle_inflation_factor();
+    obstacle_factory_config.set_robot_obstacle_inflation_factor(default_inflation_factor -
+                                                                1.0);
     obstacle_factory = RobotNavigationObstacleFactory(obstacle_factory_config);
 }
 
@@ -81,13 +86,15 @@ void HRVOAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive,
 
         // Update non-robot obstacles
         std::set<TbotsProto::MotionConstraint> motion_constraints;
-        auto motion_constraint_enum_descriptor = TbotsProto::MotionConstraint_descriptor();
+        auto motion_constraint_enum_descriptor =
+            TbotsProto::MotionConstraint_descriptor();
         for (int constraint_int : motion_control.motion_constraints())
         {
             TbotsProto::MotionConstraint constraint;
-            auto enum_value_descriptor = motion_constraint_enum_descriptor->value(constraint_int);
-            bool parsed =
-                    TbotsProto::MotionConstraint_Parse(enum_value_descriptor->name(), &constraint);
+            auto enum_value_descriptor =
+                motion_constraint_enum_descriptor->value(constraint_int);
+            bool parsed = TbotsProto::MotionConstraint_Parse(
+                enum_value_descriptor->name(), &constraint);
             if (!parsed)
             {
                 LOG(WARNING) << "HRVO: Failed to parse MotionConstraint enum value: "
@@ -96,12 +103,12 @@ void HRVOAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive,
             }
 
             auto new_obstacles =
-                    obstacle_factory.createFromMotionConstraint(constraint, world);
+                obstacle_factory.createFromMotionConstraint(constraint, world);
             if (enum_value_descriptor->options().HasExtension(TbotsProto::dynamic) &&
                 enum_value_descriptor->options().GetExtension(TbotsProto::dynamic))
             {
                 dynamic_obstacles.insert(dynamic_obstacles.end(), new_obstacles.begin(),
-                                        new_obstacles.end());
+                                         new_obstacles.end());
                 break;
             }
             else
@@ -111,9 +118,11 @@ void HRVOAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive,
             }
         }
 
-        if (new_primitive.move().ball_collision_type() == TbotsProto::BallCollisionType::AVOID)
+        if (new_primitive.move().ball_collision_type() ==
+            TbotsProto::BallCollisionType::AVOID)
         {
-            auto ball_obstacle = obstacle_factory.createFromBallPosition(world.ball().position());
+            auto ball_obstacle =
+                obstacle_factory.createFromBallPosition(world.ball().position());
             dynamic_obstacles.push_back(ball_obstacle);
         }
 
@@ -124,16 +133,18 @@ void HRVOAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive,
             {
                 // Shift the current destination to a point outside the obstacle
                 Point closest_point = obstacle->closestPoint(destination);
-                destination = closest_point + (closest_point - destination).normalize(ROBOT_MAX_RADIUS_METERS);
+                destination =
+                    closest_point +
+                    (closest_point - destination).normalize(ROBOT_MAX_RADIUS_METERS);
             }
         }
 
         // Max distance which the robot can travel in one time step + scaling
         // TODO (#2370): This constant is calculated multiple times.
         float path_radius = (max_speed_ * simulator_->getTimeStep()) / 2;
-        auto path_points  = {PathPoint(
-                Vector(destination.x(), destination.y()), speed_at_dest)};
-        path              = AgentPath(path_points, path_radius);
+        auto path_points  = {
+            PathPoint(Vector(destination.x(), destination.y()), speed_at_dest)};
+        path = AgentPath(path_points, path_radius);
     }
     setPath(path);
 }
@@ -182,10 +193,10 @@ void HRVOAgent::computeVelocityObstacles()
     {
         // Add obstacle if the current path goes through it, or if we're very close to it
         if (obstacle->intersects(path_segment) ||
-                obstacle->distance(agent_position_point) < 4 * ROBOT_MAX_RADIUS_METERS)
+            obstacle->distance(agent_position_point) < 4 * ROBOT_MAX_RADIUS_METERS)
         {
             VelocityObstacle velocity_obstacle =
-                    obstacle->generateVelocityObstacle(circle_rep_of_agent, Vector());
+                obstacle->generateVelocityObstacle(circle_rep_of_agent, Vector());
             velocity_obstacles_.push_back(velocity_obstacle);
         }
     }

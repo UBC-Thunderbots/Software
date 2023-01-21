@@ -1,10 +1,10 @@
 #pragma once
 
+#include "software/geom/circle.h"
 #include "software/geom/line.h"
 #include "software/geom/point.h"
-#include "software/geom/segment.h"
 #include "software/geom/polygon.h"
-#include "software/geom/circle.h"
+#include "software/geom/segment.h"
 
 /**
  * Finds the closest Point on a Line to a Point
@@ -35,8 +35,8 @@ Point closestPoint(const Segment &segment, const Point &p);
  *
  * @return the Point on polygon closest to point.
  */
-Point closestPoint(const Polygon& polygon, const Point &p);
-Point closestPoint(const Point &p, const Polygon& polygon);
+Point closestPoint(const Polygon &polygon, const Point &p);
+Point closestPoint(const Point &p, const Polygon &polygon);
 
 /**
  * Finds the Point on circle closest to point.
@@ -46,5 +46,5 @@ Point closestPoint(const Point &p, const Polygon& polygon);
  *
  * @return the Point on circle closest to point.
  */
-Point closestPoint(const Circle& circle, const Point &p);
-Point closestPoint(const Point &p, const Circle& circle);
+Point closestPoint(const Circle &circle, const Point &p);
+Point closestPoint(const Point &p, const Circle &circle);
