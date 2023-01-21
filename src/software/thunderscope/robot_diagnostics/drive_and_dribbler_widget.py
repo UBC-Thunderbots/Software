@@ -48,7 +48,7 @@ class DriveAndDribblerWidget(QWidget):
         self.proto_unix_io.send_proto(MotorControl, motor_control)
 
     def value_change(self, value):
-        """Change the slider's value by 0.1 per step
+        """Change the slider's value
 
         :param title: the name of the slider
 
@@ -145,7 +145,7 @@ class DriveAndDribblerWidget(QWidget):
             3,
             self.constants.indefinite_dribbler_speed_rpm,
             -self.constants.indefinite_dribbler_speed_rpm,
-            1000,
+            1,
         )
 
         # add listener function to update label with slider value
