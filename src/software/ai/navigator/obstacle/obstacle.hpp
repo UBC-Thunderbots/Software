@@ -8,12 +8,12 @@
 #include "proto/primitive.pb.h"
 #include "shared/constants.h"
 #include "software/ai/navigator/obstacle/obstacle_visitor.h"
+#include "software/geom/algorithms/closest_point.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/algorithms/distance.h"
 #include "software/geom/algorithms/generate_velocity_obstacle.h"
 #include "software/geom/algorithms/intersects.h"
 #include "software/geom/algorithms/rasterize.h"
-#include "software/geom/algorithms/closest_point.h"
 #include "software/geom/point.h"
 #include "software/geom/segment.h"
 

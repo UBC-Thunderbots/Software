@@ -105,7 +105,5 @@ class FieldLayer(pg.GraphicsObject):
 
         for circle_obstacle in obstacles.circle:
             painter.drawEllipse(
-                self.createCircle(
-                    circle_obstacle.origin, circle_obstacle.radius
-                )
+                self.createCircle(circle_obstacle.origin, circle_obstacle.radius)
             )

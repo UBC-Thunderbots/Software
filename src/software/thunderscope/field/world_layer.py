@@ -285,10 +285,14 @@ class WorldLayer(FieldLayer):
         # Draw Field Boundary
         painter.drawRect(
             QtCore.QRectF(
-                -(field.field_x_length / 2 + field.boundary_buffer_size) * MILLIMETERS_PER_METER,
-                (field.field_y_length / 2 + field.boundary_buffer_size) * MILLIMETERS_PER_METER,
-                (field.field_x_length + 2*field.boundary_buffer_size) * MILLIMETERS_PER_METER,
-                -(field.field_y_length + 2*field.boundary_buffer_size) * MILLIMETERS_PER_METER,
+                -(field.field_x_length / 2 + field.boundary_buffer_size)
+                * MILLIMETERS_PER_METER,
+                (field.field_y_length / 2 + field.boundary_buffer_size)
+                * MILLIMETERS_PER_METER,
+                (field.field_x_length + 2 * field.boundary_buffer_size)
+                * MILLIMETERS_PER_METER,
+                -(field.field_y_length + 2 * field.boundary_buffer_size)
+                * MILLIMETERS_PER_METER,
             )
         )
 
