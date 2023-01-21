@@ -10,6 +10,7 @@
 #include "proto/visualization.pb.h"
 #include "software/geom/vector.h"
 #include "software/world/world.h"
+#include "software/geom/algorithms/intersection.h"
 
 class MotionPlanningSimulator {
 public:
@@ -40,8 +41,11 @@ public:
      */
     void updatePrimitiveSet(const TbotsProto::PrimitiveSet &new_primitive_set);
 
-    // comment
-    void doStep();
+    void doStep(double time_step);
+
+    std::optional<std::shared_ptr<HRVOAgent>> getFriendlyAgentFromRobotId(
+            unsigned int robot_id) const;
+
 
 private:
 
@@ -77,15 +81,13 @@ private:
 
     // The colour of the friendly team
     const TeamColour friendly_team_colour;
-    // will be removed
-    // KdTree used to calculate the K nearest agents
-    std::unique_ptr<KdTree> kd_tree;
 
     // List of agents (robots) in this simulation
-    std::vector<Agent> agents;
+    std::vector<std::shared_ptr<Agent>> agents;
 
-    // simulator context
-    MotionPlanningSimulatorContext context;
+    // robot id to agent index
+    std::map<unsigned int, unsigned int> friendly_robot_id_map;
+    std::map<unsigned int, unsigned int> enemy_robot_id_map;
 
 
     // The max amount (meters) which the friendly/enemy robot radius can increase by.

@@ -4,11 +4,10 @@ MotionPlanningSimulator::MotionPlanningSimulator(float time_step, const RobotCon
                                                  const TeamColour friendly_team_colour):
     robot_constants(robot_constants),
     primitive_set(),
-    global_time(0.0f),
-    time_step(time_step),
-    kd_tree(std::make_unique<KdTree>(this)),
     world(std::nullopt),
     agents(),
+    friendly_robot_id_map(),
+    enemy_robot_id_map(),
     friendly_team_colour(friendly_team_colour)
 {
 }
@@ -18,46 +17,77 @@ void MotionPlanningSimulator::updateWorld(const World &world)
     this->world               = world;
     const auto &friendly_team = world.friendlyTeam().getAllRobots();
     const auto &enemy_team    = world.enemyTeam().getAllRobots();
-
-    updateRemovedAgents(world);
-
-    // update agents
-    for (const Robot &friendly_robot : friendly_team)
+    // TODO (#2498): Update implementation to correctly support adding and removing agents
+    //               to represent the newly added and removed friendly/enemy robots in the
+    //               World.
+    if (friendly_robot_id_map.empty() && enemy_robot_id_map.empty())
     {
-        auto hrvo_agent = getFriendlyAgentFromRobotId(friendly_robot.id());
-        if (hrvo_agent.has_value())
+        for (const Robot &friendly_robot : friendly_team)
         {
-            hrvo_agent.value()->setPosition(friendly_robot.position().toVector());
-            // We do not use velocity feedback for friendly robots as it results
-            // in the robots not being able to accelerate properly.
+            std::size_t agent_index = addHRVORobotAgent(friendly_robot);
+            friendly_robot_id_map.emplace(friendly_robot.id(), agent_index);
         }
-        else
+
+        for (const Robot &enemy_robot : enemy_team)
         {
-            addHRVORobotAgent(friendly_robot, TeamSide::FRIENDLY);
+            // Set goal of enemy robot to be the farthest point, when moving in the
+            // current direction
+            Segment segment(enemy_robot.position(),
+                            enemy_robot.position() + enemy_robot.velocity() * 100);
+
+            // Enemy robot should not enter the friendly defense area
+            std::unordered_set<Point> intersection_point_set =
+                    intersection(world.field().friendlyDefenseArea(), segment);
+            if (intersection_point_set.empty() &&
+                contains(world.field().fieldLines(), enemy_robot.position()))
+            {
+                // If the robot is in the field, then move in the current direction
+                // towards the field edge
+                intersection_point_set =
+                        intersection(world.field().fieldLines(), segment);
+            }
+
+            if (intersection_point_set.empty())
+            {
+                // If there is no intersection point (robot is outside the field),
+                // continue moving in the current direction
+                intersection_point_set.insert(enemy_robot.position() +
+                                              enemy_robot.velocity() * 5);
+            }
+
+            Vector goal_position = intersection_point_set.begin()->toVector();
+            std::size_t agent_index =
+                    addLinearVelocityRobotAgent(enemy_robot, goal_position);
+            enemy_robot_id_map.emplace(enemy_robot.id(), agent_index);
         }
     }
-
-    for (const Robot &enemy_robot : enemy_team)
+    else
     {
-        auto agent_iter = std::find_if(
-                agents.begin(), agents.end(), [&enemy_robot](std::shared_ptr<Agent> agent) {
-                    return (agent->getRobotId() == enemy_robot.id() &&
-                            agent->getAgentType() == TeamSide::ENEMY);
-                });
-
-        if (agent_iter != agents.end())
+        // Update Agents
+        for (const Robot &friendly_robot : friendly_team)
         {
-            (*agent_iter)->setPosition(enemy_robot.position().toVector());
-            (*agent_iter)->setVelocity(enemy_robot.velocity());
+            auto hrvo_agent = getFriendlyAgentFromRobotId(friendly_robot.id());
+            if (hrvo_agent.has_value())
+            {
+                hrvo_agent.value()->setPosition(friendly_robot.position().toVector());
+                // We do not use velocity feedback for friendly robots as it results
+                // in the robots not being able to accelerate properly.
+            }
         }
-        else
+
+        for (const Robot &enemy_robot : enemy_team)
         {
-            Vector destination =
-                    (enemy_robot.position() + enemy_robot.velocity() * 5).toVector();
-            addLinearVelocityRobotAgent(enemy_robot, destination, TeamSide::ENEMY);
+            auto agent_index_iter = enemy_robot_id_map.find(enemy_robot.id());
+            if (agent_index_iter != enemy_robot_id_map.end())
+            {
+                unsigned int agent_index = agent_index_iter->second;
+                agents[agent_index].setPosition(enemy_robot.position().toVector());
+                agents[agent_index].setVelocity(enemy_robot.velocity());
+            }
         }
     }
 }
+
 
 void MotionPlanningSimulator::updatePrimitiveSet(const TbotsProto::PrimitiveSet &new_primitive_set)
 {
@@ -83,27 +113,19 @@ MotionPlanningSimulator::addLinearVelocityRobotAgent(const Robot &robot, const V
     return 0;
 }
 
-void MotionPlanningSimulator::doStep()
+void MotionPlanningSimulator::doStep(double time_step)
 {
-    if (kd_tree == nullptr)
-    {
-        throw std::runtime_error(
-                "Simulation not initialized when attempting to do step.");
-    }
 
     if (time_step == 0.0f)
     {
-        throw std::runtime_error("Time step not set when attempting to do step.");
+        throw std::runtime_error("Time step is zero");
     }
 
-    reached_goals = true;
 
-    if (agents.size() == 0)
+    if (agents.empty())
     {
         return;
     }
-
-    kd_tree->build();
 
     // Update all agent radii based on their velocity
     for (auto &agent : agents)
@@ -114,7 +136,7 @@ void MotionPlanningSimulator::doStep()
     // Compute what velocity each agent will take next
     for (auto &agent : agents)
     {
-        agent->computeNewVelocity(time_step, world_state);
+        agent->computeNewVelocity(agents, time_step);
     }
 
     // Update the positions of all agents given their velocity
@@ -122,6 +144,20 @@ void MotionPlanningSimulator::doStep()
     {
         agent->update(time_step);
     }
+}
 
-    global_time += time_step;
+std::optional<std::shared_ptr<HRVOAgent>> MotionPlanningSimulator::getFriendlyAgentFromRobotId(
+        unsigned int robot_id) const
+{
+    auto agent_index_iter = friendly_robot_id_map.find(robot_id);
+    if (agent_index_iter != friendly_robot_id_map.end())
+    {
+        unsigned int agent_index = agent_index_iter->second;
+        auto hrvo_agent = std::static_pointer_cast<HRVOAgent>(agents[agent_index]);
+        if (hrvo_agent != nullptr)
+        {
+            return hrvo_agent;
+        }
+    }
+    return std::nullopt;
 }

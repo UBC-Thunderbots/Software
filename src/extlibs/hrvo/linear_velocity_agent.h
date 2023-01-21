@@ -34,8 +34,9 @@ class LinearVelocityAgent : public Agent
 
     /**
      * Computes the new velocity of this agent.
+     * @param agents is unused
      */
-    void computeNewVelocity(double time_step) override;
+    void computeNewVelocity(std::vector<Agent> &agents, double time_step) override;
 
     /**
      * Create the velocity obstacle which other_agent should see for this Agent

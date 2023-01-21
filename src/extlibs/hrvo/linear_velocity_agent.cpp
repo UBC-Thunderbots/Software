@@ -10,7 +10,7 @@ LinearVelocityAgent::LinearVelocityAgent(const Vector &position,
 {
 }
 
-void LinearVelocityAgent::computeNewVelocity(double time_step)
+void LinearVelocityAgent::computeNewVelocity(std::vector<Agent> &agents, double time_step)
 {
     // TODO (#2496): Fix bug where LinearVelocityAgents go past their destination
     // Preferring a velocity which points directly towards goal

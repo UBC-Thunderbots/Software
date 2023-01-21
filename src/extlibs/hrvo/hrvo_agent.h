@@ -42,7 +42,6 @@
 #include "simulator.h"
 #include "software/ai/navigator/obstacle/robot_navigation_obstacle_factory.h"
 #include "software/geom/vector.h"
-#include "extlibs/hrvo/simulator_context.h"
 
 /**
  * An agent/robot in the simulation which uses the HRVO algorithm to motion plan towards
@@ -77,8 +76,13 @@ class HRVOAgent : public Agent
 
     /**
      * Computes the new velocity of this agent.
+     * relies on:
+     * neighbours, static_obstacles, ball_obstacle
+     *
+     * updates
+     * velocity_obstacles_
      */
-    void computeNewVelocity(double time_step, MotionPlanningSimulatorContext state) override;
+    void computeNewVelocity(std::vector<Agent> &agents, double time_step) override;
 
     /**
      * Create the hybrid reciprocal velocity obstacle which other_agent should see for
@@ -93,6 +97,10 @@ class HRVOAgent : public Agent
 
     /**
      * Computes the preferred velocity of this agent.
+     * relies on
+     * pref_speed, velocity and position
+     *
+     * updates pref_velocity
      */
     void computePreferredVelocity(double time_step);
 
@@ -143,7 +151,13 @@ class HRVOAgent : public Agent
      */
     void setPreferredSpeed(float new_pref_speed);
 
-   private:
+private:
+    /**
+     * Compute all the velocity obstacles that this Agent should take into account and
+     * add it to `velocityObstacles_`.
+     */
+    void computeVelocityObstacles();
+
     /**
      * A candidate point is a internal structure used when computing new velocities. It is
      * composed of a potential new velocity and the index of two VelocityObstacles in
@@ -223,12 +237,6 @@ class HRVOAgent : public Agent
      * candidate is as fast or slower
      */
     bool isCandidateFasterThanCurrentSpeed(const Candidate &candidate) const;
-
-    /**
-     * Compute all the velocity obstacles that this Agent should take into account and
-     * add it to `velocityObstacles_`.
-     */
-    void computeVelocityObstacles();
 
    public:
     float pref_speed_;

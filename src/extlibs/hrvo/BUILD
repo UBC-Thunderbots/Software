@@ -32,13 +32,11 @@ cc_library(
     hdrs = [
         "agent.h",
         "hrvo_agent.h",
-        "hrvo_agent"
         "kd_tree.h",
         "linear_velocity_agent.h",
         "path.h",
         "path_point.h",
         "simulator.h",
-        "simulator_context.h"
         "new_simulator.h"
     ],
     deps = [

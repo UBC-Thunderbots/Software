@@ -40,7 +40,7 @@ class Agent
     /**
      * Computes the new velocity of this agent.
      */
-    virtual void computeNewVelocity(double time_step, MotionPlanningSimulatorContext state) = 0;
+    virtual void computeNewVelocity(std::vector<std::shared_ptr<Agent>> &agents, double time_step) = 0;
 
     /**
      * Create the velocity obstacle which other_agent should see for this Agent
