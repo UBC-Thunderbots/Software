@@ -62,6 +62,18 @@ RobotNavigationObstacleFactory::createStaticObstaclesFromMotionConstraint(
             obstacles.push_back(createFromFieldRectangle(
                 field.enemyHalf(), field.fieldLines(), field.fieldBoundary()));
             break;
+        case TbotsProto::MotionConstraint::ENEMY_HALF_WITHOUT_CENTRE_CIRCLE:
+        {
+            double larger_radius                 = field.centerCircleRadius() + 0.2;
+            Polygon centre_circle_and_enemy_half = Polygon(
+                    {Point(0, field.yLength() / 2), Point(0, larger_radius),
+                     Point(larger_radius, larger_radius), Point(larger_radius + 0.2, 0),
+                     Point(larger_radius, -larger_radius), Point(0, -larger_radius),
+                     Point(0, -field.yLength() / 2), field.fieldBoundary().posXNegYCorner(),
+                     field.fieldBoundary().posXPosYCorner()});
+            obstacles.push_back(createFromShape(centre_circle_and_enemy_half));
+            break;
+        }
         case TbotsProto::MotionConstraint::AVOID_FIELD_BOUNDARY_ZONE:
         {
             Rectangle field_walls    = field.fieldBoundary();
@@ -126,6 +138,9 @@ RobotNavigationObstacleFactory::createDynamicObstaclesFromMotionConstraint(
             // not handled by this obstacle factory since it's a static obstacle
             break;
         case TbotsProto::MotionConstraint::ENEMY_HALF:
+            // not handled by this obstacle factory since it's a static obstacle
+            break;
+        case TbotsProto::MotionConstraint::ENEMY_HALF_WITHOUT_CENTRE_CIRCLE:
             // not handled by this obstacle factory since it's a static obstacle
             break;
         case TbotsProto::MotionConstraint::AVOID_FIELD_BOUNDARY_ZONE:
