@@ -8,7 +8,7 @@ from software.simulated_tests.validation import (
 )
 
 
-class RobotEntersRegion(Validation):
+class RobotStopsInRegion(Validation):
 
     """Checks if a Robot enters any of the provided regions."""
 
@@ -28,7 +28,7 @@ class RobotEntersRegion(Validation):
             for robot in world.friendly_team.team_robots:
                 if tbots.contains(
                     region, tbots.createPoint(robot.current_state.global_position)
-                ):
+                ) and (tbots.createVector(robot.velocity).length() <= 0.01):
                     num_robots -= 1
                     if num_robots == 0:
                         return ValidationStatus.PASSING
@@ -48,8 +48,8 @@ class RobotEntersRegion(Validation):
 
 
 (
-    RobotEventuallyEntersRegion,
-    RobotEventuallyExitsRegion,
-    RobotAlwaysStaysInRegion,
-    RobotNeverEntersRegion,
+    RobotEventuallyStopsInRegion,
+    RobotEventuallyMovesInRegion,
+    RobotAlwaysStopsInRegion,
+    RobotNeverStopsInRegion,
 ) = create_validation_types(RobotEntersRegion)

@@ -12,6 +12,8 @@ from proto.ssl_gc_common_pb2 import Team
 from proto.ssl_gc_geometry_pb2 import Vector2
 
 # TODO (#2599): Remove Duration parameter from test
+
+
 @pytest.mark.parametrize(
     "run_enemy_ai,test_duration", [(False, 20)]
 )  # , (True, 20)]) # TODO (#2690): Robot gets stuck in corner of defense area
@@ -59,7 +61,8 @@ def test_two_ai_ball_placement(simulated_test_runner, run_enemy_ai, test_duratio
     blue_play = Play()
     blue_play.name = PlayName.BallPlacementPlay
 
-    simulated_test_runner.blue_full_system_proto_unix_io.send_proto(Play, blue_play)
+    simulated_test_runner.blue_full_system_proto_unix_io.send_proto(
+        Play, blue_play)
 
     # We can parametrize running in ai_vs_ai mode
     if run_enemy_ai:
@@ -88,7 +91,15 @@ def test_two_ai_ball_placement(simulated_test_runner, run_enemy_ai, test_duratio
     eventually_validation_sequence_set = [
         [
             # Ball should arrive within 5cm of placement point
-            BallEventuallyEntersRegion(regions=[tbots.Circle(ball_final_pos, 0.05)]),
+            BallEventuallyStopsInRegion(
+                regions=[tbots.Circle(ball_final_pos, 0.05)]),
+            RobotEventuallyEntersRegion(
+                regions=[tbots.Circle(ball_final_pos, 0.1)]),
+            RobotEventuallyStopsInRegion(
+                regions=[tbots.Rectangle(tbots.Field.createSSLDivisionBField().friendlyDefenseArea().posXNegYCorner(
+                ), tbots.Field.createSSLDivisionBField().friendlyDefenseArea().posXPosYCorner() + 0.2)],
+                num_robots=blue_bots.length()-2
+            )
         ]
     ]
 
