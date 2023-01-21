@@ -578,6 +578,8 @@ class TigersAutoref(object):
         field = tbots.Field.createSSLDivisionBField()  
         ci_input.geometry.CopyFrom(createGeometryData(field, 0.3))
 
+        print(ci_input)
+
         size = ci_input.ByteSize()
 
         # Send a request to the host with the size of the message
@@ -587,17 +589,33 @@ class TigersAutoref(object):
         response_data = self.ci_socket.recv(
                 Gamecontroller.CI_MODE_OUTPUT_RECEIVE_BUFFER_SIZE
         )
-        pdb.set_trace()
-        msg_len, new_pos = decoder._DecodeVarint32(response_data, offset)
-        print(str(msg_len) + ", " + str(new_pos) + ", " + str(len(response_data)))
-        ci_output = AutoRefCiOutput()
-        if (msg_len > len(response_data)):
-            print("Must get additional data")
-            response_data += self.ci_socket.recv(
-                msg_len - len(response_data)
-            )
-        ci_output.ParseFromString(response_data[new_pos : new_pos + msg_len])
-        self.send_ci_input(ci_output.tracker_wrapper_packet)
+        msg_len, new_pos = decoder._DecodeVarint32(response_data, 0)
+        offset = 0
+        while offset < len(response_data):
+            msg_len, new_pos = decoder._DecodeVarint32(response_data, offset)
+            offset = new_pos
+            print("offset: " + str(offset) + ", " + str(msg_len) + ", " + str(new_pos) + ", " + str(len(response_data)))
+            #print(response_data)
+            ci_output = AutoRefCiOutput()
+            if (offset + msg_len > len(response_data)):
+                print("Must get additional data")
+                response_data += self.ci_socket.recv(
+                        offset + msg_len - len(response_data)
+                )
+            ci_output.ParseFromString(response_data[offset : offset + msg_len])
+            self.send_ci_input(ci_output.tracker_wrapper_packet)
+            #print(ci_output)
+            offset += msg_len
+
+        #print(str(msg_len) + ", " + str(new_pos) + ", " + str(len(response_data)))
+        #ci_output = AutoRefCiOutput()
+        #if (msg_len > len(response_data)):
+        #    print("Must get additional data")
+        #    response_data += self.ci_socket.recv(
+        #        msg_len - len(response_data)
+        #    )
+        #ci_output.ParseFromString(response_data[new_pos : new_pos + msg_len])
+        #self.send_ci_input(ci_output.tracker_wrapper_packet)
 
     def sslWrappers(self):
         print("ssl enter")
@@ -697,6 +715,7 @@ class TigersAutoref(object):
             :param data: The referee command to send
 
             """
+            print('hello')
             print(data)
             blue_fullsystem_proto_unix_io.send_proto(Referee, data)
             yellow_fullsystem_proto_unix_io.send_proto(Referee, data)
