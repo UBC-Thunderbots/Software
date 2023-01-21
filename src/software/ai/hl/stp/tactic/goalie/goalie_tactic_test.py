@@ -104,6 +104,7 @@ def test_goalie_blocks_shot(
     robot_initial_position,
     simulated_test_runner,
 ):
+
     # Setup Robot
     simulated_test_runner.simulator_proto_unix_io.send_proto(
         WorldState,
