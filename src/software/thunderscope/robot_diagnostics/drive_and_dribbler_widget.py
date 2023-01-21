@@ -1,31 +1,20 @@
 from pyqtgraph.Qt.QtCore import Qt
 from pyqtgraph.Qt.QtWidgets import *
 import time
+import software.python_bindings as tbots
 
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.common import common_widgets
 from proto.import_all_protos import *
 
-# TODO (#2683) get these values from robot constants
-MAX_DRIBBLER_RPM = 10000
-MIN_DRIBBLER_RPM = -10000
-
-MAX_LINEAR_SPEED_MPS = 5
-MIN_LINEAR_SPEED_MPS = -5
-
-MAX_ANGULAR_SPEED_RAD_PER_S = 20
-MIN_ANGULAR_SPEED_RAD_PER_S = -20
-
 
 class DriveAndDribblerWidget(QWidget):
     def __init__(self, proto_unix_io):
         """Initialize the widget to control the robot's motors
-
         :param proto_unix_io: the proto_unix_io object
-
         """
         self.input_a = time.time()
-
+        self.constants = tbots.create2021RobotConstants()
         QWidget.__init__(self)
         layout = QVBoxLayout()
 
@@ -59,9 +48,7 @@ class DriveAndDribblerWidget(QWidget):
 
     def value_change(self, value):
         """Change the slider's value by 0.1 per step
-
         :param title: the name of the slider
-
         """
         value = float(value)
         value_str = "%.2f" % value
@@ -69,9 +56,7 @@ class DriveAndDribblerWidget(QWidget):
 
     def setup_direct_velocity(self, title):
         """Create a widget to control the direct velocity of the robot's motors
-
         :param title: the name of the slider
-
         """
 
         group_box = QGroupBox(title)
@@ -82,21 +67,33 @@ class DriveAndDribblerWidget(QWidget):
             self.x_velocity_slider,
             self.x_velocity_label,
         ) = common_widgets.create_float_slider(
-            "X (m/s)", 2, MIN_LINEAR_SPEED_MPS, MAX_LINEAR_SPEED_MPS, 1
+            "X (m/s)",
+            2,
+            -self.constants.robot_max_speed_m_per_s * 1000,
+            self.constants.robot_max_speed_m_per_s * 1000,
+            1,
         )
         (
             y_layout,
             self.y_velocity_slider,
             self.y_velocity_label,
         ) = common_widgets.create_float_slider(
-            "Y (m/s)", 2, MIN_LINEAR_SPEED_MPS, MAX_LINEAR_SPEED_MPS, 1
+            "Y (m/s)",
+            2,
+            -self.constants.robot_max_speed_m_per_s * 1000,
+            self.constants.robot_max_speed_m_per_s * 1000,
+            1,
         )
         (
             dps_layout,
             self.angular_velocity_slider,
             self.angular_velocity_label,
         ) = common_widgets.create_float_slider(
-            "θ (rad/s)", 2, MIN_ANGULAR_SPEED_RAD_PER_S, MAX_ANGULAR_SPEED_RAD_PER_S, 1,
+            "θ (rad/s)",
+            2,
+            -self.constants.robot_max_ang_speed_rad_per_s * 1000,
+            self.constants.robot_max_ang_speed_rad_per_s * 1000,
+            1,
         )
 
         # add listener functions for sliders to update label with slider value
@@ -139,7 +136,11 @@ class DriveAndDribblerWidget(QWidget):
             self.dribbler_speed_rpm_slider,
             self.dribbler_speed_rpm_label,
         ) = common_widgets.create_float_slider(
-            "RPM", 1, MIN_DRIBBLER_RPM, MAX_DRIBBLER_RPM, 1000
+            "RPM",
+            1,
+            self.constants.indefinite_dribbler_speed_rpm * 1000,
+            -self.constants.indefinite_dribbler_speed_rpm * 1000,
+            1000,
         )
 
         # add listener function to update label with slider value
