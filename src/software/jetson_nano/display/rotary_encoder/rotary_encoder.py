@@ -1,4 +1,4 @@
-import Jetson.Gpio as Gpio  # pip install Jetson.Gpio
+import Jetson.GPIO as Gpio  # pip install Jetson.GPIO
 
 """
 The naming convention for the pins used to determine rotation state follow the labels
@@ -72,9 +72,9 @@ class RotaryEncoder:
         self.transitions_per_rotation = len(STATES) - 1
 
     def setup(self):
-        """ Initialize Gpio pins and rotary encoder state """
+        """ Initialize GPIO pins and rotary encoder state """
 
-        # Set the Gpio mode if it has not been set
+        # Set the GPIO mode if it has not been set
         if not Gpio.getmode():
             Gpio.setmode(Gpio.BOARD)
 
@@ -108,7 +108,7 @@ class RotaryEncoder:
             self.dir = COUNTERCLOCKWISE
 
     def start(self):
-        """ Start listening to Gpio pins to trigger callback functions """
+        """ Start listening to GPIO pins to trigger callback functions """
 
         def on_rotation(channel):
             """ Update rotation state and call user defined callback functions after complete rotation """
@@ -144,7 +144,7 @@ class RotaryEncoder:
         )
 
     def stop(self):
-        """ clean up the Gpio pins that we were using for this class """
+        """ clean up the GPIO pins that we were using for this class """
         Gpio.cleanup()
 
 

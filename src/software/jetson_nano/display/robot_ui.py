@@ -133,7 +133,7 @@ class RobotUi:
             time.sleep(timeout)
 
     def stop(self):
-        """ Cleanup the Gpio pins """
+        """ Cleanup the GPIO pins """
         self.shutdown = True
         self.rotary_encoder.stop()
 

@@ -12,7 +12,7 @@
 
 Gpio::Gpio(std::string gpio_number, GpioDirection direction, GpioState initial_state)
 {
-    // Setup the provided Gpio pin
+    // Setup the provided GPIO pin
     gpio_number_ = gpio_number;
 
     auto export_gpio_fs = std::ofstream("/sys/class/gpio/export");
@@ -20,7 +20,7 @@ Gpio::Gpio(std::string gpio_number, GpioDirection direction, GpioState initial_s
     export_gpio_fs.close();
 
     auto set_direction_fs =
-        std::ofstream("/sys/class/Gpio/Gpio" + gpio_number + "/direction");
+        std::ofstream("/sys/class/gpio/gpio" + gpio_number + "/direction");
 
     switch (direction)
     {
@@ -44,7 +44,7 @@ Gpio::Gpio(std::string gpio_number, GpioDirection direction, GpioState initial_s
 
 void Gpio::setValue(GpioState state)
 {
-    std::ofstream gpio_fs("/sys/class/Gpio/Gpio" + gpio_number_ + "/value");
+    std::ofstream gpio_fs("/sys/class/gpio/gpio" + gpio_number_ + "/value");
 
     CHECK(gpio_fs.is_open()) << "Could not set Gpio pin " << gpio_number_;
 
@@ -70,10 +70,10 @@ void Gpio::setValue(GpioState state)
 
 GpioState Gpio::getValue()
 {
-    std::ifstream gpio_fs("/sys/class/Gpio/Gpio" + gpio_number_ + "/value");
+    std::ifstream gpio_fs("/sys/class/gpio/gpio" + gpio_number_ + "/value");
     std::string level;
 
-    CHECK(gpio_fs.is_open()) << "Could not read Gpio pin";
+    CHECK(gpio_fs.is_open()) << "Could not read GPIO pin";
     std::getline(gpio_fs, level);
 
     if (level.compare("0") == 0)
