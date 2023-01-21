@@ -1,8 +1,7 @@
 #include "proto/message_translation/tbots_protobuf.h"
 
 
-std::unique_ptr<TbotsProto::World> createWorld(const World& world,
-                                               const uint64_t sequence_number)
+std::unique_ptr<TbotsProto::World> createWorld(const World& world)
 {
     // create msg
     auto world_msg                        = std::make_unique<TbotsProto::World>();
@@ -12,10 +11,21 @@ std::unique_ptr<TbotsProto::World> createWorld(const World& world,
     *(world_msg->mutable_enemy_team())    = *createTeam(world.enemyTeam());
     *(world_msg->mutable_ball())          = *createBall(world.ball());
     *(world_msg->mutable_game_state())    = *createGameState(world.gameState());
-    if (sequence_number != 0)
-    {
-        world_msg->set_sequence_number(sequence_number);
-    }
+
+    return world_msg;
+}
+
+std::unique_ptr<TbotsProto::World> createWorldWithSequenceNumber(const World& world,
+                                                                const uint64_t sequence_number) {
+    // create msg
+    auto world_msg                        = std::make_unique<TbotsProto::World>();
+    *(world_msg->mutable_time_sent())     = *createCurrentTimestamp();
+    *(world_msg->mutable_field())         = *createField(world.field());
+    *(world_msg->mutable_friendly_team()) = *createTeam(world.friendlyTeam());
+    *(world_msg->mutable_enemy_team())    = *createTeam(world.enemyTeam());
+    *(world_msg->mutable_ball())          = *createBall(world.ball());
+    *(world_msg->mutable_game_state())    = *createGameState(world.gameState());
+    world_msg->set_sequence_number(sequence_number);
 
     return world_msg;
 }

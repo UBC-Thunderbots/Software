@@ -67,7 +67,7 @@ void UnixSimulatorBackend::onValueReceived(TbotsProto::PrimitiveSet primitives)
 
 void UnixSimulatorBackend::onValueReceived(World world)
 {
-    world_output->sendProto(*createWorld(world, sequence_number++));
+    world_output->sendProto(*createWorldWithSequenceNumber(world, sequence_number++));
 
     LOG(VISUALIZE) << *createNamedValue(
         "World Hz",
