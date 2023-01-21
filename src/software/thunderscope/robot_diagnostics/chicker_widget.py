@@ -39,7 +39,7 @@ class ChickerWidget(QWidget):
         # Initialising the buttons
 
         # push button group box
-        self.push_button_box, self.push_buttons = common_widgets.create_button(
+        self.push_button_box, self.push_buttons = common_widgets.create_buttons(
             ["Kick", "Chip"]
         )
         self.kick_button = self.push_buttons[0]

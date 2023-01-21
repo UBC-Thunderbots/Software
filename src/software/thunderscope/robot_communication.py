@@ -160,7 +160,7 @@ class RobotCommunication(object):
 
             self.sequence_number += 1
 
-            if True:
+            if self.estop_reader.isEstopPlay():
                 self.last_time = primitive_set.time_sent.epoch_timestamp_seconds
                 self.send_primitive_set.send_proto(primitive_set)
 
