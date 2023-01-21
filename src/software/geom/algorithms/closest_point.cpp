@@ -88,8 +88,18 @@ Point closestPoint(const Polygon& polygon, const Point &p)
     return closest_point;
 }
 
+Point closestPoint(const Point &p, const Polygon& polygon)
+{
+    return closestPoint(polygon, p);
+}
+
 Point closestPoint(const Circle& circle, const Point &p)
 {
     Vector v = p - circle.origin();
     return circle.origin() + v.normalize(circle.radius());
+}
+
+Point closestPoint(const Point &p, const Circle& circle)
+{
+    return closestPoint(circle, p);
 }
