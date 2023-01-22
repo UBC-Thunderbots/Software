@@ -13,7 +13,7 @@ bool PassDefenderFSM::passStarted(const Update& event)
         ball_receiver_point_vector.orientation());
 }
 
-bool PassDefenderFSM::strayPass(const Update& event)
+bool PassDefenderFSM::ballDeflected(const Update& event)
 {
     auto ball_position = event.common.world.ball().position();
     Vector ball_receiver_point_vector(
@@ -23,11 +23,11 @@ bool PassDefenderFSM::strayPass(const Update& event)
     auto orientation_difference = event.common.world.ball().velocity().orientation() -
                                   ball_receiver_point_vector.orientation();
 
-    // If pass has strayed far from its intended destination (ex it was deflected)
-    // we consider the pass finished
+    // If pass has strayed far from its intended destination,
+    // we consider the pass finished and the ball deflected
     bool stray_pass =
         event.common.world.ball().velocity().length() > MIN_STRAY_PASS_SPEED &&
-        orientation_difference > MIN_STRAY_PASS_ANGLE;
+        orientation_difference.abs() > MIN_STRAY_PASS_ANGLE;
 
     return stray_pass;
 }

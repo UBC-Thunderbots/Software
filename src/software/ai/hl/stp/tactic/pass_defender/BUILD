@@ -18,3 +18,13 @@ cc_library(
         "//software/logger",
     ],
 )
+
+cc_test(
+    name = "pass_defender_fsm_test",
+    srcs = ["pass_defender_fsm_test.cpp"],
+    deps = [
+        ":pass_defender_tactic",
+        "//software/test_util",
+        "@gtest//:gtest_main",
+    ],
+)

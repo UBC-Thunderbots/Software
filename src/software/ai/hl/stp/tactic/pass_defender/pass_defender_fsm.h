@@ -44,12 +44,14 @@ struct PassDefenderFSM
     /**
      * Guard that checks if the ball is deviating more than MIN_STRAY_PASS_ANGLE
      * when the ball has been kicked and a pass is in progress.
+     * Ball could be deflected due to another robot intercepting the pass,
+     * or the pass defender could have chipped the ball away themselves.
      *
      * @param event PassDefenderFSM::Update event
      *
      * @return true if stray pass
      */
-    bool strayPass(const Update& event);
+    bool ballDeflected(const Update& event);
 
     /**
      * Action to move to the specified location to block a potential pass
@@ -77,7 +79,7 @@ struct PassDefenderFSM
         DEFINE_SML_EVENT(Update)
 
         DEFINE_SML_GUARD(passStarted)
-        DEFINE_SML_GUARD(strayPass)
+        DEFINE_SML_GUARD(ballDeflected)
 
         DEFINE_SML_ACTION(blockPass)
         DEFINE_SML_ACTION(interceptBall)
@@ -87,8 +89,18 @@ struct PassDefenderFSM
             *BlockPassState_S + Update_E[passStarted_G] / interceptBall_A =
                 InterceptBallState_S,
             BlockPassState_S + Update_E / blockPass_A,
-            InterceptBallState_S + Update_E[strayPass_G] / blockPass_A = BlockPassState_S,
+            InterceptBallState_S + Update_E[ballDeflected_G] / blockPass_A = BlockPassState_S,
             InterceptBallState_S + Update_E / interceptBall_A,
             X + Update_E / SET_STOP_PRIMITIVE_ACTION = X);
+
+        // otherwise
+        //  ┌─────┐
+        //  │  ┌──┴─────────────┐  passStarted?  ┌────────────────────┐
+        //  └─►│ BlockPassState ├────────────────┤ InterceptBallState │
+        //     └────────────────┘                └─────────┬──────────┘
+        //              ▲                                  │
+        //              └──────────────────────────────────┘
+        //                        ballDeflected?
+        //
     }
 };

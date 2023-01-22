@@ -6,8 +6,9 @@
 #include "software/geom/point.h"
 
 /**
- * A pass defender moves to a location on the field to block and intercept
- * a potential pass between enemy robots.
+ * A pass defender moves to a location on the field to block a potential 
+ * pass between enemy robots + intercepts and chips the ball away when
+ * an active enemy pass is directed towards the defender. 
  *
  */
 class PassDefenderTactic : public Tactic

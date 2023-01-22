@@ -31,6 +31,7 @@ from proto.ssl_gc_common_pb2 import Team
         )
     ],
 )
+
 def test_defense_play(simulated_test_runner, blue_bots, yellow_bots):
 
     # Starting point must be Point
@@ -68,17 +69,17 @@ def test_defense_play(simulated_test_runner, blue_bots, yellow_bots):
     )
 
     # Always Validation
-    # TODO: #2753 Validation
+    # TODO: #2753, #2782 Validation
     always_validation_sequence_set = [[]]
 
     # Eventually Validation
-    # TODO: #2753 Validation
+    # TODO: #2753, #2782 Validation
     eventually_validation_sequence_set = [[]]
 
     simulated_test_runner.run_test(
         eventually_validation_sequence_set=eventually_validation_sequence_set,
         always_validation_sequence_set=always_validation_sequence_set,
-        test_timeout_s=300,
+        test_timeout_s=25,
     )
 
 
