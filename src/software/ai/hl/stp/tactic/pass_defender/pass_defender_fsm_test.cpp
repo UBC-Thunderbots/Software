@@ -39,8 +39,7 @@ TEST(PassDefenderFSMTest, test_transitions)
     // Deflect ball away from pass defender
     world =
         ::TestUtil::setBallPosition(world, Point(-0.5, 0), Timestamp::fromSeconds(124));
-    world =
-        ::TestUtil::setBallVelocity(world, Vector(0, 1), Timestamp::fromSeconds(124));
+    world = ::TestUtil::setBallVelocity(world, Vector(0, 1), Timestamp::fromSeconds(124));
     EXPECT_TRUE(world.ball().hasBallBeenKicked(Angle::quarter()));
 
     // Transition back to BlockPassState

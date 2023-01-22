@@ -89,7 +89,8 @@ struct PassDefenderFSM
             *BlockPassState_S + Update_E[passStarted_G] / interceptBall_A =
                 InterceptBallState_S,
             BlockPassState_S + Update_E / blockPass_A,
-            InterceptBallState_S + Update_E[ballDeflected_G] / blockPass_A = BlockPassState_S,
+            InterceptBallState_S + Update_E[ballDeflected_G] / blockPass_A =
+                BlockPassState_S,
             InterceptBallState_S + Update_E / interceptBall_A,
             X + Update_E / SET_STOP_PRIMITIVE_ACTION = X);
 

@@ -31,7 +31,6 @@ from proto.ssl_gc_common_pb2 import Team
         )
     ],
 )
-
 def test_defense_play(simulated_test_runner, blue_bots, yellow_bots):
 
     # Starting point must be Point
