@@ -299,6 +299,7 @@ if __name__ == "__main__":
                 tick = SimulatorTick(milliseconds=tick_rate_ms)
                 tscope.simulator_proto_unix_io.send_proto(SimulatorTick, tick)
                 time.sleep(tick_rate_ms / 1000)
+                #if()
 
         # Launch all binaries
         with Simulator(

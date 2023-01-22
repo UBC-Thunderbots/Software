@@ -51,6 +51,11 @@ message SimulatorTick
     required double milliseconds = 1;
 }
 
+message SimulationState
+{
+    required bool is_playing = 1;
+    // have another type for how fast it runs
+}
 message Pass
 {
     // The location of the passer

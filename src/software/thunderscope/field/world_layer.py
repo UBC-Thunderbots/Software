@@ -50,7 +50,9 @@ class WorldLayer(FieldLayer):
         self.key_pressed = {}
         self.display_robot_id = False
 
-        self.accepted_keys = [Qt.Key.Key_Control, Qt.Key.Key_I]
+        self.is_playing = True;
+
+        self.accepted_keys = [Qt.Key.Key_Control, Qt.Key.Key_I, QtCore.Qt.Key.Key_Space]
         for key in self.accepted_keys:
             self.key_pressed[key] = False
 
@@ -69,7 +71,26 @@ class WorldLayer(FieldLayer):
         if event.key() == QtCore.Qt.Key.Key_I:
             self.display_robot_id = not self.display_robot_id
 
-    def keyReleaseEvent(self, event):
+        """ if ctrl and space are both pressed, pause gameplay"""
+        # if user holding ctrl + space, send a command to simulator to pauce the gameplay
+        if self.key_pressed[QtCore.Qt.Key.Key_Control] and self.key_pressed[QtCore.Qt.Key.Key_Space]:
+            #print a value to check if it works
+            print('ctrl + space works!!!')
+            #191
+            simulator_state = SimulationState(is_playing = not self.is_playing)
+            self.is_playing = not self.is_playing
+            #register_observer <- search for this find examples to use
+            self.simulator_io.send_proto(SimulationState, simulator_state)
+            #register_observer(self, proto_class, buffer):
+            """Register a widget to consume from a given protobuf class
+
+            :param proto_class: Class of protobuf to consume
+            :param buffer: buffer from the widget to register
+
+            """
+
+
+def keyReleaseEvent(self, event):
         """Detect when a key has been released (override)
 
         :param event: The event
