@@ -23,7 +23,7 @@ Agent::Agent(const Vector &position, float radius,
     updateRadiusFromVelocity();
 }
 
-// returns  boolean on whether it reaches goal
+// returns boolean on whether it reaches goal
 bool Agent::update(double time_step)
 {
     if (new_velocity_.length() >= max_speed_)

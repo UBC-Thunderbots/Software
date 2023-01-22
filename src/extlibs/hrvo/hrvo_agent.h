@@ -54,20 +54,20 @@ class HRVOAgent : public Agent
      * Constructor
      *
      * @param position              The starting position of this agent.
-     * @param max_neighbor_dist     The maximum distance away which another agent can be
      * from this agent to be considered as a neighbor (i.e. velocity obstacles for it
      * would be created)
-     * @param max_neighbors         The maximum number of other agents which this agent
-     * will try to avoid collisions with at a time.
      * @param radius                The radius of this agent.
-     * @param max_radius_inflation  The maximum amount which the radius of this agent can
-     * inflate.
      * @param velocity              The initial velocity of this agent.
-     * @param max_accel              The maximum acceleration of this agent.
      * @param path                  The path which this agent should take.
-     * @param max_speed              The maximum speed of this agent.
      * @param robot_id		 	    The robot id for this agent.
      * @param type		 		    The side that this agent is on (friendly/enemy).
+     * @param max_neighbors         The maximum number of other agents which this agent
+     * @param max_neighbor_dist     The maximum distance away which another agent can be
+     * will try to avoid collisions with at a time.
+     * @param max_radius_inflation  The maximum amount which the radius of this agent can
+     * inflate.
+     * @param max_speed              The maximum speed of this agent.
+     * @param max_accel              The maximum acceleration of this agent.
      */
     HRVOAgent(const Vector &position, float max_neighbor_dist,
               std::size_t max_neighbors, float radius, float max_radius_inflation,

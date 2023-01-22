@@ -22,7 +22,7 @@ class TestHrvo : public testing::Test
     }
 
    protected:
-    HRVOSimulator sim;
+    Simulator sim;
     World world;
 
     Robot friendly_robot_1;

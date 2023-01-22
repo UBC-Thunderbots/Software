@@ -45,7 +45,7 @@
 #include "software/networking/threaded_proto_unix_sender.hpp"
 #include "software/world/world.h"
 
-class HRVOSimulator
+class Simulator
 {
    public:
     /**
@@ -55,8 +55,8 @@ class HRVOSimulator
      * robot
      * @param friendly_team_colour The colour of the friendly team
      */
-    explicit HRVOSimulator(float time_step, const RobotConstants_t &robot_constants,
-                           const TeamColour friendly_team_colour);
+    explicit Simulator(float time_step, const RobotConstants_t &robot_constants,
+                       const TeamColour friendly_team_colour);
 
     /**
      * Reset all agents to match the state of the given world.

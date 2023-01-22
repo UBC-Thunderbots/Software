@@ -1,18 +1,18 @@
-#include "new_simulator.h"
+#include "hrvo_simulator.h"
 
-MotionPlanningSimulator::MotionPlanningSimulator(float time_step, const RobotConstants_t &robot_constants,
-                                                 const TeamColour friendly_team_colour):
-    robot_constants(robot_constants),
-    primitive_set(),
-    world(std::nullopt),
-    agents(),
-    friendly_robot_id_map(),
-    enemy_robot_id_map(),
-    friendly_team_colour(friendly_team_colour)
+HRVOSimulator::HRVOSimulator(float time_step, const RobotConstants_t &robot_constants,
+                             const TeamColour friendly_team_colour):
+        robot_constants(robot_constants),
+        primitive_set(),
+        world(std::nullopt),
+        agents(),
+        friendly_robot_id_map(),
+        enemy_robot_id_map(),
+        friendly_team_colour(friendly_team_colour)
 {
 }
 
-void MotionPlanningSimulator::updateWorld(const World &world)
+void HRVOSimulator::updateWorld(const World &world)
 {
     this->world               = world;
     const auto &friendly_team = world.friendlyTeam().getAllRobots();
@@ -89,7 +89,7 @@ void MotionPlanningSimulator::updateWorld(const World &world)
 }
 
 
-void MotionPlanningSimulator::updatePrimitiveSet(const TbotsProto::PrimitiveSet &new_primitive_set)
+void HRVOSimulator::updatePrimitiveSet(const TbotsProto::PrimitiveSet &new_primitive_set)
 {
     primitive_set = new_primitive_set;
 
@@ -104,16 +104,16 @@ void MotionPlanningSimulator::updatePrimitiveSet(const TbotsProto::PrimitiveSet 
     }
 }
 
-std::size_t MotionPlanningSimulator::addHRVORobotAgent(const Robot &robot, TeamSide type) {
+std::size_t HRVOSimulator::addHRVORobotAgent(const Robot &robot, TeamSide type) {
     return 0;
 }
 
 std::size_t
-MotionPlanningSimulator::addLinearVelocityRobotAgent(const Robot &robot, const Vector &destination, TeamSide type) {
+HRVOSimulator::addLinearVelocityRobotAgent(const Robot &robot, const Vector &destination, TeamSide type) {
     return 0;
 }
 
-void MotionPlanningSimulator::doStep(double time_step)
+void HRVOSimulator::doStep(double time_step)
 {
 
     if (time_step == 0.0f)
@@ -146,7 +146,7 @@ void MotionPlanningSimulator::doStep(double time_step)
     }
 }
 
-std::optional<std::shared_ptr<HRVOAgent>> MotionPlanningSimulator::getFriendlyAgentFromRobotId(
+std::optional<std::shared_ptr<HRVOAgent>> HRVOSimulator::getFriendlyAgentFromRobotId(
         unsigned int robot_id) const
 {
     auto agent_index_iter = friendly_robot_id_map.find(robot_id);

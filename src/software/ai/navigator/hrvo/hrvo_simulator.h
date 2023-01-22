@@ -4,8 +4,6 @@
 #include <limits>
 #include <vector>
 
-#include "extlibs/hrvo/agent.h"
-#include "extlibs/hrvo/kd_tree.h"
 #include "proto/tbots_software_msgs.pb.h"
 #include "proto/visualization.pb.h"
 #include "software/geom/vector.h"
@@ -13,7 +11,7 @@
 #include "software/geom/algorithms/intersection.h"
 #include "software/geom/algorithms/nearest_neighbor_search.hpp"
 
-class MotionPlanningSimulator {
+class HRVOSimulator {
 public:
     /**
      * Constructor
@@ -22,8 +20,8 @@ public:
      * robot
      * @param friendly_team_colour The colour of the friendly team
      */
-    explicit MotionPlanningSimulator(float time_step, const RobotConstants_t &robot_constants,
-                                     const TeamColour friendly_team_colour);
+    explicit HRVOSimulator(float time_step, const RobotConstants_t &robot_constants,
+                           const TeamColour friendly_team_colour);
 
     /**
      * Reset all agents to match the state of the given world.

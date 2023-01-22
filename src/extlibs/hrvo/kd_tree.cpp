@@ -38,7 +38,7 @@
 #include "extlibs/hrvo/hrvo_agent.h"
 #include "extlibs/hrvo/simulator.h"
 
-KdTree::KdTree(HRVOSimulator *simulator) : simulator_(simulator) {}
+KdTree::KdTree(Simulator *simulator) : simulator_(simulator) {}
 
 void KdTree::build()
 {

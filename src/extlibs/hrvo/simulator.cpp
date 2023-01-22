@@ -43,8 +43,8 @@
 #include "software/geom/algorithms/intersection.h"
 #include "software/logger/logger.h"
 
-HRVOSimulator::HRVOSimulator(float time_step, const RobotConstants_t &robot_constants,
-                             const TeamColour friendly_team_colour)
+Simulator::Simulator(float time_step, const RobotConstants_t &robot_constants,
+                     const TeamColour friendly_team_colour)
     : primitive_set(),
       robot_constants(robot_constants),
       global_time(0.0f),
@@ -57,7 +57,7 @@ HRVOSimulator::HRVOSimulator(float time_step, const RobotConstants_t &robot_cons
 {
 }
 
-void HRVOSimulator::updateWorld(const World &world)
+void Simulator::updateWorld(const World &world)
 {
     this->world               = world;
     const auto &friendly_team = world.friendlyTeam().getAllRobots();
@@ -103,7 +103,7 @@ void HRVOSimulator::updateWorld(const World &world)
     }
 }
 
-void HRVOSimulator::updatePrimitiveSet(const TbotsProto::PrimitiveSet &new_primitive_set)
+void Simulator::updatePrimitiveSet(const TbotsProto::PrimitiveSet &new_primitive_set)
 {
     primitive_set = new_primitive_set;
 
@@ -118,7 +118,7 @@ void HRVOSimulator::updatePrimitiveSet(const TbotsProto::PrimitiveSet &new_primi
     }
 }
 
-std::size_t HRVOSimulator::addHRVORobotAgent(const Robot &robot, TeamSide type)
+std::size_t Simulator::addHRVORobotAgent(const Robot &robot, TeamSide type)
 {
     Vector position = robot.position().toVector();
     Vector velocity;
@@ -177,9 +177,9 @@ std::size_t HRVOSimulator::addHRVORobotAgent(const Robot &robot, TeamSide type)
                         max_accel, path, MAX_NEIGHBOR_SEARCH_DIST, MAX_NEIGHBORS, robot.id(), type);
 }
 
-std::size_t HRVOSimulator::addLinearVelocityRobotAgent(const Robot &robot,
-                                                       const Vector &destination,
-                                                       TeamSide type)
+std::size_t Simulator::addLinearVelocityRobotAgent(const Robot &robot,
+                                                   const Vector &destination,
+                                                   TeamSide type)
 {
     Vector position = robot.position().toVector();
     Vector velocity = robot.velocity();
@@ -195,13 +195,13 @@ std::size_t HRVOSimulator::addLinearVelocityRobotAgent(const Robot &robot,
                                   max_accel, path, robot.id(), type);
 }
 
-std::size_t HRVOSimulator::addHRVOAgent(const Vector &position, float agent_radius,
-                                        float max_radius_inflation,
-                                        const Vector &curr_velocity, float max_speed,
-                                        float max_accel, AgentPath &path,
-                                        float max_neighbor_dist,
-                                        std::size_t max_neighbors, RobotId robot_id,
-                                        TeamSide type)
+std::size_t Simulator::addHRVOAgent(const Vector &position, float agent_radius,
+                                    float max_radius_inflation,
+                                    const Vector &curr_velocity, float max_speed,
+                                    float max_accel, AgentPath &path,
+                                    float max_neighbor_dist,
+                                    std::size_t max_neighbors, RobotId robot_id,
+                                    TeamSide type)
 {
     std::shared_ptr<HRVOAgent> agent = std::make_shared<HRVOAgent>(
         position, max_neighbor_dist, max_neighbors, agent_radius,
@@ -210,11 +210,11 @@ std::size_t HRVOSimulator::addHRVOAgent(const Vector &position, float agent_radi
     return agents.size() - 1;
 }
 
-size_t HRVOSimulator::addLinearVelocityAgent(const Vector &position, float agent_radius,
-                                             float max_radius_inflation,
-                                             const Vector &curr_velocity, float max_speed,
-                                             float max_accel, AgentPath &path,
-                                             RobotId robot_id, TeamSide type)
+size_t Simulator::addLinearVelocityAgent(const Vector &position, float agent_radius,
+                                         float max_radius_inflation,
+                                         const Vector &curr_velocity, float max_speed,
+                                         float max_accel, AgentPath &path,
+                                         RobotId robot_id, TeamSide type)
 {
     std::shared_ptr<LinearVelocityAgent> agent = std::make_shared<LinearVelocityAgent>(
         position, agent_radius, max_radius_inflation, curr_velocity, max_speed,
@@ -224,7 +224,7 @@ size_t HRVOSimulator::addLinearVelocityAgent(const Vector &position, float agent
     return agents.size() - 1;
 }
 
-void HRVOSimulator::doStep()
+void Simulator::doStep()
 {
     if (kd_tree == nullptr)
     {
@@ -267,7 +267,7 @@ void HRVOSimulator::doStep()
     global_time += time_step;
 }
 
-Vector HRVOSimulator::getRobotVelocity(unsigned int robot_id) const
+Vector Simulator::getRobotVelocity(unsigned int robot_id) const
 {
     auto hrvo_agent = getFriendlyAgentFromRobotId(robot_id);
     if (hrvo_agent.has_value())
@@ -280,7 +280,7 @@ Vector HRVOSimulator::getRobotVelocity(unsigned int robot_id) const
     return Vector();
 }
 
-void HRVOSimulator::updateRobotVelocity(RobotId robot_id, const Vector &new_velocity)
+void Simulator::updateRobotVelocity(RobotId robot_id, const Vector &new_velocity)
 {
     auto hrvo_agent = getFriendlyAgentFromRobotId(robot_id);
     if (hrvo_agent.has_value())
@@ -289,7 +289,7 @@ void HRVOSimulator::updateRobotVelocity(RobotId robot_id, const Vector &new_velo
     }
 }
 
-void HRVOSimulator::visualize(unsigned int robot_id) const
+void Simulator::visualize(unsigned int robot_id) const
 {
     auto friendly_agent_opt = getFriendlyAgentFromRobotId(robot_id);
     if (!friendly_agent_opt.has_value())
@@ -331,7 +331,7 @@ void HRVOSimulator::visualize(unsigned int robot_id) const
     }
 }
 
-std::optional<std::shared_ptr<HRVOAgent>> HRVOSimulator::getFriendlyAgentFromRobotId(
+std::optional<std::shared_ptr<HRVOAgent>> Simulator::getFriendlyAgentFromRobotId(
     unsigned int robot_id) const
 {
     auto found = std::find_if(agents.begin(), agents.end(),
@@ -347,47 +347,47 @@ std::optional<std::shared_ptr<HRVOAgent>> HRVOSimulator::getFriendlyAgentFromRob
         std::static_pointer_cast<HRVOAgent>(*found));
 }
 
-float HRVOSimulator::getAgentMaxAccel(std::size_t agent_no) const
+float Simulator::getAgentMaxAccel(std::size_t agent_no) const
 {
     return agents[agent_no]->getMaxAccel();
 }
 
-Vector HRVOSimulator::getAgentPosition(std::size_t agent_no) const
+Vector Simulator::getAgentPosition(std::size_t agent_no) const
 {
     return agents[agent_no]->getPosition();
 }
 
-float HRVOSimulator::getAgentRadius(std::size_t agent_no) const
+float Simulator::getAgentRadius(std::size_t agent_no) const
 {
     return agents[agent_no]->getRadius();
 }
 
-bool HRVOSimulator::hasAgentReachedGoal(std::size_t agent_no) const
+bool Simulator::hasAgentReachedGoal(std::size_t agent_no) const
 {
     return agents[agent_no]->hasReachedGoal();
 }
 
-Vector HRVOSimulator::getAgentVelocity(std::size_t agent_no) const
+Vector Simulator::getAgentVelocity(std::size_t agent_no) const
 {
     return agents[agent_no]->getVelocity();
 }
 
-Vector HRVOSimulator::getAgentPrefVelocity(std::size_t agent_no) const
+Vector Simulator::getAgentPrefVelocity(std::size_t agent_no) const
 {
     return agents[agent_no]->getPrefVelocity();
 }
 
-const std::unique_ptr<KdTree> &HRVOSimulator::getKdTree() const
+const std::unique_ptr<KdTree> &Simulator::getKdTree() const
 {
     return kd_tree;
 }
 
-const std::vector<std::shared_ptr<Agent>> &HRVOSimulator::getAgents() const
+const std::vector<std::shared_ptr<Agent>> &Simulator::getAgents() const
 {
     return agents;
 }
 
-void HRVOSimulator::updateRemovedAgents(const World &world)
+void Simulator::updateRemovedAgents(const World &world)
 {
     auto agents_to_remove = std::remove_if(
         agents.begin(), agents.end(), [&world](std::shared_ptr<Agent> agent) {
