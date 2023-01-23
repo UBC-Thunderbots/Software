@@ -532,8 +532,8 @@ class Thunderscope(object):
         field.add_layer("Passing", passing)
         field.add_layer("Simulator", sim_state)
         hrvo_sim_states = []
-        # Add Hrvo layers to field widget and have them hidden on startup
-        # TODO (#2655): Add/Remove Hrvo layers dynamically based on the HrvoVisualization proto messages
+        # Add HRVO layers to field widget and have them hidden on startup
+        # TODO (#2655): Add/Remove HRVO layers dynamically based on the HRVOVisualization proto messages
         for robot_id in range(MAX_ROBOT_IDS_PER_SIDE):
             hrvo_sim_state = hrvo_layer.HrvoLayer(
                 robot_id, self.visualization_buffer_size

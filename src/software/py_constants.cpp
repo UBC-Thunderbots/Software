@@ -52,8 +52,8 @@ PYBIND11_MODULE(py_constants, m)
     m.attr("SIMULATION_TICK_PATH")     = SIMULATION_TICK_PATH;
     m.attr("YELLOW_WORLD_PATH")        = YELLOW_WORLD_PATH;
     m.attr("BLUE_WORLD_PATH")          = BLUE_WORLD_PATH;
-    m.attr("YELLOW_Hrvo_PATH")         = YELLOW_Hrvo_PATH;
-    m.attr("BLUE_Hrvo_PATH")           = BLUE_Hrvo_PATH;
+    m.attr("YELLOW_HRVO_PATH")         = YELLOW_HRVO_PATH;
+    m.attr("BLUE_HRVO_PATH")           = BLUE_HRVO_PATH;
     m.attr("BLUE_PRIMITIVE_SET")       = BLUE_PRIMITIVE_SET;
     m.attr("YELLOW_PRIMITIVE_SET")     = YELLOW_PRIMITIVE_SET;
     m.attr("SIMULATOR_STATE_PATH")     = SIMULATOR_STATE_PATH;

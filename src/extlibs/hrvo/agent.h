@@ -8,7 +8,7 @@
 class HrvoSimulator;
 
 /**
- * An agent/robot in the Hrvo simulation.
+ * An agent/robot in the HRVO simulation.
  */
 class Agent
 {
@@ -169,7 +169,7 @@ class Agent
     // The requested new velocity of this Agent
     Vector new_velocity_;
     // The desired new speed of this Agent
-    // NOTE: Hrvo algorithm will try to pick this speed, however, it may pick a different
+    // NOTE: HRVO algorithm will try to pick this speed, however, it may pick a different
     // speed to avoid collisions.
     Vector pref_velocity_;
     // The path of this Agent

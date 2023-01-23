@@ -89,7 +89,7 @@ void KdTree::buildRecursive(std::size_t begin, std::size_t end, std::size_t node
         }
     }
 
-    if (end - begin > Hrvo_MAX_LEAF_SIZE)
+    if (end - begin > HRVO_MAX_LEAF_SIZE)
     {
         const bool vertical = nodes_[node].maxX_ - nodes_[node].minX_ >
                               nodes_[node].maxY_ - nodes_[node].minY_;
@@ -145,7 +145,7 @@ void KdTree::buildRecursive(std::size_t begin, std::size_t end, std::size_t node
 
 void KdTree::queryRecursive(HrvoAgent *agent, float &range_sq, std::size_t node) const
 {
-    if (nodes_[node].end_ - nodes_[node].begin_ <= Hrvo_MAX_LEAF_SIZE)
+    if (nodes_[node].end_ - nodes_[node].begin_ <= HRVO_MAX_LEAF_SIZE)
     {
         for (std::size_t i = nodes_[node].begin_; i < nodes_[node].end_; ++i)
         {

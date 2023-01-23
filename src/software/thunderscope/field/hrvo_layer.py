@@ -10,7 +10,7 @@ from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 class HrvoLayer(FieldLayer):
     def __init__(self, robot_id, buffer_size=5):
-        """Visualize the state of the Hrvo Simulator
+        """Visualize the state of the HRVO Simulator
 
         :param robot_id: The id of the robot which this layer will visualize
         :param buffer_size: The buffer size, set higher for smoother plots.
@@ -31,7 +31,7 @@ class HrvoLayer(FieldLayer):
 
         """
 
-        # Draw the Hrvo velocity obstacles and agents
+        # Draw the HRVO velocity obstacles and agents
 
         velocity_obstacle_msg = self.prev_message
         while not self.hrvo_buffer.queue.empty():

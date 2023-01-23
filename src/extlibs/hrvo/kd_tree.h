@@ -90,7 +90,7 @@ class KdTree
     };
 
     // The maximum leaf size of a k-D tree.
-    static const std::size_t Hrvo_MAX_LEAF_SIZE = 10;
+    static const std::size_t HRVO_MAX_LEAF_SIZE = 10;
 
    public:
     /**

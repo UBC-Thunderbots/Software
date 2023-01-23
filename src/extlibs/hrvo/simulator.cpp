@@ -347,11 +347,11 @@ void HrvoSimulator::visualize(unsigned int robot_id) const
 
     if (friendly_team_colour == TeamColour::YELLOW)
     {
-        LOG(VISUALIZE, YELLOW_Hrvo_PATH) << hrvo_visualization;
+        LOG(VISUALIZE, YELLOW_HRVO_PATH) << hrvo_visualization;
     }
     else
     {
-        LOG(VISUALIZE, BLUE_Hrvo_PATH) << hrvo_visualization;
+        LOG(VISUALIZE, BLUE_HRVO_PATH) << hrvo_visualization;
     }
 }
 
