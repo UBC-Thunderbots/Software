@@ -17,7 +17,7 @@ class MotionConstraintVisitor : public TacticVisitor
      *
      * @param The tactic to register
      *
-     * @modifies current_allowed_constraints
+     * @modifies current_motion_constraints
      */
     void visit(const GoalieTactic &tactic) override;
     void visit(const CreaseDefenderTactic &tactic) override;
@@ -41,16 +41,18 @@ class MotionConstraintVisitor : public TacticVisitor
     void visit(const MoveGoalieToGoalLineTactic &tactic) override;
 
     /**
-     * Gets the current allowed constraints from a tactic
+     * Gets the motion constraints updated with the requirements of the tactics
      *
-     * @param The tactic to register
+     * @param The tactic to use to update the motion constraints
+     * @param The existing motion constraints from other sources
      *
-     * @modifies current_allowed_constraints
+     * @modifies current_motion_constraints
      * @return set of MotionConstraints
      */
-    std::set<TbotsProto::MotionConstraint> getCurrentAllowedConstraints(
-        const Tactic &tactic);
+    std::set<TbotsProto::MotionConstraint> getUpdatedMotionConstraints(
+        const Tactic &tactic,
+        std::set<TbotsProto::MotionConstraint> existing_motion_constraints);
 
    private:
-    std::set<TbotsProto::MotionConstraint> current_allowed_constraints;
+    std::set<TbotsProto::MotionConstraint> current_motion_constraints;
 };

@@ -63,7 +63,17 @@ void MotionConstraintVisitor::visit(const PenaltySetupTactic &tactic)
 
 void MotionConstraintVisitor::visit(const ReceiverTactic &tactic) {}
 
-void MotionConstraintVisitor::visit(const AttackerTactic &tactic) { }
+void MotionConstraintVisitor::visit(const AttackerTactic &tactic) {
+
+    if (current_motion_constraints.contains(TbotsProto::MotionConstraint::ENEMY_HALF))
+    {
+        current_motion_constraints.erase(TbotsProto::MotionConstraint::CENTER_CIRCLE);
+        current_motion_constraints.erase(TbotsProto::MotionConstraint::ENEMY_HALF);
+        current_motion_constraints.insert(
+                TbotsProto::MotionConstraint::ENEMY_HALF_WITHOUT_CENTRE_CIRCLE);
+    }
+
+}
 
 void MotionConstraintVisitor::visit(const DefenseShadowEnemyTactic &tactic) {}
 
@@ -78,7 +88,7 @@ void MotionConstraintVisitor::visit(const DribbleTactic &tactic) {}
 void MotionConstraintVisitor::visit(const GetBehindBallTactic &tactic) {}
 
 void MotionConstraintVisitor::visit(const MoveGoalieToGoalLineTactic &tactic)
-{
+{{
     current_allowed_constraints = std::set<TbotsProto::MotionConstraint>({
         TbotsProto::MotionConstraint::FRIENDLY_HALF,
         TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA
