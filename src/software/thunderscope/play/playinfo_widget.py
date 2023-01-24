@@ -17,6 +17,10 @@ class PlayInfoWidget(QWidget):
     NUM_ROWS = 6
     NUM_COLS = 4
 
+    # empirically makes even bolded items fit within columns
+    HEADER_SIZE_HINT_WIDTH_EXPANSION = 12
+    ITEM_SIZE_HINT_WIDTH_EXPANSION = 10
+
     def __init__(self, minimum_column_width=200, buffer_size=5):
         """Shows the current play information including tactic and FSM state
 
@@ -70,10 +74,6 @@ class PlayInfoWidget(QWidget):
             tactic_names.append(
                 play_info_dict["robotTacticAssignment"][robot_id]["tacticName"]
             )
-
-        # empirically makes even bolded items fit within columns
-        HEADER_SIZE_HINT_WIDTH_EXPANSION = 12
-        ITEM_SIZE_HINT_WIDTH_EXPANSION = 10
 
         set_table_data(
             {

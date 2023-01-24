@@ -15,6 +15,10 @@ class RefereeInfoWidget(QWidget):
     NUM_ROWS = 13
     NUM_COLS = 3
 
+    # empirically makes even bolded items fit within columns
+    HEADER_SIZE_HINT_WIDTH_EXPANSION = 12
+    ITEM_SIZE_HINT_WIDTH_EXPANSION = 11
+
     def __init__(self, buffer_size=5):
         """Shows the referee information 
 
@@ -90,10 +94,6 @@ class RefereeInfoWidget(QWidget):
             else:
                 blue.append(referee_msg_dict["blue"][info])
                 yellow.append(referee_msg_dict["yellow"][info])
-
-        # empirically makes even bolded items fit within columns
-        HEADER_SIZE_HINT_WIDTH_EXPANSION = 12
-        ITEM_SIZE_HINT_WIDTH_EXPANSION = 11
 
         set_table_data(
             {"Team Info": team_info, "Blue": blue, "Yellow": yellow,},
