@@ -126,4 +126,15 @@ BallState createBallState(const TbotsProto::BallState ball_state);
 std::unique_ptr<TbotsProto::PassVisualization> createPassVisualization(
     const std::vector<PassWithRating>& passes_with_rating);
 
-std::unique_ptr<TbotsProto::CostVisualization> createCostVisualization(const std::unordered_map<std::string, std::vector<double>> ratings, int num_rows);
+/**
+ * Returns a cost visualization given a map of function names to their ratings
+ *
+ * @param ratings A map of function names to their ratings
+ *                The ratings are sent as a 1D vector of doubles
+ *                (e.g. { "function1": { 1.0, 2.0, 3.0 } })
+ * @param num_rows The number of rows to display in the cost visualization
+ *
+ * @return The unique_ptr to a CostVisualization proto
+ */
+std::unique_ptr<TbotsProto::CostVisualization> createCostVisualization(
+    const std::unordered_map<std::string, std::vector<double>> ratings, int num_rows);

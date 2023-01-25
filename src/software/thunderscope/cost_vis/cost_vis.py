@@ -33,27 +33,22 @@ class CostVisualizationWidget(QtWidgets.QMainWindow):
         self.pass_shoot_score = np.zeros(shape=(6,3))
         self.zone_rating = np.zeros(shape=(6,3))
 
+        # TODO: rename variables to be more descriptive
+
+        layout = pg.LayoutWidget(parent=self)
+
         win = pg.GraphicsLayoutWidget(show=True)
         self.vb = win.addViewBox()
         self.img = pg.ImageItem(self.data)
         self.vb.addItem(self.img)
         self.vb.setAspectLocked()
-        self.setCentralWidget(win)
+        layout.addWidget(win, row=0, col=0, colspan=1, rowspan=1)
 
-        ## generate empty curves
-        # self.curves = []
-        # self.levels = np.linspace(self.data.min(), self.data.max(), 10)
-        # for i in range(len(self.levels)):
-        #     v = self.levels[i]
-        #     ## generate isocurve with automatic color selection
-        #     c = pg.IsocurveItem(level=v, pen=(i, len(self.levels)*1.5))
-        #     c.setParentItem(self.img)  ## make sure isocurve is always correctly displayed over image
-        #     c.setZValue(10)
-        #     self.curves.append(c)
+        self.check_box1 = QtWidgets.QCheckBox("Static Position Quality")
+        layout.addWidget(self.check_box1, row=1, col=0, colspan=1, rowspan=1)
 
-        ## animate!
-        # self.ptr = 0
-        # self.imgLevels = (self.data.min(), self.data.max() * 2)
+        self.setCentralWidget(layout)
+        
 
     def refresh(self):
         try:
@@ -83,6 +78,3 @@ class CostVisualizationWidget(QtWidgets.QMainWindow):
         print(self.data)
 
         self.img.setImage(self.data)
-        # for c in self.curves:
-        #     c.setParentItem(self.img)
-        #     c.setData(self.data)
