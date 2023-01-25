@@ -12,11 +12,6 @@ class CostVisualizationWidget(QtWidgets.QMainWindow):
 
     COST_VISUALIZATION_TIMEOUT_S = 0.5
 
-    MIN_VAL = 0
-    MAX_VAL = 1
-    X_SIZE = 40
-    Y_SIZE = 40
-
     def __init__(self, buffer_size=5):
         super(CostVisualizationWidget, self).__init__()
         self.cost_visualization_buffer = ThreadSafeBuffer(
@@ -33,19 +28,31 @@ class CostVisualizationWidget(QtWidgets.QMainWindow):
         self.pass_shoot_score = np.zeros(shape=(6,3))
         self.zone_rating = np.zeros(shape=(6,3))
 
-        # TODO: rename variables to be more descriptive
-
         layout = pg.LayoutWidget(parent=self)
 
         win = pg.GraphicsLayoutWidget(show=True)
         self.vb = win.addViewBox()
         self.img = pg.ImageItem(self.data)
         self.vb.addItem(self.img)
-        self.vb.setAspectLocked()
-        layout.addWidget(win, row=0, col=0, colspan=1, rowspan=1)
+        self.vb.setAspectLocked() # remove this to make it stretch to fit the window
+        layout.addWidget(win, row=0, col=0, colspan=5, rowspan=1)
 
-        self.check_box1 = QtWidgets.QCheckBox("Static Position Quality")
-        layout.addWidget(self.check_box1, row=1, col=0, colspan=1, rowspan=1)
+        # push buttons - span from column 0 to 4 on row 1
+        self.static_pos_box = QtWidgets.QCheckBox("Static Position Quality")
+        layout.addWidget(self.static_pos_box, row=1, col=0, colspan=1, rowspan=1)
+        self.static_pos_box.setChecked(True)
+        self.pass_friend_box = QtWidgets.QCheckBox("Pass Friendly Capability")
+        layout.addWidget(self.pass_friend_box, row=1, col=1, colspan=1, rowspan=1)
+        self.pass_friend_box.setChecked(True)
+        self.pass_enemy_box = QtWidgets.QCheckBox("Pass Enemy Risk")
+        layout.addWidget(self.pass_enemy_box, row=1, col=2, colspan=1, rowspan=1)
+        self.pass_enemy_box.setChecked(True)
+        self.pass_shoot_box = QtWidgets.QCheckBox("Pass Shoot Score")
+        layout.addWidget(self.pass_shoot_box, row=1, col=3, colspan=1, rowspan=1)
+        self.pass_shoot_box.setChecked(True)
+        self.zone_rate_box = QtWidgets.QCheckBox("Zone Rating")
+        layout.addWidget(self.zone_rate_box, row=1, col=4, colspan=1, rowspan=1)
+        self.zone_rate_box.setChecked(True)
 
         self.setCentralWidget(layout)
         
@@ -58,7 +65,6 @@ class CostVisualizationWidget(QtWidgets.QMainWindow):
 
         if not cost_vis:
             cost_vis = self.cached_cost_vis
-
             # If we haven't received pass visualizations for a bit, clear the layer
             if time.time() > self.timeout:
                 return
@@ -73,8 +79,7 @@ class CostVisualizationWidget(QtWidgets.QMainWindow):
         self.pass_shoot_score = np.array(cost_vis.pass_shoot_score.cost).reshape(6,3)
         self.zone_rating = np.array(cost_vis.zone_rating.cost).reshape(6,3)
 
-        self.data = self.static_position_quality + self.pass_friendly_capability + self.pass_enemy_risk + self.pass_shoot_score + self.zone_rating
-        
-        print(self.data)
+        # update data based on push button states
+        self.data = self.static_pos_box.isChecked() * self.static_position_quality + self.pass_friend_box.isChecked() * self.pass_friendly_capability + self.pass_enemy_box.isChecked() * self.pass_enemy_risk + self.pass_shoot_box.isChecked() * self.pass_shoot_score + self.zone_rate_box.isChecked() * self.zone_rating
 
         self.img.setImage(self.data)
