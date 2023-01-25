@@ -349,7 +349,8 @@ std::unique_ptr<TbotsProto::PassVisualization> createPassVisualization(
     return pass_visualization_msg;
 }
 
-std::unique_ptr<TbotsProto::CostVisualization> createCostVisualization(const std::unordered_map<std::string, std::vector<double>> ratings, int num_rows)
+std::unique_ptr<TbotsProto::CostVisualization> createCostVisualization(
+    const std::unordered_map<std::string, std::vector<double>> ratings, int num_rows)
 {
     // make a CostVisualization object
     auto cost_visualization_msg = std::make_unique<TbotsProto::CostVisualization>();
@@ -365,7 +366,8 @@ std::unique_ptr<TbotsProto::CostVisualization> createCostVisualization(const std
     {
         static_position_quality->add_cost(rating);
     }
-    cost_visualization_msg->set_allocated_static_position_quality(static_position_quality.release());
+    cost_visualization_msg->set_allocated_static_position_quality(
+        static_position_quality.release());
 
     // ratePassFriendlyCapability
     auto pass_friendly_capability = std::make_unique<TbotsProto::NameCostsPair>();
@@ -375,7 +377,8 @@ std::unique_ptr<TbotsProto::CostVisualization> createCostVisualization(const std
     {
         pass_friendly_capability->add_cost(rating);
     }
-    cost_visualization_msg->set_allocated_pass_friendly_capability(pass_friendly_capability.release());
+    cost_visualization_msg->set_allocated_pass_friendly_capability(
+        pass_friendly_capability.release());
 
     // ratePassEnemyRisk
     auto pass_enemy_risk = std::make_unique<TbotsProto::NameCostsPair>();

@@ -430,7 +430,9 @@ class Thunderscope(object):
         playinfo_dock = Dock("Play Info")
         playinfo_dock.addWidget(widgets["playinfo_widget"])
 
-        widgets["cost_visualization_widget"] = self.setup_cost_visualization_widget(full_system_proto_unix_io)
+        widgets["cost_visualization_widget"] = self.setup_cost_visualization_widget(
+            full_system_proto_unix_io
+        )
         cost_visualization_dock = Dock("Cost Visualization")
         cost_visualization_dock.addWidget(widgets["cost_visualization_widget"])
 
@@ -682,7 +684,9 @@ class Thunderscope(object):
 
         """
         cost_vis_widget = CostVisualizationWidget()
-        proto_unix_io.register_observer(CostVisualization, cost_vis_widget.cost_visualization_buffer)
+        proto_unix_io.register_observer(
+            CostVisualization, cost_vis_widget.cost_visualization_buffer
+        )
         self.register_refresh_function(cost_vis_widget.refresh)
         return cost_vis_widget
 
