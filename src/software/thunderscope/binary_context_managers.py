@@ -578,6 +578,20 @@ class TigersAutoref(object):
         field = tbots.Field.createSSLDivisionBField()  
         ci_input.geometry.CopyFrom(createGeometryData(field, 0.3))
 
+        timestamp = int(time.time_ns()) 
+        referee_msg = Referee(packet_timestamp=timestamp)
+        referee_msg.stage = Referee.NORMAL_FIRST_HALF_PRE
+        referee_msg.stage_time_left = 1000
+        referee_msg.command         = Referee.PREPARE_KICKOFF_BLUE
+        referee_msg.command_counter = 0
+        referee_msg.command_timestamp   = timestamp
+        referee_msg.yellow.CopyFrom(self.resetTeam("Yellow"))
+        referee_msg.blue.CopyFrom(self.resetTeam("Blue"))
+        referee_msg.current_action_time_remaining = 1000
+        
+        print(referee_msg)
+        ci_input.referee_message.CopyFrom(referee_msg)
+
         print(ci_input)
 
         size = ci_input.ByteSize()
@@ -603,6 +617,7 @@ class TigersAutoref(object):
                         offset + msg_len - len(response_data)
                 )
             ci_output.ParseFromString(response_data[offset : offset + msg_len])
+            pdb.set_trace()
             self.send_ci_input(ci_output.tracker_wrapper_packet)
             #print(ci_output)
             offset += msg_len
@@ -617,10 +632,78 @@ class TigersAutoref(object):
         #ci_output.ParseFromString(response_data[new_pos : new_pos + msg_len])
         #self.send_ci_input(ci_output.tracker_wrapper_packet)
 
+    def sendTeamInfo(self):
+        ssl_wrapper = self.wrapper_buffer.get(block=True)
+        ci_input = AutoRefCiInput()
+        ci_input.detection.append(ssl_wrapper.detection)
+
+        timestamp = int(time.time_ns()) 
+        referee_msg = Referee(packet_timestamp=timestamp)
+        referee_msg.stage = Referee.NORMAL_FIRST_HALF_PRE
+        referee_msg.stage_time_left = 1000
+        referee_msg.command         = Referee.PREPARE_KICKOFF_BLUE
+        referee_msg.command_counter = 0
+        referee_msg.command_timestamp   = timestamp
+        referee_msg.yellow.CopyFrom(self.resetTeam("Yellow"))
+        referee_msg.blue.CopyFrom(self.resetTeam("Blue"))
+        referee_msg.current_action_time_remaining = 1000
+        
+        print(referee_msg)
+        ci_input.referee_message.CopyFrom(referee_msg)
+        pdb.set_trace()
+
+        size = ci_input.ByteSize()
+
+        # Send a request to the host with the size of the message
+        self.ci_socket.send(
+            encoder._VarintBytes(size) + ci_input.SerializeToString()
+        )
+        response_data = self.ci_socket.recv(
+                Gamecontroller.CI_MODE_OUTPUT_RECEIVE_BUFFER_SIZE
+        )
+        msg_len, new_pos = decoder._DecodeVarint32(response_data, 0)
+        offset = 0
+        while offset < len(response_data):
+            msg_len, new_pos = decoder._DecodeVarint32(response_data, offset)
+            offset = new_pos
+            print("offset: " + str(offset) + ", " + str(msg_len) + ", " + str(new_pos) + ", " + str(len(response_data)))
+            #print(response_data)
+            ci_output = AutoRefCiOutput()
+            pdb.set_trace()
+            if (offset + msg_len > len(response_data)):
+                print("Must get additional data")
+                response_data += self.ci_socket.recv(
+                        offset + msg_len - len(response_data)
+                )
+            ci_output.ParseFromString(response_data[offset : offset + msg_len])
+            self.send_ci_input(ci_output.tracker_wrapper_packet)
+            #print(ci_output)
+            offset += msg_len
+
+
+    def resetTeam(self, name):
+        team = Referee.TeamInfo()
+        team.name = name
+        team.score = 0
+        team.red_cards = 0
+        team.yellow_cards = 0
+        team.timeouts = 0
+        team.timeout_time = 300000000 # 300 seconds timeout
+        team.goalkeeper = 0
+        team.foul_counter = 0
+        team.ball_placement_failures = 0
+        team.can_place_ball = True
+        team.max_allowed_bots = 6
+        team.bot_substitution_intent = False
+        team.ball_placement_failures = False
+
+        return team
+
     def sslWrappers(self):
         print("ssl enter")
         #pdb.set_trace()
         self.sendGeometry();
+        #self.sendTeamInfo();
         while True:
             ssl_wrapper = self.wrapper_buffer.get(block=True)
             ci_input = AutoRefCiInput()
