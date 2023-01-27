@@ -1,4 +1,4 @@
-#include "software/ai/hl/stp/play/penalty_kick_play.h"
+#include "software/ai/hl/stp/play/penalty_kick/penalty_kick_play.h"
 
 #include <gtest/gtest.h>
 

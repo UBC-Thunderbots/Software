@@ -1,4 +1,4 @@
-#include "software/ai/hl/stp/play/penalty_kick_play_fsm.h"
+#include "software/ai/hl/stp/play/penalty_kick/penalty_kick_play_fsm.h"
 
 PenaltyKickPlayFSM::PenaltyKickPlayFSM(TbotsProto::AiConfig ai_config)
     : ai_config(ai_config),
