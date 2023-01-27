@@ -91,13 +91,13 @@ extern "C"
 
 MotorService::MotorService(const RobotConstants_t& robot_constants,
                            int control_loop_frequency_hz)
-    : spi_demux_select_0(SPI_CS_DRIVER_TO_CONTROLLER_MUX_0_Gpio, GpioDirection::OUTPUT,
+    : spi_demux_select_0(SPI_CS_DRIVER_TO_CONTROLLER_MUX_0_GPIO, GpioDirection::OUTPUT,
                          GpioState::LOW),
-      spi_demux_select_1(SPI_CS_DRIVER_TO_CONTROLLER_MUX_1_Gpio, GpioDirection::OUTPUT,
+      spi_demux_select_1(SPI_CS_DRIVER_TO_CONTROLLER_MUX_1_GPIO, GpioDirection::OUTPUT,
                          GpioState::LOW),
-      driver_control_enable_gpio(DRIVER_CONTROL_ENABLE_GpiGpio, GpioDirection::OUTPUT,
+      driver_control_enable_gpio(DRIVER_CONTROL_ENABLE_GPIO, GpioDirection::OUTPUT,
                                  GpioState::HIGH),
-      reset_gpio(MOTOR_DRIVER_RESET_Gpio, GpioDirection::OUTPUT, GpioState::HIGH),
+      reset_gpio(MOTOR_DRIVER_RESET_GPIO, GpioDirection::OUTPUT, GpioState::HIGH),
       euclidean_to_four_wheel(robot_constants)
 {
     robot_constants_ = robot_constants;
