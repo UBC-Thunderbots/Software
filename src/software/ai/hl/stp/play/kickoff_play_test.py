@@ -76,6 +76,8 @@ def test_kickoff_play(
         ),
     )
 
+    # [SUCHIR] - create two sets of always and eventually validation: 1) set up (not touching the ball yet) and 2) kicking off
+
     # Always Validation
     # TODO- #2809 Validation
     always_validation_sequence_set = [[]]
