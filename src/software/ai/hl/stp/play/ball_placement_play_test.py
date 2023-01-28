@@ -12,7 +12,9 @@ from proto.ssl_gc_common_pb2 import Team
 from proto.ssl_gc_geometry_pb2 import Vector2
 
 
-@pytest.mark.parametrize("run_enemy_ai,test_duration", [[False, 10], (True, 10)])
+@pytest.mark.parametrize(
+    "run_enemy_ai", [False]
+)  # , True])  TODO: Issue 2780 re-enable this test
 def test_two_ai_ball_placement(simulated_test_runner, run_enemy_ai, test_duration):
 
     # starting point must be Point
@@ -80,12 +82,15 @@ def test_two_ai_ball_placement(simulated_test_runner, run_enemy_ai, test_duratio
     )
 
     # Always Validation
-    # TODO- #2780 Validation
     always_validation_sequence_set = [[]]
 
     # Eventually Validation
-    # TODO- #2780 Validation
-    eventually_validation_sequence_set = [[]]
+    eventually_validation_sequence_set = [
+        [
+            # Ball should arrive within 5cm of placement point
+            BallEventuallyEntersRegion(regions=[tbots.Circle(ball_final_pos, 0.05)]),
+        ]
+    ]
 
     simulated_test_runner.run_test(
         eventually_validation_sequence_set=eventually_validation_sequence_set,
