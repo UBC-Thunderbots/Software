@@ -38,7 +38,7 @@ def ansible_runner(playbook: str, options: dict = {}):
         for i in range(MAX_NUM_ROBOTS):
             ip = ROBOT_IP_PREFIX + str(i)
             # Ping 3 times waiting 1s for timeout
-            command = ['ping', '-w 1', '-c 3', ip]
+            command = ["ping", "-w 1", "-c 3", ip]
             ping_processes[i] = subprocess.Popen(command, stdout=subprocess.DEVNULL)
         while ping_processes:
             for i, proc in ping_processes.items():
