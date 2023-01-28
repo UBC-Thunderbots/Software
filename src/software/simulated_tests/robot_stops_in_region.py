@@ -52,4 +52,4 @@ class RobotStopsInRegion(Validation):
     RobotEventuallyMovesInRegion,
     RobotAlwaysStopsInRegion,
     RobotNeverStopsInRegion,
-) = create_validation_types(RobotEntersRegion)
+) = create_validation_types(RobotStopsInRegion)

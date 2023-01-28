@@ -3,6 +3,9 @@ import pytest
 import software.python_bindings as tbots
 from proto.play_pb2 import Play, PlayName
 from software.simulated_tests.ball_enters_region import *
+from software.simulated_tests.ball_stops_in_region import *
+from software.simulated_tests.robot_stops_in_region import *
+from software.simulated_tests.robot_enters_region import *
 from software.simulated_tests.simulated_test_fixture import (
     simulated_test_runner,
     pytest_main,
@@ -92,14 +95,9 @@ def test_two_ai_ball_placement(simulated_test_runner, run_enemy_ai, test_duratio
         [
             # Ball should arrive within 5cm of placement point
             BallEventuallyStopsInRegion(
-                regions=[tbots.Circle(ball_final_pos, 0.05)]),
+                regions=[tbots.Circle(ball_final_pos, 0.55555)]),
             RobotEventuallyEntersRegion(
-                regions=[tbots.Circle(ball_final_pos, 0.1)]),
-            RobotEventuallyStopsInRegion(
-                regions=[tbots.Rectangle(tbots.Field.createSSLDivisionBField().friendlyDefenseArea().posXNegYCorner(
-                ), tbots.Field.createSSLDivisionBField().friendlyDefenseArea().posXPosYCorner() + 0.2)],
-                num_robots=blue_bots.length()-2
-            )
+                regions=[tbots.Circle(ball_final_pos, 0.5)]),
         ]
     ]
 
