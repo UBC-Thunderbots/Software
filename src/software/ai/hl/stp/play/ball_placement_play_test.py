@@ -95,7 +95,7 @@ def test_two_ai_ball_placement(simulated_test_runner, run_enemy_ai):
     simulated_test_runner.run_test(
         eventually_validation_sequence_set=eventually_validation_sequence_set,
         always_validation_sequence_set=always_validation_sequence_set,
-        test_timeout_s=15
+        test_timeout_s=15,
     )
 
 
