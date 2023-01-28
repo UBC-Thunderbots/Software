@@ -5,7 +5,6 @@
   vars:
     all_services:
       - thunderloop
-      - display
     all_actions:
       - stop
       - sync
@@ -17,7 +16,7 @@
   tasks:
 
     - debug:
-        msg: "[Robot ID = {{ inventory_hostname }}]"
+          msg: "[Robot ID = {{ inventory_hostname }}]"
       tags: always
 
     - name: Extract services & actions from tags
@@ -85,4 +84,17 @@
           loop_control:
             loop_var: service_name
           when: "'start' in actions"
+          tags: always
+
+        - name: Disable Announcements
+          become: true
+          become_method: sudo
+          ansible.builtin.systemd:
+            name: "{{ service_name }}"
+            enabled: no
+            masked: no
+            state: stopped
+          with_items: ["wifi_announcement", "ethernet_announcement"]
+          loop_control:
+            loop_var: service_name
           tags: always

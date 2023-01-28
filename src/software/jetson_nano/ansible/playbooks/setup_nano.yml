@@ -185,6 +185,18 @@
             dest: /etc/systemd/system
             copy_links: yes
 
+        - name: Remove announcements
+          become_method: sudo
+          become: true
+          tags:
+            - syncSystemdFiles
+          file:
+            path: "/etc/systemd/system/{{ service_name }}"
+            state: absent
+          with_items: ["wifi_announcement", "ethernet_announcement"]
+          loop_control:
+            loop_var: service_name
+
           # NOTE: "Enabling systems" means they will start on boot
         - name: Enable system services
           become: true
