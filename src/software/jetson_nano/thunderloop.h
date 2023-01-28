@@ -77,9 +77,6 @@ class Thunderloop
      */
     double getCpuTemperature();
 
-    // Primitive Executor
-    PrimitiveExecutor primitive_executor_;
-
     // Input Msg Buffers
     TbotsProto::PrimitiveSet primitive_set_;
     TbotsProto::World world_;
@@ -101,6 +98,14 @@ class Thunderloop
     int channel_id_;
     std::string network_interface_;
     int loop_hz_;
+
+    // Calibrated power service constants
+    int kick_slope_;
+    int kick_constant_;
+    int chip_pulse_width_;
+
+    // Primitive Executor
+    PrimitiveExecutor primitive_executor_;
 
     // 500 millisecond timeout on receiving primitives before we stop the robots
     const double PRIMITIVE_MANAGER_TIMEOUT_NS = 500.0 * NANOSECONDS_PER_MILLISECOND;
