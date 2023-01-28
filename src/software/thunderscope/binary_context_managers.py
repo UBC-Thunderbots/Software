@@ -462,9 +462,8 @@ class Gamecontroller(object):
             :param data: The referee command to send
 
             """
-            #print(data)
-            #blue_full_system_proto_unix_io.send_proto(Referee, data)
-            #yellow_full_system_proto_unix_io.send_proto(Referee, data)
+            blue_full_system_proto_unix_io.send_proto(Referee, data)
+            yellow_full_system_proto_unix_io.send_proto(Referee, data)
 
         self.receive_referee_command = SSLRefereeProtoListener(
             Gamecontroller.REFEREE_IP, self.referee_port, __send_referee_command, True,
@@ -764,7 +763,7 @@ class TigersAutoref(object):
     def sslWrappers(self):
         print("ssl enter")
         #pdb.set_trace()
-        time.sleep(1.2);
+        time.sleep(2.4);
         self.ci_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.ci_socket.connect(("", 10013))
         self.sendGeometry();

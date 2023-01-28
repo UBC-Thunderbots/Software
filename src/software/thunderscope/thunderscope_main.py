@@ -302,7 +302,8 @@ if __name__ == "__main__":
             while True:
                 tick = SimulatorTick(milliseconds=tick_rate_ms)
                 tscope.simulator_proto_unix_io.send_proto(SimulatorTick, tick)
-                time.sleep(tick_rate_ms / 1000)
+                if not args.ci_mode:
+                    time.sleep(tick_rate_ms / 1000)
 
         # Launch all binaries
         with Simulator(
@@ -320,7 +321,7 @@ if __name__ == "__main__":
         ) as gamecontroller, TigersAutoref(
                 autoref_runtime_dir="/tmp/tbots/autoref",
                 ci_mode=args.ci_mode,
-                gc=gamecontroller
+                gc=gamecontroller,
         ) as autoref:
 
             tscope.blue_full_system_proto_unix_io.register_to_observe_everything(
@@ -355,5 +356,6 @@ if __name__ == "__main__":
 
             thread.start()
             print("stcope show")
-            #tscope.show()
+            if (not args.ci_mode):
+                tscope.show()
             thread.join()
