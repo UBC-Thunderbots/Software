@@ -3,8 +3,7 @@
 #include <boost/functional/hash/hash.hpp>
 #include <queue>
 
-#include "extlibs/enlsvg/ENLSVG.h"
-
+#include "extlibs/enlsvg/enlsvg.h"
 #include "software/ai/navigator/obstacle/obstacle.hpp"
 #include "software/geom/linear_spline2d.h"
 #include "software/logger/logger.h"
