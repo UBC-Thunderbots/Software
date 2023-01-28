@@ -13,7 +13,7 @@ class ThreadedUnixSender:
 
     MAX_SEND_FAILURES_BEFORE_LOG = 100
 
-    def __init__(self, unix_path, protobuf_type, max_buffer_size=3):
+    def __init__(self, unix_path, proto_type, max_buffer_size=3):
 
         """Send protobufs over unix sockets
 
@@ -24,8 +24,7 @@ class ThreadedUnixSender:
 
         """
         self.unix_path = unix_path
-        self.proto_buffer = ThreadSafeBuffer(max_buffer_size, protobuf_type)
-        # self.proto_buffer = queue.Queue(max_buffer_size)
+        self.proto_buffer = ThreadSafeBuffer(max_buffer_size, proto_type)
 
         self.socket = socket.socket(socket.AF_UNIX, type=socket.SOCK_DGRAM)
         self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF, UNIX_BUFFER_SIZE)

@@ -88,7 +88,6 @@ class ProtoUnixIO:
         :param buffer: buffer from the widget to register
 
         """
-        print("register_observer: ", type(buffer), "for ", proto_class.DESCRIPTOR.full_name, flush=True)
         if proto_class.DESCRIPTOR.full_name in self.proto_observers:
             self.proto_observers[proto_class.DESCRIPTOR.full_name].append(buffer)
         else:
@@ -131,7 +130,9 @@ class ProtoUnixIO:
         :param proto_class: The protobuf type to send
 
         """
-        sender = ThreadedUnixSender(unix_path=runtime_dir + unix_path, protobuf_type=proto_class)
+        sender = ThreadedUnixSender(
+            unix_path=runtime_dir + unix_path, proto_type=proto_class
+        )
         self.unix_senders[proto_class.DESCRIPTOR.full_name] = sender
         self.register_observer(proto_class, sender.proto_buffer)
 
