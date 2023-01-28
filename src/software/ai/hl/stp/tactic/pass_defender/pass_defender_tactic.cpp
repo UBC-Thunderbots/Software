@@ -11,7 +11,7 @@ PassDefenderTactic::PassDefenderTactic()
 {
     for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)
     {
-        fsm_map[id] = std::make_unique<FSM<PassDefenderFSM>>();
+        fsm_map[id] = std::make_unique<FSM<PassDefenderFSM>>(PassDefenderFSM());
     }
 }
 
@@ -30,7 +30,8 @@ void PassDefenderTactic::updatePrimitive(const TacticUpdate &tactic_update,
 {
     if (reset_fsm)
     {
-        fsm_map[tactic_update.robot.id()] = std::make_unique<FSM<PassDefenderFSM>>();
+        fsm_map[tactic_update.robot.id()] =
+            std::make_unique<FSM<PassDefenderFSM>>(PassDefenderFSM());
     }
     fsm_map.at(tactic_update.robot.id())
         ->process_event(PassDefenderFSM::Update(control_params, tactic_update));

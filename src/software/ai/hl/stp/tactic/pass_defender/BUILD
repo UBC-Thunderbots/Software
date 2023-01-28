@@ -1,5 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
+load("@simulated_tests_deps//:requirements.bzl", "requirement")
+
 cc_library(
     name = "pass_defender_tactic",
     srcs = [
@@ -26,5 +28,18 @@ cc_test(
         ":pass_defender_tactic",
         "//software/test_util",
         "@gtest//:gtest_main",
+    ],
+)
+
+py_test(
+    name = "pass_defender_tactic_test",
+    srcs = [
+        "pass_defender_tactic_test.py",
+    ],
+    deps = [
+        "//software/simulated_tests:simulated_test_fixture",
+        "//software/simulated_tests:speed_threshold_helpers",
+        "//software/simulated_tests:validation",
+        requirement("pytest"),
     ],
 )

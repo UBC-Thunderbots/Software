@@ -9,27 +9,30 @@ bool PassDefenderFSM::passStarted(const Update& event)
         event.control_params.position_to_block_from.x() - ball_position.x(),
         event.control_params.position_to_block_from.y() - ball_position.y());
 
-    return event.common.world.ball().hasBallBeenKicked(
-        ball_receiver_point_vector.orientation());
+    bool pass_started = event.common.world.ball().hasBallBeenKicked(
+        ball_receiver_point_vector.orientation(), MIN_PASS_SPEED,
+        MAX_PASS_ANGLE_DIFFERENCE);
+
+    if (pass_started)
+    {
+        // We want to keep track of the initial trajectory of the pass
+        // so that we can later tell whether the ball strays from
+        // this trajectory
+        pass_orientation = event.common.world.ball().velocity().orientation();
+    }
+
+    return pass_started;
 }
 
 bool PassDefenderFSM::ballDeflected(const Update& event)
 {
-    auto ball_position = event.common.world.ball().position();
-    Vector ball_receiver_point_vector(
-        event.control_params.position_to_block_from.x() - ball_position.x(),
-        event.control_params.position_to_block_from.y() - ball_position.y());
+    auto orientation_difference =
+        event.common.world.ball().velocity().orientation().minDiff(pass_orientation);
 
-    auto orientation_difference = event.common.world.ball().velocity().orientation() -
-                                  ball_receiver_point_vector.orientation();
-
-    // If pass has strayed far from its intended destination,
-    // we consider the pass finished and the ball deflected
-    bool stray_pass =
-        event.common.world.ball().velocity().length() > MIN_STRAY_PASS_SPEED &&
-        orientation_difference.abs() > MIN_STRAY_PASS_ANGLE;
-
-    return stray_pass;
+    // If the ball strays from the initial trajectory of the pass,
+    // it was likely deflected off course by another robot or chipped
+    // away by the pass defender
+    return orientation_difference.abs() > MIN_DEFLECTION_ANGLE;
 }
 
 void PassDefenderFSM::blockPass(const Update& event)

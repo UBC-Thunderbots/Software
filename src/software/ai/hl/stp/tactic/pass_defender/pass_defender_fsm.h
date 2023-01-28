@@ -6,7 +6,6 @@
 
 struct PassDefenderFSM
 {
-   public:
     class BlockPassState;
     class InterceptBallState;
 
@@ -20,13 +19,16 @@ struct PassDefenderFSM
 
     DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
-    // The minimum angle between a ball's trajectory and the ball_receiver_point vector
-    // for which we can consider a pass to be stray (i.e it won't make it to the
-    // intercepting defender)
-    static constexpr Angle MIN_STRAY_PASS_ANGLE = Angle::fromDegrees(60);
+    // The minimum speed of the ball for it to be considered a pass
+    static constexpr double MIN_PASS_SPEED = 0.5;
 
-    // The minimum speed required for a pass to be considered stray
-    static constexpr double MIN_STRAY_PASS_SPEED = 0.3;
+    // The maximum angle difference to determine if ball has been kicked in
+    // the approximate direction of the defender
+    static constexpr Angle MAX_PASS_ANGLE_DIFFERENCE = Angle::fromDegrees(30);
+
+    // The minimum angle difference between a ball's trajectory and
+    // pass_orientation for which we can consider a pass to be deflected
+    static constexpr Angle MIN_DEFLECTION_ANGLE = Angle::fromDegrees(30);
 
     // Distance to chip the ball when trying to yeet it
     // TODO (#1878): Replace this with a more intelligent chip distance system
@@ -42,7 +44,7 @@ struct PassDefenderFSM
     bool passStarted(const Update& event);
 
     /**
-     * Guard that checks if the ball is deviating more than MIN_STRAY_PASS_ANGLE
+     * Guard that checks if the ball is deviating more than MIN_DEFLECTION_ANGLE
      * when the ball has been kicked and a pass is in progress.
      * Ball could be deflected due to another robot intercepting the pass,
      * or the pass defender could have chipped the ball away themselves.
@@ -84,16 +86,6 @@ struct PassDefenderFSM
         DEFINE_SML_ACTION(blockPass)
         DEFINE_SML_ACTION(interceptBall)
 
-        return make_transition_table(
-            // src_state + event [guard] / action = dest_state
-            *BlockPassState_S + Update_E[passStarted_G] / interceptBall_A =
-                InterceptBallState_S,
-            BlockPassState_S + Update_E / blockPass_A,
-            InterceptBallState_S + Update_E[ballDeflected_G] / blockPass_A =
-                BlockPassState_S,
-            InterceptBallState_S + Update_E / interceptBall_A,
-            X + Update_E / SET_STOP_PRIMITIVE_ACTION = X);
-
         // otherwise
         //  ┌─────┐
         //  │  ┌──┴─────────────┐  passStarted?  ┌────────────────────┐
@@ -103,5 +95,18 @@ struct PassDefenderFSM
         //              └──────────────────────────────────┘
         //                        ballDeflected?
         //
+
+        return make_transition_table(
+            // src_state + event [guard] / action = dest_state
+            *BlockPassState_S + Update_E[passStarted_G] / interceptBall_A =
+                InterceptBallState_S,
+            BlockPassState_S + Update_E / blockPass_A,
+            InterceptBallState_S + Update_E[ballDeflected_G] / blockPass_A =
+                BlockPassState_S,
+            InterceptBallState_S + Update_E / interceptBall_A,
+            X + Update_E / SET_STOP_PRIMITIVE_ACTION = X);
     }
+
+   private:
+    Angle pass_orientation;
 };
