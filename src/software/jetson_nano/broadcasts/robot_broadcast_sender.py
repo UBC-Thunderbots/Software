@@ -3,8 +3,10 @@ import fcntl
 import socket
 import struct
 import time
+import redis
 
 from proto.announcement_pb2 import Announcement
+from software.py_constants import *
 
 BROADCAST_INTERVAL_SECONDS = 2
 
@@ -56,9 +58,11 @@ def main():
     )
     args = vars(ap.parse_args())
 
+    redis_client = redis.Redis(host="localhost", port=6379, db=0)
+
     # Construct a announcement protobuf
     announcement = Announcement()
-    announcement.robot_id = 1  # TODO (#2229): read this value from the key-value store
+    announcement.robot_id = int(redis_client.get(ROBOT_ID_REDIS_KEY))
     announcement.ip_addr = get_ip_address(args["interface"])
     announcement.mac_addr = get_mac_address(args["interface"])
 

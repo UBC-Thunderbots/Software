@@ -39,14 +39,14 @@ Gpio::Gpio(std::string gpio_number, GpioDirection direction, GpioState initial_s
     set_direction_fs.close();
     setValue(initial_state);
 
-    LOG(DEBUG) << "Gpio " << gpio_number_ << " online";
+    LOG(DEBUG) << "GPIO " << gpio_number_ << " online";
 }
 
 void Gpio::setValue(GpioState state)
 {
     std::ofstream gpio_fs("/sys/class/gpio/gpio" + gpio_number_ + "/value");
 
-    CHECK(gpio_fs.is_open()) << "Could not set Gpio pin " << gpio_number_;
+    CHECK(gpio_fs.is_open()) << "Could not set GPIO pin " << gpio_number_;
 
     switch (state)
     {

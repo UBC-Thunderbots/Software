@@ -203,7 +203,9 @@ class Simulator(object):
 
     """ Simulator Context Manager """
 
-    def __init__(self, simulator_runtime_dir=None, debug_simulator=False):
+    def __init__(
+        self, simulator_runtime_dir=None, debug_simulator=False, enable_realism=False
+    ):
         """Run Simulator
 
         NOTE: If any of the runtime directories are None, the corresponding binary
@@ -216,6 +218,7 @@ class Simulator(object):
         self.simulator_runtime_dir = simulator_runtime_dir
         self.debug_simulator = debug_simulator
         self.er_force_simulator_proc = None
+        self.enable_realism = enable_realism
 
     def __enter__(self):
         """Enter the simulator context manager. 
@@ -235,6 +238,9 @@ class Simulator(object):
         simulator_command = "software/er_force_simulator_main --runtime_dir={}".format(
             self.simulator_runtime_dir
         )
+
+        if self.enable_realism:
+            simulator_command += " --enable_realism"
 
         if self.debug_simulator:
 
@@ -321,7 +327,7 @@ gdb --args bazel-bin/{simulator_command}
         ] + [
             # TODO (#2655): Add/Remove HRVO layers dynamically based on the HRVOVisualization proto messages
             (BLUE_HRVO_PATH, HRVOVisualization, True)
-            for robot_id in range(6)
+            for _ in range(MAX_ROBOT_IDS_PER_SIDE)
         ]:
             blue_full_system_proto_unix_io.attach_unix_receiver(
                 self.simulator_runtime_dir, *arg
@@ -342,7 +348,7 @@ gdb --args bazel-bin/{simulator_command}
         ] + [
             # TODO (#2655): Add/Remove HRVO layers dynamically based on the HRVOVisualization proto messages
             (YELLOW_HRVO_PATH, HRVOVisualization, True)
-            for robot_id in range(6)
+            for _ in range(MAX_ROBOT_IDS_PER_SIDE)
         ]:
             yellow_full_system_proto_unix_io.attach_unix_receiver(
                 self.simulator_runtime_dir, *arg

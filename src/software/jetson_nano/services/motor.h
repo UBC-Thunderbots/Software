@@ -28,6 +28,8 @@ class MotorService
      * call the appropriate trinamic api function to spin the appropriate motor.
      *
      * @param motor The motor msg to unpack and execute on the motors
+     * @param time_elapsed_since_last_poll_s The time since last poll was called in
+     * seconds
      * @returns MotorStatus The status of all the drive units
      */
     TbotsProto::MotorStatus poll(const TbotsProto::MotorControl& motor_control,
@@ -81,6 +83,11 @@ class MotorService
     void runOpenLoopCalibrationRoutine(uint8_t motor, size_t num_samples);
 
    private:
+    /**
+     * Checks for faults, clears them and sets up motors.
+     *
+     */
+    void setUpMotors();
     /**
      * Calls the configuration functions below in the right sequence
      *

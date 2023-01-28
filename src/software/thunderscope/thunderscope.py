@@ -18,7 +18,7 @@ else:
     import PyQt6
     from PyQt6.QtWebEngineWidgets import QWebEngineView
 
-from qt_material import apply_stylesheet
+from qt_material import apply_stylesheet, list_themes
 
 import pyqtgraph
 import qdarktheme
@@ -28,7 +28,7 @@ from pyqtgraph.Qt.QtWidgets import *
 
 from software.py_constants import *
 from proto.import_all_protos import *
-from software.thunderscope.arbitrary_plot.named_value_plotter import NamedValuePlotter
+from software.thunderscope.common.proto_plotter import ProtoPlotter
 from extlibs.er_force_sim.src.protobuf.world_pb2 import *
 from software.thunderscope.dock_label_style import *
 
@@ -54,6 +54,7 @@ from software.thunderscope.robot_diagnostics.chicker import ChickerWidget
 from software.thunderscope.robot_diagnostics.drive_and_dribbler_widget import (
     DriveAndDribblerWidget,
 )
+from software.thunderscope.robot_diagnostics.robot_view import RobotView
 from software.thunderscope.robot_diagnostics.estop_view import EstopView
 from software.thunderscope.replay.proto_player import ProtoPlayer
 
@@ -459,13 +460,28 @@ class Thunderscope(object):
 
         self.robot_diagnostics_dock_area.addDock(log_dock)
         self.robot_diagnostics_dock_area.addDock(drive_dock, "right", log_dock)
-        self.robot_diagnostics_dock_area.addDock(chicker_dock, "bottom", drive_dock)
+        self.robot_diagnostics_dock_area.addDock(chicker_dock, "below", drive_dock)
+
+        robot_view = self.setup_robot_view(proto_unix_io)
+
+        dock = Dock("Robot View")
+        dock.addWidget(robot_view)
+        self.robot_diagnostics_dock_area.addDock(dock, "top", log_dock)
 
         estop_view = self.setup_estop_view(proto_unix_io)
 
         dock = Dock("Estop View")
         dock.addWidget(estop_view)
         self.robot_diagnostics_dock_area.addDock(dock, "bottom", log_dock)
+
+    def setup_robot_view(self, proto_unix_io):
+        """Setup the robot view widget
+        :param proto_unix_io: The proto unix io object for the full system
+        """
+        robot_view = RobotView()
+        self.register_refresh_function(robot_view.refresh)
+        proto_unix_io.register_observer(RobotStatus, robot_view.robot_status_buffer)
+        return robot_view
 
     def setup_estop_view(self, proto_unix_io):
         """Setup the estop view widget
@@ -518,7 +534,7 @@ class Thunderscope(object):
         hrvo_sim_states = []
         # Add HRVO layers to field widget and have them hidden on startup
         # TODO (#2655): Add/Remove HRVO layers dynamically based on the HRVOVisualization proto messages
-        for robot_id in range(6):
+        for robot_id in range(MAX_ROBOT_IDS_PER_SIDE):
             hrvo_sim_state = hrvo_layer.HRVOLayer(
                 robot_id, self.visualization_buffer_size
             )
@@ -592,18 +608,23 @@ class Thunderscope(object):
         :returns: The performance plot widget
 
         """
-        # Create widget
-        named_value_plotter = NamedValuePlotter()
 
-        # Register observer
-        proto_unix_io.register_observer(
-            NamedValue, named_value_plotter.named_value_buffer
+        def extract_namedvalue_data(named_value_data):
+            return {named_value_data.name: named_value_data.value}
+
+        # Performance Plots plot HZ so the values can't be negative
+        proto_plotter = ProtoPlotter(
+            min_y=0,
+            max_y=100,
+            window_secs=15,
+            configuration={NamedValue: extract_namedvalue_data},
         )
 
+        # Register observer
+        proto_unix_io.register_observer(NamedValue, proto_plotter.buffers[NamedValue])
         # Register refresh function
-        self.register_refresh_function(named_value_plotter.refresh)
-
-        return named_value_plotter
+        self.register_refresh_function(proto_plotter.refresh)
+        return proto_plotter
 
     def setup_play_info(self, proto_unix_io):
         """Setup the play info widget
@@ -615,6 +636,7 @@ class Thunderscope(object):
 
         play_info = playInfoWidget()
         proto_unix_io.register_observer(PlayInfo, play_info.playinfo_buffer)
+        proto_unix_io.register_observer(Referee, play_info.referee_buffer)
         self.register_refresh_function(play_info.refresh)
 
         return play_info

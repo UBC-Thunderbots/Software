@@ -90,7 +90,6 @@ if __name__ == "__main__":
         help="Replay folder for the yellow full_system",
         default=None,
     )
-
     # Run blue or yellow full system over WiFi
     group = parser.add_mutually_exclusive_group()
     group.add_argument(
@@ -123,6 +122,26 @@ if __name__ == "__main__":
         type=int,
         default=5,
         help="How many packets to buffer while rendering",
+    )
+    parser.add_argument(
+        "--enable_realism",
+        action="store_true",
+        default=False,
+        help="set realism flag to use realistic config",
+    )
+    parser.add_argument(
+        "--estop_path",
+        action="store",
+        type=str,
+        default="/dev/ttyACM0",
+        help="Path to the Estop",
+    )
+    parser.add_argument(
+        "--estop_baudrate",
+        action="store",
+        type=int,
+        default=115200,
+        help="Estop Baudrate",
     )
 
     # Sanity check that an interface was provided
@@ -164,7 +183,7 @@ if __name__ == "__main__":
         ] + [
             # TODO (#2655): Add/Remove HRVO layers dynamically based on the HRVOVisualization proto messages
             {"proto_class": HRVOVisualization, "unix_path": YELLOW_HRVO_PATH}
-            for robot_id in range(6)
+            for _ in range(MAX_ROBOT_IDS_PER_SIDE)
         ]:
             proto_unix_io.attach_unix_receiver(
                 runtime_dir, from_log_visualize=True, **arg
@@ -196,8 +215,7 @@ if __name__ == "__main__":
         runtime_dir = args.blue_full_system_runtime_dir
         friendly_colour_yellow = False
         debug = args.debug_blue_full_system
-
-    if args.run_yellow:
+    elif args.run_yellow:
 
         tscope = Thunderscope(
             layout_path=args.layout,
@@ -214,9 +232,18 @@ if __name__ == "__main__":
         debug = args.debug_yellow_full_system
 
     if args.run_blue or args.run_yellow:
-        with RobotCommunication(
+        with ProtoLogger(
+            args.blue_full_system_runtime_dir,
+        ) as blue_logger, ProtoLogger(
+            args.yellow_full_system_runtime_dir,
+        ) as yellow_logger, RobotCommunication(
             proto_unix_io, getRobotMulticastChannel(0), args.interface
-        ), FullSystem(runtime_dir, debug, friendly_colour_yellow) as full_system:
+        ), FullSystem(
+            runtime_dir, debug, friendly_colour_yellow
+        ) as full_system:
+
+            proto_unix_io.register_to_observe_everything(blue_logger.buffer)
+            proto_unix_io.register_to_observe_everything(yellow_logger.buffer)
             full_system.setup_proto_unix_io(proto_unix_io)
             tscope.show()
 
@@ -275,7 +302,7 @@ if __name__ == "__main__":
 
         # Launch all binaries
         with Simulator(
-            args.simulator_runtime_dir, args.debug_simulator
+            args.simulator_runtime_dir, args.debug_simulator, args.enable_realism
         ) as simulator, FullSystem(
             args.blue_full_system_runtime_dir, args.debug_blue_full_system, False
         ) as blue_fs, FullSystem(

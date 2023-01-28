@@ -161,7 +161,7 @@ if __name__ == "__main__":
 
     BUTTON_PIN = 40  # BOARD 35, TEGRA_SOC: 'DAP4_FS'
     PIN_1 = 33  # BOARD 40, TEGRA_SOC: 'DAP4_DOUT'
-    PIN_2 = 35  # BOARD 33, TEGRA_SOC: 'Gpio_PE6'
+    PIN_2 = 35  # BOARD 33, TEGRA_SOC: 'GPIO_PE6'
 
     rot = RotaryEncoder(
         PIN_1,

@@ -15,6 +15,7 @@ cc_library(
         "//proto/message_translation:ssl_simulation_robot_control",
         "//proto/message_translation:ssl_wrapper",
         "//software/jetson_nano:primitive_executor",
+        "//software/physics:velocity_conversion_util",
         "//software/world",
         "//software/world:field",
         "//software/world:team_colour",

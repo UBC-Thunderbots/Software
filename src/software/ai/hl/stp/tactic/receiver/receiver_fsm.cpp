@@ -81,11 +81,11 @@ std::optional<Shot> ReceiverFSM::findFeasibleShot(const World& world,
         Vector robot_to_shot_target =
             best_shot_opt.value().getPointToShootAt() - assigned_robot.position();
         abs_angle_between_pass_and_shot_vectors =
-            acuteAngle(robot_to_ball, robot_to_shot_target);
+            convexAngle(robot_to_ball, robot_to_shot_target);
 
         Angle goal_angle =
-            acuteAngle(world.field().friendlyGoalpostPos(), assigned_robot.position(),
-                       world.field().friendlyGoalpostNeg());
+            convexAngle(world.field().friendlyGoalpostPos(), assigned_robot.position(),
+                        world.field().friendlyGoalpostNeg());
 
         double net_percent_open =
             best_shot_opt.value().getOpenAngle().toDegrees() / goal_angle.toDegrees();
@@ -128,7 +128,7 @@ void ReceiverFSM::updateOnetouch(const Update& event)
     }
     else
     {
-        event.common.set_primitive(createStopPrimitive(false));
+        event.common.set_primitive(createStopPrimitive());
     }
 }
 

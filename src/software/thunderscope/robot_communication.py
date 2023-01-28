@@ -58,6 +58,8 @@ class RobotCommunication(object):
         self.send_estop_state_thread = threading.Thread(target=self.__send_estop_state)
         self.run_thread = threading.Thread(target=self.run)
 
+        self.fullsystem_connected_to_robots = True
+
         try:
             self.estop_reader = ThreadedEstopReader(
                 self.estop_path, self.estop_buadrate
@@ -90,12 +92,12 @@ class RobotCommunication(object):
 
                 # Send the world
                 world = self.world_buffer.get(block=True)
-                self.send_world.send_proto(world)
+                self.world_mcast_sender.send_proto(world)
 
                 # Send the primitive set
                 primitive_set = self.primitive_buffer.get(block=False)
 
-                if True:
+                if self.estop_reader.isEstopPlay():
                     self.send_primitive_set.send_proto(primitive_set)
 
             else:
@@ -121,7 +123,7 @@ class RobotCommunication(object):
 
                 self.sequence_number += 1
 
-                if True:
+                if self.estop_reader.isEstopPlay():
                     self.last_time = primitive_set.time_sent.epoch_timestamp_seconds
                     self.send_primitive_set.send_proto(primitive_set)
 
@@ -142,7 +144,7 @@ class RobotCommunication(object):
     def connect_robot_to_diagnostics(self, robot_id):
         self.robots_connected_to_diagnostics.add(robot_id)
 
-    def discconnect_robot_from_diagnostics(self, robot_id):
+    def disconnect_robot_from_diagnostics(self, robot_id):
         self.robots_connected_to_diagnostics.remove(robot_id)
 
     def __enter__(self):
@@ -158,6 +160,10 @@ class RobotCommunication(object):
             True,
         )
 
+        self.send_primitive_mcast_sender = PrimitiveSetProtoSender(
+            self.multicast_channel + "%" + self.interface, PRIMITIVE_PORT, True
+        )
+
         self.receive_robot_log = RobotLogProtoListener(
             self.multicast_channel + "%" + self.interface,
             ROBOT_LOGS_PORT,
@@ -166,11 +172,18 @@ class RobotCommunication(object):
         )
 
         self.receive_ssl_wrapper = SSLWrapperPacketProtoListener(
-            SSL_ADDRESS,
-            SSL_PORT,
+            SSL_VISION_ADDRESS,
+            SSL_VISION_PORT,
             lambda data: self.full_system_proto_unix_io.send_proto(
                 SSL_WrapperPacket, data
             ),
+            True,
+        )
+
+        self.receive_ssl_referee_proto = SSLRefereeProtoListener(
+            SSL_REFEREE_ADDRESS,
+            SSL_REFEREE_PORT,
+            lambda data: self.full_system_proto_unix_io.send_proto(Referee, data),
             True,
         )
 
@@ -179,7 +192,7 @@ class RobotCommunication(object):
             self.multicast_channel + "%" + self.interface, PRIMITIVE_PORT, True
         )
 
-        self.send_world = WorldProtoSender(
+        self.world_mcast_sender = WorldProtoSender(
             self.multicast_channel + "%" + self.interface, VISION_PORT, True
         )
 
