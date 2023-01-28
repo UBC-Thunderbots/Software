@@ -354,5 +354,6 @@ if __name__ == "__main__":
             )
 
             thread.start()
-            tscope.show()
+            print("stcope show")
+            #tscope.show()
             thread.join()

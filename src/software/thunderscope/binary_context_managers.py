@@ -12,6 +12,7 @@ from subprocess import Popen
 from software.python_bindings import *
 import software.python_bindings as tbots
 from proto.import_all_protos import *
+from proto.ssl_gc_common_pb2 import Team
 from software.py_constants import *
 from extlibs.er_force_sim.src.protobuf.world_pb2 import (
     SimulatorState,
@@ -539,6 +540,64 @@ class Gamecontroller(object):
         ci_output.ParseFromString(response_data[new_pos : new_pos + msg_len])
         return ci_output
 
+    def resetTeam(self, name, team):
+        update_team_state                   = UpdateTeamState()
+        update_team_state.for_team          = team
+        update_team_state.team_name              = name
+        update_team_state.goals             = 0
+        update_team_state.timeouts_left     = 4
+        update_team_state.timeout_time_left = "05:00" 
+        update_team_state.can_place_ball    = True
+
+        return update_team_state
+
+    def resetGame(self):
+        game_update = UpdateConfig() 
+        game_update.division = Division.DIV_B
+        game_update.first_kickoff_team = Team.BLUE
+        game_update.auto_continue = True
+        game_update.match_type = MatchType.FRIENDLY
+
+        return game_update
+
+    def resetTeamInfo(self, tracker_wrapper):
+        ci_ci_input = CiInput(timestamp=int(time.time_ns()))
+        ci_input_blue_update = Input()
+        ci_input_blue_update.reset_match = True
+        ci_input_blue_update.change.update_team_state.CopyFrom(self.resetTeam("BLUE", Team.BLUE))
+
+        ci_input_yellow_update = Input()
+        ci_input_yellow_update.reset_match = True
+        ci_input_yellow_update.change.update_team_state.CopyFrom(self.resetTeam("YELLOW", Team.YELLOW))
+
+        ci_input_game_update = Input()
+        ci_input_game_update.reset_match = True
+        ci_input_game_update.change.update_config.CopyFrom(self.resetGame())
+
+        ci_ci_input.api_inputs.append(ci_input_blue_update)
+        ci_ci_input.api_inputs.append(ci_input_yellow_update)
+        ci_ci_input.api_inputs.append(ci_input_game_update)
+
+
+        # https://cwiki.apache.org/confluence/display/GEODE/Delimiting+Protobuf+Messages
+        size = ci_ci_input.ByteSize()
+
+        # Send a request to the host with the size of the message
+        self.ci_socket.send(
+            encoder._VarintBytes(size) + ci_ci_input.SerializeToString()
+        )
+
+        response_data = self.ci_socket.recv(
+            Gamecontroller.CI_MODE_OUTPUT_RECEIVE_BUFFER_SIZE
+        )
+
+        msg_len, new_pos = decoder._DecodeVarint32(response_data, 0)
+        ci_output = CiOutput()
+        ci_output.ParseFromString(response_data[new_pos : new_pos + msg_len])
+        return ci_output
+
+        return
+
 
 class TigersAutoref(object):
     def __init__(self, ci_mode=False, autoref_runtime_dir=None, buffer_size=5, gc=Gamecontroller()):
@@ -551,7 +610,8 @@ class TigersAutoref(object):
         self.autoref_runtime_dir = autoref_runtime_dir
         self.wrapper_buffer = ThreadSafeBuffer(buffer_size, SSL_WrapperPacket)
         self.gamecontroller = gc
-        self.ci_socket = self.gamecontroller.ci_socket
+        
+        
         #time.sleep(Gamecontroller.CI_MODE_LAUNCH_DELAY_S)
         #self.ci_port = self.gamecontroller.next_free_port()
         #print("autoref ci port: " + str(self.ci_port))
@@ -561,12 +621,14 @@ class TigersAutoref(object):
         #pdb.set_trace()
         print("autoref enter")
 
-        self.auto_ref_proc_thread = threading.Thread(target=self.startAutoref)
+        self.auto_ref_proc_thread = threading.Thread(target=self.startAutoref, daemon=True)
         self.auto_ref_proc_thread.start()
+        print("post autoref start")
 
         self.auto_ref_wrapper_thread = threading.Thread(target=self.sslWrappers)
         self.auto_ref_wrapper_thread.start()
         print("thread started")
+        #pdb.set_trace()
 
         return self
 
@@ -617,7 +679,7 @@ class TigersAutoref(object):
                         offset + msg_len - len(response_data)
                 )
             ci_output.ParseFromString(response_data[offset : offset + msg_len])
-            pdb.set_trace()
+            #pdb.set_trace()
             self.send_ci_input(ci_output.tracker_wrapper_packet)
             #print(ci_output)
             offset += msg_len
@@ -650,7 +712,7 @@ class TigersAutoref(object):
         
         print(referee_msg)
         ci_input.referee_message.CopyFrom(referee_msg)
-        pdb.set_trace()
+        #pdb.set_trace()
 
         size = ci_input.ByteSize()
 
@@ -669,7 +731,7 @@ class TigersAutoref(object):
             print("offset: " + str(offset) + ", " + str(msg_len) + ", " + str(new_pos) + ", " + str(len(response_data)))
             #print(response_data)
             ci_output = AutoRefCiOutput()
-            pdb.set_trace()
+            #pdb.set_trace()
             if (offset + msg_len > len(response_data)):
                 print("Must get additional data")
                 response_data += self.ci_socket.recv(
@@ -702,7 +764,18 @@ class TigersAutoref(object):
     def sslWrappers(self):
         print("ssl enter")
         #pdb.set_trace()
+        time.sleep(1.2);
+        self.ci_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.ci_socket.connect(("", 10013))
         self.sendGeometry();
+        ssl_wrapper = self.wrapper_buffer.get(block=True)
+        self.gamecontroller.resetTeamInfo(ssl_wrapper)
+        ssl_wrapper = self.wrapper_buffer.get(block=True)
+        self.gamecontroller.resetTeamInfo(ssl_wrapper)
+        self.gamecontroller.send_ci_input(
+            gc_command=Command.Type.STOP, team=Team.UNKNOWN
+        )
+
         #self.sendTeamInfo();
         while True:
             ssl_wrapper = self.wrapper_buffer.get(block=True)
@@ -784,8 +857,9 @@ class TigersAutoref(object):
             autoref_cmd += " -ci"
 
         #pdb.set_trace()
-        #self.tigers_autoref_proc = Popen(autoref_cmd.split(" "))
-        time.sleep(1)
+        with open(os.devnull, "w") as fp:
+            self.tigers_autoref_proc = Popen(autoref_cmd.split(" "), stdout=fp, stderr=fp)
+        print("autoref started")
 
     def setup_ssl_wrapper_packets(
         self, blue_fullsystem_proto_unix_io, yellow_fullsystem_proto_unix_io
@@ -808,8 +882,8 @@ class TigersAutoref(object):
         
         #pdb.set_trace()
         blue_fullsystem_proto_unix_io.register_observer(SSL_WrapperPacket, self.wrapper_buffer)
-        self.ci_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.ci_socket.connect(("", 10013))
+        #self.ci_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        #self.ci_socket.connect(("", 10013))
 
         #self.autoref_sender = SSL_AutoRefCiInputProtoSender("127.0.0.1", 10013, False)
         #self.autoref_receiver = SSL_AutoRefCiOutputProtoListener(
