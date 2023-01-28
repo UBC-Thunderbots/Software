@@ -458,7 +458,7 @@ py_test(
     srcs = [
         "enemy_ball_placement_play_test.py",
     ],
-    tags = ["exclusive",],
+    tags = ["exclusive"],
     deps = [
         "//software/simulated_tests:simulated_test_fixture",
         "//software/simulated_tests:validation",
@@ -523,8 +523,8 @@ py_test(
     ],
     deps = [
         "//software/simulated_tests:simulated_test_fixture",
-        "//software/simulated_tests:validation",
         "//software/simulated_tests:speed_threshold_helpers",
+        "//software/simulated_tests:validation",
         requirement("pytest"),
     ],
 )
@@ -605,7 +605,7 @@ py_test(
     srcs = [
         "ball_placement_play_test.py",
     ],
-    tags = ["exclusive",],
+    tags = ["exclusive"],
     deps = [
         "//software/simulated_tests:simulated_test_fixture",
         "//software/simulated_tests:validation",

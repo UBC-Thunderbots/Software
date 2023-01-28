@@ -11,10 +11,7 @@ from proto.ssl_gc_common_pb2 import Team
 
 
 @pytest.mark.parametrize("is_friendly_test", [True, False])
-def test_kickoff_play(
-    simulated_test_runner,
-    is_friendly_test
-):
+def test_kickoff_play(simulated_test_runner, is_friendly_test):
 
     # starting point must be Point
     ball_initial_pos = tbots.Point(0, 0)
