@@ -60,7 +60,9 @@ namespace
                 new AttackerTactic(ai_config),
                 std::set<TbotsProto::MotionConstraint>({})),
             std::pair<std::shared_ptr<Tactic>, std::set<TbotsProto::MotionConstraint>>(
-                new StopTactic(), std::set<TbotsProto::MotionConstraint>({}))};
+                new StopTactic(), std::set<TbotsProto::MotionConstraint>({})),
+            std::pair<std::shared_ptr<Tactic>, std::set<TbotsProto::MotionConstraint>>(
+                new PassDefenderTactic(), std::set<TbotsProto::MotionConstraint>({}))};
 
     // sets of motion constraints for each type of game state
     auto stoppage_or_them_motion_constraints = std::set<TbotsProto::MotionConstraint>(
