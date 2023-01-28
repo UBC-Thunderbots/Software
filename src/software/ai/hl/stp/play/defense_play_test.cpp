@@ -88,7 +88,29 @@ TEST_F(DefensePlayTest, test_defense_play_one_immediate_threat)
     // the test
     setRefereeCommand(RefereeCommand::STOP, RefereeCommand::STOP);
 
-    std::vector<ValidationFunction> terminating_validation_functions = {};
+    std::vector<ValidationFunction> terminating_validation_functions = {
+        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+            // Wait for all robots to come to a halt
+            robotHalt(world_ptr, yield);
+            // Attacker in front of enemy with the ball
+            Rectangle attacker_rect(Point(-2.5, 0.5), Point(-1, -0.5));
+            robotInPolygon(attacker_rect, 1, world_ptr, yield);
+
+            // Two friendly robots swarming around the immediate threat
+            Rectangle swarming_rect(Point(-2, 1), Point(0, -1));
+            robotInPolygon(swarming_rect, 2, world_ptr, yield);
+
+            // Two friendly crease defenders should be close to the goalie
+            Point goalie_position = world_ptr->friendlyTeam().goalie()->position();
+            Rectangle left_crease_defender_rect(
+                Point(goalie_position.x(), goalie_position.y() + 0.5),
+                Point(goalie_position.x() + 0.5, goalie_position.y()));
+            Rectangle right_crease_defender_rect(
+                Point(goalie_position.x(), goalie_position.y()),
+                Point(goalie_position.x() + 0.5, goalie_position.y() - 0.5));
+            robotInPolygon(left_crease_defender_rect, 1, world_ptr, yield);
+            robotInPolygon(right_crease_defender_rect, 1, world_ptr, yield);
+        }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {

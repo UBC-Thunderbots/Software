@@ -109,7 +109,6 @@ void HRVOAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive,
             {
                 dynamic_obstacles.insert(dynamic_obstacles.end(), new_obstacles.begin(),
                                          new_obstacles.end());
-                break;
             }
             else
             {
