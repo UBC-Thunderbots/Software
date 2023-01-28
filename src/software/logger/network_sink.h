@@ -35,4 +35,5 @@ class NetworkSink
    private:
     std::unique_ptr<ThreadedProtoUdpSender<TbotsProto::RobotLog>> log_output;
     int robot_id;
+    std::string last_msg;
 };

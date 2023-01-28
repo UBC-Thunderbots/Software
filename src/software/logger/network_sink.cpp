@@ -17,8 +17,16 @@ void NetworkSink::sendToNetwork(g3::LogMessageMover log_entry)
     TbotsProto::LogLevel log_level_proto;
 
     if (TbotsProto::LogLevel_Parse(log_entry.get().level(), &log_level_proto))
-    {
-        log_msg_proto->set_log_msg(log_entry.get().message());
+    {   
+        // reduce spam by sending a period if message is same as previous
+        std::string msg_to_send;
+        if (log_entry.get().message() == last_msg) {
+            msg_to_send = ".";
+        } else {
+            msg_to_send = log_entry.get().message();
+        }
+
+        log_msg_proto->set_log_msg(msg_to_send);
         log_msg_proto->set_robot_id(robot_id);
         log_msg_proto->set_log_level(log_level_proto);
         log_msg_proto->set_file_name(log_entry.get().file());
@@ -27,4 +35,6 @@ void NetworkSink::sendToNetwork(g3::LogMessageMover log_entry)
 
         log_output->sendProto(*log_msg_proto);
     }
+
+    last_msg = log_entry.get().message();
 }
