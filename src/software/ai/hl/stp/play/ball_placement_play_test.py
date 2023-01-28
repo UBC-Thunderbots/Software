@@ -15,7 +15,7 @@ from proto.ssl_gc_geometry_pb2 import Vector2
 @pytest.mark.parametrize(
     "run_enemy_ai", [False]
 )  # , True])  TODO: Issue 2780 re-enable this test
-def test_two_ai_ball_placement(simulated_test_runner, run_enemy_ai, test_duration):
+def test_two_ai_ball_placement(simulated_test_runner, run_enemy_ai):
 
     # starting point must be Point
     ball_initial_pos = tbots.Point(2, 2)
@@ -95,7 +95,7 @@ def test_two_ai_ball_placement(simulated_test_runner, run_enemy_ai, test_duratio
     simulated_test_runner.run_test(
         eventually_validation_sequence_set=eventually_validation_sequence_set,
         always_validation_sequence_set=always_validation_sequence_set,
-        test_timeout_s=test_duration,
+        test_timeout_s=15
     )
 
 
