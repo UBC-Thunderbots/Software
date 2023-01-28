@@ -523,18 +523,6 @@ py_test(
     ],
 )
 
-py_test(
-    name = "first_test",
-    srcs = [
-        "first_test.py",
-    ],
-    deps = [
-        "//software/simulated_tests:simulated_test_fixture",
-        "//software/simulated_tests:validation",
-        requirement("pytest"),
-    ],
-)
-
 cc_test(
     name = "ball_placement_play_test_old",
     srcs = ["ball_placement_play_test.cpp"],
