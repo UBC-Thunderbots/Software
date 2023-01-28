@@ -51,7 +51,7 @@ struct PassDefenderFSM
      *
      * @param event PassDefenderFSM::Update event
      *
-     * @return true if stray pass
+     * @return true if ball deflected
      */
     bool ballDeflected(const Update& event);
 
@@ -65,7 +65,7 @@ struct PassDefenderFSM
     /**
      * Action to intercept an active pass and chip the ball away, adjusting
      * the defender's position to be directly in front of the ball's trajectory
-     * for better interception.
+     * for better interception
      *
      * @param event PassDefenderFSM::Update event
      */
