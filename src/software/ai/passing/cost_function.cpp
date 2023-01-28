@@ -51,41 +51,34 @@ double rateZone(const Field& field, const Team& enemy_team, const Rectangle& zon
     // Rate zones that are up the field higher to encourage progress up the field
     double pass_up_field_rating = zone.centre().x() / field.xLength();
 
-    double enemy_risk_rating =
-        zoneEnemyRiskRating(enemy_team, ball_position, zone, passing_config);
-
-    return pass_up_field_rating * static_pass_quality * enemy_risk_rating;
-}
-
-double zoneEnemyRiskRating(const Team& enemy_team, const Point& ball_position,
-                           const Rectangle& zone,
-                           TbotsProto::PassingConfig passing_config)
-{
     auto enemy_reaction_time =
         Duration::fromSeconds(passing_config.enemy_reaction_time());
     double enemy_proximity_importance = passing_config.enemy_proximity_importance();
 
-    return (ratePassEnemyRisk(enemy_team,
-                              Pass(ball_position, zone.negXNegYCorner(),
-                                   passing_config.max_pass_speed_m_per_s()),
-                              enemy_reaction_time, enemy_proximity_importance) +
-            ratePassEnemyRisk(enemy_team,
-                              Pass(ball_position, zone.negXPosYCorner(),
-                                   passing_config.max_pass_speed_m_per_s()),
-                              enemy_reaction_time, enemy_proximity_importance) +
-            ratePassEnemyRisk(enemy_team,
-                              Pass(ball_position, zone.posXNegYCorner(),
-                                   passing_config.max_pass_speed_m_per_s()),
-                              enemy_reaction_time, enemy_proximity_importance) +
-            ratePassEnemyRisk(enemy_team,
-                              Pass(ball_position, zone.posXPosYCorner(),
-                                   passing_config.max_pass_speed_m_per_s()),
-                              enemy_reaction_time, enemy_proximity_importance) +
-            ratePassEnemyRisk(enemy_team,
-                              Pass(ball_position, zone.centre(),
-                                   passing_config.max_pass_speed_m_per_s()),
-                              enemy_reaction_time, enemy_proximity_importance)) /
-           5.0;
+    double enemy_risk_rating =
+        (ratePassEnemyRisk(enemy_team,
+                           Pass(ball_position, zone.negXNegYCorner(),
+                                passing_config.max_pass_speed_m_per_s()),
+                           enemy_reaction_time, enemy_proximity_importance) +
+         ratePassEnemyRisk(enemy_team,
+                           Pass(ball_position, zone.negXPosYCorner(),
+                                passing_config.max_pass_speed_m_per_s()),
+                           enemy_reaction_time, enemy_proximity_importance) +
+         ratePassEnemyRisk(enemy_team,
+                           Pass(ball_position, zone.posXNegYCorner(),
+                                passing_config.max_pass_speed_m_per_s()),
+                           enemy_reaction_time, enemy_proximity_importance) +
+         ratePassEnemyRisk(enemy_team,
+                           Pass(ball_position, zone.posXPosYCorner(),
+                                passing_config.max_pass_speed_m_per_s()),
+                           enemy_reaction_time, enemy_proximity_importance) +
+         ratePassEnemyRisk(
+             enemy_team,
+             Pass(ball_position, zone.centre(), passing_config.max_pass_speed_m_per_s()),
+             enemy_reaction_time, enemy_proximity_importance)) /
+        5.0;
+
+    return pass_up_field_rating * static_pass_quality * enemy_risk_rating;
 }
 
 double ratePassShootScore(const Field& field, const Team& enemy_team, const Pass& pass,
