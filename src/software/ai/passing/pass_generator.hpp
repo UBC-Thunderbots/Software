@@ -204,57 +204,59 @@ ZonePassMap<ZoneEnum> PassGenerator<ZoneEnum>::samplePasses(const World& world)
 template <class ZoneEnum>
 void PassGenerator<ZoneEnum>::sampleZoneCentrePasses(const World& world)
 {
-    // row and col count to pass to Python
-    // number of col
+    // this decides the numbers of rows and cols we visualize
+    // TODO: move to contants file
     int NUM_ROWS = 3;
+    int NUM_COLS = 6;
+    double width = world.field().xLength() / NUM_COLS;
+    double height = world.field().yLength() / NUM_ROWS;
 
     std::unordered_map<std::string, std::vector<double>> func_to_costs;
-
     std::vector<double> static_pos_quality_costs;
     std::vector<double> pass_friendly_capability_costs;
     std::vector<double> pass_enemy_risk_costs;
     std::vector<double> pass_shoot_score_costs;
-    std::vector<double> zone_rating_costs;
 
-    // Sample a pass in each zone's centre
-    for (ZoneEnum zone_id : pitch_division_->getAllZoneIds())
+    // We loop column wise (int the same order as how zones are defined)
+    for (int i = 0; i < NUM_COLS; i++)
     {
-        auto pass =
-            Pass(world.ball().position(), pitch_division_->getZone(zone_id).centre(),
-                 passing_config_.max_pass_speed_m_per_s());
+        // x coordinate of the centre of the column
+        double x = width * i + width / 2 - world.field().xLength() / 2;
 
-        // ----- Passes ----- //
-        // getStaticPositionQuality
-        static_pos_quality_costs.push_back(getStaticPositionQuality(
-            world.field(), pass.receiverPoint(), passing_config_));
+        for (int j = 0; j < NUM_ROWS; j++)
+        {
+            double y = height * j + height / 2 - world.field().yLength() / 2;
+            auto pass =
+                Pass(world.ball().position(), Point(x, y),
+                    passing_config_.max_pass_speed_m_per_s());
 
-        // ratePassFriendlyCapability
-        pass_friendly_capability_costs.push_back(
-            ratePassFriendlyCapability(world.friendlyTeam(), pass, passing_config_));
+            // ----- Passes ----- //
+            // getStaticPositionQuality
+            static_pos_quality_costs.push_back(getStaticPositionQuality(
+                world.field(), pass.receiverPoint(), passing_config_));
 
-        // ratePassEnemyRisk
-        pass_enemy_risk_costs.push_back(ratePassEnemyRisk(
-            world.enemyTeam(), pass,
-            Duration::fromSeconds(passing_config_.enemy_reaction_time()),
-            passing_config_.enemy_proximity_importance()));
+            // ratePassFriendlyCapability
+            pass_friendly_capability_costs.push_back(
+                ratePassFriendlyCapability(world.friendlyTeam(), pass, passing_config_));
 
-        // ratePassShootScore
-        pass_shoot_score_costs.push_back(
-            ratePassShootScore(world.field(), world.enemyTeam(), pass, passing_config_));
+            // ratePassEnemyRisk
+            pass_enemy_risk_costs.push_back(ratePassEnemyRisk(
+                world.enemyTeam(), pass,
+                Duration::fromSeconds(passing_config_.enemy_reaction_time()),
+                passing_config_.enemy_proximity_importance()));
 
-        // rateZone
-        zone_rating_costs.push_back(rateZone(world.field(), world.enemyTeam(),
-                                             pitch_division_->getZone(zone_id),
-                                             world.ball().position(), passing_config_));
+            // ratePassShootScore
+            pass_shoot_score_costs.push_back(
+                ratePassShootScore(world.field(), world.enemyTeam(), pass, passing_config_));
+        }
     }
 
     func_to_costs["getStaticPositionQuality"]   = static_pos_quality_costs;
     func_to_costs["ratePassFriendlyCapability"] = pass_friendly_capability_costs;
     func_to_costs["ratePassEnemyRisk"]          = pass_enemy_risk_costs;
     func_to_costs["ratePassShootScore"]         = pass_shoot_score_costs;
-    func_to_costs["rateZone"]                   = zone_rating_costs;
 
-    LOG(VISUALIZE) << *createCostVisualization(func_to_costs, NUM_ROWS);
+    LOG(VISUALIZE) << *createCostVisualization(func_to_costs, NUM_ROWS, NUM_COLS);
 }
 
 template <class ZoneEnum>

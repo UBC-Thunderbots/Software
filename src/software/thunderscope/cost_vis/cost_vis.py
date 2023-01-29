@@ -24,11 +24,10 @@ class CostVisualizationWidget(QtWidgets.QMainWindow):
 
         # initialize arrays with zeros
         self.data = np.zeros(shape=(6, 3))
-        self.static_position_quality = np.zeros(shape=(6, 3))
-        self.pass_friendly_capability = np.zeros(shape=(6, 3))
-        self.pass_enemy_risk = np.zeros(shape=(6, 3))
-        self.pass_shoot_score = np.zeros(shape=(6, 3))
-        self.zone_rating = np.zeros(shape=(6, 3))
+        # self.static_position_quality = np.zeros(shape=(6, 3))
+        # self.pass_friendly_capability = np.zeros(shape=(6, 3))
+        # self.pass_enemy_risk = np.zeros(shape=(6, 3))
+        # self.pass_shoot_score = np.zeros(shape=(6, 3))
 
         layout = pg.LayoutWidget(parent=self)
 
@@ -52,9 +51,6 @@ class CostVisualizationWidget(QtWidgets.QMainWindow):
         self.pass_shoot_box = QtWidgets.QCheckBox("Pass Shoot Score")
         layout.addWidget(self.pass_shoot_box, row=1, col=3, colspan=1, rowspan=1)
         self.pass_shoot_box.setChecked(True)
-        self.zone_rate_box = QtWidgets.QCheckBox("Zone Rating")
-        layout.addWidget(self.zone_rate_box, row=1, col=4, colspan=1, rowspan=1)
-        self.zone_rate_box.setChecked(True)
 
         self.setCentralWidget(layout)
 
@@ -78,13 +74,12 @@ class CostVisualizationWidget(QtWidgets.QMainWindow):
 
         self.static_position_quality = np.array(
             cost_vis.static_position_quality.cost
-        ).reshape(6, 3)
+        ).reshape(cost_vis.num_cols, cost_vis.num_rows)
         self.pass_friendly_capability = np.array(
             cost_vis.pass_friendly_capability.cost
-        ).reshape(6, 3)
-        self.pass_enemy_risk = np.array(cost_vis.pass_enemy_risk.cost).reshape(6, 3)
-        self.pass_shoot_score = np.array(cost_vis.pass_shoot_score.cost).reshape(6, 3)
-        self.zone_rating = np.array(cost_vis.zone_rating.cost).reshape(6, 3)
+        ).reshape(cost_vis.num_cols, cost_vis.num_rows)
+        self.pass_enemy_risk = np.array(cost_vis.pass_enemy_risk.cost).reshape(cost_vis.num_cols, cost_vis.num_rows)
+        self.pass_shoot_score = np.array(cost_vis.pass_shoot_score.cost).reshape(cost_vis.num_cols, cost_vis.num_rows)
 
         # update data based on push button states
         self.data = (
@@ -92,7 +87,6 @@ class CostVisualizationWidget(QtWidgets.QMainWindow):
             + self.pass_friend_box.isChecked() * self.pass_friendly_capability
             + self.pass_enemy_box.isChecked() * self.pass_enemy_risk
             + self.pass_shoot_box.isChecked() * self.pass_shoot_score
-            + self.zone_rate_box.isChecked() * self.zone_rating
         )
 
         self.img.setImage(self.data)
