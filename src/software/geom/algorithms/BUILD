@@ -12,6 +12,7 @@ cc_library(
         "distance.cpp",
         "find_open_circles.cpp",
         "furthest_point.cpp",
+        "generate_velocity_obstacle.cpp",
         "intersection.cpp",
         "intersects.cpp",
         "rasterize.cpp",
@@ -27,12 +28,14 @@ cc_library(
         "distance.h",
         "find_open_circles.h",
         "furthest_point.h",
+        "generate_velocity_obstacle.h",
         "intersection.h",
         "intersects.h",
         "rasterize.h",
         "voronoi_diagram.h",
     ],
     deps = [
+        "//software/ai/navigator/path_planner/hrvo:velocity_obstacle",
         "//software/geom:angle",
         "//software/geom:circle",
         "//software/geom:geom_constants",
@@ -45,6 +48,24 @@ cc_library(
         "//software/geom:segment",
         "//software/geom:vector",
         "//software/logger",
+    ],
+)
+
+cc_library(
+    name = "nearest_neighbor_search",
+    hdrs = [
+        "nearest_neighbor_search.hpp",
+    ],
+    deps = [],
+)
+
+cc_test(
+    name = "nearest_neighbor_test",
+    srcs = ["nearest_neighbor_test.cpp"],
+    deps = [
+        ":nearest_neighbor_search",
+        "//shared/test_util:tbots_gtest_main",
+        "//software/test_util",
     ],
 )
 

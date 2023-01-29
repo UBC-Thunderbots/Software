@@ -2,7 +2,6 @@
 
 #include "shared/constants.h"
 #include "software/constants.h"
-
 namespace py = pybind11;
 
 PYBIND11_MODULE(py_constants, m)

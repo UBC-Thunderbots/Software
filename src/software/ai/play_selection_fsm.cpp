@@ -34,9 +34,9 @@ bool PlaySelectionFSM::gameStatePlaying(const Update& event)
     return event.game_state.isPlaying();
 }
 
-bool PlaySelectionFSM::gameStateSetup(const Update& event)
+bool PlaySelectionFSM::gameStateSetupRestart(const Update& event)
 {
-    return event.game_state.isSetupState();
+    return event.game_state.isSetupRestart();
 }
 
 void PlaySelectionFSM::setupSetPlay(const Update& event)

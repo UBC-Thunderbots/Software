@@ -6,7 +6,7 @@
 void robotsNotInCenterCircle(std::shared_ptr<World> world_ptr,
                              ValidationCoroutine::push_type& yield)
 {
-    for (auto robot : world_ptr->friendlyTeam().getAllRobots())
+    for (const auto& robot : world_ptr->friendlyTeam().getAllRobots())
     {
         if (contains(world_ptr->field().centerCircle(), robot.position()))
         {

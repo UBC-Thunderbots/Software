@@ -77,4 +77,4 @@ struct TacticUpdate
     event.common.create_motion_control(event.common.robot, DESTINATION)
 
 #define SET_STOP_PRIMITIVE_ACTION                                                        \
-    [this](auto event) { event.common.set_primitive(createStopPrimitive(false)); }
+    [this](auto event) { event.common.set_primitive(createStopPrimitive()); }
