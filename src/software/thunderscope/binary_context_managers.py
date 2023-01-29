@@ -763,7 +763,7 @@ class TigersAutoref(object):
     def sslWrappers(self):
         print("ssl enter")
         #pdb.set_trace()
-        time.sleep(2.4);
+        time.sleep(3.0);
         self.ci_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.ci_socket.connect(("", 10013))
         self.sendGeometry();

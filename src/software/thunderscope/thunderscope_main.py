@@ -4,6 +4,7 @@ import threading
 import argparse
 import numpy
 import pdb
+import contextlib
 
 from software.thunderscope.thunderscope import Thunderscope
 from software.thunderscope.binary_context_managers import *
@@ -145,6 +146,12 @@ if __name__ == "__main__":
         action="store_true",
         default=False,
         help="Run in CI mode (timestamp provided)",
+    )
+    parser.add_argument(
+            "--disable_autoref",
+            action="store_true",
+            default=False,
+            help="Disable Autoref and manually use the gamecontroller"
     )
 
     # Sanity check that an interface was provided
@@ -304,7 +311,7 @@ if __name__ == "__main__":
                 tscope.simulator_proto_unix_io.send_proto(SimulatorTick, tick)
                 if not args.ci_mode:
                     time.sleep(tick_rate_ms / 1000)
-
+        #pdb.set_trace()
         # Launch all binaries
         with Simulator(
             args.simulator_runtime_dir, args.debug_simulator
@@ -318,11 +325,11 @@ if __name__ == "__main__":
             args.yellow_full_system_runtime_dir,
         ) as yellow_logger, Gamecontroller(
                 ci_mode=args.ci_mode
-        ) as gamecontroller, TigersAutoref(
+        ) as gamecontroller, (TigersAutoref(
                 autoref_runtime_dir="/tmp/tbots/autoref",
                 ci_mode=args.ci_mode,
                 gc=gamecontroller,
-        ) as autoref:
+        ) if args.disable_autoref is False else contextlib.nullcontext()) as autoref:
 
             tscope.blue_full_system_proto_unix_io.register_to_observe_everything(
                 blue_logger.buffer
@@ -342,7 +349,8 @@ if __name__ == "__main__":
                 tscope.blue_full_system_proto_unix_io,
                 tscope.yellow_full_system_proto_unix_io,
             )
-            autoref.setup_ssl_wrapper_packets(tscope.blue_full_system_proto_unix_io, tscope.yellow_full_system_proto_unix_io)
+            if (not args.disable_autoref):
+                autoref.setup_ssl_wrapper_packets(tscope.blue_full_system_proto_unix_io, tscope.yellow_full_system_proto_unix_io)
             #print(gamecontroller.send_ci_input(
             #    gc_command=Command.Type.FORCE_START, team=Team.UNKNOWN
             #))
