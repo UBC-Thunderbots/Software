@@ -232,8 +232,10 @@ Now that you're setup, if you can run it on the command line, you can run it in 
             - For instance, a call to run the AI as blue on wifi could be: `./tbots.py run thunderscope_main --interface=enp0s5 --run_blue`
         - This command will set up robot communication and the Unix full system binary context manager. The Unix full system context manager hooks up our AI, Backend and SensorFusion
 2. Run Robot Diagnostics:
-    - (#2711) There isn't a clean way to do this at the moment.
+    - (#2711) There isn't a clean way to do this at the moment. This command is subject to change.
     - The Mechanical and Electrical sub-teams use Robot Diagnostics to test specific parts of the Robot.
+    - `./tbots.py run thunderscope --run_blue --interface <network_interface>`
+    - [More info here](useful-robot-commands#robot-diagnostics)
 3. Run our SimulatedPlayTests in Thunderscope
     - This will launch the visualizer and simulate AI Plays, allowing us to visually see the robots acting according to their roles.
     1. For legacy C++ tests (#2581) with the visualizer:
@@ -285,11 +287,11 @@ To build for the Jetson Nano, build the target with the `--cpu=jetson_nano` flag
 
 ## Deploying to Jetson Nano 
 
-We use ansible to automatically update software running on the Jetson Nano. [See these instructions.](/docs/deploying.md) 
+We use ansible to automatically update software running on the Jetson Nano. [More info here.](useful-robot-commands.md#flashing-the-nano) 
 
 To update binaries on a working robot, you can run:
 
-`./tbots.py run run_ansible --cpu=jetson_nano -- --playbook remote_flash.yml --port 45000 --ssh_pass our_password_here`
+`bazel run //software/jetson_nano/ansible:run_ansible --cpu=jetson_nano -- --playbook deploy_nano.yml --hosts <robot_ip> --ssh_pass <jetson_nano_password>`
 
 ## Setting up Virtual Robocup 2021
 

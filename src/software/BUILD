@@ -70,6 +70,7 @@ pybind_library(
         "//proto:tbots_cc_proto",
         "//proto/message_translation:tbots_geometry",
         "//proto/message_translation:ssl_geometry",
+        "//shared:robot_constants",
         "//software/estop:threaded_estop_reader",
         "//software/geom:angle",
         "//software/geom:point",

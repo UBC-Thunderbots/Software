@@ -146,6 +146,8 @@ MotorService::~MotorService() {}
 
 void MotorService::setUpMotors()
 {
+    prev_wheel_velocities = {0.0, 0.0, 0.0, 0.0};
+
     // Check for driver faults
     for (uint8_t motor = 0; motor < NUM_DRIVE_MOTORS; motor++)
     {
@@ -378,9 +380,11 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
         euclidean_to_four_wheel.getEuclideanVelocity(current_wheel_velocities);
 
     motor_status.mutable_local_velocity()->set_x_component_meters(
-        static_cast<float>(current_euclidean_velocity[0]));
+        current_euclidean_velocity[0]);
     motor_status.mutable_local_velocity()->set_y_component_meters(
-        static_cast<float>(current_euclidean_velocity[1]));
+        current_euclidean_velocity[1]);
+    motor_status.mutable_angular_velocity()->set_radians_per_second(
+        current_euclidean_velocity[2]);
 
     WheelSpace_t target_wheel_velocities = {0.0, 0.0, 0.0, 0.0};
 
@@ -904,6 +908,11 @@ void MotorService::startDriver(uint8_t motor)
     writeToDriverOrDieTrying(motor, TMC6100_DRV_CONF,
                              current_drive_conf & (~TMC6100_DRVSTRENGTH_MASK));
     writeToDriverOrDieTrying(motor, TMC6100_GCONF, 0x40);
+
+    // All default but updated SHORTFILTER to 2us to avoid false positive shorts
+    // detection.
+    writeToDriverOrDieTrying(motor, TMC6100_SHORT_CONF, 0x13020606);
+
     LOG(DEBUG) << "Driver " << std::to_string(motor) << " accepted conf";
 }
 

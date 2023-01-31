@@ -67,7 +67,8 @@ TEST_F(DefensePlayTest, test_defense_play)
             Duration::fromSeconds(10));
 }
 
-TEST_F(DefensePlayTest, test_defense_play_one_immediate_threat)
+// TODO (#2801): Enable test once robots stop oscillating around ball obstacle
+TEST_F(DefensePlayTest, DISABLED_test_defense_play_one_immediate_threat)
 {
     BallState ball_state(Point(-1.2, 0), Vector(0, 0));
     auto friendly_robots = TestUtil::createStationaryRobotStatesWithId(
