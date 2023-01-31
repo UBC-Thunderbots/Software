@@ -234,6 +234,9 @@ class DriveAndDribblerWidget(QWidget):
         self.angular_velocity_slider.setValue(0)
 
     def reset_dribbler_slider(self):
+        """
+        Reset the dribbler slider back to 0
+        """
         self.dribbler_speed_rpm_slider.setValue(0)
 
     def reset_all_sliders(self):
