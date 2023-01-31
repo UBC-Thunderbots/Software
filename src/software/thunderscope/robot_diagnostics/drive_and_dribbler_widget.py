@@ -48,9 +48,10 @@ class DriveAndDribblerWidget(QWidget):
         self.proto_unix_io.send_proto(MotorControl, motor_control)
 
     def value_change(self, value):
-        """Change the slider's value
+        """
+        Converts the given float value to a string label
 
-        :param title: the name of the slider
+        :param value: float value to be converted
 
         """
         value = float(value)
