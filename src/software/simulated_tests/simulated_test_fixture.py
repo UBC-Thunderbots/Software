@@ -38,6 +38,9 @@ PAUSE_AFTER_FAIL_DELAY_S = 3
 
 
 class TestType(Enum):
+    """
+    Enum for the 2 types of tests available
+    """
     INVARIANT = 1
     AGGREGATE = 1
 
@@ -213,7 +216,7 @@ class InvariantTestRunner(SimulatedTestRunner):
     Test passes or fails based on the outcome of this test
     """
 
-    def __int__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         super(InvariantTestRunner, self).__init__(self, *args, **kwargs)
 
     def run_test(
