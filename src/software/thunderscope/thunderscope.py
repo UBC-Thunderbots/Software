@@ -359,6 +359,7 @@ class Thunderscope(object):
                 self.simulator_proto_unix_io,
                 self.yellow_full_system_proto_unix_io,
                 load_fullsystem_robot_view,
+                load_diagnostics,
                 True,
             )
         if load_blue:
@@ -367,6 +368,7 @@ class Thunderscope(object):
                 self.simulator_proto_unix_io,
                 self.blue_full_system_proto_unix_io,
                 load_fullsystem_robot_view,
+                load_diagnostics,
                 False,
             )
 
@@ -406,6 +408,7 @@ class Thunderscope(object):
         sim_proto_unix_io,
         full_system_proto_unix_io,
         load_robot_view,
+        load_diagnostics,
         friendly_colour_yellow,
     ):
         """Configure the default layout for thunderscope
@@ -416,6 +419,8 @@ class Thunderscope(object):
         :param load_robot_view: Whether robot view should be loaded on the fullsystem tab or not
                                 - should not be loaded in AI vs AI
                                 - should not be loaded with diagnostics, will be loaded in that tab instead
+        :param load_diagnostics: Whether diagnostics is being loaded currently
+                                 - robot view should have checkboxes if diagnostics is loaded
         :param friendly_colour_yellow: Whether the friendly colour is yellow
 
         """
@@ -457,7 +462,7 @@ class Thunderscope(object):
 
         if load_robot_view:
             widgets["robot_view"] = self.setup_robot_view(
-                full_system_proto_unix_io, False
+                full_system_proto_unix_io, load_diagnostics
             )
             robot_view_dock = Dock("RobotView")
             robot_view_dock.addWidget(widgets["robot_view"])
