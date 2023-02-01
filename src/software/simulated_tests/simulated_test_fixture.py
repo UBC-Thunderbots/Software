@@ -90,6 +90,8 @@ class SimulatedTestRunner(object):
             buffer_size=1, protobuf_type=RobotStatus
         )
 
+
+
         self.blue_full_system_proto_unix_io.register_observer(
             SSL_WrapperPacket, self.ssl_wrapper_buffer
         )
@@ -143,7 +145,11 @@ class SimulatedTestRunner(object):
 
         time_elapsed_s = 0
 
+        print('here');
+
         while time_elapsed_s < test_timeout_s:
+
+            print('time_elasped');
 
             # Update the timestamp logged by the ProtoLogger
             with self.timestamp_mutex:
@@ -154,6 +160,8 @@ class SimulatedTestRunner(object):
             self.simulator_proto_unix_io.send_proto(SimulatorTick, tick)
             time_elapsed_s += tick_duration_s
 
+            print('add to time elapsed');
+
             if self.thunderscope:
                 time.sleep(tick_duration_s)
 
@@ -162,6 +170,7 @@ class SimulatedTestRunner(object):
                     world = self.world_buffer.get(
                         block=True, timeout=WORLD_BUFFER_TIMEOUT
                     )
+                    print("does it even get here????")
                     break
                 except queue.Empty as empty:
                     # If we timeout, that means full_system missed the last
@@ -177,6 +186,8 @@ class SimulatedTestRunner(object):
                     self.blue_full_system_proto_unix_io.send_proto(
                         RobotStatus, robot_status
                     )
+
+            print('end of while loop');
 
             # Validate
             (
@@ -207,6 +218,8 @@ class SimulatedTestRunner(object):
 
         # Check that all eventually validations are eventually valid
         validation.check_validation(eventually_validation_proto_set)
+
+        print("total end pls")
 
         self.__stopper()
 

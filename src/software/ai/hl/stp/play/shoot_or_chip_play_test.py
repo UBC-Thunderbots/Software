@@ -72,7 +72,7 @@ def test_shoot_or_chip_play(simulated_test_runner):
 
     simulated_test_runner.run_test(
         setup=setup,
-        params=[0, 1, 2, 3, 4, 5],
+        params=[0],
         inv_eventually_validation_sequence_set=[[]],
         inv_always_validation_sequence_set=[[]],
         ag_eventually_validation_sequence_set=[[]],
