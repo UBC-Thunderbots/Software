@@ -42,7 +42,10 @@ class TestType(Enum):
     Enum for the 2 types of tests available
     """
     INVARIANT = 1
-    AGGREGATE = 1
+    AGGREGATE = 2
+
+    # to make pytest ignore this class
+    __test__ = False
 
 
 class SimulatedTestRunner(object):
