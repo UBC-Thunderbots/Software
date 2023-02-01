@@ -39,3 +39,14 @@ cc_library(
         "@boost//:bind",
     ],
 )
+
+cc_test(
+    name = "play_selection_fsm_test",
+    srcs = ["play_selection_fsm_test.cpp"],
+    deps = [
+        "//shared/test_util:tbots_gtest_main",
+        "//software/ai",
+        "//software/test_util",
+        "//software/world",
+    ],
+)

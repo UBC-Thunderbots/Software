@@ -67,9 +67,6 @@ static const double BALL_MASS_KG = 0.004593;
 static const double STOP_COMMAND_ROBOT_MAX_SPEED_METERS_PER_SECOND = 1.5;
 // The max allowed speed of the robot before collisions would incur a foul
 static const double COLLISION_ALLOWED_ROBOT_MAX_SPEED_METERS_PER_SECOND = 0.5;
-// The maximum number of robots we can communicate with over radio.
-static const unsigned MAX_ROBOTS_OVER_RADIO = 8;
-
 // The maximum speed attainable by enemy robots
 static const double ENEMY_ROBOT_MAX_SPEED_METERS_PER_SECOND = 3.0;
 // The maximum acceleration achievable by enemy robots, in metres per seconds squared.
@@ -97,13 +94,26 @@ static const double SECONDS_PER_MILLISECOND      = 1.0 / 1000.0;
 static const double MILLISECONDS_PER_MICROSECOND = 1.0 / 1000.0;
 static const double MILLISECONDS_PER_NANOSECOND  = 1.0 / 1000000.0;
 
+// The total number of robot ids on one team
+static const unsigned int MAX_ROBOT_IDS_PER_SIDE = 8;
 // The total number of possible robot ids between two teams
-static const unsigned int MAX_ROBOT_IDS = 16;
+static const unsigned int MAX_ROBOT_IDS = MAX_ROBOT_IDS_PER_SIDE * 2;
 
-// We currently have 4s batteries on the robot that charge up to a little over
-// 16V, so we use 16 here to approximate a fully-charged battery
-// Makes the battery max voltage a constant now that we are simulating firmware
-static const float ROBOT_MAX_BATTERY_VOLTAGE = 16.0;
+// Battery Constants
+static const unsigned NUM_CELLS_IN_BATTERY    = 3;
+static const unsigned NUM_BATTERIES_IN_SERIES = 2;
+static const double MAX_SINGLE_CELL_VOLTAGE   = 4.2;
+static const double MIN_SINGLE_CELL_VOLTAGE   = 3.2 + 0.1;  // +0.1v headroom
+
+static const double MIN_BATTERY_VOLTAGE =
+    MIN_SINGLE_CELL_VOLTAGE * NUM_CELLS_IN_BATTERY * NUM_BATTERIES_IN_SERIES;
+static const double MAX_BATTERY_VOLTAGE =
+    MAX_SINGLE_CELL_VOLTAGE * NUM_CELLS_IN_BATTERY * NUM_BATTERIES_IN_SERIES;
+static const double BATTERY_WARNING_VOLTAGE = MIN_BATTERY_VOLTAGE + 1.0;  // 1V headroom
+
+// Chick Capacitor Constants
+static const double MIN_CAPACITOR_VOLTAGE = 0;
+static const double MAX_CAPACITOR_VOLTAGE = 250.0 + 50.0;  // +50v headroom
 
 static const unsigned int ROBOT_CHIP_ANGLE_DEGREES = 45;
 

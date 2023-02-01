@@ -3,13 +3,13 @@ syntax = "proto3";
 package TbotsProto;
 
 import "proto/tbots_timestamp_msg.proto";
+import "proto/geneva_slot.proto";
 import "proto/geometry.proto";
 
 message RobotStatus
 {
     uint32 robot_id                           = 1;
     repeated ErrorCode error_code             = 2;
-    BreakBeamStatus break_beam_status         = 3;
     ChipperKickerStatus chipper_kicker_status = 4;
     MotorStatus motor_status                  = 5;
     NetworkStatus network_status              = 6;
@@ -17,6 +17,7 @@ message RobotStatus
     JetsonStatus jetson_status                = 8;
     ThunderloopStatus thunderloop_status      = 9;
     Timestamp time_sent                       = 10;
+    uint64 last_handled_primitive_set         = 11;
 }
 
 message ThunderloopStatus
@@ -25,23 +26,14 @@ message ThunderloopStatus
     uint64 primitive_executor_start_time_ns = 2;
     uint64 primitive_executor_step_time_ns  = 3;
     uint64 motor_service_poll_time_ns       = 4;
-    uint64 iteration_time_ns                = 5;
+    uint64 power_service_poll_time_ns       = 5;
+    uint64 iteration_time_ns                = 6;
 }
 
 message JetsonStatus
 {
     // Jetson CPU temperature
     double cpu_temperature = 3;
-}
-
-/* Data about the status of the break beam */
-message BreakBeamStatus
-{
-    // Whether or not the ball is interrupting the robot’s laser beam.
-    bool ball_in_beam = 1;
-
-    // The reading of the robot’s laser sensor, normalized to [0,1]
-    float break_beam_reading = 2;
 }
 
 /* Data about the status of the chipper and kicker */
@@ -85,18 +77,19 @@ enum ErrorCode
 message DriveUnit
 {
     // The current RPM of the wheel
-    uint32 wheel_rpm = 1;
+    float wheel_velocity = 1;
 }
 
 /* Data from all four drive units and the dribbler */
 message MotorStatus
 {
-    DriveUnit front_left    = 1;
-    DriveUnit front_right   = 2;
-    DriveUnit back_left     = 3;
-    DriveUnit back_right    = 4;
-    DribblerStatus dribbler = 5;
-    Vector local_velocity   = 6;
+    DriveUnit front_left             = 1;
+    DriveUnit front_right            = 2;
+    DriveUnit back_left              = 3;
+    DriveUnit back_right             = 4;
+    DribblerStatus dribbler          = 5;
+    Vector local_velocity            = 6;
+    AngularVelocity angular_velocity = 7;
 }
 
 /* Data about the network connection with the robots, including network-derived values */
@@ -115,12 +108,11 @@ message NetworkStatus
 message PowerStatus
 {
     // The voltage on the robot’s battery, in volts.
-    float battery_voltage = 1;
-
-    // voltage on the robot’s capacitor, in volts.
+    float battery_voltage   = 1;
     float capacitor_voltage = 2;
+    // voltage on the robot’s capacitor, in volts.
     float current_draw      = 3;
-    float geneva_angle_deg  = 4;
-    bool breakbream_tripped = 5;
-    bool flyback_fault      = 6;
+    Geneva.Slot geneva_slot = 4;
+    uint32 sequence_num     = 5;
+    bool breakbeam_tripped  = 6;
 }

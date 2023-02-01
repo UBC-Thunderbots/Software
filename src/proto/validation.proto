@@ -22,6 +22,7 @@ message ValidationGeometry
     repeated Polygon polygons = 1;
     repeated Circle circles   = 2;
     repeated Vector vectors   = 3;
+    repeated Segment segments = 4;
 }
 
 message ValidationProto

@@ -4,7 +4,7 @@ from proto.import_all_protos import *
 
 from pyqtgraph.Qt import QtCore, QtGui
 
-from software.thunderscope.colors import Colors
+from software.thunderscope.constants import Colors
 from software.py_constants import *
 from software.networking.threaded_unix_listener import ThreadedUnixListener
 from software.thunderscope.field.field_layer import FieldLayer
@@ -64,6 +64,16 @@ class ValidationLayer(FieldLayer):
 
             poly = QtGui.QPolygon(polygon_points)
             painter.drawPolygon(poly)
+
+        for segment in validation.geometry.segments:
+            painter.drawLine(
+                QtCore.QLine(
+                    int(segment.start.x_meters),
+                    int(segment.start.y_meters),
+                    int(segment.end.x_meters),
+                    int(segment.end.y_meters),
+                )
+            )
 
     def paint(self, painter, option, widget):
         """Paint this layer

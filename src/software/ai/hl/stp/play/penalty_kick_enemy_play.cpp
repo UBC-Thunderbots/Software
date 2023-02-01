@@ -24,7 +24,7 @@ void PenaltyKickEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
     do
     {
-        // Move all non-shooter robots to the center of the field
+        // Move all non-shooter robots behind the penalty mark
         move_tactic_2->updateControlParams(
             Point(world.field().enemyPenaltyMark().x() + 1.5, 0),
             world.field().enemyGoalCenter().toVector().orientation(), 0);

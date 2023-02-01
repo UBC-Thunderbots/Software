@@ -10,6 +10,7 @@ cc_library(
         "//proto/primitive:primitive_msg_factory",
         "//shared:constants",
         "//software/math:math_functions",
+        "//software/physics:velocity_conversion_util",
         "//software/world",
     ],
 )
@@ -27,6 +28,7 @@ cc_library(
         "//software/jetson_nano/services:power",
         "//software/logger:network_logger",
         "//software/util/scoped_timespec_timer",
+        "//software/world:team",
     ],
 )
 

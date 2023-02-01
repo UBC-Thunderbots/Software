@@ -41,6 +41,7 @@
 #include "proto/tbots_software_msgs.pb.h"
 #include "proto/visualization.pb.h"
 #include "software/geom/vector.h"
+#include "software/networking/threaded_proto_unix_sender.hpp"
 #include "software/world/world.h"
 
 class HRVOSimulator
@@ -99,23 +100,20 @@ class HRVOSimulator
      * @param max_radius_inflation  The maximum amount which the radius of this agent can
      * inflate.
      * @param curr_velocity         The initial velocity of this agent.
-     * @param maxSpeed              The maximum speed of this agent.
-     * @param prefSpeed             The preferred speed of this agent.
-     * @param maxAccel              The maximum acceleration of this agent.
+     * @param max_speed              The maximum speed of this agent.
+     * @param max_accel              The maximum acceleration of this agent.
      * @param path                  The path which this agent should take.
-     * @param neighborDist          The maximum distance away from this agent which
-     * another agent can be to be considered as an obstacle.
-     * @param maxNeighbors          The maximum number of other agents which this agent
-     * will try to avoid collisions with at a time.
-     * @param uncertaintyOffset     The uncertainty offset of this agent.
+     * @param max_neighbor_dist  The maximum distance away which another agent can be from
+     * this agent to be considered as a neighbor (i.e. velocity obstacles for it would be
+     * generated).
+     * @param max_neighbors  The maximum number of neighbors which this agent will
+     * consider at once.
      * @return The index of the agent.
      */
     std::size_t addHRVOAgent(const Vector &position, float agent_radius,
                              float max_radius_inflation, const Vector &curr_velocity,
-                             float maxSpeed, float prefSpeed, float maxAccel,
-                             AgentPath &path, float neighborDist,
-                             std::size_t maxNeighbors, float uncertaintyOffset);
-
+                             float max_speed, float max_accel, AgentPath &path,
+                             float max_neighbor_dist, std::size_t max_neighbors);
     /**
      * Add a new LinearlyVelocityAgent
      * @param position              The starting position of this agent.
@@ -177,19 +175,19 @@ class HRVOSimulator
     /**
      *      Returns the maximum acceleration of a specified agent.
      *
-     * @param agentNo  The number of the agent whose maximum acceleration is to be
+     * @param agent_no  The number of the agent whose maximum acceleration is to be
      * retrieved.
      * @return    The present maximum acceleration of the agent.
      */
-    float getAgentMaxAccel(std::size_t agentNo) const;
+    float getAgentMaxAccel(std::size_t agent_no) const;
 
     /**
      *      Returns the position of a specified agent.
      *
-     * @param agentNo  The number of the agent whose position is to be retrieved.
+     * @param agent_no  The number of the agent whose position is to be retrieved.
      * @return    The present position of the (center of) the agent.
      */
-    Vector getAgentPosition(std::size_t agentNo) const;
+    Vector getAgentPosition(std::size_t agent_no) const;
 
     /**
      *      Returns the preferred velocity of a specified agent.
@@ -197,36 +195,43 @@ class HRVOSimulator
      * The preferred speed of an agent is the speed it would choose
      * to take if it were not influenced by other agents.
      *
-     * @param agentNo  The number of the agent whose preferred velocity is to be
+     * @param agent_no  The number of the agent whose preferred velocity is to be
      * retrieved.
      * @return    The present preferred velocity of the agent.
      */
-    Vector getAgentPrefVelocity(std::size_t agentNo) const;
+    Vector getAgentPrefVelocity(std::size_t agent_no) const;
 
     /**
      *      Returns the radius of a specified agent.
      *
-     * @param agentNo  The number of the agent whose radius is to be retrieved.
+     * @param agent_no  The number of the agent whose radius is to be retrieved.
      * @return    The present radius of the agent.
      */
-    float getAgentRadius(std::size_t agentNo) const;
+    float getAgentRadius(std::size_t agent_no) const;
 
     /**
      *      Returns the progress towards its goal of a specified agent.
      *
-     * @param agentNo  The number of the agent whose progress towards its goal is to
+     * @param agent_no  The number of the agent whose progress towards its goal is to
      * be retrieved.
      * @return    True if the agent has reached its goal; false otherwise.
      */
-    bool hasAgentReachedGoal(std::size_t agentNo) const;
+    bool hasAgentReachedGoal(std::size_t agent_no) const;
 
     /**
      *      Returns the velocity of a specified agent.
      *
-     * @param agentNo  The number of the agent whose velocity is to be retrieved.
+     * @param agent_no  The number of the agent whose velocity is to be retrieved.
      * @return    The present velocity of the agent.
      */
-    Vector getAgentVelocity(std::size_t agentNo) const;
+    Vector getAgentVelocity(std::size_t agent_no) const;
+
+    /**
+     * Update the velocity of the agent with the given id
+     * @param robot_id Robot id of the agent to update
+     * @param new_velocity New global velocity of the agent
+     */
+    void updateRobotVelocity(RobotId robot_id, const Vector &new_velocity);
 
     /**
      *   Returns the global time of the simulation.
@@ -272,11 +277,8 @@ class HRVOSimulator
     // PrimitiveSet which includes the path which each friendly robot should take
     TbotsProto::PrimitiveSet primitive_set;
 
-    // True if the ball should be treated as an agent (obstacle)
-    // NOTE: This will take effect the next time we receive a world, and we know
-    //       the current ball position and velocity
-    bool add_ball_agent;
-    std::size_t ball_agent_id;
+    // Latest World which the simulator has received
+    std::optional<World> world;
 
     // The robot constants which all agents will use
     RobotConstants_t robot_constants;
@@ -309,19 +311,10 @@ class HRVOSimulator
     static constexpr float FRIENDLY_ROBOT_RADIUS_MAX_INFLATION = 0.05f;
     static constexpr float ENEMY_ROBOT_RADIUS_MAX_INFLATION    = 0.06f;
 
-    // How much larger should the goal radius be. This is added as a safety tolerance so
-    // robots do not "teleport" over the goal between simulation frames.
-    static constexpr float GOAL_RADIUS_SCALE = 1.05f;
-
     // How much larger should the goal radius be (in meters). This is added as a safety
     // tolerance so robots do not accidentally enter the minimum distance threshold.
     // NOTE: This value must be >= 0
     static constexpr float BALL_AGENT_RADIUS_OFFSET = 0.1f;
-
-    // The scale multiple of max robot speed which the preferred speed will be set at.
-    // pref_speed = max_speed * PREF_SPEED_SCALE
-    // NOTE: This scale multiple must be <= 1
-    static constexpr float PREF_SPEED_SCALE = 0.85f;
 
     // The maximum distance which HRVO Agents will look for neighbors, in meters.
     // A large radius picked to allow for far visibility of neighbors so Agents have
@@ -337,6 +330,5 @@ class HRVOSimulator
     static constexpr float MAX_COLLISION_SPEED = 0.5f;
 
     friend class Agent;
-    friend class Goal;
     friend class KdTree;
 };
