@@ -233,6 +233,11 @@ def enable_slider(slider, label, get_value):
 
 
 def disable_radio_button(button_group):
+    """
+    Disables a whole radio button group
+    Sets all buttons to unselected and disables their onClick function
+    :param button_group: button group to disable
+    """
     button_group.setExclusive(False)
     for button in button_group.buttons():
         button.setChecked(False)

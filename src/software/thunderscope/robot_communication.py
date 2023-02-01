@@ -9,6 +9,9 @@ import time
 
 
 class IndividualRobotMode(IntEnum):
+    """
+    Enum for the mode of input for an individual robot
+    """
     NONE = 0
     DIAGNOSTICS = 1
     XBOX = 2
@@ -106,20 +109,19 @@ class RobotCommunication(object):
 
             # fullsystem is running, so world data is being received
             if self.robots_connected_to_fullsystem:
-                diagnostics_primitive = DirectControlPrimitive(
-                    motor_control=self.motor_control_diagnostics_buffer.get(
-                        block=False
-                    ),
-                    power_control=self.power_control_diagnostics_buffer.get(
-                        block=False
-                    ),
-                )
+                world = self.world_buffer.get(block=True)
+
+                # send the world proto
+                self.send_world.send_proto(world)
+
+                # Get the primitives
+                primitive_set = self.primitive_buffer.get(block=False)
 
                 # Filter the primitives to only include robots not connected to diagnostics
                 for robot_id in self.robots_connected_to_diagnostics:
-                    robot_primitives[robot_id] = Primitive(
-                        direct_control=diagnostics_primitive
-                    )
+                    del primitive_set[robot_id]
+
+                robot_primitives = primitive_set
 
             # diagnostics is running
             if self.robots_connected_to_diagnostics:
