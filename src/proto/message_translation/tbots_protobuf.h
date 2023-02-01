@@ -137,4 +137,5 @@ std::unique_ptr<TbotsProto::PassVisualization> createPassVisualization(
  * @return The unique_ptr to a CostVisualization proto
  */
 std::unique_ptr<TbotsProto::CostVisualization> createCostVisualization(
-    const std::unordered_map<std::string, std::vector<double>> ratings, int num_rows, int num_cols);
+    const std::unordered_map<std::string, std::vector<double>> ratings, int num_rows,
+    int num_cols);

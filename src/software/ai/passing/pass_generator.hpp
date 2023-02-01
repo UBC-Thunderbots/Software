@@ -206,9 +206,9 @@ void PassGenerator<ZoneEnum>::sampleZoneCentrePasses(const World& world)
 {
     // this decides the numbers of rows and cols we visualize
     // TODO: move to contants file
-    int NUM_ROWS = 3;
-    int NUM_COLS = 6;
-    double width = world.field().xLength() / NUM_COLS;
+    int NUM_ROWS  = 3;
+    int NUM_COLS  = 6;
+    double width  = world.field().xLength() / NUM_COLS;
     double height = world.field().yLength() / NUM_ROWS;
 
     std::unordered_map<std::string, std::vector<double>> func_to_costs;
@@ -225,10 +225,9 @@ void PassGenerator<ZoneEnum>::sampleZoneCentrePasses(const World& world)
 
         for (int j = 0; j < NUM_ROWS; j++)
         {
-            double y = height * j + height / 2 - world.field().yLength() / 2;
-            auto pass =
-                Pass(world.ball().position(), Point(x, y),
-                    passing_config_.max_pass_speed_m_per_s());
+            double y  = height * j + height / 2 - world.field().yLength() / 2;
+            auto pass = Pass(world.ball().position(), Point(x, y),
+                             passing_config_.max_pass_speed_m_per_s());
 
             // ----- Passes ----- //
             // getStaticPositionQuality
@@ -246,8 +245,8 @@ void PassGenerator<ZoneEnum>::sampleZoneCentrePasses(const World& world)
                 passing_config_.enemy_proximity_importance()));
 
             // ratePassShootScore
-            pass_shoot_score_costs.push_back(
-                ratePassShootScore(world.field(), world.enemyTeam(), pass, passing_config_));
+            pass_shoot_score_costs.push_back(ratePassShootScore(
+                world.field(), world.enemyTeam(), pass, passing_config_));
         }
     }
 

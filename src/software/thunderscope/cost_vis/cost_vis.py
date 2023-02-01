@@ -41,16 +41,12 @@ class CostVisualizationWidget(QtWidgets.QMainWindow):
         # push buttons - span from column 0 to 4 on row 1
         self.static_pos_box = QtWidgets.QCheckBox("Static Position Quality")
         layout.addWidget(self.static_pos_box, row=1, col=0, colspan=1, rowspan=1)
-        self.static_pos_box.setChecked(True)
         self.pass_friend_box = QtWidgets.QCheckBox("Pass Friendly Capability")
         layout.addWidget(self.pass_friend_box, row=1, col=1, colspan=1, rowspan=1)
-        self.pass_friend_box.setChecked(True)
         self.pass_enemy_box = QtWidgets.QCheckBox("Pass Enemy Risk")
         layout.addWidget(self.pass_enemy_box, row=1, col=2, colspan=1, rowspan=1)
-        self.pass_enemy_box.setChecked(True)
         self.pass_shoot_box = QtWidgets.QCheckBox("Pass Shoot Score")
         layout.addWidget(self.pass_shoot_box, row=1, col=3, colspan=1, rowspan=1)
-        self.pass_shoot_box.setChecked(True)
 
         self.setCentralWidget(layout)
 
@@ -78,15 +74,22 @@ class CostVisualizationWidget(QtWidgets.QMainWindow):
         self.pass_friendly_capability = np.array(
             cost_vis.pass_friendly_capability.cost
         ).reshape(cost_vis.num_cols, cost_vis.num_rows)
-        self.pass_enemy_risk = np.array(cost_vis.pass_enemy_risk.cost).reshape(cost_vis.num_cols, cost_vis.num_rows)
-        self.pass_shoot_score = np.array(cost_vis.pass_shoot_score.cost).reshape(cost_vis.num_cols, cost_vis.num_rows)
-
-        # update data based on push button states
-        self.data = (
-            self.static_pos_box.isChecked() * self.static_position_quality
-            + self.pass_friend_box.isChecked() * self.pass_friendly_capability
-            + self.pass_enemy_box.isChecked() * self.pass_enemy_risk
-            + self.pass_shoot_box.isChecked() * self.pass_shoot_score
+        self.pass_enemy_risk = np.array(cost_vis.pass_enemy_risk.cost).reshape(
+            cost_vis.num_cols, cost_vis.num_rows
         )
+        self.pass_shoot_score = np.array(cost_vis.pass_shoot_score.cost).reshape(
+            cost_vis.num_cols, cost_vis.num_rows
+        )
+
+        # multiply all the arrays together
+        self.data = np.ones(shape=(6, 3))
+        if self.static_pos_box.isChecked():
+            self.data = self.static_position_quality
+        if self.pass_friend_box.isChecked():
+            self.data *= self.pass_friendly_capability
+        if self.pass_enemy_box.isChecked():
+            self.data *= self.pass_enemy_risk
+        if self.pass_shoot_box.isChecked():
+            self.data *= self.pass_shoot_score
 
         self.img.setImage(self.data)
