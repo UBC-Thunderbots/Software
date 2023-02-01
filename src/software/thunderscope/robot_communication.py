@@ -5,6 +5,7 @@ from proto.import_all_protos import *
 from pyqtgraph.Qt import QtCore
 from enum import IntEnum
 import threading
+import logging
 import time
 
 
@@ -150,7 +151,7 @@ class RobotCommunication(object):
                 )
 
             if self.robots_connected_to_xbox:
-                print("In Progress")
+                logging.info("In Progress")
 
             # initialize total primitive set and send it
             primitive_set = PrimitiveSet(
