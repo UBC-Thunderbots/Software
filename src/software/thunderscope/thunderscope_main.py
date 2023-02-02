@@ -354,8 +354,10 @@ if __name__ == "__main__":
                 tscope.blue_full_system_proto_unix_io,
                 tscope.yellow_full_system_proto_unix_io,
             )
-            if (not args.disable_autoref):
-                autoref.setup_ssl_wrapper_packets(tscope.blue_full_system_proto_unix_io, tscope.yellow_full_system_proto_unix_io)
+            if not args.disable_autoref:
+                autoref_proto_unix_io = ProtoUnixIO()
+                simulator.setup_autoref_proto_unix_io(autoref_proto_unix_io)
+                autoref.setup_ssl_wrapper_packets(autoref_proto_unix_io, tscope.blue_full_system_proto_unix_io, tscope.yellow_full_system_proto_unix_io)
             #print(gamecontroller.send_ci_input(
             #    gc_command=Command.Type.FORCE_START, team=Team.UNKNOWN
             #))

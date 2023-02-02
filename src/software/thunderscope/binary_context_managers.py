@@ -20,7 +20,7 @@ from extlibs.er_force_sim.src.protobuf.world_pb2 import (
     SimRobot,
 )
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
-
+from software.thunderscope.proto_unix_io import ProtoUnixIO
 
 def is_cmd_running(command):
     """Check if there is any running process that was launched
@@ -358,6 +358,11 @@ gdb --args bazel-bin/{simulator_command}
             yellow_full_system_proto_unix_io.attach_unix_receiver(
                 self.simulator_runtime_dir, *arg
             )
+
+    def setup_autoref_proto_unix_io(self, autoref_proto_unix_io):
+        autoref_proto_unix_io.attach_unix_receiver(
+                self.simulator_runtime_dir, SSL_WRAPPER_PATH, SSL_WrapperPacket
+        )
 
 
 class Gamecontroller(object):
@@ -867,7 +872,7 @@ class TigersAutoref(object):
         print("autoref started")
 
     def setup_ssl_wrapper_packets(
-        self, blue_fullsystem_proto_unix_io, yellow_fullsystem_proto_unix_io
+        self, autoref_proto_unix_io, blue_fullsystem_proto_unix_io, yellow_fullsystem_proto_unix_io
     ):
         #pdb.set_trace()
         def __send_referee_command(data):
@@ -885,8 +890,10 @@ class TigersAutoref(object):
         def __get_autoref_ci_output(data):
             print(data)
         
+        autoref_proto_unix_io.register_observer(SSL_WrapperPacket, self.wrapper_buffer)
+
         #pdb.set_trace()
-        blue_fullsystem_proto_unix_io.register_observer(SSL_WrapperPacket, self.wrapper_buffer)
+        #blue_fullsystem_proto_unix_io.register_observer(SSL_WrapperPacket, self.wrapper_buffer)
         #self.ci_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         #self.ci_socket.connect(("", 10013))
 
