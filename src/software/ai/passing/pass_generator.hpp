@@ -145,7 +145,12 @@ template <class ZoneEnum>
 PassEvaluation<ZoneEnum> PassGenerator<ZoneEnum>::generatePassEvaluation(
     const World& world)
 {
-    sampleZoneCentrePasses(world);
+    // Generate sample passes for cost visualization
+    if (passing_config_.generate_sample_passes())
+    {
+        sampleZoneCentrePasses(world);
+    }
+
     auto generated_passes = samplePasses(world);
     if (current_best_passes_.empty())
     {

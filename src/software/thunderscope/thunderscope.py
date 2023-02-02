@@ -93,6 +93,7 @@ class Thunderscope(object):
         yellow_replay_log=None,
         refresh_interval_ms=10,
         visualization_buffer_size=5,
+        cost_visualization=False,
     ):
         """Initialize Thunderscope
 
@@ -110,6 +111,7 @@ class Thunderscope(object):
             The interval in milliseconds to refresh all the widgets.
         :param visualization_buffer_size: The size of the visualization buffer.
             Increasing this will increase smoothness but will be less realtime. 
+        :param cost_visualization: Whether to visualize pass costs or not
 
         """
         signal.signal(signal.SIGINT, signal.SIG_DFL)
@@ -124,6 +126,7 @@ class Thunderscope(object):
         self.yellow_replay_log = yellow_replay_log
         self.refresh_interval_ms = refresh_interval_ms
         self.visualization_buffer_size = visualization_buffer_size
+        self.cost_visualization = cost_visualization
         self.widgets = {}
         self.refresh_timers = []
 
@@ -430,18 +433,20 @@ class Thunderscope(object):
         playinfo_dock = Dock("Play Info")
         playinfo_dock.addWidget(widgets["playinfo_widget"])
 
-        widgets["cost_visualization_widget"] = self.setup_cost_visualization_widget(
-            full_system_proto_unix_io
-        )
-        cost_visualization_dock = Dock("Cost Visualization")
-        cost_visualization_dock.addWidget(widgets["cost_visualization_widget"])
+        if self.cost_visualization:
+            widgets["cost_visualization_widget"] = self.setup_cost_visualization_widget(
+                full_system_proto_unix_io
+            )
+            cost_visualization_dock = Dock("Cost Visualization")
+            cost_visualization_dock.addWidget(widgets["cost_visualization_widget"])
 
         dock_area.addDock(field_dock)
         dock_area.addDock(log_dock, "left", field_dock)
         dock_area.addDock(parameter_dock, "above", log_dock)
         dock_area.addDock(playinfo_dock, "bottom", field_dock)
         dock_area.addDock(performance_dock, "right", playinfo_dock)
-        dock_area.addDock(cost_visualization_dock, "right", field_dock)
+        if self.cost_visualization:
+            dock_area.addDock(cost_visualization_dock, "right", field_dock)
 
     def configure_robot_diagnostics_layout(self, dock_area, proto_unix_io):
         """Configure the default layout for the robot diagnostics widget

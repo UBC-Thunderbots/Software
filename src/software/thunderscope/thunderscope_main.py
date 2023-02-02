@@ -143,6 +143,11 @@ if __name__ == "__main__":
         default=115200,
         help="Estop Baudrate",
     )
+    parser.add_argument(
+        "--cost_visualization",
+        action="store_true",
+        help="show pass cost visualization layer",
+    )
 
     # Sanity check that an interface was provided
     args = parser.parse_args()
@@ -167,6 +172,7 @@ if __name__ == "__main__":
         tscope = Thunderscope(
             layout_path=args.layout,
             visualization_buffer_size=args.visualization_buffer_size,
+            cost_visualization=args.cost_visualization,
         )
         proto_unix_io = tscope.blue_full_system_proto_unix_io
 
@@ -210,6 +216,7 @@ if __name__ == "__main__":
             load_diagnostics=True,
             load_gamecontroller=False,
             visualization_buffer_size=args.visualization_buffer_size,
+            cost_visualization=args.cost_visualization,
         )
 
         proto_unix_io = tscope.blue_full_system_proto_unix_io
@@ -225,6 +232,7 @@ if __name__ == "__main__":
             load_diagnostics=True,
             load_gamecontroller=False,
             visualization_buffer_size=args.visualization_buffer_size,
+            cost_visualization=args.cost_visualization,
         )
 
         proto_unix_io = tscope.yellow_full_system_proto_unix_io
@@ -259,6 +267,7 @@ if __name__ == "__main__":
             visualization_buffer_size=args.visualization_buffer_size,
             blue_replay_log=args.blue_log,
             yellow_replay_log=args.yellow_log,
+            cost_visualization=args.cost_visualization,
         )
         tscope.show()
 
@@ -275,6 +284,7 @@ if __name__ == "__main__":
         tscope = Thunderscope(
             layout_path=args.layout,
             visualization_buffer_size=args.visualization_buffer_size,
+            cost_visualization=args.cost_visualization,
         )
 
         def __async_sim_ticker(tick_rate_ms):
