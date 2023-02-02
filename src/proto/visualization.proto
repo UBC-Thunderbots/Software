@@ -42,10 +42,7 @@ message NameCostsPair
 
 message CostVisualization
 {
-    uint32 num_rows                        = 1;
-    uint32 num_cols                        = 2;
-    NameCostsPair static_position_quality  = 3;
-    NameCostsPair pass_friendly_capability = 4;
-    NameCostsPair pass_enemy_risk          = 5;
-    NameCostsPair pass_shoot_score         = 6;
+    uint32 num_rows                       = 1;
+    uint32 num_cols                       = 2;
+    repeated NameCostsPair name_and_costs = 3;
 }

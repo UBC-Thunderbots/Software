@@ -139,3 +139,14 @@ std::unique_ptr<TbotsProto::PassVisualization> createPassVisualization(
 std::unique_ptr<TbotsProto::CostVisualization> createCostVisualization(
     const std::unordered_map<std::string, std::vector<double>> ratings, int num_rows,
     int num_cols);
+
+/**
+ * Returns a name-costs pair given a name and a vector of costs
+ *
+ * @param name The name of the function
+ * @param costs The vector of costs
+ *
+ * @return The unique_ptr to a NameCostsPair proto
+ */
+std::unique_ptr<TbotsProto::NameCostsPair> createNameCostsPair(
+    const std::string name, const std::vector<double> costs);

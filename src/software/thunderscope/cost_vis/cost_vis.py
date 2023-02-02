@@ -22,15 +22,10 @@ class CostVisualizationWidget(QtWidgets.QMainWindow):
             time.time() + CostVisualizationWidget.COST_VISUALIZATION_TIMEOUT_S
         )
 
-        # initialize arrays with zeros
         self.data = np.zeros(shape=(6, 3))
-        # self.static_position_quality = np.zeros(shape=(6, 3))
-        # self.pass_friendly_capability = np.zeros(shape=(6, 3))
-        # self.pass_enemy_risk = np.zeros(shape=(6, 3))
-        # self.pass_shoot_score = np.zeros(shape=(6, 3))
 
+        # set up the layout
         layout = pg.LayoutWidget(parent=self)
-
         win = pg.GraphicsLayoutWidget(show=True)
         self.vb = win.addViewBox()
         self.img = pg.ImageItem(self.data)
@@ -68,16 +63,19 @@ class CostVisualizationWidget(QtWidgets.QMainWindow):
             )
             self.cached_cost_vis = cost_vis
 
+        # the index of the cost in the cost_vis.name_and_costs array
+        # is determined by the order in which the cost functions are
+        # passed in in tbots_protobuf.cpp
         self.static_position_quality = np.array(
-            cost_vis.static_position_quality.cost
+            cost_vis.name_and_costs[0].cost
         ).reshape(cost_vis.num_cols, cost_vis.num_rows)
         self.pass_friendly_capability = np.array(
-            cost_vis.pass_friendly_capability.cost
+            cost_vis.name_and_costs[1].cost
         ).reshape(cost_vis.num_cols, cost_vis.num_rows)
-        self.pass_enemy_risk = np.array(cost_vis.pass_enemy_risk.cost).reshape(
+        self.pass_enemy_risk = np.array(cost_vis.name_and_costs[2].cost).reshape(
             cost_vis.num_cols, cost_vis.num_rows
         )
-        self.pass_shoot_score = np.array(cost_vis.pass_shoot_score.cost).reshape(
+        self.pass_shoot_score = np.array(cost_vis.name_and_costs[3].cost).reshape(
             cost_vis.num_cols, cost_vis.num_rows
         )
 

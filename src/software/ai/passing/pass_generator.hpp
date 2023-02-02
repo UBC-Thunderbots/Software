@@ -234,7 +234,6 @@ void PassGenerator<ZoneEnum>::sampleZoneCentrePasses(const World& world)
             auto pass = Pass(world.ball().position(), Point(x, y),
                              passing_config_.max_pass_speed_m_per_s());
 
-            // ----- Passes ----- //
             // getStaticPositionQuality
             static_pos_quality_costs.push_back(getStaticPositionQuality(
                 world.field(), pass.receiverPoint(), passing_config_));

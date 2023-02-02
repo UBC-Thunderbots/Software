@@ -40,21 +40,6 @@ double rateZone(const Field& field, const Team& enemy_team, const Rectangle& zon
                 const Point& ball_position, TbotsProto::PassingConfig passing_config);
 
 /**
- * Calculates enemy risk rating for a given zone
- *
- * @param enemy_team The enemy team
- * @param ball_position The position of the ball
- * @param zone The zone to rate
- * @param passing_config The passing config used for tuning
- *
- * @return A value in [0,1] representing the eney risk of the zone, with 1 being a
- *        great zone to send a cherry picker to, and 0 being a zone to avoid.
- */
-double zoneEnemyRiskRating(const Team& enemy_team, const Point& ball_position,
-                           const Rectangle& zone,
-                           TbotsProto::PassingConfig passing_config);
-
-/**
  * Rate pass based on the probability of scoring once we receive the pass
  *
  * @param field The field we are playing on
