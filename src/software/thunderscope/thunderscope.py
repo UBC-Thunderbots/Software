@@ -418,7 +418,6 @@ class Thunderscope(object):
         :param full_system_proto_unix_io: The proto unix io object for the full system
         :param load_robot_view: Whether robot view should be loaded on the fullsystem tab or not
                                 - should not be loaded in AI vs AI
-                                - should not be loaded with diagnostics, will be loaded in that tab instead
         :param load_diagnostics: Whether diagnostics is being loaded currently
                                  - robot view should have checkboxes if diagnostics is loaded
         :param friendly_colour_yellow: Whether the friendly colour is yellow
