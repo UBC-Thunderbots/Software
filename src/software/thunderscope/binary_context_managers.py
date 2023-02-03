@@ -867,7 +867,7 @@ class TigersAutoref(object):
             autoref_cmd += " -ci"
 
         #pdb.set_trace()
-        self.tigers_autoref_proc = Popen(autoref_cmd.split(" "), stdout=fp, stderr=fp)
+        self.tigers_autoref_proc = Popen(autoref_cmd.split(" "))
         print("autoref started")
 
     def setup_ssl_wrapper_packets(
