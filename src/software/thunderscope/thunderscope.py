@@ -3,7 +3,6 @@ import time
 import textwrap
 import shelve
 import signal
-import platform
 import logging
 
 # PyQt5 doesn't play nicely with i3 and Ubuntu 18, PyQt6 is much more stable
