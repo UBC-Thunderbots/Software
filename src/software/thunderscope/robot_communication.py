@@ -13,6 +13,7 @@ class IndividualRobotMode(IntEnum):
     """
     Enum for the mode of input for an individual robot
     """
+
     NONE = 0
     DIAGNOSTICS = 1
     XBOX = 2
