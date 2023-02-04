@@ -6,7 +6,6 @@ import time
 import threading
 import google.protobuf.internal.encoder as encoder
 import google.protobuf.internal.decoder as decoder
-import pdb
 
 from subprocess import Popen
 from software.python_bindings import *
@@ -87,7 +86,6 @@ class FullSystem(object):
             self.full_system_runtime_dir,
             "--friendly_colour_yellow" if self.friendly_colour_yellow else "",
         )
-        print("Full System running " + os.getcwd())
 
         if self.debug_full_system:
 
@@ -360,6 +358,12 @@ gdb --args bazel-bin/{simulator_command}
             )
 
     def setup_autoref_proto_unix_io(self, autoref_proto_unix_io):
+        """
+        Setup the proto unix io for the autoref, so that it can receive tracker wrapper packets
+
+        :param autoref_proto_unix_io the proto unix io for the autoref
+
+        """
         autoref_proto_unix_io.attach_unix_receiver(
                 self.simulator_runtime_dir, SSL_WRAPPER_PATH, SSL_WrapperPacket
         )
@@ -387,7 +391,6 @@ class Gamecontroller(object):
         # so that we can run multiple gamecontroller instances in parallel
         self.referee_port = self.next_free_port()
         self.ci_port = self.next_free_port()
-        #self.ci_port = 10007
 
     def __enter__(self):
         """Enter the gamecontroller context manager. 
@@ -551,9 +554,15 @@ class Gamecontroller(object):
         return ci_output
 
     def resetTeam(self, name, team):
+        '''
+        Returns an UpdateTeamState proto for the gamecontroller to reset team info.
+
+        :param name name of the new team
+        :param team yellow or blue team to update
+        '''
         update_team_state                   = UpdateTeamState()
         update_team_state.for_team          = team
-        update_team_state.team_name              = name
+        update_team_state.team_name         = name
         update_team_state.goals             = 0
         update_team_state.timeouts_left     = 4
         update_team_state.timeout_time_left = "05:00" 
@@ -864,8 +873,8 @@ class TigersAutoref(object):
         #autoref_cmd = "bin/./autoReferee -a -hl"
         autoref_cmd = "software/autoref/run_autoref"
 
-        #if self.ci_mode:
-        #    autoref_cmd += " -ci"
+        if self.ci_mode:
+            autoref_cmd += " --ci"
 
         #pdb.set_trace()
         self.tigers_autoref_proc = Popen(autoref_cmd.split(' '))

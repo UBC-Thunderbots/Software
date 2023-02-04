@@ -32,15 +32,11 @@ def start_ai_vs_ai(simulator_runtime_dir, blue_fs_dir, yellow_fs_dir):
         while True:
             tick = SimulatorTick(milliseconds=SIM_TICK_RATE_MS)
             simulator_proto_unix_io.send_proto(SimulatorTick, tick)
-            #time.sleep(tick_rate_ms / 1000)
 
-    print("pre proto unix io")
     blue_fs_proto_unix_io   = ProtoUnixIO()
     yellow_fs_proto_unix_io = ProtoUnixIO()
     simulator_proto_unix_io = ProtoUnixIO()
 
-
-    print("init2")
     with Simulator(
             simulator_runtime_dir
     ) as simulator, FullSystem(
@@ -58,8 +54,6 @@ def start_ai_vs_ai(simulator_runtime_dir, blue_fs_dir, yellow_fs_dir):
         ci_mode=True,
         gc=gamecontroller,
     ) as autoref:
-        print("init")
-
         blue_fs_proto_unix_io.register_to_observe_everything(
                 blue_logger.buffer
         )
@@ -82,12 +76,6 @@ def start_ai_vs_ai(simulator_runtime_dir, blue_fs_dir, yellow_fs_dir):
         autoref_proto_unix_io = ProtoUnixIO()
         simulator.setup_autoref_proto_unix_io(autoref_proto_unix_io)
         autoref.setup_ssl_wrapper_packets(autoref_proto_unix_io, blue_fs_proto_unix_io, yellow_fs_proto_unix_io)
-
-        #gamecontroller.send_ci_input(
-        #    gc_command=Command.Type.FORCE_START, team=Team.UNKNOWN
-        #)
-
-        # Start the simulator
 
         thread = threading.Thread(
             target=__async_sim_ticker, args=(simulator_proto_unix_io,), daemon=True,

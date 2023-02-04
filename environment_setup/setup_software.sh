@@ -157,6 +157,7 @@ touch /tmp/AutoReferee-autoref-ci/.git # a hacky way to make gradle happy when i
 cp -r /tmp/AutoReferee-autoref-ci/build/install/autoReferee/ /opt/tbotspython/autoReferee
 
 sudo chmod +x "$CURR_DIR/../software/run_autoref.sh"
+sudo cp "$CURR_DIR/../software/autoref/DIV_B.txt" "/opt/tbotspython/autoReferee/config/geometry/"
 
 print_status_msg "Finished setting up AutoRef"
 
