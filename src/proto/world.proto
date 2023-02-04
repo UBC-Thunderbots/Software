@@ -45,6 +45,11 @@ message WorldState
     optional BallState ball_state         = 3;
 }
 
+message SimulationStartedTrigger
+{
+    required bool sim_started = 1; 
+}
+
 message SimulatorTick
 {
     // The duration to step the simulation
