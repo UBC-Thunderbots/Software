@@ -132,11 +132,7 @@ class RobotCommunication(object):
                 # Get the primitives
                 primitive_set = self.primitive_buffer.get(block=False)
 
-                # Filter the primitives to only include robots not connected to diagnostics
-                for robot_id in self.robots_connected_to_diagnostics:
-                    del primitive_set[robot_id]
-
-                robot_primitives = primitive_set
+                robot_primitives = dict(primitive_set.robot_primitives)
 
             # diagnostics is running
             if (
