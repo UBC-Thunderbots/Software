@@ -1,30 +1,27 @@
-#include "extlibs/hrvo/path.h"
+#pragma once
 
 #include <optional>
-#include <stdexcept>
-#include <utility>
 
-#include "extlibs/hrvo/path_point.h"
-#include "software/geom/vector.h"
+#include "path_point.h"
+#include "robot_path.h"
 
-
-AgentPath::AgentPath()
+RobotPath::RobotPath()
 {
     path_radius = 0.0f;
 }
 
-AgentPath::AgentPath(const std::vector<PathPoint> &path_points, float goal_radius_)
+RobotPath::RobotPath(const std::vector<PathPoint> &path_points, double goal_radius_)
 {
     path        = path_points;
     path_radius = goal_radius_;
 }
 
-void AgentPath::incrementPathIndex()
+void RobotPath::incrementPathIndex()
 {
     curr_path_index++;
 }
 
-std::optional<PathPoint> AgentPath::getCurrentPathPoint() const
+std::optional<PathPoint> RobotPath::getCurrentPathPoint() const
 {
     if (curr_path_index >= path.size())
     {
@@ -43,12 +40,12 @@ std::optional<PathPoint> AgentPath::getCurrentPathPoint() const
     }
 }
 
-bool AgentPath::isGoingToFinalPathPoint()
+bool RobotPath::isGoingToFinalPathPoint()
 {
     return curr_path_index >= path.size() - 1;
 }
 
-float AgentPath::getPathRadius() const
+double RobotPath::getPathRadius() const
 {
     return path_radius;
 }

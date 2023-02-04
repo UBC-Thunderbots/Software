@@ -1,4 +1,4 @@
-#include "extlibs/hrvo/path_point.h"
+#include "software/ai/navigator/path_planner/hrvo/path_point.h"
 
 #include "software/geom/vector.h"
 

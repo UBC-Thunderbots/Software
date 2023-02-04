@@ -4,11 +4,14 @@
 #include <limits>
 #include <vector>
 
+#include "software/ai/navigator/path_planner/hrvo/hrvo_agent.h"
+#include "software/ai/navigator/path_planner/hrvo/lv_agent.h"
 #include "proto/tbots_software_msgs.pb.h"
 #include "proto/visualization.pb.h"
 #include "software/geom/vector.h"
 #include "software/world/world.h"
 #include "software/geom/algorithms/intersection.h"
+#include "software/geom/algorithms/contains.h"
 #include "software/geom/algorithms/nearest_neighbor_search.hpp"
 
 class HRVOSimulator {
@@ -54,9 +57,8 @@ private:
      * @param robot    The robot which this agent should be based on
      * @param type     Whether this robot is FRIENDLY or ENEMY
      *
-     * @return    The index of the agent.
      */
-    std::size_t addHRVORobotAgent(const Robot &robot, TeamSide type);
+    void addHRVORobotAgent(const Robot &robot, TeamSide type);
 
     /**
      *      Adds a new Linear Velocity Agent to the simulation based on Robot.
@@ -64,9 +66,8 @@ private:
      * @param robot       	The robot which this agent should be based on
      * @param destination 	Destination for this robot
      * @param type 		Whether this robot is FRIENDLY or ENEMY
-     * @return    The index of the agent.
-     */
-    std::size_t addLinearVelocityRobotAgent(const Robot &robot, const Vector &destination,
+    */
+    void addLinearVelocityRobotAgent(const Robot &robot, const Vector &destination,
                                             TeamSide type);
 
     // PrimitiveSet which includes the path which each friendly robot should take
@@ -81,12 +82,9 @@ private:
     // The colour of the friendly team
     const TeamColour friendly_team_colour;
 
-    // List of agents (robots) in this simulation
-    std::vector<std::shared_ptr<Agent>> agents;
-
-    // robot id to agent index
-    std::map<unsigned int, unsigned int> friendly_robot_id_map;
-    std::map<unsigned int, unsigned int> enemy_robot_id_map;
+    // robot id to agent
+    std::map<unsigned int, std::shared_ptr<HRVOAgent>> friendly_team;
+    std::map<unsigned int, std::shared_ptr<LVAgent>> enemy_team;
 
 
     // The max amount (meters) which the friendly/enemy robot radius can increase by.
