@@ -235,9 +235,9 @@ Now that you're setup, if you can run it on the command line, you can run it in 
     - (#2711) There isn't a clean way to do this at the moment. This command is subject to change.
     - The Mechanical and Electrical sub-teams use Robot Diagnostics to test specific parts of the Robot.
     - To run just Diagnostics
-      - `./tbots.py run thunderscope --run_blue --interface <network_interface>`
+      - `./tbots.py run thunderscope --run_diagnostics --interface <network_interface>`
     - To run AI + Diagnostics
-      - `./tbots.py run thunderscope --run_blue --interface <network_interface>`
+      - `./tbots.py run thunderscope --run_blue --run_diagnostics --interface <network_interface>`
     - [More info here](useful-robot-commands#robot-diagnostics)
 3. Run our SimulatedPlayTests in Thunderscope
     - This will launch the visualizer and simulate AI Plays, allowing us to visually see the robots acting according to their roles.

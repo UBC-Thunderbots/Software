@@ -263,7 +263,7 @@ if __name__ == "__main__":
             getRobotMulticastChannel(0),
             args.interface,
         ) as robot_communication:
-            if current_mode == RobotCommunicationMode.DIAGNOSTICS:
+            if args.run_diagnostics:
                 tscope.toggle_robot_connection_signal.connect(
                     robot_communication.toggle_robot_connection
                 )
