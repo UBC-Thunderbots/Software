@@ -125,3 +125,10 @@ BallState createBallState(const TbotsProto::BallState ball_state);
  */
 std::unique_ptr<TbotsProto::PassVisualization> createPassVisualization(
     const std::vector<PassWithRating>& passes_with_rating);
+
+/**
+ * Returns the SimulationStartedTrigger which has default value of false
+ *
+ * @return the SimulationStartedTrigger 
+ */
+SimulationStartedTrigger createSimulationStartedTrigger();

@@ -137,6 +137,8 @@ void ErForceSimulator::setWorldState(const TbotsProto::WorldState& world_state)
     {
         setRobots(world_state.yellow_robots(), gameController::Team::YELLOW);
     }
+
+    LOG(VISUALIZE) << createSimulationStartedTrigger();
 }
 
 void ErForceSimulator::setBallState(const BallState& ball_state)
