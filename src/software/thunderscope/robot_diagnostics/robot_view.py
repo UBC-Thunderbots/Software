@@ -2,7 +2,6 @@ import pyqtgraph as pg
 from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtWidgets import *
 from software.py_constants import *
-import software.thunderscope.common.common_widgets as common_widgets
 from proto.import_all_protos import *
 
 
@@ -109,12 +108,11 @@ class RobotView(QWidget):
         """
         control_mode_menu = QComboBox()
 
-        control_mode_menu.addItems(["None", "Manual", "Xbox"])
-        control_mode_menu.setCurrentIndex(0)
-
         if load_fullsystem:
             control_mode_menu.addItem("AI")
-            control_mode_menu.setCurrentIndex(3)
+
+        control_mode_menu.addItems(["None", "Manual"])
+        control_mode_menu.setCurrentIndex(0)
 
         control_mode_menu.currentIndexChanged.connect(
             lambda mode, robot_id=robot_id: self.toggle_robot_connection_signal.emit(

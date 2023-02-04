@@ -166,28 +166,16 @@ class Thunderscope(object):
         #
 
         if load_blue:
-            self.blue_full_system_proto_unix_io = (
-                ProtoUnixIO()
-                if blue_full_system_proto_unix_io is None
-                else blue_full_system_proto_unix_io
-            )
+            self.blue_full_system_proto_unix_io = blue_full_system_proto_unix_io or ProtoUnixIO()
         if load_yellow:
-            self.yellow_full_system_proto_unix_io = (
-                ProtoUnixIO()
-                if yellow_full_system_proto_unix_io is None
-                else yellow_full_system_proto_unix_io
-            )
+            self.yellow_full_system_proto_unix_io = yellow_full_system_proto_unix_io or ProtoUnixIO()
 
         # the proto unix io to which diagnostics protos should be sent to
         # if one of the fullsystems is running, uses the same proto
         # if not, initialises a new one
         # only used if diagnostics is enabled
-        self.robot_diagnostics_proto_unix_io = (
-            self.blue_full_system_proto_unix_io
-            if load_blue
-            else self.yellow_full_system_proto_unix_io
-            if load_yellow
-            else ProtoUnixIO()
+        self.robot_diagnostics_proto_unix_io = self.blue_full_system_proto_unix_io or (
+            self.yellow_full_system_proto_unix_io or ProtoUnixIO()
         )
 
         self.simulator_proto_unix_io = (
@@ -492,6 +480,18 @@ class Thunderscope(object):
         log_dock = Dock("Logs")
         log_dock.addWidget(self.diagnostics_widgets["log_widget"])
 
+        self.diagnostics_widgets["diagnostics_input"] = self.setup_diagnostics_input_widget(
+            proto_unix_io
+        )
+        input_dock = Dock("Diagnostics Input")
+        input_dock.addWidget(self.diagnostics_widgets["diagnostics_input"])
+        self.diagnostics_widgets["diagnostics_input"].toggle_controls_signal.connect(
+            self.diagnostics_widgets["chicker"].set_should_enable_buttons
+        )
+        self.diagnostics_widgets["diagnostics_input"].toggle_controls_signal.connect(
+            self.diagnostics_widgets["drive"].toggle_all
+        )
+
         if not load_fullsystem:
             self.diagnostics_widgets["robot_view"] = self.setup_robot_view(
                 proto_unix_io, False
@@ -505,7 +505,8 @@ class Thunderscope(object):
         self.robot_diagnostics_dock_area.addDock(log_dock)
         if not load_fullsystem:
             dock_area.addDock(robot_view_dock, "above", log_dock)
-        self.robot_diagnostics_dock_area.addDock(drive_dock, "right", log_dock)
+        self.robot_diagnostics_dock_area.addDock(input_dock, "right", log_dock)
+        self.robot_diagnostics_dock_area.addDock(drive_dock, "below", input_dock)
         self.robot_diagnostics_dock_area.addDock(chicker_dock, "below", drive_dock)
 
         estop_view = self.setup_estop_view(proto_unix_io)

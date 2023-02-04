@@ -58,7 +58,7 @@ class RobotCommunication(object):
         self.current_proto_unix_io.register_observer(World, self.world_buffer)
 
         self.robots_connected_to_fullsystem = set()
-        self.robots_connected_to_diagnostics = set()
+        self.robots_connected_to_manual = set()
         self.robots_connected_to_xbox = set()
         self.robots_to_be_disconnected = set()
 
@@ -78,19 +78,20 @@ class RobotCommunication(object):
 
         self.fullsystem_connected_to_robots = True
 
-        try:
-            self.estop_reader = ThreadedEstopReader(
-                self.estop_path, self.estop_buadrate
-            )
-        except Exception:
-            raise Exception("Could not find estop, make sure its plugged in")
+        # try:
+        #     self.estop_reader = ThreadedEstopReader(
+        #         self.estop_path, self.estop_buadrate
+        #     )
+        # except Exception:
+        #     raise Exception("Could not find estop, make sure its plugged in")
 
     def __send_estop_state(self):
-        while True:
-            self.current_proto_unix_io.send_proto(
-                EstopState, EstopState(is_playing=self.estop_reader.isEstopPlay())
-            )
-            time.sleep(0.1)
+        print("yea")
+        # while True:
+        #     self.current_proto_unix_io.send_proto(
+        #         EstopState, EstopState(is_playing=self.estop_reader.isEstopPlay())
+        #     )
+        #     time.sleep(0.1)
 
     def run(self):
         """Forward World and PrimitiveSet protos from fullsystem to the robots.
@@ -120,26 +121,25 @@ class RobotCommunication(object):
                 primitive_set = self.primitive_buffer.get(block=False)
 
                 # Filter the primitives to only include robots not connected to diagnostics
-                for robot_id in self.robots_connected_to_diagnostics:
+                for robot_id in self.robots_connected_to_manual:
                     del primitive_set[robot_id]
 
                 robot_primitives = primitive_set
 
+            # get the manual control primitive
+            diagnostics_primitive = DirectControlPrimitive(
+                motor_control=self.motor_control_diagnostics_buffer.get(
+                    block=False
+                ),
+                power_control=self.power_control_diagnostics_buffer.get(
+                    block=False
+                ),
+            )
+
             # diagnostics is running
-            if self.robots_connected_to_diagnostics:
-
-                # get the manual control primitive
-                diagnostics_primitive = DirectControlPrimitive(
-                    motor_control=self.motor_control_diagnostics_buffer.get(
-                        block=False
-                    ),
-                    power_control=self.power_control_diagnostics_buffer.get(
-                        block=False
-                    ),
-                )
-
+            if self.robots_connected_to_manual:
                 # for all robots connected to diagnostics, set their primitive
-                for robot_id in self.robots_connected_to_diagnostics:
+                for robot_id in self.robots_connected_to_manual:
                     robot_primitives[robot_id] = Primitive(
                         direct_control=diagnostics_primitive
                     )
@@ -151,9 +151,6 @@ class RobotCommunication(object):
                     stop=StopPrimitive()
                 )
 
-            if self.robots_connected_to_xbox:
-                logging.info("XBox connection in progress, protos not being sent currently")
-
             # initialize total primitive set and send it
             primitive_set = PrimitiveSet(
                 time_sent=Timestamp(epoch_timestamp_seconds=time.time()),
@@ -164,7 +161,7 @@ class RobotCommunication(object):
 
             self.sequence_number += 1
 
-            if self.estop_reader.isEstopPlay():
+            if True:
                 self.last_time = primitive_set.time_sent.epoch_timestamp_seconds
                 self.send_primitive_set.send_proto(primitive_set)
 
@@ -179,13 +176,13 @@ class RobotCommunication(object):
         """
         self.robots_connected_to_xbox.discard(robot_id)
         self.robots_connected_to_fullsystem.discard(robot_id)
-        self.robots_connected_to_diagnostics.discard(robot_id)
+        self.robots_connected_to_manual.discard(robot_id)
         self.robots_to_be_disconnected.discard(robot_id)
 
         if mode == IndividualRobotMode.NONE:
             self.robots_to_be_disconnected.add(robot_id)
         elif mode == IndividualRobotMode.DIAGNOSTICS:
-            self.robots_connected_to_diagnostics.add(robot_id)
+            self.robots_connected_to_manual.add(robot_id)
         elif mode == IndividualRobotMode.XBOX:
             self.robots_connected_to_xbox.add(robot_id)
         elif mode == IndividualRobotMode.AI:
