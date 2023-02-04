@@ -83,8 +83,8 @@ class PlayInfoWidget(QWidget):
                 "Tactic FSM State": tactic_fsm_states,
             },
             self.play_table,
-            HEADER_SIZE_HINT_WIDTH_EXPANSION,
-            ITEM_SIZE_HINT_WIDTH_EXPANSION,
+            PlayInfoWidget.HEADER_SIZE_HINT_WIDTH_EXPANSION,
+            PlayInfoWidget.ITEM_SIZE_HINT_WIDTH_EXPANSION,
         )
 
         self.play_table.resizeColumnsToContents()

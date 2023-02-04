@@ -98,8 +98,8 @@ class RefereeInfoWidget(QWidget):
         set_table_data(
             {"Team Info": team_info, "Blue": blue, "Yellow": yellow,},
             self.referee_table,
-            HEADER_SIZE_HINT_WIDTH_EXPANSION,
-            ITEM_SIZE_HINT_WIDTH_EXPANSION,
+            RefereeInfoWidget.HEADER_SIZE_HINT_WIDTH_EXPANSION,
+            RefereeInfoWidget.ITEM_SIZE_HINT_WIDTH_EXPANSION,
         )
 
         self.referee_table.resizeColumnsToContents()
