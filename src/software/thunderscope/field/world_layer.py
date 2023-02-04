@@ -72,14 +72,19 @@ class WorldLayer(FieldLayer):
             self.display_robot_id = not self.display_robot_id
 
         """ if ctrl and space are both pressed, pause gameplay"""
-        # if user holding ctrl + space, send a command to simulator to pauce the gameplay
+        # if user holding ctrl + space, send a command to simulator to pause the gameplay
         if self.key_pressed[QtCore.Qt.Key.Key_Control] and self.key_pressed[QtCore.Qt.Key.Key_Space]:
             #print a value to check if it works
             print('ctrl + space works!!!')
+            # the issue isnt with the keys then,,, hmmm,,,
             #191
+            #self.simulator_io.send_proto(SimulationState, simulator_state)
             simulator_state = SimulationState(is_playing = not self.is_playing)
             self.is_playing = not self.is_playing
+
+            # the line below was written on Saturday jan 28th
             #register_observer <- search for this find examples to use
+            #print ( simulator_state )
             self.simulator_io.send_proto(SimulationState, simulator_state)
             #register_observer(self, proto_class, buffer):
             """Register a widget to consume from a given protobuf class
@@ -91,12 +96,12 @@ class WorldLayer(FieldLayer):
 
 
 def keyReleaseEvent(self, event):
-        """Detect when a key has been released (override)
+    """Detect when a key has been released (override)
 
-        :param event: The event
+    :param event: The event
 
-        """
-        self.key_pressed[event.key()] = False
+    """
+    self.key_pressed[event.key()] = False
 
     def __should_invert_coordinate_frame(self):
         """Our coordinate system always assumes that the friendly team is defending
