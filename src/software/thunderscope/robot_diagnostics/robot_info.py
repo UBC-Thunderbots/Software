@@ -11,7 +11,7 @@ class RobotInfo(QWidget):
         """
 
         super().__init__()
-        
+
         self.layout = QHBoxLayout()
         self.status_layout = QVBoxLayout()
         self.control_mode_layout = QHBoxLayout()
