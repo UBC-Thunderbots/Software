@@ -12,7 +12,8 @@ PenaltyKickPlay::PenaltyKickPlay(TbotsProto::AiConfig config)
 void PenaltyKickPlay::getNextTactics(TacticCoroutine::push_type &yield,
                                      const World &world)
 {
-    // This function doesn't get called, it should be removed once coroutines are phased out
+    // This function doesn't get called, it should be removed once coroutines are phased
+    // out
 }
 
 void PenaltyKickPlay::updateTactics(const PlayUpdate &play_update)
