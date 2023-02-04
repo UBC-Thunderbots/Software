@@ -20,6 +20,7 @@ from extlibs.er_force_sim.src.protobuf.world_pb2 import (
 )
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.proto_unix_io import ProtoUnixIO
+from software.networking.ssl_proto_communication import SslSocket
 
 def is_cmd_running(command):
     """Check if there is any running process that was launched
@@ -675,12 +676,14 @@ class TigersAutoref(object):
 
         print(ci_input)
 
-        size = ci_input.ByteSize()
+        self.ci_socket.send(ci_input)
+        #size = ci_input.ByteSize()
 
-        # Send a request to the host with the size of the message
-        self.ci_socket.send(
-            encoder._VarintBytes(size) + ci_input.SerializeToString()
-        )
+        ## Send a request to the host with the size of the message
+        #self.ci_socket.send(
+        #    encoder._VarintBytes(size) + ci_input.SerializeToString()
+        #)
+        response_data = self.ci_socket.receive(AutoRefCiOutput);
         response_data = self.ci_socket.recv(
                 Gamecontroller.CI_MODE_OUTPUT_RECEIVE_BUFFER_SIZE
         )
@@ -783,9 +786,12 @@ class TigersAutoref(object):
     def sslWrappers(self):
         print("ssl enter")
         #pdb.set_trace()
-        time.sleep(12.0);
-        self.ci_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.ci_socket.connect(("", 10013))
+        time.sleep(3.0);
+
+        self.ci_socket = SslSocket(10013)
+
+        #self.ci_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        #self.ci_socket.connect(("", 10013))
         self.sendGeometry();
         ssl_wrapper = self.wrapper_buffer.get(block=True)
         self.gamecontroller.resetTeamInfo(ssl_wrapper)

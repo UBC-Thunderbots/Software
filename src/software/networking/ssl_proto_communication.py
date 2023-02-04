@@ -1,7 +1,7 @@
 import socket
 import google.protobuf.internal.encoder as encoder
 
-class SslSocket(object);
+class SslSocket(object):
     def __init__(self, port):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.connect(("", port))
@@ -15,8 +15,9 @@ class SslSocket(object);
 
     def receive(self, proto_type) :
         try : 
-            proto_class = eval(proto_class)
+            proto_class = eval(proto_type)
+            print("actually works?")
         except NameError:
-            raise TypeError(f"Unknown proto type in replay: '{protobuf_type}'")
+            raise TypeError(f"Unknown proto type: '{proto_type}'")
 
 

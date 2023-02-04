@@ -88,6 +88,7 @@ py_library(
         "//proto/message_translation:py_tbots_protobuf",
         "//extlibs/er_force_sim/src/protobuf:erforce_py_proto",
         ":thread_safe_buffer",
+        "//software/networking:ssl_proto_communication",
     ]
 )
 
