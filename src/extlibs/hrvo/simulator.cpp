@@ -35,7 +35,7 @@
 #include <stdexcept>
 
 #include "extlibs/hrvo/agent.h"
-#include "extlibs/hrvo/hrvo_robot.h"
+#include "extlibs/hrvo/hrvo_agent.h"
 #include "extlibs/hrvo/kd_tree.h"
 #include "extlibs/hrvo/linear_velocity_agent.h"
 #include "proto/message_translation/tbots_geometry.h"

@@ -19,6 +19,7 @@ cc_library(
         "hrvo_simulator.cpp",
         "hrvo_agent.cpp",
         "lv_agent.cpp",
+        "agent.cpp",
         "path_point.cpp",
         "robot_path.cpp"
     ],
@@ -26,6 +27,7 @@ cc_library(
         "hrvo_simulator.h",
         "hrvo_agent.h",
         "lv_agent.h",
+        "agent.h",
         "path_point.h",
         "robot_path.h"
     ],

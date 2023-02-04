@@ -1,69 +1,38 @@
-/*
- * agent.cpp
- * HRVO Library
- *
- * Copyright 2009 University of North Carolina at Chapel Hill
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- * Please send all bug reports to <geom@cs.unc.edu>.
- *
- * The authors may be contacted via:
- *
- * Jamie Snape, Jur van den Berg, Stephen J. Guy, and Dinesh Manocha
- * Dept. of Computer Science
- * 201 S. Columbia St.
- * Frederick P. Brooks, Jr. Computer Science Bldg.
- * Chapel Hill, N.C. 27599-3175
- * United States of America
- *
- * <https://gamma.cs.unc.edu/HRVO/>
- */
-
-#include <algorithm>
-#include <cmath>
-#include <limits>
-
 #include "hrvo_agent.h"
-#include "proto/message_translation/tbots_geometry.h"
-#include "software/geom/algorithms/intersection.h"
-#include "software/geom/vector.h"
-#include "software/world/world.h"
 
-HRVOAgent::HRVOAgent(RobotId robot_id, RobotState &robot_state, TeamSide side, RobotPath &path,
-                     double radius, double max_speed, double max_accel, double max_radius_inflation) :
+HRVOAgent::HRVOAgent(RobotId robot_id, const RobotState &robot_state, TeamSide side, RobotPath &path,
+                     double radius, double min_radius, double max_speed, double max_accel, double max_radius_inflation) :
           robot_id(robot_id),
           robot_state(robot_state),
           side(side),
+          path(path),
           radius(radius),
-          max_speed(max_speed),
-          max_accel(max_accel),
-          max_radius_inflation(max_radius_inflation)
+          Agent(min_radius, max_speed, max_accel, max_radius_inflation)
 {
+}
+
+void HRVOAgent::updateRadiusFromVelocity() {
+    // Linearly increase radius based on the current agent velocity
+    radius = min_radius + max_radius_inflation * (robot_state.velocity().length() / max_speed);
+}
+
+const RobotPath &LVAgent::getPath()
+{
+    return path;
 }
 
 void HRVOAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive,
                                 const World &world, double time_step)
 {
-    AgentPath path;
-    static_obstacles.clear();
-    ball_obstacle = std::nullopt;
+    RobotPath path;
+//    static_obstacles.clear();
+//    ball_obstacle = std::nullopt;
     if (new_primitive.has_move())
     {
         const auto &motion_control = new_primitive.move().motion_control();
         float speed_at_dest        = new_primitive.move().final_speed_m_per_s();
         float new_max_speed        = new_primitive.move().max_speed_m_per_s();
-        setMaxSpeed(new_max_speed);
+        this->max_speed = new_max_speed;
         setPreferredSpeed(new_max_speed * PREF_SPEED_SCALE);
 
         // TODO (#2418): Update implementation of Primitive to support
@@ -74,10 +43,10 @@ void HRVOAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive,
 
         // Max distance which the robot can travel in one time step + scaling
         // TODO (#2370): This constant is calculated multiple times.
-        float path_radius = (max_speed_ * time_step) / 2;
+        float path_radius = (max_speed * time_step) / 2;
         auto path_points  = {PathPoint(
-                Vector(destination.x_meters(), destination.y_meters()), speed_at_dest)};
-        path              = AgentPath(path_points, path_radius);
+                Point(destination.x_meters(), destination.y_meters()), speed_at_dest)};
+        path              = RobotPath(path_points, path_radius);
 
         // Update static obstacles
         std::set<TbotsProto::MotionConstraint> motion_constraints;
@@ -103,7 +72,7 @@ void HRVOAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive,
             }
         }
     }
-    setPath(path);
+    this->path = path;
 }
 
 std::set<std::pair<float, std::size_t>> HRVOAgent::computeNeighbors(HRVOAgent candidate, std::vector<std::shared_ptr<Agent>> other_agents)
@@ -121,12 +90,15 @@ std::set<std::pair<float, std::size_t>> HRVOAgent::computeNeighbors(HRVOAgent ca
     return neighbours;
 }
 
-std::vector<VelocityObstacle> HRVOAgent::computeVelocityObstacles(std::vector<std::shared_ptr<Agent>> &agents)
+
+std::vector<VelocityObstacle> HRVOAgent::computeVelocityObstacles(std::vector<std::shared_ptr<Agent>> &neighbours)
 {
     std::vector<VelocityObstacle> velocity_obstacles;
-    velocity_obstacles.reserve(neighbors_.size());
+    velocity_obstacles.reserve(neighbors.size());
 
     const auto current_path_point_opt = getPath().getCurrentPathPoint();
+    auto current_destination = current_path_point_opt.value().getPosition();
+
     if (!current_path_point_opt.has_value())
     {
         // Don't draw any velocity obstacles if we do not have a destination
@@ -138,13 +110,13 @@ std::vector<VelocityObstacle> HRVOAgent::computeVelocityObstacles(std::vector<st
     for (const auto &neighbor : neighbours)
     {
         std::shared_ptr<Agent> other_agent = agents[neighbor.second];
-        VelocityObstacle velocity_obstacle = other_agent->createVelocityObstacle(*this);
+        VelocityObstacle velocity_obstacle = this->createVelocityObstacle(*other_agent);
         velocity_obstacles.push_back(velocity_obstacle);
     }
 
     // Create Velocity Obstacles for nearby static obstacles
-    Point agent_position_point(getPosition());
-    Circle circle_rep_of_agent(agent_position_point, radius_);
+    Point agent_position_point(this->robot_state.position());
+    Circle circle_rep_of_agent(agent_position_point, radius);
     Segment path(agent_position_point, Point(current_destination));
     for (const auto &obstacle : static_obstacles)
     {
@@ -609,6 +581,10 @@ Vector HRVOAgent::computePreferredVelocity(double time_step)
                          velocity_.length() + max_accel_ * time_step);
         return dist_vector_to_goal.normalize(curr_pref_speed);
     }
+}
+
+void HRVOAgent::updateRadiusFromVelocity() {
+    radius = min_radius_ + max_radius_inflation_ * (velocity.length() / max_speed);
 }
 
 void HRVOAgent::insertNeighbor(std::size_t agent_no, float &range_sq)

@@ -1,18 +1,17 @@
 #include "software/ai/navigator/path_planner/hrvo/path_point.h"
 
-#include "software/geom/vector.h"
 
-PathPoint::PathPoint(const Vector &position, const float destination_speed)
-    : position_(position), speed_at_destination(destination_speed)
+PathPoint::PathPoint(const Point &position, const double speed)
+    : position(position), speed(speed)
 {
 }
 
-Vector PathPoint::getPosition() const
+Point PathPoint::getPosition() const
 {
-    return position_;
+    return position;
 }
 
-float PathPoint::getSpeed() const
+double PathPoint::getSpeed() const
 {
-    return speed_at_destination;
+    return speed;
 }

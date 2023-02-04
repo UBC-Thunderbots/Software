@@ -119,7 +119,7 @@ class Simulator
     std::size_t addHRVOAgent(const Vector &position, float agent_radius,
                              float max_radius_inflation, const Vector &curr_velocity,
                              float max_speed, float max_accel, AgentPath &path,
-                             float max_neighbor_dist, std::size_t max_neighbors, RobotId robot_id, TeamSide type));
+                             float max_neighbor_dist, std::size_t max_neighbors, RobotId robot_id, TeamSide type);
     /**
      * Add a new LinearlyVelocityAgent
      * @param position              The starting position of this agent.

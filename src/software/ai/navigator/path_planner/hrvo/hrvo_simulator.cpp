@@ -33,6 +33,13 @@ void HRVOSimulator::updateWorld(const World &world) {
     }
 }
 
+//std::vector<Robot> HRVOSimulator::merge() {
+//    for (const LVAgent &enemy_robot: enemy_team) {
+//        enemy_robot.agent_type
+//
+//    }
+//}
+
 
 void HRVOSimulator::updatePrimitiveSet(const TbotsProto::PrimitiveSet &new_primitive_set) {
     primitive_set = new_primitive_set;
@@ -162,16 +169,15 @@ void HRVOSimulator::doStep(double time_step) {
         return;
     }
 
-    // Update all the hrv agent velocities radii based on their velocity
+    // Update all the hrvo robots velocities radii based on their current velocity
     for (auto &robot: friendly_team) {
         // Linearly increase radius based on the current agent velocity
-        radius_ = min_radius_ + max_radius_inflation_ * (velocity_.length() / max_speed_);
         robot->updateRadiusFromVelocity();
     }
 
     // Compute what velocity each agent will take next
-    for (auto &agent: agents) {
-        agent->computeNewVelocity(agents, time_step);
+    for (auto &robot: friendly_team) {
+        robot->computeNewVelocity(agents, time_step);
     }
 
     // Update the positions of all agents given their velocity
