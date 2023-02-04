@@ -16,7 +16,7 @@
   tasks:
 
     - debug:
-          msg: "[Robot ID = {{ inventory_hostname }}]"
+        msg: "[Robot ID = {{ inventory_hostname }}]"
       tags: always
 
     - name: Extract services & actions from tags

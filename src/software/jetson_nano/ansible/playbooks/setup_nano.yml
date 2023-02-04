@@ -191,7 +191,7 @@
           tags:
             - syncSystemdFiles
           file:
-            path: "/etc/systemd/system/{{ service_name }}"
+            path: "/etc/systemd/system/{{ service_name }}.service"
             state: absent
           with_items: ["wifi_announcement", "ethernet_announcement"]
           loop_control:
