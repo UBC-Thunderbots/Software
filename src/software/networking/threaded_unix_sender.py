@@ -6,13 +6,14 @@ from threading import Thread
 from google.protobuf import text_format
 from google.protobuf.any_pb2 import Any
 from software.py_constants import UNIX_BUFFER_SIZE
+from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 
 class ThreadedUnixSender:
 
     MAX_SEND_FAILURES_BEFORE_LOG = 100
 
-    def __init__(self, unix_path, max_buffer_size=3):
+    def __init__(self, unix_path, proto_type, max_buffer_size=3):
 
         """Send protobufs over unix sockets
 
@@ -23,7 +24,7 @@ class ThreadedUnixSender:
 
         """
         self.unix_path = unix_path
-        self.proto_buffer = queue.Queue(max_buffer_size)
+        self.proto_buffer = ThreadSafeBuffer(max_buffer_size, proto_type)
 
         self.socket = socket.socket(socket.AF_UNIX, type=socket.SOCK_DGRAM)
         self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF, UNIX_BUFFER_SIZE)
@@ -48,7 +49,7 @@ class ThreadedUnixSender:
         proto = None
 
         while not self.stop:
-            proto = self.proto_buffer.get()
+            proto = self.proto_buffer.get(block=True)
             if proto is not None:
                 send = proto.SerializeToString()
                 try:
@@ -73,6 +74,6 @@ class ThreadedUnixSender:
 
         """
         try:
-            self.proto_buffer.put_nowait(proto)
+            self.proto_buffer.put(proto)
         except queue.Full as queue_full:
             logging.warning("send buffer overrun for {}".format(self.unix_path))
