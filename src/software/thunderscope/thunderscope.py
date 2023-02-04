@@ -467,7 +467,9 @@ class Thunderscope(object):
             robot_view_dock.addWidget(widgets["robot_view"])
             dock_area.addDock(robot_view_dock, "above", log_dock)
             if load_diagnostics:
-                self.toggle_robot_connection_signal = widgets["robot_view"].toggle_robot_connection_signal
+                self.toggle_robot_connection_signal = widgets[
+                    "robot_view"
+                ].toggle_robot_connection_signal
 
     def configure_robot_diagnostics_layout(
         self, dock_area, proto_unix_io, load_fullsystem,
