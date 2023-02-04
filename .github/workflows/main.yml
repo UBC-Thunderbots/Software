@@ -161,7 +161,7 @@ jobs:
         timeout-minutes: 2
         run: |
           cd src
-          timeout 2 bazel run //software:ai_vs_ai_ci || code=$?; if [[ $code -ne 124 && $code -ne 0]]; then exit $code; fi
+          timeout 2m bazel run //software:ai_vs_ai_ci || code=$?; if [[$code -ne 124 && $code -ne 0]]; then exit $code; fi
 
 
       - name: Upload AI vs AI logs
@@ -171,7 +171,7 @@ jobs:
           path: |
             /tmp/tbots/blue/logs
 
-      - name: Upload AI vs AI proto logs
+      - name: Upload AI vs AI logs
         uses: actions/upload-artifact@v3
         with:
           name: yellow-ai-vs-ai-proto-logs
