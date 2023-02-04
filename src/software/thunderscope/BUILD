@@ -82,6 +82,7 @@ py_library(
     data = [
         "//software:er_force_simulator_main",
         "//software:unix_full_system",
+        "//software/autoref:run_autoref",
     ],
     deps = [
         "//proto/message_translation:py_tbots_protobuf",

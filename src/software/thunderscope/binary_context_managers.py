@@ -774,7 +774,7 @@ class TigersAutoref(object):
     def sslWrappers(self):
         print("ssl enter")
         #pdb.set_trace()
-        time.sleep(3.0);
+        time.sleep(12.0);
         self.ci_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.ci_socket.connect(("", 10013))
         self.sendGeometry();
@@ -859,15 +859,16 @@ class TigersAutoref(object):
     def startAutoref(self):
         #pdb.set_trace()
         print(os.getcwd())
-        os.chdir("/opt/tbotspython/autoReferee/")
+        #os.chdir("/opt/tbotspython/autoReferee/")
         print(os.getcwd())
-        autoref_cmd = "bin/./autoReferee -a -hl"
+        #autoref_cmd = "bin/./autoReferee -a -hl"
+        autoref_cmd = "software/autoref/run_autoref"
 
-        if self.ci_mode:
-            autoref_cmd += " -ci"
+        #if self.ci_mode:
+        #    autoref_cmd += " -ci"
 
         #pdb.set_trace()
-        self.tigers_autoref_proc = Popen(autoref_cmd.split(" "))
+        self.tigers_autoref_proc = Popen(autoref_cmd.split(' '))
         print("autoref started")
 
     def setup_ssl_wrapper_packets(

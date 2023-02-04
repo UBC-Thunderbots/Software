@@ -155,6 +155,9 @@ unzip -q -o -d /tmp/ /tmp/autoref-ci.zip
 touch /tmp/AutoReferee-autoref-ci/.git # a hacky way to make gradle happy when it tries to find a dependency
 /tmp/AutoReferee-autoref-ci/./gradlew installDist -p /tmp/AutoReferee-autoref-ci/ -Dorg.gradle.java.home=/usr/lib/jvm/jdk-17/
 cp -r /tmp/AutoReferee-autoref-ci/build/install/autoReferee/ /opt/tbotspython/autoReferee
+
+sudo chmod +x "$CURR_DIR/../software/run_autoref.sh"
+
 print_status_msg "Finished setting up AutoRef"
 
 # Install Bazel
