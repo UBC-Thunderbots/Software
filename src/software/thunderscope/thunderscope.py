@@ -182,6 +182,7 @@ class Thunderscope(object):
         # if one of the fullsystems is running, uses the same proto
         # if not, initialises a new one
         # only used if diagnostics is enabled
+        # all diagnostics widgets send their primitives through here
         self.robot_diagnostics_proto_unix_io = (
             self.blue_full_system_proto_unix_io
             if load_blue
