@@ -34,6 +34,7 @@ void PenaltyKickPlayFSM::setupPosition(const Update &event)
                                                         BALL_MAX_RADIUS_METERS + 0.1);
     double ball_position_x = event.common.world.field().friendlyPenaltyMark().x();
 
+    // Adjust number of tactics based on the number of robots available
     unsigned int num_tactics = event.common.num_tactics;
     if (num_tactics != away_from_kick_tactics.size())
     {
