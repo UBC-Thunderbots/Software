@@ -107,7 +107,7 @@ class RobotCommunication(object):
         """
         while True:
             # total primitives for all robots
-            robot_primitives = dict()
+            robot_primitives = {}
 
             # fullsystem is running, so world data is being received
             if self.robots_connected_to_fullsystem:
@@ -152,7 +152,7 @@ class RobotCommunication(object):
                 )
 
             if self.robots_connected_to_xbox:
-                logging.info("In Progress")
+                logging.info("XBox connection in progress, protos not being sent currently")
 
             # initialize total primitive set and send it
             primitive_set = PrimitiveSet(
