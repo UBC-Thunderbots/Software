@@ -127,8 +127,12 @@ std::unique_ptr<TbotsProto::PassVisualization> createPassVisualization(
     const std::vector<PassWithRating>& passes_with_rating);
 
 /**
- * Returns the SimulationStartedTrigger which has default value of false
+ * Returns the SimulationStartedTrigger given the simulation start trigger
  *
- * @return the SimulationStartedTrigger 
+ * @param sim_started_trigger a boolean value that is true if simulation has already started
+ *
+ * @return The unique_ptr to a TbotsProto::SimulationStartedTrigger proto containing 
+ *         a boolean value for whether simulation has started or not
  */
-SimulationStartedTrigger createSimulationStartedTrigger();
+std::unique_ptr<TbotsProto::SimulationStartedTrigger> createSimulationStartedTrigger(const bool sim_started_trigger);
+

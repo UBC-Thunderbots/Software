@@ -349,7 +349,10 @@ std::unique_ptr<TbotsProto::PassVisualization> createPassVisualization(
     return pass_visualization_msg;
 }
 
-SimulationStartedTrigger createSimulationStartedTrigger()
+std::unique_ptr<TbotsProto::SimulationStartedTrigger> createSimulationStartedTrigger(const bool sim_started_trigger)
 {
-    return SimulationStartedTrigger(false);
+    auto sim_started_trigger_msg = std::make_unique<TbotsProto::SimulationStartedTrigger>();
+
+    return sim_started_trigger_msg;
 }
+
