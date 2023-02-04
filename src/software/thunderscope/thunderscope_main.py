@@ -11,6 +11,7 @@ import software.python_bindings as cpp_bindings
 from software.py_constants import *
 from software.thunderscope.robot_communication import RobotCommunication
 from software.thunderscope.replay.proto_logger import ProtoLogger
+from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 NUM_ROBOTS = 6
 SIM_TICK_RATE_MS = 16
