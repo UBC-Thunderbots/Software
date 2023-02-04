@@ -67,7 +67,7 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
     // move tactics to use to move to positions defined above
     std::vector<std::shared_ptr<MoveTactic>> move_tactics = {
-        std::make_shared<MoveTactic>(), std::make_shared<MoveTactic>(),
+        std::make_shared<PrepareKickoffMoveTactic>(), std::make_shared<MoveTactic>(),
         std::make_shared<MoveTactic>(), std::make_shared<MoveTactic>(),
         std::make_shared<MoveTactic>()};
 

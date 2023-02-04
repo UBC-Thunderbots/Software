@@ -18,15 +18,7 @@ void MotionConstraintVisitor::visit(const CreaseDefenderTactic &tactic)
 
 void MotionConstraintVisitor::visit(const ShadowEnemyTactic &tactic) {}
 
-void MotionConstraintVisitor::visit(const MoveTactic &tactic) {
-
-    if (current_motion_constraints.contains(TbotsProto::MotionConstraint::ENEMY_HALF)) {
-        current_motion_constraints.erase(TbotsProto::MotionConstraint::CENTER_CIRCLE);
-        current_motion_constraints.erase(TbotsProto::MotionConstraint::ENEMY_HALF);
-        current_motion_constraints.insert(TbotsProto::MotionConstraint::ENEMY_HALF_WITHOUT_CENTRE_CIRCLE);
-    }
-
-}
+void MotionConstraintVisitor::visit(const MoveTactic &tactic) {}
 
 void MotionConstraintVisitor::visit(const ChipTactic &tactic) {}
 
@@ -39,6 +31,20 @@ void MotionConstraintVisitor::visit(const KickoffChipTactic &tactic)
     current_motion_constraints.erase(TbotsProto::MotionConstraint::CENTER_CIRCLE);
     current_motion_constraints.erase(
             TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL);
+    //TODO: edit
+    current_motion_constraints.erase(TbotsProto::MotionConstraint::ENEMY_HALF);
+    current_motion_constraints.insert(TbotsProto::MotionConstraint::ENEMY_HALF_WITHOUT_CENTRE_CIRCLE);
+}
+
+//TODO: Create a visitor for a new prepare kickoff move tactic
+void MotionConstraintVisitor::visit(const PrepareKickoffMoveTactic &tactic) {
+
+    //TODO: When we are in the prepare kickoff state, we still want to be as close to the ball as possible
+    current_motion_constraints.erase(TbotsProto::MotionConstraint::CENTER_CIRCLE);
+    current_motion_constraints.erase(
+            TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL);
+    current_motion_constraints.erase(TbotsProto::MotionConstraint::ENEMY_HALF);
+    current_motion_constraints.insert(TbotsProto::MotionConstraint::ENEMY_HALF_WITHOUT_CENTRE_CIRCLE);
 }
 
 void MotionConstraintVisitor::visit(const StopTactic &tactic) {}
@@ -62,16 +68,7 @@ void MotionConstraintVisitor::visit(const PenaltySetupTactic &tactic)
 
 void MotionConstraintVisitor::visit(const ReceiverTactic &tactic) {}
 
-void MotionConstraintVisitor::visit(const AttackerTactic &tactic)
-{
-    if (current_motion_constraints.contains(TbotsProto::MotionConstraint::ENEMY_HALF))
-    {
-        current_motion_constraints.erase(TbotsProto::MotionConstraint::CENTER_CIRCLE);
-        current_motion_constraints.erase(TbotsProto::MotionConstraint::ENEMY_HALF);
-        current_motion_constraints.insert(
-            TbotsProto::MotionConstraint::ENEMY_HALF_WITHOUT_CENTRE_CIRCLE);
-    }
-}
+void MotionConstraintVisitor::visit(const AttackerTactic &tactic) { }
 
 void MotionConstraintVisitor::visit(const DefenseShadowEnemyTactic &tactic) {}
 
