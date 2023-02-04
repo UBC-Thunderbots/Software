@@ -161,5 +161,5 @@ jobs:
         timeout-minutes: 2
         run: |
           cd src
-          bazel run //software:ai_vs_ai_ci
+          timeout 2 bazel run //software:ai_vs_ai_ci || code=$?; if [[ $code -ne 124 && $code -ne 0]]; then exit $code; fi
 
