@@ -3,7 +3,7 @@ import queue
 import numpy as np
 
 import pyqtgraph as pg
-from pyqtgraph.Qt import QtWidgets, mkQApp, QtCore
+from pyqtgraph.Qt import QtWidgets
 from proto.import_all_protos import *
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
@@ -22,17 +22,20 @@ class CostVisualizationWidget(QtWidgets.QMainWindow):
             time.time() + CostVisualizationWidget.COST_VISUALIZATION_TIMEOUT_S
         )
 
-        self.data = np.zeros(shape=(6, 3))
-
-        # set up the layout
         layout = pg.LayoutWidget(parent=self)
         win = pg.GraphicsLayoutWidget(show=True)
-        self.vb = win.addViewBox()
+
+        # image settings
+        self.data = np.zeros(shape=(6, 3))
         self.img = pg.ImageItem(self.data)
+        self.img.setBorder(pg.mkPen(color=(255, 255, 255)))
+
+        # layout settings
+        self.vb = win.addViewBox()
         self.vb.addItem(self.img)
         self.vb.setAspectLocked()  # remove this to make it stretch to fit the window
-        layout.addWidget(win)  # pass in row, col, rowspan, and colspan if you want to add more items to the layout
-
+        layout.addWidget(win)
+        # ^ pass in row, col, rowspan, and colspan if you want to add more items to the layout
         self.setCentralWidget(layout)
 
     def refresh(self):
@@ -54,8 +57,8 @@ class CostVisualizationWidget(QtWidgets.QMainWindow):
             self.cached_cost_vis = cost_vis
 
         # Update the data and image
-        self.data = np.array(
-            cost_vis.cost
-        ).reshape(cost_vis.num_cols, cost_vis.num_rows)
+        self.data = np.array(cost_vis.cost).reshape(
+            cost_vis.num_cols, cost_vis.num_rows
+        )
 
         self.img.setImage(self.data)

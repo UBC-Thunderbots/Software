@@ -209,11 +209,11 @@ ZonePassMap<ZoneEnum> PassGenerator<ZoneEnum>::samplePasses(const World& world)
 template <class ZoneEnum>
 void PassGenerator<ZoneEnum>::sampleZoneCentrePasses(const World& world)
 {
-    // this decides the numbers of rows and cols we visualize
-    int NUM_ROWS  = 30;
-    int NUM_COLS  = 45;
-    double width  = world.field().xLength() / NUM_COLS;
-    double height = world.field().yLength() / NUM_ROWS;
+    // number of rows and columns are configured in parameters.proto
+    int num_rows  = passing_config_.cost_vis_config().num_rows();
+    int num_cols  = passing_config_.cost_vis_config().num_cols();
+    double width  = world.field().xLength() / num_cols;
+    double height = world.field().yLength() / num_rows;
 
     std::vector<double> costs;
     double static_pos_quality_costs;
@@ -222,11 +222,11 @@ void PassGenerator<ZoneEnum>::sampleZoneCentrePasses(const World& world)
     double pass_shoot_score_costs;
 
     // We loop column wise (in the same order as how zones are defined)
-    for (int i = 0; i < NUM_COLS; i++)
+    for (int i = 0; i < num_cols; i++)
     {
         // x coordinate of the centre of the column
         double x = width * i + width / 2 - world.field().xLength() / 2;
-        for (int j = 0; j < NUM_ROWS; j++)
+        for (int j = 0; j < num_rows; j++)
         {
             // y coordinate of the centre of the row
             double y  = height * j + height / 2 - world.field().yLength() / 2;
@@ -234,24 +234,28 @@ void PassGenerator<ZoneEnum>::sampleZoneCentrePasses(const World& world)
                              passing_config_.max_pass_speed_m_per_s());
 
             // default values
-            static_pos_quality_costs = 1;
+            static_pos_quality_costs       = 1;
             pass_friendly_capability_costs = 1;
-            pass_enemy_risk_costs = 1;
-            pass_shoot_score_costs = 1;
+            pass_enemy_risk_costs          = 1;
+            pass_shoot_score_costs         = 1;
 
             // getStaticPositionQuality
-            if (passing_config_.cost_vis_config().static_position_quality()) {
+            if (passing_config_.cost_vis_config().static_position_quality())
+            {
                 static_pos_quality_costs = getStaticPositionQuality(
                     world.field(), pass.receiverPoint(), passing_config_);
             }
 
             // ratePassFriendlyCapability
-            if (passing_config_.cost_vis_config().pass_friendly_capability()) {
-                pass_friendly_capability_costs = ratePassFriendlyCapability(world.friendlyTeam(), pass, passing_config_);
+            if (passing_config_.cost_vis_config().pass_friendly_capability())
+            {
+                pass_friendly_capability_costs = ratePassFriendlyCapability(
+                    world.friendlyTeam(), pass, passing_config_);
             }
 
             // ratePassEnemyRisk
-            if (passing_config_.cost_vis_config().pass_enemy_risk()) {
+            if (passing_config_.cost_vis_config().pass_enemy_risk())
+            {
                 pass_enemy_risk_costs = ratePassEnemyRisk(
                     world.enemyTeam(), pass,
                     Duration::fromSeconds(passing_config_.enemy_reaction_time()),
@@ -259,16 +263,18 @@ void PassGenerator<ZoneEnum>::sampleZoneCentrePasses(const World& world)
             }
 
             // ratePassShootScore
-            if (passing_config_.cost_vis_config().pass_shoot_score()) {
+            if (passing_config_.cost_vis_config().pass_shoot_score())
+            {
                 pass_shoot_score_costs = ratePassShootScore(
                     world.field(), world.enemyTeam(), pass, passing_config_);
             }
 
-            costs.push_back(static_pos_quality_costs * pass_friendly_capability_costs * pass_enemy_risk_costs * pass_shoot_score_costs);
+            costs.push_back(static_pos_quality_costs * pass_friendly_capability_costs *
+                            pass_enemy_risk_costs * pass_shoot_score_costs);
         }
     }
 
-    LOG(VISUALIZE) << *createCostVisualization(costs, NUM_ROWS, NUM_COLS);
+    LOG(VISUALIZE) << *createCostVisualization(costs, num_rows, num_cols);
 }
 
 template <class ZoneEnum>
