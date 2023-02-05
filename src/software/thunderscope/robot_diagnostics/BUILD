@@ -15,7 +15,17 @@ py_library(
 
 py_library(
     name = "chicker",
-    srcs = ["chicker.py"],
+    srcs = ["chicker_widget.py"],
+    deps = [
+        "//software/thunderscope:constants",
+        "//software/thunderscope:thread_safe_buffer",
+        requirement("pyqtgraph"),
+    ],
+)
+
+py_library(
+    name = "diagnostics_input_widget",
+    srcs = ["diagnostics_input_widget.py"],
     deps = [
         "//software/thunderscope:constants",
         "//software/thunderscope:thread_safe_buffer",
