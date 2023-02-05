@@ -141,6 +141,8 @@ class RobotCommunication(object):
 
             # sends a final stop primitive to all disconnected robots and removes them from list
             # in order to prevent robots acting on cached old primitives
+            # TODO: Repeated Stop primitives
+            # Map for number of times stop has been sent
             while self.robots_to_be_disconnected:
                 robot_primitives[self.robots_to_be_disconnected.pop()] = Primitive(
                     stop=StopPrimitive()
