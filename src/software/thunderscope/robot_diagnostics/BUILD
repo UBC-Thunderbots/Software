@@ -34,11 +34,22 @@ py_library(
 )
 
 py_library(
+    name = "robot_info",
+    srcs = ["robot_info.py"],
+    deps = [
+        "//software/thunderscope:constants",
+        "//software/thunderscope:thread_safe_buffer",
+        requirement("pyqtgraph"),
+    ],
+)
+
+py_library(
     name = "robot_view",
     srcs = ["robot_view.py"],
     deps = [
         "//software/thunderscope:constants",
         "//software/thunderscope:thread_safe_buffer",
+        "//software/thunderscope/robot_diagnostics:robot_info",
         requirement("pyqtgraph"),
     ],
 )

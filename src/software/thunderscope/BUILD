@@ -54,6 +54,7 @@ py_library(
         "//software/thunderscope/robot_diagnostics:drive_and_dribbler_widget",
         "//software/thunderscope/robot_diagnostics:estop_view",
         "//software/thunderscope/robot_diagnostics:robot_view",
+        "//software/thunderscope/robot_diagnostics:robot_info",
         requirement("pyqtgraph"),
         requirement("numpy"),
     ],

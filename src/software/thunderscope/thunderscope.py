@@ -528,12 +528,12 @@ class Thunderscope(object):
         dock.addWidget(estop_view)
         self.robot_diagnostics_dock_area.addDock(dock, "bottom", log_dock)
 
-    def setup_robot_view(self, proto_unix_io, load_diagnostics):
+    def setup_robot_view(self, proto_unix_io, load_fullsystem):
         """Setup the robot view widget
         :param proto_unix_io: The proto unix io object for the full system
-        :param load_diagnostics: Boolean to indicate if robot diagnostics should be loaded
+        :param load_fullsystem: Boolean to indicate if checkboxes should be loaded
         """
-        robot_view = RobotView(load_diagnostics)
+        robot_view = RobotView(load_fullsystem)
         self.register_refresh_function(robot_view.refresh)
         proto_unix_io.register_observer(RobotStatus, robot_view.robot_status_buffer)
         return robot_view
