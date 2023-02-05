@@ -13,7 +13,7 @@ std::set<TbotsProto::MotionConstraint> buildMotionConstraintSet(
 
     // updates current_allowed_constraints
     current_motion_constraints = motion_constraint_visitor.getUpdatedMotionConstraints(
-            tactic, current_motion_constraints);
+        tactic, current_motion_constraints);
 
     return current_motion_constraints;
 }

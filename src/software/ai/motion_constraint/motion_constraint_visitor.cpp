@@ -6,14 +6,14 @@ void MotionConstraintVisitor::visit(const GoalieTactic &tactic)
 {
     current_motion_constraints.erase(TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA);
     current_motion_constraints.erase(
-            TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL);
+        TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL);
     current_motion_constraints.erase(TbotsProto::MotionConstraint::FRIENDLY_HALF);
 }
 
 void MotionConstraintVisitor::visit(const CreaseDefenderTactic &tactic)
 {
     current_motion_constraints.erase(
-            TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL);
+        TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL);
 }
 
 void MotionConstraintVisitor::visit(const ShadowEnemyTactic &tactic) {}
@@ -31,15 +31,17 @@ void MotionConstraintVisitor::visit(const KickoffChipTactic &tactic)
     current_motion_constraints.erase(TbotsProto::MotionConstraint::CENTER_CIRCLE);
     current_motion_constraints.erase(TbotsProto::MotionConstraint::ENEMY_HALF);
     current_motion_constraints.erase(
-            TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL);
+        TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL);
 }
 
-void MotionConstraintVisitor::visit(const PrepareKickoffMoveTactic &tactic) {
+void MotionConstraintVisitor::visit(const PrepareKickoffMoveTactic &tactic)
+{
     current_motion_constraints.erase(TbotsProto::MotionConstraint::CENTER_CIRCLE);
     current_motion_constraints.erase(
-            TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL);
+        TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL);
     current_motion_constraints.erase(TbotsProto::MotionConstraint::ENEMY_HALF);
-    current_motion_constraints.insert(TbotsProto::MotionConstraint::ENEMY_HALF_WITHOUT_CENTRE_CIRCLE);
+    current_motion_constraints.insert(
+        TbotsProto::MotionConstraint::ENEMY_HALF_WITHOUT_CENTRE_CIRCLE);
 }
 
 void MotionConstraintVisitor::visit(const StopTactic &tactic) {}
@@ -47,7 +49,7 @@ void MotionConstraintVisitor::visit(const StopTactic &tactic) {}
 void MotionConstraintVisitor::visit(const PenaltyKickTactic &tactic)
 {
     current_motion_constraints.erase(
-            TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL);
+        TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL);
     current_motion_constraints.erase(TbotsProto::MotionConstraint::ENEMY_DEFENSE_AREA);
     current_motion_constraints.erase(TbotsProto::MotionConstraint::ENEMY_HALF);
 }
@@ -58,12 +60,12 @@ void MotionConstraintVisitor::visit(const PenaltySetupTactic &tactic)
     current_motion_constraints.erase(TbotsProto::MotionConstraint::ENEMY_DEFENSE_AREA);
     current_motion_constraints.erase(TbotsProto::MotionConstraint::FRIENDLY_HALF);
     current_motion_constraints.erase(
-            TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL);
+        TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL);
 }
 
 void MotionConstraintVisitor::visit(const ReceiverTactic &tactic) {}
 
-void MotionConstraintVisitor::visit(const AttackerTactic &tactic) { }
+void MotionConstraintVisitor::visit(const AttackerTactic &tactic) {}
 
 void MotionConstraintVisitor::visit(const DefenseShadowEnemyTactic &tactic) {}
 
