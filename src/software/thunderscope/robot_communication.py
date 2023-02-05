@@ -179,6 +179,9 @@ class RobotCommunication(object):
             self.robots_connected_to_fullsystem.add(robot_id)
 
     def setup_for_fullsystem(self):
+        """
+        Sets up a world sender, a listener for SSL vision data, and connects all robots to fullsystem as default
+        """
         self.receive_ssl_wrapper = SSLWrapperPacketProtoListener(
             SSL_VISION_ADDRESS,
             SSL_VISION_PORT,

@@ -35,12 +35,24 @@ class FloatSlider(QSlider):
         return float(super(FloatSlider, self).value()) / self.decimals
 
     def setMinimum(self, min_val):
+        """
+        Sets a minimum float value for this slider
+        :param min_val: value to set as the minimum
+        """
         return super(FloatSlider, self).setMinimum(min_val * self.decimals)
 
     def setMaximum(self, max_val):
+        """
+        Sets a maximum float value for this slider
+        :param max_val: value to set as the maximum
+        """
         return super(FloatSlider, self).setMaximum(max_val * self.decimals)
 
     def setValue(self, value):
+        """
+        Sets a float value as the value for this slider
+        :param value: value to set as the slider's value
+        """
         super(FloatSlider, self).setValue(int(value * self.decimals))
 
 
