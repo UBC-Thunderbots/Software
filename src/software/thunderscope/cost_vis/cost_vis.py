@@ -38,6 +38,15 @@ class CostVisualizationWidget(QtWidgets.QMainWindow):
         # ^ pass in row, col, rowspan, and colspan if you want to add more items to the layout
         self.setCentralWidget(layout)
 
+        # isocurve settings
+        self.curves = []
+        self.levels = np.linspace(0, 1, 10)  # 10 isocurves
+        for i in range(len(self.levels)):
+            v = self.levels[i]
+            c = pg.IsocurveItem(level=v, pen=(i, len(self.levels)*1.5))
+            c.setParentItem(self.img)
+            self.curves.append(c)
+
     def refresh(self):
         try:
             cost_vis = self.cost_visualization_buffer.queue.get_nowait()
@@ -62,3 +71,7 @@ class CostVisualizationWidget(QtWidgets.QMainWindow):
         )
 
         self.img.setImage(self.data)
+
+        for c in self.curves:
+            c.setParentItem(self.img)
+            c.setData(self.data)
