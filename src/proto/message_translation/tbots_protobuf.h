@@ -127,26 +127,13 @@ std::unique_ptr<TbotsProto::PassVisualization> createPassVisualization(
     const std::vector<PassWithRating>& passes_with_rating);
 
 /**
- * Returns a cost visualization given a map of function names to their ratings
+ * Returns a cost visualization given a vector of costs
  *
- * @param ratings A map of function names to their ratings
- *                The ratings are sent as a 1D vector of doubles
- *                (e.g. { "function1": { 1.0, 2.0, 3.0 } })
+ * @param costs A vector of costs to visualize
  * @param num_rows The number of rows to display in the cost visualization
+ * @param num_cols The number of columns to display in the cost visualization
  *
  * @return The unique_ptr to a CostVisualization proto
  */
 std::unique_ptr<TbotsProto::CostVisualization> createCostVisualization(
-    const std::unordered_map<std::string, std::vector<double>> ratings, int num_rows,
-    int num_cols);
-
-/**
- * Returns a name-costs pair given a name and a vector of costs
- *
- * @param name The name of the function
- * @param costs The vector of costs
- *
- * @return The unique_ptr to a NameCostsPair proto
- */
-std::unique_ptr<TbotsProto::NameCostsPair> createNameCostsPair(
-    const std::string name, const std::vector<double> costs);
+    const std::vector<double> &costs, int num_rows, int num_cols);

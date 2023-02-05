@@ -350,43 +350,16 @@ std::unique_ptr<TbotsProto::PassVisualization> createPassVisualization(
 }
 
 std::unique_ptr<TbotsProto::CostVisualization> createCostVisualization(
-    const std::unordered_map<std::string, std::vector<double>> ratings, int num_rows,
-    int num_cols)
+    const std::vector<double> &costs, int num_rows, int num_cols)
 {
-    std::vector<double> this_rating;
-
-    // make a CostVisualization object
     auto cost_visualization_msg = std::make_unique<TbotsProto::CostVisualization>();
     cost_visualization_msg->set_num_rows(num_rows);
     cost_visualization_msg->set_num_cols(num_cols);
 
-    // getStaticPositionQuality
-    *(cost_visualization_msg->add_name_and_costs()) = *createNameCostsPair(
-        "getStaticPositionQuality", ratings.at("getStaticPositionQuality"));
-
-    // ratePassFriendlyCapability
-    *(cost_visualization_msg->add_name_and_costs()) = *createNameCostsPair(
-        "ratePassFriendlyCapability", ratings.at("ratePassFriendlyCapability"));
-
-    // ratePassEnemyCapability
-    *(cost_visualization_msg->add_name_and_costs()) =
-        *createNameCostsPair("ratePassEnemyRisk", ratings.at("ratePassEnemyRisk"));
-
-    // ratePassOpenness
-    *(cost_visualization_msg->add_name_and_costs()) =
-        *createNameCostsPair("ratePassShootScore", ratings.at("ratePassShootScore"));
+    for (const auto& cost : costs)
+    {
+        cost_visualization_msg->add_cost(cost);
+    }
 
     return cost_visualization_msg;
-}
-
-std::unique_ptr<TbotsProto::NameCostsPair> createNameCostsPair(
-    const std::string name, const std::vector<double> costs)
-{
-    auto name_costs_pair_msg = std::make_unique<TbotsProto::NameCostsPair>();
-    name_costs_pair_msg->set_name(name);
-    for (auto& cost : costs)
-    {
-        name_costs_pair_msg->add_cost(cost);
-    }
-    return name_costs_pair_msg;
 }

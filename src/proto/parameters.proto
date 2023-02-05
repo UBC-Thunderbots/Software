@@ -121,9 +121,8 @@ message PassingConfig
     // The number of steps of gradient descent to perform in each iteration
     required int32 number_of_gradient_descent_steps_per_iter = 9
         [default = 2, (bounds).min_int_value = 0, (bounds).max_int_value = 100];
-
-    // Whether we should generate sample passes for the cost visualization
-    required bool generate_sample_passes = 10 [default = false];
+    // Cost visualization parameters
+    required CostVisualizationConfig cost_vis_config = 10;
 }
 
 message GoalieTacticConfig
@@ -293,4 +292,15 @@ message RobotNavigationObstacleConfig
         (bounds).min_double_value = 0.0,
         (bounds).max_double_value = 10.0
     ];
+}
+
+message CostVisualizationConfig
+{
+    // Whether we should generate sample passes for the cost visualization
+    required bool generate_sample_passes   = 1 [default = false];
+    // cost functions
+    required bool static_position_quality  = 2 [default = false];
+    required bool pass_friendly_capability = 3 [default = false];
+    required bool pass_enemy_risk          = 4 [default = false];
+    required bool pass_shoot_score         = 5 [default = false];
 }
