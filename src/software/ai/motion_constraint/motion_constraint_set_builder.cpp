@@ -15,10 +15,6 @@ std::set<TbotsProto::MotionConstraint> buildMotionConstraintSet(
     current_motion_constraints = motion_constraint_visitor.getUpdatedMotionConstraints(
             tactic, current_motion_constraints);
 
-    //TODO: testing
-    //current_motion_constraints.erase(TbotsProto::MotionConstraint::CENTER_CIRCLE);
-    //current_motion_constraints.erase(TbotsProto::MotionConstraint::ENEMY_HALF);
-
     return current_motion_constraints;
 }
 

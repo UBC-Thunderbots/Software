@@ -29,17 +29,12 @@ void MotionConstraintVisitor::visit(const PivotKickTactic &tactic) {}
 void MotionConstraintVisitor::visit(const KickoffChipTactic &tactic)
 {
     current_motion_constraints.erase(TbotsProto::MotionConstraint::CENTER_CIRCLE);
+    current_motion_constraints.erase(TbotsProto::MotionConstraint::ENEMY_HALF);
     current_motion_constraints.erase(
             TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL);
-    //TODO: edit
-    current_motion_constraints.erase(TbotsProto::MotionConstraint::ENEMY_HALF);
-    current_motion_constraints.insert(TbotsProto::MotionConstraint::ENEMY_HALF_WITHOUT_CENTRE_CIRCLE);
 }
 
-//TODO: Create a visitor for a new prepare kickoff move tactic
 void MotionConstraintVisitor::visit(const PrepareKickoffMoveTactic &tactic) {
-
-    //TODO: When we are in the prepare kickoff state, we still want to be as close to the ball as possible
     current_motion_constraints.erase(TbotsProto::MotionConstraint::CENTER_CIRCLE);
     current_motion_constraints.erase(
             TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL);

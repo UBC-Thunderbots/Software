@@ -64,12 +64,12 @@ RobotNavigationObstacleFactory::createStaticObstaclesFromMotionConstraint(
             break;
         case TbotsProto::MotionConstraint::ENEMY_HALF_WITHOUT_CENTRE_CIRCLE:
         {
-            double larger_radius                 = field.centerCircleRadius() + 0.2;
+            double radius = field.centerCircleRadius() + 0.2;
             Polygon centre_circle_and_enemy_half = Polygon(
-                {Point(0, field.yLength() / 2), Point(0, larger_radius),
-                 Point(larger_radius, larger_radius), Point(larger_radius + 0.2, 0),
-                 Point(larger_radius, -larger_radius), Point(0, -larger_radius),
-                 Point(0, -field.yLength() / 2), field.fieldBoundary().posXNegYCorner(),
+                {Point(0, field.fieldBoundary().yLength() / 2), Point(0, radius),
+                 Point(radius * std::cos(M_PI / 4), radius * std::sin(M_PI / 4)), Point(radius, 0),
+                 Point(radius * std::cos(M_PI / 4), -radius * std::sin(M_PI / 4)), Point(0, -radius),
+                 Point(0, -field.fieldBoundary().yLength() / 2), field.fieldBoundary().posXNegYCorner(),
                  field.fieldBoundary().posXPosYCorner()});
             obstacles.push_back(createFromShape(centre_circle_and_enemy_half));
             break;
