@@ -30,10 +30,10 @@ class RobotInfo(QWidget):
         self.status_layout = QVBoxLayout()
 
         # Battery Bar
-        self.battery_progress_bar = common_widgets.ColorProgressBar(MAX_BATTERY_VOLTAGE, MIN_BATTERY_VOLTAGE)
-        self.status_layout.addWidget(
-            self.battery_progress_bar
+        self.battery_progress_bar = common_widgets.ColorProgressBar(
+            MAX_BATTERY_VOLTAGE, MIN_BATTERY_VOLTAGE
         )
+        self.status_layout.addWidget(self.battery_progress_bar)
 
         # Control mode dropdown
         self.control_mode_layout = QHBoxLayout()
@@ -43,25 +43,15 @@ class RobotInfo(QWidget):
         self.breakbeam_label = QLabel()
         self.breakbeam_label.setText("BREAKBEAM")
         self.breakbeam_label.setStyleSheet("background-color: grey")
-        self.control_mode_layout.addWidget(
-            self.breakbeam_label
-        )
-        self.control_mode_layout.addWidget(
-            self.control_mode_menu
-        )
+        self.control_mode_layout.addWidget(self.breakbeam_label)
+        self.control_mode_layout.addWidget(self.control_mode_menu)
 
-        self.status_layout.addLayout(
-            self.control_mode_layout
-        )
+        self.status_layout.addLayout(self.control_mode_layout)
 
         # Vision Pattern
-        self.layout.addWidget(
-            self.create_vision_pattern_label("b", 25)
-        )
+        self.layout.addWidget(self.create_vision_pattern_label("b", 25))
 
-        self.layout.addLayout(
-            self.status_layout
-        )
+        self.layout.addLayout(self.status_layout)
 
         self.setLayout(self.layout)
 
@@ -110,7 +100,7 @@ class RobotInfo(QWidget):
             QtCore.QRectF(0, 0, int(radius * 2), int(radius * 2),),
             -45 * convert_degree,
             270 * convert_degree,
-            )
+        )
 
         # Draw the vision pattern
         # Draw the centre team color
@@ -124,7 +114,9 @@ class RobotInfo(QWidget):
 
         # Grab the colors for the vision pattern and setup the locations
         # for the four circles in the four corners
-        top_right, top_left, bottom_left, bottom_right = Colors.VISION_PATTERN_LOOKUP[self.robot_id]
+        top_right, top_left, bottom_left, bottom_right = Colors.VISION_PATTERN_LOOKUP[
+            self.robot_id
+        ]
         top_circle_locations = [
             QtCore.QPointF(radius + radius / 2 + 5, radius - radius / 2),
             QtCore.QPointF(radius - radius / 2 - 5, radius - radius / 2),
@@ -133,7 +125,7 @@ class RobotInfo(QWidget):
         ]
 
         for color, location in zip(
-                Colors.VISION_PATTERN_LOOKUP[self.robot_id], top_circle_locations
+            Colors.VISION_PATTERN_LOOKUP[self.robot_id], top_circle_locations
         ):
             painter.setBrush(pg.mkBrush(color))
             painter.drawEllipse(location, radius / 5, radius / 5)
@@ -150,7 +142,7 @@ class RobotInfo(QWidget):
         Receives important sections of RobotStatus proto for this robot and updates widget with alerts
         Checks for
             - Whether breakbeam is tripped
-            - If Battery Volatage is too low
+            - If Battery Voltage is too low
             - If this robot has errors
         :param power_status: The power status message for this robot
         :param error_codes: The error codes of this robot
@@ -164,13 +156,11 @@ class RobotInfo(QWidget):
             self.breakbeam_label.setText("Not in Beam")
             self.breakbeam_label.setStyleSheet("background-color: green")
 
-        self.battery_progress_bar.setValue(
-            power_status.battery_voltage
-        )
+        self.battery_progress_bar.setValue(power_status.battery_voltage)
 
         if (
-                power_status.battery_voltage <= BATTERY_WARNING_VOLTAGE
-                and not self.battery_warning_disabled
+            power_status.battery_voltage <= BATTERY_WARNING_VOLTAGE
+            and not self.battery_warning_disabled
         ):
             QMessageBox.information(
                 self,
@@ -180,7 +170,6 @@ class RobotInfo(QWidget):
             self.battery_warning_disabled = True
         elif power_status.battery_voltage > BATTERY_WARNING_VOLTAGE:
             self.battery_warning_disabled = False
-
 
         for code in error_codes:
             if code != ErrorCode.NO_ERROR:

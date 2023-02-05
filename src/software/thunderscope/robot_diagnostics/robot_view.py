@@ -30,11 +30,15 @@ class RobotView(QWidget):
 
         self.layout = QVBoxLayout()
 
-        self.robot_info_widgets = [RobotInfo(x, load_fullsystem) for x in range(MAX_ROBOT_IDS_PER_SIDE)]
+        self.robot_info_widgets = [
+            RobotInfo(x, load_fullsystem) for x in range(MAX_ROBOT_IDS_PER_SIDE)
+        ]
 
         for id in range(MAX_ROBOT_IDS_PER_SIDE):
             self.robot_info_widgets[id].toggle_one_connection_signal.connect(
-                lambda mode, robot_id: self.toggle_all_connection_signal.emit(mode, robot_id)
+                lambda mode, robot_id: self.toggle_all_connection_signal.emit(
+                    mode, robot_id
+                )
             )
 
             self.layout.addWidget(self.robot_info_widgets[id])

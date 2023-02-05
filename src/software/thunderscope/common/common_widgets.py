@@ -61,6 +61,7 @@ class ColorProgressBar(QProgressBar):
     This class extends QSlider to support floats instead of ints
     Also changes slider color based on percentage filled
     """
+
     def __init__(self, min_val, max_val, decimals=2):
         """
         Creates a ColorProgressBar with the specified min, max and decimals
@@ -78,10 +79,7 @@ class ColorProgressBar(QProgressBar):
         )
 
         super(ColorProgressBar, self).setStyleSheet(
-            "QProgressBar::chunk"
-            "{"
-            f"background: grey"
-            "}"
+            "QProgressBar::chunk" "{" f"background: grey" "}"
         )
 
     def setValue(self, value):
