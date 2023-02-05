@@ -14,8 +14,7 @@ class IndividualRobotMode(IntEnum):
     """
 
     NONE = 0
-    DIAGNOSTICS = 1
-    XBOX = 2
+    MANUAL = 1
     AI = 3
 
 
@@ -58,7 +57,6 @@ class RobotCommunication(object):
 
         self.robots_connected_to_fullsystem = set()
         self.robots_connected_to_manual = set()
-        self.robots_connected_to_xbox = set()
         self.robots_to_be_disconnected = {}
 
         self.current_proto_unix_io.register_observer(
@@ -110,7 +108,7 @@ class RobotCommunication(object):
 
             # fullsystem is running, so world data is being received
             if self.robots_connected_to_fullsystem:
-                world = self.world_buffer.get(block=True)
+                world = self.world_buffer.get(block=False)
 
                 # send the world proto
                 self.send_world.send_proto(world)
@@ -149,6 +147,8 @@ class RobotCommunication(object):
                 sequence_number=self.sequence_number,
             )
 
+            print(primitive_set)
+
             self.sequence_number += 1
 
             if self.estop_reader.isEstopPlay():
@@ -164,17 +164,14 @@ class RobotCommunication(object):
         :param mode: the mode of input for this robot's primitives
         :param robot_id: the id of the robot to be added or removed from the diagnostics set
         """
-        self.robots_connected_to_xbox.discard(robot_id)
         self.robots_connected_to_fullsystem.discard(robot_id)
         self.robots_connected_to_manual.discard(robot_id)
         self.robots_to_be_disconnected.pop(robot_id, None)
 
         if mode == IndividualRobotMode.NONE:
             self.robots_to_be_disconnected[robot_id] = NUM_TIMES_SEND_STOP
-        elif mode == IndividualRobotMode.DIAGNOSTICS:
+        elif mode == IndividualRobotMode.MANUAL:
             self.robots_connected_to_manual.add(robot_id)
-        elif mode == IndividualRobotMode.XBOX:
-            self.robots_connected_to_xbox.add(robot_id)
         elif mode == IndividualRobotMode.AI:
             self.robots_connected_to_fullsystem.add(robot_id)
 

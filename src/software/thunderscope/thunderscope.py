@@ -453,9 +453,9 @@ class Thunderscope(object):
             robot_view_dock = Dock("RobotView")
             robot_view_dock.addWidget(widgets["robot_view"])
             dock_area.addDock(robot_view_dock, "above", log_dock)
-            self.toggle_robot_connection_signal = widgets[
+            self.toggle_all_connection_signal = widgets[
                 "robot_view"
-            ].toggle_robot_connection_signal
+            ].toggle_all_connection_signal
 
     def configure_robot_diagnostics_layout(
         self, dock_area, proto_unix_io, load_fullsystem,
@@ -501,9 +501,9 @@ class Thunderscope(object):
             )
             robot_view_dock = Dock("RobotView")
             robot_view_dock.addWidget(self.diagnostics_widgets["robot_view"])
-            self.toggle_robot_connection_signal = self.diagnostics_widgets[
+            self.toggle_all_connection_signal = self.diagnostics_widgets[
                 "robot_view"
-            ].toggle_robot_connection_signal
+            ].toggle_all_connection_signal
 
         self.robot_diagnostics_dock_area.addDock(log_dock)
         if not load_fullsystem:
