@@ -2,7 +2,6 @@
 
 #include "shared/constants.h"
 #include "software/constants.h"
-
 namespace py = pybind11;
 
 PYBIND11_MODULE(py_constants, m)
@@ -107,6 +106,7 @@ PYBIND11_MODULE(py_constants, m)
     m.attr("MILLISECONDS_PER_NANOSECOND")  = MILLISECONDS_PER_NANOSECOND;
 
     m.attr("NUM_GENEVA_ANGLES") = NUM_GENEVA_ANGLES;
+    m.attr("CHICKER_TIMEOUT")   = CHICKER_TIMEOUT;
 
     m.attr("MAX_ROBOT_IDS_PER_SIDE") = MAX_ROBOT_IDS_PER_SIDE;
 

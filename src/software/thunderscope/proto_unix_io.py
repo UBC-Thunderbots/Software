@@ -130,7 +130,9 @@ class ProtoUnixIO:
         :param proto_class: The protobuf type to send
 
         """
-        sender = ThreadedUnixSender(unix_path=runtime_dir + unix_path)
+        sender = ThreadedUnixSender(
+            unix_path=runtime_dir + unix_path, proto_type=proto_class
+        )
         self.unix_senders[proto_class.DESCRIPTOR.full_name] = sender
         self.register_observer(proto_class, sender.proto_buffer)
 
