@@ -78,20 +78,19 @@ class RobotCommunication(object):
 
         self.fullsystem_connected_to_robots = True
 
-        # try:
-        #     self.estop_reader = ThreadedEstopReader(
-        #         self.estop_path, self.estop_buadrate
-        #     )
-        # except Exception:
-        #     raise Exception("Could not find estop, make sure its plugged in")
+        try:
+            self.estop_reader = ThreadedEstopReader(
+                self.estop_path, self.estop_buadrate
+            )
+        except Exception:
+            raise Exception("Could not find estop, make sure its plugged in")
 
     def __send_estop_state(self):
-        print("yea")
-        # while True:
-        #     self.current_proto_unix_io.send_proto(
-        #         EstopState, EstopState(is_playing=self.estop_reader.isEstopPlay())
-        #     )
-        #     time.sleep(0.1)
+        while True:
+            self.current_proto_unix_io.send_proto(
+                EstopState, EstopState(is_playing=self.estop_reader.isEstopPlay())
+            )
+            time.sleep(0.1)
 
     def run(self):
         """Forward World and PrimitiveSet protos from fullsystem to the robots.
@@ -161,7 +160,7 @@ class RobotCommunication(object):
 
             self.sequence_number += 1
 
-            if True:
+            if self.estop_reader.isEstopPlay():
                 self.last_time = primitive_set.time_sent.epoch_timestamp_seconds
                 self.send_primitive_set.send_proto(primitive_set)
 
