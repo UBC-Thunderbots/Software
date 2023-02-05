@@ -174,6 +174,7 @@ class RobotView(QWidget):
         """Refresh the view
         """
         # TODO (#2791): fix robot view refresh function
+
         robot_status = self.robot_status_buffer.get(block=False)
 
         robot_id = robot_status.robot_id
