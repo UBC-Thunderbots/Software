@@ -1,4 +1,4 @@
-#include "hrvo_agent.h"
+#include "software/ai/navigator/path_planner/hrvo/hrvo_agent.h"
 
 HRVOAgent::HRVOAgent(RobotId robot_id, const RobotState &robot_state, TeamSide side, RobotPath &path,
                      double radius, double min_radius, double max_speed, double max_accel, double max_radius_inflation) :
@@ -7,6 +7,7 @@ HRVOAgent::HRVOAgent(RobotId robot_id, const RobotState &robot_state, TeamSide s
           side(side),
           path(path),
           radius(radius),
+          velocity_obstacles(),
           Agent(min_radius, max_speed, max_accel, max_radius_inflation)
 {
 }

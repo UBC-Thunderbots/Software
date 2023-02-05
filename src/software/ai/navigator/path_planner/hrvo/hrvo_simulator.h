@@ -45,9 +45,7 @@ public:
 
     void doStep(double time_step);
 
-    std::optional<std::shared_ptr<HRVOAgent>> getFriendlyAgentFromRobotId(
-            unsigned int robot_id) const;
-
+    void visualize(unsigned int robot_id);
 
 private:
 
@@ -83,8 +81,7 @@ private:
     const TeamColour friendly_team_colour;
 
     // robot id to agent
-    std::map<unsigned int, std::shared_ptr<HRVOAgent>> friendly_team;
-    std::map<unsigned int, std::shared_ptr<LVAgent>> enemy_team;
+    std::map<unsigned int, std::shared_ptr<Agent>> robots;
 
 
     // The max amount (meters) which the friendly/enemy robot radius can increase by.

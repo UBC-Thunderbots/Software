@@ -3,6 +3,11 @@
 #include <algorithm>
 #include <cmath>
 #include <limits>
+#include <cstddef>
+#include <map>
+#include <set>
+#include <utility>
+#include <vector>
 
 #include "software/ai/navigator/path_planner/hrvo/lv_agent.h"
 #include "software/ai/navigator/path_planner/hrvo/velocity_obstacle.h"
@@ -74,7 +79,7 @@ public:
      * relies on
      * `ball_obstacle`, `neighbours_`
      */
-    std::vector<VelocityObstacle> computeVelocityObstacles(std::map<int, HRVOAgent> &friendlies, std::map<int, LVAgent> &enemies, double time_step);
+    std::vector<VelocityObstacle> computeVelocityObstacles(std::map<int, Agent> &robots, double time_step) override;
 
     /**
      * Computes the most direct linear velocity for this agent.
@@ -88,7 +93,7 @@ public:
      * @param other_agent The Agent which this velocity obstacle is being generated for
      * @return The velocity obstacle which other_agent should see for this Agent
      */
-    VelocityObstacle createVelocityObstacle(const Agent &other_agent);
+    VelocityObstacle createVelocityObstacle(const Agent &other_agent) override;
 
     /**
      * Create the hybrid reciprocal velocity obstacle which other_agent should see for
@@ -129,6 +134,8 @@ protected:
     double radius;
     // The path of this Agent
     RobotPath path;
+
+    std::vector<VelocityObstacle> velocity_obstacles;
 };
 
 

@@ -9,6 +9,7 @@ HRVOSimulator::HRVOSimulator(float time_step, const RobotConstants_t &robot_cons
         world(std::nullopt),
         friendly_team(),
         enemy_team(),
+        robots(),
         friendly_team_colour(friendly_team_colour) {
 }
 
@@ -27,6 +28,7 @@ void HRVOSimulator::updateWorld(const World &world) {
 
     for (const Robot &enemy_robot: world_enemy_team) {
 //        TODO
+//        use 1 map with agent.
 //        std::size_t robot =
 //                addLinearVelocityRobotAgent(enemy_robot, goal_position);
 //        enemy_team.insert(enemy_robot.id(), agent_index);
@@ -185,3 +187,10 @@ void HRVOSimulator::doStep(double time_step) {
         agent->update(time_step);
     }
 }
+
+void HRVOSimulator::visualize(unsigned int robot_id)
+{
+    return;
+}
+
+
