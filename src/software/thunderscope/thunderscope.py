@@ -165,6 +165,9 @@ class Thunderscope(object):
         # protobuf types on two separate widgets.
         #
 
+        self.blue_full_system_proto_unix_io = None
+        self.yellow_full_system_proto_unix_io = None
+
         if load_blue:
             self.blue_full_system_proto_unix_io = blue_full_system_proto_unix_io or ProtoUnixIO()
         if load_yellow:
@@ -178,11 +181,7 @@ class Thunderscope(object):
             self.yellow_full_system_proto_unix_io or ProtoUnixIO()
         )
 
-        self.simulator_proto_unix_io = (
-            ProtoUnixIO()
-            if simulator_proto_unix_io is None
-            else simulator_proto_unix_io
-        )
+        self.simulator_proto_unix_io = simulator_proto_unix_io or ProtoUnixIO()
 
         # Setup the main window and load the requested tabs
         self.configure_layout(layout_path, load_blue, load_yellow, load_diagnostics)
