@@ -35,6 +35,8 @@ class ColouredCoutSink
      */
     void displayColouredLog(g3::LogMessageMover log_entry);
 
+    std::chrono::duration<int64_t> LOG_INTERVAL_TIMESTAMP = std::chrono::seconds(2);
+
    private:
     /**
      * Gets the Colour associated with this log level
@@ -54,4 +56,8 @@ class ColouredCoutSink
      * log message
      */
     bool print_detailed;
+
+    std::string last_msg;
+    g3::high_resolution_time_point last_msg_timestamp;
+    int num_repeats;
 };

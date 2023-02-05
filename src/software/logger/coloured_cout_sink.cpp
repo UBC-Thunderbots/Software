@@ -61,15 +61,29 @@ void ColouredCoutSink::displayColouredLog(g3::LogMessageMover log_entry)
         return;
     }
 
+    bool past_time = log_entry.get()._timestamp - LOG_INTERVAL_TIMESTAMP > last_msg_timestamp;
+    std::cout << "Past time: " << past_time << "\n";
+    std::cout << "Repeat: " << (log_entry.get().message() == last_msg) << "\n";
+    if (log_entry.get().message() == last_msg && past_time) {
+        // repeated message outside timestamp, increase repeats and don't log
+        num_repeats++;
+        return;
+    }
+
+    // log and save info
     std::ostringstream oss;
     if (print_detailed)
     {
-        oss << "\033[" << colour << "m" << log_entry.get().toString() << "\033[m";
+        oss << "\033[" << colour << "m" << " (" << num_repeats << ") " << log_entry.get().toString() << "\033[m";
     }
     else
     {
-        oss << "\033[" << colour << "m" << log_entry.get().message() << "\n\033[m";
+        oss << "\033[" << colour << "m" << log_entry.get().message() << " (" << num_repeats << ")" << "\n\033[m";
     }
     std::cout << oss.str() << std::flush;
     resetColour();
+
+    last_msg = log_entry.get().message();
+    last_msg_timestamp = log_entry.get()._timestamp;
+    num_repeats = 1;
 }
