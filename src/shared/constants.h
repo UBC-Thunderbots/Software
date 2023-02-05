@@ -137,6 +137,9 @@ static const int ESTOP_MESSAGE_SIZE_BYTES = 1;
 static const unsigned char ESTOP_PLAY_MSG = 0;
 static const unsigned char ESTOP_STOP_MSG = 1;
 
+// Number of times to send a STOP primitive when robot is disconnected from Manual Control
+static const unsigned int NUM_TIMES_SEND_STOP = 10;
+
 // product and vendor id for Arduino Uno Rev3 (retrieved from
 // http://www.linux-usb.org/usb.ids )
 #define ARDUINO_ID_LENGTH 5

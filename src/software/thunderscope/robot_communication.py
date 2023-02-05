@@ -60,7 +60,7 @@ class RobotCommunication(object):
         self.robots_connected_to_fullsystem = set()
         self.robots_connected_to_manual = set()
         self.robots_connected_to_xbox = set()
-        self.robots_to_be_disconnected = set()
+        self.robots_to_be_disconnected = {}
 
         self.current_proto_unix_io.register_observer(
             PrimitiveSet, self.primitive_buffer
@@ -141,12 +141,13 @@ class RobotCommunication(object):
 
             # sends a final stop primitive to all disconnected robots and removes them from list
             # in order to prevent robots acting on cached old primitives
-            # TODO: Repeated Stop primitives
-            # Map for number of times stop has been sent
-            while self.robots_to_be_disconnected:
-                robot_primitives[self.robots_to_be_disconnected.pop()] = Primitive(
-                    stop=StopPrimitive()
-                )
+            for robot_id, num_times_to_stop in self.robots_to_be_disconnected.items():
+                if num_times_to_stop > 0:
+                    robot_primitives[robot_id] = Primitive(
+                        stop=StopPrimitive()
+                    )
+                    self.robots_to_be_disconnected[robot_id] = num_times_to_stop - 1
+
 
             # initialize total primitive set and send it
             primitive_set = PrimitiveSet(
@@ -174,10 +175,10 @@ class RobotCommunication(object):
         self.robots_connected_to_xbox.discard(robot_id)
         self.robots_connected_to_fullsystem.discard(robot_id)
         self.robots_connected_to_manual.discard(robot_id)
-        self.robots_to_be_disconnected.discard(robot_id)
+        self.robots_to_be_disconnected.pop(robot_id, None)
 
         if mode == IndividualRobotMode.NONE:
-            self.robots_to_be_disconnected.add(robot_id)
+            self.robots_to_be_disconnected[robot_id] = NUM_TIMES_SEND_STOP
         elif mode == IndividualRobotMode.DIAGNOSTICS:
             self.robots_connected_to_manual.add(robot_id)
         elif mode == IndividualRobotMode.XBOX:

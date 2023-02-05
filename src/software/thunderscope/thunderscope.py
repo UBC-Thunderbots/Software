@@ -504,9 +504,9 @@ class Thunderscope(object):
         self.robot_diagnostics_dock_area.addDock(log_dock)
         if not load_fullsystem:
             dock_area.addDock(robot_view_dock, "above", log_dock)
-        self.robot_diagnostics_dock_area.addDock(input_dock, "right", log_dock)
-        self.robot_diagnostics_dock_area.addDock(drive_dock, "below", input_dock)
+        self.robot_diagnostics_dock_area.addDock(drive_dock, "right", log_dock)
         self.robot_diagnostics_dock_area.addDock(chicker_dock, "below", drive_dock)
+        self.robot_diagnostics_dock_area.addDock(input_dock, "top", chicker_dock)
 
         estop_view = self.setup_estop_view(proto_unix_io)
 
