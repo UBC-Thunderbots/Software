@@ -169,9 +169,13 @@ class Thunderscope(object):
         self.yellow_full_system_proto_unix_io = None
 
         if load_blue:
-            self.blue_full_system_proto_unix_io = blue_full_system_proto_unix_io or ProtoUnixIO()
+            self.blue_full_system_proto_unix_io = (
+                blue_full_system_proto_unix_io or ProtoUnixIO()
+            )
         if load_yellow:
-            self.yellow_full_system_proto_unix_io = yellow_full_system_proto_unix_io or ProtoUnixIO()
+            self.yellow_full_system_proto_unix_io = (
+                yellow_full_system_proto_unix_io or ProtoUnixIO()
+            )
 
         # the proto unix io to which diagnostics protos should be sent to
         # if one of the fullsystems is running, uses the same proto
@@ -479,9 +483,9 @@ class Thunderscope(object):
         log_dock = Dock("Logs")
         log_dock.addWidget(self.diagnostics_widgets["log_widget"])
 
-        self.diagnostics_widgets["diagnostics_input"] = self.setup_diagnostics_input_widget(
-            proto_unix_io
-        )
+        self.diagnostics_widgets[
+            "diagnostics_input"
+        ] = self.setup_diagnostics_input_widget(proto_unix_io)
         input_dock = Dock("Diagnostics Input")
         input_dock.addWidget(self.diagnostics_widgets["diagnostics_input"])
         self.diagnostics_widgets["diagnostics_input"].toggle_controls_signal.connect(

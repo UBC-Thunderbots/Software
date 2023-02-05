@@ -125,5 +125,5 @@ PYBIND11_MODULE(py_constants, m)
     m.attr("BATTERY_WARNING_VOLTAGE") = BATTERY_WARNING_VOLTAGE;
 
     // Robot Communication
-    m.attr("NUM_TIMES_SEND_STOP")     = NUM_TIMES_SEND_STOP;
+    m.attr("NUM_TIMES_SEND_STOP") = NUM_TIMES_SEND_STOP;
 }

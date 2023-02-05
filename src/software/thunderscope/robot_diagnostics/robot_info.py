@@ -3,8 +3,8 @@ from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtWidgets import *
 from software.py_constants import *
 
-class RobotInfo(QWidget):
 
+class RobotInfo(QWidget):
     def __init__(self, robot_id, load_fullsystem):
         """
         Initialize a single robot's info widget
@@ -16,7 +16,9 @@ class RobotInfo(QWidget):
         self.status_layout = QVBoxLayout()
         self.control_mode_layout = QHBoxLayout()
         self.battery_progress_bar = QProgressBar()
-        self.control_mode_menu = self.create_control_mode_menu(robot_id, load_fullsystem)
+        self.control_mode_menu = self.create_control_mode_menu(
+            robot_id, load_fullsystem
+        )
 
     def create_control_mode_menu(self, robot_id, load_fullsystem):
         """

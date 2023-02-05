@@ -5,7 +5,6 @@ from proto.import_all_protos import *
 from pyqtgraph.Qt import QtCore
 from enum import IntEnum
 import threading
-import logging
 import time
 
 
@@ -123,12 +122,8 @@ class RobotCommunication(object):
 
             # get the manual control primitive
             diagnostics_primitive = DirectControlPrimitive(
-                motor_control=self.motor_control_diagnostics_buffer.get(
-                    block=False
-                ),
-                power_control=self.power_control_diagnostics_buffer.get(
-                    block=False
-                ),
+                motor_control=self.motor_control_diagnostics_buffer.get(block=False),
+                power_control=self.power_control_diagnostics_buffer.get(block=False),
             )
 
             # diagnostics is running
@@ -143,11 +138,8 @@ class RobotCommunication(object):
             # in order to prevent robots acting on cached old primitives
             for robot_id, num_times_to_stop in self.robots_to_be_disconnected.items():
                 if num_times_to_stop > 0:
-                    robot_primitives[robot_id] = Primitive(
-                        stop=StopPrimitive()
-                    )
+                    robot_primitives[robot_id] = Primitive(stop=StopPrimitive())
                     self.robots_to_be_disconnected[robot_id] = num_times_to_stop - 1
-
 
             # initialize total primitive set and send it
             primitive_set = PrimitiveSet(
