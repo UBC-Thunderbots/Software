@@ -73,8 +73,6 @@ class RobotCommunication(object):
         self.send_estop_state_thread = threading.Thread(target=self.__send_estop_state)
         self.run_thread = threading.Thread(target=self.run)
 
-        self.fullsystem_connected_to_robots = True
-
         try:
             self.estop_reader = ThreadedEstopReader(
                 self.estop_path, self.estop_buadrate
@@ -147,8 +145,6 @@ class RobotCommunication(object):
                 sequence_number=self.sequence_number,
             )
 
-            print(primitive_set)
-
             self.sequence_number += 1
 
             if self.estop_reader.isEstopPlay():
@@ -205,6 +201,10 @@ class RobotCommunication(object):
             ROBOT_STATUS_PORT,
             lambda data: self.current_proto_unix_io.send_proto(RobotStatus, data),
             True,
+        )
+
+        self.send_primitive_mcast_sender = PrimitiveSetProtoSender(
+            self.multicast_channel + "%" + self.interface, PRIMITIVE_PORT, True
         )
 
         self.receive_robot_log = RobotLogProtoListener(

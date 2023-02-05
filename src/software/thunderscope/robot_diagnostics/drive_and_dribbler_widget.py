@@ -2,7 +2,6 @@ from pyqtgraph.Qt.QtCore import Qt
 from pyqtgraph.Qt.QtWidgets import *
 import time
 import software.python_bindings as tbots
-
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.common import common_widgets
 from proto.import_all_protos import *
@@ -49,9 +48,10 @@ class DriveAndDribblerWidget(QWidget):
         self.proto_unix_io.send_proto(MotorControl, motor_control)
 
     def value_change(self, value):
-        """Change the slider's value by 0.1 per step
+        """
+        Converts the given float value to a string label
 
-        :param title: the name of the slider
+        :param value: float value to be converted
 
         """
         value = float(value)

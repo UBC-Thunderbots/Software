@@ -31,7 +31,7 @@ class RobotInfo(QWidget):
 
         # Battery Bar
         self.battery_progress_bar = common_widgets.ColorProgressBar(
-            MAX_BATTERY_VOLTAGE, MIN_BATTERY_VOLTAGE
+            MIN_BATTERY_VOLTAGE, MAX_BATTERY_VOLTAGE
         )
         self.status_layout.addWidget(self.battery_progress_bar)
 
