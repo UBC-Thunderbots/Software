@@ -42,14 +42,14 @@ def test_two_ai_ball_placement(simulated_test_runner, run_enemy_ai, test_duratio
     ]
 
     # Game Controller Setup
-    simulated_test_runner.gamecontroller.send_ci_input(
+    simulated_test_runner.gamecontroller.send_gc_command(
         gc_command=Command.Type.STOP, team=Team.UNKNOWN
     )
-    simulated_test_runner.gamecontroller.send_ci_input(
+    simulated_test_runner.gamecontroller.send_gc_command(
         gc_command=Command.Type.FORCE_START, team=Team.BLUE
     )
     # Pass in placement point here - not required for all play tests
-    simulated_test_runner.gamecontroller.send_ci_input(
+    simulated_test_runner.gamecontroller.send_gc_command(
         gc_command=Command.Type.BALL_PLACEMENT,
         team=Team.BLUE,
         final_ball_placement_point=ball_final_pos,

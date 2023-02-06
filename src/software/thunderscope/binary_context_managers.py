@@ -484,7 +484,7 @@ class Gamecontroller(object):
             Gamecontroller.REFEREE_IP, self.referee_port, __send_referee_command, True,
         )
 
-    def send_ci_input(
+    def send_gc_command(
         self,
         gc_command: proto.ssl_gc_state_pb2.Command,
         team: proto.ssl_gc_common_pb2.Team,
@@ -502,7 +502,8 @@ class Gamecontroller(object):
         :return: The response CiOutput containing 1 or more refree msgs
 
         """
-        ci_ci_input = CiInput(timestamp=int(time.time_ns()))
+        packet_timestamp = timestamp or int(time.time_ns())
+        ci_ci_input = CiInput(timestamp=packet_timestamp)
         ci_input = Input()
         ci_change = Change()
         ci_new_command = NewCommand()

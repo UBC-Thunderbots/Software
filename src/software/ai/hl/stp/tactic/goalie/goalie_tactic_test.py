@@ -121,10 +121,10 @@ def test_goalie_blocks_shot(
     #
     # NOTE: The gamecontroller responses are automatically handled by
     # the gamecontroller context manager class
-    simulated_test_runner.gamecontroller.send_ci_input(
+    simulated_test_runner.gamecontroller.send_gc_command(
         gc_command=Command.Type.STOP, team=Team.UNKNOWN
     )
-    simulated_test_runner.gamecontroller.send_ci_input(
+    simulated_test_runner.gamecontroller.send_gc_command(
         gc_command=Command.Type.FORCE_START, team=Team.BLUE
     )
 
