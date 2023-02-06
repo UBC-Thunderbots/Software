@@ -370,7 +370,5 @@ if __name__ == "__main__":
             )
 
             thread.start()
-            print("stcope show")
-            if (not args.ci_mode):
-                tscope.show()
+            tscope.show()
             thread.join()

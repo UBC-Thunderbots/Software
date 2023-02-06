@@ -620,9 +620,9 @@ class Gamecontroller(object):
 
 
 class TigersAutoref(object):
+    AUTOREF_LAUNCH_DELAY = 2.5
+
     def __init__(self, ci_mode=False, autoref_runtime_dir=None, buffer_size=5, gc=Gamecontroller()):
-        #pdb.set_trace()
-        print("autoref init")
         self.tigers_autoref_proc = None
         self.auto_ref_proc_thread = None
         self.auto_ref_wrapper_thread = None
@@ -630,25 +630,13 @@ class TigersAutoref(object):
         self.autoref_runtime_dir = autoref_runtime_dir
         self.wrapper_buffer = ThreadSafeBuffer(buffer_size, SSL_WrapperPacket)
         self.gamecontroller = gc
-        
-        
-        #time.sleep(Gamecontroller.CI_MODE_LAUNCH_DELAY_S)
-        #self.ci_port = self.gamecontroller.next_free_port()
-        #print("autoref ci port: " + str(self.ci_port))
-        #self.ci_socket.connect(("", self.ci_port))
 
     def __enter__(self):
-        #pdb.set_trace()
-        print("autoref enter")
-
         self.auto_ref_proc_thread = threading.Thread(target=self.startAutoref, daemon=True)
         self.auto_ref_proc_thread.start()
-        print("post autoref start")
 
-        self.auto_ref_wrapper_thread = threading.Thread(target=self.sslWrappers)
+        self.auto_ref_wrapper_thread = threading.Thread(target=self.send_to_autoref_and_forward_to_gamecontroller)
         self.auto_ref_wrapper_thread.start()
-        print("thread started")
-        #pdb.set_trace()
 
         return self
 
@@ -660,189 +648,39 @@ class TigersAutoref(object):
         field = tbots.Field.createSSLDivisionBField()  
         ci_input.geometry.CopyFrom(createGeometryData(field, 0.3))
 
-        timestamp = int(time.time_ns()) 
-        referee_msg = Referee(packet_timestamp=timestamp)
-        referee_msg.stage = Referee.NORMAL_FIRST_HALF_PRE
-        referee_msg.stage_time_left = 1000
-        referee_msg.command         = Referee.PREPARE_KICKOFF_BLUE
-        referee_msg.command_counter = 0
-        referee_msg.command_timestamp   = timestamp
-        referee_msg.yellow.CopyFrom(self.resetTeam("Yellow"))
-        referee_msg.blue.CopyFrom(self.resetTeam("Blue"))
-        referee_msg.current_action_time_remaining = 1000
-        
-        print(referee_msg)
-        ci_input.referee_message.CopyFrom(referee_msg)
-
-        print(ci_input)
-
         self.ci_socket.send(ci_input)
-        #size = ci_input.ByteSize()
+        response_data = self.ci_socket.receive(AutoRefCiOutput)
 
-        ## Send a request to the host with the size of the message
-        #self.ci_socket.send(
-        #    encoder._VarintBytes(size) + ci_input.SerializeToString()
-        #)
-        response_data = self.ci_socket.receive(AutoRefCiOutput);
-        response_data = self.ci_socket.recv(
-                Gamecontroller.CI_MODE_OUTPUT_RECEIVE_BUFFER_SIZE
-        )
-        msg_len, new_pos = decoder._DecodeVarint32(response_data, 0)
-        offset = 0
-        while offset < len(response_data):
-            msg_len, new_pos = decoder._DecodeVarint32(response_data, offset)
-            offset = new_pos
-            print("offset: " + str(offset) + ", " + str(msg_len) + ", " + str(new_pos) + ", " + str(len(response_data)))
-            #print(response_data)
-            ci_output = AutoRefCiOutput()
-            if (offset + msg_len > len(response_data)):
-                print("Must get additional data")
-                response_data += self.ci_socket.recv(
-                        offset + msg_len - len(response_data)
-                )
-            ci_output.ParseFromString(response_data[offset : offset + msg_len])
-            #pdb.set_trace()
+        for ci_output in response_data:
             self.send_ci_input(ci_output.tracker_wrapper_packet)
-            #print(ci_output)
-            offset += msg_len
 
-        #print(str(msg_len) + ", " + str(new_pos) + ", " + str(len(response_data)))
-        #ci_output = AutoRefCiOutput()
-        #if (msg_len > len(response_data)):
-        #    print("Must get additional data")
-        #    response_data += self.ci_socket.recv(
-        #        msg_len - len(response_data)
-        #    )
-        #ci_output.ParseFromString(response_data[new_pos : new_pos + msg_len])
-        #self.send_ci_input(ci_output.tracker_wrapper_packet)
-
-    def sendTeamInfo(self):
-        ssl_wrapper = self.wrapper_buffer.get(block=True)
-        ci_input = AutoRefCiInput()
-        ci_input.detection.append(ssl_wrapper.detection)
-
-        timestamp = int(time.time_ns()) 
-        referee_msg = Referee(packet_timestamp=timestamp)
-        referee_msg.stage = Referee.NORMAL_FIRST_HALF_PRE
-        referee_msg.stage_time_left = 1000
-        referee_msg.command         = Referee.PREPARE_KICKOFF_BLUE
-        referee_msg.command_counter = 0
-        referee_msg.command_timestamp   = timestamp
-        referee_msg.yellow.CopyFrom(self.resetTeam("Yellow"))
-        referee_msg.blue.CopyFrom(self.resetTeam("Blue"))
-        referee_msg.current_action_time_remaining = 1000
-        
-        print(referee_msg)
-        ci_input.referee_message.CopyFrom(referee_msg)
-        #pdb.set_trace()
-
-        size = ci_input.ByteSize()
-
-        # Send a request to the host with the size of the message
-        self.ci_socket.send(
-            encoder._VarintBytes(size) + ci_input.SerializeToString()
-        )
-        response_data = self.ci_socket.recv(
-                Gamecontroller.CI_MODE_OUTPUT_RECEIVE_BUFFER_SIZE
-        )
-        msg_len, new_pos = decoder._DecodeVarint32(response_data, 0)
-        offset = 0
-        while offset < len(response_data):
-            msg_len, new_pos = decoder._DecodeVarint32(response_data, offset)
-            offset = new_pos
-            print("offset: " + str(offset) + ", " + str(msg_len) + ", " + str(new_pos) + ", " + str(len(response_data)))
-            #print(response_data)
-            ci_output = AutoRefCiOutput()
-            #pdb.set_trace()
-            if (offset + msg_len > len(response_data)):
-                print("Must get additional data")
-                response_data += self.ci_socket.recv(
-                        offset + msg_len - len(response_data)
-                )
-            ci_output.ParseFromString(response_data[offset : offset + msg_len])
-            self.send_ci_input(ci_output.tracker_wrapper_packet)
-            #print(ci_output)
-            offset += msg_len
-
-
-    def resetTeam(self, name):
-        team = Referee.TeamInfo()
-        team.name = name
-        team.score = 0
-        team.red_cards = 0
-        team.yellow_cards = 0
-        team.timeouts = 0
-        team.timeout_time = 300000000 # 300 seconds timeout
-        team.goalkeeper = 0
-        team.foul_counter = 0
-        team.ball_placement_failures = 0
-        team.can_place_ball = True
-        team.max_allowed_bots = 6
-        team.bot_substitution_intent = False
-        team.ball_placement_failures = False
-
-        return team
-
-    def sslWrappers(self):
-        print("ssl enter")
-        #pdb.set_trace()
-        time.sleep(3.0);
+    def send_to_autoref_and_forward_to_gamecontroller(self):
+        # We cannot start the Autoref binary immediately, so we must wait until the binary has started before we try to connect to it
+        time.sleep(TigersAutoref.AUTOREF_LAUNCH_DELAY);
 
         self.ci_socket = SslSocket(10013)
 
-        #self.ci_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        #self.ci_socket.connect(("", 10013))
         self.sendGeometry();
+
         ssl_wrapper = self.wrapper_buffer.get(block=True)
         self.gamecontroller.resetTeamInfo(ssl_wrapper)
+
         ssl_wrapper = self.wrapper_buffer.get(block=True)
         self.gamecontroller.resetTeamInfo(ssl_wrapper)
         self.gamecontroller.send_ci_input(
             gc_command=Command.Type.STOP, team=Team.UNKNOWN
         )
 
-        #self.sendTeamInfo();
         while True:
             ssl_wrapper = self.wrapper_buffer.get(block=True)
             ci_input = AutoRefCiInput()
             ci_input.detection.append(ssl_wrapper.detection)
-            #ci_input = AutoRefCiInput(detection=ssl_wrapper.detection)
-            #ci_input.detection.CopyFrom(ssl_wrapper.detection)
-            #self.autoref_sender.send_proto(ci_input)
-            # https://cwiki.apache.org/confluence/display/GEODE/Delimiting+Protobuf+Messages
-            size = ci_input.ByteSize()
 
-            #self.autoref_sender.send_proto(ci_input)
+            self.ci_socket.send(ci_input)
+            response_data = self.ci_socket.receive(AutoRefCiOutput)
 
-            # Send a request to the host with the size of the message
-            self.ci_socket.send(
-                encoder._VarintBytes(size) + ci_input.SerializeToString()
-            )
-            response_data = self.ci_socket.recv(
-                    Gamecontroller.CI_MODE_OUTPUT_RECEIVE_BUFFER_SIZE
-            )
-
-            #self.autoref_sender.send_proto(ci_input)
-
-            #input()
-            offset = 0
-            while offset < len(response_data):
-                msg_len, new_pos = decoder._DecodeVarint32(response_data, offset)
-                offset = new_pos
-                print("offset: " + str(offset) + ", " + str(msg_len) + ", " + str(new_pos) + ", " + str(len(response_data)))
-                #print(response_data)
-                ci_output = AutoRefCiOutput()
-                if (offset + msg_len > len(response_data)):
-                    print("Must get additional data")
-                    response_data += self.ci_socket.recv(
-                            offset + msg_len - len(response_data)
-                    )
-                ci_output.ParseFromString(response_data[offset : offset + msg_len])
+            for ci_output in response_data:
                 self.send_ci_input(ci_output.tracker_wrapper_packet)
-                #print(ci_output)
-                offset += msg_len
-
-            #print(ci_input)
 
     def send_ci_input(self, tracker_wrapper):
         #pdb.set_trace()
@@ -897,8 +735,6 @@ class TigersAutoref(object):
             :param data: The referee command to send
 
             """
-            print('hello')
-            print(data)
             blue_fullsystem_proto_unix_io.send_proto(Referee, data)
             yellow_fullsystem_proto_unix_io.send_proto(Referee, data)
 
