@@ -2,6 +2,9 @@ import socket
 import google.protobuf.internal.encoder as encoder
 import google.protobuf.internal.decoder as decoder
 
+class SslSocketProtoParseException(Exception):
+    pass
+
 class SslSocket(object):
     RECEIVE_BUFFER_SIZE = 9000
 
@@ -10,8 +13,10 @@ class SslSocket(object):
         self.socket.connect(("", port))
 
     def send(self, proto):
+        # https://cwiki.apache.org/confluence/display/GEODE/Delimiting+Protobuf+Messages
         size = proto.ByteSize()
 
+        # Send a request to the host with the size of the message
         self.socket.send(
             encoder._VarintBytes(size) + proto.SerializeToString()
         )
@@ -38,6 +43,8 @@ class SslSocket(object):
                         offset + msg_len - len(response_data)
                 )
             ci_output.ParseFromString(response_data[offset : offset + msg_len])
+            if not ci_output.IsInitialized():
+                raise SslSocketProtoParseException("Improper proto of type '{proto_type}' parsed")
             offset += msg_len
             responses.append(ci_output)
 

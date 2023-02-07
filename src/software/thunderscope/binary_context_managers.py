@@ -415,13 +415,11 @@ class Gamecontroller(object):
             self.gamecontroller_proc = Popen(command)
 
         if self.ci_mode:
-            print("ci port: " + str(self.ci_port))
             # We can't connect to the ci port right away, it takes
             # CI_MODE_LAUNCH_DELAY_S to start up the gamecontroller
             time.sleep(Gamecontroller.CI_MODE_LAUNCH_DELAY_S)
 
-            self.ci_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.ci_socket.connect(("", self.ci_port))
+            self.ci_socket = SslSocket(self.ci_port)
 
         return self
 
@@ -502,8 +500,7 @@ class Gamecontroller(object):
         :return: The response CiOutput containing 1 or more refree msgs
 
         """
-        packet_timestamp = timestamp or int(time.time_ns())
-        ci_ci_input = CiInput(timestamp=packet_timestamp)
+        ci_ci_input = CiInput(timestamp=int(time.time_ns()))
         ci_input = Input()
         ci_change = Change()
         ci_new_command = NewCommand()
@@ -538,22 +535,29 @@ class Gamecontroller(object):
             ci_input.change.CopyFrom(ci_change)
             ci_ci_input.api_inputs.append(ci_input)
 
-        # https://cwiki.apache.org/confluence/display/GEODE/Delimiting+Protobuf+Messages
-        size = ci_ci_input.ByteSize()
+        ci_output_list = self.send_ci_input(ci_ci_input)
 
-        # Send a request to the host with the size of the message
-        self.ci_socket.send(
-            encoder._VarintBytes(size) + ci_ci_input.SerializeToString()
-        )
+        return ci_output_list
 
-        response_data = self.ci_socket.recv(
-            Gamecontroller.CI_MODE_OUTPUT_RECEIVE_BUFFER_SIZE
-        )
+    def send_ci_input(self, ci_input):
+        '''
+        Send CiInput proto to the Gamecontroller. Retries if the Gamecontroller output isn't parseable as a CiOutput proto
 
-        msg_len, new_pos = decoder._DecodeVarint32(response_data, 0)
-        ci_output = CiOutput()
-        ci_output.ParseFromString(response_data[new_pos : new_pos + msg_len])
-        return ci_output
+        :param CiInput proto to send to the Gamecontroller
+
+        :return: a list of CiOutput protos received from the Gamecontroller
+        '''
+        ci_output_list = list()
+        while True :
+            try :
+                self.ci_socket.send(ci_input)
+                ci_output_list = self.ci_socket.receive(CiOutput)
+                break
+            except SslSocketProtoParseException as parse_err:
+                logging.info("error receiving CiOutput proto from the gamecontroller: " + parse_err.args)
+                pass
+
+        return ci_output_list
 
     def resetTeam(self, name, team):
         '''
@@ -561,6 +565,8 @@ class Gamecontroller(object):
 
         :param name name of the new team
         :param team yellow or blue team to update
+
+        :return: corresponding UpdateTeamState proto
         '''
         update_team_state                   = UpdateTeamState()
         update_team_state.for_team          = team
@@ -572,16 +578,30 @@ class Gamecontroller(object):
 
         return update_team_state
 
-    def resetGame(self):
+    def resetGame(self, division):
+        '''
+        Returns an UpdateConfig proto for the Gamecontroller to reset game info.
+
+        :param division the Division proto corresponding to the game division to set up the Gamecontroller for
+
+        :return: corresponding UpdateConfig proto
+        '''
         game_update = UpdateConfig() 
-        game_update.division = Division.DIV_B
+        game_update.division = division 
         game_update.first_kickoff_team = Team.BLUE
         game_update.auto_continue = True
         game_update.match_type = MatchType.FRIENDLY
 
         return game_update
 
-    def resetTeamInfo(self, tracker_wrapper):
+    def resetTeamInfo(self, division):
+        '''
+        Sends a message to the Gamecontroller to reset Team information.
+
+        :param division the Division proto corresponding to the game division to set up the Gamecontroller for
+
+        :return: a list of CiOutput protos from the Gamecontroller
+        '''
         ci_ci_input = CiInput(timestamp=int(time.time_ns()))
         ci_input_blue_update = Input()
         ci_input_blue_update.reset_match = True
@@ -593,35 +613,17 @@ class Gamecontroller(object):
 
         ci_input_game_update = Input()
         ci_input_game_update.reset_match = True
-        ci_input_game_update.change.update_config.CopyFrom(self.resetGame())
+        ci_input_game_update.change.update_config.CopyFrom(self.resetGame(division))
 
         ci_ci_input.api_inputs.append(ci_input_blue_update)
         ci_ci_input.api_inputs.append(ci_input_yellow_update)
         ci_ci_input.api_inputs.append(ci_input_game_update)
 
-
-        # https://cwiki.apache.org/confluence/display/GEODE/Delimiting+Protobuf+Messages
-        size = ci_ci_input.ByteSize()
-
-        # Send a request to the host with the size of the message
-        self.ci_socket.send(
-            encoder._VarintBytes(size) + ci_ci_input.SerializeToString()
-        )
-
-        response_data = self.ci_socket.recv(
-            Gamecontroller.CI_MODE_OUTPUT_RECEIVE_BUFFER_SIZE
-        )
-
-        msg_len, new_pos = decoder._DecodeVarint32(response_data, 0)
-        ci_output = CiOutput()
-        ci_output.ParseFromString(response_data[new_pos : new_pos + msg_len])
-        return ci_output
-
-        return
-
+        return self.send_ci_input(ci_ci_input)
 
 class TigersAutoref(object):
     AUTOREF_LAUNCH_DELAY = 2.5
+    AUTOREF_COMM_PORT = 10013
 
     def __init__(self, ci_mode=False, autoref_runtime_dir=None, buffer_size=5, gc=Gamecontroller()):
         self.tigers_autoref_proc = None
@@ -650,7 +652,15 @@ class TigersAutoref(object):
         ci_input.geometry.CopyFrom(createGeometryData(field, 0.3))
 
         self.ci_socket.send(ci_input)
-        response_data = self.ci_socket.receive(AutoRefCiOutput)
+
+        response_data = None
+        while True:
+            try :
+                response_data = self.ci_socket.receive(AutoRefCiOutput)
+                break
+            except SslSocketProtoParseException as parse_err:
+                logging.info("error with sending geometry data: \n" + parse_err.args)
+                pass
 
         for ci_output in response_data:
             self.send_ci_input(ci_output.tracker_wrapper_packet)
@@ -659,29 +669,30 @@ class TigersAutoref(object):
         # We cannot start the Autoref binary immediately, so we must wait until the binary has started before we try to connect to it
         time.sleep(TigersAutoref.AUTOREF_LAUNCH_DELAY);
 
-        self.ci_socket = SslSocket(10013)
+        self.ci_socket = SslSocket(TigersAutoref.AUTOREF_COMM_PORT)
 
         self.sendGeometry();
+        self.gamecontroller.resetTeamInfo()
 
-        ssl_wrapper = self.wrapper_buffer.get(block=True)
-        self.gamecontroller.resetTeamInfo(ssl_wrapper)
-
-        ssl_wrapper = self.wrapper_buffer.get(block=True)
-        self.gamecontroller.resetTeamInfo(ssl_wrapper)
-        self.gamecontroller.send_ci_input(
+        self.gamecontroller.send_gc_command(
             gc_command=Command.Type.STOP, team=Team.UNKNOWN
         )
 
         while True:
-            ssl_wrapper = self.wrapper_buffer.get(block=True)
-            ci_input = AutoRefCiInput()
-            ci_input.detection.append(ssl_wrapper.detection)
+            try :
+                ssl_wrapper = self.wrapper_buffer.get(block=True)
+                ci_input = AutoRefCiInput()
+                ci_input.detection.append(ssl_wrapper.detection)
 
-            self.ci_socket.send(ci_input)
-            response_data = self.ci_socket.receive(AutoRefCiOutput)
+                self.ci_socket.send(ci_input)
+                response_data = self.ci_socket.receive(AutoRefCiOutput)
 
-            for ci_output in response_data:
-                self.send_ci_input(ci_output.tracker_wrapper_packet)
+                for ci_output in response_data:
+                    self.send_ci_input(ci_output.tracker_wrapper_packet)
+            except SslSocketProtoParseException as parse_error :
+                logging.info("error with receiving AutoRefCiOutput, ignoring... this packet")
+                pass
+
 
     def send_ci_input(self, tracker_wrapper):
         #pdb.set_trace()
@@ -690,24 +701,28 @@ class TigersAutoref(object):
         ci_input.tracker_packet.CopyFrom(tracker_wrapper)
 
         # https://cwiki.apache.org/confluence/display/GEODE/Delimiting+Protobuf+Messages
-        size = ci_input.ByteSize()
+        #size = ci_input.ByteSize()
 
         # Send a request to the host with the size of the message
-        self.gamecontroller.ci_socket.send(
-            encoder._VarintBytes(size) + ci_input.SerializeToString()
-        )
+        #self.gamecontroller.ci_socket.send(
+        #    encoder._VarintBytes(size) + ci_input.SerializeToString()
+        #)
+        self.gamecontroller.ci_socket.send(ci_input)
 
         print("response data from gamecontroller")
-        response_data = self.gamecontroller.ci_socket.recv(
-            Gamecontroller.CI_MODE_OUTPUT_RECEIVE_BUFFER_SIZE
-        )
+        #response_data = self.gamecontroller.ci_socket.recv(
+        #    Gamecontroller.CI_MODE_OUTPUT_RECEIVE_BUFFER_SIZE
+        #)
+        response_data_list = self.gamecontroller.ci_socket.receive(CiOutput)
         #print(response_data)
 
-        msg_len, new_pos = decoder._DecodeVarint32(response_data, 0)
-        ci_output = CiOutput()
-        ci_output.ParseFromString(response_data[new_pos : new_pos + msg_len])
+        #msg_len, new_pos = decoder._DecodeVarint32(response_data, 0)
+        #ci_output = CiOutput()
+        #ci_output.ParseFromString(response_data[new_pos : new_pos + msg_len])
         print("gamecontroller output")
-        print(ci_output)
+        print(response_data_list)
+
+        return response_data_list
 
 
     def startAutoref(self):
