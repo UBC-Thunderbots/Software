@@ -42,9 +42,11 @@ void PassDefenderFSM::blockPass(const Update& event)
     auto face_ball_orientation =
         (ball_position - event.common.robot.position()).orientation();
 
+    // Face the ball and move to position_to_block_from, which should be a location
+    // on the field that blocks a passing lane between two enemy robots
     event.common.set_primitive(createMovePrimitive(
         CREATE_MOTION_CONTROL(position_to_block_from), face_ball_orientation, 0,
-        TbotsProto::DribblerMode::OFF, TbotsProto::BallCollisionType::AVOID,
+        TbotsProto::DribblerMode::OFF, TbotsProto::BallCollisionType::ALLOW,
         AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
         TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
         event.common.robot.robotConstants()));
@@ -58,11 +60,15 @@ void PassDefenderFSM::interceptBall(const Update& event)
     if ((ball.position() - robot_position).length() >
         BALL_TO_FRONT_OF_ROBOT_DISTANCE_WHEN_DRIBBLING)
     {
+        // Find the closest point on the line of the ball's current trajectory
+        // that the defender can move to and intercept the pass
         auto intercept_position = closestPoint(
             robot_position, Line(ball.position(), ball.position() + ball.velocity()));
 
         auto face_ball_orientation = (ball.position() - robot_position).orientation();
 
+        // Move to intercept the pass by positioning defender in front of the
+        // ball's current trajectory
         event.common.set_primitive(createMovePrimitive(
             CREATE_MOTION_CONTROL(intercept_position), face_ball_orientation, 0,
             TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,

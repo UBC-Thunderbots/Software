@@ -80,7 +80,6 @@ def test_ball_chipped_on_intercept(
     simulated_test_runner.run_test(
         eventually_validation_sequence_set=eventually_validation_sequence_set,
         always_validation_sequence_set=always_validation_sequence_set,
-        test_timeout_s=25,
     )
 
 
