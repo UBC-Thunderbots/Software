@@ -622,10 +622,21 @@ class Gamecontroller(object):
         return self.send_ci_input(ci_ci_input)
 
 class TigersAutoref(object):
-    AUTOREF_LAUNCH_DELAY = 2.5
-    AUTOREF_COMM_PORT = 10013
+    '''
+    A wrapper over the TigersAutoref binary. It coordinates communication between the Simulator, TigersAutoref and Gamecontroller. 
 
-    def __init__(self, ci_mode=False, autoref_runtime_dir=None, buffer_size=5, gc=Gamecontroller()):
+    In CI mode, the flow of data corresponds to:
+
+              SSL_DetectionFrame          AutoRefCiOutput: TrackerWrapperPacket                CiOutput
+    Simulator ------------------> AutoRef ------------------------------------> Gamecontroller --------------> AI
+                AutoRefCiInput                         CiInput                                 RefereeMessage
+
+    For more information: https://github.com/RoboCup-SSL/ssl-game-controller/blob/master/doc/AutoRefCi.md
+    '''
+    AUTOREF_COMM_PORT = 10013
+    AUTOREF_NUM_RETRIES = 10
+
+    def __init__(self, ci_mode=False, autoref_runtime_dir=None, buffer_size=5, gc=Gamecontroller(), verbose=False):
         self.tigers_autoref_proc = None
         self.auto_ref_proc_thread = None
         self.auto_ref_wrapper_thread = None
@@ -633,6 +644,7 @@ class TigersAutoref(object):
         self.autoref_runtime_dir = autoref_runtime_dir
         self.wrapper_buffer = ThreadSafeBuffer(buffer_size, SSL_WrapperPacket)
         self.gamecontroller = gc
+        self.verbosity = verbose
 
     def __enter__(self):
         self.auto_ref_proc_thread = threading.Thread(target=self.startAutoref, daemon=True)
@@ -644,6 +656,9 @@ class TigersAutoref(object):
         return self
 
     def sendGeometry(self):
+        '''
+        Sends updated field geometry to the AutoRef so that the TigersAutoref knows about field sizes.
+        '''
         ssl_wrapper = self.wrapper_buffer.get(block=True)
         ci_input = AutoRefCiInput()
         ci_input.detection.append(ssl_wrapper.detection)
@@ -665,11 +680,29 @@ class TigersAutoref(object):
         for ci_output in response_data:
             self.send_ci_input(ci_output.tracker_wrapper_packet)
 
-    def send_to_autoref_and_forward_to_gamecontroller(self):
-        # We cannot start the Autoref binary immediately, so we must wait until the binary has started before we try to connect to it
-        time.sleep(TigersAutoref.AUTOREF_LAUNCH_DELAY);
+    def persistently_connect_to_autoref(self):
+        '''
+        Connect to the TigersAutoref binary. Retry connection a few times if the connection doesn't go through in case the binary hasn't started yet.
+        '''
+        tries = 0
+        while (tries < TigersAutoref.AUTOREF_NUM_RETRIES):
+            try :
+                # We cannot start the Autoref binary immediately, so we must wait until the binary has started before we try to connect to it
+                time.sleep(0.5);
+                self.ci_socket = SslSocket(TigersAutoref.AUTOREF_COMM_PORT)
+                return
+            except ConnectionRefusedError:
+                tries += 1
 
-        self.ci_socket = SslSocket(TigersAutoref.AUTOREF_COMM_PORT)
+        logging.info("Failed to connect to autoref binary. Is it running?")
+
+        return
+
+    def send_to_autoref_and_forward_to_gamecontroller(self):
+        '''
+        Main communication loop that sets up the TigersAutoref and coordinates communication between Simulator, TigersAutoref and Gamecontroller.
+        '''
+        self.persistently_connect_to_autoref()
 
         self.sendGeometry();
         self.gamecontroller.resetTeamInfo()

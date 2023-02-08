@@ -44,9 +44,9 @@ def start_ai_vs_ai(simulator_runtime_dir, blue_fs_dir, yellow_fs_dir):
     ) as blue_fs, FullSystem(
             yellow_fs_dir, friendly_colour_yellow=True
     ) as yellow_fs, ProtoLogger(
-            blue_fs_dir
+            f"{blue_fs_dir}/logs/",
     ) as blue_logger, ProtoLogger(
-            yellow_fs_dir
+            f"{yellow_fs_dir}/logs/",
     ) as yellow_logger, Gamecontroller(
             ci_mode=True
     ) as gamecontroller, TigersAutoref(
