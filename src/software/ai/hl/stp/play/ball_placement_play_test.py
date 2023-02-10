@@ -18,7 +18,7 @@ from proto.ssl_gc_geometry_pb2 import Vector2
 
 
 @pytest.mark.parametrize(
-    "run_enemy_ai,test_duration", [(False, 20), (False, 20)]
+    "run_enemy_ai,test_duration", [(False, 20)]
 )  # , (True, 20)]) # TODO (#2690): Robot gets stuck in corner of defense area
 def test_free_kick_ball_placement(simulated_test_runner, run_enemy_ai, test_duration):
 
@@ -136,6 +136,7 @@ def test_free_kick_ball_placement(simulated_test_runner, run_enemy_ai, test_dura
     # )
 
 
+@pytest.mark.parametrize("run_enemy_ai,test_duration", [(False, 20)])
 def test_force_start_ball_placement(simulated_test_runner, run_enemy_ai, test_duration):
 
     # starting point must be Point
