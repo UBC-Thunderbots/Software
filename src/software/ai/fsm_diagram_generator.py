@@ -31,10 +31,9 @@ def generate_diagram(fsm):
     # Remove all whitespace
     transition_table = re.sub(r"\s+", "", transition_table, flags=re.MULTILINE)
 
-    transitions = transition_table.split(",")
-
     diagram_uml = ""
 
+    transitions = transition_table.split(",")
     for transition in transitions:
 
         # Transitions have the following format:
@@ -54,27 +53,32 @@ def generate_diagram(fsm):
         # Extract src_state from transition, which is before '+' sign
         src_state = transition.split("+")[0]
 
-        # Remove suffixes from states, guard, action
         def remove_suffix(str, suffix):
             return str[: -len(suffix)] if str.endswith(suffix) else str
 
+        # Remove suffixes from states, guard, action
         src_state = remove_suffix(src_state, "_S")
         dest_state = remove_suffix(dest_state, "_S")
         guard = remove_suffix(guard, "_G")
         action = remove_suffix(action, "_A")
 
+        # Terminate state is marked with X in transition table.
+        # Give terminate state custom styling with the
+        # :::terminate classDef style
         if dest_state == "X":
-            dest_state = "[*]"
+            dest_state = "Terminate:::terminate"
+        if src_state == "X":
+            src_state = "Terminate:::terminate"
 
+        # Initial state is marked with '*' prefix, so need to add
+        # special transition from start to initial state in our diagram
         if src_state.startswith("*"):
             src_state = src_state[1:]
             diagram_uml += f"[*] --> {src_state}\n"
 
+        # If dest_state is omitted, it is an internal transition
         if not dest_state:
             dest_state = src_state
-
-        if src_state == "X":
-            src_state = "Terminate:::terminate"
 
         diagram_uml += f"{src_state} --> {dest_state}"
 
@@ -107,7 +111,7 @@ if __name__ == "__main__":
         print("# Play and Tactic FSM Diagrams\n", file=output_file)
 
         diagrams_generated = 0
-        
+
         ai_dir = os.path.join(root_dir, "src/software/ai")
         for root, dirs, files in os.walk(ai_dir):
             for file in files:
@@ -127,8 +131,8 @@ if __name__ == "__main__":
                 if diagram:
 
                     # Get file path to FSM header file relative to project root
-                    filepath = filepath[filepath.find("src/"):]
-                    
+                    filepath = filepath[filepath.find("src/") :]
+
                     # Format diagram in Markdown syntax and write to output file
                     print(f"## [{fsm_name}](/{filepath})\n", file=output_file)
                     print(f"```mermaid\n\n{diagram}\n```\n", file=output_file)
