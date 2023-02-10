@@ -110,7 +110,7 @@ if __name__ == "__main__":
 
         print("# Play and Tactic FSM Diagrams\n", file=output_file)
 
-        diagrams_generated = 0
+        diagrams_count = 0
 
         ai_dir = os.path.join(root_dir, "src/software/ai")
         for root, dirs, files in os.walk(ai_dir):
@@ -119,6 +119,7 @@ if __name__ == "__main__":
                 if not file.endswith("fsm.h"):
                     continue
 
+                # Read contents of FSM header file
                 filepath = os.path.join(root, file)
                 with open(filepath, "r") as f:
                     fsm = f.read()
@@ -137,10 +138,10 @@ if __name__ == "__main__":
                     print(f"## [{fsm_name}](/{filepath})\n", file=output_file)
                     print(f"```mermaid\n\n{diagram}\n```\n", file=output_file)
 
-                    diagrams_generated += 1
+                    diagrams_count += 1
 
         # Print out confirmation message to console
         print(
-            f"Generated {diagrams_generated} FSM diagrams. "
+            f"Generated {diagrams_count} FSM diagrams. "
             + f"View output in {OUTPUT_FILE_PATH}"
         )
