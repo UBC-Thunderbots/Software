@@ -31,7 +31,7 @@ def generate_diagram(fsm):
     # Remove all whitespace
     transition_table = re.sub(r"\s+", "", transition_table, flags=re.MULTILINE)
 
-    diagram_uml = ""
+    diagram = ""
 
     transitions = transition_table.split(",")
     for transition in transitions:
@@ -74,74 +74,83 @@ def generate_diagram(fsm):
         # special transition from start to initial state in our diagram
         if src_state.startswith("*"):
             src_state = src_state[1:]
-            diagram_uml += f"[*] --> {src_state}\n"
+            diagram += f"[*] --> {src_state}\n"
 
         # If dest_state is omitted, it is an internal transition
         if not dest_state:
             dest_state = src_state
 
-        diagram_uml += f"{src_state} --> {dest_state}"
+        diagram += f"{src_state} --> {dest_state}"
 
         if guard:
-            diagram_uml += f" : [{guard}]"
+            diagram += f" : [{guard}]"
 
             if action:
-                diagram_uml += f"\\n<i>{action}</i>"
+                diagram += f"\\n<i>{action}</i>"
 
         elif action:
-            diagram_uml += f" : <i>{action}</i>"
+            diagram += f" : <i>{action}</i>"
 
-        diagram_uml += "\n"
+        diagram += "\n"
 
-    return (
-        "stateDiagram-v2\n"
-        + "classDef terminate fill:white,color:black,font-weight:bold\n"
-        + "direction LR\n"
-        + diagram_uml
-    )
+    return diagram
 
 
 if __name__ == "__main__":
 
     root_dir = Path(os.path.abspath(__file__)).parents[3]
 
+    fsm_diagrams = {}
+    fsm_file_paths = {}
+
+    ai_dir = os.path.join(root_dir, "src/software/ai")
+    for root, dirs, files in os.walk(ai_dir):
+        for file in files:
+
+            if not file.endswith("fsm.h"):
+                continue
+
+            # Read contents of FSM header file
+            file_path = os.path.join(root, file)
+            with open(file_path, "r") as f:
+                fsm = f.read()
+
+            diagram = generate_diagram(fsm)
+
+            if diagram:
+
+                # Regex match to extract FSM struct name
+                fsm_name = re.findall(r"struct\s+(\w+)\s*\{", fsm)[0]
+
+                # Get file path to FSM header file relative to project root
+                file_path = file_path[file_path.find("src/") :]
+
+                fsm_diagrams[fsm_name] = diagram
+                fsm_file_paths[fsm_name] = file_path
+
     output_file_path = os.path.join(root_dir, OUTPUT_FILE_PATH)
     with open(output_file_path, "w") as output_file:
 
         print("# Play and Tactic FSM Diagrams\n", file=output_file)
 
-        diagrams_count = 0
+        for fsm_name, diagram in fsm_diagrams.items():
+            
+            file_path = fsm_file_paths[fsm_name]
 
-        ai_dir = os.path.join(root_dir, "src/software/ai")
-        for root, dirs, files in os.walk(ai_dir):
-            for file in files:
+            # Format diagram in Markdown syntax and write to output file
+            print(
+                f"## [{fsm_name}](/{file_path})\n\n"
+                + "```mermaid\n\n"
+                + "stateDiagram-v2\n"
+                + "classDef terminate fill:white,color:black,font-weight:bold\n"
+                + "direction LR\n"
+                + diagram
+                + "\n```\n",
+                file=output_file
+            )
 
-                if not file.endswith("fsm.h"):
-                    continue
-
-                # Read contents of FSM header file
-                filepath = os.path.join(root, file)
-                with open(filepath, "r") as f:
-                    fsm = f.read()
-
-                # Regex match to extract FSM struct name
-                fsm_name = re.findall(r"struct\s+(\w+)\s*\{", fsm)[0]
-
-                diagram = generate_diagram(fsm)
-
-                if diagram:
-
-                    # Get file path to FSM header file relative to project root
-                    filepath = filepath[filepath.find("src/") :]
-
-                    # Format diagram in Markdown syntax and write to output file
-                    print(f"## [{fsm_name}](/{filepath})\n", file=output_file)
-                    print(f"```mermaid\n\n{diagram}\n```\n", file=output_file)
-
-                    diagrams_count += 1
-
-        # Print out confirmation message to console
-        print(
-            f"Generated {diagrams_count} FSM diagrams. "
-            + f"View output in {OUTPUT_FILE_PATH}"
-        )
+    # Print out confirmation message to console
+    print(
+        f"Generated {len(fsm_diagrams)} FSM diagrams. "
+        + f"View output in {OUTPUT_FILE_PATH}"
+    )
