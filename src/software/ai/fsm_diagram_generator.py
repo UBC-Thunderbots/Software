@@ -9,10 +9,10 @@ OUTPUT_FILE_PATH = "docs/fsm-diagrams.md"
 
 def generate_diagram(fsm):
     """
-    Generates a mermaid.js text definition for a state diagram 
+    Generates a Mermaid text definition for a state diagram 
     representing the FSM.
 
-    Details on mermaid.js UML syntax:
+    Details on Mermaid UML syntax:
     https://mermaid.js.org/syntax/stateDiagram.html
 
     :param fsm: the FSM code containing its transition table
@@ -99,7 +99,7 @@ def generate_diagram(fsm):
 
 if __name__ == "__main__":
 
-    root_dir = Path(os.path.abspath(__file__)).parents[4]
+    root_dir = Path(os.path.abspath(__file__)).parents[3]
 
     output_file_path = os.path.join(root_dir, OUTPUT_FILE_PATH)
     with open(output_file_path, "w") as output_file:
