@@ -5,17 +5,18 @@ from ansible.executor.playbook_executor import PlaybookExecutor
 from ansible.parsing.dataloader import DataLoader
 from ansible.inventory.manager import InventoryManager
 from ansible.vars.manager import VariableManager
+from software.jetson_nano.broadcasts.robot_broadcast_receiver import (
+    receive_announcements,
+)
 import os
 import argparse
-import subprocess
 
 # Wrapper around Ansible's Python API, which is used to run scripts on multiple robots (hosts) at once
 # documentation can be found here: https://docs.ansible.com/ansible/latest/dev_guide/developing_api.html
 
 HOST_GROUP = "THUNDERBOTS_HOSTS"
 NANO_USER = "robot"
-ROBOT_IP_PREFIX = "192.168.0.20"
-MAX_NUM_ROBOTS = 8
+ANNOUNCEMENT_LISTEN_DURATION_S = 10
 
 # loads variables, inventory, and play into Ansible API, then runs it
 def ansible_runner(playbook: str, options: dict = {}):
@@ -30,25 +31,19 @@ def ansible_runner(playbook: str, options: dict = {}):
     ssh_pass = options.get("ssh_pass", "")
 
     hosts = set(options.get("hosts", []))
-    host_aliases = hosts.copy()
+    host_aliases = hosts
 
     if not hosts:
-        # Spawn multiple processes to ping different robots
-        ping_processes = {}
-        for i in range(MAX_NUM_ROBOTS):
-            ip = ROBOT_IP_PREFIX + str(i)
-            # Ping 3 times waiting 1s for timeout
-            command = ["ping", "-w 1", "-c 3", ip]
-            ping_processes[i] = subprocess.Popen(command, stdout=subprocess.DEVNULL)
-        while ping_processes:
-            for i, proc in ping_processes.items():
-                # Check status of ping processes
-                if proc.poll() is not None:
-                    del ping_processes[i]
-                    if proc.returncode == 0:
-                        hosts.add(ROBOT_IP_PREFIX + str(i))
-                        host_aliases.add(i)
-                    break
+        if not options["port"]:
+            print("Announcement Port not defined, exiting")
+            exit()
+
+        announcements = receive_announcements(
+            port=int(options["port"]), duration=ANNOUNCEMENT_LISTEN_DURATION_S
+        )
+        print(announcements)
+        hosts = {a.ip_addr for a in announcements}
+        host_aliases = {a.robot_id for a in announcements}
 
     num_forks = len(hosts)
 
@@ -90,7 +85,10 @@ def ansible_runner(playbook: str, options: dict = {}):
     # adding hosts and their aliases (robot IDs if available) to the inventory
     for host, alias in zip(hosts, host_aliases):
         inventory.add_host(host, group)
-        variable_manager.set_host_variable(host, "inventory_hostname", alias)
+
+        # todo (#2625) investigate robot id bug
+
+        # variable_manager.set_host_variable(host, "inventory_hostname", alias)
 
     # playbook executor controls running the playbook
     pbex = PlaybookExecutor(
@@ -115,7 +113,7 @@ def main():
         "-ho",
         nargs="*",
         required=False,
-        help="space separated list of hosts to run on",
+        help="space separated list of hosts to run on, defaults to using robot announcements",
         default=[],
     )
 
@@ -142,6 +140,14 @@ def main():
         required=False,
         help="space separated list of variables to set in the form key=value",
         default=[],
+    )
+
+    ap.add_argument(
+        "--port",
+        "-p",
+        required=False,
+        help="port to listen to Announcement scripts on",
+        default=0,
     )
 
     args = vars(ap.parse_args())

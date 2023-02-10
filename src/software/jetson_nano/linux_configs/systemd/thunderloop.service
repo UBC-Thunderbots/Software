@@ -10,9 +10,6 @@ After=thunderbots.service network.target
 [Service]
 ExecStart=/home/robot/thunderbots_binaries/thunderloop_main
 
-# How long to wait after KillSignal (SIGTERM by default) to send FinalKillSignal (SIGKILL by default)
-TimeoutStopSec=15s
-
 # Always restart on crash
 Restart=always
 

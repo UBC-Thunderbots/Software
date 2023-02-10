@@ -62,19 +62,11 @@ This refers to setting up the Jetson Nano for the first time. This will enable S
 
 Robot Diagnostics allow users to input various commands to the robots. It can be used to move the robot in the x, y and theta direction as well as kick, chip, autokick or autochip. It can also be used to spin the dribbler. 
 
-<b>If multiple people are using robot diagnostics at the same time on the same network please make sure each person only connects to the robots they are testing via the checkboxes</b>
-
-###For Just Diagnostics
+<b>If multiple people are using robot diagnostics at the same time on the same network please have a software member modify the connected robot ids</b>
 
 From Software/src
 
-`./tbots.py run thunderscope --run_diagnostics --interface <network_interface>`
-
-###For AI + Diagnostics
-
-From Software/src
-
-`./tbots.py run thunderscope --run_blue --run_diagnostics --interface <network_interface>`
+`./tbots.py run thunderscope --run_blue --interface <network_interface>`
 
 network_interface can be found with `ifconfig` commonly `wlp59s0` for wifi.
 

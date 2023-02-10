@@ -66,6 +66,11 @@ py_proto_library(
     ],
 )
 
+py_proto_library(
+    name = "announcement_py_proto",
+    srcs = ["announcement.proto"],
+)
+
 proto_library(
     name = "ssl_proto",
     srcs = [

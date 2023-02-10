@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+message Announcement
+{
+    uint32 robot_id        = 1;
+    string ip_addr         = 2;
+    string mac_addr        = 3;
+    string sha256_checksum = 4;
+}
