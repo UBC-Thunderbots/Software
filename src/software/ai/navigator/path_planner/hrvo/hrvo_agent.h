@@ -20,6 +20,8 @@
 #include "software/world/world.h"
 #include "proto/primitive.pb.h"
 #include "proto/message_translation/tbots_geometry.h"
+#include "software/ai/navigator/obstacle/obstacle.hpp"
+#include "software/ai/navigator/obstacle/robot_navigation_obstacle_factory.h"
 
 class HRVOAgent : Agent {
 public:
@@ -41,26 +43,17 @@ public:
               double radius, double min_radius, double max_speed, double max_accel, double max_radius_inflation);
 
 
-
+    // TODO
+    // check double -> Duration conversion
     void updatePrimitive(const TbotsProto::Primitive &new_primitive,
-                                    const World &world, double time_step);
+                                    const World &world, Duration time_step);
 
-    /*
-     * updates the radius based on current velocity
-     */
-    void updateRadiusFromVelocity() override;
-
-    /*
-     * get robots path
-     */
-    const RobotPath &getPath() override;
 
     /**
      * Computes the new velocity of this agent.
-     * @param friendlies hrvo agents for representing the friendly team
-     * @param enemies linear velocity agents for representing the enemy team
+     * @param agents a map of offset robot ids to agents
      */
-    void computeNewVelocity(std::map<int, HRVOAgent> &friendlies, std::map<int, LVAgent> &enemies, Duration time_step);
+    void computeNewVelocity(std::map<unsigned int, std::shared_ptr<Agent>> &robots, Duration time_step) override;
 
     /**
      * Computes the preferred velocity of this agent.
@@ -69,7 +62,7 @@ public:
      *
      * updates pref_velocity
      */
-    Vector computePreferredVelocity(double time_step);
+    Vector computePreferredVelocity(Duration time_step) override;
 
     /**
      * Compute all the velocity obstacles that this Agent should take into account and
@@ -79,13 +72,7 @@ public:
      * relies on
      * `ball_obstacle`, `neighbours_`
      */
-    std::vector<VelocityObstacle> computeVelocityObstacles(std::map<int, Agent> &robots, double time_step) override;
-
-    /**
-     * Computes the most direct linear velocity for this agent.
-     * @param agents is unused
-     */
-    void computeLinearVelocity(Duration time_step);
+    void computeVelocityObstacles(std::map<unsigned int, std::shared_ptr<Agent>> &robots, Duration time_step);
 
     /**
      * Create the velocity obstacle which other_agent should see for this Agent
@@ -106,12 +93,21 @@ public:
      */
     VelocityObstacle createHybridReciprocalVelocityObstacle(const HRVOAgent &other_agent);
 
+    /**
+     * compute the neighbours of this robot
+     * @param robots
+     * @return the robot simualator ids
+     */
+    std::vector<unsigned int> computeNeighbors(std::map<unsigned int, std::shared_ptr<Agent>> &robots);
+
     class Candidate
     {
     public:
 
-        // FOR NOW like this kekw
-        Candidate() : obstacles(std::pair(VelocityObstacle(Vector(0, 0), Vector(0, 0), Vector(0, 0)),
+        // TODO
+        // fix to use constructor instead of setters
+        // move to separate file
+        explicit Candidate(Vector velocity) : velocity(velocity), obstacles(std::pair(VelocityObstacle(Vector(0, 0), Vector(0, 0), Vector(0, 0)),
                                           VelocityObstacle(Vector(0, 0), Vector(0, 0), Vector(0, 0)))) {}
 
         // The velocity of the candidate.
@@ -123,19 +119,18 @@ public:
 
 
 protected:
-    // robot id of this Agent
-    RobotId robot_id;
-    RobotState robot_state;
-    // whether this Agent is FRIENDLY or ENEMY
-    // keeping this for now, even tho we have assumption that friendlies are hrvo.
-    // maybe at some point we can predict the strategy used by enemies
-    TeamSide side;
-    // This agent's current actual radius
-    double radius;
-    // The path of this Agent
-    RobotPath path;
+    Vector new_velocity;
+
+    RobotNavigationObstacleFactory obstacle_factory;
 
     std::vector<VelocityObstacle> velocity_obstacles;
+    std::vector<ObstaclePtr> static_obstacles;
+    std::optional<ObstaclePtr> ball_obstacle;
+
+    static constexpr double MIN_PREF_SPEED_MULTIPLIER = 0.5;
+    static constexpr double DECEL_DIST_MULTIPLIER = 1.2;
+    static constexpr double DECEL_PREF_SPEED_MULTIPLIER = 0.6;
+    static constexpr double PREF_SPEED_SCALE = 0.85;
 };
 
 

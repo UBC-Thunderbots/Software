@@ -30,7 +30,7 @@ public:
      * Computes the new velocity of this agent.
      * @param agents is unused
      */
-    void computeNewVelocity(std::map<int, HRVOAgent> &friendlies, std::map<int, LVAgent> &enemies, double time_step);
+    void computeNewVelocity(std::map<unsigned int, std::shared_ptr<Agent>> &robots, Duration time_step) override;
 
     /**
      * Create the velocity obstacle which other_agent should see for this Agent
@@ -40,27 +40,4 @@ public:
      */
     VelocityObstacle createVelocityObstacle(const Agent &other_agent);
 
-    /*
-     * updates the radius based on current velocity
-     */
-    void updateRadiusFromVelocity() override;
-
-    /*
-     * get robots path
-     */
-    const RobotPath &getPath() override;
-
-
-protected:
-
-    // robot id of this Agent
-    RobotId robot_id;
-    // current state
-    RobotState robot_state;
-    // whether this Agent is FRIENDLY or ENEMY
-    TeamSide side;
-    // This agent's current actual radius
-    double radius;
-    // The path of this Agent
-    RobotPath path;
 };

@@ -7,8 +7,6 @@ HRVOSimulator::HRVOSimulator(float time_step, const RobotConstants_t &robot_cons
         robot_constants(robot_constants),
         primitive_set(),
         world(std::nullopt),
-        friendly_team(),
-        enemy_team(),
         robots(),
         friendly_team_colour(friendly_team_colour) {
 }
@@ -20,27 +18,18 @@ void HRVOSimulator::updateWorld(const World &world) {
     // TODO (#2498): Update implementation to correctly support adding and removing agents
     //               to represent the newly added and removed friendly/enemy robots in the
     //               World.
-    friendly_team.clear();
-    enemy_team.clear();
+    robots.clear();
     for (const Robot &friendly_robot: world_friendly_team) {
-        addHRVORobotAgent(friendly_robot, TeamSide::FRIENDLY);
+        configureHRVORobot(friendly_robot);
     }
 
     for (const Robot &enemy_robot: world_enemy_team) {
 //        TODO
-//        use 1 map with agent.
 //        std::size_t robot =
 //                addLinearVelocityRobotAgent(enemy_robot, goal_position);
 //        enemy_team.insert(enemy_robot.id(), agent_index);
     }
 }
-
-//std::vector<Robot> HRVOSimulator::merge() {
-//    for (const LVAgent &enemy_robot: enemy_team) {
-//        enemy_robot.agent_type
-//
-//    }
-//}
 
 
 void HRVOSimulator::updatePrimitiveSet(const TbotsProto::PrimitiveSet &new_primitive_set) {
@@ -48,14 +37,15 @@ void HRVOSimulator::updatePrimitiveSet(const TbotsProto::PrimitiveSet &new_primi
 
     // Update all friendly agent's primitives
     for (auto &[robot_id, primitive]: primitive_set.robot_primitives()) {
-        auto hrvo_agent_opt = getFriendlyAgentFromRobotId(robot_id);
-        if (hrvo_agent_opt.has_value() && world.has_value()) {
-            hrvo_agent_opt.value()->updatePrimitive(primitive, world.value());
+        auto agent = robots[robot_id];
+        if (world.has_value()) {
+            // TODO time_step
+            agent->updatePrimitive(primitive, world.value(), 1 / 60);
         }
     }
 }
 
-void HRVOSimulator::addHRVORobotAgent(const Robot &robot, TeamSide type) {
+void HRVOSimulator::configureHRVORobot(const Robot &robot) {
     float max_accel = 1e-4;
     float max_speed = 1e-4;
     // TODO move this logic to constructor for agent
@@ -102,11 +92,10 @@ void HRVOSimulator::addHRVORobotAgent(const Robot &robot, TeamSide type) {
     RobotPath path =
             RobotPath({PathPoint(destination_point, speed_at_goal)}, path_radius);
 
-    std::shared_ptr<HRVOAgent> agent = std::make_shared<HRVOAgent>(robot.id(), robot.currentState(),
-                                                                   type, path_radius, path, max_speed, max_accel,
+    std::shared_ptr<Agent> agent = std::make_shared<HRVOAgent>(robot.id(), robot.currentState(),
+                                                                   TeamSide::FRIENDLY, path_radius, path, max_speed, max_accel,
                                                                    FRIENDLY_ROBOT_RADIUS_MAX_INFLATION);
-
-    friendly_team.insert(std::make_pair(robot.id(), agent));
+    robots.insert({robot.id(), agent});
 
 }
 
@@ -156,7 +145,7 @@ void HRVOSimulator::addLinearVelocityRobotAgent(const Robot &robot, const Vector
                                                                max_radius_inflation, curr_velocity, max_speed,
                                                                max_accel, path, robot_id, type);
 
-    agents.push_back(std::move(agent));
+    robots.push_back(std::move(agent));
     return agents.size() - 1;
 }
 
@@ -167,12 +156,12 @@ void HRVOSimulator::doStep(double time_step) {
     }
 
 
-    if (friendly_team.empty() || enemy_team.empty()) {
+    if (robots.empty()) {
         return;
     }
 
     // Update all the hrvo robots velocities radii based on their current velocity
-    for (auto &robot: friendly_team) {
+    for (auto &robot: robots) {
         // Linearly increase radius based on the current agent velocity
         robot->updateRadiusFromVelocity();
     }
@@ -190,6 +179,12 @@ void HRVOSimulator::doStep(double time_step) {
 
 void HRVOSimulator::visualize(unsigned int robot_id)
 {
+    std::shared_ptr<HRVOAgent> robot = std::static_pointer_cast<HRVOAgent>(robots[robot_id]);
+    std::vector<TbotsProto::VelocityObstacle> velocity_obstacles;
+    for (const VelocityObstacle &vo : velocity_obstacles)
+    {
+        velocity_obstacles.emplace_back(*createVelocityObstacleProto(vo, getPosition()));
+    }
     return;
 }
 

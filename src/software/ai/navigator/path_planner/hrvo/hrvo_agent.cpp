@@ -2,39 +2,26 @@
 
 HRVOAgent::HRVOAgent(RobotId robot_id, const RobotState &robot_state, TeamSide side, RobotPath &path,
                      double radius, double min_radius, double max_speed, double max_accel, double max_radius_inflation) :
-          robot_id(robot_id),
-          robot_state(robot_state),
-          side(side),
-          path(path),
-          radius(radius),
-          velocity_obstacles(),
-          Agent(min_radius, max_speed, max_accel, max_radius_inflation)
+                     obstacle_factory(),
+                     Agent(robot_id, robot_state, side,
+                           path, radius, min_radius, max_speed,
+                           max_accel, max_radius_inflation)
 {
-}
-
-void HRVOAgent::updateRadiusFromVelocity() {
-    // Linearly increase radius based on the current agent velocity
-    radius = min_radius + max_radius_inflation * (robot_state.velocity().length() / max_speed);
-}
-
-const RobotPath &LVAgent::getPath()
-{
-    return path;
 }
 
 void HRVOAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive,
-                                const World &world, double time_step)
+                                const World &world,
+                                Duration time_step)
 {
     RobotPath path;
-//    static_obstacles.clear();
-//    ball_obstacle = std::nullopt;
+    static_obstacles.clear();
+    ball_obstacle = std::nullopt;
     if (new_primitive.has_move())
     {
         const auto &motion_control = new_primitive.move().motion_control();
         float speed_at_dest        = new_primitive.move().final_speed_m_per_s();
         float new_max_speed        = new_primitive.move().max_speed_m_per_s();
         this->max_speed = new_max_speed;
-        setPreferredSpeed(new_max_speed * PREF_SPEED_SCALE);
 
         // TODO (#2418): Update implementation of Primitive to support
         // multiple path points and remove this check
@@ -44,7 +31,7 @@ void HRVOAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive,
 
         // Max distance which the robot can travel in one time step + scaling
         // TODO (#2370): This constant is calculated multiple times.
-        float path_radius = (max_speed * time_step) / 2;
+        double path_radius = (max_speed * time_step.toMilliseconds()) / 2;
         auto path_points  = {PathPoint(
                 Point(destination.x_meters(), destination.y_meters()), speed_at_dest)};
         path              = RobotPath(path_points, path_radius);
@@ -76,14 +63,16 @@ void HRVOAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive,
     this->path = path;
 }
 
-std::set<std::pair<float, std::size_t>> HRVOAgent::computeNeighbors(HRVOAgent candidate, std::vector<std::shared_ptr<Agent>> other_agents)
+std::vector<unsigned int> HRVOAgent::computeNeighbors(std::map<unsigned int, std::shared_ptr<Agent>> &robots)
 {
-    std::set<std::pair<float, std::size_t>> neighbours;
+    std::vector<unsigned int> neighbours;
     // Only consider agents within this distance away from our position
-    auto current_destination = current_path_point_opt.value().getPosition();
+    Point current_destination = path.getCurrentPathPoint()->getPosition();
     double dist_to_obstacle_threshold =
-            std::min(static_cast<double>(max_neighbor_dist),
-                     (getPosition() - current_destination).length());
+            std::min(2.5, (this->robot_state.position() - current_destination).length());
+
+
+
     // Re-calculate all agents (neighbors) within the distance threshold
     // which we want to create velocity obstacles for
     // TODO: Use brute force search algorithm instead.
@@ -91,11 +80,9 @@ std::set<std::pair<float, std::size_t>> HRVOAgent::computeNeighbors(HRVOAgent ca
     return neighbours;
 }
 
-
-std::vector<VelocityObstacle> HRVOAgent::computeVelocityObstacles(std::vector<std::shared_ptr<Agent>> &neighbours)
+void HRVOAgent::computeVelocityObstacles(std::map<unsigned int, std::shared_ptr<Agent>> &robots, Duration time_step)
 {
-    std::vector<VelocityObstacle> velocity_obstacles;
-    velocity_obstacles.reserve(neighbors.size());
+    velocity_obstacles.reserve(robots.size());
 
     const auto current_path_point_opt = getPath().getCurrentPathPoint();
     auto current_destination = current_path_point_opt.value().getPosition();
@@ -103,14 +90,14 @@ std::vector<VelocityObstacle> HRVOAgent::computeVelocityObstacles(std::vector<st
     if (!current_path_point_opt.has_value())
     {
         // Don't draw any velocity obstacles if we do not have a destination
-        return velocity_obstacles;
+        return;
     }
 
     // Create Velocity Obstacles for neighboring agents
-    std::set<std::pair<float, std::size_t>> neighbours = computeNeighbors(agents);
+    std::vector<unsigned int> neighbours = computeNeighbors(robots);
     for (const auto &neighbor : neighbours)
     {
-        std::shared_ptr<Agent> other_agent = agents[neighbor.second];
+        std::shared_ptr<Agent> other_agent = robots[neighbor];
         VelocityObstacle velocity_obstacle = this->createVelocityObstacle(*other_agent);
         velocity_obstacles.push_back(velocity_obstacle);
     }
@@ -148,16 +135,13 @@ std::vector<VelocityObstacle> HRVOAgent::computeVelocityObstacles(std::vector<st
             velocity_obstacles.push_back(velocity_obstacle);
         }
     }
-
-    return velocity_obstacles;
 }
 
 VelocityObstacle HRVOAgent::createVelocityObstacle(const Agent &other_agent)
 {
-    Circle obstacle_agent_circle(Point(getPosition()), radius_);
-    Circle moving_agent_circle(Point(other_agent.getPosition()), radius_);
-    auto vo = generateVelocityObstacle(obstacle_agent_circle, moving_agent_circle,
-                                       getVelocity());
+    Circle obstacle_agent_circle(robot_state.position(), radius);
+    Circle moving_agent_circle(other_agent.robot_state.position(), radius);
+    auto vo = generateVelocityObstacle(obstacle_agent_circle, moving_agent_circle, robot_state.velocity());
 
     // Convert velocity obstacle to hybrid reciprocal velocity obstacle (HRVO)
     // by shifting one side of the velocity obstacle to share the responsibility
@@ -166,8 +150,8 @@ VelocityObstacle HRVOAgent::createVelocityObstacle(const Agent &other_agent)
     // Refer to: https://gamma.cs.unc.edu/HRVO/HRVO-T-RO.pdf#page=2
     Vector vo_side;
     Vector rvo_side;
-    if ((other_agent.getPrefVelocity() - pref_velocity_)
-            .isClockwiseOf(position_ - other_agent.getPosition()))
+    if ((other_agent.getPrefVelocity() - pref_velocity)
+            .isClockwiseOf(robot_state.position() - other_agent.robot_state.position()))
     {
         vo_side  = vo.getLeftSide();
         rvo_side = vo.getRightSide();
@@ -178,7 +162,7 @@ VelocityObstacle HRVOAgent::createVelocityObstacle(const Agent &other_agent)
         vo_side  = vo.getRightSide();
         rvo_side = vo.getLeftSide();
     }
-    Vector rvo_apex = (pref_velocity_ + other_agent.getPrefVelocity()) / 2;
+    Vector rvo_apex = (pref_velocity + other_agent.getPrefVelocity()) / 2;
     Line vo_side_line(Point(vo.getApex()), Point(vo.getApex() + vo_side));
     Line rvo_side_line(Point(rvo_apex), Point(rvo_apex + rvo_side));
 
@@ -192,252 +176,246 @@ VelocityObstacle HRVOAgent::createVelocityObstacle(const Agent &other_agent)
     return VelocityObstacle(hrvo_apex, vo.getLeftSide(), vo.getRightSide());
 }
 
-void HRVOAgent::computeNewVelocity(std::map<int, HRVOAgent> &friendlies, std::map<int, LVAgent> &enemies, double time_step)
+void HRVOAgent::computeNewVelocity(std::map<unsigned int, std::shared_ptr<Agent>> &agents, Duration time_step)
 {
     // Based on The Hybrid Reciprocal Velocity Obstacle paper:
     // https://gamma.cs.unc.edu/HRVO/HRVO-T-RO.pdf
-    // these should return values instead of set fields
-    const auto pref_velocity = computePreferredVelocity(time_step);
-    const auto velocity_obstacles = computeVelocityObstacles(friendlies, enemies);
 
-    std::vector<std::pair<int, Candidate>> candidates;
+    computeVelocityObstacles(agents, time_step);
+    const auto pref_velocity = computePreferredVelocity(time_step);
+
+    std::multimap<double, Candidate> candidates;
 
     // verifies that the candidate speed is realistic and adds it to the possible
     // candidates
     auto addToCandidateListIfValid = [&](const Candidate &c) {
-        if (c.velocity.lengthSquared() < max_speed_ * max_speed_)
+        if (c.velocity.lengthSquared() < max_speed * max_speed)
         {
-            // candidates is <INT, CANDIDATE>
             // key is difference in pref to calculated velocity
-            candidates.push_back(
-                    std::make_pair((pref_velocity - c.velocity).lengthSquared(), c));
+            candidates.insert(std::make_pair((pref_velocity - c.velocity).lengthSquared(), c));
         }
     };
 
-    // Find candidate velocities which this agent can take to avoid collision
+    // Find candidate velocities which this agent can take to avoid collision.
     // if small enough, add preferred velocity as candidate velocity or a normalized
     // version of it otherwise
-    if (pref_velocity.lengthSquared() < max_speed * max_speed)
-    {
-        candidate.velocity = pref_velocity_;
-    }
-    else
-    {
-        candidate.velocity = pref_velocity_.normalize(max_speed_);
-    }
+    Vector candidate_velocity = pref_velocity.lengthSquared() < max_speed * max_speed ? pref_velocity : pref_velocity.normalize(max_speed);
+    auto candidate = Candidate(candidate_velocity);
 
-    candidates_.insert(
-            std::make_pair((pref_velocity_ - candidate.velocity).lengthSquared(), candidate));
+    candidates.insert(std::make_pair((pref_velocity - candidate.velocity).lengthSquared(), candidate));
 
     // this adds candidate points that are projections of the preferred velocity onto the
     // line segment of each obstacle
-    for (int i = 0; i < static_cast<int>(velocity_obstacles_.size()); ++i)
+    for (int i = 0; i < static_cast<int>(velocity_obstacles.size()); ++i)
     {
         const Vector apex_to_pref_velocity =
-                pref_velocity_ - velocity_obstacles_[i].getApex();
+                pref_velocity - velocity_obstacles[i].getApex();
 
         candidate.velocity_obstacle_1_ = i;
         candidate.velocity_obstacle_2_ = i;
 
-        const float dot_product_1 =
-                apex_to_pref_velocity.dot(velocity_obstacles_[i].getRightSide());
-        const float dot_product_2 =
-                apex_to_pref_velocity.dot(velocity_obstacles_[i].getLeftSide());
+        const double dot_product_1 =
+                apex_to_pref_velocity.dot(velocity_obstacles[i].getRightSide());
+        const double dot_product_2 =
+                apex_to_pref_velocity.dot(velocity_obstacles[i].getLeftSide());
 
         if (dot_product_1 > 0.0f &&
-            velocity_obstacles_[i].getRightSide().isClockwiseOf(apex_to_pref_velocity))
+            velocity_obstacles[i].getRightSide().isClockwiseOf(apex_to_pref_velocity))
         {
-            candidate.velocity = velocity_obstacles_[i].getApex() +
-                                 dot_product_1 * velocity_obstacles_[i].getRightSide();
+            candidate.velocity = velocity_obstacles[i].getApex() +
+                                 dot_product_1 * velocity_obstacles[i].getRightSide();
 
             addToCandidateListIfValid(candidate);
         }
 
         if (dot_product_2 > 0.0f &&
-            velocity_obstacles_[i].getLeftSide().isCounterClockwiseOf(
+            velocity_obstacles[i].getLeftSide().isCounterClockwiseOf(
                     apex_to_pref_velocity))
         {
-            candidate.velocity = velocity_obstacles_[i].getApex() +
-                                 dot_product_2 * velocity_obstacles_[i].getLeftSide();
+            candidate.velocity = velocity_obstacles[i].getApex() +
+                                 dot_product_2 * velocity_obstacles[i].getLeftSide();
 
             addToCandidateListIfValid(candidate);
         }
     }
 
-    for (int j = 0; j < static_cast<int>(velocity_obstacles_.size()); ++j)
+    for (int j = 0; j < static_cast<int>(velocity_obstacles.size()); ++j)
     {
-        candidate.velocity_obstacle_1_ = std::numeric_limits<int>::max();
+        candidate.velocity_obstacle_1 = std::numeric_limits<int>::max();
         candidate.velocity_obstacle_2_ = j;
 
-        float discriminant =
-                max_speed_ * max_speed_ -
-                std::pow((velocity_obstacles_[j].getApex())
-                                 .determinant(velocity_obstacles_[j].getRightSide()),
+        double discriminant =
+                max_speed * max_speed -
+                std::pow((velocity_obstacles[j].getApex())
+                                 .determinant(velocity_obstacles[j].getRightSide()),
                          2.f);
 
         if (discriminant > 0.0f)
         {
-            const float t1 = -(velocity_obstacles_[j].getApex().dot(
-                    velocity_obstacles_[j].getRightSide())) +
+            const double t1 = -(velocity_obstacles[j].getApex().dot(
+                    velocity_obstacles[j].getRightSide())) +
                              std::sqrt(discriminant);
-            const float t2 = -(velocity_obstacles_[j].getApex().dot(
-                    velocity_obstacles_[j].getRightSide())) -
+            const double t2 = -(velocity_obstacles[j].getApex().dot(
+                    velocity_obstacles[j].getRightSide())) -
                              std::sqrt(discriminant);
 
             if (t1 >= 0.0f)
             {
-                candidate.velocity = velocity_obstacles_[j].getApex() +
-                                     t1 * velocity_obstacles_[j].getRightSide();
-                candidates_.insert(std::make_pair(
-                        (pref_velocity_ - candidate.velocity).lengthSquared(), candidate));
+                candidate.velocity = velocity_obstacles[j].getApex() +
+                                     t1 * velocity_obstacles[j].getRightSide();
+                candidates.insert(std::make_pair(
+                        (pref_velocity - candidate.velocity).lengthSquared(), candidate));
             }
 
             if (t2 >= 0.0f)
             {
-                candidate.velocity = velocity_obstacles_[j].getApex() +
-                                     t2 * velocity_obstacles_[j].getRightSide();
-                candidates_.insert(std::make_pair(
-                        (pref_velocity_ - candidate.velocity).lengthSquared(), candidate));
+                candidate.velocity = velocity_obstacles[j].getApex() +
+                                     t2 * velocity_obstacles[j].getRightSide();
+                candidates.insert(std::make_pair(
+                        (pref_velocity - candidate.velocity).lengthSquared(), candidate));
             }
         }
 
-        discriminant = max_speed_ * max_speed_ -
-                       std::pow((velocity_obstacles_[j].getApex())
-                                        .determinant(velocity_obstacles_[j].getLeftSide()),
+        discriminant = max_speed * max_speed -
+                       std::pow((velocity_obstacles[j].getApex())
+                                        .determinant(velocity_obstacles[j].getLeftSide()),
                                 2.f);
 
         if (discriminant > 0.0f)
         {
-            const float t1 = -(velocity_obstacles_[j].getApex().dot(
-                    velocity_obstacles_[j].getLeftSide())) +
+            const double t1 = -(velocity_obstacles[j].getApex().dot(
+                    velocity_obstacles[j].getLeftSide())) +
                              std::sqrt(discriminant);
-            const float t2 = -(velocity_obstacles_[j].getApex().dot(
-                    velocity_obstacles_[j].getLeftSide())) -
+            const double t2 = -(velocity_obstacles[j].getApex().dot(
+                    velocity_obstacles[j].getLeftSide())) -
                              std::sqrt(discriminant);
 
             if (t1 >= 0.0f)
             {
-                candidate.velocity = velocity_obstacles_[j].getApex() +
-                                     t1 * velocity_obstacles_[j].getLeftSide();
-                candidates_.insert(std::make_pair(
-                        (pref_velocity_ - candidate.velocity).lengthSquared(), candidate));
+                candidate.velocity = velocity_obstacles[j].getApex() +
+                                     t1 * velocity_obstacles[j].getLeftSide();
+                candidates.insert(std::make_pair(
+                        (pref_velocity - candidate.velocity).lengthSquared(), candidate));
             }
 
             if (t2 >= 0.0f)
             {
-                candidate.velocity = velocity_obstacles_[j].getApex() +
-                                     t2 * velocity_obstacles_[j].getLeftSide();
-                candidates_.insert(std::make_pair(
-                        (pref_velocity_ - candidate.velocity).lengthSquared(), candidate));
+                candidate.velocity = velocity_obstacles[j].getApex() +
+                                     t2 * velocity_obstacles[j].getLeftSide();
+                candidates.insert(std::make_pair(
+                        (pref_velocity - candidate.velocity).lengthSquared(), candidate));
             }
         }
     }
 
     // intersection points of all velocity obstacles with each other
-    for (int i = 0; i < static_cast<int>(velocity_obstacles_.size()) - 1; ++i)
+    // except for last obstacle?
+    for (int i = 0; i < static_cast<int>(velocity_obstacles.size()) - 1; ++i)
     {
-        for (int j = i + 1; j < static_cast<int>(velocity_obstacles_.size()); ++j)
+        for (int j = i + 1; j < static_cast<int>(velocity_obstacles.size()); ++j)
         {
             candidate.velocity_obstacle_1_ = i;
             candidate.velocity_obstacle_2_ = j;
 
-            float d = (velocity_obstacles_[i].getRightSide())
-                    .determinant(velocity_obstacles_[j].getRightSide());
+            double d = (velocity_obstacles[i].getRightSide())
+                    .determinant(velocity_obstacles[j].getRightSide());
 
             if (d != 0.0f)
             {
-                const float s =
-                        (velocity_obstacles_[j].getApex() - velocity_obstacles_[i].getApex())
-                                .determinant(velocity_obstacles_[j].getRightSide()) /
+                // TODO
+                // refactor these calculations into separate function
+                const double s =
+                        (velocity_obstacles[j].getApex() - velocity_obstacles[i].getApex())
+                                .determinant(velocity_obstacles[j].getRightSide()) /
                         d;
-                const float t =
-                        (velocity_obstacles_[j].getApex() - velocity_obstacles_[i].getApex())
-                                .determinant(velocity_obstacles_[i].getRightSide()) /
+                const double t =
+                        (velocity_obstacles[j].getApex() - velocity_obstacles[i].getApex())
+                                .determinant(velocity_obstacles[i].getRightSide()) /
                         d;
 
                 if (s >= 0.0f && t >= 0.0f)
                 {
-                    candidate.velocity = velocity_obstacles_[i].getApex() +
-                                         s * velocity_obstacles_[i].getRightSide();
+                    candidate.velocity = velocity_obstacles[i].getApex() +
+                                         s * velocity_obstacles[i].getRightSide();
                     addToCandidateListIfValid(candidate);
                 }
             }
 
-            d = (velocity_obstacles_[i].getLeftSide())
-                    .determinant(velocity_obstacles_[j].getRightSide());
+            d = (velocity_obstacles[i].getLeftSide())
+                    .determinant(velocity_obstacles[j].getRightSide());
 
             if (d != 0.0f)
             {
-                const float s =
-                        (velocity_obstacles_[j].getApex() - velocity_obstacles_[i].getApex())
-                                .determinant(velocity_obstacles_[j].getRightSide()) /
+                const double s =
+                        (velocity_obstacles[j].getApex() - velocity_obstacles[i].getApex())
+                                .determinant(velocity_obstacles[j].getRightSide()) /
                         d;
-                const float t =
-                        (velocity_obstacles_[j].getApex() - velocity_obstacles_[i].getApex())
-                                .determinant(velocity_obstacles_[i].getLeftSide()) /
+                const double t =
+                        (velocity_obstacles[j].getApex() - velocity_obstacles[i].getApex())
+                                .determinant(velocity_obstacles[i].getLeftSide()) /
                         d;
 
                 if (s >= 0.0f && t >= 0.0f)
                 {
-                    candidate.velocity = velocity_obstacles_[i].getApex() +
-                                         s * velocity_obstacles_[i].getLeftSide();
+                    candidate.velocity = velocity_obstacles[i].getApex() +
+                                         s * velocity_obstacles[i].getLeftSide();
                     addToCandidateListIfValid(candidate);
                 }
             }
 
-            d = (velocity_obstacles_[i].getRightSide())
-                    .determinant(velocity_obstacles_[j].getLeftSide());
+            d = (velocity_obstacles[i].getRightSide())
+                    .determinant(velocity_obstacles[j].getLeftSide());
 
             if (d != 0.0f)
             {
-                const float s =
-                        (velocity_obstacles_[j].getApex() - velocity_obstacles_[i].getApex())
-                                .determinant(velocity_obstacles_[j].getLeftSide()) /
+                const double s =
+                        (velocity_obstacles[j].getApex() - velocity_obstacles[i].getApex())
+                                .determinant(velocity_obstacles[j].getLeftSide()) /
                         d;
-                const float t =
-                        (velocity_obstacles_[j].getApex() - velocity_obstacles_[i].getApex())
-                                .determinant(velocity_obstacles_[i].getRightSide()) /
+                const double t =
+                        (velocity_obstacles[j].getApex() - velocity_obstacles[i].getApex())
+                                .determinant(velocity_obstacles[i].getRightSide()) /
                         d;
 
                 if (s >= 0.0f && t >= 0.0f)
                 {
-                    candidate.velocity = velocity_obstacles_[i].getApex() +
-                                         s * velocity_obstacles_[i].getRightSide();
+                    candidate.velocity = velocity_obstacles[i].getApex() +
+                                         s * velocity_obstacles[i].getRightSide();
                     addToCandidateListIfValid(candidate);
                 }
             }
 
-            d = (velocity_obstacles_[i].getLeftSide())
-                    .determinant(velocity_obstacles_[j].getLeftSide());
+            d = (velocity_obstacles[i].getLeftSide())
+                    .determinant(velocity_obstacles[j].getLeftSide());
 
             if (d != 0.0f)
             {
-                const float s =
-                        (velocity_obstacles_[j].getApex() - velocity_obstacles_[i].getApex())
-                                .determinant(velocity_obstacles_[j].getLeftSide()) /
+                const double s =
+                        (velocity_obstacles[j].getApex() - velocity_obstacles[i].getApex())
+                                .determinant(velocity_obstacles[j].getLeftSide()) /
                         d;
-                const float t =
-                        (velocity_obstacles_[j].getApex() - velocity_obstacles_[i].getApex())
-                                .determinant(velocity_obstacles_[i].getLeftSide()) /
+                const double t =
+                        (velocity_obstacles[j].getApex() - velocity_obstacles[i].getApex())
+                                .determinant(velocity_obstacles[i].getLeftSide()) /
                         d;
 
                 if (s >= 0.0f && t >= 0.0f)
                 {
-                    candidate.velocity = velocity_obstacles_[i].getApex() +
-                                         s * velocity_obstacles_[i].getLeftSide();
+                    candidate.velocity = velocity_obstacles[i].getApex() +
+                                         s * velocity_obstacles[i].getLeftSide();
                     addToCandidateListIfValid(candidate);
                 }
             }
         }
     }
 
-    double min_pref_speed = pref_velocity_.length() * MIN_PREF_SPEED_MULTIPLER;
+    double min_pref_speed = pref_velocity.length() * MIN_PREF_SPEED_MULTIPLIER;
 
     // corresponds to the velocity obstacle that is furthest away when picking a velocity
     // we might collide with
     int optimal_furthest_away_obstacle = -1;
 
-    new_velocity_ = Vector();
+    new_velocity = Vector();
 
     // Choosing a candidate velocity has these goals:
     // - Pick a velocity as close as possible to the preferred velocity as long as it
@@ -446,7 +424,7 @@ void HRVOAgent::computeNewVelocity(std::map<int, HRVOAgent> &friendlies, std::ma
     // velocity that minimizes collisions with the closest velocity obstacles
     // - Candidate multimap is organized by distance from preferred velocity so we pick
     // the first valid velocity
-    for (const auto [dist_to_pref_velocity_sq, candidate] : candidates_)
+    for (const auto [dist_to_pref_velocity_sq, candidate] : candidates)
     {
         std::optional<int> first_intersecting_velocity_obstacle =
                 findIntersectingVelocityObstacle(candidate);
@@ -455,7 +433,7 @@ void HRVOAgent::computeNewVelocity(std::map<int, HRVOAgent> &friendlies, std::ma
         // and is fast
         if (isIdealCandidate(candidate))
         {
-            new_velocity_ = candidate.velocity;
+            new_velocity = candidate.velocity;
             return;
         }
 
@@ -483,7 +461,7 @@ void HRVOAgent::computeNewVelocity(std::map<int, HRVOAgent> &friendlies, std::ma
                 optimal_furthest_away_obstacle =
                         first_intersecting_velocity_obstacle.value();
             }
-            new_velocity_ = candidate.velocity;
+            new_velocity = candidate.velocity;
         }
     }
 }
@@ -496,7 +474,7 @@ bool HRVOAgent::isIdealCandidate(const Candidate &candidate) const
 
 bool HRVOAgent::isCandidateSlow(const Candidate &candidate) const
 {
-    double min_pref_speed = std::abs(pref_velocity_.length()) * MIN_PREF_SPEED_MULTIPLER;
+    double min_pref_speed = std::abs(pref_velocity.length()) * MIN_PREF_SPEED_MULTIPLIER;
 
     return std::abs(candidate.velocity.length()) < min_pref_speed;
 }
@@ -508,16 +486,16 @@ bool HRVOAgent::isCandidateFast(const Candidate &candidate) const
 
 bool HRVOAgent::isCandidateFasterThanCurrentSpeed(const Candidate &candidate) const
 {
-    return std::abs(candidate.velocity.length()) > std::abs(new_velocity_.length());
+    return std::abs(candidate.velocity.length()) > std::abs(new_velocity.length());
 }
 
 std::optional<int> HRVOAgent::findIntersectingVelocityObstacle(
         const Candidate &candidate) const
 {
-    for (int j = 0; j < static_cast<int>(velocity_obstacles_.size()); ++j)
+    for (int j = 0; j < static_cast<int>(velocity_obstacles.size()); ++j)
     {
         if (j != candidate.velocity_obstacle_1_ && j != candidate.velocity_obstacle_2_ &&
-            velocity_obstacles_[j].containsVelocity(candidate.velocity))
+            velocity_obstacles[j].containsVelocity(candidate.velocity))
         {
             return std::make_optional<int>(j);
         }
@@ -526,27 +504,27 @@ std::optional<int> HRVOAgent::findIntersectingVelocityObstacle(
     return std::nullopt;
 }
 
-Vector HRVOAgent::computePreferredVelocity(double time_step)
+Vector HRVOAgent::computePreferredVelocity(Duration time_step)
 {
+    double pref_speed = max_speed * PREF_SPEED_SCALE;
     auto path_point_opt = path.getCurrentPathPoint();
 
-    if (pref_speed_ <= 0.01f || max_accel_ <= 0.01f || path_point_opt == std::nullopt)
+    if (pref_speed <= 0.01f || max_accel <= 0.01f || path_point_opt == std::nullopt)
     {
         // Used to avoid edge cases with division by zero
         return Vector(0.f, 0.f);
     }
 
-    Vector goal_position = path_point_opt.value().getPosition();
-    float speed_at_goal  = path_point_opt.value().getSpeed();
+    Point goal_position = path_point_opt.value().getPosition();
+    double speed_at_goal  = path_point_opt.value().getSpeed();
 
-    Vector dist_vector_to_goal = goal_position - position_;
+    Vector dist_vector_to_goal = goal_position - robot_state.position();
     auto dist_to_goal          = static_cast<float>(dist_vector_to_goal.length());
 
     // d = (Vf^2 - Vi^2) / 2a
     double start_linear_deceleration_distance =
-            std::abs((std::pow(speed_at_goal, 2) - std::pow(pref_speed_, 2)) /
-                     (2 * max_accel_)) *
-            decel_dist_multiplier;
+            std::abs((std::pow(speed_at_goal, 2) - std::pow(pref_speed, 2)) /
+                     (2 * max_accel)) * DECEL_DIST_MULTIPLIER;
 
     if (dist_to_goal < start_linear_deceleration_distance)
     {
@@ -555,13 +533,12 @@ Vector HRVOAgent::computePreferredVelocity(double time_step)
         // v_pref = sqrt(v_goal^2 + 2 * a * d_remainingToDestination)
         float curr_pref_speed =
                 static_cast<float>(
-                        std::sqrt(std::pow(speed_at_goal, 2) + 2 * max_accel_ * dist_to_goal)) *
-                decel_pref_speed_multiplier;
+                        std::sqrt(std::pow(speed_at_goal, 2) + 2 * max_accel * dist_to_goal)) * DECEL_PREF_SPEED_MULTIPLIER;
         Vector ideal_pref_velocity = dist_vector_to_goal.normalize(curr_pref_speed);
 
         // Limit the preferred velocity to the kinematic limits
-        const Vector dv = ideal_pref_velocity - velocity_;
-        if (dv.length() <= max_accel_ * time_step)
+        const Vector dv = ideal_pref_velocity - robot_state.velocity();
+        if (dv.length() <= max_accel * time_step.toMilliseconds())
         {
             return ideal_pref_velocity;
         }
@@ -569,7 +546,7 @@ Vector HRVOAgent::computePreferredVelocity(double time_step)
         {
             // Calculate the maximum velocity towards the preferred velocity, given the
             // acceleration constraint
-            return velocity_ + dv.normalize(max_accel_ * time_step);
+            return robot_state.velocity() + dv.normalize(max_accel * time_step);
         }
     }
     else
@@ -577,90 +554,19 @@ Vector HRVOAgent::computePreferredVelocity(double time_step)
         // Accelerate to preferred speed
         // v_pref = v_now + a * t
         float curr_pref_speed =
-                std::min(static_cast<double>(pref_speed_),
+                std::min(static_cast<double>(pref_speed),
                         //
-                         velocity_.length() + max_accel_ * time_step);
+                         robot_state.velocity().length() + max_accel * time_step.toMilliseconds());
         return dist_vector_to_goal.normalize(curr_pref_speed);
-    }
-}
-
-void HRVOAgent::updateRadiusFromVelocity() {
-    radius = min_radius_ + max_radius_inflation_ * (velocity.length() / max_speed);
-}
-
-void HRVOAgent::insertNeighbor(std::size_t agent_no, float &range_sq)
-{
-    std::shared_ptr<Agent> other_agent = simulator_->getAgents()[agent_no];
-    auto path_point_opt                = path.getCurrentPathPoint();
-
-    if (path_point_opt == std::nullopt || this == other_agent.get())
-    {
-        // return if we don't have a path
-        // or we're adding this robot as a neighbour to itself
-        return;
-    }
-
-    Vector other_agent_relative_pos = other_agent->getPosition() - position_;
-    const float dist_sq             = other_agent_relative_pos.lengthSquared();
-
-    Vector goal_pos          = path_point_opt.value().getPosition();
-    Vector relative_goal_pos = goal_pos - position_;
-
-    // Whether the other robot is with in 45 degrees of the goal, relative to us
-    const float forty_five_deg_ratio = 1.f / std::sqrt(2.f);
-    bool is_other_agent_in_front =
-            relative_goal_pos.normalize().dot(other_agent_relative_pos.normalize()) >
-            forty_five_deg_ratio;
-
-    bool is_other_agent_moving_towards_us =
-            velocity_.normalize().dot((other_agent->getVelocity()).normalize()) <
-            -forty_five_deg_ratio;
-
-    // Whether the other agent is within a 1.5-meter radius of our goal
-    bool is_other_agent_near_goal =
-            (other_agent->getPosition() - goal_pos).lengthSquared() < 1.5f;
-
-    // Helper lambda function for adding other_agent to list of neighbors
-    auto add_other_agent = [&]() {
-        if (neighbors_.size() == max_neighbors_)
-        {
-            neighbors_.erase(--neighbors_.end());
-        }
-
-        neighbors_.insert(std::make_pair(dist_sq, agent_no));
-
-        if (neighbors_.size() == max_neighbors_)
-        {
-            range_sq = (--neighbors_.end())->first;
-        }
-    };
-
-    if (dist_sq < std::pow(radius_ + other_agent->getRadius(), 2))
-    {
-        // In collision with other agent, so the other neighbors are not important
-        neighbors_.clear();
-        add_other_agent();
-    }
-    else if (dist_sq < range_sq)
-    {
-        add_other_agent();
-    }
-    else if (is_other_agent_in_front && is_other_agent_moving_towards_us &&
-             is_other_agent_near_goal)
-    {
-        // This is an edge case for when the other agent is outside our search range,
-        // but is moving towards us from behind our destination, so it is posing a
-        // possible threat of collision if we ignore it.
-        add_other_agent();
     }
 }
 
 std::vector<TbotsProto::VelocityObstacle> HRVOAgent::getVelocityObstaclesAsProto() const
 {
     std::vector<TbotsProto::VelocityObstacle> velocity_obstacles;
-    for (const VelocityObstacle &vo : velocity_obstacles_)
+    for (const VelocityObstacle &vo : velocity_obstacles)
     {
-        velocity_obstacles.emplace_back(*createVelocityObstacleProto(vo, getPosition()));
+        velocity_obstacles.emplace_back(*createVelocityObstacleProto(vo, robot_state.position()));
     }
     return velocity_obstacles;
 }
@@ -669,15 +575,10 @@ std::vector<Circle> HRVOAgent::getCandidateVelocitiesAsCircles(
         const float circle_rad) const
 {
     std::vector<Circle> candidate_circles;
-    for (auto &candidate : candidates_)
+    for (auto &candidate : candidates)
     {
-        Vector candidate_pos = position_ + candidate.second.velocity;
+        Vector candidate_pos = robot_state.position() + candidate.second.velocity;
         candidate_circles.emplace_back(Circle(Point(candidate_pos), circle_rad));
     }
     return candidate_circles;
-}
-
-void HRVOAgent::setPreferredSpeed(float new_pref_speed)
-{
-    pref_speed_ = new_pref_speed;
 }

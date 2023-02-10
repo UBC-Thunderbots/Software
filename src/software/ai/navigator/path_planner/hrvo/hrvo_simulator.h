@@ -45,6 +45,11 @@ public:
 
     void doStep(double time_step);
 
+    /**
+     * Assumption: friendly team is the only robots running HRVO,
+     * only enemy robots have robot id offset
+     * @param robot_id
+     */
     void visualize(unsigned int robot_id);
 
 private:
@@ -56,7 +61,7 @@ private:
      * @param type     Whether this robot is FRIENDLY or ENEMY
      *
      */
-    void addHRVORobotAgent(const Robot &robot, TeamSide type);
+    void configureHRVORobot(const Robot &robot);
 
     /**
      *      Adds a new Linear Velocity Agent to the simulation based on Robot.
