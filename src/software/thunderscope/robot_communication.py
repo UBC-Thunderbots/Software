@@ -28,6 +28,7 @@ class RobotCommunication(object):
         current_mode,
         multicast_channel,
         interface,
+        disable_estop,
         estop_path="/dev/ttyACM0",
         estop_buadrate=115200,
     ):
@@ -37,6 +38,7 @@ class RobotCommunication(object):
         :param current_mode: one of RobotCommunicationMode, indicates which mode is currently running
         :param multicast_channel: The multicast channel to use
         :param interface: The interface to use
+        :param disable_estop: whether to disable estop checks (ONLY FOR TESTING LOCALLY)
         :param estop_path: The path to the estop
         :param estop_baudrate: The baudrate of the estop
 
@@ -44,11 +46,12 @@ class RobotCommunication(object):
         self.sequence_number = 0
         self.last_time = time.time()
         self.current_proto_unix_io = current_proto_unix_io
+        self.current_mode = current_mode
         self.multicast_channel = str(multicast_channel)
         self.interface = interface
+        self.disable_estop = disable_estop
         self.estop_path = estop_path
         self.estop_buadrate = estop_buadrate
-        self.current_mode = current_mode
 
         self.world_buffer = ThreadSafeBuffer(1, World)
         self.primitive_buffer = ThreadSafeBuffer(1, PrimitiveSet)
@@ -87,18 +90,22 @@ class RobotCommunication(object):
         self.send_estop_state_thread = threading.Thread(target=self.__send_estop_state)
         self.run_thread = threading.Thread(target=self.run)
 
-        try:
-            self.estop_reader = ThreadedEstopReader(
-                self.estop_path, self.estop_buadrate
-            )
-        except Exception:
-            raise Exception("Could not find estop, make sure its plugged in")
+        if not self.disable_estop:
+            try:
+                self.estop_reader = ThreadedEstopReader(
+                    self.estop_path, self.estop_buadrate
+                )
+            except Exception:
+                raise Exception("Could not find estop, make sure its plugged in")
 
     def __send_estop_state(self):
-        while True:
-            self.current_proto_unix_io.send_proto(
-                EstopState, EstopState(is_playing=self.estop_reader.isEstopPlay())
-            )
+        if self.disable_estop:
+            pass
+        else:
+            while True:
+                self.current_proto_unix_io.send_proto(
+                    EstopState, EstopState(is_playing=self.estop_reader.isEstopPlay())
+                )
             time.sleep(0.1)
 
     def run(self):
@@ -173,7 +180,7 @@ class RobotCommunication(object):
 
             self.sequence_number += 1
 
-            if self.estop_reader.isEstopPlay():
+            if not self.disable_estop and self.estop_reader.isEstopPlay():
                 self.last_time = primitive_set.time_sent.epoch_timestamp_seconds
                 self.send_primitive_set.send_proto(primitive_set)
 
