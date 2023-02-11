@@ -7,7 +7,7 @@ from software.thunderscope.robot_diagnostics.robot_info import RobotInfo
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 
-class RobotView(QWidget):
+class RobotView(QScrollArea):
     """Class to show a snapshot of the robot's current state.
 
     Displays the vision pattern, capacitor/battery voltages,
@@ -43,7 +43,10 @@ class RobotView(QWidget):
 
             self.layout.addWidget(self.robot_info_widgets[id])
 
-        self.setLayout(self.layout)
+        self.container = QWidget()
+        self.container.setLayout(self.layout)
+        self.setWidget(self.container)
+        self.setWidgetResizable(True)
 
     def refresh(self):
         """
