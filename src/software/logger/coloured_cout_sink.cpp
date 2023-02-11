@@ -61,11 +61,19 @@ void ColouredCoutSink::displayColouredLog(g3::LogMessageMover log_entry)
         return;
     }
 
-    bool past_time = log_entry.get()._timestamp - LOG_INTERVAL_TIMESTAMP > last_msg_timestamp;
-    std::cout << "Past time: " << past_time << "\n";
-    std::cout << "Repeat: " << (log_entry.get().message() == last_msg) << "\n";
+    std::chrono::_V2::system_clock::duration current_time = log_entry.get()._timestamp.time_since_epoch();
+    bool past_time = current_time - LOG_INTERVAL_TIMESTAMP < last_msg_timestamp;
+
+    std::cout << "Interval: " << LOG_INTERVAL_TIMESTAMP.count() << "\n";
+    std::cout << "Current timestamp: " << current_time.count() << "\n";
+    std::cout << "Last timestamp: " << last_msg_timestamp.count() << "\n";
+
+    std::cout << "isPastTime: " << past_time << "\n";
+    std::cout << "isRepeat: " << (log_entry.get().message() == last_msg) << "\n\n";
+
     if (log_entry.get().message() == last_msg && past_time) {
         // repeated message outside timestamp, increase repeats and don't log
+        std::cout << "Repeated message " << num_repeats << " detected, not logging\n";
         num_repeats++;
         return;
     }
@@ -84,6 +92,6 @@ void ColouredCoutSink::displayColouredLog(g3::LogMessageMover log_entry)
     resetColour();
 
     last_msg = log_entry.get().message();
-    last_msg_timestamp = log_entry.get()._timestamp;
+    last_msg_timestamp = log_entry.get()._timestamp.time_since_epoch();
     num_repeats = 1;
 }
