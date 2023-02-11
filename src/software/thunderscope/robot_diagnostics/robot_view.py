@@ -50,7 +50,16 @@ class RobotView(QWidget):
         Refresh the view
         Gets a RobotStatus proto and calls the corresponding update method
         """
-        robot_status = self.robot_status_buffer.get(block=False)
+        #robot_status = self.robot_status_buffer.get(block=False)
+
+        robot_status = RobotStatus(
+            robot_id=5,
+            power_status=PowerStatus(
+                breakbeam_tripped=True,
+                battery_voltage=MAX_BATTERY_VOLTAGE
+            ),
+            error_code=[]
+        )
 
         self.robot_info_widgets[robot_status.robot_id].update(
             robot_status.power_status, robot_status.error_code

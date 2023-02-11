@@ -44,7 +44,6 @@ class RobotCommunication(object):
         self.sequence_number = 0
         self.last_time = time.time()
         self.current_proto_unix_io = current_proto_unix_io
-        self.current_mode = current_mode
         self.multicast_channel = str(multicast_channel)
         self.interface = interface
         self.disable_estop = disable_estop
@@ -113,7 +112,7 @@ class RobotCommunication(object):
 
             # fullsystem is running, so world data is being received
             if self.robots_connected_to_fullsystem:
-                world = self.world_buffer.get(block=False)
+                world = self.world_buffer.get(block=True)
 
                 # send the world proto
                 self.send_world.send_proto(world)
