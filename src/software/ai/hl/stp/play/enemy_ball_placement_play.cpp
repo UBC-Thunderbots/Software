@@ -69,6 +69,17 @@ void EnemyBallPlacementPlay::ballPlacementWithShadow(
         // so that we don't interfere with the enemy robots going to pick up the ball
         if (!enemy_at_ball)
         {
+            // Check to update flag
+            for (const auto &enemy_robot : world.enemyTeam().getAllRobotsExceptGoalie())
+            {
+                if (std::abs(
+                        (enemy_robot.position() - world.ball().position()).length()) <
+                    0.25)
+                {
+                    enemy_at_ball = true;
+                }
+            }
+
             move_tactics[0]->updateControlParams(
                 world.ball().position() + ball_to_net +
                     ball_to_net.perpendicular().normalize(1.25 * ROBOT_MAX_RADIUS_METERS),
@@ -79,17 +90,6 @@ void EnemyBallPlacementPlay::ballPlacementWithShadow(
                 ball_to_net.orientation() + Angle::half(), 0);
             tactics_to_run[0].emplace_back(move_tactics[0]);
             tactics_to_run[0].emplace_back(move_tactics[1]);
-
-            // Check to update flag
-            for (auto enemy_robot : world.enemyTeam().getAllRobotsExceptGoalie())
-            {
-                if (std::abs(
-                        (enemy_robot.position() - world.ball().position()).length()) <
-                    0.25)
-                {
-                    enemy_at_ball = true;
-                }
-            }
         }
         // if no threats, send two robots near placement point
         else if (enemy_threats.size() == 0)
