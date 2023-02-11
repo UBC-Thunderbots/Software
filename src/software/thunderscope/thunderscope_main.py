@@ -359,8 +359,8 @@ if __name__ == "__main__":
                 autoref_proto_unix_io = ProtoUnixIO()
                 simulator.setup_autoref_proto_unix_io(autoref_proto_unix_io)
                 autoref.setup_ssl_wrapper_packets(autoref_proto_unix_io,
-                                                  blue_full_system_proto_unix_io,
-                                                  yellow_full_system_proto_unix_io)
+                                                  tscope.blue_full_system_proto_unix_io,
+                                                  tscope.yellow_full_system_proto_unix_io)
 
             # Start the simulator
             thread = threading.Thread(

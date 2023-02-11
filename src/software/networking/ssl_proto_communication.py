@@ -42,7 +42,11 @@ class SslSocket(object):
                 response_data += self.socket.recv(
                         offset + msg_len - len(response_data)
                 )
-            ci_output.ParseFromString(response_data[offset : offset + msg_len])
+            try :
+                ci_output.ParseFromString(response_data[offset : offset + msg_len])
+            except google.protobuf.message.DecodeError as err :
+                raise SsslSocketProtoParseException("Error parsing proto: " + err.args)
+
             if not ci_output.IsInitialized():
                 raise SslSocketProtoParseException("Improper proto of type '{proto_type}' parsed")
             offset += msg_len

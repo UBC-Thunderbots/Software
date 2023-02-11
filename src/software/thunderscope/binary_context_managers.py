@@ -19,6 +19,8 @@ from extlibs.er_force_sim.src.protobuf.world_pb2 import (
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.networking.ssl_proto_communication import *
 
+import pdb
+
 def is_cmd_running(command):
     """Check if there is any running process that was launched
     with the given command.
@@ -465,7 +467,7 @@ class Gamecontroller(object):
 
         """
 
-        register_referee_command_observer(blue_full_system_proto_unix_io,
+        self.register_referee_command_observer(blue_full_system_proto_unix_io,
                                           yellow_full_system_proto_unix_io,
                                           self.referee_port)
 
@@ -722,8 +724,9 @@ class TigersAutoref(object):
             return
 
 
+        pdb.set_trace()
         self.send_geometry();
-        self.gamecontroller.resetTeamInfo(Division.DIV_B)
+        self.gamecontroller.reset_team_info(Division.DIV_B)
 
         self.gamecontroller.send_gc_command(
             gc_command=Command.Type.STOP, team=Team.UNKNOWN
