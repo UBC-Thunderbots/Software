@@ -90,6 +90,7 @@ class RobotCommunication(object):
         self.send_estop_state_thread = threading.Thread(target=self.__send_estop_state)
         self.run_thread = threading.Thread(target=self.run)
 
+        # only checks for estop if checking is not disabled
         if not self.disable_estop:
             try:
                 self.estop_reader = ThreadedEstopReader(
@@ -99,9 +100,7 @@ class RobotCommunication(object):
                 raise Exception("Could not find estop, make sure its plugged in")
 
     def __send_estop_state(self):
-        if self.disable_estop:
-            pass
-        else:
+        if not self.disable_estop:
             while True:
                 self.current_proto_unix_io.send_proto(
                     EstopState, EstopState(is_playing=self.estop_reader.isEstopPlay())
