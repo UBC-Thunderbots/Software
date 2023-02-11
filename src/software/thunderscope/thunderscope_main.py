@@ -157,7 +157,7 @@ if __name__ == "__main__":
         "--disable_estop",
         action="store_true",
         default=False,
-        help="Disables checking for estop plugged in (ONLY USE FOR LOCAL TESTING)"
+        help="Disables checking for estop plugged in (ONLY USE FOR LOCAL TESTING)",
     )
 
     # Sanity check that an interface was provided
@@ -268,7 +268,7 @@ if __name__ == "__main__":
             current_mode,
             getRobotMulticastChannel(0),
             args.interface,
-            args.disable_estop
+            args.disable_estop,
         ) as robot_communication:
             if args.run_diagnostics:
                 tscope.toggle_robot_connection_signal.connect(
