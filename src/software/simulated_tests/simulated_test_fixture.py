@@ -510,6 +510,8 @@ def simulated_test_runner():
                     yellow_full_system_proto_unix_io,
                     layout_path=args.layout,
                     visualization_buffer_size=args.visualization_buffer_size,
+                    load_blue=True,
+                    load_yellow=True
                 )
 
             time.sleep(LAUNCH_DELAY_S)
