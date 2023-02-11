@@ -106,7 +106,7 @@ class RobotCommunication(object):
 
             # fullsystem is running, so world data is being received
             if self.robots_connected_to_fullsystem:
-                world = self.world_buffer.get(block=False)
+                world = self.world_buffer.get(block=True)
 
                 # send the world proto
                 self.send_world.send_proto(world)
