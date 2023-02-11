@@ -1,10 +1,10 @@
 #include "software/ai/navigator/path_planner/hrvo/hrvo_agent.h"
 
 HRVOAgent::HRVOAgent(RobotId robot_id, const RobotState &robot_state, TeamSide side, RobotPath &path,
-                     double radius, double min_radius, double max_speed, double max_accel, double max_radius_inflation) :
-                     obstacle_factory(),
+                     double radius, double max_speed, double max_accel, double max_radius_inflation) :
+                     obstacle_factory(TbotsProto::RobotNavigationObstacleConfig()),
                      Agent(robot_id, robot_state, side,
-                           path, radius, min_radius, max_speed,
+                           path, radius, max_speed,
                            max_accel, max_radius_inflation)
 {
 }
@@ -150,7 +150,7 @@ VelocityObstacle HRVOAgent::createVelocityObstacle(const Agent &other_agent)
     // Refer to: https://gamma.cs.unc.edu/HRVO/HRVO-T-RO.pdf#page=2
     Vector vo_side;
     Vector rvo_side;
-    if ((other_agent.getPrefVelocity() - pref_velocity)
+    if ((other_agent.getPrefVelocity() - preferred_velocity)
             .isClockwiseOf(robot_state.position() - other_agent.robot_state.position()))
     {
         vo_side  = vo.getLeftSide();
@@ -162,7 +162,7 @@ VelocityObstacle HRVOAgent::createVelocityObstacle(const Agent &other_agent)
         vo_side  = vo.getRightSide();
         rvo_side = vo.getLeftSide();
     }
-    Vector rvo_apex = (pref_velocity + other_agent.getPrefVelocity()) / 2;
+    Vector rvo_apex = (preferred_velocity + other_agent.getPrefVelocity()) / 2;
     Line vo_side_line(Point(vo.getApex()), Point(vo.getApex() + vo_side));
     Line rvo_side_line(Point(rvo_apex), Point(rvo_apex + rvo_side));
 
@@ -474,7 +474,7 @@ bool HRVOAgent::isIdealCandidate(const Candidate &candidate) const
 
 bool HRVOAgent::isCandidateSlow(const Candidate &candidate) const
 {
-    double min_pref_speed = std::abs(pref_velocity.length()) * MIN_PREF_SPEED_MULTIPLIER;
+    double min_pref_speed = std::abs(preferred_velocity.length()) * MIN_PREF_SPEED_MULTIPLIER;
 
     return std::abs(candidate.velocity.length()) < min_pref_speed;
 }
@@ -559,6 +559,10 @@ Vector HRVOAgent::computePreferredVelocity(Duration time_step)
                          robot_state.velocity().length() + max_accel * time_step.toMilliseconds());
         return dist_vector_to_goal.normalize(curr_pref_speed);
     }
+}
+
+std::vector<VelocityObstacle> HRVOAgent::getVelocityObstacles() {
+    return velocity_obstacles;
 }
 
 std::vector<TbotsProto::VelocityObstacle> HRVOAgent::getVelocityObstaclesAsProto() const

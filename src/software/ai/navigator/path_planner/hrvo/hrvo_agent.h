@@ -29,7 +29,7 @@ public:
      * Constructor
      *
      * @param robot_id	            The robot id for this agent.
-     * @prarm robot_state            The robots current state
+     * @prarm robot_state           The robots current state
      * @param type	  	            The team side for this agent (friendly or enemy).
      * @param radius                The radius of this agent.
      * @param path                  The path of this agent
@@ -40,7 +40,7 @@ public:
      */
 
     HRVOAgent(RobotId robot_id, const RobotState &robot_state, TeamSide side, RobotPath &path,
-              double radius, double min_radius, double max_speed, double max_accel, double max_radius_inflation);
+              double radius, double max_speed, double max_accel, double max_radius_inflation);
 
 
     // TODO
@@ -100,6 +100,10 @@ public:
      */
     std::vector<unsigned int> computeNeighbors(std::map<unsigned int, std::shared_ptr<Agent>> &robots);
 
+    // GETTERS
+
+    std::vector<VelocityObstacle> getVelocityObstacles();
+
     class Candidate
     {
     public:
@@ -119,8 +123,6 @@ public:
 
 
 protected:
-    Vector new_velocity;
-
     RobotNavigationObstacleFactory obstacle_factory;
 
     std::vector<VelocityObstacle> velocity_obstacles;

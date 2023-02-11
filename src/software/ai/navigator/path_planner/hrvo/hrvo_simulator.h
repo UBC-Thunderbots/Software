@@ -23,7 +23,7 @@ public:
      * robot
      * @param friendly_team_colour The colour of the friendly team
      */
-    explicit HRVOSimulator(float time_step, const RobotConstants_t &robot_constants,
+    explicit HRVOSimulator(double time_step, const RobotConstants_t &robot_constants,
                            const TeamColour friendly_team_colour);
 
     /**
@@ -43,7 +43,7 @@ public:
      */
     void updatePrimitiveSet(const TbotsProto::PrimitiveSet &new_primitive_set);
 
-    void doStep(double time_step);
+    void doStep(Duration time_step);
 
     /**
      * Assumption: friendly team is the only robots running HRVO,
@@ -70,8 +70,8 @@ private:
      * @param destination 	Destination for this robot
      * @param type 		Whether this robot is FRIENDLY or ENEMY
     */
-    void addLinearVelocityRobotAgent(const Robot &robot, const Vector &destination,
-                                            TeamSide type);
+    void configureLVRobot(const Robot &robot, const Vector &destination,
+                          TeamSide type);
 
     // PrimitiveSet which includes the path which each friendly robot should take
     TbotsProto::PrimitiveSet primitive_set;
@@ -88,11 +88,14 @@ private:
     // robot id to agent
     std::map<unsigned int, std::shared_ptr<Agent>> robots;
 
+    // simulator time step
+    Duration time_step;
+
 
     // The max amount (meters) which the friendly/enemy robot radius can increase by.
     // This scale is used to avoid close encounters, and reduce chance of collision.
-    static constexpr float FRIENDLY_ROBOT_RADIUS_MAX_INFLATION = 0.05f;
-    static constexpr float ENEMY_ROBOT_RADIUS_MAX_INFLATION = 0.06f;
+    static constexpr double FRIENDLY_ROBOT_RADIUS_MAX_INFLATION = 0.05f;
+    static constexpr double ENEMY_ROBOT_RADIUS_MAX_INFLATION = 0.06f;
 
     // How much larger should the goal radius be. This is added as a safety tolerance so
     // robots do not "teleport" over the goal between simulation frames.
@@ -103,15 +106,8 @@ private:
     // NOTE: This value must be >= 0
     static constexpr float BALL_AGENT_RADIUS_OFFSET = 0.1f;
 
-    // The scale multiple of max robot speed which the preferred speed will be set at.
-    // pref_speed = max_speed * PREF_SPEED_SCALE
-    // NOTE: This scale multiple must be <= 1
-    static constexpr float PREF_SPEED_SCALE = 0.85f;
-
     // The maximum distance which HRVO Agents will look for neighbors, in meters.
     // A large radius picked to allow for far visibility of neighbors so Agents have
     // enough space to decelerate and avoid collisions.
     static constexpr float MAX_NEIGHBOR_SEARCH_DIST = 2.5f;
-    // The maximum number of neighbors/agents to consider when drawing velocity obstacles.
-    static constexpr unsigned int MAX_NEIGHBORS = 15;
 };

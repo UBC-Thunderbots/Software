@@ -14,7 +14,7 @@ class Agent {
 public:
 
     Agent(RobotId robot_id, const RobotState &robot_state, TeamSide side, RobotPath &path,
-          double radius, double min_radius, double max_speed, double max_accel, double max_radius_inflation);
+          double radius, double max_speed, double max_accel, double max_radius_inflation);
 
     virtual ~Agent() = default;
 
@@ -53,14 +53,7 @@ public:
      *
      * @return The max acceleration of the agent
      */
-    const double getMaxAccel() const;
-
-    /**
-     * Return the preferred velocity of the agent
-     *
-     * @return The preferred velocity of the agent
-     */
-    Vector &getPrefVelocity() const;
+    double getMaxAccel() const;
 
     /**
      * Return the state of the agent
@@ -69,6 +62,9 @@ public:
      */
     const RobotState &getRobotState();
 
+    Vector getPreferredVelocity() const;
+
+    void setPreferredVelocity(Vector velocity);
 
     // robot id of this Agent
     RobotId robot_id;
@@ -81,9 +77,7 @@ public:
     // The path of this Agent
     RobotPath path;
 
-
-
-    Vector pref_velocity;
+    Vector new_velocity;
 
     double max_speed;
     const double max_accel;
@@ -91,6 +85,10 @@ public:
     const double min_radius;
     // The maximum amount which the radius can increase by
     const double max_radius_inflation;
+
+protected:
+    Vector preferred_velocity;
+
 };
 
 

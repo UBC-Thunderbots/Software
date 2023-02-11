@@ -1,14 +1,14 @@
 #include "agent.h"
 
 Agent::Agent(RobotId robot_id, const RobotState &robot_state, TeamSide side,
-             RobotPath &path, double radius, double min_radius,
-             double max_speed, double max_accel, double max_radius_inflation) :
+             RobotPath &path, double radius, double max_speed,
+             double max_accel, double max_radius_inflation) :
         robot_id(robot_id),
         robot_state(robot_state),
         side(side),
         path(path),
         radius(radius),
-        min_radius(min_radius),
+        min_radius(radius),
         max_speed(max_speed),
         max_accel(max_accel),
         max_radius_inflation(max_radius_inflation) {
@@ -30,6 +30,16 @@ const RobotState &Agent::getRobotState() {
 
 RobotPath &Agent::getPath() {
     return path;
+}
+
+Vector Agent::getPreferredVelocity() const
+{
+    return preferred_velocity;
+}
+
+void Agent::setPreferredVelocity(Vector velocity)
+{
+    preferred_velocity = velocity;
 }
 
 

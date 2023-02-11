@@ -24,7 +24,7 @@ public:
      */
 
     LVAgent(RobotId robot_id, const RobotState &robot_state, TeamSide side, RobotPath &path,
-            double radius, double min_radius, double max_speed, double max_accel, double max_radius_inflation);
+            double radius, double max_speed, double max_accel, double max_radius_inflation);
 
     /**
      * Computes the new velocity of this agent.
@@ -38,6 +38,12 @@ public:
      * @param other_agent The Agent which this velocity obstacle is being generated for
      * @return The velocity obstacle which other_agent should see for this Agent
      */
-    VelocityObstacle createVelocityObstacle(const Agent &other_agent);
+    VelocityObstacle createVelocityObstacle(const Agent &other_agent) override;
+
+    Vector computePreferredVelocity(Duration time_step) override;
+
+    void updatePrimitive(const TbotsProto::Primitive &new_primitive,
+                                 const World &world,
+                                 Duration time_step) override;
 
 };
