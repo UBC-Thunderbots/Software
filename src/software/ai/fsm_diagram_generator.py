@@ -134,7 +134,7 @@ if __name__ == "__main__":
         print("# Play and Tactic FSM Diagrams\n", file=output_file)
 
         for fsm_name, diagram in fsm_diagrams.items():
-            
+
             file_path = fsm_file_paths[fsm_name]
 
             # Format diagram in Markdown syntax and write to output file
@@ -146,7 +146,7 @@ if __name__ == "__main__":
                 + "direction LR\n"
                 + diagram
                 + "\n```\n",
-                file=output_file
+                file=output_file,
             )
 
     # Print out confirmation message to console
