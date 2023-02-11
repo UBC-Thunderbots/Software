@@ -35,7 +35,7 @@ class ColouredCoutSink
      */
     void displayColouredLog(g3::LogMessageMover log_entry);
 
-    std::chrono::_V2::system_clock::duration LOG_INTERVAL_TIMESTAMP = std::chrono::nanoseconds(1 * 1000000000);
+    std::chrono::_V2::system_clock::duration LOG_INTERVAL_TIMESTAMP = std::chrono::nanoseconds(2 * 1000000000);
 
    private:
     /**

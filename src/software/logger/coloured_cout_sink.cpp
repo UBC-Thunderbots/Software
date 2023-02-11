@@ -63,35 +63,27 @@ void ColouredCoutSink::displayColouredLog(g3::LogMessageMover log_entry)
 
     std::chrono::_V2::system_clock::duration current_time = log_entry.get()._timestamp.time_since_epoch();
     bool past_time = current_time - LOG_INTERVAL_TIMESTAMP < last_msg_timestamp;
-
-    std::cout << "Interval: " << LOG_INTERVAL_TIMESTAMP.count() << "\n";
-    std::cout << "Current timestamp: " << current_time.count() << "\n";
-    std::cout << "Last timestamp: " << last_msg_timestamp.count() << "\n";
-
-    std::cout << "isPastTime: " << past_time << "\n";
-    std::cout << "isRepeat: " << (log_entry.get().message() == last_msg) << "\n\n";
-
     if (log_entry.get().message() == last_msg && past_time) {
         // repeated message outside timestamp, increase repeats and don't log
-        std::cout << "Repeated message " << num_repeats << " detected, not logging\n";
         num_repeats++;
         return;
     }
 
     // log and save info
+    last_msg = log_entry.get().message();
+    last_msg_timestamp = log_entry.get()._timestamp.time_since_epoch();
+
     std::ostringstream oss;
     if (print_detailed)
     {
-        oss << "\033[" << colour << "m" << " (" << num_repeats << ") " << log_entry.get().toString() << "\033[m";
+        log_entry.get()._message += "(" + std::to_string(num_repeats) + " repeats)";
+        oss << "\033[" << colour << "m" << log_entry.get().toString() << "\n\033[m";
     }
     else
     {
-        oss << "\033[" << colour << "m" << log_entry.get().message() << " (" << num_repeats << ")" << "\n\033[m";
+        oss << "\033[" << colour << "m" << log_entry.get().message() << " (" << num_repeats << " repeats)" << "\n\033[m";
     }
     std::cout << oss.str() << std::flush;
     resetColour();
-
-    last_msg = log_entry.get().message();
-    last_msg_timestamp = log_entry.get()._timestamp.time_since_epoch();
     num_repeats = 1;
 }
