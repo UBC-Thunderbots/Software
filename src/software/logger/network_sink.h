@@ -32,8 +32,13 @@ class NetworkSink
      */
     void sendToNetwork(g3::LogMessageMover log_entry);
 
+    std::chrono::_V2::system_clock::duration LOG_INTERVAL_TIMESTAMP = std::chrono::nanoseconds(2 * 1000000000);
+
    private:
     std::unique_ptr<ThreadedProtoUdpSender<TbotsProto::RobotLog>> log_output;
     int robot_id;
+    
     std::string last_msg;
+    std::chrono::_V2::system_clock::duration last_msg_timestamp;
+    int num_repeats;
 };

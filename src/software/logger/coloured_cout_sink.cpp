@@ -73,15 +73,18 @@ void ColouredCoutSink::displayColouredLog(g3::LogMessageMover log_entry)
     last_msg = log_entry.get().message();
     last_msg_timestamp = log_entry.get()._timestamp.time_since_epoch();
 
+    if (num_repeats > 1) {
+        log_entry.get()._message += "(" + std::to_string(num_repeats) + " repeats)";
+    }
+
     std::ostringstream oss;
     if (print_detailed)
     {
-        log_entry.get()._message += "(" + std::to_string(num_repeats) + " repeats)";
         oss << "\033[" << colour << "m" << log_entry.get().toString() << "\n\033[m";
     }
     else
     {
-        oss << "\033[" << colour << "m" << log_entry.get().message() << " (" << num_repeats << " repeats)" << "\n\033[m";
+        oss << "\033[" << colour << "m" << log_entry.get().message() << "\n\033[m";
     }
     std::cout << oss.str() << std::flush;
     resetColour();

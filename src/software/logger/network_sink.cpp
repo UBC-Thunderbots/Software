@@ -13,27 +13,31 @@ NetworkSink::NetworkSink(unsigned int channel, const std::string& interface, int
 
 void NetworkSink::sendToNetwork(g3::LogMessageMover log_entry)
 {
-    // Spam reduction notes TODO delete
-    // Different from last message: log it, save timestamp and message
-    // Same as last message: check timestamp, if within interval of saved timestamp, repeats++
-    //         if outside interval, log it with repeats added, reset saved repeats and timestamp
-    
-    // problem?: drops number of repeats on new message
-
     auto log_msg_proto = std::make_unique<TbotsProto::RobotLog>();
     TbotsProto::LogLevel log_level_proto;
 
     if (TbotsProto::LogLevel_Parse(log_entry.get().level(), &log_level_proto))
-    {   
-        // reduce spam by sending a period if message is same as previous
-        std::string msg_to_send;
-        if (log_entry.get().message() == last_msg) {
-            msg_to_send = ".";
-        } else {
-            msg_to_send = log_entry.get().message();
+    {
+        std::chrono::_V2::system_clock::duration current_time = log_entry.get()._timestamp.time_since_epoch();
+        bool past_time = current_time - LOG_INTERVAL_TIMESTAMP < last_msg_timestamp;
+        if (log_entry.get().message() == last_msg && past_time) {
+            // repeated message outside timestamp, increase repeats and don't log
+            num_repeats++;
+            return;
         }
 
-        log_msg_proto->set_log_msg(msg_to_send);
+        // save info and log
+        last_msg = log_entry.get().message();
+        last_msg_timestamp = log_entry.get()._timestamp.time_since_epoch();
+
+        std::string msg_to_log;
+        if (num_repeats > 1) {
+            msg_to_log = last_msg + "(" + std::to_string(num_repeats) + " repeats)";
+        } else {
+            msg_to_log = last_msg;
+        }
+        
+        log_msg_proto->set_log_msg(msg_to_log);
         log_msg_proto->set_robot_id(robot_id);
         log_msg_proto->set_log_level(log_level_proto);
         log_msg_proto->set_file_name(log_entry.get().file());
@@ -42,6 +46,6 @@ void NetworkSink::sendToNetwork(g3::LogMessageMover log_entry)
 
         log_output->sendProto(*log_msg_proto);
 
-        last_msg = log_entry.get().message();
+        num_repeats = 1;
     }
 }
