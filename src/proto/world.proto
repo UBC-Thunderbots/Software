@@ -54,7 +54,7 @@ message SimulatorTick
 message SimulationState
 {
     required bool is_playing = 1 [default = true];
-    // have another type for how fast it runs
+    // for the future, if adding a speed functionality, the proto should be added here
 }
 message Pass
 {

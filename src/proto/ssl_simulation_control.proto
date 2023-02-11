@@ -91,4 +91,3 @@ message SimulatorResponse
     // List of errors, like using unsupported features
     repeated SimulatorError errors = 1;
 }
-
