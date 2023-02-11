@@ -3,15 +3,19 @@ from software.thunderscope.binary_context_managers import *
 from software.thunderscope.replay.proto_logger import ProtoLogger
 from proto.message_translation import tbots_protobuf
 import software.python_bindings as cpp_bindings
-from proto.ssl_gc_common_pb2 import Team
 
 import numpy
 
-SIM_TICK_RATE_MS = 16
-
 def start_ai_vs_ai(simulator_runtime_dir, blue_fs_dir, yellow_fs_dir):
+    '''
+    Start AI vs AI silently, ticking as fast as possible without visualization.
+
+    :param simulator_runtime_dir the runtime directory to set up ProtoUnixIO for the Simulator
+    :param blue_fs_dir              the runtime directory to set up ProtoUnixIO for the blue FullSystem
+    :param yellow_fs_dir            the runtime directory to set up ProtoUnixIO for the yellow FullSystem
+    '''
     def __async_sim_ticker(simulator_proto_unix_io):
-        """Setup the world and tick simulation forever
+        """Setup the world and tick simulation forever, as fast as possible
 
         :param tick_rate_ms: The tick rate of the simulation
 
@@ -30,7 +34,7 @@ def start_ai_vs_ai(simulator_runtime_dir, blue_fs_dir, yellow_fs_dir):
 
         # Tick Simulation
         while True:
-            tick = SimulatorTick(milliseconds=SIM_TICK_RATE_MS)
+            tick = SimulatorTick(milliseconds=SIXTY_HERTZ_MILLISECONDS_PER_TICK)
             simulator_proto_unix_io.send_proto(SimulatorTick, tick)
 
     blue_fs_proto_unix_io   = ProtoUnixIO()

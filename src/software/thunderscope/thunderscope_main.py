@@ -13,10 +13,12 @@ import software.python_bindings as cpp_bindings
 from software.py_constants import *
 from software.thunderscope.robot_communication import RobotCommunication
 from software.thunderscope.replay.proto_logger import ProtoLogger
-from proto.ssl_gc_common_pb2 import Team
+from software.thunderscope.proto_unix_io import ProtoUnixIO
 
 NUM_ROBOTS = 6
-SIM_TICK_RATE_MS = 16
+
+#TODO: remove
+import pdb
 
 ###########################################################################
 #                         Thunderscope Main                               #
@@ -147,16 +149,16 @@ if __name__ == "__main__":
         help="Estop Baudrate",
     )
     parser.add_argument(
-        "--ci_mode",
-        action="store_true",
-        default=False,
-        help="Run in CI mode (timestamp provided)",
-    )
-    parser.add_argument(
-            "--disable_autoref",
+            "--enable_autoref",
             action="store_true",
             default=False,
-            help="Disable Autoref and manually use the gamecontroller"
+            help="Enable autoref"
+    )
+    parser.add_argument(
+            "--verbose",
+            action="store_true",
+            default=True,
+            help="Include logs from the Gamecontroller and Autoref"
     )
 
     # Sanity check that an interface was provided
@@ -285,8 +287,6 @@ if __name__ == "__main__":
     #
     # The async sim ticket ticks the simulator at a fixed rate.
     else:
-        #pdb.set_trace()
-
         tscope = Thunderscope(
             layout_path=args.layout,
             visualization_buffer_size=args.visualization_buffer_size,
@@ -314,8 +314,8 @@ if __name__ == "__main__":
             while True:
                 tick = SimulatorTick(milliseconds=tick_rate_ms)
                 tscope.simulator_proto_unix_io.send_proto(SimulatorTick, tick)
-                if not args.ci_mode:
-                    time.sleep(tick_rate_ms / 1000)
+                time.sleep(tick_rate_ms / 1000)
+
         #pdb.set_trace()
         # Launch all binaries
         with Simulator(
@@ -329,13 +329,14 @@ if __name__ == "__main__":
         ) as blue_logger, ProtoLogger(
             args.yellow_full_system_runtime_dir,
         ) as yellow_logger, Gamecontroller(
-                ci_mode=args.ci_mode
+            supress_logs=(not args.verbose),
+            ci_mode=args.enable_autoref
         ) as gamecontroller, (TigersAutoref(
                 autoref_runtime_dir="/tmp/tbots/autoref",
-                ci_mode=args.ci_mode,
+                ci_mode=args.enable_autoref,
                 gc=gamecontroller,
-        ) if args.disable_autoref is False else contextlib.nullcontext()) as autoref:
-
+                supress_logs=(not args.verbose)
+        ) if args.enable_autoref is True else contextlib.nullcontext()) as autoref:
             tscope.blue_full_system_proto_unix_io.register_to_observe_everything(
                 blue_logger.buffer
             )
@@ -354,19 +355,16 @@ if __name__ == "__main__":
                 tscope.blue_full_system_proto_unix_io,
                 tscope.yellow_full_system_proto_unix_io,
             )
-            if not args.disable_autoref:
+            if args.enable_autoref:
                 autoref_proto_unix_io = ProtoUnixIO()
                 simulator.setup_autoref_proto_unix_io(autoref_proto_unix_io)
-                autoref.setup_ssl_wrapper_packets(autoref_proto_unix_io, tscope.blue_full_system_proto_unix_io, tscope.yellow_full_system_proto_unix_io)
-            #print(gamecontroller.send_ci_input(
-            #    gc_command=Command.Type.FORCE_START, team=Team.UNKNOWN
-            #))
-
-            print("finished setup")
+                autoref.setup_ssl_wrapper_packets(autoref_proto_unix_io,
+                                                  blue_full_system_proto_unix_io,
+                                                  yellow_full_system_proto_unix_io)
 
             # Start the simulator
             thread = threading.Thread(
-                target=__async_sim_ticker, args=(SIM_TICK_RATE_MS,), daemon=True,
+                target=__async_sim_ticker, args=(SIXTY_HERTZ_MILLISECONDS_PER_TICK,), daemon=True,
             )
 
             thread.start()
