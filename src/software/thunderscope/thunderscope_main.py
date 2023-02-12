@@ -17,9 +17,6 @@ from software.thunderscope.proto_unix_io import ProtoUnixIO
 
 NUM_ROBOTS = 6
 
-#TODO: remove
-import pdb
-
 ###########################################################################
 #                         Thunderscope Main                               #
 ###########################################################################
@@ -316,7 +313,6 @@ if __name__ == "__main__":
                 tscope.simulator_proto_unix_io.send_proto(SimulatorTick, tick)
                 time.sleep(tick_rate_ms / 1000)
 
-        #pdb.set_trace()
         # Launch all binaries
         with Simulator(
             args.simulator_runtime_dir, args.debug_simulator, args.enable_realism

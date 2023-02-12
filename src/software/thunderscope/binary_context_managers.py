@@ -460,7 +460,7 @@ class Gamecontroller(object):
     def setup_proto_unix_io(
         self, blue_full_system_proto_unix_io, yellow_full_system_proto_unix_io
     ):
-        """Setup gamecontroller io
+        """Setup gamecontroller io. Registers to receive RefereeCommands from the Gamecontroller UI.
 
         :param blue_full_system_proto_unix_io: The proto unix io of the blue full system.
         :param yellow_full_system_proto_unix_io: The proto unix io of the yellow full system.
@@ -475,6 +475,12 @@ class Gamecontroller(object):
             self, blue_full_system_proto_unix_io, yellow_full_system_proto_unix_io,
             port
             ):
+        """Register as an observer of RefereeCommands on the specified port.
+
+        :param blue_full_system_proto_unix_io:      the proto unix io of the blue full system
+        :param yellow_full_system_proto_unix_io:    the proto unix io of the yellow full system
+        :param port:                                the port to listen for RefereeCommands
+        """
         def __send_referee_command(data):
             """Send a referee command from the gamecontroller to both full
             systems.
@@ -492,6 +498,11 @@ class Gamecontroller(object):
     def register_ci_referee_command_observer(
             self, blue_full_system_proto_unix_io, yellow_full_system_proto_unix_io
             ):
+        """Register the CI port for RefereeCommands. Requires ci_mode=True
+
+        :param blue_full_system_proto_unix_io:      the proto unix io of the blue full system
+        :param yellow_full_system_proto_unix_io:    the proto unix io of the yellow full system
+        """
         self.register_referee_command_observer(blue_full_system_proto_unix_io,
                                                yellow_full_system_proto_unix_io,
                                                self.ci_port)
@@ -756,7 +767,7 @@ class TigersAutoref(object):
 
         :return: a list of CiOutput protos received from the Gamecontroller
         '''
-        ci_input = CiInput(timestamp=int(tracker_wrapper.tracked_frame.timestamp*NANOSECONDS_PER_SECOND))
+        ci_input = CiInput(timestamp=int(time.time_ns()))
         ci_input.api_inputs.append(Input())
         ci_input.tracker_packet.CopyFrom(tracker_wrapper)
 
