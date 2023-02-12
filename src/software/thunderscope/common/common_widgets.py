@@ -81,11 +81,7 @@ class ColorProgressBar(QProgressBar):
         )
 
         super(ColorProgressBar, self).setStyleSheet(
-            "QProgressBar::chunk" 
-            "{" 
-            "background: grey" 
-            "color: black"
-            "}"
+            "QProgressBar::chunk" "{" "background: grey" "color: black" "}"
         )
 
         self.valueChanged.connect(self.emitFloatValueChanged)
@@ -132,9 +128,6 @@ class ColorProgressBar(QProgressBar):
 
     def value(self):
         return float(super(ColorProgressBar, self).value()) / self.decimals
-
-
-
 
 
 def create_buttons(text: list):
