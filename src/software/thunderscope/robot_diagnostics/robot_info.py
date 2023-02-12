@@ -30,10 +30,21 @@ class RobotInfo(QWidget):
         self.status_layout = QVBoxLayout()
 
         # Battery Bar
+        self.battery_layout = QHBoxLayout()
         self.battery_progress_bar = common_widgets.ColorProgressBar(
-            MIN_BATTERY_VOLTAGE, MAX_BATTERY_VOLTAGE
+            MIN_BATTERY_VOLTAGE - 3, MAX_BATTERY_VOLTAGE
         )
-        self.status_layout.addWidget(self.battery_progress_bar)
+        # Battery Voltage Label
+        self.battery_label = QLabel()
+        self.battery_label.setText("NAN")
+        # Label changes when voltage bar level changes
+        self.battery_progress_bar.floatValueChanged.connect(
+            lambda float_val: self.battery_label.setText("%.2fV" % float_val)
+        )
+        self.battery_layout.addWidget(self.battery_progress_bar)
+        self.battery_layout.addWidget(self.battery_label)
+
+        self.status_layout.addLayout(self.battery_layout)
 
         # Control mode dropdown
         self.control_mode_layout = QHBoxLayout()

@@ -62,6 +62,8 @@ class ColorProgressBar(QProgressBar):
     Also changes slider color based on percentage filled
     """
 
+    floatValueChanged = pyqtSignal(float)
+
     def __init__(self, min_val, max_val, decimals=2):
         """
         Creates a ColorProgressBar with the specified min, max and decimals
@@ -79,8 +81,20 @@ class ColorProgressBar(QProgressBar):
         )
 
         super(ColorProgressBar, self).setStyleSheet(
-            "QProgressBar::chunk" "{" f"background: grey" "}"
+            "QProgressBar::chunk" 
+            "{" 
+            "background: grey" 
+            "color: black"
+            "}"
         )
+
+        self.valueChanged.connect(self.emitFloatValueChanged)
+
+    def emitFloatValueChanged(self):
+        """
+        Emits a signal with the slider's float value
+        """
+        self.floatValueChanged.emit(self.value())
 
     def setValue(self, value):
         """
@@ -118,6 +132,9 @@ class ColorProgressBar(QProgressBar):
 
     def value(self):
         return float(super(ColorProgressBar, self).value()) / self.decimals
+
+
+
 
 
 def create_buttons(text: list):

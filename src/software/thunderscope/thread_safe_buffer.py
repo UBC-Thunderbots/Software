@@ -36,7 +36,7 @@ class ThreadSafeBuffer(object):
         self.protos_dropped = 0
         self.last_logged_protos_dropped = 0
 
-    def get(self, block=False, timeout=None):
+    def get(self, block=False, timeout=None, return_default=True):
         """Get data from the buffer. If the buffer is empty, and
         block is True, wait until a new msg is received. If block
         is False, then return a cached value immediately.
@@ -69,7 +69,8 @@ class ThreadSafeBuffer(object):
             self.cached_msg = self.queue.get_nowait()
 
         except queue.Empty as empty:
-            pass
+            if not return_default:
+                return None
 
         return self.cached_msg
 

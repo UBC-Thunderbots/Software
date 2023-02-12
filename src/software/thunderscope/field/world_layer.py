@@ -489,6 +489,7 @@ class WorldLayer(FieldLayer):
 
         """
         self.cached_world = self.world_buffer.get(block=False)
+        print(self.cached_world)
 
         self.draw_field(painter, self.cached_world.field)
         self.draw_ball_state(painter, self.cached_world.ball.current_state)
