@@ -360,7 +360,7 @@ if __name__ == "__main__":
 
             # Start the simulator
             thread = threading.Thread(
-                target=__async_sim_ticker, args=(SIXTY_HERTZ_MILLISECONDS_PER_TICK,), daemon=True,
+                target=__async_sim_ticker, args=(SIXTY_HZ_MILLISECONDS_PER_TICK,), daemon=True,
             )
 
             thread.start()

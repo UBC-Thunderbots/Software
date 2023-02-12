@@ -38,17 +38,21 @@ class SslSocket(object):
             msg_len, new_pos = decoder._DecodeVarint32(response_data, offset)
             offset = new_pos
             ci_output = proto_type()
+
+            # we didn't receive enough data to parse this message, to get more
             if (offset + msg_len > len(response_data)):
                 response_data += self.socket.recv(
                         offset + msg_len - len(response_data)
                 )
+
             try :
                 ci_output.ParseFromString(response_data[offset : offset + msg_len])
             except google.protobuf.message.DecodeError as err :
-                raise SsslSocketProtoParseException("Error parsing proto: " + err.args)
+                raise SsslSocketProtoParseException("ProtoDecode Error parsing proto: " + err.args)
 
             if not ci_output.IsInitialized():
                 raise SslSocketProtoParseException("Improper proto of type '{proto_type}' parsed")
+
             offset += msg_len
             responses.append(ci_output)
 
