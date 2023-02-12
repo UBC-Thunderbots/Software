@@ -43,10 +43,13 @@ class RobotView(QScrollArea):
 
             self.layout.addWidget(self.robot_info_widgets[id])
 
-        self.container = QWidget()
+        self.container = QFrame(self)
         self.container.setLayout(self.layout)
         self.setWidget(self.container)
         self.setWidgetResizable(True)
+        self.setMinimumHeight(
+            self.container.sizeHint().height()
+        )
 
     def refresh(self):
         """
