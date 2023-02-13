@@ -71,7 +71,8 @@
           register: result
           args:
             chdir: ~/thunderbots_binaries
-          ignore_errors: yes
+          when: "'sync' in actions"
+          ignore_errors: yes # Remove when display is re-enabled
 
         - name: Start Services
           become: true
@@ -99,4 +100,4 @@
           loop_control:
             loop_var: service_name
           tags: always
-          ignore_errors: yes
+          failed_when: false
