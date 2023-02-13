@@ -5,6 +5,9 @@ LINE_WIDTH = 3
 SPEED_LINE_WIDTH = 2
 SPEED_SEGMENT_SCALE = 0.2
 
+ROBOT_RADIUS = 25
+TEAM_B = "b"
+
 # Mapping between RobotStatus Error Codes and their dialog messages
 ERROR_CODE_MESSAGES = {
     ErrorCode.LOW_CAP: "Low Cap",

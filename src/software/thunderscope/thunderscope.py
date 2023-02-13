@@ -453,9 +453,7 @@ class Thunderscope(object):
             robot_view_dock = Dock("RobotView")
             robot_view_dock.addWidget(widgets["robot_view"])
             dock_area.addDock(robot_view_dock, "above", log_dock)
-            self.toggle_all_connection_signal = widgets[
-                "robot_view"
-            ].toggle_all_connection_signal
+            self.control_mode_signal = widgets["robot_view"].control_mode_signal
 
     def configure_robot_diagnostics_layout(
         self, dock_area, proto_unix_io, load_fullsystem,
@@ -501,9 +499,9 @@ class Thunderscope(object):
             )
             robot_view_dock = Dock("RobotView")
             robot_view_dock.addWidget(self.diagnostics_widgets["robot_view"])
-            self.toggle_all_connection_signal = self.diagnostics_widgets[
+            self.control_mode_signal = self.diagnostics_widgets[
                 "robot_view"
-            ].toggle_all_connection_signal
+            ].control_mode_signal
 
         self.robot_diagnostics_dock_area.addDock(log_dock)
         if not load_fullsystem:
@@ -521,7 +519,7 @@ class Thunderscope(object):
     def setup_robot_view(self, proto_unix_io, load_fullsystem):
         """Setup the robot view widget
         :param proto_unix_io: The proto unix io object for the full system
-        :param load_fullsystem: Boolean to indicate if checkboxes should be loaded
+        :param load_fullsystem: Boolean to indicate if control mode menus should have an AI option
         """
         robot_view = RobotView(load_fullsystem)
         self.register_refresh_function(robot_view.refresh)

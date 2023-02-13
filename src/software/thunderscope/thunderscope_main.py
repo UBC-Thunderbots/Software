@@ -245,7 +245,7 @@ if __name__ == "__main__":
             current_proto_unix_io, getRobotMulticastChannel(0), args.interface,
         ) as robot_communication:
             if args.run_diagnostics:
-                tscope.toggle_all_connection_signal.connect(
+                tscope.control_mode_signal.connect(
                     lambda mode, robot_id: robot_communication.toggle_robot_connection(
                         mode, robot_id
                     )

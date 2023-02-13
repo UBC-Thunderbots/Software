@@ -136,6 +136,8 @@ class RobotCommunication(object):
                 if num_times_to_stop > 0:
                     robot_primitives[robot_id] = Primitive(stop=StopPrimitive())
                     self.robots_to_be_disconnected[robot_id] = num_times_to_stop - 1
+                elif num_times_to_stop == 0:
+                    del self.robots_to_be_disconnected[robot_id]
 
             # initialize total primitive set and send it
             primitive_set = PrimitiveSet(
@@ -201,10 +203,6 @@ class RobotCommunication(object):
             ROBOT_STATUS_PORT,
             lambda data: self.current_proto_unix_io.send_proto(RobotStatus, data),
             True,
-        )
-
-        self.send_primitive_mcast_sender = PrimitiveSetProtoSender(
-            self.multicast_channel + "%" + self.interface, PRIMITIVE_PORT, True
         )
 
         self.receive_robot_log = RobotLogProtoListener(

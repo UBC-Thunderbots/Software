@@ -329,3 +329,19 @@ def disable_radio_button(button_group):
         button.setChecked(False)
         button.clicked.disconnect()
         button.clicked.connect(lambda state, curr=button: curr.setChecked(False))
+
+
+def draw_robot(painter, rect, start_angle, span_angle):
+    """
+    Draws a robot bounded by the given rectangle with a chord defined by the given angles
+    :param painter:
+    :param rect:
+    :param start_angle:
+    :param span_angle:
+    :return:
+    """
+    convert_degree = -16
+
+    painter.drawChord(
+        rect, start_angle * convert_degree, span_angle * convert_degree,
+    )
