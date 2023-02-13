@@ -71,6 +71,7 @@
           register: result
           args:
             chdir: ~/thunderbots_binaries
+          ignore_errors: yes
 
         - name: Start Services
           become: true
@@ -98,3 +99,4 @@
           loop_control:
             loop_var: service_name
           tags: always
+          ignore_errors: yes
