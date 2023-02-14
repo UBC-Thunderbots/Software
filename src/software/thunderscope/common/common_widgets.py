@@ -334,11 +334,10 @@ def disable_radio_button(button_group):
 def draw_robot(painter, rect, start_angle, span_angle):
     """
     Draws a robot bounded by the given rectangle with a chord defined by the given angles
-    :param painter:
-    :param rect:
-    :param start_angle:
-    :param span_angle:
-    :return:
+    :param painter: the QPainter object that is drawing in thunderscope
+    :param rect: the rectangle that is bounding the robot's circle
+    :param start_angle: the start of the chord, measured anti-clockwise from the horizontal middle
+    :param span_angle: the end of the chord, measured anti-clockwise from the horizontal middle
     """
     convert_degree = -16
 

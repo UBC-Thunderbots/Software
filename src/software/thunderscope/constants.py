@@ -6,7 +6,6 @@ SPEED_LINE_WIDTH = 2
 SPEED_SEGMENT_SCALE = 0.2
 
 ROBOT_RADIUS = 25
-TEAM_B = "b"
 
 # Mapping between RobotStatus Error Codes and their dialog messages
 ERROR_CODE_MESSAGES = {
@@ -31,6 +30,7 @@ class Colors(object):
     DESIRED_ROBOT_LOCATION_OUTLINE = QtGui.QColor(255, 0, 0, 150)
     SPEED_VECTOR_COLOR = QtGui.QColor(255, 0, 255, 100)
 
+    ROBOT_MIDDLE_BLUE = "blue"
     ROBOT_SPEED_SLOW_COLOR = "black"
     NAVIGATOR_PATH_COLOR = "green"
     NAVIGATOR_OBSTACLE_COLOR = "orange"

@@ -70,7 +70,9 @@ class RobotInfo(QWidget):
         self.status_layout.addLayout(self.control_mode_layout)
 
         # Vision Pattern
-        self.layout.addWidget(self.create_vision_pattern_label(TEAM_B, ROBOT_RADIUS))
+        self.layout.addWidget(
+            self.create_vision_pattern_label(Colors.ROBOT_MIDDLE_BLUE, ROBOT_RADIUS)
+        )
 
         self.layout.addLayout(self.status_layout)
 
