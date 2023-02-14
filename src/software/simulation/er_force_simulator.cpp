@@ -17,6 +17,7 @@
 #include "software/logger/logger.h"
 #include "software/physics/velocity_conversion_util.h"
 #include "software/world/robot_state.h"
+#include "software/physics/euclidean_to_wheel.h"
 
 ErForceSimulator::ErForceSimulator(const TbotsProto::FieldType& field_type,
                                    const RobotConstants_t& robot_constants,
@@ -351,21 +352,38 @@ void ErForceSimulator::setRobotPrimitive(
     }
 }
 
+TbotsProto::DirectControlPrimitive rampVelocity(
+        TbotsProto::DirectControlPrimitive& direct_control)
+{
+    EuclideanSpace_t current_euclidean_velocity = {};
+    if (direct_control.motor_control().has_direct_per_wheel_control())
+    {
+        WheelSpace_t wheel_velocity = {
+                direct_control.motor_control().direct_per_wheel_control().front_left_wheel_velocity(),
+                direct_control.motor_control().direct_per_wheel_control().front_left_wheel_velocity(),
+                direct_control.motor_control().direct_per_wheel_control().front_left_wheel_velocity(),
+                direct_control.motor_control().direct_per_wheel_control().front_left_wheel_velocity(),
+        };
+        current_euclidean_velocity = getEuclideanVelocity(wheel_velocity);
+    }
+
+}
+
 SSLSimulationProto::RobotControl ErForceSimulator::updateSimulatorRobots(
     std::unordered_map<unsigned int, std::shared_ptr<PrimitiveExecutor>>&
         robot_primitive_executor_map,
-    const TbotsProto::World& world_msg)
-{
+    const TbotsProto::World& world_msg) {
     SSLSimulationProto::RobotControl robot_control;
 
-    for (auto& primitive_executor_with_id : robot_primitive_executor_map)
-    {
-        unsigned int robot_id    = primitive_executor_with_id.first;
-        auto& primitive_executor = primitive_executor_with_id.second;
-        auto direct_control      = primitive_executor->stepPrimitive();
+    for (auto &primitive_executor_with_id: robot_primitive_executor_map) {
+        unsigned int robot_id = primitive_executor_with_id.first;
+        auto &primitive_executor = primitive_executor_with_id.second;
+        auto direct_control = primitive_executor->stepPrimitive();
+
+        auto ramped_direct_control = rampVelocity(*direct_control);
 
         auto command = *getRobotCommandFromDirectControl(
-            robot_id, std::move(direct_control), robot_constants);
+                robot_id, std::move(direct_control), robot_constants);
         *(robot_control.mutable_robot_commands()->Add()) = command;
     }
     return robot_control;

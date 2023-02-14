@@ -8,6 +8,8 @@
 #include "software/world/field.h"
 #include "software/world/team_types.h"
 #include "software/world/world.h"
+#include "software/physics/velocity_ramping.h"
+#include "software/physics/euclidean_to_wheel.h"
 
 
 /**
@@ -181,6 +183,9 @@ class ErForceSimulator
         std::unordered_map<unsigned int, std::shared_ptr<PrimitiveExecutor>>&
             robot_primitive_executor_map,
         const TbotsProto::World& world_msg);
+
+    TbotsProto::DirectControlPrimitive rampVelocity(
+            TbotsProto::DirectControlPrimitive& direct_control);
 
     // Map of Robot id to Primitive Executor
     std::unordered_map<unsigned int, std::shared_ptr<PrimitiveExecutor>>
