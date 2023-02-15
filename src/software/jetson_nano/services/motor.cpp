@@ -423,7 +423,7 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
             break;
         }
     }
-    target_wheel_velocities = rampWheelVelocity(
+    target_wheel_velocities = euclidean_to_four_wheel.rampWheelVelocity(
         prev_wheel_velocities, target_linear_velocity,
         static_cast<double>(robot_constants_.robot_max_speed_m_per_s),
         static_cast<double>(robot_constants_.robot_max_acceleration_m_per_s_2),

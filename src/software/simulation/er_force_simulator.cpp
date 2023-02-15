@@ -352,27 +352,6 @@ void ErForceSimulator::setRobotPrimitive(
     }
 }
 
-TbotsProto::DirectControlPrimitive rampVelocity(
-        TbotsProto::DirectControlPrimitive& direct_control)
-{
-    EuclideanSpace_t current_euclidean_velocity = {};
-    if (direct_control.motor_control().has_direct_per_wheel_control())
-    {
-        WheelSpace_t wheel_velocity = {
-                direct_control.motor_control().direct_per_wheel_control().front_left_wheel_velocity(),
-                direct_control.motor_control().direct_per_wheel_control().front_left_wheel_velocity(),
-                direct_control.motor_control().direct_per_wheel_control().front_left_wheel_velocity(),
-                direct_control.motor_control().direct_per_wheel_control().front_left_wheel_velocity(),
-        };
-        current_euclidean_velocity = euclidean_four_wheel_convert.getEuclideanVelocity(wheel_velocity);
-    }
-    else if (direct_control.motor_control().has_direct_velocity_control())
-    {
-
-    }
-
-}
-
 SSLSimulationProto::RobotControl ErForceSimulator::updateSimulatorRobots(
     std::unordered_map<unsigned int, std::shared_ptr<PrimitiveExecutor>>&
         robot_primitive_executor_map,
@@ -384,7 +363,13 @@ SSLSimulationProto::RobotControl ErForceSimulator::updateSimulatorRobots(
         auto &primitive_executor = primitive_executor_with_id.second;
         auto direct_control = primitive_executor->stepPrimitive();
 
-        auto ramped_direct_control = rampVelocity(*direct_control);
+        auto sim_state                  = getSimulatorState();
+        const auto& sim_robots          = sim_state.blue_robots();
+        auto current_velocity_map       = getRobotIdToLocalVelocityMap(sim_robots);
+        auto ramped_direct_control      = euclidean_four_wheel_convert.rampVelocity(
+                current_velocity_map.at(robot_id),
+                std::move(direct_control),
+                primitive_executor_time_step);
 
         auto command = *getRobotCommandFromDirectControl(
                 robot_id, std::move(direct_control), robot_constants);

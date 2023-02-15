@@ -2,7 +2,10 @@
 
 #include <Eigen/Dense>
 
+#include "proto/primitive.pb.h"
 #include "shared/robot_constants.h"
+#include "software/geom/vector.h"
+#include "software/geom/angular_velocity.h"
 
 /**
  * Vector representation of 2D Euclidean space.
@@ -56,11 +59,33 @@ class EuclideanToWheel
      */
     EuclideanSpace_t getEuclideanVelocity(const WheelSpace_t &wheel_velocity) const;
 
+
+    /**
+     * Ramp the velocity over the given timestep and set the target velocity on the motor.
+     *
+     * NOTE: This function has no state.
+     * Also NOTE: This function handles all electrical rpm to meters/second conversion.
+     *
+     * @param velocity_target The target velocity in m/s
+     * @param velocity_current The current velocity m/s
+     * @param time_to_ramp The time allocated for acceleration in seconds
+     *
+     */
+    WheelSpace_t rampWheelVelocity(const WheelSpace_t& current_primitive,
+                                   const EuclideanSpace_t& target_euclidean_velocity,
+                                   const double& time_to_ramp);
+
+    std::unique_ptr<TbotsProto::DirectControlPrimitive> rampWheelVelocity(
+            const std::pair<Vector, AngularVelocity> current_primitive,
+            const std::unique_ptr<TbotsProto::DirectControlPrimitive> target_velocity_primitive,
+            const double& time_to_ramp);
+
    private:
     /**
      * The radius of the robot in meters.
      */
     const double robot_radius_m_{};
+    const RobotConstants_t robot_constants;
 
     /**
      * Euclidean velocity to wheel velocity coupling matrix.

@@ -8,7 +8,6 @@
 #include "shared/robot_constants.h"
 #include "software/jetson_nano/gpio.h"
 #include "software/physics/euclidean_to_wheel.h"
-#include "software/physics/velocity_ramping.h"
 
 class MotorService
 {
