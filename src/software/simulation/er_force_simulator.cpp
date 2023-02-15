@@ -17,7 +17,6 @@
 #include "software/logger/logger.h"
 #include "software/physics/velocity_conversion_util.h"
 #include "software/world/robot_state.h"
-#include "software/physics/euclidean_to_wheel.h"
 
 ErForceSimulator::ErForceSimulator(const TbotsProto::FieldType& field_type,
                                    const RobotConstants_t& robot_constants,
@@ -28,7 +27,8 @@ ErForceSimulator::ErForceSimulator(const TbotsProto::FieldType& field_type,
       robot_constants(robot_constants),
       field(Field::createField(field_type)),
       blue_robot_with_ball(std::nullopt),
-      yellow_robot_with_ball(std::nullopt)
+      yellow_robot_with_ball(std::nullopt),
+      euclidean_four_wheel_convert(robot_constants)
 {
     QString full_filename = CONFIG_DIRECTORY;
 
@@ -364,7 +364,11 @@ TbotsProto::DirectControlPrimitive rampVelocity(
                 direct_control.motor_control().direct_per_wheel_control().front_left_wheel_velocity(),
                 direct_control.motor_control().direct_per_wheel_control().front_left_wheel_velocity(),
         };
-        current_euclidean_velocity = getEuclideanVelocity(wheel_velocity);
+        current_euclidean_velocity = euclidean_four_wheel_convert.getEuclideanVelocity(wheel_velocity);
+    }
+    else if (direct_control.motor_control().has_direct_velocity_control())
+    {
+
     }
 
 }
