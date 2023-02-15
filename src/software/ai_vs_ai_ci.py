@@ -57,6 +57,7 @@ def start_ai_vs_ai(simulator_runtime_dir, blue_fs_dir, yellow_fs_dir):
         autoref_runtime_dir="/tmp/tbots/autoref",
         ci_mode=True,
         gc=gamecontroller,
+        tick_rate_ms=SIXTY_HERTZ_MILLISECONDS_PER_TICK
     ) as autoref:
         blue_fs_proto_unix_io.register_to_observe_everything(
                 blue_logger.buffer

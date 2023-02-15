@@ -3,7 +3,6 @@ import time
 import threading
 import argparse
 import numpy
-import pdb
 import contextlib
 
 from software.thunderscope.thunderscope import Thunderscope
@@ -331,7 +330,8 @@ if __name__ == "__main__":
                 autoref_runtime_dir="/tmp/tbots/autoref",
                 ci_mode=args.enable_autoref,
                 gc=gamecontroller,
-                supress_logs=(not args.verbose)
+                supress_logs=(not args.verbose),
+                tick_rate_ms=SIXTY_HERTZ_MILLISECONDS_PER_TICK
         ) if args.enable_autoref is True else contextlib.nullcontext()) as autoref:
             tscope.blue_full_system_proto_unix_io.register_to_observe_everything(
                 blue_logger.buffer
@@ -360,7 +360,7 @@ if __name__ == "__main__":
 
             # Start the simulator
             thread = threading.Thread(
-                target=__async_sim_ticker, args=(SIXTY_HZ_MILLISECONDS_PER_TICK,), daemon=True,
+                target=__async_sim_ticker, args=(SIXTY_HERTZ_MILLISECONDS_PER_TICK,), daemon=True,
             )
 
             thread.start()

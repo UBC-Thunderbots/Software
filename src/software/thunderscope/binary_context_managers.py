@@ -19,8 +19,6 @@ from extlibs.er_force_sim.src.protobuf.world_pb2 import (
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.networking.ssl_proto_communication import *
 
-import pdb
-
 def is_cmd_running(command):
     """Check if there is any running process that was launched
     with the given command.
@@ -661,7 +659,7 @@ class TigersAutoref(object):
     AUTOREF_COMM_PORT = 10013
     AUTOREF_NUM_RETRIES = 10
 
-    def __init__(self, ci_mode=False, autoref_runtime_dir=None, buffer_size=5, gc=Gamecontroller(), supress_logs=True):
+    def __init__(self, tick_rate_ms, ci_mode=False, autoref_runtime_dir=None, buffer_size=5, gc=Gamecontroller(), supress_logs=True, ):
         self.tigers_autoref_proc = None
         self.auto_ref_proc_thread = None
         self.auto_ref_wrapper_thread = None
@@ -670,6 +668,9 @@ class TigersAutoref(object):
         self.wrapper_buffer = ThreadSafeBuffer(buffer_size, SSL_WrapperPacket)
         self.gamecontroller = gc
         self.supress_logs = supress_logs
+        self.tick_rate_ms = tick_rate_ms
+        self.current_timestamp = int(time.time_ns())
+
 
     def __enter__(self):
         if not os.path.exists("/opt/tbotspython/autoReferee/bin/autoReferee"):
@@ -734,8 +735,6 @@ class TigersAutoref(object):
             logging.info("Failed to connect to autoref binary. Is it running?")
             return
 
-
-        pdb.set_trace()
         self.send_geometry();
         self.gamecontroller.reset_team_info(Division.DIV_B)
 
@@ -767,7 +766,9 @@ class TigersAutoref(object):
 
         :return: a list of CiOutput protos received from the Gamecontroller
         '''
-        ci_input = CiInput(timestamp=int(time.time_ns()))
+        ci_input = CiInput(timestamp=self.current_timestamp)
+        self.current_timestamp += int(self.tick_rate_ms*NANOSECONDS_PER_MILLISECOND)
+
         ci_input.api_inputs.append(Input())
         ci_input.tracker_packet.CopyFrom(tracker_wrapper)
 
