@@ -160,7 +160,7 @@ TEST_F(STPTacticAssignmentTest,
     world.updateFriendlyTeamState(friendly_team);
 
     auto move_tactic_1 = std::make_shared<MoveTactic>();
-    auto stop_tactic_1 = std::make_shared<StopTactic>(false);
+    auto stop_tactic_1 = std::make_shared<StopTactic>();
 
     move_tactic_1->updateControlParams(Point(-1, 0), Angle::zero(), 0,
                                        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
@@ -329,9 +329,9 @@ TEST_F(STPTacticAssignmentTest,
     friendly_team.updateRobots({robot_0, robot_1, robot_2});
     world.updateFriendlyTeamState(friendly_team);
 
-    auto stop_tactic_1 = std::make_shared<StopTactic>(false);
-    auto stop_tactic_2 = std::make_shared<StopTactic>(false);
-    auto stop_tactic_3 = std::make_shared<StopTactic>(false);
+    auto stop_tactic_1 = std::make_shared<StopTactic>();
+    auto stop_tactic_2 = std::make_shared<StopTactic>();
+    auto stop_tactic_3 = std::make_shared<StopTactic>();
 
     ConstTacticVector tactics = {stop_tactic_1, stop_tactic_2, stop_tactic_3};
 
@@ -359,9 +359,9 @@ TEST_F(STPTacticAssignmentTest,
     friendly_team.updateRobots({robot_0, robot_1, robot_2});
     world.updateFriendlyTeamState(friendly_team);
 
-    auto stop_tactic_1 = std::make_shared<StopTactic>(false);
+    auto stop_tactic_1 = std::make_shared<StopTactic>();
     auto move_tactic_1 = std::make_shared<MoveTactic>();
-    auto stop_tactic_2 = std::make_shared<StopTactic>(false);
+    auto stop_tactic_2 = std::make_shared<StopTactic>();
 
     // The destination of the move_tactic is relatively close to the robot positions, so
     // the cost of assigning any robot to the move_tactic should be less than the

@@ -73,16 +73,17 @@ class ThreadSafeBuffer(object):
 
         return self.cached_msg
 
-    def put(self, proto, block=False):
+    def put(self, proto, block=False, timeout=None):
         """Put data into the buffer. If the buffer is full, then
         the proto will be logged.
 
         :param proto: The proto to place in the buffer
         :param block: Should block until there is space in the buffer
+        :param timeout: If block is True, then wait for this many seconds
 
         """
         if block:
-            self.queue.put(proto)
+            self.queue.put(proto, block, timeout)
             return
 
         try:
