@@ -29,7 +29,6 @@ namespace
                 new GoalieTactic(ai_config),
                 std::set<TbotsProto::MotionConstraint>(
                     {TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA,
-                     TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA,
                      TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL,
                      TbotsProto::MotionConstraint::FRIENDLY_HALF})),
             std::pair<std::shared_ptr<Tactic>, std::set<TbotsProto::MotionConstraint>>(
@@ -38,6 +37,7 @@ namespace
                 new KickoffChipTactic(),
                 std::set<TbotsProto::MotionConstraint>(
                     {TbotsProto::MotionConstraint::CENTER_CIRCLE,
+                     TbotsProto::MotionConstraint::ENEMY_HALF,
                      TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL})),
             std::pair<std::shared_ptr<Tactic>, std::set<TbotsProto::MotionConstraint>>(
                 new PenaltyKickTactic(ai_config),
