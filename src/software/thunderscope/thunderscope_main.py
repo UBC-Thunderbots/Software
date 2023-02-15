@@ -145,16 +145,13 @@ if __name__ == "__main__":
         help="Estop Baudrate",
     )
     parser.add_argument(
-            "--enable_autoref",
-            action="store_true",
-            default=False,
-            help="Enable autoref"
+        "--enable_autoref", action="store_true", default=False, help="Enable autoref"
     )
     parser.add_argument(
-            "--verbose",
-            action="store_true",
-            default=True,
-            help="Include logs from the Gamecontroller and Autoref"
+        "--verbose",
+        action="store_true",
+        default=True,
+        help="Include logs from the Gamecontroller and Autoref",
     )
 
     # Sanity check that an interface was provided
@@ -324,15 +321,18 @@ if __name__ == "__main__":
         ) as blue_logger, ProtoLogger(
             args.yellow_full_system_runtime_dir,
         ) as yellow_logger, Gamecontroller(
-            supress_logs=(not args.verbose),
-            ci_mode=args.enable_autoref
-        ) as gamecontroller, (TigersAutoref(
+            supress_logs=(not args.verbose), ci_mode=args.enable_autoref
+        ) as gamecontroller, (
+            TigersAutoref(
                 autoref_runtime_dir="/tmp/tbots/autoref",
                 ci_mode=args.enable_autoref,
                 gc=gamecontroller,
                 supress_logs=(not args.verbose),
-                tick_rate_ms=SIXTY_HERTZ_MILLISECONDS_PER_TICK
-        ) if args.enable_autoref is True else contextlib.nullcontext()) as autoref:
+                tick_rate_ms=SIXTY_HERTZ_MILLISECONDS_PER_TICK,
+            )
+            if args.enable_autoref is True
+            else contextlib.nullcontext()
+        ) as autoref:
             tscope.blue_full_system_proto_unix_io.register_to_observe_everything(
                 blue_logger.buffer
             )
@@ -354,13 +354,17 @@ if __name__ == "__main__":
             if args.enable_autoref:
                 autoref_proto_unix_io = ProtoUnixIO()
                 simulator.setup_autoref_proto_unix_io(autoref_proto_unix_io)
-                autoref.setup_ssl_wrapper_packets(autoref_proto_unix_io,
-                                                  tscope.blue_full_system_proto_unix_io,
-                                                  tscope.yellow_full_system_proto_unix_io)
+                autoref.setup_ssl_wrapper_packets(
+                    autoref_proto_unix_io,
+                    tscope.blue_full_system_proto_unix_io,
+                    tscope.yellow_full_system_proto_unix_io,
+                )
 
             # Start the simulator
             thread = threading.Thread(
-                target=__async_sim_ticker, args=(SIXTY_HERTZ_MILLISECONDS_PER_TICK,), daemon=True,
+                target=__async_sim_ticker,
+                args=(SIXTY_HERTZ_MILLISECONDS_PER_TICK,),
+                daemon=True,
             )
 
             thread.start()

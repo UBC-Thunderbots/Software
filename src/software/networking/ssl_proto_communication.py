@@ -2,11 +2,12 @@ import socket
 import google.protobuf.internal.encoder as encoder
 import google.protobuf.internal.decoder as decoder
 
+
 class SslSocketProtoParseException(Exception):
-    '''
+    """
     A custom exception raised by the SSL Socket class when a proto cannot be parsed
-    '''
-    pass
+    """
+
 
 class SslSocket(object):
     """
@@ -16,6 +17,7 @@ class SslSocket(object):
 
     Encoding details can be seen here: https://github.com/RoboCup-SSL/ssl-game-controller/blob/master/cmd/ssl-auto-ref-client/README.md
     """
+
     RECEIVE_BUFFER_SIZE = 9000
 
     def __init__(self, port):
@@ -37,11 +39,9 @@ class SslSocket(object):
         size = proto.ByteSize()
 
         # Send a request to the host with the size of the message
-        self.socket.send(
-            encoder._VarintBytes(size) + proto.SerializeToString()
-        )
+        self.socket.send(encoder._VarintBytes(size) + proto.SerializeToString())
 
-    def receive(self, proto_type) :
+    def receive(self, proto_type):
         """
         Receives proto(s) on the socket and returns them, given the proto type to expect. This function is blocking
 
@@ -54,14 +54,12 @@ class SslSocket(object):
         """
         responses = list()
 
-        try : 
-            proto = proto_type()
+        try:
+            proto_type()
         except NameError:
             raise TypeError(f"Unknown proto type: '{proto_type}'")
 
-        response_data = self.socket.recv(
-                SslSocket.RECEIVE_BUFFER_SIZE
-        )
+        response_data = self.socket.recv(SslSocket.RECEIVE_BUFFER_SIZE)
 
         offset = 0
         while offset < len(response_data):
@@ -70,21 +68,22 @@ class SslSocket(object):
             ci_output = proto_type()
 
             # we didn't receive enough data to parse this message, to get more
-            if (offset + msg_len > len(response_data)):
-                response_data += self.socket.recv(
-                        offset + msg_len - len(response_data)
+            if offset + msg_len > len(response_data):
+                response_data += self.socket.recv(offset + msg_len - len(response_data))
+
+            try:
+                ci_output.ParseFromString(response_data[offset : offset + msg_len])
+            except google.protobuf.message.DecodeError as err:
+                raise SslSocketProtoParseException(
+                    "ProtoDecode Error parsing proto: " + err.args
                 )
 
-            try :
-                ci_output.ParseFromString(response_data[offset : offset + msg_len])
-            except google.protobuf.message.DecodeError as err :
-                raise SslSocketProtoParseException("ProtoDecode Error parsing proto: " + err.args)
-
             if not ci_output.IsInitialized():
-                raise SslSocketProtoParseException("Improper proto of type '{proto_type}' parsed")
+                raise SslSocketProtoParseException(
+                    "Improper proto of type '{proto_type}' parsed"
+                )
 
             offset += msg_len
             responses.append(ci_output)
 
         return responses
-

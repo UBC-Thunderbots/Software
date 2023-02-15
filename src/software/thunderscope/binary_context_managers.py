@@ -13,11 +13,10 @@ import software.python_bindings as tbots
 from proto.import_all_protos import *
 from proto.ssl_gc_common_pb2 import Team
 from software.py_constants import *
-from extlibs.er_force_sim.src.protobuf.world_pb2 import (
-    SimulatorState,
-)
+from extlibs.er_force_sim.src.protobuf.world_pb2 import SimulatorState
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.networking.ssl_proto_communication import *
+
 
 def is_cmd_running(command):
     """Check if there is any running process that was launched
@@ -363,7 +362,7 @@ gdb --args bazel-bin/{simulator_command}
 
         """
         autoref_proto_unix_io.attach_unix_receiver(
-                self.simulator_runtime_dir, SSL_WRAPPER_PATH, SSL_WrapperPacket
+            self.simulator_runtime_dir, SSL_WRAPPER_PATH, SSL_WrapperPacket
         )
 
 
@@ -465,20 +464,22 @@ class Gamecontroller(object):
 
         """
 
-        self.register_referee_command_observer(blue_full_system_proto_unix_io,
-                                          yellow_full_system_proto_unix_io,
-                                          self.referee_port)
+        self.register_referee_command_observer(
+            blue_full_system_proto_unix_io,
+            yellow_full_system_proto_unix_io,
+            self.referee_port,
+        )
 
     def register_referee_command_observer(
-            self, blue_full_system_proto_unix_io, yellow_full_system_proto_unix_io,
-            port
-            ):
+        self, blue_full_system_proto_unix_io, yellow_full_system_proto_unix_io, port
+    ):
         """Register as an observer of RefereeCommands on the specified port.
 
         :param blue_full_system_proto_unix_io:      the proto unix io of the blue full system
         :param yellow_full_system_proto_unix_io:    the proto unix io of the yellow full system
         :param port:                                the port to listen for RefereeCommands
         """
+
         def __send_referee_command(data):
             """Send a referee command from the gamecontroller to both full
             systems.
@@ -494,16 +495,18 @@ class Gamecontroller(object):
         )
 
     def register_ci_referee_command_observer(
-            self, blue_full_system_proto_unix_io, yellow_full_system_proto_unix_io
-            ):
+        self, blue_full_system_proto_unix_io, yellow_full_system_proto_unix_io
+    ):
         """Register the CI port for RefereeCommands. Requires ci_mode=True
 
         :param blue_full_system_proto_unix_io:      the proto unix io of the blue full system
         :param yellow_full_system_proto_unix_io:    the proto unix io of the yellow full system
         """
-        self.register_referee_command_observer(blue_full_system_proto_unix_io,
-                                               yellow_full_system_proto_unix_io,
-                                               self.ci_port)
+        self.register_referee_command_observer(
+            blue_full_system_proto_unix_io,
+            yellow_full_system_proto_unix_io,
+            self.ci_port,
+        )
 
     def send_gc_command(
         self,
@@ -563,54 +566,56 @@ class Gamecontroller(object):
         return ci_output_list
 
     def send_ci_input(self, ci_input):
-        '''
+        """
         Send CiInput proto to the Gamecontroller. Retries if the Gamecontroller output isn't parseable as a CiOutput proto
 
         :param CiInput proto to send to the Gamecontroller
 
         :return: a list of CiOutput protos received from the Gamecontroller
-        '''
+        """
         ci_output_list = list()
-        while True :
-            try :
+        while True:
+            try:
                 self.ci_socket.send(ci_input)
                 ci_output_list = self.ci_socket.receive(CiOutput)
                 break
             except SslSocketProtoParseException as parse_err:
-                logging.info("error receiving CiOutput proto from the gamecontroller: " + parse_err.args)
-                pass
+                logging.info(
+                    "error receiving CiOutput proto from the gamecontroller: "
+                    + parse_err.args
+                )
 
         return ci_output_list
 
     def reset_team(self, name, team):
-        '''
+        """
         Returns an UpdateTeamState proto for the gamecontroller to reset team info.
 
         :param name name of the new team
         :param team yellow or blue team to update
 
         :return: corresponding UpdateTeamState proto
-        '''
-        update_team_state                   = UpdateTeamState()
-        update_team_state.for_team          = team
-        update_team_state.team_name         = name
-        update_team_state.goals             = 0
-        update_team_state.timeouts_left     = 4
-        update_team_state.timeout_time_left = "05:00" 
-        update_team_state.can_place_ball    = True
+        """
+        update_team_state = UpdateTeamState()
+        update_team_state.for_team = team
+        update_team_state.team_name = name
+        update_team_state.goals = 0
+        update_team_state.timeouts_left = 4
+        update_team_state.timeout_time_left = "05:00"
+        update_team_state.can_place_ball = True
 
         return update_team_state
 
     def reset_game(self, division):
-        '''
+        """
         Returns an UpdateConfig proto for the Gamecontroller to reset game info.
 
         :param division the Division proto corresponding to the game division to set up the Gamecontroller for
 
         :return: corresponding UpdateConfig proto
-        '''
-        game_update = UpdateConfig() 
-        game_update.division = division 
+        """
+        game_update = UpdateConfig()
+        game_update.division = division
         game_update.first_kickoff_team = Team.BLUE
         game_update.auto_continue = True
         game_update.match_type = MatchType.FRIENDLY
@@ -618,21 +623,25 @@ class Gamecontroller(object):
         return game_update
 
     def reset_team_info(self, division):
-        '''
+        """
         Sends a message to the Gamecontroller to reset Team information.
 
         :param division the Division proto corresponding to the game division to set up the Gamecontroller for
 
         :return: a list of CiOutput protos from the Gamecontroller
-        '''
+        """
         ci_ci_input = CiInput(timestamp=int(time.time_ns()))
         ci_input_blue_update = Input()
         ci_input_blue_update.reset_match = True
-        ci_input_blue_update.change.update_team_state.CopyFrom(self.reset_team("BLUE", Team.BLUE))
+        ci_input_blue_update.change.update_team_state.CopyFrom(
+            self.reset_team("BLUE", Team.BLUE)
+        )
 
         ci_input_yellow_update = Input()
         ci_input_yellow_update.reset_match = True
-        ci_input_yellow_update.change.update_team_state.CopyFrom(self.reset_team("YELLOW", Team.YELLOW))
+        ci_input_yellow_update.change.update_team_state.CopyFrom(
+            self.reset_team("YELLOW", Team.YELLOW)
+        )
 
         ci_input_game_update = Input()
         ci_input_game_update.reset_match = True
@@ -644,8 +653,9 @@ class Gamecontroller(object):
 
         return self.send_ci_input(ci_ci_input)
 
+
 class TigersAutoref(object):
-    '''
+    """
     A wrapper over the TigersAutoref binary. It coordinates communication between the Simulator, TigersAutoref and Gamecontroller. 
 
     In CI mode, the flow of data corresponds to:
@@ -655,11 +665,20 @@ class TigersAutoref(object):
                 AutoRefCiInput                         CiInput                                 RefereeMessage
 
     For more information: https://github.com/RoboCup-SSL/ssl-game-controller/blob/master/doc/AutoRefCi.md
-    '''
+    """
+
     AUTOREF_COMM_PORT = 10013
     AUTOREF_NUM_RETRIES = 10
 
-    def __init__(self, tick_rate_ms, ci_mode=False, autoref_runtime_dir=None, buffer_size=5, gc=Gamecontroller(), supress_logs=True, ):
+    def __init__(
+        self,
+        tick_rate_ms,
+        ci_mode=False,
+        autoref_runtime_dir=None,
+        buffer_size=5,
+        gc=Gamecontroller(),
+        supress_logs=True,
+    ):
         self.tigers_autoref_proc = None
         self.auto_ref_proc_thread = None
         self.auto_ref_wrapper_thread = None
@@ -671,55 +690,59 @@ class TigersAutoref(object):
         self.tick_rate_ms = tick_rate_ms
         self.current_timestamp = int(time.time_ns())
 
-
     def __enter__(self):
         if not os.path.exists("/opt/tbotspython/autoReferee/bin/autoReferee"):
-            logging.info("Could not find autoref binary, did you run ./setup_software.sh")
+            logging.info(
+                "Could not find autoref binary, did you run ./setup_software.sh"
+            )
 
-        self.auto_ref_proc_thread = threading.Thread(target=self.start_autoref, daemon=True)
+        self.auto_ref_proc_thread = threading.Thread(
+            target=self.start_autoref, daemon=True
+        )
         self.auto_ref_proc_thread.start()
 
-        self.auto_ref_wrapper_thread = threading.Thread(target=self.send_to_autoref_and_forward_to_gamecontroller)
+        self.auto_ref_wrapper_thread = threading.Thread(
+            target=self.send_to_autoref_and_forward_to_gamecontroller
+        )
         self.auto_ref_wrapper_thread.start()
 
         return self
 
     def send_geometry(self):
-        '''
+        """
         Sends updated field geometry to the AutoRef so that the TigersAutoref knows about field sizes.
-        '''
+        """
         ssl_wrapper = self.wrapper_buffer.get(block=True)
         ci_input = AutoRefCiInput()
         ci_input.detection.append(ssl_wrapper.detection)
 
-        field = tbots.Field.createSSLDivisionBField()  
+        field = tbots.Field.createSSLDivisionBField()
         ci_input.geometry.CopyFrom(createGeometryData(field, 0.3))
 
         self.ci_socket.send(ci_input)
 
         response_data = None
         while True:
-            try :
+            try:
                 response_data = self.ci_socket.receive(AutoRefCiOutput)
                 break
             except SslSocketProtoParseException as parse_err:
                 logging.info("error with sending geometry data: \n" + parse_err.args)
-                pass
 
         for ci_output in response_data:
             self.forward_to_gamecontroller(ci_output.tracker_wrapper_packet)
 
     def persistently_connect_to_autoref(self):
-        '''
+        """
         Connect to the TigersAutoref binary. Retry connection a few times if the connection doesn't go through in case the binary hasn't started yet.
 
         :return: True if the action was successful, False otherwise
-        '''
+        """
         tries = 0
-        while (tries < TigersAutoref.AUTOREF_NUM_RETRIES):
-            try :
+        while tries < TigersAutoref.AUTOREF_NUM_RETRIES:
+            try:
                 # We cannot start the Autoref binary immediately, so we must wait until the binary has started before we try to connect to it
-                time.sleep(0.5);
+                time.sleep(0.5)
                 self.ci_socket = SslSocket(TigersAutoref.AUTOREF_COMM_PORT)
                 return True
             except ConnectionRefusedError:
@@ -728,14 +751,14 @@ class TigersAutoref(object):
         return False
 
     def send_to_autoref_and_forward_to_gamecontroller(self):
-        '''
+        """
         Main communication loop that sets up the TigersAutoref and coordinates communication between Simulator, TigersAutoref and Gamecontroller. Returns early if connection to the TigersAutoref binary was unsuccessful.
-        '''
+        """
         if not self.persistently_connect_to_autoref():
             logging.info("Failed to connect to autoref binary. Is it running?")
             return
 
-        self.send_geometry();
+        self.send_geometry()
         self.gamecontroller.reset_team_info(Division.DIV_B)
 
         self.gamecontroller.send_gc_command(
@@ -743,7 +766,7 @@ class TigersAutoref(object):
         )
 
         while True:
-            try :
+            try:
                 ssl_wrapper = self.wrapper_buffer.get(block=True)
                 ci_input = AutoRefCiInput()
                 ci_input.detection.append(ssl_wrapper.detection)
@@ -753,21 +776,21 @@ class TigersAutoref(object):
 
                 for ci_output in response_data:
                     self.forward_to_gamecontroller(ci_output.tracker_wrapper_packet)
-            except SslSocketProtoParseException as parse_error :
-                logging.info("error with receiving AutoRefCiOutput, ignoring this packet...")
-                pass
-
+            except SslSocketProtoParseException as parse_error:
+                logging.info(
+                    "error with receiving AutoRefCiOutput, ignoring this packet..."
+                )
 
     def forward_to_gamecontroller(self, tracker_wrapper):
-        '''
-        Uses the given tracker_wrapper to create a CiInput for the Gamecontroller to track. Uses the timestmap from the given tracker_wrapper to support asynchronous ticking.
+        """
+        Uses the given tracker_wrapper to create a CiInput for the Gamecontroller to track. Uses the timestamp from the given tracker_wrapper to support asynchronous ticking.
 
         :param tracker_wrapper TrackerWrapperPacket for the Gamecontroller to track
 
         :return: a list of CiOutput protos received from the Gamecontroller
-        '''
+        """
         ci_input = CiInput(timestamp=self.current_timestamp)
-        self.current_timestamp += int(self.tick_rate_ms*NANOSECONDS_PER_MILLISECOND)
+        self.current_timestamp += int(self.tick_rate_ms * NANOSECONDS_PER_MILLISECOND)
 
         ci_input.api_inputs.append(Input())
         ci_input.tracker_packet.CopyFrom(tracker_wrapper)
@@ -775,9 +798,9 @@ class TigersAutoref(object):
         return self.gamecontroller.send_ci_input(ci_input)
 
     def start_autoref(self):
-        '''
+        """
         Starts the TigersAutoref binary.
-        '''
+        """
         autoref_cmd = "software/autoref/run_autoref"
 
         if self.ci_mode:
@@ -785,22 +808,25 @@ class TigersAutoref(object):
 
         if self.supress_logs:
             with open(os.devnull, "w") as fp:
-                self.tigers_autoref_proc = Popen(autoref_cmd.split(' '), stdout=fp, stderr=fp)
+                self.tigers_autoref_proc = Popen(
+                    autoref_cmd.split(" "), stdout=fp, stderr=fp
+                )
         else:
-            self.tigers_autoref_proc = Popen(autoref_cmd.split(' '))
+            self.tigers_autoref_proc = Popen(autoref_cmd.split(" "))
 
     def setup_ssl_wrapper_packets(
-        self, autoref_proto_unix_io,
+        self,
+        autoref_proto_unix_io,
         blue_full_system_proto_unix_io,
-        yellow_full_system_proto_unix_io
+        yellow_full_system_proto_unix_io,
     ):
-        '''
+        """
         Registers as an observer of TrackerWrapperPackets from the Simulator, so that they can be forwarded to the Gamecontroller in CI mode.
-        '''
+        """
         autoref_proto_unix_io.register_observer(SSL_WrapperPacket, self.wrapper_buffer)
-        self.gamecontroller.register_ci_referee_command_observer(blue_full_system_proto_unix_io,
-                                                                 yellow_full_system_proto_unix_io)
-
+        self.gamecontroller.register_ci_referee_command_observer(
+            blue_full_system_proto_unix_io, yellow_full_system_proto_unix_io
+        )
 
     def __exit__(self, type, value, traceback):
         if self.tigers_autoref_proc:

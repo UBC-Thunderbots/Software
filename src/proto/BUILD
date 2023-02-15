@@ -74,6 +74,7 @@ py_proto_library(
 proto_library(
     name = "ssl_proto",
     srcs = [
+        "ssl_autoref_ci.proto",
         "ssl_gc_api.proto",
         "ssl_gc_change.proto",
         "ssl_gc_ci.proto",
@@ -89,7 +90,6 @@ proto_library(
         "ssl_vision_geometry.proto",
         "ssl_vision_wrapper.proto",
         "ssl_vision_wrapper_tracked.proto",
-        "ssl_autoref_ci.proto",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -184,6 +184,7 @@ py_proto_library(
         "play_info_msg.proto",
         "robot_log_msg.proto",
         "sensor_msg.proto",
+        "ssl_autoref_ci.proto",
         "ssl_gc_api.proto",
         "ssl_gc_change.proto",
         "ssl_gc_ci.proto",
@@ -199,7 +200,6 @@ py_proto_library(
         "ssl_vision_geometry.proto",
         "ssl_vision_wrapper.proto",
         "ssl_vision_wrapper_tracked.proto",
-        "ssl_autoref_ci.proto",
     ],
     deps = [
         ":tbots_py_proto",

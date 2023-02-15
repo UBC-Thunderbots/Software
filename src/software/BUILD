@@ -68,8 +68,8 @@ pybind_library(
     deps = [
         "//proto:ssl_cc_proto",
         "//proto:tbots_cc_proto",
-        "//proto/message_translation:tbots_geometry",
         "//proto/message_translation:ssl_geometry",
+        "//proto/message_translation:tbots_geometry",
         "//shared:robot_constants",
         "//software/estop:threaded_estop_reader",
         "//software/geom:angle",
@@ -100,10 +100,10 @@ py_binary(
         "//software:python_bindings.so",
     ],
     deps = [
+        "//proto/message_translation:py_tbots_protobuf",
         "//software/thunderscope:binary_context_managers",
         "//software/thunderscope:proto_unix_io",
         "//software/thunderscope/replay:proto_logger",
-        "//proto/message_translation:py_tbots_protobuf",
         requirement("numpy"),
     ],
 )

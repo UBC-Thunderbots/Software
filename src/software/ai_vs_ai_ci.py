@@ -6,14 +6,16 @@ import software.python_bindings as cpp_bindings
 
 import numpy
 
+
 def start_ai_vs_ai(simulator_runtime_dir, blue_fs_dir, yellow_fs_dir):
-    '''
+    """
     Start AI vs AI silently, ticking as fast as possible without visualization.
 
     :param simulator_runtime_dir the runtime directory to set up ProtoUnixIO for the Simulator
     :param blue_fs_dir              the runtime directory to set up ProtoUnixIO for the blue FullSystem
     :param yellow_fs_dir            the runtime directory to set up ProtoUnixIO for the yellow FullSystem
-    '''
+    """
+
     def __async_sim_ticker(simulator_proto_unix_io):
         """Setup the world and tick simulation forever, as fast as possible
 
@@ -22,10 +24,12 @@ def start_ai_vs_ai(simulator_runtime_dir, blue_fs_dir, yellow_fs_dir):
         """
         world_state = tbots_protobuf.create_world_state(
             blue_robot_locations=[
-                cpp_bindings.Point(-3, y) for y in numpy.linspace(-2, 2, DIV_B_NUM_ROBOTS)
+                cpp_bindings.Point(-3, y)
+                for y in numpy.linspace(-2, 2, DIV_B_NUM_ROBOTS)
             ],
             yellow_robot_locations=[
-                cpp_bindings.Point(3, y) for y in numpy.linspace(-2, 2, DIV_B_NUM_ROBOTS)
+                cpp_bindings.Point(3, y)
+                for y in numpy.linspace(-2, 2, DIV_B_NUM_ROBOTS)
             ],
             ball_location=cpp_bindings.Point(0, 0),
             ball_velocity=cpp_bindings.Vector(0, 0),
@@ -37,50 +41,43 @@ def start_ai_vs_ai(simulator_runtime_dir, blue_fs_dir, yellow_fs_dir):
             tick = SimulatorTick(milliseconds=SIXTY_HERTZ_MILLISECONDS_PER_TICK)
             simulator_proto_unix_io.send_proto(SimulatorTick, tick)
 
-    blue_fs_proto_unix_io   = ProtoUnixIO()
+    blue_fs_proto_unix_io = ProtoUnixIO()
     yellow_fs_proto_unix_io = ProtoUnixIO()
     simulator_proto_unix_io = ProtoUnixIO()
 
-    with Simulator(
-            simulator_runtime_dir
-    ) as simulator, FullSystem(
-            blue_fs_dir, friendly_colour_yellow=False
+    with Simulator(simulator_runtime_dir) as simulator, FullSystem(
+        blue_fs_dir, friendly_colour_yellow=False
     ) as blue_fs, FullSystem(
-            yellow_fs_dir, friendly_colour_yellow=True
+        yellow_fs_dir, friendly_colour_yellow=True
     ) as yellow_fs, ProtoLogger(
-            f"{blue_fs_dir}/logs/",
+        f"{blue_fs_dir}/logs/",
     ) as blue_logger, ProtoLogger(
-            f"{yellow_fs_dir}/logs/",
+        f"{yellow_fs_dir}/logs/",
     ) as yellow_logger, Gamecontroller(
-            ci_mode=True
+        ci_mode=True
     ) as gamecontroller, TigersAutoref(
         autoref_runtime_dir="/tmp/tbots/autoref",
         ci_mode=True,
         gc=gamecontroller,
-        tick_rate_ms=SIXTY_HERTZ_MILLISECONDS_PER_TICK
+        tick_rate_ms=SIXTY_HERTZ_MILLISECONDS_PER_TICK,
     ) as autoref:
-        blue_fs_proto_unix_io.register_to_observe_everything(
-                blue_logger.buffer
-        )
-        yellow_fs_proto_unix_io.register_to_observe_everything(
-                yellow_logger.buffer
-        )
+        blue_fs_proto_unix_io.register_to_observe_everything(blue_logger.buffer)
+        yellow_fs_proto_unix_io.register_to_observe_everything(yellow_logger.buffer)
 
         blue_fs.setup_proto_unix_io(blue_fs_proto_unix_io)
         yellow_fs.setup_proto_unix_io(yellow_fs_proto_unix_io)
         simulator.setup_proto_unix_io(
-                simulator_proto_unix_io,
-                blue_fs_proto_unix_io,
-                yellow_fs_proto_unix_io
+            simulator_proto_unix_io, blue_fs_proto_unix_io, yellow_fs_proto_unix_io
         )
         gamecontroller.setup_proto_unix_io(
-                blue_fs_proto_unix_io,
-                yellow_fs_proto_unix_io
+            blue_fs_proto_unix_io, yellow_fs_proto_unix_io
         )
 
         autoref_proto_unix_io = ProtoUnixIO()
         simulator.setup_autoref_proto_unix_io(autoref_proto_unix_io)
-        autoref.setup_ssl_wrapper_packets(autoref_proto_unix_io, blue_fs_proto_unix_io, yellow_fs_proto_unix_io)
+        autoref.setup_ssl_wrapper_packets(
+            autoref_proto_unix_io, blue_fs_proto_unix_io, yellow_fs_proto_unix_io
+        )
 
         thread = threading.Thread(
             target=__async_sim_ticker, args=(simulator_proto_unix_io,), daemon=True,
@@ -88,7 +85,6 @@ def start_ai_vs_ai(simulator_runtime_dir, blue_fs_dir, yellow_fs_dir):
         thread.start()
         thread.join()
 
-        
+
 if __name__ == "__main__":
     start_ai_vs_ai("/tmp/tbots/sim", "/tmp/tbots/blue", "/tmp/tbots/yellow")
-

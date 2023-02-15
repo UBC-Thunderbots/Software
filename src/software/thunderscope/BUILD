@@ -55,10 +55,10 @@ py_library(
     name = "proto_unix_io",
     srcs = ["proto_unix_io.py"],
     deps = [
+        ":thread_safe_buffer",
         "//software/networking:threaded_unix_listener_py",
         "//software/networking:threaded_unix_sender_py",
-        ":thread_safe_buffer",
-    ]
+    ],
 )
 
 py_library(
@@ -85,11 +85,11 @@ py_library(
         "//software/autoref:run_autoref",
     ],
     deps = [
-        "//proto/message_translation:py_tbots_protobuf",
-        "//extlibs/er_force_sim/src/protobuf:erforce_py_proto",
         ":thread_safe_buffer",
+        "//extlibs/er_force_sim/src/protobuf:erforce_py_proto",
+        "//proto/message_translation:py_tbots_protobuf",
         "//software/networking:ssl_proto_communication",
-    ]
+    ],
 )
 
 py_library(
