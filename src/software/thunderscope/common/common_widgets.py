@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-=======
-from pyqtgraph.Qt.QtCore import Qt
->>>>>>> 056cdc4cd33dfae9d3f7270d7144c4a8d19192ba
 from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph.Qt.QtCore import *
@@ -221,10 +217,7 @@ def set_table_data(
 
     table.setHorizontalHeaderLabels(horizontal_headers)
 
-<<<<<<< HEAD
 
-=======
->>>>>>> 056cdc4cd33dfae9d3f7270d7144c4a8d19192ba
 def change_button_state(button, enable):
     """Change button color and clickable state.
 
@@ -282,7 +275,4 @@ def disable_radio_button(button_group):
         button.setChecked(False)
         button.clicked.disconnect()
         button.clicked.connect(lambda state, curr=button: curr.setChecked(False))
-<<<<<<< HEAD
-=======
 
->>>>>>> 056cdc4cd33dfae9d3f7270d7144c4a8d19192ba
