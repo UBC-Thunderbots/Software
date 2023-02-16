@@ -1,4 +1,4 @@
-from pyqtgraph.Qt import QtGui
+from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph.Qt.QtCore import *
 
