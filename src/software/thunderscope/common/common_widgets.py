@@ -181,8 +181,6 @@ def create_push_button(title):
 
     return push_button
 
-
-<<<<<<< HEAD
 def set_table_data(
     data, table, header_size_hint_width_expansion, item_size_hint_width_expansion
 ):
@@ -214,7 +212,7 @@ def set_table_data(
             table.setItem(m, n, newitem)
 
     table.setHorizontalHeaderLabels(horizontal_headers)
-=======
+
 def change_button_state(button, enable):
     """Change button color and clickable state.
 
@@ -272,4 +270,4 @@ def disable_radio_button(button_group):
         button.setChecked(False)
         button.clicked.disconnect()
         button.clicked.connect(lambda state, curr=button: curr.setChecked(False))
->>>>>>> 628ab87d618f8070a840b88a779f87beb699e412
+
