@@ -181,10 +181,7 @@ def create_push_button(title):
 
     return push_button
 
-<<<<<<< HEAD
 
-=======
->>>>>>> 056cdc4cd33dfae9d3f7270d7144c4a8d19192ba
 def set_table_data(
     data, table, header_size_hint_width_expansion, item_size_hint_width_expansion
 ):
@@ -275,4 +272,3 @@ def disable_radio_button(button_group):
         button.setChecked(False)
         button.clicked.disconnect()
         button.clicked.connect(lambda state, curr=button: curr.setChecked(False))
-
