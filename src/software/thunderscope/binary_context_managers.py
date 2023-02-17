@@ -776,7 +776,7 @@ class TigersAutoref(object):
 
                 for ci_output in response_data:
                     self.forward_to_gamecontroller(ci_output.tracker_wrapper_packet)
-            except SslSocketProtoParseException as parse_error:
+            except SslSocketProtoParseException:
                 logging.info(
                     "error with receiving AutoRefCiOutput, ignoring this packet..."
                 )
