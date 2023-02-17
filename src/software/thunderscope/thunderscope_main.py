@@ -300,8 +300,11 @@ if __name__ == "__main__":
         tscope = Thunderscope(
             layout_path=args.layout,
             visualization_buffer_size=args.visualization_buffer_size,
+            load_blue=(args.blue_log is not None),
             blue_replay_log=args.blue_log,
+            load_yellow=(args.yellow_log is not None),
             yellow_replay_log=args.yellow_log,
+            load_gamecontroller=False,
         )
         tscope.show()
 
