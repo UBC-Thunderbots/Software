@@ -10,7 +10,10 @@ from software.thunderscope.binary_context_managers import *
 from proto.message_translation import tbots_protobuf
 import software.python_bindings as cpp_bindings
 from software.py_constants import *
-from software.thunderscope.robot_communication import RobotCommunication
+from software.thunderscope.robot_communication import (
+    RobotCommunication,
+    RobotCommunicationMode,
+)
 from software.thunderscope.replay.proto_logger import ProtoLogger
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 
@@ -91,6 +94,7 @@ if __name__ == "__main__":
         help="Replay folder for the yellow full_system",
         default=None,
     )
+
     # Run blue or yellow full system over WiFi
     group = parser.add_mutually_exclusive_group()
     group.add_argument(
@@ -102,6 +106,12 @@ if __name__ == "__main__":
         "--run_yellow",
         action="store_true",
         help="Run full system as the yellow team, over WiFi; estop required",
+    )
+
+    parser.add_argument(
+        "--run_diagnostics",
+        action="store_true",
+        help="Run robots diagnostics for Manual or Xbox control; estop required",
     )
     parser.add_argument(
         "--interface",
@@ -152,6 +162,10 @@ if __name__ == "__main__":
         action="store_true",
         default=True,
         help="Include logs from the Gamecontroller and Autoref",
+        "--disable_estop",
+        action="store_true",
+        default=False,
+        help="Disables checking for estop plugged in (ONLY USE FOR LOCAL TESTING)",
     )
 
     # Sanity check that an interface was provided
@@ -207,55 +221,83 @@ if __name__ == "__main__":
     #              AI + Robot Communication + Robot Diagnostics               #
     ###########################################################################
     #
-    # When we are running with real robots. We want to run 1 instance of AI
-    # and 1 instance of RobotCommunication which will send/recv packets over
-    # the provided multicast channel.
-    if args.run_blue:
+    # When we are running with real robots. Possible Running Options:
+    #
+    #       Run Blue
+    #       Run Yellow
+    #       Run Blue + Diagnostics
+    #       Run Yellow + Diagnostics
+    #       Run Diagnostics
+    #
+    # We want to run either 1 instance of AI or 1 instance of RobotCommunication or both which will
+    # send/recv packets over the provided multicast channel.
 
+    if args.run_blue or args.run_yellow or args.run_diagnostics:
         tscope = Thunderscope(
             layout_path=args.layout,
-            load_blue=True,
-            load_yellow=False,
-            load_diagnostics=True,
+            load_blue=bool(args.run_blue),
+            load_yellow=bool(args.run_yellow),
+            load_diagnostics=bool(args.run_diagnostics),
             load_gamecontroller=False,
             visualization_buffer_size=args.visualization_buffer_size,
         )
 
-        proto_unix_io = tscope.blue_full_system_proto_unix_io
-        runtime_dir = args.blue_full_system_runtime_dir
-        friendly_colour_yellow = False
-        debug = args.debug_blue_full_system
-    elif args.run_yellow:
+        current_proto_unix_io = None
+        current_mode = RobotCommunicationMode.NONE
 
-        tscope = Thunderscope(
-            layout_path=args.layout,
-            load_blue=False,
-            load_yellow=True,
-            load_diagnostics=True,
-            load_gamecontroller=False,
-            visualization_buffer_size=args.visualization_buffer_size,
-        )
+        if args.run_blue:
+            current_proto_unix_io = tscope.blue_full_system_proto_unix_io
+            runtime_dir = args.blue_full_system_runtime_dir
+            friendly_colour_yellow = False
+            debug = args.debug_blue_full_system
+        elif args.run_yellow:
+            current_proto_unix_io = tscope.yellow_full_system_proto_unix_io
+            runtime_dir = args.yellow_full_system_runtime_dir
+            friendly_colour_yellow = True
+            debug = args.debug_yellow_full_system
 
-        proto_unix_io = tscope.yellow_full_system_proto_unix_io
-        runtime_dir = args.yellow_full_system_runtime_dir
-        friendly_colour_yellow = True
-        debug = args.debug_yellow_full_system
+        # if either fullsystem is running, mode is fullsystem
+        if args.run_blue or args.run_yellow:
+            current_mode = RobotCommunicationMode.FULLSYSTEM
 
-    if args.run_blue or args.run_yellow:
-        with ProtoLogger(
-            args.blue_full_system_runtime_dir,
-        ) as blue_logger, ProtoLogger(
-            args.yellow_full_system_runtime_dir,
-        ) as yellow_logger, RobotCommunication(
-            proto_unix_io, getRobotMulticastChannel(0), args.interface
-        ), FullSystem(
-            runtime_dir, debug, friendly_colour_yellow
-        ) as full_system:
+        # this proto will be the same as the fullsystem one if fullsystem is enabled
+        if args.run_diagnostics:
+            current_proto_unix_io = tscope.robot_diagnostics_proto_unix_io
 
-            proto_unix_io.register_to_observe_everything(blue_logger.buffer)
-            proto_unix_io.register_to_observe_everything(yellow_logger.buffer)
-            full_system.setup_proto_unix_io(proto_unix_io)
-            tscope.show()
+            # switches to both mode if fullsystem enabled, or just diagnostics if not
+            current_mode = (
+                RobotCommunicationMode.BOTH
+                if current_mode == RobotCommunicationMode.FULLSYSTEM
+                else RobotCommunicationMode.DIAGNOSTICS
+            )
+
+        with RobotCommunication(
+            current_proto_unix_io,
+            current_mode,
+            getRobotMulticastChannel(0),
+            args.interface,
+            args.disable_estop,
+        ) as robot_communication:
+            if args.run_diagnostics:
+                tscope.toggle_robot_connection_signal.connect(
+                    robot_communication.toggle_robot_connection
+                )
+            if args.run_blue or args.run_yellow:
+                full_system_runtime_dir = (
+                    args.blue_full_system_runtime_dir
+                    if args.run_blue
+                    else args.yellow_full_system_runtime_dir
+                )
+                with ProtoLogger(full_system_runtime_dir,) as logger, FullSystem(
+                    runtime_dir, debug, friendly_colour_yellow
+                ) as full_system:
+
+                    current_proto_unix_io.register_to_observe_everything(logger.buffer)
+                    full_system.setup_proto_unix_io(current_proto_unix_io)
+
+                    tscope.show()
+            else:
+                tscope.show()
 
     ###########################################################################
     #                              Replay                                     #
@@ -281,6 +323,8 @@ if __name__ == "__main__":
     # The async sim ticket ticks the simulator at a fixed rate.
     else:
         tscope = Thunderscope(
+            load_blue=True,
+            load_yellow=True,
             layout_path=args.layout,
             visualization_buffer_size=args.visualization_buffer_size,
         )
