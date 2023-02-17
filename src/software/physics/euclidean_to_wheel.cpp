@@ -105,22 +105,9 @@ WheelSpace_t EuclideanToWheel::rampWheelVelocity(
     auto max_delta_target_wheel_velocity =
         delta_target_wheel_velocity.cwiseAbs().maxCoeff();
 
-    std::cout << "current" << std::endl;
-    std::cout << toString(current_wheel_velocity[0]) << std::endl;
-    std::cout << toString(current_wheel_velocity[1]) << std::endl;
-    std::cout << toString(current_wheel_velocity[2]) << std::endl;
-    std::cout << toString(current_wheel_velocity[3]) << std::endl;
-
-    std::cout << "target" << std::endl;
-    std::cout << toString(target_wheel_velocity[0]) << std::endl;
-    std::cout << toString(target_wheel_velocity[1]) << std::endl;
-    std::cout << toString(target_wheel_velocity[2]) << std::endl;
-    std::cout << toString(target_wheel_velocity[3]) << std::endl;
-
     // Step 2: Compare max delta velocity against the calculated maximum
     if (max_delta_target_wheel_velocity > allowable_delta_wheel_velocity)
     {
-        std::cout << toString(max_delta_target_wheel_velocity) << std::endl;
         // Step 3: If larger, scale down to allowable max
         ramp_wheel_velocity =
             (delta_target_wheel_velocity / max_delta_target_wheel_velocity) *
@@ -133,12 +120,6 @@ WheelSpace_t EuclideanToWheel::rampWheelVelocity(
         ramp_wheel_velocity = target_wheel_velocity;
     }
 
-    std::cout << "first ramp" << std::endl;
-    std::cout << toString(ramp_wheel_velocity[0]) << std::endl;
-    std::cout << toString(ramp_wheel_velocity[1]) << std::endl;
-    std::cout << toString(ramp_wheel_velocity[2]) << std::endl;
-    std::cout << toString(ramp_wheel_velocity[3]) << std::endl;
-
     // find absolute max wheel velocity
     auto max_ramp_wheel_velocity = ramp_wheel_velocity.cwiseAbs().maxCoeff();
 
@@ -149,12 +130,6 @@ WheelSpace_t EuclideanToWheel::rampWheelVelocity(
         ramp_wheel_velocity = (ramp_wheel_velocity / max_ramp_wheel_velocity) *
                               max_allowable_wheel_velocity;
     }
-
-    std::cout << "second ramp" << std::endl;
-    std::cout << toString(ramp_wheel_velocity[0]) << std::endl;
-    std::cout << toString(ramp_wheel_velocity[1]) << std::endl;
-    std::cout << toString(ramp_wheel_velocity[2]) << std::endl;
-    std::cout << toString(ramp_wheel_velocity[3]) << std::endl;
 
     return ramp_wheel_velocity;
 }
