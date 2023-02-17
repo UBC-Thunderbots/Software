@@ -106,8 +106,8 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
         PriorityTacticVector result = {{}};
 
-        // TODO This needs to be adjusted post field testing, ball needs to land exactly
-        // in the middle of the enemy field
+        // TODO (#2612): This needs to be adjusted post field testing, ball needs to land
+        // exactly in the middle of the enemy field
         kickoff_chip_tactic->updateControlParams(
             world.ball().position(),
             world.field().centerPoint() + Vector(world.field().xLength() / 6, 0));
