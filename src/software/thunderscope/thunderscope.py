@@ -485,7 +485,7 @@ class Thunderscope(object):
 
         self.diagnostics_widgets[
             "diagnostics_input"
-        ] = self.setup_diagnostics_input_widget(proto_unix_io)
+        ] = self.setup_diagnostics_input_widget()
         input_dock = Dock("Diagnostics Input")
         input_dock.addWidget(self.diagnostics_widgets["diagnostics_input"])
         self.diagnostics_widgets["diagnostics_input"].toggle_controls_signal.connect(
@@ -701,14 +701,13 @@ class Thunderscope(object):
 
         return chicker_widget
 
-    def setup_diagnostics_input_widget(self, proto_unix_io):
+    def setup_diagnostics_input_widget(self):
         """
 
         :param proto_unix_io: The proto unix io object
-        :returns the fullsystem connect widget
         """
 
-        diagnostics_input_widget = FullSystemConnectWidget(proto_unix_io)
+        diagnostics_input_widget = FullSystemConnectWidget()
 
         self.register_refresh_function(diagnostics_input_widget.refresh)
 

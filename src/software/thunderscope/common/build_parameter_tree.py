@@ -1,12 +1,10 @@
-from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph import parametertree
 from google.protobuf.json_format import MessageToDict
 from thefuzz import fuzz
-from proto.import_all_protos import *
 
-@staticmethod
-def __create_int_parameter(key, value, descriptor):
+
+def __create_int_parameter_writable(key, value, descriptor):
     """Converts an int field of a proto to a SliderParameter with
     the min/max bounds set according to the provided ParameterRangeOptions
 
@@ -38,8 +36,8 @@ def __create_int_parameter(key, value, descriptor):
         "step": 1,
     }
 
-@staticmethod
-def __create_double_parameter(key, value, descriptor):
+
+def __create_double_parameter_writable(key, value, descriptor):
     """Converts a double field of a proto to a SliderParameter with
     the min/max bounds set according to the provided ParameterRangeOptions
     min/vax options.
@@ -70,7 +68,7 @@ def __create_double_parameter(key, value, descriptor):
         "step": 0.01,
     }
 
-@staticmethod
+
 def __create_enum_parameter(key, value, descriptor):
     """Converts an enum field in a protobuf to a ListParameter. Uses
     the options to lookup all possible enum values and provides them
@@ -96,7 +94,7 @@ def __create_enum_parameter(key, value, descriptor):
         limits=options,
     )
 
-@staticmethod
+
 def __create_bool_parameter(key, value, _):
     """Convert a bool field in proto to a BoolParameter
 
@@ -107,8 +105,8 @@ def __create_bool_parameter(key, value, _):
     """
     return {"name": key, "type": "bool", "value": value}
 
-@staticmethod
-def __create_string_parameter(key, value, descriptor):
+
+def __create_string_parameter_writable(key, value, descriptor):
     """Convert a string field in proto to a StrParameter
 
     :param key: The name of the parameter
@@ -118,8 +116,23 @@ def __create_string_parameter(key, value, descriptor):
     """
     return {"name": key, "type": "text", "value": " "}
 
-def config_proto_to_param_dict(
-        self, message, search_term=None, current_attr=None,
+
+def __create_parameter_read_only(key, value, descriptor):
+    """Convert a string field in proto to a read only TextParameter
+
+    :param key: The name of the parameter
+    :param value: The default value
+    :param descriptor: The proto descriptor
+
+    """
+    return {"name": key, "type": "text", "value": value, "readonly": True}
+
+
+def config_proto_to_field_list(
+        message,
+        read_only=True,
+        search_term=None,
+        search_filter_threshold=60
 ):
     """Converts a protobuf to a pyqtgraph parameter tree dictionary
     that can loaded directly into a ParameterTree
@@ -127,15 +140,12 @@ def config_proto_to_param_dict(
     https://pyqtgraph.readthedocs.io/en/latest/parametertree/index.html
 
     :param message: The message to convert to a dictionary
+    :param read_only: Whether the parameters should be read only or writable
     :param search_term: The search filter
-    :param current_attr: Which attr we are currently on to set
+    :param search_filter_threshold: the search filter threshold
 
     """
-    message_dict = {}
     field_list = []
-
-    if not current_attr:
-        current_attr = "self.proto_to_configure"
 
     for descriptor in message.DESCRIPTOR.fields:
 
@@ -143,7 +153,7 @@ def config_proto_to_param_dict(
         value = getattr(message, descriptor.name)
 
         if search_term and descriptor.type != descriptor.TYPE_MESSAGE:
-            if fuzz.partial_ratio(search_term, key) < self.search_filter_threshold:
+            if fuzz.partial_ratio(search_term, key) < search_filter_threshold:
                 continue
 
         if descriptor.type == descriptor.TYPE_MESSAGE:
@@ -151,46 +161,66 @@ def config_proto_to_param_dict(
                 {
                     "name": key,
                     "type": "group",
-                    "children": self.config_proto_to_param_dict(
-                        value, search_term, f"{current_attr}.{key}",
+                    "children": config_proto_to_field_list(
+                        value,
+                        read_only=read_only,
+                        search_term=search_term,
+                        search_filter_threshold=search_filter_threshold
                     ),
                 }
             )
 
         elif descriptor.type == descriptor.TYPE_BOOL:
-            field_list.append(self.__create_bool_parameter(key, value, descriptor))
+            field_list.append(
+                __create_parameter_read_only(key, str(value), descriptor)
+                if read_only
+                else __create_bool_parameter(key, value, descriptor)
+            )
 
         elif descriptor.type == descriptor.TYPE_ENUM:
-            field_list.append(self.__create_enum_parameter(key, value, descriptor))
+            field_list.append(
+                __create_parameter_read_only(key, str(value), descriptor)
+                if read_only
+                else __create_enum_parameter(key, value, descriptor)
+            )
 
         elif descriptor.type == descriptor.TYPE_STRING:
             field_list.append(
-                self.__create_string_parameter(key, value, descriptor)
+                __create_parameter_read_only(key, value, descriptor)
+                if read_only
+                else __create_string_parameter_writable(key, value, descriptor)
             )
 
-        elif descriptor.type == descriptor.TYPE_DOUBLE:
+        elif descriptor.type in [
+            descriptor.TYPE_DOUBLE,
+            descriptor.TYPE_FLOAT
+        ]:
             field_list.append(
-                self.__create_double_parameter(key, value, descriptor)
+                __create_parameter_read_only(key, "%.2f" % value, descriptor)
+                if read_only
+                else __create_double_parameter_writable(key, value, descriptor)
             )
 
-        elif descriptor.type in [descriptor.TYPE_INT32, descriptor.TYPE_INT64]:
-            field_list.append(self.__create_int_parameter(key, value, descriptor))
+        elif descriptor.type in [
+            descriptor.TYPE_INT32,
+            descriptor.TYPE_INT64,
+            descriptor.TYPE_UINT32,
+            descriptor.TYPE_UINT64
+        ]:
+            field_list.append(
+                __create_parameter_read_only(key, str(value), descriptor)
+                if read_only
+                else __create_int_parameter_writable(key, value, descriptor)
+            )
 
         else:
             raise NotImplementedError(
                 "Unsupported type {} in parameter config".format(descriptor.type)
             )
 
-        # Protobuf doesn't set the default values by default, and won't let
-        # us serialize the message if all the required fields are not set (even
-        # if they have a default). So lets just set the default as the value
-        if descriptor.type != descriptor.TYPE_MESSAGE:
-            if descriptor.type == descriptor.TYPE_STRING:
-                exec(f"{current_attr}.{key} = '{value}'")
-            else:
-                exec(f"{current_attr}.{key} = {value}")
-
     if field_list:
         return field_list
 
-    return message_dict
+    return {}
+
+

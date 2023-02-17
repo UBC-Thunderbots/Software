@@ -38,11 +38,16 @@ class ProtoConfigurationWidget(QWidget):
         self.on_change_callback = on_change_callback
         self.proto_to_configure = proto_to_configure
 
+        # Create search query bar
+        self.search_query = QLineEdit()
+        self.search_query.textChanged.connect(self.__handle_search_query_changed)
+        self.search_filter_threshold = search_filter_threshold
+
         # Create ParameterGroup from Protobuf
         self.param_group = parametertree.Parameter.create(
             name="params",
             type="group",
-            children=build_parameter_tree.config_proto_to_param_dict(self.proto_to_configure, None),
+            children=self.config_proto_to_param_dict(self.proto_to_configure, read_only=False, search_term=None),
         )
 
         # Create ParameterTree
@@ -50,11 +55,6 @@ class ProtoConfigurationWidget(QWidget):
         self.param_tree.setParameters(self.param_group, showTop=False)
         self.param_group.sigTreeStateChanged.connect(self.__handle_parameter_changed)
         self.param_tree.setAlternatingRowColors(False)
-
-        # Create search query bar
-        self.search_query = QLineEdit()
-        self.search_query.textChanged.connect(self.__handle_search_query_changed)
-        self.search_filter_threshold = search_filter_threshold
 
         layout.addWidget(self.search_query)
         layout.addWidget(self.param_tree)
@@ -71,7 +71,7 @@ class ProtoConfigurationWidget(QWidget):
         self.param_group = parametertree.Parameter.create(
             name="params",
             type="group",
-            children=build_parameter_tree.config_proto_to_param_dict(
+            children=self.config_proto_to_param_dict(
                 self.proto_to_configure, search_term
             ),
         )
@@ -106,4 +106,52 @@ class ProtoConfigurationWidget(QWidget):
 
             self.on_change_callback(child_name, data, self.proto_to_configure)
 
+    def config_proto_to_param_dict(
+        self, message, search_term=None
+    ):
+        """Converts a protobuf to a pyqtgraph parameter tree dictionary
+        that can loaded directly into a ParameterTree
 
+        https://pyqtgraph.readthedocs.io/en/latest/parametertree/index.html
+
+        :param message: The message to convert to a dictionary
+        :param search_term: The search filter
+
+        """
+
+        field_list = build_parameter_tree.config_proto_to_field_list(
+            message,
+            search_term=search_term,
+            search_filter_threshold=self.search_filter_threshold
+        )
+
+        self.build_proto(message)
+
+        return field_list
+
+    def build_proto(self, message, current_attr=None):
+        """
+        Builds the given message
+        :param message: the message to build
+        :param current_attr: the string to execute to access the current level of fields
+        :return:
+        """
+
+        if not current_attr:
+            current_attr = "self.proto_to_configure"
+
+        for descriptor in message.DESCRIPTOR.fields:
+
+            key = descriptor.name
+            value = getattr(message, descriptor.name)
+
+            # Protobuf doesn't set the default values by default, and won't let
+            # us serialize the message if all the required fields are not set (even
+            # if they have a default). So lets just set the default as the value
+            if descriptor.type != descriptor.TYPE_MESSAGE:
+                if descriptor.type == descriptor.TYPE_STRING:
+                    exec(f"{current_attr}.{key} = '{value}'")
+                else:
+                    exec(f"{current_attr}.{key} = {value}")
+            else:
+                self.build_proto(value, f"{current_attr}.{key}")

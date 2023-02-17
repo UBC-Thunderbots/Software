@@ -4,6 +4,7 @@ from pyqtgraph.Qt.QtWidgets import *
 from software.py_constants import *
 from proto.import_all_protos import *
 from software.thunderscope.robot_diagnostics.robot_info import RobotInfo
+from software.thunderscope.robot_diagnostics.robot_status import RobotStatusView
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 
@@ -33,9 +34,7 @@ class RobotView(QScrollArea):
         self.robot_info_widgets = [
             RobotInfo(x, load_fullsystem) for x in range(MAX_ROBOT_IDS_PER_SIDE)
         ]
-        self.robot_status_widgets = [
-            ProtoConfigurationWidget()
-        ]
+        self.robot_status_widget = RobotStatusView()
 
         for id in range(MAX_ROBOT_IDS_PER_SIDE):
             self.robot_info_widgets[id].toggle_one_connection_signal.connect(
@@ -46,12 +45,20 @@ class RobotView(QScrollArea):
 
             self.layout.addWidget(self.robot_info_widgets[id])
 
+            if id == 2:
+                print("yes")
+                self.layout.addWidget(self.robot_status_widget)
+
         self.container = QFrame(self)
         self.container.setLayout(self.layout)
         self.setWidget(self.container)
         self.setWidgetResizable(True)
+
+        desktop = QDesktopWidget()
+        self.screen_size = desktop.availableGeometry()
+
         self.setMinimumHeight(
-            self.container.sizeHint().height()
+            self.screen_size.height() * 0.5
         )
 
     def refresh(self):
