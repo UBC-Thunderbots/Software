@@ -87,3 +87,9 @@ class SslSocket(object):
             responses.append(ci_output)
 
         return responses
+
+    def close(self):
+        """
+        Closes the socket associated with this object.
+        """
+        self.socket.close()
