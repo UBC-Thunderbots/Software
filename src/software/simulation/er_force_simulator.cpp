@@ -10,7 +10,6 @@
 #include "extlibs/er_force_sim/src/protobuf/robot.h"
 #include "proto/message_translation/ssl_detection.h"
 #include "proto/message_translation/ssl_geometry.h"
-#include "proto/message_translation/ssl_simulation_robot_control.h"
 #include "proto/message_translation/ssl_wrapper.h"
 #include "proto/message_translation/tbots_protobuf.h"
 #include "proto/robot_status_msg.pb.h"
@@ -368,11 +367,11 @@ SSLSimulationProto::RobotControl ErForceSimulator::updateSimulatorRobots(
         auto current_velocity_map       = getRobotIdToLocalVelocityMap(sim_robots);
         auto ramped_direct_control      = euclidean_four_wheel_convert.rampVelocity(
                 current_velocity_map.at(robot_id),
-                std::move(direct_control),
+                *direct_control,
                 primitive_executor_time_step);
 
         auto command = *getRobotCommandFromDirectControl(
-                robot_id, std::move(direct_control), robot_constants);
+                robot_id, std::move(ramped_direct_control), robot_constants);
         *(robot_control.mutable_robot_commands()->Add()) = command;
     }
     return robot_control;

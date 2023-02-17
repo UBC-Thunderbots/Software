@@ -77,7 +77,7 @@ class EuclideanToWheel
 
     std::unique_ptr<TbotsProto::DirectControlPrimitive> rampWheelVelocity(
             const std::pair<Vector, AngularVelocity> current_primitive,
-            const std::unique_ptr<TbotsProto::DirectControlPrimitive> target_velocity_primitive,
+            TbotsProto::DirectControlPrimitive& target_velocity_primitive,
             const double& time_to_ramp);
 
    private:

@@ -88,7 +88,7 @@ WheelSpace_t EuclideanToWheel::rampWheelVelocity(
         const double& time_to_ramp)
 {
     double allowed_acceleration = static_cast<double>(robot_constants.robot_max_acceleration_m_per_s_2);
-    double max_allowable_wheel_velocity = static_cast<double>(robot_constants.robot_max_acceleration_m_per_s_2);
+    double max_allowable_wheel_velocity = static_cast<double>(robot_constants.robot_max_speed_m_per_s);
 
     // ramp wheel velocity
     WheelSpace_t ramp_wheel_velocity;
@@ -137,12 +137,12 @@ WheelSpace_t EuclideanToWheel::rampWheelVelocity(
 
 std::unique_ptr<TbotsProto::DirectControlPrimitive> EuclideanToWheel::rampWheelVelocity(
         const std::pair<Vector, AngularVelocity> current_velocity,
-        const std::unique_ptr<TbotsProto::DirectControlPrimitive> target_velocity_primitive,
+        TbotsProto::DirectControlPrimitive& target_velocity_primitive,
         const double& time_to_ramp)
 {
     EuclideanSpace_t target_euclidean_velocity = {};
 
-    TbotsProto::MotorControl motor_control = target_velocity_primitive->motor_control();
+    TbotsProto::MotorControl motor_control = target_velocity_primitive.motor_control();
     if (motor_control.has_direct_per_wheel_control())
     {
         TbotsProto::MotorControl_DirectPerWheelControl direct_per_wheel = motor_control.direct_per_wheel_control();
@@ -154,12 +154,12 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> EuclideanToWheel::rampWheelV
         };
         target_euclidean_velocity = getEuclideanVelocity(wheel_velocity);
     }
-    else if (target_velocity_primitive->motor_control().has_direct_velocity_control())
+    else if (target_velocity_primitive.motor_control().has_direct_velocity_control())
     {
         TbotsProto::MotorControl_DirectVelocityControl direct_velocity = motor_control.direct_velocity_control();
         target_euclidean_velocity = {
-                -(int)direct_velocity.velocity().y_component_meters(),
-                (int)direct_velocity.velocity().x_component_meters(),
+                -direct_velocity.velocity().y_component_meters(),
+                direct_velocity.velocity().x_component_meters(),
                 direct_velocity.angular_velocity().radians_per_second()
         };
     }
@@ -179,11 +179,11 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> EuclideanToWheel::rampWheelV
 
     EuclideanSpace_t ramped_euclidean = getEuclideanVelocity(ramped_four_wheel);
 
-    auto mutable_direct_velocity = target_velocity_primitive->mutable_motor_control()->mutable_direct_velocity_control();
+    auto mutable_direct_velocity = target_velocity_primitive.mutable_motor_control()->mutable_direct_velocity_control();
     *(mutable_direct_velocity->mutable_velocity()) = *createVectorProto({ramped_euclidean[1], -ramped_euclidean[0]});
     *(mutable_direct_velocity->mutable_angular_velocity()) = *createAngularVelocityProto(
             AngularVelocity::fromRadians(ramped_euclidean[2]));
 
-    return std::move(target_velocity_primitive);
+    return std::make_unique<TbotsProto::DirectControlPrimitive>(target_velocity_primitive);
 
 }

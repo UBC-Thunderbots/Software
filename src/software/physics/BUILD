@@ -10,6 +10,9 @@ cc_library(
     ],
     deps = [
         "//shared:robot_constants",
+        "//proto/primitive:primitive_msg_factory",
+        "//software/geom:vector",
+        "//software/geom:angular_velocity",
         "@eigen",
     ],
 )
@@ -22,7 +25,11 @@ cc_test(
     deps = [
         ":euclidean_to_wheel",
         "//shared/test_util:tbots_gtest_main",
+        "//software/geom:vector",
+        "//software/geom:angular_velocity",
         "//software/test_util",
+        "//proto/primitive:primitive_msg_factory",
+        "//shared:robot_constants"
     ],
 )
 
