@@ -94,6 +94,12 @@ if __name__ == "__main__":
         help="Replay folder for the yellow full_system",
         default=None,
     )
+    parser.add_argument(
+        "--verbose",
+        action="store_true",
+        default=True,
+        help="Include logs from the Gamecontroller and Autoref",
+    )
 
     # Run blue or yellow full system over WiFi
     group = parser.add_mutually_exclusive_group()
@@ -158,10 +164,6 @@ if __name__ == "__main__":
         "--enable_autoref", action="store_true", default=False, help="Enable autoref"
     )
     parser.add_argument(
-        "--verbose",
-        action="store_true",
-        default=True,
-        help="Include logs from the Gamecontroller and Autoref",
         "--disable_estop",
         action="store_true",
         default=False,

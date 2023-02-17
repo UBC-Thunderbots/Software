@@ -142,7 +142,7 @@ jobs:
             //software/geom/...
 
   autorefd-game:
-    name: AutoRef'd Game (2 Minutes)
+    name: AutoRef'd Game (3 Minutes)
     runs-on: ubuntu-20.04
     steps:
       # checks-out the repository under $GITHUB_WORKSPACE
@@ -157,10 +157,10 @@ jobs:
           cd src
           bazel build //software/thunderscope:thunderscope_main
 
-      - name: AI vs AI (2 minutes)
+      - name: AI vs AI (3 minutes)
         run: |
           cd src
-          timeout 2m bazel run //software:ai_vs_ai_ci || code=$?; if [[$code -ne 124 && $code -ne 0]]; then exit $code; fi
+          timeout 3m bazel run //software:ai_vs_ai_ci || code=$?; if [[$code -ne 124 && $code -ne 0]]; then exit $code; fi
 
 
       - name: Upload AI vs AI logs
