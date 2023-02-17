@@ -5,11 +5,11 @@
 #include "proto/ssl_vision_wrapper.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
 #include "software/jetson_nano/primitive_executor.h"
+#include "software/physics/euclidean_to_wheel.h"
+#include "software/physics/velocity_ramping.h"
 #include "software/world/field.h"
 #include "software/world/team_types.h"
 #include "software/world/world.h"
-#include "software/physics/velocity_ramping.h"
-#include "software/physics/euclidean_to_wheel.h"
 
 
 /**
@@ -185,7 +185,7 @@ class ErForceSimulator
         const TbotsProto::World& world_msg);
 
     TbotsProto::DirectControlPrimitive rampVelocity(
-            TbotsProto::DirectControlPrimitive& direct_control);
+        TbotsProto::DirectControlPrimitive& direct_control);
 
     // Map of Robot id to Primitive Executor
     std::unordered_map<unsigned int, std::shared_ptr<PrimitiveExecutor>>

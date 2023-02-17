@@ -354,24 +354,25 @@ void ErForceSimulator::setRobotPrimitive(
 SSLSimulationProto::RobotControl ErForceSimulator::updateSimulatorRobots(
     std::unordered_map<unsigned int, std::shared_ptr<PrimitiveExecutor>>&
         robot_primitive_executor_map,
-    const TbotsProto::World& world_msg) {
+    const TbotsProto::World& world_msg)
+{
     SSLSimulationProto::RobotControl robot_control;
 
-    for (auto &primitive_executor_with_id: robot_primitive_executor_map) {
-        unsigned int robot_id = primitive_executor_with_id.first;
-        auto &primitive_executor = primitive_executor_with_id.second;
-        auto direct_control = primitive_executor->stepPrimitive();
+    for (auto& primitive_executor_with_id : robot_primitive_executor_map)
+    {
+        unsigned int robot_id    = primitive_executor_with_id.first;
+        auto& primitive_executor = primitive_executor_with_id.second;
+        auto direct_control      = primitive_executor->stepPrimitive();
 
-        auto sim_state                  = getSimulatorState();
-        const auto& sim_robots          = sim_state.blue_robots();
-        auto current_velocity_map       = getRobotIdToLocalVelocityMap(sim_robots);
-        auto ramped_direct_control      = euclidean_four_wheel_convert.rampVelocity(
-                current_velocity_map.at(robot_id),
-                *direct_control,
-                primitive_executor_time_step);
+        auto sim_state             = getSimulatorState();
+        const auto& sim_robots     = sim_state.blue_robots();
+        auto current_velocity_map  = getRobotIdToLocalVelocityMap(sim_robots);
+        auto ramped_direct_control = euclidean_four_wheel_convert.rampVelocity(
+            current_velocity_map.at(robot_id), *direct_control,
+            primitive_executor_time_step);
 
         auto command = *getRobotCommandFromDirectControl(
-                robot_id, std::move(ramped_direct_control), robot_constants);
+            robot_id, std::move(ramped_direct_control), robot_constants);
         *(robot_control.mutable_robot_commands()->Add()) = command;
     }
     return robot_control;

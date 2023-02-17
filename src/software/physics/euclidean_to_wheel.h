@@ -4,8 +4,8 @@
 
 #include "proto/primitive.pb.h"
 #include "shared/robot_constants.h"
-#include "software/geom/vector.h"
 #include "software/geom/angular_velocity.h"
+#include "software/geom/vector.h"
 
 /**
  * Vector representation of 2D Euclidean space.
@@ -41,7 +41,7 @@ class EuclideanToWheel
      *
      * @param robot_constants The constants of the robot we are computing for.
      */
-    explicit EuclideanToWheel(const RobotConstants_t &robot_constants);
+    explicit EuclideanToWheel(const RobotConstants_t& robot_constants);
 
     /**
      * Gets the wheel velocity from the Euclidean velocity.
@@ -57,7 +57,7 @@ class EuclideanToWheel
      * @param wheel_velocity The wheel velocity.
      * @return The equivalent Euclidean velocity.
      */
-    EuclideanSpace_t getEuclideanVelocity(const WheelSpace_t &wheel_velocity) const;
+    EuclideanSpace_t getEuclideanVelocity(const WheelSpace_t& wheel_velocity) const;
 
 
     /**
@@ -76,9 +76,9 @@ class EuclideanToWheel
                                    const double& time_to_ramp);
 
     std::unique_ptr<TbotsProto::DirectControlPrimitive> rampWheelVelocity(
-            const std::pair<Vector, AngularVelocity> current_primitive,
-            TbotsProto::DirectControlPrimitive& target_velocity_primitive,
-            const double& time_to_ramp);
+        const std::pair<Vector, AngularVelocity> current_primitive,
+        TbotsProto::DirectControlPrimitive& target_velocity_primitive,
+        const double& time_to_ramp);
 
    private:
     /**

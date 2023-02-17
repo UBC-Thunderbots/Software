@@ -9,10 +9,10 @@ cc_library(
         "euclidean_to_wheel.h",
     ],
     deps = [
-        "//shared:robot_constants",
         "//proto/primitive:primitive_msg_factory",
-        "//software/geom:vector",
+        "//shared:robot_constants",
         "//software/geom:angular_velocity",
+        "//software/geom:vector",
         "@eigen",
     ],
 )
@@ -24,12 +24,12 @@ cc_test(
     ],
     deps = [
         ":euclidean_to_wheel",
-        "//shared/test_util:tbots_gtest_main",
-        "//software/geom:vector",
-        "//software/geom:angular_velocity",
-        "//software/test_util",
         "//proto/primitive:primitive_msg_factory",
-        "//shared:robot_constants"
+        "//shared:robot_constants",
+        "//shared/test_util:tbots_gtest_main",
+        "//software/geom:angular_velocity",
+        "//software/geom:vector",
+        "//software/test_util",
     ],
 )
 
