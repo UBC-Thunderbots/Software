@@ -33,6 +33,9 @@ class RobotView(QScrollArea):
         self.robot_info_widgets = [
             RobotInfo(x, load_fullsystem) for x in range(MAX_ROBOT_IDS_PER_SIDE)
         ]
+        self.robot_status_widgets = [
+            ProtoConfigurationWidget()
+        ]
 
         for id in range(MAX_ROBOT_IDS_PER_SIDE):
             self.robot_info_widgets[id].toggle_one_connection_signal.connect(
