@@ -41,6 +41,7 @@ class TestType(Enum):
     """
     Enum for the 2 types of tests available
     """
+
     INVARIANT = 1
     AGGREGATE = 2
 
@@ -89,8 +90,6 @@ class SimulatedTestRunner(object):
         self.robot_status_buffer = ThreadSafeBuffer(
             buffer_size=1, protobuf_type=RobotStatus
         )
-
-
 
         self.blue_full_system_proto_unix_io.register_observer(
             SSL_WrapperPacket, self.ssl_wrapper_buffer
@@ -500,7 +499,7 @@ def simulated_test_runner():
                     layout_path=args.layout,
                     visualization_buffer_size=args.visualization_buffer_size,
                     load_blue=True,
-                    load_yellow=True
+                    load_yellow=True,
                 )
 
             time.sleep(LAUNCH_DELAY_S)
