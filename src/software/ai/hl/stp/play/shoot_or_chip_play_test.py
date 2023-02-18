@@ -70,6 +70,11 @@ def test_shoot_or_chip_play(simulated_test_runner):
 
         simulated_test_runner.blue_full_system_proto_unix_io.send_proto(Play, blue_play)
 
+        simulated_test_runner.simulator_proto_unix_io.send_proto(
+            WorldState,
+            world_state
+        )
+
     simulated_test_runner.run_test(
         setup=setup,
         params=[0],
