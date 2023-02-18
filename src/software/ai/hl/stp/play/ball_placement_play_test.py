@@ -16,7 +16,7 @@ from proto.ssl_gc_geometry_pb2 import Vector2
 # TODO (#2599): Remove Duration parameter from test
 
 # test duration global constant
-test_duration = 20
+TEST_DURATION = 20
 
 
 @pytest.mark.parametrize(
@@ -103,7 +103,7 @@ def test_free_kick_ball_placement(simulated_test_runner, run_enemy_ai):
     simulated_test_runner.run_test(
         eventually_validation_sequence_set=placement_eventually_validation_sequence_set,
         always_validation_sequence_set=placement_always_validation_sequence_set,
-        test_timeout_s=test_duration,
+        test_timeout_s=TEST_DURATION,
     )
 
     # TODO (#2797): uncomment tests below to verify robots actually drop ball and exit region
@@ -136,7 +136,7 @@ def test_free_kick_ball_placement(simulated_test_runner, run_enemy_ai):
     # simulated_test_runner.run_test(
     #     eventually_validation_sequence_set=drop_ball_eventually_validation_sequence_set,
     #     always_validation_sequence_set=drop_ball_always_validation_sequence_set,
-    #     test_timeout_s=test_duration,
+    #     test_timeout_s=TEST_DURATION,
     # )
 
 
@@ -221,7 +221,7 @@ def test_force_start_ball_placement(simulated_test_runner, run_enemy_ai):
     simulated_test_runner.run_test(
         eventually_validation_sequence_set=placement_eventually_validation_sequence_set,
         always_validation_sequence_set=placement_always_validation_sequence_set,
-        test_timeout_s=test_duration,
+        test_timeout_s=TEST_DURATION,
     )
 
     # TODO (#2797): uncomment tests below to verify robots actually drop ball and exit region
@@ -254,7 +254,7 @@ def test_force_start_ball_placement(simulated_test_runner, run_enemy_ai):
     # simulated_test_runner.run_test(
     #     eventually_validation_sequence_set=drop_ball_eventually_validation_sequence_set,
     #     always_validation_sequence_set=drop_ball_always_validation_sequence_set,
-    #     test_timeout_s=test_duration,
+    #     test_timeout_s=TEST_DURATION,
     # )
 
 
