@@ -132,8 +132,6 @@ class RobotCommunication(object):
                 if num_times_to_stop > 0:
                     robot_primitives[robot_id] = Primitive(stop=StopPrimitive())
                     self.robots_to_be_disconnected[robot_id] = num_times_to_stop - 1
-                elif num_times_to_stop == 0:
-                    del self.robots_to_be_disconnected[robot_id]
 
             # initialize total primitive set and send it
             primitive_set = PrimitiveSet(
