@@ -221,7 +221,7 @@ class InvariantTestRunner(SimulatedTestRunner):
     """
 
     def __init__(self, *args, **kwargs):
-        super(InvariantTestRunner, self).__init__(self, *args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def run_test(
         self,
@@ -285,7 +285,7 @@ class AggregateTestRunner(SimulatedTestRunner):
     """
 
     def __int__(self, *args, **kwargs):
-        super().__init__(self, *args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def run_test(
         self,
