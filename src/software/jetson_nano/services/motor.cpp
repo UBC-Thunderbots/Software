@@ -424,10 +424,7 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
         }
     }
     target_wheel_velocities = euclidean_to_four_wheel.rampWheelVelocity(
-        prev_wheel_velocities, target_linear_velocity,
-        static_cast<double>(robot_constants_.robot_max_speed_m_per_s),
-        static_cast<double>(robot_constants_.robot_max_acceleration_m_per_s_2),
-        time_elapsed_since_last_poll_s);
+        prev_wheel_velocities, target_linear_velocity, time_elapsed_since_last_poll_s);
 
     // TODO (#2719): interleave the angular accelerations in here at some point.
     prev_wheel_velocities = target_wheel_velocities;

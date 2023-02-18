@@ -6,7 +6,6 @@
 #include "proto/tbots_software_msgs.pb.h"
 #include "software/jetson_nano/primitive_executor.h"
 #include "software/physics/euclidean_to_wheel.h"
-#include "software/physics/velocity_ramping.h"
 #include "software/world/field.h"
 #include "software/world/team_types.h"
 #include "software/world/world.h"

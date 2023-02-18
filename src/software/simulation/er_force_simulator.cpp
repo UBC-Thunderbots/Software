@@ -10,6 +10,7 @@
 #include "extlibs/er_force_sim/src/protobuf/robot.h"
 #include "proto/message_translation/ssl_detection.h"
 #include "proto/message_translation/ssl_geometry.h"
+#include "proto/message_translation/ssl_simulation_robot_control.h"
 #include "proto/message_translation/ssl_wrapper.h"
 #include "proto/message_translation/tbots_protobuf.h"
 #include "proto/robot_status_msg.pb.h"
@@ -23,11 +24,11 @@ ErForceSimulator::ErForceSimulator(const TbotsProto::FieldType& field_type,
     : yellow_team_world_msg(std::make_unique<TbotsProto::World>()),
       blue_team_world_msg(std::make_unique<TbotsProto::World>()),
       frame_number(0),
+      euclidean_four_wheel_convert(robot_constants),
       robot_constants(robot_constants),
       field(Field::createField(field_type)),
       blue_robot_with_ball(std::nullopt),
-      yellow_robot_with_ball(std::nullopt),
-      euclidean_four_wheel_convert(robot_constants)
+      yellow_robot_with_ball(std::nullopt)
 {
     QString full_filename = CONFIG_DIRECTORY;
 
@@ -367,7 +368,7 @@ SSLSimulationProto::RobotControl ErForceSimulator::updateSimulatorRobots(
         auto sim_state             = getSimulatorState();
         const auto& sim_robots     = sim_state.blue_robots();
         auto current_velocity_map  = getRobotIdToLocalVelocityMap(sim_robots);
-        auto ramped_direct_control = euclidean_four_wheel_convert.rampVelocity(
+        auto ramped_direct_control = euclidean_four_wheel_convert.rampWheelVelocity(
             current_velocity_map.at(robot_id), *direct_control,
             primitive_executor_time_step);
 
