@@ -8,7 +8,7 @@ from software.simulated_tests.validation import (
 )
 
 
-class FriendlyGoalScored(Validation):
+class FriendlyTeamScored(Validation):
 
     """Checks if a ball enters the enemy goal."""
 
@@ -48,4 +48,4 @@ class FriendlyGoalScored(Validation):
     _FriendlyTeamGoalEventuallyRemoved,  # These two don't make much sense
     _FriendlyTeamAlwaysScored,  # These two don't make much sense
     FriendlyTeamNeverScored,
-) = create_validation_types(FriendlyGoalScored)
+) = create_validation_types(FriendlyTeamScored)

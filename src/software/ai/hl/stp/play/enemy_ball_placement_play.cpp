@@ -65,21 +65,20 @@ void EnemyBallPlacementPlay::ballPlacementWithShadow(
         Vector placement_to_net = (placement_point - world.field().friendlyGoalCenter())
                                       .normalize(-0.75 - ROBOT_MAX_RADIUS_METERS);
 
+        // Check to see if the enemy has the ball. Once they do, we change our shadowing
+        // behaviour
+        for (const auto &enemy_robot : world.enemyTeam().getAllRobotsExceptGoalie())
+        {
+            if ((enemy_robot.position() - world.ball().position()).length() < 0.25)
+                {
+                    enemy_at_ball = true;
+                }
+        }
+
         // If the enemy hasn't reached the ball yet, we use this flag to avoid shadowing
         // so that we don't interfere with the enemy robots going to pick up the ball
         if (!enemy_at_ball)
         {
-            // Check to update flag
-            for (const auto &enemy_robot : world.enemyTeam().getAllRobotsExceptGoalie())
-            {
-                if (std::abs(
-                        (enemy_robot.position() - world.ball().position()).length()) <
-                    0.25)
-                {
-                    enemy_at_ball = true;
-                }
-            }
-
             move_tactics[0]->updateControlParams(
                 world.ball().position() + ball_to_net +
                     ball_to_net.perpendicular().normalize(1.25 * ROBOT_MAX_RADIUS_METERS),
