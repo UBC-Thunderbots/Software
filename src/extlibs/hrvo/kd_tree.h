@@ -45,22 +45,22 @@ class HRVOSimulator;
  */
 class KdTree
 {
-private:
+   private:
     /**
      * Defines a k-D tree node.
      */
     class Node
     {
-    public:
+       public:
         Node()
-                : begin_(0),
-                  end_(0),
-                  left_(0),
-                  right_(0),
-                  maxX_(0.0f),
-                  maxY_(0.0f),
-                  minX_(0.0f),
-                  minY_(0.0f)
+            : begin_(0),
+              end_(0),
+              left_(0),
+              right_(0),
+              maxX_(0.0f),
+              maxY_(0.0f),
+              minX_(0.0f),
+              minY_(0.0f)
         {
         }
 
@@ -92,7 +92,7 @@ private:
     // The maximum leaf size of a k-D tree.
     static const std::size_t HRVO_MAX_LEAF_SIZE = 10;
 
-public:
+   public:
     /**
      * Constructor
      *
@@ -135,7 +135,7 @@ public:
      */
     void queryRecursive(HRVOAgent *agent, float &range_sq, std::size_t node) const;
 
-private:
+   private:
     HRVOSimulator *const simulator_;
     std::vector<std::size_t> agents_;
     std::vector<Node> nodes_;

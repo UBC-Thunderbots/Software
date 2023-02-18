@@ -11,7 +11,7 @@
  */
 class AgentPath
 {
-public:
+   public:
     /**
      * Default constructor for this path
      */
@@ -48,7 +48,7 @@ public:
      */
     float getPathRadius() const;
 
-private:
+   private:
     std::vector<PathPoint> path;
     unsigned int curr_path_index = 0;
     // path radius for this robot. The max distance away from any path point in this path
