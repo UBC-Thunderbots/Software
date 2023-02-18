@@ -1,3 +1,4 @@
+import sys
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtWidgets import *
@@ -54,11 +55,10 @@ class RobotView(QScrollArea):
         self.setWidget(self.container)
         self.setWidgetResizable(True)
 
-        desktop = QDesktopWidget()
-        self.screen_size = desktop.availableGeometry()
+        self.desktop = QApplication(sys.argv).primaryScreen()
 
         self.setMinimumHeight(
-            self.screen_size.height() * 0.5
+            self.desktop.availableGeometry().height() * 0.5
         )
 
     def refresh(self):
