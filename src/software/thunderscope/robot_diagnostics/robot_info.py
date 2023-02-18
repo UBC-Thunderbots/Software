@@ -9,6 +9,10 @@ from software.thunderscope.constants import *
 
 class RobotInfo(QWidget):
 
+    # Offsets the minimum of the battery bar from the minimum ideal voltage
+    # Allows battery % to go below the minimum ideal level
+    BATTERY_MIN_OFFSET = 3
+
     toggle_one_connection_signal = QtCore.pyqtSignal(int, int)
 
     def __init__(self, robot_id, load_fullsystem, control_mode_signal):
@@ -35,14 +39,10 @@ class RobotInfo(QWidget):
 
         self.status_layout = QVBoxLayout()
 
-        # Offsets the minimum of the battery bar from the minimum ideal voltage
-        # Allows battery % to go below the minimum ideal level
-        BATTERY_MIN_OFFSET = 3
-
         # Battery Bar
         self.battery_layout = QHBoxLayout()
         self.battery_progress_bar = common_widgets.ColorProgressBar(
-            MIN_BATTERY_VOLTAGE - BATTERY_MIN_OFFSET, MAX_BATTERY_VOLTAGE
+            MIN_BATTERY_VOLTAGE - self.BATTERY_MIN_OFFSET, MAX_BATTERY_VOLTAGE
         )
         # Battery Voltage Label
         self.battery_label = QLabel()
@@ -87,11 +87,16 @@ class RobotInfo(QWidget):
         """
         control_mode_menu = QComboBox()
 
-        control_mode_menu.addItems(["None", "Manual"])
+        control_mode_menu.addItems(
+            [
+                common_widgets.IndividualRobotMode.NONE.name,
+                common_widgets.IndividualRobotMode.MANUAL.name,
+            ]
+        )
         control_mode_menu.setCurrentIndex(0)
 
         if load_fullsystem:
-            control_mode_menu.addItem("AI")
+            control_mode_menu.addItem(common_widgets.IndividualRobotMode.AI.name)
             control_mode_menu.setCurrentIndex(2)
 
         control_mode_menu.currentIndexChanged.connect(

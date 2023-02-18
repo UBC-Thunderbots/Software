@@ -1,5 +1,16 @@
 from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph.Qt.QtCore import *
+from enum import IntEnum
+
+
+class IndividualRobotMode(IntEnum):
+    """
+    Enum for the mode of input for an individual robot
+    """
+
+    NONE = 0
+    MANUAL = 1
+    AI = 3
 
 
 class FloatSlider(QSlider):
@@ -331,16 +342,16 @@ def disable_radio_button(button_group):
         button.clicked.connect(lambda state, curr=button: curr.setChecked(False))
 
 
-def draw_robot(painter, rect, start_angle, span_angle):
+def draw_robot(painter, rect, start_angle_degree, span_angle_degree):
     """
     Draws a robot bounded by the given rectangle with a chord defined by the given angles
     :param painter: the QPainter object that is drawing in thunderscope
     :param rect: the rectangle that is bounding the robot's circle
-    :param start_angle: the start of the chord, measured anti-clockwise from the horizontal middle
-    :param span_angle: the end of the chord, measured anti-clockwise from the horizontal middle
+    :param start_angle_degree: the start of the chord, measured anti-clockwise from the horizontal middle in degrees
+    :param span_angle_degree: the end of the chord, measured anti-clockwise from the horizontal middle in degrees
     """
     convert_degree = -16
 
     painter.drawChord(
-        rect, start_angle * convert_degree, span_angle * convert_degree,
+        rect, start_angle_degree * convert_degree, span_angle_degree * convert_degree,
     )

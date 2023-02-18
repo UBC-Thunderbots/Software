@@ -1,21 +1,11 @@
 from software.py_constants import *
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
+from software.thunderscope.common.common_widgets import IndividualRobotMode
 from software.python_bindings import *
 from proto.import_all_protos import *
 from pyqtgraph.Qt import QtCore
-from enum import IntEnum
 import threading
 import time
-
-
-class IndividualRobotMode(IntEnum):
-    """
-    Enum for the mode of input for an individual robot
-    """
-
-    NONE = 0
-    MANUAL = 1
-    AI = 3
 
 
 class RobotCommunication(object):
