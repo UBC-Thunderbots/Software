@@ -227,7 +227,7 @@ def test_force_start_ball_placement(simulated_test_runner, run_enemy_ai):
     # TODO (#2797): uncomment tests below to verify robots actually drop ball and exit region
     # send a non free kick command after the ball ball placement command
     # simulated_test_runner.gamecontroller.send_ci_input(
-    #     gc_command=Command.Type.DIRECT_FREE_BLUE, team=Team.BLUE
+    #     gc_command=Command.Type.FORCE_START, team=Team.BLUE
     # )
 
     # # Drop Ball Always Validation
@@ -239,7 +239,7 @@ def test_force_start_ball_placement(simulated_test_runner, run_enemy_ai):
     # ]
 
     # # Drop Ball Eventually Validation
-    # # Direct free kick after ball placement, the robot must be 0.05 away from the ball after the placement
+    # # Non free kick after ball placement, the robot must be 0.5 away from the ball after the placement
     # # See detailed rules here: https://robocup-ssl.github.io/ssl-rules/sslrules.html#_ball_placement
     # drop_ball_eventually_validation_sequence_set = [
     #     [
