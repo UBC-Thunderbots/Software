@@ -7,7 +7,7 @@
  */
 class PathPoint
 {
-   public:
+public:
     /**
      * @param position The position of this path point
      * @param speed_at_position The speed at this path point
@@ -26,7 +26,7 @@ class PathPoint
      */
     float getSpeed() const;
 
-   private:
+private:
     // position for the path point
     Vector position_;
     // desired speed for the path point

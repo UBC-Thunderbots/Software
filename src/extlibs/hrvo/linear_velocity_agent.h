@@ -3,7 +3,6 @@
 #include "agent.h"
 #include "simulator.h"
 #include "software/geom/vector.h"
-#include "software/world/robot_state.h"
 
 /**
  * An agent/robot in the simulation which has linear velocity.
@@ -11,7 +10,7 @@
  */
 class LinearVelocityAgent : public Agent
 {
-   public:
+public:
     /**
      * Constructor
      *
@@ -24,19 +23,15 @@ class LinearVelocityAgent : public Agent
      * @param max_speed              The maximum speed of this agent.
      * @param max_accel              The maximum acceleration of this agent.
      * @param path                  The path of this agent
-     * @param robot_id	  The robot id for this agent.
-     * @param type	  	  The team side for this agent (friendly or enemy).
      */
-    LinearVelocityAgent(const Vector &position, float radius,
+    LinearVelocityAgent(HRVOSimulator *simulator, const Vector &position, float radius,
                         float max_radius_inflation, const Vector &velocity,
-                        float max_speed, float max_accel, AgentPath &path, RobotId robot_id,
-                        TeamSide type);
+                        float max_speed, float max_accel, AgentPath &path);
 
     /**
      * Computes the new velocity of this agent.
-     * @param agents is unused
      */
-    void computeNewVelocity(std::vector<Agent> &agents, double time_step) override;
+    void computeNewVelocity() override;
 
     /**
      * Create the velocity obstacle which other_agent should see for this Agent

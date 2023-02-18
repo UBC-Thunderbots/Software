@@ -49,40 +49,33 @@
  */
 class HRVOAgent : public Agent
 {
-   public:
+public:
     /**
      * Constructor
      *
+     * @param simulator             The simulation.
      * @param position              The starting position of this agent.
+     * @param max_neighbor_dist     The maximum distance away which another agent can be
      * from this agent to be considered as a neighbor (i.e. velocity obstacles for it
      * would be created)
-     * @param radius                The radius of this agent.
-     * @param velocity              The initial velocity of this agent.
-     * @param path                  The path which this agent should take.
-     * @param robot_id		 	    The robot id for this agent.
-     * @param type		 		    The side that this agent is on (friendly/enemy).
      * @param max_neighbors         The maximum number of other agents which this agent
-     * @param max_neighbor_dist     The maximum distance away which another agent can be
      * will try to avoid collisions with at a time.
+     * @param radius                The radius of this agent.
      * @param max_radius_inflation  The maximum amount which the radius of this agent can
      * inflate.
-     * @param max_speed              The maximum speed of this agent.
+     * @param velocity              The initial velocity of this agent.
      * @param max_accel              The maximum acceleration of this agent.
+     * @param path                  The path which this agent should take.
+     * @param max_speed              The maximum speed of this agent.
      */
-    HRVOAgent(const Vector &position, float max_neighbor_dist,
+    HRVOAgent(HRVOSimulator *simulator, const Vector &position, float max_neighbor_dist,
               std::size_t max_neighbors, float radius, float max_radius_inflation,
-              const Vector &velocity, float max_accel, AgentPath &path,
-              float max_speed, RobotId robot_Id, TeamSide type);
+              const Vector &velocity, float max_accel, AgentPath &path, float max_speed);
 
     /**
      * Computes the new velocity of this agent.
-     * relies on:
-     * neighbours, static_obstacles, ball_obstacle
-     *
-     * updates
-     * velocity_obstacles_
      */
-    void computeNewVelocity(std::vector<std::shared_ptr<Agent>> &agents, double time_step) override;
+    void computeNewVelocity() override;
 
     /**
      * Create the hybrid reciprocal velocity obstacle which other_agent should see for
@@ -96,23 +89,17 @@ class HRVOAgent : public Agent
     VelocityObstacle createVelocityObstacle(const Agent &other_agent) override;
 
     /**
-     * Computes the preferred velocity of this agent.
-     * relies on
-     * pref_speed, velocity and position
-     *
-     * updates pref_velocity
-     */
-    void computePreferredVelocity(double time_step);
-
-    /**
      * @param neighbor_dist_threshold The max distance away which another agent can be to
      * be considered a neighbor.
      * Computes the `maxNeighbors` nearest neighbors of this agent which are within
      * `neighbor_dist_threshold`.
-     * TODO should return list of agent pointers, won't need to map back to agents later.
-     *
      */
-    std::set<std::pair<float, std::size_t>> computeNeighbors(std::vector<std::shared_ptr<Agent>> other_agents);
+    void computeNeighbors(double neighbor_dist_threshold);
+
+    /**
+     * Computes the preferred velocity of this agent.
+     */
+    void computePreferredVelocity();
 
     /**
      * Inserts a neighbor into the set of neighbors of this agent.
@@ -128,7 +115,7 @@ class HRVOAgent : public Agent
      * @param new_primitive The new primitive to pursue
      * @param world The world in which the new primitive is being pursued
      */
-    void updatePrimitive(const TbotsProto::Primitive &new_primitive, const World &world, double time_step);
+    void updatePrimitive(const TbotsProto::Primitive &new_primitive, const World &world);
 
     /**
      * Get a list of circles which represent the new velocity candidates
@@ -136,7 +123,7 @@ class HRVOAgent : public Agent
      * @return list of circles which represent the new velocity candidates
      */
     std::vector<Circle> getCandidateVelocitiesAsCircles(
-        const float circle_rad = 0.03f) const;
+            const float circle_rad = 0.03f) const;
 
     /**
      * Get a list of velocity obstacle protos which represent the velocity obstacles
@@ -155,25 +142,13 @@ class HRVOAgent : public Agent
 
 private:
     /**
-     * Compute all the velocity obstacles that this Agent should take into account and
-     * add it to `velocityObstacles_`.
-     * this only considers making VO's for relevant agents in the `neighbours_` field.
-     *
-     * relies on
-     * `ball_obstacle`, `neighbours_`
-     * updates
-     * `velocity_obstacles_`
-     */
-    void computeVelocityObstacles(std::vector<std::shared_ptr<Agent>> &agents);
-
-    /**
      * A candidate point is a internal structure used when computing new velocities. It is
      * composed of a potential new velocity and the index of two VelocityObstacles in
      * velocity_obstacles_ that were used to compute it.
      */
     class Candidate
     {
-       public:
+    public:
         Candidate() : velocity_obstacle_1_(0), velocity_obstacle_2_(0) {}
 
         // The velocity of the candidate.
@@ -246,22 +221,24 @@ private:
      */
     bool isCandidateFasterThanCurrentSpeed(const Candidate &candidate) const;
 
-   public:
+    /**
+     * Compute all the velocity obstacles that this Agent should take into account and
+     * add it to `velocityObstacles_`.
+     */
+    void computeVelocityObstacles();
+
+public:
     float pref_speed_;
-    // remove
+
     std::size_t max_neighbors_;
-    // move to simulator, dynamic based on speed
     float max_neighbor_dist;
-    // calcualte and return, should be local var
+    float uncertainty_offset_;
     std::multimap<float, Candidate> candidates_;
     // distance -> Agent Index
-    // caluclated by simulator
     std::set<std::pair<float, std::size_t>> neighbors_;
-    // getter, private
     std::vector<VelocityObstacle> velocity_obstacles_;
     std::vector<ObstaclePtr> static_obstacles;
     std::optional<ObstaclePtr> ball_obstacle;
-    // feels like it doesn;t belong
     RobotNavigationObstacleFactory obstacle_factory;
 
     // TODO (#2519): Remove magic numbers

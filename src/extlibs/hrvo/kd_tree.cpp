@@ -38,18 +38,18 @@
 #include "extlibs/hrvo/hrvo_agent.h"
 #include "extlibs/hrvo/simulator.h"
 
-KdTree::KdTree(Simulator *simulator) : simulator_(simulator) {}
+KdTree::KdTree(HRVOSimulator *simulator) : simulator_(simulator) {}
 
 void KdTree::build()
 {
-    agents_ = {};
+    agents_.reserve(simulator_->agents.size());
 
-    for (std::size_t i = 0; i < simulator_->agents.size(); ++i)
+    for (std::size_t i = agents_.size(); i < simulator_->agents.size(); ++i)
     {
         agents_.push_back(i);
     }
 
-    nodes_.resize(2 * simulator_->agents.size() + 1);
+    nodes_.resize(2 * simulator_->agents.size() - 1);
 
     if (!agents_.empty())
     {
@@ -62,9 +62,9 @@ void KdTree::buildRecursive(std::size_t begin, std::size_t end, std::size_t node
     nodes_[node].begin_ = begin;
     nodes_[node].end_   = end;
     nodes_[node].minX_  = nodes_[node].maxX_ =
-        simulator_->agents[agents_[begin]]->getPosition().x();
+            simulator_->agents[agents_[begin]]->getPosition().x();
     nodes_[node].minY_ = nodes_[node].maxY_ =
-        simulator_->agents[agents_[begin]]->getPosition().y();
+            simulator_->agents[agents_[begin]]->getPosition().y();
 
     for (std::size_t i = begin + 1; i < end; ++i)
     {
@@ -103,16 +103,16 @@ void KdTree::buildRecursive(std::size_t begin, std::size_t end, std::size_t node
         {
             while (left <= right &&
                    (vertical
-                        ? simulator_->agents[agents_[left]]->getPosition().x()
-                        : simulator_->agents[agents_[left]]->getPosition().y()) < split)
+                    ? simulator_->agents[agents_[left]]->getPosition().x()
+                    : simulator_->agents[agents_[left]]->getPosition().y()) < split)
             {
                 ++left;
             }
 
             while (right >= left &&
                    (vertical
-                        ? simulator_->agents[agents_[right]]->getPosition().x()
-                        : simulator_->agents[agents_[right]]->getPosition().y()) >= split)
+                    ? simulator_->agents[agents_[right]]->getPosition().x()
+                    : simulator_->agents[agents_[right]]->getPosition().y()) >= split)
             {
                 --right;
             }
@@ -160,45 +160,45 @@ void KdTree::queryRecursive(HRVOAgent *agent, float &range_sq, std::size_t node)
         if (agent->position_.x() < nodes_[nodes_[node].left_].minX_)
         {
             dist_sq_left +=
-                std::pow(nodes_[nodes_[node].left_].minX_ - agent->position_.x(), 2.f);
+                    std::pow(nodes_[nodes_[node].left_].minX_ - agent->position_.x(), 2.f);
         }
         else if (agent->position_.x() > nodes_[nodes_[node].left_].maxX_)
         {
             dist_sq_left +=
-                std::pow(agent->position_.x() - nodes_[nodes_[node].left_].maxX_, 2.f);
+                    std::pow(agent->position_.x() - nodes_[nodes_[node].left_].maxX_, 2.f);
         }
 
         if (agent->position_.y() < nodes_[nodes_[node].left_].minY_)
         {
             dist_sq_left +=
-                std::pow(nodes_[nodes_[node].left_].minY_ - agent->position_.y(), 2.f);
+                    std::pow(nodes_[nodes_[node].left_].minY_ - agent->position_.y(), 2.f);
         }
         else if (agent->position_.y() > nodes_[nodes_[node].left_].maxY_)
         {
             dist_sq_left +=
-                std::pow(agent->position_.y() - nodes_[nodes_[node].left_].maxY_, 2.f);
+                    std::pow(agent->position_.y() - nodes_[nodes_[node].left_].maxY_, 2.f);
         }
 
         if (agent->position_.x() < nodes_[nodes_[node].right_].minX_)
         {
             dist_sq_right +=
-                std::pow(nodes_[nodes_[node].right_].minX_ - agent->position_.x(), 2.f);
+                    std::pow(nodes_[nodes_[node].right_].minX_ - agent->position_.x(), 2.f);
         }
         else if (agent->position_.x() > nodes_[nodes_[node].right_].maxX_)
         {
             dist_sq_right +=
-                std::pow(agent->position_.x() - nodes_[nodes_[node].right_].maxX_, 2.f);
+                    std::pow(agent->position_.x() - nodes_[nodes_[node].right_].maxX_, 2.f);
         }
 
         if (agent->position_.y() < nodes_[nodes_[node].right_].minY_)
         {
             dist_sq_right +=
-                std::pow(nodes_[nodes_[node].right_].minY_ - agent->position_.y(), 2.f);
+                    std::pow(nodes_[nodes_[node].right_].minY_ - agent->position_.y(), 2.f);
         }
         else if (agent->position_.y() > nodes_[nodes_[node].right_].maxY_)
         {
             dist_sq_right +=
-                std::pow(agent->position_.y() - nodes_[nodes_[node].right_].maxY_, 2.f);
+                    std::pow(agent->position_.y() - nodes_[nodes_[node].right_].maxY_, 2.f);
         }
 
         if (dist_sq_left < dist_sq_right)

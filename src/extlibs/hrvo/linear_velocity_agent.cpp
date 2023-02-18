@@ -1,16 +1,15 @@
 #include "linear_velocity_agent.h"
 
-LinearVelocityAgent::LinearVelocityAgent(const Vector &position,
+LinearVelocityAgent::LinearVelocityAgent(HRVOSimulator *simulator, const Vector &position,
                                          float radius, float max_radius_inflation,
                                          const Vector &velocity, float max_speed,
-                                         float max_accel, AgentPath &path,
-                                         RobotId robot_id, TeamSide type)
-    : Agent(position, radius, max_radius_inflation, velocity, velocity,
-            max_speed, max_accel, path, robot_id, type)
+                                         float max_accel, AgentPath &path)
+        : Agent(simulator, position, radius, max_radius_inflation, velocity, velocity,
+                max_speed, max_accel, path)
 {
 }
 
-void LinearVelocityAgent::computeNewVelocity(std::vector<Agent> &agents, double time_step)
+void LinearVelocityAgent::computeNewVelocity()
 {
     // TODO (#2496): Fix bug where LinearVelocityAgents go past their destination
     // Preferring a velocity which points directly towards goal
@@ -33,7 +32,7 @@ void LinearVelocityAgent::computeNewVelocity(std::vector<Agent> &agents, double 
     }
 
     const Vector dv = pref_velocity_ - velocity_;
-    if (dv.length() <= max_accel_ * time_step)
+    if (dv.length() <= max_accel_ * simulator_->getTimeStep())
     {
         new_velocity_ = pref_velocity_;
     }
@@ -41,13 +40,13 @@ void LinearVelocityAgent::computeNewVelocity(std::vector<Agent> &agents, double 
     {
         // Calculate the maximum velocity towards the preferred velocity, given the
         // acceleration constraint
-        new_velocity_ = velocity_ + dv.normalize(max_accel_ * time_step);
+        new_velocity_ = velocity_ + dv.normalize(max_accel_ * simulator_->getTimeStep());
     }
 }
 
 VelocityObstacle LinearVelocityAgent::createVelocityObstacle(const Agent &other_agent)
 {
     return VelocityObstacle::generateVelocityObstacle(
-        Circle(Point(getPosition()), getRadius()),
-        Circle(Point(other_agent.getPosition()), other_agent.getRadius()), getVelocity());
+            Circle(Point(getPosition()), getRadius()),
+            Circle(Point(other_agent.getPosition()), other_agent.getRadius()), getVelocity());
 }

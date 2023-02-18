@@ -3,28 +3,27 @@
 #include "extlibs/hrvo/path.h"
 #include "extlibs/hrvo/simulator.h"
 
-Agent::Agent(const Vector &position, float radius,
+Agent::Agent(HRVOSimulator *simulator, const Vector &position, float radius,
              float max_radius_inflation, const Vector &velocity,
-             const Vector &pref_velocity, float max_speed, float max_accel, AgentPath &path,
-             unsigned int robot_id, TeamSide type)
-    : position_(position),
-      min_radius_(radius),
-      radius_(radius),
-      max_radius_inflation_(max_radius_inflation),
-      velocity_(velocity),
-      pref_velocity_(pref_velocity),
-      max_speed_(max_speed),
-      max_accel_(max_accel),
-      path(path),
-      robot_id(robot_id),
-      agent_type(type)
+             const Vector &pref_velocity, float max_speed, float max_accel,
+             AgentPath &path)
+        : simulator_(simulator),
+          position_(position),
+          min_radius_(radius),
+          radius_(radius),
+          max_radius_inflation_(max_radius_inflation),
+          velocity_(velocity),
+          pref_velocity_(pref_velocity),
+          max_speed_(max_speed),
+          max_accel_(max_accel),
+          path(path),
+          reached_goal_(false)
 {
     // Update `radius_` based on the velocity
     updateRadiusFromVelocity();
 }
 
-// returns boolean on whether it reaches goal
-bool Agent::update(double time_step)
+void Agent::update()
 {
     if (new_velocity_.length() >= max_speed_)
     {
@@ -33,7 +32,7 @@ bool Agent::update(double time_step)
     }
 
     const Vector dv = new_velocity_ - velocity_;
-    if (dv.length() < max_accel_ * time_step || dv.length() == 0.f)
+    if (dv.length() < max_accel_ * simulator_->getTimeStep() || dv.length() == 0.f)
     {
         velocity_ = new_velocity_;
     }
@@ -42,10 +41,10 @@ bool Agent::update(double time_step)
         // Calculate the maximum velocity towards the preferred velocity, given the
         // acceleration constraint
         velocity_ =
-            velocity_ + (max_accel_ * time_step * (dv / dv.length()));
+                velocity_ + (max_accel_ * simulator_->getTimeStep()) * (dv / dv.length());
     }
 
-    position_ += velocity_ * time_step;
+    position_ += velocity_ * simulator_->time_step;
 
     Vector current_dest;
 
@@ -67,19 +66,18 @@ bool Agent::update(double time_step)
         if (path.isGoingToFinalPathPoint())
         {
             reached_goal_ = true;
-            return true;
         }
         else
         {
             path.incrementPathIndex();
             reached_goal_             = false;
-            return false;
+            simulator_->reached_goals = false;
         }
     }
     else
     {
         reached_goal_             = false;
-        return false;
+        simulator_->reached_goals = false;
     }
 }
 
@@ -151,16 +149,6 @@ void Agent::setMaxSpeed(float max_speed)
 void Agent::setRadius(float radius)
 {
     radius_ = radius;
-}
-
-RobotId Agent::getRobotId()
-{
-    return robot_id;
-}
-
-TeamSide Agent::getAgentType()
-{
-    return agent_type;
 }
 
 void Agent::updateRadiusFromVelocity()

@@ -17,8 +17,8 @@
  * neighbor
  * @return a list representing a subset of neighbors
  */
+// TODO use std::iterator instead for T
 template <class T, typename Func>
-// std::iterator
 std::vector<T> findNeighboursInThreshold(const T& candidate,
                                          const std::vector<T>& neighbors,
                                          double threshold, Func distanceFunc)
