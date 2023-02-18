@@ -34,3 +34,6 @@ class RobotStatusView(QWidget):
         self.param_tree.setParameters(self.param_group, showTop=False)
 
         layout.addWidget(self.param_tree)
+        self.setMinimumHeight(
+            self.param_tree
+        )

@@ -500,6 +500,7 @@ class Thunderscope(object):
                 proto_unix_io, False
             )
             robot_view_dock = Dock("RobotView")
+            robot_view_dock.setStretch(y=5)
             robot_view_dock.addWidget(self.diagnostics_widgets["robot_view"])
             self.toggle_all_connection_signal = self.diagnostics_widgets[
                 "robot_view"
@@ -516,6 +517,7 @@ class Thunderscope(object):
 
         dock = Dock("Estop View")
         dock.addWidget(estop_view)
+        dock.setStretch(y=1)
         self.robot_diagnostics_dock_area.addDock(dock, "bottom", log_dock)
 
     def setup_robot_view(self, proto_unix_io, load_fullsystem):

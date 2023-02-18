@@ -33,9 +33,11 @@ class RobotView(QScrollArea):
         self.layout = QVBoxLayout()
 
         self.robot_info_widgets = [
-            RobotInfo(x, load_fullsystem) for x in range(MAX_ROBOT_IDS_PER_SIDE)
+            RobotInfo(id, load_fullsystem) for id in range(MAX_ROBOT_IDS_PER_SIDE)
         ]
-        self.robot_status_widget = RobotStatusView()
+        self.robot_status_widgets = [
+            RobotStatusView() for id in range(MAX_ROBOT_IDS_PER_SIDE)
+        ]
 
         for id in range(MAX_ROBOT_IDS_PER_SIDE):
             self.robot_info_widgets[id].toggle_one_connection_signal.connect(
@@ -45,21 +47,12 @@ class RobotView(QScrollArea):
             )
 
             self.layout.addWidget(self.robot_info_widgets[id])
-
-            if id == 2:
-                print("yes")
-                self.layout.addWidget(self.robot_status_widget)
+            self.layout.addWidget(self.robot_status_widgets[id])
 
         self.container = QFrame(self)
         self.container.setLayout(self.layout)
         self.setWidget(self.container)
         self.setWidgetResizable(True)
-
-        self.desktop = QApplication(sys.argv).primaryScreen()
-
-        self.setMinimumHeight(
-            self.desktop.availableGeometry().height() * 0.5
-        )
 
     def refresh(self):
         """
