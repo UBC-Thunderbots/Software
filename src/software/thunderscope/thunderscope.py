@@ -464,6 +464,7 @@ class Thunderscope(object):
             )
             cost_visualization_dock = Dock("Cost Visualization")
             cost_visualization_dock.addWidget(widgets["cost_visualization_widget"])
+            widgets["field_widget"].field_resized.connect(widgets["cost_visualization_widget"].update_axis_range)
 
         dock_area.addDock(field_dock)
         dock_area.addDock(log_dock, "left", field_dock)

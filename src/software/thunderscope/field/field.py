@@ -12,6 +12,12 @@ class Field(QWidget):
 
     """Wrapper to handle Field Layers and provide replay controls"""
 
+    # signal for when field is resized
+    # this is to sync the cost_vis widget with the field
+    # first 4 arguments are the x and y min and max values of the field
+    # last 2 are self.max_x_range and self.max_y_range
+    field_resized = QtCore.pyqtSignal([float, float, float, float, float, float])
+
     def __init__(self, player=None, max_x_range=10000, max_y_range=6000):
         """Initialize the field
 
@@ -51,6 +57,8 @@ class Field(QWidget):
         self.range_set = False
 
         self.plot_widget.setMouseTracking(True)
+
+        self.cached_field_range = self.plot_widget.viewRange()
 
         # Setup Field Plot Legend
         self.legend = pg.LegendItem((80, 60), offset=(70, 20))
@@ -119,3 +127,10 @@ class Field(QWidget):
                 yRange=(-int(self.max_y_range / 2), int(self.max_y_range / 2)),
             )
             self.range_set = True
+
+        # emit signal when plot_widget is resized
+        if self.cached_field_range != self.plot_widget.viewRange():
+            self.cached_field_range = self.plot_widget.viewRange()
+            range = self.plot_widget.viewRange()
+            self.field_resized.emit(range[0][0], range[0][1], range[1][0], range[1][1],
+                                    self.max_x_range, self.max_y_range)

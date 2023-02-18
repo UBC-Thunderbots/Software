@@ -55,15 +55,15 @@ class CostVisualizationWidget(QtWidgets.QMainWindow):
         self.img.setBorder(pg.mkPen(color=(255, 255, 255)))
 
         # layout settings
-        self.view_box = win.addViewBox()
+        self.view_box = win.addViewBox(rowspan=2)
         self.view_box.addItem(self.img)
         self.view_box.setAspectLocked()
+        self.view_box.disableAutoRange()
         layout.addWidget(win)
         self.setCentralWidget(layout)
 
-        # max number
-        self.max_label = pg.TextItem("PLOTTING OFF")
-        self.view_box.addItem(self.max_label)
+        # max number label
+        self.max_label = win.addLabel("PLOTTING OFF", row=1, col=0)
 
         # isocurve settings
         self.curves = []
@@ -82,11 +82,11 @@ class CostVisualizationWidget(QtWidgets.QMainWindow):
 
         if not cost_vis:
             cost_vis = self.cached_cost_vis
-            # If we haven't received pass visualizations for a bit, clear the layer
+            # If we haven't received cost visualizations for a bit, clear the layer
             if time.time() > self.timeout:
                 return
         else:
-            # We received new pass data, so lets update our timeout
+            # We received new cost data, so lets update our timeout
             self.timeout = (
                 time.time() + CostVisualizationWidget.COST_VISUALIZATION_TIMEOUT_S
             )
@@ -105,3 +105,41 @@ class CostVisualizationWidget(QtWidgets.QMainWindow):
         for isocurve in self.curves:
             isocurve.setParentItem(self.img)
             isocurve.setData(self.data)
+
+    def update_axis_range(self, x_min, x_max, y_min, y_max, max_x_range, max_y_range):
+        """Update the axis range of the plot
+
+        :param x_min: the minimum x value
+        :param x_max: the maximum x value
+        :param y_min: the minimum y value
+        :param y_max: the maximum y value
+        :param max_x_range: field.max_x_range from field.py
+        :param max_y_range: field.max_y_range from field.py
+        """
+
+        # convert from field coordinates to image coordinates
+        x_min = self.convert_range(-max_x_range / 2, max_x_range / 2, 0, self.cached_cost_vis.num_cols, x_min)
+        x_max = self.convert_range(-max_x_range / 2, max_x_range / 2, 0, self.cached_cost_vis.num_cols, x_max)
+        y_min = self.convert_range(-max_y_range / 2, max_y_range / 2, 0, self.cached_cost_vis.num_rows, y_min)
+        y_max = self.convert_range(-max_y_range / 2, max_y_range / 2, 0, self.cached_cost_vis.num_rows, y_max)
+
+        self.view_box.setRange(xRange=(x_min, x_max), yRange=(y_min, y_max))
+
+    def convert_range(self, old_min : float, old_max : float, new_min : float, new_max : float, old_value : float):
+        """Helper function to convert a value from one range to another
+        
+        :param old_min: the minimum value of the old range
+        :param old_max: the maximum value of the old range
+        :param new_min: the minimum value of the new range
+        :param new_min: the maximum value of the new range
+        :param old_value: the value to convert
+
+        :return: the converted value in the range [new_min, new_max]
+        """
+        old_range = old_max - old_min
+        if old_range == 0:
+            new_value = new_min
+        else:
+            new_range = new_max - new_min
+            new_value = (((old_value - old_min) * new_range) / old_range) + new_min
+        return new_value
