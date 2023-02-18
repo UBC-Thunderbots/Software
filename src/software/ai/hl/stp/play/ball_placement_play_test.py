@@ -16,7 +16,7 @@ from proto.ssl_gc_geometry_pb2 import Vector2
 # TODO (#2599): Remove Duration parameter from test
 
 # test duration global constant
-test_duration = 10
+test_duration = 20
 
 
 @pytest.mark.parametrize(
