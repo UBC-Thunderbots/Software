@@ -118,14 +118,29 @@ class CostVisualizationWidget(QtWidgets.QMainWindow):
         """
 
         # convert from field coordinates to image coordinates
-        x_min = self.convert_range(-max_x_range / 2, max_x_range / 2, 0, self.cached_cost_vis.num_cols, x_min)
-        x_max = self.convert_range(-max_x_range / 2, max_x_range / 2, 0, self.cached_cost_vis.num_cols, x_max)
-        y_min = self.convert_range(-max_y_range / 2, max_y_range / 2, 0, self.cached_cost_vis.num_rows, y_min)
-        y_max = self.convert_range(-max_y_range / 2, max_y_range / 2, 0, self.cached_cost_vis.num_rows, y_max)
+        x_min = self.convert_range(
+            -max_x_range / 2, max_x_range / 2, 0, self.cached_cost_vis.num_cols, x_min
+        )
+        x_max = self.convert_range(
+            -max_x_range / 2, max_x_range / 2, 0, self.cached_cost_vis.num_cols, x_max
+        )
+        y_min = self.convert_range(
+            -max_y_range / 2, max_y_range / 2, 0, self.cached_cost_vis.num_rows, y_min
+        )
+        y_max = self.convert_range(
+            -max_y_range / 2, max_y_range / 2, 0, self.cached_cost_vis.num_rows, y_max
+        )
 
         self.view_box.setRange(xRange=(x_min, x_max), yRange=(y_min, y_max))
 
-    def convert_range(self, old_min : float, old_max : float, new_min : float, new_max : float, old_value : float):
+    def convert_range(
+        self,
+        old_min: float,
+        old_max: float,
+        new_min: float,
+        new_max: float,
+        old_value: float,
+    ):
         """Helper function to convert a value from one range to another
         
         :param old_min: the minimum value of the old range

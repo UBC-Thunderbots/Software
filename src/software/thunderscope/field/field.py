@@ -132,5 +132,11 @@ class Field(QWidget):
         if self.cached_field_range != self.plot_widget.viewRange():
             self.cached_field_range = self.plot_widget.viewRange()
             range = self.plot_widget.viewRange()
-            self.field_resized.emit(range[0][0], range[0][1], range[1][0], range[1][1],
-                                    self.max_x_range, self.max_y_range)
+            self.field_resized.emit(
+                range[0][0],
+                range[0][1],
+                range[1][0],
+                range[1][1],
+                self.max_x_range,
+                self.max_y_range,
+            )

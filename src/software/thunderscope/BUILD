@@ -48,6 +48,7 @@ py_library(
         "//software/thunderscope/log:g3log_checkboxes",
         "//software/thunderscope/log:g3log_widget",
         "//software/thunderscope/play:playinfo_widget",
+        "//software/thunderscope/play:refereeinfo_widget",
         "//software/thunderscope/replay:proto_logger",
         "//software/thunderscope/replay:proto_player",
         "//software/thunderscope/robot_diagnostics:chicker",
