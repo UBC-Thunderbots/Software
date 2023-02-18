@@ -10,7 +10,7 @@
  */
 class LinearVelocityAgent : public Agent
 {
-public:
+   public:
     /**
      * Constructor
      *

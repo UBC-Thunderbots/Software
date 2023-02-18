@@ -12,7 +12,7 @@ class HRVOSimulator;
  */
 class Agent
 {
-public:
+   public:
     /**
      * Constructor
      *
@@ -154,7 +154,7 @@ public:
      */
     void setPath(const AgentPath &new_path);
 
-protected:
+   protected:
     // Agent Properties
     Vector position_;
     // This agent's current actual radius

@@ -46,7 +46,7 @@
 
 class HRVOSimulator
 {
-public:
+   public:
     /**
      * Constructor
      * @param time_step The time step between each step of the simulator
@@ -151,7 +151,7 @@ public:
      * @return Optional shared pointer to an HRVO agent
      */
     std::optional<std::shared_ptr<HRVOAgent>> getFriendlyAgentFromRobotId(
-            unsigned int robot_id) const;
+        unsigned int robot_id) const;
 
     /**
      * Visualize this simulator to Thunderscope
@@ -273,7 +273,7 @@ public:
         return reached_goals;
     }
 
-private:
+   private:
     // PrimitiveSet which includes the path which each friendly robot should take
     TbotsProto::PrimitiveSet primitive_set;
 
@@ -305,7 +305,7 @@ private:
     std::map<unsigned int, unsigned int> friendly_robot_id_map;
     std::map<unsigned int, unsigned int> enemy_robot_id_map;
 
-public:
+   public:
     // The max amount (meters) which the friendly/enemy robot radius can increase by.
     // This scale is used to avoid close encounters, and reduce chance of collision.
     static constexpr float FRIENDLY_ROBOT_RADIUS_MAX_INFLATION = 0.05f;

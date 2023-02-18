@@ -49,7 +49,7 @@
  */
 class HRVOAgent : public Agent
 {
-public:
+   public:
     /**
      * Constructor
      *
@@ -123,7 +123,7 @@ public:
      * @return list of circles which represent the new velocity candidates
      */
     std::vector<Circle> getCandidateVelocitiesAsCircles(
-            const float circle_rad = 0.03f) const;
+        const float circle_rad = 0.03f) const;
 
     /**
      * Get a list of velocity obstacle protos which represent the velocity obstacles
@@ -140,7 +140,7 @@ public:
      */
     void setPreferredSpeed(float new_pref_speed);
 
-private:
+   private:
     /**
      * A candidate point is a internal structure used when computing new velocities. It is
      * composed of a potential new velocity and the index of two VelocityObstacles in
@@ -148,7 +148,7 @@ private:
      */
     class Candidate
     {
-    public:
+       public:
         Candidate() : velocity_obstacle_1_(0), velocity_obstacle_2_(0) {}
 
         // The velocity of the candidate.
@@ -227,7 +227,7 @@ private:
      */
     void computeVelocityObstacles();
 
-public:
+   public:
     float pref_speed_;
 
     std::size_t max_neighbors_;

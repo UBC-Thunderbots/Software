@@ -7,17 +7,17 @@ Agent::Agent(HRVOSimulator *simulator, const Vector &position, float radius,
              float max_radius_inflation, const Vector &velocity,
              const Vector &pref_velocity, float max_speed, float max_accel,
              AgentPath &path)
-        : simulator_(simulator),
-          position_(position),
-          min_radius_(radius),
-          radius_(radius),
-          max_radius_inflation_(max_radius_inflation),
-          velocity_(velocity),
-          pref_velocity_(pref_velocity),
-          max_speed_(max_speed),
-          max_accel_(max_accel),
-          path(path),
-          reached_goal_(false)
+    : simulator_(simulator),
+      position_(position),
+      min_radius_(radius),
+      radius_(radius),
+      max_radius_inflation_(max_radius_inflation),
+      velocity_(velocity),
+      pref_velocity_(pref_velocity),
+      max_speed_(max_speed),
+      max_accel_(max_accel),
+      path(path),
+      reached_goal_(false)
 {
     // Update `radius_` based on the velocity
     updateRadiusFromVelocity();
@@ -41,7 +41,7 @@ void Agent::update()
         // Calculate the maximum velocity towards the preferred velocity, given the
         // acceleration constraint
         velocity_ =
-                velocity_ + (max_accel_ * simulator_->getTimeStep()) * (dv / dv.length());
+            velocity_ + (max_accel_ * simulator_->getTimeStep()) * (dv / dv.length());
     }
 
     position_ += velocity_ * simulator_->time_step;

@@ -4,8 +4,8 @@ LinearVelocityAgent::LinearVelocityAgent(HRVOSimulator *simulator, const Vector 
                                          float radius, float max_radius_inflation,
                                          const Vector &velocity, float max_speed,
                                          float max_accel, AgentPath &path)
-        : Agent(simulator, position, radius, max_radius_inflation, velocity, velocity,
-                max_speed, max_accel, path)
+    : Agent(simulator, position, radius, max_radius_inflation, velocity, velocity,
+            max_speed, max_accel, path)
 {
 }
 
@@ -47,6 +47,6 @@ void LinearVelocityAgent::computeNewVelocity()
 VelocityObstacle LinearVelocityAgent::createVelocityObstacle(const Agent &other_agent)
 {
     return VelocityObstacle::generateVelocityObstacle(
-            Circle(Point(getPosition()), getRadius()),
-            Circle(Point(other_agent.getPosition()), other_agent.getRadius()), getVelocity());
+        Circle(Point(getPosition()), getRadius()),
+        Circle(Point(other_agent.getPosition()), other_agent.getRadius()), getVelocity());
 }
