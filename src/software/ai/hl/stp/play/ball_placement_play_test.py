@@ -18,8 +18,10 @@ from proto.ssl_gc_geometry_pb2 import Vector2
 # test duration global constant
 test_duration = 10
 
+
 @pytest.mark.parametrize(
-    "run_enemy_ai", [(False,),(True,)]) # TODO (#2690): Robot gets stuck in corner of defense area
+    "run_enemy_ai", [(False,), (True,)]
+)  # TODO (#2690): Robot gets stuck in corner of defense area
 def test_free_kick_ball_placement(simulated_test_runner, run_enemy_ai):
 
     # starting point must be Point
@@ -105,7 +107,7 @@ def test_free_kick_ball_placement(simulated_test_runner, run_enemy_ai):
     )
 
     # TODO (#2797): uncomment tests below to verify robots actually drop ball and exit region
-    # send a free kick command 
+    # send a free kick command
     # simulated_test_runner.gamecontroller.send_ci_input(
     #     gc_command=Command.Type.DIRECT_FREE_BLUE, team=Team.BLUE
     # )
