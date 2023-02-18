@@ -11,7 +11,7 @@
 MAKE_ENUM(GpioState, LOW, HIGH);
 MAKE_ENUM(GpioDirection, INPUT, OUTPUT);
 
-class GPIO
+class Gpio
 {
    public:
     /*
@@ -23,7 +23,7 @@ class GPIO
      * @param direction The direction to configure this gpio in
      * @param initial_state The initial GpioState of the pin
      */
-    GPIO(std::string gpio_number, GpioDirection direction, GpioState initial_state);
+    Gpio(std::string gpio_number, GpioDirection direction, GpioState initial_state);
 
     /**
      * Set the value to the provided state

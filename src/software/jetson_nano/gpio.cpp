@@ -10,7 +10,7 @@
 
 #include "software/logger/logger.h"
 
-GPIO::GPIO(std::string gpio_number, GpioDirection direction, GpioState initial_state)
+Gpio::Gpio(std::string gpio_number, GpioDirection direction, GpioState initial_state)
 {
     // Setup the provided GPIO pin
     gpio_number_ = gpio_number;
@@ -42,7 +42,7 @@ GPIO::GPIO(std::string gpio_number, GpioDirection direction, GpioState initial_s
     LOG(DEBUG) << "GPIO " << gpio_number_ << " online";
 }
 
-void GPIO::setValue(GpioState state)
+void Gpio::setValue(GpioState state)
 {
     std::ofstream gpio_fs("/sys/class/gpio/gpio" + gpio_number_ + "/value");
 
@@ -68,7 +68,7 @@ void GPIO::setValue(GpioState state)
     }
 }
 
-GpioState GPIO::getValue()
+GpioState Gpio::getValue()
 {
     std::ifstream gpio_fs("/sys/class/gpio/gpio" + gpio_number_ + "/value");
     std::string level;
