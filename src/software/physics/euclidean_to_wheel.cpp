@@ -105,9 +105,13 @@ WheelSpace_t EuclideanToWheel::rampWheelVelocity(
     auto max_delta_target_wheel_velocity =
         delta_target_wheel_velocity.cwiseAbs().maxCoeff();
 
+    std::cout << "Max Target: ";
+    std:: cout << max_delta_target_wheel_velocity << std::endl;
+
     // Step 2: Compare max delta velocity against the calculated maximum
     if (max_delta_target_wheel_velocity > allowable_delta_wheel_velocity)
     {
+        std::cout << "Delta Ramped" << std::endl;
         // Step 3: If larger, scale down to allowable max
         ramp_wheel_velocity =
             (delta_target_wheel_velocity / max_delta_target_wheel_velocity) *
@@ -126,10 +130,16 @@ WheelSpace_t EuclideanToWheel::rampWheelVelocity(
     // compare against max wheel velocity
     if (max_ramp_wheel_velocity > max_allowable_wheel_velocity)
     {
+        std::cout << "Total Ramped" << std::endl;
         // if larger, scale down to max
         ramp_wheel_velocity = (ramp_wheel_velocity / max_ramp_wheel_velocity) *
                               max_allowable_wheel_velocity;
     }
+
+    auto ramp_wheel_velocity_max = (ramp_wheel_velocity - current_wheel_velocity).cwiseAbs().maxCoeff();
+
+    std::cout << "Max Ramped: ";
+    std:: cout << ramp_wheel_velocity_max << std::endl;
 
     return ramp_wheel_velocity;
 }
