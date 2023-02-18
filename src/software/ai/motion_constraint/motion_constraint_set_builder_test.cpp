@@ -38,12 +38,14 @@ namespace
             std::make_tuple(std::make_shared<ChipTactic>(),
                             std::set<TbotsProto::MotionConstraint>(),
                             std::set<TbotsProto::MotionConstraint>()),
-            std::make_tuple(std::make_shared<KickoffChipTactic>(),
-                            std::set<TbotsProto::MotionConstraint>(
-                                {TbotsProto::MotionConstraint::CENTER_CIRCLE,
-                                 TbotsProto::MotionConstraint::ENEMY_HALF,
-                                 TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL}),
-                            std::set<TbotsProto::MotionConstraint>()),
+            std::make_tuple(
+                std::make_shared<KickoffChipTactic>(),
+                std::set<TbotsProto::MotionConstraint>(
+                    {TbotsProto::MotionConstraint::CENTER_CIRCLE,
+                     TbotsProto::MotionConstraint::ENEMY_HALF,
+                     TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL}),
+                std::set<TbotsProto::MotionConstraint>(
+                    {TbotsProto::MotionConstraint::ENEMY_HALF_WITHOUT_CENTRE_CIRCLE})),
             std::make_tuple(std::make_shared<PenaltyKickTactic>(ai_config),
                             std::set<TbotsProto::MotionConstraint>(
                                 {TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL,
