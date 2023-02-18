@@ -21,23 +21,21 @@ cc_library(
     name = "hrvo",
     srcs = [
         "agent.cpp",
-        "HRVOAgent.cpp",
+        "hrvo_agent.cpp",
         "kd_tree.cpp",
         "linear_velocity_agent.cpp",
         "path.cpp",
         "path_point.cpp",
         "simulator.cpp",
-        "new_simulator.cpp"
     ],
     hdrs = [
         "agent.h",
-        "HRVOAgent.h",
+        "hrvo_agent.h",
         "kd_tree.h",
         "linear_velocity_agent.h",
         "path.h",
         "path_point.h",
         "simulator.h",
-        "new_simulator.h"
     ],
     deps = [
         "//proto:visualization_cc_proto",

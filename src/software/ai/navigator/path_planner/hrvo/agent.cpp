@@ -24,6 +24,19 @@ double Agent::getMaxAccel() const {
     return max_accel;
 }
 
+double Agent::getMaxSpeed() const {
+    return max_speed;
+}
+
+double Agent::getRadius() const
+{
+    return radius;
+}
+
+RobotId Agent::getRobotId() {
+    return robot_id;
+}
+
 const RobotState &Agent::getRobotState() {
     return robot_state;
 }

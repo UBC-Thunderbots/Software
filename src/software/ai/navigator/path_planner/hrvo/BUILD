@@ -37,6 +37,7 @@ cc_library(
         "//software/ai/navigator/obstacle:robot_navigation_obstacle_factory",
         "//software/ai/navigator/path_planner/hrvo:velocity_obstacle",
         "//software/geom:vector",
+        "//software/geom/algorithms:nearest_neighbor_search",
         "//software/networking:threaded_proto_unix_sender",
         "//software/world",
     ]

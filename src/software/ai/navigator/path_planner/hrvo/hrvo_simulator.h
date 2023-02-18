@@ -50,7 +50,7 @@ public:
      * only enemy robots have robot id offset
      * @param robot_id
      */
-    void visualize(unsigned int robot_id);
+    void visualize(RobotId robot_id);
 
 private:
 
@@ -70,23 +70,22 @@ private:
      * @param destination 	Destination for this robot
      * @param type 		Whether this robot is FRIENDLY or ENEMY
     */
-    void configureLVRobot(const Robot &robot, const Vector &destination,
-                          TeamSide type);
-
-    // PrimitiveSet which includes the path which each friendly robot should take
-    TbotsProto::PrimitiveSet primitive_set;
-
-    // Latest World which the simulator has received
-    std::optional<World> world;
+    void configureLVRobot(const Robot &robot);
 
     // The robot constants which all agents will use
     RobotConstants_t robot_constants;
 
+    // robot id to agent
+    std::map<RobotId, std::shared_ptr<Agent>> robots;
+
+    // Latest World which the simulator has received
+    std::optional<World> world;
+
+    // PrimitiveSet which includes the path which each friendly robot should take
+    TbotsProto::PrimitiveSet primitive_set;
+
     // The colour of the friendly team
     const TeamColour friendly_team_colour;
-
-    // robot id to agent
-    std::map<unsigned int, std::shared_ptr<Agent>> robots;
 
     // simulator time step
     Duration time_step;
@@ -94,20 +93,12 @@ private:
 
     // The max amount (meters) which the friendly/enemy robot radius can increase by.
     // This scale is used to avoid close encounters, and reduce chance of collision.
-    static constexpr double FRIENDLY_ROBOT_RADIUS_MAX_INFLATION = 0.05f;
-    static constexpr double ENEMY_ROBOT_RADIUS_MAX_INFLATION = 0.06f;
+    static constexpr double FRIENDLY_ROBOT_RADIUS_MAX_INFLATION = 0.05;
+    static constexpr double ENEMY_ROBOT_RADIUS_MAX_INFLATION = 0.06;
 
     // How much larger should the goal radius be. This is added as a safety tolerance so
     // robots do not "teleport" over the goal between simulation frames.
-    static constexpr float GOAL_RADIUS_SCALE = 1.05f;
+    static constexpr double GOAL_RADIUS_SCALE = 1.05;
 
-    // How much larger should the goal radius be (in meters). This is added as a safety
-    // tolerance so robots do not accidentally enter the minimum distance threshold.
-    // NOTE: This value must be >= 0
-    static constexpr float BALL_AGENT_RADIUS_OFFSET = 0.1f;
-
-    // The maximum distance which HRVO Agents will look for neighbors, in meters.
-    // A large radius picked to allow for far visibility of neighbors so Agents have
-    // enough space to decelerate and avoid collisions.
-    static constexpr float MAX_NEIGHBOR_SEARCH_DIST = 2.5f;
+    const unsigned int ENEMY_LV_ROBOT_OFFSET = 1000;
 };

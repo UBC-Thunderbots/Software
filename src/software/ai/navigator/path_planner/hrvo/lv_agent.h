@@ -9,7 +9,7 @@
 #include "software/world/robot_state.h"
 #include "software/world/team_types.h"
 
-class LVAgent : Agent {
+class LVAgent : public Agent {
 
 public:
     /**

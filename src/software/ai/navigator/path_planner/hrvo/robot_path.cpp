@@ -1,5 +1,3 @@
-#pragma once
-
 #include <optional>
 
 #include "path_point.h"
