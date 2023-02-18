@@ -70,9 +70,9 @@ void EnemyBallPlacementPlay::ballPlacementWithShadow(
         for (const auto &enemy_robot : world.enemyTeam().getAllRobotsExceptGoalie())
         {
             if ((enemy_robot.position() - world.ball().position()).length() < 0.25)
-                {
-                    enemy_at_ball = true;
-                }
+            {
+                enemy_at_ball = true;
+            }
         }
 
         // If the enemy hasn't reached the ball yet, we use this flag to avoid shadowing
