@@ -85,7 +85,6 @@ py_library(
         "friendly_has_ball_possession.py",
         "robot_enters_region.py",
         "robot_speed_threshold.py",
-        "robot_stops_in_region.py",
         "validation.py",
     ],
     data = [

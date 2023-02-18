@@ -4,7 +4,6 @@ import software.python_bindings as tbots
 from proto.play_pb2 import Play, PlayName
 from software.simulated_tests.ball_enters_region import *
 from software.simulated_tests.ball_stops_in_region import *
-from software.simulated_tests.robot_stops_in_region import *
 from software.simulated_tests.robot_enters_region import *
 from software.simulated_tests.simulated_test_fixture import (
     simulated_test_runner,
@@ -16,11 +15,12 @@ from proto.ssl_gc_geometry_pb2 import Vector2
 
 # TODO (#2599): Remove Duration parameter from test
 
+# test duration global constant
+test_duration = 10
 
 @pytest.mark.parametrize(
-    "run_enemy_ai,test_duration", [(False, 20)]
-)  # , (True, 20)]) # TODO (#2690): Robot gets stuck in corner of defense area
-def test_free_kick_ball_placement(simulated_test_runner, run_enemy_ai, test_duration):
+    "run_enemy_ai", [(False,),(True,)]) # TODO (#2690): Robot gets stuck in corner of defense area
+def test_free_kick_ball_placement(simulated_test_runner, run_enemy_ai):
 
     # starting point must be Point
     ball_initial_pos = tbots.Point(2, 2)
@@ -105,7 +105,7 @@ def test_free_kick_ball_placement(simulated_test_runner, run_enemy_ai, test_dura
     )
 
     # TODO (#2797): uncomment tests below to verify robots actually drop ball and exit region
-
+    # send a free kick command 
     # simulated_test_runner.gamecontroller.send_ci_input(
     #     gc_command=Command.Type.DIRECT_FREE_BLUE, team=Team.BLUE
     # )
@@ -119,6 +119,8 @@ def test_free_kick_ball_placement(simulated_test_runner, run_enemy_ai, test_dura
     # ]
 
     # # Drop Ball Eventually Validation
+    # # Direct free kick after ball placement, the robot must be 0.05 away from the ball after the placement
+    # # See detailed rules here: https://robocup-ssl.github.io/ssl-rules/sslrules.html#_ball_placement
     # drop_ball_eventually_validation_sequence_set = [
     #     [
     #         # Ball should arrive within 5cm of placement point
@@ -136,8 +138,8 @@ def test_free_kick_ball_placement(simulated_test_runner, run_enemy_ai, test_dura
     # )
 
 
-@pytest.mark.parametrize("run_enemy_ai,test_duration", [(False, 20)])
-def test_force_start_ball_placement(simulated_test_runner, run_enemy_ai, test_duration):
+@pytest.mark.parametrize("run_enemy_ai", [(False,), (True,)])
+def test_force_start_ball_placement(simulated_test_runner, run_enemy_ai):
 
     # starting point must be Point
     ball_initial_pos = tbots.Point(2, 2)
@@ -153,7 +155,6 @@ def test_force_start_ball_placement(simulated_test_runner, run_enemy_ai, test_du
         tbots.Point(-2.75, -1.5),
         tbots.Point(4.6, -3.1),
     ]
-
     yellow_bots = [
         tbots.Point(1, 0),
         tbots.Point(1, 2.5),
@@ -222,7 +223,7 @@ def test_force_start_ball_placement(simulated_test_runner, run_enemy_ai, test_du
     )
 
     # TODO (#2797): uncomment tests below to verify robots actually drop ball and exit region
-
+    # send a non free kick command after the ball ball placement command
     # simulated_test_runner.gamecontroller.send_ci_input(
     #     gc_command=Command.Type.DIRECT_FREE_BLUE, team=Team.BLUE
     # )
@@ -236,6 +237,8 @@ def test_force_start_ball_placement(simulated_test_runner, run_enemy_ai, test_du
     # ]
 
     # # Drop Ball Eventually Validation
+    # # Direct free kick after ball placement, the robot must be 0.05 away from the ball after the placement
+    # # See detailed rules here: https://robocup-ssl.github.io/ssl-rules/sslrules.html#_ball_placement
     # drop_ball_eventually_validation_sequence_set = [
     #     [
     #         # Ball should arrive within 5cm of placement point
