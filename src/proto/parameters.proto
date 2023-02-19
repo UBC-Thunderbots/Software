@@ -298,13 +298,11 @@ message CostVisualizationConfig
 {
     // Whether we should generate sample passes for the cost visualization
     required bool generate_sample_passes = 1 [default = false];
-    required int32 num_rows              = 2
-        [default = 30, (bounds).min_int_value = 1, (bounds).max_int_value = 100];
-    required int32 num_cols = 3
+    required int32 num_cols              = 2
         [default = 45, (bounds).min_int_value = 1, (bounds).max_int_value = 100];
     // cost functions
-    required bool static_position_quality  = 4 [default = false];
-    required bool pass_friendly_capability = 5 [default = false];
-    required bool pass_enemy_risk          = 6 [default = false];
-    required bool pass_shoot_score         = 7 [default = false];
+    required bool static_position_quality  = 3 [default = false];
+    required bool pass_friendly_capability = 4 [default = false];
+    required bool pass_enemy_risk          = 5 [default = false];
+    required bool pass_shoot_score         = 6 [default = false];
 }

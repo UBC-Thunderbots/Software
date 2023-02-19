@@ -74,6 +74,8 @@ class CostVisualizationWidget(QtWidgets.QMainWindow):
             isocurve.setParentItem(self.img)
             self.curves.append(isocurve)
 
+        self.prev_num_rows = 0
+
     def refresh(self):
         try:
             cost_vis = self.cost_visualization_buffer.queue.get_nowait()
@@ -102,6 +104,13 @@ class CostVisualizationWidget(QtWidgets.QMainWindow):
         # Update the max number
         self.max_label.setText("max: " + str(np.max(self.data)))
 
+        # update range if num rows was changed
+        if self.prev_num_rows != cost_vis.num_rows:
+            self.view_box.setRange(
+                xRange=(0, cost_vis.num_cols), yRange=(0, cost_vis.num_rows)
+            )
+            self.prev_num_rows = cost_vis.num_rows
+
         for isocurve in self.curves:
             isocurve.setParentItem(self.img)
             isocurve.setData(self.data)
@@ -117,44 +126,29 @@ class CostVisualizationWidget(QtWidgets.QMainWindow):
         :param max_y_range: field.max_y_range from field.py
         """
 
-        # convert from field coordinates to image coordinates
-        x_min = self.convert_range(
-            -max_x_range / 2, max_x_range / 2, 0, self.cached_cost_vis.num_cols, x_min
-        )
-        x_max = self.convert_range(
-            -max_x_range / 2, max_x_range / 2, 0, self.cached_cost_vis.num_cols, x_max
-        )
-        y_min = self.convert_range(
-            -max_y_range / 2, max_y_range / 2, 0, self.cached_cost_vis.num_rows, y_min
-        )
-        y_max = self.convert_range(
-            -max_y_range / 2, max_y_range / 2, 0, self.cached_cost_vis.num_rows, y_max
-        )
+        if self.cached_cost_vis.num_cols != 0 and self.cached_cost_vis.num_rows != 0:
+            # convert from field coordinates to image coordinates
+            x_min = np.interp(
+                x_min,
+                [-max_x_range / 2, max_x_range / 2],
+                [0, self.cached_cost_vis.num_cols],
+            )
+            x_max = np.interp(
+                x_max,
+                [-max_x_range / 2, max_x_range / 2],
+                [0, self.cached_cost_vis.num_cols],
+            )
+            y_min = np.interp(
+                y_min,
+                [-max_y_range / 2, max_y_range / 2],
+                [0, self.cached_cost_vis.num_rows],
+            )
+            y_max = np.interp(
+                y_max,
+                [-max_y_range / 2, max_y_range / 2],
+                [0, self.cached_cost_vis.num_rows],
+            )
 
-        self.view_box.setRange(xRange=(x_min, x_max), yRange=(y_min, y_max))
+            self.view_box.setRange(xRange=(x_min, x_max), yRange=(y_min, y_max))
 
-    def convert_range(
-        self,
-        old_min: float,
-        old_max: float,
-        new_min: float,
-        new_max: float,
-        old_value: float,
-    ):
-        """Helper function to convert a value from one range to another
-        
-        :param old_min: the minimum value of the old range
-        :param old_max: the maximum value of the old range
-        :param new_min: the minimum value of the new range
-        :param new_min: the maximum value of the new range
-        :param old_value: the value to convert
-
-        :return: the converted value in the range [new_min, new_max]
-        """
-        old_range = old_max - old_min
-        if old_range == 0:
-            new_value = new_min
-        else:
-            new_range = new_max - new_min
-            new_value = (((old_value - old_min) * new_range) / old_range) + new_min
-        return new_value
+            self.prev_num_rows = self.cached_cost_vis.num_rows

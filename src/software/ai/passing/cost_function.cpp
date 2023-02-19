@@ -343,8 +343,10 @@ void samplePassesForVisualization(const World& world,
                                   const TbotsProto::PassingConfig& passing_config)
 {
     // number of rows and columns are configured in parameters.proto
-    int num_rows  = passing_config.cost_vis_config().num_rows();
-    int num_cols  = passing_config.cost_vis_config().num_cols();
+    int num_cols = passing_config.cost_vis_config().num_cols();
+    // this is for DivB field, for DivA, it would be num_cols * 3 / 4 as specified in
+    // field.cpp
+    int num_rows  = num_cols * 2 / 3;
     double width  = world.field().xLength() / num_cols;
     double height = world.field().yLength() / num_rows;
 
