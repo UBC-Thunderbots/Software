@@ -4,6 +4,7 @@ import pytest
 
 import software.python_bindings as tbots
 from proto.play_pb2 import Play, PlayName
+from software.simulated_tests.robot_enters_region import *
 from proto.import_all_protos import *
 from software.simulated_tests.simulated_test_fixture import simulated_test_runner
 from proto.message_translation.tbots_protobuf import create_world_state
@@ -11,10 +12,7 @@ from proto.ssl_gc_common_pb2 import Team
 
 
 @pytest.mark.parametrize("is_friendly_test", [True, False])
-def test_kickoff_play(
-    simulated_test_runner,
-    is_friendly_test
-):
+def test_kickoff_play(simulated_test_runner, is_friendly_test):
 
     # starting point must be Point
     ball_initial_pos = tbots.Point(0, 0)
@@ -77,10 +75,28 @@ def test_kickoff_play(
     )
 
     # [SUCHIR] - create two sets of always and eventually validation: 1) set up (not touching the ball yet) and 2) kicking off
+    # questions:
+    # am I validating just our team or both our team and the enemy team?
+
+    # things to check:
+    # - robots must move to their own half of the field (excluding the center circle)
+    #    > note that one robot of the attacking team is allowed to be within the whole center circle
+    # - ball must be kicked within 10 seconds
+    # - ball moves 0.05m from kick-off
+
+    # 02/18/2023
+    # should I change the simulated test to be named "robots_enter_region" instead
+    # is there a format to the comments in the simulated_test file (I wanna add comments)
 
     # Always Validation
     # TODO- #2809 Validation
-    always_validation_sequence_set = [[]]
+    always_validation_sequence_set = [
+        [
+            NumberOfRobotsAlwaysStaysInRegion(
+                region=[tbots.field.friendlyHalf()], req_robot_cnt=6
+            )
+        ]
+    ]
 
     # Eventually Validation
     # TODO- #2809 Validation
