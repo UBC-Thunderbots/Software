@@ -54,6 +54,7 @@ py_library(
         "//software/thunderscope/robot_diagnostics:diagnostics_input_widget",
         "//software/thunderscope/robot_diagnostics:drive_and_dribbler_widget",
         "//software/thunderscope/robot_diagnostics:estop_view",
+        "//software/thunderscope/robot_diagnostics:robot_info",
         "//software/thunderscope/robot_diagnostics:robot_view",
         requirement("pyqtgraph"),
         requirement("numpy"),
@@ -93,5 +94,6 @@ py_library(
     ],
     deps = [
         "//software/thunderscope:constants",
+        "//software/thunderscope/common:common_widgets",
     ],
 )
