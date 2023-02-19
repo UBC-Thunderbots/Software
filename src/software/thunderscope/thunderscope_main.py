@@ -295,14 +295,10 @@ if __name__ == "__main__":
             )
             tscope.simulator_proto_unix_io.send_proto(WorldState, world_state)
 
-            # below are the changes made on saturday jan 28th, 2023
-            # example for the buffer
-            # self.primitive_set_buffer = ThreadSafeBuffer(buffer_size, PrimitiveSet)
             simulation_state_buffer = ThreadSafeBuffer(1, SimulationState)
             tscope.simulator_proto_unix_io.register_observer(
                 SimulationState, simulation_state_buffer
             )
-            # or would it be tscope.simulator_proto_unix_io.register_observer(SimulationState, self.simulation_state_buffer)
 
             # Tick Simulation
             while True:
