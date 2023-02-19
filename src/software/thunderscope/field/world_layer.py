@@ -71,8 +71,7 @@ class WorldLayer(FieldLayer):
         if event.key() == QtCore.Qt.Key.Key_I:
             self.display_robot_id = not self.display_robot_id
 
-        """ if ctrl and space are both pressed, pause gameplay"""
-        # if user is holding ctrl + space, send a command to simulator to pause the gameplay
+        # if user is holding ctrl + space, send a command to simulator to pause/play the gameplay
         if (
             self.key_pressed[QtCore.Qt.Key.Key_Control]
             and self.key_pressed[QtCore.Qt.Key.Key_Space]
