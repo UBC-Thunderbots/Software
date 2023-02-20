@@ -4,21 +4,31 @@ from pyqtgraph.Qt.QtWidgets import *
 from software.py_constants import *
 from proto.import_all_protos import *
 import software.thunderscope.common.common_widgets as common_widgets
-from software.thunderscope.constants import Colors, ERROR_CODE_MESSAGES
+from software.thunderscope.constants import *
 
 
 class RobotInfo(QWidget):
 
+    # Offsets the minimum of the battery bar from the minimum ideal voltage
+    # Allows battery % to go below the minimum ideal level
+    BATTERY_MIN_OFFSET = 3
+
     toggle_one_connection_signal = QtCore.pyqtSignal(int, int)
 
-    def __init__(self, robot_id, load_fullsystem):
+    def __init__(self, robot_id, load_fullsystem, control_mode_signal):
         """
         Initialize a single robot's info widget
+
+        :param robot_id: id of robot whose info is being displayed
+        :param load_fullsystem: whether fullsystem is loaded currently
+                                Shows / Hides AI option from control mode menu accordingly
+        :param control_mode_signal: signal that should be emitted when a robot changes control mode
         """
 
         super().__init__()
 
         self.robot_id = robot_id
+        self.control_mode_signal = control_mode_signal
 
         # when this robot has a battery warning, this is set to True
         # which prevents spamming the same battery warning
@@ -30,10 +40,21 @@ class RobotInfo(QWidget):
         self.status_layout = QVBoxLayout()
 
         # Battery Bar
+        self.battery_layout = QHBoxLayout()
         self.battery_progress_bar = common_widgets.ColorProgressBar(
-            MIN_BATTERY_VOLTAGE, MAX_BATTERY_VOLTAGE
+            MIN_BATTERY_VOLTAGE - self.BATTERY_MIN_OFFSET, MAX_BATTERY_VOLTAGE
         )
-        self.status_layout.addWidget(self.battery_progress_bar)
+        # Battery Voltage Label
+        self.battery_label = QLabel()
+        self.battery_label.setText("NAN")
+        # Label changes when voltage bar level changes
+        self.battery_progress_bar.floatValueChanged.connect(
+            lambda float_val: self.battery_label.setText("%.2fV" % float_val)
+        )
+        self.battery_layout.addWidget(self.battery_progress_bar)
+        self.battery_layout.addWidget(self.battery_label)
+
+        self.status_layout.addLayout(self.battery_layout)
 
         # Control mode dropdown
         self.control_mode_layout = QHBoxLayout()
@@ -54,7 +75,9 @@ class RobotInfo(QWidget):
         self.status_layout.addLayout(self.control_mode_layout)
 
         # Vision Pattern
-        self.layout.addWidget(self.create_vision_pattern_label("b", 25))
+        self.layout.addWidget(
+            self.create_vision_pattern_label(Colors.ROBOT_MIDDLE_BLUE, ROBOT_RADIUS)
+        )
 
         self.layout.addLayout(self.status_layout)
 
@@ -79,15 +102,20 @@ class RobotInfo(QWidget):
         """
         control_mode_menu = QComboBox()
 
-        control_mode_menu.addItems(["None", "Manual"])
+        control_mode_menu.addItems(
+            [
+                common_widgets.IndividualRobotMode.NONE.name,
+                common_widgets.IndividualRobotMode.MANUAL.name,
+            ]
+        )
         control_mode_menu.setCurrentIndex(0)
 
         if load_fullsystem:
-            control_mode_menu.addItem("AI")
+            control_mode_menu.addItem(common_widgets.IndividualRobotMode.AI.name)
             control_mode_menu.setCurrentIndex(2)
 
         control_mode_menu.currentIndexChanged.connect(
-            lambda mode, robot_id=self.robot_id: self.toggle_one_connection_signal.emit(
+            lambda mode, robot_id=self.robot_id: self.control_mode_signal.emit(
                 mode, robot_id
             )
         )
@@ -109,12 +137,8 @@ class RobotInfo(QWidget):
         painter.setPen(pg.mkPen("black"))
         painter.setBrush(pg.mkBrush("black"))
 
-        convert_degree = -16
-
-        painter.drawChord(
-            QtCore.QRectF(0, 0, int(radius * 2), int(radius * 2),),
-            -45 * convert_degree,
-            270 * convert_degree,
+        common_widgets.draw_robot(
+            painter, QtCore.QRectF(0, 0, int(radius * 2), int(radius * 2),), -45, 270,
         )
 
         # Draw the vision pattern

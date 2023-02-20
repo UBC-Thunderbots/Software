@@ -1,5 +1,17 @@
+from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph.Qt.QtCore import *
+from enum import IntEnum
+
+
+class IndividualRobotMode(IntEnum):
+    """
+    Enum for the mode of input for an individual robot
+    """
+
+    NONE = 0
+    MANUAL = 1
+    AI = 3
 
 
 class FloatSlider(QSlider):
@@ -62,6 +74,8 @@ class ColorProgressBar(QProgressBar):
     Also changes slider color based on percentage filled
     """
 
+    floatValueChanged = pyqtSignal(float)
+
     def __init__(self, min_val, max_val, decimals=2):
         """
         Creates a ColorProgressBar with the specified min, max and decimals
@@ -79,8 +93,16 @@ class ColorProgressBar(QProgressBar):
         )
 
         super(ColorProgressBar, self).setStyleSheet(
-            "QProgressBar::chunk" "{" f"background: grey" "}"
+            "QProgressBar::chunk" "{" "background: grey" "color: black" "}"
         )
+
+        self.valueChanged.connect(self.emitFloatValueChanged)
+
+    def emitFloatValueChanged(self):
+        """
+        Emits a signal with the slider's float value
+        """
+        self.floatValueChanged.emit(self.value())
 
     def setValue(self, value):
         """
@@ -257,6 +279,39 @@ def create_push_button(title):
     return push_button
 
 
+def set_table_data(
+    data, table, header_size_hint_width_expansion, item_size_hint_width_expansion
+):
+    """Set data in a table
+
+    :param data: dict containing {"column_name": [column_items]}
+    :param table: table widget that will contain the data
+    :param header_size_hint_width_expansion: the factor multiplied by the length of the header
+    :param item_size_hint_width_expansion: the factor multiplied by the length of the item
+
+    """
+    horizontal_headers = []
+
+    for n, key in enumerate(data.keys()):
+        horizontal_headers.append(key)
+
+        for m, item in enumerate(data[key]):
+            str_item = str(item)
+            newitem = QTableWidgetItem(str_item)
+            newitem.setSizeHint(
+                QtCore.QSize(
+                    max(
+                        len(key) * header_size_hint_width_expansion,
+                        len(str_item) * item_size_hint_width_expansion,
+                    ),
+                    1,
+                )
+            )
+            table.setItem(m, n, newitem)
+
+    table.setHorizontalHeaderLabels(horizontal_headers)
+
+
 def change_button_state(button, enable):
     """Change button color and clickable state.
 
@@ -319,3 +374,18 @@ def disable_radio_button(button_group):
         button.setChecked(False)
         button.clicked.disconnect()
         button.clicked.connect(lambda state, curr=button: curr.setChecked(False))
+
+
+def draw_robot(painter, rect, start_angle_degree, span_angle_degree):
+    """
+    Draws a robot bounded by the given rectangle with a chord defined by the given angles
+    :param painter: the QPainter object that is drawing in thunderscope
+    :param rect: the rectangle that is bounding the robot's circle
+    :param start_angle_degree: the start of the chord, measured anti-clockwise from the horizontal middle in degrees
+    :param span_angle_degree: the end of the chord, measured anti-clockwise from the horizontal middle in degrees
+    """
+    convert_degree = -16
+
+    painter.drawChord(
+        rect, start_angle_degree * convert_degree, span_angle_degree * convert_degree,
+    )

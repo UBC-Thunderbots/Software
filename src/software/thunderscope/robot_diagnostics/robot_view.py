@@ -16,13 +16,16 @@ class RobotView(QScrollArea):
 
     """
 
-    toggle_all_connection_signal = QtCore.pyqtSignal(int, int)
+    control_mode_signal = QtCore.pyqtSignal(int, int)
 
     def __init__(self, load_fullsystem):
 
         """
         Initialize the robot view.
         Sets up a Robot Info Widget for each robot
+
+        :param load_fullsystem: whether fullsystem is loaded currently
+                                Shows / Hides AI option from control mode menu accordingly
         """
 
         super().__init__()
@@ -32,19 +35,14 @@ class RobotView(QScrollArea):
         self.layout = QVBoxLayout()
 
         self.robot_info_widgets = [
-            RobotInfo(id, load_fullsystem) for id in range(MAX_ROBOT_IDS_PER_SIDE)
+            RobotInfo(id, load_fullsystem, self.control_mode_signal)
+            for id in range(MAX_ROBOT_IDS_PER_SIDE)
         ]
         self.robot_status_widgets = [
             RobotStatusView() for id in range(MAX_ROBOT_IDS_PER_SIDE)
         ]
 
         for id in range(MAX_ROBOT_IDS_PER_SIDE):
-            self.robot_info_widgets[id].toggle_one_connection_signal.connect(
-                lambda mode, robot_id: self.toggle_all_connection_signal.emit(
-                    mode, robot_id
-                )
-            )
-
             self.robot_info_widgets[id].robot_status_expand.clicked.connect(
                 self.robot_status_widgets[id].toggle_visibility
             )
@@ -62,9 +60,10 @@ class RobotView(QScrollArea):
         Refresh the view
         Gets a RobotStatus proto and calls the corresponding update method
         """
-        robot_status = self.robot_status_buffer.get(block=False)
+        robot_status = self.robot_status_buffer.get(block=False, return_cached=False)
 
-        self.robot_info_widgets[robot_status.robot_id].update(
-            robot_status.power_status, robot_status.error_code
-        )
-        self.robot_status_widgets[robot_status.robot_id].update(robot_status)
+        if robot_status is not None:
+            self.robot_info_widgets[robot_status.robot_id].update(
+                robot_status.power_status, robot_status.error_code
+            )
+            self.robot_status_widgets[robot_status.robot_id].update(robot_status)

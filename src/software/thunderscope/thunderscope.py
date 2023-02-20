@@ -49,7 +49,8 @@ from software.thunderscope.common.proto_configuration_widget import (
 from software.thunderscope.field.field import Field
 from software.thunderscope.log.g3log_widget import g3logWidget
 from software.thunderscope.proto_unix_io import ProtoUnixIO
-from software.thunderscope.play.playinfo_widget import playInfoWidget
+from software.thunderscope.play.playinfo_widget import PlayInfoWidget
+from software.thunderscope.play.refereeinfo_widget import RefereeInfoWidget
 from software.thunderscope.robot_diagnostics.chicker_widget import ChickerWidget
 from software.thunderscope.robot_diagnostics.diagnostics_input_widget import (
     FullSystemConnectWidget,
@@ -440,10 +441,17 @@ class Thunderscope(object):
         playinfo_dock = Dock("Play Info")
         playinfo_dock.addWidget(widgets["playinfo_widget"])
 
+        widgets["refereeinfo_widget"] = self.setup_referee_info(
+            full_system_proto_unix_io
+        )
+        refereeinfo_dock = Dock("Referee Info")
+        refereeinfo_dock.addWidget(widgets["refereeinfo_widget"])
+
         dock_area.addDock(field_dock)
-        dock_area.addDock(log_dock, "left", field_dock)
-        dock_area.addDock(parameter_dock, "above", log_dock)
-        dock_area.addDock(playinfo_dock, "bottom", field_dock)
+        dock_area.addDock(parameter_dock, "left", field_dock)
+        dock_area.addDock(log_dock, "above", parameter_dock)
+        dock_area.addDock(refereeinfo_dock, "bottom", field_dock)
+        dock_area.addDock(playinfo_dock, "above", refereeinfo_dock)
         dock_area.addDock(performance_dock, "right", playinfo_dock)
 
         if load_robot_view:
@@ -453,9 +461,7 @@ class Thunderscope(object):
             robot_view_dock = Dock("RobotView")
             robot_view_dock.addWidget(widgets["robot_view"])
             dock_area.addDock(robot_view_dock, "above", log_dock)
-            self.toggle_all_connection_signal = widgets[
-                "robot_view"
-            ].toggle_all_connection_signal
+            self.control_mode_signal = widgets["robot_view"].control_mode_signal
 
     def configure_robot_diagnostics_layout(
         self, dock_area, proto_unix_io, load_fullsystem,
@@ -502,9 +508,9 @@ class Thunderscope(object):
             robot_view_dock = Dock("RobotView")
             robot_view_dock.setStretch(y=5)
             robot_view_dock.addWidget(self.diagnostics_widgets["robot_view"])
-            self.toggle_all_connection_signal = self.diagnostics_widgets[
+            self.control_mode_signal = self.diagnostics_widgets[
                 "robot_view"
-            ].toggle_all_connection_signal
+            ].control_mode_signal
 
         self.robot_diagnostics_dock_area.addDock(log_dock)
         if not load_fullsystem:
@@ -523,7 +529,7 @@ class Thunderscope(object):
     def setup_robot_view(self, proto_unix_io, load_fullsystem):
         """Setup the robot view widget
         :param proto_unix_io: The proto unix io object for the full system
-        :param load_fullsystem: Boolean to indicate if checkboxes should be loaded
+        :param load_fullsystem: Boolean to indicate if control mode menus should have an AI option
         """
         robot_view = RobotView(load_fullsystem)
         self.register_refresh_function(robot_view.refresh)
@@ -681,12 +687,25 @@ class Thunderscope(object):
 
         """
 
-        play_info = playInfoWidget()
+        play_info = PlayInfoWidget()
         proto_unix_io.register_observer(PlayInfo, play_info.playinfo_buffer)
-        proto_unix_io.register_observer(Referee, play_info.referee_buffer)
         self.register_refresh_function(play_info.refresh)
 
         return play_info
+
+    def setup_referee_info(self, proto_unix_io):
+        """Setup the referee info widget
+
+        :param proto_unix_io: The proto unix io object
+        :returns: The referee info widget
+
+        """
+
+        referee_info = RefereeInfoWidget()
+        proto_unix_io.register_observer(Referee, referee_info.referee_buffer)
+        self.register_refresh_function(referee_info.refresh)
+
+        return referee_info
 
     def setup_chicker_widget(self, proto_unix_io):
         """Setup the chicker widget for robot diagnostics
@@ -705,6 +724,8 @@ class Thunderscope(object):
 
     def setup_diagnostics_input_widget(self):
         """
+
+        Sets up the diagnostics input widget with the given proto unix io
 
         :param proto_unix_io: The proto unix io object
         """
