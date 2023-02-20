@@ -3,9 +3,9 @@ import time
 import textwrap
 import shelve
 import signal
+import platform
 import logging
 
-# PyQt5 doesn't play nicely with i3 and Ubuntu 18, PyQt6 is much more stable
 # Unfortunately, PyQt6 doesn't install on Ubuntu 18. Thankfully both
 # libraries are interchangeable, and  we just need to swap them in this
 # one spot, and pyqtgraph will pick up on it and store the library under
