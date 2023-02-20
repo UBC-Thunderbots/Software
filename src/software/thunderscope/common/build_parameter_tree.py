@@ -18,9 +18,7 @@ def __create_int_parameter_writable(key, value, descriptor):
 
     # Extract the options from the descriptor, and store it
     # in the dictionary.
-    options = MessageToDict(
-        descriptor.GetOptions(), preserving_proto_field_name=True
-    )
+    options = MessageToDict(descriptor.GetOptions(), preserving_proto_field_name=True)
 
     try:
         min_max = options["[TbotsProto.bounds]"]
@@ -50,9 +48,7 @@ def __create_double_parameter_writable(key, value, descriptor):
 
     # Extract the options from the descriptor, and store it
     # in the dictionary.
-    options = MessageToDict(
-        descriptor.GetOptions(), preserving_proto_field_name=True
-    )
+    options = MessageToDict(descriptor.GetOptions(), preserving_proto_field_name=True)
 
     try:
         min_max = options["[TbotsProto.bounds]"]
@@ -125,14 +121,11 @@ def __create_parameter_read_only(key, value, descriptor):
     :param descriptor: The proto descriptor
 
     """
-    return {"name": key, "type": "text", "value": value, "readonly": True}
+    return {"name": key, "type": "str", "value": value, "readonly": True}
 
 
 def config_proto_to_field_list(
-        message,
-        read_only=True,
-        search_term=None,
-        search_filter_threshold=60
+    message, read_only=True, search_term=None, search_filter_threshold=60
 ):
     """Converts a protobuf to a pyqtgraph parameter tree dictionary
     that can loaded directly into a ParameterTree
@@ -165,7 +158,7 @@ def config_proto_to_field_list(
                         value,
                         read_only=read_only,
                         search_term=search_term,
-                        search_filter_threshold=search_filter_threshold
+                        search_filter_threshold=search_filter_threshold,
                     ),
                 }
             )
@@ -191,10 +184,7 @@ def config_proto_to_field_list(
                 else __create_string_parameter_writable(key, value, descriptor)
             )
 
-        elif descriptor.type in [
-            descriptor.TYPE_DOUBLE,
-            descriptor.TYPE_FLOAT
-        ]:
+        elif descriptor.type in [descriptor.TYPE_DOUBLE, descriptor.TYPE_FLOAT]:
             field_list.append(
                 __create_parameter_read_only(key, "%.2f" % value, descriptor)
                 if read_only
@@ -205,7 +195,7 @@ def config_proto_to_field_list(
             descriptor.TYPE_INT32,
             descriptor.TYPE_INT64,
             descriptor.TYPE_UINT32,
-            descriptor.TYPE_UINT64
+            descriptor.TYPE_UINT64,
         ]:
             field_list.append(
                 __create_parameter_read_only(key, str(value), descriptor)
@@ -222,5 +212,3 @@ def config_proto_to_field_list(
         return field_list
 
     return {}
-
-

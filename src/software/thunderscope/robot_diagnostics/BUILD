@@ -67,5 +67,5 @@ py_library(
 
 py_library(
     name = "robot_status",
-    srcs = ["robot_status.py"]
+    srcs = ["robot_status.py"],
 )

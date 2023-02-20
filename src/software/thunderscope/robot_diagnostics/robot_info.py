@@ -39,12 +39,17 @@ class RobotInfo(QWidget):
         self.control_mode_layout = QHBoxLayout()
         self.control_mode_menu = self.create_control_mode_menu(load_fullsystem)
 
+        # Robot Status expand button
+        self.robot_status_expand = self.create_robot_status_expand_button()
+
         # Breakbeam status
         self.breakbeam_label = QLabel()
         self.breakbeam_label.setText("BREAKBEAM")
         self.breakbeam_label.setStyleSheet("background-color: grey")
+
         self.control_mode_layout.addWidget(self.breakbeam_label)
         self.control_mode_layout.addWidget(self.control_mode_menu)
+        self.control_mode_layout.addWidget(self.robot_status_expand)
 
         self.status_layout.addLayout(self.control_mode_layout)
 
@@ -54,6 +59,16 @@ class RobotInfo(QWidget):
         self.layout.addLayout(self.status_layout)
 
         self.setLayout(self.layout)
+
+    def create_robot_status_expand_button(self):
+        """
+        Creates the button to expand / collapse the robot status view
+        :return: QPushButton object
+        """
+        button = QPushButton()
+        button.setCheckable(True)
+        button.setText("INFO")
+        return button
 
     def create_control_mode_menu(self, load_fullsystem):
         """

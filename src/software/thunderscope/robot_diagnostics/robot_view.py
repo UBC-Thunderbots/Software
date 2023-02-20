@@ -1,4 +1,3 @@
-import sys
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtWidgets import *
@@ -46,6 +45,10 @@ class RobotView(QScrollArea):
                 )
             )
 
+            self.robot_info_widgets[id].robot_status_expand.clicked.connect(
+                self.robot_status_widgets[id].toggle_visibility
+            )
+
             self.layout.addWidget(self.robot_info_widgets[id])
             self.layout.addWidget(self.robot_status_widgets[id])
 
@@ -59,17 +62,9 @@ class RobotView(QScrollArea):
         Refresh the view
         Gets a RobotStatus proto and calls the corresponding update method
         """
-        #robot_status = self.robot_status_buffer.get(block=False)
-
-        robot_status = RobotStatus(
-            robot_id=5,
-            power_status=PowerStatus(
-                breakbeam_tripped=True,
-                battery_voltage=MAX_BATTERY_VOLTAGE
-            ),
-            error_code=[]
-        )
+        robot_status = self.robot_status_buffer.get(block=False)
 
         self.robot_info_widgets[robot_status.robot_id].update(
             robot_status.power_status, robot_status.error_code
         )
+        self.robot_status_widgets[robot_status.robot_id].update(robot_status)

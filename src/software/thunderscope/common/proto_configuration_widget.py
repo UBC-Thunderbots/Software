@@ -47,7 +47,9 @@ class ProtoConfigurationWidget(QWidget):
         self.param_group = parametertree.Parameter.create(
             name="params",
             type="group",
-            children=self.config_proto_to_param_dict(self.proto_to_configure, read_only=False, search_term=None),
+            children=self.config_proto_to_param_dict(
+                self.proto_to_configure, read_only=False, search_term=None
+            ),
         )
 
         # Create ParameterTree
@@ -106,9 +108,7 @@ class ProtoConfigurationWidget(QWidget):
 
             self.on_change_callback(child_name, data, self.proto_to_configure)
 
-    def config_proto_to_param_dict(
-        self, message, search_term=None
-    ):
+    def config_proto_to_param_dict(self, message, search_term=None):
         """Converts a protobuf to a pyqtgraph parameter tree dictionary
         that can loaded directly into a ParameterTree
 
@@ -122,7 +122,7 @@ class ProtoConfigurationWidget(QWidget):
         field_list = build_parameter_tree.config_proto_to_field_list(
             message,
             search_term=search_term,
-            search_filter_threshold=self.search_filter_threshold
+            search_filter_threshold=self.search_filter_threshold,
         )
 
         self.build_proto(message)

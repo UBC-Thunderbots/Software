@@ -4,8 +4,8 @@ py_library(
     name = "proto_configuration_widget",
     srcs = ["proto_configuration_widget.py"],
     deps = [
-        "//software/thunderscope/common:build_parameter_tree"
-    ]
+        "//software/thunderscope/common:build_parameter_tree",
+    ],
 )
 
 py_library(
@@ -23,5 +23,5 @@ py_library(
 
 py_library(
     name = "build_parameter_tree",
-    srcs = ["build_parameter_tree.py"]
+    srcs = ["build_parameter_tree.py"],
 )
