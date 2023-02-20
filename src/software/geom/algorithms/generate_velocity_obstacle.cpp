@@ -9,8 +9,7 @@ VelocityObstacle generateVelocityObstacle(const Circle& obstacle, const Circle& 
     const Angle robot_relative_to_obstacle_angle = robot_to_obstacle_vector.orientation();
 
     // opening angle of each side is defined as the obstacle radius plus the robot radius
-    Angle opening_angle = Angle::asin((robot.radius() + obstacle.radius()) /
-                                      robot_to_obstacle_vector.length());
+    Angle opening_angle;
 
     if (intersects(obstacle, robot))
     {
@@ -22,6 +21,9 @@ VelocityObstacle generateVelocityObstacle(const Circle& obstacle, const Circle& 
         // from being the complement of what we want (since VOs are defined as
         // area created between the smallest angles between the two sides).
         opening_angle = Angle::quarter() - Angle::fromRadians(0.0001);
+    } else {
+        opening_angle = Angle::asin((robot.radius() + obstacle.radius()) /
+                    robot_to_obstacle_vector.length());
     }
 
     // Direction of the two edges of the velocity obstacle

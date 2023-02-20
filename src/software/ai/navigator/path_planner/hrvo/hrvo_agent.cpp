@@ -79,8 +79,12 @@ std::vector<RobotId> HRVOAgent::computeNeighbors(std::map<RobotId, std::shared_p
             });
 
     // remove this robot
-    std::remove_if(robot_list.begin(), robot_list.end(),
-                   [&](std::pair<RobotId, RobotState> robot) { return robot.first == robot_id; });
+    robot_list.erase(
+            std::remove_if(robot_list.begin(), robot_list.end(),
+                           [this](std::pair<RobotId, RobotState> robot) {
+                               return robot.first == this->robot_id;
+                           }
+            ), robot_list.end());
 
     // run brute force nn search on robot_id and
     std::vector<std::pair<RobotId, RobotState>> neighbors = findNeighboursInThreshold(
