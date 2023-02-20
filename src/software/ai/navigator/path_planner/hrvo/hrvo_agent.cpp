@@ -1,11 +1,11 @@
 #include "software/ai/navigator/path_planner/hrvo/hrvo_agent.h"
 
-HRVOAgent::HRVOAgent(RobotId robot_id, const RobotState &robot_state, TeamSide side, RobotPath &path,
+HRVOAgent::HRVOAgent(RobotId robot_id, RobotState robot_state, TeamSide side, RobotPath &path,
                      double radius, double max_speed, double max_accel, double max_radius_inflation) :
         Agent(robot_id, robot_state, side,
               path, radius, max_speed,
               max_accel, max_radius_inflation),
-        obstacle_factory(TbotsProto::RobotNavigationObstacleConfig()){
+        obstacle_factory(TbotsProto::RobotNavigationObstacleConfig()) {
 }
 
 void HRVOAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive,
@@ -56,7 +56,6 @@ void HRVOAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive,
 }
 
 std::vector<RobotId> HRVOAgent::computeNeighbors(std::map<RobotId, std::shared_ptr<Agent>> &robots) {
-    std::vector<unsigned int> neighbours;
     // Only consider agents within this distance away from our position
     Point current_destination = path.getCurrentPathPoint()->getPosition();
     double dist_to_obstacle_threshold =
@@ -68,6 +67,8 @@ std::vector<RobotId> HRVOAgent::computeNeighbors(std::map<RobotId, std::shared_p
 
     std::vector<std::pair<RobotId, RobotState>> robot_list;
 
+    // TODO change to use iterator, then remove robot candidate at the end
+
     // transform map into list
     std::transform(
             robots.begin(),
@@ -77,20 +78,24 @@ std::vector<RobotId> HRVOAgent::computeNeighbors(std::map<RobotId, std::shared_p
                 return std::make_pair(id_robot_pair.first, id_robot_pair.second->getRobotState());
             });
 
+    // remove this robot
+    std::remove_if(robot_list.begin(), robot_list.end(),
+                   [&](std::pair<RobotId, RobotState> robot) { return robot.first == robot_id; });
+
     // run brute force nn search on robot_id and
     std::vector<std::pair<RobotId, RobotState>> neighbors = findNeighboursInThreshold(
-            std::make_pair(this->getRobotId(), this->getRobotState()),
+            std::make_pair(this->robot_id, this->getRobotState()),
             robot_list,
             dist_to_obstacle_threshold,
             compare);
 
     // transform id-state pairs into list of ids
-    std::vector<RobotId> neighbor_ids;
+    std::vector<unsigned int> neighbor_ids;
     std::transform(
-            neighbours.begin(),
-            neighbours.end(),
+            neighbors.begin(),
+            neighbors.end(),
             std::back_inserter(neighbor_ids),
-            [&](const std::pair<RobotId, RobotState> &id_neighbour_pair) {
+            [&](std::pair<RobotId, RobotState> id_neighbour_pair) {
                 return id_neighbour_pair.first;
             });
 

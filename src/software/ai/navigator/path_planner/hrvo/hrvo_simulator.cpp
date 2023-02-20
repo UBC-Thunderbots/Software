@@ -17,6 +17,7 @@ void HRVOSimulator::updateWorld(const World &world) {
     // TODO (#2498): Update implementation to correctly support adding and removing agents
     //               to represent the newly added and removed friendly/enemy robots in the
     //               World.
+    // TODO update agents instead of recreate tracked agents.
     robots.clear();
     for (const Robot &friendly_robot: world.friendlyTeam().getAllRobots()) {
         configureHRVORobot(friendly_robot);
@@ -213,6 +214,36 @@ void HRVOSimulator::visualize(unsigned int robot_id)
     }
 
     return;
+}
+
+void HRVOSimulator::updateRobotVelocity(RobotId robot_id, const Vector &new_velocity)
+{
+    auto hrvo_agent = robots.find(robot_id);
+    if (hrvo_agent != robots.end())
+    {
+        hrvo_agent->second->robot_state.velocity() = new_velocity;
+    }
+}
+
+Vector HRVOSimulator::getRobotVelocity(unsigned int robot_id) const
+{
+    auto hrvo_agent = robots.find(robot_id);
+    if (hrvo_agent != robots.end())
+    {
+        return hrvo_agent->second->robot_state.velocity();
+    }
+    LOG(WARNING) << "Velocity for robot " << robot_id
+                 << " can not be found since it does not exist in HRVO Simulator"
+                 << std::endl;
+    return Vector();
+}
+
+std::size_t HRVOSimulator::getRobotCount() {
+    return robots.size();
+}
+
+std::map<RobotId, std::shared_ptr<Agent>> HRVOSimulator::getRobots() {
+    return robots;
 }
 
 

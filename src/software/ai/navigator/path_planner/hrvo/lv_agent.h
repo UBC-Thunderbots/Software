@@ -23,7 +23,7 @@ public:
      * inflate.
      */
 
-    LVAgent(RobotId robot_id, const RobotState &robot_state, TeamSide side, RobotPath &path,
+    LVAgent(RobotId robot_id, RobotState robot_state, TeamSide side, RobotPath &path,
             double radius, double max_speed, double max_accel, double max_radius_inflation);
 
     /**

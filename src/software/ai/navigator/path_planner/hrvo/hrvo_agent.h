@@ -41,7 +41,7 @@ public:
      * inflate.
      */
 
-    HRVOAgent(RobotId robot_id, const RobotState &robot_state, TeamSide side, RobotPath &path,
+    HRVOAgent(RobotId robot_id, RobotState robot_state, TeamSide side, RobotPath &path,
               double radius, double max_speed, double max_accel, double max_radius_inflation);
 
 
@@ -85,7 +85,7 @@ public:
     /**
      * compute the neighbours of this robot
      * @param robots
-     * @return the robot simualator ids
+     * @return the robot simulator ids
      */
     std::vector<RobotId> computeNeighbors(std::map<RobotId, std::shared_ptr<Agent>> &robots);
 

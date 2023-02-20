@@ -45,12 +45,21 @@ public:
 
     void doStep(Duration time_step);
 
+    void updateRobotVelocity(RobotId robot_id, const Vector &new_velocity);
+
+    Vector getRobotVelocity(unsigned int robot_id) const;
+
+
     /**
      * Assumption: friendly team is the only robots running HRVO,
      * only enemy robots have robot id offset
      * @param robot_id
      */
     void visualize(RobotId robot_id);
+
+    std::size_t getRobotCount();
+
+    std::map<RobotId, std::shared_ptr<Agent>> getRobots();
 
 private:
 
@@ -84,16 +93,16 @@ private:
     // PrimitiveSet which includes the path which each friendly robot should take
     TbotsProto::PrimitiveSet primitive_set;
 
+
     // The colour of the friendly team
     const TeamColour friendly_team_colour;
-
     // simulator time step
     Duration time_step;
-
 
     // The max amount (meters) which the friendly/enemy robot radius can increase by.
     // This scale is used to avoid close encounters, and reduce chance of collision.
     static constexpr double FRIENDLY_ROBOT_RADIUS_MAX_INFLATION = 0.05;
+
     static constexpr double ENEMY_ROBOT_RADIUS_MAX_INFLATION = 0.06;
 
     // How much larger should the goal radius be. This is added as a safety tolerance so

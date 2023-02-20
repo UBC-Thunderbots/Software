@@ -13,7 +13,7 @@
 class Agent {
 public:
 
-    Agent(RobotId robot_id, const RobotState &robot_state, TeamSide side, RobotPath &path,
+    Agent(RobotId robot_id, RobotState robot_state, TeamSide side, RobotPath &path,
           double radius, double max_speed, double max_accel, double max_radius_inflation);
 
     /**
@@ -45,10 +45,7 @@ public:
      *
      * @return The state of the agent
      */
-    const RobotState &getRobotState();
-
-
-    RobotId getRobotId();
+    RobotState getRobotState();
 
     Vector getPreferredVelocity() const;
 
@@ -82,7 +79,7 @@ public:
     // robot id of this Agent
     RobotId robot_id;
     // current state
-    const RobotState robot_state;
+    RobotState robot_state;
     // whether this Agent is FRIENDLY or ENEMY
     TeamSide side;
     // The path of this Agent

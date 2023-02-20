@@ -1,6 +1,6 @@
 #include "agent.h"
 
-Agent::Agent(RobotId robot_id, const RobotState &robot_state, TeamSide side,
+Agent::Agent(RobotId robot_id, RobotState robot_state, TeamSide side,
              RobotPath &path, double radius, double max_speed,
              double max_accel, double max_radius_inflation) :
         robot_id(robot_id),
@@ -33,11 +33,7 @@ double Agent::getRadius() const
     return radius;
 }
 
-RobotId Agent::getRobotId() {
-    return robot_id;
-}
-
-const RobotState &Agent::getRobotState() {
+RobotState Agent::getRobotState() {
     return robot_state;
 }
 
