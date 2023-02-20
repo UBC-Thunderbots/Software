@@ -87,5 +87,4 @@ struct PenaltyKickPlayFSM
     TbotsProto::AiConfig ai_config;
     std::shared_ptr<PenaltyKickTactic> penalty_kick_tactic;
     std::vector<std::shared_ptr<PenaltySetupTactic>> penalty_setup_tactics;
-    std::vector<std::shared_ptr<StopTactic>> away_from_kick_tactics;
 };

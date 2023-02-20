@@ -3,17 +3,13 @@
 PenaltyKickPlayFSM::PenaltyKickPlayFSM(TbotsProto::AiConfig ai_config)
     : ai_config(ai_config),
       penalty_kick_tactic(std::make_shared<PenaltyKickTactic>(ai_config)),
-      penalty_setup_tactics(std::vector<std::shared_ptr<PenaltySetupTactic>>()),
-      away_from_kick_tactics(std::vector<std::shared_ptr<StopTactic>>())
+      penalty_setup_tactics(std::vector<std::shared_ptr<PenaltySetupTactic>>())
 {
 }
 
 void PenaltyKickPlayFSM::performKick(const Update &event)
 {
     PriorityTacticVector tactics_to_run = {{}};
-
-    tactics_to_run[0].insert(tactics_to_run[0].end(), away_from_kick_tactics.begin(),
-                             away_from_kick_tactics.end());
     tactics_to_run[0].emplace_back(penalty_kick_tactic);
     event.common.set_tactics(tactics_to_run);
 }
@@ -36,7 +32,7 @@ void PenaltyKickPlayFSM::setupPosition(const Update &event)
 
     // Adjust number of tactics based on the number of robots available
     unsigned int num_tactics = event.common.num_tactics;
-    if (num_tactics != away_from_kick_tactics.size())
+    if (num_tactics != penalty_setup_tactics.size())
     {
         penalty_setup_tactics =
             std::vector<std::shared_ptr<PenaltySetupTactic>>(num_tactics);
