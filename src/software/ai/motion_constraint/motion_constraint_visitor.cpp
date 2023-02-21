@@ -89,8 +89,6 @@ void MotionConstraintVisitor::visit(const MoveGoalieToGoalLineTactic &tactic)
 
 void MotionConstraintVisitor::visit(const PassDefenderTactic &tactic) {}
 
-// clang-format on
-
 std::set<TbotsProto::MotionConstraint>
 MotionConstraintVisitor::getUpdatedMotionConstraints(
     const Tactic &tactic,
