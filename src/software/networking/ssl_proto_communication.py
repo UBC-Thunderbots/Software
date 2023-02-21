@@ -11,7 +11,7 @@ class SslSocketProtoParseException(Exception):
 
 class SslSocket(object):
     """
-    The SSL Socket is class is responsible for communication with SSL protos from SSL binaries. The encoding that SSL uses is slightly different from our encoding when we send protobufs between different processes (and robots).
+    The SSL Socket class is responsible for communication with SSL protos from SSL binaries. The encoding that SSL uses is slightly different from our encoding when we send protobufs between different processes (and robots).
 
     Each SSL Proto message is preceded by an uvarint containing the message size in bytes, so we must read a certain buffered amount, and then read the rest of the message as necessary.
 
