@@ -112,7 +112,7 @@ class ProtoConfigurationWidget(QWidget):
         """Converts a protobuf to a pyqtgraph parameter tree dictionary
         that can loaded directly into a ParameterTree
 
-        https://pyqtgraph.readthedocs.io/en/latest/parametertree/index.html
+        Also builds a field from the message
 
         :param message: The message to convert to a dictionary
         :param search_term: The search filter
@@ -131,7 +131,7 @@ class ProtoConfigurationWidget(QWidget):
 
     def build_proto(self, message, current_attr=None):
         """
-        Builds the given message
+        Builds the given message to a field
         :param message: the message to build
         :param current_attr: the string to execute to access the current level of fields
         :return:

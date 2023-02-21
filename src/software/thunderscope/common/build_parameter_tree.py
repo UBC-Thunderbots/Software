@@ -114,7 +114,7 @@ def __create_string_parameter_writable(key, value, descriptor):
 
 
 def __create_parameter_read_only(key, value, descriptor):
-    """Convert a string field in proto to a read only TextParameter
+    """Convert a string field in proto to a read only Str Parameter
 
     :param key: The name of the parameter
     :param value: The default value
