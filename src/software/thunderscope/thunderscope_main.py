@@ -10,10 +10,7 @@ from software.thunderscope.binary_context_managers import *
 from proto.message_translation import tbots_protobuf
 import software.python_bindings as cpp_bindings
 from software.py_constants import *
-from software.thunderscope.robot_communication import (
-    RobotCommunication,
-    RobotCommunicationMode,
-)
+from software.thunderscope.robot_communication import RobotCommunication
 from software.thunderscope.replay.proto_logger import ProtoLogger
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 
@@ -94,10 +91,11 @@ if __name__ == "__main__":
         help="Replay folder for the yellow full_system",
         default=None,
     )
+
     parser.add_argument(
         "--verbose",
         action="store_true",
-        default=True,
+        default=False,
         help="Include logs from the Gamecontroller and Autoref",
     )
 
@@ -245,7 +243,6 @@ if __name__ == "__main__":
         )
 
         current_proto_unix_io = None
-        current_mode = RobotCommunicationMode.NONE
 
         if args.run_blue:
             current_proto_unix_io = tscope.blue_full_system_proto_unix_io
@@ -258,33 +255,25 @@ if __name__ == "__main__":
             friendly_colour_yellow = True
             debug = args.debug_yellow_full_system
 
-        # if either fullsystem is running, mode is fullsystem
-        if args.run_blue or args.run_yellow:
-            current_mode = RobotCommunicationMode.FULLSYSTEM
-
         # this proto will be the same as the fullsystem one if fullsystem is enabled
         if args.run_diagnostics:
             current_proto_unix_io = tscope.robot_diagnostics_proto_unix_io
 
-            # switches to both mode if fullsystem enabled, or just diagnostics if not
-            current_mode = (
-                RobotCommunicationMode.BOTH
-                if current_mode == RobotCommunicationMode.FULLSYSTEM
-                else RobotCommunicationMode.DIAGNOSTICS
-            )
-
         with RobotCommunication(
             current_proto_unix_io,
-            current_mode,
             getRobotMulticastChannel(0),
             args.interface,
             args.disable_estop,
         ) as robot_communication:
             if args.run_diagnostics:
-                tscope.toggle_robot_connection_signal.connect(
-                    robot_communication.toggle_robot_connection
+                tscope.control_mode_signal.connect(
+                    lambda mode, robot_id: robot_communication.toggle_robot_connection(
+                        mode, robot_id
+                    )
                 )
+
             if args.run_blue or args.run_yellow:
+                robot_communication.setup_for_fullsystem()
                 full_system_runtime_dir = (
                     args.blue_full_system_runtime_dir
                     if args.run_blue
@@ -369,14 +358,17 @@ if __name__ == "__main__":
         ) as yellow_logger, Gamecontroller(
             supress_logs=(not args.verbose), ci_mode=args.enable_autoref
         ) as gamecontroller, (
+            # Here we only intialize autoref if the --enable_autoref flag is requested.
+            # To avoid nested Python withs, the autoref is initialized as None when this flag doesn't exist.
+            # All calls to autoref should be guarded with args.enable_autoref
             TigersAutoref(
                 autoref_runtime_dir="/tmp/tbots/autoref",
                 ci_mode=args.enable_autoref,
                 gc=gamecontroller,
                 supress_logs=(not args.verbose),
-                tick_rate_ms=SIXTY_HERTZ_MILLISECONDS_PER_TICK,
+                tick_rate_ms=DEFAULT_SIMULATOR_TICK_RATE_MILLISECONDS_PER_TICK,
             )
-            if args.enable_autoref is True
+            if args.enable_autoref
             else contextlib.nullcontext()
         ) as autoref:
             tscope.blue_full_system_proto_unix_io.register_to_observe_everything(
@@ -409,7 +401,7 @@ if __name__ == "__main__":
             # Start the simulator
             thread = threading.Thread(
                 target=__async_sim_ticker,
-                args=(SIXTY_HERTZ_MILLISECONDS_PER_TICK,),
+                args=(DEFAULT_SIMULATOR_TICK_RATE_MILLISECONDS_PER_TICK,),
                 daemon=True,
             )
 

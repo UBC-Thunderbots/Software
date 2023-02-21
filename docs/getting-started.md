@@ -232,15 +232,26 @@ Now that you're setup, if you can run it on the command line, you can run it in 
         - `[interface_here]` corresponds to the `ifconfig` interfaces seen in the previous step
             - For instance, a call to run the AI as blue on wifi could be: `./tbots.py run thunderscope_main --interface=enp0s5 --run_blue`
         - This command will set up robot communication and the Unix full system binary context manager. The Unix full system context manager hooks up our AI, Backend and SensorFusion
-2. Run Robot Diagnostics:
-    - (#2711) There isn't a clean way to do this at the moment. This command is subject to change.
+2. Run AI along with Robot Diagnostics:
     - The Mechanical and Electrical sub-teams use Robot Diagnostics to test specific parts of the Robot.
+    - If we want to run with one AI and Diagnostics
+        - `./tbots.py run thunderscope_main [--run_blue | --run_yellow] --run_diagnostics` will start Thunderscope
+            - `[--run_blue | --run_yellow]` indicate which FullSystem to run
+            - `--run_diagnostics` indicates if diagnostics should be loaded as well
+        - Initially, the robots are all connected to the AI and only receive input from it
+        - To change the input source for the robot, use the drop-down menu of that robot to change it between None, AI, and Manual
+        - None means the robots are receiving no commands
+        - More info about Manual control below
+3. Run only Diagnostics
     - To run just Diagnostics
-      - `./tbots.py run thunderscope --run_diagnostics --interface <network_interface>`
-    - To run AI + Diagnostics
-      - `./tbots.py run thunderscope --run_blue --run_diagnostics --interface <network_interface>`
-    - [More info here](useful-robot-commands#robot-diagnostics)
-3. Run our SimulatedPlayTests in Thunderscope
+        - `./tbots.py run thunderscope --run_diagnostics --interface <network_interface>`
+    - Initially, all of the robots are set to 'None' and will not receive any commands
+    - For the robot you want to control, choose Manual in its dropdown menu
+    - Manual Control
+      - When a robot is in Manual control mode, the commands it receives depend on the radio buttons to the top-right
+        - Diagnostics Control allows us to use the on-screen sliders and buttons to control the robot
+        - XBox control allows us to use a connected XBox controller to control the robots
+4. Run our SimulatedPlayTests in Thunderscope
     - This will launch the visualizer and simulate AI Plays, allowing us to visually see the robots acting according to their roles.
     1. For legacy C++ tests (#2581) with the visualizer:
         1. First run Thunderscope configured for receiving protobufs over unix sockets correctly: `./tbots.py run thunderscope_main --visualize_cpp_test`
@@ -250,7 +261,7 @@ Now that you're setup, if you can run it on the command line, you can run it in 
         - Without the visualizer: `./tbots.py test [some_target_here]`
     3. For legacy C++ tests (#2581) without the visualizer:
         - `./tbots.py test [some_target_here]`
-4. Run our SimulatedTacticTests in Thunderscope:
+5. Run our SimulatedTacticTests in Thunderscope:
     - This will launch the visualizer and simulate an AI Tactic on a single robot
     1. For legacy C++ tests (#2581) with the visualizer:
         - First, run Thunderscope configured for receiving protobufs over unix sockets correctly: `./tbots.py run thunderscope_main --visualize_cpp_test`
