@@ -358,7 +358,7 @@ if __name__ == "__main__":
         ) as yellow_logger, Gamecontroller(
             supress_logs=(not args.verbose), ci_mode=args.enable_autoref
         ) as gamecontroller, (
-            # Here we only intialize autoref if the --enable_autoref flag is requested.
+            # Here we only initialize autoref if the --enable_autoref flag is requested.
             # To avoid nested Python withs, the autoref is initialized as None when this flag doesn't exist.
             # All calls to autoref should be guarded with args.enable_autoref
             TigersAutoref(
