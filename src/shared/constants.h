@@ -95,8 +95,8 @@ static const double MILLISECONDS_PER_MICROSECOND = 1.0 / 1000.0;
 static const double MILLISECONDS_PER_NANOSECOND  = 1.0 / 1000000.0;
 static const double SECONDS_PER_MINUTE           = 60.0;
 
-static const double SIXTY_HERTZ_MILLISECONDS_PER_TICK =
-    1.0 / 60 * MILLISECONDS_PER_SECOND;
+static const double DEFAULT_SIMULATOR_TICK_RATE_MILLISECONDS_PER_TICK =
+    1.0 / 60 * MILLISECONDS_PER_SECOND; // corresponds to 60 Hz
 
 // The total number of robot ids on one team
 static const unsigned int MAX_ROBOT_IDS_PER_SIDE = 8;

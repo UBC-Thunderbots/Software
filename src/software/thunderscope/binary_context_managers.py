@@ -822,6 +822,10 @@ class TigersAutoref(object):
     ):
         """
         Registers as an observer of TrackerWrapperPackets from the Simulator, so that they can be forwarded to the Gamecontroller in CI mode.
+
+        :param autoref_proto_unix_io:               the proto unix io for the Autoref to receive SSLWrapperPackets
+        :param blue_full_system_proto_unix_io:      the proto unix io for the blue full system
+        :param yellow_full_system_proto_unix_io:    the proto unix io for the yellow full system
         """
         autoref_proto_unix_io.register_observer(SSL_WrapperPacket, self.wrapper_buffer)
         self.gamecontroller.register_ci_referee_command_observer(
