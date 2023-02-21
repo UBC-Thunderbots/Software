@@ -396,7 +396,7 @@ if __name__ == "__main__":
                 tscope.simulator_proto_unix_io,
                 tscope.blue_full_system_proto_unix_io,
                 tscope.yellow_full_system_proto_unix_io,
-                autoref_proto_unix_io
+                autoref_proto_unix_io,
             )
             gamecontroller.setup_proto_unix_io(
                 tscope.blue_full_system_proto_unix_io,

@@ -61,20 +61,23 @@ def start_ai_vs_ai(simulator_runtime_dir, blue_fs_dir, yellow_fs_dir):
         gc=gamecontroller,
         tick_rate_ms=SIXTY_HERTZ_MILLISECONDS_PER_TICK,
     ) as autoref:
+        autoref_proto_unix_io = ProtoUnixIO()
+
         blue_fs_proto_unix_io.register_to_observe_everything(blue_logger.buffer)
         yellow_fs_proto_unix_io.register_to_observe_everything(yellow_logger.buffer)
 
         blue_fs.setup_proto_unix_io(blue_fs_proto_unix_io)
         yellow_fs.setup_proto_unix_io(yellow_fs_proto_unix_io)
         simulator.setup_proto_unix_io(
-            simulator_proto_unix_io, blue_fs_proto_unix_io, yellow_fs_proto_unix_io
+            simulator_proto_unix_io,
+            blue_fs_proto_unix_io,
+            yellow_fs_proto_unix_io,
+            autoref_proto_unix_io,
         )
         gamecontroller.setup_proto_unix_io(
             blue_fs_proto_unix_io, yellow_fs_proto_unix_io
         )
 
-        autoref_proto_unix_io = ProtoUnixIO()
-        simulator.setup_autoref_proto_unix_io(autoref_proto_unix_io)
         autoref.setup_ssl_wrapper_packets(
             autoref_proto_unix_io, blue_fs_proto_unix_io, yellow_fs_proto_unix_io
         )

@@ -359,6 +359,7 @@ def simulated_test_runner():
                 simulator_proto_unix_io,
                 blue_full_system_proto_unix_io,
                 yellow_full_system_proto_unix_io,
+                ProtoUnixIO(),
             )
             gamecontroller.setup_proto_unix_io(
                 blue_full_system_proto_unix_io, yellow_full_system_proto_unix_io,
