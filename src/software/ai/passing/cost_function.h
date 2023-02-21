@@ -2,6 +2,7 @@
 
 #include <functional>
 
+#include "proto/message_translation/tbots_protobuf.h"
 #include "proto/parameters.pb.h"
 #include "software/ai/passing/pass.h"
 #include "software/math/math_functions.h"
@@ -142,3 +143,17 @@ double getStaticPositionQuality(const Field& field, const Point& position,
  */
 double calculateProximityRisk(const Point& point, const Team& enemy_team,
                               double enemy_proximity_importance);
+
+/**
+ * Sample passes at different points on the field and rate them, similar to ratePass, to
+ * be visualized in thunderscope
+ *
+ * The cost functions used to rate the pass depends on passing_config.cost_vis_config
+ * configuration, this can be controlled from thunderscope The number of points sampled is
+ * also controlled from there.
+ *
+ * The sampled values are sent over protobuf to thunderscope as a CostVisualization
+ * message. These values are eventually visualized in thunderscope in the cost_vis widget
+ */
+void samplePassesForVisualization(const World& world,
+                                  const TbotsProto::PassingConfig& passing_config);
