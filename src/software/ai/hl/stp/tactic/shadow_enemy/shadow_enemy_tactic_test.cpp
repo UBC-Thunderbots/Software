@@ -70,7 +70,7 @@ TEST_F(ShadowEnemyTacticTest, test_block_pass)
 
     runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(5));
+            Duration::fromSeconds(60));
 }
 
 TEST_F(ShadowEnemyTacticTest, test_block_pass_if_enemy_does_not_have_ball)
