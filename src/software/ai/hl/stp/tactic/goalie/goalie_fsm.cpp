@@ -1,56 +1,61 @@
 #include "software/ai/hl/stp/tactic/goalie/goalie_fsm.h"
 
+#include "software/ai/evaluation/find_open_areas.h"
+#include "software/math/math_functions.h"
+
 Point GoalieFSM::getGoaliePositionToBlock(
     const Ball &ball, const Field &field,
     TbotsProto::GoalieTacticConfig goalie_tactic_config)
 {
-    // compute angle between two vectors, negative goal post to ball and positive
-    // goal post to ball
-    Angle block_cone_angle = convexAngle(field.friendlyGoalpostNeg(), ball.position(),
-                                         field.friendlyGoalpostPos());
-
-    std::optional<Point> clamped_goalie_pos = std::nullopt;
-
-    if (distanceSquared(field.friendlyGoalpostNeg(), ball.position()) > 0 &&
-        distanceSquared(field.friendlyGoalpostPos(), ball.position()) > 0 &&
-        block_cone_angle != Angle::zero())
-    {
-        // how far in should the goalie wedge itself into the block cone, to block
-        // balls
-        auto block_cone_radius = goalie_tactic_config.block_cone_radius();
-
-        // compute block cone position, allowing 1 ROBOT_MAX_RADIUS_METERS extra on
-        // either side
-        Point goalie_pos = calculateBlockCone(
-            field.friendlyGoalpostNeg(), field.friendlyGoalpostPos(), ball.position(),
-            block_cone_radius * block_cone_angle.toRadians());
-
-        // restrain the goalie in the defense area, if the goalie cannot be
-        // restrained or if there is no proper intersection, then we safely default to
-        // center of the goal
-        clamped_goalie_pos =
-            restrainGoalieInRectangle(field, goalie_pos, field.friendlyDefenseArea());
-    }
-
-    // if the goalie could not be restrained in the defense area,
-    // then the ball must be either on a really sharp angle to the net where
-    // its impossible to get a shot, or the ball is behind the net, in which
-    // case we snap to either post
-    if (!clamped_goalie_pos)
+    // Check if the ball is in the region where it will be at a sharp
+    // angle to the goal -- if so, goalie should snap to goalposts
+    //
+    //       ┌───┬───────────────────────┐
+    //       │xxx│                       │
+    //       │xxx│◄──────┐               │
+    //       │xxx│       │               │
+    //       ├───┴───┐   │               │
+    //     ┌─┤       │   │               │
+    // goal│ │d-area │   ├──snap_to_post_region
+    //     └─┤       │   │               │
+    //       ├───┬───┘   │               │
+    //       │xxx│       │               │
+    //       │xxx│◄──────┘               │
+    //       │xxx│                       │
+    //       └───┴───────────────────────┘
+    //
+    double snap_to_post_region_x =
+        field.friendlyHalf().xMin() + (field.defenseAreaXLength() / 2);
+    if (ball.position().x() < snap_to_post_region_x)
     {
         if (ball.position().y() > 0)
         {
-            return field.friendlyGoalpostPos() + Vector(0, -ROBOT_MAX_RADIUS_METERS);
+            return field.friendlyGoalpostPos() + Vector(ROBOT_MAX_RADIUS_METERS, 0);
         }
         else
         {
-            return field.friendlyGoalpostNeg() + Vector(0, ROBOT_MAX_RADIUS_METERS);
+            return field.friendlyGoalpostNeg() + Vector(ROBOT_MAX_RADIUS_METERS, 0);
         }
     }
-    else
+
+    // Default to conservative depth when ball is at opposite end of field
+    double depth = CONSERVATIVE_DEPTH;
+
+    if (field.pointInFriendlyHalf(ball.position()))
     {
-        return *clamped_goalie_pos;
+        // As the ball gets deeper into our friendly half, the goalie should transition
+        // from playing aggressively out far to a deeper conservative depth
+        depth = normalizeValueToRange(ball.position().x(), snap_to_post_region_x,
+                                      field.centerPoint().x(), CONSERVATIVE_DEPTH,
+                                      AGGRESSIVE_DEPTH);
     }
+
+    Vector goalie_direction_vector =
+        (ball.position() - field.friendlyGoalCenter()).normalize();
+    Point goalie_position =
+        field.friendlyGoalCenter() + (depth * goalie_direction_vector);
+
+    return goalie_position;
 }
 
 std::vector<Point> GoalieFSM::getIntersectionsBetweenBallVelocityAndFullGoalSegment(
@@ -77,82 +82,25 @@ Rectangle GoalieFSM::getNoChipRectangle(const Field &field)
         field.friendlyGoalpostPos() + Vector(2 * ROBOT_MAX_RADIUS_METERS, 0));
 }
 
-std::optional<Point> GoalieFSM::restrainGoalieInRectangle(
-    const Field &field, Point goalie_desired_position, Rectangle goalie_restricted_area)
+Point GoalieFSM::findGoodChipTarget(const World &world)
 {
-    //           NW    pos_side   NE
-    //            +---------------+
-    //            |               |
-    //            |               |
-    //            |               |
-    //       +----+               |
-    //       |    |               |
-    //       |    |               |
-    // goal  |    |               | width
-    //       |    |               |
-    //       |    |               |
-    //       |    |               |
-    //       +----+               |
-    //            |               |
-    //            |               |
-    //            |               |
-    //           ++---------------+
-    //           SW    neg_side   SE
-    //
-    // Given the goalies desired position and the restricted area,
-    // first find the 3 intersections with each side of the restricted area
-    // (width, pos_side, neg_side) and the line from the desired position to the
-    // center of the friendly goal
-    auto width_x_goal =
-        intersection(Line(goalie_desired_position, field.friendlyGoalCenter()),
-                     Line(goalie_restricted_area.posXPosYCorner(),
-                          goalie_restricted_area.posXNegYCorner()));
-    auto pos_side_x_goal =
-        intersection(Line(goalie_desired_position, field.friendlyGoalCenter()),
-                     Line(goalie_restricted_area.posXPosYCorner(),
-                          goalie_restricted_area.negXPosYCorner()));
-    auto neg_side_x_goal =
-        intersection(Line(goalie_desired_position, field.friendlyGoalCenter()),
-                     Line(goalie_restricted_area.posXNegYCorner(),
-                          goalie_restricted_area.negXNegYCorner()));
+    // Default chip target is the enemy goal
+    Point chip_target = world.field().enemyGoalCenter();
 
-    // if the goalie restricted area already contains the point, then we are
-    // safe to move there.
-    if (contains(goalie_restricted_area, goalie_desired_position))
+    std::vector<Circle> open_areas = findGoodChipTargets(world);
+    if (!open_areas.empty())
     {
-        return std::make_optional<Point>(goalie_desired_position);
-    }
-    // Due to the nature of the line intersection, its important to make sure the
-    // corners are included, if the goalies desired position intersects with width
-    // (see above), use those positions The last comparison is for the edge case when
-    // the ball is behind the net
-    else if (width_x_goal &&
-             width_x_goal->y() <= goalie_restricted_area.posXPosYCorner().y() &&
-             width_x_goal->y() >= goalie_restricted_area.posXNegYCorner().y() &&
-             field.friendlyGoalCenter().x() <= goalie_desired_position.x())
-    {
-        return std::make_optional<Point>(*width_x_goal);
+        chip_target = open_areas[0].origin();
+
+        // Avoid chipping out of field or towards friendly corners by clamping the chip
+        // target to the region in front of the friendly defense area
+        double clamped_chip_target_x =
+            std::clamp(chip_target.x(), world.field().friendlyDefenseArea().xMax(),
+                       world.field().enemyGoalCenter().x());
+        chip_target = Point(clamped_chip_target_x, chip_target.y());
     }
 
-    // if either two sides of the goal are intercepted, then use those positions
-    else if (pos_side_x_goal &&
-             pos_side_x_goal->x() <= goalie_restricted_area.posXPosYCorner().x() &&
-             pos_side_x_goal->x() >= goalie_restricted_area.negXPosYCorner().x())
-    {
-        return std::make_optional<Point>(*pos_side_x_goal);
-    }
-    else if (neg_side_x_goal &&
-             neg_side_x_goal->x() <= goalie_restricted_area.posXNegYCorner().x() &&
-             neg_side_x_goal->x() >= goalie_restricted_area.negXNegYCorner().x())
-    {
-        return std::make_optional<Point>(*neg_side_x_goal);
-    }
-
-    // if there are no intersections (ex. ball behind net), then we are out of luck
-    else
-    {
-        return std::nullopt;
-    }
+    return chip_target;
 }
 
 bool GoalieFSM::shouldPanic(const Update &event)
@@ -206,19 +154,22 @@ void GoalieFSM::panic(const Update &event)
 void GoalieFSM::updatePivotKick(
     const Update &event, boost::sml::back::process<PivotKickFSM::Update> processEvent)
 {
+    // Ensure that we start our chip away from the no chip zone in front of
+    // the goal (prevents accidentally scoring an own goal)
     double clear_origin_x =
         getNoChipRectangle(event.common.world.field()).xMax() + ROBOT_MAX_RADIUS_METERS;
-    Point clear_origin = Point(clear_origin_x, event.common.world.ball().position().y());
+    double chip_origin_x =
+        std::max(clear_origin_x, event.common.world.ball().position().x());
+    Point chip_origin = Point(chip_origin_x, event.common.world.ball().position().y());
 
-    Angle clear_direction = (event.common.world.ball().position() -
-                             event.common.world.field().friendlyGoalCenter())
-                                .orientation();
+    Point chip_target  = findGoodChipTarget(event.common.world);
+    Vector chip_vector = chip_target - chip_origin;
 
     PivotKickFSM::ControlParams control_params{
-        .kick_origin    = clear_origin,
-        .kick_direction = clear_direction,
+        .kick_origin    = chip_origin,
+        .kick_direction = chip_vector.orientation(),
         .auto_chip_or_kick =
-            AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS},
+            AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, chip_vector.length()},
     };
 
     // update the pivotkick fsm

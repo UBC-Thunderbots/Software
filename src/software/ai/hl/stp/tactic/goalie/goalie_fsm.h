@@ -32,6 +32,14 @@ struct GoalieFSM
     // TODO (#1878): Replace this with a more intelligent chip distance system
     static constexpr double YEET_CHIP_DISTANCE_METERS = 2.0;
 
+    // Depth goalie should be at for plays close to the defense area (potential lateral
+    // play, rebounds)
+    static constexpr double CONSERVATIVE_DEPTH = 0.3;
+
+    // Depth goalie should be at to aggressively narrow the angle the ball has to the
+    // goal as it enters the friendly half
+    static constexpr double AGGRESSIVE_DEPTH = 0.7;
+
     /**
      * Constructor for GoalieFSM struct
      *
@@ -75,6 +83,15 @@ struct GoalieFSM
      * @return the area within the friendly goalie's no-chip rectangle
      */
     static Rectangle getNoChipRectangle(const Field &field);
+
+    /**
+     * Finds a good point to chip the ball to from its current position
+     *
+     * @param world the world
+     *
+     * @return a point on the field that is a good place to chip to
+     */
+    static Point findGoodChipTarget(const World &world);
 
     /**
      * Guard that checks if the ball is moving faster than the time_to_panic threshold
@@ -195,22 +212,6 @@ struct GoalieFSM
                 PositionToBlock_S,
             X + Update_E = X);
     }
-
-   private:
-    /*
-     * Restrains the goalie to a rectangle, with the preferred point being the one
-     * that intersects the point the goalie wants to move to and the center of the
-     * goal
-     *
-     * @param field the field to restrain the goalie on
-     * @param goalie_desired_position The point the goalie would like to go to
-     * @param goalie_restricted_area The rectangle that the goalie is to stay in
-     * @return goalie_suggested_position That the goalie should go to
-     */
-    // TODO: Refactor this function (#2045)
-    static std::optional<Point> restrainGoalieInRectangle(
-        const Field &field, Point goalie_desired_position,
-        Rectangle goalie_restricted_area);
 
    private:
     // the goalie tactic config
