@@ -162,6 +162,11 @@ if __name__ == "__main__":
         "--enable_autoref", action="store_true", default=False, help="Enable autoref"
     )
     parser.add_argument(
+        "--cost_visualization",
+        action="store_true",
+        help="show pass cost visualization layer",
+    )
+    parser.add_argument(
         "--disable_estop",
         action="store_true",
         default=False,
@@ -191,6 +196,7 @@ if __name__ == "__main__":
         tscope = Thunderscope(
             layout_path=args.layout,
             visualization_buffer_size=args.visualization_buffer_size,
+            cost_visualization=args.cost_visualization,
         )
         proto_unix_io = tscope.blue_full_system_proto_unix_io
 
@@ -200,6 +206,7 @@ if __name__ == "__main__":
             {"proto_class": Obstacles},
             {"proto_class": PathVisualization},
             {"proto_class": PassVisualization},
+            {"proto_class": CostVisualization},
             {"proto_class": NamedValue},
             {"proto_class": PrimitiveSet},
             {"proto_class": World},
@@ -240,6 +247,7 @@ if __name__ == "__main__":
             load_diagnostics=bool(args.run_diagnostics),
             load_gamecontroller=False,
             visualization_buffer_size=args.visualization_buffer_size,
+            cost_visualization=args.cost_visualization,
         )
 
         current_proto_unix_io = None
@@ -301,6 +309,7 @@ if __name__ == "__main__":
             visualization_buffer_size=args.visualization_buffer_size,
             blue_replay_log=args.blue_log,
             yellow_replay_log=args.yellow_log,
+            cost_visualization=args.cost_visualization,
         )
         tscope.show()
 
@@ -318,6 +327,7 @@ if __name__ == "__main__":
             load_yellow=True,
             layout_path=args.layout,
             visualization_buffer_size=args.visualization_buffer_size,
+            cost_visualization=args.cost_visualization,
         )
 
         def __async_sim_ticker(tick_rate_ms):
@@ -371,6 +381,8 @@ if __name__ == "__main__":
             if args.enable_autoref
             else contextlib.nullcontext()
         ) as autoref:
+            autoref_proto_unix_io = ProtoUnixIO()
+
             tscope.blue_full_system_proto_unix_io.register_to_observe_everything(
                 blue_logger.buffer
             )
@@ -384,14 +396,13 @@ if __name__ == "__main__":
                 tscope.simulator_proto_unix_io,
                 tscope.blue_full_system_proto_unix_io,
                 tscope.yellow_full_system_proto_unix_io,
+                autoref_proto_unix_io
             )
             gamecontroller.setup_proto_unix_io(
                 tscope.blue_full_system_proto_unix_io,
                 tscope.yellow_full_system_proto_unix_io,
             )
             if args.enable_autoref:
-                autoref_proto_unix_io = ProtoUnixIO()
-                simulator.setup_autoref_proto_unix_io(autoref_proto_unix_io)
                 autoref.setup_ssl_wrapper_packets(
                     autoref_proto_unix_io,
                     tscope.blue_full_system_proto_unix_io,

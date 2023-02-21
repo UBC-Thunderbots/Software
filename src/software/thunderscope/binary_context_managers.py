@@ -165,6 +165,7 @@ gdb --args bazel-bin/{full_system}
             Obstacles,
             PathVisualization,
             PassVisualization,
+            CostVisualization,
             NamedValue,
             PlayInfo,
         ]:
