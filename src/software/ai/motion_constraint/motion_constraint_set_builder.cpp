@@ -6,26 +6,14 @@
 std::set<TbotsProto::MotionConstraint> buildMotionConstraintSet(
     const GameState &game_state, const Tactic &tactic)
 {
-    std::set<TbotsProto::MotionConstraint> current_allowed_constraints;
     MotionConstraintVisitor motion_constraint_visitor;
 
     std::set<TbotsProto::MotionConstraint> current_motion_constraints =
         buildMotionConstraintSetFromGameState(game_state);
-    try
-    {
-        // updates current_allowed_constraints
-        current_allowed_constraints =
-            motion_constraint_visitor.getCurrentAllowedConstraints(tactic);
-    }
-    catch (std::invalid_argument &)
-    {
-        // Tactic didn't implement accept so don't add any more motion constraints
-    }
 
-    for (const auto &constraint : current_allowed_constraints)
-    {
-        current_motion_constraints.erase(constraint);
-    }
+    // updates current_allowed_constraints
+    current_motion_constraints = motion_constraint_visitor.getUpdatedMotionConstraints(
+        tactic, current_motion_constraints);
 
     return current_motion_constraints;
 }
