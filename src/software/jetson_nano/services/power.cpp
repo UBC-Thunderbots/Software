@@ -1,12 +1,17 @@
 #include "software/jetson_nano/services/power.h"
 
 #include <boost/bind/bind.hpp>
+#include <boost/filesystem.hpp>
 #include <cstdint>
 
 #include "proto/power_frame_msg.nanopb.h"
 
 PowerService::PowerService()
 {
+    if (!boost::filesystem::exists(DEVICE_SERIAL_PORT))
+    {
+        LOG(FATAL) << "PLUG THE USB INTO THE JETSON NANO";
+    }
     this->uart = std::make_unique<BoostUartCommunication>(BAUD_RATE, DEVICE_SERIAL_PORT);
     this->read_thread = std::thread(boost::bind(&PowerService::continuousRead, this));
 }
