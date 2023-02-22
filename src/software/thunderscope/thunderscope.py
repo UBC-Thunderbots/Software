@@ -3,14 +3,19 @@ import time
 import textwrap
 import shelve
 import signal
+import platform
 import logging
 
 # Unfortunately, PyQt6 doesn't install on Ubuntu 18. Thankfully both
 # libraries are interchangeable, and  we just need to swap them in this
 # one spot, and pyqtgraph will pick up on it and store the library under
 # pyqtgraph.Qt. So from PyQt5 import x becomes from pyqtgraph.Qt import x
-import PyQt6
-from PyQt6.QtWebEngineWidgets import QWebEngineView
+if "18.04" in platform.version():
+    import PyQt5
+    from PyQt5.QtWebEngineWidgets import QWebEngineView
+else:
+    import PyQt6
+    from PyQt6.QtWebEngineWidgets import QWebEngineView
 
 from qt_material import apply_stylesheet, list_themes
 
