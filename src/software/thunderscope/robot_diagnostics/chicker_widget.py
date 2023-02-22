@@ -21,7 +21,7 @@ class ChickerWidget(QWidget):
         to be sent to the robots.
 
         NOTE: The powerboards run in regulation mode, which means that they are
-        always charged and do not need to be explicitly charged. 
+        always charged and do not need to be explicitly charged.
 
         The powerboard also has an internal cooldown, so spamming kick or chip
         will not work until the capacitors charge up and the cooldown is over.
@@ -39,7 +39,7 @@ class ChickerWidget(QWidget):
         # Initialising the buttons
 
         # push button group box
-        self.push_button_box, self.push_buttons = common_widgets.create_button(
+        self.push_button_box, self.push_buttons = common_widgets.create_buttons(
             ["Kick", "Chip"]
         )
         self.kick_button = self.push_buttons[0]
@@ -126,9 +126,7 @@ class ChickerWidget(QWidget):
             self.disable_kick_chip_buttons()
 
             # set and start timer to re-enable buttons after 3 seconds
-            QTimer.singleShot(
-                3 * MILLISECONDS_PER_SECOND, self.enable_kick_chip_buttons
-            )
+            QTimer.singleShot(CHICKER_TIMEOUT, self.enable_kick_chip_buttons)
 
     def disable_kick_chip_buttons(self):
         """
