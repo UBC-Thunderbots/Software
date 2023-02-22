@@ -219,7 +219,7 @@ if __name__ == "__main__":
     # We want to run either 1 instance of AI or 1 instance of RobotCommunication or both which will
     # send/recv packets over the provided multicast channel.
 
-    if args.run_blue or args.run_yellow or args.run_diagnostics:
+    elif args.run_blue or args.run_yellow or args.run_diagnostics:
         tscope = Thunderscope(
             layout_path=args.layout,
             load_blue=bool(args.run_blue),

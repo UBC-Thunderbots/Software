@@ -202,7 +202,7 @@ class ErForceSimulator
 
     amun::SimulatorSetup er_force_sim_setup;
     std::unique_ptr<camun::simulator::Simulator> er_force_sim;
-    EuclideanToWheel euclidean_four_wheel_convert;
+    EuclideanToWheel euclidean_to_four_wheel;
 
     RobotConstants_t robot_constants;
     Field field;

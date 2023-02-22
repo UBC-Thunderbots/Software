@@ -145,11 +145,11 @@ WheelSpace_t EuclideanToWheel::rampWheelVelocity(
 }
 
 std::unique_ptr<TbotsProto::DirectControlPrimitive> EuclideanToWheel::rampWheelVelocity(
-    const std::pair<Vector, AngularVelocity> current_velocity,
+    const std::pair<Vector, AngularVelocity> current_local_velocity ,
     TbotsProto::DirectControlPrimitive& target_velocity_primitive,
     const double& time_to_ramp)
 {
-    EuclideanSpace_t target_euclidean_velocity = {};
+    EuclideanSpace_t target_euclidean_velocity = EuclideanSpace_t::Zero();
 
     TbotsProto::MotorControl motor_control = target_velocity_primitive.motor_control();
     if (motor_control.has_direct_per_wheel_control())
@@ -158,9 +158,9 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> EuclideanToWheel::rampWheelV
             motor_control.direct_per_wheel_control();
         WheelSpace_t wheel_velocity = {
             direct_per_wheel.front_left_wheel_velocity(),
-            direct_per_wheel.front_left_wheel_velocity(),
-            direct_per_wheel.front_left_wheel_velocity(),
-            direct_per_wheel.front_left_wheel_velocity(),
+            direct_per_wheel.back_left_wheel_velocity(),
+            direct_per_wheel.front_right_wheel_velocity(),
+            direct_per_wheel.back_right_wheel_velocity(),
         };
         target_euclidean_velocity = getEuclideanVelocity(wheel_velocity);
     }
@@ -174,9 +174,9 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> EuclideanToWheel::rampWheelV
             direct_velocity.angular_velocity().radians_per_second()};
     }
 
-    EuclideanSpace_t current_euclidean_velocity = {-current_velocity.first.y(),
-                                                   current_velocity.first.x(),
-                                                   current_velocity.second.toRadians()};
+    EuclideanSpace_t current_euclidean_velocity = {-current_local_velocity.first.y(),
+                                                   current_local_velocity.first.x(),
+                                                   current_local_velocity.second.toRadians()};
 
     WheelSpace_t current_four_wheel_velocity =
         getWheelVelocity(current_euclidean_velocity);

@@ -24,7 +24,7 @@ ErForceSimulator::ErForceSimulator(const TbotsProto::FieldType& field_type,
     : yellow_team_world_msg(std::make_unique<TbotsProto::World>()),
       blue_team_world_msg(std::make_unique<TbotsProto::World>()),
       frame_number(0),
-      euclidean_four_wheel_convert(robot_constants),
+      euclidean_to_four_wheel(robot_constants),
       robot_constants(robot_constants),
       field(Field::createField(field_type)),
       blue_robot_with_ball(std::nullopt),
@@ -368,7 +368,12 @@ SSLSimulationProto::RobotControl ErForceSimulator::updateSimulatorRobots(
         auto sim_state             = getSimulatorState();
         const auto& sim_robots     = sim_state.blue_robots();
         auto current_velocity_map  = getRobotIdToLocalVelocityMap(sim_robots);
-        auto ramped_direct_control = euclidean_four_wheel_convert.rampWheelVelocity(
+
+        // this code ramps the target velocity which we get from the primitive executor's primitive
+        // ramping is done to make sure the wheel motors aren't spinning too fast
+        // this returns the same primitive with modified velocity values
+        // makes simulator robots move slower (more realistic)
+        auto ramped_direct_control = euclidean_to_four_wheel.rampWheelVelocity(
             current_velocity_map.at(robot_id), *direct_control,
             primitive_executor_time_step);
 
