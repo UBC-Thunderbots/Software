@@ -125,4 +125,7 @@ PYBIND11_MODULE(py_constants, m)
     m.attr("MIN_BATTERY_VOLTAGE")     = MIN_BATTERY_VOLTAGE;
     m.attr("MAX_BATTERY_VOLTAGE")     = MAX_BATTERY_VOLTAGE;
     m.attr("BATTERY_WARNING_VOLTAGE") = BATTERY_WARNING_VOLTAGE;
+
+    // Robot Communication
+    m.attr("NUM_TIMES_SEND_STOP") = NUM_TIMES_SEND_STOP;
 }

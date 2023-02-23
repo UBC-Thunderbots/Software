@@ -74,7 +74,7 @@ class DriveAndDribblerWidget(QWidget):
             self.x_velocity_label,
         ) = common_widgets.create_float_slider(
             "X (m/s)",
-            3,
+            2,
             -self.constants.robot_max_speed_m_per_s,
             self.constants.robot_max_speed_m_per_s,
             1,
@@ -85,7 +85,7 @@ class DriveAndDribblerWidget(QWidget):
             self.y_velocity_label,
         ) = common_widgets.create_float_slider(
             "Y (m/s)",
-            3,
+            2,
             -self.constants.robot_max_speed_m_per_s,
             self.constants.robot_max_speed_m_per_s,
             1,
@@ -96,7 +96,7 @@ class DriveAndDribblerWidget(QWidget):
             self.angular_velocity_label,
         ) = common_widgets.create_float_slider(
             "θ (rad/s)",
-            3,
+            2,
             -self.constants.robot_max_ang_speed_rad_per_s,
             self.constants.robot_max_ang_speed_rad_per_s,
             1,
@@ -143,7 +143,7 @@ class DriveAndDribblerWidget(QWidget):
             self.dribbler_speed_rpm_label,
         ) = common_widgets.create_float_slider(
             "RPM",
-            3,
+            1,
             self.constants.indefinite_dribbler_speed_rpm,
             -self.constants.indefinite_dribbler_speed_rpm,
             1,
@@ -241,6 +241,9 @@ class DriveAndDribblerWidget(QWidget):
         self.angular_velocity_slider.setValue(0)
 
     def reset_dribbler_slider(self):
+        """
+        Reset the dribbler slider back to 0
+        """
         self.dribbler_speed_rpm_slider.setValue(0)
 
     def reset_all_sliders(self):

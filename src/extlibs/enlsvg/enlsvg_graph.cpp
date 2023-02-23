@@ -1,9 +1,9 @@
-#include "extlibs/enlsvg/Pathfinding/enlsvg_graph.h"
+#include "extlibs/enlsvg/enlsvg_graph.h"
 
 #include <algorithm>
 
-#include "extlibs/enlsvg/Pathfinding/grid.h"
-#include "extlibs/enlsvg/Pathfinding/line_of_sight_scanner.h"
+#include "extlibs/enlsvg/grid.h"
+#include "extlibs/enlsvg/line_of_sight_scanner.h"
 
 namespace Pathfinding
 {
