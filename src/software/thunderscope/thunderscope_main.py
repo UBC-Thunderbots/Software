@@ -183,6 +183,8 @@ if __name__ == "__main__":
         tscope = Thunderscope(
             layout_path=args.layout,
             visualization_buffer_size=args.visualization_buffer_size,
+            load_blue=True,
+            load_yellow=True,
         )
         proto_unix_io = tscope.blue_full_system_proto_unix_io
 

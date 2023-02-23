@@ -6,17 +6,8 @@ import signal
 import platform
 import logging
 
-# PyQt5 doesn't play nicely with i3 and Ubuntu 18, PyQt6 is much more stable
-# Unfortunately, PyQt6 doesn't install on Ubuntu 18. Thankfully both
-# libraries are interchangeable, and  we just need to swap them in this
-# one spot, and pyqtgraph will pick up on it and store the library under
-# pyqtgraph.Qt. So from PyQt5 import x becomes from pyqtgraph.Qt import x
-if "18.04" in platform.version():
-    import PyQt5
-    from PyQt5.QtWebEngineWidgets import QWebEngineView
-else:
-    import PyQt6
-    from PyQt6.QtWebEngineWidgets import QWebEngineView
+import PyQt6
+from PyQt6.QtWebEngineWidgets import QWebEngineView
 
 from qt_material import apply_stylesheet, list_themes
 
