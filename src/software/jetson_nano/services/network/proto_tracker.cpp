@@ -27,15 +27,7 @@ void ProtoTracker::send(uint64_t seq_num)
         recent_proto_seq_nums.pop();
     }
 
-    float proto_loss_rate = calculate_proto_loss_rate(seq_num);
-
-    if (proto_loss_rate > PROTO_LOSS_WARNING_THRESHOLD)
-    {
-        LOG(WARNING) << proto_type << " loss in the past "
-                     << std::min(seq_num,
-                                 static_cast<uint64_t>(RECENT_PROTO_LOSS_PERIOD))
-                     << "  is " << proto_loss_rate << "%";
-    }
+    proto_loss_rate = calculate_proto_loss_rate(seq_num);
 
     last_valid = true;
 }
@@ -43,6 +35,11 @@ void ProtoTracker::send(uint64_t seq_num)
 bool ProtoTracker::isLastValid()
 {
     return last_valid;
+}
+
+float ProtoTracker::getLossRate()
+{
+    return proto_loss_rate;
 }
 
 float ProtoTracker::calculate_proto_loss_rate(uint64_t seq_num)

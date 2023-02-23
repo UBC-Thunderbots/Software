@@ -23,18 +23,22 @@ class ProtoTracker
      * @return a boolean indicating whether the last received proto was valid
      */
     bool isLastValid();
+    /**
+     * @return a float equal to the proto loss rate
+     */
+    float getLossRate();
 
    private:
     // Function for calculating the proto loss rate
     float calculate_proto_loss_rate(uint64_t seq_num);
 
     // Constants
-    static constexpr float PROTO_LOSS_WARNING_THRESHOLD = 0.1f;
-    static constexpr uint8_t RECENT_PROTO_LOSS_PERIOD   = 100;
+    static constexpr uint8_t RECENT_PROTO_LOSS_PERIOD = 100;
 
     // Variables
     std::string proto_type;
-    bool last_valid = false;
+    bool last_valid       = false;
+    float proto_loss_rate = 0;
 
     // Queue of the sequence numbers of received protos in the past
     // RECENT_PROTO_LOSS_PERIOD protos

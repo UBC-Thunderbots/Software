@@ -39,6 +39,9 @@ class NetworkService
         const TbotsProto::RobotStatus& robot_status);
 
    private:
+    // Constants
+    static constexpr float PROTO_LOSS_WARNING_THRESHOLD = 0.1f;
+
     // Variables
     TbotsProto::PrimitiveSet primitive_set_msg;
     TbotsProto::World world_msg;
