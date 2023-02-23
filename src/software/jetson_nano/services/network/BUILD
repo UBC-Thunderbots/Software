@@ -17,8 +17,8 @@ cc_library(
 
 cc_library(
     name = "packet_tracker",
-    srcs = ["packet_tracker.cpp"],
-    hdrs = ["packet_tracker.h"],
+    srcs = ["proto_tracker.cpp"],
+    hdrs = ["proto_tracker.h"],
     deps = [
         "//software/logger",
     ],

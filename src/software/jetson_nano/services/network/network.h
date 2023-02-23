@@ -7,7 +7,7 @@
 #include "proto/tbots_software_msgs.pb.h"
 #include "proto/world.pb.h"
 #include "shared/robot_constants.h"
-#include "software/jetson_nano/services/network/packet_tracker.h"
+#include "software/jetson_nano/services/network/proto_tracker.h"
 #include "software/networking/threaded_proto_udp_listener.hpp"
 #include "software/networking/threaded_proto_udp_sender.hpp"
 
@@ -56,15 +56,7 @@ class NetworkService
     void primitiveSetCallback(TbotsProto::PrimitiveSet input);
     void worldCallback(TbotsProto::World input);
 
-    // Queue of the sequence numbers of received primitive sets in the past
-    // RECENT_PACKET_LOSS_PERIOD primitive sets
-    std::queue<uint64_t> recent_primitive_set_seq_nums;
-
-    // Queue of the sequence numbers of received worlds in the past
-    // RECENT_PACKET_LOSS_PERIOD worlds
-    std::queue<uint64_t> recent_world_seq_nums;
-
-    // PacketTrackers for tracking recent primitive set and world loss
-    PacketTracker primitive_tracker = PacketTracker("primitive set");
-    PacketTracker world_tracker     = PacketTracker("world");
+    // ProtoTrackers for tracking recent primitive set and world loss
+    ProtoTracker primitive_tracker = ProtoTracker("primitive set");
+    ProtoTracker world_tracker     = ProtoTracker("world");
 };
