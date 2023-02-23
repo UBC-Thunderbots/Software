@@ -17,6 +17,7 @@ class RobotViewComponent(QWidget):
     message when expanded
 
     """
+
     def __init__(self, id, load_fullsystem, control_mode_signal):
         """
         Sets up a Robot Info Widget and a Robot Status Widget for each robot
@@ -33,14 +34,10 @@ class RobotViewComponent(QWidget):
         self.layout = QVBoxLayout()
 
         self.robot_info = RobotInfo(id, load_fullsystem, control_mode_signal)
-        self.layout.addWidget(
-           self.robot_info
-        )
+        self.layout.addWidget(self.robot_info)
 
         self.robot_status = RobotStatusView()
-        self.layout.addWidget(
-            self.robot_status
-        )
+        self.layout.addWidget(self.robot_status)
 
         self.robot_info.robot_status_expand.clicked.connect(
             self.robot_status.toggle_visibility

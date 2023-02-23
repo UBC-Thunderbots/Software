@@ -80,7 +80,6 @@ def __create_enum_parameter(key, value, descriptor):
     for enum_desc in descriptor.enum_type.values:
         options.append(enum_desc.name)
 
-
     # The list index is indexed from 1
     current_enum_index = value - 1
 
@@ -174,19 +173,13 @@ def config_proto_to_field_list(
             else:
                 string_val = str(value)
 
-            field_list.append(
-                __create_parameter_read_only(key, string_val, descriptor)
-            )
+            field_list.append(__create_parameter_read_only(key, string_val, descriptor))
 
         elif descriptor.type == descriptor.TYPE_BOOL:
-            field_list.append(
-                __create_bool_parameter(key, value, descriptor)
-            )
+            field_list.append(__create_bool_parameter(key, value, descriptor))
 
         elif descriptor.type == descriptor.TYPE_ENUM:
-            field_list.append(
-                __create_enum_parameter(key, value, descriptor)
-            )
+            field_list.append(__create_enum_parameter(key, value, descriptor))
 
         elif descriptor.type == descriptor.TYPE_STRING:
             field_list.append(
@@ -204,9 +197,7 @@ def config_proto_to_field_list(
             descriptor.TYPE_UINT32,
             descriptor.TYPE_UINT64,
         ]:
-            field_list.append(
-                __create_int_parameter_writable(key, value, descriptor)
-            )
+            field_list.append(__create_int_parameter_writable(key, value, descriptor))
 
         else:
             raise NotImplementedError(
