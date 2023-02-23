@@ -1,6 +1,6 @@
 /*
  * simulator.cpp
- * Hrvo Library
+ * HRVO Library
  *
  * Copyright 2009 University of North Carolina at Chapel Hill
  *
@@ -309,10 +309,7 @@ Vector HrvoSimulator::getRobotVelocity(unsigned int robot_id) const
     return Vector();
 }
 
-<<<<<<< HEAD
-void HrvoSimulator::visualize(unsigned int robot_id) const
-=======
-void HRVOSimulator::updateRobotVelocity(RobotId robot_id, const Vector &new_velocity)
+void HrvoSimulator::updateRobotVelocity(RobotId robot_id, const Vector &new_velocity)
 {
     auto hrvo_agent = getFriendlyAgentFromRobotId(robot_id);
     if (hrvo_agent.has_value())
@@ -321,8 +318,7 @@ void HRVOSimulator::updateRobotVelocity(RobotId robot_id, const Vector &new_velo
     }
 }
 
-void HRVOSimulator::visualize(unsigned int robot_id) const
->>>>>>> c070809816e7711d3e1d65d4a1aef0a54d866bb7
+void HrvoSimulator::visualize(unsigned int robot_id) const
 {
     auto friendly_agent_opt = getFriendlyAgentFromRobotId(robot_id);
     if (!friendly_agent_opt.has_value())

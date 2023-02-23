@@ -1,6 +1,6 @@
 /*
  * simulator.h
- * Hrvo Library
+ * HRVO Library
  *
  * Copyright 2009 University of North Carolina at Chapel Hill
  *
@@ -146,9 +146,9 @@ class HrvoSimulator
     Vector getRobotVelocity(unsigned int robot_id) const;
 
     /**
-     * Get friendly Hrvo agent from robot id. Returns std::nullopt if agent does not exist
+     * Get friendly HRVO agent from robot id. Returns std::nullopt if agent does not exist
      * @param robot_id Robot id as represented in the real world
-     * @return Optional shared pointer to an Hrvo agent
+     * @return Optional shared pointer to an HRVO agent
      */
     std::optional<std::shared_ptr<HrvoAgent>> getFriendlyAgentFromRobotId(
         unsigned int robot_id) const;

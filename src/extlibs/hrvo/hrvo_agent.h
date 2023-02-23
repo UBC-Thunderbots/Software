@@ -44,7 +44,7 @@
 #include "software/geom/vector.h"
 
 /**
- * An agent/robot in the simulation which uses the Hrvo algorithm to motion plan towards
+ * An agent/robot in the simulation which uses the HRVO algorithm to motion plan towards
  * the destination while avoiding obstacles.
  */
 class HrvoAgent : public Agent

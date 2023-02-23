@@ -96,13 +96,9 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
 {
     hrvo_simulator_.doStep();
 
-<<<<<<< HEAD
-    // Visualize the Hrvo Simulator for the current robot
-    hrvo_simulator_.visualize(robot_id);
-=======
+
     // Visualize the HRVO Simulator for the current robot
     hrvo_simulator_.visualize(robot_id_);
->>>>>>> c070809816e7711d3e1d65d4a1aef0a54d866bb7
 
     switch (current_primitive_.primitive_case())
     {

@@ -1,6 +1,6 @@
 /*
  * kd_tree.cpp
- * Hrvo Library
+ * HRVO Library
  *
  * Copyright 2009 University of North Carolina at Chapel Hill
  *

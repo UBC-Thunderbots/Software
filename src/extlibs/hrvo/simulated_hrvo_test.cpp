@@ -300,13 +300,10 @@ TEST_F(SimulatedHrvoTest, test_agent_not_going_in_static_obstacles)
             Duration::fromSeconds(20));
 }
 
-<<<<<<< HEAD
-TEST_F(SimulatedHrvoTest, test_start_in_local_minima)
-=======
+
 // This test is mainly for showcasing the behaviour of HRVO in an edge case where
 // the robot starts in a local minima, as a result, it does not have any validations.
-TEST_F(SimulatedHRVOTest, test_start_in_local_minima)
->>>>>>> c070809816e7711d3e1d65d4a1aef0a54d866bb7
+TEST_F(SimulatedHrvoTest, test_start_in_local_minima)
 {
     Point destination      = Point(2.8, 0);
     Point initial_position = Point(0.7, 0);

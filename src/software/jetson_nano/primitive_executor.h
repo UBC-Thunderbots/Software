@@ -85,12 +85,8 @@ class PrimitiveExecutor
 
     TbotsProto::Primitive current_primitive_;
     RobotConstants_t robot_constants_;
-<<<<<<< HEAD
     HrvoSimulator hrvo_simulator_;
-=======
-    HRVOSimulator hrvo_simulator_;
     double time_step_;
     Angle curr_orientation_;
     RobotId robot_id_;
->>>>>>> c070809816e7711d3e1d65d4a1aef0a54d866bb7
 };

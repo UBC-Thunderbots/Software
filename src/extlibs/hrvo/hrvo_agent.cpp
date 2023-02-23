@@ -1,6 +1,6 @@
 /*
  * agent.cpp
- * Hrvo Library
+ * HRVO Library
  *
  * Copyright 2009 University of North Carolina at Chapel Hill
  *
@@ -191,7 +191,7 @@ VelocityObstacle HrvoAgent::createVelocityObstacle(const Agent &other_agent)
     // Convert velocity obstacle to hybrid reciprocal velocity obstacle (Hrvo)
     // by shifting one side of the velocity obstacle to share the responsibility
     // of avoiding collision with other agent. This assumes that the other agent will also
-    // be running Hrvo
+    // be running HRVO
     // Refer to: https://gamma.cs.unc.edu/HRVO/HRVO-T-RO.pdf#page=2
     Vector vo_side;
     Vector rvo_side;
