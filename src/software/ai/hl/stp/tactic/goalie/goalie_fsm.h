@@ -34,11 +34,11 @@ struct GoalieFSM
 
     // Depth goalie should be at for plays close to the defense area (potential lateral
     // play, rebounds)
-    static constexpr double CONSERVATIVE_DEPTH = 0.3;
+    static constexpr double CONSERVATIVE_DEPTH_METERS = 0.3;
 
     // Depth goalie should be at to aggressively narrow the angle the ball has to the
     // goal as it enters the friendly half
-    static constexpr double AGGRESSIVE_DEPTH = 0.7;
+    static constexpr double AGGRESSIVE_DEPTH_METERS = 0.7;
 
     /**
      * Constructor for GoalieFSM struct

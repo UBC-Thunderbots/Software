@@ -39,15 +39,15 @@ Point GoalieFSM::getGoaliePositionToBlock(
     }
 
     // Default to conservative depth when ball is at opposite end of field
-    double depth = CONSERVATIVE_DEPTH;
+    double depth = CONSERVATIVE_DEPTH_METERS;
 
     if (field.pointInFriendlyHalf(ball.position()))
     {
         // As the ball gets deeper into our friendly half, the goalie should transition
         // from playing aggressively out far to a deeper conservative depth
         depth = normalizeValueToRange(ball.position().x(), snap_to_post_region_x,
-                                      field.centerPoint().x(), CONSERVATIVE_DEPTH,
-                                      AGGRESSIVE_DEPTH);
+                                      field.centerPoint().x(), CONSERVATIVE_DEPTH_METERS,
+                                      AGGRESSIVE_DEPTH_METERS);
     }
 
     Vector goalie_direction_vector =
@@ -87,17 +87,16 @@ Point GoalieFSM::findGoodChipTarget(const World &world)
     // Default chip target is the enemy goal
     Point chip_target = world.field().enemyGoalCenter();
 
-    std::vector<Circle> open_areas = findGoodChipTargets(world);
+    // Avoid chipping out of field or towards friendly corners by restraining the
+    // chip target to the region in front of the friendly defense area
+    Rectangle chip_target_area = Rectangle(
+        world.field().friendlyCornerPos() + Vector(world.field().defenseAreaXLength(), 0),
+        world.field().enemyCornerNeg());
+
+    std::vector<Circle> open_areas = findGoodChipTargets(world, chip_target_area);
     if (!open_areas.empty())
     {
         chip_target = open_areas[0].origin();
-
-        // Avoid chipping out of field or towards friendly corners by clamping the chip
-        // target to the region in front of the friendly defense area
-        double clamped_chip_target_x =
-            std::clamp(chip_target.x(), world.field().friendlyDefenseArea().xMax(),
-                       world.field().enemyGoalCenter().x());
-        chip_target = Point(clamped_chip_target_x, chip_target.y());
     }
 
     return chip_target;
