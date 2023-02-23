@@ -11,9 +11,6 @@
 #include "software/networking/threaded_proto_udp_listener.hpp"
 #include "software/networking/threaded_proto_udp_sender.hpp"
 
-// constexpr float PACKET_LOSS_WARNING_THRESHOLD = 0.1f;
-// constexpr uint8_t RECENT_PACKET_LOSS_PERIOD   = 100;
-
 class NetworkService
 {
    public:
@@ -67,6 +64,7 @@ class NetworkService
     // RECENT_PACKET_LOSS_PERIOD worlds
     std::queue<uint64_t> recent_world_seq_nums;
 
+    // PacketTrackers for tracking recent primitive set and world loss
     PacketTracker primitive_tracker = PacketTracker("primitive set");
     PacketTracker world_tracker = PacketTracker("world");
 };
