@@ -15,8 +15,9 @@ std::unique_ptr<TbotsProto::World> createWorld(const World& world)
     return world_msg;
 }
 
-std::unique_ptr<TbotsProto::World> createWorldWithSequenceNumber(const World& world,
-                                                                const uint64_t sequence_number) {
+std::unique_ptr<TbotsProto::World> createWorldWithSequenceNumber(
+    const World& world, const uint64_t sequence_number)
+{
     // create msg
     auto world_msg                        = std::make_unique<TbotsProto::World>();
     *(world_msg->mutable_time_sent())     = *createCurrentTimestamp();

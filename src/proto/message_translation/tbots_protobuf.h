@@ -19,7 +19,8 @@
 std::unique_ptr<TbotsProto::World> createWorld(const World& world);
 
 /**
- * Returns a TbotsProto::World proto with a sequence number given a World and a sequence number.
+ * Returns a TbotsProto::World proto with a sequence number given a World and a sequence
+ * number.
  *
  * @param world The world msg to extract the TbotsProto::World from
  * @param sequence_number A sequence number for tracking the TbotsProto::World
@@ -27,7 +28,8 @@ std::unique_ptr<TbotsProto::World> createWorld(const World& world);
  * @return The unique_ptr to a TbotsProto::World proto containing the field, friendly
  * team, enemy team, ball, game state, and the sequence number.
  */
-std::unique_ptr<TbotsProto::World> createWorldWithSequenceNumber(const World& world, const uint64_t sequence_number);
+std::unique_ptr<TbotsProto::World> createWorldWithSequenceNumber(
+    const World& world, const uint64_t sequence_number);
 
 /**
  * Returns a TbotsProto::Team proto given a Team.

@@ -1,5 +1,6 @@
 #include <queue>
 #include <string>
+
 #include "software/logger/logger.h"
 
 class PacketTracker
@@ -12,7 +13,8 @@ class PacketTracker
      */
     PacketTracker(const std::string& type);
     /**
-     * When a new sequence number is sent, the PacketTracker updates the proto tracking and logs a warning if loss rate is greater than the threshold
+     * When a new sequence number is sent, the PacketTracker updates the proto tracking
+     * and logs a warning if loss rate is greater than the threshold
      *
      * @param seq_num The sequence number of the newly received protobuf
      */

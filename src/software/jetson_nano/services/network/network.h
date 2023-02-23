@@ -66,5 +66,5 @@ class NetworkService
 
     // PacketTrackers for tracking recent primitive set and world loss
     PacketTracker primitive_tracker = PacketTracker("primitive set");
-    PacketTracker world_tracker = PacketTracker("world");
+    PacketTracker world_tracker     = PacketTracker("world");
 };
