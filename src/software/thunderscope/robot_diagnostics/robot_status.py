@@ -1,7 +1,7 @@
 from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph import parametertree
 from proto.import_all_protos import *
-from software.thunderscope.common import build_parameter_tree
+from software.thunderscope.common import proto_parameter_tree_util
 
 
 class RobotStatusView(QWidget):
@@ -28,7 +28,7 @@ class RobotStatusView(QWidget):
         self.param_group = parametertree.Parameter.create(
             name="RobotStatus",
             type="group",
-            children=build_parameter_tree.config_proto_to_field_list(
+            children=proto_parameter_tree_util.config_proto_to_field_list(
                 RobotStatus(), read_only=True, search_term=None
             ),
         )

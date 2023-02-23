@@ -724,10 +724,7 @@ class Thunderscope(object):
 
     def setup_diagnostics_input_widget(self):
         """
-
-        Sets up the diagnostics input widget with the given proto unix io
-
-        :param proto_unix_io: The proto unix io object
+        Sets up the diagnostics input widget
         """
 
         diagnostics_input_widget = FullSystemConnectWidget()

@@ -4,7 +4,7 @@ from pyqtgraph import parametertree
 from google.protobuf.json_format import MessageToDict
 from thefuzz import fuzz
 from proto.import_all_protos import *
-from software.thunderscope.common import build_parameter_tree
+from software.thunderscope.common import proto_parameter_tree_util
 
 
 class ProtoConfigurationWidget(QWidget):
@@ -48,7 +48,7 @@ class ProtoConfigurationWidget(QWidget):
             name="params",
             type="group",
             children=self.config_proto_to_param_dict(
-                self.proto_to_configure, read_only=False, search_term=None
+                self.proto_to_configure, search_term=None
             ),
         )
 
@@ -119,7 +119,7 @@ class ProtoConfigurationWidget(QWidget):
 
         """
 
-        field_list = build_parameter_tree.config_proto_to_field_list(
+        field_list = proto_parameter_tree_util.config_proto_to_field_list(
             message,
             search_term=search_term,
             search_filter_threshold=self.search_filter_threshold,

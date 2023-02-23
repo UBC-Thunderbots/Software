@@ -80,6 +80,7 @@ def __create_enum_parameter(key, value, descriptor):
     for enum_desc in descriptor.enum_type.values:
         options.append(enum_desc.name)
 
+
     # The list index is indexed from 1
     current_enum_index = value - 1
 
@@ -125,7 +126,7 @@ def __create_parameter_read_only(key, value, descriptor):
 
 
 def config_proto_to_field_list(
-    message, read_only=True, search_term=None, search_filter_threshold=60
+    message, read_only=False, search_term=None, search_filter_threshold=60
 ):
     """Converts a protobuf to a pyqtgraph parameter tree dictionary
     that can loaded directly into a ParameterTree
@@ -163,32 +164,38 @@ def config_proto_to_field_list(
                 }
             )
 
+        elif read_only:
+            string_val = ""
+            if descriptor.type in [descriptor.TYPE_DOUBLE, descriptor.TYPE_FLOAT]:
+                string_val = "%.2f" % value
+            elif descriptor.type == descriptor.TYPE_ENUM:
+                if type(value) == int:
+                    string_val = descriptor.enum_type.values[value - 1].name
+            else:
+                string_val = str(value)
+
+            field_list.append(
+                __create_parameter_read_only(key, string_val, descriptor)
+            )
+
         elif descriptor.type == descriptor.TYPE_BOOL:
             field_list.append(
-                __create_parameter_read_only(key, str(value), descriptor)
-                if read_only
-                else __create_bool_parameter(key, value, descriptor)
+                __create_bool_parameter(key, value, descriptor)
             )
 
         elif descriptor.type == descriptor.TYPE_ENUM:
             field_list.append(
-                __create_parameter_read_only(key, str(value), descriptor)
-                if read_only
-                else __create_enum_parameter(key, value, descriptor)
+                __create_enum_parameter(key, value, descriptor)
             )
 
         elif descriptor.type == descriptor.TYPE_STRING:
             field_list.append(
-                __create_parameter_read_only(key, value, descriptor)
-                if read_only
-                else __create_string_parameter_writable(key, value, descriptor)
+                __create_string_parameter_writable(key, value, descriptor)
             )
 
         elif descriptor.type in [descriptor.TYPE_DOUBLE, descriptor.TYPE_FLOAT]:
             field_list.append(
-                __create_parameter_read_only(key, "%.2f" % value, descriptor)
-                if read_only
-                else __create_double_parameter_writable(key, value, descriptor)
+                __create_double_parameter_writable(key, value, descriptor)
             )
 
         elif descriptor.type in [
@@ -198,9 +205,7 @@ def config_proto_to_field_list(
             descriptor.TYPE_UINT64,
         ]:
             field_list.append(
-                __create_parameter_read_only(key, str(value), descriptor)
-                if read_only
-                else __create_int_parameter_writable(key, value, descriptor)
+                __create_int_parameter_writable(key, value, descriptor)
             )
 
         else:
