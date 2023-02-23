@@ -301,11 +301,8 @@ if __name__ == "__main__":
             blue_replay_log=args.blue_log,
             load_yellow=(args.yellow_log is not None),
             yellow_replay_log=args.yellow_log,
-<<<<<<< HEAD
             load_gamecontroller=False,
-=======
             cost_visualization=args.cost_visualization,
->>>>>>> ef0384d09186c55fe4f45d9a696a31538ee263ed
         )
         tscope.show()
 

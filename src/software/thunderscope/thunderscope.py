@@ -3,7 +3,6 @@ import time
 import textwrap
 import shelve
 import signal
-import platform
 import logging
 
 import PyQt6
