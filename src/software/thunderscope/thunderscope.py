@@ -5,6 +5,7 @@ import shelve
 import signal
 import platform
 import logging
+import pathlib
 
 # PyQt5 doesn't play nicely with i3 and Ubuntu 18, PyQt6 is much more stable
 # Unfortunately, PyQt6 doesn't install on Ubuntu 18. Thankfully both
@@ -64,6 +65,8 @@ from software.thunderscope.robot_diagnostics.estop_view import EstopView
 from software.thunderscope.replay.proto_player import ProtoPlayer
 
 SAVED_LAYOUT_PATH = "/opt/tbotspython/saved_tscope_layout"
+LAYOUT_FILE_EXTENSION = "tscopelayout"
+LAST_OPENED_LAYOUT_PATH = f"{SAVED_LAYOUT_PATH}/last_opened_tscope_layout.{LAYOUT_FILE_EXTENSION}"
 GAME_CONTROLLER_URL = "http://localhost:8081"
 
 
@@ -258,16 +261,21 @@ class Thunderscope(object):
         registered state to a file
 
         """
+        # Create a folder at SAVED_LAYOUT_PATH if it doesn't exist
+        try:
+            pathlib.Path(SAVED_LAYOUT_PATH).mkdir(exist_ok=True)
+        except FileNotFoundError:
+            logging.warning(f"Could not create folder at '{SAVED_LAYOUT_PATH}' for layout files")
 
         filename, _ = QtGui.QFileDialog.getSaveFileName(
             self.window,
             "Save layout",
-            "~/dock_layout_{}.tscopelayout".format(int(time.time())),
+            f"{SAVED_LAYOUT_PATH}/dock_layout_{int(time.time())}.{LAYOUT_FILE_EXTENSION}",
             options=QFileDialog.Option.DontUseNativeDialog,
         )
 
         if not filename:
-            logging.warn("No filename selected")
+            # No layout file was selected
             return
 
         with shelve.open(filename, "c") as shelf:
@@ -277,12 +285,13 @@ class Thunderscope(object):
                 "robot_diagnostics_dock_state"
             ] = self.robot_diagnostics_dock_area.saveState()
 
-        with shelve.open(SAVED_LAYOUT_PATH, "c") as shelf:
+        with shelve.open(LAST_OPENED_LAYOUT_PATH, "c") as shelf:
             shelf["blue_dock_state"] = self.blue_full_system_dock_area.saveState()
             shelf["yellow_dock_state"] = self.yellow_full_system_dock_area.saveState()
             shelf[
                 "robot_diagnostics_dock_state"
             ] = self.robot_diagnostics_dock_area.saveState()
+# TODO: Remove qt.webenginecontext prints
 
     def load_layout(self, filename=None):
         """Open a file dialog to load the layout and state to all widgets
@@ -296,18 +305,19 @@ class Thunderscope(object):
             filename, _ = QtGui.QFileDialog.getOpenFileName(
                 self.window,
                 "Open layout",
-                "~/",
+                f"{SAVED_LAYOUT_PATH}/", # TODO: If folder doesn't exist does this throw
                 options=QFileDialog.Option.DontUseNativeDialog,
             )
 
             if not filename:
-                logging.warn("No filename selected")
+                logging.warning("No filename selected")
                 return
 
         # lets load the layouts from the shelf into their respective dock areas
         # if the dock doesn't exist in the default layout, we ignore it
         # (instead of adding a placeholder dock)
         with shelve.open(filename, "r") as shelf:
+            print(f"Loading Thunderscope layout from: '{filename}'")
 
             self.blue_full_system_dock_area.restoreState(
                 shelf["blue_dock_state"], missing="ignore"
@@ -320,8 +330,8 @@ class Thunderscope(object):
             )
 
             # Update default layout
-            if filename != SAVED_LAYOUT_PATH:
-                with shelve.open(SAVED_LAYOUT_PATH, "c") as default_shelf:
+            if filename != LAST_OPENED_LAYOUT_PATH:
+                with shelve.open(LAST_OPENED_LAYOUT_PATH, "c") as default_shelf:
                     default_shelf["blue_dock_state"] = shelf["blue_dock_state"]
                     default_shelf["yellow_dock_state"] = shelf["yellow_dock_state"]
                     default_shelf["robot_diagnostics_dock_state"] = shelf[
@@ -366,20 +376,19 @@ class Thunderscope(object):
                 False,
             )
 
-        if load_yellow or load_blue:
-            path = layout_path if layout_path else SAVED_LAYOUT_PATH
-
-            try:
-                self.load_layout(path)
-            except Exception:
-                pass
-
         if load_diagnostics:
             self.configure_robot_diagnostics_layout(
                 self.robot_diagnostics_dock_area,
                 self.robot_diagnostics_proto_unix_io,
                 load_blue or load_yellow,
             )
+
+        # Load the layout file if it exists
+        path = layout_path if layout_path else LAST_OPENED_LAYOUT_PATH
+        try:
+            self.load_layout(path)
+        except Exception:
+            pass
 
     def register_refresh_function(self, refresh_func):
         """Register the refresh functions to run at the refresh_interval_ms
@@ -779,6 +788,7 @@ class Thunderscope(object):
         """Show the main window"""
 
         self.window.show()
+        self.window.showMaximized()
         pyqtgraph.exec()
 
     def close(self):
