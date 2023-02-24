@@ -4,6 +4,7 @@ import threading
 import argparse
 import numpy
 
+from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.thunderscope import Thunderscope
 from software.thunderscope.binary_context_managers import *
 from proto.message_translation import tbots_protobuf
@@ -337,10 +338,20 @@ if __name__ == "__main__":
             )
             tscope.simulator_proto_unix_io.send_proto(WorldState, world_state)
 
+            simulation_state_buffer = ThreadSafeBuffer(1, SimulationState)
+            tscope.simulator_proto_unix_io.register_observer(
+                SimulationState, simulation_state_buffer
+            )
+
             # Tick Simulation
             while True:
-                tick = SimulatorTick(milliseconds=tick_rate_ms)
-                tscope.simulator_proto_unix_io.send_proto(SimulatorTick, tick)
+
+                simulation_state_message = simulation_state_buffer.get()
+
+                if simulation_state_message.is_playing:
+                    tick = SimulatorTick(milliseconds=tick_rate_ms)
+                    tscope.simulator_proto_unix_io.send_proto(SimulatorTick, tick)
+
                 time.sleep(tick_rate_ms / 1000)
 
         # Launch all binaries
