@@ -47,6 +47,7 @@ from software.thunderscope.field import (
 from software.thunderscope.common.proto_configuration_widget import (
     ProtoConfigurationWidget,
 )
+from software.thunderscope.cost_vis.cost_vis import CostVisualizationWidget
 from software.thunderscope.field.field import Field
 from software.thunderscope.log.g3log_widget import g3logWidget
 from software.thunderscope.constants import IndividualRobotMode
@@ -98,6 +99,7 @@ class Thunderscope(object):
         yellow_replay_log=None,
         refresh_interval_ms=10,
         visualization_buffer_size=5,
+        cost_visualization=False,
     ):
         """Initialize Thunderscope
 
@@ -115,6 +117,7 @@ class Thunderscope(object):
             The interval in milliseconds to refresh all the widgets.
         :param visualization_buffer_size: The size of the visualization buffer.
             Increasing this will increase smoothness but will be less realtime. 
+        :param cost_visualization: Whether to visualize pass costs or not
 
         """
         signal.signal(signal.SIGINT, signal.SIG_DFL)
@@ -129,6 +132,7 @@ class Thunderscope(object):
         self.yellow_replay_log = yellow_replay_log
         self.refresh_interval_ms = refresh_interval_ms
         self.visualization_buffer_size = visualization_buffer_size
+        self.cost_visualization = cost_visualization
         self.widgets = {}
         self.refresh_timers = []
 
@@ -443,6 +447,16 @@ class Thunderscope(object):
         playinfo_dock = Dock("Play Info")
         playinfo_dock.addWidget(widgets["playinfo_widget"])
 
+        if self.cost_visualization:
+            widgets["cost_visualization_widget"] = self.setup_cost_visualization_widget(
+                full_system_proto_unix_io
+            )
+            cost_visualization_dock = Dock("Cost Visualization")
+            cost_visualization_dock.addWidget(widgets["cost_visualization_widget"])
+            widgets["field_widget"].field_resized.connect(
+                widgets["cost_visualization_widget"].update_axis_range
+            )
+
         widgets["refereeinfo_widget"] = self.setup_referee_info(
             full_system_proto_unix_io
         )
@@ -455,6 +469,8 @@ class Thunderscope(object):
         dock_area.addDock(refereeinfo_dock, "bottom", field_dock)
         dock_area.addDock(playinfo_dock, "above", refereeinfo_dock)
         dock_area.addDock(performance_dock, "right", playinfo_dock)
+        if self.cost_visualization:
+            dock_area.addDock(cost_visualization_dock, "right", field_dock)
 
         if load_robot_view:
             widgets["robot_view"] = self.setup_robot_view(
@@ -754,6 +770,20 @@ class Thunderscope(object):
         self.register_refresh_function(drive_and_dribbler_widget.refresh)
 
         return drive_and_dribbler_widget
+
+    def setup_cost_visualization_widget(self, proto_unix_io):
+        """Setup the cost visualization widget
+
+        :param proto_unix_io: The proto unix io object
+        :returns: The cost visualization widget
+
+        """
+        cost_vis_widget = CostVisualizationWidget()
+        proto_unix_io.register_observer(
+            CostVisualization, cost_vis_widget.cost_visualization_buffer
+        )
+        self.register_refresh_function(cost_vis_widget.refresh)
+        return cost_vis_widget
 
     def show(self):
         """Show the main window"""

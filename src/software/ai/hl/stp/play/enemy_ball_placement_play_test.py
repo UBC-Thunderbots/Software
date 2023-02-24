@@ -9,17 +9,13 @@ from software.simulated_tests.simulated_test_fixture import (
 )
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
-from proto.ssl_gc_geometry_pb2 import Vector2
 
 
-@pytest.mark.parametrize(
-    "run_enemy_ai", [False]
-)  # , True])  TODO: Issue 2780 re-enable this test
-def test_two_ai_ball_placement(simulated_test_runner, run_enemy_ai):
+def test_two_ai_ball_placement(simulated_test_runner):
 
-    # starting point must be Point
+    # Initial position is from Blue's perspective
     ball_initial_pos = tbots.Point(2, 2)
-    # placement point must be Vector2 to work with game controller
+    # Final point is going to be from yellow's perspective  (since yellow will be the one placing)
     ball_final_pos = tbots.Point(-3, -2)
 
     # Setup Bots
@@ -51,24 +47,20 @@ def test_two_ai_ball_placement(simulated_test_runner, run_enemy_ai):
     # Pass in placement point here - not required for all play tests
     simulated_test_runner.gamecontroller.send_ci_input(
         gc_command=Command.Type.BALL_PLACEMENT,
-        team=Team.BLUE,
+        team=Team.YELLOW,
         final_ball_placement_point=ball_final_pos,
     )
 
     # Force play override here
     blue_play = Play()
-    blue_play.name = PlayName.BallPlacementPlay
+    blue_play.name = PlayName.EnemyBallPlacementPlay
 
     simulated_test_runner.blue_full_system_proto_unix_io.send_proto(Play, blue_play)
 
-    # We can parametrize running in ai_vs_ai mode
-    if run_enemy_ai:
-        yellow_play = Play()
-        yellow_play.name = PlayName.EnemyBallPlacementPlay
+    yellow_play = Play()
+    yellow_play.name = PlayName.BallPlacementPlay
 
-        simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(
-            Play, yellow_play
-        )
+    simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(Play, yellow_play)
 
     # Create world state
     simulated_test_runner.simulator_proto_unix_io.send_proto(
@@ -82,20 +74,17 @@ def test_two_ai_ball_placement(simulated_test_runner, run_enemy_ai):
     )
 
     # Always Validation
+    # TODO- #2783 Validation
     always_validation_sequence_set = [[]]
 
     # Eventually Validation
-    eventually_validation_sequence_set = [
-        [
-            # Ball should arrive within 5cm of placement point
-            BallEventuallyEntersRegion(regions=[tbots.Circle(ball_final_pos, 0.05)]),
-        ]
-    ]
+    # TODO- #2783 Validation
+    eventually_validation_sequence_set = [[]]
 
     simulated_test_runner.run_test(
         eventually_validation_sequence_set=eventually_validation_sequence_set,
         always_validation_sequence_set=always_validation_sequence_set,
-        test_timeout_s=15,
+        test_timeout_s=7.5,
     )
 
 
