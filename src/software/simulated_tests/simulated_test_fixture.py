@@ -82,6 +82,9 @@ class SimulatedTestRunner(object):
         self.last_exception = None
 
         self.world_buffer = ThreadSafeBuffer(buffer_size=1, protobuf_type=World)
+        self.primitive_set_buffer = ThreadSafeBuffer(
+            buffer_size=1, protobuf_type=PrimitiveSet
+        )
         self.last_exception = None
 
         self.ssl_wrapper_buffer = ThreadSafeBuffer(
@@ -138,13 +141,37 @@ class SimulatedTestRunner(object):
         eventually_validation_sequence_set=[[]],
         test_timeout_s=3,
         tick_duration_s=0.0166,  # Default to 60hz
+        ci_cmd_with_delay=[],
     ):
-        """Step simulation, full_system and run validation
+        """Run a test
+
+        :param always_validation_sequence_set: Validation functions that should
+                                hold on every tick
+        :param eventually_validation_sequence_set: Validation that should
+                                eventually be true, before the test ends
+        :param test_timeout_s: The timeout for the test, if any eventually_validations
+                                remain after the timeout, the test fails.
+        :param tick_duration_s: The simulation step duration
+        :param ci_cmd_with_delay: A list consisting of a duration, and a
+                                tuple forming a ci command
+                                {
+                                    (time, command, team),
+                                    (time, command, team),
+                                    ...
+                                }
         """
 
         time_elapsed_s = 0
 
         while time_elapsed_s < test_timeout_s:
+            # Check for new CI commands at this time step
+            for (delay, cmd, team) in ci_cmd_with_delay:
+                # If delay matches time
+                if delay <= time_elapsed_s:
+                    # send command
+                    self.gamecontroller.send_ci_input(cmd, team)
+                    # remove command from the list
+                    ci_cmd_with_delay.remove((delay, cmd, team))
 
             # Update the timestamp logged by the ProtoLogger
             with self.timestamp_mutex:
@@ -177,6 +204,11 @@ class SimulatedTestRunner(object):
                     )
                     self.blue_full_system_proto_unix_io.send_proto(
                         RobotStatus, robot_status
+                    )
+                    # We need this blocking get call to synchronize the running speed of world and primitives
+                    # Otherwise, we end up with behaviour that doesn't simulate what would happen in the real world
+                    self.primitive_set_buffer.get(
+                        block=True, timeout=WORLD_BUFFER_TIMEOUT
                     )
 
             # Validate
@@ -257,7 +289,18 @@ class InvariantTestRunner(SimulatedTestRunner):
         # any test failures and propagate them to the main thread
         if self.thunderscope:
 
-            run_sim_thread = threading.Thread(target=self.runner, daemon=True)
+            run_sim_thread = threading.Thread(
+                target=self.runner,
+                daemon=True,
+                args=[
+                    inv_always_validation_sequence_set,
+                    inv_eventually_validation_sequence_set,
+                    test_timeout_s[0]
+                    if type(test_timeout_s) == list
+                    else test_timeout_s,
+                    tick_duration_s,
+                ],
+            )
             run_sim_thread.start()
             self.thunderscope.show()
             run_sim_thread.join()
@@ -327,7 +370,18 @@ class AggregateTestRunner(SimulatedTestRunner):
                     # If thunderscope is enabled, run the test in a thread and show
                     # thunderscope on this thread. The excepthook is setup to catch
                     # any test failures and propagate them to the main thread
-                    run_sim_thread = threading.Thread(target=self.runner, daemon=True)
+                    run_sim_thread = threading.Thread(
+                        target=self.runner,
+                        daemon=True,
+                        args=[
+                            ag_always_validation_sequence_set,
+                            ag_eventually_validation_sequence_set,
+                            test_timeout_s[0]
+                            if type(test_timeout_s) == list
+                            else test_timeout_s,
+                            tick_duration_s,
+                        ],
+                    )
                     run_sim_thread.start()
                     self.thunderscope.show()
                     run_sim_thread.join()
@@ -528,7 +582,9 @@ def simulated_test_runner():
 
             # Only validate on the blue worlds
             blue_full_system_proto_unix_io.register_observer(World, runner.world_buffer)
-
+            blue_full_system_proto_unix_io.register_observer(
+                PrimitiveSet, runner.primitive_set_buffer
+            )
             # Setup proto loggers.
             #
             # NOTE: Its important we use the test runners time provider because

@@ -8,6 +8,7 @@ cc_library(
     hdrs = ["cost_function.h"],
     deps = [
         ":pass",
+        "//proto/message_translation:tbots_protobuf",
         "//software/ai/evaluation:calc_best_shot",
         "//software/ai/evaluation:time_to_travel",
         "//software/logger",
