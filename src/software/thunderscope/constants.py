@@ -1,5 +1,17 @@
 from pyqtgraph.Qt import QtCore, QtGui
 from proto.import_all_protos import *
+from enum import IntEnum
+
+
+class IndividualRobotMode(IntEnum):
+    """
+    Enum for the mode of input for an individual robot
+    """
+
+    NONE = 0
+    MANUAL = 1
+    AI = 3
+
 
 LINE_WIDTH = 3
 SPEED_LINE_WIDTH = 2

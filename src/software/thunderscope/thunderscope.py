@@ -5,6 +5,7 @@ import shelve
 import signal
 import platform
 import logging
+from typing import List
 
 # PyQt5 doesn't play nicely with i3 and Ubuntu 18, PyQt6 is much more stable
 # Unfortunately, PyQt6 doesn't install on Ubuntu 18. Thankfully both
@@ -48,6 +49,7 @@ from software.thunderscope.common.proto_configuration_widget import (
 )
 from software.thunderscope.field.field import Field
 from software.thunderscope.log.g3log_widget import g3logWidget
+from software.thunderscope.constants import IndividualRobotMode
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.thunderscope.play.playinfo_widget import PlayInfoWidget
 from software.thunderscope.play.refereeinfo_widget import RefereeInfoWidget
@@ -456,7 +458,12 @@ class Thunderscope(object):
 
         if load_robot_view:
             widgets["robot_view"] = self.setup_robot_view(
-                full_system_proto_unix_io, True
+                full_system_proto_unix_io,
+                [
+                    IndividualRobotMode.NONE,
+                    IndividualRobotMode.MANUAL,
+                    IndividualRobotMode.AI,
+                ],
             )
             robot_view_dock = Dock("RobotView")
             robot_view_dock.addWidget(widgets["robot_view"])
@@ -503,7 +510,7 @@ class Thunderscope(object):
 
         if not load_fullsystem:
             self.diagnostics_widgets["robot_view"] = self.setup_robot_view(
-                proto_unix_io, False
+                proto_unix_io, [IndividualRobotMode.NONE, IndividualRobotMode.MANUAL,]
             )
             robot_view_dock = Dock("RobotView")
             robot_view_dock.setStretch(y=5)
@@ -526,12 +533,15 @@ class Thunderscope(object):
         dock.setStretch(y=1)
         self.robot_diagnostics_dock_area.addDock(dock, "bottom", log_dock)
 
-    def setup_robot_view(self, proto_unix_io, load_fullsystem):
+    def setup_robot_view(
+        self, proto_unix_io, available_control_modes: List[IndividualRobotMode]
+    ):
         """Setup the robot view widget
         :param proto_unix_io: The proto unix io object for the full system
-        :param load_fullsystem: Boolean to indicate if control mode menus should have an AI option
+        :param available_control_modes: the currently available input modes for the robots
+                                        according to what mode thunderscope is run in
         """
-        robot_view = RobotView(load_fullsystem)
+        robot_view = RobotView(available_control_modes)
         self.register_refresh_function(robot_view.refresh)
         proto_unix_io.register_observer(RobotStatus, robot_view.robot_status_buffer)
         return robot_view

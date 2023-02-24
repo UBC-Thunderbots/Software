@@ -1,17 +1,6 @@
 from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph.Qt.QtCore import *
-from enum import IntEnum
-
-
-class IndividualRobotMode(IntEnum):
-    """
-    Enum for the mode of input for an individual robot
-    """
-
-    NONE = 0
-    MANUAL = 1
-    AI = 3
 
 
 class FloatSlider(QSlider):

@@ -1,6 +1,6 @@
 from software.py_constants import *
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
-from software.thunderscope.common.common_widgets import IndividualRobotMode
+from software.thunderscope.constants import IndividualRobotMode
 from software.python_bindings import *
 from proto.import_all_protos import *
 from pyqtgraph.Qt import QtCore

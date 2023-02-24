@@ -1,8 +1,10 @@
 import pyqtgraph as pg
+from typing import List
 from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtWidgets import *
 from software.py_constants import *
 from proto.import_all_protos import *
+from software.thunderscope.constants import IndividualRobotMode
 from software.thunderscope.robot_diagnostics.robot_info import RobotInfo
 from software.thunderscope.robot_diagnostics.robot_status import RobotStatusView
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
@@ -18,14 +20,20 @@ class RobotViewComponent(QWidget):
 
     """
 
-    def __init__(self, id, load_fullsystem, control_mode_signal):
+    def __init__(
+        self,
+        id,
+        available_control_modes: List[IndividualRobotMode],
+        control_mode_signal,
+    ):
         """
         Sets up a Robot Info Widget and a Robot Status Widget for each robot
 
         Sets the Robot Status widget to show / hide upon button click
 
         :param id: id of the current robot
-        :param load_fullsystem: whether fullsystem is loaded currently
+        :param available_control_modes: the currently available input modes for the robots
+                                        according to what mode thunderscope is run in
         :param control_mode_signal: the signal to emit when control mode changes
                                     in order to communicate to robot communications
         """
@@ -33,7 +41,7 @@ class RobotViewComponent(QWidget):
 
         self.layout = QVBoxLayout()
 
-        self.robot_info = RobotInfo(id, load_fullsystem, control_mode_signal)
+        self.robot_info = RobotInfo(id, available_control_modes, control_mode_signal)
         self.layout.addWidget(self.robot_info)
 
         self.robot_status = RobotStatusView()
@@ -56,13 +64,13 @@ class RobotView(QScrollArea):
 
     control_mode_signal = QtCore.pyqtSignal(int, int)
 
-    def __init__(self, load_fullsystem):
+    def __init__(self, available_control_modes: List[IndividualRobotMode]):
 
         """
         Initialize the robot view component for each robot.
 
-        :param load_fullsystem: whether fullsystem is loaded currently
-                                Shows / Hides AI option from control mode menu accordingly
+        :param available_control_modes: the currently available input modes for the robots
+                                        according to what mode thunderscope is run in
         """
 
         super().__init__()
@@ -71,13 +79,14 @@ class RobotView(QScrollArea):
 
         self.layout = QVBoxLayout()
 
-        self.robot_view_widgets = [
-            RobotViewComponent(id, load_fullsystem, self.control_mode_signal)
-            for id in range(MAX_ROBOT_IDS_PER_SIDE)
-        ]
+        self.robot_view_widgets = []
 
         for id in range(MAX_ROBOT_IDS_PER_SIDE):
-            self.layout.addWidget(self.robot_view_widgets[id])
+            robot_view_widget = RobotViewComponent(
+                id, available_control_modes, self.control_mode_signal
+            )
+            self.robot_view_widgets.append(robot_view_widget)
+            self.layout.addWidget(robot_view_widget)
 
         # for a QScrollArea, widgets cannot be added to it directly
         # doing so causes no scrolling to happen, and all the components get smaller
@@ -96,7 +105,9 @@ class RobotView(QScrollArea):
         robot_status = self.robot_status_buffer.get(block=False, return_cached=False)
 
         if robot_status is not None:
-            self.robot_info_widgets[robot_status.robot_id].update(
+            self.robot_view_widgets[robot_status.robot_id].robot_info.update(
                 robot_status.power_status, robot_status.error_code
             )
-            self.robot_status_widgets[robot_status.robot_id].update(robot_status)
+            self.robot_view_widgets[robot_status.robot_id].robot_status.update(
+                robot_status
+            )
