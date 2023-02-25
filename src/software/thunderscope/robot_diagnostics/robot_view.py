@@ -63,6 +63,11 @@ class RobotViewComponent(QWidget):
 
         self.robot_status.toggle_visibility()
 
+    def update(self, robot_status):
+        self.robot_info.update(robot_status.power_status, robot_status.error_code)
+        if self.robot_status:
+            self.robot_status.update(robot_status)
+
 
 class RobotView(QScrollArea):
     """
@@ -114,10 +119,12 @@ class RobotView(QScrollArea):
         """
         robot_status = self.robot_status_buffer.get(block=False, return_cached=False)
 
+        robot_status = RobotStatus(
+            robot_id=5,
+            power_status=PowerStatus(breakbeam_tripped=True, battery_voltage=20,),
+            error_code=[ErrorCode.NO_ERROR],
+            thunderloop_status=ThunderloopStatus(network_service_poll_time_ns=4),
+        )
+
         if robot_status is not None:
-            self.robot_view_widgets[robot_status.robot_id].robot_info.update(
-                robot_status.power_status, robot_status.error_code
-            )
-            self.robot_view_widgets[robot_status.robot_id].robot_status.update(
-                robot_status
-            )
+            self.robot_view_widgets[robot_status.robot_id].update(robot_status)

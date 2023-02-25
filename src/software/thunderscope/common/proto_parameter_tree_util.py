@@ -164,14 +164,16 @@ def config_proto_to_field_list(
             )
 
         elif read_only:
-            string_val = ""
+            string_val = str(value)
             if descriptor.type in [descriptor.TYPE_DOUBLE, descriptor.TYPE_FLOAT]:
                 string_val = "%.2f" % value
             elif descriptor.type == descriptor.TYPE_ENUM:
                 if type(value) == int:
-                    string_val = descriptor.enum_type.values[value - 1].name
-            else:
-                string_val = str(value)
+                    string_val = descriptor.enum_type.values[value].name
+                elif descriptor.label == descriptor.LABEL_REPEATED:
+                    string_val = str(
+                        [descriptor.enum_type.values[index].name for index in value]
+                    )
 
             field_list.append(__create_parameter_read_only(key, string_val, descriptor))
 

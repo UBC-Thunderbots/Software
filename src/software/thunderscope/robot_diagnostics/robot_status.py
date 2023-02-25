@@ -48,7 +48,6 @@ class RobotStatusView(QWidget):
         :param new_message: the new message to get values from
         :param path: the path of the current message
                       string args starting from the highest parent field
-        :return:
         """
 
         if self.robot_status_visible:
@@ -63,7 +62,25 @@ class RobotStatusView(QWidget):
                     # if value is found, update tree
                     child = self.param_group.child(*path, key)
 
-                    child.setValue(str(value))
+                    str_value = str(value)
+
+                    if descriptor.type in [
+                        descriptor.TYPE_DOUBLE,
+                        descriptor.TYPE_FLOAT,
+                    ]:
+                        str_value = "%.2f" % value
+                    elif descriptor.type == descriptor.TYPE_ENUM:
+                        if type(value) == int:
+                            str_value = descriptor.enum_type.values[value].name
+                        elif descriptor.label == descriptor.LABEL_REPEATED:
+                            str_value = str(
+                                [
+                                    descriptor.enum_type.values[index].name
+                                    for index in value
+                                ]
+                            )
+
+                    child.setValue(str(str_value))
 
     def toggle_visibility(self):
         """
