@@ -316,7 +316,7 @@ class HrvoSimulator
     // NOTE: This value must be >= 0
     static constexpr float BALL_AGENT_RADIUS_OFFSET = 0.1f;
 
-    // The maximum distance which Hrvo Agents will look for neighbors, in meters.
+    // The maximum distance which HRVO Agents will look for neighbors, in meters.
     // A large radius picked to allow for far visibility of neighbors so Agents have
     // enough space to decelerate and avoid collisions.
     static constexpr float MAX_NEIGHBOR_SEARCH_DIST = 2.5f;

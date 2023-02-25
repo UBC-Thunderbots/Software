@@ -304,7 +304,7 @@ Vector HrvoSimulator::getRobotVelocity(unsigned int robot_id) const
         return hrvo_agent.value()->getVelocity();
     }
     LOG(WARNING) << "Velocity for robot " << robot_id
-                 << " can not be found since it does not exist in Hrvo Simulator"
+                 << " can not be found since it does not exist in HRVO Simulator"
                  << std::endl;
     return Vector();
 }
