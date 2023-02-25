@@ -136,3 +136,14 @@ std::unique_ptr<TbotsProto::PassVisualization> createPassVisualization(
  */
 std::unique_ptr<TbotsProto::SimulationStartedTrigger> createSimulationStartedTrigger(const bool sim_started_trigger);
 
+/**
+ * Returns a cost visualization given a vector of costs
+ *
+ * @param costs A vector of costs to visualize
+ * @param num_rows The number of rows to display in the cost visualization
+ * @param num_cols The number of columns to display in the cost visualization
+ *
+ * @return The unique_ptr to a CostVisualization proto
+ */
+std::unique_ptr<TbotsProto::CostVisualization> createCostVisualization(
+    const std::vector<double>& costs, int num_rows, int num_cols);

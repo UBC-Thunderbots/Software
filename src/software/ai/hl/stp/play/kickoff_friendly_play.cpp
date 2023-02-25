@@ -67,7 +67,7 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
     // move tactics to use to move to positions defined above
     std::vector<std::shared_ptr<MoveTactic>> move_tactics = {
-        std::make_shared<MoveTactic>(), std::make_shared<MoveTactic>(),
+        std::make_shared<PrepareKickoffMoveTactic>(), std::make_shared<MoveTactic>(),
         std::make_shared<MoveTactic>(), std::make_shared<MoveTactic>(),
         std::make_shared<MoveTactic>()};
 
@@ -106,8 +106,8 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
         PriorityTacticVector result = {{}};
 
-        // TODO This needs to be adjusted post field testing, ball needs to land exactly
-        // in the middle of the enemy field
+        // TODO (#2612): This needs to be adjusted post field testing, ball needs to land
+        // exactly in the middle of the enemy field
         kickoff_chip_tactic->updateControlParams(
             world.ball().position(),
             world.field().centerPoint() + Vector(world.field().xLength() / 6, 0));
