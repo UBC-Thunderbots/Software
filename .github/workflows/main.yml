@@ -124,23 +124,6 @@ jobs:
             //software/simulated_tests/...   \
             //software/ai/hl/...
 
-  ubuntu-18-software-tests:
-    name: Ubuntu 18 Software Tests
-    runs-on: ubuntu-18.04
-    steps:
-      # checks-out the repository under $GITHUB_WORKSPACE
-      - uses: actions/checkout@v2
-
-      - name: Environment Setup
-        run: |
-          "${GITHUB_WORKSPACE}"/environment_setup/setup_software.sh
-
-      - name: Software Geom Test
-        run: |
-          cd src
-          bazel test --show_timestamps       \
-            //software/geom/...
-
   autorefd-game:
     name: AutoRef'd Game (3 Minutes)
     runs-on: ubuntu-20.04
@@ -176,5 +159,3 @@ jobs:
           name: yellow-ai-vs-ai-proto-logs
           path: |
             /tmp/tbots/yellow/logs
-
-
