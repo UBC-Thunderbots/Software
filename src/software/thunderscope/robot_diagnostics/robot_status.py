@@ -44,25 +44,26 @@ class RobotStatusView(QWidget):
 
     def update(self, new_message, *path):
         """
-        Updates the tree with new values from a new message
+        Updates the tree with new values from a new message if the tree is visible
         :param new_message: the new message to get values from
         :param path: the path of the current message
                       string args starting from the highest parent field
         :return:
         """
 
-        for descriptor in new_message.DESCRIPTOR.fields:
-            key = descriptor.name
-            value = getattr(new_message, descriptor.name)
+        if self.robot_status_visible:
+            for descriptor in new_message.DESCRIPTOR.fields:
+                key = descriptor.name
+                value = getattr(new_message, descriptor.name)
 
-            # if a nested message is found, keep searching for the value
-            if descriptor.type == descriptor.TYPE_MESSAGE:
-                self.update(value, *path, key)
-            else:
-                # if value is found, update tree
-                child = self.param_group.child(*path, key)
+                # if a nested message is found, keep searching for the value
+                if descriptor.type == descriptor.TYPE_MESSAGE:
+                    self.update(value, *path, key)
+                else:
+                    # if value is found, update tree
+                    child = self.param_group.child(*path, key)
 
-                child.setValue(str(value))
+                    child.setValue(str(value))
 
     def toggle_visibility(self):
         """

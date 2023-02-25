@@ -51,6 +51,7 @@ class RobotViewComponent(QWidget):
             self.robot_status.toggle_visibility
         )
 
+        self.layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(self.layout)
 
 
