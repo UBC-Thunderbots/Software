@@ -124,6 +124,27 @@ def __create_parameter_read_only(key, value, descriptor):
     return {"name": key, "type": "str", "value": value, "readonly": True}
 
 
+def get_string_val(descriptor, value):
+    """
+    Converts the given value to a string depending on the descriptor type
+    :param descriptor: the descriptor of the current value
+    :param value: the value to convert
+    :return: A string version of the value
+    """
+    if descriptor.type in [
+        descriptor.TYPE_DOUBLE,
+        descriptor.TYPE_FLOAT,
+    ]:
+        return "%.2f" % value
+    elif descriptor.type == descriptor.TYPE_ENUM:
+        if type(value) == int:
+            return descriptor.enum_type.values[value].name
+        elif descriptor.label == descriptor.LABEL_REPEATED:
+            return str([descriptor.enum_type.values[index].name for index in value])
+    else:
+        return str(value)
+
+
 def config_proto_to_field_list(
     message, read_only=False, search_term=None, search_filter_threshold=60
 ):
@@ -164,18 +185,11 @@ def config_proto_to_field_list(
             )
 
         elif read_only:
-            string_val = str(value)
-            if descriptor.type in [descriptor.TYPE_DOUBLE, descriptor.TYPE_FLOAT]:
-                string_val = "%.2f" % value
-            elif descriptor.type == descriptor.TYPE_ENUM:
-                if type(value) == int:
-                    string_val = descriptor.enum_type.values[value].name
-                elif descriptor.label == descriptor.LABEL_REPEATED:
-                    string_val = str(
-                        [descriptor.enum_type.values[index].name for index in value]
-                    )
-
-            field_list.append(__create_parameter_read_only(key, string_val, descriptor))
+            field_list.append(
+                __create_parameter_read_only(
+                    key, get_string_val(descriptor, value), descriptor
+                )
+            )
 
         elif descriptor.type == descriptor.TYPE_BOOL:
             field_list.append(__create_bool_parameter(key, value, descriptor))

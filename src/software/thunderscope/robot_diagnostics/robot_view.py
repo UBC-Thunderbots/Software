@@ -119,12 +119,5 @@ class RobotView(QScrollArea):
         """
         robot_status = self.robot_status_buffer.get(block=False, return_cached=False)
 
-        robot_status = RobotStatus(
-            robot_id=5,
-            power_status=PowerStatus(breakbeam_tripped=True, battery_voltage=20,),
-            error_code=[ErrorCode.NO_ERROR],
-            thunderloop_status=ThunderloopStatus(network_service_poll_time_ns=4),
-        )
-
         if robot_status is not None:
             self.robot_view_widgets[robot_status.robot_id].update(robot_status)

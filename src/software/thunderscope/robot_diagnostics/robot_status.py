@@ -61,26 +61,9 @@ class RobotStatusView(QWidget):
                 else:
                     # if value is found, update tree
                     child = self.param_group.child(*path, key)
-
-                    str_value = str(value)
-
-                    if descriptor.type in [
-                        descriptor.TYPE_DOUBLE,
-                        descriptor.TYPE_FLOAT,
-                    ]:
-                        str_value = "%.2f" % value
-                    elif descriptor.type == descriptor.TYPE_ENUM:
-                        if type(value) == int:
-                            str_value = descriptor.enum_type.values[value].name
-                        elif descriptor.label == descriptor.LABEL_REPEATED:
-                            str_value = str(
-                                [
-                                    descriptor.enum_type.values[index].name
-                                    for index in value
-                                ]
-                            )
-
-                    child.setValue(str(str_value))
+                    child.setValue(
+                        proto_parameter_tree_util.get_string_val(descriptor, value)
+                    )
 
     def toggle_visibility(self):
         """
