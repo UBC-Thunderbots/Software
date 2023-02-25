@@ -148,6 +148,19 @@ class Thunderscope(object):
         self.window.setCentralWidget(self.tabs)
         self.window.setWindowTitle("Thunderscope")
 
+        simulationToolBar = self.window.addToolBar("simulation")
+        pauseSim = QAction("Pause", self)
+        simulationToolBar.addAction(self, "pause")
+        self.toolButton = QtWidgets.QToolButton(self.window)
+        #pauseButton = QToolButton()
+        #pauseButton.setText("pause")
+        #pauseButton.setCheckable(True)
+        #pauseButton.setAutoExclusive(True)
+        #simulationToolBar.addWidget(pauseButton)
+
+        #pauseAction =
+
+
         # ProtoUnixIOs
         #
         # NOTE: Simulated tests need to be able to run without Thunderscope
