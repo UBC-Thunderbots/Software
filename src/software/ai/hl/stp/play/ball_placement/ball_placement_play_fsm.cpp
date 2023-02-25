@@ -2,9 +2,50 @@
 
 BallPlacementPlayFSM::BallPlacementPlayFSM(TbotsProto::AiConfig ai_config)
     : ai_config(ai_config),
-      place_ball_tactic(std::make_shared<DribbleTactic>(ai_config)),
+      pivot_kick_tactic(std::make_shared<PivotKickTactic>(ai_config)),
+      place_ball_tactic(std::make_shared<PlaceBallTactic>(ai_config)),
       move_tactics(std::vector<std::shared_ptr<MoveTactic>>())
 {
+}
+
+void BallPlacementPlayFSM::kickOffWall(const Update &event)
+{
+    PriorityTacticVector tactics_to_run = {{}};
+
+    Point ball_pos = event.common.world.ball().position();
+    Rectangle field_boundary = event.common.world.field().fieldBoundary();
+    AutoChipOrKick auto_chick = {AutoChipOrKickMode::AUTOKICK, 0.5};
+
+    Angle kick_angle;
+    if (ball_pos.x() > field_boundary.xMax()) {
+        if (ball_pos.y() > 0) {
+            kick_angle.fromDegrees(-45);
+        } else {
+            kick_angle.fromDegrees(45);
+        }
+    } else if (ball_pos.x() < field_boundary.xMin()) {
+        if (ball_pos.y() > 0) {
+            kick_angle.fromDegrees(-135);
+        } else {
+            kick_angle.fromDegrees(-135);
+        }
+    } else if (ball_pos.y() > field_boundary.yMax()) {
+        if (ball_pos.x() > 0) {
+            kick_angle.fromDegrees(135);
+        } else {
+            kick_angle.fromDegrees(45);
+        }
+    } else if (ball_pos.y() < field_boundary.yMin()) {
+        if (ball_pos.x() > 0) {
+            kick_angle.fromDegrees(-135);
+        } else {
+            kick_angle.fromDegrees(-45);
+        }
+    }
+
+    pivot_kick_tactic->updateControlParams(ball_pos, kick_angle, auto_chick);
+    tactics_to_run[0].emplace_back(pivot_kick_tactic);
+    event.common.set_tactics(tactics_to_run);
 }
 
 void BallPlacementPlayFSM::placeBall(const Update &event)
@@ -44,4 +85,22 @@ void BallPlacementPlayFSM::placeBall(const Update &event)
                              move_tactics.end());
     tactics_to_run[0].emplace_back(place_ball_tactic);
     event.common.set_tactics(tactics_to_run);
+}
+
+bool BallPlacementPlayFSM::shouldKickOffWall(const Update &event)
+{
+    // check if ball is too close to border
+    Point ball_pos = event.common.world.ball().position();
+    Rectangle field_boundary = event.common.world.field().fieldBoundary();
+
+    return !contains(field_boundary, ball_pos);
+}
+
+bool BallPlacementPlayFSM::kickDone(const Update &event)
+{
+    const auto ball_velocity = event.common.world.ball().velocity().length();
+    const auto ball_shot_threshold =
+            this->ai_config.shoot_or_pass_play_config().ball_shot_threshold();
+
+    return ball_velocity > ball_shot_threshold;
 }

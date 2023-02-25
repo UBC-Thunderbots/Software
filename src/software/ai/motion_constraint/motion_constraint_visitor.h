@@ -40,6 +40,7 @@ class MotionConstraintVisitor : public TacticVisitor
     void visit(const PivotKickTactic &tactic) override;
     void visit(const MoveGoalieToGoalLineTactic &tactic) override;
     void visit(const PrepareKickoffMoveTactic &tactic) override;
+    void visit(const PlaceBallTactic &tactic) override;
 
     /**
      * Gets the motion constraints updated with the requirements of the tactics
