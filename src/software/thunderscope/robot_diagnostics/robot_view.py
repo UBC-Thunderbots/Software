@@ -29,7 +29,7 @@ class RobotViewComponent(QWidget):
         """
         Sets up a Robot Info Widget and a Robot Status Widget for each robot
 
-        Sets the Robot Status widget to show / hide upon button click
+        Sets the Robot Status widget to None so that it can be added later on button click
 
         :param id: id of the current robot
         :param available_control_modes: the currently available input modes for the robots
@@ -44,15 +44,25 @@ class RobotViewComponent(QWidget):
         self.robot_info = RobotInfo(id, available_control_modes, control_mode_signal)
         self.layout.addWidget(self.robot_info)
 
-        self.robot_status = RobotStatusView()
-        self.layout.addWidget(self.robot_status)
+        self.robot_status = None
 
-        self.robot_info.robot_status_expand.clicked.connect(
-            self.robot_status.toggle_visibility
-        )
+        self.robot_info.robot_status_expand.clicked.connect(self.robot_status_expand)
 
         self.layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(self.layout)
+
+    def robot_status_expand(self):
+        """
+        Handles the info button click event from the Robot Info widget
+        If robot status widget is not defined, initialises one and adds it to this layout
+        If robot status widget is defined, toggles its visibility
+        """
+        if self.robot_status:
+            self.robot_status.toggle_visibility()
+        else:
+            self.robot_status = RobotStatusView()
+            self.layout.addWidget(self.robot_status)
+            self.robot_status.toggle_visibility()
 
 
 class RobotView(QScrollArea):
