@@ -20,7 +20,8 @@
 
 ErForceSimulator::ErForceSimulator(const TbotsProto::FieldType& field_type,
                                    const RobotConstants_t& robot_constants,
-                                   std::unique_ptr<RealismConfigErForce>& realism_config)
+                                   std::unique_ptr<RealismConfigErForce>& realism_config,
+                                   const bool ramping)
     : yellow_team_world_msg(std::make_unique<TbotsProto::World>()),
       blue_team_world_msg(std::make_unique<TbotsProto::World>()),
       frame_number(0),
@@ -28,7 +29,8 @@ ErForceSimulator::ErForceSimulator(const TbotsProto::FieldType& field_type,
       robot_constants(robot_constants),
       field(Field::createField(field_type)),
       blue_robot_with_ball(std::nullopt),
-      yellow_robot_with_ball(std::nullopt)
+      yellow_robot_with_ball(std::nullopt),
+      ramping(ramping)
 {
     QString full_filename = CONFIG_DIRECTORY;
 
@@ -355,31 +357,46 @@ void ErForceSimulator::setRobotPrimitive(
 SSLSimulationProto::RobotControl ErForceSimulator::updateSimulatorRobots(
     std::unordered_map<unsigned int, std::shared_ptr<PrimitiveExecutor>>&
         robot_primitive_executor_map,
-    const TbotsProto::World& world_msg)
+    const TbotsProto::World& world_msg,
+    gameController::Team side)
 {
     SSLSimulationProto::RobotControl robot_control;
+
+    auto sim_state             = getSimulatorState();
+    std::map<RobotId, std::pair<Vector, Angle>> current_velocity_map;
+    if (side == gameController::Team::BLUE)
+    {
+        const auto& sim_robots     = sim_state.yellow_robots();
+        current_velocity_map  = getRobotIdToLocalVelocityMap(sim_robots);
+    }
+    else
+    {
+        const auto& sim_robots     = sim_state.blue_robots();
+        current_velocity_map  = getRobotIdToLocalVelocityMap(sim_robots);
+    }
 
     for (auto& primitive_executor_with_id : robot_primitive_executor_map)
     {
         unsigned int robot_id    = primitive_executor_with_id.first;
         auto& primitive_executor = primitive_executor_with_id.second;
-        auto direct_control      = primitive_executor->stepPrimitive();
+        std::unique_ptr<TbotsProto::DirectControlPrimitive> direct_control;
 
-        auto sim_state             = getSimulatorState();
-        const auto& sim_robots     = sim_state.blue_robots();
-        auto current_velocity_map  = getRobotIdToLocalVelocityMap(sim_robots);
-
-        // this code ramps the target velocity which we get from the primitive executor's primitive
-        // ramping is done to make sure the wheel motors aren't spinning too fast
-        // this returns the same primitive with modified velocity values
-        // makes simulator robots move slower (more realistic)
-        auto ramped_direct_control = euclidean_to_four_wheel.rampWheelVelocity(
-            current_velocity_map.at(robot_id), *direct_control,
-            primitive_executor_time_step);
+        if (ramping)
+        {
+            auto direct_control_no_ramp = primitive_executor->stepPrimitive();
+            direct_control = euclidean_to_four_wheel.rampWheelVelocity(
+                    current_velocity_map.at(robot_id), *direct_control_no_ramp,
+                    primitive_executor_time_step);
+        }
+        else
+        {
+            direct_control = primitive_executor->stepPrimitive();
+        }
 
         auto command = *getRobotCommandFromDirectControl(
-            robot_id, std::move(ramped_direct_control), robot_constants);
+                robot_id, std::move(direct_control), robot_constants);
         *(robot_control.mutable_robot_commands()->Add()) = command;
+
     }
     return robot_control;
 }
@@ -389,10 +406,10 @@ void ErForceSimulator::stepSimulation(const Duration& time_step)
     current_time = current_time + time_step;
 
     SSLSimulationProto::RobotControl yellow_robot_control =
-        updateSimulatorRobots(yellow_primitive_executor_map, *yellow_team_world_msg);
+        updateSimulatorRobots(yellow_primitive_executor_map, *yellow_team_world_msg, gameController::Team::YELLOW);
 
     SSLSimulationProto::RobotControl blue_robot_control =
-        updateSimulatorRobots(blue_primitive_executor_map, *blue_team_world_msg);
+        updateSimulatorRobots(blue_primitive_executor_map, *blue_team_world_msg, gameController::Team::BLUE);
 
     auto yellow_radio_responses =
         er_force_sim->acceptYellowRobotControlCommand(yellow_robot_control);

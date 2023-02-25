@@ -29,7 +29,8 @@ class ErForceSimulator
      */
     explicit ErForceSimulator(const TbotsProto::FieldType& field_type,
                               const RobotConstants_t& robot_constants,
-                              std::unique_ptr<RealismConfigErForce>& realism_config);
+                              std::unique_ptr<RealismConfigErForce>& realism_config,
+                              const bool ramping = false);
     ErForceSimulator()  = delete;
     ~ErForceSimulator() = default;
 
@@ -181,7 +182,8 @@ class ErForceSimulator
     SSLSimulationProto::RobotControl updateSimulatorRobots(
         std::unordered_map<unsigned int, std::shared_ptr<PrimitiveExecutor>>&
             robot_primitive_executor_map,
-        const TbotsProto::World& world_msg);
+        const TbotsProto::World& world_msg,
+        gameController::Team side);
 
     TbotsProto::DirectControlPrimitive rampVelocity(
         TbotsProto::DirectControlPrimitive& direct_control);
@@ -209,6 +211,8 @@ class ErForceSimulator
 
     std::optional<RobotId> blue_robot_with_ball;
     std::optional<RobotId> yellow_robot_with_ball;
+
+    bool ramping;
 
     const QString CONFIG_FILE      = "simulator/2020";
     const QString CONFIG_DIRECTORY = "extlibs/er_force_sim/config/";

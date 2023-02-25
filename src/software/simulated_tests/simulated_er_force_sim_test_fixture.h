@@ -61,7 +61,8 @@ class SimulatedErForceSimTestFixture : public ::testing::Test
         const std::vector<RobotStateWithId> &enemy_robots,
         const std::vector<ValidationFunction> &terminating_validation_functions,
         const std::vector<ValidationFunction> &non_terminating_validation_functions,
-        const Duration &timeout);
+        const Duration &timeout,
+        const bool ramping = false);
 
     /**
      * Registers a new tick time for calculating friendly tick time statistics
