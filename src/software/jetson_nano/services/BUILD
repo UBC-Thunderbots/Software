@@ -43,3 +43,11 @@ cc_library(
         "@boost//:asio",
     ],
 )
+
+cc_test(
+    name = "robot_auto_test",
+    srcs = ["robot_auto_test.cpp"],
+    deps = [
+        "//shared/test_util:tbots_gtest_main",
+    ],
+)
