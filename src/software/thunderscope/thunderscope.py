@@ -3,7 +3,6 @@ import time
 import textwrap
 import shelve
 import signal
-import platform
 import logging
 
 # Unfortunately, PyQt6 doesn't install on Ubuntu 18. Thankfully both

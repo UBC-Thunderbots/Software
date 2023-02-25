@@ -13,8 +13,6 @@ from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
 from proto.ssl_gc_geometry_pb2 import Vector2
 
-# TODO (#2599): Remove Duration parameter from test
-
 # test duration global constant
 TEST_DURATION = 20
 
