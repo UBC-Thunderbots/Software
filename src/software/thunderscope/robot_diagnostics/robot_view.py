@@ -57,12 +57,11 @@ class RobotViewComponent(QWidget):
         If robot status widget is not defined, initialises one and adds it to this layout
         If robot status widget is defined, toggles its visibility
         """
-        if self.robot_status:
-            self.robot_status.toggle_visibility()
-        else:
+        if not self.robot_status:
             self.robot_status = RobotStatusView()
             self.layout.addWidget(self.robot_status)
-            self.robot_status.toggle_visibility()
+
+        self.robot_status.toggle_visibility()
 
 
 class RobotView(QScrollArea):
