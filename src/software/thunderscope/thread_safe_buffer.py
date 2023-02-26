@@ -36,7 +36,7 @@ class ThreadSafeBuffer(object):
         self.protos_dropped = 0
         self.last_logged_protos_dropped = 0
 
-    def get(self, block=False, timeout=None):
+    def get(self, block=False, timeout=None, return_cached=True):
         """Get data from the buffer. If the buffer is empty, and
         block is True, wait until a new msg is received. If block
         is False, then return a cached value immediately.
@@ -44,6 +44,8 @@ class ThreadSafeBuffer(object):
         :param block: If block is True, then block until a new message
                       comes through. Otherwise returned the cached msg.
         :param timeout: If block is True, then wait for this many seconds
+        :param return_cached: If queue is empty, decides whether to
+                              return cached value (True) or return None (false)
 
         :return: protobuf (cached if block is False and there is no data
                  in the buffer)
@@ -69,20 +71,22 @@ class ThreadSafeBuffer(object):
             self.cached_msg = self.queue.get_nowait()
 
         except queue.Empty as empty:
-            pass
+            if not return_cached:
+                return None
 
         return self.cached_msg
 
-    def put(self, proto, block=False):
+    def put(self, proto, block=False, timeout=None):
         """Put data into the buffer. If the buffer is full, then
         the proto will be logged.
 
         :param proto: The proto to place in the buffer
         :param block: Should block until there is space in the buffer
+        :param timeout: If block is True, then wait for this many seconds
 
         """
         if block:
-            self.queue.put(proto)
+            self.queue.put(proto, block, timeout)
             return
 
         try:

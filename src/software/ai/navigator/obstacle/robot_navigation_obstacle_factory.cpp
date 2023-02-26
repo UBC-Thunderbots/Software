@@ -62,6 +62,25 @@ RobotNavigationObstacleFactory::createStaticObstaclesFromMotionConstraint(
             obstacles.push_back(createFromFieldRectangle(
                 field.enemyHalf(), field.fieldLines(), field.fieldBoundary()));
             break;
+        case TbotsProto::MotionConstraint::ENEMY_HALF_WITHOUT_CENTRE_CIRCLE:
+        {
+            double radius                        = field.centerCircleRadius();
+            Polygon centre_circle_and_enemy_half = Polygon(
+                {Point(-robot_radius_expansion_amount,
+                       field.fieldBoundary().yLength() / 2),
+                 Point(-robot_radius_expansion_amount, radius), Point(0, radius),
+                 Point(radius * std::cos(M_PI / 4), radius * std::sin(M_PI / 4)),
+                 Point(radius, 0),
+                 Point(radius * std::cos(M_PI / 4), -radius * std::sin(M_PI / 4)),
+                 Point(0, -radius), Point(-robot_radius_expansion_amount, -radius),
+                 Point(-robot_radius_expansion_amount,
+                       -field.fieldBoundary().yLength() / 2),
+                 field.fieldBoundary().posXNegYCorner(),
+                 field.fieldBoundary().posXPosYCorner()});
+            obstacles.push_back(
+                std::make_shared<GeomObstacle<Polygon>>(centre_circle_and_enemy_half));
+            break;
+        }
         case TbotsProto::MotionConstraint::AVOID_FIELD_BOUNDARY_ZONE:
         {
             Rectangle field_walls    = field.fieldBoundary();
@@ -126,6 +145,9 @@ RobotNavigationObstacleFactory::createDynamicObstaclesFromMotionConstraint(
             // not handled by this obstacle factory since it's a static obstacle
             break;
         case TbotsProto::MotionConstraint::ENEMY_HALF:
+            // not handled by this obstacle factory since it's a static obstacle
+            break;
+        case TbotsProto::MotionConstraint::ENEMY_HALF_WITHOUT_CENTRE_CIRCLE:
             // not handled by this obstacle factory since it's a static obstacle
             break;
         case TbotsProto::MotionConstraint::AVOID_FIELD_BOUNDARY_ZONE:

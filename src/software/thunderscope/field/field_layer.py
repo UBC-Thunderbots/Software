@@ -3,6 +3,7 @@ import pyqtgraph as pg
 from pyqtgraph.Qt import QtCore, QtGui
 from proto.geometry_pb2 import Point, Angle, Segment
 from proto.primitive_pb2 import Obstacles
+import software.thunderscope.common.common_widgets as common_widgets
 from software.py_constants import *
 
 
@@ -63,11 +64,12 @@ class FieldLayer(pg.GraphicsObject):
         :param orientation: Proto Angle representing the orientation of robot
         :param painter: The painter object to draw robot with
         """
-        convert_degree = -16
-        painter.drawChord(
+
+        common_widgets.draw_robot(
+            painter,
             self.createCircle(position, ROBOT_MAX_RADIUS_METERS),
-            int((math.degrees(orientation.radians) + 45)) * convert_degree,
-            270 * convert_degree,
+            int((math.degrees(orientation.radians) + 45)),
+            270,
         )
 
     def drawSegment(self, segment: Segment, painter):

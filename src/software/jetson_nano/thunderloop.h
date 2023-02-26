@@ -99,6 +99,11 @@ class Thunderloop
     std::string network_interface_;
     int loop_hz_;
 
+    // Calibrated power service constants
+    int kick_slope_;
+    int kick_constant_;
+    int chip_pulse_width_;
+
     // Primitive Executor
     PrimitiveExecutor primitive_executor_;
 

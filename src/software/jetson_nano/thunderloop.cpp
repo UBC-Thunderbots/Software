@@ -21,23 +21,41 @@ extern int clock_nanosleep(clockid_t __clock_id, int __flags,
 
 Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, const int loop_hz)
     // TODO (#2495): Set the friendly team colour once we receive World proto
-    : robot_id_(MAX_ROBOT_IDS + 1),  // Initialize to a robot ID that is not valid
-      primitive_executor_(1.0 / loop_hz, robot_constants, TeamColour::YELLOW, robot_id_)
+    : redis_client_(
+          std::make_unique<RedisClient>(REDIS_DEFAULT_HOST, REDIS_DEFAULT_PORT)),
+      robot_constants_(robot_constants),
+      robot_id_(std::stoi(redis_client_->getSync(ROBOT_ID_REDIS_KEY))),
+      channel_id_(std::stoi(redis_client_->getSync(ROBOT_MULTICAST_CHANNEL_REDIS_KEY))),
+      network_interface_(redis_client_->getSync(ROBOT_NETWORK_INTERFACE_REDIS_KEY)),
+      loop_hz_(loop_hz),
+      kick_slope_(std::stoi(redis_client_->getSync(ROBOT_KICK_SLOPE_REDIS_KEY))),
+      kick_constant_(std::stoi(redis_client_->getSync(ROBOT_KICK_CONSTANT_REDIS_KEY))),
+      chip_pulse_width_(
+          std::stoi(redis_client_->getSync(ROBOT_CHIP_PULSE_WIDTH_REDIS_KEY))),
+      primitive_executor_(loop_hz, robot_constants, TeamColour::YELLOW, robot_id_)
 {
-    channel_id_      = 0;
-    loop_hz_         = loop_hz;
-    robot_constants_ = robot_constants;
+    NetworkLoggerSingleton::initializeLogger(channel_id_, network_interface_, robot_id_);
+    LOG(INFO)
+        << "THUNDERLOOP: Network Logger initialized! Next initializing Network Service";
 
-    redis_client_ = std::make_unique<RedisClient>(REDIS_DEFAULT_HOST, REDIS_DEFAULT_PORT);
-
-    auto robot_id   = std::stoi(redis_client_->get(ROBOT_ID_REDIS_KEY));
-    auto channel_id = std::stoi(redis_client_->get(ROBOT_MULTICAST_CHANNEL_REDIS_KEY));
-    auto network_interface = redis_client_->get(ROBOT_NETWORK_INTERFACE_REDIS_KEY);
-
-    NetworkLoggerSingleton::initializeLogger(channel_id, network_interface, robot_id);
+    network_service_ = std::make_unique<NetworkService>(
+        std::string(ROBOT_MULTICAST_CHANNELS.at(channel_id_)) + "%" + network_interface_,
+        VISION_PORT, PRIMITIVE_PORT, ROBOT_STATUS_PORT, true);
+    LOG(INFO)
+        << "THUNDERLOOP: Network Service initialized! Next initializing Motor Service";
 
     motor_service_ = std::make_unique<MotorService>(robot_constants, loop_hz);
+    LOG(INFO)
+        << "THUNDERLOOP: Motor Service initialized! Next initializing Power Service";
+
     power_service_ = std::make_unique<PowerService>();
+    LOG(INFO) << "THUNDERLOOP: Power Service initialized!";
+
+    LOG(INFO) << "THUNDERLOOP: finished initialization with ROBOT ID: " << robot_id_
+              << ", CHANNEL ID: " << channel_id_
+              << ", and NETWORK INTERFACE: " << network_interface_;
+    LOG(INFO)
+        << "THUNDERLOOP: to update Thunderloop configuration, change REDIS store and restart Thunderloop";
 }
 
 Thunderloop::~Thunderloop() {}
@@ -83,35 +101,6 @@ Thunderloop::~Thunderloop() {}
 
             // Collect jetson status
             jetson_status_.set_cpu_temperature(getCpuTemperature());
-
-            // Grab the latest configs from redis
-            auto robot_id = std::stoi(redis_client_->get(ROBOT_ID_REDIS_KEY));
-            auto channel_id =
-                std::stoi(redis_client_->get(ROBOT_MULTICAST_CHANNEL_REDIS_KEY));
-            auto network_interface =
-                redis_client_->get(ROBOT_NETWORK_INTERFACE_REDIS_KEY);
-
-            // If any of the configs have changed, update the network service to switch
-            // to the new interface and channel with the correct robot ID
-            if (robot_id != robot_id_ || channel_id != channel_id_ ||
-                network_interface != network_interface_)
-            {
-                LOG(DEBUG) << "Switch over to Robot ID: " << robot_id
-                           << " Channel ID: " << channel_id
-                           << " Network Interface: " << network_interface;
-
-                // Update the robot ID and channel ID
-                robot_id_          = robot_id;
-                channel_id_        = channel_id;
-                network_interface_ = network_interface;
-
-                primitive_executor_.setRobotId(robot_id_);
-
-                network_service_ = std::make_unique<NetworkService>(
-                    std::string(ROBOT_MULTICAST_CHANNELS.at(channel_id_)) + "%" +
-                        network_interface_,
-                    VISION_PORT, PRIMITIVE_PORT, ROBOT_STATUS_PORT, true);
-            }
 
             // Network Service: receive newest world, primitives and set out the last
             // robot status
@@ -164,22 +153,6 @@ Thunderloop::~Thunderloop() {}
             ScopedTimespecTimer::timespecDiff(&current_time, &last_world_recieved_time,
                                               &world_result);
 
-            auto nanoseconds_elapsed_since_last_world =
-                world_result.tv_sec * static_cast<int>(NANOSECONDS_PER_SECOND) +
-                world_result.tv_nsec;
-
-            if (nanoseconds_elapsed_since_last_world >
-                static_cast<long>(WORLD_TIMEOUT_NS))
-            {
-                primitive_executor_.setStopPrimitive();
-
-                // Log milliseconds since last world received if we are timing out
-                LOG(WARNING) << "World timeout, overriding with StopPrimitive\n"
-                             << "Milliseconds since last world: "
-                             << static_cast<int>(nanoseconds_elapsed_since_last_world) *
-                                    MILLISECONDS_PER_NANOSECOND;
-            }
-
             // Primitive Executor: run the last primitive if we have not timed out
             {
                 ScopedTimespecTimer timer(&poll_time);
@@ -217,16 +190,9 @@ Thunderloop::~Thunderloop() {}
             // Power Service: execute the power control command
             {
                 ScopedTimespecTimer timer(&poll_time);
-                auto kick_slope =
-                    std::stoi(redis_client_->get(ROBOT_KICK_SLOPE_REDIS_KEY));
-                auto kick_constant =
-                    std::stoi(redis_client_->get(ROBOT_KICK_CONSTANT_REDIS_KEY));
-                auto chip_pulse_width =
-                    std::stoi(redis_client_->get(ROBOT_CHIP_PULSE_WIDTH_REDIS_KEY));
-
                 power_status_ =
-                    power_service_->poll(direct_control_.power_control(), kick_slope,
-                                         kick_constant, chip_pulse_width);
+                    power_service_->poll(direct_control_.power_control(), kick_slope_,
+                                         kick_constant_, chip_pulse_width_);
             }
             thunderloop_status_.set_power_service_poll_time_ns(
                 static_cast<unsigned long>(poll_time.tv_nsec));
@@ -244,16 +210,18 @@ Thunderloop::~Thunderloop() {}
                 static_cast<unsigned long>(poll_time.tv_nsec));
 
             // Update Robot Status with poll responses
+            robot_status_.set_robot_id(robot_id_);
             *(robot_status_.mutable_thunderloop_status()) = thunderloop_status_;
             *(robot_status_.mutable_motor_status())       = motor_status_;
             *(robot_status_.mutable_power_status())       = power_status_;
             *(robot_status_.mutable_jetson_status())      = jetson_status_;
 
             // Update Redis
-            redis_client_->set(ROBOT_BATTERY_VOLTAGE_REDIS_KEY,
-                               std::to_string(power_status_.battery_voltage()));
-            redis_client_->set(ROBOT_CURRENT_DRAW_REDIS_KEY,
-                               std::to_string(power_status_.current_draw()));
+            redis_client_->setNoCommit(ROBOT_BATTERY_VOLTAGE_REDIS_KEY,
+                                       std::to_string(power_status_.battery_voltage()));
+            redis_client_->setNoCommit(ROBOT_CURRENT_DRAW_REDIS_KEY,
+                                       std::to_string(power_status_.current_draw()));
+            redis_client_->asyncCommit();
         }
 
         auto loop_duration =

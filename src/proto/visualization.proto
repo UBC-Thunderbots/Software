@@ -35,3 +35,10 @@ message HRVOVisualization
     repeated Circle robots                       = 3;
     repeated Obstacles dynamic_obstacles         = 4;
 }
+
+message CostVisualization
+{
+    uint32 num_rows      = 1;
+    uint32 num_cols      = 2;
+    repeated double cost = 3;
+}
