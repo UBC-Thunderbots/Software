@@ -5,7 +5,7 @@ cc_library(
     srcs = ["network.cpp"],
     hdrs = ["network.h"],
     deps = [
-        ":packet_tracker",
+        ":proto_tracker",
         "//proto:tbots_cc_proto",
         "//shared:robot_constants",
         "//software/logger",
@@ -16,10 +16,19 @@ cc_library(
 )
 
 cc_library(
-    name = "packet_tracker",
+    name = "proto_tracker",
     srcs = ["proto_tracker.cpp"],
     hdrs = ["proto_tracker.h"],
     deps = [
         "//software/logger",
+    ],
+)
+
+cc_test(
+    name = "proto_tracker_test",
+    srcs = ["proto_tracker_test.cpp",],
+    deps = [
+        ":proto_tracker",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )
