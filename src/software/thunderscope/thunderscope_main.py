@@ -185,6 +185,8 @@ if __name__ == "__main__":
         tscope = Thunderscope(
             layout_path=args.layout,
             visualization_buffer_size=args.visualization_buffer_size,
+            load_blue=True,
+            load_yellow=True,
             cost_visualization=args.cost_visualization,
         )
         proto_unix_io = tscope.blue_full_system_proto_unix_io
@@ -296,8 +298,11 @@ if __name__ == "__main__":
         tscope = Thunderscope(
             layout_path=args.layout,
             visualization_buffer_size=args.visualization_buffer_size,
+            load_blue=(args.blue_log is not None),
             blue_replay_log=args.blue_log,
+            load_yellow=(args.yellow_log is not None),
             yellow_replay_log=args.yellow_log,
+            load_gamecontroller=False,
             cost_visualization=args.cost_visualization,
         )
         tscope.show()
