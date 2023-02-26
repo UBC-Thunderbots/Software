@@ -54,13 +54,13 @@ HRVOAgent::HRVOAgent(HRVOSimulator *simulator, const Vector &position,
       // parameter is changed
       obstacle_factory(TbotsProto::RobotNavigationObstacleConfig())
 {
-    // Reduce the inflation factor by 1, since HRVO automatically takes into account the
+    // Reduce the inflation factor since HRVO automatically takes into account the
     // robot radius when avoiding obstacles
     auto obstacle_factory_config = TbotsProto::RobotNavigationObstacleConfig();
     double default_inflation_factor =
         obstacle_factory_config.robot_obstacle_inflation_factor();
     obstacle_factory_config.set_robot_obstacle_inflation_factor(default_inflation_factor -
-                                                                1.0);
+                                                                1.5);
     obstacle_factory = RobotNavigationObstacleFactory(obstacle_factory_config);
 }
 
