@@ -305,6 +305,12 @@ def load_command_line_arguments():
         help="The test filter, if not specified all tests will run. "
         + "See https://docs.pytest.org/en/latest/how-to/usage.html#specifying-tests-selecting-tests",
     )
+    parser.add_argument(
+        "--enable_realism",
+        action="store_true",
+        default=False,
+        help="Use realism in the simulator",
+    )
     return parser.parse_args()
 
 
@@ -337,7 +343,9 @@ def simulated_test_runner():
 
     # Launch all binaries
     with Simulator(
-        f"{args.simulator_runtime_dir}/test/{test_name}", args.debug_simulator
+        f"{args.simulator_runtime_dir}/test/{test_name}",
+        args.debug_simulator,
+        args.enable_realism,
     ) as simulator, FullSystem(
         f"{args.blue_full_system_runtime_dir}/test/{test_name}",
         args.debug_blue_full_system,
