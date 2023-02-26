@@ -174,8 +174,7 @@ void SimulatedErForceSimTestFixture::runTest(
     const std::vector<RobotStateWithId> &enemy_robots,
     const std::vector<ValidationFunction> &terminating_validation_functions,
     const std::vector<ValidationFunction> &non_terminating_validation_functions,
-    const Duration &timeout,
-    const bool ramping)
+    const Duration &timeout, const bool ramping)
 {
     const Duration simulation_time_step =
         Duration::fromSeconds(1.0 / SIMULATED_CAMERA_FPS);

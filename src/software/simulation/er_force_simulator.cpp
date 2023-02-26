@@ -357,22 +357,21 @@ void ErForceSimulator::setRobotPrimitive(
 SSLSimulationProto::RobotControl ErForceSimulator::updateSimulatorRobots(
     std::unordered_map<unsigned int, std::shared_ptr<PrimitiveExecutor>>&
         robot_primitive_executor_map,
-    const TbotsProto::World& world_msg,
-    gameController::Team side)
+    const TbotsProto::World& world_msg, gameController::Team side)
 {
     SSLSimulationProto::RobotControl robot_control;
 
-    auto sim_state             = getSimulatorState();
+    auto sim_state = getSimulatorState();
     std::map<RobotId, std::pair<Vector, Angle>> current_velocity_map;
     if (side == gameController::Team::BLUE)
     {
-        const auto& sim_robots     = sim_state.yellow_robots();
-        current_velocity_map  = getRobotIdToLocalVelocityMap(sim_robots);
+        const auto& sim_robots = sim_state.blue_robots();
+        current_velocity_map   = getRobotIdToLocalVelocityMap(sim_robots);
     }
     else
     {
-        const auto& sim_robots     = sim_state.blue_robots();
-        current_velocity_map  = getRobotIdToLocalVelocityMap(sim_robots);
+        const auto& sim_robots = sim_state.yellow_robots();
+        current_velocity_map   = getRobotIdToLocalVelocityMap(sim_robots);
     }
 
     for (auto& primitive_executor_with_id : robot_primitive_executor_map)
@@ -384,9 +383,9 @@ SSLSimulationProto::RobotControl ErForceSimulator::updateSimulatorRobots(
         if (ramping)
         {
             auto direct_control_no_ramp = primitive_executor->stepPrimitive();
-            direct_control = euclidean_to_four_wheel.rampWheelVelocity(
-                    current_velocity_map.at(robot_id), *direct_control_no_ramp,
-                    primitive_executor_time_step);
+            direct_control              = euclidean_to_four_wheel.rampWheelVelocity(
+                current_velocity_map.at(robot_id), *direct_control_no_ramp,
+                primitive_executor_time_step);
         }
         else
         {
@@ -394,9 +393,8 @@ SSLSimulationProto::RobotControl ErForceSimulator::updateSimulatorRobots(
         }
 
         auto command = *getRobotCommandFromDirectControl(
-                robot_id, std::move(direct_control), robot_constants);
+            robot_id, std::move(direct_control), robot_constants);
         *(robot_control.mutable_robot_commands()->Add()) = command;
-
     }
     return robot_control;
 }
@@ -406,10 +404,11 @@ void ErForceSimulator::stepSimulation(const Duration& time_step)
     current_time = current_time + time_step;
 
     SSLSimulationProto::RobotControl yellow_robot_control =
-        updateSimulatorRobots(yellow_primitive_executor_map, *yellow_team_world_msg, gameController::Team::YELLOW);
+        updateSimulatorRobots(yellow_primitive_executor_map, *yellow_team_world_msg,
+                              gameController::Team::YELLOW);
 
-    SSLSimulationProto::RobotControl blue_robot_control =
-        updateSimulatorRobots(blue_primitive_executor_map, *blue_team_world_msg, gameController::Team::BLUE);
+    SSLSimulationProto::RobotControl blue_robot_control = updateSimulatorRobots(
+        blue_primitive_executor_map, *blue_team_world_msg, gameController::Team::BLUE);
 
     auto yellow_radio_responses =
         er_force_sim->acceptYellowRobotControlCommand(yellow_robot_control);

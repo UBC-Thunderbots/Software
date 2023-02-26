@@ -105,10 +105,6 @@ WheelSpace_t EuclideanToWheel::rampWheelVelocity(
     auto max_delta_target_wheel_velocity =
         delta_target_wheel_velocity.cwiseAbs().maxCoeff();
 
-    std::cout << "Max Delta" << std::endl;
-    std::cout << toString(max_delta_target_wheel_velocity) << std::endl;
-    std::cout << "allowable delta" << std::endl;
-    std::cout << toString(allowable_delta_wheel_velocity) << std::endl;
     // Step 2: Compare max delta velocity against the calculated maximum
     if (max_delta_target_wheel_velocity > allowable_delta_wheel_velocity)
     {
@@ -139,13 +135,10 @@ WheelSpace_t EuclideanToWheel::rampWheelVelocity(
 }
 
 std::unique_ptr<TbotsProto::DirectControlPrimitive> EuclideanToWheel::rampWheelVelocity(
-    const std::pair<Vector, AngularVelocity> current_local_velocity ,
+    const std::pair<Vector, AngularVelocity> current_local_velocity,
     TbotsProto::DirectControlPrimitive& target_velocity_primitive,
     const double& time_to_ramp)
 {
-    std::cout << "Current vel:" << std::endl;
-    std::cout << toString(current_local_velocity.first.x()) << std::endl;
-    std::cout << toString(current_local_velocity.first.y()) << std::endl;
     EuclideanSpace_t target_euclidean_velocity = EuclideanSpace_t::Zero();
 
     TbotsProto::MotorControl motor_control = target_velocity_primitive.motor_control();
@@ -171,9 +164,9 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> EuclideanToWheel::rampWheelV
             direct_velocity.angular_velocity().radians_per_second()};
     }
 
-    EuclideanSpace_t current_euclidean_velocity = {-current_local_velocity.first.y(),
-                                                   current_local_velocity.first.x(),
-                                                   current_local_velocity.second.toRadians()};
+    EuclideanSpace_t current_euclidean_velocity = {
+        -current_local_velocity.first.y(), current_local_velocity.first.x(),
+        current_local_velocity.second.toRadians()};
 
     WheelSpace_t current_four_wheel_velocity =
         getWheelVelocity(current_euclidean_velocity);

@@ -182,8 +182,7 @@ class ErForceSimulator
     SSLSimulationProto::RobotControl updateSimulatorRobots(
         std::unordered_map<unsigned int, std::shared_ptr<PrimitiveExecutor>>&
             robot_primitive_executor_map,
-        const TbotsProto::World& world_msg,
-        gameController::Team side);
+        const TbotsProto::World& world_msg, gameController::Team side);
 
     TbotsProto::DirectControlPrimitive rampVelocity(
         TbotsProto::DirectControlPrimitive& direct_control);
