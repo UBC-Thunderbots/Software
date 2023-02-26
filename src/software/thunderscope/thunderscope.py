@@ -1,4 +1,3 @@
-import os
 import time
 import textwrap
 import shelve
@@ -66,7 +65,9 @@ from software.thunderscope.replay.proto_player import ProtoPlayer
 
 SAVED_LAYOUT_PATH = "/opt/tbotspython/saved_tscope_layout"
 LAYOUT_FILE_EXTENSION = "tscopelayout"
-LAST_OPENED_LAYOUT_PATH = f"{SAVED_LAYOUT_PATH}/last_opened_tscope_layout.{LAYOUT_FILE_EXTENSION}"
+LAST_OPENED_LAYOUT_PATH = (
+    f"{SAVED_LAYOUT_PATH}/last_opened_tscope_layout.{LAYOUT_FILE_EXTENSION}"
+)
 GAME_CONTROLLER_URL = "http://localhost:8081"
 
 
@@ -247,14 +248,13 @@ class Thunderscope(object):
 
     def reset_layout(self):
         """Reset the layout to the default layout"""
-
-        if os.path.exists(SAVED_LAYOUT_PATH):
-            os.remove(SAVED_LAYOUT_PATH)
-            QMessageBox.information(
-                self.window,
-                "Restart Required",
-                "Restart thunderscope to reset the layout.",
-            )
+        saved_layout_path = pathlib.Path(LAST_OPENED_LAYOUT_PATH)
+        saved_layout_path.unlink(missing_ok=True)
+        QMessageBox.information(
+            self.window,
+            "Restart Required",
+            "Restart thunderscope to reset the layout.",
+        )
 
     def save_layout(self):
         """Open a file dialog to save the layout and any other
@@ -265,7 +265,9 @@ class Thunderscope(object):
         try:
             pathlib.Path(SAVED_LAYOUT_PATH).mkdir(exist_ok=True)
         except FileNotFoundError:
-            logging.warning(f"Could not create folder at '{SAVED_LAYOUT_PATH}' for layout files")
+            logging.warning(
+                f"Could not create folder at '{SAVED_LAYOUT_PATH}' for layout files"
+            )
 
         filename, _ = QtGui.QFileDialog.getSaveFileName(
             self.window,
@@ -291,7 +293,6 @@ class Thunderscope(object):
             shelf[
                 "robot_diagnostics_dock_state"
             ] = self.robot_diagnostics_dock_area.saveState()
-# TODO: Remove qt.webenginecontext prints
 
     def load_layout(self, filename=None):
         """Open a file dialog to load the layout and state to all widgets
@@ -305,7 +306,7 @@ class Thunderscope(object):
             filename, _ = QtGui.QFileDialog.getOpenFileName(
                 self.window,
                 "Open layout",
-                f"{SAVED_LAYOUT_PATH}/", # TODO: If folder doesn't exist does this throw
+                f"{SAVED_LAYOUT_PATH}/",
                 options=QFileDialog.Option.DontUseNativeDialog,
             )
 
