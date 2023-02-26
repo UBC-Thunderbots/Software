@@ -26,7 +26,7 @@ cc_library(
 
 cc_test(
     name = "proto_tracker_test",
-    srcs = ["proto_tracker_test.cpp",],
+    srcs = ["proto_tracker_test.cpp"],
     deps = [
         ":proto_tracker",
         "//shared/test_util:tbots_gtest_main",

@@ -2,15 +2,18 @@
 
 #include <gtest/gtest.h>
 
-TEST(ProtoTrackerTest, no_loss_rate) {
+TEST(ProtoTrackerTest, no_loss_rate)
+{
     ProtoTracker tracker = ProtoTracker("");
-    for (int i = 0; i <= 5; i++) {
+    for (int i = 0; i <= 5; i++)
+    {
         tracker.send(i);
         EXPECT_EQ(0, tracker.getLossRate());
     }
 }
 
-TEST(ProtoTrackerTest, half_loss_rate) {
+TEST(ProtoTrackerTest, half_loss_rate)
+{
     ProtoTracker tracker = ProtoTracker("");
     tracker.send(0);
     EXPECT_EQ(0, tracker.getLossRate());
@@ -22,7 +25,8 @@ TEST(ProtoTrackerTest, half_loss_rate) {
     EXPECT_NEAR(3.0 / 7, tracker.getLossRate(), 1e-4);
 }
 
-TEST(ProtoTrackerTest, two_loss_proto) {
+TEST(ProtoTrackerTest, two_loss_proto)
+{
     ProtoTracker tracker = ProtoTracker("");
     tracker.send(0);
     EXPECT_EQ(0, tracker.getLossRate());
@@ -36,7 +40,8 @@ TEST(ProtoTrackerTest, two_loss_proto) {
     EXPECT_NEAR(2.0 / 7, tracker.getLossRate(), 1e-4);
 }
 
-TEST(ProtoTrackerTest, ai_reset_test) {
+TEST(ProtoTrackerTest, ai_reset_test)
+{
     ProtoTracker tracker = ProtoTracker("");
     tracker.send(0);
     EXPECT_EQ(0, tracker.getLossRate());
@@ -48,11 +53,12 @@ TEST(ProtoTrackerTest, ai_reset_test) {
     EXPECT_NEAR(97.0 / 100, tracker.getLossRate(), 1e-4);
     tracker.send(101);
     EXPECT_NEAR(96.0 / 100, tracker.getLossRate(), 1e-4);
-    tracker.send(0); // AI reset
+    tracker.send(0);  // AI reset
     EXPECT_EQ(0, tracker.getLossRate());
 }
 
-TEST(ProtoTrackerTest, out_of_order_test) {
+TEST(ProtoTrackerTest, out_of_order_test)
+{
     ProtoTracker tracker = ProtoTracker("");
     tracker.send(0);
     EXPECT_EQ(0, tracker.getLossRate());
@@ -60,6 +66,6 @@ TEST(ProtoTrackerTest, out_of_order_test) {
     EXPECT_EQ(0, tracker.getLossRate());
     tracker.send(2);
     EXPECT_EQ(0, tracker.getLossRate());
-    tracker.send(1); // out of order
+    tracker.send(1);  // out of order
     EXPECT_EQ(0, tracker.getLossRate());
 }
