@@ -1,5 +1,17 @@
+from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph.Qt.QtCore import *
+from enum import IntEnum
+
+
+class IndividualRobotMode(IntEnum):
+    """
+    Enum for the mode of input for an individual robot
+    """
+
+    NONE = 0
+    MANUAL = 1
+    AI = 3
 
 
 class FloatSlider(QSlider):
@@ -35,13 +47,99 @@ class FloatSlider(QSlider):
         return float(super(FloatSlider, self).value()) / self.decimals
 
     def setMinimum(self, min_val):
+        """
+        Sets a minimum float value for this slider
+        :param min_val: value to set as the minimum
+        """
         return super(FloatSlider, self).setMinimum(min_val * self.decimals)
 
     def setMaximum(self, max_val):
+        """
+        Sets a maximum float value for this slider
+        :param max_val: value to set as the maximum
+        """
         return super(FloatSlider, self).setMaximum(max_val * self.decimals)
 
     def setValue(self, value):
+        """
+        Sets a float value as the value for this slider
+        :param value: value to set as the slider's value
+        """
         super(FloatSlider, self).setValue(int(value * self.decimals))
+
+
+class ColorProgressBar(QProgressBar):
+    """
+    This class extends QSlider to support floats instead of ints
+    Also changes slider color based on percentage filled
+    """
+
+    floatValueChanged = pyqtSignal(float)
+
+    def __init__(self, min_val, max_val, decimals=2):
+        """
+        Creates a ColorProgressBar with the specified min, max and decimals
+        Sets initial slider color to grey
+        :param min_val: min value of slider
+        :param max_val: max value of slider
+        :param decimals: number of decimal places to be used
+        """
+        super(ColorProgressBar, self).__init__()
+
+        self.decimals = 10 ** decimals
+
+        super(ColorProgressBar, self).setRange(
+            min_val * self.decimals, max_val * self.decimals
+        )
+
+        super(ColorProgressBar, self).setStyleSheet(
+            "QProgressBar::chunk" "{" "background: grey" "color: black" "}"
+        )
+
+        self.valueChanged.connect(self.emitFloatValueChanged)
+
+    def emitFloatValueChanged(self):
+        """
+        Emits a signal with the slider's float value
+        """
+        self.floatValueChanged.emit(self.value())
+
+    def setValue(self, value):
+        """
+        Sets the value of the slider to the given float value
+        Sets the color of the slider based on the percentage filled
+            - 100% to 50% -> Green to Yellow
+            - 50% to 0% -> Yellow to Red
+        :param value:
+        :return:
+        """
+        super(ColorProgressBar, self).setValue(value * self.decimals)
+
+        percent = (self.value() - self.minimum()) / (self.maximum() - self.minimum())
+
+        if percent < 0.5:
+            super(ColorProgressBar, self).setStyleSheet(
+                "QProgressBar::chunk"
+                "{"
+                f"background: rgb(255, {255 * (2 * percent)}, 0)"
+                "}"
+            )
+        else:
+            super(ColorProgressBar, self).setStyleSheet(
+                "QProgressBar::chunk"
+                "{"
+                f"background: rgb({255 * 2 * (1 - percent)}, 255, 0)"
+                "}"
+            )
+
+    def maximum(self):
+        return float(super(ColorProgressBar, self).maximum()) / self.decimals
+
+    def minimum(self):
+        return float(super(ColorProgressBar, self).minimum()) / self.decimals
+
+    def value(self):
+        return float(super(ColorProgressBar, self).value()) / self.decimals
 
 
 def create_buttons(text: list):
@@ -181,6 +279,39 @@ def create_push_button(title):
     return push_button
 
 
+def set_table_data(
+    data, table, header_size_hint_width_expansion, item_size_hint_width_expansion
+):
+    """Set data in a table
+
+    :param data: dict containing {"column_name": [column_items]}
+    :param table: table widget that will contain the data
+    :param header_size_hint_width_expansion: the factor multiplied by the length of the header
+    :param item_size_hint_width_expansion: the factor multiplied by the length of the item
+
+    """
+    horizontal_headers = []
+
+    for n, key in enumerate(data.keys()):
+        horizontal_headers.append(key)
+
+        for m, item in enumerate(data[key]):
+            str_item = str(item)
+            newitem = QTableWidgetItem(str_item)
+            newitem.setSizeHint(
+                QtCore.QSize(
+                    max(
+                        len(key) * header_size_hint_width_expansion,
+                        len(str_item) * item_size_hint_width_expansion,
+                    ),
+                    1,
+                )
+            )
+            table.setItem(m, n, newitem)
+
+    table.setHorizontalHeaderLabels(horizontal_headers)
+
+
 def change_button_state(button, enable):
     """Change button color and clickable state.
 
@@ -233,8 +364,28 @@ def enable_slider(slider, label, get_value):
 
 
 def disable_radio_button(button_group):
+    """
+    Disables a whole radio button group
+    Sets all buttons to unselected and disables their onClick function
+    :param button_group: button group to disable
+    """
     button_group.setExclusive(False)
     for button in button_group.buttons():
         button.setChecked(False)
         button.clicked.disconnect()
         button.clicked.connect(lambda state, curr=button: curr.setChecked(False))
+
+
+def draw_robot(painter, rect, start_angle_degree, span_angle_degree):
+    """
+    Draws a robot bounded by the given rectangle with a chord defined by the given angles
+    :param painter: the QPainter object that is drawing in thunderscope
+    :param rect: the rectangle that is bounding the robot's circle
+    :param start_angle_degree: the start of the chord, measured anti-clockwise from the horizontal middle in degrees
+    :param span_angle_degree: the end of the chord, measured anti-clockwise from the horizontal middle in degrees
+    """
+    convert_degree = -16
+
+    painter.drawChord(
+        rect, start_angle_degree * convert_degree, span_angle_degree * convert_degree,
+    )

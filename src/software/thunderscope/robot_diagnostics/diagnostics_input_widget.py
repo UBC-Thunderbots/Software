@@ -10,7 +10,7 @@ class ControlMode(IntEnum):
     Enum for the 2 modes of control (Manual and XBox)
     """
 
-    MANUAL = 0
+    DIAGNOSTICS = 0
     XBOX = 1
 
 
@@ -27,7 +27,7 @@ class FullSystemConnectWidget(QWidget):
 
     def __init__(self, proto_unix_io):
         """
-        Initialises a new Fullsystem Connect Widget to allow switching between Manual, XBox, and Fullsystem control
+        Initialises a new Fullsystem Connect Widget to allow switching between Diagnostics and XBox control
         :param proto_unix_io: The proto_unix_io object
         """
 
@@ -36,24 +36,24 @@ class FullSystemConnectWidget(QWidget):
         vbox_layout = QVBoxLayout()
         self.connect_options_group = QButtonGroup()
 
-        radio_button_names = ["Manual Control", "XBox Control"]
+        radio_button_names = ["Diagnostics Control", "XBox Control"]
 
         self.connect_options_box, self.connect_options = common_widgets.create_radio(
             radio_button_names, self.connect_options_group
         )
 
-        self.manual_control_button = self.connect_options[ControlMode.MANUAL]
+        self.diagnostics_control_button = self.connect_options[ControlMode.DIAGNOSTICS]
         self.xbox_control_button = self.connect_options[ControlMode.XBOX]
 
-        self.manual_control_button.clicked.connect(
-            lambda: self.switch_control_mode(ControlMode.MANUAL)
+        self.diagnostics_control_button.clicked.connect(
+            lambda: self.switch_control_mode(ControlMode.DIAGNOSTICS)
         )
         self.xbox_control_button.clicked.connect(
             lambda: self.switch_control_mode(ControlMode.XBOX)
         )
 
-        self.manual_control_button.setChecked(True)
-        self.control_mode = ControlMode.MANUAL
+        self.diagnostics_control_button.setChecked(True)
+        self.control_mode = ControlMode.DIAGNOSTICS
 
         vbox_layout.addWidget(self.connect_options_box)
 
@@ -63,14 +63,14 @@ class FullSystemConnectWidget(QWidget):
         """
         Switches the control mode to the given mode
 
-        Emits a signal to indicate whether manual controls should be disabled or not
+        Emits a signal to indicate whether diagnostics controls should be disabled or not
 
         :param mode: mode to switch to (one of ControlMode values)
 
         """
         self.control_mode = mode
 
-        self.toggle_controls_signal.emit(self.control_mode == ControlMode.MANUAL)
+        self.toggle_controls_signal.emit(self.control_mode == ControlMode.DIAGNOSTICS)
 
     def refresh(self):
         pass
