@@ -555,7 +555,7 @@ py_test(
 )
 
 cc_test(
-    name = "shoot_or_chip_play_test",
+    name = "shoot_or_chip_play_test_old",
     srcs = ["shoot_or_chip_play_test.cpp"],
     deps = [
         "//shared/test_util:tbots_gtest_main",
@@ -565,6 +565,18 @@ cc_test(
         "//software/test_util",
         "//software/time:duration",
         "//software/world",
+    ],
+)
+
+py_test(
+    name = "shoot_or_chip_play_test",
+    srcs = [
+        "shoot_or_chip_play_test.py",
+    ],
+    deps = [
+        "//software/simulated_tests:simulated_test_fixture",
+        "//software/simulated_tests:validation",
+        requirement("pytest"),
     ],
 )
 
