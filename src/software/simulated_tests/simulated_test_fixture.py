@@ -149,7 +149,7 @@ class SimulatorTestRunner(object):
                     # If delay matches time
                     if delay <= time_elapsed_s:
                         # send command
-                        self.gamecontroller.send_ci_input(cmd, team)
+                        self.gamecontroller.send_gc_command(cmd, team)
                         # remove command from the list
                         ci_cmd_with_delay.remove((delay, cmd, team))
 
