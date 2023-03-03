@@ -14,13 +14,11 @@ from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
 from proto.geometry_pb2 import Point, Vector, Angle, AngularVelocity
 
-from proto.ssl_gc_geometry_pb2 import Vector2
-
 
 def test_shoot_or_chip_play(simulated_test_runner):
     def setup(*args):
         ball_initial_pos = tbots.Point(-1.4, 2)
-        tbots.Vector(0, 0)
+        ball_initial_vel = tbots.Vector(0, 0)
 
         field = tbots.Field.createSSLDivisionBField()
 
@@ -45,7 +43,7 @@ def test_shoot_or_chip_play(simulated_test_runner):
             yellow_robot_locations=yellow_bots,
             blue_robot_locations=blue_bots,
             ball_location=ball_initial_pos,
-            ball_velocity=tbots.Vector(0, 0),
+            ball_velocity=ball_initial_vel,
         )
 
         last_robot = RobotState(
