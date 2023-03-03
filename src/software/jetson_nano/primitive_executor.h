@@ -1,5 +1,6 @@
 #pragma once
-#include "extlibs/hrvo/simulator.h"
+//#include "extlibs/hrvo/simulator.h"
+#include "software/ai/navigator/path_planner/hrvo/hrvo_simulator.h"
 #include "proto/primitive.pb.h"
 #include "proto/robot_status_msg.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
@@ -85,7 +86,7 @@ class PrimitiveExecutor
 
     TbotsProto::Primitive current_primitive_;
     RobotConstants_t robot_constants_;
-    Simulator hrvo_simulator_;
+    HRVOSimulator hrvo_simulator_;
     double time_step_;
     Angle curr_orientation_;
     RobotId robot_id_;

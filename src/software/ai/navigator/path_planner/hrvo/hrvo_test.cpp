@@ -67,7 +67,7 @@ void assertRobotInAgentList(const Robot &robot, const TeamSide &side,
 TEST_F(TestHrvo, test_update_world_empty_agents)
 {
     sim.updateWorld(world);
-    sim.doStep(Duration::fromMilliseconds(200u));
+    sim.doStep();
 
     EXPECT_EQ(0, sim.getRobotCount());
 }
@@ -79,7 +79,7 @@ TEST_F(TestHrvo, test_update_world_with_one_friendly_agent)
                   Team());
 
     sim.updateWorld(world);
-    sim.doStep(time_step);
+    sim.doStep();
 
     EXPECT_EQ(1, sim.getRobotCount());
 
@@ -93,7 +93,7 @@ TEST_F(TestHrvo, test_update_world_with_one_enemy_agent)
                   Team({enemy_robot_1}));
 
     sim.updateWorld(world);
-    sim.doStep(time_step);
+    sim.doStep();
 
     ASSERT_EQ(1, sim.getRobotCount());
 
@@ -111,7 +111,7 @@ TEST_F(TestHrvo, test_update_world_with_friendly_and_enemy_agent)
                   Team({enemy_robot_1}));
 
     sim.updateWorld(world);
-    sim.doStep(time_step);
+    sim.doStep();
 
     ASSERT_EQ(2, sim.getRobotCount());
 
@@ -136,7 +136,7 @@ TEST_F(TestHrvo, test_update_world_add_friendly_robots_second_tick)
     world = World(Field::createSSLDivisionBField(), Ball(Point(), Vector(), Timestamp()),
                   Team(friendly_robots), Team(enemy_robots));
     sim.updateWorld(world);
-    sim.doStep(time_step);
+    sim.doStep();
 
     ASSERT_EQ(friendly_robots.size() + enemy_robots.size(), sim.getRobotCount());
     auto agents = sim.getRobots();
@@ -158,7 +158,7 @@ TEST_F(TestHrvo, test_update_world_add_friendly_robots_second_tick)
     world = World(Field::createSSLDivisionBField(), Ball(Point(), Vector(), Timestamp()),
                   Team(friendly_robots), Team(enemy_robots));
     sim.updateWorld(world);
-    sim.doStep(time_step);
+    sim.doStep();
 
     ASSERT_EQ(friendly_robots.size() + enemy_robots.size(), sim.getRobotCount());
     agents = sim.getRobots();
@@ -190,7 +190,7 @@ TEST_F(TestHrvo, test_update_world_add_enemy_robots_second_tick)
     world = World(Field::createSSLDivisionBField(), Ball(Point(), Vector(), Timestamp()),
                   Team(friendly_robots), Team(enemy_robots));
     sim.updateWorld(world);
-    sim.doStep(time_step);
+    sim.doStep();
 
     ASSERT_EQ(friendly_robots.size() + enemy_robots.size(), sim.getRobotCount());
     auto agents = sim.getRobots();
@@ -212,7 +212,7 @@ TEST_F(TestHrvo, test_update_world_add_enemy_robots_second_tick)
     world = World(Field::createSSLDivisionBField(), Ball(Point(), Vector(), Timestamp()),
                   Team(friendly_robots), Team(enemy_robots));
     sim.updateWorld(world);
-    sim.doStep(time_step);
+    sim.doStep();
 
     ASSERT_EQ(friendly_robots.size() + enemy_robots.size(), sim.getRobotCount());
     agents = sim.getRobots();
@@ -247,7 +247,7 @@ TEST_F(TestHrvo, test_update_world_remove_friendly_robots_second_tick)
     world = World(Field::createSSLDivisionBField(), Ball(Point(), Vector(), Timestamp()),
                   Team(friendly_robots), Team(enemy_robots));
     sim.updateWorld(world);
-    sim.doStep(time_step);
+    sim.doStep();
 
     ASSERT_EQ(friendly_robots.size() + enemy_robots.size(), sim.getRobotCount());
     auto agents = sim.getRobots();
@@ -267,7 +267,7 @@ TEST_F(TestHrvo, test_update_world_remove_friendly_robots_second_tick)
     world = World(Field::createSSLDivisionBField(), Ball(Point(), Vector(), Timestamp()),
                   Team(friendly_robots), Team(enemy_robots));
     sim.updateWorld(world);
-    sim.doStep(time_step);
+    sim.doStep();
 
     ASSERT_EQ(friendly_robots.size() + enemy_robots.size(), sim.getRobotCount());
     agents = sim.getRobots();
@@ -307,7 +307,7 @@ TEST_F(TestHrvo, test_update_world_remove_enemy_robots_second_tick)
     world = World(Field::createSSLDivisionBField(), Ball(Point(), Vector(), Timestamp()),
                   Team(friendly_robots), Team(enemy_robots));
     sim.updateWorld(world);
-    sim.doStep(time_step);
+    sim.doStep();
 
     ASSERT_EQ(friendly_robots.size() + enemy_robots.size(), sim.getRobotCount());
     auto agents = sim.getRobots();
@@ -328,7 +328,7 @@ TEST_F(TestHrvo, test_update_world_remove_enemy_robots_second_tick)
     world = World(Field::createSSLDivisionBField(), Ball(Point(), Vector(), Timestamp()),
                   Team(friendly_robots), Team(enemy_robots));
     sim.updateWorld(world);
-    sim.doStep(time_step);
+    sim.doStep();
 
     ASSERT_EQ(friendly_robots.size() + enemy_robots.size(), sim.getRobotCount());
     agents = sim.getRobots();
@@ -365,7 +365,7 @@ TEST_F(TestHrvo, test_update_world_add_and_remove_friendly_robots_second_tick)
     world = World(Field::createSSLDivisionBField(), Ball(Point(), Vector(), Timestamp()),
                   Team(friendly_robots), Team(enemy_robots));
     sim.updateWorld(world);
-    sim.doStep(time_step);
+    sim.doStep();
 
     ASSERT_EQ(friendly_robots.size() + enemy_robots.size(), sim.getRobotCount());
     auto agents = sim.getRobots();
@@ -388,7 +388,7 @@ TEST_F(TestHrvo, test_update_world_add_and_remove_friendly_robots_second_tick)
     world = World(Field::createSSLDivisionBField(), Ball(Point(), Vector(), Timestamp()),
                   Team(friendly_robots), Team(enemy_robots));
     sim.updateWorld(world);
-    sim.doStep(time_step);
+    sim.doStep();
 
     ASSERT_EQ(friendly_robots.size() + enemy_robots.size(), sim.getRobotCount());
     agents = sim.getRobots();
@@ -425,7 +425,7 @@ TEST_F(TestHrvo, test_update_world_add_and_remove_enemy_robots_second_tick)
     world = World(Field::createSSLDivisionBField(), Ball(Point(), Vector(), Timestamp()),
                   Team(friendly_robots), Team(enemy_robots));
     sim.updateWorld(world);
-    sim.doStep(time_step);
+    sim.doStep();
 
     ASSERT_EQ(friendly_robots.size() + enemy_robots.size(), sim.getRobotCount());
     auto agents = sim.getRobots();
@@ -449,7 +449,7 @@ TEST_F(TestHrvo, test_update_world_add_and_remove_enemy_robots_second_tick)
     world = World(Field::createSSLDivisionBField(), Ball(Point(), Vector(), Timestamp()),
                   Team(friendly_robots), Team(enemy_robots));
     sim.updateWorld(world);
-    sim.doStep(time_step);
+    sim.doStep();
 
     ASSERT_EQ(friendly_robots.size() + enemy_robots.size(), sim.getRobotCount());
     agents = sim.getRobots();
@@ -485,7 +485,7 @@ TEST_F(TestHrvo, test_update_world_add_and_remove_friendly_and_enemy_robots_seco
     world = World(Field::createSSLDivisionBField(), Ball(Point(), Vector(), Timestamp()),
                   Team(friendly_robots), Team(enemy_robots));
     sim.updateWorld(world);
-    sim.doStep(time_step);
+    sim.doStep();
 
     ASSERT_EQ(friendly_robots.size() + enemy_robots.size(), sim.getRobotCount());
     auto agents = sim.getRobots();
@@ -514,7 +514,7 @@ TEST_F(TestHrvo, test_update_world_add_and_remove_friendly_and_enemy_robots_seco
     world = World(Field::createSSLDivisionBField(), Ball(Point(), Vector(), Timestamp()),
                   Team(friendly_robots), Team(enemy_robots));
     sim.updateWorld(world);
-    sim.doStep(time_step);
+    sim.doStep();
 
     ASSERT_EQ(friendly_robots.size() + enemy_robots.size(), sim.getRobotCount());
     agents = sim.getRobots();

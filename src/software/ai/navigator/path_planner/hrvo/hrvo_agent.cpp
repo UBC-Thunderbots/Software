@@ -27,8 +27,8 @@ void HRVOAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive,
         auto destination = motion_control.path().points().at(1);
 
         // Max distance which the robot can travel in one time step + scaling
-        // TODO (#2370): This constant is calculated multiple times.
-        double path_radius = (max_speed * time_step.toMilliseconds()) / 2;
+        // TODO (#2370): This constant is calculated multiple    times.
+        double path_radius = (max_speed * time_step.toSeconds()) / 2;
         auto path_points = {PathPoint(
                 Point(destination.x_meters(), destination.y_meters()), speed_at_dest)};
         path = RobotPath(path_points, path_radius);
@@ -110,7 +110,7 @@ std::vector<RobotId> HRVOAgent::computeNeighbors(std::map<RobotId, std::shared_p
     // which we want to create velocity obstacles for
 }
 
-void HRVOAgent::computeVelocityObstacles(std::map<RobotId, std::shared_ptr<Agent>> &robots, Duration time_step) {
+void HRVOAgent::computeVelocityObstacles(std::map<RobotId, std::shared_ptr<Agent>> &robots) {
     velocity_obstacles.reserve(robots.size());
 
     const auto current_path_point_opt = getPath().getCurrentPathPoint();
@@ -198,9 +198,10 @@ void HRVOAgent::computeNewVelocity(std::map<unsigned int, std::shared_ptr<Agent>
     // Based on The Hybrid Reciprocal Velocity Obstacle paper:
     // https://gamma.cs.unc.edu/HRVO/HRVO-T-RO.pdf
 
-    computeVelocityObstacles(agents, time_step);
-    const auto pref_velocity = computePreferredVelocity(time_step);
+    computeVelocityObstacles(agents);
 
+    const auto pref_velocity = computePreferredVelocity(time_step);
+    LOG(INFO) << pref_velocity;
     // key is difference in length squared between PREFERRED and ACTUAL velocity
     std::multimap<double, Candidate> candidates;
 
@@ -515,12 +516,12 @@ Vector HRVOAgent::computePreferredVelocity(Duration time_step) {
 
         // Limit the preferred velocity to the kinematic limits
         const Vector dv = ideal_pref_velocity - robot_state.velocity();
-        if (dv.length() <= max_accel * time_step.toMilliseconds()) {
+        if (dv.length() <= max_accel * time_step.toSeconds()) {
             return ideal_pref_velocity;
         } else {
             // Calculate the maximum velocity towards the preferred velocity, given the
             // acceleration constraint
-            return robot_state.velocity() + dv.normalize(max_accel * time_step.toMilliseconds());
+            return robot_state.velocity() + dv.normalize(max_accel * time_step.toSeconds());
         }
     } else {
         // Accelerate to preferred speed
@@ -528,7 +529,7 @@ Vector HRVOAgent::computePreferredVelocity(Duration time_step) {
         double curr_pref_speed =
                 std::min(static_cast<double>(pref_speed),
                         //
-                         robot_state.velocity().length() + max_accel * time_step.toMilliseconds());
+                         robot_state.velocity().length() + max_accel * time_step.toSeconds());
         return dist_vector_to_goal.normalize(curr_pref_speed);
     }
 }

@@ -9,10 +9,11 @@ HRVOSimulator::HRVOSimulator(double time_step, const RobotConstants_t &robot_con
         world(std::nullopt),
         primitive_set(),
         friendly_team_colour(friendly_team_colour),
-        time_step(Duration::fromMilliseconds(time_step)) {
+        time_step(Duration::fromSeconds(time_step)) {
 }
 
 void HRVOSimulator::updateWorld(const World &world) {
+    LOG(INFO) << time_step;
     this->world = world;
     // TODO (#2498): Update implementation to correctly support adding and removing agents
     //               to represent the newly added and removed friendly/enemy robots in the
@@ -78,22 +79,20 @@ void HRVOSimulator::configureHRVORobot(const Robot &robot) {
             destination_point_proto =
                     move_primitive.motion_control().path().points().at(1);
             destination_point =
-                    Point(static_cast<float>(destination_point_proto.x_meters()),
-                           static_cast<float>(destination_point_proto.y_meters()));
+                    Point(destination_point_proto.x_meters(),
+                           destination_point_proto.y_meters());
             speed_at_goal = move_primitive.final_speed_m_per_s();
             max_speed = move_primitive.max_speed_m_per_s();
         }
     }
 
     // Max distance which the robot can travel in one time step + scaling
-    double max_radius = (max_speed * time_step.toMilliseconds()) / 2;
+    double max_radius = (max_speed * time_step.toSeconds()) / 2;
 
-    RobotPath path =
-            RobotPath({PathPoint(destination_point, speed_at_goal)}, max_radius);
+    RobotPath path = RobotPath({PathPoint(destination_point, speed_at_goal)}, max_radius);
 
     std::shared_ptr<HRVOAgent> agent = std::make_shared<HRVOAgent>(robot.id(), robot.currentState(),TeamSide::FRIENDLY, path,
                                                                    ROBOT_MAX_RADIUS_METERS, max_speed, max_accel, FRIENDLY_ROBOT_RADIUS_MAX_INFLATION);
-
     robots[robot.id()] = std::static_pointer_cast<Agent>(agent);
 
 }
@@ -126,7 +125,7 @@ void HRVOSimulator::configureLVRobot(const Robot &robot) {
     double max_speed = robot_constants.robot_max_speed_m_per_s;
 
     // Max distance which the robot can travel in one time step + scaling
-    double path_radius = (robot.velocity().length() * time_step.toMilliseconds()) / 2;
+    double path_radius = (robot.velocity().length() * time_step.toSeconds()) / 2;
 
     RobotPath path = RobotPath({PathPoint(destination, 0.0)}, path_radius);
 
@@ -139,9 +138,9 @@ void HRVOSimulator::configureLVRobot(const Robot &robot) {
     robots[robot.id() + ENEMY_LV_ROBOT_OFFSET] =  std::static_pointer_cast<Agent>(agent);
 }
 
-void HRVOSimulator::doStep(Duration time_step) {
+void HRVOSimulator::doStep() {
 
-    if (time_step.toMilliseconds() == 0.0) {
+    if (time_step.toSeconds() == 0.0) {
         throw std::runtime_error("Time step is zero");
     }
 
@@ -158,7 +157,7 @@ void HRVOSimulator::doStep(Duration time_step) {
 
     // Compute what velocity each agent will take next
     for (auto &robot: robots) {
-        robot.second->computeNewVelocity(robots, Duration(time_step));
+        robot.second->computeNewVelocity(robots, time_step);
     }
 
     // Update the positions of all agents given their velocity

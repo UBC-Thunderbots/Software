@@ -43,7 +43,7 @@ public:
      */
     void updatePrimitiveSet(const TbotsProto::PrimitiveSet &new_primitive_set);
 
-    void doStep(Duration time_step);
+    void doStep();
 
     void updateRobotVelocity(RobotId robot_id, const Vector &new_velocity);
 

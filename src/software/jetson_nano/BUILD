@@ -5,7 +5,7 @@ cc_library(
     srcs = ["primitive_executor.cpp"],
     hdrs = ["primitive_executor.h"],
     deps = [
-        "//extlibs/hrvo",
+        "//software/ai/navigator/path_planner/hrvo:hrvo",
         "//proto:tbots_cc_proto",
         "//proto/primitive:primitive_msg_factory",
         "//shared:constants",

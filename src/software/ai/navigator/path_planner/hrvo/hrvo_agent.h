@@ -73,7 +73,7 @@ public:
      * relies on
      * `ball_obstacle`, `neighbours_`
      */
-    void computeVelocityObstacles(std::map<RobotId, std::shared_ptr<Agent>> &robots, Duration time_step);
+    void computeVelocityObstacles(std::map<RobotId, std::shared_ptr<Agent>> &robots);
 
     /**
      * Create the velocity obstacle which other_agent should see for this Agent
