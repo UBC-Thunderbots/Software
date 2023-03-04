@@ -364,3 +364,18 @@ std::unique_ptr<TbotsProto::PassVisualization> createPassVisualization(
     }
     return pass_visualization_msg;
 }
+
+std::unique_ptr<TbotsProto::CostVisualization> createCostVisualization(
+    const std::vector<double>& costs, int num_rows, int num_cols)
+{
+    auto cost_visualization_msg = std::make_unique<TbotsProto::CostVisualization>();
+    cost_visualization_msg->set_num_rows(num_rows);
+    cost_visualization_msg->set_num_cols(num_cols);
+
+    for (const auto& cost : costs)
+    {
+        cost_visualization_msg->add_cost(cost);
+    }
+
+    return cost_visualization_msg;
+}

@@ -101,20 +101,23 @@ class ProtoUnixIO:
         """
         self.all_proto_observers.append(buffer)
 
-    def send_proto(self, proto_class, data):
+    def send_proto(self, proto_class, data, block=False, timeout=None):
         """Send the data to all register_observers
 
         :param proto_class: The class to send
         :param data: The data to send
+        :param block: If block is True, then block until a free space opens up
+                      to put the proto. Otherwise, proto will be dropped if queue is full.
+        :param timeout: If block is True, then wait for this many seconds
 
         """
         if proto_class.DESCRIPTOR.full_name in self.proto_observers:
             for buffer in self.proto_observers[proto_class.DESCRIPTOR.full_name]:
-                buffer.put(data)
+                buffer.put(data, block, timeout)
 
         for buffer in self.all_proto_observers:
             try:
-                buffer.put(data, block=False)
+                buffer.put(data, block, timeout)
             except queue.Full:
                 print("Buffer registered to receive everything dropped data")
 
@@ -127,7 +130,9 @@ class ProtoUnixIO:
         :param proto_class: The protobuf type to send
 
         """
-        sender = ThreadedUnixSender(unix_path=runtime_dir + unix_path)
+        sender = ThreadedUnixSender(
+            unix_path=runtime_dir + unix_path, proto_type=proto_class
+        )
         self.unix_senders[proto_class.DESCRIPTOR.full_name] = sender
         self.register_observer(proto_class, sender.proto_buffer)
 

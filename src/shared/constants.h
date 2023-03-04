@@ -93,6 +93,7 @@ static const double SECONDS_PER_NANOSECOND       = 1.0 / 1000000000.0;
 static const double SECONDS_PER_MILLISECOND      = 1.0 / 1000.0;
 static const double MILLISECONDS_PER_MICROSECOND = 1.0 / 1000.0;
 static const double MILLISECONDS_PER_NANOSECOND  = 1.0 / 1000000.0;
+static const double SECONDS_PER_MINUTE           = 60.0;
 
 // The total number of robot ids on one team
 static const unsigned int MAX_ROBOT_IDS_PER_SIDE = 8;
@@ -116,7 +117,7 @@ static const double MIN_CAPACITOR_VOLTAGE = 0;
 static const double MAX_CAPACITOR_VOLTAGE = 250.0 + 50.0;  // +50v headroom
 
 static const unsigned int ROBOT_CHIP_ANGLE_DEGREES = 45;
-
+static const double CHICKER_TIMEOUT                = 3 * MILLISECONDS_PER_SECOND;
 // How many robots are allowed in each division
 static const unsigned DIV_A_NUM_ROBOTS = 11;
 static const unsigned DIV_B_NUM_ROBOTS = 6;
@@ -136,6 +137,9 @@ static const int ESTOP_MESSAGE_SIZE_BYTES = 1;
 
 static const unsigned char ESTOP_PLAY_MSG = 0;
 static const unsigned char ESTOP_STOP_MSG = 1;
+
+// Number of times to send a STOP primitive when robot is disconnected from Manual Control
+static const unsigned int NUM_TIMES_SEND_STOP = 10;
 
 // product and vendor id for Arduino Uno Rev3 (retrieved from
 // http://www.linux-usb.org/usb.ids )

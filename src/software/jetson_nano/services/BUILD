@@ -26,5 +26,6 @@ cc_library(
         "//software/logger",
         "//software/uart:boost_uart_communication",
         "@boost//:asio",
+        "@boost//:filesystem",
     ],
 )
