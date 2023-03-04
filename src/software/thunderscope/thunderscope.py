@@ -148,6 +148,7 @@ class Thunderscope(object):
 
         self.window = QtGui.QMainWindow()
         self.window.setCentralWidget(self.tabs)
+        self.window.setWindowIcon(QtGui.QIcon("software/thunderscope/thunderscope-logo.png"))
         self.window.setWindowTitle("Thunderscope")
 
         # ProtoUnixIOs
@@ -308,8 +309,6 @@ class Thunderscope(object):
         # if the dock doesn't exist in the default layout, we ignore it
         # (instead of adding a placeholder dock)
         with shelve.open(filename, "r") as shelf:
-            print(f"Loading Thunderscope layout from: '{filename}'")
-
             self.blue_full_system_dock_area.restoreState(
                 shelf["blue_dock_state"], missing="ignore"
             )
