@@ -6,13 +6,15 @@
 
 #include "software/ai/navigator/path_planner/hrvo/hrvo_agent.h"
 #include "software/ai/navigator/path_planner/hrvo/lv_agent.h"
-#include "proto/tbots_software_msgs.pb.h"
-#include "proto/visualization.pb.h"
-#include "software/geom/vector.h"
-#include "software/world/world.h"
+#include "software/ai/navigator/path_planner/hrvo/path_point.h"
+#include "software/ai/navigator/path_planner/hrvo/robot_path.h"
 #include "software/geom/algorithms/intersection.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/algorithms/nearest_neighbor_search.hpp"
+#include "software/geom/vector.h"
+#include "software/world/world.h"
+#include "proto/tbots_software_msgs.pb.h"
+#include "proto/visualization.pb.h"
 
 class HRVOSimulator {
 public:
@@ -24,7 +26,8 @@ public:
      * @param friendly_team_colour The colour of the friendly team
      */
     explicit HRVOSimulator(double time_step, const RobotConstants_t &robot_constants,
-                           const TeamColour friendly_team_colour);
+                           TeamColour friendly_team_colour);
+
 
     /**
      * Reset all agents to match the state of the given world.
@@ -36,6 +39,7 @@ public:
      */
     void updateWorld(const World &world);
 
+
     /**
      * Reset all friendly agents goal points to match the path of the given primitive set
      *
@@ -43,43 +47,72 @@ public:
      */
     void updatePrimitiveSet(const TbotsProto::PrimitiveSet &new_primitive_set);
 
+
+    /**
+     * Performs a simulation step; updates the position, and velocity
+     * of each agent, and the progress of each towards its goal by moving
+     * the simulation time_step seconds forward
+     */
     void doStep();
 
-    void updateRobotVelocity(RobotId robot_id, const Vector &new_velocity);
 
+    /**
+     * Get the current friendly robot velocity
+     *
+     * @param robot_id The robot id of the friendly robot to retrieve velocity from
+     * @return Current global velocity of robot
+     */
     Vector getRobotVelocity(unsigned int robot_id) const;
 
 
     /**
-     * Assumption: friendly team is the only robots running HRVO,
-     * only enemy robots have robot id offset
+     * Update the velocity of the agent with the given id
+     * @param robot_id Robot id of the agent to update
+     * @param new_velocity New global velocity of the agent
+     */
+    void updateRobotVelocity(RobotId robot_id, const Vector &new_velocity);
+
+
+    /**
+     *  Returns the count of agents in the simulation.
+     *
+     * @return The count of agents in the simulation.
+     */
+    std::size_t getRobotCount();
+
+
+    /**
+     * Get all the robots running in this simulation
+     *
+     * @return a map of from robot id's to agents
+     */
+    std::map<RobotId, std::shared_ptr<Agent>> getRobots();
+
+
+    /**
+     * visualize the HRVO obstacles for friendly team
+     *
      * @param robot_id
      */
     void visualize(RobotId robot_id);
 
-    std::size_t getRobotCount();
-
-    std::map<RobotId, std::shared_ptr<Agent>> getRobots();
-
 private:
 
     /**
-     *      Adds a new Hybrid Reciprocal Agent to the simulation based on Robot.
+     * Configure and add a HRVO Agent to the simulation.
      *
-     * @param robot    The robot which this agent should be based on
-     * @param type     Whether this robot is FRIENDLY or ENEMY
-     *
+     * @param robot The robot for which this agent is based on
      */
     void configureHRVORobot(const Robot &robot);
 
+
     /**
-     *      Adds a new Linear Velocity Agent to the simulation based on Robot.
+     *  Configure and add a LV Agent to the simulation.
      *
-     * @param robot       	The robot which this agent should be based on
-     * @param destination 	Destination for this robot
-     * @param type 		Whether this robot is FRIENDLY or ENEMY
+     * @param robot The robot for which this agent is based on
     */
     void configureLVRobot(const Robot &robot);
+
 
     // The robot constants which all agents will use
     RobotConstants_t robot_constants;
@@ -97,7 +130,7 @@ private:
     // The colour of the friendly team
     const TeamColour friendly_team_colour;
     // simulator time step
-    Duration time_step;
+    double time_step;
 
     // The max amount (meters) which the friendly/enemy robot radius can increase by.
     // This scale is used to avoid close encounters, and reduce chance of collision.
@@ -109,5 +142,6 @@ private:
     // robots do not "teleport" over the goal between simulation frames.
     static constexpr double GOAL_RADIUS_SCALE = 1.05;
 
+    // index offset for enemy robot ids in the `robots` map
     const unsigned int ENEMY_LV_ROBOT_OFFSET = 1000;
 };

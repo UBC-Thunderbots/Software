@@ -8,7 +8,7 @@ LVAgent::LVAgent(RobotId robot_id, RobotState robot_state, TeamSide side, RobotP
 {
 }
 
-void LVAgent::computeNewVelocity(std::map<unsigned int, std::shared_ptr<Agent>> &robots, Duration time_step) {
+void LVAgent::computeNewVelocity(std::map<unsigned int, std::shared_ptr<Agent>> &robots, double time_step) {
     // TODO (#2496): Fix bug where LinearVelocityAgents go past their destination
     // Preferring a velocity which points directly towards goal
 
@@ -16,7 +16,7 @@ void LVAgent::computeNewVelocity(std::map<unsigned int, std::shared_ptr<Agent>> 
     setPreferredVelocity(pref_velocity);
 
     const Vector dv = preferred_velocity - robot_state.velocity();
-    if (dv.length() <= max_accel * time_step.toMilliseconds())
+    if (dv.length() <= max_accel * time_step)
     {
         new_velocity = preferred_velocity;
     }
@@ -24,11 +24,11 @@ void LVAgent::computeNewVelocity(std::map<unsigned int, std::shared_ptr<Agent>> 
     {
         // Calculate the maximum velocity towards the preferred velocity, given the
         // acceleration constraint
-        new_velocity = robot_state.velocity() + dv.normalize(max_accel * time_step.toMilliseconds());
+        new_velocity = robot_state.velocity() + dv.normalize(max_accel * time_step);
     }
 }
 
-Vector LVAgent::computePreferredVelocity(Duration time_step) {
+Vector LVAgent::computePreferredVelocity(double time_step) {
 
     auto path_point_opt = path.getCurrentPathPoint();
 
@@ -52,6 +52,6 @@ VelocityObstacle LVAgent::createVelocityObstacle(const Agent &other_agent) {
             Circle(Point(other_agent.robot_state.position()), other_agent.radius), robot_state.velocity());
 }
 
-void LVAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive, const World &world, Duration time_step) {
+void LVAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive, const World &world, double time_step) {
     return;
 }

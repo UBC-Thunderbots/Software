@@ -1,15 +1,13 @@
 #include "hrvo_simulator.h"
-#include "software/ai/navigator/path_planner/hrvo/path_point.h"
-#include "software/ai/navigator/path_planner/hrvo/robot_path.h"
 
 HRVOSimulator::HRVOSimulator(double time_step, const RobotConstants_t &robot_constants,
-                             const TeamColour friendly_team_colour) :
+                             TeamColour friendly_team_colour) :
         robot_constants(robot_constants),
         robots(),
         world(std::nullopt),
         primitive_set(),
         friendly_team_colour(friendly_team_colour),
-        time_step(Duration::fromSeconds(time_step)) {
+        time_step(time_step) {
 }
 
 void HRVOSimulator::updateWorld(const World &world) {
@@ -87,7 +85,7 @@ void HRVOSimulator::configureHRVORobot(const Robot &robot) {
     }
 
     // Max distance which the robot can travel in one time step + scaling
-    double max_radius = (max_speed * time_step.toSeconds()) / 2;
+    double max_radius = (max_speed * time_step) / 2;
 
     RobotPath path = RobotPath({PathPoint(destination_point, speed_at_goal)}, max_radius);
 
@@ -125,7 +123,7 @@ void HRVOSimulator::configureLVRobot(const Robot &robot) {
     double max_speed = robot_constants.robot_max_speed_m_per_s;
 
     // Max distance which the robot can travel in one time step + scaling
-    double path_radius = (robot.velocity().length() * time_step.toSeconds()) / 2;
+    double path_radius = (robot.velocity().length() * time_step) / 2;
 
     RobotPath path = RobotPath({PathPoint(destination, 0.0)}, path_radius);
 
@@ -140,7 +138,7 @@ void HRVOSimulator::configureLVRobot(const Robot &robot) {
 
 void HRVOSimulator::doStep() {
 
-    if (time_step.toSeconds() == 0.0) {
+    if (time_step == 0.0) {
         throw std::runtime_error("Time step is zero");
     }
 
@@ -212,7 +210,6 @@ void HRVOSimulator::visualize(unsigned int robot_id)
         LOG(VISUALIZE, BLUE_HRVO_PATH) << hrvo_visualization;
     }
 
-    return;
 }
 
 void HRVOSimulator::updateRobotVelocity(RobotId robot_id, const Vector &new_velocity)

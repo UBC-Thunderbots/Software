@@ -15,21 +15,21 @@ Agent::Agent(RobotId robot_id, RobotState robot_state, TeamSide side,
 
 }
 
-void Agent::update(Duration time_step) {
+void Agent::update(double time_step) {
     if (new_velocity.length() >= max_speed) {
         // New velocity can not be greater than max speed
         new_velocity = new_velocity.normalize(max_speed);
     }
 
     const Vector dv = new_velocity - robot_state.velocity();
-    if (dv.length() < max_accel * time_step.toMilliseconds() || dv.length() == 0.0) {
+    if (dv.length() < max_accel * time_step || dv.length() == 0.0) {
         robot_state.velocity() = new_velocity;
     } else {
         // Calculate the maximum velocity towards the preferred velocity, given the
         // acceleration constraint
-        robot_state.velocity() = robot_state.velocity() + (max_accel * time_step.toMilliseconds()) * (dv / dv.length());
+        robot_state.velocity() = robot_state.velocity() + (max_accel * time_step) * (dv / dv.length());
     }
-    robot_state.position() = robot_state.position() + (robot_state.velocity() * time_step.toMilliseconds());
+    robot_state.position() = robot_state.position() + (robot_state.velocity() * time_step);
 
     Point current_dest;
 

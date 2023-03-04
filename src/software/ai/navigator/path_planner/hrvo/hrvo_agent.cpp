@@ -10,7 +10,7 @@ HRVOAgent::HRVOAgent(RobotId robot_id, RobotState robot_state, TeamSide side, Ro
 
 void HRVOAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive,
                                 const World &world,
-                                Duration time_step) {
+                                double time_step) {
     RobotPath path;
     static_obstacles.clear();
     ball_obstacle = std::nullopt;
@@ -28,7 +28,7 @@ void HRVOAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive,
 
         // Max distance which the robot can travel in one time step + scaling
         // TODO (#2370): This constant is calculated multiple    times.
-        double path_radius = (max_speed * time_step.toSeconds()) / 2;
+        double path_radius = (max_speed * time_step) / 2;
         auto path_points = {PathPoint(
                 Point(destination.x_meters(), destination.y_meters()), speed_at_dest)};
         path = RobotPath(path_points, path_radius);
@@ -67,8 +67,6 @@ std::vector<RobotId> HRVOAgent::computeNeighbors(std::map<RobotId, std::shared_p
 
     std::vector<std::pair<RobotId, RobotState>> robot_list;
 
-    // TODO change to use iterator, then remove robot candidate at the end
-
     // transform map into list
     std::transform(
             robots.begin(),
@@ -86,14 +84,14 @@ std::vector<RobotId> HRVOAgent::computeNeighbors(std::map<RobotId, std::shared_p
                            }
             ), robot_list.end());
 
-    // run brute force nn search on robot_id and
+    // run brute force nn search
     std::vector<std::pair<RobotId, RobotState>> neighbors = findNeighboursInThreshold(
             std::make_pair(this->robot_id, this->getRobotState()),
             robot_list,
             dist_to_obstacle_threshold,
             compare);
 
-    // transform id-state pairs into list of ids
+    // unzip and return id from id-robot pairs
     std::vector<unsigned int> neighbor_ids;
     std::transform(
             neighbors.begin(),
@@ -104,10 +102,6 @@ std::vector<RobotId> HRVOAgent::computeNeighbors(std::map<RobotId, std::shared_p
             });
 
     return neighbor_ids;
-
-
-    // Re-calculate all agents (neighbors) within the distance threshold
-    // which we want to create velocity obstacles for
 }
 
 void HRVOAgent::computeVelocityObstacles(std::map<RobotId, std::shared_ptr<Agent>> &robots) {
@@ -125,7 +119,7 @@ void HRVOAgent::computeVelocityObstacles(std::map<RobotId, std::shared_ptr<Agent
     std::vector<unsigned int> neighbours = computeNeighbors(robots);
     for (const auto &neighbor: neighbours) {
         std::shared_ptr<Agent> other_agent = robots[neighbor];
-        VelocityObstacle velocity_obstacle = this->createVelocityObstacle(*other_agent);
+        VelocityObstacle velocity_obstacle = createVelocityObstacle(*other_agent);
         velocity_obstacles.push_back(velocity_obstacle);
     }
 
@@ -160,10 +154,10 @@ void HRVOAgent::computeVelocityObstacles(std::map<RobotId, std::shared_ptr<Agent
     }
 }
 
-VelocityObstacle HRVOAgent::createVelocityObstacle(const Agent &other_agent) {
-    Circle obstacle_agent_circle(robot_state.position(), radius);
-    Circle moving_agent_circle(other_agent.robot_state.position(), radius);
-    auto vo = generateVelocityObstacle(obstacle_agent_circle, moving_agent_circle, robot_state.velocity());
+VelocityObstacle HRVOAgent::createVelocityObstacle(Agent &other_agent) {
+    Circle moving_agent_circle(robot_state.position(), radius);
+    Circle obstacle_agent_circle(other_agent.robot_state.position(), radius);
+    auto vo = generateVelocityObstacle(obstacle_agent_circle, moving_agent_circle, other_agent.robot_state.velocity());
 
     // Convert velocity obstacle to hybrid reciprocal velocity obstacle (HRVO)
     // by shifting one side of the velocity obstacle to share the responsibility
@@ -194,14 +188,14 @@ VelocityObstacle HRVOAgent::createVelocityObstacle(const Agent &other_agent) {
     return VelocityObstacle(hrvo_apex, vo.getLeftSide(), vo.getRightSide());
 }
 
-void HRVOAgent::computeNewVelocity(std::map<unsigned int, std::shared_ptr<Agent>> &agents, Duration time_step) {
+void HRVOAgent::computeNewVelocity(std::map<unsigned int, std::shared_ptr<Agent>> &agents, double time_step) {
     // Based on The Hybrid Reciprocal Velocity Obstacle paper:
     // https://gamma.cs.unc.edu/HRVO/HRVO-T-RO.pdf
 
     computeVelocityObstacles(agents);
 
     const auto pref_velocity = computePreferredVelocity(time_step);
-    LOG(INFO) << pref_velocity;
+
     // key is difference in length squared between PREFERRED and ACTUAL velocity
     std::multimap<double, Candidate> candidates;
 
@@ -459,7 +453,7 @@ bool HRVOAgent::isIdealCandidate(const Candidate &candidate) const {
 }
 
 bool HRVOAgent::isCandidateSlow(const Candidate &candidate) const {
-    double min_pref_speed = std::abs(preferred_velocity.length()) * candidate.MIN_PREF_SPEED_MULTIPLIER;
+    double min_pref_speed = std::abs(preferred_velocity.length()) * MIN_PREF_SPEED_MULTIPLIER;
 
     return std::abs(candidate.velocity.length()) < min_pref_speed;
 }
@@ -484,7 +478,7 @@ std::optional<int> HRVOAgent::findIntersectingVelocityObstacle(
     return std::nullopt;
 }
 
-Vector HRVOAgent::computePreferredVelocity(Duration time_step) {
+Vector HRVOAgent::computePreferredVelocity(double time_step) {
     double pref_speed = max_speed * PREF_SPEED_SCALE;
     auto path_point_opt = path.getCurrentPathPoint();
 
@@ -516,12 +510,12 @@ Vector HRVOAgent::computePreferredVelocity(Duration time_step) {
 
         // Limit the preferred velocity to the kinematic limits
         const Vector dv = ideal_pref_velocity - robot_state.velocity();
-        if (dv.length() <= max_accel * time_step.toSeconds()) {
+        if (dv.length() <= max_accel * time_step) {
             return ideal_pref_velocity;
         } else {
             // Calculate the maximum velocity towards the preferred velocity, given the
             // acceleration constraint
-            return robot_state.velocity() + dv.normalize(max_accel * time_step.toSeconds());
+            return robot_state.velocity() + dv.normalize(max_accel * time_step);
         }
     } else {
         // Accelerate to preferred speed
@@ -529,7 +523,7 @@ Vector HRVOAgent::computePreferredVelocity(Duration time_step) {
         double curr_pref_speed =
                 std::min(static_cast<double>(pref_speed),
                         //
-                         robot_state.velocity().length() + max_accel * time_step.toSeconds());
+                         robot_state.velocity().length() + max_accel * time_step);
         return dist_vector_to_goal.normalize(curr_pref_speed);
     }
 }

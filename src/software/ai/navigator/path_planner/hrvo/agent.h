@@ -12,57 +12,104 @@
 
 class Agent {
 public:
-
+    /**
+     * Constructor
+     *
+     * @param robot_id	            The robot id for this agent.
+     * @prarm robot_state           The robots current state
+     * @param side	  	            The team side for this agent (friendly or enemy).
+     * @param path                  The path of this agent
+     * @param radius                The radius of this agent.
+     * @param max_speed             The maximum speed of this agent.
+     * @param max_accel             The maximum acceleration of this agent.
+     * @param max_radius_inflation  The maximum amount which the radius of this agent can inflate.
+     */
     Agent(RobotId robot_id, RobotState robot_state, TeamSide side, RobotPath &path,
           double radius, double max_speed, double max_accel, double max_radius_inflation);
 
+
     /**
-     * Update the agent's radius based on its current velocity
+     * Update the agent's path and current state
+     *
+     * @param time_step the current time step that the simulator is running at
+     */
+    void update(double time_step);
+
+
+    /**
+     * Update the agent's radius based on its current (robot_state) velocity
      */
     void updateRadiusFromVelocity();
 
+
     /**
-     * updates the agents path and current state based
-     * @param time_step
+     * Update the primitive which this agent is currently pursuing.
+     *
+     * @param new_primitive The new primitive to pursue
+     * @param world The world in which the new primitive is being pursued
+     * @param time_step the time_step to use to step at
      */
-    void update(Duration time_step);
-
-    virtual Vector computePreferredVelocity(Duration time_step) = 0;
-
-    virtual void computeNewVelocity(std::map<unsigned int, std::shared_ptr<Agent>> &robots, Duration time_step) = 0;
-
-    virtual VelocityObstacle createVelocityObstacle(const Agent &other_agent) = 0;
-
     virtual void updatePrimitive(const TbotsProto::Primitive &new_primitive,
                                  const World &world,
-                                 Duration time_step) = 0;
+                                 double time_step) = 0;
+
+    /**
+     * Computes the preferred velocity of this agent.
+     *
+     * @param time_step
+     * @return the computed preferred velocity
+     */
+    virtual Vector computePreferredVelocity(double time_step) = 0;
+
+    /**
+     * Run the HRVO algorithm, and compute the new velocity this agent should move at
+     *
+     * @param robots robots in the simulation
+     * @param time_step
+     */
+    virtual void computeNewVelocity(std::map<unsigned int, std::shared_ptr<Agent>> &robots, double time_step) = 0;
 
 
-    // GETTERS
+    /**
+     * Create the VO to represent the given agent, relative to this agent
+     *
+     * @param other_agent The Agent which this velocity obstacle is being generated for
+     * @return The velocity obstacle which other_agent should see for this Agent
+     */
+    virtual VelocityObstacle createVelocityObstacle(const Agent &other_agent) = 0;
+
 
     /**
      * Return the state of the agent
      *
-     * @return The state of the agent
+     * @return The RobotState for this agent
      */
     RobotState getRobotState();
 
+    /**
+     * Get the preferred velocity for this robot
+     *
+     * @return the computed preferred velocity, if there is one.
+     */
     Vector getPreferredVelocity() const;
 
     /**
      * Gets the max speed for this agent
+     *
      * @return max speed for this agent
      */
     double getMaxSpeed() const;
 
     /**
      * Gets the radius for this agent
+     *
      * @return radius for this agent
      */
     double getRadius() const;
 
     /**
      * Gets the the path for this agent
+     *
      * @return Path for this agent
      */
     RobotPath &getPath();
@@ -74,6 +121,11 @@ public:
      */
     double getMaxAccel() const;
 
+    /**
+     * Set this robots preferred velocity
+     *
+     * @param The velocity for which preferred_velocity should be set to
+     */
     void setPreferredVelocity(Vector velocity);
 
     // robot id of this Agent
