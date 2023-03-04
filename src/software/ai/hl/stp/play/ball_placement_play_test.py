@@ -94,6 +94,7 @@ def test_two_ai_ball_placement(simulated_test_runner, run_enemy_ai):
         [
             # Ball should arrive within 0.15 m of placement point
             BallEventuallyEntersRegion(regions=[tbots.Circle(ball_final_pos, 0.15)]),
+            RobotEventuallyEntersRegion(regions=[tbots.Circle(ball_final_pos, 0.15)]),
         ]
     ]
 
@@ -113,7 +114,7 @@ def test_two_ai_ball_placement(simulated_test_runner, run_enemy_ai):
     # drop_ball_always_validation_sequence_set = [
     #     [
     #         BallAlwaysStaysInRegion(
-    #             regions=[tbots.Circle(ball_final_pos, 0.1)]),
+    #             regions=[tbots.Circle(ball_final_pos, 0.15)]),
     #     ]
     # ]
 
@@ -122,11 +123,12 @@ def test_two_ai_ball_placement(simulated_test_runner, run_enemy_ai):
     # # See detailed rules here: https://robocup-ssl.github.io/ssl-rules/sslrules.html#_ball_placement
     # drop_ball_eventually_validation_sequence_set = [
     #     [
-    #         # Ball should arrive within 5cm of placement point
+    #         # Ball should arrive within 0.15m of placement point
     #         BallEventuallyStopsInRegion(
-    #             regions=[tbots.Circle(ball_final_pos, 0.05)]),
+    #             regions=[tbots.Circle(ball_final_pos, 0.15)]),
+    #           #Robot should exit from ball at least 0.05m
     #         RobotEventuallyExitsRegion(
-    #             regions=[tbots.Circle(ball_final_pos, 0.05)]),
+    #             regions=[tbots.Circle(ball_final_pos, 0.2)]),
     #     ]
     # ]
 
@@ -211,6 +213,7 @@ def test_force_start_ball_placement(simulated_test_runner, run_enemy_ai):
         [
             # Ball should arrive within 0.15m of placement point
             BallEventuallyEntersRegion(regions=[tbots.Circle(ball_final_pos, 0.15)]),
+            RobotEventuallyEntersRegion(regions=[tbots.Circle(ball_final_pos, 0.15)]),
         ]
     ]
 
@@ -235,15 +238,16 @@ def test_force_start_ball_placement(simulated_test_runner, run_enemy_ai):
     # ]
 
     # # Drop Ball Eventually Validation
-    # # Non free kick after ball placement, the robot must be 0.5m away from the ball after the placement
+    # # Non free kick after ball placement, the robot must be 0.5 away from the ball after the placement
     # # See detailed rules here: https://robocup-ssl.github.io/ssl-rules/sslrules.html#_ball_placement
     # drop_ball_eventually_validation_sequence_set = [
     #     [
-    #         # Ball should arrive within 5cm of placement point
+    #         # Ball should arrive within 0.15m of placement point
     #         BallEventuallyStopsInRegion(
-    #             regions=[tbots.Circle(ball_final_pos, 0.05)]),
+    #             regions=[tbots.Circle(ball_final_pos, 0.15)]),
+    #           # Robot has to be 0.5 m away from the ball
     #         RobotEventuallyExitsRegion(
-    #             regions=[tbots.Circle(ball_final_pos, 0.5)]),
+    #             regions=[tbots.Circle(ball_final_pos, 0.65)]),
     #     ]
     # ]
 
