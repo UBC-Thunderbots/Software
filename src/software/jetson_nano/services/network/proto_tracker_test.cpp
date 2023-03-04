@@ -66,6 +66,8 @@ TEST(ProtoTrackerTest, out_of_order_test)
     EXPECT_EQ(0, tracker.getLossRate());
     tracker.send(2);
     EXPECT_EQ(0, tracker.getLossRate());
+    EXPECT_TRUE(tracker.isLastValid());
     tracker.send(1);  // out of order
     EXPECT_EQ(0, tracker.getLossRate());
+    EXPECT_FALSE(tracker.isLastValid());
 }
