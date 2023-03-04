@@ -60,6 +60,6 @@ class NetworkService
     void worldCallback(TbotsProto::World input);
 
     // ProtoTrackers for tracking recent primitive set and world loss
-    ProtoTracker primitive_tracker = ProtoTracker("primitive set");
-    ProtoTracker world_tracker     = ProtoTracker("world");
+    ProtoTracker primitive_tracker;
+    ProtoTracker world_tracker;
 };

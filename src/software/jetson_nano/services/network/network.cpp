@@ -8,6 +8,8 @@ NetworkService::NetworkService(const std::string& ip_address,
                                unsigned short world_listener_port,
                                unsigned short primitive_listener_port,
                                unsigned short robot_status_sender_port, bool multicast)
+    : primitive_tracker(ProtoTracker("primitive set")),
+      world_tracker(ProtoTracker("primitive set"))
 {
     sender = std::make_unique<ThreadedProtoUdpSender<TbotsProto::RobotStatus>>(
         ip_address, robot_status_sender_port, multicast);
