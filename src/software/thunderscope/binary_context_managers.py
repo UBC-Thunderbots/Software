@@ -168,6 +168,7 @@ gdb --args bazel-bin/{full_system}
             CostVisualization,
             NamedValue,
             PlayInfo,
+            SimulationStartedTrigger,
         ]:
             proto_unix_io.attach_unix_receiver(
                 runtime_dir=self.full_system_runtime_dir,
@@ -311,6 +312,8 @@ gdb --args bazel-bin/{simulator_command}
             (WORLD_STATE_PATH, WorldState),
         ]:
             simulator_proto_unix_io.attach_unix_sender(self.simulator_runtime_dir, *arg)
+
+        simulator_proto_unix_io.attach_unix_receiver(self.simulator_runtime_dir, SIMULATION_STARTED_TRIGGER_PATH, SimulationStartedTrigger)
 
         # setup blue full system unix io
         for arg in [
