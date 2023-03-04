@@ -89,7 +89,7 @@ struct BallPlacementPlayFSM
 
    private:
     TbotsProto::AiConfig ai_config;
-    std::shared_ptr<PivotKickTactic> pivot_kick_tactic;
+    std::shared_ptr<WallKickoffTactic> pivot_kick_tactic;
     std::shared_ptr<PlaceBallTactic> place_ball_tactic;
-    std::vector<std::shared_ptr<MoveTactic>> move_tactics;
+    std::vector<std::shared_ptr<PlaceBallMoveTactic>> move_tactics;
 };

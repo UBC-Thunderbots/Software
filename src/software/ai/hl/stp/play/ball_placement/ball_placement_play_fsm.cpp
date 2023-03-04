@@ -2,9 +2,9 @@
 
 BallPlacementPlayFSM::BallPlacementPlayFSM(TbotsProto::AiConfig ai_config)
     : ai_config(ai_config),
-      pivot_kick_tactic(std::make_shared<PivotKickTactic>(ai_config)),
+      pivot_kick_tactic(std::make_shared<WallKickoffTactic>(ai_config)),
       place_ball_tactic(std::make_shared<PlaceBallTactic>(ai_config)),
-      move_tactics(std::vector<std::shared_ptr<MoveTactic>>())
+      move_tactics(std::vector<std::shared_ptr<PlaceBallMoveTactic>>())
 {
 }
 
@@ -54,9 +54,9 @@ void BallPlacementPlayFSM::placeBall(const Update &event)
 
     unsigned int num_tactics = event.common.num_tactics;
 
-    move_tactics = std::vector<std::shared_ptr<MoveTactic>>(num_tactics - 1);
+    move_tactics = std::vector<std::shared_ptr<PlaceBallMoveTactic>>(num_tactics - 1);
     std::generate(move_tactics.begin(), move_tactics.end(),
-                  [this]() { return std::make_shared<MoveTactic>(); });
+                  [this]() { return std::make_shared<PlaceBallMoveTactic>(); });
 
     // non goalie and non ball placing robots line up along a line just outside the
     // friendly defense area to wait for ball placement to finish
@@ -91,9 +91,9 @@ bool BallPlacementPlayFSM::shouldKickOffWall(const Update &event)
 {
     // check if ball is too close to border
     Point ball_pos = event.common.world.ball().position();
-    Rectangle field_boundary = event.common.world.field().fieldBoundary();
+    Rectangle field_lines = event.common.world.field().fieldLines();
 
-    return !contains(field_boundary, ball_pos);
+    return !contains(field_lines, ball_pos);
 }
 
 bool BallPlacementPlayFSM::kickDone(const Update &event)
