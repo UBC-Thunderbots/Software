@@ -62,7 +62,7 @@ void ColouredCoutSink::displayColouredLog(g3::LogMessageMover log_entry)
         return;
     }
 
-    std::chrono::_V2::system_clock::duration current_time = log_entry.get()._timestamp.time_since_epoch();
+    std::chrono::_V2::system_clock::time_point current_time = std::chrono::system_clock::now();
     bool past_time = current_time - LOG_INTERVAL_TIMESTAMP < last_msg_timestamp;
     if (log_entry.get().message() == last_msg && past_time) {
         // repeated message outside timestamp, increase repeats and don't log
@@ -72,7 +72,7 @@ void ColouredCoutSink::displayColouredLog(g3::LogMessageMover log_entry)
 
     // log and save info
     last_msg = log_entry.get().message();
-    last_msg_timestamp = log_entry.get()._timestamp.time_since_epoch();
+    last_msg_timestamp = current_time;
 
     // remove newline from end of message
     if (log_entry.get()._message.back() == '\n') {

@@ -39,6 +39,6 @@ class NetworkSink
     int robot_id;
     
     std::string last_msg;
-    std::chrono::_V2::system_clock::duration last_msg_timestamp;
+    std::chrono::_V2::system_clock::time_point last_msg_timestamp;
     int num_repeats;
 };
