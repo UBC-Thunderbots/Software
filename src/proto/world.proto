@@ -47,7 +47,7 @@ message WorldState
 
 message SimulationStartedTrigger
 {
-    required bool sim_started = 1; 
+    required bool sim_started = 1;
 }
 
 message SimulatorTick

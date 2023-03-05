@@ -313,7 +313,11 @@ gdb --args bazel-bin/{simulator_command}
         ]:
             simulator_proto_unix_io.attach_unix_sender(self.simulator_runtime_dir, *arg)
 
-        simulator_proto_unix_io.attach_unix_receiver(self.simulator_runtime_dir, SIMULATION_STARTED_TRIGGER_PATH, SimulationStartedTrigger)
+        simulator_proto_unix_io.attach_unix_receiver(
+            self.simulator_runtime_dir,
+            SIMULATION_STARTED_TRIGGER_PATH,
+            SimulationStartedTrigger,
+        )
 
         # setup blue full system unix io
         for arg in [

@@ -349,9 +349,11 @@ std::unique_ptr<TbotsProto::PassVisualization> createPassVisualization(
     return pass_visualization_msg;
 }
 
-std::unique_ptr<TbotsProto::SimulationStartedTrigger> createSimulationStartedTrigger(const bool sim_started_trigger)
+std::unique_ptr<TbotsProto::SimulationStartedTrigger> createSimulationStartedTrigger(
+    const bool sim_started_trigger)
 {
-    auto sim_started_trigger_msg = std::make_unique<TbotsProto::SimulationStartedTrigger>();
+    auto sim_started_trigger_msg =
+        std::make_unique<TbotsProto::SimulationStartedTrigger>();
     sim_started_trigger_msg->set_sim_started(sim_started_trigger);
     return sim_started_trigger_msg;
 }
@@ -370,4 +372,3 @@ std::unique_ptr<TbotsProto::CostVisualization> createCostVisualization(
 
     return cost_visualization_msg;
 }
-

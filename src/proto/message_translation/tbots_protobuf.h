@@ -129,12 +129,14 @@ std::unique_ptr<TbotsProto::PassVisualization> createPassVisualization(
 /**
  * Returns the SimulationStartedTrigger given the simulation start trigger
  *
- * @param sim_started_trigger a boolean value that is true if simulation has already started
+ * @param sim_started_trigger a boolean value that is true if simulation has already
+ * started
  *
- * @return The unique_ptr to a TbotsProto::SimulationStartedTrigger proto containing 
+ * @return The unique_ptr to a TbotsProto::SimulationStartedTrigger proto containing
  *         a boolean value for whether simulation has started or not
  */
-std::unique_ptr<TbotsProto::SimulationStartedTrigger> createSimulationStartedTrigger(const bool sim_started_trigger);
+std::unique_ptr<TbotsProto::SimulationStartedTrigger> createSimulationStartedTrigger(
+    const bool sim_started_trigger);
 
 /**
  * Returns a cost visualization given a vector of costs

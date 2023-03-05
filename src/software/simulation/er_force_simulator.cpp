@@ -139,11 +139,11 @@ void ErForceSimulator::setWorldState(const TbotsProto::WorldState& world_state)
     }
 
     auto sim_started_trigger_msg = *createSimulationStartedTrigger(true);
-    if(!has_sent_sim_start_trigger)
+    if (!has_sent_sim_start_trigger)
     {
-       LOG(VISUALIZE) << sim_started_trigger_msg; 
-       has_sent_sim_start_trigger = true;
-       std::cout << sim_started_trigger_msg.DebugString() << std::endl;
+        LOG(VISUALIZE) << sim_started_trigger_msg;
+        has_sent_sim_start_trigger = true;
+        std::cout << sim_started_trigger_msg.DebugString() << std::endl;
     }
 }
 
