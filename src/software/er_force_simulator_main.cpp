@@ -127,6 +127,7 @@ int main(int argc, char **argv)
             runtime_dir + WORLD_STATE_PATH, [&](TbotsProto::WorldState input) {
                 std::scoped_lock lock(simulator_mutex);
                 er_force_sim->setWorldState(input);
+                std::cout << input.DebugString() + "WorldState" << std::endl;
             });
 
         // World Input: Buffer vision until we have primitives to tick
@@ -164,6 +165,8 @@ int main(int argc, char **argv)
         auto simulator_tick = ThreadedProtoUnixListener<TbotsProto::SimulatorTick>(
             runtime_dir + SIMULATION_TICK_PATH, [&](TbotsProto::SimulatorTick input) {
                 std::scoped_lock lock(simulator_mutex);
+
+                std::cout << input.DebugString() + "SimulatorTick" << std::endl;
 
                 // Step the simulation and send back the wrapper packets and
                 // the robot status msgs
