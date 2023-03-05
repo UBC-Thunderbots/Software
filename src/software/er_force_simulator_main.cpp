@@ -123,8 +123,9 @@ int main(int argc, char **argv)
             runtime_dir + SIMULATOR_STATE_PATH);
 
         // Simulation Started Trigger as Simulator Output
-        auto simulation_started_trigger = ThreadedProtoUnixSender<TbotsProto::SimulationStartedTrigger>(
-            runtime_dir + SIMULATION_STARTED_TRIGGER_PATH);
+        auto simulation_started_trigger =
+            ThreadedProtoUnixSender<TbotsProto::SimulationStartedTrigger>(
+                runtime_dir + SIMULATION_STARTED_TRIGGER_PATH);
 
         // Inputs
         // World State Input: Configures the ERForceSimulator
@@ -134,7 +135,8 @@ int main(int argc, char **argv)
                 er_force_sim->setWorldState(input);
 
                 auto sim_started_trigger_msg = *createSimulationStartedTrigger(true);
-                if(!er_force_sim->has_sent_sim_start_trigger) {
+                if (!er_force_sim->has_sent_sim_start_trigger)
+                {
                     simulation_started_trigger.sendProto(sim_started_trigger_msg);
                     er_force_sim->has_sent_sim_start_trigger = true;
                 }

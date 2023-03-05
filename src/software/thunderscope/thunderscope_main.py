@@ -333,10 +333,12 @@ if __name__ == "__main__":
 
             """
             sim_start_buffer = ThreadSafeBuffer(1, SimulationStartedTrigger, False)
-            tscope.simulator_proto_unix_io.register_observer(SimulationStartedTrigger, sim_start_buffer)
+            tscope.simulator_proto_unix_io.register_observer(
+                SimulationStartedTrigger, sim_start_buffer
+            )
 
-            sim_start_buffer.get(block=False) 
-            
+            sim_start_buffer.get(block=False)
+
             world_state = tbots_protobuf.create_world_state(
                 blue_robot_locations=[
                     cpp_bindings.Point(-3, y) for y in numpy.linspace(-2, 2, NUM_ROBOTS)
@@ -348,7 +350,7 @@ if __name__ == "__main__":
                 ball_velocity=cpp_bindings.Vector(0, 0),
             )
             tscope.simulator_proto_unix_io.send_proto(WorldState, world_state)
-                
+
             simulation_state_buffer = ThreadSafeBuffer(1, SimulationState)
             tscope.simulator_proto_unix_io.register_observer(
                 SimulationState, simulation_state_buffer
