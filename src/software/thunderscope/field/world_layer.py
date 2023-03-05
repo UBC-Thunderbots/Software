@@ -10,11 +10,11 @@ from pyqtgraph.Qt.QtWidgets import *
 from proto.geometry_pb2 import Point, Segment
 from software.py_constants import *
 from software.thunderscope.constants import (
+    BALL_HEIGHT_EFFECT_MULTIPLIER,
     LINE_WIDTH,
     SPEED_LINE_WIDTH,
     SPEED_SEGMENT_SCALE,
 )
-from software.thunderscope.constants import LINE_WIDTH
 from software.thunderscope.constants import Colors
 from software.networking.threaded_unix_listener import ThreadedUnixListener
 from software.thunderscope.field.field_layer import FieldLayer
