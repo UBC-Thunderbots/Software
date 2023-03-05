@@ -16,11 +16,11 @@ py_library(
     name = "thunderscope",
     srcs = ["thunderscope.py"],
     data = [
+        "thunderscope-logo.png",
         "//software:er_force_simulator_main",
         "//software:py_constants.so",
         "//software:python_bindings.so",
         "//software:unix_full_system",
-        "thunderscope-logo.png"
     ],
     deps = [
         "//extlibs/er_force_sim/src/protobuf:erforce_py_proto",

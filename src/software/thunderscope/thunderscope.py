@@ -148,7 +148,9 @@ class Thunderscope(object):
 
         self.window = QtGui.QMainWindow()
         self.window.setCentralWidget(self.tabs)
-        self.window.setWindowIcon(QtGui.QIcon("software/thunderscope/thunderscope-logo.png"))
+        self.window.setWindowIcon(
+            QtGui.QIcon("software/thunderscope/thunderscope-logo.png")
+        )
         self.window.setWindowTitle("Thunderscope")
 
         # ProtoUnixIOs
