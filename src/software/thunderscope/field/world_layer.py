@@ -406,9 +406,7 @@ class WorldLayer(FieldLayer):
         # Ball should get larger as the height of the ball increases
         ball_radius = BALL_MAX_RADIUS_METERS * (1 + ball_state.distance_from_ground)
 
-        painter.drawEllipse(
-            self.createCircle(ball_state.global_position, ball_radius)
-        )
+        painter.drawEllipse(self.createCircle(ball_state.global_position, ball_radius))
 
         # If the mouse is being dragged on the screen, visualize
         # the ball velocity vector. The 0.5 scaling is abitrary
