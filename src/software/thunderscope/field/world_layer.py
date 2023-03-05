@@ -403,8 +403,11 @@ class WorldLayer(FieldLayer):
         painter.setPen(pg.mkPen(Colors.BALL_COLOR, width=LINE_WIDTH))
         painter.setBrush(pg.mkBrush(Colors.BALL_COLOR))
 
+        # Ball should get larger as the height of the ball increases
+        ball_radius = BALL_MAX_RADIUS_METERS * (1 + ball_state.distance_from_ground)
+
         painter.drawEllipse(
-            self.createCircle(ball_state.global_position, BALL_MAX_RADIUS_METERS)
+            self.createCircle(ball_state.global_position, ball_radius)
         )
 
         # If the mouse is being dragged on the screen, visualize
