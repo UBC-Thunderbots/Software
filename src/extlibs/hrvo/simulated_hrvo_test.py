@@ -22,6 +22,7 @@ class HrvoTestVariants(Enum):
     LOCAL_MINIMA = 8
     LOCAL_MINIMA_OPEN_END = 9
     AVOIDING_BALL_OBSTACLE = 10
+    DRIVE_8_STRAIGHT_CIRCLE = 11
 
 
 DRIVE_IN_STRAIGHT_LINE_PARAMS = {
@@ -121,7 +122,7 @@ DRIVE_IN_STRAIGHT_LINE_PARAMS = {
         "friendly_robots": [],
         "enemy_robots": [],
         "destination": Point(x_meters=-1.0, y_meters=0),
-    },
+    }
 }
 
 
@@ -219,7 +220,7 @@ def hrvo_test_setup(world_state_dict, simulated_test_runner):
         len(friendly_robots) - 1,
         world_state_dict["destination"],
         desired_orientation,
-        0,
+        0
     )
 
     simulated_test_runner.blue_full_system_proto_unix_io.send_proto(
@@ -243,165 +244,278 @@ def hrvo_test_setup(world_state_dict, simulated_test_runner):
         ),
     )
 
+#
+# def test_drive_straight_moving_enemy_behind(simulated_test_runner):
+#     # Always Validation
+#     always_validation_sequence_set = [[]]
+#
+#     setup_param = DRIVE_IN_STRAIGHT_LINE_PARAMS[
+#         HrvoTestVariants.MOVING_ENEMY_BEHIND.name
+#     ]
+#
+#     destination = setup_param["destination"]
+#     threshold = 0.05
+#     # Eventually Validation
+#     eventually_validation_sequence_set = get_reached_destination_validation(setup_param)
+#
+#     simulated_test_runner.run_test(
+#         setup=lambda world_dict: hrvo_test_setup(world_dict, simulated_test_runner),
+#         params=[setup_param],
+#         inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
+#         inv_always_validation_sequence_set=always_validation_sequence_set,
+#         ag_eventually_validation_sequence_set=[[]],
+#         ag_always_validation_sequence_set=[[]],
+#         test_timeout_s=10,
+#     )
+#
+#
+# def test_drive_straight_moving_enemy_side(simulated_test_runner):
+#     # Always Validation
+#     always_validation_sequence_set = [[]]
+#
+#     setup_param = DRIVE_IN_STRAIGHT_LINE_PARAMS[HrvoTestVariants.MOVING_ENEMY_SIDE.name]
+#
+#     destination = setup_param["destination"]
+#     threshold = 0.05
+#     # Eventually Validation
+#     eventually_validation_sequence_set = get_reached_destination_validation(setup_param)
+#
+#     simulated_test_runner.run_test(
+#         setup=lambda world_dict: hrvo_test_setup(world_dict, simulated_test_runner),
+#         params=[setup_param],
+#         inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
+#         inv_always_validation_sequence_set=always_validation_sequence_set,
+#         ag_eventually_validation_sequence_set=[[]],
+#         ag_always_validation_sequence_set=[[]],
+#         test_timeout_s=10,
+#     )
+#
+#
+# def test_drive_straight_no_obstacle(simulated_test_runner):
+#     # Always Validation
+#     always_validation_sequence_set = [[]]
+#
+#     setup_param = DRIVE_IN_STRAIGHT_LINE_PARAMS[HrvoTestVariants.NO_OBSTACLE.name]
+#
+#     eventually_validation_sequence_set = get_reached_destination_validation(setup_param)
+#
+#     simulated_test_runner.run_test(
+#         setup=lambda world_dict: hrvo_test_setup(world_dict, simulated_test_runner),
+#         params=[setup_param],
+#         inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
+#         inv_always_validation_sequence_set=always_validation_sequence_set,
+#         ag_eventually_validation_sequence_set=[[]],
+#         ag_always_validation_sequence_set=[[]],
+#         test_timeout_s=10,
+#     )
+#
+#
+# def test_drive_straight_friendly_in_front(simulated_test_runner):
+#     # Always Validation
+#     always_validation_sequence_set = [[]]
+#
+#     setup_param = DRIVE_IN_STRAIGHT_LINE_PARAMS[
+#         HrvoTestVariants.FRIENDLY_ROBOT_IN_FRONT.name
+#     ]
+#
+#     eventually_validation_sequence_set = get_reached_destination_validation(setup_param)
+#
+#     simulated_test_runner.run_test(
+#         setup=lambda world_dict: hrvo_test_setup(world_dict, simulated_test_runner),
+#         params=[setup_param],
+#         inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
+#         inv_always_validation_sequence_set=always_validation_sequence_set,
+#         ag_eventually_validation_sequence_set=[[]],
+#         ag_always_validation_sequence_set=[[]],
+#         test_timeout_s=10,
+#     )
+#
+#
+# def test_single_enemy_directly_in_front(simulated_test_runner):
+#     # Always Validation
+#     always_validation_sequence_set = [[]]
+#
+#     setup_param = DRIVE_IN_STRAIGHT_LINE_PARAMS[
+#         HrvoTestVariants.SINGLE_ENEMY_IN_FRONT.name
+#     ]
+#
+#     eventually_validation_sequence_set = get_reached_destination_validation(setup_param)
+#
+#     simulated_test_runner.run_test(
+#         setup=lambda world_dict: hrvo_test_setup(world_dict, simulated_test_runner),
+#         params=[setup_param],
+#         inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
+#         inv_always_validation_sequence_set=always_validation_sequence_set,
+#         ag_eventually_validation_sequence_set=[[]],
+#         ag_always_validation_sequence_set=[[]],
+#         test_timeout_s=10,
+#     )
+#
+#
+# def test_zig_zag(simulated_test_runner):
+#     # Always Validation
+#     always_validation_sequence_set = [[]]
+#
+#     setup_param = get_zig_zag_params()
+#
+#     eventually_validation_sequence_set = get_reached_destination_validation(setup_param)
+#
+#     simulated_test_runner.run_test(
+#         setup=lambda world_dict: hrvo_test_setup(world_dict, simulated_test_runner),
+#         params=[setup_param],
+#         inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
+#         inv_always_validation_sequence_set=always_validation_sequence_set,
+#         ag_eventually_validation_sequence_set=[[]],
+#         ag_always_validation_sequence_set=[[]],
+#         test_timeout_s=10,
+#     )
+#
+#
+# def test_not_going_in_static_obstacles(simulated_test_runner):
+#     # Always Validation
+#     always_validation_sequence_set = [[]]
+#
+#     setup_param = DRIVE_IN_STRAIGHT_LINE_PARAMS[
+#         HrvoTestVariants.NOT_GOING_IN_STATIC_OBSTACLES.name
+#     ]
+#
+#     eventually_validation_sequence_set = get_reached_destination_validation(setup_param)
+#
+#     simulated_test_runner.run_test(
+#         setup=lambda world_dict: hrvo_test_setup(world_dict, simulated_test_runner),
+#         params=[setup_param],
+#         inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
+#         inv_always_validation_sequence_set=always_validation_sequence_set,
+#         ag_eventually_validation_sequence_set=[[]],
+#         ag_always_validation_sequence_set=[[]],
+#         test_timeout_s=10,
+#     )
+#
+#
+# def test_start_in_local_minima(simulated_test_runner):
+#     # Always Validation
+#     always_validation_sequence_set = [[]]
+#
+#     setup_param = DRIVE_IN_STRAIGHT_LINE_PARAMS[HrvoTestVariants.LOCAL_MINIMA.name]
+#
+#     eventually_validation_sequence_set = [[]]
+#
+#     simulated_test_runner.run_test(
+#         setup=lambda world_dict: hrvo_test_setup(world_dict, simulated_test_runner),
+#         params=[setup_param],
+#         inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
+#         inv_always_validation_sequence_set=always_validation_sequence_set,
+#         ag_eventually_validation_sequence_set=[[]],
+#         ag_always_validation_sequence_set=[[]],
+#         test_timeout_s=20,
+#     )
+#
+#
+# def test_start_in_local_minima_open_end(simulated_test_runner):
+#     # Always Validation
+#     always_validation_sequence_set = [[]]
+#
+#     setup_param = DRIVE_IN_STRAIGHT_LINE_PARAMS[
+#         HrvoTestVariants.LOCAL_MINIMA_OPEN_END.name
+#     ]
+#
+#     eventually_validation_sequence_set = get_reached_destination_validation(setup_param)
+#
+#     simulated_test_runner.run_test(
+#         setup=lambda world_dict: hrvo_test_setup(world_dict, simulated_test_runner),
+#         params=[setup_param],
+#         inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
+#         inv_always_validation_sequence_set=always_validation_sequence_set,
+#         ag_eventually_validation_sequence_set=[[]],
+#         ag_always_validation_sequence_set=[[]],
+#         test_timeout_s=20,
+#     )
+#
+#
+# def test_robot_avoiding_ball_obstacle(simulated_test_runner):
+#     # Always Validation
+#     always_validation_sequence_set = [[]]
+#
+#     setup_param = DRIVE_IN_STRAIGHT_LINE_PARAMS[
+#         HrvoTestVariants.AVOIDING_BALL_OBSTACLE.name
+#     ]
+#
+#     eventually_validation_sequence_set = get_reached_destination_validation(setup_param)
+#
+#     simulated_test_runner.run_test(
+#         setup=lambda world_dict: hrvo_test_setup(world_dict, simulated_test_runner),
+#         params=[setup_param],
+#         inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
+#         inv_always_validation_sequence_set=always_validation_sequence_set,
+#         ag_eventually_validation_sequence_set=[[]],
+#         ag_always_validation_sequence_set=[[]],
+#         test_timeout_s=20,
+#     )
 
-def test_drive_straight_moving_enemy_behind(simulated_test_runner):
+
+def test_8_driving_straight_circle(simulated_test_runner):
+
+    def setup(setup_param):
+        ball_initial_pos = tbots.Point(1, 2)
+        ball_initial_vel = tbots.Point(0, 0)
+
+        radius, num_robots = setup_param
+
+        friendly_robots = []
+
+        # Game Controller Setup
+        simulated_test_runner.gamecontroller.send_ci_input(
+            gc_command=Command.Type.STOP, team=Team.UNKNOWN
+        )
+        simulated_test_runner.gamecontroller.send_ci_input(
+            gc_command=Command.Type.FORCE_START, team=Team.BLUE
+        )
+
+        params = AssignedTacticPlayControlParams()
+
+        for i in range(num_robots):
+            angle = i * 2 * math.pi / num_robots
+            x_meters = radius * math.cos(angle)
+            y_meters = radius * math.sin(angle)
+
+            friendly_robots.append(RobotState(
+                global_position=Point(
+                    x_meters=x_meters,
+                    y_meters=y_meters
+                )
+            ))
+
+            params = get_move_update_control_params(
+                i, Point(x_meters=-x_meters, y_meters=-y_meters),
+                Angle(radians=angle + math.pi), 0,
+                params=params
+            )
+
+        simulated_test_runner.blue_full_system_proto_unix_io.send_proto(
+            AssignedTacticPlayControlParams, params
+        )
+
+        # Setup Robots
+        simulated_test_runner.simulator_proto_unix_io.send_proto(
+            WorldState,
+            create_world_state_from_state(
+                yellow_robot_states=[],
+                blue_robot_states=friendly_robots,
+                ball_location=ball_initial_pos,
+                ball_velocity=ball_initial_vel,
+            ),
+        )
+
     # Always Validation
     always_validation_sequence_set = [[]]
-
-    setup_param = DRIVE_IN_STRAIGHT_LINE_PARAMS[
-        HrvoTestVariants.MOVING_ENEMY_BEHIND.name
-    ]
-
-    destination = setup_param["destination"]
-    threshold = 0.05
-    # Eventually Validation
-    eventually_validation_sequence_set = get_reached_destination_validation(setup_param)
-
-    simulated_test_runner.run_test(
-        setup=lambda world_dict: hrvo_test_setup(world_dict, simulated_test_runner),
-        params=[setup_param],
-        inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
-        inv_always_validation_sequence_set=always_validation_sequence_set,
-        ag_eventually_validation_sequence_set=[[]],
-        ag_always_validation_sequence_set=[[]],
-        test_timeout_s=10,
-    )
-
-
-def test_drive_straight_moving_enemy_side(simulated_test_runner):
-    # Always Validation
-    always_validation_sequence_set = [[]]
-
-    setup_param = DRIVE_IN_STRAIGHT_LINE_PARAMS[HrvoTestVariants.MOVING_ENEMY_SIDE.name]
-
-    destination = setup_param["destination"]
-    threshold = 0.05
-    # Eventually Validation
-    eventually_validation_sequence_set = get_reached_destination_validation(setup_param)
-
-    simulated_test_runner.run_test(
-        setup=lambda world_dict: hrvo_test_setup(world_dict, simulated_test_runner),
-        params=[setup_param],
-        inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
-        inv_always_validation_sequence_set=always_validation_sequence_set,
-        ag_eventually_validation_sequence_set=[[]],
-        ag_always_validation_sequence_set=[[]],
-        test_timeout_s=10,
-    )
-
-
-def test_drive_straight_no_obstacle(simulated_test_runner):
-    # Always Validation
-    always_validation_sequence_set = [[]]
-
-    setup_param = DRIVE_IN_STRAIGHT_LINE_PARAMS[HrvoTestVariants.NO_OBSTACLE.name]
-
-    eventually_validation_sequence_set = get_reached_destination_validation(setup_param)
-
-    simulated_test_runner.run_test(
-        setup=lambda world_dict: hrvo_test_setup(world_dict, simulated_test_runner),
-        params=[setup_param],
-        inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
-        inv_always_validation_sequence_set=always_validation_sequence_set,
-        ag_eventually_validation_sequence_set=[[]],
-        ag_always_validation_sequence_set=[[]],
-        test_timeout_s=10,
-    )
-
-
-def test_drive_straight_friendly_in_front(simulated_test_runner):
-    # Always Validation
-    always_validation_sequence_set = [[]]
-
-    setup_param = DRIVE_IN_STRAIGHT_LINE_PARAMS[
-        HrvoTestVariants.FRIENDLY_ROBOT_IN_FRONT.name
-    ]
-
-    eventually_validation_sequence_set = get_reached_destination_validation(setup_param)
-
-    simulated_test_runner.run_test(
-        setup=lambda world_dict: hrvo_test_setup(world_dict, simulated_test_runner),
-        params=[setup_param],
-        inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
-        inv_always_validation_sequence_set=always_validation_sequence_set,
-        ag_eventually_validation_sequence_set=[[]],
-        ag_always_validation_sequence_set=[[]],
-        test_timeout_s=10,
-    )
-
-
-def test_single_enemy_directly_in_front(simulated_test_runner):
-    # Always Validation
-    always_validation_sequence_set = [[]]
-
-    setup_param = DRIVE_IN_STRAIGHT_LINE_PARAMS[
-        HrvoTestVariants.SINGLE_ENEMY_IN_FRONT.name
-    ]
-
-    eventually_validation_sequence_set = get_reached_destination_validation(setup_param)
-
-    simulated_test_runner.run_test(
-        setup=lambda world_dict: hrvo_test_setup(world_dict, simulated_test_runner),
-        params=[setup_param],
-        inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
-        inv_always_validation_sequence_set=always_validation_sequence_set,
-        ag_eventually_validation_sequence_set=[[]],
-        ag_always_validation_sequence_set=[[]],
-        test_timeout_s=10,
-    )
-
-
-def test_zig_zag(simulated_test_runner):
-    # Always Validation
-    always_validation_sequence_set = [[]]
-
-    setup_param = get_zig_zag_params()
-
-    eventually_validation_sequence_set = get_reached_destination_validation(setup_param)
-
-    simulated_test_runner.run_test(
-        setup=lambda world_dict: hrvo_test_setup(world_dict, simulated_test_runner),
-        params=[setup_param],
-        inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
-        inv_always_validation_sequence_set=always_validation_sequence_set,
-        ag_eventually_validation_sequence_set=[[]],
-        ag_always_validation_sequence_set=[[]],
-        test_timeout_s=10,
-    )
-
-
-def test_not_going_in_static_obstacles(simulated_test_runner):
-    # Always Validation
-    always_validation_sequence_set = [[]]
-
-    setup_param = DRIVE_IN_STRAIGHT_LINE_PARAMS[
-        HrvoTestVariants.NOT_GOING_IN_STATIC_OBSTACLES.name
-    ]
-
-    eventually_validation_sequence_set = get_reached_destination_validation(setup_param)
-
-    simulated_test_runner.run_test(
-        setup=lambda world_dict: hrvo_test_setup(world_dict, simulated_test_runner),
-        params=[setup_param],
-        inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
-        inv_always_validation_sequence_set=always_validation_sequence_set,
-        ag_eventually_validation_sequence_set=[[]],
-        ag_always_validation_sequence_set=[[]],
-        test_timeout_s=10,
-    )
-
-
-def test_start_in_local_minima(simulated_test_runner):
-    # Always Validation
-    always_validation_sequence_set = [[]]
-
-    setup_param = DRIVE_IN_STRAIGHT_LINE_PARAMS[HrvoTestVariants.LOCAL_MINIMA.name]
 
     eventually_validation_sequence_set = [[]]
 
+    #get_reached_destination_validation(setup_param)
+
     simulated_test_runner.run_test(
-        setup=lambda world_dict: hrvo_test_setup(world_dict, simulated_test_runner),
-        params=[setup_param],
+        setup=setup,
+        params=[(1.5, 4)],
         inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
         inv_always_validation_sequence_set=always_validation_sequence_set,
         ag_eventually_validation_sequence_set=[[]],
@@ -410,50 +524,7 @@ def test_start_in_local_minima(simulated_test_runner):
     )
 
 
-def test_start_in_local_minima_open_end(simulated_test_runner):
-    # Always Validation
-    always_validation_sequence_set = [[]]
-
-    setup_param = DRIVE_IN_STRAIGHT_LINE_PARAMS[
-        HrvoTestVariants.LOCAL_MINIMA_OPEN_END.name
-    ]
-
-    eventually_validation_sequence_set = get_reached_destination_validation(setup_param)
-
-    simulated_test_runner.run_test(
-        setup=lambda world_dict: hrvo_test_setup(world_dict, simulated_test_runner),
-        params=[setup_param],
-        inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
-        inv_always_validation_sequence_set=always_validation_sequence_set,
-        ag_eventually_validation_sequence_set=[[]],
-        ag_always_validation_sequence_set=[[]],
-        test_timeout_s=20,
-    )
-
-
-def test_robot_avoiding_ball_obstacle(simulated_test_runner):
-    # Always Validation
-    always_validation_sequence_set = [[]]
-
-    setup_param = DRIVE_IN_STRAIGHT_LINE_PARAMS[
-        HrvoTestVariants.AVOIDING_BALL_OBSTACLE.name
-    ]
-
-    eventually_validation_sequence_set = get_reached_destination_validation(setup_param)
-
-    simulated_test_runner.run_test(
-        setup=lambda world_dict: hrvo_test_setup(world_dict, simulated_test_runner),
-        params=[setup_param],
-        inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
-        inv_always_validation_sequence_set=always_validation_sequence_set,
-        ag_eventually_validation_sequence_set=[[]],
-        ag_always_validation_sequence_set=[[]],
-        test_timeout_s=20,
-    )
-
-
-def get_reached_destination_validation(setup_param):
-    destination = setup_param["destination"]
+def get_reached_destination_validation(destination):
     threshold = 0.05
     # Eventually Validation
     return [
@@ -478,9 +549,9 @@ def get_reached_destination_validation(setup_param):
 
 
 def get_move_update_control_params(
-    robot_id, destination, desired_orientation, final_speed
+    robot_id, destination, desired_orientation, final_speed, params=None
 ):
-    params = AssignedTacticPlayControlParams()
+    params = params if params else AssignedTacticPlayControlParams()
     params.assigned_tactics[robot_id].move.CopyFrom(
         MoveTactic(
             destination=destination,

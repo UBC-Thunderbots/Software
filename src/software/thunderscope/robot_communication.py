@@ -147,6 +147,7 @@ class RobotCommunication(object):
                 self.last_time = primitive_set.time_sent.epoch_timestamp_seconds
                 self.send_primitive_set.send_proto(primitive_set)
 
+
             time.sleep(0.01)
 
     def toggle_robot_connection(self, mode, robot_id):
