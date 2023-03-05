@@ -230,10 +230,11 @@ class Thunderscope(object):
                     
                     Mouse Shortcuts:
                     
-                    Double Click Purple Bar to pop window out
-                    Drag Purple Bar to rearrange docks
+                    Double Click Blue Bar to pop window out
+                    Drag Blue Bar to rearrange docks
                     Click items in legends to select/deselect
                     Cntrl-Click and Drag: Move ball and kick
+                    Cntrl-Space: Stop AI vs AI simulation
                     """
                 ),
             )
