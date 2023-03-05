@@ -400,6 +400,9 @@ bool SimBall::addDetection(SSLProto::SSL_DetectionBall *ball, btVector3 pos, flo
     // ccw
     const ErForceVector noise = m_rng->normalVector(stddev);
     coordinates::toVision(ErForceVector(modX, modY) + noise, *ball);
+
+    ball->set_z(modZ * 1000); // modZ is in kilometres, need to convert to metres
+
     return true;
 }
 
