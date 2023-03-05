@@ -168,7 +168,6 @@ gdb --args bazel-bin/{full_system}
             CostVisualization,
             NamedValue,
             PlayInfo,
-            SimulationStartedTrigger,
         ]:
             proto_unix_io.attach_unix_receiver(
                 runtime_dir=self.full_system_runtime_dir,

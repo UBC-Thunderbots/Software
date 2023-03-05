@@ -1,6 +1,7 @@
 #include <boost/program_options.hpp>
 
 #include "extlibs/er_force_sim/src/protobuf/world.pb.h"
+#include "proto/message_translation/tbots_protobuf.h"
 #include "proto/tbots_software_msgs.pb.h"
 #include "proto/vision.pb.h"
 #include "proto/world.pb.h"
@@ -121,13 +122,22 @@ int main(int argc, char **argv)
         auto simulator_state_output = ThreadedProtoUnixSender<world::SimulatorState>(
             runtime_dir + SIMULATOR_STATE_PATH);
 
+        // Simulation Started Trigger as Simulator Output
+        auto simulation_started_trigger = ThreadedProtoUnixSender<TbotsProto::SimulationStartedTrigger>(
+            runtime_dir + SIMULATION_STARTED_TRIGGER_PATH);
+
         // Inputs
         // World State Input: Configures the ERForceSimulator
         auto world_state_input = ThreadedProtoUnixListener<TbotsProto::WorldState>(
             runtime_dir + WORLD_STATE_PATH, [&](TbotsProto::WorldState input) {
                 std::scoped_lock lock(simulator_mutex);
                 er_force_sim->setWorldState(input);
-                std::cout << input.DebugString() + "WorldState" << std::endl;
+
+                auto sim_started_trigger_msg = *createSimulationStartedTrigger(true);
+                if(!er_force_sim->has_sent_sim_start_trigger) {
+                    simulation_started_trigger.sendProto(sim_started_trigger_msg);
+                    er_force_sim->has_sent_sim_start_trigger = true;
+                }
             });
 
         // World Input: Buffer vision until we have primitives to tick
@@ -165,8 +175,6 @@ int main(int argc, char **argv)
         auto simulator_tick = ThreadedProtoUnixListener<TbotsProto::SimulatorTick>(
             runtime_dir + SIMULATION_TICK_PATH, [&](TbotsProto::SimulatorTick input) {
                 std::scoped_lock lock(simulator_mutex);
-
-                std::cout << input.DebugString() + "SimulatorTick" << std::endl;
 
                 // Step the simulation and send back the wrapper packets and
                 // the robot status msgs

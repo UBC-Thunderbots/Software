@@ -137,14 +137,6 @@ void ErForceSimulator::setWorldState(const TbotsProto::WorldState& world_state)
     {
         setRobots(world_state.yellow_robots(), gameController::Team::YELLOW);
     }
-
-    auto sim_started_trigger_msg = *createSimulationStartedTrigger(true);
-    if (!has_sent_sim_start_trigger)
-    {
-        LOG(VISUALIZE) << sim_started_trigger_msg;
-        has_sent_sim_start_trigger = true;
-        std::cout << sim_started_trigger_msg.DebugString() << std::endl;
-    }
 }
 
 void ErForceSimulator::setBallState(const BallState& ball_state)

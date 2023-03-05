@@ -332,29 +332,22 @@ if __name__ == "__main__":
             :param tick_rate_ms: The tick rate of the simulation
 
             """
-            print("Entered async_sim_ticker function", flush=True)
             sim_start_buffer = ThreadSafeBuffer(1, SimulationStartedTrigger, False)
             tscope.simulator_proto_unix_io.register_observer(SimulationStartedTrigger, sim_start_buffer)
 
-            while True:
-                print("Entered sim start loop", flush=True)
-                if not sim_start_buffer.get(block=False):
-                    world_state = tbots_protobuf.create_world_state(
-                        blue_robot_locations=[
-                            cpp_bindings.Point(-3, y) for y in numpy.linspace(-2, 2, NUM_ROBOTS)
-                        ],
-                        yellow_robot_locations=[
-                            cpp_bindings.Point(3, y) for y in numpy.linspace(-2, 2, NUM_ROBOTS)
-                        ],
-                        ball_location=cpp_bindings.Point(0, 0),
-                        ball_velocity=cpp_bindings.Vector(0, 0),
-                    )
-                    tscope.simulator_proto_unix_io.send_proto(WorldState, world_state)
-                    print(f'Python: {world_state=}', flush=True)
-                else:
-                    break
-                
-                time.sleep(10)
+            sim_start_buffer.get(block=False) 
+            
+            world_state = tbots_protobuf.create_world_state(
+                blue_robot_locations=[
+                    cpp_bindings.Point(-3, y) for y in numpy.linspace(-2, 2, NUM_ROBOTS)
+                ],
+                yellow_robot_locations=[
+                    cpp_bindings.Point(3, y) for y in numpy.linspace(-2, 2, NUM_ROBOTS)
+                ],
+                ball_location=cpp_bindings.Point(0, 0),
+                ball_velocity=cpp_bindings.Vector(0, 0),
+            )
+            tscope.simulator_proto_unix_io.send_proto(WorldState, world_state)
                 
             simulation_state_buffer = ThreadSafeBuffer(1, SimulationState)
             tscope.simulator_proto_unix_io.register_observer(
@@ -363,14 +356,12 @@ if __name__ == "__main__":
 
             # Tick Simulation
             while True:
-                print("Entered Tick Loop", flush=True)
 
                 simulation_state_message = simulation_state_buffer.get()
 
                 if simulation_state_message.is_playing:
                     tick = SimulatorTick(milliseconds=tick_rate_ms)
                     tscope.simulator_proto_unix_io.send_proto(SimulatorTick, tick)
-                    print(f'Python: {tick=}', flush=True)
 
                 time.sleep(tick_rate_ms / 1000)
 
