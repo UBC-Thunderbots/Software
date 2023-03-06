@@ -23,11 +23,13 @@ void Agent::update(double time_step) {
 
     const Vector dv = new_velocity - robot_state.velocity();
     if (dv.length() < max_accel * time_step || dv.length() == 0.0) {
-        robot_state.velocity() = new_velocity;
+        robot_state = RobotState(robot_state.position(), new_velocity,
+                                 robot_state.orientation(), robot_state.angularVelocity());
     } else {
         // Calculate the maximum velocity towards the preferred velocity, given the
         // acceleration constraint
-        robot_state.velocity() = robot_state.velocity() + (max_accel * time_step) * (dv / dv.length());
+        robot_state = RobotState(robot_state.position(), robot_state.velocity() + (max_accel * time_step) * (dv / dv.length()),
+                                 robot_state.orientation(), robot_state.angularVelocity());
     }
     robot_state.position() = robot_state.position() + (robot_state.velocity() * time_step);
 

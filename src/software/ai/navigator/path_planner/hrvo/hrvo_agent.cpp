@@ -154,7 +154,7 @@ void HRVOAgent::computeVelocityObstacles(std::map<RobotId, std::shared_ptr<Agent
     }
 }
 
-VelocityObstacle HRVOAgent::createVelocityObstacle(Agent &other_agent) {
+VelocityObstacle HRVOAgent::createVelocityObstacle(const Agent &other_agent) {
     Circle moving_agent_circle(robot_state.position(), radius);
     Circle obstacle_agent_circle(other_agent.robot_state.position(), radius);
     auto vo = generateVelocityObstacle(obstacle_agent_circle, moving_agent_circle, other_agent.robot_state.velocity());
