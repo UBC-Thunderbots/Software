@@ -119,7 +119,7 @@ void HRVOAgent::computeVelocityObstacles(std::map<RobotId, std::shared_ptr<Agent
     std::vector<unsigned int> neighbours = computeNeighbors(robots);
     for (const auto &neighbor: neighbours) {
         std::shared_ptr<Agent> other_agent = robots[neighbor];
-        VelocityObstacle velocity_obstacle = createVelocityObstacle(*other_agent);
+        VelocityObstacle velocity_obstacle = other_agent->createVelocityObstacle(*this);
         velocity_obstacles.push_back(velocity_obstacle);
     }
 
@@ -155,9 +155,9 @@ void HRVOAgent::computeVelocityObstacles(std::map<RobotId, std::shared_ptr<Agent
 }
 
 VelocityObstacle HRVOAgent::createVelocityObstacle(const Agent &other_agent) {
-    Circle moving_agent_circle(robot_state.position(), radius);
-    Circle obstacle_agent_circle(other_agent.robot_state.position(), radius);
-    auto vo = generateVelocityObstacle(obstacle_agent_circle, moving_agent_circle, other_agent.robot_state.velocity());
+    Circle moving_agent_circle(other_agent.robot_state.position(), radius);
+    Circle obstacle_agent_circle(robot_state.position(), radius);
+    auto vo = generateVelocityObstacle(obstacle_agent_circle, moving_agent_circle, robot_state.velocity());
 
     // Convert velocity obstacle to hybrid reciprocal velocity obstacle (HRVO)
     // by shifting one side of the velocity obstacle to share the responsibility
