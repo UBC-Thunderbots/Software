@@ -1,7 +1,8 @@
+#include "robot_path.h"
+
 #include <optional>
 
 #include "path_point.h"
-#include "robot_path.h"
 
 RobotPath::RobotPath()
 {

@@ -1,14 +1,16 @@
 #include "lv_agent.h"
 
 LVAgent::LVAgent(RobotId robot_id, RobotState robot_state, TeamSide side, RobotPath &path,
-                 double radius, double max_speed, double max_accel, double max_radius_inflation) :
-        Agent(robot_id, robot_state, side,
-              path, radius, max_speed,
-              max_accel, max_radius_inflation)
+                 double radius, double max_speed, double max_accel,
+                 double max_radius_inflation)
+    : Agent(robot_id, robot_state, side, path, radius, max_speed, max_accel,
+            max_radius_inflation)
 {
 }
 
-void LVAgent::computeNewVelocity(std::map<unsigned int, std::shared_ptr<Agent>> &robots, double time_step) {
+void LVAgent::computeNewVelocity(std::map<unsigned int, std::shared_ptr<Agent>> &robots,
+                                 double time_step)
+{
     // TODO (#2496): Fix bug where LinearVelocityAgents go past their destination
     // Preferring a velocity which points directly towards goal
 
@@ -28,15 +30,15 @@ void LVAgent::computeNewVelocity(std::map<unsigned int, std::shared_ptr<Agent>> 
     }
 }
 
-Vector LVAgent::computePreferredVelocity(double time_step) {
-
+Vector LVAgent::computePreferredVelocity(double time_step)
+{
     auto path_point_opt = path.getCurrentPathPoint();
 
     if (path_point_opt == std::nullopt)
     {
         return Vector(0.f, 0.f);
     }
-    Point goal_pos = path_point_opt.value().getPosition();
+    Point goal_pos                 = path_point_opt.value().getPosition();
     Vector unbounded_pref_velocity = goal_pos - robot_state.position();
 
     if (unbounded_pref_velocity.length() > max_speed)
@@ -46,12 +48,16 @@ Vector LVAgent::computePreferredVelocity(double time_step) {
     return unbounded_pref_velocity;
 }
 
-VelocityObstacle LVAgent::createVelocityObstacle(const Agent &other_agent) {
+VelocityObstacle LVAgent::createVelocityObstacle(const Agent &other_agent)
+{
     return VelocityObstacle::generateVelocityObstacle(
-            Circle(Point(robot_state.position()), radius),
-            Circle(Point(other_agent.robot_state.position()), other_agent.radius), robot_state.velocity());
+        Circle(Point(robot_state.position()), radius),
+        Circle(Point(other_agent.robot_state.position()), other_agent.radius),
+        robot_state.velocity());
 }
 
-void LVAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive, const World &world, double time_step) {
+void LVAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive,
+                              const World &world, double time_step)
+{
     return;
 }

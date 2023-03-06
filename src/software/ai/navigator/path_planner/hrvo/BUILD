@@ -14,24 +14,24 @@ cc_library(
 )
 
 cc_library(
-    name="hrvo",
-    srcs=[
-        "hrvo_simulator.cpp",
-        "hrvo_agent.cpp",
-        "lv_agent.cpp",
+    name = "hrvo",
+    srcs = [
         "agent.cpp",
+        "hrvo_agent.cpp",
+        "hrvo_simulator.cpp",
+        "lv_agent.cpp",
         "path_point.cpp",
-        "robot_path.cpp"
+        "robot_path.cpp",
     ],
-    hdrs=[
-        "hrvo_simulator.h",
-        "hrvo_agent.h",
-        "lv_agent.h",
+    hdrs = [
         "agent.h",
+        "hrvo_agent.h",
+        "hrvo_simulator.h",
+        "lv_agent.h",
         "path_point.h",
-        "robot_path.h"
+        "robot_path.h",
     ],
-    deps=[
+    deps = [
         "//proto:visualization_cc_proto",
         "//proto/primitive:primitive_msg_factory",
         "//software/ai/navigator/obstacle:robot_navigation_obstacle_factory",
@@ -40,7 +40,7 @@ cc_library(
         "//software/geom/algorithms:nearest_neighbor_search",
         "//software/networking:threaded_proto_unix_sender",
         "//software/world",
-    ]
+    ],
 )
 
 cc_test(

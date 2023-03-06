@@ -1,9 +1,9 @@
 #pragma once
 //#include "extlibs/hrvo/simulator.h"
-#include "software/ai/navigator/path_planner/hrvo/hrvo_simulator.h"
 #include "proto/primitive.pb.h"
 #include "proto/robot_status_msg.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
+#include "software/ai/navigator/path_planner/hrvo/hrvo_simulator.h"
 #include "software/geom/vector.h"
 #include "software/world/world.h"
 

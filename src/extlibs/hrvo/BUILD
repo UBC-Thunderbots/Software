@@ -47,13 +47,3 @@ cc_library(
         "//software/world",
     ],
 )
-
-cc_test(
-    name = "hrvo_test",
-    srcs = ["hrvo_test.cpp"],
-    deps = [
-        ":hrvo",
-        "//shared/test_util:tbots_gtest_main",
-        "//software/test_util",
-    ],
-)

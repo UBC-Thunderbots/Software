@@ -77,8 +77,7 @@ AngularVelocity PrimitiveExecutor::getTargetAngularVelocity(
 
     double max_angular_speed =
         static_cast<double>(robot_constants_.robot_max_ang_speed_rad_per_s);
-    double next_angular_speed
-    = std::min(max_angular_speed, deceleration_angular_speed);
+    double next_angular_speed = std::min(max_angular_speed, deceleration_angular_speed);
 
     const double signed_delta_orientation =
         (dest_orientation - curr_orientation_).clamp().toRadians();

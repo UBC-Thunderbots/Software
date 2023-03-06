@@ -2,16 +2,17 @@
 
 #include <map>
 
+#include "proto/primitive.pb.h"
 #include "software/ai/navigator/path_planner/hrvo/robot_path.h"
 #include "software/ai/navigator/path_planner/hrvo/velocity_obstacle.h"
 #include "software/geom/vector.h"
 #include "software/time/duration.h"
 #include "software/world/world.h"
-#include "proto/primitive.pb.h"
 
 
-class Agent {
-public:
+class Agent
+{
+   public:
     /**
      * Constructor
      *
@@ -22,7 +23,8 @@ public:
      * @param radius                The radius of this agent.
      * @param max_speed             The maximum speed of this agent.
      * @param max_accel             The maximum acceleration of this agent.
-     * @param max_radius_inflation  The maximum amount which the radius of this agent can inflate.
+     * @param max_radius_inflation  The maximum amount which the radius of this agent can
+     * inflate.
      */
     Agent(RobotId robot_id, RobotState robot_state, TeamSide side, RobotPath &path,
           double radius, double max_speed, double max_accel, double max_radius_inflation);
@@ -50,8 +52,7 @@ public:
      * @param time_step the time_step to use to step at
      */
     virtual void updatePrimitive(const TbotsProto::Primitive &new_primitive,
-                                 const World &world,
-                                 double time_step) = 0;
+                                 const World &world, double time_step) = 0;
 
     /**
      * Computes the preferred velocity of this agent.
@@ -67,7 +68,8 @@ public:
      * @param robots robots in the simulation
      * @param time_step
      */
-    virtual void computeNewVelocity(std::map<unsigned int, std::shared_ptr<Agent>> &robots, double time_step) = 0;
+    virtual void computeNewVelocity(
+        std::map<unsigned int, std::shared_ptr<Agent>> &robots, double time_step) = 0;
 
 
     /**
@@ -150,8 +152,6 @@ public:
 
     Vector new_velocity;
 
-protected:
+   protected:
     Vector preferred_velocity;
 };
-
-

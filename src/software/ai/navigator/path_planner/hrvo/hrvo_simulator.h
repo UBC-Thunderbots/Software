@@ -4,20 +4,21 @@
 #include <limits>
 #include <vector>
 
+#include "proto/tbots_software_msgs.pb.h"
+#include "proto/visualization.pb.h"
 #include "software/ai/navigator/path_planner/hrvo/hrvo_agent.h"
 #include "software/ai/navigator/path_planner/hrvo/lv_agent.h"
 #include "software/ai/navigator/path_planner/hrvo/path_point.h"
 #include "software/ai/navigator/path_planner/hrvo/robot_path.h"
-#include "software/geom/algorithms/intersection.h"
 #include "software/geom/algorithms/contains.h"
+#include "software/geom/algorithms/intersection.h"
 #include "software/geom/algorithms/nearest_neighbor_search.hpp"
 #include "software/geom/vector.h"
 #include "software/world/world.h"
-#include "proto/tbots_software_msgs.pb.h"
-#include "proto/visualization.pb.h"
 
-class HRVOSimulator {
-public:
+class HRVOSimulator
+{
+   public:
     /**
      * Constructor
      * @param time_step The time step between each step of the simulator
@@ -96,8 +97,7 @@ public:
      */
     void visualize(RobotId robot_id);
 
-private:
-
+   private:
     /**
      * Configure and add a HRVO Agent to the simulation.
      *
@@ -110,7 +110,7 @@ private:
      *  Configure and add a LV Agent to the simulation.
      *
      * @param robot The robot for which this agent is based on
-    */
+     */
     void configureLVRobot(const Robot &robot);
 
 

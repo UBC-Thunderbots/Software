@@ -2,31 +2,32 @@
 
 #include <algorithm>
 #include <cmath>
-#include <limits>
 #include <cstddef>
+#include <limits>
 #include <map>
 #include <set>
 #include <utility>
 #include <vector>
 
+#include "proto/message_translation/tbots_geometry.h"
+#include "proto/primitive.pb.h"
+#include "software/ai/navigator/obstacle/obstacle.hpp"
+#include "software/ai/navigator/obstacle/robot_navigation_obstacle_factory.h"
 #include "software/ai/navigator/path_planner/hrvo/lv_agent.h"
-#include "software/ai/navigator/path_planner/hrvo/velocity_obstacle.h"
 #include "software/ai/navigator/path_planner/hrvo/robot_path.h"
-#include "software/time/duration.h"
-#include "software/geom/vector.h"
+#include "software/ai/navigator/path_planner/hrvo/velocity_obstacle.h"
 #include "software/geom/algorithms/intersection.h"
+#include "software/geom/algorithms/nearest_neighbor_search.hpp"
+#include "software/geom/vector.h"
+#include "software/time/duration.h"
 #include "software/world/robot_state.h"
 #include "software/world/team_types.h"
 #include "software/world/world.h"
-#include "proto/primitive.pb.h"
-#include "proto/message_translation/tbots_geometry.h"
-#include "software/ai/navigator/obstacle/obstacle.hpp"
-#include "software/ai/navigator/obstacle/robot_navigation_obstacle_factory.h"
-#include "software/geom/algorithms/nearest_neighbor_search.hpp"
 
 
-class HRVOAgent : public Agent {
-public:
+class HRVOAgent : public Agent
+{
+   public:
     /**
      * Constructor
      *
@@ -37,10 +38,12 @@ public:
      * @param radius                The radius of this agent.
      * @param max_speed             The maximum speed of this agent.
      * @param max_accel             The maximum acceleration of this agent.
-     * @param max_radius_inflation  The maximum amount which the radius of this agent can inflate.
+     * @param max_radius_inflation  The maximum amount which the radius of this agent can
+     * inflate.
      */
     HRVOAgent(RobotId robot_id, RobotState robot_state, TeamSide side, RobotPath &path,
-              double radius, double max_speed, double max_accel, double max_radius_inflation);
+              double radius, double max_speed, double max_accel,
+              double max_radius_inflation);
 
 
     /**
@@ -50,8 +53,8 @@ public:
      * @param world The world in which the new primitive is being pursued
      * @param time_step the time_step to use to step at
      */
-    void updatePrimitive(const TbotsProto::Primitive &new_primitive,
-                         const World &world, double time_step) override;
+    void updatePrimitive(const TbotsProto::Primitive &new_primitive, const World &world,
+                         double time_step) override;
 
 
     /**
@@ -59,7 +62,8 @@ public:
      *
      * @param robots a map from robot ids to robots, for all robots in the simulation
      */
-    void computeNewVelocity(std::map<unsigned int, std::shared_ptr<Agent>> &robots, double time_step) override;
+    void computeNewVelocity(std::map<unsigned int, std::shared_ptr<Agent>> &robots,
+                            double time_step) override;
 
     /**
      * Computes the preferred velocity of this agent.
@@ -89,7 +93,8 @@ public:
      * @param robots
      * @return the robot simulator ids
      */
-    std::vector<RobotId> computeNeighbors(std::map<RobotId, std::shared_ptr<Agent>> &robots);
+    std::vector<RobotId> computeNeighbors(
+        std::map<RobotId, std::shared_ptr<Agent>> &robots);
 
     /**
      * get the velocity obstacles that this agent sees
@@ -104,20 +109,19 @@ public:
     std::optional<ObstaclePtr> getBallObstacle();
 
 
-    class Candidate {
-    public:
+    class Candidate
+    {
+       public:
         /**
          * Constructor. all candidate velocities occur at the intersections of vo's.
          * @param velocity the velocity for this candidate
          * @param index_1 the index of the first velocity obstacle
          * @param index_2 the index of the second velocity obstacle
          */
-        explicit Candidate(Vector velocity, int index_1, int index_2) :
-                velocity(velocity),
-                obstacle_indexes(std::pair(
-                        index_1,
-                        index_2)
-                ) {}
+        explicit Candidate(Vector velocity, int index_1, int index_2)
+            : velocity(velocity), obstacle_indexes(std::pair(index_1, index_2))
+        {
+        }
 
         // The velocity of the candidate.
         Vector velocity;
@@ -182,14 +186,14 @@ public:
     bool isCandidateFasterThanCurrentSpeed(const Candidate &candidate) const;
 
 
-protected:
+   protected:
     RobotNavigationObstacleFactory obstacle_factory;
     std::vector<VelocityObstacle> velocity_obstacles;
     std::vector<ObstaclePtr> static_obstacles;
     std::optional<ObstaclePtr> ball_obstacle;
 
-    static constexpr double PREF_SPEED_SCALE = 0.85;
-    static constexpr double DECEL_DIST_MULTIPLIER = 1.2;
+    static constexpr double PREF_SPEED_SCALE            = 0.85;
+    static constexpr double DECEL_DIST_MULTIPLIER       = 1.2;
     static constexpr double DECEL_PREF_SPEED_MULTIPLIER = 0.6;
 
     // The maximum distance which HRVO Agents will look for neighbors, in meters.
@@ -202,5 +206,3 @@ protected:
 
     static constexpr double MIN_PREF_SPEED_MULTIPLIER = 0.5;
 };
-
-
