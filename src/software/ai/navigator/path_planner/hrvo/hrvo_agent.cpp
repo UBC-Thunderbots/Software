@@ -448,8 +448,9 @@ void HRVOAgent::computeNewVelocity(std::map<unsigned int, std::shared_ptr<Agent>
     // velocity that minimizes collisions with the closest velocity obstacles
     // - Candidate multimap is organized by distance from preferred velocity so we pick
     // the first valid velocity
-    for (const auto [dist_to_pref_velocity_sq, candidate] : candidates)
+    for (const auto dist_to_pref_velocity_sq_candidate_pair : candidates)
     {
+        const auto candidate = dist_to_pref_velocity_sq_candidate_pair.second;
         std::optional<int> first_intersecting_velocity_obstacle =
             findIntersectingVelocityObstacle(candidate);
 
