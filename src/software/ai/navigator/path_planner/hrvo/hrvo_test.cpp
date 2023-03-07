@@ -7,8 +7,7 @@ class TestHrvo : public testing::Test
 {
    public:
     TestHrvo()
-        : time_step(1.0 / 60.0),
-          sim(200u, create2021RobotConstants(), TeamColour::YELLOW),
+        : sim(1.0 / 60.0, create2021RobotConstants(), TeamColour::YELLOW),
           world(Field::createSSLDivisionBField(),
                 Ball(Point(0, 0), Vector(0, 0), Timestamp()), Team(), Team()),
           friendly_robot_1(0, Point(), Vector(), Angle(), AngularVelocity(), Timestamp()),
@@ -23,7 +22,6 @@ class TestHrvo : public testing::Test
     }
 
    protected:
-    double time_step;
     HRVOSimulator sim;
     World world;
 
