@@ -64,8 +64,8 @@ cc_test(
 )
 
 cc_test(
-    name = "simulator_hrvo_test",
-    srcs = ["simulator_hrvo_test.cpp"],
+    name = "simulated_hrvo_test",
+    srcs = ["simulated_hrvo_test.cpp"],
     deps = [
         ":hrvo",
         "//shared/test_util:tbots_gtest_main",
