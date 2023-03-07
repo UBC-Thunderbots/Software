@@ -21,12 +21,11 @@ class HRVOSimulator
    public:
     /**
      * Constructor
-     * @param time_step The time step between each step of the simulator
      * @param robot_constants The robot constants to be used for all Agents representing a
      * robot
      * @param friendly_team_colour The colour of the friendly team
      */
-    explicit HRVOSimulator(double time_step, const RobotConstants_t &robot_constants,
+    explicit HRVOSimulator(const RobotConstants_t &robot_constants,
                            TeamColour friendly_team_colour);
 
 
@@ -38,23 +37,26 @@ class HRVOSimulator
      *
      * @param world The world which the simulation should be based upon
      */
-    void updateWorld(const World &world);
+    void updateWorld(const World &world, double time_step);
 
 
     /**
      * Reset all friendly agents goal points to match the path of the given primitive set
      *
      * @param new_primitive_set
+     * @param time_step the time_step to use
      */
-    void updatePrimitiveSet(const TbotsProto::PrimitiveSet &new_primitive_set);
+    void updatePrimitiveSet(const TbotsProto::PrimitiveSet &new_primitive_set, double time_step);
 
 
     /**
      * Performs a simulation step; updates the position, and velocity
      * of each agent, and the progress of each towards its goal by moving
      * the simulation time_step seconds forward
+     *
+     * @param time_step the time_step to use
      */
-    void doStep();
+    void doStep(double time_step);
 
 
     /**
@@ -102,16 +104,18 @@ class HRVOSimulator
      * Configure and add a HRVO Agent to the simulation.
      *
      * @param robot The robot for which this agent is based on
+     * @param time_step the time_step to use
      */
-    void configureHRVORobot(const Robot &robot);
+    void configureHRVORobot(const Robot &robot, double time_step);
 
 
     /**
      *  Configure and add a LV Agent to the simulation.
      *
      * @param robot The robot for which this agent is based on
+     * @param time_step the time_step to use
      */
-    void configureLVRobot(const Robot &robot);
+    void configureLVRobot(const Robot &robot, double time_step);
 
 
     // The robot constants which all agents will use
@@ -129,8 +133,6 @@ class HRVOSimulator
 
     // The colour of the friendly team
     const TeamColour friendly_team_colour;
-    // simulator time step
-    double time_step;
 
     // The max amount (meters) which the friendly/enemy robot radius can increase by.
     // This scale is used to avoid close encounters, and reduce chance of collision.

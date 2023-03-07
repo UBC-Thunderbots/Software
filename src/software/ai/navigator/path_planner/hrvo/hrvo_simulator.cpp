@@ -1,38 +1,35 @@
 #include "hrvo_simulator.h"
 
-HRVOSimulator::HRVOSimulator(double time_step, const RobotConstants_t &robot_constants,
+HRVOSimulator::HRVOSimulator(const RobotConstants_t &robot_constants,
                              TeamColour friendly_team_colour)
     : robot_constants(robot_constants),
       robots(),
       world(std::nullopt),
       primitive_set(),
-      friendly_team_colour(friendly_team_colour),
-      time_step(time_step)
+      friendly_team_colour(friendly_team_colour)
 {
 }
 
-void HRVOSimulator::updateWorld(const World &world)
+void HRVOSimulator::updateWorld(const World &world, double time_step)
 {
-    LOG(INFO) << time_step;
     this->world = world;
     // TODO (#2498): Update implementation to correctly support adding and removing agents
     //               to represent the newly added and removed friendly/enemy robots in the
     //               World.
-    // TODO update agents instead of recreate tracked agents.
     robots.clear();
     for (const Robot &friendly_robot : world.friendlyTeam().getAllRobots())
     {
-        configureHRVORobot(friendly_robot);
+        configureHRVORobot(friendly_robot, time_step);
     }
 
     for (const Robot &enemy_robot : world.enemyTeam().getAllRobots())
     {
-        configureLVRobot(enemy_robot);
+        configureLVRobot(enemy_robot, time_step);
     }
 }
 
 
-void HRVOSimulator::updatePrimitiveSet(const TbotsProto::PrimitiveSet &new_primitive_set)
+void HRVOSimulator::updatePrimitiveSet(const TbotsProto::PrimitiveSet &new_primitive_set, double time_step)
 {
     primitive_set = new_primitive_set;
 
@@ -51,7 +48,7 @@ void HRVOSimulator::updatePrimitiveSet(const TbotsProto::PrimitiveSet &new_primi
     }
 }
 
-void HRVOSimulator::configureHRVORobot(const Robot &robot)
+void HRVOSimulator::configureHRVORobot(const Robot &robot, double time_step)
 {
     double max_accel = 1e-4;
     double max_speed = 1e-4;
@@ -107,7 +104,7 @@ void HRVOSimulator::configureHRVORobot(const Robot &robot)
     robots[robot.id()] = std::static_pointer_cast<Agent>(agent);
 }
 
-void HRVOSimulator::configureLVRobot(const Robot &robot)
+void HRVOSimulator::configureLVRobot(const Robot &robot, double time_step)
 {
     // Set goal of enemy robot to be the farthest point, when moving in the
     // current direction
@@ -148,11 +145,12 @@ void HRVOSimulator::configureLVRobot(const Robot &robot)
     robots[robot.id() + ENEMY_LV_ROBOT_OFFSET] = std::static_pointer_cast<Agent>(agent);
 }
 
-void HRVOSimulator::doStep()
+void HRVOSimulator::doStep(double time_step)
 {
     if (time_step == 0.0)
     {
-        throw std::runtime_error("Time step is zero");
+        LOG(WARNING) << "Simulator time step is zero";
+        return;
     }
 
 
