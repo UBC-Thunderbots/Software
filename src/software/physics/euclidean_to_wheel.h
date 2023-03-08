@@ -98,7 +98,7 @@ class EuclideanToWheel
      * The radius of the robot in meters.
      */
     const double robot_radius_m_{};
-    const RobotConstants_t robot_constants;
+    const RobotConstants_t robot_constants_;
 
     /**
      * Euclidean velocity to wheel velocity coupling matrix.

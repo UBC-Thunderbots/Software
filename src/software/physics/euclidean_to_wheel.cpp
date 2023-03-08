@@ -9,15 +9,15 @@
 #include "software/geom/vector.h"
 
 EuclideanToWheel::EuclideanToWheel(const RobotConstants_t& robot_constants)
-    : robot_radius_m_(robot_constants.robot_radius_m), robot_constants(robot_constants)
+    : robot_radius_m_(robot_constants.robot_radius_m), robot_constants_(robot_constants)
 {
     // Phi, the angle between the hemisphere line of the robot and the front wheel axles
     // [rads]
-    auto p = robot_constants.front_wheel_angle_deg * M_PI / 180.;
+    auto p = robot_constants_.front_wheel_angle_deg * M_PI / 180.;
 
     // Theta, the angle between the hemisphere line of the robot and the rear wheel axles
     // [rads]
-    auto t = robot_constants.back_wheel_angle_deg * M_PI / 180.;
+    auto t = robot_constants_.back_wheel_angle_deg * M_PI / 180.;
 
     // Caching repeated calculations
     auto cos_p = std::cos(p);
@@ -86,9 +86,9 @@ WheelSpace_t EuclideanToWheel::rampWheelVelocity(
     const EuclideanSpace_t& target_euclidean_velocity, const double& time_to_ramp)
 {
     double allowed_acceleration =
-        static_cast<double>(robot_constants.robot_max_acceleration_m_per_s_2);
+        static_cast<double>(robot_constants_.robot_max_acceleration_m_per_s_2);
     double max_allowable_wheel_velocity =
-        static_cast<double>(robot_constants.robot_max_speed_m_per_s);
+        static_cast<double>(robot_constants_.robot_max_speed_m_per_s);
 
     // ramp wheel velocity
     WheelSpace_t ramp_wheel_velocity;
