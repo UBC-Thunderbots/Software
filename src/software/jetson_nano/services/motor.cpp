@@ -390,41 +390,20 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
 
     EuclideanSpace_t target_linear_velocity  = {0.0, 0.0, 0.0};
     EuclideanSpace_t target_angular_velocity = {0.0, 0.0, 0.0};
-    int target_dribbler_rpm                  = motor.dribbler_speed_rpm();
-    static int ramp_rpm                      = 0;
+    int target_dribbler_rpm =
+        motor.drive_control_case() ==
+                TbotsProto::MotorControl::DriveControlCase::DRIVE_CONTROL_NOT_SET
+            ? 0
+            : motor.dribbler_speed_rpm();
+    static int ramp_rpm = 0;
 
-    switch (motor.drive_control_case())
-    {
-        case TbotsProto::MotorControl::DriveControlCase::kDirectPerWheelControl:
-        {
-            target_wheel_velocities = {
-                motor.direct_per_wheel_control().front_right_wheel_velocity(),
-                motor.direct_per_wheel_control().front_left_wheel_velocity(),
-                motor.direct_per_wheel_control().back_left_wheel_velocity(),
-                motor.direct_per_wheel_control().back_right_wheel_velocity()};
+    EuclideanSpace_t prev_euclidean_wheel_velocity =
+        euclidean_to_four_wheel.getEuclideanVelocity(prev_wheel_velocities)
 
-            break;
-        }
-        case TbotsProto::MotorControl::DriveControlCase::kDirectVelocityControl:
-        {
-            target_linear_velocity = {
-                -motor.direct_velocity_control().velocity().y_component_meters(),
-                motor.direct_velocity_control().velocity().x_component_meters(),
-                motor.direct_velocity_control().angular_velocity().radians_per_second()};
-        };
-
-        break;
-        case TbotsProto::MotorControl::DriveControlCase::DRIVE_CONTROL_NOT_SET:
-        {
-            target_linear_velocity  = {0.0, 0.0, 0.0};
-            target_angular_velocity = {0.0, 0.0, 0.0};
-            target_dribbler_rpm     = 0;
-
-            break;
-        }
-    }
-    target_wheel_velocities = euclidean_to_four_wheel.rampWheelVelocity(
-        prev_wheel_velocities, target_linear_velocity, time_elapsed_since_last_poll_s);
+            target_wheel_velocities = euclidean_to_four_wheel.rampWheelVelocity(
+            {prev_euclidean_wheel_velocity[1], -prev_euclidean_wheel_velocity[0]},
+            AngularVelocity::fromRadians(prev_euclidean_wheel_velocity[2]), motor,
+            time_elapsed_since_last_poll_s);
 
     // TODO (#2719): interleave the angular accelerations in here at some point.
     prev_wheel_velocities = target_wheel_velocities;

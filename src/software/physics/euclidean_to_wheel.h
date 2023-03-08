@@ -87,9 +87,10 @@ class EuclideanToWheel
      * @param time_to_ramp The time allocated for acceleration in seconds
      *
      */
-    std::unique_ptr<TbotsProto::DirectControlPrimitive> rampWheelVelocity(
-        const std::pair<Vector, AngularVelocity> current_local_velocity,
-        TbotsProto::DirectControlPrimitive& target_velocity_primitive,
+    WheelSpace_t rampWheelVelocity(
+        const Vector current_local_velocity,
+        const AngularVelocity current_local_angular_velocity,
+        const TbotsProto::MotorControl& target_velocity_primitive,
         const double& time_to_ramp);
 
    private:

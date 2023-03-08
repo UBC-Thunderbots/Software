@@ -382,10 +382,13 @@ SSLSimulationProto::RobotControl ErForceSimulator::updateSimulatorRobots(
 
         if (ramping)
         {
-            auto direct_control_no_ramp = primitive_executor->stepPrimitive();
-            direct_control              = euclidean_to_four_wheel.rampWheelVelocity(
-                current_velocity_map.at(robot_id), *direct_control_no_ramp,
-                primitive_executor_time_step);
+            auto direct_control_no_ramp    = primitive_executor->stepPrimitive();
+            WheelSpace_t ramped_four_wheel = euclidean_to_four_wheel.rampWheelVelocity(
+                current_velocity_map.at(robot_id).first,
+                current_velocity_map.at(robot_id).second,
+                direct_control_no_ramp->motor_control(), primitive_executor_time_step);
+            direct_control =
+                getPrimitiveFromFourWheel(ramped_four_wheel, *direct_control_no_ramp);
         }
         else
         {
@@ -397,6 +400,25 @@ SSLSimulationProto::RobotControl ErForceSimulator::updateSimulatorRobots(
         *(robot_control.mutable_robot_commands()->Add()) = command;
     }
     return robot_control;
+}
+
+std::unique_ptr<TbotsProto::DirectControlPrimitive>
+ErForceSimulator::getPrimitiveFromFourWheel(
+    WheelSpace_t ramped_four_wheel,
+    TbotsProto::DirectControlPrimitive& target_velocity_primitive)
+{
+    EuclideanSpace_t ramped_euclidean =
+        euclidean_to_four_wheel.getEuclideanVelocity(ramped_four_wheel);
+
+    auto mutable_direct_velocity = target_velocity_primitive.mutable_motor_control()
+                                       ->mutable_direct_velocity_control();
+    *(mutable_direct_velocity->mutable_velocity()) =
+        *createVectorProto({ramped_euclidean[1], -ramped_euclidean[0]});
+    *(mutable_direct_velocity->mutable_angular_velocity()) =
+        *createAngularVelocityProto(AngularVelocity::fromRadians(ramped_euclidean[2]));
+
+    return std::make_unique<TbotsProto::DirectControlPrimitive>(
+        target_velocity_primitive);
 }
 
 void ErForceSimulator::stepSimulation(const Duration& time_step)

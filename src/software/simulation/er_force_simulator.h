@@ -184,8 +184,9 @@ class ErForceSimulator
             robot_primitive_executor_map,
         const TbotsProto::World& world_msg, gameController::Team side);
 
-    TbotsProto::DirectControlPrimitive rampVelocity(
-        TbotsProto::DirectControlPrimitive& direct_control);
+    std::unique_ptr<TbotsProto::DirectControlPrimitive> getPrimitiveFromFourWheel(
+        WheelSpace_t ramped_four_wheel,
+        TbotsProto::DirectControlPrimitive& target_velocity_primitive);
 
     // Map of Robot id to Primitive Executor
     std::unordered_map<unsigned int, std::shared_ptr<PrimitiveExecutor>>
