@@ -398,12 +398,12 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
     static int ramp_rpm = 0;
 
     EuclideanSpace_t prev_euclidean_wheel_velocity =
-        euclidean_to_four_wheel.getEuclideanVelocity(prev_wheel_velocities)
+        euclidean_to_four_wheel.getEuclideanVelocity(prev_wheel_velocities);
 
-            target_wheel_velocities = euclidean_to_four_wheel.rampWheelVelocity(
-            {prev_euclidean_wheel_velocity[1], -prev_euclidean_wheel_velocity[0]},
-            AngularVelocity::fromRadians(prev_euclidean_wheel_velocity[2]), motor,
-            time_elapsed_since_last_poll_s);
+    target_wheel_velocities = euclidean_to_four_wheel.rampWheelVelocity(
+        {prev_euclidean_wheel_velocity[1], -prev_euclidean_wheel_velocity[0]},
+        AngularVelocity::fromRadians(prev_euclidean_wheel_velocity[2]), motor,
+        time_elapsed_since_last_poll_s);
 
     // TODO (#2719): interleave the angular accelerations in here at some point.
     prev_wheel_velocities = target_wheel_velocities;
