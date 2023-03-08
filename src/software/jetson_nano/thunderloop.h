@@ -90,6 +90,8 @@ class Thunderloop
     TbotsProto::PowerStatus power_status_;
     TbotsProto::MotorStatus motor_status_;
     TbotsProto::ThunderloopStatus thunderloop_status_;
+    TbotsProto::ChipperKickerStatus chipper_kicker_status_;
+    TbotsProto::Timestamp time_sent_;
 
     // Current State
     RobotConstants_t robot_constants_;

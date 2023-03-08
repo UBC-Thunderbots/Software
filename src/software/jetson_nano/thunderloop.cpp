@@ -72,6 +72,8 @@ Thunderloop::~Thunderloop() {}
     struct timespec last_primitive_received_time;
     struct timespec last_world_recieved_time;
     struct timespec current_time;
+    struct timespec last_chipper_fired;
+    struct timespec last_kicker_fired;
 
     // Input buffer
     TbotsProto::PrimitiveSet new_primitive_set;
@@ -86,6 +88,10 @@ Thunderloop::~Thunderloop() {}
     // Note: CLOCK_MONOTONIC is used over CLOCK_REALTIME since
     // CLOCK_REALTIME can jump backwards
     clock_gettime(CLOCK_MONOTONIC, &next_shot);
+    clock_gettime(CLOCK_MONOTONIC, &last_primitive_received_time);
+    clock_gettime(CLOCK_MONOTONIC, &last_world_recieved_time);
+    clock_gettime(CLOCK_MONOTONIC, &last_chipper_fired);
+    clock_gettime(CLOCK_MONOTONIC, &last_kicker_fired);
 
     double loop_duration_seconds = 0.0;
 
@@ -114,6 +120,11 @@ Thunderloop::~Thunderloop() {}
             thunderloop_status_.set_network_service_poll_time_ns(
                 static_cast<unsigned long>(poll_time.tv_nsec));
 
+            network_status_.set_ms_since_last_primitive_received(UINT64_MAX);
+            network_status_.set_ms_since_last_vision_received(UINT64_MAX);
+
+            uint64_t last_handled_primitive_set = primitive_set_.sequence_number();
+
             // If the primitive msg is new, update the internal buffer
             // and start the new primitive.
             if (new_primitive_set.time_sent().epoch_timestamp_seconds() >
@@ -124,7 +135,13 @@ Thunderloop::~Thunderloop() {}
 
                 // Update primitive executor's primitive set
                 {
+                    struct timespec time_since_last_primitive_received;
+                    clock_gettime(CLOCK_MONOTONIC, &current_time);
+                    ScopedTimespecTimer::timespecDiff(
+                            &current_time, &last_primitive_received_time, &time_since_last_primitive_received);
                     clock_gettime(CLOCK_MONOTONIC, &last_primitive_received_time);
+                    network_status_.set_ms_since_last_primitive_received(
+                            time_since_last_primitive_received.tv_nsec / 1000000);
 
                     // Start new primitive
                     {
@@ -141,32 +158,25 @@ Thunderloop::~Thunderloop() {}
             if (new_world.time_sent().epoch_timestamp_seconds() >
                 world_.time_sent().epoch_timestamp_seconds())
             {
+                struct timespec time_since_last_vision_received;
+                clock_gettime(CLOCK_MONOTONIC, &current_time);
+                ScopedTimespecTimer::timespecDiff(&current_time, &last_world_recieved_time,
+                                                  &time_since_last_vision_received);
                 clock_gettime(CLOCK_MONOTONIC, &last_world_recieved_time);
+                network_status_.set_ms_since_last_vision_received(time_since_last_vision_received.tv_nsec / 1000000);
                 primitive_executor_.updateWorld(new_world);
                 world_ = new_world;
             }
 
             // If world not received in a while, stop robot
-            struct timespec world_result;
-
-            clock_gettime(CLOCK_MONOTONIC, &current_time);
-            ScopedTimespecTimer::timespecDiff(&current_time, &last_world_recieved_time,
-                                              &world_result);
-
             // Primitive Executor: run the last primitive if we have not timed out
             {
                 ScopedTimespecTimer timer(&poll_time);
 
                 // Handle emergency stop override
-                struct timespec primitive_result;
-
-                clock_gettime(CLOCK_MONOTONIC, &current_time);
-                ScopedTimespecTimer::timespecDiff(
-                    &current_time, &last_primitive_received_time, &primitive_result);
-
                 auto nanoseconds_elapsed_since_last_primitive =
-                    primitive_result.tv_sec * static_cast<int>(NANOSECONDS_PER_SECOND) +
-                    primitive_result.tv_nsec;
+                        time_since_last_primitive_received.tv_sec * static_cast<int>(NANOSECONDS_PER_SECOND) +
+                        time_since_last_primitive_received.tv_nsec;
 
                 if (nanoseconds_elapsed_since_last_primitive >
                     static_cast<long>(PRIMITIVE_MANAGER_TIMEOUT_NS))
@@ -197,6 +207,28 @@ Thunderloop::~Thunderloop() {}
             thunderloop_status_.set_power_service_poll_time_ns(
                 static_cast<unsigned long>(poll_time.tv_nsec));
 
+            chipper_kicker_status_.set_ms_since_chipper_fired(UINT64_MAX);
+            chipper_kicker_status_.set_ms_since_kicker_fired(UINT64_MAX);
+
+            if (direct_control_.power_control().chicker().has_kick_speed_m_per_s())
+            {
+                struct timespec time_since_kicker_fired;
+                clock_gettime(CLOCK_MONOTONIC, &current_time);
+                ScopedTimespecTimer::timespecDiff(&current_time, &last_kicker_fired,
+                                                  &time_since_kicker_fired);
+                clock_gettime(CLOCK_MONOTONIC, &last_kicker_fired);
+                chipper_kicker_status_.set_ms_since_kicker_fired(time_since_kicker_fired.tv_nsec / 1000000);
+            }
+            else if (direct_control_.power_control().chicker().has_chip_distance_meters())
+            {
+                struct timespec time_since_chipper_fired;
+                clock_gettime(CLOCK_MONOTONIC, &current_time);
+                ScopedTimespecTimer::timespecDiff(&current_time, &last_chipper_fired,
+                                                  &time_since_chipper_fired);
+                clock_gettime(CLOCK_MONOTONIC, &last_chipper_fired);
+                chipper_kicker_status_.set_ms_since_kicker_fired(time_since_chipper_fired.tv_nsec / 1000000);
+            }
+
             // Motor Service: execute the motor control command
             {
                 ScopedTimespecTimer timer(&poll_time);
@@ -209,12 +241,19 @@ Thunderloop::~Thunderloop() {}
             thunderloop_status_.set_motor_service_poll_time_ns(
                 static_cast<unsigned long>(poll_time.tv_nsec));
 
+            clock_gettime(CLOCK_MONOTONIC, &current_time);
+            time_sent_.set_epoch_timestamp_seconds(current_time.tv_sec);
+
             // Update Robot Status with poll responses
             robot_status_.set_robot_id(robot_id_);
-            *(robot_status_.mutable_thunderloop_status()) = thunderloop_status_;
-            *(robot_status_.mutable_motor_status())       = motor_status_;
-            *(robot_status_.mutable_power_status())       = power_status_;
-            *(robot_status_.mutable_jetson_status())      = jetson_status_;
+            robot_status_.set_last_handled_primitive_set(last_handled_primitive_set);
+            *(robot_status_.mutable_time_sent())                = time_sent_;
+            *(robot_status_.mutable_thunderloop_status())       = thunderloop_status_;
+            *(robot_status_.mutable_motor_status())             = motor_status_;
+            *(robot_status_.mutable_power_status())             = power_status_;
+            *(robot_status_.mutable_jetson_status())            = jetson_status_;
+            *(robot_status_.mutable_network_status())           = network_status_;
+            *(robot_status_.mutable_chipper_kicker_status())    = chipper_kicker_status_;
 
             // Update Redis
             redis_client_->setNoCommit(ROBOT_BATTERY_VOLTAGE_REDIS_KEY,

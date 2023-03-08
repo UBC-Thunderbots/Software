@@ -450,23 +450,26 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
         static_cast<int>(target_wheel_velocities[BACK_RIGHT_WHEEL_SPACE_INDEX] *
                          ELECTRICAL_RPM_PER_MECHANICAL_MPS));
 
+    int final_dribbler_rpm = 0;
     // If the dribbler only needs to change by DRIBBLER_ACCELERATION_THRESHOLD_RPM_PER_S,
     // just set the value
     if (std::abs(target_dribbler_rpm - ramp_rpm) <=
         DRIBBLER_ACCELERATION_THRESHOLD_RPM_PER_S)
     {
-        tmc4671_setTargetVelocity(DRIBBLER_MOTOR_CHIP_SELECT, target_dribbler_rpm);
+        final_dribbler_rpm = target_dribbler_rpm;
     }
     else if (target_dribbler_rpm > ramp_rpm + DRIBBLER_ACCELERATION_THRESHOLD_RPM_PER_S)
     {
         ramp_rpm += DRIBBLER_ACCELERATION_THRESHOLD_RPM_PER_S;
-        tmc4671_setTargetVelocity(DRIBBLER_MOTOR_CHIP_SELECT, ramp_rpm);
+        final_dribbler_rpm = ramp_rpm;
     }
     else if (target_dribbler_rpm < ramp_rpm - DRIBBLER_ACCELERATION_THRESHOLD_RPM_PER_S)
     {
         ramp_rpm -= DRIBBLER_ACCELERATION_THRESHOLD_RPM_PER_S;
-        tmc4671_setTargetVelocity(DRIBBLER_MOTOR_CHIP_SELECT, ramp_rpm);
+        final_dribbler_rpm = ramp_rpm;
     }
+    tmc4671_setTargetVelocity(DRIBBLER_MOTOR_CHIP_SELECT, final_dribbler_rpm);
+    motor_status.mutable_dribbler()->set_dribbler_rpm(final_dribbler_rpm);
 
     return motor_status;
 }
