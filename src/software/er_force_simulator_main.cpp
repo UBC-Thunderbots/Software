@@ -127,7 +127,7 @@ int main(int argc, char **argv)
             ThreadedProtoUnixSender<TbotsProto::SimulationStartedTrigger>(
                 runtime_dir + SIMULATION_STARTED_TRIGGER_PATH);
 
-       // sleep(1);
+        // sleep(1);
 
         // Inputs
         // World State Input: Configures the ERForceSimulator
@@ -199,11 +199,11 @@ int main(int argc, char **argv)
 
                 simulator_state_output.sendProto(er_force_sim->getSimulatorState());
             });
-        
+
         auto sim_started_trigger_msg = *createSimulationStartedTrigger(true);
         simulation_started_trigger.sendProto(sim_started_trigger_msg);
         std::cout << "Sent proto" << std::endl;
-        
+
         // This blocks forever without using the CPU
         std::promise<void>().get_future().wait();
     }
