@@ -127,19 +127,15 @@ int main(int argc, char **argv)
             ThreadedProtoUnixSender<TbotsProto::SimulationStartedTrigger>(
                 runtime_dir + SIMULATION_STARTED_TRIGGER_PATH);
 
+       // sleep(1);
+
         // Inputs
         // World State Input: Configures the ERForceSimulator
         auto world_state_input = ThreadedProtoUnixListener<TbotsProto::WorldState>(
             runtime_dir + WORLD_STATE_PATH, [&](TbotsProto::WorldState input) {
                 std::scoped_lock lock(simulator_mutex);
                 er_force_sim->setWorldState(input);
-
-                auto sim_started_trigger_msg = *createSimulationStartedTrigger(true);
-                if (!er_force_sim->has_sent_sim_start_trigger)
-                {
-                    simulation_started_trigger.sendProto(sim_started_trigger_msg);
-                    er_force_sim->has_sent_sim_start_trigger = true;
-                }
+                std::cout << input.DebugString() << std::endl;
             });
 
         // World Input: Buffer vision until we have primitives to tick
@@ -178,6 +174,8 @@ int main(int argc, char **argv)
             runtime_dir + SIMULATION_TICK_PATH, [&](TbotsProto::SimulatorTick input) {
                 std::scoped_lock lock(simulator_mutex);
 
+                std::cout << input.DebugString() << std::endl;
+
                 // Step the simulation and send back the wrapper packets and
                 // the robot status msgs
                 er_force_sim->stepSimulation(
@@ -201,7 +199,11 @@ int main(int argc, char **argv)
 
                 simulator_state_output.sendProto(er_force_sim->getSimulatorState());
             });
-
+        
+        auto sim_started_trigger_msg = *createSimulationStartedTrigger(true);
+        simulation_started_trigger.sendProto(sim_started_trigger_msg);
+        std::cout << "Sent proto" << std::endl;
+        
         // This blocks forever without using the CPU
         std::promise<void>().get_future().wait();
     }

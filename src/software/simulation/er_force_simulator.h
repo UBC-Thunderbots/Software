@@ -138,8 +138,6 @@ class ErForceSimulator
      */
     static std::unique_ptr<RealismConfigErForce> createRealisticRealismConfig();
 
-    bool has_sent_sim_start_trigger = false;
-
    private:
     /**
      * Sets the primitive being simulated by the robot in simulation

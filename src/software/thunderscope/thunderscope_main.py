@@ -12,7 +12,6 @@ import software.python_bindings as cpp_bindings
 from software.py_constants import *
 from software.thunderscope.robot_communication import RobotCommunication
 from software.thunderscope.replay.proto_logger import ProtoLogger
-from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 NUM_ROBOTS = 6
 SIM_TICK_RATE_MS = 16
@@ -326,18 +325,18 @@ if __name__ == "__main__":
             cost_visualization=args.cost_visualization,
         )
 
+        sim_start_buffer = ThreadSafeBuffer(1, SimulationStartedTrigger)
+
         def __async_sim_ticker(tick_rate_ms):
             """Setup the world and tick simulation forever
 
             :param tick_rate_ms: The tick rate of the simulation
 
             """
-            sim_start_buffer = ThreadSafeBuffer(1, SimulationStartedTrigger, False)
-            tscope.simulator_proto_unix_io.register_observer(
-                SimulationStartedTrigger, sim_start_buffer
-            )
 
-            sim_start_buffer.get(block=False)
+            print("Before buffer.get", flush=True)
+            sim_start_buffer.get(block=True)
+            print("After buffer.get", flush=True)
 
             world_state = tbots_protobuf.create_world_state(
                 blue_robot_locations=[
@@ -350,6 +349,7 @@ if __name__ == "__main__":
                 ball_velocity=cpp_bindings.Vector(0, 0),
             )
             tscope.simulator_proto_unix_io.send_proto(WorldState, world_state)
+            print(f'Python: {world_state=}', flush=True)
 
             simulation_state_buffer = ThreadSafeBuffer(1, SimulationState)
             tscope.simulator_proto_unix_io.register_observer(
@@ -364,8 +364,14 @@ if __name__ == "__main__":
                 if simulation_state_message.is_playing:
                     tick = SimulatorTick(milliseconds=tick_rate_ms)
                     tscope.simulator_proto_unix_io.send_proto(SimulatorTick, tick)
+                    print(f'Python: {tick=}', flush=True)
 
                 time.sleep(tick_rate_ms / 1000)
+
+        tscope.simulator_proto_unix_io.register_observer(
+            SimulationStartedTrigger, sim_start_buffer
+        )
+        print("Buffer registered", flush=True)
 
         # Launch all binaries
         with Simulator(
