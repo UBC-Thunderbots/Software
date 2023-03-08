@@ -53,8 +53,9 @@ class RobotEntersRegion(Validation):
 
 
 class RobotEntersRegionAndStops(RobotEntersRegion):
-    def __init__(self, regions=None, num_ticks=1):
+    def __init__(self, robot_id, regions=None, num_ticks=1):
         super().__init__(regions=regions)
+        self.robot_id = robot_id
         self.num_ticks = num_ticks
         self.ticks_so_far = 0
 
@@ -63,18 +64,19 @@ class RobotEntersRegionAndStops(RobotEntersRegion):
 
         if base_validation_status == ValidationStatus.PASSING:
             for robot in world.friendly_team.team_robots:
-                if math.hypot(
-                    robot.current_state.global_velocity.x_component_meters,
-                    robot.current_state.global_velocity.y_component_meters,
-                ) < math.pow(10, -2):
-                    self.ticks_so_far = self.ticks_so_far + 1
-                    if self.ticks_so_far >= self.num_ticks:
-                        return ValidationStatus.PASSING
+                if robot.id == self.robot_id:
+                    if math.hypot(
+                            robot.current_state.global_velocity.x_component_meters,
+                            robot.current_state.global_velocity.y_component_meters,
+                    ) < math.pow(10, -2):
+                        self.ticks_so_far = self.ticks_so_far + 1
+                        if self.ticks_so_far >= self.num_ticks:
+                            return ValidationStatus.PASSING
 
         return ValidationStatus.FAILING
 
     def __repr__(self):
-        return "Check for stationary robot in regions " + ",".join(
+        return f"Check for stationary robot {self.robot_id} in regions " + ",".join(
             repr(region) for region in self.regions
         )
 
