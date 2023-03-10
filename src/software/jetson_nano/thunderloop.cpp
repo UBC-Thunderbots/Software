@@ -120,11 +120,12 @@ Thunderloop::~Thunderloop() {}
             thunderloop_status_.set_network_service_poll_time_ns(
                 static_cast<unsigned long>(poll_time.tv_nsec));
 
-            network_status_.set_ms_since_last_primitive_received(UINT64_MAX);
-            network_status_.set_ms_since_last_vision_received(UINT64_MAX);
+            network_status_.set_ms_since_last_primitive_received(UINT32_MAX);
+            network_status_.set_ms_since_last_vision_received(UINT32_MAX);
 
             uint64_t last_handled_primitive_set = primitive_set_.sequence_number();
 
+            struct timespec time_since_last_primitive_received;
             // If the primitive msg is new, update the internal buffer
             // and start the new primitive.
             if (new_primitive_set.time_sent().epoch_timestamp_seconds() >
@@ -135,14 +136,13 @@ Thunderloop::~Thunderloop() {}
 
                 // Update primitive executor's primitive set
                 {
-                    struct timespec time_since_last_primitive_received;
                     clock_gettime(CLOCK_MONOTONIC, &current_time);
                     ScopedTimespecTimer::timespecDiff(
                         &current_time, &last_primitive_received_time,
                         &time_since_last_primitive_received);
                     clock_gettime(CLOCK_MONOTONIC, &last_primitive_received_time);
                     network_status_.set_ms_since_last_primitive_received(
-                        time_since_last_primitive_received.tv_nsec / 1000000);
+                            (uint32_t)time_since_last_primitive_received.tv_nsec / 1000000);
 
                     // Start new primitive
                     {
@@ -211,8 +211,8 @@ Thunderloop::~Thunderloop() {}
             thunderloop_status_.set_power_service_poll_time_ns(
                 static_cast<unsigned long>(poll_time.tv_nsec));
 
-            chipper_kicker_status_.set_ms_since_chipper_fired(UINT64_MAX);
-            chipper_kicker_status_.set_ms_since_kicker_fired(UINT64_MAX);
+            chipper_kicker_status_.set_ms_since_chipper_fired(UINT32_MAX);
+            chipper_kicker_status_.set_ms_since_kicker_fired(UINT32_MAX);
 
             if (direct_control_.power_control().chicker().has_kick_speed_m_per_s())
             {
