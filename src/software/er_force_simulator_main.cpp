@@ -122,12 +122,13 @@ int main(int argc, char **argv)
         auto simulator_state_output = ThreadedProtoUnixSender<world::SimulatorState>(
             runtime_dir + SIMULATOR_STATE_PATH);
 
+        
         // Simulation Started Trigger as Simulator Output
         auto simulation_started_trigger =
             ThreadedProtoUnixSender<TbotsProto::SimulationStartedTrigger>(
                 runtime_dir + SIMULATION_STARTED_TRIGGER_PATH);
 
-        // sleep(1);
+        bool has_sent_sim_start_trigger = false;
 
         // Inputs
         // World State Input: Configures the ERForceSimulator
@@ -135,7 +136,12 @@ int main(int argc, char **argv)
             runtime_dir + WORLD_STATE_PATH, [&](TbotsProto::WorldState input) {
                 std::scoped_lock lock(simulator_mutex);
                 er_force_sim->setWorldState(input);
-                std::cout << input.DebugString() << std::endl;
+
+                if(!has_sent_sim_start_trigger) {
+                    auto sim_started_trigger_msg = *createSimulationStartedTrigger(true);
+                    simulation_started_trigger.sendProto(sim_started_trigger_msg);
+                    has_sent_sim_start_trigger = true;
+                }
             });
 
         // World Input: Buffer vision until we have primitives to tick
@@ -174,8 +180,6 @@ int main(int argc, char **argv)
             runtime_dir + SIMULATION_TICK_PATH, [&](TbotsProto::SimulatorTick input) {
                 std::scoped_lock lock(simulator_mutex);
 
-                std::cout << input.DebugString() << std::endl;
-
                 // Step the simulation and send back the wrapper packets and
                 // the robot status msgs
                 er_force_sim->stepSimulation(
@@ -199,10 +203,6 @@ int main(int argc, char **argv)
 
                 simulator_state_output.sendProto(er_force_sim->getSimulatorState());
             });
-
-        auto sim_started_trigger_msg = *createSimulationStartedTrigger(true);
-        simulation_started_trigger.sendProto(sim_started_trigger_msg);
-        std::cout << "Sent proto" << std::endl;
 
         // This blocks forever without using the CPU
         std::promise<void>().get_future().wait();
