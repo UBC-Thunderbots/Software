@@ -107,15 +107,15 @@ class HRVOAgent : public Agent
      */
     std::optional<ObstaclePtr> getBallObstacle();
 
-
+    // This class holds the calculated candidate velocity given two velocity obstacles
     class CandidateVelocity
     {
        public:
         /**
          * Constructor. all candidate velocities occur at the intersections of vo's.
          * @param velocity the velocity for this candidate
-         * @param index_1 the index of the first velocity obstacle
-         * @param index_2 the index of the second velocity obstacle
+         * @param index_1 the index of the first intersecting velocity obstacle
+         * @param index_2 the index of the second intersecting velocity obstacle
          */
         explicit CandidateVelocity(Vector velocity, int index_1, int index_2)
             : velocity(velocity), obstacle_indexes(std::pair(index_1, index_2))

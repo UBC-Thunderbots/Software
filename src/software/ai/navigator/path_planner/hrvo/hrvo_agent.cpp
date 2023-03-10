@@ -186,7 +186,7 @@ VelocityObstacle HRVOAgent::createVelocityObstacle(const Agent &other_agent)
     }
     else
     {
-        // Vise versa of above
+        // Vice versa of above
         vo_side  = vo.getRightSide();
         rvo_side = vo.getLeftSide();
     }
