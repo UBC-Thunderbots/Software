@@ -127,16 +127,17 @@ std::unique_ptr<TbotsProto::PassVisualization> createPassVisualization(
     const std::vector<PassWithRating>& passes_with_rating);
 
 /**
- * Returns the SimulationStartedTrigger given the simulation start trigger
+ * Returns the WorldStateReceivedTrigger given the world state received trigger
  *
- * @param sim_started_trigger a boolean value that is true if simulation has already
- * started
+ * @param world_state_received_trigger a boolean value that is true when world state proto has been
+ *                                     been received
  *
- * @return The unique_ptr to a TbotsProto::SimulationStartedTrigger proto containing
- *         a boolean value for whether simulation has started or not
+ * @return The unique_ptr to a TbotsProto::WorldStateReceivedTrigger proto containing
+ *         a boolean value for whether world state proto has been received
+ *                                    
  */
-std::unique_ptr<TbotsProto::SimulationStartedTrigger> createSimulationStartedTrigger(
-    const bool sim_started_trigger);
+std::unique_ptr<TbotsProto::WorldStateReceivedTrigger> createWorldStateReceivedTrigger(
+    const bool world_state_received_trigger);
 
 /**
  * Returns a cost visualization given a vector of costs

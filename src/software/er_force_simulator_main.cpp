@@ -123,13 +123,13 @@ int main(int argc, char **argv)
             runtime_dir + SIMULATOR_STATE_PATH);
 
 
-        // Simulation Started Trigger as Simulator Output
-        auto simulation_started_trigger =
-            ThreadedProtoUnixSender<TbotsProto::SimulationStartedTrigger>(
-                runtime_dir + SIMULATION_STARTED_TRIGGER_PATH);
+        // World State Received Trigger as Simulator Output
+        auto world_state_received_trigger =
+            ThreadedProtoUnixSender<TbotsProto::WorldStateReceivedTrigger>(
+                runtime_dir + WORLD_STATE_RECEIVED_TRIGGER_PATH);
 
-        bool has_sent_sim_start_trigger = false;
-
+        bool has_sent_world_state_trigger = false;
+        sleep(5);
         // Inputs
         // World State Input: Configures the ERForceSimulator
         auto world_state_input = ThreadedProtoUnixListener<TbotsProto::WorldState>(
@@ -137,11 +137,11 @@ int main(int argc, char **argv)
                 std::scoped_lock lock(simulator_mutex);
                 er_force_sim->setWorldState(input);
 
-                if (!has_sent_sim_start_trigger)
+                if (!has_sent_world_state_trigger)
                 {
-                    auto sim_started_trigger_msg = *createSimulationStartedTrigger(true);
-                    simulation_started_trigger.sendProto(sim_started_trigger_msg);
-                    has_sent_sim_start_trigger = true;
+                    auto world_state_received_trigger_msg = *createWorldStateReceivedTrigger(true);
+                    world_state_received_trigger.sendProto(world_state_received_trigger_msg);
+                    has_sent_world_state_trigger = true;
                 }
             });
 

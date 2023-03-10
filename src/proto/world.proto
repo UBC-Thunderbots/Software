@@ -45,9 +45,9 @@ message WorldState
     optional BallState ball_state         = 3;
 }
 
-message SimulationStartedTrigger
+message WorldStateReceivedTrigger
 {
-    required bool sim_started = 1;
+    required bool world_state_received = 1;
 }
 
 message SimulatorTick
