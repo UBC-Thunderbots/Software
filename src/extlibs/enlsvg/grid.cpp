@@ -1,4 +1,4 @@
-#include "extlibs/enlsvg/Pathfinding/grid.h"
+#include "extlibs/enlsvg/grid.h"
 
 #include <iostream>
 

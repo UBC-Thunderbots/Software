@@ -20,6 +20,9 @@ class ChickerWidget(QWidget):
         """Handles the robot diagnostics input to create a PowerControl message
         to be sent to the robots.
 
+        NOTE: The powerboards run in regulation mode, which means that they are
+        always charged and do not need to be explicitly charged.
+
         The powerboard also has an internal cooldown, so spamming kick or chip
         will not work until the capacitors charge up and the cooldown is over.
 

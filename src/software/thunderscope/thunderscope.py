@@ -3,20 +3,10 @@ import time
 import textwrap
 import shelve
 import signal
-import platform
 import logging
 
-# PyQt5 doesn't play nicely with i3 and Ubuntu 18, PyQt6 is much more stable
-# Unfortunately, PyQt6 doesn't install on Ubuntu 18. Thankfully both
-# libraries are interchangeable, and  we just need to swap them in this
-# one spot, and pyqtgraph will pick up on it and store the library under
-# pyqtgraph.Qt. So from PyQt5 import x becomes from pyqtgraph.Qt import x
-if "18.04" in platform.version():
-    import PyQt5
-    from PyQt5.QtWebEngineWidgets import QWebEngineView
-else:
-    import PyQt6
-    from PyQt6.QtWebEngineWidgets import QWebEngineView
+import PyQt6
+from PyQt6.QtWebEngineWidgets import QWebEngineView
 
 from qt_material import apply_stylesheet, list_themes
 
@@ -46,6 +36,7 @@ from software.thunderscope.field import (
 from software.thunderscope.common.proto_configuration_widget import (
     ProtoConfigurationWidget,
 )
+from software.thunderscope.cost_vis.cost_vis import CostVisualizationWidget
 from software.thunderscope.field.field import Field
 from software.thunderscope.log.g3log_widget import g3logWidget
 from software.thunderscope.proto_unix_io import ProtoUnixIO
@@ -96,6 +87,7 @@ class Thunderscope(object):
         yellow_replay_log=None,
         refresh_interval_ms=10,
         visualization_buffer_size=5,
+        cost_visualization=False,
     ):
         """Initialize Thunderscope
 
@@ -113,6 +105,7 @@ class Thunderscope(object):
             The interval in milliseconds to refresh all the widgets.
         :param visualization_buffer_size: The size of the visualization buffer.
             Increasing this will increase smoothness but will be less realtime. 
+        :param cost_visualization: Whether to visualize pass costs or not
 
         """
         signal.signal(signal.SIGINT, signal.SIG_DFL)
@@ -127,6 +120,7 @@ class Thunderscope(object):
         self.yellow_replay_log = yellow_replay_log
         self.refresh_interval_ms = refresh_interval_ms
         self.visualization_buffer_size = visualization_buffer_size
+        self.cost_visualization = cost_visualization
         self.widgets = {}
         self.refresh_timers = []
 
@@ -166,37 +160,27 @@ class Thunderscope(object):
         # protobuf types on two separate widgets.
         #
 
+        self.blue_full_system_proto_unix_io = None
+        self.yellow_full_system_proto_unix_io = None
+
         if load_blue:
             self.blue_full_system_proto_unix_io = (
-                ProtoUnixIO()
-                if blue_full_system_proto_unix_io is None
-                else blue_full_system_proto_unix_io
+                blue_full_system_proto_unix_io or ProtoUnixIO()
             )
         if load_yellow:
             self.yellow_full_system_proto_unix_io = (
-                ProtoUnixIO()
-                if yellow_full_system_proto_unix_io is None
-                else yellow_full_system_proto_unix_io
+                yellow_full_system_proto_unix_io or ProtoUnixIO()
             )
 
         # the proto unix io to which diagnostics protos should be sent to
         # if one of the fullsystems is running, uses the same proto
         # if not, initialises a new one
         # only used if diagnostics is enabled
-        # all diagnostics widgets send their primitives through here
-        self.robot_diagnostics_proto_unix_io = (
-            self.blue_full_system_proto_unix_io
-            if load_blue
-            else self.yellow_full_system_proto_unix_io
-            if load_yellow
-            else ProtoUnixIO()
+        self.robot_diagnostics_proto_unix_io = self.blue_full_system_proto_unix_io or (
+            self.yellow_full_system_proto_unix_io or ProtoUnixIO()
         )
 
-        self.simulator_proto_unix_io = (
-            ProtoUnixIO()
-            if simulator_proto_unix_io is None
-            else simulator_proto_unix_io
-        )
+        self.simulator_proto_unix_io = simulator_proto_unix_io or ProtoUnixIO()
 
         # Setup the main window and load the requested tabs
         self.configure_layout(layout_path, load_blue, load_yellow, load_diagnostics)
@@ -361,7 +345,6 @@ class Thunderscope(object):
                 self.simulator_proto_unix_io,
                 self.yellow_full_system_proto_unix_io,
                 load_fullsystem_robot_view,
-                load_diagnostics,
                 True,
             )
         if load_blue:
@@ -370,7 +353,6 @@ class Thunderscope(object):
                 self.simulator_proto_unix_io,
                 self.blue_full_system_proto_unix_io,
                 load_fullsystem_robot_view,
-                load_diagnostics,
                 False,
             )
 
@@ -410,7 +392,6 @@ class Thunderscope(object):
         sim_proto_unix_io,
         full_system_proto_unix_io,
         load_robot_view,
-        load_diagnostics,
         friendly_colour_yellow,
     ):
         """Configure the default layout for thunderscope
@@ -420,8 +401,7 @@ class Thunderscope(object):
         :param full_system_proto_unix_io: The proto unix io object for the full system
         :param load_robot_view: Whether robot view should be loaded on the fullsystem tab or not
                                 - should not be loaded in AI vs AI
-        :param load_diagnostics: Whether diagnostics is being loaded currently
-                                 - robot view should have checkboxes if diagnostics is loaded
+                                - should not be loaded with diagnostics, will be loaded in that tab instead
         :param friendly_colour_yellow: Whether the friendly colour is yellow
 
         """
@@ -455,6 +435,16 @@ class Thunderscope(object):
         playinfo_dock = Dock("Play Info")
         playinfo_dock.addWidget(widgets["playinfo_widget"])
 
+        if self.cost_visualization:
+            widgets["cost_visualization_widget"] = self.setup_cost_visualization_widget(
+                full_system_proto_unix_io
+            )
+            cost_visualization_dock = Dock("Cost Visualization")
+            cost_visualization_dock.addWidget(widgets["cost_visualization_widget"])
+            widgets["field_widget"].field_resized.connect(
+                widgets["cost_visualization_widget"].update_axis_range
+            )
+
         widgets["refereeinfo_widget"] = self.setup_referee_info(
             full_system_proto_unix_io
         )
@@ -467,18 +457,17 @@ class Thunderscope(object):
         dock_area.addDock(refereeinfo_dock, "bottom", field_dock)
         dock_area.addDock(playinfo_dock, "above", refereeinfo_dock)
         dock_area.addDock(performance_dock, "right", playinfo_dock)
+        if self.cost_visualization:
+            dock_area.addDock(cost_visualization_dock, "right", field_dock)
 
         if load_robot_view:
             widgets["robot_view"] = self.setup_robot_view(
-                full_system_proto_unix_io, load_diagnostics
+                full_system_proto_unix_io, True
             )
             robot_view_dock = Dock("RobotView")
             robot_view_dock.addWidget(widgets["robot_view"])
             dock_area.addDock(robot_view_dock, "above", log_dock)
-            if load_diagnostics:
-                self.toggle_robot_connection_signal = widgets[
-                    "robot_view"
-                ].toggle_robot_connection_signal
+            self.control_mode_signal = widgets["robot_view"].control_mode_signal
 
     def configure_robot_diagnostics_layout(
         self, dock_area, proto_unix_io, load_fullsystem,
@@ -506,38 +495,34 @@ class Thunderscope(object):
         log_dock = Dock("Logs")
         log_dock.addWidget(self.diagnostics_widgets["log_widget"])
 
-        if not load_fullsystem:
-            self.diagnostics_widgets["robot_view"] = self.setup_robot_view(
-                proto_unix_io, True
-            )
-            robot_view_dock = Dock("RobotView")
-            robot_view_dock.addWidget(self.diagnostics_widgets["robot_view"])
-            self.toggle_robot_connection_signal = self.diagnostics_widgets[
-                "robot_view"
-            ].toggle_robot_connection_signal
-
         self.diagnostics_widgets[
             "diagnostics_input"
         ] = self.setup_diagnostics_input_widget(proto_unix_io)
-        diagnostics_input_dock = Dock("Diagnostics_Input")
-        diagnostics_input_dock.addWidget(self.diagnostics_widgets["diagnostics_input"])
-
+        input_dock = Dock("Diagnostics Input")
+        input_dock.addWidget(self.diagnostics_widgets["diagnostics_input"])
+        self.diagnostics_widgets["diagnostics_input"].toggle_controls_signal.connect(
+            self.diagnostics_widgets["chicker"].set_should_enable_buttons
+        )
         self.diagnostics_widgets["diagnostics_input"].toggle_controls_signal.connect(
             self.diagnostics_widgets["drive"].toggle_all
         )
 
-        self.diagnostics_widgets["diagnostics_input"].toggle_controls_signal.connect(
-            self.diagnostics_widgets["chicker"].set_should_enable_buttons
-        )
+        if not load_fullsystem:
+            self.diagnostics_widgets["robot_view"] = self.setup_robot_view(
+                proto_unix_io, False
+            )
+            robot_view_dock = Dock("RobotView")
+            robot_view_dock.addWidget(self.diagnostics_widgets["robot_view"])
+            self.control_mode_signal = self.diagnostics_widgets[
+                "robot_view"
+            ].control_mode_signal
 
         self.robot_diagnostics_dock_area.addDock(log_dock)
         if not load_fullsystem:
             dock_area.addDock(robot_view_dock, "above", log_dock)
         self.robot_diagnostics_dock_area.addDock(drive_dock, "right", log_dock)
         self.robot_diagnostics_dock_area.addDock(chicker_dock, "below", drive_dock)
-        self.robot_diagnostics_dock_area.addDock(
-            diagnostics_input_dock, "top", chicker_dock
-        )
+        self.robot_diagnostics_dock_area.addDock(input_dock, "top", chicker_dock)
 
         estop_view = self.setup_estop_view(proto_unix_io)
 
@@ -545,12 +530,12 @@ class Thunderscope(object):
         dock.addWidget(estop_view)
         self.robot_diagnostics_dock_area.addDock(dock, "bottom", log_dock)
 
-    def setup_robot_view(self, proto_unix_io, load_diagnostics):
+    def setup_robot_view(self, proto_unix_io, load_fullsystem):
         """Setup the robot view widget
         :param proto_unix_io: The proto unix io object for the full system
-        :param load_diagnostics: Boolean to indicate if robot diagnostics should be loaded
+        :param load_fullsystem: Boolean to indicate if control mode menus should have an AI option
         """
-        robot_view = RobotView(load_diagnostics)
+        robot_view = RobotView(load_fullsystem)
         self.register_refresh_function(robot_view.refresh)
         proto_unix_io.register_observer(RobotStatus, robot_view.robot_status_buffer)
         return robot_view
@@ -744,8 +729,6 @@ class Thunderscope(object):
     def setup_diagnostics_input_widget(self, proto_unix_io):
         """
 
-        Sets up the diagnostics input widget with the given proto unix io
-
         :param proto_unix_io: The proto unix io object
         :returns the fullsystem connect widget
         """
@@ -767,6 +750,20 @@ class Thunderscope(object):
         self.register_refresh_function(drive_and_dribbler_widget.refresh)
 
         return drive_and_dribbler_widget
+
+    def setup_cost_visualization_widget(self, proto_unix_io):
+        """Setup the cost visualization widget
+
+        :param proto_unix_io: The proto unix io object
+        :returns: The cost visualization widget
+
+        """
+        cost_vis_widget = CostVisualizationWidget()
+        proto_unix_io.register_observer(
+            CostVisualization, cost_vis_widget.cost_visualization_buffer
+        )
+        self.register_refresh_function(cost_vis_widget.refresh)
+        return cost_vis_widget
 
     def show(self):
         """Show the main window"""
