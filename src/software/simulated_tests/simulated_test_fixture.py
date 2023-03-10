@@ -6,7 +6,6 @@ import sys
 import os
 
 import pytest
-from enum import Enum
 import software.python_bindings as tbots
 from proto.import_all_protos import *
 
@@ -35,18 +34,6 @@ LAUNCH_DELAY_S = 0.1
 WORLD_BUFFER_TIMEOUT = 0.5
 PROCESS_BUFFER_DELAY_S = 0.01
 PAUSE_AFTER_FAIL_DELAY_S = 3
-
-
-class TestType(Enum):
-    """
-    Enum for the 2 types of tests available
-    """
-
-    INVARIANT = 1
-    AGGREGATE = 2
-
-    # to make pytest ignore this class
-    __test__ = False
 
 
 class SimulatedTestRunner(object):
@@ -243,6 +230,58 @@ class SimulatedTestRunner(object):
 
         self.__stopper()
 
+    def run_test(
+        self,
+        always_validation_sequence_set,
+        eventually_validation_sequence_set,
+        test_timeout_s=3,
+        tick_duration_s=0.0166,
+        index=0,
+    ):
+        """
+        Helper function to run a test, with thunderscope if enabled
+        :param always_validation_sequence_set: validation that should always be true
+        :param eventually_validation_sequence_set: validation that should eventually be true
+        :param test_timeout_s: how long the test should run before timing out
+        :param tick_duration_s: length of a tick
+        :param index: index of the current test. default is 0 (invariant test)
+                      values can be passed in during aggregate testing for different timeout durations
+        """
+
+        test_timeout_duration = (
+            test_timeout_s[index] if type(test_timeout_s) == list else test_timeout_s
+        )
+
+        if self.thunderscope:
+            # If thunderscope is enabled, run the test in a thread and show
+            # thunderscope on this thread. The excepthook is setup to catch
+            # any test failures and propagate them to the main thread
+            run_sim_thread = threading.Thread(
+                target=self.runner,
+                daemon=True,
+                args=[
+                    always_validation_sequence_set,
+                    eventually_validation_sequence_set,
+                    test_timeout_duration,
+                    tick_duration_s,
+                ],
+            )
+            run_sim_thread.start()
+            self.thunderscope.show()
+            run_sim_thread.join()
+
+            if self.last_exception:
+                pytest.fail(str(self.last_exception))
+
+            # If thunderscope is disabled, just run the test
+        else:
+            self.runner(
+                always_validation_sequence_set,
+                eventually_validation_sequence_set,
+                test_timeout_duration,
+                tick_duration_s,
+            )
+
 
 class InvariantTestRunner(SimulatedTestRunner):
 
@@ -284,38 +323,12 @@ class InvariantTestRunner(SimulatedTestRunner):
 
         setup(params[0])
 
-        # If thunderscope is enabled, run the test in a thread and show
-        # thunderscope on this thread. The excepthook is setup to catch
-        # any test failures and propagate them to the main thread
-        if self.thunderscope:
-
-            run_sim_thread = threading.Thread(
-                target=self.runner,
-                daemon=True,
-                args=[
-                    inv_always_validation_sequence_set,
-                    inv_eventually_validation_sequence_set,
-                    test_timeout_s[0]
-                    if type(test_timeout_s) == list
-                    else test_timeout_s,
-                    tick_duration_s,
-                ],
-            )
-            run_sim_thread.start()
-            self.thunderscope.show()
-            run_sim_thread.join()
-
-            if self.last_exception:
-                pytest.fail(str(self.last_exception))
-
-        # If thunderscope is disabled, just run the test
-        else:
-            self.runner(
-                inv_always_validation_sequence_set,
-                inv_eventually_validation_sequence_set,
-                test_timeout_s[0] if type(test_timeout_s) == list else test_timeout_s,
-                tick_duration_s,
-            )
+        super().run_test(
+            inv_always_validation_sequence_set,
+            inv_eventually_validation_sequence_set,
+            test_timeout_s,
+            tick_duration_s,
+        )
 
 
 class AggregateTestRunner(SimulatedTestRunner):
@@ -366,41 +379,16 @@ class AggregateTestRunner(SimulatedTestRunner):
             failed_tests = 0
 
             try:
-                if self.thunderscope:
-                    # If thunderscope is enabled, run the test in a thread and show
-                    # thunderscope on this thread. The excepthook is setup to catch
-                    # any test failures and propagate them to the main thread
-                    run_sim_thread = threading.Thread(
-                        target=self.runner,
-                        daemon=True,
-                        args=[
-                            ag_always_validation_sequence_set,
-                            ag_eventually_validation_sequence_set,
-                            test_timeout_s[0]
-                            if type(test_timeout_s) == list
-                            else test_timeout_s,
-                            tick_duration_s,
-                        ],
-                    )
-                    run_sim_thread.start()
-                    self.thunderscope.show()
-                    run_sim_thread.join()
-
-                    if self.last_exception:
-                        pytest.fail(str(self.last_exception))
-
-                # If thunderscope is disabled, just run the test
-                else:
-                    self.runner(
-                        ag_always_validation_sequence_set,
-                        ag_eventually_validation_sequence_set,
-                        test_timeout_s[x]
-                        if type(test_timeout_s) == list
-                        else test_timeout_s,
-                        tick_duration_s,
-                    )
+                super().run_test(
+                    ag_always_validation_sequence_set,
+                    ag_eventually_validation_sequence_set,
+                    test_timeout_s,
+                    tick_duration_s,
+                )
             except AssertionError:
                 failed_tests += 1
+
+        # TODO (#2856) Fix validation and results output
 
         print(f"{failed_tests} test failed")
 

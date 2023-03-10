@@ -20,7 +20,7 @@ from proto.ssl_gc_geometry_pb2 import Vector2
 def test_shoot_or_chip_play(simulated_test_runner):
     def setup(*args):
         ball_initial_pos = tbots.Point(-1.4, 2)
-        tbots.Vector(0, 0)
+        ball_initial_vel = tbots.Vector(0, 0)
 
         field = tbots.Field.createSSLDivisionBField()
 
@@ -45,7 +45,7 @@ def test_shoot_or_chip_play(simulated_test_runner):
             yellow_robot_locations=yellow_bots,
             blue_robot_locations=blue_bots,
             ball_location=ball_initial_pos,
-            ball_velocity=tbots.Vector(0, 0),
+            ball_velocity=ball_initial_vel,
         )
 
         last_robot = RobotState(
@@ -76,6 +76,8 @@ def test_shoot_or_chip_play(simulated_test_runner):
 
     simulated_test_runner.run_test(
         setup=setup,
+        # this array is just so that the test runs 5 times
+        # if needed, actual arguments can be passed in to customize each test iteration
         params=[0, 1, 2, 3, 4],
         inv_eventually_validation_sequence_set=[[]],
         inv_always_validation_sequence_set=[[]],
