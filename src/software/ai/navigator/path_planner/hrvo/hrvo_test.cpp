@@ -24,7 +24,8 @@ class TestHrvo : public testing::Test
     }
 
     HRVOSimulator sim;
-protected:
+
+   protected:
     Duration time_step;
     RobotConstants_t robot_constants;
     World world;
@@ -56,13 +57,15 @@ void assertRobotInAgentList(const Robot &robot, const TeamSide &side,
 {
     auto result = std::find_if(
         sim_robots.begin(), sim_robots.end(),
-        [&robot,
-         &side, enemy_robot_offset](std::optional<std::pair<RobotId, std::shared_ptr<Agent>>> sim_robot) {
+        [&robot, &side, enemy_robot_offset](
+            std::optional<std::pair<RobotId, std::shared_ptr<Agent>>> sim_robot) {
             if (!sim_robot.has_value())
             {
                 return false;
             }
-            return side == TeamSide::ENEMY ? (sim_robot.value().first - enemy_robot_offset) == robot.id() : sim_robot.value().second->robot_id == robot.id();
+            return side == TeamSide::ENEMY
+                       ? (sim_robot.value().first - enemy_robot_offset) == robot.id()
+                       : sim_robot.value().second->robot_id == robot.id();
         });
     ASSERT_TRUE(result != sim_robots.end());
 }
@@ -87,7 +90,8 @@ TEST_F(TestHrvo, test_update_world_with_one_friendly_agent)
     EXPECT_EQ(1, sim.getRobotCount());
 
     auto agents = sim.getRobots();
-    assertRobotInAgentList(friendly_robot_1, TeamSide::FRIENDLY, sim.getRobots(), sim.ENEMY_LV_ROBOT_OFFSET);
+    assertRobotInAgentList(friendly_robot_1, TeamSide::FRIENDLY, sim.getRobots(),
+                           sim.ENEMY_LV_ROBOT_OFFSET);
 }
 
 TEST_F(TestHrvo, test_update_world_with_one_enemy_agent)
@@ -102,7 +106,8 @@ TEST_F(TestHrvo, test_update_world_with_one_enemy_agent)
     ASSERT_EQ(1, sim.getRobotCount());
 
     auto agents = sim.getRobots();
-    assertRobotInAgentList(enemy_robot_1, TeamSide::ENEMY, sim.getRobots(), sim.ENEMY_LV_ROBOT_OFFSET);
+    assertRobotInAgentList(enemy_robot_1, TeamSide::ENEMY, sim.getRobots(),
+                           sim.ENEMY_LV_ROBOT_OFFSET);
 }
 
 TEST_F(TestHrvo, test_update_world_with_friendly_and_enemy_agent)
@@ -119,8 +124,10 @@ TEST_F(TestHrvo, test_update_world_with_friendly_and_enemy_agent)
 
     ASSERT_EQ(2, sim.getRobotCount());
 
-    assertRobotInAgentList(friendly_robot_1, TeamSide::FRIENDLY, sim.getRobots(), sim.ENEMY_LV_ROBOT_OFFSET);
-    assertRobotInAgentList(enemy_robot_1, TeamSide::ENEMY, sim.getRobots(), sim.ENEMY_LV_ROBOT_OFFSET);
+    assertRobotInAgentList(friendly_robot_1, TeamSide::FRIENDLY, sim.getRobots(),
+                           sim.ENEMY_LV_ROBOT_OFFSET);
+    assertRobotInAgentList(enemy_robot_1, TeamSide::ENEMY, sim.getRobots(),
+                           sim.ENEMY_LV_ROBOT_OFFSET);
 }
 
 TEST_F(TestHrvo, test_update_world_add_friendly_robots_second_tick)
@@ -148,7 +155,8 @@ TEST_F(TestHrvo, test_update_world_add_friendly_robots_second_tick)
 
     for (Robot &robot : friendly_robots)
     {
-        assertRobotInAgentList(robot, TeamSide::FRIENDLY, agents, sim.ENEMY_LV_ROBOT_OFFSET);
+        assertRobotInAgentList(robot, TeamSide::FRIENDLY, agents,
+                               sim.ENEMY_LV_ROBOT_OFFSET);
     }
 
     for (Robot &robot : enemy_robots)
@@ -171,7 +179,8 @@ TEST_F(TestHrvo, test_update_world_add_friendly_robots_second_tick)
 
     for (Robot &robot : friendly_robots)
     {
-        assertRobotInAgentList(robot, TeamSide::FRIENDLY, agents, sim.ENEMY_LV_ROBOT_OFFSET);
+        assertRobotInAgentList(robot, TeamSide::FRIENDLY, agents,
+                               sim.ENEMY_LV_ROBOT_OFFSET);
     }
 
     for (Robot &robot : enemy_robots)
@@ -204,7 +213,8 @@ TEST_F(TestHrvo, test_update_world_add_enemy_robots_second_tick)
 
     for (Robot &robot : friendly_robots)
     {
-        assertRobotInAgentList(robot, TeamSide::FRIENDLY, agents, sim.ENEMY_LV_ROBOT_OFFSET);
+        assertRobotInAgentList(robot, TeamSide::FRIENDLY, agents,
+                               sim.ENEMY_LV_ROBOT_OFFSET);
     }
 
     for (Robot &robot : enemy_robots)
@@ -227,7 +237,8 @@ TEST_F(TestHrvo, test_update_world_add_enemy_robots_second_tick)
 
     for (Robot &robot : friendly_robots)
     {
-        assertRobotInAgentList(robot, TeamSide::FRIENDLY, agents, sim.ENEMY_LV_ROBOT_OFFSET);
+        assertRobotInAgentList(robot, TeamSide::FRIENDLY, agents,
+                               sim.ENEMY_LV_ROBOT_OFFSET);
     }
 
     for (Robot &robot : enemy_robots)
@@ -263,7 +274,8 @@ TEST_F(TestHrvo, test_update_world_remove_friendly_robots_second_tick)
 
     for (Robot &robot : friendly_robots)
     {
-        assertRobotInAgentList(robot, TeamSide::FRIENDLY, agents, sim.ENEMY_LV_ROBOT_OFFSET);
+        assertRobotInAgentList(robot, TeamSide::FRIENDLY, agents,
+                               sim.ENEMY_LV_ROBOT_OFFSET);
     }
 
     for (Robot &robot : enemy_robots)
@@ -284,7 +296,8 @@ TEST_F(TestHrvo, test_update_world_remove_friendly_robots_second_tick)
 
     for (Robot &robot : friendly_robots)
     {
-        assertRobotInAgentList(robot, TeamSide::FRIENDLY, agents, sim.ENEMY_LV_ROBOT_OFFSET);
+        assertRobotInAgentList(robot, TeamSide::FRIENDLY, agents,
+                               sim.ENEMY_LV_ROBOT_OFFSET);
     }
 
     for (Robot &robot : enemy_robots)
@@ -325,7 +338,8 @@ TEST_F(TestHrvo, test_update_world_remove_enemy_robots_second_tick)
 
     for (Robot &robot : friendly_robots)
     {
-        assertRobotInAgentList(robot, TeamSide::FRIENDLY, agents, sim.ENEMY_LV_ROBOT_OFFSET);
+        assertRobotInAgentList(robot, TeamSide::FRIENDLY, agents,
+                               sim.ENEMY_LV_ROBOT_OFFSET);
     }
 
     for (Robot &robot : enemy_robots)
@@ -347,7 +361,8 @@ TEST_F(TestHrvo, test_update_world_remove_enemy_robots_second_tick)
 
     for (Robot &robot : friendly_robots)
     {
-        assertRobotInAgentList(robot, TeamSide::FRIENDLY, agents, sim.ENEMY_LV_ROBOT_OFFSET);
+        assertRobotInAgentList(robot, TeamSide::FRIENDLY, agents,
+                               sim.ENEMY_LV_ROBOT_OFFSET);
     }
 
     for (Robot &robot : enemy_robots)
@@ -385,7 +400,8 @@ TEST_F(TestHrvo, test_update_world_add_and_remove_friendly_robots_second_tick)
 
     for (Robot &robot : friendly_robots)
     {
-        assertRobotInAgentList(robot, TeamSide::FRIENDLY, agents, sim.ENEMY_LV_ROBOT_OFFSET);
+        assertRobotInAgentList(robot, TeamSide::FRIENDLY, agents,
+                               sim.ENEMY_LV_ROBOT_OFFSET);
     }
 
     for (Robot &robot : enemy_robots)
@@ -408,7 +424,8 @@ TEST_F(TestHrvo, test_update_world_add_and_remove_friendly_robots_second_tick)
 
     for (Robot &robot : friendly_robots)
     {
-        assertRobotInAgentList(robot, TeamSide::FRIENDLY, agents, sim.ENEMY_LV_ROBOT_OFFSET);
+        assertRobotInAgentList(robot, TeamSide::FRIENDLY, agents,
+                               sim.ENEMY_LV_ROBOT_OFFSET);
     }
 
     for (Robot &robot : enemy_robots)
@@ -446,7 +463,8 @@ TEST_F(TestHrvo, test_update_world_add_and_remove_enemy_robots_second_tick)
 
     for (Robot &robot : friendly_robots)
     {
-        assertRobotInAgentList(robot, TeamSide::FRIENDLY, agents, sim.ENEMY_LV_ROBOT_OFFSET);
+        assertRobotInAgentList(robot, TeamSide::FRIENDLY, agents,
+                               sim.ENEMY_LV_ROBOT_OFFSET);
     }
 
     for (Robot &robot : enemy_robots)
@@ -471,7 +489,8 @@ TEST_F(TestHrvo, test_update_world_add_and_remove_enemy_robots_second_tick)
 
     for (Robot &robot : friendly_robots)
     {
-        assertRobotInAgentList(robot, TeamSide::FRIENDLY, agents, sim.ENEMY_LV_ROBOT_OFFSET);
+        assertRobotInAgentList(robot, TeamSide::FRIENDLY, agents,
+                               sim.ENEMY_LV_ROBOT_OFFSET);
     }
 
     for (Robot &robot : enemy_robots)
@@ -508,7 +527,8 @@ TEST_F(TestHrvo, test_update_world_add_and_remove_friendly_and_enemy_robots_seco
 
     for (Robot &robot : friendly_robots)
     {
-        assertRobotInAgentList(robot, TeamSide::FRIENDLY, agents, sim.ENEMY_LV_ROBOT_OFFSET);
+        assertRobotInAgentList(robot, TeamSide::FRIENDLY, agents,
+                               sim.ENEMY_LV_ROBOT_OFFSET);
     }
 
     for (Robot &robot : enemy_robots)
@@ -538,7 +558,8 @@ TEST_F(TestHrvo, test_update_world_add_and_remove_friendly_and_enemy_robots_seco
 
     for (Robot &robot : friendly_robots)
     {
-        assertRobotInAgentList(robot, TeamSide::FRIENDLY, agents, sim.ENEMY_LV_ROBOT_OFFSET);
+        assertRobotInAgentList(robot, TeamSide::FRIENDLY, agents,
+                               sim.ENEMY_LV_ROBOT_OFFSET);
     }
 
     for (Robot &robot : enemy_robots)

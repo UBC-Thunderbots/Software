@@ -28,13 +28,13 @@ void Agent::update(Duration time_step)
     const Vector dv = new_velocity - velocity;
     if (dv.length() < max_accel * time_step.toSeconds() || dv.length() == 0.0)
     {
-        velocity = new_velocity;
+        setVelocity(new_velocity);
     }
     else
     {
         // Calculate the maximum velocity towards the preferred velocity, given the
         // acceleration constraint
-        velocity = velocity + dv.normalize(max_accel * time_step.toSeconds());
+        setVelocity(velocity + dv.normalize(max_accel * time_step.toSeconds()));
     }
     position = position + (velocity * time_step.toSeconds());
 
@@ -47,7 +47,7 @@ void Agent::update(Duration time_step)
         current_dest = path_point.value().getPosition();
 
         if ((current_dest - position).lengthSquared() <
-            path.getPathRadius() * path.getPathRadius() &&
+                path.getPathRadius() * path.getPathRadius() &&
             !path.isGoingToFinalPathPoint())
         {
             // Is at current goal position
@@ -77,19 +77,23 @@ double Agent::getRadius() const
     return radius;
 }
 
-Point Agent::getPosition() const {
+Point Agent::getPosition() const
+{
     return position;
 }
 
-Vector Agent::getVelocity() const {
+Vector Agent::getVelocity() const
+{
     return velocity;
 }
 
-Angle Agent::getOrientation() const {
+Angle Agent::getOrientation() const
+{
     return orientation;
 }
 
-AngularVelocity Agent::getAngularVelocity() const {
+AngularVelocity Agent::getAngularVelocity() const
+{
     return angular_velocity;
 }
 
@@ -108,6 +112,7 @@ void Agent::setPreferredVelocity(const Vector &pref_velocity)
     preferred_velocity = pref_velocity;
 }
 
-void Agent::setVelocity(const Vector &velocity_update) {
+void Agent::setVelocity(const Vector &velocity_update)
+{
     velocity = velocity_update;
 }

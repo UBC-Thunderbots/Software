@@ -1,8 +1,8 @@
 #include "software/ai/navigator/path_planner/hrvo/hrvo_agent.h"
 
 HRVOAgent::HRVOAgent(RobotId robot_id, const RobotState &robot_state,
-                     const RobotPath &path, double radius, double max_speed, double max_accel,
-                     double max_radius_inflation)
+                     const RobotPath &path, double radius, double max_speed,
+                     double max_accel, double max_radius_inflation)
     : Agent(robot_id, robot_state, path, radius, max_speed, max_accel,
             max_radius_inflation),
       obstacle_factory(TbotsProto::RobotNavigationObstacleConfig())
@@ -70,8 +70,8 @@ std::vector<RobotId> HRVOAgent::computeNeighbors(
     double dist_to_obstacle_threshold =
         std::min(2.5, (position - current_destination).length());
 
-    auto compare = [&](const std::pair<RobotId, Point>& r1,
-                       const std::pair<RobotId, Point>& r2) {
+    auto compare = [&](const std::pair<RobotId, Point> &r1,
+                       const std::pair<RobotId, Point> &r2) {
         return distanceSquared(r1.second, r2.second);
     };
 
@@ -93,8 +93,8 @@ std::vector<RobotId> HRVOAgent::computeNeighbors(
 
     // run brute force nn search
     std::vector<std::pair<RobotId, Point>> neighbors =
-        findNeighboursInThreshold(std::make_pair(robot_id, position),
-                                  robot_list, dist_to_obstacle_threshold, compare);
+        findNeighboursInThreshold(std::make_pair(robot_id, position), robot_list,
+                                  dist_to_obstacle_threshold, compare);
 
     // unzip and return id from id-robot pairs
     std::vector<unsigned int> neighbor_ids;
@@ -168,7 +168,8 @@ VelocityObstacle HRVOAgent::createVelocityObstacle(const Agent &other_agent)
 {
     Circle moving_agent_circle(other_agent.getPosition(), radius);
     Circle obstacle_agent_circle(position, radius);
-    auto vo = generateVelocityObstacle(obstacle_agent_circle, moving_agent_circle, velocity);
+    auto vo =
+        generateVelocityObstacle(obstacle_agent_circle, moving_agent_circle, velocity);
 
     // Convert velocity obstacle to hybrid reciprocal velocity obstacle (HRVO)
     // by shifting one side of the velocity obstacle to share the responsibility
@@ -232,8 +233,9 @@ void HRVOAgent::computeNewVelocity(std::map<unsigned int, std::shared_ptr<Agent>
     Vector candidate_velocity = pref_velocity.lengthSquared() < max_speed * max_speed
                                     ? pref_velocity
                                     : pref_velocity.normalize(max_speed);
-    auto pref_candidate = CandidateVelocity(candidate_velocity, std::numeric_limits<int>::max(),
-                                            std::numeric_limits<int>::max());
+    auto pref_candidate =
+        CandidateVelocity(candidate_velocity, std::numeric_limits<int>::max(),
+                          std::numeric_limits<int>::max());
 
     candidates.insert(std::make_pair(
         (pref_velocity - pref_candidate.velocity).lengthSquared(), pref_candidate));
@@ -289,8 +291,9 @@ void HRVOAgent::computeNewVelocity(std::map<unsigned int, std::shared_ptr<Agent>
                 candidate_velocity = velocity_obstacles[j].getApex() +
                                      t1 * velocity_obstacles[j].getRightSide();
                 candidates.insert(std::make_pair(
-                        (pref_velocity - candidate_velocity).lengthSquared(),
-                        CandidateVelocity(candidate_velocity, std::numeric_limits<int>::max(), j)));
+                    (pref_velocity - candidate_velocity).lengthSquared(),
+                    CandidateVelocity(candidate_velocity, std::numeric_limits<int>::max(),
+                                      j)));
             }
 
             if (t2 >= 0.0f)
@@ -298,8 +301,9 @@ void HRVOAgent::computeNewVelocity(std::map<unsigned int, std::shared_ptr<Agent>
                 candidate_velocity = velocity_obstacles[j].getApex() +
                                      t2 * velocity_obstacles[j].getRightSide();
                 candidates.insert(std::make_pair(
-                        (pref_velocity - candidate_velocity).lengthSquared(),
-                        CandidateVelocity(candidate_velocity, std::numeric_limits<int>::max(), j)));
+                    (pref_velocity - candidate_velocity).lengthSquared(),
+                    CandidateVelocity(candidate_velocity, std::numeric_limits<int>::max(),
+                                      j)));
             }
         }
 
@@ -322,8 +326,9 @@ void HRVOAgent::computeNewVelocity(std::map<unsigned int, std::shared_ptr<Agent>
                 candidate_velocity = velocity_obstacles[j].getApex() +
                                      t1 * velocity_obstacles[j].getLeftSide();
                 candidates.insert(std::make_pair(
-                        (pref_velocity - candidate_velocity).lengthSquared(),
-                        CandidateVelocity(candidate_velocity, std::numeric_limits<int>::max(), j)));
+                    (pref_velocity - candidate_velocity).lengthSquared(),
+                    CandidateVelocity(candidate_velocity, std::numeric_limits<int>::max(),
+                                      j)));
             }
 
             if (t2 >= 0.0f)
@@ -331,8 +336,9 @@ void HRVOAgent::computeNewVelocity(std::map<unsigned int, std::shared_ptr<Agent>
                 candidate_velocity = velocity_obstacles[j].getApex() +
                                      t2 * velocity_obstacles[j].getLeftSide();
                 candidates.insert(std::make_pair(
-                        (pref_velocity - candidate_velocity).lengthSquared(),
-                        CandidateVelocity(candidate_velocity, std::numeric_limits<int>::max(), j)));
+                    (pref_velocity - candidate_velocity).lengthSquared(),
+                    CandidateVelocity(candidate_velocity, std::numeric_limits<int>::max(),
+                                      j)));
             }
         }
     }
@@ -363,7 +369,8 @@ void HRVOAgent::computeNewVelocity(std::map<unsigned int, std::shared_ptr<Agent>
                 {
                     candidate_velocity = velocity_obstacles[i].getApex() +
                                          s * velocity_obstacles[i].getRightSide();
-                    addToCandidateListIfValid(CandidateVelocity(candidate_velocity, i, j));
+                    addToCandidateListIfValid(
+                        CandidateVelocity(candidate_velocity, i, j));
                 }
             }
 
@@ -385,7 +392,8 @@ void HRVOAgent::computeNewVelocity(std::map<unsigned int, std::shared_ptr<Agent>
                 {
                     candidate_velocity = velocity_obstacles[i].getApex() +
                                          s * velocity_obstacles[i].getLeftSide();
-                    addToCandidateListIfValid(CandidateVelocity(candidate_velocity, i, j));
+                    addToCandidateListIfValid(
+                        CandidateVelocity(candidate_velocity, i, j));
                 }
             }
 
@@ -407,7 +415,8 @@ void HRVOAgent::computeNewVelocity(std::map<unsigned int, std::shared_ptr<Agent>
                 {
                     candidate_velocity = velocity_obstacles[i].getApex() +
                                          s * velocity_obstacles[i].getRightSide();
-                    addToCandidateListIfValid(CandidateVelocity(candidate_velocity, i, j));
+                    addToCandidateListIfValid(
+                        CandidateVelocity(candidate_velocity, i, j));
                 }
             }
 
@@ -429,7 +438,8 @@ void HRVOAgent::computeNewVelocity(std::map<unsigned int, std::shared_ptr<Agent>
                 {
                     candidate_velocity = velocity_obstacles[i].getApex() +
                                          s * velocity_obstacles[i].getLeftSide();
-                    addToCandidateListIfValid(CandidateVelocity(candidate_velocity, i, j));
+                    addToCandidateListIfValid(
+                        CandidateVelocity(candidate_velocity, i, j));
                 }
             }
         }
@@ -509,7 +519,8 @@ bool HRVOAgent::isCandidateFast(const CandidateVelocity &candidate) const
     return !isCandidateSlow(candidate);
 }
 
-bool HRVOAgent::isCandidateFasterThanCurrentSpeed(const CandidateVelocity &candidate) const
+bool HRVOAgent::isCandidateFasterThanCurrentSpeed(
+    const CandidateVelocity &candidate) const
 {
     return std::abs(candidate.velocity.length()) > std::abs(new_velocity.length());
 }
@@ -582,7 +593,8 @@ Vector HRVOAgent::computePreferredVelocity(Duration time_step)
         // Accelerate to preferred speed
         // v_pref = v_now + a * t
         double curr_pref_speed =
-            std::min(static_cast<double>(pref_speed), velocity.length() + max_accel * time_step.toSeconds());
+            std::min(static_cast<double>(pref_speed),
+                     velocity.length() + max_accel * time_step.toSeconds());
         return dist_vector_to_goal.normalize(curr_pref_speed);
     }
 }

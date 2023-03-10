@@ -1,13 +1,10 @@
 #include "hrvo_simulator.h"
 
-HRVOSimulator::HRVOSimulator()
-    : robots(),
-      world(std::nullopt),
-      primitive_set()
-{
-}
+HRVOSimulator::HRVOSimulator() : robots(), world(std::nullopt), primitive_set() {}
 
-void HRVOSimulator::updateWorld(const World &world, const RobotConstants_t &robot_constants, Duration time_step)
+void HRVOSimulator::updateWorld(const World &world,
+                                const RobotConstants_t &robot_constants,
+                                Duration time_step)
 {
     this->world = world;
     // TODO (#2498): Update implementation to correctly support adding and removing agents
@@ -26,7 +23,8 @@ void HRVOSimulator::updateWorld(const World &world, const RobotConstants_t &robo
 }
 
 
-void HRVOSimulator::updatePrimitiveSet(const TbotsProto::PrimitiveSet &new_primitive_set, Duration time_step)
+void HRVOSimulator::updatePrimitiveSet(const TbotsProto::PrimitiveSet &new_primitive_set,
+                                       Duration time_step)
 {
     primitive_set = new_primitive_set;
 
@@ -37,16 +35,21 @@ void HRVOSimulator::updatePrimitiveSet(const TbotsProto::PrimitiveSet &new_primi
         if (friendly_robot == robots.end())
         {
             continue;
-        } else {
+        }
+        else
+        {
             if (world.has_value())
             {
-                friendly_robot->second->updatePrimitive(primitive, world.value(), time_step);
+                friendly_robot->second->updatePrimitive(primitive, world.value(),
+                                                        time_step);
             }
         }
     }
 }
 
-void HRVOSimulator::configureHRVORobot(const Robot &robot, const RobotConstants_t &robot_constants, Duration time_step)
+void HRVOSimulator::configureHRVORobot(const Robot &robot,
+                                       const RobotConstants_t &robot_constants,
+                                       Duration time_step)
 {
     double max_accel = 1e-4;
     double max_speed = 1e-4;
@@ -95,13 +98,15 @@ void HRVOSimulator::configureHRVORobot(const Robot &robot, const RobotConstants_
 
     RobotPath path = RobotPath({PathPoint(destination_point, speed_at_goal)}, max_radius);
 
-    std::shared_ptr<HRVOAgent> agent =
-        std::make_shared<HRVOAgent>(robot.id(), robot.currentState(),                                    path, ROBOT_MAX_RADIUS_METERS, max_speed, max_accel,
-                                    FRIENDLY_ROBOT_RADIUS_MAX_INFLATION);
+    std::shared_ptr<HRVOAgent> agent = std::make_shared<HRVOAgent>(
+        robot.id(), robot.currentState(), path, ROBOT_MAX_RADIUS_METERS, max_speed,
+        max_accel, FRIENDLY_ROBOT_RADIUS_MAX_INFLATION);
     robots[robot.id()] = std::static_pointer_cast<Agent>(agent);
 }
 
-void HRVOSimulator::configureLVRobot(const Robot &robot, const RobotConstants_t &robot_constants, Duration time_step)
+void HRVOSimulator::configureLVRobot(const Robot &robot,
+                                     const RobotConstants_t &robot_constants,
+                                     Duration time_step)
 {
     Point destination = robot.position() + 2 * robot.velocity();
     double max_speed  = robot_constants.robot_max_speed_m_per_s;
@@ -114,8 +119,8 @@ void HRVOSimulator::configureLVRobot(const Robot &robot, const RobotConstants_t 
     // robot_constants.robot_max_speed_m_per_s
 
     std::shared_ptr<LVAgent> agent = std::make_shared<LVAgent>(
-        robot.id(), robot.currentState(), path, ROBOT_MAX_RADIUS_METERS,
-        max_speed, 0.0, ENEMY_ROBOT_RADIUS_MAX_INFLATION);
+        robot.id(), robot.currentState(), path, ROBOT_MAX_RADIUS_METERS, max_speed, 0.0,
+        ENEMY_ROBOT_RADIUS_MAX_INFLATION);
 
     robots[robot.id() + ENEMY_LV_ROBOT_OFFSET] = std::static_pointer_cast<Agent>(agent);
 }

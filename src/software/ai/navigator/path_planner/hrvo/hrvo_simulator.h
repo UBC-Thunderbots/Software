@@ -36,7 +36,8 @@ class HRVOSimulator
      *
      * @param world The world which the simulation should be based upon
      */
-    void updateWorld(const World &world, const RobotConstants_t &robot_constants, Duration time_step);
+    void updateWorld(const World &world, const RobotConstants_t &robot_constants,
+                     Duration time_step);
 
 
     /**
@@ -45,7 +46,8 @@ class HRVOSimulator
      * @param new_primitive_set
      * @param time_step the time_step to use
      */
-    void updatePrimitiveSet(const TbotsProto::PrimitiveSet &new_primitive_set, Duration time_step);
+    void updatePrimitiveSet(const TbotsProto::PrimitiveSet &new_primitive_set,
+                            Duration time_step);
 
 
     /**
@@ -101,16 +103,16 @@ class HRVOSimulator
     // Robot id offset for enemy robots so we don't have
     // friendly and enemy agents with overlapping ids in the `robots` map
     const unsigned int ENEMY_LV_ROBOT_OFFSET = 1000;
-private:
 
-
+   private:
     /**
      * Configure and add a HRVO Agent to the simulation.
      *
      * @param robot The robot for which this agent is based on
      * @param time_step the time_step to use
      */
-    void configureHRVORobot(const Robot &robot, const RobotConstants_t &robot_constants, Duration time_step);
+    void configureHRVORobot(const Robot &robot, const RobotConstants_t &robot_constants,
+                            Duration time_step);
 
 
     /**
@@ -119,7 +121,8 @@ private:
      * @param robot The robot for which this agent is based on
      * @param time_step the time_step to use
      */
-    void configureLVRobot(const Robot &robot, const RobotConstants_t &robot_constants, Duration time_step);
+    void configureLVRobot(const Robot &robot, const RobotConstants_t &robot_constants,
+                          Duration time_step);
 
     // robot id to agent
     std::map<RobotId, std::shared_ptr<Agent>> robots;

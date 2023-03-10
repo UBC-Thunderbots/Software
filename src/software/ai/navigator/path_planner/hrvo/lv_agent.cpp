@@ -52,8 +52,7 @@ VelocityObstacle LVAgent::createVelocityObstacle(const Agent &other_agent)
 {
     return VelocityObstacle::generateVelocityObstacle(
         Circle(Point(position), radius),
-        Circle(Point(other_agent.getPosition()), other_agent.radius),
-        velocity);
+        Circle(Point(other_agent.getPosition()), other_agent.radius), velocity);
 }
 
 void LVAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive,

@@ -140,7 +140,8 @@ class HRVOAgent : public Agent
      * intersects in velocity_obstacles_, or std::nullopt if the candidate does not
      * intersect any
      */
-    std::optional<int> findIntersectingVelocityObstacle(const CandidateVelocity &candidate) const;
+    std::optional<int> findIntersectingVelocityObstacle(
+        const CandidateVelocity &candidate) const;
 
 
     /**
