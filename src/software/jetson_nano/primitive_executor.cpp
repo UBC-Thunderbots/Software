@@ -7,13 +7,14 @@
 #include "proto/visualization.pb.h"
 #include "software/physics/velocity_conversion_util.h"
 
-PrimitiveExecutor::PrimitiveExecutor(const double time_step,
+PrimitiveExecutor::PrimitiveExecutor(const Duration time_step,
                                      const RobotConstants_t &robot_constants,
                                      const TeamColour friendly_team_colour,
                                      const RobotId robot_id)
     : current_primitive_(),
+      friendly_team_colour(friendly_team_colour),
       robot_constants_(robot_constants),
-      hrvo_simulator_(robot_constants, friendly_team_colour),
+      hrvo_simulator_(),
       time_step_(time_step),
       curr_orientation_(Angle::zero()),
       robot_id_(robot_id)
@@ -40,7 +41,7 @@ void PrimitiveExecutor::setStopPrimitive()
 void PrimitiveExecutor::updateWorld(const TbotsProto::World &world_msg)
 {
     World new_world = World(world_msg);
-    hrvo_simulator_.updateWorld(new_world, time_step_);
+    hrvo_simulator_.updateWorld(new_world, robot_constants_, time_step_);
 
     auto this_robot = new_world.friendlyTeam().getRobotById(robot_id_);
     if (this_robot.has_value())
@@ -85,7 +86,7 @@ AngularVelocity PrimitiveExecutor::getTargetAngularVelocity(
         std::copysign(next_angular_speed, signed_delta_orientation));
 
     // Update estimated orientation for next iteration
-    curr_orientation_ += target_angular_velocity * time_step_;
+    curr_orientation_ += target_angular_velocity * time_step_.toSeconds();
 
     return target_angular_velocity;
 }
@@ -96,7 +97,7 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
     hrvo_simulator_.doStep(time_step_);
 
     // Visualize the HRVO Simulator for the current robot
-    hrvo_simulator_.visualize(robot_id_);
+    hrvo_simulator_.visualize(robot_id_, friendly_team_colour);
 
     switch (current_primitive_.primitive_case())
     {

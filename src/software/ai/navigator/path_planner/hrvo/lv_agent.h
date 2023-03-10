@@ -17,7 +17,6 @@ class LVAgent : public Agent
      *
      * @param robot_id	            The robot id for this agent.
      * @prarm robot_state           The robots current state
-     * @param side	  	            The team side for this agent (friendly or enemy).
      * @param path                  The path of this agent
      * @param radius                The radius of this agent.
      * @param max_speed             The maximum speed of this agent.
@@ -25,7 +24,7 @@ class LVAgent : public Agent
      * @param max_radius_inflation  The maximum amount which the radius of this agent can
      * inflate.
      */
-    LVAgent(RobotId robot_id, RobotState robot_state, TeamSide side, RobotPath &path,
+    LVAgent(RobotId robot_id, const RobotState &robot_state, const RobotPath &path,
             double radius, double max_speed, double max_accel,
             double max_radius_inflation);
 
@@ -36,7 +35,7 @@ class LVAgent : public Agent
      * @param the simulators time step
      */
     void computeNewVelocity(std::map<unsigned int, std::shared_ptr<Agent>> &robots,
-                            double time_step) override;
+                            Duration time_step) override;
 
     /**
      * Create the velocity obstacle which other_agent should see for this Agent
@@ -53,7 +52,7 @@ class LVAgent : public Agent
      * @param time_step
      * @return the computed preferred velocity
      */
-    Vector computePreferredVelocity(double time_step) override;
+    Vector computePreferredVelocity(Duration time_step) override;
 
     /**
      * Update the primitive which this agent is currently pursuing.
@@ -63,5 +62,5 @@ class LVAgent : public Agent
      * @param time_step the time_step to use to step at
      */
     void updatePrimitive(const TbotsProto::Primitive &new_primitive, const World &world,
-                         double time_step) override;
+                         Duration time_step) override;
 };

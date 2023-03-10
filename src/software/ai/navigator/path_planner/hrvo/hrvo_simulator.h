@@ -25,8 +25,7 @@ class HRVOSimulator
      * robot
      * @param friendly_team_colour The colour of the friendly team
      */
-    explicit HRVOSimulator(const RobotConstants_t &robot_constants,
-                           TeamColour friendly_team_colour);
+    explicit HRVOSimulator();
 
 
     /**
@@ -37,7 +36,7 @@ class HRVOSimulator
      *
      * @param world The world which the simulation should be based upon
      */
-    void updateWorld(const World &world, double time_step);
+    void updateWorld(const World &world, const RobotConstants_t &robot_constants, Duration time_step);
 
 
     /**
@@ -46,7 +45,7 @@ class HRVOSimulator
      * @param new_primitive_set
      * @param time_step the time_step to use
      */
-    void updatePrimitiveSet(const TbotsProto::PrimitiveSet &new_primitive_set, double time_step);
+    void updatePrimitiveSet(const TbotsProto::PrimitiveSet &new_primitive_set, Duration time_step);
 
 
     /**
@@ -56,7 +55,7 @@ class HRVOSimulator
      *
      * @param time_step the time_step to use
      */
-    void doStep(double time_step);
+    void doStep(Duration time_step);
 
 
     /**
@@ -97,7 +96,7 @@ class HRVOSimulator
      *
      * @param robot_id
      */
-    void visualize(RobotId robot_id);
+    void visualize(RobotId robot_id, TeamColour friendly_team_colour);
 
    private:
     /**
@@ -106,7 +105,7 @@ class HRVOSimulator
      * @param robot The robot for which this agent is based on
      * @param time_step the time_step to use
      */
-    void configureHRVORobot(const Robot &robot, double time_step);
+    void configureHRVORobot(const Robot &robot, const RobotConstants_t &robot_constants, Duration time_step);
 
 
     /**
@@ -115,11 +114,8 @@ class HRVOSimulator
      * @param robot The robot for which this agent is based on
      * @param time_step the time_step to use
      */
-    void configureLVRobot(const Robot &robot, double time_step);
+    void configureLVRobot(const Robot &robot, const RobotConstants_t &robot_constants, Duration time_step);
 
-
-    // The robot constants which all agents will use
-    RobotConstants_t robot_constants;
 
     // robot id to agent
     std::map<RobotId, std::shared_ptr<Agent>> robots;
@@ -129,10 +125,6 @@ class HRVOSimulator
 
     // PrimitiveSet which includes the path which each friendly robot should take
     TbotsProto::PrimitiveSet primitive_set;
-
-
-    // The colour of the friendly team
-    const TeamColour friendly_team_colour;
 
     // The max amount (meters) which the friendly/enemy robot radius can increase by.
     // This scale is used to avoid close encounters, and reduce chance of collision.
@@ -144,6 +136,7 @@ class HRVOSimulator
     // robots do not "teleport" over the goal between simulation frames.
     static constexpr double GOAL_RADIUS_SCALE = 1.05;
 
-    // index offset for enemy robot ids in the `robots` map
-    const unsigned int ENEMY_LV_ROBOT_OFFSET = 1000;
+    // Robot id offset for enemy robots so we don't have
+    // friendly and enemy agents with overlapping ids in the `robots` map
+     const unsigned int ENEMY_LV_ROBOT_OFFSET = 1000;
 };

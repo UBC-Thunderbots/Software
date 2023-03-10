@@ -32,7 +32,7 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, const int loop
       kick_constant_(std::stoi(redis_client_->getSync(ROBOT_KICK_CONSTANT_REDIS_KEY))),
       chip_pulse_width_(
           std::stoi(redis_client_->getSync(ROBOT_CHIP_PULSE_WIDTH_REDIS_KEY))),
-      primitive_executor_(loop_hz, robot_constants, TeamColour::YELLOW, robot_id_)
+      primitive_executor_(Duration::fromSeconds(1.0 / loop_hz), robot_constants, TeamColour::YELLOW, robot_id_)
 {
     NetworkLoggerSingleton::initializeLogger(channel_id_, network_interface_, robot_id_);
     LOG(INFO)

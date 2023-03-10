@@ -1,5 +1,4 @@
 #pragma once
-//#include "extlibs/hrvo/simulator.h"
 #include "proto/primitive.pb.h"
 #include "proto/robot_status_msg.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
@@ -18,7 +17,7 @@ class PrimitiveExecutor
      * @param friendly_team_colour The colour of the friendly team
      * @param robot_id The id of the robot which uses this primitive executor
      */
-    explicit PrimitiveExecutor(const double time_step,
+    explicit PrimitiveExecutor(const Duration time_step,
                                const RobotConstants_t &robot_constants,
                                const TeamColour friendly_team_colour,
                                const RobotId robot_id);
@@ -85,9 +84,12 @@ class PrimitiveExecutor
         const TbotsProto::MovePrimitive &move_primitive);
 
     TbotsProto::Primitive current_primitive_;
+    TeamColour friendly_team_colour;
     RobotConstants_t robot_constants_;
     HRVOSimulator hrvo_simulator_;
-    double time_step_;
+
+    // time step to be used, in Seconds
+    Duration time_step_;
     Angle curr_orientation_;
     RobotId robot_id_;
 };

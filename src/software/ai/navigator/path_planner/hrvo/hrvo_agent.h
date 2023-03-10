@@ -33,7 +33,6 @@ class HRVOAgent : public Agent
      *
      * @param robot_id	            The robot id for this agent.
      * @prarm robot_state           The robots current state
-     * @param side	  	            The team side for this agent (friendly or enemy).
      * @param path                  The path of this agent
      * @param radius                The radius of this agent.
      * @param max_speed             The maximum speed of this agent.
@@ -41,7 +40,7 @@ class HRVOAgent : public Agent
      * @param max_radius_inflation  The maximum amount which the radius of this agent can
      * inflate.
      */
-    HRVOAgent(RobotId robot_id, RobotState robot_state, TeamSide side, RobotPath &path,
+    HRVOAgent(RobotId robot_id, const RobotState &robot_state, const RobotPath &path,
               double radius, double max_speed, double max_accel,
               double max_radius_inflation);
 
@@ -54,7 +53,7 @@ class HRVOAgent : public Agent
      * @param time_step the time_step to use to step at
      */
     void updatePrimitive(const TbotsProto::Primitive &new_primitive, const World &world,
-                         double time_step) override;
+                         Duration time_step) override;
 
 
     /**
@@ -63,7 +62,7 @@ class HRVOAgent : public Agent
      * @param robots a map from robot ids to robots, for all robots in the simulation
      */
     void computeNewVelocity(std::map<unsigned int, std::shared_ptr<Agent>> &robots,
-                            double time_step) override;
+                            Duration time_step) override;
 
     /**
      * Computes the preferred velocity of this agent.
@@ -71,7 +70,7 @@ class HRVOAgent : public Agent
      * @param time_step
      * @return the computed preferred velocity
      */
-    Vector computePreferredVelocity(double time_step) override;
+    Vector computePreferredVelocity(Duration time_step) override;
 
     /**
      * Compute all the velocity obstacles that this Agent should take into account and
@@ -109,7 +108,7 @@ class HRVOAgent : public Agent
     std::optional<ObstaclePtr> getBallObstacle();
 
 
-    class Candidate
+    class CandidateVelocity
     {
        public:
         /**
@@ -118,7 +117,7 @@ class HRVOAgent : public Agent
          * @param index_1 the index of the first velocity obstacle
          * @param index_2 the index of the second velocity obstacle
          */
-        explicit Candidate(Vector velocity, int index_1, int index_2)
+        explicit CandidateVelocity(Vector velocity, int index_1, int index_2)
             : velocity(velocity), obstacle_indexes(std::pair(index_1, index_2))
         {
         }
@@ -141,7 +140,7 @@ class HRVOAgent : public Agent
      * intersects in velocity_obstacles_, or std::nullopt if the candidate does not
      * intersect any
      */
-    std::optional<int> findIntersectingVelocityObstacle(const Candidate &candidate) const;
+    std::optional<int> findIntersectingVelocityObstacle(const CandidateVelocity &candidate) const;
 
 
     /**
@@ -152,7 +151,7 @@ class HRVOAgent : public Agent
      *
      * @return true if it the candidate point doesn't intersect any obstacle and is fast
      */
-    bool isIdealCandidate(const Candidate &candidate) const;
+    bool isIdealCandidate(const CandidateVelocity &candidate) const;
 
     /**
      * Returns true if the given candidate point is faster than the minimum preferred
@@ -163,7 +162,7 @@ class HRVOAgent : public Agent
      * @return true if the candidate is faster or equal to the minimum preferred speed,
      * false otherwise
      */
-    bool isCandidateFast(const Candidate &candidate) const;
+    bool isCandidateFast(const CandidateVelocity &candidate) const;
 
     /**
      * Returns true if the candidate point is slower than the minimum preferred speed.
@@ -173,7 +172,7 @@ class HRVOAgent : public Agent
      * @return true if the candidate is slower than the minimum preferred speed, false if
      * the speed is faster or the equal to the minimum preferred speed.
      */
-    bool isCandidateSlow(const Candidate &candidate) const;
+    bool isCandidateSlow(const CandidateVelocity &candidate) const;
 
     /**
      * Returns true if the candidate is faster than the current new_velocity_.
@@ -183,7 +182,7 @@ class HRVOAgent : public Agent
      * @return true if the candidate point is faster than new_velocity_, false if the
      * candidate is as fast or slower
      */
-    bool isCandidateFasterThanCurrentSpeed(const Candidate &candidate) const;
+    bool isCandidateFasterThanCurrentSpeed(const CandidateVelocity &candidate) const;
 
 
    protected:

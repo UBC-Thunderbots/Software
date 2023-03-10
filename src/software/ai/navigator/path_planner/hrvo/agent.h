@@ -18,7 +18,6 @@ class Agent
      *
      * @param robot_id	            The robot id for this agent.
      * @prarm robot_state           The robots current state
-     * @param side	  	            The team side for this agent (friendly or enemy).
      * @param path                  The path of this agent
      * @param radius                The radius of this agent.
      * @param max_speed             The maximum speed of this agent.
@@ -26,7 +25,7 @@ class Agent
      * @param max_radius_inflation  The maximum amount which the radius of this agent can
      * inflate.
      */
-    Agent(RobotId robot_id, RobotState robot_state, TeamSide side, RobotPath &path,
+    Agent(RobotId robot_id, const RobotState &robot_state, const RobotPath &path,
           double radius, double max_speed, double max_accel, double max_radius_inflation);
 
 
@@ -35,7 +34,7 @@ class Agent
      *
      * @param time_step the current time step that the simulator is running at
      */
-    void update(double time_step);
+    void update(Duration time_step);
 
 
     /**
@@ -49,27 +48,29 @@ class Agent
      *
      * @param new_primitive The new primitive to pursue
      * @param world The world in which the new primitive is being pursued
-     * @param time_step the time_step to use to step at
+     * @param time_step the time step to use
      */
     virtual void updatePrimitive(const TbotsProto::Primitive &new_primitive,
-                                 const World &world, double time_step) = 0;
+                                 const World &world, Duration time_step) = 0;
+
 
     /**
      * Computes the preferred velocity of this agent.
      *
-     * @param time_step
+     * @param time_step the time step to use
      * @return the computed preferred velocity
      */
-    virtual Vector computePreferredVelocity(double time_step) = 0;
+    virtual Vector computePreferredVelocity(Duration time_step) = 0;
+
 
     /**
      * Run the HRVO algorithm, and compute the new velocity this agent should move at
      *
      * @param robots robots in the simulation
-     * @param time_step
+     * @param time_step the time step to use
      */
     virtual void computeNewVelocity(
-        std::map<unsigned int, std::shared_ptr<Agent>> &robots, double time_step) = 0;
+        std::map<unsigned int, std::shared_ptr<Agent>> &robots, Duration time_step) = 0;
 
 
     /**
@@ -82,11 +83,44 @@ class Agent
 
 
     /**
-     * Return the state of the agent
+     * Return the position of the agent
      *
-     * @return The RobotState for this agent
+     * @return The position for this agent
      */
-    RobotState getRobotState();
+    Point getPosition() const;
+
+
+    /**
+     * Return the velocity of the agent
+     *
+     * @return The velocity for this agent
+     */
+    Vector getVelocity() const;
+
+
+    /**
+     * Set the velocity of the agent
+     *
+     * @param new_velocity The velocity to set for this agent
+     */
+    void setVelocity(const Vector &velocity_update);
+
+
+    /**
+     * Return the orientation of the agent
+     *
+     * @return The orientation for this agent
+     */
+    Angle getOrientation() const;
+
+
+    /**
+     * Return the angular velocity of the agent
+     *
+     * @return The angular velocity for this agent
+     */
+    AngularVelocity getAngularVelocity() const;
+
 
     /**
      * Get the preferred velocity for this robot
@@ -95,12 +129,22 @@ class Agent
      */
     Vector getPreferredVelocity() const;
 
+
+    /**
+     * Set this robots preferred velocity
+     *
+     * @param pref_velocity The velocity for which preferred_velocity should be set to
+     */
+    void setPreferredVelocity(const Vector &pref_velocity);
+
+
     /**
      * Gets the max speed for this agent
      *
      * @return max speed for this agent
      */
     double getMaxSpeed() const;
+
 
     /**
      * Gets the radius for this agent
@@ -109,12 +153,14 @@ class Agent
      */
     double getRadius() const;
 
+
     /**
      * Gets the the path for this agent
      *
      * @return Path for this agent
      */
     RobotPath &getPath();
+
 
     /**
      * Return the max acceleration of the agent
@@ -123,35 +169,38 @@ class Agent
      */
     double getMaxAccel() const;
 
-    /**
-     * Set this robots preferred velocity
-     *
-     * @param The velocity for which preferred_velocity should be set to
-     */
-    void setPreferredVelocity(Vector velocity);
-
-    // robot id of this Agent
+    // robot id of this agent
     RobotId robot_id;
-    // current state
-    RobotState robot_state;
-    // whether this Agent is FRIENDLY or ENEMY
-    TeamSide side;
-    // The path of this Agent
+
+    // The path of this agent
     RobotPath path;
 
-    // This agent's current actual radius
+    // This agent's current radius
     double radius;
+
     // The minimum radius which this agent can be
     const double min_radius;
 
+    // the maximum speed for the agent
     double max_speed;
-    const double max_accel;
-    // The maximum amount which the radius can increase by
 
+    // the maximum acceleration for the agent
+    const double max_accel;
+
+    // The maximum amount which the radius can increase by
     const double max_radius_inflation;
 
+    // the computed new_velocity the agent will
     Vector new_velocity;
 
    protected:
     Vector preferred_velocity;
+
+    Point position;
+
+    Vector velocity;
+
+    Angle orientation;
+
+    AngularVelocity angular_velocity;
 };
