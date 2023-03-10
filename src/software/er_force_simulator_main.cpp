@@ -122,7 +122,7 @@ int main(int argc, char **argv)
         auto simulator_state_output = ThreadedProtoUnixSender<world::SimulatorState>(
             runtime_dir + SIMULATOR_STATE_PATH);
 
-        
+
         // Simulation Started Trigger as Simulator Output
         auto simulation_started_trigger =
             ThreadedProtoUnixSender<TbotsProto::SimulationStartedTrigger>(
@@ -137,7 +137,8 @@ int main(int argc, char **argv)
                 std::scoped_lock lock(simulator_mutex);
                 er_force_sim->setWorldState(input);
 
-                if(!has_sent_sim_start_trigger) {
+                if (!has_sent_sim_start_trigger)
+                {
                     auto sim_started_trigger_msg = *createSimulationStartedTrigger(true);
                     simulation_started_trigger.sendProto(sim_started_trigger_msg);
                     has_sent_sim_start_trigger = true;
