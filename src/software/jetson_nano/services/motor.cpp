@@ -387,9 +387,6 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
         current_euclidean_velocity[2]);
 
     WheelSpace_t target_wheel_velocities = {0.0, 0.0, 0.0, 0.0};
-
-    EuclideanSpace_t target_linear_velocity  = {0.0, 0.0, 0.0};
-    EuclideanSpace_t target_angular_velocity = {0.0, 0.0, 0.0};
     int target_dribbler_rpm =
         motor.drive_control_case() ==
                 TbotsProto::MotorControl::DriveControlCase::DRIVE_CONTROL_NOT_SET
