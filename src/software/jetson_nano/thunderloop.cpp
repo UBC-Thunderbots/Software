@@ -142,7 +142,7 @@ Thunderloop::~Thunderloop() {}
                         &time_since_last_primitive_received);
                     clock_gettime(CLOCK_MONOTONIC, &last_primitive_received_time);
                     network_status_.set_ms_since_last_primitive_received(
-                            (uint32_t)time_since_last_primitive_received.tv_nsec / 1000000);
+                        (uint32_t)(time_since_last_primitive_received.tv_nsec / 1000000));
 
                     // Start new primitive
                     {
@@ -166,7 +166,7 @@ Thunderloop::~Thunderloop() {}
                                                   &time_since_last_vision_received);
                 clock_gettime(CLOCK_MONOTONIC, &last_world_recieved_time);
                 network_status_.set_ms_since_last_vision_received(
-                    time_since_last_vision_received.tv_nsec / 1000000);
+                    (uint32_t)(time_since_last_vision_received.tv_nsec / 1000000));
                 primitive_executor_.updateWorld(new_world);
                 world_ = new_world;
             }
@@ -222,7 +222,7 @@ Thunderloop::~Thunderloop() {}
                                                   &time_since_kicker_fired);
                 clock_gettime(CLOCK_MONOTONIC, &last_kicker_fired);
                 chipper_kicker_status_.set_ms_since_kicker_fired(
-                    time_since_kicker_fired.tv_nsec / 1000000);
+                    (uint32_t)(time_since_kicker_fired.tv_nsec / 1000000));
             }
             else if (direct_control_.power_control().chicker().has_chip_distance_meters())
             {
@@ -232,7 +232,7 @@ Thunderloop::~Thunderloop() {}
                                                   &time_since_chipper_fired);
                 clock_gettime(CLOCK_MONOTONIC, &last_chipper_fired);
                 chipper_kicker_status_.set_ms_since_kicker_fired(
-                    time_since_chipper_fired.tv_nsec / 1000000);
+                    (uint32_t)(time_since_chipper_fired.tv_nsec / 1000000));
             }
 
             // Motor Service: execute the motor control command
@@ -248,7 +248,7 @@ Thunderloop::~Thunderloop() {}
                 static_cast<unsigned long>(poll_time.tv_nsec));
 
             clock_gettime(CLOCK_MONOTONIC, &current_time);
-            time_sent_.set_epoch_timestamp_seconds(current_time.tv_sec);
+            time_sent_.set_epoch_timestamp_seconds((double)(current_time.tv_sec));
 
             // Update Robot Status with poll responses
             robot_status_.set_robot_id(robot_id_);
