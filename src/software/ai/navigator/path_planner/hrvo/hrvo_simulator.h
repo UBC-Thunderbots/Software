@@ -98,7 +98,12 @@ class HRVOSimulator
      */
     void visualize(RobotId robot_id, TeamColour friendly_team_colour);
 
-   private:
+    // Robot id offset for enemy robots so we don't have
+    // friendly and enemy agents with overlapping ids in the `robots` map
+    const unsigned int ENEMY_LV_ROBOT_OFFSET = 1000;
+private:
+
+
     /**
      * Configure and add a HRVO Agent to the simulation.
      *
@@ -115,7 +120,6 @@ class HRVOSimulator
      * @param time_step the time_step to use
      */
     void configureLVRobot(const Robot &robot, const RobotConstants_t &robot_constants, Duration time_step);
-
 
     // robot id to agent
     std::map<RobotId, std::shared_ptr<Agent>> robots;
@@ -135,8 +139,4 @@ class HRVOSimulator
     // How much larger should the goal radius be. This is added as a safety tolerance so
     // robots do not "teleport" over the goal between simulation frames.
     static constexpr double GOAL_RADIUS_SCALE = 1.05;
-
-    // Robot id offset for enemy robots so we don't have
-    // friendly and enemy agents with overlapping ids in the `robots` map
-     const unsigned int ENEMY_LV_ROBOT_OFFSET = 1000;
 };
