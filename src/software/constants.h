@@ -33,7 +33,7 @@ const std::string YELLOW_PRIMITIVE_SET                   = "/yellow_primitive_se
 const std::string SIMULATOR_STATE_PATH                   = "/simulator_state";
 const std::string DYNAMIC_PARAMETER_UPDATE_REQUEST_PATH  = "/dynamic_parameter_request";
 const std::string DYNAMIC_PARAMETER_UPDATE_RESPONSE_PATH = "/dynamic_parameter_response";
-const std::string WORLD_STATE_RECEIVED_TRIGGER_PATH        = "/world_state_received_trigger";
+const std::string WORLD_STATE_RECEIVED_TRIGGER_PATH = "/world_state_received_trigger";
 
 const unsigned UNIX_BUFFER_SIZE = 20000;
 

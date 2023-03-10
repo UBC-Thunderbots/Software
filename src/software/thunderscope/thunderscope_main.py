@@ -337,7 +337,9 @@ if __name__ == "__main__":
             )
 
             while True:
-                world_state_received = world_state_received_buffer.get(block=False, return_cached=False)
+                world_state_received = world_state_received_buffer.get(
+                    block=False, return_cached=False
+                )
                 if not world_state_received:
                     world_state = tbots_protobuf.create_world_state(
                         blue_robot_locations=[

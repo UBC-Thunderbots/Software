@@ -139,8 +139,10 @@ int main(int argc, char **argv)
 
                 if (!has_sent_world_state_trigger)
                 {
-                    auto world_state_received_trigger_msg = *createWorldStateReceivedTrigger(true);
-                    world_state_received_trigger.sendProto(world_state_received_trigger_msg);
+                    auto world_state_received_trigger_msg =
+                        *createWorldStateReceivedTrigger(true);
+                    world_state_received_trigger.sendProto(
+                        world_state_received_trigger_msg);
                     has_sent_world_state_trigger = true;
                 }
             });

@@ -129,12 +129,12 @@ std::unique_ptr<TbotsProto::PassVisualization> createPassVisualization(
 /**
  * Returns the WorldStateReceivedTrigger given the world state received trigger
  *
- * @param world_state_received_trigger a boolean value that is true when world state proto has been
- *                                     been received
+ * @param world_state_received_trigger a boolean value that is true when world state proto
+ * has been been received
  *
  * @return The unique_ptr to a TbotsProto::WorldStateReceivedTrigger proto containing
  *         a boolean value for whether world state proto has been received
- *                                    
+ *
  */
 std::unique_ptr<TbotsProto::WorldStateReceivedTrigger> createWorldStateReceivedTrigger(
     const bool world_state_received_trigger);
