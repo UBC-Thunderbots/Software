@@ -116,9 +116,13 @@ class RobotInfo(QWidget):
         )
 
         if IndividualRobotMode.AI in available_control_modes:
-            control_mode_menu.setCurrentIndex(2)
+            control_mode_menu.setCurrentIndex(
+                control_mode_menu.findText(IndividualRobotMode.AI.name)
+            )
         else:
-            control_mode_menu.setCurrentIndex(0)
+            control_mode_menu.setCurrentIndex(
+                control_mode_menu.findText(IndividualRobotMode.NONE.name)
+            )
 
         control_mode_menu.currentIndexChanged.connect(
             lambda mode, robot_id=self.robot_id: self.control_mode_signal.emit(

@@ -10,7 +10,7 @@ class IndividualRobotMode(IntEnum):
 
     NONE = 0
     MANUAL = 1
-    AI = 3
+    AI = 2
 
 
 LINE_WIDTH = 3
