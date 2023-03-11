@@ -142,8 +142,9 @@ Thunderloop::~Thunderloop() {}
                         &time_since_last_primitive_received);
                     clock_gettime(CLOCK_MONOTONIC, &last_primitive_received_time);
                     network_status_.set_ms_since_last_primitive_received(
-                        (uint32_t)(time_since_last_primitive_received.tv_nsec /
-                                   NANOSECONDS_PER_MILLISECOND));
+                        static_cast<uint32_t>(
+                            time_since_last_primitive_received.tv_nsec) /
+                        static_cast<uint32_t>(NANOSECONDS_PER_MILLISECOND));
 
                     // Start new primitive
                     {
@@ -167,8 +168,9 @@ Thunderloop::~Thunderloop() {}
                                                   &time_since_last_vision_received);
                 clock_gettime(CLOCK_MONOTONIC, &last_world_recieved_time);
                 network_status_.set_ms_since_last_vision_received(
-                    (uint32_t)(time_since_last_vision_received.tv_nsec /
-                               NANOSECONDS_PER_MILLISECOND));
+                    static_cast<uint32_t>(time_since_last_vision_received.tv_nsec) /
+                    static_cast<uint32_t>(NANOSECONDS_PER_MILLISECOND));
+
                 primitive_executor_.updateWorld(new_world);
                 world_ = new_world;
             }
@@ -223,8 +225,9 @@ Thunderloop::~Thunderloop() {}
                 ScopedTimespecTimer::timespecDiff(&current_time, &last_kicker_fired,
                                                   &time_since_kicker_fired);
                 clock_gettime(CLOCK_MONOTONIC, &last_kicker_fired);
-                chipper_kicker_status_.set_ms_since_kicker_fired((uint32_t)(
-                    time_since_kicker_fired.tv_nsec / NANOSECONDS_PER_MILLISECOND));
+                chipper_kicker_status_.set_ms_since_kicker_fired(
+                    static_cast<uint32_t>(time_since_kicker_fired.tv_nsec) /
+                    static_cast<uint32_t>(NANOSECONDS_PER_MILLISECOND));
             }
             else if (direct_control_.power_control().chicker().has_chip_distance_meters())
             {
@@ -233,8 +236,9 @@ Thunderloop::~Thunderloop() {}
                 ScopedTimespecTimer::timespecDiff(&current_time, &last_chipper_fired,
                                                   &time_since_chipper_fired);
                 clock_gettime(CLOCK_MONOTONIC, &last_chipper_fired);
-                chipper_kicker_status_.set_ms_since_kicker_fired((uint32_t)(
-                    time_since_chipper_fired.tv_nsec / NANOSECONDS_PER_MILLISECOND));
+                chipper_kicker_status_.set_ms_since_kicker_fired(
+                    static_cast<uint32_t>(time_since_chipper_fired.tv_nsec) /
+                    static_cast<uint32_t>(NANOSECONDS_PER_MILLISECOND));
             }
 
             // Motor Service: execute the motor control command
