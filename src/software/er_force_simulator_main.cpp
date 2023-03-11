@@ -129,7 +129,7 @@ int main(int argc, char **argv)
                 runtime_dir + WORLD_STATE_RECEIVED_TRIGGER_PATH);
 
         bool has_sent_world_state_trigger = false;
-        sleep(5);
+ 
         // Inputs
         // World State Input: Configures the ERForceSimulator
         auto world_state_input = ThreadedProtoUnixListener<TbotsProto::WorldState>(
