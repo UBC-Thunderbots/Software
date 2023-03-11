@@ -2,7 +2,6 @@
 
 #include "shared/constants.h"
 #include "software/constants.h"
-
 namespace py = pybind11;
 
 PYBIND11_MODULE(py_constants, m)
@@ -105,8 +104,10 @@ PYBIND11_MODULE(py_constants, m)
     m.attr("SECONDS_PER_MILLISECOND")      = SECONDS_PER_MILLISECOND;
     m.attr("MILLISECONDS_PER_MICROSECOND") = MILLISECONDS_PER_MICROSECOND;
     m.attr("MILLISECONDS_PER_NANOSECOND")  = MILLISECONDS_PER_NANOSECOND;
+    m.attr("SECONDS_PER_MINUTE")           = SECONDS_PER_MINUTE;
 
     m.attr("NUM_GENEVA_ANGLES") = NUM_GENEVA_ANGLES;
+    m.attr("CHICKER_TIMEOUT")   = CHICKER_TIMEOUT;
 
     m.attr("MAX_ROBOT_IDS_PER_SIDE") = MAX_ROBOT_IDS_PER_SIDE;
 
@@ -124,4 +125,7 @@ PYBIND11_MODULE(py_constants, m)
     m.attr("MIN_BATTERY_VOLTAGE")     = MIN_BATTERY_VOLTAGE;
     m.attr("MAX_BATTERY_VOLTAGE")     = MAX_BATTERY_VOLTAGE;
     m.attr("BATTERY_WARNING_VOLTAGE") = BATTERY_WARNING_VOLTAGE;
+
+    // Robot Communication
+    m.attr("NUM_TIMES_SEND_STOP") = NUM_TIMES_SEND_STOP;
 }

@@ -10,11 +10,11 @@ from pyqtgraph.Qt.QtWidgets import *
 from proto.geometry_pb2 import Point, Segment
 from software.py_constants import *
 from software.thunderscope.constants import (
+    BALL_HEIGHT_EFFECT_MULTIPLIER,
     LINE_WIDTH,
     SPEED_LINE_WIDTH,
     SPEED_SEGMENT_SCALE,
 )
-from software.thunderscope.constants import LINE_WIDTH
 from software.thunderscope.constants import Colors
 from software.networking.threaded_unix_listener import ThreadedUnixListener
 from software.thunderscope.field.field_layer import FieldLayer
@@ -50,7 +50,9 @@ class WorldLayer(FieldLayer):
         self.key_pressed = {}
         self.display_robot_id = False
 
-        self.accepted_keys = [Qt.Key.Key_Control, Qt.Key.Key_I]
+        self.is_playing = True
+
+        self.accepted_keys = [Qt.Key.Key_Control, Qt.Key.Key_I, QtCore.Qt.Key.Key_Space]
         for key in self.accepted_keys:
             self.key_pressed[key] = False
 
@@ -68,6 +70,17 @@ class WorldLayer(FieldLayer):
         self.key_pressed[event.key()] = True
         if event.key() == QtCore.Qt.Key.Key_I:
             self.display_robot_id = not self.display_robot_id
+
+        # if user is holding ctrl + space, send a command to simulator to pause the gameplay
+        if (
+            self.key_pressed[QtCore.Qt.Key.Key_Control]
+            and self.key_pressed[QtCore.Qt.Key.Key_Space]
+        ):
+
+            simulator_state = SimulationState(is_playing=not self.is_playing)
+            self.is_playing = not self.is_playing
+
+            self.simulator_io.send_proto(SimulationState, simulator_state)
 
     def keyReleaseEvent(self, event):
         """Detect when a key has been released (override)
@@ -390,9 +403,12 @@ class WorldLayer(FieldLayer):
         painter.setPen(pg.mkPen(Colors.BALL_COLOR, width=LINE_WIDTH))
         painter.setBrush(pg.mkBrush(Colors.BALL_COLOR))
 
-        painter.drawEllipse(
-            self.createCircle(ball_state.global_position, BALL_MAX_RADIUS_METERS)
+        # Ball should get larger as the height of the ball increases
+        ball_radius = BALL_MAX_RADIUS_METERS * (
+            1 + BALL_HEIGHT_EFFECT_MULTIPLIER * ball_state.distance_from_ground
         )
+
+        painter.drawEllipse(self.createCircle(ball_state.global_position, ball_radius))
 
         # If the mouse is being dragged on the screen, visualize
         # the ball velocity vector. The 0.5 scaling is abitrary

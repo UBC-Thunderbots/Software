@@ -43,6 +43,8 @@ enum MotionConstraint
     HALF_METER_AROUND_BALL = 7 [(dynamic) = true];
     // Path between ball and placement point in ball placement
     AVOID_BALL_PLACEMENT_INTERFERENCE = 8 [(dynamic) = true];
+    // The enemy half of the field without the centre circle
+    ENEMY_HALF_WITHOUT_CENTRE_CIRCLE = 9;
 }
 
 message MotionControl
@@ -108,15 +110,12 @@ message Primitive
 {
     oneof primitive
     {
-        EstopPrimitive estop                  = 1;
-        MovePrimitive move                    = 2;
-        StopPrimitive stop                    = 3;
-        DirectControlPrimitive direct_control = 4;
+        MovePrimitive move                    = 1;
+        StopPrimitive stop                    = 2;
+        DirectControlPrimitive direct_control = 3;
     }
     double cost = 5;
 }
-
-message EstopPrimitive {}
 
 message MovePrimitive
 {
@@ -130,15 +129,7 @@ message MovePrimitive
     BallCollisionType ball_collision_type = 8;
 }
 
-message StopPrimitive
-{
-    enum StopType
-    {
-        BRAKE = 0;
-        COAST = 1;
-    }
-    StopType stop_type = 1;
-}
+message StopPrimitive {}
 
 message MotorControl
 {

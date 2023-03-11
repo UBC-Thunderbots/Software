@@ -208,22 +208,6 @@ cc_library(
 )
 
 cc_library(
-    name = "penalty_kick_play",
-    srcs = ["penalty_kick_play.cpp"],
-    hdrs = ["penalty_kick_play.h"],
-    deps = [
-        ":play",
-        "//shared:constants",
-        "//software/ai/hl/stp/tactic/goalie:goalie_tactic",
-        "//software/ai/hl/stp/tactic/move:move_tactic",
-        "//software/ai/hl/stp/tactic/penalty_kick:penalty_kick_tactic",
-        "//software/logger",
-        "//software/util/generic_factory",
-    ],
-    alwayslink = True,
-)
-
-cc_library(
     name = "shoot_or_chip_play",
     srcs = ["shoot_or_chip_play.cpp"],
     hdrs = ["shoot_or_chip_play.h"],
@@ -298,7 +282,6 @@ cc_library(
         ":kickoff_enemy_play",
         ":kickoff_friendly_play",
         ":penalty_kick_enemy_play",
-        ":penalty_kick_play",
         ":shoot_or_chip_play",
         ":stop_play",
         "//software/ai/hl/stp/play/crease_defense:crease_defense_play",
@@ -307,6 +290,7 @@ cc_library(
         "//software/ai/hl/stp/play/hardware_challenge_plays:scoring_from_contested_possession_play",
         "//software/ai/hl/stp/play/hardware_challenge_plays:scoring_with_static_defenders_play",
         "//software/ai/hl/stp/play/offense:offense_play",
+        "//software/ai/hl/stp/play/penalty_kick:penalty_kick_play",
         "//software/ai/hl/stp/play/shoot_or_pass:shoot_or_pass_play",
     ],
 )
@@ -326,7 +310,7 @@ cc_test(
 )
 
 cc_test(
-    name = "kickoff_friendly_play_test",
+    name = "kickoff_friendly_play_cpp_test",
     srcs = ["kickoff_friendly_play_test.cpp"],
     deps = [
         "//shared/test_util:tbots_gtest_main",
@@ -342,7 +326,7 @@ cc_test(
 )
 
 cc_test(
-    name = "kickoff_enemy_play_test",
+    name = "kickoff_enemy_play_cpp_test",
     srcs = ["kickoff_enemy_play_test.cpp"],
     deps = [
         "//shared/test_util:tbots_gtest_main",
@@ -358,8 +342,24 @@ cc_test(
     ],
 )
 
+py_test(
+    name = "kickoff_play_test",
+    srcs = [
+        "kickoff_play_test.py",
+    ],
+    # TODO (#2619) Remove tag to run in parallel
+    tags = [
+        "exclusive",
+    ],
+    deps = [
+        "//software/simulated_tests:simulated_test_fixture",
+        "//software/simulated_tests:validation",
+        requirement("pytest"),
+    ],
+)
+
 cc_test(
-    name = "corner_kick_play_test",
+    name = "corner_kick_play_cpp_test",
     srcs = ["corner_kick_play_test.cpp"],
     deps = [
         "//shared/test_util:tbots_gtest_main",
@@ -373,8 +373,24 @@ cc_test(
     ],
 )
 
+py_test(
+    name = "corner_kick_play_test",
+    srcs = [
+        "corner_kick_play_test.py",
+    ],
+    # TODO (#2619) Remove tag to run in parallel
+    tags = [
+        "exclusive",
+    ],
+    deps = [
+        "//software/simulated_tests:simulated_test_fixture",
+        "//software/simulated_tests:validation",
+        requirement("pytest"),
+    ],
+)
+
 cc_test(
-    name = "defense_play_test",
+    name = "defense_play_cpp_test",
     srcs = ["defense_play_test.cpp"],
     deps = [
         "//shared/test_util:tbots_gtest_main",
@@ -389,8 +405,24 @@ cc_test(
     ],
 )
 
+py_test(
+    name = "defense_play_test",
+    srcs = [
+        "defense_play_test.py",
+    ],
+    # TODO (#2619) Remove tag to run in parallel
+    tags = [
+        "exclusive",
+    ],
+    deps = [
+        "//software/simulated_tests:simulated_test_fixture",
+        "//software/simulated_tests:validation",
+        requirement("pytest"),
+    ],
+)
+
 cc_test(
-    name = "enemy_ball_placement_play_test",
+    name = "enemy_ball_placement_play_cpp_test",
     srcs = ["enemy_ball_placement_play_test.cpp"],
     deps = [
         "//shared/test_util:tbots_gtest_main",
@@ -402,6 +434,19 @@ cc_test(
         "//software/test_util",
         "//software/time:duration",
         "//software/world",
+    ],
+)
+
+py_test(
+    name = "enemy_ball_placement_play_test",
+    srcs = [
+        "enemy_ball_placement_play_test.py",
+    ],
+    tags = ["exclusive"],
+    deps = [
+        "//software/simulated_tests:simulated_test_fixture",
+        "//software/simulated_tests:validation",
+        requirement("pytest"),
     ],
 )
 
@@ -437,7 +482,7 @@ cc_test(
 )
 
 cc_test(
-    name = "halt_play_test",
+    name = "halt_play_cpp_test",
     srcs = ["halt_play_test.cpp"],
     deps = [
         "//shared/test_util:tbots_gtest_main",
@@ -451,8 +496,25 @@ cc_test(
     ],
 )
 
+py_test(
+    name = "halt_play_test",
+    srcs = [
+        "halt_play_test.py",
+    ],
+    # TODO (#2619) Remove tag to run in parallel
+    tags = [
+        "exclusive",
+    ],
+    deps = [
+        "//software/simulated_tests:simulated_test_fixture",
+        "//software/simulated_tests:speed_threshold_helpers",
+        "//software/simulated_tests:validation",
+        requirement("pytest"),
+    ],
+)
+
 cc_test(
-    name = "free_kick_play_test",
+    name = "free_kick_play_cpp_test",
     srcs = ["free_kick_play_test.cpp"],
     deps = [
         "//shared/test_util:tbots_gtest_main",
@@ -465,6 +527,17 @@ cc_test(
     ],
 )
 
+py_test(
+    name = "free_kick_play_test",
+    srcs = ["free_kick_play_test.py"],
+    tags = ["exclusive"],
+    deps = [
+        "//software/simulated_tests:simulated_test_fixture",
+        "//software/simulated_tests:validation",
+        requirement("pytest"),
+    ],
+)
+
 cc_test(
     name = "shoot_or_chip_play_test",
     srcs = ["shoot_or_chip_play_test.cpp"],
@@ -472,22 +545,6 @@ cc_test(
         "//shared/test_util:tbots_gtest_main",
         "//software/ai/hl/stp/play:shoot_or_chip_play",
         "//software/simulated_tests:simulated_er_force_sim_play_test_fixture",
-        "//software/simulated_tests/validation:validation_function",
-        "//software/test_util",
-        "//software/time:duration",
-        "//software/world",
-    ],
-)
-
-cc_test(
-    name = "penalty_kick_play_test",
-    srcs = ["penalty_kick_play_test.cpp"],
-    deps = [
-        "//shared/test_util:tbots_gtest_main",
-        "//software/ai/hl/stp/play:penalty_kick_play",
-        "//software/simulated_tests:simulated_er_force_sim_play_test_fixture",
-        "//software/simulated_tests/non_terminating_validation_functions",
-        "//software/simulated_tests/terminating_validation_functions",
         "//software/simulated_tests/validation:validation_function",
         "//software/test_util",
         "//software/time:duration",
@@ -516,6 +573,7 @@ py_test(
     srcs = [
         "ball_placement_play_test.py",
     ],
+    tags = ["exclusive"],
     deps = [
         "//software/simulated_tests:simulated_test_fixture",
         "//software/simulated_tests:validation",
@@ -524,7 +582,7 @@ py_test(
 )
 
 cc_test(
-    name = "ball_placement_play_test_old",
+    name = "ball_placement_play_cpp_test",
     srcs = ["ball_placement_play_test.cpp"],
     deps = [
         "//shared/test_util:tbots_gtest_main",
