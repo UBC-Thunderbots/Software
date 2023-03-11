@@ -9,27 +9,34 @@ class ProtoTracker
     /**
      * Tracks recent proto loss given the sequence numbers of received protos
      *
-     * @param type The name of the type of protobufs being tracked
+     * @param type The name of the type of protos being tracked
      */
     ProtoTracker(const std::string& type);
+
     /**
      * When a new sequence number is sent, the ProtoTracker updates the proto tracking
-     * and logs a warning if loss rate is greater than the threshold
      *
-     * @param seq_num The sequence number of the newly received protobuf
+     * @param seq_num The sequence number of the newly received proto
      */
     void send(uint64_t seq_num);
+
     /**
      * @return a boolean indicating whether the last received proto was valid
      */
     bool isLastValid();
+
     /**
      * @return a float equal to the proto loss rate
      */
     float getLossRate();
 
    private:
-    // Function for calculating the proto loss rate
+    /**
+     * Private function for calculating the proto loss rate
+     *
+     * @param seq_num The sequence number of the newly received protobuf
+     * @return a float equal to the proto loss rate
+     */
     float calculate_proto_loss_rate(uint64_t seq_num);
 
     // Constants
