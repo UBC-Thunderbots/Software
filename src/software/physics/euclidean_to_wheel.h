@@ -72,26 +72,8 @@ class EuclideanToWheel
      *
      */
     WheelSpace_t rampWheelVelocity(const WheelSpace_t& current_wheel_velocity,
-                                   const EuclideanSpace_t& target_euclidean_velocity,
+                                   const WheelSpace_t& target_wheel_velocity,
                                    const double& time_to_ramp);
-
-    /**
-     * Convert the given Vector-Angle pair and Primitive to WheelSpace_t and
-     * EuclideanSpace_t to pass into rampWheelVelocity
-     *
-     * Modify given primitive with values from resulting WheelSpace_t and return pointer
-     * to it
-     *
-     * @param target_velocity_primitive The target DirectControl Primitive
-     * @param current_primitive The current velocity and Angular velocity
-     * @param time_to_ramp The time allocated for acceleration in seconds
-     *
-     */
-    WheelSpace_t rampWheelVelocity(
-        const Vector current_local_velocity,
-        const AngularVelocity current_local_angular_velocity,
-        const TbotsProto::MotorControl& target_velocity_primitive,
-        const double& time_to_ramp);
 
    private:
     /**

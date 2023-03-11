@@ -382,13 +382,11 @@ SSLSimulationProto::RobotControl ErForceSimulator::updateSimulatorRobots(
 
         if (ramping)
         {
-            auto direct_control_no_ramp    = primitive_executor->stepPrimitive();
-            WheelSpace_t ramped_four_wheel = euclidean_to_four_wheel.rampWheelVelocity(
+            auto direct_control_no_ramp = primitive_executor->stepPrimitive();
+            direct_control              = getRampedVelocityPrimitive(
                 current_velocity_map.at(robot_id).first,
-                current_velocity_map.at(robot_id).second,
-                direct_control_no_ramp->motor_control(), primitive_executor_time_step);
-            direct_control =
-                getPrimitiveFromFourWheel(ramped_four_wheel, *direct_control_no_ramp);
+                current_velocity_map.at(robot_id).second, *direct_control_no_ramp,
+                primitive_executor_time_step);
         }
         else
         {
@@ -402,11 +400,44 @@ SSLSimulationProto::RobotControl ErForceSimulator::updateSimulatorRobots(
     return robot_control;
 }
 
+
+// Takes in current velocity and angular velocity and a target Direct Control primitive
+// converts current and target velocities to Wheel velocities
+// ramps the target primitive based on the current velocities
+// and returns a pointer to a new Direct Control primitive
 std::unique_ptr<TbotsProto::DirectControlPrimitive>
-ErForceSimulator::getPrimitiveFromFourWheel(
-    WheelSpace_t ramped_four_wheel,
-    TbotsProto::DirectControlPrimitive& target_velocity_primitive)
+ErForceSimulator::getRampedVelocityPrimitive(
+    const Vector current_local_velocity,
+    const AngularVelocity current_local_angular_velocity,
+    TbotsProto::DirectControlPrimitive& target_velocity_primitive,
+    const double& time_to_ramp)
 {
+    EuclideanSpace_t target_euclidean_velocity = EuclideanSpace_t::Zero();
+
+    TbotsProto::MotorControl motor_control = target_velocity_primitive.motor_control();
+
+    TbotsProto::MotorControl_DirectVelocityControl direct_velocity =
+        motor_control.direct_velocity_control();
+
+    // getting the target wheel velocity
+    target_euclidean_velocity = {-direct_velocity.velocity().y_component_meters(),
+                                 direct_velocity.velocity().x_component_meters(),
+                                 direct_velocity.angular_velocity().radians_per_second()};
+
+    WheelSpace_t target_wheel_velocity =
+        euclidean_to_four_wheel.getWheelVelocity(target_euclidean_velocity);
+
+    // getting the current wheel velocity
+    EuclideanSpace_t current_euclidean_velocity = {
+        -current_local_velocity.y(), current_local_velocity.x(),
+        current_local_angular_velocity.toRadians()};
+
+    WheelSpace_t current_wheel_velocity =
+        euclidean_to_four_wheel.getWheelVelocity(current_euclidean_velocity);
+
+    WheelSpace_t ramped_four_wheel = euclidean_to_four_wheel.rampWheelVelocity(
+        current_wheel_velocity, target_wheel_velocity, time_to_ramp);
+
     EuclideanSpace_t ramped_euclidean =
         euclidean_to_four_wheel.getEuclideanVelocity(ramped_four_wheel);
 

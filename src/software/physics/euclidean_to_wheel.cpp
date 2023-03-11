@@ -82,8 +82,8 @@ EuclideanSpace_t EuclideanToWheel::getEuclideanVelocity(
 }
 
 WheelSpace_t EuclideanToWheel::rampWheelVelocity(
-    const WheelSpace_t& current_wheel_velocity,
-    const EuclideanSpace_t& target_euclidean_velocity, const double& time_to_ramp)
+    const WheelSpace_t& current_wheel_velocity, const WheelSpace_t& target_wheel_velocity,
+    const double& time_to_ramp)
 {
     double allowed_acceleration =
         static_cast<double>(robot_constants_.robot_max_acceleration_m_per_s_2);
@@ -95,9 +95,6 @@ WheelSpace_t EuclideanToWheel::rampWheelVelocity(
 
     // calculate max allowable wheel velocity delta using dv = a*t
     auto allowable_delta_wheel_velocity = allowed_acceleration * time_to_ramp;
-
-    // convert euclidean to wheel velocity
-    WheelSpace_t target_wheel_velocity = getWheelVelocity(target_euclidean_velocity);
 
     // Ramp wheel velocity vector
     // Step 1: Find absolute max velocity delta
@@ -132,49 +129,4 @@ WheelSpace_t EuclideanToWheel::rampWheelVelocity(
     }
 
     return ramp_wheel_velocity;
-}
-
-// TODO: Remove this functions
-WheelSpace_t EuclideanToWheel::rampWheelVelocity(
-    const Vector current_local_velocity,
-    const AngularVelocity current_local_angular_velocity,
-    const TbotsProto::MotorControl& motor_control, const double& time_to_ramp)
-{
-    EuclideanSpace_t target_euclidean_velocity = EuclideanSpace_t::Zero();
-
-    if (motor_control.has_direct_per_wheel_control())
-    {
-        TbotsProto::MotorControl_DirectPerWheelControl direct_per_wheel =
-            motor_control.direct_per_wheel_control();
-        WheelSpace_t wheel_velocity = {
-            direct_per_wheel.front_left_wheel_velocity(),
-            direct_per_wheel.back_left_wheel_velocity(),
-            direct_per_wheel.front_right_wheel_velocity(),
-            direct_per_wheel.back_right_wheel_velocity(),
-        };
-        target_euclidean_velocity = getEuclideanVelocity(wheel_velocity);
-    }
-    else if (motor_control.has_direct_velocity_control())
-    {
-        TbotsProto::MotorControl_DirectVelocityControl direct_velocity =
-            motor_control.direct_velocity_control();
-        target_euclidean_velocity = {
-            -direct_velocity.velocity().y_component_meters(),
-            direct_velocity.velocity().x_component_meters(),
-            direct_velocity.angular_velocity().radians_per_second()};
-    }
-    else
-    {
-        target_euclidean_velocity = {0, 0, 0};
-    }
-
-    EuclideanSpace_t current_euclidean_velocity = {
-        -current_local_velocity.y(), current_local_velocity.x(),
-        current_local_angular_velocity.toRadians()};
-
-    WheelSpace_t current_four_wheel_velocity =
-        getWheelVelocity(current_euclidean_velocity);
-
-    return rampWheelVelocity(current_four_wheel_velocity, target_euclidean_velocity,
-                             time_to_ramp);
 }

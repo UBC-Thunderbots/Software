@@ -393,13 +393,34 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
             : motor.dribbler_speed_rpm();
     ramp_rpm = 0;
 
-    EuclideanSpace_t prev_euclidean_wheel_velocity =
-        euclidean_to_four_wheel.getEuclideanVelocity(prev_wheel_velocities);
+    WheelSpace_t target_wheel_velocities = WheelSpace_t::Zero();
 
-    WheelSpace_t target_wheel_velocities = euclidean_to_four_wheel.rampWheelVelocity(
-        {prev_euclidean_wheel_velocity[1], -prev_euclidean_wheel_velocity[0]},
-        AngularVelocity::fromRadians(prev_euclidean_wheel_velocity[2]), motor,
-        time_elapsed_since_last_poll_s);
+    if (motor.has_direct_per_wheel_control())
+    {
+        TbotsProto::MotorControl_DirectPerWheelControl direct_per_wheel =
+            motor.direct_per_wheel_control();
+        target_wheel_velocities = {
+            direct_per_wheel.front_left_wheel_velocity(),
+            direct_per_wheel.back_left_wheel_velocity(),
+            direct_per_wheel.front_right_wheel_velocity(),
+            direct_per_wheel.back_right_wheel_velocity(),
+        };
+    }
+    else if (motor.has_direct_velocity_control())
+    {
+        TbotsProto::MotorControl_DirectVelocityControl direct_velocity =
+            motor.direct_velocity_control();
+        EuclideanSpace_t target_euclidean_velocity = {
+            -direct_velocity.velocity().y_component_meters(),
+            direct_velocity.velocity().x_component_meters(),
+            direct_velocity.angular_velocity().radians_per_second()};
+
+        target_wheel_velocities =
+            euclidean_to_four_wheel.getWheelVelocity(target_euclidean_velocity);
+    }
+
+    target_wheel_velocities = euclidean_to_four_wheel.rampWheelVelocity(
+        prev_wheel_velocities, target_wheel_velocities, time_elapsed_since_last_poll_s);
 
     // TODO (#2719): interleave the angular accelerations in here at some point.
     prev_wheel_velocities = target_wheel_velocities;
