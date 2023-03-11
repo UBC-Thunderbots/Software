@@ -125,19 +125,25 @@ def hrvo_test_setup(
         ),
     )
 
+# TODO: add tests
+#   - enemy collision
+#   - friendly collision
+#   - enemy and friendly moving to places
+# TODO: add always collision validation
+# TODO: print message for if robot is not exactly stationary
 @pytest.mark.parametrize(
     "friendly_robot_positions,friendly_robot_destinations,enemy_robots,ball_initial_pos,ball_initial_vel",
     [
-        # # robot moving straight with a moving enemy robot behind it
-        # (
-        #     [Point(x_meters=-2.3, y_meters=0)],
-        #     [Point(x_meters=2.8, y_meters=0)],
-        #     [RobotState(
-        #         global_position=Point(x_meters=-4.2, y_meters=0),
-        #         global_velocity=Vector(x_component_meters=6, y_component_meters=0),
-        #     )],
-        #     None, None
-        # ),
+        # robot moving straight with a moving enemy robot behind it
+        (
+            [Point(x_meters=-2.3, y_meters=0)],
+            [Point(x_meters=2.8, y_meters=0)],
+            [RobotState(
+                global_position=Point(x_meters=-4.2, y_meters=0),
+                global_velocity=Vector(x_component_meters=6, y_component_meters=0),
+            )],
+            None, None
+        ),
         # robot moving straight with a moving enemy robot to its side
         (
             [Point(x_meters=-2.5, y_meters=0)],
@@ -546,7 +552,7 @@ def get_reached_destination_validation(robot_destinations):
     return [
         [
             RobotEventuallyEntersRegionAndStops(
-                index,
+                robot_id,
                 regions=[
                     tbots.Rectangle(
                         tbots.Point(
@@ -562,7 +568,7 @@ def get_reached_destination_validation(robot_destinations):
                 num_ticks=15,
             )
         ]
-        for index, destination in enumerate(robot_destinations)
+        for robot_id, destination in enumerate(robot_destinations)
     ]
 
 
