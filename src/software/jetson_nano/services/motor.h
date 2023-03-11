@@ -88,6 +88,10 @@ class MotorService
      */
     void setUpMotors();
 
+    void writeIntToTMC4671(uint8_t motor, uint8_t address, int32_t value);
+    int readIntFromTMC4671(uint8_t motor, uint8_t address);
+    double readVelocityFromTMC4671(uint8_t motor);
+
    private:
     void motorServiceInit(const RobotConstants_t& robot_constants,
                           int control_loop_frequency_hz);
@@ -140,10 +144,6 @@ class MotorService
      */
     void writeToControllerOrDieTrying(uint8_t motor, uint8_t address, int32_t value);
     void writeToDriverOrDieTrying(uint8_t motor, uint8_t address, int32_t value);
-
-    void writeIntToTMC4671(uint8_t motor, uint8_t address, int32_t value);
-    int readIntFromTMC4671(uint8_t motor, uint8_t address);
-    double readVelocityFromTMC4671(uint8_t motor);
 
     /**
      * Trigger an SPI transfer over an open SPI connection

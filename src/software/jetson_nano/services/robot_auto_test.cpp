@@ -28,6 +28,13 @@ class RobotAutoTestFixture : public testing::Test
     // Services
     std::unique_ptr<MotorService>
         motor_service_;  // TODO: loop_hz is not being used in motor service
+
+    // SPI Chip Selects
+    static const uint8_t FRONT_LEFT_MOTOR_CHIP_SELECT  = 0;
+    static const uint8_t FRONT_RIGHT_MOTOR_CHIP_SELECT = 3;
+    static const uint8_t BACK_LEFT_MOTOR_CHIP_SELECT   = 1;
+    static const uint8_t BACK_RIGHT_MOTOR_CHIP_SELECT  = 2;
+    static const uint8_t NUM_DRIVE_MOTORS              = 4;
 };
 
 TEST_F(RobotAutoTestFixture, SetUpMotors) {
@@ -45,7 +52,11 @@ TEST_F(RobotAutoTestFixture, TestMotorVelocities) {
 //    int robot_id = 0;
 //    PrimitiveExecutor primitive_executor = PrimitiveExecutor(CONTROL_LOOP_HZ, create2021RobotConstants(), TeamColour::YELLOW, robot_id);
 
+
+    WheelSpace_t target_wheel_velocities = {0.0, 0.0, 0.0, 0.0};
+
     Vector expected_velocity = Vector(2, -4);
+
     AngularVelocity expected_angular_velocity = AngularVelocity::fromRadians(0.5);
 
     //TODO: we wont need to create a primitive and do the extra overhead
@@ -68,6 +79,22 @@ TEST_F(RobotAutoTestFixture, TestMotorVelocities) {
 //            MECHANICAL_MPS_PER_ELECTRICAL_RPM;
 
 
+    // Set target speeds accounting for acceleration
+    motor_service_->writeIntToTMC4671(FRONT_RIGHT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_TARGET,
+                                      static_cast<int>(target_wheel_velocities[FRONT_RIGHT_WHEEL_SPACE_INDEX] *
+                                                       ELECTRICAL_RPM_PER_MECHANICAL_MPS));
+
+    motor_service_->writeIntToTMC4671(FRONT_LEFT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_TARGET,
+                                      static_cast<int>(target_wheel_velocities[FRONT_LEFT_WHEEL_SPACE_INDEX] *
+                                                       ELECTRICAL_RPM_PER_MECHANICAL_MPS));
+
+    motor_service_->writeIntToTMC4671(BACK_LEFT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_TARGET,
+                                       static_cast<int>(target_wheel_velocities[BACK_LEFT_WHEEL_SPACE_INDEX] *
+                                                        ELECTRICAL_RPM_PER_MECHANICAL_MPS));
+
+    motor_service_->writeIntToTMC4671(BACK_RIGHT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_TARGET,
+                                      static_cast<int>(target_wheel_velocities[BACK_RIGHT_WHEEL_SPACE_INDEX] *
+                                                       ELECTRICAL_RPM_PER_MECHANICAL_MPS));
     //Read the Motor Status value from the motor status
 //    Vector actual_local_vector = createVector(motor_status_.local_velocity());
 //    AngularVelocity actual_angular_velocity = createAngularVelocity(motor_status_.angular_velocity());
