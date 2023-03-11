@@ -687,6 +687,19 @@ void MotorService::writeToDriverOrDieTrying(uint8_t motor, uint8_t address, int3
                                << " received: " << read_value;
 }
 
+void MotorService::writeIntToTMC4671(uint8_t motor, uint8_t address, int32_t value) {
+    tmc4671_writeInt(motor, address, value);
+}
+
+int MotorService::readIntFromTMC4671(uint8_t motor, uint8_t address) {
+    return tmc4671_readInt(motor, address);
+}
+
+double MotorService::readVelocityFromTMC4671(uint8_t motor) {
+    return static_cast<double>(tmc4671_getActualVelocity(motor)) *
+           MECHANICAL_MPS_PER_ELECTRICAL_RPM;
+}
+
 void MotorService::writeToControllerOrDieTrying(uint8_t motor, uint8_t address,
                                                 int32_t value)
 {

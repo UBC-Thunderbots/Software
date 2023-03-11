@@ -49,7 +49,10 @@ cc_test(
     srcs = ["robot_auto_test.cpp"],
     deps = [
         ":motor",
+        "//proto/message_translation:tbots_geometry",
+        "//proto/primitive:primitive_msg_factory",
         "//shared:robot_constants",
         "//shared/test_util:tbots_gtest_main",
+        "//software/jetson_nano:primitive_executor",
     ],
 )
