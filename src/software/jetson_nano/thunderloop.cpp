@@ -117,8 +117,8 @@ Thunderloop::~Thunderloop() {}
                 new_world         = std::get<1>(result);
             }
 
-            thunderloop_status_.set_network_service_poll_time_ns(
-                static_cast<unsigned long>(poll_time.tv_nsec));
+            thunderloop_status_.set_network_service_poll_time_ms(
+                static_cast<double>(poll_time.tv_nsec) / NANOSECONDS_PER_MILLISECOND);
 
             network_status_.set_ms_since_last_primitive_received(UINT32_MAX);
             network_status_.set_ms_since_last_vision_received(UINT32_MAX);
@@ -142,9 +142,8 @@ Thunderloop::~Thunderloop() {}
                         &time_since_last_primitive_received);
                     clock_gettime(CLOCK_MONOTONIC, &last_primitive_received_time);
                     network_status_.set_ms_since_last_primitive_received(
-                        static_cast<uint32_t>(
-                            time_since_last_primitive_received.tv_nsec) /
-                        static_cast<uint32_t>(NANOSECONDS_PER_MILLISECOND));
+                        static_cast<double>(time_since_last_primitive_received.tv_nsec) /
+                        NANOSECONDS_PER_MILLISECOND);
 
                     // Start new primitive
                     {
@@ -152,8 +151,9 @@ Thunderloop::~Thunderloop() {}
                         primitive_executor_.updatePrimitiveSet(primitive_set_);
                     }
 
-                    thunderloop_status_.set_primitive_executor_start_time_ns(
-                        static_cast<unsigned long>(poll_time.tv_nsec));
+                    thunderloop_status_.set_primitive_executor_start_time_ms(
+                        static_cast<double>(poll_time.tv_nsec) /
+                        NANOSECONDS_PER_MILLISECOND);
                 }
             }
 
@@ -168,8 +168,8 @@ Thunderloop::~Thunderloop() {}
                                                   &time_since_last_vision_received);
                 clock_gettime(CLOCK_MONOTONIC, &last_world_recieved_time);
                 network_status_.set_ms_since_last_vision_received(
-                    static_cast<uint32_t>(time_since_last_vision_received.tv_nsec) /
-                    static_cast<uint32_t>(NANOSECONDS_PER_MILLISECOND));
+                    static_cast<double>(time_since_last_vision_received.tv_nsec) /
+                    NANOSECONDS_PER_MILLISECOND);
 
                 primitive_executor_.updateWorld(new_world);
                 world_ = new_world;
@@ -202,8 +202,8 @@ Thunderloop::~Thunderloop() {}
                 direct_control_ = *primitive_executor_.stepPrimitive();
             }
 
-            thunderloop_status_.set_primitive_executor_step_time_ns(
-                static_cast<unsigned long>(poll_time.tv_nsec));
+            thunderloop_status_.set_primitive_executor_step_time_ms(
+                static_cast<double>(poll_time.tv_nsec) / NANOSECONDS_PER_MILLISECOND);
 
             // Power Service: execute the power control command
             {
@@ -212,8 +212,8 @@ Thunderloop::~Thunderloop() {}
                     power_service_->poll(direct_control_.power_control(), kick_slope_,
                                          kick_constant_, chip_pulse_width_);
             }
-            thunderloop_status_.set_power_service_poll_time_ns(
-                static_cast<unsigned long>(poll_time.tv_nsec));
+            thunderloop_status_.set_power_service_poll_time_ms(
+                static_cast<double>(poll_time.tv_nsec) / NANOSECONDS_PER_MILLISECOND);
 
             chipper_kicker_status_.set_ms_since_chipper_fired(UINT32_MAX);
             chipper_kicker_status_.set_ms_since_kicker_fired(UINT32_MAX);
@@ -226,8 +226,8 @@ Thunderloop::~Thunderloop() {}
                                                   &time_since_kicker_fired);
                 clock_gettime(CLOCK_MONOTONIC, &last_kicker_fired);
                 chipper_kicker_status_.set_ms_since_kicker_fired(
-                    static_cast<uint32_t>(time_since_kicker_fired.tv_nsec) /
-                    static_cast<uint32_t>(NANOSECONDS_PER_MILLISECOND));
+                    static_cast<double>(time_since_kicker_fired.tv_nsec) /
+                    NANOSECONDS_PER_MILLISECOND);
             }
             else if (direct_control_.power_control().chicker().has_chip_distance_meters())
             {
@@ -237,8 +237,8 @@ Thunderloop::~Thunderloop() {}
                                                   &time_since_chipper_fired);
                 clock_gettime(CLOCK_MONOTONIC, &last_chipper_fired);
                 chipper_kicker_status_.set_ms_since_kicker_fired(
-                    static_cast<uint32_t>(time_since_chipper_fired.tv_nsec) /
-                    static_cast<uint32_t>(NANOSECONDS_PER_MILLISECOND));
+                    static_cast<double>(time_since_chipper_fired.tv_nsec) /
+                    NANOSECONDS_PER_MILLISECOND);
             }
 
             // Motor Service: execute the motor control command
@@ -250,8 +250,8 @@ Thunderloop::~Thunderloop() {}
                     createVector(motor_status_.local_velocity()),
                     createAngularVelocity(motor_status_.angular_velocity()));
             }
-            thunderloop_status_.set_motor_service_poll_time_ns(
-                static_cast<unsigned long>(poll_time.tv_nsec));
+            thunderloop_status_.set_motor_service_poll_time_ms(
+                static_cast<double>(poll_time.tv_nsec) / NANOSECONDS_PER_MILLISECOND);
 
             clock_gettime(CLOCK_MONOTONIC, &current_time);
             time_sent_.set_epoch_timestamp_seconds((double)(current_time.tv_sec));
@@ -278,7 +278,8 @@ Thunderloop::~Thunderloop() {}
         auto loop_duration =
             iteration_time.tv_sec * static_cast<int>(NANOSECONDS_PER_SECOND) +
             iteration_time.tv_nsec;
-        thunderloop_status_.set_iteration_time_ns(loop_duration);
+        thunderloop_status_.set_iteration_time_ms(static_cast<double>(loop_duration) /
+                                                  NANOSECONDS_PER_MILLISECOND);
 
         // Make sure the iteration can fit inside the period of the loop
         loop_duration_seconds =
