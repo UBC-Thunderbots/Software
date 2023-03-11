@@ -203,4 +203,5 @@ class MotorService
 
     // Previous wheel velocities
     WheelSpace_t prev_wheel_velocities;
+    int ramp_rpm;
 };

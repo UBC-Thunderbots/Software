@@ -386,18 +386,17 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
     motor_status.mutable_angular_velocity()->set_radians_per_second(
         current_euclidean_velocity[2]);
 
-    WheelSpace_t target_wheel_velocities = {0.0, 0.0, 0.0, 0.0};
     int target_dribbler_rpm =
         motor.drive_control_case() ==
                 TbotsProto::MotorControl::DriveControlCase::DRIVE_CONTROL_NOT_SET
             ? 0
             : motor.dribbler_speed_rpm();
-    static int ramp_rpm = 0;
+    ramp_rpm = 0;
 
     EuclideanSpace_t prev_euclidean_wheel_velocity =
         euclidean_to_four_wheel.getEuclideanVelocity(prev_wheel_velocities);
 
-    target_wheel_velocities = euclidean_to_four_wheel.rampWheelVelocity(
+    WheelSpace_t target_wheel_velocities = euclidean_to_four_wheel.rampWheelVelocity(
         {prev_euclidean_wheel_velocity[1], -prev_euclidean_wheel_velocity[0]},
         AngularVelocity::fromRadians(prev_euclidean_wheel_velocity[2]), motor,
         time_elapsed_since_last_poll_s);

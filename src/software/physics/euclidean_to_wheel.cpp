@@ -134,6 +134,7 @@ WheelSpace_t EuclideanToWheel::rampWheelVelocity(
     return ramp_wheel_velocity;
 }
 
+// TODO: Remove this functions
 WheelSpace_t EuclideanToWheel::rampWheelVelocity(
     const Vector current_local_velocity,
     const AngularVelocity current_local_angular_velocity,
