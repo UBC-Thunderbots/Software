@@ -101,8 +101,12 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
       reset_gpio(MOTOR_DRIVER_RESET_GPIO, GpioDirection::OUTPUT, GpioState::HIGH),
       euclidean_to_four_wheel(robot_constants)
 {
-    robot_constants_ = robot_constants;
+    motorServiceInit(robot_constants, control_loop_frequency_hz);
+}
 
+void MotorService::motorServiceInit(const RobotConstants_t& robot_constants,
+                                    int control_loop_frequency_hz)
+{
     int ret = 0;
 
     /**
@@ -138,8 +142,6 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
 
     // Make this instance available to the static functions above
     g_motor_service = this;
-
-    setUpMotors();
 }
 
 MotorService::~MotorService() {}

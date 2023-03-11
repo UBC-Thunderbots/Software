@@ -82,12 +82,15 @@ class MotorService
      */
     void runOpenLoopCalibrationRoutine(uint8_t motor, size_t num_samples);
 
-   private:
     /**
      * Checks for faults, clears them and sets up motors.
      *
      */
     void setUpMotors();
+
+   private:
+    void motorServiceInit(const RobotConstants_t& robot_constants,
+                          int control_loop_frequency_hz);
     /**
      * Calls the configuration functions below in the right sequence
      *

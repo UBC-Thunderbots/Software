@@ -48,6 +48,8 @@ cc_test(
     name = "robot_auto_test",
     srcs = ["robot_auto_test.cpp"],
     deps = [
+        ":motor",
+        "//shared:robot_constants",
         "//shared/test_util:tbots_gtest_main",
     ],
 )
