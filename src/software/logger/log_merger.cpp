@@ -2,20 +2,53 @@
 
 LogMerger::LogMerger() {}
 
-bool LogMerger::isMessageRepeated(std::string msg) {
-    // not in map: add to map and return false
-    // in map, but outside time: replace in map and return false
-    // in map, and within time: increment repeats and return true
+std::list<std::string> LogMerger::log(std::string msg) {
+    std::chrono::_V2::system_clock::time_point current_time =
+        std::chrono::system_clock::now();
+    std::list<std::string> messages = getOldMessages(current_time);
 
-    if (message_map.count(msg)) {
-        Message& m = message_map[msg];
-        std::chrono::_V2::system_clock::time_point current_time =
-            std::chrono::system_clock::now();
-        if (current_time - LOG_MERGE_DURATION < m.timestamp) {
-            // repeated message within time
-            m.repeats++;
+    if (repeat_map.count(msg)) {
+        // msg is in the repeat map, add a repeat and return the old messages
+        repeat_map[msg]++;
+        return messages;
+    }
+
+    // msg is not in the repeat map, add it to the map and list and log it
+    repeat_map[msg] = 0;
+    message_list.push_back(Message(msg, current_time));
+
+    messages.push_front(msg);
+    return messages;
+}
+
+std::list<std::string> LogMerger::getOldMessages(std::chrono::_V2::system_clock::time_point current_time) {
+    std::list<std::string> result;
+    while (message_list.size() > 0) {
+        Message currentMessage = message_list.front();
+        if (current_time - LOG_MERGE_DURATION >= currentMessage.timestamp) {
+            // old message
+            std::string currentString = currentMessage.message;
+            result.push_back(addRepeats(currentString, repeat_map[currentString]));
+            repeat_map.erase(currentString);
+            message_list.pop_front();
+        } else {
+            // new message, rest of list is new
+            break;
         }
     }
-    // either not in map or too old
-    
+    return result;
+}
+
+std::string LogMerger::addRepeats(std::string msg, int repeats) {
+    // remove newline from end of message
+    if (msg.back() == '\n')
+    {
+        msg.pop_back();
+    }
+
+    if (repeats > 1)
+    {
+        msg += " (" + std::to_string(repeats) + " repeats)";
+    }
+    return msg;
 }

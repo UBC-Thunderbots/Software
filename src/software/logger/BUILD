@@ -1,6 +1,16 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
+    name = "log_merger",
+    srcs = [
+        "log_merger.cpp",
+    ],
+    hdrs = [
+        "log_merger.h",
+    ],
+)
+
+cc_library(
     name = "logger",
     hdrs = [
         "custom_logging_levels.h",
