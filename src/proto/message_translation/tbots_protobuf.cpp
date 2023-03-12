@@ -353,7 +353,7 @@ std::unique_ptr<TbotsProto::WorldStateReceivedTrigger> createWorldStateReceivedT
 {
     auto world_state_received_trigger_msg =
         std::make_unique<TbotsProto::WorldStateReceivedTrigger>();
-        
+
     return world_state_received_trigger_msg;
 }
 
