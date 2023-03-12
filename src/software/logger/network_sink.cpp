@@ -25,6 +25,10 @@ void NetworkSink::sendToNetwork(g3::LogMessageMover log_entry)
         log_msg_proto->set_line_number(
             static_cast<uint32_t>(std::stoul(log_entry.get().line())));
 
+        TbotsProto::Timestamp timestamp;
+        timestamp.set_epoch_timestamp_seconds(static_cast<double>(time(nullptr)));
+        *(log_msg_proto->mutable_created_timestamp()) = timestamp;
+
         log_output->sendProto(*log_msg_proto);
     }
 }

@@ -77,6 +77,12 @@ class Thunderloop
      */
     double getCpuTemperature();
 
+    /**
+     * Converts the given timespec value to nanoseconds
+     * @return The time in nanoseconds
+     */
+    double getNanoseconds(timespec time);
+
     // Input Msg Buffers
     TbotsProto::PrimitiveSet primitive_set_;
     TbotsProto::World world_;
