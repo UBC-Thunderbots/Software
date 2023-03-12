@@ -56,6 +56,13 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, const int loop
               << ", and NETWORK INTERFACE: " << network_interface_;
     LOG(INFO)
         << "THUNDERLOOP: to update Thunderloop configuration, change REDIS store and restart Thunderloop";
+
+    // Initializing default values for network and chipper kicker statuses
+    network_status_.set_ms_since_last_primitive_received(UINT32_MAX);
+    network_status_.set_ms_since_last_vision_received(UINT32_MAX);
+
+    chipper_kicker_status_.set_ms_since_chipper_fired(UINT32_MAX);
+    chipper_kicker_status_.set_ms_since_kicker_fired(UINT32_MAX);
 }
 
 Thunderloop::~Thunderloop() {}
@@ -118,14 +125,17 @@ Thunderloop::~Thunderloop() {}
             }
 
             thunderloop_status_.set_network_service_poll_time_ms(
-                getNanoseconds(poll_time));
-
-            network_status_.set_ms_since_last_primitive_received(UINT32_MAX);
-            network_status_.set_ms_since_last_vision_received(UINT32_MAX);
+                getMilliseconds(poll_time));
 
             uint64_t last_handled_primitive_set = primitive_set_.sequence_number();
 
             struct timespec time_since_last_primitive_received;
+            clock_gettime(CLOCK_MONOTONIC, &current_time);
+            ScopedTimespecTimer::timespecDiff(&current_time,
+                                              &last_primitive_received_time,
+                                              &time_since_last_primitive_received);
+            network_status_.set_ms_since_last_primitive_received(
+                getMilliseconds(time_since_last_primitive_received));
             // If the primitive msg is new, update the internal buffer
             // and start the new primitive.
             if (new_primitive_set.time_sent().epoch_timestamp_seconds() >
@@ -136,13 +146,7 @@ Thunderloop::~Thunderloop() {}
 
                 // Update primitive executor's primitive set
                 {
-                    clock_gettime(CLOCK_MONOTONIC, &current_time);
-                    ScopedTimespecTimer::timespecDiff(
-                        &current_time, &last_primitive_received_time,
-                        &time_since_last_primitive_received);
                     clock_gettime(CLOCK_MONOTONIC, &last_primitive_received_time);
-                    network_status_.set_ms_since_last_primitive_received(
-                        getNanoseconds(time_since_last_primitive_received));
 
                     // Start new primitive
                     {
@@ -151,23 +155,22 @@ Thunderloop::~Thunderloop() {}
                     }
 
                     thunderloop_status_.set_primitive_executor_start_time_ms(
-                        getNanoseconds(poll_time));
+                        getMilliseconds(poll_time));
                 }
             }
+
+            struct timespec time_since_last_vision_received;
+            clock_gettime(CLOCK_MONOTONIC, &current_time);
+            ScopedTimespecTimer::timespecDiff(&current_time, &last_world_recieved_time,
+                                              &time_since_last_vision_received);
+            network_status_.set_ms_since_last_vision_received(
+                getMilliseconds(time_since_last_vision_received));
 
             // If the world msg is new, update the internal buffer
             if (new_world.time_sent().epoch_timestamp_seconds() >
                 world_.time_sent().epoch_timestamp_seconds())
             {
-                struct timespec time_since_last_vision_received;
-                clock_gettime(CLOCK_MONOTONIC, &current_time);
-                ScopedTimespecTimer::timespecDiff(&current_time,
-                                                  &last_world_recieved_time,
-                                                  &time_since_last_vision_received);
                 clock_gettime(CLOCK_MONOTONIC, &last_world_recieved_time);
-                network_status_.set_ms_since_last_vision_received(
-                    getNanoseconds(time_since_last_vision_received));
-
                 primitive_executor_.updateWorld(new_world);
                 world_ = new_world;
             }
@@ -179,7 +182,7 @@ Thunderloop::~Thunderloop() {}
 
                 // Handle emergency stop override
                 auto nanoseconds_elapsed_since_last_primitive =
-                    getNanoseconds(time_since_last_primitive_received);
+                    getMilliseconds(time_since_last_primitive_received);
 
                 if (nanoseconds_elapsed_since_last_primitive >
                     PRIMITIVE_MANAGER_TIMEOUT_NS)
@@ -198,7 +201,7 @@ Thunderloop::~Thunderloop() {}
             }
 
             thunderloop_status_.set_primitive_executor_step_time_ms(
-                getNanoseconds(poll_time));
+                getMilliseconds(poll_time));
 
             // Power Service: execute the power control command
             {
@@ -207,30 +210,45 @@ Thunderloop::~Thunderloop() {}
                     power_service_->poll(direct_control_.power_control(), kick_slope_,
                                          kick_constant_, chip_pulse_width_);
             }
-            thunderloop_status_.set_power_service_poll_time_ms(getNanoseconds(poll_time));
+            thunderloop_status_.set_power_service_poll_time_ms(
+                getMilliseconds(poll_time));
 
-            chipper_kicker_status_.set_ms_since_chipper_fired(UINT32_MAX);
-            chipper_kicker_status_.set_ms_since_kicker_fired(UINT32_MAX);
+            struct timespec time_since_kicker_fired;
+            clock_gettime(CLOCK_MONOTONIC, &current_time);
+            ScopedTimespecTimer::timespecDiff(&current_time, &last_kicker_fired,
+                                              &time_since_kicker_fired);
+            chipper_kicker_status_.set_ms_since_kicker_fired(
+                getMilliseconds(time_since_kicker_fired));
 
-            if (direct_control_.power_control().chicker().has_kick_speed_m_per_s())
+            struct timespec time_since_chipper_fired;
+            clock_gettime(CLOCK_MONOTONIC, &current_time);
+            ScopedTimespecTimer::timespecDiff(&current_time, &last_chipper_fired,
+                                              &time_since_chipper_fired);
+            chipper_kicker_status_.set_ms_since_chipper_fired(
+                getMilliseconds(time_since_chipper_fired));
+
+            LOG(DEBUG) << direct_control_.DebugString();
+            if (direct_control_.power_control().chicker().has_kick_speed_m_per_s() ||
+                direct_control_.power_control()
+                    .chicker()
+                    .auto_chip_or_kick()
+                    .has_autokick_speed_m_per_s())
             {
-                struct timespec time_since_kicker_fired;
-                clock_gettime(CLOCK_MONOTONIC, &current_time);
-                ScopedTimespecTimer::timespecDiff(&current_time, &last_kicker_fired,
-                                                  &time_since_kicker_fired);
+                LOG(INFO) << "KICK HAPPENED";
                 clock_gettime(CLOCK_MONOTONIC, &last_kicker_fired);
-                chipper_kicker_status_.set_ms_since_kicker_fired(
-                    getNanoseconds(time_since_kicker_fired));
+
+                LOG(INFO) << toString(getMilliseconds(time_since_kicker_fired));
             }
-            else if (direct_control_.power_control().chicker().has_chip_distance_meters())
+            else if (direct_control_.power_control()
+                         .chicker()
+                         .has_chip_distance_meters() ||
+                     direct_control_.power_control()
+                         .chicker()
+                         .auto_chip_or_kick()
+                         .has_autochip_distance_meters())
             {
-                struct timespec time_since_chipper_fired;
-                clock_gettime(CLOCK_MONOTONIC, &current_time);
-                ScopedTimespecTimer::timespecDiff(&current_time, &last_chipper_fired,
-                                                  &time_since_chipper_fired);
+                LOG(INFO) << "CHIP HAPPENED";
                 clock_gettime(CLOCK_MONOTONIC, &last_chipper_fired);
-                chipper_kicker_status_.set_ms_since_kicker_fired(
-                    getNanoseconds(time_since_chipper_fired));
             }
 
             // Motor Service: execute the motor control command
@@ -242,7 +260,8 @@ Thunderloop::~Thunderloop() {}
                     createVector(motor_status_.local_velocity()),
                     createAngularVelocity(motor_status_.angular_velocity()));
             }
-            thunderloop_status_.set_motor_service_poll_time_ms(getNanoseconds(poll_time));
+            thunderloop_status_.set_motor_service_poll_time_ms(
+                getMilliseconds(poll_time));
 
             clock_gettime(CLOCK_MONOTONIC, &current_time);
             time_sent_.set_epoch_timestamp_seconds(
@@ -267,7 +286,7 @@ Thunderloop::~Thunderloop() {}
             redis_client_->asyncCommit();
         }
 
-        auto loop_duration = getNanoseconds(iteration_time);
+        auto loop_duration = getMilliseconds(iteration_time);
         thunderloop_status_.set_iteration_time_ms(loop_duration /
                                                   NANOSECONDS_PER_MILLISECOND);
 
@@ -281,9 +300,9 @@ Thunderloop::~Thunderloop() {}
     }
 }
 
-double Thunderloop::getNanoseconds(timespec time)
+double Thunderloop::getMilliseconds(timespec time)
 {
-    return (static_cast<double>(time.tv_nsec) * 1000) +
+    return (static_cast<double>(time.tv_sec) * 1000) +
            (static_cast<double>(time.tv_nsec) / NANOSECONDS_PER_MILLISECOND);
 }
 

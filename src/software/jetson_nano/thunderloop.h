@@ -81,7 +81,7 @@ class Thunderloop
      * Converts the given timespec value to nanoseconds
      * @return The time in nanoseconds
      */
-    double getNanoseconds(timespec time);
+    double getMilliseconds(timespec time);
 
     // Input Msg Buffers
     TbotsProto::PrimitiveSet primitive_set_;
