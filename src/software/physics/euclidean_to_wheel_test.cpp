@@ -15,9 +15,8 @@ class EuclideanToWheelTest : public ::testing::Test
     RobotConstants robot_constants = create2021RobotConstants();
     double robot_radius            = create2021RobotConstants().robot_radius_m;
 
+    WheelSpace_t target_wheel_velocity{};
     WheelSpace_t current_wheel_velocity{};
-    std::pair<Vector, AngularVelocity> current_velocity{};
-    TbotsProto::DirectControlPrimitive target_velocity_primitive{};
     double time_to_ramp{};
 
 
@@ -184,16 +183,15 @@ TEST_F(EuclideanToWheelTest, test_velocity_no_ramping)
     auto current_wheel_velocity_coefficient = std::min(
         max_allowable_wheel_velocity * 0.9, allowable_delta_wheel_velocity * 0.9);
 
-    target_euclidean_velocity = euclidean_to_four_wheel.getEuclideanVelocity(
-        {current_wheel_velocity_coefficient, current_wheel_velocity_coefficient,
-         current_wheel_velocity_coefficient, current_wheel_velocity_coefficient});
+    target_wheel_velocity = {
+        current_wheel_velocity_coefficient, current_wheel_velocity_coefficient,
+        current_wheel_velocity_coefficient, current_wheel_velocity_coefficient};
 
     auto ramped_wheel_velocity = euclidean_to_four_wheel.rampWheelVelocity(
-        current_wheel_velocity, target_euclidean_velocity, 0.1);
+        current_wheel_velocity, target_wheel_velocity, 0.1);
 
-    EXPECT_TRUE(TestUtil::equalWithinTolerance(
-        euclidean_to_four_wheel.getEuclideanVelocity(ramped_wheel_velocity),
-        target_euclidean_velocity, 0.001));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(ramped_wheel_velocity,
+                                               target_wheel_velocity, 0.001));
 }
 
 TEST_F(EuclideanToWheelTest, test_velocity_delta_ramp)
@@ -207,20 +205,19 @@ TEST_F(EuclideanToWheelTest, test_velocity_delta_ramp)
 
     auto current_wheel_velocity_coefficient = 5 * allowable_delta_wheel_velocity;
 
-    target_euclidean_velocity = euclidean_to_four_wheel.getEuclideanVelocity(
-        {current_wheel_velocity_coefficient, current_wheel_velocity_coefficient,
-         current_wheel_velocity_coefficient, current_wheel_velocity_coefficient});
+    target_wheel_velocity = {
+        current_wheel_velocity_coefficient, current_wheel_velocity_coefficient,
+        current_wheel_velocity_coefficient, current_wheel_velocity_coefficient};
 
     auto ramped_wheel_velocity = euclidean_to_four_wheel.rampWheelVelocity(
-        current_wheel_velocity, target_euclidean_velocity, 0.1);
+        current_wheel_velocity, target_wheel_velocity, 0.1);
 
-    EuclideanSpace_t expected_velocity = euclidean_to_four_wheel.getEuclideanVelocity(
-        {allowable_delta_wheel_velocity, allowable_delta_wheel_velocity,
-         allowable_delta_wheel_velocity, allowable_delta_wheel_velocity});
+    WheelSpace_t expected_wheel_velocity = {
+        allowable_delta_wheel_velocity, allowable_delta_wheel_velocity,
+        allowable_delta_wheel_velocity, allowable_delta_wheel_velocity};
 
-    EXPECT_TRUE(TestUtil::equalWithinTolerance(
-        euclidean_to_four_wheel.getEuclideanVelocity(ramped_wheel_velocity),
-        expected_velocity, 0.001));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(ramped_wheel_velocity,
+                                               expected_wheel_velocity, 0.001));
 }
 
 TEST_F(EuclideanToWheelTest, test_velocity_total_ramp)
@@ -238,22 +235,20 @@ TEST_F(EuclideanToWheelTest, test_velocity_total_ramp)
 
     auto current_wheel_velocity_coefficient = 0.9 * allowable_delta_wheel_velocity;
 
-    target_euclidean_velocity = euclidean_to_four_wheel.getEuclideanVelocity(
-        {current_speed + current_wheel_velocity_coefficient,
-         current_speed + current_wheel_velocity_coefficient,
-         current_speed + current_wheel_velocity_coefficient,
-         current_speed + current_wheel_velocity_coefficient});
+    target_wheel_velocity = {current_speed + current_wheel_velocity_coefficient,
+                             current_speed + current_wheel_velocity_coefficient,
+                             current_speed + current_wheel_velocity_coefficient,
+                             current_speed + current_wheel_velocity_coefficient};
 
     auto ramped_wheel_velocity = euclidean_to_four_wheel.rampWheelVelocity(
-        current_wheel_velocity, target_euclidean_velocity, 0.1);
+        current_wheel_velocity, target_wheel_velocity, 0.1);
 
-    EuclideanSpace_t expected_velocity = euclidean_to_four_wheel.getEuclideanVelocity(
-        {max_allowable_wheel_velocity, max_allowable_wheel_velocity,
-         max_allowable_wheel_velocity, max_allowable_wheel_velocity});
+    WheelSpace_t expected_wheel_velocity = {
+        max_allowable_wheel_velocity, max_allowable_wheel_velocity,
+        max_allowable_wheel_velocity, max_allowable_wheel_velocity};
 
-    EXPECT_TRUE(TestUtil::equalWithinTolerance(
-        euclidean_to_four_wheel.getEuclideanVelocity(ramped_wheel_velocity),
-        expected_velocity, 0.001));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(ramped_wheel_velocity,
+                                               expected_wheel_velocity, 0.001));
 }
 
 TEST_F(EuclideanToWheelTest, test_velocity_both_ramps)
@@ -271,20 +266,18 @@ TEST_F(EuclideanToWheelTest, test_velocity_both_ramps)
 
     auto current_wheel_velocity_coefficient = 5 * allowable_delta_wheel_velocity;
 
-    target_euclidean_velocity = euclidean_to_four_wheel.getEuclideanVelocity(
-        {current_speed + current_wheel_velocity_coefficient,
-         current_speed + current_wheel_velocity_coefficient,
-         current_speed + current_wheel_velocity_coefficient,
-         current_speed + current_wheel_velocity_coefficient});
+    target_wheel_velocity = {current_speed + current_wheel_velocity_coefficient,
+                             current_speed + current_wheel_velocity_coefficient,
+                             current_speed + current_wheel_velocity_coefficient,
+                             current_speed + current_wheel_velocity_coefficient};
 
     auto ramped_wheel_velocity = euclidean_to_four_wheel.rampWheelVelocity(
-        current_wheel_velocity, target_euclidean_velocity, 0.1);
+        current_wheel_velocity, target_wheel_velocity, 0.1);
 
-    EuclideanSpace_t expected_velocity = euclidean_to_four_wheel.getEuclideanVelocity(
-        {max_allowable_wheel_velocity, max_allowable_wheel_velocity,
-         max_allowable_wheel_velocity, max_allowable_wheel_velocity});
+    WheelSpace_t expected_wheel_velocity = {
+        max_allowable_wheel_velocity, max_allowable_wheel_velocity,
+        max_allowable_wheel_velocity, max_allowable_wheel_velocity};
 
-    EXPECT_TRUE(TestUtil::equalWithinTolerance(
-        euclidean_to_four_wheel.getEuclideanVelocity(ramped_wheel_velocity),
-        expected_velocity, 0.001));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(ramped_wheel_velocity,
+                                               expected_wheel_velocity, 0.001));
 }
