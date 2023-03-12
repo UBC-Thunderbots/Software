@@ -47,7 +47,7 @@ message WorldState
 
 message WorldStateReceivedTrigger
 {
-    required bool world_state_received = 1;
+    
 }
 
 message SimulatorTick

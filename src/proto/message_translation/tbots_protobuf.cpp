@@ -349,13 +349,11 @@ std::unique_ptr<TbotsProto::PassVisualization> createPassVisualization(
     return pass_visualization_msg;
 }
 
-std::unique_ptr<TbotsProto::WorldStateReceivedTrigger> createWorldStateReceivedTrigger(
-    const bool world_state_received_trigger)
+std::unique_ptr<TbotsProto::WorldStateReceivedTrigger> createWorldStateReceivedTrigger()
 {
     auto world_state_received_trigger_msg =
         std::make_unique<TbotsProto::WorldStateReceivedTrigger>();
-    world_state_received_trigger_msg->set_world_state_received(
-        world_state_received_trigger);
+        
     return world_state_received_trigger_msg;
 }
 
