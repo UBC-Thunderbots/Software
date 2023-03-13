@@ -151,7 +151,6 @@ class RobotCommunication(object):
                     or self.robots_connected_to_manual
                 )
             ):
-                print(primitive_set)
                 self.last_time = primitive_set.time_sent.epoch_timestamp_seconds
                 self.send_primitive_set.send_proto(primitive_set)
 

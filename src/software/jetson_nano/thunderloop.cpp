@@ -56,13 +56,6 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, const int loop
               << ", and NETWORK INTERFACE: " << network_interface_;
     LOG(INFO)
         << "THUNDERLOOP: to update Thunderloop configuration, change REDIS store and restart Thunderloop";
-
-    // Initializing default values for network and chipper kicker statuses
-    network_status_.set_ms_since_last_primitive_received(UINT32_MAX);
-    network_status_.set_ms_since_last_vision_received(UINT32_MAX);
-
-    chipper_kicker_status_.set_ms_since_chipper_fired(UINT32_MAX);
-    chipper_kicker_status_.set_ms_since_kicker_fired(UINT32_MAX);
 }
 
 Thunderloop::~Thunderloop() {}
@@ -182,7 +175,7 @@ Thunderloop::~Thunderloop() {}
 
                 // Handle emergency stop override
                 auto nanoseconds_elapsed_since_last_primitive =
-                    getMilliseconds(time_since_last_primitive_received);
+                    getNanoseconds(time_since_last_primitive_received);
 
                 if (nanoseconds_elapsed_since_last_primitive >
                     PRIMITIVE_MANAGER_TIMEOUT_NS)
@@ -193,8 +186,8 @@ Thunderloop::~Thunderloop() {}
                     LOG(WARNING)
                         << "Primitive timeout, overriding with StopPrimitive\n"
                         << "Milliseconds since last world: "
-                        << static_cast<int>(nanoseconds_elapsed_since_last_primitive) *
-                               MILLISECONDS_PER_NANOSECOND;
+                        << static_cast<int>(nanoseconds_elapsed_since_last_primitive /
+                                            NANOSECONDS_PER_MILLISECOND);
                 }
 
                 direct_control_ = *primitive_executor_.stepPrimitive();
@@ -227,18 +220,16 @@ Thunderloop::~Thunderloop() {}
             chipper_kicker_status_.set_ms_since_chipper_fired(
                 getMilliseconds(time_since_chipper_fired));
 
-            LOG(DEBUG) << direct_control_.DebugString();
+            // if a kick proto is sent or if autokick is on
             if (direct_control_.power_control().chicker().has_kick_speed_m_per_s() ||
                 direct_control_.power_control()
                     .chicker()
                     .auto_chip_or_kick()
                     .has_autokick_speed_m_per_s())
             {
-                LOG(INFO) << "KICK HAPPENED";
                 clock_gettime(CLOCK_MONOTONIC, &last_kicker_fired);
-
-                LOG(INFO) << toString(getMilliseconds(time_since_kicker_fired));
             }
+            // if a chip proto is sent or if autochip is on
             else if (direct_control_.power_control()
                          .chicker()
                          .has_chip_distance_meters() ||
@@ -247,7 +238,6 @@ Thunderloop::~Thunderloop() {}
                          .auto_chip_or_kick()
                          .has_autochip_distance_meters())
             {
-                LOG(INFO) << "CHIP HAPPENED";
                 clock_gettime(CLOCK_MONOTONIC, &last_chipper_fired);
             }
 
@@ -286,7 +276,7 @@ Thunderloop::~Thunderloop() {}
             redis_client_->asyncCommit();
         }
 
-        auto loop_duration = getMilliseconds(iteration_time);
+        auto loop_duration = getNanoseconds(iteration_time);
         thunderloop_status_.set_iteration_time_ms(loop_duration /
                                                   NANOSECONDS_PER_MILLISECOND);
 
@@ -302,8 +292,14 @@ Thunderloop::~Thunderloop() {}
 
 double Thunderloop::getMilliseconds(timespec time)
 {
-    return (static_cast<double>(time.tv_sec) * 1000) +
+    return (static_cast<double>(time.tv_sec) * MILLISECONDS_PER_SECOND) +
            (static_cast<double>(time.tv_nsec) / NANOSECONDS_PER_MILLISECOND);
+}
+
+double Thunderloop::getNanoseconds(timespec time)
+{
+    return (static_cast<double>(time.tv_sec) * NANOSECONDS_PER_SECOND) +
+           static_cast<double>(time.tv_nsec);
 }
 
 void Thunderloop::timespecNorm(struct timespec& ts)
