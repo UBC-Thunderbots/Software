@@ -19,6 +19,8 @@ SPEED_SEGMENT_SCALE = 0.2
 
 ROBOT_RADIUS = 25
 
+BALL_HEIGHT_EFFECT_MULTIPLIER = 3
+
 # Mapping between RobotStatus Error Codes and their dialog messages
 ERROR_CODE_MESSAGES = {
     ErrorCode.LOW_CAP: "Low Cap",
