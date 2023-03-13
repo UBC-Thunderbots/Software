@@ -1,9 +1,11 @@
+import pdb
 import queue
 import time
 import os
 
 import pytest
 import software.python_bindings as tbots
+import argparse
 from proto.import_all_protos import *
 
 from pyqtgraph.Qt import QtCore, QtGui
@@ -69,6 +71,8 @@ class FieldTestRunner(TbotsTestRunner):
             yellow_full_system_proto_unix_io,
             gamecontroller,
         )
+        # pdb.set_trace()
+        print("A", flush=True)
         self.publish_validation_protos = publish_validation_protos
 
         logger.info("determining robots on field")
@@ -441,7 +445,10 @@ def field_test_initializer(
         friendly_colour_yellow=False,
         should_restart_on_crash=False,
     ) as blue_fs, RobotCommunication(
-        blue_full_system_proto_unix_io, getRobotMulticastChannel(0), args.interface
+        current_proto_unix_io=blue_full_system_proto_unix_io,
+        multicast_channel=getRobotMulticastChannel(0),
+        interface=args.interface,
+        disable_estop=False
     ) as rc_blue, FullSystem(
         f"{args.yellow_full_system_runtime_dir}/test/{test_name}",
         debug_full_system=args.debug_yellow_full_system,
@@ -491,3 +498,130 @@ def field_test_initializer(
                 print(
                     f"\n\nTo replay this test for the yellow team, go to the `src` folder and run \n./tbots.py run thunderscope --yellow_log {yellow_logger.log_folder}"
                 )
+
+
+def load_command_line_arguments():
+    """Load from command line arguments using argpase
+    NOTE: Pytest has its own built in argument parser (conftest.py, pytest_addoption)
+    but it doesn't seem to play nicely with bazel. We just use argparse instead.
+    """
+    parser = argparse.ArgumentParser(description="Run simulated or field pytests")
+    parser.add_argument(
+        "--enable_thunderscope", action="store_true", help="enable thunderscope"
+    )
+    parser.add_argument(
+        "--simulator_runtime_dir",
+        type=str,
+        help="simulator runtime directory",
+        default="/tmp/tbots",
+    )
+    parser.add_argument(
+        "--blue_full_system_runtime_dir",
+        type=str,
+        help="blue full_system runtime directory",
+        default="/tmp/tbots/blue",
+    )
+    parser.add_argument(
+        "--yellow_full_system_runtime_dir",
+        type=str,
+        help="yellow full_system runtime directory",
+        default="/tmp/tbots/yellow",
+    )
+    parser.add_argument(
+        "--layout",
+        action="store",
+        help="Which layout to run, if not specified the last layout will run",
+    )
+    parser.add_argument(
+        "--debug_blue_full_system",
+        action="store_true",
+        default=False,
+        help="Debug blue full_system",
+    )
+    parser.add_argument(
+        "--debug_yellow_full_system",
+        action="store_true",
+        default=False,
+        help="Debug yellow full_system",
+    )
+    parser.add_argument(
+        "--debug_simulator",
+        action="store_true",
+        default=False,
+        help="Debug the simulator",
+    )
+    parser.add_argument(
+        "--visualization_buffer_size",
+        action="store",
+        type=int,
+        default=5,
+        help="How many packets to buffer while rendering",
+    )
+    parser.add_argument(
+        "--show_gamecontroller_logs",
+        action="store_true",
+        default=False,
+        help="How many packets to buffer while rendering",
+    )
+    parser.add_argument(
+        "--run_field_test",
+        action="store_true",
+        default=False,
+        help="whether to run test as a field test instead of a simulated test",
+    )
+    parser.add_argument(
+        "--test_filter",
+        action="store",
+        default="",
+        help="The test filter, if not specified all tests will run. "
+             + "See https://docs.pytest.org/en/latest/how-to/usage.html#specifying-tests-selecting-tests",
+    )
+
+    parser.add_argument(
+        "--interface",
+        action="store",
+        type=str,
+        default=None,
+        help="Which interface to communicate over",
+    )
+
+    parser.add_argument(
+        "--estop_path",
+        action="store",
+        type=str,
+        default="/dev/ttyACM0",
+        help="Path to the Estop",
+    )
+
+    parser.add_argument(
+        "--estop_baudrate",
+        action="store",
+        type=int,
+        default=115200,
+        help="Estop Baudrate",
+    )
+
+    return parser.parse_args()
+
+@pytest.fixture
+def field_test_runner():
+
+    print("C", flush=True)
+    simulator_proto_unix_io = ProtoUnixIO()
+    yellow_full_system_proto_unix_io = ProtoUnixIO()
+    blue_full_system_proto_unix_io = ProtoUnixIO()
+
+    initializer = field_test_initializer(
+        blue_full_system_proto_unix_io=blue_full_system_proto_unix_io,
+        yellow_full_system_proto_unix_io=yellow_full_system_proto_unix_io,
+    )
+
+    yield_val = next(initializer)
+
+    yield yield_val
+
+    # test teardown
+    try:
+        next(initializer)
+    except StopIteration as e:
+        raise e

@@ -6,6 +6,7 @@ from proto.import_all_protos import *
 from pyqtgraph.Qt import QtCore
 import threading
 import time
+import pdb
 
 
 class RobotCommunication(object):
@@ -21,6 +22,7 @@ class RobotCommunication(object):
         estop_path="/dev/ttyACM0",
         estop_buadrate=115200,
     ):
+        # pdb.set_trace()
         """Initialize the communication with the robots
 
         :param current_proto_unix_io: the current proto unix io object

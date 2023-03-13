@@ -24,6 +24,7 @@ class TbotsTestRunner(object):
         yellow_full_system_proto_unix_io,
         gamecontroller,
     ):
+        print("B", flush=True)
         """Initialize the TestRunner. 
         
         :param test_name: The name of the test to run
