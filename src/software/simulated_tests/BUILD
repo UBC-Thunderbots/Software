@@ -68,6 +68,29 @@ py_library(
         "//software/networking:threaded_unix_listener_py",
         "//software/networking:threaded_unix_sender_py",
         "//software/simulated_tests:validation",
+        ":tbots_test_runner",
+        "//software/thunderscope",
+        "//software/thunderscope:binary_context_managers",
+        "//software/thunderscope/replay:proto_logger",
+    ],
+)
+
+
+py_library(
+    name = "tbots_test_runner",
+    srcs = [
+        "tbots_test_runner.py",
+    ],
+    data = [
+        "//software:py_constants.so",
+    ],
+    deps = [
+#        ":pytest_main",
+        "//proto:import_all_protos",
+        "//software/logger:py_logger",
+        "//software/networking:threaded_unix_listener_py",
+        "//software/networking:threaded_unix_sender_py",
+        "//software/simulated_tests:validation",
         "//software/thunderscope",
         "//software/thunderscope:binary_context_managers",
         "//software/thunderscope/replay:proto_logger",

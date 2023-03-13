@@ -15,6 +15,7 @@ from software.networking.threaded_unix_sender import ThreadedUnixSender
 from software.simulated_tests.robot_enters_region import RobotEntersRegion
 
 from software.simulated_tests import validation
+from software.simulated_tests.tbots_test_runner import TbotsTestRunner
 from software.thunderscope.thunderscope import Thunderscope
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.proto_unix_io import ProtoUnixIO
@@ -36,7 +37,7 @@ PROCESS_BUFFER_DELAY_S = 0.01
 PAUSE_AFTER_FAIL_DELAY_S = 3
 
 
-class SimulatorTestRunner(object):
+class SimulatorTestRunner(TbotsTestRunner):
 
     """Run a simulated test"""
 
@@ -60,36 +61,51 @@ class SimulatorTestRunner(object):
 
         """
 
-        self.test_name = test_name
-        self.thunderscope = thunderscope
+        # self.test_name = test_name
+        # self.thunderscope = thunderscope
+        # self.blue_full_system_proto_unix_io = blue_full_system_proto_unix_io
+        # self.yellow_full_system_proto_unix_io = yellow_full_system_proto_unix_io
+        # self.gamecontroller = gamecontroller
+        # self.last_exception = None
+        #
+        # self.world_buffer = ThreadSafeBuffer(buffer_size=1, protobuf_type=World)
+        # self.primitive_set_buffer = ThreadSafeBuffer(
+        #     buffer_size=1, protobuf_type=PrimitiveSet
+        # )
+        # self.last_exception = None
+        #
+        # self.ssl_wrapper_buffer = ThreadSafeBuffer(
+        #     buffer_size=1, protobuf_type=SSL_WrapperPacket
+        # )
+        # self.robot_status_buffer = ThreadSafeBuffer(
+        #     buffer_size=1, protobuf_type=RobotStatus
+        # )
+        #
+        # self.blue_full_system_proto_unix_io.register_observer(
+        #     SSL_WrapperPacket, self.ssl_wrapper_buffer
+        # )
+        # self.blue_full_system_proto_unix_io.register_observer(
+        #     RobotStatus, self.robot_status_buffer
+        # )
+        #
+        # self.timestamp = 0
+        # self.timestamp_mutex = threading.Lock()
+        super(SimulatorTestRunner, self).__init__(
+            test_name,
+            thunderscope,
+            blue_full_system_proto_unix_io,
+            yellow_full_system_proto_unix_io,
+            gamecontroller,
+        )
         self.simulator_proto_unix_io = simulator_proto_unix_io
-        self.blue_full_system_proto_unix_io = blue_full_system_proto_unix_io
-        self.yellow_full_system_proto_unix_io = yellow_full_system_proto_unix_io
-        self.gamecontroller = gamecontroller
-        self.last_exception = None
 
-        self.world_buffer = ThreadSafeBuffer(buffer_size=1, protobuf_type=World)
-        self.primitive_set_buffer = ThreadSafeBuffer(
-            buffer_size=1, protobuf_type=PrimitiveSet
-        )
-        self.last_exception = None
+    def set_worldState(self, worldstate: WorldState):
+        """Sets the simulation worldstate
 
-        self.ssl_wrapper_buffer = ThreadSafeBuffer(
-            buffer_size=1, protobuf_type=SSL_WrapperPacket
-        )
-        self.robot_status_buffer = ThreadSafeBuffer(
-            buffer_size=1, protobuf_type=RobotStatus
-        )
-
-        self.blue_full_system_proto_unix_io.register_observer(
-            SSL_WrapperPacket, self.ssl_wrapper_buffer
-        )
-        self.blue_full_system_proto_unix_io.register_observer(
-            RobotStatus, self.robot_status_buffer
-        )
-
-        self.timestamp = 0
-        self.timestamp_mutex = threading.Lock()
+        Args:
+            worldstate (WorldState): proto containing the desired worldstate
+        """
+        self.simulator_proto_unix_io.send_proto(WorldState, worldstate)
 
     def time_provider(self):
         """Provide the current time in seconds since the epoch"""
@@ -415,9 +431,9 @@ def simulated_test_runner():
 
             # Only validate on the blue worlds
             blue_full_system_proto_unix_io.register_observer(World, runner.world_buffer)
-            blue_full_system_proto_unix_io.register_observer(
-                PrimitiveSet, runner.primitive_set_buffer
-            )
+            # blue_full_system_proto_unix_io.register_observer(
+            #     PrimitiveSet, runner.primitive_set_buffer
+            # )
             # Setup proto loggers.
             #
             # NOTE: Its important we use the test runners time provider because
