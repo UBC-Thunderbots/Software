@@ -27,7 +27,7 @@ void NetworkSink::sendToNetwork(g3::LogMessageMover log_entry)
 
         TbotsProto::Timestamp timestamp;
         const auto current_time_ms =
-            std::std::chrono::time_point_cast<std::chrono::std::chrono::milliseconds>(
+            std::chrono::time_point_cast<std::chrono::milliseconds>(
                 std::chrono::system_clock::now());
         timestamp.set_epoch_timestamp_seconds(
             static_cast<double>(current_time_ms.time_since_epoch().count()) /
