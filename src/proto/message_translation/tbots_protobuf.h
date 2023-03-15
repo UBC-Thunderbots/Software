@@ -127,6 +127,15 @@ std::unique_ptr<TbotsProto::PassVisualization> createPassVisualization(
     const std::vector<PassWithRating>& passes_with_rating);
 
 /**
+ * Returns the WorldStateReceivedTrigger given the world state received trigger
+ *
+ * @return The unique_ptr to a TbotsProto::WorldStateReceivedTrigger proto containing
+ *         a boolean value for whether world state proto has been received
+ *
+ */
+std::unique_ptr<TbotsProto::WorldStateReceivedTrigger> createWorldStateReceivedTrigger();
+
+/**
  * Returns a cost visualization given a vector of costs
  *
  * @param costs A vector of costs to visualize

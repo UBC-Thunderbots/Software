@@ -349,6 +349,14 @@ std::unique_ptr<TbotsProto::PassVisualization> createPassVisualization(
     return pass_visualization_msg;
 }
 
+std::unique_ptr<TbotsProto::WorldStateReceivedTrigger> createWorldStateReceivedTrigger()
+{
+    auto world_state_received_trigger_msg =
+        std::make_unique<TbotsProto::WorldStateReceivedTrigger>();
+
+    return world_state_received_trigger_msg;
+}
+
 std::unique_ptr<TbotsProto::CostVisualization> createCostVisualization(
     const std::vector<double>& costs, int num_rows, int num_cols)
 {
