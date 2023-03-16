@@ -7,11 +7,9 @@
 #include "proto/tbots_software_msgs.pb.h"
 #include "proto/world.pb.h"
 #include "shared/robot_constants.h"
+#include "software/jetson_nano/services/network/proto_tracker.h"
 #include "software/networking/threaded_proto_udp_listener.hpp"
 #include "software/networking/threaded_proto_udp_sender.hpp"
-
-constexpr float PACKET_LOSS_WARNING_THRESHOLD = 0.1f;
-constexpr uint8_t RECENT_PACKET_LOSS_PERIOD   = 100;
 
 class NetworkService
 {
@@ -41,6 +39,9 @@ class NetworkService
         const TbotsProto::RobotStatus& robot_status);
 
    private:
+    // Constants
+    static constexpr float PROTO_LOSS_WARNING_THRESHOLD = 0.1f;
+
     // Variables
     TbotsProto::PrimitiveSet primitive_set_msg;
     TbotsProto::World world_msg;
@@ -58,7 +59,7 @@ class NetworkService
     void primitiveSetCallback(TbotsProto::PrimitiveSet input);
     void worldCallback(TbotsProto::World input);
 
-    // Queue of the sequence numbers of received primitive sets in the past
-    // RECENT_PACKET_LOSS_PERIOD primitive sets
-    std::queue<uint64_t> recent_primitive_set_seq_nums;
+    // ProtoTrackers for tracking recent primitive_set and world loss
+    ProtoTracker primitive_tracker;
+    ProtoTracker world_tracker;
 };
