@@ -8,6 +8,13 @@
 #include "proto/primitive/primitive_msg_factory.h"
 #include "proto/message_translation/tbots_geometry.h"
 
+extern "C"
+{
+#include "external/trinamic/tmc/ic/TMC4671/TMC4671.h"
+#include "external/trinamic/tmc/ic/TMC4671/TMC4671_Variants.h"
+#include "external/trinamic/tmc/ic/TMC6100/TMC6100.h"
+}
+
 class RobotAutoTestFixture : public testing::Test
 {
     // Test Motor Setup and Calibration
@@ -21,6 +28,7 @@ class RobotAutoTestFixture : public testing::Test
     {
         motor_service_ = std::make_unique<MotorService>(
             create2021RobotConstants(), CONTROL_LOOP_HZ);
+        robot_constants_ = create2021RobotConstants();
     }
 
     ~RobotAutoTestFixture() {}
@@ -28,6 +36,7 @@ class RobotAutoTestFixture : public testing::Test
     // Services
     std::unique_ptr<MotorService>
         motor_service_;  // TODO: loop_hz is not being used in motor service
+    RobotConstants_t robot_constants_;
 
     // SPI Chip Selects
     static const uint8_t FRONT_LEFT_MOTOR_CHIP_SELECT  = 0;
@@ -41,63 +50,110 @@ TEST_F(RobotAutoTestFixture, SetUpMotors) {
     motor_service_->setUpMotors();
 }
 
-TEST_F(RobotAutoTestFixture, TestMotorVelocities) {
-//    struct timespec iteration_time = {3, 500000000};
-//    auto loop_duration =
-//            iteration_time.tv_sec * static_cast<int>(NANOSECONDS_PER_SECOND) +
-//            iteration_time.tv_nsec;
-//    double loop_duration_seconds =
-//            static_cast<double>(loop_duration) * SECONDS_PER_NANOSECOND;
-//
-//    int robot_id = 0;
-//    PrimitiveExecutor primitive_executor = PrimitiveExecutor(CONTROL_LOOP_HZ, create2021RobotConstants(), TeamColour::YELLOW, robot_id);
+TEST_F(RobotAutoTestFixture, TestFrontRightMotorVelocity) {
 
-
+    WheelSpace_t prev_wheel_velocities = {0.0, 0.0, 0.0, 0.0};
     WheelSpace_t target_wheel_velocities = {0.0, 0.0, 0.0, 0.0};
+    EuclideanSpace_t target_linear_velocity  = {0.5, 0.5, 0.0};
 
-    Vector expected_velocity = Vector(2, -4);
+    for (int i = 0; i < 10; i++) {
+        target_wheel_velocities = motor_service_->rampWheelVelocity(prev_wheel_velocities, target_linear_velocity, static_cast<double>(robot_constants_.robot_max_speed_m_per_s),
+                                                                    static_cast<double>(robot_constants_.robot_max_acceleration_m_per_s_2), 0.1);
+        prev_wheel_velocities = target_wheel_velocities;
 
-    AngularVelocity expected_angular_velocity = AngularVelocity::fromRadians(0.5);
+        // Set target speeds accounting for acceleration
+        motor_service_->writeIntToTMC4671(FRONT_RIGHT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_TARGET,
+                                          static_cast<int>(target_wheel_velocities[FRONT_RIGHT_WHEEL_SPACE_INDEX] *
+                                                           MotorService::ELECTRICAL_RPM_PER_MECHANICAL_MPS));
+        // Read the Motor Status value from the motor status
+        double front_right_velocity =
+                static_cast<double>(motor_service_->readVelocityFromTMC4671(FRONT_RIGHT_MOTOR_CHIP_SELECT)) *
+                MotorService::MECHANICAL_MPS_PER_ELECTRICAL_RPM;
 
-    //TODO: we wont need to create a primitive and do the extra overhead
-//    auto output = createDirectControlPrimitive(expected_velocity, expected_angular_velocity,
-//                                               200, TbotsProto::AutoChipOrKick());
-//
-//    TbotsProto::MotorStatus motor_status_ = motor_service_->poll(output->direct_control().motor_control(), loop_duration_seconds); //TODO: what should we use for loop duration?
+        EXPECT_DOUBLE_EQ(front_right_velocity, target_wheel_velocities[FRONT_RIGHT_WHEEL_SPACE_INDEX]);
+    }
 
-//    double front_right_velocity =
-//            static_cast<double>(tmc4671_getActualVelocity(FRONT_RIGHT_MOTOR_CHIP_SELECT)) *
-//            MECHANICAL_MPS_PER_ELECTRICAL_RPM;
-//    double front_left_velocity =
-//            static_cast<double>(tmc4671_getActualVelocity(FRONT_LEFT_MOTOR_CHIP_SELECT)) *
-//            MECHANICAL_MPS_PER_ELECTRICAL_RPM;
-//    double back_right_velocity =
-//            static_cast<double>(tmc4671_getActualVelocity(BACK_RIGHT_MOTOR_CHIP_SELECT)) *
-//            MECHANICAL_MPS_PER_ELECTRICAL_RPM;
-//    double back_left_velocity =
-//            static_cast<double>(tmc4671_getActualVelocity(BACK_LEFT_MOTOR_CHIP_SELECT)) *
-//            MECHANICAL_MPS_PER_ELECTRICAL_RPM;
+    // reset the motor velocity
+    motor_service_->writeIntToTMC4671(FRONT_RIGHT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_TARGET, 0);
+}
 
+TEST_F(RobotAutoTestFixture, TestFrontLeftMotorVelocity) {
 
-    // Set target speeds accounting for acceleration
-    motor_service_->writeIntToTMC4671(FRONT_RIGHT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_TARGET,
-                                      static_cast<int>(target_wheel_velocities[FRONT_RIGHT_WHEEL_SPACE_INDEX] *
-                                                       ELECTRICAL_RPM_PER_MECHANICAL_MPS));
+    WheelSpace_t prev_wheel_velocities = {0.0, 0.0, 0.0, 0.0};
+    WheelSpace_t target_wheel_velocities = {0.0, 0.0, 0.0, 0.0};
+    EuclideanSpace_t target_linear_velocity  = {0.5, 0.5, 0.0};
 
-    motor_service_->writeIntToTMC4671(FRONT_LEFT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_TARGET,
-                                      static_cast<int>(target_wheel_velocities[FRONT_LEFT_WHEEL_SPACE_INDEX] *
-                                                       ELECTRICAL_RPM_PER_MECHANICAL_MPS));
+    for (int i = 0; i < 10; i++) {
+        target_wheel_velocities = motor_service_->rampWheelVelocity(prev_wheel_velocities, target_linear_velocity, static_cast<double>(robot_constants_.robot_max_speed_m_per_s),
+                                                                    static_cast<double>(robot_constants_.robot_max_acceleration_m_per_s_2), 0.1);
+        prev_wheel_velocities = target_wheel_velocities;
 
-    motor_service_->writeIntToTMC4671(BACK_LEFT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_TARGET,
-                                       static_cast<int>(target_wheel_velocities[BACK_LEFT_WHEEL_SPACE_INDEX] *
-                                                        ELECTRICAL_RPM_PER_MECHANICAL_MPS));
+        // Set target speeds accounting for acceleration
+        motor_service_->writeIntToTMC4671(FRONT_LEFT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_TARGET,
+                                          static_cast<int>(target_wheel_velocities[FRONT_LEFT_WHEEL_SPACE_INDEX] *
+                                                           MotorService::ELECTRICAL_RPM_PER_MECHANICAL_MPS));
+        // Read the Motor Status value from the motor status
+        double front_left_velocity =
+                static_cast<double>(motor_service_->readVelocityFromTMC4671(FRONT_LEFT_MOTOR_CHIP_SELECT)) *
+                MotorService::MECHANICAL_MPS_PER_ELECTRICAL_RPM;
 
-    motor_service_->writeIntToTMC4671(BACK_RIGHT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_TARGET,
-                                      static_cast<int>(target_wheel_velocities[BACK_RIGHT_WHEEL_SPACE_INDEX] *
-                                                       ELECTRICAL_RPM_PER_MECHANICAL_MPS));
-    //Read the Motor Status value from the motor status
-//    Vector actual_local_vector = createVector(motor_status_.local_velocity());
-//    AngularVelocity actual_angular_velocity = createAngularVelocity(motor_status_.angular_velocity());
+        EXPECT_DOUBLE_EQ(front_left_velocity, target_wheel_velocities[FRONT_LEFT_WHEEL_SPACE_INDEX]);
+    }
 
+    // reset the motor velocity
+    motor_service_->writeIntToTMC4671(FRONT_LEFT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_TARGET, 0);
+}
 
+TEST_F(RobotAutoTestFixture, TestBackLeftMotorVelocity) {
+
+    WheelSpace_t prev_wheel_velocities = {0.0, 0.0, 0.0, 0.0};
+    WheelSpace_t target_wheel_velocities = {0.0, 0.0, 0.0, 0.0};
+    EuclideanSpace_t target_linear_velocity  = {0.5, 0.5, 0.0};
+
+    for (int i = 0; i < 10; i++) {
+        target_wheel_velocities = motor_service_->rampWheelVelocity(prev_wheel_velocities, target_linear_velocity, static_cast<double>(robot_constants_.robot_max_speed_m_per_s),
+                                                                    static_cast<double>(robot_constants_.robot_max_acceleration_m_per_s_2), 0.1);
+        prev_wheel_velocities = target_wheel_velocities;
+
+        // Set target speeds accounting for acceleration
+        motor_service_->writeIntToTMC4671(BACK_LEFT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_TARGET,
+                                          static_cast<int>(target_wheel_velocities[BACK_LEFT_WHEEL_SPACE_INDEX] *
+                                                           MotorService::ELECTRICAL_RPM_PER_MECHANICAL_MPS));
+        // Read the Motor Status value from the motor status
+        double back_left_velocity =
+                static_cast<double>(motor_service_->readVelocityFromTMC4671(BACK_LEFT_MOTOR_CHIP_SELECT)) *
+                MotorService::MECHANICAL_MPS_PER_ELECTRICAL_RPM;
+
+        EXPECT_DOUBLE_EQ(back_left_velocity, target_wheel_velocities[BACK_LEFT_WHEEL_SPACE_INDEX]);
+    }
+
+    // reset the motor velocity
+    motor_service_->writeIntToTMC4671(BACK_LEFT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_TARGET, 0);
+}
+
+TEST_F(RobotAutoTestFixture, TestBackRightMotorVelocity) {
+
+    WheelSpace_t prev_wheel_velocities = {0.0, 0.0, 0.0, 0.0};
+    WheelSpace_t target_wheel_velocities = {0.0, 0.0, 0.0, 0.0};
+    EuclideanSpace_t target_linear_velocity  = {0.5, 0.5, 0.0};
+
+    for (int i = 0; i < 10; i++) {
+        target_wheel_velocities = motor_service_->rampWheelVelocity(prev_wheel_velocities, target_linear_velocity, static_cast<double>(robot_constants_.robot_max_speed_m_per_s),
+                                                                    static_cast<double>(robot_constants_.robot_max_acceleration_m_per_s_2), 0.1);
+        prev_wheel_velocities = target_wheel_velocities;
+
+        // Set target speeds accounting for acceleration
+        motor_service_->writeIntToTMC4671(BACK_RIGHT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_TARGET,
+                                          static_cast<int>(target_wheel_velocities[BACK_RIGHT_WHEEL_SPACE_INDEX] *
+                                                           MotorService::ELECTRICAL_RPM_PER_MECHANICAL_MPS));
+        // Read the Motor Status value from the motor status
+        double back_left_velocity =
+                static_cast<double>(motor_service_->readVelocityFromTMC4671(BACK_RIGHT_MOTOR_CHIP_SELECT)) *
+                MotorService::MECHANICAL_MPS_PER_ELECTRICAL_RPM;
+
+        EXPECT_DOUBLE_EQ(back_left_velocity, target_wheel_velocities[BACK_RIGHT_WHEEL_SPACE_INDEX]);
+    }
+
+    // reset the motor velocity
+    motor_service_->writeIntToTMC4671(BACK_RIGHT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_TARGET, 0);
 }

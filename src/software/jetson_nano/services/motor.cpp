@@ -63,8 +63,6 @@ static const char* DRIVER_CONTROL_ENABLE_GPIO             = "194";
 // pairs of the drive motor.
 //
 // TODO (#2720): compute from robot constants (this was computed by hand and is accurate)
-static double MECHANICAL_MPS_PER_ELECTRICAL_RPM = 0.000111;
-static double ELECTRICAL_RPM_PER_MECHANICAL_MPS = 1 / MECHANICAL_MPS_PER_ELECTRICAL_RPM;
 
 static double RUNAWAY_PROTECTION_THRESHOLD_MPS       = 2.00;
 static int DRIBBLER_ACCELERATION_THRESHOLD_RPM_PER_S = 1000;

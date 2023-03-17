@@ -54,5 +54,6 @@ cc_test(
         "//shared:robot_constants",
         "//shared/test_util:tbots_gtest_main",
         "//software/jetson_nano:primitive_executor",
+        "@trinamic",
     ],
 )
