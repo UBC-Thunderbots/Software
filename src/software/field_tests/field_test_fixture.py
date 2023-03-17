@@ -2,6 +2,7 @@ import pdb
 import queue
 import time
 import os
+import threading
 
 import pytest
 import software.python_bindings as tbots
@@ -94,6 +95,7 @@ class FieldTestRunner(TbotsTestRunner):
                 raise Exception("no friendly robots found on field")
 
         except queue.Empty as empty:
+            print("empty",flush=True)
             raise Exception("unable to determine robots on the field")
 
     def send_gamecontroller_command(
@@ -399,34 +401,26 @@ class FieldTestRunner(TbotsTestRunner):
             validation.check_validation(eventually_validation_proto_set)
             stop_test(TEST_END_DELAY)
 
-        cli_args = load_command_line_arguments()
+        ex = Excepthook()
+        threading.excepthook = ex.excepthook
 
-        if cli_args.enable_thunderscope:
-            thunderscope = Thunderscope(
-                simulator_proto_unix_io=simulator_proto_unix_io,
-                blue_full_system_proto_unix_io=blue_full_system_proto_unix_io,
-                yellow_full_system_proto_unix_io=yellow_full_system_proto_unix_io,
-            )
-            ex = Excepthook()
-            threading.excepthook = ex.excepthook
+        if self.thunderscope:
+
             run_sim_thread = threading.Thread(target=run_test, daemon=True)
             run_sim_thread.start()
 
-            thunderscope.show()
+            self.thunderscope.show()
             run_sim_thread.join()
 
             if ex.last_exception:
                 pytest.fail(str(ex.last_exception))
 
         else:
-            thunderscope = None
             __runner()
 
 
-
-
 def field_test_initializer(
-    yellow_full_system_proto_unix_io, blue_full_system_proto_unix_io
+    simulator_proto_unix_io,yellow_full_system_proto_unix_io, blue_full_system_proto_unix_io
 ):
     args = load_command_line_arguments()
 
@@ -436,14 +430,14 @@ def field_test_initializer(
     current_test = current_test.replace("[", "-")
 
     test_name = current_test.split("-")[0]
+    tscope = None
 
     # Launch all binaries
-
     with FullSystem(
         f"{args.blue_full_system_runtime_dir}/test/{test_name}",
         debug_full_system=args.debug_blue_full_system,
         friendly_colour_yellow=False,
-        should_restart_on_crash=False,
+        should_restart_on_crash=True,
     ) as blue_fs, RobotCommunication(
         current_proto_unix_io=blue_full_system_proto_unix_io,
         multicast_channel=getRobotMulticastChannel(0),
@@ -464,13 +458,31 @@ def field_test_initializer(
             gamecontroller.setup_proto_unix_io(
                 blue_full_system_proto_unix_io, yellow_full_system_proto_unix_io,
             )
-
+            print("D", flush=True)
+            # If we want to run thunderscope, inject the proto unix ios
+            # and start the test
+            if args.enable_thunderscope:
+                print("tscope enabled", flush=True)
+                tscope = Thunderscope(
+                    simulator_proto_unix_io=simulator_proto_unix_io,
+                    blue_full_system_proto_unix_io=simulator_proto_unix_io,
+                    yellow_full_system_proto_unix_io=yellow_full_system_proto_unix_io,
+                    # layout_path=args.layout,
+                    layout_path=None,
+                    visualization_buffer_size=args.visualization_buffer_size,
+                    load_blue=True,
+                    load_yellow=True
+                )
+                tscope.show()
+            print("E", flush=True)
             runner = FieldTestRunner(
-                current_test,
-                blue_full_system_proto_unix_io,
-                yellow_full_system_proto_unix_io,
-                gamecontroller,
+                test_name=current_test,
+                blue_full_system_proto_unix_io=blue_full_system_proto_unix_io,
+                yellow_full_system_proto_unix_io=yellow_full_system_proto_unix_io,
+                gamecontroller=gamecontroller,
+                thunderscope=tscope
             )
+            print("F", flush=True)
 
             # Setup proto loggers.
             #
@@ -611,7 +623,9 @@ def field_test_runner():
     yellow_full_system_proto_unix_io = ProtoUnixIO()
     blue_full_system_proto_unix_io = ProtoUnixIO()
 
+    print("G", flush=True)
     initializer = field_test_initializer(
+        simulator_proto_unix_io=simulator_proto_unix_io,
         blue_full_system_proto_unix_io=blue_full_system_proto_unix_io,
         yellow_full_system_proto_unix_io=yellow_full_system_proto_unix_io,
     )
