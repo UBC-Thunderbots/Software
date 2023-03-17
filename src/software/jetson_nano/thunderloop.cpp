@@ -219,7 +219,7 @@ Thunderloop::~Thunderloop() {}
             // Update Robot Status with poll responses
             robot_status_.set_robot_id(robot_id_);
             *(robot_status_.mutable_thunderloop_status()) = thunderloop_status_;
-            *(robot_status_.mutable_motor_status())       = motor_status_;
+            *(robot_status_.mutable_motor_status())       = motor_status_.value();
             *(robot_status_.mutable_power_status())       = power_status_;
             *(robot_status_.mutable_jetson_status())      = jetson_status_;
 
