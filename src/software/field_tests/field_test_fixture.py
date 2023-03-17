@@ -454,6 +454,7 @@ def field_test_initializer(
         ) as gamecontroller:
             blue_fs.setup_proto_unix_io(blue_full_system_proto_unix_io)
             yellow_fs.setup_proto_unix_io(yellow_full_system_proto_unix_io)
+            rc_blue.setup_for_fullsystem()
 
             gamecontroller.setup_proto_unix_io(
                 blue_full_system_proto_unix_io, yellow_full_system_proto_unix_io,

@@ -77,9 +77,9 @@ logger = createLogger(__name__)
 # this test can only be run on the field
 
 def test_basic_rotation(field_test_runner):
-    pdb.set_trace()
+    # pdb.set_trace()
     test_angles = [0, 45, 90, 180, 270, 0]
-    id = 1
+    id = 6
 
     # current position
     world = field_test_runner.world_buffer.get(

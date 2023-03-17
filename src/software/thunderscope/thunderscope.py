@@ -89,6 +89,8 @@ class Thunderscope(object):
         visualization_buffer_size=5,
         cost_visualization=False,
     ):
+        print("H", flush=True)
+        # print("load_blue" + simulator_proto_unix_io, flush=True)
         """Initialize Thunderscope
 
         :param simulator_proto_unix_io: The simulator's proto unix io
@@ -145,7 +147,7 @@ class Thunderscope(object):
         self.window = QtGui.QMainWindow()
         self.window.setCentralWidget(self.tabs)
         self.window.setWindowTitle("Thunderscope")
-
+        print("I", flush=True)
         # ProtoUnixIOs
         #
         # NOTE: Simulated tests need to be able to run without Thunderscope
@@ -171,7 +173,7 @@ class Thunderscope(object):
             self.yellow_full_system_proto_unix_io = (
                 yellow_full_system_proto_unix_io or ProtoUnixIO()
             )
-
+        print("J", flush=True)
         # the proto unix io to which diagnostics protos should be sent to
         # if one of the fullsystems is running, uses the same proto
         # if not, initialises a new one
@@ -182,9 +184,31 @@ class Thunderscope(object):
 
         self.simulator_proto_unix_io = simulator_proto_unix_io or ProtoUnixIO()
 
+        # print("dianostics" + load_diagnostics, flush=True)
+        # print("blue" + load_blue, flush=True)
+        # print("yellow" + load_yellow, flush=True)
+        # print(load_blue + " " + load_yellow + " " + load_diagnostics, flush=True)
+        print("K", flush=True)
         # Setup the main window and load the requested tabs
+        if layout_path is not None:
+            print(layout_path,flush=True)
+        else:
+            print("layout is none")
+        if load_blue is not None:
+            print(load_blue,flush=True)
+        else:
+            print("blue is none",flush=True)
+        if load_yellow is not None:
+            print(load_yellow,flush=True)
+        else:
+            print("yellow is none",flush=True)
+        if load_diagnostics is not None:
+            print(load_diagnostics,flush=True)
+        else:
+            print("load dia is none",flush=True)
         self.configure_layout(layout_path, load_blue, load_yellow, load_diagnostics)
 
+        print("L", flush=True)
         # Save and Load Prompts
         #
         # NOTE: As long as Thunderscope has focus, the keyboard shortcuts will
@@ -331,14 +355,13 @@ class Thunderscope(object):
         :param load_yellow: Whether to load the yellow layout.
         :param load_diagnostics: Whether to load the diagnostics layout.
         """
-
         # whether the fullsystem tab should have the robot view widget
         load_fullsystem_robot_view = True
 
         if load_blue == load_yellow:
             # in AI vs AI mode, fullsystem tab should not have robot view
             load_fullsystem_robot_view = False
-
+        print("conf_layout A", flush=True)
         if load_yellow:
             self.configure_full_system_layout(
                 self.yellow_full_system_dock_area,
@@ -347,6 +370,7 @@ class Thunderscope(object):
                 load_fullsystem_robot_view,
                 True,
             )
+        print("conf_layout A again",flush=True)
         if load_blue:
             self.configure_full_system_layout(
                 self.blue_full_system_dock_area,
@@ -356,9 +380,11 @@ class Thunderscope(object):
                 False,
             )
 
+        print("conf_layout B", flush=True)
         if load_yellow or load_blue:
             path = layout_path if layout_path else SAVED_LAYOUT_PATH
 
+            print("conf_layout C", flush=True)
             try:
                 self.load_layout(path)
             except Exception:
@@ -394,6 +420,7 @@ class Thunderscope(object):
         load_robot_view,
         friendly_colour_yellow,
     ):
+        print("entered full sys layout",flush = True)
         """Configure the default layout for thunderscope
 
         :param dock_area: The dock area to configure the layout
