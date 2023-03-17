@@ -88,7 +88,7 @@ class Thunderloop
     TbotsProto::JetsonStatus jetson_status_;
     TbotsProto::NetworkStatus network_status_;
     TbotsProto::PowerStatus power_status_;
-    TbotsProto::MotorStatus motor_status_;
+    std::optional<TbotsProto::MotorStatus> motor_status_;
     TbotsProto::ThunderloopStatus thunderloop_status_;
 
     // Current State

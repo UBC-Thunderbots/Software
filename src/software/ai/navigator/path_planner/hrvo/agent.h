@@ -70,7 +70,8 @@ class Agent
      * @param time_step the time step to use
      */
     virtual void computeNewVelocity(
-        std::map<unsigned int, std::shared_ptr<Agent>> &robots, Duration time_step) = 0;
+        const std::map<unsigned int, std::shared_ptr<Agent>> &robots,
+        Duration time_step) = 0;
 
 
     /**
@@ -159,7 +160,7 @@ class Agent
      *
      * @return Path for this agent
      */
-    RobotPath &getPath();
+    const RobotPath &getPath();
 
 
     /**

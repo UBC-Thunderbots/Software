@@ -26,23 +26,19 @@ void HRVOSimulator::updateWorld(const World &world,
 void HRVOSimulator::updatePrimitiveSet(const TbotsProto::PrimitiveSet &new_primitive_set,
                                        Duration time_step)
 {
-    primitive_set = new_primitive_set;
-
     // Update all friendly agent's primitives
-    for (auto &[robot_id, primitive] : primitive_set.robot_primitives())
+    if (world.has_value())
     {
-        auto friendly_robot = robots.find(robot_id);
-        if (friendly_robot == robots.end())
+        primitive_set = new_primitive_set;
+        for (auto &[robot_id, primitive] : primitive_set.robot_primitives())
         {
-            continue;
-        }
-        else
-        {
-            if (world.has_value())
+            auto friendly_robot = robots.find(robot_id);
+            if (friendly_robot == robots.end())
             {
-                friendly_robot->second->updatePrimitive(primitive, world.value(),
-                                                        time_step);
+                continue;
             }
+
+            friendly_robot->second->updatePrimitive(primitive, world.value(), time_step);
         }
     }
 }
@@ -108,6 +104,7 @@ void HRVOSimulator::configureLVRobot(const Robot &robot,
                                      const RobotConstants_t &robot_constants,
                                      Duration time_step)
 {
+    // Assume that enemy robots will continue to move in their current direction.
     Point destination = robot.position() + 2 * robot.velocity();
     double max_speed  = robot_constants.robot_max_speed_m_per_s;
 
@@ -115,8 +112,6 @@ void HRVOSimulator::configureLVRobot(const Robot &robot,
     double path_radius = (robot.velocity().length() * time_step.toSeconds()) / 2;
 
     RobotPath path = RobotPath({PathPoint(destination, 0.0)}, path_radius);
-
-    // robot_constants.robot_max_speed_m_per_s
 
     std::shared_ptr<LVAgent> agent = std::make_shared<LVAgent>(
         robot.id(), robot.currentState(), path, ROBOT_MAX_RADIUS_METERS, max_speed, 0.0,
@@ -161,15 +156,6 @@ void HRVOSimulator::doStep(Duration time_step)
 
 void HRVOSimulator::visualize(unsigned int robot_id, TeamColour friendly_team_colour)
 {
-    TbotsProto::HRVOVisualization hrvo_visualization;
-    // Visualize all agents
-    for (const auto &robot : robots)
-    {
-        Point position(robot.second->getPosition());
-        *(hrvo_visualization.add_robots()) =
-            *createCircleProto(Circle(position, robot.second->radius));
-    }
-
     auto friendly_robot = robots.find(robot_id);
     if (friendly_robot == robots.end())
     {
@@ -179,34 +165,8 @@ void HRVOSimulator::visualize(unsigned int robot_id, TeamColour friendly_team_co
 
     std::shared_ptr<HRVOAgent> robot =
         std::static_pointer_cast<HRVOAgent>(friendly_robot->second);
-    std::vector<TbotsProto::VelocityObstacle> vo_protos;
 
-    for (const VelocityObstacle &vo : robot->getVelocityObstacles())
-    {
-        vo_protos.emplace_back(
-            *createVelocityObstacleProto(vo, robot->getPosition().toVector()));
-    }
-    hrvo_visualization.set_robot_id(robot_id);
-
-    *(hrvo_visualization.mutable_velocity_obstacles()) = {vo_protos.begin(),
-                                                          vo_protos.end()};
-
-
-    // Visualize the ball obstacle
-    if (robot->getBallObstacle().has_value())
-    {
-        TbotsProto::Circle ball_circle =
-            robot->getBallObstacle().value()->createObstacleProto().circle()[0];
-        *(hrvo_visualization.add_robots()) = ball_circle;
-    }
-    if (friendly_team_colour == TeamColour::YELLOW)
-    {
-        LOG(VISUALIZE, YELLOW_HRVO_PATH) << hrvo_visualization;
-    }
-    else
-    {
-        LOG(VISUALIZE, BLUE_HRVO_PATH) << hrvo_visualization;
-    }
+    robot->visualize(friendly_team_colour);
 }
 
 void HRVOSimulator::updateRobotVelocity(RobotId robot_id, const Vector &new_velocity)

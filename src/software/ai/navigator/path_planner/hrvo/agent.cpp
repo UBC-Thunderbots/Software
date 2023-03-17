@@ -38,13 +38,11 @@ void Agent::update(Duration time_step)
     }
     position = position + (velocity * time_step.toSeconds());
 
-    Point current_dest;
-
-    const std::optional<PathPoint> &path_point = path.getCurrentPathPoint();
+    std::optional<PathPoint> path_point = path.getCurrentPathPoint();
 
     if (path_point != std::nullopt)
     {
-        current_dest = path_point.value().getPosition();
+        Point current_dest = path_point.value().getPosition();
 
         if ((current_dest - position).lengthSquared() <
                 path.getPathRadius() * path.getPathRadius() &&
@@ -97,7 +95,7 @@ AngularVelocity Agent::getAngularVelocity() const
     return angular_velocity;
 }
 
-RobotPath &Agent::getPath()
+const RobotPath &Agent::getPath()
 {
     return path;
 }

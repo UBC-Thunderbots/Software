@@ -138,8 +138,4 @@ class HRVOSimulator
     static constexpr double FRIENDLY_ROBOT_RADIUS_MAX_INFLATION = 0.05;
 
     static constexpr double ENEMY_ROBOT_RADIUS_MAX_INFLATION = 0.06;
-
-    // How much larger should the goal radius be. This is added as a safety tolerance so
-    // robots do not "teleport" over the goal between simulation frames.
-    static constexpr double GOAL_RADIUS_SCALE = 1.05;
 };

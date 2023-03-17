@@ -5,7 +5,8 @@ HRVOAgent::HRVOAgent(RobotId robot_id, const RobotState &robot_state,
                      double max_accel, double max_radius_inflation)
     : Agent(robot_id, robot_state, path, radius, max_speed, max_accel,
             max_radius_inflation),
-      obstacle_factory(TbotsProto::RobotNavigationObstacleConfig())
+      obstacle_factory(TbotsProto::RobotNavigationObstacleConfig()),
+      neighbours()
 {
 }
 
@@ -63,7 +64,7 @@ void HRVOAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive,
 }
 
 std::vector<RobotId> HRVOAgent::computeNeighbors(
-    std::map<RobotId, std::shared_ptr<Agent>> &robots)
+    const std::map<RobotId, std::shared_ptr<Agent>> &robots)
 {
     // Only consider agents within this distance away from our position
     Point current_destination = path.getCurrentPathPoint()->getPosition();
@@ -86,7 +87,7 @@ std::vector<RobotId> HRVOAgent::computeNeighbors(
 
     // remove this robot
     robot_list.erase(std::remove_if(robot_list.begin(), robot_list.end(),
-                                    [this](std::pair<RobotId, Point> robot) {
+                                    [this](const std::pair<RobotId, Point> &robot) {
                                         return robot_id == robot.first;
                                     }),
                      robot_list.end());
@@ -99,7 +100,7 @@ std::vector<RobotId> HRVOAgent::computeNeighbors(
     // unzip and return id from id-robot pairs
     std::vector<unsigned int> neighbor_ids;
     std::transform(neighbors.begin(), neighbors.end(), std::back_inserter(neighbor_ids),
-                   [&](std::pair<RobotId, Point> id_neighbour_pair) {
+                   [&](const std::pair<RobotId, Point> &id_neighbour_pair) {
                        return id_neighbour_pair.first;
                    });
 
@@ -107,7 +108,7 @@ std::vector<RobotId> HRVOAgent::computeNeighbors(
 }
 
 void HRVOAgent::computeVelocityObstacles(
-    std::map<RobotId, std::shared_ptr<Agent>> &robots)
+    const std::map<RobotId, std::shared_ptr<Agent>> &robots)
 {
     velocity_obstacles.reserve(robots.size());
 
@@ -121,10 +122,13 @@ void HRVOAgent::computeVelocityObstacles(
     }
 
     // Create Velocity Obstacles for neighboring agents
-    std::vector<unsigned int> neighbours = computeNeighbors(robots);
-    for (const auto &neighbor : neighbours)
+    std::vector<unsigned int> neighbour_ids = computeNeighbors(robots);
+
+    neighbours.clear();
+    for (const auto &neighbor : neighbour_ids)
     {
-        std::shared_ptr<Agent> other_agent = robots[neighbor];
+        std::shared_ptr<Agent> other_agent = robots.find(neighbor)->second;
+        neighbours.push_back(other_agent);
         VelocityObstacle velocity_obstacle = other_agent->createVelocityObstacle(*this);
         velocity_obstacles.push_back(velocity_obstacle);
     }
@@ -204,8 +208,8 @@ VelocityObstacle HRVOAgent::createVelocityObstacle(const Agent &other_agent)
     return VelocityObstacle(hrvo_apex, vo.getLeftSide(), vo.getRightSide());
 }
 
-void HRVOAgent::computeNewVelocity(std::map<unsigned int, std::shared_ptr<Agent>> &agents,
-                                   Duration time_step)
+void HRVOAgent::computeNewVelocity(
+    const std::map<unsigned int, std::shared_ptr<Agent>> &agents, Duration time_step)
 {
     // Based on The Hybrid Reciprocal Velocity Obstacle paper:
     // https://gamma.cs.unc.edu/HRVO/HRVO-T-RO.pdf
@@ -607,4 +611,44 @@ std::optional<ObstaclePtr> HRVOAgent::getBallObstacle()
 std::vector<VelocityObstacle> HRVOAgent::getVelocityObstacles()
 {
     return velocity_obstacles;
+}
+
+void HRVOAgent::visualize(TeamColour friendly_team_colour)
+{
+    TbotsProto::HRVOVisualization hrvo_visualization;
+    // Visualize all neighbours
+    for (const auto &robot : neighbours)
+    {
+        Point position(robot->getPosition());
+        *(hrvo_visualization.add_robots()) =
+            *createCircleProto(Circle(position, robot->radius));
+    }
+
+    std::vector<TbotsProto::VelocityObstacle> vo_protos;
+    for (const VelocityObstacle &vo : getVelocityObstacles())
+    {
+        vo_protos.emplace_back(
+            *createVelocityObstacleProto(vo, getPosition().toVector()));
+    }
+    hrvo_visualization.set_robot_id(robot_id);
+
+    *(hrvo_visualization.mutable_velocity_obstacles()) = {vo_protos.begin(),
+                                                          vo_protos.end()};
+
+    // Visualize the ball obstacle
+    if (getBallObstacle().has_value())
+    {
+        TbotsProto::Circle ball_circle =
+            getBallObstacle().value()->createObstacleProto().circle()[0];
+        *(hrvo_visualization.add_robots()) = ball_circle;
+    }
+
+    if (friendly_team_colour == TeamColour::YELLOW)
+    {
+        LOG(VISUALIZE, YELLOW_HRVO_PATH) << hrvo_visualization;
+    }
+    else
+    {
+        LOG(VISUALIZE, BLUE_HRVO_PATH) << hrvo_visualization;
+    }
 }

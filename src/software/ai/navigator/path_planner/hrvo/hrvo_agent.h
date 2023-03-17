@@ -11,6 +11,7 @@
 
 #include "proto/message_translation/tbots_geometry.h"
 #include "proto/primitive.pb.h"
+#include "proto/visualization.pb.h"
 #include "software/ai/navigator/obstacle/obstacle.hpp"
 #include "software/ai/navigator/obstacle/robot_navigation_obstacle_factory.h"
 #include "software/ai/navigator/path_planner/hrvo/lv_agent.h"
@@ -61,7 +62,7 @@ class HRVOAgent : public Agent
      *
      * @param robots a map from robot ids to robots, for all robots in the simulation
      */
-    void computeNewVelocity(std::map<unsigned int, std::shared_ptr<Agent>> &robots,
+    void computeNewVelocity(const std::map<unsigned int, std::shared_ptr<Agent>> &robots,
                             Duration time_step) override;
 
     /**
@@ -78,7 +79,8 @@ class HRVOAgent : public Agent
      *
      * @param the robots nearest neighbours
      */
-    void computeVelocityObstacles(std::map<RobotId, std::shared_ptr<Agent>> &robots);
+    void computeVelocityObstacles(
+        const std::map<RobotId, std::shared_ptr<Agent>> &robots);
 
     /**
      * Create the VO for the given agent, relative to this agent
@@ -93,7 +95,7 @@ class HRVOAgent : public Agent
      * @return the robot simulator ids
      */
     std::vector<RobotId> computeNeighbors(
-        std::map<RobotId, std::shared_ptr<Agent>> &robots);
+        const std::map<RobotId, std::shared_ptr<Agent>> &robots);
 
     /**
      * get the velocity obstacles that this agent sees
@@ -106,6 +108,15 @@ class HRVOAgent : public Agent
      * @return an o obstacle pointer
      */
     std::optional<ObstaclePtr> getBallObstacle();
+
+
+    /**
+     * construct the visualization proto for this robot
+     *
+     * @param friendly_team_colour the team color for this robot
+     */
+    void visualize(TeamColour friendly_team_colour);
+
 
     // This class holds the calculated candidate velocity given two velocity obstacles
     class CandidateVelocity
@@ -191,6 +202,7 @@ class HRVOAgent : public Agent
     std::vector<VelocityObstacle> velocity_obstacles;
     std::vector<ObstaclePtr> static_obstacles;
     std::optional<ObstaclePtr> ball_obstacle;
+    std::vector<std::shared_ptr<Agent>> neighbours;
 
     static constexpr double PREF_SPEED_SCALE            = 0.85;
     static constexpr double DECEL_DIST_MULTIPLIER       = 1.2;
@@ -200,9 +212,6 @@ class HRVOAgent : public Agent
     // A large radius picked to allow for far visibility of neighbors so Agents have
     // enough space to decelerate and avoid collisions.
     static constexpr double MAX_NEIGHBOR_SEARCH_DIST = 2.5;
-
-    // The maximum number of neighbours to look for.
-    static constexpr double MAX_NEIGHBORS_DIV_B = 12;
 
     static constexpr double MIN_PREF_SPEED_MULTIPLIER = 0.5;
 };

@@ -8,8 +8,8 @@ LVAgent::LVAgent(RobotId robot_id, const RobotState &robot_state, const RobotPat
 {
 }
 
-void LVAgent::computeNewVelocity(std::map<unsigned int, std::shared_ptr<Agent>> &robots,
-                                 Duration time_step)
+void LVAgent::computeNewVelocity(
+    const std::map<unsigned int, std::shared_ptr<Agent>> &robots, Duration time_step)
 {
     // TODO (#2496): Fix bug where LinearVelocityAgents go past their destination
     // Preferring a velocity which points directly towards goal
@@ -58,5 +58,7 @@ VelocityObstacle LVAgent::createVelocityObstacle(const Agent &other_agent)
 void LVAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive,
                               const World &world, Duration time_step)
 {
+    // this operation is not supported for LV agents since they
+    // represent enemy robots, which aren't controlled or updated by us
     return;
 }

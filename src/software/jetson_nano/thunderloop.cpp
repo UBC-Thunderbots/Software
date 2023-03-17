@@ -23,6 +23,7 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, const int loop
     // TODO (#2495): Set the friendly team colour once we receive World proto
     : redis_client_(
           std::make_unique<RedisClient>(REDIS_DEFAULT_HOST, REDIS_DEFAULT_PORT)),
+      motor_status_(std::nullopt),
       robot_constants_(robot_constants),
       robot_id_(std::stoi(redis_client_->getSync(ROBOT_ID_REDIS_KEY))),
       channel_id_(std::stoi(redis_client_->getSync(ROBOT_MULTICAST_CHANNEL_REDIS_KEY))),
@@ -147,6 +148,14 @@ Thunderloop::~Thunderloop() {}
                 world_ = new_world;
             }
 
+            if (motor_status_.has_value())
+            {
+                auto status = motor_status_.value();
+                primitive_executor_.updateVelocity(
+                    createVector(status.local_velocity()),
+                    createAngularVelocity(status.angular_velocity()));
+            }
+
             // If world not received in a while, stop robot
             struct timespec world_result;
 
@@ -203,9 +212,6 @@ Thunderloop::~Thunderloop() {}
                 ScopedTimespecTimer timer(&poll_time);
                 motor_status_ = motor_service_->poll(direct_control_.motor_control(),
                                                      loop_duration_seconds);
-                primitive_executor_.updateVelocity(
-                    createVector(motor_status_.local_velocity()),
-                    createAngularVelocity(motor_status_.angular_velocity()));
             }
             thunderloop_status_.set_motor_service_poll_time_ns(
                 static_cast<unsigned long>(poll_time.tv_nsec));
