@@ -7,9 +7,6 @@ void HRVOSimulator::updateWorld(const World &world,
                                 Duration time_step)
 {
     this->world = world;
-    // TODO (#2498): Update implementation to correctly support adding and removing agents
-    //               to represent the newly added and removed friendly/enemy robots in the
-    //               World.
     robots.clear();
     for (const Robot &friendly_robot : world.friendlyTeam().getAllRobots())
     {
@@ -49,7 +46,6 @@ void HRVOSimulator::configureHRVORobot(const Robot &robot,
 {
     double max_accel = 1e-4;
     double max_speed = 1e-4;
-    // TODO move this logic to constructor for agent
     const std::set<RobotCapability> &unavailable_capabilities =
         robot.getUnavailableCapabilities();
     bool can_move = unavailable_capabilities.find(RobotCapability::Move) ==

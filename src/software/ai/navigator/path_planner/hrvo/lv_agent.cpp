@@ -11,9 +11,6 @@ LVAgent::LVAgent(RobotId robot_id, const RobotState &robot_state, const RobotPat
 void LVAgent::computeNewVelocity(
     const std::map<unsigned int, std::shared_ptr<Agent>> &robots, Duration time_step)
 {
-    // TODO (#2496): Fix bug where LinearVelocityAgents go past their destination
-    // Preferring a velocity which points directly towards goal
-
     Vector pref_velocity = computePreferredVelocity(time_step);
     setPreferredVelocity(pref_velocity);
 
