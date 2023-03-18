@@ -321,7 +321,7 @@ def load_command_line_arguments():
         "--show_gamecontroller_logs",
         action="store_true",
         default=False,
-        help="How many packets to buffer while rendering",
+        help="Show gamecontroller logs",
     )
     parser.add_argument(
         "--test_filter",
@@ -398,6 +398,8 @@ def simulated_test_runner():
                     yellow_full_system_proto_unix_io,
                     layout_path=args.layout,
                     visualization_buffer_size=args.visualization_buffer_size,
+                    load_blue=True,
+                    load_yellow=True,
                 )
 
             time.sleep(LAUNCH_DELAY_S)
