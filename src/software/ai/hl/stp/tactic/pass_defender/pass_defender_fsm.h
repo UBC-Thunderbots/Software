@@ -86,16 +86,6 @@ struct PassDefenderFSM
         DEFINE_SML_ACTION(blockPass)
         DEFINE_SML_ACTION(interceptBall)
 
-        // otherwise
-        //  ┌─────┐
-        //  │  ┌──┴─────────────┐  passStarted?  ┌────────────────────┐
-        //  └─►│ BlockPassState ├────────────────┤ InterceptBallState │
-        //     └────────────────┘                └─────────┬──────────┘
-        //              ▲                                  │
-        //              └──────────────────────────────────┘
-        //                        ballDeflected?
-        //
-
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
             *BlockPassState_S + Update_E[passStarted_G] / interceptBall_A =
