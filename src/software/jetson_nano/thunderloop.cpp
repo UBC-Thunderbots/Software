@@ -184,10 +184,9 @@ Thunderloop::~Thunderloop() {}
 
                     // Log milliseconds since last world received if we are timing out
                     LOG(WARNING)
-                        << "Primitive timeout, overriding with StopPrimitive\n"
-                        << "Milliseconds since last world: "
-                        << static_cast<int>(nanoseconds_elapsed_since_last_primitive /
-                                            NANOSECONDS_PER_MILLISECOND);
+                        << "Primitive timeout, overriding with StopPrimitive - Milliseconds since last world: "
+                        << static_cast<int>(nanoseconds_elapsed_since_last_primitive) *
+                               MILLISECONDS_PER_NANOSECOND;
                 }
 
                 direct_control_ = *primitive_executor_.stepPrimitive();
