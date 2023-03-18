@@ -400,11 +400,6 @@ SSLSimulationProto::RobotControl ErForceSimulator::updateSimulatorRobots(
     return robot_control;
 }
 
-
-// Takes in current velocity and angular velocity and a target Direct Control primitive
-// converts current and target velocities to Wheel velocities
-// ramps the target primitive based on the current velocities
-// and returns a pointer to a new Direct Control primitive
 std::unique_ptr<TbotsProto::DirectControlPrimitive>
 ErForceSimulator::getRampedVelocityPrimitive(
     const Vector current_local_velocity,
@@ -412,17 +407,14 @@ ErForceSimulator::getRampedVelocityPrimitive(
     TbotsProto::DirectControlPrimitive& target_velocity_primitive,
     const double& time_to_ramp)
 {
-    EuclideanSpace_t target_euclidean_velocity = EuclideanSpace_t::Zero();
-
-    TbotsProto::MotorControl motor_control = target_velocity_primitive.motor_control();
-
     TbotsProto::MotorControl_DirectVelocityControl direct_velocity =
-        motor_control.direct_velocity_control();
+        target_velocity_primitive.motor_control().direct_velocity_control();
 
     // getting the target wheel velocity
-    target_euclidean_velocity = {-direct_velocity.velocity().y_component_meters(),
-                                 direct_velocity.velocity().x_component_meters(),
-                                 direct_velocity.angular_velocity().radians_per_second()};
+    EuclideanSpace_t target_euclidean_velocity = {
+        -direct_velocity.velocity().y_component_meters(),
+        direct_velocity.velocity().x_component_meters(),
+        direct_velocity.angular_velocity().radians_per_second()};
 
     WheelSpace_t target_wheel_velocity =
         euclidean_to_four_wheel.getWheelVelocity(target_euclidean_velocity);

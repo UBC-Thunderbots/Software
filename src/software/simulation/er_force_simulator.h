@@ -184,6 +184,18 @@ class ErForceSimulator
             robot_primitive_executor_map,
         const TbotsProto::World& world_msg, gameController::Team side);
 
+    /**
+     * Takes in current velocity and angular velocity and a target Direct Control
+     * primitive converts current and target velocities to Wheel velocities ramps the
+     * target primitive based on the current velocities and returns a pointer to a new
+     * Direct Control primitive
+     *
+     * @param current_local_velocity the current velocity of a robot
+     * @param current_local_angular_velocity the current angular velocity of a robot
+     * @param target_velocity_primitive the target primitive that should be ramped
+     * @param time_to_ramp time it should be ramped over
+     * @return
+     */
     std::unique_ptr<TbotsProto::DirectControlPrimitive> getRampedVelocityPrimitive(
         const Vector current_local_velocity,
         const AngularVelocity current_local_angular_velocity,

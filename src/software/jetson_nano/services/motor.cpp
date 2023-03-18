@@ -99,7 +99,8 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
       driver_control_enable_gpio(DRIVER_CONTROL_ENABLE_GPIO, GpioDirection::OUTPUT,
                                  GpioState::HIGH),
       reset_gpio(MOTOR_DRIVER_RESET_GPIO, GpioDirection::OUTPUT, GpioState::HIGH),
-      euclidean_to_four_wheel(robot_constants)
+      euclidean_to_four_wheel(robot_constants),
+      ramp_rpm(0)
 {
     robot_constants_ = robot_constants;
 
@@ -391,7 +392,6 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
                 TbotsProto::MotorControl::DriveControlCase::DRIVE_CONTROL_NOT_SET
             ? 0
             : motor.dribbler_speed_rpm();
-    ramp_rpm = 0;
 
     WheelSpace_t target_wheel_velocities = WheelSpace_t::Zero();
 
@@ -400,9 +400,9 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
         TbotsProto::MotorControl_DirectPerWheelControl direct_per_wheel =
             motor.direct_per_wheel_control();
         target_wheel_velocities = {
+            direct_per_wheel.front_right_wheel_velocity(),
             direct_per_wheel.front_left_wheel_velocity(),
             direct_per_wheel.back_left_wheel_velocity(),
-            direct_per_wheel.front_right_wheel_velocity(),
             direct_per_wheel.back_right_wheel_velocity(),
         };
     }

@@ -66,8 +66,8 @@ class EuclideanToWheel
      * NOTE: This function has no state.
      * Also NOTE: This function handles all electrical rpm to meters/second conversion.
      *
-     * @param target_euclidean_velocity The target Euclidean velocity in m/s
-     * @param current_wheel_velocity The current 4-wheel velocity m/s
+     * @param current_wheel_velocity The current 4-wheel velocity in m/s
+     * @param target_wheel_velocity The target 4-wheel velocity m/s
      * @param time_to_ramp The time allocated for acceleration in seconds
      *
      */
