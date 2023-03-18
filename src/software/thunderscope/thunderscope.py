@@ -255,6 +255,7 @@ class Thunderscope(object):
                 ),
             )
         )
+        print("exiting TSCOPE construction",flush=True)
 
     def reset_layout(self):
         """Reset the layout to the default layout"""
@@ -420,81 +421,94 @@ class Thunderscope(object):
         load_robot_view,
         friendly_colour_yellow,
     ):
-        print("entered full sys layout",flush = True)
-        """Configure the default layout for thunderscope
+        try:
+            print("entered full sys layout",flush = True)
+            """Configure the default layout for thunderscope
 
-        :param dock_area: The dock area to configure the layout
-        :param sim_proto_unix_io: The proto unix io object for the simulator
-        :param full_system_proto_unix_io: The proto unix io object for the full system
-        :param load_robot_view: Whether robot view should be loaded on the fullsystem tab or not
-                                - should not be loaded in AI vs AI
-                                - should not be loaded with diagnostics, will be loaded in that tab instead
-        :param friendly_colour_yellow: Whether the friendly colour is yellow
+            :param dock_area: The dock area to configure the layout
+            :param sim_proto_unix_io: The proto unix io object for the simulator
+            :param full_system_proto_unix_io: The proto unix io object for the full system
+            :param load_robot_view: Whether robot view should be loaded on the fullsystem tab or not
+                                    - should not be loaded in AI vs AI
+                                    - should not be loaded with diagnostics, will be loaded in that tab instead
+            :param friendly_colour_yellow: Whether the friendly colour is yellow
 
-        """
-        # Configure Docks and save them
-        self.widgets[friendly_colour_yellow] = {}
-        widgets = self.widgets[friendly_colour_yellow]
+            """
+            # Configure Docks and save them
+            self.widgets[friendly_colour_yellow] = {}
+            widgets = self.widgets[friendly_colour_yellow]
 
-        widgets["field_widget"] = self.setup_field_widget(
-            sim_proto_unix_io, full_system_proto_unix_io, friendly_colour_yellow
-        )
-        field_dock = Dock("Field")
-        field_dock.addWidget(widgets["field_widget"])
+            print("conf A",flush = True)
+            widgets["field_widget"] = self.setup_field_widget(
+                sim_proto_unix_io, full_system_proto_unix_io, friendly_colour_yellow
+            )
+            field_dock = Dock("Field")
+            field_dock.addWidget(widgets["field_widget"])
 
-        widgets["log_widget"] = self.setup_log_widget(full_system_proto_unix_io)
-        log_dock = Dock("Logs")
-        log_dock.addWidget(widgets["log_widget"])
+            print("conf B",flush = True)
+            widgets["log_widget"] = self.setup_log_widget(full_system_proto_unix_io)
+            log_dock = Dock("Logs")
+            log_dock.addWidget(widgets["log_widget"])
 
-        widgets["performance_widget"] = self.setup_performance_plot(
-            full_system_proto_unix_io
-        )
-        performance_dock = Dock("Performance")
-        performance_dock.addWidget(widgets["performance_widget"].win)
-
-        widgets["parameter_widget"] = self.setup_parameter_widget(
-            full_system_proto_unix_io, friendly_colour_yellow
-        )
-        parameter_dock = Dock("Parameters")
-        parameter_dock.addWidget(widgets["parameter_widget"])
-
-        widgets["playinfo_widget"] = self.setup_play_info(full_system_proto_unix_io)
-        playinfo_dock = Dock("Play Info")
-        playinfo_dock.addWidget(widgets["playinfo_widget"])
-
-        if self.cost_visualization:
-            widgets["cost_visualization_widget"] = self.setup_cost_visualization_widget(
+            widgets["performance_widget"] = self.setup_performance_plot(
                 full_system_proto_unix_io
             )
-            cost_visualization_dock = Dock("Cost Visualization")
-            cost_visualization_dock.addWidget(widgets["cost_visualization_widget"])
-            widgets["field_widget"].field_resized.connect(
-                widgets["cost_visualization_widget"].update_axis_range
+            performance_dock = Dock("Performance")
+            performance_dock.addWidget(widgets["performance_widget"].win)
+
+            print("conf C",flush = True)
+            widgets["parameter_widget"] = self.setup_parameter_widget(
+                full_system_proto_unix_io, friendly_colour_yellow
             )
+            parameter_dock = Dock("Parameters")
+            parameter_dock.addWidget(widgets["parameter_widget"])
 
-        widgets["refereeinfo_widget"] = self.setup_referee_info(
-            full_system_proto_unix_io
-        )
-        refereeinfo_dock = Dock("Referee Info")
-        refereeinfo_dock.addWidget(widgets["refereeinfo_widget"])
+            widgets["playinfo_widget"] = self.setup_play_info(full_system_proto_unix_io)
+            playinfo_dock = Dock("Play Info")
+            playinfo_dock.addWidget(widgets["playinfo_widget"])
 
-        dock_area.addDock(field_dock)
-        dock_area.addDock(parameter_dock, "left", field_dock)
-        dock_area.addDock(log_dock, "above", parameter_dock)
-        dock_area.addDock(refereeinfo_dock, "bottom", field_dock)
-        dock_area.addDock(playinfo_dock, "above", refereeinfo_dock)
-        dock_area.addDock(performance_dock, "right", playinfo_dock)
-        if self.cost_visualization:
-            dock_area.addDock(cost_visualization_dock, "right", field_dock)
+            print("conf C",flush = True)
+            if self.cost_visualization:
+                widgets["cost_visualization_widget"] = self.setup_cost_visualization_widget(
+                    full_system_proto_unix_io
+                )
+                cost_visualization_dock = Dock("Cost Visualization")
+                cost_visualization_dock.addWidget(widgets["cost_visualization_widget"])
+                widgets["field_widget"].field_resized.connect(
+                    widgets["cost_visualization_widget"].update_axis_range
+                )
 
-        if load_robot_view:
-            widgets["robot_view"] = self.setup_robot_view(
-                full_system_proto_unix_io, True
+            widgets["refereeinfo_widget"] = self.setup_referee_info(
+                full_system_proto_unix_io
             )
-            robot_view_dock = Dock("RobotView")
-            robot_view_dock.addWidget(widgets["robot_view"])
-            dock_area.addDock(robot_view_dock, "above", log_dock)
-            self.control_mode_signal = widgets["robot_view"].control_mode_signal
+            refereeinfo_dock = Dock("Referee Info")
+            refereeinfo_dock.addWidget(widgets["refereeinfo_widget"])
+
+            print("conf D",flush = True)
+            dock_area.addDock(field_dock)
+            dock_area.addDock(parameter_dock, "left", field_dock)
+            dock_area.addDock(log_dock, "above", parameter_dock)
+            dock_area.addDock(refereeinfo_dock, "bottom", field_dock)
+            dock_area.addDock(playinfo_dock, "above", refereeinfo_dock)
+            dock_area.addDock(performance_dock, "right", playinfo_dock)
+            if self.cost_visualization:
+                dock_area.addDock(cost_visualization_dock, "right", field_dock)
+
+            print("conf D",flush = True)
+            if load_robot_view:
+                widgets["robot_view"] = self.setup_robot_view(
+                    full_system_proto_unix_io, True
+                )
+
+                print("conf E",flush = True)
+                robot_view_dock = Dock("RobotView")
+                robot_view_dock.addWidget(widgets["robot_view"])
+                dock_area.addDock(robot_view_dock, "above", log_dock)
+                self.control_mode_signal = widgets["robot_view"].control_mode_signal
+        except Exception as e:
+            print("exception!\n",flush=True)
+            print(e)
+
 
     def configure_robot_diagnostics_layout(
         self, dock_area, proto_unix_io, load_fullsystem,
@@ -731,7 +745,7 @@ class Thunderscope(object):
         :returns: The referee info widget
 
         """
-
+        print("Entered ref info",flush=True)
         referee_info = RefereeInfoWidget()
         proto_unix_io.register_observer(Referee, referee_info.referee_buffer)
         self.register_refresh_function(referee_info.refresh)
@@ -794,9 +808,11 @@ class Thunderscope(object):
 
     def show(self):
         """Show the main window"""
+        print("in tscope.show",flush=True)
 
         self.window.show()
         pyqtgraph.exec()
+        print("exiting tscope.show",flush=True)
 
     def close(self):
         """Close the main window"""

@@ -322,6 +322,11 @@ class FieldTestRunner(TbotsTestRunner):
         :param test_timeout_s: The timeout for the test, if any eventually_validations
                                 remain after the timeout, the test fails.
         """
+        print("\n\n\nIN RUN_TEST\n\n\n",flush=True)
+        if(self.thunderscope):
+            print("We have Thunderscope",flush=True)
+        else:
+            print("We do not have Thunderscope", flush=True)
         def stop_test(delay):
             time.sleep(delay)
             if self.thunderscope:
@@ -405,10 +410,9 @@ class FieldTestRunner(TbotsTestRunner):
         threading.excepthook = ex.excepthook
 
         if self.thunderscope:
-
             run_sim_thread = threading.Thread(target=run_test, daemon=True)
             run_sim_thread.start()
-
+            print("Showing TSCOPE",flush=True)
             self.thunderscope.show()
             run_sim_thread.join()
 
@@ -472,9 +476,9 @@ def field_test_initializer(
                     layout_path=None,
                     visualization_buffer_size=args.visualization_buffer_size,
                     load_blue=True,
-                    load_yellow=True
+                    load_yellow=False
                 )
-                tscope.show()
+                print("pre-E", flush=True)
             print("E", flush=True)
             runner = FieldTestRunner(
                 test_name=current_test,
