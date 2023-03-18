@@ -47,6 +47,7 @@ cc_library(
 cc_test(
     name = "robot_auto_test",
     srcs = ["robot_auto_test.cpp"],
+    linkstatic = True,
     deps = [
         ":motor",
         "//proto/message_translation:tbots_geometry",
