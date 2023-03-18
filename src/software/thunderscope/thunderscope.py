@@ -148,15 +148,37 @@ class Thunderscope(object):
         self.window.setCentralWidget(self.tabs)
         self.window.setWindowTitle("Thunderscope")
 
+        self.is_playing = True
         simulationToolBar = self.window.addToolBar("simulation")
-        pauseSim = QAction("Pause", self)
-        simulationToolBar.addAction(self, "pause")
-        self.toolButton = QtWidgets.QToolButton(self.window)
-        #pauseButton = QToolButton()
-        #pauseButton.setText("pause")
-        #pauseButton.setCheckable(True)
-        #pauseButton.setAutoExclusive(True)
-        #simulationToolBar.addWidget(pauseButton)
+
+        pixmapi_pause = QStyle.StandardPixmap.SP_MediaStop
+        #pixmap_play = QStyle.StandardPixmap.SP_MediaPlay
+
+        pauseicon = self.window.style().standardIcon(pixmapi_pause)
+        #playicon = self.window.style().standardIcon(pixmap_play)
+
+        self.pauseSim = QtGui.QAction(pauseicon, "Pause", self.window)
+        simulationToolBar.addAction(self.pauseSim)
+
+
+        self.pauseSim.setShortcut("Ctrl+Space")
+
+        # making it checkable
+        #self.pauseSim.setCheckable(True)
+
+        #self.pauseSim.toggled.connect(self.__on_pause_simulation_clicked)
+        self.pauseSim.triggered.connect(self.__on_pause_simulation_clicked)
+
+        #lambda: print("Toggled Signal Emitted")
+
+        # use built in icons, toggle between pause and play icons
+
+        # self.toolButton = QToolButton(self.window)
+        # pauseButton = QToolButton()
+        # pauseButton.setText("pause")
+        # pauseButton.setCheckable(True)
+        # pauseButton.setAutoExclusive(True)
+        # simulationToolBar.addWidget(pauseButton)
 
         #pauseAction =
 
@@ -375,6 +397,49 @@ class Thunderscope(object):
                 if load_blue
                 else self.yellow_full_system_proto_unix_io,
             )
+
+    def __on_pause_simulation_clicked(self, toggle_state):
+        """ when the pause button is clicked, pause gameplay"""
+        # my initial implementation that doesnt work
+        # my guess is that the problem with this
+        # is that it only modifies the is_playing field
+        # of the new SimulationState instance and does not
+        # affect the actual state of my actual simulation.
+
+        simulator_state = SimulationState(is_playing=not self.is_playing)
+        self.is_playing = not self.is_playing
+        self.simulator_proto_unix_io.send_proto(SimulationState, simulator_state)
+
+
+        # change the icon of the button based on simulation state
+        if self.is_playing:
+            pixmapi = QStyle.StandardPixmap.SP_MediaStop
+
+        else:
+            pixmapi = QStyle.StandardPixmap.SP_MediaPlay
+            #self.pauseSim.setIcon(icon)
+        icon = self.window.style().standardIcon(pixmapi)
+        self.pauseSim.setIcon(icon)
+
+
+        # so i checked with the print statement and the connect code does call this method and it runs
+        #print( "pause button works" )
+
+        """
+        self.simulator_state.is_playing = not self.simulator_state.is_playing
+
+        if self.simulator_state.is_playing:
+            # resume simulation loop or process
+            print("Simulation resumed")
+        else:
+            # pause simulation loop or process
+            print("Simulation paused")
+        """
+        #simulator_state = SimulationState(is_playing=not self.is_playing)
+        #if (SimulationState(is_playing=not self.is_playing)):
+        #    print("simulation resumed")
+        #else:
+        #    print("simulation paused")
 
     def register_refresh_function(self, refresh_func):
         """Register the refresh functions to run at the refresh_interval_ms
