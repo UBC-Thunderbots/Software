@@ -50,8 +50,6 @@ class WorldLayer(FieldLayer):
         self.key_pressed = {}
         self.display_robot_id = False
 
-        # self.is_playing = True
-
         self.accepted_keys = [Qt.Key.Key_Control, Qt.Key.Key_I, QtCore.Qt.Key.Key_Space]
         for key in self.accepted_keys:
             self.key_pressed[key] = False
@@ -70,19 +68,6 @@ class WorldLayer(FieldLayer):
         self.key_pressed[event.key()] = True
         if event.key() == QtCore.Qt.Key.Key_I:
             self.display_robot_id = not self.display_robot_id
-
-        # if user is holding ctrl + space, send a command to simulator to pause the gameplay
-        # if (
-        # self.key_pressed[QtCore.Qt.Key.Key_Control]
-        # and self.key_pressed[QtCore.Qt.Key.Key_Space]
-        # self.pauseSim.clicked.connect(self.__on_pause_simulation_clicked)
-        # self.pauseSim.clicked(something like thunderscope.pauseSim???)
-        # ):
-
-        # simulator_state = SimulationState(is_playing=not self.is_playing)
-        # self.is_playing = not self.is_playing
-
-        # self.simulator_io.send_proto(SimulationState, simulator_state)
 
     def keyReleaseEvent(self, event):
         """Detect when a key has been released (override)
