@@ -179,8 +179,7 @@ TEST_F(EuclideanToWheelTest, test_velocity_no_ramping)
 
     current_wheel_velocity = {0, 0, 0, 0};
 
-    auto current_wheel_velocity_coefficient = std::min(
-        max_allowable_wheel_velocity * 0.9, allowable_delta_wheel_velocity * 0.9);
+    auto current_wheel_velocity_coefficient = allowable_delta_wheel_velocity * 0.9;
 
     target_wheel_velocity = {
         current_wheel_velocity_coefficient, current_wheel_velocity_coefficient,
@@ -189,8 +188,10 @@ TEST_F(EuclideanToWheelTest, test_velocity_no_ramping)
     auto ramped_wheel_velocity = euclidean_to_four_wheel.rampWheelVelocity(
         current_wheel_velocity, target_wheel_velocity, time_to_ramp);
 
-    EXPECT_TRUE(TestUtil::equalWithinTolerance(ramped_wheel_velocity,
-                                               target_wheel_velocity, 0.001));
+    EXPECT_LE((ramped_wheel_velocity - current_wheel_velocity).cwiseAbs().maxCoeff(),
+              allowable_delta_wheel_velocity);
+
+    EXPECT_LE(ramped_wheel_velocity.cwiseAbs().maxCoeff(), max_allowable_wheel_velocity);
 }
 
 TEST_F(EuclideanToWheelTest, test_velocity_delta_ramp)
@@ -198,6 +199,8 @@ TEST_F(EuclideanToWheelTest, test_velocity_delta_ramp)
     auto allowable_delta_wheel_velocity =
         static_cast<double>(robot_constants.robot_max_acceleration_m_per_s_2) *
         time_to_ramp;
+    auto max_allowable_wheel_velocity =
+        static_cast<double>(robot_constants.robot_max_speed_m_per_s);
 
     current_wheel_velocity = {0, 0, 0, 0};
 
@@ -216,6 +219,11 @@ TEST_F(EuclideanToWheelTest, test_velocity_delta_ramp)
 
     EXPECT_TRUE(TestUtil::equalWithinTolerance(ramped_wheel_velocity,
                                                expected_wheel_velocity, 0.001));
+
+    EXPECT_LE((ramped_wheel_velocity - current_wheel_velocity).cwiseAbs().maxCoeff(),
+              allowable_delta_wheel_velocity);
+
+    EXPECT_LE(ramped_wheel_velocity.cwiseAbs().maxCoeff(), max_allowable_wheel_velocity);
 }
 
 TEST_F(EuclideanToWheelTest, test_velocity_total_ramp)
@@ -226,11 +234,11 @@ TEST_F(EuclideanToWheelTest, test_velocity_total_ramp)
     auto max_allowable_wheel_velocity =
         static_cast<double>(robot_constants.robot_max_speed_m_per_s);
 
-    auto current_speed = max_allowable_wheel_velocity * 2;
+    auto current_speed = max_allowable_wheel_velocity * 0.95;
 
     current_wheel_velocity = {current_speed, current_speed, current_speed, current_speed};
 
-    auto current_wheel_velocity_coefficient = 0.9 * allowable_delta_wheel_velocity;
+    auto current_wheel_velocity_coefficient = allowable_delta_wheel_velocity;
 
     target_wheel_velocity = {current_speed + current_wheel_velocity_coefficient,
                              current_speed + current_wheel_velocity_coefficient,
@@ -246,6 +254,11 @@ TEST_F(EuclideanToWheelTest, test_velocity_total_ramp)
 
     EXPECT_TRUE(TestUtil::equalWithinTolerance(ramped_wheel_velocity,
                                                expected_wheel_velocity, 0.001));
+
+    EXPECT_LE((ramped_wheel_velocity - current_wheel_velocity).cwiseAbs().maxCoeff(),
+              allowable_delta_wheel_velocity);
+
+    EXPECT_LE(ramped_wheel_velocity.cwiseAbs().maxCoeff(), max_allowable_wheel_velocity);
 }
 
 TEST_F(EuclideanToWheelTest, test_velocity_both_ramps)
@@ -256,7 +269,7 @@ TEST_F(EuclideanToWheelTest, test_velocity_both_ramps)
     auto max_allowable_wheel_velocity =
         static_cast<double>(robot_constants.robot_max_speed_m_per_s);
 
-    auto current_speed = max_allowable_wheel_velocity * 2;
+    auto current_speed = max_allowable_wheel_velocity * 0.95;
 
     current_wheel_velocity = {current_speed, current_speed, current_speed, current_speed};
 
@@ -276,4 +289,9 @@ TEST_F(EuclideanToWheelTest, test_velocity_both_ramps)
 
     EXPECT_TRUE(TestUtil::equalWithinTolerance(ramped_wheel_velocity,
                                                expected_wheel_velocity, 0.001));
+
+    EXPECT_LE((ramped_wheel_velocity - current_wheel_velocity).cwiseAbs().maxCoeff(),
+              allowable_delta_wheel_velocity);
+
+    EXPECT_LE(ramped_wheel_velocity.cwiseAbs().maxCoeff(), max_allowable_wheel_velocity);
 }
