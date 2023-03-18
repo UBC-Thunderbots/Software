@@ -23,6 +23,7 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, const int loop
     // TODO (#2495): Set the friendly team colour once we receive World proto
     : redis_client_(
           std::make_unique<RedisClient>(REDIS_DEFAULT_HOST, REDIS_DEFAULT_PORT)),
+      motor_status_(std::nullopt),
       robot_constants_(robot_constants),
       robot_id_(std::stoi(redis_client_->getSync(ROBOT_ID_REDIS_KEY))),
       channel_id_(std::stoi(redis_client_->getSync(ROBOT_MULTICAST_CHANNEL_REDIS_KEY))),
