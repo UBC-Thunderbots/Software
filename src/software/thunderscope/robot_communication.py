@@ -67,7 +67,6 @@ class RobotCommunication(object):
         self.run_world_thread = threading.Thread(target=self.run_world)
         self.run_primitive_set_thread = threading.Thread(target=self.run_primitive_set)
 
-
         # only checks for estop if checking is not disabled
         if not self.disable_estop:
             try:
@@ -116,7 +115,9 @@ class RobotCommunication(object):
             # fullsystem is running, so world data is being received
             if self.robots_connected_to_fullsystem:
                 # Get the primitives
-                primitive_set = self.primitive_buffer.get(block=True, timeout=0.01)
+                primitive_set = self.primitive_buffer.get(
+                    block=True, timeout=ROBOT_COMMUNICATIONS_TIMEOUT
+                )
 
                 robot_primitives = dict(primitive_set.robot_primitives)
 
@@ -157,7 +158,7 @@ class RobotCommunication(object):
 
             # sleep if not running fullsystem
             if not self.robots_connected_to_fullsystem:
-                time.sleep(0.01)
+                time.sleep(ROBOT_COMMUNICATIONS_TIMEOUT)
 
     def toggle_robot_connection(self, mode, robot_id):
         """

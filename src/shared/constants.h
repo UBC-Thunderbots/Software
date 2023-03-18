@@ -141,6 +141,10 @@ static const unsigned char ESTOP_STOP_MSG = 1;
 // Number of times to send a STOP primitive when robot is disconnected from Manual Control
 static const unsigned int NUM_TIMES_SEND_STOP = 10;
 
+// Time (in ms) to sleep / delay the loop iteration for different protos in robot
+// communications
+static const double ROBOT_COMMUNICATIONS_TIMEOUT = 0.01;
+
 // product and vendor id for Arduino Uno Rev3 (retrieved from
 // http://www.linux-usb.org/usb.ids )
 #define ARDUINO_ID_LENGTH 5
