@@ -65,6 +65,14 @@ struct BallPlacementPlayFSM
      */
     bool kickDone(const Update& event);
 
+    /**
+     * Helper function for setting up the MoveTactics of the robots away from the ball
+     * placing robot
+     *
+     * @param event the BallPlacementPlayFSM Update event
+     */
+    void setupMoveTactics(const Update& event);
+
     auto operator()()
     {
         using namespace boost::sml;
@@ -82,8 +90,9 @@ struct BallPlacementPlayFSM
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *StartState_S + Update_E[shouldKickOffWall_G]  = KickOffWallState_S,
-            *StartState_S + Update_E[!shouldKickOffWall_G] = PlaceBallState_S,
+            *StartState_S + Update_E[shouldKickOffWall_G]       = KickOffWallState_S,
+            *StartState_S + Update_E[!shouldKickOffWall_G]      = PlaceBallState_S,
+            KickOffWallState_S + Update_E[!shouldKickOffWall_G] = PlaceBallState_S,
             KickOffWallState_S + Update_E[!kickDone_G] / kickOffWall_A =
                 KickOffWallState_S,
             KickOffWallState_S + Update_E[kickDone_G] = StartState_S,
