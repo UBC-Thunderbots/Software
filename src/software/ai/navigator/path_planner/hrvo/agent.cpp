@@ -38,7 +38,7 @@ void Agent::update(Duration time_step)
     }
     position = position + (velocity * time_step.toSeconds());
 
-    std::optional<PathPoint> path_point = path.getCurrentPathPoint();
+    const std::optional<PathPoint> &path_point = path.getCurrentPathPoint();
 
     if (path_point != std::nullopt)
     {

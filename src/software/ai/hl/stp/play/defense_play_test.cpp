@@ -47,16 +47,20 @@ TEST_F(DefensePlayTest, test_defense_play)
             Rectangle attacker_rect(Point(0, 2.85), Point(0.9, 2));
             robotInPolygon(attacker_rect, 1, world_ptr, yield);
 
-            // Two friendly crease defenders should be close to the goalie
-            Point goalie_position = world_ptr->friendlyTeam().goalie()->position();
-            Rectangle left_crease_defender_rect(
-                Point(goalie_position.x(), goalie_position.y() + 0.4),
-                Point(goalie_position.x() + 0.3, goalie_position.y()));
-            Rectangle right_crease_defender_rect(
-                Point(goalie_position.x(), goalie_position.y()),
-                Point(goalie_position.x() + 0.3, goalie_position.y() - 0.3));
-            robotInPolygon(left_crease_defender_rect, 1, world_ptr, yield);
-            robotInPolygon(right_crease_defender_rect, 1, world_ptr, yield);
+            // Top right point of friendly defense area.
+            auto tr = world_ptr->field().friendlyDefenseArea().posXPosYCorner();
+
+            // Bottom right point of friendly defense area.
+            auto br = world_ptr->field().friendlyDefenseArea().posXNegYCorner();
+            auto centre = world_ptr->field().friendlyDefenseArea().centre();
+
+            // add an x-offset to the B-R point, to make a vertical rectangle beside the defense area.
+            Rectangle crease_defense_area(
+                    Point(tr.x(), tr.y()),
+                    Point(br.x() + 0.25, centre.y())
+                    );
+
+            robotInPolygon(crease_defense_area, 2, world_ptr, yield);
         }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {

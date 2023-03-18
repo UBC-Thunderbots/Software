@@ -68,8 +68,8 @@ std::vector<RobotId> HRVOAgent::computeNeighbors(
 {
     // Only consider agents within this distance away from our position
     Point current_destination = path.getCurrentPathPoint()->getPosition();
-    double dist_to_obstacle_threshold =
-        std::min(2.5, (position - current_destination).length());
+    double dist_to_obstacle_threshold_squared =
+        std::min(std::pow(MAX_NEIGHBOR_SEARCH_DIST, 2), (position - current_destination).lengthSquared());
 
     auto compare = [&](const std::pair<RobotId, Point> &r1,
                        const std::pair<RobotId, Point> &r2) {
@@ -95,7 +95,7 @@ std::vector<RobotId> HRVOAgent::computeNeighbors(
     // run brute force nn search
     std::vector<std::pair<RobotId, Point>> neighbors =
         findNeighboursInThreshold(std::make_pair(robot_id, position), robot_list,
-                                  dist_to_obstacle_threshold, compare);
+                                  dist_to_obstacle_threshold_squared, compare);
 
     // unzip and return id from id-robot pairs
     std::vector<unsigned int> neighbor_ids;
@@ -180,6 +180,7 @@ VelocityObstacle HRVOAgent::createVelocityObstacle(const Agent &other_agent)
     // of avoiding collision with other agent. This assumes that the other agent will also
     // be running HRVO
     // Refer to: https://gamma.cs.unc.edu/HRVO/HRVO-T-RO.pdf#page=2
+    // Github: https://github.com/snape/HRVO
     Vector vo_side;
     Vector rvo_side;
     if ((other_agent.getPreferredVelocity() - preferred_velocity)
@@ -348,7 +349,6 @@ void HRVOAgent::computeNewVelocity(
     }
 
     // intersection points of all velocity obstacles with each other
-    // except for last obstacle?
     for (int i = 0; i < static_cast<int>(velocity_obstacles.size()) - 1; ++i)
     {
         for (int j = i + 1; j < static_cast<int>(velocity_obstacles.size()); ++j)
@@ -358,8 +358,6 @@ void HRVOAgent::computeNewVelocity(
 
             if (d != 0.0f)
             {
-                // TODO
-                // refactor these calculations into separate function
                 const double s =
                     (velocity_obstacles[j].getApex() - velocity_obstacles[i].getApex())
                         .determinant(velocity_obstacles[j].getRightSide()) /
