@@ -100,11 +100,29 @@ void DribbleFSM::getPossession(const Update &event)
 
 void DribbleFSM::dribble(const Update &event)
 {
+    auto ball_position       = event.common.world.ball().position();
+    auto dribble_destination = event.control_params.dribble_destination;
+
+    bool should_pivot;
+    if (dribble_destination.has_value())
+    {
+        should_pivot = (ball_position - dribble_destination.value()).length() > 0.30;
+    }
+    else
+    {
+        should_pivot = false;
+    }
+
     auto [target_destination, target_orientation] =
         calculateNextDribbleDestinationAndOrientation(
             event.common.world.ball(), event.common.robot,
             event.control_params.dribble_destination,
             event.control_params.final_dribble_orientation);
+
+    if (should_pivot)
+    {
+        target_orientation = (dribble_destination.value() - ball_position).orientation();
+    }
 
     event.common.set_primitive(createMovePrimitive(
         CREATE_MOTION_CONTROL(target_destination), target_orientation, 0,

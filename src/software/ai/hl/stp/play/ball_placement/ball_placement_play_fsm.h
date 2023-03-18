@@ -3,9 +3,9 @@
 #include "proto/parameters.pb.h"
 #include "shared/constants.h"
 #include "software/ai/hl/stp/play/play_fsm.h"
-#include "software/ai/hl/stp/tactic/pivot_kick/pivot_kick_tactic.h"
 #include "software/ai/hl/stp/tactic/dribble/dribble_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
+#include "software/ai/hl/stp/tactic/pivot_kick/pivot_kick_tactic.h"
 #include "software/ai/passing/eighteen_zone_pitch_division.h"
 
 
@@ -31,7 +31,8 @@ struct BallPlacementPlayFSM
     explicit BallPlacementPlayFSM(TbotsProto::AiConfig ai_config);
 
     /**
-     * Action that has the placing kick the ball off the wall to give more space to dribble
+     * Action that has the placing kick the ball off the wall to give more space to
+     * dribble
      *
      * @param event the BallPlacementPlayFSM Update event
      */
@@ -55,7 +56,8 @@ struct BallPlacementPlayFSM
     bool shouldKickOffWall(const Update& event);
 
     /**
-     * Guard on whether the placing robot has finished moving the ball into a better position with a kick
+     * Guard on whether the placing robot has finished moving the ball into a better
+     * position with a kick
      *
      * @param event the BallPlacementPlayFSM Update event
      *
@@ -80,10 +82,11 @@ struct BallPlacementPlayFSM
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *StartState_S + Update_E [shouldKickOffWall_G] = KickOffWallState_S,
-            *StartState_S + Update_E [!shouldKickOffWall_G] = PlaceBallState_S,
-            KickOffWallState_S + Update_E [!kickDone_G] / kickOffWall_A = KickOffWallState_S,
-            KickOffWallState_S + Update_E [kickDone_G] = StartState_S,
+            *StartState_S + Update_E[shouldKickOffWall_G]  = KickOffWallState_S,
+            *StartState_S + Update_E[!shouldKickOffWall_G] = PlaceBallState_S,
+            KickOffWallState_S + Update_E[!kickDone_G] / kickOffWall_A =
+                KickOffWallState_S,
+            KickOffWallState_S + Update_E[kickDone_G] = StartState_S,
             PlaceBallState_S + Update_E / placeBall_A = PlaceBallState_S);
     }
 
