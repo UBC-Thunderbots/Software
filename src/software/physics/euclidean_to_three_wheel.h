@@ -2,8 +2,8 @@
 
 #include <Eigen/Dense>
 
-#include "shared/robot_constants.h"
 #include "euclidean_to_wheel.h"
+#include "shared/robot_constants.h"
 
 /**
  * Vector representation of the robot wheel space.
@@ -14,10 +14,9 @@
  */
 typedef Eigen::Vector3d ThreeWheelSpace_t;
 
-// TODO: Update
-static constexpr int FRONT_WHEEL_SPACE_INDEX = 0;
-static constexpr int LEFT_WHEEL_SPACE_INDEX  = 1;
-static constexpr int RIGHT_WHEEL_SPACE_INDEX = 2;
+static constexpr int FRONT_THREE_WHEEL_SPACE_INDEX = 0;
+static constexpr int LEFT_THREE_WHEEL_SPACE_INDEX  = 1;
+static constexpr int RIGHT_THREE_WHEEL_SPACE_INDEX = 2;
 
 class EuclideanToThreeWheel
 {
@@ -37,7 +36,7 @@ class EuclideanToThreeWheel
      * @param euclidean_velocity The Euclidean velocity.
      * @return The equivalent wheel speeds.
      */
-    ThreeWheelSpace_t getWheelVelocity(const EuclideanSpace_t& euclidean_velocity) const;
+    ThreeWheelSpace_t getWheelVelocity(const EuclideanSpace_t &euclidean_velocity) const;
 
     /**
      * Gets the Euclidean velocity from the wheel velocity.
