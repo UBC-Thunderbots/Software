@@ -7,7 +7,7 @@
 #include "proto/tbots_software_msgs.pb.h"
 #include "shared/robot_constants.h"
 #include "software/jetson_nano/gpio.h"
-#include "software/physics/euclidean_to_wheel.h"
+#include "software/physics/euclidean_to_three_wheel.h"
 
 class MotorService
 {
@@ -19,7 +19,7 @@ class MotorService
      * @param RobotConstants_t The robot constants
      * @param control_loop_frequency_hz The frequency the main loop will call poll at
      */
-    MotorService(const RobotConstants_t& robot_constants, int control_loop_frequency_hz);
+    MotorService(const RobotConstants_t& robot_constants, int control_loop_frequency_hz, int num_motors=4);
 
     virtual ~MotorService();
 
@@ -162,7 +162,7 @@ class MotorService
      * @param time_to_ramp The time allocated for acceleration in seconds
      *
      */
-    WheelSpace_t rampWheelVelocity(const WheelSpace_t& current_wheel_velocity,
+    ThreeWheelSpace_t rampWheelVelocity(const ThreeWheelSpace_t& current_wheel_velocity,
                                    const EuclideanSpace_t& target_euclidean_velocity,
                                    double max_allowable_wheel_velocity,
                                    double allowed_acceleration,
@@ -214,9 +214,11 @@ class MotorService
     std::unordered_map<int, int> file_descriptors;
 
     // Drive Motors
-    EuclideanToWheel euclidean_to_four_wheel;
+    EuclideanToThreeWheel euclidean_to_three_wheel;
     std::unordered_map<int, bool> encoder_calibrated_;
 
     // Previous wheel velocities
-    WheelSpace_t prev_wheel_velocities;
+    ThreeWheelSpace_t prev_wheel_velocities;
+
+    int num_drive_motors;
 };
