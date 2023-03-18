@@ -41,12 +41,12 @@ class ThreadSafeBuffer(object):
 
         If the buffer is empty:
 
-            - If block is True,
+            - If block is True
                 - wait until a new msg is received.
                 - If a timeout is supplied, wait for timeout seconds
                 - Then throw an error, or return cached message if return_cached is True
 
-            - If block is False,
+            - If block is False
                 - Return None if return_cached is False
                 - Return cached message if return_cached is True
 
