@@ -152,10 +152,15 @@ void HRVOSimulator::doStep(Duration time_step)
 
 void HRVOSimulator::visualize(unsigned int robot_id, TeamColour friendly_team_colour)
 {
+    if (robots.empty())
+    {
+        return;
+    }
+
     auto friendly_robot = robots.find(robot_id);
     if (friendly_robot == robots.end())
     {
-        LOG(WARNING) << "Attempt to visualize untracked robot";
+        LOG(WARNING) << "Attempt to visualize untracked robot with id " << robot_id;
         return;
     }
 
