@@ -461,7 +461,7 @@ def load_command_line_arguments():
         "--show_gamecontroller_logs",
         action="store_true",
         default=False,
-        help="How many packets to buffer while rendering",
+        help="Show gamecontroller logs",
     )
     parser.add_argument(
         "--test_filter",
