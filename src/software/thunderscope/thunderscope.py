@@ -159,6 +159,8 @@ class Thunderscope(object):
         simulationToolBar.addAction(self.pauseSim)
         self.pauseSim.setShortcut("Ctrl+Space")
 
+        simulationToolBar.setFixedHeight(30)
+        simulationToolBar.setIconSize(QtCore.QSize(10, 40))
         self.pauseSim.triggered.connect(self.__on_pause_simulation_clicked)
 
         # ProtoUnixIOs
@@ -377,7 +379,7 @@ class Thunderscope(object):
             )
 
     def __on_pause_simulation_clicked(self, toggle_state):
-        """ when the pause button is clicked, pause gameplay"""
+        """ when the pause button is clicked, pause gameplay """
 
         simulator_state = SimulationState(is_playing=not self.is_playing)
         self.is_playing = not self.is_playing
