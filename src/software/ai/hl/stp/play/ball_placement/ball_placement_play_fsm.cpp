@@ -13,52 +13,53 @@ void BallPlacementPlayFSM::kickOffWall(const Update &event)
     PriorityTacticVector tactics_to_run = {{}};
 
     Point ball_pos            = event.common.world.ball().position();
-    Rectangle field_boundary  = event.common.world.field().fieldBoundary();
-    AutoChipOrKick auto_chick = {AutoChipOrKickMode::AUTOKICK, 0.5};
+    Rectangle field_lines     = event.common.world.field().fieldLines();
+    double kick_speed         = 3;
+    AutoChipOrKick auto_chick = {AutoChipOrKickMode::AUTOKICK, kick_speed};
 
     Angle kick_angle;
-    if (ball_pos.x() > field_boundary.xMax())
+    if (ball_pos.x() > field_lines.xMax())
     {
         if (ball_pos.y() > 0)
         {
-            kick_angle.fromDegrees(-45);
+            kick_angle = Angle::fromDegrees(-45);
         }
         else
         {
-            kick_angle.fromDegrees(45);
+            kick_angle = Angle::fromDegrees(45);
         }
     }
-    else if (ball_pos.x() < field_boundary.xMin())
+    else if (ball_pos.x() < field_lines.xMin())
     {
         if (ball_pos.y() > 0)
         {
-            kick_angle.fromDegrees(-135);
+            kick_angle = Angle::fromDegrees(-135);
         }
         else
         {
-            kick_angle.fromDegrees(-135);
+            kick_angle = Angle::fromDegrees(-135);
         }
     }
-    else if (ball_pos.y() > field_boundary.yMax())
+    else if (ball_pos.y() > field_lines.yMax())
     {
         if (ball_pos.x() > 0)
         {
-            kick_angle.fromDegrees(135);
+            kick_angle = Angle::fromDegrees(135);
         }
         else
         {
-            kick_angle.fromDegrees(45);
+            kick_angle = Angle::fromDegrees(45);
         }
     }
-    else if (ball_pos.y() < field_boundary.yMin())
+    else if (ball_pos.y() < field_lines.yMin())
     {
         if (ball_pos.x() > 0)
         {
-            kick_angle.fromDegrees(-135);
+            kick_angle = Angle::fromDegrees(-135);
         }
         else
         {
-            kick_angle.fromDegrees(-45);
+            kick_angle = Angle::fromDegrees(-45);
         }
     }
 
@@ -108,19 +109,17 @@ void BallPlacementPlayFSM::placeBall(const Update &event)
 
 bool BallPlacementPlayFSM::shouldKickOffWall(const Update &event)
 {
-    return false;
-    //    // check if ball is too close to border
-    //    Point ball_pos = event.common.world.ball().position();
-    //    Rectangle field_lines = event.common.world.field().fieldLines();
-    //
-    //    return !contains(field_lines, ball_pos);
+    // check if ball is too close to border
+    Point ball_pos        = event.common.world.ball().position();
+    Rectangle field_lines = event.common.world.field().fieldLines();
+
+    return !contains(field_lines, ball_pos);
 }
 
 bool BallPlacementPlayFSM::kickDone(const Update &event)
 {
-    const auto ball_velocity = event.common.world.ball().velocity().length();
-    const auto ball_shot_threshold =
-        this->ai_config.shoot_or_pass_play_config().ball_shot_threshold();
+    const auto ball_velocity   = event.common.world.ball().velocity().length();
+    double ball_shot_threshold = 1;
 
     return ball_velocity > ball_shot_threshold;
 }
