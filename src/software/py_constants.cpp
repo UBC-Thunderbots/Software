@@ -61,6 +61,7 @@ PYBIND11_MODULE(py_constants, m)
         DYNAMIC_PARAMETER_UPDATE_REQUEST_PATH;
     m.attr("DYNAMIC_PARAMETER_UPDATE_RESPONSE_PATH") =
         DYNAMIC_PARAMETER_UPDATE_RESPONSE_PATH;
+    m.attr("WORLD_STATE_RECEIVED_TRIGGER_PATH") = WORLD_STATE_RECEIVED_TRIGGER_PATH;
 
     // Multicast Channels
     m.def("getRobotMulticastChannel", [](py::args& args) {
