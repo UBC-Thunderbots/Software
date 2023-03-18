@@ -64,7 +64,9 @@ class RobotCommunication(object):
         )
 
         self.send_estop_state_thread = threading.Thread(target=self.__send_estop_state)
-        self.run_thread = threading.Thread(target=self.run)
+        self.run_world_thread = threading.Thread(target=self.run_world)
+        self.run_primitive_set_thread = threading.Thread(target=self.run_primitive_set)
+
 
         # only checks for estop if checking is not disabled
         if not self.disable_estop:
@@ -83,17 +85,28 @@ class RobotCommunication(object):
                 )
             time.sleep(0.1)
 
-    def run(self):
-        """Forward World and PrimitiveSet protos from fullsystem to the robots.
+    def run_world(self):
+        """
+        Forward World protos from fullsystem to the robots
+        Blocks if no world is available and does not return a cached world
+        :return:
+        """
+        while True:
+            world = self.world_buffer.get(block=True, return_cached=False)
+
+            # send the world proto
+            self.send_world.send_proto(world)
+
+    def run_primitive_set(self):
+        """Forward PrimitiveSet protos from fullsystem to the robots.
+
+        For AI protos, blocks for 10ms if no proto is available, and then returns a cached proto
+
+        For Diagnostics protos, does not blocks and returns cached message is none available
+        Sleeps for 10ms for diagnostics
 
         If the emergency stop is tripped, the PrimitiveSet will not be sent so
         that the robots timeout and stop.
-
-        NOTE: If disconnect_fullsystem_from_robots is called, then the packets
-        will not be forwarded to the robots.
-
-        send_override_primitive_set can be used to send a primitive set, which
-        is useful to dip in and out of robot diagnostics.
 
         """
         while True:
@@ -102,13 +115,8 @@ class RobotCommunication(object):
 
             # fullsystem is running, so world data is being received
             if self.robots_connected_to_fullsystem:
-                world = self.world_buffer.get(block=True)
-
-                # send the world proto
-                self.send_world.send_proto(world)
-
                 # Get the primitives
-                primitive_set = self.primitive_buffer.get(block=False)
+                primitive_set = self.primitive_buffer.get(block=True, timeout=0.01)
 
                 robot_primitives = dict(primitive_set.robot_primitives)
 
@@ -147,7 +155,9 @@ class RobotCommunication(object):
                 self.last_time = primitive_set.time_sent.epoch_timestamp_seconds
                 self.send_primitive_set.send_proto(primitive_set)
 
-            time.sleep(0.01)
+            # sleep if not running fullsystem
+            if not self.robots_connected_to_fullsystem:
+                time.sleep(0.01)
 
     def toggle_robot_connection(self, mode, robot_id):
         """
@@ -212,7 +222,8 @@ class RobotCommunication(object):
         )
 
         self.send_estop_state_thread.start()
-        self.run_thread.start()
+        self.run_world_thread.start()
+        self.run_primitive_set_thread.start()
 
         return self
 

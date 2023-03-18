@@ -65,14 +65,17 @@ class ThreadSafeBuffer(object):
             self.last_logged_protos_dropped = self.protos_dropped
 
         if block:
-            return self.queue.get(timeout=timeout)
-
-        try:
-            self.cached_msg = self.queue.get_nowait()
-
-        except queue.Empty as empty:
-            if not return_cached:
-                return None
+            try:
+                self.cached_msg = self.queue.get(timeout=timeout)
+            except queue.Empty as empty:
+                if not return_cached:
+                    raise empty
+        else:
+            try:
+                self.cached_msg = self.queue.get_nowait()
+            except queue.Empty as empty:
+                if not return_cached:
+                    return None
 
         return self.cached_msg
 
