@@ -48,6 +48,15 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "log_merger_test",
+    srcs = ["log_merger_test.cpp"],
+    deps = [
+        ":log_merger",
+        "//shared/test_util:tbots_gtest_main",
+    ],
+)
+
 cc_library(
     name = "coloured_cout_sink",
     srcs = [

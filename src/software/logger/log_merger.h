@@ -20,9 +20,14 @@ class LogMerger {
         */
         std::list<std::string> log(std::string msg);
 
-    private:
+        /**
+         * Adds LOG_MERGE_DURATION amount of time to the merger's currently tracked time. Used for testing
+        */
+        void passTime();
+
         const std::chrono::_V2::system_clock::duration LOG_MERGE_DURATION = std::chrono::seconds(2);
 
+    private:
         /**
          * Looks through the message list for expired messages, removes them from the list and map, and returns them as strings
         */
@@ -45,4 +50,6 @@ class LogMerger {
 
         std::unordered_map<std::string, int> repeat_map; // maps message strings to their number of repeats
         std::list<Message> message_list; // used to keep track of time order for messages
+
+        std::chrono::_V2::system_clock::duration passed_time; // for testing, time passed manually
 };
