@@ -51,14 +51,13 @@ TEST_F(DefensePlayTest, test_defense_play)
             auto tr = world_ptr->field().friendlyDefenseArea().posXPosYCorner();
 
             // Bottom right point of friendly defense area.
-            auto br = world_ptr->field().friendlyDefenseArea().posXNegYCorner();
+            auto br     = world_ptr->field().friendlyDefenseArea().posXNegYCorner();
             auto centre = world_ptr->field().friendlyDefenseArea().centre();
 
-            // add an x-offset to the B-R point, to make a vertical rectangle beside the defense area.
-            Rectangle crease_defense_area(
-                    Point(tr.x(), tr.y()),
-                    Point(br.x() + 0.25, centre.y())
-                    );
+            // add an x-offset to the B-R point, to make a vertical rectangle beside the
+            // defense area.
+            Rectangle crease_defense_area(Point(tr.x(), tr.y()),
+                                          Point(br.x() + 0.25, centre.y()));
 
             robotInPolygon(crease_defense_area, 2, world_ptr, yield);
         }};

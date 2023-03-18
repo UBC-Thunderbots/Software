@@ -69,7 +69,8 @@ std::vector<RobotId> HRVOAgent::computeNeighbors(
     // Only consider agents within this distance away from our position
     Point current_destination = path.getCurrentPathPoint()->getPosition();
     double dist_to_obstacle_threshold_squared =
-        std::min(std::pow(MAX_NEIGHBOR_SEARCH_DIST, 2), (position - current_destination).lengthSquared());
+        std::min(std::pow(MAX_NEIGHBOR_SEARCH_DIST, 2),
+                 (position - current_destination).lengthSquared());
 
     auto compare = [&](const std::pair<RobotId, Point> &r1,
                        const std::pair<RobotId, Point> &r2) {
