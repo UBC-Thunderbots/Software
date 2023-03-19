@@ -1,55 +1,67 @@
 #pragma once
-#include <string>
-#include <unordered_map>
 #include <chrono>
 #include <list>
+#include <string>
+#include <unordered_map>
 
 /**
  * Handles merging repeated log messages into a single message
-*/
-class LogMerger {
-    public:
-        /**
-         * Creates a merger to hold repeated log messages
-        */
-        LogMerger();
+ */
+class LogMerger
+{
+   public:
+    /**
+     * Creates a merger to hold repeated log messages
+     */
+    LogMerger();
 
-        /**
-         * Returns a list of all strings that should be logged at the current time, starting with the given string (if it isn't a repeat)
-         * @param msg The string to be logged
-        */
-        std::list<std::string> log(std::string msg);
+    /**
+     * Returns a list of all strings that should be logged at the current time, starting
+     * with the given string (if it isn't a repeat)
+     * @param msg The string to be logged
+     */
+    std::list<std::string> log(std::string msg);
 
-        /**
-         * Adds LOG_MERGE_DURATION amount of time to the merger's currently tracked time. Used for testing
-        */
-        void passTime();
+    /**
+     * Adds LOG_MERGE_DURATION amount of time to the merger's currently tracked time. Used
+     * for testing
+     */
+    void pastime();
 
-        const std::chrono::_V2::system_clock::duration LOG_MERGE_DURATION = std::chrono::seconds(2);
+    const std::chrono::_V2::system_clock::duration LOG_MERGE_DURATION =
+        std::chrono::seconds(2);
 
-    private:
-        /**
-         * Looks through the message list for expired messages, removes them from the list and map, and returns them as strings
-        */
-        std::list<std::string> getOldMessages(std::chrono::_V2::system_clock::time_point current_time);
+   private:
+    /**
+     * Looks through the message list for expired messages, removes them from the list and
+     * map, and returns them as strings
+     */
+    std::list<std::string> getOldMessages(
+        std::chrono::_V2::system_clock::time_point current_time);
 
-        /**
-         * Add number of repeats to a message
-        */
-        std::string addRepeats(std::string msg, int repeats);
+    /**
+     * Add number of repeats to a message
+     */
+    std::string addRepeats(std::string msg, int repeats);
 
-        /**
-         * Stores messages and the time they were first seen within the last few seconds
-        */
-        struct Message {
-            std::string message;
-            std::chrono::_V2::system_clock::time_point timestamp;
+    /**
+     * Stores messages and the time they were first seen within the last few seconds
+     */
+    struct Message
+    {
+        std::string message;
+        std::chrono::_V2::system_clock::time_point timestamp;
 
-            Message(std::string message, std::chrono::_V2::system_clock::time_point timestamp) : message(message), timestamp(timestamp) {}
-        };
+        Message(std::string message, std::chrono::_V2::system_clock::time_point timestamp)
+            : message(message), timestamp(timestamp)
+        {
+        }
+    };
 
-        std::unordered_map<std::string, int> repeat_map; // maps message strings to their number of repeats
-        std::list<Message> message_list; // used to keep track of time order for messages
+    std::unordered_map<std::string, int>
+        repeat_map;                   // maps message strings to their number of repeats
+    std::list<Message> message_list;  // used to keep track of time order for messages
 
-        std::chrono::_V2::system_clock::duration passed_time; // for testing, time passed manually
+    std::chrono::_V2::system_clock::duration
+        passed_time;  // for testing, time passed manually
 };

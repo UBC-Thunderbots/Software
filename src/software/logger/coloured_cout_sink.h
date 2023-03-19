@@ -2,6 +2,7 @@
 #include <g3log/logmessage.hpp>
 #include <iostream>
 
+#include "software/logger/log_merger.h"
 #include "software/util/make_enum/make_enum.h"
 
 MAKE_ENUM(FG_Colour, YELLOW, RED, GREEN, WHITE);
@@ -35,9 +36,6 @@ class ColouredCoutSink
      */
     void displayColouredLog(g3::LogMessageMover log_entry);
 
-    std::chrono::_V2::system_clock::duration LOG_INTERVAL_TIMESTAMP =
-        std::chrono::nanoseconds(2 * 1000000000);
-
    private:
     /**
      * Gets the Colour associated with this log level
@@ -58,7 +56,5 @@ class ColouredCoutSink
      */
     bool print_detailed;
 
-    std::string last_msg;
-    std::chrono::_V2::system_clock::time_point last_msg_timestamp;
-    int num_repeats;
+    LogMerger merger;
 };

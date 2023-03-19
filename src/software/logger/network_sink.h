@@ -4,6 +4,7 @@
 #include <iostream>
 
 #include "proto/robot_log_msg.pb.h"
+#include "software/logger/log_merger.h"
 #include "software/networking/threaded_proto_udp_sender.hpp"
 
 
@@ -39,7 +40,5 @@ class NetworkSink
     std::unique_ptr<ThreadedProtoUdpSender<TbotsProto::RobotLog>> log_output;
     int robot_id;
 
-    std::string last_msg;
-    std::chrono::_V2::system_clock::time_point last_msg_timestamp;
-    int num_repeats;
+    LogMerger merger;
 };

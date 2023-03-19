@@ -19,6 +19,7 @@ cc_library(
     deps = [
         ":coloured_cout_sink",
         ":csv_sink",
+        ":log_merger",
         ":protobuf_sink",
         "@g3log",
         "@g3sinks",
@@ -67,6 +68,7 @@ cc_library(
         "custom_logging_levels.h",
     ],
     deps = [
+        ":log_merger",
         "//software/util/make_enum",
         "@g3log",
     ],
@@ -105,6 +107,7 @@ cc_library(
         "network_sink.h",
     ],
     deps = [
+        ":log_merger",
         "//proto:tbots_cc_proto",
         "//shared:constants",
         "//software/networking:threaded_proto_udp_sender",

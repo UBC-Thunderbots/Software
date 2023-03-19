@@ -2,14 +2,16 @@
 
 LogMerger::LogMerger() : passed_time(std::chrono::seconds(0)) {}
 
-std::list<std::string> LogMerger::log(std::string msg) {
+std::list<std::string> LogMerger::log(std::string msg)
+{
     std::chrono::_V2::system_clock::time_point current_time =
         std::chrono::system_clock::now();
     // add passed time from testing
     current_time += passed_time;
     std::list<std::string> messages = getOldMessages(current_time);
 
-    if (repeat_map.count(msg)) {
+    if (repeat_map.count(msg))
+    {
         // msg is in the repeat map, add a repeat and return the old messages
         repeat_map[msg]++;
         return messages;
@@ -23,17 +25,24 @@ std::list<std::string> LogMerger::log(std::string msg) {
     return messages;
 }
 
-std::list<std::string> LogMerger::getOldMessages(std::chrono::_V2::system_clock::time_point current_time) {
+std::list<std::string> LogMerger::getOldMessages(
+    std::chrono::_V2::system_clock::time_point current_time)
+{
     std::list<std::string> result;
-    while (message_list.size() > 0) {
+    while (message_list.size() > 0)
+    {
         Message currentMessage = message_list.front();
-        if (current_time - LOG_MERGE_DURATION >= currentMessage.timestamp && repeat_map[currentMessage.message] > 0) {
+        if (current_time - LOG_MERGE_DURATION >= currentMessage.timestamp &&
+            repeat_map[currentMessage.message] > 0)
+        {
             // old message w/ at least 1 repeat
             std::string currentString = currentMessage.message;
             result.push_back(addRepeats(currentString, repeat_map[currentString]));
             repeat_map.erase(currentString);
             message_list.pop_front();
-        } else {
+        }
+        else
+        {
             // new message, rest of list is new
             break;
         }
@@ -41,7 +50,8 @@ std::list<std::string> LogMerger::getOldMessages(std::chrono::_V2::system_clock:
     return result;
 }
 
-std::string LogMerger::addRepeats(std::string msg, int repeats) {
+std::string LogMerger::addRepeats(std::string msg, int repeats)
+{
     // remove newline from end of message
     if (msg.back() == '\n')
     {
@@ -55,6 +65,7 @@ std::string LogMerger::addRepeats(std::string msg, int repeats) {
     return msg;
 }
 
-void LogMerger::passTime() {
+void LogMerger::pastime()
+{
     passed_time += LOG_MERGE_DURATION;
 }

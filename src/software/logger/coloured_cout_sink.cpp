@@ -2,9 +2,9 @@
 
 #include "software/logger/custom_logging_levels.h"
 
-ColouredCoutSink::ColouredCoutSink(bool print_detailed) : print_detailed(print_detailed)
+ColouredCoutSink::ColouredCoutSink(bool print_detailed)
+    : print_detailed(print_detailed), merger(LogMerger())
 {
-    num_repeats = 0;
 }
 
 std::string ColouredCoutSink::colourToString(const FG_Colour colour)
@@ -62,41 +62,20 @@ void ColouredCoutSink::displayColouredLog(g3::LogMessageMover log_entry)
         return;
     }
 
-    std::chrono::_V2::system_clock::time_point current_time =
-        std::chrono::system_clock::now();
-    bool past_time = current_time - LOG_INTERVAL_TIMESTAMP < last_msg_timestamp;
-    if (log_entry.get().message() == last_msg && past_time)
-    {
-        // repeated message outside timestamp, increase repeats and don't log
-        num_repeats++;
-        return;
-    }
-
-    // log and save info
-    last_msg           = log_entry.get().message();
-    last_msg_timestamp = current_time;
-
-    // remove newline from end of message
-    if (log_entry.get()._message.back() == '\n')
-    {
-        log_entry.get()._message.pop_back();
-    }
-
-    if (num_repeats > 1)
-    {
-        log_entry.get()._message += " (" + std::to_string(num_repeats) + " repeats)";
-    }
-
     std::ostringstream oss;
     if (print_detailed)
     {
-        oss << "\033[" << colour << "m" << log_entry.get().toString() << "\n\033[m";
+        // detailed messages have timing data, do not merge
+        oss << "\033[" << colour << "m" << log_entry.get().toString() << "\033[m";
     }
     else
     {
-        oss << "\033[" << colour << "m" << log_entry.get().message() << "\n\n\033[m";
+        std::list<std::string> logs = merger.log(log_entry.get().message());
+        for (std::string msg : logs)
+        {
+            oss << "\033[" << colour << "m" << msg << "\n\033[m";
+        }
     }
     std::cout << oss.str() << std::flush;
     resetColour();
-    num_repeats = 1;
 }
