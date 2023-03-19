@@ -64,6 +64,12 @@ class RobotViewComponent(QWidget):
         self.robot_status.toggle_visibility()
 
     def update(self, robot_status):
+        """
+        Updates the Robot View Components with the new robot status message
+        Updates the robot info widget and, if initialized, the robot status widget as well
+        
+        :param robot_status: the new message data to update the widget with
+        """
         self.robot_info.update(robot_status.power_status, robot_status.error_code)
         if self.robot_status:
             self.robot_status.update(robot_status)
