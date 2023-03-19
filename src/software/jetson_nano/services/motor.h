@@ -105,6 +105,16 @@ class MotorService
                                    double allowed_acceleration,
                                    const double& time_to_ramp);
 
+    /**
+     * Log the driver fault in a human readable log msg
+     *
+     * @param motor The motor to log the status for
+     * @return bool true if faulted
+     */
+    bool checkDriverFault(uint8_t motor);
+
+    void setUpDriveMotor(uint8_t motor);
+
     void writeIntToTMC4671(uint8_t motor, uint8_t address, int32_t value);
     int readIntFromTMC4671(uint8_t motor, uint8_t address);
     double readVelocityFromTMC4671(uint8_t motor);
@@ -190,14 +200,6 @@ class MotorService
     uint8_t readWriteByte(uint8_t motor, uint8_t data, uint8_t last_transfer,
                           uint32_t spi_speed);
 
-
-    /**
-     * Log the driver fault in a human readable log msg
-     *
-     * @param motor The motor to log the status for
-     * @return bool true if faulted
-     */
-    bool checkDriverFault(uint8_t motor);
 
     // Select between driver and controller gpio
     Gpio spi_demux_select_0;

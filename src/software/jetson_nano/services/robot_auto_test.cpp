@@ -54,6 +54,18 @@ class RobotAutoTestFixture : public testing::Test
 
 TEST_F(RobotAutoTestFixture, TestFrontRightMotorVelocity) {
 
+    // 1. Check driver fault, make the function public
+    motor_service_->checkDriverFault(FRONT_RIGHT_MOTOR_CHIP_SELECT);
+
+    // 2. Put some log messages for motor calibration
+    motor_service_->startEncoderCalibration(FRONT_RIGHT_MOTOR_CHIP_SELECT);
+    LOG(INFO) << "Starting motor encoder calibration";
+    motor_service_->endEncoderCalibration(FRONT_RIGHT_MOTOR_CHIP_SELECT);
+    LOG(INFO) << "Ending motor encoder calibration";
+
+    // 3. Abstract out drive motor setup into a function
+    motor_service_->setUpDriveMotor(FRONT_RIGHT_MOTOR_CHIP_SELECT);
+
     WheelSpace_t prev_wheel_velocities = {0.0, 0.0, 0.0, 0.0};
     WheelSpace_t target_wheel_velocities = {0.0, 0.0, 0.0, 0.0};
     EuclideanSpace_t target_linear_velocity  = {0.5, 0.5, 0.0};
@@ -76,7 +88,12 @@ TEST_F(RobotAutoTestFixture, TestFrontRightMotorVelocity) {
         LOG(INFO) << target_wheel_velocities[FRONT_RIGHT_WHEEL_SPACE_INDEX] << "Target wheel velocity";
         LOG(INFO) << front_right_velocity << "Actual wheel velocity read";
 
+        // 4. Make the threshold more lenient for expect equal double
         //EXPECT_DOUBLE_EQ(front_right_velocity, target_wheel_velocities[FRONT_RIGHT_WHEEL_SPACE_INDEX]);
+        EXPECT_NEAR(front_right_velocity, target_wheel_velocities[FRONT_RIGHT_WHEEL_SPACE_INDEX], 0.01);
+
+        // 5. Check driver faults again after making updates to motor
+        motor_service_->checkDriverFault(FRONT_RIGHT_MOTOR_CHIP_SELECT);
     }
 
     // reset the motor velocity

@@ -164,11 +164,7 @@ void MotorService::setUpMotors()
     // Drive Motor Setup
     for (uint8_t motor = 0; motor < NUM_DRIVE_MOTORS; motor++)
     {
-        startDriver(motor);
-        checkDriverFault(motor);
-        // Start all the controllers as drive motor controllers
-        startController(motor, false);
-        tmc4671_setTargetVelocity(motor, 0);
+        setUpDriveMotor(motor);
     }
 
     // Dribbler Motor Setup
@@ -178,6 +174,13 @@ void MotorService::setUpMotors()
     tmc4671_setTargetVelocity(DRIBBLER_MOTOR_CHIP_SELECT, 0);
 }
 
+void MotorService::setUpDriveMotor(uint8_t motor) {
+    startDriver(motor);
+    checkDriverFault(motor);
+    // Start all the controllers as drive motor controllers
+    startController(motor, false);
+    tmc4671_setTargetVelocity(motor, 0);
+}
 
 bool MotorService::checkDriverFault(uint8_t motor)
 {
