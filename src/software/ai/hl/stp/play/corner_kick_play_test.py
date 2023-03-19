@@ -11,7 +11,7 @@ from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
 
 
-def corner_kick_test_setup(ball_and_bots_pos, simulated_test_runner):
+def corner_kick_play_test_setup(ball_and_bots_pos, simulated_test_runner):
     """
         Setup for Corner Kick Play Test
         :param ball_and_bots_pos: object
@@ -69,11 +69,13 @@ def corner_kick_test_setup(ball_and_bots_pos, simulated_test_runner):
     )
 
 
-def test_corner_kick_play(simulated_test_runner):
+def test_corner_kick_play_bottom_left(simulated_test_runner):
     # TODO- #2781 Validation
     # TODO- #2781 Validation
     simulated_test_runner.run_test(
-        setup=lambda runner=simulated_test_runner: corner_kick_test_setup(simulated_test_runner),
+        setup=lambda ball_and_bots_pos: corner_kick_play_test_setup(
+            ball_and_bots_pos, simulated_test_runner
+        ),
         params=[
             {
                 "ball_initial_pos": tbots.Point(4.5, -3),
@@ -84,8 +86,24 @@ def test_corner_kick_play(simulated_test_runner):
                     tbots.Point(-3, -0.5),
                     tbots.Point(-3, -1.5),
                     tbots.Point(4.6, -3.1),
-                ]
-            },
+                ],
+            }
+        ],
+        inv_always_validation_sequence_set=[[]],
+        inv_eventually_validation_sequence_set=[[]],
+        ag_always_validation_sequence_set=[[]],
+        ag_eventually_validation_sequence_set=[[]],
+        test_timeout_s=10,
+    )
+
+
+def test_corner_kick_play_top_right(simulated_test_runner):
+    # TODO- #2781 Validation
+    simulated_test_runner.run_test(
+        setup=lambda ball_and_bots_pos, runner=simulated_test_runner: corner_kick_play_test_setup(
+            ball_and_bots_pos, simulated_test_runner
+        ),
+        params=[
             {
                 "ball_initial_pos": tbots.Point(4.5, 3),
                 "blue_bots": [
@@ -95,7 +113,7 @@ def test_corner_kick_play(simulated_test_runner):
                     tbots.Point(0, -0.5),
                     tbots.Point(0, -1.5),
                     tbots.Point(4.6, 3.1),
-                ]
+                ],
             }
         ],
         inv_always_validation_sequence_set=[[]],
@@ -104,6 +122,9 @@ def test_corner_kick_play(simulated_test_runner):
         ag_eventually_validation_sequence_set=[[]],
         test_timeout_s=10,
     )
+
+
+corner_kick_play_test_setup.__test__ = False
 
 
 if __name__ == "__main__":
