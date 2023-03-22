@@ -66,8 +66,8 @@ class RobotEntersRegionAndStops(RobotEntersRegion):
             for robot in world.friendly_team.team_robots:
                 if robot.id == self.robot_id:
                     if math.hypot(
-                            robot.current_state.global_velocity.x_component_meters,
-                            robot.current_state.global_velocity.y_component_meters,
+                        robot.current_state.global_velocity.x_component_meters,
+                        robot.current_state.global_velocity.y_component_meters,
                     ) < math.pow(10, -2):
                         self.ticks_so_far = self.ticks_so_far + 1
                         if self.ticks_so_far >= self.num_ticks:
