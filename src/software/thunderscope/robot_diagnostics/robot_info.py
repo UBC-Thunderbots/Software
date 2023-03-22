@@ -2,6 +2,7 @@ import pyqtgraph as pg
 from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtWidgets import *
 from software.py_constants import *
+from typing import List
 from proto.import_all_protos import *
 import software.thunderscope.common.common_widgets as common_widgets
 from software.thunderscope.constants import *
@@ -15,13 +16,18 @@ class RobotInfo(QWidget):
 
     toggle_one_connection_signal = QtCore.pyqtSignal(int, int)
 
-    def __init__(self, robot_id, load_fullsystem, control_mode_signal):
+    def __init__(
+        self,
+        robot_id,
+        available_control_modes: List[IndividualRobotMode],
+        control_mode_signal,
+    ):
         """
         Initialize a single robot's info widget
 
         :param robot_id: id of robot whose info is being displayed
-        :param load_fullsystem: whether fullsystem is loaded currently
-                                Shows / Hides AI option from control mode menu accordingly
+        :param available_control_modes: the currently available input modes for the robots
+                                        according to what mode thunderscope is run in
         :param control_mode_signal: signal that should be emitted when a robot changes control mode
         """
 
@@ -58,14 +64,19 @@ class RobotInfo(QWidget):
 
         # Control mode dropdown
         self.control_mode_layout = QHBoxLayout()
-        self.control_mode_menu = self.create_control_mode_menu(load_fullsystem)
+        self.control_mode_menu = self.create_control_mode_menu(available_control_modes)
+
+        # Robot Status expand button
+        self.robot_status_expand = self.create_robot_status_expand_button()
 
         # Breakbeam status
         self.breakbeam_label = QLabel()
         self.breakbeam_label.setText("BREAKBEAM")
         self.breakbeam_label.setStyleSheet("background-color: grey")
+
         self.control_mode_layout.addWidget(self.breakbeam_label)
         self.control_mode_layout.addWidget(self.control_mode_menu)
+        self.control_mode_layout.addWidget(self.robot_status_expand)
 
         self.status_layout.addLayout(self.control_mode_layout)
 
@@ -78,26 +89,40 @@ class RobotInfo(QWidget):
 
         self.setLayout(self.layout)
 
-    def create_control_mode_menu(self, load_fullsystem):
+    def create_robot_status_expand_button(self):
+        """
+        Creates the button to expand / collapse the robot status view
+        :return: QPushButton object
+        """
+        button = QPushButton()
+        button.setCheckable(True)
+        button.setText("INFO")
+        return button
+
+    def create_control_mode_menu(
+        self, available_control_modes: List[IndividualRobotMode]
+    ):
         """
         Creates the drop down menu to select the input for each robot
         :param robot_id: the id of the robot this menu belongs to
-        :param load_fullsystem: whether fullsystem is also an option
+        :param available_control_modes: the currently available input modes for the robots
+                                        according to what mode thunderscope is run in
         :return: QComboBox object
         """
         control_mode_menu = QComboBox()
 
         control_mode_menu.addItems(
-            [
-                common_widgets.IndividualRobotMode.NONE.name,
-                common_widgets.IndividualRobotMode.MANUAL.name,
-            ]
+            [control_mode.name for control_mode in available_control_modes]
         )
-        control_mode_menu.setCurrentIndex(0)
 
-        if load_fullsystem:
-            control_mode_menu.addItem(common_widgets.IndividualRobotMode.AI.name)
-            control_mode_menu.setCurrentIndex(2)
+        if IndividualRobotMode.AI in available_control_modes:
+            control_mode_menu.setCurrentIndex(
+                control_mode_menu.findText(IndividualRobotMode.AI.name)
+            )
+        else:
+            control_mode_menu.setCurrentIndex(
+                control_mode_menu.findText(IndividualRobotMode.NONE.name)
+            )
 
         control_mode_menu.currentIndexChanged.connect(
             lambda mode, robot_id=self.robot_id: self.control_mode_signal.emit(
