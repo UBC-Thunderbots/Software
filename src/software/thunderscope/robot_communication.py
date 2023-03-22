@@ -1,6 +1,6 @@
 from software.py_constants import *
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
-from software.thunderscope.common.common_widgets import IndividualRobotMode
+from software.thunderscope.constants import IndividualRobotMode
 from software.python_bindings import *
 from proto.import_all_protos import *
 from pyqtgraph.Qt import QtCore
@@ -82,7 +82,7 @@ class RobotCommunication(object):
                 self.current_proto_unix_io.send_proto(
                     EstopState, EstopState(is_playing=self.estop_reader.isEstopPlay())
                 )
-            time.sleep(0.1)
+                time.sleep(0.1)
 
     def run_world(self):
         """
@@ -152,7 +152,14 @@ class RobotCommunication(object):
 
             self.sequence_number += 1
 
-            if not self.disable_estop and self.estop_reader.isEstopPlay():
+            if (
+                not self.disable_estop
+                and self.estop_reader.isEstopPlay()
+                and (
+                    self.robots_connected_to_fullsystem
+                    or self.robots_connected_to_manual
+                )
+            ):
                 self.last_time = primitive_set.time_sent.epoch_timestamp_seconds
                 self.send_primitive_set.send_proto(primitive_set)
 
