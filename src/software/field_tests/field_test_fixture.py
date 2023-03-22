@@ -92,6 +92,7 @@ class FieldTestRunner(TbotsTestRunner):
             logger.info(f"blue team ids {self.friendly_robot_ids_field}")
 
             if len(self.friendly_robot_ids_field) == 0:
+                print("raising an exception",flush=True)
                 raise Exception("no friendly robots found on field")
 
         except queue.Empty as empty:
@@ -346,6 +347,7 @@ class FieldTestRunner(TbotsTestRunner):
             """
                 stop_test(PAUSE_AFTER_FAIL_DELAY_S)
                 self.last_exception = args.exc_value
+                print(args.exc_value,flush=True)
                 raise self.last_exception
 
         def __runner():
@@ -355,11 +357,6 @@ class FieldTestRunner(TbotsTestRunner):
             test_end_time = time.time() + test_timeout_s
 
             while time.time() < test_end_time:
-
-                def stop_test(delay):
-                    time.sleep(delay)
-                if self.thunderscope:
-                    self.thunderscope.close()
                 # Update the timestamp logged by the ProtoLogger
                 with self.timestamp_mutex:
                     ssl_wrapper = self.ssl_wrapper_buffer.get(block=False)
@@ -410,7 +407,7 @@ class FieldTestRunner(TbotsTestRunner):
         threading.excepthook = ex.excepthook
 
         if self.thunderscope:
-            run_sim_thread = threading.Thread(target=run_test, daemon=True)
+            run_sim_thread = threading.Thread(target=__runner, daemon=True)
             run_sim_thread.start()
             print("Showing TSCOPE",flush=True)
             self.thunderscope.show()
@@ -470,7 +467,7 @@ def field_test_initializer(
                 print("tscope enabled", flush=True)
                 tscope = Thunderscope(
                     simulator_proto_unix_io=simulator_proto_unix_io,
-                    blue_full_system_proto_unix_io=simulator_proto_unix_io,
+                    blue_full_system_proto_unix_io=blue_full_system_proto_unix_io,
                     yellow_full_system_proto_unix_io=yellow_full_system_proto_unix_io,
                     # layout_path=args.layout,
                     layout_path=None,
@@ -508,6 +505,7 @@ def field_test_initializer(
                 yellow_full_system_proto_unix_io.register_to_observe_everything(
                     yellow_logger.buffer
                 )
+                print("Z",flush=True)
                 yield runner
                 print(
                     f"\n\nTo replay this test for the blue team, go to the `src` folder and run \n./tbots.py run thunderscope --blue_log {blue_logger.log_folder}"
@@ -643,4 +641,5 @@ def field_test_runner():
     try:
         next(initializer)
     except StopIteration as e:
+        print(e,flush=True)
         raise e

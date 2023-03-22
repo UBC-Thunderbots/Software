@@ -83,7 +83,7 @@ def test_basic_rotation(field_test_runner):
 
     # current position
     world = field_test_runner.world_buffer.get(
-        block=False, timeout=WORLD_BUFFER_TIMEOUT
+        block=True, timeout=WORLD_BUFFER_TIMEOUT
     )
     robot = [robot for robot in world.friendly_team.team_robots if robot.id == id][0]
 
@@ -109,6 +109,12 @@ def test_basic_rotation(field_test_runner):
         params.assigned_tactics[id].move.CopyFrom(move_tactic)
 
         field_test_runner.set_tactics(params, True)
+        print("getting to run_test",flush=True)
+        field_test_runner.run_test(
+            always_validation_sequence_set=[[]],
+            eventually_validation_sequence_set=[[]],
+            test_timeout_s=5
+        )
 
         # validate by eye
         logger.info(f"robot set to {angle} orientation")
