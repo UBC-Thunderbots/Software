@@ -205,6 +205,15 @@ Now that you're setup, if you can run it on the command line, you can run it in 
             - To start normal gameplay from Kickoff, press "Stop", then "Kickoff" for either team and then "Normal Start".
             - To learn more about how we coordinate different RefereeCommands to start special case gameplay behaviour (PenaltyKick, CornerKick, FreeKick), look at the [SSL rule documentation](https://ssl.robocup.org/rules/).
         - In addition, you can use ctrl-click to move the ball around in the Simulator, or try changing the Play Override on the Visualizer to select specific Plays!
+    
+    - If we want to run with one AI and / or Diagnostics
+      - `./tbots.py run thunderscope_main [--run_blue | --run_yellow] [--run_diagnostics]` will start Thunderscope
+        - `[--run_blue | --run_yellow]` indicate which FullSystem to run
+        - `[--run_diagnostics]` indicates if diagnostics should be loaded as well
+      - If FullSystem is running, the robots receive input from the AI
+      - If Diagnostics is enabled, the robots can also receive input from Manual controls or XBox controls
+      - This mode allows us to test and debug the robots by setting each robot's input to be either AI, Manual Control or XBox Control
+      - Control mode for each robot can be set with each one's drop down menu in the Robot View widget
 
     - If we want to run it with real robots:
         - Open your terminal, `cd` into `Software/src` and run `ifconfig`.
