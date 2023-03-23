@@ -8,7 +8,6 @@ from software.simulated_tests.ball_enters_region import *
 from software.simulated_tests.simulated_test_fixture import (
     simulated_test_runner,
     pytest_main,
-    TestType,
 )
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
@@ -74,6 +73,8 @@ def test_shoot_or_chip_play(simulated_test_runner):
 
     simulated_test_runner.run_test(
         setup=setup,
+        # this array is just so that the test runs 5 times
+        # if needed, actual arguments can be passed in to customize each test iteration
         params=[0, 1, 2, 3, 4],
         inv_eventually_validation_sequence_set=[[]],
         inv_always_validation_sequence_set=[[]],

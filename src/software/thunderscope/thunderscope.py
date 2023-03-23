@@ -1,9 +1,9 @@
-import os
 import time
 import textwrap
 import shelve
 import signal
 import logging
+import pathlib
 
 import PyQt6
 from PyQt6.QtWebEngineWidgets import QWebEngineView
@@ -54,6 +54,10 @@ from software.thunderscope.robot_diagnostics.estop_view import EstopView
 from software.thunderscope.replay.proto_player import ProtoPlayer
 
 SAVED_LAYOUT_PATH = "/opt/tbotspython/saved_tscope_layout"
+LAYOUT_FILE_EXTENSION = "tscopelayout"
+LAST_OPENED_LAYOUT_PATH = (
+    f"{SAVED_LAYOUT_PATH}/last_opened_tscope_layout.{LAYOUT_FILE_EXTENSION}"
+)
 GAME_CONTROLLER_URL = "http://localhost:8081"
 
 
@@ -144,6 +148,9 @@ class Thunderscope(object):
 
         self.window = QtGui.QMainWindow()
         self.window.setCentralWidget(self.tabs)
+        self.window.setWindowIcon(
+            QtGui.QIcon("software/thunderscope/thunderscope-logo.png")
+        )
         self.window.setWindowTitle("Thunderscope")
 
         # ProtoUnixIOs
@@ -223,10 +230,11 @@ class Thunderscope(object):
                     
                     Mouse Shortcuts:
                     
-                    Double Click Purple Bar to pop window out
-                    Drag Purple Bar to rearrange docks
+                    Double Click Blue Bar to pop window out
+                    Drag Blue Bar to rearrange docks
                     Click items in legends to select/deselect
                     Cntrl-Click and Drag: Move ball and kick
+                    Cntrl-Space: Stop AI vs AI simulation
                     """
                 ),
             )
@@ -234,30 +242,36 @@ class Thunderscope(object):
 
     def reset_layout(self):
         """Reset the layout to the default layout"""
-
-        if os.path.exists(SAVED_LAYOUT_PATH):
-            os.remove(SAVED_LAYOUT_PATH)
-            QMessageBox.information(
-                self.window,
-                "Restart Required",
-                "Restart thunderscope to reset the layout.",
-            )
+        saved_layout_path = pathlib.Path(LAST_OPENED_LAYOUT_PATH)
+        saved_layout_path.unlink(missing_ok=True)
+        QMessageBox.information(
+            self.window,
+            "Restart Required",
+            "Restart thunderscope to reset the layout.",
+        )
 
     def save_layout(self):
         """Open a file dialog to save the layout and any other
         registered state to a file
 
         """
+        # Create a folder at SAVED_LAYOUT_PATH if it doesn't exist
+        try:
+            pathlib.Path(SAVED_LAYOUT_PATH).mkdir(exist_ok=True)
+        except FileNotFoundError:
+            logging.warning(
+                f"Could not create folder at '{SAVED_LAYOUT_PATH}' for layout files"
+            )
 
         filename, _ = QtGui.QFileDialog.getSaveFileName(
             self.window,
             "Save layout",
-            "~/dock_layout_{}.tscopelayout".format(int(time.time())),
+            f"{SAVED_LAYOUT_PATH}/dock_layout_{int(time.time())}.{LAYOUT_FILE_EXTENSION}",
             options=QFileDialog.Option.DontUseNativeDialog,
         )
 
         if not filename:
-            logging.warn("No filename selected")
+            # No layout file was selected
             return
 
         with shelve.open(filename, "c") as shelf:
@@ -267,7 +281,7 @@ class Thunderscope(object):
                 "robot_diagnostics_dock_state"
             ] = self.robot_diagnostics_dock_area.saveState()
 
-        with shelve.open(SAVED_LAYOUT_PATH, "c") as shelf:
+        with shelve.open(LAST_OPENED_LAYOUT_PATH, "c") as shelf:
             shelf["blue_dock_state"] = self.blue_full_system_dock_area.saveState()
             shelf["yellow_dock_state"] = self.yellow_full_system_dock_area.saveState()
             shelf[
@@ -286,19 +300,18 @@ class Thunderscope(object):
             filename, _ = QtGui.QFileDialog.getOpenFileName(
                 self.window,
                 "Open layout",
-                "~/",
+                f"{SAVED_LAYOUT_PATH}/",
                 options=QFileDialog.Option.DontUseNativeDialog,
             )
 
             if not filename:
-                logging.warn("No filename selected")
+                logging.warning("No filename selected")
                 return
 
         # lets load the layouts from the shelf into their respective dock areas
         # if the dock doesn't exist in the default layout, we ignore it
         # (instead of adding a placeholder dock)
         with shelve.open(filename, "r") as shelf:
-
             self.blue_full_system_dock_area.restoreState(
                 shelf["blue_dock_state"], missing="ignore"
             )
@@ -310,8 +323,8 @@ class Thunderscope(object):
             )
 
             # Update default layout
-            if filename != SAVED_LAYOUT_PATH:
-                with shelve.open(SAVED_LAYOUT_PATH, "c") as default_shelf:
+            if filename != LAST_OPENED_LAYOUT_PATH:
+                with shelve.open(LAST_OPENED_LAYOUT_PATH, "c") as default_shelf:
                     default_shelf["blue_dock_state"] = shelf["blue_dock_state"]
                     default_shelf["yellow_dock_state"] = shelf["yellow_dock_state"]
                     default_shelf["robot_diagnostics_dock_state"] = shelf[
@@ -356,20 +369,19 @@ class Thunderscope(object):
                 False,
             )
 
-        if load_yellow or load_blue:
-            path = layout_path if layout_path else SAVED_LAYOUT_PATH
-
-            try:
-                self.load_layout(path)
-            except Exception:
-                pass
-
         if load_diagnostics:
             self.configure_robot_diagnostics_layout(
                 self.robot_diagnostics_dock_area,
                 self.robot_diagnostics_proto_unix_io,
                 load_blue or load_yellow,
             )
+
+        # Load the layout file if it exists
+        path = layout_path if layout_path else LAST_OPENED_LAYOUT_PATH
+        try:
+            self.load_layout(path)
+        except Exception:
+            pass
 
     def register_refresh_function(self, refresh_func):
         """Register the refresh functions to run at the refresh_interval_ms
@@ -769,6 +781,7 @@ class Thunderscope(object):
         """Show the main window"""
 
         self.window.show()
+        self.window.showMaximized()
         pyqtgraph.exec()
 
     def close(self):
