@@ -106,7 +106,7 @@ class SimulatedTestRunner(object):
 
         """
 
-        __stopper(delay=PAUSE_AFTER_FAIL_DELAY_S)
+        self.__stopper(delay=PAUSE_AFTER_FAIL_DELAY_S)
         self.last_exception = args.exc_value
         raise self.last_exception
 
