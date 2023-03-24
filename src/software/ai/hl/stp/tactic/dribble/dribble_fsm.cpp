@@ -77,6 +77,36 @@ std::tuple<Point, Angle> DribbleFSM::calculateNextDribbleDestinationAndOrientati
     Point target_destination =
         robotPositionToFaceBall(dribble_destination, target_orientation);
 
+    // std::cout << "Called with: " << dribble_destination_opt << " and " << final_dribble_orientation_opt << std::endl;
+    std::cout << "Ball is at: " << ball.position() << " Robot is at: " << robot.position() << " Distance is: " << distance(robot.position(), ball.position()) << std::endl;
+
+    // when we have the ball in the dribbler, only then we pivot around the ball
+    if (distance(robot.position(), ball.position()) < 0.088)
+    {
+
+        std::cout << "robot orientation: " << robot.orientation() << " target orientation " << target_orientation << std::endl;
+
+        Angle mid_angle_1 = target_orientation + (robot.orientation() - target_orientation) / 2.0;
+        Angle mid_angle_2 = mid_angle_1 + Angle::half();
+
+        // pick the closer one to the target orientation
+        Angle target_angle = (mid_angle_1 - target_orientation).abs() < (mid_angle_2 - target_orientation).abs() ? mid_angle_1 : mid_angle_2;
+
+        // this gave incorrect behaviour for -180 -> 180 rotation
+        // Angle target_angle = target_orientation + (robot.orientation() - target_orientation) / 2.0;
+
+        Point target_coords = dribble_destination - (ROBOT_MAX_RADIUS_METERS * Vector::createFromAngle(target_angle));
+
+        target_destination = target_coords;
+        target_orientation = target_angle;
+
+        std::cout << "Pivoting smartly to " << target_orientation << " at " << target_destination << std::endl;
+    }
+    else
+    {
+        std::cout << "Pivoting normally" << std::endl;
+    }
+
     return std::make_tuple(target_destination, target_orientation);
 }
 
