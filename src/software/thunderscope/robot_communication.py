@@ -101,7 +101,7 @@ class RobotCommunication(object):
 
         For AI protos, blocks for 10ms if no proto is available, and then returns a cached proto
 
-        For Diagnostics protos, does not blocks and returns cached message is none available
+        For Diagnostics protos, does not block and returns cached message if none available
         Sleeps for 10ms for diagnostics
 
         If the emergency stop is tripped, the PrimitiveSet will not be sent so
@@ -116,7 +116,7 @@ class RobotCommunication(object):
             if self.robots_connected_to_fullsystem:
                 # Get the primitives
                 primitive_set = self.primitive_buffer.get(
-                    block=True, timeout=ROBOT_COMMUNICATIONS_TIMEOUT
+                    block=True, timeout=ROBOT_COMMUNICATIONS_TIMEOUT_S
                 )
 
                 robot_primitives = dict(primitive_set.robot_primitives)
@@ -165,7 +165,7 @@ class RobotCommunication(object):
 
             # sleep if not running fullsystem
             if not self.robots_connected_to_fullsystem:
-                time.sleep(ROBOT_COMMUNICATIONS_TIMEOUT)
+                time.sleep(ROBOT_COMMUNICATIONS_TIMEOUT_S)
 
     def toggle_robot_connection(self, mode, robot_id):
         """
