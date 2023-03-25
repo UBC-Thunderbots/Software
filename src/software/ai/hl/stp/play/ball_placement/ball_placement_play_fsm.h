@@ -16,6 +16,7 @@ struct BallPlacementPlayFSM
     class StartState;
     class KickOffWallState;
     class PlaceBallState;
+    class RetreatState;
 
     struct ControlParams
     {
@@ -47,6 +48,13 @@ struct BallPlacementPlayFSM
     void placeBall(const Update& event);
 
     /**
+     * Action that has the placing robot retreat after placing the ball
+     *
+     * @param event the BallPlacementPlayFSM Update event
+     */
+    void retreat(const Update& event);
+
+    /**
      * Guard on whether the ball is in a "dead zone"
      *
      * @param event the BallPlacementPlayFSM Update event
@@ -66,6 +74,15 @@ struct BallPlacementPlayFSM
     bool kickDone(const Update& event);
 
     /**
+     * Guard on whether the placing robot has finished placing the ball into the desired position
+     *
+     * @param event the BallPlacementPlayFSM Update event
+     *
+     * @return whether the kick has been performed
+     */
+    bool ballPlaced(const Update& event);
+
+    /**
      * Helper function for setting up the MoveTactics of the robots away from the ball
      * placing robot
      *
@@ -80,13 +97,16 @@ struct BallPlacementPlayFSM
         DEFINE_SML_STATE(StartState)
         DEFINE_SML_STATE(KickOffWallState)
         DEFINE_SML_STATE(PlaceBallState)
+        DEFINE_SML_STATE(RetreatState)
         DEFINE_SML_EVENT(Update)
 
         DEFINE_SML_ACTION(placeBall)
         DEFINE_SML_ACTION(kickOffWall)
+        DEFINE_SML_ACTION(retreat)
 
         DEFINE_SML_GUARD(shouldKickOffWall)
         DEFINE_SML_GUARD(kickDone)
+        DEFINE_SML_GUARD(ballPlaced)
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
@@ -96,12 +116,15 @@ struct BallPlacementPlayFSM
             KickOffWallState_S + Update_E[!kickDone_G] / kickOffWall_A =
                 KickOffWallState_S,
             KickOffWallState_S + Update_E[kickDone_G] = StartState_S,
-            PlaceBallState_S + Update_E / placeBall_A = PlaceBallState_S);
+            PlaceBallState_S + Update_E[!ballPlaced_G] / placeBall_A = PlaceBallState_S,
+            PlaceBallState_S + Update_E[ballPlaced_G] / retreat_A = RetreatState_S,
+            RetreatState_S + Update_E[ballPlaced_G] / retreat_A = RetreatState_S);
     }
 
    private:
     TbotsProto::AiConfig ai_config;
     std::shared_ptr<WallKickoffTactic> pivot_kick_tactic;
     std::shared_ptr<PlaceBallTactic> place_ball_tactic;
+    std::shared_ptr<MoveTactic> retreat_tactic;
     std::vector<std::shared_ptr<PlaceBallMoveTactic>> move_tactics;
 };
