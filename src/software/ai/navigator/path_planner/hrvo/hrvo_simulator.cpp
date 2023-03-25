@@ -77,16 +77,16 @@ void HRVOSimulator::configureHRVORobot(const Robot &robot,
             const auto &move_primitive = primitive.move();
             // TODO (#2418): Update implementation of Primitive to support
             // multiple path points and remove this check
-            if (motion_control.path().points().size() < 2) {
-                LOG(WARNING) << "Empty path: " << motion_control.path().points().size() << std::endl;
+            if (motion_control.path().points().size() < 2)
+            {
+                LOG(WARNING) << "Empty path: " << motion_control.path().points().size()
+                             << std::endl;
                 return;
             }
 
 
-            auto destination = motion_control.path().points().at(1);
-            destination_point = Point(destination.x_meters(),
-                                      destination.y_meters());
-
+            auto destination  = motion_control.path().points().at(1);
+            destination_point = Point(destination.x_meters(), destination.y_meters());
         }
     }
 
@@ -143,9 +143,9 @@ void HRVOSimulator::doStep(Duration time_step)
     }
 
     // Compute what velocity each agent will take next
-    // loops are seperated so that all robot fields that need to updated,
-    // are updated separately. Otherwise, some robots would already be updated with new velocity,
-    // while others aren't.
+    // loops are separated so that all robot fields that need to updated,
+    // are updated separately. Otherwise, some robots would already be updated with new
+    // velocity, while others aren't.
     for (auto &robot : robots)
     {
         robot.second->computeNewVelocity(robots, time_step);

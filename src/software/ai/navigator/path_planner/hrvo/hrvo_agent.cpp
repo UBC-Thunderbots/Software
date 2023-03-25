@@ -25,19 +25,23 @@ void HRVOAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive,
 
         // TODO (#2418): Update implementation of Primitive to support
         // multiple path points and remove this check
-        if (motion_control.path().points().size() < 2) {
-            LOG(WARNING) << "Empty path: " << motion_control.path().points().size() << std::endl;
+        if (motion_control.path().points().size() < 2)
+        {
+            LOG(WARNING) << "Empty path: " << motion_control.path().points().size()
+                         << std::endl;
             return;
         }
 
         auto destination = motion_control.path().points().at(1);
 
+        Point destination_point = Point(destination.x_meters(), destination.y_meters());
+
         // Max distance which the robot can travel in one time step + scaling
-        // TODO (#2370): This constant is calculated multiple    times.
+        // TODO (#2370): This constant is calculated multiple times.
         double path_radius = (max_speed * time_step.toSeconds()) / 2;
-        auto path_points   = {PathPoint(
-            Point(destination.x_meters(), destination.y_meters()), speed_at_dest)};
-        path               = RobotPath(path_points, path_radius);
+
+        auto path_points = {PathPoint(destination_point, speed_at_dest, angle_at_dest)};
+        path             = RobotPath(path_points, path_radius);
 
         // Update static obstacles
         std::set<TbotsProto::MotionConstraint> motion_constraints;
@@ -244,9 +248,12 @@ void HRVOAgent::computeNewVelocity(
     // version of it otherwise
     Vector candidate_velocity;
 
-    if (pref_velocity.lengthSquared() < max_speed * max_speed) {
+    if (pref_velocity.lengthSquared() < max_speed * max_speed)
+    {
         candidate_velocity = pref_velocity;
-    } else {
+    }
+    else
+    {
         candidate_velocity = pref_velocity.normalize(max_speed);
     }
 
