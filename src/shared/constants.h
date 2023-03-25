@@ -143,7 +143,7 @@ static const unsigned int NUM_TIMES_SEND_STOP = 10;
 
 // Time (in seconds) to sleep / delay the loop iteration for different protos in robot
 // communications
-static const double ROBOT_COMMUNICATIONS_TIMEOUT_S = 0.01;
+static const double ROBOT_COMMUNICATIONS_TIMEOUT_S = 0.02;
 
 // product and vendor id for Arduino Uno Rev3 (retrieved from
 // http://www.linux-usb.org/usb.ids )
