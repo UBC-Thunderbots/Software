@@ -37,11 +37,11 @@ void HRVOAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive,
         Point destination_point = Point(destination.x_meters(), destination.y_meters());
 
         // Max distance which the robot can travel in one time step + scaling
-        // TODO (#2370): This constant is calculated multiple times.
+        // TODO (#2370): This constant is calculated multiple    times.
         double path_radius = (max_speed * time_step.toSeconds()) / 2;
-
-        auto path_points = {PathPoint(destination_point, speed_at_dest, angle_at_dest)};
-        path             = RobotPath(path_points, path_radius);
+        auto path_points   = {PathPoint(
+                Point(destination.x_meters(), destination.y_meters()), speed_at_dest)};
+        path               = RobotPath(path_points, path_radius);
 
         // Update static obstacles
         std::set<TbotsProto::MotionConstraint> motion_constraints;
