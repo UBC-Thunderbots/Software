@@ -12,6 +12,16 @@ from proto.message_translation.tbots_protobuf import create_world_state_from_sta
 
 
 def get_zig_zag_params(front_wall_x, robot_y_delta, num_walls):
+    """
+    Gets the test params to cause movement in a zig zag pattern
+    due to multiple walls of enemy robots
+
+    :param front_wall_x: the x position of the first wall
+    :param robot_y_delta: the vertical separation between each robot in the wall
+    :param num_walls: the number of walls to use
+    :return: positions and destinations of friendly and enemy robots to cause
+             a zig zag movement
+    """
     return (
         [Point(x_meters=front_wall_x - 0.5, y_meters=0)],
         [Point(x_meters=front_wall_x + 3 + 1.5, y_meters=0)],
@@ -27,10 +37,22 @@ def get_zig_zag_params(front_wall_x, robot_y_delta, num_walls):
         [],
         None,
         None,
+        15
     )
 
 
 def get_robot_circle_pos(radius, num_robots, start):
+    """
+    Gets the test params to position robots in a circle and have them move
+    along each diameter
+
+    :param radius: the radius of the circle
+    :param num_robots: the number of robots in the circle
+    :param start: if True, start positioning the robots from (radius, 0)
+                  else, start from (-radius, 0)
+                  basically outputs robot start and end points based on boolean
+    :return: list of positions of robots that form a circle
+    """
     return [
         Point(
             x_meters=(1 if start else -1)
@@ -44,7 +66,7 @@ def get_robot_circle_pos(radius, num_robots, start):
     ]
 
 
-def hrvo_test_setup(
+def hrvo_setup(
     friendly_robots_positions,
     friendly_robots_destinations,
     enemy_robots_positions,
@@ -53,6 +75,18 @@ def hrvo_test_setup(
     ball_initial_vel,
     simulated_test_runner,
 ):
+    """
+    Setup for the hrvo tests
+
+    :param friendly_robots_positions:
+    :param friendly_robots_destinations:
+    :param enemy_robots_positions:
+    :param enemy_robots_destinations:
+    :param ball_initial_pos:
+    :param ball_initial_vel:
+    :param simulated_test_runner:
+    :return:
+    """
     desired_orientation = Angle(radians=0)
 
     ball_initial_pos = ball_initial_pos if ball_initial_pos else tbots.Point(1, 2)
@@ -116,28 +150,28 @@ def hrvo_test_setup(
 # TODO: print message for if robot is not exactly stationary
 @pytest.mark.parametrize(
     "friendly_robot_positions,friendly_robot_destinations,enemy_robots_positions,"
-    + "enemy_robots_destinations,ball_initial_pos,ball_initial_vel",
+    + "enemy_robots_destinations,ball_initial_pos,ball_initial_vel,timeout_s",
     [
         # # robot moving straight with no obstacles
         # (
         #         [Point(x_meters=-2.5, y_meters=0)],
         #         [Point(x_meters=2.8, y_meters=0)],
         #         [], [],
-        #         None, None
+        #         None, None, 5
         # ),
         # # robot moving straight with a moving enemy robot behind it
         # (
         #     [Point(x_meters=-2.3, y_meters=0)],
         #     [Point(x_meters=2.8, y_meters=0)],
         #     [Point(x_meters=-2.5, y_meters=0)], [Point(x_meters=-2.1, y_meters=0)],
-        #     None, None
+        #     None, None, 5
         # ),
         # # robot moving straight with a moving enemy robot to its side
         # (
         #     [Point(x_meters=-2.5, y_meters=0)],
         #     [Point(x_meters=2.8, y_meters=0)],
         #     [Point(x_meters=-1, y_meters=-0.8)], [Point(x_meters=1, y_meters=-0.8)],
-        #     None, None
+        #     None, None, 5
         # ),
         # # robot moving straight with a moving enemy robot moving straight towards it
         # (
@@ -151,21 +185,21 @@ def hrvo_test_setup(
         #     [Point(x_meters=-2.5, y_meters=0), Point(x_meters=2, y_meters=0)],
         #     [Point(x_meters=2.8, y_meters=0), Point(x_meters=2, y_meters=0)],
         #     [], [],
-        #     None, None
+        #     None, None, 5
         # ),
         # # robot moving with a stationary enemy robot in front of it
         # (
         #     [Point(x_meters=0.7, y_meters=0)],
         #     [Point(x_meters=2, y_meters=0)],
         #     [Point(x_meters=1, y_meters=0)], [],
-        #     None, None
+        #     None, None, 5
         # ),
         # # robot moving straight with a moving friendly robot moving straight towards it
         # (
         #         [Point(x_meters=-2.5, y_meters=0), Point(x_meters=2.8, y_meters=0)],
         #         [Point(x_meters=2.8, y_meters=0), Point(x_meters=-2.5, y_meters=0)],
         #         [], [],
-        #         None, None
+        #         None, None, 5
         # ),
         # # robot moving with a 3 enemy robot wall in front of it
         # (
@@ -176,7 +210,7 @@ def hrvo_test_setup(
         #         Point(x_meters=1, y_meters=0.3),
         #         Point(x_meters=1, y_meters=-0.3)
         #     ], [],
-        #     None, None
+        #     None, None, 8
         # ),
         # # robot moving with various stationary enemy robots in front of it
         # # walls generated by range(start_x, start_x + step * num_robots, step)
@@ -187,7 +221,7 @@ def hrvo_test_setup(
         #         Point(x_meters=float(x_meters) / 10, y_meters=0)
         #         for x_meters in range(20, 32, 2)
         #     ], [],
-        #     None, None
+        #     None, None, 15
         # ),
         # # robot moving in a local minima (enemy robots in a curve around it)
         # (
@@ -202,7 +236,7 @@ def hrvo_test_setup(
         #         Point(x_meters=1, y_meters=-0.6),
         #         Point(x_meters=0.7, y_meters=-0.6)
         #     ], [],
-        #     None, None
+        #     None, None, 15
         # ),
         # # robot moving in a local minima (enemy robots in a curve around it) with an opening in the middle
         # (
@@ -217,7 +251,7 @@ def hrvo_test_setup(
         #         Point(x_meters=1, y_meters=-0.6),
         #         Point(x_meters=0.7, y_meters=-0.6)
         #     ], [],
-        #     None, None
+        #     None, None, 10
         # ),
         # # robot moving in a zig zag path around enemy robots
         # get_zig_zag_params(-2, 0.3, 3),
@@ -229,6 +263,7 @@ def hrvo_test_setup(
             [],
             None,
             None,
+            20
         ),
         # half enemy half friendly robots in a circle moving along each diameter
         (
@@ -257,6 +292,7 @@ def hrvo_test_setup(
             ],
             None,
             None,
+            20
         ),
     ],
     ids=[
@@ -284,6 +320,7 @@ def test_robot_movement(
     enemy_robots_destinations,
     ball_initial_pos,
     ball_initial_vel,
+    timeout_s
 ):
     # Always Validation
     always_validation_sequence_set = [[RobotDoesNotCollide()]]
@@ -294,7 +331,7 @@ def test_robot_movement(
     )
 
     simulated_test_runner.run_test(
-        setup=lambda param: hrvo_test_setup(
+        setup=lambda param: hrvo_setup(
             friendly_robot_positions,
             friendly_robot_destinations,
             enemy_robots_positions,
@@ -308,7 +345,7 @@ def test_robot_movement(
         inv_always_validation_sequence_set=always_validation_sequence_set,
         ag_eventually_validation_sequence_set=[[]],
         ag_always_validation_sequence_set=[[]],
-        test_timeout_s=15,
+        test_timeout_s=timeout_s,
     )
 
 
@@ -357,11 +394,6 @@ def get_move_update_control_params(
 
     return params
 
-
-get_zig_zag_params.__test__ = False
-get_move_update_control_params.__test__ = False
-get_reached_destination_validation.__test__ = False
-hrvo_test_setup.__test__ = False
 
 if __name__ == "__main__":
     pytest_main(__file__)
