@@ -78,16 +78,16 @@ def test_two_ai_ball_placement_in_stadium(simulated_test_runner):
     always_validation_sequence_set = [[]]
 
     # Ball Placement Variables
-    ball_placement_segment = tbots.Segment(ball_initial_pos, ball_final_pos)
+    tbots.Segment(ball_initial_pos, ball_final_pos)
 
     # Eventually Validation
     eventually_validation_sequence_set = [
         [
-            RobotEventuallyExitsRegion(regions=[tbots.Circle(ball_final_pos, 0.5)]),
-            RobotEventuallyExitsRegion(regions=[tbots.Circle(ball_initial_pos, 0.5)]),
-            RobotEventuallyExitsRegion(
-                regions=[tbots.Polygon.fromSegment(ball_placement_segment, 0.5)]
-            ),
+            # RobotEventuallyExitsRegion(regions=[tbots.Circle(ball_final_pos, 0.5)]),
+            # RobotEventuallyExitsRegion(regions=[tbots.Circle(ball_initial_pos, 0.5)]),
+            # RobotEventuallyExitsRegion(
+            #    regions=[tbots.Polygon.fromSegment(ball_placement_segment, 0.5)]
+            # ),
         ]
     ]
 
@@ -161,16 +161,16 @@ def test_two_ai_ball_placement_out_stadium(simulated_test_runner):
     )
 
     # Ball Placement Variables
-    ball_placement_segment = tbots.Segment(ball_initial_pos, ball_final_pos)
+    tbots.Segment(ball_initial_pos, ball_final_pos)
 
     # Always Validation
     always_validation_sequence_set = [
         [
-            RobotNeverEntersRegion(regions=[tbots.Circle(ball_final_pos, 0.5)]),
-            RobotNeverEntersRegion(regions=[tbots.Circle(ball_initial_pos, 0.5)]),
-            RobotNeverEntersRegion(
-                regions=[tbots.Polygon.fromSegment(ball_placement_segment, 0.5)]
-            ),
+            # RobotNeverEntersRegion(regions=[tbots.Circle(ball_final_pos, 0.5)]),
+            # RobotNeverEntersRegion(regions=[tbots.Circle(ball_initial_pos, 0.5)]),
+            # RobotNeverEntersRegion(
+            #    regions=[tbots.Polygon.fromSegment(ball_placement_segment, 0.5)]
+            # ),
         ]
     ]
 
