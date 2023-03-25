@@ -387,11 +387,17 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
     motor_status.mutable_angular_velocity()->set_radians_per_second(
         current_euclidean_velocity[2]);
 
-    int target_dribbler_rpm =
-        motor.drive_control_case() ==
-                TbotsProto::MotorControl::DriveControlCase::DRIVE_CONTROL_NOT_SET
-            ? 0
-            : motor.dribbler_speed_rpm();
+    int target_dribbler_rpm;
+
+    if (motor.drive_control_case() ==
+        TbotsProto::MotorControl::DriveControlCase::DRIVE_CONTROL_NOT_SET)
+    {
+        target_dribbler_rpm = 0;
+    }
+    else
+    {
+        target_dribbler_rpm = motor.dribbler_speed_rpm();
+    }
 
     WheelSpace_t target_wheel_velocities = WheelSpace_t::Zero();
 
