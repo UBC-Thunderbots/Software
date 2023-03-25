@@ -80,6 +80,11 @@ Point Agent::getPosition() const
     return position;
 }
 
+void Agent::setPosition(const Point &new_position) {
+
+    position = new_position;
+}
+
 Vector Agent::getVelocity() const
 {
     return velocity;

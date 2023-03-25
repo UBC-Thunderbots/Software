@@ -102,7 +102,7 @@ class HRVOSimulator
 
     // Robot id offset for enemy robots so we don't have
     // friendly and enemy agents with overlapping ids in the `robots` map
-    const unsigned int ENEMY_LV_ROBOT_OFFSET = 1000;
+    static const unsigned int ENEMY_LV_ROBOT_OFFSET = 1000;
 
    private:
     /**

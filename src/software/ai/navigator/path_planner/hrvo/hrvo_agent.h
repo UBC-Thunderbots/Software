@@ -61,6 +61,7 @@ class HRVOAgent : public Agent
      * Computes the new velocity of this agent.
      *
      * @param robots a map from robot ids to robots, for all robots in the simulation
+     * @param time_step the time step to use
      */
     void computeNewVelocity(const std::map<unsigned int, std::shared_ptr<Agent>> &robots,
                             Duration time_step) override;
@@ -137,6 +138,7 @@ class HRVOAgent : public Agent
         Vector velocity;
         // pair of (potentially) intersecting velocity obstacles
         // from which we can calculate the candidate velocity
+        // TODO (#2872): change to use shared_ptr's to obstacles instead.
         std::pair<int, int> obstacle_indexes;
     };
 

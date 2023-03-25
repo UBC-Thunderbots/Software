@@ -92,6 +92,14 @@ class Agent
 
 
     /**
+     * Set the position of this agent
+     *
+     * @param The new position for this agent
+     */
+    void setPosition(const Point &new_position);
+
+
+    /**
      * Return the velocity of the agent
      *
      * @return The velocity for this agent

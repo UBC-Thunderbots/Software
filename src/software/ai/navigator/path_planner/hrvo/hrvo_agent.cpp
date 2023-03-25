@@ -25,8 +25,11 @@ void HRVOAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive,
 
         // TODO (#2418): Update implementation of Primitive to support
         // multiple path points and remove this check
-        CHECK(motion_control.path().points().size() >= 2)
-            << "Empty path: " << motion_control.path().points().size() << std::endl;
+        if (motion_control.path().points().size() < 2) {
+            LOG(WARNING) << "Empty path: " << motion_control.path().points().size() << std::endl;
+            return;
+        }
+
         auto destination = motion_control.path().points().at(1);
 
         // Max distance which the robot can travel in one time step + scaling
@@ -49,6 +52,9 @@ void HRVOAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive,
                 static_cast<TbotsProto::MotionConstraint>(constraint_int);
             auto new_obstacles =
                 obstacle_factory.createFromMotionConstraint(constraint, world);
+
+            // TODO (#2871): This assumes the constraint first obstacle is the ball,
+            // which may not be the case;
             if (constraint == TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL)
             {
                 ball_obstacle = new_obstacles[0];
@@ -236,9 +242,14 @@ void HRVOAgent::computeNewVelocity(
     // Find candidate velocities which this agent can take to avoid collision.
     // if small enough, add preferred velocity as candidate velocity or a normalized
     // version of it otherwise
-    Vector candidate_velocity = pref_velocity.lengthSquared() < max_speed * max_speed
-                                    ? pref_velocity
-                                    : pref_velocity.normalize(max_speed);
+    Vector candidate_velocity;
+
+    if (pref_velocity.lengthSquared() < max_speed * max_speed) {
+        candidate_velocity = pref_velocity;
+    } else {
+        candidate_velocity = pref_velocity.normalize(max_speed);
+    }
+
     auto pref_candidate =
         CandidateVelocity(candidate_velocity, std::numeric_limits<int>::max(),
                           std::numeric_limits<int>::max());

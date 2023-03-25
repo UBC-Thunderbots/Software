@@ -68,20 +68,25 @@ void HRVOSimulator::configureHRVORobot(const Robot &robot,
         TbotsProto::Primitive primitive = primitive_iter->second;
         TbotsProto::Point destination_point_proto;
 
+        // TODO (#2873): This code block is repeated inside HRVOAgent.cpp.
+        // and it just calculates the path point from the primitive.
+        // this can be factored out to a function, so that its usage can called by the
+        // simulator and for each agent.
         if (primitive.has_move())
         {
             const auto &move_primitive = primitive.move();
             // TODO (#2418): Update implementation of Primitive to support
             // multiple path points and remove this check
-            CHECK(move_primitive.motion_control().path().points().size() >= 2)
-                << "Empty path: "
-                << move_primitive.motion_control().path().points().size() << std::endl;
-            destination_point_proto =
-                move_primitive.motion_control().path().points().at(1);
-            destination_point = Point(destination_point_proto.x_meters(),
-                                      destination_point_proto.y_meters());
-            speed_at_goal     = move_primitive.final_speed_m_per_s();
-            max_speed         = move_primitive.max_speed_m_per_s();
+            if (motion_control.path().points().size() < 2) {
+                LOG(WARNING) << "Empty path: " << motion_control.path().points().size() << std::endl;
+                return;
+            }
+
+
+            auto destination = motion_control.path().points().at(1);
+            destination_point = Point(destination.x_meters(),
+                                      destination.y_meters());
+
         }
     }
 
@@ -138,6 +143,9 @@ void HRVOSimulator::doStep(Duration time_step)
     }
 
     // Compute what velocity each agent will take next
+    // loops are seperated so that all robot fields that need to updated,
+    // are updated separately. Otherwise, some robots would already be updated with new velocity,
+    // while others aren't.
     for (auto &robot : robots)
     {
         robot.second->computeNewVelocity(robots, time_step);
