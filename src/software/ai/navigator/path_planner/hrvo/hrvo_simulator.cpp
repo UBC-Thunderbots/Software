@@ -75,6 +75,7 @@ void HRVOSimulator::configureHRVORobot(const Robot &robot,
         if (primitive.has_move())
         {
             const auto &move_primitive = primitive.move();
+            const auto &motion_control = move_primitive.motion_control();
             // TODO (#2418): Update implementation of Primitive to support
             // multiple path points and remove this check
             if (motion_control.path().points().size() < 2)
