@@ -88,6 +88,9 @@ TEST_F(RobotAutoTestFixture, TestFrontRightMotorVelocity) {
         LOG(INFO) << target_wheel_velocities[FRONT_RIGHT_WHEEL_SPACE_INDEX] << "Target wheel velocity";
         LOG(INFO) << front_right_velocity << "Actual wheel velocity read";
 
+        // Run-away protection
+        motor_service_->disableVelocity(front_right_velocity, prev_wheel_velocities[FRONT_RIGHT_WHEEL_SPACE_INDEX]);
+
         // 4. Make the threshold more lenient for expect equal double
         //EXPECT_DOUBLE_EQ(front_right_velocity, target_wheel_velocities[FRONT_RIGHT_WHEEL_SPACE_INDEX]);
         EXPECT_NEAR(front_right_velocity, target_wheel_velocities[FRONT_RIGHT_WHEEL_SPACE_INDEX], 0.01);

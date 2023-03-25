@@ -35,6 +35,8 @@ class MotorService
     TbotsProto::MotorStatus poll(const TbotsProto::MotorControl& motor_control,
                                  double time_elapsed_since_last_poll_s);
 
+    void disableVelocity(double current_velocity, double previous_velocity);
+
     /**
      * Trinamic API binding, sets spi_demux_select_0|1 pins
      * appropriately and calls readWriteByte. See C++ implementation file for more info

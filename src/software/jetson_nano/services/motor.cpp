@@ -276,6 +276,13 @@ bool MotorService::checkDriverFault(uint8_t motor)
     return !gstat_bitset.any();
 }
 
+void MotorService::disableVelocity(double current_velocity, double previous_velocity) {
+    if (std::abs(current_velocity - previous_velocity) > RUNAWAY_PROTECTION_THRESHOLD_MPS)
+    {
+        driver_control_enable_gpio.setValue(GpioState::LOW);
+        LOG(FATAL) << "Front right motor runaway";
+    }
+}
 
 TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor,
                                            double time_elapsed_since_last_poll_s)
