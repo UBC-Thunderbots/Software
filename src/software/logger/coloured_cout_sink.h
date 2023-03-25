@@ -2,7 +2,6 @@
 #include <g3log/logmessage.hpp>
 #include <iostream>
 
-#include "software/logger/log_merger.h"
 #include "software/util/make_enum/make_enum.h"
 
 MAKE_ENUM(FG_Colour, YELLOW, RED, GREEN, WHITE);
@@ -55,6 +54,4 @@ class ColouredCoutSink
      * log message
      */
     bool print_detailed;
-
-    LogMerger merger;
 };

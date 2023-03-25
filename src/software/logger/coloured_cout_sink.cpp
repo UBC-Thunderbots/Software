@@ -2,8 +2,7 @@
 
 #include "software/logger/custom_logging_levels.h"
 
-ColouredCoutSink::ColouredCoutSink(bool print_detailed)
-    : print_detailed(print_detailed), merger(LogMerger())
+ColouredCoutSink::ColouredCoutSink(bool print_detailed) : print_detailed(print_detailed)
 {
 }
 
@@ -65,16 +64,11 @@ void ColouredCoutSink::displayColouredLog(g3::LogMessageMover log_entry)
     std::ostringstream oss;
     if (print_detailed)
     {
-        // detailed messages have timing data, do not merge
         oss << "\033[" << colour << "m" << log_entry.get().toString() << "\033[m";
     }
     else
     {
-        std::list<std::string> logs = merger.log(log_entry.get().message());
-        for (std::string msg : logs)
-        {
-            oss << "\033[" << colour << "m" << msg << "\n\033[m";
-        }
+        oss << "\033[" << colour << "m" << log_entry.get().message() << "\n\033[m";
     }
     std::cout << oss.str() << std::flush;
     resetColour();
