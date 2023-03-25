@@ -143,11 +143,13 @@ PYBIND11_MODULE(python_bindings, m)
         .def("getPoints", &Polygon::getPoints)
         .def("getSegments", &Polygon::getSegments)
         // Overloaded
-        .def("__repr__", [](const Polygon& v) {
-            std::stringstream stream;
-            stream << v;
-            return stream.str();
-        });
+        .def("__repr__",
+             [](const Polygon& v) {
+                 std::stringstream stream;
+                 stream << v;
+                 return stream.str();
+             })
+        .def("fromSegment", &Polygon::fromSegment);
 
     py::class_<Angle>(m, "Angle")
         .def(py::init<>())
