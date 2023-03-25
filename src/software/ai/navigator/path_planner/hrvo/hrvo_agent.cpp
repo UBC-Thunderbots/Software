@@ -2,9 +2,10 @@
 
 HRVOAgent::HRVOAgent(RobotId robot_id, const RobotState &robot_state,
                      const RobotPath &path, double radius, double max_speed,
-                     double max_accel, double max_radius_inflation)
-    : Agent(robot_id, robot_state, path, radius, max_speed, max_accel,
-            max_radius_inflation),
+                     double max_accel, double max_angular_speed, double max_angular_accel,
+                     double max_radius_inflation)
+    : Agent(robot_id, robot_state, path, radius, max_speed, max_accel, max_angular_speed,
+            max_angular_accel, max_radius_inflation),
       obstacle_factory(TbotsProto::RobotNavigationObstacleConfig()),
       neighbours()
 {
@@ -18,10 +19,12 @@ void HRVOAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive,
     ball_obstacle = std::nullopt;
     if (new_primitive.has_move())
     {
-        const auto &motion_control = new_primitive.move().motion_control();
-        float speed_at_dest        = new_primitive.move().final_speed_m_per_s();
-        float new_max_speed        = new_primitive.move().max_speed_m_per_s();
-        this->max_speed            = new_max_speed;
+        const auto &move_primitive = new_primitive.move();
+        const auto &motion_control = move_primitive.motion_control();
+
+        double speed_at_dest = move_primitive.final_speed_m_per_s();
+        max_speed            = move_primitive.max_speed_m_per_s();
+        Angle angle_at_dest  = createAngle(move_primitive.final_angle());
 
         // TODO (#2418): Update implementation of Primitive to support
         // multiple path points and remove this check
@@ -37,11 +40,11 @@ void HRVOAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive,
         Point destination_point = Point(destination.x_meters(), destination.y_meters());
 
         // Max distance which the robot can travel in one time step + scaling
-        // TODO (#2370): This constant is calculated multiple    times.
+        // TODO (#2370): This constant is calculated multiple times.
         double path_radius = (max_speed * time_step.toSeconds()) / 2;
-        auto path_points   = {PathPoint(
-                Point(destination.x_meters(), destination.y_meters()), speed_at_dest)};
-        path               = RobotPath(path_points, path_radius);
+
+        auto path_points = {PathPoint(destination_point, speed_at_dest, angle_at_dest)};
+        path             = RobotPath(path_points, path_radius);
 
         // Update static obstacles
         std::set<TbotsProto::MotionConstraint> motion_constraints;
@@ -219,6 +222,37 @@ VelocityObstacle HRVOAgent::createVelocityObstacle(const Agent &other_agent)
 
     return VelocityObstacle(hrvo_apex, vo.getLeftSide(), vo.getRightSide());
 }
+
+
+void HRVOAgent::computeNewAngularVelocity(Duration time_step)
+{
+    const Angle dest_orientation   = path.getCurrentPathPoint().value().getOrientation();
+    const double delta_orientation = dest_orientation.minDiff(orientation).toRadians();
+
+    // angular velocity given linear deceleration and distance remaining to target
+    // orientation.
+    // Vi = sqrt(0^2 + 2 * a * d)
+    double deceleration_angular_speed =
+        std::sqrt(2 * max_angular_accel * delta_orientation);
+
+    double next_angular_speed = std::min(max_angular_speed, deceleration_angular_speed);
+
+    const double signed_delta_orientation =
+        (dest_orientation - orientation).clamp().toRadians();
+    auto target_angular_velocity = AngularVelocity::fromRadians(
+        std::copysign(next_angular_speed, signed_delta_orientation));
+
+    // Update estimated orientation for next iteration
+    orientation += target_angular_velocity * time_step.toSeconds();
+
+    // not that setting this directly breaks the consistency
+    // of first calculating a desired new (angular) velocity,
+    // and then clamping based on realistic bounds,
+    // like how Sim::computeNewVelocity() is executed first,
+    // and then new_velocity is used in Sim::update();
+    angular_velocity = target_angular_velocity;
+}
+
 
 void HRVOAgent::computeNewVelocity(
     const std::map<unsigned int, std::shared_ptr<Agent>> &agents, Duration time_step)
