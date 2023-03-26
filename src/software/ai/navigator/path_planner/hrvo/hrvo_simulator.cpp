@@ -8,12 +8,20 @@ void HRVOSimulator::updateWorld(const World &world,
 {
     this->world = world;
     robots.clear();
+
+    // initialize an array of bits, with each bit corresponding to the robot whose id is the index
+    // this keeps track of all the friendly robot ids in the world packet
+    std::bitset<MAX_ROBOT_IDS_PER_SIDE> tracked_friendlies;
+    std::bitset<MAX_ROBOT_IDS_PER_SIDE> tracked_enemies;
+
     for (const Robot &friendly_robot : world.friendlyTeam().getAllRobots())
     {
         auto hrvo_agent = robots.find(friendly_robot.id());
+        tracked_friendlies.set(friendly_robot.id(), true);
+
         if (hrvo_agent != robots.end())
         {
-            updateHRVORobot(hrvo_agent->second, friendly_robot);
+            updateAgent(hrvo_agent->second, friendly_robot);
         }
         else
         {
@@ -21,10 +29,36 @@ void HRVOSimulator::updateWorld(const World &world,
         }
     }
 
+    // flip all the tracked bits to get all the robot ids which are NOT in the world packet,
+    // and friendly enemy agent that aren't present in the world packet.
+    tracked_friendlies.flip();
+    std::erase_if(robots, [&](const std::pair<RobotId, std::shared_ptr<Agent>>& id_robot_pair) {
+        auto const& [id, _] = id_robot_pair;
+        return tracked_friendlies.test(id);
+    });
+
     for (const Robot &enemy_robot : world.enemyTeam().getAllRobots())
     {
-        configureLVRobot(enemy_robot, robot_constants, time_step);
+        auto hrvo_agent = robots.find(enemy_robot.id() + ENEMY_LV_ROBOT_OFFSET);
+        tracked_enemies.set(enemy_robot.id(), true);
+
+        if (hrvo_agent != robots.end())
+        {
+            updateAgent(hrvo_agent->second, enemy_robot);
+        }
+        else
+        {
+            configureHRVORobot(enemy_robot, robot_constants, time_step);
+        }
     }
+
+    // flip all the tracked bits to get all the robot ids which are NOT in the world packet,
+    // and delete enemy agent that aren't present in the world packet.
+    tracked_enemies.flip();
+    std::erase_if(robots, [&](const std::pair<RobotId, std::shared_ptr<Agent>>& id_robot_pair) {
+        auto const& [id, _] = id_robot_pair;
+        return tracked_enemies.test(id - ENEMY_LV_ROBOT_OFFSET);
+    });
 }
 
 
@@ -48,7 +82,7 @@ void HRVOSimulator::updatePrimitiveSet(const TbotsProto::PrimitiveSet &new_primi
     }
 }
 
-void HRVOSimulator::updateHRVORobot(const std::shared_ptr<Agent> &agent,
+void HRVOSimulator::updateAgent(const std::shared_ptr<Agent> &agent,
                                     const Robot &friendly_robot)
 {
     agent->setPosition(friendly_robot.position());

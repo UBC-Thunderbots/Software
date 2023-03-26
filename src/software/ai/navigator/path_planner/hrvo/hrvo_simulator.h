@@ -3,6 +3,7 @@
 #include <fstream>
 #include <limits>
 #include <vector>
+#include <bitset>
 
 #include "proto/tbots_software_msgs.pb.h"
 #include "proto/visualization.pb.h"
@@ -142,6 +143,15 @@ class HRVOSimulator
     void configureLVRobot(const Robot &robot, const RobotConstants_t &robot_constants,
                           Duration time_step);
 
+    /**
+     *  Update position, velocity, orientation and angular velocity for this agent.
+     *
+     * @param agent The simulator agent being updated.
+     * @param friendly_robot the world robot whose values should be used
+     */
+    static void updateAgent(const std::shared_ptr<Agent> &agent,
+                                const Robot &friendly_robot);
+
     // robot id to agent
     std::map<RobotId, std::shared_ptr<Agent>> robots;
 
@@ -157,6 +167,4 @@ class HRVOSimulator
 
     static constexpr double ENEMY_ROBOT_RADIUS_MAX_INFLATION = 0.06;
 
-    static void updateHRVORobot(const std::shared_ptr<Agent> &agent,
-                                const Robot &friendly_robot);
 };
