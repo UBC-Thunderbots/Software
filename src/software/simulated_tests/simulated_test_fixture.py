@@ -345,7 +345,7 @@ class AggregateTestRunner(SimulatedTestRunner):
 
     def run_test(
         self,
-        setup=(lambda: None),
+        setup=(lambda arg: None),
         params=[],
         ag_always_validation_sequence_set=[[]],
         ag_eventually_validation_sequence_set=[[]],
@@ -369,14 +369,14 @@ class AggregateTestRunner(SimulatedTestRunner):
 
         threading.excepthook = self.excepthook
 
+        failed_tests = 0
+
         # Runs the test once for each given parameter
         # Catches Assertion Error thrown by failing test and increments counter
         # Calculates overall results and prints them
         for x in range(len(params)):
 
             setup(params[x])
-
-            failed_tests = 0
 
             try:
                 super().run_test(
