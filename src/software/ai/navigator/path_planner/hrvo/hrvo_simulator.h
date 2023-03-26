@@ -1,9 +1,9 @@
 #pragma once
 
+#include <bitset>
 #include <fstream>
 #include <limits>
 #include <vector>
-#include <bitset>
 
 #include "proto/tbots_software_msgs.pb.h"
 #include "proto/visualization.pb.h"
@@ -150,7 +150,7 @@ class HRVOSimulator
      * @param friendly_robot the world robot whose values should be used
      */
     static void updateAgent(const std::shared_ptr<Agent> &agent,
-                                const Robot &friendly_robot);
+                            const Robot &friendly_robot);
 
     // robot id to agent
     std::map<RobotId, std::shared_ptr<Agent>> robots;
@@ -166,5 +166,4 @@ class HRVOSimulator
     static constexpr double FRIENDLY_ROBOT_RADIUS_MAX_INFLATION = 0.05;
 
     static constexpr double ENEMY_ROBOT_RADIUS_MAX_INFLATION = 0.06;
-
 };
