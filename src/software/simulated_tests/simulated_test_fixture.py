@@ -390,7 +390,7 @@ class AggregateTestRunner(SimulatedTestRunner):
 
         # TODO (#2856) Fix validation and results output
 
-        print(f"{failed_tests} test failed")
+        logger.info(f"{failed_tests} test failed")
 
         assert failed_tests == 0
 
