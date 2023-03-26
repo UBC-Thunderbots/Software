@@ -13,6 +13,7 @@ class RobotDoesNotCollide(Validation):
     """
     Checks if any 2 robots have collided
     """
+
     def __init__(self):
         """
         Initialised the list of robots that have fouled to empty
