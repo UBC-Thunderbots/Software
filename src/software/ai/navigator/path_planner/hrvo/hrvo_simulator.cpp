@@ -37,7 +37,7 @@ void HRVOSimulator::updateWorld(const World &world,
         std::erase_if(
             robots, [&](const std::pair<RobotId, std::shared_ptr<Agent>> &id_robot_pair) {
                 auto const &[id, _] = id_robot_pair;
-                return tracked_friendlies.test(id);
+                return tracked_friendlies[id] == 1;
             });
     }
 
@@ -68,7 +68,7 @@ void HRVOSimulator::updateWorld(const World &world,
                 // in the map is offset (indicating that they're an enemy)
                 if (id >= ENEMY_LV_ROBOT_OFFSET)
                 {
-                    return tracked_enemies.test(id - ENEMY_LV_ROBOT_OFFSET);
+                    return tracked_enemies[id - ENEMY_LV_ROBOT_OFFSET] == 1;
                 }
                 else
                 {
