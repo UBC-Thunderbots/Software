@@ -120,10 +120,6 @@ def test_corner_kick_play_top_right(simulated_test_runner):
     )
 
 
-# tells pytest to ignore the setup method as a test
-corner_kick_play_test_setup.__test__ = False
-
-
 if __name__ == "__main__":
     # Run the test, -s disables all capturing at -vv increases verbosity
     sys.exit(pytest.main([__file__, "-svv"]))

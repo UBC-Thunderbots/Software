@@ -11,7 +11,7 @@ from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
 
 
-def free_kick_play_test_setup(
+def free_kick_play_setup(
     blue_bots, yellow_bots, ball_initial_pos, play_name, simulated_test_runner
 ):
     """
@@ -65,8 +65,12 @@ def test_free_kick_play_friendly(simulated_test_runner, ball_initial_pos):
     # TODO- #2753 Validation
     # params just have to be a list of length 1 to ensure the test runs at least once
     simulated_test_runner.run_test(
-        setup=lambda test_setup_arg: free_kick_play_test_setup(
-            test_setup_arg, simulated_test_runner
+        setup=lambda test_setup_arg: free_kick_play_setup(
+            test_setup_arg["blue_bots"],
+            test_setup_arg["yellow_bots"],
+            test_setup_arg["ball_initial_pos"],
+            test_setup_arg["play_name"],
+            simulated_test_runner
         ),
         params=[
             {
@@ -147,7 +151,7 @@ def test_free_kick_play_enemy(simulated_test_runner, ball_initial_pos, yellow_bo
     ]
     # TODO- #2753 Validation
     simulated_test_runner.run_test(
-        setup=lambda test_setup_arg: free_kick_play_test_setup(
+        setup=lambda test_setup_arg: free_kick_play_setup(
             test_setup_arg["blue_bots"],
             test_setup_arg["yellow_bots"],
             test_setup_arg["ball_initial_pos"],
@@ -184,7 +188,7 @@ def test_free_kick_play_enemy(simulated_test_runner, ball_initial_pos, yellow_bo
 def test_free_kick_play_both(simulated_test_runner, ball_initial_pos):
     # TODO- #2753 Validation
     simulated_test_runner.run_test(
-        setup=lambda test_setup_arg: free_kick_play_test_setup(
+        setup=lambda test_setup_arg: free_kick_play_setup(
             test_setup_arg["blue_bots"],
             test_setup_arg["yellow_bots"],
             test_setup_arg["ball_initial_pos"],
@@ -219,10 +223,6 @@ def test_free_kick_play_both(simulated_test_runner, ball_initial_pos):
         ag_eventually_validation_sequence_set=[[]],
         test_timeout_s=15,
     )
-
-
-# tells pytest to ignore the setup method as a test
-free_kick_play_test_setup.__test__ = False
 
 
 if __name__ == "__main__":
