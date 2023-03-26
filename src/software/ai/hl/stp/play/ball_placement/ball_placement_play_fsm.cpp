@@ -102,9 +102,17 @@ void BallPlacementPlayFSM::retreat(const Update &event)
                              move_tactics.end());
 
     Point ball_pos = event.common.world.ball().position();
-    Point goal_center = event.common.world.field().friendlyGoalCenter();
 
-    Point retreat_position = ball_pos + (goal_center - ball_pos).normalize() * 0.5;
+    Point retreat_position;
+    if (event.common.world.gameState().getNextRefereeCommand() == RefereeCommand::DIRECT_FREE_US) {
+        // on free kicks, retreat 0.05m, facing the enemy goal
+        Vector retreat_direction = (ball_pos - event.common.world.field().enemyGoalCenter()).normalize();
+                retreat_position = ball_pos + retreat_direction * (0.05 + ROBOT_MAX_HEIGHT_METERS);
+    } else {
+        // on force starts or other commands, retreat 0.5m, between ball and friendly goal.
+        Vector retreat_direction = (event.common.world.field().friendlyGoalCenter() - ball_pos).normalize();
+        retreat_position = ball_pos + retreat_direction * (0.5 + ROBOT_MAX_HEIGHT_METERS);
+    }
 
     // setup ball placement tactic for ball placing robot
     retreat_tactic->updateControlParams(retreat_position, Angle::zero(), 0.0);
@@ -136,16 +144,9 @@ bool BallPlacementPlayFSM::ballPlaced(const Update &event)
     std::optional<Point> placement_point = event.common.world.gameState().getBallPlacementPoint();
     std::vector<Robot> robots = event.common.world.friendlyTeam().getAllRobots();
 
-    // check that all robots are stationary
-    for (long unsigned int i = 0; i < robots.size(); i++) {
-        if (robots[i].velocity().length() > 0.01) {
-            return false;
-        }
-    }
-
     // see if the ball is at the placement destination
     if (placement_point.has_value()) {
-        return comparePoints(ball_pos, placement_point.value(), 0.15);
+        return comparePoints(ball_pos, placement_point.value(), 0.15) && event.common.world.ball().velocity().length() < 0.01;
     } else {
         return true;
     }

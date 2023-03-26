@@ -146,6 +146,18 @@ class GameState
     const RefereeCommand& getRefereeCommand() const;
 
     /**
+     * Sets the next Referee command
+     */
+    void setNextRefereeCommand(RefereeCommand command);
+
+    /**
+     * Returns the next Referee command
+     *
+     * @return the next Referee command
+     */
+    const RefereeCommand& getNextRefereeCommand() const;
+
+    /**
      * Returns the current restart reason
      *
      * @return the current restart reason
@@ -432,6 +444,7 @@ class GameState
     PlayState play_state_;
     RestartReason restart_reason_;
     RefereeCommand command_;
+    RefereeCommand next_command_;
     std::optional<Ball> ball_;
 
     // True if our team can kick the ball during a restart
