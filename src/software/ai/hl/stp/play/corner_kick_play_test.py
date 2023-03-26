@@ -11,21 +11,13 @@ from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
 
 
-def corner_kick_play_test_setup(ball_and_bots_pos, simulated_test_runner):
+def corner_kick_play_test_setup(ball_initial_pos, blue_bots, simulated_test_runner):
     """
         Setup for Corner Kick Play Test
-        :param ball_and_bots_pos: object
-            {
-                "ball_initial_pos": initial position of the ball,
-                "blue_bots": list of positions of blue robots
-            }
+        :param ball_initial_pos: initial position of the ball
+        :param blue_bots: positions of blue robots
         :param simulated_test_runner: the simulated test runner currently being used
-        """
-    # starting point must be Point
-    ball_initial_pos = ball_and_bots_pos["ball_initial_pos"]
-
-    # Setup Bots
-    blue_bots = ball_and_bots_pos["blue_bots"]
+    """
 
     yellow_bots = [
         tbots.Point(1, 0),
@@ -74,7 +66,9 @@ def test_corner_kick_play_bottom_left(simulated_test_runner):
     # TODO- #2781 Validation
     simulated_test_runner.run_test(
         setup=lambda ball_and_bots_pos: corner_kick_play_test_setup(
-            ball_and_bots_pos, simulated_test_runner
+            ball_and_bots_pos["ball_initial_pos"],
+            ball_and_bots_pos["blue_bots"],
+            simulated_test_runner,
         ),
         params=[
             {
@@ -101,7 +95,9 @@ def test_corner_kick_play_top_right(simulated_test_runner):
     # TODO- #2781 Validation
     simulated_test_runner.run_test(
         setup=lambda ball_and_bots_pos, runner=simulated_test_runner: corner_kick_play_test_setup(
-            ball_and_bots_pos, simulated_test_runner
+            ball_and_bots_pos["ball_initial_pos"],
+            ball_and_bots_pos["blue_bots"],
+            simulated_test_runner,
         ),
         params=[
             {
@@ -122,9 +118,6 @@ def test_corner_kick_play_top_right(simulated_test_runner):
         ag_eventually_validation_sequence_set=[[]],
         test_timeout_s=10,
     )
-
-
-corner_kick_play_test_setup.__test__ = False
 
 
 if __name__ == "__main__":
