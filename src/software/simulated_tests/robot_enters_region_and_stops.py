@@ -77,6 +77,7 @@ class RobotEntersRegionAndStops(RobotEntersRegion):
 
         return super().__repr__()
 
+
 (
     RobotEventuallyEntersRegionAndStops,
     RobotEventuallyExitsRegionAndMoves,
