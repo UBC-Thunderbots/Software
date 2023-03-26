@@ -48,17 +48,23 @@ void HRVOSimulator::updateWorld(const World &world,
         }
         else
         {
-            configureHRVORobot(enemy_robot, robot_constants, time_step);
+            configureLVRobot(enemy_robot, robot_constants, time_step);
         }
     }
 
     // flip all the tracked bits to get all the robot ids which are NOT in the world packet,
     // and delete enemy agent that aren't present in the world packet.
     tracked_enemies.flip();
-    std::erase_if(robots, [&](const std::pair<RobotId, std::shared_ptr<Agent>>& id_robot_pair) {
-        auto const& [id, _] = id_robot_pair;
-        return tracked_enemies.test(id - ENEMY_LV_ROBOT_OFFSET);
-    });
+    if (tracked_enemies.any()) {
+        std::erase_if(robots, [&](const std::pair<RobotId, std::shared_ptr<Agent>>& id_robot_pair) {
+            auto const& [id, _] = id_robot_pair;
+            if (id >= ENEMY_LV_ROBOT_OFFSET) {
+                return tracked_enemies.test(id - ENEMY_LV_ROBOT_OFFSET);
+            } else {
+                return false;
+            }
+        });
+    }
 }
 
 
