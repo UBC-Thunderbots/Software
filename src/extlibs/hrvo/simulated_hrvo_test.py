@@ -164,12 +164,12 @@ def hrvo_setup(
         ),
         # robot moving straight with no obstacles while turning from 0 to 180 degrees
         (
-                [Point(x_meters=-2.5, y_meters=0)],
-                [Point(x_meters=2.8, y_meters=0)],
-                [Angle(radians=math.pi)],
-                [],
-                [],
-                5,
+            [Point(x_meters=-2.5, y_meters=0)],
+            [Point(x_meters=2.8, y_meters=0)],
+            [Angle(radians=math.pi)],
+            [],
+            [],
+            5,
         ),
         # robot moving straight with a moving enemy robot behind it
         (
