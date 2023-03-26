@@ -185,7 +185,11 @@ def test_free_kick_play_both(simulated_test_runner, ball_initial_pos):
     # TODO- #2753 Validation
     simulated_test_runner.run_test(
         setup=lambda test_setup_arg: free_kick_play_test_setup(
-            test_setup_arg, simulated_test_runner
+            test_setup_arg["blue_bots"],
+            test_setup_arg["yellow_bots"],
+            test_setup_arg["ball_initial_pos"],
+            test_setup_arg["play_name"],
+            simulated_test_runner
         ),
         params=[
             {
