@@ -70,7 +70,7 @@ def test_free_kick_play_friendly(simulated_test_runner, ball_initial_pos):
             test_setup_arg["yellow_bots"],
             test_setup_arg["ball_initial_pos"],
             test_setup_arg["play_name"],
-            simulated_test_runner
+            simulated_test_runner,
         ),
         params=[
             {
@@ -193,7 +193,7 @@ def test_free_kick_play_both(simulated_test_runner, ball_initial_pos):
             test_setup_arg["yellow_bots"],
             test_setup_arg["ball_initial_pos"],
             test_setup_arg["play_name"],
-            simulated_test_runner
+            simulated_test_runner,
         ),
         params=[
             {
