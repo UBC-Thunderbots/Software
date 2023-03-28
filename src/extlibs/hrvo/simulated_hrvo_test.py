@@ -201,8 +201,8 @@ def hrvo_setup(
         # robot moving with a stationary friendly robot in front of it
         (
             [Point(x_meters=-2.5, y_meters=0), Point(x_meters=2, y_meters=0)],
-            [],
             [Point(x_meters=2.8, y_meters=0), Point(x_meters=2, y_meters=0)],
+            [],
             [],
             [],
             5,
@@ -233,7 +233,7 @@ def hrvo_setup(
             [Angle(radians=math.pi), Angle(radians=0)],
             [],
             [],
-            60,
+            5,
         ),
         # robot moving with a 3 enemy robot wall in front of it
         (
