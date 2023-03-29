@@ -67,6 +67,7 @@ class RobotCommunication(object):
 
         self.send_estop_state_thread = threading.Thread(target=self.__send_estop_state)
         self.run_thread = threading.Thread(target=self.run)
+        self.stop_running = False
 
         # only checks for estop if checking is not disabled
         if not self.disable_estop:
@@ -79,7 +80,7 @@ class RobotCommunication(object):
 
     def __send_estop_state(self):
         if not self.disable_estop:
-            while True:
+            while not self.stop_running:
                 self.current_proto_unix_io.send_proto(
                     EstopState, EstopState(is_playing=self.estop_reader.isEstopPlay())
                 )
@@ -98,7 +99,7 @@ class RobotCommunication(object):
         is useful to dip in and out of robot diagnostics.
 
         """
-        while True:
+        while not self.stop_running:
             # total primitives for all robots
             robot_primitives = {}
 
@@ -219,8 +220,11 @@ class RobotCommunication(object):
 
         return self
 
-    def __exit__(self):
+    def __exit__(self,type,value,traceback):
         """Exit RobotCommunication context manager
 
         """
+        print("killing robocom",flush=True)
+        self.stop_running = True
         self.run_thread.join()
+        print("join is over")

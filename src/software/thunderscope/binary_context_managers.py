@@ -125,7 +125,7 @@ gdb --args bazel-bin/{full_system}
 
     def __restart__(self):
         "Restarts full system."
-
+        print("restarting FS")
         while True:
             if not is_cmd_running(
                 [
@@ -145,6 +145,7 @@ gdb --args bazel-bin/{full_system}
         :param traceback: The traceback of the exception
 
         """
+        print("exiting fS",flush=True)
         if self.full_system_proc:
             self.full_system_proc.kill()
             self.full_system_proc.wait()

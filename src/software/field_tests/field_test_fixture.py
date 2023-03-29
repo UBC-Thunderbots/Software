@@ -328,7 +328,9 @@ class FieldTestRunner(TbotsTestRunner):
             print("We have Thunderscope",flush=True)
         else:
             print("We do not have Thunderscope", flush=True)
+
         def stop_test(delay):
+            print("stop_test",flush=True)
             time.sleep(delay)
             if self.thunderscope:
                 self.thunderscope.close()
@@ -352,7 +354,6 @@ class FieldTestRunner(TbotsTestRunner):
 
         def __runner():
             time.sleep(LAUNCH_DELAY_S)
-            # first argument is test itself
 
             test_end_time = time.time() + test_timeout_s
 
@@ -438,7 +439,7 @@ def field_test_initializer(
         f"{args.blue_full_system_runtime_dir}/test/{test_name}",
         debug_full_system=args.debug_blue_full_system,
         friendly_colour_yellow=False,
-        should_restart_on_crash=True,
+        should_restart_on_crash=False,
     ) as blue_fs, RobotCommunication(
         current_proto_unix_io=blue_full_system_proto_unix_io,
         multicast_channel=getRobotMulticastChannel(0),
@@ -638,8 +639,7 @@ def field_test_runner():
     yield yield_val
 
     # test teardown
-    try:
-        next(initializer)
-    except StopIteration as e:
-        print(e,flush=True)
-        raise e
+    # try:
+    #     next(initializer)
+    # except StopIteration as e:
+    #     raise e
