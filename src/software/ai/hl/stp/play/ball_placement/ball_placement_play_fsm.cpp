@@ -29,18 +29,18 @@ void BallPlacementPlayFSM::kickOffWall(const Update &event)
     {
         if (ball_pos.y() > 0)
         {
-            kick_angle = Angle::fromDegrees(-45);
+            kick_angle = Angle::fromDegrees(45);
         }
         else
         {
-            kick_angle = Angle::fromDegrees(45);
+            kick_angle = Angle::fromDegrees(-45);
         }
     }
     else if (ball_pos.x() < field_lines.xMin())
     {
         if (ball_pos.y() > 0)
         {
-            kick_angle = Angle::fromDegrees(-135);
+            kick_angle = Angle::fromDegrees(135);
         }
         else
         {
@@ -86,7 +86,7 @@ void BallPlacementPlayFSM::placeBall(const Update &event)
 
     // setup ball placement tactic for ball placing robot
     place_ball_tactic->updateControlParams(
-        event.common.world.gameState().getBallPlacementPoint(), std::nullopt, true);
+        event.common.world.gameState().getBallPlacementPoint(), Angle::zero(), true);
     tactics_to_run[0].emplace_back(place_ball_tactic);
 
     event.common.set_tactics(tactics_to_run);
@@ -105,11 +105,11 @@ void BallPlacementPlayFSM::retreat(const Update &event)
 
     Point retreat_position;
     if (event.common.world.gameState().getNextRefereeCommand() == RefereeCommand::DIRECT_FREE_US) {
-        // on free kicks, retreat 0.05m, facing the enemy goal
+        // on free kicks, retreat 0.05m (+ buffer), facing the enemy goal
         Vector retreat_direction = (ball_pos - event.common.world.field().enemyGoalCenter()).normalize();
-                retreat_position = ball_pos + retreat_direction * (0.05 + ROBOT_MAX_HEIGHT_METERS);
+        retreat_position = ball_pos + retreat_direction * (0.05 + ROBOT_MAX_HEIGHT_METERS);
     } else {
-        // on force starts or other commands, retreat 0.5m, between ball and friendly goal.
+        // on force starts or other commands, retreat 0.5m (+ buffer), between ball and friendly goal.
         Vector retreat_direction = (event.common.world.field().friendlyGoalCenter() - ball_pos).normalize();
         retreat_position = ball_pos + retreat_direction * (0.5 + ROBOT_MAX_HEIGHT_METERS);
     }
@@ -135,7 +135,7 @@ bool BallPlacementPlayFSM::kickDone(const Update &event)
     const auto ball_velocity   = event.common.world.ball().velocity().length();
     double ball_shot_threshold = 1;
 
-    return ball_velocity > ball_shot_threshold;
+    return ball_velocity > ball_shot_threshold && !shouldKickOffWall(event);
 }
 
 bool BallPlacementPlayFSM::ballPlaced(const Update &event)
@@ -146,7 +146,7 @@ bool BallPlacementPlayFSM::ballPlaced(const Update &event)
 
     // see if the ball is at the placement destination
     if (placement_point.has_value()) {
-        return comparePoints(ball_pos, placement_point.value(), 0.15) && event.common.world.ball().velocity().length() < 0.01;
+        return comparePoints(ball_pos, placement_point.value(), 0.05) && event.common.world.ball().velocity().length() < 0.1;
     } else {
         return true;
     }
