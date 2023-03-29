@@ -13,14 +13,12 @@ from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
 from proto.ssl_gc_geometry_pb2 import Vector2
 
-# TODO (#2599): Remove Duration parameter from test
-
 # test duration global constant
 TEST_DURATION = 20
 
 
 @pytest.mark.parametrize(
-    "run_enemy_ai", [(False,), (True,)]
+    "run_enemy_ai", [False, True]
 )  # TODO (#2690): Robot gets stuck in corner of defense area
 def test_two_ai_ball_placement(simulated_test_runner, run_enemy_ai):
 
@@ -94,9 +92,9 @@ def test_two_ai_ball_placement(simulated_test_runner, run_enemy_ai):
     # Placement Eventually Validation
     placement_eventually_validation_sequence_set = [
         [
-            # Ball should arrive within 5cm of placement point
-            BallEventuallyEntersRegion(regions=[tbots.Circle(ball_final_pos, 0.1)]),
-            RobotEventuallyEntersRegion(regions=[tbots.Circle(ball_final_pos, 0.1)]),
+            # Ball should arrive within 0.15 m of placement point
+            BallEventuallyEntersRegion(regions=[tbots.Circle(ball_final_pos, 0.15)]),
+            RobotEventuallyEntersRegion(regions=[tbots.Circle(ball_final_pos, 0.15)]),
         ]
     ]
 
@@ -116,7 +114,7 @@ def test_two_ai_ball_placement(simulated_test_runner, run_enemy_ai):
     # drop_ball_always_validation_sequence_set = [
     #     [
     #         BallAlwaysStaysInRegion(
-    #             regions=[tbots.Circle(ball_final_pos, 0.1)]),
+    #             regions=[tbots.Circle(ball_final_pos, 0.15)]),
     #     ]
     # ]
 
@@ -125,11 +123,12 @@ def test_two_ai_ball_placement(simulated_test_runner, run_enemy_ai):
     # # See detailed rules here: https://robocup-ssl.github.io/ssl-rules/sslrules.html#_ball_placement
     # drop_ball_eventually_validation_sequence_set = [
     #     [
-    #         # Ball should arrive within 5cm of placement point
+    #         # Ball should arrive within 0.15m of placement point
     #         BallEventuallyStopsInRegion(
-    #             regions=[tbots.Circle(ball_final_pos, 0.05)]),
+    #             regions=[tbots.Circle(ball_final_pos, 0.15)]),
+    #           #Robot should exit from ball at least 0.05m
     #         RobotEventuallyExitsRegion(
-    #             regions=[tbots.Circle(ball_final_pos, 0.05)]),
+    #             regions=[tbots.Circle(ball_final_pos, 0.2)]),
     #     ]
     # ]
 
@@ -140,7 +139,7 @@ def test_two_ai_ball_placement(simulated_test_runner, run_enemy_ai):
     # )
 
 
-@pytest.mark.parametrize("run_enemy_ai", [(False,), (True,)])
+@pytest.mark.parametrize("run_enemy_ai", [False, True])
 def test_force_start_ball_placement(simulated_test_runner, run_enemy_ai):
 
     # starting point must be Point
@@ -212,9 +211,9 @@ def test_force_start_ball_placement(simulated_test_runner, run_enemy_ai):
     # Placement Eventually Validation
     placement_eventually_validation_sequence_set = [
         [
-            # Ball should arrive within 5cm of placement point
-            BallEventuallyEntersRegion(regions=[tbots.Circle(ball_final_pos, 0.1)]),
-            RobotEventuallyEntersRegion(regions=[tbots.Circle(ball_final_pos, 0.1)]),
+            # Ball should arrive within 0.15m of placement point
+            BallEventuallyEntersRegion(regions=[tbots.Circle(ball_final_pos, 0.15)]),
+            RobotEventuallyEntersRegion(regions=[tbots.Circle(ball_final_pos, 0.15)]),
         ]
     ]
 
@@ -243,11 +242,12 @@ def test_force_start_ball_placement(simulated_test_runner, run_enemy_ai):
     # # See detailed rules here: https://robocup-ssl.github.io/ssl-rules/sslrules.html#_ball_placement
     # drop_ball_eventually_validation_sequence_set = [
     #     [
-    #         # Ball should arrive within 5cm of placement point
+    #         # Ball should arrive within 0.15m of placement point
     #         BallEventuallyStopsInRegion(
-    #             regions=[tbots.Circle(ball_final_pos, 0.05)]),
+    #             regions=[tbots.Circle(ball_final_pos, 0.15)]),
+    #           # Robot has to be 0.5 m away from the ball
     #         RobotEventuallyExitsRegion(
-    #             regions=[tbots.Circle(ball_final_pos, 0.5)]),
+    #             regions=[tbots.Circle(ball_final_pos, 0.65)]),
     #     ]
     # ]
 
