@@ -32,11 +32,12 @@ void logFromNetworking(TbotsProto::RobotLog log)
     LOG(level) << "[ROBOT " << log.robot_id() << " " << LogLevel_Name(log.log_level())
                << "]"
                << "[" << log.file_name() << ":" << log.line_number()
-               << "]: " << log.log_msg() << std::endl;
+               << "] " << log.created_timestamp().epoch_timestamp_seconds() << ": " << log.log_msg();
 }
 
 int main(int argc, char **argv)
 {
+    // TODO: Update to allow filtering of robots, and changing multicast channel
     // load command line arguments
     auto args           = std::make_shared<NetworkLogListenerMainCommandLineArgs>();
     bool help_requested = args->loadFromCommandLineArguments(argc, argv);

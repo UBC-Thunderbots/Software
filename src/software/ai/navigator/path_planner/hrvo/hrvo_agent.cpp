@@ -1,4 +1,5 @@
 #include "software/ai/navigator/path_planner/hrvo/hrvo_agent.h"
+#include "software/physics/velocity_conversion_util.h"
 
 HRVOAgent::HRVOAgent(RobotId robot_id, const RobotState &robot_state,
                      const RobotPath &path, double radius, double max_speed,
@@ -6,7 +7,8 @@ HRVOAgent::HRVOAgent(RobotId robot_id, const RobotState &robot_state,
     : Agent(robot_id, robot_state, path, radius, max_speed, max_accel,
             max_radius_inflation),
       obstacle_factory(TbotsProto::RobotNavigationObstacleConfig()),
-      neighbours()
+      neighbours(),
+      config()
 {
 }
 
@@ -561,62 +563,52 @@ std::optional<int> HRVOAgent::findIntersectingVelocityObstacle(
     return std::nullopt;
 }
 
+// TODO: Add Plot Juggler in this PR, or a separate PR through a new UDP sender
+// TODO: We're passing the robot constants all over the place, can we make it a static constexpr
 Vector HRVOAgent::computePreferredVelocity(Duration time_step)
 {
-    double pref_speed   = max_speed * PREF_SPEED_SCALE;
     auto path_point_opt = path.getCurrentPathPoint();
-
-    if (pref_speed <= 0.01f || max_accel <= 0.01f || path_point_opt == std::nullopt)
+    if (!path_point_opt.has_value())
     {
-        // Used to avoid edge cases with division by zero
-        return Vector(0.f, 0.f);
+        return Vector();
     }
 
-    Point goal_position  = path_point_opt.value().getPosition();
-    double speed_at_goal = path_point_opt.value().getSpeed();
+    Point destination  = path_point_opt.value().getPosition();
+    Vector local_error = globalToLocalVelocity(destination - position, orientation);
 
-    Vector dist_vector_to_goal = goal_position - position;
-    auto dist_to_goal          = static_cast<float>(dist_vector_to_goal.length());
+    // We calculate the new desired velocity based on two proportional controllers,
+    // one for each axis in the local frame.
+    const double vx = local_error.x() * config.linear_velocity_kp();
+    const double vy = local_error.x() * config.linear_velocity_kp();
+    Vector pid_vel = Vector(vx, vy);
+    Vector curr_local_velocity = globalToLocalVelocity(velocity, orientation);
+    Vector delta_velocity = pid_vel - curr_local_velocity;
 
-    // d = (Vf^2 - Vi^2) / 2a
-    double start_linear_deceleration_distance =
-        std::abs((std::pow(speed_at_goal, 2) - std::pow(pref_speed, 2)) /
-                 (2 * max_accel)) *
-        DECEL_DIST_MULTIPLIER;
-
-    if (dist_to_goal < start_linear_deceleration_distance)
+    // Clamp to max acceleration
+    float acceleration_limit;
+    if (pid_vel.length() >= curr_local_velocity.length())
     {
-        // velocity given linear deceleration, distance away from goal, and desired final
-        // speed
-        // v_pref = sqrt(v_goal^2 + 2 * a * d_remainingToDestination)
-        double curr_pref_speed =
-            static_cast<double>(
-                std::sqrt(std::pow(speed_at_goal, 2) + 2 * max_accel * dist_to_goal)) *
-            DECEL_PREF_SPEED_MULTIPLIER;
-        Vector ideal_pref_velocity = dist_vector_to_goal.normalize(curr_pref_speed);
-
-        // Limit the preferred velocity to the kinematic limits
-        const Vector dv = ideal_pref_velocity - velocity;
-        if (dv.length() <= max_accel * time_step.toSeconds())
-        {
-            return ideal_pref_velocity;
-        }
-        else
-        {
-            // Calculate the maximum velocity towards the preferred velocity, given the
-            // acceleration constraint
-            return velocity + dv.normalize(max_accel * time_step.toSeconds());
-        }
+        // Robot is accelerating
+        acceleration_limit = robot_constants.robot_max_acceleration_m_per_s_2;
     }
     else
     {
-        // Accelerate to preferred speed
-        // v_pref = v_now + a * t
-        double curr_pref_speed =
-            std::min(static_cast<double>(pref_speed),
-                     velocity.length() + max_accel * time_step.toSeconds());
-        return dist_vector_to_goal.normalize(curr_pref_speed);
+        // Robot is decelerating
+        acceleration_limit = robot_constants.robot_max_deceleration_m_per_s_2;
     }
+    Vector max_delta_velocity = delta_velocity.normalize(std::min(delta_velocity.length(),
+                                                                  acceleration_limit * time_step.toSeconds()));
+    Vector desired_output = curr_local_velocity + max_delta_velocity;
+
+    // Clamp to max speed
+    Vector output = desired_output.normalize(std::min(desired_output.length(), static_cast<double>(robot_constants.robot_max_speed_m_per_s)));
+
+    // To avoid the robot swinging when turning and moving in a linear line, we
+    // will compensate for the current angular velocity by rotating the velocity
+    // in the opposite direction
+    output = output.rotate(-angular_velocity * time_step.toSeconds() * config.angular_velocity_compensation());
+
+    return localToGlobalVelocity(output, orientation);
 }
 
 std::optional<ObstaclePtr> HRVOAgent::getBallObstacle()
@@ -637,7 +629,7 @@ void HRVOAgent::visualize(TeamColour friendly_team_colour)
     {
         Point position(robot->getPosition());
         *(hrvo_visualization.add_robots()) =
-            *createCircleProto(Circle(position, robot->radius));
+            *createCircleProto(Circle(position, robot->getRadius()));
     }
 
     std::vector<TbotsProto::VelocityObstacle> vo_protos;

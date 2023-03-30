@@ -306,7 +306,7 @@ void ErForceSimulator::setYellowRobotPrimitiveSet(
     {
         auto& [local_vel, angular_vel] = robot_to_vel_pair_map.at(robot_id);
         setRobotPrimitive(robot_id, primitive_set_msg, yellow_primitive_executor_map,
-                          world_proto, local_vel, angular_vel);
+                          world_proto, local_vel, angular_vel); // TODO: add prev_yellow_world_timestamp ... from debug_motion_planning branch
     }
 }
 

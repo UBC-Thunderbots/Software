@@ -178,6 +178,7 @@ class Agent
      */
     double getMaxAccel() const;
 
+protected:
     // robot id of this agent
     RobotId robot_id;
 
@@ -189,6 +190,8 @@ class Agent
 
     // The minimum radius which this agent can be
     const double min_radius;
+
+    RobotConstants_t robot_constants = create2021RobotConstants(); // TODO: Remove
 
     // the maximum speed for the agent
     double max_speed;
@@ -202,7 +205,6 @@ class Agent
     // the computed new_velocity the agent will
     Vector new_velocity;
 
-   protected:
     Vector preferred_velocity;
 
     Point position;

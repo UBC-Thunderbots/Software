@@ -205,10 +205,9 @@ class HRVOAgent : public Agent
     std::vector<ObstaclePtr> static_obstacles;
     std::optional<ObstaclePtr> ball_obstacle;
     std::vector<std::shared_ptr<Agent>> neighbours;
+    TbotsProto::HRVOConfig config;
 
     static constexpr double PREF_SPEED_SCALE            = 0.85;
-    static constexpr double DECEL_DIST_MULTIPLIER       = 1.2;
-    static constexpr double DECEL_PREF_SPEED_MULTIPLIER = 0.6;
 
     // The maximum distance which HRVO Agents will look for neighbors, in meters.
     // A large radius picked to allow for far visibility of neighbors so Agents have

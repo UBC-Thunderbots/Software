@@ -293,6 +293,20 @@ message RobotNavigationObstacleConfig
     ];
 }
 
+message HRVOConfig // TODO: Add to full config message
+{
+    required double linear_velocity_kp = 1 [
+        default                   = 2.0,
+        (bounds).min_double_value = 0.001,
+        (bounds).max_double_value = 10.0
+    ];
+    required double angular_velocity_compensation = 2 [
+        default                   = 1.5,
+        (bounds).min_double_value = 0.0,
+        (bounds).max_double_value = 3.0
+    ];
+}
+
 message CostVisualizationConfig
 {
     // Whether we should generate sample passes for the cost visualization

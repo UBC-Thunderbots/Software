@@ -78,5 +78,3 @@ ProtoUdpSender<SendProto>::~ProtoUdpSender()
 {
     socket_.close();
 }
-
-#include "software/networking/proto_udp_sender.hpp"
