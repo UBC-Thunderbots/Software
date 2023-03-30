@@ -179,11 +179,11 @@ TEST_F(EuclideanToWheelTest, test_velocity_no_ramping)
 
     current_wheel_velocity = {0, 0, 0, 0};
 
-    auto current_wheel_velocity_coefficient = allowable_delta_wheel_velocity * 0.9;
+    auto target_wheel_velocity_coefficient = allowable_delta_wheel_velocity * 0.9;
 
     target_wheel_velocity = {
-        current_wheel_velocity_coefficient, current_wheel_velocity_coefficient,
-        current_wheel_velocity_coefficient, current_wheel_velocity_coefficient};
+            target_wheel_velocity_coefficient, target_wheel_velocity_coefficient,
+            target_wheel_velocity_coefficient, target_wheel_velocity_coefficient};
 
     auto ramped_wheel_velocity = euclidean_to_four_wheel.rampWheelVelocity(
         current_wheel_velocity, target_wheel_velocity, time_to_ramp);
@@ -204,11 +204,11 @@ TEST_F(EuclideanToWheelTest, test_velocity_delta_ramp)
 
     current_wheel_velocity = {0, 0, 0, 0};
 
-    auto current_wheel_velocity_coefficient = 5 * allowable_delta_wheel_velocity;
+    auto target_wheel_velocity_coefficient = 5 * allowable_delta_wheel_velocity;
 
     target_wheel_velocity = {
-        current_wheel_velocity_coefficient, current_wheel_velocity_coefficient,
-        current_wheel_velocity_coefficient, current_wheel_velocity_coefficient};
+            target_wheel_velocity_coefficient, target_wheel_velocity_coefficient,
+            target_wheel_velocity_coefficient, target_wheel_velocity_coefficient};
 
     auto ramped_wheel_velocity = euclidean_to_four_wheel.rampWheelVelocity(
         current_wheel_velocity, target_wheel_velocity, time_to_ramp);
@@ -238,12 +238,12 @@ TEST_F(EuclideanToWheelTest, test_velocity_total_ramp)
 
     current_wheel_velocity = {current_speed, current_speed, current_speed, current_speed};
 
-    auto current_wheel_velocity_coefficient = allowable_delta_wheel_velocity;
+    auto target_wheel_velocity_coefficient = allowable_delta_wheel_velocity;
 
-    target_wheel_velocity = {current_speed + current_wheel_velocity_coefficient,
-                             current_speed + current_wheel_velocity_coefficient,
-                             current_speed + current_wheel_velocity_coefficient,
-                             current_speed + current_wheel_velocity_coefficient};
+    target_wheel_velocity = {current_speed + target_wheel_velocity_coefficient,
+                             current_speed + target_wheel_velocity_coefficient,
+                             current_speed + target_wheel_velocity_coefficient,
+                             current_speed + target_wheel_velocity_coefficient};
 
     auto ramped_wheel_velocity = euclidean_to_four_wheel.rampWheelVelocity(
         current_wheel_velocity, target_wheel_velocity, time_to_ramp);
@@ -273,12 +273,12 @@ TEST_F(EuclideanToWheelTest, test_velocity_both_ramps)
 
     current_wheel_velocity = {current_speed, current_speed, current_speed, current_speed};
 
-    auto current_wheel_velocity_coefficient = 5 * allowable_delta_wheel_velocity;
+    auto target_wheel_velocity_coefficient = 5 * allowable_delta_wheel_velocity;
 
-    target_wheel_velocity = {current_speed + current_wheel_velocity_coefficient,
-                             current_speed + current_wheel_velocity_coefficient,
-                             current_speed + current_wheel_velocity_coefficient,
-                             current_speed + current_wheel_velocity_coefficient};
+    target_wheel_velocity = {current_speed + target_wheel_velocity_coefficient,
+                             current_speed + target_wheel_velocity_coefficient,
+                             current_speed + target_wheel_velocity_coefficient,
+                             current_speed + target_wheel_velocity_coefficient};
 
     auto ramped_wheel_velocity = euclidean_to_four_wheel.rampWheelVelocity(
         current_wheel_velocity, target_wheel_velocity, time_to_ramp);
