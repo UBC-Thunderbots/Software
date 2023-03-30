@@ -30,6 +30,7 @@
 #include "software/geom/vector.h"
 #include "software/networking/threaded_proto_udp_listener.hpp"
 #include "software/networking/threaded_proto_udp_sender.hpp"
+#include "software/networking/threaded_udp_sender.h"
 #include "software/uart/boost_uart_communication.h"
 #include "software/world/field.h"
 #include "software/world/robot.h"
@@ -331,6 +332,9 @@ PYBIND11_MODULE(python_bindings, m)
     declareThreadedProtoUdpSender<TbotsProto::World>(m, "World");
     declareThreadedProtoUdpSender<TbotsProto::RobotStatus>(m, "RobotStatus");
     declareThreadedProtoUdpSender<TbotsProto::PrimitiveSet>(m, "PrimitiveSet");
+
+    py::class_<ThreadedUdpSender>(m, "ThreadedUdpSender")
+        .def("sendString", &ThreadedUdpSender::sendString);
 
     // Estop Reader
     py::class_<ThreadedEstopReader, std::unique_ptr<ThreadedEstopReader>>(

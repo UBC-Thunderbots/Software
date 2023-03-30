@@ -53,8 +53,9 @@ void PrimitiveExecutor::updateWorld(const TbotsProto::World &world_msg)
 void PrimitiveExecutor::updateVelocity(const Vector &local_velocity,
                                        const AngularVelocity &angular_velocity)
 {
-    hrvo_simulator_.updateRobotVelocity(
-        robot_id_, localToGlobalVelocity(local_velocity, curr_orientation_));
+    // TODO: Add feedback logic here
+//    hrvo_simulator_.updateRobotVelocity(
+//        robot_id_, localToGlobalVelocity(local_velocity, curr_orientation_));
 }
 
 Vector PrimitiveExecutor::getTargetLinearVelocity()
