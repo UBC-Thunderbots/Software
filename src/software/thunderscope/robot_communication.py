@@ -1,4 +1,5 @@
 from software.py_constants import *
+from software.thunderscope.constants import ROBOT_COMMUNICATIONS_TIMEOUT_S
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.constants import IndividualRobotMode
 from software.python_bindings import *
@@ -15,6 +16,7 @@ class RobotCommunication(object):
     def __init__(
         self,
         current_proto_unix_io,
+        run_worlds,
         multicast_channel,
         interface,
         disable_estop,
@@ -24,6 +26,7 @@ class RobotCommunication(object):
         """Initialize the communication with the robots
 
         :param current_proto_unix_io: the current proto unix io object
+        :param run_worlds: whether to run the worlds thread (if fullsystem is enabled)
         :param multicast_channel: The multicast channel to use
         :param interface: The interface to use
         :param disable_estop: whether to disable estop checks (ONLY FOR TESTING LOCALLY)
@@ -39,6 +42,9 @@ class RobotCommunication(object):
         self.disable_estop = disable_estop
         self.estop_path = estop_path
         self.estop_buadrate = estop_buadrate
+
+        self.running = False
+        self.run_worlds = run_worlds
 
         self.world_buffer = ThreadSafeBuffer(1, World)
         self.primitive_buffer = ThreadSafeBuffer(1, PrimitiveSet)
@@ -90,7 +96,7 @@ class RobotCommunication(object):
         Blocks if no world is available and does not return a cached world
         :return:
         """
-        while True:
+        while self.running:
             world = self.world_buffer.get(block=True, return_cached=False)
 
             # send the world proto
@@ -108,7 +114,7 @@ class RobotCommunication(object):
         that the robots timeout and stop.
 
         """
-        while True:
+        while self.running:
             # total primitives for all robots
             robot_primitives = {}
 
@@ -119,7 +125,11 @@ class RobotCommunication(object):
                     block=True, timeout=ROBOT_COMMUNICATIONS_TIMEOUT_S
                 )
 
-                robot_primitives = dict(primitive_set.robot_primitives)
+                fullsystem_primitives = dict(primitive_set.robot_primitives)
+
+                for robot_id in fullsystem_primitives.keys():
+                    if robot_id in self.robots_connected_to_fullsystem:
+                        robot_primitives[robot_id] = fullsystem_primitives[robot_id]
 
             # get the manual control primitive
             diagnostics_primitive = DirectControlPrimitive(
@@ -160,7 +170,6 @@ class RobotCommunication(object):
                     or self.robots_connected_to_manual
                 )
             ):
-                self.last_time = primitive_set.time_sent.epoch_timestamp_seconds
                 self.send_primitive_set.send_proto(primitive_set)
 
             # sleep if not running fullsystem
@@ -189,12 +198,12 @@ class RobotCommunication(object):
         """
         Sets up a world sender, a listener for SSL vision data, and connects all robots to fullsystem as default
         """
-        self.receive_ssl_wrapper = SSLWrapperPacketProtoListener(
-            SSL_VISION_ADDRESS,
-            SSL_VISION_PORT,
-            lambda data: self.current_proto_unix_io.send_proto(SSL_WrapperPacket, data),
-            True,
-        )
+        # self.receive_ssl_wrapper = SSLWrapperPacketProtoListener(
+        #     SSL_VISION_ADDRESS,
+        #     SSL_VISION_PORT,
+        #     lambda data: self.current_proto_unix_io.send_proto(SSL_WrapperPacket, data),
+        #     True,
+        # )
 
         self.send_world = WorldProtoSender(
             self.multicast_channel + "%" + self.interface, VISION_PORT, True
@@ -229,9 +238,13 @@ class RobotCommunication(object):
             self.multicast_channel + "%" + self.interface, PRIMITIVE_PORT, True
         )
 
+        self.running = True
+
         self.send_estop_state_thread.start()
-        self.run_world_thread.start()
         self.run_primitive_set_thread.start()
+
+        if self.run_worlds:
+            self.run_world_thread.start()
 
         return self
 
@@ -239,4 +252,6 @@ class RobotCommunication(object):
         """Exit RobotCommunication context manager
 
         """
-        self.run_thread.join()
+        self.run_world_thread.join()
+        self.run_primitive_set_thread.join()
+        self.running = False

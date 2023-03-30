@@ -179,7 +179,7 @@ Thunderloop::~Thunderloop() {}
             // These should be after the new primitive / world update sections above
 
             // If world not received in a while, stop robot
-            if (nanoseconds_elapsed_since_last_world > PRIMITIVE_MANAGER_TIMEOUT_NS)
+            if (nanoseconds_elapsed_since_last_world > PACKET_TIMEOUT_NS)
             {
                 primitive_executor_.setStopPrimitive();
 
@@ -199,8 +199,7 @@ Thunderloop::~Thunderloop() {}
                 auto nanoseconds_elapsed_since_last_primitive =
                     getNanoseconds(time_since_last_primitive_received);
 
-                if (nanoseconds_elapsed_since_last_primitive >
-                    PRIMITIVE_MANAGER_TIMEOUT_NS)
+                if (nanoseconds_elapsed_since_last_primitive > PACKET_TIMEOUT_NS)
                 {
                     primitive_executor_.setStopPrimitive();
 
