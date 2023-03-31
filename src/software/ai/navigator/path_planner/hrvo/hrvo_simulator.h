@@ -119,12 +119,11 @@ class HRVOSimulator
      */
     void visualize(RobotId robot_id, TeamColour friendly_team_colour);
 
-   private:
     // Robot id offset for enemy robots so we don't have
     // friendly and enemy agents with overlapping ids in the `robots` map
     static const unsigned int ENEMY_LV_ROBOT_OFFSET = 1000;
 
-
+   private:
     /**
      * Configure and add a HRVO Agent to the simulation.
      *
