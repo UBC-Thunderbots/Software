@@ -230,7 +230,7 @@ if __name__ == "__main__":
     # We want to run either 1 instance of AI or 1 instance of RobotCommunication or both which will
     # send/recv packets over the provided multicast channel.
 
-    if args.run_blue or args.run_yellow or args.run_diagnostics:
+    elif args.run_blue or args.run_yellow or args.run_diagnostics:
         tscope = Thunderscope(
             layout_path=args.layout,
             load_blue=bool(args.run_blue),
@@ -365,7 +365,7 @@ if __name__ == "__main__":
             )
 
             # Tick Simulation
-            while True:
+            while tscope.is_open():
 
                 simulation_state_message = simulation_state_buffer.get()
 
@@ -379,9 +379,9 @@ if __name__ == "__main__":
         with Simulator(
             args.simulator_runtime_dir, args.debug_simulator, args.enable_realism
         ) as simulator, FullSystem(
-            args.blue_full_system_runtime_dir, args.debug_blue_full_system, False
+            args.blue_full_system_runtime_dir, args.debug_blue_full_system, False, False
         ) as blue_fs, FullSystem(
-            args.yellow_full_system_runtime_dir, args.debug_yellow_full_system, True
+            args.yellow_full_system_runtime_dir, args.debug_yellow_full_system, True, False
         ) as yellow_fs, ProtoLogger(
             args.blue_full_system_runtime_dir,
         ) as blue_logger, ProtoLogger(

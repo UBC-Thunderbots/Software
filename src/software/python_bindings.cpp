@@ -334,6 +334,7 @@ PYBIND11_MODULE(python_bindings, m)
     declareThreadedProtoUdpSender<TbotsProto::PrimitiveSet>(m, "PrimitiveSet");
 
     py::class_<ThreadedUdpSender>(m, "ThreadedUdpSender")
+        .def(py::init<const std::string&, const unsigned short, bool>())
         .def("sendString", &ThreadedUdpSender::sendString);
 
     // Estop Reader

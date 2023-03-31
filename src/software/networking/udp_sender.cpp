@@ -1,4 +1,5 @@
 #include "udp_sender.h"
+#include <iostream>
 
 UdpSender::UdpSender(boost::asio::io_service& io_service,
                     const std::string& ip_address,
@@ -21,6 +22,7 @@ UdpSender::UdpSender(boost::asio::io_service& io_service,
 void UdpSender::sendString(const std::string& message)
 {
     // TODO: Add try catch
+    std::cout << "Sending message: " << message << std::endl;
     socket_.send_to(boost::asio::buffer(message, message.length()), receiver_endpoint);
 }
 

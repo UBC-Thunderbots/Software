@@ -107,6 +107,12 @@ std::unique_ptr<TbotsProto::NamedValue> createNamedValue(const std::string name,
                                                          float value);
 
 /**
+ * TODO
+ */
+std::unique_ptr<TbotsProto::PlotJugglerValue> createPlotJugglerValue(
+    const std::map<std::string, double>& values);
+
+/**
  * Returns a timestamp msg with the time that this function was called
  *
  * @return The unique_ptr to a TbotsProto::Timestamp with the current UTC time

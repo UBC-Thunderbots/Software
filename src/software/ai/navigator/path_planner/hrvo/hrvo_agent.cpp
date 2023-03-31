@@ -1,5 +1,6 @@
 #include "software/ai/navigator/path_planner/hrvo/hrvo_agent.h"
 #include "software/physics/velocity_conversion_util.h"
+#include "proto/message_translation/tbots_protobuf.h"
 
 HRVOAgent::HRVOAgent(RobotId robot_id, const RobotState &robot_state,
                      const RobotPath &path, double radius, double max_speed,
@@ -607,6 +608,12 @@ Vector HRVOAgent::computePreferredVelocity(Duration time_step)
     // will compensate for the current angular velocity by rotating the velocity
     // in the opposite direction
     output = output.rotate(-angular_velocity * time_step.toSeconds() * config.angular_velocity_compensation());
+
+
+    std::map<std::string, double> plotjuggler_values;
+    plotjuggler_values.insert({std::to_string(robot_id) + "_vxy_pref", output.length()});
+    LOG(VISUALIZE) << *createPlotJugglerValue(plotjuggler_values);
+    plotjuggler_values.clear();
 
     return localToGlobalVelocity(output, orientation);
 }
