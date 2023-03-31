@@ -4,6 +4,7 @@
 #include <fstream>
 #include <limits>
 #include <vector>
+#include <map>
 
 #include "proto/tbots_software_msgs.pb.h"
 #include "proto/visualization.pb.h"
