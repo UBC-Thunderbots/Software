@@ -80,7 +80,7 @@ def test_basic_rotation(field_test_runner):
     # pdb.set_trace()
     # test_angles = [0, 45, 90, 180, 270, 0]
     test_angles = [0]
-    id = 6
+    id = 1
 
     # current position
     world = field_test_runner.world_buffer.get(

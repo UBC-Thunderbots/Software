@@ -33,6 +33,7 @@ from software.simulated_tests.tbots_test_runner import TbotsTestRunner
 from software.thunderscope.robot_communication import RobotCommunication
 from software.py_constants import *
 from software.simulated_tests.ball_stops_in_region import BallEventuallyStopsInRegion
+import faulthandler
 
 logger = createLogger(__name__)
 
@@ -334,23 +335,24 @@ class FieldTestRunner(TbotsTestRunner):
             time.sleep(delay)
             if self.thunderscope:
                 self.thunderscope.close()
+            print("test is over", flush=True)
 
-        class Excepthook(object):
-            def __init__(self):
-                self.last_exception = None
-
-            def excepthook(self, args):
-                """This function is _critical_ for show_thunderscope to work.
-            If the test Thread raises an exception we won't be able to close
-            the window from the main thread.
-
-            :param args: The args passed in from the hook
-
-            """
-                stop_test(PAUSE_AFTER_FAIL_DELAY_S)
-                self.last_exception = args.exc_value
-                print(args.exc_value,flush=True)
-                raise self.last_exception
+        # class Excepthook(object):
+        #     def __init__(self):
+        #         self.last_exception = None
+        #
+        #     def excepthook(self, args):
+        #         """This function is _critical_ for show_thunderscope to work.
+        #     If the test Thread raises an exception we won't be able to close
+        #     the window from the main thread.
+        #
+        #     :param args: The args passed in from the hook
+        #
+        #     """
+        #         stop_test(PAUSE_AFTER_FAIL_DELAY_S)
+        #         self.last_exception = args.exc_value
+        #         print(args.exc_value,flush=True)
+        #         raise self.last_exception
 
         def __runner():
             time.sleep(LAUNCH_DELAY_S)
@@ -404,17 +406,32 @@ class FieldTestRunner(TbotsTestRunner):
             validation.check_validation(eventually_validation_proto_set)
             stop_test(TEST_END_DELAY)
 
-        ex = Excepthook()
-        threading.excepthook = ex.excepthook
+
+        # ex = Excepthook()
+        def excepthook(args):
+            """This function is _critical_ for show_thunderscope to work.
+            If the test Thread will raises an exception we won't be able to close
+            the window from the main thread.
+
+            :param args: The args passed in from the hook
+
+            """
+
+            stop_test(delay=PAUSE_AFTER_FAIL_DELAY_S)
+            self.last_exception = args.exc_value
+            raise self.last_exception
+
+        threading.excepthook = excepthook
 
         if self.thunderscope:
             run_sim_thread = threading.Thread(target=__runner, daemon=True)
             run_sim_thread.start()
-            print("Showing TSCOPE",flush=True)
             self.thunderscope.show()
+            print("Showing TSCOPE",flush=True)
             run_sim_thread.join()
 
-            if ex.last_exception:
+            if self.last_exception:
+                print("exception raised if thunderscope",flush=True)
                 pytest.fail(str(ex.last_exception))
 
         else:
@@ -509,11 +526,12 @@ def field_test_initializer(
                 print("Z",flush=True)
                 yield runner
                 print(
-                    f"\n\nTo replay this test for the blue team, go to the `src` folder and run \n./tbots.py run thunderscope --blue_log {blue_logger.log_folder}"
+                    f"\n\nTo replay this test for the blue team, go to the `src` folder and run \n./tbots.py run thunderscope --blue_log {blue_logger.log_folder}", flush=True
                 )
                 print(
-                    f"\n\nTo replay this test for the yellow team, go to the `src` folder and run \n./tbots.py run thunderscope --yellow_log {yellow_logger.log_folder}"
+                    f"\n\nTo replay this test for the yellow team, go to the `src` folder and run \n./tbots.py run thunderscope --yellow_log {yellow_logger.log_folder}", flush=True
                 )
+    return
 
 
 def load_command_line_arguments():
@@ -621,25 +639,117 @@ def load_command_line_arguments():
 
 @pytest.fixture
 def field_test_runner():
-
+    faulthandler.enable()
     print("C", flush=True)
     simulator_proto_unix_io = ProtoUnixIO()
     yellow_full_system_proto_unix_io = ProtoUnixIO()
     blue_full_system_proto_unix_io = ProtoUnixIO()
+    args = load_command_line_arguments()
 
-    print("G", flush=True)
-    initializer = field_test_initializer(
-        simulator_proto_unix_io=simulator_proto_unix_io,
-        blue_full_system_proto_unix_io=blue_full_system_proto_unix_io,
-        yellow_full_system_proto_unix_io=yellow_full_system_proto_unix_io,
-    )
+    # Grab the current test name to store the proto log for the test case
+    current_test = os.environ.get("PYTEST_CURRENT_TEST").split(":")[-1].split(" ")[0]
+    current_test = current_test.replace("]", "")
+    current_test = current_test.replace("[", "-")
 
-    yield_val = next(initializer)
+    test_name = current_test.split("-")[0]
+    tscope = None
 
-    yield yield_val
+    # Launch all binaries
+    with FullSystem(
+        f"{args.blue_full_system_runtime_dir}/test/{test_name}",
+        debug_full_system=args.debug_blue_full_system,
+        friendly_colour_yellow=False,
+        should_restart_on_crash=False,
+    ) as blue_fs, RobotCommunication(
+        current_proto_unix_io=blue_full_system_proto_unix_io,
+        multicast_channel=getRobotMulticastChannel(0),
+        interface=args.interface,
+        disable_estop=False
+    ) as rc_blue, FullSystem(
+        f"{args.yellow_full_system_runtime_dir}/test/{test_name}",
+        debug_full_system=args.debug_yellow_full_system,
+        friendly_colour_yellow=True,
+        should_restart_on_crash=False,
+    ) as yellow_fs:
+        with Gamecontroller(
+                supress_logs=(not args.show_gamecontroller_logs), ci_mode=True
+        ) as gamecontroller:
+            blue_fs.setup_proto_unix_io(blue_full_system_proto_unix_io)
+            yellow_fs.setup_proto_unix_io(yellow_full_system_proto_unix_io)
+            rc_blue.setup_for_fullsystem()
 
+            gamecontroller.setup_proto_unix_io(
+                blue_full_system_proto_unix_io, yellow_full_system_proto_unix_io,
+            )
+            print("D", flush=True)
+            # If we want to run thunderscope, inject the proto unix ios
+            # and start the test
+            if args.enable_thunderscope:
+                print("tscope enabled", flush=True)
+                tscope = Thunderscope(
+                    simulator_proto_unix_io=simulator_proto_unix_io,
+                    blue_full_system_proto_unix_io=blue_full_system_proto_unix_io,
+                    yellow_full_system_proto_unix_io=yellow_full_system_proto_unix_io,
+                    # layout_path=args.layout,
+                    layout_path=None,
+                    visualization_buffer_size=args.visualization_buffer_size,
+                    load_blue=True,
+                    load_yellow=False
+                )
+                print("pre-E", flush=True)
+            print("E", flush=True)
+            runner = FieldTestRunner(
+                test_name=current_test,
+                blue_full_system_proto_unix_io=blue_full_system_proto_unix_io,
+                yellow_full_system_proto_unix_io=yellow_full_system_proto_unix_io,
+                gamecontroller=gamecontroller,
+                thunderscope=tscope
+            )
+            print("F", flush=True)
+
+            # Setup proto loggers.
+            #
+            # NOTE: Its important we use the test runners time provider because
+            # test will run as fast as possible with a varying tick rate. The
+            # SimulatorTestRunner time provider is tied to the simulators
+            # t_capture coming out of the wrapper packet (rather than time.time).
+            with ProtoLogger(
+                f"{args.blue_full_system_runtime_dir}/logs/{current_test}",
+                time_provider=runner.time_provider,
+            ) as blue_logger, ProtoLogger(
+                f"{args.yellow_full_system_runtime_dir}/logs/{current_test}",
+                time_provider=runner.time_provider,
+            ) as yellow_logger:
+                blue_full_system_proto_unix_io.register_to_observe_everything(
+                    blue_logger.buffer
+                )
+                yellow_full_system_proto_unix_io.register_to_observe_everything(
+                    yellow_logger.buffer
+                )
+                print("Z",flush=True)
+                yield runner
+                print(
+                    f"\n\nTo replay this test for the blue team, go to the `src` folder and run \n./tbots.py run thunderscope --blue_log {blue_logger.log_folder}", flush=True
+                )
+                print(
+                    f"\n\nTo replay this test for the yellow team, go to the `src` folder and run \n./tbots.py run thunderscope --yellow_log {yellow_logger.log_folder}", flush=True
+                )
+    print("exiting field test runner fixture",flush=True)
+    # initializer = field_test_initializer(
+    #     simulator_proto_unix_io=simulator_proto_unix_io,
+    #     blue_full_system_proto_unix_io=blue_full_system_proto_unix_io,
+    #     yellow_full_system_proto_unix_io=yellow_full_system_proto_unix_io,
+    # )
+
+    # print("running first next in runner",flush=True)
+    # yield_val = next(initializer)
+    # yield yield_val
+    # print("after yield in runner",flush=True)
     # test teardown
     # try:
+    #     print("running second next in runner",flush=True)
     #     next(initializer)
     # except StopIteration as e:
-    #     raise e
+    #     # raise e
+    #     pass
+    # yield

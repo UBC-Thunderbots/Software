@@ -421,6 +421,7 @@ class Gamecontroller(object):
         """
         self.gamecontroller_proc.kill()
         self.gamecontroller_proc.wait()
+        print("exiting gc",flush=True)
 
         if self.ci_socket:
             self.ci_socket.close()

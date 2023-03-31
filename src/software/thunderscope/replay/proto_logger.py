@@ -89,6 +89,7 @@ class ProtoLogger(object):
 
         """
         self.stop_logging = True
+        print("exiting proto_logger",flush=True)
         self.thread.join()
 
     def __log_protobufs(self):
