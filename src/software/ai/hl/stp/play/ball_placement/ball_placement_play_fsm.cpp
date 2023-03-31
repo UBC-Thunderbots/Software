@@ -84,9 +84,24 @@ void BallPlacementPlayFSM::placeBall(const Update &event)
     tactics_to_run[0].insert(tactics_to_run[0].end(), move_tactics.begin(),
                              move_tactics.end());
 
+    Angle final_angle = Angle::zero();
+    std::optional<Point> placement_point = event.common.world.gameState().getBallPlacementPoint();
+
+    Vector final_direction;
+    if (placement_point.has_value()) {
+        if (event.common.world.gameState().getNextRefereeCommand() == RefereeCommand::DIRECT_FREE_US) {
+            // on free kicks, retreat 0.05m (+ buffer), facing the enemy goal
+            final_direction = (event.common.world.field().enemyGoalCenter() - placement_point.value()).normalize();
+        } else {
+            // on force starts or other commands, retreat 0.5m (+ buffer), between ball and friendly goal.
+            final_direction = (placement_point.value() - event.common.world.field().friendlyGoalCenter()).normalize();
+        }
+        final_angle = Angle::asin(final_direction.y() / final_direction.x());
+    }
+
     // setup ball placement tactic for ball placing robot
     place_ball_tactic->updateControlParams(
-        event.common.world.gameState().getBallPlacementPoint(), Angle::zero(), true);
+        event.common.world.gameState().getBallPlacementPoint(), final_angle, true);
     tactics_to_run[0].emplace_back(place_ball_tactic);
 
     event.common.set_tactics(tactics_to_run);
@@ -103,6 +118,7 @@ void BallPlacementPlayFSM::retreat(const Update &event)
 
     Point ball_pos = event.common.world.ball().position();
 
+    Vector retreat_direction;
     Point retreat_position;
     if (event.common.world.gameState().getNextRefereeCommand() == RefereeCommand::DIRECT_FREE_US) {
         // on free kicks, retreat 0.05m (+ buffer), facing the enemy goal
@@ -114,8 +130,10 @@ void BallPlacementPlayFSM::retreat(const Update &event)
         retreat_position = ball_pos + retreat_direction * (0.5 + ROBOT_MAX_HEIGHT_METERS);
     }
 
+    Angle current_angle = event.common.world.friendlyTeam().getNearestRobot(ball_pos)->orientation();
+
     // setup ball placement tactic for ball placing robot
-    retreat_tactic->updateControlParams(retreat_position, Angle::zero(), 0.0);
+    retreat_tactic->updateControlParams(retreat_position, current_angle, 0.0);
     tactics_to_run[0].emplace_back(retreat_tactic);
 
     event.common.set_tactics(tactics_to_run);

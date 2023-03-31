@@ -474,6 +474,7 @@ class Gamecontroller(object):
         gc_command: proto.ssl_gc_state_pb2.Command,
         team: proto.ssl_gc_common_pb2.Team,
         final_ball_placement_point=None,
+        gc_next_command: proto.ssl_gc_state_pb2.Command=None
     ):
         """Send a ci input to the gamecontroller.
 
@@ -536,5 +537,9 @@ class Gamecontroller(object):
 
         msg_len, new_pos = decoder._DecodeVarint32(response_data, 0)
         ci_output = CiOutput()
+
+        # next_command = Command(type=gc_next_command, for_team=team)
+        # ci_output.referee_msg.CopyFrom()
+
         ci_output.ParseFromString(response_data[new_pos : new_pos + msg_len])
         return ci_output
