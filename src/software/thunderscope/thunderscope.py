@@ -154,7 +154,6 @@ class Thunderscope(object):
 
         pixmapi_pause = QStyle.StandardPixmap.SP_MediaPause
         pauseicon = self.window.style().standardIcon(pixmapi_pause)
-
         self.pauseSim = QtGui.QAction(pauseicon, "Pause", self.window)
         simulationToolBar.addAction(self.pauseSim)
         self.pauseSim.setShortcut("Ctrl+Space")
