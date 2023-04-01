@@ -98,9 +98,16 @@ class RobotCommunication(object):
         """
         while self.running:
             world = self.world_buffer.get(block=True, return_cached=False)
-
-            # send the world proto
-            self.send_world.send_proto(world)
+            if (
+                not self.disable_estop
+                and self.estop_reader.isEstopPlay()
+                and (
+                    self.robots_connected_to_fullsystem
+                    or self.robots_connected_to_manual
+                )
+            ):
+                # send the world proto
+                self.send_world.send_proto(world)
 
     def run_primitive_set(self):
         """Forward PrimitiveSet protos from fullsystem to the robots.
