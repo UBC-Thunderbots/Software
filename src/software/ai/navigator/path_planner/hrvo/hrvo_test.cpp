@@ -63,9 +63,7 @@ TEST_F(TestHrvo, test_update_world_with_one_friendly_agent)
 
     EXPECT_EQ(1, sim.getRobotCount());
 
-    auto agents = sim.getRobots();
-    assertRobotInAgentList(friendly_robot_1, TeamSide::FRIENDLY, sim.getRobots(),
-                           sim.ENEMY_LV_ROBOT_OFFSET);
+    ASSERT_TRUE(sim.robotExists(friendly_robot_1.id(), TeamSide::FRIENDLY));
 }
 
 TEST_F(TestHrvo, test_update_world_with_one_enemy_agent)

@@ -40,6 +40,7 @@ cc_library(
         "//software/geom/algorithms:nearest_neighbor_search",
         "//software/networking:threaded_proto_unix_sender",
         "//software/world",
+        "@boost//:dynamic_bitset",
     ],
 )
 

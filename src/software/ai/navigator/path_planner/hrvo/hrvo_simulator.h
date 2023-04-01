@@ -17,6 +17,7 @@
 #include "software/geom/algorithms/nearest_neighbor_search.hpp"
 #include "software/geom/vector.h"
 #include "software/world/world.h"
+#include <boost/dynamic_bitset.hpp>
 
 class HRVOSimulator
 {

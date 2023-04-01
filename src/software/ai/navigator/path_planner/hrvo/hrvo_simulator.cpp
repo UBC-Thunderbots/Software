@@ -9,12 +9,15 @@ void HRVOSimulator::updateWorld(const World &world,
     this->world = world;
     robots.clear();
 
+    auto friendlies = world.friendlyTeam();
+    auto enemies = world.enemyTeam();
+
     // initialize an array of bits, with each bit corresponding to the robot whose id is
     // the index this keeps track of all the friendly robot ids in the world packet
-    std::bitset<MAX_ROBOT_IDS_PER_SIDE> tracked_friendlies;
-    std::bitset<MAX_ROBOT_IDS_PER_SIDE> tracked_enemies;
+    boost::dynamic_bitset<>  tracked_friendlies(friendlies.numRobots());
+    boost::dynamic_bitset<>  tracked_enemies(enemies.numRobots());
 
-    for (const Robot &friendly_robot : world.friendlyTeam().getAllRobots())
+    for (const Robot &friendly_robot : friendlies.getAllRobots())
     {
         auto hrvo_agent = robots.find(friendly_robot.id());
         tracked_friendlies.set(friendly_robot.id(), true);
@@ -41,7 +44,7 @@ void HRVOSimulator::updateWorld(const World &world,
             });
     }
 
-    for (const Robot &enemy_robot : world.enemyTeam().getAllRobots())
+    for (const Robot &enemy_robot : enemies.getAllRobots())
     {
         auto hrvo_agent = robots.find(enemy_robot.id() + ENEMY_LV_ROBOT_OFFSET);
         tracked_enemies.set(enemy_robot.id(), true);
@@ -70,10 +73,7 @@ void HRVOSimulator::updateWorld(const World &world,
                 {
                     return tracked_enemies[id - ENEMY_LV_ROBOT_OFFSET] == 1;
                 }
-                else
-                {
-                    return false;
-                }
+                return false;
             });
     }
 }
@@ -317,7 +317,10 @@ std::size_t HRVOSimulator::getRobotCount()
     return robots.size();
 }
 
-std::map<RobotId, std::shared_ptr<Agent>> HRVOSimulator::getRobots()
-{
-    return robots;
+bool HRVOSimulator::robotExists(RobotId id, TeamSide side) {
+    if (side == TeamSide::FRIENDLY) {
+        return robots.find(id) != robots.end();
+    } else {
+        return robots.find(id + ENEMY_LV_ROBOT_OFFSET) != robots.end();
+    }
 }
