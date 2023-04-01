@@ -106,11 +106,12 @@ class HRVOSimulator
 
 
     /**
-     * Get all the robots running in this simulation
+     * Check if a robot with id exists in the simulator `robots` map
      *
-     * @return a map of from robot id's to agents
+     * @param id the robot id
+     * @param side either friendly or and enemy robot
      */
-    std::map<RobotId, std::shared_ptr<Agent>> getRobots();
+    bool robotExists(RobotId id, TeamSide side);
 
 
     /**
