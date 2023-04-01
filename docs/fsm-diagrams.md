@@ -67,7 +67,7 @@ stateDiagram-v2
 classDef terminate fill:white,color:black,font-weight:bold
 direction LR
 [*] --> DefenseState
-DefenseState --> DefenseState : <i>defendDefenseArea</i>
+DefenseState --> Terminate:::terminate : <i>defendDefenseArea</i>
 Terminate:::terminate --> Terminate:::terminate
 
 ```
@@ -82,7 +82,7 @@ direction LR
 [*] --> MoveFSM
 MoveFSM --> MoveFSM : <i>blockThreat</i>
 MoveFSM --> Terminate:::terminate
-Terminate:::terminate --> MoveFSM : <i>blockThreat</i>
+Terminate:::terminate --> Terminate:::terminate : <i>blockThreat</i>
 
 ```
 
