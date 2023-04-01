@@ -7,10 +7,9 @@ void HRVOSimulator::updateWorld(const World &world,
                                 Duration time_step)
 {
     this->world = world;
-    robots.clear();
 
-    auto friendlies = world.friendlyTeam();
-    auto enemies = world.enemyTeam();
+    const auto& friendlies = world.friendlyTeam();
+    const auto& enemies = world.enemyTeam();
 
     // initialize an array of bits, with each bit corresponding to the robot whose id is
     // the index this keeps track of all the friendly robot ids in the world packet
