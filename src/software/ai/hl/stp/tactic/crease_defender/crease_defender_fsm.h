@@ -74,7 +74,7 @@ struct CreaseDefenderFSM
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
             *MoveFSM_S + Update_E / blockThreat_A, MoveFSM_S = X,
-            X + Update_E / blockThreat_A = MoveFSM_S);
+            X + Update_E / blockThreat_A = X);
     }
 
    private:
