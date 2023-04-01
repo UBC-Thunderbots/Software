@@ -8,6 +8,9 @@ cc_library(
     hdrs = [
         "log_merger.h",
     ],
+    deps = [
+        "@g3log",
+    ]
 )
 
 cc_library(

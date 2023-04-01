@@ -2,43 +2,44 @@
 
 LogMerger::LogMerger() : passed_time(std::chrono::seconds(0)) {}
 
-std::list<std::string> LogMerger::log(std::string msg)
+std::list<g3::LogMessageMover> LogMerger::log(g3::LogMessageMover &log)
 {
+    std::string msg = log.get().message();
+
     std::chrono::_V2::system_clock::time_point current_time =
         std::chrono::system_clock::now();
     // add passed time from testing
     current_time += passed_time;
-    std::list<std::string> messages = getOldMessages(current_time);
+    std::list<g3::LogMessageMover> messages_to_log = _getOldMessages(current_time);
 
     if (repeat_map.count(msg))
     {
         // msg is in the repeat map, add a repeat and return the old messages
         repeat_map[msg]++;
-        return messages;
+        return messages_to_log;
     }
 
-    // msg is not in the repeat map, add it to the map and list and log it
+    // msg is not in the repeat map, add the log to the map and list and log it
     repeat_map[msg] = 0;
-    message_list.push_back(Message(msg, current_time));
+    message_list.push_back(Message(log, msg, current_time));
 
-    messages.push_front(msg);
-    return messages;
+    messages_to_log.push_front(log);
+    return messages_to_log;
 }
 
-std::list<std::string> LogMerger::getOldMessages(
+std::list<g3::LogMessageMover> LogMerger::_getOldMessages(
     std::chrono::_V2::system_clock::time_point current_time)
 {
-    std::list<std::string> result;
+    std::list<g3::LogMessageMover> result;
     while (message_list.size() > 0)
     {
-        Message currentMessage = message_list.front();
-        if (current_time - LOG_MERGE_DURATION >= currentMessage.timestamp &&
-            repeat_map[currentMessage.message] > 0)
+        Message current_message = message_list.front();
+        if (current_time - LOG_MERGE_DURATION >= current_message.timestamp)
         {
-            // old message w/ at least 1 repeat
-            std::string currentString = currentMessage.message;
-            result.push_back(addRepeats(currentString, repeat_map[currentString]));
-            repeat_map.erase(currentString);
+            // old, add repeats to the message and add it to the list
+            g3::LogMessageMover log = current_message.log;
+            result.push_back(_addRepeats(log, repeat_map[current_message.msg]));
+            repeat_map.erase(current_message.msg);
             message_list.pop_front();
         }
         else
@@ -50,19 +51,29 @@ std::list<std::string> LogMerger::getOldMessages(
     return result;
 }
 
-std::string LogMerger::addRepeats(std::string msg, int repeats)
+g3::LogMessageMover LogMerger::_addRepeats(g3::LogMessageMover &log, int repeats)
 {
+    // if no repeats, do nothing
+    if (repeats == 0) {
+        return log;
+    }
+
+    std::string writable_msg = log.get().write();
+
     // remove newline from end of message
-    if (msg.back() == '\n')
+    if (writable_msg.back() == '\n')
     {
-        msg.pop_back();
+        writable_msg.pop_back();
     }
 
     if (repeats > 1)
     {
-        msg += " (" + std::to_string(repeats) + " repeats)";
+        writable_msg += " (" + std::to_string(repeats) + " repeats)";
+    } else {
+        writable_msg += " (1 repeat)";
     }
-    return msg;
+
+    return log;
 }
 
 void LogMerger::pastime()
