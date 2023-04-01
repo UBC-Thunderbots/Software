@@ -557,7 +557,6 @@ void HRVOAgent::computeNewVelocity(
             new_velocity = candidate.velocity;
         }
     }
-    candidates.clear();
 }
 
 bool HRVOAgent::isIdealCandidate(const CandidateVelocity &candidate) const

@@ -212,8 +212,8 @@ void HRVOSimulator::configureLVRobot(const Robot &robot,
         {PathPoint(destination, 0.0, robot.currentState().orientation())}, path_radius);
 
     std::shared_ptr<LVAgent> agent = std::make_shared<LVAgent>(
-        robot.id(), robot.currentState(), path, ROBOT_MAX_RADIUS_METERS, max_speed, 0.0,
-        0.0, 0.0, ENEMY_ROBOT_RADIUS_MAX_INFLATION);
+        robot.id(), robot.currentState(), path, ROBOT_MAX_RADIUS_METERS, max_speed, 0.1,
+        0.1, 0.1, ENEMY_ROBOT_RADIUS_MAX_INFLATION);
 
     robots[robot.id() + ENEMY_LV_ROBOT_OFFSET] = std::static_pointer_cast<Agent>(agent);
 }
