@@ -2,7 +2,7 @@
 
 #include "software/logger/custom_logging_levels.h"
 
-ColouredCoutSink::ColouredCoutSink(bool print_detailed) : print_detailed(print_detailed)
+ColouredCoutSink::ColouredCoutSink(bool print_detailed) : print_detailed(print_detailed), log_merger(LogMerger())
 {
 }
 
@@ -52,7 +52,14 @@ void ColouredCoutSink::resetColour()
 
 void ColouredCoutSink::displayColouredLog(g3::LogMessageMover log_entry)
 {
-    auto level  = log_entry.get()._level;
+    g3::LogMessage new_log = log_entry.get();
+    for (g3::LogMessage log : log_merger.log(new_log)) {
+        displaySingleLog(log);
+    }
+}
+
+void ColouredCoutSink::displaySingleLog(g3::LogMessage &log) {
+    auto level  = log._level;
     auto colour = colourToString(getColour(level));
 
     if (level.value == VISUALIZE.value || level.value == CSV.value)
@@ -64,11 +71,11 @@ void ColouredCoutSink::displayColouredLog(g3::LogMessageMover log_entry)
     std::ostringstream oss;
     if (print_detailed)
     {
-        oss << "\033[" << colour << "m" << log_entry.get().toString() << "\033[m";
+        oss << "\033[" << colour << "m" << log.toString() << "\033[m";
     }
     else
     {
-        oss << "\033[" << colour << "m" << log_entry.get().message() << "\n\033[m";
+        oss << "\033[" << colour << "m" << log.message() << "\n\033[m";
     }
     std::cout << oss.str() << std::flush;
     resetColour();

@@ -131,6 +131,4 @@ TEST(LogMergerTests, log_one_in_middle)
 
     g3::LogMessage repeats = createLog("First message (9 repeats)");
     checkLogsEqual(repeats, log2.front());
-
-
 }

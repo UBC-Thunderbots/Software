@@ -27,15 +27,21 @@ class NetworkSink
     NetworkSink(unsigned int channel, const std::string& interface, int robot_id);
     /**
      * This function is called on every call to LOG(). It sends a RobotLog proto on the
-     * network
+     * network and merges repeated messages.
      *
      * @param log_entry the message received on a LOG() call
      */
     void sendToNetwork(g3::LogMessageMover log_entry);
 
+    /**
+     * Send a single log to the network, without merging.
+     * 
+     * @param log the LogMessage to send
+    */
+    void sendOneToNetwork(g3::LogMessage log);
+
    private:
     std::unique_ptr<ThreadedProtoUdpSender<TbotsProto::RobotLog>> log_output;
     int robot_id;
-
-    LogMerger merger;
+    LogMerger log_merger;
 };
