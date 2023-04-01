@@ -89,25 +89,17 @@ void MotionConstraintVisitor::visit(const MoveGoalieToGoalLineTactic &tactic)
 
 void MotionConstraintVisitor::visit(const PlaceBallTactic &tactic)
 {
-    current_motion_constraints.erase(TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA);
-    current_motion_constraints.erase(TbotsProto::MotionConstraint::INFLATED_ENEMY_DEFENSE_AREA);
-    current_motion_constraints.erase(
-        TbotsProto::MotionConstraint::AVOID_FIELD_BOUNDARY_ZONE);
+    current_motion_constraints.clear();
 }
 
 void MotionConstraintVisitor::visit(const PlaceBallMoveTactic &tactic)
 {
-    current_motion_constraints.erase(TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA);
-    current_motion_constraints.erase(TbotsProto::MotionConstraint::INFLATED_ENEMY_DEFENSE_AREA);
-    current_motion_constraints.erase(
-        TbotsProto::MotionConstraint::AVOID_FIELD_BOUNDARY_ZONE);
+    current_motion_constraints.clear();
 }
 
 void MotionConstraintVisitor::visit(const WallKickoffTactic &tactic)
 {
-    current_motion_constraints.erase(TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA);
-    current_motion_constraints.erase(
-        TbotsProto::MotionConstraint::AVOID_FIELD_BOUNDARY_ZONE);
+    current_motion_constraints.clear();
 }
 
 std::set<TbotsProto::MotionConstraint>
