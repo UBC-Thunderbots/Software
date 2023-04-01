@@ -70,11 +70,29 @@ class HRVOSimulator
 
 
     /**
+     * Get the current friendly robot velocity
+     *
+     * @param robot_id The robot id of the friendly robot to retrieve velocity from
+     * @return Current global velocity of robot
+     */
+    AngularVelocity getRobotAngularVelocity(unsigned int robot_id) const;
+
+
+    /**
      * Update the velocity of the agent with the given id
      * @param robot_id Robot id of the agent to update
      * @param new_velocity New global velocity of the agent
      */
     void updateRobotVelocity(RobotId robot_id, const Vector &new_velocity);
+
+
+    /**
+     * Update the velocity of the agent with the given id
+     * @param robot_id Robot id of the agent to update
+     * @param new_velocity New global velocity of the agent
+     */
+    void updateRobotAngularVelocity(RobotId robot_id,
+                                    const AngularVelocity &new_angular_velocity);
 
 
     /**

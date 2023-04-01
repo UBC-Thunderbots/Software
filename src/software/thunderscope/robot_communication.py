@@ -213,6 +213,13 @@ class RobotCommunication(object):
             True,
         )
 
+        self.send_primitive_set = PlotJugglerProtoListener(
+            self.multicast_channel + "%" + self.interface,
+            PLOTJUGGLER_PORT,
+            lambda data: self.current_proto_unix_io.send_proto(PlotJugglerValue, data),
+            True,
+        )
+
         # Create multicast senders
         self.send_primitive_set = PrimitiveSetProtoSender(
             self.multicast_channel + "%" + self.interface, PRIMITIVE_PORT, True

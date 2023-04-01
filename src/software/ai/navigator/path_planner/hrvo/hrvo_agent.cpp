@@ -4,9 +4,10 @@
 
 HRVOAgent::HRVOAgent(RobotId robot_id, const RobotState &robot_state,
                      const RobotPath &path, double radius, double max_speed,
-                     double max_accel, double max_radius_inflation)
-    : Agent(robot_id, robot_state, path, radius, max_speed, max_accel,
-            max_radius_inflation),
+                     double max_accel, double max_angular_speed, double max_angular_accel,
+                     double max_radius_inflation)
+    : Agent(robot_id, robot_state, path, radius, max_speed, max_accel, max_angular_speed,
+            max_angular_accel, max_radius_inflation),
       obstacle_factory(TbotsProto::RobotNavigationObstacleConfig()),
       neighbours(),
       config()
@@ -21,10 +22,12 @@ void HRVOAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive,
     ball_obstacle = std::nullopt;
     if (new_primitive.has_move())
     {
-        const auto &motion_control = new_primitive.move().motion_control();
-        float speed_at_dest        = new_primitive.move().final_speed_m_per_s();
-        float new_max_speed        = new_primitive.move().max_speed_m_per_s();
-        this->max_speed            = new_max_speed;
+        const auto &move_primitive = new_primitive.move();
+        const auto &motion_control = move_primitive.motion_control();
+
+        double speed_at_dest = move_primitive.final_speed_m_per_s();
+        max_speed            = move_primitive.max_speed_m_per_s();
+        Angle angle_at_dest  = createAngle(move_primitive.final_angle());
 
         // TODO (#2418): Update implementation of Primitive to support
         // multiple path points and remove this check
@@ -40,10 +43,11 @@ void HRVOAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive,
         Point destination_point = Point(destination.x_meters(), destination.y_meters());
 
         // Max distance which the robot can travel in one time step + scaling
-        // TODO (#2370): This constant is calculated multiple    times.
+        // TODO (#2370): This constant is calculated multiple times.
         double path_radius = (max_speed * time_step.toSeconds()) / 2;
-        auto path_points   = {PathPoint(destination_point, speed_at_dest)};
-        path               = RobotPath(path_points, path_radius);
+
+        auto path_points = {PathPoint(destination_point, speed_at_dest, angle_at_dest)};
+        path             = RobotPath(path_points, path_radius);
 
         // Update static obstacles
         std::set<TbotsProto::MotionConstraint> motion_constraints;
@@ -221,6 +225,39 @@ VelocityObstacle HRVOAgent::createVelocityObstacle(const Agent &other_agent)
 
     return VelocityObstacle(hrvo_apex, vo.getLeftSide(), vo.getRightSide());
 }
+
+
+void HRVOAgent::computeNewAngularVelocity(Duration time_step)
+{
+    auto path_point_opt = path.getCurrentPathPoint();
+    if (!path_point_opt.has_value())
+    {
+        angular_velocity = AngularVelocity::fromRadians(0);
+        return;
+    }
+
+    const Angle dest_orientation = path_point_opt.value().getOrientation();
+    const double signed_delta_orientation =
+            (dest_orientation - orientation).clamp().toRadians();
+
+    // PID controller
+    const double pid_output = signed_delta_orientation * config.angular_velocity_kp();
+    AngularVelocity pid_angular_velocity = AngularVelocity::fromRadians(pid_output);
+
+    // Clamp acceleration
+    double delta_angular_velocity = (pid_angular_velocity - angular_velocity).toRadians();
+    const double max_accel = max_angular_accel * time_step.toSeconds();
+    const double clamped_delta_angular_velocity = std::clamp(delta_angular_velocity, -max_accel, max_accel);
+
+    // Clamp velocity
+    const double desired_output = angular_velocity.toRadians() + clamped_delta_angular_velocity;
+    const double max_angular_vel = static_cast<double>(max_angular_speed);
+    AngularVelocity output = AngularVelocity::fromRadians(std::clamp(desired_output, -max_angular_vel, max_angular_vel));
+
+    orientation += ((angular_velocity + output) / 2) * time_step.toSeconds();
+    angular_velocity = output;
+}
+
 
 void HRVOAgent::computeNewVelocity(
     const std::map<unsigned int, std::shared_ptr<Agent>> &agents, Duration time_step)
@@ -580,7 +617,7 @@ Vector HRVOAgent::computePreferredVelocity(Duration time_step)
     // We calculate the new desired velocity based on two proportional controllers,
     // one for each axis in the local frame.
     const double vx = local_error.x() * config.linear_velocity_kp();
-    const double vy = local_error.x() * config.linear_velocity_kp();
+    const double vy = local_error.y() * config.linear_velocity_kp();
     Vector pid_vel = Vector(vx, vy);
     Vector curr_local_velocity = globalToLocalVelocity(velocity, orientation);
     Vector delta_velocity = pid_vel - curr_local_velocity;
@@ -589,7 +626,7 @@ Vector HRVOAgent::computePreferredVelocity(Duration time_step)
     float acceleration_limit;
     if (pid_vel.length() >= curr_local_velocity.length())
     {
-        // Robot is accelerating
+        // Robot is accelerating TODO: These values should be passed in and saved as fields aswell probably
         acceleration_limit = robot_constants.robot_max_acceleration_m_per_s_2;
     }
     else
@@ -602,7 +639,7 @@ Vector HRVOAgent::computePreferredVelocity(Duration time_step)
     Vector desired_output = curr_local_velocity + max_delta_velocity;
 
     // Clamp to max speed
-    Vector output = desired_output.normalize(std::min(desired_output.length(), static_cast<double>(robot_constants.robot_max_speed_m_per_s)));
+    Vector output = desired_output.normalize(std::min(desired_output.length(), static_cast<double>(max_speed)));
 
     // To avoid the robot swinging when turning and moving in a linear line, we
     // will compensate for the current angular velocity by rotating the velocity

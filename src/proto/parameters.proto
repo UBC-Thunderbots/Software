@@ -39,6 +39,7 @@ message AiConfig
     required RobotCapabilitiesConfig robot_capabilities_config              = 9;
     required DefensePlayConfig defense_play_config                          = 11;
     required RobotNavigationObstacleConfig robot_navigation_obstacle_config = 12;
+    required HRVOConfig hrvo_config                                        = 13;
 }
 
 message AiControlConfig
@@ -300,7 +301,12 @@ message HRVOConfig // TODO: Add to full config message
         (bounds).min_double_value = 0.001,
         (bounds).max_double_value = 10.0
     ];
-    required double angular_velocity_compensation = 2 [
+    required double angular_velocity_kp = 2 [
+        default                   = 2.8,
+        (bounds).min_double_value = 0.001,
+        (bounds).max_double_value = 10.0
+    ];
+    required double angular_velocity_compensation = 3 [
         default                   = 1.5,
         (bounds).min_double_value = 0.0,
         (bounds).max_double_value = 3.0

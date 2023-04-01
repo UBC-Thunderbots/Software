@@ -1,14 +1,16 @@
 #include "agent.h"
 
 Agent::Agent(RobotId robot_id, const RobotState &robot_state, const RobotPath &path,
-             double radius, double max_speed, double max_accel,
-             double max_radius_inflation)
+             double radius, double max_speed, double max_accel, double max_angular_speed,
+             double max_angular_accel, double max_radius_inflation)
     : robot_id(robot_id),
       path(path),
       radius(radius),
       min_radius(radius),
       max_speed(max_speed),
       max_accel(max_accel),
+      max_angular_speed(max_angular_speed),
+      max_angular_accel(max_angular_accel),
       max_radius_inflation(max_radius_inflation),
       position(robot_state.position()),
       velocity(robot_state.velocity()),
@@ -118,4 +120,14 @@ void Agent::setPreferredVelocity(const Vector &pref_velocity)
 void Agent::setVelocity(const Vector &velocity_update)
 {
     velocity = velocity_update;
+}
+
+void Agent::setAngularVelocity(const AngularVelocity &new_angular_velocity)
+{
+    angular_velocity = new_angular_velocity;
+}
+
+void Agent::setOrientation(const Angle &new_orientation)
+{
+    orientation = new_orientation;
 }

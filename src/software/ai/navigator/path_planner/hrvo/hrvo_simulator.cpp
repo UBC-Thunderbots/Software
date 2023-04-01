@@ -44,16 +44,21 @@ void HRVOSimulator::configureHRVORobot(const Robot &robot,
                                        const RobotConstants_t &robot_constants,
                                        Duration time_step)
 {
-    double max_accel = 1e-4;
-    double max_speed = 1e-4;
+    double max_accel         = 1e-4;
+    double max_speed         = 1e-4;
+    double max_angular_speed = 1e-4;
+    double max_angular_accel = 1e-4;
     const std::set<RobotCapability> &unavailable_capabilities =
         robot.getUnavailableCapabilities();
     bool can_move = unavailable_capabilities.find(RobotCapability::Move) ==
                     unavailable_capabilities.end();
     if (can_move)
     {
-        max_accel = robot_constants.robot_max_acceleration_m_per_s_2;
         max_speed = robot_constants.robot_max_speed_m_per_s;
+        max_accel = robot_constants.robot_max_acceleration_m_per_s_2;
+
+        max_angular_speed = robot_constants.robot_max_ang_speed_rad_per_s;
+        max_angular_accel = robot_constants.robot_max_ang_acceleration_rad_per_s_2;
     }
 
     // Get this robot's destination point, if it has a primitive
@@ -61,12 +66,12 @@ void HRVOSimulator::configureHRVORobot(const Robot &robot,
     // destination
     Point destination_point      = robot.position();
     double speed_at_goal         = 0.0;
+    Angle angle_at_goal          = robot.orientation();
     const auto &robot_primitives = primitive_set.robot_primitives();
     auto primitive_iter          = robot_primitives.find(robot.id());
     if (primitive_iter != robot_primitives.end())
     {
         TbotsProto::Primitive primitive = primitive_iter->second;
-        TbotsProto::Point destination_point_proto;
 
         // TODO (#2873): This code block is repeated inside HRVOAgent.cpp.
         // and it just calculates the path point from the primitive.
@@ -85,6 +90,9 @@ void HRVOSimulator::configureHRVORobot(const Robot &robot,
                 return;
             }
 
+            speed_at_goal = move_primitive.final_speed_m_per_s();
+            max_speed     = move_primitive.max_speed_m_per_s();
+            angle_at_goal = createAngle(move_primitive.final_angle());
 
             auto destination  = motion_control.path().points().at(1);
             destination_point = Point(destination.x_meters(), destination.y_meters());
@@ -94,11 +102,13 @@ void HRVOSimulator::configureHRVORobot(const Robot &robot,
     // Max distance which the robot can travel in one time step + scaling
     double max_radius = (max_speed * time_step.toSeconds()) / 2;
 
-    RobotPath path = RobotPath({PathPoint(destination_point, speed_at_goal)}, max_radius);
+    auto path_points = {PathPoint(destination_point, speed_at_goal, angle_at_goal)};
+    RobotPath path   = RobotPath(path_points, max_radius);
 
     std::shared_ptr<HRVOAgent> agent = std::make_shared<HRVOAgent>(
         robot.id(), robot.currentState(), path, ROBOT_MAX_RADIUS_METERS, max_speed,
-        max_accel, FRIENDLY_ROBOT_RADIUS_MAX_INFLATION);
+        max_accel, max_angular_speed, max_angular_accel,
+        FRIENDLY_ROBOT_RADIUS_MAX_INFLATION);
     robots[robot.id()] = std::static_pointer_cast<Agent>(agent);
 }
 
@@ -113,11 +123,12 @@ void HRVOSimulator::configureLVRobot(const Robot &robot,
     // Max distance which the robot can travel in one time step + scaling
     double path_radius = (robot.velocity().length() * time_step.toSeconds()) / 2;
 
-    RobotPath path = RobotPath({PathPoint(destination, 0.0)}, path_radius);
+    RobotPath path = RobotPath(
+        {PathPoint(destination, 0.0, robot.currentState().orientation())}, path_radius);
 
     std::shared_ptr<LVAgent> agent = std::make_shared<LVAgent>(
         robot.id(), robot.currentState(), path, ROBOT_MAX_RADIUS_METERS, max_speed, 0.0,
-        ENEMY_ROBOT_RADIUS_MAX_INFLATION);
+        0.0, 0.0, ENEMY_ROBOT_RADIUS_MAX_INFLATION); // TODO: Double check the 0.0s
 
     robots[robot.id() + ENEMY_LV_ROBOT_OFFSET] = std::static_pointer_cast<Agent>(agent);
 }
@@ -150,6 +161,11 @@ void HRVOSimulator::doStep(Duration time_step)
     for (auto &robot : robots)
     {
         robot.second->computeNewVelocity(robots, time_step);
+    }
+
+    for (auto &robot : robots)
+    {
+        robot.second->computeNewAngularVelocity(time_step);
     }
 
     // Update the positions of all agents given their velocity
@@ -188,6 +204,18 @@ void HRVOSimulator::updateRobotVelocity(RobotId robot_id, const Vector &new_velo
     }
 }
 
+
+void HRVOSimulator::updateRobotAngularVelocity(
+    RobotId robot_id, const AngularVelocity &new_angular_velocity)
+{
+    auto hrvo_agent = robots.find(robot_id);
+    if (hrvo_agent != robots.end())
+    {
+        hrvo_agent->second->setAngularVelocity(new_angular_velocity);
+    }
+}
+
+
 Vector HRVOSimulator::getRobotVelocity(unsigned int robot_id) const
 {
     auto hrvo_agent = robots.find(robot_id);
@@ -200,6 +228,21 @@ Vector HRVOSimulator::getRobotVelocity(unsigned int robot_id) const
                  << std::endl;
     return Vector();
 }
+
+
+AngularVelocity HRVOSimulator::getRobotAngularVelocity(unsigned int robot_id) const
+{
+    auto hrvo_agent = robots.find(robot_id);
+    if (hrvo_agent != robots.end())
+    {
+        return hrvo_agent->second->getAngularVelocity();
+    }
+    LOG(WARNING) << "Angular velocity for robot " << robot_id
+                 << " can not be found since it does not exist in HRVO Simulator"
+                 << std::endl;
+    return AngularVelocity();
+}
+
 
 std::size_t HRVOSimulator::getRobotCount()
 {
