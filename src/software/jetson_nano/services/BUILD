@@ -29,17 +29,3 @@ cc_library(
         "@boost//:filesystem",
     ],
 )
-
-cc_library(
-    name = "network",
-    srcs = ["network.cpp"],
-    hdrs = ["network.h"],
-    deps = [
-        "//proto:tbots_cc_proto",
-        "//shared:robot_constants",
-        "//software/logger",
-        "//software/networking:threaded_proto_udp_listener",
-        "//software/networking:threaded_proto_udp_sender",
-        "@boost//:asio",
-    ],
-)
