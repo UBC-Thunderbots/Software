@@ -16,7 +16,6 @@ class RobotCommunication(object):
     def __init__(
         self,
         current_proto_unix_io,
-        run_worlds,
         multicast_channel,
         interface,
         disable_estop,
@@ -26,7 +25,6 @@ class RobotCommunication(object):
         """Initialize the communication with the robots
 
         :param current_proto_unix_io: the current proto unix io object
-        :param run_worlds: whether to run the worlds thread (if fullsystem is enabled)
         :param multicast_channel: The multicast channel to use
         :param interface: The interface to use
         :param disable_estop: whether to disable estop checks (ONLY FOR TESTING LOCALLY)
@@ -44,7 +42,6 @@ class RobotCommunication(object):
         self.estop_buadrate = estop_buadrate
 
         self.running = False
-        self.run_worlds = run_worlds
 
         self.world_buffer = ThreadSafeBuffer(1, World)
         self.primitive_buffer = ThreadSafeBuffer(1, PrimitiveSet)
@@ -205,12 +202,12 @@ class RobotCommunication(object):
         """
         Sets up a world sender, a listener for SSL vision data, and connects all robots to fullsystem as default
         """
-        # self.receive_ssl_wrapper = SSLWrapperPacketProtoListener(
-        #     SSL_VISION_ADDRESS,
-        #     SSL_VISION_PORT,
-        #     lambda data: self.current_proto_unix_io.send_proto(SSL_WrapperPacket, data),
-        #     True,
-        # )
+        self.receive_ssl_wrapper = SSLWrapperPacketProtoListener(
+            SSL_VISION_ADDRESS,
+            SSL_VISION_PORT,
+            lambda data: self.current_proto_unix_io.send_proto(SSL_WrapperPacket, data),
+            True,
+        )
 
         self.send_world = WorldProtoSender(
             self.multicast_channel + "%" + self.interface, VISION_PORT, True
@@ -219,6 +216,8 @@ class RobotCommunication(object):
         self.robots_connected_to_fullsystem = {
             robot_id for robot_id in range(MAX_ROBOT_IDS_PER_SIDE)
         }
+
+        self.run_world_thread.start()
 
     def __enter__(self):
         """Enter RobotCommunication context manager. Setup multicast listener
@@ -250,15 +249,18 @@ class RobotCommunication(object):
         self.send_estop_state_thread.start()
         self.run_primitive_set_thread.start()
 
-        if self.run_worlds:
-            self.run_world_thread.start()
-
         return self
 
     def __exit__(self):
         """Exit RobotCommunication context manager
 
+        Ends all currently running loops and joins all currently active threads
+
         """
-        self.run_world_thread.join()
-        self.run_primitive_set_thread.join()
+        # end all loops which depend on this condition
         self.running = False
+
+        if self.run_world_thread.is_alive():
+            self.run_world_thread.join()
+
+        self.run_primitive_set_thread.join()
