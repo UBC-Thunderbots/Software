@@ -300,6 +300,7 @@ void HRVOAgent::computeNewVelocity(
 
     // this adds candidate points that are projections of the preferred velocity onto the
     // line segment of each obstacle
+    LOG(WARNING) << "GOT TO FIRST LOOP" << std::endl;
     for (int i = 0; i < static_cast<int>(velocity_obstacles.size()); ++i)
     {
         const Vector apex_to_pref_velocity =
@@ -327,6 +328,7 @@ void HRVOAgent::computeNewVelocity(
         }
     }
 
+    LOG(WARNING) << "GOT TO SECOND LOOP" << std::endl;
     for (int j = 0; j < static_cast<int>(velocity_obstacles.size()); ++j)
     {
         double discriminant =
@@ -402,6 +404,7 @@ void HRVOAgent::computeNewVelocity(
     }
 
     // intersection points of all velocity obstacles with each other
+    LOG(WARNING) << "GOT TO THIRD LOOP" << std::endl;
     for (int i = 0; i < static_cast<int>(velocity_obstacles.size()) - 1; ++i)
     {
         for (int j = i + 1; j < static_cast<int>(velocity_obstacles.size()); ++j)
@@ -512,6 +515,7 @@ void HRVOAgent::computeNewVelocity(
     // velocity that minimizes collisions with the closest velocity obstacles
     // - Candidate multimap is organized by distance from preferred velocity so we pick
     // the first valid velocity
+    LOG(WARNING) << "GOT TO FOURTH LOOP" << std::endl;
     for (const auto &dist_to_pref_velocity_sq_candidate_pair : candidates)
     {
         const auto candidate = dist_to_pref_velocity_sq_candidate_pair.second;
@@ -553,6 +557,7 @@ void HRVOAgent::computeNewVelocity(
             new_velocity = candidate.velocity;
         }
     }
+    candidates.clear();
 }
 
 bool HRVOAgent::isIdealCandidate(const CandidateVelocity &candidate) const

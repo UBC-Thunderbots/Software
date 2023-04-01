@@ -13,13 +13,13 @@ class TestHrvo : public testing::Test
           world(Field::createSSLDivisionBField(),
                 Ball(Point(0, 0), Vector(0, 0), Timestamp()), Team(), Team()),
           friendly_robot_1(0, Point(), Vector(), Angle(), AngularVelocity(), Timestamp()),
-          friendly_robot_2(0, Point(), Vector(), Angle(), AngularVelocity(), Timestamp()),
-          friendly_robot_3(0, Point(), Vector(), Angle(), AngularVelocity(), Timestamp()),
-          friendly_robot_4(0, Point(), Vector(), Angle(), AngularVelocity(), Timestamp()),
+          friendly_robot_2(1, Point(), Vector(), Angle(), AngularVelocity(), Timestamp()),
+          friendly_robot_3(2, Point(), Vector(), Angle(), AngularVelocity(), Timestamp()),
+          friendly_robot_4(3, Point(), Vector(), Angle(), AngularVelocity(), Timestamp()),
           enemy_robot_1(0, Point(), Vector(), Angle(), AngularVelocity(), Timestamp()),
-          enemy_robot_2(0, Point(), Vector(), Angle(), AngularVelocity(), Timestamp()),
-          enemy_robot_3(0, Point(), Vector(), Angle(), AngularVelocity(), Timestamp()),
-          enemy_robot_4(0, Point(), Vector(), Angle(), AngularVelocity(), Timestamp())
+          enemy_robot_2(1, Point(), Vector(), Angle(), AngularVelocity(), Timestamp()),
+          enemy_robot_3(2, Point(), Vector(), Angle(), AngularVelocity(), Timestamp()),
+          enemy_robot_4(3, Point(), Vector(), Angle(), AngularVelocity(), Timestamp())
     {
     }
 
