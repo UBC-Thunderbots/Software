@@ -83,8 +83,6 @@ def test_two_ai_ball_placement_in_stadium(simulated_test_runner):
     # Eventually Validation
     eventually_validation_sequence_set = [
         [
-            # RobotEventuallyExitsRegion(regions=[tbots.Circle(ball_final_pos, 0.5)]),
-            # RobotEventuallyExitsRegion(regions=[tbots.Circle(ball_initial_pos, 0.5)]),
             # RobotEventuallyExitsRegion(
             #    regions=[tbots.Polygon.fromSegment(ball_placement_segment, 0.5)]
             # ),
@@ -166,8 +164,6 @@ def test_two_ai_ball_placement_out_stadium(simulated_test_runner):
     # Always Validation
     always_validation_sequence_set = [
         [
-            # RobotNeverEntersRegion(regions=[tbots.Circle(ball_final_pos, 0.5)]),
-            # RobotNeverEntersRegion(regions=[tbots.Circle(ball_initial_pos, 0.5)]),
             # RobotNeverEntersRegion(
             #    regions=[tbots.Polygon.fromSegment(ball_placement_segment, 0.5)]
             # ),
