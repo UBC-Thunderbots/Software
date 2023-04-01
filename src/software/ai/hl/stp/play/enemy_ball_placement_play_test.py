@@ -78,7 +78,7 @@ def test_two_ai_ball_placement_in_stadium(simulated_test_runner):
     always_validation_sequence_set = [[]]
 
     # Ball Placement Variables
-    tbots.Segment(ball_initial_pos, ball_final_pos)
+    ball_placement_segment = tbots.Segment(ball_initial_pos, ball_final_pos)
 
     # Eventually Validation
     eventually_validation_sequence_set = [
@@ -161,7 +161,7 @@ def test_two_ai_ball_placement_out_stadium(simulated_test_runner):
     )
 
     # Ball Placement Variables
-    tbots.Segment(ball_initial_pos, ball_final_pos)
+    ball_placement_segment = tbots.Segment(ball_initial_pos, ball_final_pos)
 
     # Always Validation
     always_validation_sequence_set = [
