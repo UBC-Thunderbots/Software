@@ -2,7 +2,7 @@ name: Generate FSM Diagrams
 
 on:
   push:
-    branches: [ master, ci_test ]
+    branches: [ master ]
     paths: [ "**_fsm.h" ]
     
 jobs:

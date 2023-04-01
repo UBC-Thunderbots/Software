@@ -53,7 +53,7 @@ struct CreaseDefensePlayFSM
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *DefenseState_S + Update_E / defendDefenseArea_A = X,
+            *DefenseState_S + Update_E / defendDefenseArea_A = DefenseState_S,
             X + Update_E                                     = X);
     }
 
