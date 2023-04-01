@@ -152,7 +152,7 @@ class Thunderscope(object):
 
         simulationToolBar = self.window.addToolBar("simulation")
 
-        pixmapi_pause = QStyle.StandardPixmap.SP_MediaStop
+        pixmapi_pause = QStyle.StandardPixmap.SP_MediaPause
         pauseicon = self.window.style().standardIcon(pixmapi_pause)
 
         self.pauseSim = QtGui.QAction(pauseicon, "Pause", self.window)
@@ -387,7 +387,7 @@ class Thunderscope(object):
 
         # change the icon of the button based on simulation state
         if self.is_playing:
-            pixmapi = QStyle.StandardPixmap.SP_MediaStop
+            pixmapi = QStyle.StandardPixmap.SP_MediaPause
         else:
             pixmapi = QStyle.StandardPixmap.SP_MediaPlay
 
