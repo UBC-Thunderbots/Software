@@ -1,6 +1,6 @@
 #pragma once
-#include <g3log/logmessage.hpp>
 #include <chrono>
+#include <g3log/logmessage.hpp>
 #include <list>
 #include <string>
 #include <unordered_map>
@@ -55,14 +55,15 @@ class LogMerger
         std::string msg;
         std::chrono::_V2::system_clock::time_point timestamp;
 
-        Message(g3::LogMessage &log, std::string msg, std::chrono::_V2::system_clock::time_point timestamp)
+        Message(g3::LogMessage &log, std::string msg,
+                std::chrono::_V2::system_clock::time_point timestamp)
             : log(log), msg(msg), timestamp(timestamp)
         {
         }
     };
 
     std::unordered_map<std::string, int>
-        repeat_map;                   // maps string messages to their number of repeats for fast access
+        repeat_map;  // maps string messages to their number of repeats for fast access
     std::list<Message> message_list;  // used to keep track of time order for messages
 
     std::chrono::_V2::system_clock::duration

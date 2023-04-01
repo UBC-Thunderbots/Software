@@ -38,7 +38,8 @@ std::list<g3::LogMessage> LogMerger::_getOldMessages(
         {
             // old, if it has repeats, add repeats to the message and add it to the list
             int repeats = repeat_map[current_message.msg];
-            if (repeats > 0) {
+            if (repeats > 0)
+            {
                 g3::LogMessage log = current_message.log;
                 result.push_back(_addRepeats(log, repeats));
             }
@@ -57,7 +58,8 @@ std::list<g3::LogMessage> LogMerger::_getOldMessages(
 g3::LogMessage LogMerger::_addRepeats(g3::LogMessage &log, int repeats)
 {
     // if no repeats, do nothing
-    if (repeats == 0) {
+    if (repeats == 0)
+    {
         return log;
     }
 
@@ -70,7 +72,9 @@ g3::LogMessage LogMerger::_addRepeats(g3::LogMessage &log, int repeats)
     if (repeats > 1)
     {
         log.write() += " (" + std::to_string(repeats) + " repeats)";
-    } else {
+    }
+    else
+    {
         log.write() += " (1 repeat)";
     }
 

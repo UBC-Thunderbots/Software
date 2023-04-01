@@ -10,7 +10,7 @@ cc_library(
     ],
     deps = [
         "@g3log",
-    ]
+    ],
 )
 
 cc_library(

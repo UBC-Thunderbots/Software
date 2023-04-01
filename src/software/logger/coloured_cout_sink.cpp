@@ -2,7 +2,8 @@
 
 #include "software/logger/custom_logging_levels.h"
 
-ColouredCoutSink::ColouredCoutSink(bool print_detailed) : print_detailed(print_detailed), log_merger(LogMerger())
+ColouredCoutSink::ColouredCoutSink(bool print_detailed)
+    : print_detailed(print_detailed), log_merger(LogMerger())
 {
 }
 
@@ -53,12 +54,14 @@ void ColouredCoutSink::resetColour()
 void ColouredCoutSink::displayColouredLog(g3::LogMessageMover log_entry)
 {
     g3::LogMessage new_log = log_entry.get();
-    for (g3::LogMessage log : log_merger.log(new_log)) {
+    for (g3::LogMessage log : log_merger.log(new_log))
+    {
         displaySingleLog(log);
     }
 }
 
-void ColouredCoutSink::displaySingleLog(g3::LogMessage &log) {
+void ColouredCoutSink::displaySingleLog(g3::LogMessage &log)
+{
     auto level  = log._level;
     auto colour = colourToString(getColour(level));
 

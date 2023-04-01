@@ -2,8 +2,8 @@
 #include <g3log/logmessage.hpp>
 #include <iostream>
 
-#include "software/util/make_enum/make_enum.h"
 #include "software/logger/log_merger.h"
+#include "software/util/make_enum/make_enum.h"
 
 MAKE_ENUM(FG_Colour, YELLOW, RED, GREEN, WHITE);
 /**
@@ -38,9 +38,9 @@ class ColouredCoutSink
 
     /**
      * Displays a single coloured log message in the terminal, without merging.
-     * 
+     *
      * @params log the LogMessage to output
-    */
+     */
     void displaySingleLog(g3::LogMessage &log);
 
    private:

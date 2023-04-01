@@ -14,12 +14,14 @@ NetworkSink::NetworkSink(unsigned int channel, const std::string& interface, int
 void NetworkSink::sendToNetwork(g3::LogMessageMover log_entry)
 {
     g3::LogMessage new_log = log_entry.get();
-    for (g3::LogMessage log : log_merger.log(new_log)) {
+    for (g3::LogMessage log : log_merger.log(new_log))
+    {
         sendOneToNetwork(log);
     }
 }
 
-void NetworkSink::sendOneToNetwork(LogMessage log) {
+void NetworkSink::sendOneToNetwork(LogMessage log)
+{
     auto log_msg_proto = std::make_unique<TbotsProto::RobotLog>();
     TbotsProto::LogLevel log_level_proto;
 
@@ -29,8 +31,7 @@ void NetworkSink::sendOneToNetwork(LogMessage log) {
         log_msg_proto->set_robot_id(robot_id);
         log_msg_proto->set_log_level(log_level_proto);
         log_msg_proto->set_file_name(log.file());
-        log_msg_proto->set_line_number(
-            static_cast<uint32_t>(std::stoul(log.line())));
+        log_msg_proto->set_line_number(static_cast<uint32_t>(std::stoul(log.line())));
 
         TbotsProto::Timestamp timestamp;
         const auto current_time_ms =

@@ -35,9 +35,9 @@ class NetworkSink
 
     /**
      * Send a single log to the network, without merging.
-     * 
+     *
      * @param log the LogMessage to send
-    */
+     */
     void sendOneToNetwork(g3::LogMessage log);
 
    private:
