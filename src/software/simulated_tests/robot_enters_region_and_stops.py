@@ -40,6 +40,11 @@ class RobotEntersRegionAndStops(RobotEntersRegion):
                  and is stationary there for the provided time
                  PASSING when a robot is stationary in the region
         """
+        for robot in world.friendly_team.team_robots:
+            print(math.hypot(
+                robot.current_state.global_velocity.x_component_meters,
+                robot.current_state.global_velocity.y_component_meters,
+            ))
         base_validation_status = super().get_validation_status(world)
 
         if base_validation_status == ValidationStatus.PASSING:
