@@ -85,12 +85,16 @@ void BallPlacementPlayFSM::placeBall(const Update &event)
                              move_tactics.end());
 
     Angle final_angle = Angle::zero();
-    std::optional<Point> placement_point = event.common.world.gameState().getBallPlacementPoint();
+    std::optional<Point> placement_point =
+        event.common.world.gameState().getBallPlacementPoint();
 
     Vector final_direction;
-    if (placement_point.has_value()) {
+    if (placement_point.has_value())
+    {
         // retreat 0.5m (+ buffer), between ball and friendly goal.
-        final_direction = (placement_point.value() - event.common.world.field().friendlyGoalCenter()).normalize();
+        final_direction =
+            (placement_point.value() - event.common.world.field().friendlyGoalCenter())
+                .normalize();
         final_angle = Angle::asin(final_direction.y() / final_direction.x());
     }
 
@@ -114,10 +118,13 @@ void BallPlacementPlayFSM::retreat(const Update &event)
     Point ball_pos = event.common.world.ball().position();
 
     // retreat 0.5m (+ buffer), between ball and friendly goal.
-    Vector retreat_direction = (event.common.world.field().friendlyGoalCenter() - ball_pos).normalize();
-    Point retreat_position = ball_pos + retreat_direction * (0.5 + ROBOT_MAX_HEIGHT_METERS);
+    Vector retreat_direction =
+        (event.common.world.field().friendlyGoalCenter() - ball_pos).normalize();
+    Point retreat_position =
+        ball_pos + retreat_direction * (0.5 + ROBOT_MAX_HEIGHT_METERS);
 
-    Angle current_angle = event.common.world.friendlyTeam().getNearestRobot(ball_pos)->orientation();
+    Angle current_angle =
+        event.common.world.friendlyTeam().getNearestRobot(ball_pos)->orientation();
 
     // setup ball placement tactic for ball placing robot
     retreat_tactic->updateControlParams(retreat_position, current_angle, 0.0);
@@ -146,13 +153,18 @@ bool BallPlacementPlayFSM::kickDone(const Update &event)
 bool BallPlacementPlayFSM::ballPlaced(const Update &event)
 {
     Point ball_pos = event.common.world.ball().position();
-    std::optional<Point> placement_point = event.common.world.gameState().getBallPlacementPoint();
+    std::optional<Point> placement_point =
+        event.common.world.gameState().getBallPlacementPoint();
     std::vector<Robot> robots = event.common.world.friendlyTeam().getAllRobots();
 
     // see if the ball is at the placement destination
-    if (placement_point.has_value()) {
-        return comparePoints(ball_pos, placement_point.value(), 0.05) && event.common.world.ball().velocity().length() < 0.1;
-    } else {
+    if (placement_point.has_value())
+    {
+        return comparePoints(ball_pos, placement_point.value(), 0.05) &&
+               event.common.world.ball().velocity().length() < 0.1;
+    }
+    else
+    {
         return true;
     }
 }

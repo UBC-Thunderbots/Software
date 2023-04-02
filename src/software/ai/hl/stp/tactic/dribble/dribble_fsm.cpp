@@ -106,7 +106,8 @@ void DribbleFSM::dribble(const Update &event)
     bool should_pivot = false;
     if (dribble_destination.has_value())
     {
-        should_pivot = (ball_position - dribble_destination.value()).length() > dribble_tactic_config.should_pivot_threshold();
+        should_pivot = (ball_position - dribble_destination.value()).length() >
+                       dribble_tactic_config.should_pivot_threshold();
     }
 
     auto [target_destination, target_orientation] =

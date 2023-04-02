@@ -177,7 +177,7 @@ message DribbleTacticConfig
 
     // Threshold (distance) to determine whether or not to pivot before dribbling
     required double should_pivot_threshold = 6 [
-        default = 0.30,
+        default                   = 0.30,
         (bounds).min_double_value = 0.0,
         (bounds).max_double_value = 2.0
     ];

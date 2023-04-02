@@ -74,7 +74,8 @@ struct BallPlacementPlayFSM
     bool kickDone(const Update& event);
 
     /**
-     * Guard on whether the placing robot has finished placing the ball into the desired position
+     * Guard on whether the placing robot has finished placing the ball into the desired
+     * position
      *
      * @param event the BallPlacementPlayFSM Update event
      *
@@ -115,12 +116,12 @@ struct BallPlacementPlayFSM
             KickOffWallState_S + Update_E[!shouldKickOffWall_G] = PlaceBallState_S,
             KickOffWallState_S + Update_E[!kickDone_G] / kickOffWall_A =
                 KickOffWallState_S,
-            KickOffWallState_S + Update_E[kickDone_G] = StartState_S,
-            PlaceBallState_S + Update_E[shouldKickOffWall_G] = StartState_S,
+            KickOffWallState_S + Update_E[kickDone_G]                = StartState_S,
+            PlaceBallState_S + Update_E[shouldKickOffWall_G]         = StartState_S,
             PlaceBallState_S + Update_E[!ballPlaced_G] / placeBall_A = PlaceBallState_S,
-            PlaceBallState_S + Update_E[ballPlaced_G] / retreat_A = RetreatState_S,
-            RetreatState_S + Update_E[!ballPlaced_G] = StartState_S,
-            RetreatState_S + Update_E[ballPlaced_G] / retreat_A = RetreatState_S);
+            PlaceBallState_S + Update_E[ballPlaced_G] / retreat_A    = RetreatState_S,
+            RetreatState_S + Update_E[!ballPlaced_G]                 = StartState_S,
+            RetreatState_S + Update_E[ballPlaced_G] / retreat_A      = RetreatState_S);
     }
 
    private:

@@ -103,10 +103,7 @@ def test_two_ai_ball_placement(simulated_test_runner, run_enemy_ai):
 
     # Drop Ball Always Validation
     drop_ball_always_validation_sequence_set = [
-        [
-            BallAlwaysStaysInRegion(
-                regions=[tbots.Circle(ball_final_pos, 0.1)]),
-        ]
+        [BallAlwaysStaysInRegion(regions=[tbots.Circle(ball_final_pos, 0.1)]),]
     ]
 
     # Drop Ball Eventually Validation
@@ -115,10 +112,8 @@ def test_two_ai_ball_placement(simulated_test_runner, run_enemy_ai):
     drop_ball_eventually_validation_sequence_set = [
         [
             # Ball should arrive within 5cm of placement point
-            BallEventuallyStopsInRegion(
-                regions=[tbots.Circle(ball_final_pos, 0.05)]),
-            RobotEventuallyExitsRegion(
-                regions=[tbots.Circle(ball_final_pos, 0.05)]),
+            BallEventuallyStopsInRegion(regions=[tbots.Circle(ball_final_pos, 0.05)]),
+            RobotEventuallyExitsRegion(regions=[tbots.Circle(ball_final_pos, 0.05)]),
         ]
     ]
 
@@ -217,12 +212,8 @@ def test_outside_goal_line_ball_placement(simulated_test_runner, run_enemy_ai):
 
     # Drop Ball Always Validation
     drop_ball_always_validation_sequence_set = [
-        [
-            BallAlwaysStaysInRegion(
-                regions=[tbots.Circle(ball_final_pos, 0.1)]),
-        ]
+        [BallAlwaysStaysInRegion(regions=[tbots.Circle(ball_final_pos, 0.1)]),]
     ]
-
 
     # Drop Ball Eventually Validation
     # Non free kick after ball placement, the robot must be 0.5 away from the ball after the placement
@@ -230,10 +221,8 @@ def test_outside_goal_line_ball_placement(simulated_test_runner, run_enemy_ai):
     drop_ball_eventually_validation_sequence_set = [
         [
             # Ball should arrive within 5cm of placement point
-            BallEventuallyStopsInRegion(
-                regions=[tbots.Circle(ball_final_pos, 0.05)]),
-            RobotEventuallyExitsRegion(
-                regions=[tbots.Circle(ball_final_pos, 0.5)]),
+            BallEventuallyStopsInRegion(regions=[tbots.Circle(ball_final_pos, 0.05)]),
+            RobotEventuallyExitsRegion(regions=[tbots.Circle(ball_final_pos, 0.5)]),
         ]
     ]
 
@@ -327,12 +316,8 @@ def test_outside_side_line_ball_placement(simulated_test_runner, run_enemy_ai):
 
     # Drop Ball Always Validation
     drop_ball_always_validation_sequence_set = [
-        [
-            BallAlwaysStaysInRegion(
-                regions=[tbots.Circle(ball_final_pos, 0.1)]),
-        ]
+        [BallAlwaysStaysInRegion(regions=[tbots.Circle(ball_final_pos, 0.1)]),]
     ]
-
 
     # Drop Ball Eventually Validation
     # Non free kick after ball placement, the robot must be 0.5 away from the ball after the placement
@@ -340,10 +325,8 @@ def test_outside_side_line_ball_placement(simulated_test_runner, run_enemy_ai):
     drop_ball_eventually_validation_sequence_set = [
         [
             # Ball should arrive within 5cm of placement point
-            BallEventuallyStopsInRegion(
-                regions=[tbots.Circle(ball_final_pos, 0.05)]),
-            RobotEventuallyExitsRegion(
-                regions=[tbots.Circle(ball_final_pos, 0.5)]),
+            BallEventuallyStopsInRegion(regions=[tbots.Circle(ball_final_pos, 0.05)]),
+            RobotEventuallyExitsRegion(regions=[tbots.Circle(ball_final_pos, 0.5)]),
         ]
     ]
 
@@ -437,12 +420,8 @@ def test_friendly_defense_area_ball_placement(simulated_test_runner, run_enemy_a
 
     # Drop Ball Always Validation
     drop_ball_always_validation_sequence_set = [
-        [
-            BallAlwaysStaysInRegion(
-                regions=[tbots.Circle(ball_final_pos, 0.1)]),
-        ]
+        [BallAlwaysStaysInRegion(regions=[tbots.Circle(ball_final_pos, 0.1)]),]
     ]
-
 
     # Drop Ball Eventually Validation
     # Non free kick after ball placement, the robot must be 0.5 away from the ball after the placement
@@ -450,10 +429,8 @@ def test_friendly_defense_area_ball_placement(simulated_test_runner, run_enemy_a
     drop_ball_eventually_validation_sequence_set = [
         [
             # Ball should arrive within 5cm of placement point
-            BallEventuallyStopsInRegion(
-                regions=[tbots.Circle(ball_final_pos, 0.05)]),
-            RobotEventuallyExitsRegion(
-                regions=[tbots.Circle(ball_final_pos, 0.5)]),
+            BallEventuallyStopsInRegion(regions=[tbots.Circle(ball_final_pos, 0.05)]),
+            RobotEventuallyExitsRegion(regions=[tbots.Circle(ball_final_pos, 0.5)]),
         ]
     ]
 
