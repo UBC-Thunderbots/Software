@@ -66,6 +66,7 @@ class HRVOAgent : public Agent
     void computeNewVelocity(const std::map<unsigned int, std::shared_ptr<Agent>> &robots,
                             Duration time_step) override;
 
+
     /**
      * Computes the preferred velocity of this agent.
      *
@@ -74,14 +75,16 @@ class HRVOAgent : public Agent
      */
     Vector computePreferredVelocity(Duration time_step) override;
 
+
     /**
-     * Compute all the velocity obstacles that this Agent should take into account and
-     * add it to `velocityObstacles`.
+     * Compute all the velocity obstacles that this agent should consider
+     * when processing obstacle avoidance, and add them to velocity_obstacles.
      *
-     * @param the robots nearest neighbours
+     * @param robots the robots in simulation
      */
     void computeVelocityObstacles(
         const std::map<RobotId, std::shared_ptr<Agent>> &robots);
+
 
     /**
      * Create the VO for the given agent, relative to this agent
@@ -90,36 +93,46 @@ class HRVOAgent : public Agent
      * @return The velocity obstacle which other_agent should see for this Agent
      */
     VelocityObstacle createVelocityObstacle(const Agent &other_agent) override;
+
+
     /**
-     * compute the neighbours of this robot
-     * @param robots
-     * @return the robot simulator ids
+     * Compute the nearest neighbours to this  robot
+     *
+     * @param robots the robots in simulation
+     * @return a list of the closest robot ids referencing agents in the simulation
      */
     std::vector<RobotId> computeNeighbors(
         const std::map<RobotId, std::shared_ptr<Agent>> &robots);
 
+
     /**
-     * get the velocity obstacles that this agent sees
+     * Get the velocity obstacles that this agent sees
+     *
      * @return a list of velocity obstacles
      */
     std::vector<VelocityObstacle> getVelocityObstacles();
 
+
     /**
-     * get the velocity obstacle for the ball that the robot sees
-     * @return an o obstacle pointer
+     * Get the ball obstacle that this agent sees
+     *
+     * @return Reference to ball obstacle
      */
     std::optional<ObstaclePtr> getBallObstacle();
 
 
     /**
-     * construct the visualization proto for this robot
+     * Construct the visualization proto for this robot
      *
      * @param friendly_team_colour the team color for this robot
      */
     void visualize(TeamColour friendly_team_colour);
 
 
-    // This class holds the calculated candidate velocity given two velocity obstacles
+    /**
+     * This class holds the candidate velocity as the intersection of 2 velocity obstacles,
+     * as well as the indexes of the intersecting velocity obstacles, indexing into velocity_obstacles
+     */
     class CandidateVelocity
     {
        public:
@@ -136,6 +149,7 @@ class HRVOAgent : public Agent
 
         // The velocity of the candidate.
         Vector velocity;
+
         // pair of (potentially) intersecting velocity obstacles
         // from which we can calculate the candidate velocity
         // TODO (#2872): change to use shared_ptr's to obstacles instead.
@@ -204,10 +218,18 @@ class HRVOAgent : public Agent
     std::vector<VelocityObstacle> velocity_obstacles;
     std::vector<ObstaclePtr> static_obstacles;
     std::optional<ObstaclePtr> ball_obstacle;
+
+    // pointers to the closest agents by euclidean distance to this agents position
     std::vector<std::shared_ptr<Agent>> neighbours;
 
+    // scale used to normalise preferred velocity so that agent has ability to speed up as
+    // a way to avoid obstacles
     static constexpr double PREF_SPEED_SCALE            = 0.85;
+
+    // a multiplier to account for different accelerations when speeding up vs slowing down
     static constexpr double DECEL_DIST_MULTIPLIER       = 1.2;
+
+    // a multiplier to account for different preferred speed when speeding up vs slowing down
     static constexpr double DECEL_PREF_SPEED_MULTIPLIER = 0.6;
 
     // The maximum distance which HRVO Agents will look for neighbors, in meters.
@@ -215,5 +237,8 @@ class HRVOAgent : public Agent
     // enough space to decelerate and avoid collisions.
     static constexpr double MAX_NEIGHBOR_SEARCH_DIST = 2.5;
 
+    // a multiplier of the preferred velocities length (speed) as a
+    // threshold for the minimum preferred speed.
+    // Used in order to filter slow candidate velocities
     static constexpr double MIN_PREF_SPEED_MULTIPLIER = 0.5;
 };
