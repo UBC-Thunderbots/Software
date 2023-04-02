@@ -479,8 +479,7 @@ class Gamecontroller(object):
         self,
         gc_command: proto.ssl_gc_state_pb2.Command,
         team: proto.ssl_gc_common_pb2.Team,
-        final_ball_placement_point=None,
-        gc_next_command: proto.ssl_gc_state_pb2.Command=None
+        final_ball_placement_point=None
     ):
         """Send a ci input to the gamecontroller.
 
