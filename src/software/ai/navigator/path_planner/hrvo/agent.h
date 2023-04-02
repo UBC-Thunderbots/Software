@@ -191,7 +191,8 @@ class Agent
     const double min_radius;
 
     // the max_speed that the agent may move at. This is NOT a physical
-    // limitation of the robot, but instead software limitation set through move primitives.
+    // limitation of the robot, but instead software limitation set through move
+    // primitives.
     double max_speed;
 
     // the maximum acceleration for the agent
@@ -208,7 +209,7 @@ class Agent
 
    protected:
     // the preferred velocity the agent should use when finding a new_velocity
-    // This velocity represents whats most optimal for getting to the destination
+    // This velocity represents what's most optimal for getting to the destination
     Vector preferred_velocity;
 
     Point position;

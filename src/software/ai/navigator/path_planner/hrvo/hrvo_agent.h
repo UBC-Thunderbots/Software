@@ -130,8 +130,9 @@ class HRVOAgent : public Agent
 
 
     /**
-     * This class holds the candidate velocity as the intersection of 2 velocity obstacles,
-     * as well as the indexes of the intersecting velocity obstacles, indexing into velocity_obstacles
+     * This class holds the candidate velocity as the intersection of 2 velocity
+     * obstacles, as well as the indexes of the intersecting velocity obstacles, indexing
+     * into velocity_obstacles
      */
     class CandidateVelocity
     {
@@ -224,12 +225,14 @@ class HRVOAgent : public Agent
 
     // scale used to normalise preferred velocity so that agent has ability to speed up as
     // a way to avoid obstacles
-    static constexpr double PREF_SPEED_SCALE            = 0.85;
+    static constexpr double PREF_SPEED_SCALE = 0.85;
 
-    // a multiplier to account for different accelerations when speeding up vs slowing down
-    static constexpr double DECEL_DIST_MULTIPLIER       = 1.2;
+    // a multiplier to account for different accelerations when speeding up vs slowing
+    // down
+    static constexpr double DECEL_DIST_MULTIPLIER = 1.2;
 
-    // a multiplier to account for different preferred speed when speeding up vs slowing down
+    // a multiplier to account for different preferred speed when speeding up vs slowing
+    // down
     static constexpr double DECEL_PREF_SPEED_MULTIPLIER = 0.6;
 
     // The maximum distance which HRVO Agents will look for neighbors, in meters.

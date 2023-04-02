@@ -129,7 +129,7 @@ void HRVOAgent::computeVelocityObstacles(
         // Don't draw any velocity obstacles if we do not have a destination
         return;
     }
-    auto current_destination          = current_path_point_opt.value().getPosition();
+    auto current_destination = current_path_point_opt.value().getPosition();
 
 
     // Create Velocity Obstacles for neighboring agents
@@ -564,10 +564,10 @@ std::optional<int> HRVOAgent::findIntersectingVelocityObstacle(
 
 Vector HRVOAgent::computePreferredVelocity(Duration time_step)
 {
-    double pref_speed   = max_speed * PREF_SPEED_SCALE;
+    double pref_speed                 = max_speed * PREF_SPEED_SCALE;
     const auto current_path_point_opt = path.getCurrentPathPoint();
 
-    if ( !current_path_point_opt.has_value() || pref_speed <= 0.01 || max_accel <= 0.01)
+    if (!current_path_point_opt.has_value() || pref_speed <= 0.01 || max_accel <= 0.01)
     {
         // Used to avoid edge cases with division by zero
         return Vector(0.0, 0.0);
