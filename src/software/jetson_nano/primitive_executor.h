@@ -72,16 +72,11 @@ class PrimitiveExecutor
     Vector getTargetLinearVelocity();
 
     /*
-     * Compute the next target angular velocity the robot should be at
-     * assuming max acceleration.
+     * Returns the next target angular velocity the robot
      *
-     * @param move_primitive The MovePrimitive to compute the angular velocity for
-     * @param curr_orientation The current orientation of the robot which is running this
-     * Primitive Executor
      * @returns AngularVelocity The target angular velocity
      */
-    AngularVelocity getTargetAngularVelocity(
-        const TbotsProto::MovePrimitive &move_primitive);
+    AngularVelocity getTargetAngularVelocity();
 
     TbotsProto::Primitive current_primitive_;
     TeamColour friendly_team_colour;
