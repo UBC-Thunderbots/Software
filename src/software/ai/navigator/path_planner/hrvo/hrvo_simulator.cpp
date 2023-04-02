@@ -21,7 +21,6 @@ void HRVOSimulator::updateWorld(const World &world,
     for (const Robot &friendly_robot : friendlies.getAllRobots())
     {
         auto hrvo_agent = robots.find(friendly_robot.id());
-        LOG(WARNING) << "friend setting bitset" << friendly_robot.id();
 
         tracked_friendlies.set(friendly_robot.id(), true);
 
@@ -33,7 +32,6 @@ void HRVOSimulator::updateWorld(const World &world,
         {
             configureHRVORobot(friendly_robot, robot_constants, time_step);
         }
-        LOG(WARNING) << "friend finished bitsetting" << friendly_robot.id();
     }
 
     // flip all the tracked bits to get all the robot ids which are NOT in the world
@@ -41,19 +39,15 @@ void HRVOSimulator::updateWorld(const World &world,
     tracked_friendlies.flip();
     if (tracked_friendlies.any())
     {
-        LOG(WARNING) << "clearing friendlies";
         std::erase_if(
             robots, [&](const std::pair<RobotId, std::shared_ptr<Agent>> &id_robot_pair) {
                 auto const &[id, _] = id_robot_pair;
-                    LOG(WARNING) << "inside clearing friendlies";
                     return tracked_friendlies[id] == 1;
             });
     }
 
     for (const Robot &enemy_robot : enemies.getAllRobots())
     {
-        LOG(WARNING) << "friend setting bitset" << enemy_robot.id();
-
         auto hrvo_agent = robots.find(enemy_robot.id() + ENEMY_LV_ROBOT_OFFSET);
         tracked_enemies.set(enemy_robot.id(), true);
 
@@ -65,8 +59,6 @@ void HRVOSimulator::updateWorld(const World &world,
         {
             configureLVRobot(enemy_robot, robot_constants, time_step);
         }
-        LOG(WARNING) << "friend finished bitsetting" << enemy_robot.id();
-
     }
 
     // flip all the tracked bits to get all the robot ids which are NOT in the world
@@ -74,14 +66,10 @@ void HRVOSimulator::updateWorld(const World &world,
     tracked_enemies.flip();
     if (tracked_enemies.any())
     {
-        LOG(WARNING) << "clearing enemies";
-
         std::erase_if(
             robots, [&](const std::pair<RobotId, std::shared_ptr<Agent>> &id_robot_pair) {
                 auto const &[id, _] = id_robot_pair;
-                LOG(WARNING) << "inside clearing enemies";
-
-                    // we only want to remove enemy agents here, so check that the id
+                // we only want to remove enemy agents here, so check that the id
                 // in the map is offset (indicating that they're an enemy)
                 if (id >= ENEMY_LV_ROBOT_OFFSET)
                 {
@@ -90,7 +78,6 @@ void HRVOSimulator::updateWorld(const World &world,
                 return false;
             });
     }
-    LOG(WARNING) << "FINISHED update worlding";
 
     assert(friendlies.numRobots() + enemies.numRobots() == robots.size());
 }
@@ -110,8 +97,8 @@ void HRVOSimulator::updatePrimitiveSet(const TbotsProto::PrimitiveSet &new_primi
             {
                 continue;
             }
+                friendly_robot->second->updatePrimitive(primitive, world.value(), time_step);
 
-            friendly_robot->second->updatePrimitive(primitive, world.value(), time_step);
         }
     }
 }

@@ -127,13 +127,12 @@ void HRVOAgent::computeVelocityObstacles(
     velocity_obstacles.reserve(robots.size());
 
     const auto current_path_point_opt = getPath().getCurrentPathPoint();
-    auto current_destination          = current_path_point_opt.value().getPosition();
-
     if (!current_path_point_opt.has_value())
     {
         // Don't draw any velocity obstacles if we do not have a destination
         return;
     }
+    auto current_destination          = current_path_point_opt.value().getPosition();
 
     // Create Velocity Obstacles for neighboring agents
     std::vector<unsigned int> neighbour_ids = computeNeighbors(robots);
@@ -226,7 +225,14 @@ VelocityObstacle HRVOAgent::createVelocityObstacle(const Agent &other_agent)
 
 void HRVOAgent::computeNewAngularVelocity(Duration time_step)
 {
-    const Angle dest_orientation   = path.getCurrentPathPoint().value().getOrientation();
+    const auto current_path_point_opt = getPath().getCurrentPathPoint();
+    if (!current_path_point_opt.has_value())
+    {
+        // Don't compute an angular velocity if there is no path point to go to
+        angular_velocity = AngularVelocity::fromRadians(0);
+        return;
+    }
+    const Angle dest_orientation   = current_path_point_opt.value().getOrientation();
     const double delta_orientation = dest_orientation.minDiff(orientation).toRadians();
 
     // angular velocity given linear deceleration and distance remaining to target
@@ -257,6 +263,7 @@ void HRVOAgent::computeNewAngularVelocity(Duration time_step)
 void HRVOAgent::computeNewVelocity(
     const std::map<unsigned int, std::shared_ptr<Agent>> &agents, Duration time_step)
 {
+
     // Based on The Hybrid Reciprocal Velocity Obstacle paper:
     // https://gamma.cs.unc.edu/HRVO/HRVO-T-RO.pdf
 
@@ -300,7 +307,6 @@ void HRVOAgent::computeNewVelocity(
 
     // this adds candidate points that are projections of the preferred velocity onto the
     // line segment of each obstacle
-    LOG(WARNING) << "GOT TO FIRST LOOP" << std::endl;
     for (int i = 0; i < static_cast<int>(velocity_obstacles.size()); ++i)
     {
         const Vector apex_to_pref_velocity =
@@ -328,7 +334,6 @@ void HRVOAgent::computeNewVelocity(
         }
     }
 
-    LOG(WARNING) << "GOT TO SECOND LOOP" << std::endl;
     for (int j = 0; j < static_cast<int>(velocity_obstacles.size()); ++j)
     {
         double discriminant =
@@ -404,7 +409,6 @@ void HRVOAgent::computeNewVelocity(
     }
 
     // intersection points of all velocity obstacles with each other
-    LOG(WARNING) << "GOT TO THIRD LOOP" << std::endl;
     for (int i = 0; i < static_cast<int>(velocity_obstacles.size()) - 1; ++i)
     {
         for (int j = i + 1; j < static_cast<int>(velocity_obstacles.size()); ++j)
@@ -515,7 +519,6 @@ void HRVOAgent::computeNewVelocity(
     // velocity that minimizes collisions with the closest velocity obstacles
     // - Candidate multimap is organized by distance from preferred velocity so we pick
     // the first valid velocity
-    LOG(WARNING) << "GOT TO FOURTH LOOP" << std::endl;
     for (const auto &dist_to_pref_velocity_sq_candidate_pair : candidates)
     {
         const auto candidate = dist_to_pref_velocity_sq_candidate_pair.second;
@@ -605,7 +608,7 @@ Vector HRVOAgent::computePreferredVelocity(Duration time_step)
     double pref_speed   = max_speed * PREF_SPEED_SCALE;
     auto path_point_opt = path.getCurrentPathPoint();
 
-    if (pref_speed <= 0.01f || max_accel <= 0.01f || path_point_opt == std::nullopt)
+    if (pref_speed <= 0.01f || max_accel <= 0.01f || !path_point_opt.has_value())
     {
         // Used to avoid edge cases with division by zero
         return Vector(0.f, 0.f);
@@ -691,10 +694,10 @@ void HRVOAgent::visualize(TeamColour friendly_team_colour)
                                                           vo_protos.end()};
 
     // Visualize the ball obstacle
-    if (getBallObstacle().has_value())
+    if (ball_obstacle.has_value())
     {
         TbotsProto::Circle ball_circle =
-            getBallObstacle().value()->createObstacleProto().circle()[0];
+            ball_obstacle.value()->createObstacleProto().circle()[0];
         *(hrvo_visualization.add_robots()) = ball_circle;
     }
 
