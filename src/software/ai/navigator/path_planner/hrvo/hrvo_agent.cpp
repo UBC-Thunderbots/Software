@@ -127,16 +127,16 @@ std::vector<RobotId> HRVOAgent::computeNeighbors(
 void HRVOAgent::computeVelocityObstacles(
     const std::map<RobotId, std::shared_ptr<Agent>> &robots)
 {
+    velocity_obstacles.clear();
     velocity_obstacles.reserve(robots.size());
 
     const auto current_path_point_opt = getPath().getCurrentPathPoint();
-    auto current_destination          = current_path_point_opt.value().getPosition();
-
     if (!current_path_point_opt.has_value())
     {
         // Don't draw any velocity obstacles if we do not have a destination
         return;
     }
+    auto current_destination = current_path_point_opt.value().getPosition();
 
     // Create Velocity Obstacles for neighboring agents
     std::vector<unsigned int> neighbour_ids = computeNeighbors(robots);
@@ -688,10 +688,10 @@ void HRVOAgent::visualize(TeamColour friendly_team_colour)
                                                           vo_protos.end()};
 
     // Visualize the ball obstacle
-    if (getBallObstacle().has_value())
+    if (ball_obstacle.has_value())
     {
         TbotsProto::Circle ball_circle =
-            getBallObstacle().value()->createObstacleProto().circle()[0];
+            ball_obstacle.value()->createObstacleProto().circle()[0];
         *(hrvo_visualization.add_robots()) = ball_circle;
     }
 

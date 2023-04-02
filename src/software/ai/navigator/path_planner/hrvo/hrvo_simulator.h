@@ -120,7 +120,7 @@ class HRVOSimulator
 
     // Robot id offset for enemy robots so we don't have
     // friendly and enemy agents with overlapping ids in the `robots` map
-    static const unsigned int ENEMY_LV_ROBOT_OFFSET = 1000;
+    static const unsigned int ENEMY_LV_ROBOT_OFFSET = 20;
 
    private:
     /**
@@ -141,6 +141,15 @@ class HRVOSimulator
      */
     void configureLVRobot(const Robot &robot, const RobotConstants_t &robot_constants,
                           Duration time_step);
+
+    /**
+     *  Update position, velocity, orientation and angular velocity for this agent.
+     *
+     * @param agent The simulator agent being updated.
+     * @param friendly_robot the world robot whose values should be used
+     */
+    static void updateAgent(const std::shared_ptr<Agent> &agent,
+                            const Robot &friendly_robot);
 
     // robot id to agent
     std::map<RobotId, std::shared_ptr<Agent>> robots;

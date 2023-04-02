@@ -22,11 +22,4 @@ namespace TestUtil
             minimum = DBL_MAX;
         }
     };
-
-    /**
-     * Creates robot constants for a mock robot
-     *
-     * @return robot constants for a mock robot
-     */
-    RobotConstants_t createMockRobotConstants();
 };  // namespace TestUtil

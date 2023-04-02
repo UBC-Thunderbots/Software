@@ -7,16 +7,86 @@ void HRVOSimulator::updateWorld(const World &world,
                                 Duration time_step)
 {
     this->world = world;
-    robots.clear();
-    for (const Robot &friendly_robot : world.friendlyTeam().getAllRobots())
+
+    auto &friendlies = world.friendlyTeam();
+    auto &enemies    = world.enemyTeam();
+
+    // initialize an array of bits, with each bit corresponding to the robot whose id is
+    // the index this keeps track of all the friendly robot ids in the world packet
+    std::vector<bool> tracked_friendlies(
+        std::max(static_cast<int>(MAX_ROBOT_IDS_PER_SIDE),
+                 static_cast<int>(friendlies.numRobots())),
+        false);
+    std::vector<bool> tracked_enemies(std::max(static_cast<int>(MAX_ROBOT_IDS_PER_SIDE),
+                                               static_cast<int>(enemies.numRobots())),
+                                      false);
+
+    for (const Robot &friendly_robot : friendlies.getAllRobots())
     {
-        configureHRVORobot(friendly_robot, robot_constants, time_step);
+        auto hrvo_agent = robots.find(friendly_robot.id());
+
+        tracked_friendlies[friendly_robot.id()] = true;
+
+        if (hrvo_agent != robots.end())
+        {
+            updateAgent(hrvo_agent->second, friendly_robot);
+        }
+        else
+        {
+            std::cout << "Adding robot " << std::to_string(friendly_robot.id()) << std::endl;
+            configureHRVORobot(friendly_robot, robot_constants, time_step);
+        }
     }
 
-    for (const Robot &enemy_robot : world.enemyTeam().getAllRobots())
+    for (unsigned int i = 0; i < tracked_friendlies.size(); ++i)
     {
-        configureLVRobot(enemy_robot, robot_constants, time_step);
+        if (!tracked_friendlies[i])
+        {
+            auto robot_it = robots.find(i);
+            if (robot_it != robots.end())
+            {
+                std::cout << "Removing robot " << std::to_string(i) << std::endl;
+                robots.erase(robot_it);
+            }
+        }
     }
+
+    for (const Robot &enemy_robot : enemies.getAllRobots())
+    {
+        auto lv_agent = robots.find(enemy_robot.id() + ENEMY_LV_ROBOT_OFFSET);
+        tracked_enemies[enemy_robot.id()] = true;
+
+        if (lv_agent != robots.end())
+        {
+            updateAgent(lv_agent->second, enemy_robot);
+        }
+        else
+        {
+            std::cout << "Adding robot " << std::to_string(enemy_robot.id() + ENEMY_LV_ROBOT_OFFSET) << std::endl;
+            configureLVRobot(enemy_robot, robot_constants, time_step);
+        }
+    }
+
+    // flip all the tracked bits to get all the robot ids which are NOT in the world
+    // packet, and delete enemy agent that aren't present in the world packet.
+    for (unsigned int i = 0; i < tracked_enemies.size(); ++i)
+    {
+        if (!tracked_enemies[i])
+        {
+            auto robot_it = robots.find(i + ENEMY_LV_ROBOT_OFFSET);
+            if (robot_it != robots.end())
+            {
+                std::cout << "Removing robot " << std::to_string(i) << std::endl;
+                robots.erase(robot_it);
+            }
+        }
+    }
+    std::cout << "Sim has : ";
+    for (auto &[robot_id, robot] : robots)
+    {
+        std::cout << std::to_string(robot_id) << ", ";
+    }
+    std::cout << "" << std::endl;
 }
 
 
@@ -38,6 +108,15 @@ void HRVOSimulator::updatePrimitiveSet(const TbotsProto::PrimitiveSet &new_primi
             friendly_robot->second->updatePrimitive(primitive, world.value(), time_step);
         }
     }
+}
+
+void HRVOSimulator::updateAgent(const std::shared_ptr<Agent> &agent,
+                                const Robot &friendly_robot)
+{
+    agent->setPosition(friendly_robot.position());
+    agent->setVelocity(friendly_robot.velocity());
+    agent->setOrientation(friendly_robot.orientation());
+    agent->setAngularVelocity(friendly_robot.angularVelocity());
 }
 
 void HRVOSimulator::configureHRVORobot(const Robot &robot,
