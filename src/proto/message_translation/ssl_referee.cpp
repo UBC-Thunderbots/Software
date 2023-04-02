@@ -59,16 +59,16 @@ const static std::unordered_map<SSLProto::Referee::Command, RefereeCommand>
         {SSLProto::Referee_Command_BALL_PLACEMENT_YELLOW,
          RefereeCommand::BALL_PLACEMENT_US}};
 
-RefereeCommand createRefereeCommand(const SSLProto::Referee::Command &command,
+RefereeCommand createRefereeCommand(const SSLProto::Referee &packet,
                                     TeamColour team_colour)
 {
     if (team_colour == TeamColour::YELLOW)
     {
-        return yellow_team_command_map.at(command);
+        return yellow_team_command_map.at(packet.command());
     }
     else
     {
-        return blue_team_command_map.at(command);
+        return blue_team_command_map.at(packet.command());
     }
 }
 

@@ -64,7 +64,7 @@ TEST_P(RefereeCommandTest, test_referee_command)
     SSLProto::Referee ref;
     ref.set_command(input);
 
-    ASSERT_EQ(expected, createRefereeCommand(ref.command(), team_colour));
+    ASSERT_EQ(expected, createRefereeCommand(ref, team_colour));
 }
 
 INSTANTIATE_TEST_CASE_P(

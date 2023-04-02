@@ -14,7 +14,7 @@
  *
  * @return RefereeCommand from command
  */
-RefereeCommand createRefereeCommand(const SSLProto::Referee::Command &command,
+RefereeCommand createRefereeCommand(const SSLProto::Referee &packet,
                                     TeamColour team_colour);
 
 /**

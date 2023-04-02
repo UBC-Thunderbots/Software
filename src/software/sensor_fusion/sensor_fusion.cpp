@@ -110,10 +110,7 @@ void SensorFusion::updateWorld(const SSLProto::Referee &packet)
 {
     if (sensor_fusion_config.friendly_color_yellow())
     {
-        game_state.updateRefereeCommand(createRefereeCommand(packet.command(), TeamColour::YELLOW));
-        if (packet.has_next_command()) {
-            game_state.setNextRefereeCommand(createRefereeCommand(packet.next_command(), TeamColour::YELLOW));
-        }
+        game_state.updateRefereeCommand(createRefereeCommand(packet, TeamColour::YELLOW));
         friendly_goalie_id = packet.yellow().goalkeeper();
         enemy_goalie_id    = packet.blue().goalkeeper();
         if (packet.has_blue_team_on_positive_half())
@@ -123,10 +120,7 @@ void SensorFusion::updateWorld(const SSLProto::Referee &packet)
     }
     else
     {
-        game_state.updateRefereeCommand(createRefereeCommand(packet.command(), TeamColour::BLUE));
-        if (packet.has_next_command()) {
-            game_state.setNextRefereeCommand(createRefereeCommand(packet.next_command(), TeamColour::BLUE));
-        }
+        game_state.updateRefereeCommand(createRefereeCommand(packet, TeamColour::BLUE));
         friendly_goalie_id = packet.blue().goalkeeper();
         enemy_goalie_id    = packet.yellow().goalkeeper();
         if (packet.has_blue_team_on_positive_half())
