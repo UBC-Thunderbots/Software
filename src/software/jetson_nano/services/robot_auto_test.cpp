@@ -76,18 +76,6 @@ TEST_F(RobotAutoTestFixture, TestFrontRightMotorVelocity) {
     motor_service_->endEncoderCalibration(FRONT_RIGHT_MOTOR_CHIP_SELECT);
     LOG(INFO) << "Ending motor encoder calibration";
 
-    int reset_detector = motor_service_->readIntFromTMC4671(0, TMC4671_PID_ACCELERATION_LIMIT);
-
-    // When the motor board is reset the value in the above register is set to the maximum
-    // signed 32 bit value Please read the header file and the datasheet for more info
-    if (reset_detector == 2147483647)
-    {
-        LOG(DEBUG) << "RESET DETECTED";
-        motor_service_->setUpMotors();
-//        encoders_calibrated = false;
-        return;
-    }
-
     WheelSpace_t prev_wheel_velocities = {0.0, 0.0, 0.0, 0.0};
     WheelSpace_t target_wheel_velocities = {0.0, 0.0, 0.0, 0.0};
     EuclideanSpace_t target_linear_velocity  = {0.1, 0.1, 0.0};
@@ -120,6 +108,16 @@ TEST_F(RobotAutoTestFixture, TestFrontRightMotorVelocity) {
 
         // 5. Check driver faults again after making updates to motor
         motor_service_->checkDriverFault(FRONT_RIGHT_MOTOR_CHIP_SELECT);
+
+        // 6. Detect the reset than
+        int reset_detector = motor_service_->readIntFromTMC4671(0, TMC4671_PID_ACCELERATION_LIMIT);
+
+        // When the motor board is reset the value in the above register is set to the maximum
+        // signed 32 bit value Please read the header file and the datasheet for more info
+        if (reset_detector == 2147483647)
+        {
+            FAIL() << "RESET DETECTED";
+        }
     }
 
     // reset the motor velocity
