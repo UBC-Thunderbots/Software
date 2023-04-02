@@ -33,7 +33,6 @@ void HRVOSimulator::updateWorld(const World &world,
         }
         else
         {
-            std::cout << "Adding robot " << std::to_string(friendly_robot.id()) << std::endl;
             configureHRVORobot(friendly_robot, robot_constants, time_step);
         }
     }
@@ -45,7 +44,6 @@ void HRVOSimulator::updateWorld(const World &world,
             auto robot_it = robots.find(i);
             if (robot_it != robots.end())
             {
-                std::cout << "Removing robot " << std::to_string(i) << std::endl;
                 robots.erase(robot_it);
             }
         }
@@ -62,7 +60,6 @@ void HRVOSimulator::updateWorld(const World &world,
         }
         else
         {
-            std::cout << "Adding robot " << std::to_string(enemy_robot.id() + ENEMY_LV_ROBOT_OFFSET) << std::endl;
             configureLVRobot(enemy_robot, robot_constants, time_step);
         }
     }
@@ -76,17 +73,10 @@ void HRVOSimulator::updateWorld(const World &world,
             auto robot_it = robots.find(i + ENEMY_LV_ROBOT_OFFSET);
             if (robot_it != robots.end())
             {
-                std::cout << "Removing robot " << std::to_string(i) << std::endl;
                 robots.erase(robot_it);
             }
         }
     }
-    std::cout << "Sim has : ";
-    for (auto &[robot_id, robot] : robots)
-    {
-        std::cout << std::to_string(robot_id) << ", ";
-    }
-    std::cout << "" << std::endl;
 }
 
 
