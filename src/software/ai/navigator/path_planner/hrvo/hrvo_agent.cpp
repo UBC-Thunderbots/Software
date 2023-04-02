@@ -132,7 +132,7 @@ void HRVOAgent::computeVelocityObstacles(
         // Don't draw any velocity obstacles if we do not have a destination
         return;
     }
-    auto current_destination          = current_path_point_opt.value().getPosition();
+    auto current_destination = current_path_point_opt.value().getPosition();
 
     // Create Velocity Obstacles for neighboring agents
     std::vector<unsigned int> neighbour_ids = computeNeighbors(robots);
@@ -263,7 +263,6 @@ void HRVOAgent::computeNewAngularVelocity(Duration time_step)
 void HRVOAgent::computeNewVelocity(
     const std::map<unsigned int, std::shared_ptr<Agent>> &agents, Duration time_step)
 {
-
     // Based on The Hybrid Reciprocal Velocity Obstacle paper:
     // https://gamma.cs.unc.edu/HRVO/HRVO-T-RO.pdf
 

@@ -7,7 +7,7 @@
  */
 class PathPoint
 {
-public:
+   public:
     /**
      * @param position The position of this path point
      * @param speed The speed at this path point
@@ -33,7 +33,7 @@ public:
      */
     Angle getOrientation() const;
 
-private:
+   private:
     // position for the path point
     Point position;
     // desired speed for the path point

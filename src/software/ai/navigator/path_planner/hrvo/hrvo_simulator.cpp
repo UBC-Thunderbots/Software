@@ -6,23 +6,28 @@ void HRVOSimulator::updateWorld(const World &world,
                                 const RobotConstants_t &robot_constants,
                                 Duration time_step)
 {
+    auto start_time = std::chrono::system_clock::now();
+
     this->world = world;
 
-    const auto& friendlies = world.friendlyTeam();
-    const auto& enemies = world.enemyTeam();
+    auto &friendlies = world.friendlyTeam();
+    auto &enemies    = world.enemyTeam();
 
     // initialize an array of bits, with each bit corresponding to the robot whose id is
     // the index this keeps track of all the friendly robot ids in the world packet
-    boost::dynamic_bitset<>  tracked_friendlies(std::max(static_cast<int>(MAX_ROBOT_IDS_PER_SIDE),
-                                                         static_cast<int>(friendlies.numRobots())));
-    boost::dynamic_bitset<>  tracked_enemies(std::max(static_cast<int>(MAX_ROBOT_IDS_PER_SIDE),
-                                                      static_cast<int>(enemies.numRobots())));
+    std::vector<bool> tracked_friendlies(
+        std::max(static_cast<int>(MAX_ROBOT_IDS_PER_SIDE),
+                 static_cast<int>(friendlies.numRobots())),
+        false);
+    std::vector<bool> tracked_enemies(std::max(static_cast<int>(MAX_ROBOT_IDS_PER_SIDE),
+                                               static_cast<int>(enemies.numRobots())),
+                                      false);
 
     for (const Robot &friendly_robot : friendlies.getAllRobots())
     {
         auto hrvo_agent = robots.find(friendly_robot.id());
 
-        tracked_friendlies.set(friendly_robot.id(), true);
+        tracked_friendlies[friendly_robot.id()] = true;
 
         if (hrvo_agent != robots.end())
         {
@@ -34,26 +39,46 @@ void HRVOSimulator::updateWorld(const World &world,
         }
     }
 
+    auto end_time = std::chrono::system_clock::now();
+    auto duration =
+        static_cast<double>(
+            std::chrono::duration_cast<std::chrono::nanoseconds>(end_time - start_time)
+                .count()) /
+        NANOSECONDS_PER_SECOND;
+    //    LOG(WARNING) << "UpdateWorld set-up and friendlies config took " << duration <<
+    //    std::endl;
+
+
     // flip all the tracked bits to get all the robot ids which are NOT in the world
     // packet, and friendly enemy agent that aren't present in the world packet.
-    tracked_friendlies.flip();
-    if (tracked_friendlies.any())
+    start_time = std::chrono::system_clock::now();
+
+    for (unsigned int i = 0; i < tracked_friendlies.size(); ++i)
     {
-        std::erase_if(
-            robots, [&](const std::pair<RobotId, std::shared_ptr<Agent>> &id_robot_pair) {
-                auto const &[id, _] = id_robot_pair;
-                    return tracked_friendlies[id] == 1;
-            });
+        if (!tracked_friendlies[i])
+        {
+            robots.erase(i);
+        }
     }
+    end_time = std::chrono::system_clock::now();
+    duration = static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(
+                                       end_time - start_time)
+                                       .count()) /
+               NANOSECONDS_PER_SECOND;
+    //    LOG(WARNING) << "Erasing friendly agents took " << duration << std::endl;
+
+
+    start_time = std::chrono::system_clock::now();
+
 
     for (const Robot &enemy_robot : enemies.getAllRobots())
     {
-        auto hrvo_agent = robots.find(enemy_robot.id() + ENEMY_LV_ROBOT_OFFSET);
-        tracked_enemies.set(enemy_robot.id(), true);
+        auto lv_agent = robots.find(enemy_robot.id() + ENEMY_LV_ROBOT_OFFSET);
+        tracked_enemies[enemy_robot.id()] = true;
 
-        if (hrvo_agent != robots.end())
+        if (lv_agent != robots.end())
         {
-            updateAgent(hrvo_agent->second, enemy_robot);
+            updateAgent(lv_agent->second, enemy_robot);
         }
         else
         {
@@ -61,25 +86,34 @@ void HRVOSimulator::updateWorld(const World &world,
         }
     }
 
+    end_time = std::chrono::system_clock::now();
+    duration = static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(
+                                       end_time - start_time)
+                                       .count()) /
+               NANOSECONDS_PER_SECOND;
+    //    LOG(WARNING) << "Updating existing enemy agents took " << duration << std::endl;
+
+
+    start_time = std::chrono::system_clock::now();
+
     // flip all the tracked bits to get all the robot ids which are NOT in the world
     // packet, and delete enemy agent that aren't present in the world packet.
-    tracked_enemies.flip();
-    if (tracked_enemies.any())
+    for (unsigned int i = 0; i < tracked_enemies.size(); ++i)
     {
-        std::erase_if(
-            robots, [&](const std::pair<RobotId, std::shared_ptr<Agent>> &id_robot_pair) {
-                auto const &[id, _] = id_robot_pair;
-                // we only want to remove enemy agents here, so check that the id
-                // in the map is offset (indicating that they're an enemy)
-                if (id >= ENEMY_LV_ROBOT_OFFSET)
-                {
-                    return tracked_enemies[id - ENEMY_LV_ROBOT_OFFSET] == 1;
-                }
-                return false;
-            });
+        if (!tracked_enemies[i])
+        {
+            robots.erase(i + ENEMY_LV_ROBOT_OFFSET);
+        }
     }
 
+
     assert(friendlies.numRobots() + enemies.numRobots() == robots.size());
+    end_time = std::chrono::system_clock::now();
+    duration = static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(
+                                       end_time - start_time)
+                                       .count()) /
+               NANOSECONDS_PER_SECOND;
+        LOG(WARNING) << "Erasing enemy agents took " << duration << std::endl;
 }
 
 
@@ -97,8 +131,7 @@ void HRVOSimulator::updatePrimitiveSet(const TbotsProto::PrimitiveSet &new_primi
             {
                 continue;
             }
-                friendly_robot->second->updatePrimitive(primitive, world.value(), time_step);
-
+            friendly_robot->second->updatePrimitive(primitive, world.value(), time_step);
         }
     }
 }
@@ -321,10 +354,14 @@ std::size_t HRVOSimulator::getRobotCount()
     return robots.size();
 }
 
-bool HRVOSimulator::robotExists(RobotId id, TeamSide side) {
-    if (side == TeamSide::FRIENDLY) {
+bool HRVOSimulator::robotExists(RobotId id, TeamSide side)
+{
+    if (side == TeamSide::FRIENDLY)
+    {
         return robots.find(id) != robots.end();
-    } else {
+    }
+    else
+    {
         return robots.find(id + ENEMY_LV_ROBOT_OFFSET) != robots.end();
     }
 }

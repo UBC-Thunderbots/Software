@@ -1,10 +1,11 @@
 #pragma once
 
 #include <bitset>
+#include <boost/dynamic_bitset.hpp>
 #include <fstream>
 #include <limits>
-#include <vector>
 #include <map>
+#include <vector>
 
 #include "proto/tbots_software_msgs.pb.h"
 #include "proto/visualization.pb.h"
@@ -17,7 +18,6 @@
 #include "software/geom/algorithms/nearest_neighbor_search.hpp"
 #include "software/geom/vector.h"
 #include "software/world/world.h"
-#include <boost/dynamic_bitset.hpp>
 
 class HRVOSimulator
 {
@@ -124,7 +124,7 @@ class HRVOSimulator
 
     // Robot id offset for enemy robots so we don't have
     // friendly and enemy agents with overlapping ids in the `robots` map
-    static const unsigned int ENEMY_LV_ROBOT_OFFSET = 1000;
+    static const unsigned int ENEMY_LV_ROBOT_OFFSET = 20;
 
    private:
     /**
