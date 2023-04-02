@@ -167,11 +167,11 @@ void MotorService::setUpMotors()
         setUpDriveMotor(motor);
     }
 
-    // Dribbler Motor Setup
-    startDriver(DRIBBLER_MOTOR_CHIP_SELECT);
-    checkDriverFault(DRIBBLER_MOTOR_CHIP_SELECT);
-    startController(DRIBBLER_MOTOR_CHIP_SELECT, true);
-    tmc4671_setTargetVelocity(DRIBBLER_MOTOR_CHIP_SELECT, 0);
+//    // Dribbler Motor Setup
+//    startDriver(DRIBBLER_MOTOR_CHIP_SELECT);
+//    checkDriverFault(DRIBBLER_MOTOR_CHIP_SELECT);
+//    startController(DRIBBLER_MOTOR_CHIP_SELECT, true);
+//    tmc4671_setTargetVelocity(DRIBBLER_MOTOR_CHIP_SELECT, 0);
 }
 
 void MotorService::setUpDriveMotor(uint8_t motor) {
@@ -479,6 +479,10 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
     }
 
     return motor_status;
+}
+
+void MotorService::setTargetVelocity(uint8_t chip_select, int target) {
+    tmc4671_setTargetVelocity(chip_select, target);
 }
 
 void MotorService::spiTransfer(int fd, uint8_t const* tx, uint8_t const* rx, unsigned len,

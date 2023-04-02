@@ -59,7 +59,7 @@ class MotorService
      *          The motor can overheat if the TMC4671 doesn't auto shut-off.
      *
      *          There are some safety checks to ensure that the encoder is
-     *          initialized, do not tamper with them. You have been warned.
+     *          initialized, do not tamper with them. You have o a directory. Run the file setup.bat and accept all defaults to install Quartus 16.1 Web Edition. After it has been installed, you should also install the "Standalone Programbeen warned.
      *
      * @param motor The motor to initialize the encoder for
      */
@@ -89,6 +89,10 @@ class MotorService
      *
      */
     void setUpMotors();
+
+    void setTargetVelocity(uint8_t chip_select, int target);
+
+
 
     /**
      * Ramp the velocity over the given timestep and set the target velocity on the motor.

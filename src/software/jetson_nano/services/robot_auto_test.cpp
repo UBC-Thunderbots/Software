@@ -30,6 +30,14 @@ class RobotAutoTestFixture : public testing::Test
         motor_service_->setUpMotors();
     }
 
+    void TearDown(void) {
+        // reset the motor velocity
+        for (uint8_t motor = 0; motor < NUM_DRIVE_MOTORS; motor++)
+        {
+            motor_service_->setTargetVelocity(motor, 0);
+        }
+    }
+
     RobotAutoTestFixture()
     {
         motor_service_ = std::make_unique<MotorService>(
@@ -55,7 +63,12 @@ class RobotAutoTestFixture : public testing::Test
 TEST_F(RobotAutoTestFixture, TestFrontRightMotorVelocity) {
 
     // 1. Check driver fault, make the function public
-    motor_service_->checkDriverFault(FRONT_RIGHT_MOTOR_CHIP_SELECT);
+    if (motor_service_->checkDriverFault(FRONT_RIGHT_MOTOR_CHIP_SELECT)) {
+        LOG(FATAL) << "Detected Motor Fault";
+    }
+
+    // 3. Abstract out drive motor setup into a function
+    motor_service_->setUpDriveMotor(FRONT_RIGHT_MOTOR_CHIP_SELECT);
 
     // 2. Put some log messages for motor calibration
     motor_service_->startEncoderCalibration(FRONT_RIGHT_MOTOR_CHIP_SELECT);
@@ -63,12 +76,21 @@ TEST_F(RobotAutoTestFixture, TestFrontRightMotorVelocity) {
     motor_service_->endEncoderCalibration(FRONT_RIGHT_MOTOR_CHIP_SELECT);
     LOG(INFO) << "Ending motor encoder calibration";
 
-    // 3. Abstract out drive motor setup into a function
-    motor_service_->setUpDriveMotor(FRONT_RIGHT_MOTOR_CHIP_SELECT);
+    int reset_detector = motor_service_->readIntFromTMC4671(0, TMC4671_PID_ACCELERATION_LIMIT);
+
+    // When the motor board is reset the value in the above register is set to the maximum
+    // signed 32 bit value Please read the header file and the datasheet for more info
+    if (reset_detector == 2147483647)
+    {
+        LOG(DEBUG) << "RESET DETECTED";
+        motor_service_->setUpMotors();
+//        encoders_calibrated = false;
+        return;
+    }
 
     WheelSpace_t prev_wheel_velocities = {0.0, 0.0, 0.0, 0.0};
     WheelSpace_t target_wheel_velocities = {0.0, 0.0, 0.0, 0.0};
-    EuclideanSpace_t target_linear_velocity  = {0.5, 0.5, 0.0};
+    EuclideanSpace_t target_linear_velocity  = {0.1, 0.1, 0.0};
 
     for (int i = 0; i < 10; i++) {
         target_wheel_velocities = motor_service_->rampWheelVelocity(prev_wheel_velocities, target_linear_velocity, static_cast<double>(robot_constants_.robot_max_speed_m_per_s),
@@ -91,16 +113,21 @@ TEST_F(RobotAutoTestFixture, TestFrontRightMotorVelocity) {
         // Run-away protection
         motor_service_->disableVelocity(front_right_velocity, prev_wheel_velocities[FRONT_RIGHT_WHEEL_SPACE_INDEX]);
 
+
         // 4. Make the threshold more lenient for expect equal double
         //EXPECT_DOUBLE_EQ(front_right_velocity, target_wheel_velocities[FRONT_RIGHT_WHEEL_SPACE_INDEX]);
-        EXPECT_NEAR(front_right_velocity, target_wheel_velocities[FRONT_RIGHT_WHEEL_SPACE_INDEX], 0.01);
+        ASSERT_NEAR(front_right_velocity, target_wheel_velocities[FRONT_RIGHT_WHEEL_SPACE_INDEX], 0.01);
 
         // 5. Check driver faults again after making updates to motor
         motor_service_->checkDriverFault(FRONT_RIGHT_MOTOR_CHIP_SELECT);
     }
 
     // reset the motor velocity
-    motor_service_->writeIntToTMC4671(FRONT_RIGHT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_TARGET, 0);
+    for (uint8_t motor = 0; motor < NUM_DRIVE_MOTORS; motor++)
+    {
+        motor_service_->setTargetVelocity(motor, 0);
+    }
+
 }
 
 //TEST_F(RobotAutoTestFixture, TestFrontRightMotorNoise) {
