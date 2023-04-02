@@ -160,9 +160,11 @@ RobotNavigationObstacleFactory::createDynamicObstaclesFromMotionConstraint(
         case TbotsProto::MotionConstraint::AVOID_BALL_PLACEMENT_INTERFERENCE:;
             if (world.gameState().getBallPlacementPoint().has_value())
             {
-                obstacles.push_back(createFromBallPlacement(
+                auto obstacles_list = createFromBallPlacement(
                     world.gameState().getBallPlacementPoint().value(),
-                    world.ball().position()));
+                    world.ball().position());
+                obstacles.insert(obstacles.end(), obstacles_list.start(),
+                                 obstacles_list.end());
             }
             else
             {
@@ -242,9 +244,13 @@ ObstaclePtr RobotNavigationObstacleFactory::createFromFieldRectangle(
         Rectangle(Point(xMin, yMin), Point(xMax, yMax)));
 }
 
-ObstaclePtr RobotNavigationObstacleFactory::createFromBallPlacement(
+std::vector<ObstaclePtr> RobotNavigationObstacleFactory::createFromBallPlacement(
     const Point &placement_point, const Point &ball_point) const
 {
-    return createFromShape(
-        Polygon::fromSegment(Segment(ball_point, placement_point), 0.5));
+    std::vector<ObstaclePtr> ret;
+    ret.push_back(createFromShape(
+        Polygon::fromSegment(Segment(ball_point, placement_point), 0, 0.5)));
+    ret.push_back(createFromShape(Circle(ball_point, 0.5)));
+    ret.push_back(createFromShape(Circle(placement_point, 0.5)));
+    return ret;
 }

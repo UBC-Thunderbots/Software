@@ -111,7 +111,7 @@ TEST(PolygonExpandTest, test_from_segments)
     const auto segment = Segment(Point(0, 0), Point(2, 2));
     double radius      = 1;
 
-    const auto poly     = Polygon::fromSegment(segment, radius);
+    const auto poly     = Polygon::fromSegment(segment, radius, radius);
     const auto segments = poly.getSegments();
 
     Vector first_side  = segments[0].toVector();

@@ -163,7 +163,7 @@ bool ShootOrPassPlayFSM::shouldAbortPass(const Update& event)
         this->ai_config.shoot_or_pass_play_config().short_pass_threshold();
 
     const auto pass_area_polygon =
-        Polygon::fromSegment(Segment(passer_point, receiver_point), 0.5);
+        Polygon::fromSegment(Segment(passer_point, receiver_point), 0.5, 0.5);
 
     // calculate a polygon that contains the receiver and passer point, and checks if the
     // ball is inside it. if the ball isn't being passed to the receiver then we should

@@ -3,6 +3,7 @@
 #include "proto/parameters.pb.h"
 #include "proto/primitive.pb.h"
 #include "software/ai/navigator/obstacle/obstacle.hpp"
+#include "software/geom/circle.h"
 #include "software/geom/line.h"
 #include "software/geom/point.h"
 #include "software/geom/polygon.h"
@@ -106,10 +107,10 @@ class RobotNavigationObstacleFactory
      * @param placement_point the point where the ball will be placed
      * @param ball_point the point where the ball currently is
      *
-     * @return ObstaclePtr
+     * @return an array of ObstaclePtr of shapes
      */
-    ObstaclePtr createFromBallPlacement(const Point &placement_point,
-                                        const Point &ball_point) const;
+    std::vector<ObstaclePtr> createFromBallPlacement(const Point &placement_point,
+                                                     const Point &ball_point) const;
 
    private:
     TbotsProto::RobotNavigationObstacleConfig config;

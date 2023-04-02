@@ -65,7 +65,8 @@ class Polygon : public virtual Shape
      * @param radius the radius of the rectangle.
      * @return an oriented polygon along the 2 points that contains both points.
      */
-    static Polygon fromSegment(const Segment& segment, double radius);
+    static Polygon fromSegment(const Segment& segment, const double radius_parallel,
+                               const double radius_normal);
 
    protected:
     /**
