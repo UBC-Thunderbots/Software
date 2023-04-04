@@ -542,9 +542,5 @@ class Gamecontroller(object):
 
         msg_len, new_pos = decoder._DecodeVarint32(response_data, 0)
         ci_output = CiOutput()
-
-        # next_command = Command(type=gc_next_command, for_team=team)
-        # ci_output.referee_msg.CopyFrom()
-
         ci_output.ParseFromString(response_data[new_pos : new_pos + msg_len])
         return ci_output

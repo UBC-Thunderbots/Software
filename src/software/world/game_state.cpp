@@ -414,15 +414,6 @@ const RefereeCommand& GameState::getRefereeCommand() const
     return command_;
 }
 
-void GameState::setNextRefereeCommand(RefereeCommand command)
-{
-    next_command_ = command;
-}
-
-const RefereeCommand& GameState::getNextRefereeCommand() const
-{
-    return next_command_;
-}
 
 void GameState::setRestartCompleted()
 {
