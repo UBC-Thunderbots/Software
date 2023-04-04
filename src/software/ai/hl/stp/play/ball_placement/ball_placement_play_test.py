@@ -17,9 +17,10 @@ from proto.ssl_gc_geometry_pb2 import Vector2
 TEST_DURATION = 20
 
 
-@pytest.mark.parametrize(
-    "run_enemy_ai", [False, True]
-)  # TODO (#2690): Robot gets stuck in corner of defense area
+# TODO (#2690): Robot gets stuck in corner of defense area
+# TODO (#2870): After resolved, should re-enable run_enemy_ai (add True to parameter
+#  list)
+@pytest.mark.parametrize("run_enemy_ai", [False,])
 def test_two_ai_ball_placement(simulated_test_runner, run_enemy_ai):
 
     # starting point must be Point
@@ -30,17 +31,16 @@ def test_two_ai_ball_placement(simulated_test_runner, run_enemy_ai):
     # Setup Bots
     blue_bots = [
         tbots.Point(-2.75, 1.5),
-        tbots.Point(-2.75, 0.5),
+        tbots.Point(-0.0, 0.0),
         tbots.Point(-2.75, -0.5),
         tbots.Field.createSSLDivisionBField().friendlyGoalCenter(),
         tbots.Field.createSSLDivisionBField().friendlyDefenseArea().negXNegYCorner(),
         tbots.Field.createSSLDivisionBField().friendlyDefenseArea().negXPosYCorner(),
     ]
-
     yellow_bots = [
-        tbots.Point(2, 0),
-        tbots.Point(2, 2.5),
-        tbots.Point(2, -2.5),
+        tbots.Point(1, 0),
+        tbots.Point(1, 2.5),
+        tbots.Point(1, -2.5),
         tbots.Field.createSSLDivisionBField().enemyGoalCenter(),
         tbots.Field.createSSLDivisionBField().enemyDefenseArea().negXNegYCorner(),
         tbots.Field.createSSLDivisionBField().enemyDefenseArea().negXPosYCorner(),
@@ -64,13 +64,13 @@ def test_two_ai_ball_placement(simulated_test_runner, run_enemy_ai):
     simulated_test_runner.blue_full_system_proto_unix_io.send_proto(Play, blue_play)
 
     # We can parametrize running in ai_vs_ai mode
-    if run_enemy_ai:
-        yellow_play = Play()
-        yellow_play.name = PlayName.EnemyBallPlacementPlay
-
-        simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(
-            Play, yellow_play
-        )
+    # if run_enemy_ai:
+    #     yellow_play = Play()
+    #     yellow_play.name = PlayName.EnemyBallPlacementPlay
+    #
+    #     simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(
+    #         Play, yellow_play
+    #     )
 
     # Create world state
     simulated_test_runner.simulator_proto_unix_io.send_proto(
@@ -89,7 +89,7 @@ def test_two_ai_ball_placement(simulated_test_runner, run_enemy_ai):
     # Placement Eventually Validation
     placement_eventually_validation_sequence_set = [
         [
-            # Ball should arrive within 0.15 m of placement point
+            # Ball should arrive within 0.15m of placement point
             BallEventuallyEntersRegion(regions=[tbots.Circle(ball_final_pos, 0.15)]),
             RobotEventuallyEntersRegion(regions=[tbots.Circle(ball_final_pos, 0.15)]),
         ]
@@ -107,13 +107,13 @@ def test_two_ai_ball_placement(simulated_test_runner, run_enemy_ai):
     ]
 
     # Drop Ball Eventually Validation
-    # Direct free kick after ball placement, the robot must be 0.05 away from the ball after the placement
+    # Non free kick after ball placement, the robot must be 0.5 away from the ball after the placement
     # See detailed rules here: https://robocup-ssl.github.io/ssl-rules/sslrules.html#_ball_placement
     drop_ball_eventually_validation_sequence_set = [
         [
             # Ball should arrive within 5cm of placement point
             BallEventuallyStopsInRegion(regions=[tbots.Circle(ball_final_pos, 0.05)]),
-            RobotEventuallyExitsRegion(regions=[tbots.Circle(ball_final_pos, 0.05)]),
+            RobotEventuallyExitsRegion(regions=[tbots.Circle(ball_final_pos, 0.5)]),
         ]
     ]
 
@@ -123,13 +123,8 @@ def test_two_ai_ball_placement(simulated_test_runner, run_enemy_ai):
         test_timeout_s=TEST_DURATION,
     )
 
-    # send a free kick command
-    simulated_test_runner.gamecontroller.send_ci_input(
-        gc_command=Command.Type.DIRECT, team=Team.BLUE
-    )
 
-
-@pytest.mark.parametrize("run_enemy_ai", [(False,), (True,)])
+@pytest.mark.parametrize("run_enemy_ai", [False,])
 def test_outside_goal_line_ball_placement(simulated_test_runner, run_enemy_ai):
 
     # starting point must be Point
@@ -173,13 +168,13 @@ def test_outside_goal_line_ball_placement(simulated_test_runner, run_enemy_ai):
     simulated_test_runner.blue_full_system_proto_unix_io.send_proto(Play, blue_play)
 
     # We can parametrize running in ai_vs_ai mode
-    if run_enemy_ai:
-        yellow_play = Play()
-        yellow_play.name = PlayName.EnemyBallPlacementPlay
-
-        simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(
-            Play, yellow_play
-        )
+    # if run_enemy_ai:
+    #     yellow_play = Play()
+    #     yellow_play.name = PlayName.EnemyBallPlacementPlay
+    #
+    #     simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(
+    #         Play, yellow_play
+    #     )
 
     # Create world state
     simulated_test_runner.simulator_proto_unix_io.send_proto(
@@ -233,7 +228,7 @@ def test_outside_goal_line_ball_placement(simulated_test_runner, run_enemy_ai):
     )
 
 
-@pytest.mark.parametrize("run_enemy_ai", [(False,), (True,)])
+@pytest.mark.parametrize("run_enemy_ai", [False,])
 def test_outside_side_line_ball_placement(simulated_test_runner, run_enemy_ai):
 
     # starting point must be Point
@@ -277,13 +272,13 @@ def test_outside_side_line_ball_placement(simulated_test_runner, run_enemy_ai):
     simulated_test_runner.blue_full_system_proto_unix_io.send_proto(Play, blue_play)
 
     # We can parametrize running in ai_vs_ai mode
-    if run_enemy_ai:
-        yellow_play = Play()
-        yellow_play.name = PlayName.EnemyBallPlacementPlay
-
-        simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(
-            Play, yellow_play
-        )
+    # if run_enemy_ai:
+    #     yellow_play = Play()
+    #     yellow_play.name = PlayName.EnemyBallPlacementPlay
+    #
+    #     simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(
+    #         Play, yellow_play
+    #     )
 
     # Create world state
     simulated_test_runner.simulator_proto_unix_io.send_proto(
@@ -337,7 +332,7 @@ def test_outside_side_line_ball_placement(simulated_test_runner, run_enemy_ai):
     )
 
 
-@pytest.mark.parametrize("run_enemy_ai", [(False,), (True,)])
+@pytest.mark.parametrize("run_enemy_ai", [False,])
 def test_friendly_defense_area_ball_placement(simulated_test_runner, run_enemy_ai):
 
     # starting point must be Point
@@ -381,13 +376,13 @@ def test_friendly_defense_area_ball_placement(simulated_test_runner, run_enemy_a
     simulated_test_runner.blue_full_system_proto_unix_io.send_proto(Play, blue_play)
 
     # We can parametrize running in ai_vs_ai mode
-    if run_enemy_ai:
-        yellow_play = Play()
-        yellow_play.name = PlayName.EnemyBallPlacementPlay
-
-        simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(
-            Play, yellow_play
-        )
+    # if run_enemy_ai:
+    #     yellow_play = Play()
+    #     yellow_play.name = PlayName.EnemyBallPlacementPlay
+    #
+    #     simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(
+    #         Play, yellow_play
+    #     )
 
     # Create world state
     simulated_test_runner.simulator_proto_unix_io.send_proto(

@@ -92,4 +92,7 @@ typedef struct RobotConstants
     // [# of wheel rotations / 1 motor rotation]
     float wheel_rotations_per_motor_rotation;
 
+    // Slower speed for controlled dribbling (when dribbling in an angle that is not directly forward)
+    float close_control_speed_m_per_s;
+
 } RobotConstants_t;
