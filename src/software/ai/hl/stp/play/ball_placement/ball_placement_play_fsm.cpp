@@ -95,7 +95,8 @@ void BallPlacementPlayFSM::placeBall(const Update &event)
         final_direction =
             (placement_point.value() - event.common.world.field().friendlyGoalCenter())
                 .normalize();
-        if (final_direction.x() != 0.0) {
+        if (final_direction.x() != 0.0)
+        {
             final_angle = Angle::atan(final_direction.y() / final_direction.x());
         }
     }

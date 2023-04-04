@@ -71,7 +71,8 @@ enum MaxAllowedSpeedMode
     STOP_COMMAND = 1;
     // Move at speed at which collisions are allowed
     COLLISIONS_ALLOWED = 2;
-    // Move at slower speed for controlled dribbling (when dribbling in an angle that is not directly forward)
+    // Move at slower speed for controlled dribbling (when dribbling in an angle that is
+    // not directly forward)
     CLOSE_CONTROL_SPEED = 3;
 }
 

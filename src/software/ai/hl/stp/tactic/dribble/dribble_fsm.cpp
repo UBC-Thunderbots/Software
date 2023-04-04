@@ -103,16 +103,18 @@ void DribbleFSM::dribble(const Update &event)
     auto ball_position       = event.common.world.ball().position();
     auto dribble_destination = event.control_params.dribble_destination;
 
-    TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode = TbotsProto::MaxAllowedSpeedMode::CLOSE_CONTROL_SPEED;
+    TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode =
+        TbotsProto::MaxAllowedSpeedMode::CLOSE_CONTROL_SPEED;
 
     auto [target_destination, target_orientation] =
-    calculateNextDribbleDestinationAndOrientation(
+        calculateNextDribbleDestinationAndOrientation(
             event.common.world.ball(), event.common.robot,
             event.control_params.dribble_destination,
             event.control_params.final_dribble_orientation);
 
-    if (dribble_destination.has_value() && (ball_position - dribble_destination.value()).length() >
-                                           dribble_tactic_config.should_pivot_threshold())
+    if (dribble_destination.has_value() &&
+        (ball_position - dribble_destination.value()).length() >
+            dribble_tactic_config.should_pivot_threshold())
     {
         target_orientation = (dribble_destination.value() - ball_position).orientation();
         max_allowed_speed_mode = TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT;
@@ -121,8 +123,7 @@ void DribbleFSM::dribble(const Update &event)
     event.common.set_primitive(createMovePrimitive(
         CREATE_MOTION_CONTROL(target_destination), target_orientation, 0,
         TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
-        AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
-        max_allowed_speed_mode, 0.0,
+        AutoChipOrKick{AutoChipOrKickMode::OFF, 0}, max_allowed_speed_mode, 0.0,
         event.common.robot.robotConstants(), 0.0));
 }
 
