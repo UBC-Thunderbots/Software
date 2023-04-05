@@ -2,7 +2,10 @@
 
 #include <Eigen/Dense>
 
+#include "proto/primitive.pb.h"
 #include "shared/robot_constants.h"
+#include "software/geom/angular_velocity.h"
+#include "software/geom/vector.h"
 
 /**
  * Vector representation of 2D Euclidean space.
@@ -38,7 +41,7 @@ class EuclideanToWheel
      *
      * @param robot_constants The constants of the robot we are computing for.
      */
-    explicit EuclideanToWheel(const RobotConstants_t &robot_constants);
+    explicit EuclideanToWheel(const RobotConstants_t& robot_constants);
 
     /**
      * Gets the wheel velocity from the Euclidean velocity.
@@ -54,13 +57,30 @@ class EuclideanToWheel
      * @param wheel_velocity The wheel velocity.
      * @return The equivalent Euclidean velocity.
      */
-    EuclideanSpace_t getEuclideanVelocity(const WheelSpace_t &wheel_velocity) const;
+    EuclideanSpace_t getEuclideanVelocity(const WheelSpace_t& wheel_velocity) const;
+
+
+    /**
+     * Ramp the velocity over the given timestep and set the target velocity on the motor.
+     *
+     * NOTE: This function has no state.
+     * Also NOTE: This function handles all electrical rpm to meters/second conversion.
+     *
+     * @param current_wheel_velocity The current 4-wheel velocity in m/s
+     * @param target_wheel_velocity The target 4-wheel velocity m/s
+     * @param time_to_ramp The time allocated for acceleration in seconds
+     *
+     */
+    WheelSpace_t rampWheelVelocity(const WheelSpace_t& current_wheel_velocity,
+                                   const WheelSpace_t& target_wheel_velocity,
+                                   const double& time_to_ramp);
 
    private:
     /**
      * The radius of the robot in meters.
      */
     const double robot_radius_m_{};
+    const RobotConstants_t robot_constants_;
 
     /**
      * Euclidean velocity to wheel velocity coupling matrix.
