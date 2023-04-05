@@ -23,6 +23,7 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, const int loop
     // TODO (#2495): Set the friendly team colour once we receive World proto
     : redis_client_(
           std::make_unique<RedisClient>(REDIS_DEFAULT_HOST, REDIS_DEFAULT_PORT)),
+      motor_status_(std::nullopt),
       robot_constants_(robot_constants),
       robot_id_(std::stoi(redis_client_->getSync(ROBOT_ID_REDIS_KEY))),
       channel_id_(std::stoi(redis_client_->getSync(ROBOT_MULTICAST_CHANNEL_REDIS_KEY))),
@@ -32,7 +33,8 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, const int loop
       kick_constant_(std::stoi(redis_client_->getSync(ROBOT_KICK_CONSTANT_REDIS_KEY))),
       chip_pulse_width_(
           std::stoi(redis_client_->getSync(ROBOT_CHIP_PULSE_WIDTH_REDIS_KEY))),
-      primitive_executor_(loop_hz, robot_constants, TeamColour::YELLOW, robot_id_)
+      primitive_executor_(Duration::fromSeconds(1.0 / loop_hz), robot_constants,
+                          TeamColour::YELLOW, robot_id_)
 {
     NetworkLoggerSingleton::initializeLogger(channel_id_, network_interface_, robot_id_);
     LOG(INFO)
@@ -168,6 +170,14 @@ Thunderloop::~Thunderloop() {}
                 world_ = new_world;
             }
 
+            if (motor_status_.has_value())
+            {
+                auto status = motor_status_.value();
+                primitive_executor_.updateVelocity(
+                    createVector(status.local_velocity()),
+                    createAngularVelocity(status.angular_velocity()));
+            }
+
             // If world not received in a while, stop robot
             // Primitive Executor: run the last primitive if we have not timed out
             {
@@ -245,9 +255,6 @@ Thunderloop::~Thunderloop() {}
                 ScopedTimespecTimer timer(&poll_time);
                 motor_status_ = motor_service_->poll(direct_control_.motor_control(),
                                                      loop_duration_seconds);
-                primitive_executor_.updateVelocity(
-                    createVector(motor_status_.local_velocity()),
-                    createAngularVelocity(motor_status_.angular_velocity()));
             }
             thunderloop_status_.set_motor_service_poll_time_ms(
                 getMilliseconds(poll_time));
@@ -261,7 +268,7 @@ Thunderloop::~Thunderloop() {}
             robot_status_.set_last_handled_primitive_set(last_handled_primitive_set);
             *(robot_status_.mutable_time_sent())             = time_sent_;
             *(robot_status_.mutable_thunderloop_status())    = thunderloop_status_;
-            *(robot_status_.mutable_motor_status())          = motor_status_;
+            *(robot_status_.mutable_motor_status())          = motor_status_.value();
             *(robot_status_.mutable_power_status())          = power_status_;
             *(robot_status_.mutable_jetson_status())         = jetson_status_;
             *(robot_status_.mutable_network_status())        = network_status_;
