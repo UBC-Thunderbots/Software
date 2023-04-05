@@ -41,7 +41,7 @@ class ThreadedUnixSender:
         """Stop handling requests
         """
         self.stop = True
-        self.server.server_close()
+        self.socket.close()
 
     def __send_protobuf(self):
         """Send the buffered protobuf
@@ -49,7 +49,9 @@ class ThreadedUnixSender:
         proto = None
 
         while not self.stop:
+            # print("threaded_unix_sender.py line 52: proto_buffer.get",flush=True)
             proto = self.proto_buffer.get(block=True)
+            # print(proto,flush=True)
             if proto is not None:
                 send = proto.SerializeToString()
                 try:

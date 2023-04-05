@@ -105,17 +105,20 @@ class RobotCommunication(object):
 
             # fullsystem is running, so world data is being received
             if self.robots_connected_to_fullsystem:
+                print("robot_communication.py line 108: world_buffer.get",flush=True)
                 world = self.world_buffer.get(block=True)
 
                 # send the world proto
                 self.send_world.send_proto(world)
 
                 # Get the primitives
+                print("robot_communication.py line 115: world_buffer.get",flush=True)
                 primitive_set = self.primitive_buffer.get(block=False)
 
                 robot_primitives = dict(primitive_set.robot_primitives)
 
             # get the manual control primitive
+            print("robot_communication.py line 122: diagnostics.get",flush=True)
             diagnostics_primitive = DirectControlPrimitive(
                 motor_control=self.motor_control_diagnostics_buffer.get(block=False),
                 power_control=self.power_control_diagnostics_buffer.get(block=False),
@@ -175,10 +178,15 @@ class RobotCommunication(object):
         Sets up a world sender, a listener for SSL vision data, and connects all robots to fullsystem as default
         """
         print("M",flush=True)
+        def test_func(data):
+            # print(data,flush=True)
+            self.current_proto_unix_io.send_proto(SSL_WrapperPacket, data)
+
         self.receive_ssl_wrapper = SSLWrapperPacketProtoListener(
             SSL_VISION_ADDRESS,
             SSL_VISION_PORT,
-            lambda data: self.current_proto_unix_io.send_proto(SSL_WrapperPacket, data),
+            # lambda data: self.current_proto_unix_io.send_proto(SSL_WrapperPacket, data),
+            test_func,
             True,
         )
 
@@ -196,17 +204,23 @@ class RobotCommunication(object):
 
         """
         # Create the multicast listeners
+        def __forward_to_proto_unix_io__(data, type):
+            if not self.stop_running:
+                self.current_proto_unix_io.send_proto(type, data)
+
         self.receive_robot_status = RobotStatusProtoListener(
             self.multicast_channel + "%" + self.interface,
             ROBOT_STATUS_PORT,
-            lambda data: self.current_proto_unix_io.send_proto(RobotStatus, data),
+            #lambda data: if not self.stop_running: self.current_proto_unix_io.send_proto(RobotStatus, data),
+            lambda data: __forward_to_proto_unix_io__(data, RobotStatus),
             True,
         )
 
         self.receive_robot_log = RobotLogProtoListener(
             self.multicast_channel + "%" + self.interface,
             ROBOT_LOGS_PORT,
-            lambda data: self.current_proto_unix_io.send_proto(RobotLog, data),
+            #lambda data: self.current_proto_unix_io.send_proto(RobotLog, data),
+            lambda data: __forward_to_proto_unix_io__(data, RobotLog),
             True,
         )
 
@@ -224,7 +238,8 @@ class RobotCommunication(object):
         """Exit RobotCommunication context manager
 
         """
-        print("killing robocom",flush=True)
         self.stop_running = True
+        self.current_proto_unix_io.force_close()
+        print("killing robocom",flush=True)
         self.run_thread.join()
-        print("join is over")
+        print("run_thread joined",flush=True)

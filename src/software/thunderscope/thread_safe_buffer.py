@@ -65,6 +65,7 @@ class ThreadSafeBuffer(object):
             self.last_logged_protos_dropped = self.protos_dropped
 
         if block:
+            print("thread_safe_buffer.py line 68: queue.get",flush=True)
             return self.queue.get(timeout=timeout)
 
         try:

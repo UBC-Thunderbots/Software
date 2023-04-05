@@ -69,6 +69,7 @@ ProtoUdpSender<SendProto>::ProtoUdpSender(boost::asio::io_service& io_service,
 template <class SendProto>
 void ProtoUdpSender<SendProto>::sendProto(const SendProto& message)
 {
+    LOG(INFO) << "send proto called!\n";
     message.SerializeToString(&data_buffer);
     socket_.send_to(boost::asio::buffer(data_buffer), receiver_endpoint);
 }

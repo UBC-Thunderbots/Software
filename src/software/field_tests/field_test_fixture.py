@@ -80,6 +80,7 @@ class FieldTestRunner(TbotsTestRunner):
         logger.info("determining robots on field")
         # survey field for available robot ids
         try:
+            print("field_test_fixture.py line 83: world_buffer.get",flush=True)
             world = self.world_buffer.get(block=True, timeout=WORLD_BUFFER_TIMEOUT)
             logger.info(world)
             self.initial_world = world
@@ -132,6 +133,8 @@ class FieldTestRunner(TbotsTestRunner):
 
         while time.time() < timeout_time:
             try:
+
+                print("field_test_fixture.py line 137: world_buffer.get",flush=True)
                 current_world = self.world_buffer.get(
                     block=True, timeout=WORLD_BUFFER_TIMEOUT
                 )
@@ -362,11 +365,14 @@ class FieldTestRunner(TbotsTestRunner):
             while time.time() < test_end_time:
                 # Update the timestamp logged by the ProtoLogger
                 with self.timestamp_mutex:
+
+                    print("field_test_fixture.py line 369: ssl_wrapper_buffer.get",flush=True)
                     ssl_wrapper = self.ssl_wrapper_buffer.get(block=False)
                     self.timestamp = ssl_wrapper.detection.t_capture
 
                 while True:
                     try:
+                        print("field_test_fixture.py line 369: world_buffer.get",flush=True)
                         world = self.world_buffer.get(
                             block=True, timeout=WORLD_BUFFER_TIMEOUT
                         )
@@ -660,12 +666,7 @@ def field_test_runner():
         debug_full_system=args.debug_blue_full_system,
         friendly_colour_yellow=False,
         should_restart_on_crash=False,
-    ) as blue_fs, RobotCommunication(
-        current_proto_unix_io=blue_full_system_proto_unix_io,
-        multicast_channel=getRobotMulticastChannel(0),
-        interface=args.interface,
-        disable_estop=False
-    ) as rc_blue, FullSystem(
+    ) as blue_fs, FullSystem(
         f"{args.yellow_full_system_runtime_dir}/test/{test_name}",
         debug_full_system=args.debug_yellow_full_system,
         friendly_colour_yellow=True,
@@ -673,7 +674,12 @@ def field_test_runner():
     ) as yellow_fs:
         with Gamecontroller(
                 supress_logs=(not args.show_gamecontroller_logs), ci_mode=True
-        ) as gamecontroller:
+        ) as gamecontroller, RobotCommunication(
+            current_proto_unix_io=blue_full_system_proto_unix_io,
+            multicast_channel=getRobotMulticastChannel(0),
+            interface=args.interface,
+            disable_estop=False
+        ) as rc_blue:
             blue_fs.setup_proto_unix_io(blue_full_system_proto_unix_io)
             yellow_fs.setup_proto_unix_io(yellow_full_system_proto_unix_io)
             rc_blue.setup_for_fullsystem()

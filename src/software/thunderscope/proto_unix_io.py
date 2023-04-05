@@ -66,6 +66,7 @@ class ProtoUnixIO:
 
         """
         while True:
+            print("proto_unix_io.py line 69: receive.get",flush=True)
             proto = receive_buffer.get()
 
             if proto.DESCRIPTOR.full_name in self.proto_observers:
@@ -169,3 +170,9 @@ class ProtoUnixIO:
             daemon=True,
         )
         self.send_proto_to_observer_threads[key].start()
+
+    def force_close(self):
+        for sender in self.unix_senders.items():
+            sender[1].force_stop()
+        for listener in self.unix_listeners.items():
+            listener[1].force_stop()
