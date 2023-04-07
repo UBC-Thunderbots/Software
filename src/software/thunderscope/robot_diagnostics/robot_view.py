@@ -29,7 +29,7 @@ class RobotView(QWidget):
 
         super().__init__()
 
-        self.robot_status_buffer = ThreadSafeBuffer(100, RobotStatus)
+        self.robot_status_buffer = ThreadSafeBuffer(100, RobotStatus,owner="RobotView.robot_status")
 
         self.layout = QVBoxLayout()
 

@@ -43,11 +43,11 @@ class RobotCommunication(object):
         self.estop_path = estop_path
         self.estop_buadrate = estop_buadrate
 
-        self.world_buffer = ThreadSafeBuffer(1, World)
-        self.primitive_buffer = ThreadSafeBuffer(1, PrimitiveSet)
+        self.world_buffer = ThreadSafeBuffer(1, World,owner="RobotCommunication.world_buffer")
+        self.primitive_buffer = ThreadSafeBuffer(1, PrimitiveSet,owner="RobotCommunication.primitive_buffer")
 
-        self.motor_control_diagnostics_buffer = ThreadSafeBuffer(1, MotorControl)
-        self.power_control_diagnostics_buffer = ThreadSafeBuffer(1, PowerControl)
+        self.motor_control_diagnostics_buffer = ThreadSafeBuffer(1, MotorControl,owner="RobotCommunication.motor_control_diagnostics")
+        self.power_control_diagnostics_buffer = ThreadSafeBuffer(1, PowerControl,owner="RobotCommunication.power_control_diagnostics")
 
         self.current_proto_unix_io.register_observer(World, self.world_buffer)
 

@@ -39,7 +39,7 @@ class CostVisualizationWidget(QtWidgets.QMainWindow):
     def __init__(self, buffer_size=5):
         super(CostVisualizationWidget, self).__init__()
         self.cost_visualization_buffer = ThreadSafeBuffer(
-            buffer_size, CostVisualization
+            buffer_size, CostVisualization,owner="CostVisualization"
         )
         self.cached_cost_vis = CostVisualization()
         self.timeout = (

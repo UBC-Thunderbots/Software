@@ -33,7 +33,7 @@ class PlayInfoWidget(QWidget):
 
         self.play_table = QTableWidget(PlayInfoWidget.NUM_ROWS, PlayInfoWidget.NUM_COLS)
 
-        self.playinfo_buffer = ThreadSafeBuffer(buffer_size, PlayInfo, False)
+        self.playinfo_buffer = ThreadSafeBuffer(buffer_size, PlayInfo, False,owner="Play.playinfo")
         self.play_table.verticalHeader().setVisible(False)
 
         self.vertical_layout = QVBoxLayout()

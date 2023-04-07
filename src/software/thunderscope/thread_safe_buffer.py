@@ -71,9 +71,9 @@ class ThreadSafeBuffer(object):
             # print("thread_safe_buffer.py line 68 blocking: queue.get",flush=True)
             # print(traceback.print_stack())
             one_time_value = random.randint(0,2147483647)
-            print(self.owner + " has called get blocking with number: ",one_time_value)
+            print(self.owner + " get blocking with number: ",one_time_value)
             retval = self.queue.get(timeout=timeout)
-            print(self.owner + "get call unblocking with number: ",one_time_value)
+            print(self.owner + " get unblocking with number: ",one_time_value)
             return retval
 
         try:

@@ -25,7 +25,7 @@ class ThreadedUnixSender:
 
         """
         self.unix_path = unix_path
-        self.proto_buffer = ThreadSafeBuffer(max_buffer_size, proto_type)
+        self.proto_buffer = ThreadSafeBuffer(max_buffer_size, proto_type,owner="ThreadedUnixSender")
 
         self.socket = socket.socket(socket.AF_UNIX, type=socket.SOCK_DGRAM)
         self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF, UNIX_BUFFER_SIZE)

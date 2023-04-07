@@ -18,7 +18,7 @@ class PathLayer(FieldLayer):
 
         """
         FieldLayer.__init__(self)
-        self.primitive_set_buffer = ThreadSafeBuffer(buffer_size, PrimitiveSet)
+        self.primitive_set_buffer = ThreadSafeBuffer(buffer_size, PrimitiveSet,owner="PathLayer.primitive_set_buffer")
 
         # Cached painter pens and brush
         self.path_pen = pg.mkPen(
