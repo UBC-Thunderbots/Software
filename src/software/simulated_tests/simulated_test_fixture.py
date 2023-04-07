@@ -33,6 +33,7 @@ logger = createLogger(__name__)
 LAUNCH_DELAY_S = 0.1
 WORLD_BUFFER_TIMEOUT = 0.5
 PROCESS_BUFFER_DELAY_S = 0.01
+TEST_START_DELAY_S = 0.01
 PAUSE_AFTER_FAIL_DELAY_S = 3
 
 
@@ -239,6 +240,14 @@ class SimulatorTestRunner(object):
             raise self.last_exception
 
         threading.excepthook = excepthook
+
+        # Start the test with a delay to allow the simulator to receive
+        # the initial world state. Without this delay, the SimulatorTick
+        # message may be received before the initial world state, causing
+        # the world to be empty, failing some AlwaysValidations
+        # TODO (#2858): Replace delay with an actual feedback from the simulator
+        #  for when it has received the initial world state
+        time.sleep(TEST_START_DELAY_S)
 
         # If thunderscope is enabled, run the test in a thread and show
         # thunderscope on this thread. The excepthook is setup to catch
