@@ -64,13 +64,20 @@ def test_two_ai_ball_placement(simulated_test_runner, run_enemy_ai):
     simulated_test_runner.blue_full_system_proto_unix_io.send_proto(Play, blue_play)
 
     # We can parametrize running in ai_vs_ai mode
-    # if run_enemy_ai:
-    #     yellow_play = Play()
-    #     yellow_play.name = PlayName.EnemyBallPlacementPlay
-    #
-    #     simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(
-    #         Play, yellow_play
-    #     )
+    if run_enemy_ai:
+        yellow_play = Play()
+        yellow_play.name = PlayName.EnemyBallPlacementPlay
+
+        simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(
+            Play, yellow_play
+        )
+    else:
+        yellow_play = Play()
+        yellow_play.name = PlayName.HaltPlay
+
+        simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(
+            Play, yellow_play
+        )
 
     # Create world state
     simulated_test_runner.simulator_proto_unix_io.send_proto(
@@ -168,13 +175,20 @@ def test_outside_goal_line_ball_placement(simulated_test_runner, run_enemy_ai):
     simulated_test_runner.blue_full_system_proto_unix_io.send_proto(Play, blue_play)
 
     # We can parametrize running in ai_vs_ai mode
-    # if run_enemy_ai:
-    #     yellow_play = Play()
-    #     yellow_play.name = PlayName.EnemyBallPlacementPlay
-    #
-    #     simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(
-    #         Play, yellow_play
-    #     )
+    if run_enemy_ai:
+        yellow_play = Play()
+        yellow_play.name = PlayName.EnemyBallPlacementPlay
+
+        simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(
+            Play, yellow_play
+        )
+    else:
+        yellow_play = Play()
+        yellow_play.name = PlayName.HaltPlay
+
+        simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(
+            Play, yellow_play
+        )
 
     # Create world state
     simulated_test_runner.simulator_proto_unix_io.send_proto(
@@ -272,13 +286,20 @@ def test_outside_side_line_ball_placement(simulated_test_runner, run_enemy_ai):
     simulated_test_runner.blue_full_system_proto_unix_io.send_proto(Play, blue_play)
 
     # We can parametrize running in ai_vs_ai mode
-    # if run_enemy_ai:
-    #     yellow_play = Play()
-    #     yellow_play.name = PlayName.EnemyBallPlacementPlay
-    #
-    #     simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(
-    #         Play, yellow_play
-    #     )
+    if run_enemy_ai:
+        yellow_play = Play()
+        yellow_play.name = PlayName.EnemyBallPlacementPlay
+
+        simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(
+            Play, yellow_play
+        )
+    else:
+        yellow_play = Play()
+        yellow_play.name = PlayName.HaltPlay
+
+        simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(
+            Play, yellow_play
+        )
 
     # Create world state
     simulated_test_runner.simulator_proto_unix_io.send_proto(
@@ -376,13 +397,20 @@ def test_friendly_defense_area_ball_placement(simulated_test_runner, run_enemy_a
     simulated_test_runner.blue_full_system_proto_unix_io.send_proto(Play, blue_play)
 
     # We can parametrize running in ai_vs_ai mode
-    # if run_enemy_ai:
-    #     yellow_play = Play()
-    #     yellow_play.name = PlayName.EnemyBallPlacementPlay
-    #
-    #     simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(
-    #         Play, yellow_play
-    #     )
+    if run_enemy_ai:
+        yellow_play = Play()
+        yellow_play.name = PlayName.EnemyBallPlacementPlay
+
+        simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(
+            Play, yellow_play
+        )
+    else:
+        yellow_play = Play()
+        yellow_play.name = PlayName.HaltPlay
+
+        simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(
+            Play, yellow_play
+        )
 
     # Create world state
     simulated_test_runner.simulator_proto_unix_io.send_proto(

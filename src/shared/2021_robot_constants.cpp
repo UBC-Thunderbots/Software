@@ -27,6 +27,6 @@ RobotConstants_t create2021RobotConstants(void)
         .max_force_dribbler_speed_rpm       = -12000.0f,
         .wheel_radius_meters                = 0.03f,
         .wheel_rotations_per_motor_rotation = 17.0f / 60.0f,
-        .cautious_dribble_speed_m_per_s     = 0.500f};
+        .cautious_dribble_speed_m_per_s     = 1.00f};
     return robot_constants;
 }
