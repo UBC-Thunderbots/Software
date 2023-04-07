@@ -58,11 +58,11 @@ void HRVOSimulator::configureHRVORobot(const Robot &robot,
 
     // Max distance which the robot can travel in one time step
     double max_radius = (max_speed * time_step.toSeconds()) / 2;
-    RobotPath path = RobotPath({PathPoint(robot.position(), 0.0)}, max_radius);
+    RobotPath path    = RobotPath({PathPoint(robot.position(), 0.0)}, max_radius);
 
     std::shared_ptr<HRVOAgent> agent = std::make_shared<HRVOAgent>(
-            robot.id(), robot.currentState(), path, ROBOT_MAX_RADIUS_METERS, max_speed,
-            max_accel, FRIENDLY_ROBOT_RADIUS_MAX_INFLATION);
+        robot.id(), robot.currentState(), path, ROBOT_MAX_RADIUS_METERS, max_speed,
+        max_accel, FRIENDLY_ROBOT_RADIUS_MAX_INFLATION);
     robots[robot.id()] = std::static_pointer_cast<Agent>(agent);
 
     // Update the primitive for this robot if it exists
