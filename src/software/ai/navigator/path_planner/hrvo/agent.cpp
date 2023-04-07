@@ -28,8 +28,20 @@ void Agent::update(Duration time_step)
         new_velocity = new_velocity.normalize(max_speed);
     }
 
+    double acceleration_limit;
+    if (new_velocity.length() >= velocity.length())
+    {
+        // Robot is accelerating
+        acceleration_limit = max_accel;
+    }
+    else
+    {
+        // Robot is decelerating
+        acceleration_limit = max_decel;
+    }
+
     const Vector dv = new_velocity - velocity;
-    if (dv.length() < max_accel * time_step.toSeconds() || dv.length() == 0.0)
+    if (dv.length() <= acceleration_limit * time_step.toSeconds())
     {
         setVelocity(new_velocity);
     }
@@ -37,7 +49,7 @@ void Agent::update(Duration time_step)
     {
         // Calculate the maximum velocity towards the preferred velocity, given the
         // acceleration constraint
-        setVelocity(velocity + dv.normalize(max_accel * time_step.toSeconds()));
+        setVelocity(velocity + dv.normalize(acceleration_limit * time_step.toSeconds()));
     }
     position = position + (velocity * time_step.toSeconds());
 
@@ -59,8 +71,12 @@ void Agent::update(Duration time_step)
 
 void Agent::updateRadiusFromVelocity()
 {
-    // Linearly increase radius based on the current agent velocity
-    radius = min_radius + max_radius_inflation * (velocity.length() / max_speed);
+    // Calculate the updated radius of the agent based on its current velocity
+    // The radius is calculated using a 4th degree polynomial which at 0 velocity
+    // is equal to min_radius, and at max_speed is equal to min_radius + max_radius_inflation.
+    // A 4th degree polynomial was chosen because we want the radius to increase quickly for smaller velocities.
+    double a = -max_radius_inflation / std::pow(max_speed, 4.0);
+    radius = min_radius + max_radius_inflation + a * std::pow(velocity.length() - max_speed, 4.0);
 }
 
 double Agent::getMaxAccel() const

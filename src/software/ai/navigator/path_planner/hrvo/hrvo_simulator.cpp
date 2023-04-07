@@ -104,9 +104,9 @@ void HRVOSimulator::updateAgent(const std::shared_ptr<Agent> &agent,
                                 const Robot &friendly_robot)
 {
     agent->setPosition(friendly_robot.position());
-    agent->setVelocity(friendly_robot.velocity());
+//    agent->setVelocity(friendly_robot.velocity()); // Turn off feedback
     agent->setOrientation(friendly_robot.orientation());
-    agent->setAngularVelocity(friendly_robot.angularVelocity());
+//    agent->setAngularVelocity(friendly_robot.angularVelocity());
 }
 
 void HRVOSimulator::configureHRVORobot(const Robot &robot,
@@ -231,12 +231,12 @@ void HRVOSimulator::doStep(Duration time_step)
     // velocity, while others aren't.
     for (auto &robot : robots)
     {
-        robot.second->computeNewVelocity(robots, time_step);
+        robot.second->computeNewAngularVelocity(time_step);
     }
 
     for (auto &robot : robots)
     {
-        robot.second->computeNewAngularVelocity(time_step);
+        robot.second->computeNewVelocity(robots, time_step);
     }
 
     // Update the positions of all agents given their velocity
