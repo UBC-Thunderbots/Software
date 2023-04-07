@@ -57,7 +57,7 @@ TEST_F(DefensePlayTest, test_defense_play)
             // add an x-offset to the B-R point, to make a vertical rectangle beside the
             // defense area.
             Rectangle crease_defense_area(Point(tr.x(), tr.y()),
-                                          Point(br.x() + 0.25, centre.y()));
+                                          Point(br.x() + 0.5, centre.y()));
 
             robotInPolygon(crease_defense_area, 2, world_ptr, yield);
         }};

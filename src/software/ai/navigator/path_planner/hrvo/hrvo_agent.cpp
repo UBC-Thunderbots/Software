@@ -75,8 +75,15 @@ void HRVOAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive,
 std::vector<RobotId> HRVOAgent::computeNeighbors(
     const std::map<RobotId, std::shared_ptr<Agent>> &robots)
 {
-    // Only consider agents within this distance away from our position
-    Point current_destination = path.getCurrentPathPoint()->getPosition();
+    const auto current_path_point_opt = path.getCurrentPathPoint();
+    if (!current_path_point_opt.has_value())
+    {
+        // Don't consider any neighbors if we're at destination
+        return {};
+    }
+    auto current_destination = current_path_point_opt.value().getPosition();
+
+    // Only consider agents that are closer to us than the destination is
     double dist_to_obstacle_threshold_squared =
         std::min(std::pow(MAX_NEIGHBOR_SEARCH_DIST, 2),
                  (position - current_destination).lengthSquared());
@@ -120,16 +127,17 @@ std::vector<RobotId> HRVOAgent::computeNeighbors(
 void HRVOAgent::computeVelocityObstacles(
     const std::map<RobotId, std::shared_ptr<Agent>> &robots)
 {
+    velocity_obstacles.clear();
     velocity_obstacles.reserve(robots.size());
 
-    const auto current_path_point_opt = getPath().getCurrentPathPoint();
-    auto current_destination          = current_path_point_opt.value().getPosition();
-
+    const auto current_path_point_opt = path.getCurrentPathPoint();
     if (!current_path_point_opt.has_value())
     {
         // Don't draw any velocity obstacles if we do not have a destination
         return;
     }
+    auto current_destination = current_path_point_opt.value().getPosition();
+
 
     // Create Velocity Obstacles for neighboring agents
     std::vector<unsigned int> neighbour_ids = computeNeighbors(robots);
@@ -563,17 +571,17 @@ std::optional<int> HRVOAgent::findIntersectingVelocityObstacle(
 
 Vector HRVOAgent::computePreferredVelocity(Duration time_step)
 {
-    double pref_speed   = max_speed * PREF_SPEED_SCALE;
-    auto path_point_opt = path.getCurrentPathPoint();
+    double pref_speed                 = max_speed * PREF_SPEED_SCALE;
+    const auto current_path_point_opt = path.getCurrentPathPoint();
 
-    if (pref_speed <= 0.01f || max_accel <= 0.01f || path_point_opt == std::nullopt)
+    if (!current_path_point_opt.has_value() || pref_speed <= 0.01 || max_accel <= 0.01)
     {
         // Used to avoid edge cases with division by zero
-        return Vector(0.f, 0.f);
+        return Vector(0.0, 0.0);
     }
 
-    Point goal_position  = path_point_opt.value().getPosition();
-    double speed_at_goal = path_point_opt.value().getSpeed();
+    Point goal_position  = current_path_point_opt.value().getPosition();
+    double speed_at_goal = current_path_point_opt.value().getSpeed();
 
     Vector dist_vector_to_goal = goal_position - position;
     auto dist_to_goal          = static_cast<float>(dist_vector_to_goal.length());
@@ -652,10 +660,10 @@ void HRVOAgent::visualize(TeamColour friendly_team_colour)
                                                           vo_protos.end()};
 
     // Visualize the ball obstacle
-    if (getBallObstacle().has_value())
+    if (ball_obstacle.has_value())
     {
         TbotsProto::Circle ball_circle =
-            getBallObstacle().value()->createObstacleProto().circle()[0];
+            ball_obstacle.value()->createObstacleProto().circle()[0];
         *(hrvo_visualization.add_robots()) = ball_circle;
     }
 
