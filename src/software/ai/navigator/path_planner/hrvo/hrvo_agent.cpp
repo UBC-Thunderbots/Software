@@ -75,8 +75,15 @@ void HRVOAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive,
 std::vector<RobotId> HRVOAgent::computeNeighbors(
     const std::map<RobotId, std::shared_ptr<Agent>> &robots)
 {
-    // Only consider agents within this distance away from our position
-    Point current_destination = path.getCurrentPathPoint()->getPosition();
+    const auto current_path_point_opt = path.getCurrentPathPoint();
+    if (!current_path_point_opt.has_value())
+    {
+        // Don't consider any neighbors if we're at destination
+        return {};
+    }
+    auto current_destination = current_path_point_opt.value().getPosition();
+
+    // Only consider agents that are closer to us than the destination is
     double dist_to_obstacle_threshold_squared =
         std::min(std::pow(MAX_NEIGHBOR_SEARCH_DIST, 2),
                  (position - current_destination).lengthSquared());
