@@ -648,8 +648,8 @@ Vector HRVOAgent::computePreferredVelocity(Duration time_step)
 
 
     std::map<std::string, double> plotjuggler_values;
-    plotjuggler_values.insert({std::to_string(robot_id) + "_vxy_pref", output.length()});
-    LOG(VISUALIZE) << *createPlotJugglerValue(plotjuggler_values);
+    plotjuggler_values.insert({std::to_string(robot_id) + "_vxy_pref123", output.length()});
+    LOG(PLOTJUGGLER) << *createPlotJugglerValue(plotjuggler_values);
     plotjuggler_values.clear();
 
     return localToGlobalVelocity(output, orientation);

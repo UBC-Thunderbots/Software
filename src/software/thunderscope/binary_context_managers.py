@@ -330,8 +330,7 @@ gdb --args bazel-bin/{simulator_command}
         for arg in [
             (BLUE_SSL_WRAPPER_PATH, SSL_WrapperPacket),
             (BLUE_ROBOT_STATUS_PATH, RobotStatus),
-            (SIMULATOR_STATE_PATH, SimulatorState), # TODO: Yellow doesn't simulator state path. No color distinction? Is this why there's a ball always?
-            ("", PlotJugglerValue, True),
+            (SIMULATOR_STATE_PATH, SimulatorState),
         ] + [
             # TODO (#2655): Add/Remove HRVO layers dynamically based on the HRVOVisualization proto messages
             (BLUE_HRVO_PATH, HRVOVisualization, True)
@@ -353,7 +352,6 @@ gdb --args bazel-bin/{simulator_command}
         for arg in [
             (YELLOW_SSL_WRAPPER_PATH, SSL_WrapperPacket),
             (YELLOW_ROBOT_STATUS_PATH, RobotStatus),
-            ("", PlotJugglerValue, True),
         ] + [
             # TODO (#2655): Add/Remove HRVO layers dynamically based on the HRVOVisualization proto messages
             (YELLOW_HRVO_PATH, HRVOVisualization, True)
@@ -386,7 +384,6 @@ class Gamecontroller(object):
         # so that we can run multiple gamecontroller instances in parallel
         self.referee_port = self.next_free_port()
         self.ci_port = self.next_free_port()
-        self.ci_socket = None
 
     def __enter__(self):
         """Enter the gamecontroller context manager. 

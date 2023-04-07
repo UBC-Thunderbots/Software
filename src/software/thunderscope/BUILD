@@ -58,7 +58,6 @@ py_library(
         "//software/thunderscope/robot_diagnostics:estop_view",
         "//software/thunderscope/robot_diagnostics:robot_info",
         "//software/thunderscope/robot_diagnostics:robot_view",
-        "//software/thunderscope/common:plot_juggler_sender",
         requirement("pyqtgraph"),
         requirement("numpy"),
     ],

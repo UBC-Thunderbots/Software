@@ -19,6 +19,7 @@ from pyqtgraph.Qt.QtWidgets import *
 
 from software.py_constants import *
 from proto.import_all_protos import *
+from software.thunderscope.common.proto_plotter import ProtoPlotter
 from extlibs.er_force_sim.src.protobuf.world_pb2 import *
 from software.thunderscope.dock_label_style import *
 
@@ -36,8 +37,6 @@ from software.thunderscope.field import (
 from software.thunderscope.common.proto_configuration_widget import (
     ProtoConfigurationWidget,
 )
-from software.thunderscope.common.plot_juggler_sender import PlotJugglerSender
-from software.thunderscope.common.proto_plotter import ProtoPlotter
 from software.thunderscope.cost_vis.cost_vis import CostVisualizationWidget
 from software.thunderscope.field.field import Field
 from software.thunderscope.log.g3log_widget import g3logWidget
@@ -194,9 +193,6 @@ class Thunderscope(object):
 
         # Setup the main window and load the requested tabs
         self.configure_layout(layout_path, load_blue, load_yellow, load_diagnostics)
-
-        # Setup the thread to forward plotjuggler values
-        self.setup_plotjuggler_sender()
 
         # Save and Load Prompts
         #
@@ -802,31 +798,3 @@ class Thunderscope(object):
         """Close the main window"""
 
         QtCore.QTimer.singleShot(0, self.window.close)
-
-    def is_open(self):
-        """Returns true if the window is open"""
-        return self.window.isVisible()
-
-    def setup_plotjuggler_sender(self):
-        """Setup the plotjuggler sender"""
-        self.plotjuggler_sender = PlotJugglerSender()
-
-        if self.blue_full_system_proto_unix_io:
-            self.blue_full_system_proto_unix_io.register_observer(
-                PlotJugglerValue, self.plotjuggler_sender.log_buffer
-            )
-
-        if self.yellow_full_system_proto_unix_io:
-            self.yellow_full_system_proto_unix_io.register_observer(
-                PlotJugglerValue, self.plotjuggler_sender.log_buffer
-            )
-
-        if self.robot_diagnostics_proto_unix_io:
-            self.robot_diagnostics_proto_unix_io.register_observer(
-                PlotJugglerValue, self.plotjuggler_sender.log_buffer
-            )
-
-        if self.simulator_proto_unix_io:
-            self.simulator_proto_unix_io.register_observer(
-                PlotJugglerValue, self.plotjuggler_sender.log_buffer
-            )

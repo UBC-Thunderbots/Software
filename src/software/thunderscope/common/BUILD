@@ -17,15 +17,6 @@ py_library(
 )
 
 py_library(
-    name = "plot_juggler_sender",
-    srcs = ["plot_juggler_sender.py"],
-    deps = [
-        "//software/thunderscope:thread_safe_buffer",
-        "//proto:software_py_proto",
-    ],
-)
-
-py_library(
     name = "common_widgets",
     srcs = ["common_widgets.py"],
 )
