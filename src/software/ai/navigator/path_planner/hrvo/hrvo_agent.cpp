@@ -35,7 +35,7 @@ void HRVOAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive,
         // multiple path points and remove this check
         if (motion_control.path().points().size() < 2)
         {
-            LOG(WARNING) << "Empty path: " << motion_control.path().points().size()
+            LOG(WARNING) << "Invalid path in move primitive with size " << motion_control.path().points().size()
                          << std::endl;
             return;
         }
