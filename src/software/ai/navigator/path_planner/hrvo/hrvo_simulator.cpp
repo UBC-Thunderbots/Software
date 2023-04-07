@@ -132,55 +132,24 @@ void HRVOSimulator::configureHRVORobot(const Robot &robot,
         max_angular_accel = robot_constants.robot_max_ang_acceleration_rad_per_s_2;
     }
 
-    // Get this robot's destination point, if it has a primitive
-    // If this robot does not have a primitive, then set its current position as its
-    // destination
-    Point destination_point      = robot.position();
-    double speed_at_goal         = 0.0;
-    Angle angle_at_goal          = robot.orientation();
-    const auto &robot_primitives = primitive_set.robot_primitives();
-    auto primitive_iter          = robot_primitives.find(robot.id());
-    if (primitive_iter != robot_primitives.end())
-    {
-        TbotsProto::Primitive primitive = primitive_iter->second;
-
-        // TODO (#2873): This code block is repeated inside HRVOAgent.cpp.
-        // and it just calculates the path point from the primitive.
-        // this can be factored out to a function, so that its usage can called by the
-        // simulator and for each agent.
-        if (primitive.has_move())
-        {
-            const auto &move_primitive = primitive.move();
-            const auto &motion_control = move_primitive.motion_control();
-            // TODO (#2418): Update implementation of Primitive to support
-            // multiple path points and remove this check
-            if (motion_control.path().points().size() < 2)
-            {
-                LOG(WARNING) << "Empty path: " << motion_control.path().points().size()
-                             << std::endl;
-                return;
-            }
-
-            speed_at_goal = move_primitive.final_speed_m_per_s();
-            max_speed     = move_primitive.max_speed_m_per_s();
-            angle_at_goal = createAngle(move_primitive.final_angle());
-
-            auto destination  = motion_control.path().points().at(1);
-            destination_point = Point(destination.x_meters(), destination.y_meters());
-        }
-    }
-
-    // Max distance which the robot can travel in one time step + scaling
+    // Max distance which the robot can travel in one time step
     double max_radius = (max_speed * time_step.toSeconds()) / 2;
-
-    auto path_points = {PathPoint(destination_point, speed_at_goal, angle_at_goal)};
-    RobotPath path   = RobotPath(path_points, max_radius);
+    RobotPath path    = RobotPath({PathPoint(robot.position(), 0.0, robot.orientation())}, max_radius);
 
     std::shared_ptr<HRVOAgent> agent = std::make_shared<HRVOAgent>(
         robot.id(), robot.currentState(), path, ROBOT_MAX_RADIUS_METERS, max_speed,
         max_accel, max_decel, max_angular_speed, max_angular_accel,
         FRIENDLY_ROBOT_RADIUS_MAX_INFLATION);
     robots[robot.id()] = std::static_pointer_cast<Agent>(agent);
+
+    // Update the primitive for this robot if it exists
+    const auto &robot_primitives = primitive_set.robot_primitives();
+    auto primitive_iter          = robot_primitives.find(robot.id());
+    if (primitive_iter != robot_primitives.end())
+    {
+        TbotsProto::Primitive primitive = primitive_iter->second;
+        agent->updatePrimitive(primitive, world.value(), time_step);
+    }
 }
 
 void HRVOSimulator::configureLVRobot(const Robot &robot,

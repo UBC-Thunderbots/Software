@@ -21,9 +21,6 @@ class HRVOSimulator
    public:
     /**
      * Constructor
-     * @param robot_constants The robot constants to be used for all Agents representing a
-     * robot
-     * @param friendly_team_colour The colour of the friendly team
      */
     explicit HRVOSimulator();
 
@@ -35,6 +32,9 @@ class HRVOSimulator
      * obstacles
      *
      * @param world The world which the simulation should be based upon
+     * @param robot_constants The robot constants to be used for all Agents representing a
+     * robot
+     * @param time_step The time step to use
      */
     void updateWorld(const World &world, const RobotConstants_t &robot_constants,
                      Duration time_step);
@@ -43,7 +43,7 @@ class HRVOSimulator
     /**
      * Reset all friendly agents goal points to match the path of the given primitive set
      *
-     * @param new_primitive_set
+     * @param new_primitive_set a new set of primitive commands for the agents
      * @param time_step the time_step to use
      */
     void updatePrimitiveSet(const TbotsProto::PrimitiveSet &new_primitive_set,
@@ -115,6 +115,7 @@ class HRVOSimulator
      * visualize the HRVO obstacles for friendly team
      *
      * @param robot_id
+     * @param friendly_team_colour the friendly teams color
      */
     void visualize(RobotId robot_id, TeamColour friendly_team_colour);
 
@@ -127,6 +128,8 @@ class HRVOSimulator
      * Configure and add a HRVO Agent to the simulation.
      *
      * @param robot The robot for which this agent is based on
+     * @param robot_constants The robot constants to be used for all Agents representing a
+     * robot
      * @param time_step the time_step to use
      */
     void configureHRVORobot(const Robot &robot, const RobotConstants_t &robot_constants,
@@ -137,6 +140,8 @@ class HRVOSimulator
      *  Configure and add a LV Agent to the simulation.
      *
      * @param robot The robot for which this agent is based on
+     * @param robot_constants The robot constants to be used for all Agents representing a
+     * robot
      * @param time_step the time_step to use
      */
     void configureLVRobot(const Robot &robot, const RobotConstants_t &robot_constants,
@@ -151,7 +156,8 @@ class HRVOSimulator
     static void updateAgent(const std::shared_ptr<Agent> &agent,
                             const Robot &friendly_robot);
 
-    // robot id to agent
+    // Map of robot ids to agent.
+    // enemy robot ids are offset by ENEMY_LV_ROBOT_OFFSET
     std::map<RobotId, std::shared_ptr<Agent>> robots;
 
     // Latest World which the simulator has received
@@ -164,5 +170,6 @@ class HRVOSimulator
     // This scale is used to avoid close encounters, and reduce chance of collision.
     static constexpr double FRIENDLY_ROBOT_RADIUS_MAX_INFLATION = 0.05;
 
+    // the max amount (meters) which the friendly/enemy robot radius can reach
     static constexpr double ENEMY_ROBOT_RADIUS_MAX_INFLATION = 0.06;
 };

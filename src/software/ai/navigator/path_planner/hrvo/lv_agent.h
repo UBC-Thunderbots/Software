@@ -14,7 +14,7 @@ class LVAgent : public Agent
    public:
     /**
      * Constructor. This type of agent (Linear Velocity Agent)
-     * moves directly towards its pathpoint, without any obstacle avoidance.
+     * moves directly towards its path point, without any obstacle avoidance.
      *
      * @param robot_id	            The robot id for this agent.
      * @prarm robot_state           The robots current state
@@ -35,8 +35,8 @@ class LVAgent : public Agent
     /**
      * Computes the new velocity of this agent.
      *
-     * @param agents unused
-     * @param the simulators time step
+     * @param robots the agents in simulation
+     * @param time_step the time step to use
      */
     void computeNewVelocity(const std::map<unsigned int, std::shared_ptr<Agent>> &robots,
                             Duration time_step) override;
@@ -61,7 +61,7 @@ class LVAgent : public Agent
     /**
      * Computes the preferred velocity of this agent.
      *
-     * @param time_step
+     * @param time_step the time step to use
      * @return the computed preferred velocity
      */
     Vector computePreferredVelocity(Duration time_step) override;
