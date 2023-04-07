@@ -163,7 +163,7 @@ RobotNavigationObstacleFactory::createDynamicObstaclesFromMotionConstraint(
                 auto obstacles_list = createFromBallPlacement(
                     world.gameState().getBallPlacementPoint().value(),
                     world.ball().position());
-                obstacles.insert(obstacles.end(), obstacles_list.start(),
+                obstacles.insert(obstacles.end(), obstacles_list.begin(),
                                  obstacles_list.end());
             }
             else
