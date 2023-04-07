@@ -2,11 +2,10 @@
 #include "software/physics/velocity_conversion_util.h"
 #include "proto/message_translation/tbots_protobuf.h"
 
-HRVOAgent::HRVOAgent(RobotId robot_id, const RobotState &robot_state,
-                     const RobotPath &path, double radius, double max_speed,
-                     double max_accel, double max_angular_speed, double max_angular_accel,
-                     double max_radius_inflation)
-    : Agent(robot_id, robot_state, path, radius, max_speed, max_accel, max_angular_speed,
+HRVOAgent::HRVOAgent(RobotId robot_id, const RobotState &robot_state, const RobotPath &path, double radius,
+                     double max_speed, double max_accel, double max_decel, double max_angular_speed,
+                     double max_angular_accel, double max_radius_inflation)
+    : Agent(robot_id, robot_state, path, radius, max_speed, max_accel, max_decel, max_angular_speed,
             max_angular_accel, max_radius_inflation),
       obstacle_factory(TbotsProto::RobotNavigationObstacleConfig()),
       neighbours(),
@@ -252,10 +251,13 @@ void HRVOAgent::computeNewAngularVelocity(Duration time_step)
     // Clamp velocity
     const double desired_output = angular_velocity.toRadians() + clamped_delta_angular_velocity;
     const double max_angular_vel = static_cast<double>(max_angular_speed);
-    AngularVelocity output = AngularVelocity::fromRadians(std::clamp(desired_output, -max_angular_vel, max_angular_vel));
+    AngularVelocity desired = AngularVelocity::fromRadians(std::clamp(desired_output, -max_angular_vel, max_angular_vel));
 
-    orientation += ((angular_velocity + output) / 2) * time_step.toSeconds();
-    angular_velocity = output;
+    // Update orientation, assuming linear acceleration between
+    // current and desired angular velocity
+    orientation += ((angular_velocity + desired) / 2) * time_step.toSeconds();
+
+    angular_velocity = desired;
 }
 
 
@@ -623,16 +625,16 @@ Vector HRVOAgent::computePreferredVelocity(Duration time_step)
     Vector delta_velocity = pid_vel - curr_local_velocity;
 
     // Clamp to max acceleration
-    float acceleration_limit;
+    double acceleration_limit;
     if (pid_vel.length() >= curr_local_velocity.length())
     {
-        // Robot is accelerating TODO: These values should be passed in and saved as fields aswell probably
-        acceleration_limit = robot_constants.robot_max_acceleration_m_per_s_2;
+        // Robot is accelerating
+        acceleration_limit = max_accel;
     }
     else
     {
         // Robot is decelerating
-        acceleration_limit = robot_constants.robot_max_deceleration_m_per_s_2;
+        acceleration_limit = max_decel;
     }
     Vector max_delta_velocity = delta_velocity.normalize(std::min(delta_velocity.length(),
                                                                   acceleration_limit * time_step.toSeconds()));

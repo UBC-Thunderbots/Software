@@ -22,14 +22,15 @@ class LVAgent : public Agent
      * @param radius                The radius of this agent.
      * @param max_speed             The maximum speed of this agent.
      * @param max_accel             The maximum acceleration of this agent.
+     * @param max_decel             The maximum deceleration of this agent.
      * @param max_angular_speed     The maximum angular speed of this agent.
      * @param max_angular_accel     The maximum angular acceleration of this agent.
      * @param max_radius_inflation  The maximum amount which the radius of this agent can
      * inflate.
      */
-    LVAgent(RobotId robot_id, const RobotState &robot_state, const RobotPath &path,
-            double radius, double max_speed, double max_accel, double max_angular_speed,
-            double max_angular_accel, double max_radius_inflation);
+    LVAgent(RobotId robot_id, const RobotState &robot_state, const RobotPath &path, double radius, double max_speed,
+            double max_accel, double max_decel, double max_angular_speed, double max_angular_accel,
+            double max_radius_inflation);
 
     /**
      * Computes the new velocity of this agent.

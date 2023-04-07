@@ -114,6 +114,7 @@ void HRVOSimulator::configureHRVORobot(const Robot &robot,
                                        Duration time_step)
 {
     double max_accel         = 1e-4;
+    double max_decel         = 1e-4;
     double max_speed         = 1e-4;
     double max_angular_speed = 1e-4;
     double max_angular_accel = 1e-4;
@@ -125,6 +126,7 @@ void HRVOSimulator::configureHRVORobot(const Robot &robot,
     {
         max_speed = robot_constants.robot_max_speed_m_per_s;
         max_accel = robot_constants.robot_max_acceleration_m_per_s_2;
+        max_decel = robot_constants.robot_max_deceleration_m_per_s_2;
 
         max_angular_speed = robot_constants.robot_max_ang_speed_rad_per_s;
         max_angular_accel = robot_constants.robot_max_ang_acceleration_rad_per_s_2;
@@ -176,7 +178,7 @@ void HRVOSimulator::configureHRVORobot(const Robot &robot,
 
     std::shared_ptr<HRVOAgent> agent = std::make_shared<HRVOAgent>(
         robot.id(), robot.currentState(), path, ROBOT_MAX_RADIUS_METERS, max_speed,
-        max_accel, max_angular_speed, max_angular_accel,
+        max_accel, max_decel, max_angular_speed, max_angular_accel,
         FRIENDLY_ROBOT_RADIUS_MAX_INFLATION);
     robots[robot.id()] = std::static_pointer_cast<Agent>(agent);
 }
@@ -197,7 +199,7 @@ void HRVOSimulator::configureLVRobot(const Robot &robot,
 
     std::shared_ptr<LVAgent> agent = std::make_shared<LVAgent>(
         robot.id(), robot.currentState(), path, ROBOT_MAX_RADIUS_METERS, max_speed, 0.0,
-        0.0, 0.0, ENEMY_ROBOT_RADIUS_MAX_INFLATION); // TODO: Double check the 0.0s
+        0.0, 0.0, 0.0, ENEMY_ROBOT_RADIUS_MAX_INFLATION); // TODO: Double check the 0.0s
 
     robots[robot.id() + ENEMY_LV_ROBOT_OFFSET] = std::static_pointer_cast<Agent>(agent);
 }

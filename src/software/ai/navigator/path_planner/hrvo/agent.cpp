@@ -1,7 +1,7 @@
 #include "agent.h"
 
-Agent::Agent(RobotId robot_id, const RobotState &robot_state, const RobotPath &path,
-             double radius, double max_speed, double max_accel, double max_angular_speed,
+Agent::Agent(RobotId robot_id, const RobotState &robot_state, const RobotPath &path, double radius,
+             double max_speed, double max_accel, double max_decel, double max_angular_speed,
              double max_angular_accel, double max_radius_inflation)
     : robot_id(robot_id),
       path(path),
@@ -9,6 +9,7 @@ Agent::Agent(RobotId robot_id, const RobotState &robot_state, const RobotPath &p
       min_radius(radius),
       max_speed(max_speed),
       max_accel(max_accel),
+      max_decel(max_decel),
       max_angular_speed(max_angular_speed),
       max_angular_accel(max_angular_accel),
       max_radius_inflation(max_radius_inflation),
