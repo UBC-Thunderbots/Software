@@ -104,7 +104,7 @@ void DribbleFSM::dribble(const Update &event)
     auto dribble_destination = event.control_params.dribble_destination;
 
     TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode =
-        TbotsProto::MaxAllowedSpeedMode::CLOSE_CONTROL_SPEED;
+        TbotsProto::MaxAllowedSpeedMode::MAX_CAUTIOUS_DRIBBLE;
 
     auto [target_destination, target_orientation] =
         calculateNextDribbleDestinationAndOrientation(

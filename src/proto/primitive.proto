@@ -73,7 +73,7 @@ enum MaxAllowedSpeedMode
     COLLISIONS_ALLOWED = 2;
     // Move at slower speed for controlled dribbling (when dribbling in an angle that is
     // not directly forward)
-    CLOSE_CONTROL_SPEED = 3;
+    MAX_CAUTIOUS_DRIBBLE = 3;
 }
 
 message AutoChipOrKick

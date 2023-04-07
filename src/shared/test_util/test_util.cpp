@@ -24,7 +24,7 @@ namespace TestUtil
             .max_force_dribbler_speed_rpm           = 2.4f,
             .wheel_radius_meters                    = 2.5f,
             .wheel_rotations_per_motor_rotation     = 2.6f,
-            .close_control_speed_m_per_s            = 1.0f};
+            .cautious_dribble_speed_m_per_s         = 1.0f};
 
         return robot_constants;
     }

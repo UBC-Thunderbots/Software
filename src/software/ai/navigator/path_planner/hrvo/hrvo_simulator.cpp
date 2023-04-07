@@ -88,6 +88,8 @@ void HRVOSimulator::configureHRVORobot(const Robot &robot,
 
             auto destination  = motion_control.path().points().at(1);
             destination_point = Point(destination.x_meters(), destination.y_meters());
+
+            max_speed = move_primitive.max_speed_m_per_s();
         }
     }
 

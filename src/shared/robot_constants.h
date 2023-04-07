@@ -94,6 +94,6 @@ typedef struct RobotConstants
 
     // Slower speed for controlled dribbling (when dribbling in an angle that is not
     // directly forward)
-    float close_control_speed_m_per_s;
+    float cautious_dribble_speed_m_per_s;
 
 } RobotConstants_t;
