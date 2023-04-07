@@ -12,6 +12,7 @@
 #include "software/logger/csv_sink.h"
 #include "software/logger/custom_logging_levels.h"
 #include "software/logger/protobuf_sink.h"
+#include "software/logger/plotjuggler_sink.h"
 
 // This undefines LOG macro defined by g3log
 #undef LOG
@@ -105,16 +106,19 @@ class LoggerSingleton
         auto visualization_handle = logWorker->addSink(
             std::make_unique<ProtobufSink>(runtime_dir), &ProtobufSink::sendProtobuf);
 
+        // Sink for PlotJuggler plotting
+        auto plotjuggler_handle = logWorker->addSink(std::make_unique<PlotJugglerSink>(),
+                                                     &PlotJugglerSink::sendToPlotJuggler);
 
         g3::initializeLogging(logWorker.get());
     }
 
     // levels is this vector are filtered out of the filtered log rotate sink
-    std::vector<LEVELS> filtered_level_filter = {DEBUG, VISUALIZE, CSV, INFO,
-                                                 ROBOT_STATUS};
-    std::vector<LEVELS> text_level_filter     = {VISUALIZE, CSV, ROBOT_STATUS};
-    const std::string filter_suffix           = "_filtered";
-    const std::string text_suffix             = "_text";
-    const std::string log_name                = "thunderbots";
+    std::vector<LEVELS> filtered_level_filter = {DEBUG, VISUALIZE,    CSV,
+                                                 INFO,  ROBOT_STATUS, PLOTJUGGLER};
+    std::vector<LEVELS> text_level_filter = {VISUALIZE, CSV, ROBOT_STATUS, PLOTJUGGLER};
+    const std::string filter_suffix       = "_filtered";
+    const std::string text_suffix         = "_text";
+    const std::string log_name            = "thunderbots";
     std::unique_ptr<g3::LogWorker> logWorker;
 };
