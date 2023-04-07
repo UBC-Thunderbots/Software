@@ -80,7 +80,7 @@ class FieldTestRunner(TbotsTestRunner):
         logger.info("determining robots on field")
         # survey field for available robot ids
         try:
-            print("field_test_fixture.py line 83: world_buffer.get",flush=True)
+            # print("field_test_fixture.py line 83: world_buffer.get",flush=True)
             world = self.world_buffer.get(block=True, timeout=WORLD_BUFFER_TIMEOUT)
             logger.info(world)
             self.initial_world = world
@@ -134,7 +134,7 @@ class FieldTestRunner(TbotsTestRunner):
         while time.time() < timeout_time:
             try:
 
-                print("field_test_fixture.py line 137: world_buffer.get",flush=True)
+                #print("field_test_fixture.py line 137: world_buffer.get",flush=True)
                 current_world = self.world_buffer.get(
                     block=True, timeout=WORLD_BUFFER_TIMEOUT
                 )
@@ -366,13 +366,13 @@ class FieldTestRunner(TbotsTestRunner):
                 # Update the timestamp logged by the ProtoLogger
                 with self.timestamp_mutex:
 
-                    print("field_test_fixture.py line 369: ssl_wrapper_buffer.get",flush=True)
+                    #print("field_test_fixture.py line 369: ssl_wrapper_buffer.get",flush=True)
                     ssl_wrapper = self.ssl_wrapper_buffer.get(block=False)
                     self.timestamp = ssl_wrapper.detection.t_capture
 
                 while True:
                     try:
-                        print("field_test_fixture.py line 369: world_buffer.get",flush=True)
+                        # print("field_test_fixture.py line 369: world_buffer.get",flush=True)
                         world = self.world_buffer.get(
                             block=True, timeout=WORLD_BUFFER_TIMEOUT
                         )
@@ -444,100 +444,100 @@ class FieldTestRunner(TbotsTestRunner):
             __runner()
 
 
-def field_test_initializer(
-    simulator_proto_unix_io,yellow_full_system_proto_unix_io, blue_full_system_proto_unix_io
-):
-    args = load_command_line_arguments()
-
-    # Grab the current test name to store the proto log for the test case
-    current_test = os.environ.get("PYTEST_CURRENT_TEST").split(":")[-1].split(" ")[0]
-    current_test = current_test.replace("]", "")
-    current_test = current_test.replace("[", "-")
-
-    test_name = current_test.split("-")[0]
-    tscope = None
-
-    # Launch all binaries
-    with FullSystem(
-        f"{args.blue_full_system_runtime_dir}/test/{test_name}",
-        debug_full_system=args.debug_blue_full_system,
-        friendly_colour_yellow=False,
-        should_restart_on_crash=False,
-    ) as blue_fs, RobotCommunication(
-        current_proto_unix_io=blue_full_system_proto_unix_io,
-        multicast_channel=getRobotMulticastChannel(0),
-        interface=args.interface,
-        disable_estop=False
-    ) as rc_blue, FullSystem(
-        f"{args.yellow_full_system_runtime_dir}/test/{test_name}",
-        debug_full_system=args.debug_yellow_full_system,
-        friendly_colour_yellow=True,
-        should_restart_on_crash=False,
-    ) as yellow_fs:
-        with Gamecontroller(
-            supress_logs=(not args.show_gamecontroller_logs), ci_mode=True
-        ) as gamecontroller:
-            blue_fs.setup_proto_unix_io(blue_full_system_proto_unix_io)
-            yellow_fs.setup_proto_unix_io(yellow_full_system_proto_unix_io)
-            rc_blue.setup_for_fullsystem()
-
-            gamecontroller.setup_proto_unix_io(
-                blue_full_system_proto_unix_io, yellow_full_system_proto_unix_io,
-            )
-            print("D", flush=True)
-            # If we want to run thunderscope, inject the proto unix ios
-            # and start the test
-            if args.enable_thunderscope:
-                print("tscope enabled", flush=True)
-                tscope = Thunderscope(
-                    simulator_proto_unix_io=simulator_proto_unix_io,
-                    blue_full_system_proto_unix_io=blue_full_system_proto_unix_io,
-                    yellow_full_system_proto_unix_io=yellow_full_system_proto_unix_io,
-                    # layout_path=args.layout,
-                    layout_path=None,
-                    visualization_buffer_size=args.visualization_buffer_size,
-                    load_blue=True,
-                    load_yellow=False
-                )
-                print("pre-E", flush=True)
-            print("E", flush=True)
-            runner = FieldTestRunner(
-                test_name=current_test,
-                blue_full_system_proto_unix_io=blue_full_system_proto_unix_io,
-                yellow_full_system_proto_unix_io=yellow_full_system_proto_unix_io,
-                gamecontroller=gamecontroller,
-                thunderscope=tscope
-            )
-            print("F", flush=True)
-
-            # Setup proto loggers.
-            #
-            # NOTE: Its important we use the test runners time provider because
-            # test will run as fast as possible with a varying tick rate. The
-            # SimulatorTestRunner time provider is tied to the simulators
-            # t_capture coming out of the wrapper packet (rather than time.time).
-            with ProtoLogger(
-                f"{args.blue_full_system_runtime_dir}/logs/{current_test}",
-                time_provider=runner.time_provider,
-            ) as blue_logger, ProtoLogger(
-                f"{args.yellow_full_system_runtime_dir}/logs/{current_test}",
-                time_provider=runner.time_provider,
-            ) as yellow_logger:
-                blue_full_system_proto_unix_io.register_to_observe_everything(
-                    blue_logger.buffer
-                )
-                yellow_full_system_proto_unix_io.register_to_observe_everything(
-                    yellow_logger.buffer
-                )
-                print("Z",flush=True)
-                yield runner
-                print(
-                    f"\n\nTo replay this test for the blue team, go to the `src` folder and run \n./tbots.py run thunderscope --blue_log {blue_logger.log_folder}", flush=True
-                )
-                print(
-                    f"\n\nTo replay this test for the yellow team, go to the `src` folder and run \n./tbots.py run thunderscope --yellow_log {yellow_logger.log_folder}", flush=True
-                )
-    return
+# def field_test_initializer(
+#     simulator_proto_unix_io,yellow_full_system_proto_unix_io, blue_full_system_proto_unix_io
+# ):
+#     args = load_command_line_arguments()
+#
+#     # Grab the current test name to store the proto log for the test case
+#     current_test = os.environ.get("PYTEST_CURRENT_TEST").split(":")[-1].split(" ")[0]
+#     current_test = current_test.replace("]", "")
+#     current_test = current_test.replace("[", "-")
+#
+#     test_name = current_test.split("-")[0]
+#     tscope = None
+#
+#     # Launch all binaries
+#     with FullSystem(
+#         f"{args.blue_full_system_runtime_dir}/test/{test_name}",
+#         debug_full_system=args.debug_blue_full_system,
+#         friendly_colour_yellow=False,
+#         should_restart_on_crash=False,
+#     ) as blue_fs, RobotCommunication(
+#         current_proto_unix_io=blue_full_system_proto_unix_io,
+#         multicast_channel=getRobotMulticastChannel(0),
+#         interface=args.interface,
+#         disable_estop=False
+#     ) as rc_blue, FullSystem(
+#         f"{args.yellow_full_system_runtime_dir}/test/{test_name}",
+#         debug_full_system=args.debug_yellow_full_system,
+#         friendly_colour_yellow=True,
+#         should_restart_on_crash=False,
+#     ) as yellow_fs:
+#         with Gamecontroller(
+#             supress_logs=(not args.show_gamecontroller_logs), ci_mode=True
+#         ) as gamecontroller:
+#             blue_fs.setup_proto_unix_io(blue_full_system_proto_unix_io)
+#             yellow_fs.setup_proto_unix_io(yellow_full_system_proto_unix_io)
+#             rc_blue.setup_for_fullsystem()
+#
+#             gamecontroller.setup_proto_unix_io(
+#                 blue_full_system_proto_unix_io, yellow_full_system_proto_unix_io,
+#             )
+#             print("opened GC", flush=True)
+#             # If we want to run thunderscope, inject the proto unix ios
+#             # and start the test
+#             if args.enable_thunderscope:
+#                 print("tscope enabled", flush=True)
+#                 tscope = Thunderscope(
+#                     simulator_proto_unix_io=simulator_proto_unix_io,
+#                     blue_full_system_proto_unix_io=blue_full_system_proto_unix_io,
+#                     yellow_full_system_proto_unix_io=yellow_full_system_proto_unix_io,
+#                     # layout_path=args.layout,
+#                     layout_path=None,
+#                     visualization_buffer_size=args.visualization_buffer_size,
+#                     load_blue=True,
+#                     load_yellow=False
+#                 )
+#                 print("pre-E", flush=True)
+#             print("E", flush=True)
+#             runner = FieldTestRunner(
+#                 test_name=current_test,
+#                 blue_full_system_proto_unix_io=blue_full_system_proto_unix_io,
+#                 yellow_full_system_proto_unix_io=yellow_full_system_proto_unix_io,
+#                 gamecontroller=gamecontroller,
+#                 thunderscope=tscope
+#             )
+#             print("F", flush=True)
+#
+#             # Setup proto loggers.
+#             #
+#             # NOTE: Its important we use the test runners time provider because
+#             # test will run as fast as possible with a varying tick rate. The
+#             # SimulatorTestRunner time provider is tied to the simulators
+#             # t_capture coming out of the wrapper packet (rather than time.time).
+#             with ProtoLogger(
+#                 f"{args.blue_full_system_runtime_dir}/logs/{current_test}",
+#                 time_provider=runner.time_provider,
+#             ) as blue_logger, ProtoLogger(
+#                 f"{args.yellow_full_system_runtime_dir}/logs/{current_test}",
+#                 time_provider=runner.time_provider,
+#             ) as yellow_logger:
+#                 blue_full_system_proto_unix_io.register_to_observe_everything(
+#                     blue_logger.buffer
+#                 )
+#                 yellow_full_system_proto_unix_io.register_to_observe_everything(
+#                     yellow_logger.buffer
+#                 )
+#                 print("Z",flush=True)
+#                 yield runner
+#                 print(
+#                     f"\n\nTo replay this test for the blue team, go to the `src` folder and run \n./tbots.py run thunderscope --blue_log {blue_logger.log_folder}", flush=True
+#                 )
+#                 print(
+#                     f"\n\nTo replay this test for the yellow team, go to the `src` folder and run \n./tbots.py run thunderscope --yellow_log {yellow_logger.log_folder}", flush=True
+#                 )
+#     return
 
 
 def load_command_line_arguments():
@@ -666,20 +666,20 @@ def field_test_runner():
         debug_full_system=args.debug_blue_full_system,
         friendly_colour_yellow=False,
         should_restart_on_crash=False,
-    ) as blue_fs, FullSystem(
+    ) as blue_fs, RobotCommunication(
+        current_proto_unix_io=blue_full_system_proto_unix_io,
+        multicast_channel=getRobotMulticastChannel(0),
+        interface=args.interface,
+        disable_estop=False
+    ) as rc_blue, FullSystem(
         f"{args.yellow_full_system_runtime_dir}/test/{test_name}",
         debug_full_system=args.debug_yellow_full_system,
         friendly_colour_yellow=True,
         should_restart_on_crash=False,
     ) as yellow_fs:
         with Gamecontroller(
-                supress_logs=(not args.show_gamecontroller_logs), ci_mode=True
-        ) as gamecontroller, RobotCommunication(
-            current_proto_unix_io=blue_full_system_proto_unix_io,
-            multicast_channel=getRobotMulticastChannel(0),
-            interface=args.interface,
-            disable_estop=False
-        ) as rc_blue:
+            supress_logs=(not args.show_gamecontroller_logs), ci_mode=True
+        ) as gamecontroller:
             blue_fs.setup_proto_unix_io(blue_full_system_proto_unix_io)
             yellow_fs.setup_proto_unix_io(yellow_full_system_proto_unix_io)
             rc_blue.setup_for_fullsystem()
@@ -687,7 +687,6 @@ def field_test_runner():
             gamecontroller.setup_proto_unix_io(
                 blue_full_system_proto_unix_io, yellow_full_system_proto_unix_io,
             )
-            print("D", flush=True)
             # If we want to run thunderscope, inject the proto unix ios
             # and start the test
             if args.enable_thunderscope:
@@ -734,6 +733,7 @@ def field_test_runner():
                 )
                 print("Z",flush=True)
                 yield runner
+                rc_blue.robots_connected_to_fullsystem = None
                 print(
                     f"\n\nTo replay this test for the blue team, go to the `src` folder and run \n./tbots.py run thunderscope --blue_log {blue_logger.log_folder}", flush=True
                 )

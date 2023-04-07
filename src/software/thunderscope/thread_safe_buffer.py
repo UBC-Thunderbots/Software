@@ -1,6 +1,8 @@
 import queue
 from software.logger.logger import createLogger
-
+import traceback
+import random
+random.seed(69)
 
 class ThreadSafeBuffer(object):
 
@@ -19,7 +21,7 @@ class ThreadSafeBuffer(object):
 
     """
 
-    def __init__(self, buffer_size, protobuf_type, log_overrun=False):
+    def __init__(self, buffer_size, protobuf_type, log_overrun=False, owner="default"):
 
         """A buffer to hold data to be consumed.
 
@@ -35,6 +37,7 @@ class ThreadSafeBuffer(object):
         self.cached_msg = protobuf_type()
         self.protos_dropped = 0
         self.last_logged_protos_dropped = 0
+        self.owner = owner
 
     def get(self, block=False, timeout=None, return_cached=True):
         """Get data from the buffer. If the buffer is empty, and
@@ -65,8 +68,13 @@ class ThreadSafeBuffer(object):
             self.last_logged_protos_dropped = self.protos_dropped
 
         if block:
-            print("thread_safe_buffer.py line 68: queue.get",flush=True)
-            return self.queue.get(timeout=timeout)
+            # print("thread_safe_buffer.py line 68 blocking: queue.get",flush=True)
+            # print(traceback.print_stack())
+            one_time_value = random.randint(0,2147483647)
+            print(self.owner + " has called get blocking with number: ",one_time_value)
+            retval = self.queue.get(timeout=timeout)
+            print(self.owner + "get call unblocking with number: ",one_time_value)
+            return retval
 
         try:
             self.cached_msg = self.queue.get_nowait()
@@ -74,6 +82,7 @@ class ThreadSafeBuffer(object):
         except queue.Empty as empty:
             if not return_cached:
                 return None
+            # print("TSB timeout",flush=True)
 
         return self.cached_msg
 

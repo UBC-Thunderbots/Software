@@ -7,6 +7,7 @@ from pyqtgraph.Qt import QtCore
 import threading
 import time
 import pdb
+import traceback
 
 
 class RobotCommunication(object):
@@ -66,7 +67,7 @@ class RobotCommunication(object):
         )
 
         self.send_estop_state_thread = threading.Thread(target=self.__send_estop_state)
-        self.run_thread = threading.Thread(target=self.run)
+        self.run_thread = threading.Thread(target=self.run,daemon=True)
         self.stop_running = False
 
         # only checks for estop if checking is not disabled
@@ -105,20 +106,24 @@ class RobotCommunication(object):
 
             # fullsystem is running, so world data is being received
             if self.robots_connected_to_fullsystem:
-                print("robot_communication.py line 108: world_buffer.get",flush=True)
+                # print("robot_communication.py line 108: world_buffer.get",flush=True)
+                # print(traceback.print_stack())
                 world = self.world_buffer.get(block=True)
 
                 # send the world proto
+                #try:
                 self.send_world.send_proto(world)
+                #except:
+                #    print("proto error")
 
                 # Get the primitives
-                print("robot_communication.py line 115: world_buffer.get",flush=True)
+                # print("robot_communication.py line 115: world_buffer.get",flush=True)
                 primitive_set = self.primitive_buffer.get(block=False)
 
                 robot_primitives = dict(primitive_set.robot_primitives)
 
             # get the manual control primitive
-            print("robot_communication.py line 122: diagnostics.get",flush=True)
+            # print("robot_communication.py line 122: diagnostics.get",flush=True)
             diagnostics_primitive = DirectControlPrimitive(
                 motor_control=self.motor_control_diagnostics_buffer.get(block=False),
                 power_control=self.power_control_diagnostics_buffer.get(block=False),
@@ -240,6 +245,7 @@ class RobotCommunication(object):
         """
         self.stop_running = True
         self.current_proto_unix_io.force_close()
+        time.sleep(2)
         print("killing robocom",flush=True)
-        self.run_thread.join()
+        self.run_thread.join(10)
         print("run_thread joined",flush=True)

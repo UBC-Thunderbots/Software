@@ -74,6 +74,7 @@ class ThreadedUnixListener:
         """
         self.stop = True
         self.server.server_close()
+       # self.thread.join()
 
     def start(self):
         """Start handling requests

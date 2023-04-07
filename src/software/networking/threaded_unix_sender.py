@@ -2,6 +2,7 @@ import logging
 import queue
 import socket
 from threading import Thread
+import random
 
 from google.protobuf import text_format
 from google.protobuf.any_pb2 import Any
@@ -42,6 +43,7 @@ class ThreadedUnixSender:
         """
         self.stop = True
         self.socket.close()
+        # self.thread.join()
 
     def __send_protobuf(self):
         """Send the buffered protobuf
@@ -49,6 +51,7 @@ class ThreadedUnixSender:
         proto = None
 
         while not self.stop:
+
             # print("threaded_unix_sender.py line 52: proto_buffer.get",flush=True)
             proto = self.proto_buffer.get(block=True)
             # print(proto,flush=True)
