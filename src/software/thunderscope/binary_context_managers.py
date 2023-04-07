@@ -427,7 +427,7 @@ class Gamecontroller(object):
         self.gamecontroller_proc.kill()
         self.gamecontroller_proc.wait()
 
-        if self.ci_socket:
+        if self.ci_mode:
             self.ci_socket.close()
 
     def next_free_port(self, port=40000, max_port=65535):

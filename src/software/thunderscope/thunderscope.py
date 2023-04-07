@@ -787,6 +787,10 @@ class Thunderscope(object):
         self.register_refresh_function(cost_vis_widget.refresh)
         return cost_vis_widget
 
+    def is_open(self):
+        """Returns true if the window is open"""
+        return self.window.isVisible()
+
     def show(self):
         """Show the main window"""
 
