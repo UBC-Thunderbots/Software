@@ -1,0 +1,6 @@
+-   repo: local
+    hooks:
+    -   id: fix_formatting
+        name: check requirements files
+        language: system
+        entry: formatting_scripts/fix_formatting.sh 
