@@ -10,6 +10,7 @@ std::vector<DefenderAssignment> getAllDefenderAssignments(
     std::vector<ShootingLane> shooting_lanes;
     std::vector<DefenderAssignment> assignments;
 
+    // Get filtered list of threats with similarly positioned threats removed
     auto filtered_threats = filterOutSimilarThreats(threats);
 
     // Construct passing lanes and determine pass defender assignments
@@ -27,8 +28,8 @@ std::vector<DefenderAssignment> getAllDefenderAssignments(
     static constexpr unsigned int SHOOTING_LANE_MULTIPLIER = 3;
 
     // Construct goal lanes and determine crease defender assignments.
-    // Using threats (not grouped threats) since we need to find potential 
-    // goal lane from every enemy on the field
+    // Using full list of threats (not filtered threats) since we need to 
+    // find potential goal lane from every enemy on the field
     for (unsigned int i = 0; i < threats.size(); i++)
     {
         auto threat_position =
