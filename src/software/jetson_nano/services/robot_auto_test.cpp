@@ -28,6 +28,7 @@ class RobotAutoTestFixture : public testing::Test
    protected:
     void SetUp(void) {
         motor_service_->setUpMotors();
+
     }
 
     void TearDown(void) {
@@ -70,7 +71,7 @@ TEST_F(RobotAutoTestFixture, TestFrontRightMotorVelocity) {
     // 3. Abstract out drive motor setup into a function
     motor_service_->setUpDriveMotor(FRONT_RIGHT_MOTOR_CHIP_SELECT);
 
-    // 2. Put some log messages for motor calibration
+    // 2. Log messages for motor calibration
     motor_service_->startEncoderCalibration(FRONT_RIGHT_MOTOR_CHIP_SELECT);
     LOG(INFO) << "Starting motor encoder calibration";
     motor_service_->endEncoderCalibration(FRONT_RIGHT_MOTOR_CHIP_SELECT);
@@ -86,9 +87,14 @@ TEST_F(RobotAutoTestFixture, TestFrontRightMotorVelocity) {
         prev_wheel_velocities = target_wheel_velocities;
 
         // Set target speeds accounting for acceleration
-        motor_service_->writeIntToTMC4671(FRONT_RIGHT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_TARGET,
-                                          static_cast<int>(target_wheel_velocities[FRONT_RIGHT_WHEEL_SPACE_INDEX] *
-                                                           MotorService::ELECTRICAL_RPM_PER_MECHANICAL_MPS));
+        int write_value = static_cast<int>(target_wheel_velocities[FRONT_RIGHT_WHEEL_SPACE_INDEX] * MotorService::ELECTRICAL_RPM_PER_MECHANICAL_MPS);
+        motor_service_->writeIntToTMC4671(FRONT_RIGHT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_TARGET, write_value);
+
+        int read_value = motor_service_->readIntFromTMC4671(FRONT_RIGHT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_TARGET);
+
+        if (write_value != read_value) {
+            FAIL() << "Read and write value are different";
+        }
 
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
