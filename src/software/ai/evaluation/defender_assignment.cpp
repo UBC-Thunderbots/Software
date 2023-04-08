@@ -7,7 +7,8 @@
 std::vector<DefenderAssignment> getAllDefenderAssignments(
     const std::vector<EnemyThreat> &threats, const Field &field, const Ball &ball)
 {
-    std::vector<ShootingLane> shooting_lanes;
+    std::vector<ShootingLane> goal_lanes;
+    std::vector<ShootingLane> passing_lanes;
     std::vector<DefenderAssignment> assignments;
 
     // Get filtered list of threats with similarly positioned threats removed
@@ -20,13 +21,10 @@ std::vector<DefenderAssignment> getAllDefenderAssignments(
         auto lane =
             Segment(primary_threat_position, filtered_threats.at(i).robot.position());
         auto threat_rating = static_cast<unsigned int>(filtered_threats.size()) - i;
-        shooting_lanes.emplace_back(ShootingLane{lane, threat_rating});
+        passing_lanes.emplace_back(ShootingLane{lane, threat_rating});
         assignments.emplace_back(
             DefenderAssignment{PASS_DEFENDER, lane.midPoint(), threat_rating});
     }
-
-    // Multiplier to ensure that goal lanes are scored higher than passing lanes
-    static constexpr unsigned int SHOOTING_LANE_MULTIPLIER = 3;
 
     // Construct goal lanes and determine crease defender assignments.
     // Using full list of threats (not filtered threats) since we need to
@@ -37,8 +35,8 @@ std::vector<DefenderAssignment> getAllDefenderAssignments(
             (i == 0) ? ball.position() : threats.at(i).robot.position();
         auto lane = Segment(threat_position, field.friendlyGoalCenter());
         auto threat_rating =
-            (static_cast<unsigned int>(threats.size()) - i) * SHOOTING_LANE_MULTIPLIER;
-        shooting_lanes.emplace_back(ShootingLane{lane, threat_rating});
+            (static_cast<unsigned int>(threats.size()) - i) * GOAL_LANE_THREAT_MULTIPLIER;
+        goal_lanes.emplace_back(ShootingLane{lane, threat_rating});
 
         // We let the target of the defender assignment be the location
         // of the originating enemy threat to cooperate with control
@@ -47,40 +45,30 @@ std::vector<DefenderAssignment> getAllDefenderAssignments(
             DefenderAssignment{CREASE_DEFENDER, threat_position, threat_rating});
     }
 
-    // Find points where goal and/or passing lanes intersect --
+    // Find points where goal and/or passing lanes intersect;
     // these are potential positions where we can place a pass defender
     // to block multiple lanes simultaneously
-    //
-    // TODO: Causing ball chasing behaviors
-    //
-    // for (auto const &shooting_lane_a : shooting_lanes)
-    // {
-    //     for (auto const &shooting_lane_b : shooting_lanes)
-    //     {
-    //         if (&shooting_lane_a == &shooting_lane_b)
-    //         {
-    //             continue;
-    //         }
+    for (auto const &goal_lane : goal_lanes)
+    {
+        for (auto const &passing_lane : passing_lanes)
+        {
+            auto intersections = intersection(goal_lane.lane, passing_lane.lane);
+            if (intersections.size() == 1)
+            {
+                auto position = intersections.at(0);
 
-    //         auto intersections =
-    //             intersection(shooting_lane_a.lane, shooting_lane_b.lane);
-    //         if (intersections.size() == 1)
-    //         {
-    //             auto position = intersections.at(0);
+                if (distance(position, goal_lane.lane.getStart()) < 0.5)
+                {
+                    continue;
+                }
 
-    //             // Coverage rating of the assignment is combined threat rating of
-    //             // both lanes used to create the assignment. This helps ensure
-    //             // these assignment blocking multiple lanes are scored as
-    //             // "better" than normal defender assignments blocking one
-    //             // single lane
-    //             auto coverage_rating = shooting_lane_a.threat_rating +
-    //             shooting_lane_b.threat_rating;
+                auto coverage_rating = std::max(goal_lane.threat_rating, 
+                                                passing_lane.threat_rating) + 1;
 
-    //             assignments.emplace_back(DefenderAssignment{PASS_DEFENDER, position,
-    //             coverage_rating});
-    //         }
-    //     }
-    // }
+                assignments.emplace_back(DefenderAssignment{PASS_DEFENDER, position, coverage_rating});
+            }
+        }
+    }
 
     // Remove assignments with targets in the defense area
     assignments.erase(

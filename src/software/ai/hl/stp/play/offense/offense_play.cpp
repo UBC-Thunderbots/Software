@@ -41,7 +41,7 @@ void OffensePlay::updateTactics(const PlayUpdate &play_update)
 
     if (team_with_possession == play_update.world.enemyTeam())
     {
-        num_defenders = play_update.num_tactics - 1;
+        num_defenders = play_update.num_tactics;
     }
     else
     {

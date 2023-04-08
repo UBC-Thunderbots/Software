@@ -50,6 +50,9 @@ static constexpr double MIN_DISTANCE_BETWEEN_THREATS = 0.25;
 // them to be considered non-similar
 static constexpr Angle MIN_ANGLE_BETWEEN_THREATS = Angle::fromDegrees(10);
 
+// Multiplier to ensure that goal lanes are scored higher (in threat rating) than passing lanes
+static constexpr unsigned int GOAL_LANE_THREAT_MULTIPLIER = 3;
+
 /**
  * Determines all possible defender assignments where a defender could be placed
  * on the field and returns them in order of decreasing coverage rating
