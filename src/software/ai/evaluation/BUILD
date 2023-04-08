@@ -102,6 +102,19 @@ cc_test(
 )
 
 cc_library(
+    name = "defender_assignment",
+    srcs = ["defender_assignment.cpp"],
+    hdrs = ["defender_assignment.h"],
+    deps = [
+        "//software/ai/evaluation:enemy_threat",
+        "//software/geom:point",
+        "//software/geom:segment",
+        "//software/geom/algorithms",
+        "//software/world:field",
+    ],
+)
+
+cc_library(
     name = "enemy_threat",
     srcs = ["enemy_threat.cpp"],
     hdrs = ["enemy_threat.h"],

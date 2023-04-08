@@ -8,7 +8,6 @@ CreaseDefensePlayFSM ::CreaseDefensePlayFSM(TbotsProto::AiConfig ai_config)
 void CreaseDefensePlayFSM::defendDefenseArea(const Update& event)
 {
     unsigned int num_defenders = event.common.num_tactics;
-    // TODO (#2385): Handle more than three defenders
     if (num_defenders > 3)
     {
         LOG(WARNING) << "CreaseDefensePlay can only handle up to 3 crease defenders"
@@ -20,8 +19,6 @@ void CreaseDefensePlayFSM::defendDefenseArea(const Update& event)
     {
         setUpDefenders(num_defenders);
     }
-    // TODO (#2385): Make the crease defense align robots on either side of the threat
-    // when there are an even number of robots
     static const std::vector<TbotsProto::CreaseDefenderAlignment> ALIGNMENTS = {
         TbotsProto::CreaseDefenderAlignment::CENTRE,
         TbotsProto::CreaseDefenderAlignment::LEFT,
