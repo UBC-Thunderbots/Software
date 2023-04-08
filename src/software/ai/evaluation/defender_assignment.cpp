@@ -45,31 +45,6 @@ std::vector<DefenderAssignment> getAllDefenderAssignments(
             DefenderAssignment{CREASE_DEFENDER, threat_position, threat_rating});
     }
 
-    // Find points where goal and/or passing lanes intersect;
-    // these are potential positions where we can place a pass defender
-    // to block multiple lanes simultaneously
-    for (auto const &goal_lane : goal_lanes)
-    {
-        for (auto const &passing_lane : passing_lanes)
-        {
-            auto intersections = intersection(goal_lane.lane, passing_lane.lane);
-            if (intersections.size() == 1)
-            {
-                auto position = intersections.at(0);
-
-                if (distance(position, goal_lane.lane.getStart()) < 0.5)
-                {
-                    continue;
-                }
-
-                auto coverage_rating = std::max(goal_lane.threat_rating, 
-                                                passing_lane.threat_rating) + 1;
-
-                assignments.emplace_back(DefenderAssignment{PASS_DEFENDER, position, coverage_rating});
-            }
-        }
-    }
-
     // Remove assignments with targets in the defense area
     assignments.erase(
         std::remove_if(assignments.begin(), assignments.end(),
