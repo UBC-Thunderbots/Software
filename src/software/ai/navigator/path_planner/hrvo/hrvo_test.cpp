@@ -97,7 +97,6 @@ TEST_F(TestHrvo, test_update_world_with_friendly_and_enemy_agent)
     ASSERT_TRUE(sim.robotExists(friendly_robot_1.id(), TeamSide::FRIENDLY));
 
     ASSERT_TRUE(sim.robotExists(enemy_robot_1.id(), TeamSide::ENEMY));
-
 }
 
 TEST_F(TestHrvo, test_update_world_add_friendly_robots_second_tick)

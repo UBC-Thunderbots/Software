@@ -179,10 +179,14 @@ std::size_t HRVOSimulator::getRobotCount()
     return robots.size();
 }
 
-bool HRVOSimulator::robotExists(RobotId id, TeamSide side) {
-    if (side == TeamSide::FRIENDLY) {
+bool HRVOSimulator::robotExists(RobotId id, TeamSide side)
+{
+    if (side == TeamSide::FRIENDLY)
+    {
         return robots.find(id) != robots.end();
-    } else {
+    }
+    else
+    {
         return robots.find(id + ENEMY_LV_ROBOT_OFFSET) != robots.end();
     }
 }
