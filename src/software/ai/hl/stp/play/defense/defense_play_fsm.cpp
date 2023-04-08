@@ -14,6 +14,17 @@ void DefensePlayFSM::defendAgainstThreats(const Update& event)
         event.common.world.field(), event.common.world.friendlyTeam(),
         event.common.world.enemyTeam(), event.common.world.ball(), false);
 
+    // Remove threats which are not near our side of the field.
+    // We define being near our side as being within 3/4 of the field length 
+    // from our goal line (max_x_coordinate)
+    double max_x_coordinate = 3 * event.common.world.field().xLength() / 4;
+    enemy_threats.erase(
+        std::remove_if(enemy_threats.begin(), enemy_threats.end(),
+            [max_x_coordinate](const auto &threat) {
+                return threat.robot.position().x() > max_x_coordinate;
+            }),
+        enemy_threats.end());
+
     if (enemy_threats.size() == 0)
     {
         return;
