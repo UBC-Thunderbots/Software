@@ -13,7 +13,6 @@
 #include "proto/robot_status_msg.pb.h"
 #include "proto/ssl_gc_referee_message.pb.h"
 #include "proto/ssl_vision_wrapper.pb.h"
-#include "proto/visualization.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
 #include "proto/team.pb.h"
 #include "proto/world.pb.h"
@@ -324,6 +323,7 @@ PYBIND11_MODULE(python_bindings, m)
         .def("field", &World::field);
 
     // Listeners
+    declareThreadedProtoUdpListener<TbotsProto::HRVOVisualization>(m, "HRVOVisualization");
     declareThreadedProtoUdpListener<SSLProto::Referee>(m, "SSLReferee");
     declareThreadedProtoUdpListener<TbotsProto::RobotStatus>(m, "RobotStatus");
     declareThreadedProtoUdpListener<TbotsProto::RobotLog>(m, "RobotLog");

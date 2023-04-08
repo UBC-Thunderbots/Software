@@ -87,6 +87,10 @@ cc_library(
         "network_sink.h",
     ],
     deps = [
+        "//proto/message_translation:tbots_protobuf",
+        "@base64",
+        "//software/logger:plotjuggler_sink",
+        "//proto:visualization_cc_proto",
         "//proto:tbots_cc_proto",
         "//shared:constants",
         "//software/networking:threaded_proto_udp_sender",
