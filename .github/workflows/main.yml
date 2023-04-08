@@ -18,6 +18,7 @@ jobs:
         run: |
           "${GITHUB_WORKSPACE}"/environment_setup/setup_software.sh
       
+      - uses: pre-commit/action@v3.0.0
       - uses: pre-commit-ci/lite-action@v1.0.1
         if: always()
 
