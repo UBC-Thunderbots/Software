@@ -178,8 +178,8 @@ Thunderloop::~Thunderloop() {}
             {
                 auto status = motor_status_.value();
                 primitive_executor_.updateVelocity(
-                        createVector(status.local_velocity()),
-                        createAngularVelocity(status.angular_velocity()));
+                    createVector(status.local_velocity()),
+                    createAngularVelocity(status.angular_velocity()));
             }
 
             // Timeout Overrides for Primitives
