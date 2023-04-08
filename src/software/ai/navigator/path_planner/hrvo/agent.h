@@ -30,7 +30,7 @@ class Agent
 
 
     /**
-     * Update the agent's path and current state
+     * Update the agent's path and current state, based on its new_velocity
      *
      * @param time_step the current time step that the simulator is running at
      */
@@ -64,7 +64,7 @@ class Agent
 
 
     /**
-     * Run the HRVO algorithm, and compute the new velocity this agent should move at
+     * Compute the new velocity that this agent should move at
      *
      * @param robots robots in the simulation
      * @param time_step the time step to use
@@ -190,7 +190,9 @@ class Agent
     // The minimum radius which this agent can be
     const double min_radius;
 
-    // the maximum speed for the agent
+    // the max_speed that the agent may move at. This is NOT a physical
+    // limitation of the robot, but instead software limitation set through move
+    // primitives.
     double max_speed;
 
     // the maximum acceleration for the agent
@@ -199,10 +201,15 @@ class Agent
     // The maximum amount which the radius can increase by
     const double max_radius_inflation;
 
-    // the computed new_velocity the agent will
+    // the computed new_velocity that the robot should pursue
+    // this velocity is most optimal for getting to the destination,
+    // after considering obstacle avoidance.
+    // It may be normalized to max_speed in `update()`.
     Vector new_velocity;
 
    protected:
+    // the preferred velocity the agent should use when finding a new_velocity
+    // This velocity represents what's most optimal for getting to the destination
     Vector preferred_velocity;
 
     Point position;

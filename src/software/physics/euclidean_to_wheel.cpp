@@ -2,18 +2,22 @@
 
 #include <cmath>
 
+#include "proto/message_translation/tbots_geometry.h"
+#include "proto/primitive/primitive_msg_factory.h"
 #include "shared/2021_robot_constants.h"
+#include "software/geom/angular_velocity.h"
+#include "software/geom/vector.h"
 
-EuclideanToWheel::EuclideanToWheel(const RobotConstants_t &robot_constants)
-    : robot_radius_m_(robot_constants.robot_radius_m)
+EuclideanToWheel::EuclideanToWheel(const RobotConstants_t& robot_constants)
+    : robot_radius_m_(robot_constants.robot_radius_m), robot_constants_(robot_constants)
 {
     // Phi, the angle between the hemisphere line of the robot and the front wheel axles
     // [rads]
-    auto p = robot_constants.front_wheel_angle_deg * M_PI / 180.;
+    auto p = robot_constants_.front_wheel_angle_deg * M_PI / 180.;
 
     // Theta, the angle between the hemisphere line of the robot and the rear wheel axles
     // [rads]
-    auto t = robot_constants.back_wheel_angle_deg * M_PI / 180.;
+    auto t = robot_constants_.back_wheel_angle_deg * M_PI / 180.;
 
     // Caching repeated calculations
     auto cos_p = std::cos(p);
@@ -63,7 +67,7 @@ WheelSpace_t EuclideanToWheel::getWheelVelocity(EuclideanSpace_t euclidean_veloc
 }
 
 EuclideanSpace_t EuclideanToWheel::getEuclideanVelocity(
-    const WheelSpace_t &wheel_velocity) const
+    const WheelSpace_t& wheel_velocity) const
 {
     EuclideanSpace_t euclidean_velocity =
         wheel_to_euclidean_velocity_D_inverse_ * wheel_velocity;
@@ -75,4 +79,54 @@ EuclideanSpace_t EuclideanToWheel::getEuclideanVelocity(
     euclidean_velocity[2] = euclidean_velocity[2] / robot_radius_m_;
 
     return euclidean_velocity;
+}
+
+WheelSpace_t EuclideanToWheel::rampWheelVelocity(
+    const WheelSpace_t& current_wheel_velocity, const WheelSpace_t& target_wheel_velocity,
+    const double& time_to_ramp)
+{
+    double allowed_acceleration =
+        static_cast<double>(robot_constants_.robot_max_acceleration_m_per_s_2);
+    double max_allowable_wheel_velocity =
+        static_cast<double>(robot_constants_.robot_max_speed_m_per_s);
+
+    // ramp wheel velocity
+    WheelSpace_t ramp_wheel_velocity;
+
+    // calculate max allowable wheel velocity delta using dv = a*t
+    auto allowable_delta_wheel_velocity = allowed_acceleration * time_to_ramp;
+
+    // Ramp wheel velocity vector
+    // Step 1: Find absolute max velocity delta
+    auto delta_target_wheel_velocity = target_wheel_velocity - current_wheel_velocity;
+    auto max_delta_target_wheel_velocity =
+        delta_target_wheel_velocity.cwiseAbs().maxCoeff();
+
+    // Step 2: Compare max delta velocity against the calculated maximum
+    if (max_delta_target_wheel_velocity > allowable_delta_wheel_velocity)
+    {
+        // Step 3: If larger, scale down to allowable max
+        ramp_wheel_velocity =
+            (delta_target_wheel_velocity / max_delta_target_wheel_velocity) *
+                allowable_delta_wheel_velocity +
+            current_wheel_velocity;
+    }
+    else
+    {
+        // If smaller, go straight to target
+        ramp_wheel_velocity = target_wheel_velocity;
+    }
+
+    // find absolute max wheel velocity
+    auto max_ramp_wheel_velocity = ramp_wheel_velocity.cwiseAbs().maxCoeff();
+
+    // compare against max wheel velocity
+    if (max_ramp_wheel_velocity > max_allowable_wheel_velocity)
+    {
+        // if larger, scale down to max
+        ramp_wheel_velocity = (ramp_wheel_velocity / max_ramp_wheel_velocity) *
+                              max_allowable_wheel_velocity;
+    }
+
+    return ramp_wheel_velocity;
 }

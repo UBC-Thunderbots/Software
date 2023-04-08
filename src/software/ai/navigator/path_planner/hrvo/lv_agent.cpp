@@ -31,7 +31,7 @@ Vector LVAgent::computePreferredVelocity(Duration time_step)
 {
     auto path_point_opt = path.getCurrentPathPoint();
 
-    if (path_point_opt == std::nullopt)
+    if (!path_point_opt.has_value())
     {
         return Vector(0.f, 0.f);
     }

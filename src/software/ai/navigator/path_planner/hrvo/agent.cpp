@@ -40,7 +40,7 @@ void Agent::update(Duration time_step)
 
     const std::optional<PathPoint> &path_point = path.getCurrentPathPoint();
 
-    if (path_point != std::nullopt)
+    if (path_point.has_value())
     {
         Point current_dest = path_point.value().getPosition();
 
