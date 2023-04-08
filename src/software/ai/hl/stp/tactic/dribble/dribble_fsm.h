@@ -16,8 +16,6 @@ struct DribbleFSM
     class GetPossession;
     class Dribble;
     class LoseBall;
-    class Pivot;
-    class Decision;
 
     /**
      * Constructor for DribbleFSM

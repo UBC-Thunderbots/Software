@@ -88,16 +88,16 @@ void BallPlacementPlayFSM::placeBall(const Update &event)
     std::optional<Point> placement_point =
         event.common.world.gameState().getBallPlacementPoint();
 
-    Vector final_direction;
+    Vector final_orientation;
     if (placement_point.has_value())
     {
         // retreat 0.5m (+ buffer), between ball and friendly goal.
-        final_direction =
+        final_orientation =
             (placement_point.value() - event.common.world.field().friendlyGoalCenter())
                 .normalize();
-        if (final_direction.x() != 0.0)
+        if (final_orientation.x() != 0.0)
         {
-            final_angle = Angle::atan(final_direction.y() / final_direction.x());
+            final_angle = Angle::atan(final_orientation.y() / final_orientation.x());
         }
     }
 
