@@ -8,7 +8,7 @@ on:
 
 jobs:
   formatting-check:
-    name: Formatting Check
+    name: Formatting
     runs-on: ubuntu-20.04
     steps:
       # checks-out the repository under $GITHUB_WORKSPACE
@@ -18,9 +18,9 @@ jobs:
         run: |
           "${GITHUB_WORKSPACE}"/environment_setup/setup_software.sh
       
-      - name: Check Formatting
-        run: |
-          ./formatting_scripts/check_formatting_ci.sh
+      - name: Pre-Commit
+        - uses: pre-commit-ci/lite-action@v1.0.1
+          if: always()
 
   software-tests:
     name: Software Tests
