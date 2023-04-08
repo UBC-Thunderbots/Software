@@ -1,8 +1,8 @@
 #include "software/ai/evaluation/defender_assignment.h"
 
+#include "software/geom/algorithms/convex_angle.h"
 #include "software/geom/algorithms/distance.h"
 #include "software/geom/algorithms/intersection.h"
-#include "software/geom/algorithms/convex_angle.h"
 
 std::vector<DefenderAssignment> getAllDefenderAssignments(
     const std::vector<EnemyThreat> &threats, const Field &field, const Ball &ball)
@@ -17,7 +17,8 @@ std::vector<DefenderAssignment> getAllDefenderAssignments(
     auto primary_threat_position = filtered_threats.front().robot.position();
     for (unsigned int i = 1; i < filtered_threats.size(); i++)
     {
-        auto lane = Segment(primary_threat_position, filtered_threats.at(i).robot.position());
+        auto lane =
+            Segment(primary_threat_position, filtered_threats.at(i).robot.position());
         auto threat_rating = static_cast<unsigned int>(filtered_threats.size()) - i;
         shooting_lanes.emplace_back(ShootingLane{lane, threat_rating});
         assignments.emplace_back(
@@ -28,7 +29,7 @@ std::vector<DefenderAssignment> getAllDefenderAssignments(
     static constexpr unsigned int SHOOTING_LANE_MULTIPLIER = 3;
 
     // Construct goal lanes and determine crease defender assignments.
-    // Using full list of threats (not filtered threats) since we need to 
+    // Using full list of threats (not filtered threats) since we need to
     // find potential goal lane from every enemy on the field
     for (unsigned int i = 0; i < threats.size(); i++)
     {
@@ -100,16 +101,16 @@ std::vector<DefenderAssignment> getAllDefenderAssignments(
 std::vector<EnemyThreat> filterOutSimilarThreats(const std::vector<EnemyThreat> &threats)
 {
     std::vector<EnemyThreat> filtered_threats;
-    
+
     // The primary threat is always included in our list of filtered threats
     auto primary_threat = threats.front();
     filtered_threats.emplace_back(primary_threat);
 
     for (const auto &threat : threats)
     {
-        auto distance_between_threats = distance(threat.robot.position(), 
-                                                 primary_threat.robot.position());
-        
+        auto distance_between_threats =
+            distance(threat.robot.position(), primary_threat.robot.position());
+
         if (distance_between_threats < MIN_DISTANCE_BETWEEN_THREATS)
         {
             continue;
@@ -120,16 +121,17 @@ std::vector<EnemyThreat> filterOutSimilarThreats(const std::vector<EnemyThreat> 
         {
             auto grouped_threat = filtered_threats[i];
 
-            auto angle = convexAngle(grouped_threat.robot.position(),
-                                     primary_threat.robot.position(),
-                                     threat.robot.position());
-            
+            auto angle =
+                convexAngle(grouped_threat.robot.position(),
+                            primary_threat.robot.position(), threat.robot.position());
+
             if (angle < MIN_ANGLE_BETWEEN_THREATS)
             {
                 // Only the closest threat to the primary threat is included in our
                 // list of filtered threats
                 if (distance(primary_threat.robot.position(), threat.robot.position()) <
-                    distance(primary_threat.robot.position(), grouped_threat.robot.position()))
+                    distance(primary_threat.robot.position(),
+                             grouped_threat.robot.position()))
                 {
                     filtered_threats[i] = grouped_threat;
                 }

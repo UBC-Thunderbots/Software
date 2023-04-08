@@ -46,7 +46,7 @@ struct ShootingLane
 // The minimum distance between two threats for them to be considered non-similar
 static constexpr double MIN_DISTANCE_BETWEEN_THREATS = 0.25;
 
-// The minimum difference between two threats in angle to the primary threat for 
+// The minimum difference between two threats in angle to the primary threat for
 // them to be considered non-similar
 static constexpr Angle MIN_ANGLE_BETWEEN_THREATS = Angle::fromDegrees(10);
 
@@ -66,7 +66,7 @@ std::vector<DefenderAssignment> getAllDefenderAssignments(
     const std::vector<EnemyThreat> &threats, const Field &field, const Ball &ball);
 
 /**
- * Filters out enemy threats with similar positioning/angle to the primary threat 
+ * Filters out enemy threats with similar positioning/angle to the primary threat
  * (i.e. the first threat in the list). Of the similar threats, only the closest
  * threat to the primary threat is returned in the filtered list.
  *
@@ -83,7 +83,7 @@ std::vector<DefenderAssignment> getAllDefenderAssignments(
  * close in proximity to the primary threat, so it is filtered out.
  *
  * @param threats all enemy threats in order of decreasing threat
- * 
+ *
  * @return a copy of the threats list with similarly positioned threats removed
  */
 std::vector<EnemyThreat> filterOutSimilarThreats(const std::vector<EnemyThreat> &threats);
