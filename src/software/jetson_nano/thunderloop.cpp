@@ -182,23 +182,8 @@ Thunderloop::~Thunderloop() {}
                         createAngularVelocity(status.angular_velocity()));
             }
 
-            auto nanoseconds_elapsed_since_last_world =
-                    getNanoseconds(time_since_last_vision_received);
-
-            // Timeout Overrides for World and Primitives
-            // These should be after the new primitive / world update sections above
-
-            // If world not received in a while, stop robot
-            if (nanoseconds_elapsed_since_last_world > PACKET_TIMEOUT_NS)
-            {
-                primitive_executor_.setStopPrimitive();
-
-                // Log milliseconds since last world received if we are timing out
-                LOG(WARNING)
-                    << "World timeout, overriding with StopPrimitive - Milliseconds since last world: "
-                    << static_cast<int>(nanoseconds_elapsed_since_last_world) *
-                           MILLISECONDS_PER_NANOSECOND;
-            }
+            // Timeout Overrides for Primitives
+            // These should be after the new primitive update section above
 
             // If primitive not received in a while, stop robot
             // Primitive Executor: run the last primitive if we have not timed out
