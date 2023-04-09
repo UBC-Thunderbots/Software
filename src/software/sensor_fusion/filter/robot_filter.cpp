@@ -82,6 +82,10 @@ std::optional<Robot> RobotFilter::getFilteredData(
             (filtered_data.timestamp.toSeconds() -
              current_robot_state.timestamp().toSeconds());
 
+//        if (filtered_data.velocity.length() <= 0.15) {
+//            filtered_data.velocity = Vector(0, 0);
+//        }
+
         // angular_velocity = orientation difference / time difference
         filtered_data.angular_velocity =
             (filtered_data.orientation - current_robot_state.orientation()).clamp() /

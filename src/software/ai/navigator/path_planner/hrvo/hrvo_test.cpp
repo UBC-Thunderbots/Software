@@ -7,7 +7,7 @@ class TestHrvo : public testing::Test
 {
    public:
     TestHrvo()
-        : sim(),
+        : sim(0),
           time_step(Duration::fromSeconds(1.0 / 60.0)),
           robot_constants(create2021RobotConstants()),
           world(Field::createSSLDivisionBField(),

@@ -1,6 +1,6 @@
 #include "hrvo_simulator.h"
 
-HRVOSimulator::HRVOSimulator() : robots(), world(std::nullopt), primitive_set() {}
+HRVOSimulator::HRVOSimulator(RobotId robot_id) : robot_id(robot_id), robots(), world(std::nullopt), primitive_set() {}
 
 void HRVOSimulator::updateWorld(const World &world,
                                 const RobotConstants_t &robot_constants,
@@ -101,12 +101,16 @@ void HRVOSimulator::updatePrimitiveSet(const TbotsProto::PrimitiveSet &new_primi
 }
 
 void HRVOSimulator::updateAgent(const std::shared_ptr<Agent> &agent,
-                                const Robot &friendly_robot)
+                                const Robot &robot)
 {
-    agent->setPosition(friendly_robot.position());
-//    agent->setVelocity(friendly_robot.velocity()); // Turn off feedback
-    agent->setOrientation(friendly_robot.orientation());
-//    agent->setAngularVelocity(friendly_robot.angularVelocity());
+    agent->setPosition(robot.position());
+    agent->setOrientation(robot.orientation());
+    if (robot.id() != robot_id)
+    {
+        // TODO: This will prevent an enemy robots with same id to get updated. Refactor to above method?!
+        agent->setVelocity(robot.velocity()); // Turn off feedback
+        agent->setAngularVelocity(robot.angularVelocity());
+    }
 }
 
 void HRVOSimulator::configureHRVORobot(const Robot &robot,

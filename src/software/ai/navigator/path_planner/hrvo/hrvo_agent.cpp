@@ -11,7 +11,7 @@ HRVOAgent::HRVOAgent(RobotId robot_id, const RobotState &robot_state, const Robo
       neighbours(),
       config()
 {
-//        config.set_linear_velocity_kp(2.8);
+//        config.set_linear_velocity_kp(1.8);
 //        config.set_angular_velocity_kp(3.0); // 6.0 is perfect for just turning in spot
 //        config.set_angular_velocity_compensation(0.0); // 0.35 for long distances, 0.5 for short
 }
@@ -714,127 +714,61 @@ std::optional<int> HRVOAgent::findIntersectingVelocityObstacle(
 // TODO: We're passing the robot constants all over the place, can we make it a static constexpr
 Vector HRVOAgent::computePreferredVelocity(Duration time_step)
 {
-    double pref_speed                 = max_speed * PREF_SPEED_SCALE;
-    const auto current_path_point_opt = path.getCurrentPathPoint();
-
-    if (!current_path_point_opt.has_value() || pref_speed <= 0.01 || max_accel <= 0.01)
+    auto path_point_opt = path.getCurrentPathPoint();
+    if (!path_point_opt.has_value())
     {
-        // Used to avoid edge cases with division by zero
-        return Vector(0.0, 0.0);
+        return Vector();
     }
 
-    Point goal_position  = current_path_point_opt.value().getPosition();
-    double speed_at_goal = current_path_point_opt.value().getSpeed();
+    Point destination  = path_point_opt.value().getPosition();
+    Vector local_error = globalToLocalVelocity(destination - position, orientation);
 
-    Vector dist_vector_to_goal = goal_position - position;
-    auto dist_to_goal          = static_cast<float>(dist_vector_to_goal.length());
+    // We calculate the new desired velocity based on two proportional controllers,
+    // one for each axis in the local frame.
+    const double vx = local_error.x() * config.linear_velocity_kp();
+    const double vy = local_error.y() * config.linear_velocity_kp();
+    Vector pid_vel = Vector(vx, vy);
+    Vector curr_local_velocity = globalToLocalVelocity(velocity, orientation);
+    Vector delta_velocity = pid_vel - curr_local_velocity;
 
-    // d = (Vf^2 - Vi^2) / 2a
-    double start_linear_deceleration_distance =
-            std::abs((std::pow(speed_at_goal, 2) - std::pow(pref_speed, 2)) /
-                     (2 * max_decel)) *
-            DECEL_DIST_MULTIPLIER;
-
-    std::map<std::string, double> plotjuggler_values;
-
-    if (dist_to_goal < start_linear_deceleration_distance)
+    // Clamp to max acceleration
+    double acceleration_limit;
+    if (pid_vel.length() >= curr_local_velocity.length())
     {
-        // velocity given linear deceleration, distance away from goal, and desired final
-        // speed
-        // v_pref = sqrt(v_goal^2 + 2 * a * d_remainingToDestination)
-        double curr_pref_speed =
-                static_cast<double>(
-                        std::sqrt(std::pow(speed_at_goal, 2) + 2 * max_decel * dist_to_goal)) *
-                DECEL_PREF_SPEED_MULTIPLIER;
-        Vector ideal_pref_velocity = dist_vector_to_goal.normalize(curr_pref_speed);
-
-        // Limit the preferred velocity to the kinematic limits
-        const Vector dv = ideal_pref_velocity - velocity;
-        if (dv.length() <= max_decel * time_step.toSeconds())
-        {
-            plotjuggler_values.insert({std::to_string(robot_id) + "_condition", 1.0});
-            LOG(PLOTJUGGLER) << *createPlotJugglerValue(plotjuggler_values);
-            return ideal_pref_velocity;
-        }
-        else
-        {
-            // Calculate the maximum velocity towards the preferred velocity, given the
-            // acceleration constraint
-            plotjuggler_values.insert({std::to_string(robot_id) + "_condition", 2.0});
-            LOG(PLOTJUGGLER) << *createPlotJugglerValue(plotjuggler_values);
-            return velocity + dv.normalize(max_decel * time_step.toSeconds());
-        }
+        // Robot is accelerating
+        acceleration_limit = max_accel;
     }
     else
     {
-        // Accelerate to preferred speed
-        // v_pref = v_now + a * t
-        double curr_pref_speed =
-                std::min(static_cast<double>(pref_speed),
-                         velocity.length() + max_accel * time_step.toSeconds());
-        plotjuggler_values.insert({std::to_string(robot_id) + "_condition", 3.0});
-        LOG(PLOTJUGGLER) << *createPlotJugglerValue(plotjuggler_values);
-        return dist_vector_to_goal.normalize(curr_pref_speed);
+        // Robot is decelerating
+        acceleration_limit = max_decel;
     }
-}
+    Vector max_delta_velocity = delta_velocity.normalize(std::min(delta_velocity.length(),
+                                                                  acceleration_limit * time_step.toSeconds()));
+    Vector desired_output = curr_local_velocity + max_delta_velocity;
 
-//Vector HRVOAgent::computePreferredVelocity(Duration time_step)
-//{
-//    auto path_point_opt = path.getCurrentPathPoint();
-//    if (!path_point_opt.has_value())
-//    {
-//        return Vector();
-//    }
-//
-//    Point destination  = path_point_opt.value().getPosition();
-//    Vector local_error = globalToLocalVelocity(destination - position, orientation);
-//
-//    // We calculate the new desired velocity based on two proportional controllers,
-//    // one for each axis in the local frame.
-//    const double vx = local_error.x() * config.linear_velocity_kp();
-//    const double vy = local_error.y() * config.linear_velocity_kp();
-//    Vector pid_vel = Vector(vx, vy);
-//    Vector curr_local_velocity = globalToLocalVelocity(velocity, orientation);
-//    Vector delta_velocity = pid_vel - curr_local_velocity;
-//
-//    // Clamp to max acceleration
-//    double acceleration_limit;
-//    if (pid_vel.length() >= curr_local_velocity.length())
-//    {
-//        // Robot is accelerating
-//        acceleration_limit = max_accel;
-//    }
-//    else
-//    {
-//        // Robot is decelerating
-//        acceleration_limit = max_decel;
-//    }
-//    Vector max_delta_velocity = delta_velocity.normalize(std::min(delta_velocity.length(),
-//                                                                  acceleration_limit * time_step.toSeconds()));
-//    Vector desired_output = curr_local_velocity + max_delta_velocity;
-//
-//    // Clamp to max speed
-//    Vector output = desired_output.normalize(std::min(desired_output.length(), static_cast<double>(max_speed)));
-//
-//    // To avoid the robot swinging when turning and moving in a linear line, we
-//    // will compensate for the current angular velocity by rotating the velocity
-//    // in the opposite direction
-//    output = output.rotate(-angular_velocity * time_step.toSeconds() * config.angular_velocity_compensation());
-//
-//    std::map<std::string, double> plotjuggler_values;
-//    plotjuggler_values.insert({std::to_string(robot_id) + "_acceleration_limit", acceleration_limit});
-//    plotjuggler_values.insert({std::to_string(robot_id) + "_local_delta_vx", (output - curr_local_velocity).x()});
-//    plotjuggler_values.insert({std::to_string(robot_id) + "_local_delta_vy", (output - curr_local_velocity).y()});
-//    plotjuggler_values.insert({std::to_string(robot_id) + "_local_error_x", local_error.x()});
-//    plotjuggler_values.insert({std::to_string(robot_id) + "_local_error_y", local_error.y()});
-//    plotjuggler_values.insert({std::to_string(robot_id) + "_local_pid_vx", pid_vel.x()});
-//    plotjuggler_values.insert({std::to_string(robot_id) + "_local_pid_vy", pid_vel.y()});
-//    plotjuggler_values.insert({std::to_string(robot_id) + "_local_clamped_vx", output.x()});
-//    plotjuggler_values.insert({std::to_string(robot_id) + "_local_clamped_vy", output.y()});
-//    LOG(PLOTJUGGLER) << *createPlotJugglerValue(plotjuggler_values);
-//
-//    return localToGlobalVelocity(output, orientation);
-//}
+    // Clamp to max speed
+    Vector output = desired_output.normalize(std::min(desired_output.length(), static_cast<double>(max_speed)));
+
+    // To avoid the robot swinging when turning and moving in a linear line, we
+    // will compensate for the current angular velocity by rotating the velocity
+    // in the opposite direction
+    output = output.rotate(-angular_velocity * time_step.toSeconds() * config.angular_velocity_compensation());
+
+    std::map<std::string, double> plotjuggler_values;
+    plotjuggler_values.insert({std::to_string(robot_id) + "_acceleration_limit", acceleration_limit});
+    plotjuggler_values.insert({std::to_string(robot_id) + "_local_delta_vx", (output - curr_local_velocity).x()});
+    plotjuggler_values.insert({std::to_string(robot_id) + "_local_delta_vy", (output - curr_local_velocity).y()});
+    plotjuggler_values.insert({std::to_string(robot_id) + "_local_error_x", local_error.x()});
+    plotjuggler_values.insert({std::to_string(robot_id) + "_local_error_y", local_error.y()});
+    plotjuggler_values.insert({std::to_string(robot_id) + "_local_pid_vx", pid_vel.x()});
+    plotjuggler_values.insert({std::to_string(robot_id) + "_local_pid_vy", pid_vel.y()});
+    plotjuggler_values.insert({std::to_string(robot_id) + "_local_clamped_vx", output.x()});
+    plotjuggler_values.insert({std::to_string(robot_id) + "_local_clamped_vy", output.y()});
+    LOG(PLOTJUGGLER) << *createPlotJugglerValue(plotjuggler_values);
+
+    return localToGlobalVelocity(output, orientation);
+}
 
 std::optional<ObstaclePtr> HRVOAgent::getBallObstacle()
 {

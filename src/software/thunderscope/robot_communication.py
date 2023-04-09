@@ -230,7 +230,7 @@ class RobotCommunication(object):
 
         return self
 
-    def __exit__(self):
+    def __exit__(self, type, value, traceback):
         """Exit RobotCommunication context manager
 
         """

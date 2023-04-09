@@ -14,7 +14,7 @@ PrimitiveExecutor::PrimitiveExecutor(const Duration time_step,
     : current_primitive_(),
       friendly_team_colour(friendly_team_colour),
       robot_constants_(robot_constants),
-      hrvo_simulator_(),
+      hrvo_simulator_(robot_id),
       time_step_(time_step),
       curr_orientation_(Angle::zero()),
       robot_id_(robot_id)

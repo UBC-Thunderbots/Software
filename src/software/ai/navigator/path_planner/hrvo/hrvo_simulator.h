@@ -22,7 +22,7 @@ class HRVOSimulator
     /**
      * Constructor
      */
-    explicit HRVOSimulator();
+    explicit HRVOSimulator(RobotId robot_id);
 
 
     /**
@@ -151,10 +151,13 @@ class HRVOSimulator
      *  Update position, velocity, orientation and angular velocity for this agent.
      *
      * @param agent The simulator agent being updated.
-     * @param friendly_robot the world robot whose values should be used
+     * @param robot the world robot whose values should be used
      */
-    static void updateAgent(const std::shared_ptr<Agent> &agent,
-                            const Robot &friendly_robot);
+    void updateAgent(const std::shared_ptr<Agent> &agent,
+                            const Robot &robot);
+
+    // TODO
+    RobotId robot_id;
 
     // Map of robot ids to agent.
     // enemy robot ids are offset by ENEMY_LV_ROBOT_OFFSET
