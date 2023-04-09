@@ -245,4 +245,12 @@ class HRVOAgent : public Agent
     // threshold for the minimum preferred speed.
     // Used in order to filter slow candidate velocities
     static constexpr double MIN_PREF_SPEED_MULTIPLIER = 0.5;
+
+    // a multiplier to account for different accelerations when speeding up vs slowing
+    // down
+    static constexpr double DECEL_DIST_MULTIPLIER = 1.2;
+
+    // a multiplier to account for different preferred speed when speeding up vs slowing
+    // down
+    static constexpr double DECEL_PREF_SPEED_MULTIPLIER = 0.6;
 };

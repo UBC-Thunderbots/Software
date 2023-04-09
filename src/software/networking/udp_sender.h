@@ -41,4 +41,6 @@ class UdpSender
 
     // The endpoint for the receiver
     boost::asio::ip::udp::endpoint receiver_endpoint;
+
+    int i = 0;
 };

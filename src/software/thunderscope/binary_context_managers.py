@@ -135,7 +135,7 @@ gdb --args bazel-bin/{full_system}
             ):
                 self.full_system_proc = Popen(self.full_system.split(" "))
                 logging.info("FullSystem has restarted.")
-        time.sleep(1)
+            time.sleep(1)
 
     def __exit__(self, type, value, traceback):
         """Exit the full_system context manager.

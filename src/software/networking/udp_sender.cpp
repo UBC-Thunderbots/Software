@@ -22,7 +22,32 @@ UdpSender::UdpSender(boost::asio::io_service& io_service,
 void UdpSender::sendString(const std::string& message)
 {
     // TODO: Add try catch
-    socket_.send_to(boost::asio::buffer(message, message.length()), receiver_endpoint);
+//    if (i < 10) {
+//        std::cerr << "About to send " << std::to_string(i++) << "th message over UDP" << std::endl;
+//    }
+//    try {
+        socket_.send_to(boost::asio::buffer(message, message.length()), receiver_endpoint);
+//    } catch (std::exception& e) {
+//        std::cerr << "UDP Sender exception caught. Skipping message to " << /*receiver_endpoint <<*/ "\n Error: " << e.what();
+//    }
+
+//    if (i++ < 10)
+//    {
+//        std::cerr << "About to send " << std::to_string(i) << "th message over UDP" << std::endl;
+//    }
+//
+//    try
+//    {
+//        socket_.send_to(boost::asio::buffer(message, message.length()), receiver_endpoint);
+//    }
+//    catch (const std::exception& e)
+//    {
+//        std::cerr << "Exception caught in UDPSender: " << e.what() << std::endl;
+//    }
+//    catch (...)
+//    {
+//        std::cerr << "Exception caught in UDPSender" << std::endl;
+//    }
 }
 
 UdpSender::~UdpSender()

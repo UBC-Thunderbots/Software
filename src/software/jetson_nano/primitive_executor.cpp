@@ -84,7 +84,7 @@ AngularVelocity PrimitiveExecutor::getTargetAngularVelocity()
 }
 
 
-std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimitive()
+std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimitive() // TODO: Make dynamic timestep
 {
     hrvo_simulator_.doStep(time_step_);
 
