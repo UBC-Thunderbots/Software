@@ -1,6 +1,22 @@
 from pyqtgraph.Qt import QtCore, QtGui
 from proto.import_all_protos import *
-from enum import IntEnum
+from enum import Enum, IntEnum
+
+
+class ProtoUnixIOTypes(Enum):
+    SIM = 1
+    BLUE = 2
+    YELLOW = 3
+    DIAGNOSTICS = 4
+    CURRENT = 5
+
+
+class ParamTypes(Enum):
+    BOOL = 1
+    PROTO_UNIX_IO = 2
+    STRING = 3
+    INT = 4
+    LIST = 5
 
 
 class IndividualRobotMode(IntEnum):

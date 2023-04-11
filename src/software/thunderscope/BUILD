@@ -6,6 +6,8 @@ py_binary(
     name = "thunderscope_main",
     srcs = ["thunderscope_main.py"],
     deps = [
+        ":config",
+        ":constants",
         ":thunderscope",
         "//software/thunderscope:binary_context_managers",
         "//software/thunderscope/replay:proto_logger",
@@ -23,6 +25,7 @@ py_library(
         "//software:unix_full_system",
     ],
     deps = [
+        ":config_types",
         "//extlibs/er_force_sim/src/protobuf:erforce_py_proto",
         "//proto:software_py_proto",
         "//proto/message_translation:py_tbots_protobuf",
@@ -33,6 +36,19 @@ py_library(
         "//software/thunderscope:dock_label_style",
         "//software/thunderscope:proto_unix_io",
         "//software/thunderscope:robot_communication",
+        requirement("pyqtgraph"),
+        requirement("numpy"),
+    ],
+)
+
+py_library(
+    name = "widget_names_to_setup",
+    srcs = ["widget_setup_functions.py"],
+    data = [
+        "//software:py_constants.so",
+        "//software:python_bindings.so",
+    ],
+    deps = [
         "//software/thunderscope/common:common_widgets",
         "//software/thunderscope/common:proto_configuration_widget",
         "//software/thunderscope/common:proto_plotter",
@@ -58,8 +74,24 @@ py_library(
         "//software/thunderscope/robot_diagnostics:estop_view",
         "//software/thunderscope/robot_diagnostics:robot_info",
         "//software/thunderscope/robot_diagnostics:robot_view",
-        requirement("pyqtgraph"),
-        requirement("numpy"),
+    ],
+)
+
+py_library(
+    name = "config_types",
+    srcs = ["thunderscope_config_types.py"],
+    deps = [
+        ":constants",
+    ],
+)
+
+py_library(
+    name = "config",
+    srcs = ["thunderscope_config.py"],
+    deps = [
+        ":config_types",
+        ":constants",
+        ":widget_names_to_setup",
     ],
 )
 

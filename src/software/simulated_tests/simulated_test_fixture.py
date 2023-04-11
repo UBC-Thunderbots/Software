@@ -24,6 +24,10 @@ from software.thunderscope.binary_context_managers import (
     Simulator,
     Gamecontroller,
 )
+from software.thunderscope.thunderscope_config import (
+    configure_two_ai_gamecontroller_view,
+)
+from software.thunderscope.constants import ProtoUnixIOTypes
 from software.thunderscope.replay.proto_logger import ProtoLogger
 
 from software.logger.logger import createLogger
@@ -211,12 +215,12 @@ class SimulatorTestRunner(object):
                     always_validation_proto_set.test_name = self.test_name
 
                     # Send out the validation proto to thunderscope
-                    self.thunderscope.blue_full_system_proto_unix_io.send_proto(
-                        ValidationProtoSet, eventually_validation_proto_set
-                    )
-                    self.thunderscope.blue_full_system_proto_unix_io.send_proto(
-                        ValidationProtoSet, always_validation_proto_set
-                    )
+                    self.thunderscope.proto_unix_io_map[
+                        ProtoUnixIOTypes.BLUE
+                    ].send_proto(ValidationProtoSet, eventually_validation_proto_set)
+                    self.thunderscope.proto_unix_io_map[
+                        ProtoUnixIOTypes.BLUE
+                    ].send_proto(ValidationProtoSet, always_validation_proto_set)
 
                 # Check that all always validations are always valid
                 validation.check_validation(always_validation_proto_set)
@@ -410,13 +414,11 @@ def simulated_test_runner():
             # and start the test
             if args.enable_thunderscope:
                 tscope = Thunderscope(
+                    configure_two_ai_gamecontroller_view(),
                     simulator_proto_unix_io,
                     blue_full_system_proto_unix_io,
                     yellow_full_system_proto_unix_io,
                     layout_path=args.layout,
-                    visualization_buffer_size=args.visualization_buffer_size,
-                    load_blue=True,
-                    load_yellow=True,
                 )
 
             time.sleep(LAUNCH_DELAY_S)

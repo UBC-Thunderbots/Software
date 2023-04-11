@@ -12,6 +12,8 @@ import software.python_bindings as cpp_bindings
 from software.py_constants import *
 from software.thunderscope.robot_communication import RobotCommunication
 from software.thunderscope.replay.proto_logger import ProtoLogger
+import software.thunderscope.thunderscope_config as config
+from software.thunderscope.constants import ProtoUnixIOTypes
 
 NUM_ROBOTS = 6
 SIM_TICK_RATE_MS = 16
@@ -183,13 +185,12 @@ if __name__ == "__main__":
             pass
 
         tscope = Thunderscope(
+            config=config.configure_two_ai_gamecontroller_view(
+                args.visualization_buffer_size, args.cost_visualization
+            ),
             layout_path=args.layout,
-            visualization_buffer_size=args.visualization_buffer_size,
-            load_blue=True,
-            load_yellow=True,
-            cost_visualization=args.cost_visualization,
         )
-        proto_unix_io = tscope.blue_full_system_proto_unix_io
+        proto_unix_io = tscope.proto_unix_io_map[ProtoUnixIOTypes.BLUE]
 
         # Setup LOG(VISUALIZE) handling from full system. We set from_log_visualize
         # to true to decode from base64.
@@ -232,31 +233,31 @@ if __name__ == "__main__":
 
     elif args.run_blue or args.run_yellow or args.run_diagnostics:
         tscope = Thunderscope(
+            config=config.configure_ai_or_diagnostics(
+                args.run_blue,
+                args.run_yellow,
+                args.run_diagnostics,
+                args.visualization_buffer_size,
+                args.cost_visualization,
+            ),
             layout_path=args.layout,
-            load_blue=bool(args.run_blue),
-            load_yellow=bool(args.run_yellow),
-            load_diagnostics=bool(args.run_diagnostics),
-            load_gamecontroller=False,
-            visualization_buffer_size=args.visualization_buffer_size,
-            cost_visualization=args.cost_visualization,
         )
 
         current_proto_unix_io = None
 
         if args.run_blue:
-            current_proto_unix_io = tscope.blue_full_system_proto_unix_io
             runtime_dir = args.blue_full_system_runtime_dir
             friendly_colour_yellow = False
             debug = args.debug_blue_full_system
         elif args.run_yellow:
-            current_proto_unix_io = tscope.yellow_full_system_proto_unix_io
             runtime_dir = args.yellow_full_system_runtime_dir
             friendly_colour_yellow = True
             debug = args.debug_yellow_full_system
 
-        # this proto will be the same as the fullsystem one if fullsystem is enabled
-        if args.run_diagnostics:
-            current_proto_unix_io = tscope.robot_diagnostics_proto_unix_io
+        # this will be the current fullsystem proto (blue or yellow)
+        # if fullsystem is loaded
+        # else, it will be the diagnostics proto
+        current_proto_unix_io = tscope.proto_unix_io_map[ProtoUnixIOTypes.CURRENT]
 
         with RobotCommunication(
             current_proto_unix_io,
@@ -296,14 +297,13 @@ if __name__ == "__main__":
     # Don't start any binaries and just replay a log.
     elif args.blue_log or args.yellow_log:
         tscope = Thunderscope(
+            config=config.configure_replay_view(
+                args.blue_log,
+                args.yellow_log,
+                args.visualization_buffer_size,
+                args.cost_visualization,
+            ),
             layout_path=args.layout,
-            visualization_buffer_size=args.visualization_buffer_size,
-            load_blue=(args.blue_log is not None),
-            blue_replay_log=args.blue_log,
-            load_yellow=(args.yellow_log is not None),
-            yellow_replay_log=args.yellow_log,
-            load_gamecontroller=False,
-            cost_visualization=args.cost_visualization,
         )
         tscope.show()
 
@@ -318,11 +318,10 @@ if __name__ == "__main__":
     else:
 
         tscope = Thunderscope(
-            load_blue=True,
-            load_yellow=True,
+            config=config.configure_two_ai_gamecontroller_view(
+                args.visualization_buffer_size, args.cost_visualization
+            ),
             layout_path=args.layout,
-            visualization_buffer_size=args.visualization_buffer_size,
-            cost_visualization=args.cost_visualization,
         )
 
         def __async_sim_ticker(tick_rate_ms):
