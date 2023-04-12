@@ -70,8 +70,8 @@ class TScopeTab:
     Data that describes a tab in Thunderscope
     """
 
-    name: str       # name of tab
-    key: TabKeys    # key to identify this tab
+    name: str  # name of tab
+    key: TabKeys  # key to identify this tab
 
     def __init__(self, name: str, key: TabKeys):
         self.name = name
@@ -85,11 +85,7 @@ class TScopeQTTab(TScopeTab):
 
     widgets: Sequence[TScopeWidget]  # list of widgets for this tab
 
-    def __init__(
-            self,
-            name: str, key: TabKeys,
-            widgets: Sequence[TScopeWidget]
-    ):
+    def __init__(self, name: str, key: TabKeys, widgets: Sequence[TScopeWidget]):
         super().__init__(name, key)
         self.widgets = widgets
 
@@ -101,12 +97,7 @@ class TScopeWebTab(TScopeTab):
 
     url: str  # url of webpage displayed by this tab
 
-    def __init__(
-            self,
-            name: str,
-            key: TabKeys,
-            url: str
-    ):
+    def __init__(self, name: str, key: TabKeys, url: str):
         super().__init__(name, key)
         self.url = url
 

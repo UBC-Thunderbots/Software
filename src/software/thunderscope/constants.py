@@ -7,6 +7,7 @@ class ProtoUnixIOTypes(Enum):
     """
     Different keys for Proto Unix IOs used by Thunderscope
     """
+
     SIM = 1
     BLUE = 2
     YELLOW = 3
@@ -18,6 +19,7 @@ class TabKeys(str, Enum):
     """
     Different keys for tabs used in various Thunderscope views
     """
+
     BLUE = "BLUE"
     YELLOW = "YELLOW"
     DIAGNOSTICS = "DIAGNOSTICS"
@@ -31,6 +33,7 @@ class ParamTypes(Enum):
     """
     Different types of parameters used by setup methods for Thunderscope widgets
     """
+
     BOOL = 1
     PROTO_UNIX_IO = 2
     STRING = 3

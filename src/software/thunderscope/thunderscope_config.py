@@ -327,7 +327,7 @@ def configure_two_ai_gamecontroller_view(
             TScopeWebTab(
                 name="Gamecontroller",
                 key=TabKeys.GAMECONTROLLER,
-                url=GAME_CONTROLLER_URL
+                url=GAME_CONTROLLER_URL,
             ),
         ],
     )

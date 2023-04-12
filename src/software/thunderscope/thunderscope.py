@@ -315,9 +315,7 @@ class Thunderscope(object):
         with shelve.open(filename, "r") as shelf:
             for key, val in shelf.items():
                 if key in self.widget_dock_map:
-                    self.tab_dock_map[key].restoreState(
-                        val
-                    )
+                    self.tab_dock_map[key].restoreState(val)
 
             # Update default layout
             if filename != LAST_OPENED_LAYOUT_PATH:
