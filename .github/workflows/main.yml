@@ -8,7 +8,7 @@ on:
 
 jobs:
   formatting-check:
-    name: Formatting
+    name: Formatting with pre-commit-ci-lite
     runs-on: ubuntu-20.04
     steps:
       # checks-out the repository under $GITHUB_WORKSPACE
