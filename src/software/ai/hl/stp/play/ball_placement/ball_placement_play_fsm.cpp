@@ -150,7 +150,7 @@ bool BallPlacementPlayFSM::kickDone(const Update &event)
     const auto ball_velocity   = event.common.world.ball().velocity().length();
     double ball_shot_threshold = 1;
 
-    return ball_velocity > ball_shot_threshold && !shouldKickOffWall(event);
+    return (ball_velocity > ball_shot_threshold) && !shouldKickOffWall(event);
 }
 
 bool BallPlacementPlayFSM::ballPlaced(const Update &event)

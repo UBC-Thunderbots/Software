@@ -13,6 +13,11 @@ class RobotEntersRegion(Validation):
     """Checks if a Robot enters any of the provided regions."""
 
     def __init__(self, regions=None, num_robots=1):
+        """
+
+        :param regions: regions on the field
+        :param num_robots: the number of robots to check
+        """
         self.regions = regions if regions else []
         self.num_robots = num_robots
 

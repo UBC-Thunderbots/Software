@@ -121,7 +121,8 @@ struct BallPlacementPlayFSM
             PlaceBallState_S + Update_E[!ballPlaced_G] / placeBall_A = PlaceBallState_S,
             PlaceBallState_S + Update_E[ballPlaced_G] / retreat_A    = RetreatState_S,
             RetreatState_S + Update_E[!ballPlaced_G]                 = StartState_S,
-            RetreatState_S + Update_E[ballPlaced_G] / retreat_A      = RetreatState_S);
+            RetreatState_S + Update_E[ballPlaced_G] / retreat_A      = X,
+            X + Update_E[!ballPlaced_G]                              = StartState_S);
     }
 
    private:
