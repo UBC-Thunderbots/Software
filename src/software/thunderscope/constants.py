@@ -4,6 +4,9 @@ from enum import Enum, IntEnum
 
 
 class ProtoUnixIOTypes(Enum):
+    """
+    Different keys for Proto Unix IOs used by Thunderscope
+    """
     SIM = 1
     BLUE = 2
     YELLOW = 3
@@ -11,7 +14,23 @@ class ProtoUnixIOTypes(Enum):
     CURRENT = 5
 
 
+class TabKeys(str, Enum):
+    """
+    Different keys for tabs used in various Thunderscope views
+    """
+    BLUE = "BLUE"
+    YELLOW = "YELLOW"
+    DIAGNOSTICS = "DIAGNOSTICS"
+    GAMECONTROLLER = "GAMECONTROLLER"
+
+    def __str__(self):
+        return str.__str__(self)
+
+
 class ParamTypes(Enum):
+    """
+    Different types of parameters used by setup methods for Thunderscope widgets
+    """
     BOOL = 1
     PROTO_UNIX_IO = 2
     STRING = 3

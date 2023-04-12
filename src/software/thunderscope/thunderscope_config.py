@@ -1,5 +1,6 @@
 from software.thunderscope.widget_setup_functions import *
 from software.thunderscope.thunderscope_config_types import *
+from software.thunderscope.constants import TabKeys
 
 GAME_CONTROLLER_URL = "http://localhost:8081"
 
@@ -301,6 +302,7 @@ def configure_two_ai_gamecontroller_view(
         tabs=[
             TScopeQTTab(
                 name="Blue FullSystem",
+                key=TabKeys.BLUE,
                 widgets=configure_base_fullsystem(
                     ProtoUnixIOTypes.BLUE,
                     False,
@@ -312,6 +314,7 @@ def configure_two_ai_gamecontroller_view(
             ),
             TScopeQTTab(
                 name="Yellow FullSystem",
+                key=TabKeys.YELLOW,
                 widgets=configure_base_fullsystem(
                     ProtoUnixIOTypes.YELLOW,
                     True,
@@ -321,7 +324,11 @@ def configure_two_ai_gamecontroller_view(
                     else [],
                 ),
             ),
-            TScopeWebTab(name="Gamecontroller", url=GAME_CONTROLLER_URL),
+            TScopeWebTab(
+                name="Gamecontroller",
+                key=TabKeys.GAMECONTROLLER,
+                url=GAME_CONTROLLER_URL
+            ),
         ],
     )
 
@@ -353,6 +360,7 @@ def configure_replay_view(
         tabs.append(
             TScopeQTTab(
                 name="Blue FullSystem",
+                key=TabKeys.BLUE,
                 widgets=configure_base_fullsystem(
                     ProtoUnixIOTypes.BLUE,
                     False,
@@ -371,6 +379,7 @@ def configure_replay_view(
         tabs.append(
             TScopeQTTab(
                 name="Yellow FullSystem",
+                key=TabKeys.YELLOW,
                 widgets=configure_base_fullsystem(
                     ProtoUnixIOTypes.YELLOW,
                     False,
@@ -431,6 +440,7 @@ def configure_ai_or_diagnostics(
         tabs.append(
             TScopeQTTab(
                 name="Blue Fullsystem",
+                key=TabKeys.BLUE,
                 widgets=configure_base_fullsystem(
                     ProtoUnixIOTypes.BLUE,
                     False,
@@ -445,6 +455,7 @@ def configure_ai_or_diagnostics(
         tabs.append(
             TScopeQTTab(
                 name="Yellow Fullsystem",
+                key=TabKeys.YELLOW,
                 widgets=configure_base_fullsystem(
                     ProtoUnixIOTypes.YELLOW,
                     False,
@@ -467,6 +478,7 @@ def configure_ai_or_diagnostics(
         tabs.append(
             TScopeQTTab(
                 name="Robot Diagnostics",
+                key=TabKeys.DIAGNOSTICS,
                 widgets=configure_base_diagnostics(
                     extra_widgets=[]
                     if (load_blue or load_yellow)

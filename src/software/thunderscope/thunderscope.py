@@ -25,6 +25,7 @@ from software.thunderscope.dock_label_style import *
 
 from software.thunderscope.thunderscope_config_types import *
 from software.thunderscope.proto_unix_io import ProtoUnixIO
+from software.thunderscope.constants import TabKeys
 
 SAVED_LAYOUT_PATH = "/opt/tbotspython/saved_tscope_layout"
 LAYOUT_FILE_EXTENSION = "tscopelayout"
@@ -104,7 +105,8 @@ class Thunderscope(object):
             ProtoUnixIOTypes.SIM: simulator_proto_unix_io or ProtoUnixIO(),
         }
         self.widgets_map = {}
-        self.dock_map = {}
+        self.tab_dock_map = {}
+        self.widget_dock_map = {}
 
         # iterate through and initialise each non-ref proto unix io
         for name in list(config.protos.keys()):
@@ -138,9 +140,10 @@ class Thunderscope(object):
                 # make dock area
                 dock_area = DockArea()
                 self.tabs.addTab(dock_area, tab.name)
+                self.tab_dock_map[str(tab.key.name)] = dock_area
 
-                self.widgets_map[tab.name] = {}
-                self.dock_map[tab.name] = {}
+                self.widgets_map[tab.key] = {}
+                self.widget_dock_map[tab.key] = {}
 
                 # first widget is initial anchor widget
                 # all other widgets will be positioned relative to this one
@@ -148,8 +151,8 @@ class Thunderscope(object):
                     self.add_one_widget(
                         dock_area,
                         widget,
-                        self.widgets_map[tab.name],
-                        self.dock_map[tab.name],
+                        self.widgets_map[tab.key],
+                        self.widget_dock_map[tab.key],
                     )
 
             # WEB Tab, displays a Chrome webpage
@@ -279,18 +282,12 @@ class Thunderscope(object):
             return
 
         with shelve.open(filename, "c") as shelf:
-            shelf["blue_dock_state"] = self.blue_full_system_dock_area.saveState()
-            shelf["yellow_dock_state"] = self.yellow_full_system_dock_area.saveState()
-            shelf[
-                "robot_diagnostics_dock_state"
-            ] = self.robot_diagnostics_dock_area.saveState()
+            for key, val in self.tab_dock_map.items():
+                shelf[key] = val.saveState()
 
         with shelve.open(LAST_OPENED_LAYOUT_PATH, "c") as shelf:
-            shelf["blue_dock_state"] = self.blue_full_system_dock_area.saveState()
-            shelf["yellow_dock_state"] = self.yellow_full_system_dock_area.saveState()
-            shelf[
-                "robot_diagnostics_dock_state"
-            ] = self.robot_diagnostics_dock_area.saveState()
+            for key, val in self.tab_dock_map.items():
+                shelf[key] = val.saveState()
 
     def load_layout(self, filename=None):
         """Open a file dialog to load the layout and state to all widgets
@@ -316,24 +313,17 @@ class Thunderscope(object):
         # if the dock doesn't exist in the default layout, we ignore it
         # (instead of adding a placeholder dock)
         with shelve.open(filename, "r") as shelf:
-            self.blue_full_system_dock_area.restoreState(
-                shelf["blue_dock_state"], missing="ignore"
-            )
-            self.yellow_full_system_dock_area.restoreState(
-                shelf["yellow_dock_state"], missing="ignore"
-            )
-            self.robot_diagnostics_dock_area.restoreState(
-                shelf["robot_diagnostics_dock_state"], missing="ignore"
-            )
+            for key, val in shelf.items():
+                if key in self.widget_dock_map:
+                    self.tab_dock_map[key].restoreState(
+                        val
+                    )
 
             # Update default layout
             if filename != LAST_OPENED_LAYOUT_PATH:
                 with shelve.open(LAST_OPENED_LAYOUT_PATH, "c") as default_shelf:
-                    default_shelf["blue_dock_state"] = shelf["blue_dock_state"]
-                    default_shelf["yellow_dock_state"] = shelf["yellow_dock_state"]
-                    default_shelf["robot_diagnostics_dock_state"] = shelf[
-                        "robot_diagnostics_dock_state"
-                    ]
+                    for key, val in shelf.items():
+                        default_shelf[key] = val
                     default_shelf.sync()
 
     def register_refresh_function(self, refresh_func):
