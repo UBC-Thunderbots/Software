@@ -11,9 +11,9 @@ HRVOAgent::HRVOAgent(RobotId robot_id, const RobotState &robot_state, const Robo
       neighbours(),
       config()
 {
-//        config.set_linear_velocity_kp(1.8);
-//        config.set_angular_velocity_kp(3.0); // 6.0 is perfect for just turning in spot
-//        config.set_angular_velocity_compensation(0.0); // 0.35 for long distances, 0.5 for short
+//    config.set_linear_velocity_kp(1.8);
+//    config.set_angular_velocity_kp(3.0); // 6.0 is perfect for just turning in spot
+//    config.set_angular_velocity_compensation(0.0); // 0.35 for long distances, 0.5 for short
 }
 
 void HRVOAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive,
@@ -236,80 +236,6 @@ VelocityObstacle HRVOAgent::createVelocityObstacle(const Agent &other_agent)
 
     return VelocityObstacle(hrvo_apex, vo.getLeftSide(), vo.getRightSide());
 }
-
-
-//Circle moving_agent_circle(other_agent.getPosition(), other_agent.getRadius());
-//Circle obstacle_agent_circle(position, radius);
-//
-////                         this agent             other agent
-////    generateVelocityObstacle(obstacle_agent_circle, moving_agent_circle, velocity);
-//
-//const Vector robot_to_obstacle_vector        = obstacle_agent_circle.origin() - moving_agent_circle.origin();
-//const Angle robot_relative_to_obstacle_angle = robot_to_obstacle_vector.orientation();
-//
-//// opening angle of each side is defined as the obstacle radius plus the robot radius
-//Angle opening_angle;
-//
-//if (intersects(moving_agent_circle, obstacle_agent_circle))
-//{
-//// The robot is colliding with obstacle.
-//// Creates Velocity Obstacle with the sides being ~180 degrees
-//// apart from each other (90 degrees relative to the robot to
-//// obstacle vector).
-//// Subtracting by a slight offset to avoid the velocity obstacle
-//// from being the complement of what we want (since VOs are defined as
-//// area created between the smallest angles between the two sides).
-//opening_angle = Angle::quarter() - Angle::fromRadians(0.0001);
-//}
-//else
-//{
-//opening_angle = Angle::asin((other_agent.getRadius() + radius) /
-//                            robot_to_obstacle_vector.length());
-//}
-//
-//// Direction of the two edges of the velocity obstacle
-//Vector side1 =
-//        Vector::createFromAngle(robot_relative_to_obstacle_angle - opening_angle);
-//Vector side2 =
-//        Vector::createFromAngle(robot_relative_to_obstacle_angle + opening_angle);
-//
-//VelocityObstacle velocity_obstacle(velocity, side1, side2);
-//
-//
-//const Vector relativePosition = position - other_agent.getPosition();
-//const Vector relativeVelocity = velocity - other_agent.getVelocity();
-//const float combinedRadius = radius + other_agent.getRadius();
-//
-////    const float angle = std::atan(relativePosition);
-////    const float openingAngle =
-////            std::asin((combinedRadius) / abs(relativePosition));
-////
-////    velocityObstacle.side1_ = Vector2(std::cos(angle - openingAngle),
-////                                      std::sin(angle - openingAngle));
-////    velocityObstacle.side2_ = Vector2(std::cos(angle + openingAngle),
-////                                      std::sin(angle + openingAngle));
-//
-//const float d = 2.0F * std::sin(openingAngle) * std::cos(openingAngle);
-//
-//if (det(relativePosition, prefVelocity_ - other->prefVelocity_) > 0.0F) {
-//const float s =
-//        0.5F * det(relativeVelocity, velocityObstacle.side2_) / d;
-//
-//velocityObstacle.apex_ =
-//other->velocity_ + s * velocityObstacle.side1_ -
-//(uncertaintyOffset_ * abs(relativePosition) / (combinedRadius)) *
-//normalize(relativePosition);
-//} else {
-//const float s =
-//        0.5F * det(relativeVelocity, velocityObstacle.side1_) / d;
-//
-//velocityObstacle.apex_ =
-//other->velocity_ + s * velocityObstacle.side2_ -
-//(uncertaintyOffset_ * abs(relativePosition) / (combinedRadius)) *
-//normalize(relativePosition);
-//}
-//
-//velocityObstacles_.push_back(velocityObstacle);
 
 void HRVOAgent::computeNewAngularVelocity(Duration time_step)
 {
@@ -728,6 +654,7 @@ Vector HRVOAgent::computePreferredVelocity(Duration time_step)
     const double vx = local_error.x() * config.linear_velocity_kp();
     const double vy = local_error.y() * config.linear_velocity_kp();
     Vector pid_vel = Vector(vx, vy);
+    pid_vel = pid_vel.normalize(std::min(pid_vel.length(), velocity.length() + max_accel * time_step.toSeconds())); // TODO: Make PID vel shorter to avoid swing
     Vector curr_local_velocity = globalToLocalVelocity(velocity, orientation);
     Vector delta_velocity = pid_vel - curr_local_velocity;
 
@@ -814,13 +741,13 @@ void HRVOAgent::visualize(TeamColour friendly_team_colour)
         *(hrvo_visualization.add_robots()) = ball_circle;
     }
 
-    LOG(VISUALIZE) << hrvo_visualization;
-//    if (friendly_team_colour == TeamColour::YELLOW)
-//    {
-//        LOG(VISUALIZE, YELLOW_HRVO_PATH) << hrvo_visualization;
-//    }
-//    else
-//    {
-//        LOG(VISUALIZE, BLUE_HRVO_PATH) << hrvo_visualization;
-//    }
+//    LOG(VISUALIZE) << hrvo_visualization; // TODO: Can't LOG to a path from the robots
+    if (friendly_team_colour == TeamColour::YELLOW)
+    {
+        LOG(VISUALIZE, YELLOW_HRVO_PATH) << hrvo_visualization;
+    }
+    else
+    {
+        LOG(VISUALIZE, BLUE_HRVO_PATH) << hrvo_visualization;
+    }
 }

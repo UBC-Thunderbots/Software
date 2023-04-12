@@ -29,7 +29,18 @@ void HRVOSimulator::updateWorld(const World &world,
 
         if (hrvo_agent != robots.end())
         {
-            updateAgent(hrvo_agent->second, friendly_robot);
+            if (friendly_robot.id() != robot_id)
+            {
+                // We do not want velocity feedback for the robot which is running
+                // this HRVO simulator as it prevents it from being able to accelerate
+                // at its maximum acceleration.
+                hrvo_agent->second->setPosition(friendly_robot.position());
+                hrvo_agent->second->setOrientation(friendly_robot.orientation());
+            }
+            else
+            {
+                updateAgent(hrvo_agent->second, friendly_robot);
+            }
         }
         else
         {
@@ -105,12 +116,8 @@ void HRVOSimulator::updateAgent(const std::shared_ptr<Agent> &agent,
 {
     agent->setPosition(robot.position());
     agent->setOrientation(robot.orientation());
-    if (robot.id() != robot_id)
-    {
-        // TODO: This will prevent an enemy robots with same id to get updated. Refactor to above method?!
-        agent->setVelocity(robot.velocity()); // Turn off feedback
-        agent->setAngularVelocity(robot.angularVelocity());
-    }
+    agent->setVelocity(robot.velocity());
+    agent->setAngularVelocity(robot.angularVelocity());
 }
 
 void HRVOSimulator::configureHRVORobot(const Robot &robot,

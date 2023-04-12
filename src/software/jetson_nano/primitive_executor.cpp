@@ -54,22 +54,21 @@ void PrimitiveExecutor::updateVelocity(const Vector &local_velocity,
                                        const AngularVelocity &angular_velocity)
 {
     // TODO: Add feedback logic here
+    Vector curr_velocity = hrvo_simulator_.getRobotVelocity(robot_id_);
+    if ((curr_velocity - local_velocity).length() > 1.5)
+    {
+        LOG(INFO) << "Update robot linear velocity";
+        hrvo_simulator_.updateRobotVelocity(
+            robot_id_, localToGlobalVelocity(local_velocity, curr_orientation_));
+    }
 
-//    Vector curr_velocity = hrvo_simulator_.getRobotVelocity(robot_id_);
-//    if ((curr_velocity - local_velocity).length() > 3.0)
-//    {
-//        LOG(INFO) << "Update robot linear velocity";
-//        hrvo_simulator_.updateRobotVelocity(
-//            robot_id_, localToGlobalVelocity(local_velocity, curr_orientation_));
-//    }
-//
-//    AngularVelocity curr_angular_velocity = hrvo_simulator_.getRobotAngularVelocity(robot_id_);
-//    if (angular_velocity.minDiff(curr_angular_velocity).toRadians() > 10.0)
-//    {
-//        LOG(INFO) << "Update robot angular velocity";
-//        hrvo_simulator_.updateRobotAngularVelocity(
-//            robot_id_, angular_velocity);
-//    }
+    AngularVelocity curr_angular_velocity = hrvo_simulator_.getRobotAngularVelocity(robot_id_);
+    if (angular_velocity.minDiff(curr_angular_velocity).toRadians() > 5.0)
+    {
+        LOG(INFO) << "Update robot angular velocity";
+        hrvo_simulator_.updateRobotAngularVelocity(
+            robot_id_, angular_velocity);
+    }
 }
 
 Vector PrimitiveExecutor::getTargetLinearVelocity()
