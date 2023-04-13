@@ -246,7 +246,4 @@ class HRVOAgent : public Agent
     // threshold for the minimum preferred speed.
     // Used in order to filter slow candidate velocities
     static constexpr double MIN_PREF_SPEED_MULTIPLIER = 0.5;
-
-    std::string team_color;
-    unsigned int actual_id;
 };

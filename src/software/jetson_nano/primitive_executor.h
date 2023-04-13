@@ -84,7 +84,7 @@ class PrimitiveExecutor
     RobotConstants_t robot_constants_;
     HRVOSimulator hrvo_simulator_;
 
-    // TODO (#): Add dynamic time_step to `stepPrimitive` and remove this constant
+    // TODO (#2855): Add dynamic time_step to `stepPrimitive` and remove this constant
     // time step to be used, in Seconds
     Duration time_step_;
     Angle curr_orientation_;

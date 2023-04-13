@@ -11,8 +11,7 @@ HRVOAgent::HRVOAgent(RobotId robot_id, const RobotState &robot_state,
             max_angular_speed, max_angular_accel, max_radius_inflation),
       obstacle_factory(TbotsProto::RobotNavigationObstacleConfig()),
       neighbours(),
-      config(),
-      team_color("y")  // TODO REMOVE
+      config()
 {
 }
 
@@ -273,11 +272,6 @@ void HRVOAgent::computeNewAngularVelocity(Duration time_step)
     orientation += ((angular_velocity + desired) / 2) * time_step.toSeconds();
 
     angular_velocity = desired;
-
-    std::map<std::string, double> plotjuggler_values;
-    plotjuggler_values.insert(
-        {std::to_string(robot_id) + team_color + "_vt", angular_velocity.toDegrees()});
-    LOG(PLOTJUGGLER) << *createPlotJugglerValue(plotjuggler_values);
 }
 
 
@@ -674,34 +668,6 @@ Vector HRVOAgent::computePreferredVelocity(Duration time_step)
     output = output.rotate(-angular_velocity * time_step.toSeconds() *
                            config.angular_velocity_compensation());
 
-    std::map<std::string, double> plotjuggler_values;
-    plotjuggler_values.insert(
-        {std::to_string(robot_id) + team_color + "_acceleration_limit",
-         acceleration_limit});
-    plotjuggler_values.insert({std::to_string(robot_id) + team_color + "_local_delta_vx",
-                               (output - curr_local_velocity).x()});
-    plotjuggler_values.insert({std::to_string(robot_id) + team_color + "_local_delta_vy",
-                               (output - curr_local_velocity).y()});
-    plotjuggler_values.insert(
-        {std::to_string(robot_id) + team_color + "_local_error_x", local_error.x()});
-    plotjuggler_values.insert(
-        {std::to_string(robot_id) + team_color + "_local_error_y", local_error.y()});
-    plotjuggler_values.insert(
-        {std::to_string(robot_id) + team_color + "_local_pid_vx", pid_vel.x()});
-    plotjuggler_values.insert(
-        {std::to_string(robot_id) + team_color + "_local_pid_vy", pid_vel.y()});
-    plotjuggler_values.insert(
-        {std::to_string(robot_id) + team_color + "_local_normalized_pid_vx",
-         realistic_pid_vel.x()});
-    plotjuggler_values.insert(
-        {std::to_string(robot_id) + team_color + "_local_normalized_pid_vy",
-         realistic_pid_vel.y()});
-    plotjuggler_values.insert(
-        {std::to_string(robot_id) + team_color + "_local_clamped_vx", output.x()});
-    plotjuggler_values.insert(
-        {std::to_string(robot_id) + team_color + "_local_clamped_vy", output.y()});
-    LOG(PLOTJUGGLER) << *createPlotJugglerValue(plotjuggler_values);
-
     return localToGlobalVelocity(output, orientation);
 }
 
@@ -717,8 +683,6 @@ std::vector<VelocityObstacle> HRVOAgent::getVelocityObstacles()
 
 void HRVOAgent::visualize(TeamColour friendly_team_colour)
 {
-    // TODO: Added for debugging and plotjuggler
-    team_color = friendly_team_colour == TeamColour::YELLOW ? "y" : "b";
     TbotsProto::HRVOVisualization hrvo_visualization;
 
     // Visualize this agent
@@ -750,8 +714,9 @@ void HRVOAgent::visualize(TeamColour friendly_team_colour)
         *(hrvo_visualization.add_robots()) = ball_circle;
     }
 
-    //    LOG(VISUALIZE) << hrvo_visualization; // TODO: Can't LOG to a path from the
-    //    robots
+    // TODO (#2838): For HRVOVisualization logs to be sent properly from the robot, no
+    // path should be passed as a second argument to LOG
+    //    i.e. LOG(VISUALIZE) << hrvo_visualization;
     if (friendly_team_colour == TeamColour::YELLOW)
     {
         LOG(VISUALIZE, YELLOW_HRVO_PATH) << hrvo_visualization;
