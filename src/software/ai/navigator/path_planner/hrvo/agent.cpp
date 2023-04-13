@@ -1,8 +1,9 @@
 #include "agent.h"
 
-Agent::Agent(RobotId robot_id, const RobotState &robot_state, const RobotPath &path, double radius,
-             double max_speed, double max_accel, double max_decel, double max_angular_speed,
-             double max_angular_accel, double max_radius_inflation)
+Agent::Agent(RobotId robot_id, const RobotState &robot_state, const RobotPath &path,
+             double radius, double max_speed, double max_accel, double max_decel,
+             double max_angular_speed, double max_angular_accel,
+             double max_radius_inflation)
     : robot_id(robot_id),
       path(path),
       radius(radius),
@@ -73,10 +74,12 @@ void Agent::updateRadiusFromVelocity()
 {
     // Calculate the updated radius of the agent based on its current velocity
     // The radius is calculated using a 4th degree polynomial which at 0 velocity
-    // is equal to min_radius, and at max_speed is equal to min_radius + max_radius_inflation.
-    // A 4th degree polynomial was chosen because we want the radius to increase quickly for smaller velocities.
+    // is equal to min_radius, and at max_speed is equal to min_radius +
+    // max_radius_inflation. A 4th degree polynomial was chosen because we want the radius
+    // to increase quickly for smaller velocities.
     double a = -max_radius_inflation / std::pow(max_speed, 4.0);
-    radius = min_radius + max_radius_inflation + a * std::pow(velocity.length() - max_speed, 4.0);
+    radius   = min_radius + max_radius_inflation +
+             a * std::pow(velocity.length() - max_speed, 4.0);
 }
 
 double Agent::getMaxAccel() const

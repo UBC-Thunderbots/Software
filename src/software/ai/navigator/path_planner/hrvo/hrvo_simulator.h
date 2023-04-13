@@ -148,8 +148,7 @@ class HRVOSimulator
      * @param agent The simulator agent being updated.
      * @param robot the world robot whose values should be used
      */
-    void updateAgent(const std::shared_ptr<Agent> &agent,
-                            const Robot &robot);
+    void updateAgent(const std::shared_ptr<Agent> &agent, const Robot &robot);
 
     RobotId robot_id;
 

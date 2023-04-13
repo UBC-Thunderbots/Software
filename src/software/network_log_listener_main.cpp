@@ -31,8 +31,9 @@ void logFromNetworking(TbotsProto::RobotLog log)
 
     LOG(level) << "[ROBOT " << log.robot_id() << " " << LogLevel_Name(log.log_level())
                << "]"
-               << "[" << log.file_name() << ":" << log.line_number()
-               << "] " << log.created_timestamp().epoch_timestamp_seconds() << ": " << log.log_msg();
+               << "[" << log.file_name() << ":" << log.line_number() << "] "
+               << log.created_timestamp().epoch_timestamp_seconds() << ": "
+               << log.log_msg();
 }
 
 int main(int argc, char **argv)
@@ -40,9 +41,9 @@ int main(int argc, char **argv)
     // load command line arguments
     struct CommandLineArgs
     {
-        bool help = false;
-        std::string interface = "";
-        int channel = 0;
+        bool help                     = false;
+        std::string interface         = "";
+        int channel                   = 0;
         std::vector<int> filtered_ids = {};
     };
 
@@ -54,12 +55,12 @@ int main(int argc, char **argv)
     desc.add_options()("interface",
                        boost::program_options::value<std::string>(&args.interface),
                        "Which network interface to listen for messages from");
-    desc.add_options()("channel",
-                       boost::program_options::value<int>(&args.channel),
+    desc.add_options()("channel", boost::program_options::value<int>(&args.channel),
                        "Multicast channel to listen on connect to");
-    desc.add_options()("filtered_ids",
-                       boost::program_options::value<std::vector<int>>(&args.filtered_ids)->multitoken(),
-                       "Robot IDs to filter out of the logs");
+    desc.add_options()(
+        "filtered_ids",
+        boost::program_options::value<std::vector<int>>(&args.filtered_ids)->multitoken(),
+        "Robot IDs to filter out of the logs");
 
     boost::program_options::variables_map vm;
     boost::program_options::store(parse_command_line(argc, argv, desc), vm);
@@ -84,8 +85,8 @@ int main(int argc, char **argv)
 
     // Callback which filters out the logs from robots with filtered_id
     auto robot_log_callback = [args](TbotsProto::RobotLog log) {
-        if (std::find(args.filtered_ids.begin(), args.filtered_ids.end(), log.robot_id()) !=
-            args.filtered_ids.end())
+        if (std::find(args.filtered_ids.begin(), args.filtered_ids.end(),
+                      log.robot_id()) != args.filtered_ids.end())
         {
             return;
         }
@@ -93,8 +94,8 @@ int main(int argc, char **argv)
     };
 
     auto log_input = std::make_unique<ThreadedProtoUdpListener<TbotsProto::RobotLog>>(
-            std::string(ROBOT_MULTICAST_CHANNELS.at(args.channel)) + "%" + args.interface,
-            ROBOT_LOGS_PORT, robot_log_callback, true);
+        std::string(ROBOT_MULTICAST_CHANNELS.at(args.channel)) + "%" + args.interface,
+        ROBOT_LOGS_PORT, robot_log_callback, true);
 
 
     LOG(INFO) << "Network logger listening on channel "

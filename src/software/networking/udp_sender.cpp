@@ -1,9 +1,9 @@
 #include "udp_sender.h"
+
 #include <iostream>
 
-UdpSender::UdpSender(boost::asio::io_service& io_service,
-                    const std::string& ip_address,
-                    const unsigned short port, bool multicast)
+UdpSender::UdpSender(boost::asio::io_service& io_service, const std::string& ip_address,
+                     const unsigned short port, bool multicast)
     : socket_(io_service)
 {
     boost::asio::ip::address addr = boost::asio::ip::make_address(ip_address);

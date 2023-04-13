@@ -59,21 +59,24 @@ void PrimitiveExecutor::updateWorld(const TbotsProto::World &world_msg)
 void PrimitiveExecutor::updateVelocity(const Vector &local_velocity,
                                        const AngularVelocity &angular_velocity)
 {
-    // To allow robots to accelerate smoothly, we only update their simulated velocity if it is
-    // significantly different from the actual robot velocity
+    // To allow robots to accelerate smoothly, we only update their simulated velocity if
+    // it is significantly different from the actual robot velocity
     Vector curr_hrvo_velocity = hrvo_simulator_.getRobotVelocity(robot_id_);
-    Vector actual_global_velocity = localToGlobalVelocity(local_velocity, curr_orientation_);
-    if ((curr_hrvo_velocity - actual_global_velocity).length() > LINEAR_VELOCITY_FEEDBACK_THRESHOLD_M_PER_S)
+    Vector actual_global_velocity =
+        localToGlobalVelocity(local_velocity, curr_orientation_);
+    if ((curr_hrvo_velocity - actual_global_velocity).length() >
+        LINEAR_VELOCITY_FEEDBACK_THRESHOLD_M_PER_S)
     {
         hrvo_simulator_.updateRobotVelocity(
             robot_id_, localToGlobalVelocity(local_velocity, curr_orientation_));
     }
 
-    AngularVelocity curr_angular_velocity = hrvo_simulator_.getRobotAngularVelocity(robot_id_);
-    if (angular_velocity.minDiff(curr_angular_velocity).toDegrees() > ANGULAR_VELOCITY_FEEDBACK_THRESHOLD_DEG_PER_S)
+    AngularVelocity curr_angular_velocity =
+        hrvo_simulator_.getRobotAngularVelocity(robot_id_);
+    if (angular_velocity.minDiff(curr_angular_velocity).toDegrees() >
+        ANGULAR_VELOCITY_FEEDBACK_THRESHOLD_DEG_PER_S)
     {
-        hrvo_simulator_.updateRobotAngularVelocity(
-            robot_id_, angular_velocity);
+        hrvo_simulator_.updateRobotAngularVelocity(robot_id_, angular_velocity);
     }
 }
 
@@ -114,9 +117,8 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
         case TbotsProto::Primitive::kMove:
         {
             // Compute the target velocities
-            Vector target_velocity = getTargetLinearVelocity();
-            AngularVelocity target_angular_velocity =
-                    getTargetAngularVelocity();
+            Vector target_velocity                  = getTargetLinearVelocity();
+            AngularVelocity target_angular_velocity = getTargetAngularVelocity();
 
             auto output = createDirectControlPrimitive(
                 target_velocity, target_angular_velocity,

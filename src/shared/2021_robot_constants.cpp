@@ -23,7 +23,7 @@ RobotConstants_t create2021RobotConstants(void)
         .robot_max_deceleration_m_per_s_2       = 6.0f,
         .robot_max_ang_acceleration_rad_per_s_2 = 30.0f,
         // Dribbler speeds are negative as that is the direction that sucks the ball in
-        .indefinite_dribbler_speed_rpm = -10000.0f,
+        .indefinite_dribbler_speed_rpm      = -10000.0f,
         .max_force_dribbler_speed_rpm       = -12000.0f,
         .wheel_radius_meters                = 0.03f,
         .wheel_rotations_per_motor_rotation = 17.0f / 60.0f};

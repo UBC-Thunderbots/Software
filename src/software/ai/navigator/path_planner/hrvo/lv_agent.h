@@ -28,8 +28,9 @@ class LVAgent : public Agent
      * @param max_radius_inflation  The maximum amount which the radius of this agent can
      * inflate.
      */
-    LVAgent(RobotId robot_id, const RobotState &robot_state, const RobotPath &path, double radius, double max_speed,
-            double max_accel, double max_decel, double max_angular_speed, double max_angular_accel,
+    LVAgent(RobotId robot_id, const RobotState &robot_state, const RobotPath &path,
+            double radius, double max_speed, double max_accel, double max_decel,
+            double max_angular_speed, double max_angular_accel,
             double max_radius_inflation);
 
     /**

@@ -1,11 +1,11 @@
 #include "software/logger/network_sink.h"
 
-#include "proto/robot_log_msg.pb.h"
-#include "shared/constants.h"
-#include "software/logger/custom_logging_levels.h"
 #include "base64.h"
 #include "google/protobuf/any.pb.h"
 #include "proto/message_translation/tbots_protobuf.h"
+#include "proto/robot_log_msg.pb.h"
+#include "shared/constants.h"
+#include "software/logger/custom_logging_levels.h"
 
 NetworkSink::NetworkSink(unsigned int channel, const std::string& interface, int robot_id)
     : robot_id(robot_id)
@@ -30,17 +30,20 @@ void NetworkSink::sendToNetwork(g3::LogMessageMover log_entry)
         size_t file_name_pos  = msg.find(PROTO_MSG_TYPE_DELIMITER);
         std::string file_name = msg.substr(0, file_name_pos);
 
-        size_t proto_type_name_pos = msg.find(PROTO_MSG_TYPE_DELIMITER, file_name_pos + 1);
+        size_t proto_type_name_pos =
+            msg.find(PROTO_MSG_TYPE_DELIMITER, file_name_pos + 1);
         std::string proto_type_name =
-                msg.substr(file_name_pos + PROTO_MSG_TYPE_DELIMITER.length(),
-                           proto_type_name_pos - PROTO_MSG_TYPE_DELIMITER.length());
+            msg.substr(file_name_pos + PROTO_MSG_TYPE_DELIMITER.length(),
+                       proto_type_name_pos - PROTO_MSG_TYPE_DELIMITER.length());
         std::string serialized_proto =
-                msg.substr(proto_type_name_pos + PROTO_MSG_TYPE_DELIMITER.length());
+            msg.substr(proto_type_name_pos + PROTO_MSG_TYPE_DELIMITER.length());
 
-        // TODO (#2838): Rewrite the following code to be generalized and work for all LOG(VISUALIZE) protobuf types
+        // TODO (#2838): Rewrite the following code to be generalized and work for all
+        // LOG(VISUALIZE) protobuf types
         if (proto_type_name == "TbotsProto.HRVOVisualization")
         {
-            // We actually only just send the Serialized Proto, and exclude the proto type and delimiters
+            // We actually only just send the Serialized Proto, and exclude the proto type
+            // and delimiters
             google::protobuf::Any any;
             any.ParseFromString(base64_decode(serialized_proto));
             any.UnpackTo(&log_msg_proto);

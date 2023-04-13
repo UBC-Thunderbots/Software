@@ -66,7 +66,7 @@ static const char* DRIVER_CONTROL_ENABLE_GPIO             = "194";
 static double MECHANICAL_MPS_PER_ELECTRICAL_RPM = 0.000111;
 static double ELECTRICAL_RPM_PER_MECHANICAL_MPS = 1 / MECHANICAL_MPS_PER_ELECTRICAL_RPM;
 
-static double RUNAWAY_PROTECTION_THRESHOLD_MPS       = 2.00;
+static double RUNAWAY_PROTECTION_THRESHOLD_MPS         = 2.00;
 static int DRIBBLER_ACCELERATION_THRESHOLD_RPM_PER_S_2 = 10000;
 
 
@@ -451,12 +451,15 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
 
     // Ramp the dribbler velocity
     // Clamp the max acceleration
-    int max_dribbler_delta_vel = static_cast<int>(DRIBBLER_ACCELERATION_THRESHOLD_RPM_PER_S_2 * time_elapsed_since_last_poll_s);
-    int delta_vel = std::clamp(target_dribbler_rpm - ramp_rpm, -max_dribbler_delta_vel, max_dribbler_delta_vel);
+    int max_dribbler_delta_vel = static_cast<int>(
+        DRIBBLER_ACCELERATION_THRESHOLD_RPM_PER_S_2 * time_elapsed_since_last_poll_s);
+    int delta_vel = std::clamp(target_dribbler_rpm - ramp_rpm, -max_dribbler_delta_vel,
+                               max_dribbler_delta_vel);
     ramp_rpm += delta_vel;
 
     // Clamp the max speed
-    int max_dribbler_vel = std::abs(static_cast<int>(robot_constants_.max_force_dribbler_speed_rpm));
+    int max_dribbler_vel =
+        std::abs(static_cast<int>(robot_constants_.max_force_dribbler_speed_rpm));
     ramp_rpm = std::clamp(ramp_rpm, -max_dribbler_vel, max_dribbler_vel);
 
     tmc4671_setTargetVelocity(DRIBBLER_MOTOR_CHIP_SELECT, ramp_rpm);

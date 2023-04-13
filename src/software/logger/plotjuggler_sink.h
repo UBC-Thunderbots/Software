@@ -1,10 +1,10 @@
 #pragma once
-#include "software/networking/threaded_udp_sender.h"
 #include <g3log/logmessage.hpp>
 #include <string>
 
 #include "proto/visualization.pb.h"
 #include "software/logger/custom_logging_levels.h"
+#include "software/networking/threaded_udp_sender.h"
 
 
 /**

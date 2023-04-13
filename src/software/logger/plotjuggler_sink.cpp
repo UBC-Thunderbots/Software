@@ -2,10 +2,11 @@
 #include "software/logger/plotjuggler_sink.h"
 
 #include <google/protobuf/util/json_util.h>
+
 #include "shared/constants.h"
 
-PlotJugglerSink::PlotJugglerSink() :
-    udp_sender(PLOTJUGGLER_GUI_DEFAULT_HOST, PLOTJUGGLER_GUI_DEFAULT_PORT, false)
+PlotJugglerSink::PlotJugglerSink()
+    : udp_sender(PLOTJUGGLER_GUI_DEFAULT_HOST, PLOTJUGGLER_GUI_DEFAULT_PORT, false)
 {
 }
 
@@ -23,7 +24,7 @@ std::ostream& operator<<(std::ostream& os,
     std::string json_string;
 
     google::protobuf::util::JsonPrintOptions options;
-    options.add_whitespace = false;
+    options.add_whitespace                = false;
     options.always_print_primitive_fields = true;
     options.preserve_proto_field_names    = true;
 

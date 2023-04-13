@@ -91,6 +91,6 @@ class PrimitiveExecutor
     RobotId robot_id_;
 
     // Thresholds for when we should update HRVO Simulator's velocity
-    static constexpr const double LINEAR_VELOCITY_FEEDBACK_THRESHOLD_M_PER_S = 1.0;
+    static constexpr const double LINEAR_VELOCITY_FEEDBACK_THRESHOLD_M_PER_S    = 1.0;
     static constexpr const double ANGULAR_VELOCITY_FEEDBACK_THRESHOLD_DEG_PER_S = 200.0;
 };

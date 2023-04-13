@@ -381,7 +381,10 @@ if __name__ == "__main__":
         ) as simulator, FullSystem(
             args.blue_full_system_runtime_dir, args.debug_blue_full_system, False, False
         ) as blue_fs, FullSystem(
-            args.yellow_full_system_runtime_dir, args.debug_yellow_full_system, True, False
+            args.yellow_full_system_runtime_dir,
+            args.debug_yellow_full_system,
+            True,
+            False,
         ) as yellow_fs, ProtoLogger(
             args.blue_full_system_runtime_dir,
         ) as blue_logger, ProtoLogger(

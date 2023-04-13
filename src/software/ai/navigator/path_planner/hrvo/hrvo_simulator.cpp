@@ -1,6 +1,9 @@
 #include "hrvo_simulator.h"
 
-HRVOSimulator::HRVOSimulator(RobotId robot_id) : robot_id(robot_id), robots(), world(std::nullopt), primitive_set() {}
+HRVOSimulator::HRVOSimulator(RobotId robot_id)
+    : robot_id(robot_id), robots(), world(std::nullopt), primitive_set()
+{
+}
 
 void HRVOSimulator::updateWorld(const World &world,
                                 const RobotConstants_t &robot_constants,
@@ -111,8 +114,7 @@ void HRVOSimulator::updatePrimitiveSet(const TbotsProto::PrimitiveSet &new_primi
     }
 }
 
-void HRVOSimulator::updateAgent(const std::shared_ptr<Agent> &agent,
-                                const Robot &robot)
+void HRVOSimulator::updateAgent(const std::shared_ptr<Agent> &agent, const Robot &robot)
 {
     agent->setPosition(robot.position());
     agent->setOrientation(robot.orientation());
@@ -145,7 +147,8 @@ void HRVOSimulator::configureHRVORobot(const Robot &robot,
 
     // Max distance which the robot can travel in one time step
     double max_radius = (max_speed * time_step.toSeconds()) / 2;
-    RobotPath path    = RobotPath({PathPoint(robot.position(), 0.0, robot.orientation())}, max_radius);
+    RobotPath path =
+        RobotPath({PathPoint(robot.position(), 0.0, robot.orientation())}, max_radius);
 
     std::shared_ptr<HRVOAgent> agent = std::make_shared<HRVOAgent>(
         robot.id(), robot.currentState(), path, ROBOT_MAX_RADIUS_METERS, max_speed,
@@ -168,9 +171,9 @@ void HRVOSimulator::configureLVRobot(const Robot &robot,
                                      Duration time_step)
 {
     // Assume that enemy robots will continue to move in their current direction.
-    Point destination = robot.position() + 2 * robot.velocity();
-    double max_speed  = robot_constants.robot_max_speed_m_per_s;
-    double max_angular_speed  = robot_constants.robot_max_ang_speed_rad_per_s;
+    Point destination        = robot.position() + 2 * robot.velocity();
+    double max_speed         = robot_constants.robot_max_speed_m_per_s;
+    double max_angular_speed = robot_constants.robot_max_ang_speed_rad_per_s;
 
     // Max distance which the robot can travel in one time step + scaling
     double path_radius = (robot.velocity().length() * time_step.toSeconds()) / 2;

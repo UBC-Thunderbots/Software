@@ -20,8 +20,7 @@ class ThreadedUdpSender
      * @param port The port to send sendString data on
      * @param multicast If true, joins the multicast group of given ip_address
      */
-    ThreadedUdpSender(const std::string& ip_address, unsigned short port,
-                           bool multicast);
+    ThreadedUdpSender(const std::string& ip_address, unsigned short port, bool multicast);
 
     ~ThreadedUdpSender();
 

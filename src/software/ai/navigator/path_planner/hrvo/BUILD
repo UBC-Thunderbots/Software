@@ -39,8 +39,8 @@ cc_library(
         "//software/geom:vector",
         "//software/geom/algorithms:nearest_neighbor_search",
         "//software/networking:threaded_proto_unix_sender",
+        "//software/physics:velocity_conversion_util",
         "//software/world",
-        "//software/physics:velocity_conversion_util"
     ],
 )
 
