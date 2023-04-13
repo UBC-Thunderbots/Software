@@ -7,17 +7,12 @@ NetworkService::NetworkService(const std::string& ip_address,
     : primitive_tracker(ProtoTracker("primitive set")),
       world_tracker(ProtoTracker("world"))
 {
-    LOG(INFO) << "Initializing ThreadedProtoUdpSender<TbotsProto::RobotStatus>";
     sender = std::make_unique<ThreadedProtoUdpSender<TbotsProto::RobotStatus>>(
         ip_address, robot_status_sender_port, multicast);
-
-    LOG(INFO) << "Initializing ThreadedProtoUdpListener<TbotsProto::PrimitiveSet>";
     listener_primitive_set =
         std::make_unique<ThreadedProtoUdpListener<TbotsProto::PrimitiveSet>>(
             ip_address, primitive_listener_port,
             boost::bind(&NetworkService::primitiveSetCallback, this, _1), multicast);
-
-    LOG(INFO) << "Initializing ThreadedProtoUdpListener<TbotsProto::World>";
     listener_world = std::make_unique<ThreadedProtoUdpListener<TbotsProto::World>>(
         ip_address, world_listener_port,
         boost::bind(&NetworkService::worldCallback, this, _1), multicast);
@@ -29,7 +24,6 @@ std::tuple<TbotsProto::PrimitiveSet, TbotsProto::World> NetworkService::poll(
     std::scoped_lock lock{primitive_set_mutex, world_mutex};
     TbotsProto::RobotStatus new_status = robot_status;
     new_status.set_last_handled_primitive_set(primitive_set_msg.sequence_number());
-//    LOG(INFO) << "Sending robot status proto";
     sender->sendProto(robot_status);
     return std::tuple<TbotsProto::PrimitiveSet, TbotsProto::World>{primitive_set_msg,
                                                                    world_msg};

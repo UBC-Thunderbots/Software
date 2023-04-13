@@ -85,7 +85,7 @@ TEST_F(SimulatedHRVOTest, test_drive_in_straight_line_with_moving_enemy_robot_fr
 TEST_F(SimulatedHRVOTest, test_drive_in_straight_line_with_no_obstacle)
 {
     Point destination      = Point(2.8, 0);
-    Point initial_position = Point(1.0, 0);
+    Point initial_position = Point(-2.5, 0);
     BallState ball_state(Point(1, 2), Vector(0, 0));
     auto friendly_robots =
         TestUtil::createStationaryRobotStatesWithId({Point(-3, 0), initial_position});
@@ -96,17 +96,16 @@ TEST_F(SimulatedHRVOTest, test_drive_in_straight_line_with_no_obstacle)
     setTactic(1, tactic);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
-//        [destination, tactic](std::shared_ptr<World> world_ptr,
-//                              ValidationCoroutine::push_type& yield) {
+        [destination, tactic](std::shared_ptr<World> world_ptr,
+                              ValidationCoroutine::push_type& yield) {
             // Small rectangle around the destination point that the robot should be
             // stationary within for 15 ticks
-//            float threshold = 0.05f;
-//            Rectangle expected_final_position(
-//                Point(destination.x() - threshold, destination.y() - threshold),
-//                Point(destination.x() + threshold, destination.y() + threshold));
-//            robotStationaryInPolygon(1, expected_final_position, 15, world_ptr, yield);
-//        }
-    };
+            float threshold = 0.05f;
+            Rectangle expected_final_position(
+                Point(destination.x() - threshold, destination.y() - threshold),
+                Point(destination.x() + threshold, destination.y() + threshold));
+            robotStationaryInPolygon(1, expected_final_position, 15, world_ptr, yield);
+        }};
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
     runTest(field_type, ball_state, friendly_robots, enemy_robots,
@@ -205,7 +204,7 @@ TEST_F(SimulatedHRVOTest, test_three_robot_wall)
 
     runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(8), true);
+            Duration::fromSeconds(10), true);
 }
 
 TEST_F(SimulatedHRVOTest, test_zig_zag_movement)

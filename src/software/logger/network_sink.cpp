@@ -10,14 +10,10 @@
 NetworkSink::NetworkSink(unsigned int channel, const std::string& interface, int robot_id)
     : robot_id(robot_id)
 {
-    std::cerr << "cerr ThreadedProtoUdpSender<TbotsProto::RobotLog>";
-    std::clog << "clog ThreadedProtoUdpSender<TbotsProto::RobotLog>";
     log_output.reset(new ThreadedProtoUdpSender<TbotsProto::RobotLog>(
         std::string(ROBOT_MULTICAST_CHANNELS.at(channel)) + "%" + interface,
         ROBOT_LOGS_PORT, true));
 
-    std::cerr << "cerr ThreadedProtoUdpSender<TbotsProto::HRVOVisualization>";
-    std::clog << "clog ThreadedProtoUdpSender<TbotsProto::HRVOVisualization>";
     log_visualize_output.reset(new ThreadedProtoUdpSender<TbotsProto::HRVOVisualization>(
         std::string(ROBOT_MULTICAST_CHANNELS.at(channel)) + "%" + interface,
         LOG_VISUALIZE_PORT, true));
@@ -41,6 +37,7 @@ void NetworkSink::sendToNetwork(g3::LogMessageMover log_entry)
         std::string serialized_proto =
                 msg.substr(proto_type_name_pos + PROTO_MSG_TYPE_DELIMITER.length());
 
+        // TODO (#2838): Rewrite the following code to be generalized and work for all LOG(VISUALIZE) protobuf types
         if (proto_type_name == "TbotsProto.HRVOVisualization")
         {
             // We actually only just send the Serialized Proto, and exclude the proto type and delimiters
@@ -64,7 +61,6 @@ void NetworkSink::sendToNetwork(g3::LogMessageMover log_entry)
         log_msg_proto.set_file_name(log_entry.get().file());
         log_msg_proto.set_line_number(
             static_cast<uint32_t>(std::stoul(log_entry.get().line())));
-        *(log_msg_proto.mutable_created_timestamp()) = *createCurrentTimestamp(); // This epoch timestamp might not have the correct format for python ...
 
         TbotsProto::Timestamp timestamp;
         const auto current_time_ms =

@@ -78,7 +78,6 @@ pybind_library(
     deps = [
         "//proto:ssl_cc_proto",
         "//proto:tbots_cc_proto",
-        "//proto:visualization_cc_proto",
         "//proto/message_translation:tbots_geometry",
         "//shared:robot_constants",
         "//software/estop:threaded_estop_reader",
@@ -89,7 +88,6 @@ pybind_library(
         "//software/geom/algorithms",
         "//software/networking:threaded_proto_udp_listener",
         "//software/networking:threaded_proto_udp_sender",
-        "//software/networking:threaded_udp_sender",
         "//software/uart:boost_uart_communication",
         "//software/world",
         "//software/world:field",

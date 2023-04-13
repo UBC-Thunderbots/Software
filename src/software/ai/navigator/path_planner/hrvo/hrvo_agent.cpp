@@ -267,6 +267,10 @@ void HRVOAgent::computeNewAngularVelocity(Duration time_step)
     orientation += ((angular_velocity + desired) / 2) * time_step.toSeconds();
 
     angular_velocity = desired;
+
+    std::map<std::string, double> plotjuggler_values;
+    plotjuggler_values.insert({std::to_string(robot_id) + team_color + "_vt", angular_velocity.toDegrees()});
+    LOG(PLOTJUGGLER) << *createPlotJugglerValue(plotjuggler_values);
 }
 
 

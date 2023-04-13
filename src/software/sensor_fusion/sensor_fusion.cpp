@@ -1,7 +1,6 @@
 #include "software/sensor_fusion/sensor_fusion.h"
 
 #include "software/logger/logger.h"
-#include "proto/message_translation/tbots_protobuf.h"
 
 SensorFusion::SensorFusion(TbotsProto::SensorFusionConfig sensor_fusion_config)
     : sensor_fusion_config(sensor_fusion_config),
@@ -35,6 +34,7 @@ std::optional<World> SensorFusion::getWorld() const
         {
             new_world.updateRefereeStage(*referee_stage);
         }
+
 
         return new_world;
     }

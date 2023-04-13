@@ -321,7 +321,6 @@ if __name__ == "__main__":
             load_blue=True,
             load_yellow=True,
             layout_path=args.layout,
-            load_gamecontroller=False,
             visualization_buffer_size=args.visualization_buffer_size,
             cost_visualization=args.cost_visualization,
         )

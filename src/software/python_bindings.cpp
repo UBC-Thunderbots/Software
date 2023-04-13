@@ -30,7 +30,6 @@
 #include "software/geom/vector.h"
 #include "software/networking/threaded_proto_udp_listener.hpp"
 #include "software/networking/threaded_proto_udp_sender.hpp"
-#include "software/networking/threaded_udp_sender.h"
 #include "software/uart/boost_uart_communication.h"
 #include "software/world/field.h"
 #include "software/world/robot.h"
@@ -327,17 +326,12 @@ PYBIND11_MODULE(python_bindings, m)
     declareThreadedProtoUdpListener<SSLProto::Referee>(m, "SSLReferee");
     declareThreadedProtoUdpListener<TbotsProto::RobotStatus>(m, "RobotStatus");
     declareThreadedProtoUdpListener<TbotsProto::RobotLog>(m, "RobotLog");
-    declareThreadedProtoUdpListener<TbotsProto::PlotJugglerValue>(m, "PlotJuggler");
     declareThreadedProtoUdpListener<SSLProto::SSL_WrapperPacket>(m, "SSLWrapperPacket");
 
     // Senders
     declareThreadedProtoUdpSender<TbotsProto::World>(m, "World");
     declareThreadedProtoUdpSender<TbotsProto::RobotStatus>(m, "RobotStatus");
     declareThreadedProtoUdpSender<TbotsProto::PrimitiveSet>(m, "PrimitiveSet");
-
-    py::class_<ThreadedUdpSender>(m, "ThreadedUdpSender")
-        .def(py::init<const std::string&, const unsigned short, bool>())
-        .def("sendString", &ThreadedUdpSender::sendString);
 
     // Estop Reader
     py::class_<ThreadedEstopReader, std::unique_ptr<ThreadedEstopReader>>(
