@@ -198,7 +198,7 @@ void HRVOAgent::computeVelocityObstacles(
 
 VelocityObstacle HRVOAgent::createVelocityObstacle(const Agent &other_agent)
 {
-    Circle moving_agent_circle(other_agent.getPosition(), radius);
+    Circle moving_agent_circle(other_agent.getPosition(), other_agent.getRadius());
     Circle obstacle_agent_circle(position, radius);
     auto vo =
         generateVelocityObstacle(obstacle_agent_circle, moving_agent_circle, velocity);
@@ -286,22 +286,7 @@ void HRVOAgent::computeNewVelocity(
     // https://gamma.cs.unc.edu/HRVO/HRVO-T-RO.pdf
 
     auto pref_velocity = computePreferredVelocity(time_step);
-
-    const auto current_path_point_opt = path.getCurrentPathPoint();
-
-    if (current_path_point_opt.has_value())
-    {
-        double distane = (current_path_point_opt.value().getPosition() - position).length();
-        double decel_distance = 0.10;
-        if (distane < decel_distance)
-        {
-            pref_velocity *= (distane / decel_distance);
-        }
-    }
-
-    std::map<std::string, double> plotjuggler_values;
-    plotjuggler_values.insert({std::to_string(robot_id) + "_pref_speed", pref_velocity.length()});
-    LOG(PLOTJUGGLER) << *createPlotJugglerValue(plotjuggler_values);
+    setPreferredVelocity(pref_velocity);
     computeVelocityObstacles(agents);
 
     // key is difference in length squared between PREFERRED and ACTUAL velocity
