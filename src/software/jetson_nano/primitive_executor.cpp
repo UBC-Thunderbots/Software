@@ -59,19 +59,19 @@ void PrimitiveExecutor::updateWorld(const TbotsProto::World &world_msg)
 void PrimitiveExecutor::updateVelocity(const Vector &local_velocity,
                                        const AngularVelocity &angular_velocity)
 {
-    // TODO: Add feedback logic here
-    Vector curr_velocity = hrvo_simulator_.getRobotVelocity(robot_id_);
-    if ((curr_velocity - local_velocity).length() > 1.5)
+    // To allow robots to accelerate smoothly, we only update their simulated velocity if it is
+    // significantly different from the actual robot velocity
+    Vector curr_hrvo_velocity = hrvo_simulator_.getRobotVelocity(robot_id_);
+    Vector actual_global_velocity = localToGlobalVelocity(local_velocity, curr_orientation_);
+    if ((curr_hrvo_velocity - actual_global_velocity).length() > LINEAR_VELOCITY_FEEDBACK_THRESHOLD_M_PER_S)
     {
-        LOG(INFO) << "Update robot linear velocity";
         hrvo_simulator_.updateRobotVelocity(
             robot_id_, localToGlobalVelocity(local_velocity, curr_orientation_));
     }
 
     AngularVelocity curr_angular_velocity = hrvo_simulator_.getRobotAngularVelocity(robot_id_);
-    if (angular_velocity.minDiff(curr_angular_velocity).toRadians() > 5.0)
+    if (angular_velocity.minDiff(curr_angular_velocity).toDegrees() > ANGULAR_VELOCITY_FEEDBACK_THRESHOLD_DEG_PER_S)
     {
-        LOG(INFO) << "Update robot angular velocity";
         hrvo_simulator_.updateRobotAngularVelocity(
             robot_id_, angular_velocity);
     }
