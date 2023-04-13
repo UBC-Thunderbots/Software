@@ -104,11 +104,12 @@ class HRVOSimulator
 
 
     /**
-     * Get all the robots running in this simulation
+     * Check if a robot with id exists in the simulator `robots` map
      *
-     * @return a map of from robot id's to agents
+     * @param id the robot id
+     * @param side either friendly or and enemy robot
      */
-    std::map<RobotId, std::shared_ptr<Agent>> getRobots();
+    bool robotExists(RobotId id, TeamSide side);
 
 
     /**
@@ -118,10 +119,6 @@ class HRVOSimulator
      * @param friendly_team_colour the friendly teams color
      */
     void visualize(RobotId robot_id, TeamColour friendly_team_colour);
-
-    // Robot id offset for enemy robots so we don't have
-    // friendly and enemy agents with overlapping ids in the `robots` map
-    static const unsigned int ENEMY_LV_ROBOT_OFFSET = 20;
 
    private:
     /**
@@ -134,8 +131,6 @@ class HRVOSimulator
      */
     void configureHRVORobot(const Robot &robot, const RobotConstants_t &robot_constants,
                             Duration time_step);
-
-
     /**
      *  Configure and add a LV Agent to the simulation.
      *
@@ -174,4 +169,8 @@ class HRVOSimulator
 
     // the max amount (meters) which the friendly/enemy robot radius can reach
     static constexpr double ENEMY_ROBOT_RADIUS_MAX_INFLATION = 0.06;
+
+    // Robot id offset for enemy robots so we don't have
+    // friendly and enemy agents with overlapping ids in the `robots` map
+    static const unsigned int ENEMY_LV_ROBOT_OFFSET = 20;
 };

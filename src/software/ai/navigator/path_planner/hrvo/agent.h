@@ -244,6 +244,9 @@ protected:
     // It may be normalized to max_speed in `update()`.
     Vector new_velocity;
 
+   protected:
+    // the preferred velocity the agent should use when finding a new_velocity
+    // This velocity represents what's most optimal for getting to the destination
     Vector preferred_velocity;
 
     Point position;

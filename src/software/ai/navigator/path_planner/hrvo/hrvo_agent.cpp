@@ -12,9 +12,6 @@ HRVOAgent::HRVOAgent(RobotId robot_id, const RobotState &robot_state, const Robo
       config(),
       team_color("y") // TODO REMOVE
 {
-//    config.set_linear_velocity_kp(1.8);
-//    config.set_angular_velocity_kp(3.0); // 6.0 is perfect for just turning in spot
-//    config.set_angular_velocity_compensation(0.0); // 0.35 for long distances, 0.5 for short
 }
 
 void HRVOAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive,
