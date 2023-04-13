@@ -23,8 +23,6 @@ jobs:
       - uses: pre-commit-ci/lite-action@v1.0.1
         name: Run pre-commit-ci-lite
         if: always()
-        with:
-          token: ${{ secrets.WRITE_TO_PULL_REQUEST_SECRET }}
 
   software-tests:
     name: Software Tests
