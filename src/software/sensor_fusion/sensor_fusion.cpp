@@ -36,15 +36,6 @@ std::optional<World> SensorFusion::getWorld() const
             new_world.updateRefereeStage(*referee_stage);
         }
 
-
-        std::map<std::string, double> plotjuggler_values;
-        for (const auto &enemy_robot : new_world.enemyTeam().getAllRobots())
-        {
-            plotjuggler_values.insert({std::to_string(enemy_robot.id() + 20) + "_vx", enemy_robot.velocity().x()});
-            plotjuggler_values.insert({std::to_string(enemy_robot.id() + 20) + "_vy", enemy_robot.velocity().y()});
-        }
-        LOG(PLOTJUGGLER) << *createPlotJugglerValue(plotjuggler_values);
-
         return new_world;
     }
     else

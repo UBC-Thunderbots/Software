@@ -9,7 +9,8 @@ HRVOAgent::HRVOAgent(RobotId robot_id, const RobotState &robot_state, const Robo
             max_angular_accel, max_radius_inflation),
       obstacle_factory(TbotsProto::RobotNavigationObstacleConfig()),
       neighbours(),
-      config()
+      config(),
+      team_color("y") // TODO REMOVE
 {
 //    config.set_linear_velocity_kp(1.8);
 //    config.set_angular_velocity_kp(3.0); // 6.0 is perfect for just turning in spot
@@ -264,18 +265,11 @@ void HRVOAgent::computeNewAngularVelocity(Duration time_step)
     const double max_angular_vel = static_cast<double>(max_angular_speed);
     AngularVelocity desired = AngularVelocity::fromRadians(std::clamp(desired_output, -max_angular_vel, max_angular_vel));
 
-    // Update orientation, assuming linear acceleration between
+    // Update orientation, assuming constant acceleration between
     // current and desired angular velocity
     orientation += ((angular_velocity + desired) / 2) * time_step.toSeconds();
 
     angular_velocity = desired;
-
-
-    std::map<std::string, double> plotjuggler_values;
-    plotjuggler_values.insert({std::to_string(robot_id) + "_signed_delta_t", signed_delta_orientation});
-    plotjuggler_values.insert({std::to_string(robot_id) + "_pid_vt", pid_output});
-    plotjuggler_values.insert({std::to_string(robot_id) + "_clamped_vt", angular_velocity.toRadians()});
-    LOG(PLOTJUGGLER) << *createPlotJugglerValue(plotjuggler_values);
 }
 
 
@@ -639,13 +633,17 @@ Vector HRVOAgent::computePreferredVelocity(Duration time_step)
     const double vx = local_error.x() * config.linear_velocity_kp();
     const double vy = local_error.y() * config.linear_velocity_kp();
     Vector pid_vel = Vector(vx, vy);
-    pid_vel = pid_vel.normalize(std::min(pid_vel.length(), velocity.length() + max_accel * time_step.toSeconds())); // TODO: Make PID vel shorter to avoid swing
+
+    // Scale down the PID velocity from being excessively high as it causes the
+    // robot to swing around the destination. This causes the velocity to point
+    // towards the destination as fast as possible.
+    Vector realistic_pid_vel = pid_vel.normalize(std::min(pid_vel.length(), velocity.length() + max_accel * time_step.toSeconds()));
     Vector curr_local_velocity = globalToLocalVelocity(velocity, orientation);
-    Vector delta_velocity = pid_vel - curr_local_velocity;
+    Vector delta_velocity = realistic_pid_vel - curr_local_velocity;
 
     // Clamp to max acceleration
     double acceleration_limit;
-    if (pid_vel.length() >= curr_local_velocity.length())
+    if (realistic_pid_vel.length() >= curr_local_velocity.length())
     {
         // Robot is accelerating
         acceleration_limit = max_accel;
@@ -667,17 +665,19 @@ Vector HRVOAgent::computePreferredVelocity(Duration time_step)
     // in the opposite direction
     output = output.rotate(-angular_velocity * time_step.toSeconds() * config.angular_velocity_compensation());
 
-    std::map<std::string, double> plotjuggler_values;
-    plotjuggler_values.insert({std::to_string(robot_id) + "_acceleration_limit", acceleration_limit});
-    plotjuggler_values.insert({std::to_string(robot_id) + "_local_delta_vx", (output - curr_local_velocity).x()});
-    plotjuggler_values.insert({std::to_string(robot_id) + "_local_delta_vy", (output - curr_local_velocity).y()});
-    plotjuggler_values.insert({std::to_string(robot_id) + "_local_error_x", local_error.x()});
-    plotjuggler_values.insert({std::to_string(robot_id) + "_local_error_y", local_error.y()});
-    plotjuggler_values.insert({std::to_string(robot_id) + "_local_pid_vx", pid_vel.x()});
-    plotjuggler_values.insert({std::to_string(robot_id) + "_local_pid_vy", pid_vel.y()});
-    plotjuggler_values.insert({std::to_string(robot_id) + "_local_clamped_vx", output.x()});
-    plotjuggler_values.insert({std::to_string(robot_id) + "_local_clamped_vy", output.y()});
-    LOG(PLOTJUGGLER) << *createPlotJugglerValue(plotjuggler_values);
+//    std::map<std::string, double> plotjuggler_values;
+//    plotjuggler_values.insert({std::to_string(robot_id) + team_color + "_acceleration_limit", acceleration_limit});
+//    plotjuggler_values.insert({std::to_string(robot_id) + team_color + "_local_delta_vx", (output - curr_local_velocity).x()});
+//    plotjuggler_values.insert({std::to_string(robot_id) + team_color + "_local_delta_vy", (output - curr_local_velocity).y()});
+//    plotjuggler_values.insert({std::to_string(robot_id) + team_color + "_local_error_x", local_error.x()});
+//    plotjuggler_values.insert({std::to_string(robot_id) + team_color + "_local_error_y", local_error.y()});
+//    plotjuggler_values.insert({std::to_string(robot_id) + team_color + "_local_pid_vx", pid_vel.x()});
+//    plotjuggler_values.insert({std::to_string(robot_id) + team_color + "_local_pid_vy", pid_vel.y()});
+//    plotjuggler_values.insert({std::to_string(robot_id) + team_color + "_local_normalized_pid_vx", realistic_pid_vel.x()});
+//    plotjuggler_values.insert({std::to_string(robot_id) + team_color + "_local_normalized_pid_vy", realistic_pid_vel.y()});
+//    plotjuggler_values.insert({std::to_string(robot_id) + team_color + "_local_clamped_vx", output.x()});
+//    plotjuggler_values.insert({std::to_string(robot_id) + team_color + "_local_clamped_vy", output.y()});
+//    LOG(PLOTJUGGLER) << *createPlotJugglerValue(plotjuggler_values);
 
     return localToGlobalVelocity(output, orientation);
 }
@@ -694,6 +694,8 @@ std::vector<VelocityObstacle> HRVOAgent::getVelocityObstacles()
 
 void HRVOAgent::visualize(TeamColour friendly_team_colour)
 {
+    // TODO: Added for debugging and plotjuggler
+    team_color = friendly_team_colour == TeamColour::YELLOW ? "y" : "b";
     TbotsProto::HRVOVisualization hrvo_visualization;
 
     // Visualize this agent
