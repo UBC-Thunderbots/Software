@@ -37,34 +37,52 @@ void logFromNetworking(TbotsProto::RobotLog log)
 
 int main(int argc, char **argv)
 {
-    // TODO: Update to allow filtering of robots, and changing multicast channel
     // load command line arguments
-    auto args           = std::make_shared<NetworkLogListenerMainCommandLineArgs>();
-    bool help_requested = args->loadFromCommandLineArguments(argc, argv);
+    struct CommandLineArgs
+    {
+        bool help = false;
+        std::string interface = "";
+        int channel = 0;
+    };
+
+    CommandLineArgs args;
+    boost::program_options::options_description desc{"Options"};
+
+    desc.add_options()("help,h", boost::program_options::bool_switch(&args.help),
+                       "Help screen");
+    desc.add_options()("interface",
+                       boost::program_options::value<std::string>(&args.interface),
+                       "Which network interface to listen for messages from");
+    desc.add_options()("channel",
+                       boost::program_options::value<int>(&args.channel),
+                       "Multicast channel to listen on connect to");
+
+    boost::program_options::variables_map vm;
+    boost::program_options::store(parse_command_line(argc, argv, desc), vm);
+    boost::program_options::notify(vm);
+
+    if (args.help)
+    {
+        std::cout << desc << std::endl;
+        return 0;
+    }
 
     auto logWorker               = g3::LogWorker::createLogWorker();
     auto colour_cout_sink_handle = logWorker->addSink(
         std::make_unique<ColouredCoutSink>(false), &ColouredCoutSink::displayColouredLog);
     g3::initializeLogging(logWorker.get());
 
-    if (!help_requested)
-    {
-        int channel           = args->getChannel()->value();
-        std::string interface = args->getInterface()->value();
-
-
-        auto log_input = std::make_unique<ThreadedProtoUdpListener<TbotsProto::RobotLog>>(
-            std::string(ROBOT_MULTICAST_CHANNELS[channel]) + "%" + interface,
+    auto log_input = std::make_unique<ThreadedProtoUdpListener<TbotsProto::RobotLog>>(
+            std::string(ROBOT_MULTICAST_CHANNELS.at(args.channel)) + "%" + args.interface,
             ROBOT_LOGS_PORT, std::function(logFromNetworking), true);
 
 
-        LOG(INFO) << "Network logger listening on channel "
-                  << ROBOT_MULTICAST_CHANNELS[channel] << " and interface "
-                  << interface << std::endl;
+    LOG(INFO) << "Network logger listening on channel "
+              << ROBOT_MULTICAST_CHANNELS.at(args.channel) << " and interface "
+              << args.interface << std::endl;
 
-        // This blocks forever without using the CPU
-        std::promise<void>().get_future().wait();
-    }
+    // This blocks forever without using the CPU
+    std::promise<void>().get_future().wait();
 
     return 0;
 }
