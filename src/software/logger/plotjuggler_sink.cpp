@@ -23,7 +23,7 @@ std::ostream& operator<<(std::ostream& os,
     std::string json_string;
 
     google::protobuf::util::JsonPrintOptions options;
-    options.add_whitespace = false;  // TODO: Added to avoid line breaks in g3log
+    options.add_whitespace = false;
     options.always_print_primitive_fields = true;
     options.preserve_proto_field_names    = true;
 

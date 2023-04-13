@@ -156,7 +156,6 @@ class HRVOSimulator
     void updateAgent(const std::shared_ptr<Agent> &agent,
                             const Robot &robot);
 
-    // TODO
     RobotId robot_id;
 
     // Map of robot ids to agent.

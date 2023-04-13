@@ -170,6 +170,7 @@ void HRVOSimulator::configureLVRobot(const Robot &robot,
     // Assume that enemy robots will continue to move in their current direction.
     Point destination = robot.position() + 2 * robot.velocity();
     double max_speed  = robot_constants.robot_max_speed_m_per_s;
+    double max_angular_speed  = robot_constants.robot_max_ang_speed_rad_per_s;
 
     // Max distance which the robot can travel in one time step + scaling
     double path_radius = (robot.velocity().length() * time_step.toSeconds()) / 2;
@@ -179,7 +180,7 @@ void HRVOSimulator::configureLVRobot(const Robot &robot,
 
     std::shared_ptr<LVAgent> agent = std::make_shared<LVAgent>(
         robot.id(), robot.currentState(), path, ROBOT_MAX_RADIUS_METERS, max_speed, 0.0,
-        0.0, 0.0, 0.0, ENEMY_ROBOT_RADIUS_MAX_INFLATION); // TODO: Double check the 0.0s
+        0.0, max_angular_speed, 0.0, ENEMY_ROBOT_RADIUS_MAX_INFLATION);
 
     robots[robot.id() + ENEMY_LV_ROBOT_OFFSET] = std::static_pointer_cast<Agent>(agent);
 }

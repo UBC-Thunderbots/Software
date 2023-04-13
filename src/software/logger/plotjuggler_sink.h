@@ -34,11 +34,12 @@ class PlotJugglerSink
 };
 
 /*
- * TODO
+ * Convert the protobuf map to a JSON string
+ * This is done to allow minimal required setup to start plotting with Plot Juggler
  *
  * @param os The output stream
- * @param message The message to serialize
- * @return The output stream containing
+ * @param message The PlotJugglerValue message to serialize
+ * @return The output stream containing the serialized message
  */
 std::ostream& operator<<(std::ostream& os,
                          const TbotsProto::PlotJugglerValue& plotjuggler_value);

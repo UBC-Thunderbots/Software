@@ -107,7 +107,12 @@ std::unique_ptr<TbotsProto::NamedValue> createNamedValue(const std::string name,
                                                          float value);
 
 /**
- * TODO
+ * Returns a TbotsProto::PlotJugglerValue proto containing the name
+ * value pairs of the map.
+ * @param values The map of name value pairs to plot
+ *
+ * @return The unique_ptr to a TbotsProto::PlotJugglerValue proto containing data with
+ *        specified names and values
  */
 std::unique_ptr<TbotsProto::PlotJugglerValue> createPlotJugglerValue(
     const std::map<std::string, double>& values);

@@ -79,10 +79,12 @@ class PrimitiveExecutor
     AngularVelocity getTargetAngularVelocity();
 
     TbotsProto::Primitive current_primitive_;
+    TbotsProto::World current_world_;
     TeamColour friendly_team_colour;
     RobotConstants_t robot_constants_;
     HRVOSimulator hrvo_simulator_;
 
+    // TODO (#): Add dynamic time_step to `stepPrimitive` and remove this constant
     // time step to be used, in Seconds
     Duration time_step_;
     Angle curr_orientation_;

@@ -615,8 +615,6 @@ std::optional<int> HRVOAgent::findIntersectingVelocityObstacle(
     return std::nullopt;
 }
 
-// TODO: Add Plot Juggler in this PR, or a separate PR through a new UDP sender
-// TODO: We're passing the robot constants all over the place, can we make it a static constexpr
 Vector HRVOAgent::computePreferredVelocity(Duration time_step)
 {
     auto path_point_opt = path.getCurrentPathPoint();
@@ -665,19 +663,19 @@ Vector HRVOAgent::computePreferredVelocity(Duration time_step)
     // in the opposite direction
     output = output.rotate(-angular_velocity * time_step.toSeconds() * config.angular_velocity_compensation());
 
-//    std::map<std::string, double> plotjuggler_values;
-//    plotjuggler_values.insert({std::to_string(robot_id) + team_color + "_acceleration_limit", acceleration_limit});
-//    plotjuggler_values.insert({std::to_string(robot_id) + team_color + "_local_delta_vx", (output - curr_local_velocity).x()});
-//    plotjuggler_values.insert({std::to_string(robot_id) + team_color + "_local_delta_vy", (output - curr_local_velocity).y()});
-//    plotjuggler_values.insert({std::to_string(robot_id) + team_color + "_local_error_x", local_error.x()});
-//    plotjuggler_values.insert({std::to_string(robot_id) + team_color + "_local_error_y", local_error.y()});
-//    plotjuggler_values.insert({std::to_string(robot_id) + team_color + "_local_pid_vx", pid_vel.x()});
-//    plotjuggler_values.insert({std::to_string(robot_id) + team_color + "_local_pid_vy", pid_vel.y()});
-//    plotjuggler_values.insert({std::to_string(robot_id) + team_color + "_local_normalized_pid_vx", realistic_pid_vel.x()});
-//    plotjuggler_values.insert({std::to_string(robot_id) + team_color + "_local_normalized_pid_vy", realistic_pid_vel.y()});
-//    plotjuggler_values.insert({std::to_string(robot_id) + team_color + "_local_clamped_vx", output.x()});
-//    plotjuggler_values.insert({std::to_string(robot_id) + team_color + "_local_clamped_vy", output.y()});
-//    LOG(PLOTJUGGLER) << *createPlotJugglerValue(plotjuggler_values);
+    std::map<std::string, double> plotjuggler_values;
+    plotjuggler_values.insert({std::to_string(robot_id) + team_color + "_acceleration_limit", acceleration_limit});
+    plotjuggler_values.insert({std::to_string(robot_id) + team_color + "_local_delta_vx", (output - curr_local_velocity).x()});
+    plotjuggler_values.insert({std::to_string(robot_id) + team_color + "_local_delta_vy", (output - curr_local_velocity).y()});
+    plotjuggler_values.insert({std::to_string(robot_id) + team_color + "_local_error_x", local_error.x()});
+    plotjuggler_values.insert({std::to_string(robot_id) + team_color + "_local_error_y", local_error.y()});
+    plotjuggler_values.insert({std::to_string(robot_id) + team_color + "_local_pid_vx", pid_vel.x()});
+    plotjuggler_values.insert({std::to_string(robot_id) + team_color + "_local_pid_vy", pid_vel.y()});
+    plotjuggler_values.insert({std::to_string(robot_id) + team_color + "_local_normalized_pid_vx", realistic_pid_vel.x()});
+    plotjuggler_values.insert({std::to_string(robot_id) + team_color + "_local_normalized_pid_vy", realistic_pid_vel.y()});
+    plotjuggler_values.insert({std::to_string(robot_id) + team_color + "_local_clamped_vx", output.x()});
+    plotjuggler_values.insert({std::to_string(robot_id) + team_color + "_local_clamped_vy", output.y()});
+    LOG(PLOTJUGGLER) << *createPlotJugglerValue(plotjuggler_values);
 
     return localToGlobalVelocity(output, orientation);
 }

@@ -233,10 +233,8 @@ class HRVOAgent : public Agent
     // pointers to the closest agents by euclidean distance to this agents position
     std::vector<std::shared_ptr<Agent>> neighbours;
 
-    // TODO (#): Support different configurations for different robots
+    // TODO (#2894): Support different configurations for different robots
     TbotsProto::HRVOConfig config;
-
-    static constexpr double PREF_SPEED_SCALE            = 0.85;
 
     // The maximum distance which HRVO Agents will look for neighbors, in meters.
     // A large radius picked to allow for far visibility of neighbors so Agents have
@@ -247,14 +245,6 @@ class HRVOAgent : public Agent
     // threshold for the minimum preferred speed.
     // Used in order to filter slow candidate velocities
     static constexpr double MIN_PREF_SPEED_MULTIPLIER = 0.5;
-
-    // a multiplier to account for different accelerations when speeding up vs slowing
-    // down
-    static constexpr double DECEL_DIST_MULTIPLIER = 1.2;
-
-    // a multiplier to account for different preferred speed when speeding up vs slowing
-    // down
-    static constexpr double DECEL_PREF_SPEED_MULTIPLIER = 0.6;
 
     std::string team_color;
     unsigned int actual_id;

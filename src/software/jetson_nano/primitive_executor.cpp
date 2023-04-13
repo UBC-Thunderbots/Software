@@ -12,6 +12,7 @@ PrimitiveExecutor::PrimitiveExecutor(const Duration time_step,
                                      const TeamColour friendly_team_colour,
                                      const RobotId robot_id)
     : current_primitive_(),
+      current_world_(),
       friendly_team_colour(friendly_team_colour),
       robot_constants_(robot_constants),
       hrvo_simulator_(robot_id),
@@ -40,13 +41,18 @@ void PrimitiveExecutor::setStopPrimitive()
 
 void PrimitiveExecutor::updateWorld(const TbotsProto::World &world_msg)
 {
-    World new_world = World(world_msg);
-    hrvo_simulator_.updateWorld(new_world, robot_constants_, time_step_);
-
-    auto this_robot = new_world.friendlyTeam().getRobotById(robot_id_);
-    if (this_robot.has_value())
+    // Only update HRVO simulator if the world is newer than the previous world
+    if (world_msg.time_sent().epoch_timestamp_seconds() >
+        current_world_.time_sent().epoch_timestamp_seconds())
     {
-        curr_orientation_ = this_robot->orientation();
+        World new_world = World(world_msg);
+        hrvo_simulator_.updateWorld(new_world, robot_constants_, time_step_);
+
+        auto this_robot = new_world.friendlyTeam().getRobotById(robot_id_);
+        if (this_robot.has_value())
+        {
+            curr_orientation_ = this_robot->orientation();
+        }
     }
 }
 
@@ -83,7 +89,7 @@ AngularVelocity PrimitiveExecutor::getTargetAngularVelocity()
 }
 
 
-std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimitive() // TODO: Make dynamic timestep
+std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimitive()
 {
     hrvo_simulator_.doStep(time_step_);
 
