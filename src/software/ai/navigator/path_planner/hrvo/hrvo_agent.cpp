@@ -628,17 +628,15 @@ Vector HRVOAgent::computePreferredVelocity(Duration time_step)
     Point destination  = path_point_opt.value().getPosition();
     Vector local_error = globalToLocalVelocity(destination - position, orientation);
 
-    // We calculate the new desired velocity based on two proportional controllers,
-    // one for each axis in the local frame.
-    const double vx = local_error.x() * config.linear_velocity_kp();
-    const double vy = local_error.y() * config.linear_velocity_kp();
-    Vector pid_vel  = Vector(vx, vy);
+    // We calculate the new desired velocity based on two proportional controllers (x, y),
+    // in the local frame.
+    Vector pid_vel = local_error * config.linear_velocity_kp();
 
     // Scale down the PID velocity from being excessively high as it causes the
     // robot to swing around the destination. This causes the velocity to point
     // towards the destination as fast as possible.
     Vector realistic_pid_vel   = pid_vel.normalize(std::min(
-        pid_vel.length(), velocity.length() + max_accel * time_step.toSeconds()));
+        pid_vel.length(), velocity.length() + config.linear_velocity_max_pid_offset()));
     Vector curr_local_velocity = globalToLocalVelocity(velocity, orientation);
     Vector delta_velocity      = realistic_pid_vel - curr_local_velocity;
 

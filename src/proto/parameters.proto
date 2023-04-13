@@ -301,12 +301,19 @@ message HRVOConfig
         (bounds).min_double_value = 0.001,
         (bounds).max_double_value = 10.0
     ];
-    required double angular_velocity_kp = 2 [
+
+    // The maximum amount which the PID velocity can be greater than
+    // the actual robot velocity. Used to prevent swinging [m/s]
+    required double linear_velocity_max_pid_offset = 2
+        [default = 0.3, (bounds).min_double_value = 0.0, (bounds).max_double_value = 5.0];
+
+    required double angular_velocity_kp = 3 [
         default                   = 2.8,
         (bounds).min_double_value = 0.001,
         (bounds).max_double_value = 10.0
     ];
-    required double angular_velocity_compensation = 3
+
+    required double angular_velocity_compensation = 4
         [default = 1.5, (bounds).min_double_value = 0.0, (bounds).max_double_value = 3.0];
 }
 
