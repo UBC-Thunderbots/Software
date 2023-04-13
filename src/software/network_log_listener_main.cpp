@@ -43,6 +43,7 @@ int main(int argc, char **argv)
         bool help = false;
         std::string interface = "";
         int channel = 0;
+        std::vector<int> filtered_ids = {};
     };
 
     CommandLineArgs args;
@@ -56,6 +57,9 @@ int main(int argc, char **argv)
     desc.add_options()("channel",
                        boost::program_options::value<int>(&args.channel),
                        "Multicast channel to listen on connect to");
+    desc.add_options()("filtered_ids",
+                       boost::program_options::value<std::vector<int>>(&args.filtered_ids)->multitoken(),
+                       "Robot IDs to filter out of the logs");
 
     boost::program_options::variables_map vm;
     boost::program_options::store(parse_command_line(argc, argv, desc), vm);
@@ -67,19 +71,45 @@ int main(int argc, char **argv)
         return 0;
     }
 
+    if (!vm.count("interface"))
+    {
+        std::cerr << "A network interface must be specified to listen on!" << std::endl;
+        return 0;
+    }
+
     auto logWorker               = g3::LogWorker::createLogWorker();
     auto colour_cout_sink_handle = logWorker->addSink(
         std::make_unique<ColouredCoutSink>(false), &ColouredCoutSink::displayColouredLog);
     g3::initializeLogging(logWorker.get());
 
+    // Callback which filters out the logs from robots with filtered_id
+    auto robot_log_callback = [args](TbotsProto::RobotLog log) {
+        if (std::find(args.filtered_ids.begin(), args.filtered_ids.end(), log.robot_id()) !=
+            args.filtered_ids.end())
+        {
+            return;
+        }
+        logFromNetworking(log);
+    };
+
     auto log_input = std::make_unique<ThreadedProtoUdpListener<TbotsProto::RobotLog>>(
             std::string(ROBOT_MULTICAST_CHANNELS.at(args.channel)) + "%" + args.interface,
-            ROBOT_LOGS_PORT, std::function(logFromNetworking), true);
+            ROBOT_LOGS_PORT, robot_log_callback, true);
 
 
     LOG(INFO) << "Network logger listening on channel "
               << ROBOT_MULTICAST_CHANNELS.at(args.channel) << " and interface "
-              << args.interface << std::endl;
+              << args.interface;
+
+    if (!args.filtered_ids.empty())
+    {
+        std::string filtered_ids_string;
+        for (auto id : args.filtered_ids)
+        {
+            filtered_ids_string += std::to_string(id) + " ";
+        }
+        LOG(INFO) << "Filtering robots with IDs: " << filtered_ids_string << std::endl;
+    }
 
     // This blocks forever without using the CPU
     std::promise<void>().get_future().wait();
