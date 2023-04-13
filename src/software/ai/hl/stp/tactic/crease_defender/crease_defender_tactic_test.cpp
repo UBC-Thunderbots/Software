@@ -28,7 +28,7 @@ class CreaseDefenderTacticTest
 
 TEST_F(CreaseDefenderTacticTest, test_chip_ball)
 {
-    Point enemy_threat_point = Point(-0.5, 0);
+    Point enemy_threat_point = Point(0.0, 0);
     TbotsProto::CreaseDefenderAlignment alignment =
         TbotsProto::CreaseDefenderAlignment::CENTRE;
 

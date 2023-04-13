@@ -159,7 +159,7 @@ message DribbleTacticConfig
     // Threshold to determine if the robot has the expected orientation when
     // completing the dribble (in degrees)
     required double final_destination_close_threshold = 3 [
-        default                   = 1.0,
+        default                   = 2.0,
         (bounds).min_double_value = 0.0,
         (bounds).max_double_value = 10.0
     ];
