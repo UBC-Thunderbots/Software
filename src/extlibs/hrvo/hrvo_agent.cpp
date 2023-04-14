@@ -183,42 +183,69 @@ void HRVOAgent::computeVelocityObstacles()
 
 VelocityObstacle HRVOAgent::createVelocityObstacle(const Agent &other_agent)
 {
-    Circle obstacle_agent_circle(Point(getPosition()), radius_);
-    Circle moving_agent_circle(Point(other_agent.getPosition()), radius_);
-    auto vo = generateVelocityObstacle(obstacle_agent_circle, moving_agent_circle,
-                                       getVelocity());
+//    Circle obstacle_agent_circle(Point(getPosition()), radius_);
+//    Circle moving_agent_circle(Point(other_agent.getPosition()), radius_);
+//    auto vo = generateVelocityObstacle(obstacle_agent_circle, moving_agent_circle,
+//                                       getVelocity());
 
     // Convert velocity obstacle to hybrid reciprocal velocity obstacle (HRVO)
     // by shifting one side of the velocity obstacle to share the responsibility
     // of avoiding collision with other agent. This assumes that the other agent will also
     // be running HRVO
     // Refer to: https://gamma.cs.unc.edu/HRVO/HRVO-T-RO.pdf#page=2
-    Vector vo_side;
-    Vector rvo_side;
-    if ((other_agent.getPrefVelocity() - pref_velocity_)
-            .isClockwiseOf(position_ - other_agent.getPosition()))
-    {
-        vo_side  = vo.getLeftSide();
-        rvo_side = vo.getRightSide();
-    }
-    else
-    {
-        // Vise versa of above
-        vo_side  = vo.getRightSide();
-        rvo_side = vo.getLeftSide();
-    }
-    Vector rvo_apex = (pref_velocity_ + other_agent.getPrefVelocity()) / 2;
-    Line vo_side_line(Point(vo.getApex()), Point(vo.getApex() + vo_side));
-    Line rvo_side_line(Point(rvo_apex), Point(rvo_apex + rvo_side));
+    const float combinedRadius = radius_ * 2;
+    const Vector relativePosition = getPosition() - other_agent.getPosition();
+    const Vector relativeVelocity = velocity_ - other_agent.getVelocity();
+    const float angle = std::atan2(relativePosition.y(), relativePosition.x());
+    const float openingAngle = std::asin((combinedRadius) / relativePosition.length());
+    Vector side1 = Vector(std::cos(angle - openingAngle),
+                          std::sin(angle - openingAngle));
+    Vector side2 = Vector(std::cos(angle + openingAngle),
+                          std::sin(angle + openingAngle));
 
-    Vector hrvo_apex            = vo.getApex();
-    auto intersection_point_opt = intersection(vo_side_line, rvo_side_line);
-    if (intersection_point_opt.has_value())
-    {
-        hrvo_apex = intersection_point_opt.value().toVector();
+    const float d = 2.0F * std::sin(openingAngle) * std::cos(openingAngle);
+
+    Vector apex;
+
+    if (relativePosition.determinant(pref_velocity_ - other_agent.getPrefVelocity()) > 0.0F) {
+        const float s =
+                0.5F * relativeVelocity.determinant(side2) / d;
+
+        apex = other_agent.getVelocity() + s * side1;
+    } else {
+        const float s =
+                0.5F * relativeVelocity.determinant(side1) / d;
+
+        apex = other_agent.getVelocity() + s * side2;
     }
 
-    return VelocityObstacle(hrvo_apex, vo.getLeftSide(), vo.getRightSide());
+
+//    Vector vo_side;
+//    Vector rvo_side;
+//    if ((other_agent.getPrefVelocity() - pref_velocity_)
+//            .isClockwiseOf(position_ - other_agent.getPosition()))
+//    {
+//        vo_side  = vo.getLeftSide();
+//        rvo_side = vo.getRightSide();
+//    }
+//    else
+//    {
+//        // Vise versa of above
+//        vo_side  = vo.getRightSide();
+//        rvo_side = vo.getLeftSide();
+//    }
+//    Vector rvo_apex = (pref_velocity_ + other_agent.getPrefVelocity()) / 2;
+//    Line vo_side_line(Point(vo.getApex()), Point(vo.getApex() + vo_side));
+//    Line rvo_side_line(Point(rvo_apex), Point(rvo_apex + rvo_side));
+//
+//    Vector hrvo_apex            = vo.getApex();
+//    auto intersection_point_opt = intersection(vo_side_line, rvo_side_line);
+//    if (intersection_point_opt.has_value())
+//    {
+//        hrvo_apex = intersection_point_opt.value().toVector();
+//    }
+
+    return VelocityObstacle(apex, side1, side2);
 }
 
 void HRVOAgent::computeNewVelocity()

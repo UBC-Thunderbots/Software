@@ -334,6 +334,7 @@ void HRVOSimulator::visualize(unsigned int robot_id) const
     auto vo_protos      = friendly_agent->getVelocityObstaclesAsProto();
     *(hrvo_visualization.mutable_velocity_obstacles()) = {vo_protos.begin(),
                                                           vo_protos.end()};
+    float rad = 0;
 
     // Visualize all agents
     for (const auto &agent : agents)
@@ -341,6 +342,7 @@ void HRVOSimulator::visualize(unsigned int robot_id) const
         Point position(agent->getPosition());
         *(hrvo_visualization.add_robots()) =
             *createCircleProto(Circle(position, agent->getRadius()));
+        rad = agent->getRadius();
     }
 
     // Visualize the ball obstacle
@@ -349,6 +351,16 @@ void HRVOSimulator::visualize(unsigned int robot_id) const
         TbotsProto::Circle ball_circle =
             friendly_agent->ball_obstacle.value()->createObstacleProto().circle()[0];
         *(hrvo_visualization.add_robots()) = ball_circle;
+    }
+
+    if (!friendly_agent->candidates_.empty())
+    {
+        for (const auto &candidate : friendly_agent->candidates_)
+        {
+            Point position(candidate.second.velocity.x(), candidate.second.velocity.y());
+            *(hrvo_visualization.add_robots()) =
+                    *createCircleProto(Circle(position, rad));
+        }
     }
 
     if (friendly_team_colour == TeamColour::YELLOW)
