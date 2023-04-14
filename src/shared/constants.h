@@ -1,11 +1,10 @@
 #pragma once
 #include <math.h>
 
-#include <string>
-
 // Some platformio targets don't support STL, so we can't
-// use unordered_map. We guard all networking stuff with
+// use unordered_map, string, .... We guard all networking stuff with
 #ifndef PLATFORMIO_BUILD
+#include <string>
 #include <unordered_map>
 
 // Networking
@@ -21,18 +20,18 @@ static const std::unordered_map<int, std::string> ROBOT_MULTICAST_CHANNELS = {
     {12, "ff02::c3d0:42d2:bb12"}, {13, "ff02::c3d0:42d2:bb13"},
     {14, "ff02::c3d0:42d2:bb14"}, {15, "ff02::c3d0:42d2:bb15"}};
 
+// PlotJuggler's default host and port
+// Should be updated to your local machine's IP address if
+// you want to plot from the robot
+static const std::string PLOTJUGGLER_GUI_DEFAULT_HOST        = "127.0.0.1";
+static const short unsigned int PLOTJUGGLER_GUI_DEFAULT_PORT = 9870;
+
 #endif  // PLATFORMIO_BUILD
 
 // Redis default server connections properties
 #define REDIS_HOST_LENGTH 10
 static const char REDIS_DEFAULT_HOST[REDIS_HOST_LENGTH] = "127.0.0.1";
 static const short unsigned int REDIS_DEFAULT_PORT      = 6379;
-
-// PlotJuggler's default host and port
-// Should be updated to your local machine's IP address if
-// you want to plot from the robot
-static const std::string PLOTJUGGLER_GUI_DEFAULT_HOST        = "127.0.0.1";
-static const short unsigned int PLOTJUGGLER_GUI_DEFAULT_PORT = 9870;
 
 // the port robots are listening to for vision and primitives
 static const short unsigned int VISION_PORT    = 42069;
@@ -50,7 +49,7 @@ static const unsigned DEFENDING_SIDE_PORT = 42073;
 // this is an int to avoid Wconversion with lwip
 static const short unsigned int MAXIMUM_TRANSFER_UNIT_BYTES = 1500;
 
-static const std::string PROTO_MSG_TYPE_DELIMITER = "!!!";
+static const char PROTO_MSG_TYPE_DELIMITER[4] = "!!!";
 
 // This file contains all constants that are shared between our software (AI)
 // and firmware code. Since this needs to be compiled by both C and C++, everything

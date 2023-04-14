@@ -109,6 +109,13 @@ std::unique_ptr<TbotsProto::NamedValue> createNamedValue(const std::string name,
 /**
  * Returns a TbotsProto::PlotJugglerValue proto containing the name
  * value pairs of the map.
+ *
+ * Could use LOG(PLOTJUGGLER) to plot the values. Example:
+ *  LOG(PLOTJUGGLER) << *createPlotJugglerValue({
+ *      {"vx", velocity.x()},
+ *      {"vy", velocity.y()}
+ *  });
+ *
  * @param values The map of name value pairs to plot
  *
  * @return The unique_ptr to a TbotsProto::PlotJugglerValue proto containing data with
