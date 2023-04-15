@@ -25,10 +25,9 @@ class FullSystemConnectWidget(QWidget):
     # Signal to indicate if manual controls should be disabled based on boolean parameter
     toggle_controls_signal = pyqtSignal(bool)
 
-    def __init__(self, proto_unix_io):
+    def __init__(self):
         """
         Initialises a new Fullsystem Connect Widget to allow switching between Diagnostics and XBox control
-        :param proto_unix_io: The proto_unix_io object
         """
 
         super(FullSystemConnectWidget, self).__init__()

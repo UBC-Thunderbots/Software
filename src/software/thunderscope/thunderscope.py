@@ -3,6 +3,7 @@ import textwrap
 import shelve
 import signal
 import logging
+from typing import List
 import pathlib
 
 import PyQt6
@@ -39,6 +40,7 @@ from software.thunderscope.common.proto_configuration_widget import (
 from software.thunderscope.cost_vis.cost_vis import CostVisualizationWidget
 from software.thunderscope.field.field import Field
 from software.thunderscope.log.g3log_widget import g3logWidget
+from software.thunderscope.constants import IndividualRobotMode
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.thunderscope.play.playinfo_widget import PlayInfoWidget
 from software.thunderscope.play.refereeinfo_widget import RefereeInfoWidget
@@ -474,7 +476,12 @@ class Thunderscope(object):
 
         if load_robot_view:
             widgets["robot_view"] = self.setup_robot_view(
-                full_system_proto_unix_io, True
+                full_system_proto_unix_io,
+                [
+                    IndividualRobotMode.NONE,
+                    IndividualRobotMode.MANUAL,
+                    IndividualRobotMode.AI,
+                ],
             )
             robot_view_dock = Dock("RobotView")
             robot_view_dock.addWidget(widgets["robot_view"])
@@ -509,7 +516,7 @@ class Thunderscope(object):
 
         self.diagnostics_widgets[
             "diagnostics_input"
-        ] = self.setup_diagnostics_input_widget(proto_unix_io)
+        ] = self.setup_diagnostics_input_widget()
         input_dock = Dock("Diagnostics Input")
         input_dock.addWidget(self.diagnostics_widgets["diagnostics_input"])
         self.diagnostics_widgets["diagnostics_input"].toggle_controls_signal.connect(
@@ -521,9 +528,10 @@ class Thunderscope(object):
 
         if not load_fullsystem:
             self.diagnostics_widgets["robot_view"] = self.setup_robot_view(
-                proto_unix_io, False
+                proto_unix_io, [IndividualRobotMode.NONE, IndividualRobotMode.MANUAL,]
             )
             robot_view_dock = Dock("RobotView")
+            robot_view_dock.setStretch(y=5)
             robot_view_dock.addWidget(self.diagnostics_widgets["robot_view"])
             self.control_mode_signal = self.diagnostics_widgets[
                 "robot_view"
@@ -540,14 +548,18 @@ class Thunderscope(object):
 
         dock = Dock("Estop View")
         dock.addWidget(estop_view)
+        dock.setStretch(y=1)
         self.robot_diagnostics_dock_area.addDock(dock, "bottom", log_dock)
 
-    def setup_robot_view(self, proto_unix_io, load_fullsystem):
+    def setup_robot_view(
+        self, proto_unix_io, available_control_modes: List[IndividualRobotMode]
+    ):
         """Setup the robot view widget
         :param proto_unix_io: The proto unix io object for the full system
-        :param load_fullsystem: Boolean to indicate if control mode menus should have an AI option
+        :param available_control_modes: the currently available input modes for the robots
+                                        according to what mode thunderscope is run in
         """
-        robot_view = RobotView(load_fullsystem)
+        robot_view = RobotView(available_control_modes)
         self.register_refresh_function(robot_view.refresh)
         proto_unix_io.register_observer(RobotStatus, robot_view.robot_status_buffer)
         return robot_view
@@ -738,14 +750,12 @@ class Thunderscope(object):
 
         return chicker_widget
 
-    def setup_diagnostics_input_widget(self, proto_unix_io):
+    def setup_diagnostics_input_widget(self):
+        """
+        Sets up the diagnostics input widget
         """
 
-        :param proto_unix_io: The proto unix io object
-        :returns the fullsystem connect widget
-        """
-
-        diagnostics_input_widget = FullSystemConnectWidget(proto_unix_io)
+        diagnostics_input_widget = FullSystemConnectWidget()
 
         self.register_refresh_function(diagnostics_input_widget.refresh)
 

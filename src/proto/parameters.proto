@@ -37,7 +37,6 @@ message AiConfig
     required EnemyCapabilityConfig enemy_capability_config                  = 7;
     required ShootOrPassPlayConfig shoot_or_pass_play_config                = 8;
     required RobotCapabilitiesConfig robot_capabilities_config              = 9;
-    required SensorFusionConfig sensor_fusion_config                        = 10;
     required DefensePlayConfig defense_play_config                          = 11;
     required RobotNavigationObstacleConfig robot_navigation_obstacle_config = 12;
 }

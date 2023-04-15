@@ -33,6 +33,7 @@ logger = createLogger(__name__)
 LAUNCH_DELAY_S = 0.1
 WORLD_BUFFER_TIMEOUT = 0.5
 PROCESS_BUFFER_DELAY_S = 0.01
+TEST_START_DELAY_S = 0.01
 PAUSE_AFTER_FAIL_DELAY_S = 3
 
 
@@ -252,6 +253,14 @@ class SimulatedTestRunner(object):
             test_timeout_s[index] if type(test_timeout_s) == list else test_timeout_s
         )
 
+        # Start the test with a delay to allow the simulator to receive
+        # the initial world state. Without this delay, the SimulatorTick
+        # message may be received before the initial world state, causing
+        # the world to be empty, failing some AlwaysValidations
+        # TODO (#2858): Replace delay with an actual feedback from the simulator
+        #  for when it has received the initial world state
+        time.sleep(TEST_START_DELAY_S)
+
         if self.thunderscope:
             # If thunderscope is enabled, run the test in a thread and show
             # thunderscope on this thread. The excepthook is setup to catch
@@ -470,6 +479,12 @@ def load_command_line_arguments():
         help="The test filter, if not specified all tests will run. "
         + "See https://docs.pytest.org/en/latest/how-to/usage.html#specifying-tests-selecting-tests",
     )
+    parser.add_argument(
+        "--enable_realism",
+        action="store_true",
+        default=False,
+        help="Use realism in the simulator",
+    )
     return parser.parse_args()
 
 
@@ -504,7 +519,9 @@ def simulated_test_runner():
 
     # Launch all binaries
     with Simulator(
-        f"{args.simulator_runtime_dir}/test/{test_name}", args.debug_simulator
+        f"{args.simulator_runtime_dir}/test/{test_name}",
+        args.debug_simulator,
+        args.enable_realism,
     ) as simulator, FullSystem(
         f"{args.blue_full_system_runtime_dir}/test/{test_name}",
         args.debug_blue_full_system,

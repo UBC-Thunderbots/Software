@@ -90,7 +90,7 @@ class ChickerWidget(QWidget):
             self.geneva_slider_layout,
             self.geneva_slider,
             self.geneva_label,
-        ) = common_widgets.create_slider("Geneva Position", 1, NUM_GENEVA_ANGLES, 1)
+        ) = common_widgets.create_slider("Geneva Position", 0, NUM_GENEVA_ANGLES - 1, 1)
         vbox_layout.addLayout(self.geneva_slider_layout)
 
         (

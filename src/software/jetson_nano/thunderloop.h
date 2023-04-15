@@ -77,6 +77,18 @@ class Thunderloop
      */
     double getCpuTemperature();
 
+    /**
+     * Converts the given timespec value to milliseconds
+     * @return The time in milliseconds
+     */
+    double getMilliseconds(timespec time);
+
+    /**
+     * Converts the given timespec value to nanoseconds
+     * @return The time in nanoseconds
+     */
+    double getNanoseconds(timespec time);
+
     // Input Msg Buffers
     TbotsProto::PrimitiveSet primitive_set_;
     TbotsProto::World world_;
@@ -88,8 +100,10 @@ class Thunderloop
     TbotsProto::JetsonStatus jetson_status_;
     TbotsProto::NetworkStatus network_status_;
     TbotsProto::PowerStatus power_status_;
-    TbotsProto::MotorStatus motor_status_;
+    std::optional<TbotsProto::MotorStatus> motor_status_;
     TbotsProto::ThunderloopStatus thunderloop_status_;
+    TbotsProto::ChipperKickerStatus chipper_kicker_status_;
+    TbotsProto::Timestamp time_sent_;
 
     // Current State
     RobotConstants_t robot_constants_;
