@@ -261,9 +261,10 @@ void HRVOAgent::computeNewVelocity(
     // Based on The Hybrid Reciprocal Velocity Obstacle paper:
     // https://gamma.cs.unc.edu/HRVO/HRVO-T-RO.pdf
 
+    const auto pref_velocity = computePreferredVelocity(time_step);
+    setPreferredVelocity(pref_velocity);
     computeVelocityObstacles(agents);
 
-    const auto pref_velocity = computePreferredVelocity(time_step);
 
     // key is difference in length squared between PREFERRED and ACTUAL velocity
     std::multimap<double, CandidateVelocity> candidates;
