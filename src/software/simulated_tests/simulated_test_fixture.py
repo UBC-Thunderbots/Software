@@ -176,7 +176,7 @@ class SimulatedTestRunner(object):
             while True:
                 try:
                     world = self.world_buffer.get(
-                        block=True, timeout=WORLD_BUFFER_TIMEOUT
+                        block=True, timeout=WORLD_BUFFER_TIMEOUT, return_cached=False,
                     )
                     break
                 except queue.Empty as empty:
@@ -196,7 +196,7 @@ class SimulatedTestRunner(object):
                     # We need this blocking get call to synchronize the running speed of world and primitives
                     # Otherwise, we end up with behaviour that doesn't simulate what would happen in the real world
                     self.primitive_set_buffer.get(
-                        block=True, timeout=WORLD_BUFFER_TIMEOUT
+                        block=True, timeout=WORLD_BUFFER_TIMEOUT, return_cached=False,
                     )
 
             # Validate
