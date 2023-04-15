@@ -10,11 +10,11 @@ from pyqtgraph.Qt.QtWidgets import *
 from proto.geometry_pb2 import Point, Segment
 from software.py_constants import *
 from software.thunderscope.constants import (
-    BALL_HEIGHT_EFFECT_MULTIPLIER,
     LINE_WIDTH,
     SPEED_LINE_WIDTH,
     SPEED_SEGMENT_SCALE,
 )
+from software.thunderscope.constants import LINE_WIDTH
 from software.thunderscope.constants import Colors
 from software.networking.threaded_unix_listener import ThreadedUnixListener
 from software.thunderscope.field.field_layer import FieldLayer
@@ -390,12 +390,9 @@ class WorldLayer(FieldLayer):
         painter.setPen(pg.mkPen(Colors.BALL_COLOR, width=LINE_WIDTH))
         painter.setBrush(pg.mkBrush(Colors.BALL_COLOR))
 
-        # Ball should get larger as the height of the ball increases
-        ball_radius = BALL_MAX_RADIUS_METERS * (
-            1 + BALL_HEIGHT_EFFECT_MULTIPLIER * ball_state.distance_from_ground
+        painter.drawEllipse(
+            self.createCircle(ball_state.global_position, BALL_MAX_RADIUS_METERS)
         )
-
-        painter.drawEllipse(self.createCircle(ball_state.global_position, ball_radius))
 
         # If the mouse is being dragged on the screen, visualize
         # the ball velocity vector. The 0.5 scaling is abitrary
