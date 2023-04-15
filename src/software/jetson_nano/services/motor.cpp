@@ -791,6 +791,8 @@ void MotorService::configureADC(uint8_t motor)
 
 void MotorService::configureEncoder(uint8_t motor)
 {
+    checkEncoderConnection(motor);
+
     LOG(INFO) << "Configuring Encoder for motor " << static_cast<uint32_t>(motor);
     // ABN encoder settings
     writeToControllerOrDieTrying(motor, TMC4671_ABN_DECODER_MODE, 0x00000000);
@@ -949,4 +951,37 @@ void MotorService::startController(uint8_t motor, bool dribbler)
         writeToControllerOrDieTrying(motor, TMC4671_MOTOR_TYPE_N_POLE_PAIRS, 0x00030008);
         configureEncoder(motor);
     }
+}
+
+void MotorService::checkEncoderConnection(uint8_t motor)
+{
+    LOG(INFO) << "Checking that the encoder is connected for motor " << static_cast<uint32_t>(motor);
+
+    // read back current velocity
+    double initial_velocity = static_cast<double>(tmc4671_getActualVelocity(motor));
+
+    // open loop mode can be used without an encoder, set open loop phi positive direction
+    writeToControllerOrDieTrying(motor, TMC4671_OPENLOOP_MODE, 0x00000000);
+    writeToControllerOrDieTrying(motor, TMC4671_PHI_E_SELECTION, TMC4671_PHI_E_OPEN_LOOP);
+    writeToControllerOrDieTrying(motor, TMC4671_OPENLOOP_ACCELERATION, 0x0000003C);
+
+    // represents effective voltage applied to the motors (% voltage)
+    writeToControllerOrDieTrying(motor, TMC4671_UQ_UD_EXT, 0x00000799);
+
+    // uq_ud_ext mode
+    writeToControllerOrDieTrying(motor, TMC4671_MODE_RAMP_MODE_MOTION, 0x00000008);
+
+    // 74 RPM
+    writeToControllerOrDieTrying(motor, TMC4671_OPENLOOP_VELOCITY_TARGET, 0x0000004A);
+
+    sleep(1); 
+
+    // now read back the velocity
+    double read_back_velocity = static_cast<double>(tmc4671_getActualVelocity(motor));
+
+    // if the two velocities are the same, something's wrong
+    CHECK(initial_velocity != read_back_velocity) << "Initial and read back velocity during encoder calibration is the same... is the encoder connected?";
+
+    // stop the motor
+    writeToControllerOrDieTrying(motor, TMC4671_OPENLOOP_VELOCITY_TARGET, 0x00000000);
 }

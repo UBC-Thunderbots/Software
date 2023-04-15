@@ -189,6 +189,8 @@ class MotorService
      */
     bool checkDriverFault(uint8_t motor);
 
+    void checkEncoderConnection(uint8_t motor);
+
     // Select between driver and controller gpio
     Gpio spi_demux_select_0;
     Gpio spi_demux_select_1;
