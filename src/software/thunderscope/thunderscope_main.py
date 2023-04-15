@@ -364,6 +364,11 @@ if __name__ == "__main__":
                 SimulationState, simulation_state_buffer
             )
 
+            simulation_state_buffer = ThreadSafeBuffer(1, SimulationState)
+            tscope.simulator_proto_unix_io.register_observer(
+                SimulationState, simulation_state_buffer
+            )
+
             # Tick Simulation
             while True:
 
