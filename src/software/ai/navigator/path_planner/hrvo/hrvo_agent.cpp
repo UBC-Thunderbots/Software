@@ -188,69 +188,71 @@ void HRVOAgent::computeVelocityObstacles(
 
 VelocityObstacle HRVOAgent::createVelocityObstacle(const Agent &other_agent)
 {
-//    Circle moving_agent_circle(other_agent.getPosition(), radius);
-//    Circle obstacle_agent_circle(position, radius);
-//    auto vo =
-//        generateVelocityObstacle(obstacle_agent_circle, moving_agent_circle, velocity);
-//
-//    // Convert velocity obstacle to hybrid reciprocal velocity obstacle (HRVO)
-//    // by shifting one side of the velocity obstacle to share the responsibility
-//    // of avoiding collision with other agent. This assumes that the other agent will also
-//    // be running HRVO
-//    // Refer to: https://gamma.cs.unc.edu/HRVO/HRVO-T-RO.pdf#page=2
-//    // Github: https://github.com/snape/HRVO
-//    Vector vo_side;
-//    Vector rvo_side;
-//    if ((other_agent.getPreferredVelocity() - preferred_velocity)
-//            .isClockwiseOf(position - other_agent.getPosition()))
-//    {
-//        vo_side  = vo.getLeftSide();
-//        rvo_side = vo.getRightSide();
-//    }
-//    else
-//    {
-//        // Vice versa of above
-//        vo_side  = vo.getRightSide();
-//        rvo_side = vo.getLeftSide();
-//    }
-//    Vector rvo_apex = (preferred_velocity + other_agent.getPreferredVelocity()) / 2;
-//    Line vo_side_line(Point(vo.getApex()), Point(vo.getApex() + vo_side));
-//    Line rvo_side_line(Point(rvo_apex), Point(rvo_apex + rvo_side));
-//
-//    Vector hrvo_apex            = vo.getApex();
-//    auto intersection_point_opt = intersection(vo_side_line, rvo_side_line);
-//    if (intersection_point_opt.has_value())
-//    {
-//        hrvo_apex = intersection_point_opt.value().toVector();
-//    }
+    Circle moving_agent_circle(other_agent.getPosition(), radius);
+    Circle obstacle_agent_circle(position, radius);
+    auto vo =
+        generateVelocityObstacle(obstacle_agent_circle, moving_agent_circle, velocity);
 
-    const double combinedRadius = radius * 2;
-    const Vector relativePosition = getPosition() - other_agent.getPosition();
-    const Vector relativeVelocity = velocity - other_agent.getVelocity();
-    const double angle = std::atan2(relativePosition.y(), relativePosition.x());
-    const double openingAngle = std::asin((combinedRadius) / relativePosition.length());
-    Vector side1 = Vector(std::cos(angle - openingAngle),
-                          std::sin(angle - openingAngle));
-    Vector side2 = Vector(std::cos(angle + openingAngle),
-                          std::sin(angle + openingAngle));
+    // Convert velocity obstacle to hybrid reciprocal velocity obstacle (HRVO)
+    // by shifting one side of the velocity obstacle to share the responsibility
+    // of avoiding collision with other agent. This assumes that the other agent will also
+    // be running HRVO
+    // Refer to: https://gamma.cs.unc.edu/HRVO/HRVO-T-RO.pdf#page=2
+    // Github: https://github.com/snape/HRVO
+    Vector vo_side;
+    Vector rvo_side;
+    if ((other_agent.getPreferredVelocity() - preferred_velocity)
+            .isClockwiseOf(position - other_agent.getPosition()))
+    {
+        vo_side  = vo.getLeftSide();
+        rvo_side = vo.getRightSide();
+    }
+    else
+    {
+        // Vice versa of above
+        vo_side  = vo.getRightSide();
+        rvo_side = vo.getLeftSide();
+    }
+    Vector rvo_apex = (preferred_velocity + other_agent.getPreferredVelocity()) / 2;
+    Line vo_side_line(Point(vo.getApex()), Point(vo.getApex() + vo_side));
+    Line rvo_side_line(Point(rvo_apex), Point(rvo_apex + rvo_side));
 
-    const double d = 2.0F * std::sin(openingAngle) * std::cos(openingAngle);
-
-    Vector apex;
-
-    if (relativePosition.determinant(preferred_velocity - other_agent.getPreferredVelocity()) > 0.0F) {
-        const double s =
-                0.5F * relativeVelocity.determinant(side2) / d;
-
-        apex = other_agent.getVelocity() + s * side1;
-    } else {
-        const double s =
-                0.5F * relativeVelocity.determinant(side1) / d;
-
-        apex = other_agent.getVelocity() + s * side2;
+    Vector hrvo_apex            = vo.getApex();
+    auto intersection_point_opt = intersection(vo_side_line, rvo_side_line);
+    if (intersection_point_opt.has_value())
+    {
+        hrvo_apex = intersection_point_opt.value().toVector();
     }
 
-    return VelocityObstacle(apex, side1, side2);
+    return VelocityObstacle(hrvo_apex, vo.getLeftSide(), vo.getRightSide());
+
+//    const double combinedRadius = radius * 2;
+//    const Vector relativePosition = getPosition() - other_agent.getPosition();
+//    const Vector relativeVelocity = velocity - other_agent.getVelocity();
+//    const double angle = std::atan2(relativePosition.y(), relativePosition.x());
+//    const double openingAngle = std::asin((combinedRadius) / relativePosition.length());
+//    Vector side1 = Vector(std::cos(angle - openingAngle),
+//                          std::sin(angle - openingAngle));
+//    Vector side2 = Vector(std::cos(angle + openingAngle),
+//                          std::sin(angle + openingAngle));
+//
+//    const double d = 2.0F * std::sin(openingAngle) * std::cos(openingAngle);
+//
+//    Vector apex;
+//
+//    if (relativePosition.determinant(preferred_velocity - other_agent.getPreferredVelocity()) > 0.0F) {
+//        const double s =
+//                0.5F * relativeVelocity.determinant(side2) / d;
+//
+//        apex = other_agent.getVelocity() + s * side1;
+//    } else {
+//        const double s =
+//                0.5F * relativeVelocity.determinant(side1) / d;
+//
+//        apex = other_agent.getVelocity() + s * side2;
+//    }
+//
+//    return VelocityObstacle(apex, side1, side2);
 }
 
 void HRVOAgent::computeNewVelocity(
