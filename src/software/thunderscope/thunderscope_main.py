@@ -331,7 +331,7 @@ if __name__ == "__main__":
 
             """
             world_state_received_buffer = ThreadSafeBuffer(1, WorldStateReceivedTrigger)
-            tscope.simulator_proto_unix_io.register_observer(
+            tscope.proto_unix_io_map[ProtoUnixIOTypes.SIM].register_observer(
                 WorldStateReceivedTrigger, world_state_received_buffer
             )
 
@@ -352,14 +352,16 @@ if __name__ == "__main__":
                         ball_location=cpp_bindings.Point(0, 0),
                         ball_velocity=cpp_bindings.Vector(0, 0),
                     )
-                    tscope.simulator_proto_unix_io.send_proto(WorldState, world_state)
+                    tscope.proto_unix_io_map[ProtoUnixIOTypes.SIM].send_proto(
+                        WorldState, world_state
+                    )
                 else:
                     break
 
                 time.sleep(0.01)
 
             simulation_state_buffer = ThreadSafeBuffer(1, SimulationState)
-            tscope.simulator_proto_unix_io.register_observer(
+            tscope.proto_unix_io_map[ProtoUnixIOTypes.SIM].register_observer(
                 SimulationState, simulation_state_buffer
             )
 
@@ -370,7 +372,9 @@ if __name__ == "__main__":
 
                 if simulation_state_message.is_playing:
                     tick = SimulatorTick(milliseconds=tick_rate_ms)
-                    tscope.simulator_proto_unix_io.send_proto(SimulatorTick, tick)
+                    tscope.proto_unix_io_map[ProtoUnixIOTypes.SIM].send_proto(
+                        SimulatorTick, tick
+                    )
 
                 time.sleep(tick_rate_ms / 1000)
 
@@ -387,23 +391,25 @@ if __name__ == "__main__":
             args.yellow_full_system_runtime_dir,
         ) as yellow_logger, Gamecontroller() as gamecontroller:
 
-            tscope.blue_full_system_proto_unix_io.register_to_observe_everything(
-                blue_logger.buffer
-            )
-            tscope.yellow_full_system_proto_unix_io.register_to_observe_everything(
-                yellow_logger.buffer
-            )
+            tscope.proto_unix_io_map[
+                ProtoUnixIOTypes.BLUE
+            ].register_to_observe_everything(blue_logger.buffer)
+            tscope.proto_unix_io_map[
+                ProtoUnixIOTypes.YELLOW
+            ].register_to_observe_everything(yellow_logger.buffer)
 
-            blue_fs.setup_proto_unix_io(tscope.blue_full_system_proto_unix_io)
-            yellow_fs.setup_proto_unix_io(tscope.yellow_full_system_proto_unix_io)
+            blue_fs.setup_proto_unix_io(tscope.proto_unix_io_map[ProtoUnixIOTypes.BLUE])
+            yellow_fs.setup_proto_unix_io(
+                tscope.proto_unix_io_map[ProtoUnixIOTypes.YELLOW]
+            )
             simulator.setup_proto_unix_io(
-                tscope.simulator_proto_unix_io,
-                tscope.blue_full_system_proto_unix_io,
-                tscope.yellow_full_system_proto_unix_io,
+                tscope.proto_unix_io_map[ProtoUnixIOTypes.SIM],
+                tscope.proto_unix_io_map[ProtoUnixIOTypes.BLUE],
+                tscope.proto_unix_io_map[ProtoUnixIOTypes.YELLOW],
             )
             gamecontroller.setup_proto_unix_io(
-                tscope.blue_full_system_proto_unix_io,
-                tscope.yellow_full_system_proto_unix_io,
+                tscope.proto_unix_io_map[ProtoUnixIOTypes.BLUE],
+                tscope.proto_unix_io_map[ProtoUnixIOTypes.YELLOW],
             )
 
             # Start the simulator
