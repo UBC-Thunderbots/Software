@@ -157,6 +157,7 @@ class Thunderscope(object):
 
         self.is_playing = True
 
+        # toolbar setup
         simulationToolBar = self.window.addToolBar("simulation")
 
         pixmapi_pause = QStyle.StandardPixmap.SP_MediaPause
