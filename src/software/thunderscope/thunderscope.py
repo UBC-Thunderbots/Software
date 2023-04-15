@@ -155,6 +155,20 @@ class Thunderscope(object):
         )
         self.window.setWindowTitle("Thunderscope")
 
+        self.is_playing = True
+
+        simulationToolBar = self.window.addToolBar("simulation")
+
+        pixmapi_pause = QStyle.StandardPixmap.SP_MediaPause
+        pauseicon = self.window.style().standardIcon(pixmapi_pause)
+        self.pauseSim = QtGui.QAction(pauseicon, "Pause", self.window)
+        simulationToolBar.addAction(self.pauseSim)
+        self.pauseSim.setShortcut("Ctrl+Space")
+
+        simulationToolBar.setFixedHeight(30)
+        simulationToolBar.setIconSize(QtCore.QSize(10, 40))
+        self.pauseSim.triggered.connect(self.__on_pause_simulation_clicked)
+
         # ProtoUnixIOs
         #
         # NOTE: Simulated tests need to be able to run without Thunderscope
@@ -384,6 +398,22 @@ class Thunderscope(object):
             self.load_layout(path)
         except Exception:
             pass
+
+    def __on_pause_simulation_clicked(self, toggle_state):
+        """ when the pause button is clicked, pause gameplay """
+
+        simulator_state = SimulationState(is_playing=not self.is_playing)
+        self.is_playing = not self.is_playing
+        self.simulator_proto_unix_io.send_proto(SimulationState, simulator_state)
+
+        # change the icon of the button based on simulation state
+        if self.is_playing:
+            pixmapi = QStyle.StandardPixmap.SP_MediaPause
+        else:
+            pixmapi = QStyle.StandardPixmap.SP_MediaPlay
+
+        icon = self.window.style().standardIcon(pixmapi)
+        self.pauseSim.setIcon(icon)
 
     def register_refresh_function(self, refresh_func):
         """Register the refresh functions to run at the refresh_interval_ms
