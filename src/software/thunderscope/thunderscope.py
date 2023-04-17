@@ -1,7 +1,6 @@
 import time
 import textwrap
 import shelve
-import signal
 import logging
 import pathlib
 
@@ -50,7 +49,6 @@ class Thunderscope(object):
             The interval in milliseconds to refresh all the widgets.
 
         """
-        signal.signal(signal.SIGINT, signal.SIG_DFL)
 
         self.refresh_interval_ms = refresh_interval_ms
         self.widgets = {}

@@ -10,6 +10,7 @@ from software.thunderscope.tab import (
     WidgetStretchData,
 )
 import pyqtgraph
+import signal
 import qdarktheme
 from qt_material import apply_stylesheet, list_themes
 
@@ -43,6 +44,8 @@ def initialize_application():
     MUST be done before any QWidgets are initialized, so this is called
     at the start of every config initialize method
     """
+    signal.signal(signal.SIGINT, signal.SIG_DFL)
+
     # Setup MainApp and initialize DockArea
     app = pyqtgraph.mkQApp("Thunderscope")
 
@@ -329,11 +332,7 @@ def configure_simulated_test_view(
     initialize_application()
 
     return TScopeConfig(
-        proto_unix_io_map={
-            ProtoUnixIOTypes.BLUE: blue_full_system_proto_unix_io,
-            ProtoUnixIOTypes.YELLOW: yellow_full_system_proto_unix_io,
-            ProtoUnixIOTypes.SIM: simulator_proto_unix_io,
-        },
+        proto_unix_io_map=proto_unix_io_map,
         tabs=[
             TScopeQTTab(
                 name="Blue FullSystem",
