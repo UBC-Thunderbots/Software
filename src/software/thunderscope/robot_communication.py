@@ -141,6 +141,8 @@ class RobotCommunication(object):
                 sequence_number=self.sequence_number,
             )
 
+            print(primitive_set)
+
             self.sequence_number += 1
 
             if (

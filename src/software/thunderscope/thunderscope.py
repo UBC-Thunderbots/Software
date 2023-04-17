@@ -5,27 +5,16 @@ import signal
 import logging
 import pathlib
 
-import PyQt6
-from PyQt6.QtWebEngineWidgets import QWebEngineView
-
-from qt_material import apply_stylesheet, list_themes
-
 import pyqtgraph
-import qdarktheme
-from pyqtgraph.dockarea import *
 from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtWidgets import *
-
-from typing import cast
 
 from software.py_constants import *
 from proto.import_all_protos import *
 from extlibs.er_force_sim.src.protobuf.world_pb2 import *
 from software.thunderscope.dock_label_style import *
 
-from software.thunderscope.thunderscope_config_types import *
-from software.thunderscope.proto_unix_io import ProtoUnixIO
-from software.thunderscope.constants import TabKeys
+from software.thunderscope.thunderscope_config import TScopeConfig
 
 SAVED_LAYOUT_PATH = "/opt/tbotspython/saved_tscope_layout"
 LAYOUT_FILE_EXTENSION = "tscopelayout"
@@ -53,9 +42,6 @@ class Thunderscope(object):
     def __init__(
         self,
         config: TScopeConfig,
-        simulator_proto_unix_io=None,
-        blue_full_system_proto_unix_io=None,
-        yellow_full_system_proto_unix_io=None,
         layout_path=None,
         refresh_interval_ms=10,
     ):
@@ -71,12 +57,6 @@ class Thunderscope(object):
 
         """
         signal.signal(signal.SIGINT, signal.SIG_DFL)
-
-        # Setup MainApp and initialize DockArea
-        self.app = pyqtgraph.mkQApp("Thunderscope")
-
-        # Setup stylesheet
-        apply_stylesheet(self.app, theme="dark_blue.xml")
 
         self.refresh_interval_ms = refresh_interval_ms
         self.widgets = {}
@@ -99,68 +79,14 @@ class Thunderscope(object):
         # protobuf types on two separate widgets.
 
         # initialize proto unix io map with initial values or default if not provided
-        self.proto_unix_io_map = {
-            ProtoUnixIOTypes.BLUE: blue_full_system_proto_unix_io or ProtoUnixIO(),
-            ProtoUnixIOTypes.YELLOW: yellow_full_system_proto_unix_io or ProtoUnixIO(),
-            ProtoUnixIOTypes.SIM: simulator_proto_unix_io or ProtoUnixIO(),
-        }
-        self.widgets_map = {}
+        self.proto_unix_io_map = config.proto_unix_io_map
         self.tab_dock_map = {}
-        self.widget_dock_map = {}
-
-        # iterate through and initialise each non-ref proto unix io
-        for name in list(config.protos.keys()):
-
-            # if not a ref proto unix io
-            if config.protos[name] is None:
-
-                # if it hasn't already been passed in above, initialise it to default
-                if name not in self.proto_unix_io_map:
-                    self.proto_unix_io_map[name] = ProtoUnixIO()
-
-                # remove once it's initialised
-                del config.protos[name]
-
-        # iterate through and initialise each ref proto unix io
-        for name, ref in config.protos.items():
-
-            # if ref exists, maps name to that ref's value
-            # else, throws error
-            if ref in self.proto_unix_io_map:
-                self.proto_unix_io_map[name] = self.proto_unix_io_map[ref]
-            else:
-                raise NameError(f"Given Proto Unix IO Reference {ref} was not found")
 
         # iterate through each tab and add one by one
         for tab in config.tabs:
-
-            # QT Tab, contains widgets
-            if type(tab) == TScopeQTTab:
-                tab = cast(TScopeQTTab, tab)
-                # make dock area
-                dock_area = DockArea()
-                self.tabs.addTab(dock_area, tab.name)
-                self.tab_dock_map[str(tab.key.name)] = dock_area
-
-                self.widgets_map[tab.key] = {}
-                self.widget_dock_map[tab.key] = {}
-
-                # first widget is initial anchor widget
-                # all other widgets will be positioned relative to this one
-                for widget in tab.widgets:
-                    self.add_one_widget(
-                        dock_area,
-                        widget,
-                        self.widgets_map[tab.key],
-                        self.widget_dock_map[tab.key],
-                    )
-
-            # WEB Tab, displays a Chrome webpage
-            elif type(tab) == TScopeWebTab:
-                tab = cast(TScopeWebTab, tab)
-                self.web_view = QWebEngineView()
-                self.web_view.load(QtCore.QUrl(tab.url))
-                self.tabs.addTab(self.web_view, tab.name)
+            self.tab_dock_map[tab.name] = tab.dock_area
+            self.tabs.addTab(tab.dock_area, tab.name)
+            self.register_refresh_function(tab.refresh)
 
         self.window = QtGui.QMainWindow()
         self.window.setCentralWidget(self.tabs)
@@ -168,11 +94,6 @@ class Thunderscope(object):
             QtGui.QIcon("software/thunderscope/thunderscope-logo.png")
         )
         self.window.setWindowTitle("Thunderscope")
-
-        # save robot view control mode signal as a field
-        for tab_widgets in self.widgets_map.values():
-            if "Robot View" in tab_widgets:
-                self.control_mode_signal = tab_widgets["Robot View"].control_mode_signal
 
         # Load the layout file if it exists
         path = layout_path if layout_path else LAST_OPENED_LAYOUT_PATH
@@ -228,24 +149,6 @@ class Thunderscope(object):
                 ),
             )
         )
-
-    def get_widget_args(self, deps):
-        """
-        Takes in a list of dependencies and converts it into a dict of arg names to values
-        So that it can be unpacked and passed into a function
-
-        :param deps: list of dependencies
-        :return: dict of function argument names to values
-        """
-        args = {}
-
-        for dep in deps:
-            if dep.type == ParamTypes.PROTO_UNIX_IO:
-                args[dep.name] = self.proto_unix_io_map[dep.value]
-            else:
-                args[dep.name] = dep.value
-
-        return args
 
     def reset_layout(self):
         """Reset the layout to the default layout"""
@@ -314,7 +217,7 @@ class Thunderscope(object):
         # (instead of adding a placeholder dock)
         with shelve.open(filename, "r") as shelf:
             for key, val in shelf.items():
-                if key in self.widget_dock_map:
+                if key in self.tab_dock_map:
                     self.tab_dock_map[key].restoreState(val)
 
             # Update default layout
@@ -339,39 +242,6 @@ class Thunderscope(object):
 
         self.refresh_timers.append(refresh_timer)
 
-    def add_one_widget(self, dock_area, data: TScopeWidget, widgets_map, dock_map):
-        """
-        Constructs a widget and dock with the given data and adds it to the given dock area
-        As well as to the given map of widgets and docks
-        :param dock_area: the dock area to add the widget to
-        :param data: the data describing the widget of type TScopeWidget
-        :param widgets_map: the map of all widgets to add to
-        :param dock_map: the map of all docks to add to
-        """
-        widget_args = self.get_widget_args(data.deps)
-
-        widget_name = data.name
-        new_widget = data.setup(**widget_args)
-
-        widgets_map[widget_name] = new_widget
-        new_dock = Dock(widget_name)
-        new_dock.addWidget(new_widget.win if data.in_window else new_widget)
-        dock_map[widget_name] = new_dock
-
-        if data.stretch:
-            stretch_data = data.stretch
-            if stretch_data.y:
-                new_dock.setStretch(y=stretch_data.y)
-            if stretch_data.x:
-                new_dock.setStretch(x=stretch_data.x)
-
-        if data.anchor and data.position:
-            dock_area.addDock(new_dock, data.position, dock_map[data.anchor])
-        else:
-            dock_area.addDock(new_dock)
-
-        if not data.no_refresh:
-            self.register_refresh_function(new_widget.refresh)
 
     def show(self):
         """Show the main window"""

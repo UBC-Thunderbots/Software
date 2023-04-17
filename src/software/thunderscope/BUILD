@@ -25,7 +25,7 @@ py_library(
         "//software:unix_full_system",
     ],
     deps = [
-        ":config_types",
+        ":config",
         "//extlibs/er_force_sim/src/protobuf:erforce_py_proto",
         "//proto:software_py_proto",
         "//proto/message_translation:py_tbots_protobuf",
@@ -78,10 +78,10 @@ py_library(
 )
 
 py_library(
-    name = "config_types",
-    srcs = ["thunderscope_config_types.py"],
+    name = "tab",
+    srcs = ["tab.py"],
     deps = [
-        ":constants",
+        ":constants"
     ],
 )
 
@@ -89,8 +89,9 @@ py_library(
     name = "config",
     srcs = ["thunderscope_config.py"],
     deps = [
-        ":config_types",
+        ":tab",
         ":constants",
+        ":proto_unix_io",
         ":widget_names_to_setup",
     ],
 )

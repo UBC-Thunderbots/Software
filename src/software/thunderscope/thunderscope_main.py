@@ -232,14 +232,15 @@ if __name__ == "__main__":
     # send/recv packets over the provided multicast channel.
 
     elif args.run_blue or args.run_yellow or args.run_diagnostics:
+        tscope_config = config.configure_ai_or_diagnostics(
+            args.run_blue,
+            args.run_yellow,
+            args.run_diagnostics,
+            args.visualization_buffer_size,
+            args.cost_visualization,
+        )
         tscope = Thunderscope(
-            config=config.configure_ai_or_diagnostics(
-                args.run_blue,
-                args.run_yellow,
-                args.run_diagnostics,
-                args.visualization_buffer_size,
-                args.cost_visualization,
-            ),
+            config=tscope_config,
             layout_path=args.layout,
         )
 
@@ -266,11 +267,16 @@ if __name__ == "__main__":
             args.disable_estop,
         ) as robot_communication:
             if args.run_diagnostics:
-                tscope.control_mode_signal.connect(
-                    lambda mode, robot_id: robot_communication.toggle_robot_connection(
-                        mode, robot_id
-                    )
-                )
+                for tab in tscope_config.tabs:
+                    if hasattr(tab, "widgets"):
+                        robot_view_widget = tab.find_widget("Robot View")
+
+                        if robot_view_widget:
+                            robot_view_widget.control_mode_signal.connect(
+                                lambda mode, robot_id: robot_communication.toggle_robot_connection(
+                                    mode, robot_id
+                                )
+                            )
 
             if args.run_blue or args.run_yellow:
                 robot_communication.setup_for_fullsystem()

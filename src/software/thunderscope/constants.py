@@ -15,7 +15,7 @@ class ProtoUnixIOTypes(Enum):
     CURRENT = 5
 
 
-class TabKeys(str, Enum):
+class TabNames(str, Enum):
     """
     Different keys for tabs used in various Thunderscope views
     """
