@@ -179,8 +179,11 @@ void MotorService::setUpMotors()
 }
 
 
-bool MotorService::checkDriverFault(uint8_t motor)
+TbotsProto::DriveUnit MotorService::checkDriverFault(uint8_t motor)
 {
+    TbotsProto::DriveUnit drive_status;
+    drive_status.set_drive_enabled(true);
+
     int gstat = tmc6100_readInt(motor, TMC6100_GSTAT);
     std::bitset<32> gstat_bitset(gstat);
 
@@ -194,6 +197,7 @@ bool MotorService::checkDriverFault(uint8_t motor)
         LOG(WARNING)
             << "Indicates that the IC has been reset. All registers have been cleared to reset values."
             << "Attention: DRV_EN must be high to allow clearing reset";
+        drive_status.add_motor_fault(TbotsProto::DriveUnit::RESET);
     }
 
     if (gstat_bitset[1])
@@ -201,6 +205,7 @@ bool MotorService::checkDriverFault(uint8_t motor)
         LOG(WARNING)
             << "drv_otpw : Indicates, that the driver temperature has exceeded overtemperature prewarning-level."
             << "No action is taken. This flag is latched.";
+        drive_status.add_motor_fault(TbotsProto::DriveUnit::DRIVER_OVERTEMPERATURE_PREWARNING);
     }
 
     if (gstat_bitset[2])
@@ -209,6 +214,7 @@ bool MotorService::checkDriverFault(uint8_t motor)
             << "drv_ot: Indicates, that the driver has been shut down due to overtemperature."
             << "This flag can only be cleared when the temperature is below the limit again."
             << "It is latched for information.";
+        drive_status.add_motor_fault(TbotsProto::DriveUnit::DRIVER_OVERTEMPERATURE);
     }
 
     if (gstat_bitset[3])
@@ -216,35 +222,47 @@ bool MotorService::checkDriverFault(uint8_t motor)
         LOG(WARNING) << "uv_cp: Indicates an undervoltage on the charge pump."
                      << "The driver is disabled during undervoltage."
                      << "This flag is latched for information.";
+        drive_status.add_motor_fault(TbotsProto::DriveUnit::UNDERVOLTAGE_CHARGEPUMP);
+        drive_status.set_drive_enabled(false);
     }
 
     if (gstat_bitset[4])
     {
         LOG(WARNING) << "shortdet_u: Short to GND detected on phase U."
                      << "The driver becomes disabled until flag becomes cleared.";
+        drive_status.add_motor_fault(TbotsProto::DriveUnit::PHASE_U_SHORT_COUNTER_DETECTED);
+        drive_status.set_drive_enabled(false);
     }
 
     if (gstat_bitset[5])
     {
         LOG(WARNING) << "s2gu: Short to GND detected on phase U."
                      << "The driver becomes disabled until flag becomes cleared.";
+        drive_status.add_motor_fault(TbotsProto::DriveUnit::PHASE_U_SHORT_TO_GND_DETECTED);
+        drive_status.set_drive_enabled(false);
     }
 
     if (gstat_bitset[6])
     {
         LOG(WARNING) << "s2vsu: Short to VS detected on phase U."
                      << "The driver becomes disabled until flag becomes cleared.";
+        drive_status.add_motor_fault(TbotsProto::DriveUnit::PHASE_U_SHORT_TO_VS_DETECTED);
+        drive_status.set_drive_enabled(false);
     }
 
     if (gstat_bitset[8])
     {
         LOG(WARNING) << "shortdet_v: V short counter has triggered at least once.";
+        drive_status.add_motor_fault(TbotsProto::DriveUnit::PHASE_V_SHORT_COUNTER_DETECTED);
     }
 
     if (gstat_bitset[9])
     {
         LOG(WARNING) << "s2gv: Short to GND detected on phase V."
                      << "The driver becomes disabled until flag becomes cleared.";
+        drive_status.add_motor_fault(TbotsProto::DriveUnit::PHASE_V_SHORT_TO_GND_DETECTED);
+        drive_status.set_drive_enabled(false);
+
     }
 
     if (gstat_bitset[10])
@@ -270,7 +288,7 @@ bool MotorService::checkDriverFault(uint8_t motor)
                      << "The driver becomes disabled until flag becomes cleared.";
     }
 
-    return !gstat_bitset.any();
+    return drive_status;
 }
 
 

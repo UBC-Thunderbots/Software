@@ -189,7 +189,7 @@ class MotorService
      * @param motor The motor to log the status for
      * @return bool true if faulted
      */
-    bool checkDriverFault(uint8_t motor);
+    TbotsProto::DriveUnit checkDriverFault(uint8_t motor);
 
     void checkEncoderConnection(uint8_t motor);
 
