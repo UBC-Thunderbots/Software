@@ -7,7 +7,7 @@ from software.thunderscope.tab import (
     TScopeWidget,
     TScopeQTTab,
     TScopeWebTab,
-    WidgetStretchData
+    WidgetStretchData,
 )
 import pyqtgraph
 import qdarktheme
@@ -28,7 +28,9 @@ class TScopeConfig:
     tabs: Sequence[TScopeTab]  # list of tabs for this view
 
     def __init__(
-            self, proto_unix_io_map: Dict[ProtoUnixIOTypes, ProtoUnixIO], tabs: Sequence[TScopeTab]
+        self,
+        proto_unix_io_map: Dict[ProtoUnixIOTypes, ProtoUnixIO],
+        tabs: Sequence[TScopeTab],
     ):
         self.proto_unix_io_map = proto_unix_io_map
         self.tabs = tabs
@@ -50,17 +52,13 @@ def configure_cost_vis(proto_unix_io):
     """
     return TScopeWidget(
         name="Cost Visualization",
-        widget=setup_cost_visualization_widget(
-            **{"proto_unix_io": proto_unix_io}
-        ),
+        widget=setup_cost_visualization_widget(**{"proto_unix_io": proto_unix_io}),
         anchor="Field",
-        position="right"
+        position="right",
     )
 
 
-def configure_robot_view_fullsystem(
-        fullsystem_proto_unix_io
-):
+def configure_robot_view_fullsystem(fullsystem_proto_unix_io):
     """
     Returns Widget Data for the Robot View Widget for FullSystem
     :param fullsystem_proto_unix_io: the proto unix io key to configure the widget with
@@ -74,18 +72,16 @@ def configure_robot_view_fullsystem(
                 "available_control_modes": [
                     IndividualRobotMode.NONE,
                     IndividualRobotMode.MANUAL,
-                    IndividualRobotMode.AI
-                ]
+                    IndividualRobotMode.AI,
+                ],
             }
         ),
         anchor="Logs",
-        position="above"
+        position="above",
     )
 
 
-def configure_robot_view_diagnostics(
-    diagnostics_proto_unix_io
-):
+def configure_robot_view_diagnostics(diagnostics_proto_unix_io):
     """
     Returns Widget Data for the Robot View Widget for Diagnostics
     :return: the widget data
@@ -95,12 +91,15 @@ def configure_robot_view_diagnostics(
         widget=setup_robot_view(
             **{
                 "proto_unix_io": diagnostics_proto_unix_io,
-                "available_control_modes": [IndividualRobotMode.NONE, IndividualRobotMode.MANUAL]
+                "available_control_modes": [
+                    IndividualRobotMode.NONE,
+                    IndividualRobotMode.MANUAL,
+                ],
             }
         ),
         anchor="Logs",
         stretch=WidgetStretchData(y=5),
-        position="above"
+        position="above",
     )
 
 
@@ -137,45 +136,39 @@ def configure_base_fullsystem(
                     "full_system_proto_unix_io": full_system_proto_unix_io,
                     "sim_proto_unix_io": sim_proto_unix_io,
                     "friendly_colour_yellow": friendly_colour_yellow,
-                    "visualization_buffer_size": visualization_buffer_size
+                    "visualization_buffer_size": visualization_buffer_size,
                 }
-            )
+            ),
         ),
         TScopeWidget(
             name="Parameters",
             widget=setup_parameter_widget(
                 **{
                     "proto_unix_io": full_system_proto_unix_io,
-                    "friendly_colour_yellow": friendly_colour_yellow
+                    "friendly_colour_yellow": friendly_colour_yellow,
                 }
             ),
             anchor="Field",
             position="left",
-            no_refresh=True
+            no_refresh=True,
         ),
         TScopeWidget(
             name="Logs",
-            widget=setup_log_widget(
-                **{"proto_unix_io": full_system_proto_unix_io}
-            ),
+            widget=setup_log_widget(**{"proto_unix_io": full_system_proto_unix_io}),
             anchor="Parameters",
-            position="above"
+            position="above",
         ),
         TScopeWidget(
             name="Referee Info",
-            widget=setup_referee_info(
-                **{"proto_unix_io": full_system_proto_unix_io}
-            ),
+            widget=setup_referee_info(**{"proto_unix_io": full_system_proto_unix_io}),
             anchor="Field",
-            position="bottom"
+            position="bottom",
         ),
         TScopeWidget(
             name="Play Info",
-            widget=setup_play_info(
-                **{"proto_unix_io": full_system_proto_unix_io}
-            ),
+            widget=setup_play_info(**{"proto_unix_io": full_system_proto_unix_io}),
             anchor="Referee Info",
-            position="above"
+            position="above",
         ),
         TScopeWidget(
             name="Performance",
@@ -184,15 +177,12 @@ def configure_base_fullsystem(
             ),
             in_window=True,
             anchor="Play Info",
-            position="right"
-        )
+            position="right",
+        ),
     ] + extra_widgets
 
 
-def configure_base_diagnostics(
-        diagnostics_proto_unix_io,
-        extra_widgets=[]
-):
+def configure_base_diagnostics(diagnostics_proto_unix_io, extra_widgets=[]):
     """
     Returns a list of widget data for a Diagnostics tab
     along with any extra widgets passed in
@@ -204,9 +194,7 @@ def configure_base_diagnostics(
     return [
         TScopeWidget(
             name="Logs",
-            widget=setup_log_widget(
-                **{"proto_unix_io": diagnostics_proto_unix_io}
-            )
+            widget=setup_log_widget(**{"proto_unix_io": diagnostics_proto_unix_io}),
         ),
         TScopeWidget(
             name="Drive and Dribbler",
@@ -214,15 +202,13 @@ def configure_base_diagnostics(
                 **{"proto_unix_io": diagnostics_proto_unix_io}
             ),
             anchor="Logs",
-            position="right"
+            position="right",
         ),
         TScopeWidget(
             name="Chicker",
-            widget=setup_chicker_widget(
-                **{"proto_unix_io": diagnostics_proto_unix_io}
-            ),
+            widget=setup_chicker_widget(**{"proto_unix_io": diagnostics_proto_unix_io}),
             anchor="Drive and Dribbler",
-            position="below"
+            position="below",
         ),
         TScopeWidget(
             name="Manual Control Input",
@@ -232,12 +218,10 @@ def configure_base_diagnostics(
         ),
         TScopeWidget(
             name="Estop",
-            widget=setup_estop_view(
-                **{"proto_unix_io": diagnostics_proto_unix_io}
-            ),
+            widget=setup_estop_view(**{"proto_unix_io": diagnostics_proto_unix_io}),
             anchor="Logs",
             stretch=WidgetStretchData(y=1),
-            position="bottom"
+            position="bottom",
         ),
     ] + extra_widgets
 
@@ -274,7 +258,9 @@ def configure_two_ai_gamecontroller_view(
                     sim_proto_unix_io=proto_unix_io_map[ProtoUnixIOTypes.SIM],
                     friendly_colour_yellow=False,
                     visualization_buffer_size=visualization_buffer_size,
-                    extra_widgets=[configure_cost_vis(proto_unix_io_map[ProtoUnixIOTypes.BLUE])]
+                    extra_widgets=[
+                        configure_cost_vis(proto_unix_io_map[ProtoUnixIOTypes.BLUE])
+                    ]
                     if cost_visualization
                     else [],
                 ),
@@ -283,11 +269,15 @@ def configure_two_ai_gamecontroller_view(
                 name="Yellow FullSystem",
                 key=TabNames.YELLOW,
                 widgets=configure_base_fullsystem(
-                    full_system_proto_unix_io=proto_unix_io_map[ProtoUnixIOTypes.YELLOW],
+                    full_system_proto_unix_io=proto_unix_io_map[
+                        ProtoUnixIOTypes.YELLOW
+                    ],
                     sim_proto_unix_io=proto_unix_io_map[ProtoUnixIOTypes.SIM],
                     friendly_colour_yellow=True,
                     visualization_buffer_size=visualization_buffer_size,
-                    extra_widgets=[configure_cost_vis(proto_unix_io_map[ProtoUnixIOTypes.YELLOW])]
+                    extra_widgets=[
+                        configure_cost_vis(proto_unix_io_map[ProtoUnixIOTypes.YELLOW])
+                    ]
                     if cost_visualization
                     else [],
                 ),
@@ -302,11 +292,11 @@ def configure_two_ai_gamecontroller_view(
 
 
 def configure_simulated_test_view(
-        simulator_proto_unix_io,
-        blue_full_system_proto_unix_io,
-        yellow_full_system_proto_unix_io,
-        visualization_buffer_size=5,
-        cost_visualization=False
+    simulator_proto_unix_io,
+    blue_full_system_proto_unix_io,
+    yellow_full_system_proto_unix_io,
+    visualization_buffer_size=5,
+    cost_visualization=False,
 ):
     """
     Constructs the Thunderscope Config for simulated tests
@@ -325,7 +315,7 @@ def configure_simulated_test_view(
     proto_unix_io_map = {
         ProtoUnixIOTypes.BLUE: blue_full_system_proto_unix_io,
         ProtoUnixIOTypes.YELLOW: yellow_full_system_proto_unix_io,
-        ProtoUnixIOTypes.SIM: simulator_proto_unix_io
+        ProtoUnixIOTypes.SIM: simulator_proto_unix_io,
     }
 
     initialize_application()
@@ -334,7 +324,7 @@ def configure_simulated_test_view(
         proto_unix_io_map={
             ProtoUnixIOTypes.BLUE: blue_full_system_proto_unix_io,
             ProtoUnixIOTypes.YELLOW: yellow_full_system_proto_unix_io,
-            ProtoUnixIOTypes.SIM: simulator_proto_unix_io
+            ProtoUnixIOTypes.SIM: simulator_proto_unix_io,
         },
         tabs=[
             TScopeQTTab(
@@ -344,7 +334,9 @@ def configure_simulated_test_view(
                     full_system_proto_unix_io=proto_unix_io_map[ProtoUnixIOTypes.BLUE],
                     friendly_colour_yellow=False,
                     visualization_buffer_size=visualization_buffer_size,
-                    extra_widgets=[configure_cost_vis(proto_unix_io_map[ProtoUnixIOTypes.BLUE])]
+                    extra_widgets=[
+                        configure_cost_vis(proto_unix_io_map[ProtoUnixIOTypes.BLUE])
+                    ]
                     if cost_visualization
                     else [],
                 ),
@@ -353,10 +345,14 @@ def configure_simulated_test_view(
                 name="Yellow FullSystem",
                 key=TabNames.YELLOW,
                 widgets=configure_base_fullsystem(
-                    full_system_proto_unix_io=proto_unix_io_map[ProtoUnixIOTypes.YELLOW],
+                    full_system_proto_unix_io=proto_unix_io_map[
+                        ProtoUnixIOTypes.YELLOW
+                    ],
                     friendly_colour_yellow=True,
                     visualization_buffer_size=visualization_buffer_size,
-                    extra_widgets=[configure_cost_vis(proto_unix_io_map[ProtoUnixIOTypes.YELLOW])]
+                    extra_widgets=[
+                        configure_cost_vis(proto_unix_io_map[ProtoUnixIOTypes.YELLOW])
+                    ]
                     if cost_visualization
                     else [],
                 ),
@@ -407,7 +403,9 @@ def configure_replay_view(
                     replay=True,
                     replay_log=blue_replay_log,
                     visualization_buffer_size=visualization_buffer_size,
-                    extra_widgets=[configure_cost_vis(proto_unix_io_map[ProtoUnixIOTypes.BLUE])]
+                    extra_widgets=[
+                        configure_cost_vis(proto_unix_io_map[ProtoUnixIOTypes.BLUE])
+                    ]
                     if cost_visualization
                     else [],
                 ),
@@ -421,13 +419,17 @@ def configure_replay_view(
                 name="Yellow FullSystem",
                 key=TabNames.YELLOW,
                 widgets=configure_base_fullsystem(
-                    full_system_proto_unix_io=proto_unix_io_map[ProtoUnixIOTypes.YELLOW],
+                    full_system_proto_unix_io=proto_unix_io_map[
+                        ProtoUnixIOTypes.YELLOW
+                    ],
                     sim_proto_unix_io=proto_unix_io_map[ProtoUnixIOTypes.SIM],
                     friendly_colour_yellow=True,
                     replay=True,
                     replay_log=yellow_replay_log,
                     visualization_buffer_size=visualization_buffer_size,
-                    extra_widgets=[configure_cost_vis(proto_unix_io_map[ProtoUnixIOTypes.YELLOW])]
+                    extra_widgets=[
+                        configure_cost_vis(proto_unix_io_map[ProtoUnixIOTypes.YELLOW])
+                    ]
                     if cost_visualization
                     else [],
                 ),
@@ -479,7 +481,9 @@ def configure_ai_or_diagnostics(
 
     if load_blue:
         proto_unix_io_map[ProtoUnixIOTypes.BLUE] = ProtoUnixIO()
-        proto_unix_io_map[ProtoUnixIOTypes.CURRENT] = proto_unix_io_map[ProtoUnixIOTypes.BLUE]
+        proto_unix_io_map[ProtoUnixIOTypes.CURRENT] = proto_unix_io_map[
+            ProtoUnixIOTypes.BLUE
+        ]
         tabs.append(
             TScopeQTTab(
                 name="Blue Fullsystem",
@@ -489,7 +493,9 @@ def configure_ai_or_diagnostics(
                     sim_proto_unix_io=proto_unix_io_map[ProtoUnixIOTypes.SIM],
                     friendly_colour_yellow=False,
                     visualization_buffer_size=visualization_buffer_size,
-                    extra_widgets=get_extra_widgets(proto_unix_io_map[ProtoUnixIOTypes.BLUE]),
+                    extra_widgets=get_extra_widgets(
+                        proto_unix_io_map[ProtoUnixIOTypes.BLUE]
+                    ),
                 ),
             )
         )
@@ -505,7 +511,9 @@ def configure_ai_or_diagnostics(
                     sim_proto_unix_io=proto_unix_io_map[ProtoUnixIOTypes.SIM],
                     friendly_colour_yellow=True,
                     visualization_buffer_size=visualization_buffer_size,
-                    extra_widgets=get_extra_widgets(proto_unix_io_map[ProtoUnixIOTypes.YELLOW]),
+                    extra_widgets=get_extra_widgets(
+                        proto_unix_io_map[ProtoUnixIOTypes.YELLOW]
+                    ),
                 ),
             )
         )
@@ -519,16 +527,24 @@ def configure_ai_or_diagnostics(
             else ProtoUnixIO()
         )
         if not load_blue and not load_yellow:
-            proto_unix_io_map[ProtoUnixIOTypes.CURRENT] = proto_unix_io_map[ProtoUnixIOTypes.DIAGNOSTICS]
+            proto_unix_io_map[ProtoUnixIOTypes.CURRENT] = proto_unix_io_map[
+                ProtoUnixIOTypes.DIAGNOSTICS
+            ]
         tabs.append(
             TScopeQTTab(
                 name="Robot Diagnostics",
                 key=TabNames.DIAGNOSTICS,
                 widgets=configure_base_diagnostics(
-                    diagnostics_proto_unix_io=proto_unix_io_map[ProtoUnixIOTypes.DIAGNOSTICS],
+                    diagnostics_proto_unix_io=proto_unix_io_map[
+                        ProtoUnixIOTypes.DIAGNOSTICS
+                    ],
                     extra_widgets=[]
                     if (load_blue or load_yellow)
-                    else [configure_robot_view_diagnostics(proto_unix_io_map[ProtoUnixIOTypes.DIAGNOSTICS])]
+                    else [
+                        configure_robot_view_diagnostics(
+                            proto_unix_io_map[ProtoUnixIOTypes.DIAGNOSTICS]
+                        )
+                    ],
                 ),
             )
         )

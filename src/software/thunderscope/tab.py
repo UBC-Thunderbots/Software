@@ -35,14 +35,14 @@ class TScopeWidget:
     in_window: Optional[bool]  # if this widget should be added in window or not
 
     def __init__(
-            self,
-            name: str,
-            widget: Any,
-            anchor: Optional[str] = None,
-            position: Optional[str] = None,
-            in_window: Optional[bool] = False,
-            stretch: Optional[object] = None,
-            no_refresh: Optional[bool] = False,
+        self,
+        name: str,
+        widget: Any,
+        anchor: Optional[str] = None,
+        position: Optional[str] = None,
+        in_window: Optional[bool] = False,
+        stretch: Optional[object] = None,
+        no_refresh: Optional[bool] = False,
     ):
         self.name = name
         self.widget = widget
@@ -58,9 +58,9 @@ class TScopeTab:
     Data that describes a tab in Thunderscope
     """
 
-    name: str               # name of tab
-    key: TabNames           # key to identify this tab
-    dock_area: QWidget      # Dock Area for this tab
+    name: str  # name of tab
+    key: TabNames  # key to identify this tab
+    dock_area: QWidget  # Dock Area for this tab
 
     def __init__(self, name: str, key: TabNames):
         self.name = name
@@ -75,10 +75,12 @@ class TScopeQTTab(TScopeTab):
     Data that describes a tab with Qt Widgets in Thunderscope
     """
 
-    widgets: Sequence[TScopeWidget]                   # list of widget data for this tab
-    widgets_map: Dict[str, TScopeWidget]              # Mapping of widget names to widget objects
-    dock_map: Dict[str, DockArea]                     # Mapping of widget names to dock areas
-    refresh_functions: Dict[str, Callable[[], None]]  # Mapping of widget names to refresh functions
+    widgets: Sequence[TScopeWidget]  # list of widget data for this tab
+    widgets_map: Dict[str, TScopeWidget]  # Mapping of widget names to widget objects
+    dock_map: Dict[str, DockArea]  # Mapping of widget names to dock areas
+    refresh_functions: Dict[
+        str, Callable[[], None]
+    ]  # Mapping of widget names to refresh functions
 
     def __init__(self, name: str, key: TabNames, widgets: Sequence[TScopeWidget]):
         super().__init__(name, key)
@@ -152,4 +154,3 @@ class TScopeWebTab(TScopeTab):
         web_view.load(QtCore.QUrl(url))
 
         self.dock_area = web_view
-

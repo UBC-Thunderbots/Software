@@ -40,10 +40,7 @@ class Thunderscope(object):
     """
 
     def __init__(
-        self,
-        config: TScopeConfig,
-        layout_path=None,
-        refresh_interval_ms=10,
+        self, config: TScopeConfig, layout_path=None, refresh_interval_ms=10,
     ):
         """Initialize Thunderscope
 
@@ -241,7 +238,6 @@ class Thunderscope(object):
         refresh_timer.start(self.refresh_interval_ms)
 
         self.refresh_timers.append(refresh_timer)
-
 
     def show(self):
         """Show the main window"""

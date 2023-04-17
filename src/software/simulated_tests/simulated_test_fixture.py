@@ -24,9 +24,7 @@ from software.thunderscope.binary_context_managers import (
     Simulator,
     Gamecontroller,
 )
-from software.thunderscope.thunderscope_config import (
-    configure_simulated_test_view,
-)
+from software.thunderscope.thunderscope_config import configure_simulated_test_view
 from software.thunderscope.replay.proto_logger import ProtoLogger
 
 from software.logger.logger import createLogger
@@ -420,7 +418,7 @@ def simulated_test_runner():
                     configure_simulated_test_view(
                         blue_full_system_proto_unix_io=blue_full_system_proto_unix_io,
                         yellow_full_system_proto_unix_io=yellow_full_system_proto_unix_io,
-                        simulator_proto_unix_io=simulator_proto_unix_io
+                        simulator_proto_unix_io=simulator_proto_unix_io,
                     ),
                     layout_path=args.layout,
                 )

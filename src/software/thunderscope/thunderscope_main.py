@@ -239,10 +239,7 @@ if __name__ == "__main__":
             args.visualization_buffer_size,
             args.cost_visualization,
         )
-        tscope = Thunderscope(
-            config=tscope_config,
-            layout_path=args.layout,
-        )
+        tscope = Thunderscope(config=tscope_config, layout_path=args.layout,)
 
         current_proto_unix_io = None
 
