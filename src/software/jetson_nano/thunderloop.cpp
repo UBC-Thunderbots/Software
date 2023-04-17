@@ -12,12 +12,28 @@
 #include "software/world/robot_state.h"
 #include "software/world/team.h"
 
+#include <csignal>
+
 /**
  * https://rt.wiki.kernel.org/index.php/Squarewave-example
  * using clock_nanosleep of librt
  */
 extern int clock_nanosleep(clockid_t __clock_id, int __flags,
                            __const struct timespec* __req, struct timespec* __rem);
+
+extern "C"
+{
+    static MotorService* g_motor_service = NULL;
+
+    void gracefulExit(int signal_num)
+    {
+        LOG(INFO) << "Received a termination signal... Thunderloop shutting down";
+
+        g_motor_service->resetMotorBoard();        
+
+        exit(signal_num);
+    }
+}
 
 Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, const int loop_hz)
     // TODO (#2495): Set the friendly team colour once we receive World proto
@@ -56,6 +72,8 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, const int loop
               << ", and NETWORK INTERFACE: " << network_interface_;
     LOG(INFO)
         << "THUNDERLOOP: to update Thunderloop configuration, change REDIS store and restart Thunderloop";
+
+    g_motor_service = motor_service_.get();
 }
 
 Thunderloop::~Thunderloop() {}
@@ -65,6 +83,11 @@ Thunderloop::~Thunderloop() {}
  */
 [[noreturn]] void Thunderloop::runLoop()
 {
+    std::signal(SIGSEGV, gracefulExit);
+    std::signal(SIGTERM, gracefulExit);
+    std::signal(SIGABRT, gracefulExit);
+    std::signal(SIGFPE, gracefulExit);
+
     // Timing
     struct timespec next_shot;
     struct timespec poll_time;

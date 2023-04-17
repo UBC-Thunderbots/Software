@@ -972,7 +972,7 @@ void MotorService::checkEncoderConnection(uint8_t motor)
     writeToControllerOrDieTrying(motor, TMC4671_MODE_RAMP_MODE_MOTION, 0x00000008);
 
     // 74 RPM
-    writeToControllerOrDieTrying(motor, TMC4671_OPENLOOP_VELOCITY_TARGET, 0x0000004A);
+    writeToControllerOrDieTrying(motor, TMC4671_OPENLOOP_VELOCITY_TARGET, 0x0000000A);
 
     sleep(1); 
 
@@ -984,4 +984,9 @@ void MotorService::checkEncoderConnection(uint8_t motor)
 
     // stop the motor
     writeToControllerOrDieTrying(motor, TMC4671_OPENLOOP_VELOCITY_TARGET, 0x00000000);
+}
+
+void MotorService::resetMotorBoard()
+{
+    reset_gpio.setValue(GpioState::LOW);
 }

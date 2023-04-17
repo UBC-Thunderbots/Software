@@ -82,6 +82,8 @@ class MotorService
      */
     void runOpenLoopCalibrationRoutine(uint8_t motor, size_t num_samples);
 
+    void resetMotorBoard();
+
    private:
     /**
      * Checks for faults, clears them and sets up motors.
