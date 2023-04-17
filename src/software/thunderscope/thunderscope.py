@@ -10,9 +10,6 @@ from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtWidgets import *
 
 from software.py_constants import *
-from proto.import_all_protos import *
-from extlibs.er_force_sim.src.protobuf.world_pb2 import *
-from software.thunderscope.dock_label_style import *
 
 from software.thunderscope.thunderscope_config import TScopeConfig
 

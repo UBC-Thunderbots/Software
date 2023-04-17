@@ -100,8 +100,9 @@ class TScopeQTTab(TScopeTab):
 
     def add_one_widget(self, data: TScopeWidget):
         """
-        Constructs a widget and dock with the given data and adds it to the given dock area
-        As well as to the given map of widgets and docks
+        Gets the widget name and object from the given data
+        Add widget to a dock and adds dock to this tab's dock area
+        And to this tab's map of widgets and docks
         :param data: the data describing the widget of type TScopeWidget
         """
 
@@ -129,10 +130,18 @@ class TScopeQTTab(TScopeTab):
             self.refresh_functions[widget_name] = new_widget.refresh
 
     def refresh(self):
+        """
+        Refreshes all the widgets belonging to this tab
+        """
         for refresh_func in self.refresh_functions.values():
             refresh_func()
 
     def find_widget(self, widget_name):
+        """
+        Finds and returns the widget object corresponding to the given name, if exists
+        If not, returns None
+        :param widget_name: the name of the widget
+        """
         if widget_name in self.widgets_map:
             return self.widgets_map[widget_name]
         else:

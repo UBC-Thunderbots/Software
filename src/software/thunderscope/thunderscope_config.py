@@ -37,6 +37,12 @@ class TScopeConfig:
 
 
 def initialize_application():
+    """
+    Initializes a QApplication
+
+    MUST be done before any QWidgets are initialized, so this is called
+    at the start of every config initialize method
+    """
     # Setup MainApp and initialize DockArea
     app = pyqtgraph.mkQApp("Thunderscope")
 
@@ -245,6 +251,7 @@ def configure_two_ai_gamecontroller_view(
         ProtoUnixIOTypes.SIM: ProtoUnixIO(),
     }
 
+    # Must be called before widgets are initialized below
     initialize_application()
 
     return TScopeConfig(
@@ -318,6 +325,7 @@ def configure_simulated_test_view(
         ProtoUnixIOTypes.SIM: simulator_proto_unix_io,
     }
 
+    # Must be called before widgets are initialized below
     initialize_application()
 
     return TScopeConfig(
@@ -332,6 +340,7 @@ def configure_simulated_test_view(
                 key=TabNames.BLUE,
                 widgets=configure_base_fullsystem(
                     full_system_proto_unix_io=proto_unix_io_map[ProtoUnixIOTypes.BLUE],
+                    sim_proto_unix_io=proto_unix_io_map[ProtoUnixIOTypes.SIM],
                     friendly_colour_yellow=False,
                     visualization_buffer_size=visualization_buffer_size,
                     extra_widgets=[
@@ -348,6 +357,7 @@ def configure_simulated_test_view(
                     full_system_proto_unix_io=proto_unix_io_map[
                         ProtoUnixIOTypes.YELLOW
                     ],
+                    sim_proto_unix_io=proto_unix_io_map[ProtoUnixIOTypes.SIM],
                     friendly_colour_yellow=True,
                     visualization_buffer_size=visualization_buffer_size,
                     extra_widgets=[
@@ -388,6 +398,7 @@ def configure_replay_view(
     proto_unix_io_map = {ProtoUnixIOTypes.SIM: ProtoUnixIO()}
     tabs = []
 
+    # Must be called before widgets are initialized below
     initialize_application()
 
     if blue_replay_log:
@@ -477,6 +488,7 @@ def configure_ai_or_diagnostics(
     proto_unix_io_map = {ProtoUnixIOTypes.SIM: ProtoUnixIO()}
     tabs = []
 
+    # Must be called before widgets are initialized below
     initialize_application()
 
     if load_blue:
