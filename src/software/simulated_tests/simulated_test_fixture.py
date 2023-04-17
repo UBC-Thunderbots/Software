@@ -218,12 +218,12 @@ class SimulatedTestRunner(object):
                 always_validation_proto_set.test_name = self.test_name
 
                 # Send out the validation proto to thunderscope
-                self.thunderscope.proto_unix_io_map[
-                    ProtoUnixIOTypes.BLUE
-                ].send_proto(ValidationProtoSet, eventually_validation_proto_set)
-                self.thunderscope.proto_unix_io_map[
-                    ProtoUnixIOTypes.BLUE
-                ].send_proto(ValidationProtoSet, always_validation_proto_set)
+                self.thunderscope.proto_unix_io_map[ProtoUnixIOTypes.BLUE].send_proto(
+                    ValidationProtoSet, eventually_validation_proto_set
+                )
+                self.thunderscope.proto_unix_io_map[ProtoUnixIOTypes.BLUE].send_proto(
+                    ValidationProtoSet, always_validation_proto_set
+                )
 
             # Check that all always validations are always valid
             validation.check_validation(always_validation_proto_set)
