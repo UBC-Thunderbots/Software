@@ -86,9 +86,11 @@ message DriveUnit
         // for the sake of consistency with the TMC 6100, "7" is unused
         PHASE_V_SHORT_COUNTER_DETECTED      = 8;
         PHASE_V_SHORT_TO_GND_DETECTED       = 9;
-        PHASE_W_SHORT_COUNTER_DETECTED      = 10;
-        PHASE_W_SHORT_TO_GND_DETECTED       = 11;
-        PHASE_W_SHORT_TO_VS_DETECTED        = 12;
+        PHASE_V_SHORT_TO_VS_DETECTED        = 10;
+        // for the sake of consistency with the TMC 6100, "11" is unused
+        PHASE_W_SHORT_COUNTER_DETECTED      = 12;
+        PHASE_W_SHORT_TO_GND_DETECTED       = 13;
+        PHASE_W_SHORT_TO_VS_DETECTED        = 14;
     } 
         
 

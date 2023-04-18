@@ -19,6 +19,7 @@
 #include <unistd.h>        // needed for sysconf(int name);
 
 #include <bitset>
+#include <new>
 
 #include "proto/tbots_software_msgs.pb.h"
 #include "shared/constants.h"
@@ -99,7 +100,8 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
       driver_control_enable_gpio(DRIVER_CONTROL_ENABLE_GPIO, GpioDirection::OUTPUT,
                                  GpioState::HIGH),
       reset_gpio(MOTOR_DRIVER_RESET_GPIO, GpioDirection::OUTPUT, GpioState::HIGH),
-      euclidean_to_four_wheel(robot_constants)
+      euclidean_to_four_wheel(robot_constants),
+      motor_fault_detector(0)
 {
     robot_constants_ = robot_constants;
 
@@ -269,34 +271,78 @@ TbotsProto::DriveUnit MotorService::checkDriverFault(uint8_t motor)
     {
         LOG(WARNING) << "s2vsv: Short to VS detected on phase V."
                      << "The driver becomes disabled until flag becomes cleared.";
+        drive_status.add_motor_fault(TbotsProto::DriveUnit::PHASE_V_SHORT_TO_VS_DETECTED);
+        drive_status.set_drive_enabled(false);
     }
 
     if (gstat_bitset[12])
     {
         LOG(WARNING) << "shortdet_w: short counter has triggered at least once.";
+        drive_status.add_motor_fault(TbotsProto::DriveUnit::PHASE_W_SHORT_COUNTER_DETECTED);
     }
 
     if (gstat_bitset[13])
     {
         LOG(WARNING) << "s2gw: Short to GND detected on phase W."
                      << "The driver becomes disabled until flag becomes cleared.";
+        drive_status.add_motor_fault(TbotsProto::DriveUnit::PHASE_W_SHORT_TO_GND_DETECTED);
+        drive_status.set_drive_enabled(false);
     }
 
     if (gstat_bitset[14])
     {
         LOG(WARNING) << "s2vsw: Short to VS detected on phase W."
                      << "The driver becomes disabled until flag becomes cleared.";
+        drive_status.add_motor_fault(TbotsProto::DriveUnit::PHASE_W_SHORT_TO_VS_DETECTED);
+        drive_status.set_drive_enabled(false);
     }
 
     return drive_status;
+}
+
+TbotsProto::MotorStatus MotorService::updateMotorStatus(
+        double front_left_velocity,
+        double front_right_velocity,
+        double back_left_velocity,
+        double back_right_velocity)
+{
+    TbotsProto::MotorStatus motor_status;
+    motor_status.mutable_front_left()->set_drive_enabled(true);
+    motor_status.mutable_front_right()->set_drive_enabled(true);
+    motor_status.mutable_back_left()->set_drive_enabled(true);
+    motor_status.mutable_back_right()->set_drive_enabled(true);
+
+    if (motor_fault_detector == FRONT_LEFT_MOTOR_CHIP_SELECT)
+    {
+        *(motor_status.mutable_front_left()) = checkDriverFault(FRONT_LEFT_MOTOR_CHIP_SELECT);
+    }
+    if (motor_fault_detector == FRONT_RIGHT_MOTOR_CHIP_SELECT)
+    {
+        *(motor_status.mutable_front_right()) = checkDriverFault(FRONT_RIGHT_MOTOR_CHIP_SELECT);
+    }
+    if (motor_fault_detector == BACK_LEFT_MOTOR_CHIP_SELECT)
+    {
+        *(motor_status.mutable_back_left()) = checkDriverFault(BACK_LEFT_MOTOR_CHIP_SELECT);
+    }
+    if (motor_fault_detector == BACK_RIGHT_MOTOR_CHIP_SELECT)
+    {
+        *(motor_status.mutable_back_right()) = checkDriverFault(BACK_RIGHT_MOTOR_CHIP_SELECT);
+    }
+
+    motor_status.mutable_front_left()->set_wheel_velocity(static_cast<float>(front_left_velocity));
+    motor_status.mutable_front_right()->set_wheel_velocity(static_cast<float>(front_right_velocity));
+    motor_status.mutable_back_left()->set_wheel_velocity(static_cast<float>(back_left_velocity));
+    motor_status.mutable_back_right()->set_wheel_velocity(static_cast<float>(back_right_velocity));
+
+    motor_fault_detector = (motor_fault_detector + 1) % NUM_DRIVE_MOTORS;
+
+    return motor_status;
 }
 
 
 TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor,
                                            double time_elapsed_since_last_poll_s)
 {
-    TbotsProto::MotorStatus motor_status;
-
     bool encoders_calibrated = (encoder_calibrated_[FRONT_LEFT_MOTOR_CHIP_SELECT] ||
                                 encoder_calibrated_[FRONT_RIGHT_MOTOR_CHIP_SELECT] ||
                                 encoder_calibrated_[BACK_LEFT_MOTOR_CHIP_SELECT] ||
@@ -349,14 +395,7 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
         static_cast<double>(tmc4671_getActualVelocity(BACK_LEFT_MOTOR_CHIP_SELECT)) *
         MECHANICAL_MPS_PER_ELECTRICAL_RPM;
 
-    motor_status.mutable_front_right()->set_wheel_velocity(
-        static_cast<float>(front_right_velocity));
-    motor_status.mutable_front_left()->set_wheel_velocity(
-        static_cast<float>(front_left_velocity));
-    motor_status.mutable_back_left()->set_wheel_velocity(
-        static_cast<float>(back_left_velocity));
-    motor_status.mutable_back_right()->set_wheel_velocity(
-        static_cast<float>(back_right_velocity));
+    TbotsProto::MotorStatus motor_status = updateMotorStatus(front_left_velocity, front_right_velocity, back_left_velocity, back_right_velocity);
 
     // This order needs to match euclidean_to_four_wheel converters order
     // We also want to work in the meters per second space rather than electrical RPMs

@@ -193,6 +193,8 @@ class MotorService
 
     void checkEncoderConnection(uint8_t motor);
 
+    TbotsProto::MotorStatus updateMotorStatus(double front_left_velocity, double front_right_velocity, double back_left_velocity, double back_right_velocity);
+
     // Select between driver and controller gpio
     Gpio spi_demux_select_0;
     Gpio spi_demux_select_1;
@@ -223,4 +225,6 @@ class MotorService
 
     // Previous wheel velocities
     WheelSpace_t prev_wheel_velocities;
+
+    int motor_fault_detector;
 };
