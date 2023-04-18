@@ -58,7 +58,7 @@ def setup_field_widget(
     :param friendly_colour_yellow: Whether the friendly colour is yellow
     :param replay: whether replay mode is currently enabled
     :param replay_log: the file path of the replay log
-    :param visualization_buffer_size:
+    :param visualization_buffer_size: How many packets to buffer while rendering
     :returns: the field widget
 
     """

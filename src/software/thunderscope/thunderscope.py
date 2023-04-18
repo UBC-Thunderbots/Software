@@ -41,9 +41,6 @@ class Thunderscope(object):
         """Initialize Thunderscope
 
         :param config: The current Thunderscope UI configuration
-        :param simulator_proto_unix_io: The simulator's proto unix io
-        :param blue_full_system_proto_unix_io: The blue full system's proto unix io
-        :param yellow_full_system_proto_unix_io: The yellow full system's proto unix io
         :param layout_path: The path to the layout to load
         :param refresh_interval_ms:
             The interval in milliseconds to refresh all the widgets.
@@ -226,10 +223,9 @@ class Thunderscope(object):
         :param refresh_func: The function to call at refresh_interval_ms
 
         """
-
         refresh_timer = QtCore.QTimer()
         refresh_timer.setTimerType(QtCore.Qt.TimerType.PreciseTimer)
-        refresh_timer.timeout.connect(refresh_func)
+        refresh_timer.timeout.connect(lambda: refresh_func())
         refresh_timer.start(self.refresh_interval_ms)
 
         self.refresh_timers.append(refresh_timer)
