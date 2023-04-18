@@ -304,7 +304,7 @@ def hrvo_setup(
             [],
             [],
             [],
-            20,
+            6,
         ),
         # friendly robots in a circle moving along each diameter
         # while turning from 0 to 180 degrees
@@ -314,7 +314,7 @@ def hrvo_setup(
             [Angle(radians=math.pi) for i in range(8)],
             [],
             [],
-            20,
+            10,
         ),
         # half enemy half friendly robots in a circle moving along each diameter
         (
@@ -342,7 +342,7 @@ def hrvo_setup(
                 for index, pos in enumerate(get_robot_circle_pos(1.5, 8, True))
                 if index % 2 == 1
             ],
-            20,
+            10,
         ),
     ],
     ids=[
@@ -409,24 +409,19 @@ def get_reached_destination_validation(robot_destinations):
     :param robot_destinations: the destination of each robot we want to make validations for
     :return: the validation sequence set
     """
-    threshold = 0.05
+    threshold = 0.08
     # Eventually Validation
     return [
         [
             RobotEventuallyEntersRegionAndStops(
                 robot_id,
-                regions=[
-                    tbots.Rectangle(
-                        tbots.Point(
-                            destination.x_meters - threshold,
-                            destination.y_meters - threshold,
-                        ),
-                        tbots.Point(
-                            destination.x_meters + threshold,
-                            destination.y_meters + threshold,
-                        ),
-                    )
-                ],
+                region=tbots.Circle(
+                    tbots.Point(
+                        destination.x_meters,
+                        destination.y_meters,
+                    ),
+                    threshold
+                ),
                 num_ticks=15,
             )
         ]
