@@ -4,11 +4,11 @@ from proto.import_all_protos import *
 
 from software.simulated_tests.validation import (
     create_validation_types,
-    create_validation_geometry
+    create_validation_geometry,
 )
 
 
-class RobotEntersRegionAndStops():
+class RobotEntersRegionAndStops:
 
     """Checks if a specific robot enters the provided regions and stops there for the provided time"""
 
@@ -43,12 +43,15 @@ class RobotEntersRegionAndStops():
         for robot in world.friendly_team.team_robots:
             if robot.id == self.robot_id:
                 if tbots.contains(
-                        self.region, tbots.createPoint(robot.current_state.global_position)
+                    self.region, tbots.createPoint(robot.current_state.global_position)
                 ):
-                    if math.hypot(
+                    if (
+                        math.hypot(
                             robot.current_state.global_velocity.x_component_meters,
                             robot.current_state.global_velocity.y_component_meters,
-                    ) < 0.01:
+                        )
+                        < 0.01
+                    ):
                         self.ticks_so_far = self.ticks_so_far + 1
                         self.is_stationary = True
                         if self.ticks_so_far >= self.num_ticks:
@@ -73,7 +76,11 @@ class RobotEntersRegionAndStops():
         if not self.is_stationary:
             return f"Check that robot {self.robot_id} in correct region is stationary"
 
-        return f"Check for stationary robot {self.robot_id} in region " + "," + repr(self.region)
+        return (
+            f"Check for stationary robot {self.robot_id} in region "
+            + ","
+            + repr(self.region)
+        )
 
 
 (

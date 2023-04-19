@@ -13,6 +13,8 @@ from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
 from proto.geometry_pb2 import Point, Vector, Angle, AngularVelocity
 
+from proto.ssl_gc_geometry_pb2 import Vector2
+
 
 def test_shoot_or_chip_play(simulated_test_runner):
     def setup(*args):

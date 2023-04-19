@@ -176,7 +176,7 @@ class SimulatedTestRunner(object):
             while True:
                 try:
                     world = self.world_buffer.get(
-                        block=True, timeout=WORLD_BUFFER_TIMEOUT
+                        block=True, timeout=WORLD_BUFFER_TIMEOUT, return_cached=False,
                     )
                     break
                 except queue.Empty as empty:
@@ -196,7 +196,7 @@ class SimulatedTestRunner(object):
                     # We need this blocking get call to synchronize the running speed of world and primitives
                     # Otherwise, we end up with behaviour that doesn't simulate what would happen in the real world
                     self.primitive_set_buffer.get(
-                        block=True, timeout=WORLD_BUFFER_TIMEOUT
+                        block=True, timeout=WORLD_BUFFER_TIMEOUT, return_cached=False,
                     )
 
             # Validate
@@ -261,10 +261,11 @@ class SimulatedTestRunner(object):
         #  for when it has received the initial world state
         time.sleep(TEST_START_DELAY_S)
 
+        # If thunderscope is enabled, run the test in a thread and show
+        # thunderscope on this thread. The excepthook is setup to catch
+        # any test failures and propagate them to the main thread
         if self.thunderscope:
-            # If thunderscope is enabled, run the test in a thread and show
-            # thunderscope on this thread. The excepthook is setup to catch
-            # any test failures and propagate them to the main thread
+
             run_sim_thread = threading.Thread(
                 target=self.runner,
                 daemon=True,
@@ -282,7 +283,7 @@ class SimulatedTestRunner(object):
             if self.last_exception:
                 pytest.fail(str(self.last_exception))
 
-            # If thunderscope is disabled, just run the test
+        # If thunderscope is disabled, just run the test
         else:
             self.runner(
                 always_validation_sequence_set,
@@ -354,7 +355,7 @@ class AggregateTestRunner(SimulatedTestRunner):
 
     def run_test(
         self,
-        setup=(lambda: None),
+        setup=(lambda arg: None),
         params=[],
         ag_always_validation_sequence_set=[[]],
         ag_eventually_validation_sequence_set=[[]],
@@ -378,14 +379,14 @@ class AggregateTestRunner(SimulatedTestRunner):
 
         threading.excepthook = self.excepthook
 
+        failed_tests = 0
+
         # Runs the test once for each given parameter
         # Catches Assertion Error thrown by failing test and increments counter
         # Calculates overall results and prints them
         for x in range(len(params)):
 
             setup(params[x])
-
-            failed_tests = 0
 
             try:
                 super().run_test(
@@ -399,7 +400,7 @@ class AggregateTestRunner(SimulatedTestRunner):
 
         # TODO (#2856) Fix validation and results output
 
-        print(f"{failed_tests} test failed")
+        logger.info(f"{failed_tests} test failed")
 
         assert failed_tests == 0
 
