@@ -1,5 +1,17 @@
 from pyqtgraph.Qt import QtCore, QtGui
 from proto.import_all_protos import *
+from enum import IntEnum
+
+
+class IndividualRobotMode(IntEnum):
+    """
+    Enum for the mode of input for an individual robot
+    """
+
+    NONE = 0
+    MANUAL = 1
+    AI = 2
+
 
 LINE_WIDTH = 3
 SPEED_LINE_WIDTH = 2
@@ -8,6 +20,10 @@ SPEED_SEGMENT_SCALE = 0.2
 ROBOT_RADIUS = 25
 
 BALL_HEIGHT_EFFECT_MULTIPLIER = 3
+
+# Time (in seconds) to sleep / delay the loop iteration for different protos
+# in robot communications
+ROBOT_COMMUNICATIONS_TIMEOUT_S = 0.02
 
 # Mapping between RobotStatus Error Codes and their dialog messages
 ERROR_CODE_MESSAGES = {

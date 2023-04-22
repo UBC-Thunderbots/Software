@@ -106,6 +106,5 @@ py_library(
     ],
     deps = [
         "//software/thunderscope:constants",
-        "//software/thunderscope/common:common_widgets",
     ],
 )
