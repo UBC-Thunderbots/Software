@@ -1010,37 +1010,55 @@ void MotorService::startController(uint8_t motor, bool dribbler)
     }
 }
 
-void MotorService::checkEncoderConnection(uint8_t motor)
+void MotorService::checkAllEncoders()
 {
-    LOG(INFO) << "Checking that the encoder is connected for motor " << static_cast<uint32_t>(motor);
+    std::vector<bool> calibrated_motors(NUM_DRIVE_MOTORS, false);
+    std::vector<double> initial_velocities;
 
-    // read back current velocity
-    double initial_velocity = static_cast<double>(tmc4671_getActualVelocity(motor));
+    for (int motor = 0; motor < NUM_DRIVE_MOTORS; ++motor)
+    {
+        // read back current velocity
+        initial_velocities[motor] = static_cast<double>(tmc4671_getActualVelocity(motor));
 
-    // open loop mode can be used without an encoder, set open loop phi positive direction
-    writeToControllerOrDieTrying(motor, TMC4671_OPENLOOP_MODE, 0x00000000);
-    writeToControllerOrDieTrying(motor, TMC4671_PHI_E_SELECTION, TMC4671_PHI_E_OPEN_LOOP);
-    writeToControllerOrDieTrying(motor, TMC4671_OPENLOOP_ACCELERATION, 0x0000003C);
+        // open loop mode can be used without an encoder, set open loop phi positive direction
+        writeToControllerOrDieTrying(motor, TMC4671_OPENLOOP_MODE, 0x00000000);
+        writeToControllerOrDieTrying(motor, TMC4671_PHI_E_SELECTION, TMC4671_PHI_E_OPEN_LOOP);
+        writeToControllerOrDieTrying(motor, TMC4671_OPENLOOP_ACCELERATION, 0x0000003C);
 
-    // represents effective voltage applied to the motors (% voltage)
-    writeToControllerOrDieTrying(motor, TMC4671_UQ_UD_EXT, 0x00000799);
+        // represents effective voltage applied to the motors (% voltage)
+        writeToControllerOrDieTrying(motor, TMC4671_UQ_UD_EXT, 0x00000799);
 
-    // uq_ud_ext mode
-    writeToControllerOrDieTrying(motor, TMC4671_MODE_RAMP_MODE_MOTION, 0x00000008);
+        // uq_ud_ext mode
+        writeToControllerOrDieTrying(motor, TMC4671_MODE_RAMP_MODE_MOTION, 0x00000008);
 
-    // 74 RPM
-    writeToControllerOrDieTrying(motor, TMC4671_OPENLOOP_VELOCITY_TARGET, 0x0000000A);
+        // 74 RPM
+        writeToControllerOrDieTrying(motor, TMC4671_OPENLOOP_VELOCITY_TARGET, 0x0000000A);
+    }
 
-    sleep(1); 
+    for (int num_iterations = 0; num_iterations < 10 
+            && std::any_of(calibrated_motors.begin(), calibrated_motors.end(), [](bool calibration_status) { return !calibration_status; });
+            ++num_iterations < 10)
+    {
+        for (int motor = 0; motor < NUM_DRIVE_MOTORS; ++motor)
+        {
+            // now read back the velocity
+            double read_back_velocity = static_cast<double>(tmc4671_getActualVelocity(motor));
+            if (read_back_velocity != initial_velocities.get(motor))
+            {
+                calibrated_motors.set(motor, true);
+            }
+        }
 
-    // now read back the velocity
-    double read_back_velocity = static_cast<double>(tmc4671_getActualVelocity(motor));
+        sleep(0.1); // 10th of a second
+    }
 
     // if the two velocities are the same, something's wrong
-    CHECK(initial_velocity != read_back_velocity) << "Initial and read back velocity during encoder calibration is the same... is the encoder connected?";
-
+    
     // stop the motor
-    writeToControllerOrDieTrying(motor, TMC4671_OPENLOOP_VELOCITY_TARGET, 0x00000000);
+    for (int motor = 0; motor < NUM_DRIVE_MOTORS; ++motor)
+    {
+        writeToControllerOrDieTrying(motor, TMC4671_OPENLOOP_VELOCITY_TARGET, 0x00000000);
+    }
 }
 
 void MotorService::resetMotorBoard()

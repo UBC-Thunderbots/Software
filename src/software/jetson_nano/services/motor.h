@@ -227,4 +227,6 @@ class MotorService
     WheelSpace_t prev_wheel_velocities;
 
     int motor_fault_detector;
+
+    static int NUM_CALIBRATION_ATTEMPTS = 10;
 };
