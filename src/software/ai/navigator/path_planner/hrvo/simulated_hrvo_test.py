@@ -407,7 +407,7 @@ def get_reached_destination_validation(robot_destinations):
     :param robot_destinations: the destination of each robot we want to make validations for
     :return: the validation sequence set
     """
-    threshold = 0.09
+    threshold = 0.05
     # Eventually Validation
     return [
         [
