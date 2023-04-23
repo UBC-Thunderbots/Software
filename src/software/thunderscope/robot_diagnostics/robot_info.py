@@ -6,6 +6,7 @@ from typing import List
 from proto.import_all_protos import *
 import software.thunderscope.common.common_widgets as common_widgets
 from software.thunderscope.constants import *
+from software.thunderscope.robot_diagnostics.motor_fault_view import MotorFaultView
 
 
 class RobotInfo(QWidget):
@@ -13,6 +14,8 @@ class RobotInfo(QWidget):
     # Offsets the minimum of the battery bar from the minimum ideal voltage
     # Allows battery % to go below the minimum ideal level
     BATTERY_MIN_OFFSET = 3
+
+    BREAKBEAM_BORDER = "border: 2px solid black"
 
     toggle_one_connection_signal = QtCore.pyqtSignal(int, int)
 
@@ -69,24 +72,36 @@ class RobotInfo(QWidget):
         # Robot Status expand button
         self.robot_status_expand = self.create_robot_status_expand_button()
 
-        # Breakbeam status
-        self.breakbeam_label = QLabel()
-        self.breakbeam_label.setText("BREAKBEAM")
-        self.breakbeam_label.setStyleSheet("background-color: grey")
+        # motor fault visualisation for the 4 wheel motors
+        self.motor_fault_view = MotorFaultView()
 
-        self.control_mode_layout.addWidget(self.breakbeam_label)
+        self.control_mode_layout.addWidget(self.motor_fault_view)
         self.control_mode_layout.addWidget(self.control_mode_menu)
         self.control_mode_layout.addWidget(self.robot_status_expand)
 
         self.status_layout.addLayout(self.control_mode_layout)
 
-        # Vision Pattern
-        self.layout.addWidget(
-            self.create_vision_pattern_label(Colors.ROBOT_MIDDLE_BLUE, ROBOT_RADIUS)
+        self.robot_model_layout = QVBoxLayout()
+        self.robot_model_layout.setContentsMargins(0, 15, 5, 10)
+
+        self.robot_model = self.create_vision_pattern_label(
+            Colors.ROBOT_MIDDLE_BLUE, ROBOT_RADIUS
         )
 
-        self.layout.addLayout(self.status_layout)
+        self.breakbeam_label = QLabel()
+        self.breakbeam_label.setStyleSheet(self.BREAKBEAM_BORDER)
+        self.breakbeam_label.setFixedWidth(self.robot_model.sizeHint().width())
+        self.breakbeam_label.setFixedHeight(self.robot_model.sizeHint().width() * 0.25)
 
+        self.robot_model_layout.addWidget(self.breakbeam_label)
+
+        self.robot_model_layout.addWidget(self.robot_model)
+
+        # Vision Pattern
+        self.layout.addLayout(self.robot_model_layout)
+
+        self.layout.addLayout(self.status_layout)
+        # self.layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(self.layout)
 
     def create_robot_status_expand_button(self):
@@ -186,24 +201,33 @@ class RobotInfo(QWidget):
 
         return label
 
-    def update(self, power_status, error_codes):
+    def update(self, motor_status, power_status, error_codes):
         """
         Receives important sections of RobotStatus proto for this robot and updates widget with alerts
         Checks for
             - Whether breakbeam is tripped
+            - If there are any motor faults
             - If Battery Voltage is too low
             - If this robot has errors
+        :param motor_status: The motor status message for this robot
         :param power_status: The power status message for this robot
         :param error_codes: The error codes of this robot
         :return:
         """
 
         if power_status.breakbeam_tripped:
-            self.breakbeam_label.setText("In Beam")
-            self.breakbeam_label.setStyleSheet("background-color: red")
+            self.breakbeam_label.setStyleSheet(
+                f"background-color: red; {self.BREAKBEAM_BORDER};" "border-color: red"
+            )
         else:
-            self.breakbeam_label.setText("Not in Beam")
-            self.breakbeam_label.setStyleSheet("background-color: green")
+            self.breakbeam_label.setStyleSheet(
+                f"background-color: transparent; {self.BREAKBEAM_BORDER}"
+            )
+
+        self.motor_fault_view.refresh(
+            motor_status,
+            motor_status.front_left.DESCRIPTOR.fields_by_name["motor_fault"]
+        )
 
         self.battery_progress_bar.setValue(power_status.battery_voltage)
 

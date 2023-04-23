@@ -1,5 +1,6 @@
 from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph import parametertree
+from software.thunderscope.common.common_widgets import get_string_val
 from google.protobuf.json_format import MessageToDict
 from thefuzz import fuzz
 
@@ -122,27 +123,6 @@ def __create_parameter_read_only(key, value, descriptor):
 
     """
     return {"name": key, "type": "str", "value": value, "readonly": True}
-
-
-def get_string_val(descriptor, value):
-    """
-    Converts the given value to a string depending on the descriptor type
-    :param descriptor: the descriptor of the current value
-    :param value: the value to convert
-    :return: A string version of the value
-    """
-    if descriptor.type in [
-        descriptor.TYPE_DOUBLE,
-        descriptor.TYPE_FLOAT,
-    ]:
-        return "%.2f" % value
-    elif descriptor.type == descriptor.TYPE_ENUM:
-        if type(value) == int:
-            return descriptor.enum_type.values[value].name
-        elif descriptor.label == descriptor.LABEL_REPEATED:
-            return str([descriptor.enum_type.values[index].name for index in value])
-    else:
-        return str(value)
 
 
 def config_proto_to_field_list(

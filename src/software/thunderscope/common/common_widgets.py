@@ -382,3 +382,24 @@ def draw_robot(painter, rect, start_angle_degree, span_angle_degree):
     painter.drawChord(
         rect, start_angle_degree * convert_degree, span_angle_degree * convert_degree,
     )
+
+
+def get_string_val(descriptor, value):
+    """
+    Converts the given value to a string depending on the descriptor type
+    :param descriptor: the descriptor of the current value
+    :param value: the value to convert
+    :return: A string version of the value
+    """
+    if descriptor.type in [
+        descriptor.TYPE_DOUBLE,
+        descriptor.TYPE_FLOAT,
+    ]:
+        return "%.2f" % value
+    elif descriptor.type == descriptor.TYPE_ENUM:
+        if type(value) == int:
+            return descriptor.enum_type.values[value].name
+        elif descriptor.label == descriptor.LABEL_REPEATED:
+            return str([descriptor.enum_type.values[index].name for index in value])
+    else:
+        return str(value)

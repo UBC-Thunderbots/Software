@@ -70,7 +70,11 @@ class RobotViewComponent(QWidget):
 
         :param robot_status: the new message data to update the widget with
         """
-        self.robot_info.update(robot_status.power_status, robot_status.error_code)
+        self.robot_info.update(
+            robot_status.motor_status,
+            robot_status.power_status,
+            robot_status.error_code,
+        )
         if self.robot_status:
             self.robot_status.update(robot_status)
 
@@ -123,7 +127,36 @@ class RobotView(QScrollArea):
         Refresh the view
         Gets a RobotStatus proto and calls the corresponding update method
         """
-        robot_status = self.robot_status_buffer.get(block=False, return_cached=False)
+        # robot_status = self.robot_status_buffer.get(block=False, return_cached=False)
+
+        robot_status = RobotStatus(
+            robot_id=2,
+            power_status=PowerStatus(breakbeam_tripped=True),
+            motor_status=MotorStatus(
+                front_left=DriveUnit(
+                    motor_fault=[
+                        DriveUnit.MotorFault.DRIVER_OVERTEMPERATURE,
+                        DriveUnit.MotorFault.PHASE_V_SHORT_COUNTER_DETECTED,
+                    ],
+                    drive_enabled=True,
+                ),
+                front_right=DriveUnit(motor_fault=[], drive_enabled=True),
+                back_left=DriveUnit(
+                    motor_fault=[
+                        DriveUnit.MotorFault.DRIVER_OVERTEMPERATURE,
+                        DriveUnit.MotorFault.PHASE_V_SHORT_COUNTER_DETECTED,
+                    ],
+                    drive_enabled=False,
+                ),
+                back_right=DriveUnit(
+                    motor_fault=[
+                        DriveUnit.MotorFault.PHASE_V_SHORT_TO_VS_DETECTED,
+                        DriveUnit.MotorFault.PHASE_V_SHORT_COUNTER_DETECTED,
+                    ],
+                    drive_enabled=False,
+                ),
+            ),
+        )
 
         if robot_status is not None:
             self.robot_view_widgets[robot_status.robot_id].update(robot_status)
