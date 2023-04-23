@@ -174,12 +174,22 @@ void SimulatedErForceSimTestFixture::runTest(
     const std::vector<RobotStateWithId> &enemy_robots,
     const std::vector<ValidationFunction> &terminating_validation_functions,
     const std::vector<ValidationFunction> &non_terminating_validation_functions,
-    const Duration &timeout, const bool ramping)
+    const Duration &timeout, const bool ramping, const bool realism)
 {
     const Duration simulation_time_step =
         Duration::fromSeconds(1.0 / SIMULATED_CAMERA_FPS);
 
-    auto realism_config = ErForceSimulator::createDefaultRealismConfig();
+    unique_ptr<RealismConfigErForce> realism_config;
+
+    if (realism)
+    {
+        realism_config = ErForceSimulator::createRealisticRealismConfig();
+    }
+    else
+    {
+        realism_config = ErForceSimulator::createDefaultRealismConfig();
+    }
+
     std::shared_ptr<ErForceSimulator> simulator(std::make_shared<ErForceSimulator>(
         field_type, create2021RobotConstants(), realism_config, ramping));
 

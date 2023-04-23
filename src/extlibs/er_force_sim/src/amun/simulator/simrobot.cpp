@@ -167,6 +167,7 @@ void SimRobot::calculateDribblerMove(const btVector3 pos, const btQuaternion rot
 
 void SimRobot::dribble(SimBall *ball, float speed)
 {
+    std::cout << "DRIBBLING" << std::endl;
     if (m_perfectDribbler)
     {
         if (canKickBall(ball) && !m_holdBallConstraint)
@@ -188,12 +189,24 @@ void SimRobot::dribble(SimBall *ball, float speed)
     else
     {
         // unit for rotation is  (rad / s) in bullet, but (rpm) in sslCommand
-        const float max_rotation_speed = 150.f / 2 / M_PI * 60;
+        const float max_rotation_speed = (1256.63f / (2 * M_PI)) * 60;
+//        std::cout << "MAX ROTATION SPEED" << std::endl;
+//        std::cout << std::to_string(max_rotation_speed) << std::endl;
         float dribbler                 = speed / max_rotation_speed;
+
+//        std::cout << "DRIBBLER" << std::endl;
+//        std::cout << std::to_string(dribbler) << std::endl;
+//        std::cout << "SPEED" << std::endl;
+//        std::cout << std::to_string(speed) << std::endl;
         // rad/s is limited to 150
         float boundedDribbler = qBound(0.0f, dribbler, 1.0f);
-        m_dribblerConstraint->enableAngularMotor(true, 150 * boundedDribbler,
-                                                 20 * boundedDribbler);
+
+        std::cout << "BOUNDED DRIBBLER" << std::endl;
+        std::cout << std::to_string(boundedDribbler) << std::endl;
+        std::cout << std::to_string(1257 * boundedDribbler) << std::endl;
+        std::cout << std::to_string(168 * boundedDribbler) << std::endl;
+        m_dribblerConstraint->enableAngularMotor(true, -5000 * boundedDribbler,
+                                                 168 * boundedDribbler);
     }
 }
 
