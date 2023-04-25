@@ -7,23 +7,6 @@ on:
     branches: [ master ]
 
 jobs:
-  formatting-check:
-    name: Formatting with pre-commit-ci-lite
-    runs-on: ubuntu-20.04
-    steps:
-      # checks-out the repository under $GITHUB_WORKSPACE
-      - uses: actions/checkout@v2
-        
-      - name: Environment Setup
-        run: |
-          "${GITHUB_WORKSPACE}"/environment_setup/setup_software.sh
-      
-      - uses: pre-commit/action@v3.0.0
-
-      - uses: pre-commit-ci/lite-action@v1.0.1
-        name: Run pre-commit-ci-lite
-        if: always()
-
   formatting-check-2:
     name: Formatting Check
     runs-on: ubuntu-20.04
