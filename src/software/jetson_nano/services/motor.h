@@ -2,6 +2,7 @@
 #include <Eigen/Dense>
 #include <memory>
 #include <string>
+#include <signal.h>
 
 #include "proto/robot_status_msg.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
@@ -84,12 +85,14 @@ class MotorService
 
     void resetMotorBoard();
 
-   private:
     /**
      * Checks for faults, clears them and sets up motors.
      *
      */
-    void setUpMotors();
+
+    void setup();
+
+   private:
     /**
      * Calls the configuration functions below in the right sequence
      *
@@ -194,6 +197,8 @@ class MotorService
     void checkAllEncoders();
 
     TbotsProto::MotorStatus updateMotorStatus(double front_left_velocity, double front_right_velocity, double back_left_velocity, double back_right_velocity);
+
+    bool is_initialized = false;
 
     // Select between driver and controller gpio
     Gpio spi_demux_select_0;

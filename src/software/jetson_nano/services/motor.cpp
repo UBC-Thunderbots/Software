@@ -128,13 +128,11 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
 
     // Make this instance available to the static functions above
     g_motor_service = this;
-
-    setUpMotors();
 }
 
 MotorService::~MotorService() {}
 
-void MotorService::setUpMotors()
+void MotorService::setup()
 {
     prev_wheel_velocities = {0.0, 0.0, 0.0, 0.0};
 
@@ -166,6 +164,10 @@ void MotorService::setUpMotors()
     checkDriverFault(DRIBBLER_MOTOR_CHIP_SELECT);
     startController(DRIBBLER_MOTOR_CHIP_SELECT, true);
     tmc4671_setTargetVelocity(DRIBBLER_MOTOR_CHIP_SELECT, 0);
+
+    checkAllEncoders();
+
+    is_initialized = true;
 }
 
 
@@ -331,6 +333,12 @@ TbotsProto::MotorStatus MotorService::updateMotorStatus(
 TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor,
                                            double time_elapsed_since_last_poll_s)
 {
+    if (!is_initialized)
+    {
+        LOG(INFO) << "MotorService hasn't been initialized. Initializing...";
+        setup();
+    }
+
     bool encoders_calibrated = (encoder_calibrated_[FRONT_LEFT_MOTOR_CHIP_SELECT] ||
                                 encoder_calibrated_[FRONT_RIGHT_MOTOR_CHIP_SELECT] ||
                                 encoder_calibrated_[BACK_LEFT_MOTOR_CHIP_SELECT] ||
@@ -343,7 +351,8 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
     if (reset_detector == 2147483647)
     {
         LOG(DEBUG) << "RESET DETECTED";
-        setUpMotors();
+        is_initialized = false;
+        setup();
         encoders_calibrated = false;
     }
     // check if encoders are calibrated
@@ -998,13 +1007,15 @@ void MotorService::startController(uint8_t motor, bool dribbler)
 
 void MotorService::checkAllEncoders()
 {
+    LOG(INFO) << "Starting encoder connection check!";
+
     std::vector<bool> calibrated_motors(NUM_DRIVE_MOTORS, false);
-    std::vector<double> initial_velocities;
+    std::vector<int> initial_velocities(NUM_DRIVE_MOTORS, 0);
 
     for (uint8_t motor = 0; motor < NUM_DRIVE_MOTORS; ++motor)
     {
         // read back current velocity
-        initial_velocities[motor] = static_cast<double>(tmc4671_getActualVelocity(motor));
+        initial_velocities[motor] = tmc4671_readInt(motor, TMC4671_ABN_DECODER_COUNT);
 
         // open loop mode can be used without an encoder, set open loop phi positive direction
         writeToControllerOrDieTrying(motor, TMC4671_OPENLOOP_MODE, 0x00000000);
@@ -1017,39 +1028,50 @@ void MotorService::checkAllEncoders()
         // uq_ud_ext mode
         writeToControllerOrDieTrying(motor, TMC4671_MODE_RAMP_MODE_MOTION, 0x00000008);
 
-        // 74 RPM
+        // 10 RPM
         writeToControllerOrDieTrying(motor, TMC4671_OPENLOOP_VELOCITY_TARGET, 0x0000000A);
     }
 
     for (int num_iterations = 0; num_iterations < 10 
             && std::any_of(calibrated_motors.begin(), calibrated_motors.end(), [](bool calibration_status) { return !calibration_status; });
-            ++num_iterations < 10)
+            ++num_iterations)
     {
         for (uint8_t motor = 0; motor < NUM_DRIVE_MOTORS; ++motor)
         {
-            // now read back the velocity
-            double read_back_velocity = static_cast<double>(tmc4671_getActualVelocity(motor));
-            if (read_back_velocity != initial_velocities.get(motor))
+            if (calibrated_motors[motor])
             {
-                calibrated_motors.set(motor, true);
+                continue;
+            }
+            // now read back the velocity
+            int read_back_velocity = tmc4671_readInt(motor, TMC4671_ABN_DECODER_COUNT);
+            LOG(INFO) << MOTOR_NAMES[motor] << " read back: " << read_back_velocity << " and initially read: " << initial_velocities[motor];
+
+            if (read_back_velocity != initial_velocities[motor])
+            {
+                calibrated_motors[motor] = true;
             }
         }
 
-        sleep(0.1); // 10th of a second
+        // sleep for 100 milliseconds
+        usleep(MICROSECONDS_PER_MILLISECOND * 100);
     }
 
-    for (int i = 0; i < NUM_DRIVE_MOTORS; ++i)
+    for (uint8_t motor = 0; motor < NUM_DRIVE_MOTORS; ++motor)
     {
-        if (!calibrated_motors.get(i)) {
-            LOG(FATAL) << MOTOR_NAMES[i] << " motor reading did not change as expected!";
+        if (!calibrated_motors[motor]) {
+            // LOG(FATAL) causes issues here because the signal handler calls the logger and the logger exits due to the FATAL signal it sends
+            LOG(FATAL) << MOTOR_NAMES[motor] << " motor reading did not change as expected!";
         } 
     }
     
-    // stop all motors
-    for (int motor = 0; motor < NUM_DRIVE_MOTORS; ++motor)
+    // stop all motors, reset back to velocity control mode
+    for (uint8_t motor = 0; motor < NUM_DRIVE_MOTORS; ++motor)
     {
         writeToControllerOrDieTrying(motor, TMC4671_OPENLOOP_VELOCITY_TARGET, 0x00000000);
+        tmc4671_switchToMotionMode(motor, TMC4671_MOTION_MODE_VELOCITY);
     }
+
+    LOG(INFO) << "Encoder connection check complete!";
 }
 
 void MotorService::resetMotorBoard()

@@ -27,9 +27,10 @@ extern "C"
 
     void gracefulExit(int signal_num)
     {
-        LOG(INFO) << "Received a termination signal... Thunderloop shutting down";
-
         g_motor_service->resetMotorBoard();        
+
+        std::cout << "\n\n!!!\nReceived termination signal: " << g3::signalToStr(signal_num) << std::endl;
+        std::cout << "Thunderloop shutting down and motor board reset\n!!!\n";
 
         exit(signal_num);
     }
@@ -50,7 +51,15 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, const int loop
           std::stoi(redis_client_->getSync(ROBOT_CHIP_PULSE_WIDTH_REDIS_KEY))),
       primitive_executor_(loop_hz, robot_constants, TeamColour::YELLOW, robot_id_)
 {
+    g3::overrideSetupSignals({});
     NetworkLoggerSingleton::initializeLogger(channel_id_, network_interface_, robot_id_);
+
+    std::signal(SIGSEGV, gracefulExit);
+    std::signal(SIGTERM, gracefulExit);
+    std::signal(SIGABRT, gracefulExit);
+    std::signal(SIGFPE, gracefulExit);
+    std::signal(SIGINT, gracefulExit);
+
     LOG(INFO)
         << "THUNDERLOOP: Network Logger initialized! Next initializing Network Service";
 
@@ -61,6 +70,8 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, const int loop
         << "THUNDERLOOP: Network Service initialized! Next initializing Motor Service";
 
     motor_service_ = std::make_unique<MotorService>(robot_constants, loop_hz);
+    g_motor_service = motor_service_.get();
+    motor_service_->setup();
     LOG(INFO)
         << "THUNDERLOOP: Motor Service initialized! Next initializing Power Service";
 
@@ -72,8 +83,6 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, const int loop
               << ", and NETWORK INTERFACE: " << network_interface_;
     LOG(INFO)
         << "THUNDERLOOP: to update Thunderloop configuration, change REDIS store and restart Thunderloop";
-
-    g_motor_service = motor_service_.get();
 }
 
 Thunderloop::~Thunderloop() {}
@@ -83,11 +92,6 @@ Thunderloop::~Thunderloop() {}
  */
 [[noreturn]] void Thunderloop::runLoop()
 {
-    std::signal(SIGSEGV, gracefulExit);
-    std::signal(SIGTERM, gracefulExit);
-    std::signal(SIGABRT, gracefulExit);
-    std::signal(SIGFPE, gracefulExit);
-
     // Timing
     struct timespec next_shot;
     struct timespec poll_time;
