@@ -191,7 +191,7 @@ class MotorService
      */
     TbotsProto::DriveUnit checkDriverFault(uint8_t motor);
 
-    void checkEncoderConnection(uint8_t motor);
+    void checkAllEncoders();
 
     TbotsProto::MotorStatus updateMotorStatus(double front_left_velocity, double front_right_velocity, double back_left_velocity, double back_right_velocity);
 
@@ -228,5 +228,21 @@ class MotorService
 
     int motor_fault_detector;
 
-    static int NUM_CALIBRATION_ATTEMPTS = 10;
+    static const int NUM_CALIBRATION_ATTEMPTS = 10;
+
+    // SPI Chip Selects
+    static const uint8_t FRONT_LEFT_MOTOR_CHIP_SELECT  = 0;
+    static const uint8_t FRONT_RIGHT_MOTOR_CHIP_SELECT = 3;
+    static const uint8_t BACK_LEFT_MOTOR_CHIP_SELECT   = 1;
+    static const uint8_t BACK_RIGHT_MOTOR_CHIP_SELECT  = 2;
+    static const uint8_t NUM_DRIVE_MOTORS              = 4;
+
+    static const uint8_t DRIBBLER_MOTOR_CHIP_SELECT = 4;
+
+    // SPI Trinamic Motor Driver Paths (indexed with chip select above)
+    static constexpr const char* SPI_PATHS[] = {"/dev/spidev0.0", "/dev/spidev0.1", "/dev/spidev0.2",
+                                  "/dev/spidev0.3", "/dev/spidev0.4"};
+
+    // Motor positions (indexed with chip select above)
+    static constexpr const char* MOTOR_NAMES[] = {"front_left", "back_left", "back_right", "front_right"};
 };

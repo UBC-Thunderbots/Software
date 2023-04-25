@@ -41,18 +41,6 @@ static const uint8_t SPI_BITS           = 8;
 static const uint32_t SPI_MODE          = 0x3u;
 static const uint32_t NUM_RETRIES_SPI   = 3;
 
-// SPI Chip Selects
-static const uint8_t FRONT_LEFT_MOTOR_CHIP_SELECT  = 0;
-static const uint8_t FRONT_RIGHT_MOTOR_CHIP_SELECT = 3;
-static const uint8_t BACK_LEFT_MOTOR_CHIP_SELECT   = 1;
-static const uint8_t BACK_RIGHT_MOTOR_CHIP_SELECT  = 2;
-static const uint8_t NUM_DRIVE_MOTORS              = 4;
-
-static const uint8_t DRIBBLER_MOTOR_CHIP_SELECT = 4;
-
-// SPI Trinamic Motor Driver Paths (indexed with chip select above)
-static const char* SPI_PATHS[] = {"/dev/spidev0.0", "/dev/spidev0.1", "/dev/spidev0.2",
-                                  "/dev/spidev0.3", "/dev/spidev0.4"};
 
 static const char* SPI_CS_DRIVER_TO_CONTROLLER_MUX_0_GPIO = "51";
 static const char* SPI_CS_DRIVER_TO_CONTROLLER_MUX_1_GPIO = "76";
@@ -848,8 +836,6 @@ void MotorService::configureADC(uint8_t motor)
 
 void MotorService::configureEncoder(uint8_t motor)
 {
-    checkEncoderConnection(motor);
-
     LOG(INFO) << "Configuring Encoder for motor " << static_cast<uint32_t>(motor);
     // ABN encoder settings
     writeToControllerOrDieTrying(motor, TMC4671_ABN_DECODER_MODE, 0x00000000);
@@ -1015,7 +1001,7 @@ void MotorService::checkAllEncoders()
     std::vector<bool> calibrated_motors(NUM_DRIVE_MOTORS, false);
     std::vector<double> initial_velocities;
 
-    for (int motor = 0; motor < NUM_DRIVE_MOTORS; ++motor)
+    for (uint8_t motor = 0; motor < NUM_DRIVE_MOTORS; ++motor)
     {
         // read back current velocity
         initial_velocities[motor] = static_cast<double>(tmc4671_getActualVelocity(motor));
@@ -1039,7 +1025,7 @@ void MotorService::checkAllEncoders()
             && std::any_of(calibrated_motors.begin(), calibrated_motors.end(), [](bool calibration_status) { return !calibration_status; });
             ++num_iterations < 10)
     {
-        for (int motor = 0; motor < NUM_DRIVE_MOTORS; ++motor)
+        for (uint8_t motor = 0; motor < NUM_DRIVE_MOTORS; ++motor)
         {
             // now read back the velocity
             double read_back_velocity = static_cast<double>(tmc4671_getActualVelocity(motor));
@@ -1052,9 +1038,14 @@ void MotorService::checkAllEncoders()
         sleep(0.1); // 10th of a second
     }
 
-    // if the two velocities are the same, something's wrong
+    for (int i = 0; i < NUM_DRIVE_MOTORS; ++i)
+    {
+        if (!calibrated_motors.get(i)) {
+            LOG(FATAL) << MOTOR_NAMES[i] << " motor reading did not change as expected!";
+        } 
+    }
     
-    // stop the motor
+    // stop all motors
     for (int motor = 0; motor < NUM_DRIVE_MOTORS; ++motor)
     {
         writeToControllerOrDieTrying(motor, TMC4671_OPENLOOP_VELOCITY_TARGET, 0x00000000);
