@@ -6,104 +6,105 @@ on:
   pull_request:
     branches: [ master ]
 
-  software-tests:
-    name: Software Tests
-    runs-on: ubuntu-20.04
-    steps:
-      # checks-out the repository under $GITHUB_WORKSPACE
-      - uses: actions/checkout@v2
+  jobs:
+    software-tests:
+      name: Software Tests
+      runs-on: ubuntu-20.04
+      steps:
+        # checks-out the repository under $GITHUB_WORKSPACE
+        - uses: actions/checkout@v2
 
-      - name: Environment Setup
-        run: |
-          "${GITHUB_WORKSPACE}"/environment_setup/setup_software.sh
+        - name: Environment Setup
+          run: |
+            "${GITHUB_WORKSPACE}"/environment_setup/setup_software.sh
 
-      - name: Software Test
-        run: |
-          cd src
-          bazel test --show_timestamps       \
-            -- //... -//software:unix_full_system \
-            -//software/simulated_tests/...  \
-            -//software/ai/hl/...            \
+        - name: Software Test
+          run: |
+            cd src
+            bazel test --show_timestamps       \
+              -- //... -//software:unix_full_system \
+              -//software/simulated_tests/...  \
+              -//software/ai/hl/...            \
 
-  jetson-nano-tests:
-    name: Jetson Nano Software Tests
-    runs-on: ubuntu-20.04
-    steps:
-      # checks-out the repository under $GITHUB_WORKSPACE
-      - uses: actions/checkout@v2
+    jetson-nano-tests:
+      name: Jetson Nano Software Tests
+      runs-on: ubuntu-20.04
+      steps:
+        # checks-out the repository under $GITHUB_WORKSPACE
+        - uses: actions/checkout@v2
 
-      - name: Environment Setup
-        run: |
-          "${GITHUB_WORKSPACE}"/environment_setup/setup_software.sh
+        - name: Environment Setup
+          run: |
+            "${GITHUB_WORKSPACE}"/environment_setup/setup_software.sh
 
-      - name: Install and start redis server
-        run: |
-          wget http://download.redis.io/redis-stable.tar.gz 
-          tar xvzf redis-stable.tar.gz >/dev/null 
-          cd redis-stable
-          make >/dev/null 
-          make install >/dev/null 
-          redis-server --daemonize yes          
+        - name: Install and start redis server
+          run: |
+            wget http://download.redis.io/redis-stable.tar.gz 
+            tar xvzf redis-stable.tar.gz >/dev/null 
+            cd redis-stable
+            make >/dev/null 
+            make install >/dev/null 
+            redis-server --daemonize yes          
 
-      - name: Stop redis server
-        run: |
-          redis-cli shutdown
+        - name: Stop redis server
+          run: |
+            redis-cli shutdown
 
-      - name: Jetson Nano Build
-        run: |
-         cd src
-         bazel build --cpu=jetson_nano //software/jetson_nano:thunderloop_main
+        - name: Jetson Nano Build
+          run: |
+           cd src
+           bazel build --cpu=jetson_nano //software/jetson_nano:thunderloop_main
 
-  simulated-gameplay-tests:
-    name: Simulated Gameplay Tests
-    runs-on: ubuntu-20.04
-    steps:
-      # checks-out the repository under $GITHUB_WORKSPACE
-      - uses: actions/checkout@v2
-        
-      - name: Environment Setup
-        run: |
-          "${GITHUB_WORKSPACE}"/environment_setup/setup_software.sh
+    simulated-gameplay-tests:
+      name: Simulated Gameplay Tests
+      runs-on: ubuntu-20.04
+      steps:
+        # checks-out the repository under $GITHUB_WORKSPACE
+        - uses: actions/checkout@v2
+          
+        - name: Environment Setup
+          run: |
+            "${GITHUB_WORKSPACE}"/environment_setup/setup_software.sh
 
-      - name: Simulated Test Run 1 (Continue on error)
-        # make sure that replays are uploaded even if tests fail
-        continue-on-error: true
-        run: |
-          cd src
-          bazel test --show_timestamps       \
-            //software:unix_full_system           \
-            //software/simulated_tests/...   \
-            //software/ai/hl/...
+        - name: Simulated Test Run 1 (Continue on error)
+          # make sure that replays are uploaded even if tests fail
+          continue-on-error: true
+          run: |
+            cd src
+            bazel test --show_timestamps       \
+              //software:unix_full_system           \
+              //software/simulated_tests/...   \
+              //software/ai/hl/...
 
-      - name: Upload simulated test proto logs
-        uses: actions/upload-artifact@v3
-        with:
-          name: blue-ai-proto-logs
-          path: |
-            /tmp/tbots/blue/logs
+        - name: Upload simulated test proto logs
+          uses: actions/upload-artifact@v3
+          with:
+            name: blue-ai-proto-logs
+            path: |
+              /tmp/tbots/blue/logs
 
-      - name: Upload simulated test proto logs
-        uses: actions/upload-artifact@v3
-        with:
-          name: yellow-ai-proto-logs
-          path: |
-            /tmp/tbots/yellow/logs
+        - name: Upload simulated test proto logs
+          uses: actions/upload-artifact@v3
+          with:
+            name: yellow-ai-proto-logs
+            path: |
+              /tmp/tbots/yellow/logs
 
-      - name: Simulated Test Run 2 (Continue on error)
-        # Run a second time without checking for errors
-        continue-on-error: true
-        run: |
-          cd src
-          bazel test --show_timestamps       \
-            //software:unix_full_system           \
-            //software/simulated_tests/...   \
-            //software/ai/hl/...
+        - name: Simulated Test Run 2 (Continue on error)
+          # Run a second time without checking for errors
+          continue-on-error: true
+          run: |
+            cd src
+            bazel test --show_timestamps       \
+              //software:unix_full_system           \
+              //software/simulated_tests/...   \
+              //software/ai/hl/...
 
-      - name: Simulated Test Run 3 (Check for errors)
-        # Run Simulated Tests a third time and finally check for failures
-        run: |
-          cd src
-          bazel test --show_timestamps       \
-            //software:unix_full_system           \
-            //software/simulated_tests/...   \
-            //software/ai/hl/...
+        - name: Simulated Test Run 3 (Check for errors)
+          # Run Simulated Tests a third time and finally check for failures
+          run: |
+            cd src
+            bazel test --show_timestamps       \
+              //software:unix_full_system           \
+              //software/simulated_tests/...   \
+              //software/ai/hl/...
