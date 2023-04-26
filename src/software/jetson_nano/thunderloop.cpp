@@ -1,7 +1,5 @@
 #include "software/jetson_nano/thunderloop.h"
 
-#include <csignal>
-
 #include "proto/message_translation/tbots_protobuf.h"
 #include "proto/tbots_software_msgs.pb.h"
 #include "shared/2021_robot_constants.h"
@@ -21,14 +19,22 @@
 extern int clock_nanosleep(clockid_t __clock_id, int __flags,
                            __const struct timespec* __req, struct timespec* __rem);
 
+// signal handling is done by csignal which requires a function pointer with C linkage
 extern "C"
 {
     static MotorService* g_motor_service = NULL;
 
-    void gracefulExit(int signal_num)
+    /**
+     * Handles process signals
+     *
+     * @param the signal value (SIGINT, SIGABRT, SIGTERN, etc)
+     */
+    void tbotsExit(int signal_num)
     {
         g_motor_service->resetMotorBoard();
 
+        // by now g3log may have died due to the termination signal, so it isn't reliable
+        // to log messages
         std::cout << "\n\n!!!\nReceived termination signal: "
                   << g3::signalToStr(signal_num) << std::endl;
         std::cout << "Thunderloop shutting down and motor board reset\n!!!\n";
@@ -57,11 +63,11 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, const int loop
     g3::overrideSetupSignals({});
     NetworkLoggerSingleton::initializeLogger(channel_id_, network_interface_, robot_id_);
 
-    std::signal(SIGSEGV, gracefulExit);
-    std::signal(SIGTERM, gracefulExit);
-    std::signal(SIGABRT, gracefulExit);
-    std::signal(SIGFPE, gracefulExit);
-    std::signal(SIGINT, gracefulExit);
+    std::signal(SIGSEGV, tbotsExit);
+    std::signal(SIGTERM, tbotsExit);
+    std::signal(SIGABRT, tbotsExit);
+    std::signal(SIGFPE, tbotsExit);
+    std::signal(SIGINT, tbotsExit);
 
     LOG(INFO)
         << "THUNDERLOOP: Network Logger initialized! Next initializing Network Service";
