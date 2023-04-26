@@ -19,7 +19,6 @@
 #include <unistd.h>        // needed for sysconf(int name);
 
 #include <bitset>
-#include <new>
 
 #include "proto/tbots_software_msgs.pb.h"
 #include "shared/constants.h"

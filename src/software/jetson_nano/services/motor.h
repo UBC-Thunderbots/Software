@@ -1,5 +1,4 @@
 #pragma once
-#include <signal.h>
 
 #include <Eigen/Dense>
 #include <memory>
@@ -85,11 +84,13 @@ class MotorService
      */
     void runOpenLoopCalibrationRoutine(uint8_t motor, size_t num_samples);
 
+    /**
+     * Reset the motor board by toggling the reset GPIO appropriately. Effectively stops the motors from moving.
+     */
     void resetMotorBoard();
 
     /**
-     * Checks for faults, clears them and sets up motors.
-     *
+     * Clears previous faults, configures the motor and checks encoder connections.
      */
     void setup();
 
