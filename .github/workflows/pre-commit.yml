@@ -7,6 +7,10 @@ on:
     branches: [ master ]
     types: [ opened, reopened, synchronize, ready_for_review ]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
 jobs:
   formatting-check:
     name: Formatting and FSM diagram generation with pre-commit-ci-lite
