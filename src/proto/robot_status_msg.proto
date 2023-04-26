@@ -72,28 +72,27 @@ enum ErrorCode
     DRIBBLER_MOTOR_HOT = 4;
 }
 
+enum MotorFault
+{
+    RESET                               = 0;
+    DRIVER_OVERTEMPERATURE_PREWARNING   = 1;
+    DRIVER_OVERTEMPERATURE              = 2;
+    UNDERVOLTAGE_CHARGEPUMP             = 3;
+    PHASE_U_SHORT_COUNTER_DETECTED      = 4;
+    PHASE_U_SHORT_TO_GND_DETECTED       = 5;
+    PHASE_U_SHORT_TO_VS_DETECTED        = 6;
+    // for the sake of consistency with the TMC 6100, "7" is unused
+    PHASE_V_SHORT_COUNTER_DETECTED      = 8;
+    PHASE_V_SHORT_TO_GND_DETECTED       = 9;
+    PHASE_V_SHORT_TO_VS_DETECTED        = 10;
+    // for the sake of consistency with the TMC 6100, "11" is unused
+    PHASE_W_SHORT_COUNTER_DETECTED      = 12;
+    PHASE_W_SHORT_TO_GND_DETECTED       = 13;
+    PHASE_W_SHORT_TO_VS_DETECTED        = 14;
+} 
+
 message DriveUnit
 {
-    enum MotorFault
-    {
-        RESET                               = 0;
-        DRIVER_OVERTEMPERATURE_PREWARNING   = 1;
-        DRIVER_OVERTEMPERATURE              = 2;
-        UNDERVOLTAGE_CHARGEPUMP             = 3;
-        PHASE_U_SHORT_COUNTER_DETECTED      = 4;
-        PHASE_U_SHORT_TO_GND_DETECTED       = 5;
-        PHASE_U_SHORT_TO_VS_DETECTED        = 6;
-        // for the sake of consistency with the TMC 6100, "7" is unused
-        PHASE_V_SHORT_COUNTER_DETECTED      = 8;
-        PHASE_V_SHORT_TO_GND_DETECTED       = 9;
-        PHASE_V_SHORT_TO_VS_DETECTED        = 10;
-        // for the sake of consistency with the TMC 6100, "11" is unused
-        PHASE_W_SHORT_COUNTER_DETECTED      = 12;
-        PHASE_W_SHORT_TO_GND_DETECTED       = 13;
-        PHASE_W_SHORT_TO_VS_DETECTED        = 14;
-    } 
-        
-
     // The current RPM of the wheel
     float wheel_velocity            = 1;
 
