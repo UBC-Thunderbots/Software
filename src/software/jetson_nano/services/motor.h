@@ -1,9 +1,10 @@
 #pragma once
+#include <signal.h>
+
 #include <Eigen/Dense>
 #include <memory>
 #include <string>
 #include <vector>
-#include <signal.h>
 
 #include "proto/robot_status_msg.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
@@ -94,11 +95,12 @@ class MotorService
 
    private:
     /**
-     * Holds motor fault information for a particular motor and whether any fault has caused the motor to be disabled.
+     * Holds motor fault information for a particular motor and whether any fault has
+     * caused the motor to be disabled.
      */
     struct MotorFaultIndicator
     {
-        bool drive_enabled; 
+        bool drive_enabled;
         std::unordered_set<TbotsProto::MotorFault> motor_faults;
 
         /**
@@ -109,10 +111,15 @@ class MotorService
         /**
          * Construct an indicator with faults and whether the motor is enabled.
          *
-         * @param drive_enabled true if the motor is enabled, false if disabled due to a motor fault
+         * @param drive_enabled true if the motor is enabled, false if disabled due to a
+         * motor fault
          * @param motor_faults  a set of faults associated with this motor
          */
-        MotorFaultIndicator(bool drive_enabled, std::unordered_set<TbotsProto::MotorFault> &motor_faults) : drive_enabled(drive_enabled), motor_faults(motor_faults) {}
+        MotorFaultIndicator(bool drive_enabled,
+                            std::unordered_set<TbotsProto::MotorFault>& motor_faults)
+            : drive_enabled(drive_enabled), motor_faults(motor_faults)
+        {
+        }
     };
 
     /**
@@ -213,28 +220,40 @@ class MotorService
      *
      * @param motor The motor to log the status for
      *
-     * @return a struct containing the motor faults and whether the motor was disabled due to the fault
+     * @return a struct containing the motor faults and whether the motor was disabled due
+     * to the fault
      */
     struct MotorFaultIndicator checkDriverFault(uint8_t motor);
 
     /**
-     * Spin each motor of the NUM_DRIVE_MOTORS in open loop mode to check if the encoder is responding as expected. Allows us to do a basic test of whether the encoder is physically connected to the motor board.
+     * Spin each motor of the NUM_DRIVE_MOTORS in open loop mode to check if the encoder
+     * is responding as expected. Allows us to do a basic test of whether the encoder is
+     * physically connected to the motor board.
      *
      * Leaves the motors connected in MOTION_MODE_VELOCITY
      */
     void checkEncoderConnections();
 
     /**
-     * Return a MotorStatus proto filled with motor faults. Some values of the proto are previously cached velocities due to SPI transaction costs.
+     * Return a MotorStatus proto filled with motor faults. Some values of the proto are
+     * previously cached velocities due to SPI transaction costs.
      *
-     * @param front_left_wheel_velocity_mps     the front left motor's velocity in mechanical MPS
-     * @param front_right_velocity_mps          the front right motor's velocity in mechanical MPS
-     * @param back_left velocity_mps            the back left motor's velocity in mechanical MPS
-     * @param back_right_velocity_mps           the back right motor's velocity in mechanical MPS
+     * @param front_left_wheel_velocity_mps     the front left motor's velocity in
+     * mechanical MPS
+     * @param front_right_velocity_mps          the front right motor's velocity in
+     * mechanical MPS
+     * @param back_left velocity_mps            the back left motor's velocity in
+     * mechanical MPS
+     * @param back_right_velocity_mps           the back right motor's velocity in
+     * mechanical MPS
      *
-     * @return a MotorStatus proto with the velocity of each motor as well as their fault statuses (some faults may be cached)
+     * @return a MotorStatus proto with the velocity of each motor as well as their fault
+     * statuses (some faults may be cached)
      */
-    TbotsProto::MotorStatus updateMotorStatus(double front_left_velocity_mps, double front_right_velocity_mps, double back_left_velocity_mps, double back_right_velocity_mps);
+    TbotsProto::MotorStatus updateMotorStatus(double front_left_velocity_mps,
+                                              double front_right_velocity_mps,
+                                              double back_left_velocity_mps,
+                                              double back_right_velocity_mps);
 
     // to check if the motors have been calibrated
     bool is_initialized = false;
@@ -284,13 +303,15 @@ class MotorService
 
     static const uint8_t DRIBBLER_MOTOR_CHIP_SELECT = 4;
 
-    static const uint8_t NUM_DRIVE_MOTORS              = 4;
-    static const uint8_t NUM_MOTORS                    = NUM_DRIVE_MOTORS + 1;
+    static const uint8_t NUM_DRIVE_MOTORS = 4;
+    static const uint8_t NUM_MOTORS       = NUM_DRIVE_MOTORS + 1;
 
     // SPI Trinamic Motor Driver Paths (indexed with chip select above)
-    static constexpr const char* SPI_PATHS[] = {"/dev/spidev0.0", "/dev/spidev0.1", "/dev/spidev0.2",
-                                  "/dev/spidev0.3", "/dev/spidev0.4"};
+    static constexpr const char* SPI_PATHS[] = {"/dev/spidev0.0", "/dev/spidev0.1",
+                                                "/dev/spidev0.2", "/dev/spidev0.3",
+                                                "/dev/spidev0.4"};
 
     // Motor names (indexed with chip select above)
-    static constexpr const char* MOTOR_NAMES[] = {"front_left", "back_left", "back_right", "front_right", "dribbler"};
+    static constexpr const char* MOTOR_NAMES[] = {"front_left", "back_left", "back_right",
+                                                  "front_right", "dribbler"};
 };

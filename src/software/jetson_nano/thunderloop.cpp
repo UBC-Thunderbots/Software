@@ -1,5 +1,7 @@
 #include "software/jetson_nano/thunderloop.h"
 
+#include <csignal>
+
 #include "proto/message_translation/tbots_protobuf.h"
 #include "proto/tbots_software_msgs.pb.h"
 #include "shared/2021_robot_constants.h"
@@ -11,8 +13,6 @@
 #include "software/util/scoped_timespec_timer/scoped_timespec_timer.h"
 #include "software/world/robot_state.h"
 #include "software/world/team.h"
-
-#include <csignal>
 
 /**
  * https://rt.wiki.kernel.org/index.php/Squarewave-example
@@ -27,9 +27,10 @@ extern "C"
 
     void gracefulExit(int signal_num)
     {
-        g_motor_service->resetMotorBoard();        
+        g_motor_service->resetMotorBoard();
 
-        std::cout << "\n\n!!!\nReceived termination signal: " << g3::signalToStr(signal_num) << std::endl;
+        std::cout << "\n\n!!!\nReceived termination signal: "
+                  << g3::signalToStr(signal_num) << std::endl;
         std::cout << "Thunderloop shutting down and motor board reset\n!!!\n";
 
         exit(signal_num);
@@ -69,7 +70,7 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, const int loop
     LOG(INFO)
         << "THUNDERLOOP: Network Service initialized! Next initializing Motor Service";
 
-    motor_service_ = std::make_unique<MotorService>(robot_constants, loop_hz);
+    motor_service_  = std::make_unique<MotorService>(robot_constants, loop_hz);
     g_motor_service = motor_service_.get();
     motor_service_->setup();
     LOG(INFO)

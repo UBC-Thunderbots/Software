@@ -288,11 +288,10 @@ MotorService::MotorFaultIndicator MotorService::checkDriverFault(uint8_t motor)
     return MotorFaultIndicator(drive_enabled, motor_faults);
 }
 
-TbotsProto::MotorStatus MotorService::updateMotorStatus(
-        double front_left_velocity_mps,
-        double front_right_velocity_mps,
-        double back_left_velocity_mps,
-        double back_right_velocity_mps)
+TbotsProto::MotorStatus MotorService::updateMotorStatus(double front_left_velocity_mps,
+                                                        double front_right_velocity_mps,
+                                                        double back_left_velocity_mps,
+                                                        double back_right_velocity_mps)
 {
     TbotsProto::MotorStatus motor_status;
 
@@ -301,9 +300,11 @@ TbotsProto::MotorStatus MotorService::updateMotorStatus(
     for (uint8_t i = 0; i < NUM_DRIVE_MOTORS; ++i)
     {
         TbotsProto::DriveUnit drive_status;
-        drive_status.set_drive_enabled(cached_motor_faults_[motor_fault_detector].drive_enabled);
+        drive_status.set_drive_enabled(
+            cached_motor_faults_[motor_fault_detector].drive_enabled);
 
-        for (const TbotsProto::MotorFault &fault : cached_motor_faults_[motor_fault_detector].motor_faults)
+        for (const TbotsProto::MotorFault& fault :
+             cached_motor_faults_[motor_fault_detector].motor_faults)
         {
             drive_status.add_motor_fault(fault);
         }
@@ -398,7 +399,9 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
         static_cast<double>(tmc4671_getActualVelocity(BACK_LEFT_MOTOR_CHIP_SELECT)) *
         MECHANICAL_MPS_PER_ELECTRICAL_RPM;
 
-    TbotsProto::MotorStatus motor_status = updateMotorStatus(front_left_velocity, front_right_velocity, back_left_velocity, back_right_velocity);
+    TbotsProto::MotorStatus motor_status =
+        updateMotorStatus(front_left_velocity, front_right_velocity, back_left_velocity,
+                          back_right_velocity);
 
     // This order needs to match euclidean_to_four_wheel converters order
     // We also want to work in the meters per second space rather than electrical RPMs
@@ -1023,9 +1026,11 @@ void MotorService::checkEncoderConnections()
         // read back current velocity
         initial_velocities[motor] = tmc4671_readInt(motor, TMC4671_ABN_DECODER_COUNT);
 
-        // open loop mode can be used without an encoder, set open loop phi positive direction
+        // open loop mode can be used without an encoder, set open loop phi positive
+        // direction
         writeToControllerOrDieTrying(motor, TMC4671_OPENLOOP_MODE, 0x00000000);
-        writeToControllerOrDieTrying(motor, TMC4671_PHI_E_SELECTION, TMC4671_PHI_E_OPEN_LOOP);
+        writeToControllerOrDieTrying(motor, TMC4671_PHI_E_SELECTION,
+                                     TMC4671_PHI_E_OPEN_LOOP);
         writeToControllerOrDieTrying(motor, TMC4671_OPENLOOP_ACCELERATION, 0x0000003C);
 
         // represents effective voltage applied to the motors (% voltage)
@@ -1038,9 +1043,11 @@ void MotorService::checkEncoderConnections()
         writeToControllerOrDieTrying(motor, TMC4671_OPENLOOP_VELOCITY_TARGET, 0x0000000A);
     }
 
-    for (int num_iterations = 0; num_iterations < 10 
-            && std::any_of(calibrated_motors.begin(), calibrated_motors.end(), [](bool calibration_status) { return !calibration_status; });
-            ++num_iterations)
+    for (int num_iterations = 0;
+         num_iterations < 10 &&
+         std::any_of(calibrated_motors.begin(), calibrated_motors.end(),
+                     [](bool calibration_status) { return !calibration_status; });
+         ++num_iterations)
     {
         for (uint8_t motor = 0; motor < NUM_DRIVE_MOTORS; ++motor)
         {
@@ -1050,7 +1057,8 @@ void MotorService::checkEncoderConnections()
             }
             // now read back the velocity
             int read_back_velocity = tmc4671_readInt(motor, TMC4671_ABN_DECODER_COUNT);
-            LOG(INFO) << MOTOR_NAMES[motor] << " read back: " << read_back_velocity << " and initially read: " << initial_velocities[motor];
+            LOG(INFO) << MOTOR_NAMES[motor] << " read back: " << read_back_velocity
+                      << " and initially read: " << initial_velocities[motor];
 
             if (read_back_velocity != initial_velocities[motor])
             {
@@ -1064,11 +1072,13 @@ void MotorService::checkEncoderConnections()
 
     for (uint8_t motor = 0; motor < NUM_DRIVE_MOTORS; ++motor)
     {
-        if (!calibrated_motors[motor]) {
-            LOG(FATAL) << MOTOR_NAMES[motor] << " motor reading did not change as expected!";
-        } 
+        if (!calibrated_motors[motor])
+        {
+            LOG(FATAL) << MOTOR_NAMES[motor]
+                       << " motor reading did not change as expected!";
+        }
     }
-    
+
     // stop all motors, reset back to velocity control mode
     for (uint8_t motor = 0; motor < NUM_DRIVE_MOTORS; ++motor)
     {
