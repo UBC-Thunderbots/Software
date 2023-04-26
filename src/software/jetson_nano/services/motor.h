@@ -3,7 +3,6 @@
 #include <Eigen/Dense>
 #include <memory>
 #include <string>
-#include <vector>
 
 #include "proto/robot_status_msg.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
@@ -85,7 +84,8 @@ class MotorService
     void runOpenLoopCalibrationRoutine(uint8_t motor, size_t num_samples);
 
     /**
-     * Reset the motor board by toggling the reset GPIO appropriately. Effectively stops the motors from moving.
+     * Reset the motor board by toggling the reset GPIO appropriately. Effectively stops
+     * the motors from moving.
      */
     void resetMotorBoard();
 

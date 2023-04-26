@@ -63,11 +63,13 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, const int loop
     g3::overrideSetupSignals({});
     NetworkLoggerSingleton::initializeLogger(channel_id_, network_interface_, robot_id_);
 
+    // catch all catch-able signals
     std::signal(SIGSEGV, tbotsExit);
     std::signal(SIGTERM, tbotsExit);
     std::signal(SIGABRT, tbotsExit);
     std::signal(SIGFPE, tbotsExit);
     std::signal(SIGINT, tbotsExit);
+    std::signal(SIGILL, tbotsExit);
 
     LOG(INFO)
         << "THUNDERLOOP: Network Logger initialized! Next initializing Network Service";
