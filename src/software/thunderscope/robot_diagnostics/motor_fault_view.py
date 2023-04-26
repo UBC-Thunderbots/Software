@@ -112,17 +112,22 @@ class MotorFaultWidget(QWidget):
             self.container_widget.setPixmap(get_stopped_icon())
 
     def event(self, event):
-        if event.type() == QEvent.HoverEnter:
-            QToolTip.showText(
-                QPoint(
-                    int(event.globalPosition().x()),
-                    int(event.globalPosition().y()),
-                ),
-                "<b>Hello</b> <i>Qt!</i>",
-                msecShowTime=5000
-            )
-        elif event.type() == QEvent.HoverLeave:
-            QToolTip.hideText()
+        # if event.type() == QEvent.Enter:
+        #     QToolTip.showText(
+        #         QPoint(
+        #             int(event.globalPosition().x()),
+        #             int(event.globalPosition().y()),
+        #         ),
+        #         "<b>Hello</b> <i>Qt!</i>",
+        #         msecShowTime=5000
+        #     )
+        # elif event.type() == QEvent.HoverLeave:
+        #     QToolTip.hideText()
+        print(event.type())
+        return super().event(event)
+        # TODO: find out where this type Enter is defined
+        # if event.type() == Type.Enter:
+        #   print("bruh")
 
 
 class MotorFaultView(QWidget):
