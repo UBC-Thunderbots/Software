@@ -85,7 +85,8 @@ int main(int argc, char **argv)
 
     // Only show logs from robots in the selected_ids list, unless it is empty
     auto robot_log_callback = [args](TbotsProto::RobotLog log) {
-        if (!args.selected_ids.empty() && std::find(args.selected_ids.begin(), args.selected_ids.end(),
+        if (!args.selected_ids.empty() &&
+            std::find(args.selected_ids.begin(), args.selected_ids.end(),
                       log.robot_id()) == args.selected_ids.end())
         {
             return;
@@ -109,7 +110,8 @@ int main(int argc, char **argv)
         {
             selected_ids_string += std::to_string(id) + " ";
         }
-        LOG(INFO) << "Showing logs from robots with IDs: " << selected_ids_string << std::endl;
+        LOG(INFO) << "Showing logs from robots with IDs: " << selected_ids_string
+                  << std::endl;
     }
     else
     {
