@@ -44,7 +44,7 @@ int main(int argc, char **argv)
         bool help                     = false;
         std::string interface         = "";
         int channel                   = 0;
-        std::vector<int> filtered_ids = {};
+        std::vector<int> selected_ids = {};
     };
 
     CommandLineArgs args;
@@ -54,13 +54,13 @@ int main(int argc, char **argv)
                        "Help screen");
     desc.add_options()("interface",
                        boost::program_options::value<std::string>(&args.interface),
-                       "Which network interface to listen for messages from");
+                       "Network interface to listen for robot logs from");
     desc.add_options()("channel", boost::program_options::value<int>(&args.channel),
-                       "Multicast channel to listen on connect to");
+                       "Multicast channel to listen for robot logs on");
     desc.add_options()(
-        "filtered_ids",
-        boost::program_options::value<std::vector<int>>(&args.filtered_ids)->multitoken(),
-        "Robot IDs to filter out of the logs");
+        "selected_ids",
+        boost::program_options::value<std::vector<int>>(&args.selected_ids)->multitoken(),
+        "Space separated robot IDs to show logs from. If not specified, logs from all robots will be shown");
 
     boost::program_options::variables_map vm;
     boost::program_options::store(parse_command_line(argc, argv, desc), vm);
@@ -83,10 +83,10 @@ int main(int argc, char **argv)
         std::make_unique<ColouredCoutSink>(false), &ColouredCoutSink::displayColouredLog);
     g3::initializeLogging(logWorker.get());
 
-    // Callback which filters out the logs from robots with filtered_id
+    // Only show logs from robots in the selected_ids list, unless it is empty
     auto robot_log_callback = [args](TbotsProto::RobotLog log) {
-        if (std::find(args.filtered_ids.begin(), args.filtered_ids.end(),
-                      log.robot_id()) != args.filtered_ids.end())
+        if (!args.selected_ids.empty() && std::find(args.selected_ids.begin(), args.selected_ids.end(),
+                      log.robot_id()) == args.selected_ids.end())
         {
             return;
         }
@@ -102,14 +102,18 @@ int main(int argc, char **argv)
               << ROBOT_MULTICAST_CHANNELS.at(args.channel) << " and interface "
               << args.interface;
 
-    if (!args.filtered_ids.empty())
+    if (!args.selected_ids.empty())
     {
-        std::string filtered_ids_string;
-        for (auto id : args.filtered_ids)
+        std::string selected_ids_string;
+        for (auto id : args.selected_ids)
         {
-            filtered_ids_string += std::to_string(id) + " ";
+            selected_ids_string += std::to_string(id) + " ";
         }
-        LOG(INFO) << "Filtering robots with IDs: " << filtered_ids_string << std::endl;
+        LOG(INFO) << "Showing logs from robots with IDs: " << selected_ids_string << std::endl;
+    }
+    else
+    {
+        LOG(INFO) << "Showing logs from all robots" << std::endl;
     }
 
     // This blocks forever without using the CPU
