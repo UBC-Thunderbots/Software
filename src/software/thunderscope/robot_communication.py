@@ -215,7 +215,7 @@ class RobotCommunication(object):
 
         self.receive_log_visualize = HRVOVisualizationProtoListener(
             self.multicast_channel + "%" + self.interface,
-            LOG_VISUALIZE_PORT,
+            HRVO_VISUALIZATION_PORT,
             lambda data: self.current_proto_unix_io.send_proto(HRVOVisualization, data),
             True,
         )

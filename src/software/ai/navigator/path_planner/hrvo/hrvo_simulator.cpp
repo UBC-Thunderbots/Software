@@ -11,25 +11,26 @@ void HRVOSimulator::updateWorld(const World &world,
 {
     this->world = world;
 
-    auto &friendlies = world.friendlyTeam();
-    auto &enemies    = world.enemyTeam();
+    const Team &friendly_team = world.friendlyTeam();
+    const Team &enemy_team    = world.enemyTeam();
 
-    // initialize an array of bits, with each bit corresponding to the robot whose id is
-    // the index this keeps track of all the friendly robot ids in the world packet
+    // Initialize an array of bools, with the index corresponding to the robot id, and the
+    // bool representing whether the robot is present in the World
     std::vector<bool> tracked_friendlies(
-        std::max(static_cast<int>(MAX_ROBOT_IDS_PER_SIDE),
-                 static_cast<int>(friendlies.numRobots())),
+        std::max(MAX_ROBOT_IDS_PER_SIDE,
+                 static_cast<unsigned int>(friendly_team.numRobots())),
         false);
-    std::vector<bool> tracked_enemies(std::max(static_cast<int>(MAX_ROBOT_IDS_PER_SIDE),
-                                               static_cast<int>(enemies.numRobots())),
-                                      false);
+    std::vector<bool> tracked_enemies(
+        std::max(MAX_ROBOT_IDS_PER_SIDE,
+                 static_cast<unsigned int>(enemy_team.numRobots())),
+        false);
 
-    for (const Robot &friendly_robot : friendlies.getAllRobots())
+    // Add all friendly robots that aren't present in the simulator
+    for (const Robot &friendly_robot : friendly_team.getAllRobots())
     {
-        auto hrvo_agent = robots.find(friendly_robot.id());
-
         tracked_friendlies[friendly_robot.id()] = true;
 
+        auto hrvo_agent = robots.find(friendly_robot.id());
         if (hrvo_agent != robots.end())
         {
             if (friendly_robot.id() != robot_id)
@@ -51,11 +52,12 @@ void HRVOSimulator::updateWorld(const World &world,
         }
     }
 
-    for (unsigned int i = 0; i < tracked_friendlies.size(); ++i)
+    // Delete all friendly agents that aren't present in the world anymore
+    for (unsigned int id = 0; id < tracked_friendlies.size(); ++id)
     {
-        if (!tracked_friendlies[i])
+        if (!tracked_friendlies[id])
         {
-            auto robot_it = robots.find(i);
+            auto robot_it = robots.find(id);
             if (robot_it != robots.end())
             {
                 robots.erase(robot_it);
@@ -63,9 +65,10 @@ void HRVOSimulator::updateWorld(const World &world,
         }
     }
 
-    for (const Robot &enemy_robot : enemies.getAllRobots())
+    // Add all enemy robots that aren't present in the simulator
+    for (const Robot &enemy_robot : enemy_team.getAllRobots())
     {
-        auto lv_agent = robots.find(enemy_robot.id() + ENEMY_LV_ROBOT_OFFSET);
+        auto lv_agent = robots.find(enemy_robot.id() + ENEMY_LV_ROBOT_ID_OFFSET);
         tracked_enemies[enemy_robot.id()] = true;
 
         if (lv_agent != robots.end())
@@ -78,13 +81,12 @@ void HRVOSimulator::updateWorld(const World &world,
         }
     }
 
-    // flip all the tracked bits to get all the robot ids which are NOT in the world
-    // packet, and delete enemy agent that aren't present in the world packet.
-    for (unsigned int i = 0; i < tracked_enemies.size(); ++i)
+    // Delete all enemy agents that aren't present in the world anymore
+    for (unsigned int id = 0; id < tracked_enemies.size(); ++id)
     {
-        if (!tracked_enemies[i])
+        if (!tracked_enemies[id])
         {
-            auto robot_it = robots.find(i + ENEMY_LV_ROBOT_OFFSET);
+            auto robot_it = robots.find(id + ENEMY_LV_ROBOT_ID_OFFSET);
             if (robot_it != robots.end())
             {
                 robots.erase(robot_it);
@@ -185,7 +187,8 @@ void HRVOSimulator::configureLVRobot(const Robot &robot,
         robot.id(), robot.currentState(), path, ROBOT_MAX_RADIUS_METERS, max_speed, 0.0,
         0.0, max_angular_speed, 0.0, ENEMY_ROBOT_RADIUS_MAX_INFLATION);
 
-    robots[robot.id() + ENEMY_LV_ROBOT_OFFSET] = std::static_pointer_cast<Agent>(agent);
+    robots[robot.id() + ENEMY_LV_ROBOT_ID_OFFSET] =
+        std::static_pointer_cast<Agent>(agent);
 }
 
 void HRVOSimulator::doStep(Duration time_step)
@@ -312,6 +315,6 @@ bool HRVOSimulator::robotExists(RobotId id, TeamSide side)
     }
     else
     {
-        return robots.find(id + ENEMY_LV_ROBOT_OFFSET) != robots.end();
+        return robots.find(id + ENEMY_LV_ROBOT_ID_OFFSET) != robots.end();
     }
 }

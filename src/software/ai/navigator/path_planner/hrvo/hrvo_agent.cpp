@@ -664,7 +664,7 @@ Vector HRVOAgent::computePreferredVelocity(Duration time_step)
     // will compensate for the current angular velocity by rotating the velocity
     // in the opposite direction
     output = output.rotate(-angular_velocity * time_step.toSeconds() *
-                           config.angular_velocity_compensation());
+                           config.angular_velocity_compensation_multiplier());
 
     return localToGlobalVelocity(output, orientation);
 }

@@ -296,6 +296,7 @@ message RobotNavigationObstacleConfig
 
 message HRVOConfig
 {
+    // Proportional constant used for calculating the desired linear velocity
     required double linear_velocity_kp = 1 [
         default                   = 2.0,
         (bounds).min_double_value = 0.001,
@@ -307,13 +308,18 @@ message HRVOConfig
     required double linear_velocity_max_pid_offset = 2
         [default = 0.3, (bounds).min_double_value = 0.0, (bounds).max_double_value = 5.0];
 
+    // Proportional constant used for calculating the desired angular velocity
     required double angular_velocity_kp = 3 [
         default                   = 2.8,
         (bounds).min_double_value = 0.001,
         (bounds).max_double_value = 10.0
     ];
 
-    required double angular_velocity_compensation = 4
+    // Compensation constant added to stop the robots from swinging when turning and
+    // moving in a linear line. This is defined as a multiplier of the angular velocity
+    // for how much the linear velocity vector should be rotated by in the opposite
+    // direction of the angular velocity.
+    required double angular_velocity_compensation_multiplier = 4
         [default = 1.5, (bounds).min_double_value = 0.0, (bounds).max_double_value = 3.0];
 }
 
