@@ -120,6 +120,24 @@ cc_library(
 )
 
 cc_library(
+    name = "example_passing_play",
+    srcs = ["example_passing_play.cpp"],
+    hdrs = ["example_passing_play.h"],
+    deps = [
+        ":play",
+        "//shared:constants",
+        "//software/ai/hl/stp/tactic/attacker:attacker_tactic",
+        "//software/ai/hl/stp/tactic/receiver:receiver_tactic",
+        "//software/logger",
+        "//software/util/generic_factory",
+        "//software/ai/passing:eighteen_zone_pitch_division",
+        "//software/ai/passing:pass_generator",
+    ],
+    alwayslink = True,
+)
+
+
+cc_library(
     name = "halt_play",
     srcs = ["halt_play.cpp"],
     hdrs = ["halt_play.h"],
@@ -292,6 +310,7 @@ cc_library(
         "//software/ai/hl/stp/play/offense:offense_play",
         "//software/ai/hl/stp/play/penalty_kick:penalty_kick_play",
         "//software/ai/hl/stp/play/shoot_or_pass:shoot_or_pass_play",
+        ":example_passing_play",
     ],
 )
 
