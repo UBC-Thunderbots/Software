@@ -628,9 +628,17 @@ Vector HRVOAgent::computePreferredVelocity(Duration time_step)
     Point destination  = path_point_opt.value().getPosition();
     Vector local_error = globalToLocalVelocity(destination - position, orientation);
 
+    if (distance(destination, previous_destination) > 0.1)
+    {
+        // Destination has significantly changed, so we will update the kp
+        double distance_for_kp = std::clamp(local_error.length(), 0.25, 2.0);
+        kp                     = 2.3 / (distance_for_kp + 0.4) + 1.5;
+        previous_destination   = destination;
+    }
+
     // We calculate the new desired velocity based on two proportional controllers (x, y),
     // in the local frame.
-    Vector pid_vel = local_error * config.linear_velocity_kp();
+    Vector pid_vel = local_error * kp;
 
     // Scale down the PID velocity from being excessively high as it causes the
     // robot to swing around the destination. This causes the velocity to point

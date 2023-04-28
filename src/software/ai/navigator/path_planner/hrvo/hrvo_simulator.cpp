@@ -33,7 +33,7 @@ void HRVOSimulator::updateWorld(const World &world,
         auto hrvo_agent = robots.find(friendly_robot.id());
         if (hrvo_agent != robots.end())
         {
-            if (friendly_robot.id() != robot_id)
+            if (friendly_robot.id() == robot_id)
             {
                 // We do not want velocity feedback for the robot which is running
                 // this HRVO simulator as it prevents it from being able to accelerate

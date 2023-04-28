@@ -231,6 +231,9 @@ class HRVOAgent : public Agent
     std::vector<ObstaclePtr> static_obstacles;
     std::optional<ObstaclePtr> ball_obstacle;
 
+    Point previous_destination;
+    double kp = 2.0;
+
     // pointers to the closest agents by euclidean distance to this agents position
     std::vector<std::shared_ptr<Agent>> neighbours;
 
