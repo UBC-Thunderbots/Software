@@ -28,6 +28,7 @@
     - debug: msg="{{ result.stdout }}"
 
     - name: Flashing... (this will take a while on the first run)
+      #shell: '/opt/tbotspython/bin/platformio run --disable-auto-clean -t nobuild -t upload -d ~/powerloop/power'
       shell: '/opt/tbotspython/bin/esptool.py --chip esp32 --port /dev/ttyTHS1 --baud 115200 --before default_reset --after hard_reset --no-stub write_flash -z --flash_mode dio --flash_freq 40m --flash_size 4MB --spi-connection=6,17,8,11,16 0x10000 ~/powerloop/power/.pio/build/pico32/firmware.bin'
       register: result
 

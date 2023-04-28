@@ -4,39 +4,42 @@ import argparse
 
 
 class FlashingESP32:
-    PICO_BOOT_PIN = 15
-    PICO_RESET_PIN = 13
+    PICO_BOOT_PIN = 18
+    PICO_RESET_PIN = 22
 
-    DELAY = 50 / 1000  # 50 MS
+    DELAY = 50 / 1000  #  50 MS
 
     def __init__(self):
         """Initialize GPIO pins"""
+        GPIO.setwarnings(False)
         GPIO.setmode(GPIO.BOARD)
 
         # set initial state to high to prevent ESP32 from entering bootloader mode
-        GPIO.setup(self.PICO_BOOT_PIN, GPIO.OUT, initial=GPIO.HIGH)
+        GPIO.setup(self.PICO_BOOT_PIN, GPIO.OUT, initial=GPIO.LOW)
         # set initial state to high to prevent ESP32 from resetting
-        GPIO.setup(self.PICO_RESET_PIN, GPIO.OUT, initial=GPIO.HIGH)
+        GPIO.setup(self.PICO_RESET_PIN, GPIO.OUT, initial=GPIO.LOW)
 
     def enter_bootloader_mode(self):
+        GPIO.output(self.PICO_BOOT_PIN, GPIO.LOW)
+        GPIO.output(self.PICO_RESET_PIN, GPIO.LOW)
+        sleep(self.DELAY)
         GPIO.output(self.PICO_BOOT_PIN, GPIO.HIGH)
+        sleep(self.DELAY)
         GPIO.output(self.PICO_RESET_PIN, GPIO.HIGH)
+        sleep(self.DELAY)
+        GPIO.output(self.PICO_RESET_PIN, GPIO.LOW)
         sleep(self.DELAY)
         GPIO.output(self.PICO_BOOT_PIN, GPIO.LOW)
-        sleep(self.DELAY)
-        GPIO.output(self.PICO_RESET_PIN, GPIO.LOW)
-        sleep(self.DELAY)
-        GPIO.output(self.PICO_RESET_PIN, GPIO.HIGH)
-        sleep(self.DELAY)
-        GPIO.output(self.PICO_BOOT_PIN, GPIO.HIGH)
+        GPIO.cleanup()
 
     def reset(self):
-        GPIO.output(self.PICO_BOOT_PIN, GPIO.HIGH)
-        GPIO.output(self.PICO_RESET_PIN, GPIO.HIGH)
-        sleep(self.DELAY)
+        GPIO.output(self.PICO_BOOT_PIN, GPIO.LOW)
         GPIO.output(self.PICO_RESET_PIN, GPIO.LOW)
         sleep(self.DELAY)
         GPIO.output(self.PICO_RESET_PIN, GPIO.HIGH)
+        sleep(self.DELAY)
+        GPIO.output(self.PICO_RESET_PIN, GPIO.LOW)
+        GPIO.cleanup()
 
 
 if __name__ == "__main__":
