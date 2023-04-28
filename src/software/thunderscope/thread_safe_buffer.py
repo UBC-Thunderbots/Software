@@ -37,15 +37,25 @@ class ThreadSafeBuffer(object):
         self.last_logged_protos_dropped = 0
 
     def get(self, block=False, timeout=None, return_cached=True):
-        """Get data from the buffer. If the buffer is empty, and
-        block is True, wait until a new msg is received. If block
-        is False, then return a cached value immediately.
+        """Get data from the buffer.
+
+        If the buffer is empty:
+
+            - If block is True
+                - wait until a new msg is received.
+                - If a timeout is supplied, wait for timeout seconds
+                - Then throw an error, or return cached message if return_cached is True
+
+            - If block is False
+                - Return None if return_cached is False
+                - Return cached message if return_cached is True
 
         :param block: If block is True, then block until a new message
-                      comes through. Otherwise returned the cached msg.
-        :param timeout: If block is True, then wait for this many seconds
+                      comes through, or returned the cached msg if return_cached = True
+        :param timeout: If block is True, then wait for this many seconds before
+                        throwing an error or returning cached
         :param return_cached: If queue is empty, decides whether to
-                              return cached value (True) or return None (false)
+                              return cached value (True) or return None / throw an error (false)
 
         :return: protobuf (cached if block is False and there is no data
                  in the buffer)
@@ -65,14 +75,17 @@ class ThreadSafeBuffer(object):
             self.last_logged_protos_dropped = self.protos_dropped
 
         if block:
-            return self.queue.get(timeout=timeout)
-
-        try:
-            self.cached_msg = self.queue.get_nowait()
-
-        except queue.Empty as empty:
-            if not return_cached:
-                return None
+            try:
+                self.cached_msg = self.queue.get(timeout=timeout)
+            except queue.Empty as empty:
+                if not return_cached:
+                    raise empty
+        else:
+            try:
+                self.cached_msg = self.queue.get_nowait()
+            except queue.Empty as empty:
+                if not return_cached:
+                    return None
 
         return self.cached_msg
 
