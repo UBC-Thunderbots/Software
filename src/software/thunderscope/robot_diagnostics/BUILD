@@ -49,7 +49,7 @@ py_library(
     srcs = ["motor_fault_view.py"],
     deps = [
         ":motor_fault_icon_loader",
-        "//software/thunderscope/common:common_widgets"
+        "//software/thunderscope/common:common_widgets",
     ],
 )
 

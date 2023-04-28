@@ -224,7 +224,8 @@ class RobotInfo(QWidget):
             )
         else:
             self.breakbeam_label.setStyleSheet(
-                f"background-color: green; {self.BREAKBEAM_BORDER};" "border-color: green"
+                f"background-color: green; {self.BREAKBEAM_BORDER};"
+                "border-color: green"
             )
 
         self.motor_fault_view.refresh(

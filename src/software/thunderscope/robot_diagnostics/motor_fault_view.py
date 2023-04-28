@@ -1,8 +1,6 @@
-import os
 from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph.Qt.QtCore import Qt, QPoint, QByteArray, QBuffer, QIODeviceBase
 from pyqtgraph.Qt import QtGui
-from enum import Enum
 from software.thunderscope.robot_diagnostics.motor_fault_icons.motor_fault_icon_loader import (
     get_no_fault_icon,
     get_stopped_icon,
@@ -18,6 +16,7 @@ class MotorFaultView(QWidget):
     Displays if any of the motors have a fault and / or are disabled
     Displays specific faults for each motor in a tooltip
     """
+
     WIDGET_SIZE_SCALE = 2.2
 
     def __init__(self):
@@ -63,7 +62,7 @@ class MotorFaultView(QWidget):
 
     def event(self, event):
         """
-        Overriden event function which intercepts Mouse Enter and Leave events
+        Overridden event function which intercepts Mouse Enter and Leave events
         Upon Enter, displays a tooltip with all the current motor faults if any
         Upon Leave, hides the tooltip
         :param event: event to check
