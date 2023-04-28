@@ -16,7 +16,7 @@ NetworkSink::NetworkSink(unsigned int channel, const std::string& interface, int
 
     log_visualize_output.reset(new ThreadedProtoUdpSender<TbotsProto::HRVOVisualization>(
         std::string(ROBOT_MULTICAST_CHANNELS.at(channel)) + "%" + interface,
-        LOG_VISUALIZE_PORT, true));
+        HRVO_VISUALIZATION_PORT, true));
 }
 
 void NetworkSink::sendToNetwork(g3::LogMessageMover log_entry)

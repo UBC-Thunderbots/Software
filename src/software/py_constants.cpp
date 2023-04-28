@@ -74,11 +74,11 @@ PYBIND11_MODULE(py_constants, m)
     });
 
     // Ports
-    m.attr("VISION_PORT")        = VISION_PORT;
-    m.attr("PRIMITIVE_PORT")     = PRIMITIVE_PORT;
-    m.attr("ROBOT_STATUS_PORT")  = ROBOT_STATUS_PORT;
-    m.attr("ROBOT_LOGS_PORT")    = ROBOT_LOGS_PORT;
-    m.attr("LOG_VISUALIZE_PORT") = LOG_VISUALIZE_PORT;
+    m.attr("VISION_PORT")             = VISION_PORT;
+    m.attr("PRIMITIVE_PORT")          = PRIMITIVE_PORT;
+    m.attr("ROBOT_STATUS_PORT")       = ROBOT_STATUS_PORT;
+    m.attr("ROBOT_LOGS_PORT")         = ROBOT_LOGS_PORT;
+    m.attr("HRVO_VISUALIZATION_PORT") = HRVO_VISUALIZATION_PORT;
 
     // PlotJuggler
     m.attr("PLOTJUGGLER_GUI_DEFAULT_HOST") = PLOTJUGGLER_GUI_DEFAULT_HOST;

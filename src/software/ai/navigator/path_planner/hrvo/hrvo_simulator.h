@@ -26,7 +26,7 @@ class HRVOSimulator
 
 
     /**
-     * Reset all agents to match the state of the given world.
+     * Update the simulator to match the state of the given world.
      * Friendly robots will use the Hybrid Reciprocal algorithm to traverse.
      * Enemy robots will go directly towards their goal without trying to avoid any
      * obstacles
@@ -153,7 +153,7 @@ class HRVOSimulator
     RobotId robot_id;
 
     // Map of robot ids to agent.
-    // enemy robot ids are offset by ENEMY_LV_ROBOT_OFFSET
+    // enemy robot ids are offset by ENEMY_LV_ROBOT_ID_OFFSET
     std::map<RobotId, std::shared_ptr<Agent>> robots;
 
     // Latest World which the simulator has received
@@ -171,5 +171,5 @@ class HRVOSimulator
 
     // Robot id offset for enemy robots so we don't have
     // friendly and enemy agents with overlapping ids in the `robots` map
-    static const unsigned int ENEMY_LV_ROBOT_OFFSET = 20;
+    static const unsigned int ENEMY_LV_ROBOT_ID_OFFSET = 20;
 };
