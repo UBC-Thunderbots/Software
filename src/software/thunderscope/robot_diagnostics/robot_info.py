@@ -81,23 +81,26 @@ class RobotInfo(QWidget):
 
         self.status_layout.addLayout(self.control_mode_layout)
 
+        # Layout containing the Vision Pattern and breakbeam indicator
         self.robot_model_layout = QVBoxLayout()
         self.robot_model_layout.setContentsMargins(0, 15, 5, 10)
 
+        # Vision pattern
         self.robot_model = self.create_vision_pattern_label(
             Colors.ROBOT_MIDDLE_BLUE, ROBOT_RADIUS
         )
 
+        # breakbeam indicator above robot
         self.breakbeam_label = QLabel()
         self.breakbeam_label.setStyleSheet(self.BREAKBEAM_BORDER)
         self.breakbeam_label.setFixedWidth(self.robot_model.sizeHint().width())
         self.breakbeam_label.setFixedHeight(self.robot_model.sizeHint().width() * 0.25)
+        self.breakbeam_label.setStyleSheet(
+            f"background-color: transparent; {self.BREAKBEAM_BORDER}"
+        )
 
         self.robot_model_layout.addWidget(self.breakbeam_label)
-
         self.robot_model_layout.addWidget(self.robot_model)
-
-        # Vision Pattern
         self.layout.addLayout(self.robot_model_layout)
 
         self.layout.addLayout(self.status_layout)
@@ -221,12 +224,12 @@ class RobotInfo(QWidget):
             )
         else:
             self.breakbeam_label.setStyleSheet(
-                f"background-color: transparent; {self.BREAKBEAM_BORDER}"
+                f"background-color: green; {self.BREAKBEAM_BORDER};" "border-color: green"
             )
 
         self.motor_fault_view.refresh(
             motor_status,
-            motor_status.front_left.DESCRIPTOR.fields_by_name["motor_fault"]
+            motor_status.front_left.DESCRIPTOR.fields_by_name["motor_fault"],
         )
 
         self.battery_progress_bar.setValue(power_status.battery_voltage)

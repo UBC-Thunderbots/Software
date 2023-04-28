@@ -127,36 +127,7 @@ class RobotView(QScrollArea):
         Refresh the view
         Gets a RobotStatus proto and calls the corresponding update method
         """
-        # robot_status = self.robot_status_buffer.get(block=False, return_cached=False)
-
-        robot_status = RobotStatus(
-            robot_id=2,
-            power_status=PowerStatus(breakbeam_tripped=True),
-            motor_status=MotorStatus(
-                front_left=DriveUnit(
-                    motor_fault=[
-                        DriveUnit.MotorFault.DRIVER_OVERTEMPERATURE,
-                        DriveUnit.MotorFault.PHASE_V_SHORT_COUNTER_DETECTED,
-                    ],
-                    drive_enabled=True,
-                ),
-                front_right=DriveUnit(motor_fault=[], drive_enabled=True),
-                back_left=DriveUnit(
-                    motor_fault=[
-                        DriveUnit.MotorFault.DRIVER_OVERTEMPERATURE,
-                        DriveUnit.MotorFault.PHASE_V_SHORT_COUNTER_DETECTED,
-                    ],
-                    drive_enabled=False,
-                ),
-                back_right=DriveUnit(
-                    motor_fault=[
-                        DriveUnit.MotorFault.PHASE_V_SHORT_TO_VS_DETECTED,
-                        DriveUnit.MotorFault.PHASE_V_SHORT_COUNTER_DETECTED,
-                    ],
-                    drive_enabled=False,
-                ),
-            ),
-        )
+        robot_status = self.robot_status_buffer.get(block=False, return_cached=False)
 
         if robot_status is not None:
             self.robot_view_widgets[robot_status.robot_id].update(robot_status)

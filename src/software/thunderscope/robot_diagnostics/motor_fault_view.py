@@ -1,5 +1,6 @@
+import os
 from pyqtgraph.Qt.QtWidgets import *
-from pyqtgraph.Qt.QtCore import Qt, QPoint, QEvent
+from pyqtgraph.Qt.QtCore import Qt, QPoint, QByteArray, QBuffer, QIODeviceBase
 from pyqtgraph.Qt import QtGui
 from enum import Enum
 from software.thunderscope.robot_diagnostics.motor_fault_icons.motor_fault_icon_loader import (
@@ -10,154 +11,152 @@ from software.thunderscope.robot_diagnostics.motor_fault_icons.motor_fault_icon_
 from software.thunderscope.common.common_widgets import get_string_val
 
 
-class MotorFaults(Enum):
-    NO_FAULT = 0
-    NO_STOP_FAULT = 1
-    STOP_FAULT = 2
+class MotorFaultView(QWidget):
+    """
+    Class to visualise information about motor faults from robot status
 
-
-class MotorFaultWidget(QWidget):
-
+    Displays if any of the motors have a fault and / or are disabled
+    Displays specific faults for each motor in a tooltip
+    """
     WIDGET_SIZE_SCALE = 2.2
 
-    def __init__(self, index):
+    def __init__(self):
+        """
+        Initializes the motor fault view widget
+
+        Sets all motor fault info to default and sets the tooltip to empty
+        Initialises the main label and the fault count notification label
+        """
         super().__init__()
-
-        self.index = index
-        self.status = MotorFaults.NO_FAULT
-        self.tooltip_visible = False
-
         self.layout = QHBoxLayout()
-        self.container_widget = QLabel()
-        self.container_widget.setFixedWidth(
-            self.container_widget.sizeHint().height() * self.WIDGET_SIZE_SCALE
-        )
-        self.container_widget.setFixedHeight(
-            self.container_widget.sizeHint().height() * self.WIDGET_SIZE_SCALE
-        )
-        self.container_widget.setScaledContents(True)
 
-        self.layout.addWidget(self.container_widget)
-        self.layout.setContentsMargins(0, 0, 0, 0)
+        self.drive_enabled = True
+        self.fault_count = 0
+        self.motor_faults = {
+            "Front Left": None,
+            "Front Right": None,
+            "Back Left": None,
+            "Back Right": None,
+        }
+        self.motor_fault_tooltip = ""
 
-        self.index_label = QLabel(self.container_widget)
-        self.index_label.setText(index)
-        self.index_label.setStyleSheet(
-            "color: black;" "font-weight: bold;" "font-size: 12pt"
-        )
-        self.index_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.index_label.setFixedWidth(self.index_label.sizeHint().height())
-        self.index_label.move(
-            self.container_widget.sizeHint().height() * self.WIDGET_SIZE_SCALE / 2
-            - self.index_label.sizeHint().height() / 2,
-            self.container_widget.sizeHint().height() * self.WIDGET_SIZE_SCALE / 2
-            - self.index_label.sizeHint().height() / 2,
-        )
+        self.motor_fault_display = QLabel()
+        self.motor_fault_display.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        self.fault_count_label = QLabel(self.container_widget)
+        self.fault_count_label = QLabel(self.motor_fault_display)
         self.fault_count_label.setFixedWidth(self.fault_count_label.sizeHint().height())
         self.fault_count_label.setStyleSheet(
             "color: white;"
-            "font-size: 8pt;"
+            "font-size: 10pt;"
             "background-color: red;"
             "border: 1px solid black"
         )
-        self.fault_count_label.move(
-            self.container_widget.sizeHint().height() * self.WIDGET_SIZE_SCALE * 1.2
-            - self.index_label.sizeHint().height(),
-            self.container_widget.sizeHint().height() * self.WIDGET_SIZE_SCALE * 1.2
-            - self.index_label.sizeHint().height()
-        )
+        self.fault_count_label.move(0, 0)
         self.fault_count_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.fault_count_label.hide()
 
+        self.update_ui()
+
+        self.layout.addWidget(self.motor_fault_display)
+
+        self.layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(self.layout)
-        self.refresh_fault_icon()
 
-    def refresh(self, fault_values, is_drive_enabled, enum_descriptor):
-        # self.container_widget.setToolTip(
-        #     "<b>Hello</b> <i>Qt!</i>" + ", ".join(
-        #         get_string_val(enum_descriptor, fault) for fault in fault_values
-        #     )
-        #     if fault_values
-        #     else "No Motor Faults :)"
-        # )
+    def event(self, event):
+        """
+        Overriden event function which intercepts Mouse Enter and Leave events
+        Upon Enter, displays a tooltip with all the current motor faults if any
+        Upon Leave, hides the tooltip
+        :param event: event to check
+        """
+        if str(event.type()) == "Type.Enter":
+            QToolTip.showText(
+                QPoint(
+                    int(event.globalPosition().x()), int(event.globalPosition().y()),
+                ),
+                self.motor_fault_tooltip
+                if self.motor_fault_tooltip
+                else "No Motor Faults :)",
+                msecShowTime=20000,
+            )
+        elif str(event.type()) == "Type.Leave":
+            QToolTip.hideText()
 
-        if fault_values:
-            self.fault_count_label.setText(str(len(fault_values)))
+        return super().event(event)
+
+    def add_faults_to_tooltip(self, enum_descriptor):
+        """
+        Adds detailed information about faults for each motor to the tooltip text
+        Fault info set by the refresh function
+        :param enum_descriptor: descriptor to translate from enum indexes to string values
+        """
+        for key in self.motor_faults.keys():
+            self.drive_enabled = (
+                self.drive_enabled and self.motor_faults[key].drive_enabled
+            )
+
+            self.fault_count += len(self.motor_faults[key].motor_fault)
+
+            self.motor_fault_tooltip += f"<b>{key} </b>"
+
+            motor_faults = self.motor_faults[key].motor_fault
+
+            if motor_faults:
+
+                self.motor_fault_tooltip += (
+                    "<ul>"
+                    + "".join(
+                        f"<li><p>{get_string_val(enum_descriptor, fault)}</p></li>"
+                        for fault in motor_faults
+                    )
+                    + "</ul>"
+                )
+            else:
+                self.motor_fault_tooltip += f"<ul><li>No Motor Faults :)</li></ul>"
+
+    def update_ui(self):
+        """
+        Updates the main UI according to the current motor states
+
+        If any motor has a fault,
+            - the notification label is visible and displays the current number of faults
+            - the color and text of the main display changes
+                - if all motors are still enabled, color is yellow and text is "Warning"
+                - if any motor is disabled, color is red and text is "Error"
+        """
+        if self.fault_count:
+            self.fault_count_label.setText(str(self.fault_count))
             self.fault_count_label.show()
         else:
             self.fault_count_label.hide()
 
-        new_status = self.get_new_status(fault_values, is_drive_enabled)
+        self.motor_fault_display.setStyleSheet("background: green;")
+        self.motor_fault_display.setText("No Fault")
 
-        if new_status != self.status:
-            self.status = new_status
-            self.refresh_fault_icon()
-
-    def get_new_status(self, fault_values, is_drive_enabled):
-        if not is_drive_enabled:
-            return MotorFaults.STOP_FAULT
-        if fault_values:
-            return MotorFaults.NO_STOP_FAULT
-        else:
-            return MotorFaults.NO_FAULT
-
-    def refresh_fault_icon(self):
-        if self.status == MotorFaults.NO_FAULT:
-            self.container_widget.setPixmap(get_no_fault_icon())
-        elif self.status == MotorFaults.NO_STOP_FAULT:
-            self.container_widget.setPixmap(get_warning_icon())
-        elif self.status == MotorFaults.STOP_FAULT:
-            self.container_widget.setPixmap(get_stopped_icon())
-
-    def event(self, event):
-        # if event.type() == QEvent.Enter:
-        #     QToolTip.showText(
-        #         QPoint(
-        #             int(event.globalPosition().x()),
-        #             int(event.globalPosition().y()),
-        #         ),
-        #         "<b>Hello</b> <i>Qt!</i>",
-        #         msecShowTime=5000
-        #     )
-        # elif event.type() == QEvent.HoverLeave:
-        #     QToolTip.hideText()
-        print(event.type())
-        return super().event(event)
-        # TODO: find out where this type Enter is defined
-        # if event.type() == Type.Enter:
-        #   print("bruh")
-
-
-class MotorFaultView(QWidget):
-    def __init__(self):
-        super().__init__()
-        self.layout = QHBoxLayout()
-
-        self.front_left_motor = MotorFaultWidget("FL")
-        self.front_right_motor = MotorFaultWidget("FR")
-        self.back_left_motor = MotorFaultWidget("BL")
-        self.back_right_motor = MotorFaultWidget("BR")
-
-        self.layout.addWidget(self.front_left_motor)
-        self.layout.addWidget(self.front_right_motor)
-        self.layout.addWidget(self.back_left_motor)
-        self.layout.addWidget(self.back_right_motor)
-
-        self.layout.setContentsMargins(0, 0, 0, 0)
-        self.setLayout(self.layout)
+        if self.fault_count:
+            self.motor_fault_display.setStyleSheet(
+                "background: yellow;" if self.drive_enabled else "background: red;"
+            )
+            self.motor_fault_display.setText(
+                "Warning" if self.drive_enabled else "Error"
+            )
 
     def refresh(self, message, enum_descriptor):
-        self.front_left_motor.refresh(
-            message.front_left.motor_fault, message.front_left.drive_enabled, enum_descriptor
-        )
-        self.front_right_motor.refresh(
-            message.front_right.motor_fault, message.front_right.drive_enabled, enum_descriptor
-        )
-        self.back_left_motor.refresh(
-            message.back_left.motor_fault, message.back_left.drive_enabled, enum_descriptor
-        )
-        self.back_right_motor.refresh(
-            message.back_right.motor_fault, message.back_right.drive_enabled, enum_descriptor
-        )
+        """
+        Converts the given message into a map of motor name to its fault info
+        And calls functions to update the main UI and the tooltip
+        :param message: the message to update the widget with
+        :param enum_descriptor: descriptor to translate from enum indexes to string values
+        """
+        self.motor_fault_tooltip = ""
+        self.drive_enabled = True
+        self.fault_count = 0
+
+        self.motor_faults = {
+            "Front Left": message.front_left,
+            "Front Right": message.front_right,
+            "Back Left": message.back_left,
+            "Back Right": message.back_right,
+        }
+
+        self.add_faults_to_tooltip(enum_descriptor)
+        self.update_ui()
