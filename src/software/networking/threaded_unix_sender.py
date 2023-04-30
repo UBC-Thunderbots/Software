@@ -49,7 +49,7 @@ class ThreadedUnixSender:
         proto = None
 
         while not self.stop:
-            proto = self.proto_buffer.get(block=True)
+            proto = self.proto_buffer.get(block=True, return_cached=False)
             if proto is not None:
                 send = proto.SerializeToString()
                 try:
