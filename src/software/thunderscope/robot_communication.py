@@ -122,6 +122,7 @@ class RobotCommunication(object):
                 primitive_set = self.primitive_buffer.get(block=False)
 
                 robot_primitives = dict(primitive_set.robot_primitives)
+                print(robot_primitives)
 
             # get the manual control primitive
             # print("robot_communication.py line 122: diagnostics.get",flush=True)
@@ -246,11 +247,10 @@ class RobotCommunication(object):
 
         """
         self.stop_running = True
-        self.receive_ssl_wrapper.close()
+        del self.receive_ssl_wrapper
         self.current_proto_unix_io.force_close()
         self.current_proto_unix_io.send_proto(SSL_WrapperPacket,None)
         self.current_proto_unix_io = None
-        time.sleep(2)
         print("killing robocom",flush=True)
         self.run_thread.join(10)
         print("run_thread joined",flush=True)

@@ -84,6 +84,8 @@ ThreadedProtoUdpListener<ReceiveProtoT>::~ThreadedProtoUdpListener()
 template <class ReceiveProtoT>
 void ThreadedProtoUdpListener<ReceiveProtoT>::close()
 {
+    udp_listener.close();
+
     // Stop the io_service. This is safe to call from another thread.
     // https://stackoverflow.com/questions/4808848/boost-asio-stopping-io-service
     // This MUST be done before attempting to join the thread because otherwise the
@@ -96,7 +98,6 @@ void ThreadedProtoUdpListener<ReceiveProtoT>::close()
     // `std::terminate` when we deallocate the thread object and kill our whole program
     io_service_thread.join();
 
-    udp_listener.close();
 }
 
 #include "software/networking/threaded_proto_udp_listener.hpp"
