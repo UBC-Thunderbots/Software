@@ -104,18 +104,13 @@ void DribbleFSM::getPossession(const Update &event)
         // if the target orientation is not close to the face ball orientation
         // then we pivot around the ball
         int pivot_threshold_deg = 20;
-        int amount_to_rotate_deg = 30;
+        double pivot_amount_deg = 30;
         if (target_orientation.minDiff(event.common.robot.orientation()) >
             Angle::fromDegrees(pivot_threshold_deg))
         {
-            Angle target_angle;
-            Angle cw_angle  = event.common.robot.orientation() + Angle::fromDegrees(amount_to_rotate_deg);
-            Angle ccw_angle  = event.common.robot.orientation() - Angle::fromDegrees(amount_to_rotate_deg);
-            if (cw_angle.minDiff(target_orientation) < ccw_angle.minDiff(target_orientation)) {
-                target_angle = cw_angle;
-            } else {
-                target_angle = ccw_angle;
-            }
+            Angle remaining_rotation = (target_orientation - event.common.robot.orientation()).clamp();
+            double amount_to_rotate_deg = std::clamp(remaining_rotation.toDegrees(), -pivot_amount_deg, pivot_amount_deg);
+            Angle target_angle = event.common.robot.orientation() + Angle::fromDegrees(amount_to_rotate_deg);
 
             Vector target_vector =
                 ROBOT_MAX_RADIUS_METERS * Vector::createFromAngle(target_angle);
@@ -145,17 +140,12 @@ void DribbleFSM::dribble(const Update &event)
     // when we have the ball in the dribbler, only then we pivot around the ball
     if (event.common.robot.isNearDribbler(event.common.world.ball().position()))
     {
+        double pivot_amount_deg = 40;
         int pivot_threshold_deg = 40;
-        int amount_to_rotate_deg = 40;
-        Angle cw_angle = event.common.robot.orientation() + Angle::fromDegrees(amount_to_rotate_deg);
-        Angle ccw_angle = event.common.robot.orientation() - Angle::fromDegrees(amount_to_rotate_deg);
-        // find the closer angle to the target orientation
-        Angle target_angle;
-        if (cw_angle.minDiff(target_orientation) < ccw_angle.minDiff(target_orientation)) {
-            target_angle = cw_angle;
-        } else {
-            target_angle = ccw_angle;
-        }
+
+        Angle remaining_rotation = (target_orientation - event.common.robot.orientation()).clamp();
+        double amount_to_rotate_deg = std::clamp(remaining_rotation.toDegrees(), -pivot_amount_deg, pivot_amount_deg);
+        Angle target_angle = event.common.robot.orientation() + Angle::fromDegrees(amount_to_rotate_deg);
 
         if (target_angle.minDiff(target_orientation) < Angle::fromDegrees(pivot_threshold_deg))
         {
