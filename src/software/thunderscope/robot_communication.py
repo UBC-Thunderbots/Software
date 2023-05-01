@@ -112,6 +112,7 @@ class RobotCommunication(object):
 
                 # send the world proto
                 #try:
+                #if world is not None:
                 self.send_world.send_proto(world)
                 #except:
                 #    print("proto error")
@@ -185,7 +186,8 @@ class RobotCommunication(object):
         print("M",flush=True)
         def test_func(data):
             # print(data,flush=True)
-            self.current_proto_unix_io.send_proto(SSL_WrapperPacket, data)
+            if not self.stop_running:
+                self.current_proto_unix_io.send_proto(SSL_WrapperPacket, data)
 
         self.receive_ssl_wrapper = SSLWrapperPacketProtoListener(
             SSL_VISION_ADDRESS,
@@ -245,6 +247,8 @@ class RobotCommunication(object):
         """
         self.stop_running = True
         self.current_proto_unix_io.force_close()
+        self.current_proto_unix_io.send_proto(SSL_WrapperPacket,None)
+        self.current_proto_unix_io = None
         time.sleep(2)
         print("killing robocom",flush=True)
         self.run_thread.join(10)

@@ -145,13 +145,14 @@ gdb --args bazel-bin/{full_system}
         :param traceback: The traceback of the exception
 
         """
-        print("exiting fS",flush=True)
         if self.full_system_proc:
             self.full_system_proc.kill()
             self.full_system_proc.wait()
 
         if self.should_restart_on_crash:
             self.thread.join()
+
+        print("exiting fS",flush=True)
 
     def setup_proto_unix_io(self, proto_unix_io):
         """Helper to run full system and attach the appropriate unix senders/listeners

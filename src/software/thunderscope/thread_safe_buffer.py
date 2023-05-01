@@ -70,11 +70,7 @@ class ThreadSafeBuffer(object):
         if block:
             # print("thread_safe_buffer.py line 68 blocking: queue.get",flush=True)
             # print(traceback.print_stack())
-            one_time_value = random.randint(0,2147483647)
-            print(self.owner + " get blocking with number: ",one_time_value)
-            retval = self.queue.get(timeout=timeout)
-            print(self.owner + " get unblocking with number: ",one_time_value)
-            return retval
+            return self.queue.get(timeout=timeout)
 
         try:
             self.cached_msg = self.queue.get_nowait()

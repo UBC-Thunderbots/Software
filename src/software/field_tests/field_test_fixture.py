@@ -645,6 +645,8 @@ def load_command_line_arguments():
 
 @pytest.fixture
 def field_test_runner():
+    print("sleepin'", flush=True)
+    time.sleep(2000)
     faulthandler.enable()
     print("C", flush=True)
     simulator_proto_unix_io = ProtoUnixIO()
@@ -703,6 +705,7 @@ def field_test_runner():
                 )
                 print("pre-E", flush=True)
             print("E", flush=True)
+            time.sleep(LAUNCH_DELAY_S)
             runner = FieldTestRunner(
                 test_name=current_test,
                 blue_full_system_proto_unix_io=blue_full_system_proto_unix_io,
@@ -710,6 +713,7 @@ def field_test_runner():
                 gamecontroller=gamecontroller,
                 thunderscope=tscope
             )
+            blue_full_system_proto_unix_io.register_observer(World,runner.world_buffer)
             print("F", flush=True)
 
             # Setup proto loggers.

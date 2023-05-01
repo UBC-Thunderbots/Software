@@ -65,11 +65,11 @@ class ThreadedUnixSender:
                         self.send_failures
                         > ThreadedUnixSender.MAX_SEND_FAILURES_BEFORE_LOG
                     ):
-                        logging.warning(
-                            "Failed to send on {}, make sure the receiver is running".format(
-                                self.unix_path
-                            )
-                        )
+                        # logging.warning(
+                        #    "Failed to send on {}, make sure the receiver is running".format(
+                        #        self.unix_path
+                        #    )
+                        #)
                         self.send_failures = 0
 
     def send(self, proto):
