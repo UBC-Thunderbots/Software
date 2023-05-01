@@ -57,3 +57,13 @@ cc_test(
         "//software/world",
     ],
 )
+
+cc_test(
+    name = "ball_placement_play_fsm_test",
+    srcs = ["ball_placement_play_fsm_test.cpp"],
+    deps = [
+        ":ball_placement_play",
+        "//shared/test_util:tbots_gtest_main",
+        "//software/test_util",
+    ],
+)

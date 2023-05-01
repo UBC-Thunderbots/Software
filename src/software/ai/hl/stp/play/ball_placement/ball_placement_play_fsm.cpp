@@ -24,51 +24,7 @@ void BallPlacementPlayFSM::kickOffWall(const Update &event)
     double kick_speed         = 3;
     AutoChipOrKick auto_chick = {AutoChipOrKickMode::AUTOKICK, kick_speed};
 
-    Angle kick_angle;
-    if (ball_pos.x() > field_lines.xMax())
-    {
-        if (ball_pos.y() > 0)
-        {
-            kick_angle = Angle::fromDegrees(45);
-        }
-        else
-        {
-            kick_angle = Angle::fromDegrees(-45);
-        }
-    }
-    else if (ball_pos.x() < field_lines.xMin())
-    {
-        if (ball_pos.y() > 0)
-        {
-            kick_angle = Angle::fromDegrees(135);
-        }
-        else
-        {
-            kick_angle = Angle::fromDegrees(-135);
-        }
-    }
-    else if (ball_pos.y() > field_lines.yMax())
-    {
-        if (ball_pos.x() > 0)
-        {
-            kick_angle = Angle::fromDegrees(135);
-        }
-        else
-        {
-            kick_angle = Angle::fromDegrees(45);
-        }
-    }
-    else if (ball_pos.y() < field_lines.yMin())
-    {
-        if (ball_pos.x() > 0)
-        {
-            kick_angle = Angle::fromDegrees(-135);
-        }
-        else
-        {
-            kick_angle = Angle::fromDegrees(-45);
-        }
-    }
+    Angle kick_angle = calculateWallKickoffAngle(ball_pos, field_lines);
     pivot_kick_tactic->updateControlParams(ball_pos, kick_angle, auto_chick);
     tactics_to_run[0].emplace_back(pivot_kick_tactic);
 
@@ -124,7 +80,7 @@ void BallPlacementPlayFSM::retreat(const Update &event)
     Vector retreat_direction =
         (event.common.world.field().friendlyGoalCenter() - ball_pos).normalize();
     Point retreat_position =
-        ball_pos + retreat_direction * (0.5 + ROBOT_MAX_HEIGHT_METERS);
+        ball_pos + retreat_direction * (0.5 + ROBOT_MAX_RADIUS_METERS);
 
     Angle current_angle =
         event.common.world.friendlyTeam().getNearestRobot(ball_pos)->orientation();
@@ -172,12 +128,68 @@ bool BallPlacementPlayFSM::ballPlaced(const Update &event)
     }
 }
 
+Angle BallPlacementPlayFSM::calculateWallKickoffAngle(const Point &ball_pos,
+                                                      const Rectangle &field_lines)
+{
+    Angle kick_angle;
+    if (ball_pos.x() > field_lines.xMax())
+    {
+        if (ball_pos.y() > 0)
+        {
+            kick_angle = Angle::fromDegrees(45);
+        }
+        else
+        {
+            kick_angle = Angle::fromDegrees(-45);
+        }
+    }
+    else if (ball_pos.x() < field_lines.xMin())
+    {
+        if (ball_pos.y() > 0)
+        {
+            kick_angle = Angle::fromDegrees(135);
+        }
+        else
+        {
+            kick_angle = Angle::fromDegrees(-135);
+        }
+    }
+    else if (ball_pos.y() > field_lines.yMax())
+    {
+        if (ball_pos.x() > 0)
+        {
+            kick_angle = Angle::fromDegrees(135);
+        }
+        else
+        {
+            kick_angle = Angle::fromDegrees(45);
+        }
+    }
+    else if (ball_pos.y() < field_lines.yMin())
+    {
+        if (ball_pos.x() > 0)
+        {
+            kick_angle = Angle::fromDegrees(-135);
+        }
+        else
+        {
+            kick_angle = Angle::fromDegrees(-45);
+        }
+    }
+    return kick_angle;
+}
+
 void BallPlacementPlayFSM::setupMoveTactics(const Update &event)
 {
-    unsigned int num_tactics = event.common.num_tactics;
-
     // assign all but one of the robots to line up away from the ball placing robot
-    move_tactics = std::vector<std::shared_ptr<PlaceBallMoveTactic>>(num_tactics - 1);
+    unsigned int num_move_tactics = event.common.num_tactics - 1;
+
+    if (num_move_tactics == 0)
+    {
+        return;
+    }
+
+    move_tactics = std::vector<std::shared_ptr<PlaceBallMoveTactic>>(num_move_tactics);
     std::generate(move_tactics.begin(), move_tactics.end(),
                   [this]() { return std::make_shared<PlaceBallMoveTactic>(); });
 
@@ -197,7 +209,7 @@ void BallPlacementPlayFSM::setupMoveTactics(const Update &event)
         Point waiting_destination =
             waiting_line_start_point +
             waiting_line_vector.normalize(waiting_line_vector.length() * i /
-                                          static_cast<double>(move_tactics.size() - 1));
+                                          static_cast<double>(move_tactics.size()));
         move_tactics.at(i)->updateControlParams(waiting_destination, Angle::zero(), 0.0);
     }
 }

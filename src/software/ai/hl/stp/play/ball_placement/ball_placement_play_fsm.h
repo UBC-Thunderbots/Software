@@ -84,6 +84,16 @@ struct BallPlacementPlayFSM
     bool ballPlaced(const Update& event);
 
     /**
+     * Helper function for calculating the angle to kick the ball off of a wall
+     *
+     * @param ball_pos
+     * @param field_lines
+     *
+     * @return the kick angle
+     */
+    Angle calculateWallKickoffAngle(const Point& ball_pos, const Rectangle& field_lines);
+
+    /**
      * Helper function for setting up the MoveTactics of the robots away from the ball
      * placing robot
      *
