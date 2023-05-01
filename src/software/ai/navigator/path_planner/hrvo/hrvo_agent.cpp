@@ -11,8 +11,14 @@ HRVOAgent::HRVOAgent(RobotId robot_id, const RobotState &robot_state,
             max_angular_speed, max_angular_accel, max_radius_inflation),
       obstacle_factory(TbotsProto::RobotNavigationObstacleConfig()),
       neighbours(),
-      config()
+      prev_dynamic_kp_destination(robot_state.position()),
+      kp(2.0)
 {
+    // Reinitialize obstacle factory with a custom inflation factor
+    auto obstacle_config = TbotsProto::RobotNavigationObstacleConfig();
+    obstacle_config.set_robot_obstacle_inflation_factor(
+        HRVO_STATIC_OBSTACLE_INFLATION_FACTOR);
+    obstacle_factory = RobotNavigationObstacleFactory(obstacle_config);
 }
 
 void HRVOAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive,
@@ -76,6 +82,14 @@ void HRVOAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive,
                                         new_obstacles.end());
             }
         }
+
+        // To simplify the logic and avoid having to simulate the ball, we treat the
+        // ball as a static obstacles
+        if (move_primitive.ball_collision_type() == TbotsProto::AVOID)
+        {
+            static_obstacles.push_back(
+                obstacle_factory.createFromBallPosition(world.ball().position()));
+        }
     }
     this->path = path;
 }
@@ -95,8 +109,6 @@ std::vector<RobotId> HRVOAgent::computeNeighbors(
     double dist_to_obstacle_threshold_squared =
         std::min(std::pow(MAX_NEIGHBOR_SEARCH_DIST, 2),
                  (position - current_destination).lengthSquared());
-    dist_to_obstacle_threshold_squared = std::max(std::pow(ROBOT_MAX_RADIUS_METERS, 2),
-                                                  dist_to_obstacle_threshold_squared);
 
     auto compare = [&](const std::pair<RobotId, Point> &r1,
                        const std::pair<RobotId, Point> &r2) {
@@ -251,7 +263,7 @@ void HRVOAgent::computeNewAngularVelocity(Duration time_step)
         (dest_orientation - orientation).clamp().toRadians();
 
     // PID controller
-    const double pid_output = signed_delta_orientation * config.angular_velocity_kp();
+    const double pid_output              = signed_delta_orientation * ANGULAR_VELOCITY_KP;
     AngularVelocity pid_angular_velocity = AngularVelocity::fromRadians(pid_output);
 
     // Clamp acceleration
@@ -628,12 +640,18 @@ Vector HRVOAgent::computePreferredVelocity(Duration time_step)
     Point destination  = path_point_opt.value().getPosition();
     Vector local_error = globalToLocalVelocity(destination - position, orientation);
 
-    if (distance(destination, previous_destination) > 0.1)
+    if (distance(destination, prev_dynamic_kp_destination) >
+        MAX_DESTINATION_CHANGE_THRESHOLD)
     {
-        // Destination has significantly changed, so we will update the kp
-        double distance_for_kp = std::clamp(local_error.length(), 0.25, 2.0);
-        kp                     = 2.3 / (distance_for_kp + 0.4) + 1.5;
-        previous_destination   = destination;
+        // Destination has significantly changed, recalculate dynamic kp.
+        // Relationship between initial distance to destination and dynamic kp was
+        // determined experimentally to have the robot decelerate as late as possible,
+        // without overshooting. The minimum distance which this function was tested on
+        // was 0.25m. More detail about the tests can be found on Notion from Apr 28,
+        // 2023.
+        double distance_for_kp      = std::max(0.25, local_error.length());
+        kp                          = 2.3 / (distance_for_kp + 0.4) + 1.5;
+        prev_dynamic_kp_destination = destination;
     }
 
     // We calculate the new desired velocity based on two proportional controllers (x, y),
@@ -643,8 +661,8 @@ Vector HRVOAgent::computePreferredVelocity(Duration time_step)
     // Scale down the PID velocity from being excessively high as it causes the
     // robot to swing around the destination. This causes the velocity to point
     // towards the destination as fast as possible.
-    Vector realistic_pid_vel   = pid_vel.normalize(std::min(
-        pid_vel.length(), velocity.length() + config.linear_velocity_max_pid_offset()));
+    Vector realistic_pid_vel = pid_vel.normalize(
+        std::min(pid_vel.length(), velocity.length() + LINEAR_VELOCITY_MAX_PID_OFFSET));
     Vector curr_local_velocity = globalToLocalVelocity(velocity, orientation);
     Vector delta_velocity      = realistic_pid_vel - curr_local_velocity;
 
@@ -672,7 +690,7 @@ Vector HRVOAgent::computePreferredVelocity(Duration time_step)
     // will compensate for the current angular velocity by rotating the velocity
     // in the opposite direction
     output = output.rotate(-angular_velocity * time_step.toSeconds() *
-                           config.angular_velocity_compensation_multiplier());
+                           ANGULAR_VELOCITY_COMPENSATION_MULTIPLIER);
 
     return localToGlobalVelocity(output, orientation);
 }
