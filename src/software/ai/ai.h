@@ -71,6 +71,7 @@ class Ai final
     std::unique_ptr<Play> current_play;
     std::map<Field, GlobalPathPlannerFactory> field_to_path_planner_factory;
     TbotsProto::PlayName prev_override;
+    TbotsProto::Play current_override_play_proto;
     bool ai_config_changed;
 
     // inter play communication

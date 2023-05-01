@@ -23,6 +23,7 @@ void Ai::overridePlay(std::unique_ptr<Play> play)
 
 void Ai::overridePlayFromProto(TbotsProto::Play play_proto)
 {
+    current_override_play_proto = play_proto;
     overridePlay(std::move(createPlay(play_proto, ai_config_)));
 }
 
@@ -63,6 +64,7 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Ai::getPrimitives(const World& world)
     if (ai_config_changed)
     {
         fsm.reset(new FSM<PlaySelectionFSM>(PlaySelectionFSM{ai_config_}));
+        overridePlayFromProto(current_override_play_proto);
     }
 
     fsm->process_event(PlaySelectionFSM::Update(
