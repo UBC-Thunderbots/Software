@@ -646,7 +646,7 @@ def load_command_line_arguments():
 @pytest.fixture
 def field_test_runner():
     print("sleepin'", flush=True)
-    time.sleep(2000)
+    time.sleep(0)
     faulthandler.enable()
     print("C", flush=True)
     simulator_proto_unix_io = ProtoUnixIO()

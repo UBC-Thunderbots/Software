@@ -246,6 +246,7 @@ class RobotCommunication(object):
 
         """
         self.stop_running = True
+        self.receive_ssl_wrapper.close()
         self.current_proto_unix_io.force_close()
         self.current_proto_unix_io.send_proto(SSL_WrapperPacket,None)
         self.current_proto_unix_io = None

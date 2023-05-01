@@ -48,6 +48,8 @@ class ProtoUdpListener
 
     virtual ~ProtoUdpListener();
 
+    virtual void close();
+
    private:
     /**
      * This function is setup as the callback to handle packets received over the network.
@@ -185,6 +187,12 @@ void ProtoUdpListener<ReceiveProtoT>::handleDataReception(
 
 template <class ReceiveProtoT>
 ProtoUdpListener<ReceiveProtoT>::~ProtoUdpListener()
+{
+    socket_.close();
+}
+
+template <class ReceiveProtoT>
+void ProtoUdpListener<ReceiveProtoT>::close()
 {
     socket_.close();
 }
