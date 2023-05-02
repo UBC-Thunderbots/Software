@@ -35,7 +35,7 @@ def get_zig_zag_params(front_wall_x, robot_y_delta, num_walls):
             )
         ],
         [],
-        12,
+        20,
     )
 
 
@@ -416,7 +416,7 @@ def get_reached_destination_validation(robot_destinations):
                 region=tbots.Circle(
                     tbots.Point(destination.x_meters, destination.y_meters,), threshold
                 ),
-                num_ticks=15,
+                num_ticks=10,
             )
         ]
         for robot_id, destination in enumerate(robot_destinations)

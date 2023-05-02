@@ -122,7 +122,7 @@ std::unique_ptr<RealismConfigErForce> ErForceSimulator::createRealisticRealismCo
     realism_config->set_vision_delay(35000000);
     realism_config->set_vision_processing_time(10000000);
     realism_config->set_missing_ball_detections(0.02f);
-    realism_config->set_simulate_dribbling(true);
+    realism_config->set_simulate_dribbling(false);
     return realism_config;
 }
 

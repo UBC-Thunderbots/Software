@@ -225,36 +225,6 @@ VelocityObstacle HRVOAgent::createVelocityObstacle(const Agent &other_agent)
     }
 
     return VelocityObstacle(hrvo_apex, vo.getLeftSide(), vo.getRightSide());
-
-    //    const double combinedRadius = radius * 2;
-    //    const Vector relativePosition = getPosition() - other_agent.getPosition();
-    //    const Vector relativeVelocity = velocity - other_agent.getVelocity();
-    //    const double angle = std::atan2(relativePosition.y(), relativePosition.x());
-    //    const double openingAngle = std::asin((combinedRadius) /
-    //    relativePosition.length()); Vector side1 = Vector(std::cos(angle -
-    //    openingAngle),
-    //                          std::sin(angle - openingAngle));
-    //    Vector side2 = Vector(std::cos(angle + openingAngle),
-    //                          std::sin(angle + openingAngle));
-    //
-    //    const double d = 2.0F * std::sin(openingAngle) * std::cos(openingAngle);
-    //
-    //    Vector apex;
-    //
-    //    if (relativePosition.determinant(preferred_velocity -
-    //    other_agent.getPreferredVelocity()) > 0.0F) {
-    //        const double s =
-    //                0.5F * relativeVelocity.determinant(side2) / d;
-    //
-    //        apex = other_agent.getVelocity() + s * side1;
-    //    } else {
-    //        const double s =
-    //                0.5F * relativeVelocity.determinant(side1) / d;
-    //
-    //        apex = other_agent.getVelocity() + s * side2;
-    //    }
-    //
-    //    return VelocityObstacle(apex, side1, side2);
 }
 
 void HRVOAgent::computeNewVelocity(
@@ -266,7 +236,6 @@ void HRVOAgent::computeNewVelocity(
     const auto pref_velocity = computePreferredVelocity(time_step);
     setPreferredVelocity(pref_velocity);
     computeVelocityObstacles(agents);
-
 
     // key is difference in length squared between PREFERRED and ACTUAL velocity
     std::multimap<double, CandidateVelocity> candidates;
