@@ -17,8 +17,6 @@ class MotorFaultView(QWidget):
     Displays specific faults for each motor in a tooltip
     """
 
-    WIDGET_SIZE_SCALE = 2.2
-
     def __init__(self):
         """
         Initializes the motor fault view widget
