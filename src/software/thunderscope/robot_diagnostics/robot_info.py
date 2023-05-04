@@ -104,7 +104,6 @@ class RobotInfo(QWidget):
         self.layout.addLayout(self.robot_model_layout)
 
         self.layout.addLayout(self.status_layout)
-        # self.layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(self.layout)
 
     def create_robot_status_expand_button(self):
