@@ -843,3 +843,26 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_enemy_ball_placement)
     EXPECT_EQ(start, path.value().front());
     EXPECT_LE(distance(path.value().back(), dest), 0.1);
 }
+
+TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_friendly_goal_motion_constraint)
+{
+    // Simulate a path where the goalie is slightly inside the friendly goal and will need
+    // to path plan to the corner of the field.
+    Field field = Field::createSSLDivisionBField();
+
+    Point start{-4.55, 0}, dest{-4.5, -3};
+
+    std::vector<ObstaclePtr> obstacles = {
+        robot_navigation_obstacle_factory.createStaticObstaclesFromMotionConstraints(
+            {TbotsProto::MotionConstraint::FRIENDLY_GOAL}, field),
+    };
+    Rectangle navigable_area = field.fieldBoundary();
+    EnlsvgPathPlanner planner =
+        EnlsvgPathPlanner(navigable_area, obstacles, field.boundaryMargin());
+    auto path = planner.findPath(start, dest);
+    EXPECT_TRUE(path != std::nullopt);
+
+    // Check that the robot goes around the net when going from inside the net to a corner
+    // on friendly side of the field
+    TestUtil::checkPathDoesNotIntersectObstacle(path.value(), obstacles);
+}

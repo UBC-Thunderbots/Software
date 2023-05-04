@@ -46,7 +46,10 @@ void HRVOAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive,
         std::set<TbotsProto::MotionConstraint> motion_constraints;
         for (int constraint_int : motion_control.motion_constraints())
         {
-            if (!TbotsProto::MotionConstraint_IsValid(constraint_int))
+            // Ignore friendly goal obstacle to allow the goalie to move close
+            // to the goal posts without any velocity obstacles in the way
+            if (!TbotsProto::MotionConstraint_IsValid(constraint_int) ||
+                constraint_int == TbotsProto::MotionConstraint::FRIENDLY_GOAL)
             {
                 continue;
             }
