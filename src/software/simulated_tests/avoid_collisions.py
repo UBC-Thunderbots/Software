@@ -9,7 +9,7 @@ from software.simulated_tests.validation import (
 )
 
 
-class RobotDoesNotCollide(Validation):
+class RobotsDoNotCollide(Validation):
     """
     Checks if any 2 robots have collided
     """
@@ -80,7 +80,12 @@ class RobotDoesNotCollide(Validation):
         )
 
         # check if robots are colliding
-        if (robot_1_pos - robot_2_pos).length() < ROBOT_MAX_RADIUS_METERS * 2 + 0.005:
+        if (
+            robot_1_pos - robot_2_pos
+        ).length() < ROBOT_MAX_RADIUS_METERS * 2 + ROBOT_COLLISION_BUFFER:
+            # the logic on which robot(s) get a foul is from the official SSL rules
+            # https://robocup-ssl.github.io/ssl-rules/sslrules.html#_crashing
+
             # check if the projection of the difference between their velocities
             # onto the line between their positions > 1.5
             # if this case is true, robots are considered to have collided
@@ -90,7 +95,7 @@ class RobotDoesNotCollide(Validation):
             ).length() > 1.5:
                 # checks if the absolute speed difference between the robots is < 0.3
                 # if so, both get a foul
-                if robot_1_vel.length() - robot_2_vel.length() < 0.3:
+                if abs(robot_1_vel.length() - robot_2_vel.length()) < 0.3:
                     self.fouled_robots.extend([robot1.id, robot2.id])
                 else:
                     # checks which robot is faster (that one will get a foul)
@@ -141,4 +146,4 @@ class RobotDoesNotCollide(Validation):
     RobotEventuallyCollides,
     RobotAlwaysDoesNotCollide,
     RobotAlwaysCollides,
-) = create_validation_types(RobotDoesNotCollide)
+) = create_validation_types(RobotsDoNotCollide)

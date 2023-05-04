@@ -48,7 +48,7 @@ def get_robot_circle_pos(radius, num_robots, start):
     :param num_robots: the number of robots in the circle
     :param start: if True, start positioning the robots from (radius, 0)
                   else, start from (-radius, 0)
-                  basically outputs robot start and end points based on boolean
+                  basically outputs robot initial and destination points based on boolean
     :return: list of positions of robots that form a circle
     """
     return [
@@ -373,7 +373,7 @@ def test_robot_movement(
     timeout_s,
 ):
     # Always Validation
-    always_validation_sequence_set = [[RobotDoesNotCollide()]]
+    always_validation_sequence_set = [[RobotsDoNotCollide()]]
 
     # Eventually Validation
     eventually_validation_sequence_set = get_reached_destination_validation(

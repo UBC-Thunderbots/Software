@@ -1,4 +1,5 @@
 import math
+from software.py_constants import *
 import software.python_bindings as tbots
 from proto.import_all_protos import *
 
@@ -50,7 +51,7 @@ class RobotEntersRegionAndStops:
                             robot.current_state.global_velocity.x_component_meters,
                             robot.current_state.global_velocity.y_component_meters,
                         )
-                        < 0.01
+                        < ROBOT_MAX_STATIONARY_SPEED_M_PER_S
                     ):
                         self.ticks_so_far = self.ticks_so_far + 1
                         self.is_stationary = True

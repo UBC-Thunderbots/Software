@@ -129,4 +129,7 @@ PYBIND11_MODULE(py_constants, m)
 
     // Robot Communication
     m.attr("NUM_TIMES_SEND_STOP") = NUM_TIMES_SEND_STOP;
+
+    m.attr("ROBOT_COLLISION_BUFFER")             = ROBOT_COLLISION_BUFFER;
+    m.attr("ROBOT_MAX_STATIONARY_SPEED_M_PER_S") = ROBOT_MAX_STATIONARY_SPEED_M_PER_S;
 }
