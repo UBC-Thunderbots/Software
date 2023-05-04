@@ -13,30 +13,10 @@ from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
 from proto.ssl_gc_geometry_pb2 import Vector2
 
-# test duration global constant
-TEST_DURATION = 20
 
-
-# TODO (#2690): Robot gets stuck in corner of defense area
-# TODO (#2870): After resolved, should re-enable run_enemy_ai (add True to parameter
-#  list)
-@pytest.mark.parametrize(
-    "run_enemy_ai, ball_start_point, ball_placement_point",
-    [
-        # test normal ball placement (not edge case)
-        (False, tbots.Point(2, 2), tbots.Point(0, -2)),
-        # test when ball starting point is outside of the goal line
-        (False, tbots.Point(-4.7, 1.6), tbots.Point(0, 0)),
-        # test when ball starting point is outside of the side lines
-        (False, tbots.Point(-2.0, 3.2), tbots.Point(0, 0)),
-        # test when ball placement point is inside of the friendly defense area
-        (False, tbots.Point(-4.0, 0.75), tbots.Point(0, 0)),
-    ],
-)
-def test_two_ai_ball_placement(
-    simulated_test_runner, run_enemy_ai, ball_start_point, ball_placement_point
+def ball_placement_play_setup(
+    run_enemy_ai, ball_start_point, ball_placement_point, simulated_test_runner
 ):
-
     # Setup Bots
     blue_bots = [
         tbots.Point(-2.75, 1.5),
@@ -99,9 +79,25 @@ def test_two_ai_ball_placement(
         ),
     )
 
-    # Placement Always Validation
-    placement_always_validation_sequence_set = [[]]
 
+# TODO (#2599): Remove Duration parameter from test
+# TODO (#2690): Robot gets stuck in corner of defense area
+@pytest.mark.parametrize(
+    "run_enemy_ai, ball_start_point, ball_placement_point",
+    [
+        # test normal ball placement (not edge case)
+        (False, tbots.Point(2, 2), tbots.Point(0, 1.5)),
+        # test when ball starting point is outside of the goal line
+        (False, tbots.Point(-4.7, 1.6), tbots.Point(0, 0.5)),
+        # test when ball starting point is outside of the side lines
+        (False, tbots.Point(-2.0, 3.2), tbots.Point(0, -0.5)),
+        # test when ball placement point is inside of the friendly defense area
+        (False, tbots.Point(-4.0, 0.75), tbots.Point(0, -1.5)),
+    ],
+)
+def test_two_ai_ball_placement(
+    simulated_test_runner, run_enemy_ai, ball_start_point, ball_placement_point
+):
     # Placement Eventually Validation
     placement_eventually_validation_sequence_set = [
         [
@@ -116,9 +112,24 @@ def test_two_ai_ball_placement(
     ]
 
     simulated_test_runner.run_test(
-        eventually_validation_sequence_set=placement_eventually_validation_sequence_set,
-        always_validation_sequence_set=placement_always_validation_sequence_set,
-        test_timeout_s=TEST_DURATION,
+        setup=lambda test_setup_arg: ball_placement_play_setup(
+            test_setup_arg["run_enemy_ai"],
+            test_setup_arg["ball_start_point"],
+            test_setup_arg["ball_placement_point"],
+            simulated_test_runner,
+        ),
+        params=[
+            {
+                "run_enemy_ai": run_enemy_ai,
+                "ball_start_point": ball_start_point,
+                "ball_placement_point": ball_placement_point,
+            }
+        ],
+        inv_always_validation_sequence_set=[[]],
+        inv_eventually_validation_sequence_set=placement_eventually_validation_sequence_set,
+        ag_always_validation_sequence_set=[[]],
+        ag_eventually_validation_sequence_set=placement_eventually_validation_sequence_set,
+        test_timeout_s=[10],
     )
 
     # Drop Ball Always Validation
@@ -142,9 +153,12 @@ def test_two_ai_ball_placement(
     ]
 
     simulated_test_runner.run_test(
-        eventually_validation_sequence_set=drop_ball_eventually_validation_sequence_set,
-        always_validation_sequence_set=drop_ball_always_validation_sequence_set,
-        test_timeout_s=TEST_DURATION,
+        # setup argument isn't passed to preserve world state from previous test run
+        inv_always_validation_sequence_set=drop_ball_always_validation_sequence_set,
+        inv_eventually_validation_sequence_set=drop_ball_eventually_validation_sequence_set,
+        ag_always_validation_sequence_set=drop_ball_always_validation_sequence_set,
+        ag_eventually_validation_sequence_set=drop_ball_eventually_validation_sequence_set,
+        test_timeout_s=[10],
     )
 
 
