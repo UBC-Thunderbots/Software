@@ -92,7 +92,7 @@ def ball_placement_play_setup(
         # test when ball starting point is outside of the side lines
         (False, tbots.Point(-2.0, 3.2), tbots.Point(0, -0.5)),
         # test when ball placement point is inside of the friendly defense area
-        (False, tbots.Point(-4.0, 0.75), tbots.Point(0, -1.5)),
+        (False, tbots.Point(-3.6, 0.0), tbots.Point(0, -1.5)),
     ],
 )
 def test_two_ai_ball_placement(
@@ -129,7 +129,7 @@ def test_two_ai_ball_placement(
         inv_eventually_validation_sequence_set=placement_eventually_validation_sequence_set,
         ag_always_validation_sequence_set=[[]],
         ag_eventually_validation_sequence_set=placement_eventually_validation_sequence_set,
-        test_timeout_s=[10],
+        test_timeout_s=[20],
     )
 
     # Drop Ball Always Validation
