@@ -51,7 +51,6 @@ class Thunderscope(object):
         self.widgets = {}
         self.refresh_timers = []
 
-        # TODO (#2586) Improve this layout
         self.tabs = QTabWidget()
 
         # ProtoUnixIOs

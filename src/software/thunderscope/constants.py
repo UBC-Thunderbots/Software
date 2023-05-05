@@ -63,6 +63,8 @@ BALL_HEIGHT_EFFECT_MULTIPLIER = 3
 # in robot communications
 ROBOT_COMMUNICATIONS_TIMEOUT_S = 0.02
 
+GAME_CONTROLLER_URL = "http://localhost:8081"
+
 # Mapping between RobotStatus Error Codes and their dialog messages
 ERROR_CODE_MESSAGES = {
     ErrorCode.LOW_CAP: "Low Cap",

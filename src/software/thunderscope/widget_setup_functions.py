@@ -203,7 +203,7 @@ def setup_referee_info(proto_unix_io):
     return referee_info
 
 
-def setup_cost_visualization_widget(self, proto_unix_io):
+def setup_cost_visualization_widget(proto_unix_io):
     """Setup the cost visualization widget
 
     :param proto_unix_io: The proto unix io object
@@ -214,7 +214,6 @@ def setup_cost_visualization_widget(self, proto_unix_io):
     proto_unix_io.register_observer(
         CostVisualization, cost_vis_widget.cost_visualization_buffer
     )
-    self.register_refresh_function(cost_vis_widget.refresh)
     return cost_vis_widget
 
 

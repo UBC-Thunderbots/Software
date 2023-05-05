@@ -31,7 +31,7 @@ class TScopeWidget:
     anchor: Optional[str]  # name of widget to position this relative to
     position: Optional[str]  # position relative to anchor to position this to
     stretch: Optional[WidgetStretchData]  # how widget should be sized
-    no_refresh: Optional[bool]  # if this widget has a refresh function or not
+    has_refresh_func: Optional[bool]  # if this widget has a refresh function or not
     in_window: Optional[bool]  # if this widget should be added in window or not
 
     def __init__(
@@ -42,14 +42,14 @@ class TScopeWidget:
         position: Optional[str] = None,
         in_window: Optional[bool] = False,
         stretch: Optional[object] = None,
-        no_refresh: Optional[bool] = False,
+        has_refresh_func: Optional[bool] = True,
     ):
         self.name = name
         self.widget = widget
         self.anchor = anchor
         self.position = position
         self.stretch = stretch
-        self.no_refresh = no_refresh
+        self.has_refresh_func = has_refresh_func
         self.in_window = in_window
 
 
@@ -126,7 +126,7 @@ class TScopeQTTab(TScopeTab):
         else:
             self.dock_area.addDock(new_dock)
 
-        if not data.no_refresh:
+        if data.has_refresh_func:
             self.refresh_functions[widget_name] = new_widget.refresh
 
     def refresh(self):
