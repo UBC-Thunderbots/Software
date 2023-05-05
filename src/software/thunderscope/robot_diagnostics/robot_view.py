@@ -96,7 +96,7 @@ class RobotView(QScrollArea):
 
         super().__init__()
 
-        self.robot_status_buffer = ThreadSafeBuffer(100, RobotStatus)
+        self.robot_status_buffer = ThreadSafeBuffer(100, RobotStatusa)
 
         self.layout = QVBoxLayout()
 

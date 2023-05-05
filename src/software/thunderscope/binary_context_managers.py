@@ -125,7 +125,6 @@ gdb --args bazel-bin/{full_system}
 
     def __restart__(self):
         "Restarts full system."
-        print("restarting FS")
         while True:
             if not is_cmd_running(
                 [
@@ -152,7 +151,6 @@ gdb --args bazel-bin/{full_system}
         if self.should_restart_on_crash:
             self.thread.join()
 
-        print("exiting fS",flush=True)
 
     def setup_proto_unix_io(self, proto_unix_io):
         """Helper to run full system and attach the appropriate unix senders/listeners
@@ -428,7 +426,6 @@ class Gamecontroller(object):
         """
         self.gamecontroller_proc.kill()
         self.gamecontroller_proc.wait()
-        print("exiting gc",flush=True)
 
         if self.ci_socket:
             self.ci_socket.close()

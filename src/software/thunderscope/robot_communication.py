@@ -238,7 +238,6 @@ class RobotCommunication(object):
         self.receive_robot_status = RobotStatusProtoListener(
             self.multicast_channel + "%" + self.interface,
             ROBOT_STATUS_PORT,
-            #lambda data: if not self.stop_running: self.current_proto_unix_io.send_proto(RobotStatus, data),
             lambda data: __forward_to_proto_unix_io__(data, RobotStatus),
             True,
         )
@@ -246,7 +245,6 @@ class RobotCommunication(object):
         self.receive_robot_log = RobotLogProtoListener(
             self.multicast_channel + "%" + self.interface,
             ROBOT_LOGS_PORT,
-            #lambda data: self.current_proto_unix_io.send_proto(RobotLog, data),
             lambda data: __forward_to_proto_unix_io__(data, RobotLog),
             True,
         )
