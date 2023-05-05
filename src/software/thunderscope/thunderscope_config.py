@@ -1,5 +1,9 @@
 from software.thunderscope.widget_setup_functions import *
-from software.thunderscope.constants import TabNames, ProtoUnixIOTypes, GAME_CONTROLLER_URL
+from software.thunderscope.constants import (
+    TabNames,
+    ProtoUnixIOTypes,
+    GAME_CONTROLLER_URL,
+)
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from typing import Sequence, Dict
 from software.thunderscope.tab import (
@@ -362,7 +366,7 @@ def configure_simulated_test_view(
                     if cost_visualization
                     else [],
                 ),
-            )
+            ),
         ],
     )
 
@@ -504,13 +508,17 @@ def configure_ai_or_diagnostics(
         )
     elif load_yellow:
         proto_unix_io_map[ProtoUnixIOTypes.YELLOW] = ProtoUnixIO()
-        proto_unix_io_map[ProtoUnixIOTypes.CURRENT] = proto_unix_io_map[ProtoUnixIOTypes.YELLOW]
+        proto_unix_io_map[ProtoUnixIOTypes.CURRENT] = proto_unix_io_map[
+            ProtoUnixIOTypes.YELLOW
+        ]
         tabs.append(
             TScopeQTTab(
                 name="Yellow Fullsystem",
                 key=TabNames.YELLOW,
                 widgets=configure_base_fullsystem(
-                    full_system_proto_unix_io=proto_unix_io_map[ProtoUnixIOTypes.YELLOW],
+                    full_system_proto_unix_io=proto_unix_io_map[
+                        ProtoUnixIOTypes.YELLOW
+                    ],
                     sim_proto_unix_io=proto_unix_io_map[ProtoUnixIOTypes.SIM],
                     friendly_colour_yellow=True,
                     visualization_buffer_size=visualization_buffer_size,
