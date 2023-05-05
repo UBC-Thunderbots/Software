@@ -403,3 +403,21 @@ def get_string_val(descriptor, value):
             return str([descriptor.enum_type.values[index].name for index in value])
     else:
         return str(value)
+
+
+def display_tooltip(event, tooltip_text):
+    """
+    Checks given event to see if it is an Enter or Leave event
+    Upon Enter, displays a tooltip with the given text
+    Upon Leave, hides the tooltip
+    :param event: event to check
+    :param tooltip_text: the text to display in the tooltip
+    """
+    if str(event.type()) == "Type.Enter":
+        QToolTip.showText(
+            QPoint(int(event.globalPosition().x()), int(event.globalPosition().y()),),
+            tooltip_text,
+            msecShowTime=20000,
+        )
+    elif str(event.type()) == "Type.Leave":
+        QToolTip.hideText()

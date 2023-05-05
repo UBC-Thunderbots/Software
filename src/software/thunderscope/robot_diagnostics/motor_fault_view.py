@@ -6,7 +6,7 @@ from software.thunderscope.robot_diagnostics.motor_fault_icons.motor_fault_icon_
     get_stopped_icon,
     get_warning_icon,
 )
-from software.thunderscope.common.common_widgets import get_string_val
+from software.thunderscope.common.common_widgets import get_string_val, display_tooltip
 
 
 class MotorFaultView(QWidget):
@@ -60,23 +60,16 @@ class MotorFaultView(QWidget):
 
     def event(self, event):
         """
-        Overridden event function which intercepts Mouse Enter and Leave events
-        Upon Enter, displays a tooltip with all the current motor faults if any
-        Upon Leave, hides the tooltip
+        Overridden event function which intercepts all events
+        On hover, displays a tooltip with all the current motor faults if any
         :param event: event to check
         """
-        if str(event.type()) == "Type.Enter":
-            QToolTip.showText(
-                QPoint(
-                    int(event.globalPosition().x()), int(event.globalPosition().y()),
-                ),
-                self.motor_fault_tooltip
-                if self.motor_fault_tooltip
-                else "No Motor Faults :)",
-                msecShowTime=20000,
-            )
-        elif str(event.type()) == "Type.Leave":
-            QToolTip.hideText()
+        display_tooltip(
+            event,
+            self.motor_fault_tooltip
+            if self.motor_fault_tooltip
+            else "No Motor Faults :)",
+        )
 
         return super().event(event)
 

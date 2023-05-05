@@ -9,13 +9,65 @@ from software.thunderscope.constants import *
 from software.thunderscope.robot_diagnostics.motor_fault_view import MotorFaultView
 
 
+class BreakbeamLabel(QLabel):
+    """
+    Displays the current breakbeam status
+    Extension of a QLabel which displays a tooltip and updates the UI with the current status
+    """
+
+    BREAKBEAM_BORDER = "border: 2px solid black"
+
+    def __init__(self):
+        """
+        Constructs a breakbeam indicator and sets the UI to the default uninitialized state
+        """
+        super().__init__()
+        self.update_breakbeam_status(None)
+
+    def update_breakbeam_status(self, new_breakbeam_status):
+        """
+        Updates the current breakbeam status and refreshes the UI accordingly
+        :param new_breakbeam_status: the new breakbeam status
+        """
+        self.breakbeam_status = new_breakbeam_status
+
+        if self.breakbeam_status == None:
+            self.setStyleSheet(
+                f"background-color: transparent; {self.BREAKBEAM_BORDER}"
+            )
+        elif self.breakbeam_status:
+            self.setStyleSheet(
+                f"background-color: red; {self.BREAKBEAM_BORDER};" "border-color: red"
+            )
+        else:
+            self.setStyleSheet(
+                f"background-color: green; {self.BREAKBEAM_BORDER};"
+                "border-color: green"
+            )
+
+    def event(self, event):
+        """
+        Overridden event function which intercepts all events
+        On hover, displays a tooltip with the current breakbeam status
+        :param event: event to check
+        """
+        common_widgets.display_tooltip(
+            event,
+            "No Signal Yet"
+            if self.breakbeam_status == None
+            else "In Beam"
+            if self.breakbeam_status
+            else "Not In Beam",
+        )
+
+        return super().event(event)
+
+
 class RobotInfo(QWidget):
 
     # Offsets the minimum of the battery bar from the minimum ideal voltage
     # Allows battery % to go below the minimum ideal level
     BATTERY_MIN_OFFSET = 3
-
-    BREAKBEAM_BORDER = "border: 2px solid black"
 
     toggle_one_connection_signal = QtCore.pyqtSignal(int, int)
 
@@ -91,13 +143,9 @@ class RobotInfo(QWidget):
         )
 
         # breakbeam indicator above robot
-        self.breakbeam_label = QLabel()
-        self.breakbeam_label.setStyleSheet(self.BREAKBEAM_BORDER)
+        self.breakbeam_label = BreakbeamLabel()
         self.breakbeam_label.setFixedWidth(self.robot_model.sizeHint().width())
         self.breakbeam_label.setFixedHeight(self.robot_model.sizeHint().width() * 0.25)
-        self.breakbeam_label.setStyleSheet(
-            f"background-color: transparent; {self.BREAKBEAM_BORDER}"
-        )
 
         self.robot_model_layout.addWidget(self.breakbeam_label)
         self.robot_model_layout.addWidget(self.robot_model)
@@ -217,15 +265,7 @@ class RobotInfo(QWidget):
         :return:
         """
 
-        if power_status.breakbeam_tripped:
-            self.breakbeam_label.setStyleSheet(
-                f"background-color: red; {self.BREAKBEAM_BORDER};" "border-color: red"
-            )
-        else:
-            self.breakbeam_label.setStyleSheet(
-                f"background-color: green; {self.BREAKBEAM_BORDER};"
-                "border-color: green"
-            )
+        self.breakbeam_label.update_breakbeam_status(power_status.breakbeam_tripped)
 
         self.motor_fault_view.refresh(
             motor_status,
