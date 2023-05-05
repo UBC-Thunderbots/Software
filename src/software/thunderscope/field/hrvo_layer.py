@@ -19,7 +19,7 @@ class HRVOLayer(FieldLayer):
         """
         FieldLayer.__init__(self)
         self.robot_id = robot_id
-        self.hrvo_buffer = ThreadSafeBuffer(buffer_size, HRVOVisualization,owner="HRVO")
+        self.hrvo_buffer = ThreadSafeBuffer(buffer_size, HRVOVisualization)
         self.prev_message = HRVOVisualization(robot_id=self.robot_id)
 
     def paint(self, painter, option, widget):

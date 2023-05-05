@@ -17,7 +17,6 @@ from software.simulated_tests.robot_enters_region import RobotEntersRegion
 from software.simulated_tests import validation
 from software.simulated_tests.tbots_test_runner import TbotsTestRunner
 from software.thunderscope.thunderscope import Thunderscope
-from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.py_constants import MILLISECONDS_PER_SECOND
 from software.thunderscope.binary_context_managers import (
@@ -61,37 +60,7 @@ class SimulatedTestRunner(TbotsTestRunner):
         :param gamecontroller: The gamecontroller context managed instance 
 
         """
-
-        # self.test_name = test_name
-        # self.thunderscope = thunderscope
-        # self.blue_full_system_proto_unix_io = blue_full_system_proto_unix_io
-        # self.yellow_full_system_proto_unix_io = yellow_full_system_proto_unix_io
-        # self.gamecontroller = gamecontroller
-        # self.last_exception = None
-        #
-        # self.world_buffer = ThreadSafeBuffer(buffer_size=1, protobuf_type=World)
-        # self.primitive_set_buffer = ThreadSafeBuffer(
-        #     buffer_size=1, protobuf_type=PrimitiveSet
-        # )
-        # self.last_exception = None
-        #
-        # self.ssl_wrapper_buffer = ThreadSafeBuffer(
-        #     buffer_size=1, protobuf_type=SSL_WrapperPacket
-        # )
-        # self.robot_status_buffer = ThreadSafeBuffer(
-        #     buffer_size=1, protobuf_type=RobotStatus
-        # )
-        #
-        # self.blue_full_system_proto_unix_io.register_observer(
-        #     SSL_WrapperPacket, self.ssl_wrapper_buffer
-        # )
-        # self.blue_full_system_proto_unix_io.register_observer(
-        #     RobotStatus, self.robot_status_buffer
-        # )
-        #
-        # self.timestamp = 0
-        # self.timestamp_mutex = threading.Lock()
-        super(SimulatorTestRunner, self).__init__(
+        super(SimulatedTestRunner, self).__init__(
             test_name,
             thunderscope,
             blue_full_system_proto_unix_io,
@@ -166,104 +135,88 @@ class SimulatedTestRunner(TbotsTestRunner):
 
         """
 
-        def __stopper(delay=PROCESS_BUFFER_DELAY_S):
-            """Stop running the test
+        time_elapsed_s = 0
 
-            :param delay: How long to wait before closing everything, defaults
-                          to PROCESS_BUFFER_DELAY_S to minimize buffer warnings
+        while time_elapsed_s < test_timeout_s:
 
-            """
-            time.sleep(delay)
+            # Check for new CI commands at this time step
+            for (delay, cmd, team) in ci_cmd_with_delay:
+                # If delay matches time
+                if delay <= time_elapsed_s:
+                    # send command
+                    self.gamecontroller.send_ci_input(cmd, team)
+                    # remove command from the list
+                    ci_cmd_with_delay.remove((delay, cmd, team))
+
+            # Update the timestamp logged by the ProtoLogger
+            with self.timestamp_mutex:
+                ssl_wrapper = self.ssl_wrapper_buffer.get(block=False)
+                self.timestamp = ssl_wrapper.detection.t_capture
+
+            tick = SimulatorTick(
+                milliseconds=tick_duration_s * MILLISECONDS_PER_SECOND
+            )
+            self.simulator_proto_unix_io.send_proto(SimulatorTick, tick)
+            time_elapsed_s += tick_duration_s
 
             if self.thunderscope:
-                self.thunderscope.close()
+                time.sleep(tick_duration_s)
 
-        def __runner():
-            """Step simulation, full_system and run validation
-            """
+            while True:
+                try:
+                    world = self.world_buffer.get(
+                        block=True, timeout=WORLD_BUFFER_TIMEOUT, return_cached=False
+                    )
+                    break
+                except queue.Empty as empty:
+                    # If we timeout, that means full_system missed the last
+                    # wrapper and robot status, lets resend it.
+                    logger.warning("Fullsystem missed last wrapper, resending ...")
 
-            time_elapsed_s = 0
-
-            while time_elapsed_s < test_timeout_s:
-
-                # Check for new CI commands at this time step
-                for (delay, cmd, team) in ci_cmd_with_delay:
-                    # If delay matches time
-                    if delay <= time_elapsed_s:
-                        # send command
-                        self.gamecontroller.send_ci_input(cmd, team)
-                        # remove command from the list
-                        ci_cmd_with_delay.remove((delay, cmd, team))
-
-                # Update the timestamp logged by the ProtoLogger
-                with self.timestamp_mutex:
                     ssl_wrapper = self.ssl_wrapper_buffer.get(block=False)
-                    self.timestamp = ssl_wrapper.detection.t_capture
+                    robot_status = self.robot_status_buffer.get(block=False)
 
-                tick = SimulatorTick(
-                    milliseconds=tick_duration_s * MILLISECONDS_PER_SECOND
-                )
-                self.simulator_proto_unix_io.send_proto(SimulatorTick, tick)
-                time_elapsed_s += tick_duration_s
-
-                if self.thunderscope:
-                    time.sleep(tick_duration_s)
-
-                while True:
-                    try:
-                        world = self.world_buffer.get(
-                            block=True, timeout=WORLD_BUFFER_TIMEOUT, return_cached=False
-                        )
-                        break
-                    except queue.Empty as empty:
-                        # If we timeout, that means full_system missed the last
-                        # wrapper and robot status, lets resend it.
-                        logger.warning("Fullsystem missed last wrapper, resending ...")
-
-                        ssl_wrapper = self.ssl_wrapper_buffer.get(block=False)
-                        robot_status = self.robot_status_buffer.get(block=False)
-
-                        self.blue_full_system_proto_unix_io.send_proto(
-                            SSL_WrapperPacket, ssl_wrapper
-                        )
-                        self.blue_full_system_proto_unix_io.send_proto(
-                            RobotStatus, robot_status
-                        )
-                        # We need this blocking get call to synchronize the running speed of world and primitives
-                        # Otherwise, we end up with behaviour that doesn't simulate what would happen in the real world
-                        self.primitive_set_buffer.get(
-                            block=True, timeout=WORLD_BUFFER_TIMEOUT, return_cached=False
-                        )
-
-                # Validate
-                (
-                    eventually_validation_proto_set,
-                    always_validation_proto_set,
-                ) = validation.run_validation_sequence_sets(
-                    world,
-                    eventually_validation_sequence_set,
-                    always_validation_sequence_set,
-                )
-
-                if self.thunderscope:
-
-                    # Set the test name
-                    eventually_validation_proto_set.test_name = self.test_name
-                    always_validation_proto_set.test_name = self.test_name
-
-                    # Send out the validation proto to thunderscope
-                    self.thunderscope.blue_full_system_proto_unix_io.send_proto(
-                        ValidationProtoSet, eventually_validation_proto_set
+                    self.blue_full_system_proto_unix_io.send_proto(
+                        SSL_WrapperPacket, ssl_wrapper
                     )
-                    self.thunderscope.blue_full_system_proto_unix_io.send_proto(
-                        ValidationProtoSet, always_validation_proto_set
+                    self.blue_full_system_proto_unix_io.send_proto(
+                        RobotStatus, robot_status
+                    )
+                    # We need this blocking get call to synchronize the running speed of world and primitives
+                    # Otherwise, we end up with behaviour that doesn't simulate what would happen in the real world
+                    self.primitive_set_buffer.get(
+                        block=True, timeout=WORLD_BUFFER_TIMEOUT, return_cached=False
                     )
 
-                # Check that all always validations are always valid
-                validation.check_validation(always_validation_proto_set)
+            # Validate
+            (
+                eventually_validation_proto_set,
+                always_validation_proto_set,
+            ) = validation.run_validation_sequence_sets(
+                world,
+                eventually_validation_sequence_set,
+                always_validation_sequence_set,
+            )
 
-            # Check that all eventually validations are eventually valid
-            validation.check_validation(eventually_validation_proto_set)
+            if self.thunderscope:
+
+                # Set the test name
+                eventually_validation_proto_set.test_name = self.test_name
+                always_validation_proto_set.test_name = self.test_name
+
+                # Send out the validation proto to thunderscope
+                self.thunderscope.blue_full_system_proto_unix_io.send_proto(
+                    ValidationProtoSet, eventually_validation_proto_set
+                )
+                self.thunderscope.blue_full_system_proto_unix_io.send_proto(
+                    ValidationProtoSet, always_validation_proto_set
+                )
+
+            # Check that all always validations are always valid
+            validation.check_validation(always_validation_proto_set)
+
+        # Check that all eventually validations are eventually valid
+        validation.check_validation(eventually_validation_proto_set)
 
         self.__stopper()
 

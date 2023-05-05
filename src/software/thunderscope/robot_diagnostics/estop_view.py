@@ -15,7 +15,7 @@ class EstopView(QLabel):
     def __init__(self):
         super().__init__()
 
-        self.estop_state_buffer = ThreadSafeBuffer(1, EstopState,owner="Estop.estop_state")
+        self.estop_state_buffer = ThreadSafeBuffer(1, EstopState)
 
         self.setText("Disconnected")
         self.setStyleSheet("background-color: blue")

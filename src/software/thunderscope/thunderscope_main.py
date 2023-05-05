@@ -359,7 +359,7 @@ if __name__ == "__main__":
 
                 time.sleep(0.01)
 
-            simulation_state_buffer = ThreadSafeBuffer(1, SimulationState,owner="Thunderscope.simulation_state_buffer")
+            simulation_state_buffer = ThreadSafeBuffer(1, SimulationState)
             tscope.simulator_proto_unix_io.register_observer(
                 SimulationState, simulation_state_buffer
             )

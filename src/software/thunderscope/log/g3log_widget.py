@@ -31,7 +31,7 @@ class g3logWidget(QWidget):
 
         # Creates checkbox widget
         self.checkbox_widget = g3logCheckboxes()
-        self.log_buffer = ThreadSafeBuffer(buffer_size, RobotLog,owner="G3LOG.log")
+        self.log_buffer = ThreadSafeBuffer(buffer_size, RobotLog)
 
         self.layout.addWidget(self.console_widget)
         self.layout.addWidget(self.checkbox_widget)

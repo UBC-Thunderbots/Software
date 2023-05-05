@@ -33,7 +33,7 @@ class RefereeInfoWidget(QWidget):
             RefereeInfoWidget.NUM_ROWS, RefereeInfoWidget.NUM_COLS
         )
         self.referee_info = QLabel()
-        self.referee_buffer = ThreadSafeBuffer(buffer_size, Referee, False,owner="RefInfo.referee_buffer")
+        self.referee_buffer = ThreadSafeBuffer(buffer_size, Referee, False)
         self.referee_table.verticalHeader().setVisible(False)
 
         self.vertical_layout = QVBoxLayout()

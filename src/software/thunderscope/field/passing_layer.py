@@ -24,7 +24,7 @@ class PassingLayer(FieldLayer):
 
         FieldLayer.__init__(self)
         self.pass_visualization_buffer = ThreadSafeBuffer(
-            buffer_size, PassVisualization,owner="PassingLayer.pass_visualization"
+            buffer_size, PassVisualization
         )
         self.cached_pass_vis = PassVisualization()
         self.timeout = time.time() + PassingLayer.PASS_VISUALIZATION_TIMEOUT_S

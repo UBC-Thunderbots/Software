@@ -67,7 +67,6 @@ class ProtoUnixIO:
 
         """
         while not self.stop_running:
-            # print("proto_unix_io.py line 69: receive.get",flush=True)
             proto = receive_buffer.get()
 
             if proto.DESCRIPTOR.full_name in self.proto_observers:
@@ -81,7 +80,7 @@ class ProtoUnixIO:
                 try:
                     buffer.put(proto, block=False)
                 except queue.Full:
-                    # print("Buffer registered to receive everything dropped data")
+                    print("Buffer registered to receive everything dropped data")
                     pass
 
     def register_observer(self, proto_class, buffer):

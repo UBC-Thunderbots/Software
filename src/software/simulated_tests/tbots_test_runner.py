@@ -39,15 +39,15 @@ class TbotsTestRunner(object):
         self.blue_full_system_proto_unix_io = blue_full_system_proto_unix_io
         self.yellow_full_system_proto_unix_io = yellow_full_system_proto_unix_io
         self.gamecontroller = gamecontroller
-        self.world_buffer = ThreadSafeBuffer(buffer_size=20, protobuf_type=World, owner="TbotsTestRunner.world_buffer")
+        self.world_buffer = ThreadSafeBuffer(buffer_size=20, protobuf_type=World)
 
         self.last_exception = None
 
         self.ssl_wrapper_buffer = ThreadSafeBuffer(
-            buffer_size=1, protobuf_type=SSL_WrapperPacket, owner="TbotsTestRunner.ssl_wrapper_packet"
+            buffer_size=1, protobuf_type=SSL_WrapperPacket
         )
         self.robot_status_buffer = ThreadSafeBuffer(
-            buffer_size=1, protobuf_type=RobotStatus, owner="TbotsTestRunner.robot_status_buffer"
+            buffer_size=1, protobuf_type=RobotStatus
         )
 
         self.blue_full_system_proto_unix_io.register_observer(

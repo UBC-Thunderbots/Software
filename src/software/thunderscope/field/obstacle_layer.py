@@ -20,7 +20,7 @@ class ObstacleLayer(FieldLayer):
 
         """
         FieldLayer.__init__(self)
-        self.primitive_set_buffer = ThreadSafeBuffer(buffer_size, PrimitiveSet,owner="ObstacleLayer.primitive_set")
+        self.primitive_set_buffer = ThreadSafeBuffer(buffer_size, PrimitiveSet)
 
     def paint(self, painter, option, widget):
         """Paint this layer

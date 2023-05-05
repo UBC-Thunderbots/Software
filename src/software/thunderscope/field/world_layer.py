@@ -38,9 +38,9 @@ class WorldLayer(FieldLayer):
         self.simulator_io = simulator_io
         self.friendly_colour_yellow = friendly_colour_yellow
 
-        self.world_buffer = ThreadSafeBuffer(buffer_size, World,owner="WorldLayer.world_buffer")
-        self.robot_status_buffer = ThreadSafeBuffer(buffer_size, RobotStatus,owner="WorldLayer.robot_status")
-        self.referee_buffer = ThreadSafeBuffer(buffer_size, Referee, False,owner="WorldLayer.ref_buffer")
+        self.world_buffer = ThreadSafeBuffer(buffer_size, World)
+        self.robot_status_buffer = ThreadSafeBuffer(buffer_size, RobotStatus)
+        self.referee_buffer = ThreadSafeBuffer(buffer_size, Referee, False)
         self.cached_world = World()
         self.cached_status = {}
 

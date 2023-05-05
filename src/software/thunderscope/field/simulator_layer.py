@@ -28,7 +28,7 @@ class SimulatorLayer(FieldLayer):
         """
         FieldLayer.__init__(self)
         self.friendly_colour_yellow = friendly_colour_yellow
-        self.simulator_state_buffer = ThreadSafeBuffer(buffer_size, SimulatorState,owner="SimLayer.sim_state_buf")
+        self.simulator_state_buffer = ThreadSafeBuffer(buffer_size, SimulatorState)
 
     def paint(self, painter, option, widget):
         """Paint this layer
