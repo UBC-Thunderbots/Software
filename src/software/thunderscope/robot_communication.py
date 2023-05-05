@@ -1,13 +1,12 @@
 from software.py_constants import *
+from software.thunderscope.constants import ROBOT_COMMUNICATIONS_TIMEOUT_S
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
-from software.thunderscope.common.common_widgets import IndividualRobotMode
+from software.thunderscope.constants import IndividualRobotMode
 from software.python_bindings import *
 from proto.import_all_protos import *
 from pyqtgraph.Qt import QtCore
 import threading
 import time
-import pdb
-import traceback
 
 
 class RobotCommunication(object):
@@ -23,7 +22,6 @@ class RobotCommunication(object):
         estop_path="/dev/ttyACM0",
         estop_buadrate=115200,
     ):
-        # pdb.set_trace()
         """Initialize the communication with the robots
 
         :param current_proto_unix_io: the current proto unix io object
@@ -43,11 +41,13 @@ class RobotCommunication(object):
         self.estop_path = estop_path
         self.estop_buadrate = estop_buadrate
 
-        self.world_buffer = ThreadSafeBuffer(1, World,owner="RobotCommunication.world_buffer")
-        self.primitive_buffer = ThreadSafeBuffer(1, PrimitiveSet,owner="RobotCommunication.primitive_buffer")
+        self.running = False
 
-        self.motor_control_diagnostics_buffer = ThreadSafeBuffer(1, MotorControl,owner="RobotCommunication.motor_control_diagnostics")
-        self.power_control_diagnostics_buffer = ThreadSafeBuffer(1, PowerControl,owner="RobotCommunication.power_control_diagnostics")
+        self.world_buffer = ThreadSafeBuffer(1, World)
+        self.primitive_buffer = ThreadSafeBuffer(1, PrimitiveSet)
+
+        self.motor_control_diagnostics_buffer = ThreadSafeBuffer(1, MotorControl)
+        self.power_control_diagnostics_buffer = ThreadSafeBuffer(1, PowerControl)
 
         self.current_proto_unix_io.register_observer(World, self.world_buffer)
 
@@ -67,8 +67,8 @@ class RobotCommunication(object):
         )
 
         self.send_estop_state_thread = threading.Thread(target=self.__send_estop_state)
-        self.run_thread = threading.Thread(target=self.run,daemon=True)
-        self.stop_running = False
+        self.run_world_thread = threading.Thread(target=self.run_world, daemon=True)
+        self.run_primitive_set_thread = threading.Thread(target=self.run_primitive_set, daemon=True)
 
         # only checks for estop if checking is not disabled
         if not self.disable_estop:
@@ -81,14 +81,38 @@ class RobotCommunication(object):
 
     def __send_estop_state(self):
         if not self.disable_estop:
-            while not self.stop_running:
+            while self.running:
                 self.current_proto_unix_io.send_proto(
                     EstopState, EstopState(is_playing=self.estop_reader.isEstopPlay())
                 )
-                time.sleep(0.1)
+            time.sleep(0.1)
 
-    def run(self):
-        """Forward World and PrimitiveSet protos from fullsystem to the robots.
+    def run_world(self):
+        """
+        Forward World protos from fullsystem to the robots
+        Blocks if no world is available and does not return a cached world
+        :return:
+        """
+        while self.running:
+            world = self.world_buffer.get(block=True, return_cached=False)
+            if (
+                not self.disable_estop
+                and self.estop_reader.isEstopPlay()
+                and (
+                    self.robots_connected_to_fullsystem
+                    or self.robots_connected_to_manual
+                )
+            ):
+                # send the world proto
+                self.send_world.send_proto(world)
+
+    def run_primitive_set(self):
+        """Forward PrimitiveSet protos from fullsystem to the robots.
+
+        For AI protos, blocks for 10ms if no proto is available, and then returns a cached proto
+
+        For Diagnostics protos, does not block and returns cached message if none available
+        Sleeps for 10ms for diagnostics
 
         If the emergency stop is tripped, the PrimitiveSet will not be sent so
         that the robots timeout and stop.
@@ -100,32 +124,24 @@ class RobotCommunication(object):
         is useful to dip in and out of robot diagnostics.
 
         """
-        while not self.stop_running:
+        while self.running:
             # total primitives for all robots
             robot_primitives = {}
 
             # fullsystem is running, so world data is being received
             if self.robots_connected_to_fullsystem:
-                # print("robot_communication.py line 108: world_buffer.get",flush=True)
-                # print(traceback.print_stack())
-                world = self.world_buffer.get(block=True)
-
-                # send the world proto
-                #try:
-                #if world is not None:
-                self.send_world.send_proto(world)
-                #except:
-                #    print("proto error")
-
                 # Get the primitives
-                # print("robot_communication.py line 115: world_buffer.get",flush=True)
-                primitive_set = self.primitive_buffer.get(block=False)
+                primitive_set = self.primitive_buffer.get(
+                    block=True, timeout=ROBOT_COMMUNICATIONS_TIMEOUT_S
+                )
 
-                robot_primitives = dict(primitive_set.robot_primitives)
-                print(robot_primitives)
+                fullsystem_primitives = dict(primitive_set.robot_primitives)
+
+                for robot_id in fullsystem_primitives.keys():
+                    if robot_id in self.robots_connected_to_fullsystem:
+                        robot_primitives[robot_id] = fullsystem_primitives[robot_id]
 
             # get the manual control primitive
-            # print("robot_communication.py line 122: diagnostics.get",flush=True)
             diagnostics_primitive = DirectControlPrimitive(
                 motor_control=self.motor_control_diagnostics_buffer.get(block=False),
                 power_control=self.power_control_diagnostics_buffer.get(block=False),
@@ -156,11 +172,19 @@ class RobotCommunication(object):
 
             self.sequence_number += 1
 
-            if not self.disable_estop and self.estop_reader.isEstopPlay():
-                self.last_time = primitive_set.time_sent.epoch_timestamp_seconds
+            if (
+                not self.disable_estop
+                and self.estop_reader.isEstopPlay()
+                and (
+                    self.robots_connected_to_fullsystem
+                    or self.robots_connected_to_manual
+                )
+            ):
                 self.send_primitive_set.send_proto(primitive_set)
 
-            time.sleep(0.01)
+            # sleep if not running fullsystem
+            if not self.robots_connected_to_fullsystem:
+                time.sleep(ROBOT_COMMUNICATIONS_TIMEOUT_S)
 
     def toggle_robot_connection(self, mode, robot_id):
         """
@@ -184,17 +208,10 @@ class RobotCommunication(object):
         """
         Sets up a world sender, a listener for SSL vision data, and connects all robots to fullsystem as default
         """
-        print("M",flush=True)
-        def test_func(data):
-            # print(data,flush=True)
-            if not self.stop_running:
-                self.current_proto_unix_io.send_proto(SSL_WrapperPacket, data)
-
         self.receive_ssl_wrapper = SSLWrapperPacketProtoListener(
             SSL_VISION_ADDRESS,
             SSL_VISION_PORT,
-            # lambda data: self.current_proto_unix_io.send_proto(SSL_WrapperPacket, data),
-            test_func,
+            lambda data: self.current_proto_unix_io.send_proto(SSL_WrapperPacket, data),
             True,
         )
 
@@ -206,6 +223,8 @@ class RobotCommunication(object):
             robot_id for robot_id in range(MAX_ROBOT_IDS_PER_SIDE)
         }
 
+        self.run_world_thread.start()
+
     def __enter__(self):
         """Enter RobotCommunication context manager. Setup multicast listener
         for RobotStatus and multicast senders for World and PrimitiveSet
@@ -213,7 +232,7 @@ class RobotCommunication(object):
         """
         # Create the multicast listeners
         def __forward_to_proto_unix_io__(data, type):
-            if not self.stop_running:
+            if self.running:
                 self.current_proto_unix_io.send_proto(type, data)
 
         self.receive_robot_status = RobotStatusProtoListener(
@@ -237,20 +256,25 @@ class RobotCommunication(object):
             self.multicast_channel + "%" + self.interface, PRIMITIVE_PORT, True
         )
 
+        self.running = True
+
         self.send_estop_state_thread.start()
-        self.run_thread.start()
+        self.run_primitive_set_thread.start()
 
         return self
 
     def __exit__(self,type,value,traceback):
         """Exit RobotCommunication context manager
 
+        Ends all currently running loops and joins all currently active threads
+
         """
-        self.stop_running = True
+        self.running = False
         del self.receive_ssl_wrapper
         self.current_proto_unix_io.force_close()
         self.current_proto_unix_io.send_proto(SSL_WrapperPacket,None)
         self.current_proto_unix_io = None
-        print("killing robocom",flush=True)
-        self.run_thread.join(10)
-        print("run_thread joined",flush=True)
+        if self.run_world_thread.is_alive():
+            self.run_world_thread.join(10)
+
+        self.run_primitive_set_thread.join(10)

@@ -1,9 +1,10 @@
-import os
 import time
 import textwrap
 import shelve
 import signal
 import logging
+from typing import List
+import pathlib
 
 import PyQt6
 from PyQt6.QtWebEngineWidgets import QWebEngineView
@@ -39,6 +40,7 @@ from software.thunderscope.common.proto_configuration_widget import (
 from software.thunderscope.cost_vis.cost_vis import CostVisualizationWidget
 from software.thunderscope.field.field import Field
 from software.thunderscope.log.g3log_widget import g3logWidget
+from software.thunderscope.constants import IndividualRobotMode
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.thunderscope.play.playinfo_widget import PlayInfoWidget
 from software.thunderscope.play.refereeinfo_widget import RefereeInfoWidget
@@ -54,6 +56,10 @@ from software.thunderscope.robot_diagnostics.estop_view import EstopView
 from software.thunderscope.replay.proto_player import ProtoPlayer
 
 SAVED_LAYOUT_PATH = "/opt/tbotspython/saved_tscope_layout"
+LAYOUT_FILE_EXTENSION = "tscopelayout"
+LAST_OPENED_LAYOUT_PATH = (
+    f"{SAVED_LAYOUT_PATH}/last_opened_tscope_layout.{LAYOUT_FILE_EXTENSION}"
+)
 GAME_CONTROLLER_URL = "http://localhost:8081"
 
 
@@ -89,8 +95,6 @@ class Thunderscope(object):
         visualization_buffer_size=5,
         cost_visualization=False,
     ):
-        print("H", flush=True)
-        # print("load_blue" + simulator_proto_unix_io, flush=True)
         """Initialize Thunderscope
 
         :param simulator_proto_unix_io: The simulator's proto unix io
@@ -146,8 +150,11 @@ class Thunderscope(object):
 
         self.window = QtGui.QMainWindow()
         self.window.setCentralWidget(self.tabs)
+        self.window.setWindowIcon(
+            QtGui.QIcon("software/thunderscope/thunderscope-logo.png")
+        )
         self.window.setWindowTitle("Thunderscope")
-        print("I", flush=True)
+
         # ProtoUnixIOs
         #
         # NOTE: Simulated tests need to be able to run without Thunderscope
@@ -173,7 +180,7 @@ class Thunderscope(object):
             self.yellow_full_system_proto_unix_io = (
                 yellow_full_system_proto_unix_io or ProtoUnixIO()
             )
-        print("J", flush=True)
+
         # the proto unix io to which diagnostics protos should be sent to
         # if one of the fullsystems is running, uses the same proto
         # if not, initialises a new one
@@ -184,31 +191,9 @@ class Thunderscope(object):
 
         self.simulator_proto_unix_io = simulator_proto_unix_io or ProtoUnixIO()
 
-        # print("dianostics" + load_diagnostics, flush=True)
-        # print("blue" + load_blue, flush=True)
-        # print("yellow" + load_yellow, flush=True)
-        # print(load_blue + " " + load_yellow + " " + load_diagnostics, flush=True)
-        print("K", flush=True)
         # Setup the main window and load the requested tabs
-        if layout_path is not None:
-            print(layout_path,flush=True)
-        else:
-            print("layout is none")
-        if load_blue is not None:
-            print(load_blue,flush=True)
-        else:
-            print("blue is none",flush=True)
-        if load_yellow is not None:
-            print(load_yellow,flush=True)
-        else:
-            print("yellow is none",flush=True)
-        if load_diagnostics is not None:
-            print(load_diagnostics,flush=True)
-        else:
-            print("load dia is none",flush=True)
         self.configure_layout(layout_path, load_blue, load_yellow, load_diagnostics)
 
-        print("L", flush=True)
         # Save and Load Prompts
         #
         # NOTE: As long as Thunderscope has focus, the keyboard shortcuts will
@@ -247,42 +232,48 @@ class Thunderscope(object):
                     
                     Mouse Shortcuts:
                     
-                    Double Click Purple Bar to pop window out
-                    Drag Purple Bar to rearrange docks
+                    Double Click Blue Bar to pop window out
+                    Drag Blue Bar to rearrange docks
                     Click items in legends to select/deselect
                     Cntrl-Click and Drag: Move ball and kick
+                    Cntrl-Space: Stop AI vs AI simulation
                     """
                 ),
             )
         )
-        print("exiting TSCOPE construction",flush=True)
 
     def reset_layout(self):
         """Reset the layout to the default layout"""
-
-        if os.path.exists(SAVED_LAYOUT_PATH):
-            os.remove(SAVED_LAYOUT_PATH)
-            QMessageBox.information(
-                self.window,
-                "Restart Required",
-                "Restart thunderscope to reset the layout.",
-            )
+        saved_layout_path = pathlib.Path(LAST_OPENED_LAYOUT_PATH)
+        saved_layout_path.unlink(missing_ok=True)
+        QMessageBox.information(
+            self.window,
+            "Restart Required",
+            "Restart thunderscope to reset the layout.",
+        )
 
     def save_layout(self):
         """Open a file dialog to save the layout and any other
         registered state to a file
 
         """
+        # Create a folder at SAVED_LAYOUT_PATH if it doesn't exist
+        try:
+            pathlib.Path(SAVED_LAYOUT_PATH).mkdir(exist_ok=True)
+        except FileNotFoundError:
+            logging.warning(
+                f"Could not create folder at '{SAVED_LAYOUT_PATH}' for layout files"
+            )
 
         filename, _ = QtGui.QFileDialog.getSaveFileName(
             self.window,
             "Save layout",
-            "~/dock_layout_{}.tscopelayout".format(int(time.time())),
+            f"{SAVED_LAYOUT_PATH}/dock_layout_{int(time.time())}.{LAYOUT_FILE_EXTENSION}",
             options=QFileDialog.Option.DontUseNativeDialog,
         )
 
         if not filename:
-            logging.warn("No filename selected")
+            # No layout file was selected
             return
 
         with shelve.open(filename, "c") as shelf:
@@ -292,7 +283,7 @@ class Thunderscope(object):
                 "robot_diagnostics_dock_state"
             ] = self.robot_diagnostics_dock_area.saveState()
 
-        with shelve.open(SAVED_LAYOUT_PATH, "c") as shelf:
+        with shelve.open(LAST_OPENED_LAYOUT_PATH, "c") as shelf:
             shelf["blue_dock_state"] = self.blue_full_system_dock_area.saveState()
             shelf["yellow_dock_state"] = self.yellow_full_system_dock_area.saveState()
             shelf[
@@ -311,19 +302,18 @@ class Thunderscope(object):
             filename, _ = QtGui.QFileDialog.getOpenFileName(
                 self.window,
                 "Open layout",
-                "~/",
+                f"{SAVED_LAYOUT_PATH}/",
                 options=QFileDialog.Option.DontUseNativeDialog,
             )
 
             if not filename:
-                logging.warn("No filename selected")
+                logging.warning("No filename selected")
                 return
 
         # lets load the layouts from the shelf into their respective dock areas
         # if the dock doesn't exist in the default layout, we ignore it
         # (instead of adding a placeholder dock)
         with shelve.open(filename, "r") as shelf:
-
             self.blue_full_system_dock_area.restoreState(
                 shelf["blue_dock_state"], missing="ignore"
             )
@@ -335,8 +325,8 @@ class Thunderscope(object):
             )
 
             # Update default layout
-            if filename != SAVED_LAYOUT_PATH:
-                with shelve.open(SAVED_LAYOUT_PATH, "c") as default_shelf:
+            if filename != LAST_OPENED_LAYOUT_PATH:
+                with shelve.open(LAST_OPENED_LAYOUT_PATH, "c") as default_shelf:
                     default_shelf["blue_dock_state"] = shelf["blue_dock_state"]
                     default_shelf["yellow_dock_state"] = shelf["yellow_dock_state"]
                     default_shelf["robot_diagnostics_dock_state"] = shelf[
@@ -356,13 +346,14 @@ class Thunderscope(object):
         :param load_yellow: Whether to load the yellow layout.
         :param load_diagnostics: Whether to load the diagnostics layout.
         """
+
         # whether the fullsystem tab should have the robot view widget
         load_fullsystem_robot_view = True
 
         if load_blue == load_yellow:
             # in AI vs AI mode, fullsystem tab should not have robot view
             load_fullsystem_robot_view = False
-        print("conf_layout A", flush=True)
+
         if load_yellow:
             self.configure_full_system_layout(
                 self.yellow_full_system_dock_area,
@@ -371,7 +362,6 @@ class Thunderscope(object):
                 load_fullsystem_robot_view,
                 True,
             )
-        print("conf_layout A again",flush=True)
         if load_blue:
             self.configure_full_system_layout(
                 self.blue_full_system_dock_area,
@@ -381,22 +371,19 @@ class Thunderscope(object):
                 False,
             )
 
-        print("conf_layout B", flush=True)
-        if load_yellow or load_blue:
-            path = layout_path if layout_path else SAVED_LAYOUT_PATH
-
-            print("conf_layout C", flush=True)
-            try:
-                self.load_layout(path)
-            except Exception:
-                pass
-
         if load_diagnostics:
             self.configure_robot_diagnostics_layout(
                 self.robot_diagnostics_dock_area,
                 self.robot_diagnostics_proto_unix_io,
                 load_blue or load_yellow,
             )
+
+        # Load the layout file if it exists
+        path = layout_path if layout_path else LAST_OPENED_LAYOUT_PATH
+        try:
+            self.load_layout(path)
+        except Exception:
+            pass
 
     def register_refresh_function(self, refresh_func):
         """Register the refresh functions to run at the refresh_interval_ms
@@ -421,94 +408,85 @@ class Thunderscope(object):
         load_robot_view,
         friendly_colour_yellow,
     ):
-        try:
-            print("entered full sys layout",flush = True)
-            """Configure the default layout for thunderscope
+        """Configure the default layout for thunderscope
 
-            :param dock_area: The dock area to configure the layout
-            :param sim_proto_unix_io: The proto unix io object for the simulator
-            :param full_system_proto_unix_io: The proto unix io object for the full system
-            :param load_robot_view: Whether robot view should be loaded on the fullsystem tab or not
-                                    - should not be loaded in AI vs AI
-                                    - should not be loaded with diagnostics, will be loaded in that tab instead
-            :param friendly_colour_yellow: Whether the friendly colour is yellow
+        :param dock_area: The dock area to configure the layout
+        :param sim_proto_unix_io: The proto unix io object for the simulator
+        :param full_system_proto_unix_io: The proto unix io object for the full system
+        :param load_robot_view: Whether robot view should be loaded on the fullsystem tab or not
+                                - should not be loaded in AI vs AI
+                                - should not be loaded with diagnostics, will be loaded in that tab instead
+        :param friendly_colour_yellow: Whether the friendly colour is yellow
 
-            """
-            # Configure Docks and save them
-            self.widgets[friendly_colour_yellow] = {}
-            widgets = self.widgets[friendly_colour_yellow]
+        """
+        # Configure Docks and save them
+        self.widgets[friendly_colour_yellow] = {}
+        widgets = self.widgets[friendly_colour_yellow]
 
-            print("conf A",flush = True)
-            widgets["field_widget"] = self.setup_field_widget(
-                sim_proto_unix_io, full_system_proto_unix_io, friendly_colour_yellow
-            )
-            field_dock = Dock("Field")
-            field_dock.addWidget(widgets["field_widget"])
+        widgets["field_widget"] = self.setup_field_widget(
+            sim_proto_unix_io, full_system_proto_unix_io, friendly_colour_yellow
+        )
+        field_dock = Dock("Field")
+        field_dock.addWidget(widgets["field_widget"])
 
-            print("conf B",flush = True)
-            widgets["log_widget"] = self.setup_log_widget(full_system_proto_unix_io)
-            log_dock = Dock("Logs")
-            log_dock.addWidget(widgets["log_widget"])
+        widgets["log_widget"] = self.setup_log_widget(full_system_proto_unix_io)
+        log_dock = Dock("Logs")
+        log_dock.addWidget(widgets["log_widget"])
 
-            widgets["performance_widget"] = self.setup_performance_plot(
+        widgets["performance_widget"] = self.setup_performance_plot(
+            full_system_proto_unix_io
+        )
+        performance_dock = Dock("Performance")
+        performance_dock.addWidget(widgets["performance_widget"].win)
+
+        widgets["parameter_widget"] = self.setup_parameter_widget(
+            full_system_proto_unix_io, friendly_colour_yellow
+        )
+        parameter_dock = Dock("Parameters")
+        parameter_dock.addWidget(widgets["parameter_widget"])
+
+        widgets["playinfo_widget"] = self.setup_play_info(full_system_proto_unix_io)
+        playinfo_dock = Dock("Play Info")
+        playinfo_dock.addWidget(widgets["playinfo_widget"])
+
+        if self.cost_visualization:
+            widgets["cost_visualization_widget"] = self.setup_cost_visualization_widget(
                 full_system_proto_unix_io
             )
-            performance_dock = Dock("Performance")
-            performance_dock.addWidget(widgets["performance_widget"].win)
-
-            print("conf C",flush = True)
-            widgets["parameter_widget"] = self.setup_parameter_widget(
-                full_system_proto_unix_io, friendly_colour_yellow
+            cost_visualization_dock = Dock("Cost Visualization")
+            cost_visualization_dock.addWidget(widgets["cost_visualization_widget"])
+            widgets["field_widget"].field_resized.connect(
+                widgets["cost_visualization_widget"].update_axis_range
             )
-            parameter_dock = Dock("Parameters")
-            parameter_dock.addWidget(widgets["parameter_widget"])
 
-            widgets["playinfo_widget"] = self.setup_play_info(full_system_proto_unix_io)
-            playinfo_dock = Dock("Play Info")
-            playinfo_dock.addWidget(widgets["playinfo_widget"])
+        widgets["refereeinfo_widget"] = self.setup_referee_info(
+            full_system_proto_unix_io
+        )
+        refereeinfo_dock = Dock("Referee Info")
+        refereeinfo_dock.addWidget(widgets["refereeinfo_widget"])
 
-            print("conf C",flush = True)
-            if self.cost_visualization:
-                widgets["cost_visualization_widget"] = self.setup_cost_visualization_widget(
-                    full_system_proto_unix_io
-                )
-                cost_visualization_dock = Dock("Cost Visualization")
-                cost_visualization_dock.addWidget(widgets["cost_visualization_widget"])
-                widgets["field_widget"].field_resized.connect(
-                    widgets["cost_visualization_widget"].update_axis_range
-                )
+        dock_area.addDock(field_dock)
+        dock_area.addDock(parameter_dock, "left", field_dock)
+        dock_area.addDock(log_dock, "above", parameter_dock)
+        dock_area.addDock(refereeinfo_dock, "bottom", field_dock)
+        dock_area.addDock(playinfo_dock, "above", refereeinfo_dock)
+        dock_area.addDock(performance_dock, "right", playinfo_dock)
+        if self.cost_visualization:
+            dock_area.addDock(cost_visualization_dock, "right", field_dock)
 
-            widgets["refereeinfo_widget"] = self.setup_referee_info(
-                full_system_proto_unix_io
+        if load_robot_view:
+            widgets["robot_view"] = self.setup_robot_view(
+                full_system_proto_unix_io,
+                [
+                    IndividualRobotMode.NONE,
+                    IndividualRobotMode.MANUAL,
+                    IndividualRobotMode.AI,
+                ],
             )
-            refereeinfo_dock = Dock("Referee Info")
-            refereeinfo_dock.addWidget(widgets["refereeinfo_widget"])
-
-            print("conf D",flush = True)
-            dock_area.addDock(field_dock)
-            dock_area.addDock(parameter_dock, "left", field_dock)
-            dock_area.addDock(log_dock, "above", parameter_dock)
-            dock_area.addDock(refereeinfo_dock, "bottom", field_dock)
-            dock_area.addDock(playinfo_dock, "above", refereeinfo_dock)
-            dock_area.addDock(performance_dock, "right", playinfo_dock)
-            if self.cost_visualization:
-                dock_area.addDock(cost_visualization_dock, "right", field_dock)
-
-            print("conf D",flush = True)
-            if load_robot_view:
-                widgets["robot_view"] = self.setup_robot_view(
-                    full_system_proto_unix_io, True
-                )
-
-                print("conf E",flush = True)
-                robot_view_dock = Dock("RobotView")
-                robot_view_dock.addWidget(widgets["robot_view"])
-                dock_area.addDock(robot_view_dock, "above", log_dock)
-                self.control_mode_signal = widgets["robot_view"].control_mode_signal
-        except Exception as e:
-            print("exception!\n",flush=True)
-            print(e)
-
+            robot_view_dock = Dock("RobotView")
+            robot_view_dock.addWidget(widgets["robot_view"])
+            dock_area.addDock(robot_view_dock, "above", log_dock)
+            self.control_mode_signal = widgets["robot_view"].control_mode_signal
 
     def configure_robot_diagnostics_layout(
         self, dock_area, proto_unix_io, load_fullsystem,
@@ -538,7 +516,7 @@ class Thunderscope(object):
 
         self.diagnostics_widgets[
             "diagnostics_input"
-        ] = self.setup_diagnostics_input_widget(proto_unix_io)
+        ] = self.setup_diagnostics_input_widget()
         input_dock = Dock("Diagnostics Input")
         input_dock.addWidget(self.diagnostics_widgets["diagnostics_input"])
         self.diagnostics_widgets["diagnostics_input"].toggle_controls_signal.connect(
@@ -550,9 +528,10 @@ class Thunderscope(object):
 
         if not load_fullsystem:
             self.diagnostics_widgets["robot_view"] = self.setup_robot_view(
-                proto_unix_io, False
+                proto_unix_io, [IndividualRobotMode.NONE, IndividualRobotMode.MANUAL,]
             )
             robot_view_dock = Dock("RobotView")
+            robot_view_dock.setStretch(y=5)
             robot_view_dock.addWidget(self.diagnostics_widgets["robot_view"])
             self.control_mode_signal = self.diagnostics_widgets[
                 "robot_view"
@@ -569,14 +548,18 @@ class Thunderscope(object):
 
         dock = Dock("Estop View")
         dock.addWidget(estop_view)
+        dock.setStretch(y=1)
         self.robot_diagnostics_dock_area.addDock(dock, "bottom", log_dock)
 
-    def setup_robot_view(self, proto_unix_io, load_fullsystem):
+    def setup_robot_view(
+        self, proto_unix_io, available_control_modes: List[IndividualRobotMode]
+    ):
         """Setup the robot view widget
         :param proto_unix_io: The proto unix io object for the full system
-        :param load_fullsystem: Boolean to indicate if control mode menus should have an AI option
+        :param available_control_modes: the currently available input modes for the robots
+                                        according to what mode thunderscope is run in
         """
-        robot_view = RobotView(load_fullsystem)
+        robot_view = RobotView(available_control_modes)
         self.register_refresh_function(robot_view.refresh)
         proto_unix_io.register_observer(RobotStatus, robot_view.robot_status_buffer)
         return robot_view
@@ -745,7 +728,7 @@ class Thunderscope(object):
         :returns: The referee info widget
 
         """
-        print("Entered ref info",flush=True)
+
         referee_info = RefereeInfoWidget()
         proto_unix_io.register_observer(Referee, referee_info.referee_buffer)
         self.register_refresh_function(referee_info.refresh)
@@ -767,14 +750,12 @@ class Thunderscope(object):
 
         return chicker_widget
 
-    def setup_diagnostics_input_widget(self, proto_unix_io):
+    def setup_diagnostics_input_widget(self):
+        """
+        Sets up the diagnostics input widget
         """
 
-        :param proto_unix_io: The proto unix io object
-        :returns the fullsystem connect widget
-        """
-
-        diagnostics_input_widget = FullSystemConnectWidget(proto_unix_io)
+        diagnostics_input_widget = FullSystemConnectWidget()
 
         self.register_refresh_function(diagnostics_input_widget.refresh)
 
@@ -808,11 +789,10 @@ class Thunderscope(object):
 
     def show(self):
         """Show the main window"""
-        print("in tscope.show",flush=True)
 
         self.window.show()
+        self.window.showMaximized()
         pyqtgraph.exec()
-        print("exiting tscope.show",flush=True)
 
     def close(self):
         """Close the main window"""

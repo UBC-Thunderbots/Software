@@ -47,7 +47,7 @@ TEST_F(SimulatedHRVOTest, test_drive_in_straight_line_with_moving_enemy_robot_fr
 
     runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(6));
+            Duration::fromSeconds(6), true);
 }
 
 TEST_F(SimulatedHRVOTest, test_drive_in_straight_line_with_moving_enemy_robot_from_side)
@@ -79,7 +79,7 @@ TEST_F(SimulatedHRVOTest, test_drive_in_straight_line_with_moving_enemy_robot_fr
 
     runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(6));
+            Duration::fromSeconds(6), true);
 }
 
 TEST_F(SimulatedHRVOTest, test_drive_in_straight_line_with_no_obstacle)
@@ -110,7 +110,7 @@ TEST_F(SimulatedHRVOTest, test_drive_in_straight_line_with_no_obstacle)
 
     runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(6));
+            Duration::fromSeconds(6), true);
 }
 
 TEST_F(SimulatedHRVOTest, test_drive_in_straight_line_with_friendly_robot_infront)
@@ -141,7 +141,7 @@ TEST_F(SimulatedHRVOTest, test_drive_in_straight_line_with_friendly_robot_infron
 
     runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(8));
+            Duration::fromSeconds(8), true);
 }
 
 TEST_F(SimulatedHRVOTest, test_single_enemy_directly_infront)
@@ -172,7 +172,7 @@ TEST_F(SimulatedHRVOTest, test_single_enemy_directly_infront)
 
     runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(6));
+            Duration::fromSeconds(6), true);
 }
 
 TEST_F(SimulatedHRVOTest, test_three_robot_wall)
@@ -204,7 +204,7 @@ TEST_F(SimulatedHRVOTest, test_three_robot_wall)
 
     runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(8));
+            Duration::fromSeconds(8), true);
 }
 
 TEST_F(SimulatedHRVOTest, test_zig_zag_movement)
@@ -253,7 +253,7 @@ TEST_F(SimulatedHRVOTest, test_zig_zag_movement)
 
     runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(10));
+            Duration::fromSeconds(10), true);
 }
 
 TEST_F(SimulatedHRVOTest, test_agent_not_going_in_static_obstacles)
@@ -297,7 +297,7 @@ TEST_F(SimulatedHRVOTest, test_agent_not_going_in_static_obstacles)
 
     runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(20));
+            Duration::fromSeconds(20), true);
 }
 
 // This test is mainly for showcasing the behaviour of HRVO in an edge case where
@@ -322,7 +322,7 @@ TEST_F(SimulatedHRVOTest, test_start_in_local_minima)
 
     runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(20));
+            Duration::fromSeconds(20), true);
 }
 
 TEST_F(SimulatedHRVOTest, test_start_in_local_minima_with_open_end)
@@ -355,7 +355,7 @@ TEST_F(SimulatedHRVOTest, test_start_in_local_minima_with_open_end)
 
     runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(7));
+            Duration::fromSeconds(7), true);
 }
 
 TEST_F(SimulatedHRVOTest, test_robot_avoiding_ball_obstacle)
@@ -386,5 +386,5 @@ TEST_F(SimulatedHRVOTest, test_robot_avoiding_ball_obstacle)
 
     runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(7));
+            Duration::fromSeconds(7), true);
 }

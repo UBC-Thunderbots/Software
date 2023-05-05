@@ -2,7 +2,6 @@ import logging
 import queue
 import socket
 from threading import Thread
-import random
 
 from google.protobuf import text_format
 from google.protobuf.any_pb2 import Any
@@ -25,7 +24,7 @@ class ThreadedUnixSender:
 
         """
         self.unix_path = unix_path
-        self.proto_buffer = ThreadSafeBuffer(max_buffer_size, proto_type,owner="ThreadedUnixSender")
+        self.proto_buffer = ThreadSafeBuffer(max_buffer_size, proto_type)
 
         self.socket = socket.socket(socket.AF_UNIX, type=socket.SOCK_DGRAM)
         self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF, UNIX_BUFFER_SIZE)
@@ -42,8 +41,7 @@ class ThreadedUnixSender:
         """Stop handling requests
         """
         self.stop = True
-        self.socket.close()
-        # self.thread.join()
+        self.server.server_close()
 
     def __send_protobuf(self):
         """Send the buffered protobuf
@@ -51,10 +49,7 @@ class ThreadedUnixSender:
         proto = None
 
         while not self.stop:
-
-            # print("threaded_unix_sender.py line 52: proto_buffer.get",flush=True)
-            proto = self.proto_buffer.get(block=True)
-            # print(proto,flush=True)
+            proto = self.proto_buffer.get(block=True, return_cached=False)
             if proto is not None:
                 send = proto.SerializeToString()
                 try:
@@ -65,11 +60,11 @@ class ThreadedUnixSender:
                         self.send_failures
                         > ThreadedUnixSender.MAX_SEND_FAILURES_BEFORE_LOG
                     ):
-                        # logging.warning(
-                        #    "Failed to send on {}, make sure the receiver is running".format(
-                        #        self.unix_path
-                        #    )
-                        #)
+                        logging.warning(
+                            "Failed to send on {}, make sure the receiver is running".format(
+                                self.unix_path
+                            )
+                        )
                         self.send_failures = 0
 
     def send(self, proto):

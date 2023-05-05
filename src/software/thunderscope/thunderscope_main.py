@@ -230,7 +230,7 @@ if __name__ == "__main__":
     # We want to run either 1 instance of AI or 1 instance of RobotCommunication or both which will
     # send/recv packets over the provided multicast channel.
 
-    if args.run_blue or args.run_yellow or args.run_diagnostics:
+    elif args.run_blue or args.run_yellow or args.run_diagnostics:
         tscope = Thunderscope(
             layout_path=args.layout,
             load_blue=bool(args.run_blue),
@@ -331,17 +331,33 @@ if __name__ == "__main__":
             :param tick_rate_ms: The tick rate of the simulation
 
             """
-            world_state = tbots_protobuf.create_world_state(
-                blue_robot_locations=[
-                    cpp_bindings.Point(-3, y) for y in numpy.linspace(-2, 2, NUM_ROBOTS)
-                ],
-                yellow_robot_locations=[
-                    cpp_bindings.Point(3, y) for y in numpy.linspace(-2, 2, NUM_ROBOTS)
-                ],
-                ball_location=cpp_bindings.Point(0, 0),
-                ball_velocity=cpp_bindings.Vector(0, 0),
+            world_state_received_buffer = ThreadSafeBuffer(1, WorldStateReceivedTrigger)
+            tscope.simulator_proto_unix_io.register_observer(
+                WorldStateReceivedTrigger, world_state_received_buffer
             )
-            tscope.simulator_proto_unix_io.send_proto(WorldState, world_state)
+
+            while True:
+                world_state_received = world_state_received_buffer.get(
+                    block=False, return_cached=False
+                )
+                if not world_state_received:
+                    world_state = tbots_protobuf.create_world_state(
+                        blue_robot_locations=[
+                            cpp_bindings.Point(-3, y)
+                            for y in numpy.linspace(-2, 2, NUM_ROBOTS)
+                        ],
+                        yellow_robot_locations=[
+                            cpp_bindings.Point(3, y)
+                            for y in numpy.linspace(-2, 2, NUM_ROBOTS)
+                        ],
+                        ball_location=cpp_bindings.Point(0, 0),
+                        ball_velocity=cpp_bindings.Vector(0, 0),
+                    )
+                    tscope.simulator_proto_unix_io.send_proto(WorldState, world_state)
+                else:
+                    break
+
+                time.sleep(0.01)
 
             simulation_state_buffer = ThreadSafeBuffer(1, SimulationState,owner="Thunderscope.simulation_state_buffer")
             tscope.simulator_proto_unix_io.register_observer(

@@ -16,6 +16,7 @@ py_library(
     name = "thunderscope",
     srcs = ["thunderscope.py"],
     data = [
+        "thunderscope-logo.png",
         "//software:er_force_simulator_main",
         "//software:py_constants.so",
         "//software:python_bindings.so",
@@ -95,6 +96,5 @@ py_library(
     ],
     deps = [
         "//software/thunderscope:constants",
-        "//software/thunderscope/common:common_widgets",
     ],
 )
