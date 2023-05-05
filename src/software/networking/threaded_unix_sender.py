@@ -41,7 +41,7 @@ class ThreadedUnixSender:
         """Stop handling requests
         """
         self.stop = True
-        self.server.server_close()
+        self.socket.close()
 
     def __send_protobuf(self):
         """Send the buffered protobuf

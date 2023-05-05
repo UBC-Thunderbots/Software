@@ -80,7 +80,7 @@ class ProtoUnixIO:
                 try:
                     buffer.put(proto, block=False)
                 except queue.Full:
-                    print("Buffer registered to receive everything dropped data")
+                    # print("Buffer registered to receive everything dropped data")
                     pass
 
     def register_observer(self, proto_class, buffer):
@@ -116,12 +116,12 @@ class ProtoUnixIO:
         if proto_class.DESCRIPTOR.full_name in self.proto_observers:
             for buffer in self.proto_observers[proto_class.DESCRIPTOR.full_name]:
                 buffer.put(data, block, timeout)
-
         for buffer in self.all_proto_observers:
             try:
                 buffer.put(data, block, timeout)
             except queue.Full:
-                print("Buffer registered to receive everything dropped data")
+                # print("Buffer registered to receive everything dropped data")
+                pass
 
     def attach_unix_sender(self, runtime_dir, unix_path, proto_class):
         """Creates a unix sender and registers an observer

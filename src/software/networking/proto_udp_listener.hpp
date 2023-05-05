@@ -3,6 +3,7 @@
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
 #include <string>
+#include <mutex>
 
 #include "software/logger/logger.h"
 #include "software/networking/proto_udp_listener.hpp"
@@ -75,6 +76,11 @@ class ProtoUdpListener
 
     // The function to call on every received packet of ReceiveProtoT data
     std::function<void(ReceiveProtoT&)> receive_callback;
+
+    std::mutex lock;
+
+    //TODO
+    bool keep_listening = true;
 };
 
 template <class ReceiveProtoT>
@@ -85,7 +91,7 @@ ProtoUdpListener<ReceiveProtoT>::ProtoUdpListener(
     : socket_(io_service), receive_callback(receive_callback)
 {
     boost::asio::ip::udp::endpoint listen_endpoint(
-        boost::asio::ip::make_address(ip_address), port);
+    boost::asio::ip::make_address(ip_address), port);
     socket_.open(listen_endpoint.protocol());
     socket_.set_option(boost::asio::socket_base::reuse_address(true));
     try
@@ -156,20 +162,28 @@ template <class ReceiveProtoT>
 void ProtoUdpListener<ReceiveProtoT>::handleDataReception(
     const boost::system::error_code& error, size_t num_bytes_received)
 {
+    if(!lock.try_lock()){
+        return;
+    }
     if (!error)
     {
         auto packet_data = ReceiveProtoT();
         packet_data.ParseFromArray(raw_received_data_.data(),
                                    static_cast<int>(num_bytes_received));
+        std::cout << "initiating callback" << std::endl;
         receive_callback(packet_data);
-
+        std::cout << "returned from callback" << std::endl;
         // Once we've handled the data, start listening again
-        startListen();
+        if(keep_listening) {
+            startListen();
+        }
     }
     else
     {
         // Start listening again to receive the next data
-        startListen();
+        if(keep_listening) {
+            startListen();
+        }
 
         LOG(WARNING)
             << "An unknown network error occurred when attempting to receive ReceiveProtoT Data. The boost system error code is "
@@ -183,16 +197,23 @@ void ProtoUdpListener<ReceiveProtoT>::handleDataReception(
             << "which means that the receive buffer is full and data loss has potentially occurred. "
             << "Consider increasing MAX_BUFFER_LENGTH";
     }
+    lock.unlock();
 }
 
 template <class ReceiveProtoT>
 ProtoUdpListener<ReceiveProtoT>::~ProtoUdpListener()
 {
-    socket_.close();
+    //lock.lock();
+    //keep_listening = false;
+    //socket_.close();
+    //lock.unlock();
 }
 
 template <class ReceiveProtoT>
 void ProtoUdpListener<ReceiveProtoT>::close()
 {
+    lock.lock();
+    keep_listening = false;
     socket_.close();
+    lock.unlock();
 }

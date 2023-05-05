@@ -667,17 +667,17 @@ def field_test_runner():
         debug_full_system=args.debug_blue_full_system,
         friendly_colour_yellow=False,
         should_restart_on_crash=False,
-    ) as blue_fs, RobotCommunication(
-        current_proto_unix_io=blue_full_system_proto_unix_io,
-        multicast_channel=getRobotMulticastChannel(0),
-        interface=args.interface,
-        disable_estop=False
-    ) as rc_blue, FullSystem(
+    ) as blue_fs, FullSystem(
         f"{args.yellow_full_system_runtime_dir}/test/{test_name}",
         debug_full_system=args.debug_yellow_full_system,
         friendly_colour_yellow=True,
         should_restart_on_crash=False,
-    ) as yellow_fs:
+    ) as yellow_fs, RobotCommunication(
+        current_proto_unix_io=blue_full_system_proto_unix_io,
+        multicast_channel=getRobotMulticastChannel(0),
+        interface=args.interface,
+        disable_estop=False
+    ) as rc_blue:
         with Gamecontroller(
             supress_logs=(not args.show_gamecontroller_logs), ci_mode=True
         ) as gamecontroller:

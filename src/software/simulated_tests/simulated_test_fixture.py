@@ -575,11 +575,6 @@ def simulated_test_runner():
                     gamecontroller,
                 )
 
-            # Only validate on the blue worlds
-            blue_full_system_proto_unix_io.register_observer(World, runner.world_buffer)
-            blue_full_system_proto_unix_io.register_observer(
-                PrimitiveSet, runner.primitive_set_buffer
-            )
             # Setup proto loggers.
             #
             # NOTE: Its important we use the test runners time provider because

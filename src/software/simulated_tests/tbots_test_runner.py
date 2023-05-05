@@ -24,8 +24,7 @@ class TbotsTestRunner(object):
         yellow_full_system_proto_unix_io,
         gamecontroller,
     ):
-        print("B", flush=True)
-        """Initialize the TestRunner. 
+        """Initialize the TestRunner.
         
         :param test_name: The name of the test to run
         :param blue_full_system_proto_unix_io: The blue full system proto unix io to use
@@ -40,7 +39,10 @@ class TbotsTestRunner(object):
         self.yellow_full_system_proto_unix_io = yellow_full_system_proto_unix_io
         self.gamecontroller = gamecontroller
         self.world_buffer = ThreadSafeBuffer(buffer_size=20, protobuf_type=World)
-
+        self.primitive_set_buffer = ThreadSafeBuffer(
+            buffer_size=1,
+            protobuf_type=PrimitiveSet
+        )
         self.last_exception = None
 
         self.ssl_wrapper_buffer = ThreadSafeBuffer(
@@ -57,8 +59,11 @@ class TbotsTestRunner(object):
             RobotStatus, self.robot_status_buffer
         )
 
+        # Only validate on the blue worlds
         self.blue_full_system_proto_unix_io.register_observer(World, self.world_buffer)
-
+        self.blue_full_system_proto_unix_io.register_observer(
+            PrimitiveSet, self.primitive_set_buffer
+        )
         self.timestamp = 0
         self.timestamp_mutex = threading.Lock()
 

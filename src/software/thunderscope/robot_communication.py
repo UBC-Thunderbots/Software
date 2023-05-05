@@ -3,6 +3,7 @@ from software.thunderscope.constants import ROBOT_COMMUNICATIONS_TIMEOUT_S
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.constants import IndividualRobotMode
 from software.python_bindings import *
+from queue import Empty
 from proto.import_all_protos import *
 from pyqtgraph.Qt import QtCore
 import threading
@@ -94,9 +95,15 @@ class RobotCommunication(object):
         :return:
         """
         while self.running:
-            world = self.world_buffer.get(block=True, return_cached=False)
+            world = None
+            try:
+                world = self.world_buffer.get(block=True, timeout=ROBOT_COMMUNICATIONS_TIMEOUT_S, return_cached=False)
+            except Empty:
+                # if empty do nothing
+                pass
             if (
-                not self.disable_estop
+                world
+                and not self.disable_estop
                 and self.estop_reader.isEstopPlay()
                 and (
                     self.robots_connected_to_fullsystem
@@ -134,9 +141,10 @@ class RobotCommunication(object):
                 primitive_set = self.primitive_buffer.get(
                     block=True, timeout=ROBOT_COMMUNICATIONS_TIMEOUT_S
                 )
-
+                # If we wait on primitive
+                if not self.robots_connected_to_fullsystem:
+                    break
                 fullsystem_primitives = dict(primitive_set.robot_primitives)
-
                 for robot_id in fullsystem_primitives.keys():
                     if robot_id in self.robots_connected_to_fullsystem:
                         robot_primitives[robot_id] = fullsystem_primitives[robot_id]
@@ -208,10 +216,15 @@ class RobotCommunication(object):
         """
         Sets up a world sender, a listener for SSL vision data, and connects all robots to fullsystem as default
         """
+        def __test_func(type, data):
+            if(self.running):
+                self.current_proto_unix_io.send_proto(type,data)
+
         self.receive_ssl_wrapper = SSLWrapperPacketProtoListener(
             SSL_VISION_ADDRESS,
             SSL_VISION_PORT,
-            lambda data: self.current_proto_unix_io.send_proto(SSL_WrapperPacket, data),
+            # lambda data: self.current_proto_unix_io.send_proto(SSL_WrapperPacket, data),
+            lambda data: __test_func(SSL_WrapperPacket,data),
             True,
         )
 
@@ -268,11 +281,15 @@ class RobotCommunication(object):
 
         """
         self.running = False
-        del self.receive_ssl_wrapper
+        self.receive_ssl_wrapper.close()
+        del self.receive_robot_log
+        del self.receive_robot_status
         self.current_proto_unix_io.force_close()
-        self.current_proto_unix_io.send_proto(SSL_WrapperPacket,None)
         self.current_proto_unix_io = None
         if self.run_world_thread.is_alive():
-            self.run_world_thread.join(10)
+            print("will join run thread",flush=True)
+            self.run_world_thread.join()
+            print("run_thread_joined",flush=True)
 
-        self.run_primitive_set_thread.join(10)
+        self.run_primitive_set_thread.join()
+        print("primitive thread joined", flush=True)
