@@ -156,7 +156,7 @@ def configure_base_fullsystem(
             ),
             anchor="Field",
             position="left",
-            has_refresh_func=True,
+            has_refresh_func=False,
         ),
         TScopeWidget(
             name="Logs",
