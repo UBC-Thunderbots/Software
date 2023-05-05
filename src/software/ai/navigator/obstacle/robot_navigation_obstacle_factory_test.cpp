@@ -372,11 +372,11 @@ TEST_F(RobotNavigationObstacleFactoryMotionConstraintTest, ball_placement_rectan
     auto obstacles =
         robot_navigation_obstacle_factory.createDynamicObstaclesFromMotionConstraint(
             TbotsProto::MotionConstraint::AVOID_BALL_PLACEMENT_INTERFERENCE, world);
-    EXPECT_EQ(1, obstacles.size());
+    EXPECT_EQ(3, obstacles.size());
     try
     {
         Polygon expected(
-            {{-0.617, 0.617}, {1.617, 0.617}, {1.617, -0.617}, {-0.617, -0.617}});
+            {{-0.117, 0.617}, {1.117, 0.617}, {1.117, -0.617}, {-0.117, -0.617}});
         auto polygon_obstacle = dynamic_cast<GeomObstacle<Polygon>&>(*obstacles[0]);
         EXPECT_TRUE(TestUtil::equalWithinTolerance(expected, polygon_obstacle.getGeom(),
                                                    METERS_PER_MILLIMETER));
@@ -411,13 +411,19 @@ TEST_F(RobotNavigationObstacleFactoryMotionConstraintTest, ball_placement_rotate
     auto obstacles =
         robot_navigation_obstacle_factory.createDynamicObstaclesFromMotionConstraint(
             TbotsProto::MotionConstraint::AVOID_BALL_PLACEMENT_INTERFERENCE, world);
-    EXPECT_EQ(1, obstacles.size());
+    EXPECT_EQ(3, obstacles.size());
     try
     {
-        Polygon expected({{-0.873, 0}, {1, 1.873}, {1.873, 1}, {0, -0.873}});
+        Polygon expected({{-0.519016, 0.353553},
+                          {0.646447, 1.519},
+                          {1.519, 0.646447},
+                          {0.353553, -0.519016}});
         auto polygon_obstacle = dynamic_cast<GeomObstacle<Polygon>&>(*obstacles[0]);
         EXPECT_TRUE(TestUtil::equalWithinTolerance(expected, polygon_obstacle.getGeom(),
                                                    METERS_PER_MILLIMETER));
+        auto start_circle = Circle(new_ball.position(), 0.5);
+        auto end_circle   = Circle(placement_point, 0.5);
+
         // check for 90 degrees between
         // +---------+ <-+
         // |<-width->|   | depth

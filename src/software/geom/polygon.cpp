@@ -84,7 +84,7 @@ Polygon Polygon::fromSegment(const Segment& segment, const double radius_paralle
      *        start_l                start_r
      *           +----------+----------+
      *           |          |          |
-     *           |          | radius_n |
+     *           |          | radius_p |
      *           |          |          |
      *           +   start  X          +
      *           |          |          |
@@ -93,7 +93,7 @@ Polygon Polygon::fromSegment(const Segment& segment, const double radius_paralle
      *           |       segment       |
      *           |          |          |
      *           |          |          |
-     *           |          | radius_p |
+     *           |          | radius_n |
      *           +   end    X----------+
      *           |                     |
      *           |                     |
