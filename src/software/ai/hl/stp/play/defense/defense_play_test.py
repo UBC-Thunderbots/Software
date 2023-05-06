@@ -27,6 +27,7 @@ from proto.ssl_gc_common_pb2 import Team
                 tbots.Point(1, -1.25),
                 tbots.Point(2, -0.25),
                 tbots.Point(2, -1.25),
+                tbots.Point(2, -1),
             ],
         )
     ],

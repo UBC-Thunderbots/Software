@@ -24,7 +24,7 @@ struct DefenderAssignment
 
     // The coverage rating of the assignment, which scores the defender's ability
     // to block high-danger enemy scoring chances or passes
-    unsigned int coverage_rating;
+    double coverage_rating;
 };
 
 // This struct stores the concept of a shooting lane, which describes
@@ -40,7 +40,7 @@ struct ShootingLane
     // The threat rating of the lane, which scores the dangerousness
     // of the lane relative to other lanes (i.e. how likely a pass or shot
     // along the lane will eventually result in the enemy team scoring)
-    unsigned int threat_rating;
+    double threat_rating;
 };
 
 // The minimum distance between two threats for them to be considered non-similar
@@ -52,7 +52,7 @@ static constexpr Angle MIN_ANGLE_BETWEEN_THREATS = Angle::fromDegrees(10);
 
 // Multiplier to ensure that goal lanes are scored higher (in threat rating) 
 // than passing lanes
-static constexpr unsigned int GOAL_LANE_THREAT_MULTIPLIER = 3;
+static constexpr double GOAL_LANE_THREAT_MULTIPLIER = 3;
 
 /**
  * Determines all possible defender assignments where a defender could be placed
@@ -91,3 +91,5 @@ std::vector<DefenderAssignment> getAllDefenderAssignments(
  * @return a copy of the threats list with similarly positioned threats removed
  */
 std::vector<EnemyThreat> filterOutSimilarThreats(const std::vector<EnemyThreat> &threats);
+
+std::vector<std::vector<ShootingLane>> groupGoalLanesByDensity(const std::vector<ShootingLane> &goal_lanes);
