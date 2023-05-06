@@ -168,11 +168,11 @@ void MotorService::setUpMotors()
         setUpDriveMotor(motor);
     }
 
-//    // Dribbler Motor Setup
-//    startDriver(DRIBBLER_MOTOR_CHIP_SELECT);
-//    checkDriverFault(DRIBBLER_MOTOR_CHIP_SELECT);
-//    startController(DRIBBLER_MOTOR_CHIP_SELECT, true);
-//    tmc4671_setTargetVelocity(DRIBBLER_MOTOR_CHIP_SELECT, 0);
+    // Dribbler Motor Setup
+    startDriver(DRIBBLER_MOTOR_CHIP_SELECT);
+    checkDriverFault(DRIBBLER_MOTOR_CHIP_SELECT);
+    startController(DRIBBLER_MOTOR_CHIP_SELECT, true);
+    tmc4671_setTargetVelocity(DRIBBLER_MOTOR_CHIP_SELECT, 0);
 }
 
 void MotorService::setUpDriveMotor(uint8_t motor) {
