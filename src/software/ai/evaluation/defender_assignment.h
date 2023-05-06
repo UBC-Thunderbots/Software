@@ -57,9 +57,13 @@ static constexpr double MIN_DISTANCE_BETWEEN_THREATS = 0.25;
 // them to be considered non-similar
 static constexpr Angle MIN_ANGLE_BETWEEN_THREATS = Angle::fromDegrees(10);
 
-// Multiplier to ensure that goal lanes are scored higher (in threat rating) 
+// Multiplier to ensure that goal lanes are scored higher (in threat rating)
 // than passing lanes
 static constexpr double GOAL_LANE_THREAT_MULTIPLIER = 3;
+
+// Max percent difference between two goal lanes' angles to goal for them to be
+// considered a dense lane cluster
+static constexpr double GOAL_LANE_DENSITY_THRESHOLD = 0.4;
 
 /**
  * Determines all possible defender assignments where a defender could be placed
@@ -99,4 +103,5 @@ std::vector<DefenderAssignment> getAllDefenderAssignments(
  */
 std::vector<EnemyThreat> filterOutSimilarThreats(const std::vector<EnemyThreat> &threats);
 
-std::vector<std::vector<GoalLane>> groupGoalLanesByDensity(std::vector<GoalLane> &goal_lanes);
+std::vector<std::vector<GoalLane>> groupGoalLanesByDensity(
+    std::vector<GoalLane> &goal_lanes);
