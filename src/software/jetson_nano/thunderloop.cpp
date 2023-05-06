@@ -124,6 +124,9 @@ Thunderloop::~Thunderloop() {}
 
             uint64_t last_handled_primitive_set = primitive_set_.sequence_number();
 
+            // Updating primitives and world with newly received data
+            // and setting the correct time elasped since last primitive / world
+
             struct timespec time_since_last_primitive_received;
             clock_gettime(CLOCK_MONOTONIC, &current_time);
             ScopedTimespecTimer::timespecDiff(&current_time,
@@ -131,6 +134,7 @@ Thunderloop::~Thunderloop() {}
                                               &time_since_last_primitive_received);
             network_status_.set_ms_since_last_primitive_received(
                 getMilliseconds(time_since_last_primitive_received));
+
             // If the primitive msg is new, update the internal buffer
             // and start the new primitive.
             if (new_primitive_set.time_sent().epoch_timestamp_seconds() >
@@ -178,7 +182,10 @@ Thunderloop::~Thunderloop() {}
                     createAngularVelocity(status.angular_velocity()));
             }
 
-            // If world not received in a while, stop robot
+            // Timeout Overrides for Primitives
+            // These should be after the new primitive update section above
+
+            // If primitive not received in a while, stop robot
             // Primitive Executor: run the last primitive if we have not timed out
             {
                 ScopedTimespecTimer timer(&poll_time);
@@ -187,14 +194,13 @@ Thunderloop::~Thunderloop() {}
                 auto nanoseconds_elapsed_since_last_primitive =
                     getNanoseconds(time_since_last_primitive_received);
 
-                if (nanoseconds_elapsed_since_last_primitive >
-                    PRIMITIVE_MANAGER_TIMEOUT_NS)
+                if (nanoseconds_elapsed_since_last_primitive > PACKET_TIMEOUT_NS)
                 {
                     primitive_executor_.setStopPrimitive();
 
                     // Log milliseconds since last world received if we are timing out
                     LOG(WARNING)
-                        << "Primitive timeout, overriding with StopPrimitive - Milliseconds since last world: "
+                        << "Primitive timeout, overriding with StopPrimitive - Milliseconds since last primitive: "
                         << static_cast<int>(nanoseconds_elapsed_since_last_primitive) *
                                MILLISECONDS_PER_NANOSECOND;
                 }
