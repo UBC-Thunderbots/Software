@@ -3,6 +3,7 @@
 #include "software/geom/algorithms/convex_angle.h"
 #include "software/geom/algorithms/distance.h"
 #include "software/geom/algorithms/intersection.h"
+#include "software/math/math_functions.h"
 
 std::vector<DefenderAssignment> getAllDefenderAssignments(
     const std::vector<EnemyThreat> &threats, const Field &field, const Ball &ball)
@@ -124,11 +125,6 @@ std::vector<EnemyThreat> filterOutSimilarThreats(const std::vector<EnemyThreat> 
     return filtered_threats;
 }
 
-inline double percent_diff(double a, double b)
-{
-    return std::abs(a - b) / std::max(a, b);
-}
-
 std::vector<std::vector<ShootingLane>> groupGoalLanesByDensity(const std::vector<ShootingLane> &goal_lanes)
 {
     std::vector<std::pair<ShootingLane, double>> lane_angle_pairs;
@@ -152,7 +148,7 @@ std::vector<std::vector<ShootingLane>> groupGoalLanesByDensity(const std::vector
     for (unsigned int i = 1; i < lane_angle_pairs.size(); i++)
     {
         // If the percent diff between current item and the previous is more than threshold
-        if (percent_diff(lane_angle_pairs[i].second, groups.back().back().second) > 0.4)
+        if (percent_difference(lane_angle_pairs[i].second, groups.back().back().second) > 0.4)
         {
             // Start a new group
             groups.emplace_back(std::vector<std::pair<ShootingLane, double>> {});

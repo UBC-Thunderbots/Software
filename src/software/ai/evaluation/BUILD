@@ -110,6 +110,7 @@ cc_library(
         "//software/geom:point",
         "//software/geom:segment",
         "//software/geom/algorithms",
+        "//software/math:math_functions",
         "//software/world:field",
     ],
 )

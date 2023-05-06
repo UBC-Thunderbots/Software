@@ -93,3 +93,16 @@ T normalizeValueToRange(T value, const T& value_min, const T& value_max,
     T new_range   = range_max - range_min;
     return new_range / value_range * (value - value_max) + range_max;
 }
+
+/**
+ * Calculates the percent difference between two values.
+ *
+ * @param a The first value
+ * @param b The second value
+ *
+ * @return The percent difference between the two values
+ */
+inline double percent_difference(double a, double b)
+{
+    return std::abs(a - b) / std::max(a, b);
+}
