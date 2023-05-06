@@ -4,15 +4,13 @@ import threading
 import argparse
 import numpy
 
+from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.thunderscope import Thunderscope
 from software.thunderscope.binary_context_managers import *
 from proto.message_translation import tbots_protobuf
 import software.python_bindings as cpp_bindings
 from software.py_constants import *
-from software.thunderscope.robot_communication import (
-    RobotCommunication,
-    RobotCommunicationMode,
-)
+from software.thunderscope.robot_communication import RobotCommunication
 from software.thunderscope.replay.proto_logger import ProtoLogger
 
 NUM_ROBOTS = 6
@@ -93,7 +91,6 @@ if __name__ == "__main__":
         help="Replay folder for the yellow full_system",
         default=None,
     )
-
     # Run blue or yellow full system over WiFi
     group = parser.add_mutually_exclusive_group()
     group.add_argument(
@@ -154,6 +151,11 @@ if __name__ == "__main__":
         help="Estop Baudrate",
     )
     parser.add_argument(
+        "--cost_visualization",
+        action="store_true",
+        help="show pass cost visualization layer",
+    )
+    parser.add_argument(
         "--disable_estop",
         action="store_true",
         default=False,
@@ -183,6 +185,9 @@ if __name__ == "__main__":
         tscope = Thunderscope(
             layout_path=args.layout,
             visualization_buffer_size=args.visualization_buffer_size,
+            load_blue=True,
+            load_yellow=True,
+            cost_visualization=args.cost_visualization,
         )
         proto_unix_io = tscope.blue_full_system_proto_unix_io
 
@@ -192,6 +197,7 @@ if __name__ == "__main__":
             {"proto_class": Obstacles},
             {"proto_class": PathVisualization},
             {"proto_class": PassVisualization},
+            {"proto_class": CostVisualization},
             {"proto_class": NamedValue},
             {"proto_class": PrimitiveSet},
             {"proto_class": World},
@@ -224,7 +230,7 @@ if __name__ == "__main__":
     # We want to run either 1 instance of AI or 1 instance of RobotCommunication or both which will
     # send/recv packets over the provided multicast channel.
 
-    if args.run_blue or args.run_yellow or args.run_diagnostics:
+    elif args.run_blue or args.run_yellow or args.run_diagnostics:
         tscope = Thunderscope(
             layout_path=args.layout,
             load_blue=bool(args.run_blue),
@@ -232,10 +238,10 @@ if __name__ == "__main__":
             load_diagnostics=bool(args.run_diagnostics),
             load_gamecontroller=False,
             visualization_buffer_size=args.visualization_buffer_size,
+            cost_visualization=args.cost_visualization,
         )
 
         current_proto_unix_io = None
-        current_mode = RobotCommunicationMode.NONE
 
         if args.run_blue:
             current_proto_unix_io = tscope.blue_full_system_proto_unix_io
@@ -248,33 +254,25 @@ if __name__ == "__main__":
             friendly_colour_yellow = True
             debug = args.debug_yellow_full_system
 
-        # if either fullsystem is running, mode is fullsystem
-        if args.run_blue or args.run_yellow:
-            current_mode = RobotCommunicationMode.FULLSYSTEM
-
         # this proto will be the same as the fullsystem one if fullsystem is enabled
         if args.run_diagnostics:
             current_proto_unix_io = tscope.robot_diagnostics_proto_unix_io
 
-            # switches to both mode if fullsystem enabled, or just diagnostics if not
-            current_mode = (
-                RobotCommunicationMode.BOTH
-                if current_mode == RobotCommunicationMode.FULLSYSTEM
-                else RobotCommunicationMode.DIAGNOSTICS
-            )
-
         with RobotCommunication(
             current_proto_unix_io,
-            current_mode,
             getRobotMulticastChannel(0),
             args.interface,
             args.disable_estop,
         ) as robot_communication:
             if args.run_diagnostics:
-                tscope.toggle_robot_connection_signal.connect(
-                    robot_communication.toggle_robot_connection
+                tscope.control_mode_signal.connect(
+                    lambda mode, robot_id: robot_communication.toggle_robot_connection(
+                        mode, robot_id
+                    )
                 )
+
             if args.run_blue or args.run_yellow:
+                robot_communication.setup_for_fullsystem()
                 full_system_runtime_dir = (
                     args.blue_full_system_runtime_dir
                     if args.run_blue
@@ -300,8 +298,12 @@ if __name__ == "__main__":
         tscope = Thunderscope(
             layout_path=args.layout,
             visualization_buffer_size=args.visualization_buffer_size,
+            load_blue=(args.blue_log is not None),
             blue_replay_log=args.blue_log,
+            load_yellow=(args.yellow_log is not None),
             yellow_replay_log=args.yellow_log,
+            load_gamecontroller=False,
+            cost_visualization=args.cost_visualization,
         )
         tscope.show()
 
@@ -320,6 +322,7 @@ if __name__ == "__main__":
             load_yellow=True,
             layout_path=args.layout,
             visualization_buffer_size=args.visualization_buffer_size,
+            cost_visualization=args.cost_visualization,
         )
 
         def __async_sim_ticker(tick_rate_ms):
@@ -328,22 +331,48 @@ if __name__ == "__main__":
             :param tick_rate_ms: The tick rate of the simulation
 
             """
-            world_state = tbots_protobuf.create_world_state(
-                blue_robot_locations=[
-                    cpp_bindings.Point(-3, y) for y in numpy.linspace(-2, 2, NUM_ROBOTS)
-                ],
-                yellow_robot_locations=[
-                    cpp_bindings.Point(3, y) for y in numpy.linspace(-2, 2, NUM_ROBOTS)
-                ],
-                ball_location=cpp_bindings.Point(0, 0),
-                ball_velocity=cpp_bindings.Vector(0, 0),
+            world_state_received_buffer = ThreadSafeBuffer(1, WorldStateReceivedTrigger)
+            tscope.simulator_proto_unix_io.register_observer(
+                WorldStateReceivedTrigger, world_state_received_buffer
             )
-            tscope.simulator_proto_unix_io.send_proto(WorldState, world_state)
+
+            while True:
+                world_state_received = world_state_received_buffer.get(
+                    block=False, return_cached=False
+                )
+                if not world_state_received:
+                    world_state = tbots_protobuf.create_world_state(
+                        blue_robot_locations=[
+                            cpp_bindings.Point(-3, y)
+                            for y in numpy.linspace(-2, 2, NUM_ROBOTS)
+                        ],
+                        yellow_robot_locations=[
+                            cpp_bindings.Point(3, y)
+                            for y in numpy.linspace(-2, 2, NUM_ROBOTS)
+                        ],
+                        ball_location=cpp_bindings.Point(0, 0),
+                        ball_velocity=cpp_bindings.Vector(0, 0),
+                    )
+                    tscope.simulator_proto_unix_io.send_proto(WorldState, world_state)
+                else:
+                    break
+
+                time.sleep(0.01)
+
+            simulation_state_buffer = ThreadSafeBuffer(1, SimulationState)
+            tscope.simulator_proto_unix_io.register_observer(
+                SimulationState, simulation_state_buffer
+            )
 
             # Tick Simulation
             while True:
-                tick = SimulatorTick(milliseconds=tick_rate_ms)
-                tscope.simulator_proto_unix_io.send_proto(SimulatorTick, tick)
+
+                simulation_state_message = simulation_state_buffer.get()
+
+                if simulation_state_message.is_playing:
+                    tick = SimulatorTick(milliseconds=tick_rate_ms)
+                    tscope.simulator_proto_unix_io.send_proto(SimulatorTick, tick)
+
                 time.sleep(tick_rate_ms / 1000)
 
         # Launch all binaries

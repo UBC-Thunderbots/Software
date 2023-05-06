@@ -97,7 +97,8 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
       driver_control_enable_gpio(DRIVER_CONTROL_ENABLE_GPIO, GpioDirection::OUTPUT,
                                  GpioState::HIGH),
       reset_gpio(MOTOR_DRIVER_RESET_GPIO, GpioDirection::OUTPUT, GpioState::HIGH),
-      euclidean_to_four_wheel(robot_constants)
+      euclidean_to_four_wheel(robot_constants),
+      ramp_rpm(0)
 {
     motorServiceInit(robot_constants, control_loop_frequency_hz);
 }
@@ -396,48 +397,46 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
     motor_status.mutable_angular_velocity()->set_radians_per_second(
         current_euclidean_velocity[2]);
 
-    WheelSpace_t target_wheel_velocities = {0.0, 0.0, 0.0, 0.0};
+    int target_dribbler_rpm;
 
-    EuclideanSpace_t target_linear_velocity  = {0.0, 0.0, 0.0};
-    EuclideanSpace_t target_angular_velocity = {0.0, 0.0, 0.0};
-    int target_dribbler_rpm                  = motor.dribbler_speed_rpm();
-    static int ramp_rpm                      = 0;
-
-    switch (motor.drive_control_case())
+    if (motor.drive_control_case() ==
+        TbotsProto::MotorControl::DriveControlCase::DRIVE_CONTROL_NOT_SET)
     {
-        case TbotsProto::MotorControl::DriveControlCase::kDirectPerWheelControl:
-        {
-            target_wheel_velocities = {
-                motor.direct_per_wheel_control().front_right_wheel_velocity(),
-                motor.direct_per_wheel_control().front_left_wheel_velocity(),
-                motor.direct_per_wheel_control().back_left_wheel_velocity(),
-                motor.direct_per_wheel_control().back_right_wheel_velocity()};
-
-            break;
-        }
-        case TbotsProto::MotorControl::DriveControlCase::kDirectVelocityControl:
-        {
-            target_linear_velocity = {
-                -motor.direct_velocity_control().velocity().y_component_meters(),
-                motor.direct_velocity_control().velocity().x_component_meters(),
-                motor.direct_velocity_control().angular_velocity().radians_per_second()};
-        };
-
-        break;
-        case TbotsProto::MotorControl::DriveControlCase::DRIVE_CONTROL_NOT_SET:
-        {
-            target_linear_velocity  = {0.0, 0.0, 0.0};
-            target_angular_velocity = {0.0, 0.0, 0.0};
-            target_dribbler_rpm     = 0;
-
-            break;
-        }
+        target_dribbler_rpm = 0;
     }
-    target_wheel_velocities = rampWheelVelocity(
-        prev_wheel_velocities, target_linear_velocity,
-        static_cast<double>(robot_constants_.robot_max_speed_m_per_s),
-        static_cast<double>(robot_constants_.robot_max_acceleration_m_per_s_2),
-        time_elapsed_since_last_poll_s);
+    else
+    {
+        target_dribbler_rpm = motor.dribbler_speed_rpm();
+    }
+
+    WheelSpace_t target_wheel_velocities = WheelSpace_t::Zero();
+
+    if (motor.has_direct_per_wheel_control())
+    {
+        TbotsProto::MotorControl_DirectPerWheelControl direct_per_wheel =
+            motor.direct_per_wheel_control();
+        target_wheel_velocities = {
+            direct_per_wheel.front_right_wheel_velocity(),
+            direct_per_wheel.front_left_wheel_velocity(),
+            direct_per_wheel.back_left_wheel_velocity(),
+            direct_per_wheel.back_right_wheel_velocity(),
+        };
+    }
+    else if (motor.has_direct_velocity_control())
+    {
+        TbotsProto::MotorControl_DirectVelocityControl direct_velocity =
+            motor.direct_velocity_control();
+        EuclideanSpace_t target_euclidean_velocity = {
+            -direct_velocity.velocity().y_component_meters(),
+            direct_velocity.velocity().x_component_meters(),
+            direct_velocity.angular_velocity().radians_per_second()};
+
+        target_wheel_velocities =
+            euclidean_to_four_wheel.getWheelVelocity(target_euclidean_velocity);
+    }
+
+    target_wheel_velocities = euclidean_to_four_wheel.rampWheelVelocity(
+        prev_wheel_velocities, target_wheel_velocities, time_elapsed_since_last_poll_s);
 
     // TODO (#2719): interleave the angular accelerations in here at some point.
     prev_wheel_velocities = target_wheel_velocities;
@@ -460,23 +459,26 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
         static_cast<int>(target_wheel_velocities[BACK_RIGHT_WHEEL_SPACE_INDEX] *
                          ELECTRICAL_RPM_PER_MECHANICAL_MPS));
 
+    int final_dribbler_rpm = 0;
     // If the dribbler only needs to change by DRIBBLER_ACCELERATION_THRESHOLD_RPM_PER_S,
     // just set the value
     if (std::abs(target_dribbler_rpm - ramp_rpm) <=
         DRIBBLER_ACCELERATION_THRESHOLD_RPM_PER_S)
     {
-        tmc4671_setTargetVelocity(DRIBBLER_MOTOR_CHIP_SELECT, target_dribbler_rpm);
+        final_dribbler_rpm = target_dribbler_rpm;
     }
     else if (target_dribbler_rpm > ramp_rpm + DRIBBLER_ACCELERATION_THRESHOLD_RPM_PER_S)
     {
         ramp_rpm += DRIBBLER_ACCELERATION_THRESHOLD_RPM_PER_S;
-        tmc4671_setTargetVelocity(DRIBBLER_MOTOR_CHIP_SELECT, ramp_rpm);
+        final_dribbler_rpm = ramp_rpm;
     }
     else if (target_dribbler_rpm < ramp_rpm - DRIBBLER_ACCELERATION_THRESHOLD_RPM_PER_S)
     {
         ramp_rpm -= DRIBBLER_ACCELERATION_THRESHOLD_RPM_PER_S;
-        tmc4671_setTargetVelocity(DRIBBLER_MOTOR_CHIP_SELECT, ramp_rpm);
+        final_dribbler_rpm = ramp_rpm;
     }
+    tmc4671_setTargetVelocity(DRIBBLER_MOTOR_CHIP_SELECT, final_dribbler_rpm);
+    motor_status.mutable_dribbler()->set_dribbler_rpm(float(final_dribbler_rpm));
 
     return motor_status;
 }
@@ -504,57 +506,6 @@ void MotorService::spiTransfer(int fd, uint8_t const* tx, uint8_t const* rx, uns
 
     CHECK(ret >= 1) << "SPI Transfer to motor failed, not safe to proceed: errno "
                     << strerror(errno);
-}
-
-WheelSpace_t MotorService::rampWheelVelocity(
-    const WheelSpace_t& current_wheel_velocity,
-    const EuclideanSpace_t& target_euclidean_velocity,
-    double max_allowable_wheel_velocity, double allowed_acceleration,
-    const double& time_to_ramp)
-{
-    // ramp wheel velocity
-    WheelSpace_t ramp_wheel_velocity;
-
-    // calculate max allowable wheel velocity delta using dv = a*t
-    auto allowable_delta_wheel_velocity = allowed_acceleration * time_to_ramp;
-
-    // convert euclidean to wheel velocity
-    WheelSpace_t target_wheel_velocity =
-        euclidean_to_four_wheel.getWheelVelocity(target_euclidean_velocity);
-
-    // Ramp wheel velocity vector
-    // Step 1: Find absolute max velocity delta
-    auto delta_target_wheel_velocity = target_wheel_velocity - current_wheel_velocity;
-    auto max_delta_target_wheel_velocity =
-        delta_target_wheel_velocity.cwiseAbs().maxCoeff();
-
-    // Step 2: Compare max delta velocity against the calculated maximum
-    if (max_delta_target_wheel_velocity > allowable_delta_wheel_velocity)
-    {
-        // Step 3: If larger, scale down to allowable max
-        ramp_wheel_velocity =
-            (delta_target_wheel_velocity / max_delta_target_wheel_velocity) *
-                allowable_delta_wheel_velocity +
-            current_wheel_velocity;
-    }
-    else
-    {
-        // If smaller, go straight to target
-        ramp_wheel_velocity = target_wheel_velocity;
-    }
-
-    // find absolute max wheel velocity
-    auto max_ramp_wheel_velocity = ramp_wheel_velocity.cwiseAbs().maxCoeff();
-
-    // compare against max wheel velocity
-    if (max_ramp_wheel_velocity > max_allowable_wheel_velocity)
-    {
-        // if larger, scale down to max
-        ramp_wheel_velocity = (ramp_wheel_velocity / max_ramp_wheel_velocity) *
-                              max_allowable_wheel_velocity;
-    }
-
-    return ramp_wheel_velocity;
 }
 
 

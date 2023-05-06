@@ -1,21 +1,11 @@
 from software.py_constants import *
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
+from software.thunderscope.constants import IndividualRobotMode
 from software.python_bindings import *
 from proto.import_all_protos import *
-from enum import Enum
+from pyqtgraph.Qt import QtCore
 import threading
 import time
-
-
-class RobotCommunicationMode(Enum):
-    """
-    Enum for the 3 different modes robot communications can run in + 1 default mode as a null value
-    """
-
-    FULLSYSTEM = 1
-    DIAGNOSTICS = 2
-    BOTH = 3
-    NONE = 4
 
 
 class RobotCommunication(object):
@@ -25,7 +15,6 @@ class RobotCommunication(object):
     def __init__(
         self,
         current_proto_unix_io,
-        current_mode,
         multicast_channel,
         interface,
         disable_estop,
@@ -35,7 +24,6 @@ class RobotCommunication(object):
         """Initialize the communication with the robots
 
         :param current_proto_unix_io: the current proto unix io object
-        :param current_mode: one of RobotCommunicationMode, indicates which mode is currently running
         :param multicast_channel: The multicast channel to use
         :param interface: The interface to use
         :param disable_estop: whether to disable estop checks (ONLY FOR TESTING LOCALLY)
@@ -46,7 +34,6 @@ class RobotCommunication(object):
         self.sequence_number = 0
         self.last_time = time.time()
         self.current_proto_unix_io = current_proto_unix_io
-        self.current_mode = current_mode
         self.multicast_channel = str(multicast_channel)
         self.interface = interface
         self.disable_estop = disable_estop
@@ -61,20 +48,9 @@ class RobotCommunication(object):
 
         self.current_proto_unix_io.register_observer(World, self.world_buffer)
 
-        # if fullsystem is running, all robots are connected to it
-        if (
-            current_mode == RobotCommunicationMode.BOTH
-            or current_mode == RobotCommunicationMode.FULLSYSTEM
-        ):
-            self.robots_connected_to_fullsystem = {
-                robot_id for robot_id in range(MAX_ROBOT_IDS_PER_SIDE)
-            }
-
-        # if diagnostics is running, no robots are connected to it initially (empty set)
-        if current_mode != RobotCommunicationMode.FULLSYSTEM:
-            self.robots_connected_to_diagnostics = set()
-
-        self.robots_to_be_disconnected = set()
+        self.robots_connected_to_fullsystem = set()
+        self.robots_connected_to_manual = set()
+        self.robots_to_be_disconnected = {}
 
         self.current_proto_unix_io.register_observer(
             PrimitiveSet, self.primitive_buffer
@@ -105,7 +81,7 @@ class RobotCommunication(object):
                 self.current_proto_unix_io.send_proto(
                     EstopState, EstopState(is_playing=self.estop_reader.isEstopPlay())
                 )
-            time.sleep(0.1)
+                time.sleep(0.1)
 
     def run(self):
         """Forward World and PrimitiveSet protos from fullsystem to the robots.
@@ -122,14 +98,10 @@ class RobotCommunication(object):
         """
         while True:
             # total primitives for all robots
-            robot_primitives = dict()
+            robot_primitives = {}
 
             # fullsystem is running, so world data is being received
-            if (
-                self.current_mode == RobotCommunicationMode.FULLSYSTEM
-                or self.current_mode == RobotCommunicationMode.BOTH
-            ):
-                # Get the world
+            if self.robots_connected_to_fullsystem:
                 world = self.world_buffer.get(block=True)
 
                 # send the world proto
@@ -140,34 +112,26 @@ class RobotCommunication(object):
 
                 robot_primitives = dict(primitive_set.robot_primitives)
 
+            # get the manual control primitive
+            diagnostics_primitive = DirectControlPrimitive(
+                motor_control=self.motor_control_diagnostics_buffer.get(block=False),
+                power_control=self.power_control_diagnostics_buffer.get(block=False),
+            )
+
             # diagnostics is running
-            if (
-                self.current_mode == RobotCommunicationMode.DIAGNOSTICS
-                or self.current_mode == RobotCommunicationMode.BOTH
-            ):
-
-                # get the manual control primitive
-                diagnostics_primitive = DirectControlPrimitive(
-                    motor_control=self.motor_control_diagnostics_buffer.get(
-                        block=False
-                    ),
-                    power_control=self.power_control_diagnostics_buffer.get(
-                        block=False
-                    ),
-                )
-
+            if self.robots_connected_to_manual:
                 # for all robots connected to diagnostics, set their primitive
-                for robot_id in self.robots_connected_to_diagnostics:
+                for robot_id in self.robots_connected_to_manual:
                     robot_primitives[robot_id] = Primitive(
                         direct_control=diagnostics_primitive
                     )
 
             # sends a final stop primitive to all disconnected robots and removes them from list
             # in order to prevent robots acting on cached old primitives
-            while self.robots_to_be_disconnected:
-                robot_primitives[self.robots_to_be_disconnected.pop()] = Primitive(
-                    stop=StopPrimitive()
-                )
+            for robot_id, num_times_to_stop in self.robots_to_be_disconnected.items():
+                if num_times_to_stop > 0:
+                    robot_primitives[robot_id] = Primitive(stop=StopPrimitive())
+                    self.robots_to_be_disconnected[robot_id] = num_times_to_stop - 1
 
             # initialize total primitive set and send it
             primitive_set = PrimitiveSet(
@@ -179,22 +143,55 @@ class RobotCommunication(object):
 
             self.sequence_number += 1
 
-            if not self.disable_estop and self.estop_reader.isEstopPlay():
+            if (
+                not self.disable_estop
+                and self.estop_reader.isEstopPlay()
+                and (
+                    self.robots_connected_to_fullsystem
+                    or self.robots_connected_to_manual
+                )
+            ):
                 self.last_time = primitive_set.time_sent.epoch_timestamp_seconds
                 self.send_primitive_set.send_proto(primitive_set)
 
             time.sleep(0.01)
 
-    def toggle_robot_connection(self, robot_id):
+    def toggle_robot_connection(self, mode, robot_id):
         """
         Connects a robot to or disconnects a robot from diagnostics
+
+        :param mode: the mode of input for this robot's primitives
         :param robot_id: the id of the robot to be added or removed from the diagnostics set
         """
-        if robot_id in self.robots_connected_to_diagnostics:
-            self.robots_connected_to_diagnostics.remove(robot_id)
-            self.robots_to_be_disconnected.add(robot_id)
-        else:
-            self.robots_connected_to_diagnostics.add(robot_id)
+        self.robots_connected_to_fullsystem.discard(robot_id)
+        self.robots_connected_to_manual.discard(robot_id)
+        self.robots_to_be_disconnected.pop(robot_id, None)
+
+        if mode == IndividualRobotMode.NONE:
+            self.robots_to_be_disconnected[robot_id] = NUM_TIMES_SEND_STOP
+        elif mode == IndividualRobotMode.MANUAL:
+            self.robots_connected_to_manual.add(robot_id)
+        elif mode == IndividualRobotMode.AI:
+            self.robots_connected_to_fullsystem.add(robot_id)
+
+    def setup_for_fullsystem(self):
+        """
+        Sets up a world sender, a listener for SSL vision data, and connects all robots to fullsystem as default
+        """
+        self.receive_ssl_wrapper = SSLWrapperPacketProtoListener(
+            SSL_VISION_ADDRESS,
+            SSL_VISION_PORT,
+            lambda data: self.current_proto_unix_io.send_proto(SSL_WrapperPacket, data),
+            True,
+        )
+
+        self.send_world = WorldProtoSender(
+            self.multicast_channel + "%" + self.interface, VISION_PORT, True
+        )
+
+        self.robots_connected_to_fullsystem = {
+            robot_id for robot_id in range(MAX_ROBOT_IDS_PER_SIDE)
+        }
 
     def __enter__(self):
         """Enter RobotCommunication context manager. Setup multicast listener
@@ -215,23 +212,6 @@ class RobotCommunication(object):
             lambda data: self.current_proto_unix_io.send_proto(RobotLog, data),
             True,
         )
-
-        if (
-            self.current_mode == RobotCommunicationMode.FULLSYSTEM
-            or self.current_mode == RobotCommunicationMode.BOTH
-        ):
-            self.receive_ssl_wrapper = SSLWrapperPacketProtoListener(
-                SSL_VISION_ADDRESS,
-                SSL_VISION_PORT,
-                lambda data: self.current_proto_unix_io.send_proto(
-                    SSL_WrapperPacket, data
-                ),
-                True,
-            )
-
-            self.send_world = WorldProtoSender(
-                self.multicast_channel + "%" + self.interface, VISION_PORT, True
-            )
 
         # Create multicast senders
         self.send_primitive_set = PrimitiveSetProtoSender(

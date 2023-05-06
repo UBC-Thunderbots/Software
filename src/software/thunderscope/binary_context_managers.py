@@ -165,6 +165,7 @@ gdb --args bazel-bin/{full_system}
             Obstacles,
             PathVisualization,
             PassVisualization,
+            CostVisualization,
             NamedValue,
             PlayInfo,
         ]:
@@ -310,6 +311,12 @@ gdb --args bazel-bin/{simulator_command}
             (WORLD_STATE_PATH, WorldState),
         ]:
             simulator_proto_unix_io.attach_unix_sender(self.simulator_runtime_dir, *arg)
+
+        simulator_proto_unix_io.attach_unix_receiver(
+            self.simulator_runtime_dir,
+            WORLD_STATE_RECEIVED_TRIGGER_PATH,
+            WorldStateReceivedTrigger,
+        )
 
         # setup blue full system unix io
         for arg in [

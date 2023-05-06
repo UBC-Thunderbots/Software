@@ -77,7 +77,6 @@ message SimulatorControl
     // Change the simulation speed
     optional float simulation_speed = 3;
 }
-
 // Command from the connected client to the simulator
 message SimulatorCommand
 {
@@ -86,7 +85,6 @@ message SimulatorCommand
     // Configure the simulation
     optional SimulatorConfig config = 2;
 }
-
 // Response of the simulator to the connected client
 message SimulatorResponse
 {

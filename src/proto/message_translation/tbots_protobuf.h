@@ -19,6 +19,19 @@
 std::unique_ptr<TbotsProto::World> createWorld(const World& world);
 
 /**
+ * Returns a TbotsProto::World proto with a sequence number given a World and a sequence
+ * number.
+ *
+ * @param world The world msg to extract the TbotsProto::World from
+ * @param sequence_number A sequence number for tracking the TbotsProto::World
+ *
+ * @return The unique_ptr to a TbotsProto::World proto containing the field, friendly
+ * team, enemy team, ball, game state, and the sequence number.
+ */
+std::unique_ptr<TbotsProto::World> createWorldWithSequenceNumber(
+    const World& world, const uint64_t sequence_number);
+
+/**
  * Returns a TbotsProto::Team proto given a Team.
  *
  * @param team The Team msg to extract the TbotsProto::Team from
@@ -125,3 +138,24 @@ BallState createBallState(const TbotsProto::BallState ball_state);
  */
 std::unique_ptr<TbotsProto::PassVisualization> createPassVisualization(
     const std::vector<PassWithRating>& passes_with_rating);
+
+/**
+ * Returns the WorldStateReceivedTrigger given the world state received trigger
+ *
+ * @return The unique_ptr to a TbotsProto::WorldStateReceivedTrigger proto containing
+ *         a boolean value for whether world state proto has been received
+ *
+ */
+std::unique_ptr<TbotsProto::WorldStateReceivedTrigger> createWorldStateReceivedTrigger();
+
+/**
+ * Returns a cost visualization given a vector of costs
+ *
+ * @param costs A vector of costs to visualize
+ * @param num_rows The number of rows to display in the cost visualization
+ * @param num_cols The number of columns to display in the cost visualization
+ *
+ * @return The unique_ptr to a CostVisualization proto
+ */
+std::unique_ptr<TbotsProto::CostVisualization> createCostVisualization(
+    const std::vector<double>& costs, int num_rows, int num_cols);

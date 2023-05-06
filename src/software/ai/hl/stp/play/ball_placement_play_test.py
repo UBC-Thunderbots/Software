@@ -11,11 +11,11 @@ from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
 from proto.ssl_gc_geometry_pb2 import Vector2
 
-# TODO (#2599): Remove Duration parameter from test
+
 @pytest.mark.parametrize(
-    "run_enemy_ai,test_duration", [(False, 20)]
-)  # , (True, 20)]) # TODO (#2690): Robot gets stuck in corner of defense area
-def test_two_ai_ball_placement(simulated_test_runner, run_enemy_ai, test_duration):
+    "run_enemy_ai", [False]
+)  # , True])  TODO: Issue 2780 re-enable this test
+def test_two_ai_ball_placement(simulated_test_runner, run_enemy_ai):
 
     # starting point must be Point
     ball_initial_pos = tbots.Point(2, 2)
@@ -95,7 +95,7 @@ def test_two_ai_ball_placement(simulated_test_runner, run_enemy_ai, test_duratio
     simulated_test_runner.run_test(
         eventually_validation_sequence_set=eventually_validation_sequence_set,
         always_validation_sequence_set=always_validation_sequence_set,
-        test_timeout_s=test_duration,
+        test_timeout_s=15,
     )
 
 

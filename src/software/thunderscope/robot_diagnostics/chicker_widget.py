@@ -20,6 +20,9 @@ class ChickerWidget(QWidget):
         """Handles the robot diagnostics input to create a PowerControl message
         to be sent to the robots.
 
+        NOTE: The powerboards run in regulation mode, which means that they are
+        always charged and do not need to be explicitly charged.
+
         The powerboard also has an internal cooldown, so spamming kick or chip
         will not work until the capacitors charge up and the cooldown is over.
 
@@ -87,7 +90,7 @@ class ChickerWidget(QWidget):
             self.geneva_slider_layout,
             self.geneva_slider,
             self.geneva_label,
-        ) = common_widgets.create_slider("Geneva Position", 1, NUM_GENEVA_ANGLES, 1)
+        ) = common_widgets.create_slider("Geneva Position", 0, NUM_GENEVA_ANGLES - 1, 1)
         vbox_layout.addLayout(self.geneva_slider_layout)
 
         (
