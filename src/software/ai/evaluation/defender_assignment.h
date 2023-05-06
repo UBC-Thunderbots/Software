@@ -43,6 +43,13 @@ struct ShootingLane
     double threat_rating;
 };
 
+// A goal lane describes a shooting lane from an enemy robot to the goal
+struct GoalLane : ShootingLane
+{
+    // The angle in radians from the enemy robot to the goal that the goal lane describes
+    Angle angle_to_goal;
+};
+
 // The minimum distance between two threats for them to be considered non-similar
 static constexpr double MIN_DISTANCE_BETWEEN_THREATS = 0.25;
 
@@ -92,4 +99,4 @@ std::vector<DefenderAssignment> getAllDefenderAssignments(
  */
 std::vector<EnemyThreat> filterOutSimilarThreats(const std::vector<EnemyThreat> &threats);
 
-std::vector<std::vector<ShootingLane>> groupGoalLanesByDensity(const std::vector<ShootingLane> &goal_lanes);
+std::vector<std::vector<GoalLane>> groupGoalLanesByDensity(std::vector<GoalLane> &goal_lanes);

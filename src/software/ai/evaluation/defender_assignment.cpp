@@ -8,7 +8,7 @@
 std::vector<DefenderAssignment> getAllDefenderAssignments(
     const std::vector<EnemyThreat> &threats, const Field &field, const Ball &ball)
 {
-    std::vector<ShootingLane> goal_lanes;
+    std::vector<GoalLane> goal_lanes;
     std::vector<ShootingLane> passing_lanes;
     std::vector<DefenderAssignment> assignments;
 
@@ -34,10 +34,18 @@ std::vector<DefenderAssignment> getAllDefenderAssignments(
     {
         auto threat_position =
             (i == 0) ? ball.position() : threats.at(i).robot.position();
+
+        // Clamp threat position to field lines
+        threat_position.setX(std::clamp(threat_position.x(), 
+                             field.fieldLines().xMin(), field.fieldLines().xMax()));
+        threat_position.setY(std::clamp(threat_position.y(), 
+                             field.fieldLines().yMin(), field.fieldLines().yMax()));
+
         auto lane = Segment(threat_position, field.friendlyGoalCenter());
         double threat_rating =
             (static_cast<double>(threats.size()) - i) * GOAL_LANE_THREAT_MULTIPLIER;
-        goal_lanes.emplace_back(ShootingLane{lane, threat_rating});
+        auto angle_to_goal = lane.toVector().orientation();
+        goal_lanes.emplace_back(GoalLane{{lane, threat_rating}, angle_to_goal});
     }
 
     auto grouped_goal_lanes = groupGoalLanesByDensity(goal_lanes);
@@ -125,49 +133,33 @@ std::vector<EnemyThreat> filterOutSimilarThreats(const std::vector<EnemyThreat> 
     return filtered_threats;
 }
 
-std::vector<std::vector<ShootingLane>> groupGoalLanesByDensity(const std::vector<ShootingLane> &goal_lanes)
+std::vector<std::vector<GoalLane>> groupGoalLanesByDensity(std::vector<GoalLane> &goal_lanes)
 {
-    std::vector<std::pair<ShootingLane, double>> lane_angle_pairs;
-    for (const auto &goal_lane : goal_lanes)
+    if (goal_lanes.size() == 0)
     {
-        auto angle_to_goal = goal_lane.lane.toVector().orientation();
-
-        std::pair<ShootingLane, double> lane_angle_pair;
-        lane_angle_pair = std::make_pair(goal_lane, angle_to_goal.toRadians());
-
-        lane_angle_pairs.emplace_back(lane_angle_pair);
+        return std::vector<std::vector<GoalLane>> {};
     }
 
-    // Sort the pairs by angle to goal in increasing order
-    std::sort(lane_angle_pairs.begin(), lane_angle_pairs.end(), 
-        [](const auto &a, const auto &b) { return a.second < b.second; });
+    std::sort(goal_lanes.begin(), goal_lanes.end(), [](const auto &a, const auto &b) { 
+        return a.angle_to_goal < b.angle_to_goal; 
+    });
 
-    std::vector<std::vector<std::pair<ShootingLane, double>>> groups;
-    groups.emplace_back(std::vector<std::pair<ShootingLane, double>> {lane_angle_pairs[0]});
+    std::vector<std::vector<GoalLane>> groups;
+    groups.emplace_back(std::vector<GoalLane> {goal_lanes[0]});
 
-    for (unsigned int i = 1; i < lane_angle_pairs.size(); i++)
+    for (unsigned int i = 1; i < goal_lanes.size(); i++)
     {
         // If the percent diff between current item and the previous is more than threshold
-        if (percent_difference(lane_angle_pairs[i].second, groups.back().back().second) > 0.4)
+        if (percent_difference(goal_lanes[i].angle_to_goal.toRadians(), 
+                               groups.back().back().angle_to_goal.toRadians()) > 0.4)
         {
             // Start a new group
-            groups.emplace_back(std::vector<std::pair<ShootingLane, double>> {});
+            groups.emplace_back(std::vector<GoalLane> {});
         }
 
         // Add the current item to the last group in groups
-        groups.back().emplace_back(lane_angle_pairs[i]);
+        groups.back().emplace_back(goal_lanes[i]);
     }
 
-    std::vector<std::vector<ShootingLane>> goal_lane_groups;
-    for (const auto &group : groups)
-    {
-        std::vector<ShootingLane> goal_lane_group;
-        for (const auto &pair : group)
-        {
-            goal_lane_group.emplace_back(pair.first);    
-        }
-        goal_lane_groups.emplace_back(goal_lane_group);
-    }
-
-    return goal_lane_groups;
+    return groups;
 }
