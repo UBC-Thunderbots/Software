@@ -327,9 +327,12 @@ def hrvo_setup(
                 if index % 2 == 0
             ],
             [],
-            # both the start and end positions are the same values
-            # but for some reason it works when actually running the test
-            # so just gonna leave this here
+            # both the start and end positions are the same values but they work
+            # this is because the start positions for yellow are in the Blue Fullsystem perspective
+            # but the enemy destinations are used to create a yellow Move Tactic,
+            # which means the destinations given here are in yellow's perspective
+            # we see blue's perspective on screen, which flips the x and y from the yellow perspective
+            # so when displayed, the destination positions look correct since they have been flipped for blue
             [
                 pos
                 for index, pos in enumerate(get_robot_circle_pos(1.5, 8, True))
