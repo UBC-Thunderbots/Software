@@ -65,6 +65,9 @@ static constexpr double GOAL_LANE_THREAT_MULTIPLIER = 3;
 // considered a dense lane cluster
 static constexpr double GOAL_LANE_DENSITY_THRESHOLD = 0.4;
 
+// Bonus added to coverage rating if the goal lane is not part of a dense cluster
+static constexpr double GOAL_LANE_NONDENSE_BONUS = 0.5;
+
 /**
  * Determines all possible defender assignments where a defender could be placed
  * on the field and returns them in order of decreasing coverage rating
@@ -103,5 +106,13 @@ std::vector<DefenderAssignment> getAllDefenderAssignments(
  */
 std::vector<EnemyThreat> filterOutSimilarThreats(const std::vector<EnemyThreat> &threats);
 
+/**
+ * Groups together goal lanes that are densely clustered (i.e. have similar angles 
+ * to the goal).
+ *
+ * @param goal_lanes the goal lanes to group
+ *
+ * @return a list of lists which represent groupings of densely clustered goal lanes 
+ */
 std::vector<std::vector<GoalLane>> groupGoalLanesByDensity(
     std::vector<GoalLane> &goal_lanes);

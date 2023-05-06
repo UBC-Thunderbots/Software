@@ -53,11 +53,14 @@ std::vector<DefenderAssignment> getAllDefenderAssignments(
     // Determine crease defender assignments.
     for (const auto &goal_lanes_group : grouped_goal_lanes)
     {
-        double density_bonus = (goal_lanes_group.size() == 1) ? 0.5 : 0;
+        // We include a non-dense bonus when rating crease defender assignment
+        // if the goal lane is not part of a dense cluster
+        double nondense_bonus = (goal_lanes_group.size() == 1) ? 0.5 : 0;
+
         for (const auto &goal_lane : goal_lanes_group)
         {
             auto threat_position   = goal_lane.lane.getStart();
-            double coverage_rating = goal_lane.threat_rating + density_bonus;
+            double coverage_rating = goal_lane.threat_rating + nondense_bonus;
 
             // We let the target of the defender assignment be the location
             // of the originating enemy threat to cooperate with control
@@ -142,11 +145,14 @@ std::vector<std::vector<GoalLane>> groupGoalLanesByDensity(
         return std::vector<std::vector<GoalLane>>{};
     }
 
+    // Sort goal lanes by angle to the goal in increasing order  
     std::sort(goal_lanes.begin(), goal_lanes.end(), [](const auto &a, const auto &b) {
         return a.angle_to_goal < b.angle_to_goal;
     });
 
     std::vector<std::vector<GoalLane>> groups;
+
+    // Include first goal lane in the first group
     groups.emplace_back(std::vector<GoalLane>{goal_lanes[0]});
 
     for (unsigned int i = 1; i < goal_lanes.size(); i++)
