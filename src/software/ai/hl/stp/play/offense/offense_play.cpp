@@ -61,29 +61,35 @@ void OffensePlay::updateTactics(const PlayUpdate &play_update)
 
     unsigned int num_shoot_or_pass = play_update.num_tactics - num_defenders;
 
-    shoot_or_pass_play->updateTactics(PlayUpdate(
-        play_update.world, num_shoot_or_pass,
-        [&tactics_to_return](PriorityTacticVector new_tactics) {
-            for (const auto &tactic_vector : new_tactics)
-            {
-                tactics_to_return.push_back(tactic_vector);
-            }
-        },
-        play_update.inter_play_communication,
-        play_update.set_inter_play_communication_fun));
+    if (num_shoot_or_pass > 0)
+    {
+        shoot_or_pass_play->updateTactics(PlayUpdate(
+            play_update.world, num_shoot_or_pass,
+            [&tactics_to_return](PriorityTacticVector new_tactics) {
+                for (const auto &tactic_vector : new_tactics)
+                {
+                    tactics_to_return.push_back(tactic_vector);
+                }
+            },
+            play_update.inter_play_communication,
+            play_update.set_inter_play_communication_fun));
+    }
 
     defense_play->updateControlParams(TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
 
-    defense_play->updateTactics(PlayUpdate(
-        play_update.world, num_defenders,
-        [&tactics_to_return](PriorityTacticVector new_tactics) {
-            for (const auto &tactic_vector : new_tactics)
-            {
-                tactics_to_return.push_back(tactic_vector);
-            }
-        },
-        play_update.inter_play_communication,
-        play_update.set_inter_play_communication_fun));
+    if (num_defenders > 0)
+    {
+        defense_play->updateTactics(PlayUpdate(
+            play_update.world, num_defenders,
+            [&tactics_to_return](PriorityTacticVector new_tactics) {
+                for (const auto &tactic_vector : new_tactics)
+                {
+                    tactics_to_return.push_back(tactic_vector);
+                }
+            },
+            play_update.inter_play_communication,
+            play_update.set_inter_play_communication_fun));
+    }
 
     play_update.set_tactics(tactics_to_return);
 }

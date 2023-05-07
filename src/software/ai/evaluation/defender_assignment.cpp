@@ -12,8 +12,22 @@ std::vector<DefenderAssignment> getAllDefenderAssignments(
     std::vector<ShootingLane> passing_lanes;
     std::vector<DefenderAssignment> assignments;
 
+    // Remove threats which are not near our side of the field.
+    // We define being near our side as being within 3/4 of the field length
+    // from our goal line (max_x_coordinate).
+    // The primary threat is the only exception to this rule.
+    std::vector<EnemyThreat> relevant_threats {threats.front()};
+    double max_x_coordinate = field.xLength() / 4;
+    for (unsigned int i = 1; i < threats.size(); i++)
+    {
+        if (threats[i].robot.position().x() < max_x_coordinate)
+        {
+            relevant_threats.emplace_back(threats[i]);
+        }
+    }
+
     // Get filtered list of threats with similarly positioned threats removed
-    auto filtered_threats = filterOutSimilarThreats(threats);
+    auto filtered_threats = filterOutSimilarThreats(relevant_threats);
 
     // Construct passing lanes and determine pass defender assignments
     auto primary_threat_position = filtered_threats.front().robot.position();
@@ -30,10 +44,10 @@ std::vector<DefenderAssignment> getAllDefenderAssignments(
     // Construct goal lanes.
     // Using full list of threats (not filtered threats) since we need to
     // find potential goal lane from every enemy on the field
-    for (unsigned int i = 0; i < threats.size(); i++)
+    for (unsigned int i = 0; i < relevant_threats.size(); i++)
     {
         auto threat_position =
-            (i == 0) ? ball.position() : threats.at(i).robot.position();
+            (i == 0) ? ball.position() : relevant_threats.at(i).robot.position();
 
         // Clamp threat position to field lines
         threat_position.setX(std::clamp(threat_position.x(), field.fieldLines().xMin(),
@@ -43,7 +57,7 @@ std::vector<DefenderAssignment> getAllDefenderAssignments(
 
         auto lane = Segment(threat_position, field.friendlyGoalCenter());
         double threat_rating =
-            (static_cast<double>(threats.size()) - i) * GOAL_LANE_THREAT_MULTIPLIER;
+            (static_cast<double>(relevant_threats.size()) - i) * GOAL_LANE_THREAT_MULTIPLIER;
         auto angle_to_goal = lane.toVector().orientation();
         goal_lanes.emplace_back(GoalLane{{lane, threat_rating}, angle_to_goal});
     }
@@ -153,7 +167,7 @@ std::vector<std::vector<GoalLane>> groupGoalLanesByDensity(
     std::vector<std::vector<GoalLane>> groups;
 
     // Include first goal lane in the first group
-    groups.emplace_back(std::vector<GoalLane>{goal_lanes[0]});
+    groups.emplace_back(std::vector<GoalLane>{goal_lanes.front()});
 
     for (unsigned int i = 1; i < goal_lanes.size(); i++)
     {

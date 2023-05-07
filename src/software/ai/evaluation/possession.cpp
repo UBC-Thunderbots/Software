@@ -63,8 +63,8 @@ std::optional<Team> getTeamWithEffectiveBallPossession(const Team &friendly_team
 
     // Find the robot that can intercept the ball the quickest
     Team team_with_possession;
-    auto best_intercept =
-        findBestInterceptForBall(ball, field, friendly_team.getAllRobots().at(0));
+    std::optional<std::pair<Point, Duration>> best_intercept;
+        
     for (const auto &robot : friendly_team.getAllRobots())
     {
         auto intercept = findBestInterceptForBall(ball, field, robot);
