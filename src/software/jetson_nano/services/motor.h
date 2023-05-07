@@ -231,6 +231,7 @@ class MotorService
      * mechanical MPS
      * @param back_right_velocity_mps           the back right motor's velocity in
      * mechanical MPS
+     * @param dribbler_rpm                      the dribbler's rotations per minute
      *
      * @return a MotorStatus proto with the velocity of each motor as well as their fault
      * statuses (some faults may be cached)
@@ -238,7 +239,8 @@ class MotorService
     TbotsProto::MotorStatus updateMotorStatus(double front_left_velocity_mps,
                                               double front_right_velocity_mps,
                                               double back_left_velocity_mps,
-                                              double back_right_velocity_mps);
+                                              double back_right_velocity_mps,
+                                              double dribbler_rpm);
 
     // to check if the motors have been calibrated
     bool is_initialized = false;

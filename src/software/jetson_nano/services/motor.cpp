@@ -149,6 +149,11 @@ void MotorService::setup()
     reset_gpio.setValue(GpioState::HIGH);
     usleep(MICROSECONDS_PER_MILLISECOND * 100);
 
+    for (uint8_t i = 0; i < NUM_MOTORS; ++i)
+    {
+        tmc6100_writeInt(i, TMC6100_GSTAT, 0x00000001);
+    }
+
     // Drive Motor Setup
     for (uint8_t motor = 0; motor < NUM_DRIVE_MOTORS; motor++)
     {
@@ -291,43 +296,63 @@ MotorService::MotorFaultIndicator MotorService::checkDriverFault(uint8_t motor)
 TbotsProto::MotorStatus MotorService::updateMotorStatus(double front_left_velocity_mps,
                                                         double front_right_velocity_mps,
                                                         double back_left_velocity_mps,
-                                                        double back_right_velocity_mps)
+                                                        double back_right_velocity_mps,
+                                                        double dribbler_rpm)
 {
     TbotsProto::MotorStatus motor_status;
 
     cached_motor_faults_[motor_fault_detector] = checkDriverFault(motor_fault_detector);
 
-    for (uint8_t i = 0; i < NUM_DRIVE_MOTORS; ++i)
+    for (uint8_t motor = 0; motor < NUM_MOTORS; ++motor)
     {
-        TbotsProto::DriveUnit drive_status;
-        drive_status.set_drive_enabled(
-            cached_motor_faults_[motor_fault_detector].drive_enabled);
+        if (motor != DRIBBLER_MOTOR_CHIP_SELECT)
+        {
+            TbotsProto::DriveUnit drive_status;
+            drive_status.set_enabled(cached_motor_faults_[motor].drive_enabled);
 
-        for (const TbotsProto::MotorFault& fault :
-             cached_motor_faults_[motor_fault_detector].motor_faults)
-        {
-            drive_status.add_motor_fault(fault);
-        }
+            for (const TbotsProto::MotorFault& fault :
+                 cached_motor_faults_[motor].motor_faults)
+            {
+                drive_status.add_motor_fault(fault);
+            }
 
-        if (motor_fault_detector == FRONT_LEFT_MOTOR_CHIP_SELECT)
-        {
-            drive_status.set_wheel_velocity(static_cast<float>(front_left_velocity_mps));
-            *(motor_status.mutable_front_left()) = drive_status;
+            if (motor == FRONT_LEFT_MOTOR_CHIP_SELECT)
+            {
+                drive_status.set_wheel_velocity(
+                    static_cast<float>(front_left_velocity_mps));
+                *(motor_status.mutable_front_left()) = drive_status;
+            }
+            if (motor == FRONT_RIGHT_MOTOR_CHIP_SELECT)
+            {
+                drive_status.set_wheel_velocity(
+                    static_cast<float>(front_right_velocity_mps));
+                *(motor_status.mutable_front_right()) = drive_status;
+            }
+            if (motor == BACK_LEFT_MOTOR_CHIP_SELECT)
+            {
+                drive_status.set_wheel_velocity(
+                    static_cast<float>(back_left_velocity_mps));
+                *(motor_status.mutable_back_left()) = drive_status;
+            }
+            if (motor == BACK_RIGHT_MOTOR_CHIP_SELECT)
+            {
+                drive_status.set_wheel_velocity(
+                    static_cast<float>(back_right_velocity_mps));
+                *(motor_status.mutable_back_right()) = drive_status;
+            }
         }
-        if (motor_fault_detector == FRONT_RIGHT_MOTOR_CHIP_SELECT)
+        else
         {
-            drive_status.set_wheel_velocity(static_cast<float>(front_right_velocity_mps));
-            *(motor_status.mutable_front_right()) = drive_status;
-        }
-        if (motor_fault_detector == BACK_LEFT_MOTOR_CHIP_SELECT)
-        {
-            drive_status.set_wheel_velocity(static_cast<float>(back_left_velocity_mps));
-            *(motor_status.mutable_back_left()) = drive_status;
-        }
-        if (motor_fault_detector == BACK_RIGHT_MOTOR_CHIP_SELECT)
-        {
-            drive_status.set_wheel_velocity(static_cast<float>(back_right_velocity_mps));
-            *(motor_status.mutable_back_right()) = drive_status;
+            TbotsProto::DribblerStatus dribbler_status;
+            dribbler_status.set_dribbler_rpm(static_cast<float>(dribbler_rpm));
+            dribbler_status.set_enabled(cached_motor_faults_[motor].drive_enabled);
+            for (const TbotsProto::MotorFault& fault :
+                 cached_motor_faults_[motor].motor_faults)
+            {
+                dribbler_status.add_motor_fault(fault);
+            }
+
+            *(motor_status.mutable_dribbler()) = dribbler_status;
         }
     }
 
@@ -335,7 +360,6 @@ TbotsProto::MotorStatus MotorService::updateMotorStatus(double front_left_veloci
 
     return motor_status;
 }
-
 
 TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor,
                                            double time_elapsed_since_last_poll_s)
@@ -351,17 +375,19 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
                                 encoder_calibrated_[BACK_LEFT_MOTOR_CHIP_SELECT] ||
                                 encoder_calibrated_[BACK_RIGHT_MOTOR_CHIP_SELECT]);
 
-    int reset_detector = tmc4671_readInt(0, TMC4671_PID_ACCELERATION_LIMIT);
-
-    // When the motor board is reset the value in the above register is set to the maximum
-    // signed 32 bit value Please read the header file and the datasheet for more info
-    if (reset_detector == 2147483647)
+    // checks if any motor has reset, sends a log message if so
+    for (uint8_t motor = 0; motor < NUM_MOTORS; ++motor)
     {
-        LOG(DEBUG) << "RESET DETECTED";
-        is_initialized = false;
-        setup();
-        encoders_calibrated = false;
+        if (cached_motor_faults_[motor].motor_faults.contains(
+                TbotsProto::MotorFault::RESET))
+        {
+            LOG(DEBUG) << "RESET DETECTED FOR MOTOR: " << MOTOR_NAMES[motor];
+            is_initialized = false;
+            setup();
+            encoders_calibrated = false;
+        }
     }
+
     // check if encoders are calibrated
     if (!encoders_calibrated)
     {
@@ -399,9 +425,14 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
         static_cast<double>(tmc4671_getActualVelocity(BACK_LEFT_MOTOR_CHIP_SELECT)) *
         MECHANICAL_MPS_PER_ELECTRICAL_RPM;
 
+    // Get the current dribbler rpm
+    double dribbler_rpm =
+        static_cast<double>(tmc4671_getActualVelocity(DRIBBLER_MOTOR_CHIP_SELECT));
+
+    // Construct a MotorStatus object with the current velocities and dribbler rpm
     TbotsProto::MotorStatus motor_status =
         updateMotorStatus(front_left_velocity, front_right_velocity, back_left_velocity,
-                          back_right_velocity);
+                          back_right_velocity, dribbler_rpm);
 
     // This order needs to match euclidean_to_four_wheel converters order
     // We also want to work in the meters per second space rather than electrical RPMs
@@ -449,20 +480,9 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
     motor_status.mutable_angular_velocity()->set_radians_per_second(
         current_euclidean_velocity[2]);
 
-    int target_dribbler_rpm;
-
-    if (motor.drive_control_case() ==
-        TbotsProto::MotorControl::DriveControlCase::DRIVE_CONTROL_NOT_SET)
-    {
-        target_dribbler_rpm = 0;
-    }
-    else
-    {
-        target_dribbler_rpm = motor.dribbler_speed_rpm();
-    }
-
     WheelSpace_t target_wheel_velocities = WheelSpace_t::Zero();
 
+    // Get target wheel velocities from the primitive
     if (motor.has_direct_per_wheel_control())
     {
         TbotsProto::MotorControl_DirectPerWheelControl direct_per_wheel =
@@ -487,6 +507,8 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
             euclidean_to_four_wheel.getWheelVelocity(target_euclidean_velocity);
     }
 
+    // ramp the target velocities to keep acceleration compared to current velocities
+    // within safe bounds
     target_wheel_velocities = euclidean_to_four_wheel.rampWheelVelocity(
         prev_wheel_velocities, target_wheel_velocities, time_elapsed_since_last_poll_s);
 
@@ -511,7 +533,22 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
         static_cast<int>(target_wheel_velocities[BACK_RIGHT_WHEEL_SPACE_INDEX] *
                          ELECTRICAL_RPM_PER_MECHANICAL_MPS));
 
+    int target_dribbler_rpm;
+
+    // Get target dribbler rpm from the primitive
+    if (motor.drive_control_case() ==
+        TbotsProto::MotorControl::DriveControlCase::DRIVE_CONTROL_NOT_SET)
+    {
+        target_dribbler_rpm = 0;
+    }
+    else
+    {
+        target_dribbler_rpm = motor.dribbler_speed_rpm();
+    }
+
     int final_dribbler_rpm = 0;
+
+    // Ramp the dribbler rpm
     // If the dribbler only needs to change by DRIBBLER_ACCELERATION_THRESHOLD_RPM_PER_S,
     // just set the value
     if (std::abs(target_dribbler_rpm - ramp_rpm) <=
@@ -529,8 +566,9 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
         ramp_rpm -= DRIBBLER_ACCELERATION_THRESHOLD_RPM_PER_S;
         final_dribbler_rpm = ramp_rpm;
     }
+
+    // Set the target dribbler rpm
     tmc4671_setTargetVelocity(DRIBBLER_MOTOR_CHIP_SELECT, final_dribbler_rpm);
-    motor_status.mutable_dribbler()->set_dribbler_rpm(float(final_dribbler_rpm));
 
     return motor_status;
 }
