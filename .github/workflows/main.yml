@@ -40,6 +40,7 @@ jobs:
             -- //... -//software:unix_full_system \
             -//software/simulated_tests/...  \
             -//software/ai/hl/...            \
+            -//software/field_tests/...      \
 
   jetson-nano-tests:
     name: Jetson Nano Software Tests
