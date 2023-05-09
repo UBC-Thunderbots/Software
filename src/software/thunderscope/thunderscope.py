@@ -154,7 +154,7 @@ class Thunderscope(object):
             QtGui.QIcon("software/thunderscope/thunderscope-logo.png")
         )
         self.window.setWindowTitle("Thunderscope")
-
+        print("LINE 157 THUNDERSCOPE",flush=True)
         # ProtoUnixIOs
         #
         # NOTE: Simulated tests need to be able to run without Thunderscope
@@ -171,7 +171,7 @@ class Thunderscope(object):
 
         self.blue_full_system_proto_unix_io = None
         self.yellow_full_system_proto_unix_io = None
-
+        print("LINE 174 THUNDERSCOPE",flush=True)
         if load_blue:
             self.blue_full_system_proto_unix_io = (
                 blue_full_system_proto_unix_io or ProtoUnixIO()
@@ -180,7 +180,7 @@ class Thunderscope(object):
             self.yellow_full_system_proto_unix_io = (
                 yellow_full_system_proto_unix_io or ProtoUnixIO()
             )
-
+        print("LINE 183",flush=True)
         # the proto unix io to which diagnostics protos should be sent to
         # if one of the fullsystems is running, uses the same proto
         # if not, initialises a new one
@@ -190,10 +190,10 @@ class Thunderscope(object):
         )
 
         self.simulator_proto_unix_io = simulator_proto_unix_io or ProtoUnixIO()
-
+        print("LINE 193",flush=True)
         # Setup the main window and load the requested tabs
         self.configure_layout(layout_path, load_blue, load_yellow, load_diagnostics)
-
+        print("LINE 196",flush=True)
         # Save and Load Prompts
         #
         # NOTE: As long as Thunderscope has focus, the keyboard shortcuts will
@@ -241,6 +241,7 @@ class Thunderscope(object):
                 ),
             )
         )
+        print("FINISHED TSCOPE construction",flush=True)
 
     def reset_layout(self):
         """Reset the layout to the default layout"""

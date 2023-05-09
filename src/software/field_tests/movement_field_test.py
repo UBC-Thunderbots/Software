@@ -116,6 +116,10 @@ def test_basic_rotation(field_test_runner):
             eventually_validation_sequence_set=[[]],
             test_timeout_s=5
         )
+        # Send a stop tactic after the test finishes
+        stop_tactic = StopTactic()
+        params = AssignedTacticPlayControlParams()
+        params.assigned_tactics[id].stop.CopyFrom(stop_tactic)
 
         # validate by eye
         logger.info(f"robot set to {angle} orientation")

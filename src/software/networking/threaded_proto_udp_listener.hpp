@@ -93,7 +93,6 @@ void ThreadedProtoUdpListener<ReceiveProtoT>::close()
     io_service.stop();
 
     LOG(INFO) << "threaded proto udp listener status: " << io_service.stopped();
-    std::cout << "threaded proto udp listener status: " << io_service.stopped() << std::endl;
 
     // Join the io_service_thread so that we wait for it to exit before destructing the
     // thread object. If we do not wait for the thread to

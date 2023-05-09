@@ -696,7 +696,7 @@ def field_test_runner():
                     simulator_proto_unix_io=simulator_proto_unix_io,
                     blue_full_system_proto_unix_io=blue_full_system_proto_unix_io,
                     yellow_full_system_proto_unix_io=yellow_full_system_proto_unix_io,
-                    # layout_path=args.layout,
+                    #layout_path=args.layout,
                     layout_path=None,
                     visualization_buffer_size=args.visualization_buffer_size,
                     load_blue=True,
@@ -736,7 +736,7 @@ def field_test_runner():
                 )
                 print("Z",flush=True)
                 yield runner
-                rc_blue.robots_connected_to_fullsystem = None
+                # send stop primitive
                 print(
                     f"\n\nTo replay this test for the blue team, go to the `src` folder and run \n./tbots.py run thunderscope --blue_log {blue_logger.log_folder}", flush=True
                 )

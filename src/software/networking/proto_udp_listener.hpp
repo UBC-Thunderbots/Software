@@ -3,7 +3,9 @@
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
 #include <string>
+#include <thread>
 #include <mutex>
+#include <condition_variable>
 
 #include "software/logger/logger.h"
 #include "software/networking/proto_udp_listener.hpp"
@@ -62,6 +64,17 @@ class ProtoUdpListener
                              size_t num_bytes_received);
 
     /**
+     * This function is setup as the callback to handle packets received over the network. If the callback takes longer
+     * than 1s, a warning is logged and the packet is dropped
+     *
+     * @param error The error code obtained when receiving the incoming data
+     * @param num_bytes_received How many bytes of data were received
+     */
+    void receiveData(
+            const boost::system::error_code & error, size_t num_bytes_received);
+
+
+    /**
      * Start listening for data
      */
     void startListen();
@@ -77,10 +90,6 @@ class ProtoUdpListener
     // The function to call on every received packet of ReceiveProtoT data
     std::function<void(ReceiveProtoT&)> receive_callback;
 
-    std::mutex lock;
-
-    //TODO
-    bool keep_listening = true;
 };
 
 template <class ReceiveProtoT>
@@ -162,58 +171,71 @@ template <class ReceiveProtoT>
 void ProtoUdpListener<ReceiveProtoT>::handleDataReception(
     const boost::system::error_code& error, size_t num_bytes_received)
 {
-    if(!lock.try_lock()){
-        return;
+    std::mutex m;
+    std::condition_variable cv;
+
+    std::thread recv_thread([this, &cv, &error, &num_bytes_received]()
+    {
+        receiveData(error, num_bytes_received);
+        cv.notify_one();
+    });
+
+    recv_thread.detach();
+
+    {
+        using namespace std::chrono_literals;
+        std::unique_lock<std::mutex> lock(m);
+        // Sometimes we hang during the receive callback because the callback function is defined in python, and passed
+        // to the pybinded UDP listener. Timeout of 1s is set to avoid infinite hanging during robot communication
+        // teardown. We are unsure why this happens
+        if(cv.wait_for(lock, 1s) == std::cv_status::timeout) {
+            LOG(WARNING)
+                    << "Timed out, starting listen again" <<std::endl;
+            startListen();
+        }
     }
+
+
+}
+
+template <class ReceiveProtoT>
+void ProtoUdpListener<ReceiveProtoT>::receiveData(
+        const boost::system::error_code &error, size_t num_bytes_received)
+{
     if (!error)
     {
         auto packet_data = ReceiveProtoT();
         packet_data.ParseFromArray(raw_received_data_.data(),
                                    static_cast<int>(num_bytes_received));
-        std::cout << "initiating callback" << std::endl;
         receive_callback(packet_data);
-        std::cout << "returned from callback" << std::endl;
-        // Once we've handled the data, start listening again
-        if(keep_listening) {
-            startListen();
-        }
+        startListen();
     }
     else
     {
-        // Start listening again to receive the next data
-        if(keep_listening) {
-            startListen();
-        }
+        startListen();
 
         LOG(WARNING)
-            << "An unknown network error occurred when attempting to receive ReceiveProtoT Data. The boost system error code is "
-            << error << std::endl;
+                << "An unknown network error occurred when attempting to receive ReceiveProtoT Data. The boost system error code is "
+                << error << std::endl;
     }
 
     if (num_bytes_received > MAX_BUFFER_LENGTH)
     {
         LOG(WARNING)
-            << "num_bytes_received > MAX_BUFFER_LENGTH, "
-            << "which means that the receive buffer is full and data loss has potentially occurred. "
-            << "Consider increasing MAX_BUFFER_LENGTH";
+                << "num_bytes_received > MAX_BUFFER_LENGTH, "
+                << "which means that the receive buffer is full and data loss has potentially occurred. "
+                << "Consider increasing MAX_BUFFER_LENGTH";
     }
-    lock.unlock();
 }
 
 template <class ReceiveProtoT>
 ProtoUdpListener<ReceiveProtoT>::~ProtoUdpListener()
 {
-    //lock.lock();
-    //keep_listening = false;
-    //socket_.close();
-    //lock.unlock();
+    socket_.close();
 }
 
 template <class ReceiveProtoT>
 void ProtoUdpListener<ReceiveProtoT>::close()
 {
-    lock.lock();
-    keep_listening = false;
     socket_.close();
-    lock.unlock();
 }

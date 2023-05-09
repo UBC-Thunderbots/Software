@@ -86,7 +86,7 @@ class RobotCommunication(object):
                 self.current_proto_unix_io.send_proto(
                     EstopState, EstopState(is_playing=self.estop_reader.isEstopPlay())
                 )
-            time.sleep(0.1)
+                time.sleep(0.1)
 
     def run_world(self):
         """
@@ -141,7 +141,7 @@ class RobotCommunication(object):
                 primitive_set = self.primitive_buffer.get(
                     block=True, timeout=ROBOT_COMMUNICATIONS_TIMEOUT_S
                 )
-                # If we wait on primitive
+                # If we wait on primitive, there's a chance we've initiated shutdown already so we need to re-guard
                 if not self.robots_connected_to_fullsystem:
                     break
                 fullsystem_primitives = dict(primitive_set.robot_primitives)
@@ -212,19 +212,25 @@ class RobotCommunication(object):
         elif mode == IndividualRobotMode.AI:
             self.robots_connected_to_fullsystem.add(robot_id)
 
+    def __forward_to_proto_unix_io(self,type, data):
+        """
+        Forwards to proto unix IO iff running is true
+        :param data: the data to be passed through
+        :param type: the proto type
+        """
+        if self.running:
+            self.current_proto_unix_io.send_proto(type,data)
+
     def setup_for_fullsystem(self):
         """
         Sets up a world sender, a listener for SSL vision data, and connects all robots to fullsystem as default
         """
-        def __test_func(type, data):
-            if(self.running):
-                self.current_proto_unix_io.send_proto(type,data)
 
         self.receive_ssl_wrapper = SSLWrapperPacketProtoListener(
             SSL_VISION_ADDRESS,
             SSL_VISION_PORT,
             # lambda data: self.current_proto_unix_io.send_proto(SSL_WrapperPacket, data),
-            lambda data: __test_func(SSL_WrapperPacket,data),
+            lambda data: self.__forward_to_proto_unix_io(SSL_WrapperPacket,data),
             True,
         )
 
@@ -244,21 +250,17 @@ class RobotCommunication(object):
 
         """
         # Create the multicast listeners
-        def __forward_to_proto_unix_io__(data, type):
-            if self.running:
-                self.current_proto_unix_io.send_proto(type, data)
-
         self.receive_robot_status = RobotStatusProtoListener(
             self.multicast_channel + "%" + self.interface,
             ROBOT_STATUS_PORT,
-            lambda data: __forward_to_proto_unix_io__(data, RobotStatus),
+            lambda data: self.__forward_to_proto_unix_io(RobotStatus,data),
             True,
         )
 
         self.receive_robot_log = RobotLogProtoListener(
             self.multicast_channel + "%" + self.interface,
             ROBOT_LOGS_PORT,
-            lambda data: __forward_to_proto_unix_io__(data, RobotLog),
+            lambda data: self.__forward_to_proto_unix_io(RobotLog,data),
             True,
         )
 
@@ -282,14 +284,7 @@ class RobotCommunication(object):
         """
         self.running = False
         self.receive_ssl_wrapper.close()
-        del self.receive_robot_log
-        del self.receive_robot_status
-        self.current_proto_unix_io.force_close()
-        self.current_proto_unix_io = None
-        if self.run_world_thread.is_alive():
-            print("will join run thread",flush=True)
-            self.run_world_thread.join()
-            print("run_thread_joined",flush=True)
-
+        self.receive_robot_log.close()
+        self.receive_robot_status.close()
+        self.run_world_thread.join()
         self.run_primitive_set_thread.join()
-        print("primitive thread joined", flush=True)
