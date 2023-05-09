@@ -6,6 +6,7 @@ from typing import List
 from proto.import_all_protos import *
 import software.thunderscope.common.common_widgets as common_widgets
 from software.thunderscope.constants import *
+from threading import Lock
 
 
 class RobotInfo(QWidget):
@@ -40,6 +41,16 @@ class RobotInfo(QWidget):
         # which prevents spamming the same battery warning
         # set back to False if battery is back above warning level
         self.battery_warning_disabled = False
+
+        # True means the robot is receiving constant RobotStatus messages
+        # False means that the robot has received no RobotStatus for at least 1 tick
+        # used to grey out display when robot disconnects
+        self.is_connected = False
+
+        # True means the timer to grey oyt the UI has been triggered
+        # to prevent too many timers and UI flashing
+        self.to_be_disconnected = False
+        self.connected_lock = Lock()
 
         self.layout = QHBoxLayout()
 
@@ -81,9 +92,16 @@ class RobotInfo(QWidget):
         self.status_layout.addLayout(self.control_mode_layout)
 
         # Vision Pattern
-        self.layout.addWidget(
-            self.create_vision_pattern_label(Colors.ROBOT_MIDDLE_BLUE, ROBOT_RADIUS)
+        self.color_vision_pattern = self.create_vision_pattern_label(
+            Colors.ROBOT_MIDDLE_BLUE, ROBOT_RADIUS, True
         )
+        self.bw_vision_pattern = self.create_vision_pattern_label(
+            Colors.BW_ROBOT_MIDDLE_BLUE, ROBOT_RADIUS, False
+        )
+
+        self.vision_pattern_label = QLabel()
+        self.disconnect_robot()
+        self.layout.addWidget(self.vision_pattern_label)
 
         self.layout.addLayout(self.status_layout)
 
@@ -132,12 +150,13 @@ class RobotInfo(QWidget):
 
         return control_mode_menu
 
-    def create_vision_pattern_label(self, team_colour, radius):
+    def create_vision_pattern_label(self, team_colour, radius, connected):
         """Given a robot id, team color and radius, draw the vision
         pattern on a label and return it.
 
         :param team_colour: The team colour
         :param radius: The radius of the robot
+        :param connected: True if vision pattern should have color, False if black and white
 
         """
         pixmap = QtGui.QPixmap(radius * 2, radius * 2)
@@ -163,9 +182,6 @@ class RobotInfo(QWidget):
 
         # Grab the colors for the vision pattern and setup the locations
         # for the four circles in the four corners
-        top_right, top_left, bottom_left, bottom_right = Colors.VISION_PATTERN_LOOKUP[
-            self.robot_id
-        ]
         top_circle_locations = [
             QtCore.QPointF(radius + radius / 2 + 5, radius - radius / 2),
             QtCore.QPointF(radius - radius / 2 - 5, radius - radius / 2),
@@ -174,19 +190,68 @@ class RobotInfo(QWidget):
         ]
 
         for color, location in zip(
-            Colors.VISION_PATTERN_LOOKUP[self.robot_id], top_circle_locations
+            (
+                Colors.VISION_PATTERN_LOOKUP
+                if connected
+                else Colors.BW_VISION_PATTERN_LOOKUP
+            )[self.robot_id],
+            top_circle_locations,
         ):
             painter.setBrush(pg.mkBrush(color))
             painter.drawEllipse(location, radius / 5, radius / 5)
 
         painter.end()
 
-        label = QLabel()
-        label.setPixmap(pixmap)
-
-        return label
+        return pixmap
 
     def update(self, power_status, error_codes):
+        """
+        Receives parts of a RobotStatus message
+
+        Sets the robot UI as connected and updates the UI
+        Then sets the robot to disconnected with a timer callback to update the UI
+        :param power_status: The power status message for this robot
+        :param error_codes: The error codes of this robot
+        """
+        self.reconnect_robot()
+
+        self.update_ui(power_status, error_codes)
+
+        self.mark_to_be_disconnected()
+
+    def mark_to_be_disconnected(self):
+        """
+        Sets the boolean flag to disconnected
+        and calls a timer with a callback to grey out the UI in DISCONNECT_DURATION_MS
+        """
+        self.is_connected = False
+        if not self.to_be_disconnected:
+            QtCore.QTimer.singleShot(DISCONNECT_DURATION_MS, self.disconnect_robot)
+            self.to_be_disconnected = True
+
+    def disconnect_robot(self):
+        """
+        If robot is disconnected, attempts to get the lock
+        Once locked, if robot is still disconnected, greys out the robot UI
+        """
+        if not self.is_connected:
+            self.connected_lock.acquire()
+            if not self.is_connected:
+                self.vision_pattern_label.setPixmap(self.bw_vision_pattern)
+                self.to_be_disconnected = False
+            self.connected_lock.release()
+
+    def reconnect_robot(self):
+        """
+        Attempts to get the lock
+        Once locked, resets boolean flag and sets robot UI to the color version
+        """
+        self.is_connected = True
+        self.connected_lock.acquire()
+        self.vision_pattern_label.setPixmap(self.color_vision_pattern)
+        self.connected_lock.release()
+
+    def update_ui(self, power_status, error_codes):
         """
         Receives important sections of RobotStatus proto for this robot and updates widget with alerts
         Checks for

@@ -34,6 +34,51 @@ ERROR_CODE_MESSAGES = {
 }
 
 
+def create_vision_pattern_lookup(color1, color2):
+    """
+    There is no pattern to this so we just have to create
+    mapping from robot id to the four corners of the vision pattern
+
+    robot-id: top-right, top-left, bottom-left, bottom-right
+
+    https://robocup-ssl.github.io/ssl-rules/sslrules.html
+
+    :param color1: first ID color
+    :param color2: second ID color
+    :return: the vision pattern lookup made up of the given colors
+    """
+    return {
+        0: [color1, color1, color2, color1],
+        1: [color1, color2, color2, color1],
+        2: [color2, color2, color2, color1],
+        3: [color2, color1, color2, color1],
+        4: [color1, color1, color1, color2],
+        5: [color1, color2, color1, color2],
+        6: [color2, color2, color1, color2],
+        7: [color2, color1, color1, color2],
+        8: [color2, color2, color2, color2],
+        9: [color1, color1, color1, color1],
+        10: [color1, color1, color2, color2],
+        11: [color2, color2, color1, color1],
+        12: [color1, color2, color2, color2],
+        13: [color1, color2, color1, color1],
+        14: [color2, color1, color2, color2],
+        15: [color2, color1, color1, color1],
+    }
+
+
+def rgb_to_bw(r, g, b):
+    """
+    Converts the given RGB color values into the corresponding black and white RGB values
+    :param r: red value
+    :param g: green value
+    :param b: blue value
+    :return: RGB tuple of the given color in black and white
+    """
+    rgb_val = 0.3 * r + 0.59 * g + 0.11 * b
+    return rgb_val, rgb_val, rgb_val
+
+
 class Colors(object):
 
     FIELD_COLOR = "w"
@@ -49,6 +94,7 @@ class Colors(object):
     SPEED_VECTOR_COLOR = QtGui.QColor(255, 0, 255, 100)
 
     ROBOT_MIDDLE_BLUE = "blue"
+    BW_ROBOT_MIDDLE_BLUE = QtGui.QColor(*rgb_to_bw(0, 0, 255))
     ROBOT_SPEED_SLOW_COLOR = "black"
     NAVIGATOR_PATH_COLOR = "green"
     NAVIGATOR_OBSTACLE_COLOR = "orange"
@@ -60,27 +106,12 @@ class Colors(object):
     PINK = QtGui.QColor(255, 0, 255)
     GREEN = QtGui.QColor(0, 255, 0)
 
-    # There is no pattern to this so we just have to create
-    # mapping from robot id to the four corners of the vision pattern
-    #
-    # robot-id: top-right, top-left, bottom-left, bottom-right
-    #
-    # https://robocup-ssl.github.io/ssl-rules/sslrules.html
-    VISION_PATTERN_LOOKUP = {
-        0: [PINK, PINK, GREEN, PINK],
-        1: [PINK, GREEN, GREEN, PINK],
-        2: [GREEN, GREEN, GREEN, PINK],
-        3: [GREEN, PINK, GREEN, PINK],
-        4: [PINK, PINK, PINK, GREEN],
-        5: [PINK, GREEN, PINK, GREEN],
-        6: [GREEN, GREEN, PINK, GREEN],
-        7: [GREEN, PINK, PINK, GREEN],
-        8: [GREEN, GREEN, GREEN, GREEN],
-        9: [PINK, PINK, PINK, PINK],
-        10: [PINK, PINK, GREEN, GREEN],
-        11: [GREEN, GREEN, PINK, PINK],
-        12: [PINK, GREEN, GREEN, GREEN],
-        13: [PINK, GREEN, PINK, PINK],
-        14: [GREEN, PINK, GREEN, GREEN],
-        15: [GREEN, PINK, PINK, PINK],
-    }
+    # Creates a default vision pattern lookup with the actual colors used on the robots
+    VISION_PATTERN_LOOKUP = create_vision_pattern_lookup(PINK, GREEN)
+
+    # Colors for black and white vision pattern
+    BW_PINK = QtGui.QColor(*rgb_to_bw(255, 0, 255))
+    BW_GREEN = QtGui.QColor(*rgb_to_bw(0, 255, 0))
+
+    # Creates a black and white vision pattern to indicate a disconnected robot
+    BW_VISION_PATTERN_LOOKUP = create_vision_pattern_lookup(BW_PINK, BW_GREEN)
