@@ -40,8 +40,7 @@ class TbotsTestRunner(object):
         self.gamecontroller = gamecontroller
         self.world_buffer = ThreadSafeBuffer(buffer_size=20, protobuf_type=World)
         self.primitive_set_buffer = ThreadSafeBuffer(
-            buffer_size=1,
-            protobuf_type=PrimitiveSet
+            buffer_size=1, protobuf_type=PrimitiveSet
         )
         self.last_exception = None
 

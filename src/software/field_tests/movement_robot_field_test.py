@@ -5,12 +5,12 @@ import sys
 from proto.ssl_gc_common_pb2 import Team
 from proto.import_all_protos import *
 from software.field_tests.field_test_fixture import *
+
 # from software.simulated_tests.tbots_test_fixture import *
 from software.simulated_tests.simulated_test_fixture import *
 from software.logger.logger import createLogger
 from software.simulated_tests.robot_enters_region import RobotEventuallyEntersRegion
 from proto.message_translation.tbots_protobuf import create_world_state
-import pdb
 
 logger = createLogger(__name__)
 
@@ -76,6 +76,7 @@ logger = createLogger(__name__)
 
 # this test can only be run on the field
 
+
 def test_basic_rotation(field_test_runner):
     # pdb.set_trace()
     # test_angles = [0, 45, 90, 180, 270, 0]
@@ -83,9 +84,7 @@ def test_basic_rotation(field_test_runner):
     id = 6
 
     # current position
-    world = field_test_runner.world_buffer.get(
-        block=True, timeout=WORLD_BUFFER_TIMEOUT
-    )
+    world = field_test_runner.world_buffer.get(block=True, timeout=WORLD_BUFFER_TIMEOUT)
     robot = [robot for robot in world.friendly_team.team_robots if robot.id == id][0]
 
     rob_pos_p = robot.current_state.global_position
@@ -110,11 +109,11 @@ def test_basic_rotation(field_test_runner):
         params.assigned_tactics[id].move.CopyFrom(move_tactic)
 
         field_test_runner.set_tactics(params, True)
-        print("getting to run_test",flush=True)
+        print("getting to run_test", flush=True)
         field_test_runner.run_test(
             always_validation_sequence_set=[[]],
             eventually_validation_sequence_set=[[]],
-            test_timeout_s=5
+            test_timeout_s=5,
         )
         # Send a stop tactic after the test finishes
         stop_tactic = StopTactic()

@@ -69,7 +69,9 @@ class RobotCommunication(object):
 
         self.send_estop_state_thread = threading.Thread(target=self.__send_estop_state)
         self.run_world_thread = threading.Thread(target=self.run_world, daemon=True)
-        self.run_primitive_set_thread = threading.Thread(target=self.run_primitive_set, daemon=True)
+        self.run_primitive_set_thread = threading.Thread(
+            target=self.run_primitive_set, daemon=True
+        )
 
         # only checks for estop if checking is not disabled
         if not self.disable_estop:
@@ -97,7 +99,11 @@ class RobotCommunication(object):
         while self.running:
             world = None
             try:
-                world = self.world_buffer.get(block=True, timeout=ROBOT_COMMUNICATIONS_TIMEOUT_S, return_cached=False)
+                world = self.world_buffer.get(
+                    block=True,
+                    timeout=ROBOT_COMMUNICATIONS_TIMEOUT_S,
+                    return_cached=False,
+                )
             except Empty:
                 # if empty do nothing
                 pass
@@ -212,14 +218,14 @@ class RobotCommunication(object):
         elif mode == IndividualRobotMode.AI:
             self.robots_connected_to_fullsystem.add(robot_id)
 
-    def __forward_to_proto_unix_io(self,type, data):
+    def __forward_to_proto_unix_io(self, type, data):
         """
         Forwards to proto unix IO iff running is true
         :param data: the data to be passed through
         :param type: the proto type
         """
         if self.running:
-            self.current_proto_unix_io.send_proto(type,data)
+            self.current_proto_unix_io.send_proto(type, data)
 
     def setup_for_fullsystem(self):
         """
@@ -230,7 +236,7 @@ class RobotCommunication(object):
             SSL_VISION_ADDRESS,
             SSL_VISION_PORT,
             # lambda data: self.current_proto_unix_io.send_proto(SSL_WrapperPacket, data),
-            lambda data: self.__forward_to_proto_unix_io(SSL_WrapperPacket,data),
+            lambda data: self.__forward_to_proto_unix_io(SSL_WrapperPacket, data),
             True,
         )
 
@@ -253,14 +259,14 @@ class RobotCommunication(object):
         self.receive_robot_status = RobotStatusProtoListener(
             self.multicast_channel + "%" + self.interface,
             ROBOT_STATUS_PORT,
-            lambda data: self.__forward_to_proto_unix_io(RobotStatus,data),
+            lambda data: self.__forward_to_proto_unix_io(RobotStatus, data),
             True,
         )
 
         self.receive_robot_log = RobotLogProtoListener(
             self.multicast_channel + "%" + self.interface,
             ROBOT_LOGS_PORT,
-            lambda data: self.__forward_to_proto_unix_io(RobotLog,data),
+            lambda data: self.__forward_to_proto_unix_io(RobotLog, data),
             True,
         )
 
@@ -276,7 +282,7 @@ class RobotCommunication(object):
 
         return self
 
-    def __exit__(self,type,value,traceback):
+    def __exit__(self, type, value, traceback):
         """Exit RobotCommunication context manager
 
         Ends all currently running loops and joins all currently active threads

@@ -153,9 +153,7 @@ class SimulatedTestRunner(TbotsTestRunner):
                 ssl_wrapper = self.ssl_wrapper_buffer.get(block=False)
                 self.timestamp = ssl_wrapper.detection.t_capture
 
-            tick = SimulatorTick(
-                milliseconds=tick_duration_s * MILLISECONDS_PER_SECOND
-            )
+            tick = SimulatorTick(milliseconds=tick_duration_s * MILLISECONDS_PER_SECOND)
             self.simulator_proto_unix_io.send_proto(SimulatorTick, tick)
             time_elapsed_s += tick_duration_s
 

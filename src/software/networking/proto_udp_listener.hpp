@@ -2,10 +2,10 @@
 
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
+#include <condition_variable>
+#include <mutex>
 #include <string>
 #include <thread>
-#include <mutex>
-#include <condition_variable>
 
 #include "software/logger/logger.h"
 #include "software/networking/proto_udp_listener.hpp"
@@ -64,14 +64,13 @@ class ProtoUdpListener
                              size_t num_bytes_received);
 
     /**
-     * This function is setup as the callback to handle packets received over the network. If the callback takes longer
-     * than 1s, a warning is logged and the packet is dropped
+     * This function is setup as the callback to handle packets received over the network.
+     * If the callback takes longer than 1s, a warning is logged and the packet is dropped
      *
      * @param error The error code obtained when receiving the incoming data
      * @param num_bytes_received How many bytes of data were received
      */
-    void receiveData(
-            const boost::system::error_code & error, size_t num_bytes_received);
+    void receiveData(const boost::system::error_code& error, size_t num_bytes_received);
 
 
     /**
@@ -89,7 +88,6 @@ class ProtoUdpListener
 
     // The function to call on every received packet of ReceiveProtoT data
     std::function<void(ReceiveProtoT&)> receive_callback;
-
 };
 
 template <class ReceiveProtoT>
@@ -100,7 +98,7 @@ ProtoUdpListener<ReceiveProtoT>::ProtoUdpListener(
     : socket_(io_service), receive_callback(receive_callback)
 {
     boost::asio::ip::udp::endpoint listen_endpoint(
-    boost::asio::ip::make_address(ip_address), port);
+        boost::asio::ip::make_address(ip_address), port);
     socket_.open(listen_endpoint.protocol());
     socket_.set_option(boost::asio::socket_base::reuse_address(true));
     try
@@ -174,8 +172,7 @@ void ProtoUdpListener<ReceiveProtoT>::handleDataReception(
     std::mutex m;
     std::condition_variable cv;
 
-    std::thread recv_thread([this, &cv, &error, &num_bytes_received]()
-    {
+    std::thread recv_thread([this, &cv, &error, &num_bytes_received]() {
         receiveData(error, num_bytes_received);
         cv.notify_one();
     });
@@ -185,22 +182,21 @@ void ProtoUdpListener<ReceiveProtoT>::handleDataReception(
     {
         using namespace std::chrono_literals;
         std::unique_lock<std::mutex> lock(m);
-        // Sometimes we hang during the receive callback because the callback function is defined in python, and passed
-        // to the pybinded UDP listener. Timeout of 1s is set to avoid infinite hanging during robot communication
-        // teardown. We are unsure why this happens
-        if(cv.wait_for(lock, 1s) == std::cv_status::timeout) {
-            LOG(WARNING)
-                    << "Timed out, starting listen again" <<std::endl;
+        // Sometimes we hang during the receive callback because the callback function is
+        // defined in python, and passed to the pybinded UDP listener. Timeout of 1s is
+        // set to avoid infinite hanging during robot communication teardown. We are
+        // unsure why this happens
+        if (cv.wait_for(lock, 1s) == std::cv_status::timeout)
+        {
+            LOG(WARNING) << "Timed out, starting listen again" << std::endl;
             startListen();
         }
     }
-
-
 }
 
 template <class ReceiveProtoT>
-void ProtoUdpListener<ReceiveProtoT>::receiveData(
-        const boost::system::error_code &error, size_t num_bytes_received)
+void ProtoUdpListener<ReceiveProtoT>::receiveData(const boost::system::error_code& error,
+                                                  size_t num_bytes_received)
 {
     if (!error)
     {
@@ -215,16 +211,16 @@ void ProtoUdpListener<ReceiveProtoT>::receiveData(
         startListen();
 
         LOG(WARNING)
-                << "An unknown network error occurred when attempting to receive ReceiveProtoT Data. The boost system error code is "
-                << error << std::endl;
+            << "An unknown network error occurred when attempting to receive ReceiveProtoT Data. The boost system error code is "
+            << error << std::endl;
     }
 
     if (num_bytes_received > MAX_BUFFER_LENGTH)
     {
         LOG(WARNING)
-                << "num_bytes_received > MAX_BUFFER_LENGTH, "
-                << "which means that the receive buffer is full and data loss has potentially occurred. "
-                << "Consider increasing MAX_BUFFER_LENGTH";
+            << "num_bytes_received > MAX_BUFFER_LENGTH, "
+            << "which means that the receive buffer is full and data loss has potentially occurred. "
+            << "Consider increasing MAX_BUFFER_LENGTH";
     }
 }
 

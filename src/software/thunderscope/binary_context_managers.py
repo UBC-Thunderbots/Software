@@ -151,7 +151,6 @@ gdb --args bazel-bin/{full_system}
         if self.should_restart_on_crash:
             self.thread.join()
 
-
     def setup_proto_unix_io(self, proto_unix_io):
         """Helper to run full system and attach the appropriate unix senders/listeners
 
