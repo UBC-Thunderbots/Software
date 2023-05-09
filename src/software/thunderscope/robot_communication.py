@@ -235,7 +235,6 @@ class RobotCommunication(object):
         self.receive_ssl_wrapper = SSLWrapperPacketProtoListener(
             SSL_VISION_ADDRESS,
             SSL_VISION_PORT,
-            # lambda data: self.current_proto_unix_io.send_proto(SSL_WrapperPacket, data),
             lambda data: self.__forward_to_proto_unix_io(SSL_WrapperPacket, data),
             True,
         )

@@ -204,10 +204,12 @@ void ProtoUdpListener<ReceiveProtoT>::receiveData(const boost::system::error_cod
         packet_data.ParseFromArray(raw_received_data_.data(),
                                    static_cast<int>(num_bytes_received));
         receive_callback(packet_data);
+        // Once we've handled the data, start listening again
         startListen();
     }
     else
     {
+        // Start listening again to receive the next data
         startListen();
 
         LOG(WARNING)

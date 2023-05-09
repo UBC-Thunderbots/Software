@@ -32,7 +32,6 @@ from software.simulated_tests.tbots_test_runner import TbotsTestRunner
 from software.thunderscope.robot_communication import RobotCommunication
 from software.py_constants import *
 from software.simulated_tests.ball_stops_in_region import BallEventuallyStopsInRegion
-import faulthandler
 
 logger = createLogger(__name__)
 
@@ -72,16 +71,12 @@ class FieldTestRunner(TbotsTestRunner):
             yellow_full_system_proto_unix_io,
             gamecontroller,
         )
-        # pdb.set_trace()
-        print("A", flush=True)
         self.publish_validation_protos = publish_validation_protos
 
         logger.info("determining robots on field")
         # survey field for available robot ids
         try:
-            # print("field_test_fixture.py line 83: world_buffer.get",flush=True)
             world = self.world_buffer.get(block=True, timeout=WORLD_BUFFER_TIMEOUT)
-            logger.info(world)
             self.initial_world = world
             self.friendly_robot_ids_field = [
                 robot.id for robot in world.friendly_team.team_robots
@@ -97,7 +92,6 @@ class FieldTestRunner(TbotsTestRunner):
                 raise Exception("no friendly robots found on field")
 
         except queue.Empty as empty:
-            print("empty", flush=True)
             raise Exception("unable to determine robots on the field")
 
     def send_gamecontroller_command(
@@ -133,7 +127,6 @@ class FieldTestRunner(TbotsTestRunner):
         while time.time() < timeout_time:
             try:
 
-                # print("field_test_fixture.py line 137: world_buffer.get",flush=True)
                 current_world = self.world_buffer.get(
                     block=True, timeout=WORLD_BUFFER_TIMEOUT
                 )
@@ -326,35 +319,11 @@ class FieldTestRunner(TbotsTestRunner):
         :param test_timeout_s: The timeout for the test, if any eventually_validations
                                 remain after the timeout, the test fails.
         """
-        print("\n\n\nIN RUN_TEST\n\n\n", flush=True)
-        if self.thunderscope:
-            print("We have Thunderscope", flush=True)
-        else:
-            print("We do not have Thunderscope", flush=True)
 
         def stop_test(delay):
-            print("stop_test", flush=True)
             time.sleep(delay)
             if self.thunderscope:
                 self.thunderscope.close()
-            print("test is over", flush=True)
-
-        # class Excepthook(object):
-        #     def __init__(self):
-        #         self.last_exception = None
-        #
-        #     def excepthook(self, args):
-        #         """This function is _critical_ for show_thunderscope to work.
-        #     If the test Thread raises an exception we won't be able to close
-        #     the window from the main thread.
-        #
-        #     :param args: The args passed in from the hook
-        #
-        #     """
-        #         stop_test(PAUSE_AFTER_FAIL_DELAY_S)
-        #         self.last_exception = args.exc_value
-        #         print(args.exc_value,flush=True)
-        #         raise self.last_exception
 
         def __runner():
             time.sleep(LAUNCH_DELAY_S)
@@ -365,13 +334,11 @@ class FieldTestRunner(TbotsTestRunner):
                 # Update the timestamp logged by the ProtoLogger
                 with self.timestamp_mutex:
 
-                    # print("field_test_fixture.py line 369: ssl_wrapper_buffer.get",flush=True)
                     ssl_wrapper = self.ssl_wrapper_buffer.get(block=False)
                     self.timestamp = ssl_wrapper.detection.t_capture
 
                 while True:
                     try:
-                        # print("field_test_fixture.py line 369: world_buffer.get",flush=True)
                         world = self.world_buffer.get(
                             block=True, timeout=WORLD_BUFFER_TIMEOUT
                         )
@@ -431,11 +398,9 @@ class FieldTestRunner(TbotsTestRunner):
             run_sim_thread = threading.Thread(target=__runner, daemon=True)
             run_sim_thread.start()
             self.thunderscope.show()
-            print("Showing TSCOPE", flush=True)
             run_sim_thread.join()
 
             if self.last_exception:
-                print("exception raised if thunderscope", flush=True)
                 pytest.fail(str(ex.last_exception))
 
         else:
@@ -548,7 +513,6 @@ def load_command_line_arguments():
 
 @pytest.fixture
 def field_test_runner():
-    faulthandler.enable()
     simulator_proto_unix_io = ProtoUnixIO()
     yellow_full_system_proto_unix_io = ProtoUnixIO()
     blue_full_system_proto_unix_io = ProtoUnixIO()
@@ -642,21 +606,3 @@ def field_test_runner():
                     flush=True,
                 )
     print("exiting field test runner fixture", flush=True)
-    # initializer = field_test_initializer(
-    #     simulator_proto_unix_io=simulator_proto_unix_io,
-    #     blue_full_system_proto_unix_io=blue_full_system_proto_unix_io,
-    #     yellow_full_system_proto_unix_io=yellow_full_system_proto_unix_io,
-    # )
-
-    # print("running first next in runner",flush=True)
-    # yield_val = next(initializer)
-    # yield yield_val
-    # print("after yield in runner",flush=True)
-    # test teardown
-    # try:
-    #     print("running second next in runner",flush=True)
-    #     next(initializer)
-    # except StopIteration as e:
-    #     # raise e
-    #     pass
-    # yield

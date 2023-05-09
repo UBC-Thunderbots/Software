@@ -109,7 +109,6 @@ def test_basic_rotation(field_test_runner):
         params.assigned_tactics[id].move.CopyFrom(move_tactic)
 
         field_test_runner.set_tactics(params, True)
-        print("getting to run_test", flush=True)
         field_test_runner.run_test(
             always_validation_sequence_set=[[]],
             eventually_validation_sequence_set=[[]],
