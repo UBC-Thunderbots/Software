@@ -74,7 +74,7 @@ class RobotViewComponent(QWidget):
         :param robot_status: the new message data to update the widget with
         """
         self.robot_info.update(robot_status.power_status, robot_status.error_code)
-        if self.robot_status is not None:
+        if self.robot_status:
             self.robot_status.update(robot_status)
 
 
@@ -128,5 +128,5 @@ class RobotView(QScrollArea):
         """
         robot_status = self.robot_status_buffer.get(block=False, return_cached=False)
 
-        if robot_status:
+        if robot_status is not None:
             self.robot_view_widgets[robot_status.robot_id].update(robot_status)
