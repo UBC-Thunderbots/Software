@@ -139,7 +139,7 @@ static const unsigned char ESTOP_PLAY_MSG = 0;
 static const unsigned char ESTOP_STOP_MSG = 1;
 
 // Number of times to send a STOP primitive when robot is disconnected from Manual Control
-static const unsigned int NUM_TIMES_SEND_STOP = 9;
+static const unsigned int NUM_TIMES_SEND_STOP = 10;
 // How long a robot should receive no RobotStatus messages for until it is considered
 // disconnected
 static const double DISCONNECT_DURATION_MS = 1 * MILLISECONDS_PER_SECOND;
