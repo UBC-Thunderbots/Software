@@ -70,7 +70,7 @@ class NumberOfRobotsEntersRegion(Validation):
         """
         # Update the map with latest robot status
         for robot in world.friendly_team.team_robots:
-            self.robot_in_zone[robot.robot_id] = tbots.contains(
+            self.robot_in_zone[robot.id] = tbots.contains(
                 self.region, tbots.createPoint(robot.current_state.global_position)
             )
         # Check if there are at least req_robot_cnt number of robots in zone

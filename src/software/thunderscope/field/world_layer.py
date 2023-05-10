@@ -365,23 +365,23 @@ class WorldLayer(FieldLayer):
         for robot in team.team_robots:
 
             # Draw robot ID
-            if robot.robot_id not in robot_id_map:
+            if robot.id not in robot_id_map:
                 robot_id_font = painter.font()
                 robot_id_font.setPointSize(int(ROBOT_MAX_RADIUS_MILLIMETERS / 4))
 
                 # setting a black background to keep ID visible over yellow robot
-                robot_id_text = pg.TextItem(str(robot.robot_id), fill=(0, 0, 0, 0))
+                robot_id_text = pg.TextItem(str(robot.id), fill=(0, 0, 0, 0))
                 robot_id_text.setFont(robot_id_font)
-                robot_id_map[robot.robot_id] = robot_id_text
+                robot_id_map[robot.id] = robot_id_text
                 robot_id_text.setParentItem(self)
 
-            robot_id_map[robot.robot_id].setPos(
+            robot_id_map[robot.id].setPos(
                 (robot.current_state.global_position.x_meters * MILLIMETERS_PER_METER)
                 - ROBOT_MAX_RADIUS_MILLIMETERS,
                 (robot.current_state.global_position.y_meters * MILLIMETERS_PER_METER)
                 - ROBOT_MAX_RADIUS_MILLIMETERS,
             )
-            robot_id_map[robot.robot_id].setVisible(self.display_robot_id)
+            robot_id_map[robot.id].setVisible(self.display_robot_id)
 
             # Draw robot
             painter.setPen(pg.mkPen(color))
@@ -450,7 +450,7 @@ class WorldLayer(FieldLayer):
         for robot in self.cached_world.friendly_team.team_robots:
             if (
                 self.cached_status.power_status.breakbeam_tripped is True
-                and robot.robot_id == self.cached_status.robot_id
+                and robot.id == self.cached_status.robot_id
             ):
                 painter.drawEllipse(
                     self.createCircle(

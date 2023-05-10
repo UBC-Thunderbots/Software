@@ -73,9 +73,8 @@ class RobotViewComponent(QWidget):
 
         :param robot_status: the new message data to update the widget with
         """
-        print(robot_status)
         self.robot_info.update(robot_status.power_status, robot_status.error_code)
-        if self.robot_status:
+        if self.robot_status is not None:
             self.robot_status.update(robot_status)
 
 
