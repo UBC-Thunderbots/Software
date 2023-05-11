@@ -202,16 +202,16 @@ class RobotCommunication(object):
         """
         Sets up a world sender, a listener for SSL vision data, and connects all robots to fullsystem as default
         """
-        # self.receive_ssl_wrapper = SSLWrapperPacketProtoListener(
-        #     SSL_VISION_ADDRESS,
-        #     SSL_VISION_PORT,
-        #     lambda data: self.current_proto_unix_io.send_proto(SSL_WrapperPacket, data),
-        #     True,
-        # )
-        #
-        # self.send_world = WorldProtoSender(
-        #     self.multicast_channel + "%" + self.interface, VISION_PORT, True
-        # )
+        self.receive_ssl_wrapper = SSLWrapperPacketProtoListener(
+            SSL_VISION_ADDRESS,
+            SSL_VISION_PORT,
+            lambda data: self.current_proto_unix_io.send_proto(SSL_WrapperPacket, data),
+            True,
+        )
+
+        self.send_world = WorldProtoSender(
+            self.multicast_channel + "%" + self.interface, VISION_PORT, True
+        )
 
         self.robots_connected_to_fullsystem = {
             robot_id for robot_id in range(MAX_ROBOT_IDS_PER_SIDE)
