@@ -68,8 +68,10 @@ class RobotCommunication(object):
         self.run_world_thread = threading.Thread(target=self.run_world)
         self.run_primitive_set_thread = threading.Thread(target=self.run_primitive_set)
 
+        # initialising the estop
+        # tries to access a plugged in estop. if not found, defaults to keyboard estop
         self.estop_reader = None
-        self.is_estopped = False
+        self.estop_is_playing = False
 
         try:
             self.estop_reader = ThreadedEstopReader(
@@ -79,20 +81,40 @@ class RobotCommunication(object):
             print("Could not find estop, using Keyboard Estop (Spacebar) instead")
 
     def __send_estop_state(self):
+        """
+        Constant loop which sends the current estop status proto
+        Uses the keyboard estop value
+        Unless estop is plugged in, in which case the physical estop value overrides it
+        """
         while True:
             if self.estop_reader:
-                self.is_estopped = self.estop_reader.isEstopPlay()
+                self.estop_is_playing = self.estop_reader.isEstopPlay()
 
             self.current_proto_unix_io.send_proto(
-                EstopState, EstopState(is_playing=self.is_estopped)
+                EstopState, EstopState(is_playing=self.estop_is_playing)
             )
             time.sleep(0.1)
 
     def toggle_keyboard_estop(self):
+        """
+        If an estop is not plugged in, toggles the keyboard estop state
+        And send a message to the console
+        """
         if not self.estop_reader:
-            self.is_estopped = not self.is_estopped
+            self.estop_is_playing = not self.estop_is_playing
 
-            print("Keyboard Estop " + ("Enabled" if self.is_estopped else "Disabled"))
+            print(
+                "Keyboard Estop " + ("Enabled" if self.estop_is_playing else "Disabled")
+            )
+
+    def should_send_primitive(self):
+        """
+        Returns True if the proto sending threads should send a proto
+        :return: boolean
+        """
+        return self.estop_is_playing and (
+            self.robots_connected_to_fullsystem or self.robots_connected_to_manual
+        )
 
     def run_world(self):
         """
@@ -102,14 +124,7 @@ class RobotCommunication(object):
         """
         while self.running:
             world = self.world_buffer.get(block=True, return_cached=False)
-            if (
-                not self.disable_estop
-                and self.estop_reader.isEstopPlay()
-                and (
-                    self.robots_connected_to_fullsystem
-                    or self.robots_connected_to_manual
-                )
-            ):
+            if self.should_send_primitive():
                 # send the world proto
                 self.send_world.send_proto(world)
 
@@ -173,9 +188,7 @@ class RobotCommunication(object):
 
             self.sequence_number += 1
 
-            if not self.is_estopped and (
-                self.robots_connected_to_fullsystem or self.robots_connected_to_manual
-            ):
+            if self.should_send_primitive():
                 self.send_primitive_set.send_proto(primitive_set)
 
             # sleep if not running fullsystem
