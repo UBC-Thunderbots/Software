@@ -16,7 +16,7 @@ std::vector<DefenderAssignment> getAllDefenderAssignments(
     // We define being near our side as being within 3/4 of the field length
     // from our goal line (max_x_coordinate).
     // The primary threat is the only exception to this rule.
-    std::vector<EnemyThreat> relevant_threats {threats.front()};
+    std::vector<EnemyThreat> relevant_threats{threats.front()};
     double max_x_coordinate = field.xLength() / 4;
     for (unsigned int i = 1; i < threats.size(); i++)
     {
@@ -55,16 +55,16 @@ std::vector<DefenderAssignment> getAllDefenderAssignments(
         threat_position.setY(std::clamp(threat_position.y(), field.fieldLines().yMin(),
                                         field.fieldLines().yMax()));
 
-        auto lane = Segment(threat_position, field.friendlyGoalCenter());
-        double threat_rating =
-            (static_cast<double>(relevant_threats.size()) - i) * GOAL_LANE_THREAT_MULTIPLIER;
+        auto lane            = Segment(threat_position, field.friendlyGoalCenter());
+        double threat_rating = (static_cast<double>(relevant_threats.size()) - i) *
+                               GOAL_LANE_THREAT_MULTIPLIER;
         auto angle_to_goal = lane.toVector().orientation();
         goal_lanes.emplace_back(GoalLane{{lane, threat_rating}, angle_to_goal});
     }
 
     auto grouped_goal_lanes = groupGoalLanesByDensity(goal_lanes);
 
-    // Determine crease defender assignments.
+    // Determine crease defender assignments based on goal lanes
     for (const auto &goal_lanes_group : grouped_goal_lanes)
     {
         // We include a non-dense bonus when rating crease defender assignment
@@ -159,7 +159,7 @@ std::vector<std::vector<GoalLane>> groupGoalLanesByDensity(
         return std::vector<std::vector<GoalLane>>{};
     }
 
-    // Sort goal lanes by angle to the goal in increasing order  
+    // Sort goal lanes by angle to the goal in increasing order
     std::sort(goal_lanes.begin(), goal_lanes.end(), [](const auto &a, const auto &b) {
         return a.angle_to_goal < b.angle_to_goal;
     });
@@ -171,8 +171,8 @@ std::vector<std::vector<GoalLane>> groupGoalLanesByDensity(
 
     for (unsigned int i = 1; i < goal_lanes.size(); i++)
     {
-        // If the percent diff between current lane vs previous lane exceeds
-        // threshold, start a new group
+        // If the percent diff between angles to goal of current lane vs previous lane 
+        // exceeds threshold, start a new group
         double percent_diff =
             percent_difference(goal_lanes[i].angle_to_goal.toRadians(),
                                groups.back().back().angle_to_goal.toRadians());
@@ -181,7 +181,7 @@ std::vector<std::vector<GoalLane>> groupGoalLanesByDensity(
             groups.emplace_back(std::vector<GoalLane>{});
         }
 
-        // Add the current item to the last group in groups
+        // Add the current item to the last group
         groups.back().emplace_back(goal_lanes[i]);
     }
 
