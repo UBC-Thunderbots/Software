@@ -378,7 +378,6 @@ class FieldTestRunner(TbotsTestRunner):
             validation.check_validation(eventually_validation_proto_set)
             stop_test(TEST_END_DELAY)
 
-        # ex = Excepthook()
         def excepthook(args):
             """This function is _critical_ for show_thunderscope to work.
             If the test Thread will raises an exception we won't be able to close
@@ -560,7 +559,6 @@ def field_test_runner():
                     simulator_proto_unix_io=simulator_proto_unix_io,
                     blue_full_system_proto_unix_io=blue_full_system_proto_unix_io,
                     yellow_full_system_proto_unix_io=yellow_full_system_proto_unix_io,
-                    # layout_path=args.layout,
                     layout_path=None,
                     visualization_buffer_size=args.visualization_buffer_size,
                     load_blue=True,
