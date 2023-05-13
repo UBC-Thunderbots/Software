@@ -242,8 +242,17 @@ class MotorService
                                               double back_right_velocity_mps,
                                               double dribbler_rpm);
 
-    // to check if the motors have been calibrated
-    bool is_initialized_ = false;
+    /**
+     * Returns true if we've detected a RESET in our cached motor faults indicators.
+     *
+     * @param motor chip select to check for RESETs
+     *
+     * @return true if the motor has returned a cached RESET fault, false otherwise
+     */
+    bool hasMotorReset(uint8_t motor)
+
+        // to check if the motors have been calibrated
+        bool is_initialized_ = false;
 
     // Select between driver and controller gpio
     Gpio spi_demux_select_0_;

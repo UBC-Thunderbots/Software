@@ -138,7 +138,7 @@ void MotorService::setup()
     for (uint8_t motor = 0; motor < NUM_MOTORS; motor++)
     {
         cached_motor_faults_[motor] = MotorFaultIndicator();
-        encoder_calibrated_[motor] = false;
+        encoder_calibrated_[motor]  = false;
     }
 
     // Clear faults by resetting all the chips on the motor board
@@ -148,9 +148,13 @@ void MotorService::setup()
     reset_gpio_.setValue(GpioState::HIGH);
     usleep(MICROSECONDS_PER_MILLISECOND * 100);
 
-    for (uint8_t i = 0; i < NUM_MOTORS; ++i)
+    for (uint8_t motor = 0; motor < NUM_MOTORS; ++motor)
     {
-        tmc6100_writeInt(i, TMC6100_GSTAT, 0x00000001);
+        if (hasMotorReset(motor))
+        {
+            LOG(INFO) << "Clearing RESET for " << MOTOR_NAMES[motor];
+            tmc6100_writeInt(motor, TMC6100_GSTAT, 0x00000001);
+        }
     }
 
     // Drive Motor Setup
@@ -391,9 +395,7 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
     // checks if any motor has reset, sends a log message if so
     for (uint8_t motor = 0; motor < NUM_MOTORS; ++motor)
     {
-        auto search =
-            cached_motor_faults_[motor].motor_faults.find(TbotsProto::MotorFault::RESET);
-        if (search != cached_motor_faults_[motor].motor_faults.end())
+        if (hasMotorReset(motor)    
         {
             LOG(DEBUG) << "RESET DETECTED FOR MOTOR: " << MOTOR_NAMES[motor];
             is_initialized_ = false;
@@ -572,6 +574,14 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
     tmc4671_setTargetVelocity(DRIBBLER_MOTOR_CHIP_SELECT, final_dribbler_rpm);
 
     return motor_status;
+}
+
+bool MotorService::hasMotorReset(uint8_t motor)
+{
+    auto search =
+        cached_motor_faults_[motor].motor_faults.find(TbotsProto::MotorFault::RESET);
+
+    return (search != cached_motor_faults_[motor].motor_faults.end());
 }
 
 void MotorService::spiTransfer(int fd, uint8_t const* tx, uint8_t const* rx, unsigned len,
