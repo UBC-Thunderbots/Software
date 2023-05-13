@@ -11,7 +11,7 @@ PowerService::PowerService()
 {
     if (!boost::filesystem::exists(DEVICE_SERIAL_PORT))
     {
-        LOG(FATAL) << "PLUG THE USB INTO THE JETSON NANO";
+        //LOG(FATAL) << "PLUG THE USB INTO THE JETSON NANO";
         throw PowerServiceException("USB not plugged into Jetson Nano");
     }
     this->uart = std::make_unique<BoostUartCommunication>(BAUD_RATE, DEVICE_SERIAL_PORT);
@@ -22,12 +22,13 @@ PowerService::PowerService()
 
 PowerService::~PowerService()
 {
+    is_running = true;
     read_thread.join();
 }
 
 void PowerService::continuousRead()
 {
-    for (;;)
+    for (;!is_running;)
     {
         tick();
     }

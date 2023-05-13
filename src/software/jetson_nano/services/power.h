@@ -54,4 +54,6 @@ class PowerService
         getMarshalledSize(TbotsProto_PowerStatus TbotsProto_PowerStatus_init_default);
     const std::string DEVICE_SERIAL_PORT    = "/dev/ttyUSB0";
     static constexpr unsigned int BAUD_RATE = 460800;
+
+    bool is_running = false;
 };
