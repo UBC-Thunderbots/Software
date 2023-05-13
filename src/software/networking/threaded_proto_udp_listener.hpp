@@ -40,9 +40,13 @@ class ThreadedProtoUdpListener
     ThreadedProtoUdpListener(unsigned short port,
                              std::function<void(ReceiveProtoT)> receive_callback);
 
+    /**
+     * Closes the socket and stops the IO service thread
+     */
+    void close();
+
     ~ThreadedProtoUdpListener();
 
-    void close();
 
    private:
     // The io_service that will be used to service all network requests

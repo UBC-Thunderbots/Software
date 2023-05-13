@@ -6,7 +6,6 @@ from proto.ssl_gc_common_pb2 import Team
 from proto.import_all_protos import *
 from software.field_tests.field_test_fixture import *
 
-# from software.simulated_tests.tbots_test_fixture import *
 from software.simulated_tests.simulated_test_fixture import *
 from software.logger.logger import createLogger
 from software.simulated_tests.robot_enters_region import RobotEventuallyEntersRegion
@@ -15,6 +14,7 @@ from proto.message_translation.tbots_protobuf import create_world_state
 logger = createLogger(__name__)
 
 
+# TODO 2908: Support running this test in both simulator or field mode
 # this test can be run either in simulation or on the field
 # @pytest.mark.parametrize(
 #     "robot_x_destination, robot_y_destination",
@@ -75,8 +75,6 @@ logger = createLogger(__name__)
 
 
 # this test can only be run on the field
-
-
 def test_basic_rotation(field_test_runner):
     # pdb.set_trace()
     # test_angles = [0, 45, 90, 180, 270, 0]
@@ -125,8 +123,6 @@ def test_basic_rotation(field_test_runner):
         time.sleep(2)
 
 
-# if __name__ == "__main__":
-#     pytest_main(__file__)
 if __name__ == "__main__":
     # Run the test, -s disables all capturing at -vv increases verbosity
     sys.exit(pytest.main([__file__, "-svv"]))

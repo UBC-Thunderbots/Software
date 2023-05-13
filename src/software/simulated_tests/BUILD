@@ -84,7 +84,6 @@ py_library(
         "//software:py_constants.so",
     ],
     deps = [
-        #        ":pytest_main",
         "//proto:import_all_protos",
         "//software/logger:py_logger",
         "//software/networking:threaded_unix_listener_py",

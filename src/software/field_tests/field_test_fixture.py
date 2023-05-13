@@ -596,7 +596,6 @@ def field_test_runner():
                     yellow_logger.buffer
                 )
                 yield runner
-                # send stop primitive
                 print(
                     f"\n\nTo replay this test for the blue team, go to the `src` folder and run \n./tbots.py run thunderscope --blue_log {blue_logger.log_folder}",
                     flush=True,

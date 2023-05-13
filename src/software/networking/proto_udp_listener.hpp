@@ -48,10 +48,13 @@ class ProtoUdpListener
      */
     ProtoUdpListener(boost::asio::io_service& io_service, unsigned short port,
                      std::function<void(ReceiveProtoT&)> receive_callback);
+    /**
+     * Closes the socket associated to the UDP listener
+     */
+    virtual void close();
 
     virtual ~ProtoUdpListener();
 
-    virtual void close();
 
    private:
     /**
