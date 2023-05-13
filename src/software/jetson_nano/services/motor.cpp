@@ -138,7 +138,7 @@ void MotorService::setup()
     for (uint8_t motor = 0; motor < NUM_MOTORS; motor++)
     {
         cached_motor_faults_[motor] = MotorFaultIndicator();
-        encoder_calibrated[motor] = false;
+        encoder_calibrated_[motor] = false;
     }
 
     // Clear faults by resetting all the chips on the motor board
