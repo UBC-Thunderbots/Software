@@ -31,6 +31,9 @@ double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
 
     double in_region_quality = rectangleSigmoid(zone, pass.receiverPoint(), 0.2);
 
+    double pass_speed_quality =
+        ratePassSpeed(pass, passing_config);
+
     // Place strict limits on the ball speed
     double min_pass_speed     = passing_config.min_pass_speed_m_per_s();
     double max_pass_speed     = passing_config.max_pass_speed_m_per_s();
@@ -39,6 +42,23 @@ double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
 
     return static_pass_quality * friendly_pass_rating * enemy_pass_rating *
            shoot_pass_rating * pass_speed_quality * in_region_quality;
+}
+
+double ratePassSpeed(const Pass& pass, TbotsProto::PassingConfig passing_config)
+{
+    double pass_speed = pass.speed();
+
+    // Place strict limits on the ball speed
+    double min_pass_speed                = passing_config.min_pass_speed_m_per_s();
+    double max_pass_speed               = passing_config.max_pass_speed_m_per_s();
+    double pass_speed_bounds_quality    = sigmoid(pass_speed, min_pass_speed, 0.2) *
+                                            (1 - sigmoid(pass_speed, max_pass_speed, 0.2));
+
+    Vector pass_distance = Vector(pass.receiverPoint().x() - pass.passerPoint().x(),
+                                  pass.receiverPoint().y() - pass.passerPoint().y());
+    double pass_distance_length = pass_distance.length();
+
+
 }
 
 double rateZone(const Field& field, const Team& enemy_team, const Rectangle& zone,

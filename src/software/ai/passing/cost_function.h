@@ -71,6 +71,15 @@ double ratePassEnemyRisk(const Team& enemy_team, const Pass& pass,
                          double enemy_proximity_importance);
 
 /**
+ * Rates pass based on the speed of the pass relative to the distance of the pass
+ * as well as the speed bounds in the passing config
+ * @param pass the pass to rate
+ * @param passing_config the passing config used for tuning
+ * @return
+ */
+double ratePassSpeed(const Pass& pass, TbotsProto::PassingConfig passing_config);
+
+/**
  * Calculates the likelihood that the given pass will be intercepted
  *
  * @param enemy_team The team of robots that we're worried about intercepting our pass
