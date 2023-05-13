@@ -65,97 +65,102 @@ class RobotAutoTestFixture : public testing::Test
     static const uint8_t NUM_DRIVE_MOTORS              = 4;
 };
 
-//TEST_F(RobotAutoTestFixture, SPITransferFrontRightMotorTest) {
-//
-//    // Check driver fault
-//    if (motor_service_->checkDriverFault(FRONT_RIGHT_MOTOR_CHIP_SELECT)) {
-//        LOG(FATAL) << "Detected Motor Fault";
-//    }
-//
-//    // We do not need to set up or calibrate the motors
-//    motor_service_->writeIntToTMC4671(FRONT_RIGHT_MOTOR_CHIP_SELECT, TMC4671_CHIPINFO_ADDR, 0x000000000);
-//    int read_value = motor_service_->readIntFromTMC4671(FRONT_RIGHT_MOTOR_CHIP_SELECT, TMC4671_CHIPINFO_DATA);
-//
-//    // Check if CHIPINFO_DATA returns 0x34363731
-//    if (read_value == 875968305) {
-//        LOG(INFO) << "SPI Transfer is successful";
-//    } else {
-//        LOG(FATAL) << "SPI Transfer not successful";
-//    }
-//}
-//
-//TEST_F(RobotAutoTestFixture, SPITransferFrontLeftMotorTest) {
-//
-//    // Check driver fault
-//    if (motor_service_->checkDriverFault(FRONT_LEFT_MOTOR_CHIP_SELECT)) {
-//        LOG(FATAL) << "Detected Motor Fault";
-//    }
-//
-//    // We do not need to set up or calibrate the motors
-//    motor_service_->writeIntToTMC4671(FRONT_LEFT_MOTOR_CHIP_SELECT, TMC4671_CHIPINFO_ADDR, 0x000000000);
-//    int read_value = motor_service_->readIntFromTMC4671(FRONT_LEFT_MOTOR_CHIP_SELECT, TMC4671_CHIPINFO_DATA);
-//
-//    // Check if CHIPINFO_DATA returns 0x34363731
-//    if (read_value == 875968305) {
-//        LOG(INFO) << "SPI Transfer is successful";
-//    } else {
-//        LOG(FATAL) << "SPI Transfer not successful";
-//    }
-//
-//}(
-//
-//TEST_F(RobotAutoTestFixture, SPITransferBackLeftMotorTest) {
-//
-//    // Check driver fault
-//    if (motor_service_->checkDriverFault(BACK_LEFT_MOTOR_CHIP_SELECT)) {
-//        LOG(FATAL) << "Detected Motor Fault";
-//    }
-//
-//    // We do not need to set up or calibrate the motors
-//    motor_service_->writeIntToTMC4671(BACK_LEFT_MOTOR_CHIP_SELECT, TMC4671_CHIPINFO_ADDR, 0x000000000);
-//    int read_value = motor_service_->readIntFromTMC4671(BACK_LEFT_MOTOR_CHIP_SELECT, TMC4671_CHIPINFO_DATA);
-//
-//    // Check if CHIPINFO_DATA returns 0x34363731
-//    if (read_value == 875968305) {
-//        LOG(INFO) << "SPI Transfer is successful";
-//    } else {
-//        LOG(FATAL) << "SPI Transfer not successful";
-//    }
-//
-//}
-//
-//TEST_F(RobotAutoTestFixture, SPITransferBackRightMotorTest) {
-//
-//    // Check driver fault
-//    if (motor_service_->checkDriverFault(BACK_RIGHT_MOTOR_CHIP_SELECT)) {
-//        LOG(FATAL) << "Detected Motor Fault";
-//    }
-//
-//    // We do not need to set up or calibrate the motors
-//    motor_service_->writeIntToTMC4671(BACK_RIGHT_MOTOR_CHIP_SELECT, TMC4671_CHIPINFO_ADDR, 0x000000000);
-//    int read_value = motor_service_->readIntFromTMC4671(BACK_RIGHT_MOTOR_CHIP_SELECT, TMC4671_CHIPINFO_DATA);
-//
-//    // Check if CHIPINFO_DATA returns 0x34363731
-//    if (read_value == 875968305) {
-//        LOG(INFO) << "SPI Transfer is successful";
-//    } else {
-//        LOG(FATAL) << "SPI Transfer not successful";
-//    }
-//
-//}
+TEST_F(RobotAutoTestFixture, SPITransferFrontRightMotorTest) {
+
+    motor_service_ = std::make_unique<MotorService>(
+            create2021RobotConstants(), CONTROL_LOOP_HZ);
+
+    // Check driver fault
+    if (motor_service_->checkDriverFault(FRONT_RIGHT_MOTOR_CHIP_SELECT)) {
+        LOG(FATAL) << "Detected Motor Fault";
+    }
+
+    // We do not need to set up or calibrate the motors
+    motor_service_->writeIntToTMC4671(FRONT_RIGHT_MOTOR_CHIP_SELECT, TMC4671_CHIPINFO_ADDR, 0x000000000);
+    int read_value = motor_service_->readIntFromTMC4671(FRONT_RIGHT_MOTOR_CHIP_SELECT, TMC4671_CHIPINFO_DATA);
+
+    // Check if CHIPINFO_DATA returns 0x34363731
+    if (read_value == 875968305) {
+        LOG(INFO) << "SPI Transfer is successful";
+    } else {
+        LOG(FATAL) << "SPI Transfer not successful";
+    }
+}
+
+TEST_F(RobotAutoTestFixture, SPITransferFrontLeftMotorTest) {
+
+    motor_service_ = std::make_unique<MotorService>(
+            create2021RobotConstants(), CONTROL_LOOP_HZ);
+
+    // Check driver fault
+    if (motor_service_->checkDriverFault(FRONT_LEFT_MOTOR_CHIP_SELECT)) {
+        LOG(FATAL) << "Detected Motor Fault";
+    }
+
+    // We do not need to set up or calibrate the motors
+    motor_service_->writeIntToTMC4671(FRONT_LEFT_MOTOR_CHIP_SELECT, TMC4671_CHIPINFO_ADDR, 0x000000000);
+    int read_value = motor_service_->readIntFromTMC4671(FRONT_LEFT_MOTOR_CHIP_SELECT, TMC4671_CHIPINFO_DATA);
+
+    // Check if CHIPINFO_DATA returns 0x34363731
+    if (read_value == 875968305) {
+        LOG(INFO) << "SPI Transfer is successful";
+    } else {
+        LOG(FATAL) << "SPI Transfer not successful";
+    }
+
+}
+
+TEST_F(RobotAutoTestFixture, SPITransferBackLeftMotorTest) {
+
+    motor_service_ = std::make_unique<MotorService>(
+            create2021RobotConstants(), CONTROL_LOOP_HZ);
+
+    // Check driver fault
+    if (motor_service_->checkDriverFault(BACK_LEFT_MOTOR_CHIP_SELECT)) {
+        LOG(FATAL) << "Detected Motor Fault";
+    }
+
+    // We do not need to set up or calibrate the motors
+    motor_service_->writeIntToTMC4671(BACK_LEFT_MOTOR_CHIP_SELECT, TMC4671_CHIPINFO_ADDR, 0x000000000);
+    int read_value = motor_service_->readIntFromTMC4671(BACK_LEFT_MOTOR_CHIP_SELECT, TMC4671_CHIPINFO_DATA);
+
+    // Check if CHIPINFO_DATA returns 0x34363731
+    if (read_value == 875968305) {
+        LOG(INFO) << "SPI Transfer is successful";
+    } else {
+        LOG(FATAL) << "SPI Transfer not successful";
+    }
+
+}
+
+TEST_F(RobotAutoTestFixture, SPITransferBackRightMotorTest) {
+
+    motor_service_ = std::make_unique<MotorService>(
+            create2021RobotConstants(), CONTROL_LOOP_HZ);
+
+    // Check driver fault
+    if (motor_service_->checkDriverFault(BACK_RIGHT_MOTOR_CHIP_SELECT)) {
+        LOG(FATAL) << "Detected Motor Fault";
+    }
+
+    // We do not need to set up or calibrate the motors
+    motor_service_->writeIntToTMC4671(BACK_RIGHT_MOTOR_CHIP_SELECT, TMC4671_CHIPINFO_ADDR, 0x000000000);
+    int read_value = motor_service_->readIntFromTMC4671(BACK_RIGHT_MOTOR_CHIP_SELECT, TMC4671_CHIPINFO_DATA);
+
+    // Check if CHIPINFO_DATA returns 0x34363731
+    if (read_value == 875968305) {
+        LOG(INFO) << "SPI Transfer is successful";
+    } else {
+        LOG(FATAL) << "SPI Transfer not successful";
+    }
+
+}
 
 TEST_F(RobotAutoTestFixture, PowerboardConnectionTest) {
 
     EXPECT_NO_THROW({
                         PowerService();
                     }) << "Unable to communicate with the power board";
-
-//    try {
-//        PowerService();
-//    } catch (const PowerServiceException &pse) {
-//        EXPECT_EQ(pse.what(), std::string("USB not plugged into Jetson Nano"));
-//        LOG(INFO) << "Connection exception caught: " << pse.what() << std::endl;
-//    }
 
 }
 
