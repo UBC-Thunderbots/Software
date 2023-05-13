@@ -6,7 +6,7 @@ from typing import List
 from proto.import_all_protos import *
 import software.thunderscope.common.common_widgets as common_widgets
 from software.thunderscope.constants import *
-from threading import Lock
+import time as time
 
 
 class RobotInfo(QWidget):
@@ -42,15 +42,7 @@ class RobotInfo(QWidget):
         # set back to False if battery is back above warning level
         self.battery_warning_disabled = False
 
-        # True means the robot is receiving constant RobotStatus messages
-        # False means that the robot has received no RobotStatus for at least 1 tick
-        # used to grey out display when robot disconnects
-        self.is_connected = False
-
-        # True means the timer to grey oyt the UI has been triggered
-        # to prevent too many timers and UI flashing
-        self.to_be_disconnected = False
-        self.connected_lock = Lock()
+        self.time_of_last_robot_status = time.time()
 
         self.layout = QHBoxLayout()
 
@@ -82,8 +74,6 @@ class RobotInfo(QWidget):
 
         # Breakbeam status
         self.breakbeam_label = QLabel()
-        self.breakbeam_label.setText("BREAKBEAM")
-        self.breakbeam_label.setStyleSheet("background-color: grey")
 
         self.control_mode_layout.addWidget(self.breakbeam_label)
         self.control_mode_layout.addWidget(self.control_mode_menu)
@@ -100,7 +90,7 @@ class RobotInfo(QWidget):
         )
 
         self.vision_pattern_label = QLabel()
-        self.disconnect_robot()
+        self.reset_ui()
         self.layout.addWidget(self.vision_pattern_label)
 
         self.layout.addLayout(self.status_layout)
@@ -208,48 +198,41 @@ class RobotInfo(QWidget):
         """
         Receives parts of a RobotStatus message
 
+        Saves the current time as the last robot status time
         Sets the robot UI as connected and updates the UI
-        Then sets the robot to disconnected with a timer callback to update the UI
+        Then sets a timer callback to disconnect the robot if needed
         :param power_status: The power status message for this robot
         :param error_codes: The error codes of this robot
         """
-        self.reconnect_robot()
+        self.time_of_last_robot_status = time.time()
+
+        self.vision_pattern_label.setPixmap(self.color_vision_pattern)
 
         self.update_ui(power_status, error_codes)
 
-        self.mark_to_be_disconnected()
-
-    def mark_to_be_disconnected(self):
-        """
-        Sets the boolean flag to disconnected
-        and calls a timer with a callback to grey out the UI in DISCONNECT_DURATION_MS
-        """
-        self.is_connected = False
-        if not self.to_be_disconnected:
-            QtCore.QTimer.singleShot(DISCONNECT_DURATION_MS, self.disconnect_robot)
-            self.to_be_disconnected = True
+        QtCore.QTimer.singleShot(DISCONNECT_DURATION_MS, self.disconnect_robot)
 
     def disconnect_robot(self):
         """
-        If robot is disconnected, attempts to get the lock
-        Once locked, if robot is still disconnected, greys out the robot UI
+        Calculates the time between the last robot status and now
+        If more than our threshold, resets UI
         """
-        if not self.is_connected:
-            self.connected_lock.acquire()
-            if not self.is_connected:
-                self.vision_pattern_label.setPixmap(self.bw_vision_pattern)
-                self.to_be_disconnected = False
-            self.connected_lock.release()
+        time_since_last_robot_status = time.time() - self.time_of_last_robot_status
+        if time_since_last_robot_status > DISCONNECT_DURATION_MS:
+            self.reset_ui()
 
-    def reconnect_robot(self):
+    def reset_ui(self):
         """
-        Attempts to get the lock
-        Once locked, resets boolean flag and sets robot UI to the color version
+        Resets the UI to the default, uninitialized values
         """
-        self.is_connected = True
-        self.connected_lock.acquire()
-        self.vision_pattern_label.setPixmap(self.color_vision_pattern)
-        self.connected_lock.release()
+        self.vision_pattern_label.setPixmap(self.bw_vision_pattern)
+
+        self.breakbeam_label.setText("BREAKBEAM")
+        self.breakbeam_label.setStyleSheet("background-color: grey")
+
+        self.control_mode_menu.setCurrentIndex(
+            self.control_mode_menu.findText(IndividualRobotMode.NONE.name)
+        )
 
     def update_ui(self, power_status, error_codes):
         """
