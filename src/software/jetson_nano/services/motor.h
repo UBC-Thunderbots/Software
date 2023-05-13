@@ -243,44 +243,43 @@ class MotorService
                                               double dribbler_rpm);
 
     // to check if the motors have been calibrated
-    bool is_initialized = false;
+    bool is_initialized_ = false;
 
     // Select between driver and controller gpio
-    Gpio spi_demux_select_0;
-    Gpio spi_demux_select_1;
+    Gpio spi_demux_select_0_;
+    Gpio spi_demux_select_1_;
 
     // Enable driver gpio
-    Gpio driver_control_enable_gpio;
-    Gpio reset_gpio;
+    Gpio driver_control_enable_gpio_;
+    Gpio reset_gpio_;
 
     // Transfer Buffers
-    uint8_t tx[5] = {0};
-    uint8_t rx[5] = {0};
+    uint8_t tx_[5] = {0};
+    uint8_t rx_[5] = {0};
 
     // Transfer State
-    bool transfer_started  = false;
-    bool currently_writing = false;
-    bool currently_reading = false;
-    uint8_t position       = 0;
-
-    // Constants
-    RobotConstants_t robot_constants_;
+    bool transfer_started_  = false;
+    bool currently_writing_ = false;
+    bool currently_reading_ = false;
+    uint8_t position_       = 0;
 
     // SPI File Descriptors
-    std::unordered_map<int, int> file_descriptors;
+    std::unordered_map<int, int> file_descriptors_;
 
     // Drive Motors
-    EuclideanToWheel euclidean_to_four_wheel;
+    EuclideanToWheel euclidean_to_four_wheel_;
     std::unordered_map<int, bool> encoder_calibrated_;
     std::unordered_map<int, MotorFaultIndicator> cached_motor_faults_;
 
     // Previous wheel velocities
-    WheelSpace_t prev_wheel_velocities;
+    WheelSpace_t prev_wheel_velocities_;
 
     // the motor cs id to check for motor faults
-    uint8_t motor_fault_detector;
+    uint8_t motor_fault_detector_;
 
     static const int NUM_CALIBRATION_ATTEMPTS = 10;
+
+    int ramp_rpm_;
 
     // SPI Chip Selects
     static const uint8_t FRONT_LEFT_MOTOR_CHIP_SELECT  = 0;
@@ -301,6 +300,4 @@ class MotorService
     // Motor names (indexed with chip select above)
     static constexpr const char* MOTOR_NAMES[] = {"front_left", "back_left", "back_right",
                                                   "front_right", "dribbler"};
-
-    int ramp_rpm;
 };

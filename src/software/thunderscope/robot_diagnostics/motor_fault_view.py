@@ -84,7 +84,7 @@ class MotorFaultView(QWidget):
         for key in self.motor_faults.keys():
             self.enabled = self.enabled and self.motor_faults[key].enabled
 
-            motor_faults = self.motor_faults[key].motor_fault
+            motor_faults = self.motor_faults[key].motor_faults
 
             byte_array = QByteArray()
             buffer = QBuffer(byte_array)
@@ -99,7 +99,7 @@ class MotorFaultView(QWidget):
 
             image_data = byte_array.toBase64()
 
-            self.fault_count += len(self.motor_faults[key].motor_fault)
+            self.fault_count += len(self.motor_faults[key].motor_faults)
 
             self.motor_fault_tooltip += (
                 "<p>"

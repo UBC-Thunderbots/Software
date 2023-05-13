@@ -53,13 +53,13 @@ message ChipperKickerStatus
 message DribblerStatus
 {
     // The current speed of the dribbler in RPM
-    float dribbler_rpm = 1;
+    float dribbler_rpm                  = 1;
 
     // Dribbler temperature
-    float dribbler_temperature = 2;
+    float dribbler_temperature          = 2;
 
-    repeated MotorFault motor_fault = 3;
-    bool enabled                    = 4;
+    repeated MotorFault motor_faults    = 3;
+    bool enabled                        = 4;
 }
 
 /* Error codes are to be displayed in the visualizer */
@@ -99,7 +99,7 @@ message DriveUnit
     // The current RPM of the wheel
     float wheel_velocity = 1;
 
-    repeated MotorFault motor_fault = 2;
+    repeated MotorFault motor_faults = 2;
     bool enabled = 3;  // certain drive faults cause the motor to be disabled
 }
 

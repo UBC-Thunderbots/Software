@@ -133,17 +133,17 @@ class RobotView(QScrollArea):
             robot_id=7,
             motor_status=MotorStatus(
                 front_left=DriveUnit(
-                    motor_fault=[MotorFault.DRIVER_OVERTEMPERATURE_PREWARNING],
+                    motor_faults=[MotorFault.DRIVER_OVERTEMPERATURE_PREWARNING],
                     enabled=True,
                 ),
                 front_right=DriveUnit(enabled=True),
                 back_left=DriveUnit(enabled=True),
                 back_right=DriveUnit(
-                    motor_fault=[MotorFault.DRIVER_OVERTEMPERATURE_PREWARNING],
+                    motor_faults=[MotorFault.DRIVER_OVERTEMPERATURE_PREWARNING],
                     enabled=False,
                 ),
                 dribbler=DribblerStatus(
-                    motor_fault=[MotorFault.DRIVER_OVERTEMPERATURE_PREWARNING],
+                    motor_faults=[MotorFault.DRIVER_OVERTEMPERATURE_PREWARNING],
                     enabled=True,
                 ),
             ),

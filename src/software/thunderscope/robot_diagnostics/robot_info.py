@@ -269,7 +269,7 @@ class RobotInfo(QWidget):
 
         self.motor_fault_view.refresh(
             motor_status,
-            motor_status.front_left.DESCRIPTOR.fields_by_name["motor_fault"],
+            motor_status.front_left.DESCRIPTOR.fields_by_name["motor_faults"],
         )
 
         self.battery_progress_bar.setValue(power_status.battery_voltage)
