@@ -138,6 +138,7 @@ void MotorService::setup()
     for (uint8_t motor = 0; motor < NUM_MOTORS; motor++)
     {
         cached_motor_faults_[motor] = MotorFaultIndicator();
+        encoder_calibrated[motor] = false;
     }
 
     // Clear faults by resetting all the chips on the motor board
@@ -169,6 +170,19 @@ void MotorService::setup()
     tmc4671_setTargetVelocity(DRIBBLER_MOTOR_CHIP_SELECT, 0);
 
     checkEncoderConnections();
+
+    // calibrate the encoders
+    for (uint8_t motor = 0; motor < NUM_DRIVE_MOTORS; motor++)
+    {
+        startEncoderCalibration(motor);
+    }
+
+    sleep(1);
+
+    for (uint8_t motor = 0; motor < NUM_DRIVE_MOTORS; motor++)
+    {
+        endEncoderCalibration(motor);
+    }
 
     is_initialized_ = true;
 }
