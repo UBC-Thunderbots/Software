@@ -81,11 +81,11 @@ extern "C"
 MotorService::MotorService(const RobotConstants_t& robot_constants,
                            int control_loop_frequency_hz)
     : spi_demux_select_0_(SPI_CS_DRIVER_TO_CONTROLLER_MUX_0_GPIO, GpioDirection::OUTPUT,
-                         GpioState::LOW),
+                          GpioState::LOW),
       spi_demux_select_1_(SPI_CS_DRIVER_TO_CONTROLLER_MUX_1_GPIO, GpioDirection::OUTPUT,
-                         GpioState::LOW),
+                          GpioState::LOW),
       driver_control_enable_gpio_(DRIVER_CONTROL_ENABLE_GPIO, GpioDirection::OUTPUT,
-                                 GpioState::HIGH),
+                                  GpioState::HIGH),
       reset_gpio_(MOTOR_DRIVER_RESET_GPIO, GpioDirection::OUTPUT, GpioState::HIGH),
       euclidean_to_four_wheel_(robot_constants),
       motor_fault_detector_(0),
@@ -101,19 +101,19 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
      */
 #define OPEN_SPI_FILE_DESCRIPTOR(motor_name, chip_select)                                \
                                                                                          \
-    file_descriptors_[chip_select] = open(SPI_PATHS[chip_select], O_RDWR);                \
-    CHECK(file_descriptors_[chip_select] >= 0)                                            \
+    file_descriptors_[chip_select] = open(SPI_PATHS[chip_select], O_RDWR);               \
+    CHECK(file_descriptors_[chip_select] >= 0)                                           \
         << "can't open device: " << #motor_name << "error: " << strerror(errno);         \
                                                                                          \
-    ret = ioctl(file_descriptors_[chip_select], SPI_IOC_WR_MODE32, &SPI_MODE);            \
+    ret = ioctl(file_descriptors_[chip_select], SPI_IOC_WR_MODE32, &SPI_MODE);           \
     CHECK(ret != -1) << "can't set spi mode for: " << #motor_name                        \
                      << "error: " << strerror(errno);                                    \
                                                                                          \
-    ret = ioctl(file_descriptors_[chip_select], SPI_IOC_WR_BITS_PER_WORD, &SPI_BITS);     \
+    ret = ioctl(file_descriptors_[chip_select], SPI_IOC_WR_BITS_PER_WORD, &SPI_BITS);    \
     CHECK(ret != -1) << "can't set bits_per_word for: " << #motor_name                   \
                      << "error: " << strerror(errno);                                    \
                                                                                          \
-    ret = ioctl(file_descriptors_[chip_select], SPI_IOC_WR_MAX_SPEED_HZ,                  \
+    ret = ioctl(file_descriptors_[chip_select], SPI_IOC_WR_MAX_SPEED_HZ,                 \
                 &MAX_SPI_SPEED_HZ);                                                      \
     CHECK(ret != -1) << "can't set spi max speed hz for: " << #motor_name                \
                      << "error: " << strerror(errno);
@@ -316,26 +316,18 @@ TbotsProto::MotorStatus MotorService::updateMotorStatus(double front_left_veloci
 
             if (motor == FRONT_LEFT_MOTOR_CHIP_SELECT)
             {
-                drive_status.set_wheel_velocity(
-                    static_cast<float>(front_left_velocity_mps));
                 *(motor_status.mutable_front_left()) = drive_status;
             }
             if (motor == FRONT_RIGHT_MOTOR_CHIP_SELECT)
             {
-                drive_status.set_wheel_velocity(
-                    static_cast<float>(front_right_velocity_mps));
                 *(motor_status.mutable_front_right()) = drive_status;
             }
             if (motor == BACK_LEFT_MOTOR_CHIP_SELECT)
             {
-                drive_status.set_wheel_velocity(
-                    static_cast<float>(back_left_velocity_mps));
                 *(motor_status.mutable_back_left()) = drive_status;
             }
             if (motor == BACK_RIGHT_MOTOR_CHIP_SELECT)
             {
-                drive_status.set_wheel_velocity(
-                    static_cast<float>(back_right_velocity_mps));
                 *(motor_status.mutable_back_right()) = drive_status;
             }
         }
@@ -354,7 +346,17 @@ TbotsProto::MotorStatus MotorService::updateMotorStatus(double front_left_veloci
         }
     }
 
-    motor_fault_detector_ = static_cast<uint8_t>((motor_fault_detector_ + 1) % NUM_MOTORS);
+    motor_status.mutable_front_left()->set_wheel_velocity(
+        static_cast<float>(front_left_velocity_mps));
+    motor_status.mutable_front_right()->set_wheel_velocity(
+        static_cast<float>(front_right_velocity_mps));
+    motor_status.mutable_back_left()->set_wheel_velocity(
+        static_cast<float>(back_left_velocity_mps));
+    motor_status.mutable_back_right()->set_wheel_velocity(
+        static_cast<float>(back_right_velocity_mps));
+
+    motor_fault_detector_ =
+        static_cast<uint8_t>((motor_fault_detector_ + 1) % NUM_MOTORS);
 
     return motor_status;
 }
@@ -367,7 +369,7 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
                                 encoder_calibrated_[BACK_LEFT_MOTOR_CHIP_SELECT] ||
                                 encoder_calibrated_[BACK_RIGHT_MOTOR_CHIP_SELECT]);
 
-    if (!encoder_calibrated)
+    if (!encoders_calibrated)
     {
         is_initialized_ = false;
     }
@@ -1046,12 +1048,14 @@ void MotorService::checkEncoderConnections()
         if (!calibrated_motors[motor])
         {
             calibrated = false;
-            LOG(WARNING) << "Encoder calibration check failure. " << MOTOR_NAMES[motor] << " did not change as expected";
+            LOG(WARNING) << "Encoder calibration check failure. " << MOTOR_NAMES[motor]
+                         << " did not change as expected";
         }
     }
     if (!calibrated)
     {
-        LOG(FATAL) << "Encoder calibration check failure. Not all encoders responded as expected";
+        LOG(FATAL)
+            << "Encoder calibration check failure. Not all encoders responded as expected";
     }
 
     // stop all motors, reset back to velocity control mode

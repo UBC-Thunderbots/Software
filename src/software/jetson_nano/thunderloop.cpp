@@ -35,9 +35,10 @@ extern "C"
 
         // by now g3log may have died due to the termination signal, so it isn't reliable
         // to log messages
-        std::cout << "\n\n!!!\nReceived termination signal: "
+        std::cerr << "\n\n!!!\nReceived termination signal: "
                   << g3::signalToStr(signal_num) << std::endl;
-        std::cout << "Thunderloop shutting down and motor board reset\n!!!\n";
+        std::cerr << "Thunderloop shutting down and motor board reset\n!!!\n"
+                  << std::endl;
 
         exit(signal_num);
     }
