@@ -209,6 +209,9 @@ cc_library(
     deps = [
         ":intercept",
         ":shot",
+        "//software/geom/algorithms",
+        "//software/time:duration",
+        "//software/time:timestamp",
         "//software/world",
     ],
 )

@@ -3,14 +3,14 @@
 #include "proto/parameters.pb.h"
 #include "shared/constants.h"
 #include "software/ai/evaluation/calc_best_shot.h"
-#include "software/ai/evaluation/possession.h"
 #include "software/logger/logger.h"
 #include "software/util/generic_factory/generic_factory.h"
 
 OffensePlay::OffensePlay(TbotsProto::AiConfig config)
     : Play(config, true),
       shoot_or_pass_play(std::make_shared<ShootOrPassPlay>(ai_config)),
-      defense_play(std::make_shared<DefensePlay>(ai_config))
+      defense_play(std::make_shared<DefensePlay>(ai_config)),
+      possession_tracker(std::make_unique<PossessionTracker>())
 {
 }
 
@@ -35,11 +35,11 @@ void OffensePlay::updateTactics(const PlayUpdate &play_update)
     unsigned int num_enemy_robots =
         static_cast<int>(play_update.world.enemyTeam().numRobots());
 
-    auto team_with_possession = getTeamWithEffectiveBallPossession(
+    TeamPossession team_with_possession = possession_tracker->getTeamWithPossession(
         play_update.world.friendlyTeam(), play_update.world.enemyTeam(),
         play_update.world.ball(), play_update.world.field());
 
-    if (team_with_possession == play_update.world.enemyTeam())
+    if (team_with_possession == TeamPossession::ENEMY_TEAM)
     {
         num_defenders = play_update.num_tactics;
     }
