@@ -155,12 +155,6 @@ if __name__ == "__main__":
         action="store_true",
         help="show pass cost visualization layer",
     )
-    parser.add_argument(
-        "--disable_estop",
-        action="store_true",
-        default=False,
-        help="Disables checking for estop plugged in (ONLY USE FOR LOCAL TESTING)",
-    )
 
     # Sanity check that an interface was provided
     args = parser.parse_args()
@@ -259,11 +253,12 @@ if __name__ == "__main__":
             current_proto_unix_io = tscope.robot_diagnostics_proto_unix_io
 
         with RobotCommunication(
-            current_proto_unix_io,
-            getRobotMulticastChannel(0),
-            args.interface,
-            args.disable_estop,
+            current_proto_unix_io, getRobotMulticastChannel(0), args.interface,
         ) as robot_communication:
+            tscope.keyboard_estop_shortcut.activated.connect(
+                robot_communication.toggle_keyboard_estop
+            )
+
             if args.run_diagnostics:
                 tscope.control_mode_signal.connect(
                     lambda mode, robot_id: robot_communication.toggle_robot_connection(
