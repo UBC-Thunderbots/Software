@@ -23,6 +23,7 @@ cc_library(
     linkopts = ["-latomic"],  # Necessary due to <atomic> not containing load/store for all sizes
     deps = [
         "//shared/uart_framing",
+        "//software/jetson_nano/services/network:power_service_exception",
         "//software/logger",
         "//software/uart:boost_uart_communication",
         "@boost//:asio",
@@ -36,11 +37,13 @@ cc_test(
     linkstatic = True,
     deps = [
         ":motor",
+        ":power",
         "//proto/message_translation:tbots_geometry",
         "//proto/primitive:primitive_msg_factory",
         "//shared:robot_constants",
         "//shared/test_util:tbots_gtest_main",
         "//software/jetson_nano:primitive_executor",
+        "//software/jetson_nano/services/network:power_service_exception",
         "@trinamic",
     ],
 )

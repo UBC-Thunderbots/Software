@@ -24,6 +24,13 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "power_service_exception",
+    srcs = ["power_service_exception.cpp"],
+    hdrs = ["power_service_exception.h"],
+    deps = [],
+)
+
 cc_test(
     name = "proto_tracker_test",
     srcs = ["proto_tracker_test.cpp"],
