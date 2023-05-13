@@ -249,10 +249,10 @@ class MotorService
      *
      * @return true if the motor has returned a cached RESET fault, false otherwise
      */
-    bool hasMotorReset(uint8_t motor)
+    bool hasMotorReset(uint8_t motor);
 
-        // to check if the motors have been calibrated
-        bool is_initialized_ = false;
+    // to check if the motors have been calibrated
+    bool is_initialized_ = false;
 
     // Select between driver and controller gpio
     Gpio spi_demux_select_0_;

@@ -395,7 +395,7 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
     // checks if any motor has reset, sends a log message if so
     for (uint8_t motor = 0; motor < NUM_MOTORS; ++motor)
     {
-        if (hasMotorReset(motor)    
+        if (hasMotorReset(motor))
         {
             LOG(DEBUG) << "RESET DETECTED FOR MOTOR: " << MOTOR_NAMES[motor];
             is_initialized_ = false;
