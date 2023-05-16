@@ -31,7 +31,7 @@ class BreakbeamLabel(QLabel):
         """
         self.breakbeam_status = new_breakbeam_status
 
-        if self.breakbeam_status == None:
+        if self.breakbeam_status is None:
             self.setStyleSheet(
                 f"background-color: transparent; {self.BREAKBEAM_BORDER}"
             )
@@ -54,7 +54,7 @@ class BreakbeamLabel(QLabel):
         common_widgets.display_tooltip(
             event,
             "No Signal Yet"
-            if self.breakbeam_status == None
+            if self.breakbeam_status is None
             else "In Beam"
             if self.breakbeam_status
             else "Not In Beam",
@@ -269,6 +269,8 @@ class RobotInfo(QWidget):
 
         self.motor_fault_view.refresh(
             motor_status,
+            # we access the front left field just to get the enum descriptor
+            # so that we can translate from enum indexes to fault names
             motor_status.front_left.DESCRIPTOR.fields_by_name["motor_faults"],
         )
 

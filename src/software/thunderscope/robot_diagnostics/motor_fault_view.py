@@ -140,15 +140,6 @@ class MotorFaultView(QWidget):
             self.motor_fault_display.setText("No Signal")
         else:
             if self.fault_count:
-                self.fault_count_label.setText(str(self.fault_count))
-                self.fault_count_label.show()
-            else:
-                self.fault_count_label.hide()
-
-            self.motor_fault_display.setStyleSheet("background: green;")
-            self.motor_fault_display.setText("No Fault")
-
-            if self.fault_count:
                 self.motor_fault_display.setStyleSheet(
                     "background: yellow; color: black;"
                     if self.enabled
@@ -156,11 +147,19 @@ class MotorFaultView(QWidget):
                 )
                 self.motor_fault_display.setText("Warning" if self.enabled else "Error")
 
-    def refresh(self, message, enum_descriptor):
+                self.fault_count_label.setText(str(self.fault_count))
+                self.fault_count_label.show()
+            else:
+                self.motor_fault_display.setStyleSheet("background: green;")
+                self.motor_fault_display.setText("No Fault")
+
+                self.fault_count_label.hide()
+
+    def refresh(self, motor_status, enum_descriptor):
         """
         Converts the given message into a map of motor name to its fault info
         And calls functions to update the main UI and the tooltip
-        :param message: the message to update the widget with
+        :param motor_status: the MotorStatus message to update the widget with
         :param enum_descriptor: descriptor to translate from enum indexes to string values
         """
         self.motor_fault_tooltip = ""
@@ -168,11 +167,11 @@ class MotorFaultView(QWidget):
         self.fault_count = 0
 
         self.motor_faults = {
-            "Front Left": message.front_left,
-            "Front Right": message.front_right,
-            "Back Left": message.back_left,
-            "Back Right": message.back_right,
-            "Dribbler": message.dribbler,
+            "Front Left": motor_status.front_left,
+            "Front Right": motor_status.front_right,
+            "Back Left": motor_status.back_left,
+            "Back Right": motor_status.back_right,
+            "Dribbler": motor_status.dribbler,
         }
 
         self.add_faults_to_tooltip(enum_descriptor)
