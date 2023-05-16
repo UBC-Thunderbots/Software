@@ -231,14 +231,33 @@ class HRVOAgent : public Agent
     std::vector<ObstaclePtr> static_obstacles;
     std::optional<ObstaclePtr> ball_obstacle;
 
-    Point previous_destination;
-    double kp = 2.0;
-
-    // pointers to the closest agents by euclidean distance to this agents position
+    // pointers to the closest agents by Euclidean distance to this agents position
     std::vector<std::shared_ptr<Agent>> neighbours;
 
-    // TODO (#2894): Support different configurations for different robots
-    TbotsProto::HRVOConfig config;
+    Point prev_dynamic_kp_destination;
+    double kp;
+
+    // The maximum amount that the destination can be moved (in meters) before
+    // we recalculate the dynamic kp value
+    static constexpr double MAX_DESTINATION_CHANGE_THRESHOLD = 0.1;
+
+    // The maximum amount which the PID velocity can be greater than
+    // the actual robot velocity. Used to prevent swinging [m/s]
+    static constexpr double LINEAR_VELOCITY_MAX_PID_OFFSET = 0.3;
+
+    // Proportional constant used for calculating the desired angular velocity
+    static constexpr double ANGULAR_VELOCITY_KP = 2.8;
+
+    // Compensation constant added to stop the robots from swinging when turning and
+    // moving in a linear line. This is defined as a multiplier of the angular velocity
+    // for how much the linear velocity vector should be rotated by in the opposite
+    // direction of the angular velocity.
+    static constexpr double ANGULAR_VELOCITY_COMPENSATION_MULTIPLIER = 1.5;
+
+    // The obstacle factory robot_obstacle_inflation_factor used by HRVO
+    // This is lower than the default value in the config used by path planner since HRVO
+    // automatically takes into account the robot radius when avoiding obstacles.
+    static constexpr double HRVO_STATIC_OBSTACLE_INFLATION_FACTOR = 0.5;
 
     // The maximum distance which HRVO Agents will look for neighbors, in meters.
     // A large radius picked to allow for far visibility of neighbors so Agents have

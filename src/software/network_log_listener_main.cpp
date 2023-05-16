@@ -66,22 +66,21 @@ int main(int argc, char **argv)
     boost::program_options::store(parse_command_line(argc, argv, desc), vm);
     boost::program_options::notify(vm);
 
+    auto logWorker               = g3::LogWorker::createLogWorker();
+    auto colour_cout_sink_handle = logWorker->addSink(
+        std::make_unique<ColouredCoutSink>(false), &ColouredCoutSink::displayColouredLog);
+    g3::initializeLogging(logWorker.get());
+
     if (args.help)
     {
-        std::cout << desc << std::endl;
+        LOG(INFO) << desc;
         return 0;
     }
 
     if (!vm.count("interface"))
     {
-        std::cerr << "A network interface must be specified to listen on!" << std::endl;
-        return 0;
+        LOG(FATAL) << "A network interface must be specified to listen on!";
     }
-
-    auto logWorker               = g3::LogWorker::createLogWorker();
-    auto colour_cout_sink_handle = logWorker->addSink(
-        std::make_unique<ColouredCoutSink>(false), &ColouredCoutSink::displayColouredLog);
-    g3::initializeLogging(logWorker.get());
 
     // Only show logs from robots in the selected_ids list, unless it is empty
     auto robot_log_callback = [args](TbotsProto::RobotLog log) {

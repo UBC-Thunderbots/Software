@@ -39,7 +39,6 @@ message AiConfig
     required RobotCapabilitiesConfig robot_capabilities_config              = 9;
     required DefensePlayConfig defense_play_config                          = 11;
     required RobotNavigationObstacleConfig robot_navigation_obstacle_config = 12;
-    required HRVOConfig hrvo_config                                         = 13;
 }
 
 message AiControlConfig
@@ -159,7 +158,7 @@ message DribbleTacticConfig
     // Threshold to determine if the robot has the expected orientation when
     // completing the dribble (in degrees)
     required double final_destination_close_threshold = 3 [
-        default                   = 2.0,
+        default                   = 1.0,
         (bounds).min_double_value = 0.0,
         (bounds).max_double_value = 10.0
     ];
@@ -292,35 +291,6 @@ message RobotNavigationObstacleConfig
         (bounds).min_double_value = 0.0,
         (bounds).max_double_value = 10.0
     ];
-}
-
-message HRVOConfig
-{
-    // Proportional constant used for calculating the desired linear velocity
-    required double linear_velocity_kp = 1 [
-        default                   = 2.0,
-        (bounds).min_double_value = 0.001,
-        (bounds).max_double_value = 10.0
-    ];
-
-    // The maximum amount which the PID velocity can be greater than
-    // the actual robot velocity. Used to prevent swinging [m/s]
-    required double linear_velocity_max_pid_offset = 2
-        [default = 0.3, (bounds).min_double_value = 0.0, (bounds).max_double_value = 5.0];
-
-    // Proportional constant used for calculating the desired angular velocity
-    required double angular_velocity_kp = 3 [
-        default                   = 2.8,
-        (bounds).min_double_value = 0.001,
-        (bounds).max_double_value = 10.0
-    ];
-
-    // Compensation constant added to stop the robots from swinging when turning and
-    // moving in a linear line. This is defined as a multiplier of the angular velocity
-    // for how much the linear velocity vector should be rotated by in the opposite
-    // direction of the angular velocity.
-    required double angular_velocity_compensation_multiplier = 4
-        [default = 1.5, (bounds).min_double_value = 0.0, (bounds).max_double_value = 3.0];
 }
 
 message CostVisualizationConfig
