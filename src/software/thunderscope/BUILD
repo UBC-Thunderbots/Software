@@ -78,8 +78,8 @@ py_library(
 )
 
 py_library(
-    name = "tab",
-    srcs = ["tab.py"],
+    name = "thunderscope_types",
+    srcs = ["thunderscope_types.py"],
     deps = [
         ":constants",
     ],
@@ -91,7 +91,7 @@ py_library(
     deps = [
         ":constants",
         ":proto_unix_io",
-        ":tab",
+        ":thunderscope_types",
         ":widget_names_to_setup",
     ],
 )

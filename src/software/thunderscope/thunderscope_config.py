@@ -6,7 +6,7 @@ from software.thunderscope.constants import (
 )
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from typing import Sequence, Dict
-from software.thunderscope.tab import (
+from software.thunderscope.thunderscope_types import (
     TScopeTab,
     TScopeWidget,
     TScopeQTTab,
@@ -185,6 +185,10 @@ def configure_base_fullsystem(
             widget=setup_performance_plot(
                 **{"proto_unix_io": full_system_proto_unix_io}
             ),
+            # this is because this widget specifically has to be added like so:
+            # dock.addWidget(widget.win) instead of dock.addWidget(widget)
+            # otherwise, it opens in a new window
+            # the setup functions returns the widget.win and the refresh function separately
             in_window=True,
             anchor="Play Info",
             position="right",
