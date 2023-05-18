@@ -13,8 +13,16 @@ Ai::Ai(const TbotsProto::AiConfig& ai_config)
       override_play(nullptr),
       current_play(std::make_unique<HaltPlay>(ai_config)),
       field_to_path_planner_factory(),
-      ai_config_changed(true)
+      ai_config_changed(false)
 {
+    auto current_override = ai_config_.ai_control_config().override_ai_play();
+    if (current_override != TbotsProto::PlayName::UseAiSelection)
+    {
+        // Override to new play if we're not running Ai Selection
+        TbotsProto::Play play_proto;
+        play_proto.set_name(current_override);
+        overridePlayFromProto(play_proto);
+    }
 }
 
 void Ai::overridePlay(std::unique_ptr<Play> play)
