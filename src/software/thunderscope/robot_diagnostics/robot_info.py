@@ -218,7 +218,10 @@ class RobotInfo(QWidget):
         If more than our threshold, resets UI
         """
         time_since_last_robot_status = time.time() - self.time_of_last_robot_status
-        if time_since_last_robot_status > DISCONNECT_DURATION_MS:
+        if (
+            time_since_last_robot_status
+            > DISCONNECT_DURATION_MS * SECONDS_PER_MILLISECOND
+        ):
             self.reset_ui()
 
     def reset_ui(self):
@@ -229,10 +232,6 @@ class RobotInfo(QWidget):
 
         self.breakbeam_label.setText("BREAKBEAM")
         self.breakbeam_label.setStyleSheet("background-color: grey")
-
-        self.control_mode_menu.setCurrentIndex(
-            self.control_mode_menu.findText(IndividualRobotMode.NONE.name)
-        )
 
     def update_ui(self, power_status, error_codes):
         """

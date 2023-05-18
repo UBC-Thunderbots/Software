@@ -99,7 +99,7 @@ class RobotView(QScrollArea):
 
         super().__init__()
 
-        self.robot_status_buffer = ThreadSafeBuffer(100, RobotStatus)
+        self.robot_status_buffer = ThreadSafeBuffer(10, RobotStatus)
 
         self.layout = QVBoxLayout()
 
@@ -125,7 +125,12 @@ class RobotView(QScrollArea):
         """
         Refresh the view
         Gets a RobotStatus proto and calls the corresponding update method
+        Until the buffer is empty
         """
         robot_status = self.robot_status_buffer.get(block=False, return_cached=False)
-        if robot_status is not None:
+
+        while robot_status is not None:
             self.robot_view_widgets[robot_status.robot_id].update(robot_status)
+            robot_status = self.robot_status_buffer.get(
+                block=False, return_cached=False
+            )
