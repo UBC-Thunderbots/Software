@@ -13,7 +13,7 @@ Ai::Ai(const TbotsProto::AiConfig& ai_config)
       override_play(nullptr),
       current_play(std::make_unique<HaltPlay>(ai_config)),
       field_to_path_planner_factory(),
-      ai_config_changed(false)
+      ai_config_changed(true)
 {
 }
 
