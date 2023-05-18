@@ -34,6 +34,8 @@
 #include "software/world/field.h"
 #include "software/world/robot.h"
 #include "software/world/world.h"
+#include "software/ai/passing/pass_generator.hpp"
+#include "software/ai/passing/eighteen_zone_pitch_division.h"
 
 namespace py = pybind11;
 
@@ -337,4 +339,8 @@ PYBIND11_MODULE(python_bindings, m)
         m, "ThreadedEstopReader")
         .def(py::init<>(&createThreadedEstopReader))
         .def("isEstopPlay", &ThreadedEstopReader::isEstopPlay);
+
+    py::class_<PassGenerator<EighteenZonePitchDivision>>(m, "PassGenerator")
+        .def(py::init<std::shared_ptr<FieldPitchDivision<EighteenZonePitchDivision>::template>, TbotsProto::PassingConfig>())
+        .def("generatePassEvaluation", &)
 }
