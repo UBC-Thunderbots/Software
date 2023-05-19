@@ -106,7 +106,7 @@ TEST(PolygonExpandTest, test_invalid_modifier)
     }
 }
 
-TEST(PolygonExpandTest, test_from_segments)
+TEST(PolygonExpandTest, test_from_segment_single_radius)
 {
     const auto segment = Segment(Point(0, 0), Point(2, 2));
     double radius      = 1;
@@ -122,6 +122,45 @@ TEST(PolygonExpandTest, test_from_segments)
     Angle ninety_degrees     = Angle::fromDegrees(90);
     double long_side_length  = radius * 2 + segment.length();
     double short_side_length = radius * 2;
+
+
+    // check side lengths
+    EXPECT_TRUE(
+        TestUtil::equalWithinTolerance(first_side.length(), short_side_length, 0.001));
+    EXPECT_TRUE(
+        TestUtil::equalWithinTolerance(second_side.length(), long_side_length, 0.001));
+    EXPECT_TRUE(
+        TestUtil::equalWithinTolerance(third_side.length(), short_side_length, 0.001));
+    EXPECT_TRUE(
+        TestUtil::equalWithinTolerance(fourth_side.length(), long_side_length, 0.001));
+
+    // check there's only 4 segments
+    EXPECT_EQ(segments.size(), 4);
+
+    // check that angle between all sides is ninety degrees
+    EXPECT_EQ(first_side.orientation() - second_side.orientation(), ninety_degrees);
+    EXPECT_EQ(second_side.orientation() - third_side.orientation(), ninety_degrees);
+    EXPECT_EQ(third_side.orientation() - fourth_side.orientation(), ninety_degrees);
+    EXPECT_EQ(fourth_side.orientation() - first_side.orientation(), ninety_degrees);
+}
+
+TEST(PolygonExpandTest, test_from_segment_two_radii)
+{
+    const auto segment = Segment(Point(0, 0), Point(2, 2));
+    double l_radius      = 2;
+    double w_radius      = 1;
+
+    const auto poly     = Polygon::fromSegment(segment, l_radius, w_radius);
+    const auto segments = poly.getSegments();
+
+    Vector first_side  = segments[0].toVector();
+    Vector second_side = segments[1].toVector();
+    Vector third_side  = segments[2].toVector();
+    Vector fourth_side = segments[3].toVector();
+
+    Angle ninety_degrees     = Angle::fromDegrees(90);
+    double long_side_length  = l_radius * 2 + segment.length();
+    double short_side_length = w_radius * 2;
 
 
     // check side lengths
