@@ -90,7 +90,9 @@ class FieldTestRunner(TbotsTestRunner):
                 raise Exception("no friendly robots found on field")
 
         except queue.Empty as empty:
-            raise Exception(f"No Worlds were received with in {WORLD_BUFFER_TIMEOUT} seconds. Please make sure atleast 1 robot and 1 ball is present on the field.")
+            raise Exception(
+                f"No Worlds were received with in {WORLD_BUFFER_TIMEOUT} seconds. Please make sure atleast 1 robot and 1 ball is present on the field."
+            )
 
     def send_gamecontroller_command(
         self,
@@ -120,7 +122,7 @@ class FieldTestRunner(TbotsTestRunner):
         self.__setRobotState(worldstate)
 
     def __validateWorldState(self, eventually_validation_set, timeout):
-        """Runs any validation function in the eventually set on the current world. If no world recieves, raises
+        """Runs any validation function in the eventually set on the current world. If no world receives, raises
         empty queue error
 
         :param eventually_validation_set: the eventually validation functions to run against our world
@@ -350,7 +352,9 @@ class FieldTestRunner(TbotsTestRunner):
                     except queue.Empty as empty:
                         # If we timeout, that means full_system missed the last
                         # wrapper and robot status, lets resend it.
-                        logger.warning(f"No World was received for {WORLD_BUFFER_TIMEOUT} seconds. Ending test early.")
+                        logger.warning(
+                            f"No World was received for {WORLD_BUFFER_TIMEOUT} seconds. Ending test early."
+                        )
 
                 # Validate
                 (
@@ -553,7 +557,7 @@ def field_test_runner():
         current_proto_unix_io=yellow_full_system_proto_unix_io,
         multicast_channel=getRobotMulticastChannel(0),
         interface=args.interface,
-        disable_estop=False
+        disable_estop=False,
     ) as rc_yellow:
         with Gamecontroller(
             supress_logs=(not args.show_gamecontroller_logs), ci_mode=True
