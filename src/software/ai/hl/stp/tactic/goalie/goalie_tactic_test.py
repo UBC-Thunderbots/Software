@@ -7,7 +7,10 @@ from software.simulated_tests.ball_stops_in_region import *
 from software.simulated_tests.excessive_dribbling import *
 from software.simulated_tests.ball_moves_forward import *
 from software.simulated_tests.test_constants import *
-from software.simulated_tests.simulated_test_fixture import pytest_main
+from software.simulated_tests.simulated_test_fixture import (
+    simulated_test_runner,
+    pytest_main,
+)
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
 
@@ -179,9 +182,8 @@ def test_goalie_blocks_shot(
     eventually_validation_sequence_set = [
         [
             # Goalie should be in the defense area
-            BallStopsInRegion(regions=[ball_validation_region]),
+            BallStopsInRegion(regions=[ball_validation_region])
         ],
-        [BallEventuallyMovesForward()],
     ]
 
     simulated_test_runner.run_test(

@@ -1,3 +1,5 @@
+import math
+
 import software.python_bindings as tbots
 from proto.import_all_protos import *
 
@@ -8,13 +10,16 @@ from software.simulated_tests.validation import (
 )
 
 
-class BallStopsInRegion(Validation):
+class BallMovesToFromRobot(Validation):
     """Checks if a ball is moving towards or away from a robot"""
 
     def __init__(
-        self, robot_id,
+        self, robot_id, to_robot, ticks_to_wait
     ):
-        self.regions = regions if regions else []
+        self.robot_id = robot_id
+        self.to_robot = to_robot
+        self.
+        self.distance_to_robot = None
 
     def get_validation_status(self, world) -> ValidationStatus:
         """Checks if the ball stops in the provided regions
@@ -23,15 +28,25 @@ class BallStopsInRegion(Validation):
         :returns: FAILING until a ball stops in any of the regions
                   PASSING when a ball stops in a region
         """
-        for region in self.regions:
-            if tbots.contains(
-                region, tbots.createPoint(world.ball.current_state.global_position)
-            ) and (
-                tbots.createVector(world.ball.current_state.global_velocity).length()
-                <= 0.01
-            ):
-                return ValidationStatus.PASSING
+        for robot in world.friendly_team.team_robots:
+            if robot.id == self.robot_id:
+                curr_ball_robot_dist = math.hypot(
+                    world.ball.current_state.global_position.x_meters - robot.current_state.global_position.x_meters,
+                    world.ball.current_state.global_position.y_meters - robot.current_state.global_position.y_meters
+                )
+                print(curr_ball_robot_dist)
+                print(self.distance_to_robot)
+                if self.distance_to_robot is not None:
+                    if self.to_robot and curr_ball_robot_dist < self.distance_to_robot - 0.07:
+                        print("HERE?")
+                        return ValidationStatus.PASSING
+                    elif curr_ball_robot_dist > self.distance_to_robot + 0.07:
+                        print("HERE?")
+                        return ValidationStatus.PASSING
 
+                self.distance_to_robot = curr_ball_robot_dist
+
+        print("?????")
         return ValidationStatus.FAILING
 
     def get_validation_geometry(self, world) -> ValidationGeometry:
@@ -41,17 +56,15 @@ class BallStopsInRegion(Validation):
         :returns: ValidationGeometry containing geometry to visualize
 
         """
-        return create_validation_geometry(self.regions)
+        return create_validation_geometry()
 
     def __repr__(self):
-        return "Checking ball stops in regions " + ",".join(
-            repr(region) for region in self.regions
-        )
+        return "Checking ball stops in regions "
 
 
 (
-    BallEventuallyStopsInRegion,
-    BallEventuallyMovesInRegion,
-    BallAlwaysStopsInRegion,
-    BallNeverStopsInRegion,
-) = create_validation_types(BallStopsInRegion)
+    BallEventuallyMovesToFromRobot,
+    BallEventuallyStops,
+    BallAlwaysMovesToFromRobot,
+    BallNeverMovesToFromRobot,
+) = create_validation_types(BallMovesToFromRobot)
