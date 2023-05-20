@@ -3,7 +3,7 @@
 #include "software/ai/evaluation/defender_assignment.h"
 #include "software/ai/evaluation/enemy_threat.h"
 
-DefensePlayFSM ::DefensePlayFSM(TbotsProto::AiConfig ai_config)
+DefensePlayFSM::DefensePlayFSM(TbotsProto::AiConfig ai_config)
     : ai_config(ai_config), crease_defenders({}), pass_defenders({})
 {
 }
@@ -65,12 +65,9 @@ void DefensePlayFSM::defendAgainstThreats(const Update& event)
         auto target = crease_defender_assignments.at(i).target;
 
         // Determine the number of crease defenders already assigned to the target
-        auto defenders_with_target_count = 
-            std::count_if(crease_defender_assignments.begin(), 
-                          crease_defender_assignments.begin() + i,
-                          [&target](const auto& assignment) { 
-                              return assignment.target == target; 
-                          });
+        auto defenders_with_target_count = std::count_if(
+            crease_defender_assignments.begin(), crease_defender_assignments.begin() + i,
+            [&target](const auto& assignment) { return assignment.target == target; });
 
         // Pick alignment based on how many crease defenders are already assigned to the
         // target

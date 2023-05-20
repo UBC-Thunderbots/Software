@@ -10,9 +10,11 @@ cc_library(
     name = "offense_play",
     srcs = [
         "offense_play.cpp",
+        "offense_play_fsm.cpp",
     ],
     hdrs = [
         "offense_play.h",
+        "offense_play_fsm.h",
     ],
     deps = [
         "//shared:constants",
