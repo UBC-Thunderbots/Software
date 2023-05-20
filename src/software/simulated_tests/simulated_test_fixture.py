@@ -332,8 +332,7 @@ class InvariantTestRunner(SimulatedTestRunner):
         setup(params[0])
 
         super().run_test(
-            inv_always_validation_sequence_set,
-            inv_eventually_validation_sequence_set,
+            inv_always_validation_sequence_set, inv_eventually_validation_sequence_set,
         )
 
 
