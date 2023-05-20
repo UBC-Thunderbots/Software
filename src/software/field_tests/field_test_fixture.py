@@ -27,7 +27,6 @@ from proto.message_translation.tbots_protobuf import create_world_state
 
 from software.logger.logger import createLogger
 
-# from software.simulated_tests.pytest_main import load_command_line_arguments
 from software.simulated_tests.tbots_test_runner import TbotsTestRunner
 from software.thunderscope.robot_communication import RobotCommunication
 from software.py_constants import *
@@ -85,14 +84,13 @@ class FieldTestRunner(TbotsTestRunner):
                 robot.id for robot in world.enemy_team.team_robots
             ]
 
-            logger.info(f"blue team ids {self.friendly_robot_ids_field}")
+            logger.info(f"friendly team ids {self.friendly_robot_ids_field}")
 
             if len(self.friendly_robot_ids_field) == 0:
-                print("raising an exception", flush=True)
                 raise Exception("no friendly robots found on field")
 
         except queue.Empty as empty:
-            raise Exception("unable to determine robots on the field")
+            raise Exception(f"No Worlds were received with in {WORLD_BUFFER_TIMEOUT} seconds. Please make sure atleast 1 robot and 1 ball is present on the field.")
 
     def send_gamecontroller_command(
         self,
@@ -122,6 +120,12 @@ class FieldTestRunner(TbotsTestRunner):
         self.__setRobotState(worldstate)
 
     def __validateWorldState(self, eventually_validation_set, timeout):
+        """Runs any validation function in the eventually set on the current world. If no world recieves, raises
+        empty queue error
+
+        :param eventually_validation_set: the eventually validation functions to run against our world
+        :param timeout: world buffer timeout
+        """
         timeout_time = time.time() + timeout
 
         while time.time() < timeout_time:
@@ -346,7 +350,7 @@ class FieldTestRunner(TbotsTestRunner):
                     except queue.Empty as empty:
                         # If we timeout, that means full_system missed the last
                         # wrapper and robot status, lets resend it.
-                        logger.warning("No world received")
+                        logger.warning(f"No World was received for {WORLD_BUFFER_TIMEOUT} seconds. Ending test early.")
 
                 # Validate
                 (
@@ -394,10 +398,10 @@ class FieldTestRunner(TbotsTestRunner):
         threading.excepthook = excepthook
 
         if self.thunderscope:
-            run_sim_thread = threading.Thread(target=__runner, daemon=True)
-            run_sim_thread.start()
+            run_test_thread = threading.Thread(target=__runner, daemon=True)
+            run_test_thread.start()
             self.thunderscope.show()
-            run_sim_thread.join()
+            run_test_thread.join()
 
             if self.last_exception:
                 pytest.fail(str(ex.last_exception))
@@ -512,6 +516,10 @@ def load_command_line_arguments():
 
 @pytest.fixture
 def field_test_runner():
+    """
+    Runs a field test
+    :return: yields the runner to the test fixture
+    """
     simulator_proto_unix_io = ProtoUnixIO()
     yellow_full_system_proto_unix_io = ProtoUnixIO()
     blue_full_system_proto_unix_io = ProtoUnixIO()
@@ -541,13 +549,19 @@ def field_test_runner():
         multicast_channel=getRobotMulticastChannel(0),
         interface=args.interface,
         disable_estop=False,
-    ) as rc_blue:
+    ) as rc_blue, RobotCommunication(
+        current_proto_unix_io=yellow_full_system_proto_unix_io,
+        multicast_channel=getRobotMulticastChannel(0),
+        interface=args.interface,
+        disable_estop=False
+    ) as rc_yellow:
         with Gamecontroller(
             supress_logs=(not args.show_gamecontroller_logs), ci_mode=True
         ) as gamecontroller:
             blue_fs.setup_proto_unix_io(blue_full_system_proto_unix_io)
             yellow_fs.setup_proto_unix_io(yellow_full_system_proto_unix_io)
             rc_blue.setup_for_fullsystem()
+            rc_yellow.setup_for_fullsystem()
 
             gamecontroller.setup_proto_unix_io(
                 blue_full_system_proto_unix_io, yellow_full_system_proto_unix_io,
@@ -602,4 +616,3 @@ def field_test_runner():
                     f"\n\nTo replay this test for the yellow team, go to the `src` folder and run \n./tbots.py run thunderscope --yellow_log {yellow_logger.log_folder}",
                     flush=True,
                 )
-    print("exiting field test runner fixture", flush=True)

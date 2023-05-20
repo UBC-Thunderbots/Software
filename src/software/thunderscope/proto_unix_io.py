@@ -57,7 +57,7 @@ class ProtoUnixIO:
         self.unix_senders = {}
         self.unix_listeners = {}
         self.send_proto_to_observer_threads = {}
-        self.stop_running = False
+        self.running = True
 
     def __send_proto_to_observers(self, receive_buffer: ThreadSafeBuffer):
         """Given a ThreadSafeBuffer (receive_buffer) consume it and
@@ -66,7 +66,7 @@ class ProtoUnixIO:
         :param receive_buffer: The queue to consume from
 
         """
-        while not self.stop_running:
+        while self.running:
             proto = receive_buffer.get()
 
             if proto.DESCRIPTOR.full_name in self.proto_observers:
@@ -169,7 +169,10 @@ class ProtoUnixIO:
         self.send_proto_to_observer_threads[key].start()
 
     def force_close(self):
-        self.stop_running = True
+        """
+        Closes all unix senders and receivers
+        """
+        self.running = False
         for sender in self.unix_senders.items():
             sender[1].force_stop()
         for listener in self.unix_listeners.items():

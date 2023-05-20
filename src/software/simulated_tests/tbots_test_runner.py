@@ -69,19 +69,16 @@ class TbotsTestRunner(object):
     def send_gamecontroller_command(
         self,
         gc_command: proto.ssl_gc_state_pb2.Command,
-        isBlue: bool,
+        is_blue: bool,
         final_ball_placement_point=None,
     ):
         """sends a gamecontroller command that is to be broadcasted to the given team
 
         param gc_command: the gamecontroller command
-        param isBlue: whether the command should be sent to the blue team
+        param is_blue: whether the command should be sent to the blue team
         final_ball_placement_point: where to place the ball in ball placement
-
-        Raises:
-            NotImplementedError: 
         """
-        if isBlue:
+        if is_blue:
             self.gamecontroller.send_ci_input(
                 gc_command=gc_command,
                 team=Team.BLUE,
@@ -95,17 +92,17 @@ class TbotsTestRunner(object):
             )
 
     def set_tactics(
-        self, tactics: AssignedTacticPlayControlParams, isBlue: bool,
+        self, tactics: AssignedTacticPlayControlParams, is_blue: bool,
     ):
         """Overrides current AI tactic for the given team
 
         param tactic: the tactic params proto to use
-        param isBlue: whether the play should be applied to the blue team
+        param is_blue: whether the play should be applied to the blue team
 
         Raises:
             NotImplementedError
         """
-        if isBlue:
+        if is_blue:
             self.blue_full_system_proto_unix_io.send_proto(
                 AssignedTacticPlayControlParams, tactics
             )
@@ -114,22 +111,26 @@ class TbotsTestRunner(object):
                 AssignedTacticPlayControlParams, tactics
             )
 
-    def set_play(self, play: Play, isBlue: bool):
+    def set_play(self, play: Play, is_blue: bool):
         """Overrides current AI play for the given team
 
         param play: the play proto to use
-        param isBlue: whether the play should be applied to the blue team
+        param is_blue: whether the play should be applied to the blue team
 
         Raises:
             NotImplementedError
         """
-        if isBlue:
+        if is_blue:
             self.blue_full_system_proto_unix_io.send_proto(Play, play)
 
         else:
             self.yellow_full_system_proto_unix_io.send_proto(Play, play)
 
     def set_worldState(self, worldstate: WorldState):
+        """Sets the worldstate for the given team
+
+        :param worldstate: the worldstate proto to use
+        """
         raise NotImplementedError("abstract class method called set_worldstate")
 
     def time_provider(self):
