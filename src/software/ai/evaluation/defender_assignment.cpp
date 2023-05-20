@@ -8,6 +8,11 @@
 std::vector<DefenderAssignment> getAllDefenderAssignments(
     const std::vector<EnemyThreat> &threats, const Field &field, const Ball &ball)
 {
+    if (threats.size() == 0)
+    {
+        return {};
+    }
+
     std::vector<GoalLane> goal_lanes;
     std::vector<ShootingLane> passing_lanes;
     std::vector<DefenderAssignment> assignments;

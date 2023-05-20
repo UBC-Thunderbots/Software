@@ -17,6 +17,11 @@ void DefensePlayFSM::defendAgainstThreats(const Update& event)
     auto assignments = getAllDefenderAssignments(
         enemy_threats, event.common.world.field(), event.common.world.ball());
 
+    if (assignments.size() == 0)
+    {
+        return;
+    }
+
     // Choose which defender assignments to assign defenders to based on number
     // of tactics available to set
     std::vector<DefenderAssignment> crease_defender_assignments;
