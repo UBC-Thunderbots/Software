@@ -78,24 +78,14 @@ void DefensePlayFSM::defendAgainstThreats(const Update& event)
                 alignment = TbotsProto::CreaseDefenderAlignment::CENTRE;
                 break;
             case 1:
-                if (event.common.world.ball().position().y() > 0)
-                {
-                    alignment = TbotsProto::CreaseDefenderAlignment::LEFT;
-                }
-                else
-                {
-                    alignment = TbotsProto::CreaseDefenderAlignment::RIGHT;
-                }
+                alignment = (event.common.world.ball().position().y() > 0)
+                                ? TbotsProto::CreaseDefenderAlignment::LEFT
+                                : TbotsProto::CreaseDefenderAlignment::RIGHT;
                 break;
             case 2:
-                if (event.common.world.ball().position().y() > 0)
-                {
-                    alignment = TbotsProto::CreaseDefenderAlignment::RIGHT;
-                }
-                else
-                {
-                    alignment = TbotsProto::CreaseDefenderAlignment::LEFT;
-                }
+                alignment = (event.common.world.ball().position().y() > 0)
+                                ? TbotsProto::CreaseDefenderAlignment::RIGHT
+                                : TbotsProto::CreaseDefenderAlignment::LEFT;
                 break;
             default:
                 alignment = TbotsProto::CreaseDefenderAlignment::CENTRE;
