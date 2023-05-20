@@ -171,7 +171,7 @@ std::vector<std::vector<GoalLane>> groupGoalLanesByDensity(
 
     for (unsigned int i = 1; i < goal_lanes.size(); i++)
     {
-        // If the percent diff between angles to goal of current lane vs previous lane 
+        // If the percent diff between angles to goal of current lane vs previous lane
         // exceeds threshold, start a new group
         double percent_diff =
             percent_difference(goal_lanes[i].angle_to_goal.toRadians(),

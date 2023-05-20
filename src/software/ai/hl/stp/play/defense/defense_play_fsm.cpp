@@ -32,7 +32,7 @@ void DefensePlayFSM::defendAgainstThreats(const Update& event)
         {
             // If we have more tactics to set than determined defender assignments,
             // assign remaining defenders to the defender assignment with the
-            // highest "coverage_rating"
+            // highest coverage rating
             defender_assignment = assignments.front();
         }
 
@@ -57,17 +57,8 @@ void DefensePlayFSM::defendAgainstThreats(const Update& event)
 
     // Reset tactics if the number of crease defenders or pass defenders
     // we intend to assign has changed
-    auto num_crease_defenders =
-        static_cast<unsigned int>(crease_defender_assignments.size());
-    auto num_pass_defenders = static_cast<unsigned int>(pass_defender_assignments.size());
-    if (num_crease_defenders != crease_defenders.size())
-    {
-        setUpCreaseDefenders(num_crease_defenders);
-    }
-    if (num_pass_defenders != pass_defenders.size())
-    {
-        setUpPassDefenders(num_pass_defenders);
-    }
+    setUpCreaseDefenders(static_cast<unsigned int>(crease_defender_assignments.size()));
+    setUpPassDefenders(static_cast<unsigned int>(pass_defender_assignments.size()));
 
     for (unsigned int i = 0; i < crease_defenders.size(); i++)
     {
@@ -115,6 +106,11 @@ void DefensePlayFSM::defendAgainstThreats(const Update& event)
 
 void DefensePlayFSM::setUpCreaseDefenders(unsigned int num_crease_defenders)
 {
+    if (num_crease_defenders == crease_defenders.size())
+    {
+        return;
+    }
+
     crease_defenders =
         std::vector<std::shared_ptr<CreaseDefenderTactic>>(num_crease_defenders);
     std::generate(crease_defenders.begin(), crease_defenders.end(), [this]() {
@@ -125,6 +121,11 @@ void DefensePlayFSM::setUpCreaseDefenders(unsigned int num_crease_defenders)
 
 void DefensePlayFSM::setUpPassDefenders(unsigned int num_pass_defenders)
 {
+    if (num_pass_defenders == pass_defenders.size())
+    {
+        return;
+    }
+
     pass_defenders = std::vector<std::shared_ptr<PassDefenderTactic>>(num_pass_defenders);
     std::generate(pass_defenders.begin(), pass_defenders.end(),
                   [this]() { return std::make_shared<PassDefenderTactic>(); });

@@ -18,18 +18,21 @@ TeamPossession PossessionTracker::getTeamWithPossession(const Team &friendly_tea
 
     updateTimes(friendly_team, enemy_team, ball, field);
 
-    const Duration TIME_NEAR_THRESHOLD = Duration::fromSeconds(0.1);
-    const Duration TIME_FAR_THRESHOLD = Duration::fromSeconds(1.5);
-    
-    if ((time_near_friendly > TIME_NEAR_THRESHOLD) && (time_near_enemy < TIME_NEAR_THRESHOLD))
+    const Duration TIME_NEAR_THRESHOLD = Duration::fromSeconds(TIME_NEAR_THRESHOLD_S);
+    const Duration TIME_FAR_THRESHOLD  = Duration::fromSeconds(TIME_FAR_THRESHOLD_S);
+
+    if ((time_near_friendly > TIME_NEAR_THRESHOLD) &&
+        (time_near_enemy < TIME_NEAR_THRESHOLD))
     {
         possession = TeamPossession::FRIENDLY_TEAM;
     }
-    else if ((time_near_friendly < TIME_NEAR_THRESHOLD) && (time_near_enemy > TIME_NEAR_THRESHOLD))
+    else if ((time_near_friendly < TIME_NEAR_THRESHOLD) &&
+             (time_near_enemy > TIME_NEAR_THRESHOLD))
     {
         possession = TeamPossession::ENEMY_TEAM;
     }
-    else if ((time_near_friendly > TIME_NEAR_THRESHOLD) && (time_near_enemy > TIME_NEAR_THRESHOLD))
+    else if ((time_near_friendly > TIME_NEAR_THRESHOLD) &&
+             (time_near_enemy > TIME_NEAR_THRESHOLD))
     {
         // Both teams are considered to have presence over the ball.
         // Determine possession based on which side of the field the ball is on.
@@ -42,26 +45,26 @@ TeamPossession PossessionTracker::getTeamWithPossession(const Team &friendly_tea
             possession = TeamPossession::FRIENDLY_TEAM;
         }
     }
-    else if ((time_far_friendly > TIME_FAR_THRESHOLD) && (time_far_enemy > TIME_FAR_THRESHOLD))
+    else if ((time_far_friendly > TIME_FAR_THRESHOLD) &&
+             (time_far_enemy > TIME_FAR_THRESHOLD))
     {
         // No team has presence over the ball.
         // Consider our team as having possession since we should seek to gain
-        // possession of the ball. 
+        // possession of the ball.
         possession = TeamPossession::FRIENDLY_TEAM;
     }
 
     return possession;
 }
 
-void PossessionTracker::updateTimes(const Team &friendly_team,
-                                    const Team &enemy_team,
-                                    const Ball &ball,
-                                    const Field &field)
+void PossessionTracker::updateTimes(const Team &friendly_team, const Team &enemy_team,
+                                    const Ball &ball, const Field &field)
 {
     Duration delta_time = ball.timestamp() - last_timestamp;
-    last_timestamp = ball.timestamp();
+    last_timestamp      = ball.timestamp();
 
-    auto nearest_friendly = getRobotWithEffectiveBallPossession(friendly_team, ball, field);
+    auto nearest_friendly =
+        getRobotWithEffectiveBallPossession(friendly_team, ball, field);
     auto nearest_enemy = getRobotWithEffectiveBallPossession(enemy_team, ball, field);
     if (!nearest_friendly || !nearest_enemy)
     {
@@ -69,9 +72,9 @@ void PossessionTracker::updateTimes(const Team &friendly_team,
     }
 
     double distance_friendly = distance(nearest_friendly->position(), ball.position());
-    double distance_enemy = distance(nearest_enemy->position(), ball.position());
+    double distance_enemy    = distance(nearest_enemy->position(), ball.position());
 
-    if (distance_friendly < DISTANCE_NEAR_TOLERANCE)
+    if (distance_friendly < DISTANCE_NEAR_TOLERANCE_METERS)
     {
         time_near_friendly = time_near_friendly + delta_time;
     }
@@ -80,7 +83,7 @@ void PossessionTracker::updateTimes(const Team &friendly_team,
         time_near_friendly = Duration::fromSeconds(0);
     }
 
-    if (distance_enemy < DISTANCE_NEAR_TOLERANCE)
+    if (distance_enemy < DISTANCE_NEAR_TOLERANCE_METERS)
     {
         time_near_enemy = time_near_enemy + delta_time;
     }
@@ -89,7 +92,7 @@ void PossessionTracker::updateTimes(const Team &friendly_team,
         time_near_enemy = Duration::fromSeconds(0);
     }
 
-    if (distance_friendly > DISTANCE_FAR_TOLERANCE)
+    if (distance_friendly > DISTANCE_FAR_TOLERANCE_METERS)
     {
         time_far_friendly = time_far_friendly + delta_time;
     }
@@ -98,7 +101,7 @@ void PossessionTracker::updateTimes(const Team &friendly_team,
         time_far_friendly = Duration::fromSeconds(0);
     }
 
-    if (distance_enemy > DISTANCE_FAR_TOLERANCE)
+    if (distance_enemy > DISTANCE_FAR_TOLERANCE_METERS)
     {
         time_far_enemy = time_far_enemy + delta_time;
     }
