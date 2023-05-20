@@ -18,11 +18,11 @@ std::vector<DefenderAssignment> getAllDefenderAssignments(
     // The primary threat is the only exception to this rule.
     std::vector<EnemyThreat> relevant_threats{threats.front()};
     double max_x_coordinate = field.xLength() / 4;
-    for (unsigned int i = 1; i < threats.size(); i++)
+    for (const auto &threat : threats)
     {
-        if (threats[i].robot.position().x() < max_x_coordinate)
+        if (threat.robot.position().x() < max_x_coordinate)
         {
-            relevant_threats.emplace_back(threats[i]);
+            relevant_threats.emplace_back(threat);
         }
     }
 
@@ -84,11 +84,12 @@ std::vector<DefenderAssignment> getAllDefenderAssignments(
         }
     }
 
-    // Remove assignments with targets in the defense area
+    // Remove pass defender assignments with targets in the defense area
     assignments.erase(
         std::remove_if(assignments.begin(), assignments.end(),
                        [&field](const auto &assignment) {
-                           return field.pointInFriendlyDefenseArea(assignment.target);
+                           return assignment.type == PASS_DEFENDER &&
+                                  field.pointInFriendlyDefenseArea(assignment.target);
                        }),
         assignments.end());
 
