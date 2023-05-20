@@ -339,8 +339,4 @@ PYBIND11_MODULE(python_bindings, m)
         m, "ThreadedEstopReader")
         .def(py::init<>(&createThreadedEstopReader))
         .def("isEstopPlay", &ThreadedEstopReader::isEstopPlay);
-
-    py::class_<PassGenerator<EighteenZonePitchDivision>>(m, "PassGenerator")
-        .def(py::init<std::shared_ptr<FieldPitchDivision<EighteenZonePitchDivision>::template>, TbotsProto::PassingConfig>())
-        .def("generatePassEvaluation", &)
 }
