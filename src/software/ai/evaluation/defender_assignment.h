@@ -5,6 +5,7 @@
 #include "software/geom/segment.h"
 #include "software/world/field.h"
 
+// Indicates the type of defender for a DefenderAssignment
 enum DefenderAssignmentType
 {
     CREASE_DEFENDER,

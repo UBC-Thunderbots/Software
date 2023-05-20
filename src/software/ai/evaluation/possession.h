@@ -35,7 +35,7 @@ class PossessionTracker
 
     // Min time in seconds that robot must stay away from ball for
     // it to be considered far away
-    static constexpr double TIME_FAR_THRESHOLD_S = 0.5;
+    static constexpr double TIME_FAR_THRESHOLD_S = 1.5;
 
     /**
      * Returns a TeamPossession value indicating which team has possession of the ball.

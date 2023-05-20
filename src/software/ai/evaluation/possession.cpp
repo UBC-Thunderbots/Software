@@ -35,8 +35,18 @@ TeamPossession PossessionTracker::getTeamWithPossession(const Team &friendly_tea
              (time_near_enemy > TIME_NEAR_THRESHOLD))
     {
         // Both teams are considered to have presence over the ball.
-        // Determine possession based on which side of the field the ball is on.
-        if (field.pointInFriendlyHalf(ball.position()))
+        // If the ball is on our side of the field, or no enemy robots are
+        // on our side of the field, consider enemy team as having possession.
+
+        auto enemy_team_robots = enemy_team.getAllRobotsExceptGoalie();
+        auto num_enemies_in_friendly_half =
+            std::count_if(enemy_team_robots.begin(), enemy_team_robots.end(),
+                          [&field](const auto &enemy) {
+                              return field.pointInFriendlyHalf(enemy.position());
+                          });
+
+        if (field.pointInFriendlyHalf(ball.position()) ||
+            num_enemies_in_friendly_half == 0)
         {
             possession = TeamPossession::ENEMY_TEAM;
         }

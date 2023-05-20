@@ -32,30 +32,35 @@ void OffensePlay::updateTactics(const PlayUpdate &play_update)
 
     PriorityTacticVector tactics_to_return;
     unsigned int num_defenders;
-    unsigned int num_enemy_robots =
-        static_cast<int>(play_update.world.enemyTeam().numRobots());
 
-    TeamPossession team_with_possession = possession_tracker->getTeamWithPossession(
+    TeamPossession possession = possession_tracker->getTeamWithPossession(
         play_update.world.friendlyTeam(), play_update.world.enemyTeam(),
         play_update.world.ball(), play_update.world.field());
 
-    if (team_with_possession == TeamPossession::ENEMY_TEAM)
+    if (possession == TeamPossession::ENEMY_TEAM)
     {
         num_defenders = play_update.num_tactics;
     }
-    else
+    else if (possession == TeamPossession::FRIENDLY_TEAM)
     {
-        num_defenders = 2;
+        auto num_enemy_robots = play_update.world.enemyTeam().numRobots();
 
-        // If enemy team has at most half a full team, we need at
-        // most half the number of defenders
-        if (num_enemy_robots <= 3)
+        if (play_update.num_tactics > num_enemy_robots)
         {
+            // Always reduce number of defenders if we have more bots on the field than
+            // the enemy team, so that we take advantage of the scoring opportunity
+            // while the enemy team is down a robot
             num_defenders = 1;
-            if (num_enemy_robots < 2)
-            {
-                num_defenders = 0;
-            }
+        }
+        else if (play_update.num_tactics <= 2)
+        {
+            // Set number of defenders to 0 so we don't get stuck defending and never 
+            // attempt to score
+            num_defenders = 0;
+        }
+        else 
+        {
+            num_defenders = 2;
         }
     }
 
