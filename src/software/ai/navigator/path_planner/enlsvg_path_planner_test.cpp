@@ -684,6 +684,42 @@ TEST_F(TestEnlsvgPathPlanner, test_going_around_defense_area)
     TestUtil::checkPathDoesNotIntersectObstacle(path.value(), obstacle_polygons);
 }
 
+TEST_F(TestEnlsvgPathPlanner, test_going_around_goal)
+{
+    World world = ::TestUtil::createBlankTestingWorld(TbotsProto::FieldType::DIV_B);
+    const Field& field = world.field();
+    Rectangle navigable_area = field.fieldBoundary();
+
+    // Inside the goal area
+    Point start{-4.57, 0};
+    // At the corner of the field
+    Point dest{-4.4, -2.9};
+
+    std::vector<ObstaclePtr> obstacles = robot_navigation_obstacle_factory.createFromMotionConstraint(
+            TbotsProto::MotionConstraint::FRIENDLY_GOAL, world);
+    // print all osbtacles in the above arrray
+    std::cout << obstacles[0]->toString() << std::endl;
+    std::cout << obstacles[1]->toString() << std::endl;
+    std::cout << obstacles[2]->toString() << std::endl;
+    std::cout << "osbtacle length: " << obstacles.size() << std::endl;
+
+    EnlsvgPathPlanner planner =
+        EnlsvgPathPlanner(navigable_area, obstacles, ROBOT_MAX_RADIUS_METERS);
+    std::optional<Path> path = planner.findPath(start, dest);
+
+    ASSERT_TRUE(path != std::nullopt);
+
+    // Make sure the start and end points match
+    EXPECT_EQ(start, path.value().front());
+    EXPECT_EQ(dest, path.value().back());
+    std::cout << "path length: " << path.value().size() << std::endl;
+
+    // Make sure path does not exceed a bounding box
+    Rectangle bounding_box({-4.6, 0.1}, {-4, -3.1});
+    TestUtil::checkPathDoesNotExceedBoundingBox(path.value(), bounding_box);
+    TestUtil::checkPathDoesNotIntersectObstacle(path.value(), obstacles);
+}
+
 TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_speed_test)
 {
     // This test does not assert anything. It prints how long it takes to path plan 121
