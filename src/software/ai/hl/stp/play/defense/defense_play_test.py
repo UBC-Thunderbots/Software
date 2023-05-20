@@ -33,7 +33,6 @@ from proto.ssl_gc_common_pb2 import Team
     ],
 )
 def test_defense_play(simulated_test_runner, blue_bots, yellow_bots):
-
     def setup(*args):
         # Starting point must be Point
         ball_initial_pos = tbots.Point(0.9, 2.85)
@@ -56,7 +55,9 @@ def test_defense_play(simulated_test_runner, blue_bots, yellow_bots):
         yellow_play.name = PlayName.ShootOrPassPlay
 
         simulated_test_runner.blue_full_system_proto_unix_io.send_proto(Play, blue_play)
-        simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(Play, yellow_play)
+        simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(
+            Play, yellow_play
+        )
 
         # Create world state
         simulated_test_runner.simulator_proto_unix_io.send_proto(
@@ -71,7 +72,7 @@ def test_defense_play(simulated_test_runner, blue_bots, yellow_bots):
 
     simulated_test_runner.run_test(
         setup=setup,
-        params=[0, 1, 2, 3, 4], # The aggregate test runs 5 times
+        params=[0, 1, 2, 3, 4],  # The aggregate test runs 5 times
         inv_always_validation_sequence_set=[[]],
         inv_eventually_validation_sequence_set=[[]],
         ag_always_validation_sequence_set=[
