@@ -6,5 +6,5 @@ TEST(PassingSimTest, test_pass)
     Robot robot1 = ::TestUtil::createRobotAtPos(Point(-1, 0));
     Robot robot2 = ::TestUtil::createRobotAtPos(Point(1, 0));
 
-    
+
 }
