@@ -81,7 +81,6 @@ py_library(
         "ball_moves_forward.py",
         "ball_speed_threshold.py",
         "ball_stops_in_region.py",
-        "ball_moves_to_from_robot.py",
         "excessive_dribbling.py",
         "friendly_has_ball_possession.py",
         "friendly_team_scored.py",
@@ -103,10 +102,4 @@ py_library(
 py_library(
     name = "speed_threshold_helpers",
     srcs = ["speed_threshold_helpers.py"],
-)
-
-py_library(
-    name = "test_constants",
-    srcs = ["test_constants.py"],
-    deps = [],
 )

@@ -55,7 +55,6 @@ py_test(
     deps = [
         "//software/simulated_tests:simulated_test_fixture",
         "//software/simulated_tests:speed_threshold_helpers",
-        "//software/simulated_tests:test_constants",
         "//software/simulated_tests:validation",
         requirement("pytest"),
     ],

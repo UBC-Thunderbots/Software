@@ -150,7 +150,6 @@ class SimulatedTestRunner(object):
         """
 
         time_elapsed_s = 0
-        eventually_validation_failure_msg = "Test Timed Out"
 
         while time_elapsed_s < test_timeout_s:
             # Check for new CI commands at this time step
@@ -227,15 +226,10 @@ class SimulatedTestRunner(object):
             # Check that all always validations are always valid
             validation.check_validation(always_validation_proto_set)
 
-            try:
-                # Check that all eventually validations are eventually valid
-                validation.check_validation(eventually_validation_proto_set)
-                self.__stopper()
-                return
-            except AssertionError as e:
-                eventually_validation_failure_msg = str(e)
+        # Check that all eventually validations are eventually valid
+        validation.check_validation(eventually_validation_proto_set)
 
-        raise AssertionError(eventually_validation_failure_msg)
+        self.__stopper()
 
     def run_test(
         self,
@@ -316,8 +310,6 @@ class InvariantTestRunner(SimulatedTestRunner):
         params=[0],
         inv_always_validation_sequence_set=[[]],
         inv_eventually_validation_sequence_set=[[]],
-        test_timeout_s=3,
-        tick_duration_s=0.0166,  # Default to 60hz
         **kwargs,
     ):
         """Run an invariant test
@@ -342,8 +334,6 @@ class InvariantTestRunner(SimulatedTestRunner):
         super().run_test(
             inv_always_validation_sequence_set,
             inv_eventually_validation_sequence_set,
-            test_timeout_s,
-            tick_duration_s,
         )
 
 
@@ -365,8 +355,6 @@ class AggregateTestRunner(SimulatedTestRunner):
         params=[],
         ag_always_validation_sequence_set=[[]],
         ag_eventually_validation_sequence_set=[[]],
-        test_timeout_s=3,
-        tick_duration_s=0.0166,  # Default to 60hz
         **kwargs,
     ):
         """Run an aggregate test
@@ -398,8 +386,6 @@ class AggregateTestRunner(SimulatedTestRunner):
                 super().run_test(
                     ag_always_validation_sequence_set,
                     ag_eventually_validation_sequence_set,
-                    test_timeout_s,
-                    tick_duration_s,
                 )
             except AssertionError:
                 failed_tests += 1
