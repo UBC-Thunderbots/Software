@@ -155,6 +155,12 @@ if __name__ == "__main__":
         action="store_true",
         help="show pass cost visualization layer",
     )
+    parser.add_argument(
+        "--use_keyboard_estop",
+        action="store_true",
+        default=False,
+        help="Allows the use of the spacebar as an estop instead of a physical one",
+    )
 
     # Sanity check that an interface was provided
     args = parser.parse_args()
@@ -253,12 +259,11 @@ if __name__ == "__main__":
             current_proto_unix_io = tscope.robot_diagnostics_proto_unix_io
 
         with RobotCommunication(
-            current_proto_unix_io, getRobotMulticastChannel(0), args.interface,
+            current_proto_unix_io,
+            getRobotMulticastChannel(0),
+            args.interface,
+            args.use_keyboard_estop,
         ) as robot_communication:
-            tscope.keyboard_estop_shortcut.activated.connect(
-                robot_communication.toggle_keyboard_estop
-            )
-
             if args.run_diagnostics:
                 tscope.control_mode_signal.connect(
                     lambda mode, robot_id: robot_communication.toggle_robot_connection(

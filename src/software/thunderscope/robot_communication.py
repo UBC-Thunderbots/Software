@@ -18,6 +18,7 @@ class RobotCommunication(object):
         current_proto_unix_io,
         multicast_channel,
         interface,
+        use_keyboard_estop=False,
         estop_path="/dev/ttyACM0",
         estop_buadrate=115200,
     ):
@@ -26,7 +27,7 @@ class RobotCommunication(object):
         :param current_proto_unix_io: the current proto unix io object
         :param multicast_channel: The multicast channel to use
         :param interface: The interface to use
-        :param disable_estop: whether to disable estop checks (ONLY FOR TESTING LOCALLY)
+        :param use_keyboard_estop: if True, allows using the spacebar as an estop. If false, checks for physical estop
         :param estop_path: The path to the estop
         :param estop_baudrate: The baudrate of the estop
 
@@ -36,6 +37,7 @@ class RobotCommunication(object):
         self.current_proto_unix_io = current_proto_unix_io
         self.multicast_channel = str(multicast_channel)
         self.interface = interface
+        self.use_keyboard_estop = use_keyboard_estop
         self.estop_path = estop_path
         self.estop_buadrate = estop_buadrate
 
@@ -73,12 +75,14 @@ class RobotCommunication(object):
         self.estop_reader = None
         self.estop_is_playing = False
 
-        try:
-            self.estop_reader = ThreadedEstopReader(
-                self.estop_path, self.estop_buadrate
-            )
-        except Exception:
-            print("Could not find estop, using Keyboard Estop (Spacebar) instead")
+        # only checks for estop if checking is not disabled
+        if not self.use_keyboard_estop:
+            try:
+                self.estop_reader = ThreadedEstopReader(
+                    self.estop_path, self.estop_buadrate
+                )
+            except Exception:
+                raise Exception("Could not find estop, make sure its plugged in")
 
     def __send_estop_state(self):
         """
@@ -87,7 +91,7 @@ class RobotCommunication(object):
         Unless estop is plugged in, in which case the physical estop value overrides it
         """
         while True:
-            if self.estop_reader:
+            if not self.use_keyboard_estop:
                 self.estop_is_playing = self.estop_reader.isEstopPlay()
 
             self.current_proto_unix_io.send_proto(
@@ -100,7 +104,7 @@ class RobotCommunication(object):
         If an estop is not plugged in, toggles the keyboard estop state
         And send a message to the console
         """
-        if not self.estop_reader:
+        if self.use_keyboard_estop:
             self.estop_is_playing = not self.estop_is_playing
 
             print(
