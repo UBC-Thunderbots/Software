@@ -103,3 +103,9 @@ py_library(
     name = "speed_threshold_helpers",
     srcs = ["speed_threshold_helpers.py"],
 )
+
+py_library(
+    name = "test_constants",
+    srcs = ["test_constants.py"],
+    deps = [],
+)

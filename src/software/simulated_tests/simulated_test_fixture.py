@@ -150,6 +150,7 @@ class SimulatedTestRunner(object):
         """
 
         time_elapsed_s = 0
+        eventually_validation_failure_msg = "Test Timed Out"
 
         while time_elapsed_s < test_timeout_s:
             # Check for new CI commands at this time step
@@ -226,10 +227,15 @@ class SimulatedTestRunner(object):
             # Check that all always validations are always valid
             validation.check_validation(always_validation_proto_set)
 
-        # Check that all eventually validations are eventually valid
-        validation.check_validation(eventually_validation_proto_set)
+            try:
+                # Check that all eventually validations are eventually valid
+                validation.check_validation(eventually_validation_proto_set)
+                self.__stopper()
+                return
+            except AssertionError as e:
+                eventually_validation_failure_msg = str(e)
 
-        self.__stopper()
+        raise AssertionError(eventually_validation_failure_msg)
 
     def run_test(
         self,
