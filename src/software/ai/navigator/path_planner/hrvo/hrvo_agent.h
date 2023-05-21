@@ -246,7 +246,7 @@ class HRVOAgent : public Agent
     static constexpr double LINEAR_VELOCITY_MAX_PID_OFFSET = 0.3;
 
     // Proportional constant used for calculating the desired angular velocity
-    static constexpr double ANGULAR_VELOCITY_KP = 2.8;
+    static constexpr double ANGULAR_VELOCITY_KP = 4.5;
 
     // Compensation constant added to stop the robots from swinging when turning and
     // moving in a linear line. This is defined as a multiplier of the angular velocity
