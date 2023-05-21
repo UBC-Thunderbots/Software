@@ -23,7 +23,6 @@ class BreakbeamLabel(QLabel):
         Constructs a breakbeam indicator and sets the UI to the default uninitialized state
         """
         super().__init__()
-        self.update_breakbeam_status(None)
 
     def update_breakbeam_status(self, new_breakbeam_status):
         """
@@ -141,10 +140,10 @@ class RobotInfo(QWidget):
         self.robot_model_layout.setContentsMargins(0, 15, 5, 10)
 
         # Vision Pattern
-        self.color_vision_pattern = self.create_vision_pattern_label(
+        self.color_vision_pattern = self.create_vision_pattern(
             Colors.ROBOT_MIDDLE_BLUE, ROBOT_RADIUS, True
         )
-        self.bw_vision_pattern = self.create_vision_pattern_label(
+        self.bw_vision_pattern = self.create_vision_pattern(
             Colors.BW_ROBOT_MIDDLE_BLUE, ROBOT_RADIUS, False
         )
 
@@ -207,9 +206,9 @@ class RobotInfo(QWidget):
 
         return control_mode_menu
 
-    def create_vision_pattern_label(self, team_colour, radius, connected):
+    def create_vision_pattern(self, team_colour, radius, connected):
         """Given a robot id, team color and radius, draw the vision
-        pattern on a label and return it.
+        pattern on a pixmap and return it.
 
         :param team_colour: The team colour
         :param radius: The radius of the robot
@@ -268,14 +267,16 @@ class RobotInfo(QWidget):
         Saves the current time as the last robot status time
         Sets the robot UI as connected and updates the UI
         Then sets a timer callback to disconnect the robot if needed
+
+        :param motor_status: The motor status message for this robot
         :param power_status: The power status message for this robot
         :param error_codes: The error codes of this robot
         """
         self.time_of_last_robot_status = time.time()
 
-        self.vision_pattern_label.setPixmap(self.color_vision_pattern)
+        self.robot_model.setPixmap(self.color_vision_pattern)
 
-        self.update_ui(power_status, error_codes)
+        self.update_ui(motor_status, power_status, error_codes)
 
         QtCore.QTimer.singleShot(DISCONNECT_DURATION_MS, self.disconnect_robot)
 
@@ -295,12 +296,11 @@ class RobotInfo(QWidget):
         """
         Resets the UI to the default, uninitialized values
         """
-        self.vision_pattern_label.setPixmap(self.bw_vision_pattern)
+        self.robot_model.setPixmap(self.bw_vision_pattern)
 
-        self.breakbeam_label.setText("BREAKBEAM")
-        self.breakbeam_label.setStyleSheet("background-color: grey")
+        self.breakbeam_label.update_breakbeam_status(None)
 
-    def update_ui(self, power_status, error_codes):
+    def update_ui(self, motor_status, power_status, error_codes):
         """
         Receives important sections of RobotStatus proto for this robot and updates widget with alerts
         Checks for
@@ -311,7 +311,6 @@ class RobotInfo(QWidget):
         :param motor_status: The motor status message for this robot
         :param power_status: The power status message for this robot
         :param error_codes: The error codes of this robot
-        :return:
         """
 
         self.breakbeam_label.update_breakbeam_status(power_status.breakbeam_tripped)
