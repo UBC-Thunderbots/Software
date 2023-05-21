@@ -106,7 +106,7 @@ class Agent
     /**
      * Set the position of this agent
      *
-     * @param The new position for this agent
+     * @param new_position The new position for this agent
      */
     void setPosition(const Point &new_position);
 
@@ -138,7 +138,7 @@ class Agent
     /**
      * Set the orientation of this agent
      *
-     * @param The new orientation for this agent
+     * @param new_orientation The new orientation for this agent
      */
     void setOrientation(const Angle &new_orientation);
 
@@ -154,7 +154,7 @@ class Agent
     /**
      * Set the angular velocity for this agent
      *
-     * @param The new angular velocity for this agent
+     * @param new_angular_velocity The new angular velocity for this agent
      */
     void setAngularVelocity(const AngularVelocity &new_angular_velocity);
 

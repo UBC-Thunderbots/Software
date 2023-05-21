@@ -87,9 +87,9 @@ class HRVOSimulator
 
 
     /**
-     * Update the velocity of the agent with the given id
+     * Update the angular velocity of the agent with the given id
      * @param robot_id Robot id of the agent to update
-     * @param new_velocity New global velocity of the agent
+     * @param new_angular_velocity New angular velocity of the agent
      */
     void updateRobotAngularVelocity(RobotId robot_id,
                                     const AngularVelocity &new_angular_velocity);
