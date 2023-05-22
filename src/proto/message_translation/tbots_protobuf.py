@@ -1,3 +1,5 @@
+import math
+
 from proto.import_all_protos import *
 
 
@@ -26,11 +28,18 @@ def create_world_state(
         )
 
     for robot_id, robot_location in enumerate(blue_robot_locations):
+        angle = 0
+        if robot_id == 1:
+            angle = math.pi
+
         world_state.blue_robots[robot_id].CopyFrom(
             RobotState(
                 global_position=Point(
                     x_meters=robot_location.x(), y_meters=robot_location.y()
                 ),
+                global_orientation=Angle(
+                    radians=angle
+                )
             )
         )
 

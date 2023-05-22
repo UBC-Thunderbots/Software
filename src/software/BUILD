@@ -80,6 +80,10 @@ pybind_library(
         "//software/uart:boost_uart_communication",
         "//software/world",
         "//software/world:field",
+        "//software/ai/passing:pass_generator",
+        "//software/ai/passing:eighteen_zone_pitch_division",
+        "//software/ai/passing:pass_evaluation",
+        "//software/ai/passing:pass",
         "@pybind11_protobuf//pybind11_protobuf:native_proto_caster",
     ],
 )

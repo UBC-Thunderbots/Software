@@ -43,3 +43,18 @@ py_test(
         requirement("pytest"),
     ],
 )
+
+py_test(
+    name = "passing_sim_test",
+    srcs = [
+        "passing_sim_test.py",
+    ],
+    deps = [
+        "//software/simulated_tests:simulated_test_fixture",
+        "//software/simulated_tests:validation",
+        "//proto:import_all_protos",
+        "//proto:software_py_proto",
+        "//proto:tbots_py_proto",
+        requirement("pytest"),
+    ],
+)

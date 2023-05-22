@@ -35,6 +35,8 @@
 #include "software/world/robot.h"
 #include "software/world/world.h"
 #include "software/ai/passing/pass_generator.hpp"
+#include "software/ai/passing/pass_evaluation.hpp"
+#include "software/ai/passing/pass.h"
 #include "software/ai/passing/eighteen_zone_pitch_division.h"
 
 namespace py = pybind11;
@@ -69,6 +71,31 @@ void declareThreadedProtoUdpListener(py::module& m, std::string name)
         .def(
             py::init<std::string, unsigned short, const std::function<void(T)>&, bool>());
 }
+
+
+template <typename T>
+void declarePassGenerator(py::module& m, std::string name)
+{
+    using Class = PassGenerator<T>;
+    std::string pyclass_name = name + "PassGenerator";
+    py::class_<Class, std::shared_ptr<Class>>(m, pyclass_name.c_str(),
+                                              py::buffer_protocol(), py::dynamic_attr())
+            .def(
+                    py::init<std::shared_ptr<EighteenZonePitchDivision>, TbotsProto::PassingConfig>())
+            .def("generatePassEvaluation", &PassGenerator<T>::generatePassEvaluation);
+}
+
+template <typename T>
+void declarePassEvaluation(py::module& m, std::string name)
+{
+    using Class = PassEvaluation<T>;
+    std::string pyclass_name = name + "PassEvaluation";
+    py::class_<Class, std::shared_ptr<Class>>(m, pyclass_name.c_str(),
+                                              py::buffer_protocol(), py::dynamic_attr())
+            .def("getBestPassOnField", &PassEvaluation<T>::getBestPassOnField);
+}
+
+
 
 /**
  * Create a new threaded e-stop reader
@@ -122,6 +149,7 @@ PYBIND11_MODULE(python_bindings, m)
         .def("normalize", py::overload_cast<double>(&Vector::normalize, py::const_))
         .def("rotate", &Vector::rotate)
         .def("orientation", &Vector::orientation)
+        .def("dot", &Vector::dot)
         // Overloaded
         .def(py::self + py::self)
         .def(py::self += py::self)
@@ -274,7 +302,12 @@ PYBIND11_MODULE(python_bindings, m)
         .def("assignGoalie", &Team::assignGoalie)
         .def("getAllRobots", &Team::getAllRobots);
 
-    py::class_<Ball>(m, "Ball").def("position", &Ball::position);
+    py::class_<Timestamp>(m, "Timestamp")
+        .def(py::init<>());
+
+    py::class_<Ball>(m, "Ball")
+        .def(py::init<Point, Vector, Timestamp>())
+        .def("position", &Ball::position);
 
     // https://pybind11.readthedocs.io/en/stable/classes.html
     py::class_<Field>(m, "Field")
@@ -318,6 +351,7 @@ PYBIND11_MODULE(python_bindings, m)
         .def("enemyGoalpostPos", &Field::enemyGoalpostPos);
 
     py::class_<World>(m, "World")
+        .def(py::init<Field, Ball, Team, Team>())
         .def("friendlyTeam", &World::friendlyTeam)
         .def("enemyTeam", &World::enemyTeam)
         .def("ball", &World::ball)
@@ -340,5 +374,18 @@ PYBIND11_MODULE(python_bindings, m)
         .def(py::init<>(&createThreadedEstopReader))
         .def("isEstopPlay", &ThreadedEstopReader::isEstopPlay);
 
-    declarePassGenerator<
+    declarePassGenerator<EighteenZoneId>(m, "EighteenZoneId");
+
+    py::class_<EighteenZonePitchDivision, std::shared_ptr<EighteenZonePitchDivision>>(m, "EighteenZonePitchDivision")
+        .def(py::init<Field>());
+
+    declarePassEvaluation<EighteenZoneId>(m, "EighteenZoneId");
+
+    py::class_<PassWithRating, std::unique_ptr<PassWithRating>>(m, "PassWithRating")
+        .def_readwrite("pass_value", &PassWithRating::pass);
+
+    py::class_<Pass, std::unique_ptr<Pass>>(m, "Pass")
+        .def("passerPoint", &Pass::passerPoint)
+        .def("receiverPoint", &Pass::receiverPoint)
+        .def("speed", &Pass::speed);
 }
