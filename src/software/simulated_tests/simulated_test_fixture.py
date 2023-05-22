@@ -130,7 +130,7 @@ class SimulatedTestRunner(object):
         test_timeout_s=3,
         tick_duration_s=0.0166,  # Default to 60hz
         ci_cmd_with_delay=[],
-        run_till_end=True,
+        run_till_end=True
     ):
         """Run a test
 
@@ -238,6 +238,7 @@ class SimulatedTestRunner(object):
                     self.__stopper()
                     return
                 except AssertionError as e:
+                    print("HTING")
                     eventually_validation_failure_msg = str(e)
 
         if not run_till_end:
@@ -256,6 +257,7 @@ class SimulatedTestRunner(object):
         tick_duration_s=0.0166,
         index=0,
         run_till_end=True,
+        **kwargs
     ):
         """
         Helper function to run a test, with thunderscope if enabled
@@ -294,6 +296,7 @@ class SimulatedTestRunner(object):
                     eventually_validation_sequence_set,
                     test_timeout_duration,
                     tick_duration_s,
+                    [],
                     run_till_end,
                 ],
             )
@@ -332,7 +335,6 @@ class InvariantTestRunner(SimulatedTestRunner):
         params=[0],
         inv_always_validation_sequence_set=[[]],
         inv_eventually_validation_sequence_set=[[]],
-        run_till_end=True,
         **kwargs,
     ):
         """Run an invariant test
@@ -344,8 +346,6 @@ class InvariantTestRunner(SimulatedTestRunner):
                                 that should hold on every tick
         :param inv_eventually_validation_sequence_set: Validation functions for invariant testing
                                 that should eventually be true, before the test ends
-        :param run_till_end: If true, test runs till the end even if eventually validation passes
-                             If false, test stops once eventually validation passes and fails if time out
 
         """
 
@@ -356,7 +356,7 @@ class InvariantTestRunner(SimulatedTestRunner):
         super().run_test(
             inv_always_validation_sequence_set,
             inv_eventually_validation_sequence_set,
-            run_till_end=run_till_end,
+            **kwargs
         )
 
 
@@ -378,7 +378,6 @@ class AggregateTestRunner(SimulatedTestRunner):
         params=[],
         ag_always_validation_sequence_set=[[]],
         ag_eventually_validation_sequence_set=[[]],
-        run_till_end=True,
         **kwargs,
     ):
         """Run an aggregate test
@@ -388,9 +387,7 @@ class AggregateTestRunner(SimulatedTestRunner):
         :param ag_always_validation_sequence_set: Validation functions for aggregate testing
                                 that should hold on every tick
         :param ag_eventually_validation_sequence_set: Validation functions for aggregate testing
-                                that should eventually be true, before the test ends
-        :param run_till_end: If true, test runs till the end even if eventually validation passes
-                             If false, test stops once eventually validation passes and fails if time out
+                                that should eventually be true, before the test end
         """
 
         threading.excepthook = self.excepthook
@@ -408,7 +405,7 @@ class AggregateTestRunner(SimulatedTestRunner):
                 super().run_test(
                     ag_always_validation_sequence_set,
                     ag_eventually_validation_sequence_set,
-                    run_till_end=run_till_end,
+                    **kwargs
                 )
             except AssertionError:
                 failed_tests += 1

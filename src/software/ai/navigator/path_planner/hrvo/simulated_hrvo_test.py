@@ -398,6 +398,7 @@ def test_robot_movement(
         ag_eventually_validation_sequence_set=[[]],
         ag_always_validation_sequence_set=[[]],
         test_timeout_s=timeout_s,
+        run_till_end=False
     )
 
 
