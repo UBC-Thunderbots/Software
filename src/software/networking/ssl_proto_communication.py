@@ -1,7 +1,7 @@
 import socket
 import google.protobuf.internal.encoder as encoder
 import google.protobuf.internal.decoder as decoder
-
+import google.protobuf.message as protobuf_message 
 
 class SslSocketProtoParseException(Exception):
     """
@@ -73,7 +73,7 @@ class SslSocket(object):
 
             try:
                 ci_output.ParseFromString(response_data[offset : offset + msg_len])
-            except google.protobuf.message.DecodeError as err:
+            except protobuf_message.DecodeError as err:
                 raise SslSocketProtoParseException(
                     "ProtoDecode Error parsing proto: " + err.args
                 )
