@@ -130,7 +130,7 @@ class SimulatedTestRunner(object):
         test_timeout_s=3,
         tick_duration_s=0.0166,  # Default to 60hz
         ci_cmd_with_delay=[],
-        run_till_end=True
+        run_till_end=True,
     ):
         """Run a test
 
@@ -238,7 +238,7 @@ class SimulatedTestRunner(object):
                     self.__stopper()
                     return
                 except AssertionError as e:
-                    print("HTING")
+                    print("THING")
                     eventually_validation_failure_msg = str(e)
 
         if not run_till_end:
@@ -257,7 +257,7 @@ class SimulatedTestRunner(object):
         tick_duration_s=0.0166,
         index=0,
         run_till_end=True,
-        **kwargs
+        **kwargs,
     ):
         """
         Helper function to run a test, with thunderscope if enabled
@@ -356,7 +356,7 @@ class InvariantTestRunner(SimulatedTestRunner):
         super().run_test(
             inv_always_validation_sequence_set,
             inv_eventually_validation_sequence_set,
-            **kwargs
+            **kwargs,
         )
 
 
@@ -405,7 +405,7 @@ class AggregateTestRunner(SimulatedTestRunner):
                 super().run_test(
                     ag_always_validation_sequence_set,
                     ag_eventually_validation_sequence_set,
-                    **kwargs
+                    **kwargs,
                 )
             except AssertionError:
                 failed_tests += 1
