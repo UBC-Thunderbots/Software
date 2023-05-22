@@ -1,6 +1,44 @@
 from pyqtgraph.Qt import QtCore, QtGui
 from proto.import_all_protos import *
-from enum import IntEnum
+from enum import Enum, IntEnum
+
+
+class ProtoUnixIOTypes(Enum):
+    """
+    Different keys for Proto Unix IOs used by Thunderscope
+    """
+
+    SIM = 1
+    BLUE = 2
+    YELLOW = 3
+    DIAGNOSTICS = 4
+    CURRENT = 5
+
+
+class TabNames(str, Enum):
+    """
+    Different keys for tabs used in various Thunderscope views
+    """
+
+    BLUE = "BLUE"
+    YELLOW = "YELLOW"
+    DIAGNOSTICS = "DIAGNOSTICS"
+    GAMECONTROLLER = "GAMECONTROLLER"
+
+    def __str__(self):
+        return str.__str__(self)
+
+
+class ParamTypes(Enum):
+    """
+    Different types of parameters used by setup methods for Thunderscope widgets
+    """
+
+    BOOL = 1
+    PROTO_UNIX_IO = 2
+    STRING = 3
+    INT = 4
+    LIST = 5
 
 
 class IndividualRobotMode(IntEnum):
@@ -24,6 +62,8 @@ BALL_HEIGHT_EFFECT_MULTIPLIER = 3
 # Time (in seconds) to sleep / delay the loop iteration for different protos
 # in robot communications
 ROBOT_COMMUNICATIONS_TIMEOUT_S = 0.02
+
+GAME_CONTROLLER_URL = "http://localhost:8081"
 
 # Mapping between RobotStatus Error Codes and their dialog messages
 ERROR_CODE_MESSAGES = {
