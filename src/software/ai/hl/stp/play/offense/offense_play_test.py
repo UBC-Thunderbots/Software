@@ -75,9 +75,10 @@ def test_offense_play(simulated_test_runner):
     eventually_validation_sequence_set = [[]]
 
     simulated_test_runner.run_test(
-        eventually_validation_sequence_set=eventually_validation_sequence_set,
-        always_validation_sequence_set=always_validation_sequence_set,
-        test_timeout_s=15,
+        inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
+        inv_always_validation_sequence_set=always_validation_sequence_set,
+        ag_eventually_validation_sequence_set=eventually_validation_sequence_set,
+        ag_always_validation_sequence_set=always_validation_sequence_set,
     )
 
 
