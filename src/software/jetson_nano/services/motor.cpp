@@ -451,16 +451,16 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
 
     // Ramp the dribbler velocity
     // Clamp the max acceleration
-    int max_dribbler_delta_vel = static_cast<int>(
+    int max_dribbler_delta_rpm = static_cast<int>(
         DRIBBLER_ACCELERATION_THRESHOLD_RPM_PER_S_2 * time_elapsed_since_last_poll_s);
-    int delta_vel = std::clamp(target_dribbler_rpm - ramp_rpm, -max_dribbler_delta_vel,
-                               max_dribbler_delta_vel);
-    ramp_rpm += delta_vel;
+    int delta_rpm = std::clamp(target_dribbler_rpm - ramp_rpm, -max_dribbler_delta_rpm,
+                               max_dribbler_delta_rpm);
+    ramp_rpm += delta_rpm;
 
-    // Clamp the max speed
-    int max_dribbler_vel =
+    // Clamp to the max rpm
+    int max_dribbler_rpm =
         std::abs(static_cast<int>(robot_constants_.max_force_dribbler_speed_rpm));
-    ramp_rpm = std::clamp(ramp_rpm, -max_dribbler_vel, max_dribbler_vel);
+    ramp_rpm = std::clamp(ramp_rpm, -max_dribbler_rpm, max_dribbler_rpm);
 
     tmc4671_setTargetVelocity(DRIBBLER_MOTOR_CHIP_SELECT, ramp_rpm);
     motor_status.mutable_dribbler()->set_dribbler_rpm(float(ramp_rpm));

@@ -301,6 +301,15 @@ AngularVelocity HRVOSimulator::getRobotAngularVelocity(unsigned int robot_id) co
     return AngularVelocity();
 }
 
+std::optional<Angle> HRVOSimulator::getRobotOrientation(RobotId robot_id) const
+{
+    auto hrvo_agent = robots.find(robot_id);
+    if (hrvo_agent != robots.end())
+    {
+        return hrvo_agent->second->getOrientation();
+    }
+    return std::nullopt;
+}
 
 std::size_t HRVOSimulator::getRobotCount()
 {

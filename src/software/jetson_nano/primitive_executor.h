@@ -87,7 +87,6 @@ class PrimitiveExecutor
     // TODO (#2855): Add dynamic time_step to `stepPrimitive` and remove this constant
     // time step to be used, in Seconds
     Duration time_step_;
-    Angle curr_orientation_;
     RobotId robot_id_;
 
     // Thresholds for when we should update HRVO Simulator's velocity

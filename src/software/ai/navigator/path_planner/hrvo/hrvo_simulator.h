@@ -94,6 +94,11 @@ class HRVOSimulator
     void updateRobotAngularVelocity(RobotId robot_id,
                                     const AngularVelocity &new_angular_velocity);
 
+    /*
+     * Get the orientation of robot with the given id
+     * @param robot_id Robot id of the agent to read velocity of
+     */
+    std::optional<Angle> getRobotOrientation(RobotId robot_id) const;
 
     /**
      *  Returns the count of agents in the simulation.

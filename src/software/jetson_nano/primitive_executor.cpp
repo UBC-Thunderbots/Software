@@ -17,7 +17,6 @@ PrimitiveExecutor::PrimitiveExecutor(const Duration time_step,
       robot_constants_(robot_constants),
       hrvo_simulator_(robot_id),
       time_step_(time_step),
-      curr_orientation_(Angle::zero()),
       robot_id_(robot_id)
 {
 }
@@ -45,14 +44,7 @@ void PrimitiveExecutor::updateWorld(const TbotsProto::World &world_msg)
     if (world_msg.time_sent().epoch_timestamp_seconds() >
         current_world_.time_sent().epoch_timestamp_seconds())
     {
-        World new_world = World(world_msg);
-        hrvo_simulator_.updateWorld(new_world, robot_constants_, time_step_);
-
-        auto this_robot = new_world.friendlyTeam().getRobotById(robot_id_);
-        if (this_robot.has_value())
-        {
-            curr_orientation_ = this_robot->orientation();
-        }
+        hrvo_simulator_.updateWorld(World(world_msg), robot_constants_, time_step_);
     }
 }
 
@@ -61,14 +53,21 @@ void PrimitiveExecutor::updateVelocity(const Vector &local_velocity,
 {
     // To allow robots to accelerate smoothly, we only update their simulated velocity if
     // it is significantly different from the actual robot velocity
+
+    std::optional<Angle> orientation_opt = hrvo_simulator_.getRobotOrientation(robot_id_);
+    if (!orientation_opt.has_value())
+    {
+        return;
+    }
+
     Vector curr_hrvo_velocity = hrvo_simulator_.getRobotVelocity(robot_id_);
     Vector actual_global_velocity =
-        localToGlobalVelocity(local_velocity, curr_orientation_);
+        localToGlobalVelocity(local_velocity, orientation_opt.value());
     if ((curr_hrvo_velocity - actual_global_velocity).length() >
         LINEAR_VELOCITY_FEEDBACK_THRESHOLD_M_PER_S)
     {
         hrvo_simulator_.updateRobotVelocity(
-            robot_id_, localToGlobalVelocity(local_velocity, curr_orientation_));
+            robot_id_, localToGlobalVelocity(local_velocity, orientation_opt.value()));
     }
 
     AngularVelocity curr_angular_velocity =
@@ -82,8 +81,16 @@ void PrimitiveExecutor::updateVelocity(const Vector &local_velocity,
 
 Vector PrimitiveExecutor::getTargetLinearVelocity()
 {
-    Vector target_global_velocity = hrvo_simulator_.getRobotVelocity(robot_id_);
-    return globalToLocalVelocity(target_global_velocity, curr_orientation_);
+    std::optional<Angle> orientation_opt = hrvo_simulator_.getRobotOrientation(robot_id_);
+    if (orientation_opt.has_value())
+    {
+        Vector target_global_velocity = hrvo_simulator_.getRobotVelocity(robot_id_);
+        return globalToLocalVelocity(target_global_velocity, orientation_opt.value());
+    }
+    else
+    {
+        return Vector();
+    }
 }
 
 AngularVelocity PrimitiveExecutor::getTargetAngularVelocity()
