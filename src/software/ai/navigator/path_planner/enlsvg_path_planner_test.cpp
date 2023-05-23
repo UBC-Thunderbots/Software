@@ -685,7 +685,7 @@ TEST_F(TestEnlsvgPathPlanner, test_going_around_defense_area)
 }
 
 // TODO (#2913): ENLSVG can not find a path from above defense area to below
-TEST_F(TestEnlsvgPathPlanner, DISABLE_test_going_from_above_enemy_defense_area_to_below)
+TEST_F(TestEnlsvgPathPlanner, DISABLED_test_going_from_above_enemy_defense_area_to_below)
 {
     World world = ::TestUtil::createBlankTestingWorld(TbotsProto::FieldType::DIV_B);
     const Field& field       = world.field();
@@ -717,7 +717,7 @@ TEST_F(TestEnlsvgPathPlanner, DISABLE_test_going_from_above_enemy_defense_area_t
 }
 
 // TODO (#2690): Path slightly intersects enemy defense area obstacle
-TEST_F(TestEnlsvgPathPlanner, DISABLE_test_going_from_below_enemy_defense_area_to_above)
+TEST_F(TestEnlsvgPathPlanner, DISABLED_test_going_from_below_enemy_defense_area_to_above)
 {
     World world = ::TestUtil::createBlankTestingWorld(TbotsProto::FieldType::DIV_B);
     const Field& field       = world.field();
