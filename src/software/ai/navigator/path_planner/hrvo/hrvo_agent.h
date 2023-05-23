@@ -259,6 +259,11 @@ class HRVOAgent : public Agent
     // automatically takes into account the robot radius when avoiding obstacles.
     static constexpr double HRVO_STATIC_OBSTACLE_INFLATION_FACTOR = 0.5;
 
+    // The minimum distance which HRVO Agents will look for neighbors, in meters.
+    // 2 robot radii + some padding to allow for a slight space between robots.
+    // Can not be static constexpr since ROBOT_MAX_RADIUS_METERS is not constexpr.
+    const double MIN_NEIGHBOR_SEARCH_DIST = 2.5 * ROBOT_MAX_RADIUS_METERS;
+
     // The maximum distance which HRVO Agents will look for neighbors, in meters.
     // A large radius picked to allow for far visibility of neighbors so Agents have
     // enough space to decelerate and avoid collisions.

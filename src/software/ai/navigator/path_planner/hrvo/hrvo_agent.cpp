@@ -105,17 +105,9 @@ std::vector<RobotId> HRVOAgent::computeNeighbors(
     }
     auto current_destination = current_path_point_opt.value().getPosition();
 
-    // Only consider agents that are closer to us than the destination is
-    // with a threshold of 2.5 times the robot radius to avoid pushing
-    // adjacent robots if they are blocking the destination.
-    double min_dist_to_neighbor = 2.5 * ROBOT_MAX_RADIUS_METERS;
-
-    // Check that the provided range is correct for clamp.
-    CHECK(min_dist_to_neighbor <= MAX_NEIGHBOR_SEARCH_DIST)
-        << "Invalid distance to obstacle range used";
     double dist_to_neighbor_threshold_squared = std::clamp(
         (position - current_destination).lengthSquared(),
-        std::pow(min_dist_to_neighbor, 2.0), std::pow(MAX_NEIGHBOR_SEARCH_DIST, 2.0));
+        std::pow(MIN_NEIGHBOR_SEARCH_DIST, 2.0), std::pow(MAX_NEIGHBOR_SEARCH_DIST, 2.0));
 
     auto compare = [&](const std::pair<RobotId, Point> &r1,
                        const std::pair<RobotId, Point> &r2) {
