@@ -116,21 +116,26 @@ RobotNavigationObstacleFactory::createStaticObstaclesFromMotionConstraint(
         {
             const Rectangle &friendly_goal = field.friendlyGoal();
 
+            // Reduce the size of the goal obstacle slightly to avoid the goalie
+            // appear to be inside the obstacle if it is touching one of the goal
+            // walls (e.g. due to noisy vision).
+            const double goal_obstacle_radius = ROBOT_MAX_RADIUS_METERS - 0.01;
+
             // Top goal post
             obstacles.push_back(std::make_shared<GeomObstacle<Polygon>>(
                 Polygon::fromSegment(Segment(friendly_goal.posXPosYCorner(),
                                              friendly_goal.negXPosYCorner()),
-                                     0, ROBOT_MAX_RADIUS_METERS)));
+                                     0, goal_obstacle_radius)));
             // Bottom goal post
             obstacles.push_back(std::make_shared<GeomObstacle<Polygon>>(
                 Polygon::fromSegment(Segment(friendly_goal.posXNegYCorner(),
                                              friendly_goal.negXNegYCorner()),
-                                     0, ROBOT_MAX_RADIUS_METERS)));
+                                     0, goal_obstacle_radius)));
             // Left goal wall
             obstacles.push_back(std::make_shared<GeomObstacle<Polygon>>(
                 Polygon::fromSegment(Segment(friendly_goal.negXPosYCorner(),
                                              friendly_goal.negXNegYCorner()),
-                                     ROBOT_MAX_RADIUS_METERS)));
+                                     goal_obstacle_radius)));
             break;
         }
         case TbotsProto::MotionConstraint::MotionConstraint_INT_MIN_SENTINEL_DO_NOT_USE_:;

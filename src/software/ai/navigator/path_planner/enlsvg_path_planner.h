@@ -177,7 +177,7 @@ class EnlsvgPathPlanner
      * @return std::optional<EnlsvgPoint>    returns std::nullopt if the entire field is
      * blocked, or an internal grid coordinate representing a closest unblocked location
      */
-    std::optional<EnlsvgPathPlanner::EnlsvgPoint> findClosestUnblockedEnlsvgPoint(
+    std::optional<EnlsvgPoint> findClosestUnblockedEnlsvgPoint(
         const EnlsvgPoint &ep, const EnlsvgPoint &other_point) const;
 
     /*

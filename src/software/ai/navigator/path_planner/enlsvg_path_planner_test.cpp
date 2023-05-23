@@ -684,25 +684,21 @@ TEST_F(TestEnlsvgPathPlanner, test_going_around_defense_area)
     TestUtil::checkPathDoesNotIntersectObstacle(path.value(), obstacle_polygons);
 }
 
-TEST_F(TestEnlsvgPathPlanner, test_going_around_goal)
+// TODO (#2913): ENLSVG can not find a path from above defense area to below
+TEST_F(TestEnlsvgPathPlanner, DISABLE_test_going_from_above_enemy_defense_area_to_below)
 {
     World world = ::TestUtil::createBlankTestingWorld(TbotsProto::FieldType::DIV_B);
     const Field& field       = world.field();
     Rectangle navigable_area = field.fieldBoundary();
 
-    // Inside the goal area
-    Point start{-4.57, 0};
-    // At the corner of the field
-    Point dest{-4.4, -2.9};
+    // Above defense area
+    Point start{4, 2};
+    // Below defense area
+    Point dest{4, -2};
 
     std::vector<ObstaclePtr> obstacles =
         robot_navigation_obstacle_factory.createFromMotionConstraint(
-            TbotsProto::MotionConstraint::FRIENDLY_GOAL, world);
-    // print all osbtacles in the above arrray
-    std::cout << obstacles[0]->toString() << std::endl;
-    std::cout << obstacles[1]->toString() << std::endl;
-    std::cout << obstacles[2]->toString() << std::endl;
-    std::cout << "osbtacle length: " << obstacles.size() << std::endl;
+            TbotsProto::MotionConstraint::INFLATED_ENEMY_DEFENSE_AREA, world);
 
     EnlsvgPathPlanner planner =
         EnlsvgPathPlanner(navigable_area, obstacles, ROBOT_MAX_RADIUS_METERS);
@@ -713,10 +709,41 @@ TEST_F(TestEnlsvgPathPlanner, test_going_around_goal)
     // Make sure the start and end points match
     EXPECT_EQ(start, path.value().front());
     EXPECT_EQ(dest, path.value().back());
-    std::cout << "path length: " << path.value().size() << std::endl;
 
     // Make sure path does not exceed a bounding box
-    Rectangle bounding_box({-4.6, 0.1}, {-4, -3.1});
+    Rectangle bounding_box({3, 3}, {4.5, -3});
+    TestUtil::checkPathDoesNotExceedBoundingBox(path.value(), bounding_box);
+    TestUtil::checkPathDoesNotIntersectObstacle(path.value(), obstacles);
+}
+
+// TODO (#2690): Path slightly intersects enemy defense area obstacle
+TEST_F(TestEnlsvgPathPlanner, DISABLE_test_going_from_below_enemy_defense_area_to_above)
+{
+    World world = ::TestUtil::createBlankTestingWorld(TbotsProto::FieldType::DIV_B);
+    const Field& field       = world.field();
+    Rectangle navigable_area = field.fieldBoundary();
+
+    // Below defense area
+    Point start{4, -2};
+    // Above defense area
+    Point dest{4, 2};
+
+    std::vector<ObstaclePtr> obstacles =
+        robot_navigation_obstacle_factory.createFromMotionConstraint(
+            TbotsProto::MotionConstraint::INFLATED_ENEMY_DEFENSE_AREA, world);
+
+    EnlsvgPathPlanner planner =
+        EnlsvgPathPlanner(navigable_area, obstacles, ROBOT_MAX_RADIUS_METERS);
+    std::optional<Path> path = planner.findPath(start, dest);
+
+    ASSERT_TRUE(path != std::nullopt);
+
+    // Make sure the start and end points match
+    EXPECT_EQ(start, path.value().front());
+    EXPECT_EQ(dest, path.value().back());
+
+    // Make sure path does not exceed a bounding box
+    Rectangle bounding_box({3, 3}, {4.5, -3});
     TestUtil::checkPathDoesNotExceedBoundingBox(path.value(), bounding_box);
     TestUtil::checkPathDoesNotIntersectObstacle(path.value(), obstacles);
 }
@@ -887,7 +914,8 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_friendly_goal_motion_cons
     // to path plan to the corner of the field.
     Field field = Field::createSSLDivisionBField();
 
-    Point start{-4.55, 0}, dest{-4.5, -3};
+    // Goalie inside the friendly goal touching the ball wall going to the corner
+    Point start{-4.59, 0}, dest{-4.6, -3};
 
     std::vector<ObstaclePtr> obstacles = {
         robot_navigation_obstacle_factory.createStaticObstaclesFromMotionConstraints(
