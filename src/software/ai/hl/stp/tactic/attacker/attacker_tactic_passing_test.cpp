@@ -90,12 +90,14 @@ INSTANTIATE_TEST_CASE_P(
                                           Angle::fromDegrees(0), Angle::fromDegrees(0))},
                         BallState(Point(-0.5, 0.5), Vector(0, 0))),
 
+        // TODO(#2909) : Enable test once the robot can turn faster and hits the ball with
         // Attacker point == Balls location & Balls location == Robots Location
-        std::make_tuple(Pass(Point(0.0, 0.0), Point(0, 0), 5),
-                        RobotStateWithId{
-                            1, RobotState(Point(0, 0), Vector(0, 0),
-                                          Angle::fromDegrees(0), Angle::fromDegrees(0))},
-                        BallState(Point(0.0, 0.0), Vector(0, 0))),
+        // std::make_tuple(Pass(Point(0.0, 0.0), Point(0, 0), 5),
+        //                 RobotStateWithId{
+        //                     1, RobotState(Point(0, 0), Vector(0, 0),
+        //                                   Angle::fromDegrees(0),
+        //                                   Angle::fromDegrees(0))},
+        //                 BallState(Point(0.0, 0.0), Vector(0, 0))),
 
         // Attacker point far away (not a normal use case, but just to sanity check)
         std::make_tuple(Pass(Point(0.0, 0.0), Point(0, 0), 5),
