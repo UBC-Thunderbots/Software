@@ -147,8 +147,8 @@ TEST(PolygonExpandTest, test_from_segment_single_radius)
 TEST(PolygonExpandTest, test_from_segment_two_radii)
 {
     const auto segment = Segment(Point(0, 0), Point(2, 2));
-    double l_radius      = 2;
-    double w_radius      = 1;
+    double l_radius    = 2;
+    double w_radius    = 1;
 
     const auto poly     = Polygon::fromSegment(segment, l_radius, w_radius);
     const auto segments = poly.getSegments();

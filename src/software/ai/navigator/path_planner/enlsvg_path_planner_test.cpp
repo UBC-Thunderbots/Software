@@ -687,7 +687,7 @@ TEST_F(TestEnlsvgPathPlanner, test_going_around_defense_area)
 TEST_F(TestEnlsvgPathPlanner, test_going_around_goal)
 {
     World world = ::TestUtil::createBlankTestingWorld(TbotsProto::FieldType::DIV_B);
-    const Field& field = world.field();
+    const Field& field       = world.field();
     Rectangle navigable_area = field.fieldBoundary();
 
     // Inside the goal area
@@ -695,7 +695,8 @@ TEST_F(TestEnlsvgPathPlanner, test_going_around_goal)
     // At the corner of the field
     Point dest{-4.4, -2.9};
 
-    std::vector<ObstaclePtr> obstacles = robot_navigation_obstacle_factory.createFromMotionConstraint(
+    std::vector<ObstaclePtr> obstacles =
+        robot_navigation_obstacle_factory.createFromMotionConstraint(
             TbotsProto::MotionConstraint::FRIENDLY_GOAL, world);
     // print all osbtacles in the above arrray
     std::cout << obstacles[0]->toString() << std::endl;

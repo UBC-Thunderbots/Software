@@ -247,10 +247,8 @@ TEST_F(DribbleTacticTest, test_dribble_dest_and_orientation_around_rectangle)
             Duration::fromSeconds(25));
 }
 
-// TODO (#2496): robot gets stuck in place
-TEST_F(
-    DribbleTacticTest,
-    DISABLED_test_dribble_dest_and_orientation_around_rectangle_with_excessive_dribbling)
+TEST_F(DribbleTacticTest,
+       test_dribble_dest_and_orientation_around_rectangle_with_excessive_dribbling)
 {
     Point initial_position    = Point(3, -3);
     Point dribble_destination = Point(4, 2.5);

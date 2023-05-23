@@ -97,11 +97,11 @@ from proto.ssl_gc_common_pb2 import Team
         #     tbots.Point(-3.5, 0),
         # ),
         (
-                tbots.Field.createSSLDivisionBField().friendlyCornerNeg()
-                + tbots.Vector(-0.25, 0),
-                tbots.Vector(0, 0.0),
-                tbots.Point(4.0, 2.0),
-                Point(x_meters=4, y_meters=-2),
+            tbots.Field.createSSLDivisionBField().friendlyCornerNeg()
+            + tbots.Vector(-0.25, 0),
+            tbots.Vector(0, 0.0),
+            tbots.Point(4.0, 2.0),
+            Point(x_meters=4, y_meters=-2),
         ),
     ],
 )
