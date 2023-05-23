@@ -70,7 +70,7 @@ class ProtoPlotter(QWidget):
         """
         QWidget.__init__(self)
 
-        self.win = pg.plot()
+        self.win = pg.PlotWidget()
         self.win.disableAutoRange()
         self.win.setYRange(min_y, max_y)
 
