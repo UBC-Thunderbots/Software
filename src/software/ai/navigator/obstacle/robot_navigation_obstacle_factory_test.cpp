@@ -82,24 +82,22 @@ class RobotNavigationObstacleFactoryMotionConstraintTest : public testing::Test
 TEST_F(RobotNavigationObstacleFactoryTest, create_rectangle_obstacle)
 {
     Rectangle rectangle(Point(1, 3), Point(5, 8));
-    Polygon expected(
-        Polygon({{0.883, 8.117}, {5.117, 8.117}, {5.117, 2.883}, {0.883, 2.883}}));
+    Rectangle expected({0.883, 2.883}, {5.117, 8.117});
     ObstaclePtr obstacle = robot_navigation_obstacle_factory.createFromShape(rectangle);
     try
     {
-        auto polygon_obstacle = dynamic_cast<GeomObstacle<Polygon>&>(*obstacle);
-        EXPECT_EQ(expected, polygon_obstacle.getGeom());
+        auto rectangle_obstacle = dynamic_cast<GeomObstacle<Rectangle>&>(*obstacle);
+        EXPECT_EQ(expected, rectangle_obstacle.getGeom());
     }
     catch (std::bad_cast&)
     {
-        ADD_FAILURE() << "Polygon Obstacle was not created for a rectangle";
+        ADD_FAILURE() << "Rectangle Obstacle was not created for a rectangle";
     }
 }
 
 TEST_F(RobotNavigationObstacleFactoryTest, create_ball_obstacle)
 {
     Point origin(2.5, 4);
-    Rectangle rectangle(Point(1, 3), Point(5, 8));
     Circle expected(origin, 0.1385);
     ObstaclePtr obstacle =
         robot_navigation_obstacle_factory.createFromBallPosition(origin);
@@ -118,7 +116,6 @@ TEST_F(RobotNavigationObstacleFactoryTest, create_ball_obstacle)
 TEST_F(RobotNavigationObstacleFactoryTest, create_robot_obstacle)
 {
     Point origin(2.5, 4);
-    Rectangle rectangle(Point(1, 3), Point(5, 8));
     Circle expected(origin, 0.207);
     ObstaclePtr obstacle =
         robot_navigation_obstacle_factory.createFromRobotPosition(origin);
