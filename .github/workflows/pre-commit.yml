@@ -1,0 +1,32 @@
+name: auto-fixes with pre-commit
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+    types: [ opened, reopened, synchronize, ready_for_review ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  formatting-check:
+    name: Formatting and FSM diagram generation with pre-commit-ci-lite
+    runs-on: ubuntu-20.04
+    if: github.event.pull_request.draft == false
+    steps:
+      # checks-out the repository under $GITHUB_WORKSPACE
+      - uses: actions/checkout@v2
+
+      - name: Environment Setup
+        run: |
+          "${GITHUB_WORKSPACE}"/environment_setup/setup_software.sh
+      
+      - uses: pre-commit/action@v3.0.0
+
+      - uses: pre-commit-ci/lite-action@v1.0.1
+        name: Run pre-commit-ci-lite
+        if: always()
+
