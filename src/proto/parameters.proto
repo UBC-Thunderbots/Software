@@ -40,7 +40,6 @@ message AiConfig
     required DefensePlayConfig defense_play_config                          = 11;
     required RobotNavigationObstacleConfig robot_navigation_obstacle_config = 12;
     required PossessionTrackerConfig possession_tracker_config              = 13;
-    required DefenderAssignmentConfig defender_assignment_config            = 14;
 }
 
 message AiControlConfig
@@ -280,10 +279,55 @@ message SensorFusionConfig
 
 message DefensePlayConfig
 {
+    message DefenderAssignmentConfig
+    {
+        // The minimum distance in meters between two threats for them to be considered
+        // non-similar
+        required double min_distance_between_threats_meters = 1 [
+            default                   = 0.25,
+            (bounds).min_double_value = 0.0,
+            (bounds).max_double_value = 10.0
+        ];
+
+        // The minimum difference between two threats in angle to the primary threat for
+        // them to be considered non-similar
+        required double min_angle_between_threats_degrees = 2 [
+            default                   = 10.0,
+            (bounds).min_double_value = 0.0,
+            (bounds).max_double_value = 360.0
+        ];
+
+        // Multiplier to ensure that goal lanes are scored higher (in threat rating)
+        // than passing lanes
+        required double goal_lane_threat_multiplier = 3 [
+            default                   = 3.0,
+            (bounds).min_double_value = 0.0,
+            (bounds).max_double_value = 10.0
+        ];
+
+        // Max percent difference between two goal lanes' angles to goal for them to be
+        // considered a dense lane cluster
+        required double goal_lane_density_threshold = 4 [
+            default                   = 0.3,
+            (bounds).min_double_value = 0.0,
+            (bounds).max_double_value = 100.0
+        ];
+
+        // Bonus added to coverage rating if the goal lane is not part of a dense cluster
+        required double goal_lane_nondense_bonus = 5 [
+            default                   = 0.5,
+            (bounds).min_double_value = 0.0,
+            (bounds).max_double_value = 10.0
+        ];
+    }
+
     // The distance at which a threat is considered "immediate" if there is only 1
     // "immediate" threat the defense play will swarm that robot with shadowers
     required double immediate_threat_distance = 1
         [default = 6.0, (bounds).min_double_value = 0.0, (bounds).max_double_value = 9.5];
+
+    // The DefenderAssignmentConfig for tuning defender assignments
+    required DefenderAssignmentConfig defender_assignment_config = 2;
 }
 
 message RobotNavigationObstacleConfig
@@ -332,48 +376,6 @@ message PossessionTrackerConfig
     // it to be considered far away
     required double time_far_threshold_s = 4 [
         default                   = 1.5,
-        (bounds).min_double_value = 0.0,
-        (bounds).max_double_value = 10.0
-    ];
-}
-
-message DefenderAssignmentConfig
-{
-    // The minimum distance in meters between two threats for them to be considered
-    // non-similar
-    required double min_distance_between_threats_meters = 1 [
-        default                   = 0.25,
-        (bounds).min_double_value = 0.0,
-        (bounds).max_double_value = 10.0
-    ];
-
-    // The minimum difference between two threats in angle to the primary threat for
-    // them to be considered non-similar
-    required double min_angle_between_threats_degrees = 2 [
-        default                   = 10.0,
-        (bounds).min_double_value = 0.0,
-        (bounds).max_double_value = 360.0
-    ];
-
-    // Multiplier to ensure that goal lanes are scored higher (in threat rating)
-    // than passing lanes
-    required double goal_lane_threat_multiplier = 3 [
-        default                   = 3.0,
-        (bounds).min_double_value = 0.0,
-        (bounds).max_double_value = 10.0
-    ];
-
-    // Max percent difference between two goal lanes' angles to goal for them to be
-    // considered a dense lane cluster
-    required double goal_lane_density_threshold = 4 [
-        default                   = 0.3,
-        (bounds).min_double_value = 0.0,
-        (bounds).max_double_value = 100.0
-    ];
-
-    // Bonus added to coverage rating if the goal lane is not part of a dense cluster
-    required double goal_lane_nondense_bonus = 5 [
-        default                   = 0.5,
         (bounds).min_double_value = 0.0,
         (bounds).max_double_value = 10.0
     ];

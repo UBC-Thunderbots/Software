@@ -7,7 +7,7 @@
 
 std::vector<DefenderAssignment> getAllDefenderAssignments(
     const std::vector<EnemyThreat> &threats, const Field &field, const Ball &ball,
-    const TbotsProto::DefenderAssignmentConfig &config)
+    const TbotsProto::DefensePlayConfig::DefenderAssignmentConfig &config)
 {
     if (threats.size() == 0)
     {

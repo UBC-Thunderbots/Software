@@ -67,7 +67,7 @@ struct GoalLane : ShootingLane
  */
 std::vector<DefenderAssignment> getAllDefenderAssignments(
     const std::vector<EnemyThreat> &threats, const Field &field, const Ball &ball,
-    const TbotsProto::DefenderAssignmentConfig &config);
+    const TbotsProto::DefensePlayConfig::DefenderAssignmentConfig &config);
 
 /**
  * Filters out enemy threats with similar positioning/angle to the primary threat

@@ -16,7 +16,7 @@ void DefensePlayFSM::defendAgainstThreats(const Update& event)
 
     auto assignments = getAllDefenderAssignments(
         enemy_threats, event.common.world.field(), event.common.world.ball(), 
-        ai_config.defender_assignment_config());
+        ai_config.defense_play_config().defender_assignment_config());
 
     if (assignments.size() == 0)
     {
