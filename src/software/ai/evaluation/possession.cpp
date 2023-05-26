@@ -7,7 +7,7 @@
 #include "software/world/field.h"
 #include "software/world/team.h"
 
-PossessionTracker::PossessionTracker(const TbotsProto::PossessionTrackerConfig &config) 
+PossessionTracker::PossessionTracker(const TbotsProto::PossessionTrackerConfig &config)
     : distance_near_tolerance_meters(config.distance_near_tolerance_meters()),
       distance_far_tolerance_meters(config.distance_far_tolerance_meters()),
       time_near_threshold(Duration::fromSeconds(config.time_near_threshold_s())),
@@ -17,7 +17,7 @@ PossessionTracker::PossessionTracker(const TbotsProto::PossessionTrackerConfig &
       time_near_enemy(Duration::fromSeconds(0)),
       time_far_friendly(Duration::fromSeconds(0)),
       time_far_enemy(Duration::fromSeconds(0)),
-      possession(TeamPossession::FRIENDLY_TEAM) 
+      possession(TeamPossession::FRIENDLY_TEAM)
 {
 }
 

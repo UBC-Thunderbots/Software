@@ -39,7 +39,6 @@ class PossessionTracker
                                          const Field &field);
 
    private:
-
     // Max distance in meters between robot and ball for robot
     // to be considered near the ball
     double distance_near_tolerance_meters;
@@ -71,7 +70,7 @@ class PossessionTracker
 
     // The team currently with possession of the ball
     TeamPossession possession;
-    
+
     /**
      * Updates the amounts of time that each team has spent near or away from the ball
      *
