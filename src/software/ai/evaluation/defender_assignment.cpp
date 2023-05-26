@@ -6,7 +6,8 @@
 #include "software/math/math_functions.h"
 
 std::vector<DefenderAssignment> getAllDefenderAssignments(
-    const std::vector<EnemyThreat> &threats, const Field &field, const Ball &ball)
+    const std::vector<EnemyThreat> &threats, const Field &field, const Ball &ball,
+    const TbotsProto::DefenderAssignmentConfig &config)
 {
     if (threats.size() == 0)
     {
@@ -32,7 +33,9 @@ std::vector<DefenderAssignment> getAllDefenderAssignments(
     }
 
     // Get filtered list of threats with similarly positioned threats removed
-    auto filtered_threats = filterOutSimilarThreats(relevant_threats);
+    auto filtered_threats = filterOutSimilarThreats(
+        relevant_threats, config.min_distance_between_threats_meters(),
+        Angle::fromDegrees(config.min_angle_between_threats_degrees()));
 
     // Construct passing lanes and determine pass defender assignments
     auto primary_threat_position = filtered_threats.front().robot.position();
@@ -62,19 +65,21 @@ std::vector<DefenderAssignment> getAllDefenderAssignments(
 
         auto lane            = Segment(threat_position, field.friendlyGoalCenter());
         double threat_rating = (static_cast<double>(relevant_threats.size()) - i) *
-                               GOAL_LANE_THREAT_MULTIPLIER;
+                               config.goal_lane_threat_multiplier();
         auto angle_to_goal = lane.toVector().orientation();
         goal_lanes.emplace_back(GoalLane{{lane, threat_rating}, angle_to_goal});
     }
 
-    auto grouped_goal_lanes = groupGoalLanesByDensity(goal_lanes);
+    auto grouped_goal_lanes =
+        groupGoalLanesByDensity(goal_lanes, config.goal_lane_density_threshold());
 
     // Determine crease defender assignments based on goal lanes
     for (const auto &goal_lanes_group : grouped_goal_lanes)
     {
         // We include a non-dense bonus when rating crease defender assignment
         // if the goal lane is not part of a dense cluster
-        double nondense_bonus = (goal_lanes_group.size() == 1) ? 0.5 : 0;
+        double nondense_bonus =
+            (goal_lanes_group.size() == 1) ? config.goal_lane_nondense_bonus() : 0;
 
         for (const auto &goal_lane : goal_lanes_group)
         {
@@ -106,7 +111,9 @@ std::vector<DefenderAssignment> getAllDefenderAssignments(
     return assignments;
 }
 
-std::vector<EnemyThreat> filterOutSimilarThreats(const std::vector<EnemyThreat> &threats)
+std::vector<EnemyThreat> filterOutSimilarThreats(const std::vector<EnemyThreat> &threats,
+                                                 double min_distance,
+                                                 const Angle &min_angle)
 {
     std::vector<EnemyThreat> filtered_threats;
 
@@ -119,7 +126,7 @@ std::vector<EnemyThreat> filterOutSimilarThreats(const std::vector<EnemyThreat> 
         double distance_between_threats =
             distance(threat.robot.position(), primary_threat.robot.position());
 
-        if (distance_between_threats < MIN_DISTANCE_BETWEEN_THREATS)
+        if (distance_between_threats < min_distance)
         {
             continue;
         }
@@ -133,7 +140,7 @@ std::vector<EnemyThreat> filterOutSimilarThreats(const std::vector<EnemyThreat> 
                 convexAngle(filtered_threat.robot.position(),
                             primary_threat.robot.position(), threat.robot.position());
 
-            if (angle < MIN_ANGLE_BETWEEN_THREATS)
+            if (angle < min_angle)
             {
                 // Only the closest threat to the primary threat is included in our
                 // list of filtered threats
@@ -158,7 +165,7 @@ std::vector<EnemyThreat> filterOutSimilarThreats(const std::vector<EnemyThreat> 
 }
 
 std::vector<std::vector<GoalLane>> groupGoalLanesByDensity(
-    std::vector<GoalLane> &goal_lanes)
+    std::vector<GoalLane> &goal_lanes, double density_threshold)
 {
     if (goal_lanes.size() == 0)
     {
@@ -182,7 +189,7 @@ std::vector<std::vector<GoalLane>> groupGoalLanesByDensity(
         double percent_diff =
             percent_difference(goal_lanes[i].angle_to_goal.toRadians(),
                                groups.back().back().angle_to_goal.toRadians());
-        if (percent_diff > GOAL_LANE_DENSITY_THRESHOLD)
+        if (percent_diff > density_threshold)
         {
             groups.emplace_back(std::vector<GoalLane>{});
         }

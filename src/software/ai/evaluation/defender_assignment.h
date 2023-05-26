@@ -1,5 +1,6 @@
 #pragma once
 
+#include "proto/parameters.pb.h"
 #include "software/ai/evaluation/enemy_threat.h"
 #include "software/geom/point.h"
 #include "software/geom/segment.h"
@@ -51,24 +52,6 @@ struct GoalLane : ShootingLane
     Angle angle_to_goal;
 };
 
-// The minimum distance between two threats for them to be considered non-similar
-static constexpr double MIN_DISTANCE_BETWEEN_THREATS = 0.25;
-
-// The minimum difference between two threats in angle to the primary threat for
-// them to be considered non-similar
-static constexpr Angle MIN_ANGLE_BETWEEN_THREATS = Angle::fromDegrees(10);
-
-// Multiplier to ensure that goal lanes are scored higher (in threat rating)
-// than passing lanes
-static constexpr double GOAL_LANE_THREAT_MULTIPLIER = 3;
-
-// Max percent difference between two goal lanes' angles to goal for them to be
-// considered a dense lane cluster
-static constexpr double GOAL_LANE_DENSITY_THRESHOLD = 0.3;
-
-// Bonus added to coverage rating if the goal lane is not part of a dense cluster
-static constexpr double GOAL_LANE_NONDENSE_BONUS = 0.5;
-
 /**
  * Determines all possible defender assignments where a defender could be placed
  * on the field and returns them in order of decreasing coverage rating
@@ -77,12 +60,14 @@ static constexpr double GOAL_LANE_NONDENSE_BONUS = 0.5;
  * in order of decreasing threat
  * @param field the field being played on
  * @param ball the ball
+ * @param config the DefenderAssignmentConfig used for tuning assignments
  *
  * @return a list of all possible defender assignments in order of decreasing
  * coverage rating
  */
 std::vector<DefenderAssignment> getAllDefenderAssignments(
-    const std::vector<EnemyThreat> &threats, const Field &field, const Ball &ball);
+    const std::vector<EnemyThreat> &threats, const Field &field, const Ball &ball,
+    const TbotsProto::DefenderAssignmentConfig &config);
 
 /**
  * Filters out enemy threats with similar positioning/angle to the primary threat
@@ -102,18 +87,26 @@ std::vector<DefenderAssignment> getAllDefenderAssignments(
  * close in proximity to the primary threat, so it is filtered out.
  *
  * @param threats all enemy threats in order of decreasing threat
- *
+ * @param min_distance the minimum distance between two threats for them to be
+ * considered non-similar
+ * @param min_angle the minimum difference between two threats in angle to the
+ * primary threat for them to be considered non-similar
+
  * @return a copy of the threats list with similarly positioned threats removed
  */
-std::vector<EnemyThreat> filterOutSimilarThreats(const std::vector<EnemyThreat> &threats);
+std::vector<EnemyThreat> filterOutSimilarThreats(const std::vector<EnemyThreat> &threats,
+                                                 double min_distance,
+                                                 const Angle &min_angle);
 
 /**
  * Groups together goal lanes that are densely clustered (i.e. have similar angles
  * to the goal).
  *
  * @param goal_lanes the goal lanes to group
+ * @param density_threshold the max percent difference between two goal lanes' angles
+ * to goal for them to be considered a dense lane cluster
  *
  * @return a list of lists which represent groupings of densely clustered goal lanes
  */
 std::vector<std::vector<GoalLane>> groupGoalLanesByDensity(
-    std::vector<GoalLane> &goal_lanes);
+    std::vector<GoalLane> &goal_lanes, double density_threshold);
