@@ -1,0 +1,68 @@
+---
+
+- name: Remote flashing
+  hosts: THUNDERBOTS_HOSTS
+
+  tasks:
+
+    - debug:
+        msg: "[Robot ID = {{ inventory_hostname }}]"
+      tags: always
+
+    - name: Start Flash Process
+      block:
+        - name: Stop Services
+          become: true
+          become_method: sudo
+          ansible.builtin.systemd:
+            name: "{{ service_name }}"
+            masked: no
+            daemon_reload: yes
+            state: stopped
+          with_items: "{{ services }}"
+          loop_control:
+            loop_var: service_name
+          when: "'stop' in actions"
+          tags: always
+
+        - name: Delete everything on ~/
+          file:
+            state: absent
+            path: /home/robot/robot_auto_test
+          become_method: sudo
+          become: true
+          register: result
+
+        - name: Sync Binaries
+          ansible.posix.synchronize:
+            src: "{{ binary_paths[service_name] }}"
+            dest: ~/thunderbots_binaries/
+            recursive: yes
+            copy_links: yes
+          with_items: "{{ services }}"
+          loop_control:
+            loop_var: service_name
+          when: "'sync' in actions"
+          tags: always
+
+        - name: Unzipping python binaries
+          command: 'unzip ~/thunderbots_binaries/*.zip'
+          register: result
+          args:
+            chdir: ~/thunderbots_binaries
+          when: "'sync' in actions"
+          ignore_errors: yes # Remove when display is re-enabled
+
+        - name: Start Services
+          become: true
+          become_method: sudo
+          ansible.builtin.systemd:
+            name: "{{ service_name }}"
+            masked: no
+            daemon_reload: yes
+            state: started
+          with_items: "{{ services }}"
+          loop_control:
+            loop_var: service_name
+          when: "'start' in actions"
+          tags: always
