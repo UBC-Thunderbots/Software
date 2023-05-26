@@ -49,6 +49,9 @@ py_test(
     srcs = [
         "passing_sim_test.py",
     ],
+    data = [
+      "//software:py_constants.so",
+    ],
     deps = [
         "//software/simulated_tests:simulated_test_fixture",
         "//software/simulated_tests:validation",

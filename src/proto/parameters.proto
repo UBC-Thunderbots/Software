@@ -122,6 +122,9 @@ message PassingConfig
         [default = 2, (bounds).min_int_value = 0, (bounds).max_int_value = 100];
     // Cost visualization parameters
     required CostVisualizationConfig cost_vis_config = 10;
+    // The max speed at which a pass should be received
+    required double max_receive_speed = 11
+        [default = 3.0, (bounds).min_double_value = 1.0, (bounds).max_double_value = 4.0];
 }
 
 message GoalieTacticConfig

@@ -10,9 +10,11 @@ from software.simulated_tests.simulated_test_fixture import (
 )
 from proto.message_translation.tbots_protobuf import create_world_state
 from software.simulated_tests.friendly_receives_ball_slow import FriendlyReceivesBallSlow
+from software import py_constants
 
 @pytest.mark.parametrize(
-    "ball_initial_position,ball_initial_velocity,attacker_robot_position,receiver_robot_positions",
+    "ball_initial_position,ball_initial_velocity,attacker_robot_position,"
+    "receiver_robot_positions",
     [
         (
             tbots.Point(-0.5, 0),
@@ -20,7 +22,23 @@ from software.simulated_tests.friendly_receives_ball_slow import FriendlyReceive
             tbots.Point(-1.0, 0.0),
             [
                 tbots.Point(1.0, 0.0)
-            ]
+            ],
+        ),
+        (
+            tbots.Point(0.0, 0.0),
+            tbots.Vector(0.0, 0.0),
+            tbots.Point(-3.5, 0.0),
+            [
+                tbots.Point(3.5, 0.0)
+            ],
+        ),
+        (
+            tbots.Point(-1.0, 0.0),
+            tbots.Vector(0.0, 0.0),
+            tbots.Point(-3.5, 2.5),
+            [
+                tbots.Point(3.5, -2.5)
+            ],
         )
     ]
 )
@@ -31,7 +49,7 @@ def test_passing(
     receiver_robot_positions,
     simulated_test_runner
 ):
-    blue_robot_locations = [attacker_robot_position].append(receiver_robot_positions)
+    blue_robot_locations = [attacker_robot_position, *receiver_robot_positions]
 
     # Setup Robot
     simulated_test_runner.simulator_proto_unix_io.send_proto(
@@ -70,8 +88,7 @@ def test_passing(
             tbots.Field.createSSLDivisionBField()
         ),
         PassingConfig(
-            min_pass_speed_m_per_s=min_pass_speed_m_per_s,
-            max_pass_speed_m_per_s=max_pass_speed_m_per_s
+            max_receive_speed=py_constants.MAX_PASS_RECEIVE_SPEED
         )
     )
 
@@ -141,6 +158,7 @@ def test_passing(
     simulated_test_runner.run_test(
         inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
         inv_always_validation_sequence_set=always_validation_sequence_set,
+        test_timeout_s=15
     )
 
 
