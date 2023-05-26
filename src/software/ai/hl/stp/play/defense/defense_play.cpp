@@ -5,7 +5,7 @@
 #include "software/logger/logger.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-DefensePlay::DefensePlay(TbotsProto::AiConfig config)
+DefensePlay::DefensePlay(const TbotsProto::AiConfig &config)
     : Play(config, true),
       fsm{DefensePlayFSM{config}},
       control_params{.max_allowed_speed_mode =

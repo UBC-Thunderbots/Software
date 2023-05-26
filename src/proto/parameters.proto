@@ -39,6 +39,7 @@ message AiConfig
     required RobotCapabilitiesConfig robot_capabilities_config              = 9;
     required DefensePlayConfig defense_play_config                          = 11;
     required RobotNavigationObstacleConfig robot_navigation_obstacle_config = 12;
+    required PossessionTrackerConfig possession_tracker_config              = 13;
 }
 
 message AiControlConfig
@@ -304,4 +305,16 @@ message CostVisualizationConfig
     required bool pass_friendly_capability = 4 [default = false];
     required bool pass_enemy_risk          = 5 [default = false];
     required bool pass_shoot_score         = 6 [default = false];
+}
+
+message PossessionTrackerConfig
+{
+    required double distance_near_tolerance_meters = 1 
+        [default = 0.1, (bounds).min_double_value = 0.0, (bounds).max_double_value = 5.0];
+    required double distance_far_tolerance_meters = 2 
+        [default = 0.5, (bounds).min_double_value = 0.0, (bounds).max_double_value = 10.0];
+    required double time_near_threshold_s = 3 
+        [default = 0.1, (bounds).min_double_value = 0.0, (bounds).max_double_value = 3.0];
+    required double time_far_threshold_s = 4 
+        [default = 1.5, (bounds).min_double_value = 0.0, (bounds).max_double_value = 10.0];
 }

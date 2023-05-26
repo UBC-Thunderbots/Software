@@ -11,7 +11,7 @@
 class DefensePlay : public Play
 {
    public:
-    DefensePlay(TbotsProto::AiConfig config);
+    DefensePlay(const TbotsProto::AiConfig &config);
 
     void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
     void updateTactics(const PlayUpdate &play_update) override;

@@ -4,7 +4,7 @@ OffensePlayFSM::OffensePlayFSM(TbotsProto::AiConfig ai_config)
     : ai_config(ai_config),
       shoot_or_pass_play(std::make_shared<ShootOrPassPlay>(ai_config)),
       defense_play(std::make_shared<DefensePlay>(ai_config)),
-      possession_tracker(std::make_shared<PossessionTracker>())
+      possession_tracker(std::make_shared<PossessionTracker>(ai_config.possession_tracker_config()))
 {
 }
 

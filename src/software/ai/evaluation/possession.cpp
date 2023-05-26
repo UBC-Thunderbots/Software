@@ -7,7 +7,19 @@
 #include "software/world/field.h"
 #include "software/world/team.h"
 
-PossessionTracker::PossessionTracker() {}
+PossessionTracker::PossessionTracker(const TbotsProto::PossessionTrackerConfig &config) 
+    : distance_near_tolerance_meters(config.distance_near_tolerance_meters()),
+      distance_far_tolerance_meters(config.distance_far_tolerance_meters()),
+      time_near_threshold_s(config.time_near_threshold_s()),
+      time_far_threshold_s(config.time_far_threshold_s()),
+      last_timestamp(Timestamp::fromSeconds(0)),
+      time_near_friendly(Duration::fromSeconds(0)),
+      time_near_enemy(Duration::fromSeconds(0)),
+      time_far_friendly(Duration::fromSeconds(0)),
+      time_far_enemy(Duration::fromSeconds(0)),
+      possession(TeamPossession::FRIENDLY_TEAM) 
+{
+}
 
 TeamPossession PossessionTracker::getTeamWithPossession(const Team &friendly_team,
                                                         const Team &enemy_team,
@@ -15,11 +27,12 @@ TeamPossession PossessionTracker::getTeamWithPossession(const Team &friendly_tea
                                                         const Field &field)
 {
     // Based on CMDragons TDP 2015
+    // http://www.cs.cmu.edu/~jmendoza/papers/cmdragons_robocup15.pdf
 
     updateTimes(friendly_team, enemy_team, ball, field);
 
-    const Duration TIME_NEAR_THRESHOLD = Duration::fromSeconds(TIME_NEAR_THRESHOLD_S);
-    const Duration TIME_FAR_THRESHOLD  = Duration::fromSeconds(TIME_FAR_THRESHOLD_S);
+    Duration TIME_NEAR_THRESHOLD = Duration::fromSeconds(time_near_threshold_s);
+    Duration TIME_FAR_THRESHOLD  = Duration::fromSeconds(time_far_threshold_s);
 
     if ((time_near_friendly > TIME_NEAR_THRESHOLD) &&
         (time_near_enemy < TIME_NEAR_THRESHOLD))
@@ -84,7 +97,7 @@ void PossessionTracker::updateTimes(const Team &friendly_team, const Team &enemy
     double distance_friendly = distance(nearest_friendly->position(), ball.position());
     double distance_enemy    = distance(nearest_enemy->position(), ball.position());
 
-    if (distance_friendly < DISTANCE_NEAR_TOLERANCE_METERS)
+    if (distance_friendly < distance_near_tolerance_meters)
     {
         time_near_friendly = time_near_friendly + delta_time;
     }
@@ -93,7 +106,7 @@ void PossessionTracker::updateTimes(const Team &friendly_team, const Team &enemy
         time_near_friendly = Duration::fromSeconds(0);
     }
 
-    if (distance_enemy < DISTANCE_NEAR_TOLERANCE_METERS)
+    if (distance_enemy < distance_near_tolerance_meters)
     {
         time_near_enemy = time_near_enemy + delta_time;
     }
@@ -102,7 +115,7 @@ void PossessionTracker::updateTimes(const Team &friendly_team, const Team &enemy
         time_near_enemy = Duration::fromSeconds(0);
     }
 
-    if (distance_friendly > DISTANCE_FAR_TOLERANCE_METERS)
+    if (distance_friendly > distance_far_tolerance_meters)
     {
         time_far_friendly = time_far_friendly + delta_time;
     }
@@ -111,7 +124,7 @@ void PossessionTracker::updateTimes(const Team &friendly_team, const Team &enemy
         time_far_friendly = Duration::fromSeconds(0);
     }
 
-    if (distance_enemy > DISTANCE_FAR_TOLERANCE_METERS)
+    if (distance_enemy > distance_far_tolerance_meters)
     {
         time_far_enemy = time_far_enemy + delta_time;
     }
