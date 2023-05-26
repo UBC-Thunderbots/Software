@@ -9,14 +9,29 @@ from software.simulated_tests.simulated_test_fixture import (
     pytest_main,
 )
 from proto.message_translation.tbots_protobuf import create_world_state
+from software.simulated_tests.friendly_receives_ball_slow import FriendlyReceivesBallSlow
 
-def test_passing(simulated_test_runner):
-    blue_robot_locations = [
-        tbots.Point(-1.0, 0.0),
-        tbots.Point(1.0, 0.0)
+@pytest.mark.parametrize(
+    "ball_initial_position,ball_initial_velocity,attacker_robot_position,receiver_robot_positions",
+    [
+        (
+            tbots.Point(-0.5, 0),
+            tbots.Vector(0.0, 0.0),
+            tbots.Point(-1.0, 0.0),
+            [
+                tbots.Point(1.0, 0.0)
+            ]
+        )
     ]
-    ball_initial_position = tbots.Point(-0.5, 0.0)
-    ball_initial_velocity = tbots.Vector(0.0, 0.0)
+)
+def test_passing(
+    ball_initial_position,
+    ball_initial_velocity,
+    attacker_robot_position,
+    receiver_robot_positions,
+    simulated_test_runner
+):
+    blue_robot_locations = [attacker_robot_position].append(receiver_robot_positions)
 
     # Setup Robot
     simulated_test_runner.simulator_proto_unix_io.send_proto(
@@ -54,7 +69,10 @@ def test_passing(simulated_test_runner):
         tbots.EighteenZonePitchDivision(
             tbots.Field.createSSLDivisionBField()
         ),
-        PassingConfig()
+        PassingConfig(
+            min_pass_speed_m_per_s=min_pass_speed_m_per_s,
+            max_pass_speed_m_per_s=max_pass_speed_m_per_s
+        )
     )
 
     pass_evaluation = pass_generator.generatePassEvaluation(world)
@@ -66,7 +84,6 @@ def test_passing(simulated_test_runner):
         best_pass.receiverPoint().x() - best_pass.passerPoint().x(),
         best_pass.receiverPoint().y() - best_pass.passerPoint().y()
     )
-    print(kick_vec.orientation().toRadians())
     # Setup Tactic
     params = AssignedTacticPlayControlParams()
     params.assigned_tactics[0].kick.CopyFrom(
@@ -112,7 +129,14 @@ def test_passing(simulated_test_runner):
 
     # Eventually Validation
     eventually_validation_sequence_set = [[]]
-    always_validation_sequence_set = [[]]
+    always_validation_sequence_set = [
+        [
+            FriendlyReceivesBallSlow(
+                robot_id=1,
+                max_receive_speed=3
+            )
+        ]
+    ]
 
     simulated_test_runner.run_test(
         inv_eventually_validation_sequence_set=eventually_validation_sequence_set,

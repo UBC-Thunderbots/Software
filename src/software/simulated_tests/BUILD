@@ -83,6 +83,7 @@ py_library(
         "ball_stops_in_region.py",
         "excessive_dribbling.py",
         "friendly_has_ball_possession.py",
+        "friendly_receives_ball_slow.py",
         "friendly_team_scored.py",
         "robot_enters_region.py",
         "robot_speed_threshold.py",
