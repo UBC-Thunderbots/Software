@@ -12,6 +12,7 @@ import software.python_bindings as cpp_bindings
 from software.py_constants import *
 from software.thunderscope.robot_communication import RobotCommunication
 from software.thunderscope.replay.proto_logger import ProtoLogger
+from software.thunderscope.constants import EstopMode
 
 NUM_ROBOTS = 6
 SIM_TICK_RATE_MS = 16
@@ -155,11 +156,18 @@ if __name__ == "__main__":
         action="store_true",
         help="show pass cost visualization layer",
     )
-    parser.add_argument(
+    estop_group = parser.add_mutually_exclusive_group()
+    estop_group.add_argument(
         "--use_keyboard_estop",
         action="store_true",
         default=False,
         help="Allows the use of the spacebar as an estop instead of a physical one",
+    )
+    estop_group.add_argument(
+        "--disable_estop",
+        action="store_true",
+        default=False,
+        help="Disables checking for estop plugged in (ONLY USE FOR LOCAL TESTING)",
     )
 
     # Sanity check that an interface was provided
@@ -258,12 +266,24 @@ if __name__ == "__main__":
         if args.run_diagnostics:
             current_proto_unix_io = tscope.robot_diagnostics_proto_unix_io
 
+        estop_mode = EstopMode.ESTOP
+        if args.use_keyboard_estop:
+            estop_mode = EstopMode.KEYBOARD_ESTOP
+        if args.disable_estop:
+            estop_mode = EstopMode.DISABLE_ESTOP
+
         with RobotCommunication(
             current_proto_unix_io,
             getRobotMulticastChannel(0),
             args.interface,
-            args.use_keyboard_estop,
+            estop_mode,
         ) as robot_communication:
+
+            if estop_mode == EstopMode.KEYBOARD_ESTOP:
+                tscope.keyboard_estop_shortcut.activated.connect(
+                    robot_communication.toggle_keyboard_estop
+                )
+
             if args.run_diagnostics:
                 tscope.control_mode_signal.connect(
                     lambda mode, robot_id: robot_communication.toggle_robot_connection(

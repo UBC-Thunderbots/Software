@@ -1,7 +1,7 @@
 from software.py_constants import *
 from software.thunderscope.constants import ROBOT_COMMUNICATIONS_TIMEOUT_S
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
-from software.thunderscope.constants import IndividualRobotMode
+from software.thunderscope.constants import IndividualRobotMode, EstopMode
 from software.python_bindings import *
 from proto.import_all_protos import *
 from pyqtgraph.Qt import QtCore
@@ -18,7 +18,7 @@ class RobotCommunication(object):
         current_proto_unix_io,
         multicast_channel,
         interface,
-        use_keyboard_estop=False,
+        estop_mode,
         estop_path="/dev/ttyACM0",
         estop_buadrate=115200,
     ):
@@ -27,7 +27,7 @@ class RobotCommunication(object):
         :param current_proto_unix_io: the current proto unix io object
         :param multicast_channel: The multicast channel to use
         :param interface: The interface to use
-        :param use_keyboard_estop: if True, allows using the spacebar as an estop. If false, checks for physical estop
+        :param estop_mode: what estop mode we are running right now, of type EstopMode
         :param estop_path: The path to the estop
         :param estop_baudrate: The baudrate of the estop
 
@@ -37,7 +37,7 @@ class RobotCommunication(object):
         self.current_proto_unix_io = current_proto_unix_io
         self.multicast_channel = str(multicast_channel)
         self.interface = interface
-        self.use_keyboard_estop = use_keyboard_estop
+        self.estop_mode = estop_mode
         self.estop_path = estop_path
         self.estop_buadrate = estop_buadrate
 
@@ -71,12 +71,13 @@ class RobotCommunication(object):
         self.run_primitive_set_thread = threading.Thread(target=self.run_primitive_set)
 
         # initialising the estop
-        # tries to access a plugged in estop. if not found, defaults to keyboard estop
+        # tries to access a plugged in estop. if not found, throws an exception
+        # if using keyboard estop, skips this step
         self.estop_reader = None
         self.estop_is_playing = False
 
-        # only checks for estop if checking is not disabled
-        if not self.use_keyboard_estop:
+        # only checks for estop if we are in physical estop mode
+        if self.estop_mode == EstopMode.ESTOP:
             try:
                 self.estop_reader = ThreadedEstopReader(
                     self.estop_path, self.estop_buadrate
@@ -86,25 +87,26 @@ class RobotCommunication(object):
 
     def __send_estop_state(self):
         """
-        Constant loop which sends the current estop status proto
+        Constant loop which sends the current estop status proto if estop is not disabled
         Uses the keyboard estop value
         Unless estop is plugged in, in which case the physical estop value overrides it
         """
-        while True:
-            if not self.use_keyboard_estop:
-                self.estop_is_playing = self.estop_reader.isEstopPlay()
+        if self.estop_mode != EstopMode.DISABLE_ESTOP:
+            while True:
+                if self.estop_mode == EstopMode.ESTOP:
+                    self.estop_is_playing = self.estop_reader.isEstopPlay()
 
-            self.current_proto_unix_io.send_proto(
-                EstopState, EstopState(is_playing=self.estop_is_playing)
-            )
-            time.sleep(0.1)
+                self.current_proto_unix_io.send_proto(
+                    EstopState, EstopState(is_playing=self.estop_is_playing)
+                )
+                time.sleep(0.1)
 
     def toggle_keyboard_estop(self):
         """
-        If an estop is not plugged in, toggles the keyboard estop state
-        And send a message to the console
+        If keyboard estop is being used, toggles the estop state
+        And sends a message to the console
         """
-        if self.use_keyboard_estop:
+        if self.estop_mode == EstopMode.KEYBOARD_ESTOP:
             self.estop_is_playing = not self.estop_is_playing
 
             print(
@@ -116,8 +118,10 @@ class RobotCommunication(object):
         Returns True if the proto sending threads should send a proto
         :return: boolean
         """
-        return self.estop_is_playing and (
-            self.robots_connected_to_fullsystem or self.robots_connected_to_manual
+        return (
+            self.estop_mode != EstopMode.DISABLE_ESTOP
+            and self.estop_is_playing
+            and (self.robots_connected_to_fullsystem or self.robots_connected_to_manual)
         )
 
     def run_world(self):
