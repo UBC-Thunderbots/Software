@@ -10,8 +10,8 @@
 PossessionTracker::PossessionTracker(const TbotsProto::PossessionTrackerConfig &config) 
     : distance_near_tolerance_meters(config.distance_near_tolerance_meters()),
       distance_far_tolerance_meters(config.distance_far_tolerance_meters()),
-      time_near_threshold_s(config.time_near_threshold_s()),
-      time_far_threshold_s(config.time_far_threshold_s()),
+      time_near_threshold(Duration::fromSeconds(config.time_near_threshold_s())),
+      time_far_threshold(Duration::fromSeconds(config.time_far_threshold_s())),
       last_timestamp(Timestamp::fromSeconds(0)),
       time_near_friendly(Duration::fromSeconds(0)),
       time_near_enemy(Duration::fromSeconds(0)),
@@ -31,21 +31,18 @@ TeamPossession PossessionTracker::getTeamWithPossession(const Team &friendly_tea
 
     updateTimes(friendly_team, enemy_team, ball, field);
 
-    Duration TIME_NEAR_THRESHOLD = Duration::fromSeconds(time_near_threshold_s);
-    Duration TIME_FAR_THRESHOLD  = Duration::fromSeconds(time_far_threshold_s);
-
-    if ((time_near_friendly > TIME_NEAR_THRESHOLD) &&
-        (time_near_enemy < TIME_NEAR_THRESHOLD))
+    if ((time_near_friendly > time_near_threshold) &&
+        (time_near_enemy < time_near_threshold))
     {
         possession = TeamPossession::FRIENDLY_TEAM;
     }
-    else if ((time_near_friendly < TIME_NEAR_THRESHOLD) &&
-             (time_near_enemy > TIME_NEAR_THRESHOLD))
+    else if ((time_near_friendly < time_near_threshold) &&
+             (time_near_enemy > time_near_threshold))
     {
         possession = TeamPossession::ENEMY_TEAM;
     }
-    else if ((time_near_friendly > TIME_NEAR_THRESHOLD) &&
-             (time_near_enemy > TIME_NEAR_THRESHOLD))
+    else if ((time_near_friendly > time_near_threshold) &&
+             (time_near_enemy > time_near_threshold))
     {
         // Both teams are considered to have presence over the ball.
         // If the ball is on our side of the field, or no enemy robots are
@@ -68,8 +65,8 @@ TeamPossession PossessionTracker::getTeamWithPossession(const Team &friendly_tea
             possession = TeamPossession::FRIENDLY_TEAM;
         }
     }
-    else if ((time_far_friendly > TIME_FAR_THRESHOLD) &&
-             (time_far_enemy > TIME_FAR_THRESHOLD))
+    else if ((time_far_friendly > time_far_threshold) &&
+             (time_far_enemy > time_far_threshold))
     {
         // No team has presence over the ball.
         // Consider our team as having possession since we should seek to gain

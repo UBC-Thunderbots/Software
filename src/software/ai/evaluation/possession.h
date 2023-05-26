@@ -50,11 +50,11 @@ class PossessionTracker
 
     // Min time in seconds that robot must stay close to ball for
     // it to be considered near
-    double time_near_threshold_s;
+    Duration time_near_threshold;
 
     // Min time in seconds that robot must stay away from ball for
     // it to be considered far away
-    double time_far_threshold_s;
+    Duration time_far_threshold;
 
     // The timestamp of last game snapshot the PossessionTracker was updated with
     Timestamp last_timestamp;
