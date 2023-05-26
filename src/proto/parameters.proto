@@ -309,12 +309,23 @@ message CostVisualizationConfig
 
 message PossessionTrackerConfig
 {
+    // Max distance in meters between robot and ball for robot
+    // to be considered near the ball
     required double distance_near_tolerance_meters = 1 
         [default = 0.1, (bounds).min_double_value = 0.0, (bounds).max_double_value = 5.0];
+
+    // Min distance in meters between robot and ball for robot
+    // to be considered far away from the ball
     required double distance_far_tolerance_meters = 2 
         [default = 0.5, (bounds).min_double_value = 0.0, (bounds).max_double_value = 10.0];
+
+    // Min time in seconds that robot must stay close to ball for
+    // it to be considered near
     required double time_near_threshold_s = 3 
         [default = 0.1, (bounds).min_double_value = 0.0, (bounds).max_double_value = 3.0];
+
+    // Min time in seconds that robot must stay away from ball for
+    // it to be considered far away
     required double time_far_threshold_s = 4 
         [default = 1.5, (bounds).min_double_value = 0.0, (bounds).max_double_value = 10.0];
 }
