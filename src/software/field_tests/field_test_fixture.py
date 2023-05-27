@@ -54,7 +54,7 @@ class FieldTestRunner(TbotsTestRunner):
         yellow_full_system_proto_unix_io,
         gamecontroller,
         publish_validation_protos=True,
-        is_yellow_friendly=False
+        is_yellow_friendly=False,
     ):
         """Initialize the FieldTestRunner
         :param test_name: The name of the test to run
@@ -70,7 +70,7 @@ class FieldTestRunner(TbotsTestRunner):
             blue_full_system_proto_unix_io,
             yellow_full_system_proto_unix_io,
             gamecontroller,
-            is_yellow_friendly
+            is_yellow_friendly,
         )
         self.publish_validation_protos = publish_validation_protos
         self.is_yellow_friendly = is_yellow_friendly
@@ -522,10 +522,11 @@ def load_command_line_arguments():
         "--run_yellow",
         action="store_true",
         default=False,
-        help="Run the test with friendly robots in yellow mode"
+        help="Run the test with friendly robots in yellow mode",
     )
 
     return parser.parse_args()
+
 
 @pytest.fixture
 def field_test_runner():
@@ -549,7 +550,7 @@ def field_test_runner():
     runtime_dir = f"{args.blue_full_system_runtime_dir}/test/{test_name}"
     friendly_proto_unix_io = blue_full_system_proto_unix_io
 
-    if(args.run_yellow):
+    if args.run_yellow:
         debug_full_sys = args.debug_yellow_full_system
         runtime_dir = f"{args.yellow_full_system_runtime_dir}/test/{test_name}"
         friendly_proto_unix_io = yellow_full_system_proto_unix_io
@@ -593,7 +594,7 @@ def field_test_runner():
                 yellow_full_system_proto_unix_io=yellow_full_system_proto_unix_io,
                 gamecontroller=gamecontroller,
                 thunderscope=tscope,
-                is_yellow_friendly=args.run_yellow
+                is_yellow_friendly=args.run_yellow,
             )
 
             friendly_proto_unix_io.register_observer(World, runner.world_buffer)

@@ -23,7 +23,7 @@ class TbotsTestRunner(object):
         blue_full_system_proto_unix_io,
         yellow_full_system_proto_unix_io,
         gamecontroller,
-        is_yellow_friendly = False,
+        is_yellow_friendly=False,
     ):
         """Initialize the TestRunner.
         
@@ -59,14 +59,18 @@ class TbotsTestRunner(object):
         self.blue_full_system_proto_unix_io.register_observer(
             RobotStatus, self.robot_status_buffer
         )
-        if(self.is_yellow_friendly):
-            self.yellow_full_system_proto_unix_io.register_observer(World, self.world_buffer)
+        if self.is_yellow_friendly:
+            self.yellow_full_system_proto_unix_io.register_observer(
+                World, self.world_buffer
+            )
             self.yellow_full_system_proto_unix_io.register_observer(
                 PrimitiveSet, self.primitive_set_buffer
             )
         # Only validate on the blue worlds
         else:
-            self.blue_full_system_proto_unix_io.register_observer(World, self.world_buffer)
+            self.blue_full_system_proto_unix_io.register_observer(
+                World, self.world_buffer
+            )
             self.blue_full_system_proto_unix_io.register_observer(
                 PrimitiveSet, self.primitive_set_buffer
             )
@@ -87,7 +91,9 @@ class TbotsTestRunner(object):
         """
         team = Team.BLUE
         # If (friendly & yellow_friendly) or (~friendly & ~yellow_friendly), set command team to yellow
-        if (is_friendly and self.is_yellow_friendly) or not (is_friendly or self.is_yellow_friendly):
+        if (is_friendly and self.is_yellow_friendly) or not (
+            is_friendly or self.is_yellow_friendly
+        ):
             team = Team.YELLOW
 
         self.gamecontroller.send_ci_input(
@@ -109,12 +115,12 @@ class TbotsTestRunner(object):
         """
         fs_proto_unix_io = self.blue_full_system_proto_unix_io
         # If (friendly & yellow_friendly) or (~friendly & ~yellow_friendly), set command team to yellow
-        if (is_friendly and self.is_yellow_friendly) or not (is_friendly or self.is_yellow_friendly):
+        if (is_friendly and self.is_yellow_friendly) or not (
+            is_friendly or self.is_yellow_friendly
+        ):
             fs_proto_unix_io = self.yellow_full_system_proto_unix_io
 
-        fs_proto_unix_io.send_proto(
-            AssignedTacticPlayControlParams, tactics
-        )
+        fs_proto_unix_io.send_proto(AssignedTacticPlayControlParams, tactics)
 
     def set_play(self, play: Play, is_friendly: bool):
         """Overrides current AI play for the given team
@@ -127,7 +133,9 @@ class TbotsTestRunner(object):
         """
         fs_proto_unix_io = self.blue_full_system_proto_unix_io
         # If (friendly & yellow_friendly) or (~friendly & ~yellow_friendly), set command team to yellow
-        if (is_friendly and self.is_yellow_friendly) or not (is_friendly or self.is_yellow_friendly):
+        if (is_friendly and self.is_yellow_friendly) or not (
+            is_friendly or self.is_yellow_friendly
+        ):
             fs_proto_unix_io = self.yellow_full_system_proto_unix_io
 
         fs_proto_unix_io.send_proto(Play, play)

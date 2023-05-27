@@ -115,7 +115,7 @@ def test_basic_rotation(field_test_runner):
         params = AssignedTacticPlayControlParams()
         params.assigned_tactics[id].stop.CopyFrom(stop_tactic)
         # send the stop tactic
-        field_test_runner.set_tactics(params,True)
+        field_test_runner.set_tactics(params, True)
 
         # validate by eye
         logger.info(f"robot set to {angle} orientation")
