@@ -27,6 +27,8 @@ from proto.message_translation.tbots_protobuf import create_world_state
 
 from software.logger.logger import createLogger
 
+
+from software.thunderscope.thunderscope_config import configure_field_test_view
 from software.simulated_tests.tbots_test_runner import TbotsTestRunner
 from software.thunderscope.robot_communication import RobotCommunication
 from software.py_constants import *
@@ -577,13 +579,12 @@ def field_test_runner():
             # and start the test
             if args.enable_thunderscope:
                 tscope = Thunderscope(
-                    simulator_proto_unix_io=simulator_proto_unix_io,
-                    blue_full_system_proto_unix_io=blue_full_system_proto_unix_io,
-                    yellow_full_system_proto_unix_io=yellow_full_system_proto_unix_io,
+                    configure_field_test_view(
+                        simulator_proto_unix_io=simulator_proto_unix_io,
+                        blue_full_system_proto_unix_io=blue_full_system_proto_unix_io,
+                        yellow_full_system_proto_unix_io=yellow_full_system_proto_unix_io,
+                    ),
                     layout_path=None,
-                    visualization_buffer_size=args.visualization_buffer_size,
-                    load_blue=not args.run_yellow,
-                    load_yellow=args.run_yellow,
                 )
             time.sleep(LAUNCH_DELAY_S)
             runner = FieldTestRunner(
