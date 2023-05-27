@@ -52,25 +52,26 @@ class FieldTestRunner(TbotsTestRunner):
         yellow_full_system_proto_unix_io,
         gamecontroller,
         publish_validation_protos=True,
+        is_yellow_friendly=False
     ):
         """Initialize the FieldTestRunner
-        
         :param test_name: The name of the test to run
         :param blue_full_system_proto_unix_io: The blue full system proto unix io to use
         :param yellow_full_system_proto_unix_io: The yellow full system proto unix io to use
         :param gamecontroller: The gamecontroller context managed instance 
         :param publish_validation_protos: whether to publish validation protos
-
+        :param: is_yellow_friendly: if yellow is the friendly team
         """
-
         super(FieldTestRunner, self).__init__(
             test_name,
             thunderscope,
             blue_full_system_proto_unix_io,
             yellow_full_system_proto_unix_io,
             gamecontroller,
+            is_yellow_friendly
         )
         self.publish_validation_protos = publish_validation_protos
+        self.is_yellow_friendly = is_yellow_friendly
 
         logger.info("determining robots on field")
         # survey field for available robot ids
@@ -515,8 +516,14 @@ def load_command_line_arguments():
         help="Estop Baudrate",
     )
 
-    return parser.parse_args()
+    parser.add_argument(
+        "--run_yellow",
+        action="store_true",
+        default=False,
+        help="Run the test with friendly robots in yellow mode"
+    )
 
+    return parser.parse_args()
 
 @pytest.fixture
 def field_test_runner():
@@ -536,36 +543,32 @@ def field_test_runner():
 
     test_name = current_test.split("-")[0]
     tscope = None
+    debug_full_sys = args.debug_blue_full_system
+    runtime_dir = f"{args.blue_full_system_runtime_dir}/test/{test_name}"
+    friendly_proto_unix_io = blue_full_system_proto_unix_io
+
+    if(args.run_yellow):
+        debug_full_sys = args.debug_yellow_full_system
+        runtime_dir = f"{args.yellow_full_system_runtime_dir}/test/{test_name}"
+        friendly_proto_unix_io = yellow_full_system_proto_unix_io
 
     # Launch all binaries
     with FullSystem(
-        f"{args.blue_full_system_runtime_dir}/test/{test_name}",
-        debug_full_system=args.debug_blue_full_system,
-        friendly_colour_yellow=False,
+        runtime_dir,
+        debug_full_system=debug_full_sys,
+        friendly_colour_yellow=args.run_yellow,
         should_restart_on_crash=False,
-    ) as blue_fs, FullSystem(
-        f"{args.yellow_full_system_runtime_dir}/test/{test_name}",
-        debug_full_system=args.debug_yellow_full_system,
-        friendly_colour_yellow=True,
-        should_restart_on_crash=False,
-    ) as yellow_fs, RobotCommunication(
-        current_proto_unix_io=blue_full_system_proto_unix_io,
+    ) as friendly_fs, RobotCommunication(
+        current_proto_unix_io=friendly_proto_unix_io,
         multicast_channel=getRobotMulticastChannel(0),
         interface=args.interface,
         disable_estop=False,
-    ) as rc_blue, RobotCommunication(
-        current_proto_unix_io=yellow_full_system_proto_unix_io,
-        multicast_channel=getRobotMulticastChannel(0),
-        interface=args.interface,
-        disable_estop=False,
-    ) as rc_yellow:
+    ) as rc_friendly:
         with Gamecontroller(
             supress_logs=(not args.show_gamecontroller_logs), ci_mode=True
         ) as gamecontroller:
-            blue_fs.setup_proto_unix_io(blue_full_system_proto_unix_io)
-            yellow_fs.setup_proto_unix_io(yellow_full_system_proto_unix_io)
-            rc_blue.setup_for_fullsystem()
-            rc_yellow.setup_for_fullsystem()
+            friendly_fs.setup_proto_unix_io(friendly_proto_unix_io)
+            rc_friendly.setup_for_fullsystem()
 
             gamecontroller.setup_proto_unix_io(
                 blue_full_system_proto_unix_io, yellow_full_system_proto_unix_io,
@@ -579,8 +582,8 @@ def field_test_runner():
                     yellow_full_system_proto_unix_io=yellow_full_system_proto_unix_io,
                     layout_path=None,
                     visualization_buffer_size=args.visualization_buffer_size,
-                    load_blue=True,
-                    load_yellow=False,
+                    load_blue=not args.run_yellow,
+                    load_yellow=args.run_yellow,
                 )
             time.sleep(LAUNCH_DELAY_S)
             runner = FieldTestRunner(
@@ -589,8 +592,10 @@ def field_test_runner():
                 yellow_full_system_proto_unix_io=yellow_full_system_proto_unix_io,
                 gamecontroller=gamecontroller,
                 thunderscope=tscope,
+                is_yellow_friendly=args.run_yellow
             )
-            blue_full_system_proto_unix_io.register_observer(World, runner.world_buffer)
+
+            friendly_proto_unix_io.register_observer(World, runner.world_buffer)
 
             # Setup proto loggers.
             #

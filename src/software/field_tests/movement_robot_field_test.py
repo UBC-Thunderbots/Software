@@ -77,7 +77,7 @@ logger = createLogger(__name__)
 # this test can only be run on the field
 def test_basic_rotation(field_test_runner):
     test_angles = [0, 45, 90, 180, 270, 0]
-    id = 6
+    id = 4
 
     # current position
     world = field_test_runner.world_buffer.get(block=True, timeout=WORLD_BUFFER_TIMEOUT)
@@ -114,6 +114,8 @@ def test_basic_rotation(field_test_runner):
         stop_tactic = StopTactic()
         params = AssignedTacticPlayControlParams()
         params.assigned_tactics[id].stop.CopyFrom(stop_tactic)
+        # send the stop tactic
+        field_test_runner.set_tactics(params,True)
 
         # validate by eye
         logger.info(f"robot set to {angle} orientation")

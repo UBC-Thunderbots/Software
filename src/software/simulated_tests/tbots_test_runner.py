@@ -23,6 +23,7 @@ class TbotsTestRunner(object):
         blue_full_system_proto_unix_io,
         yellow_full_system_proto_unix_io,
         gamecontroller,
+        is_yellow_friendly = False,
     ):
         """Initialize the TestRunner.
         
@@ -38,6 +39,7 @@ class TbotsTestRunner(object):
         self.blue_full_system_proto_unix_io = blue_full_system_proto_unix_io
         self.yellow_full_system_proto_unix_io = yellow_full_system_proto_unix_io
         self.gamecontroller = gamecontroller
+        self.is_yellow_friendly = is_yellow_friendly
         self.world_buffer = ThreadSafeBuffer(buffer_size=20, protobuf_type=World)
         self.primitive_set_buffer = ThreadSafeBuffer(
             buffer_size=1, protobuf_type=PrimitiveSet
@@ -57,19 +59,24 @@ class TbotsTestRunner(object):
         self.blue_full_system_proto_unix_io.register_observer(
             RobotStatus, self.robot_status_buffer
         )
-
+        if(self.is_yellow_friendly):
+            self.yellow_full_system_proto_unix_io.register_observer(World, self.world_buffer)
+            self.yellow_full_system_proto_unix_io.register_observer(
+                PrimitiveSet, self.primitive_set_buffer
+            )
         # Only validate on the blue worlds
-        self.blue_full_system_proto_unix_io.register_observer(World, self.world_buffer)
-        self.blue_full_system_proto_unix_io.register_observer(
-            PrimitiveSet, self.primitive_set_buffer
-        )
+        else:
+            self.blue_full_system_proto_unix_io.register_observer(World, self.world_buffer)
+            self.blue_full_system_proto_unix_io.register_observer(
+                PrimitiveSet, self.primitive_set_buffer
+            )
         self.timestamp = 0
         self.timestamp_mutex = threading.Lock()
 
     def send_gamecontroller_command(
         self,
         gc_command: proto.ssl_gc_state_pb2.Command,
-        is_blue: bool,
+        is_friendly: bool,
         final_ball_placement_point=None,
     ):
         """sends a gamecontroller command that is to be broadcasted to the given team
@@ -78,40 +85,38 @@ class TbotsTestRunner(object):
         param is_blue: whether the command should be sent to the blue team
         final_ball_placement_point: where to place the ball in ball placement
         """
-        if is_blue:
-            self.gamecontroller.send_ci_input(
-                gc_command=gc_command,
-                team=Team.BLUE,
-                final_ball_placement_point=final_ball_placement_point,
-            )
-        else:
-            self.gamecontroller.send_ci_input(
-                gc_command=gc_command,
-                team=Team.YELLOW,
-                final_ball_placement_point=final_ball_placement_point,
-            )
+        team = Team.BLUE
+        # If (friendly & yellow_friendly) or (~friendly & ~yellow_friendly), set command team to yellow
+        if (is_friendly and self.is_yellow_friendly) or not (is_friendly or self.is_yellow_friendly):
+            team = Team.YELLOW
+
+        self.gamecontroller.send_ci_input(
+            gc_command=gc_command,
+            team=team,
+            final_ball_placement_point=final_ball_placement_point,
+        )
 
     def set_tactics(
-        self, tactics: AssignedTacticPlayControlParams, is_blue: bool,
+        self, tactics: AssignedTacticPlayControlParams, is_friendly: bool,
     ):
         """Overrides current AI tactic for the given team
 
         param tactic: the tactic params proto to use
-        param is_blue: whether the play should be applied to the blue team
+        param is_friendly: whether the play should be applied to the "friendly" team
 
         Raises:
             NotImplementedError
         """
-        if is_blue:
-            self.blue_full_system_proto_unix_io.send_proto(
-                AssignedTacticPlayControlParams, tactics
-            )
-        else:
-            self.yellow_full_system_proto_unix_io.send_proto(
-                AssignedTacticPlayControlParams, tactics
-            )
+        fs_proto_unix_io = self.blue_full_system_proto_unix_io
+        # If (friendly & yellow_friendly) or (~friendly & ~yellow_friendly), set command team to yellow
+        if (is_friendly and self.is_yellow_friendly) or not (is_friendly or self.is_yellow_friendly):
+            fs_proto_unix_io = self.yellow_full_system_proto_unix_io
 
-    def set_play(self, play: Play, is_blue: bool):
+        fs_proto_unix_io.send_proto(
+            AssignedTacticPlayControlParams, tactics
+        )
+
+    def set_play(self, play: Play, is_friendly: bool):
         """Overrides current AI play for the given team
 
         param play: the play proto to use
@@ -120,11 +125,12 @@ class TbotsTestRunner(object):
         Raises:
             NotImplementedError
         """
-        if is_blue:
-            self.blue_full_system_proto_unix_io.send_proto(Play, play)
+        fs_proto_unix_io = self.blue_full_system_proto_unix_io
+        # If (friendly & yellow_friendly) or (~friendly & ~yellow_friendly), set command team to yellow
+        if (is_friendly and self.is_yellow_friendly) or not (is_friendly or self.is_yellow_friendly):
+            fs_proto_unix_io = self.yellow_full_system_proto_unix_io
 
-        else:
-            self.yellow_full_system_proto_unix_io.send_proto(Play, play)
+        fs_proto_unix_io.send_proto(Play, play)
 
     def set_worldState(self, worldstate: WorldState):
         """Sets the worldstate for the given team

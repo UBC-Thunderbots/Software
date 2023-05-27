@@ -147,9 +147,7 @@ class RobotCommunication(object):
                 primitive_set = self.primitive_buffer.get(
                     block=True, timeout=ROBOT_COMMUNICATIONS_TIMEOUT_S
                 )
-                # If we wait on primitive, there's a chance we've initiated shutdown already so we need to re-guard
-                if not self.robots_connected_to_fullsystem:
-                    break
+
                 fullsystem_primitives = dict(primitive_set.robot_primitives)
                 for robot_id in fullsystem_primitives.keys():
                     if robot_id in self.robots_connected_to_fullsystem:
