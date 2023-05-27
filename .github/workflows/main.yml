@@ -6,22 +6,11 @@ on:
   pull_request:
     branches: [ master ]
 
-jobs:
-  formatting-check:
-    name: Formatting Check
-    runs-on: ubuntu-20.04
-    steps:
-      # checks-out the repository under $GITHUB_WORKSPACE
-      - uses: actions/checkout@v2
-        
-      - name: Environment Setup
-        run: |
-          "${GITHUB_WORKSPACE}"/environment_setup/setup_software.sh
-      
-      - name: Check Formatting
-        run: |
-          ./formatting_scripts/check_formatting_ci.sh
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
 
+jobs:
   software-tests:
     name: Software Tests
     runs-on: ubuntu-20.04

@@ -19,11 +19,13 @@ from software.simulated_tests.tbots_test_runner import TbotsTestRunner
 from software.thunderscope.thunderscope import Thunderscope
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.py_constants import MILLISECONDS_PER_SECOND
+from software.thunderscope.constants import ProtoUnixIOTypes
 from software.thunderscope.binary_context_managers import (
     FullSystem,
     Simulator,
     Gamecontroller,
 )
+from software.thunderscope.thunderscope_config import configure_simulated_test_view
 from software.thunderscope.replay.proto_logger import ProtoLogger
 
 from software.logger.logger import createLogger
@@ -203,10 +205,10 @@ class SimulatedTestRunner(TbotsTestRunner):
                 always_validation_proto_set.test_name = self.test_name
 
                 # Send out the validation proto to thunderscope
-                self.thunderscope.blue_full_system_proto_unix_io.send_proto(
+                self.thunderscope.proto_unix_io_map[ProtoUnixIOTypes.BLUE].send_proto(
                     ValidationProtoSet, eventually_validation_proto_set
                 )
-                self.thunderscope.blue_full_system_proto_unix_io.send_proto(
+                self.thunderscope.proto_unix_io_map[ProtoUnixIOTypes.BLUE].send_proto(
                     ValidationProtoSet, always_validation_proto_set
                 )
 
@@ -540,13 +542,12 @@ def simulated_test_runner():
             # and start the test
             if args.enable_thunderscope:
                 tscope = Thunderscope(
-                    simulator_proto_unix_io,
-                    blue_full_system_proto_unix_io,
-                    yellow_full_system_proto_unix_io,
+                    configure_simulated_test_view(
+                        blue_full_system_proto_unix_io=blue_full_system_proto_unix_io,
+                        yellow_full_system_proto_unix_io=yellow_full_system_proto_unix_io,
+                        simulator_proto_unix_io=simulator_proto_unix_io,
+                    ),
                     layout_path=args.layout,
-                    visualization_buffer_size=args.visualization_buffer_size,
-                    load_blue=True,
-                    load_yellow=True,
                 )
 
             time.sleep(LAUNCH_DELAY_S)
