@@ -37,9 +37,7 @@ def create_world_state(
                 global_position=Point(
                     x_meters=robot_location.x(), y_meters=robot_location.y()
                 ),
-                global_orientation=Angle(
-                    radians=angle
-                )
+                global_orientation=Angle(radians=angle),
             )
         )
 

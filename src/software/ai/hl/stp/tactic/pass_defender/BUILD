@@ -50,14 +50,14 @@ py_test(
         "passing_sim_test.py",
     ],
     data = [
-      "//software:py_constants.so",
+        "//software:py_constants.so",
     ],
     deps = [
-        "//software/simulated_tests:simulated_test_fixture",
-        "//software/simulated_tests:validation",
         "//proto:import_all_protos",
         "//proto:software_py_proto",
         "//proto:tbots_py_proto",
+        "//software/simulated_tests:simulated_test_fixture",
+        "//software/simulated_tests:validation",
         requirement("pytest"),
     ],
 )
