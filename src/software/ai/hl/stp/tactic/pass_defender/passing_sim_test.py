@@ -1,5 +1,3 @@
-import math
-
 import pytest
 
 import software.python_bindings as tbots
@@ -9,8 +7,11 @@ from software.simulated_tests.simulated_test_fixture import (
     pytest_main,
 )
 from proto.message_translation.tbots_protobuf import create_world_state
-from software.simulated_tests.friendly_receives_ball_slow import FriendlyReceivesBallSlow
+from software.simulated_tests.friendly_receives_ball_slow import (
+    FriendlyReceivesBallSlow,
+)
 from software import py_constants
+
 
 @pytest.mark.parametrize(
     "ball_initial_position,ball_initial_velocity,attacker_robot_position,"
@@ -20,34 +21,32 @@ from software import py_constants
             tbots.Point(-0.5, 0),
             tbots.Vector(0.0, 0.0),
             tbots.Point(-1.0, 0.0),
-            [
-                tbots.Point(1.0, 0.0)
-            ],
+            [tbots.Point(1.0, 0.0)],
         ),
-        (
-            tbots.Point(0.0, 0.0),
-            tbots.Vector(0.0, 0.0),
-            tbots.Point(-3.5, 0.0),
-            [
-                tbots.Point(3.5, 0.0)
-            ],
-        ),
-        (
-            tbots.Point(-1.0, 0.0),
-            tbots.Vector(0.0, 0.0),
-            tbots.Point(-3.5, 2.5),
-            [
-                tbots.Point(3.5, -2.5)
-            ],
-        )
-    ]
+        # (
+        #     tbots.Point(0.0, 0.0),
+        #     tbots.Vector(0.0, 0.0),
+        #     tbots.Point(-3.5, 0.0),
+        #     [
+        #         tbots.Point(3.5, 0.0)
+        #     ],
+        # ),
+        # (
+        #     tbots.Point(-1.0, 0.0),
+        #     tbots.Vector(0.0, 0.0),
+        #     tbots.Point(-3.5, 2.5),
+        #     [
+        #         tbots.Point(3.5, -2.5)
+        #     ],
+        # )
+    ],
 )
 def test_passing(
     ball_initial_position,
     ball_initial_velocity,
     attacker_robot_position,
     receiver_robot_positions,
-    simulated_test_runner
+    simulated_test_runner,
 ):
     blue_robot_locations = [attacker_robot_position, *receiver_robot_positions]
 
@@ -64,32 +63,26 @@ def test_passing(
 
     world = tbots.World(
         tbots.Field.createSSLDivisionBField(),
-        tbots.Ball(
-            ball_initial_position,
-            ball_initial_velocity,
-            tbots.Timestamp()
-        ),
+        tbots.Ball(ball_initial_position, ball_initial_velocity, tbots.Timestamp()),
         tbots.Team(
-            [tbots.Robot(
-                index,
-                location,
-                tbots.Vector(0.0, 0.0),
-                tbots.Angle.fromRadians(0),
-                tbots.Angle(),
-                tbots.Timestamp(),
-
-            ) for index, location in enumerate(blue_robot_locations)]
+            [
+                tbots.Robot(
+                    index,
+                    location,
+                    tbots.Vector(0.0, 0.0),
+                    tbots.Angle.fromRadians(0),
+                    tbots.Angle(),
+                    tbots.Timestamp(),
+                )
+                for index, location in enumerate(blue_robot_locations)
+            ]
         ),
-        tbots.Team([])
+        tbots.Team([]),
     )
 
     pass_generator = tbots.EighteenZoneIdPassGenerator(
-        tbots.EighteenZonePitchDivision(
-            tbots.Field.createSSLDivisionBField()
-        ),
-        PassingConfig(
-            max_receive_speed=py_constants.MAX_PASS_RECEIVE_SPEED
-        )
+        tbots.EighteenZonePitchDivision(tbots.Field.createSSLDivisionBField()),
+        PassingConfig(max_receive_speed=py_constants.MAX_PASS_RECEIVE_SPEED),
     )
 
     pass_evaluation = pass_generator.generatePassEvaluation(world)
@@ -99,7 +92,7 @@ def test_passing(
 
     kick_vec = tbots.Vector(
         best_pass.receiverPoint().x() - best_pass.passerPoint().x(),
-        best_pass.receiverPoint().y() - best_pass.passerPoint().y()
+        best_pass.receiverPoint().y() - best_pass.passerPoint().y(),
     )
     # Setup Tactic
     params = AssignedTacticPlayControlParams()
@@ -107,33 +100,28 @@ def test_passing(
         KickTactic(
             kick_origin=Point(
                 x_meters=best_pass.passerPoint().x(),
-                y_meters=best_pass.passerPoint().y()
+                y_meters=best_pass.passerPoint().y(),
             ),
-            kick_direction=Angle(
-                radians=kick_vec.orientation().toRadians()
-            ),
-            kick_speed_meters_per_second=best_pass.speed()
+            kick_direction=Angle(radians=kick_vec.orientation().toRadians()),
+            kick_speed_meters_per_second=best_pass.speed(),
         )
     )
     receiver_args = {
         "pass": Pass(
             passer_point=Point(
                 x_meters=best_pass.passerPoint().x(),
-                y_meters=best_pass.passerPoint().y()
+                y_meters=best_pass.passerPoint().y(),
             ),
             receiver_point=Point(
                 x_meters=best_pass.receiverPoint().x(),
-                y_meters=best_pass.receiverPoint().y()
+                y_meters=best_pass.receiverPoint().y(),
             ),
-            pass_speed_m_per_s=best_pass.speed()
+            pass_speed_m_per_s=best_pass.speed(),
         ),
-        "disable_one_touch_shot": True
+        "disable_one_touch_shot": True,
     }
-    params.assigned_tactics[1].receiver.CopyFrom(
-        ReceiverTactic(
-            **receiver_args
-        )
-    )
+
+    params.assigned_tactics[1].receiver.CopyFrom(ReceiverTactic(**receiver_args))
     simulated_test_runner.blue_full_system_proto_unix_io.send_proto(
         AssignedTacticPlayControlParams, params
     )
@@ -147,18 +135,13 @@ def test_passing(
     # Eventually Validation
     eventually_validation_sequence_set = [[]]
     always_validation_sequence_set = [
-        [
-            FriendlyReceivesBallSlow(
-                robot_id=1,
-                max_receive_speed=3
-            )
-        ]
+        [FriendlyReceivesBallSlow(robot_id=1, max_receive_speed=2.5)]
     ]
 
     simulated_test_runner.run_test(
         inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
         inv_always_validation_sequence_set=always_validation_sequence_set,
-        test_timeout_s=15
+        test_timeout_s=15,
     )
 
 

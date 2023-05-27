@@ -94,7 +94,8 @@ class PassGenerator
      * @param pass_destination
      * @return
      */
-    double getPassSpeed(const Point& ball_position, const Point& pass_destination, double dest_speed);
+    double getPassSpeed(const Point& ball_position, const Point& pass_destination,
+                        double dest_speed);
 
     /**
      * Given a map of passes, runs a gradient descent optimizer to find
@@ -194,13 +195,12 @@ ZonePassMap<ZoneEnum> PassGenerator<ZoneEnum>::samplePasses(const World& world)
         std::uniform_real_distribution x_distribution(zone.xMin(), zone.xMax());
         std::uniform_real_distribution y_distribution(zone.yMin(), zone.yMax());
 
-        auto pass_destination = Point(x_distribution(random_num_gen_), y_distribution(random_num_gen_));
-        auto pass_speed = getPassSpeed(world.ball().position(), pass_destination, passing_config_.max_receive_speed());
+        auto pass_destination =
+            Point(x_distribution(random_num_gen_), y_distribution(random_num_gen_));
+        auto pass_speed = getPassSpeed(world.ball().position(), pass_destination,
+                                       passing_config_.max_receive_speed());
 
-        auto pass =
-            Pass(world.ball().position(),
-                 pass_destination,
-                 speed_distribution(random_num_gen_));
+        auto pass = Pass(world.ball().position(), pass_destination, pass_speed);
 
         passes.emplace(
             zone_id,
@@ -212,15 +212,20 @@ ZonePassMap<ZoneEnum> PassGenerator<ZoneEnum>::samplePasses(const World& world)
 }
 
 template <class ZoneEnum>
-double PassGenerator<ZoneEnum>::getPassSpeed(const Point& ball_position, const Point& pass_destination, double dest_speed)
+double PassGenerator<ZoneEnum>::getPassSpeed(const Point& ball_position,
+                                             const Point& pass_destination,
+                                             double dest_speed)
 {
-    Vector pass_distance = Vector(pass_destination.x() - ball_position.x(),
+    Vector pass_distance        = Vector(pass_destination.x() - ball_position.x(),
                                   pass_destination.y() - ball_position.y());
     double pass_distance_length = pass_distance.length();
 
-    double deceleration = -2.0;
+    double deceleration = -0.5;
 
-    double pass_speed = sqrt((dest_speed * dest_speed) - 2 * deceleration * pass_distance_length);
+    std::cout << "DEST SPEED: " << toString(dest_speed) << std::endl;
+
+    double pass_speed =
+        sqrt((dest_speed * dest_speed) - 2 * deceleration * pass_distance_length);
     return pass_speed;
 }
 

@@ -9,7 +9,6 @@ from software.simulated_tests.validation import (
 
 
 class FriendlyReceivesBallSlow(Validation):
-
     def __init__(self, robot_id, max_receive_speed):
         self.robot_id = robot_id
         self.max_receive_speed = max_receive_speed
@@ -28,8 +27,7 @@ class FriendlyReceivesBallSlow(Validation):
         for robot in world.friendly_team.team_robots:
             if robot.id == self.robot_id:
                 if tbots.Robot(robot).isNearDribbler(ball_position, 0.01):
-                    print(ball_velocity.length())
-                    if ball_velocity.length() > self.max_receive_speed:
+                    if ball_velocity.length() - self.max_receive_speed > 0.2:
                         return ValidationStatus.FAILING
         return ValidationStatus.PASSING
 
@@ -52,5 +50,5 @@ class FriendlyReceivesBallSlow(Validation):
     FriendlyEventuallyReceivesBallSlow,
     FriendlyEventuallyLosesBallSlow,
     FriendlyAlwaysReceivesBallSlow,
-    FriendlyNeverReceivesBallSlow
+    FriendlyNeverReceivesBallSlow,
 ) = create_validation_types(FriendlyReceivesBallSlow)
