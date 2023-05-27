@@ -22,23 +22,21 @@ class KickTactic : public Tactic
      * Updates the params for this tactic that cannot be derived from the world
      *
      * @param kick_origin The location where the kick will be taken
-     * @param kick_direction The direction the Robot will kick in
-     * @param kick_speed_meters_per_second The distance between the starting location
-     * of the kick and the location of the first bounce
+     * @param kick_direction The direction the robot will kick in
+     * @param auto_chip_or_kick The auto kick or chip settings
      */
     void updateControlParams(const Point& kick_origin, const Angle& kick_direction,
-                             double kick_speed_meters_per_second);
+                             AutoChipOrKick auto_chip_or_kick);
 
     /**
-     * Updates the control parameters for this KickTactic.
+     * Updates the control parameters for this KickTactic
      *
      * @param kick_origin The location where the kick will be taken
-     * @param kick_direction The direction the Robot will kick in
-     * @param kick_speed_meters_per_second The speed of how fast the Robot
-     * will kick the ball in meters per second
+     * @param kick_target The location where the robot will kick towards
+     * @param auto_chip_or_kick The auto kick or chip settings
      */
     void updateControlParams(const Point& kick_origin, const Point& kick_target,
-                             double kick_speed_meters_per_second);
+                             AutoChipOrKick auto_chip_or_kick);
 
     void accept(TacticVisitor& visitor) const override;
 

@@ -12,10 +12,10 @@ struct KickFSM
     {
         // The location where the kick will be taken from
         Point kick_origin;
-        // The direction the Robot will kick in
+        // The direction the robot will kick in
         Angle kick_direction;
-        // How fast the Robot will kick the ball in meters per second
-        double kick_speed_meters_per_second;
+        // How the robot will chip or kick the ball
+        AutoChipOrKick auto_chip_or_kick;
     };
 
     DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
