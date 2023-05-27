@@ -376,11 +376,11 @@ def configure_simulated_test_view(
 
 
 def configure_field_test_view(
-        simulator_proto_unix_io,
-        blue_full_system_proto_unix_io,
-        yellow_full_system_proto_unix_io,
-        visualization_buffer_size=5,
-        cost_visualization=False,
+    simulator_proto_unix_io,
+    blue_full_system_proto_unix_io,
+    yellow_full_system_proto_unix_io,
+    visualization_buffer_size=5,
+    cost_visualization=False,
 ):
     """
     Constructs the Thunderscope Config for field tests

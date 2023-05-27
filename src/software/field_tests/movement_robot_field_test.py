@@ -76,7 +76,7 @@ logger = createLogger(__name__)
 
 # this test can only be run on the field
 def test_basic_rotation(field_test_runner):
-    test_angles = [0,45,90,180,270,0]
+    test_angles = [0, 45, 90, 180, 270, 0]
     id = 5
 
     # current position
