@@ -49,6 +49,7 @@ py_library(
     srcs = ["motor_fault_view.py"],
     deps = [
         "//software/thunderscope/common:common_widgets",
+        "//software/thunderscope/common:proto_parameter_tree_util",
         "//software/thunderscope/robot_diagnostics/motor_fault_icons:motor_fault_icon_loader",
     ],
 )
