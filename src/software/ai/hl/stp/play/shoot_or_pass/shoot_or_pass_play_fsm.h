@@ -22,7 +22,7 @@ struct ShootOrPassPlayFSM
 
     struct ControlParams
     {
-        bool should_one_touch;
+        bool should_single_touch;
     };
 
     DEFINE_PLAY_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
@@ -55,11 +55,11 @@ struct ShootOrPassPlayFSM
     void lookForPass(const Update& event);
 
     /**
-     * Action to restart looking for a pass for a free kicker
+     * Action to restart looking for a pass in single touch mode
      *
      * @param event the ShootOrPassPlayFSM Update event
      */
-    void freeKickStartLookingForPass(const Update& event);
+    void singleTouchStartLookingForPass(const Update& event);
 
     /**
      * Action to restart looking for a pass
@@ -74,6 +74,13 @@ struct ShootOrPassPlayFSM
      * @param event the ShootOrPassPlayFSM Update event
      */
     void takePass(const Update& event);
+
+    /**
+     * Action to maintain a pass in progress
+     *
+     * @param event the ShootOrPassPlayFSM Update event
+     */
+    void maintainPassInProgress(const Update& event);
 
     /**
      * Guard to check if a pass has been found
@@ -111,9 +118,23 @@ struct ShootOrPassPlayFSM
      */
     bool tookShot(const Update& event);
 
-    bool shouldFreeKick(const Update& event);
+    /**
+     * Guard on whether we should use single touch mode
+     *
+     * @param event the ShootOrPassPlayFSM Update event
+     *
+     * @return whether we should use single touch mode
+     */
+    bool shouldSingleTouch(const Update& event);
+
+    /**
+     * Guard on whether there is a pass in progress
+     *
+     * @param event the ShootOrPassPlayFSM Update event
+     *
+     * @return whether there is a pass in progress
+     */
     bool hasPassInProgress(const Update& event);
-    void maintainPassInProgress(const Update& event);
 
     auto operator()()
     {
@@ -126,11 +147,11 @@ struct ShootOrPassPlayFSM
 
         DEFINE_SML_ACTION(lookForPass)
         DEFINE_SML_ACTION(startLookingForPass)
-        DEFINE_SML_ACTION(freeKickStartLookingForPass)
+        DEFINE_SML_ACTION(singleTouchStartLookingForPass)
         DEFINE_SML_ACTION(takePass)
         DEFINE_SML_ACTION(maintainPassInProgress)
 
-        DEFINE_SML_GUARD(shouldFreeKick)
+        DEFINE_SML_GUARD(shouldSingleTouch)
         DEFINE_SML_GUARD(passFound)
         DEFINE_SML_GUARD(shouldAbortPass)
         DEFINE_SML_GUARD(passCompleted)
@@ -139,7 +160,7 @@ struct ShootOrPassPlayFSM
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *StartState_S + Update_E[shouldFreeKick_G] / freeKickStartLookingForPass_A =
+            *StartState_S + Update_E[shouldSingleTouch_G] / singleTouchStartLookingForPass_A =
                 AttemptShotState_S,
             StartState_S + Update_E[!hasPassInProgress_G] / startLookingForPass_A =
                 AttemptShotState_S,

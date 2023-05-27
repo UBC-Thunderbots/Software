@@ -8,7 +8,7 @@
 ShootOrPassPlay::ShootOrPassPlay(TbotsProto::AiConfig config)
     : Play(config, true),
       fsm{ShootOrPassPlayFSM{config}},
-      control_params{.should_one_touch = false}
+      control_params{.should_single_touch = false}
 {
 }
 
@@ -22,9 +22,9 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
     }
 }
 
-void ShootOrPassPlay::updateControlParams(bool should_one_touch)
+void ShootOrPassPlay::updateControlParams(bool should_single_touch)
 {
-    control_params.should_one_touch = should_one_touch;
+    control_params.should_single_touch = should_single_touch;
 }
 
 void ShootOrPassPlay::updateTactics(const PlayUpdate &play_update)

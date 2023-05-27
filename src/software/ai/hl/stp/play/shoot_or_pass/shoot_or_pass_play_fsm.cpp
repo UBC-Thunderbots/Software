@@ -100,7 +100,7 @@ void ShootOrPassPlayFSM::startLookingForPass(const Update& event)
     lookForPass(event);
 }
 
-void ShootOrPassPlayFSM::freeKickStartLookingForPass(const Update& event)
+void ShootOrPassPlayFSM::singleTouchStartLookingForPass(const Update& event)
 {
     attacker_tactic = std::make_shared<AttackerTactic>(ai_config);
     attacker_tactic->updateShouldSingleTouch(true);
@@ -227,9 +227,9 @@ bool ShootOrPassPlayFSM::tookShot(const Update& event)
     return ball_oriented_towards_goal && (ball_velocity > ball_shot_threshold);
 }
 
-bool ShootOrPassPlayFSM::shouldFreeKick(const Update& event)
+bool ShootOrPassPlayFSM::shouldSingleTouch(const Update& event)
 {
-    return event.control_params.should_one_touch;
+    return event.control_params.should_single_touch;
 }
 
 bool ShootOrPassPlayFSM::hasPassInProgress(const Update& event)
