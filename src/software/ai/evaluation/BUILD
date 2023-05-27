@@ -227,6 +227,17 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "possession_tracker_test",
+    srcs = ["possession_tracker_test.cpp"],
+    deps = [
+        ":possession",
+        "//shared:constants",
+        "//shared/test_util:tbots_gtest_main",
+        "//software/test_util",
+    ],
+)
+
 cc_library(
     name = "shot",
     srcs = ["shot.cpp"],

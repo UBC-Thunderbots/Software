@@ -45,7 +45,7 @@ TeamPossession PossessionTracker::getTeamWithPossession(const Team &friendly_tea
              (time_near_enemy > time_near_threshold))
     {
         // Both teams are considered to have presence over the ball.
-        // If the ball is on our side of the field, or no enemy robots are
+        // If the ball is on our side of the field, or there are enemy robots
         // on our side of the field, consider enemy team as having possession.
 
         auto enemy_team_robots = enemy_team.getAllRobotsExceptGoalie();
@@ -56,7 +56,7 @@ TeamPossession PossessionTracker::getTeamWithPossession(const Team &friendly_tea
                           });
 
         if (field.pointInFriendlyHalf(ball.position()) ||
-            num_enemies_in_friendly_half == 0)
+            num_enemies_in_friendly_half > 0)
         {
             possession = TeamPossession::ENEMY_TEAM;
         }
