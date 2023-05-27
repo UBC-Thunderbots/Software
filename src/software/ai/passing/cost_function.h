@@ -77,7 +77,7 @@ double ratePassEnemyRisk(const Team& enemy_team, const Pass& pass,
  * @param passing_config the passing config used for tuning
  * @return
  */
-double ratePassSpeed(const Pass& pass, TbotsProto::PassingConfig passing_config);
+double ratePassSpeed(const Pass& pass, TbotsProto::PassingConfig& passing_config);
 
 /**
  * Calculates the likelihood that the given pass will be intercepted
