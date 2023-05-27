@@ -238,7 +238,6 @@ class SimulatedTestRunner(object):
                     self.__stopper()
                     return
                 except AssertionError as e:
-                    print("THING")
                     eventually_validation_failure_msg = str(e)
 
         if not run_till_end:
