@@ -9,11 +9,13 @@ from software.simulated_tests.validation import (
 
 
 class FriendlyReceivesBallSlow(Validation):
+
+    """
+
+    """
     def __init__(self, robot_id, max_receive_speed):
         self.robot_id = robot_id
         self.max_receive_speed = max_receive_speed
-
-    """Checks if any friendly robot has possession of the ball."""
 
     def get_validation_status(self, world) -> ValidationStatus:
         """Checks if any friendly robot has possession of the ball
