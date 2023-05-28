@@ -78,7 +78,8 @@ enum ErrorCode
 enum MotorFault
 {
     // Refer to Trinamic 6100 datasheet for precise definitions of motor faults.
-    // https://trinamic.com/fileadmin/assets/Products/ICs_Documents/TMC6100_datasheet_Rev1.00.pdf (Section 5.1, p22-23)
+    // https://trinamic.com/fileadmin/assets/Products/ICs_Documents/TMC6100_datasheet_Rev1.00.pdf
+    // (Section 5.1, p22-23)
     RESET                             = 0;
     DRIVER_OVERTEMPERATURE_PREWARNING = 1;
     DRIVER_OVERTEMPERATURE            = 2;
