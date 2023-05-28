@@ -197,8 +197,10 @@ ZonePassMap<ZoneEnum> PassGenerator<ZoneEnum>::samplePasses(const World& world)
 
         auto pass_destination =
             Point(x_distribution(random_num_gen_), y_distribution(random_num_gen_));
-        auto pass_speed = getPassSpeed(world.ball().position(), pass_destination,
-                                       passing_config_.max_receive_speed());
+//        auto pass_speed = getPassSpeed(world.ball().position(), pass_destination,
+//                                       passing_config_.max_receive_speed());4
+
+        auto pass_speed = speed_distribution(random_num_gen_);
 
         auto pass = Pass(world.ball().position(), pass_destination, pass_speed);
 
