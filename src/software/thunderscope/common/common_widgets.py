@@ -1,6 +1,7 @@
 from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph.Qt.QtCore import *
+from software.py_constants import *
 
 
 class FloatSlider(QSlider):
@@ -396,7 +397,7 @@ def display_tooltip(event, tooltip_text):
         QToolTip.showText(
             QPoint(int(event.globalPosition().x()), int(event.globalPosition().y()),),
             tooltip_text,
-            msecShowTime=20000,
+            msecShowTime=20 * MILLISECONDS_PER_SECOND,
         )
     elif str(event.type()) == "Type.Leave":
         QToolTip.hideText()
