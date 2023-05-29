@@ -716,8 +716,7 @@ TEST_F(TestEnlsvgPathPlanner, DISABLED_test_going_from_above_enemy_defense_area_
     TestUtil::checkPathDoesNotIntersectObstacle(path.value(), obstacles);
 }
 
-// TODO (#2690): Path slightly intersects enemy defense area obstacle
-TEST_F(TestEnlsvgPathPlanner, DISABLED_test_going_from_below_enemy_defense_area_to_above)
+TEST_F(TestEnlsvgPathPlanner, test_going_from_below_enemy_defense_area_to_above)
 {
     World world = ::TestUtil::createBlankTestingWorld(TbotsProto::FieldType::DIV_B);
     const Field& field       = world.field();
@@ -728,12 +727,17 @@ TEST_F(TestEnlsvgPathPlanner, DISABLED_test_going_from_below_enemy_defense_area_
     // Above defense area
     Point dest{4, 2};
 
-    std::vector<ObstaclePtr> obstacles =
+    // Inflated defense area that robots try to avoid
+    std::vector<ObstaclePtr> inflated_defense_area =
         robot_navigation_obstacle_factory.createFromMotionConstraint(
             TbotsProto::MotionConstraint::INFLATED_ENEMY_DEFENSE_AREA, world);
+    // Actual enemy defense area which we must avoid going through
+    std::vector<ObstaclePtr> defense_area =
+        robot_navigation_obstacle_factory.createFromMotionConstraint(
+            TbotsProto::MotionConstraint::ENEMY_DEFENSE_AREA, world);
 
     EnlsvgPathPlanner planner =
-        EnlsvgPathPlanner(navigable_area, obstacles, ROBOT_MAX_RADIUS_METERS);
+        EnlsvgPathPlanner(navigable_area, inflated_defense_area, ROBOT_MAX_RADIUS_METERS);
     std::optional<Path> path = planner.findPath(start, dest);
 
     ASSERT_TRUE(path != std::nullopt);
@@ -745,7 +749,7 @@ TEST_F(TestEnlsvgPathPlanner, DISABLED_test_going_from_below_enemy_defense_area_
     // Make sure path does not exceed a bounding box
     Rectangle bounding_box({3, 3}, {4.5, -3});
     TestUtil::checkPathDoesNotExceedBoundingBox(path.value(), bounding_box);
-    TestUtil::checkPathDoesNotIntersectObstacle(path.value(), obstacles);
+    TestUtil::checkPathDoesNotIntersectObstacle(path.value(), defense_area);
 }
 
 TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_speed_test)
