@@ -27,6 +27,14 @@ struct DefenderAssignment
     // The coverage rating of the assignment, which scores the defender's ability
     // to block high-danger enemy scoring chances or passes
     double coverage_rating;
+
+    // Equality operator for unit testing.
+    bool operator==(const DefenderAssignment &other) const
+    {
+        return this->type == other.type &&
+               this->target == other.target &&
+               this->coverage_rating == other.coverage_rating;
+    }
 };
 
 // This struct stores the concept of a shooting lane, which describes
@@ -43,6 +51,13 @@ struct ShootingLane
     // of the lane relative to other lanes (i.e. how likely a pass or shot
     // along the lane will eventually result in the enemy team scoring)
     double threat_rating;
+
+    // Equality operator for unit testing.
+    bool operator==(const ShootingLane &other) const
+    {
+        return this->lane == other.lane &&
+               this->threat_rating == other.threat_rating;
+    }
 };
 
 // A goal lane describes a shooting lane from an enemy robot to the goal
@@ -50,6 +65,14 @@ struct GoalLane : ShootingLane
 {
     // The angle in radians from the enemy robot to the goal that the goal lane describes
     Angle angle_to_goal;
+
+    // Equality operator for unit testing.
+    bool operator==(const GoalLane &other) const
+    {
+        return this->lane == other.lane &&
+               this->threat_rating == other.threat_rating &&
+               this->angle_to_goal == other.angle_to_goal;
+    }
 };
 
 /**

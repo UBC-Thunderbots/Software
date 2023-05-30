@@ -115,6 +115,17 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "defender_assignment_test",
+    srcs = ["defender_assignment_test.cpp"],
+    deps = [
+        ":defender_assignment",
+        "//shared:constants",
+        "//shared/test_util:tbots_gtest_main",
+        "//software/test_util",
+    ],
+)
+
 cc_library(
     name = "enemy_threat",
     srcs = ["enemy_threat.cpp"],

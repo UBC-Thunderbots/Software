@@ -66,7 +66,7 @@ std::vector<DefenderAssignment> getAllDefenderAssignments(
         auto lane            = Segment(threat_position, field.friendlyGoalCenter());
         double threat_rating = (static_cast<double>(relevant_threats.size()) - i) *
                                config.goal_lane_threat_multiplier();
-        auto angle_to_goal = lane.toVector().orientation();
+        auto angle_to_goal = lane.reverse().toVector().orientation();
         goal_lanes.emplace_back(GoalLane{{lane, threat_rating}, angle_to_goal});
     }
 
