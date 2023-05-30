@@ -69,7 +69,8 @@ TEST(PossessionTrackerTest, get_possession_with_ball_near_both_teams)
 
     // Ball equally near both friendly and enemy bots for a period of time
     // (i.e both teams have presence over the ball).
-    // Enemy team should have possession since the ball is in the friendly half.
+    // Enemy team should have possession since the ball is being fought
+    // over in the friendly half.
     world.updateBall(Ball({-0.5, 0}, {0, 0}, Timestamp::fromSeconds(0)));
     possession = possession_tracker.getTeamWithPossession(
         world.friendlyTeam(), world.enemyTeam(), world.ball(), world.field());
