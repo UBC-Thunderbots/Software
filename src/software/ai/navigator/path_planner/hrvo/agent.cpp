@@ -48,7 +48,7 @@ void Agent::update(Duration time_step)
     }
     else
     {
-        // Calculate the maximum velocity towards the preferred velocity, given the
+        // Calculate the maximum velocity towards the new velocity, given the
         // acceleration constraint
         setVelocity(velocity + dv.normalize(acceleration_limit * time_step.toSeconds()));
     }

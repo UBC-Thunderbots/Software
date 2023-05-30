@@ -169,10 +169,10 @@ class HRVOSimulator
 
     // The max amount (meters) which the friendly/enemy robot radius can increase by.
     // This scale is used to avoid close encounters, and reduce chance of collision.
-    static constexpr double FRIENDLY_ROBOT_RADIUS_MAX_INFLATION = 0.05;
+    static constexpr double FRIENDLY_ROBOT_RADIUS_MAX_INFLATION = 0.06;
 
     // the max amount (meters) which the friendly/enemy robot radius can reach
-    static constexpr double ENEMY_ROBOT_RADIUS_MAX_INFLATION = 0.06;
+    static constexpr double ENEMY_ROBOT_RADIUS_MAX_INFLATION = 0.7;
 
     // Robot id offset for enemy robots so we don't have
     // friendly and enemy agents with overlapping ids in the `robots` map
