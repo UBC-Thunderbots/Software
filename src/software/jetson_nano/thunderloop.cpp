@@ -24,6 +24,7 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, bool enable_lo
     // TODO (#2495): Set the friendly team colour once we receive World proto
     : redis_client_(
           std::make_unique<RedisClient>(REDIS_DEFAULT_HOST, REDIS_DEFAULT_PORT)),
+      motor_status_(std::nullopt),
       robot_constants_(robot_constants),
       robot_id_(std::stoi(redis_client_->getSync(ROBOT_ID_REDIS_KEY))),
       channel_id_(std::stoi(redis_client_->getSync(ROBOT_MULTICAST_CHANNEL_REDIS_KEY))),
@@ -33,7 +34,8 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, bool enable_lo
       kick_constant_(std::stoi(redis_client_->getSync(ROBOT_KICK_CONSTANT_REDIS_KEY))),
       chip_pulse_width_(
           std::stoi(redis_client_->getSync(ROBOT_CHIP_PULSE_WIDTH_REDIS_KEY))),
-      primitive_executor_(loop_hz, robot_constants, TeamColour::YELLOW, robot_id_)
+      primitive_executor_(Duration::fromSeconds(1.0 / loop_hz), robot_constants,
+                          TeamColour::YELLOW, robot_id_)
 {
     NetworkLoggerSingleton::initializeLogger(channel_id_, network_interface_, robot_id_,
                                              enable_log_merging);
@@ -124,6 +126,9 @@ Thunderloop::~Thunderloop() {}
 
             uint64_t last_handled_primitive_set = primitive_set_.sequence_number();
 
+            // Updating primitives and world with newly received data
+            // and setting the correct time elasped since last primitive / world
+
             struct timespec time_since_last_primitive_received;
             clock_gettime(CLOCK_MONOTONIC, &current_time);
             ScopedTimespecTimer::timespecDiff(&current_time,
@@ -131,6 +136,7 @@ Thunderloop::~Thunderloop() {}
                                               &time_since_last_primitive_received);
             network_status_.set_ms_since_last_primitive_received(
                 getMilliseconds(time_since_last_primitive_received));
+
             // If the primitive msg is new, update the internal buffer
             // and start the new primitive.
             if (new_primitive_set.time_sent().epoch_timestamp_seconds() >
@@ -170,7 +176,18 @@ Thunderloop::~Thunderloop() {}
                 world_ = new_world;
             }
 
-            // If world not received in a while, stop robot
+            if (motor_status_.has_value())
+            {
+                auto status = motor_status_.value();
+                primitive_executor_.updateVelocity(
+                    createVector(status.local_velocity()),
+                    createAngularVelocity(status.angular_velocity()));
+            }
+
+            // Timeout Overrides for Primitives
+            // These should be after the new primitive update section above
+
+            // If primitive not received in a while, stop robot
             // Primitive Executor: run the last primitive if we have not timed out
             {
                 ScopedTimespecTimer timer(&poll_time);
@@ -179,14 +196,13 @@ Thunderloop::~Thunderloop() {}
                 auto nanoseconds_elapsed_since_last_primitive =
                     getNanoseconds(time_since_last_primitive_received);
 
-                if (nanoseconds_elapsed_since_last_primitive >
-                    PRIMITIVE_MANAGER_TIMEOUT_NS)
+                if (nanoseconds_elapsed_since_last_primitive > PACKET_TIMEOUT_NS)
                 {
                     primitive_executor_.setStopPrimitive();
 
                     // Log milliseconds since last world received if we are timing out
                     LOG(WARNING)
-                        << "Primitive timeout, overriding with StopPrimitive - Milliseconds since last world: "
+                        << "Primitive timeout, overriding with StopPrimitive - Milliseconds since last primitive: "
                         << static_cast<int>(nanoseconds_elapsed_since_last_primitive) *
                                MILLISECONDS_PER_NANOSECOND;
                 }
@@ -247,9 +263,6 @@ Thunderloop::~Thunderloop() {}
                 ScopedTimespecTimer timer(&poll_time);
                 motor_status_ = motor_service_->poll(direct_control_.motor_control(),
                                                      loop_duration_seconds);
-                primitive_executor_.updateVelocity(
-                    createVector(motor_status_.local_velocity()),
-                    createAngularVelocity(motor_status_.angular_velocity()));
             }
             thunderloop_status_.set_motor_service_poll_time_ms(
                 getMilliseconds(poll_time));
@@ -263,7 +276,7 @@ Thunderloop::~Thunderloop() {}
             robot_status_.set_last_handled_primitive_set(last_handled_primitive_set);
             *(robot_status_.mutable_time_sent())             = time_sent_;
             *(robot_status_.mutable_thunderloop_status())    = thunderloop_status_;
-            *(robot_status_.mutable_motor_status())          = motor_status_;
+            *(robot_status_.mutable_motor_status())          = motor_status_.value();
             *(robot_status_.mutable_power_status())          = power_status_;
             *(robot_status_.mutable_jetson_status())         = jetson_status_;
             *(robot_status_.mutable_network_status())        = network_status_;
