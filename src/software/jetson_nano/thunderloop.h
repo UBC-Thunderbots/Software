@@ -44,9 +44,11 @@ class Thunderloop
      *
      *
      * @param robot_constants The robot constants
+     * @param enable_log_merging Whether to merge repeated log message or not
      * @param loop_hz The rate to run the loop
      */
-    Thunderloop(const RobotConstants_t &robot_constants, const int loop_hz);
+    Thunderloop(const RobotConstants_t &robot_constants, bool enable_log_merging,
+                const int loop_hz);
 
     ~Thunderloop();
 

@@ -23,8 +23,10 @@ class NetworkSink
      * @param interface The interface to join the multicast group on (lo, eth0, enp3s0f1,
      * etc.)
      * @param robot_id id of the robot sending the logs
+     * @param enable_log_merging Whether to merge repeated log message or not
      */
-    NetworkSink(unsigned int channel, const std::string& interface, int robot_id);
+    NetworkSink(unsigned int channel, const std::string& interface, int robot_id,
+                bool enable_log_merging);
     /**
      * This function is called on every call to LOG(). It sends a RobotLog proto on the
      * network and merges repeated messages.
@@ -38,7 +40,7 @@ class NetworkSink
      *
      * @param log the LogMessage to send
      */
-    void sendOneToNetwork(g3::LogMessage log);
+    void sendOneLogToNetwork(g3::LogMessage log);
 
    private:
     std::unique_ptr<ThreadedProtoUdpSender<TbotsProto::RobotLog>> log_output;

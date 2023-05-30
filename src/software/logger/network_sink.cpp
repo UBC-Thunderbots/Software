@@ -3,8 +3,9 @@
 #include "proto/robot_log_msg.pb.h"
 #include "shared/constants.h"
 
-NetworkSink::NetworkSink(unsigned int channel, const std::string& interface, int robot_id)
-    : robot_id(robot_id), log_merger(LogMerger())
+NetworkSink::NetworkSink(unsigned int channel, const std::string& interface, int robot_id,
+                         bool enable_log_merging)
+    : robot_id(robot_id), log_merger(LogMerger(enable_log_merging))
 {
     log_output.reset(new ThreadedProtoUdpSender<TbotsProto::RobotLog>(
         std::string(ROBOT_MULTICAST_CHANNELS.at(channel)) + "%" + interface,
@@ -16,11 +17,11 @@ void NetworkSink::sendToNetwork(g3::LogMessageMover log_entry)
     g3::LogMessage new_log = log_entry.get();
     for (g3::LogMessage log : log_merger.log(new_log))
     {
-        sendOneToNetwork(log);
+        sendOneLogToNetwork(log);
     }
 }
 
-void NetworkSink::sendOneToNetwork(g3::LogMessage log)
+void NetworkSink::sendOneLogToNetwork(g3::LogMessage log)
 {
     auto log_msg_proto = std::make_unique<TbotsProto::RobotLog>();
     TbotsProto::LogLevel log_level_proto;

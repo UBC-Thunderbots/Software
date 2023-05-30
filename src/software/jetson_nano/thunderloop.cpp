@@ -19,7 +19,8 @@
 extern int clock_nanosleep(clockid_t __clock_id, int __flags,
                            __const struct timespec* __req, struct timespec* __rem);
 
-Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, const int loop_hz)
+Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, bool enable_log_merging,
+                         const int loop_hz)
     // TODO (#2495): Set the friendly team colour once we receive World proto
     : redis_client_(
           std::make_unique<RedisClient>(REDIS_DEFAULT_HOST, REDIS_DEFAULT_PORT)),
@@ -34,7 +35,8 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, const int loop
           std::stoi(redis_client_->getSync(ROBOT_CHIP_PULSE_WIDTH_REDIS_KEY))),
       primitive_executor_(loop_hz, robot_constants, TeamColour::YELLOW, robot_id_)
 {
-    NetworkLoggerSingleton::initializeLogger(channel_id_, network_interface_, robot_id_);
+    NetworkLoggerSingleton::initializeLogger(channel_id_, network_interface_, robot_id_,
+                                             enable_log_merging);
     LOG(INFO)
         << "THUNDERLOOP: Network Logger initialized! Next initializing Network Service";
 

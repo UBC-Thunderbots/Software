@@ -14,8 +14,10 @@ class LogMerger
    public:
     /**
      * Creates a merger to hold repeated log messages
+     *
+     * @param enable_merging Whether to merge logs or not
      */
-    LogMerger();
+    explicit LogMerger(bool enable_merging = true);
 
     /**
      * Returns a list of all logs that should be logged at the current time, starting
@@ -68,4 +70,6 @@ class LogMerger
 
     std::chrono::_V2::system_clock::duration
         passed_time;  // for testing, time passed manually
+
+    bool enable_merging;
 };
