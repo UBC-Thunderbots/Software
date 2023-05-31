@@ -23,14 +23,39 @@ class GroupGoalLanesByDensityTest : public DefenderAssignmentTest
 
 TEST_F(GetAllDefenderAssignmentsTest, no_threats)
 {
-    World world = TestUtil::createBlankTestingWorld();
+    auto world = TestUtil::createBlankTestingWorld();
     auto threats = getAllEnemyThreats(world.field(), world.friendlyTeam(),
                                       world.enemyTeam(), world.ball(), false);
 
-    auto results = getAllDefenderAssignments(threats, world.field(), world.ball(), config);
+    auto assignments = getAllDefenderAssignments(threats, world.field(), world.ball(), config);
 
-    // Make sure we got the correct number of results
-    EXPECT_EQ(results.size(), 0);
+    // Make sure we got the correct number of assignments
+    EXPECT_EQ(assignments.size(), 0);
+}
+
+TEST_F(GetAllDefenderAssignmentsTest, single_threat)
+{
+    Point threat_position(1, 1); 
+    auto world      = TestUtil::createBlankTestingWorld();
+    auto enemy_team = TestUtil::setRobotPositionsHelper(
+        world.enemyTeam(), {threat_position}, Timestamp::fromSeconds(0));
+    world.updateEnemyTeamState(enemy_team);
+
+    Point ball_position(-1, -1);
+    world.updateBall(Ball(ball_position, Vector(), Timestamp()));
+
+    auto threats = getAllEnemyThreats(world.field(), world.friendlyTeam(),
+                                      world.enemyTeam(), world.ball(), false);
+
+    auto assignments = getAllDefenderAssignments(threats, world.field(), world.ball(), config);
+
+    // Make sure we got the correct number of assignments
+    EXPECT_EQ(assignments.size(), 1);
+
+    // Crease defenders should target ball, not the primary threat
+    auto assignment = assignments[0];
+    EXPECT_EQ(assignment.type, DefenderAssignmentType::CREASE_DEFENDER);
+    EXPECT_EQ(assignment.target, ball_position);
 }
 
 TEST_F(FilterOutSimilarThreatsTest, no_similar_threats)

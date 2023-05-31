@@ -24,11 +24,11 @@ std::vector<DefenderAssignment> getAllDefenderAssignments(
     // The primary threat is the only exception to this rule.
     std::vector<EnemyThreat> relevant_threats{threats.front()};
     double max_x_coordinate = field.xLength() / 4;
-    for (const auto &threat : threats)
+    for (unsigned int i = 1; i < threats.size(); i++)
     {
-        if (threat.robot.position().x() < max_x_coordinate)
+        if (threats[i].robot.position().x() < max_x_coordinate)
         {
-            relevant_threats.emplace_back(threat);
+            relevant_threats.emplace_back(threats[i]);
         }
     }
 
