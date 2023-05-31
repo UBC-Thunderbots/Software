@@ -101,16 +101,17 @@ void DribbleFSM::getPossession(const Update &event)
                 event.control_params.dribble_destination,
                 event.control_params.final_dribble_orientation);
 
-        // if the target orientation is not close to the face ball orientation
-        // then we pivot around the ball
-        int pivot_threshold_deg = 20;
-        double pivot_amount_deg = 30;
+        int pivot_threshold_deg = 40;  // this should be <= pivot threshold in dribble()
+        double pivot_amount_deg = 60;
         if (target_orientation.minDiff(event.common.robot.orientation()) >
             Angle::fromDegrees(pivot_threshold_deg))
         {
-            Angle remaining_rotation = (target_orientation - event.common.robot.orientation()).clamp();
-            double amount_to_rotate_deg = std::clamp(remaining_rotation.toDegrees(), -pivot_amount_deg, pivot_amount_deg);
-            Angle target_angle = event.common.robot.orientation() + Angle::fromDegrees(amount_to_rotate_deg);
+            Angle remaining_rotation =
+                (target_orientation - event.common.robot.orientation()).clamp();
+            double amount_to_rotate_deg = std::clamp(remaining_rotation.toDegrees(),
+                                                     -pivot_amount_deg, pivot_amount_deg);
+            Angle target_angle          = event.common.robot.orientation() +
+                                 Angle::fromDegrees(amount_to_rotate_deg);
 
             Vector target_vector =
                 ROBOT_MAX_RADIUS_METERS * Vector::createFromAngle(target_angle);
@@ -136,28 +137,25 @@ void DribbleFSM::dribble(const Update &event)
 
     Point dribble_destination = getDribbleBallDestination(
         event.common.world.ball().position(), event.control_params.dribble_destination);
+    double pivot_amount_deg = 40;
+    int pivot_threshold_deg = 40;
 
-    // when we have the ball in the dribbler, only then we pivot around the ball
-    if (event.common.robot.isNearDribbler(event.common.world.ball().position()))
+    Angle remaining_rotation =
+        (target_orientation - event.common.robot.orientation()).clamp();
+    double amount_to_rotate_deg =
+        std::clamp(remaining_rotation.toDegrees(), -pivot_amount_deg, pivot_amount_deg);
+    Angle target_angle =
+        event.common.robot.orientation() + Angle::fromDegrees(amount_to_rotate_deg);
+
+    if (target_angle.minDiff(target_orientation) <
+        Angle::fromDegrees(pivot_threshold_deg))
     {
-        double pivot_amount_deg = 40;
-        int pivot_threshold_deg = 40;
-
-        Angle remaining_rotation = (target_orientation - event.common.robot.orientation()).clamp();
-        double amount_to_rotate_deg = std::clamp(remaining_rotation.toDegrees(), -pivot_amount_deg, pivot_amount_deg);
-        Angle target_angle = event.common.robot.orientation() + Angle::fromDegrees(amount_to_rotate_deg);
-
-        if (target_angle.minDiff(target_orientation) < Angle::fromDegrees(pivot_threshold_deg))
-        {
-            target_angle = target_orientation;
-        }
-        Point target_coords =
-            dribble_destination -
-            (ROBOT_MAX_RADIUS_METERS * Vector::createFromAngle(target_angle));
-
-        target_destination = target_coords;
-        target_orientation = target_angle;
+        target_angle = target_orientation;
     }
+
+    target_destination = dribble_destination - (ROBOT_MAX_RADIUS_METERS *
+                                                Vector::createFromAngle(target_angle));
+    target_orientation = target_angle;
 
     event.common.set_primitive(createMovePrimitive(
         CREATE_MOTION_CONTROL(target_destination), target_orientation, 0,
