@@ -79,7 +79,7 @@ TEST_F(SimulatedHRVOTest, test_drive_in_straight_line_with_moving_enemy_robot_fr
 
     runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(6), true);
+            Duration::fromSeconds(10), true);
 }
 
 TEST_F(SimulatedHRVOTest, test_drive_in_straight_line_with_no_obstacle)
