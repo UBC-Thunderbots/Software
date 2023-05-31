@@ -23,11 +23,12 @@ class GroupGoalLanesByDensityTest : public DefenderAssignmentTest
 
 TEST_F(GetAllDefenderAssignmentsTest, no_threats)
 {
-    World world = TestUtil::createBlankTestingWorld();
+    World world  = TestUtil::createBlankTestingWorld();
     auto threats = getAllEnemyThreats(world.field(), world.friendlyTeam(),
                                       world.enemyTeam(), world.ball(), false);
 
-    auto results = getAllDefenderAssignments(threats, world.field(), world.ball(), config);
+    auto results =
+        getAllDefenderAssignments(threats, world.field(), world.ball(), config);
 
     // Make sure we got the correct number of results
     EXPECT_EQ(results.size(), 0);
