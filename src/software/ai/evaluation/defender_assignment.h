@@ -31,8 +31,7 @@ struct DefenderAssignment
     // Equality operator for unit testing.
     bool operator==(const DefenderAssignment &other) const
     {
-        return this->type == other.type &&
-               this->target == other.target &&
+        return this->type == other.type && this->target == other.target &&
                this->coverage_rating == other.coverage_rating;
     }
 };
@@ -55,8 +54,7 @@ struct ShootingLane
     // Equality operator for unit testing.
     bool operator==(const ShootingLane &other) const
     {
-        return this->lane == other.lane &&
-               this->threat_rating == other.threat_rating;
+        return this->lane == other.lane && this->threat_rating == other.threat_rating;
     }
 };
 
@@ -69,8 +67,7 @@ struct GoalLane : ShootingLane
     // Equality operator for unit testing.
     bool operator==(const GoalLane &other) const
     {
-        return this->lane == other.lane &&
-               this->threat_rating == other.threat_rating &&
+        return this->lane == other.lane && this->threat_rating == other.threat_rating &&
                this->angle_to_goal == other.angle_to_goal;
     }
 };
