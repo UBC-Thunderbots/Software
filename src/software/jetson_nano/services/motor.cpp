@@ -589,7 +589,7 @@ void MotorService::spiTransfer(int fd, uint8_t const* tx, uint8_t const* rx, uns
 {
     int ret;
 
-    struct spi_ioc_transfer tr[1];
+    struct spi_ioc_transfer tr[2];
     memset(tr, 0, sizeof(tr));
 
     tr[0].tx_buf        = (unsigned long)tx_;
@@ -598,8 +598,42 @@ void MotorService::spiTransfer(int fd, uint8_t const* tx, uint8_t const* rx, uns
     tr[0].delay_usecs   = 0;
     tr[0].speed_hz      = spi_speed;
     tr[0].bits_per_word = 8;
+    tr[1].tx_buf        = (unsigned long)tx_;
+    tr[1].rx_buf        = (unsigned long)rx_;
+    tr[1].len           = len;
+    tr[1].delay_usecs   = 0;
+    tr[1].speed_hz      = spi_speed;
+    tr[1].bits_per_word = 8;
 
-    ret = ioctl(fd, SPI_IOC_MESSAGE(1), &tr);
+    ret = ioctl(fd, SPI_IOC_MESSAGE(2), &tr);
+
+    CHECK(ret >= 1) << "SPI Transfer to motor failed, not safe to proceed: errno "
+                    << strerror(errno);
+}
+
+
+void MotorService::writeAfterReadSpiTransfer(int fd, const uint8_t *write_buf, const int *read_buf,
+                                             unsigned int write_len, unsigned int read_len, uint32_t spi_speed)
+{
+    int ret;
+
+    struct spi_ioc_transfer tr[2];
+    memset(tr, 0, sizeof(tr));
+
+    tr[0].tx_buf        = (unsigned long)write_buf;
+    tr[0].rx_buf        = (unsigned long)read_buf;
+    tr[0].len           = len;
+    tr[0].delay_usecs   = 0;
+    tr[0].speed_hz      = spi_speed;
+    tr[0].bits_per_word = 8;
+    tr[1].tx_buf        = (unsigned long)tx_;
+    tr[1].rx_buf        = (unsigned long)rx_;
+    tr[1].len           = len;
+    tr[1].delay_usecs   = 0;
+    tr[1].speed_hz      = spi_speed;
+    tr[1].bits_per_word = 8;
+
+    ret = ioctl(fd, SPI_IOC_MESSAGE(2), &tr);
 
     CHECK(ret >= 1) << "SPI Transfer to motor failed, not safe to proceed: errno "
                     << strerror(errno);

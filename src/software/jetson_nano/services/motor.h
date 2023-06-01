@@ -187,6 +187,19 @@ class MotorService
                      uint32_t spi_speed);
 
     /**
+     * Performs two back to back SPI transactions, first a read and then a write
+     *
+     * @param fd the SPI file descriptor to transfer data over
+     * @param write_buf the write buffer of data to send out
+     * @param read_buf the read buffer of data to read
+     * @param write_len the length of the write buffer
+     * @param read_len the length of the read buffer
+     * @param spi_speed the speed to run spi at
+     */
+    void writeAfterReadSpiTransfer(int fd, uint8_t const* write_buf, uint8t const* read_buf, unsigned write_len,
+                                   unsigned read_len, uint32_t spi_speed);
+
+    /**
      * Trinamic API Binding function
      *
      * @param motor Which motor to talk to (in our case, the chip select)
