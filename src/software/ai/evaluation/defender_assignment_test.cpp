@@ -23,11 +23,12 @@ class GroupGoalLanesByDensityTest : public DefenderAssignmentTest
 
 TEST_F(GetAllDefenderAssignmentsTest, no_threats)
 {
-    auto world = TestUtil::createBlankTestingWorld();
+    auto world   = TestUtil::createBlankTestingWorld();
     auto threats = getAllEnemyThreats(world.field(), world.friendlyTeam(),
                                       world.enemyTeam(), world.ball(), false);
 
-    auto assignments = getAllDefenderAssignments(threats, world.field(), world.ball(), config);
+    auto assignments =
+        getAllDefenderAssignments(threats, world.field(), world.ball(), config);
 
     // Make sure we got the correct number of assignments
     EXPECT_EQ(assignments.size(), 0);
@@ -35,7 +36,7 @@ TEST_F(GetAllDefenderAssignmentsTest, no_threats)
 
 TEST_F(GetAllDefenderAssignmentsTest, single_threat)
 {
-    Point threat_position(1, 1); 
+    Point threat_position(1, 1);
     auto world      = TestUtil::createBlankTestingWorld();
     auto enemy_team = TestUtil::setRobotPositionsHelper(
         world.enemyTeam(), {threat_position}, Timestamp::fromSeconds(0));
@@ -47,7 +48,8 @@ TEST_F(GetAllDefenderAssignmentsTest, single_threat)
     auto threats = getAllEnemyThreats(world.field(), world.friendlyTeam(),
                                       world.enemyTeam(), world.ball(), false);
 
-    auto assignments = getAllDefenderAssignments(threats, world.field(), world.ball(), config);
+    auto assignments =
+        getAllDefenderAssignments(threats, world.field(), world.ball(), config);
 
     // Make sure we got the correct number of assignments
     EXPECT_EQ(assignments.size(), 1);
