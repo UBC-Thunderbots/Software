@@ -36,7 +36,7 @@ class DribbleTactic : public Tactic
      */
     void updateControlParams(std::optional<Point> dribble_destination,
                              std::optional<Angle> final_dribble_orientation,
-                             bool allow_excessive_dribbling = false,
+                             bool allow_excessive_dribbling             = false,
                              std::optional<double> pivot_start_distance = std::nullopt);
 
     void accept(TacticVisitor& visitor) const override;

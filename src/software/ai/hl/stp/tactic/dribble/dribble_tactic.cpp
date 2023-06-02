@@ -5,10 +5,11 @@
 DribbleTactic::DribbleTactic(TbotsProto::AiConfig ai_config)
     : Tactic({RobotCapability::Move, RobotCapability::Dribble, RobotCapability::Kick}),
       fsm_map(),
-      control_params{DribbleFSM::ControlParams{.dribble_destination       = std::nullopt,
-                                               .final_dribble_orientation = std::nullopt,
-                                               .allow_excessive_dribbling = false,
-                                               .pivot_start_distance      = std::optional<double>(ROBOT_MAX_RADIUS_METERS * 5)}},
+      control_params{DribbleFSM::ControlParams{
+          .dribble_destination       = std::nullopt,
+          .final_dribble_orientation = std::nullopt,
+          .allow_excessive_dribbling = false,
+          .pivot_start_distance = std::optional<double>(ROBOT_MAX_RADIUS_METERS * 5)}},
       ai_config(ai_config)
 {
     for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)

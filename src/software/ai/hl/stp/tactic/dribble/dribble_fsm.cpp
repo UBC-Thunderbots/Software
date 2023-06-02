@@ -93,8 +93,7 @@ void DribbleFSM::getPossession(const Update &event)
     // when close to ball, pivot smartly
     double pivot_start_distance = event.control_params.pivot_start_distance.value_or(0.0);
 
-    if (distance(event.common.robot.position(), ball_position) <
-        pivot_start_distance)
+    if (distance(event.common.robot.position(), ball_position) < pivot_start_distance)
     {
         // find the target destination and orientation after the dribble
         auto [target_destination, target_orientation] =

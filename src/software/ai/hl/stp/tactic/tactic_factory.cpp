@@ -87,7 +87,7 @@ std::shared_ptr<Tactic> createTactic(const TbotsProto::DribbleTactic &tactic_pro
     auto tactic                              = std::make_shared<DribbleTactic>(ai_config);
     std::optional<Point> dribble_destination = std::nullopt;
     std::optional<Angle> final_dribble_orientation = std::nullopt;
-    std::optional<double> pivot_start_distance = std::nullopt;
+    std::optional<double> pivot_start_distance     = std::nullopt;
     if (tactic_proto.has_dribble_destination())
     {
         dribble_destination = createPoint(tactic_proto.dribble_destination());
