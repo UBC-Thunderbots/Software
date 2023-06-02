@@ -96,13 +96,11 @@ T normalizeValueToRange(T value, const T& value_min, const T& value_max,
 
 /**
  * Calculates the percent difference between two values.
+ * If both values are zero, this function returns zero.
  *
  * @param a The first value
  * @param b The second value
  *
  * @return The percent difference between the two values
  */
-inline double percent_difference(double a, double b)
-{
-    return std::abs(a - b) / std::max(a, b);
-}
+double percent_difference(double a, double b);

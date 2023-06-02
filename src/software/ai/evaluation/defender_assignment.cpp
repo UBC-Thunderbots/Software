@@ -54,8 +54,11 @@ std::vector<DefenderAssignment> getAllDefenderAssignments(
     // find potential goal lane from every enemy on the field
     for (unsigned int i = 0; i < relevant_threats.size(); i++)
     {
-        auto threat_position =
-            (i == 0) ? ball.position() : relevant_threats.at(i).robot.position();
+        auto threat_position = relevant_threats.at(i).robot.position();
+        if (i == 0)
+        {
+            threat_position = ball.position();
+        } 
 
         // Clamp threat position to field lines
         threat_position.setX(std::clamp(threat_position.x(), field.fieldLines().xMin(),
@@ -78,8 +81,11 @@ std::vector<DefenderAssignment> getAllDefenderAssignments(
     {
         // We include a non-dense bonus when rating crease defender assignment
         // if the goal lane is not part of a dense cluster
-        double nondense_bonus =
-            (goal_lanes_group.size() == 1) ? config.goal_lane_nondense_bonus() : 0;
+        double nondense_bonus = 0;
+        if (goal_lanes_group.size() == 1)
+        {
+            nondense_bonus = config.goal_lane_nondense_bonus();
+        }
 
         for (const auto &goal_lane : goal_lanes_group)
         {

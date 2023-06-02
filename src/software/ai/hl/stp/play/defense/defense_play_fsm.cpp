@@ -77,24 +77,28 @@ void DefensePlayFSM::defendAgainstThreats(const Update& event)
 
         // Pick alignment based on how many crease defenders are already assigned to the
         // target
-        TbotsProto::CreaseDefenderAlignment alignment;
-        switch (defenders_with_target_count)
+        auto alignment = TbotsProto::CreaseDefenderAlignment::CENTRE;
+        if (defenders_with_target_count == 1)
         {
-            case 0:
-                alignment = TbotsProto::CreaseDefenderAlignment::CENTRE;
-                break;
-            case 1:
-                alignment = (event.common.world.ball().position().y() > 0)
-                                ? TbotsProto::CreaseDefenderAlignment::LEFT
-                                : TbotsProto::CreaseDefenderAlignment::RIGHT;
-                break;
-            case 2:
-                alignment = (event.common.world.ball().position().y() > 0)
-                                ? TbotsProto::CreaseDefenderAlignment::RIGHT
-                                : TbotsProto::CreaseDefenderAlignment::LEFT;
-                break;
-            default:
-                alignment = TbotsProto::CreaseDefenderAlignment::CENTRE;
+            if (event.common.world.ball().position().y() > 0)
+            {
+                alignment = TbotsProto::CreaseDefenderAlignment::LEFT;
+            }
+            else
+            {
+                alignment = TbotsProto::CreaseDefenderAlignment::RIGHT;
+            }
+        }
+        else if (defenders_with_target_count == 2)
+        {
+            if (event.common.world.ball().position().y() > 0)
+            {
+                alignment = TbotsProto::CreaseDefenderAlignment::RIGHT;
+            }
+            else
+            {
+                alignment = TbotsProto::CreaseDefenderAlignment::LEFT;
+            }
         }
 
         crease_defenders.at(i)->updateControlParams(
