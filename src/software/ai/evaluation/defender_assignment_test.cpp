@@ -139,15 +139,16 @@ TEST_F(FilterOutSimilarThreatsTest, filter_out_similarly_angled_threats)
 
 TEST_F(GroupGoalLanesByDensityTest, single_dense_cluster)
 {
+    Field field = Field::createField(TbotsProto::FieldType::DIV_B);
+
     std::vector<Point> threat_positions = {Point(-1, -1), Point(-1, -1.5), Point(-1, 0),
                                            Point(-1, 2)};
 
     // Create goal lanes from threat positions
     std::vector<GoalLane> goal_lanes;
-    const Point FRIENDLY_GOAL_CENTER(-4.5, 0);
     for (const auto &threat_position : threat_positions)
     {
-        auto lane          = Segment(threat_position, FRIENDLY_GOAL_CENTER);
+        auto lane          = Segment(threat_position, field.friendlyGoalCenter());
         auto angle_to_goal = lane.reverse().toVector().orientation();
         // Threat rating doesn't matter for this test, so it's set to 0
         goal_lanes.emplace_back(GoalLane{{lane, 0}, angle_to_goal});
@@ -170,15 +171,16 @@ TEST_F(GroupGoalLanesByDensityTest, single_dense_cluster)
 
 TEST_F(GroupGoalLanesByDensityTest, multiple_dense_clusters)
 {
+    Field field = Field::createField(TbotsProto::FieldType::DIV_B);
+
     std::vector<Point> threat_positions = {Point(-1, -1), Point(-1, -1.5), Point(-1, 0),
                                            Point(-1, 2.5), Point(-1, 2)};
 
     // Create goal lanes from threat positions
     std::vector<GoalLane> goal_lanes;
-    const Point FRIENDLY_GOAL_CENTER(-4.5, 0);
     for (const auto &threat_position : threat_positions)
     {
-        auto lane          = Segment(threat_position, FRIENDLY_GOAL_CENTER);
+        auto lane          = Segment(threat_position, field.friendlyGoalCenter());
         auto angle_to_goal = lane.reverse().toVector().orientation();
         // Threat rating doesn't matter for this test, so it's set to 0
         goal_lanes.emplace_back(GoalLane{{lane, 0}, angle_to_goal});
