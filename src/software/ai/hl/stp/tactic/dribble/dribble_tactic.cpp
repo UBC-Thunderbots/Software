@@ -7,7 +7,8 @@ DribbleTactic::DribbleTactic(TbotsProto::AiConfig ai_config)
       fsm_map(),
       control_params{DribbleFSM::ControlParams{.dribble_destination       = std::nullopt,
                                                .final_dribble_orientation = std::nullopt,
-                                               .allow_excessive_dribbling = false}},
+                                               .allow_excessive_dribbling = false,
+                                               .pivot_start_distance      = std::optional<double>(ROBOT_MAX_RADIUS_METERS * 5)}},
       ai_config(ai_config)
 {
     for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)
@@ -19,11 +20,13 @@ DribbleTactic::DribbleTactic(TbotsProto::AiConfig ai_config)
 
 void DribbleTactic::updateControlParams(std::optional<Point> dribble_destination,
                                         std::optional<Angle> final_dribble_orientation,
-                                        bool allow_excessive_dribbling)
+                                        bool allow_excessive_dribbling,
+                                        std::optional<double> pivot_start_distance)
 {
     control_params.dribble_destination       = dribble_destination;
     control_params.final_dribble_orientation = final_dribble_orientation;
     control_params.allow_excessive_dribbling = allow_excessive_dribbling;
+    control_params.pivot_start_distance      = pivot_start_distance;
 }
 
 void DribbleTactic::accept(TacticVisitor &visitor) const

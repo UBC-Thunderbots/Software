@@ -79,6 +79,8 @@ message DribbleTactic
     optional Angle final_dribble_orientation = 2;
     // whether to allow excessive dribbling, i.e. more than 1 metre at a time
     required bool allow_excessive_dribbling = 3;
+    // distance at which to start pivoting
+    optional double pivot_start_distance = 4;
 }
 
 message GetBehindBallTactic

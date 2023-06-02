@@ -7,7 +7,8 @@ void PivotKickFSM::getPossessionAndPivot(
     DribbleFSM::ControlParams control_params{
         .dribble_destination       = event.control_params.kick_origin,
         .final_dribble_orientation = event.control_params.kick_direction,
-        .allow_excessive_dribbling = false};
+        .allow_excessive_dribbling = false,
+        .pivot_start_distance      = std::optional<double>(ROBOT_MAX_RADIUS_METERS * 5)};
 
     processEvent(DribbleFSM::Update(control_params, event.common));
 }

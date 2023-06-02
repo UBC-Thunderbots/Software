@@ -32,10 +32,12 @@ class DribbleTactic : public Tactic
      * finishing dribbling
      * @param allow_excessive_dribbling Whether to allow excessive dribbling, i.e. more
      * than 1 metre at a time
+     * @param pivot_start_distance The distance from the ball to start pivoting
      */
     void updateControlParams(std::optional<Point> dribble_destination,
                              std::optional<Angle> final_dribble_orientation,
-                             bool allow_excessive_dribbling = false);
+                             bool allow_excessive_dribbling = false,
+                             std::optional<double> pivot_start_distance = std::nullopt);
 
     void accept(TacticVisitor& visitor) const override;
 

@@ -87,6 +87,7 @@ std::shared_ptr<Tactic> createTactic(const TbotsProto::DribbleTactic &tactic_pro
     auto tactic                              = std::make_shared<DribbleTactic>(ai_config);
     std::optional<Point> dribble_destination = std::nullopt;
     std::optional<Angle> final_dribble_orientation = std::nullopt;
+    std::optional<double> pivot_start_distance = std::nullopt;
     if (tactic_proto.has_dribble_destination())
     {
         dribble_destination = createPoint(tactic_proto.dribble_destination());
@@ -95,9 +96,14 @@ std::shared_ptr<Tactic> createTactic(const TbotsProto::DribbleTactic &tactic_pro
     {
         final_dribble_orientation = createAngle(tactic_proto.final_dribble_orientation());
     }
+    if (tactic_proto.has_pivot_start_distance())
+    {
+        pivot_start_distance = tactic_proto.pivot_start_distance();
+    }
 
     tactic->updateControlParams(dribble_destination, final_dribble_orientation,
-                                tactic_proto.allow_excessive_dribbling());
+                                tactic_proto.allow_excessive_dribbling(),
+                                pivot_start_distance);
     return tactic;
 }
 

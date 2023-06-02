@@ -81,7 +81,8 @@ void AttackerFSM::keepAway(const Update& event,
 
     control_params = {.dribble_destination       = keepaway_dribble_dest,
                       .final_dribble_orientation = final_dribble_orientation,
-                      .allow_excessive_dribbling = false};
+                      .allow_excessive_dribbling = false,
+                      .pivot_start_distance = ROBOT_MAX_RADIUS_METERS * 5};
 
 
     processEvent(DribbleFSM::Update(control_params, event.common));

@@ -140,7 +140,8 @@ void PenaltyKickFSM::updateApproachKeeper(
     DribbleFSM::ControlParams control_params{
         .dribble_destination       = std::optional<Point>(position),
         .final_dribble_orientation = std::optional<Angle>(Angle::zero()),
-        .allow_excessive_dribbling = false};
+        .allow_excessive_dribbling = false,
+        .pivot_start_distance      = std::optional<double>(ROBOT_MAX_RADIUS_METERS * 5)};
     processEvent(DribbleFSM::Update(control_params, event.common));
 }
 
@@ -155,7 +156,8 @@ void PenaltyKickFSM::adjustOrientationForShot(
     DribbleFSM::ControlParams control_params{
         .dribble_destination       = std::optional<Point>(final_position),
         .final_dribble_orientation = std::optional<Angle>(shot_angle),
-        .allow_excessive_dribbling = false};
+        .allow_excessive_dribbling = false,
+        .pivot_start_distance      = std::optional<double>(ROBOT_MAX_RADIUS_METERS * 5)};
     processEvent(DribbleFSM::Update(control_params, event.common));
 }
 
