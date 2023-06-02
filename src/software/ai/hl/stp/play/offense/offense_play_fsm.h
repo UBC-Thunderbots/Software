@@ -88,5 +88,4 @@ struct OffensePlayFSM
     TbotsProto::AiConfig ai_config;
     std::shared_ptr<ShootOrPassPlay> shoot_or_pass_play;
     std::shared_ptr<DefensePlay> defense_play;
-    std::shared_ptr<PossessionTracker> possession_tracker;
 };

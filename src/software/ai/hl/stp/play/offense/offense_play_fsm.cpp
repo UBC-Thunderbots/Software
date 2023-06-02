@@ -3,18 +3,13 @@
 OffensePlayFSM::OffensePlayFSM(TbotsProto::AiConfig ai_config)
     : ai_config(ai_config),
       shoot_or_pass_play(std::make_shared<ShootOrPassPlay>(ai_config)),
-      defense_play(std::make_shared<DefensePlay>(ai_config)),
-      possession_tracker(
-          std::make_shared<PossessionTracker>(ai_config.possession_tracker_config()))
+      defense_play(std::make_shared<DefensePlay>(ai_config))
 {
 }
 
 bool OffensePlayFSM::enemyHasPossession(const Update& event)
 {
-    TeamPossession possession = possession_tracker->getTeamWithPossession(
-        event.common.world.friendlyTeam(), event.common.world.enemyTeam(),
-        event.common.world.ball(), event.common.world.field());
-
+    TeamPossession possession = event.common.world.getTeamWithPossession();
     return (possession == TeamPossession::ENEMY_TEAM);
 }
 

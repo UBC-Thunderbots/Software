@@ -2,9 +2,8 @@
 
 #include "proto/parameters.pb.h"
 #include "shared/constants.h"
-#include "software/ai/evaluation/possession.h"
+#include "software/sensor_fusion/possession/possession_tracker.h"
 #include "software/test_util/test_util.h"
-
 
 TEST(PossessionTrackerTest, get_possession_with_ball_near_team)
 {

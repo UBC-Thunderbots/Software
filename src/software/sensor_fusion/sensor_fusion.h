@@ -10,6 +10,7 @@
 #include "software/sensor_fusion/filter/ball_filter.h"
 #include "software/sensor_fusion/filter/robot_team_filter.h"
 #include "software/sensor_fusion/filter/vision_detection.h"
+#include "software/sensor_fusion/possession/possession_tracker.h"
 #include "software/world/ball.h"
 #include "software/world/team.h"
 #include "software/world/world.h"
@@ -138,7 +139,8 @@ class SensorFusion
     RobotTeamFilter friendly_team_filter;
     RobotTeamFilter enemy_team_filter;
 
-    TeamSide team_with_possession;
+    TeamPossession possession;
+    std::shared_ptr<PossessionTracker> possession_tracker;
 
     std::optional<RobotId> friendly_robot_id_with_ball_in_dribbler;
 

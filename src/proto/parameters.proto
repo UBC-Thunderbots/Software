@@ -39,7 +39,6 @@ message AiConfig
     required RobotCapabilitiesConfig robot_capabilities_config              = 9;
     required DefensePlayConfig defense_play_config                          = 11;
     required RobotNavigationObstacleConfig robot_navigation_obstacle_config = 12;
-    required PossessionTrackerConfig possession_tracker_config              = 13;
 }
 
 message AiControlConfig
@@ -275,6 +274,9 @@ message SensorFusionConfig
     // Number of dropped detections before we consider the ball not to be in the dribbler
     required int32 num_dropped_detections_before_ball_not_in_dribbler = 12
         [default = 3, (bounds).min_int_value = 0, (bounds).max_int_value = 1000];
+
+    // Possession tracker for determining which team has possession of the ball
+    required PossessionTrackerConfig possession_tracker_config = 13;
 }
 
 message DefensePlayConfig
