@@ -58,7 +58,7 @@ std::vector<DefenderAssignment> getAllDefenderAssignments(
         if (i == 0)
         {
             threat_position = ball.position();
-        } 
+        }
 
         // Clamp threat position to field lines
         threat_position.setX(std::clamp(threat_position.x(), field.fieldLines().xMin(),
