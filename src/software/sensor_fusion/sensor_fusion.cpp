@@ -14,8 +14,8 @@ SensorFusion::SensorFusion(TbotsProto::SensorFusionConfig sensor_fusion_config)
       friendly_team_filter(),
       enemy_team_filter(),
       possession(TeamPossession::FRIENDLY_TEAM),
-      possession_tracker(
-          std::make_shared<PossessionTracker>(sensor_fusion_config.possession_tracker_config())),
+      possession_tracker(std::make_shared<PossessionTracker>(
+          sensor_fusion_config.possession_tracker_config())),
       friendly_goalie_id(0),
       enemy_goalie_id(0),
       defending_positive_side(false),
@@ -290,8 +290,8 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
 
     if (ball && field)
     {
-        possession = possession_tracker->getTeamWithPossession(
-            friendly_team, enemy_team, *ball, *field);
+        possession = possession_tracker->getTeamWithPossession(friendly_team, enemy_team,
+                                                               *ball, *field);
     }
 }
 
