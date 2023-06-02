@@ -216,14 +216,7 @@
             - enableSystemd
 
         - name: Enable NetworkManager-wait-online.service
-          become: true
-          become_method: sudo
-          ansible.builtin.syytemd:
-            name: NetworkManager-wait-online
-            enabled: yes
-            masked: no
-            daemon_reload: tes
-          tags: enable-wifi-waiter
+          service: name=NetworkManager-wait-online enabled=yes
 
         - name: Reboot
           become: true

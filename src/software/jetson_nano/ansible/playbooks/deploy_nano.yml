@@ -102,7 +102,4 @@
           tags: always
           failed_when: false
         - name: Enable NetworkManager-wait-online.service
-          become: true
-          become_method: sudo
-          command: 'sudo systemctl enable NetworkManager-wait-online.service'
-          tags: always
+          service: name=NetworkManager-wait-online enabled=yes
