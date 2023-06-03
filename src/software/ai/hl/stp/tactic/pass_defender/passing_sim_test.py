@@ -45,7 +45,7 @@ from software import py_constants
             tbots.Point(-3.5, 2.5),
             [tbots.Point(3.5, -2.5)],
             [],
-        )
+        ),
     ],
 )
 def test_passing(
@@ -118,23 +118,7 @@ def test_passing(
             kick_speed_meters_per_second=best_pass.speed(),
         )
     )
-    # params = AssignedTacticPlayControlParams()
-    # params.assigned_tactics[0].attacker.CopyFrom(
-    #     AttackerTactic(
-    #         best_pass_so_far=Pass(
-    #             passer_point=Point(
-    #                 x_meters=best_pass.passerPoint().x(),
-    #                 y_meters=best_pass.passerPoint().y()
-    #             ),
-    #             receiver_point=Point(
-    #                 x_meters=best_pass.receiverPoint().x(),
-    #                 y_meters=best_pass.receiverPoint().y()
-    #             ),
-    #             pass_speed_m_per_s=best_pass.speed()
-    #         ),
-    #         pass_committed=True,
-    #     )
-    # )
+
     receiver_args = {
         "pass": Pass(
             passer_point=Point(

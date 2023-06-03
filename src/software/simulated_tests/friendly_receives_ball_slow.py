@@ -11,18 +11,27 @@ from software.simulated_tests.validation import (
 class FriendlyReceivesBallSlow(Validation):
 
     """
-
+    Checks if a receiver receives the ball below a certain speed
     """
+
     def __init__(self, robot_id, max_receive_speed):
+        """
+        Constructs the validation to check the given robot ID for receiving the ball
+        at the given speed
+        :param robot_id: the robot id to check
+        :param max_receive_speed: the max speed the ball should be received at
+        """
         self.robot_id = robot_id
         self.max_receive_speed = max_receive_speed
 
     def get_validation_status(self, world) -> ValidationStatus:
-        """Checks if any friendly robot has possession of the ball
+        """Checks if the specified robot receives the ball too fast
 
         :param world: The world msg to validate
-        :returns: FAILING when no friendly robot has possession of the ball
-                  PASSING when any friendly robot has possession of the ball
+        :returns: FAILING if the ball is near the robot's dribbler at a speed higher
+                    than the max receive speed
+                  PASSING if the ball is not near the dribbler, or if it is near
+                    the dribbler at a speed slower than the max
         """
         ball_position = tbots.createPoint(world.ball.current_state.global_position)
         ball_velocity = tbots.createVector(world.ball.current_state.global_velocity)

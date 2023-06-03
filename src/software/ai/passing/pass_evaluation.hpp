@@ -8,6 +8,7 @@
 #include <unordered_set>
 #include <vector>
 
+#include "eighteen_zone_pitch_division.h"
 #include "proto/parameters.pb.h"
 #include "software/ai/passing/field_pitch_division.h"
 #include "software/ai/passing/pass.h"
@@ -15,7 +16,6 @@
 #include "software/geom/point.h"
 #include "software/time/timestamp.h"
 #include "software/world/world.h"
-#include "eighteen_zone_pitch_division.h"
 
 template <class ZoneEnum>
 using ZonePassMap = std::unordered_map<ZoneEnum, PassWithRating>;

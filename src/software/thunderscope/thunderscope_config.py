@@ -51,7 +51,7 @@ def initialize_application():
     app = pyqtgraph.mkQApp("Thunderscope")
 
     # Setup stylesheet
-    # apply_stylesheet(app, theme="dark_blue.xml")
+    apply_stylesheet(app, theme="dark_blue.xml")
 
 
 def configure_cost_vis(proto_unix_io):

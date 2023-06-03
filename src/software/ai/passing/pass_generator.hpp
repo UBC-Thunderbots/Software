@@ -7,6 +7,7 @@
 #include <random>
 #include <thread>
 
+#include "eighteen_zone_pitch_division.h"
 #include "proto/message_translation/tbots_protobuf.h"
 #include "proto/parameters.pb.h"
 #include "software/ai/passing/cost_function.h"
@@ -17,7 +18,6 @@
 #include "software/optimization/gradient_descent_optimizer.hpp"
 #include "software/time/timestamp.h"
 #include "software/world/world.h"
-#include "eighteen_zone_pitch_division.h"
 
 // The random seed to initialize the random number generator
 static const int PASS_GENERATOR_SEED = 14;
