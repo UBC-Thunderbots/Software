@@ -1,10 +1,11 @@
 #include "lv_agent.h"
 
 LVAgent::LVAgent(RobotId robot_id, const RobotState &robot_state, const RobotPath &path,
-                 double radius, double max_speed, double max_accel,
+                 double radius, double max_speed, double max_accel, double max_decel,
+                 double max_angular_speed, double max_angular_accel,
                  double max_radius_inflation)
-    : Agent(robot_id, robot_state, path, radius, max_speed, max_accel,
-            max_radius_inflation)
+    : Agent(robot_id, robot_state, path, radius, max_speed, max_accel, max_decel,
+            max_angular_speed, max_angular_accel, max_radius_inflation)
 {
 }
 
@@ -49,7 +50,7 @@ VelocityObstacle LVAgent::createVelocityObstacle(const Agent &other_agent)
 {
     return VelocityObstacle::generateVelocityObstacle(
         Circle(Point(position), radius),
-        Circle(Point(other_agent.getPosition()), other_agent.radius), velocity);
+        Circle(Point(other_agent.getPosition()), other_agent.getRadius()), velocity);
 }
 
 void LVAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive,
@@ -57,5 +58,11 @@ void LVAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive,
 {
     // this operation is not supported for LV agents since they
     // represent enemy robots, which aren't controlled or updated by us
+    return;
+}
+
+void LVAgent::computeNewAngularVelocity(Duration time_step)
+{
+    // Since this is an enemy agent, we don't calculate the desired angular velocity.
     return;
 }

@@ -79,7 +79,7 @@ TEST_F(SimulatedHRVOTest, test_drive_in_straight_line_with_moving_enemy_robot_fr
 
     runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(6), true);
+            Duration::fromSeconds(10), true);
 }
 
 TEST_F(SimulatedHRVOTest, test_drive_in_straight_line_with_no_obstacle)
@@ -92,7 +92,7 @@ TEST_F(SimulatedHRVOTest, test_drive_in_straight_line_with_no_obstacle)
     auto enemy_robots = TestUtil::createStationaryRobotStatesWithId({Point(-2, -2)});
 
     auto tactic = std::make_shared<MoveTactic>();
-    tactic->updateControlParams(destination, Angle::zero(), 0);
+    tactic->updateControlParams(destination, Angle::half(), 0);
     setTactic(1, tactic);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
@@ -204,7 +204,7 @@ TEST_F(SimulatedHRVOTest, test_three_robot_wall)
 
     runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(8), true);
+            Duration::fromSeconds(10), true);
 }
 
 TEST_F(SimulatedHRVOTest, test_zig_zag_movement)

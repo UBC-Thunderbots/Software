@@ -134,7 +134,8 @@ gdb --args bazel-bin/{full_system}
             ):
                 self.full_system_proc = Popen(self.full_system.split(" "))
                 logging.info("FullSystem has restarted.")
-        time.sleep(1)
+
+            time.sleep(1)
 
     def __exit__(self, type, value, traceback):
         """Exit the full_system context manager.
@@ -426,7 +427,7 @@ class Gamecontroller(object):
         self.gamecontroller_proc.kill()
         self.gamecontroller_proc.wait()
 
-        if self.ci_socket:
+        if self.ci_mode:
             self.ci_socket.close()
 
     def next_free_port(self, port=40000, max_port=65535):

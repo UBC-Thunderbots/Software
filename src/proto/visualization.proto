@@ -16,6 +16,12 @@ message NamedValue
     float value = 2;
 }
 
+message PlotJugglerValue
+{
+    double timestamp         = 1;
+    map<string, double> data = 2;
+}
+
 message PassWithRating
 {
     double rating = 1;

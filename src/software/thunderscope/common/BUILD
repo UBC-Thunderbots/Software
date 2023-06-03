@@ -24,4 +24,7 @@ py_library(
 py_library(
     name = "proto_parameter_tree_util",
     srcs = ["proto_parameter_tree_util.py"],
+    deps = [
+        ":common_widgets",
+    ],
 )

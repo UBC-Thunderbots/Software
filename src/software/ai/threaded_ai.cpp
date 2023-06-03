@@ -9,7 +9,7 @@
 #include "software/ai/hl/stp/tactic/tactic_factory.h"
 #include "software/multithreading/thread_safe_buffer.hpp"
 
-ThreadedAi::ThreadedAi(TbotsProto::AiConfig ai_config)
+ThreadedAi::ThreadedAi(const TbotsProto::AiConfig& ai_config)
     // Disabling warnings on log buffer full, since buffer size is 1 and we
     // always want AI to use the latest World
     : FirstInFirstOutThreadedObserver<World>(),

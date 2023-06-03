@@ -1,6 +1,7 @@
 from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph.Qt.QtCore import *
+from software.py_constants import *
 
 
 class FloatSlider(QSlider):
@@ -382,3 +383,21 @@ def draw_robot(painter, rect, start_angle_degree, span_angle_degree):
     painter.drawChord(
         rect, start_angle_degree * convert_degree, span_angle_degree * convert_degree,
     )
+
+
+def display_tooltip(event, tooltip_text):
+    """
+    Checks given event to see if it is an Enter or Leave event
+    Upon Enter, displays a tooltip with the given text
+    Upon Leave, hides the tooltip
+    :param event: event to check
+    :param tooltip_text: the text to display in the tooltip
+    """
+    if str(event.type()) == "Type.Enter":
+        QToolTip.showText(
+            QPoint(int(event.globalPosition().x()), int(event.globalPosition().y()),),
+            tooltip_text,
+            msecShowTime=20 * MILLISECONDS_PER_SECOND,
+        )
+    elif str(event.type()) == "Type.Leave":
+        QToolTip.hideText()
