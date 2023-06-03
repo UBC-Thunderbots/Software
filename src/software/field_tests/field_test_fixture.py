@@ -11,7 +11,10 @@ from proto.ssl_gc_common_pb2 import Team
 from pyqtgraph.Qt import QtCore, QtGui
 
 from software.networking.threaded_unix_sender import ThreadedUnixSender
-from software.simulated_tests.robot_enters_region import RobotEntersRegion, RobotEventuallyEntersRegion
+from software.simulated_tests.robot_enters_region import (
+    RobotEntersRegion,
+    RobotEventuallyEntersRegion,
+)
 
 from software.simulated_tests import validation
 from software.thunderscope.thunderscope import Thunderscope
@@ -384,7 +387,7 @@ def field_test_runner():
                         simulator_proto_unix_io=simulator_proto_unix_io,
                         blue_full_system_proto_unix_io=blue_full_system_proto_unix_io,
                         yellow_full_system_proto_unix_io=yellow_full_system_proto_unix_io,
-                        yellow_is_friendly=args.run_yellow
+                        yellow_is_friendly=args.run_yellow,
                     ),
                     layout_path=None,
                 )

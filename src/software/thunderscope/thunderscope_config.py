@@ -376,12 +376,12 @@ def configure_simulated_test_view(
 
 
 def configure_field_test_view(
-        simulator_proto_unix_io,
-        blue_full_system_proto_unix_io,
-        yellow_full_system_proto_unix_io,
-        visualization_buffer_size=5,
-        cost_visualization=False,
-        yellow_is_friendly=False
+    simulator_proto_unix_io,
+    blue_full_system_proto_unix_io,
+    yellow_full_system_proto_unix_io,
+    visualization_buffer_size=5,
+    cost_visualization=False,
+    yellow_is_friendly=False,
 ):
     """
     Constructs the Thunderscope Config for field tests
@@ -447,10 +447,7 @@ def configure_field_test_view(
             )
         ]
 
-    return TScopeConfig(
-        proto_unix_io_map=proto_unix_io_map,
-        tabs=tabs
-    )
+    return TScopeConfig(proto_unix_io_map=proto_unix_io_map, tabs=tabs)
 
 
 def configure_replay_view(
