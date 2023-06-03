@@ -46,7 +46,7 @@ extern "C"
 
 Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, bool enable_log_merging,
                          const int loop_hz)
-     // TODO (#2495): Set the friendly team colour once we receive World proto
+    // TODO (#2495): Set the friendly team colour once we receive World proto
     : redis_client_(
           std::make_unique<RedisClient>(REDIS_DEFAULT_HOST, REDIS_DEFAULT_PORT)),
       motor_status_(std::nullopt),
