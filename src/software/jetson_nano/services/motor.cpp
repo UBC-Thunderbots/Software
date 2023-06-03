@@ -40,18 +40,6 @@ static const uint8_t SPI_BITS           = 8;
 static const uint32_t SPI_MODE          = 0x3u;
 static const uint32_t NUM_RETRIES_SPI   = 3;
 
-// SPI Chip Selects
-static const uint8_t FRONT_LEFT_MOTOR_CHIP_SELECT  = 0;
-static const uint8_t FRONT_RIGHT_MOTOR_CHIP_SELECT = 3;
-static const uint8_t BACK_LEFT_MOTOR_CHIP_SELECT   = 1;
-static const uint8_t BACK_RIGHT_MOTOR_CHIP_SELECT  = 2;
-static const uint8_t NUM_DRIVE_MOTORS              = 4;
-
-static const uint8_t DRIBBLER_MOTOR_CHIP_SELECT = 4;
-
-// SPI Trinamic Motor Driver Paths (indexed with chip select above)
-static const char* SPI_PATHS[] = {"/dev/spidev0.0", "/dev/spidev0.1", "/dev/spidev0.2",
-                                  "/dev/spidev0.3", "/dev/spidev0.4"};
 
 static const char* SPI_CS_DRIVER_TO_CONTROLLER_MUX_0_GPIO = "51";
 static const char* SPI_CS_DRIVER_TO_CONTROLLER_MUX_1_GPIO = "76";
@@ -66,8 +54,8 @@ static const char* DRIVER_CONTROL_ENABLE_GPIO             = "194";
 static double MECHANICAL_MPS_PER_ELECTRICAL_RPM = 0.000111;
 static double ELECTRICAL_RPM_PER_MECHANICAL_MPS = 1 / MECHANICAL_MPS_PER_ELECTRICAL_RPM;
 
-static double RUNAWAY_PROTECTION_THRESHOLD_MPS       = 2.00;
-static int DRIBBLER_ACCELERATION_THRESHOLD_RPM_PER_S = 1000;
+static double RUNAWAY_PROTECTION_THRESHOLD_MPS         = 2.00;
+static int DRIBBLER_ACCELERATION_THRESHOLD_RPM_PER_S_2 = 10000;
 
 
 extern "C"
@@ -92,18 +80,18 @@ extern "C"
 
 MotorService::MotorService(const RobotConstants_t& robot_constants,
                            int control_loop_frequency_hz)
-    : spi_demux_select_0(SPI_CS_DRIVER_TO_CONTROLLER_MUX_0_GPIO, GpioDirection::OUTPUT,
-                         GpioState::LOW),
-      spi_demux_select_1(SPI_CS_DRIVER_TO_CONTROLLER_MUX_1_GPIO, GpioDirection::OUTPUT,
-                         GpioState::LOW),
-      driver_control_enable_gpio(DRIVER_CONTROL_ENABLE_GPIO, GpioDirection::OUTPUT,
-                                 GpioState::HIGH),
-      reset_gpio(MOTOR_DRIVER_RESET_GPIO, GpioDirection::OUTPUT, GpioState::HIGH),
-      euclidean_to_four_wheel(robot_constants),
-      ramp_rpm(0)
+    : spi_demux_select_0_(SPI_CS_DRIVER_TO_CONTROLLER_MUX_0_GPIO, GpioDirection::OUTPUT,
+                          GpioState::LOW),
+      spi_demux_select_1_(SPI_CS_DRIVER_TO_CONTROLLER_MUX_1_GPIO, GpioDirection::OUTPUT,
+                          GpioState::LOW),
+      driver_control_enable_gpio_(DRIVER_CONTROL_ENABLE_GPIO, GpioDirection::OUTPUT,
+                                  GpioState::HIGH),
+      reset_gpio_(MOTOR_DRIVER_RESET_GPIO, GpioDirection::OUTPUT, GpioState::HIGH),
+      robot_constants_(robot_constants),
+      euclidean_to_four_wheel_(robot_constants),
+      motor_fault_detector_(0),
+      dribbler_ramp_rpm_(0)
 {
-    robot_constants_ = robot_constants;
-
     int ret = 0;
 
     /**
@@ -114,19 +102,19 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
      */
 #define OPEN_SPI_FILE_DESCRIPTOR(motor_name, chip_select)                                \
                                                                                          \
-    file_descriptors[chip_select] = open(SPI_PATHS[chip_select], O_RDWR);                \
-    CHECK(file_descriptors[chip_select] >= 0)                                            \
+    file_descriptors_[chip_select] = open(SPI_PATHS[chip_select], O_RDWR);               \
+    CHECK(file_descriptors_[chip_select] >= 0)                                           \
         << "can't open device: " << #motor_name << "error: " << strerror(errno);         \
                                                                                          \
-    ret = ioctl(file_descriptors[chip_select], SPI_IOC_WR_MODE32, &SPI_MODE);            \
+    ret = ioctl(file_descriptors_[chip_select], SPI_IOC_WR_MODE32, &SPI_MODE);           \
     CHECK(ret != -1) << "can't set spi mode for: " << #motor_name                        \
                      << "error: " << strerror(errno);                                    \
                                                                                          \
-    ret = ioctl(file_descriptors[chip_select], SPI_IOC_WR_BITS_PER_WORD, &SPI_BITS);     \
+    ret = ioctl(file_descriptors_[chip_select], SPI_IOC_WR_BITS_PER_WORD, &SPI_BITS);    \
     CHECK(ret != -1) << "can't set bits_per_word for: " << #motor_name                   \
                      << "error: " << strerror(errno);                                    \
                                                                                          \
-    ret = ioctl(file_descriptors[chip_select], SPI_IOC_WR_MAX_SPEED_HZ,                  \
+    ret = ioctl(file_descriptors_[chip_select], SPI_IOC_WR_MAX_SPEED_HZ,                 \
                 &MAX_SPI_SPEED_HZ);                                                      \
     CHECK(ret != -1) << "can't set spi max speed hz for: " << #motor_name                \
                      << "error: " << strerror(errno);
@@ -139,28 +127,36 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
 
     // Make this instance available to the static functions above
     g_motor_service = this;
-
-    setUpMotors();
 }
 
 MotorService::~MotorService() {}
 
-void MotorService::setUpMotors()
+void MotorService::setup()
 {
-    prev_wheel_velocities = {0.0, 0.0, 0.0, 0.0};
+    prev_wheel_velocities_ = {0.0, 0.0, 0.0, 0.0};
 
-    // Check for driver faults
-    for (uint8_t motor = 0; motor < NUM_DRIVE_MOTORS; motor++)
+    // reset motor fault cache
+    for (uint8_t motor = 0; motor < NUM_MOTORS; motor++)
     {
-        checkDriverFault(motor);
+        cached_motor_faults_[motor] = MotorFaultIndicator();
+        encoder_calibrated_[motor]  = false;
     }
 
     // Clear faults by resetting all the chips on the motor board
-    reset_gpio.setValue(GpioState::LOW);
+    reset_gpio_.setValue(GpioState::LOW);
     usleep(MICROSECONDS_PER_MILLISECOND * 100);
 
-    reset_gpio.setValue(GpioState::HIGH);
+    reset_gpio_.setValue(GpioState::HIGH);
     usleep(MICROSECONDS_PER_MILLISECOND * 100);
+
+    for (uint8_t motor = 0; motor < NUM_MOTORS; ++motor)
+    {
+        if (hasMotorReset(motor))
+        {
+            LOG(INFO) << "Clearing RESET for " << MOTOR_NAMES[motor];
+            tmc6100_writeInt(motor, TMC6100_GSTAT, 0x00000001);
+        }
+    }
 
     // Drive Motor Setup
     for (uint8_t motor = 0; motor < NUM_DRIVE_MOTORS; motor++)
@@ -177,11 +173,30 @@ void MotorService::setUpMotors()
     checkDriverFault(DRIBBLER_MOTOR_CHIP_SELECT);
     startController(DRIBBLER_MOTOR_CHIP_SELECT, true);
     tmc4671_setTargetVelocity(DRIBBLER_MOTOR_CHIP_SELECT, 0);
+
+    checkEncoderConnections();
+
+    // calibrate the encoders
+    for (uint8_t motor = 0; motor < NUM_DRIVE_MOTORS; motor++)
+    {
+        startEncoderCalibration(motor);
+    }
+
+    sleep(1);
+
+    for (uint8_t motor = 0; motor < NUM_DRIVE_MOTORS; motor++)
+    {
+        endEncoderCalibration(motor);
+    }
+
+    is_initialized_ = true;
 }
 
-
-bool MotorService::checkDriverFault(uint8_t motor)
+MotorService::MotorFaultIndicator MotorService::checkDriverFault(uint8_t motor)
 {
+    bool drive_enabled = true;
+    std::unordered_set<TbotsProto::MotorFault> motor_faults;
+
     int gstat = tmc6100_readInt(motor, TMC6100_GSTAT);
     std::bitset<32> gstat_bitset(gstat);
 
@@ -195,6 +210,7 @@ bool MotorService::checkDriverFault(uint8_t motor)
         LOG(WARNING)
             << "Indicates that the IC has been reset. All registers have been cleared to reset values."
             << "Attention: DRV_EN must be high to allow clearing reset";
+        motor_faults.insert(TbotsProto::MotorFault::RESET);
     }
 
     if (gstat_bitset[1])
@@ -202,6 +218,7 @@ bool MotorService::checkDriverFault(uint8_t motor)
         LOG(WARNING)
             << "drv_otpw : Indicates, that the driver temperature has exceeded overtemperature prewarning-level."
             << "No action is taken. This flag is latched.";
+        motor_faults.insert(TbotsProto::MotorFault::DRIVER_OVERTEMPERATURE_PREWARNING);
     }
 
     if (gstat_bitset[2])
@@ -210,6 +227,7 @@ bool MotorService::checkDriverFault(uint8_t motor)
             << "drv_ot: Indicates, that the driver has been shut down due to overtemperature."
             << "This flag can only be cleared when the temperature is below the limit again."
             << "It is latched for information.";
+        motor_faults.insert(TbotsProto::MotorFault::DRIVER_OVERTEMPERATURE);
     }
 
     if (gstat_bitset[3])
@@ -217,99 +235,178 @@ bool MotorService::checkDriverFault(uint8_t motor)
         LOG(WARNING) << "uv_cp: Indicates an undervoltage on the charge pump."
                      << "The driver is disabled during undervoltage."
                      << "This flag is latched for information.";
+        motor_faults.insert(TbotsProto::MotorFault::UNDERVOLTAGE_CHARGEPUMP);
+        drive_enabled = false;
     }
 
     if (gstat_bitset[4])
     {
         LOG(WARNING) << "shortdet_u: Short to GND detected on phase U."
                      << "The driver becomes disabled until flag becomes cleared.";
+        motor_faults.insert(TbotsProto::MotorFault::PHASE_U_SHORT_COUNTER_DETECTED);
+        drive_enabled = false;
     }
 
     if (gstat_bitset[5])
     {
         LOG(WARNING) << "s2gu: Short to GND detected on phase U."
                      << "The driver becomes disabled until flag becomes cleared.";
+        motor_faults.insert(TbotsProto::MotorFault::PHASE_U_SHORT_TO_GND_DETECTED);
+        drive_enabled = false;
     }
 
     if (gstat_bitset[6])
     {
         LOG(WARNING) << "s2vsu: Short to VS detected on phase U."
                      << "The driver becomes disabled until flag becomes cleared.";
+        motor_faults.insert(TbotsProto::MotorFault::PHASE_U_SHORT_TO_VS_DETECTED);
+        drive_enabled = false;
     }
 
     if (gstat_bitset[8])
     {
         LOG(WARNING) << "shortdet_v: V short counter has triggered at least once.";
+        motor_faults.insert(TbotsProto::MotorFault::PHASE_V_SHORT_COUNTER_DETECTED);
     }
 
     if (gstat_bitset[9])
     {
         LOG(WARNING) << "s2gv: Short to GND detected on phase V."
                      << "The driver becomes disabled until flag becomes cleared.";
+        motor_faults.insert(TbotsProto::MotorFault::PHASE_V_SHORT_TO_GND_DETECTED);
+        drive_enabled = false;
     }
 
     if (gstat_bitset[10])
     {
         LOG(WARNING) << "s2vsv: Short to VS detected on phase V."
                      << "The driver becomes disabled until flag becomes cleared.";
+        motor_faults.insert(TbotsProto::MotorFault::PHASE_V_SHORT_TO_VS_DETECTED);
+        drive_enabled = false;
     }
 
     if (gstat_bitset[12])
     {
         LOG(WARNING) << "shortdet_w: short counter has triggered at least once.";
+        motor_faults.insert(TbotsProto::MotorFault::PHASE_W_SHORT_COUNTER_DETECTED);
     }
 
     if (gstat_bitset[13])
     {
         LOG(WARNING) << "s2gw: Short to GND detected on phase W."
                      << "The driver becomes disabled until flag becomes cleared.";
+        motor_faults.insert(TbotsProto::MotorFault::PHASE_W_SHORT_TO_GND_DETECTED);
+        drive_enabled = false;
     }
 
     if (gstat_bitset[14])
     {
         LOG(WARNING) << "s2vsw: Short to VS detected on phase W."
                      << "The driver becomes disabled until flag becomes cleared.";
+        motor_faults.insert(TbotsProto::MotorFault::PHASE_W_SHORT_TO_VS_DETECTED);
+        drive_enabled = false;
     }
 
-    return !gstat_bitset.any();
+    return MotorFaultIndicator(drive_enabled, motor_faults);
 }
 
+TbotsProto::MotorStatus MotorService::updateMotorStatus(double front_left_velocity_mps,
+                                                        double front_right_velocity_mps,
+                                                        double back_left_velocity_mps,
+                                                        double back_right_velocity_mps,
+                                                        double dribbler_rpm)
+{
+    TbotsProto::MotorStatus motor_status;
+
+    cached_motor_faults_[motor_fault_detector_] = checkDriverFault(motor_fault_detector_);
+
+    for (uint8_t motor = 0; motor < NUM_MOTORS; ++motor)
+    {
+        if (motor != DRIBBLER_MOTOR_CHIP_SELECT)
+        {
+            TbotsProto::DriveUnit drive_status;
+            drive_status.set_enabled(cached_motor_faults_[motor].drive_enabled);
+
+            for (const TbotsProto::MotorFault& fault :
+                 cached_motor_faults_[motor].motor_faults)
+            {
+                drive_status.add_motor_faults(fault);
+            }
+
+            if (motor == FRONT_LEFT_MOTOR_CHIP_SELECT)
+            {
+                *(motor_status.mutable_front_left()) = drive_status;
+            }
+            if (motor == FRONT_RIGHT_MOTOR_CHIP_SELECT)
+            {
+                *(motor_status.mutable_front_right()) = drive_status;
+            }
+            if (motor == BACK_LEFT_MOTOR_CHIP_SELECT)
+            {
+                *(motor_status.mutable_back_left()) = drive_status;
+            }
+            if (motor == BACK_RIGHT_MOTOR_CHIP_SELECT)
+            {
+                *(motor_status.mutable_back_right()) = drive_status;
+            }
+        }
+        else
+        {
+            TbotsProto::DribblerStatus dribbler_status;
+            dribbler_status.set_dribbler_rpm(static_cast<float>(dribbler_rpm));
+            dribbler_status.set_enabled(cached_motor_faults_[motor].drive_enabled);
+            for (const TbotsProto::MotorFault& fault :
+                 cached_motor_faults_[motor].motor_faults)
+            {
+                dribbler_status.add_motor_faults(fault);
+            }
+
+            *(motor_status.mutable_dribbler()) = dribbler_status;
+        }
+    }
+
+    motor_status.mutable_front_left()->set_wheel_velocity(
+        static_cast<float>(front_left_velocity_mps));
+    motor_status.mutable_front_right()->set_wheel_velocity(
+        static_cast<float>(front_right_velocity_mps));
+    motor_status.mutable_back_left()->set_wheel_velocity(
+        static_cast<float>(back_left_velocity_mps));
+    motor_status.mutable_back_right()->set_wheel_velocity(
+        static_cast<float>(back_right_velocity_mps));
+
+    motor_fault_detector_ =
+        static_cast<uint8_t>((motor_fault_detector_ + 1) % NUM_MOTORS);
+
+    return motor_status;
+}
 
 TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor,
                                            double time_elapsed_since_last_poll_s)
 {
-    TbotsProto::MotorStatus motor_status;
-
     bool encoders_calibrated = (encoder_calibrated_[FRONT_LEFT_MOTOR_CHIP_SELECT] ||
                                 encoder_calibrated_[FRONT_RIGHT_MOTOR_CHIP_SELECT] ||
                                 encoder_calibrated_[BACK_LEFT_MOTOR_CHIP_SELECT] ||
                                 encoder_calibrated_[BACK_RIGHT_MOTOR_CHIP_SELECT]);
 
-    int reset_detector = tmc4671_readInt(0, TMC4671_PID_ACCELERATION_LIMIT);
-
-    // When the motor board is reset the value in the above register is set to the maximum
-    // signed 32 bit value Please read the header file and the datasheet for more info
-    if (reset_detector == 2147483647)
-    {
-        LOG(DEBUG) << "RESET DETECTED";
-        setUpMotors();
-        encoders_calibrated = false;
-    }
-    // check if encoders are calibrated
     if (!encoders_calibrated)
     {
-        // if not, calibrate the encoders
-        for (uint8_t motor = 0; motor < NUM_DRIVE_MOTORS; motor++)
-        {
-            startEncoderCalibration(motor);
-        }
+        is_initialized_ = false;
+    }
 
-        sleep(1);
-
-        for (uint8_t motor = 0; motor < NUM_DRIVE_MOTORS; motor++)
+    // checks if any motor has reset, sends a log message if so
+    for (uint8_t motor = 0; motor < NUM_MOTORS; ++motor)
+    {
+        if (hasMotorReset(motor))
         {
-            endEncoderCalibration(motor);
+            LOG(DEBUG) << "RESET DETECTED FOR MOTOR: " << MOTOR_NAMES[motor];
+            is_initialized_ = false;
         }
+    }
+
+    if (!is_initialized_)
+    {
+        LOG(INFO) << "MotorService re-initializing";
+        setup();
     }
 
     CHECK(encoder_calibrated_[FRONT_LEFT_MOTOR_CHIP_SELECT] &&
@@ -332,14 +429,14 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
         static_cast<double>(tmc4671_getActualVelocity(BACK_LEFT_MOTOR_CHIP_SELECT)) *
         MECHANICAL_MPS_PER_ELECTRICAL_RPM;
 
-    motor_status.mutable_front_right()->set_wheel_velocity(
-        static_cast<float>(front_right_velocity));
-    motor_status.mutable_front_left()->set_wheel_velocity(
-        static_cast<float>(front_left_velocity));
-    motor_status.mutable_back_left()->set_wheel_velocity(
-        static_cast<float>(back_left_velocity));
-    motor_status.mutable_back_right()->set_wheel_velocity(
-        static_cast<float>(back_right_velocity));
+    // Get the current dribbler rpm
+    double dribbler_rpm =
+        static_cast<double>(tmc4671_getActualVelocity(DRIBBLER_MOTOR_CHIP_SELECT));
+
+    // Construct a MotorStatus object with the current velocities and dribbler rpm
+    TbotsProto::MotorStatus motor_status =
+        updateMotorStatus(front_left_velocity, front_right_velocity, back_left_velocity,
+                          back_right_velocity, dribbler_rpm);
 
     // This order needs to match euclidean_to_four_wheel converters order
     // We also want to work in the meters per second space rather than electrical RPMs
@@ -348,59 +445,48 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
 
     // Run-away protection
     if (std::abs(current_wheel_velocities[FRONT_RIGHT_WHEEL_SPACE_INDEX] -
-                 prev_wheel_velocities[FRONT_RIGHT_WHEEL_SPACE_INDEX]) >
+                 prev_wheel_velocities_[FRONT_RIGHT_WHEEL_SPACE_INDEX]) >
         RUNAWAY_PROTECTION_THRESHOLD_MPS)
     {
-        driver_control_enable_gpio.setValue(GpioState::LOW);
+        driver_control_enable_gpio_.setValue(GpioState::LOW);
         LOG(FATAL) << "Front right motor runaway";
     }
     else if (std::abs(current_wheel_velocities[FRONT_LEFT_WHEEL_SPACE_INDEX] -
-                      prev_wheel_velocities[FRONT_LEFT_WHEEL_SPACE_INDEX]) >
+                      prev_wheel_velocities_[FRONT_LEFT_WHEEL_SPACE_INDEX]) >
              RUNAWAY_PROTECTION_THRESHOLD_MPS)
     {
-        driver_control_enable_gpio.setValue(GpioState::LOW);
+        driver_control_enable_gpio_.setValue(GpioState::LOW);
         LOG(FATAL) << "Front left motor runaway";
     }
     else if (std::abs(current_wheel_velocities[BACK_LEFT_WHEEL_SPACE_INDEX] -
-                      prev_wheel_velocities[BACK_LEFT_WHEEL_SPACE_INDEX]) >
+                      prev_wheel_velocities_[BACK_LEFT_WHEEL_SPACE_INDEX]) >
              RUNAWAY_PROTECTION_THRESHOLD_MPS)
     {
-        driver_control_enable_gpio.setValue(GpioState::LOW);
+        driver_control_enable_gpio_.setValue(GpioState::LOW);
         LOG(FATAL) << "Back left motor runaway";
     }
     else if (std::abs(current_wheel_velocities[BACK_RIGHT_WHEEL_SPACE_INDEX] -
-                      prev_wheel_velocities[BACK_RIGHT_WHEEL_SPACE_INDEX]) >
+                      prev_wheel_velocities_[BACK_RIGHT_WHEEL_SPACE_INDEX]) >
              RUNAWAY_PROTECTION_THRESHOLD_MPS)
     {
-        driver_control_enable_gpio.setValue(GpioState::LOW);
+        driver_control_enable_gpio_.setValue(GpioState::LOW);
         LOG(FATAL) << "Back right motor runaway";
     }
 
     // Convert to Euclidean velocity_delta
     EuclideanSpace_t current_euclidean_velocity =
-        euclidean_to_four_wheel.getEuclideanVelocity(current_wheel_velocities);
+        euclidean_to_four_wheel_.getEuclideanVelocity(current_wheel_velocities);
 
     motor_status.mutable_local_velocity()->set_x_component_meters(
-        current_euclidean_velocity[0]);
-    motor_status.mutable_local_velocity()->set_y_component_meters(
         current_euclidean_velocity[1]);
+    motor_status.mutable_local_velocity()->set_y_component_meters(
+        -current_euclidean_velocity[0]);
     motor_status.mutable_angular_velocity()->set_radians_per_second(
         current_euclidean_velocity[2]);
 
-    int target_dribbler_rpm;
-
-    if (motor.drive_control_case() ==
-        TbotsProto::MotorControl::DriveControlCase::DRIVE_CONTROL_NOT_SET)
-    {
-        target_dribbler_rpm = 0;
-    }
-    else
-    {
-        target_dribbler_rpm = motor.dribbler_speed_rpm();
-    }
-
     WheelSpace_t target_wheel_velocities = WheelSpace_t::Zero();
 
+    // Get target wheel velocities from the primitive
     if (motor.has_direct_per_wheel_control())
     {
         TbotsProto::MotorControl_DirectPerWheelControl direct_per_wheel =
@@ -422,14 +508,16 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
             direct_velocity.angular_velocity().radians_per_second()};
 
         target_wheel_velocities =
-            euclidean_to_four_wheel.getWheelVelocity(target_euclidean_velocity);
+            euclidean_to_four_wheel_.getWheelVelocity(target_euclidean_velocity);
     }
 
-    target_wheel_velocities = euclidean_to_four_wheel.rampWheelVelocity(
-        prev_wheel_velocities, target_wheel_velocities, time_elapsed_since_last_poll_s);
+    // ramp the target velocities to keep acceleration compared to current velocities
+    // within safe bounds
+    target_wheel_velocities = euclidean_to_four_wheel_.rampWheelVelocity(
+        prev_wheel_velocities_, target_wheel_velocities, time_elapsed_since_last_poll_s);
 
     // TODO (#2719): interleave the angular accelerations in here at some point.
-    prev_wheel_velocities = target_wheel_velocities;
+    prev_wheel_velocities_ = target_wheel_velocities;
 
     // Set target speeds accounting for acceleration
     tmc4671_writeInt(
@@ -449,28 +537,44 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
         static_cast<int>(target_wheel_velocities[BACK_RIGHT_WHEEL_SPACE_INDEX] *
                          ELECTRICAL_RPM_PER_MECHANICAL_MPS));
 
-    int final_dribbler_rpm = 0;
-    // If the dribbler only needs to change by DRIBBLER_ACCELERATION_THRESHOLD_RPM_PER_S,
-    // just set the value
-    if (std::abs(target_dribbler_rpm - ramp_rpm) <=
-        DRIBBLER_ACCELERATION_THRESHOLD_RPM_PER_S)
+    // Get target dribbler rpm from the primitive
+    int target_dribbler_rpm;
+    if (motor.drive_control_case() ==
+        TbotsProto::MotorControl::DriveControlCase::DRIVE_CONTROL_NOT_SET)
     {
-        final_dribbler_rpm = target_dribbler_rpm;
+        target_dribbler_rpm = 0;
     }
-    else if (target_dribbler_rpm > ramp_rpm + DRIBBLER_ACCELERATION_THRESHOLD_RPM_PER_S)
+    else
     {
-        ramp_rpm += DRIBBLER_ACCELERATION_THRESHOLD_RPM_PER_S;
-        final_dribbler_rpm = ramp_rpm;
+        target_dribbler_rpm = motor.dribbler_speed_rpm();
     }
-    else if (target_dribbler_rpm < ramp_rpm - DRIBBLER_ACCELERATION_THRESHOLD_RPM_PER_S)
-    {
-        ramp_rpm -= DRIBBLER_ACCELERATION_THRESHOLD_RPM_PER_S;
-        final_dribbler_rpm = ramp_rpm;
-    }
-    tmc4671_setTargetVelocity(DRIBBLER_MOTOR_CHIP_SELECT, final_dribbler_rpm);
-    motor_status.mutable_dribbler()->set_dribbler_rpm(float(final_dribbler_rpm));
+
+    // Ramp the dribbler velocity
+    // Clamp the max acceleration
+    int max_dribbler_delta_rpm = static_cast<int>(
+        DRIBBLER_ACCELERATION_THRESHOLD_RPM_PER_S_2 * time_elapsed_since_last_poll_s);
+    int delta_rpm = std::clamp(target_dribbler_rpm - dribbler_ramp_rpm_,
+                               -max_dribbler_delta_rpm, max_dribbler_delta_rpm);
+    dribbler_ramp_rpm_ += delta_rpm;
+
+    // Clamp to the max rpm
+    int max_dribbler_rpm =
+        std::abs(static_cast<int>(robot_constants_.max_force_dribbler_speed_rpm));
+    dribbler_ramp_rpm_ =
+        std::clamp(dribbler_ramp_rpm_, -max_dribbler_rpm, max_dribbler_rpm);
+
+    tmc4671_setTargetVelocity(DRIBBLER_MOTOR_CHIP_SELECT, dribbler_ramp_rpm_);
+    motor_status.mutable_dribbler()->set_dribbler_rpm(float(dribbler_ramp_rpm_));
 
     return motor_status;
+}
+
+bool MotorService::hasMotorReset(uint8_t motor)
+{
+    auto search =
+        cached_motor_faults_[motor].motor_faults.find(TbotsProto::MotorFault::RESET);
+
+    return (search != cached_motor_faults_[motor].motor_faults.end());
 }
 
 void MotorService::spiTransfer(int fd, uint8_t const* tx, uint8_t const* rx, unsigned len,
@@ -481,8 +585,8 @@ void MotorService::spiTransfer(int fd, uint8_t const* tx, uint8_t const* rx, uns
     struct spi_ioc_transfer tr[1];
     memset(tr, 0, sizeof(tr));
 
-    tr[0].tx_buf        = (unsigned long)tx;
-    tr[0].rx_buf        = (unsigned long)rx;
+    tr[0].tx_buf        = (unsigned long)tx_;
+    tr[0].rx_buf        = (unsigned long)rx_;
     tr[0].len           = len;
     tr[0].delay_usecs   = 0;
     tr[0].speed_hz      = spi_speed;
@@ -532,16 +636,16 @@ void MotorService::spiTransfer(int fd, uint8_t const* tx, uint8_t const* rx, uns
 uint8_t MotorService::tmc4671ReadWriteByte(uint8_t motor, uint8_t data,
                                            uint8_t last_transfer)
 {
-    spi_demux_select_0.setValue(GpioState::HIGH);
-    spi_demux_select_1.setValue(GpioState::LOW);
+    spi_demux_select_0_.setValue(GpioState::HIGH);
+    spi_demux_select_1_.setValue(GpioState::LOW);
     return readWriteByte(motor, data, last_transfer, TMC4671_SPI_SPEED);
 }
 
 uint8_t MotorService::tmc6100ReadWriteByte(uint8_t motor, uint8_t data,
                                            uint8_t last_transfer)
 {
-    spi_demux_select_0.setValue(GpioState::LOW);
-    spi_demux_select_1.setValue(GpioState::HIGH);
+    spi_demux_select_0_.setValue(GpioState::LOW);
+    spi_demux_select_1_.setValue(GpioState::HIGH);
     return readWriteByte(motor, data, last_transfer, TMC6100_SPI_SPEED);
 }
 
@@ -550,58 +654,58 @@ uint8_t MotorService::readWriteByte(uint8_t motor, uint8_t data, uint8_t last_tr
 {
     uint8_t ret_byte = 0;
 
-    if (!transfer_started)
+    if (!transfer_started_)
     {
-        memset(tx, 0, sizeof(tx));
-        memset(rx, 0, sizeof(rx));
-        position = 0;
+        memset(tx_, 0, sizeof(tx_));
+        memset(rx_, 0, sizeof(rx_));
+        position_ = 0;
 
         if (data & TMC_WRITE_BIT)
         {
             // If the transfer started and its a write operation,
             // set the appropriate flags.
-            currently_reading = false;
-            currently_writing = true;
+            currently_reading_ = false;
+            currently_writing_ = true;
         }
         else
         {
             // The first byte should contain the address on a read operation.
             // Trigger a transfer (1 byte) and buffer the response (4 bytes)
-            tx[position] = data;
-            spiTransfer(file_descriptors[motor], tx, rx, 5, spi_speed);
+            tx_[position_] = data;
+            spiTransfer(file_descriptors_[motor], tx_, rx_, 5, spi_speed);
 
-            currently_reading = true;
-            currently_writing = false;
+            currently_reading_ = true;
+            currently_writing_ = false;
         }
 
-        transfer_started = true;
+        transfer_started_ = true;
     }
 
-    if (currently_writing)
+    if (currently_writing_)
     {
         // Buffer the data to send out when last_transfer is true.
-        tx[position++] = data;
+        tx_[position_++] = data;
     }
 
-    if (currently_reading)
+    if (currently_reading_)
     {
         // If we are reading, we just need to return the buffered data
         // byte by byte.
-        ret_byte = rx[position++];
+        ret_byte = rx_[position_++];
     }
 
-    if (currently_writing && last_transfer)
+    if (currently_writing_ && last_transfer)
     {
         // we have all the bytes for this transfer, lets trigger the transfer and
         // reset state
-        spiTransfer(file_descriptors[motor], tx, rx, 5, spi_speed);
-        transfer_started = false;
+        spiTransfer(file_descriptors_[motor], tx_, rx_, 5, spi_speed);
+        transfer_started_ = false;
     }
 
-    if (currently_reading && last_transfer)
+    if (currently_reading_ && last_transfer)
     {
         // when reading, if last transfer is true, we just need to reset state
-        transfer_started = false;
+        transfer_started_ = false;
     }
 
     return ret_byte;
@@ -628,7 +732,7 @@ void MotorService::writeToDriverOrDieTrying(uint8_t motor, uint8_t address, int3
 
     // If we get here, we have failed to write to the driver. We reset
     // the chip to clear any bad values we just wrote and crash so everything stops.
-    reset_gpio.setValue(GpioState::LOW);
+    reset_gpio_.setValue(GpioState::LOW);
     CHECK(read_value == value) << "Couldn't write " << value
                                << " to the TMC6100 at address " << address
                                << " at address " << static_cast<uint32_t>(address)
@@ -658,7 +762,7 @@ void MotorService::writeToControllerOrDieTrying(uint8_t motor, uint8_t address,
 
     // If we get here, we have failed to write to the controller. We reset
     // the chip to clear any bad values we just wrote and crash so everything stops.
-    reset_gpio.setValue(GpioState::LOW);
+    reset_gpio_.setValue(GpioState::LOW);
     CHECK(read_value == value) << "Couldn't write " << value
                                << " to the TMC4671 at address " << address
                                << " at address " << static_cast<uint32_t>(address)
@@ -897,4 +1001,91 @@ void MotorService::startController(uint8_t motor, bool dribbler)
         writeToControllerOrDieTrying(motor, TMC4671_MOTOR_TYPE_N_POLE_PAIRS, 0x00030008);
         configureEncoder(motor);
     }
+}
+
+void MotorService::checkEncoderConnections()
+{
+    LOG(INFO) << "Starting encoder connection check!";
+
+    std::vector<bool> calibrated_motors(NUM_DRIVE_MOTORS, false);
+    std::vector<int> initial_velocities(NUM_DRIVE_MOTORS, 0);
+
+    for (uint8_t motor = 0; motor < NUM_DRIVE_MOTORS; ++motor)
+    {
+        // read back current velocity
+        initial_velocities[motor] = tmc4671_readInt(motor, TMC4671_ABN_DECODER_COUNT);
+
+        // open loop mode can be used without an encoder, set open loop phi positive
+        // direction
+        writeToControllerOrDieTrying(motor, TMC4671_OPENLOOP_MODE, 0x00000000);
+        writeToControllerOrDieTrying(motor, TMC4671_PHI_E_SELECTION,
+                                     TMC4671_PHI_E_OPEN_LOOP);
+        writeToControllerOrDieTrying(motor, TMC4671_OPENLOOP_ACCELERATION, 0x0000003C);
+
+        // represents effective voltage applied to the motors (% voltage)
+        writeToControllerOrDieTrying(motor, TMC4671_UQ_UD_EXT, 0x00000799);
+
+        // uq_ud_ext mode
+        writeToControllerOrDieTrying(motor, TMC4671_MODE_RAMP_MODE_MOTION, 0x00000008);
+
+        // 10 RPM
+        writeToControllerOrDieTrying(motor, TMC4671_OPENLOOP_VELOCITY_TARGET, 0x0000000A);
+    }
+
+    for (int num_iterations = 0;
+         num_iterations < 10 &&
+         std::any_of(calibrated_motors.begin(), calibrated_motors.end(),
+                     [](bool calibration_status) { return !calibration_status; });
+         ++num_iterations)
+    {
+        for (uint8_t motor = 0; motor < NUM_DRIVE_MOTORS; ++motor)
+        {
+            if (calibrated_motors[motor])
+            {
+                continue;
+            }
+            // now read back the velocity
+            int read_back_velocity = tmc4671_readInt(motor, TMC4671_ABN_DECODER_COUNT);
+            LOG(INFO) << MOTOR_NAMES[motor] << " read back: " << read_back_velocity
+                      << " and initially read: " << initial_velocities[motor];
+
+            if (read_back_velocity != initial_velocities[motor])
+            {
+                calibrated_motors[motor] = true;
+            }
+        }
+
+        // sleep for 100 milliseconds
+        usleep(MICROSECONDS_PER_MILLISECOND * 100);
+    }
+
+    bool calibrated = true;
+    for (uint8_t motor = 0; motor < NUM_DRIVE_MOTORS; ++motor)
+    {
+        if (!calibrated_motors[motor])
+        {
+            calibrated = false;
+            LOG(WARNING) << "Encoder calibration check failure. " << MOTOR_NAMES[motor]
+                         << " did not change as expected";
+        }
+    }
+    if (!calibrated)
+    {
+        LOG(FATAL)
+            << "Encoder calibration check failure. Not all encoders responded as expected";
+    }
+
+    // stop all motors, reset back to velocity control mode
+    for (uint8_t motor = 0; motor < NUM_DRIVE_MOTORS; ++motor)
+    {
+        writeToControllerOrDieTrying(motor, TMC4671_OPENLOOP_VELOCITY_TARGET, 0x00000000);
+        tmc4671_switchToMotionMode(motor, TMC4671_MOTION_MODE_VELOCITY);
+    }
+
+    LOG(INFO) << "All encoders appear to be connected!";
+}
+
+void MotorService::resetMotorBoard()
+{
+    reset_gpio_.setValue(GpioState::LOW);
 }

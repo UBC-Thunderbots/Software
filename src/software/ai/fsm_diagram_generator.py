@@ -105,7 +105,8 @@ if __name__ == "__main__":
 
     ai_dir = os.path.join(root_dir, "src/software/ai")
     for root, dirs, files in os.walk(ai_dir):
-        for file in files:
+        dirs.sort()
+        for file in sorted(files):
 
             if not file.endswith("fsm.h"):
                 continue
