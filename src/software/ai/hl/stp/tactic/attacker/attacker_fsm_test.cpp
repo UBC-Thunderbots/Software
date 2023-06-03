@@ -16,11 +16,18 @@ TEST(AttackerFSMTest, test_transitions)
                                               .chip_target      = std::nullopt};
 
     TbotsProto::AiConfig ai_config;
-    FSM<AttackerFSM> fsm{DribbleFSM(ai_config.dribble_tactic_config()),
+    FSM<AttackerFSM> fsm{GetBehindBallFSM(),
+                         DribbleFSM(ai_config.dribble_tactic_config()),
                          AttackerFSM(ai_config.attacker_tactic_config())};
-    EXPECT_TRUE(fsm.is(boost::sml::state<DribbleFSM>));
+    EXPECT_TRUE(fsm.is(boost::sml::state<MoveFSM>));
 
     // robot far from attacker point
+    fsm.process_event(AttackerFSM::Update(
+        control_params, TacticUpdate(
+                robot, world, [](std::unique_ptr<TbotsProto::Primitive>) {},
+                TEST_UTIL_CREATE_MOTION_CONTROL_NO_DEST)));
+    EXPECT_TRUE(fsm.is(boost::sml::state<DribbleFSM>));
+
     fsm.process_event(AttackerFSM::Update(
         control_params, TacticUpdate(
                             robot, world, [](std::unique_ptr<TbotsProto::Primitive>) {},
