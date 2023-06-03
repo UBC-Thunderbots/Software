@@ -90,7 +90,9 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
       robot_constants_(robot_constants),
       euclidean_to_four_wheel_(robot_constants),
       motor_fault_detector_(0),
-      dribbler_ramp_rpm_(0)
+      dribbler_ramp_rpm_(0),
+      tracked_motor_fault_start_time_(std::nullopt),
+      num_tracked_motor_resets_(0)
 {
     int ret = 0;
 
@@ -133,6 +135,28 @@ MotorService::~MotorService() {}
 
 void MotorService::setup()
 {
+    const auto now = std::chrono::system_clock::now();
+    if (tracked_motor_fault_start_time_.has_value())
+    {
+       if ((tracked_motor_fault_start_time_.value() - now).count() < MOTOR_FAULT_TIME_THRESHOLD_S)
+       {
+           num_tracked_motor_resets_++;
+       }
+
+       tracked_motor_fault_start_time_ = std::make_optional(now);
+       num_tracked_motor_resets_ = 1;
+    }
+    else
+    {
+       tracked_motor_fault_start_time_ = std::make_optional(now);
+    }
+
+
+    if (tracked_motor_fault_start_time_.has_value() && num_tracked_motor_resets_ > MOTOR_FAULT_THRESHOLD)
+    {
+        LOG(FATAL) << "In the last " << (now - tracked_motor_fault_start_time_.value()).count() << "s, the motor board has resetted " << num_tracked_motor_resets_ << " times. Thunderloop crashing for safety.";
+    }
+
     prev_wheel_velocities_ = {0.0, 0.0, 0.0, 0.0};
 
     // reset motor fault cache
@@ -151,7 +175,7 @@ void MotorService::setup()
 
     for (uint8_t motor = 0; motor < NUM_MOTORS; ++motor)
     {
-        if (hasMotorReset(motor))
+        if (requiresMotorReinit(motor))
         {
             LOG(INFO) << "Clearing RESET for " << MOTOR_NAMES[motor];
             tmc6100_writeInt(motor, TMC6100_GSTAT, 0x00000001);
@@ -396,7 +420,7 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
     // checks if any motor has reset, sends a log message if so
     for (uint8_t motor = 0; motor < NUM_MOTORS; ++motor)
     {
-        if (hasMotorReset(motor))
+        if (requiresMotorReinit(motor))
         {
             LOG(DEBUG) << "RESET DETECTED FOR MOTOR: " << MOTOR_NAMES[motor];
             is_initialized_ = false;
@@ -569,12 +593,13 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
     return motor_status;
 }
 
-bool MotorService::hasMotorReset(uint8_t motor)
+bool MotorService::requiresMotorReinit(uint8_t motor)
 {
-    auto search =
+    auto reset_search =
         cached_motor_faults_[motor].motor_faults.find(TbotsProto::MotorFault::RESET);
 
-    return (search != cached_motor_faults_[motor].motor_faults.end());
+    return !cached_motor_faults_[motor].drive_enabled
+        && (reset_search != cached_motor_faults_[motor].motor_faults.end());
 }
 
 void MotorService::spiTransfer(int fd, uint8_t const* tx, uint8_t const* rx, unsigned len,
