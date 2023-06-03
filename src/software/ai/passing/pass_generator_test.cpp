@@ -14,7 +14,7 @@ class PassGeneratorTest : public testing::Test
    protected:
     virtual void SetUp()
     {
-        passing_config.set_min_pass_speed_m_per_s(2.6);
+        passing_config.set_min_pass_speed_m_per_s(1);
         passing_config.set_max_pass_speed_m_per_s(5.5);
 
         pitch_division = std::make_shared<const EighteenZonePitchDivision>(world.field());
@@ -40,8 +40,6 @@ class PassGeneratorTest : public testing::Test
         for (int i = 0; i < max_iters; i++)
         {
             auto pass_eval = pass_generator->generatePassEvaluation(world);
-            auto best_pass = pass_eval.getBestPassOnField().pass;
-            std::cout << "RECEIVER POINT: " << best_pass.receiverPoint() << std::endl;
         }
     }
 

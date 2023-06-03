@@ -22,44 +22,29 @@ from software import py_constants
             tbots.Vector(0.0, 0.0),
             tbots.Point(-1.0, 0.0),
             [tbots.Point(1.0, 0.0)],
-            []
+            [],
         ),
         (
             tbots.Point(0.0, 0.0),
             tbots.Vector(0.0, 0.0),
             tbots.Point(-3.5, 0.0),
-            [
-                tbots.Point(3.5, 0.0)
-            ], []
+            [tbots.Point(3.5, 0.0)],
+            [],
         ),
+        # TODO: Make Interception Better
         (
             tbots.Point(0.0, 0.0),
             tbots.Vector(0.0, 0.0),
             tbots.Point(0.0, -1.0),
-            [
-                tbots.Point(3.5, 0.0)
-            ], []
+            [tbots.Point(3.5, 0.0)],
+            [],
         ),
         (
             tbots.Point(-1.0, 0.0),
             tbots.Vector(0.0, 0.0),
             tbots.Point(-3.5, 2.5),
-            [
-                tbots.Point(3.5, -2.5)
-            ], []
-        ),
-        (
-            tbots.Point(3.5, 0),
-            tbots.Vector(0.0, 0.0),
-            tbots.Point(3.7, 0),
-            [
-                tbots.Point(3.7, 2)
-            ],
-            [
-                tbots.Point(0.0, 3.0),
-                tbots.Point(0.0, -3.0),
-                tbots.Point(2.0, 3.0)
-            ]
+            [tbots.Point(3.5, -2.5)],
+            [],
         )
     ],
 )

@@ -203,12 +203,10 @@ ZonePassMap<ZoneEnum> PassGenerator<ZoneEnum>::samplePasses(const World& world)
 
         auto pass = Pass(world.ball().position(), pass_destination, pass_speed);
 
-        auto rating = ratePass(world, pass, pitch_division_->getZone(zone_id),
-                               passing_config_);
+        auto rating =
+            ratePass(world, pass, pitch_division_->getZone(zone_id), passing_config_);
 
-        passes.emplace(
-            zone_id,
-            PassWithRating{pass, rating});
+        passes.emplace(zone_id, PassWithRating{pass, rating});
     }
 
     return passes;
