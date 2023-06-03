@@ -61,6 +61,7 @@ PYBIND11_MODULE(py_constants, m)
         DYNAMIC_PARAMETER_UPDATE_REQUEST_PATH;
     m.attr("DYNAMIC_PARAMETER_UPDATE_RESPONSE_PATH") =
         DYNAMIC_PARAMETER_UPDATE_RESPONSE_PATH;
+    m.attr("WORLD_STATE_RECEIVED_TRIGGER_PATH") = WORLD_STATE_RECEIVED_TRIGGER_PATH;
 
     // Multicast Channels
     m.def("getRobotMulticastChannel", [](py::args& args) {
@@ -127,5 +128,6 @@ PYBIND11_MODULE(py_constants, m)
     m.attr("BATTERY_WARNING_VOLTAGE") = BATTERY_WARNING_VOLTAGE;
 
     // Robot Communication
-    m.attr("NUM_TIMES_SEND_STOP") = NUM_TIMES_SEND_STOP;
+    m.attr("NUM_TIMES_SEND_STOP")    = NUM_TIMES_SEND_STOP;
+    m.attr("DISCONNECT_DURATION_MS") = DISCONNECT_DURATION_MS;
 }
