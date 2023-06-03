@@ -70,6 +70,8 @@ py_library(
         "//software/simulated_tests:validation",
         "//software/thunderscope",
         "//software/thunderscope:binary_context_managers",
+        "//software/thunderscope:config",
+        "//software/thunderscope:constants",
         "//software/thunderscope/replay:proto_logger",
     ],
 )

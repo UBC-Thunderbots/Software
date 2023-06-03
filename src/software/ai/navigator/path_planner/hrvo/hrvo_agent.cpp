@@ -1,13 +1,24 @@
 #include "software/ai/navigator/path_planner/hrvo/hrvo_agent.h"
 
+#include "proto/message_translation/tbots_protobuf.h"
+#include "software/physics/velocity_conversion_util.h"
+
 HRVOAgent::HRVOAgent(RobotId robot_id, const RobotState &robot_state,
                      const RobotPath &path, double radius, double max_speed,
-                     double max_accel, double max_radius_inflation)
-    : Agent(robot_id, robot_state, path, radius, max_speed, max_accel,
-            max_radius_inflation),
+                     double max_accel, double max_decel, double max_angular_speed,
+                     double max_angular_accel, double max_radius_inflation)
+    : Agent(robot_id, robot_state, path, radius, max_speed, max_accel, max_decel,
+            max_angular_speed, max_angular_accel, max_radius_inflation),
       obstacle_factory(TbotsProto::RobotNavigationObstacleConfig()),
-      neighbours()
+      neighbours(),
+      prev_dynamic_kp_destination(robot_state.position()),
+      kp(2.0)
 {
+    // Reinitialize obstacle factory with a custom inflation factor
+    auto obstacle_config = TbotsProto::RobotNavigationObstacleConfig();
+    obstacle_config.set_robot_obstacle_inflation_factor(
+        HRVO_STATIC_OBSTACLE_INFLATION_FACTOR);
+    obstacle_factory = RobotNavigationObstacleFactory(obstacle_config);
 }
 
 void HRVOAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive,
@@ -18,17 +29,19 @@ void HRVOAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive,
     ball_obstacle = std::nullopt;
     if (new_primitive.has_move())
     {
-        const auto &motion_control = new_primitive.move().motion_control();
-        float speed_at_dest        = new_primitive.move().final_speed_m_per_s();
-        float new_max_speed        = new_primitive.move().max_speed_m_per_s();
-        this->max_speed            = new_max_speed;
+        const auto &move_primitive = new_primitive.move();
+        const auto &motion_control = move_primitive.motion_control();
+
+        double speed_at_dest = move_primitive.final_speed_m_per_s();
+        max_speed            = move_primitive.max_speed_m_per_s();
+        Angle angle_at_dest  = createAngle(move_primitive.final_angle());
 
         // TODO (#2418): Update implementation of Primitive to support
         // multiple path points and remove this check
         if (motion_control.path().points().size() < 2)
         {
-            LOG(WARNING) << "Empty path: " << motion_control.path().points().size()
-                         << std::endl;
+            LOG(WARNING) << "Invalid path in move primitive with size "
+                         << motion_control.path().points().size() << std::endl;
             return;
         }
 
@@ -37,10 +50,11 @@ void HRVOAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive,
         Point destination_point = Point(destination.x_meters(), destination.y_meters());
 
         // Max distance which the robot can travel in one time step + scaling
-        // TODO (#2370): This constant is calculated multiple    times.
+        // TODO (#2370): This constant is calculated multiple times.
         double path_radius = (max_speed * time_step.toSeconds()) / 2;
-        auto path_points   = {PathPoint(destination_point, speed_at_dest)};
-        path               = RobotPath(path_points, path_radius);
+
+        auto path_points = {PathPoint(destination_point, speed_at_dest, angle_at_dest)};
+        path             = RobotPath(path_points, path_radius);
 
         // Update static obstacles
         std::set<TbotsProto::MotionConstraint> motion_constraints;
@@ -68,6 +82,14 @@ void HRVOAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive,
                                         new_obstacles.end());
             }
         }
+
+        // To simplify the logic and avoid having to simulate the ball, we treat the
+        // ball as a static obstacles
+        if (move_primitive.ball_collision_type() == TbotsProto::AVOID)
+        {
+            static_obstacles.push_back(
+                obstacle_factory.createFromBallPosition(world.ball().position()));
+        }
     }
     this->path = path;
 }
@@ -83,10 +105,9 @@ std::vector<RobotId> HRVOAgent::computeNeighbors(
     }
     auto current_destination = current_path_point_opt.value().getPosition();
 
-    // Only consider agents that are closer to us than the destination is
-    double dist_to_obstacle_threshold_squared =
-        std::min(std::pow(MAX_NEIGHBOR_SEARCH_DIST, 2),
-                 (position - current_destination).lengthSquared());
+    double dist_to_neighbor_threshold_squared = std::clamp(
+        (position - current_destination).lengthSquared(),
+        std::pow(MIN_NEIGHBOR_SEARCH_DIST, 2.0), std::pow(MAX_NEIGHBOR_SEARCH_DIST, 2.0));
 
     auto compare = [&](const std::pair<RobotId, Point> &r1,
                        const std::pair<RobotId, Point> &r2) {
@@ -112,7 +133,7 @@ std::vector<RobotId> HRVOAgent::computeNeighbors(
     // run brute force nn search
     std::vector<std::pair<RobotId, Point>> neighbors =
         findNeighboursInThreshold(std::make_pair(robot_id, position), robot_list,
-                                  dist_to_obstacle_threshold_squared, compare);
+                                  dist_to_neighbor_threshold_squared, compare);
 
     // unzip and return id from id-robot pairs
     std::vector<unsigned int> neighbor_ids;
@@ -188,7 +209,7 @@ void HRVOAgent::computeVelocityObstacles(
 
 VelocityObstacle HRVOAgent::createVelocityObstacle(const Agent &other_agent)
 {
-    Circle moving_agent_circle(other_agent.getPosition(), radius);
+    Circle moving_agent_circle(other_agent.getPosition(), other_agent.getRadius());
     Circle obstacle_agent_circle(position, radius);
     auto vo =
         generateVelocityObstacle(obstacle_agent_circle, moving_agent_circle, velocity);
@@ -227,13 +248,51 @@ VelocityObstacle HRVOAgent::createVelocityObstacle(const Agent &other_agent)
     return VelocityObstacle(hrvo_apex, vo.getLeftSide(), vo.getRightSide());
 }
 
+void HRVOAgent::computeNewAngularVelocity(Duration time_step)
+{
+    auto path_point_opt = path.getCurrentPathPoint();
+    if (!path_point_opt.has_value())
+    {
+        angular_velocity = AngularVelocity::fromRadians(0);
+        return;
+    }
+
+    const Angle dest_orientation = path_point_opt.value().getOrientation();
+    const double signed_delta_orientation =
+        (dest_orientation - orientation).clamp().toRadians();
+
+    // PID controller
+    const double pid_output              = signed_delta_orientation * ANGULAR_VELOCITY_KP;
+    AngularVelocity pid_angular_velocity = AngularVelocity::fromRadians(pid_output);
+
+    // Clamp acceleration
+    double delta_angular_velocity = (pid_angular_velocity - angular_velocity).toRadians();
+    const double max_accel        = max_angular_accel * time_step.toSeconds();
+    const double clamped_delta_angular_velocity =
+        std::clamp(delta_angular_velocity, -max_accel, max_accel);
+
+    // Clamp velocity
+    const double desired_output =
+        angular_velocity.toRadians() + clamped_delta_angular_velocity;
+    const double max_angular_vel = static_cast<double>(max_angular_speed);
+    AngularVelocity desired      = AngularVelocity::fromRadians(
+        std::clamp(desired_output, -max_angular_vel, max_angular_vel));
+
+    // Update orientation, assuming constant acceleration between
+    // current and desired angular velocity
+    orientation += ((angular_velocity + desired) / 2) * time_step.toSeconds();
+
+    angular_velocity = desired;
+}
+
+
 void HRVOAgent::computeNewVelocity(
     const std::map<unsigned int, std::shared_ptr<Agent>> &agents, Duration time_step)
 {
     // Based on The Hybrid Reciprocal Velocity Obstacle paper:
     // https://gamma.cs.unc.edu/HRVO/HRVO-T-RO.pdf
 
-    const auto pref_velocity = computePreferredVelocity(time_step);
+    auto pref_velocity = computePreferredVelocity(time_step);
     setPreferredVelocity(pref_velocity);
     computeVelocityObstacles(agents);
 
@@ -571,60 +630,68 @@ std::optional<int> HRVOAgent::findIntersectingVelocityObstacle(
 
 Vector HRVOAgent::computePreferredVelocity(Duration time_step)
 {
-    double pref_speed                 = max_speed * PREF_SPEED_SCALE;
-    const auto current_path_point_opt = path.getCurrentPathPoint();
-
-    if (!current_path_point_opt.has_value() || pref_speed <= 0.01 || max_accel <= 0.01)
+    auto path_point_opt = path.getCurrentPathPoint();
+    if (!path_point_opt.has_value())
     {
-        // Used to avoid edge cases with division by zero
-        return Vector(0.0, 0.0);
+        return Vector();
     }
 
-    Point goal_position  = current_path_point_opt.value().getPosition();
-    double speed_at_goal = current_path_point_opt.value().getSpeed();
+    Point destination  = path_point_opt.value().getPosition();
+    Vector local_error = globalToLocalVelocity(destination - position, orientation);
 
-    Vector dist_vector_to_goal = goal_position - position;
-    auto dist_to_goal          = static_cast<float>(dist_vector_to_goal.length());
-
-    // d = (Vf^2 - Vi^2) / 2a
-    double start_linear_deceleration_distance =
-        std::abs((std::pow(speed_at_goal, 2) - std::pow(pref_speed, 2)) /
-                 (2 * max_accel)) *
-        DECEL_DIST_MULTIPLIER;
-
-    if (dist_to_goal < start_linear_deceleration_distance)
+    if (distance(destination, prev_dynamic_kp_destination) >
+        MAX_DESTINATION_CHANGE_THRESHOLD)
     {
-        // velocity given linear deceleration, distance away from goal, and desired final
-        // speed
-        // v_pref = sqrt(v_goal^2 + 2 * a * d_remainingToDestination)
-        double curr_pref_speed =
-            static_cast<double>(
-                std::sqrt(std::pow(speed_at_goal, 2) + 2 * max_accel * dist_to_goal)) *
-            DECEL_PREF_SPEED_MULTIPLIER;
-        Vector ideal_pref_velocity = dist_vector_to_goal.normalize(curr_pref_speed);
+        // Destination has significantly changed, recalculate dynamic kp.
+        // Relationship between initial distance to destination and dynamic kp was
+        // determined experimentally to have the robot decelerate as late as possible,
+        // without overshooting. The minimum distance which this function was tested on
+        // was 0.25m. More detail about the tests can be found on Notion from Apr 28,
+        // 2023.
+        double distance_for_kp      = std::max(0.25, local_error.length());
+        kp                          = 2.3 / (distance_for_kp + 0.4) + 1.5;
+        prev_dynamic_kp_destination = destination;
+    }
 
-        // Limit the preferred velocity to the kinematic limits
-        const Vector dv = ideal_pref_velocity - velocity;
-        if (dv.length() <= max_accel * time_step.toSeconds())
-        {
-            return ideal_pref_velocity;
-        }
-        else
-        {
-            // Calculate the maximum velocity towards the preferred velocity, given the
-            // acceleration constraint
-            return velocity + dv.normalize(max_accel * time_step.toSeconds());
-        }
+    // We calculate the new desired velocity based on two proportional controllers (x, y),
+    // in the local frame.
+    Vector pid_vel = local_error * kp;
+
+    // Scale down the PID velocity from being excessively high as it causes the
+    // robot to swing around the destination. This causes the velocity to point
+    // towards the destination as fast as possible.
+    Vector realistic_pid_vel = pid_vel.normalize(
+        std::min(pid_vel.length(), velocity.length() + LINEAR_VELOCITY_MAX_PID_OFFSET));
+    Vector curr_local_velocity = globalToLocalVelocity(velocity, orientation);
+    Vector delta_velocity      = realistic_pid_vel - curr_local_velocity;
+
+    // Clamp to max acceleration
+    double acceleration_limit;
+    if (realistic_pid_vel.length() >= curr_local_velocity.length())
+    {
+        // Robot is accelerating
+        acceleration_limit = max_accel;
     }
     else
     {
-        // Accelerate to preferred speed
-        // v_pref = v_now + a * t
-        double curr_pref_speed =
-            std::min(static_cast<double>(pref_speed),
-                     velocity.length() + max_accel * time_step.toSeconds());
-        return dist_vector_to_goal.normalize(curr_pref_speed);
+        // Robot is decelerating
+        acceleration_limit = max_decel;
     }
+    Vector max_delta_velocity = delta_velocity.normalize(
+        std::min(delta_velocity.length(), acceleration_limit * time_step.toSeconds()));
+    Vector desired_output = curr_local_velocity + max_delta_velocity;
+
+    // Clamp to max speed
+    Vector output = desired_output.normalize(
+        std::min(desired_output.length(), static_cast<double>(max_speed)));
+
+    // To avoid the robot swinging when turning and moving in a linear line, we
+    // will compensate for the current angular velocity by rotating the velocity
+    // in the opposite direction
+    output = output.rotate(-angular_velocity * time_step.toSeconds() *
+                           ANGULAR_VELOCITY_COMPENSATION_MULTIPLIER);
+
+    return localToGlobalVelocity(output, orientation);
 }
 
 std::optional<ObstaclePtr> HRVOAgent::getBallObstacle()
@@ -640,12 +707,15 @@ std::vector<VelocityObstacle> HRVOAgent::getVelocityObstacles()
 void HRVOAgent::visualize(TeamColour friendly_team_colour)
 {
     TbotsProto::HRVOVisualization hrvo_visualization;
+
+    // Visualize this agent
+    *(hrvo_visualization.add_robots()) = *createCircleProto(Circle(position, radius));
+
     // Visualize all neighbours
     for (const auto &robot : neighbours)
     {
-        Point position(robot->getPosition());
         *(hrvo_visualization.add_robots()) =
-            *createCircleProto(Circle(position, robot->radius));
+            *createCircleProto(Circle(robot->getPosition(), robot->getRadius()));
     }
 
     std::vector<TbotsProto::VelocityObstacle> vo_protos;
@@ -667,6 +737,9 @@ void HRVOAgent::visualize(TeamColour friendly_team_colour)
         *(hrvo_visualization.add_robots()) = ball_circle;
     }
 
+    // TODO (#2838): For HRVOVisualization logs to be sent properly from the robot, no
+    // path should be passed as a second argument to LOG
+    //    i.e. LOG(VISUALIZE) << hrvo_visualization;
     if (friendly_team_colour == TeamColour::YELLOW)
     {
         LOG(VISUALIZE, YELLOW_HRVO_PATH) << hrvo_visualization;

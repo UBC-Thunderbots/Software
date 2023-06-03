@@ -209,6 +209,13 @@ class RobotCommunication(object):
             True,
         )
 
+        self.receive_ssl_referee_proto = SSLRefereeProtoListener(
+            SSL_REFEREE_ADDRESS,
+            SSL_REFEREE_PORT,
+            lambda data: self.current_proto_unix_io.send_proto(Referee, data),
+            True,
+        )
+
         self.send_world = WorldProtoSender(
             self.multicast_channel + "%" + self.interface, VISION_PORT, True
         )
@@ -239,6 +246,13 @@ class RobotCommunication(object):
             True,
         )
 
+        self.receive_log_visualize = HRVOVisualizationProtoListener(
+            self.multicast_channel + "%" + self.interface,
+            HRVO_VISUALIZATION_PORT,
+            lambda data: self.current_proto_unix_io.send_proto(HRVOVisualization, data),
+            True,
+        )
+
         # Create multicast senders
         self.send_primitive_set = PrimitiveSetProtoSender(
             self.multicast_channel + "%" + self.interface, PRIMITIVE_PORT, True
@@ -251,7 +265,7 @@ class RobotCommunication(object):
 
         return self
 
-    def __exit__(self):
+    def __exit__(self, type, value, traceback):
         """Exit RobotCommunication context manager
 
         Ends all currently running loops and joins all currently active threads
