@@ -1,4 +1,4 @@
-#include "software/ai/hl/stp/play/penalty_kick_enemy_play.h"
+#include "software/ai/hl/stp/play/penalty_kick_enemy/penalty_kick_enemy_play.h"
 
 #include "shared/constants.h"
 #include "software/ai/hl/stp/tactic/goalie/goalie_tactic.h"
@@ -45,7 +45,7 @@ void PenaltyKickEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
                   -8 * ROBOT_MAX_RADIUS_METERS),
             world.field().enemyGoalCenter().toVector().orientation(), 0);
 
-        if (!world.gameState().isPlaying())
+        if (world.gameState().isSetupState())
         {
             goalie_tactic->updateControlParams(true);
         }
