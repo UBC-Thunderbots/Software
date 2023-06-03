@@ -172,7 +172,7 @@ TEST_F(EuclideanToWheelTest, test_double_convertion)
 TEST_F(EuclideanToWheelTest, test_velocity_no_ramping)
 {
     auto allowable_delta_wheel_velocity =
-        static_cast<double>(robot_constants.robot_max_acceleration_m_per_s_2) *
+        static_cast<double>(robot_constants.motor_max_acceleration_m_per_s_2) *
         time_to_ramp;
     auto max_allowable_wheel_velocity =
         static_cast<double>(robot_constants.robot_max_speed_m_per_s);
@@ -197,7 +197,7 @@ TEST_F(EuclideanToWheelTest, test_velocity_no_ramping)
 TEST_F(EuclideanToWheelTest, test_velocity_delta_ramp)
 {
     auto allowable_delta_wheel_velocity =
-        static_cast<double>(robot_constants.robot_max_acceleration_m_per_s_2) *
+        static_cast<double>(robot_constants.motor_max_acceleration_m_per_s_2) *
         time_to_ramp;
     auto max_allowable_wheel_velocity =
         static_cast<double>(robot_constants.robot_max_speed_m_per_s);
@@ -229,7 +229,7 @@ TEST_F(EuclideanToWheelTest, test_velocity_delta_ramp)
 TEST_F(EuclideanToWheelTest, test_velocity_total_ramp)
 {
     auto allowable_delta_wheel_velocity =
-        static_cast<double>(robot_constants.robot_max_acceleration_m_per_s_2) *
+        static_cast<double>(robot_constants.motor_max_acceleration_m_per_s_2) *
         time_to_ramp;
     auto max_allowable_wheel_velocity =
         static_cast<double>(robot_constants.robot_max_speed_m_per_s);
@@ -264,7 +264,7 @@ TEST_F(EuclideanToWheelTest, test_velocity_total_ramp)
 TEST_F(EuclideanToWheelTest, test_velocity_both_ramps)
 {
     auto allowable_delta_wheel_velocity =
-        static_cast<double>(robot_constants.robot_max_acceleration_m_per_s_2) *
+        static_cast<double>(robot_constants.motor_max_acceleration_m_per_s_2) *
         time_to_ramp;
     auto max_allowable_wheel_velocity =
         static_cast<double>(robot_constants.robot_max_speed_m_per_s);
