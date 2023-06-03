@@ -17,6 +17,7 @@
 #include "software/optimization/gradient_descent_optimizer.hpp"
 #include "software/time/timestamp.h"
 #include "software/world/world.h"
+#include "eighteen_zone_pitch_division.h"
 
 // The random seed to initialize the random number generator
 static const int PASS_GENERATOR_SEED = 14;
@@ -197,17 +198,17 @@ ZonePassMap<ZoneEnum> PassGenerator<ZoneEnum>::samplePasses(const World& world)
 
         auto pass_destination =
             Point(x_distribution(random_num_gen_), y_distribution(random_num_gen_));
-//        auto pass_speed = getPassSpeed(world.ball().position(), pass_destination,
-//                                       passing_config_.max_receive_speed());4
-
-        auto pass_speed = speed_distribution(random_num_gen_);
+        auto pass_speed = getPassSpeed(world.ball().position(), pass_destination,
+                                       passing_config_.max_receive_speed());
 
         auto pass = Pass(world.ball().position(), pass_destination, pass_speed);
 
+        auto rating = ratePass(world, pass, pitch_division_->getZone(zone_id),
+                               passing_config_);
+
         passes.emplace(
             zone_id,
-            PassWithRating{pass, ratePass(world, pass, pitch_division_->getZone(zone_id),
-                                          passing_config_)});
+            PassWithRating{pass, rating});
     }
 
     return passes;

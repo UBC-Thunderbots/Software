@@ -106,7 +106,7 @@ message PassingConfig
     ];
     // The minimum pass speed (in m/s)
     required double min_pass_speed_m_per_s = 6
-        [default = 4.3, (bounds).min_double_value = 0.0, (bounds).max_double_value = 5.0];
+        [default = 2.6, (bounds).min_double_value = 0.0, (bounds).max_double_value = 5.0];
     // The maximum pass speed (in m/s)
     required double max_pass_speed_m_per_s = 7 [
         default                   = 6.0,

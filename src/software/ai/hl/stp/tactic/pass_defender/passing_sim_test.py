@@ -15,30 +15,52 @@ from software import py_constants
 
 @pytest.mark.parametrize(
     "ball_initial_position,ball_initial_velocity,attacker_robot_position,"
-    "receiver_robot_positions",
+    "receiver_robot_positions,enemy_robot_positions",
     [
         (
             tbots.Point(-0.5, 0),
             tbots.Vector(0.0, 0.0),
             tbots.Point(-1.0, 0.0),
             [tbots.Point(1.0, 0.0)],
+            []
         ),
-        # (
-        #     tbots.Point(0.0, 0.0),
-        #     tbots.Vector(0.0, 0.0),
-        #     tbots.Point(-3.5, 0.0),
-        #     [
-        #         tbots.Point(3.5, 0.0)
-        #     ],
-        # ),
-        # (
-        #     tbots.Point(-1.0, 0.0),
-        #     tbots.Vector(0.0, 0.0),
-        #     tbots.Point(-3.5, 2.5),
-        #     [
-        #         tbots.Point(3.5, -2.5)
-        #     ],
-        # )
+        (
+            tbots.Point(0.0, 0.0),
+            tbots.Vector(0.0, 0.0),
+            tbots.Point(-3.5, 0.0),
+            [
+                tbots.Point(3.5, 0.0)
+            ], []
+        ),
+        (
+            tbots.Point(0.0, 0.0),
+            tbots.Vector(0.0, 0.0),
+            tbots.Point(0.0, -1.0),
+            [
+                tbots.Point(3.5, 0.0)
+            ], []
+        ),
+        (
+            tbots.Point(-1.0, 0.0),
+            tbots.Vector(0.0, 0.0),
+            tbots.Point(-3.5, 2.5),
+            [
+                tbots.Point(3.5, -2.5)
+            ], []
+        ),
+        (
+            tbots.Point(3.5, 0),
+            tbots.Vector(0.0, 0.0),
+            tbots.Point(3.7, 0),
+            [
+                tbots.Point(3.7, 2)
+            ],
+            [
+                tbots.Point(0.0, 3.0),
+                tbots.Point(0.0, -3.0),
+                tbots.Point(2.0, 3.0)
+            ]
+        )
     ],
 )
 def test_passing(
@@ -46,6 +68,7 @@ def test_passing(
     ball_initial_velocity,
     attacker_robot_position,
     receiver_robot_positions,
+    enemy_robot_positions,
     simulated_test_runner,
 ):
     blue_robot_locations = [attacker_robot_position, *receiver_robot_positions]
@@ -54,7 +77,7 @@ def test_passing(
     simulated_test_runner.simulator_proto_unix_io.send_proto(
         WorldState,
         create_world_state(
-            [],
+            yellow_robot_locations=enemy_robot_positions,
             blue_robot_locations=blue_robot_locations,
             ball_location=ball_initial_position,
             ball_velocity=ball_initial_velocity,
@@ -85,8 +108,12 @@ def test_passing(
         PassingConfig(max_receive_speed=py_constants.MAX_PASS_RECEIVE_SPEED),
     )
 
-    pass_evaluation = pass_generator.generatePassEvaluation(world)
+    for index in range(0, 100):
+        pass_eval = pass_generator.generatePassEvaluation(world)
+        best_pass_eval = pass_eval.getBestPassOnField()
+        best_pass = best_pass_eval.pass_value
 
+    pass_evaluation = pass_generator.generatePassEvaluation(world)
     best_pass_eval = pass_evaluation.getBestPassOnField()
     best_pass = best_pass_eval.pass_value
 
@@ -106,6 +133,23 @@ def test_passing(
             kick_speed_meters_per_second=best_pass.speed(),
         )
     )
+    # params = AssignedTacticPlayControlParams()
+    # params.assigned_tactics[0].attacker.CopyFrom(
+    #     AttackerTactic(
+    #         best_pass_so_far=Pass(
+    #             passer_point=Point(
+    #                 x_meters=best_pass.passerPoint().x(),
+    #                 y_meters=best_pass.passerPoint().y()
+    #             ),
+    #             receiver_point=Point(
+    #                 x_meters=best_pass.receiverPoint().x(),
+    #                 y_meters=best_pass.receiverPoint().y()
+    #             ),
+    #             pass_speed_m_per_s=best_pass.speed()
+    #         ),
+    #         pass_committed=True,
+    #     )
+    # )
     receiver_args = {
         "pass": Pass(
             passer_point=Point(
@@ -141,7 +185,7 @@ def test_passing(
     simulated_test_runner.run_test(
         inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
         inv_always_validation_sequence_set=always_validation_sequence_set,
-        test_timeout_s=15,
+        test_timeout_s=10,
     )
 
 
