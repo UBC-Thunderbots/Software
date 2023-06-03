@@ -381,6 +381,7 @@ def configure_field_test_view(
         yellow_full_system_proto_unix_io,
         visualization_buffer_size=5,
         cost_visualization=False,
+        yellow_is_friendly=False
 ):
     """
     Constructs the Thunderscope Config for field tests
@@ -405,24 +406,11 @@ def configure_field_test_view(
     # Must be called before widgets are initialized below
     initialize_application()
 
-    return TScopeConfig(
-        proto_unix_io_map=proto_unix_io_map,
-        tabs=[
-            TScopeQTTab(
-                name="Blue FullSystem",
-                key=TabNames.BLUE,
-                widgets=configure_base_fullsystem(
-                    full_system_proto_unix_io=proto_unix_io_map[ProtoUnixIOTypes.BLUE],
-                    sim_proto_unix_io=proto_unix_io_map[ProtoUnixIOTypes.SIM],
-                    friendly_colour_yellow=False,
-                    visualization_buffer_size=visualization_buffer_size,
-                    extra_widgets=[
-                        configure_cost_vis(proto_unix_io_map[ProtoUnixIOTypes.BLUE])
-                    ]
-                    if cost_visualization
-                    else [],
-                ),
-            ),
+    tabs = []
+
+    # Choose the right tab based on yellow/blue
+    if yellow_is_friendly:
+        tabs = [
             TScopeQTTab(
                 name="Yellow FullSystem",
                 key=TabNames.YELLOW,
@@ -439,8 +427,30 @@ def configure_field_test_view(
                     if cost_visualization
                     else [],
                 ),
-            ),
-        ],
+            )
+        ]
+    else:
+        tabs = [
+            TScopeQTTab(
+                name="Blue FullSystem",
+                key=TabNames.BLUE,
+                widgets=configure_base_fullsystem(
+                    full_system_proto_unix_io=proto_unix_io_map[ProtoUnixIOTypes.BLUE],
+                    sim_proto_unix_io=proto_unix_io_map[ProtoUnixIOTypes.SIM],
+                    friendly_colour_yellow=False,
+                    visualization_buffer_size=visualization_buffer_size,
+                    extra_widgets=[
+                        configure_cost_vis(proto_unix_io_map[ProtoUnixIOTypes.BLUE])
+                    ]
+                    if cost_visualization
+                    else [],
+                ),
+            )
+        ]
+
+    return TScopeConfig(
+        proto_unix_io_map=proto_unix_io_map,
+        tabs=tabs
     )
 
 
