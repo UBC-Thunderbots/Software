@@ -36,8 +36,11 @@
 
         - name: Sync Binaries
           ansible.posix.synchronize:
-            src: /home/joshua/Repositories/Thunderbots/Software/src/bazel-bin/software/jetson_nano/services/robot_auto_test
-#            src: ../../../services/robot_auto_test
+#            src: /home/joshua/Repositories/Thunderbots/Software/src/bazel-bin/software/jetson_nano/services/robot_auto_test
+#            src: ../../../services/robot_auto_test.runfiles/__main__/software/jetson_nano/services/robot_auto_test
+#            src: /home/joshua/Repositories/Thunderbots/Software/src/bazel-bin/software/jetson_nano/services/robot_auto_test_binary
+            src: ../../services/robot_auto_test_binary
+#            src: ../../services/robot_auto_test
             dest: ~/thunderbots_binaries/
             recursive: yes
             copy_links: yes

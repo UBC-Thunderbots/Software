@@ -56,22 +56,22 @@ genrule(
     local = True,
 )
 
-#cc_binary(
-#    name = "robot_auto_test",
-#    srcs = ["robot_auto_test.cpp"],
-#    linkopts = [
-#        "-lpthread",
-#        "-lrt",
-#    ],
-#    deps = [
-#        ":motor",
-#        ":power",
-#        "//proto/message_translation:tbots_geometry",
-#        "//proto/primitive:primitive_msg_factory",
-#        "//shared:robot_constants",
-#        "//shared/test_util:tbots_gtest_main",
-#        "//software/jetson_nano:primitive_executor",
-#        "//software/jetson_nano/services/network:power_service_exception",
-#        "@trinamic",
-#    ],
-#)
+cc_binary(
+    name = "robot_auto_test_binary",
+    srcs = ["robot_auto_test_binary.cpp"],
+    linkopts = [
+        "-lpthread",
+        "-lrt",
+    ],
+    deps = [
+        ":motor",
+        ":power",
+        "//proto/message_translation:tbots_geometry",
+        "//proto/primitive:primitive_msg_factory",
+        "//shared:robot_constants",
+        #        "//shared/test_util:tbots_gtest_main",
+        "//software/jetson_nano:primitive_executor",
+        "//software/jetson_nano/services/network:power_service_exception",
+        "@trinamic",
+    ],
+)
