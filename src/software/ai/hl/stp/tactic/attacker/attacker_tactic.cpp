@@ -11,12 +11,13 @@ AttackerTactic::AttackerTactic(TbotsProto::AiConfig ai_config)
       best_pass_so_far(std::nullopt),
       pass_committed(false),
       chip_target(std::nullopt),
+      should_single_touch(false),
       ai_config(ai_config)
 {
     for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)
     {
         fsm_map[id] = std::make_unique<FSM<AttackerFSM>>(
-            DribbleFSM(ai_config.dribble_tactic_config()),
+            GetBehindBallFSM(), DribbleFSM(ai_config.dribble_tactic_config()),
             AttackerFSM(ai_config.attacker_tactic_config()));
     }
 }
@@ -34,6 +35,10 @@ void AttackerTactic::updateControlParams(std::optional<Point> chip_target)
     this->chip_target = chip_target;
 }
 
+void AttackerTactic::updateControlParams(bool should_single_touch) {
+    this->should_single_touch = should_single_touch;
+}
+
 void AttackerTactic::accept(TacticVisitor& visitor) const
 {
     visitor.visit(*this);
@@ -44,7 +49,7 @@ void AttackerTactic::updatePrimitive(const TacticUpdate& tactic_update, bool res
     if (reset_fsm)
     {
         fsm_map[tactic_update.robot.id()] = std::make_unique<FSM<AttackerFSM>>(
-            DribbleFSM(ai_config.dribble_tactic_config()),
+            GetBehindBallFSM(), DribbleFSM(ai_config.dribble_tactic_config()),
             AttackerFSM(ai_config.attacker_tactic_config()));
     }
 
@@ -60,10 +65,13 @@ void AttackerTactic::updatePrimitive(const TacticUpdate& tactic_update, bool res
         shot = std::nullopt;
     }
 
-    AttackerFSM::ControlParams control_params{.best_pass_so_far = best_pass_so_far,
-                                              .pass_committed   = pass_committed,
-                                              .shot             = shot,
-                                              .chip_target      = chip_target};
+    AttackerFSM::ControlParams control_params{
+            .best_pass_so_far    = best_pass_so_far,
+            .pass_committed      = pass_committed,
+            .shot                = shot,
+            .chip_target         = chip_target,
+            .should_single_touch = should_single_touch,
+    };
 
     fsm_map.at(tactic_update.robot.id())
         ->process_event(AttackerFSM::Update(control_params, tactic_update));

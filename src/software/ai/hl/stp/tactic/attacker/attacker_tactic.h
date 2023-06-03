@@ -24,7 +24,7 @@ class AttackerTactic : public Tactic
     AttackerTactic() = delete;
 
     /**
-     * Updates the control parameters for this AttackerTactic.
+     * Updates the control parameters for this AttackerTactic
      *
      * @param updated_pass The pass to perform
      */
@@ -38,6 +38,13 @@ class AttackerTactic : public Tactic
      * not provided, the point defaults to the enemy goal
      */
     void updateControlParams(std::optional<Point> chip_target);
+
+    /**
+     * Updates the control parameters for this AttackerTactic
+     *
+     * @param should_single_touch Whether we should single touch
+     */
+    void updateControlParams(bool should_single_touch);
 
     void accept(TacticVisitor& visitor) const override;
 
@@ -55,6 +62,9 @@ class AttackerTactic : public Tactic
     // The point the robot will chip towards if it is unable to shoot and is in danger
     // of losing the ball to an enemy
     std::optional<Point> chip_target;
+
+    // Whether we should single touch
+    bool should_single_touch;
 
     // AI config
     TbotsProto::AiConfig ai_config;
