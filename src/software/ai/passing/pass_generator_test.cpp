@@ -144,8 +144,6 @@ TEST_F(PassGeneratorTest, check_pass_does_not_converge_to_self_pass)
     auto pass_eval = pass_generator->generatePassEvaluation(world);
     auto [converged_pass, converged_score] = pass_eval.getBestPassOnField();
 
-    std::cout << "RECEIVER POINT: " << converged_pass.receiverPoint() << std::endl;
-
     // We expect to have converged to a point near robot 2. The tolerance is fairly
     // generous here because the enemies on the field can "force" the point slightly
     // away from the chosen receiver robot

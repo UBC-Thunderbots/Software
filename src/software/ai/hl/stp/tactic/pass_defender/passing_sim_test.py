@@ -1,5 +1,5 @@
 import pytest
-
+import math
 import software.python_bindings as tbots
 from proto.import_all_protos import *
 from software.simulated_tests.simulated_test_fixture import (
@@ -15,13 +15,14 @@ from software import py_constants
 
 @pytest.mark.parametrize(
     "ball_initial_position,ball_initial_velocity,attacker_robot_position,"
-    "receiver_robot_positions,enemy_robot_positions",
+    "receiver_robot_positions,friendly_orientations,enemy_robot_positions",
     [
         (
             tbots.Point(-0.5, 0),
             tbots.Vector(0.0, 0.0),
             tbots.Point(-1.0, 0.0),
             [tbots.Point(1.0, 0.0)],
+            [0, math.pi],
             [],
         ),
         (
@@ -29,6 +30,7 @@ from software import py_constants
             tbots.Vector(0.0, 0.0),
             tbots.Point(-3.5, 0.0),
             [tbots.Point(3.5, 0.0)],
+            [0, math.pi],
             [],
         ),
         # TODO: Make Interception Better
@@ -37,6 +39,7 @@ from software import py_constants
             tbots.Vector(0.0, 0.0),
             tbots.Point(0.0, -1.0),
             [tbots.Point(3.5, 0.0)],
+            [0, math.pi],
             [],
         ),
         (
@@ -44,6 +47,7 @@ from software import py_constants
             tbots.Vector(0.0, 0.0),
             tbots.Point(-3.5, 2.5),
             [tbots.Point(3.5, -2.5)],
+            [0, math.pi],
             [],
         ),
     ],
@@ -53,6 +57,7 @@ def test_passing(
     ball_initial_velocity,
     attacker_robot_position,
     receiver_robot_positions,
+    friendly_orientations,
     enemy_robot_positions,
     simulated_test_runner,
 ):
@@ -66,6 +71,7 @@ def test_passing(
             blue_robot_locations=blue_robot_locations,
             ball_location=ball_initial_position,
             ball_velocity=ball_initial_velocity,
+            blue_robot_orientations=friendly_orientations,
         ),
     )
 

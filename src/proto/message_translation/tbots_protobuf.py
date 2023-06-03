@@ -1,10 +1,12 @@
-import math
-
 from proto.import_all_protos import *
 
 
 def create_world_state(
-    yellow_robot_locations, blue_robot_locations, ball_location, ball_velocity
+    yellow_robot_locations,
+    blue_robot_locations,
+    ball_location,
+    ball_velocity,
+    blue_robot_orientations=[],
 ):
     """Initializes the world from a list of robot locations and ball location/velocity.
 
@@ -14,6 +16,7 @@ def create_world_state(
     :param blue_robot_locations: A list of blue robot locations
     :param ball_location: Location of the ball
     :param ball_velocity: Velocity of the ball
+    :param blue_robot_orientations: A list of blue robots orientations
 
     """
     world_state = WorldState()
@@ -28,16 +31,17 @@ def create_world_state(
         )
 
     for robot_id, robot_location in enumerate(blue_robot_locations):
-        angle = 0
-        if robot_id == 1:
-            angle = math.pi
-
+        orientation = 0
+        try:
+            orientation = blue_robot_orientations[robot_id]
+        except IndexError:
+            pass
         world_state.blue_robots[robot_id].CopyFrom(
             RobotState(
                 global_position=Point(
                     x_meters=robot_location.x(), y_meters=robot_location.y()
                 ),
-                global_orientation=Angle(radians=angle),
+                global_orientation=Angle(radians=orientation),
             )
         )
 
