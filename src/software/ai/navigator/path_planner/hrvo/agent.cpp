@@ -1,7 +1,8 @@
 #include "agent.h"
 
 Agent::Agent(RobotId robot_id, const RobotState &robot_state, const RobotPath &path,
-             double radius, double max_speed, double max_accel,
+             double radius, double max_speed, double max_accel, double max_decel,
+             double max_angular_speed, double max_angular_accel,
              double max_radius_inflation)
     : robot_id(robot_id),
       path(path),
@@ -9,6 +10,9 @@ Agent::Agent(RobotId robot_id, const RobotState &robot_state, const RobotPath &p
       min_radius(radius),
       max_speed(max_speed),
       max_accel(max_accel),
+      max_decel(max_decel),
+      max_angular_speed(max_angular_speed),
+      max_angular_accel(max_angular_accel),
       max_radius_inflation(max_radius_inflation),
       position(robot_state.position()),
       velocity(robot_state.velocity()),
@@ -25,16 +29,28 @@ void Agent::update(Duration time_step)
         new_velocity = new_velocity.normalize(max_speed);
     }
 
+    double acceleration_limit;
+    if (new_velocity.length() >= velocity.length())
+    {
+        // Robot is accelerating
+        acceleration_limit = max_accel;
+    }
+    else
+    {
+        // Robot is decelerating
+        acceleration_limit = max_decel;
+    }
+
     const Vector dv = new_velocity - velocity;
-    if (dv.length() < max_accel * time_step.toSeconds() || dv.length() == 0.0)
+    if (dv.length() <= acceleration_limit * time_step.toSeconds())
     {
         setVelocity(new_velocity);
     }
     else
     {
-        // Calculate the maximum velocity towards the preferred velocity, given the
+        // Calculate the maximum velocity towards the new velocity, given the
         // acceleration constraint
-        setVelocity(velocity + dv.normalize(max_accel * time_step.toSeconds()));
+        setVelocity(velocity + dv.normalize(acceleration_limit * time_step.toSeconds()));
     }
     position = position + (velocity * time_step.toSeconds());
 
@@ -56,8 +72,14 @@ void Agent::update(Duration time_step)
 
 void Agent::updateRadiusFromVelocity()
 {
-    // Linearly increase radius based on the current agent velocity
-    radius = min_radius + max_radius_inflation * (velocity.length() / max_speed);
+    // Calculate the updated radius of the agent based on its current velocity
+    // The radius is calculated using a 4th degree polynomial which at 0 velocity
+    // is equal to min_radius, and at max_speed is equal to min_radius +
+    // max_radius_inflation. A 4th degree polynomial was chosen because we want the radius
+    // to increase quickly for smaller velocities.
+    double a = -max_radius_inflation / std::pow(max_speed, 4.0);
+    radius   = min_radius + max_radius_inflation +
+             a * std::pow(velocity.length() - max_speed, 4.0);
 }
 
 double Agent::getMaxAccel() const
@@ -118,4 +140,14 @@ void Agent::setPreferredVelocity(const Vector &pref_velocity)
 void Agent::setVelocity(const Vector &velocity_update)
 {
     velocity = velocity_update;
+}
+
+void Agent::setAngularVelocity(const AngularVelocity &new_angular_velocity)
+{
+    angular_velocity = new_angular_velocity;
+}
+
+void Agent::setOrientation(const Angle &new_orientation)
+{
+    orientation = new_orientation;
 }

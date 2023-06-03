@@ -44,6 +44,10 @@ class NetworkLoggerSingleton
         auto csv_sink_handle = logWorker->addSink(std::make_unique<CSVSink>(CSV_PATH),
                                                   &CSVSink::appendToFile);
 
+        // Sink for PlotJuggler plotting
+        auto plotjuggler_handle = logWorker->addSink(std::make_unique<PlotJugglerSink>(),
+                                                     &PlotJugglerSink::sendToPlotJuggler);
+
         g3::initializeLogging(logWorker.get());
     }
 
