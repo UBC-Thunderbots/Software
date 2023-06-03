@@ -275,6 +275,8 @@ class MotorService
     // SPI File Descriptors
     std::unordered_map<int, int> file_descriptors_;
 
+    RobotConstants_t robot_constants_;
+
     // Drive Motors
     EuclideanToWheel euclidean_to_four_wheel_;
     std::unordered_map<int, bool> encoder_calibrated_;
@@ -288,7 +290,7 @@ class MotorService
 
     static const int NUM_CALIBRATION_ATTEMPTS = 10;
 
-    int ramp_rpm_;
+    int dribbler_ramp_rpm_;
 
     // SPI Chip Selects
     static const uint8_t FRONT_LEFT_MOTOR_CHIP_SELECT  = 0;

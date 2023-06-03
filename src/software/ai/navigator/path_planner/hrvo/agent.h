@@ -22,11 +22,16 @@ class Agent
      * @param radius                The radius of this agent.
      * @param max_speed             The maximum speed of this agent.
      * @param max_accel             The maximum acceleration of this agent.
+     * @param max_decel             The maximum deceleration of this agent.
+     * @param max_angular_speed     The maximum angular speed of this agent.
+     * @param max_angular_accel     The maximum angular acceleration of this agent.
      * @param max_radius_inflation  The maximum amount which the radius of this agent can
      * inflate.
      */
     Agent(RobotId robot_id, const RobotState &robot_state, const RobotPath &path,
-          double radius, double max_speed, double max_accel, double max_radius_inflation);
+          double radius, double max_speed, double max_accel, double max_decel,
+          double max_angular_speed, double max_angular_accel,
+          double max_radius_inflation);
 
 
     /**
@@ -73,6 +78,13 @@ class Agent
         const std::map<unsigned int, std::shared_ptr<Agent>> &robots,
         Duration time_step) = 0;
 
+    /**
+     * Compute the new angular velocity that this agent should rotate at
+     *
+     * @param time_step the time step to use
+     */
+    virtual void computeNewAngularVelocity(Duration time_step) = 0;
+
 
     /**
      * Create the VO to represent the given agent, relative to this agent
@@ -94,7 +106,7 @@ class Agent
     /**
      * Set the position of this agent
      *
-     * @param The new position for this agent
+     * @param new_position The new position for this agent
      */
     void setPosition(const Point &new_position);
 
@@ -124,11 +136,27 @@ class Agent
 
 
     /**
+     * Set the orientation of this agent
+     *
+     * @param new_orientation The new orientation for this agent
+     */
+    void setOrientation(const Angle &new_orientation);
+
+
+    /**
      * Return the angular velocity of the agent
      *
      * @return The angular velocity for this agent
      */
     AngularVelocity getAngularVelocity() const;
+
+
+    /**
+     * Set the angular velocity for this agent
+     *
+     * @param new_angular_velocity The new angular velocity for this agent
+     */
+    void setAngularVelocity(const AngularVelocity &new_angular_velocity);
 
 
     /**
@@ -178,6 +206,7 @@ class Agent
      */
     double getMaxAccel() const;
 
+   protected:
     // robot id of this agent
     RobotId robot_id;
 
@@ -197,6 +226,15 @@ class Agent
 
     // the maximum acceleration for the agent
     const double max_accel;
+
+    // the maximum deceleration for the agent
+    const double max_decel;
+
+    // the maximum speed for the agent
+    double max_angular_speed;
+
+    // the maximum acceleration for the agent
+    const double max_angular_accel;
 
     // The maximum amount which the radius can increase by
     const double max_radius_inflation;

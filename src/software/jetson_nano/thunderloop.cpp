@@ -109,7 +109,7 @@ Thunderloop::~Thunderloop() {}
     struct timespec poll_time;
     struct timespec iteration_time;
     struct timespec last_primitive_received_time;
-    struct timespec last_world_recieved_time;
+    struct timespec last_world_received_time;
     struct timespec current_time;
     struct timespec last_chipper_fired;
     struct timespec last_kicker_fired;
@@ -128,7 +128,7 @@ Thunderloop::~Thunderloop() {}
     // CLOCK_REALTIME can jump backwards
     clock_gettime(CLOCK_MONOTONIC, &next_shot);
     clock_gettime(CLOCK_MONOTONIC, &last_primitive_received_time);
-    clock_gettime(CLOCK_MONOTONIC, &last_world_recieved_time);
+    clock_gettime(CLOCK_MONOTONIC, &last_world_received_time);
     clock_gettime(CLOCK_MONOTONIC, &last_chipper_fired);
     clock_gettime(CLOCK_MONOTONIC, &last_kicker_fired);
 
@@ -197,7 +197,7 @@ Thunderloop::~Thunderloop() {}
 
             struct timespec time_since_last_vision_received;
             clock_gettime(CLOCK_MONOTONIC, &current_time);
-            ScopedTimespecTimer::timespecDiff(&current_time, &last_world_recieved_time,
+            ScopedTimespecTimer::timespecDiff(&current_time, &last_world_received_time,
                                               &time_since_last_vision_received);
             network_status_.set_ms_since_last_vision_received(
                 getMilliseconds(time_since_last_vision_received));
@@ -206,7 +206,7 @@ Thunderloop::~Thunderloop() {}
             if (new_world.time_sent().epoch_timestamp_seconds() >
                 world_.time_sent().epoch_timestamp_seconds())
             {
-                clock_gettime(CLOCK_MONOTONIC, &last_world_recieved_time);
+                clock_gettime(CLOCK_MONOTONIC, &last_world_received_time);
                 primitive_executor_.updateWorld(new_world);
                 world_ = new_world;
             }
