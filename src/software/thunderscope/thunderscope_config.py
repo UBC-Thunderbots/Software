@@ -407,7 +407,6 @@ def configure_field_test_view(
     initialize_application()
 
     tabs = []
-
     # Choose the right tab based on yellow/blue
     if yellow_is_friendly:
         tabs = [
