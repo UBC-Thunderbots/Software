@@ -19,9 +19,34 @@
 extern int clock_nanosleep(clockid_t __clock_id, int __flags,
                            __const struct timespec* __req, struct timespec* __rem);
 
+// signal handling is done by csignal which requires a function pointer with C linkage
+extern "C"
+{
+    static MotorService* g_motor_service = NULL;
+
+    /**
+     * Handles process signals
+     *
+     * @param the signal value (SIGINT, SIGABRT, SIGTERN, etc)
+     */
+    void tbotsExit(int signal_num)
+    {
+        g_motor_service->resetMotorBoard();
+
+        // by now g3log may have died due to the termination signal, so it isn't reliable
+        // to log messages
+        std::cerr << "\n\n!!!\nReceived termination signal: "
+                  << g3::signalToStr(signal_num) << std::endl;
+        std::cerr << "Thunderloop shutting down and motor board reset\n!!!\n"
+                  << std::endl;
+
+        exit(signal_num);
+    }
+}
+
 Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, bool enable_log_merging,
                          const int loop_hz)
-    // TODO (#2495): Set the friendly team colour once we receive World proto
+     // TODO (#2495): Set the friendly team colour once we receive World proto
     : redis_client_(
           std::make_unique<RedisClient>(REDIS_DEFAULT_HOST, REDIS_DEFAULT_PORT)),
       motor_status_(std::nullopt),
@@ -37,8 +62,18 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, bool enable_lo
       primitive_executor_(Duration::fromSeconds(1.0 / loop_hz), robot_constants,
                           TeamColour::YELLOW, robot_id_)
 {
+    g3::overrideSetupSignals({});
     NetworkLoggerSingleton::initializeLogger(channel_id_, network_interface_, robot_id_,
                                              enable_log_merging);
+
+    // catch all catch-able signals
+    std::signal(SIGSEGV, tbotsExit);
+    std::signal(SIGTERM, tbotsExit);
+    std::signal(SIGABRT, tbotsExit);
+    std::signal(SIGFPE, tbotsExit);
+    std::signal(SIGINT, tbotsExit);
+    std::signal(SIGILL, tbotsExit);
+
     LOG(INFO)
         << "THUNDERLOOP: Network Logger initialized! Next initializing Network Service";
 
@@ -48,7 +83,9 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, bool enable_lo
     LOG(INFO)
         << "THUNDERLOOP: Network Service initialized! Next initializing Motor Service";
 
-    motor_service_ = std::make_unique<MotorService>(robot_constants, loop_hz);
+    motor_service_  = std::make_unique<MotorService>(robot_constants, loop_hz);
+    g_motor_service = motor_service_.get();
+    motor_service_->setup();
     LOG(INFO)
         << "THUNDERLOOP: Motor Service initialized! Next initializing Power Service";
 
