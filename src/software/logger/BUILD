@@ -23,6 +23,7 @@ cc_library(
         ":coloured_cout_sink",
         ":csv_sink",
         ":log_merger",
+        ":plotjuggler_sink",
         ":protobuf_sink",
         "@g3log",
         "@g3sinks",
@@ -112,8 +113,29 @@ cc_library(
     deps = [
         ":log_merger",
         "//proto:tbots_cc_proto",
+        "//proto:visualization_cc_proto",
+        "//proto/message_translation:tbots_protobuf",
         "//shared:constants",
+        "//software/logger:plotjuggler_sink",
         "//software/networking:threaded_proto_udp_sender",
+        "@base64",
+        "@g3log",
+    ],
+)
+
+cc_library(
+    name = "plotjuggler_sink",
+    srcs = [
+        "plotjuggler_sink.cpp",
+    ],
+    hdrs = [
+        "custom_logging_levels.h",
+        "plotjuggler_sink.h",
+    ],
+    deps = [
+        "//proto:visualization_cc_proto",
+        "//shared:constants",
+        "//software/networking:threaded_udp_sender",
         "@g3log",
     ],
 )

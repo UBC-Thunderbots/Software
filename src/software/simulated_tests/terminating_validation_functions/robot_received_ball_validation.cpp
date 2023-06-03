@@ -10,7 +10,7 @@ void robotReceivedBall(std::shared_ptr<World> world_ptr,
         std::vector<Robot> robots = world_ptr->friendlyTeam().getAllRobots();
         return std::any_of(robots.begin(), robots.end(), [world_ptr](Robot robot) {
             Point ball_position = world_ptr->ball().position();
-            return robot.isNearDribbler(ball_position, 0.01);
+            return robot.isNearDribbler(ball_position, 0.02);
         });
     };
 
