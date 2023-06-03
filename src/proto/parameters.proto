@@ -310,7 +310,7 @@ message DefensePlayConfig
         // Max percent difference between two goal lanes' angles to goal for them to be
         // considered a dense lane cluster
         required double goal_lane_density_threshold = 4 [
-            default                   = 0.3,
+            default                   = 0.4,
             (bounds).min_double_value = 0.0,
             (bounds).max_double_value = 100.0
         ];
