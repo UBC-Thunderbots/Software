@@ -4,8 +4,8 @@
 #include <iostream>
 
 #include "proto/robot_log_msg.pb.h"
-#include "software/logger/log_merger.h"
 #include "proto/visualization.pb.h"
+#include "software/logger/log_merger.h"
 #include "software/networking/threaded_proto_udp_sender.hpp"
 
 

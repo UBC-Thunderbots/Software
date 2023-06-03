@@ -43,9 +43,9 @@ void NetworkSink::sendOneLogToNetwork(g3::LogMessage log)
 
         unsigned int delimiter_length = strlen(PROTO_MSG_TYPE_DELIMITER);
         size_t proto_type_name_pos =
-                msg.find(PROTO_MSG_TYPE_DELIMITER, file_name_pos + 1);
+            msg.find(PROTO_MSG_TYPE_DELIMITER, file_name_pos + 1);
         std::string proto_type_name  = msg.substr(file_name_pos + delimiter_length,
-                                                  proto_type_name_pos - delimiter_length);
+                                                 proto_type_name_pos - delimiter_length);
         std::string serialized_proto = msg.substr(proto_type_name_pos + delimiter_length);
 
         // TODO (#2838): Rewrite the following code to be generalized and work for all
@@ -74,11 +74,11 @@ void NetworkSink::sendOneLogToNetwork(g3::LogMessage log)
 
         TbotsProto::Timestamp timestamp;
         const auto current_time_ms =
-                std::chrono::time_point_cast<std::chrono::milliseconds>(
-                        std::chrono::system_clock::now());
+            std::chrono::time_point_cast<std::chrono::milliseconds>(
+                std::chrono::system_clock::now());
         timestamp.set_epoch_timestamp_seconds(
-                static_cast<double>(current_time_ms.time_since_epoch().count()) /
-                MILLISECONDS_PER_SECOND);
+            static_cast<double>(current_time_ms.time_since_epoch().count()) /
+            MILLISECONDS_PER_SECOND);
         *(log_msg_proto->mutable_created_timestamp()) = timestamp;
 
         log_output->sendProto(*log_msg_proto);
