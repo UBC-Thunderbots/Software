@@ -17,7 +17,7 @@ logger = createLogger(__name__)
 
 def test_pivot_kick(field_test_runner):
 
-    id = 5 
+    id = 5
 
     world = field_test_runner.world_buffer.get(block=True, timeout=WORLD_BUFFER_TIMEOUT)
     print("Here are the robots:")
