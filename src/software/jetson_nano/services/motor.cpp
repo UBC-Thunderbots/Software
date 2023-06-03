@@ -154,17 +154,10 @@ void MotorService::setup()
 
     if (tracked_motor_fault_start_time_.has_value() && num_tracked_motor_resets_ > MOTOR_FAULT_THRESHOLD)
     {
-        LOG(FATAL) << "In the last " << (now - tracked_motor_fault_start_time_.value()).count() << "s, the motor board has resetted " << num_tracked_motor_resets_ << " times. Thunderloop crashing for safety.";
+        LOG(FATAL) << "In the last " << (now - tracked_motor_fault_start_time_.value()).count() << "s, the motor board has reset " << num_tracked_motor_resets_ << " times. Thunderloop crashing for safety.";
     }
 
     prev_wheel_velocities_ = {0.0, 0.0, 0.0, 0.0};
-
-    // reset motor fault cache
-    for (uint8_t motor = 0; motor < NUM_MOTORS; motor++)
-    {
-        cached_motor_faults_[motor] = MotorFaultIndicator();
-        encoder_calibrated_[motor]  = false;
-    }
 
     // Clear faults by resetting all the chips on the motor board
     reset_gpio_.setValue(GpioState::LOW);
@@ -175,11 +168,10 @@ void MotorService::setup()
 
     for (uint8_t motor = 0; motor < NUM_MOTORS; ++motor)
     {
-        if (requiresMotorReinit(motor))
-        {
-            LOG(INFO) << "Clearing RESET for " << MOTOR_NAMES[motor];
-            tmc6100_writeInt(motor, TMC6100_GSTAT, 0x00000001);
-        }
+        LOG(INFO) << "Clearing RESET for " << MOTOR_NAMES[motor];
+        tmc6100_writeInt(motor, TMC6100_GSTAT, 0x00000001);
+        cached_motor_faults_[motor] = MotorFaultIndicator();
+        encoder_calibrated_[motor]  = false;
     }
 
     // Drive Motor Setup
@@ -599,7 +591,7 @@ bool MotorService::requiresMotorReinit(uint8_t motor)
         cached_motor_faults_[motor].motor_faults.find(TbotsProto::MotorFault::RESET);
 
     return !cached_motor_faults_[motor].drive_enabled
-        && (reset_search != cached_motor_faults_[motor].motor_faults.end());
+        || (reset_search != cached_motor_faults_[motor].motor_faults.end());
 }
 
 void MotorService::spiTransfer(int fd, uint8_t const* tx, uint8_t const* rx, unsigned len,
@@ -818,7 +810,7 @@ void MotorService::configureDrivePI(uint8_t motor)
     writeToControllerOrDieTrying(motor, TMC4671_PID_POSITION_P_POSITION_I, 0);
 
     writeToControllerOrDieTrying(motor, TMC4671_PIDOUT_UQ_UD_LIMITS, 32767);
-    writeToControllerOrDieTrying(motor, TMC4671_PID_TORQUE_FLUX_LIMITS, 5000);
+    writeToControllerOrDieTrying(motor, TMC4671_PID_TORQUE_FLUX_LIMITS, 2500);
     writeToControllerOrDieTrying(motor, TMC4671_PID_ACCELERATION_LIMIT, 1000);
 
     writeToControllerOrDieTrying(motor, TMC4671_PID_VELOCITY_LIMIT, 45000);
