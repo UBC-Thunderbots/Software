@@ -7,10 +7,10 @@ from software.simulated_tests.robot_enters_region_and_stops import *
 from software.simulated_tests.avoid_collisions import *
 import software.python_bindings as tbots
 from proto.ssl_gc_common_pb2 import Team
-from proto.message_translation.tbots_protobuf import create_world_state_from_state
+from proto.message_translation.tbots_protobuf import create_world_state
 
 
-def get_zig_zag_params(front_wall_x, robot_y_delta, num_walls):
+def get_zig_zag_params(front_wall_x, robot_y_delta, num_walls, wall_height):
     """
     Gets the test params to cause movement in a zig zag pattern
     due to multiple walls of enemy robots
@@ -18,19 +18,22 @@ def get_zig_zag_params(front_wall_x, robot_y_delta, num_walls):
     :param front_wall_x: the x position of the first wall
     :param robot_y_delta: the vertical separation between each robot in the wall
     :param num_walls: the number of walls to use
+    :param wall_height: the height of each wall
     :return: positions and destinations of friendly and enemy robots to cause
              a zig zag movement
     """
     return (
-        [Point(x_meters=front_wall_x - 0.5, y_meters=0)],
-        [Point(x_meters=front_wall_x + 3 + 1.5, y_meters=0)],
+        [tbots.Point(front_wall_x - 0.5, 0)],
+        [tbots.Point(front_wall_x + 3 + 1.5, 0)],
         [],
         [
-            Point(x_meters=x_meters, y_meters=float(y_meters) / 10)
+            tbots.Point(x_meters, float(y_meters) / 10)
             for x_meters in range(front_wall_x, front_wall_x + num_walls + 1, 1)
             for y_meters in range(
                 0,
-                (1 if x_meters % 2 == 0 else -1) * 3 * int(robot_y_delta * 10),
+                (1 if x_meters % 2 == 0 else -1)
+                * wall_height
+                * int(robot_y_delta * 10),
                 (1 if x_meters % 2 == 0 else -1) * int(robot_y_delta * 10),
             )
         ],
@@ -53,13 +56,9 @@ def get_robot_circle_pos(radius, num_robots, start):
     :return: list of positions of robots that form a circle
     """
     return [
-        Point(
-            x_meters=(1 if start else -1)
-            * radius
-            * math.cos(i * 2 * math.pi / num_robots),
-            y_meters=(1 if start else -1)
-            * radius
-            * math.sin(i * 2 * math.pi / num_robots),
+        tbots.Point(
+            (1 if start else -1) * radius * math.cos(i * 2 * math.pi / num_robots),
+            (1 if start else -1) * radius * math.sin(i * 2 * math.pi / num_robots),
         )
         for i in range(num_robots)
     ]
@@ -83,21 +82,11 @@ def hrvo_setup(
     :param enemy_robots_destinations: destinations of enemy robots
     :param simulated_test_runner: the current test runner being used
     """
-    desired_orientation = Angle(radians=0)
+    desired_orientation = tbots.Angle.fromRadians(0)
 
     ball_initial_pos = tbots.Point(1, 2)
 
     ball_initial_vel = tbots.Point(0, 0)
-
-    friendly_robots = [
-        RobotState(global_position=robot_position)
-        for robot_position in friendly_robots_positions
-    ]
-
-    enemy_robots = [
-        RobotState(global_position=robot_position)
-        for robot_position in enemy_robots_positions
-    ]
 
     # Game Controller Setup
     simulated_test_runner.gamecontroller.send_ci_input(
@@ -129,7 +118,7 @@ def hrvo_setup(
 
     for index, destination in enumerate(enemy_robots_destinations):
         yellow_params = get_move_update_control_params(
-            index, destination, Angle(radians=0), 0, params=yellow_params
+            index, destination, tbots.Angle.fromRadians(0), 0, params=yellow_params
         )
 
     simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(
@@ -139,9 +128,9 @@ def hrvo_setup(
     # Setup Robots
     simulated_test_runner.simulator_proto_unix_io.send_proto(
         WorldState,
-        create_world_state_from_state(
-            yellow_robot_states=enemy_robots,
-            blue_robot_states=friendly_robots,
+        create_world_state(
+            yellow_robot_locations=enemy_robots_positions,
+            blue_robot_locations=friendly_robots_positions,
             ball_location=ball_initial_pos,
             ball_velocity=ball_initial_vel,
         ),
@@ -153,20 +142,12 @@ def hrvo_setup(
     + "enemy_robots_positions,enemy_robots_destinations,timeout_s,run_till_end",
     [
         # robot moving straight with no obstacles
-        (
-            [Point(x_meters=-2.5, y_meters=0)],
-            [Point(x_meters=2.8, y_meters=0)],
-            [],
-            [],
-            [],
-            10,
-            False,
-        ),
+        ([tbots.Point(-2.5, 0)], [tbots.Point(2.8, 0)], [], [], [], 10, False,),
         # robot moving straight with no obstacles while turning from 0 to 180 degrees
         (
-            [Point(x_meters=-2.5, y_meters=0)],
-            [Point(x_meters=2.8, y_meters=0)],
-            [Angle(radians=math.pi)],
+            [tbots.Point(-2.5, 0)],
+            [tbots.Point(2.8, 0)],
+            [tbots.Angle.fromRadians(math.pi)],
             [],
             [],
             10,
@@ -174,38 +155,38 @@ def hrvo_setup(
         ),
         # robot moving straight with a moving enemy robot behind it
         (
-            [Point(x_meters=-2.3, y_meters=0)],
-            [Point(x_meters=2.8, y_meters=0)],
+            [tbots.Point(-2.3, 0)],
+            [tbots.Point(2.8, 0)],
             [],
-            [Point(x_meters=-2.5, y_meters=0)],
-            [Point(x_meters=-2.1, y_meters=0)],
+            [tbots.Point(-2.5, 0)],
+            [tbots.Point(-2.1, 0)],
             10,
             False,
         ),
         # robot moving straight with a moving enemy robot to its side
         (
-            [Point(x_meters=-2.5, y_meters=0)],
-            [Point(x_meters=2.8, y_meters=0)],
+            [tbots.Point(-2.5, 0)],
+            [tbots.Point(2.8, 0)],
             [],
-            [Point(x_meters=-1, y_meters=-0.8)],
-            [Point(x_meters=1, y_meters=0)],
+            [tbots.Point(-1, -0.8)],
+            [tbots.Point(1, 0)],
             10,
             False,
         ),
         # robot moving straight with a moving enemy robot moving straight towards it
         (
-            [Point(x_meters=-2.5, y_meters=0)],
-            [Point(x_meters=2.8, y_meters=0)],
+            [tbots.Point(-2.5, 0)],
+            [tbots.Point(2.8, 0)],
             [],
-            [Point(x_meters=2.8, y_meters=0)],
-            [Point(x_meters=2.5, y_meters=0)],
+            [tbots.Point(2.8, 0)],
+            [tbots.Point(2.5, 0)],
             10,
             False,
         ),
         # robot moving with a stationary friendly robot in front of it
         (
-            [Point(x_meters=-2.5, y_meters=0), Point(x_meters=2, y_meters=0)],
-            [Point(x_meters=2.7, y_meters=0), Point(x_meters=2, y_meters=0)],
+            [tbots.Point(-2.5, 0), tbots.Point(2, 0)],
+            [tbots.Point(2.7, 0), tbots.Point(2, 0)],
             [],
             [],
             [],
@@ -214,18 +195,18 @@ def hrvo_setup(
         ),
         # robot moving with a stationary enemy robot in front of it
         (
-            [Point(x_meters=0.7, y_meters=0)],
-            [Point(x_meters=2, y_meters=0)],
+            [tbots.Point(0.7, 0)],
+            [tbots.Point(2, 0)],
             [],
-            [Point(x_meters=1, y_meters=0)],
+            [tbots.Point(1, 0)],
             [],
             12,
             False,
         ),
         # robot moving straight with a moving friendly robot moving straight towards it
         (
-            [Point(x_meters=-2.5, y_meters=0), Point(x_meters=2.7, y_meters=0)],
-            [Point(x_meters=2.7, y_meters=0), Point(x_meters=-2.5, y_meters=0)],
+            [tbots.Point(-2.5, 0), tbots.Point(2.7, 0)],
+            [tbots.Point(2.7, 0), tbots.Point(-2.5, 0)],
             [],
             [],
             [],
@@ -235,9 +216,9 @@ def hrvo_setup(
         # robot moving straight with a moving friendly robot moving straight towards it
         # while both are turning from 0 to 180 degrees
         (
-            [Point(x_meters=-2.5, y_meters=0), Point(x_meters=2.7, y_meters=0)],
-            [Point(x_meters=2.7, y_meters=0), Point(x_meters=-2.5, y_meters=0)],
-            [Angle(radians=math.pi), Angle(radians=0)],
+            [tbots.Point(-2.5, 0), tbots.Point(2.7, 0)],
+            [tbots.Point(2.7, 0), tbots.Point(-2.5, 0)],
+            [tbots.Angle.fromRadians(math.pi), tbots.Angle.fromRadians(0)],
             [],
             [],
             10,
@@ -245,14 +226,10 @@ def hrvo_setup(
         ),
         # robot moving with a 3 enemy robot wall in front of it
         (
-            [Point(x_meters=0, y_meters=0)],
-            [Point(x_meters=2.7, y_meters=0)],
+            [tbots.Point(0, 0)],
+            [tbots.Point(2.7, 0)],
             [],
-            [
-                Point(x_meters=1, y_meters=0),
-                Point(x_meters=1, y_meters=0.3),
-                Point(x_meters=1, y_meters=-0.3),
-            ],
+            [tbots.Point(1, 0), tbots.Point(1, 0.3), tbots.Point(1, -0.3),],
             [],
             10,
             False,
@@ -260,30 +237,27 @@ def hrvo_setup(
         # robot moving with various stationary enemy robots in front of it
         # walls generated by range(start_x, start_x + step * num_robots, step)
         (
-            [Point(x_meters=2.8, y_meters=-1)],
-            [Point(x_meters=2.8, y_meters=1)],
+            [tbots.Point(2.8, -1)],
+            [tbots.Point(2.8, 1)],
             [],
-            [
-                Point(x_meters=float(x_meters) / 10, y_meters=0)
-                for x_meters in range(20, 32, 2)
-            ],
+            [tbots.Point(float(x_meters) / 10, 0) for x_meters in range(20, 32, 2)],
             [],
             25,
             True,
         ),
         # robot moving in a local minima (enemy robots in a curve around it)
         (
-            [Point(x_meters=0.7, y_meters=0)],
-            [Point(x_meters=2.7, y_meters=1)],
+            [tbots.Point(0.7, 0)],
+            [tbots.Point(2.7, 1)],
             [],
             [
-                Point(x_meters=1, y_meters=0),
-                Point(x_meters=1, y_meters=0.3),
-                Point(x_meters=1, y_meters=0.6),
-                Point(x_meters=0.7, y_meters=0.6),
-                Point(x_meters=1, y_meters=-0.3),
-                Point(x_meters=1, y_meters=-0.6),
-                Point(x_meters=0.7, y_meters=-0.6),
+                tbots.Point(1, 0),
+                tbots.Point(1, 0.3),
+                tbots.Point(1, 0.6),
+                tbots.Point(0.7, 0.6),
+                tbots.Point(1, -0.3),
+                tbots.Point(1, -0.6),
+                tbots.Point(0.7, -0.6),
             ],
             [],
             25,
@@ -291,24 +265,24 @@ def hrvo_setup(
         ),
         # robot moving in a local minima (enemy robots in a curve around it) with an opening in the middle
         (
-            [Point(x_meters=0.7, y_meters=0)],
-            [Point(x_meters=2.7, y_meters=1)],
+            [tbots.Point(0.7, 0)],
+            [tbots.Point(2.7, 1)],
             [],
             [
-                Point(x_meters=1.5, y_meters=0),
-                Point(x_meters=1, y_meters=0.3),
-                Point(x_meters=1, y_meters=0.6),
-                Point(x_meters=0.7, y_meters=0.6),
-                Point(x_meters=1, y_meters=-0.3),
-                Point(x_meters=1, y_meters=-0.6),
-                Point(x_meters=0.7, y_meters=-0.6),
+                tbots.Point(1.5, 0),
+                tbots.Point(1, 0.3),
+                tbots.Point(1, 0.6),
+                tbots.Point(0.7, 0.6),
+                tbots.Point(1, -0.3),
+                tbots.Point(1, -0.6),
+                tbots.Point(0.7, -0.6),
             ],
             [],
             10,
             False,
         ),
         # robot moving in a zig zag path around enemy robots
-        get_zig_zag_params(-2, 0.3, 3),
+        get_zig_zag_params(-2, 0.3, 3, 5),
         # friendly robots in a circle moving along each diameter
         (
             get_robot_circle_pos(1.5, 8, True),
@@ -324,7 +298,7 @@ def hrvo_setup(
         (
             get_robot_circle_pos(1.5, 8, True),
             get_robot_circle_pos(1.5, 8, False),
-            [Angle(radians=math.pi) for i in range(8)],
+            [tbots.Angle.fromRadians(math.pi) for i in range(8)],
             [],
             [],
             20,
@@ -438,7 +412,7 @@ def get_reached_destination_validation(robot_destinations):
             RobotEventuallyEntersRegionAndStops(
                 robot_id,
                 region=tbots.Circle(
-                    tbots.Point(destination.x_meters, destination.y_meters,), threshold
+                    tbots.Point(destination.x(), destination.y()), threshold
                 ),
                 num_ticks=10,
             )
@@ -468,8 +442,8 @@ def get_move_update_control_params(
     params = params if params else AssignedTacticPlayControlParams()
     params.assigned_tactics[robot_id].move.CopyFrom(
         MoveTactic(
-            destination=destination,
-            final_orientation=desired_orientation,
+            destination=Point(x_meters=destination.x(), y_meters=destination.y()),
+            final_orientation=Angle(radians=desired_orientation.toRadians()),
             final_speed=final_speed,
             dribbler_mode=DribblerMode.OFF,
             ball_collision_type=BallCollisionType.ALLOW,

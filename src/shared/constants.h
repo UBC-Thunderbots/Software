@@ -167,4 +167,4 @@ static const unsigned CONTROL_LOOP_HZ                  = 60u;
 static const unsigned NUM_GENEVA_ANGLES = 5;
 
 static const double ROBOT_COLLISION_BUFFER             = 0.005;
-static const double ROBOT_MAX_STATIONARY_SPEED_M_PER_S = 0.035;
+static const double ROBOT_MAX_STATIONARY_SPEED_M_PER_S = 0.01;
