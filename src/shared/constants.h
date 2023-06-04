@@ -114,7 +114,7 @@ static const unsigned int MAX_ROBOT_IDS = MAX_ROBOT_IDS_PER_SIDE * 2;
 static const unsigned NUM_CELLS_IN_BATTERY    = 3;
 static const unsigned NUM_BATTERIES_IN_SERIES = 2;
 static const double MAX_SINGLE_CELL_VOLTAGE   = 4.2;
-static const double MIN_SINGLE_CELL_VOLTAGE   = 3.2 + 0.1;  // +0.1v headroom
+static const double MIN_SINGLE_CELL_VOLTAGE   = 3.7 + 0.1;  // +0.1v headroom
 
 static const double MIN_BATTERY_VOLTAGE =
     MIN_SINGLE_CELL_VOLTAGE * NUM_CELLS_IN_BATTERY * NUM_BATTERIES_IN_SERIES;
