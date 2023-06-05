@@ -1,7 +1,5 @@
 #include "software/ai/hl/stp/play/ball_placement/ball_placement_play_fsm.h"
 
-const double BallPlacementPlayFSM::shot_velocity_threshold = 1.0;
-
 BallPlacementPlayFSM::BallPlacementPlayFSM(TbotsProto::AiConfig ai_config)
     : ai_config(ai_config),
       pivot_kick_tactic(std::make_shared<WallKickoffTactic>(ai_config)),
@@ -23,8 +21,7 @@ void BallPlacementPlayFSM::kickOffWall(const Update &event)
     // setup wall kickoff tactic for ball placing robot
     Point ball_pos            = event.common.world.ball().position();
     Rectangle field_lines     = event.common.world.field().fieldLines();
-    double kick_speed         = 3;
-    AutoChipOrKick auto_chick = {AutoChipOrKickMode::AUTOKICK, kick_speed};
+    AutoChipOrKick auto_chick = {AutoChipOrKickMode::AUTOKICK, WALL_KICKOFF_VELOCITY_M_PER_S};
 
     Angle kick_angle = calculateWallKickoffAngle(ball_pos, field_lines);
     pivot_kick_tactic->updateControlParams(ball_pos, kick_angle, auto_chick);
@@ -106,7 +103,7 @@ bool BallPlacementPlayFSM::shouldKickOffWall(const Update &event)
 bool BallPlacementPlayFSM::kickDone(const Update &event)
 {
     const auto ball_velocity = event.common.world.ball().velocity().length();
-    return (ball_velocity > shot_velocity_threshold) && !shouldKickOffWall(event);
+    return (ball_velocity > SHOT_VELOCITY_THRESHOLD_M_PER_S) && !shouldKickOffWall(event);
 }
 
 bool BallPlacementPlayFSM::ballPlaced(const Update &event)

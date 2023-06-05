@@ -141,5 +141,6 @@ struct BallPlacementPlayFSM
     std::shared_ptr<PlaceBallTactic> place_ball_tactic;
     std::shared_ptr<MoveTactic> retreat_tactic;
     std::vector<std::shared_ptr<PlaceBallMoveTactic>> move_tactics;
-    static double const shot_velocity_threshold;
+    constexpr static double const SHOT_VELOCITY_THRESHOLD_M_PER_S = 1.0;
+    constexpr static double const WALL_KICKOFF_VELOCITY_M_PER_S = 3.0;
 };
