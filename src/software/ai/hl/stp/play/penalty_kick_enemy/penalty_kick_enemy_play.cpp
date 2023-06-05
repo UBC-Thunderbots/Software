@@ -4,8 +4,8 @@
 #include "software/util/generic_factory/generic_factory.h"
 
 PenaltyKickEnemyPlay::PenaltyKickEnemyPlay(TbotsProto::AiConfig config)
-    : Play(config, true), 
-      fsm{PenaltyKickEnemyPlayFSM{config}}, 
+    : Play(config, true),
+      fsm{PenaltyKickEnemyPlayFSM{config}},
       control_params{.goalie_tactic = goalie_tactic}
 {
 }
@@ -13,7 +13,7 @@ PenaltyKickEnemyPlay::PenaltyKickEnemyPlay(TbotsProto::AiConfig config)
 void PenaltyKickEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
                                           const World &world)
 {
-    // This function doesn't get called, it should be removed once coroutines 
+    // This function doesn't get called, it should be removed once coroutines
     // are phased out
 }
 

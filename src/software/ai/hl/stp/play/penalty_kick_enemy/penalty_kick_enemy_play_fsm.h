@@ -46,7 +46,8 @@ struct PenaltyKickEnemyPlayFSM
      *
      * @param event the FSM event
      *
-     * @return whether the robots have gotten into position to start the enemy penalty kick
+     * @return whether the robots have gotten into position to start the enemy penalty
+     * kick
      */
     bool setupPositionDone(const Update& event);
 
@@ -68,10 +69,9 @@ struct PenaltyKickEnemyPlayFSM
             // src_state + event [guard] / action = dest_state
             *SetupPositionState_S + Update_E[!setupPositionDone_G] / setupPosition_A =
                 SetupPositionState_S,
-            SetupPositionState_S + Update_E[setupPositionDone_G] / defendKick_A = 
+            SetupPositionState_S + Update_E[setupPositionDone_G] / defendKick_A =
                 DefendKickState_S,
-            DefendKickState_S + Update_E / defendKick_A,
-            X + Update_E = X);
+            DefendKickState_S + Update_E / defendKick_A, X + Update_E = X);
     }
 
    private:

@@ -4,15 +4,15 @@ cc_library(
     name = "penalty_kick_enemy_play",
     srcs = [
         "penalty_kick_enemy_play.cpp",
-        "penalty_kick_enemy_play_fsm.cpp"
+        "penalty_kick_enemy_play_fsm.cpp",
     ],
     hdrs = [
         "penalty_kick_enemy_play.h",
-        "penalty_kick_enemy_play_fsm.h"
+        "penalty_kick_enemy_play_fsm.h",
     ],
     deps = [
         "//shared:constants",
-        "//software/ai/hl/stp/play:play",
+        "//software/ai/hl/stp/play",
         "//software/ai/hl/stp/tactic/goalie:goalie_tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",
         "//software/logger",

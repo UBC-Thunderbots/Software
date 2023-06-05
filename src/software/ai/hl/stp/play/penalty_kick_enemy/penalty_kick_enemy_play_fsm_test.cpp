@@ -20,7 +20,8 @@ TEST(PenaltyKickEnemyPlayFSMTest, test_transitions)
     TbotsProto::AiConfig ai_config;
 
     int num_tactics = 5;
-    std::shared_ptr<GoalieTactic> goalie_tactic = std::make_shared<GoalieTactic>(ai_config);
+    std::shared_ptr<GoalieTactic> goalie_tactic =
+        std::make_shared<GoalieTactic>(ai_config);
 
     FSM<PenaltyKickEnemyPlayFSM> fsm(PenaltyKickEnemyPlayFSM{ai_config});
 
