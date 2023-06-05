@@ -28,6 +28,7 @@ void PenaltyKickEnemyPlayFSM::setupPosition(const Update &event)
             event.common.world.field().enemyGoalCenter().toVector().orientation(), 0);
     }
 
+    // Move goalie to the goal line
     event.control_params.goalie_tactic->updateControlParams(true);
 
     tactics_to_run[0].insert(tactics_to_run[0].end(), move_tactics.begin(),
@@ -37,6 +38,7 @@ void PenaltyKickEnemyPlayFSM::setupPosition(const Update &event)
 
 void PenaltyKickEnemyPlayFSM::defendKick(const Update &event)
 {
+    // Allow goalie to move freely and defend against penalty kick
     event.control_params.goalie_tactic->updateControlParams(false);
 }
 
