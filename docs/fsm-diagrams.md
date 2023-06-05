@@ -61,7 +61,9 @@ stateDiagram-v2
 classDef terminate fill:white,color:black,font-weight:bold
 direction LR
 [*] --> StartState
-StartState --> AttemptShotState : <i>startLookingForPass</i>
+StartState --> AttemptShotState : [shouldSingleTouch]\n<i>singleTouchStartLookingForPass</i>
+StartState --> AttemptShotState : [!hasPassInProgress]\n<i>startLookingForPass</i>
+StartState --> TakePassState : [hasPassInProgress]\n<i>maintainPassInProgress</i>
 AttemptShotState --> TakePassState : [passFound]\n<i>takePass</i>
 AttemptShotState --> Terminate:::terminate : [tookShot]
 AttemptShotState --> AttemptShotState : [!passFound]\n<i>lookForPass</i>
@@ -79,7 +81,12 @@ Terminate:::terminate --> AttemptShotState : <i>startLookingForPass</i>
 stateDiagram-v2
 classDef terminate fill:white,color:black,font-weight:bold
 direction LR
-[*] --> DribbleFSM
+[*] --> MoveFSM
+MoveFSM --> DribbleFSM : [!shouldSingleTouch]\n<i>keepAway</i>
+MoveFSM --> KickFSM : [shouldKick]\n<i>singleTouchKick</i>
+MoveFSM --> MoveFSM : [!shouldKick]\n<i>alignToBall</i>
+KickFSM --> KickFSM : <i>singleTouchKick</i>
+KickFSM --> Terminate:::terminate
 DribbleFSM --> PivotKickFSM : [shouldKick]\n<i>pivotKick</i>
 DribbleFSM --> DribbleFSM : [!shouldKick]\n<i>keepAway</i>
 PivotKickFSM --> PivotKickFSM : <i>pivotKick</i>
