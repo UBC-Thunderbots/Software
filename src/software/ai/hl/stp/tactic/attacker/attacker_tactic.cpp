@@ -35,7 +35,8 @@ void AttackerTactic::updateControlParams(std::optional<Point> chip_target)
     this->chip_target = chip_target;
 }
 
-void AttackerTactic::updateControlParams(bool should_single_touch) {
+void AttackerTactic::updateControlParams(bool should_single_touch)
+{
     this->should_single_touch = should_single_touch;
 }
 
@@ -66,11 +67,11 @@ void AttackerTactic::updatePrimitive(const TacticUpdate& tactic_update, bool res
     }
 
     AttackerFSM::ControlParams control_params{
-            .best_pass_so_far    = best_pass_so_far,
-            .pass_committed      = pass_committed,
-            .shot                = shot,
-            .chip_target         = chip_target,
-            .should_single_touch = should_single_touch,
+        .best_pass_so_far    = best_pass_so_far,
+        .pass_committed      = pass_committed,
+        .shot                = shot,
+        .chip_target         = chip_target,
+        .should_single_touch = should_single_touch,
     };
 
     fsm_map.at(tactic_update.robot.id())

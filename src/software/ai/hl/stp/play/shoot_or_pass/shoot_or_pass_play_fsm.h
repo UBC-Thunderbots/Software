@@ -160,8 +160,8 @@ struct ShootOrPassPlayFSM
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *StartState_S + Update_E[shouldSingleTouch_G] / singleTouchStartLookingForPass_A =
-                AttemptShotState_S,
+            *StartState_S + Update_E[shouldSingleTouch_G] /
+                                singleTouchStartLookingForPass_A = AttemptShotState_S,
             StartState_S + Update_E[!hasPassInProgress_G] / startLookingForPass_A =
                 AttemptShotState_S,
             StartState_S + Update_E[hasPassInProgress_G] / maintainPassInProgress_A =

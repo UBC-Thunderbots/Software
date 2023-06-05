@@ -24,8 +24,8 @@ TEST(AttackerFSMTest, test_transitions)
     // robot far from attacker point
     fsm.process_event(AttackerFSM::Update(
         control_params, TacticUpdate(
-                robot, world, [](std::unique_ptr<TbotsProto::Primitive>) {},
-                TEST_UTIL_CREATE_MOTION_CONTROL_NO_DEST)));
+                            robot, world, [](std::unique_ptr<TbotsProto::Primitive>) {},
+                            TEST_UTIL_CREATE_MOTION_CONTROL_NO_DEST)));
     EXPECT_TRUE(fsm.is(boost::sml::state<DribbleFSM>));
 
     fsm.process_event(AttackerFSM::Update(
