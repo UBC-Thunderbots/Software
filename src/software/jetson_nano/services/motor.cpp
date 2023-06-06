@@ -136,8 +136,9 @@ MotorService::~MotorService() {}
 void MotorService::setup()
 {
     const auto now = std::chrono::system_clock::now();
-    if (tracked_motor_fault_start_time_.has_value() 
-            && (tracked_motor_fault_start_time_.value() - now).count() < MOTOR_FAULT_TIME_THRESHOLD_S)
+    if (tracked_motor_fault_start_time_.has_value() &&
+        (tracked_motor_fault_start_time_.value() - now).count() <
+            MOTOR_FAULT_TIME_THRESHOLD_S)
     {
         num_tracked_motor_resets_++;
     }
