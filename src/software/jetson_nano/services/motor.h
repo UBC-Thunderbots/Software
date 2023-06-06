@@ -309,7 +309,7 @@ class MotorService
     static const uint8_t NUM_MOTORS       = NUM_DRIVE_MOTORS + 1;
 
     static const int MOTOR_FAULT_TIME_THRESHOLD_S = 60;
-    static const int MOTOR_FAULT_THRESHOLD        = 3;
+    static const int MOTOR_FAULT_THRESHOLD_COUNT  = 3;
 
     // SPI Trinamic Motor Driver Paths (indexed with chip select above)
     static constexpr const char* SPI_PATHS[] = {"/dev/spidev0.0", "/dev/spidev0.1",

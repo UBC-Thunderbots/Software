@@ -136,25 +136,20 @@ MotorService::~MotorService() {}
 void MotorService::setup()
 {
     const auto now = std::chrono::system_clock::now();
-    if (tracked_motor_fault_start_time_.has_value())
+    if (tracked_motor_fault_start_time_.has_value() 
+            && (tracked_motor_fault_start_time_.value() - now).count() < MOTOR_FAULT_TIME_THRESHOLD_S)
     {
-        if ((tracked_motor_fault_start_time_.value() - now).count() <
-            MOTOR_FAULT_TIME_THRESHOLD_S)
-        {
-            num_tracked_motor_resets_++;
-        }
-
-        tracked_motor_fault_start_time_ = std::make_optional(now);
-        num_tracked_motor_resets_       = 1;
+        num_tracked_motor_resets_++;
     }
     else
     {
         tracked_motor_fault_start_time_ = std::make_optional(now);
+        num_tracked_motor_resets_       = 1;
     }
 
 
     if (tracked_motor_fault_start_time_.has_value() &&
-        num_tracked_motor_resets_ > MOTOR_FAULT_THRESHOLD)
+        num_tracked_motor_resets_ > MOTOR_FAULT_THRESHOLD_COUNT)
     {
         LOG(FATAL) << "In the last "
                    << (now - tracked_motor_fault_start_time_.value()).count()
