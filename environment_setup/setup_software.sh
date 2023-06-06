@@ -161,8 +161,8 @@ fi
 print_status_msg "Done PlatformIO Setup"
 
 print_status_msg "Installing GLIBC-2.35"
-wget -c http://ftp.gnu.org/gnu/libc/glibc-2.35.tar.gz -O /tmp/glibc-2.35.tar.gz
-tar -zxvf /tmp/glibc-2.35.tar.gz -C /tmp/
+wget -nv -c http://ftp.gnu.org/gnu/libc/glibc-2.35.tar.gz -O /tmp/glibc-2.35.tar.gz
+tar -zxf /tmp/glibc-2.35.tar.gz -C /tmp/
 cd /tmp/glibc-2.35/
 mkdir build
 cd build/
@@ -170,5 +170,6 @@ sudo ../configure --prefix=/opt/glibc
 sudo make
 sudo make install
 cd "$CURR_DIR"
+export LD_LIBRARY PATH=/opt/glibc/bin:$LD_LIBRARY PATH
 print_status_msg "Done installing GLIBC-2.35"
 print_status_msg "Done Software Setup, please reboot for changes to take place"
