@@ -159,4 +159,16 @@ if ! sudo /usr/bin/python3.8 -m pip install --prefix /usr/local platformio==6.0.
 fi
 
 print_status_msg "Done PlatformIO Setup"
+
+print_status_msg "Installing GLIBC-2.35"
+wget -c http://ftp.gnu.org/gnu/libc/glibc-2.35.tar.gz -O /tmp/glibc-2.35.tar.gz
+tar -zxvf /tmp/glibc-2.35.tar.gz -C /tmp/
+cd /tmp/glibc-2.35/
+mkdir build
+cd build/
+sudo ../configure --prefix=/opt/glibc
+sudo make
+sudo make install
+cd "$CURR_DIR"
+print_status_msg "Done installing GLIBC-2.35"
 print_status_msg "Done Software Setup, please reboot for changes to take place"
