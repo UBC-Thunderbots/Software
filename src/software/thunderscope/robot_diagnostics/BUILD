@@ -37,9 +37,20 @@ py_library(
     name = "robot_info",
     srcs = ["robot_info.py"],
     deps = [
+        ":motor_fault_view",
         "//software/thunderscope:constants",
         "//software/thunderscope:thread_safe_buffer",
         requirement("pyqtgraph"),
+    ],
+)
+
+py_library(
+    name = "motor_fault_view",
+    srcs = ["motor_fault_view.py"],
+    deps = [
+        "//software/thunderscope/common:common_widgets",
+        "//software/thunderscope/common:proto_parameter_tree_util",
+        "//software/thunderscope/robot_diagnostics/motor_fault_icons:motor_fault_icon_loader",
     ],
 )
 

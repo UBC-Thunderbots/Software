@@ -73,7 +73,11 @@ class RobotViewComponent(QWidget):
 
         :param robot_status: the new message data to update the widget with
         """
-        self.robot_info.update(robot_status.power_status, robot_status.error_code)
+        self.robot_info.update(
+            robot_status.motor_status,
+            robot_status.power_status,
+            robot_status.error_code,
+        )
         if self.robot_status:
             self.robot_status.update(robot_status)
 
