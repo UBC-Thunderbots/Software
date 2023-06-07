@@ -27,8 +27,7 @@ std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
     move_primitive_msg->mutable_move()->set_max_speed_m_per_s(
         static_cast<float>(convertMaxAllowedSpeedModeToMaxAllowedSpeed(
             max_allowed_speed_mode, robot_constants)));
-    move_primitive_msg->mutable_move()->set_should_drive_forward(
-        should_drive_forward);  // TODO
+    move_primitive_msg->mutable_move()->set_should_drive_forward(should_drive_forward);
 
     *(move_primitive_msg->mutable_move()->mutable_final_angle()) =
         *createAngleProto(final_angle);
