@@ -42,6 +42,7 @@ host_software_packages=(
     default-jdk # Needed for Bazel to run properly
     gcc-9 # We use gcc 9.3.0
     libstdc++6-9-dbg
+    gawk # for building GLIBC
     git # required for build
     g++-9
     kcachegrind # This lets us view the profiles output by callgrind
@@ -161,15 +162,27 @@ fi
 print_status_msg "Done PlatformIO Setup"
 
 print_status_msg "Installing GLIBC-2.35"
+wget -nv -c http://ftp.gnu.org/gnu/bison/bison-3.8.2.tar.gz -O /tmp/bison-3.8.2
+tar -zxf /tmp/bison-3.8.2 -C /tmp/
+cd /tmp/bison-3.8.2
+mkdir build
+cd build
+../configure --prefix=/opt/bison-3.8.2
+make
+sudo make install
+cd "$CURR_DIR"
+export PATH=/opt/bison-3.8.2/bin:$PATH
+
 wget -nv -c http://ftp.gnu.org/gnu/libc/glibc-2.35.tar.gz -O /tmp/glibc-2.35.tar.gz
 tar -zxf /tmp/glibc-2.35.tar.gz -C /tmp/
 cd /tmp/glibc-2.35/
 mkdir build
 cd build/
-sudo ../configure --prefix=/opt/glibc
-sudo make
+../configure --prefix=/opt/glibc
+make
 sudo make install
 cd "$CURR_DIR"
-export LD_LIBRARY PATH=/opt/glibc/bin:$LD_LIBRARY PATH
+echo "export LD_LIBRARY_PATH=/opt/glibc/lib:$LD_LIBRARY_PATH" >> ~/.bashrc
+
 print_status_msg "Done installing GLIBC-2.35"
 print_status_msg "Done Software Setup, please reboot for changes to take place"
