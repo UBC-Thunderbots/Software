@@ -79,7 +79,7 @@ struct BallPlacementPlayFSM
      *
      * @param event the BallPlacementPlayFSM Update event
      *
-     * @return whether the kick has been performed
+     * @return whether the ball has been placed into the desired position
      */
     bool ballPlaced(const Update& event);
 
