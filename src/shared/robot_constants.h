@@ -66,24 +66,30 @@ typedef struct RobotConstants
     // The distance from one end of the dribbler to the other [meters]
     float dribbler_width_meters;
 
-    // The maximum speed achievable by our robots, in metres per second [m/s]
-    float robot_max_speed_m_per_s;
-
-    // The maximum angular speed achievable by our robots [rad/s]
-    float robot_max_ang_speed_rad_per_s;
-
-    // The maximum acceleration achievable by our robots [m/s^2]
-    float robot_max_acceleration_m_per_s_2;
-
-    // The maximum angular acceleration achievable by our robots [rad/s^2]
-    float robot_max_ang_acceleration_rad_per_s_2;
-
     // Indefinite dribbler mode sets a speed that can be maintained indefinitely [rpm]
     float indefinite_dribbler_speed_rpm;
 
     // Max force dribbler mode sets the speed that applies the maximum amount of force on
     // the ball [rpm]
     float max_force_dribbler_speed_rpm;
+
+    // The maximum acceleration achievable by our motors [m/s^2]
+    float motor_max_acceleration_m_per_s_2;
+
+    // The maximum speed achievable by our robots, in metres per second [m/s]
+    float robot_max_speed_m_per_s;
+
+    // The maximum acceleration achievable by our robots [m/s^2]
+    float robot_max_acceleration_m_per_s_2;
+
+    // The maximum deceleration (break) achievable by our robots [m/s^2]
+    float robot_max_deceleration_m_per_s_2;
+
+    // The maximum angular speed achievable by our robots [rad/s]
+    float robot_max_ang_speed_rad_per_s;
+
+    // The maximum angular acceleration achievable by our robots [rad/s^2]
+    float robot_max_ang_acceleration_rad_per_s_2;
 
     // The radius of the wheel, in meters
     float wheel_radius_meters;

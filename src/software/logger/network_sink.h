@@ -4,6 +4,7 @@
 #include <iostream>
 
 #include "proto/robot_log_msg.pb.h"
+#include "proto/visualization.pb.h"
 #include "software/networking/threaded_proto_udp_sender.hpp"
 
 
@@ -34,5 +35,7 @@ class NetworkSink
 
    private:
     std::unique_ptr<ThreadedProtoUdpSender<TbotsProto::RobotLog>> log_output;
+    std::unique_ptr<ThreadedProtoUdpSender<TbotsProto::HRVOVisualization>>
+        log_visualize_output;
     int robot_id;
 };

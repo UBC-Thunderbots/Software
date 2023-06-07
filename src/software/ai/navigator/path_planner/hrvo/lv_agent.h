@@ -22,11 +22,15 @@ class LVAgent : public Agent
      * @param radius                The radius of this agent.
      * @param max_speed             The maximum speed of this agent.
      * @param max_accel             The maximum acceleration of this agent.
+     * @param max_decel             The maximum deceleration of this agent.
+     * @param max_angular_speed     The maximum angular speed of this agent.
+     * @param max_angular_accel     The maximum angular acceleration of this agent.
      * @param max_radius_inflation  The maximum amount which the radius of this agent can
      * inflate.
      */
     LVAgent(RobotId robot_id, const RobotState &robot_state, const RobotPath &path,
-            double radius, double max_speed, double max_accel,
+            double radius, double max_speed, double max_accel, double max_decel,
+            double max_angular_speed, double max_angular_accel,
             double max_radius_inflation);
 
     /**
@@ -37,6 +41,14 @@ class LVAgent : public Agent
      */
     void computeNewVelocity(const std::map<unsigned int, std::shared_ptr<Agent>> &robots,
                             Duration time_step) override;
+
+    /**
+     * Computes the new angular velocity of this agent.
+     *
+     * @param time_step the time step to use
+     */
+    void computeNewAngularVelocity(Duration time_step) override;
+
 
     /**
      * Create the velocity obstacle which other_agent should see for this Agent
