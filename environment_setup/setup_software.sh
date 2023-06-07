@@ -183,6 +183,7 @@ make
 sudo make install
 cd "$CURR_DIR"
 echo "export LD_LIBRARY_PATH=/opt/glibc/lib:$LD_LIBRARY_PATH" >> ~/.bashrc
+source ~/.bashrc
 
 print_status_msg "Done installing GLIBC-2.35"
 print_status_msg "Done Software Setup, please reboot for changes to take place"
