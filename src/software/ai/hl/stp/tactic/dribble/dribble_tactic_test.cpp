@@ -248,14 +248,13 @@ TEST_F(DribbleTacticTest, test_dribble_dest_and_orientation_around_rectangle)
 }
 
 // TODO (#2690): robot gets stuck in the corner of the defense area
-TEST_F(
-    DribbleTacticTest,
-    DISABLED_test_dribble_dest_and_orientation_around_rectangle_with_excessive_dribbling)
+TEST_F(DribbleTacticTest,
+       test_dribble_dest_and_orientation_around_rectangle_with_excessive_dribbling)
 {
-    Point initial_position    = Point(3, -3);
-    Point dribble_destination = Point(4, 2.5);
+    Point dribble_destination = Point(3, 2);
+    Point initial_position    = Point(3, 2.5);
     Angle dribble_orientation = Angle::half();
-    BallState ball_state(Point(4, -2.5), Vector(0, 0));
+    BallState ball_state(Point(4.2, -2.5), Vector(0, 0));
     auto friendly_robots =
         TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5), initial_position});
     auto tactic = std::make_shared<DribbleTactic>(ai_config);
