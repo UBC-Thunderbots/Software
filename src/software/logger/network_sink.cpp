@@ -34,10 +34,10 @@ void NetworkSink::sendOneLogToNetwork(g3::LogMessage log)
     auto log_msg_proto = std::make_unique<TbotsProto::RobotLog>();
     TbotsProto::LogLevel log_level_proto;
 
-    if (log.level().value == VISUALIZE.value)
+    if (log._level.value == VISUALIZE.value)
     {
         TbotsProto::HRVOVisualization log_msg_proto;
-        std::string msg       = log_entry.get().message();
+        std::string msg       = log.message();
         size_t file_name_pos  = msg.find(PROTO_MSG_TYPE_DELIMITER);
         std::string file_name = msg.substr(0, file_name_pos);
 
