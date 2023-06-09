@@ -92,25 +92,6 @@ class MotorService
 
     void setTargetVelocity(uint8_t chip_select, int target);
 
-
-
-    /**
-     * Ramp the velocity over the given timestep and set the target velocity on the motor.
-     *
-     * NOTE: This function has no state.
-     * Also NOTE: This function handles all electrical rpm to meters/second conversion.
-     *
-     * @param velocity_target The target velocity in m/s
-     * @param velocity_current The current velocity m/s
-     * @param time_to_ramp The time allocated for acceleration in seconds
-     *
-     */
-    WheelSpace_t rampWheelVelocity(const WheelSpace_t& current_wheel_velocity,
-                                   const EuclideanSpace_t& target_euclidean_velocity,
-                                   double max_allowable_wheel_velocity,
-                                   double allowed_acceleration,
-                                   const double& time_to_ramp);
-
     /**
      * Log the driver fault in a human readable log msg
      *
@@ -119,11 +100,38 @@ class MotorService
      */
     bool checkDriverFault(uint8_t motor);
 
+    /**
+     * Sets up motor as drive motor controllers
+     *
+     * @param motor drive motor number
+     */
     void setUpDriveMotor(uint8_t motor);
 
+    /**
+     * Wrapper function that writes int to the TMC4671
+     * @param motor drive motor number
+     * @param address motor address
+     * @param value write value
+     */
     void writeIntToTMC4671(uint8_t motor, uint8_t address, int32_t value);
+
+    /**
+     * Wrapper function that reads int from the TMC4671
+     *
+     * @param motor drive motor number
+     * @param address motor address
+     * @return read value
+     */
     int readIntFromTMC4671(uint8_t motor, uint8_t address);
+
+    /**
+     * Reads the velocity from the TMC4671
+     *
+     * @param motor drive motor number
+     * @return double velocity value
+     */
     double readVelocityFromTMC4671(uint8_t motor);
+
     static constexpr double MECHANICAL_MPS_PER_ELECTRICAL_RPM = 0.000111;
     static constexpr double ELECTRICAL_RPM_PER_MECHANICAL_MPS = 1 / MECHANICAL_MPS_PER_ELECTRICAL_RPM;
 

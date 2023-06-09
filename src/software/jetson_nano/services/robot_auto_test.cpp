@@ -18,7 +18,7 @@ extern "C"
 }
 
 std::unique_ptr<MotorService>
-        motor_service_;  // TODO: loop_hz is not being used in motor service
+        motor_service_;
 std::unique_ptr<PowerService> power_service_;
 RobotConstants_t robot_constants_;
 int read_value;
@@ -32,8 +32,7 @@ static const uint8_t BACK_RIGHT_MOTOR_CHIP_SELECT  = 2;
 static const uint8_t CHIP_SELECT[] = {FRONT_LEFT_MOTOR_CHIP_SELECT, FRONT_RIGHT_MOTOR_CHIP_SELECT, BACK_LEFT_MOTOR_CHIP_SELECT, BACK_RIGHT_MOTOR_CHIP_SELECT};
 
 int main(int argc, char **argv) {
-    std::cout << "running on the jetson nano!" << std::endl;
-    std::cout << "running ansible re-build robot_auto_test_binary" << std::endl;
+    LOG(INFO) << "Running on the Jetson Nano!";
 
     // Testing Motor board SPI transfer
     for (uint8_t chip_select : CHIP_SELECT) {
