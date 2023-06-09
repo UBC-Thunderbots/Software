@@ -247,12 +247,11 @@ TEST_F(DribbleTacticTest, test_dribble_dest_and_orientation_around_rectangle)
             Duration::fromSeconds(25));
 }
 
-// TODO (#2690): robot gets stuck in the corner of the defense area
 TEST_F(DribbleTacticTest,
        test_dribble_dest_and_orientation_around_rectangle_with_excessive_dribbling)
 {
     Point dribble_destination = Point(3, 2);
-    Point initial_position    = Point(3, 2.5);
+    Point initial_position    = Point(4.5, -3.0);
     Angle dribble_orientation = Angle::half();
     BallState ball_state(Point(4.2, -2.5), Vector(0, 0));
     auto friendly_robots =
