@@ -31,34 +31,9 @@ cc_library(
     ],
 )
 
-# We aren't able to have a non-testonly rule depend on a testonly rule
-cc_test(
+cc_binary(
     name = "robot_auto_test",
     srcs = ["robot_auto_test.cpp"],
-    linkstatic = True,
-    deps = [
-        ":motor",
-        ":power",
-        "//proto/message_translation:tbots_geometry",
-        "//proto/primitive:primitive_msg_factory",
-        "//shared:robot_constants",
-        "//shared/test_util:tbots_gtest_main",
-        "//software/jetson_nano:primitive_executor",
-        "//software/jetson_nano/services/network:power_service_exception",
-        "@trinamic",
-    ],
-)
-
-genrule(
-    name = "robot_auto_test_invoker",
-    srcs = [":robot_auto_test"],
-    outs = ["robot_auto_test.tar"],
-    local = True,
-)
-
-cc_binary(
-    name = "robot_auto_test_binary",
-    srcs = ["robot_auto_test_binary.cpp"],
     linkopts = [
         "-lpthread",
         "-lrt",
@@ -69,7 +44,6 @@ cc_binary(
         "//proto/message_translation:tbots_geometry",
         "//proto/primitive:primitive_msg_factory",
         "//shared:robot_constants",
-        #        "//shared/test_util:tbots_gtest_main",
         "//software/jetson_nano:primitive_executor",
         "//software/jetson_nano/services/network:power_service_exception",
         "@trinamic",

@@ -36,14 +36,14 @@
 
         - name: Sync Binary
           ansible.posix.synchronize:
-            src: ../../services/robot_auto_test_binary
+            src: ../../services/robot_auto_test
             dest: ~/thunderbots_binaries/
             recursive: yes
             copy_links: yes
           tags: always
 
         - name: Run Binary
-          command: "./robot_auto_test_binary"
+          command: "./robot_auto_test"
           args:
             chdir: ~/thunderbots_binaries
           register: robot_auto_test_output
