@@ -34,7 +34,7 @@
             msg: "{{ansible_search_path}}"
           tags: always
 
-        - name: Sync Binaries
+        - name: Sync Binary
           ansible.posix.synchronize:
 #            src: /home/joshua/Repositories/Thunderbots/Software/src/bazel-bin/software/jetson_nano/services/robot_auto_test
 #            src: ../../../services/robot_auto_test.runfiles/__main__/software/jetson_nano/services/robot_auto_test
@@ -49,25 +49,24 @@
 #            loop_var: service_name
 #          when: "'sync' in actions"
           tags: always
-#
-#        - name: Unzipping python binaries
-#          command: 'unzip ~/thunderbots_binaries/*.zip'
-#          register: result
-#          args:
-#            chdir: ~/thunderbots_binaries
-#          when: "'sync' in actions"
-#          ignore_errors: yes # Remove when display is re-enabled
 
-#        - name: Start Services
-#          become: true
-#          become_method: sudo
-#          ansible.builtin.systemd:
+# A bit buggy
+        - name: Run Binary
+          command: "./robot_auto_test_binary"
+          args:
+            chdir: ~/thunderbots_binaries
+
+        - name: Start Services
+          become: true
+          become_method: sudo
+          ansible.builtin.systemd:
 #            name: "{{ service_name }}"
-#            masked: no
-#            daemon_reload: yes
-#            state: started
+            name: "thunderloop.service"
+            masked: no
+            daemon_reload: yes
+            state: started
 #          with_items: "{{ services }}"
 #          loop_control:
 #            loop_var: service_name
 #          when: "'start' in actions"
-#          tags: always
+          tags: always
