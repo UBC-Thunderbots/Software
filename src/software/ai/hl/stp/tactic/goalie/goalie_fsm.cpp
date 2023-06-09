@@ -83,8 +83,8 @@ Rectangle GoalieFSM::getNoChipRectangle(const Field &field)
         field.friendlyGoalpostPos() + Vector(2 * ROBOT_MAX_RADIUS_METERS, 0));
 }
 
-Point GoalieFSM::findGoodChipTarget(const World &world,
-                                    const TbotsProto::GoalieTacticConfig &goalie_tactic_config)
+Point GoalieFSM::findGoodChipTarget(
+    const World &world, const TbotsProto::GoalieTacticConfig &goalie_tactic_config)
 {
     // Default chip target is the enemy goal
     Point chip_target = world.field().enemyGoalCenter();
