@@ -1,6 +1,3 @@
-#ifndef THUNDERBOTS_SOFTWARE_POWER_SERVICE_EXCEPTION_H
-#define THUNDERBOTS_SOFTWARE_POWER_SERVICE_EXCEPTION_H
-
 #include <exception>
 #include <string>
 
@@ -11,6 +8,3 @@ public:
 private:
     std::string message_;
 };
-
-
-#endif //THUNDERBOTS_SOFTWARE_POWER_SERVICE_EXCEPTION_H

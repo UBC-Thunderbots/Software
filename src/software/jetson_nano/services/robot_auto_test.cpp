@@ -1,5 +1,3 @@
-//#include <gtest/gtest.h>
-
 #include "shared/2021_robot_constants.h"
 #include "shared/constants.h"
 #include "software/jetson_nano/services/motor.h"
@@ -47,7 +45,6 @@ int main(int argc, char **argv) {
             LOG(FATAL) << "Detected Motor Fault";
         }
 
-        // We do not need to set up or calibrate the motors
         motor_service_->writeIntToTMC4671(chip_select, TMC4671_CHIPINFO_ADDR, 0x000000000);
         read_value = motor_service_->readIntFromTMC4671(chip_select, TMC4671_CHIPINFO_DATA);
 
