@@ -36,37 +36,29 @@
 
         - name: Sync Binary
           ansible.posix.synchronize:
-#            src: /home/joshua/Repositories/Thunderbots/Software/src/bazel-bin/software/jetson_nano/services/robot_auto_test
-#            src: ../../../services/robot_auto_test.runfiles/__main__/software/jetson_nano/services/robot_auto_test
-#            src: /home/joshua/Repositories/Thunderbots/Software/src/bazel-bin/software/jetson_nano/services/robot_auto_test_binary
             src: ../../services/robot_auto_test_binary
-#            src: ../../services/robot_auto_test
             dest: ~/thunderbots_binaries/
             recursive: yes
             copy_links: yes
-#          with_items: "{{ services }}"
-#          loop_control:
-#            loop_var: service_name
-#          when: "'sync' in actions"
           tags: always
 
-# A bit buggy
         - name: Run Binary
           command: "./robot_auto_test_binary"
           args:
             chdir: ~/thunderbots_binaries
+          register: robot_auto_test_output
+          ignore_errors: true
+
+        - name: Print Binary Output
+          debug:
+            var: robot_auto_test_output.stdout
 
         - name: Start Services
           become: true
           become_method: sudo
           ansible.builtin.systemd:
-#            name: "{{ service_name }}"
             name: "thunderloop.service"
             masked: no
             daemon_reload: yes
             state: started
-#          with_items: "{{ services }}"
-#          loop_control:
-#            loop_var: service_name
-#          when: "'start' in actions"
           tags: always
