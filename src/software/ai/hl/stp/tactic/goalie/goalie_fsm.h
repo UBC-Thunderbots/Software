@@ -84,8 +84,8 @@ struct GoalieFSM
      *
      * @return a point on the field that is a good place to chip to
      */
-    static Point findGoodChipTarget(const World &world,
-                                    const TbotsProto::GoalieTacticConfig &goalie_tactic_config);
+    static Point findGoodChipTarget(
+        const World &world, const TbotsProto::GoalieTacticConfig &goalie_tactic_config);
 
     /**
      * Guard that checks if the ball is moving faster than the time_to_panic threshold
