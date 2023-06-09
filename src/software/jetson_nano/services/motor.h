@@ -90,6 +90,12 @@ class MotorService
      */
     void setUpMotors();
 
+    /**
+     * Sets the target velocity for the motor
+     *
+     * @param chip_select motor chip select
+     * @param target int target wheel velocity
+     */
     void setTargetVelocity(uint8_t chip_select, int target);
 
     /**
