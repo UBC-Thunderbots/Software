@@ -19,6 +19,15 @@
       args:
         chdir: ~/
 
+    - name: Stop thunderloop
+      become: true
+      become_method: sudo
+      ansible.builtin.systemd:
+        name: "thunderloop"
+        masked: no
+        daemon_reload: yes
+        state: stopped
+
     - name: Enter bootloader mode
       script: ../scripts/esp32_flashing.py bootloader
       args:
@@ -38,4 +47,13 @@
       args:
         executable: /opt/tbotspython/bin/python
       register: result
+
+    - name: Start thunderloop
+        become: true
+        become_method: sudo
+        ansible.builtin.systemd:
+          name: "thunderloop"
+          masked: no
+          daemon_reload: yes
+          state: started
 
