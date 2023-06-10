@@ -12,7 +12,6 @@ from proto.ssl_gc_common_pb2 import Team
 from proto.ssl_gc_geometry_pb2 import Vector2
 
 # TODO (#2599): Remove Duration parameter from test
-# TODO (#2690): Robot gets stuck in corner of defense area
 
 
 def test_two_ai_ball_placement(simulated_test_runner):
