@@ -119,7 +119,7 @@ class MotorService
          */
         MotorFaultIndicator(bool drive_enabled,
                             std::unordered_set<TbotsProto::MotorFault>& motor_faults)
-                : drive_enabled(drive_enabled), motor_faults(motor_faults)
+            : drive_enabled(drive_enabled), motor_faults(motor_faults)
         {
         }
     };
@@ -159,7 +159,7 @@ class MotorService
      * @param control_loop_frequency_hz control loop frequency in Hertz
      */
     void motorServiceInit(const RobotConstants_t& robot_constants,
-                              int control_loop_frequency_hz);
+                          int control_loop_frequency_hz);
 
     /**
      * Holds motor fault information for a particular motor and whether any fault has
@@ -310,7 +310,8 @@ class MotorService
 
     // Wheel constants
     static constexpr double MECHANICAL_MPS_PER_ELECTRICAL_RPM = 0.000111;
-    static constexpr double ELECTRICAL_RPM_PER_MECHANICAL_MPS = 1 / MECHANICAL_MPS_PER_ELECTRICAL_RPM;
+    static constexpr double ELECTRICAL_RPM_PER_MECHANICAL_MPS =
+        1 / MECHANICAL_MPS_PER_ELECTRICAL_RPM;
 
     // to check if the motors have been calibrated
     bool is_initialized_ = false;
