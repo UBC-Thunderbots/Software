@@ -51,7 +51,7 @@ TEST_P(PenaltyKickEnemyPlayTest, test_penalty_kick_enemy_play_setup)
     setEnemyGoalie(0);
     setAiPlay(TbotsProto::PlayName::PenaltyKickEnemyPlay);
     setRefereeCommand(current_command, previous_command);
-    Rectangle behind_ball_region = 
+    Rectangle behind_ball_region =
         Rectangle(Point(field.enemyPenaltyMark().x() + 1, field.enemyCornerPos().y()),
                   field.enemyCornerNeg());
 
