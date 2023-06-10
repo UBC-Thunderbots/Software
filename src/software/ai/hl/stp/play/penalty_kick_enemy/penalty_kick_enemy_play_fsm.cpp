@@ -21,10 +21,10 @@ void PenaltyKickEnemyPlayFSM::setupPosition(const Update &event)
     // Move all robots behind the penalty mark
     for (unsigned int i = 0; i < move_tactics.size(); i++)
     {
-        double y_offset = 4 * ((double)i - ((double)move_tactics.size() - 1) / 2.0) *
+        double y_offset = 8 * ((double)i - ((double)move_tactics.size() - 1) / 2.0) *
                           ROBOT_MAX_RADIUS_METERS;
         move_tactics.at(i)->updateControlParams(
-            Point(event.common.world.field().enemyPenaltyMark().x() + 1.5, y_offset),
+            Point(event.common.world.field().enemyPenaltyMark().x() + 1.75, y_offset),
             event.common.world.field().enemyGoalCenter().toVector().orientation(), 0);
     }
 
