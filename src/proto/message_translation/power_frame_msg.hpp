@@ -8,6 +8,7 @@
 #include <memory>
 #include <unordered_map>
 #include <vector>
+#include <cmath>
 
 #ifdef PLATFORMIO_BUILD
 #include <proto/power_frame_msg.nanopb.h>
@@ -133,9 +134,9 @@ TbotsProto_PowerPulseControl inline createNanoPbPowerPulseControl(
             nanopb_control.chicker.which_chicker_command =
                 TbotsProto_PowerPulseControl_ChickerControl_kick_pulse_width_tag;
             nanopb_control.chicker.chicker_command.kick_pulse_width =
-                kick_slope *
-                    static_cast<uint32_t>(google_control.chicker().kick_speed_m_per_s()) +
-                kick_constant;
+                static_cast<uint32_t>(
+                    574.0 * std::exp(0.346 * google_control.chicker()
+                    .auto_chip_or_kick().autokick_speed_m_per_s()));
             break;
         case TbotsProto::PowerControl::ChickerControl::kChipDistanceMeters:
             nanopb_control.chicker.which_chicker_command =
@@ -153,11 +154,9 @@ TbotsProto_PowerPulseControl inline createNanoPbPowerPulseControl(
                         TbotsProto_PowerPulseControl_AutoChipOrKick_autokick_pulse_width_tag;
                     nanopb_control.chicker.chicker_command.auto_chip_or_kick
                         .auto_chip_or_kick.autokick_pulse_width =
-                        kick_slope *
-                            static_cast<uint32_t>(google_control.chicker()
-                                                      .auto_chip_or_kick()
-                                                      .autokick_speed_m_per_s()) +
-                        kick_constant;
+                        static_cast<uint32_t>(
+                            574.0 * std::exp(0.346 * google_control.chicker()
+                            .auto_chip_or_kick().autokick_speed_m_per_s()));
                     break;
                 case TbotsProto::AutoChipOrKick::kAutochipDistanceMeters:
                     nanopb_control.chicker.chicker_command.auto_chip_or_kick
