@@ -7,7 +7,7 @@ class FlashingESP32:
     PICO_BOOT_PIN = 11
     PICO_RESET_PIN = 12
 
-    DELAY = 50 / 1000  #  50 MS
+    DELAY = 100 / 1000  #  100 MS
 
     def __init__(self):
         """Initialize GPIO pins"""
