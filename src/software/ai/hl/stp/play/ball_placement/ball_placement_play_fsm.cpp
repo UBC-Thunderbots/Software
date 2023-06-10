@@ -21,7 +21,8 @@ void BallPlacementPlayFSM::kickOffWall(const Update &event)
     // setup wall kickoff tactic for ball placing robot
     Point ball_pos            = event.common.world.ball().position();
     Rectangle field_lines     = event.common.world.field().fieldLines();
-    AutoChipOrKick auto_chick = {AutoChipOrKickMode::AUTOKICK, WALL_KICKOFF_VELOCITY_M_PER_S};
+    AutoChipOrKick auto_chick = {AutoChipOrKickMode::AUTOKICK,
+                                 WALL_KICKOFF_VELOCITY_M_PER_S};
 
     Angle kick_angle = calculateWallKickoffAngle(ball_pos, field_lines);
     pivot_kick_tactic->updateControlParams(ball_pos, kick_angle, auto_chick);

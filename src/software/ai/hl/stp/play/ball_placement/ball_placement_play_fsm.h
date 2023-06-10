@@ -79,7 +79,7 @@ struct BallPlacementPlayFSM
      *
      * @param event the BallPlacementPlayFSM Update event
      *
-     * @return whether the kick has been performed
+     * @return whether the ball has been placed into the desired position
      */
     bool ballPlaced(const Update& event);
 
@@ -142,5 +142,5 @@ struct BallPlacementPlayFSM
     std::shared_ptr<MoveTactic> retreat_tactic;
     std::vector<std::shared_ptr<PlaceBallMoveTactic>> move_tactics;
     constexpr static double const SHOT_VELOCITY_THRESHOLD_M_PER_S = 1.0;
-    constexpr static double const WALL_KICKOFF_VELOCITY_M_PER_S = 3.0;
+    constexpr static double const WALL_KICKOFF_VELOCITY_M_PER_S   = 3.0;
 };
