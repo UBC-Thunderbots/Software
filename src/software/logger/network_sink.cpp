@@ -23,7 +23,7 @@ NetworkSink::NetworkSink(unsigned int channel, const std::string& interface, int
 void NetworkSink::sendToNetwork(g3::LogMessageMover log_entry)
 {
     g3::LogMessage new_log = log_entry.get();
-    for (g3::LogMessage log : log_merger.log(new_log))
+    for (const g3::LogMessage &log : log_merger.log(new_log))
     {
         sendOneLogToNetwork(log);
     }
