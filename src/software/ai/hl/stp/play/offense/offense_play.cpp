@@ -25,63 +25,60 @@ void OffensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
 
 void OffensePlay::updateTactics(const PlayUpdate &play_update)
 {
-    if (play_update.num_tactics == 0)
+    auto num_friendly_robots = play_update.num_tactics;
+    auto num_enemy_robots    = play_update.world.enemyTeam().numRobots();
+
+    if (num_friendly_robots == 0)
     {
         return;
     }
 
     PriorityTacticVector tactics_to_return;
-    unsigned int num_defenders = 2;
-    unsigned int num_enemy_robots =
-        static_cast<unsigned int>(play_update.world.enemyTeam().numRobots());
+    unsigned int num_defenders, num_attackers;
 
-    if (play_update.world.gameState().isSetupState() &&
-        (play_update.world.gameState().isOurDirectFree() ||
-         play_update.world.gameState().isOurIndirectFree()))
-    {
-        // if we're in free kick on the enemy side, then we can commit more robots in
-        // forward positions
-        if (play_update.world.ball().position().x() > 0)
-        {
-            num_defenders = static_cast<unsigned int>(std::max(
-                0, static_cast<int>(
-                       2 - 2 * play_update.world.ball().position().x() /
-                               (play_update.world.field().fieldLines().xMax() / 3.0))));
-        }
-        shoot_or_pass_play->updateControlParams(true);
-    }
-    else if (play_update.world.gameState().isReadyState() &&
-             play_update.world.gameState().isOurKickoff())
+    // Set single touch modes for free kick and kickoff
+    if ((play_update.world.gameState().isSetupState() &&
+         (play_update.world.gameState().isOurDirectFree() ||
+          play_update.world.gameState().isOurIndirectFree())) ||
+        (play_update.world.gameState().isReadyState() &&
+         play_update.world.gameState().isOurKickoff()))
     {
         shoot_or_pass_play->updateControlParams(true);
     }
-    else if (num_enemy_robots <= 3)
+
+    // Assign number of defenders
+    if (num_friendly_robots > num_enemy_robots)
     {
-        // enemy team has at most half a full team, so we need at most half the number of
+        // If we have more robots than the enemy, then we can reduce the number of
         // defenders
         num_defenders = 1;
         if (num_enemy_robots < 2)
         {
+            // If the enemy only has 1 robot, then we can dedicate all robots to offense
             num_defenders = 0;
         }
     }
-    else if (play_update.num_tactics <= 3)
+    else if (num_friendly_robots <= 3)
     {
-        // play_update.num_tactics == 0 is handled above
-        num_defenders = play_update.num_tactics - 1;
+        // If we are short on robots and the enemy is not, then increase the number of
+        // defenders
+        num_defenders = num_friendly_robots - 1;
     }
-    else if (play_update.world.ball().position().x() <
-             play_update.world.field().fieldLines().xMin() / 4.0)
+    else if (play_update.world.ball().position().x() < 0)
     {
-        // if we have more than 3 robots and the ball is on our side of the field, then we
-        // should dedicate an additional robot to defense
+        // If we have more than 3 robots and the ball is on our side of the field, then
+        // dedicate an additional robot to defense
         num_defenders = 3;
     }
+    else
+    {
+        num_defenders = 2;
+    }
 
-    unsigned int num_shoot_or_pass = play_update.num_tactics - num_defenders;
+    num_attackers = num_friendly_robots - num_defenders;
 
     shoot_or_pass_play->updateTactics(PlayUpdate(
-        play_update.world, num_shoot_or_pass,
+        play_update.world, num_attackers,
         [&tactics_to_return](PriorityTacticVector new_tactics) {
             for (const auto &tactic_vector : new_tactics)
             {
