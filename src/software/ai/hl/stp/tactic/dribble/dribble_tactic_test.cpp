@@ -29,9 +29,9 @@ class DribbleTacticTest : public SimulatedErForceSimPlayTestFixture
         robotReceivedBall(world_ptr, yield);
         auto received_ball_time = world_ptr->getMostRecentTimestamp();
         while (world_ptr->getMostRecentTimestamp() <
-               received_ball_time + Duration::fromSeconds(1))
+               received_ball_time + Duration::fromSeconds(2))
         {
-            yield("Waiting 1 second to see if possession is maintained");
+            yield("Waiting 2 second to see if possession is maintained");
         }
         robotReceivedBall(world_ptr, yield);
     }
@@ -247,7 +247,7 @@ TEST_F(DribbleTacticTest, test_dribble_dest_and_orientation_around_rectangle)
             Duration::fromSeconds(25));
 }
 
-// TODO (#2496): robot gets stuck in place
+// TODO (#2690): robot gets stuck in the corner of the defense area
 TEST_F(
     DribbleTacticTest,
     DISABLED_test_dribble_dest_and_orientation_around_rectangle_with_excessive_dribbling)

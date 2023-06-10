@@ -30,7 +30,7 @@ class ThreadedAi : public FirstInFirstOutThreadedObserver<World>,
      *
      * @param tbots_proto The AI configuration
      */
-    explicit ThreadedAi(TbotsProto::AiConfig ai_config);
+    explicit ThreadedAi(const TbotsProto::AiConfig& ai_config);
 
     /**
      * Override the AI play
@@ -56,7 +56,7 @@ class ThreadedAi : public FirstInFirstOutThreadedObserver<World>,
      *
      * @param world the new world
      */
-    void runAiAndSendPrimitives(const World &world);
+    void runAiAndSendPrimitives(const World& world);
 
     Ai ai;
     TbotsProto::AiConfig ai_config;

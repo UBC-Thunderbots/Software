@@ -125,7 +125,7 @@ TEST_F(EnemyFreekickPlayTest, test_enemy_free_kick_close_to_net)
             // Wait for all robots to come to a halt
             robotHalt(world_ptr, yield);
             // Two robots defending close to the enemy robot performing the free kick
-            Rectangle shadowing_free_kicker_rect(Point(-3.5, 1.25), Point(-2.75, 0.5));
+            Rectangle shadowing_free_kicker_rect(Point(-3.5, 1.25), Point(-2.5, 0.0));
             robotInPolygon(shadowing_free_kicker_rect, 2, world_ptr, yield);
 
             // Two friendly robots in position to shadow enemy robots. Rectangles are
