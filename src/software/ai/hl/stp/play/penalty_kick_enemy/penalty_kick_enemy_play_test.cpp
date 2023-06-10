@@ -25,8 +25,7 @@ class PenaltyKickEnemyPlayTest
     Field field                      = Field::createField(field_type);
 };
 
-// TODO (#2714): Re-enable tests
-TEST_P(PenaltyKickEnemyPlayTest, DISABLED_test_penalty_kick_enemy_play_setup)
+TEST_P(PenaltyKickEnemyPlayTest, test_penalty_kick_enemy_play_setup)
 {
     RefereeCommand current_command  = std::get<0>(GetParam());
     RefereeCommand previous_command = std::get<1>(GetParam());
@@ -52,11 +51,9 @@ TEST_P(PenaltyKickEnemyPlayTest, DISABLED_test_penalty_kick_enemy_play_setup)
     setEnemyGoalie(0);
     setAiPlay(TbotsProto::PlayName::PenaltyKickEnemyPlay);
     setRefereeCommand(current_command, previous_command);
-    Polygon behind_ball_region =
-        Polygon({Point(field.enemyPenaltyMark().x() + 1, field.yLength() / 2),
-                 Point(field.enemyPenaltyMark().x() + 1, -field.yLength() / 2),
-                 Point(field.xLength() / 2, field.yLength() / 2),
-                 Point(-field.xLength() / 2, -field.yLength() / 2)});
+    Rectangle behind_ball_region = 
+        Rectangle(Point(field.enemyPenaltyMark().x() + 1, field.enemyCornerPos().y()),
+                  field.enemyCornerNeg());
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [behind_ball_region](std::shared_ptr<World> world_ptr,
@@ -82,32 +79,27 @@ INSTANTIATE_TEST_CASE_P(
                             {Point(1, 2), Point(-1, -2), Point(-2.5, 3), Point(2, -1),
                              Point(0, 3), Point(3, 0)}),
                         1),
-        std::make_tuple(RefereeCommand::NORMAL_START,
-                        RefereeCommand::PREPARE_PENALTY_THEM,
+        std::make_tuple(RefereeCommand::PREPARE_PENALTY_THEM, RefereeCommand::HALT,
                         TestUtil::createStationaryRobotStatesWithId(
                             {Point(2.2, 1.2), Point(-0.5, -2.1), Point(-2.5, 1.3),
                              Point(1.2, -1.5), Point(0, 2), Point(1, 0)}),
                         1.3),
-        std::make_tuple(RefereeCommand::NORMAL_START,
-                        RefereeCommand::PREPARE_PENALTY_THEM,
+        std::make_tuple(RefereeCommand::PREPARE_PENALTY_THEM, RefereeCommand::HALT,
                         TestUtil::createStationaryRobotStatesWithId(
                             {Point(2.2, 1.2), Point(-0.5, -2.1), Point(-2.5, 1.3),
                              Point(1.2, -1.5), Point(0, 2), Point(1, 0)}),
                         1.4),
-        std::make_tuple(RefereeCommand::NORMAL_START,
-                        RefereeCommand::PREPARE_PENALTY_THEM,
+        std::make_tuple(RefereeCommand::PREPARE_PENALTY_THEM, RefereeCommand::HALT,
                         TestUtil::createStationaryRobotStatesWithId(
                             {Point(2.2, 1.2), Point(-0.5, -2.1), Point(-2.5, 1.3),
                              Point(1.2, -1.5), Point(0, 2), Point(1, 0)}),
                         1.45),
-        std::make_tuple(RefereeCommand::NORMAL_START,
-                        RefereeCommand::PREPARE_PENALTY_THEM,
+        std::make_tuple(RefereeCommand::PREPARE_PENALTY_THEM, RefereeCommand::HALT,
                         TestUtil::createStationaryRobotStatesWithId(
                             {Point(2.2, 1.2), Point(-0.5, -2.1), Point(-2.5, 1.3),
                              Point(1.2, -1.5), Point(0, 2), Point(1, 0)}),
                         1.5),
-        std::make_tuple(RefereeCommand::NORMAL_START,
-                        RefereeCommand::PREPARE_PENALTY_THEM,
+        std::make_tuple(RefereeCommand::PREPARE_PENALTY_THEM, RefereeCommand::HALT,
                         TestUtil::createStationaryRobotStatesWithId(
                             {Point(2.2, 1.2), Point(-0.5, -2.1), Point(-2.5, 1.3),
                              Point(1.2, -1.5), Point(0, 2), Point(1, 0)}),
