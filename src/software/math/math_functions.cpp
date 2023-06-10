@@ -51,3 +51,12 @@ double sigmoid(const double& v, const double& offset, const double& sig_width)
 
     return 1 / (1 + std::exp(sig_change_factor * (offset - v)));
 }
+
+double percent_difference(double a, double b)
+{
+    if (a == 0 && b == 0)
+    {
+        return 0;
+    }
+    return std::abs(a - b) / ((std::abs(a) + std::abs(b)) / 2);
+}
