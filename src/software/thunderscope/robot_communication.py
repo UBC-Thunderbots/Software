@@ -19,7 +19,7 @@ class RobotCommunication(object):
         multicast_channel,
         interface,
         disable_estop,
-        estop_path="/dev/ttyACM0",
+        estop_path,
         estop_buadrate=115200,
     ):
         """Initialize the communication with the robots
