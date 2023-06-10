@@ -40,7 +40,7 @@ int main(int argc, char **argv) {
                 create2021RobotConstants(), CONTROL_LOOP_HZ);
 
         // Check driver fault
-        if (motor_service_->checkDriverFault(chip_select)) {
+        if (motor_service_->checkDriverFault(chip_select).drive_enabled) {
             LOG(FATAL) << "Detected Motor Fault";
         }
 

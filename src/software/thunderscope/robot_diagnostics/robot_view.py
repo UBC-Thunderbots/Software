@@ -22,7 +22,7 @@ class RobotViewComponent(QWidget):
 
     def __init__(
         self,
-        id,
+        robot_id,
         available_control_modes: List[IndividualRobotMode],
         control_mode_signal,
     ):
@@ -31,7 +31,7 @@ class RobotViewComponent(QWidget):
 
         Sets the Robot Status widget to None so that it can be added later on button click
 
-        :param id: id of the current robot
+        :param robot_id: id of the current robot
         :param available_control_modes: the currently available input modes for the robots
                                         according to what mode thunderscope is run in
         :param control_mode_signal: the signal to emit when control mode changes
@@ -39,9 +39,12 @@ class RobotViewComponent(QWidget):
         """
         super().__init__()
 
+        self.robot_id = robot_id
         self.layout = QVBoxLayout()
 
-        self.robot_info = RobotInfo(id, available_control_modes, control_mode_signal)
+        self.robot_info = RobotInfo(
+            robot_id, available_control_modes, control_mode_signal
+        )
         self.layout.addWidget(self.robot_info)
 
         self.robot_status = None
@@ -70,7 +73,11 @@ class RobotViewComponent(QWidget):
 
         :param robot_status: the new message data to update the widget with
         """
-        self.robot_info.update(robot_status.power_status, robot_status.error_code)
+        self.robot_info.update(
+            robot_status.motor_status,
+            robot_status.power_status,
+            robot_status.error_code,
+        )
         if self.robot_status:
             self.robot_status.update(robot_status)
 
@@ -96,7 +103,7 @@ class RobotView(QScrollArea):
 
         super().__init__()
 
-        self.robot_status_buffer = ThreadSafeBuffer(100, RobotStatus)
+        self.robot_status_buffer = ThreadSafeBuffer(10, RobotStatus)
 
         self.layout = QVBoxLayout()
 
@@ -122,8 +129,12 @@ class RobotView(QScrollArea):
         """
         Refresh the view
         Gets a RobotStatus proto and calls the corresponding update method
+        Until the buffer is empty
         """
         robot_status = self.robot_status_buffer.get(block=False, return_cached=False)
 
-        if robot_status is not None:
+        while robot_status is not None:
             self.robot_view_widgets[robot_status.robot_id].update(robot_status)
+            robot_status = self.robot_status_buffer.get(
+                block=False, return_cached=False
+            )

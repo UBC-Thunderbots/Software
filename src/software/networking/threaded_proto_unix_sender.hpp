@@ -4,7 +4,7 @@
 #include <boost/bind.hpp>
 #include <string>
 
-#include "software/networking/proto_unix_sender.hpp"
+#include "software/networking/unix_sender.h"
 
 template <class SendProto>
 class ThreadedProtoUnixSender
@@ -30,7 +30,10 @@ class ThreadedProtoUnixSender
    private:
     // The io_service that will be used to service all network requests
     boost::asio::io_service io_service;
-    ProtoUnixSender<SendProto> unix_sender;
+
+    std::string data_buffer;
+    UnixSender unix_sender;
+
     // The thread running the io_service in the background. This thread will run for the
     // entire lifetime of the class
     std::thread io_service_thread;
@@ -62,5 +65,6 @@ ThreadedProtoUnixSender<SendProtoT>::~ThreadedProtoUnixSender()
 template <class SendProtoT>
 void ThreadedProtoUnixSender<SendProtoT>::sendProto(const SendProtoT& message)
 {
-    unix_sender.sendProto(message);
+    message.SerializeToString(&data_buffer);
+    unix_sender.sendString(data_buffer);
 }

@@ -19,6 +19,31 @@
 extern int clock_nanosleep(clockid_t __clock_id, int __flags,
                            __const struct timespec* __req, struct timespec* __rem);
 
+// signal handling is done by csignal which requires a function pointer with C linkage
+extern "C"
+{
+    static MotorService* g_motor_service = NULL;
+
+    /**
+     * Handles process signals
+     *
+     * @param the signal value (SIGINT, SIGABRT, SIGTERN, etc)
+     */
+    void tbotsExit(int signal_num)
+    {
+        g_motor_service->resetMotorBoard();
+
+        // by now g3log may have died due to the termination signal, so it isn't reliable
+        // to log messages
+        std::cerr << "\n\n!!!\nReceived termination signal: "
+                  << g3::signalToStr(signal_num) << std::endl;
+        std::cerr << "Thunderloop shutting down and motor board reset\n!!!\n"
+                  << std::endl;
+
+        exit(signal_num);
+    }
+}
+
 Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, const int loop_hz)
     // TODO (#2495): Set the friendly team colour once we receive World proto
     : redis_client_(
@@ -36,7 +61,17 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, const int loop
       primitive_executor_(Duration::fromSeconds(1.0 / loop_hz), robot_constants,
                           TeamColour::YELLOW, robot_id_)
 {
+    g3::overrideSetupSignals({});
     NetworkLoggerSingleton::initializeLogger(channel_id_, network_interface_, robot_id_);
+
+    // catch all catch-able signals
+    std::signal(SIGSEGV, tbotsExit);
+    std::signal(SIGTERM, tbotsExit);
+    std::signal(SIGABRT, tbotsExit);
+    std::signal(SIGFPE, tbotsExit);
+    std::signal(SIGINT, tbotsExit);
+    std::signal(SIGILL, tbotsExit);
+
     LOG(INFO)
         << "THUNDERLOOP: Network Logger initialized! Next initializing Network Service";
 
@@ -46,7 +81,9 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, const int loop
     LOG(INFO)
         << "THUNDERLOOP: Network Service initialized! Next initializing Motor Service";
 
-    motor_service_ = std::make_unique<MotorService>(robot_constants, loop_hz);
+    motor_service_  = std::make_unique<MotorService>(robot_constants, loop_hz);
+    g_motor_service = motor_service_.get();
+    motor_service_->setup();
     LOG(INFO)
         << "THUNDERLOOP: Motor Service initialized! Next initializing Power Service";
 
@@ -72,7 +109,7 @@ Thunderloop::~Thunderloop() {}
     struct timespec poll_time;
     struct timespec iteration_time;
     struct timespec last_primitive_received_time;
-    struct timespec last_world_recieved_time;
+    struct timespec last_world_received_time;
     struct timespec current_time;
     struct timespec last_chipper_fired;
     struct timespec last_kicker_fired;
@@ -91,7 +128,7 @@ Thunderloop::~Thunderloop() {}
     // CLOCK_REALTIME can jump backwards
     clock_gettime(CLOCK_MONOTONIC, &next_shot);
     clock_gettime(CLOCK_MONOTONIC, &last_primitive_received_time);
-    clock_gettime(CLOCK_MONOTONIC, &last_world_recieved_time);
+    clock_gettime(CLOCK_MONOTONIC, &last_world_received_time);
     clock_gettime(CLOCK_MONOTONIC, &last_chipper_fired);
     clock_gettime(CLOCK_MONOTONIC, &last_kicker_fired);
 
@@ -124,6 +161,9 @@ Thunderloop::~Thunderloop() {}
 
             uint64_t last_handled_primitive_set = primitive_set_.sequence_number();
 
+            // Updating primitives and world with newly received data
+            // and setting the correct time elasped since last primitive / world
+
             struct timespec time_since_last_primitive_received;
             clock_gettime(CLOCK_MONOTONIC, &current_time);
             ScopedTimespecTimer::timespecDiff(&current_time,
@@ -131,6 +171,7 @@ Thunderloop::~Thunderloop() {}
                                               &time_since_last_primitive_received);
             network_status_.set_ms_since_last_primitive_received(
                 getMilliseconds(time_since_last_primitive_received));
+
             // If the primitive msg is new, update the internal buffer
             // and start the new primitive.
             if (new_primitive_set.time_sent().epoch_timestamp_seconds() >
@@ -156,7 +197,7 @@ Thunderloop::~Thunderloop() {}
 
             struct timespec time_since_last_vision_received;
             clock_gettime(CLOCK_MONOTONIC, &current_time);
-            ScopedTimespecTimer::timespecDiff(&current_time, &last_world_recieved_time,
+            ScopedTimespecTimer::timespecDiff(&current_time, &last_world_received_time,
                                               &time_since_last_vision_received);
             network_status_.set_ms_since_last_vision_received(
                 getMilliseconds(time_since_last_vision_received));
@@ -165,7 +206,7 @@ Thunderloop::~Thunderloop() {}
             if (new_world.time_sent().epoch_timestamp_seconds() >
                 world_.time_sent().epoch_timestamp_seconds())
             {
-                clock_gettime(CLOCK_MONOTONIC, &last_world_recieved_time);
+                clock_gettime(CLOCK_MONOTONIC, &last_world_received_time);
                 primitive_executor_.updateWorld(new_world);
                 world_ = new_world;
             }
@@ -178,7 +219,10 @@ Thunderloop::~Thunderloop() {}
                     createAngularVelocity(status.angular_velocity()));
             }
 
-            // If world not received in a while, stop robot
+            // Timeout Overrides for Primitives
+            // These should be after the new primitive update section above
+
+            // If primitive not received in a while, stop robot
             // Primitive Executor: run the last primitive if we have not timed out
             {
                 ScopedTimespecTimer timer(&poll_time);
@@ -187,14 +231,13 @@ Thunderloop::~Thunderloop() {}
                 auto nanoseconds_elapsed_since_last_primitive =
                     getNanoseconds(time_since_last_primitive_received);
 
-                if (nanoseconds_elapsed_since_last_primitive >
-                    PRIMITIVE_MANAGER_TIMEOUT_NS)
+                if (nanoseconds_elapsed_since_last_primitive > PACKET_TIMEOUT_NS)
                 {
                     primitive_executor_.setStopPrimitive();
 
                     // Log milliseconds since last world received if we are timing out
                     LOG(WARNING)
-                        << "Primitive timeout, overriding with StopPrimitive - Milliseconds since last world: "
+                        << "Primitive timeout, overriding with StopPrimitive - Milliseconds since last primitive: "
                         << static_cast<int>(nanoseconds_elapsed_since_last_primitive) *
                                MILLISECONDS_PER_NANOSECOND;
                 }

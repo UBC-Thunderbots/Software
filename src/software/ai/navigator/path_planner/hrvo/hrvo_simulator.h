@@ -22,11 +22,11 @@ class HRVOSimulator
     /**
      * Constructor
      */
-    explicit HRVOSimulator();
+    explicit HRVOSimulator(RobotId robot_id);
 
 
     /**
-     * Reset all agents to match the state of the given world.
+     * Update the simulator to match the state of the given world.
      * Friendly robots will use the Hybrid Reciprocal algorithm to traverse.
      * Enemy robots will go directly towards their goal without trying to avoid any
      * obstacles
@@ -70,12 +70,35 @@ class HRVOSimulator
 
 
     /**
+     * Get the current friendly robot velocity
+     *
+     * @param robot_id The robot id of the friendly robot to retrieve velocity from
+     * @return Current global velocity of robot
+     */
+    AngularVelocity getRobotAngularVelocity(unsigned int robot_id) const;
+
+
+    /**
      * Update the velocity of the agent with the given id
      * @param robot_id Robot id of the agent to update
      * @param new_velocity New global velocity of the agent
      */
     void updateRobotVelocity(RobotId robot_id, const Vector &new_velocity);
 
+
+    /**
+     * Update the angular velocity of the agent with the given id
+     * @param robot_id Robot id of the agent to update
+     * @param new_angular_velocity New angular velocity of the agent
+     */
+    void updateRobotAngularVelocity(RobotId robot_id,
+                                    const AngularVelocity &new_angular_velocity);
+
+    /*
+     * Get the orientation of robot with the given id
+     * @param robot_id Robot id of the agent to read velocity of
+     */
+    std::optional<Angle> getRobotOrientation(RobotId robot_id) const;
 
     /**
      *  Returns the count of agents in the simulation.
@@ -86,11 +109,12 @@ class HRVOSimulator
 
 
     /**
-     * Get all the robots running in this simulation
+     * Check if a robot with id exists in the simulator `robots` map
      *
-     * @return a map of from robot id's to agents
+     * @param id the robot id
+     * @param side either friendly or and enemy robot
      */
-    std::map<RobotId, std::shared_ptr<Agent>> getRobots();
+    bool robotExists(RobotId id, TeamSide side);
 
 
     /**
@@ -100,10 +124,6 @@ class HRVOSimulator
      * @param friendly_team_colour the friendly teams color
      */
     void visualize(RobotId robot_id, TeamColour friendly_team_colour);
-
-    // Robot id offset for enemy robots so we don't have
-    // friendly and enemy agents with overlapping ids in the robots map
-    static const unsigned int ENEMY_LV_ROBOT_OFFSET = 1000;
 
    private:
     /**
@@ -116,8 +136,6 @@ class HRVOSimulator
      */
     void configureHRVORobot(const Robot &robot, const RobotConstants_t &robot_constants,
                             Duration time_step);
-
-
     /**
      *  Configure and add a LV Agent to the simulation.
      *
@@ -129,8 +147,18 @@ class HRVOSimulator
     void configureLVRobot(const Robot &robot, const RobotConstants_t &robot_constants,
                           Duration time_step);
 
+    /**
+     *  Update position, velocity, orientation and angular velocity for this agent.
+     *
+     * @param agent The simulator agent being updated.
+     * @param robot the world robot whose values should be used
+     */
+    void updateAgent(const std::shared_ptr<Agent> &agent, const Robot &robot);
+
+    RobotId robot_id;
+
     // Map of robot ids to agent.
-    // enemy robot ids are offset by ENEMY_LV_ROBOT_OFFSET
+    // enemy robot ids are offset by ENEMY_LV_ROBOT_ID_OFFSET
     std::map<RobotId, std::shared_ptr<Agent>> robots;
 
     // Latest World which the simulator has received
@@ -141,8 +169,12 @@ class HRVOSimulator
 
     // The max amount (meters) which the friendly/enemy robot radius can increase by.
     // This scale is used to avoid close encounters, and reduce chance of collision.
-    static constexpr double FRIENDLY_ROBOT_RADIUS_MAX_INFLATION = 0.05;
+    static constexpr double FRIENDLY_ROBOT_RADIUS_MAX_INFLATION = 0.06;
 
     // the max amount (meters) which the friendly/enemy robot radius can reach
-    static constexpr double ENEMY_ROBOT_RADIUS_MAX_INFLATION = 0.06;
+    static constexpr double ENEMY_ROBOT_RADIUS_MAX_INFLATION = 0.7;
+
+    // Robot id offset for enemy robots so we don't have
+    // friendly and enemy agents with overlapping ids in the `robots` map
+    static const unsigned int ENEMY_LV_ROBOT_ID_OFFSET = 20;
 };
