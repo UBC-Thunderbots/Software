@@ -23,13 +23,13 @@ NetworkSink::NetworkSink(unsigned int channel, const std::string& interface, int
 void NetworkSink::sendToNetwork(const g3::LogMessageMover& log_entry)
 {
     g3::LogMessage new_log = log_entry.get();
-    for (const g3::LogMessage &log : log_merger.log(new_log))
+    for (const g3::LogMessage& log : log_merger.log(new_log))
     {
         sendOneLogToNetwork(log);
     }
 }
 
-void NetworkSink::sendOneLogToNetwork(const g3::LogMessage &log)
+void NetworkSink::sendOneLogToNetwork(const g3::LogMessage& log)
 {
     auto log_msg_proto = std::make_unique<TbotsProto::RobotLog>();
     TbotsProto::LogLevel log_level_proto;
