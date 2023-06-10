@@ -96,6 +96,10 @@ class MotorService
      */
     void setup();
 
+    /**
+     * Holds motor fault information for a particular motor and whether any fault has
+     * caused the motor to be disabled.
+     */
     struct MotorFaultIndicator
     {
         bool drive_enabled;
@@ -149,6 +153,15 @@ class MotorService
 
    private:
     /**
+     * Initializes Motor Service
+     *
+     * @param robot_constants robot constants for motor service
+     * @param control_loop_frequency_hz control loop frequency in Hertz
+     */
+    void motorServiceInit(const RobotConstants_t& robot_constants,
+                              int control_loop_frequency_hz);
+
+    /**
      * Holds motor fault information for a particular motor and whether any fault has
      * caused the motor to be disabled.
      */
@@ -161,14 +174,6 @@ class MotorService
      * @param target int target wheel velocity
      */
     void setTargetVelocity(uint8_t chip_select, int target);
-
-    /**
-     * Log the driver fault in a human readable log msg
-     *
-     * @param motor The motor to log the status for
-     * @return bool true if faulted
-     */
-//    bool checkDriverFault(uint8_t motor);
 
     /**
      * Sets up motor as drive motor controllers
@@ -184,13 +189,6 @@ class MotorService
      * @return double velocity value
      */
     double readVelocityFromTMC4671(uint8_t motor);
-
-    static constexpr double MECHANICAL_MPS_PER_ELECTRICAL_RPM = 0.000111;
-    static constexpr double ELECTRICAL_RPM_PER_MECHANICAL_MPS = 1 / MECHANICAL_MPS_PER_ELECTRICAL_RPM;
-
-   private:
-    void motorServiceInit(const RobotConstants_t& robot_constants,
-                          int control_loop_frequency_hz);
 
     /**
      * Calls the configuration functions below in the right sequence
@@ -309,6 +307,10 @@ class MotorService
      * @return true if the motor has returned a cached RESET fault, false otherwise
      */
     bool hasMotorReset(uint8_t motor);
+
+    // Wheel constants
+    static constexpr double MECHANICAL_MPS_PER_ELECTRICAL_RPM = 0.000111;
+    static constexpr double ELECTRICAL_RPM_PER_MECHANICAL_MPS = 1 / MECHANICAL_MPS_PER_ELECTRICAL_RPM;
 
     // to check if the motors have been calibrated
     bool is_initialized_ = false;

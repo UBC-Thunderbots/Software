@@ -55,5 +55,6 @@ class PowerService
     const std::string DEVICE_SERIAL_PORT    = "/dev/ttyUSB0";
     static constexpr unsigned int BAUD_RATE = 460800;
 
+    // Required flag to exit power service cleanly
     bool is_running = false;
 };

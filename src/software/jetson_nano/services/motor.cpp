@@ -170,7 +170,7 @@ void MotorService::setup()
 
     // Dribbler Motor Setup
     startDriver(DRIBBLER_MOTOR_CHIP_SELECT);
-    MotorFaultIndicator motor_fault_indicator = checkDriverFault(DRIBBLER_MOTOR_CHIP_SELECT);
+    checkDriverFault(DRIBBLER_MOTOR_CHIP_SELECT);
     startController(DRIBBLER_MOTOR_CHIP_SELECT, true);
     tmc4671_setTargetVelocity(DRIBBLER_MOTOR_CHIP_SELECT, 0);
     checkEncoderConnections();

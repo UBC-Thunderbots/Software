@@ -22,7 +22,6 @@ def ansible_runner(playbook: str, options: dict = {}):
     loader = DataLoader()
 
     print("starting ansible run")
-    print("Current working directory " + os.getcwd())
 
     # parse options
     vars = set(options.get("extra_vars", []))
