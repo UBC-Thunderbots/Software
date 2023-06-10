@@ -54,8 +54,8 @@ static const char* DRIVER_CONTROL_ENABLE_GPIO             = "194";
 static double MECHANICAL_MPS_PER_ELECTRICAL_RPM = 0.000111;
 static double ELECTRICAL_RPM_PER_MECHANICAL_MPS = 1 / MECHANICAL_MPS_PER_ELECTRICAL_RPM;
 
-static double RUNAWAY_PROTECTION_THRESHOLD_MPS       = 2.00;
-static int DRIBBLER_ACCELERATION_THRESHOLD_RPM_PER_S = 1000;
+static double RUNAWAY_PROTECTION_THRESHOLD_MPS         = 2.00;
+static int DRIBBLER_ACCELERATION_THRESHOLD_RPM_PER_S_2 = 10000;
 
 
 extern "C"
@@ -87,9 +87,10 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
       driver_control_enable_gpio_(DRIVER_CONTROL_ENABLE_GPIO, GpioDirection::OUTPUT,
                                   GpioState::HIGH),
       reset_gpio_(MOTOR_DRIVER_RESET_GPIO, GpioDirection::OUTPUT, GpioState::HIGH),
+      robot_constants_(robot_constants),
       euclidean_to_four_wheel_(robot_constants),
       motor_fault_detector_(0),
-      ramp_rpm_(0)
+      dribbler_ramp_rpm_(0)
 {
     int ret = 0;
 
@@ -477,9 +478,9 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
         euclidean_to_four_wheel_.getEuclideanVelocity(current_wheel_velocities);
 
     motor_status.mutable_local_velocity()->set_x_component_meters(
-        current_euclidean_velocity[0]);
-    motor_status.mutable_local_velocity()->set_y_component_meters(
         current_euclidean_velocity[1]);
+    motor_status.mutable_local_velocity()->set_y_component_meters(
+        -current_euclidean_velocity[0]);
     motor_status.mutable_angular_velocity()->set_radians_per_second(
         current_euclidean_velocity[2]);
 
@@ -536,9 +537,8 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
         static_cast<int>(target_wheel_velocities[BACK_RIGHT_WHEEL_SPACE_INDEX] *
                          ELECTRICAL_RPM_PER_MECHANICAL_MPS));
 
-    int target_dribbler_rpm;
-
     // Get target dribbler rpm from the primitive
+    int target_dribbler_rpm;
     if (motor.drive_control_case() ==
         TbotsProto::MotorControl::DriveControlCase::DRIVE_CONTROL_NOT_SET)
     {
@@ -549,29 +549,22 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
         target_dribbler_rpm = motor.dribbler_speed_rpm();
     }
 
-    int final_dribbler_rpm = 0;
+    // Ramp the dribbler velocity
+    // Clamp the max acceleration
+    int max_dribbler_delta_rpm = static_cast<int>(
+        DRIBBLER_ACCELERATION_THRESHOLD_RPM_PER_S_2 * time_elapsed_since_last_poll_s);
+    int delta_rpm = std::clamp(target_dribbler_rpm - dribbler_ramp_rpm_,
+                               -max_dribbler_delta_rpm, max_dribbler_delta_rpm);
+    dribbler_ramp_rpm_ += delta_rpm;
 
-    // Ramp the dribbler rpm
-    // If the dribbler only needs to change by DRIBBLER_ACCELERATION_THRESHOLD_RPM_PER_S,
-    // just set the value
-    if (std::abs(target_dribbler_rpm - ramp_rpm_) <=
-        DRIBBLER_ACCELERATION_THRESHOLD_RPM_PER_S)
-    {
-        final_dribbler_rpm = target_dribbler_rpm;
-    }
-    else if (target_dribbler_rpm > ramp_rpm_ + DRIBBLER_ACCELERATION_THRESHOLD_RPM_PER_S)
-    {
-        ramp_rpm_ += DRIBBLER_ACCELERATION_THRESHOLD_RPM_PER_S;
-        final_dribbler_rpm = ramp_rpm_;
-    }
-    else if (target_dribbler_rpm < ramp_rpm_ - DRIBBLER_ACCELERATION_THRESHOLD_RPM_PER_S)
-    {
-        ramp_rpm_ -= DRIBBLER_ACCELERATION_THRESHOLD_RPM_PER_S;
-        final_dribbler_rpm = ramp_rpm_;
-    }
+    // Clamp to the max rpm
+    int max_dribbler_rpm =
+        std::abs(static_cast<int>(robot_constants_.max_force_dribbler_speed_rpm));
+    dribbler_ramp_rpm_ =
+        std::clamp(dribbler_ramp_rpm_, -max_dribbler_rpm, max_dribbler_rpm);
 
-    // Set the target dribbler rpm
-    tmc4671_setTargetVelocity(DRIBBLER_MOTOR_CHIP_SELECT, final_dribbler_rpm);
+    tmc4671_setTargetVelocity(DRIBBLER_MOTOR_CHIP_SELECT, dribbler_ramp_rpm_);
+    motor_status.mutable_dribbler()->set_dribbler_rpm(float(dribbler_ramp_rpm_));
 
     return motor_status;
 }

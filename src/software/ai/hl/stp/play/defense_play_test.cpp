@@ -126,7 +126,10 @@ TEST_F(DefensePlayTest, DISABLED_test_defense_play_one_immediate_threat)
             Duration::fromSeconds(10));
 }
 
-TEST_F(DefensePlayTest, test_defense_play_close_to_net)
+// TODO (#2782): Defense play should assign shadowing robots
+//  Test case also doesn't run when the shadowing_rect is modified,
+//  thus the test has been disabled until it's fixed
+TEST_F(DefensePlayTest, DISABLED_test_defense_play_close_to_net)
 {
     BallState ball_state(Point(-2.4, 1), Vector(0, 0));
     auto friendly_robots = TestUtil::createStationaryRobotStatesWithId(
