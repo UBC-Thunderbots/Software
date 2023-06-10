@@ -29,7 +29,7 @@ void NetworkSink::sendToNetwork(const g3::LogMessageMover& log_entry)
     }
 }
 
-void NetworkSink::sendOneLogToNetwork(g3::LogMessage log)
+void NetworkSink::sendOneLogToNetwork(const g3::LogMessage &log)
 {
     auto log_msg_proto = std::make_unique<TbotsProto::RobotLog>();
     TbotsProto::LogLevel log_level_proto;
