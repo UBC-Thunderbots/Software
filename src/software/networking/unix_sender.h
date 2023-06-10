@@ -31,7 +31,6 @@ class UnixSender
     // The endpoint for the receiver
     boost::asio::local::datagram_protocol::endpoint receiver_endpoint_;
     std::string unix_socket_path_;
-    std::string data_buffer_;
 
     // Failed to send log throttling
     const unsigned MAX_SEND_FAILURES_BEFORE_LOG = 100;

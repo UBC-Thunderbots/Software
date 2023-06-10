@@ -38,11 +38,15 @@ class HRVOAgent : public Agent
      * @param radius                The radius of this agent.
      * @param max_speed             The maximum speed of this agent.
      * @param max_accel             The maximum acceleration of this agent.
+     * @param max_decel             The maximum deceleration of this agent.
+     * @param max_angular_speed     The maximum angular speed of this agent.
+     * @param max_angular_accel     The maximum angular acceleration of this agent.
      * @param max_radius_inflation  The maximum amount which the radius of this agent can
      * inflate.
      */
     HRVOAgent(RobotId robot_id, const RobotState &robot_state, const RobotPath &path,
-              double radius, double max_speed, double max_accel,
+              double radius, double max_speed, double max_accel, double max_decel,
+              double max_angular_speed, double max_angular_accel,
               double max_radius_inflation);
 
 
@@ -66,6 +70,13 @@ class HRVOAgent : public Agent
     void computeNewVelocity(const std::map<unsigned int, std::shared_ptr<Agent>> &robots,
                             Duration time_step) override;
 
+
+    /**
+     * Computes the new angular velocity of this agent.
+     *
+     * @param time_step the time step to use
+     */
+    void computeNewAngularVelocity(Duration time_step) override;
 
     /**
      * Computes the preferred velocity of this agent.
@@ -220,20 +231,38 @@ class HRVOAgent : public Agent
     std::vector<ObstaclePtr> static_obstacles;
     std::optional<ObstaclePtr> ball_obstacle;
 
-    // pointers to the closest agents by euclidean distance to this agents position
+    // pointers to the closest agents by Euclidean distance to this agents position
     std::vector<std::shared_ptr<Agent>> neighbours;
 
-    // scale used to normalise preferred velocity so that agent has ability to speed up as
-    // a way to avoid obstacles
-    static constexpr double PREF_SPEED_SCALE = 0.85;
+    Point prev_dynamic_kp_destination;
+    double kp;
 
-    // a multiplier to account for different accelerations when speeding up vs slowing
-    // down
-    static constexpr double DECEL_DIST_MULTIPLIER = 1.2;
+    // The maximum amount that the destination can be moved (in meters) before
+    // we recalculate the dynamic kp value
+    static constexpr double MAX_DESTINATION_CHANGE_THRESHOLD = 0.1;
 
-    // a multiplier to account for different preferred speed when speeding up vs slowing
-    // down
-    static constexpr double DECEL_PREF_SPEED_MULTIPLIER = 0.6;
+    // The maximum amount which the PID velocity can be greater than
+    // the actual robot velocity. Used to prevent swinging [m/s]
+    static constexpr double LINEAR_VELOCITY_MAX_PID_OFFSET = 0.3;
+
+    // Proportional constant used for calculating the desired angular velocity
+    static constexpr double ANGULAR_VELOCITY_KP = 4.5;
+
+    // Compensation constant added to stop the robots from swinging when turning and
+    // moving in a linear line. This is defined as a multiplier of the angular velocity
+    // for how much the linear velocity vector should be rotated by in the opposite
+    // direction of the angular velocity.
+    static constexpr double ANGULAR_VELOCITY_COMPENSATION_MULTIPLIER = 1.5;
+
+    // The obstacle factory robot_obstacle_inflation_factor used by HRVO
+    // This is lower than the default value in the config used by path planner since HRVO
+    // automatically takes into account the robot radius when avoiding obstacles.
+    static constexpr double HRVO_STATIC_OBSTACLE_INFLATION_FACTOR = 0.5;
+
+    // The minimum distance which HRVO Agents will look for neighbors, in meters.
+    // 2 robot radii + some padding to allow for a slight space between robots.
+    // Can not be static constexpr since ROBOT_MAX_RADIUS_METERS is not constexpr.
+    const double MIN_NEIGHBOR_SEARCH_DIST = 2.5 * ROBOT_MAX_RADIUS_METERS;
 
     // The maximum distance which HRVO Agents will look for neighbors, in meters.
     // A large radius picked to allow for far visibility of neighbors so Agents have

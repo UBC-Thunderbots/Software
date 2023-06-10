@@ -3,9 +3,6 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "test_util",
     testonly = True,
-    srcs = [
-        "test_util.cpp",
-    ],
     hdrs = [
         "test_util.h",
     ],
