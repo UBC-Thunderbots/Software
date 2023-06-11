@@ -30,10 +30,6 @@ struct PassDefenderFSM
     // pass_orientation for which we can consider a pass to be deflected
     static constexpr Angle MIN_DEFLECTION_ANGLE = Angle::fromDegrees(30);
 
-    // Distance to chip the ball when trying to yeet it
-    // TODO (#1878): Replace this with a more intelligent chip distance system
-    static constexpr double YEET_CHIP_DISTANCE_METERS = 2.0;
-
     /**
      * Guard that checks if the ball has been kicked
      *
