@@ -28,6 +28,7 @@
 extern "C"
 {
 #include "external/trinamic/tmc/ic/TMC4671/TMC4671.h"
+#include "external/trinamic/tmc/ic/TMC4671/TMC4671_Register.h"
 #include "external/trinamic/tmc/ic/TMC4671/TMC4671_Variants.h"
 #include "external/trinamic/tmc/ic/TMC6100/TMC6100.h"
 }
@@ -380,6 +381,196 @@ TbotsProto::MotorStatus MotorService::updateMotorStatus(double front_left_veloci
     return motor_status;
 }
 
+//TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor,
+//                                           double time_elapsed_since_last_poll_s)
+//{
+//    bool encoders_calibrated = (encoder_calibrated_[FRONT_LEFT_MOTOR_CHIP_SELECT] ||
+//                                encoder_calibrated_[FRONT_RIGHT_MOTOR_CHIP_SELECT] ||
+//                                encoder_calibrated_[BACK_LEFT_MOTOR_CHIP_SELECT] ||
+//                                encoder_calibrated_[BACK_RIGHT_MOTOR_CHIP_SELECT]);
+//
+//    if (!encoders_calibrated)
+//    {
+//        is_initialized_ = false;
+//    }
+//
+//    // checks if any motor has reset, sends a log message if so
+//    for (uint8_t motor = 0; motor < NUM_MOTORS; ++motor)
+//    {
+//        if (hasMotorReset(motor))
+//        {
+//            LOG(DEBUG) << "RESET DETECTED FOR MOTOR: " << MOTOR_NAMES[motor];
+//            is_initialized_ = false;
+//        }
+//    }
+//
+//    if (!is_initialized_)
+//    {
+//        LOG(INFO) << "MotorService re-initializing";
+//        setup();
+//    }
+//
+//    CHECK(encoder_calibrated_[FRONT_LEFT_MOTOR_CHIP_SELECT] &&
+//          encoder_calibrated_[FRONT_RIGHT_MOTOR_CHIP_SELECT] &&
+//          encoder_calibrated_[BACK_LEFT_MOTOR_CHIP_SELECT] &&
+//          encoder_calibrated_[BACK_RIGHT_MOTOR_CHIP_SELECT])
+//        << "Running without encoder calibration can cause serious harm, exiting";
+//
+//    // Get current wheel electical RPMs (don't account for pole pairs)
+//    double front_right_velocity =
+//        static_cast<double>(tmc4671_getActualVelocity(FRONT_RIGHT_MOTOR_CHIP_SELECT)) *
+//        MECHANICAL_MPS_PER_ELECTRICAL_RPM;
+//    double front_left_velocity =
+//        static_cast<double>(tmc4671_getActualVelocity(FRONT_LEFT_MOTOR_CHIP_SELECT)) *
+//        MECHANICAL_MPS_PER_ELECTRICAL_RPM;
+//    double back_right_velocity =
+//        static_cast<double>(tmc4671_getActualVelocity(BACK_RIGHT_MOTOR_CHIP_SELECT)) *
+//        MECHANICAL_MPS_PER_ELECTRICAL_RPM;
+//    double back_left_velocity =
+//        static_cast<double>(tmc4671_getActualVelocity(BACK_LEFT_MOTOR_CHIP_SELECT)) *
+//        MECHANICAL_MPS_PER_ELECTRICAL_RPM;
+//
+//    // Get the current dribbler rpm
+//    double dribbler_rpm =
+//        static_cast<double>(tmc4671_getActualVelocity(DRIBBLER_MOTOR_CHIP_SELECT));
+//
+//    // Construct a MotorStatus object with the current velocities and dribbler rpm
+//    TbotsProto::MotorStatus motor_status =
+//        updateMotorStatus(front_left_velocity, front_right_velocity, back_left_velocity,
+//                          back_right_velocity, dribbler_rpm);
+//
+//    // This order needs to match euclidean_to_four_wheel converters order
+//    // We also want to work in the meters per second space rather than electrical RPMs
+//    WheelSpace_t current_wheel_velocities = {front_right_velocity, front_left_velocity,
+//                                             back_left_velocity, back_right_velocity};
+//
+//    // Run-away protection
+//    if (std::abs(current_wheel_velocities[FRONT_RIGHT_WHEEL_SPACE_INDEX] -
+//                 prev_wheel_velocities_[FRONT_RIGHT_WHEEL_SPACE_INDEX]) >
+//        RUNAWAY_PROTECTION_THRESHOLD_MPS)
+//    {
+//        driver_control_enable_gpio_.setValue(GpioState::LOW);
+//        LOG(FATAL) << "Front right motor runaway";
+//    }
+//    else if (std::abs(current_wheel_velocities[FRONT_LEFT_WHEEL_SPACE_INDEX] -
+//                      prev_wheel_velocities_[FRONT_LEFT_WHEEL_SPACE_INDEX]) >
+//             RUNAWAY_PROTECTION_THRESHOLD_MPS)
+//    {
+//        driver_control_enable_gpio_.setValue(GpioState::LOW);
+//        LOG(FATAL) << "Front left motor runaway";
+//    }
+//    else if (std::abs(current_wheel_velocities[BACK_LEFT_WHEEL_SPACE_INDEX] -
+//                      prev_wheel_velocities_[BACK_LEFT_WHEEL_SPACE_INDEX]) >
+//             RUNAWAY_PROTECTION_THRESHOLD_MPS)
+//    {
+//        driver_control_enable_gpio_.setValue(GpioState::LOW);
+//        LOG(FATAL) << "Back left motor runaway";
+//    }
+//    else if (std::abs(current_wheel_velocities[BACK_RIGHT_WHEEL_SPACE_INDEX] -
+//                      prev_wheel_velocities_[BACK_RIGHT_WHEEL_SPACE_INDEX]) >
+//             RUNAWAY_PROTECTION_THRESHOLD_MPS)
+//    {
+//        driver_control_enable_gpio_.setValue(GpioState::LOW);
+//        LOG(FATAL) << "Back right motor runaway";
+//    }
+//
+//    // Convert to Euclidean velocity_delta
+//    EuclideanSpace_t current_euclidean_velocity =
+//        euclidean_to_four_wheel_.getEuclideanVelocity(current_wheel_velocities);
+//
+//    motor_status.mutable_local_velocity()->set_x_component_meters(
+//        current_euclidean_velocity[1]);
+//    motor_status.mutable_local_velocity()->set_y_component_meters(
+//        -current_euclidean_velocity[0]);
+//    motor_status.mutable_angular_velocity()->set_radians_per_second(
+//        current_euclidean_velocity[2]);
+//
+//    WheelSpace_t target_wheel_velocities = WheelSpace_t::Zero();
+//
+//    // Get target wheel velocities from the primitive
+//    if (motor.has_direct_per_wheel_control())
+//    {
+//        TbotsProto::MotorControl_DirectPerWheelControl direct_per_wheel =
+//            motor.direct_per_wheel_control();
+//        target_wheel_velocities = {
+//            direct_per_wheel.front_right_wheel_velocity(),
+//            direct_per_wheel.front_left_wheel_velocity(),
+//            direct_per_wheel.back_left_wheel_velocity(),
+//            direct_per_wheel.back_right_wheel_velocity(),
+//        };
+//    }
+//    else if (motor.has_direct_velocity_control())
+//    {
+//        TbotsProto::MotorControl_DirectVelocityControl direct_velocity =
+//            motor.direct_velocity_control();
+//        EuclideanSpace_t target_euclidean_velocity = {
+//            -direct_velocity.velocity().y_component_meters(),
+//            direct_velocity.velocity().x_component_meters(),
+//            direct_velocity.angular_velocity().radians_per_second()};
+//
+//        target_wheel_velocities =
+//            euclidean_to_four_wheel_.getWheelVelocity(target_euclidean_velocity);
+//    }
+//
+//    // ramp the target velocities to keep acceleration compared to current velocities
+//    // within safe bounds
+//    target_wheel_velocities = euclidean_to_four_wheel_.rampWheelVelocity(
+//        prev_wheel_velocities_, target_wheel_velocities, time_elapsed_since_last_poll_s);
+//
+//    // TODO (#2719): interleave the angular accelerations in here at some point.
+//    prev_wheel_velocities_ = target_wheel_velocities;
+//
+//    // Set target speeds accounting for acceleration
+//    tmc4671_writeInt(
+//        FRONT_RIGHT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_TARGET,
+//        static_cast<int>(target_wheel_velocities[FRONT_RIGHT_WHEEL_SPACE_INDEX] *
+//                         ELECTRICAL_RPM_PER_MECHANICAL_MPS));
+//    tmc4671_writeInt(
+//        FRONT_LEFT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_TARGET,
+//        static_cast<int>(target_wheel_velocities[FRONT_LEFT_WHEEL_SPACE_INDEX] *
+//                         ELECTRICAL_RPM_PER_MECHANICAL_MPS));
+//    tmc4671_writeInt(
+//        BACK_LEFT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_TARGET,
+//        static_cast<int>(target_wheel_velocities[BACK_LEFT_WHEEL_SPACE_INDEX] *
+//                         ELECTRICAL_RPM_PER_MECHANICAL_MPS));
+//    tmc4671_writeInt(
+//        BACK_RIGHT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_TARGET,
+//        static_cast<int>(target_wheel_velocities[BACK_RIGHT_WHEEL_SPACE_INDEX] *
+//                         ELECTRICAL_RPM_PER_MECHANICAL_MPS));
+//
+//    // Get target dribbler rpm from the primitive
+//    int target_dribbler_rpm;
+//    if (motor.drive_control_case() ==
+//        TbotsProto::MotorControl::DriveControlCase::DRIVE_CONTROL_NOT_SET)
+//    {
+//        target_dribbler_rpm = 0;
+//    }
+//    else
+//    {
+//        target_dribbler_rpm = motor.dribbler_speed_rpm();
+//    }
+//
+//    // Ramp the dribbler velocity
+//    // Clamp the max acceleration
+//    int max_dribbler_delta_rpm = static_cast<int>(
+//        DRIBBLER_ACCELERATION_THRESHOLD_RPM_PER_S_2 * time_elapsed_since_last_poll_s);
+//    int delta_rpm = std::clamp(target_dribbler_rpm - dribbler_ramp_rpm_,
+//                               -max_dribbler_delta_rpm, max_dribbler_delta_rpm);
+//    dribbler_ramp_rpm_ += delta_rpm;
+//
+//    // Clamp to the max rpm
+//    int max_dribbler_rpm =
+//        std::abs(static_cast<int>(robot_constants_.max_force_dribbler_speed_rpm));
+//    dribbler_ramp_rpm_ =
+//        std::clamp(dribbler_ramp_rpm_, -max_dribbler_rpm, max_dribbler_rpm);
+//
+//    tmc4671_setTargetVelocity(DRIBBLER_MOTOR_CHIP_SELECT, dribbler_ramp_rpm_);
+//    motor_status.mutable_dribbler()->set_dribbler_rpm(float(dribbler_ramp_rpm_));
+//
+//    return motor_status;
+//}
+
+
 TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor,
                                            double time_elapsed_since_last_poll_s)
 {
@@ -416,27 +607,44 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
         << "Running without encoder calibration can cause serious harm, exiting";
 
     // Get current wheel electical RPMs (don't account for pole pairs)
+//    double front_right_velocity =
+//            static_cast<double>(tmc4671_getActualVelocity(FRONT_RIGHT_MOTOR_CHIP_SELECT)) *
+//            MECHANICAL_MPS_PER_ELECTRICAL_RPM;
+//    double front_left_velocity =
+//            static_cast<double>(tmc4671_getActualVelocity(FRONT_LEFT_MOTOR_CHIP_SELECT)) *
+//            MECHANICAL_MPS_PER_ELECTRICAL_RPM;
+//    double back_right_velocity =
+//            static_cast<double>(tmc4671_getActualVelocity(BACK_RIGHT_MOTOR_CHIP_SELECT)) *
+//            MECHANICAL_MPS_PER_ELECTRICAL_RPM;
+//    double back_left_velocity =
+//            static_cast<double>(tmc4671_getActualVelocity(BACK_LEFT_MOTOR_CHIP_SELECT)) *
+//            MECHANICAL_MPS_PER_ELECTRICAL_RPM;
+
     double front_right_velocity =
-        static_cast<double>(tmc4671_getActualVelocity(FRONT_RIGHT_MOTOR_CHIP_SELECT)) *
-        MECHANICAL_MPS_PER_ELECTRICAL_RPM;
+            static_cast<double>(tmc4671ReadThenWriteValue(FRONT_RIGHT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_ACTUAL, TMC4671_PID_VELOCITY_TARGET,front_right_target_velocity)) *
+            MECHANICAL_MPS_PER_ELECTRICAL_RPM;
     double front_left_velocity =
-        static_cast<double>(tmc4671_getActualVelocity(FRONT_LEFT_MOTOR_CHIP_SELECT)) *
-        MECHANICAL_MPS_PER_ELECTRICAL_RPM;
+            static_cast<double>(tmc4671ReadThenWriteValue(FRONT_LEFT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_ACTUAL,TMC4671_PID_VELOCITY_TARGET,front_left_target_velocity)) *
+            MECHANICAL_MPS_PER_ELECTRICAL_RPM;
     double back_right_velocity =
-        static_cast<double>(tmc4671_getActualVelocity(BACK_RIGHT_MOTOR_CHIP_SELECT)) *
-        MECHANICAL_MPS_PER_ELECTRICAL_RPM;
+            static_cast<double>(tmc4671ReadThenWriteValue(BACK_RIGHT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_ACTUAL,TMC4671_PID_VELOCITY_TARGET,back_right_target_velocity)) *
+            MECHANICAL_MPS_PER_ELECTRICAL_RPM;
     double back_left_velocity =
-        static_cast<double>(tmc4671_getActualVelocity(BACK_LEFT_MOTOR_CHIP_SELECT)) *
-        MECHANICAL_MPS_PER_ELECTRICAL_RPM;
+            static_cast<double>(tmc4671ReadThenWriteValue(BACK_LEFT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_ACTUAL,TMC4671_PID_VELOCITY_TARGET,back_left_target_velocity)) *
+            MECHANICAL_MPS_PER_ELECTRICAL_RPM;
+
+
 
     // Get the current dribbler rpm
+//    double dribbler_rpm =
+//            static_cast<double>(tmc4671_getActualVelocity(DRIBBLER_MOTOR_CHIP_SELECT));
     double dribbler_rpm =
-        static_cast<double>(tmc4671_getActualVelocity(DRIBBLER_MOTOR_CHIP_SELECT));
+            static_cast<double>(tmc4671ReadThenWriteValue(DRIBBLER_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_ACTUAL),dribbler_ramp_rpm_);
 
     // Construct a MotorStatus object with the current velocities and dribbler rpm
     TbotsProto::MotorStatus motor_status =
-        updateMotorStatus(front_left_velocity, front_right_velocity, back_left_velocity,
-                          back_right_velocity, dribbler_rpm);
+            updateMotorStatus(front_left_velocity, front_right_velocity, back_left_velocity,
+                              back_right_velocity, dribbler_rpm);
 
     // This order needs to match euclidean_to_four_wheel converters order
     // We also want to work in the meters per second space rather than electrical RPMs
@@ -475,14 +683,14 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
 
     // Convert to Euclidean velocity_delta
     EuclideanSpace_t current_euclidean_velocity =
-        euclidean_to_four_wheel_.getEuclideanVelocity(current_wheel_velocities);
+            euclidean_to_four_wheel_.getEuclideanVelocity(current_wheel_velocities);
 
     motor_status.mutable_local_velocity()->set_x_component_meters(
-        current_euclidean_velocity[1]);
+            current_euclidean_velocity[1]);
     motor_status.mutable_local_velocity()->set_y_component_meters(
-        -current_euclidean_velocity[0]);
+            -current_euclidean_velocity[0]);
     motor_status.mutable_angular_velocity()->set_radians_per_second(
-        current_euclidean_velocity[2]);
+            current_euclidean_velocity[2]);
 
     WheelSpace_t target_wheel_velocities = WheelSpace_t::Zero();
 
@@ -490,52 +698,60 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
     if (motor.has_direct_per_wheel_control())
     {
         TbotsProto::MotorControl_DirectPerWheelControl direct_per_wheel =
-            motor.direct_per_wheel_control();
+                motor.direct_per_wheel_control();
         target_wheel_velocities = {
-            direct_per_wheel.front_right_wheel_velocity(),
-            direct_per_wheel.front_left_wheel_velocity(),
-            direct_per_wheel.back_left_wheel_velocity(),
-            direct_per_wheel.back_right_wheel_velocity(),
+                direct_per_wheel.front_right_wheel_velocity(),
+                direct_per_wheel.front_left_wheel_velocity(),
+                direct_per_wheel.back_left_wheel_velocity(),
+                direct_per_wheel.back_right_wheel_velocity(),
         };
     }
     else if (motor.has_direct_velocity_control())
     {
         TbotsProto::MotorControl_DirectVelocityControl direct_velocity =
-            motor.direct_velocity_control();
+                motor.direct_velocity_control();
         EuclideanSpace_t target_euclidean_velocity = {
-            -direct_velocity.velocity().y_component_meters(),
-            direct_velocity.velocity().x_component_meters(),
-            direct_velocity.angular_velocity().radians_per_second()};
+                -direct_velocity.velocity().y_component_meters(),
+                direct_velocity.velocity().x_component_meters(),
+                direct_velocity.angular_velocity().radians_per_second()};
 
         target_wheel_velocities =
-            euclidean_to_four_wheel_.getWheelVelocity(target_euclidean_velocity);
+                euclidean_to_four_wheel_.getWheelVelocity(target_euclidean_velocity);
     }
 
     // ramp the target velocities to keep acceleration compared to current velocities
     // within safe bounds
     target_wheel_velocities = euclidean_to_four_wheel_.rampWheelVelocity(
-        prev_wheel_velocities_, target_wheel_velocities, time_elapsed_since_last_poll_s);
+            prev_wheel_velocities_, target_wheel_velocities, time_elapsed_since_last_poll_s);
 
     // TODO (#2719): interleave the angular accelerations in here at some point.
     prev_wheel_velocities_ = target_wheel_velocities;
 
     // Set target speeds accounting for acceleration
-    tmc4671_writeInt(
-        FRONT_RIGHT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_TARGET,
-        static_cast<int>(target_wheel_velocities[FRONT_RIGHT_WHEEL_SPACE_INDEX] *
-                         ELECTRICAL_RPM_PER_MECHANICAL_MPS));
-    tmc4671_writeInt(
-        FRONT_LEFT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_TARGET,
-        static_cast<int>(target_wheel_velocities[FRONT_LEFT_WHEEL_SPACE_INDEX] *
-                         ELECTRICAL_RPM_PER_MECHANICAL_MPS));
-    tmc4671_writeInt(
-        BACK_LEFT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_TARGET,
-        static_cast<int>(target_wheel_velocities[BACK_LEFT_WHEEL_SPACE_INDEX] *
-                         ELECTRICAL_RPM_PER_MECHANICAL_MPS));
-    tmc4671_writeInt(
-        BACK_RIGHT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_TARGET,
-        static_cast<int>(target_wheel_velocities[BACK_RIGHT_WHEEL_SPACE_INDEX] *
-                         ELECTRICAL_RPM_PER_MECHANICAL_MPS));
+//    tmc4671_writeInt(
+//            FRONT_RIGHT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_TARGET,
+//            static_cast<int>(target_wheel_velocities[FRONT_RIGHT_WHEEL_SPACE_INDEX] *
+//                             ELECTRICAL_RPM_PER_MECHANICAL_MPS));
+    front_right_target_velocity = static_cast<int>(target_wheel_velocities[FRONT_RIGHT_WHEEL_SPACE_INDEX] *
+                                                            ELECTRICAL_RPM_PER_MECHANICAL_MPS);
+//    tmc4671_writeInt(
+//            FRONT_LEFT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_TARGET,
+//            static_cast<int>(target_wheel_velocities[FRONT_LEFT_WHEEL_SPACE_INDEX] *
+//                             ELECTRICAL_RPM_PER_MECHANICAL_MPS));
+    front_left_target_velocity = static_cast<int>(target_wheel_velocities[FRONT_LEFT_WHEEL_SPACE_INDEX] *
+                                                            ELECTRICAL_RPM_PER_MECHANICAL_MPS);
+//    tmc4671_writeInt(
+//            BACK_LEFT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_TARGET,
+//            static_cast<int>(target_wheel_velocities[BACK_LEFT_WHEEL_SPACE_INDEX] *
+//                             ELECTRICAL_RPM_PER_MECHANICAL_MPS));
+    back_left_target_velocity = static_cast<int>(target_wheel_velocities[BACK_LEFT_WHEEL_SPACE_INDEX] *
+                                                 ELECTRICAL_RPM_PER_MECHANICAL_MPS);
+//    tmc4671_writeInt(
+//            BACK_RIGHT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_TARGET,
+//            static_cast<int>(target_wheel_velocities[BACK_RIGHT_WHEEL_SPACE_INDEX] *
+//                             ELECTRICAL_RPM_PER_MECHANICAL_MPS));
+    back_right_target_velocity = static_cast<int>(target_wheel_velocities[BACK_RIGHT_WHEEL_SPACE_INDEX] *
+                                                  ELECTRICAL_RPM_PER_MECHANICAL_MPS);
 
     // Get target dribbler rpm from the primitive
     int target_dribbler_rpm;
@@ -552,16 +768,16 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
     // Ramp the dribbler velocity
     // Clamp the max acceleration
     int max_dribbler_delta_rpm = static_cast<int>(
-        DRIBBLER_ACCELERATION_THRESHOLD_RPM_PER_S_2 * time_elapsed_since_last_poll_s);
+            DRIBBLER_ACCELERATION_THRESHOLD_RPM_PER_S_2 * time_elapsed_since_last_poll_s);
     int delta_rpm = std::clamp(target_dribbler_rpm - dribbler_ramp_rpm_,
                                -max_dribbler_delta_rpm, max_dribbler_delta_rpm);
     dribbler_ramp_rpm_ += delta_rpm;
 
     // Clamp to the max rpm
     int max_dribbler_rpm =
-        std::abs(static_cast<int>(robot_constants_.max_force_dribbler_speed_rpm));
+            std::abs(static_cast<int>(robot_constants_.max_force_dribbler_speed_rpm));
     dribbler_ramp_rpm_ =
-        std::clamp(dribbler_ramp_rpm_, -max_dribbler_rpm, max_dribbler_rpm);
+            std::clamp(dribbler_ramp_rpm_, -max_dribbler_rpm, max_dribbler_rpm);
 
     tmc4671_setTargetVelocity(DRIBBLER_MOTOR_CHIP_SELECT, dribbler_ramp_rpm_);
     motor_status.mutable_dribbler()->set_dribbler_rpm(float(dribbler_ramp_rpm_));
@@ -605,23 +821,30 @@ void MotorService::spiTransfer(int fd, uint8_t const* tx, uint8_t const* rx, uns
 }
 
 
-void MotorService::writeAfterReadSpiTransfer(int fd, const uint8_t *write_buf, const int *read_buf,
-                                             unsigned int write_len, unsigned int read_len, uint32_t spi_speed)
+void MotorService::readThenWriteSpiTransfer(int fd, const uint8_t *write_tx, const uint8_t *read_rx, uint32_t spi_speed)
 {
     int ret;
+
+    uint8_t read_tx[5];
+    uint8_t write_rx[5];
+    memset(read_tx,0,5);
+    memset(write_rx, 0, 5);
+
+    // Get the address from the write buffer, and clear write bit
+    read_tx[0] = write_tx[0] & 0x7f;
 
     struct spi_ioc_transfer tr[2];
     memset(tr, 0, sizeof(tr));
 
-    tr[0].tx_buf        = (unsigned long)write_buf;
-    tr[0].rx_buf        = (unsigned long)read_buf;
-    tr[0].len           = len;
+    tr[0].tx_buf        = (unsigned long)read_tx;
+    tr[0].rx_buf        = (unsigned long)read_rx;
+    tr[0].len           = 5;
     tr[0].delay_usecs   = 0;
     tr[0].speed_hz      = spi_speed;
     tr[0].bits_per_word = 8;
-    tr[1].tx_buf        = (unsigned long)tx_;
-    tr[1].rx_buf        = (unsigned long)rx_;
-    tr[1].len           = len;
+    tr[1].tx_buf        = (unsigned long)write_tx;
+    tr[1].rx_buf        = (unsigned long)write_rx;
+    tr[1].len           = 5;
     tr[1].delay_usecs   = 0;
     tr[1].speed_hz      = spi_speed;
     tr[1].bits_per_word = 8;
@@ -673,6 +896,36 @@ uint8_t MotorService::tmc4671ReadWriteByte(uint8_t motor, uint8_t data,
     spi_demux_select_0_.setValue(GpioState::HIGH);
     spi_demux_select_1_.setValue(GpioState::LOW);
     return readWriteByte(motor, data, last_transfer, TMC4671_SPI_SPEED);
+}
+
+int32_t MotorService::tmc4671ReadThenWriteValue(uint8_t motor, uint8_t read_addr, uint8_t write_addr, int32_t write_data)
+{
+    spi_demux_select_0_.setValue(GpioState::HIGH);
+    spi_demux_select_1_.setValue(GpioState::LOW);
+    // ensure tx_ and rx_ are cleared
+    memset(tx_,0,5);
+    memset(rx_,0,5);
+
+    //  Trinamic transactions looks like this:
+    //  + - - - + - - - + - - - + - - - + - - - +
+    //  |  ADDR |             DATA              |
+    //  + - - - + - - - + - - - + - - - + - - - +
+    //      0        1      2       3       4
+    //  Also it is in BIG Endian, therefore MSB is leftmost bit of 0.
+    //  For a write, MSB must be 1, for read, MSB must be 0
+    //  https://github.com/trinamic/TMC-API/blob/master/tmc/ic/TMC4671/TMC4671.c
+    tx_[0] = addr |= 0x80;
+    memcpy(tx_+1,&write_data,4);
+
+    readThenWriteSpiTransfer(file_descriptors_[motor],tx_,rx_,TMC4671_SPI_SPEED);
+
+    int32_t value = rx_[0];
+    for(int i = 1; i < 4; i++)
+    {
+        value <<= 8;
+        value |= rx_[i];
+    }
+    return value;
 }
 
 uint8_t MotorService::tmc6100ReadWriteByte(uint8_t motor, uint8_t data,
