@@ -15,8 +15,8 @@ from software.networking.threaded_unix_sender import ThreadedUnixSender
 from software.simulated_tests.robot_enters_region import RobotEntersRegion
 
 from software.simulated_tests import validation
+from software.simulated_tests.tbots_test_runner import TbotsTestRunner
 from software.thunderscope.thunderscope import Thunderscope
-from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.py_constants import MILLISECONDS_PER_SECOND
 from software.thunderscope.constants import ProtoUnixIOTypes
@@ -39,7 +39,7 @@ TEST_START_DELAY_S = 0.01
 PAUSE_AFTER_FAIL_DELAY_S = 3
 
 
-class SimulatedTestRunner(object):
+class SimulatedTestRunner(TbotsTestRunner):
 
     """Run a simulated test"""
 
@@ -53,46 +53,31 @@ class SimulatedTestRunner(object):
         gamecontroller,
     ):
         """Initialize the SimulatorTestRunner
-
+        
         :param test_name: The name of the test to run
         :param thunderscope: The thunderscope to use, None if not used
         :param simulator_proto_unix_io: The simulator proto unix io to use
         :param blue_full_system_proto_unix_io: The blue full system proto unix io to use
         :param yellow_full_system_proto_unix_io: The yellow full system proto unix io to use
-        :param gamecontroller: The gamecontroller context managed instance
+        :param gamecontroller: The gamecontroller context managed instance 
 
         """
-
-        self.test_name = test_name
-        self.thunderscope = thunderscope
+        super(SimulatedTestRunner, self).__init__(
+            test_name,
+            thunderscope,
+            blue_full_system_proto_unix_io,
+            yellow_full_system_proto_unix_io,
+            gamecontroller,
+        )
         self.simulator_proto_unix_io = simulator_proto_unix_io
-        self.blue_full_system_proto_unix_io = blue_full_system_proto_unix_io
-        self.yellow_full_system_proto_unix_io = yellow_full_system_proto_unix_io
-        self.gamecontroller = gamecontroller
-        self.last_exception = None
 
-        self.world_buffer = ThreadSafeBuffer(buffer_size=1, protobuf_type=World)
-        self.primitive_set_buffer = ThreadSafeBuffer(
-            buffer_size=1, protobuf_type=PrimitiveSet
-        )
-        self.last_exception = None
+    def set_worldState(self, worldstate: WorldState):
+        """Sets the simulation worldstate
 
-        self.ssl_wrapper_buffer = ThreadSafeBuffer(
-            buffer_size=1, protobuf_type=SSL_WrapperPacket
-        )
-        self.robot_status_buffer = ThreadSafeBuffer(
-            buffer_size=1, protobuf_type=RobotStatus
-        )
-
-        self.blue_full_system_proto_unix_io.register_observer(
-            SSL_WrapperPacket, self.ssl_wrapper_buffer
-        )
-        self.blue_full_system_proto_unix_io.register_observer(
-            RobotStatus, self.robot_status_buffer
-        )
-
-        self.timestamp = 0
-        self.timestamp_mutex = threading.Lock()
+        Args:
+            worldstate (WorldState): proto containing the desired worldstate
+        """
+        self.simulator_proto_unix_io.send_proto(WorldState, worldstate)
 
     def time_provider(self):
         """Provide the current time in seconds since the epoch"""
@@ -159,6 +144,7 @@ class SimulatedTestRunner(object):
         eventually_validation_failure_msg = "Test Timed Out"
 
         while time_elapsed_s < test_timeout_s:
+
             # Check for new CI commands at this time step
             for (delay, cmd, team) in ci_cmd_with_delay:
                 # If delay matches time
@@ -183,7 +169,7 @@ class SimulatedTestRunner(object):
             while True:
                 try:
                     world = self.world_buffer.get(
-                        block=True, timeout=WORLD_BUFFER_TIMEOUT, return_cached=False,
+                        block=True, timeout=WORLD_BUFFER_TIMEOUT, return_cached=False
                     )
                     break
                 except queue.Empty as empty:
@@ -203,7 +189,7 @@ class SimulatedTestRunner(object):
                     # We need this blocking get call to synchronize the running speed of world and primitives
                     # Otherwise, we end up with behaviour that doesn't simulate what would happen in the real world
                     self.primitive_set_buffer.get(
-                        block=True, timeout=WORLD_BUFFER_TIMEOUT, return_cached=False,
+                        block=True, timeout=WORLD_BUFFER_TIMEOUT, return_cached=False
                     )
 
             # Validate
@@ -598,11 +584,6 @@ def simulated_test_runner():
                     gamecontroller,
                 )
 
-            # Only validate on the blue worlds
-            blue_full_system_proto_unix_io.register_observer(World, runner.world_buffer)
-            blue_full_system_proto_unix_io.register_observer(
-                PrimitiveSet, runner.primitive_set_buffer
-            )
             # Setup proto loggers.
             #
             # NOTE: Its important we use the test runners time provider because
