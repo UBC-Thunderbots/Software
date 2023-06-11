@@ -132,6 +132,7 @@ class SimulatedTestRunner(object):
         test_timeout_s=3,
         tick_duration_s=0.0166,  # Default to 60hz
         ci_cmd_with_delay=[],
+        run_till_end=True,
     ):
         """Run a test
 
@@ -149,9 +150,13 @@ class SimulatedTestRunner(object):
                                     (time, command, team),
                                     ...
                                 }
+        :param run_till_end: If true, test runs till the end even if eventually validation passes
+                             If false, test stops once eventually validation passes and fails if time out
         """
 
         time_elapsed_s = 0
+
+        eventually_validation_failure_msg = "Test Timed Out"
 
         while time_elapsed_s < test_timeout_s:
             # Check for new CI commands at this time step
@@ -228,6 +233,18 @@ class SimulatedTestRunner(object):
             # Check that all always validations are always valid
             validation.check_validation(always_validation_proto_set)
 
+            if not run_till_end:
+                try:
+                    # Check that all eventually validations are eventually valid
+                    validation.check_validation(eventually_validation_proto_set)
+                    self.__stopper()
+                    return
+                except AssertionError as e:
+                    eventually_validation_failure_msg = str(e)
+
+        if not run_till_end:
+            raise AssertionError(eventually_validation_failure_msg)
+
         # Check that all eventually validations are eventually valid
         validation.check_validation(eventually_validation_proto_set)
 
@@ -240,6 +257,8 @@ class SimulatedTestRunner(object):
         test_timeout_s=3,
         tick_duration_s=0.0166,
         index=0,
+        run_till_end=True,
+        **kwargs,
     ):
         """
         Helper function to run a test, with thunderscope if enabled
@@ -249,6 +268,8 @@ class SimulatedTestRunner(object):
         :param tick_duration_s: length of a tick
         :param index: index of the current test. default is 0 (invariant test)
                       values can be passed in during aggregate testing for different timeout durations
+        :param run_till_end: If true, test runs till the end even if eventually validation passes
+                             If false, test stops once eventually validation passes and fails if time out
         """
 
         test_timeout_duration = (
@@ -276,6 +297,8 @@ class SimulatedTestRunner(object):
                     eventually_validation_sequence_set,
                     test_timeout_duration,
                     tick_duration_s,
+                    [],
+                    run_till_end,
                 ],
             )
             run_sim_thread.start()
@@ -292,6 +315,7 @@ class SimulatedTestRunner(object):
                 eventually_validation_sequence_set,
                 test_timeout_duration,
                 tick_duration_s,
+                run_till_end=run_till_end,
             )
 
 
@@ -312,8 +336,6 @@ class InvariantTestRunner(SimulatedTestRunner):
         params=[0],
         inv_always_validation_sequence_set=[[]],
         inv_eventually_validation_sequence_set=[[]],
-        test_timeout_s=3,
-        tick_duration_s=0.0166,  # Default to 60hz
         **kwargs,
     ):
         """Run an invariant test
@@ -325,9 +347,6 @@ class InvariantTestRunner(SimulatedTestRunner):
                                 that should hold on every tick
         :param inv_eventually_validation_sequence_set: Validation functions for invariant testing
                                 that should eventually be true, before the test ends
-        :param test_timeout_s: The timeout for the test, if any eventually_validations
-                                remain after the timeout, the test fails.
-        :param tick_duration_s: The simulation step duration
 
         """
 
@@ -338,8 +357,7 @@ class InvariantTestRunner(SimulatedTestRunner):
         super().run_test(
             inv_always_validation_sequence_set,
             inv_eventually_validation_sequence_set,
-            test_timeout_s,
-            tick_duration_s,
+            **kwargs,
         )
 
 
@@ -361,8 +379,6 @@ class AggregateTestRunner(SimulatedTestRunner):
         params=[],
         ag_always_validation_sequence_set=[[]],
         ag_eventually_validation_sequence_set=[[]],
-        test_timeout_s=3,
-        tick_duration_s=0.0166,  # Default to 60hz
         **kwargs,
     ):
         """Run an aggregate test
@@ -372,11 +388,7 @@ class AggregateTestRunner(SimulatedTestRunner):
         :param ag_always_validation_sequence_set: Validation functions for aggregate testing
                                 that should hold on every tick
         :param ag_eventually_validation_sequence_set: Validation functions for aggregate testing
-                                that should eventually be true, before the test ends
-        :param test_timeout_s: The timeout for the test, if any eventually_validations
-                                remain after the timeout, the test fails.
-        :param tick_duration_s: The simulation step duration
-
+                                that should eventually be true, before the test end
         """
 
         threading.excepthook = self.excepthook
@@ -394,8 +406,7 @@ class AggregateTestRunner(SimulatedTestRunner):
                 super().run_test(
                     ag_always_validation_sequence_set,
                     ag_eventually_validation_sequence_set,
-                    test_timeout_s,
-                    tick_duration_s,
+                    **kwargs,
                 )
             except AssertionError:
                 failed_tests += 1

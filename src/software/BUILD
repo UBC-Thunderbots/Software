@@ -38,6 +38,17 @@ cc_binary(
     ],
 )
 
+cc_binary(
+    name = "network_log_listener_main",
+    srcs = ["network_log_listener_main.cpp"],
+    deps = [
+        "//proto:tbots_cc_proto",
+        "//shared:constants",
+        "//software/networking:threaded_proto_udp_listener",
+        "@boost//:program_options",
+    ],
+)
+
 cc_library(
     name = "constants",
     hdrs = ["constants.h"],
