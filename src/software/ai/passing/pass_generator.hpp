@@ -221,7 +221,7 @@ double PassGenerator<ZoneEnum>::getPassSpeed(const Point& ball_position,
                                   pass_destination.y() - ball_position.y());
     double pass_distance_length = pass_distance.length();
 
-    double deceleration = -0.5;
+    double deceleration = passing_config_.pass_deceleration();
 
     double pass_speed =
         sqrt((dest_speed * dest_speed) - 2 * deceleration * pass_distance_length);
