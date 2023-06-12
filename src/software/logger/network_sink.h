@@ -34,14 +34,14 @@ class NetworkSink
      *
      * @param log_entry the message received on a LOG() call
      */
-    void sendToNetwork(const g3::LogMessageMover log_entry);
+    void sendToNetwork(const g3::LogMessageMover& log_entry);
 
     /**
      * Send a single log to the network, without merging.
      *
      * @param log the LogMessage to send
      */
-    void sendOneLogToNetwork(const g3::LogMessage log);
+    void sendOneLogToNetwork(const g3::LogMessage& log);
 
    private:
     std::unique_ptr<ThreadedProtoUdpSender<TbotsProto::RobotLog>> log_output;
