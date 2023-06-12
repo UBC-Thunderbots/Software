@@ -34,7 +34,7 @@ class NetworkSink
      *
      * @param log_entry the message received on a LOG() call
      */
-    void sendToNetwork(const g3::LogMessageMover& log_entry);
+    void sendToNetwork(g3::LogMessageMover log_entry);
 
     /**
      * Send a single log to the network, without merging.
