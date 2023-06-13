@@ -1,8 +1,8 @@
 protobuf==3.19.5
 pyqtgraph==0.12.4
 autoflake==1.4
-pyqt6 # version is embedded in the package
-PyQt6-WebEngine
+pyqt6==6.5.0
+PyQt6-WebEngine # version is embedded in the package
 thefuzz==0.19.0
 iterfzf==0.5.0.20.0
 pyqtdarktheme==1.1.0

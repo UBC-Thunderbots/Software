@@ -242,6 +242,10 @@ class Thunderscope(object):
         self.window.showMaximized()
         pyqtgraph.exec()
 
+    def is_open(self):
+        """Returns true if the window is open"""
+        return self.window.isVisible()
+
     def close(self):
         """Close the main window"""
 

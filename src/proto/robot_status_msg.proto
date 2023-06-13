@@ -57,6 +57,9 @@ message DribblerStatus
 
     // Dribbler temperature
     float dribbler_temperature = 2;
+
+    repeated MotorFault motor_faults = 3;
+    bool enabled                     = 4;
 }
 
 /* Error codes are to be displayed in the visualizer */
@@ -72,10 +75,35 @@ enum ErrorCode
     DRIBBLER_MOTOR_HOT = 4;
 }
 
+enum MotorFault
+{
+    // Refer to Trinamic 6100 datasheet for precise definitions of motor faults.
+    // https://trinamic.com/fileadmin/assets/Products/ICs_Documents/TMC6100_datasheet_Rev1.00.pdf
+    // (Section 5.1, p22-23)
+    RESET                             = 0;
+    DRIVER_OVERTEMPERATURE_PREWARNING = 1;
+    DRIVER_OVERTEMPERATURE            = 2;
+    UNDERVOLTAGE_CHARGEPUMP           = 3;
+    PHASE_U_SHORT_COUNTER_DETECTED    = 4;
+    PHASE_U_SHORT_TO_GND_DETECTED     = 5;
+    PHASE_U_SHORT_TO_VS_DETECTED      = 6;
+    // for the sake of consistency with the TMC 6100, "7" is unused
+    PHASE_V_SHORT_COUNTER_DETECTED = 8;
+    PHASE_V_SHORT_TO_GND_DETECTED  = 9;
+    PHASE_V_SHORT_TO_VS_DETECTED   = 10;
+    // for the sake of consistency with the TMC 6100, "11" is unused
+    PHASE_W_SHORT_COUNTER_DETECTED = 12;
+    PHASE_W_SHORT_TO_GND_DETECTED  = 13;
+    PHASE_W_SHORT_TO_VS_DETECTED   = 14;
+}
+
 message DriveUnit
 {
     // The current RPM of the wheel
     float wheel_velocity = 1;
+
+    repeated MotorFault motor_faults = 2;
+    bool enabled = 3;  // certain drive faults cause the motor to be disabled
 }
 
 /* Data from all four drive units and the dribbler */

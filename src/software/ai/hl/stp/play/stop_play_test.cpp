@@ -23,7 +23,7 @@ class StopPlayTest : public SimulatedErForceSimPlayTestFixture
         return {
             [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
                 // Wait 2 seconds for robots that start too close to the ball to move away
-                if (world_ptr->getMostRecentTimestamp() >= Timestamp::fromSeconds(4))
+                if (world_ptr->getMostRecentTimestamp() >= Timestamp::fromSeconds(8))
                 {
                     robotsSlowDown(1.5, world_ptr, yield);
                     robotsAvoidBall(0.5, {}, world_ptr, yield);
@@ -48,9 +48,7 @@ class StopPlayTest : public SimulatedErForceSimPlayTestFixture
              field.enemyDefenseArea().negXPosYCorner()});
 };
 
-// TODO (#2519): The ball is not an obstacle for robots running crease defense tactic,
-//               as a result, they collide with the ball and the test fails
-TEST_F(StopPlayTest, DISABLED_test_stop_play_ball_at_centre_robots_spread_out)
+TEST_F(StopPlayTest, test_stop_play_ball_at_centre_robots_spread_out)
 {
     BallState ball_state(Point(0, 0), Vector(0, 0));
     auto friendly_robots = TestUtil::createStationaryRobotStatesWithId(
@@ -131,9 +129,7 @@ TEST_F(StopPlayTest, test_stop_play_enemy_half_corner_robots_close_together)
             Duration::fromSeconds(10));
 }
 
-// TODO (#2519): The ball is not an obstacle for robots running crease defense tactic,
-//               as a result, they collide with the ball and the test fails
-TEST_F(StopPlayTest, DISABLED_test_stop_play_centre_robots_close_together)
+TEST_F(StopPlayTest, test_stop_play_centre_robots_close_together)
 {
     BallState ball_state(Point(0, 0), Vector(0, 0));
     auto friendly_robots = TestUtil::createStationaryRobotStatesWithId(

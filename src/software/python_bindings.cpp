@@ -64,8 +64,8 @@ void declareThreadedProtoUdpListener(py::module& m, std::string name)
     std::string pyclass_name = name + "ProtoListener";
     py::class_<Class, std::shared_ptr<Class>>(m, pyclass_name.c_str(),
                                               py::buffer_protocol(), py::dynamic_attr())
-        .def(
-            py::init<std::string, unsigned short, const std::function<void(T)>&, bool>());
+        .def(py::init<std::string, unsigned short, const std::function<void(T)>&, bool>())
+        .def("close", &Class::close);
 }
 
 /**
@@ -322,6 +322,8 @@ PYBIND11_MODULE(python_bindings, m)
         .def("field", &World::field);
 
     // Listeners
+    declareThreadedProtoUdpListener<TbotsProto::HRVOVisualization>(m,
+                                                                   "HRVOVisualization");
     declareThreadedProtoUdpListener<SSLProto::Referee>(m, "SSLReferee");
     declareThreadedProtoUdpListener<TbotsProto::RobotStatus>(m, "RobotStatus");
     declareThreadedProtoUdpListener<TbotsProto::RobotLog>(m, "RobotLog");

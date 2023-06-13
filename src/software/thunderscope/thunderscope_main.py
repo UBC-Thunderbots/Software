@@ -265,6 +265,11 @@ if __name__ == "__main__":
         # else, it will be the diagnostics proto
         current_proto_unix_io = tscope.proto_unix_io_map[ProtoUnixIOTypes.CURRENT]
 
+        # different estops use different ports this detects which one to use based on what is plugged in
+        estop_path = (
+            "/dev/ttyACM0" if os.path.isfile("/dev/ttyACM0") else "/dev/ttyUSB0"
+        )
+
         estop_mode = EstopMode.ESTOP
         if args.use_keyboard_estop:
             estop_mode = EstopMode.KEYBOARD_ESTOP
@@ -275,6 +280,8 @@ if __name__ == "__main__":
             current_proto_unix_io,
             getRobotMulticastChannel(0),
             args.interface,
+            args.disable_estop,
+            estop_path,
             estop_mode,
         ) as robot_communication:
 
@@ -389,7 +396,7 @@ if __name__ == "__main__":
             )
 
             # Tick Simulation
-            while True:
+            while tscope.is_open():
 
                 simulation_state_message = simulation_state_buffer.get()
 
@@ -405,9 +412,12 @@ if __name__ == "__main__":
         with Simulator(
             args.simulator_runtime_dir, args.debug_simulator, args.enable_realism
         ) as simulator, FullSystem(
-            args.blue_full_system_runtime_dir, args.debug_blue_full_system, False
+            args.blue_full_system_runtime_dir, args.debug_blue_full_system, False, False
         ) as blue_fs, FullSystem(
-            args.yellow_full_system_runtime_dir, args.debug_yellow_full_system, True
+            args.yellow_full_system_runtime_dir,
+            args.debug_yellow_full_system,
+            True,
+            False,
         ) as yellow_fs, ProtoLogger(
             args.blue_full_system_runtime_dir,
         ) as blue_logger, ProtoLogger(
