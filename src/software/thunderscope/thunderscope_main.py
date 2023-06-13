@@ -160,7 +160,7 @@ if __name__ == "__main__":
     )
     estop_group = parser.add_mutually_exclusive_group()
     estop_group.add_argument(
-        "--use_keyboard_estop",
+        "--keyboard_estop",
         action="store_true",
         default=False,
         help="Allows the use of the spacebar as an estop instead of a physical one",
@@ -271,7 +271,7 @@ if __name__ == "__main__":
         )
 
         estop_mode = EstopMode.ESTOP
-        if args.use_keyboard_estop:
+        if args.keyboard_estop:
             estop_mode = EstopMode.KEYBOARD_ESTOP
         if args.disable_estop:
             estop_mode = EstopMode.DISABLE_ESTOP
@@ -280,9 +280,8 @@ if __name__ == "__main__":
             current_proto_unix_io,
             getRobotMulticastChannel(0),
             args.interface,
-            args.disable_estop,
-            estop_path,
             estop_mode,
+            estop_path=estop_path,
         ) as robot_communication:
 
             if estop_mode == EstopMode.KEYBOARD_ESTOP:
