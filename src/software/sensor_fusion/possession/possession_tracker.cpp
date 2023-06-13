@@ -9,6 +9,7 @@ PossessionTracker::PossessionTracker(const TbotsProto::PossessionTrackerConfig &
       distance_far_tolerance_meters(config.distance_far_tolerance_meters()),
       time_near_threshold(Duration::fromSeconds(config.time_near_threshold_s())),
       time_far_threshold(Duration::fromSeconds(config.time_far_threshold_s())),
+      time_stagnant_threshold(Duration::fromSeconds(config.time_stagnant_threshold_s())),
       last_timestamp(Timestamp::fromSeconds(0)),
       time_near_friendly(Duration::fromSeconds(0)),
       time_near_enemy(Duration::fromSeconds(0)),
@@ -36,7 +37,14 @@ TeamPossession PossessionTracker::getTeamWithPossession(const Team &friendly_tea
     else if ((time_near_friendly < time_near_threshold) &&
              (time_near_enemy > time_near_threshold))
     {
-        possession = TeamPossession::ENEMY_TEAM;
+        if (time_near_enemy < time_stagnant_threshold)
+        {
+            possession = TeamPossession::ENEMY_TEAM;
+        }
+        else
+        {
+            possession = TeamPossession::STAGNANT_ENEMY_TEAM;
+        }
     }
     else if ((time_near_friendly > time_near_threshold) &&
              (time_near_enemy > time_near_threshold))
@@ -55,7 +63,7 @@ TeamPossession PossessionTracker::getTeamWithPossession(const Team &friendly_tea
         if (field.pointInFriendlyHalf(ball.position()) ||
             num_enemies_in_friendly_half > 0)
         {
-            possession = TeamPossession::ENEMY_TEAM;
+            possession = TeamPossession::STAGNANT_ENEMY_TEAM;
         }
         else
         {

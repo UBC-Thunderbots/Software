@@ -48,6 +48,9 @@ class PossessionTracker
     // Min time that robot must stay away from ball for it to be considered far away
     Duration time_far_threshold;
 
+    // Min time that team must hold possession for in order to be considered stagnant
+    Duration time_stagnant_threshold;
+
     // The timestamp of last game snapshot the PossessionTracker was updated with
     Timestamp last_timestamp;
 

@@ -83,7 +83,7 @@ def test_defense_play(simulated_test_runner, blue_bots, yellow_bots):
             ]
         ],
         ag_eventually_validation_sequence_set=[[]],
-        test_timeout_s=30,
+        test_timeout_s=60,
     )
 
 
