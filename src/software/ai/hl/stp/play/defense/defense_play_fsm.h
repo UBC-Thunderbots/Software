@@ -21,6 +21,9 @@ struct DefensePlayFSM
 
     DEFINE_PLAY_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
+    // Distance away from an enemy that shadowers will position themselves to shadow
+    const double ROBOT_SHADOWING_DISTANCE_METERS = ROBOT_MAX_RADIUS_METERS * 3;
+
     /**
      * Creates a defense play FSM
      *

@@ -1,7 +1,6 @@
 #include "software/ai/hl/stp/play/defense/defense_play_fsm.h"
 
 #include "software/ai/evaluation/defender_assignment.h"
-#include "software/ai/evaluation/enemy_threat.h"
 
 DefensePlayFSM::DefensePlayFSM(TbotsProto::AiConfig ai_config)
     : ai_config(ai_config), crease_defenders({}), pass_defenders({}), shadowers({})
@@ -148,7 +147,6 @@ void DefensePlayFSM::updateShadowers(const Update& event,
 {
     setUpShadowers(static_cast<unsigned int>(threats_to_shadow.size()));
 
-    const double ROBOT_SHADOWING_DISTANCE_METERS = ROBOT_MAX_RADIUS_METERS * 3;
     for (unsigned int i = 0; i < shadowers.size(); i++)
     {
         shadowers.at(i)->updateControlParams(threats_to_shadow.at(i),
