@@ -17,38 +17,46 @@ from software import py_constants
     "ball_initial_position,ball_initial_velocity,attacker_robot_position,"
     "receiver_robot_positions,friendly_orientations,enemy_robot_positions",
     [
+        # (
+        #     tbots.Point(-0.5, 0),
+        #     tbots.Vector(0.0, 0.0),
+        #     tbots.Point(-1.0, 0.0),
+        #     [tbots.Point(1.0, 0.0)],
+        #     [0, math.pi],
+        #     [],
+        # ),
+        # (
+        #     tbots.Point(0.0, 0.0),
+        #     tbots.Vector(0.0, 0.0),
+        #     tbots.Point(-3.5, 0.0),
+        #     [tbots.Point(3.5, 0.0)],
+        #     [0, math.pi],
+        #     [],
+        # ),
+        # # TODO: Make Interception Better
+        # (
+        #     tbots.Point(0.0, 0.0),
+        #     tbots.Vector(0.0, 0.0),
+        #     tbots.Point(0.0, -1.0),
+        #     [tbots.Point(3.5, 0.0)],
+        #     [0, math.pi],
+        #     [],
+        # ),
+        # (
+        #     tbots.Point(-1.0, 0.0),
+        #     tbots.Vector(0.0, 0.0),
+        #     tbots.Point(-3.5, 2.5),
+        #     [tbots.Point(3.5, -2.5)],
+        #     [0, math.pi],
+        #     [],
+        # ),
         (
             tbots.Point(-0.5, 0),
             tbots.Vector(0.0, 0.0),
             tbots.Point(-1.0, 0.0),
-            [tbots.Point(1.0, 0.0)],
+            [tbots.Point(1.5, 0.0)],
             [0, math.pi],
-            [],
-        ),
-        (
-            tbots.Point(0.0, 0.0),
-            tbots.Vector(0.0, 0.0),
-            tbots.Point(-3.5, 0.0),
-            [tbots.Point(3.5, 0.0)],
-            [0, math.pi],
-            [],
-        ),
-        # TODO: Make Interception Better
-        (
-            tbots.Point(0.0, 0.0),
-            tbots.Vector(0.0, 0.0),
-            tbots.Point(0.0, -1.0),
-            [tbots.Point(3.5, 0.0)],
-            [0, math.pi],
-            [],
-        ),
-        (
-            tbots.Point(-1.0, 0.0),
-            tbots.Vector(0.0, 0.0),
-            tbots.Point(-3.5, 2.5),
-            [tbots.Point(3.5, -2.5)],
-            [0, math.pi],
-            [],
+            [tbots.Point(0.5, 0.0)],
         ),
     ],
 )
