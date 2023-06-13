@@ -144,10 +144,7 @@ class RobotCommunication(object):
             except Empty:
                 # if empty do nothing
                 pass
-            if (
-                world
-                and self.should_send_primitive()
-            ):
+            if world and self.should_send_primitive():
                 # send the world proto
                 self.send_world.send_proto(world)
 
