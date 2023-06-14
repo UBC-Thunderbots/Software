@@ -15,6 +15,7 @@ TEST(DefensePlayFSMTest, test_transitions)
     FSM<DefensePlayFSM> fsm(DefensePlayFSM{ai_config});
     EXPECT_TRUE(fsm.is(boost::sml::state<DefensePlayFSM::DefenseState>));
 
+    world.setTeamWithPossession(TeamPossession::ENEMY_TEAM);
     fsm.process_event(DefensePlayFSM::Update(
         DefensePlayFSM::ControlParams{
             .max_allowed_speed_mode = TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT},
@@ -22,6 +23,25 @@ TEST(DefensePlayFSMTest, test_transitions)
             world, 3, [](PriorityTacticVector new_tactics) {}, InterPlayCommunication{},
             [](InterPlayCommunication comm) {})));
 
-    // DefensePlayFSM always stays in the DefenseState
+    EXPECT_TRUE(fsm.is(boost::sml::state<DefensePlayFSM::DefenseState>));
+
+    world.setTeamWithPossession(TeamPossession::STAGNANT_ENEMY_TEAM);
+    fsm.process_event(DefensePlayFSM::Update(
+        DefensePlayFSM::ControlParams{
+            .max_allowed_speed_mode = TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT},
+        PlayUpdate(
+            world, 3, [](PriorityTacticVector new_tactics) {}, InterPlayCommunication{},
+            [](InterPlayCommunication comm) {})));
+
+    EXPECT_TRUE(fsm.is(boost::sml::state<DefensePlayFSM::AggressiveDefenseState>));
+
+    world.setTeamWithPossession(TeamPossession::ENEMY_TEAM);
+    fsm.process_event(DefensePlayFSM::Update(
+        DefensePlayFSM::ControlParams{
+            .max_allowed_speed_mode = TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT},
+        PlayUpdate(
+            world, 3, [](PriorityTacticVector new_tactics) {}, InterPlayCommunication{},
+            [](InterPlayCommunication comm) {})));
+
     EXPECT_TRUE(fsm.is(boost::sml::state<DefensePlayFSM::DefenseState>));
 }

@@ -63,6 +63,9 @@ TeamPossession PossessionTracker::getTeamWithPossession(const Team &friendly_tea
         if (field.pointInFriendlyHalf(ball.position()) ||
             num_enemies_in_friendly_half > 0)
         {
+            // Possession is considered stagnant since the ball is being
+            // actively over fought over (both teams are near ball), but
+            // enemy possession remains unchanged 
             possession = TeamPossession::STAGNANT_ENEMY_TEAM;
         }
         else
