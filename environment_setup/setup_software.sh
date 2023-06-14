@@ -40,6 +40,7 @@ host_software_packages=(
     codespell # Fixes typos
     curl
     default-jdk # Needed for Bazel to run properly
+    dkms  # dynamic kernel module loading for spi-ch341a-usb driver
     gcc-9 # We use gcc 9.3.0
     libstdc++6-9-dbg
     git # required for build
@@ -59,9 +60,9 @@ host_software_packages=(
     python3-protobuf # This is required for the "NanoPb" library, which does not
                     # properly manage this as a bazel dependency, so we have
                     # to manually install it ourselves
+    python3-testresources
     python3-yaml # Load dynamic parameter configuration files
     qt5-default # A GUI library used by er-force sim
-    tmux        # Used by AI vs AI script
     valgrind # Checks for memory leaks
     libsqlite3-dev # needed to build Python 3 with sqlite support
     libffi-dev # needed to use _ctypes in Python3
@@ -138,9 +139,7 @@ print_status_msg "Done Installing Bazel"
 print_status_msg "Setting Up PlatformIO"
 
 # setup platformio to compile arduino code
-# link to instructions: https://docs.platformio.org/en/latest/core/installation.html
-# **need to reboot for changes to come into effect**
-
+# link to instructions: https://docs.platformio.org/en/latest/core/installation.html # **need to reboot for changes to come into effect**
 # downloading platformio udev rules
 if ! curl -fsSL https://raw.githubusercontent.com/platformio/platformio-core/master/scripts/99-platformio-udev.rules | sudo tee /etc/udev/rules.d/99-platformio-udev.rules; then
     print_status_msg "Error: Downloading PlatformIO udev rules failed"
@@ -159,4 +158,42 @@ if ! sudo /usr/bin/python3.8 -m pip install --prefix /usr/local platformio==6.0.
 fi
 
 print_status_msg "Done PlatformIO Setup"
+
+print_status_msg "Setting up radio communication module"
+
+wget -nc https://github.com/joan2937/pigpio/archive/master.zip -O /tmp/master.zip
+unzip /tmp/master.zip -d /tmp/
+cd /tmp/pigpio-master
+make
+sudo make install
+cd "$CURR_DIR" 
+
+git clone https://github.com/Thunderbots/spi-ch341-usb.git /opt/tbotspython/spi-ch341a-usb
+cd /opt/tbotspython/spi-ch341a-usb/
+make
+sudo make install
+cd "$CURR_DIR" 
+
+git clone https://github.com/nRF24/RF24.git /tmp/rf24libs
+cd /tmp/rf24libs/
+./configure --driver=SPIDEV
+make
+sudo make install
+sudo ln -s $(ls /usr/lib/$(ls /usr/lib/gcc | tail -1)/libboost_python3*.so | tail -1) /usr/lib/$(ls /usr/lib/gcc | tail -1)/libboost_python3.so
+cd pyRF24
+python3 setup.py build
+sudo python3 setup.py install
+cd "$CURR_DIR" 
+
+git clone https://github.com/nRF24/RF24Network.git /tmp/rf24network
+cd /tmp/rf24network/
+make
+sudo make install
+cd RPi/pyRF24Network/
+python3 setup.py build
+sudo python3 setup.py install
+cd "$CURR_DIR" 
+
+print_status_msg "Setting up radio communication module"
+
 print_status_msg "Done Software Setup, please reboot for changes to take place"
