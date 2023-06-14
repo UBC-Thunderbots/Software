@@ -78,6 +78,9 @@ class RobotCommunication(object):
         # if using keyboard estop, skips this step
         self.estop_reader = None
         self.estop_is_playing = False
+        # when the estop has just been stopped,
+        # we want to send a stop primitive once to all currently connected robots
+        self.should_send_stop = False
 
         # only checks for estop if we are in physical estop mode
         if self.estop_mode == EstopMode.ESTOP:
@@ -98,6 +101,7 @@ class RobotCommunication(object):
             while True:
                 if self.estop_mode == EstopMode.ESTOP:
                     self.estop_is_playing = self.estop_reader.isEstopPlay()
+                    self.should_send_stop = not self.estop_is_playing
 
                 self.current_proto_unix_io.send_proto(
                     EstopState, EstopState(is_playing=self.estop_is_playing)
@@ -111,6 +115,7 @@ class RobotCommunication(object):
         """
         if self.estop_mode == EstopMode.KEYBOARD_ESTOP:
             self.estop_is_playing = not self.estop_is_playing
+            self.should_send_stop = not self.estop_is_playing
 
             print(
                 "Keyboard Estop " + ("Enabled" if self.estop_is_playing else "Disabled")
@@ -144,10 +149,7 @@ class RobotCommunication(object):
             except Empty:
                 # if empty do nothing
                 pass
-            if (
-                world
-                and self.should_send_primitive()
-            ):
+            if world and self.should_send_primitive():
                 # send the world proto
                 self.send_world.send_proto(world)
 
@@ -210,14 +212,20 @@ class RobotCommunication(object):
             primitive_set = PrimitiveSet(
                 time_sent=Timestamp(epoch_timestamp_seconds=time.time()),
                 stay_away_from_ball=False,
-                robot_primitives=robot_primitives,
+                robot_primitives=robot_primitives
+                if not self.should_send_stop
+                else {
+                    robot_id: Primitive(stop=StopPrimitive())
+                    for robot_id in robot_primitives.keys()
+                },
                 sequence_number=self.sequence_number,
             )
 
             self.sequence_number += 1
 
-            if self.should_send_primitive():
+            if self.should_send_primitive() or self.should_send_stop:
                 self.send_primitive_set.send_proto(primitive_set)
+                self.should_send_stop = False
 
             # sleep if not running fullsystem
             if not self.robots_connected_to_fullsystem:
