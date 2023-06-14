@@ -215,6 +215,11 @@
           tags:
             - enableSystemd
 
+        - name: Enable WiFi waiter service
+          become: true
+          become_method: sudo
+          service: name=NetworkManager-wait-online enabled=yes
+
         - name: Reboot
           become: true
           become_user: root
