@@ -194,6 +194,10 @@ python3 setup.py build
 sudo python3 setup.py install
 cd "$CURR_DIR" 
 
+echo "SUBSYSTEM==\"spidev\", GROUP=\"spiuser\", MODE=\"0660\"" | sudo tee /etc/udev/rules.d/50-spi.rules
+sudo groupadd spiuser
+sudo adduser "$USER" spiuser
+
 print_status_msg "Setting up radio communication module"
 
 print_status_msg "Done Software Setup, please reboot for changes to take place"
