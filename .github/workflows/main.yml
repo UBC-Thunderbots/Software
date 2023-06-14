@@ -30,6 +30,7 @@ jobs:
             -//software/simulated_tests/...  \
             -//software/ai/hl/...            \
             -//software/field_tests/...      \
+            -//software/ai/navigator/...
 
   jetson-nano-tests:
     name: Jetson Nano Software Tests
