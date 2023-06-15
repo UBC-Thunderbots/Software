@@ -139,7 +139,8 @@ print_status_msg "Done Installing Bazel"
 print_status_msg "Setting Up PlatformIO"
 
 # setup platformio to compile arduino code
-# link to instructions: https://docs.platformio.org/en/latest/core/installation.html # **need to reboot for changes to come into effect**
+# link to instructions: https://docs.platformio.org/en/latest/core/installation.html
+# **need to reboot for changes to come into effect**
 # downloading platformio udev rules
 if ! curl -fsSL https://raw.githubusercontent.com/platformio/platformio-core/master/scripts/99-platformio-udev.rules | sudo tee /etc/udev/rules.d/99-platformio-udev.rules; then
     print_status_msg "Error: Downloading PlatformIO udev rules failed"
@@ -172,6 +173,7 @@ git clone https://github.com/Thunderbots/spi-ch341-usb.git /opt/tbotspython/spi-
 cd /opt/tbotspython/spi-ch341a-usb/
 make
 sudo make install
+sudo insmod spi-ch341-usb.ko
 cd "$CURR_DIR" 
 
 git clone https://github.com/nRF24/RF24.git /tmp/rf24libs
@@ -181,8 +183,8 @@ make
 sudo make install
 sudo ln -s $(ls /usr/lib/$(ls /usr/lib/gcc | tail -1)/libboost_python3*.so | tail -1) /usr/lib/$(ls /usr/lib/gcc | tail -1)/libboost_python3.so
 cd pyRF24
-python3 setup.py build
-sudo python3 setup.py install
+/opt/tbotspython/bin/python3 setup.py build
+sudo /opt/tbotspython/bin/python3 setup.py install
 cd "$CURR_DIR" 
 
 git clone https://github.com/nRF24/RF24Network.git /tmp/rf24network
@@ -190,14 +192,15 @@ cd /tmp/rf24network/
 make
 sudo make install
 cd RPi/pyRF24Network/
-python3 setup.py build
-sudo python3 setup.py install
+/opt/tbotspython/bin/python3 setup.py build
+sudo /opt/tbotspython/bin/python3 setup.py install
 cd "$CURR_DIR" 
 
+# set up UDEV rule so that we don't need sudo when running thunderscope_main
 echo "SUBSYSTEM==\"spidev\", GROUP=\"spiuser\", MODE=\"0660\"" | sudo tee /etc/udev/rules.d/50-spi.rules
 sudo groupadd spiuser
 sudo adduser "$USER" spiuser
 
-print_status_msg "Setting up radio communication module"
+print_status_msg "Radio communication module setup complete"
 
 print_status_msg "Done Software Setup, please reboot for changes to take place"
