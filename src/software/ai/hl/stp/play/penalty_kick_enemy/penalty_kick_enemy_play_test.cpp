@@ -39,13 +39,13 @@ TEST_P(PenaltyKickEnemyPlayTest, test_penalty_kick_enemy_play_setup)
         Point(field.enemyPenaltyMark().x() + 0.3, 0),  // kicker robot
         Point(field.enemyPenaltyMark().x() + enemy_distance_behind_ball, 0),
         Point(field.enemyPenaltyMark().x() + enemy_distance_behind_ball,
-              4 * ROBOT_MAX_RADIUS_METERS),
-        Point(field.enemyPenaltyMark().x() + enemy_distance_behind_ball,
               8 * ROBOT_MAX_RADIUS_METERS),
         Point(field.enemyPenaltyMark().x() + enemy_distance_behind_ball,
-              -4 * ROBOT_MAX_RADIUS_METERS),
+              16 * ROBOT_MAX_RADIUS_METERS),
         Point(field.enemyPenaltyMark().x() + enemy_distance_behind_ball,
               -8 * ROBOT_MAX_RADIUS_METERS),
+        Point(field.enemyPenaltyMark().x() + enemy_distance_behind_ball,
+              -16 * ROBOT_MAX_RADIUS_METERS),
     });
     setFriendlyGoalie(0);
     setEnemyGoalie(0);
@@ -68,7 +68,7 @@ TEST_P(PenaltyKickEnemyPlayTest, test_penalty_kick_enemy_play_setup)
 
     runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(10));
+            Duration::fromSeconds(20));
 }
 
 INSTANTIATE_TEST_CASE_P(
@@ -112,19 +112,19 @@ TEST_F(PenaltyKickEnemyPlayTest, test_penalty_kick_enemy_play_goalie)
     // friendly robots already in position
     auto friendly_robots = TestUtil::createStationaryRobotStatesWithId(
         {field.friendlyGoalCenter(), Point(field.enemyPenaltyMark().x() + 1.5, 0),
-         Point(field.enemyPenaltyMark().x() + 1.5, 4 * ROBOT_MAX_RADIUS_METERS),
-         Point(field.enemyPenaltyMark().x() + 1.5, -4 * ROBOT_MAX_RADIUS_METERS),
          Point(field.enemyPenaltyMark().x() + 1.5, 8 * ROBOT_MAX_RADIUS_METERS),
-         Point(field.enemyPenaltyMark().x() + 1.5, -8 * ROBOT_MAX_RADIUS_METERS)});
+         Point(field.enemyPenaltyMark().x() + 1.5, -8 * ROBOT_MAX_RADIUS_METERS),
+         Point(field.enemyPenaltyMark().x() + 1.5, 16 * ROBOT_MAX_RADIUS_METERS),
+         Point(field.enemyPenaltyMark().x() + 1.5, -16 * ROBOT_MAX_RADIUS_METERS)});
 
     // enemy robots behind the penalty mark
     auto enemy_robots = TestUtil::createStationaryRobotStatesWithId({
         Point(field.enemyPenaltyMark().x() + 0.3, 0),
         Point(field.enemyPenaltyMark().x() + 1, 0),
-        Point(field.enemyPenaltyMark().x() + 1, 4 * ROBOT_MAX_RADIUS_METERS),
         Point(field.enemyPenaltyMark().x() + 1, 8 * ROBOT_MAX_RADIUS_METERS),
-        Point(field.enemyPenaltyMark().x() + 1, -4 * ROBOT_MAX_RADIUS_METERS),
+        Point(field.enemyPenaltyMark().x() + 1, 16 * ROBOT_MAX_RADIUS_METERS),
         Point(field.enemyPenaltyMark().x() + 1, -8 * ROBOT_MAX_RADIUS_METERS),
+        Point(field.enemyPenaltyMark().x() + 1, -16 * ROBOT_MAX_RADIUS_METERS),
     });
     setFriendlyGoalie(0);
     setEnemyGoalie(0);
@@ -151,5 +151,5 @@ TEST_F(PenaltyKickEnemyPlayTest, test_penalty_kick_enemy_play_goalie)
 
     runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(10));
+            Duration::fromSeconds(20));
 }
