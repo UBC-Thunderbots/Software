@@ -209,7 +209,8 @@ void MotorService::setup()
     is_initialized_ = true;
 }
 
-void MotorService::setUpDriveMotor(uint8_t motor) {
+void MotorService::setUpDriveMotor(uint8_t motor)
+{
     startDriver(motor);
     checkDriverFault(motor);
     // Start all the controllers as drive motor controllers
@@ -335,8 +336,10 @@ MotorService::MotorFaultIndicator MotorService::checkDriverFault(uint8_t motor)
     return MotorFaultIndicator(drive_enabled, motor_faults);
 }
 
-void MotorService::disableVelocity(double current_velocity, double previous_velocity) {
-    if (std::abs(current_velocity - previous_velocity) > RUNAWAY_PROTECTION_THRESHOLD_MPS) {
+void MotorService::disableVelocity(double current_velocity, double previous_velocity)
+{
+    if (std::abs(current_velocity - previous_velocity) > RUNAWAY_PROTECTION_THRESHOLD_MPS)
+    {
         driver_control_enable_gpio_.setValue(GpioState::LOW);
         LOG(FATAL) << "Front right motor runaway";
     }
@@ -601,7 +604,8 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
     return motor_status;
 }
 
-void MotorService::setTargetVelocity(uint8_t chip_select, int target) {
+void MotorService::setTargetVelocity(uint8_t chip_select, int target)
+{
     tmc4671_setTargetVelocity(chip_select, target);
 }
 
@@ -777,15 +781,18 @@ void MotorService::writeToDriverOrDieTrying(uint8_t motor, uint8_t address, int3
                                << " received: " << read_value;
 }
 
-void MotorService::writeIntToTMC4671(uint8_t motor, uint8_t address, int32_t value) {
+void MotorService::writeIntToTMC4671(uint8_t motor, uint8_t address, int32_t value)
+{
     tmc4671_writeInt(motor, address, value);
 }
 
-int MotorService::readIntFromTMC4671(uint8_t motor, uint8_t address) {
+int MotorService::readIntFromTMC4671(uint8_t motor, uint8_t address)
+{
     return tmc4671_readInt(motor, address);
 }
 
-double MotorService::readVelocityFromTMC4671(uint8_t motor) {
+double MotorService::readVelocityFromTMC4671(uint8_t motor)
+{
     return static_cast<double>(tmc4671_getActualVelocity(motor)) *
            MECHANICAL_MPS_PER_ELECTRICAL_RPM;
 }
