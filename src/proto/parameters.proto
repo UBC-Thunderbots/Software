@@ -131,7 +131,7 @@ message PassingConfig
         (bounds).max_double_value = 5.0
     ];
     required double backwards_pass_distance = 13
-        [default = 0.5, (bounds).min_double_value = 0.0, (bounds).max_double_value = 2.0]
+        [default = 0.5, (bounds).min_double_value = 0.0, (bounds).max_double_value = 2.0];
 }
 
 message GoalieTacticConfig
