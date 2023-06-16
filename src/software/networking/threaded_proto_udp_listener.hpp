@@ -40,7 +40,13 @@ class ThreadedProtoUdpListener
     ThreadedProtoUdpListener(unsigned short port,
                              std::function<void(ReceiveProtoT)> receive_callback);
 
+    /**
+     * Closes the socket and stops the IO service thread
+     */
+    void close();
+
     ~ThreadedProtoUdpListener();
+
 
    private:
     // The io_service that will be used to service all network requests
@@ -75,6 +81,15 @@ ThreadedProtoUdpListener<ReceiveProtoT>::ThreadedProtoUdpListener(
 template <class ReceiveProtoT>
 ThreadedProtoUdpListener<ReceiveProtoT>::~ThreadedProtoUdpListener()
 {
+    close();
+}
+
+
+template <class ReceiveProtoT>
+void ThreadedProtoUdpListener<ReceiveProtoT>::close()
+{
+    udp_listener.close();
+
     // Stop the io_service. This is safe to call from another thread.
     // https://stackoverflow.com/questions/4808848/boost-asio-stopping-io-service
     // This MUST be done before attempting to join the thread because otherwise the

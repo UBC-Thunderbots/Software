@@ -300,13 +300,14 @@ class MotorService
                                               double dribbler_rpm);
 
     /**
-     * Returns true if we've detected a RESET in our cached motor faults indicators.
+     * Returns true if we've detected a RESET in our cached motor faults indicators or if
+     * we have a fault that disables drive.
      *
      * @param motor chip select to check for RESETs
      *
      * @return true if the motor has returned a cached RESET fault, false otherwise
      */
-    bool hasMotorReset(uint8_t motor);
+    bool requiresMotorReinit(uint8_t motor);
 
     // Wheel constants
     static constexpr double MECHANICAL_MPS_PER_ELECTRICAL_RPM = 0.000111;
@@ -353,6 +354,10 @@ class MotorService
 
     int dribbler_ramp_rpm_;
 
+    std::optional<std::chrono::time_point<std::chrono::system_clock>>
+        tracked_motor_fault_start_time_;
+    int num_tracked_motor_resets_;
+
     // SPI Chip Selects
     static const uint8_t FRONT_LEFT_MOTOR_CHIP_SELECT  = 0;
     static const uint8_t FRONT_RIGHT_MOTOR_CHIP_SELECT = 3;
@@ -363,6 +368,9 @@ class MotorService
 
     static const uint8_t NUM_DRIVE_MOTORS = 4;
     static const uint8_t NUM_MOTORS       = NUM_DRIVE_MOTORS + 1;
+
+    static const int MOTOR_FAULT_TIME_THRESHOLD_S = 60;
+    static const int MOTOR_FAULT_THRESHOLD_COUNT  = 3;
 
     // SPI Trinamic Motor Driver Paths (indexed with chip select above)
     static constexpr const char* SPI_PATHS[] = {"/dev/spidev0.0", "/dev/spidev0.1",

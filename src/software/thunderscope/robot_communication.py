@@ -3,6 +3,7 @@ from software.thunderscope.constants import ROBOT_COMMUNICATIONS_TIMEOUT_S
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.constants import IndividualRobotMode
 from software.python_bindings import *
+from queue import Empty
 from proto.import_all_protos import *
 from pyqtgraph.Qt import QtCore
 import threading
@@ -19,7 +20,7 @@ class RobotCommunication(object):
         multicast_channel,
         interface,
         disable_estop,
-        estop_path="/dev/ttyACM0",
+        estop_path,
         estop_buadrate=115200,
     ):
         """Initialize the communication with the robots
@@ -67,8 +68,10 @@ class RobotCommunication(object):
         )
 
         self.send_estop_state_thread = threading.Thread(target=self.__send_estop_state)
-        self.run_world_thread = threading.Thread(target=self.run_world)
-        self.run_primitive_set_thread = threading.Thread(target=self.run_primitive_set)
+        self.run_world_thread = threading.Thread(target=self.run_world, daemon=True)
+        self.run_primitive_set_thread = threading.Thread(
+            target=self.run_primitive_set, daemon=True
+        )
 
         # only checks for estop if checking is not disabled
         if not self.disable_estop:
@@ -81,7 +84,7 @@ class RobotCommunication(object):
 
     def __send_estop_state(self):
         if not self.disable_estop:
-            while True:
+            while self.running:
                 self.current_proto_unix_io.send_proto(
                     EstopState, EstopState(is_playing=self.estop_reader.isEstopPlay())
                 )
@@ -94,9 +97,19 @@ class RobotCommunication(object):
         :return:
         """
         while self.running:
-            world = self.world_buffer.get(block=True, return_cached=False)
+            world = None
+            try:
+                world = self.world_buffer.get(
+                    block=True,
+                    timeout=ROBOT_COMMUNICATIONS_TIMEOUT_S,
+                    return_cached=False,
+                )
+            except Empty:
+                # if empty do nothing
+                pass
             if (
-                not self.disable_estop
+                world
+                and not self.disable_estop
                 and self.estop_reader.isEstopPlay()
                 and (
                     self.robots_connected_to_fullsystem
@@ -117,6 +130,12 @@ class RobotCommunication(object):
         If the emergency stop is tripped, the PrimitiveSet will not be sent so
         that the robots timeout and stop.
 
+        NOTE: If disconnect_fullsystem_from_robots is called, then the packets
+        will not be forwarded to the robots.
+
+        send_override_primitive_set can be used to send a primitive set, which
+        is useful to dip in and out of robot diagnostics.
+
         """
         while self.running:
             # total primitives for all robots
@@ -130,7 +149,6 @@ class RobotCommunication(object):
                 )
 
                 fullsystem_primitives = dict(primitive_set.robot_primitives)
-
                 for robot_id in fullsystem_primitives.keys():
                     if robot_id in self.robots_connected_to_fullsystem:
                         robot_primitives[robot_id] = fullsystem_primitives[robot_id]
@@ -198,14 +216,24 @@ class RobotCommunication(object):
         elif mode == IndividualRobotMode.AI:
             self.robots_connected_to_fullsystem.add(robot_id)
 
+    def __forward_to_proto_unix_io(self, type, data):
+        """
+        Forwards to proto unix IO iff running is true
+        :param data: the data to be passed through
+        :param type: the proto type
+        """
+        if self.running:
+            self.current_proto_unix_io.send_proto(type, data)
+
     def setup_for_fullsystem(self):
         """
         Sets up a world sender, a listener for SSL vision data, and connects all robots to fullsystem as default
         """
+
         self.receive_ssl_wrapper = SSLWrapperPacketProtoListener(
             SSL_VISION_ADDRESS,
             SSL_VISION_PORT,
-            lambda data: self.current_proto_unix_io.send_proto(SSL_WrapperPacket, data),
+            lambda data: self.__forward_to_proto_unix_io(SSL_WrapperPacket, data),
             True,
         )
 
@@ -235,14 +263,14 @@ class RobotCommunication(object):
         self.receive_robot_status = RobotStatusProtoListener(
             self.multicast_channel + "%" + self.interface,
             ROBOT_STATUS_PORT,
-            lambda data: self.current_proto_unix_io.send_proto(RobotStatus, data),
+            lambda data: self.__forward_to_proto_unix_io(RobotStatus, data),
             True,
         )
 
         self.receive_robot_log = RobotLogProtoListener(
             self.multicast_channel + "%" + self.interface,
             ROBOT_LOGS_PORT,
-            lambda data: self.current_proto_unix_io.send_proto(RobotLog, data),
+            lambda data: self.__forward_to_proto_unix_io(RobotLog, data),
             True,
         )
 
@@ -271,10 +299,9 @@ class RobotCommunication(object):
         Ends all currently running loops and joins all currently active threads
 
         """
-        # end all loops which depend on this condition
         self.running = False
-
-        if self.run_world_thread.is_alive():
-            self.run_world_thread.join()
-
+        self.receive_ssl_wrapper.close()
+        self.receive_robot_log.close()
+        self.receive_robot_status.close()
+        self.run_world_thread.join()
         self.run_primitive_set_thread.join()
