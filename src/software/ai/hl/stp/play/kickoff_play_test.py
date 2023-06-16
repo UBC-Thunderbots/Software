@@ -5,6 +5,7 @@ import pytest
 import software.python_bindings as tbots
 from proto.play_pb2 import Play, PlayName
 from software.simulated_tests.robot_enters_region import *
+from software.simulated_tests.ball_enters_region import *
 from proto.import_all_protos import *
 from software.simulated_tests.simulated_test_fixture import simulated_test_runner
 from proto.message_translation.tbots_protobuf import create_world_state
@@ -74,19 +75,27 @@ def test_kickoff_play(simulated_test_runner, is_friendly_test):
         ),
     )
 
+
+
     # Always Validation
     # TODO- #2809 Validation
     always_validation_sequence_set = [
         [
             NumberOfRobotsAlwaysStaysInRegion(
-                region=[tbots.field.friendlyHalf()], req_robot_cnt=6
+                    region=[tbots.field.friendlyHalf], req_robot_cnt=6
             )
         ]
     ]
 
     # Eventually Validation
     # TODO- #2809 Validation
-    eventually_validation_sequence_set = [[]]
+    eventually_validation_sequence_set = [
+        [
+            BallEventuallyExitsRegion(
+                region=[tbots.field.centerCircle]
+            )
+        ]
+    ]
 
     simulated_test_runner.run_test(
         eventually_validation_sequence_set=eventually_validation_sequence_set,
