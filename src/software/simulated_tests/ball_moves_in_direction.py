@@ -32,7 +32,12 @@ class BallMoves(Validation):
             world.ball.current_state.global_position
         )
 
-        if (self.direction and current_ball_position.x() >= self.last_ball_position.x()) or (not self.direction and current_ball_position.x() <= self.last_ball_position.x()):
+        if (
+            self.direction and current_ball_position.x() >= self.last_ball_position.x()
+        ) or (
+            not self.direction
+            and current_ball_position.x() <= self.last_ball_position.x()
+        ):
             validation_status = ValidationStatus.PASSING
         self.last_ball_position = current_ball_position
         return validation_status
@@ -51,13 +56,15 @@ class BallMoves(Validation):
                     tbots.Point(
                         self.last_ball_position.x() + 0.01,
                         tbots.Field(world.field).fieldBoundary().yMax(),
-                        ),
+                    ),
                 )
             ]
         )
 
     def __repr__(self):
-        return "Check that the ball moves " + "forward" if self.direction else "backward"
+        return (
+            "Check that the ball moves " + "forward" if self.direction else "backward"
+        )
 
 
 class BallMovesForward(BallMoves):
@@ -87,7 +94,7 @@ class BallMovesInDirectionInRegions(BallMoves):
 
         for region in self.regions:
             if tbots.contains(
-                    region, tbots.createPoint(world.ball.current_state.global_position)
+                region, tbots.createPoint(world.ball.current_state.global_position)
             ):
                 return super().get_validation_status(world)
 
@@ -97,14 +104,17 @@ class BallMovesInDirectionInRegions(BallMoves):
         """
         (override) Shows the last ball position line, and the regions the ball should be moving in
         """
-        return create_validation_geometry(
-            self.regions
-        )
+        return create_validation_geometry(self.regions)
 
     def __repr__(self):
-        return "Check that the ball moves " + "forward" if self.direction else "backward" + " in regions "  + ",".join(
-            repr(region) for region in self.regions
+        return (
+            "Check that the ball moves " + "forward"
+            if self.direction
+            else "backward"
+            + " in regions "
+            + ",".join(repr(region) for region in self.regions)
         )
+
 
 (
     BallEventuallyMovesInDirectionInRegions,
@@ -112,5 +122,3 @@ class BallMovesInDirectionInRegions(BallMoves):
     BallAlwaysMovesInDirectionInRegions,
     BallNeverMovesInDirectionInRegions,
 ) = create_validation_types(BallMovesInDirectionInRegions)
-
-

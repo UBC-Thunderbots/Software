@@ -48,7 +48,7 @@ def initialize_application():
     signal.signal(signal.SIGINT, signal.SIG_DFL)
 
     # Setup MainApp and initialize DockArea
-    app = pyqtgraph.mkQApp("Thunderscope")
+    pyqtgraph.mkQApp("Thunderscope")
 
     # Setup stylesheet
     # apply_stylesheet(app, theme="dark_blue.xml")

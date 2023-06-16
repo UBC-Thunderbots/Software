@@ -11,11 +11,9 @@ from software.simulated_tests.friendly_receives_ball_slow import (
     FriendlyAlwaysReceivesBallSlow,
 )
 from software.simulated_tests.ball_moves_in_direction import (
-    BallAlwaysMovesInDirectionInRegions
+    BallAlwaysMovesInDirectionInRegions,
 )
-from software.simulated_tests.ball_enters_region import (
-    BallEventuallyEntersRegion
-)
+from software.simulated_tests.ball_enters_region import BallEventuallyEntersRegion
 from software import py_constants
 
 
@@ -27,7 +25,7 @@ def setup_pass_and_robots(
     friendly_orientations,
     enemy_robot_positions,
     receive_pass,
-    simulated_test_runner
+    simulated_test_runner,
 ):
     """
     Sets up a test involving 1 robot passing the ball
@@ -74,17 +72,19 @@ def setup_pass_and_robots(
                 for index, location in enumerate(blue_robot_locations)
             ]
         ),
-        tbots.Team([
-            tbots.Robot(
-                index,
-                location,
-                tbots.Vector(0.0, 0.0),
-                tbots.Angle.fromRadians(0),
-                tbots.Angle(),
-                tbots.Timestamp(),
-            )
-            for index, location in enumerate(enemy_robot_positions)
-        ]),
+        tbots.Team(
+            [
+                tbots.Robot(
+                    index,
+                    location,
+                    tbots.Vector(0.0, 0.0),
+                    tbots.Angle.fromRadians(0),
+                    tbots.Angle(),
+                    tbots.Timestamp(),
+                )
+                for index, location in enumerate(enemy_robot_positions)
+            ]
+        ),
     )
 
     # construct a pass generator with a max receive speed set
@@ -108,7 +108,7 @@ def setup_pass_and_robots(
     kick_vec = tbots.Vector(
         best_pass.receiverPoint().x() - best_pass.passerPoint().x(),
         best_pass.receiverPoint().y() - best_pass.passerPoint().y(),
-        )
+    )
 
     # Setup the passer's tactic
     # We use KickTactic since AttackerTactic shoots towards the goal instead if open
@@ -161,89 +161,89 @@ def setup_pass_and_robots(
     "ball_initial_position,ball_initial_velocity,attacker_robot_position,"
     "receiver_robot_positions,friendly_orientations,enemy_robot_positions",
     [
-        # # pass between 2 robots close to each other
-        # (
-        #     tbots.Point(-0.85, 0),
-        #     tbots.Vector(0.0, 0.0),
-        #     tbots.Point(-1.0, 0.0),
-        #     [tbots.Point(1.0, 0.0)],
-        #     [0, math.pi],
-        #     [],
-        # ),
-        # # pass between 2 robots on opposite ends of the field
-        # (
-        #     tbots.Point(-3.35, 0.0),
-        #     tbots.Vector(0.0, 0.0),
-        #     tbots.Point(-3.5, 0.0),
-        #     [tbots.Point(3.5, 0.0)],
-        #     [0, math.pi],
-        #     [],
-        # ),
-        # # TODO: Make Interception Better
-        # # pass between 2 robots above one another (on the y-axis)
-        # (
-        #     tbots.Point(0.0, 0.0),
-        #     tbots.Vector(0.0, 0.0),
-        #     tbots.Point(0.0, -1.0),
-        #     [tbots.Point(3.5, 0.0)],
-        #     [0, math.pi],
-        #     [],
-        # ),
-        # # pass between 2 robots on opposite ends of the field's diagonal
-        # (
-        #     tbots.Point(-3.35, 2.35),
-        #     tbots.Vector(0.0, 0.0),
-        #     tbots.Point(-3.5, 2.5),
-        #     [tbots.Point(3.5, -2.5)],
-        #     [0, math.pi],
-        #     [],
-        # ),
-        # # straight pass with an enemy in between the 2 robots
-        # (
-        #     tbots.Point(-0.5, 0),
-        #     tbots.Vector(0.0, 0.0),
-        #     tbots.Point(-1.0, 0.0),
-        #     [tbots.Point(1.5, 0.0)],
-        #     [0, math.pi],
-        #     [tbots.Point(0.5, 0.0)],
-        # ),
-        # # pass with a sparse wall of enemy robots in between the 2 robots
-        # (
-        #     tbots.Point(-1.7, 0),
-        #     tbots.Vector(0.0, 0.0),
-        #     tbots.Point(-2.0, 0.0),
-        #     [tbots.Point(2.5, 0.0)],
-        #     [0, math.pi],
-        #     [
-        #         tbots.Point(0.5, 2.0),
-        #         tbots.Point(0.5, 1.0),
-        #         tbots.Point(0.5, 0.0),
-        #         tbots.Point(0.5, -1.0),
-        #         tbots.Point(0.5, -2.0)
-        #     ],
-        # ),
+        # pass between 2 robots close to each other
+        (
+            tbots.Point(-0.85, 0),
+            tbots.Vector(0.0, 0.0),
+            tbots.Point(-1.0, 0.0),
+            [tbots.Point(1.0, 0.0)],
+            [0, math.pi],
+            [],
+        ),
+        # pass between 2 robots on opposite ends of the field
+        (
+            tbots.Point(-3.35, 0.0),
+            tbots.Vector(0.0, 0.0),
+            tbots.Point(-3.5, 0.0),
+            [tbots.Point(3.5, 0.0)],
+            [0, math.pi],
+            [],
+        ),
+        # TODO: Make Interception Better
+        # pass between 2 robots above one another (on the y-axis)
+        (
+            tbots.Point(0.0, 0.0),
+            tbots.Vector(0.0, 0.0),
+            tbots.Point(0.0, -1.0),
+            [tbots.Point(3.5, 0.0)],
+            [0, math.pi],
+            [],
+        ),
+        # pass between 2 robots on opposite ends of the field's diagonal
+        (
+            tbots.Point(-3.35, 2.35),
+            tbots.Vector(0.0, 0.0),
+            tbots.Point(-3.5, 2.5),
+            [tbots.Point(3.5, -2.5)],
+            [0, math.pi],
+            [],
+        ),
+        # straight pass with an enemy in between the 2 robots
+        (
+            tbots.Point(-0.5, 0),
+            tbots.Vector(0.0, 0.0),
+            tbots.Point(-1.0, 0.0),
+            [tbots.Point(1.5, 0.0)],
+            [0, math.pi],
+            [tbots.Point(0.5, 0.0)],
+        ),
+        # pass with a sparse wall of enemy robots in between the 2 robots
+        (
+            tbots.Point(-1.7, 0),
+            tbots.Vector(0.0, 0.0),
+            tbots.Point(-2.0, 0.0),
+            [tbots.Point(2.5, 0.0)],
+            [0, math.pi],
+            [
+                tbots.Point(0.5, 2.0),
+                tbots.Point(0.5, 1.0),
+                tbots.Point(0.5, 0.0),
+                tbots.Point(0.5, -1.0),
+                tbots.Point(0.5, -2.0),
+            ],
+        ),
         # pass with a dense wall of enemy robots in between the 2 robots
         (
-                tbots.Point(-1.7, 0),
-                tbots.Vector(0.0, 0.0),
-                tbots.Point(-2.0, 0.0),
-                [tbots.Point(2.5, 0.0)],
-                [0, math.pi],
-                [
-                    tbots.Point(0.5, float(y) / 10)
-                    for y in range(int(-0.7 * 10), int(0.9 * 10), 2)
-                ],
+            tbots.Point(-1.7, 0),
+            tbots.Vector(0.0, 0.0),
+            tbots.Point(-2.0, 0.0),
+            [tbots.Point(2.5, 0.0)],
+            [0, math.pi],
+            [
+                tbots.Point(0.5, float(y) / 10)
+                for y in range(int(-0.5 * 10), int(0.7 * 10), 2)
+            ],
         ),
     ],
     ids=[
-        # "short_pass",
-        # "long_pass",
-        # "pass_vertically",
-        # "pass_diagonally",
-        # "pass_with_enemy_in_between",
-        # "pass_through_sparse_wall_of_enemies",
-        "pass_through_dense_wall_of_enemies"
-    ]
+        "short_pass",
+        "long_pass",
+        "pass_vertically",
+        "pass_diagonally",
+        "pass_with_enemy_in_between",
+        "pass_through_sparse_wall_of_enemies",
+        "pass_through_dense_wall_of_enemies",
+    ],
 )
 def test_passing_receive_speed(
     ball_initial_position,
@@ -259,7 +259,6 @@ def test_passing_receive_speed(
 
     # Validate that the ball is always received by the other robot
     # slower than the max receive speed
-    buffer_x = 0.3
     always_validation_sequence_set = [
         [FriendlyAlwaysReceivesBallSlow(robot_id=1, max_receive_speed=2.5)],
     ]
@@ -273,134 +272,136 @@ def test_passing_receive_speed(
             friendly_orientations=friendly_orientations,
             enemy_robot_positions=enemy_robot_positions,
             simulated_test_runner=simulated_test_runner,
-            receive_pass=True
+            receive_pass=True,
         ),
         params=[0],
         inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
         inv_always_validation_sequence_set=always_validation_sequence_set,
         test_timeout_s=10,
-        run_till_end=True
+        run_till_end=True,
     )
-#
-#
-# @pytest.mark.parametrize(
-#     "ball_initial_position,ball_initial_velocity,attacker_robot_position,"
-#     "receiver_robot_positions,friendly_orientations,enemy_robot_positions",
-#     [
-#         (
-#             tbots.Point(1.7, -2),
-#             tbots.Vector(0.0, 0.0),
-#             tbots.Point(2.0, -2.0),
-#             [tbots.Point(-2.5, 2.0)],
-#             [math.pi, 0],
-#             [],
-#         ),
-#         (
-#             tbots.Point(0.3, 0),
-#             tbots.Vector(0.0, 0.0),
-#             tbots.Point(0.5, 0),
-#             [tbots.Point(-0.5, 0)],
-#             [math.pi, 0],
-#             [],
-#         ),
-#         (
-#             tbots.Point(0.4, 0),
-#             tbots.Vector(0.0, 0.0),
-#             tbots.Point(0.6, 0),
-#             [tbots.Point(-0.6, 0)],
-#             [math.pi, 0],
-#             [],
-#         ),
-#         (
-#             tbots.Point(0.8, 0),
-#             tbots.Vector(0.0, 0.0),
-#             tbots.Point(1, 0),
-#             [tbots.Point(-1, 0), tbots.Point(1, 1), tbots.Point(1, -1), tbots.Point(2, 0)],
-#             [math.pi, 0],
-#             [],
-#         ),
-#         (
-#             tbots.Point(0.8, 0),
-#             tbots.Vector(0.0, 0.0),
-#             tbots.Point(1, 0),
-#             [tbots.Point(-1, 0), tbots.Point(2.5, 2.5)],
-#             [math.pi, 0],
-#             [],
-#         ),
-#         (
-#             tbots.Point(0.4, 0),
-#             tbots.Vector(0.0, 0.0),
-#             tbots.Point(0.5, 0),
-#             [tbots.Point(-1, 0)],
-#             [math.pi, 0],
-#             [tbots.Point(0.5, 0.5), tbots.Point(0.5, -0.5), tbots.Point(1, 0)],
-#         )
-#     ],
-#     ids=[
-#         "long_pass_backwards",
-#         "short_pass_backwards",
-#         "almost_short_pass_backwards",
-#         "4_pass_options_with_1_backwards",
-#         "2_pass_options_with_closest_one_backwards",
-#         "backwards_pass_forced_by_surrounding_enemies",
-#     ]
-# )
-# def test_passing_no_backwards_passes(
-#     ball_initial_position,
-#     ball_initial_velocity,
-#     attacker_robot_position,
-#     receiver_robot_positions,
-#     friendly_orientations,
-#     enemy_robot_positions,
-#     simulated_test_runner,
-# ):
-#     field = tbots.Field.createSSLDivisionBField()
-#     best_pass = setup_pass_and_robots(
-#         ball_initial_position=ball_initial_position,
-#         ball_initial_velocity=ball_initial_velocity,
-#         attacker_robot_position=attacker_robot_position,
-#         receiver_robot_positions=receiver_robot_positions,
-#         friendly_orientations=friendly_orientations,
-#         enemy_robot_positions=enemy_robot_positions,
-#         receive_pass=False,
-#         simulated_test_runner=simulated_test_runner,
-#     )
-#
-#     # Eventually Validation
-#     eventually_validation_sequence_set = [
-#         [
-#             BallEventuallyEntersRegion(
-#                 regions=[
-#                     tbots.Circle(
-#                         best_pass.receiverPoint(),
-#                         0.1
-#                     )
-#                 ]
-#             )
-#         ]
-#     ]
-#
-#     buffer_x = 0.3
-#     always_validation_sequence_set = [
-#         [FriendlyAlwaysReceivesBallSlow(robot_id=1, max_receive_speed=2.5)],
-#         [BallAlwaysMovesInDirectionInRegions(
-#             initial_ball_position=ball_initial_position,
-#             direction=True,
-#             regions=[
-#                 tbots.Rectangle(
-#                     tbots.Point(-field.xLength() / 2, field.yLength() / 2),
-#                     tbots.Point(0 - buffer_x, -field.yLength() / 2)
-#                 )
-#             ]
-#         )]
-#     ]
-#
-#     simulated_test_runner.run_test(
-#         inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
-#         inv_always_validation_sequence_set=always_validation_sequence_set,
-#         test_timeout_s=10,
-#         run_till_end=False
-#     )
+
+
+@pytest.mark.parametrize(
+    "ball_initial_position,ball_initial_velocity,attacker_robot_position,"
+    "receiver_robot_positions,friendly_orientations,enemy_robot_positions",
+    [
+        (
+            tbots.Point(1.7, -2),
+            tbots.Vector(0.0, 0.0),
+            tbots.Point(2.0, -2.0),
+            [tbots.Point(-2.5, 2.0)],
+            [math.pi, 0],
+            [],
+        ),
+        (
+            tbots.Point(0.3, 0),
+            tbots.Vector(0.0, 0.0),
+            tbots.Point(0.5, 0),
+            [tbots.Point(-0.5, 0)],
+            [math.pi, 0],
+            [],
+        ),
+        (
+            tbots.Point(0.4, 0),
+            tbots.Vector(0.0, 0.0),
+            tbots.Point(0.6, 0),
+            [tbots.Point(-0.6, 0)],
+            [math.pi, 0],
+            [],
+        ),
+        (
+            tbots.Point(0.8, 0),
+            tbots.Vector(0.0, 0.0),
+            tbots.Point(1, 0),
+            [
+                tbots.Point(-1, 0),
+                tbots.Point(1, 1),
+                tbots.Point(1, -1),
+                tbots.Point(2, 0),
+            ],
+            [math.pi, 0],
+            [],
+        ),
+        (
+            tbots.Point(0.8, 0),
+            tbots.Vector(0.0, 0.0),
+            tbots.Point(1, 0),
+            [tbots.Point(-1, 0), tbots.Point(2.5, 2.5)],
+            [math.pi, 0],
+            [],
+        ),
+        (
+            tbots.Point(0.4, 0),
+            tbots.Vector(0.0, 0.0),
+            tbots.Point(0.5, 0),
+            [tbots.Point(-1, 0)],
+            [math.pi, 0],
+            [tbots.Point(0.5, 0.5), tbots.Point(0.5, -0.5), tbots.Point(1, 0)],
+        ),
+    ],
+    ids=[
+        "long_pass_backwards",
+        "short_pass_backwards",
+        "almost_short_pass_backwards",
+        "4_pass_options_with_1_backwards",
+        "2_pass_options_with_closest_one_backwards",
+        "backwards_pass_forced_by_surrounding_enemies",
+    ],
+)
+def test_passing_no_backwards_passes(
+    ball_initial_position,
+    ball_initial_velocity,
+    attacker_robot_position,
+    receiver_robot_positions,
+    friendly_orientations,
+    enemy_robot_positions,
+    simulated_test_runner,
+):
+    field = tbots.Field.createSSLDivisionBField()
+    best_pass = setup_pass_and_robots(
+        ball_initial_position=ball_initial_position,
+        ball_initial_velocity=ball_initial_velocity,
+        attacker_robot_position=attacker_robot_position,
+        receiver_robot_positions=receiver_robot_positions,
+        friendly_orientations=friendly_orientations,
+        enemy_robot_positions=enemy_robot_positions,
+        receive_pass=False,
+        simulated_test_runner=simulated_test_runner,
+    )
+
+    # Eventually Validation
+    eventually_validation_sequence_set = [
+        [
+            BallEventuallyEntersRegion(
+                regions=[tbots.Circle(best_pass.receiverPoint(), 0.1)]
+            )
+        ]
+    ]
+
+    buffer_x = 0.3
+    always_validation_sequence_set = [
+        [FriendlyAlwaysReceivesBallSlow(robot_id=1, max_receive_speed=2.5)],
+        [
+            BallAlwaysMovesInDirectionInRegions(
+                initial_ball_position=ball_initial_position,
+                direction=True,
+                regions=[
+                    tbots.Rectangle(
+                        tbots.Point(-field.xLength() / 2, field.yLength() / 2),
+                        tbots.Point(0 - buffer_x, -field.yLength() / 2),
+                    )
+                ],
+            )
+        ],
+    ]
+
+    simulated_test_runner.run_test(
+        inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
+        inv_always_validation_sequence_set=always_validation_sequence_set,
+        test_timeout_s=10,
+        run_till_end=False,
+    )
 
 
 if __name__ == "__main__":
