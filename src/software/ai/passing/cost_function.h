@@ -70,6 +70,8 @@ double ratePassEnemyRisk(const Team& enemy_team, const Pass& pass,
                          const Duration& enemy_reaction_time,
                          double enemy_proximity_importance);
 
+double ratePassBackwardsQuality(const Field& field, const Pass& pass, TbotsProto::PassingConfig& passing_config);
+
 /**
  * Rates pass based on the speed of the pass relative to the distance of the pass
  * as well as the speed bounds in the passing config

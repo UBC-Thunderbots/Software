@@ -101,7 +101,7 @@ py_library(
     name = "validation",
     srcs = [
         "ball_enters_region.py",
-        "ball_moves_forward.py",
+        "ball_moves_in_direction.py",
         "ball_speed_threshold.py",
         "ball_stops_in_region.py",
         "excessive_dribbling.py",

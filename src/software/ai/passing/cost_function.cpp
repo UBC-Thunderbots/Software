@@ -21,6 +21,9 @@ double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
     double friendly_pass_rating =
         ratePassFriendlyCapability(world.friendlyTeam(), pass, passing_config);
 
+    double pass_backwards_rating =
+            ratePassBackwardsQuality(world.field(), pass, passing_config);
+
     double enemy_pass_rating =
         ratePassEnemyRisk(world.enemyTeam(), pass,
                           Duration::fromSeconds(passing_config.enemy_reaction_time()),
@@ -34,7 +37,21 @@ double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
     double pass_speed_quality = ratePassSpeed(pass, passing_config);
 
     return static_pass_quality * friendly_pass_rating * enemy_pass_rating *
-           shoot_pass_rating * pass_speed_quality * in_region_quality;
+            pass_backwards_rating * shoot_pass_rating * pass_speed_quality * in_region_quality;
+}
+
+double ratePassBackwardsQuality(const Field& field, const Pass& pass, TbotsProto::PassingConfig& passing_config)
+{
+    if (field.pointInEnemyHalf(pass.passerPoint()) && field.pointInFriendlyHalf(pass.receiverPoint()))
+    {
+        double pass_distance = (pass.receiverPoint() - pass.passerPoint()).length();
+        if (pass_distance > 0.5)
+        {
+            return 0;
+        }
+    }
+
+    return 1;
 }
 
 double ratePassSpeed(const Pass& pass, TbotsProto::PassingConfig& passing_config)
