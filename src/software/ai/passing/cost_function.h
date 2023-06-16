@@ -70,6 +70,14 @@ double ratePassEnemyRisk(const Team& enemy_team, const Pass& pass,
                          const Duration& enemy_reaction_time,
                          double enemy_proximity_importance);
 
+/**
+ * Rates pass based on if the pass is backwards towards the friendly half,
+ * and if so, how long the pass is
+ * @param field The field from which we determine the friendly half
+ * @param pass The pass to rate
+ * @param passing_config The passing config used for tuning
+ * @return
+ */
 double ratePassBackwardsQuality(const Field& field, const Pass& pass,
                                 TbotsProto::PassingConfig& passing_config);
 

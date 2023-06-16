@@ -48,7 +48,7 @@ double ratePassBackwardsQuality(const Field& field, const Pass& pass,
         field.pointInFriendlyHalf(pass.receiverPoint()))
     {
         double pass_distance = (pass.receiverPoint() - pass.passerPoint()).length();
-        if (pass_distance > 0.5)
+        if (pass_distance > passing_config.backwards_pass_distance())
         {
             return 0;
         }
