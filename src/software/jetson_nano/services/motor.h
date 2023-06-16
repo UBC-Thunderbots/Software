@@ -309,7 +309,10 @@ class MotorService
      */
     bool requiresMotorReinit(uint8_t motor);
 
-    // Wheel constants
+    // All trinamic RPMS are electrical RPMS, they don't factor in the number of pole
+    // pairs of the drive motor.
+    //
+    // TODO (#2720): compute from robot constants (this was computed by hand and is accurate)
     static constexpr double MECHANICAL_MPS_PER_ELECTRICAL_RPM = 0.000111;
     static constexpr double ELECTRICAL_RPM_PER_MECHANICAL_MPS = 1 / MECHANICAL_MPS_PER_ELECTRICAL_RPM;
 

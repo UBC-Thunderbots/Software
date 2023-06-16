@@ -46,12 +46,6 @@ static const char* SPI_CS_DRIVER_TO_CONTROLLER_MUX_1_GPIO = "76";
 static const char* MOTOR_DRIVER_RESET_GPIO                = "168";
 static const char* DRIVER_CONTROL_ENABLE_GPIO             = "194";
 
-
-// All trinamic RPMS are electrical RPMS, they don't factor in the number of pole
-// pairs of the drive motor.
-//
-// TODO (#2720): compute from robot constants (this was computed by hand and is accurate)
-
 static double RUNAWAY_PROTECTION_THRESHOLD_MPS         = 2.00;
 static int DRIBBLER_ACCELERATION_THRESHOLD_RPM_PER_S_2 = 10000;
 

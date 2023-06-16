@@ -31,6 +31,8 @@ static const uint8_t BACK_RIGHT_MOTOR_CHIP_SELECT  = 2;
 
 static const uint8_t CHIP_SELECT[] = {FRONT_LEFT_MOTOR_CHIP_SELECT, FRONT_RIGHT_MOTOR_CHIP_SELECT, BACK_LEFT_MOTOR_CHIP_SELECT, BACK_RIGHT_MOTOR_CHIP_SELECT};
 
+constexpr int ASCII_4671_IN_HEXADECIMAL = 0x34363731;
+
 int main(int argc, char **argv) {
     LOG(INFO) << "Running on the Jetson Nano!";
 
@@ -48,7 +50,7 @@ int main(int argc, char **argv) {
         read_value = motor_service_->readIntFromTMC4671(chip_select, TMC4671_CHIPINFO_DATA);
 
         // Check if CHIPINFO_DATA returns 0x34363731
-        if (read_value == 875968305) {
+        if (read_value == ASCII_4671_IN_HEXADECIMAL) {
             LOG(INFO) << "SPI Transfer is successful";
         } else {
             LOG(FATAL) << "SPI Transfer not successful";

@@ -25,7 +25,7 @@ PowerService::~PowerService()
 
 void PowerService::continuousRead()
 {
-    for (;!is_running;)
+    while (!is_running)
     {
         tick();
     }
