@@ -12,6 +12,8 @@ class GoalieTacticChipTest
 
 TEST_P(GoalieTacticChipTest, test_find_good_chip_targets)
 {
+    TbotsProto::GoalieTacticConfig goalie_tactic_config;
+
     std::vector<Point> enemy_robot_positions = std::get<0>(GetParam());
     Rectangle expected_chip_region_to_avoid  = std::get<1>(GetParam());
 
@@ -19,7 +21,7 @@ TEST_P(GoalieTacticChipTest, test_find_good_chip_targets)
     world = TestUtil::setEnemyRobotPositions(world, enemy_robot_positions, Timestamp());
     world.updateBall(Ball(world.field().friendlyGoalCenter(), Vector(), Timestamp()));
 
-    Point chip_target = GoalieFSM::findGoodChipTarget(world);
+    Point chip_target = GoalieFSM::findGoodChipTarget(world, goalie_tactic_config);
 
     // Chip target should be in region in front of friendly defense area
     EXPECT_TRUE(contains(Rectangle(world.field().friendlyCornerPos() +

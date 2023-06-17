@@ -37,6 +37,35 @@ Terminate:::terminate --> Terminate:::terminate
 
 ```
 
+## [DefensePlayFSM](/src/software/ai/hl/stp/play/defense/defense_play_fsm.h)
+
+```mermaid
+
+stateDiagram-v2
+classDef terminate fill:white,color:black,font-weight:bold
+direction LR
+[*] --> DefenseState
+DefenseState --> DefenseState : <i>defendAgainstThreats</i>
+Terminate:::terminate --> Terminate:::terminate
+
+```
+
+## [OffensePlayFSM](/src/software/ai/hl/stp/play/offense/offense_play_fsm.h)
+
+```mermaid
+
+stateDiagram-v2
+classDef terminate fill:white,color:black,font-weight:bold
+direction LR
+[*] --> OffensiveState
+OffensiveState --> DefensiveState : [enemyHasPossession]\n<i>setupDefensiveStrategy</i>
+OffensiveState --> OffensiveState : <i>setupOffensiveStrategy</i>
+DefensiveState --> OffensiveState : [!enemyHasPossession]\n<i>setupOffensiveStrategy</i>
+DefensiveState --> DefensiveState : <i>setupDefensiveStrategy</i>
+Terminate:::terminate --> Terminate:::terminate
+
+```
+
 ## [PenaltyKickPlayFSM](/src/software/ai/hl/stp/play/penalty_kick/penalty_kick_play_fsm.h)
 
 ```mermaid

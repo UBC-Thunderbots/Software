@@ -16,10 +16,10 @@ TEST(GoalieFSMTest, test_get_goalie_position_to_block)
     Point goalie_pos =
         GoalieFSM::getGoaliePositionToBlock(ball, field, goalie_tactic_config);
     EXPECT_TRUE(contains(field.friendlyDefenseArea(), goalie_pos));
-    EXPECT_EQ(
-        Point(field.friendlyDefenseArea().xMin() + GoalieFSM::CONSERVATIVE_DEPTH_METERS,
-              0),
-        goalie_pos);
+    EXPECT_EQ(Point(field.friendlyDefenseArea().xMin() +
+                        goalie_tactic_config.conservative_depth_meters(),
+                    0),
+              goalie_pos);
 
     // ball at positive friendly corner, goalie should snap to positive goal post
     ball.updateState(BallState(field.friendlyCornerPos(), Vector(0, 0)),
