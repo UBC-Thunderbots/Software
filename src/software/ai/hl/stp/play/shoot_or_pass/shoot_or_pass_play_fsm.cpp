@@ -36,7 +36,7 @@ void ShootOrPassPlayFSM::updateOffensivePositioningTactics(
 
     for (unsigned int i = 0; i < offensive_positioning_tactics.size(); i++)
     {
-        auto pass1 = pass_eval.getBestPassInZones({ranked_zones[i]}).pass;
+        auto pass1 = pass_eval.getBestPassInZones({ranked_zones[i + 1]}).pass;
 
         offensive_positioning_tactics[i]->updateControlParams(
             pass1.receiverPoint(), pass1.receiverOrientation(), 0.0,
@@ -84,7 +84,7 @@ void ShootOrPassPlayFSM::lookForPass(const Update& event)
                              pass_score_ramp_down_duration,
                          1.0 - abs_min_pass_score);
         updateOffensivePositioningTactics(ranked_zones, pass_eval,
-                                          event.common.num_tactics - 1);
+                                          event.common.num_tactics - 2);
 
         ret_tactics[1].insert(ret_tactics[1].end(), offensive_positioning_tactics.begin(),
                               offensive_positioning_tactics.end());
