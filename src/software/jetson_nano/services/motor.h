@@ -196,9 +196,9 @@ class MotorService
      * @param read_len the length of the read buffer
      * @param spi_speed the speed to run spi at
      */
-    void readThenWriteSpiTransfer(int fd, uint8_t const* write_tx, uint8_t const* read_rx, uint32_t spi_speed);
+    void readThenWriteSpiTransfer(int fd, const uint8_t *read_tx, uint8_t const* write_tx, uint8_t const* read_rx, uint32_t spi_speed);
 
-    int32_t tmc4671ReadThenWriteValue(uint8_t motor, uint8_t addr, int32_t write_data);
+    int32_t tmc4671ReadThenWriteValue(uint8_t motor, uint8_t read_addr, uint8_t write_addr, int32_t write_data);
 
     /**
      * Trinamic API Binding function
@@ -275,7 +275,7 @@ class MotorService
     // Enable driver gpio
     Gpio driver_control_enable_gpio_;
     Gpio reset_gpio_;
-    qwq
+
     // Transfer Buffers
     uint8_t tx_[5] = {0};
     uint8_t rx_[5] = {0};

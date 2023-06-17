@@ -639,7 +639,7 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
 //    double dribbler_rpm =
 //            static_cast<double>(tmc4671_getActualVelocity(DRIBBLER_MOTOR_CHIP_SELECT));
     double dribbler_rpm =
-            static_cast<double>(tmc4671ReadThenWriteValue(DRIBBLER_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_ACTUAL),dribbler_ramp_rpm_);
+            static_cast<double>(tmc4671ReadThenWriteValue(DRIBBLER_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_ACTUAL, TMC4671_PID_VELOCITY_TARGET,dribbler_ramp_rpm_));
 
     // Construct a MotorStatus object with the current velocities and dribbler rpm
     TbotsProto::MotorStatus motor_status =
@@ -779,7 +779,8 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
     dribbler_ramp_rpm_ =
             std::clamp(dribbler_ramp_rpm_, -max_dribbler_rpm, max_dribbler_rpm);
 
-    tmc4671_setTargetVelocity(DRIBBLER_MOTOR_CHIP_SELECT, dribbler_ramp_rpm_);
+//    tmc4671_setTargetVelocity(DRIBBLER_MOTOR_CHIP_SELECT, dribbler_ramp_rpm_);
+
     motor_status.mutable_dribbler()->set_dribbler_rpm(float(dribbler_ramp_rpm_));
 
     return motor_status;
@@ -807,51 +808,42 @@ void MotorService::spiTransfer(int fd, uint8_t const* tx, uint8_t const* rx, uns
     tr[0].delay_usecs   = 0;
     tr[0].speed_hz      = spi_speed;
     tr[0].bits_per_word = 8;
-    tr[1].tx_buf        = (unsigned long)tx_;
-    tr[1].rx_buf        = (unsigned long)rx_;
-    tr[1].len           = len;
-    tr[1].delay_usecs   = 0;
-    tr[1].speed_hz      = spi_speed;
-    tr[1].bits_per_word = 8;
 
-    ret = ioctl(fd, SPI_IOC_MESSAGE(2), &tr);
+    ret = ioctl(fd, SPI_IOC_MESSAGE(1), &tr);
 
     CHECK(ret >= 1) << "SPI Transfer to motor failed, not safe to proceed: errno "
                     << strerror(errno);
 }
 
 
-void MotorService::readThenWriteSpiTransfer(int fd, const uint8_t *write_tx, const uint8_t *read_rx, uint32_t spi_speed)
+void MotorService::readThenWriteSpiTransfer(int fd, const uint8_t *read_tx, const uint8_t *write_tx, const uint8_t *read_rx, uint32_t spi_speed)
 {
-    int ret;
+    int ret1,ret2;
 
-    uint8_t read_tx[5];
-    uint8_t write_rx[5];
-    memset(read_tx,0,5);
-    memset(write_rx, 0, 5);
-
-    // Get the address from the write buffer, and clear write bit
-    read_tx[0] = write_tx[0] & 0x7f;
+    uint8_t write_rx[5] = {0};
 
     struct spi_ioc_transfer tr[2];
     memset(tr, 0, sizeof(tr));
 
-    tr[0].tx_buf        = (unsigned long)read_tx;
-    tr[0].rx_buf        = (unsigned long)read_rx;
+    tr[0].tx_buf        = (unsigned long)write_tx;
+    tr[0].rx_buf        = (unsigned long)write_rx;
     tr[0].len           = 5;
     tr[0].delay_usecs   = 0;
     tr[0].speed_hz      = spi_speed;
     tr[0].bits_per_word = 8;
-    tr[1].tx_buf        = (unsigned long)write_tx;
-    tr[1].rx_buf        = (unsigned long)write_rx;
+    tr[0].cs_change     = 1;
+    tr[1].tx_buf        = (unsigned long)read_tx;
+    tr[1].rx_buf        = (unsigned long)read_rx;
     tr[1].len           = 5;
     tr[1].delay_usecs   = 0;
     tr[1].speed_hz      = spi_speed;
     tr[1].bits_per_word = 8;
+    tr[1].cs_change     = 1;
 
-    ret = ioctl(fd, SPI_IOC_MESSAGE(2), &tr);
+    ret1 = ioctl(fd, SPI_IOC_MESSAGE(1), &tr);
+    ret2 = ioctl(fd, SPI_IOC_MESSAGE(1),&tr[1]);
 
-    CHECK(ret >= 1) << "SPI Transfer to motor failed, not safe to proceed: errno "
+    CHECK(ret1 >= 1 && ret2>=1) << "SPI Transfer to motor failed, not safe to proceed: errno "
                     << strerror(errno);
 }
 
@@ -903,8 +895,9 @@ int32_t MotorService::tmc4671ReadThenWriteValue(uint8_t motor, uint8_t read_addr
     spi_demux_select_0_.setValue(GpioState::HIGH);
     spi_demux_select_1_.setValue(GpioState::LOW);
     // ensure tx_ and rx_ are cleared
-    memset(tx_,0,5);
-    memset(rx_,0,5);
+    memset(read_tx_,0,5);
+    memset(write_tx_,0,5);
+    memset(read_rx_,0,5);
 
     //  Trinamic transactions looks like this:
     //  + - - - + - - - + - - - + - - - + - - - +
@@ -914,16 +907,22 @@ int32_t MotorService::tmc4671ReadThenWriteValue(uint8_t motor, uint8_t read_addr
     //  Also it is in BIG Endian, therefore MSB is leftmost bit of 0.
     //  For a write, MSB must be 1, for read, MSB must be 0
     //  https://github.com/trinamic/TMC-API/blob/master/tmc/ic/TMC4671/TMC4671.c
-    tx_[0] = addr |= 0x80;
-    memcpy(tx_+1,&write_data,4);
-
-    readThenWriteSpiTransfer(file_descriptors_[motor],tx_,rx_,TMC4671_SPI_SPEED);
-
-    int32_t value = rx_[0];
-    for(int i = 1; i < 4; i++)
+    read_tx_[0] = read_addr & 0x7f;
+    write_tx_[0] = write_addr | 0x80;
+    memcpy(write_tx_+1,&write_data,4);
+    LOG(DEBUG) <<"read_addr value: " << std::hex << (uint32_t) read_addr;
+    for(int i = 0; i < 5; i++)
     {
+        LOG(DEBUG) << "read_tx byte " << i << " is: " << std::hex << (uint32_t) read_tx_[i];
+    }
+    readThenWriteSpiTransfer(file_descriptors_[motor],read_tx_,write_tx_,read_rx_,TMC4671_SPI_SPEED);
+
+    int32_t value = read_rx_[0];
+    for(int i = 1; i < 5; i++)
+    {
+        LOG(DEBUG) << "read_rx byte " << i << " is: " << std::hex << read_rx_[i];
         value <<= 8;
-        value |= rx_[i];
+        value |= read_rx_[i];
     }
     return value;
 }
@@ -1261,13 +1260,16 @@ void MotorService::startDriver(uint8_t motor)
 void MotorService::startController(uint8_t motor, bool dribbler)
 {
     // Read the chip ID to validate the SPI connection
-    tmc4671_writeInt(motor, TMC4671_CHIPINFO_ADDR, 0x000000000);
-    int chip_id = tmc4671_readInt(motor, TMC4671_CHIPINFO_DATA);
+//    tmc4671_writeInt(motor, TMC4671_CHIPINFO_ADDR, 0x000000000);
+//    int chip_id = tmc4671_readInt(motor, TMC4671_CHIPINFO_DATA);
+    int chip_id = tmc4671ReadThenWriteValue(motor, TMC4671_CHIPINFO_DATA, TMC4671_CHIPINFO_ADDR, 0x0);
+
+    LOG(DEBUG) << "Printing Chip ID: " << chip_id;
 
     CHECK(0x34363731 == chip_id) << "The TMC4671 of motor "
                                  << static_cast<uint32_t>(motor) << " is not responding";
 
-    LOG(DEBUG) << "Controller " << std::to_string(motor)
+    LOG(FATAL) << "Controller " << std::to_string(motor)
                << " online, responded with: " << chip_id;
 
     // Configure common controller params
