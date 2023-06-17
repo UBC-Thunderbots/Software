@@ -306,14 +306,6 @@ def load_command_line_arguments():
     )
 
     parser.add_argument(
-        "--estop_path",
-        action="store",
-        type=str,
-        default="/dev/ttyACM0",
-        help="Path to the Estop",
-    )
-
-    parser.add_argument(
         "--estop_baudrate",
         action="store",
         type=int,
