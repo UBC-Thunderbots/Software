@@ -13,6 +13,7 @@ cc_library(
         "//software/logger",
         "//software/sensor_fusion/filter:sensor_fusion_filters",
         "//software/sensor_fusion/filter:vision_detection",
+        "//software/sensor_fusion/possession:possession_tracker",
         "//software/world",
     ],
 )

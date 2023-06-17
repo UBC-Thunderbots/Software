@@ -32,14 +32,6 @@ struct GoalieFSM
     // TODO (#1878): Replace this with a more intelligent chip distance system
     static constexpr double YEET_CHIP_DISTANCE_METERS = 2.0;
 
-    // Depth goalie should be at for plays close to the defense area (potential lateral
-    // play, rebounds)
-    static constexpr double CONSERVATIVE_DEPTH_METERS = 0.3;
-
-    // Depth goalie should be at to aggressively narrow the angle the ball has to the
-    // goal as it enters the friendly half
-    static constexpr double AGGRESSIVE_DEPTH_METERS = 0.7;
-
     /**
      * Constructor for GoalieFSM struct
      *
@@ -88,10 +80,12 @@ struct GoalieFSM
      * Finds a good point to chip the ball to from its current position
      *
      * @param world the world
+     * @param goalie_tactic_config the goalie tactic config
      *
      * @return a point on the field that is a good place to chip to
      */
-    static Point findGoodChipTarget(const World &world);
+    static Point findGoodChipTarget(
+        const World &world, const TbotsProto::GoalieTacticConfig &goalie_tactic_config);
 
     /**
      * Guard that checks if the ball is moving faster than the time_to_panic threshold

@@ -375,6 +375,81 @@ def configure_simulated_test_view(
     )
 
 
+def configure_field_test_view(
+    simulator_proto_unix_io,
+    blue_full_system_proto_unix_io,
+    yellow_full_system_proto_unix_io,
+    visualization_buffer_size=5,
+    cost_visualization=False,
+    yellow_is_friendly=False,
+):
+    """
+    Constructs the Thunderscope Config for field tests
+    A view with 2 FullSystem tabs (Blue and Yellow)
+    And 1 Gamecontroller tab
+
+    :param simulator_proto_unix_io: the proto unix io for the simulator
+    :param blue_full_system_proto_unix_io: the proto unix io for the blue fullsystem
+    :param yellow_full_system_proto_unix_io: the proto unix io for the yellow fullsystem
+    :param visualization_buffer_size: The size of the visualization buffer.
+            Increasing this will increase smoothness but will be less realtime.
+    :param cost_visualization: True if cost visualization widget should be enabled
+                                False if not
+    :return: the Thunderscope Config for this view
+    """
+    proto_unix_io_map = {
+        ProtoUnixIOTypes.BLUE: blue_full_system_proto_unix_io,
+        ProtoUnixIOTypes.YELLOW: yellow_full_system_proto_unix_io,
+        ProtoUnixIOTypes.SIM: simulator_proto_unix_io,
+    }
+
+    # Must be called before widgets are initialized below
+    initialize_application()
+
+    tabs = []
+    # Choose the right tab based on yellow/blue
+    if yellow_is_friendly:
+        tabs = [
+            TScopeQTTab(
+                name="Yellow FullSystem",
+                key=TabNames.YELLOW,
+                widgets=configure_base_fullsystem(
+                    full_system_proto_unix_io=proto_unix_io_map[
+                        ProtoUnixIOTypes.YELLOW
+                    ],
+                    sim_proto_unix_io=proto_unix_io_map[ProtoUnixIOTypes.SIM],
+                    friendly_colour_yellow=True,
+                    visualization_buffer_size=visualization_buffer_size,
+                    extra_widgets=[
+                        configure_cost_vis(proto_unix_io_map[ProtoUnixIOTypes.YELLOW])
+                    ]
+                    if cost_visualization
+                    else [],
+                ),
+            )
+        ]
+    else:
+        tabs = [
+            TScopeQTTab(
+                name="Blue FullSystem",
+                key=TabNames.BLUE,
+                widgets=configure_base_fullsystem(
+                    full_system_proto_unix_io=proto_unix_io_map[ProtoUnixIOTypes.BLUE],
+                    sim_proto_unix_io=proto_unix_io_map[ProtoUnixIOTypes.SIM],
+                    friendly_colour_yellow=False,
+                    visualization_buffer_size=visualization_buffer_size,
+                    extra_widgets=[
+                        configure_cost_vis(proto_unix_io_map[ProtoUnixIOTypes.BLUE])
+                    ]
+                    if cost_visualization
+                    else [],
+                ),
+            )
+        ]
+
+    return TScopeConfig(proto_unix_io_map=proto_unix_io_map, tabs=tabs)
+
+
 def configure_replay_view(
     blue_replay_log,
     yellow_replay_log,
