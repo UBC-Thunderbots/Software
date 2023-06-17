@@ -36,7 +36,9 @@ void ShootOrPassPlayFSM::updateOffensivePositioningTactics(
 
     for (unsigned int i = 0; i < offensive_positioning_tactics.size(); i++)
     {
+        std::cout << "ZONE FOR OTHER PASS: " << ranked_zones[i + 1] << std::endl;
         auto pass1 = pass_eval.getBestPassInZones({ranked_zones[i + 1]}).pass;
+        std::cout << "OTHER PASS: " << std::to_string(pass1.passerPoint().x()) << " " << std::to_string(pass1.passerPoint().y()) << std::endl;
 
         offensive_positioning_tactics[i]->updateControlParams(
             pass1.receiverPoint(), pass1.receiverOrientation(), 0.0,
@@ -73,7 +75,7 @@ void ShootOrPassPlayFSM::lookForPass(const Update& event)
 
         // update the best pass in the attacker tactic
         attacker_tactic->updateControlParams(best_pass_and_score_so_far.pass, false);
-
+        std::cout << "PASS: " << std::to_string(best_pass_and_score_so_far.pass.passerPoint().x()) << " " << std::to_string(best_pass_and_score_so_far.pass.passerPoint().y()) << std::endl;
         // If we've assigned a robot as the passer in the PassGenerator, we
         // lower our threshold based on how long the PassGenerator has been
         // running since we set it
