@@ -79,7 +79,7 @@ class ColorProgressBar(QProgressBar):
         self.decimals = 10 ** decimals
 
         super(ColorProgressBar, self).setRange(
-            min_val * self.decimals, max_val * self.decimals
+            int(min_val * self.decimals), int(max_val * self.decimals)
         )
 
         super(ColorProgressBar, self).setStyleSheet(
