@@ -276,11 +276,11 @@ class MotorService
     Gpio driver_control_enable_gpio_;
     Gpio reset_gpio_;
 
-    // Transfer Buffers
+    // Transfer Buffers for spiTransfer
     uint8_t tx_[5] = {0};
     uint8_t rx_[5] = {0};
 
-    // Transfer Buffers
+    // Transfer Buffers for readThenWriteSpiTransfer
     uint8_t write_tx_[5] = {0};
     uint8_t read_tx_[5] = {0};
     uint8_t read_rx_[5] = {0};
