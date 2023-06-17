@@ -351,6 +351,7 @@ PYBIND11_MODULE(python_bindings, m)
 
     py::class_<World>(m, "World")
         .def(py::init<Field, Ball, Team, Team>())
+        .def(py::init<TbotsProto::World>())
         .def("friendlyTeam", &World::friendlyTeam)
         .def("enemyTeam", &World::enemyTeam)
         .def("ball", &World::ball)

@@ -358,6 +358,9 @@ def field_test_runner():
         runtime_dir = f"{args.yellow_full_system_runtime_dir}/test/{test_name}"
         friendly_proto_unix_io = yellow_full_system_proto_unix_io
 
+    # different estops use different ports this detects which one to use based on what is plugged in
+    estop_path = "/dev/ttyACM0" if os.path.isfile("/dev/ttyACM0") else "/dev/ttyUSB0"
+
     # Launch all binaries
     with FullSystem(
         runtime_dir,
@@ -369,6 +372,7 @@ def field_test_runner():
         multicast_channel=getRobotMulticastChannel(0),
         interface=args.interface,
         disable_estop=False,
+        estop_path=estop_path,
     ) as rc_friendly:
         with Gamecontroller(
             supress_logs=(not args.show_gamecontroller_logs), ci_mode=True
