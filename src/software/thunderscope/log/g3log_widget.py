@@ -82,9 +82,7 @@ class g3logWidget(QWidget):
             self.console_widget.write(log_str)
             if log.log_level == LogLevel.FATAL or log.log_level == LogLevel.CONTRACT:
                 QMessageBox.information(
-                    self,
-                    "Fatal Log Alert",
-                    log_str,
+                    self, "Fatal Log Alert", log_str,
                 )
         else:
             return

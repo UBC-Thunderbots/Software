@@ -176,10 +176,15 @@ class RobotView(QScrollArea):
         robot_crash = self.robot_crash_buffer.get(block=False, return_cached=False)
 
         if robot_crash is not None:
-            if time.time() - self.robot_last_crash_time_s[robot_crash.robot_id] > self.robot_crash_timeout_s:
-                robot_crash_text = f"robot_id: {robot_crash.robot_id}\n"\
-                    + f"exit_signal: {robot_crash.exit_signal}\n"\
+            if (
+                time.time() - self.robot_last_crash_time_s[robot_crash.robot_id]
+                > self.robot_crash_timeout_s
+            ):
+                robot_crash_text = (
+                    f"robot_id: {robot_crash.robot_id}\n"
+                    + f"exit_signal: {robot_crash.exit_signal}\n"
                     + f"stack_dump: {robot_crash.stack_dump}"
+                )
                 dialog = RobotCrashDialog()
                 dialog.setMessage(robot_crash_text)
                 if robot_crash.status is not None:
