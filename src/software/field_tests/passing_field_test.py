@@ -10,11 +10,12 @@ from software.simulated_tests.friendly_receives_ball_slow import (
 from software.simulated_tests.ball_moves_in_direction import (
     BallAlwaysMovesInDirectionInRegions,
 )
+from software import py_constants
 
 
 def test_passing(field_test_runner):
-    passer_robot_id = 4
-    receiver_robot_id = 5
+    passer_robot_id = 1
+    receiver_robot_id = 6
     should_receive_pass = True
 
     world = field_test_runner.world_buffer.get(block=True, timeout=WORLD_BUFFER_TIMEOUT)
@@ -35,7 +36,19 @@ def test_passing(field_test_runner):
 
     # after 100 times, get the best pass we have on the field
     pass_evaluation = pass_generator.generatePassEvaluation(tbots_world)
-    best_pass_eval = pass_evaluation.getBestPassOnField()
+    best_pass_eval = pass_evaluation.getBestPassInZones(
+        {
+            tbots.EighteenZoneId.ZONE_1,
+            tbots.EighteenZoneId.ZONE_2,
+            tbots.EighteenZoneId.ZONE_3,
+            tbots.EighteenZoneId.ZONE_4,
+            tbots.EighteenZoneId.ZONE_5,
+            tbots.EighteenZoneId.ZONE_6,
+            tbots.EighteenZoneId.ZONE_7,
+            tbots.EighteenZoneId.ZONE_8,
+            tbots.EighteenZoneId.ZONE_9,
+        }
+    )
     best_pass = best_pass_eval.pass_value
 
     kick_vec = tbots.Vector(
@@ -80,6 +93,9 @@ def test_passing(field_test_runner):
             ReceiverTactic(**receiver_args)
         )
 
+    field = tbots.Field.createSSLDivisionBField()
+    eighteen_zones = tbots.EighteenZonePitchDivision(field)
+
     # Validate that the ball is always received by the other robot
     # slower than the max receive speed
     # and also that the ball is not passed backwards over long distances
@@ -87,13 +103,12 @@ def test_passing(field_test_runner):
         [FriendlyAlwaysReceivesBallSlow(robot_id=1, max_receive_speed=2.5)],
         [
             BallAlwaysMovesInDirectionInRegions(
-                initial_ball_position=ball_initial_position,
+                initial_ball_position=tbots_world.ball().position(),
                 direction=True,
                 regions=[
-                    tbots.Rectangle(
-                        tbots.Point(-field.xLength() / 2, field.yLength() / 2),
-                        tbots.Point(0 - buffer_x, -field.yLength() / 2),
-                    )
+                    eighteen_zones.getZone(tbots.EighteenZoneId.ZONE_7),
+                    eighteen_zones.getZone(tbots.EighteenZoneId.ZONE_8),
+                    eighteen_zones.getZone(tbots.EighteenZoneId.ZONE_9),
                 ],
             )
         ],

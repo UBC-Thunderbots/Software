@@ -11,6 +11,7 @@ cc_library(
         "//proto/message_translation:tbots_protobuf",
         "//software/ai/evaluation:calc_best_shot",
         "//software/ai/evaluation:time_to_travel",
+        "//software/ai/passing:eighteen_zone_pitch_division",
         "//software/logger",
         "//software/math:math_functions",
         "//software/util/make_enum",

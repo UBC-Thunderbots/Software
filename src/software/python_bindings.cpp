@@ -96,7 +96,6 @@ void declarePassEvaluation(py::module& m, std::string name)
 }
 
 
-
 /**
  * Create a new threaded e-stop reader
  *
@@ -380,7 +379,8 @@ PYBIND11_MODULE(python_bindings, m)
 
     py::class_<EighteenZonePitchDivision, std::shared_ptr<EighteenZonePitchDivision>>(
         m, "EighteenZonePitchDivision")
-        .def(py::init<Field>());
+        .def(py::init<Field>())
+        .def("getZone", &EighteenZonePitchDivision::getZone);
 
     declarePassEvaluation<EighteenZoneId>(m, "EighteenZoneId");
 
@@ -391,4 +391,25 @@ PYBIND11_MODULE(python_bindings, m)
         .def("passerPoint", &Pass::passerPoint)
         .def("receiverPoint", &Pass::receiverPoint)
         .def("speed", &Pass::speed);
+
+    py::enum_<EighteenZoneId>(m, "EighteenZoneId")
+        .value("ZONE_1", EighteenZoneId::ZONE_1)
+        .value("ZONE_2", EighteenZoneId::ZONE_2)
+        .value("ZONE_3", EighteenZoneId::ZONE_3)
+        .value("ZONE_4", EighteenZoneId::ZONE_4)
+        .value("ZONE_5", EighteenZoneId::ZONE_5)
+        .value("ZONE_6", EighteenZoneId::ZONE_6)
+        .value("ZONE_7", EighteenZoneId::ZONE_7)
+        .value("ZONE_8", EighteenZoneId::ZONE_8)
+        .value("ZONE_9", EighteenZoneId::ZONE_9)
+        .value("ZONE_10", EighteenZoneId::ZONE_10)
+        .value("ZONE_11", EighteenZoneId::ZONE_11)
+        .value("ZONE_12", EighteenZoneId::ZONE_12)
+        .value("ZONE_13", EighteenZoneId::ZONE_13)
+        .value("ZONE_14", EighteenZoneId::ZONE_14)
+        .value("ZONE_15", EighteenZoneId::ZONE_15)
+        .value("ZONE_16", EighteenZoneId::ZONE_16)
+        .value("ZONE_17", EighteenZoneId::ZONE_17)
+        .value("ZONE_18", EighteenZoneId::ZONE_18)
+        .export_values();
 }
