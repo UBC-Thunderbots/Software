@@ -43,6 +43,7 @@ class g3logWidget(QWidget):
             LogLevel.INFO: "INFO",
             LogLevel.WARNING: "WARNING",
             LogLevel.FATAL: "FATAL",
+            LogLevel.CONTRACT: "CONTRACT",
         }
 
     def refresh(self):
@@ -69,11 +70,21 @@ class g3logWidget(QWidget):
                 and self.checkbox_widget.warning_checkbox.isChecked()
             )
             or (
+                log.log_level == LogLevel.CONTRACT
+                and self.checkbox_widget.fatal_checkbox.isChecked()
+            )
+            or (
                 log.log_level == LogLevel.FATAL
                 and self.checkbox_widget.fatal_checkbox.isChecked()
             )
         ):
             log_str = f"R{log.robot_id} {log.created_timestamp.epoch_timestamp_seconds} {self.log_level_str_map[log.log_level]} [{log.file_name}->{log.line_number}] {log.log_msg}\n"
             self.console_widget.write(log_str)
+            if log.log_level == LogLevel.FATAL or log.log_level == LogLevel.CONTRACT:
+                QMessageBox.information(
+                    self,
+                    "Fatal Log Alert",
+                    log_str,
+                )
         else:
             return

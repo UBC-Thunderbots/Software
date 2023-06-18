@@ -90,6 +90,9 @@ class Thunderloop
      */
     double getNanoseconds(timespec time);
 
+    void broadcastRobotStatus();
+    void sendCrashProto(g3::FatalMessagePtr message);
+
     // Input Msg Buffers
     TbotsProto::PrimitiveSet primitive_set_;
     TbotsProto::World world_;

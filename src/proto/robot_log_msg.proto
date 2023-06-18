@@ -7,10 +7,11 @@ import "proto/tbots_timestamp_msg.proto";
 // the severity level of the log
 enum LogLevel
 {
-    DEBUG   = 0;
-    INFO    = 1;
-    WARNING = 2;
-    FATAL   = 3;
+    DEBUG    = 0;
+    INFO     = 1;
+    WARNING  = 2;
+    FATAL    = 3;
+    CONTRACT = 4; // Special Fatal log for if a CHECK fails
 };
 
 message RobotLog

@@ -11,6 +11,7 @@
 #include "software/util/scoped_timespec_timer/scoped_timespec_timer.h"
 #include "software/world/robot_state.h"
 #include "software/world/team.h"
+#include "proto/robot_crash_msg.pb.h"
 
 /**
  * https://rt.wiki.kernel.org/index.php/Squarewave-example
@@ -23,6 +24,10 @@ extern int clock_nanosleep(clockid_t __clock_id, int __flags,
 extern "C"
 {
     static MotorService* g_motor_service = NULL;
+    static TbotsProto::RobotStatus* robot_status = NULL;
+    static int channel_id;
+    static std::string network_interface;
+    static int robot_id;
 
     /**
      * Handles process signals
@@ -39,6 +44,18 @@ extern "C"
                   << g3::signalToStr(signal_num) << std::endl;
         std::cerr << "Thunderloop shutting down and motor board reset\n!!!\n"
                   << std::endl;
+
+        TbotsProto::RobotCrash crash_msg;
+        auto dump = g3::internal::stackdump();
+        crash_msg.set_robot_id(robot_id);
+        crash_msg.set_stack_dump(dump);
+        crash_msg.set_exit_signal(g3::signalToStr(signal_num));
+        *(crash_msg.mutable_status()) = *robot_status;
+        auto sender = std::make_unique<ThreadedProtoUdpSender<TbotsProto::RobotCrash>>(
+                std::string(ROBOT_MULTICAST_CHANNELS.at(channel_id)) + "%" + network_interface,
+                ROBOT_CRASH_PORT, true);
+        sender->sendProto(crash_msg);
+        std::cerr << "Broadcasting robot crash msg";
 
         exit(signal_num);
     }
@@ -71,6 +88,12 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, const int loop
     std::signal(SIGFPE, tbotsExit);
     std::signal(SIGINT, tbotsExit);
     std::signal(SIGILL, tbotsExit);
+
+    // Initialize values for udp sender in signal handler
+    robot_status = &robot_status_;
+    channel_id = channel_id_;
+    network_interface = network_interface_;
+    robot_id = robot_id_;
 
     LOG(INFO)
         << "THUNDERLOOP: Network Logger initialized! Next initializing Network Service";
