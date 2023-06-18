@@ -257,11 +257,17 @@ if __name__ == "__main__":
         # else, it will be the diagnostics proto
         current_proto_unix_io = tscope.proto_unix_io_map[ProtoUnixIOTypes.CURRENT]
 
+        # different estops use different ports this detects which one to use based on what is plugged in
+        estop_path = (
+            "/dev/ttyACM0" if os.path.isfile("/dev/ttyACM0") else "/dev/ttyUSB0"
+        )
+
         with RobotCommunication(
             current_proto_unix_io,
             getRobotMulticastChannel(0),
             args.interface,
             args.disable_estop,
+            estop_path,
         ) as robot_communication:
             if args.run_diagnostics:
                 for tab in tscope_config.tabs:

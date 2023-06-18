@@ -164,16 +164,16 @@ class World final
     /**
      * Sets the team with possession
      *
-     * @param team_with_possesion The team with possession
+     * @param possession The team with possession
      */
-    void setTeamWithPossession(TeamSide team_with_possesion);
+    void setTeamWithPossession(TeamPossession possession);
 
     /**
      * Gets the team with possession
      *
      * @return The team with possession
      */
-    TeamSide getTeamWithPossession() const;
+    TeamPossession getTeamWithPossession() const;
 
     /**
      * Defines the equality operator for a World. Worlds are equal if their field, ball
@@ -215,5 +215,5 @@ class World final
     // A small buffer that stores previous referee stage
     boost::circular_buffer<RefereeStage> referee_stage_history_;
     // which team has possession of the ball
-    TeamSide team_with_possesion_;
+    TeamPossession team_with_possession_;
 };
