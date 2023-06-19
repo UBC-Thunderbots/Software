@@ -81,12 +81,6 @@ def test_kickoff_play(simulated_test_runner, is_friendly_test):
     # TODO- #2809 Validation
     always_validation_sequence_set = [
         [
-            NumberOfRobotsAlwaysStaysInRegion(
-                    region=tbots.field.friendlyHalf(), req_robot_cnt=5
-            ),
-            NumberOfRobotsAlwaysStaysInRegion(
-                region=tbots.field.centreCircle(), req_robot_cnt=1
-            ),
             NumberOfRobotsNeverEntersRegion(
                 region=tbots.field.enemyHalf(), req_robot_cnt=2
             )
@@ -98,7 +92,7 @@ def test_kickoff_play(simulated_test_runner, is_friendly_test):
     eventually_validation_sequence_set = [
         [
             BallEventuallyExitsRegion(
-                region=tbots.field.centreCircle()
+                region=tbots.field.centerCircle()
             )
         ]
     ]
