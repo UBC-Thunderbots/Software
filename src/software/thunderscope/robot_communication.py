@@ -185,12 +185,12 @@ class RobotCommunication(object):
             self.sequence_number += 1
 
             if (
-                # not self.disable_estop
-                # and self.estop_reader.isEstopPlay()
-                # and (
+                not self.disable_estop
+                and self.estop_reader.isEstopPlay()
+                and (
                 self.robots_connected_to_fullsystem
                 or self.robots_connected_to_manual
-                # )
+                )
             ):
                 self.send_primitive_set.send_proto(primitive_set)
 
