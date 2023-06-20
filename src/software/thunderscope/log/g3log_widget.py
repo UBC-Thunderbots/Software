@@ -90,8 +90,8 @@ class g3logWidget(QWidget):
             self.console_widget.write(log_str)
             if log.log_level == LogLevel.FATAL or log.log_level == LogLevel.CONTRACT:
                 if (
-                        time.time() - self.robot_last_fatal_time_s[log.robot_id]
-                        > self.robot_fatal_timeout_s
+                    time.time() - self.robot_last_fatal_time_s[log.robot_id]
+                    > self.robot_fatal_timeout_s
                 ):
                     QMessageBox.information(
                         self, "Fatal Log Alert", log_str,
