@@ -1,6 +1,8 @@
 import pyqtgraph as pg
 from pyqtgraph.Qt.QtWidgets import *
 import queue
+import time
+from software.py_constants import *
 import pyqtgraph.console as pg_console
 from proto.robot_log_msg_pb2 import RobotLog, LogLevel
 from proto.import_all_protos import *
@@ -36,6 +38,12 @@ class g3logWidget(QWidget):
         self.layout.addWidget(self.console_widget)
         self.layout.addWidget(self.checkbox_widget)
         self.setLayout(self.layout)
+
+        # ignore repeated crash proto
+        self.robot_last_fatal_time_s = []
+        for id in range(MAX_ROBOT_IDS_PER_SIDE):
+            self.robot_last_fatal_time_s.append(0)
+        self.robot_fatal_timeout_s = 5
 
         # LogLevel to string conversion map
         self.log_level_str_map = {
@@ -81,8 +89,13 @@ class g3logWidget(QWidget):
             log_str = f"R{log.robot_id} {log.created_timestamp.epoch_timestamp_seconds} {self.log_level_str_map[log.log_level]} [{log.file_name}->{log.line_number}] {log.log_msg}\n"
             self.console_widget.write(log_str)
             if log.log_level == LogLevel.FATAL or log.log_level == LogLevel.CONTRACT:
-                QMessageBox.information(
-                    self, "Fatal Log Alert", log_str,
-                )
+                if (
+                        time.time() - self.robot_last_fatal_time_s[log.robot_id]
+                        > self.robot_fatal_timeout_s
+                ):
+                    QMessageBox.information(
+                        self, "Fatal Log Alert", log_str,
+                    )
+                self.robot_last_fatal_time_s[log.robot_id] = time.time()
         else:
             return
