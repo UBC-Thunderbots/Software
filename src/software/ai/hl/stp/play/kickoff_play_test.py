@@ -75,8 +75,6 @@ def test_kickoff_play(simulated_test_runner, is_friendly_test):
         ),
     )
 
-
-
     # Always Validation
     # TODO- #2809 Validation
     always_validation_sequence_set = [
@@ -90,11 +88,7 @@ def test_kickoff_play(simulated_test_runner, is_friendly_test):
     # Eventually Validation
     # TODO- #2809 Validation
     eventually_validation_sequence_set = [
-        [
-            BallEventuallyExitsRegion(
-                region=tbots.field.centerCircle()
-            )
-        ]
+        [BallEventuallyExitsRegion(region=tbots.field.centerCircle())]
     ]
 
     simulated_test_runner.run_test(
