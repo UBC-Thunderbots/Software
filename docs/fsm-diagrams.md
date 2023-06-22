@@ -265,7 +265,7 @@ classDef terminate fill:white,color:black,font-weight:bold
 direction LR
 [*] --> DribbleFSM
 DribbleFSM --> DribbleFSM : [!takePenaltyShot]\n<i>updateApproachKeeper</i>
-DribbleFSM --> KickFSM : [timeOutApproach]
+DribbleFSM --> KickFSM : [timeOutApproach]\n<i>shoot</i>
 DribbleFSM --> DribbleFSM : <i>adjustOrientationForShot</i>
 DribbleFSM --> KickFSM
 KickFSM --> KickFSM : <i>shoot</i>
