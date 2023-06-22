@@ -13,7 +13,13 @@ from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 
 class RobotCrashDialog(QDialog):
-    def __init__(self, parent=None):
+    """Dialog to show information about a robot before it crashed,
+
+    Displays the a message and RobotStatus.
+
+    """
+
+    def __init__(self, message, robot_status, parent=None):
         super().__init__(parent)
 
         self.setWindowTitle("Robot Crash")
@@ -23,19 +29,15 @@ class RobotCrashDialog(QDialog):
         self.buttonBox.rejected.connect(self.reject)
 
         self.layout = QVBoxLayout()
-        self.message = QLabel("Placeholder")
+        self.message = QLabel(message)
         self.layout.addWidget(self.message)
         self.robot_status = RobotStatusView()
+        if robot_status is not None:
+            self.robot_status.update(robot_status)
+            self.robot_status.toggle_visibility()
         self.layout.addWidget(self.robot_status)
         self.layout.addWidget(self.buttonBox)
         self.setLayout(self.layout)
-
-    def setMessage(self, message):
-        self.message.setText(message)
-
-    def setRobotStatus(self, robot_status):
-        self.robot_status.update(robot_status)
-        self.robot_status.toggle_visibility()
 
 
 class RobotViewComponent(QWidget):
@@ -185,9 +187,6 @@ class RobotView(QScrollArea):
                     + f"exit_signal: {robot_crash.exit_signal}\n"
                     + f"stack_dump: {robot_crash.stack_dump}"
                 )
-                dialog = RobotCrashDialog()
-                dialog.setMessage(robot_crash_text)
-                if robot_crash.status is not None:
-                    dialog.setRobotStatus(robot_crash.status)
+                dialog = RobotCrashDialog(robot_crash_text, robot_crash)
                 dialog.exec()
             self.robot_last_crash_time_s[robot_crash.robot_id] = time.time()
