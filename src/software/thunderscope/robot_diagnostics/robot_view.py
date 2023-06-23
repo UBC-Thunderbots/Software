@@ -150,7 +150,7 @@ class RobotView(QScrollArea):
             self.robot_last_crash_time_s.append(0)
 
         # ignore repeated crash proto
-        self.robot_crash_timeout_s = 5
+        self.ROBOT_CRASH_TIMEOUT_S = 5
 
         # for a QScrollArea, widgets cannot be added to it directly
         # doing so causes no scrolling to happen, and all the components get smaller
@@ -180,7 +180,7 @@ class RobotView(QScrollArea):
         if robot_crash is not None:
             if (
                 time.time() - self.robot_last_crash_time_s[robot_crash.robot_id]
-                > self.robot_crash_timeout_s
+                > self.ROBOT_CRASH_TIMEOUT_S
             ):
                 robot_crash_text = (
                     f"robot_id: {robot_crash.robot_id}\n"
