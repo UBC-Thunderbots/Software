@@ -14,6 +14,8 @@ class RobotsDoNotCollide(Validation):
     Checks if any 2 robots have collided
     """
 
+    ROBOT_COLLISION_BUFFER = 0.005
+
     def __init__(self):
         """
         Initialised the list of robots that have fouled to empty
@@ -82,7 +84,7 @@ class RobotsDoNotCollide(Validation):
         # check if robots are colliding
         if (
             robot_1_pos - robot_2_pos
-        ).length() < ROBOT_MAX_RADIUS_METERS * 2 + ROBOT_COLLISION_BUFFER:
+        ).length() < ROBOT_MAX_RADIUS_METERS * 2 + self.ROBOT_COLLISION_BUFFER:
             # the logic on which robot(s) get a foul is from the official SSL rules
             # https://robocup-ssl.github.io/ssl-rules/sslrules.html#_crashing
 

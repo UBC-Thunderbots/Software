@@ -10,8 +10,9 @@ from software.simulated_tests.validation import (
 
 
 class RobotEntersRegionAndStops:
-
     """Checks if a specific robot enters the provided regions and stops there for the provided time"""
+
+    ROBOT_MAX_STATIONARY_SPEED_M_PER_S = 0.01
 
     def __init__(self, robot_id, region=None, num_ticks=1):
         """
@@ -51,7 +52,7 @@ class RobotEntersRegionAndStops:
                             robot.current_state.global_velocity.x_component_meters,
                             robot.current_state.global_velocity.y_component_meters,
                         )
-                        < ROBOT_MAX_STATIONARY_SPEED_M_PER_S
+                        < self.ROBOT_MAX_STATIONARY_SPEED_M_PER_S
                     ):
                         self.ticks_so_far = self.ticks_so_far + 1
                         self.is_stationary = True
