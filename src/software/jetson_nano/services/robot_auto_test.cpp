@@ -4,7 +4,6 @@
 #include "software/jetson_nano/services/power.h"
 #include "software/jetson_nano/primitive_executor.h"
 #include "software/util/scoped_timespec_timer/scoped_timespec_timer.h"
-#include "software/jetson_nano/services/network/power_service_exception.h"
 #include "proto/primitive/primitive_msg_factory.h"
 #include "proto/message_translation/tbots_geometry.h"
 #include <chrono>

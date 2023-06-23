@@ -5,7 +5,6 @@
 #include <cstdint>
 
 #include "proto/power_frame_msg.nanopb.h"
-#include "software/jetson_nano/services/network/power_service_exception.h"
 
 PowerService::PowerService()
 {
