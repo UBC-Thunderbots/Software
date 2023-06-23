@@ -589,3 +589,15 @@ cc_test(
         "//software/ai/hl/stp/play:play_factory",
     ],
 )
+
+py_test(
+    name = "shoot_or_pass_defense_play_test",
+    srcs = [
+        "shoot_or_pass_defense_play_test.py",
+    ],
+    deps = [
+        "//software/simulated_tests:simulated_test_fixture",
+        "//software/simulated_tests:validation",
+        requirement("pytest"),
+    ],
+)
