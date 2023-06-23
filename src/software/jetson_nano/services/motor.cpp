@@ -336,15 +336,6 @@ MotorService::MotorFaultIndicator MotorService::checkDriverFault(uint8_t motor)
     return MotorFaultIndicator(drive_enabled, motor_faults);
 }
 
-void MotorService::disableVelocity(double current_velocity, double previous_velocity)
-{
-    if (std::abs(current_velocity - previous_velocity) > RUNAWAY_PROTECTION_THRESHOLD_MPS)
-    {
-        driver_control_enable_gpio_.setValue(GpioState::LOW);
-        LOG(FATAL) << "Front right motor runaway";
-    }
-}
-
 TbotsProto::MotorStatus MotorService::updateMotorStatus(double front_left_velocity_mps,
                                                         double front_right_velocity_mps,
                                                         double back_left_velocity_mps,

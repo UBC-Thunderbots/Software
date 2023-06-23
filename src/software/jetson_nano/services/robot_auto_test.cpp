@@ -24,10 +24,10 @@ RobotConstants_t robot_constants_;
 int read_value;
 
 // SPI Chip Selects
-static const uint8_t FRONT_LEFT_MOTOR_CHIP_SELECT  = 0;
-static const uint8_t FRONT_RIGHT_MOTOR_CHIP_SELECT = 3;
-static const uint8_t BACK_LEFT_MOTOR_CHIP_SELECT   = 1;
-static const uint8_t BACK_RIGHT_MOTOR_CHIP_SELECT  = 2;
+static const uint8_t FRONT_LEFT_MOTOR_CHIP_SELECT  = motor_service_->FRONT_LEFT_MOTOR_CHIP_SELECT;
+static const uint8_t FRONT_RIGHT_MOTOR_CHIP_SELECT = motor_service_->FRONT_RIGHT_MOTOR_CHIP_SELECT;
+static const uint8_t BACK_LEFT_MOTOR_CHIP_SELECT   = motor_service_->BACK_LEFT_MOTOR_CHIP_SELECT;
+static const uint8_t BACK_RIGHT_MOTOR_CHIP_SELECT  = motor_service_->BACK_RIGHT_MOTOR_CHIP_SELECT;
 
 static const uint8_t CHIP_SELECT[] = {FRONT_LEFT_MOTOR_CHIP_SELECT, FRONT_RIGHT_MOTOR_CHIP_SELECT, BACK_LEFT_MOTOR_CHIP_SELECT, BACK_RIGHT_MOTOR_CHIP_SELECT};
 
@@ -60,7 +60,7 @@ int main(int argc, char **argv) {
     // Testing Power board SPI transfer
     try {
         PowerService();
-    } catch (const PowerServiceException &pse) {
+    } catch (std::runtime_error &e) {
         LOG(FATAL) << "Unable to communicate with the power board";
     }
 }

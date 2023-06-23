@@ -13,6 +13,13 @@
 class MotorService
 {
    public:
+
+    // SPI Chip Selects
+    static const uint8_t FRONT_LEFT_MOTOR_CHIP_SELECT  = 0;
+    static const uint8_t FRONT_RIGHT_MOTOR_CHIP_SELECT = 3;
+    static const uint8_t BACK_LEFT_MOTOR_CHIP_SELECT   = 1;
+    static const uint8_t BACK_RIGHT_MOTOR_CHIP_SELECT  = 2;
+
     /**
      * Service that interacts with the motor board.
      * Opens all the required ports and maintains them until destroyed.
@@ -35,8 +42,6 @@ class MotorService
      */
     TbotsProto::MotorStatus poll(const TbotsProto::MotorControl& motor_control,
                                  double time_elapsed_since_last_poll_s);
-
-    void disableVelocity(double current_velocity, double previous_velocity);
 
     /**
      * Trinamic API binding, sets spi_demux_select_0|1 pins
@@ -135,6 +140,8 @@ class MotorService
     struct MotorFaultIndicator checkDriverFault(uint8_t motor);
 
     /**
+     * Used for testing purposes:
+     *
      * Wrapper function that writes int to the TMC4671
      * @param motor drive motor number
      * @param address motor address
@@ -143,8 +150,9 @@ class MotorService
     void writeIntToTMC4671(uint8_t motor, uint8_t address, int32_t value);
 
     /**
-     * Wrapper function that reads int from the TMC4671
+     * Used for testing purposes:
      *
+     * Wrapper function that reads int from the TMC4671
      * @param motor drive motor number
      * @param address motor address
      * @return read value
@@ -361,12 +369,6 @@ class MotorService
     std::optional<std::chrono::time_point<std::chrono::system_clock>>
         tracked_motor_fault_start_time_;
     int num_tracked_motor_resets_;
-
-    // SPI Chip Selects
-    static const uint8_t FRONT_LEFT_MOTOR_CHIP_SELECT  = 0;
-    static const uint8_t FRONT_RIGHT_MOTOR_CHIP_SELECT = 3;
-    static const uint8_t BACK_LEFT_MOTOR_CHIP_SELECT   = 1;
-    static const uint8_t BACK_RIGHT_MOTOR_CHIP_SELECT  = 2;
 
     static const uint8_t DRIBBLER_MOTOR_CHIP_SELECT = 4;
 
