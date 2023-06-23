@@ -32,6 +32,7 @@ static const uint8_t BACK_RIGHT_MOTOR_CHIP_SELECT  = motor_service_->BACK_RIGHT_
 static const uint8_t CHIP_SELECT[] = {FRONT_LEFT_MOTOR_CHIP_SELECT, FRONT_RIGHT_MOTOR_CHIP_SELECT, BACK_LEFT_MOTOR_CHIP_SELECT, BACK_RIGHT_MOTOR_CHIP_SELECT};
 
 constexpr int ASCII_4671_IN_HEXADECIMAL = 0x34363731;
+constexpr double THRESHOLD = 0.0001;
 
 int main(int argc, char **argv) {
     LOG(INFO) << "Running on the Jetson Nano!";
@@ -59,7 +60,19 @@ int main(int argc, char **argv) {
 
     // Testing Power board SPI transfer
     try {
-        PowerService();
+        PowerService power_service = PowerService();
+        TbotsProto::PowerStatus power_status = power_service.poll(TbotsProto::PowerControl(), 0, 0, 0);
+
+        if (abs(power_status.battery_voltage() - 0) < THRESHOLD) {
+            LOG(FATAL) << "Battery voltage is zero";
+        } else if (abs(power_status.capacitor_voltage() - 0) < THRESHOLD) {
+            LOG(FATAL) << "Capacitor voltage is zero";
+        } else if (abs(power_status.current_draw() - 0) < THRESHOLD) {
+            LOG(FATAL) << "Current draw is zero";
+        } else if (power_status.sequence_num() == 0) {
+            LOG(FATAL) << "Sequence number is zero";
+        }
+
     } catch (std::runtime_error &e) {
         LOG(FATAL) << "Unable to communicate with the power board";
     }
