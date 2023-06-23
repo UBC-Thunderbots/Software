@@ -43,7 +43,7 @@ void PenaltyKickPlayFSM::setupPosition(const Update &event)
     // Move all non-shooter robots behind the penalty
     for (unsigned int i = 0; i < penalty_setup_tactics.size() - 1; i++)
     {
-        double y_offset = 4 *
+        double y_offset = 8 *
                           ((double)i - ((double)penalty_setup_tactics.size() - 1) / 2.0) *
                           ROBOT_MAX_RADIUS_METERS;
         penalty_setup_tactics.at(i)->updateControlParams(
