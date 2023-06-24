@@ -89,11 +89,14 @@ def hrvo_setup(
     ball_initial_vel = tbots.Point(0, 0)
 
     # Game Controller Setup
-    simulated_test_runner.gamecontroller.send_ci_input(
-        gc_command=Command.Type.STOP, team=Team.UNKNOWN
+    simulated_test_runner.send_gamecontroller_command(
+        gc_command=Command.Type.STOP, is_friendly=True
     )
-    simulated_test_runner.gamecontroller.send_ci_input(
-        gc_command=Command.Type.FORCE_START, team=Team.BLUE
+    simulated_test_runner.send_gamecontroller_command(
+        gc_command=Command.Type.STOP, is_friendly=False
+    )
+    simulated_test_runner.send_gamecontroller_command(
+        gc_command=Command.Type.FORCE_START, is_friendly=True
     )
 
     blue_params = AssignedTacticPlayControlParams()
@@ -109,9 +112,7 @@ def hrvo_setup(
             params=blue_params,
         )
 
-    simulated_test_runner.blue_full_system_proto_unix_io.send_proto(
-        AssignedTacticPlayControlParams, blue_params
-    )
+    simulated_test_runner.set_tactics(blue_params, True)
 
     # Setup no tactics on the enemy side
     yellow_params = AssignedTacticPlayControlParams()
@@ -121,9 +122,7 @@ def hrvo_setup(
             index, destination, tbots.Angle.fromRadians(0), 0, params=yellow_params
         )
 
-    simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(
-        AssignedTacticPlayControlParams, yellow_params
-    )
+    simulated_test_runner.set_tactics(yellow_params, False)
 
     # Setup Robots
     simulated_test_runner.simulator_proto_unix_io.send_proto(
