@@ -5,7 +5,8 @@ Description=Robot UI Software
 PartOf=thunderbots.service
 
 # At startup, start this unit after the thunderbots.service start
-After=thunderbots.service thunderloop.service network.target
+After=thunderbots.service thunderloop.service network.target network-online.target
+Wants=network-online.target
 
 # Allow restarts at 10Hz
 StartLimitIntervalSec=10

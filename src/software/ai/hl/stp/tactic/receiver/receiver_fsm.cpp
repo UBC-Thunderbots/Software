@@ -119,7 +119,7 @@ void ReceiverFSM::updateOnetouch(const Update& event)
     {
         event.common.set_primitive(createMovePrimitive(
             CREATE_MOTION_CONTROL(one_touch.getPointToShootAt()),
-            one_touch.getOpenAngle(), 0, TbotsProto::DribblerMode::OFF,
+            one_touch.getOpenAngle(), 0, false, TbotsProto::DribblerMode::OFF,
             TbotsProto::BallCollisionType::ALLOW,
             AutoChipOrKick{AutoChipOrKickMode::AUTOKICK,
                            BALL_MAX_SPEED_METERS_PER_SECOND},
@@ -138,11 +138,11 @@ void ReceiverFSM::updateReceive(const Update& event)
     {
         event.common.set_primitive(createMovePrimitive(
             CREATE_MOTION_CONTROL(event.control_params.pass->receiverPoint()),
-            event.control_params.pass->receiverOrientation(), 0,
+            event.control_params.pass->receiverOrientation(), 0, false,
             TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
             AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
             TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
-            event.common.robot.robotConstants()));
+            event.common.robot.robotConstants(), std::optional<double>()));
     }
 }
 
@@ -165,11 +165,11 @@ void ReceiverFSM::adjustReceive(const Update& event)
         Angle ball_receive_orientation = (ball.position() - robot_pos).orientation();
 
         event.common.set_primitive(createMovePrimitive(
-            CREATE_MOTION_CONTROL(ball_receive_pos), ball_receive_orientation, 0,
+            CREATE_MOTION_CONTROL(ball_receive_pos), ball_receive_orientation, 0, false,
             TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
             AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
             TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
-            event.common.robot.robotConstants()));
+            event.common.robot.robotConstants(), std::optional<double>()));
     }
 }
 
