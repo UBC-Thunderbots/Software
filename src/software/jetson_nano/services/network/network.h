@@ -6,6 +6,7 @@
 #include "proto/robot_status_msg.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
 #include "proto/world.pb.h"
+#include "shared/constants.h"
 #include "shared/robot_constants.h"
 #include "software/jetson_nano/services/network/proto_tracker.h"
 #include "software/networking/threaded_proto_udp_listener.hpp"

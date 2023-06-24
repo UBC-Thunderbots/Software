@@ -1,7 +1,5 @@
 #include "software/jetson_nano/services/network/network.h"
 
-#include "shared/constants.h"
-
 NetworkService::NetworkService(const std::string& ip_address,
                                unsigned short world_listener_port,
                                unsigned short primitive_listener_port,
