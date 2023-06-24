@@ -132,6 +132,11 @@ static const double CHICKER_TIMEOUT                = 3 * MILLISECONDS_PER_SECOND
 static const unsigned DIV_A_NUM_ROBOTS = 11;
 static const unsigned DIV_B_NUM_ROBOTS = 6;
 
+// Kick Spd to Pulse Width Safety Constraint Constants
+
+static const int MAX_KICK_CONSTANT       = 850;
+static const double MAX_KICK_COEFFICIENT = 0.4;
+
 // Arduino
 
 // UART baud rate used to communicate between system and arudino

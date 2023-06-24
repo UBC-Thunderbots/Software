@@ -40,7 +40,8 @@ class NetworkService
 
    private:
     // Constants
-    static constexpr float PROTO_LOSS_WARNING_THRESHOLD = 0.1f;
+    static constexpr float PROTO_LOSS_WARNING_THRESHOLD          = 0.1f;
+    static constexpr unsigned int ROBOT_STATUS_BROADCAST_RATE_HZ = 60;
 
     // Variables
     TbotsProto::PrimitiveSet primitive_set_msg;
@@ -54,6 +55,8 @@ class NetworkService
         listener_primitive_set;
     std::unique_ptr<ThreadedProtoUdpListener<TbotsProto::World>> listener_world;
 
+    unsigned int network_ticks     = 0;
+    unsigned int thunderloop_ticks = 0;
 
     // Functions to callback primitiveSet and world and stores them in a variable
     void primitiveSetCallback(TbotsProto::PrimitiveSet input);
