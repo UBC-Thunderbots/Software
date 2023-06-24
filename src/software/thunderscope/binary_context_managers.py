@@ -471,9 +471,9 @@ class Gamecontroller(object):
             blue_full_system_proto_unix_io.send_proto(Referee, data)
             yellow_full_system_proto_unix_io.send_proto(Referee, data)
 
-        # self.receive_referee_command = SSLRefereeProtoListener(
-        #     Gamecontroller.REFEREE_IP, self.referee_port, __send_referee_command, True,
-        # )
+        self.receive_referee_command = SSLRefereeProtoListener(
+            Gamecontroller.REFEREE_IP, self.referee_port, __send_referee_command, True,
+        )
 
     def send_ci_input(
         self,
