@@ -41,7 +41,9 @@ class NetworkService
    private:
     // Constants
     static constexpr float PROTO_LOSS_WARNING_THRESHOLD          = 0.1f;
-    static constexpr unsigned int ROBOT_STATUS_BROADCAST_RATE_HZ = 60;
+    static constexpr unsigned int ROBOT_STATUS_BROADCAST_RATE_HZ = 10;
+    static constexpr unsigned int ROBOT_STATUS_TO_THUNDERLOOP_HZ_RATIO =
+        ROBOT_STATUS_BROADCAST_RATE_HZ / (CONTROL_LOOP_HZ + 1.0);
 
     // Variables
     TbotsProto::PrimitiveSet primitive_set_msg;

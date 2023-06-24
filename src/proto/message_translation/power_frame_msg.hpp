@@ -130,8 +130,8 @@ TbotsProto_PowerPulseControl inline createNanoPbPowerPulseControl(
         TbotsProto_PowerPulseControl_init_default;
 
     // Safety bounds
-    kick_constant = std::max(kick_constant, MAX_KICK_CONSTANT);
-    kick_coeff    = std::max(kick_coeff, MAX_KICK_COEFFICIENT);
+    kick_constant = std::min(kick_constant, MAX_KICK_CONSTANT);
+    kick_coeff    = std::min(kick_coeff, MAX_KICK_COEFFICIENT);
 
     switch (google_control.chicker().chicker_command_case())
     {
@@ -140,9 +140,8 @@ TbotsProto_PowerPulseControl inline createNanoPbPowerPulseControl(
                 TbotsProto_PowerPulseControl_ChickerControl_kick_pulse_width_tag;
             nanopb_control.chicker.chicker_command.kick_pulse_width =
                 static_cast<uint32_t>(
-                    kick_constant * std::exp(kick_coeff * google_control.chicker()
-                                                              .auto_chip_or_kick()
-                                                              .autokick_speed_m_per_s()));
+                    kick_constant *
+                    std::exp(kick_coeff * google_control.chicker().kick_speed_m_per_s()));
             break;
         case TbotsProto::PowerControl::ChickerControl::kChipDistanceMeters:
             nanopb_control.chicker.which_chicker_command =

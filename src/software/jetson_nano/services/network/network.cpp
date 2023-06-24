@@ -25,8 +25,7 @@ std::tuple<TbotsProto::PrimitiveSet, TbotsProto::World> NetworkService::poll(
 {
     std::scoped_lock lock{primitive_set_mutex, world_mutex};
     // Rate limit sending of proto based on thunderloop freq
-    if (network_ticks / (thunderloop_ticks + 1.0) <=
-        ROBOT_STATUS_BROADCAST_RATE_HZ / (CONTROL_LOOP_HZ + 1.0))
+    if (network_ticks / (thunderloop_ticks + 1.0) <= ROBOT_STATUS_TO_THUNDERLOOP_HZ_RATIO)
     {
         sender->sendProto(robot_status);
         network_ticks = (network_ticks + 1) % ROBOT_STATUS_BROADCAST_RATE_HZ;
