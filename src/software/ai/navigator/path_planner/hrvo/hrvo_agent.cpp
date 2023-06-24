@@ -585,10 +585,7 @@ void HRVOAgent::computeNewVelocity(
             new_velocity = candidate.velocity;
         }
     }
-    LOG(PLOTJUGGLER) << *createPlotJugglerValue({
-        {"x", getPosition().x()},
-        {"y", getPosition().y()}
-    });
+
 }
 
 bool HRVOAgent::isIdealCandidate(const CandidateVelocity &candidate) const

@@ -162,6 +162,6 @@ static const char ARDUINO_PRODUCT_ID[ARDUINO_ID_LENGTH] = "0043";
 
 // Number of times the control loop should tick per trajectory element
 static const unsigned NUM_TICKS_PER_TRAJECTORY_ELEMENT = 4u;
-static const unsigned CONTROL_LOOP_HZ                  = 200u;
+static const unsigned CONTROL_LOOP_HZ                  = 90u;
 
 static const unsigned NUM_GENEVA_ANGLES = 5;
