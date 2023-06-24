@@ -140,11 +140,7 @@ if __name__ == "__main__":
         help="set realism flag to use realistic config",
     )
     parser.add_argument(
-        "--estop_path",
-        action="store",
-        type=str,
-        default="/dev/ttyACM0",
-        help="Path to the Estop",
+        "--estop_path", action="store", type=str, help="Path to the Estop",
     )
     parser.add_argument(
         "--estop_baudrate",
@@ -265,23 +261,18 @@ if __name__ == "__main__":
         # else, it will be the diagnostics proto
         current_proto_unix_io = tscope.proto_unix_io_map[ProtoUnixIOTypes.CURRENT]
 
-        # different estops use different ports this detects which one to use based on what is plugged in
-        estop_path = (
-            "/dev/ttyACM0" if os.path.isfile("/dev/ttyACM0") else "/dev/ttyUSB0"
-        )
-
-        estop_mode = EstopMode.ESTOP
+        estop_mode = EstopMode.PHYSICAL_ESTOP
         if args.keyboard_estop:
             estop_mode = EstopMode.KEYBOARD_ESTOP
         if args.disable_estop:
             estop_mode = EstopMode.DISABLE_ESTOP
 
         with RobotCommunication(
-            current_proto_unix_io,
-            getRobotMulticastChannel(0),
-            args.interface,
-            estop_mode,
-            estop_path=estop_path,
+            current_proto_unix_io=current_proto_unix_io,
+            multicast_channel=getRobotMulticastChannel(0),
+            interface=args.interface,
+            estop_mode=estop_mode,
+            estop_path=args.estop_path,
         ) as robot_communication:
 
             if estop_mode == EstopMode.KEYBOARD_ESTOP:

@@ -62,7 +62,7 @@ class EstopMode(IntEnum):
 
     DISABLE_ESTOP = 0
     KEYBOARD_ESTOP = 1
-    ESTOP = 2
+    PHYSICAL_ESTOP = 2
 
 
 LINE_WIDTH = 3

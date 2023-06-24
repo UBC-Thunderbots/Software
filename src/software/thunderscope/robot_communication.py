@@ -8,6 +8,7 @@ from proto.import_all_protos import *
 from pyqtgraph.Qt import QtCore
 import threading
 import time
+import os
 
 
 class RobotCommunication(object):
@@ -20,7 +21,7 @@ class RobotCommunication(object):
         multicast_channel,
         interface,
         estop_mode,
-        estop_path="/dev/ttyACM0",
+        estop_path=None,
         estop_buadrate=115200,
     ):
         """Initialize the communication with the robots
@@ -39,7 +40,13 @@ class RobotCommunication(object):
         self.multicast_channel = str(multicast_channel)
         self.interface = interface
         self.estop_mode = estop_mode
-        self.estop_path = estop_path
+        # if estop path is passed in use that
+        # else, use different estop based on what is plugged in
+        self.estop_path = (
+            estop_path
+            if estop_path
+            else ("/dev/ttyACM0" if os.path.isfile("/dev/ttyACM0") else "/dev/ttyUSB0")
+        )
         self.estop_buadrate = estop_buadrate
 
         self.running = False
@@ -83,7 +90,7 @@ class RobotCommunication(object):
         self.should_send_stop = False
 
         # only checks for estop if we are in physical estop mode
-        if self.estop_mode == EstopMode.ESTOP:
+        if self.estop_mode == EstopMode.PHYSICAL_ESTOP:
             try:
                 self.estop_reader = ThreadedEstopReader(
                     self.estop_path, self.estop_buadrate
@@ -99,7 +106,7 @@ class RobotCommunication(object):
         """
         if self.estop_mode != EstopMode.DISABLE_ESTOP:
             while True:
-                if self.estop_mode == EstopMode.ESTOP:
+                if self.estop_mode == EstopMode.PHYSICAL_ESTOP:
                     self.estop_is_playing = self.estop_reader.isEstopPlay()
                     self.should_send_stop = not self.estop_is_playing
 
@@ -118,7 +125,12 @@ class RobotCommunication(object):
             self.should_send_stop = not self.estop_is_playing
 
             print(
-                "Keyboard Estop " + ("Enabled" if self.estop_is_playing else "Disabled")
+                "Keyboard Estop changed from "
+                + (
+                    str(EstopStates.PLAY)
+                    if self.estop_is_playing
+                    else str(EstopStates.STOP)
+                )
             )
 
     def should_send_primitive(self):
