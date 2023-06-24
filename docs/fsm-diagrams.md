@@ -82,6 +82,21 @@ Terminate:::terminate --> Terminate:::terminate
 
 ```
 
+## [PenaltyKickEnemyPlayFSM](/src/software/ai/hl/stp/play/penalty_kick_enemy/penalty_kick_enemy_play_fsm.h)
+
+```mermaid
+
+stateDiagram-v2
+classDef terminate fill:white,color:black,font-weight:bold
+direction LR
+[*] --> SetupPositionState
+SetupPositionState --> SetupPositionState : [!setupPositionDone]\n<i>setupPosition</i>
+SetupPositionState --> DefendKickState : [setupPositionDone]\n<i>defendKick</i>
+DefendKickState --> DefendKickState : <i>defendKick</i>
+Terminate:::terminate --> Terminate:::terminate
+
+```
+
 ## [ShootOrPassPlayFSM](/src/software/ai/hl/stp/play/shoot_or_pass/shoot_or_pass_play_fsm.h)
 
 ```mermaid
@@ -265,7 +280,7 @@ classDef terminate fill:white,color:black,font-weight:bold
 direction LR
 [*] --> DribbleFSM
 DribbleFSM --> DribbleFSM : [!takePenaltyShot]\n<i>updateApproachKeeper</i>
-DribbleFSM --> KickFSM : [timeOutApproach]
+DribbleFSM --> KickFSM : [timeOutApproach]\n<i>shoot</i>
 DribbleFSM --> DribbleFSM : <i>adjustOrientationForShot</i>
 DribbleFSM --> KickFSM
 KickFSM --> KickFSM : <i>shoot</i>

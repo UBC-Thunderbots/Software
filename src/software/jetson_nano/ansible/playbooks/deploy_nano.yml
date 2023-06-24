@@ -88,6 +88,11 @@
           when: "'start' in actions"
           tags: always
 
+        - name: Enable WiFi waiter service
+          become: true
+          become_method: sudo
+          service: name=NetworkManager-wait-online enabled=yes
+
         - name: Disable Announcements
           become: true
           become_method: sudo
