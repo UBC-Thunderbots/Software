@@ -128,7 +128,7 @@ TEST(LogMergerTests, log_one_in_middle)
 
     g3::LogMessage msg3            = createLog("First message");
     std::list<g3::LogMessage> log2 = merger.log(msg3);
-    EXPECT_EQ(2, log2.size()) << log2.back().toString();
+    EXPECT_EQ(2, log2.size());
     checkLogsEqual(msg3, log2.front());
     log2.pop_front();
 
