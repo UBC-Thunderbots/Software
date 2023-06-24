@@ -23,7 +23,7 @@ static const std::unordered_map<int, std::string> ROBOT_MULTICAST_CHANNELS = {
 // PlotJuggler's default host and port
 // Should be updated to your local machine's IP address if
 // you want to plot from the robot
-static const std::string PLOTJUGGLER_GUI_DEFAULT_HOST        = "127.0.0.1";
+static const std::string PLOTJUGGLER_GUI_DEFAULT_HOST        = "192.168.0.111";
 static const short unsigned int PLOTJUGGLER_GUI_DEFAULT_PORT = 9870;
 
 #endif  // PLATFORMIO_BUILD
@@ -162,6 +162,6 @@ static const char ARDUINO_PRODUCT_ID[ARDUINO_ID_LENGTH] = "0043";
 
 // Number of times the control loop should tick per trajectory element
 static const unsigned NUM_TICKS_PER_TRAJECTORY_ELEMENT = 4u;
-static const unsigned CONTROL_LOOP_HZ                  = 60u;
+static const unsigned CONTROL_LOOP_HZ                  = 200u;
 
 static const unsigned NUM_GENEVA_ANGLES = 5;
