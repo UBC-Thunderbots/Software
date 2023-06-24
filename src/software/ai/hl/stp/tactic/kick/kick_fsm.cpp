@@ -4,7 +4,7 @@ void KickFSM::updateKick(const Update &event)
 {
     event.common.set_primitive(createMovePrimitive(
         CREATE_MOTION_CONTROL(event.common.world.ball().currentState().position()),
-        event.control_params.kick_direction, 0.1, TbotsProto::DribblerMode::OFF,
+        event.control_params.kick_direction, 0.1, false, TbotsProto::DribblerMode::OFF,
         TbotsProto::BallCollisionType::ALLOW,
         AutoChipOrKick{AutoChipOrKickMode::AUTOKICK,
                        event.control_params.kick_speed_meters_per_second},
