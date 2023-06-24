@@ -52,6 +52,7 @@ py_test(
     data = [
         "//software:py_constants.so",
     ],
+    tags = ["exclusive"],
     deps = [
         "//proto:import_all_protos",
         "//proto:software_py_proto",
