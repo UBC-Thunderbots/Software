@@ -32,6 +32,7 @@ static const uint8_t CHIP_SELECT[] = {FRONT_LEFT_MOTOR_CHIP_SELECT, FRONT_RIGHT_
 
 constexpr int ASCII_4671_IN_HEXADECIMAL = 0x34363731;
 constexpr double THRESHOLD = 0.0001;
+constexpr int DELAY = 10000;
 std::string runtime_dir  = "/tmp/tbots/yellow_test";
 
 int main(int argc, char **argv) {
@@ -64,13 +65,10 @@ int main(int argc, char **argv) {
     try {
         power_service_ = std::make_unique<PowerService>();
 
-        usleep(10000);
+        usleep(DELAY);
 
         TbotsProto::PowerStatus power_status = power_service_->poll(TbotsProto::PowerControl(), 0, 0, 0);
-        std::cout << power_status.DebugString() << std::endl;
-
         power_status = power_service_->poll(TbotsProto::PowerControl(), 0, 0, 0);
-        std::cout << power_status.DebugString() << std::endl;
 
         if (abs(power_status.battery_voltage() - 0) < THRESHOLD) {
             LOG(FATAL) << "Battery voltage is zero";
