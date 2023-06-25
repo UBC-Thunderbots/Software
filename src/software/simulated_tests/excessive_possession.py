@@ -22,7 +22,6 @@ class ExcessivePossession(Validation):
         self.max_possession_time = max_possession_time
         self.possession_start_times_dict = {}
 
-
     def get_validation_status(self, world) -> ValidationStatus:
         """Checks if any friendly robot possesses the ball for more than the specified max.
 
@@ -30,22 +29,19 @@ class ExcessivePossession(Validation):
         :returns: FAILING when the robot is possesses the ball for too long
                   PASSING when the robot possesses the ball for less than the max time
         """
-        print("HERE")
         ball_position = tbots.createPoint(world.ball.current_state.global_position)
         for robot in world.friendly_team.team_robots:
-            if tbots.Robot(robot).isNearDribbler(ball_position, 0.01):
-                self.possession_start_times_dict[robot.id] = time.time_ns()
-                print(f"START: {self.possession_start_times_dict[robot.id]}")
+            if tbots.Robot(robot).isNearDribbler(ball_position, 0.02):
+                if robot.id not in self.possession_start_times_dict:
+                    self.possession_start_times_dict[robot.id] = time.time_ns()
             else:
                 if robot.id in self.possession_start_times_dict:
-                    curr_time = time.time_ns()
-                    print(f"CURR: {curr_time}")
-                    print(f"START: {self.possession_start_times_dict[robot.id]}")
-                    possession_time = abs(curr_time - self.possession_start_times_dict[robot.id])
-                    print(f"POSS: {possession_time}")
                     del self.possession_start_times_dict[robot.id]
-                    if (possession_time / NANOSECONDS_PER_SECOND) > self.max_possession_time:
-                        return ValidationStatus.FAILING
+            if robot.id in self.possession_start_times_dict:
+                curr_time = time.time_ns()
+                possession_time = abs(curr_time - self.possession_start_times_dict[robot.id])
+                if (float(possession_time) / NANOSECONDS_PER_SECOND) > self.max_possession_time:
+                    return ValidationStatus.FAILING
         return ValidationStatus.PASSING
 
     def get_validation_geometry(self, world) -> ValidationGeometry:

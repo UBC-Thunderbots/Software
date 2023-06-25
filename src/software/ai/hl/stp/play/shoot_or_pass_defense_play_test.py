@@ -10,10 +10,8 @@ from software.simulated_tests.simulated_test_fixture import (
     pytest_main,
 )
 from proto.message_translation.tbots_protobuf import create_world_state
-from proto.ssl_gc_common_pb2 import Team
-from proto.geometry_pb2 import Point, Vector, Angle, AngularVelocity
 from proto.import_all_protos import *
-from proto.ssl_gc_geometry_pb2 import Vector2
+from proto.ssl_gc_common_pb2 import Team
 
 
 def test_shoot_or_pass_defense_play(simulated_test_runner):

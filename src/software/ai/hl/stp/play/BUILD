@@ -595,6 +595,7 @@ py_test(
     srcs = [
         "shoot_or_pass_defense_play_test.py",
     ],
+    tags = ["exclusive"],
     deps = [
         "//software/simulated_tests:simulated_test_fixture",
         "//software/simulated_tests:validation",
