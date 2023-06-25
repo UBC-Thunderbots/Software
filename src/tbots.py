@@ -26,6 +26,7 @@ if __name__ == "__main__":
     parser.add_argument("search_query")
     parser.add_argument("-h", "--help", action="store_true")
     parser.add_argument("-p", "--print_command", action="store_true")
+    parser.add_argument("-o", "--optimized_build", action="store_true")
     parser.add_argument("-d", "--debug_build", action="store_true")
     parser.add_argument("-ds", "--select_debug_binaries", action="store")
     parser.add_argument("-i", "--interactive", action="store_true")
@@ -86,6 +87,9 @@ if __name__ == "__main__":
     # Trigger a debug build
     if args.debug_build or args.select_debug_binaries:
         command += ["-c", "dbg"]
+
+    if args.optimized_build:
+        command += ["--copt=-O3"]
 
     # Select debug binaries to run
     if args.select_debug_binaries:
