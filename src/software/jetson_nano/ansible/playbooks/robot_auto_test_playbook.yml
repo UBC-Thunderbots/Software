@@ -45,7 +45,9 @@
         - name: Run Binary
           command: "./robot_auto_test"
           args:
-            chdir: ~/thunderbots_binaries
+            chdir: /home/robot/thunderbots_binaries
+          become_method: sudo
+          become: true
           register: robot_auto_test_output
           ignore_errors: true
 

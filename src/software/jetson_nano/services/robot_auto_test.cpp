@@ -32,17 +32,20 @@ static const uint8_t CHIP_SELECT[] = {FRONT_LEFT_MOTOR_CHIP_SELECT, FRONT_RIGHT_
 
 constexpr int ASCII_4671_IN_HEXADECIMAL = 0x34363731;
 constexpr double THRESHOLD = 0.0001;
+std::string runtime_dir  = "/tmp/tbots/yellow_test";
 
 int main(int argc, char **argv) {
+    LoggerSingleton::initializeLogger(runtime_dir);
     LOG(INFO) << "Running on the Jetson Nano!";
+
+    motor_service_ = std::make_unique<MotorService>(
+            create2021RobotConstants(), CONTROL_LOOP_HZ);
 
     // Testing Motor board SPI transfer
     for (uint8_t chip_select : CHIP_SELECT) {
-        motor_service_ = std::make_unique<MotorService>(
-                create2021RobotConstants(), CONTROL_LOOP_HZ);
 
         // Check driver fault
-        if (motor_service_->checkDriverFault(chip_select).drive_enabled) {
+        if (!motor_service_->checkDriverFault(chip_select).drive_enabled) {
             LOG(FATAL) << "Detected Motor Fault";
         }
 
@@ -59,8 +62,15 @@ int main(int argc, char **argv) {
 
     // Testing Power board SPI transfer
     try {
-        PowerService power_service = PowerService();
-        TbotsProto::PowerStatus power_status = power_service.poll(TbotsProto::PowerControl(), 0, 0, 0);
+        power_service_ = std::make_unique<PowerService>();
+
+        usleep(10000);
+
+        TbotsProto::PowerStatus power_status = power_service_->poll(TbotsProto::PowerControl(), 0, 0, 0);
+        std::cout << power_status.DebugString() << std::endl;
+
+        power_status = power_service_->poll(TbotsProto::PowerControl(), 0, 0, 0);
+        std::cout << power_status.DebugString() << std::endl;
 
         if (abs(power_status.battery_voltage() - 0) < THRESHOLD) {
             LOG(FATAL) << "Battery voltage is zero";

@@ -44,6 +44,7 @@ cc_binary(
         "//proto/primitive:primitive_msg_factory",
         "//shared:robot_constants",
         "//software/jetson_nano:primitive_executor",
+        "//software/logger",
         "@trinamic",
     ],
 )
