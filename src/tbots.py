@@ -88,6 +88,7 @@ if __name__ == "__main__":
     if args.debug_build or args.select_debug_binaries:
         command += ["-c", "dbg"]
 
+    # Trigger an optimized build
     if args.optimized_build:
         command += ["--copt=-O3"]
 
