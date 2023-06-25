@@ -42,17 +42,9 @@ This will stop the current Systemd services, replace and restart them. Binaries 
 
 `bazel run //software/jetson_nano/ansible:run_ansible --cpu=jetson_nano -- --playbook deploy_nano.yml --hosts <robot_ip> --ssh_pass <jetson_nano_password>`
 
-You could also use the `tbots.py` script to flash
-
-`./tbots.py run run_ansible -f <robot_ids> -pwd <jetson_nano_password>` (Note that this uses robot IDs rather than full robot IP addresses)
-
-Example: Flashing robots 1, 4, and 7
-
-`./tbots.py run run_ansible -f 1 4 7 -pwd <jetson_nano_password>`
-
 ## Flashing the powerboard
 
-This will flash powerloop, the current firmware in `software/power/`, onto the power board. It will prompt the user into setting the powerboard into bootloader mode by holding the reset button and pressing the boot button. Then once the board is flashed, pressing the reset button after to use the new firmware.  
+This will flash powerloop, the current firmware in `software/power/`, onto the power board. It will prompt the user into setting the powerboard into bootloader mode by holding the boot button (left if looking from the back of the robot) and pressing the reset button (right if looking from the back of the robot), then releasing the reset button first, then the boot button. Once the board is flashed, pressing the reset button after to use the new firmware.  
 
 Looking from the back of the robot the reset and boot buttons are on right side of the battery holder on the lowest board with the reset being on the left and the boot on the right. <b>Warning it may kick/chip when pressed.</b>
 
