@@ -81,14 +81,14 @@ def test_kickoff_play(simulated_test_runner, is_friendly_test):
     if is_friendly_test:
         always_validation_sequence_set[0].append(
             NumberOfRobotsNeverEntersRegion(
-                region=[tbots.field.enemyHalf(), tbots.field.centerCircle()],
+                region=[tbots.Field.EnemyHalf(), tbots.Field.CenterCircle()],
                 req_robot_cnt=2,
             )
         )
     else:
         always_validation_sequence_set[0].append(
             NumberOfRobotsNeverEntersRegion(
-                region=[tbots.field.friendlyHalf(), tbots.field.centerCircle()],
+                region=[tbots.Field.FriendlyHalf(), tbots.Field.CenterCircle()],
                 req_robot_cnt=2,
             )
         )
@@ -96,7 +96,7 @@ def test_kickoff_play(simulated_test_runner, is_friendly_test):
     # Eventually Validation
     # TODO- #2809 Validation
     eventually_validation_sequence_set = [
-        [BallEventuallyExitsRegion(region=[tbots.circle(ball_initial_pos, 0.05)])]
+        [BallEventuallyExitsRegion(region=[tbots.Circle(ball_initial_pos, 0.05)])]
     ]
 
     simulated_test_runner.run_test(
