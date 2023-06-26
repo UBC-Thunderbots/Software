@@ -7,10 +7,15 @@ from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtCore import Qt
 from pyqtgraph.Qt.QtWidgets import *
 
-from proto.geometry_pb2 import Point
+from proto.geometry_pb2 import Point, Segment
 from software.py_constants import *
-from software.thunderscope.constants import LINE_WIDTH
-from software.thunderscope.colors import Colors
+from software.thunderscope.constants import (
+    BALL_HEIGHT_EFFECT_MULTIPLIER,
+    LINE_WIDTH,
+    SPEED_LINE_WIDTH,
+    SPEED_SEGMENT_SCALE,
+)
+from software.thunderscope.constants import Colors
 from software.networking.threaded_unix_listener import ThreadedUnixListener
 from software.thunderscope.field.field_layer import FieldLayer
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
@@ -45,7 +50,9 @@ class WorldLayer(FieldLayer):
         self.key_pressed = {}
         self.display_robot_id = False
 
-        self.accepted_keys = [Qt.Key.Key_Control, Qt.Key.Key_I]
+        self.is_playing = True
+
+        self.accepted_keys = [Qt.Key.Key_Control, Qt.Key.Key_I, QtCore.Qt.Key.Key_Space]
         for key in self.accepted_keys:
             self.key_pressed[key] = False
 
@@ -63,6 +70,17 @@ class WorldLayer(FieldLayer):
         self.key_pressed[event.key()] = True
         if event.key() == QtCore.Qt.Key.Key_I:
             self.display_robot_id = not self.display_robot_id
+
+        # if user is holding ctrl + space, send a command to simulator to pause the gameplay
+        if (
+            self.key_pressed[QtCore.Qt.Key.Key_Control]
+            and self.key_pressed[QtCore.Qt.Key.Key_Space]
+        ):
+
+            simulator_state = SimulationState(is_playing=not self.is_playing)
+            self.is_playing = not self.is_playing
+
+            self.simulator_io.send_proto(SimulationState, simulator_state)
 
     def keyReleaseEvent(self, event):
         """Detect when a key has been released (override)
@@ -385,9 +403,12 @@ class WorldLayer(FieldLayer):
         painter.setPen(pg.mkPen(Colors.BALL_COLOR, width=LINE_WIDTH))
         painter.setBrush(pg.mkBrush(Colors.BALL_COLOR))
 
-        painter.drawEllipse(
-            self.createCircle(ball_state.global_position, BALL_MAX_RADIUS_METERS)
+        # Ball should get larger as the height of the ball increases
+        ball_radius = BALL_MAX_RADIUS_METERS * (
+            1 + BALL_HEIGHT_EFFECT_MULTIPLIER * ball_state.distance_from_ground
         )
+
+        painter.drawEllipse(self.createCircle(ball_state.global_position, ball_radius))
 
         # If the mouse is being dragged on the screen, visualize
         # the ball velocity vector. The 0.5 scaling is abitrary
@@ -428,7 +449,7 @@ class WorldLayer(FieldLayer):
 
         for robot in self.cached_world.friendly_team.team_robots:
             if (
-                self.cached_status.break_beam_status.ball_in_beam is True
+                self.cached_status.power_status.breakbeam_tripped is True
                 and robot.id == self.cached_status.robot_id
             ):
                 painter.drawEllipse(
@@ -436,6 +457,44 @@ class WorldLayer(FieldLayer):
                         robot.current_state.global_position, ROBOT_MAX_RADIUS_METERS / 2
                     )
                 )
+
+    def draw_robot_speeds(self, painter):
+        """Draw the robot speeds
+
+        :param painter: The painter
+
+        """
+        painter.setPen(pg.mkPen(Colors.SPEED_VECTOR_COLOR, width=SPEED_LINE_WIDTH))
+
+        for robot in self.cached_world.friendly_team.team_robots:
+            velocity = robot.current_state.global_velocity
+            start = robot.current_state.global_position
+            end = Point(
+                x_meters=start.x_meters
+                + velocity.x_component_meters * SPEED_SEGMENT_SCALE,
+                y_meters=start.y_meters
+                + velocity.y_component_meters * SPEED_SEGMENT_SCALE,
+            )
+            speed_line = Segment(start=start, end=end)
+            self.drawSegment(speed_line, painter)
+
+    def draw_ball_speed(self, painter):
+        """Draw the ball speed
+
+        :param painter: The painter
+
+        """
+        painter.setPen(pg.mkPen(Colors.SPEED_VECTOR_COLOR, width=SPEED_LINE_WIDTH))
+
+        ball = self.cached_world.ball
+        velocity = ball.current_state.global_velocity
+        start = ball.current_state.global_position
+        end = Point(
+            x_meters=start.x_meters + velocity.x_component_meters * SPEED_SEGMENT_SCALE,
+            y_meters=start.y_meters + velocity.y_component_meters * SPEED_SEGMENT_SCALE,
+        )
+        speed_line = Segment(start=start, end=end)
+        self.drawSegment(speed_line, painter)
 
     def paint(self, painter, option, widget):
         """Paint this layer
@@ -474,3 +533,5 @@ class WorldLayer(FieldLayer):
             self.enemy_robot_id_text_items,
         )
         self.draw_robot_status(painter)
+        self.draw_robot_speeds(painter)
+        self.draw_ball_speed(painter)

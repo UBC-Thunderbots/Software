@@ -5,6 +5,7 @@
 #include "proto/ssl_vision_wrapper.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
 #include "software/jetson_nano/primitive_executor.h"
+#include "software/physics/euclidean_to_wheel.h"
 #include "software/world/field.h"
 #include "software/world/team_types.h"
 #include "software/world/world.h"
@@ -24,9 +25,12 @@ class ErForceSimulator
      *
      * @param field_type The field type
      * @param robot_constants The robot constants
+     * @param realism_config realism configuration
      */
     explicit ErForceSimulator(const TbotsProto::FieldType& field_type,
-                              const RobotConstants_t& robot_constants);
+                              const RobotConstants_t& robot_constants,
+                              std::unique_ptr<RealismConfigErForce>& realism_config,
+                              const bool ramping = false);
     ErForceSimulator()  = delete;
     ~ErForceSimulator() = default;
 
@@ -124,6 +128,18 @@ class ErForceSimulator
      */
     void resetCurrentTime();
 
+    /**
+     * Creates the default realism config using erforce simulator's default config
+     * @return a pointer to default realism config
+     */
+    static std::unique_ptr<RealismConfigErForce> createDefaultRealismConfig();
+
+    /**
+     * Creates the realistic realism config
+     * @return a pointer to realistic realism config
+     */
+    static std::unique_ptr<RealismConfigErForce> createRealisticRealismConfig();
+
    private:
     /**
      * Sets the primitive being simulated by the robot in simulation
@@ -134,21 +150,24 @@ class ErForceSimulator
      * primitive set to
      * @param world_msg The world message
      * @param local_velocity The local velocity
+     * @param angular_velocity The angular velocity
      */
     static void setRobotPrimitive(
         RobotId id, const TbotsProto::PrimitiveSet& primitive_set_msg,
         std::unordered_map<unsigned int, std::shared_ptr<PrimitiveExecutor>>&
             robot_primitive_executor_map,
-        const TbotsProto::World& world_msg, Vector local_velocity);
+        const TbotsProto::World& world_msg, const Vector& local_velocity,
+        const AngularVelocity angular_velocity);
 
     /**
-     * Gets a map from robot id to local velocity from repeated sim robots
+     * Gets a map from robot id to local and angular velocity from repeated sim robots
      *
-     * @param repeated sim robots
+     * @param sim_robots Repeated er force sim robot protos
      *
-     * @return a map from robot id to local velocity
+     * @return a map from robot id to local velocity and angular velocity
      */
-    static std::map<RobotId, Vector> getRobotIdToLocalVelocityMap(
+    static std::map<RobotId, std::pair<Vector, AngularVelocity>>
+    getRobotIdToLocalVelocityMap(
         const google::protobuf::RepeatedPtrField<world::SimRobot>& sim_robots);
 
     /**
@@ -163,7 +182,25 @@ class ErForceSimulator
     SSLSimulationProto::RobotControl updateSimulatorRobots(
         std::unordered_map<unsigned int, std::shared_ptr<PrimitiveExecutor>>&
             robot_primitive_executor_map,
-        const TbotsProto::World& world_msg);
+        const TbotsProto::World& world_msg, gameController::Team side);
+
+    /**
+     * Takes in current velocity and angular velocity and a target Direct Control
+     * primitive converts current and target velocities to Wheel velocities ramps the
+     * target primitive based on the current velocities and returns a pointer to a new
+     * Direct Control primitive
+     *
+     * @param current_local_velocity the current velocity of a robot
+     * @param current_local_angular_velocity the current angular velocity of a robot
+     * @param target_velocity_primitive the target primitive that should be ramped
+     * @param time_to_ramp time it should be ramped over
+     * @return
+     */
+    std::unique_ptr<TbotsProto::DirectControlPrimitive> getRampedVelocityPrimitive(
+        const Vector current_local_velocity,
+        const AngularVelocity current_local_angular_velocity,
+        TbotsProto::DirectControlPrimitive& target_velocity_primitive,
+        const double& time_to_ramp);
 
     // Map of Robot id to Primitive Executor
     std::unordered_map<unsigned int, std::shared_ptr<PrimitiveExecutor>>
@@ -181,12 +218,15 @@ class ErForceSimulator
 
     amun::SimulatorSetup er_force_sim_setup;
     std::unique_ptr<camun::simulator::Simulator> er_force_sim;
+    EuclideanToWheel euclidean_to_four_wheel;
 
     RobotConstants_t robot_constants;
     Field field;
 
     std::optional<RobotId> blue_robot_with_ball;
     std::optional<RobotId> yellow_robot_with_ball;
+
+    bool ramping;
 
     const QString CONFIG_FILE      = "simulator/2020";
     const QString CONFIG_DIRECTORY = "extlibs/er_force_sim/config/";

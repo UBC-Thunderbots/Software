@@ -11,14 +11,15 @@ py_binary(
     ],
     data = [
         ":playbooks",
+        ":scripts",
         "//software/jetson_nano:setup_nano",
         "//software/jetson_nano:thunderloop_main",
-        "//software/jetson_nano/broadcasts:robot_broadcast_receiver",
-        "//software/jetson_nano/broadcasts:robot_broadcast_sender_zip",
         "//software/jetson_nano/display:robot_ui_zip",
         "//software/jetson_nano/linux_configs:device_tree",
+        "//software/jetson_nano/linux_configs:extlinux",
         "//software/jetson_nano/linux_configs/systemd:systemd_files",
         "//software/jetson_nano/redis",
+        "//software/power:powerloop_tar",
     ],
     deps = [
         requirement("ansible"),
@@ -29,5 +30,12 @@ filegroup(
     name = "playbooks",
     data = glob([
         "playbooks/**/*.yml",
+    ]),
+)
+
+filegroup(
+    name = "scripts",
+    data = glob([
+        "scripts/**/*.py",
     ]),
 )

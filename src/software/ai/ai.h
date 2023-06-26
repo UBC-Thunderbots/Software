@@ -11,16 +11,16 @@
 /**
  * This class wraps all our AI logic and decision making.
  */
-class AI final
+class Ai final
 {
    public:
-    AI() = delete;
+    Ai() = delete;
 
     /**
      * Create an AI with given configurations
      * @param ai_config_ The AI configuration
      */
-    explicit AI(TbotsProto::AiConfig ai_config);
+    explicit Ai(const TbotsProto::AiConfig& ai_config);
 
     /**
      * Overrides the play
@@ -60,7 +60,7 @@ class AI final
      *
      * @param ai_config The new AiConfig proto
      */
-    void updateAiConfig(TbotsProto::AiConfig ai_config);
+    void updateAiConfig(TbotsProto::AiConfig& ai_config);
 
    private:
     void checkAiConfig();
@@ -70,7 +70,7 @@ class AI final
     std::unique_ptr<Play> override_play;
     std::unique_ptr<Play> current_play;
     std::map<Field, GlobalPathPlannerFactory> field_to_path_planner_factory;
-    TbotsProto::PlayName prev_override;
+    TbotsProto::Play current_override_play_proto;
     bool ai_config_changed;
 
     // inter play communication

@@ -2,7 +2,10 @@
 
 #include <Eigen/Dense>
 
+#include "proto/primitive.pb.h"
 #include "shared/robot_constants.h"
+#include "software/geom/angular_velocity.h"
+#include "software/geom/vector.h"
 
 /**
  * Vector representation of 2D Euclidean space.
@@ -23,6 +26,11 @@ typedef Eigen::Vector3d EuclideanSpace_t;
  */
 typedef Eigen::Vector4d WheelSpace_t;
 
+static constexpr int FRONT_RIGHT_WHEEL_SPACE_INDEX = 0;
+static constexpr int FRONT_LEFT_WHEEL_SPACE_INDEX  = 1;
+static constexpr int BACK_LEFT_WHEEL_SPACE_INDEX   = 2;
+static constexpr int BACK_RIGHT_WHEEL_SPACE_INDEX  = 3;
+
 class EuclideanToWheel
 {
    public:
@@ -31,105 +39,60 @@ class EuclideanToWheel
     /**
      * Initializes the Euclidean velocity to wheel speed conversion matrices.
      *
-     * @param control_loop_frequency_Hz The frequency of the control loop.
      * @param robot_constants The constants of the robot we are computing for.
      */
-    explicit EuclideanToWheel(const int &control_loop_frequency_Hz,
-                              const RobotConstants_t &robot_constants);
+    explicit EuclideanToWheel(const RobotConstants_t& robot_constants);
 
     /**
-     * Gets wheel velocity targets from the desired Euclidean velocity.
+     * Gets the wheel velocity from the Euclidean velocity.
      *
-     * @param target_euclidean_velocity The target Euclidean velocity.
+     * @param euclidean_velocity The Euclidean velocity.
      * @return The equivalent wheel speeds.
      */
-    WheelSpace_t getTargetWheelSpeeds(const EuclideanSpace_t &target_euclidean_velocity,
-                                      const WheelSpace_t &current_wheel_speeds);
+    WheelSpace_t getWheelVelocity(EuclideanSpace_t euclidean_velocity) const;
 
     /**
-     * Gets the equivalent Euclidean velocity from the measured wheel speeds.
+     * Gets the Euclidean velocity from the wheel velocity.
      *
-     * @param wheel_speeds The measured wheel speeds.
-     * @return The equivalent robot Euclidean velocity.
+     * @param wheel_velocity The wheel velocity.
+     * @return The equivalent Euclidean velocity.
      */
-    EuclideanSpace_t getEuclideanVelocity(const WheelSpace_t &wheel_speeds);
+    EuclideanSpace_t getEuclideanVelocity(const WheelSpace_t& wheel_velocity) const;
+
+
+    /**
+     * Ramp the velocity over the given timestep and set the target velocity on the motor.
+     *
+     * NOTE: This function has no state.
+     * Also NOTE: This function handles all electrical rpm to meters/second conversion.
+     *
+     * @param current_wheel_velocity The current 4-wheel velocity in m/s
+     * @param target_wheel_velocity The target 4-wheel velocity m/s
+     * @param time_to_ramp The time allocated for acceleration in seconds
+     *
+     */
+    WheelSpace_t rampWheelVelocity(const WheelSpace_t& current_wheel_velocity,
+                                   const WheelSpace_t& target_wheel_velocity,
+                                   const double& time_to_ramp);
 
    private:
     /**
-     * The control loop time period [s].
+     * The radius of the robot in meters.
      */
-    double delta_t_s_{};
+    const double robot_radius_m_{};
+    const RobotConstants_t robot_constants_;
 
     /**
-     * The mass of the robot [kg].
-     */
-    double robot_mass_M_kg_{};
-
-    /**
-     * The robot radius [m].
-     */
-    double robot_radius_R_m_{};
-
-    /**
-     * The mass distribution of the robot [m].
-     */
-    double inertial_factor_alpha_m_{};
-
-    /**
-     * The angle between the hemisphere line of the robot and the front wheel axles
-     * [rads].
-     */
-    double front_wheel_angle_phi_rad_{};
-
-    /**
-     * The angle between the hemisphere line of the robot and the rear wheel axles [rads].
-     */
-    double rear_wheel_angle_theta_rad_{};
-
-    /**
-     * Wheel force to wheel speed delta [m/s].
-     */
-    Eigen::Matrix4d wheel_force_to_wheel_speed_delta_D_C_alpha_;
-
-    /**
-     * Wheel speed to Euclidean velocity coupling matrix.
-     */
-    Eigen::Matrix<double, 3, 4> wheel_speed_to_euclidean_velocity_D_inverse_;
-
-    /**
-     * Gets the target Euclidean acceleration.
+     * Euclidean velocity to wheel velocity coupling matrix.
      *
-     * @param initial_velocity The initial velocity.
-     * @param target_velocity The target velocity.
-     * @return The Euclidean acceleration.
+     * ref: http://robocup.mi.fu-berlin.de/buch/omnidrive.pdf pg 16
      */
-    EuclideanSpace_t getEuclideanAcceleration(
-        const EuclideanSpace_t &initial_velocity,
-        const EuclideanSpace_t &target_velocity) const;
+    Eigen::Matrix<double, 4, 3> euclidean_to_wheel_velocity_D_;
 
     /**
-     * Gets the translational wheel forces.
+     * Wheel velocity to Euclidean velocity coupling matrix.
      *
-     * @refitem http://robocup.mi.fu-berlin.de/buch/omnidrive.pdf pg 14
-     * @param target_acceleration The target Euclidean acceleration.
-     * @return The target translational wheel forces.
+     * ref: http://robocup.mi.fu-berlin.de/buch/omnidrive.pdf pg 16
      */
-    WheelSpace_t getTranslationalWheelForces(EuclideanSpace_t target_acceleration) const;
-
-    /**
-     * Gets the rotational wheel forces.
-     *
-     * @refitem http://robocup.mi.fu-berlin.de/buch/omnidrive.pdf pg 14
-     * @param target_acceleration The target Euclidean acceleration.
-     * @return The target rotational wheel forces.
-     */
-    WheelSpace_t getRotationalWheelForces(EuclideanSpace_t target_acceleration) const;
-
-    /**
-     * Gets the wheel speed delta.
-     *
-     * @param target_wheel_forces The target wheel forces.
-     * @return The target wheel speed delta.
-     */
-    WheelSpace_t getWheelSpeedsDelta(const WheelSpace_t &target_wheel_forces);
+    Eigen::Matrix<double, 3, 4> wheel_to_euclidean_velocity_D_inverse_;
 };

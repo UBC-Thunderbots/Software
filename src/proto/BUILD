@@ -9,6 +9,7 @@ proto_library(
     srcs = [
         "ball.proto",
         "game_state.proto",
+        "geneva_slot.proto",
         "geometry.proto",
         "parameters.proto",
         "play.proto",
@@ -45,6 +46,7 @@ py_proto_library(
         "ball.proto",
         "estop_state.proto",
         "game_state.proto",
+        "geneva_slot.proto",
         "geometry.proto",
         "parameters.proto",
         "play.proto",
@@ -62,11 +64,6 @@ py_proto_library(
     deps = [
         "@nanopb//:nanopb_options_py_proto",
     ],
-)
-
-py_proto_library(
-    name = "announcement_py_proto",
-    srcs = ["announcement.proto"],
 )
 
 proto_library(

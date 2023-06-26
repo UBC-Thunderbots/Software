@@ -205,6 +205,15 @@ Now that you're setup, if you can run it on the command line, you can run it in 
             - To start normal gameplay from Kickoff, press "Stop", then "Kickoff" for either team and then "Normal Start".
             - To learn more about how we coordinate different RefereeCommands to start special case gameplay behaviour (PenaltyKick, CornerKick, FreeKick), look at the [SSL rule documentation](https://ssl.robocup.org/rules/).
         - In addition, you can use ctrl-click to move the ball around in the Simulator, or try changing the Play Override on the Visualizer to select specific Plays!
+    
+    - If we want to run with one AI and / or Diagnostics
+      - `./tbots.py run thunderscope_main [--run_blue | --run_yellow] [--run_diagnostics]` will start Thunderscope
+        - `[--run_blue | --run_yellow]` indicate which FullSystem to run
+        - `[--run_diagnostics]` indicates if diagnostics should be loaded as well
+      - If FullSystem is running, the robots receive input from the AI
+      - If Diagnostics is enabled, the robots can also receive input from Manual controls or XBox controls
+      - This mode allows us to test and debug the robots by setting each robot's input to be either AI, Manual Control or XBox Control
+      - Control mode for each robot can be set with each one's drop down menu in the Robot View widget
 
     - If we want to run it with real robots:
         - Open your terminal, `cd` into `Software/src` and run `ifconfig`.
@@ -231,10 +240,26 @@ Now that you're setup, if you can run it on the command line, you can run it in 
         - `[interface_here]` corresponds to the `ifconfig` interfaces seen in the previous step
             - For instance, a call to run the AI as blue on wifi could be: `./tbots.py run thunderscope_main --interface=enp0s5 --run_blue`
         - This command will set up robot communication and the Unix full system binary context manager. The Unix full system context manager hooks up our AI, Backend and SensorFusion
-2. Run Robot Diagnostics:
-    - (#2711) There isn't a clean way to do this at the moment.
+2. Run AI along with Robot Diagnostics:
     - The Mechanical and Electrical sub-teams use Robot Diagnostics to test specific parts of the Robot.
-3. Run our SimulatedPlayTests in Thunderscope
+    - If we want to run with one AI and Diagnostics
+        - `./tbots.py run thunderscope_main [--run_blue | --run_yellow] --run_diagnostics` will start Thunderscope
+            - `[--run_blue | --run_yellow]` indicate which FullSystem to run
+            - `--run_diagnostics` indicates if diagnostics should be loaded as well
+        - Initially, the robots are all connected to the AI and only receive input from it
+        - To change the input source for the robot, use the drop-down menu of that robot to change it between None, AI, and Manual
+        - None means the robots are receiving no commands
+        - More info about Manual control below
+3. Run only Diagnostics
+    - To run just Diagnostics
+        - `./tbots.py run thunderscope --run_diagnostics --interface <network_interface>`
+    - Initially, all of the robots are set to 'None' and will not receive any commands
+    - For the robot you want to control, choose Manual in its dropdown menu
+    - Manual Control
+      - When a robot is in Manual control mode, the commands it receives depend on the radio buttons to the top-right
+        - Diagnostics Control allows us to use the on-screen sliders and buttons to control the robot
+        - XBox control allows us to use a connected XBox controller to control the robots
+4. Run our SimulatedPlayTests in Thunderscope
     - This will launch the visualizer and simulate AI Plays, allowing us to visually see the robots acting according to their roles.
     1. For legacy C++ tests (#2581) with the visualizer:
         1. First run Thunderscope configured for receiving protobufs over unix sockets correctly: `./tbots.py run thunderscope_main --visualize_cpp_test`
@@ -244,7 +269,7 @@ Now that you're setup, if you can run it on the command line, you can run it in 
         - Without the visualizer: `./tbots.py test [some_target_here]`
     3. For legacy C++ tests (#2581) without the visualizer:
         - `./tbots.py test [some_target_here]`
-4. Run our SimulatedTacticTests in Thunderscope:
+5. Run our SimulatedTacticTests in Thunderscope:
     - This will launch the visualizer and simulate an AI Tactic on a single robot
     1. For legacy C++ tests (#2581) with the visualizer:
         - First, run Thunderscope configured for receiving protobufs over unix sockets correctly: `./tbots.py run thunderscope_main --visualize_cpp_test`
@@ -285,11 +310,11 @@ To build for the Jetson Nano, build the target with the `--cpu=jetson_nano` flag
 
 ## Deploying to Jetson Nano 
 
-We use Ansible to automatically update software running on the Jetson Nano. [See these instructions.](/src/software/jetson_nano/ansible/README.md) 
+We use ansible to automatically update software running on the Jetson Nano. [More info here.](useful-robot-commands.md#flashing-the-nano) 
 
 To update binaries on a working robot, you can run:
 
-`./tbots.py run run_ansible --cpu=jetson_nano -- --playbook remote_flash.yml --port 45000 --ssh_pass our_password_here`
+`bazel run //software/jetson_nano/ansible:run_ansible --cpu=jetson_nano -- --playbook deploy_nano.yml --hosts <robot_ip> --ssh_pass <jetson_nano_password>`
 
 ## Setting up Virtual Robocup 2021
 

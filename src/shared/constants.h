@@ -2,8 +2,9 @@
 #include <math.h>
 
 // Some platformio targets don't support STL, so we can't
-// use unordered_map. We guard all networking stuff with
+// use unordered_map, string, .... We guard all networking stuff with
 #ifndef PLATFORMIO_BUILD
+#include <string>
 #include <unordered_map>
 
 // Networking
@@ -19,6 +20,12 @@ static const std::unordered_map<int, std::string> ROBOT_MULTICAST_CHANNELS = {
     {12, "ff02::c3d0:42d2:bb12"}, {13, "ff02::c3d0:42d2:bb13"},
     {14, "ff02::c3d0:42d2:bb14"}, {15, "ff02::c3d0:42d2:bb15"}};
 
+// PlotJuggler's default host and port
+// Should be updated to your local machine's IP address if
+// you want to plot from the robot
+static const std::string PLOTJUGGLER_GUI_DEFAULT_HOST        = "127.0.0.1";
+static const short unsigned int PLOTJUGGLER_GUI_DEFAULT_PORT = 9870;
+
 #endif  // PLATFORMIO_BUILD
 
 // Redis default server connections properties
@@ -31,8 +38,9 @@ static const short unsigned int VISION_PORT    = 42069;
 static const short unsigned int PRIMITIVE_PORT = 42070;
 
 // the port the AI receives msgs from the robot
-static const short unsigned int ROBOT_STATUS_PORT = 42071;
-static const short unsigned int ROBOT_LOGS_PORT   = 42072;
+static const short unsigned int ROBOT_STATUS_PORT       = 42071;
+static const short unsigned int ROBOT_LOGS_PORT         = 42072;
+static const short unsigned int HRVO_VISUALIZATION_PORT = 42073;
 
 // the port to listen to for what side of the field to defend
 static const unsigned DEFENDING_SIDE_PORT = 42073;
@@ -40,6 +48,8 @@ static const unsigned DEFENDING_SIDE_PORT = 42073;
 // maximum transfer unit of the network interface
 // this is an int to avoid Wconversion with lwip
 static const short unsigned int MAXIMUM_TRANSFER_UNIT_BYTES = 1500;
+
+static const char PROTO_MSG_TYPE_DELIMITER[4] = "!!!";
 
 // This file contains all constants that are shared between our software (AI)
 // and firmware code. Since this needs to be compiled by both C and C++, everything
@@ -67,9 +77,6 @@ static const double BALL_MASS_KG = 0.004593;
 static const double STOP_COMMAND_ROBOT_MAX_SPEED_METERS_PER_SECOND = 1.5;
 // The max allowed speed of the robot before collisions would incur a foul
 static const double COLLISION_ALLOWED_ROBOT_MAX_SPEED_METERS_PER_SECOND = 0.5;
-// The maximum number of robots we can communicate with over radio.
-static const unsigned MAX_ROBOTS_OVER_RADIO = 8;
-
 // The maximum speed attainable by enemy robots
 static const double ENEMY_ROBOT_MAX_SPEED_METERS_PER_SECOND = 3.0;
 // The maximum acceleration achievable by enemy robots, in metres per seconds squared.
@@ -96,17 +103,31 @@ static const double SECONDS_PER_NANOSECOND       = 1.0 / 1000000000.0;
 static const double SECONDS_PER_MILLISECOND      = 1.0 / 1000.0;
 static const double MILLISECONDS_PER_MICROSECOND = 1.0 / 1000.0;
 static const double MILLISECONDS_PER_NANOSECOND  = 1.0 / 1000000.0;
+static const double SECONDS_PER_MINUTE           = 60.0;
 
+// The total number of robot ids on one team
+static const unsigned int MAX_ROBOT_IDS_PER_SIDE = 8;
 // The total number of possible robot ids between two teams
-static const unsigned int MAX_ROBOT_IDS = 16;
+static const unsigned int MAX_ROBOT_IDS = MAX_ROBOT_IDS_PER_SIDE * 2;
 
-// We currently have 4s batteries on the robot that charge up to a little over
-// 16V, so we use 16 here to approximate a fully-charged battery
-// Makes the battery max voltage a constant now that we are simulating firmware
-static const float ROBOT_MAX_BATTERY_VOLTAGE = 16.0;
+// Battery Constants
+static const unsigned NUM_CELLS_IN_BATTERY    = 3;
+static const unsigned NUM_BATTERIES_IN_SERIES = 2;
+static const double MAX_SINGLE_CELL_VOLTAGE   = 4.2;
+static const double MIN_SINGLE_CELL_VOLTAGE   = 3.5 + 0.1;  // +0.1v headroom
+
+static const double MIN_BATTERY_VOLTAGE =
+    MIN_SINGLE_CELL_VOLTAGE * NUM_CELLS_IN_BATTERY * NUM_BATTERIES_IN_SERIES;
+static const double MAX_BATTERY_VOLTAGE =
+    MAX_SINGLE_CELL_VOLTAGE * NUM_CELLS_IN_BATTERY * NUM_BATTERIES_IN_SERIES;
+static const double BATTERY_WARNING_VOLTAGE = MIN_BATTERY_VOLTAGE + 1.0;  // 1V headroom
+
+// Chick Capacitor Constants
+static const double MIN_CAPACITOR_VOLTAGE = 0;
+static const double MAX_CAPACITOR_VOLTAGE = 250.0 + 50.0;  // +50v headroom
 
 static const unsigned int ROBOT_CHIP_ANGLE_DEGREES = 45;
-
+static const double CHICKER_TIMEOUT                = 3 * MILLISECONDS_PER_SECOND;
 // How many robots are allowed in each division
 static const unsigned DIV_A_NUM_ROBOTS = 11;
 static const unsigned DIV_B_NUM_ROBOTS = 6;
@@ -127,6 +148,12 @@ static const int ESTOP_MESSAGE_SIZE_BYTES = 1;
 static const unsigned char ESTOP_PLAY_MSG = 0;
 static const unsigned char ESTOP_STOP_MSG = 1;
 
+// Number of times to send a STOP primitive when robot is disconnected from Manual Control
+static const unsigned int NUM_TIMES_SEND_STOP = 10;
+// How long a robot should receive no RobotStatus messages for until it is considered
+// disconnected
+static const double DISCONNECT_DURATION_MS = 1 * MILLISECONDS_PER_SECOND;
+
 // product and vendor id for Arduino Uno Rev3 (retrieved from
 // http://www.linux-usb.org/usb.ids )
 #define ARDUINO_ID_LENGTH 5
@@ -135,6 +162,6 @@ static const char ARDUINO_PRODUCT_ID[ARDUINO_ID_LENGTH] = "0043";
 
 // Number of times the control loop should tick per trajectory element
 static const unsigned NUM_TICKS_PER_TRAJECTORY_ELEMENT = 4u;
-static const unsigned CONTROL_LOOP_HZ                  = 200u;
+static const unsigned CONTROL_LOOP_HZ                  = 60u;
 
 static const unsigned NUM_GENEVA_ANGLES = 5;

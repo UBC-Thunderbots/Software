@@ -2,13 +2,14 @@
 
 #include <numeric>
 
+#include "proto/message_translation/tbots_protobuf.h"
 #include "proto/parameters.pb.h"
 #include "software/../shared/constants.h"
 #include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/evaluation/time_to_travel.h"
-#include "software/geom/algorithms/acute_angle.h"
 #include "software/geom/algorithms/closest_point.h"
 #include "software/geom/algorithms/contains.h"
+#include "software/geom/algorithms/convex_angle.h"
 #include "software/logger/logger.h"
 
 double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
@@ -54,7 +55,6 @@ double rateZone(const Field& field, const Team& enemy_team, const Rectangle& zon
     auto enemy_reaction_time =
         Duration::fromSeconds(passing_config.enemy_reaction_time());
     double enemy_proximity_importance = passing_config.enemy_proximity_importance();
-
 
     double enemy_risk_rating =
         (ratePassEnemyRisk(enemy_team,
@@ -102,8 +102,8 @@ double ratePassShootScore(const Field& field, const Team& enemy_team, const Pass
     }
 
     // Figure out what the maximum open angle of the goal could be from the receiver pos.
-    Angle goal_angle = acuteAngle(field.enemyGoalpostNeg(), pass.receiverPoint(),
-                                  field.enemyGoalpostPos())
+    Angle goal_angle = convexAngle(field.enemyGoalpostNeg(), pass.receiverPoint(),
+                                   field.enemyGoalpostPos())
                            .abs();
     double net_percent_open = 0;
     if (goal_angle > Angle::zero())
@@ -337,4 +337,77 @@ double calculateProximityRisk(const Point& point, const Team& enemy_team,
         point_enemy_proximity_risk = 0;
     }
     return point_enemy_proximity_risk;
+}
+
+void samplePassesForVisualization(const World& world,
+                                  const TbotsProto::PassingConfig& passing_config)
+{
+    // number of rows and columns are configured in parameters.proto
+    int num_cols = passing_config.cost_vis_config().num_cols();
+    // this is for DivB field, for DivA, it would be num_cols * 3 / 4 as specified in
+    // field.cpp
+    int num_rows  = num_cols * 2 / 3;
+    double width  = world.field().xLength() / num_cols;
+    double height = world.field().yLength() / num_rows;
+
+    std::vector<double> costs;
+    double static_pos_quality_costs;
+    double pass_friendly_capability_costs;
+    double pass_enemy_risk_costs;
+    double pass_shoot_score_costs;
+
+    // We loop column wise (in the same order as how zones are defined)
+    for (int i = 0; i < num_cols; i++)
+    {
+        // x coordinate of the centre of the column
+        double x = width * i + width / 2 - world.field().xLength() / 2;
+        for (int j = 0; j < num_rows; j++)
+        {
+            // y coordinate of the centre of the row
+            double y  = height * j + height / 2 - world.field().yLength() / 2;
+            auto pass = Pass(world.ball().position(), Point(x, y),
+                             passing_config.max_pass_speed_m_per_s());
+
+            // default values
+            static_pos_quality_costs       = 1;
+            pass_friendly_capability_costs = 1;
+            pass_enemy_risk_costs          = 1;
+            pass_shoot_score_costs         = 1;
+
+            // getStaticPositionQuality
+            if (passing_config.cost_vis_config().static_position_quality())
+            {
+                static_pos_quality_costs = getStaticPositionQuality(
+                    world.field(), pass.receiverPoint(), passing_config);
+            }
+
+            // ratePassFriendlyCapability
+            if (passing_config.cost_vis_config().pass_friendly_capability())
+            {
+                pass_friendly_capability_costs = ratePassFriendlyCapability(
+                    world.friendlyTeam(), pass, passing_config);
+            }
+
+            // ratePassEnemyRisk
+            if (passing_config.cost_vis_config().pass_enemy_risk())
+            {
+                pass_enemy_risk_costs = ratePassEnemyRisk(
+                    world.enemyTeam(), pass,
+                    Duration::fromSeconds(passing_config.enemy_reaction_time()),
+                    passing_config.enemy_proximity_importance());
+            }
+
+            // ratePassShootScore
+            if (passing_config.cost_vis_config().pass_shoot_score())
+            {
+                pass_shoot_score_costs = ratePassShootScore(
+                    world.field(), world.enemyTeam(), pass, passing_config);
+            }
+
+            costs.push_back(static_pos_quality_costs * pass_friendly_capability_costs *
+                            pass_enemy_risk_costs * pass_shoot_score_costs);
+        }
+    }
+
+    LOG(VISUALIZE) << *createCostVisualization(costs, num_rows, num_cols);
 }

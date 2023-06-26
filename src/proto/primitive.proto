@@ -3,6 +3,7 @@ syntax = "proto3";
 package TbotsProto;
 
 import "proto/geometry.proto";
+import "proto/geneva_slot.proto";
 import "google/protobuf/descriptor.proto";
 
 extend google.protobuf.EnumValueOptions
@@ -42,6 +43,8 @@ enum MotionConstraint
     HALF_METER_AROUND_BALL = 7 [(dynamic) = true];
     // Path between ball and placement point in ball placement
     AVOID_BALL_PLACEMENT_INTERFERENCE = 8 [(dynamic) = true];
+    // The enemy half of the field without the centre circle
+    ENEMY_HALF_WITHOUT_CENTRE_CIRCLE = 9;
 }
 
 message MotionControl
@@ -79,6 +82,8 @@ message AutoChipOrKick
     };
 }
 
+// This is only used for simulation. Similar proto in power_frame_msg.proto but with pulse
+// width instead of m_per_s
 message PowerControl
 {
     message ChickerControl
@@ -97,62 +102,46 @@ message PowerControl
         float rotation_speed_rpm = 2;
     }
 
-    enum ChargeMode
-    {
-        DISCHARGE = 0;
-        CHARGE    = 1;
-        FLOAT     = 2;
-    }
-
-    ChickerControl chicker = 1;
-    GenevaControl geneva   = 2;
-    ChargeMode charge_mode = 3;
+    ChickerControl chicker  = 1;
+    Geneva.Slot geneva_slot = 2;
 }
 
 message Primitive
 {
     oneof primitive
     {
-        EstopPrimitive estop                  = 1;
-        MovePrimitive move                    = 2;
-        StopPrimitive stop                    = 3;
-        DirectControlPrimitive direct_control = 4;
+        MovePrimitive move                    = 1;
+        StopPrimitive stop                    = 2;
+        DirectControlPrimitive direct_control = 3;
     }
     double cost = 5;
 }
-
-message EstopPrimitive {}
 
 message MovePrimitive
 {
     MotionControl motion_control          = 1;
     float final_speed_m_per_s             = 2;
     Angle final_angle                     = 3;
-    float dribbler_speed_rpm              = 4;
+    int32 dribbler_speed_rpm              = 4;
     float max_speed_m_per_s               = 5;
     AutoChipOrKick auto_chip_or_kick      = 6;
     float target_spin_rev_per_s           = 7;
     BallCollisionType ball_collision_type = 8;
+    // Whether the robot should face the direction of intermediate path points
+    // (if there is any) or just the final destination
+    optional bool should_drive_forward = 9;
 }
 
-message StopPrimitive
-{
-    enum StopType
-    {
-        BRAKE = 0;
-        COAST = 1;
-    }
-    StopType stop_type = 1;
-}
+message StopPrimitive {}
 
 message MotorControl
 {
     message DirectPerWheelControl
     {
-        float front_left_wheel_rpm  = 1;
-        float back_left_wheel_rpm   = 2;
-        float front_right_wheel_rpm = 3;
-        float back_right_wheel_rpm  = 4;
+        float front_left_wheel_velocity  = 1;
+        float back_left_wheel_velocity   = 2;
+        float front_right_wheel_velocity = 3;
+        float back_right_wheel_velocity  = 4;
     }
 
     message DirectVelocityControl
@@ -167,7 +156,7 @@ message MotorControl
         DirectVelocityControl direct_velocity_control  = 2;
     }
 
-    float dribbler_speed_rpm = 4;
+    int32 dribbler_speed_rpm = 4;
 }
 
 message DirectControlPrimitive

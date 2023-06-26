@@ -1,32 +1,6 @@
 #include "proto/message_translation/tbots_protobuf.h"
 
 
-std::unique_ptr<TbotsProto::Vision> createVision(const World& world)
-{
-    // create msg and set timestamp
-    auto vision_msg                    = std::make_unique<TbotsProto::Vision>();
-    *(vision_msg->mutable_time_sent()) = *createCurrentTimestamp();
-
-    // set robot_states map
-    auto& robot_states_map = *vision_msg->mutable_robot_states();
-    auto friendly_robots   = world.friendlyTeam().getAllRobots();
-
-    // For every friendly robot, we create a RobotState proto. The unique_ptr
-    // is dereferenced, and there is an implicit deep copy into robot_states_map
-    //
-    // Since the unique_ptr immediately loses scope after the copy, the memory is
-    // freed
-    std::for_each(friendly_robots.begin(), friendly_robots.end(),
-                  [&](const Robot& robot) {
-                      robot_states_map[robot.id()] = *createRobotStateProto(robot);
-                  });
-
-    // set ball state
-    *(vision_msg->mutable_ball_state()) = *createBallState(world.ball());
-
-    return vision_msg;
-}
-
 std::unique_ptr<TbotsProto::World> createWorld(const World& world)
 {
     // create msg
@@ -37,6 +11,22 @@ std::unique_ptr<TbotsProto::World> createWorld(const World& world)
     *(world_msg->mutable_enemy_team())    = *createTeam(world.enemyTeam());
     *(world_msg->mutable_ball())          = *createBall(world.ball());
     *(world_msg->mutable_game_state())    = *createGameState(world.gameState());
+
+    return world_msg;
+}
+
+std::unique_ptr<TbotsProto::World> createWorldWithSequenceNumber(
+    const World& world, const uint64_t sequence_number)
+{
+    // create msg
+    auto world_msg                        = std::make_unique<TbotsProto::World>();
+    *(world_msg->mutable_time_sent())     = *createCurrentTimestamp();
+    *(world_msg->mutable_field())         = *createField(world.field());
+    *(world_msg->mutable_friendly_team()) = *createTeam(world.friendlyTeam());
+    *(world_msg->mutable_enemy_team())    = *createTeam(world.enemyTeam());
+    *(world_msg->mutable_ball())          = *createBall(world.ball());
+    *(world_msg->mutable_game_state())    = *createGameState(world.gameState());
+    world_msg->set_sequence_number(sequence_number);
 
     return world_msg;
 }
@@ -323,6 +313,21 @@ std::unique_ptr<TbotsProto::NamedValue> createNamedValue(const std::string name,
     return named_value_msg;
 }
 
+std::unique_ptr<TbotsProto::PlotJugglerValue> createPlotJugglerValue(
+    const std::map<std::string, double>& values)
+{
+    auto plot_juggler_value_msg = std::make_unique<TbotsProto::PlotJugglerValue>();
+    double now =
+        static_cast<double>(std::chrono::system_clock::now().time_since_epoch().count() /
+                            NANOSECONDS_PER_SECOND);
+    plot_juggler_value_msg->set_timestamp(now);
+    for (auto const& [key, val] : values)
+    {
+        (*plot_juggler_value_msg->mutable_data())[key] = val;
+    }
+    return plot_juggler_value_msg;
+}
+
 std::unique_ptr<TbotsProto::Timestamp> createCurrentTimestamp()
 {
     auto timestamp_msg    = std::make_unique<TbotsProto::Timestamp>();
@@ -373,4 +378,27 @@ std::unique_ptr<TbotsProto::PassVisualization> createPassVisualization(
         *(pass_visualization_msg->add_best_passes()) = *pass_with_rating_msg;
     }
     return pass_visualization_msg;
+}
+
+std::unique_ptr<TbotsProto::WorldStateReceivedTrigger> createWorldStateReceivedTrigger()
+{
+    auto world_state_received_trigger_msg =
+        std::make_unique<TbotsProto::WorldStateReceivedTrigger>();
+
+    return world_state_received_trigger_msg;
+}
+
+std::unique_ptr<TbotsProto::CostVisualization> createCostVisualization(
+    const std::vector<double>& costs, int num_rows, int num_cols)
+{
+    auto cost_visualization_msg = std::make_unique<TbotsProto::CostVisualization>();
+    cost_visualization_msg->set_num_rows(num_rows);
+    cost_visualization_msg->set_num_cols(num_cols);
+
+    for (const auto& cost : costs)
+    {
+        cost_visualization_msg->add_cost(cost);
+    }
+
+    return cost_visualization_msg;
 }

@@ -13,7 +13,9 @@ SensorFusion::SensorFusion(TbotsProto::SensorFusionConfig sensor_fusion_config)
       ball_filter(),
       friendly_team_filter(),
       enemy_team_filter(),
-      team_with_possession(TeamSide::ENEMY),
+      possession(TeamPossession::FRIENDLY_TEAM),
+      possession_tracker(std::make_shared<PossessionTracker>(
+          sensor_fusion_config.possession_tracker_config())),
       friendly_goalie_id(0),
       enemy_goalie_id(0),
       defending_positive_side(false),
@@ -29,12 +31,11 @@ std::optional<World> SensorFusion::getWorld() const
     {
         World new_world(*field, *ball, friendly_team, enemy_team);
         new_world.updateGameState(game_state);
-        new_world.setTeamWithPossession(team_with_possession);
+        new_world.setTeamWithPossession(possession);
         if (referee_stage)
         {
             new_world.updateRefereeStage(*referee_stage);
         }
-
 
         return new_world;
     }
@@ -169,8 +170,8 @@ void SensorFusion::updateWorld(
         }
         friendly_team.setUnavailableRobotCapabilities(robot_id, unavailableCapabilities);
 
-        if (robot_status_msg.has_break_beam_status() &&
-            robot_status_msg.break_beam_status().ball_in_beam())
+        if (robot_status_msg.has_power_status() &&
+            robot_status_msg.power_status().breakbeam_tripped())
         {
             friendly_robot_id_with_ball_in_dribbler = robot_id;
             ball_in_dribbler_timeout =
@@ -287,21 +288,10 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
         }
     }
 
-    if (ball)
+    if (ball && field)
     {
-        bool friendly_team_has_ball = teamHasBall(friendly_team, *ball);
-        bool enemy_team_has_ball    = teamHasBall(enemy_team, *ball);
-
-        if (friendly_team_has_ball && !enemy_team_has_ball)
-        {
-            // take defensive view of exclusive possession for friendly possession
-            team_with_possession = TeamSide::FRIENDLY;
-        }
-
-        if (enemy_team_has_ball)
-        {
-            team_with_possession = TeamSide::ENEMY;
-        }
+        possession = possession_tracker->getTeamWithPossession(friendly_team, enemy_team,
+                                                               *ball, *field);
     }
 }
 
@@ -396,5 +386,5 @@ void SensorFusion::resetWorldComponents()
     ball_filter          = BallFilter();
     friendly_team_filter = RobotTeamFilter();
     enemy_team_filter    = RobotTeamFilter();
-    team_with_possession = TeamSide::ENEMY;
+    possession           = TeamPossession::FRIENDLY_TEAM;
 }

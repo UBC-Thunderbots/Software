@@ -17,6 +17,8 @@
 #include "proto/team.pb.h"
 #include "proto/world.pb.h"
 #include "pybind11_protobuf/native_proto_caster.h"
+#include "shared/2021_robot_constants.h"
+#include "shared/robot_constants.h"
 #include "software/estop/threaded_estop_reader.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/circle.h"
@@ -24,6 +26,7 @@
 #include "software/geom/point.h"
 #include "software/geom/polygon.h"
 #include "software/geom/rectangle.h"
+#include "software/geom/segment.h"
 #include "software/geom/vector.h"
 #include "software/networking/threaded_proto_udp_listener.hpp"
 #include "software/networking/threaded_proto_udp_sender.hpp"
@@ -61,8 +64,8 @@ void declareThreadedProtoUdpListener(py::module& m, std::string name)
     std::string pyclass_name = name + "ProtoListener";
     py::class_<Class, std::shared_ptr<Class>>(m, pyclass_name.c_str(),
                                               py::buffer_protocol(), py::dynamic_attr())
-        .def(
-            py::init<std::string, unsigned short, const std::function<void(T)>&, bool>());
+        .def(py::init<std::string, unsigned short, const std::function<void(T)>&, bool>())
+        .def("close", &Class::close);
 }
 
 /**
@@ -83,7 +86,6 @@ std::unique_ptr<ThreadedEstopReader> createThreadedEstopReader(std::string uart_
 PYBIND11_MODULE(python_bindings, m)
 {
     pybind11_protobuf::ImportNativeProtoCasters();
-
     // Operator overloading section of
     // https://pybind11.readthedocs.io/en/stable/advanced/classes.html
     py::class_<Point>(m, "Point", py::module_local())
@@ -162,10 +164,11 @@ PYBIND11_MODULE(python_bindings, m)
     py::class_<ConvexPolygon, Polygon>(m, "ConvexPolygon");
     py::class_<Rectangle, ConvexPolygon>(m, "Rectangle")
         .def(py::init<Point, Point>())
+        // Overloaded
         .def("__repr__",
-             [](const Rectangle& v) {
+             [](const Rectangle& r) {
                  std::stringstream stream;
-                 stream << v;
+                 stream << r;
                  return stream.str();
              })
         .def("xLength", &Rectangle::xLength)
@@ -194,20 +197,56 @@ PYBIND11_MODULE(python_bindings, m)
 
     py::class_<Circle>(m, "Circle")
         .def(py::init<Point, double>())
+        // Overloaded
+        .def("__repr__",
+             [](const Circle& c) {
+                 std::stringstream stream;
+                 stream << c;
+                 return stream.str();
+             })
         .def("origin", &Circle::origin)
         .def("radius", &Circle::radius)
         .def("area", &Circle::area);
 
+    py::class_<RobotConstants>(m, "RobotConstants")
+        .def_readwrite("max_force_dribbler_speed_rpm",
+                       &RobotConstants::max_force_dribbler_speed_rpm)
+        .def_readwrite("robot_radius_m", &RobotConstants::robot_radius_m)
+        .def_readwrite("mass_kg", &RobotConstants::mass_kg)
+        .def_readwrite("inertial_factor", &RobotConstants::inertial_factor)
+        .def_readwrite("jerk_limit_kg_m_per_s_3",
+                       &RobotConstants::jerk_limit_kg_m_per_s_3)
+        .def_readwrite("front_wheel_angle_deg", &RobotConstants::front_wheel_angle_deg)
+        .def_readwrite("back_wheel_angle_deg", &RobotConstants::back_wheel_angle_deg)
+        .def_readwrite("front_of_robot_width_meters",
+                       &RobotConstants::front_of_robot_width_meters)
+        .def_readwrite("dribbler_width_meters", &RobotConstants::dribbler_width_meters)
+        .def_readwrite("robot_max_acceleration_m_per_s_2",
+                       &RobotConstants::robot_max_acceleration_m_per_s_2)
+        .def_readwrite("robot_max_ang_acceleration_rad_per_s_2",
+                       &RobotConstants::robot_max_ang_acceleration_rad_per_s_2)
+        .def_readwrite("indefinite_dribbler_speed_rpm",
+                       &RobotConstants::indefinite_dribbler_speed_rpm)
+        .def_readwrite("wheel_radius_meters", &RobotConstants::wheel_radius_meters)
+        .def_readwrite("wheel_rotations_per_motor_rotation",
+                       &RobotConstants::wheel_rotations_per_motor_rotation)
+        .def_readwrite("robot_max_speed_m_per_s",
+                       &RobotConstants::robot_max_speed_m_per_s)
+        .def_readwrite("robot_max_ang_speed_rad_per_s",
+                       &RobotConstants::robot_max_ang_speed_rad_per_s);
+    m.def("create2021RobotConstants", &create2021RobotConstants);
 
     m.def("createPoint", &createPoint);
     m.def("createPolygon", &createPolygon);
     m.def("createCircle", &createCircle);
     m.def("createVector", &createVector);
+    m.def("createSegment", &createSegment);
 
     m.def("createPointProto", &createPointProto);
     m.def("createPolygonProto", &createPolygonProto);
     m.def("createCircleProto", &createCircleProto);
     m.def("createVectorProto", &createVectorProto);
+    m.def("createSegmentProto", &createSegmentProto);
 
     m.def("contains", py::overload_cast<const Circle&, const Segment&>(&contains));
     m.def("contains", py::overload_cast<const Circle&, const Point&>(&contains));
@@ -283,6 +322,8 @@ PYBIND11_MODULE(python_bindings, m)
         .def("field", &World::field);
 
     // Listeners
+    declareThreadedProtoUdpListener<TbotsProto::HRVOVisualization>(m,
+                                                                   "HRVOVisualization");
     declareThreadedProtoUdpListener<SSLProto::Referee>(m, "SSLReferee");
     declareThreadedProtoUdpListener<TbotsProto::RobotStatus>(m, "RobotStatus");
     declareThreadedProtoUdpListener<TbotsProto::RobotLog>(m, "RobotLog");

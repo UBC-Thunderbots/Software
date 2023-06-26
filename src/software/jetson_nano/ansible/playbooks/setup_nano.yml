@@ -54,6 +54,28 @@
               - "[Robot ID = {{ inventory_hostname }}]"
               - "Setup Script run successfully"
 
+        # UART setup
+        - name: Stop nvgetty
+          become: true
+          become_method: sudo
+          command: 'systemctl stop nvgetty'
+
+        - name: Disable nvgetty
+          become: true
+          become_method: sudo
+          command: 'systemctl disable nvgetty'
+
+        - name: Setup udevadm trigger
+          become: true
+          become_method: sudo
+          command: 'udevadm trigger'
+
+        - name: Add user robot to dialout
+          become: true
+          become_method: sudo
+          command: 'adduser robot dialout'
+
+        # Device tree setup
         - name: Sync Device Tree
           become: true
           become_method: sudo
@@ -62,6 +84,18 @@
             - device_tree
           ansible.posix.synchronize:
             src: ../../../linux_configs/device_tree.zip
+            dest: ~/
+            recursive: yes
+            copy_links: yes
+
+        - name: Sync extlinux conf
+          become: true
+          become_method: sudo
+          tags:
+            - sync
+            - device_tree
+          ansible.posix.synchronize:
+            src: ../../../linux_configs/extlinux.conf
             dest: ~/
             recursive: yes
             copy_links: yes
@@ -79,7 +113,7 @@
           tags:
             - sync
             - device_tree
-          shell: 'dtc -q -I dts -O dtb ~/trinamic.dts > trinamic.dtb'
+          shell: 'dtc -q -I dts -O dtb ~/device_tree.dts > device_tree.dtb'
           register: result
           args:
             chdir: ~/
@@ -91,7 +125,18 @@
           tags:
             - sync
             - device_tree
-          shell: 'mv /home/robot/trinamic.dtb /boot/kernel_tegra210-p3448-0000-p3449-0000-b00-user-custom.dtb'
+          shell: 'mv /home/robot/device_tree.dtb /boot/kernel_tegra210-p3448-0000-p3449-0000-b00-user-custom.dtb'
+          register: result
+          args:
+            chdir: ~/
+
+        - name: Move extlinux file
+          become_method: sudo
+          become: true
+          tags:
+            - sync
+            - device_tree
+          shell: 'mv /home/robot/extlinux.conf /boot/extlinux/extlinux.conf'
           register: result
           args:
             chdir: ~/
@@ -112,7 +157,6 @@
           with_items:
             # bazel makes its own zip files, we append another zip to deconflict
             - ../../display/robot_ui_zip.zip
-            - ../../broadcasts/robot_broadcast_sender_zip.zip
             - ../../thunderloop_main
           loop_control:
             loop_var: binary_path
@@ -141,6 +185,18 @@
             dest: /etc/systemd/system
             copy_links: yes
 
+        - name: Remove announcements
+          become_method: sudo
+          become: true
+          tags:
+            - syncSystemdFiles
+          file:
+            path: "/etc/systemd/system/{{ service_name }}.service"
+            state: absent
+          with_items: ["wifi_announcement", "ethernet_announcement"]
+          loop_control:
+            loop_var: service_name
+
           # NOTE: "Enabling systems" means they will start on boot
         - name: Enable system services
           become: true
@@ -149,8 +205,6 @@
             - thunderbots
             - thunderloop
             - display
-            - wifi_announcement
-            - ethernet_announcement
           loop_control:
             loop_var: service_name
           ansible.builtin.systemd:
@@ -160,6 +214,11 @@
             daemon_reload: yes
           tags:
             - enableSystemd
+
+        - name: Enable WiFi waiter service
+          become: true
+          become_method: sudo
+          service: name=NetworkManager-wait-online enabled=yes
 
         - name: Reboot
           become: true

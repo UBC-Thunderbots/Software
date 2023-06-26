@@ -18,6 +18,8 @@
  * @param final_speed_m_per_s The speed at final destination
  * @param final_angle The final orientation the robot should have at the end
  * of the movement
+ * @param should_drive_forward Whether the robot should face the direction of intermediate
+ * path points (if there is any) or just the final destination
  * @param dribbler_mode The dribbler mode
  * @param auto_chip_or_kick The command to autochip or autokick
  * @param max_allowed_speed_mode The mode of maximum speed allowed
@@ -29,22 +31,21 @@
  * @return Pointer to Move Primitive Message
  */
 std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
-    const TbotsProto::MotionControl& motion_control, const Angle& final_angle,
-    double final_speed, const TbotsProto::DribblerMode& dribbler_mode,
-    const TbotsProto::BallCollisionType& ball_collision_type,
-    const AutoChipOrKick& auto_chip_or_kick,
-    const TbotsProto::MaxAllowedSpeedMode& max_allowed_speed_mode,
-    double target_spin_rev_per_s, const RobotConstants_t& robot_constants,
+    const TbotsProto::MotionControl &motion_control, const Angle &final_angle,
+    double final_speed, bool should_drive_forward,
+    const TbotsProto::DribblerMode &dribbler_mode,
+    const TbotsProto::BallCollisionType &ball_collision_type,
+    const AutoChipOrKick &auto_chip_or_kick,
+    const TbotsProto::MaxAllowedSpeedMode &max_allowed_speed_mode,
+    double target_spin_rev_per_s, const RobotConstants_t &robot_constants,
     std::optional<double> cost_override = std::nullopt);
 
 /**
  * Create a Stop Move Primitive Message
  *
- * @param stop_type Indicate to brake or coast to a stop
- *
  * @return Pointer to Stop Primitive Message
  */
-std::unique_ptr<TbotsProto::Primitive> createStopPrimitive(bool coast);
+std::unique_ptr<TbotsProto::Primitive> createStopPrimitive();
 
 /**
  * Creates a new DirectControl Primitive AI could output this primitive to control the
@@ -57,17 +58,9 @@ std::unique_ptr<TbotsProto::Primitive> createStopPrimitive(bool coast);
  * @return Pointer to the DirectControl Primitive
  */
 std::unique_ptr<TbotsProto::Primitive> createDirectControlPrimitive(
-    const Vector& velocity, AngularVelocity angular_velocity, double dribbler_rpm,
-    const TbotsProto::AutoChipOrKick& auto_chip_or_kick);
+    const Vector &velocity, AngularVelocity angular_velocity, double dribbler_rpm,
+    const TbotsProto::AutoChipOrKick &auto_chip_or_kick);
 
-
-
-/**
- * Create a Estop Primitive Message
- *
- * @return Pointer to Stop Primitive Message
- */
-std::unique_ptr<TbotsProto::Primitive> createEstopPrimitive();
 
 /**
  * Convert dribbler mode to dribbler speed

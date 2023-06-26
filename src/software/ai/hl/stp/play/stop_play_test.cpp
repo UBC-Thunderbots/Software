@@ -23,7 +23,7 @@ class StopPlayTest : public SimulatedErForceSimPlayTestFixture
         return {
             [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
                 // Wait 2 seconds for robots that start too close to the ball to move away
-                if (world_ptr->getMostRecentTimestamp() >= Timestamp::fromSeconds(2))
+                if (world_ptr->getMostRecentTimestamp() >= Timestamp::fromSeconds(8))
                 {
                     robotsSlowDown(1.5, world_ptr, yield);
                     robotsAvoidBall(0.5, {}, world_ptr, yield);
@@ -36,7 +36,7 @@ class StopPlayTest : public SimulatedErForceSimPlayTestFixture
         SimulatedErForceSimPlayTestFixture::SetUp();
         setFriendlyGoalie(0);
         setEnemyGoalie(0);
-        setAIPlay(TbotsProto::PlayName::StopPlay);
+        setAiPlay(TbotsProto::PlayName::StopPlay);
         setRefereeCommand(RefereeCommand::STOP, RefereeCommand::STOP);
     }
     TbotsProto::FieldType field_type = TbotsProto::FieldType::DIV_B;
@@ -48,8 +48,7 @@ class StopPlayTest : public SimulatedErForceSimPlayTestFixture
              field.enemyDefenseArea().negXPosYCorner()});
 };
 
-// TODO (#2602): test failing since a robot isn't avoiding the ball
-TEST_F(StopPlayTest, DISABLED_test_stop_play_ball_at_centre_robots_spread_out)
+TEST_F(StopPlayTest, test_stop_play_ball_at_centre_robots_spread_out)
 {
     BallState ball_state(Point(0, 0), Vector(0, 0));
     auto friendly_robots = TestUtil::createStationaryRobotStatesWithId(
@@ -130,8 +129,7 @@ TEST_F(StopPlayTest, test_stop_play_enemy_half_corner_robots_close_together)
             Duration::fromSeconds(10));
 }
 
-// TODO (#2519): fix and re-enable
-TEST_F(StopPlayTest, DISABLED_test_stop_play_centre_robots_close_together)
+TEST_F(StopPlayTest, test_stop_play_centre_robots_close_together)
 {
     BallState ball_state(Point(0, 0), Vector(0, 0));
     auto friendly_robots = TestUtil::createStationaryRobotStatesWithId(
@@ -163,10 +161,8 @@ TEST_F(StopPlayTest, test_stop_play_ball_in_front_of_enemy_defense_area)
             Duration::fromSeconds(10));
 }
 
-// TODO: (#1948) Re-enable test once bug is fixed, fix warning and robot positioning
-// This test is disabled due to a bug that causes Robot 2 to move too close to the ball.
-// Robots' positioning was not good, two robots were on the wrong side of the ball.
-// This test produced the warning, "Navigator's path manager could not find a path"
+// TODO (#2519): The ball is not an obstacle for robots running crease defense tactic,
+//               as a result, they collide with the ball and the test fails
 TEST_F(StopPlayTest, DISABLED_test_stop_play_ball_in_front_of_friendly_defense_area)
 {
     BallState ball_state(Point(-3, 0), Vector(0, 0));

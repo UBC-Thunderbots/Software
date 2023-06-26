@@ -37,6 +37,17 @@ cc_binary(
     ],
 )
 
+cc_binary(
+    name = "network_log_listener_main",
+    srcs = ["network_log_listener_main.cpp"],
+    deps = [
+        "//proto:tbots_cc_proto",
+        "//shared:constants",
+        "//software/networking:threaded_proto_udp_listener",
+        "@boost//:program_options",
+    ],
+)
+
 cc_library(
     name = "constants",
     hdrs = ["constants.h"],
@@ -68,9 +79,11 @@ pybind_library(
         "//proto:ssl_cc_proto",
         "//proto:tbots_cc_proto",
         "//proto/message_translation:tbots_geometry",
+        "//shared:robot_constants",
         "//software/estop:threaded_estop_reader",
         "//software/geom:angle",
         "//software/geom:point",
+        "//software/geom:segment",
         "//software/geom:vector",
         "//software/geom/algorithms",
         "//software/networking:threaded_proto_udp_listener",

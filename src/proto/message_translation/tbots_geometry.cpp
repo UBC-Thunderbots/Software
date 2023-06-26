@@ -52,6 +52,15 @@ std::unique_ptr<TbotsProto::Circle> createCircleProto(const Circle& circle)
     return circle_proto;
 }
 
+std::unique_ptr<TbotsProto::Segment> createSegmentProto(const Segment& segment)
+{
+    auto segment_proto                = std::make_unique<TbotsProto::Segment>();
+    *(segment_proto->mutable_start()) = *createPointProto(segment.getStart());
+    *(segment_proto->mutable_end())   = *createPointProto(segment.getEnd());
+
+    return segment_proto;
+}
+
 std::unique_ptr<TbotsProto::VelocityObstacle> createVelocityObstacleProto(
     const VelocityObstacle& vo, const Vector& offset)
 {
@@ -97,6 +106,11 @@ Polygon createPolygon(const TbotsProto::Polygon& polygon)
 Circle createCircle(const TbotsProto::Circle& circle)
 {
     return Circle(createPoint(circle.origin()), circle.radius());
+}
+
+Segment createSegment(const TbotsProto::Segment& segment)
+{
+    return Segment(createPoint(segment.start()), createPoint(segment.end()));
 }
 
 VelocityObstacle createVelocityObstacle(

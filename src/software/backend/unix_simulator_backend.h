@@ -40,4 +40,7 @@ class UnixSimulatorBackend : public Backend, public Subject<TbotsProto::Thunderb
     std::unique_ptr<ThreadedProtoUnixSender<TbotsProto::PrimitiveSet>> primitive_output;
     std::unique_ptr<ThreadedProtoUnixSender<TbotsProto::ThunderbotsConfig>>
         dynamic_parameter_update_respone_sender;
+
+    // World protobuf sequence number counter
+    uint64_t sequence_number = 0;
 };

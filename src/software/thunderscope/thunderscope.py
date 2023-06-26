@@ -1,73 +1,22 @@
-import os
 import time
 import textwrap
 import shelve
-import signal
-import platform
-import numpy
-
-# PyQt5 doesn't play nicely with i3 and Ubuntu 18, PyQt6 is much more stable
-# Unfortunately, PyQt6 doesn't install on Ubuntu 18. Thankfully both
-# libraries are interchangeable, and  we just need to swap them in this
-# one spot, and pyqtgraph will pick up on it and store the library under
-# pyqtgraph.Qt. So from PyQt5 import x becomes from pyqtgraph.Qt import x
-if "18.04" in platform.version():
-    import PyQt5
-    from PyQt5.QtWebEngineWidgets import QWebEngineView
-else:
-    import PyQt6
-    from PyQt6.QtWebEngineWidgets import QWebEngineView
-
-from qt_material import apply_stylesheet
+import logging
+import pathlib
 
 import pyqtgraph
-import qdarktheme
-from pyqtgraph.dockarea import *
 from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtWidgets import *
 
-import software.python_bindings as cpp_bindings
-
-from proto.import_all_protos import *
-from proto.message_translation import tbots_protobuf
-
 from software.py_constants import *
-from software.networking import threaded_unix_sender
-from software.thunderscope.robot_communication import RobotCommunication
-from software.thunderscope.arbitrary_plot.named_value_plotter import NamedValuePlotter
-from software.thunderscope.binary_context_managers import *
-from extlibs.er_force_sim.src.protobuf.world_pb2 import *
-from software.thunderscope.dock_label_style import *
 
-# Import Widgets
-from software.thunderscope.field import (
-    obstacle_layer,
-    path_layer,
-    validation_layer,
-    simulator_layer,
-    world_layer,
-    passing_layer,
-    hrvo_layer,
-)
-
-from software.thunderscope.common.proto_configuration_widget import (
-    ProtoConfigurationWidget,
-)
-from software.thunderscope.field.field import Field
-from software.thunderscope.log.g3log_widget import g3logWidget
-from software.thunderscope.proto_unix_io import ProtoUnixIO
-from software.thunderscope.play.playinfo_widget import playInfoWidget
-from software.thunderscope.robot_diagnostics.chicker import ChickerWidget
-from software.thunderscope.robot_diagnostics.drive_and_dribbler_widget import (
-    DriveAndDribblerWidget,
-)
-from software.thunderscope.replay.proto_player import ProtoPlayer
+from software.thunderscope.thunderscope_config import TScopeConfig
 
 SAVED_LAYOUT_PATH = "/opt/tbotspython/saved_tscope_layout"
-NUM_ROBOTS = 6
-SIM_TICK_RATE_MS = 16
-REFRESH_INTERVAL_MS = 5
-GAME_CONTROLLER_URL = "http://localhost:8081"
+LAYOUT_FILE_EXTENSION = "tscopelayout"
+LAST_OPENED_LAYOUT_PATH = (
+    f"{SAVED_LAYOUT_PATH}/last_opened_tscope_layout.{LAYOUT_FILE_EXTENSION}"
+)
 
 
 class Thunderscope(object):
@@ -80,98 +29,71 @@ class Thunderscope(object):
     Users can move docks (purple bar) around, double click to pop them out into
     another window, etc. https://pyqtgraph.readthedocs.io/en/latest/
 
-    The setup_* functions return docks. See configure_default_layout for an
+    The setup_* functions return docks. See configure_full_system_layout for an
     example. The returned docks can be arranged differently based on the
     use case (robot diagnostics, simulation, robocup, demo, etc..)
 
     """
 
     def __init__(
-        self,
-        simulator_proto_unix_io=None,
-        blue_full_system_proto_unix_io=None,
-        yellow_full_system_proto_unix_io=None,
-        layout_path=None,
-        load_blue=True,
-        load_yellow=True,
-        blue_replay_log=None,
-        yellow_replay_log=None,
-        refresh_interval_ms=10,
-        visualization_buffer_size=5,
+        self, config: TScopeConfig, layout_path=None, refresh_interval_ms=10,
     ):
         """Initialize Thunderscope
 
-        :param simulator_proto_unix_io: The simulator's proto unix io
-        :param blue_full_system_proto_unix_io: The blue full system's proto unix io
-        :param yellow_full_system_proto_unix_io: The yellow full system's proto unix io
+        :param config: The current Thunderscope UI configuration
         :param layout_path: The path to the layout to load
-        :param load_blue: Whether to load the blue dock area
-        :param load_yellow: Whether to load the yellow dock area
-        :param blue_replay_log: The blue replay log
-        :param yellow_replay_log: The yellow replay log
-        :param refresh_interval_ms: The interval in milliseconds to refresh the simulator
-        :param visualization_buffer_size: The size of the visualization buffer
+        :param refresh_interval_ms:
+            The interval in milliseconds to refresh all the widgets.
 
         """
 
-        # Setup MainApp and initialize DockArea
-        self.app = pyqtgraph.mkQApp("Thunderscope")
-
-        # Setup stylesheet
-        apply_stylesheet(self.app, theme="dark_blue.xml")
-
-        self.blue_replay_log = blue_replay_log
-        self.yellow_replay_log = yellow_replay_log
         self.refresh_interval_ms = refresh_interval_ms
-        self.visualization_buffer_size = visualization_buffer_size
         self.widgets = {}
+        self.refresh_timers = []
 
-        signal.signal(signal.SIGINT, signal.SIG_DFL)
-
-        # TODO (#2586) Improve this layout
         self.tabs = QTabWidget()
-        self.blue_full_system_dock_area = DockArea()
-        self.yellow_full_system_dock_area = DockArea()
-
-        self.web_view = QWebEngineView()
-        self.web_view.load(QtCore.QUrl(GAME_CONTROLLER_URL))
-
-        self.tabs.addTab(self.blue_full_system_dock_area, "Blue Fullsystem")
-        self.tabs.addTab(self.yellow_full_system_dock_area, "Yellow Fullsystem")
-        self.tabs.addTab(self.web_view, "Gamecontroller")
-
-        self.window = QtGui.QMainWindow()
-        self.window.setCentralWidget(self.tabs)
-        self.window.setWindowTitle("Thunderscope")
 
         # ProtoUnixIOs
         #
-        # NOTE: We have two separate IOs for each full system because the
+        # NOTE: Simulated tests need to be able to run without Thunderscope
+        # enabled, so the test fixture creates its own ProtoUnixIOs. But, we
+        # would optionally like to enable thunderscope, observe protos and plot
+        # them in thunderscope. So we need to switch over to the dependency
+        # injected ProtoUnixIOs when provided.
+
+        # Also NOTE: We have two separate IOs for each full system because the
         # er force simulator expects two inputs of the same protobuf type but
         # from the blue or yellow team. We also would like to visualize the same
         # protobuf types on two separate widgets.
-        self.simulator_proto_unix_io = (
-            ProtoUnixIO()
-            if simulator_proto_unix_io is None
-            else simulator_proto_unix_io
-        )
-        self.yellow_full_system_proto_unix_io = (
-            ProtoUnixIO()
-            if yellow_full_system_proto_unix_io is None
-            else yellow_full_system_proto_unix_io
-        )
-        self.blue_full_system_proto_unix_io = (
-            ProtoUnixIO()
-            if blue_full_system_proto_unix_io is None
-            else blue_full_system_proto_unix_io
-        )
 
-        self.refresh_timers = []
+        # initialize proto unix io map with initial values or default if not provided
+        self.proto_unix_io_map = config.proto_unix_io_map
+        self.tab_dock_map = {}
 
-        # Setup the main window and  load
-        self.__setup(layout_path, load_blue, load_yellow)
+        # iterate through each tab and add one by one
+        for tab in config.tabs:
+            self.tab_dock_map[tab.name] = tab.dock_area
+            self.tabs.addTab(tab.dock_area, tab.name)
+            self.register_refresh_function(tab.refresh)
+
+        self.window = QtGui.QMainWindow()
+        self.window.setCentralWidget(self.tabs)
+        self.window.setWindowIcon(
+            QtGui.QIcon("software/thunderscope/thunderscope-logo.png")
+        )
+        self.window.setWindowTitle("Thunderscope")
+
+        # Load the layout file if it exists
+        path = layout_path if layout_path else LAST_OPENED_LAYOUT_PATH
+        try:
+            self.load_layout(path)
+        except Exception:
+            pass
 
         # Save and Load Prompts
+        #
+        # NOTE: As long as Thunderscope has focus, the keyboard shortcuts will
+        # work because they are setup on self.window.
         self.save_layout_shortcut = QtGui.QShortcut(
             QtGui.QKeySequence("Ctrl+S"), self.window
         )
@@ -185,19 +107,7 @@ class Thunderscope(object):
         self.reset_layout_shortcut = QtGui.QShortcut(
             QtGui.QKeySequence("Ctrl+R"), self.window
         )
-
-        def __reset_layout():
-            if os.path.exists(SAVED_LAYOUT_PATH):
-                os.remove(SAVED_LAYOUT_PATH)
-                QMessageBox.information(
-                    self.window,
-                    "Restart Required",
-                    """
-                    Restart thunderscope to reset the layout.
-                    """,
-                )
-
-        self.reset_layout_shortcut.activated.connect(__reset_layout)
+        self.reset_layout_shortcut.activated.connect(self.reset_layout)
 
         self.show_help = QtGui.QShortcut(QtGui.QKeySequence("h"), self.window)
         self.show_help.activated.connect(
@@ -218,13 +128,24 @@ class Thunderscope(object):
                     
                     Mouse Shortcuts:
                     
-                    Double Click Purple Bar to pop window out
-                    Drag Purple Bar to rearrange docks
+                    Double Click Blue Bar to pop window out
+                    Drag Blue Bar to rearrange docks
                     Click items in legends to select/deselect
                     Cntrl-Click and Drag: Move ball and kick
+                    Cntrl-Space: Stop AI vs AI simulation
                     """
                 ),
             )
+        )
+
+    def reset_layout(self):
+        """Reset the layout to the default layout"""
+        saved_layout_path = pathlib.Path(LAST_OPENED_LAYOUT_PATH)
+        saved_layout_path.unlink(missing_ok=True)
+        QMessageBox.information(
+            self.window,
+            "Restart Required",
+            "Restart thunderscope to reset the layout.",
         )
 
     def save_layout(self):
@@ -232,25 +153,32 @@ class Thunderscope(object):
         registered state to a file
 
         """
+        # Create a folder at SAVED_LAYOUT_PATH if it doesn't exist
+        try:
+            pathlib.Path(SAVED_LAYOUT_PATH).mkdir(exist_ok=True)
+        except FileNotFoundError:
+            logging.warning(
+                f"Could not create folder at '{SAVED_LAYOUT_PATH}' for layout files"
+            )
 
         filename, _ = QtGui.QFileDialog.getSaveFileName(
             self.window,
             "Save layout",
-            "~/dock_layout_{}.tscopelayout".format(int(time.time())),
+            f"{SAVED_LAYOUT_PATH}/dock_layout_{int(time.time())}.{LAYOUT_FILE_EXTENSION}",
             options=QFileDialog.Option.DontUseNativeDialog,
         )
 
         if not filename:
-            print("No filename selected")
+            # No layout file was selected
             return
 
         with shelve.open(filename, "c") as shelf:
-            shelf["blue_dock_state"] = self.blue_full_system_dock_area.saveState()
-            shelf["yellow_dock_state"] = self.yellow_full_system_dock_area.saveState()
+            for key, val in self.tab_dock_map.items():
+                shelf[key] = val.saveState()
 
-        with shelve.open(SAVED_LAYOUT_PATH, "c") as shelf:
-            shelf["blue_dock_state"] = self.blue_full_system_dock_area.saveState()
-            shelf["yellow_dock_state"] = self.yellow_full_system_dock_area.saveState()
+        with shelve.open(LAST_OPENED_LAYOUT_PATH, "c") as shelf:
+            for key, val in self.tab_dock_map.items():
+                shelf[key] = val.saveState()
 
     def load_layout(self, filename=None):
         """Open a file dialog to load the layout and state to all widgets
@@ -264,61 +192,28 @@ class Thunderscope(object):
             filename, _ = QtGui.QFileDialog.getOpenFileName(
                 self.window,
                 "Open layout",
-                "~/",
+                f"{SAVED_LAYOUT_PATH}/",
                 options=QFileDialog.Option.DontUseNativeDialog,
             )
 
             if not filename:
-                print("No filename selected")
+                logging.warning("No filename selected")
                 return
 
+        # lets load the layouts from the shelf into their respective dock areas
+        # if the dock doesn't exist in the default layout, we ignore it
+        # (instead of adding a placeholder dock)
         with shelve.open(filename, "r") as shelf:
-            self.blue_full_system_dock_area.restoreState(
-                shelf["blue_dock_state"], missing="ignore"
-            )
-            self.yellow_full_system_dock_area.restoreState(
-                shelf["yellow_dock_state"], missing="ignore"
-            )
+            for key, val in shelf.items():
+                if key in self.tab_dock_map:
+                    self.tab_dock_map[key].restoreState(val)
 
             # Update default layout
-            if filename != SAVED_LAYOUT_PATH:
-                with shelve.open(SAVED_LAYOUT_PATH, "c") as default_shelf:
-                    default_shelf["blue_dock_state"] = shelf["blue_dock_state"]
-                    default_shelf["yellow_dock_state"] = shelf["yellow_dock_state"]
+            if filename != LAST_OPENED_LAYOUT_PATH:
+                with shelve.open(LAST_OPENED_LAYOUT_PATH, "c") as default_shelf:
+                    for key, val in shelf.items():
+                        default_shelf[key] = val
                     default_shelf.sync()
-
-    def __setup(self, layout_path, load_blue=True, load_yellow=True):
-        """Load the specified layout or the default file. If the default layout
-        file doesn't exist, and no layout is provided, then just configure
-        the default layout.
-
-        :param layout_path: Path to the layout file to load.
-        :param load_blue: Whether to load the blue layout.
-        :param load_yellow: Whether to load the yellow layout.
-
-        """
-        if load_yellow:
-            self.configure_default_layout(
-                self.yellow_full_system_dock_area,
-                self.simulator_proto_unix_io,
-                self.yellow_full_system_proto_unix_io,
-                True,
-            )
-
-        if load_blue:
-            self.configure_default_layout(
-                self.blue_full_system_dock_area,
-                self.simulator_proto_unix_io,
-                self.blue_full_system_proto_unix_io,
-                False,
-            )
-
-        path = layout_path if layout_path else SAVED_LAYOUT_PATH
-
-        try:
-            self.load_layout(path)
-        except Exception:
-            pass
 
     def register_refresh_function(self, refresh_func):
         """Register the refresh functions to run at the refresh_interval_ms
@@ -327,234 +222,25 @@ class Thunderscope(object):
         :param refresh_func: The function to call at refresh_interval_ms
 
         """
-
         refresh_timer = QtCore.QTimer()
         refresh_timer.setTimerType(QtCore.Qt.TimerType.PreciseTimer)
-        refresh_timer.timeout.connect(refresh_func)
+        refresh_timer.timeout.connect(lambda: refresh_func())
         refresh_timer.start(self.refresh_interval_ms)
 
         self.refresh_timers.append(refresh_timer)
-
-    def configure_default_layout(
-        self,
-        dock_area,
-        sim_proto_unix_io,
-        full_system_proto_unix_io,
-        friendly_colour_yellow,
-    ):
-        """Configure the default layout for thunderscope
-
-        :param dock_area: The dock area to configure the layout
-        :param sim_proto_unix_io: The proto unix io object for the simulator
-        :param full_system_proto_unix_io: The proto unix io object for the full system
-        :param friendly_colour_yellow: Whether the friendly colour is yellow
-
-        """
-        # Configure Docks and save them
-        self.widgets[friendly_colour_yellow] = {}
-        widgets = self.widgets[friendly_colour_yellow]
-
-        widgets["field_widget"] = self.setup_field_widget(
-            sim_proto_unix_io, full_system_proto_unix_io, friendly_colour_yellow
-        )
-        field_dock = Dock("Field")
-        field_dock.addWidget(widgets["field_widget"])
-
-        widgets["log_widget"] = self.setup_log_widget(full_system_proto_unix_io)
-        log_dock = Dock("Logs")
-        log_dock.addWidget(widgets["log_widget"])
-
-        widgets["performance_widget"] = self.setup_performance_plot(
-            full_system_proto_unix_io
-        )
-        performance_dock = Dock("Performance")
-        performance_dock.addWidget(widgets["performance_widget"].win)
-
-        widgets["parameter_widget"] = self.setup_parameter_widget(
-            full_system_proto_unix_io, friendly_colour_yellow
-        )
-        parameter_dock = Dock("Parameters")
-        parameter_dock.addWidget(widgets["parameter_widget"])
-
-        widgets["playinfo_widget"] = self.setup_play_info(full_system_proto_unix_io)
-        playinfo_dock = Dock("Play Info")
-        playinfo_dock.addWidget(widgets["playinfo_widget"])
-
-        dock_area.addDock(field_dock)
-        dock_area.addDock(log_dock, "left", field_dock)
-        dock_area.addDock(parameter_dock, "above", log_dock)
-        dock_area.addDock(playinfo_dock, "bottom", field_dock)
-        dock_area.addDock(performance_dock, "right", playinfo_dock)
-
-    def setup_field_widget(
-        self, sim_proto_unix_io, full_system_proto_unix_io, friendly_colour_yellow
-    ):
-        """setup the field widget with the constituent layers
-
-        :param sim_proto_unix_io: The proto unix io object for the simulator
-        :param full_system_proto_unix_io: The proto unix io object for the full system
-        :param friendly_colour_yellow: Whether the friendly colour is yellow
-        :returns: the field widget
-
-        """
-        self.player = ProtoPlayer(
-            self.yellow_replay_log if friendly_colour_yellow else self.blue_replay_log,
-            full_system_proto_unix_io,
-        )
-        field = Field(player=self.player)
-
-        # Create layers
-        paths = path_layer.PathLayer(self.visualization_buffer_size)
-        obstacles = obstacle_layer.ObstacleLayer(self.visualization_buffer_size)
-        validation = validation_layer.ValidationLayer(self.visualization_buffer_size)
-        world = world_layer.WorldLayer(
-            sim_proto_unix_io, friendly_colour_yellow, self.visualization_buffer_size
-        )
-        sim_state = simulator_layer.SimulatorLayer(
-            friendly_colour_yellow, self.visualization_buffer_size
-        )
-        passing = passing_layer.PassingLayer(self.visualization_buffer_size)
-
-        # Add field layers to field
-        field.add_layer("Vision", world)
-        field.add_layer("Obstacles", obstacles)
-        field.add_layer("Paths", paths)
-        field.add_layer("Validation", validation)
-        field.add_layer("Passing", passing)
-        field.add_layer("Simulator", sim_state)
-        hrvo_sim_states = []
-        # Add HRVO layers to field widget and have them hidden on startup
-        # TODO (#2655): Add/Remove HRVO layers dynamically based on the HRVOVisualization proto messages
-        for robot_id in range(6):
-            hrvo_sim_state = hrvo_layer.HRVOLayer(
-                robot_id, self.visualization_buffer_size
-            )
-            hrvo_sim_states.append(hrvo_sim_state)
-            field.add_layer(f"HRVO {robot_id}", hrvo_sim_state, False)
-
-        # Register observers
-        sim_proto_unix_io.register_observer(
-            SimulatorState, sim_state.simulator_state_buffer
-        )
-
-        for arg in [
-            (World, world.world_buffer),
-            (RobotStatus, world.robot_status_buffer),
-            (Referee, world.referee_buffer),
-            (PrimitiveSet, obstacles.primitive_set_buffer),
-            (PrimitiveSet, paths.primitive_set_buffer),
-            (PassVisualization, passing.pass_visualization_buffer),
-            (ValidationProtoSet, validation.validation_set_buffer),
-            (SimulatorState, sim_state.simulator_state_buffer),
-        ] + [
-            (HRVOVisualization, hrvo_sim_state.hrvo_buffer)
-            for hrvo_sim_state in hrvo_sim_states
-        ]:
-            full_system_proto_unix_io.register_observer(*arg)
-
-        # Register refresh functions
-        self.register_refresh_function(field.refresh)
-
-        return field
-
-    def setup_parameter_widget(self, proto_unix_io, friendly_colour_yellow):
-        """Setup the parameter widget
-
-        :param proto_unix_io: The proto unix io object
-        :param friendly_colour_yellow: 
-        :returns: The proto configuration widget
-
-        """
-
-        self.config = ThunderbotsConfig()
-        self.config.sensor_fusion_config.friendly_color_yellow = friendly_colour_yellow
-
-        def on_change_callback(attr, value, updated_proto):
-            proto_unix_io.send_proto(ThunderbotsConfig, updated_proto)
-
-        return ProtoConfigurationWidget(self.config, on_change_callback)
-
-    def setup_log_widget(self, proto_unix_io):
-        """Setup the wiget that receives logs from full system
-
-        :param proto_unix_io: The proto unix io object
-        :returns: The log widget
-
-        """
-        # Create widget
-        logs = g3logWidget()
-
-        # Register observer
-        proto_unix_io.register_observer(RobotLog, logs.log_buffer)
-
-        # Register refresh function
-        self.register_refresh_function(logs.refresh)
-
-        return logs
-
-    def setup_performance_plot(self, proto_unix_io):
-        """Setup the performance plot
-
-        :param proto_unix_io: The proto unix io object
-        :returns: The performance plot widget
-
-        """
-        # Create widget
-        named_value_plotter = NamedValuePlotter()
-
-        # Register observer
-        proto_unix_io.register_observer(
-            NamedValue, named_value_plotter.named_value_buffer
-        )
-
-        # Register refresh function
-        self.register_refresh_function(named_value_plotter.refresh)
-
-        return named_value_plotter
-
-    def setup_play_info(self, proto_unix_io):
-        """Setup the play info widget
-
-        :param proto_unix_io: The proto unix io object
-        :returns: The play info widget
-
-        """
-
-        play_info = playInfoWidget()
-        proto_unix_io.register_observer(PlayInfo, play_info.playinfo_buffer)
-        self.register_refresh_function(play_info.refresh)
-
-        return play_info
-
-    def setup_chicker_widget(self, proto_unix_io):
-        """Setup the chicker widget for robot diagnostics
-
-        :param proto_unix_io: The proto unix io object
-        :returns: The chicker widget
-
-        """
-        # Create widget
-        chicker_widget = ChickerWidget()
-
-        # Register refresh function
-        self.register_refresh_function(self.chicker_widget.refresh)
-
-        return chicker_widget
-
-    def setup_drive_and_dribbler_widget(self):
-        """Setup the drive and dribbler widget
-
-        :returns: The drive and dribbler widget
-
-        """
-
-        return DriveAndDribblerWidget()
 
     def show(self):
         """Show the main window"""
 
         self.window.show()
+        self.window.showMaximized()
         pyqtgraph.exec()
 
+    def is_open(self):
+        """Returns true if the window is open"""
+        return self.window.isVisible()
+
     def close(self):
+        """Close the main window"""
+
         QtCore.QTimer.singleShot(0, self.window.close)

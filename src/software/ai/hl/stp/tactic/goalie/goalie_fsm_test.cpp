@@ -10,13 +10,16 @@ TEST(GoalieFSMTest, test_get_goalie_position_to_block)
     Field field = Field::createSSLDivisionBField();
     TbotsProto::GoalieTacticConfig goalie_tactic_config;
 
-    // ball at center field, goalie should position itself at the front of the friendly
-    // defense area
+    // ball at center field, goalie should position itself at conservative depth
+    // in line with the ball
     Ball ball = Ball(Point(0, 0), Vector(0, 0), Timestamp::fromSeconds(123));
     Point goalie_pos =
         GoalieFSM::getGoaliePositionToBlock(ball, field, goalie_tactic_config);
     EXPECT_TRUE(contains(field.friendlyDefenseArea(), goalie_pos));
-    EXPECT_EQ(Point(field.friendlyDefenseArea().xMax(), 0), goalie_pos);
+    EXPECT_EQ(Point(field.friendlyDefenseArea().xMin() +
+                        goalie_tactic_config.conservative_depth_meters(),
+                    0),
+              goalie_pos);
 
     // ball at positive friendly corner, goalie should snap to positive goal post
     ball.updateState(BallState(field.friendlyCornerPos(), Vector(0, 0)),
@@ -24,7 +27,7 @@ TEST(GoalieFSMTest, test_get_goalie_position_to_block)
     Point goalie_pos_corner_positive =
         GoalieFSM::getGoaliePositionToBlock(ball, field, goalie_tactic_config);
     EXPECT_TRUE(contains(field.friendlyDefenseArea(), goalie_pos_corner_positive));
-    EXPECT_EQ(field.friendlyGoalpostPos() + Vector(0, -ROBOT_MAX_RADIUS_METERS),
+    EXPECT_EQ(field.friendlyGoalpostPos() + Vector(ROBOT_MAX_RADIUS_METERS, 0),
               goalie_pos_corner_positive);
 
     // ball at negative friendly corner, goalie should snap to negative goal post
@@ -33,7 +36,7 @@ TEST(GoalieFSMTest, test_get_goalie_position_to_block)
     Point goalie_pos_corner_negative =
         GoalieFSM::getGoaliePositionToBlock(ball, field, goalie_tactic_config);
     EXPECT_TRUE(contains(field.friendlyDefenseArea(), goalie_pos_corner_negative));
-    EXPECT_EQ(field.friendlyGoalpostNeg() + Vector(0, ROBOT_MAX_RADIUS_METERS),
+    EXPECT_EQ(field.friendlyGoalpostNeg() + Vector(ROBOT_MAX_RADIUS_METERS, 0),
               goalie_pos_corner_negative);
 
     // ball in friendly defense area

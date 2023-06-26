@@ -9,16 +9,6 @@
 #include "software/world/world.h"
 
 /**
- * Returns a TbotsProto::Vision proto given a World.
- *
- * @param world The world msg to extract the TbotsProto::Vision from
- *
- * @return The unique_ptr to a TbotsProto::Vision proto containing the friendly team and
- * ball information
- */
-std::unique_ptr<TbotsProto::Vision> createVision(const World& world);
-
-/**
  * Returns a TbotsProto::World proto given a World.
  *
  * @param world The world msg to extract the TbotsProto::World from
@@ -27,6 +17,19 @@ std::unique_ptr<TbotsProto::Vision> createVision(const World& world);
  * team, enemy team, ball, and the game state.
  */
 std::unique_ptr<TbotsProto::World> createWorld(const World& world);
+
+/**
+ * Returns a TbotsProto::World proto with a sequence number given a World and a sequence
+ * number.
+ *
+ * @param world The world msg to extract the TbotsProto::World from
+ * @param sequence_number A sequence number for tracking the TbotsProto::World
+ *
+ * @return The unique_ptr to a TbotsProto::World proto containing the field, friendly
+ * team, enemy team, ball, game state, and the sequence number.
+ */
+std::unique_ptr<TbotsProto::World> createWorldWithSequenceNumber(
+    const World& world, const uint64_t sequence_number);
 
 /**
  * Returns a TbotsProto::Team proto given a Team.
@@ -104,6 +107,24 @@ std::unique_ptr<TbotsProto::NamedValue> createNamedValue(const std::string name,
                                                          float value);
 
 /**
+ * Returns a TbotsProto::PlotJugglerValue proto containing the name
+ * value pairs of the map.
+ *
+ * Could use LOG(PLOTJUGGLER) to plot the values. Example:
+ *  LOG(PLOTJUGGLER) << *createPlotJugglerValue({
+ *      {"vx", velocity.x()},
+ *      {"vy", velocity.y()}
+ *  });
+ *
+ * @param values The map of name value pairs to plot
+ *
+ * @return The unique_ptr to a TbotsProto::PlotJugglerValue proto containing data with
+ *        specified names and values
+ */
+std::unique_ptr<TbotsProto::PlotJugglerValue> createPlotJugglerValue(
+    const std::map<std::string, double>& values);
+
+/**
  * Returns a timestamp msg with the time that this function was called
  *
  * @return The unique_ptr to a TbotsProto::Timestamp with the current UTC time
@@ -135,3 +156,24 @@ BallState createBallState(const TbotsProto::BallState ball_state);
  */
 std::unique_ptr<TbotsProto::PassVisualization> createPassVisualization(
     const std::vector<PassWithRating>& passes_with_rating);
+
+/**
+ * Returns the WorldStateReceivedTrigger given the world state received trigger
+ *
+ * @return The unique_ptr to a TbotsProto::WorldStateReceivedTrigger proto containing
+ *         a boolean value for whether world state proto has been received
+ *
+ */
+std::unique_ptr<TbotsProto::WorldStateReceivedTrigger> createWorldStateReceivedTrigger();
+
+/**
+ * Returns a cost visualization given a vector of costs
+ *
+ * @param costs A vector of costs to visualize
+ * @param num_rows The number of rows to display in the cost visualization
+ * @param num_cols The number of columns to display in the cost visualization
+ *
+ * @return The unique_ptr to a CostVisualization proto
+ */
+std::unique_ptr<TbotsProto::CostVisualization> createCostVisualization(
+    const std::vector<double>& costs, int num_rows, int num_cols);

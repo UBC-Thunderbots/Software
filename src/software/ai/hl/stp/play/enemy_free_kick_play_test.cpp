@@ -41,7 +41,7 @@ TEST_P(EnemyFreekickPlayTest, DISABLED_test_enemy_free_kick_play)
     }
 
     setEnemyGoalie(5);
-    setAIPlay(TbotsProto::PlayName::EnemyFreekickPlay);
+    setAiPlay(TbotsProto::PlayName::EnemyFreekickPlay);
     setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::DIRECT_FREE_THEM);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
@@ -117,7 +117,7 @@ TEST_F(EnemyFreekickPlayTest, test_enemy_free_kick_close_to_net)
         Point(-3.8, -2),
     });
     setEnemyGoalie(0);
-    setAIPlay(TbotsProto::PlayName::EnemyFreekickPlay);
+    setAiPlay(TbotsProto::PlayName::EnemyFreekickPlay);
     setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::DIRECT_FREE_THEM);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
@@ -125,7 +125,7 @@ TEST_F(EnemyFreekickPlayTest, test_enemy_free_kick_close_to_net)
             // Wait for all robots to come to a halt
             robotHalt(world_ptr, yield);
             // Two robots defending close to the enemy robot performing the free kick
-            Rectangle shadowing_free_kicker_rect(Point(-3.5, 1.25), Point(-2.75, 0.5));
+            Rectangle shadowing_free_kicker_rect(Point(-3.5, 1.25), Point(-2.5, 0.0));
             robotInPolygon(shadowing_free_kicker_rect, 2, world_ptr, yield);
 
             // Two friendly robots in position to shadow enemy robots. Rectangles are
@@ -179,7 +179,7 @@ TEST_F(EnemyFreekickPlayTest, DISABLED_test_enemy_free_kick_chipper_robots_close
         Point(-4, 1.4),
     });
     setEnemyGoalie(0);
-    setAIPlay(TbotsProto::PlayName::EnemyFreekickPlay);
+    setAiPlay(TbotsProto::PlayName::EnemyFreekickPlay);
     setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::DIRECT_FREE_THEM);
 
     std::vector<ValidationFunction> terminating_validation_functions = {

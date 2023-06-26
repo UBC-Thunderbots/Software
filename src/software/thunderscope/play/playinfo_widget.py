@@ -7,14 +7,19 @@ from google.protobuf.json_format import MessageToDict
 from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtWidgets import *
 from proto.import_all_protos import *
+from software.thunderscope.common.common_widgets import set_table_data
 
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 
-class playInfoWidget(QTableWidget):
+class PlayInfoWidget(QWidget):
 
     NUM_ROWS = 6
     NUM_COLS = 4
+
+    # empirically makes even bolded items fit within columns
+    HEADER_SIZE_HINT_WIDTH_EXPANSION = 12
+    ITEM_SIZE_HINT_WIDTH_EXPANSION = 10
 
     def __init__(self, minimum_column_width=200, buffer_size=5):
         """Shows the current play information including tactic and FSM state
@@ -24,40 +29,16 @@ class playInfoWidget(QTableWidget):
                             Set lower for more realtime plots. Default is arbitrary
 
         """
-        QTableWidget.__init__(self, playInfoWidget.NUM_ROWS, playInfoWidget.NUM_COLS)
+        QWidget.__init__(self)
+
+        self.play_table = QTableWidget(PlayInfoWidget.NUM_ROWS, PlayInfoWidget.NUM_COLS)
 
         self.playinfo_buffer = ThreadSafeBuffer(buffer_size, PlayInfo, False)
-        self.verticalHeader().setVisible(False)
+        self.play_table.verticalHeader().setVisible(False)
 
-    def set_data(self, data):
-        """Data to set in the table
-
-        :param data: dict containing {"column_name": [column_items]}
-
-        """
-        horizontal_headers = []
-
-        # empirically makes even bolded items fit within columns
-        HEADER_SIZE_HINT_WIDTH_EXPANSION = 12
-        ITEM_SIZE_HINT_WIDTH_EXPANSION = 10
-
-        for n, key in enumerate(data.keys()):
-            horizontal_headers.append(key)
-
-            for m, item in enumerate(data[key]):
-                newitem = QTableWidgetItem(item)
-                newitem.setSizeHint(
-                    QtCore.QSize(
-                        max(
-                            len(key) * HEADER_SIZE_HINT_WIDTH_EXPANSION,
-                            len(item) * ITEM_SIZE_HINT_WIDTH_EXPANSION,
-                        ),
-                        1,
-                    )
-                )
-                self.setItem(m, n, newitem)
-
-        self.setHorizontalHeaderLabels(horizontal_headers)
+        self.vertical_layout = QVBoxLayout()
+        self.vertical_layout.addWidget(self.play_table)
+        self.setLayout(self.vertical_layout)
 
     def refresh(self):
         """Update the play info widget with new play information
@@ -80,7 +61,7 @@ class playInfoWidget(QTableWidget):
         )
 
         # setting table size dynamically
-        self.setRowCount(num_rows)
+        self.play_table.setRowCount(num_rows)
 
         for state in play_info_dict["play"]["playState"]:
             play_name.append(state)
@@ -94,14 +75,17 @@ class playInfoWidget(QTableWidget):
                 play_info_dict["robotTacticAssignment"][robot_id]["tacticName"]
             )
 
-        self.set_data(
+        set_table_data(
             {
                 "Play": play_name,
                 "Robot ID": robot_ids,
                 "Tactic Name": tactic_names,
                 "Tactic FSM State": tactic_fsm_states,
-            }
+            },
+            self.play_table,
+            PlayInfoWidget.HEADER_SIZE_HINT_WIDTH_EXPANSION,
+            PlayInfoWidget.ITEM_SIZE_HINT_WIDTH_EXPANSION,
         )
 
-        self.resizeColumnsToContents()
-        self.resizeRowsToContents()
+        self.play_table.resizeColumnsToContents()
+        self.play_table.resizeRowsToContents()

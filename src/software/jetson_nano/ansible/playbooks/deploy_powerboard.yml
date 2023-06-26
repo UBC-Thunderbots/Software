@@ -1,0 +1,35 @@
+---
+
+- name: Deploy to the powerboard
+  hosts: THUNDERBOTS_HOSTS
+
+  tasks:
+    - name: Sync powerboard files
+      become: true
+      become_method: sudo
+      ansible.posix.synchronize:
+        src: ../../../../../power/powerloop.tar.gz
+        dest: ~/
+        recursive: yes
+        copy_links: yes
+
+    - name: Untar powerboard files
+      shell: 'mkdir -p powerloop && tar -xvf ~/powerloop.tar.gz -C powerloop'
+      register: result
+      args:
+        chdir: ~/
+
+    - name: Put the powerboard in bootloader mode
+      ansible.builtin.pause:
+        prompt: "Press enter to continue"
+        echo: no
+
+    - name: Flashing... (this will take a while on the first run)
+      shell: '/opt/tbotspython/bin/platformio run --disable-auto-clean -t nobuild -t upload -d ~/powerloop/power'
+      register: result
+
+    - name: Reset powerboard to finish flashing
+      ansible.builtin.pause:
+        prompt: "Press enter to continue"
+        echo: no
+
