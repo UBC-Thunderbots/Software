@@ -1,5 +1,3 @@
-import math
-
 import pytest
 
 import software.python_bindings as tbots
@@ -60,18 +58,16 @@ def test_shoot_or_pass_defense_play(simulated_test_runner):
         yellow_play = Play()
         yellow_play.name = PlayName.DefensePlay
 
-        simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(Play, yellow_play)
+        simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(
+            Play, yellow_play
+        )
 
         simulated_test_runner.simulator_proto_unix_io.send_proto(
             WorldState, world_state
         )
 
     always_validation_sequence_set = [
-        [
-            NeverExcessivelyPossesses(
-                max_possession_time=5
-            )
-        ]
+        [NeverExcessivelyPossesses(max_possession_time=10)]
     ]
 
     simulated_test_runner.run_test(

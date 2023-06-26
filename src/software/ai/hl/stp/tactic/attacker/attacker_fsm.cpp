@@ -57,9 +57,10 @@ void AttackerFSM::keepAway(const Update& event,
     }
     else
     {
-//        // we didn't get a best_pass_so_far, so we will be using the default pass.
-//        LOG(INFO) << "Attacker FSM has no best pass so far, using default pass "
-//                  << "to enemy goal center.";
+        //        // we didn't get a best_pass_so_far, so we will be using the default
+        //        pass. LOG(INFO) << "Attacker FSM has no best pass so far, using default
+        //        pass "
+        //                  << "to enemy goal center.";
     }
 
     auto keepaway_dribble_dest =

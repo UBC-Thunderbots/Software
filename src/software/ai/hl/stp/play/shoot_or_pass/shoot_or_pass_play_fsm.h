@@ -61,6 +61,12 @@ struct ShootOrPassPlayFSM
     void startLookingForPass(const Update& event);
 
     /**
+     * Gets the best offensive position zones
+     */
+    vector<EighteenZoneId> getBestOffensivePositions(
+        PassEvaluation<EighteenZoneId> pass_eval, const Update& event);
+
+    /**
      * Action to take a pass
      *
      * @param event the ShootOrPassPlayFSM Update event
@@ -143,6 +149,7 @@ struct ShootOrPassPlayFSM
     PassGenerator<EighteenZoneId> pass_generator;
     Timestamp pass_optimization_start_time;
     PassWithRating best_pass_and_score_so_far;
+    EighteenZoneId best_pass_zone;
     Duration time_since_commit_stage_start;
     double min_pass_score_threshold;
 };

@@ -20,7 +20,9 @@ class ExcessivePossession(Validation):
         :param max_possession_time: the max time a robot can hold the ball before validation fails
         """
         self.max_possession_time = max_possession_time
-        self.possession_start_times_dict = {}
+
+        # tuple of id of robot currently possessing the ball, and the time it started possession
+        self.possession_id_and_start_time = None
 
     def get_validation_status(self, world) -> ValidationStatus:
         """Checks if any friendly robot possesses the ball for more than the specified max.
@@ -32,15 +34,34 @@ class ExcessivePossession(Validation):
         ball_position = tbots.createPoint(world.ball.current_state.global_position)
         for robot in world.friendly_team.team_robots:
             if tbots.Robot(robot).isNearDribbler(ball_position, 0.02):
-                if robot.id not in self.possession_start_times_dict:
-                    self.possession_start_times_dict[robot.id] = time.time_ns()
+                # if robot is not currently possessing ball
+                if (
+                    self.possession_id_and_start_time is None
+                    or self.possession_id_and_start_time[0] != robot.id
+                ):
+                    # record the id and time at which robot starts possession
+                    self.possession_id_and_start_time = (robot.id, time.time_ns())
             else:
-                if robot.id in self.possession_start_times_dict:
-                    del self.possession_start_times_dict[robot.id]
-            if robot.id in self.possession_start_times_dict:
+                # robot was possessing the ball but has lost possession in this world
+                if (
+                    self.possession_id_and_start_time is not None
+                    and self.possession_id_and_start_time[0] == robot.id
+                ):
+                    # once robot stops possessing ball, reset the start time and id
+                    self.possession_id_and_start_time = None
+
+            # if a robot is currently possessing the ball
+            if (
+                self.possession_id_and_start_time is not None
+                and self.possession_id_and_start_time[0] == robot.id
+            ):
+                # calculate the duration of possession till now
                 curr_time = time.time_ns()
-                possession_time = abs(curr_time - self.possession_start_times_dict[robot.id])
-                if (float(possession_time) / NANOSECONDS_PER_SECOND) > self.max_possession_time:
+                possession_time = abs(curr_time - self.possession_id_and_start_time[1])
+                # if more than specified max, fail
+                if (
+                    float(possession_time) / NANOSECONDS_PER_SECOND
+                ) > self.max_possession_time:
                     return ValidationStatus.FAILING
         return ValidationStatus.PASSING
 

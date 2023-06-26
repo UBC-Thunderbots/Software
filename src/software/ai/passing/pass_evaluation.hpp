@@ -116,14 +116,15 @@ PassEvaluation<ZoneEnum>::PassEvaluation(
 }
 
 template <class ZoneEnum>
-std::pair<ZoneEnum, PassWithRating> PassEvaluation<ZoneEnum>::getBestPassAndZoneOnField() const
+std::pair<ZoneEnum, PassWithRating> PassEvaluation<ZoneEnum>::getBestPassAndZoneOnField()
+    const
 {
     auto best_pass =
-            std::max_element(best_pass_in_zones_.begin(), best_pass_in_zones_.end(),
-                             [](const std::pair<ZoneEnum, PassWithRating>& p1,
-                                const std::pair<ZoneEnum, PassWithRating>& p2) {
-                                 return p1.second.rating < p2.second.rating;
-                             });
+        std::max_element(best_pass_in_zones_.begin(), best_pass_in_zones_.end(),
+                         [](const std::pair<ZoneEnum, PassWithRating>& p1,
+                            const std::pair<ZoneEnum, PassWithRating>& p2) {
+                             return p1.second.rating < p2.second.rating;
+                         });
     return *best_pass;
 }
 
