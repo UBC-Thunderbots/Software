@@ -1,6 +1,19 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
+    name = "log_merger",
+    srcs = [
+        "log_merger.cpp",
+    ],
+    hdrs = [
+        "log_merger.h",
+    ],
+    deps = [
+        "@g3log",
+    ],
+)
+
+cc_library(
     name = "logger",
     hdrs = [
         "custom_logging_levels.h",
@@ -9,6 +22,7 @@ cc_library(
     deps = [
         ":coloured_cout_sink",
         ":csv_sink",
+        ":log_merger",
         ":plotjuggler_sink",
         ":protobuf_sink",
         "@g3log",
@@ -39,6 +53,15 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "log_merger_test",
+    srcs = ["log_merger_test.cpp"],
+    deps = [
+        ":log_merger",
+        "//shared/test_util:tbots_gtest_main",
+    ],
+)
+
 cc_library(
     name = "coloured_cout_sink",
     srcs = [
@@ -49,6 +72,7 @@ cc_library(
         "custom_logging_levels.h",
     ],
     deps = [
+        ":log_merger",
         "//software/util/make_enum",
         "@g3log",
     ],
@@ -87,6 +111,7 @@ cc_library(
         "network_sink.h",
     ],
     deps = [
+        ":log_merger",
         "//proto:tbots_cc_proto",
         "//proto:visualization_cc_proto",
         "//proto/message_translation:tbots_protobuf",
