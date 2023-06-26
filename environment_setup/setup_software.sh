@@ -88,18 +88,6 @@ if [[ $(lsb_release -rs) == "20.04" ]]; then
     ldconfig
 fi
 
-if [[ $(lsb_release -rs) == "18.04" ]]; then
-    # This is required for bazel, we've seen some issues where
-    # the bazel install hasn't installed it properly
-    host_software_packages+=(python-minimal)
-    host_software_packages+=(libclang-dev)
-    host_software_packages+=(python2.7-dev)
-    host_software_packages+=(python3.8)
-    host_software_packages+=(python3.8-dev)
-    host_software_packages+=(python3.8-venv)
-    host_software_packages+=(python3-setuptools)
-fi
-
 if ! sudo apt-get install "${host_software_packages[@]}" -y ; then
     print_status_msg "Error: Installing utilities and dependencies failed"
     exit 1
@@ -119,10 +107,6 @@ fi
 if ! sudo /opt/tbotspython/bin/python3 -m pip install --upgrade pip ; then
     print_status_msg "Error: Upgrading pip version in venv failed"
     exit 1
-fi
-
-if [[ $(lsb_release -rs) == "18.04" ]]; then
-    sudo /opt/tbotspython/bin/pip3 install -r ubuntu18_requirements.txt
 fi
 
 if [[ $(lsb_release -rs) == "20.04" ]]; then

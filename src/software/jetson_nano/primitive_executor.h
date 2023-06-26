@@ -1,8 +1,8 @@
 #pragma once
-#include "extlibs/hrvo/simulator.h"
 #include "proto/primitive.pb.h"
 #include "proto/robot_status_msg.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
+#include "software/ai/navigator/path_planner/hrvo/hrvo_simulator.h"
 #include "software/geom/vector.h"
 #include "software/world/world.h"
 
@@ -17,7 +17,7 @@ class PrimitiveExecutor
      * @param friendly_team_colour The colour of the friendly team
      * @param robot_id The id of the robot which uses this primitive executor
      */
-    explicit PrimitiveExecutor(const double time_step,
+    explicit PrimitiveExecutor(const Duration time_step,
                                const RobotConstants_t &robot_constants,
                                const TeamColour friendly_team_colour,
                                const RobotId robot_id);
@@ -72,21 +72,24 @@ class PrimitiveExecutor
     Vector getTargetLinearVelocity();
 
     /*
-     * Compute the next target angular velocity the robot should be at
-     * assuming max acceleration.
+     * Returns the next target angular velocity the robot
      *
-     * @param move_primitive The MovePrimitive to compute the angular velocity for
-     * @param curr_orientation The current orientation of the robot which is running this
-     * Primitive Executor
      * @returns AngularVelocity The target angular velocity
      */
-    AngularVelocity getTargetAngularVelocity(
-        const TbotsProto::MovePrimitive &move_primitive);
+    AngularVelocity getTargetAngularVelocity();
 
     TbotsProto::Primitive current_primitive_;
+    TbotsProto::World current_world_;
+    TeamColour friendly_team_colour;
     RobotConstants_t robot_constants_;
     HRVOSimulator hrvo_simulator_;
-    double time_step_;
-    Angle curr_orientation_;
+
+    // TODO (#2855): Add dynamic time_step to `stepPrimitive` and remove this constant
+    // time step to be used, in Seconds
+    Duration time_step_;
     RobotId robot_id_;
+
+    // Thresholds for when we should update HRVO Simulator's velocity
+    static constexpr const double LINEAR_VELOCITY_FEEDBACK_THRESHOLD_M_PER_S    = 1.0;
+    static constexpr const double ANGULAR_VELOCITY_FEEDBACK_THRESHOLD_DEG_PER_S = 200.0;
 };

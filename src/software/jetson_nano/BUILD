@@ -5,10 +5,10 @@ cc_library(
     srcs = ["primitive_executor.cpp"],
     hdrs = ["primitive_executor.h"],
     deps = [
-        "//extlibs/hrvo",
         "//proto:tbots_cc_proto",
         "//proto/primitive:primitive_msg_factory",
         "//shared:constants",
+        "//software/ai/navigator/path_planner/hrvo",
         "//software/math:math_functions",
         "//software/physics:velocity_conversion_util",
         "//software/world",
@@ -24,8 +24,8 @@ cc_library(
         "//proto:tbots_cc_proto",
         "//software/jetson_nano/redis",
         "//software/jetson_nano/services:motor",
-        "//software/jetson_nano/services:network",
         "//software/jetson_nano/services:power",
+        "//software/jetson_nano/services/network",
         "//software/logger:network_logger",
         "//software/util/scoped_timespec_timer",
         "//software/world:team",
@@ -53,6 +53,7 @@ cc_binary(
     deps = [
         ":thunderloop",
         "//shared:constants",
+        "@boost//:program_options",
     ],
 )
 

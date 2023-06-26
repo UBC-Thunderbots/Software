@@ -1,5 +1,8 @@
 #pragma once
 
+#include "proto/parameters.pb.h"
+#include "software/time/duration.h"
+#include "software/time/timestamp.h"
 #include "software/world/world.h"
 
 /**

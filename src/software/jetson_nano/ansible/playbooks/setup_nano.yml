@@ -157,7 +157,6 @@
           with_items:
             # bazel makes its own zip files, we append another zip to deconflict
             - ../../display/robot_ui_zip.zip
-            - ../../broadcasts/robot_broadcast_sender_zip.zip
             - ../../thunderloop_main
           loop_control:
             loop_var: binary_path
@@ -186,6 +185,18 @@
             dest: /etc/systemd/system
             copy_links: yes
 
+        - name: Remove announcements
+          become_method: sudo
+          become: true
+          tags:
+            - syncSystemdFiles
+          file:
+            path: "/etc/systemd/system/{{ service_name }}.service"
+            state: absent
+          with_items: ["wifi_announcement", "ethernet_announcement"]
+          loop_control:
+            loop_var: service_name
+
           # NOTE: "Enabling systems" means they will start on boot
         - name: Enable system services
           become: true
@@ -193,7 +204,7 @@
           with_items:
             - thunderbots
             - thunderloop
-            - wifi_announcement
+            - display
           loop_control:
             loop_var: service_name
           ansible.builtin.systemd:
@@ -203,6 +214,11 @@
             daemon_reload: yes
           tags:
             - enableSystemd
+
+        - name: Enable WiFi waiter service
+          become: true
+          become_method: sudo
+          service: name=NetworkManager-wait-online enabled=yes
 
         - name: Reboot
           become: true
