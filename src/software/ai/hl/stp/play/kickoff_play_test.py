@@ -14,7 +14,6 @@ from proto.ssl_gc_common_pb2 import Team
 
 @pytest.mark.parametrize("is_friendly_test", [True, False])
 def test_kickoff_play(simulated_test_runner, is_friendly_test):
-
     # starting point must be Point
     ball_initial_pos = tbots.Point(0, 0)
 
@@ -77,19 +76,31 @@ def test_kickoff_play(simulated_test_runner, is_friendly_test):
 
     # Always Validation
     # TODO- #2809 Validation
-    always_validation_sequence_set = [
-        [
+    always_validation_sequence_set = [[]]
+
+    if is_friendly_test:
+        always_validation_sequence_set[0].append(
             NumberOfRobotsNeverEntersRegion(
-                region=tbots.field.enemyHalf(), req_robot_cnt=2
+                region=[tbots.field.enemyHalf(), tbots.field.centerCircle()], req_robot_cnt=2
             )
-        ]
-    ]
+        )
+    else:
+        always_validation_sequence_set[0].append(
+            NumberOfRobotsNeverEntersRegion(
+                region=[tbots.field.friendlyHalf(), tbots.field.centerCircle()], req_robot_cnt=2
+            )
+        )
 
     # Eventually Validation
     # TODO- #2809 Validation
     eventually_validation_sequence_set = [
-        [BallEventuallyExitsRegion(region=tbots.field.centerCircle())]
+        [
+            BallEventuallyExitsRegion(
+                region=[tbots.circle()]
+            )
+        ]
     ]
+
 
     simulated_test_runner.run_test(
         eventually_validation_sequence_set=eventually_validation_sequence_set,
