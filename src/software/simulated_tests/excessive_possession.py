@@ -12,7 +12,7 @@ from software.simulated_tests.validation import (
 
 class ExcessivePossession(Validation):
 
-    """Checks if any friendly robot is excessively dribbling the ball, i.e. for over 1m."""
+    """Checks if any friendly robot is excessively possessing the ball for more than the max time"""
 
     def __init__(self, max_possession_time):
         """

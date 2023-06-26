@@ -17,6 +17,7 @@ def test_shoot_or_pass_defense_play(simulated_test_runner):
         ball_initial_pos = tbots.Point(0, 0)
         ball_initial_vel = tbots.Vector(0, 0)
 
+        # sets up lines of friendly and enemy robots
         blue_bots = [
             tbots.Point(-2, 2.25),
             tbots.Point(-2, 1.25),
