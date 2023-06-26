@@ -11,27 +11,24 @@ from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
 
 
-@pytest.mark.parametrize(
-    "yellow_positions",
+@pytest.mark.parametrize("yellow_positions", [
     [
-        [
-            tbots.Point(1, 3),
-            tbots.Point(1, -0.25),
-            tbots.Point(1, -1.25),
-            tbots.Field.createSSLDivisionBField().enemyGoalCenter(),
-            tbots.Field.createSSLDivisionBField().enemyDefenseArea().negXNegYCorner(),
-            tbots.Field.createSSLDivisionBField().enemyDefenseArea().negXPosYCorner(),
-        ],
-        [
-            tbots.Point(-2, 1.05),
-            tbots.Point(-3.5, 2),
-            tbots.Point(-1.5, 0),
-            tbots.Point(-2.3, -1),
-            tbots.Point(-3.8, -2),
-            tbots.Field.createSSLDivisionBField().enemyGoalCenter(),
-        ],
+        tbots.Point(1, 3),
+        tbots.Point(1, -0.25),
+        tbots.Point(1, -1.25),
+        tbots.Field.createSSLDivisionBField().enemyGoalCenter(),
+        tbots.Field.createSSLDivisionBField().enemyDefenseArea().negXNegYCorner(),
+        tbots.Field.createSSLDivisionBField().enemyDefenseArea().negXPosYCorner(),
     ],
-)
+    [
+        tbots.Point(-2, 1.05),
+        tbots.Point(-3.5, 2),
+        tbots.Point(-1.5, 0),
+        tbots.Point(-2.3, -1),
+        tbots.Point(-3.8, -2),
+        tbots.Field.createSSLDivisionBField().enemyGoalCenter(),
+    ]
+])
 def test_defense_play(simulated_test_runner, yellow_positions):
 
     # starting point must be Point

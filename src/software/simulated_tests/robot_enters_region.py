@@ -12,9 +12,8 @@ class RobotEntersRegion(Validation):
 
     """Checks if a Robot enters any of the provided regions."""
 
-    def __init__(self, regions=None, num_robots=1):
+    def __init__(self, regions=None):
         self.regions = regions if regions else []
-        self.num_robots = num_robots
 
     def get_validation_status(self, world) -> ValidationStatus:
         """Checks if _any_ robot enters the provided regions
@@ -23,16 +22,12 @@ class RobotEntersRegion(Validation):
         :returns: FAILING until a robot enters any of the regions
                   PASSING when a robot enters
         """
-        count = 0
-
         for region in self.regions:
             for robot in world.friendly_team.team_robots:
                 if tbots.contains(
-                    region, tbots.createPoint(robot.current_stateS.global_position)
+                    region, tbots.createPoint(robot.current_state.global_position)
                 ):
-                    count += 1
-        if count == self.num_robots:
-            return ValidationStatus.PASSING
+                    return ValidationStatus.PASSING
 
         return ValidationStatus.FAILING
 

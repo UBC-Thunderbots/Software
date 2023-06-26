@@ -359,7 +359,7 @@ class Gamecontroller(object):
 
     """ Gamecontroller Context Manager """
 
-    CI_MODE_LAUNCH_DELAY_S = 1
+    CI_MODE_LAUNCH_DELAY_S = 0.3
     REFEREE_IP = "224.5.23.1"
     CI_MODE_OUTPUT_RECEIVE_BUFFER_SIZE = 9000
 
