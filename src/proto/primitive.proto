@@ -127,6 +127,9 @@ message MovePrimitive
     AutoChipOrKick auto_chip_or_kick      = 6;
     float target_spin_rev_per_s           = 7;
     BallCollisionType ball_collision_type = 8;
+    // Whether the robot should face the direction of intermediate path points
+    // (if there is any) or just the final destination
+    optional bool should_drive_forward = 9;
 }
 
 message StopPrimitive {}
