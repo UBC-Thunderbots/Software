@@ -151,10 +151,9 @@ class RobotCommunication(object):
                 fullsystem_primitives = dict(primitive_set.robot_primitives)
                 for robot_id in fullsystem_primitives.keys():
                     if robot_id in self.robots_connected_to_fullsystem:
-                        primitive = self.__reduce_primitive_size(
+                        robot_primitives[robot_id] = self.__reduce_primitive_size(
                             fullsystem_primitives[robot_id]
                         )
-                        robot_primitives[robot_id] = primitive
 
             # get the manual control primitive
             diagnostics_primitive = DirectControlPrimitive(
