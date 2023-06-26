@@ -78,7 +78,7 @@ def test_shoot_or_pass_defense_play(simulated_test_runner):
         inv_always_validation_sequence_set=always_validation_sequence_set,
         ag_eventually_validation_sequence_set=[[]],
         ag_always_validation_sequence_set=always_validation_sequence_set,
-        test_timeout_s=10,
+        test_timeout_s=120,
     )
 
 
