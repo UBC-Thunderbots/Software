@@ -41,22 +41,52 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const World
 
     //    auto attacker = std::make_shared<AttackerTactic>(ai_config);
 
+    auto align_to_ball_tactic = std::make_shared<MoveTactic>();
+    do {
+        updateAlignToBallTactic(align_to_ball_tactic, world);
+        yield({{align_to_ball_tactic}});
+    } while (!align_to_ball_tactic->done());
+
+    std::optional<Shot> shot =
+            calcBestShotOnGoal(world.field(), world.friendlyTeam(), world.enemyTeam(),
+                               world.ball().position(), TeamType::ENEMY);
+    LOG(DEBUG) << "Shot angle:" << shot->getOpenAngle().toDegrees();
+    if (shot && shot->getOpenAngle() > Angle::fromDegrees(6))
+    {
+        LOG(DEBUG) << "SHOOTING";
+        auto kicker = std::make_shared<KickTactic>();
+        do {
+            kicker->updateControlParams(
+                    world.ball().position(),
+                    (shot->getPointToShootAt() - world.ball().position()).orientation(),
+                    BALL_MAX_SPEED_METERS_PER_SECOND - 0.5);
+
+            yield({{kicker, std::get<0>(crease_defender_tactics),
+                    std::get<1>(crease_defender_tactics)}});
+        } while (!kicker->done());
+        LOG(DEBUG) << "Finished Shooting";
+        return;
+    }
+
     PassWithRating best_pass_and_score_so_far =
         shootOrFindPassStage(yield, crease_defender_tactics, world);
 
+    LOG(DEBUG) << "Pass score:" << best_pass_and_score_so_far.rating;
     //    if (attacker->done())
     //    {
     //        LOG(DEBUG) << "Took shot";
     //    }
     if (best_pass_and_score_so_far.rating > MIN_ACCEPTABLE_PASS_SCORE)
     {
+        LOG(DEBUG) << "PASSING";
         performPassStage(yield, crease_defender_tactics, best_pass_and_score_so_far,
                          world);
     }
     else
     {
+        LOG(DEBUG) << "CHIPPING";
         LOG(DEBUG) << "Pass had score of " << best_pass_and_score_so_far.rating
-                   << " which is below our threshold of" << MIN_ACCEPTABLE_PASS_SCORE
+                   << " which is below our threshold of " << MIN_ACCEPTABLE_PASS_SCORE
                    << ", so chipping at enemy net";
 
         chipAtGoalStage(yield, crease_defender_tactics, world);
@@ -210,7 +240,8 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
         best_pass_and_score_so_far =
             pass_generator.generatePassEvaluation(world).getBestPassOnField();
         LOG(DEBUG) << "Best pass found so far is: " << best_pass_and_score_so_far.pass;
-        LOG(DEBUG) << "    with score: " << best_pass_and_score_so_far.rating;
+        LOG(DEBUG) << "with score: " << best_pass_and_score_so_far.rating;
+        //        LOG(DEBUG) << "minscore: " << min_score;
 
         Duration time_since_commit_stage_start =
             world.getMostRecentTimestamp() - commit_stage_start_time;
@@ -218,6 +249,7 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
                                      MAX_TIME_TO_COMMIT_TO_PASS.toSeconds(),
                                  1.0);
     } while (best_pass_and_score_so_far.rating < min_score);
+    LOG(DEBUG) << "DONE PASS GENERATION";
     return best_pass_and_score_so_far;
 }
 
