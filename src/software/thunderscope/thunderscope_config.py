@@ -48,10 +48,10 @@ def initialize_application():
     signal.signal(signal.SIGINT, signal.SIG_DFL)
 
     # Setup MainApp and initialize DockArea
-    pyqtgraph.mkQApp("Thunderscope")
+    app = pyqtgraph.mkQApp("Thunderscope")
 
     # Setup stylesheet
-    # apply_stylesheet(app, theme="dark_blue.xml")
+    apply_stylesheet(app, theme="dark_blue.xml")
 
 
 def configure_cost_vis(proto_unix_io):
