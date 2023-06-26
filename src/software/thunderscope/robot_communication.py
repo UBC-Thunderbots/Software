@@ -151,7 +151,10 @@ class RobotCommunication(object):
                 fullsystem_primitives = dict(primitive_set.robot_primitives)
                 for robot_id in fullsystem_primitives.keys():
                     if robot_id in self.robots_connected_to_fullsystem:
-                        robot_primitives[robot_id] = fullsystem_primitives[robot_id]
+                        primitive = self.__reduce_primitive_size(
+                            fullsystem_primitives[robot_id]
+                        )
+                        robot_primitives[robot_id] = primitive
 
             # get the manual control primitive
             diagnostics_primitive = DirectControlPrimitive(
@@ -224,6 +227,21 @@ class RobotCommunication(object):
         """
         if self.running:
             self.current_proto_unix_io.send_proto(type, data)
+
+    def __reduce_primitive_size(self, primitive):
+        """
+        Reduces the size of the primitive by removing the static obstacles
+        :param primitive: the primitive to be reduced
+        :return: The reduced primitive
+        """
+
+        # The static_obstacles array is the largest part of the Primitive proto.
+        # Since it is not used by the robots, we will remove all values from its
+        # array.
+        if primitive.HasField("move"):
+            del primitive.move.motion_control.static_obstacles[:]
+
+        return primitive
 
     def setup_for_fullsystem(self):
         """
