@@ -44,7 +44,8 @@ extern "C"
     }
 }
 
-Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, const int loop_hz)
+Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, bool enable_log_merging,
+                         const int loop_hz)
     // TODO (#2495): Set the friendly team colour once we receive World proto
     : redis_client_(
           std::make_unique<RedisClient>(REDIS_DEFAULT_HOST, REDIS_DEFAULT_PORT)),
@@ -62,7 +63,8 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, const int loop
                           TeamColour::YELLOW, robot_id_)
 {
     g3::overrideSetupSignals({});
-    NetworkLoggerSingleton::initializeLogger(channel_id_, network_interface_, robot_id_);
+    NetworkLoggerSingleton::initializeLogger(channel_id_, network_interface_, robot_id_,
+                                             enable_log_merging);
 
     // catch all catch-able signals
     std::signal(SIGSEGV, tbotsExit);
