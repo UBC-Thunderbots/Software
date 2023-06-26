@@ -110,6 +110,31 @@ Point GoalieFSM::findGoodChipTarget(
     return chip_target;
 }
 
+bool GoalieFSM::shouldEvacuateCrease(const Update &event)
+{
+    Rectangle friendly_defense_area = event.common.world.field().friendlyDefenseArea();
+    Ball ball           = event.common.world.ball();
+
+    double robot_radius_expansion_amount =
+        ROBOT_MAX_RADIUS_METERS *
+        robot_navigation_obstacle_config.robot_obstacle_inflation_factor();
+    Rectangle inflated_defense_area =
+        friendly_defense_area.expand(robot_radius_expansion_amount);
+
+    bool ball_in_dead_zone =  !contains(friendly_defense_area, ball.position()) &&
+            contains(friendly_defense_area.expand(robot_radius_expansion_amount),
+                    ball.position());
+
+    double safe_distance_threshhold = 2.0;
+    double nearest_enemy_distance_to_ball = distance(event.common.world.enemyTeam().getNearestRobot(ball.position())->position(), ball.position());
+    double goalie_distance_to_ball = distance(event.common.world.friendlyTeam().goalie()->position(), ball.position());
+    bool safe_to_evacuate = nearest_enemy_distance_to_ball * safe_distance_threshhold > goalie_distance_to_ball;
+
+    double ball_velocity_threshold = 0.1;
+    bool ball_is_stagnant = ball.velocity().length() > ball_velocity_threshold;
+    return ball_in_dead_zone && ball_is_stagnant && safe_to_evacuate;
+}
+
 bool GoalieFSM::shouldPanic(const Update &event)
 {
     double ball_speed_panic = goalie_tactic_config.ball_speed_panic();
@@ -201,9 +226,15 @@ void GoalieFSM::positionToBlock(const Update &event)
         max_allowed_speed_mode, 0.0, event.common.robot.robotConstants()));
 }
 
-bool GoalieFSM::ballInDefenseArea(const Update &event)
+bool GoalieFSM::ballInInflatedDefenseArea(const Update &event)
 {
-    return contains(event.common.world.field().friendlyDefenseArea(),
+    double robot_radius_expansion_amount =
+            ROBOT_MAX_RADIUS_METERS *
+            robot_navigation_obstacle_config.robot_obstacle_inflation_factor();
+    Rectangle inflated_defense_area =
+            event.common.world.field().friendlyDefenseArea().expand(robot_radius_expansion_amount);
+
+    return contains(inflated_defense_area,
                     event.common.world.ball().position());
 }
 
