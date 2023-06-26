@@ -1,10 +1,12 @@
 #include "software/ai/hl/stp/play/free_kick_play.h"
 
 #include "shared/constants.h"
+#include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/evaluation/possession.h"
 #include "software/ai/hl/stp/play/corner_kick_play.h"
 #include "software/ai/hl/stp/tactic/attacker/attacker_tactic.h"
 #include "software/ai/hl/stp/tactic/chip/chip_tactic.h"
+#include "software/ai/hl/stp/tactic/kick/kick_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/ai/hl/stp/tactic/receiver/receiver_tactic.h"
 #include "software/ai/passing/eighteen_zone_pitch_division.h"
@@ -35,17 +37,18 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const World
             ai_config.robot_navigation_obstacle_config()),
         std::make_shared<CreaseDefenderTactic>(
             ai_config.robot_navigation_obstacle_config())};
+    updateCreaseDefenderTactics(crease_defender_tactics, world);
 
-    auto attacker = std::make_shared<AttackerTactic>(ai_config);
+    //    auto attacker = std::make_shared<AttackerTactic>(ai_config);
 
     PassWithRating best_pass_and_score_so_far =
-        shootOrFindPassStage(yield, attacker, crease_defender_tactics, world);
+        shootOrFindPassStage(yield, crease_defender_tactics, world);
 
-    if (attacker->done())
-    {
-        LOG(DEBUG) << "Took shot";
-    }
-    else if (best_pass_and_score_so_far.rating > MIN_ACCEPTABLE_PASS_SCORE)
+    //    if (attacker->done())
+    //    {
+    //        LOG(DEBUG) << "Took shot";
+    //    }
+    if (best_pass_and_score_so_far.rating > MIN_ACCEPTABLE_PASS_SCORE)
     {
         performPassStage(yield, crease_defender_tactics, best_pass_and_score_so_far,
                          world);
@@ -66,13 +69,12 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const World
 void FreeKickPlay::updateAlignToBallTactic(
     std::shared_ptr<MoveTactic> align_to_ball_tactic, const World &world)
 {
-    Vector ball_to_center_vec = Vector(0, 0) - world.ball().position().toVector();
-    // We want the kicker to get into position behind the ball facing the center
-    // of the field
+    Vector ball_to_goal_vec =
+        world.field().enemyGoalCenter().toVector() - world.ball().position().toVector();
+    // We want the kicker to get into position behind the ball facing the enemy net
     align_to_ball_tactic->updateControlParams(
-        world.ball().position() -
-            ball_to_center_vec.normalize(ROBOT_MAX_RADIUS_METERS * 2),
-        ball_to_center_vec.orientation(), 0);
+        world.ball().position() - ball_to_goal_vec.normalize(ROBOT_MAX_RADIUS_METERS * 2),
+        ball_to_goal_vec.orientation(), 0);
 }
 
 void FreeKickPlay::chipAtGoalStage(
@@ -83,7 +85,7 @@ void FreeKickPlay::chipAtGoalStage(
     auto chip_tactic = std::make_shared<ChipTactic>();
 
     // Figure out where the fallback chip target is
-    // This is exerimentally determined to be a reasonable value
+    // This is experimentally determined to be a reasonable value
     double fallback_chip_target_x_offset = 1.5;
     Point chip_target =
         world.field().enemyGoalCenter() - Vector(fallback_chip_target_x_offset, 0);
@@ -91,12 +93,7 @@ void FreeKickPlay::chipAtGoalStage(
     do
     {
         chip_tactic->updateControlParams(world.ball().position(), chip_target);
-        std::get<0>(crease_defender_tactics)
-            ->updateControlParams(world.ball().position(),
-                                  TbotsProto::CreaseDefenderAlignment::LEFT);
-        std::get<1>(crease_defender_tactics)
-            ->updateControlParams(world.ball().position(),
-                                  TbotsProto::CreaseDefenderAlignment::RIGHT);
+        updateCreaseDefenderTactics(crease_defender_tactics, world);
 
         yield({{chip_tactic, std::get<0>(crease_defender_tactics),
                 std::get<1>(crease_defender_tactics)}});
@@ -116,26 +113,23 @@ void FreeKickPlay::performPassStage(
     LOG(DEBUG) << "Score of pass we committed to: " << best_pass_and_score_so_far.rating;
 
     // Perform the pass and wait until the receiver is finished
-    auto attacker = std::make_shared<AttackerTactic>(ai_config);
+    auto kicker   = std::make_shared<KickTactic>();
     auto receiver = std::make_shared<ReceiverTactic>();
     do
     {
-        attacker->updateControlParams(pass, true);
+        kicker->updateControlParams(pass.passerPoint(), pass.passerOrientation(),
+                                    pass.speed());
         receiver->updateControlParams(pass);
 
-        std::get<0>(crease_defender_tactics)
-            ->updateControlParams(world.ball().position(),
-                                  TbotsProto::CreaseDefenderAlignment::LEFT);
-        std::get<1>(crease_defender_tactics)
-            ->updateControlParams(world.ball().position(),
-                                  TbotsProto::CreaseDefenderAlignment::RIGHT);
-        yield({{attacker, receiver, std::get<0>(crease_defender_tactics),
+        updateCreaseDefenderTactics(crease_defender_tactics, world);
+
+        yield({{kicker, receiver, std::get<0>(crease_defender_tactics),
                 std::get<1>(crease_defender_tactics)}});
     } while (!receiver->done());
 }
 
 PassWithRating FreeKickPlay::shootOrFindPassStage(
-    TacticCoroutine::push_type &yield, std::shared_ptr<AttackerTactic> shoot_tactic,
+    TacticCoroutine::push_type &yield,
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics,
     const World &world)
 {
@@ -163,13 +157,13 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
     // This tactic will move a robot into position to initially take the free-kick
     auto align_to_ball_tactic = std::make_shared<MoveTactic>();
 
-    // Put the robot in roughly the right position to perform the kick
+    // Put the kicker in roughly the right position to perform the kick
     LOG(DEBUG) << "Aligning to ball";
     do
     {
         updateAlignToBallTactic(align_to_ball_tactic, world);
 
-        auto pass_eval = pass_generator.generatePassEvaluation(world);
+        pass_eval = pass_generator.generatePassEvaluation(world);
 
         auto pass1 = pass_eval.getBestPassInZones(cherry_pick_region_1).pass;
         auto pass2 = pass_eval.getBestPassInZones(cherry_pick_region_2).pass;
@@ -181,12 +175,6 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
             pass2.receiverPoint(), pass2.receiverOrientation(), 0.0,
             TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
 
-        std::get<0>(crease_defender_tactics)
-            ->updateControlParams(world.ball().position(),
-                                  TbotsProto::CreaseDefenderAlignment::LEFT);
-        std::get<1>(crease_defender_tactics)
-            ->updateControlParams(world.ball().position(),
-                                  TbotsProto::CreaseDefenderAlignment::RIGHT);
         yield({{align_to_ball_tactic, cherry_pick_tactic_1, cherry_pick_tactic_2,
                 std::get<0>(crease_defender_tactics),
                 std::get<1>(crease_defender_tactics)}});
@@ -203,9 +191,7 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
     Timestamp commit_stage_start_time = world.getMostRecentTimestamp();
     do
     {
-        updateAlignToBallTactic(align_to_ball_tactic, world);
-
-        auto pass_eval = pass_generator.generatePassEvaluation(world);
+        pass_eval = pass_generator.generatePassEvaluation(world);
 
         auto pass1 = pass_eval.getBestPassInZones(cherry_pick_region_1).pass;
         auto pass2 = pass_eval.getBestPassInZones(cherry_pick_region_2).pass;
@@ -217,14 +203,8 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
             pass2.receiverPoint(), pass2.receiverOrientation(), 0.0,
             TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
 
-        std::get<0>(crease_defender_tactics)
-            ->updateControlParams(world.ball().position(),
-                                  TbotsProto::CreaseDefenderAlignment::LEFT);
-        std::get<1>(crease_defender_tactics)
-            ->updateControlParams(world.ball().position(),
-                                  TbotsProto::CreaseDefenderAlignment::RIGHT);
-        yield({{align_to_ball_tactic, shoot_tactic, cherry_pick_tactic_1,
-                cherry_pick_tactic_2, std::get<0>(crease_defender_tactics),
+        yield({{align_to_ball_tactic, cherry_pick_tactic_1, cherry_pick_tactic_2,
+                std::get<0>(crease_defender_tactics),
                 std::get<1>(crease_defender_tactics)}});
 
         best_pass_and_score_so_far =
@@ -239,6 +219,18 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
                                  1.0);
     } while (best_pass_and_score_so_far.rating < min_score);
     return best_pass_and_score_so_far;
+}
+
+void FreeKickPlay::updateCreaseDefenderTactics(
+    std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics,
+    const World &world)
+{
+    std::get<0>(crease_defender_tactics)
+        ->updateControlParams(world.ball().position(),
+                              TbotsProto::CreaseDefenderAlignment::LEFT);
+    std::get<1>(crease_defender_tactics)
+        ->updateControlParams(world.ball().position(),
+                              TbotsProto::CreaseDefenderAlignment::RIGHT);
 }
 
 // Register this play in the genericFactory

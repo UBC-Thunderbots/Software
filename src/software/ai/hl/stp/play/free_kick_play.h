@@ -21,7 +21,7 @@ class FreeKickPlay : public Play
     const Duration MAX_TIME_TO_COMMIT_TO_PASS;
 
     // The minimum pass score we will attempt
-    static constexpr double MIN_ACCEPTABLE_PASS_SCORE = 0.05;
+    static constexpr double MIN_ACCEPTABLE_PASS_SCORE = 0.1;
 
     /**
      * Finds a place to chip the ball near the net and chips there.
@@ -61,7 +61,7 @@ class FreeKickPlay : public Play
      * @return the pass that was found
      */
     PassWithRating shootOrFindPassStage(
-        TacticCoroutine::push_type &yield, std::shared_ptr<AttackerTactic> shoot_tactic,
+        TacticCoroutine::push_type &yield,
         std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics,
         const World &world);
 
@@ -73,4 +73,14 @@ class FreeKickPlay : public Play
      */
     void updateAlignToBallTactic(std::shared_ptr<MoveTactic> align_to_ball_tactic,
                                  const World &world);
+
+    /**
+     * Updates the crease defender tactics to help the goalie
+     *
+     * @param crease_defender_tactics The crease defender tactics
+     * @param world The current state of the world
+     */
+    void updateCreaseDefenderTactics(
+        std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics,
+        const World &world);
 };
