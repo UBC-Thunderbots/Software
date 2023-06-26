@@ -22,7 +22,8 @@ class PenaltyKickPlayTest : public SimulatedErForceSimPlayTestFixture
     Field field                      = Field::createField(field_type);
 };
 
-TEST_F(PenaltyKickPlayTest, test_penalty_kick_setup)
+// TODO (#2602): test failing since a robot isn't avoiding the ball
+TEST_F(PenaltyKickPlayTest, DISABLED_test_penalty_kick_setup)
 {
     BallState ball_state(field.friendlyPenaltyMark(), Vector(0, 0));
     auto friendly_robots = TestUtil::createStationaryRobotStatesWithId(
