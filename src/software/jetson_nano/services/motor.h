@@ -187,17 +187,29 @@ class MotorService
                      uint32_t spi_speed);
 
     /**
-     * Performs two back to back SPI transactions, first a read and then a write
+     * Performs two back to back SPI transactions, first a read and then a write.
+     * NOTE: read_tx and write_tx must both be in BIG ENDIAN, as required by the
+     * Trinamic controller
      *
      * @param fd the SPI file descriptor to transfer data over
-     * @param write_buf the write buffer of data to send out
-     * @param read_buf the read buffer of data to read
-     * @param write_len the length of the write buffer
-     * @param read_len the length of the read buffer
+     * @param read_tx pointer to the buffer containing the address for reading
+     * @param write_tx pointer to the buffer containing the address + data for write
+     * @param read_rx the buffer our read response will be placed in
      * @param spi_speed the speed to run spi at
      */
     void readThenWriteSpiTransfer(int fd, const uint8_t *read_tx, uint8_t const* write_tx, uint8_t const* read_rx, uint32_t spi_speed);
 
+    /**
+     * A function which is written in the same style as the rest of the Trinamic API.
+     * This will trigger two SPI transactions back to back, reading a value and then
+     * writing a value for a specific motor
+     *
+     * @param motor The motor we want to read & write from
+     * @param read_addr the address of the register to read
+     * @param write_addr the address of the register to write
+     * @param write_data the data to write
+     * @return the value read from the trinamic controller
+     */
     int32_t tmc4671ReadThenWriteValue(uint8_t motor, uint8_t read_addr, uint8_t write_addr, int32_t write_data);
 
     /**
