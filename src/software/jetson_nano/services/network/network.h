@@ -68,4 +68,7 @@ class NetworkService
     // ProtoTrackers for tracking recent primitive_set and world loss
     ProtoTracker primitive_tracker;
     ProtoTracker world_tracker;
+
+    // track last breakbeam state for sending RobotStatus outside of specified rate
+    bool last_breakbeam_state_sent = false;
 };

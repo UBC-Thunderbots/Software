@@ -27,9 +27,10 @@ std::tuple<TbotsProto::PrimitiveSet, TbotsProto::World> NetworkService::poll(
          robot_status.motor_status().front_right().motor_faults_size() > 0 ||
          robot_status.motor_status().back_left().motor_faults_size() > 0 ||
          robot_status.motor_status().back_right().motor_faults_size() > 0) ||
-        (network_ticks / (thunderloop_ticks + 1.0) <=
-         ROBOT_STATUS_TO_THUNDERLOOP_HZ_RATIO))
+        robot_status.power_status().breakbeam_tripped() != last_breakbeam_state_sent ||
+        network_ticks / (thunderloop_ticks + 1.0) <= ROBOT_STATUS_TO_THUNDERLOOP_HZ_RATIO)
     {
+        last_breakbeam_state_sent = robot_status.power_status().breakbeam_tripped();
         sender->sendProto(robot_status);
         network_ticks = (network_ticks + 1) % ROBOT_STATUS_BROADCAST_RATE_HZ;
     }
