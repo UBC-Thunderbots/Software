@@ -1,4 +1,4 @@
-#include "software/ai/hl/stp/play/penalty_kick_enemy_play.h"
+#include "software/ai/hl/stp/play/penalty_kick_enemy/penalty_kick_enemy_play.h"
 
 #include <gtest/gtest.h>
 
@@ -25,8 +25,7 @@ class PenaltyKickEnemyPlayTest
     Field field                      = Field::createField(field_type);
 };
 
-// TODO (#2714): Re-enable tests
-TEST_P(PenaltyKickEnemyPlayTest, DISABLED_test_penalty_kick_enemy_play_setup)
+TEST_P(PenaltyKickEnemyPlayTest, test_penalty_kick_enemy_play_setup)
 {
     RefereeCommand current_command  = std::get<0>(GetParam());
     RefereeCommand previous_command = std::get<1>(GetParam());
@@ -40,23 +39,21 @@ TEST_P(PenaltyKickEnemyPlayTest, DISABLED_test_penalty_kick_enemy_play_setup)
         Point(field.enemyPenaltyMark().x() + 0.3, 0),  // kicker robot
         Point(field.enemyPenaltyMark().x() + enemy_distance_behind_ball, 0),
         Point(field.enemyPenaltyMark().x() + enemy_distance_behind_ball,
-              4 * ROBOT_MAX_RADIUS_METERS),
-        Point(field.enemyPenaltyMark().x() + enemy_distance_behind_ball,
               8 * ROBOT_MAX_RADIUS_METERS),
         Point(field.enemyPenaltyMark().x() + enemy_distance_behind_ball,
-              -4 * ROBOT_MAX_RADIUS_METERS),
+              16 * ROBOT_MAX_RADIUS_METERS),
         Point(field.enemyPenaltyMark().x() + enemy_distance_behind_ball,
               -8 * ROBOT_MAX_RADIUS_METERS),
+        Point(field.enemyPenaltyMark().x() + enemy_distance_behind_ball,
+              -16 * ROBOT_MAX_RADIUS_METERS),
     });
     setFriendlyGoalie(0);
     setEnemyGoalie(0);
     setAiPlay(TbotsProto::PlayName::PenaltyKickEnemyPlay);
     setRefereeCommand(current_command, previous_command);
-    Polygon behind_ball_region =
-        Polygon({Point(field.enemyPenaltyMark().x() + 1, field.yLength() / 2),
-                 Point(field.enemyPenaltyMark().x() + 1, -field.yLength() / 2),
-                 Point(field.xLength() / 2, field.yLength() / 2),
-                 Point(-field.xLength() / 2, -field.yLength() / 2)});
+    Rectangle behind_ball_region =
+        Rectangle(Point(field.enemyPenaltyMark().x() + 1, field.enemyCornerPos().y()),
+                  field.enemyCornerNeg());
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [behind_ball_region](std::shared_ptr<World> world_ptr,
@@ -71,7 +68,7 @@ TEST_P(PenaltyKickEnemyPlayTest, DISABLED_test_penalty_kick_enemy_play_setup)
 
     runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(10));
+            Duration::fromSeconds(20));
 }
 
 INSTANTIATE_TEST_CASE_P(
@@ -82,32 +79,27 @@ INSTANTIATE_TEST_CASE_P(
                             {Point(1, 2), Point(-1, -2), Point(-2.5, 3), Point(2, -1),
                              Point(0, 3), Point(3, 0)}),
                         1),
-        std::make_tuple(RefereeCommand::NORMAL_START,
-                        RefereeCommand::PREPARE_PENALTY_THEM,
+        std::make_tuple(RefereeCommand::PREPARE_PENALTY_THEM, RefereeCommand::HALT,
                         TestUtil::createStationaryRobotStatesWithId(
                             {Point(2.2, 1.2), Point(-0.5, -2.1), Point(-2.5, 1.3),
                              Point(1.2, -1.5), Point(0, 2), Point(1, 0)}),
                         1.3),
-        std::make_tuple(RefereeCommand::NORMAL_START,
-                        RefereeCommand::PREPARE_PENALTY_THEM,
+        std::make_tuple(RefereeCommand::PREPARE_PENALTY_THEM, RefereeCommand::HALT,
                         TestUtil::createStationaryRobotStatesWithId(
                             {Point(2.2, 1.2), Point(-0.5, -2.1), Point(-2.5, 1.3),
                              Point(1.2, -1.5), Point(0, 2), Point(1, 0)}),
                         1.4),
-        std::make_tuple(RefereeCommand::NORMAL_START,
-                        RefereeCommand::PREPARE_PENALTY_THEM,
+        std::make_tuple(RefereeCommand::PREPARE_PENALTY_THEM, RefereeCommand::HALT,
                         TestUtil::createStationaryRobotStatesWithId(
                             {Point(2.2, 1.2), Point(-0.5, -2.1), Point(-2.5, 1.3),
                              Point(1.2, -1.5), Point(0, 2), Point(1, 0)}),
                         1.45),
-        std::make_tuple(RefereeCommand::NORMAL_START,
-                        RefereeCommand::PREPARE_PENALTY_THEM,
+        std::make_tuple(RefereeCommand::PREPARE_PENALTY_THEM, RefereeCommand::HALT,
                         TestUtil::createStationaryRobotStatesWithId(
                             {Point(2.2, 1.2), Point(-0.5, -2.1), Point(-2.5, 1.3),
                              Point(1.2, -1.5), Point(0, 2), Point(1, 0)}),
                         1.5),
-        std::make_tuple(RefereeCommand::NORMAL_START,
-                        RefereeCommand::PREPARE_PENALTY_THEM,
+        std::make_tuple(RefereeCommand::PREPARE_PENALTY_THEM, RefereeCommand::HALT,
                         TestUtil::createStationaryRobotStatesWithId(
                             {Point(2.2, 1.2), Point(-0.5, -2.1), Point(-2.5, 1.3),
                              Point(1.2, -1.5), Point(0, 2), Point(1, 0)}),
@@ -120,19 +112,19 @@ TEST_F(PenaltyKickEnemyPlayTest, test_penalty_kick_enemy_play_goalie)
     // friendly robots already in position
     auto friendly_robots = TestUtil::createStationaryRobotStatesWithId(
         {field.friendlyGoalCenter(), Point(field.enemyPenaltyMark().x() + 1.5, 0),
-         Point(field.enemyPenaltyMark().x() + 1.5, 4 * ROBOT_MAX_RADIUS_METERS),
-         Point(field.enemyPenaltyMark().x() + 1.5, -4 * ROBOT_MAX_RADIUS_METERS),
          Point(field.enemyPenaltyMark().x() + 1.5, 8 * ROBOT_MAX_RADIUS_METERS),
-         Point(field.enemyPenaltyMark().x() + 1.5, -8 * ROBOT_MAX_RADIUS_METERS)});
+         Point(field.enemyPenaltyMark().x() + 1.5, -8 * ROBOT_MAX_RADIUS_METERS),
+         Point(field.enemyPenaltyMark().x() + 1.5, 16 * ROBOT_MAX_RADIUS_METERS),
+         Point(field.enemyPenaltyMark().x() + 1.5, -16 * ROBOT_MAX_RADIUS_METERS)});
 
     // enemy robots behind the penalty mark
     auto enemy_robots = TestUtil::createStationaryRobotStatesWithId({
         Point(field.enemyPenaltyMark().x() + 0.3, 0),
         Point(field.enemyPenaltyMark().x() + 1, 0),
-        Point(field.enemyPenaltyMark().x() + 1, 4 * ROBOT_MAX_RADIUS_METERS),
         Point(field.enemyPenaltyMark().x() + 1, 8 * ROBOT_MAX_RADIUS_METERS),
-        Point(field.enemyPenaltyMark().x() + 1, -4 * ROBOT_MAX_RADIUS_METERS),
+        Point(field.enemyPenaltyMark().x() + 1, 16 * ROBOT_MAX_RADIUS_METERS),
         Point(field.enemyPenaltyMark().x() + 1, -8 * ROBOT_MAX_RADIUS_METERS),
+        Point(field.enemyPenaltyMark().x() + 1, -16 * ROBOT_MAX_RADIUS_METERS),
     });
     setFriendlyGoalie(0);
     setEnemyGoalie(0);
@@ -159,5 +151,5 @@ TEST_F(PenaltyKickEnemyPlayTest, test_penalty_kick_enemy_play_goalie)
 
     runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(10));
+            Duration::fromSeconds(20));
 }
