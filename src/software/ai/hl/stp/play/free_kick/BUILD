@@ -1,16 +1,23 @@
 package(default_visibility = ["//visibility:public"])
+
 load("@simulated_tests_deps//:requirements.bzl", "requirement")
 
 cc_library(
     name = "free_kick_play",
-    srcs = ["free_kick_play.cpp"],
-    hdrs = ["free_kick_play.h"],
+    srcs = [
+        "free_kick_play.cpp",
+        "free_kick_play_fsm.cpp",
+    ],
+    hdrs = [
+        "free_kick_play.h",
+        "free_kick_play_fsm.h",
+    ],
     deps = [
-        "//software/ai/hl/stp/play",
         "//shared:constants",
         "//software/ai/evaluation:enemy_threat",
         "//software/ai/evaluation:find_open_areas",
         "//software/ai/evaluation:possession",
+        "//software/ai/hl/stp/play",
         "//software/ai/hl/stp/tactic/chip:chip_tactic",
         "//software/ai/hl/stp/tactic/crease_defender:crease_defender_tactic",
         "//software/ai/hl/stp/tactic/goalie:goalie_tactic",
