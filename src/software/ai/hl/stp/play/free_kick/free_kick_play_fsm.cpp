@@ -16,12 +16,11 @@ FreeKickPlayFSM::FreeKickPlayFSM(TbotsProto::AiConfig ai_config)
                                             Field::createSSLDivisionBField()),
                                         ai_config.passing_config())),
       MAX_TIME_TO_COMMIT_TO_PASS(Duration::fromSeconds(
-          5)),  // Spent at most 5 seconds looking for a pass. The rule for division B
+          5)),  // Spend at most 5 seconds looking for a pass. The rule for division B
                 // teams is at most 10 seconds spent on the entire free kick
       MIN_ACCEPTABLE_PASS_SCORE(0.1),
       MIN_OPEN_ANGLE_FOR_SHOT(
-          5),  // Only attempt shots with an opening angle greater than 5 degrees
-      MIN_PASS_DISTANCE(1)  // Only take passes greater than 1 meter in length
+          5)  // Only attempt shots with an opening angle greater than 5 degrees
 {
     std::generate(offensive_positioning_tactics.begin(),
                   offensive_positioning_tactics.end(),
@@ -109,7 +108,7 @@ void FreeKickPlayFSM::startLookingForPass(const FreeKickPlayFSM::Update &event)
         pass_generator.generatePassEvaluation(event.common.world)
             .rankZonesForReceiving(event.common.world,
                                    best_pass_and_score_so_far.pass.receiverPoint());
-    LOG(DEBUG) << ranked_zones[0] << "---" << ranked_zones[1];
+    LOG(DEBUG) << ranked_zones[0] << "---" << ranked_zones[1] << "---" << ranked_zones[2] << "---" << ranked_zones[3] << "---" << ranked_zones[4] << "---" << ranked_zones[5];
 }
 
 bool FreeKickPlayFSM::timeExpired(const FreeKickPlayFSM::Update &event)
@@ -163,14 +162,9 @@ bool FreeKickPlayFSM::passFound(const Update &event)
     double min_score = 1 - std::min(time_since_pass_optimization_start.toSeconds() /
                                         MAX_TIME_TO_COMMIT_TO_PASS.toSeconds(),
                                     1.0);
-    Pass pass        = best_pass_and_score_so_far.pass;
-    double distance  = (pass.receiverPoint() - pass.passerPoint()).length();
-    LOG(DEBUG) << "Pass distance: " << distance;
 
-    // Only attempt passes with a distance greater than the minimum distance because the
-    // passer tactic and the receiver tactic will oscillate and get stuck
     return min_score > MIN_ACCEPTABLE_PASS_SCORE &&
-           best_pass_and_score_so_far.rating > min_score && distance > MIN_PASS_DISTANCE;
+           best_pass_and_score_so_far.rating > min_score;
 }
 
 void FreeKickPlayFSM::passBall(const Update &event)

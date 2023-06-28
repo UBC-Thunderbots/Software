@@ -219,7 +219,5 @@ struct FreeKickPlayFSM
     // The minimum shot angle opening we will attempt
     const double MIN_OPEN_ANGLE_FOR_SHOT;
 
-    // The minimum pass distance we will attempt
-    const double MIN_PASS_DISTANCE;
     Timestamp pass_optimization_start_time;
 };
