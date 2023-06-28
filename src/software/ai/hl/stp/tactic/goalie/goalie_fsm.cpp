@@ -115,6 +115,7 @@ bool GoalieFSM::shouldEvacuateCrease(const Update &event)
     Rectangle friendly_defense_area = event.common.world.field().friendlyDefenseArea();
     Ball ball           = event.common.world.ball();
 
+    // calculate inflated crease obstacle
     double robot_radius_expansion_amount =
         ROBOT_MAX_RADIUS_METERS *
         robot_navigation_obstacle_config.robot_obstacle_inflation_factor();
@@ -125,13 +126,15 @@ bool GoalieFSM::shouldEvacuateCrease(const Update &event)
             contains(friendly_defense_area.expand(robot_radius_expansion_amount),
                     ball.position());
 
-    double safe_distance_threshhold = 2.0;
+    // goalie should only evacuate crease if there are no enemy robots nearby
+    double safe_distance_multiplier = goalie_tactic_config.safe_distance_multiplier();
     double nearest_enemy_distance_to_ball = distance(event.common.world.enemyTeam().getNearestRobot(ball.position())->position(), ball.position());
     double goalie_distance_to_ball = distance(event.common.world.friendlyTeam().goalie()->position(), ball.position());
-    bool safe_to_evacuate = nearest_enemy_distance_to_ball * safe_distance_threshhold > goalie_distance_to_ball;
+    bool safe_to_evacuate = nearest_enemy_distance_to_ball * safe_distance_multiplier > goalie_distance_to_ball;
 
-    double ball_velocity_threshold = 0.1;
-    bool ball_is_stagnant = ball.velocity().length() > ball_velocity_threshold;
+    double ball_velocity_threshold = goalie_tactic_config.ball_speed_panic();
+    bool ball_is_stagnant = ball.velocity().length() < ball_velocity_threshold;
+
     return ball_in_dead_zone && ball_is_stagnant && safe_to_evacuate;
 }
 
