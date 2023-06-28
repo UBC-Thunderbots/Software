@@ -59,7 +59,7 @@ def free_kick_play_setup(
 # We want to test friendly half, enemy half, and at the border of the field
 @pytest.mark.parametrize(
     "ball_initial_pos",
-    [tbots.Point(1.5, -2.75), tbots.Point(-1.5, -2.75), tbots.Point(1.5, -3)],
+    [tbots.Point(1.5, 1.75), tbots.Point(-1.5, -2.75), tbots.Point(1.5, -3)],
 )
 def test_free_kick_play_friendly(simulated_test_runner, ball_initial_pos):
     # TODO- #2753 Validation
@@ -83,9 +83,9 @@ def test_free_kick_play_friendly(simulated_test_runner, ball_initial_pos):
                     tbots.Point(4, -2.5),
                 ],
                 "yellow_bots": [
-                    tbots.Point(1, 0),
-                    tbots.Point(1, 2.5),
-                    tbots.Point(1, -2.5),
+                    tbots.Point(3.5, 0),
+                    tbots.Point(3.5, 0.5),
+                    tbots.Point(3.5, 0.75),
                     tbots.Field.createSSLDivisionBField().enemyGoalCenter(),
                     tbots.Field.createSSLDivisionBField()
                     .enemyDefenseArea()

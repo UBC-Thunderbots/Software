@@ -108,7 +108,6 @@ void FreeKickPlayFSM::startLookingForPass(const FreeKickPlayFSM::Update &event)
         pass_generator.generatePassEvaluation(event.common.world)
             .rankZonesForReceiving(event.common.world,
                                    best_pass_and_score_so_far.pass.receiverPoint());
-    LOG(DEBUG) << ranked_zones[0] << "---" << ranked_zones[1] << "---" << ranked_zones[2] << "---" << ranked_zones[3] << "---" << ranked_zones[4] << "---" << ranked_zones[5];
 }
 
 bool FreeKickPlayFSM::timeExpired(const FreeKickPlayFSM::Update &event)
@@ -188,15 +187,27 @@ void FreeKickPlayFSM::passBall(const Update &event)
 
 bool FreeKickPlayFSM::shotDone(const Update &event)
 {
+    if (shoot_tactic->done())
+    {
+        LOG(DEBUG) << "Finished shot.";
+    }
     return shoot_tactic->done();
 }
 
 bool FreeKickPlayFSM::passDone(const FreeKickPlayFSM::Update &event)
 {
-    return passer_tactic->done() && receiver_tactic->done();
+    if (receiver_tactic->done())
+    {
+        LOG(DEBUG) << "Finished pass.";
+    }
+    return receiver_tactic->done();
 }
 
 bool FreeKickPlayFSM::chipDone(const FreeKickPlayFSM::Update &event)
 {
+    if (chip_tactic->done())
+    {
+        LOG(DEBUG) << "Finished chip.";
+    }
     return chip_tactic->done();
 }
