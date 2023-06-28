@@ -83,9 +83,9 @@ def test_free_kick_play_friendly(simulated_test_runner, ball_initial_pos):
                     tbots.Point(4, -2.5),
                 ],
                 "yellow_bots": [
-                    tbots.Point(3.5, 0),
-                    tbots.Point(3.5, 0.5),
-                    tbots.Point(3.5, 0.75),
+                    tbots.Point(1, 0),
+                    tbots.Point(1, 2.5),
+                    tbots.Point(1, -2.5),
                     tbots.Field.createSSLDivisionBField().enemyGoalCenter(),
                     tbots.Field.createSSLDivisionBField()
                     .enemyDefenseArea()
