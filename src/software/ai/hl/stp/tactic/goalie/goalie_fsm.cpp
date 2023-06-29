@@ -113,7 +113,7 @@ Point GoalieFSM::findGoodChipTarget(
 bool GoalieFSM::shouldEvacuateCrease(const Update &event)
 {
     Rectangle friendly_defense_area = event.common.world.field().friendlyDefenseArea();
-    Ball ball           = event.common.world.ball();
+    Ball ball                       = event.common.world.ball();
 
     // calculate inflated crease obstacle
     double robot_radius_expansion_amount =
@@ -122,18 +122,23 @@ bool GoalieFSM::shouldEvacuateCrease(const Update &event)
     Rectangle inflated_defense_area =
         friendly_defense_area.expand(robot_radius_expansion_amount);
 
-    bool ball_in_dead_zone =  !contains(friendly_defense_area, ball.position()) &&
-            contains(friendly_defense_area.expand(robot_radius_expansion_amount),
-                    ball.position());
+    bool ball_in_dead_zone =
+        !contains(friendly_defense_area, ball.position()) &&
+        contains(friendly_defense_area.expand(robot_radius_expansion_amount),
+                 ball.position());
 
     // goalie should only evacuate crease if there are no enemy robots nearby
     double safe_distance_multiplier = goalie_tactic_config.safe_distance_multiplier();
-    double nearest_enemy_distance_to_ball = distance(event.common.world.enemyTeam().getNearestRobot(ball.position())->position(), ball.position());
-    double goalie_distance_to_ball = distance(event.common.world.friendlyTeam().goalie()->position(), ball.position());
-    bool safe_to_evacuate = nearest_enemy_distance_to_ball * safe_distance_multiplier > goalie_distance_to_ball;
+    double nearest_enemy_distance_to_ball = distance(
+        event.common.world.enemyTeam().getNearestRobot(ball.position())->position(),
+        ball.position());
+    double goalie_distance_to_ball =
+        distance(event.common.world.friendlyTeam().goalie()->position(), ball.position());
+    bool safe_to_evacuate = nearest_enemy_distance_to_ball * safe_distance_multiplier >
+                            goalie_distance_to_ball;
 
     double ball_velocity_threshold = goalie_tactic_config.ball_speed_panic();
-    bool ball_is_stagnant = ball.velocity().length() < ball_velocity_threshold;
+    bool ball_is_stagnant          = ball.velocity().length() < ball_velocity_threshold;
 
     return ball_in_dead_zone && ball_is_stagnant && safe_to_evacuate;
 }
@@ -232,13 +237,13 @@ void GoalieFSM::positionToBlock(const Update &event)
 bool GoalieFSM::ballInInflatedDefenseArea(const Update &event)
 {
     double robot_radius_expansion_amount =
-            ROBOT_MAX_RADIUS_METERS *
-            robot_navigation_obstacle_config.robot_obstacle_inflation_factor();
+        ROBOT_MAX_RADIUS_METERS *
+        robot_navigation_obstacle_config.robot_obstacle_inflation_factor();
     Rectangle inflated_defense_area =
-            event.common.world.field().friendlyDefenseArea().expand(robot_radius_expansion_amount);
+        event.common.world.field().friendlyDefenseArea().expand(
+            robot_radius_expansion_amount);
 
-    return contains(inflated_defense_area,
-                    event.common.world.ball().position());
+    return contains(inflated_defense_area, event.common.world.ball().position());
 }
 
 bool GoalieFSM::shouldMoveToGoalLine(const Update &event)

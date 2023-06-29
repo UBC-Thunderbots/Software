@@ -135,7 +135,8 @@ struct GoalieFSM
     bool panicDone(const Update &event);
 
     /**
-     * Action that prompts the goalie to leave the crease momentarily to chip the ball away
+     * Action that prompts the goalie to leave the crease momentarily to chip the ball
+     * away
      *
      * @param event
      */
@@ -206,7 +207,8 @@ struct GoalieFSM
             // src_state + event [guard] / action = dest_state
             *PositionToBlock_S + Update_E[shouldMoveToGoalLine_G] / moveToGoalLine_A =
                 MoveToGoalLine_S,
-            PositionToBlock_S + Update_E[shouldEvacuateCrease_G] / updatePivotKick_A = PivotKickFSM_S,
+            PositionToBlock_S + Update_E[shouldEvacuateCrease_G] / updatePivotKick_A =
+                PivotKickFSM_S,
             PositionToBlock_S + Update_E[shouldPanic_G] / panic_A = Panic_S,
             PositionToBlock_S + Update_E[shouldPivotChip_G] / updatePivotKick_A =
                 PivotKickFSM_S,

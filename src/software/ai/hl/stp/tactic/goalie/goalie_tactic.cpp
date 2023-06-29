@@ -38,7 +38,9 @@ void GoalieTactic::updatePrimitive(const TacticUpdate &tactic_update, bool reset
     {
         fsm_map[tactic_update.robot.id()] = std::make_unique<FSM<GoalieFSM>>(
             DribbleFSM(ai_config.dribble_tactic_config()),
-            GoalieFSM(ai_config.goalie_tactic_config(), ai_config.robot_navigation_obstacle_config(), max_allowed_speed_mode));
+            GoalieFSM(ai_config.goalie_tactic_config(),
+                      ai_config.robot_navigation_obstacle_config(),
+                      max_allowed_speed_mode));
     }
     fsm_map.at(tactic_update.robot.id())
         ->process_event(GoalieFSM::Update(control_params, tactic_update));
