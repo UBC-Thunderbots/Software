@@ -52,17 +52,29 @@ struct FreeKickPlayFSM
     /**
      * Updates the offensive positioning tactics
      *
-     *
-     * @param the ranked zones to look for offensive positions in
-     * @param pass_eval The pass evaluation to help find best passes
-     * @param num_tactics the number of tactics to return
+     * @param world the latest world
      */
     void updateOffensivePositioningTactics(const World& world);
 
+    /**
+     * Updates the kicker to align to the ball
+     *
+     * @param world the latest world
+     */
     void updateAlignToBallTactic(const World& world);
 
+    /**
+     * Action that starts the process of looking for a pass
+     *
+     * @param event the FreeKickPlayFSM Update event
+     */
     void startLookingForPass(const Update& event);
 
+    /**
+     * Action that looks for a pass between the kicker and another robot
+     *
+     * @param event the FreeKickPlayFSM Update event
+     */
     void lookForPass(const Update& event);
 
     /**
