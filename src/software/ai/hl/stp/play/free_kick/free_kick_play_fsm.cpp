@@ -165,8 +165,7 @@ void FreeKickPlayFSM::passBall(const Update &event)
     PriorityTacticVector tactics_to_run = {{}};
 
     // We have committed to the pass
-    LOG(DEBUG) << "Committed to pass. Pass: " << best_pass_and_score_so_far.pass;
-    LOG(DEBUG) << "Score:" << best_pass_and_score_so_far.rating;
+    LOG(DEBUG) << "Found pass with score: " << best_pass_and_score_so_far.rating << ". Passing...";
 
     Pass pass = best_pass_and_score_so_far.pass;
 
