@@ -14,13 +14,7 @@ FreeKickPlayFSM::FreeKickPlayFSM(TbotsProto::AiConfig ai_config)
       pass_generator(
           PassGenerator<EighteenZoneId>(std::make_shared<const EighteenZonePitchDivision>(
                                             Field::createSSLDivisionBField()),
-                                        ai_config.passing_config())),
-      MAX_TIME_TO_COMMIT_TO_PASS(Duration::fromSeconds(
-          5)),  // Spend at most 5 seconds looking for a pass. The rule for division B
-                // teams is at most 10 seconds spent on the entire free kick
-      MIN_ACCEPTABLE_PASS_SCORE(0.1),
-      MIN_OPEN_ANGLE_FOR_SHOT(
-          5)  // Only attempt shots with an opening angle greater than 5 degrees
+                                        ai_config.passing_config()))
 {
     std::generate(offensive_positioning_tactics.begin(),
                   offensive_positioning_tactics.end(),

@@ -231,13 +231,11 @@ struct FreeKickPlayFSM
     PassGenerator<EighteenZoneId> pass_generator;
 
     // The maximum time that we will wait before committing to a pass
-    const Duration MAX_TIME_TO_COMMIT_TO_PASS;
-
+    static const inline Duration MAX_TIME_TO_COMMIT_TO_PASS = Duration::fromSeconds(5);
     // The minimum pass score we will attempt
-    const double MIN_ACCEPTABLE_PASS_SCORE;
-
+    static constexpr double MIN_ACCEPTABLE_PASS_SCORE = 0.1;
     // The minimum shot angle opening we will attempt
-    const double MIN_OPEN_ANGLE_FOR_SHOT;
+    static constexpr double MIN_OPEN_ANGLE_FOR_SHOT = 5;
 
     Timestamp pass_optimization_start_time;
 };
