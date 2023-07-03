@@ -1,3 +1,5 @@
+import logging
+
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtWidgets import *
@@ -328,19 +330,21 @@ class RobotInfo(QWidget):
             power_status.battery_voltage <= BATTERY_WARNING_VOLTAGE
             and not self.battery_warning_disabled
         ):
-            QMessageBox.information(
-                self,
-                "Battery Voltage Alert",
-                f"robot {self.robot_id} voltage is {power_status.battery_voltage}",
-            )
+            # QMessageBox.information(
+            #     self,
+            #     "Battery Voltage Alert",
+            #     f"robot {self.robot_id} voltage is {power_status.battery_voltage}",
+            # )
+            logging.warning(f"Battery Voltage Alert\n\nrobot {self.robot_id} voltage is {power_status.battery_voltage}")
             self.battery_warning_disabled = True
         elif power_status.battery_voltage > BATTERY_WARNING_VOLTAGE:
             self.battery_warning_disabled = False
 
         for code in error_codes:
             if code != ErrorCode.NO_ERROR:
-                QMessageBox.warning(
-                    self,
-                    f"Warning: {ERROR_CODE_MESSAGES[code]}",
-                    f"{ERROR_CODE_MESSAGES[code]} warning for robot {self.robot_id}",
-                )
+                # QMessageBox.warning(
+                #     self,
+                #     f"Warning: {ERROR_CODE_MESSAGES[code]}",
+                #     f"{ERROR_CODE_MESSAGES[code]} warning for robot {self.robot_id}",
+                # )
+                logging.warning(f"WARNING ERROR CODE FROM ROBOT {self.robot_id}: {ERROR_CODE_MESSAGES[code]} {ERROR_CODE_MESSAGES[code]}")

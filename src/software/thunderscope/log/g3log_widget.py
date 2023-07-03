@@ -1,3 +1,5 @@
+import logging
+
 import pyqtgraph as pg
 from pyqtgraph.Qt.QtWidgets import *
 import queue
@@ -93,9 +95,10 @@ class g3logWidget(QWidget):
                     time.time() - self.robot_last_fatal_time_s[log.robot_id]
                     > self.ROBOT_FATAL_TIMEOUT_S
                 ):
-                    QMessageBox.information(
-                        self, "Fatal Log Alert", log_str,
-                    )
+                    # QMessageBox.information(
+                    #     self, "Fatal Log Alert", log_str,
+                    # )
+                    logging.warning(f"Fatal Log Alert\n\n{log_str}")
                 self.robot_last_fatal_time_s[log.robot_id] = time.time()
         else:
             return

@@ -188,5 +188,5 @@ class RobotView(QScrollArea):
                     + f"stack_dump: {robot_crash.stack_dump}"
                 )
                 dialog = RobotCrashDialog(robot_crash_text, robot_crash)
-                dialog.exec()
+                # dialog.exec()
             self.robot_last_crash_time_s[robot_crash.robot_id] = time.time()
