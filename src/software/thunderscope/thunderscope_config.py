@@ -57,7 +57,7 @@ def initialize_application():
 def configure_cost_vis(proto_unix_io):
     """
     Returns Widget Data for the Cost Visualization Widget
-    :param proto_unix_io: the proto unix io key to configure the widget with
+    :param proto_unix_io: the proto unix io to configure the widget with
     :return: the widget data
     """
     return TScopeWidget(
@@ -71,7 +71,7 @@ def configure_cost_vis(proto_unix_io):
 def configure_robot_view_fullsystem(fullsystem_proto_unix_io):
     """
     Returns Widget Data for the Robot View Widget for FullSystem
-    :param fullsystem_proto_unix_io: the proto unix io key to configure the widget with
+    :param fullsystem_proto_unix_io: the proto unix io to configure the widget with
     :return: the widget data
     """
     return TScopeWidget(
@@ -110,6 +110,21 @@ def configure_robot_view_diagnostics(diagnostics_proto_unix_io):
         anchor="Logs",
         stretch=WidgetStretchData(y=5),
         position="above",
+    )
+
+
+def configure_estop(proto_unix_io):
+    """
+    Returns Widget Data for the Estop widget
+    :param proto_unix_io: the proto unix io to configure the widget with
+    :return:
+    """
+    return TScopeWidget(
+        name="Estop",
+        widget=setup_estop_view(**{"proto_unix_io": proto_unix_io}),
+        anchor="Logs",
+        stretch=WidgetStretchData(y=1),
+        position="bottom",
     )
 
 
@@ -229,13 +244,6 @@ def configure_base_diagnostics(diagnostics_proto_unix_io, extra_widgets=[]):
             widget=setup_diagnostics_input_widget(),
             anchor="Chicker",
             position="top",
-        ),
-        TScopeWidget(
-            name="Estop",
-            widget=setup_estop_view(**{"proto_unix_io": diagnostics_proto_unix_io}),
-            anchor="Logs",
-            stretch=WidgetStretchData(y=1),
-            position="bottom",
         ),
     ] + extra_widgets
 
@@ -557,6 +565,7 @@ def configure_ai_or_diagnostics(
             [configure_cost_vis(proto_unix_io)] if cost_visualization else []
         )
         extra_widgets.append(configure_robot_view_fullsystem(proto_unix_io))
+        extra_widgets.append(configure_estop(proto_unix_io))
         return extra_widgets
 
     proto_unix_io_map = {ProtoUnixIOTypes.SIM: ProtoUnixIO()}
@@ -633,7 +642,10 @@ def configure_ai_or_diagnostics(
                     else [
                         configure_robot_view_diagnostics(
                             proto_unix_io_map[ProtoUnixIOTypes.DIAGNOSTICS]
-                        )
+                        ),
+                        configure_estop(
+                            proto_unix_io_map[ProtoUnixIOTypes.DIAGNOSTICS]
+                        ),
                     ],
                 ),
             )
