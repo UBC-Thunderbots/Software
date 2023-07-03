@@ -10,7 +10,6 @@ FreeKickPlayFSM::FreeKickPlayFSM(TbotsProto::AiConfig ai_config)
       passer_tactic(std::make_shared<KickTactic>()),
       receiver_tactic(std::make_shared<ReceiverTactic>()),
       offensive_positioning_tactics(std::vector<std::shared_ptr<MoveTactic>>(2)),
-      ranked_zones(std::vector<EighteenZoneId>(18)),
       pass_generator(
           PassGenerator<EighteenZoneId>(std::make_shared<const EighteenZonePitchDivision>(
                                             Field::createSSLDivisionBField()),
@@ -19,16 +18,25 @@ FreeKickPlayFSM::FreeKickPlayFSM(TbotsProto::AiConfig ai_config)
     std::generate(offensive_positioning_tactics.begin(),
                   offensive_positioning_tactics.end(),
                   []() { return std::make_shared<MoveTactic>(); });
-    std::generate(ranked_zones.begin(), ranked_zones.end(),
-                  []() { return EighteenZoneId(); });
 }
 
 void FreeKickPlayFSM::setupPosition(const Update &event)
 {
+    if (ranked_zones.empty()) {
+        ranked_zones =
+                pass_generator.generatePassEvaluation(event.common.world)
+                        .rankZonesForReceiving(event.common.world,
+                                               best_pass_and_score_so_far.pass.receiverPoint());
+    }
     PriorityTacticVector tactics_to_run = {{}};
 
     updateAlignToBallTactic(event.common.world);
     tactics_to_run[0].emplace_back(align_to_ball_tactic);
+
+    updateOffensivePositioningTactics(event.common.world);
+    tactics_to_run[0].insert(tactics_to_run[0].end(),
+                             offensive_positioning_tactics.begin(),
+                             offensive_positioning_tactics.end());
 
     event.common.set_tactics(tactics_to_run);
 }
