@@ -22,11 +22,12 @@ FreeKickPlayFSM::FreeKickPlayFSM(TbotsProto::AiConfig ai_config)
 
 void FreeKickPlayFSM::setupPosition(const Update &event)
 {
-    if (ranked_zones.empty()) {
+    if (ranked_zones.empty())
+    {
         ranked_zones =
-                pass_generator.generatePassEvaluation(event.common.world)
-                        .rankZonesForReceiving(event.common.world,
-                                               best_pass_and_score_so_far.pass.receiverPoint());
+            pass_generator.generatePassEvaluation(event.common.world)
+                .rankZonesForReceiving(event.common.world,
+                                       best_pass_and_score_so_far.pass.receiverPoint());
     }
     PriorityTacticVector tactics_to_run = {{}};
 
@@ -173,7 +174,8 @@ void FreeKickPlayFSM::passBall(const Update &event)
     PriorityTacticVector tactics_to_run = {{}};
 
     // We have committed to the pass
-    LOG(DEBUG) << "Found pass with score: " << best_pass_and_score_so_far.rating << ". Passing...";
+    LOG(DEBUG) << "Found pass with score: " << best_pass_and_score_so_far.rating
+               << ". Passing...";
 
     Pass pass = best_pass_and_score_so_far.pass;
 
