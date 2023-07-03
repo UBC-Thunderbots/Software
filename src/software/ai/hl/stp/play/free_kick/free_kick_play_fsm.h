@@ -132,7 +132,6 @@ struct FreeKickPlayFSM
      *
      * @return whether the time to search for a pass is over
      */
-
     bool timeExpired(const Update& event);
 
     /**
