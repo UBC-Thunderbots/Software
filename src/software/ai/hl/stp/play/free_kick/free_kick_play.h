@@ -2,9 +2,6 @@
 
 #include "software/ai/hl/stp/play/free_kick/free_kick_play_fsm.h"
 
-/**
- * A Play for Direct Free kicks
- */
 class FreeKickPlay : public Play
 {
    public:
