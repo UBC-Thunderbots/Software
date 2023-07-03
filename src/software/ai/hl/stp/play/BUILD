@@ -10,6 +10,10 @@ cc_library(
     name = "ball_placement_play",
     srcs = ["ball_placement_play.cpp"],
     hdrs = ["ball_placement_play.h"],
+    # TODO (#2619) Remove tag to run in parallel
+    tags = [
+        "exclusive",
+    ],
     deps = [
         ":play",
         "//shared:constants",
