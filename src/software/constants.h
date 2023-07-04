@@ -53,7 +53,7 @@ const std::string ROBOT_BATTERY_VOLTAGE_REDIS_KEY   = "/battery_voltage";
 const std::string ROBOT_CAPACITOR_VOLTAGE_REDIS_KEY = "/cap_voltage";
 
 const std::string SSL_VISION_ADDRESS          = "224.5.23.2";
-static constexpr unsigned int SSL_VISION_PORT = 10020;
+static constexpr unsigned int SSL_VISION_PORT = 10006;
 
 const std::string SSL_REFEREE_ADDRESS          = "224.5.23.1";
 static constexpr unsigned int SSL_REFEREE_PORT = 10003;
