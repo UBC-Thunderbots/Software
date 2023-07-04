@@ -18,7 +18,7 @@ class BreakbeamLabel(QLabel):
     Extension of a QLabel which displays a tooltip and updates the UI with the current status
     """
 
-    BREAKBEAM_BORDER = "border: 2px solid black"
+    BREAKBEAM_BORDER = "border: 1px solid black"
 
     def __init__(self):
         """
@@ -139,7 +139,7 @@ class RobotInfo(QWidget):
 
         # Layout containing the Vision Pattern and breakbeam indicator
         self.robot_model_layout = QVBoxLayout()
-        self.robot_model_layout.setContentsMargins(0, 15, 5, 10)
+        self.robot_model_layout.setContentsMargins(0, 5, 5, 0)
 
         # Vision Pattern
         self.color_vision_pattern = self.create_vision_pattern(
@@ -153,8 +153,8 @@ class RobotInfo(QWidget):
 
         # breakbeam indicator above robot
         self.breakbeam_label = BreakbeamLabel()
-        self.breakbeam_label.setFixedWidth(self.robot_model.sizeHint().width())
-        self.breakbeam_label.setFixedHeight(self.robot_model.sizeHint().width() * 0.25)
+        self.breakbeam_label.setFixedWidth(self.color_vision_pattern.width())
+        self.breakbeam_label.setFixedHeight(self.color_vision_pattern.width() * 0.25)
 
         self.robot_model_layout.addWidget(self.breakbeam_label)
         self.robot_model_layout.addWidget(self.robot_model)

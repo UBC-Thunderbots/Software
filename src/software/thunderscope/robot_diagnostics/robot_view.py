@@ -149,6 +149,7 @@ class RobotView(QScrollArea):
             self.layout.addWidget(robot_view_widget)
             self.robot_last_crash_time_s.append(0)
 
+
         # ignore repeated crash proto
         self.ROBOT_CRASH_TIMEOUT_S = 5
 
