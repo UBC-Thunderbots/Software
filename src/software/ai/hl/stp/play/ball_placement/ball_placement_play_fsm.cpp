@@ -44,17 +44,11 @@ void BallPlacementPlayFSM::placeBall(const Update &event)
     std::optional<Point> placement_point =
         event.common.world.gameState().getBallPlacementPoint();
 
-    Vector final_orientation;
+    Vector placement_dribble_direction;
     if (placement_point.has_value())
     {
-        // retreat 0.5m (+ buffer), between ball and friendly goal.
-        final_orientation =
-            (placement_point.value() - event.common.world.field().friendlyGoalCenter())
-                .normalize();
-        if (final_orientation.x() != 0.0)
-        {
-            final_angle = Angle::atan(final_orientation.y() / final_orientation.x());
-        }
+        placement_dribble_orientation = placement_point.value() - event.common.world.ball().position();
+        final_angle = placement_dribble_orientation.orientation()
     }
 
     // setup ball placement tactic for ball placing robot
@@ -77,16 +71,25 @@ void BallPlacementPlayFSM::retreat(const Update &event)
     Point ball_pos = event.common.world.ball().position();
 
     // retreat 0.5m (+ buffer), between ball and friendly goal.
+    Angle final_angle = Angle::zero();
+    std::optional<Point> placement_point =
+            event.common.world.gameState().getBallPlacementPoint();
+
+    Vector final_vector;
+    if (placement_point.has_value()) {
+        final_orientation =
+                (placement_point.value() - event.common.world.field().friendlyGoalCenter())
+                        .normalize();
+        final_angle = final_vector.orientation();
+    }
+
     Vector retreat_direction =
         (event.common.world.field().friendlyGoalCenter() - ball_pos).normalize();
     Point retreat_position =
         ball_pos + retreat_direction * (0.5 + ROBOT_MAX_RADIUS_METERS);
 
-    Angle current_angle =
-        event.common.world.friendlyTeam().getNearestRobot(ball_pos)->orientation();
-
     // setup ball placement tactic for ball placing robot
-    retreat_tactic->updateControlParams(retreat_position, current_angle, 0.0);
+    retreat_tactic->updateControlParams(retreat_position, final_angle, 0.0);
     tactics_to_run[0].emplace_back(retreat_tactic);
 
     event.common.set_tactics(tactics_to_run);
