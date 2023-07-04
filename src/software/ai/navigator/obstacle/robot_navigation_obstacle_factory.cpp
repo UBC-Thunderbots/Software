@@ -135,7 +135,7 @@ RobotNavigationObstacleFactory::createStaticObstaclesFromMotionConstraint(
             obstacles.push_back(std::make_shared<GeomObstacle<Polygon>>(
                 Polygon::fromSegment(Segment(friendly_goal.negXPosYCorner(),
                                              friendly_goal.negXNegYCorner()),
-                                     goal_obstacle_radius)));
+                                     goal_obstacle_radius))); // TODO: Shift this closer to the edge so path cant go behind net
             break;
         }
         case TbotsProto::MotionConstraint::MotionConstraint_INT_MIN_SENTINEL_DO_NOT_USE_:;

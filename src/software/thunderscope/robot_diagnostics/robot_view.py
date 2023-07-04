@@ -1,3 +1,5 @@
+import logging
+
 import pyqtgraph as pg
 import time
 from google.protobuf import text_format
@@ -171,6 +173,15 @@ class RobotView(QScrollArea):
         robot_status = self.robot_status_buffer.get(block=False, return_cached=False)
 
         while robot_status is not None:
+            if robot_status.robot_id >= len(self.robot_view_widgets):
+                logging.warning(
+                    f"Received robot status for robot id {robot_status.robot_id} which is greater than the maximum number of robots supported (={len(self.robot_view_widgets)})"
+                )
+                robot_status = self.robot_status_buffer.get(
+                    block=False, return_cached=False
+                )
+                continue
+
             self.robot_view_widgets[robot_status.robot_id].update(robot_status)
             robot_status = self.robot_status_buffer.get(
                 block=False, return_cached=False
@@ -188,6 +199,8 @@ class RobotView(QScrollArea):
                     + f"exit_signal: {robot_crash.exit_signal}\n"
                     + f"stack_dump: {robot_crash.stack_dump}"
                 )
-                dialog = RobotCrashDialog(robot_crash_text, robot_crash)
+                # dialog = RobotCrashDialog(robot_crash_text, robot_crash)
                 # dialog.exec()
+                logging.warning("Robot crash log received!!!\n\n" + robot_crash_text)
+
             self.robot_last_crash_time_s[robot_crash.robot_id] = time.time()

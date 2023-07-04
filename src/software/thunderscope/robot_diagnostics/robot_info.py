@@ -341,7 +341,7 @@ class RobotInfo(QWidget):
             self.battery_warning_disabled = False
 
         for code in error_codes:
-            if code != ErrorCode.NO_ERROR:
+            if code != ErrorCode.NO_ERROR and code in ERROR_CODE_MESSAGES.keys():
                 # QMessageBox.warning(
                 #     self,
                 #     f"Warning: {ERROR_CODE_MESSAGES[code]}",
