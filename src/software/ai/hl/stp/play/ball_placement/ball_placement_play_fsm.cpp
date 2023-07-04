@@ -123,7 +123,10 @@ void BallPlacementPlayFSM::retreat(const Update &event)
         ball_pos + retreat_direction * (0.5 + ROBOT_MAX_RADIUS_METERS);
 
     // setup ball placement tactic for ball placing robot
-    retreat_tactic->updateControlParams(retreat_position, final_angle, 0.0);
+    retreat_tactic->updateControlParams(retreat_position, final_angle, 0.0,
+                                        TbotsProto::DribblerMode::OFF, TbotsProto::BallCollisionType::AVOID,
+                                        {AutoChipOrKickMode::OFF, 0},
+                                        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0);
     tactics_to_run[0].emplace_back(retreat_tactic);
 
     event.common.set_tactics(tactics_to_run);
