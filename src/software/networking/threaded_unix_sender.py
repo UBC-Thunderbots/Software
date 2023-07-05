@@ -51,7 +51,12 @@ class ThreadedUnixSender:
         while not self.stop:
             proto = self.proto_buffer.get(block=True, return_cached=False)
             if proto is not None:
-                send = proto.SerializeToString()
+                try:
+                    send = proto.SerializeToString()
+                except Exception:
+                    logging.warning("Failed to serialize proto to send over unix socket")
+                    continue
+
                 try:
                     self.socket.sendto(send, self.unix_path)
                 except Exception:
