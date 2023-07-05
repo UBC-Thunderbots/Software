@@ -11,7 +11,8 @@ PossessionTracker::PossessionTracker(const TbotsProto::PossessionTrackerConfig &
       time_near_threshold(Duration::fromSeconds(config.time_near_threshold_s())),
       time_far_threshold(Duration::fromSeconds(config.time_far_threshold_s())),
       time_stagnant_threshold(Duration::fromSeconds(config.time_stagnant_threshold_s())),
-      time_ball_stagnant_threshold(Duration::fromSeconds(config.time_ball_stagnant_threshold_s())),
+      time_ball_stagnant_threshold(
+          Duration::fromSeconds(config.time_ball_stagnant_threshold_s())),
       last_timestamp(Timestamp::fromSeconds(0)),
       time_near_friendly(Duration::fromSeconds(0)),
       time_near_enemy(Duration::fromSeconds(0)),
@@ -96,7 +97,7 @@ void PossessionTracker::updateTimes(const Team &friendly_team, const Team &enemy
     Duration delta_time = ball.timestamp() - last_timestamp;
     last_timestamp      = ball.timestamp();
 
-    // Check whether the ball moved and update the amount of time 
+    // Check whether the ball moved and update the amount of time
     // since the ball last moved
     if (distance(ball.position(), last_ball_position) > ball_moved_threshold_meters)
     {
@@ -117,7 +118,7 @@ void PossessionTracker::updateTimes(const Team &friendly_team, const Team &enemy
         // No enemy threats, so zero time spent near and away from enemy.
         // This will ensure that the friendly team has possession.
         time_near_enemy = Duration::fromSeconds(0);
-        time_far_enemy = Duration::fromSeconds(0);
+        time_far_enemy  = Duration::fromSeconds(0);
         return;
     }
 
@@ -126,7 +127,7 @@ void PossessionTracker::updateTimes(const Team &friendly_team, const Team &enemy
         // No friendly robots, so zero time spent near and away from friendly team.
         // This will ensure that the enemy team has possession.
         time_near_friendly = Duration::fromSeconds(0);
-        time_far_friendly = Duration::fromSeconds(0);
+        time_far_friendly  = Duration::fromSeconds(0);
         return;
     }
 

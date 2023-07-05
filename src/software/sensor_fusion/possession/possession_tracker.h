@@ -55,7 +55,8 @@ class PossessionTracker
     // Min time that team must hold possession for in order to be considered stagnant
     Duration time_stagnant_threshold;
 
-    // Min time that the ball must stay still in order for possession to be considered stagnant
+    // Min time that the ball must stay still in order for possession to be considered
+    // stagnant
     Duration time_ball_stagnant_threshold;
 
     // The timestamp of last game snapshot the PossessionTracker was updated with
