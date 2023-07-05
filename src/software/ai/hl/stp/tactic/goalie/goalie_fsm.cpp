@@ -223,13 +223,10 @@ void GoalieFSM::updatePivotKick(
 
     // if goalie is in dead zone, retreat back into defense area
     if (ball_in_dead_zone) {
-        if (event.common.world.ball().position().y() >= event.common.world.field().friendlyDefenseArea().yMax()) {
-            chip_origin = event.common.world.field().friendlyDefenseArea().posXPosYCorner();
-        } else if ((event.common.world.ball().position().y() <= event.common.world.field().friendlyDefenseArea().yMin())) {
-            chip_origin = event.common.world.field().friendlyDefenseArea().posXNegYCorner();
-        } else {
-            chip_origin = closestPoint(event.common.world.field().friendlyDefenseArea(), event.common.world.friendlyTeam().goalie()->position());
-        }
+        Point defense_area_center = event.common.world.field().friendlyDefenseArea().centre();
+        Vector retreat_direction = (defense_area_center - event.common.world.ball().position()).normalize();
+        Point closest_point = closestPoint(event.common.world.field().friendlyDefenseArea(), event.common.world.friendlyTeam().goalie()->position());
+        chip_origin = closest_point + retreat_direction * 2 * ROBOT_MAX_RADIUS_METERS;
     }
 
     Vector chip_vector = chip_target - chip_origin;
