@@ -34,15 +34,21 @@ direction LR
 [*] --> StartState
 StartState --> KickOffWallState : [shouldKickOffWall]
 [*] --> StartState
-StartState --> PlaceBallState : [!shouldKickOffWall]
-KickOffWallState --> PlaceBallState : [!shouldKickOffWall]
+StartState --> AlignPlacementState : [!shouldKickOffWall]
+KickOffWallState --> AlignPlacementState : [!shouldKickOffWall]
 KickOffWallState --> KickOffWallState : [!kickDone]\n<i>kickOffWall</i>
 KickOffWallState --> StartState : [kickDone]
+AlignPlacementState --> KickOffWallState : [shouldKickOffWall]\n<i>kickOffWall</i>
+AlignPlacementState --> AlignPlacementState : [!alignDone]\n<i>alignPlacement</i>
+AlignPlacementState --> PlaceBallState : [alignDone]
 PlaceBallState --> StartState : [shouldKickOffWall]
 PlaceBallState --> PlaceBallState : [!ballPlaced]\n<i>placeBall</i>
-PlaceBallState --> RetreatState : [ballPlaced]\n<i>retreat</i>
-RetreatState --> StartState : [!ballPlaced]
-RetreatState --> Terminate:::terminate : [ballPlaced]\n<i>retreat</i>
+PlaceBallState --> WaitState : [ballPlaced]\n<i>startWait</i>
+WaitState --> WaitState : [!waitDone]
+WaitState --> RetreatState : [waitDone]
+RetreatState --> Terminate:::terminate : [retreatDone_G&&ballPlaced]
+RetreatState --> RetreatState : [!ballPlaced]\n<i>placeBall</i>
+RetreatState --> RetreatState : [ballPlaced]\n<i>retreat</i>
 Terminate:::terminate --> StartState : [!ballPlaced]
 
 ```
@@ -254,6 +260,7 @@ classDef terminate fill:white,color:black,font-weight:bold
 direction LR
 [*] --> PositionToBlock
 PositionToBlock --> MoveToGoalLine : [shouldMoveToGoalLine]\n<i>moveToGoalLine</i>
+PositionToBlock --> PivotKickFSM : [shouldEvacuateCrease]\n<i>updatePivotKick</i>
 PositionToBlock --> Panic : [shouldPanic]\n<i>panic</i>
 PositionToBlock --> PivotKickFSM : [shouldPivotChip]\n<i>updatePivotKick</i>
 PositionToBlock --> PositionToBlock : <i>positionToBlock</i>
@@ -262,8 +269,8 @@ Panic --> PivotKickFSM : [shouldPivotChip]\n<i>updatePivotKick</i>
 Panic --> PositionToBlock : [panicDone]\n<i>positionToBlock</i>
 Panic --> Panic : <i>panic</i>
 PivotKickFSM --> MoveToGoalLine : [shouldMoveToGoalLine]\n<i>moveToGoalLine</i>
-PivotKickFSM --> PivotKickFSM : [ballInDefenseArea]\n<i>updatePivotKick</i>
-PivotKickFSM --> PositionToBlock : [!ballInDefenseArea]\n<i>positionToBlock</i>
+PivotKickFSM --> PivotKickFSM : [ballInInflatedDefenseArea]\n<i>updatePivotKick</i>
+PivotKickFSM --> PositionToBlock : [!ballInInflatedDefenseArea]\n<i>positionToBlock</i>
 MoveToGoalLine --> MoveToGoalLine : [shouldMoveToGoalLine]\n<i>moveToGoalLine</i>
 MoveToGoalLine --> PositionToBlock : [!shouldMoveToGoalLine]\n<i>positionToBlock</i>
 Terminate:::terminate --> Terminate:::terminate
