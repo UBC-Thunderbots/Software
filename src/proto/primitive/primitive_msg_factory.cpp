@@ -120,6 +120,8 @@ double convertMaxAllowedSpeedModeToMaxAllowedSpeed(
     {
         case TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT:
             return robot_constants.robot_max_speed_m_per_s;
+        case TbotsProto::MaxAllowedSpeedMode::CLOSE_CONTROL:
+            return robot_constants.robot_max_speed_while_dribbling_m_per_s;
         case TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND:
             return STOP_COMMAND_ROBOT_MAX_SPEED_METERS_PER_SECOND;
         case TbotsProto::MaxAllowedSpeedMode::COLLISIONS_ALLOWED:
