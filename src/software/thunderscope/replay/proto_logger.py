@@ -141,10 +141,6 @@ class ProtoLogger(object):
 
     @staticmethod
     def create_log_entry(proto, current_time):
-        if proto.DESCRIPTOR.full_name == "SSLProto.SSL_WrapperPacket":
-            del proto.detections.robots_blue[0].x
-        else:
-            print(f"{proto.DESCRIPTOR.full_name} != \"SSLProto.SSL_WrapperPacket\"")
         serialized_proto = base64.b64encode(proto.SerializeToString())
         log_entry = (
                 f"{current_time}{REPLAY_METADATA_DELIMETER}"
