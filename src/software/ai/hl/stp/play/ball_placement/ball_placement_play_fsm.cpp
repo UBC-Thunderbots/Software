@@ -93,6 +93,11 @@ void BallPlacementPlayFSM::placeBall(const Update &event)
     event.common.set_tactics(tactics_to_run);
 }
 
+void BallPlacementPlayFSM::startWait(const Update &event)
+{
+    start_time = std::chrono::system_clock::now();
+}
+
 void BallPlacementPlayFSM::retreat(const Update &event)
 {
     PriorityTacticVector tactics_to_run = {{}};
@@ -174,6 +179,12 @@ bool BallPlacementPlayFSM::ballPlaced(const Update &event)
     {
         return true;
     }
+}
+
+bool BallPlacementPlayFSM::waitDone(const Update &event)
+{
+    std::chrono::time_point<std::chrono::system_clock> current_time = std::chrono::system_clock::now();
+    return static_cast<double>(std::chrono::duration_cast<std::chrono::seconds>(current_time - start_time).count()) > 3.0;
 }
 
 Angle BallPlacementPlayFSM::calculateWallKickoffAngle(const Point &ball_pos,

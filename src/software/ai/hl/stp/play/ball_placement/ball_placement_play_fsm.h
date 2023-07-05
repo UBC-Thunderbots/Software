@@ -7,6 +7,7 @@
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/ai/hl/stp/tactic/pivot_kick/pivot_kick_tactic.h"
 #include "software/ai/passing/eighteen_zone_pitch_division.h"
+#include <chrono>
 
 
 using Zones = std::unordered_set<EighteenZoneId>;
@@ -17,6 +18,7 @@ struct BallPlacementPlayFSM
     class KickOffWallState;
     class AlignPlacementState;
     class PlaceBallState;
+    class WaitState;
     class RetreatState;
 
     struct ControlParams
@@ -54,6 +56,13 @@ struct BallPlacementPlayFSM
      * @param event the BallPlacementPlayFSM Update event
      */
     void placeBall(const Update& event);
+
+    /**
+     * Action that waits stationary 5 seconds for the dribbler to stop spinning
+     *
+     * @param event the BallPlacementPlayFSM Update event
+     */
+    void startWait(const Update& event);
 
     /**
      * Action that has the placing robot retreat after placing the ball
@@ -100,6 +109,13 @@ struct BallPlacementPlayFSM
     bool ballPlaced(const Update& event);
 
     /**
+     * Guard on whether the robot has waited stationary for 5 seconds
+     * @param event the BallPlacementPlayFSM Update event
+     * @return whether the robot has waited for 5 seconds
+     */
+    bool waitDone(const Update& event);
+
+    /**
      * Helper function for calculating the angle to kick the ball off of a wall
      *
      * @param ball_pos
@@ -125,18 +141,21 @@ struct BallPlacementPlayFSM
         DEFINE_SML_STATE(KickOffWallState)
         DEFINE_SML_STATE(AlignPlacementState)
         DEFINE_SML_STATE(PlaceBallState)
+        DEFINE_SML_STATE(WaitState)
         DEFINE_SML_STATE(RetreatState)
         DEFINE_SML_EVENT(Update)
 
         DEFINE_SML_ACTION(alignPlacement)
         DEFINE_SML_ACTION(placeBall)
         DEFINE_SML_ACTION(kickOffWall)
+        DEFINE_SML_ACTION(startWait)
         DEFINE_SML_ACTION(retreat)
 
         DEFINE_SML_GUARD(shouldKickOffWall)
         DEFINE_SML_GUARD(alignDone)
         DEFINE_SML_GUARD(kickDone)
         DEFINE_SML_GUARD(ballPlaced)
+        DEFINE_SML_GUARD(waitDone)
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
@@ -146,11 +165,14 @@ struct BallPlacementPlayFSM
             KickOffWallState_S + Update_E[!kickDone_G] / kickOffWall_A =
                 KickOffWallState_S,
             KickOffWallState_S + Update_E[kickDone_G]                = StartState_S,
+            AlignPlacementState_S + Update_E[shouldKickOffWall_G] / kickOffWall_A = KickOffWallState_S,
             AlignPlacementState_S + Update_E[!alignDone_G] / alignPlacement_A = AlignPlacementState_S,
             AlignPlacementState_S + Update_E[alignDone_G] = PlaceBallState_S,
             PlaceBallState_S + Update_E[shouldKickOffWall_G]         = StartState_S,
             PlaceBallState_S + Update_E[!ballPlaced_G] / placeBall_A = PlaceBallState_S,
-            PlaceBallState_S + Update_E[ballPlaced_G] / retreat_A    = RetreatState_S,
+            PlaceBallState_S + Update_E[ballPlaced_G] / startWait_A    = WaitState_S,
+            WaitState_S + Update_E[waitDone_G] / retreat_A = RetreatState_S,
+            WaitState_S + Update_E[!waitDone_G] = WaitState_S,
             RetreatState_S + Update_E[!ballPlaced_G]                 = StartState_S,
             RetreatState_S + Update_E[ballPlaced_G] / retreat_A      = X,
             X + Update_E[!ballPlaced_G]                              = StartState_S);
@@ -164,6 +186,7 @@ struct BallPlacementPlayFSM
     std::shared_ptr<MoveTactic> retreat_tactic;
     std::vector<std::shared_ptr<PlaceBallMoveTactic>> move_tactics;
     Point setup_point;
+    std::chrono::time_point<std::chrono::system_clock> start_time;
     constexpr static double const SHOT_VELOCITY_THRESHOLD_M_PER_S = 1.0;
     constexpr static double const WALL_KICKOFF_VELOCITY_M_PER_S   = 3.0;
 };
