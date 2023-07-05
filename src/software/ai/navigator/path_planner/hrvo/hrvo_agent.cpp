@@ -662,7 +662,7 @@ Vector HRVOAgent::computePreferredVelocity(Duration time_step)
         // was 0.25m. More detail about the tests can be found on Notion from Apr 28,
         // 2023.
         double distance_for_kp      = std::max(0.25, local_error.length());
-        kp                          = 2.3 / (distance_for_kp + 0.4) + 1.5;
+        kp                          = 2.0 / (distance_for_kp + 0.2) + 0.9;
         prev_dynamic_kp_destination = destination;
     }
 

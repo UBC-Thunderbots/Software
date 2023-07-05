@@ -1,3 +1,5 @@
+import logging
+
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtWidgets import *
@@ -16,7 +18,7 @@ class BreakbeamLabel(QLabel):
     Extension of a QLabel which displays a tooltip and updates the UI with the current status
     """
 
-    BREAKBEAM_BORDER = "border: 2px solid black"
+    BREAKBEAM_BORDER = "border: 1px solid black"
 
     def __init__(self):
         """
@@ -137,7 +139,7 @@ class RobotInfo(QWidget):
 
         # Layout containing the Vision Pattern and breakbeam indicator
         self.robot_model_layout = QVBoxLayout()
-        self.robot_model_layout.setContentsMargins(0, 15, 5, 10)
+        self.robot_model_layout.setContentsMargins(0, 5, 5, 0)
 
         # Vision Pattern
         self.color_vision_pattern = self.create_vision_pattern(
@@ -151,8 +153,8 @@ class RobotInfo(QWidget):
 
         # breakbeam indicator above robot
         self.breakbeam_label = BreakbeamLabel()
-        self.breakbeam_label.setFixedWidth(self.robot_model.sizeHint().width())
-        self.breakbeam_label.setFixedHeight(self.robot_model.sizeHint().width() * 0.25)
+        self.breakbeam_label.setFixedWidth(self.color_vision_pattern.width())
+        self.breakbeam_label.setFixedHeight(self.color_vision_pattern.width() * 0.25)
 
         self.robot_model_layout.addWidget(self.breakbeam_label)
         self.robot_model_layout.addWidget(self.robot_model)
@@ -328,19 +330,21 @@ class RobotInfo(QWidget):
             power_status.battery_voltage <= BATTERY_WARNING_VOLTAGE
             and not self.battery_warning_disabled
         ):
-            QMessageBox.information(
-                self,
-                "Battery Voltage Alert",
-                f"robot {self.robot_id} voltage is {power_status.battery_voltage}",
-            )
+            # QMessageBox.information(
+            #     self,
+            #     "Battery Voltage Alert",
+            #     f"robot {self.robot_id} voltage is {power_status.battery_voltage}",
+            # )
+            logging.warning(f"Battery Voltage Alert\n\nrobot {self.robot_id} voltage is {power_status.battery_voltage}")
             self.battery_warning_disabled = True
         elif power_status.battery_voltage > BATTERY_WARNING_VOLTAGE:
             self.battery_warning_disabled = False
 
         for code in error_codes:
-            if code != ErrorCode.NO_ERROR:
-                QMessageBox.warning(
-                    self,
-                    f"Warning: {ERROR_CODE_MESSAGES[code]}",
-                    f"{ERROR_CODE_MESSAGES[code]} warning for robot {self.robot_id}",
-                )
+            if code != ErrorCode.NO_ERROR and code in ERROR_CODE_MESSAGES.keys():
+                # QMessageBox.warning(
+                #     self,
+                #     f"Warning: {ERROR_CODE_MESSAGES[code]}",
+                #     f"{ERROR_CODE_MESSAGES[code]} warning for robot {self.robot_id}",
+                # )
+                logging.warning(f"WARNING ERROR CODE FROM ROBOT {self.robot_id}: {ERROR_CODE_MESSAGES[code]} {ERROR_CODE_MESSAGES[code]}")

@@ -6,6 +6,7 @@
 #include "proto/robot_status_msg.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
 #include "proto/world.pb.h"
+#include "shared/constants.h"
 #include "shared/robot_constants.h"
 #include "software/jetson_nano/services/network/proto_tracker.h"
 #include "software/networking/threaded_proto_udp_listener.hpp"
@@ -40,7 +41,10 @@ class NetworkService
 
    private:
     // Constants
-    static constexpr float PROTO_LOSS_WARNING_THRESHOLD = 0.1f;
+    static constexpr float PROTO_LOSS_WARNING_THRESHOLD          = 0.1f;
+    static constexpr unsigned int ROBOT_STATUS_BROADCAST_RATE_HZ = 30;
+    static constexpr double ROBOT_STATUS_TO_THUNDERLOOP_HZ_RATIO =
+        ROBOT_STATUS_BROADCAST_RATE_HZ / (CONTROL_LOOP_HZ + 1.0);
 
     // Variables
     TbotsProto::PrimitiveSet primitive_set_msg;
@@ -54,6 +58,8 @@ class NetworkService
         listener_primitive_set;
     std::unique_ptr<ThreadedProtoUdpListener<TbotsProto::World>> listener_world;
 
+    unsigned int network_ticks     = 0;
+    unsigned int thunderloop_ticks = 0;
 
     // Functions to callback primitiveSet and world and stores them in a variable
     void primitiveSetCallback(TbotsProto::PrimitiveSet input);
@@ -62,4 +68,7 @@ class NetworkService
     // ProtoTrackers for tracking recent primitive_set and world loss
     ProtoTracker primitive_tracker;
     ProtoTracker world_tracker;
+
+    // track last breakbeam state for sending RobotStatus outside of specified rate
+    bool last_breakbeam_state_sent = false;
 };

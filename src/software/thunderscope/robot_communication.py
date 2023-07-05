@@ -1,13 +1,14 @@
 from software.py_constants import *
 from software.thunderscope.constants import ROBOT_COMMUNICATIONS_TIMEOUT_S
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
-from software.thunderscope.constants import IndividualRobotMode
+from software.thunderscope.constants import IndividualRobotMode, EstopMode
 from software.python_bindings import *
 from queue import Empty
 from proto.import_all_protos import *
 from pyqtgraph.Qt import QtCore
 import threading
 import time
+import os
 
 
 class RobotCommunication(object):
@@ -19,8 +20,8 @@ class RobotCommunication(object):
         current_proto_unix_io,
         multicast_channel,
         interface,
-        disable_estop,
-        estop_path,
+        estop_mode,
+        estop_path=None,
         estop_buadrate=115200,
     ):
         """Initialize the communication with the robots
@@ -28,7 +29,7 @@ class RobotCommunication(object):
         :param current_proto_unix_io: the current proto unix io object
         :param multicast_channel: The multicast channel to use
         :param interface: The interface to use
-        :param disable_estop: whether to disable estop checks (ONLY FOR TESTING LOCALLY)
+        :param estop_mode: what estop mode we are running right now, of type EstopMode
         :param estop_path: The path to the estop
         :param estop_baudrate: The baudrate of the estop
 
@@ -38,8 +39,14 @@ class RobotCommunication(object):
         self.current_proto_unix_io = current_proto_unix_io
         self.multicast_channel = str(multicast_channel)
         self.interface = interface
-        self.disable_estop = disable_estop
-        self.estop_path = estop_path
+        self.estop_mode = estop_mode
+        # if estop path is passed in use that
+        # else, use different estop based on what is plugged in
+        self.estop_path = (
+            estop_path
+            if estop_path
+            else ("/dev/ttyACM0" if os.path.isfile("/dev/ttyACM0") else "/dev/ttyUSB0")
+        )
         self.estop_buadrate = estop_buadrate
 
         self.running = False
@@ -73,8 +80,17 @@ class RobotCommunication(object):
             target=self.run_primitive_set, daemon=True
         )
 
-        # only checks for estop if checking is not disabled
-        if not self.disable_estop:
+        # initialising the estop
+        # tries to access a plugged in estop. if not found, throws an exception
+        # if using keyboard estop, skips this step
+        self.estop_reader = None
+        self.estop_is_playing = False
+        # when the estop has just been stopped,
+        # we want to send a stop primitive once to all currently connected robots
+        self.should_send_stop = False
+
+        # only checks for estop if we are in physical estop mode
+        if self.estop_mode == EstopMode.PHYSICAL_ESTOP:
             try:
                 self.estop_reader = ThreadedEstopReader(
                     self.estop_path, self.estop_buadrate
@@ -83,12 +99,50 @@ class RobotCommunication(object):
                 raise Exception("Could not find estop, make sure its plugged in")
 
     def __send_estop_state(self):
-        if not self.disable_estop:
-            while self.running:
+        """
+        Constant loop which sends the current estop status proto if estop is not disabled
+        Uses the keyboard estop value
+        Unless estop is plugged in, in which case the physical estop value overrides it
+        """
+        if self.estop_mode != EstopMode.DISABLE_ESTOP:
+            while True:
+                if self.estop_mode == EstopMode.PHYSICAL_ESTOP:
+                    self.estop_is_playing = self.estop_reader.isEstopPlay()
+                    self.should_send_stop = not self.estop_is_playing
+
                 self.current_proto_unix_io.send_proto(
-                    EstopState, EstopState(is_playing=self.estop_reader.isEstopPlay())
+                    EstopState, EstopState(is_playing=self.estop_is_playing)
                 )
                 time.sleep(0.1)
+
+    def toggle_keyboard_estop(self):
+        """
+        If keyboard estop is being used, toggles the estop state
+        And sends a message to the console
+        """
+        if self.estop_mode == EstopMode.KEYBOARD_ESTOP:
+            self.estop_is_playing = not self.estop_is_playing
+            self.should_send_stop = not self.estop_is_playing
+
+            print(
+                "Keyboard Estop changed from "
+                + (
+                    str(EstopStates.PLAY)
+                    if self.estop_is_playing
+                    else str(EstopStates.STOP)
+                )
+            )
+
+    def should_send_primitive(self):
+        """
+        Returns True if the proto sending threads should send a proto
+        :return: boolean
+        """
+        return (
+            self.estop_mode != EstopMode.DISABLE_ESTOP
+            and self.estop_is_playing
+            and (self.robots_connected_to_fullsystem or self.robots_connected_to_manual)
+        )
 
     def run_world(self):
         """
@@ -107,15 +161,7 @@ class RobotCommunication(object):
             except Empty:
                 # if empty do nothing
                 pass
-            if (
-                world
-                and not self.disable_estop
-                and self.estop_reader.isEstopPlay()
-                and (
-                    self.robots_connected_to_fullsystem
-                    or self.robots_connected_to_manual
-                )
-            ):
+            if world and self.should_send_primitive():
                 # send the world proto
                 self.send_world.send_proto(world)
 
@@ -151,7 +197,9 @@ class RobotCommunication(object):
                 fullsystem_primitives = dict(primitive_set.robot_primitives)
                 for robot_id in fullsystem_primitives.keys():
                     if robot_id in self.robots_connected_to_fullsystem:
-                        robot_primitives[robot_id] = fullsystem_primitives[robot_id]
+                        robot_primitives[robot_id] = self.__reduce_primitive_size(
+                            fullsystem_primitives[robot_id]
+                        )
 
             # get the manual control primitive
             diagnostics_primitive = DirectControlPrimitive(
@@ -178,21 +226,20 @@ class RobotCommunication(object):
             primitive_set = PrimitiveSet(
                 time_sent=Timestamp(epoch_timestamp_seconds=time.time()),
                 stay_away_from_ball=False,
-                robot_primitives=robot_primitives,
+                robot_primitives=robot_primitives
+                if not self.should_send_stop
+                else {
+                    robot_id: Primitive(stop=StopPrimitive())
+                    for robot_id in robot_primitives.keys()
+                },
                 sequence_number=self.sequence_number,
             )
 
             self.sequence_number += 1
 
-            if (
-                not self.disable_estop
-                and self.estop_reader.isEstopPlay()
-                and (
-                    self.robots_connected_to_fullsystem
-                    or self.robots_connected_to_manual
-                )
-            ):
+            if self.should_send_primitive() or self.should_send_stop:
                 self.send_primitive_set.send_proto(primitive_set)
+                self.should_send_stop = False
 
             # sleep if not running fullsystem
             if not self.robots_connected_to_fullsystem:
@@ -224,6 +271,21 @@ class RobotCommunication(object):
         """
         if self.running:
             self.current_proto_unix_io.send_proto(type, data)
+
+    def __reduce_primitive_size(self, primitive):
+        """
+        Reduces the size of the primitive by removing the static obstacles
+        :param primitive: the primitive to be reduced
+        :return: The reduced primitive
+        """
+
+        # The static_obstacles array is the largest part of the Primitive proto.
+        # Since it is not used by the robots, we will remove all values from its
+        # array.
+        if primitive.HasField("move"):
+            del primitive.move.motion_control.static_obstacles[:]
+
+        return primitive
 
     def setup_for_fullsystem(self):
         """
@@ -278,6 +340,13 @@ class RobotCommunication(object):
             self.multicast_channel + "%" + self.interface,
             HRVO_VISUALIZATION_PORT,
             lambda data: self.current_proto_unix_io.send_proto(HRVOVisualization, data),
+            True,
+        )
+
+        self.receive_robot_crash = RobotCrashProtoListener(
+            self.multicast_channel + "%" + self.interface,
+            ROBOT_CRASH_PORT,
+            lambda data: self.current_proto_unix_io.send_proto(RobotCrash, data),
             True,
         )
 

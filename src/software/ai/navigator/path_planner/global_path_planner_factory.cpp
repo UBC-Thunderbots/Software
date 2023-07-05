@@ -52,10 +52,9 @@ GlobalPathPlannerFactory::GlobalPathPlannerFactory(
         {
             auto obstacles = obstacle_factory.createStaticObstaclesFromMotionConstraints(
                 static_motion_constraints, field);
-            planners.emplace(std::make_pair(
-                static_motion_constraints,
-                std::make_shared<EnlsvgPathPlanner>(field.fieldBoundary(), obstacles,
-                                                    ROBOT_MAX_RADIUS_METERS)));
+            planners.emplace(std::make_pair(static_motion_constraints,
+                                            std::make_shared<EnlsvgPathPlanner>(
+                                                field.fieldBoundary(), obstacles, 0)));
 
             google::protobuf::RepeatedPtrField<TbotsProto::Obstacles>
                 repeated_obstacle_proto;

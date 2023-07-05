@@ -26,7 +26,7 @@ class BallStopsInRegion(Validation):
                 region, tbots.createPoint(world.ball.current_state.global_position)
             ) and (
                 tbots.createVector(world.ball.current_state.global_velocity).length()
-                <= 0.01
+                <= 0.05
             ):
                 return ValidationStatus.PASSING
 

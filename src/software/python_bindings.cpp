@@ -9,6 +9,7 @@
 #include "proto/geometry.pb.h"
 #include "proto/message_translation/tbots_geometry.h"
 #include "proto/parameters.pb.h"
+#include "proto/robot_crash_msg.pb.h"
 #include "proto/robot_log_msg.pb.h"
 #include "proto/robot_status_msg.pb.h"
 #include "proto/ssl_gc_referee_message.pb.h"
@@ -328,6 +329,7 @@ PYBIND11_MODULE(python_bindings, m)
     declareThreadedProtoUdpListener<TbotsProto::RobotStatus>(m, "RobotStatus");
     declareThreadedProtoUdpListener<TbotsProto::RobotLog>(m, "RobotLog");
     declareThreadedProtoUdpListener<SSLProto::SSL_WrapperPacket>(m, "SSLWrapperPacket");
+    declareThreadedProtoUdpListener<TbotsProto::RobotCrash>(m, "RobotCrash");
 
     // Senders
     declareThreadedProtoUdpSender<TbotsProto::World>(m, "World");
@@ -339,4 +341,10 @@ PYBIND11_MODULE(python_bindings, m)
         m, "ThreadedEstopReader")
         .def(py::init<>(&createThreadedEstopReader))
         .def("isEstopPlay", &ThreadedEstopReader::isEstopPlay);
+
+    py::enum_<EstopState>(m, "EstopStates")
+        .value("STOP", EstopState::STOP)
+        .value("PLAY", EstopState::PLAY)
+        .value("STATUS_ERROR", EstopState::STATUS_ERROR)
+        .export_values();
 }

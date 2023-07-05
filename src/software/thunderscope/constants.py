@@ -51,6 +51,20 @@ class IndividualRobotMode(IntEnum):
     AI = 2
 
 
+class EstopMode(IntEnum):
+    """
+    Enum for the various estop modes we can run thunderscope in
+
+    DISABLE_ESTOP: No physical / keyboard estop is needed, but we cannot send anything over the network
+    KEYBOARD_ESTOP: The spacebar can be used as an estop toggle instead of a physical estop
+    ESTOP: A physical estop is needed to run thunderscope, throws an exception if none is plugged in
+    """
+
+    DISABLE_ESTOP = 0
+    KEYBOARD_ESTOP = 1
+    PHYSICAL_ESTOP = 2
+
+
 LINE_WIDTH = 3
 SPEED_LINE_WIDTH = 2
 SPEED_SEGMENT_SCALE = 0.2
