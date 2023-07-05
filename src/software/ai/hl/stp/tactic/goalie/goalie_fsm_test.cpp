@@ -90,6 +90,7 @@ TEST(GoalieFSMTest, test_transitions)
     TbotsProto::AiConfig ai_config;
     FSM<GoalieFSM> fsm(DribbleFSM(ai_config.dribble_tactic_config()),
                        GoalieFSM(ai_config.goalie_tactic_config(),
+                                 ai_config.robot_navigation_obstacle_config(),
                                  TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT));
 
     // goalie starts in PositionToBlock
@@ -187,9 +188,31 @@ TEST(GoalieFSMTest, test_transitions)
                 TEST_UTIL_CREATE_MOTION_CONTROL_NO_DEST)));
     EXPECT_TRUE(fsm.is(boost::sml::state<PivotKickFSM>));
 
-    // ball is now moving quickly towards the friendly goal
+    world = ::TestUtil::setBallPosition(world, Point(0, 0), Timestamp::fromSeconds(124));
+    world = ::TestUtil::setBallVelocity(world, Vector(0, 0), Timestamp::fromSeconds(124));
+
+    // goalie should return to PositionToBlock
+    fsm.process_event(GoalieFSM::Update(
+        {}, TacticUpdate(
+                goalie, world, [](std::unique_ptr<TbotsProto::Primitive>) {},
+                TEST_UTIL_CREATE_MOTION_CONTROL_NO_DEST)));
+    EXPECT_TRUE(fsm.is(boost::sml::state<GoalieFSM::PositionToBlock>));
+
+    TbotsProto::GoalieTacticConfig goalie_tactic_config;
+    goalie_tactic_config.set_safe_distance_multiplier(5.0);
+
+    // ball is far away from the defense area
+    Point point_in_dead_zone =
+        Point(world.field().friendlyDefenseArea().xMax() + BALL_MAX_RADIUS_METERS * 2, 0);
+    world = ::TestUtil::setBallPosition(world, point_in_dead_zone,
+                                        Timestamp::fromSeconds(125));
     world =
-        ::TestUtil::setBallPosition(world, Point(-3.5, 1), Timestamp::fromSeconds(124));
-    world =
-        ::TestUtil::setBallVelocity(world, Vector(-2, -1), Timestamp::fromSeconds(124));
+        ::TestUtil::setBallVelocity(world, Vector(0, -0), Timestamp::fromSeconds(125));
+
+    // goalie should enter PivotKickFSM
+    fsm.process_event(GoalieFSM::Update(
+        {}, TacticUpdate(
+                goalie, world, [](std::unique_ptr<TbotsProto::Primitive>) {},
+                TEST_UTIL_CREATE_MOTION_CONTROL_NO_DEST)));
+    EXPECT_TRUE(fsm.is(boost::sml::state<PivotKickFSM>));
 }

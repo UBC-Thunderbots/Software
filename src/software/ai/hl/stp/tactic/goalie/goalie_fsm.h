@@ -38,9 +38,12 @@ struct GoalieFSM
      * @param goalie_tactic_config The config to fetch parameters from
      * @param max_allowed_speed_mode The maximum allowed speed mode
      */
-    explicit GoalieFSM(TbotsProto::GoalieTacticConfig goalie_tactic_config,
-                       TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode)
+    explicit GoalieFSM(
+        TbotsProto::GoalieTacticConfig goalie_tactic_config,
+        TbotsProto::RobotNavigationObstacleConfig robot_navigation_obstacle_config,
+        TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode)
         : goalie_tactic_config(goalie_tactic_config),
+          robot_navigation_obstacle_config(robot_navigation_obstacle_config),
           max_allowed_speed_mode(max_allowed_speed_mode)
     {
     }
@@ -88,6 +91,15 @@ struct GoalieFSM
         const World &world, const TbotsProto::GoalieTacticConfig &goalie_tactic_config);
 
     /**
+     * Guard that checks if the goalie should leave the crease the intercept the ball
+     * when it is stuck in the dead zone right that exists right outside of the crease
+     *
+     * @param event
+     * @return if the goalie should leave the crease
+     */
+    bool shouldEvacuateCrease(const Update &event);
+
+    /**
      * Guard that checks if the ball is moving faster than the time_to_panic threshold
      * and has a clear path to the goal, if both are true then the goalie should panic
      * and move to block the ball
@@ -121,6 +133,14 @@ struct GoalieFSM
      * @return if the goalie should stop panicking
      */
     bool panicDone(const Update &event);
+
+    /**
+     * Action that prompts the goalie to leave the crease momentarily to chip the ball
+     * away
+     *
+     * @param event
+     */
+    void evacuateCrease(const Update &event);
 
     /**
      * Action that updates the MovePrimitive to time_to_panic and stop the ball
@@ -158,7 +178,7 @@ struct GoalieFSM
      *
      * @param event GoalieFSM::Update event
      */
-    bool ballInDefenseArea(const Update &event);
+    bool ballInInflatedDefenseArea(const Update &event);
 
     auto operator()()
     {
@@ -171,8 +191,9 @@ struct GoalieFSM
 
         DEFINE_SML_EVENT(Update)
 
-        DEFINE_SML_GUARD(ballInDefenseArea)
+        DEFINE_SML_GUARD(ballInInflatedDefenseArea)
         DEFINE_SML_GUARD(panicDone)
+        DEFINE_SML_GUARD(shouldEvacuateCrease)
         DEFINE_SML_GUARD(shouldPivotChip)
         DEFINE_SML_GUARD(shouldPanic)
         DEFINE_SML_GUARD(shouldMoveToGoalLine)
@@ -186,6 +207,8 @@ struct GoalieFSM
             // src_state + event [guard] / action = dest_state
             *PositionToBlock_S + Update_E[shouldMoveToGoalLine_G] / moveToGoalLine_A =
                 MoveToGoalLine_S,
+            PositionToBlock_S + Update_E[shouldEvacuateCrease_G] / updatePivotKick_A =
+                PivotKickFSM_S,
             PositionToBlock_S + Update_E[shouldPanic_G] / panic_A = Panic_S,
             PositionToBlock_S + Update_E[shouldPivotChip_G] / updatePivotKick_A =
                 PivotKickFSM_S,
@@ -197,8 +220,8 @@ struct GoalieFSM
             Panic_S + Update_E / panic_A,
             PivotKickFSM_S + Update_E[shouldMoveToGoalLine_G] / moveToGoalLine_A =
                 MoveToGoalLine_S,
-            PivotKickFSM_S + Update_E[ballInDefenseArea_G] / updatePivotKick_A,
-            PivotKickFSM_S + Update_E[!ballInDefenseArea_G] / positionToBlock_A =
+            PivotKickFSM_S + Update_E[ballInInflatedDefenseArea_G] / updatePivotKick_A,
+            PivotKickFSM_S + Update_E[!ballInInflatedDefenseArea_G] / positionToBlock_A =
                 PositionToBlock_S,
             MoveToGoalLine_S + Update_E[shouldMoveToGoalLine_G] / moveToGoalLine_A =
                 MoveToGoalLine_S,
@@ -210,6 +233,7 @@ struct GoalieFSM
    private:
     // the goalie tactic config
     TbotsProto::GoalieTacticConfig goalie_tactic_config;
+    TbotsProto::RobotNavigationObstacleConfig robot_navigation_obstacle_config;
     // The maximum allowed speed mode
     TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode;
 };
