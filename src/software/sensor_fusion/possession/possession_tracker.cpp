@@ -7,14 +7,18 @@
 PossessionTracker::PossessionTracker(const TbotsProto::PossessionTrackerConfig &config)
     : distance_near_tolerance_meters(config.distance_near_tolerance_meters()),
       distance_far_tolerance_meters(config.distance_far_tolerance_meters()),
+      ball_moved_threshold_meters(config.ball_moved_threshold_meters()),
       time_near_threshold(Duration::fromSeconds(config.time_near_threshold_s())),
       time_far_threshold(Duration::fromSeconds(config.time_far_threshold_s())),
       time_stagnant_threshold(Duration::fromSeconds(config.time_stagnant_threshold_s())),
+      time_ball_stagnant_threshold(Duration::fromSeconds(config.time_ball_stagnant_threshold_s())),
       last_timestamp(Timestamp::fromSeconds(0)),
       time_near_friendly(Duration::fromSeconds(0)),
       time_near_enemy(Duration::fromSeconds(0)),
       time_far_friendly(Duration::fromSeconds(0)),
       time_far_enemy(Duration::fromSeconds(0)),
+      time_since_ball_moved(Duration::fromSeconds(0)),
+      last_ball_position(Point()),
       possession(TeamPossession::FRIENDLY_TEAM)
 {
 }
@@ -37,7 +41,8 @@ TeamPossession PossessionTracker::getTeamWithPossession(const Team &friendly_tea
     else if ((time_near_friendly < time_near_threshold) &&
              (time_near_enemy > time_near_threshold))
     {
-        if (time_near_enemy < time_stagnant_threshold)
+        if (time_near_enemy < time_stagnant_threshold &&
+            time_since_ball_moved < time_ball_stagnant_threshold)
         {
             possession = TeamPossession::ENEMY_TEAM;
         }
@@ -91,11 +96,37 @@ void PossessionTracker::updateTimes(const Team &friendly_team, const Team &enemy
     Duration delta_time = ball.timestamp() - last_timestamp;
     last_timestamp      = ball.timestamp();
 
+    // Check whether the ball moved and update the amount of time 
+    // since the ball last moved
+    if (distance(ball.position(), last_ball_position) > ball_moved_threshold_meters)
+    {
+        time_since_ball_moved = Duration::fromSeconds(0);
+    }
+    else
+    {
+        time_since_ball_moved = time_since_ball_moved + delta_time;
+    }
+    last_ball_position = ball.position();
+
     auto nearest_friendly =
         getRobotWithEffectiveBallPossession(friendly_team, ball, field);
     auto nearest_enemy = getRobotWithEffectiveBallPossession(enemy_team, ball, field);
-    if (!nearest_friendly || !nearest_enemy)
+
+    if (!nearest_enemy)
     {
+        // No enemy threats, so zero time spent near and away from enemy.
+        // This will ensure that the friendly team has possession.
+        time_near_enemy = Duration::fromSeconds(0);
+        time_far_enemy = Duration::fromSeconds(0);
+        return;
+    }
+
+    if (!nearest_friendly)
+    {
+        // No friendly robots, so zero time spent near and away from friendly team.
+        // This will ensure that the enemy team has possession.
+        time_near_friendly = Duration::fromSeconds(0);
+        time_far_friendly = Duration::fromSeconds(0);
         return;
     }
 

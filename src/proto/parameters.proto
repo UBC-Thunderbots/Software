@@ -401,4 +401,17 @@ message PossessionTrackerConfig
         (bounds).min_double_value = 0.0,
         (bounds).max_double_value = 30.0
     ];
+
+    // Min distance in meters that ball must move between two timestamps
+    // for the ball to be considered moved
+    required double ball_moved_threshold_meters = 6
+        [default = 0.05, (bounds).min_double_value = 0.0, (bounds).max_double_value = 5.0];
+
+    // Min time that the ball must stay still in order for possession 
+    // to be considered stagnant
+    required double time_ball_stagnant_threshold_s = 7 [
+        default                   = 3.5,
+        (bounds).min_double_value = 0.0,
+        (bounds).max_double_value = 30.0
+    ];
 }
