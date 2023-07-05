@@ -6,6 +6,7 @@ BallPlacementPlayFSM::BallPlacementPlayFSM(TbotsProto::AiConfig ai_config)
       place_ball_tactic(std::make_shared<PlaceBallTactic>(ai_config)),
       align_placement_tactic(std::make_shared<MoveTactic>()),
       retreat_tactic(std::make_shared<MoveTactic>()),
+      stop_tactic(std::make_shared<StopTactic>()),
       move_tactics(std::vector<std::shared_ptr<PlaceBallMoveTactic>>())
 {
 }
@@ -98,6 +99,21 @@ void BallPlacementPlayFSM::startWait(const Update &event)
     start_time = std::chrono::system_clock::now();
 }
 
+void BallPlacementPlayFSM::waiting(const Update &event)
+{
+    PriorityTacticVector tactics_to_run = {{}};
+
+    // setup move tactics for robots away from ball placing robot
+    setupMoveTactics(event);
+    tactics_to_run[0].insert(tactics_to_run[0].end(), move_tactics.begin(),
+                             move_tactics.end());
+
+    // setup ball placement tactic for ball placing robot
+    tactics_to_run[0].emplace_back(stop_tactic);
+
+    event.common.set_tactics(tactics_to_run);
+}
+
 void BallPlacementPlayFSM::retreat(const Update &event)
 {
     PriorityTacticVector tactics_to_run = {{}};
@@ -122,13 +138,14 @@ void BallPlacementPlayFSM::retreat(const Update &event)
         final_angle = final_vector.orientation();
     }
 
-    Vector retreat_direction =
-        (event.common.world.field().friendlyGoalCenter() - ball_pos).normalize();
+    Angle robot_orientation = event.common.world.friendlyTeam().getNearestRobot(event.common.world.ball().position())->orientation();
+    Vector retreat_direction = -Vector::createFromAngle(robot_orientation);
+//        (event.common.world.field().friendlyGoalCenter() - ball_pos).normalize();
     Point retreat_position =
-        ball_pos + retreat_direction * (0.5 + ROBOT_MAX_RADIUS_METERS);
+        ball_pos + retreat_direction.normalize(1.5 + ROBOT_MAX_RADIUS_METERS);
 
     // setup ball placement tactic for ball placing robot
-    retreat_tactic->updateControlParams(retreat_position, final_angle, 0.0,
+    retreat_tactic->updateControlParams(retreat_position, robot_orientation, 0.0,
                                         TbotsProto::DribblerMode::OFF, TbotsProto::BallCollisionType::AVOID,
                                         {AutoChipOrKickMode::OFF, 0},
                                         TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0);
@@ -172,7 +189,7 @@ bool BallPlacementPlayFSM::ballPlaced(const Update &event)
     // see if the ball is at the placement destination
     if (placement_point.has_value())
     {
-        return comparePoints(ball_pos, placement_point.value(), 0.05) &&
+        return comparePoints(ball_pos, placement_point.value(), 0.15) &&
                event.common.world.ball().velocity().length() < 0.1;
     }
     else
@@ -190,7 +207,7 @@ bool BallPlacementPlayFSM::waitDone(const Update &event)
 bool BallPlacementPlayFSM::retreatDone(const Update &event)
 {
     Point ball_position = event.common.world.ball().position();
-    return distance(ball_position, event.common.world.friendlyTeam().getNearestRobot(ball_position)->position()) > 0.5;
+    return distance(ball_position, event.common.world.friendlyTeam().getNearestRobot(ball_position)->position()) > 0.55;
 }
 
 Angle BallPlacementPlayFSM::calculateWallKickoffAngle(const Point &ball_pos,

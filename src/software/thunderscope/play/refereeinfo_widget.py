@@ -73,18 +73,29 @@ class RefereeInfoWidget(QWidget):
             else:
                 team_info.append(team_info_name)
 
+        text = ""
         for info in team_info:
             if info == "yellowCardTimes":
-                text = ""
-                for time in referee_msg_dict["blue"]["yellowCardTimes"]:
-                    formatted_time = int(time * SECONDS_PER_MICROSECOND)
-                    text = text + str(formatted_time) + ", "
-                blue.append(text)
-                text = ""
-                for time in referee_msg_dict["yellow"]["yellowCardTimes"]:
-                    formatted_time = int(time * SECONDS_PER_MICROSECOND)
-                    text = text + str(formatted_time) + ", "
-                yellow.append(text)
+                pass
+                # for time in referee_msg_dict["blue"]["yellowCardTimes"]:
+                #     formatted_time = int(time * SECONDS_PER_MICROSECOND)
+                #     text = text + str(formatted_time) + ", "
+                # blue.append(text)
+                # text = ""
+                # for time in referee_msg_dict["yellow"]["yellowCardTimes"]:
+                #     formatted_time = int(time * SECONDS_PER_MICROSECOND)
+                #     text = text + str(formatted_time) + ", "
+                # yellow.append(text)
+                # text = ""
+                # for time in referee_msg_dict["blue"]["yellowCardTimes"]:
+                #     formatted_time = int(time * SECONDS_PER_MICROSECOND)
+                #     text = text + str(formatted_time) + ", "
+                # blue.append(text)
+                # text = ""
+                # for time in referee_msg_dict["yellow"]["yellowCardTimes"]:
+                #     formatted_time = int(time * SECONDS_PER_MICROSECOND)
+                #     text = text + str(formatted_time) + ", "
+                # yellow.append(text)
             elif info == "remainingTimeouts":
                 blue.append(referee_msg_dict["blue"]["timeouts"])
                 yellow.append(referee_msg_dict["yellow"]["timeouts"])

@@ -6,6 +6,7 @@
 #include "software/ai/hl/stp/tactic/dribble/dribble_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/ai/hl/stp/tactic/pivot_kick/pivot_kick_tactic.h"
+#include "software/ai/hl/stp/tactic/stop/stop_tactic.h"
 #include "software/ai/passing/eighteen_zone_pitch_division.h"
 #include <chrono>
 
@@ -140,6 +141,8 @@ struct BallPlacementPlayFSM
      */
     void setupMoveTactics(const Update& event);
 
+    void waiting(const Update &event);
+
     auto operator()()
     {
         using namespace boost::sml;
@@ -157,6 +160,7 @@ struct BallPlacementPlayFSM
         DEFINE_SML_ACTION(kickOffWall)
         DEFINE_SML_ACTION(startWait)
         DEFINE_SML_ACTION(retreat)
+        DEFINE_SML_ACTION(waiting)
 
         DEFINE_SML_GUARD(shouldKickOffWall)
         DEFINE_SML_GUARD(alignDone)
@@ -179,12 +183,12 @@ struct BallPlacementPlayFSM
             PlaceBallState_S + Update_E[shouldKickOffWall_G]         = StartState_S,
             PlaceBallState_S + Update_E[!ballPlaced_G] / placeBall_A = PlaceBallState_S,
             PlaceBallState_S + Update_E[ballPlaced_G] / startWait_A    = WaitState_S,
-            WaitState_S + Update_E[!waitDone_G] = WaitState_S,
+            WaitState_S + Update_E[!waitDone_G] / waiting_A = WaitState_S,
             WaitState_S + Update_E[waitDone_G] = RetreatState_S,
             RetreatState_S + Update_E[retreatDone_G && ballPlaced_G] = X,
-            RetreatState_S + Update_E[!ballPlaced_G] / placeBall_A   = RetreatState_S,
-            RetreatState_S + Update_E[ballPlaced_G] / retreat_A     = RetreatState_S,
-            X + Update_E[!ballPlaced_G]                              = StartState_S);
+//            RetreatState_S + Update_E[!ballPlaced_G] / placeBall_A   = RetreatState_S,
+            RetreatState_S + Update_E[ballPlaced_G] / retreat_A     = RetreatState_S);
+//            X + Update_E[!ballPlaced_G]                              = StartState_S);
     }
 
    private:
@@ -193,6 +197,7 @@ struct BallPlacementPlayFSM
     std::shared_ptr<PlaceBallTactic> place_ball_tactic;
     std::shared_ptr<MoveTactic> align_placement_tactic;
     std::shared_ptr<MoveTactic> retreat_tactic;
+    std::shared_ptr<StopTactic> stop_tactic;
     std::vector<std::shared_ptr<PlaceBallMoveTactic>> move_tactics;
     Point setup_point;
     std::chrono::time_point<std::chrono::system_clock> start_time;
