@@ -37,7 +37,6 @@ void ShootOrPassPlayFSM::updateOffensivePositioningTactics(
     for (unsigned int i = 0; i < offensive_positioning_tactics.size(); i++)
     {
         auto pass1 = pass_eval.getBestPassInZones({ranked_zones[i]}).pass;
-
         offensive_positioning_tactics[i]->updateControlParams(
             pass1.receiverPoint(), pass1.receiverOrientation(), 0.0,
             TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
@@ -54,12 +53,13 @@ void ShootOrPassPlayFSM::lookForPass(const Update& event)
         auto pitch_division =
             std::make_shared<const EighteenZonePitchDivision>(event.common.world.field());
 
-        auto pass_eval    = pass_generator.generatePassEvaluation(event.common.world);
-        auto ranked_zones = pass_eval.rankZonesForReceiving(
-            event.common.world, event.common.world.ball().position());
+        auto pass_eval = pass_generator.generatePassEvaluation(event.common.world);
 
-        best_pass_and_score_so_far = pass_eval.getBestPassOnField();
+        auto best_pass_score_and_zone = pass_eval.getBestPassAndZoneOnField();
+        best_pass_zone                = best_pass_score_and_zone.first;
+        best_pass_and_score_so_far    = best_pass_score_and_zone.second;
 
+        auto ranked_zones = getBestOffensivePositions(pass_eval, event);
 
         // Wait for a good pass by starting out only looking for "perfect" passes
         // (with a score of 1) and decreasing this threshold over time
@@ -69,11 +69,9 @@ void ShootOrPassPlayFSM::lookForPass(const Update& event)
         double pass_score_ramp_down_duration =
             ai_config.shoot_or_pass_play_config().pass_score_ramp_down_duration();
         pass_eval = pass_generator.generatePassEvaluation(event.common.world);
-        best_pass_and_score_so_far = pass_eval.getBestPassOnField();
 
         // update the best pass in the attacker tactic
         attacker_tactic->updateControlParams(best_pass_and_score_so_far.pass, false);
-
         // If we've assigned a robot as the passer in the PassGenerator, we
         // lower our threshold based on how long the PassGenerator has been
         // running since we set it
@@ -84,7 +82,7 @@ void ShootOrPassPlayFSM::lookForPass(const Update& event)
                              pass_score_ramp_down_duration,
                          1.0 - abs_min_pass_score);
         updateOffensivePositioningTactics(ranked_zones, pass_eval,
-                                          event.common.num_tactics - 1);
+                                          event.common.num_tactics - 2);
 
         ret_tactics[1].insert(ret_tactics[1].end(), offensive_positioning_tactics.begin(),
                               offensive_positioning_tactics.end());
@@ -100,12 +98,22 @@ void ShootOrPassPlayFSM::startLookingForPass(const Update& event)
     lookForPass(event);
 }
 
+vector<EighteenZoneId> ShootOrPassPlayFSM::getBestOffensivePositions(
+    PassEvaluation<EighteenZoneId> pass_eval, const Update& event)
+{
+    auto ranked_zones = pass_eval.rankZonesForReceiving(
+        event.common.world, best_pass_and_score_so_far.pass.receiverPoint());
+    ranked_zones.erase(
+        std::remove(ranked_zones.begin(), ranked_zones.end(), best_pass_zone),
+        ranked_zones.end());
+    return ranked_zones;
+}
+
 void ShootOrPassPlayFSM::takePass(const Update& event)
 {
     auto pass_eval = pass_generator.generatePassEvaluation(event.common.world);
 
-    auto ranked_zones = pass_eval.rankZonesForReceiving(
-        event.common.world, best_pass_and_score_so_far.pass.receiverPoint());
+    auto ranked_zones = getBestOffensivePositions(pass_eval, event);
 
     // if we make it here then we have committed to the pass
     attacker_tactic->updateControlParams(best_pass_and_score_so_far.pass, true);
