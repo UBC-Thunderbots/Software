@@ -1,0 +1,69 @@
+name: Tbots CI
+
+on:
+  push:
+    branches: [ robocup_2023 ]
+  pull_request:
+    branches: [ robocup_2023 ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  software-tests:
+    name: Software Tests
+    runs-on: ubuntu-20.04
+    steps:
+      # checks-out the repository under $GITHUB_WORKSPACE
+      - uses: actions/checkout@v2
+
+      - name: Environment Setup
+        run: |
+          "${GITHUB_WORKSPACE}"/environment_setup/setup_software.sh
+
+      - name: Software Test
+        run: |
+          cd src
+          bazel build --show_timestamps       \
+            -- //... -//software:unix_full_system \
+            -//software/simulated_tests/...  \
+            -//software/ai/hl/...            \
+            -//software/field_tests/...      \
+
+  jetson-nano-tests:
+    name: Jetson Nano Software Tests
+    runs-on: ubuntu-20.04
+    steps:
+      # checks-out the repository under $GITHUB_WORKSPACE
+      - uses: actions/checkout@v2
+
+      - name: Environment Setup
+        run: |
+          "${GITHUB_WORKSPACE}"/environment_setup/setup_software.sh
+
+      - name: Jetson Nano Build
+        run: |
+         cd src
+         bazel build --cpu=jetson_nano //software/jetson_nano:thunderloop_main
+
+  simulated-gameplay-tests:
+    name: Simulated Gameplay Tests
+    runs-on: ubuntu-20.04
+    steps:
+      # checks-out the repository under $GITHUB_WORKSPACE
+      - uses: actions/checkout@v2
+        
+      - name: Environment Setup
+        run: |
+          "${GITHUB_WORKSPACE}"/environment_setup/setup_software.sh
+
+      - name: Simulated Test Run 1 (Continue on error)
+        # make sure that replays are uploaded even if tests fail
+        continue-on-error: true
+        run: |
+          cd src
+          bazel build --show_timestamps       \
+            //software:unix_full_system           \
+            //software/simulated_tests/...   \
+            //software/ai/hl/...

@@ -684,6 +684,74 @@ TEST_F(TestEnlsvgPathPlanner, test_going_around_defense_area)
     TestUtil::checkPathDoesNotIntersectObstacle(path.value(), obstacle_polygons);
 }
 
+// TODO (#2913): ENLSVG can not find a path from above defense area to below
+TEST_F(TestEnlsvgPathPlanner, DISABLED_test_going_from_above_enemy_defense_area_to_below)
+{
+    World world = ::TestUtil::createBlankTestingWorld(TbotsProto::FieldType::DIV_B);
+    const Field& field       = world.field();
+    Rectangle navigable_area = field.fieldBoundary();
+
+    // Above defense area
+    Point start{4, 2};
+    // Below defense area
+    Point dest{4, -2};
+
+    std::vector<ObstaclePtr> obstacles =
+        robot_navigation_obstacle_factory.createFromMotionConstraint(
+            TbotsProto::MotionConstraint::INFLATED_ENEMY_DEFENSE_AREA, world);
+
+    EnlsvgPathPlanner planner =
+        EnlsvgPathPlanner(navigable_area, obstacles, ROBOT_MAX_RADIUS_METERS);
+    std::optional<Path> path = planner.findPath(start, dest);
+
+    ASSERT_TRUE(path != std::nullopt);
+
+    // Make sure the start and end points match
+    EXPECT_EQ(start, path.value().front());
+    EXPECT_EQ(dest, path.value().back());
+
+    // Make sure path does not exceed a bounding box
+    Rectangle bounding_box({3, 3}, {4.5, -3});
+    TestUtil::checkPathDoesNotExceedBoundingBox(path.value(), bounding_box);
+    TestUtil::checkPathDoesNotIntersectObstacle(path.value(), obstacles);
+}
+
+TEST_F(TestEnlsvgPathPlanner, test_going_from_below_enemy_defense_area_to_above)
+{
+    World world = ::TestUtil::createBlankTestingWorld(TbotsProto::FieldType::DIV_B);
+    const Field& field       = world.field();
+    Rectangle navigable_area = field.fieldBoundary();
+
+    // Below defense area
+    Point start{4, -2};
+    // Above defense area
+    Point dest{4, 2};
+
+    // Inflated defense area that robots try to avoid
+    std::vector<ObstaclePtr> inflated_defense_area =
+        robot_navigation_obstacle_factory.createFromMotionConstraint(
+            TbotsProto::MotionConstraint::INFLATED_ENEMY_DEFENSE_AREA, world);
+    // Actual enemy defense area which we must avoid going through
+    std::vector<ObstaclePtr> defense_area =
+        robot_navigation_obstacle_factory.createFromMotionConstraint(
+            TbotsProto::MotionConstraint::ENEMY_DEFENSE_AREA, world);
+
+    EnlsvgPathPlanner planner =
+        EnlsvgPathPlanner(navigable_area, inflated_defense_area, ROBOT_MAX_RADIUS_METERS);
+    std::optional<Path> path = planner.findPath(start, dest);
+
+    ASSERT_TRUE(path != std::nullopt);
+
+    // Make sure the start and end points match
+    EXPECT_EQ(start, path.value().front());
+    EXPECT_EQ(dest, path.value().back());
+
+    // Make sure path does not exceed a bounding box
+    Rectangle bounding_box({3, 3}, {4.5, -3});
+    TestUtil::checkPathDoesNotExceedBoundingBox(path.value(), bounding_box);
+    TestUtil::checkPathDoesNotIntersectObstacle(path.value(), defense_area);
+}
+
 TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_speed_test)
 {
     // This test does not assert anything. It prints how long it takes to path plan 121
@@ -842,4 +910,28 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_enemy_ball_placement)
     EXPECT_EQ(2, path.value().size());
     EXPECT_EQ(start, path.value().front());
     EXPECT_LE(distance(path.value().back(), dest), 0.1);
+}
+
+TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_friendly_goal_motion_constraint)
+{
+    // Simulate a path where the goalie is slightly inside the friendly goal and will need
+    // to path plan to the corner of the field.
+    Field field = Field::createSSLDivisionBField();
+
+    // Goalie inside the friendly goal touching the ball wall going to the corner
+    Point start{-4.59, 0}, dest{-4.6, -3};
+
+    std::vector<ObstaclePtr> obstacles = {
+        robot_navigation_obstacle_factory.createStaticObstaclesFromMotionConstraints(
+            {TbotsProto::MotionConstraint::FRIENDLY_GOAL}, field),
+    };
+    Rectangle navigable_area = field.fieldBoundary();
+    EnlsvgPathPlanner planner =
+        EnlsvgPathPlanner(navigable_area, obstacles, field.boundaryMargin());
+    auto path = planner.findPath(start, dest);
+    EXPECT_TRUE(path != std::nullopt);
+
+    // Check that the robot goes around the net when going from inside the net to a corner
+    // on friendly side of the field
+    TestUtil::checkPathDoesNotIntersectObstacle(path.value(), obstacles);
 }

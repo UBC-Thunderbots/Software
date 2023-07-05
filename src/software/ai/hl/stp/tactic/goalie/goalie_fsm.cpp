@@ -2,6 +2,7 @@
 
 #include "software/ai/evaluation/find_open_areas.h"
 #include "software/math/math_functions.h"
+#include "software/geom/algorithms/closest_point.h"
 
 Point GoalieFSM::getGoaliePositionToBlock(
     const Ball &ball, const Field &field,
@@ -110,6 +111,39 @@ Point GoalieFSM::findGoodChipTarget(
     return chip_target;
 }
 
+bool GoalieFSM::shouldEvacuateCrease(const Update &event)
+{
+    Rectangle friendly_defense_area = event.common.world.field().friendlyDefenseArea();
+    Ball ball                       = event.common.world.ball();
+
+    // calculate inflated crease obstacle
+    double robot_radius_expansion_amount =
+        ROBOT_MAX_RADIUS_METERS *
+        robot_navigation_obstacle_config.robot_obstacle_inflation_factor();
+    Rectangle inflated_defense_area =
+        friendly_defense_area.expand(robot_radius_expansion_amount);
+
+    bool ball_in_dead_zone =
+        !contains(friendly_defense_area, ball.position()) &&
+        contains(friendly_defense_area.expand(robot_radius_expansion_amount),
+                 ball.position());
+
+    // goalie should only evacuate crease if there are no enemy robots nearby
+    double safe_distance_multiplier = goalie_tactic_config.safe_distance_multiplier();
+    double nearest_enemy_distance_to_ball = distance(
+        event.common.world.enemyTeam().getNearestRobot(ball.position())->position(),
+        ball.position());
+    double goalie_distance_to_ball =
+        distance(event.common.world.friendlyTeam().goalie()->position(), ball.position());
+    bool safe_to_evacuate = nearest_enemy_distance_to_ball * safe_distance_multiplier >
+                            goalie_distance_to_ball;
+
+    double ball_velocity_threshold = goalie_tactic_config.ball_speed_panic();
+    bool ball_is_stagnant          = ball.velocity().length() < ball_velocity_threshold;
+
+    return ball_in_dead_zone && ball_is_stagnant && safe_to_evacuate;
+}
+
 bool GoalieFSM::shouldPanic(const Update &event)
 {
     double ball_speed_panic = goalie_tactic_config.ball_speed_panic();
@@ -152,7 +186,7 @@ void GoalieFSM::panic(const Update &event)
         (event.common.world.ball().position() - goalie_pos).orientation();
 
     event.common.set_primitive(createMovePrimitive(
-        CREATE_MOTION_CONTROL(goalie_pos), goalie_orientation, 0.0,
+        CREATE_MOTION_CONTROL(goalie_pos), goalie_orientation, 0.0, false,
         TbotsProto::DribblerMode::OFF, TbotsProto::BallCollisionType::ALLOW,
         AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS},
         max_allowed_speed_mode, 0.0, event.common.robot.robotConstants()));
@@ -170,6 +204,31 @@ void GoalieFSM::updatePivotKick(
     Point chip_origin = Point(chip_origin_x, event.common.world.ball().position().y());
 
     Point chip_target  = findGoodChipTarget(event.common.world, goalie_tactic_config);
+
+    // check if goalie is outside defense area, inside inflated defense area
+    Rectangle friendly_defense_area = event.common.world.field().friendlyDefenseArea();
+    Ball ball                       = event.common.world.ball();
+
+    // calculate inflated crease obstacle
+    double robot_radius_expansion_amount =
+            ROBOT_MAX_RADIUS_METERS *
+            robot_navigation_obstacle_config.robot_obstacle_inflation_factor();
+    Rectangle inflated_defense_area =
+            friendly_defense_area.expand(robot_radius_expansion_amount);
+
+    bool ball_in_dead_zone =
+            !contains(friendly_defense_area, ball.position()) &&
+            contains(friendly_defense_area.expand(robot_radius_expansion_amount),
+                     ball.position());
+
+    // if goalie is in dead zone, retreat back into defense area
+    if (ball_in_dead_zone) {
+        Point defense_area_center = event.common.world.field().friendlyDefenseArea().centre();
+        Vector retreat_direction = (defense_area_center - event.common.world.ball().position()).normalize();
+        Point closest_point = closestPoint(event.common.world.field().friendlyDefenseArea(), event.common.world.friendlyTeam().goalie()->position());
+        chip_origin = closest_point + retreat_direction * 2 * ROBOT_MAX_RADIUS_METERS;
+    }
+
     Vector chip_vector = chip_target - chip_origin;
 
     PivotKickFSM::ControlParams control_params{
@@ -195,16 +254,23 @@ void GoalieFSM::positionToBlock(const Update &event)
     auto goalie_final_speed = goalie_tactic_config.goalie_final_speed();
 
     event.common.set_primitive(createMovePrimitive(
-        CREATE_MOTION_CONTROL(goalie_pos), goalie_orientation, goalie_final_speed,
+        CREATE_MOTION_CONTROL(goalie_pos), goalie_orientation, goalie_final_speed, false,
         TbotsProto::DribblerMode::OFF, TbotsProto::BallCollisionType::ALLOW,
         AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS},
-        max_allowed_speed_mode, 0.0, event.common.robot.robotConstants()));
+        max_allowed_speed_mode, 0.0, event.common.robot.robotConstants(),
+        std::optional<double>()));
 }
 
-bool GoalieFSM::ballInDefenseArea(const Update &event)
+bool GoalieFSM::ballInInflatedDefenseArea(const Update &event)
 {
-    return contains(event.common.world.field().friendlyDefenseArea(),
-                    event.common.world.ball().position());
+    double robot_radius_expansion_amount =
+        ROBOT_MAX_RADIUS_METERS *
+        robot_navigation_obstacle_config.robot_obstacle_inflation_factor();
+    Rectangle inflated_defense_area =
+        event.common.world.field().friendlyDefenseArea().expand(
+            robot_radius_expansion_amount);
+
+    return contains(inflated_defense_area, event.common.world.ball().position());
 }
 
 bool GoalieFSM::shouldMoveToGoalLine(const Update &event)
@@ -216,8 +282,8 @@ void GoalieFSM::moveToGoalLine(const Update &event)
 {
     event.common.set_primitive(createMovePrimitive(
         CREATE_MOTION_CONTROL(event.common.world.field().friendlyGoalCenter()),
-        Angle::zero(), 0, TbotsProto::DribblerMode::OFF,
+        Angle::zero(), 0, false, TbotsProto::DribblerMode::OFF,
         TbotsProto::BallCollisionType::AVOID,
         AutoChipOrKick{AutoChipOrKickMode::OFF, 0.0}, max_allowed_speed_mode, 0.0,
-        event.common.robot.robotConstants()));
+        event.common.robot.robotConstants(), std::optional<double>()));
 }

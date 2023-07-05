@@ -4,12 +4,13 @@
 #include "software/logger/logger.h"
 
 std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
-    const TbotsProto::MotionControl& motion_control, const Angle& final_angle,
-    double final_speed, const TbotsProto::DribblerMode& dribbler_mode,
-    const TbotsProto::BallCollisionType& ball_collision_type,
-    const AutoChipOrKick& auto_chip_or_kick,
-    const TbotsProto::MaxAllowedSpeedMode& max_allowed_speed_mode,
-    double target_spin_rev_per_s, const RobotConstants_t& robot_constants,
+    const TbotsProto::MotionControl &motion_control, const Angle &final_angle,
+    double final_speed, bool should_drive_forward,
+    const TbotsProto::DribblerMode &dribbler_mode,
+    const TbotsProto::BallCollisionType &ball_collision_type,
+    const AutoChipOrKick &auto_chip_or_kick,
+    const TbotsProto::MaxAllowedSpeedMode &max_allowed_speed_mode,
+    double target_spin_rev_per_s, const RobotConstants_t &robot_constants,
     std::optional<double> cost_override)
 {
     auto move_primitive_msg = std::make_unique<TbotsProto::Primitive>();
@@ -26,6 +27,7 @@ std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
     move_primitive_msg->mutable_move()->set_max_speed_m_per_s(
         static_cast<float>(convertMaxAllowedSpeedModeToMaxAllowedSpeed(
             max_allowed_speed_mode, robot_constants)));
+    move_primitive_msg->mutable_move()->set_should_drive_forward(should_drive_forward);
 
     *(move_primitive_msg->mutable_move()->mutable_final_angle()) =
         *createAngleProto(final_angle);
@@ -67,8 +69,8 @@ std::unique_ptr<TbotsProto::Primitive> createStopPrimitive()
 }
 
 std::unique_ptr<TbotsProto::Primitive> createDirectControlPrimitive(
-    const Vector& velocity, AngularVelocity angular_velocity, double dribbler_speed_rpm,
-    const TbotsProto::AutoChipOrKick& auto_chip_or_kick)
+    const Vector &velocity, AngularVelocity angular_velocity, double dribbler_speed_rpm,
+    const TbotsProto::AutoChipOrKick &auto_chip_or_kick)
 {
     auto direct_control_primitive_msg = std::make_unique<TbotsProto::Primitive>();
     auto direct_velocity_control =
@@ -118,6 +120,8 @@ double convertMaxAllowedSpeedModeToMaxAllowedSpeed(
     {
         case TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT:
             return robot_constants.robot_max_speed_m_per_s;
+        case TbotsProto::MaxAllowedSpeedMode::CLOSE_CONTROL:
+            return robot_constants.robot_max_speed_while_dribbling_m_per_s;
         case TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND:
             return STOP_COMMAND_ROBOT_MAX_SPEED_METERS_PER_SECOND;
         case TbotsProto::MaxAllowedSpeedMode::COLLISIONS_ALLOWED:

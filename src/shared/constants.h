@@ -41,6 +41,7 @@ static const short unsigned int PRIMITIVE_PORT = 42070;
 static const short unsigned int ROBOT_STATUS_PORT       = 42071;
 static const short unsigned int ROBOT_LOGS_PORT         = 42072;
 static const short unsigned int HRVO_VISUALIZATION_PORT = 42073;
+static const short unsigned int ROBOT_CRASH_PORT        = 42074;
 
 // the port to listen to for what side of the field to defend
 static const unsigned DEFENDING_SIDE_PORT = 42073;
@@ -132,6 +133,11 @@ static const double CHICKER_TIMEOUT                = 3 * MILLISECONDS_PER_SECOND
 static const unsigned DIV_A_NUM_ROBOTS = 11;
 static const unsigned DIV_B_NUM_ROBOTS = 6;
 
+// Kick Spd to Pulse Width Safety Constraint Constants
+
+static const int MAX_KICK_CONSTANT       = 850;
+static const double MAX_KICK_COEFFICIENT = 0.4;
+
 // Arduino
 
 // UART baud rate used to communicate between system and arudino
@@ -162,6 +168,6 @@ static const char ARDUINO_PRODUCT_ID[ARDUINO_ID_LENGTH] = "0043";
 
 // Number of times the control loop should tick per trajectory element
 static const unsigned NUM_TICKS_PER_TRAJECTORY_ELEMENT = 4u;
-static const unsigned CONTROL_LOOP_HZ                  = 60u;
+static const unsigned CONTROL_LOOP_HZ                  = 100u;
 
 static const unsigned NUM_GENEVA_ANGLES = 5;

@@ -45,6 +45,8 @@ enum MotionConstraint
     AVOID_BALL_PLACEMENT_INTERFERENCE = 8 [(dynamic) = true];
     // The enemy half of the field without the centre circle
     ENEMY_HALF_WITHOUT_CENTRE_CIRCLE = 9;
+    // The friendly goal
+    FRIENDLY_GOAL = 10;
 }
 
 message MotionControl
@@ -71,6 +73,8 @@ enum MaxAllowedSpeedMode
     STOP_COMMAND = 1;
     // Move at speed at which collisions are allowed
     COLLISIONS_ALLOWED = 2;
+    // Move at lower speed limit while dribbling
+    CLOSE_CONTROL = 3;
 }
 
 message AutoChipOrKick
@@ -127,6 +131,9 @@ message MovePrimitive
     AutoChipOrKick auto_chip_or_kick      = 6;
     float target_spin_rev_per_s           = 7;
     BallCollisionType ball_collision_type = 8;
+    // Whether the robot should face the direction of intermediate path points
+    // (if there is any) or just the final destination
+    optional bool should_drive_forward = 9;
 }
 
 message StopPrimitive {}
