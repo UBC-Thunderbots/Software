@@ -34,13 +34,17 @@ direction LR
 [*] --> StartState
 StartState --> KickOffWallState : [shouldKickOffWall]
 [*] --> StartState
-StartState --> PlaceBallState : [!shouldKickOffWall]
-KickOffWallState --> PlaceBallState : [!shouldKickOffWall]
+StartState --> AlignPlacementState : [!shouldKickOffWall]
+KickOffWallState --> AlignPlacementState : [!shouldKickOffWall]
 KickOffWallState --> KickOffWallState : [!kickDone]\n<i>kickOffWall</i>
 KickOffWallState --> StartState : [kickDone]
+AlignPlacementState --> AlignPlacementState : [!alignDone]\n<i>alignPlacement</i>
+AlignPlacementState --> PlaceBallState : [alignDone]
 PlaceBallState --> StartState : [shouldKickOffWall]
 PlaceBallState --> PlaceBallState : [!ballPlaced]\n<i>placeBall</i>
-PlaceBallState --> RetreatState : [ballPlaced]\n<i>retreat</i>
+PlaceBallState --> WaitState : [ballPlaced]\n<i>startWait</i>
+WaitState --> RetreatState : [waitDone]\n<i>retreat</i>
+WaitState --> WaitState : [!waitDone]
 RetreatState --> StartState : [!ballPlaced]
 RetreatState --> Terminate:::terminate : [ballPlaced]\n<i>retreat</i>
 Terminate:::terminate --> StartState : [!ballPlaced]
