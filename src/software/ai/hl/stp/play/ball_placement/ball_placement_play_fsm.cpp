@@ -187,6 +187,12 @@ bool BallPlacementPlayFSM::waitDone(const Update &event)
     return static_cast<double>(std::chrono::duration_cast<std::chrono::seconds>(current_time - start_time).count()) > 3.0;
 }
 
+bool BallPlacementPlayFSM::retreatDone(const Update &event)
+{
+    Point ball_position = event.common.world.ball().position();
+    return distance(ball_position, event.common.world.friendlyTeam().getNearestRobot(ball_position)->position()) > 0.5;
+}
+
 Angle BallPlacementPlayFSM::calculateWallKickoffAngle(const Point &ball_pos,
                                                       const Rectangle &field_lines)
 {

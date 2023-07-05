@@ -116,6 +116,13 @@ struct BallPlacementPlayFSM
     bool waitDone(const Update& event);
 
     /**
+     * Guard on whether the robot has retreated outside of the required range
+     * @param event the BallPlacementPlayFSM Update event
+     * @return whether the robot has retreated outside of the required range
+     */
+    bool retreatDone(const Update& event);
+
+    /**
      * Helper function for calculating the angle to kick the ball off of a wall
      *
      * @param ball_pos
@@ -156,6 +163,7 @@ struct BallPlacementPlayFSM
         DEFINE_SML_GUARD(kickDone)
         DEFINE_SML_GUARD(ballPlaced)
         DEFINE_SML_GUARD(waitDone)
+        DEFINE_SML_GUARD(retreatDone)
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
@@ -171,10 +179,11 @@ struct BallPlacementPlayFSM
             PlaceBallState_S + Update_E[shouldKickOffWall_G]         = StartState_S,
             PlaceBallState_S + Update_E[!ballPlaced_G] / placeBall_A = PlaceBallState_S,
             PlaceBallState_S + Update_E[ballPlaced_G] / startWait_A    = WaitState_S,
-            WaitState_S + Update_E[waitDone_G] / retreat_A = RetreatState_S,
             WaitState_S + Update_E[!waitDone_G] = WaitState_S,
-            RetreatState_S + Update_E[!ballPlaced_G]                 = StartState_S,
-            RetreatState_S + Update_E[ballPlaced_G] / retreat_A      = X,
+            WaitState_S + Update_E[waitDone_G] = RetreatState_S,
+            RetreatState_S + Update_E[retreatDone_G && ballPlaced_G] = X,
+            RetreatState_S + Update_E[!ballPlaced_G] / placeBall_A   = RetreatState_S,
+            RetreatState_S + Update_E[ballPlaced_G] / retreat_A     = RetreatState_S,
             X + Update_E[!ballPlaced_G]                              = StartState_S);
     }
 
