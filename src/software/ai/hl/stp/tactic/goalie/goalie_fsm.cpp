@@ -2,6 +2,7 @@
 
 #include "software/ai/evaluation/find_open_areas.h"
 #include "software/math/math_functions.h"
+#include "software/geom/algorithms/closest_point.h"
 
 Point GoalieFSM::getGoaliePositionToBlock(
     const Ball &ball, const Field &field,
@@ -203,6 +204,34 @@ void GoalieFSM::updatePivotKick(
     Point chip_origin = Point(chip_origin_x, event.common.world.ball().position().y());
 
     Point chip_target  = findGoodChipTarget(event.common.world, goalie_tactic_config);
+
+    // check if goalie is outside defense area, inside inflated defense area
+    Rectangle friendly_defense_area = event.common.world.field().friendlyDefenseArea();
+    Ball ball                       = event.common.world.ball();
+
+    // calculate inflated crease obstacle
+    double robot_radius_expansion_amount =
+            ROBOT_MAX_RADIUS_METERS *
+            robot_navigation_obstacle_config.robot_obstacle_inflation_factor();
+    Rectangle inflated_defense_area =
+            friendly_defense_area.expand(robot_radius_expansion_amount);
+
+    bool ball_in_dead_zone =
+            !contains(friendly_defense_area, ball.position()) &&
+            contains(friendly_defense_area.expand(robot_radius_expansion_amount),
+                     ball.position());
+
+    // if goalie is in dead zone, retreat back into defense area
+    if (ball_in_dead_zone) {
+        if (event.common.world.ball().position().y() >= event.common.world.field().friendlyDefenseArea().yMax()) {
+            chip_origin = event.common.world.field().friendlyDefenseArea().posXPosYCorner();
+        } else if ((event.common.world.ball().position().y() <= event.common.world.field().friendlyDefenseArea().yMin())) {
+            chip_origin = event.common.world.field().friendlyDefenseArea().posXNegYCorner();
+        } else {
+            chip_origin = closestPoint(event.common.world.field().friendlyDefenseArea(), event.common.world.friendlyTeam().goalie()->position());
+        }
+    }
+
     Vector chip_vector = chip_target - chip_origin;
 
     PivotKickFSM::ControlParams control_params{
