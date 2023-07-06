@@ -112,14 +112,14 @@ struct CreaseDefenderFSM
      *
      * @param field The field that has the friendly defense area
      * @param ray The ray to intersect
-     * @param robot_obstacle_inflation_factor The robot obstacle inflation factor
+     * @param inflated_defense_area The inflated friendly defense area
      *
      * @return the intersection with the front or sides of the defense area, returns
      * std::nullopt if there is no intersection or if the start point of the ray is inside
      * or behind the defense area
      */
     static std::optional<Point> findDefenseAreaIntersection(
-        const Field& field, const Ray& ray, double robot_obstacle_inflation_factor);
+        const Field& field, const Ray& ray, const Rectangle &inflated_defense_area);
 
    private:
     bool enemyCloseToBall(const Update &event);
