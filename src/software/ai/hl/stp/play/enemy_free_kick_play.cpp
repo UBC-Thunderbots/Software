@@ -62,7 +62,7 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
             tactics_to_run[0].emplace_back(crease_defenders[0]);
         }
 
-        auto num_unassigned_robots = 4 - num_crease_defenders;
+        auto num_unassigned_robots = 5 - num_crease_defenders;
         for (int i = 0;
              i < std::min(num_unassigned_robots, (int)enemy_threats.size() - 1); i++)
         {
