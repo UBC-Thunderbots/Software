@@ -1,3 +1,5 @@
+import copy
+
 from software.py_constants import *
 from software.thunderscope.constants import ROBOT_COMMUNICATIONS_TIMEOUT_S
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
@@ -283,9 +285,11 @@ class RobotCommunication(object):
         # Since it is not used by the robots, we will remove all values from its
         # array.
         if primitive.HasField("move"):
-            del primitive.move.motion_control.static_obstacles[:]
-
-        return primitive
+            primitive_copy = copy.copy(primitive)
+            del primitive_copy.move.motion_control.static_obstacles[:]
+            return primitive_copy
+        else:
+            return primitive
 
     def setup_for_fullsystem(self):
         """
