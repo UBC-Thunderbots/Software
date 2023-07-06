@@ -280,7 +280,7 @@ void HRVOAgent::computeNewAngularVelocity(Duration time_step)
 
     // Clamp acceleration
     double delta_angular_velocity = (pid_angular_velocity - angular_velocity).toRadians();
-    double max_accel        = max_angular_accel * time_step.toSeconds();
+    double max_accel              = max_angular_accel * time_step.toSeconds();
     max_accel *= std::clamp(1.0 - (1 * velocity.length() / max_speed), 0.0, 1.0);
     const double clamped_delta_angular_velocity =
         std::clamp(delta_angular_velocity, -max_accel, max_accel);
@@ -674,7 +674,8 @@ Vector HRVOAgent::computePreferredVelocity(Duration time_step)
     // Scale down the PID velocity from being excessively high as it causes the
     // robot to swing around the destination. This causes the velocity to point
     // towards the destination as fast as possible.
-//    double increase = LINEAR_VELOCITY_MAX_PID_OFFSET * (1 - angular_velocity.toRadians() / max_angular_speed);
+    //    double increase = LINEAR_VELOCITY_MAX_PID_OFFSET * (1 -
+    //    angular_velocity.toRadians() / max_angular_speed);
     Vector realistic_pid_vel = pid_vel.normalize(
         std::min(pid_vel.length(), velocity.length() + LINEAR_VELOCITY_MAX_PID_OFFSET));
     Vector curr_local_velocity = globalToLocalVelocity(velocity, orientation);
@@ -764,13 +765,13 @@ void HRVOAgent::visualize(TeamColour friendly_team_colour)
     // TODO (#2838): For HRVOVisualization logs to be sent properly from the robot, no
     // path should be passed as a second argument to LOG
     //    i.e. LOG(VISUALIZE) << hrvo_visualization;
-//    LOG(VISUALIZE) << hrvo_visualization;
-//    if (friendly_team_colour == TeamColour::YELLOW)
-//    {
-//        LOG(VISUALIZE, YELLOW_HRVO_PATH) << hrvo_visualization;
-//    }
-//    else
-//    {
-//        LOG(VISUALIZE, BLUE_HRVO_PATH) << hrvo_visualization;
-//    }
+    //    LOG(VISUALIZE) << hrvo_visualization;
+    //    if (friendly_team_colour == TeamColour::YELLOW)
+    //    {
+    //        LOG(VISUALIZE, YELLOW_HRVO_PATH) << hrvo_visualization;
+    //    }
+    //    else
+    //    {
+    //        LOG(VISUALIZE, BLUE_HRVO_PATH) << hrvo_visualization;
+    //    }
 }

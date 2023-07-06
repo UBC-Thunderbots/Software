@@ -8,16 +8,16 @@ import "proto/geometry.proto";
 
 message RobotStatus
 {
-    uint32 robot_id                           = 1;
-    repeated ErrorCode error_code             = 2;
-    ChipperKickerStatus chipper_kicker_status = 4;
-    MotorStatus motor_status                  = 5;
-    NetworkStatus network_status              = 6;
-    PowerStatus power_status                  = 7;
-    JetsonStatus jetson_status                = 8;
-    ThunderloopStatus thunderloop_status      = 9;
-    Timestamp time_sent                       = 10;
-    uint64 last_handled_primitive_set         = 11;
+    uint32 robot_id                                   = 1;
+    repeated ErrorCode error_code                     = 2;
+    ChipperKickerStatus chipper_kicker_status         = 4;
+    MotorStatus motor_status                          = 5;
+    NetworkStatus network_status                      = 6;
+    PowerStatus power_status                          = 7;
+    JetsonStatus jetson_status                        = 8;
+    ThunderloopStatus thunderloop_status              = 9;
+    Timestamp time_sent                               = 10;
+    uint64 last_handled_primitive_set                 = 11;
     PrimitiveExecutorStatus primitive_executor_status = 12;
 }
 

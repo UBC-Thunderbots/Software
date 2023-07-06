@@ -20,10 +20,10 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
     // Assign up to two crease defenders
     std::vector<std::shared_ptr<CreaseDefenderTactic>> crease_defenders = {
-            std::make_shared<CreaseDefenderTactic>(
-                    ai_config.robot_navigation_obstacle_config()),
-            std::make_shared<CreaseDefenderTactic>(
-                    ai_config.robot_navigation_obstacle_config())};
+        std::make_shared<CreaseDefenderTactic>(
+            ai_config.robot_navigation_obstacle_config()),
+        std::make_shared<CreaseDefenderTactic>(
+            ai_config.robot_navigation_obstacle_config())};
 
     // Try to shadow as many enemy robots as possible
     std::vector<std::shared_ptr<ShadowEnemyTactic>> shadow_potential_receivers;
@@ -47,9 +47,9 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
         if (num_crease_defenders == 2)
         {
             crease_defenders[0]->updateControlParams(
-                    world.ball().position(), TbotsProto::CreaseDefenderAlignment::LEFT);
+                world.ball().position(), TbotsProto::CreaseDefenderAlignment::LEFT);
             crease_defenders[1]->updateControlParams(
-                    world.ball().position(), TbotsProto::CreaseDefenderAlignment::RIGHT);
+                world.ball().position(), TbotsProto::CreaseDefenderAlignment::RIGHT);
 
             tactics_to_run[0].emplace_back(crease_defenders[0]);
             tactics_to_run[0].emplace_back(crease_defenders[1]);
@@ -57,7 +57,7 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
         else
         {
             crease_defenders[0]->updateControlParams(
-                    world.ball().position(), TbotsProto::CreaseDefenderAlignment::CENTRE);
+                world.ball().position(), TbotsProto::CreaseDefenderAlignment::CENTRE);
 
             tactics_to_run[0].emplace_back(crease_defenders[0]);
         }
@@ -67,9 +67,9 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
              i < std::min(num_unassigned_robots, (int)enemy_threats.size() - 1); i++)
         {
             shadow_potential_receivers.emplace_back(
-                    std::make_shared<ShadowEnemyTactic>());
+                std::make_shared<ShadowEnemyTactic>());
             shadow_potential_receivers[i]->updateControlParams(
-                    enemy_threats[i + 1], ROBOT_MAX_RADIUS_METERS * 3);
+                enemy_threats[i + 1], ROBOT_MAX_RADIUS_METERS * 3);
 
             tactics_to_run[0].emplace_back(shadow_potential_receivers[i]);
         }

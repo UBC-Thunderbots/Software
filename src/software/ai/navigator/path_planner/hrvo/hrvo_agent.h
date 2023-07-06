@@ -28,7 +28,7 @@
 
 class HRVOAgent : public Agent
 {
-public:
+   public:
     /**
      * Constructor
      *
@@ -94,7 +94,7 @@ public:
      * @param robots the robots in simulation
      */
     void computeVelocityObstacles(
-            const std::map<RobotId, std::shared_ptr<Agent>> &robots);
+        const std::map<RobotId, std::shared_ptr<Agent>> &robots);
 
 
     /**
@@ -113,7 +113,7 @@ public:
      * @return a list of the closest robot ids referencing agents in the simulation
      */
     std::vector<RobotId> computeNeighbors(
-            const std::map<RobotId, std::shared_ptr<Agent>> &robots);
+        const std::map<RobotId, std::shared_ptr<Agent>> &robots);
 
 
     /**
@@ -147,7 +147,7 @@ public:
      */
     class CandidateVelocity
     {
-    public:
+       public:
         /**
          * Constructor. all candidate velocities occur at the intersections of vo's.
          * @param velocity the velocity for this candidate
@@ -155,7 +155,7 @@ public:
          * @param index_2 the index of the second intersecting velocity obstacle
          */
         explicit CandidateVelocity(Vector velocity, int index_1, int index_2)
-                : velocity(velocity), obstacle_indexes(std::pair(index_1, index_2))
+            : velocity(velocity), obstacle_indexes(std::pair(index_1, index_2))
         {
         }
 
@@ -180,7 +180,7 @@ public:
      * intersect any
      */
     std::optional<int> findIntersectingVelocityObstacle(
-            const CandidateVelocity &candidate) const;
+        const CandidateVelocity &candidate) const;
 
 
     /**
@@ -225,7 +225,7 @@ public:
     bool isCandidateFasterThanCurrentSpeed(const CandidateVelocity &candidate) const;
 
 
-protected:
+   protected:
     RobotNavigationObstacleFactory obstacle_factory;
     std::vector<VelocityObstacle> velocity_obstacles;
     std::vector<ObstaclePtr> static_obstacles;

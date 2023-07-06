@@ -132,14 +132,22 @@ RobotNavigationObstacleFactory::createStaticObstaclesFromMotionConstraint(
                                              friendly_goal.negXNegYCorner()),
                                      0, goal_obstacle_radius)));
             // Left goal wall
-            // Shift the goal obstacle and make it bigger by the same size to avoid the possibility of
-            // the goalie trying to path plan through the wall of the goalie to move out.
+            // Shift the goal obstacle and make it bigger by the same size to avoid the
+            // possibility of the goalie trying to path plan through the wall of the
+            // goalie to move out.
             double goal_horizontal_obstacle_offset = 0.2;
-            double goal_vertical_obstacle_offset = 0.15;
-            obstacles.push_back(std::make_shared<GeomObstacle<Polygon>>(
-                Polygon::fromSegment(Segment(friendly_goal.negXPosYCorner() + Vector(-goal_horizontal_obstacle_offset, 0),
-                                             friendly_goal.negXNegYCorner() + Vector(-goal_horizontal_obstacle_offset, 0)),
-                                     goal_obstacle_radius + goal_vertical_obstacle_offset, goal_obstacle_radius + goal_horizontal_obstacle_offset))); // TODO: Shift this closer to the edge so path cant go behind net
+            double goal_vertical_obstacle_offset   = 0.15;
+            obstacles.push_back(
+                std::make_shared<GeomObstacle<Polygon>>(Polygon::fromSegment(
+                    Segment(friendly_goal.negXPosYCorner() +
+                                Vector(-goal_horizontal_obstacle_offset, 0),
+                            friendly_goal.negXNegYCorner() +
+                                Vector(-goal_horizontal_obstacle_offset, 0)),
+                    goal_obstacle_radius + goal_vertical_obstacle_offset,
+                    goal_obstacle_radius +
+                        goal_horizontal_obstacle_offset)));  // TODO: Shift this closer to
+                                                             // the edge so path cant go
+                                                             // behind net
             break;
         }
         case TbotsProto::MotionConstraint::MotionConstraint_INT_MIN_SENTINEL_DO_NOT_USE_:;

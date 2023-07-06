@@ -1,10 +1,10 @@
 #pragma once
 
+#include "software/geom/circle.h"
 #include "software/geom/line.h"
 #include "software/geom/point.h"
-#include "software/geom/segment.h"
 #include "software/geom/polygon.h"
-#include "software/geom/circle.h"
+#include "software/geom/segment.h"
 
 /**
  * Finds the closest Point on a Line to a Point

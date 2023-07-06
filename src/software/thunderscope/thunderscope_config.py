@@ -113,7 +113,6 @@ def configure_robot_view_diagnostics(diagnostics_proto_unix_io):
     )
 
 
-
 def configure_robot_view_replay(replay_proto_unix_io):
     """
     Returns Widget Data for the Robot View Widget for Replay
@@ -131,6 +130,7 @@ def configure_robot_view_replay(replay_proto_unix_io):
         anchor="Logs",
         position="above",
     )
+
 
 def configure_estop(proto_unix_io):
     """
@@ -669,11 +669,16 @@ def configure_ai_or_diagnostics(
                         configure_estop(
                             proto_unix_io_map[ProtoUnixIOTypes.DIAGNOSTICS]
                         ),
-                    ] + ([
-                        configure_robot_view_diagnostics(
-                            proto_unix_io_map[ProtoUnixIOTypes.DIAGNOSTICS]
-                        ),
-                    ] if (not load_blue and not load_yellow) else []),
+                    ]
+                    + (
+                        [
+                            configure_robot_view_diagnostics(
+                                proto_unix_io_map[ProtoUnixIOTypes.DIAGNOSTICS]
+                            ),
+                        ]
+                        if (not load_blue and not load_yellow)
+                        else []
+                    ),
                 ),
             )
         )

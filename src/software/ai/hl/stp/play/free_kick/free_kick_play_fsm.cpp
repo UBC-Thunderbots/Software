@@ -179,8 +179,8 @@ void FreeKickPlayFSM::passBall(const Update &event)
 
     Pass pass = best_pass_and_score_so_far.pass;
 
-    passer_tactic->updateControlParams(event.common.world.ball().position(), pass.passerOrientation(),
-                                       pass.speed());
+    passer_tactic->updateControlParams(event.common.world.ball().position(),
+                                       pass.passerOrientation(), pass.speed());
     receiver_tactic->updateControlParams(pass);
     tactics_to_run[0].emplace_back(passer_tactic);
     tactics_to_run[0].emplace_back(receiver_tactic);
