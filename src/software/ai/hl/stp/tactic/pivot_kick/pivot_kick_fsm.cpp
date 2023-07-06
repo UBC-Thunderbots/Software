@@ -9,6 +9,11 @@ void PivotKickFSM::getPossessionAndPivot(
         .final_dribble_orientation = event.control_params.kick_direction,
         .allow_excessive_dribbling = false};
 
+    if (event.control_params.dribble_into_ball_orientation.has_value())
+    {
+        control_params.final_dribble_orientation = event.control_params.dribble_into_ball_orientation.value();
+    }
+
     processEvent(DribbleFSM::Update(control_params, event.common));
 }
 

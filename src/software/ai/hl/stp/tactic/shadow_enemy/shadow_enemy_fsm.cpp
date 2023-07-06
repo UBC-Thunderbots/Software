@@ -67,7 +67,7 @@ void ShadowEnemyFSM::blockPass(const Update &event)
 
     event.common.set_primitive(createMovePrimitive(
         CREATE_MOTION_CONTROL(position_to_block), face_ball_orientation, 0, false,
-        TbotsProto::DribblerMode::OFF, TbotsProto::BallCollisionType::AVOID,
+        TbotsProto::DribblerMode::OFF, TbotsProto::BallCollisionType::ALLOW,
         AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
         TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
         event.common.robot.robotConstants()));
@@ -100,7 +100,7 @@ void ShadowEnemyFSM::blockShot(const Update &event,
         .final_orientation      = face_ball_orientation,
         .final_speed            = 0.0,
         .dribbler_mode          = TbotsProto::DribblerMode::OFF,
-        .ball_collision_type    = TbotsProto::BallCollisionType::AVOID,
+        .ball_collision_type    = TbotsProto::BallCollisionType::ALLOW,
         .auto_chip_or_kick      = AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
         .max_allowed_speed_mode = TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
         .target_spin_rev_per_s  = 0.0};

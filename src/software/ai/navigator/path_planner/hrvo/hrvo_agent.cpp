@@ -755,12 +755,13 @@ void HRVOAgent::visualize(TeamColour friendly_team_colour)
     // TODO (#2838): For HRVOVisualization logs to be sent properly from the robot, no
     // path should be passed as a second argument to LOG
     //    i.e. LOG(VISUALIZE) << hrvo_visualization;
-    if (friendly_team_colour == TeamColour::YELLOW)
-    {
-        LOG(VISUALIZE, YELLOW_HRVO_PATH) << hrvo_visualization;
-    }
-    else
-    {
-        LOG(VISUALIZE, BLUE_HRVO_PATH) << hrvo_visualization;
-    }
+//    LOG(VISUALIZE) << hrvo_visualization;
+//    if (friendly_team_colour == TeamColour::YELLOW)
+//    {
+//        LOG(VISUALIZE, YELLOW_HRVO_PATH) << hrvo_visualization;
+//    }
+//    else
+//    {
+//        LOG(VISUALIZE, BLUE_HRVO_PATH) << hrvo_visualization;
+//    }
 }
