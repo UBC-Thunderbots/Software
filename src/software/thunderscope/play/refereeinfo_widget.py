@@ -73,7 +73,6 @@ class RefereeInfoWidget(QWidget):
             else:
                 team_info.append(team_info_name)
 
-        text = ""
         for info in team_info:
             if info == "yellowCardTimes":
                 pass

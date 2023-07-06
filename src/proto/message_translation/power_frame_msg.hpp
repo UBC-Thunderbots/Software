@@ -99,16 +99,19 @@ void inline setPowerMsg(TbotsProto_PowerFrame& frame,
  *
  * @return a nanopb power status msg with provided fields
  */
-TbotsProto_PowerStatus inline createNanoPbPowerStatus(
-    float battery_voltage, float capacitor_voltage, float current_draw,
-    TbotsProto_Geneva_Slot geneva_slot, uint32_t sequence_num, bool breakbeam_tripped)
+TbotsProto_PowerStatus inline createNanoPbPowerStatus(float battery_voltage,
+                                                      float capacitor_voltage,
+                                                      float current_draw,
+                                                      TbotsProto_Geneva_Slot geneva_slot,
+                                                      uint32_t time_since_last_msg_ms,
+                                                      bool breakbeam_tripped)
 {
-    TbotsProto_PowerStatus status = {.battery_voltage   = battery_voltage,
-                                     .capacitor_voltage = capacitor_voltage,
-                                     .current_draw      = current_draw,
-                                     .geneva_slot       = geneva_slot,
-                                     .sequence_num      = sequence_num,
-                                     .breakbeam_tripped = breakbeam_tripped};
+    TbotsProto_PowerStatus status = {.battery_voltage        = battery_voltage,
+                                     .capacitor_voltage      = capacitor_voltage,
+                                     .current_draw           = current_draw,
+                                     .geneva_slot            = geneva_slot,
+                                     .time_since_last_msg_ms = time_since_last_msg_ms,
+                                     .breakbeam_tripped      = breakbeam_tripped};
     return status;
 }
 

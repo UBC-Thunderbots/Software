@@ -335,7 +335,9 @@ class RobotInfo(QWidget):
             #     "Battery Voltage Alert",
             #     f"robot {self.robot_id} voltage is {power_status.battery_voltage}",
             # )
-            logging.warning(f"Battery Voltage Alert\n\nrobot {self.robot_id} voltage is {power_status.battery_voltage}")
+            logging.warning(
+                f"Battery Voltage Alert\n\nrobot {self.robot_id} voltage is {power_status.battery_voltage}"
+            )
             self.battery_warning_disabled = True
         elif power_status.battery_voltage > BATTERY_WARNING_VOLTAGE:
             self.battery_warning_disabled = False
@@ -347,4 +349,6 @@ class RobotInfo(QWidget):
                 #     f"Warning: {ERROR_CODE_MESSAGES[code]}",
                 #     f"{ERROR_CODE_MESSAGES[code]} warning for robot {self.robot_id}",
                 # )
-                logging.warning(f"WARNING ERROR CODE FROM ROBOT {self.robot_id}: {ERROR_CODE_MESSAGES[code]} {ERROR_CODE_MESSAGES[code]}")
+                logging.warning(
+                    f"WARNING ERROR CODE FROM ROBOT {self.robot_id}: {ERROR_CODE_MESSAGES[code]} {ERROR_CODE_MESSAGES[code]}"
+                )

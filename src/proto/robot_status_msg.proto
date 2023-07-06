@@ -135,8 +135,8 @@ message PowerStatus
     float battery_voltage   = 1;
     float capacitor_voltage = 2;
     // voltage on the robot’s capacitor, in volts.
-    float current_draw      = 3;
-    Geneva.Slot geneva_slot = 4;
-    uint32 sequence_num     = 5;
-    bool breakbeam_tripped  = 6;
+    float current_draw            = 3;
+    Geneva.Slot geneva_slot       = 4;
+    uint32 time_since_last_msg_ms = 5;
+    bool breakbeam_tripped        = 6;
 }

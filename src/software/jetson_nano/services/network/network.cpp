@@ -55,8 +55,8 @@ void NetworkService::primitiveSetCallback(TbotsProto::PrimitiveSet input)
     if (primitive_set_loss_rate > PROTO_LOSS_WARNING_THRESHOLD)
     {
         // Log in 5% increments to allow the logs to be merged
-        LOG(WARNING) << "Primitive set loss rate is " << static_cast<int>(primitive_set_loss_rate * 20) * 5
-                     << "%";
+        LOG(WARNING) << "Primitive set loss rate is "
+                     << static_cast<int>(primitive_set_loss_rate * 20) * 5 << "%";
     }
 }
 
@@ -75,6 +75,7 @@ void NetworkService::worldCallback(TbotsProto::World input)
     if (world_loss_rate > PROTO_LOSS_WARNING_THRESHOLD)
     {
         // Log in 5% increments to allow the logs to be merged
-        LOG(WARNING) << "World loss rate is " << static_cast<int>(world_loss_rate * 20) * 5 << "%";
+        LOG(WARNING) << "World loss rate is "
+                     << static_cast<int>(world_loss_rate * 20) * 5 << "%";
     }
 }
