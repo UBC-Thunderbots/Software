@@ -37,6 +37,9 @@ struct OffensePlayFSM
      */
     bool enemyHasPossession(const Update& event);
 
+
+    bool fewEnemyThreatsInFriendlyHalf(const World &world);
+
     /**
      * Action to configure the play for offensive gameplay
      *
