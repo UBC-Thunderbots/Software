@@ -18,6 +18,9 @@ double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
     double static_pass_quality =
         getStaticPositionQuality(world.field(), pass.receiverPoint(), passing_config);
 
+    //double pass_distance_quality =
+    //    getPassDistanceQuality(pass.receiverPoint(), passing_config);
+
     double friendly_pass_rating =
         ratePassFriendlyCapability(world.friendlyTeam(), pass, passing_config);
 
@@ -40,6 +43,13 @@ double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
     return static_pass_quality * friendly_pass_rating * enemy_pass_rating *
            shoot_pass_rating * pass_speed_quality * in_region_quality;
 }
+
+//double getPassDistanceQuality(const Pass &pass)
+//{
+//    double distance = distanceSquared(pass.passerPoint(), pass.receiverPoint());
+//
+//     return sigmoid(distance, );
+//}
 
 double rateZone(const Field& field, const Team& enemy_team, const Rectangle& zone,
                 const Point& ball_position, TbotsProto::PassingConfig passing_config)
