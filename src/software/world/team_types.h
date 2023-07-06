@@ -15,4 +15,10 @@ MAKE_ENUM(TeamColour, YELLOW, BLUE)
 /**
  * Indicates which team has possession of the ball
  */
-MAKE_ENUM(TeamPossession, FRIENDLY_TEAM, ENEMY_TEAM)
+MAKE_ENUM(TeamPossession,
+          // Friendly team has possession over ball
+          FRIENDLY_TEAM,
+          // Enemy team has possession over ball
+          ENEMY_TEAM,
+          // Enemy possession is stagnant (undisturbed for some time)
+          STAGNANT_ENEMY_TEAM)

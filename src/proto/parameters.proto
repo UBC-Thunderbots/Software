@@ -342,10 +342,7 @@ message DefensePlayConfig
         ];
     }
 
-    // The distance at which a threat is considered "immediate" if there is only 1
-    // "immediate" threat the defense play will swarm that robot with shadowers
-    required double immediate_threat_distance = 1
-        [default = 6.0, (bounds).min_double_value = 0.0, (bounds).max_double_value = 9.5];
+    reserved 1;
 
     // The DefenderAssignmentConfig for tuning defender assignments
     required DefenderAssignmentConfig defender_assignment_config = 2;
@@ -378,7 +375,7 @@ message PossessionTrackerConfig
     // Max distance in meters between robot and ball for robot
     // to be considered near the ball
     required double distance_near_tolerance_meters = 1
-        [default = 0.1, (bounds).min_double_value = 0.0, (bounds).max_double_value = 5.0];
+        [default = 0.2, (bounds).min_double_value = 0.0, (bounds).max_double_value = 5.0];
 
     // Min distance in meters between robot and ball for robot
     // to be considered far away from the ball
@@ -399,5 +396,29 @@ message PossessionTrackerConfig
         default                   = 1.5,
         (bounds).min_double_value = 0.0,
         (bounds).max_double_value = 10.0
+    ];
+
+    // Min time that team must hold possession for in order to be
+    // considered stagnant
+    required double time_stagnant_threshold_s = 5 [
+        default                   = 2.5,
+        (bounds).min_double_value = 0.0,
+        (bounds).max_double_value = 30.0
+    ];
+
+    // Min distance in meters that ball must move between two timestamps
+    // for the ball to be considered moved
+    required double ball_moved_threshold_meters = 6 [
+        default                   = 0.05,
+        (bounds).min_double_value = 0.0,
+        (bounds).max_double_value = 5.0
+    ];
+
+    // Min time that the ball must stay still in order for possession
+    // to be considered stagnant
+    required double time_ball_stagnant_threshold_s = 7 [
+        default                   = 3.5,
+        (bounds).min_double_value = 0.0,
+        (bounds).max_double_value = 30.0
     ];
 }

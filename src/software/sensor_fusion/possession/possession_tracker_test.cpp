@@ -40,12 +40,19 @@ TEST(PossessionTrackerTest, get_possession_with_ball_near_team)
         world.friendlyTeam(), world.enemyTeam(), world.ball(), world.field());
     EXPECT_EQ(possession, TeamPossession::ENEMY_TEAM);
 
-    // Move ball near friendly bot for a period of time.
-    // Friendly team should have clear possession.
-    world.updateBall(Ball({0.55, 0}, {0, 0}, Timestamp::fromSeconds(0.5)));
+    // Keep ball near enemy bot for a prolonged period of time.
+    // Enemy possession should be considered stagnant.
+    world.updateBall(Ball({1.45, 0}, {0, 0}, Timestamp::fromSeconds(5)));
     possession = possession_tracker.getTeamWithPossession(
         world.friendlyTeam(), world.enemyTeam(), world.ball(), world.field());
-    world.updateBall(Ball({0.55, 0}, {0, 0}, Timestamp::fromSeconds(1)));
+    EXPECT_EQ(possession, TeamPossession::STAGNANT_ENEMY_TEAM);
+
+    // Move ball near friendly bot for a period of time.
+    // Friendly team should have clear possession.
+    world.updateBall(Ball({0.55, 0}, {0, 0}, Timestamp::fromSeconds(5.5)));
+    possession = possession_tracker.getTeamWithPossession(
+        world.friendlyTeam(), world.enemyTeam(), world.ball(), world.field());
+    world.updateBall(Ball({0.55, 0}, {0, 0}, Timestamp::fromSeconds(6)));
     possession = possession_tracker.getTeamWithPossession(
         world.friendlyTeam(), world.enemyTeam(), world.ball(), world.field());
     EXPECT_EQ(possession, TeamPossession::FRIENDLY_TEAM);
@@ -69,15 +76,15 @@ TEST(PossessionTrackerTest, get_possession_with_ball_near_both_teams)
 
     // Ball equally near both friendly and enemy bots for a period of time
     // (i.e both teams have presence over the ball).
-    // Enemy team should have possession since the ball is being fought
-    // over in the friendly half.
+    // Enemy team should have stagnant possession since the ball is being fought
+    // over in the friendly half, but enemy possession remains unchanged.
     world.updateBall(Ball({-0.5, 0}, {0, 0}, Timestamp::fromSeconds(0)));
     possession = possession_tracker.getTeamWithPossession(
         world.friendlyTeam(), world.enemyTeam(), world.ball(), world.field());
     world.updateBall(Ball({-0.5, 0}, {0, 0}, Timestamp::fromSeconds(1)));
     possession = possession_tracker.getTeamWithPossession(
         world.friendlyTeam(), world.enemyTeam(), world.ball(), world.field());
-    EXPECT_EQ(possession, TeamPossession::ENEMY_TEAM);
+    EXPECT_EQ(possession, TeamPossession::STAGNANT_ENEMY_TEAM);
 
     // Position all bots in the enemy half.
     friendly_team = TestUtil::setRobotPositionsHelper(

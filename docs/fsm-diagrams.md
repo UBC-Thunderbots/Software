@@ -68,7 +68,10 @@ stateDiagram-v2
 classDef terminate fill:white,color:black,font-weight:bold
 direction LR
 [*] --> DefenseState
-DefenseState --> DefenseState : <i>defendAgainstThreats</i>
+DefenseState --> AggressiveDefenseState : [shouldDefendAggressively]\n<i>shadowAndBlockShots</i>
+DefenseState --> DefenseState : <i>blockShots</i>
+AggressiveDefenseState --> DefenseState : [!shouldDefendAggressively]\n<i>blockShots</i>
+AggressiveDefenseState --> AggressiveDefenseState : <i>shadowAndBlockShots</i>
 Terminate:::terminate --> Terminate:::terminate
 
 ```
