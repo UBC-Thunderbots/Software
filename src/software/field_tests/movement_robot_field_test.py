@@ -123,7 +123,6 @@ logger = createLogger(__name__)
 #         time.sleep(2)
 
 
-
 # def test_pivot_kick(field_test_runner):
 #     id = 5
 #
@@ -153,37 +152,45 @@ logger = createLogger(__name__)
 
 import math
 
+
 def test_one_robots_foward_back(field_test_runner):
     id1 = 5
 
     world = field_test_runner.world_buffer.get(block=True, timeout=WORLD_BUFFER_TIMEOUT)
     print("Here are the robots:")
-    print([robot.current_state.global_position for robot in world.friendly_team.team_robots])
+    print(
+        [
+            robot.current_state.global_position
+            for robot in world.friendly_team.team_robots
+        ]
+    )
 
     tactic_pos_y = MoveTactic(
         destination=Point(x_meters=4.0, y_meters=2.0),
         final_speed=0.0,
         dribbler_mode=DribblerMode.OFF,
-        final_orientation=Angle(radians=-math.pi/2),
+        final_orientation=Angle(radians=-math.pi / 2),
         ball_collision_type=BallCollisionType.AVOID,
         auto_chip_or_kick=AutoChipOrKick(autokick_speed_m_per_s=0.0),
         max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT,
-        target_spin_rev_per_s=0.0
+        target_spin_rev_per_s=0.0,
     )
     tactic_neg_y = MoveTactic(
         destination=Point(x_meters=4.0, y_meters=-2.0),
         final_speed=0.0,
         dribbler_mode=DribblerMode.OFF,
-        final_orientation=Angle(radians=-math.pi/2),
+        final_orientation=Angle(radians=-math.pi / 2),
         ball_collision_type=BallCollisionType.AVOID,
         auto_chip_or_kick=AutoChipOrKick(autokick_speed_m_per_s=0.0),
         max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT,
-        target_spin_rev_per_s=0.0
+        target_spin_rev_per_s=0.0,
     )
 
     for test_id in range(4):
         params = AssignedTacticPlayControlParams()
-        params.assigned_tactics[id1].move.CopyFrom(tactic_neg_y if test_id % 2 == 0 else tactic_pos_y)
+        params.assigned_tactics[id1].move.CopyFrom(
+            tactic_neg_y if test_id % 2 == 0 else tactic_pos_y
+        )
 
         field_test_runner.set_tactics(params, True)
         field_test_runner.run_test(

@@ -14,7 +14,6 @@ EnemyFreekickPlay::EnemyFreekickPlay(TbotsProto::AiConfig config) : Play(config,
 void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
                                        const World &world)
 {
-
     // Free kicks are usually taken near the edge of the field. We assign one robot to
     // shadow the enemy robot taking the free kick
     auto shadow_free_kicker = std::make_shared<ShadowEnemyTactic>();
