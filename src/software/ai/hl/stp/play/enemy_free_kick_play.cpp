@@ -43,11 +43,6 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
             return;
         }
 
-        // Shadow free kicker should shadow the enemy robot with the ball
-        shadow_free_kicker->updateControlParams(enemy_threats[0],
-                                                ROBOT_MAX_RADIUS_METERS * 3);
-        tactics_to_run[0].emplace_back(shadow_free_kicker);
-
         // Assign crease defenders
         auto num_crease_defenders = world.friendlyTeam().numRobots() > 3 ? 2 : 1;
         if (num_crease_defenders == 2)
@@ -79,6 +74,11 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
             tactics_to_run[0].emplace_back(shadow_potential_receivers[i]);
         }
+
+        // Shadow free kicker should shadow the enemy robot with the ball
+        shadow_free_kicker->updateControlParams(enemy_threats[0],
+                                                ROBOT_MAX_RADIUS_METERS * 3);
+        tactics_to_run[0].emplace_back(shadow_free_kicker);
 
         // yield the Tactics this Play wants to run, in order of priority
         yield(tactics_to_run);
