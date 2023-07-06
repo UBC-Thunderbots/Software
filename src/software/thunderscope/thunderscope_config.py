@@ -498,8 +498,8 @@ def configure_replay_view(
                     visualization_buffer_size=visualization_buffer_size,
                     extra_widgets=[
                         configure_cost_vis(proto_unix_io_map[ProtoUnixIOTypes.BLUE]),
-                        configure_robot_view_fullsystem(proto_unix_io_map[ProtoUnixIOTypes.BLUE]),
-                        configure_estop(proto_unix_io_map[ProtoUnixIOTypes.BLUE])
+                        # configure_robot_view_fullsystem(proto_unix_io_map[ProtoUnixIOTypes.BLUE]),
+                        # configure_estop(proto_unix_io_map[ProtoUnixIOTypes.BLUE])
                     ]
                     if cost_visualization
                     else [],
@@ -524,8 +524,8 @@ def configure_replay_view(
                     visualization_buffer_size=visualization_buffer_size,
                     extra_widgets=[
                         configure_cost_vis(proto_unix_io_map[ProtoUnixIOTypes.YELLOW]),
-                        configure_robot_view_fullsystem(proto_unix_io_map[ProtoUnixIOTypes.YELLOW]),
-                        configure_estop(proto_unix_io_map[ProtoUnixIOTypes.YELLOW])
+                        # configure_robot_view_fullsystem(proto_unix_io_map[ProtoUnixIOTypes.YELLOW]),
+                        # configure_estop(proto_unix_io_map[ProtoUnixIOTypes.YELLOW])
                     ]
                     if cost_visualization
                     else [],
