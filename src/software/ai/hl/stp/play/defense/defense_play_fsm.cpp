@@ -68,9 +68,9 @@ void DefensePlayFSM::updateCreaseAndPassDefenders(
         else
         {
             // If we have more tactics to set than determined defender assignments,
-            // assign remaining defenders to the defender assignment with the
-            // highest coverage rating
-            defender_assignment = assignments.front();
+            // assign remaining defenders to the defender assignments with the
+            // highest coverage ratings
+            defender_assignment = assignments.at(i % assignments.size());
         }
 
         if (defender_assignment.type == CREASE_DEFENDER)
