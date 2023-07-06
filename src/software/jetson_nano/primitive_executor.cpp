@@ -99,7 +99,8 @@ AngularVelocity PrimitiveExecutor::getTargetAngularVelocity()
 }
 
 
-std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimitive(TbotsProto::PrimitiveExecutorStatus& status)
+std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimitive(
+    TbotsProto::PrimitiveExecutorStatus &status)
 {
     hrvo_simulator_.doStep(time_step_);
 

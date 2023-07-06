@@ -38,7 +38,8 @@ void AttackerFSM::pivotKick(const Update& event,
                                event.control_params.best_pass_so_far->speed()}};
     }
 
-    std::optional<Robot> closest_enemy = event.common.world.enemyTeam().getNearestRobot(ball_position);
+    std::optional<Robot> closest_enemy =
+        event.common.world.enemyTeam().getNearestRobot(ball_position);
     double enemy_dist_to_ball = distance(closest_enemy->position(), ball_position);
     if (closest_enemy.has_value() &&
         enemy_dist_to_ball < distance(event.common.robot.position(), ball_position) &&

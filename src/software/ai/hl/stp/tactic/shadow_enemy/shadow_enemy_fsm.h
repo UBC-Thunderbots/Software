@@ -111,7 +111,8 @@ struct ShadowEnemyFSM
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *MoveFSM_S + Update_E[!enemyThreatHasBall_G] / stealAndChip_A = StealAndChipState_S,
+            *MoveFSM_S + Update_E[!enemyThreatHasBall_G] / stealAndChip_A =
+                StealAndChipState_S,
             MoveFSM_S + Update_E / blockShot_A, MoveFSM_S = StealAndChipState_S,
             BlockPassState_S + Update_E[!enemyThreatHasBall_G] / blockPass_A,
             BlockPassState_S + Update_E[enemyThreatHasBall_G] / blockShot_A = MoveFSM_S,

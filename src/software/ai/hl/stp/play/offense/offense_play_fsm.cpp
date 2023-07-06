@@ -47,17 +47,16 @@ void OffensePlayFSM::setupOffensiveStrategy(const Update& event)
     setTactics(event, num_shoot_or_pass, num_defenders);
 }
 
-bool OffensePlayFSM::overbalancedFriendlyRobotsInFriendlyHalf(const World &world)
+bool OffensePlayFSM::overbalancedFriendlyRobotsInFriendlyHalf(const World& world)
 {
     const std::vector<Robot> friendly_robots = world.friendlyTeam().getAllRobots();
 
-    return (world.getTeamWithPossession() == TeamPossession::FRIENDLY_TEAM
-            && std::count_if(world.friendlyTeam().getAllRobots().begin(),
-                world.friendlyTeam().getAllRobots().end(),
-                [&](const Robot &robot)
-                {
-                    return robot.position().x() < ROBOT_MIN_X_THRESHOLD;
-                }) >= TOO_MANY_FRIENDLY_HALF_ROBOTS_THRESHOLD);
+    return (world.getTeamWithPossession() == TeamPossession::FRIENDLY_TEAM &&
+            std::count_if(world.friendlyTeam().getAllRobots().begin(),
+                          world.friendlyTeam().getAllRobots().end(),
+                          [&](const Robot& robot) {
+                              return robot.position().x() < ROBOT_MIN_X_THRESHOLD;
+                          }) >= TOO_MANY_FRIENDLY_HALF_ROBOTS_THRESHOLD);
 }
 
 void OffensePlayFSM::setupDefensiveStrategy(const Update& event)

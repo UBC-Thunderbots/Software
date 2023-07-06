@@ -382,7 +382,7 @@ SSLSimulationProto::RobotControl ErForceSimulator::updateSimulatorRobots(
         auto& primitive_executor = primitive_executor_with_id.second;
         std::unique_ptr<TbotsProto::DirectControlPrimitive> direct_control;
 
-        TbotsProto::PrimitiveExecutorStatus status; // Added for compilation
+        TbotsProto::PrimitiveExecutorStatus status;  // Added for compilation
         if (ramping)
         {
             auto direct_control_no_ramp = primitive_executor->stepPrimitive(status);

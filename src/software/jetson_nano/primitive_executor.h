@@ -62,7 +62,8 @@ class PrimitiveExecutor
      *
      * @returns DirectControlPrimitive The direct control primitive msg
      */
-    std::unique_ptr<TbotsProto::DirectControlPrimitive> stepPrimitive(TbotsProto::PrimitiveExecutorStatus& status);
+    std::unique_ptr<TbotsProto::DirectControlPrimitive> stepPrimitive(
+        TbotsProto::PrimitiveExecutorStatus &status);
 
    private:
     /*

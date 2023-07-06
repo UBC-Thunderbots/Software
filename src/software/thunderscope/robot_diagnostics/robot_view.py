@@ -105,9 +105,7 @@ class RobotViewComponent(QWidget):
 
         :param robot_status: the new message data to update the widget with
         """
-        self.robot_info.update(
-            robot_status
-        )
+        self.robot_info.update(robot_status)
         if self.robot_status:
             self.robot_status.update(robot_status)
 
@@ -148,7 +146,6 @@ class RobotView(QScrollArea):
             self.robot_view_widgets.append(robot_view_widget)
             self.layout.addWidget(robot_view_widget)
             self.robot_last_crash_time_s.append(0)
-
 
         # ignore repeated crash proto
         self.ROBOT_CRASH_TIMEOUT_S = 5
