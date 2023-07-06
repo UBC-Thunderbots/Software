@@ -1,4 +1,4 @@
-#include "software/ai/hl/stp/play/free_kick_play.h"
+#include "software/ai/hl/stp/play/free_kick/free_kick_play.h"
 
 #include <gtest/gtest.h>
 

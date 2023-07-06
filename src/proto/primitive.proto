@@ -45,6 +45,8 @@ enum MotionConstraint
     AVOID_BALL_PLACEMENT_INTERFERENCE = 8 [(dynamic) = true];
     // The enemy half of the field without the centre circle
     ENEMY_HALF_WITHOUT_CENTRE_CIRCLE = 9;
+    // The friendly goal
+    FRIENDLY_GOAL = 10;
 }
 
 message MotionControl
@@ -71,6 +73,8 @@ enum MaxAllowedSpeedMode
     STOP_COMMAND = 1;
     // Move at speed at which collisions are allowed
     COLLISIONS_ALLOWED = 2;
+    // Move at lower speed limit while dribbling
+    CLOSE_CONTROL = 3;
 }
 
 message AutoChipOrKick

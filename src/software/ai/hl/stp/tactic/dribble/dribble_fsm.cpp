@@ -110,7 +110,7 @@ void DribbleFSM::dribble(const Update &event)
         CREATE_MOTION_CONTROL(target_destination), target_orientation, 0, true,
         TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
         AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
-        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
+        TbotsProto::MaxAllowedSpeedMode::CLOSE_CONTROL, 0.0,
         event.common.robot.robotConstants(), 0.0));
 }
 

@@ -24,6 +24,29 @@ Terminate:::terminate --> Terminate:::terminate
 
 ```
 
+## [BallPlacementPlayFSM](/src/software/ai/hl/stp/play/ball_placement/ball_placement_play_fsm.h)
+
+```mermaid
+
+stateDiagram-v2
+classDef terminate fill:white,color:black,font-weight:bold
+direction LR
+[*] --> StartState
+StartState --> KickOffWallState : [shouldKickOffWall]
+[*] --> StartState
+StartState --> PlaceBallState : [!shouldKickOffWall]
+KickOffWallState --> PlaceBallState : [!shouldKickOffWall]
+KickOffWallState --> KickOffWallState : [!kickDone]\n<i>kickOffWall</i>
+KickOffWallState --> StartState : [kickDone]
+PlaceBallState --> StartState : [shouldKickOffWall]
+PlaceBallState --> PlaceBallState : [!ballPlaced]\n<i>placeBall</i>
+PlaceBallState --> RetreatState : [ballPlaced]\n<i>retreat</i>
+RetreatState --> StartState : [!ballPlaced]
+RetreatState --> Terminate:::terminate : [ballPlaced]\n<i>retreat</i>
+Terminate:::terminate --> StartState : [!ballPlaced]
+
+```
+
 ## [CreaseDefensePlayFSM](/src/software/ai/hl/stp/play/crease_defense/crease_defense_play_fsm.h)
 
 ```mermaid
@@ -47,6 +70,29 @@ direction LR
 [*] --> DefenseState
 DefenseState --> DefenseState : <i>defendAgainstThreats</i>
 Terminate:::terminate --> Terminate:::terminate
+
+```
+
+## [FreeKickPlayFSM](/src/software/ai/hl/stp/play/free_kick/free_kick_play_fsm.h)
+
+```mermaid
+
+stateDiagram-v2
+classDef terminate fill:white,color:black,font-weight:bold
+direction LR
+[*] --> SetupPositionState
+SetupPositionState --> SetupPositionState : [!setupDone]\n<i>setupPosition</i>
+SetupPositionState --> ShootState : [shotFound]
+ShootState --> ShootState : [!shotDone]\n<i>shootBall</i>
+ShootState --> Terminate:::terminate : [shotDone]
+SetupPositionState --> AttemptPassState : <i>startLookingForPass</i>
+AttemptPassState --> ChipState : [timeExpired]
+AttemptPassState --> AttemptPassState : [!passFound]\n<i>lookForPass</i>
+AttemptPassState --> PassState : [passFound]
+PassState --> PassState : [!passDone]\n<i>passBall</i>
+PassState --> Terminate:::terminate : [passDone]
+ChipState --> ChipState : [!chipDone]\n<i>chipBall</i>
+ChipState --> Terminate:::terminate : [chipDone]
 
 ```
 

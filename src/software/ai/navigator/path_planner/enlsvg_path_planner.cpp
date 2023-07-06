@@ -70,8 +70,8 @@ std::optional<Path> EnlsvgPathPlanner::findPath(const Point &start,
     EnlsvgPoint enlsvg_end   = convertPointToEnlsvgPoint(end);
 
     // closest unblocked points to requested start and end
-    auto new_start = findClosestUnblockedEnlsvgPoint(enlsvg_start);
-    auto new_end   = findClosestUnblockedEnlsvgPoint(enlsvg_end);
+    auto new_start = findClosestUnblockedEnlsvgPoint(enlsvg_start, enlsvg_end);
+    auto new_end   = findClosestUnblockedEnlsvgPoint(enlsvg_end, enlsvg_start);
 
     if (new_start == std::nullopt || new_end == std::nullopt)
     {
@@ -168,7 +168,8 @@ std::optional<Path> EnlsvgPathPlanner::convertEnlsvgPathToPath(const EnlsvgPath 
 }
 
 std::optional<EnlsvgPathPlanner::EnlsvgPoint>
-EnlsvgPathPlanner::findClosestUnblockedEnlsvgPoint(const EnlsvgPoint &ep) const
+EnlsvgPathPlanner::findClosestUnblockedEnlsvgPoint(const EnlsvgPoint &ep,
+                                                   const EnlsvgPoint &other_point) const
 {
     // Try to short circuit
     if (!isBlocked(ep))
@@ -195,6 +196,18 @@ EnlsvgPathPlanner::findClosestUnblockedEnlsvgPoint(const EnlsvgPoint &ep) const
                                       {test_coord.x, test_coord.y - 1},
                                       {test_coord.x, test_coord.y + 1},
                                       {test_coord.x - 1, test_coord.y}};
+
+        // Order based on whichever point is closer to the other point we are coming
+        // from/going to. This should help reduce the chance of the starting point moving
+        // away from the end point (or vise versa), thus reducing the bug where robots get
+        // stuck in the corner of the defense area moving back and forth due to the start
+        // point being blocked.
+        std::sort(std::begin(next_coords), std::end(next_coords),
+                  [other_point](const EnlsvgPoint &a, const EnlsvgPoint &b) {
+                      return std::hypot(a.x - other_point.x, a.y - other_point.y) <
+                             std::hypot(b.x - other_point.x, b.y - other_point.y);
+                  });
+
         for (auto &next_coord : next_coords)
         {
             if (isCoordNavigable(next_coord) && visited.count(next_coord) == 0)
