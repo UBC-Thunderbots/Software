@@ -35,9 +35,9 @@ void CreaseDefenderTactic::updateControlParams(
     TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode,
     bool is_currently_in_possession)
 {
-    control_params.enemy_threat_origin       = enemy_threat_origin;
-    control_params.crease_defender_alignment = alignment;
-    control_params.max_allowed_speed_mode    = max_allowed_speed_mode;
+    control_params.enemy_threat_origin        = enemy_threat_origin;
+    control_params.crease_defender_alignment  = alignment;
+    control_params.max_allowed_speed_mode     = max_allowed_speed_mode;
     control_params.is_currently_in_possession = is_currently_in_possession;
 }
 

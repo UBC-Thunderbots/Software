@@ -51,7 +51,7 @@ class CreaseDefenderTactic : public Tactic
                              const TbotsProto::CreaseDefenderAlignment &alignment,
                              TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode =
                                  TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
-                                 bool is_currently_in_possession=false);
+                             bool is_currently_in_possession = false);
 
     void accept(TacticVisitor &visitor) const override;
 
