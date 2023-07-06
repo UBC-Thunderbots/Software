@@ -706,6 +706,15 @@ Vector HRVOAgent::computePreferredVelocity(Duration time_step)
     output = output.rotate(-angular_velocity * time_step.toSeconds() *
                            ANGULAR_VELOCITY_COMPENSATION_MULTIPLIER);
 
+
+//    LOG(PLOTJUGGLER) << *createPlotJugglerValue({
+//            {std::to_string(robot_id) + "_x", position.x()},
+//            {std::to_string(robot_id) + "_y", position.y()},
+//            {std::to_string(robot_id) + "_t", orientation.toRadians()},
+//            {std::to_string(robot_id) + "_vx_pref", output.x()},
+//            {std::to_string(robot_id) + "_vy_pref", output.y()},
+//    });
+
     return localToGlobalVelocity(output, orientation);
 }
 
