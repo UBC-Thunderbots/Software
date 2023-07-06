@@ -50,25 +50,35 @@ std::optional<Point> CreaseDefenderFSM::findBlockThreatPoint(
     }
 
     // Step along the defense area perimeter if the alignment is not centre
+    std::optional<Point> stepped_block_threat_point = std::nullopt;
     if (crease_defender_alignment == TbotsProto::CreaseDefenderAlignment::LEFT)
     {
-        auto stepped_block_threat_point = stepAlongPerimeter(
+        stepped_block_threat_point = stepAlongPerimeter(
             inflated_defense_area, block_threat_point, 
             -ROBOT_MAX_RADIUS_METERS * 2);
-        if (stepped_block_threat_point)
-        {
-            block_threat_point = stepped_block_threat_point.value();
-        }
     }
     else if (crease_defender_alignment == TbotsProto::CreaseDefenderAlignment::RIGHT)
     {
-        auto stepped_block_threat_point = stepAlongPerimeter(
+        stepped_block_threat_point = stepAlongPerimeter(
             inflated_defense_area, block_threat_point, 
             ROBOT_MAX_RADIUS_METERS * 2);
-        if (stepped_block_threat_point)
-        {
-            block_threat_point = stepped_block_threat_point.value();
-        }
+    }
+    else if (crease_defender_alignment == TbotsProto::CreaseDefenderAlignment::FAR_LEFT)
+    {
+        stepped_block_threat_point = stepAlongPerimeter(
+            inflated_defense_area, block_threat_point, 
+            -ROBOT_MAX_RADIUS_METERS * 4);
+    }
+    else if (crease_defender_alignment == TbotsProto::CreaseDefenderAlignment::FAR_RIGHT)
+    {
+        stepped_block_threat_point = stepAlongPerimeter(
+            inflated_defense_area, block_threat_point, 
+            ROBOT_MAX_RADIUS_METERS * 4);
+    }
+
+    if (stepped_block_threat_point)
+    {
+        block_threat_point = stepped_block_threat_point.value();
     }
 
     return block_threat_point;
