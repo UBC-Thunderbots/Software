@@ -13,8 +13,8 @@ void AttackerFSM::pivotKick(const Update& event,
     PivotKickFSM::ControlParams control_params{
         .kick_origin       = ball_position,
         .kick_direction    = (chip_target - ball_position).orientation(),
-        .auto_chip_or_kick = AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP,
-                                            (chip_target - ball_position).length()}};
+        .auto_chip_or_kick = AutoChipOrKick{AutoChipOrKickMode::AUTOKICK,
+                                            BALL_MAX_SPEED_METERS_PER_SECOND}};
 
     if (event.control_params.shot)
     {

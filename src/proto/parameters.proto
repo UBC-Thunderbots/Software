@@ -153,6 +153,10 @@ message GoalieTacticConfig
     // defense area crease
     required double min_chip_distance_from_crease_meters = 8
         [default = 2, (bounds).min_double_value = 0.0, (bounds).max_double_value = 10.0];
+    // Distance threshold multiplier used for calculating whether not an enemy robot
+    // is a safe distance away
+    required double safe_distance_multiplier = 9
+        [default = 2, (bounds).min_double_value = 0.0, (bounds).max_double_value = 10.0];
 }
 
 message DribbleTacticConfig
@@ -269,7 +273,7 @@ message SensorFusionConfig
 
     // The id of the friendly goalie
     required int32 friendly_goalie_id = 5
-        [default = 0, (bounds).min_int_value = 0, (bounds).max_int_value = 16];
+        [default = 1, (bounds).min_int_value = 0, (bounds).max_int_value = 16];
 
     // The id of the enemy goalie
     required int32 enemy_goalie_id = 6

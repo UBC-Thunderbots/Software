@@ -59,6 +59,7 @@ void PrimitiveExecutor::updateVelocity(const Vector &local_velocity,
     {
         return;
     }
+    LOG(DEBUG) << "Robot actual velocity = " << local_velocity.length();
 
     Vector curr_hrvo_velocity = hrvo_simulator_.getRobotVelocity(robot_id_);
     Vector actual_global_velocity =

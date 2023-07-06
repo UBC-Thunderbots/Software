@@ -28,7 +28,7 @@ std::list<g3::LogMessage> LogMerger::log(g3::LogMessage &log)
         repeat_map[msg] = 0;
         message_list.push_back(Message(log, msg, current_time));
 
-        messages_to_log.push_front(log);
+        messages_to_log.push_back(log);
         return messages_to_log;
     }
     else
