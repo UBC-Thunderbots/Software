@@ -43,7 +43,7 @@ RobotNavigationObstacleFactory::createStaticObstaclesFromMotionConstraint(
         {
             obstacles.push_back(createFromFieldRectangle(field.enemyDefenseArea(),
                                                          field.fieldLines(),
-                                                         field.fieldBoundary(), 0.3));
+                                                         field.fieldBoundary(), 0.15));
         }
         break;
         case TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA:

@@ -273,7 +273,7 @@ message SensorFusionConfig
 
     // The id of the friendly goalie
     required int32 friendly_goalie_id = 5
-        [default = 0, (bounds).min_int_value = 0, (bounds).max_int_value = 16];
+        [default = 1, (bounds).min_int_value = 0, (bounds).max_int_value = 16];
 
     // The id of the enemy goalie
     required int32 enemy_goalie_id = 6
