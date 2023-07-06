@@ -182,7 +182,7 @@ void CreaseDefenderFSM::chipAway(const Update &event)
                 0.0, false,
                 TbotsProto::DribblerMode::MAX_FORCE,
                 TbotsProto::BallCollisionType::ALLOW,
-                AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
+                AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, 100},
                 TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
                 event.common.robot.robotConstants(), 0.0));
 }
