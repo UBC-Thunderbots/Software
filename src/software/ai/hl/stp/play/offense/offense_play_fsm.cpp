@@ -10,7 +10,8 @@ OffensePlayFSM::OffensePlayFSM(TbotsProto::AiConfig ai_config)
 bool OffensePlayFSM::enemyHasPossession(const Update& event)
 {
     TeamPossession possession = event.common.world.getTeamWithPossession();
-    return (possession == TeamPossession::ENEMY_TEAM);
+    return (possession == TeamPossession::ENEMY_TEAM) ||
+           (possession == TeamPossession::STAGNANT_ENEMY_TEAM);
 }
 
 void OffensePlayFSM::setupOffensiveStrategy(const Update& event)

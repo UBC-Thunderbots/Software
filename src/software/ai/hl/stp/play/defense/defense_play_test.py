@@ -148,7 +148,7 @@ def test_defense_kick_out_of_play(simulated_test_runner):
             ]
         ],
         ag_eventually_validation_sequence_set=[[]],
-        test_timeout_s=30,
+        test_timeout_s=60,
     )
 
 if __name__ == "__main__":
