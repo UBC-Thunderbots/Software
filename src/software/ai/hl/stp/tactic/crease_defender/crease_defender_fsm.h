@@ -27,6 +27,7 @@ struct CreaseDefenderFSM
         TbotsProto::CreaseDefenderAlignment crease_defender_alignment;
         // The maximum allowed speed mode
         TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode;
+        bool is_currently_in_possession;
     };
 
     // this struct defines the only event that the CreaseDefenderFSM responds to
@@ -126,6 +127,6 @@ struct CreaseDefenderFSM
 
     TbotsProto::RobotNavigationObstacleConfig robot_navigation_obstacle_config;
 
-    static constexpr double ENEMY_THREATS_CLOSE_THRESHOLD_M = 0.015;
+    static constexpr double ENEMY_THREATS_CLOSE_THRESHOLD_M = 0.15;
     static constexpr double BALL_CLOSE_THRESHOLD_M = 0.05;
 };

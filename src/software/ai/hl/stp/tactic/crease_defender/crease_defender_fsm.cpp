@@ -56,6 +56,25 @@ void CreaseDefenderFSM::blockThreat(
     {
         ball_collision_type = TbotsProto::BallCollisionType::AVOID;
     }
+    if (event.control_params.is_currently_in_possession
+            && std::any_of(event.common.world.friendlyTeam().getAllRobots().begin(),
+                event.common.world.friendlyTeam().getAllRobots().end(),
+                [&event](const Robot &robot)
+                {
+                    return robot.isNearDribbler(event.common.world.ball().position());
+                })
+            && event.common.robot.isNearDribbler(event.common.world.ball().position(), ROBOT_MAX_RADIUS_METERS))
+    {
+        if (event.control_params.crease_defender_alignment == TbotsProto::CreaseDefenderAlignment::LEFT || 
+                (event.common.robot.position() - event.common.world.ball().position()).x() < 0)
+        {
+            destination = destination + Vector(0, ROBOT_MAX_RADIUS_METERS);
+        }
+        else
+        {
+            destination = destination + Vector(0, -ROBOT_MAX_RADIUS_METERS);
+        }
+    }
 
     MoveFSM::ControlParams control_params{
         .destination         = destination,

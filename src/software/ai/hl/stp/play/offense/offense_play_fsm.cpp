@@ -44,7 +44,7 @@ void OffensePlayFSM::setupOffensiveStrategy(const Update& event)
 
     num_shoot_or_pass = event.common.num_tactics - num_defenders;
 
-    setTactics(event, num_shoot_or_pass, num_defenders);
+    setTactics(event, num_shoot_or_pass, num_defenders, true);
 }
 
 bool OffensePlayFSM::overbalancedFriendlyRobotsInFriendlyHalf(const World &world)
@@ -66,7 +66,7 @@ void OffensePlayFSM::setupDefensiveStrategy(const Update& event)
 }
 
 void OffensePlayFSM::setTactics(const Update& event, int num_shoot_or_pass,
-                                int num_defenders)
+                                int num_defenders, bool is_currently_in_possession)
 {
     PriorityTacticVector tactics_to_return;
 

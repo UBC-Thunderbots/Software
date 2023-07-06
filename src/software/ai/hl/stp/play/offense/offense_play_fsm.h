@@ -59,7 +59,7 @@ struct OffensePlayFSM
      * @param num_shoot_or_pass the number of attackers (ShootOrPassPlay)
      * @param num_defenders the number of defenders (DefensePlay)
      */
-    void setTactics(const Update& event, int num_shoot_or_pass, int num_defenders);
+    void setTactics(const Update& event, int num_shoot_or_pass, int num_defenders, bool is_currently_in_possession=false);
 
     auto operator()()
     {
