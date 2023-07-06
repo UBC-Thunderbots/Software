@@ -20,7 +20,7 @@ void PivotKickFSM::getPossessionAndPivot(
 void PivotKickFSM::kickBall(const Update& event)
 {
     event.common.set_primitive(createMovePrimitive(
-        CREATE_MOTION_CONTROL(event.control_params.kick_origin),
+        CREATE_MOTION_CONTROL(event.common.world.ball().position()),
         event.control_params.kick_direction, 0, false, TbotsProto::DribblerMode::OFF,
         TbotsProto::BallCollisionType::ALLOW, event.control_params.auto_chip_or_kick,
         TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,

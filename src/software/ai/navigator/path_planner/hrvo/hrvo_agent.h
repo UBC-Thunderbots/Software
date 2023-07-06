@@ -28,7 +28,7 @@
 
 class HRVOAgent : public Agent
 {
-   public:
+public:
     /**
      * Constructor
      *
@@ -94,7 +94,7 @@ class HRVOAgent : public Agent
      * @param robots the robots in simulation
      */
     void computeVelocityObstacles(
-        const std::map<RobotId, std::shared_ptr<Agent>> &robots);
+            const std::map<RobotId, std::shared_ptr<Agent>> &robots);
 
 
     /**
@@ -113,7 +113,7 @@ class HRVOAgent : public Agent
      * @return a list of the closest robot ids referencing agents in the simulation
      */
     std::vector<RobotId> computeNeighbors(
-        const std::map<RobotId, std::shared_ptr<Agent>> &robots);
+            const std::map<RobotId, std::shared_ptr<Agent>> &robots);
 
 
     /**
@@ -147,7 +147,7 @@ class HRVOAgent : public Agent
      */
     class CandidateVelocity
     {
-       public:
+    public:
         /**
          * Constructor. all candidate velocities occur at the intersections of vo's.
          * @param velocity the velocity for this candidate
@@ -155,7 +155,7 @@ class HRVOAgent : public Agent
          * @param index_2 the index of the second intersecting velocity obstacle
          */
         explicit CandidateVelocity(Vector velocity, int index_1, int index_2)
-            : velocity(velocity), obstacle_indexes(std::pair(index_1, index_2))
+                : velocity(velocity), obstacle_indexes(std::pair(index_1, index_2))
         {
         }
 
@@ -180,7 +180,7 @@ class HRVOAgent : public Agent
      * intersect any
      */
     std::optional<int> findIntersectingVelocityObstacle(
-        const CandidateVelocity &candidate) const;
+            const CandidateVelocity &candidate) const;
 
 
     /**
@@ -225,7 +225,7 @@ class HRVOAgent : public Agent
     bool isCandidateFasterThanCurrentSpeed(const CandidateVelocity &candidate) const;
 
 
-   protected:
+protected:
     RobotNavigationObstacleFactory obstacle_factory;
     std::vector<VelocityObstacle> velocity_obstacles;
     std::vector<ObstaclePtr> static_obstacles;
@@ -246,7 +246,7 @@ class HRVOAgent : public Agent
     static constexpr double LINEAR_VELOCITY_MAX_PID_OFFSET = 0.3;
 
     // Proportional constant used for calculating the desired angular velocity
-    static constexpr double ANGULAR_VELOCITY_KP = 3.5;
+    static constexpr double ANGULAR_VELOCITY_KP = 4.5;
 
     // Compensation constant added to stop the robots from swinging when turning and
     // moving in a linear line. This is defined as a multiplier of the angular velocity

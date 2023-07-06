@@ -113,6 +113,25 @@ def configure_robot_view_diagnostics(diagnostics_proto_unix_io):
     )
 
 
+
+def configure_robot_view_replay(replay_proto_unix_io):
+    """
+    Returns Widget Data for the Robot View Widget for Replay
+    :param replay_proto_unix_io: the proto unix io key to configure the widget with
+    :return: the widget data
+    """
+    return TScopeWidget(
+        name="Robot View",
+        widget=setup_robot_view(
+            **{
+                "proto_unix_io": replay_proto_unix_io,
+                "available_control_modes": [IndividualRobotMode.NONE,],
+            }
+        ),
+        anchor="Logs",
+        position="above",
+    )
+
 def configure_estop(proto_unix_io):
     """
     Returns Widget Data for the Estop widget
@@ -477,6 +496,19 @@ def configure_replay_view(
                                 False if not
     :return: the Thunderscope Config for this view
     """
+
+    def get_extra_widgets(proto_unix_io):
+        """
+        Gets the extra widgets for the fullsystem tab
+        :param proto_unix_io: the proto unix io to configure widgets with
+        :return: list of widget data for the extra widgets
+        """
+        extra_widgets = (
+            [configure_cost_vis(proto_unix_io)] if cost_visualization else []
+        )
+        extra_widgets.append(configure_robot_view_replay(proto_unix_io))
+        return extra_widgets
+
     proto_unix_io_map = {ProtoUnixIOTypes.SIM: ProtoUnixIO()}
     tabs = []
 
@@ -496,13 +528,9 @@ def configure_replay_view(
                     replay=True,
                     replay_log=blue_replay_log,
                     visualization_buffer_size=visualization_buffer_size,
-                    extra_widgets=[
-                        configure_cost_vis(proto_unix_io_map[ProtoUnixIOTypes.BLUE]),
-                        # configure_robot_view_fullsystem(proto_unix_io_map[ProtoUnixIOTypes.BLUE]),
-                        # configure_estop(proto_unix_io_map[ProtoUnixIOTypes.BLUE])
-                    ]
-                    if cost_visualization
-                    else [],
+                    extra_widgets=get_extra_widgets(
+                        proto_unix_io_map[ProtoUnixIOTypes.BLUE]
+                    ),
                 ),
             )
         )
@@ -522,13 +550,9 @@ def configure_replay_view(
                     replay=True,
                     replay_log=yellow_replay_log,
                     visualization_buffer_size=visualization_buffer_size,
-                    extra_widgets=[
-                        configure_cost_vis(proto_unix_io_map[ProtoUnixIOTypes.YELLOW]),
-                        # configure_robot_view_fullsystem(proto_unix_io_map[ProtoUnixIOTypes.YELLOW]),
-                        # configure_estop(proto_unix_io_map[ProtoUnixIOTypes.YELLOW])
-                    ]
-                    if cost_visualization
-                    else [],
+                    extra_widgets=get_extra_widgets(
+                        proto_unix_io_map[ProtoUnixIOTypes.YELLOW]
+                    ),
                 ),
             )
         )

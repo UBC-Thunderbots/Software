@@ -281,7 +281,7 @@ void HRVOAgent::computeNewAngularVelocity(Duration time_step)
     // Clamp acceleration
     double delta_angular_velocity = (pid_angular_velocity - angular_velocity).toRadians();
     double max_accel        = max_angular_accel * time_step.toSeconds();
-    max_accel *= std::clamp(1.0 - (2 * velocity.length() / max_speed), 0.0, 1.0);
+    max_accel *= std::clamp(1.0 - (1 * velocity.length() / max_speed), 0.0, 1.0);
     const double clamped_delta_angular_velocity =
         std::clamp(delta_angular_velocity, -max_accel, max_accel);
 
@@ -663,7 +663,7 @@ Vector HRVOAgent::computePreferredVelocity(Duration time_step)
         // was 0.25m. More detail about the tests can be found on Notion from Apr 28,
         // 2023.
         double distance_for_kp      = std::max(0.25, local_error.length());
-        kp                          = 2.0 / (distance_for_kp + 0.2) + 0.9;
+        kp                          = 2.3 / (distance_for_kp + 0.4) + 1.5;
         prev_dynamic_kp_destination = destination;
     }
 
