@@ -30,6 +30,7 @@ struct ReceiverFSM
     // The minimum proportion of open net we're shooting on vs the entire size of the net
     // that we require before attempting a shot
     static constexpr double MIN_SHOT_NET_PERCENT_OPEN = 0.07;
+    static constexpr double MIN_SHOT_NET_PERCENT_OPEN = 0.08;
     static constexpr double MIN_PASS_START_SPEED      = 0.02;
     static constexpr double BALL_MIN_MOVEMENT_SPEED   = 0.04;
 

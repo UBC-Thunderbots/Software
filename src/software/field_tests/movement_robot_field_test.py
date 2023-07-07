@@ -154,7 +154,7 @@ import math
 
 
 def test_one_robots_foward_back(field_test_runner):
-    id1 = 1
+    id1 = 5
 
     world = field_test_runner.world_buffer.get(block=True, timeout=WORLD_BUFFER_TIMEOUT)
     print("Here are the robots:")
@@ -166,20 +166,20 @@ def test_one_robots_foward_back(field_test_runner):
     )
 
     tactic_pos_y = MoveTactic(
-        destination=Point(x_meters=1.5, y_meters=2.5),
+        destination=Point(x_meters=1.5, y_meters=-2.5),
         final_speed=0.0,
         dribbler_mode=DribblerMode.OFF,
-        final_orientation=Angle(radians=math.pi),
+        final_orientation=Angle(radians=math.pi / 2),
         ball_collision_type=BallCollisionType.ALLOW,
         auto_chip_or_kick=AutoChipOrKick(autokick_speed_m_per_s=0.0),
         max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT,
         target_spin_rev_per_s=0.0,
     )
     tactic_neg_y = MoveTactic(
-        destination=Point(x_meters=1.5, y_meters=1.5),
+        destination=Point(x_meters=1.5, y_meters=2.5),
         final_speed=0.0,
         dribbler_mode=DribblerMode.OFF,
-        final_orientation=Angle(radians=0),
+        final_orientation=Angle(radians=-math.pi / 2),
         ball_collision_type=BallCollisionType.ALLOW,
         auto_chip_or_kick=AutoChipOrKick(autokick_speed_m_per_s=0.0),
         max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT,
@@ -196,7 +196,7 @@ def test_one_robots_foward_back(field_test_runner):
         field_test_runner.run_test(
             always_validation_sequence_set=[[]],
             eventually_validation_sequence_set=[[]],
-            test_timeout_s=0.8,
+            test_timeout_s=4,
         )
 
     # Send a stop tactic after the test finishes

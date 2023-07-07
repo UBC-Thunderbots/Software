@@ -127,6 +127,8 @@ struct CreaseDefenderFSM
 
     TbotsProto::RobotNavigationObstacleConfig robot_navigation_obstacle_config;
 
-    static constexpr double ENEMY_THREATS_CLOSE_THRESHOLD_M = 0.015;
+    static constexpr double ENEMY_THREATS_CLOSE_THRESHOLD_M = 0.15;
     static constexpr double BALL_CLOSE_THRESHOLD_M          = 0.05;
+
+    bool isSafeToChipForward(const Update& event);
 };
