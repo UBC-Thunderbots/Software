@@ -45,9 +45,9 @@ std::queue<DefenderAssignment> getAllDefenderAssignments(
         auto lane =
             Segment(primary_threat_position, filtered_threats.at(i).robot.position());
         double threat_rating = static_cast<double>(filtered_threats.size()) - i;
-        passing_lanes.emplace_back(ShootingLane{lane, threat_rating, filtered_threats.at(i)});
+        passing_lanes.emplace_back(ShootingLane{lane, threat_rating});
         assignments.emplace_back(
-            DefenderAssignment{PASS_DEFENDER, lane.midPoint(), threat_rating, filtered_threats.at(i)});
+            DefenderAssignment(PASS_DEFENDER, lane.midPoint(), threat_rating));
     }
 
     // Construct goal lanes.
@@ -71,7 +71,7 @@ std::queue<DefenderAssignment> getAllDefenderAssignments(
         double threat_rating = (static_cast<double>(relevant_threats.size()) - i) *
                                config.goal_lane_threat_multiplier();
         auto angle_to_goal = lane.reverse().toVector().orientation();
-        goal_lanes.emplace_back(GoalLane{{lane, threat_rating, relevant_threats.at(i)}, angle_to_goal});
+        goal_lanes.emplace_back(GoalLane{{lane, threat_rating}, angle_to_goal});
     }
 
     auto grouped_goal_lanes =
@@ -90,8 +90,6 @@ std::queue<DefenderAssignment> getAllDefenderAssignments(
 
         for (const auto &goal_lane : goal_lanes_group)
         {
-            EnemyThreat enemy_threat = goal_lane.enemy_threat;
-
             const Point threat_position = goal_lane.lane.getStart();
             double coverage_rating = goal_lane.threat_rating + nondense_bonus;
 
@@ -99,7 +97,7 @@ std::queue<DefenderAssignment> getAllDefenderAssignments(
             // of the originating enemy threat to cooperate with control
             // params for CreaseDefenderTactic
             assignments.emplace_back(
-                DefenderAssignment{CREASE_DEFENDER, threat_position, coverage_rating, enemy_threat});
+                DefenderAssignment(CREASE_DEFENDER, threat_position, coverage_rating));
         }
     }
 

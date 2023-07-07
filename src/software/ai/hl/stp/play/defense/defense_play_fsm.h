@@ -74,7 +74,7 @@ struct DefensePlayFSM
      * @param event the FSM event
      * @param threats_to_shadow the enemy threats to shadow
      */
-    void updateShadowers(const Update& event, const std::vector<DefenderAssignment> &threats_to_shadow);
+    void updateShadowers(const Update& event, const std::vector<EnemyThreat> &threats_to_shadow);
 
     /**
      * Helper function to set up crease defender tactic vector members
@@ -142,8 +142,9 @@ struct DefensePlayFSM
 
     std::vector<DefenderAssignment> crease_defender_assignments;
     std::vector<DefenderAssignment> pass_defender_assignments;
-
     std::vector<std::shared_ptr<ShadowEnemyTactic>> shadowers;
+
+    std::queue<DefenderAssignment> defender_assignments_q;
 
     std::optional<DefenderAssignment> highest_cov_rating_assignment;
 };

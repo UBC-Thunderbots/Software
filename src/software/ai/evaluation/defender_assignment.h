@@ -30,13 +30,25 @@ struct DefenderAssignment
     // to block high-danger enemy scoring chances or passes
     double coverage_rating;
 
-    EnemyThreat enemy_threat;
-
     // Equality operator for unit testing.
     bool operator==(const DefenderAssignment &other) const
     {
         return this->type == other.type && this->target == other.target &&
                this->coverage_rating == other.coverage_rating;
+    }
+
+    DefenderAssignment(const DefenderAssignment& defender_assignment)
+        : type(defender_assignment.type),
+        target(defender_assignment.target),
+        coverage_rating(defender_assignment.coverage_rating)
+    {
+    }
+
+    DefenderAssignment(DefenderAssignmentType type, Point target, double coverage_rating)
+        : type(type),
+        target(target),
+        coverage_rating(coverage_rating)
+    {
     }
 };
 
@@ -54,8 +66,6 @@ struct ShootingLane
     // of the lane relative to other lanes (i.e. how likely a pass or shot
     // along the lane will eventually result in the enemy team scoring)
     double threat_rating;
-
-    EnemyThreat enemy_threat;
 
     // Equality operator for unit testing.
     bool operator==(const ShootingLane &other) const
